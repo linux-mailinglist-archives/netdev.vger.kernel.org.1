@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-237795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC312C50485
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 03:01:36 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DEB3C504A0
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 03:04:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01DB13B311A
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:01:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1541A4F0F21
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF31C296BD8;
-	Wed, 12 Nov 2025 02:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1575929B8DD;
+	Wed, 12 Nov 2025 02:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AotoBcY4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZRBGDHvT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8592127F4F5;
-	Wed, 12 Nov 2025 02:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7F227F4F5;
+	Wed, 12 Nov 2025 02:00:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762912844; cv=none; b=mT+dj3m9XaE9yy/3Q21XR4PDKr7EVAiZuETtrY16X2pVNEmcQqRmdEOGDCg15p+z23zfBCcLKnIOkPVPz3pJD1UGsjwy3CRQti5Nyh//49CTZxdf7tgOtET0w3iNTBhZatKLH9oxH1YdrUDFnaFACktlCFSRygtm77OxM+I3dJM=
+	t=1762912853; cv=none; b=aZ6BPTcCpZVq7J8YPsnfFsGnaZfLfPh3yR8jHCTZdYKcLl1od9/pGyW2/NnGWiQocR9MEfSoR8CMcsVQgZHq3vEQjFoPtMqwGzniQxsQNLpP/mdeWfUDDCZd52P93uzMB9AtvrZ8aEW1YErNjQc0tL9dKipUvL2n+XHx3T9me9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762912844; c=relaxed/simple;
-	bh=XdsqchhmGoFR89yJXh5BrLRPg9oo7WDQ7HA8Mm5p5ko=;
+	s=arc-20240116; t=1762912853; c=relaxed/simple;
+	bh=bmOHQWtKrHPntI9DeDNIWpuAgYazNgi4duLqiFfEnvQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tCjRz9Td9nx6Ol1BZlA8ftbiLYof3d3EQshe8VciZpOr7FQyjvA5oNc/vM+sIU4OBBO0mHWAc1q36xOGDefbMnFA/sxDxiZ9waHjDUpl8AitEQ5ugVXHNLIKlz4JQgp9DJz1mbUo0xh9vI8mOxV8Dm9pvEIafIu3dbn+upc+Kc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AotoBcY4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07324C113D0;
-	Wed, 12 Nov 2025 02:00:44 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=sFjEpFMLojTM4bRLX0yD9PYN03fOx8ln4rRf513gn6R7QBrL6DRh8UQ4woDWcVPcn24lltkdCNLD42/A1GDezW2tnUgPfeBYYfzVSoHpdw/5kLS+82tw84fBKzoHLzNsglps0EFAdwa5O66OcUlkCs+0SICMkwxOVVNmkxwtcH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZRBGDHvT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73DCEC16AAE;
+	Wed, 12 Nov 2025 02:00:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762912844;
-	bh=XdsqchhmGoFR89yJXh5BrLRPg9oo7WDQ7HA8Mm5p5ko=;
+	s=k20201202; t=1762912852;
+	bh=bmOHQWtKrHPntI9DeDNIWpuAgYazNgi4duLqiFfEnvQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AotoBcY499NUpQYjMcABVOsQ8685hDeM2RO/dgqm/e3u5JQBO4DpoLlo2kqPVXrHw
-	 IFEVg9gyeQRAokblZeFjricNzlSfbHwRnxApsjwDzOjOxBFAf4UpwomW7WCFvM1wXX
-	 sCNZK2M5b8qlO2V7PzNHmNppNpsMCFUAp75fvHByidkY4bAFBhhkeox8HWrlZSbTSy
-	 bPVOtymAa8B0RDdVZOvpM+Ura4L+RiI1rrgfqdO7Z763KrnA3epgy+R90XAkg/Vjmx
-	 FwBDKgm/G/emaviaoTKqa7oh7WvUrydne/c4sA5z2W+vjwU1GhtktPRDTnTYgqcfZ+
-	 0YhrITjdIPKDA==
+	b=ZRBGDHvTwVZgG2vuUoyWLjDWMBOrtkEXeNMuDphzzKwHtO/pyy9jL/8NVquwpSRZ1
+	 KfVjxByxLTOEKWZHTSPhIXTBSxRzcXnCVRpw8ARkqLzpKHBF3UtnyPa/DfrotlKE1i
+	 M+hCq3y28JeymcTsVxEoJ6AuUmjElJM1px2jNRLX46fiUDLeqXOIdDhGaOfa0sdWnB
+	 ljT1dJHzE68dXgSzqrynRWRX7ksbPd79IJhNLIe2c220w2kfxAbXbUMbD7SMP0yueO
+	 h3QzdQ6cFb2vzkLjhkWM850fjp6KiLFQc5fLOY0S36PoTH4MAHHvb7uuBkXnN3F+p8
+	 lp5HfcCwv+RNg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EA8380DBCD;
-	Wed, 12 Nov 2025 02:00:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEA7380DBCD;
+	Wed, 12 Nov 2025 02:00:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,51 +52,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/6] selftests: mptcp: join: fix some flaky tests
+Subject: Re: [PATCH net-next v2] net: netcp: ethss: Fix type of first
+ parameter
+ in hwtstamp stubs
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176291281400.3632748.6310646970595796010.git-patchwork-notify@kernel.org>
-Date: Wed, 12 Nov 2025 02:00:14 +0000
+ <176291282249.3632748.2889753579213224698.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Nov 2025 02:00:22 +0000
 References: 
- <20251110-net-mptcp-sft-join-unstable-v1-0-a4332c714e10@kernel.org>
+ <20251110-netcp_ethss-fix-cpts-stubs-clang-wifpts-v2-1-aa6204ec1f43@kernel.org>
 In-Reply-To: 
- <20251110-net-mptcp-sft-join-unstable-v1-0-a4332c714e10@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- shuah@kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+ <20251110-netcp_ethss-fix-cpts-stubs-clang-wifpts-v2-1-aa6204ec1f43@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, nick.desaulniers+lkml@gmail.com,
+ morbo@google.com, justinstitt@google.com, vadim.fedorenko@linux.dev,
+ kory.maincent@bootlin.com, netdev@vger.kernel.org, llvm@lists.linux.dev,
+ patches@lists.linux.dev
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 10 Nov 2025 19:23:39 +0100 you wrote:
-> When looking at the recent CI results on NIPA and MPTCP CIs, a few MPTCP
-> Join tests are marked as unstable. Here are some fixes for that.
+On Mon, 10 Nov 2025 13:55:34 -0700 you wrote:
+> When building without CONFIG_TI_CPTS, there are a series of errors from
+> -Wincompatible-pointer-types:
 > 
-> - Patch 1: a small fix for mptcp_connect.sh, printing a note as
->   initially intended. For >=v5.13.
-> 
-> - Patch 2: avoid unexpected reset when closing subflows. For >= 5.13.
+>   drivers/net/ethernet/ti/netcp_ethss.c:3831:27: error: initialization of 'int (*)(void *, struct kernel_hwtstamp_config *)' from incompatible pointer type 'int (*)(struct gbe_intf *, struct kernel_hwtstamp_config *)' [-Wincompatible-pointer-types]
+>    3831 |         .hwtstamp_get   = gbe_hwtstamp_get,
+>         |                           ^~~~~~~~~~~~~~~~
+>   drivers/net/ethernet/ti/netcp_ethss.c:3831:27: note: (near initialization for 'gbe_module.hwtstamp_get')
+>   drivers/net/ethernet/ti/netcp_ethss.c:2758:19: note: 'gbe_hwtstamp_get' declared here
+>    2758 | static inline int gbe_hwtstamp_get(struct gbe_intf *gbe_intf,
+>         |                   ^~~~~~~~~~~~~~~~
+>   drivers/net/ethernet/ti/netcp_ethss.c:3832:27: error: initialization of 'int (*)(void *, struct kernel_hwtstamp_config *, struct netlink_ext_ack *)' from incompatible pointer type 'int (*)(struct gbe_intf *, struct kernel_hwtstamp_config *, struct netlink_ext_ack *)' [-Wincompatible-pointer-types]
+>    3832 |         .hwtstamp_set   = gbe_hwtstamp_set,
+>         |                           ^~~~~~~~~~~~~~~~
+>   drivers/net/ethernet/ti/netcp_ethss.c:3832:27: note: (near initialization for 'gbe_module.hwtstamp_set')
+>   drivers/net/ethernet/ti/netcp_ethss.c:2764:19: note: 'gbe_hwtstamp_set' declared here
+>    2764 | static inline int gbe_hwtstamp_set(struct gbe_intf *gbe_intf,
+>         |                   ^~~~~~~~~~~~~~~~
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/6] selftests: mptcp: connect: fix fallback note due to OoO
-    https://git.kernel.org/netdev/net/c/63c643aa7b72
-  - [net,2/6] selftests: mptcp: join: rm: set backup flag
-    https://git.kernel.org/netdev/net/c/aea73bae662a
-  - [net,3/6] selftests: mptcp: join: endpoints: longer transfer
-    https://git.kernel.org/netdev/net/c/6457595db987
-  - [net,4/6] selftests: mptcp: join: userspace: longer transfer
-    https://git.kernel.org/netdev/net/c/290493078b96
-  - [net,5/6] selftests: mptcp: connect: trunc: read all recv data
-    https://git.kernel.org/netdev/net/c/ee79980f7a42
-  - [net,6/6] selftests: mptcp: join: properly kill background tasks
-    https://git.kernel.org/netdev/net/c/852b644acbce
+  - [net-next,v2] net: netcp: ethss: Fix type of first parameter in hwtstamp stubs
+    https://git.kernel.org/netdev/net-next/c/34bff6f03c13
 
 You are awesome, thank you!
 -- 
