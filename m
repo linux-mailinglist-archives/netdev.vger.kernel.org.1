@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-238134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E50AC54856
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:56:45 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95067C5486B
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:58:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B2F7F4E101D
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 20:53:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B580A34782B
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 20:58:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D14299AA3;
-	Wed, 12 Nov 2025 20:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0B32D8372;
+	Wed, 12 Nov 2025 20:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="T5F3tLV9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="q4kdPvyJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24E22741DA;
-	Wed, 12 Nov 2025 20:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7702D5924;
+	Wed, 12 Nov 2025 20:58:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762980834; cv=none; b=kr68ulQSvHTZJfkMRPGVDNkF/ysf0cDktPsvgTVD3NWKxDlciwLZ2dyNAFjlC7Wq9iYf/bRq9IlzHTWL6oiWwaM3CZfiIQTmRLS8erpP/4ohJXe4ln8Umplm2BjJKIYy0bP8rdPsI/p6EMUsTzP87cdFOuV69+PQrlQ/ur9vw0k=
+	t=1762981086; cv=none; b=OrCBj3dvCa2xHcN+DatJpxmOzH9wVNlRWiXybXuOzAiGAxtyHdeDymCEYY4A1FOQq6aUdmI1x65Dc9eJn1NGyrsj6w/RNWzr0A8rfxxOtlQuVYTLyG/ZNGv9YfCWH6ed11SjvAIMUH5jVJxxXDvtzRlDEQ3oa3Im5TfnavL8S/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762980834; c=relaxed/simple;
-	bh=Si6ky0PVCXOZ9+9QL8Uy2CSqcyxNRl44nBvNsfXqVno=;
+	s=arc-20240116; t=1762981086; c=relaxed/simple;
+	bh=hsuooyegSfA8eauTztWjZKsKulTseNL2r2cuAbtf4aI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nLmgWm87F2/UkyhGXPGGRojADW0YlN47l9COYUQENlwKCuW9StNZEKzGw4axzgo7nWNtGFAmlYukpGMv2MMtd6jXjmQ00DF61zWp+tOo4rCOQrASspv6lPUUhSz/2qf3KbVzI4hitbloYQV3irQnDuN1kRcE4XvYbAbLgi8dfNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=T5F3tLV9; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=d9iL7R4hBS7rPPZBl4rxUJwHBPJd1auVwSUfIcLsWgkQKKYevVsgrOn6u+ju7c+IiDNvsS41v0OLjBj7KWJL7Vhe76MMQEfiaHInKE4EEAtHjsOGXwWFHKom20HHpIkVVGTTtwuCdSjpHa872G0BCwN/SaxRL5nOB/hKVohpB4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=q4kdPvyJ; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,24 +36,37 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7fpBZVidFveA9Ks7wfYkZKKMsRGsjfRV2sjl0L3hrK4=; b=T5F3tLV9R4+zrzj+fQXlj3d3r+
-	NW4E2aziwzzkfMFZpeEijNRVTVvoX3nNqrtk1xq/izw6njhOL8A5sFFyZy4E81xkrDG2LwQJ+MyhY
-	D8mS5SoyPGG4kvg4XStQqXRXtgxGf9Pf9fzr9p9ncDlUCIbTBqyQU2Dm3cKXNKwpW80M=;
+	bh=W0g0sQvLZJ6bd54PV3ZTssgbnJn3VgkVlCFUCktk/3g=; b=q4kdPvyJgl57A+azXnnozBTYFx
+	RNce8GwXHy0ldhuhBRyF87iLq2TmojyChLxHqxFMACPykZEOE8WMFxKEziQ7UGjPV+WTVQ0Gvxp6L
+	pv3pdzra3PtVDDmtRvBYwW8sweleKTElTehW9X/CCcpVi8nn9pGnlOQDScmlKa+tY128=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vJHqa-00Dmsd-J6; Wed, 12 Nov 2025 21:53:44 +0100
-Date: Wed, 12 Nov 2025 21:53:44 +0100
+	id 1vJHua-00Dmtl-Kh; Wed, 12 Nov 2025 21:57:52 +0100
+Date: Wed, 12 Nov 2025 21:57:52 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, almasrymina@google.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, kernel-team@meta.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux@armlinux.org.uk,
-	pabeni@redhat.com, rmk+kernel@armlinux.org.uk
-Subject: Re: [PATCH net-next] eth: fbnic: Configure RDE settings for pause
- frame
-Message-ID: <289f4375-c569-44ca-86cb-18b48d17c9c3@lunn.ch>
-References: <20251112180427.2904990-1-mohsin.bashr@gmail.com>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: pcs: renesas,rzn1-miic:
+ Add renesas,miic-phylink-active-low property
+Message-ID: <de098757-2088-4b34-8a9a-407f9487991c@lunn.ch>
+References: <20251112201937.1336854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251112201937.1336854-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,22 +75,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251112180427.2904990-1-mohsin.bashr@gmail.com>
+In-Reply-To: <20251112201937.1336854-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-> @@ -36,8 +36,13 @@ int fbnic_phylink_set_pauseparam(struct net_device *netdev,
->  				 struct ethtool_pauseparam *pause)
->  {
->  	struct fbnic_net *fbn = netdev_priv(netdev);
-> +	int err;
-> +
-> +	err = phylink_ethtool_set_pauseparam(fbn->phylink, pause);
-> +	if (!err)
-> +		fbn->tx_pause = pause->tx_pause ? true : false;
+On Wed, Nov 12, 2025 at 08:19:36PM +0000, Prabhakar wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> 
+> Add the boolean DT property `renesas,miic-phylink-active-low` to the RZN1
+> MIIC binding schema. This property allows configuring the active level
+> of the PHY-link signals used by the Switch, EtherCAT, and SERCOS III
+> interfaces.
+> 
+> The signal polarity is controlled by fields in the MIIC_PHYLINK register:
+>   - SWLNK[3:0]: configures the Switch interface link signal level
+>       0 - Active High
+>       1 - Active Low
+>   - CATLNK[6:4]: configures the EtherCAT interface link signal level
+>       0 - Active Low
+>       1 - Active High
+>   - S3LNK[9:8]: configures the SERCOS III interface link signal level
+>       0 - Active Low
+>       1 - Active High
+> 
+> When the `renesas,miic-phylink-active-low` property is present, the
+> PHY-link signal is configured as active-low. When omitted, the signal
+> defaults to active-high.
 
-You should store this away in mac_link_up. Pause can be negotiated. It
-could be the link partner does not want pause, does not support pause.
-When phylink calls .mac_link_up this has all been determined and you
-then know how to setup the hardware. Here is too early.
+Sorry, but i asked in a previous version, what is phy-link? You still
+don't explain what this signal is. phylib/phylink tells you about the
+link state, if there is a link partner, what link speed has been
+negotiated, duplex, pause etc. What does this signal indicate?
 
 	Andrew
+
 
