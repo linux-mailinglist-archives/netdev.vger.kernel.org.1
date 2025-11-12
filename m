@@ -1,82 +1,85 @@
-Return-Path: <netdev+bounces-237866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5572AC50F95
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:40:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DADACC50FB2
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:43:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 885E64E5A95
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 07:40:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9851A3A614E
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 07:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB242C1589;
-	Wed, 12 Nov 2025 07:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C9F2D8DAF;
+	Wed, 12 Nov 2025 07:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="Vih4wtyP"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="HqrVPZHZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic306-47.consmr.mail.ne1.yahoo.com (sonic306-47.consmr.mail.ne1.yahoo.com [66.163.189.109])
+Received: from sonic304-47.consmr.mail.ne1.yahoo.com (sonic304-47.consmr.mail.ne1.yahoo.com [66.163.191.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEDE283682
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 07:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.189.109
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5672D9EE2
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 07:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.191.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762933213; cv=none; b=VUu9+TH9d/8V2JQPvloRdjGR4qPPmlVqYAqKDnz32l6o5h8pNhPTI0MVhHe65k51Aiu8L489jZwLg82pZotmhouxRwkXFWKW7watJkZzVxdxPQPOQB8nFx46RgkbpLT5F7XIkrLJfOtaNyRRewaNR0MuBug803CK1HtbNCM3rUw=
+	t=1762933218; cv=none; b=QDwzso4BK2EToArhLLiAf5xZ6bLRd9IsM0f5YrX3N+a+tF8F7xZETLTQC6Fbiz+5k7pIyfk49iww494S8dq2ICuiS/QIEFxwqXhSPKZdXLn9wzl7IC5S1tRpnbTGoIO6JA4tTb14AQCl9h0xQr/OgKoaR9RrNDlUs1XeEbi/1cM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762933213; c=relaxed/simple;
-	bh=LSzdYuWoamHebh03fKJ8/lv8BD0HLynbeo5r9QrB2P8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=kpl0Bb8t/CBEXngG/UG8G+bf64f9raSJZofpF2e6z7poXMjtC4EohRvb5IeSwNvGjRYot5K/kqTa9yA6kX7tsErl/gdEN09DuiNJORDqunlh+XEPtn0OJGu/6gVc9/G1c+y9gkvF3frgl38j3C2QWT1w7+Mjh+dyey8uhr2h03o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=Vih4wtyP; arc=none smtp.client-ip=66.163.189.109
+	s=arc-20240116; t=1762933218; c=relaxed/simple;
+	bh=dlh6LlHVG2M9YzO6My0+Zr01fsRMVgvrEyzCDrIsLpg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RfUjprWcFGOGTkkozzYCKR6eQCvkS6++QPJo5fAwMMMXde3jx6q5ZcMFbzf5kblRUOocgGGiGgy202J9v02pCtWA7BxClavV1TF4QpUgy9C0PWVMdU7Huq3N0BejWS+RV5EaMryMefLHGYz9Kjzr2LWkUh3MTfFzsBmVjaBXd/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=HqrVPZHZ; arc=none smtp.client-ip=66.163.191.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1762933210; bh=xDuVxFAiRdNFEFecMfUNl5KnR+phJ1+xrKIDXhBhgeg=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=Vih4wtyP7sGTNQkcYoz2sqKuv2DmlemAiuQ1Cn7yKacIIBepUjukw/lHezk832volCKA+t6CWDqH698Ula0WW155Bi7s+6uUnIW7/cnD1pQeVdyGun811zi2ekPH9tplihBevnUna8rlris0xBUP7+1YWiQCLXlYMTGKDJhrhsi6KUrv8Rzta4VZl8aBM2NDPyGmdJhclOkuSAha6apkgMElGHyKCsRih1DT6BI3dItRTvbLocqR5msQI6UVl8r4dBDTW5gyuA7tnjjFv4y99re4Ah2WNqXCIOkINqsWxQRN2Pa2/30nveUaPnlxGL5TY3bEaXkIuAyZJ/Sef+LuQw==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1762933210; bh=dkrYOcReryFqabQmSxkJPX6XQeI5Ddg2tViiXDR4eEO=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=k8EOicgKGnYOJVn3KVpl2GHdWgxEWcN/1H/GDQNGC0AEegB4mkxJKxd9cSWQutgbmlmpahMSI8G6tATtiSfCCz5Z4Kl59qnR8F6CmLdvBCSMSAfOKZPGpJ0gQVsmDmVXjxXWL2q2o38ebz3wQ62qroQGgf5zRhVb0rs6xoz69YKgGH0QXYNIeRUCAYtxhqeYTHsgmGT5sVNwpocokEwLcrdkjLds8GGLRRr+H/EnKgkP7hAv9dQrDGjb5vrI7EYb8vB0quUZrEpco27G3y0Pi9N9qWFSaFKTD4mRJJ4sXBu9Npml6E9iRuisgmUdqkllTk3tXKqf4IYfdcpalXpmlA==
-X-YMail-OSG: Hl8o79gVM1kkVw9eBYg9MfDR4kTQ1gnv3_jMj7jNTPk8YKzGc4KrkDUmGwasjnt
- 5ffCIKOV3bQwf85lD2_uo6FEk3XWYYa9jYDG89h0CBVcYLlbtGXCKdOwXStyCmu3HM.b4LDeGFzi
- sH39UbtJjSSHBt7pMb6K.eydwmI3akd0n5ou86igyT3H.p_Xa96x8hj4NEmCncPgVHQdH8JZzkOO
- xZbryVSSW4cOb9IlPe1NCtAvJZBI8cEns42qjJJAwNG.SSu5wkvJ3HYdINSd1g2_SIVV4Y4Pj8QO
- ba49IROW8H.3AiahWmA3orAdznS6JqZIiEOmrc4fZM20Lz7iGNLaRDnl2J2zqGN.58NHYd_d92BB
- 2.oWJy3kYnUAPJ7BQxIhz5jjV8KFx8i1ezcRMPR_cYl.DT3OetKo3TZh4HDbvU_xytLkMW.Ji9j9
- 3rvB1EClITQvTUsy45np79i1KA5UQdNkRs5a9mTiVCmFbZpkMjZ2DbtEFMiKu676HD4NhD.pPjI4
- _jYfAChUYvtQBJIRFr_F1vSL4AfI3jymjw_djGzvbgG28SB_KzBMUVVbtXeq7lCMwLigwwERn9.q
- geAIqdvSZoV4hFOJWlkTpOgXBO5FVfnrlNYATnCcmYskOOBOlZmd.5USsCgHxfiw.wIRJOsLtsLn
- ijOgUvDxBpnYADsg5Ek5ixyo7ZMVlvUqeNYWMoYEAizBvOnnaTz4xOVVs2nKeDU9oz5_hugO4Qct
- 8nHrPa5byWV0guTH.8EpIlPbpEAKCN94YfyLUs9c5e3Pa0DWcm0It5kJ8qutcrt56oVetEOP_eBW
- UOeVZTVahDX2KD8Wrsnt12lqdRUzqYfHpABlUwM_zANZE_IWhfsEHP14HWt.z1_vWLILSBzgtAGE
- edBaZkA03b.9vRcHr3I7YtxNovfuSLuxGzXHYVMsDyJ5ga5VTP66j.hTKDZqFYW_1yjcOoQAgKcO
- ToC5q9xOyn98FHDYQ6.me_qKvspuiyWtrqtYN958.JnAcHV0fiW1NKJZYN3DOdbolRc7ZwRq8_zI
- 2qBQdHx6brbNYlTgfxXwYA4tkUBxzNjus4ZVN9A3Nf9qnFc83dxuVBwB2nGD5lRjLPLSpNnn4g6g
- CB2xn7rec_C7knvdEyBpgX8KX1L0JefrSzjvWu8vWnIKsxqFDs2swszJis3RAWMGkrEc1hj7RRc4
- eXC3K0rhytLbTx0nKfnAFS7bUMa5.EpeX5WGJCf.0htKRWSSrBK8DDbFXvlz43LnOJC9nsjOWTYa
- ZUAzjJwKv0Vbu3GASE_trekdkAop_aDMi.scsCFCDzkU.cnGRL4_cvBOgr7jSur3tkoHpugTARTr
- jJXeHADJnLkHEfzimfObMd3Rr3JSQ7MrNI7u5l6DS3uLEPLBM4.INfJ8ytqkbkWL4UtX6OB29Sm0
- fjbLRfrk3t5M2YK5JAFe8VsKrheKjd9wL18JZldwM9oSc5cXTCcr8Xz_fUw07AN9PLxx8MHWOLaH
- sHe0o.Ex7MIByl_.PDtOiJtgJC_n_iOTMM9pKJ2.ohyQpCL8w4ShYP87NY7sH4z3IiOc4.oDI0dU
- egpeMcvvxwGLHWerx6AVqbjpvMXeLbzpU3eWoXFs.LNxITyrdu_Q3p4zRdPwGcWu.Y.CUIg6GOlB
- XJz3PtYLPMAzKALZwhYV8LeMsY4gghuNHUxjvVpJafb5_6EooAtGMkdjOn61gYCeTNoApPrPEaMl
- D06fiCHX7d0NX8PEwXhl2hOHeFPEEu8qWaLFxTKd_CNLSnM1jNleiD8VgN1xYDNDr6nt0_MgfV4x
- lfPGPjMDSaITUsuNl5VC6S9SrXZ4vSyeCf7zYFvS6Fmv.dK5WiFQViZoLrci8AEJgqpZkNJN3Hiz
- jUG_xBKtBrPXKyTiN_a.uHrWGYOjbkjCsRkjgpogbWIWEsBtDhb2CyXdRe_A3q1AzTNeB7ZHsYdU
- IO6T..DQ48ZrWja70dvIQymTXIyzbVM8cb_LUEB5AzsZMN2bgNHXKRQbCr8bZK9lSjoIUHEe2oSw
- wvxpJz8m9vpvCYFZ_RqL1ld1DvuLR8j47QB62ujpjyBOPUhb5N5bTQNMzMEH.QDzrTvnHT5p8o65
- QlD2rNRxWJFHeIoQJT.Ard6pMOWeSpqU6yTTDJD93KuBdJF0xbW7a00Uxn.LscIZut6TUInERXsi
- U2TFVz6_t9Gx74MehWDpuAlYURzcFM7MCOZnEBE55jwY8JEWD4oqRyqfcDhZnh4KPWHimRr1guGN
- V
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1762933216; bh=ZwArgljLr6/Lo+sgo10BP0rVV4dpOdUy22RlCIb1XE0=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=HqrVPZHZNS6AA2wR9Scw5QZiEVKaqj9dTHlh8v7E4DZiUOMNR7GbHu10/4JvlcmO6s92sdklw819QD72x3Xgahnly9AdQ/DNuusDarVywtL50g9zmIm7z67fFRaR4hCgADC9UTONqzxyTI52wkC9IOleAl53YOqTOUxZnDlaqNsFMcmcD9YhoSdySgy6I7kNQh1u+GOHKexgmVBm5Yuh6+h06zJB0kjwoPjMSJh1Gxzk5r9ocPKiDjSSnC/dumcJwt0gJFQM2HPhRILS68+X7N4OnVxR4SaXYHjeRXSQZWyArbPJ2a3gmNXT5TZD7Y6ifaKeJ9Rmol0Zh40wkQw8/A==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1762933216; bh=PUTtww14ywViD9qyO3qqFz/GaaULdaQ6Yko2aPc2gY8=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=XjxYjkr13wSbpHPilU9yF0YbqWvirZrZ9tGaLov8YB/alN4L7kaNbVHwXIzUpiJqmijwTG6riW8W00FIK4PRb/0KgbQjRpe6CvsqK0GtOrFYQPMoy98KTyki1o+5iVGkhttO/qV6671MwJ2LIpNkUXdGS4sayQkgjHPb4XkFsF51mTPhYiQ0B4rVdSJKo2suIPhDi8WDLZyfvcYcHw7SAS9DDHZcI4Z8I5Ph+eFT4sE6mapbgMp8ulIi093NVGgGxUO4FEfUaE+0fcdMPoB5e5rZVfIfw2G2N55Ek8po/BlYsWSsjCBzADrcRHADUU2mOC5LFntoXK0NszBbhlKMbA==
+X-YMail-OSG: Ai5TpUwVM1n2Yk0_hAiR3BDs1.flFkUXX6OYzZnVH4Bq9287vv50ErVa0oTwoeG
+ JASsgQVEAqTua9rYEHFNuZjF5VRVUwgNLwqGndvw7elXaXaFXkHAPQxDOLK_eoFyIjrNIQTL1VLw
+ m0hyX5wwVXGIypZls4EoRcJ1vngfAJCf4wr_QAlDra0ok1EVT2C_kTlfE.g9fZpE0plq0LEGK9N5
+ h8ZExS_ju1ZwXCN52F4WjsVfPmxtGE0NUrGXDu2wvx5ZrgJ5ME9_VgjdMxYK3xzLzGzweCQ3krip
+ jzNhdSi.9Z6zvpdT.LyzsCPU.ODe1_AvZP1JXqWyQ8.LkBYs3o2DdIIMOdmmteK21KfcXvdig4qX
+ XDrqkK_fOPg2UOJnOkGa3SthF0tJyK9ogtVi_TUFsJ47XY9b9AAJPt0l1wmW0uDJFk_8TqDIPST6
+ OziID1pR.6WHlW5YWIvhRVZIf0OkcDpRKCprLl2hiuX5A3BmysfIM6YwS4LcWWqir6m54CSmuBIG
+ losGsQcGVYZ_pzHLleQiDE7DjSy4aRy6HGe81c2SiH7nju58oMi2WM4nKlM1PP6fhYn5WLpMWl2P
+ t03w9.ZTSnOVY1VrGkuQ1SAON.I2H.cSPRgydyJiFgMeamqB5Sd7cdF59iRLCsoGjcGbe66FnOVV
+ eWx8KFB65M.ebLVBAvJg5G2oOLqCXJATq76.ZjXu1KCYFXTbmcNz6tPOjuS6P9lDD3L2s5pS0dUH
+ hA8T_1gI4QUNQwu4ziQxmyLpbHlSfWjajg3KxdjRaQWsVqywJG8UFx6zbfFYLz8XxO1Qh9cZs8F.
+ CqqfRGLjsuf0nvVujiNkLoIwHeCOtfBQBPkAG8YggWfRnO6mDd1RQcy715HD9yiMJHzyEiDgqj2z
+ zMORRmuf2BhKwrAkEYSvW_HALCpkT6R_sv52jD0WNpX0Zl2iFqoQ8tTd1XuUg9SGWis9qI4JjTey
+ X5RDLgOneLj8hKKu95t29.DzoTXdmgvwKXr825zQlzx49n8I2c5sdbNPXAGGKRCoQlrxBUO_iMq0
+ dLpzliTnWBM4EXW_4MhPNQ9AfuLRLDvo834hsWcUCCNhMv07Yu_f0IW1r2UmjxCi27nYp37qpdot
+ sXknNvoPg6TLwsokeNi80CmANfkCQu8aXaoUaR8kVY.cZCFcMH.6aKr4GC7hVOwa6GAzxwnldHeI
+ WLbt4k.aaSIfNTO_X3.VRe9_D8gbCDa5bppcs17VCKF5OtRnH4DViQSUy2JwafRgJhco9e6Q5hw5
+ l0W9RfXlAWlU8iy1g6SJGYQH.N5NCBCxB7Z6spTsVbDyK9dSRrBqjQ.v6wQNB0NHK8wNiyhGfd9I
+ eJcb_afH7nzQCncAIuqFDqHjQJBpeZXCZSJEQzX4xAaQyimmNIPlTzm8tRUly.GiKB8EMpwTa6kH
+ JFDXPYAdkPaV06q7tJD2hr8XBgW0g_EpfDDwlQlE_1ssXtWlnQMPidmWM1Lq.ytekfBMwwqRxXhB
+ RKmNgYWSxcfWjOOUaQLQHxo7.FyKJSS4IndokklV_pmREMyBJAsHdH5Z6lPgbuLRi0Q0j0rwTKRO
+ .51gj.mTn4SU1KvbaRcI_Xd53R8ReEXQDgjNfkrUVMlYvYEfvdP6tqd6RMWsVUpZtoU_FSU5kznW
+ sXdNmwt8yMECEtxPrf2CyqgNEQoD3LcScLsCZ9hwij.q_W9qFPEWhmz0tF.5X5P7Kn5TyJpTOP_X
+ 7oVvhsiT3sdbWT6WAmjLL.EDQpkgjjnaDou.yo4aBs39zj3UWGjiIZlzD1kHOUMq7KNimd7gMH6w
+ paW9yNAAzuvkHyzxkUqe_RdHF7ykuxYBWwWgTtkloBsCG1NtOQA05HJpfCClL6DyNiZuQwSGbWuR
+ VcWWN25YIWnVZ6Tfd3KyviLuOvoull3MC0Y6uSkcoWht4dZK1IX8pskYlRONXAU6_fC2hbOpvoF5
+ TRUXNsBJDY7QamC._4ev9nteLm1N0wTmukpJsXgn4Q6CuM0fYx6OFRBsbdoFojID7UfnxHsXtUxH
+ NS9AWPza855c2JK7YdZ.hCgXJ2wF_rnH64NR5793pGm_QwI1gQB45cEqMpSyiX.iuf3e.PONIFtm
+ gWcA2lkv2y.xOFf_Sx5fuxCWKeILnKwukSWxt_6w75UVdBR_pT3d0zftdMLkVUDYn6acO.f6FLOa
+ gD4ImqVk6RafpxvyFptyTdQkjkAIk8HtBMsAVWjX6l6VGKa0DJDwQKXdp8tPmkvhFBGyogh6Wwsa
+ o
 X-Sonic-MF: <mmietus97@yahoo.com>
-X-Sonic-ID: 5c5f95ce-5aca-4c2d-ba4c-8828507c9556
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic306.consmr.mail.ne1.yahoo.com with HTTP; Wed, 12 Nov 2025 07:40:10 +0000
+X-Sonic-ID: c8b4b5f1-c136-4b21-affa-62aaec2307d1
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic304.consmr.mail.ne1.yahoo.com with HTTP; Wed, 12 Nov 2025 07:40:16 +0000
 Received: by hermes--production-ir2-5fcfdd8d7f-2cnbk (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID ce2e5d13638178c4daec60c4681fbbb6;
-          Wed, 12 Nov 2025 07:27:57 +0000 (UTC)
+          Wed, 12 Nov 2025 07:28:03 +0000 (UTC)
 From: Marek Mietus <mmietus97@yahoo.com>
 To: netdev@vger.kernel.org,
 	sd@queasysnail.net,
 	kuba@kernel.org
 Cc: Marek Mietus <mmietus97@yahoo.com>
-Subject: [PATCH net-next v4 00/14] net: tunnel: introduce noref xmit flows for tunnels
-Date: Wed, 12 Nov 2025 08:27:06 +0100
-Message-ID: <20251112072720.5076-1-mmietus97@yahoo.com>
+Subject: [PATCH net-next v4 01/14] net: dst: implement dstref object
+Date: Wed, 12 Nov 2025 08:27:07 +0100
+Message-ID: <20251112072720.5076-2-mmietus97@yahoo.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251112072720.5076-1-mmietus97@yahoo.com>
+References: <20251112072720.5076-1-mmietus97@yahoo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,107 +87,191 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-References: <20251112072720.5076-1-mmietus97.ref@yahoo.com>
 
-Currently, tunnel xmit flows always take a reference on the dst_entry
-for each xmitted packet. These atomic operations are redundant in some
-flows.
+Implement the dstref object, which is a potentially noref pointer to a
+struct dst_entry.
 
-This patchset introduces the infrastructure required for converting
-the tunnel xmit flows to noref, and converts them where possible.
+A similar object already exists in skb->_skb_refdst,
+but is coupled to struct sk_buff, and it can be very useful on its
+own. For example, it can be used to return a potentially noref dst from
+a function, which is currently not possible unless we attach it to an
+skb.
 
-A new opaque type "dstref_t" is introduced. It represents a potentially
-noref pointer to a dst_entry.
-This allows for noref flows while still allowing the original referenced
-flows in cases where noref can't be used.
+Implement dstref as a standalone object, decoupled from sk_buff.
 
-Additionally, RCU variants for dst cache helpers are introduced,
-since most tunnels rely on dst cache for dst resolution.
+Some of the helpers have to be in dst.h to prevent a circular include
+between skbuff.h and dst.h.
 
-These changes improve tunnel performance, since less atomic operations
-are used.
-
-There are already noref optimizations in both ipv4 and ip6.
-(See __ip_queue_xmit, inet6_csk_xmit)
-This patchset implements similar optimizations in ip and udp tunnels.
-
-Benchmarks:
-I used a vxlan tunnel over a pair of veth peers and measured the average
-throughput over multiple samples.
-
-I ran 100 samples on a clean build, and another 100 on a patched
-build. Each sample ran for 120 seconds. These were my results:
-
-clean:      70.31 mb/sec, stddev = 1.63
-patched:    73.13 mb/sec, stddev = 1.28
-
-TL;DR - This patchset results in a 4% improvement in throughput for
-vxlan. It's safe to assume that we might see similar results when testing
-other tunnels.
-
-Changes in v4:
- - Added the dst_cache_get_rcu function
- - Implemented the dstref object and used it to implement noref xmit flows
- - Converted all tunnels to use noref xmit flows
- - Fixed formatting of comments in dst_cache.h
- - Reworded some messages
-
-Link to v3: https://lore.kernel.org/netdev/20250922110622.10368-1-mmietus97@yahoo.com/
-
-Marek Mietus (14):
-  net: dst: implement dstref object
-  net: skb: use dstref for storing dst entry
-  net: skb: rename skb_dstref_restore to skb_dstref_set
-  net: dst_cache: add noref versions for dst_cache
-  net: tunnel: use dstref in ip and udp tunnel xmit functions
-  net: tunnel: return dstref in udp_tunnel{,6}_dst_lookup
-  net: tunnel: make udp_tunnel{,6}_dst_lookup return a noref dst
-  net: ovpn: convert ovpn_udp{4,6}_output to use a noref dst
-  net: wireguard: convert send{4,6} to use a noref dst when possible
-  net: tunnel: convert ip_md_tunnel_xmit to use a noref dst when
-    possible
-  net: tunnel: convert ip_tunnel_xmit to use a noref dst when possible
-  net: sit: convert ipip6_tunnel_xmit to use a noref dst
-  net: tipc: convert tipc_udp_xmit to use a noref dst
-  net: sctp: convert sctp_v{4,6}_xmit to use a noref dst when possible
-
- drivers/net/amt.c                       |   6 +-
- drivers/net/bareudp.c                   |  63 ++++++-----
- drivers/net/geneve.c                    |  87 +++++++++-------
- drivers/net/gtp.c                       |  10 +-
- drivers/net/ovpn/udp.c                  |  12 +--
- drivers/net/vxlan/vxlan_core.c          |  80 +++++++-------
- drivers/net/wireguard/socket.c          |  34 ++++--
- include/linux/skbuff.h                  |  63 ++++-------
- include/net/dst.h                       |  48 ++++++---
- include/net/dst_cache.h                 |  71 +++++++++++++
- include/net/dst_metadata.h              |   6 +-
- include/net/dstref.h                    | 111 ++++++++++++++++++++
- include/net/ip_tunnels.h                |   2 +-
- include/net/tcp.h                       |   9 +-
- include/net/udp_tunnel.h                |  12 +--
- net/core/dst_cache.c                    | 133 ++++++++++++++++++++++--
- net/core/pktgen.c                       |   2 +-
- net/ieee802154/6lowpan/reassembly.c     |   5 +-
- net/ipv4/icmp.c                         |   6 +-
- net/ipv4/ip_fragment.c                  |   5 +-
- net/ipv4/ip_options.c                   |   8 +-
- net/ipv4/ip_tunnel.c                    |  63 ++++++-----
- net/ipv4/ip_tunnel_core.c               |   9 +-
- net/ipv4/udp_tunnel_core.c              |  42 ++++----
- net/ipv6/ip6_udp_tunnel.c               |  52 +++++----
- net/ipv6/netfilter/nf_conntrack_reasm.c |   5 +-
- net/ipv6/reassembly.c                   |   5 +-
- net/ipv6/sit.c                          |  15 +--
- net/openvswitch/actions.c               |  16 +--
- net/openvswitch/datapath.h              |   2 +-
- net/sched/sch_frag.c                    |  18 ++--
- net/sctp/ipv6.c                         |   6 +-
- net/sctp/protocol.c                     |   6 +-
- net/tipc/udp_media.c                    |  14 +--
- 34 files changed, 684 insertions(+), 342 deletions(-)
+Signed-off-by: Marek Mietus <mmietus97@yahoo.com>
+---
+ include/net/dst.h    |  28 +++++++++++
+ include/net/dstref.h | 111 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 139 insertions(+)
  create mode 100644 include/net/dstref.h
 
+diff --git a/include/net/dst.h b/include/net/dst.h
+index f8aa1239b4db..d7169f067637 100644
+--- a/include/net/dst.h
++++ b/include/net/dst.h
+@@ -18,6 +18,7 @@
+ #include <linux/refcount.h>
+ #include <linux/rcuref.h>
+ #include <net/neighbour.h>
++#include <net/dstref.h>
+ #include <asm/processor.h>
+ #include <linux/indirect_call_wrapper.h>
+ 
+@@ -260,6 +261,33 @@ void dst_release(struct dst_entry *dst);
+ 
+ void dst_release_immediate(struct dst_entry *dst);
+ 
++/**
++ * dstref_drop - drop the given dstref object.
++ * @dstref: the dstref object to drop.
++ *
++ * This drops the refcount on the dst iff the dstref object holds a reference to it.
++ */
++static inline void dstref_drop(dstref_t dstref)
++{
++	if (!dstref_is_noref(dstref))
++		dst_release(__dstref_dst(dstref));
++}
++
++/**
++ * dstref_clone - clones the given dstref object.
++ * @dstref: the dstref object to clone.
++ *
++ * Clones the dstref while preserving the ownership semantics of the input dstref.
++ *
++ * Return: a clone of the provided dstref object.
++ */
++static inline dstref_t dstref_clone(dstref_t dstref)
++{
++	if (!dstref_is_noref(dstref))
++		dst_clone(__dstref_dst(dstref));
++	return dstref;
++}
++
+ static inline void refdst_drop(unsigned long refdst)
+ {
+ 	if (!(refdst & SKB_DST_NOREF))
+diff --git a/include/net/dstref.h b/include/net/dstref.h
+new file mode 100644
+index 000000000000..637079260c93
+--- /dev/null
++++ b/include/net/dstref.h
+@@ -0,0 +1,111 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _NET_DSTREF_H
++#define _NET_DSTREF_H
++
++#include <linux/types.h>
++#include <linux/rcupdate.h>
++#include <linux/compiler.h>
++
++/**
++ * This is required since we can't include dst.h here, in order avoid circular includes between
++ * skbuff.h and dst.h.
++ */
++struct dst_entry;
++
++/**
++ * typedef dstref_t - a pointer to a dst which may or may not hold a reference to the dst.
++ */
++typedef unsigned long __bitwise dstref_t;
++
++/**
++ * This bit is used to specify whether or not the dstref object holds a reference to its dst_entry.
++ */
++#define DSTREF_DST_NOREF       1UL
++#define DSTREF_DST_PTRMASK     ~(DSTREF_DST_NOREF)
++
++/**
++ * An empty dstref object which does not point to any dst.
++ */
++#define DSTREF_EMPTY ((__force dstref_t)0UL)
++
++/**
++ * A noref variant of an empty dstref object which does not point to any dst.
++ */
++#define DSTREF_EMPTY_NOREF ((__force dstref_t)DSTREF_DST_NOREF)
++
++/**
++ * dst_to_dstref - create a dstref object which holds a reference to the dst.
++ * @dst: dst to convert.
++ *
++ * The provided dst can be NULL, in which case an empty dstref is returned.
++ *
++ * This function steals the reference on the provided dst, and does not take an extra reference on
++ * it.
++ *
++ * Return: dstref object which points to the given dst and holds a reference to it, or an empty
++ * dstref object if dst is NULL.
++ */
++static inline dstref_t dst_to_dstref(struct dst_entry *dst)
++{
++	return (__force dstref_t)dst;
++}
++
++/**
++ * dst_to_dstref_noref - create a dstref pointer which does not hold a reference to the dst.
++ * @dst: dst to convert.
++ *
++ * The provided dst can be NULL, in which case a noref empty dstref is returned.
++ *
++ * This function must be called within an RCU read-side critical section.
++ *
++ * Return: dstref object which points to the given dst and does not hold a reference to it, or a
++ * noref empty dstref object if dst is NULL.
++ */
++static inline dstref_t dst_to_dstref_noref(struct dst_entry *dst)
++{
++	WARN_ON(!rcu_read_lock_held() && !rcu_read_lock_bh_held());
++	return (__force dstref_t)((unsigned long)dst | DSTREF_DST_NOREF);
++}
++
++/**
++ * Is the given dstref object a noref dstref, which doesn't hold a reference to the dst that it
++ * points to?
++ */
++static inline bool dstref_is_noref(dstref_t dstref)
++{
++	return (__force unsigned long)dstref & DSTREF_DST_NOREF;
++}
++
++/*
++ * __dstref_dst - get the dst that is pointed at by the given dstref object, without performing
++ * safety checks.
++ * @dstref: the dstref object to get the dst of.
++ *
++ * This function returns the dst without performing safety checks.
++ * Prefer using dstref_dst instead of using this function.
++ *
++ * Return: the dst object pointed at by the given dstref object.
++ */
++static inline struct dst_entry *__dstref_dst(dstref_t dstref)
++{
++	return (struct dst_entry *)((__force unsigned long)dstref & DSTREF_DST_PTRMASK);
++}
++
++/**
++ * dstref_dst - get the dst that is pointed at by the given dstref object.
++ * @dstref: the dstref object to get the dst of.
++ *
++ * If the dstref object is noref, this function must be called within an RCU read-side critical
++ * section.
++ *
++ * Return: the dst object pointed at by the given dstref object.
++ */
++static inline struct dst_entry *dstref_dst(dstref_t dstref)
++{
++	WARN_ON(dstref_is_noref(dstref) &&
++		!rcu_read_lock_held() &&
++		!rcu_read_lock_bh_held());
++	return __dstref_dst(dstref);
++}
++
++#endif /* _NET_DSTREF_H */
 -- 
 2.51.0
 
