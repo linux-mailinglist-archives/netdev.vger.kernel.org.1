@@ -1,196 +1,145 @@
-Return-Path: <netdev+bounces-238142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A015C549BD
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 22:21:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF1BC54993
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 22:18:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B60EF3BA291
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:15:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A81664E0FEA
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CAC32DECA8;
-	Wed, 12 Nov 2025 21:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88D32DE70E;
+	Wed, 12 Nov 2025 21:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g84iIzu7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GJENCc9v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DD02D879F
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 21:15:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E6E2A1CF
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 21:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762982105; cv=none; b=hwoo1zvU2GiNjB9ypOHMrlDmLprhQm/ayApFBhWyyVmLpHqGhvEYfQ22JA0qffqOpwf1uQR6XZ0ax3Yec2o8BkigBYhNamjKN0GCJjFbMOSfAKdPMvPHZutdkz3Q7jxr1dtogPQ/377DFrInYGgiz36briepHbF+C++0oDTt+/k=
+	t=1762982235; cv=none; b=YLzz8Wha7fjdBxuDRSFHhc5q2bjmslebT6zSTjXTaZpFCQGE5bFmPiaiB79vNSDnMKuWmlNopR2YspGjjYePz0Ss7UvhU+U1cMl90u6Eb1hzkThr1gFmTyTaD9HYJWcSF6pA1N7OrN5J7BqVtPJb5jhPAnboUfiyhSQb+yisO0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762982105; c=relaxed/simple;
-	bh=n3f4HWZPOFNW0Esz//T/Kay4Yn+zJwokTI5vJ+JwBiw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fru10RbwQ42szoE8Zp4AAm7X3tHk5w8ZGvvgRS1gr0o4jTJNiR9Ylk/sjDvnsxCblJV+RezDI5gviY9lm/lrMi6WdDMbtIGTCKzJqRQCkKtvMuhNS0cE9q0kFLVZ7zEFrHJl+H7rDrEo/27jzHB5hl6EfPV91BgD37ecL/m5bUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g84iIzu7; arc=none smtp.client-ip=74.125.224.41
+	s=arc-20240116; t=1762982235; c=relaxed/simple;
+	bh=Hv+MI87wNAeJB0MtR+ThCEGDtrHbVWd8n3vF+vNuo2c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nyVEK+fMKHHDlKLs8woU8Nc1HWuvdRzz5recSBJB+s5KEslJTgdVNXKVjmMViCPPQWLvaQ6lId1NBBN+R95W5MUANbdMdeX9pk6EKJLkKXaXhMjNh78aCJm7TMGM/AIDTvuZHntZhFfT2cqI5FqLSlIJivtoAr29z1B4jo2oIeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GJENCc9v; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-63fc6115d65so104467d50.0
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 13:15:03 -0800 (PST)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-477632cc932so572945e9.3
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 13:17:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762982102; x=1763586902; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YSxx8TQJuyqJmpWHS687wtXhuaiwB0qu3NOyp9VRHq4=;
-        b=g84iIzu7iJyOHDDn8S+ffiibBC20pr3A2ChPO8bWuuOe6ifsEkLfZffggWYrxRKeC6
-         ZaueQmn8eppNA5D0OarsCmgbUisO8XfyRpjrhcNBXPLyUa8dSaRsQTMFP32jvoErndjx
-         o6aRbjWgD/Tz4WoqsL0pTrA2qsG4tLW9ghkevItGDMUpCDJzskfa2VNzdF+2sY96ueHk
-         +d9ku0iY1DAJdobFdrQDF8IJ3+TkpilwPRqvB64CXFPBeYwUPdN8FMdNwuAximbicAor
-         mXA+lYh5rB6iod+z038FoZhVczWZjTI3hTnwNK6d0xtuQSUzJHs7TnyAQBp3LFZt2Z8j
-         riRA==
+        d=gmail.com; s=20230601; t=1762982232; x=1763587032; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Dfq7IiORCnaEGil0Gx1QeQnmkd9CjrRYNigvgURHSrs=;
+        b=GJENCc9vFlYlsiz1r2MFNe5PisHE5qfLqlDaInqkqxHhHMwzMBeFwze8elea4mDUPR
+         aY3iykSqEhw1R2ITYu+8LGtIoawKPxIVO3fWFDRr9Gw9EhTRhN0QWBPI7YCRo6EForHL
+         x7BUM6h5XHywzJF2FR4ddSUnIBOisACP2sNZHAZs+c3/E7f17ORHZBcv3PZNxNP/6cwB
+         Tg+MGJcrB003Xe2nYaxVxw1V7kWlTWfLSwf1v+a09m1lrWnC222cGVXMw5III00DarmS
+         VGlXBmjuLt+oIdncobXlFkebuAuPIzcyo4sVHncurrp5TIA+VbLjR0JHhrSAcHLzuc0q
+         x6Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762982102; x=1763586902;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YSxx8TQJuyqJmpWHS687wtXhuaiwB0qu3NOyp9VRHq4=;
-        b=nX/pMB3wveWwwV6zoqArNSa4MFuoyinv/IkRqbzkTRmvr8k1QekltCIma5Z7prc/2g
-         3O5rEUuKar48Fg3Ej/XiktRR32CMgqX83TnO21GSn6K46UdCFLCMwf4AVWpIOXF8afXu
-         QMvfdi9x/bTBJq4sS2RbXsTaun1w2Qrjmmym+iSVOXqJqOcbGhLnwzX7pE+G5Gz4twAD
-         ZJBRnS5ck4X0nIUsdAanbYllMZGfeKFwn8lbRFJ9miOGcaHkJ74NdldjmyQi5jwJ9GMe
-         skbl3VydCVQYeOzpuMFM9ySJECINzylpz7Ol/9pZMlmoKl0sJHjy+KuCR/X2znutHHle
-         VMOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVM0Ilyz1TmkZoH+dVRLzSaxT+qYJIrP7TlnNQOumXoe4apBSoNyhJ7FxGwl/9ir/9Y20IFOak=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJpcOsCGLyn3Y+lR/tOTE1E6G1ZznFmLAjGy6QoSzmf2agwc4j
-	tVdfVBPO05/X5xb0rmll0Qt5b0DP91ppmzbcjNm0Hmk+sqPsgQNpCTYuuv5sG70mwxYuwKXI6b3
-	waaBgl/TqQmDWftNNl0KStrjm7eFiJrU=
-X-Gm-Gg: ASbGncvl53W/pRgrjdoEQ2LGAySpcPyOYCDbNIP0SlEdWPo1t8Vx1/4Zh21z2JhceAQ
-	teQTfeFFWfPMi9gJ3hGAKk/dYIv1K4iSFuOadL2htH3X/NHQYSyxm4WGpAjX2c+QuggIce+4oGl
-	Eit+xZQk90jeQ7xxcIiBxx4yh4Ox+UV6dN0eQvqp4qBbIXc+ZLgHTiql0Fc16DBZjtGDx6P71tw
-	fhKNXZa83MbayJl5+yHIODx0lfZ5t4lQxULtGvyuvH3UjpFEFxuB2tUcIrE
-X-Google-Smtp-Source: AGHT+IEj9MWU8FX0gimdh9L/S/QDhTr82ZkgzJjHFZjMFkTY0snmbuO2jEKKQUPpksqIp+ahbcz0pWUhOnHCR/Vjcfg=
-X-Received: by 2002:a05:690e:418b:b0:641:718:8a17 with SMTP id
- 956f58d0204a3-64107188c64mr2047078d50.53.1762982102458; Wed, 12 Nov 2025
- 13:15:02 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762982232; x=1763587032;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dfq7IiORCnaEGil0Gx1QeQnmkd9CjrRYNigvgURHSrs=;
+        b=XEzRZsswwwQUWXdawPofRf068TkUD5ZnGH/Io7/eJdD3WwONjNBr8YSB7X6YAG5pbU
+         Bp+ppM3O/ujX5Oykb3XdhtldNZTec0MTTaDotcVJNSS6kgAxDIfk3FzMK/n7NYzi604O
+         t14/dd3p2H6qW5NBi7JdXClUmcoV20bzix65VlKp2QviwMkEqm6XG2/hkTYA2qPZeSUA
+         df+vxKBa0tINH0BSoa6ilptuejtjOoZsx8UuyTRrk1HGQ1zWGuSoPkl15i3tj0gDYMvy
+         6821UlLjp6JP7Au0fs1qA0+wzX+gmB7t552NMJBv7tr3BZzrXSWzI/BqdQh7OR4UlV54
+         19kg==
+X-Forwarded-Encrypted: i=1; AJvYcCXo55FxYybllBC6qYBOLaZWkCTFRgUGW57Fh9ejTKYX0IYCJTNhQdrUxTgTp9q/7o6DxO34Dtg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjntefmayQPGqHQhLWYMKntC2ZV0MPniBcltelQAGlfFNHqFnQ
+	JdOTDqkJiw4QxCNhddnKUqLR3HBrHMdThxci0Ddk6goUV77K0E/efjJMo7jPWg==
+X-Gm-Gg: ASbGnctnCL/aMEB6Uf+g0N9EJokk1/DzfaofR6m4t36+dbNv1z3QuyPY5hFSTaWHh4O
+	sulUwDddy+E4OouzdaMMYN9tIo4aPgKhWJTF2qEwV4FcFECyQ0GOQEkH7hHNQCIWWrbkl7Z+CWR
+	lDpeENzqQkU3MqiOTEUlgA4e94g94SPPYBtK5pfU+DU80JlGP7a/utX1yoRUPM8H5xmP2NYCH7s
+	8lDiFH70t+D0XHE7rsbU72K9kjdRZaLeg5C7e+BBJD4Q0yVn0y4RW6aOtw7YuH+YFVuPEtAFPf3
+	0dl8O19p3FJndkn842/c3NwtvikVE8MgUi7/OA7zl14vg1GC6MTR1b3pO49X4TOlvsQ6WY5SyyO
+	9jRLeX/MkO2X4dglUUhZnioVXXOlMzNDu5is3K60UdkJW8MTHhmG0cQ9b52kzzclU0I/BeccTRX
+	aC0Y3HZKTacfk/+j0y2QrFFeJgeKE8vUpyNv4l9uglhruoCxgjChMFORJEiVbIrBo/AdBwK7TRY
+	Lme/ugQReCICvq5PRRc0aZf6m9PWTOHbBNeg9pwang=
+X-Google-Smtp-Source: AGHT+IFEBgAmqP6sDTbjye4OdG3fWeZ3MM+uxcqobrNld8gb0/HgCLmtsFCbxxNCrkpKZipBjinz+Q==
+X-Received: by 2002:a05:600c:1c15:b0:477:63a4:88fe with SMTP id 5b1f17b1804b1-4778707065emr51691725e9.2.1762982232177;
+        Wed, 12 Nov 2025 13:17:12 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f26:f700:b18b:e3d1:83c0:fb24? (p200300ea8f26f700b18be3d183c0fb24.dip0.t-ipconnect.de. [2003:ea:8f26:f700:b18b:e3d1:83c0:fb24])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47787e51f54sm53476905e9.8.2025.11.12.13.17.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Nov 2025 13:17:11 -0800 (PST)
+Message-ID: <9f6f7b43-9153-4e56-a473-b9ad588f5014@gmail.com>
+Date: Wed, 12 Nov 2025 22:17:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112175939.2365295-1-ameryhung@gmail.com> <20251112175939.2365295-3-ameryhung@gmail.com>
- <CAADnVQ+2OXNo99B2krjwOb5XeFhi6GUagotcyf36xvLDoHqmjw@mail.gmail.com>
- <CAMB2axM0-NF5F=O6Lq1WPbb8PJtdZrQaOTFKWApWEhfT7MD4hw@mail.gmail.com> <CAADnVQKWKC3oh6ycxE+tstYupwVsdbhYHOncnfTOFWLL2DmJjw@mail.gmail.com>
-In-Reply-To: <CAADnVQKWKC3oh6ycxE+tstYupwVsdbhYHOncnfTOFWLL2DmJjw@mail.gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Wed, 12 Nov 2025 13:14:51 -0800
-X-Gm-Features: AWmQ_bmzsOHzTZ6ufxz1ivFzx1AQCvdWVNQiLoxhMXVG-_tD4QdPQq6TFyfYMAI
-Message-ID: <CAMB2axOEauSyi13-acjDJUB--8+V7ZUG+r2V=fATwZHDQjFH4w@mail.gmail.com>
-Subject: Re: [PATCH RFC bpf-next 2/2] bpf: Use kmalloc_nolock() in local
- storage unconditionally
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Song Liu <song@kernel.org>, 
-	Kernel Team <kernel-team@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: dsa: remove definition of struct
+ dsa_switch_driver
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <4053a98f-052f-4dc1-a3d4-ed9b3d3cc7cb@gmail.com>
+ <20251112211329.6hm7an4lwi43kqis@skbuf>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <20251112211329.6hm7an4lwi43kqis@skbuf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 12, 2025 at 12:05=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Wed, Nov 12, 2025 at 11:51=E2=80=AFAM Amery Hung <ameryhung@gmail.com>=
- wrote:
-> >
-> > On Wed, Nov 12, 2025 at 11:35=E2=80=AFAM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Wed, Nov 12, 2025 at 9:59=E2=80=AFAM Amery Hung <ameryhung@gmail.c=
-om> wrote:
-> > > >
-> > > > @@ -80,23 +80,12 @@ bpf_selem_alloc(struct bpf_local_storage_map *s=
-map, void *owner,
-> > > >         if (mem_charge(smap, owner, smap->elem_size))
-> > > >                 return NULL;
-> > > >
-> > > > -       if (smap->bpf_ma) {
-> > > > -               selem =3D bpf_mem_cache_alloc_flags(&smap->selem_ma=
-, gfp_flags);
-> > > > -               if (selem)
-> > > > -                       /* Keep the original bpf_map_kzalloc behavi=
-or
-> > > > -                        * before started using the bpf_mem_cache_a=
-lloc.
-> > > > -                        *
-> > > > -                        * No need to use zero_map_value. The bpf_s=
-elem_free()
-> > > > -                        * only does bpf_mem_cache_free when there =
-is
-> > > > -                        * no other bpf prog is using the selem.
-> > > > -                        */
-> > > > -                       memset(SDATA(selem)->data, 0, smap->map.val=
-ue_size);
-> > > > -       } else {
-> > > > -               selem =3D bpf_map_kzalloc(&smap->map, smap->elem_si=
-ze,
-> > > > -                                       gfp_flags | __GFP_NOWARN);
-> > > > -       }
-> > > > +       selem =3D bpf_map_kmalloc_nolock(&smap->map, smap->elem_siz=
-e, gfp_flags, NUMA_NO_NODE);
-> > >
-> > >
-> > > Pls enable CONFIG_DEBUG_VM=3Dy then you'll see that the above trigger=
-s:
-> > > void *kmalloc_nolock_noprof(size_t size, gfp_t gfp_flags, int node)
-> > > {
-> > >         gfp_t alloc_gfp =3D __GFP_NOWARN | __GFP_NOMEMALLOC | gfp_fla=
-gs;
-> > > ...
-> > >         VM_WARN_ON_ONCE(gfp_flags & ~(__GFP_ACCOUNT | __GFP_ZERO |
-> > >                                       __GFP_NO_OBJ_EXT));
-> > >
-> > > and benchmarking numbers have to be redone, since with
-> > > unsupported gfp flags kmalloc_nolock() is likely doing something wron=
-g.
-> >
-> > I see. Thanks for pointing it out. Currently the verifier determines
-> > the flag and rewrites the program based on if the caller of
-> > storage_get helpers is sleepable. I will remove it and redo the
-> > benchmark.
->
-> yes. that part of the verifier can be removed too.
-> First I would redo the benchmark numbers with s/gfp_flags/0 in the above =
-line.
+On 11/12/2025 10:13 PM, Vladimir Oltean wrote:
+> On Wed, Nov 12, 2025 at 09:46:24PM +0100, Heiner Kallweit wrote:
+>> Since 93e86b3bc842 ("net: dsa: Remove legacy probing support")
+>> this struct has no user any longer.
+>>
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>> ---
+>>  include/net/dsa.h | 5 -----
+>>  1 file changed, 5 deletions(-)
+>>
+>> diff --git a/include/net/dsa.h b/include/net/dsa.h
+>> index 67762fdaf..d7845e83c 100644
+>> --- a/include/net/dsa.h
+>> +++ b/include/net/dsa.h
+>> @@ -1312,11 +1312,6 @@ static inline int dsa_devlink_port_to_port(struct devlink_port *port)
+>>  	return port->index;
+>>  }
+>>  
+>> -struct dsa_switch_driver {
+>> -	struct list_head	list;
+>> -	const struct dsa_switch_ops *ops;
+>> -};
+>> -
+>>  bool dsa_fdb_present_in_other_db(struct dsa_switch *ds, int port,
+>>  				 const unsigned char *addr, u16 vid,
+>>  				 struct dsa_db db);
+>> -- 
+>> 2.51.2
+>>
+> 
+> Thanks. I think I also have this patch in some git tree on some computer
+> somewhere...
+> 
+> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+> 
+> Are you working on something, or did you just randomly notice it?
 
-Here are the new numbers after setting gfp_flags =3D __GFP_ZERO and
-removing memset(0). BTW, the test is done on a physical machine. The
-numbers for sk local storage can change =C2=B11-2. I will try to increase
-the test iteration or kill other unnecessary things running on the
-machine to see if the number fluctuates less.
+When working on following patch
+https://patchwork.kernel.org/project/netdevbpf/patch/3abaa3c5-fbb9-4052-9346-6cb096a25878@gmail.com/
+I came across 34b31da486a5 which refers to struct dsa_switch_driver in
+its commmit message.
 
-Socket local storage
-memory alloc     batch  creation speed              creation speed diff
----------------  ----   ------------------                         ----
-kzalloc           16    104.217 =C2=B1 0.974k/s  4.15 kmallocs/create
-(before)          32    104.355 =C2=B1 0.606k/s  4.13 kmallocs/create
-                  64    103.611 =C2=B1 0.707k/s  4.15 kmallocs/create
-
-kmalloc_nolock    16    100.402 =C2=B1 1.282k/s  1.11 kmallocs/create  -3.7=
-%
-(after)           32    101.592 =C2=B1 0.861k/s  1.07 kmallocs/create  -2.6=
-%
-                  64     98.995 =C2=B1 0.868k/s  1.07 kmallocs/create  -4.6=
-%
-
-Task local storage
-memory alloc     batch  creation speed              creation speed diff
----------------  ----   ------------------                         ----
-BPF memory        16     24.668 =C2=B1 0.121k/s  2.54 kmallocs/create
-allocator         32     22.899 =C2=B1 0.097k/s  2.67 kmallocs/create
-(before)          64     22.559 =C2=B1 0.076k/s  2.56 kmallocs/create
-
-kmalloc_nolock    16     25.659 =C2=B1 0.108k/s  2.51 kmallocs/create  +4.0=
-%
-(after)           32     23.723 =C2=B1 0.082k/s  2.54 kmallocs/create  +3.6=
-%
-                  64     23.359 =C2=B1 0.236k/s  2.48 kmallocs/create  +3.5=
-%
 
