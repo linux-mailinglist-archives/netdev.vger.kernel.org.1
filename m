@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-238002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4032CC52A01
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:12:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85FE6C529B9
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:06:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 90D6C4EC596
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:59:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23F781892C2F
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 14:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F297433343F;
-	Wed, 12 Nov 2025 13:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFCD33970D;
+	Wed, 12 Nov 2025 13:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fkQAr3bH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mH5g/mvo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CFF247291
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 13:57:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA17335549
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 13:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762955855; cv=none; b=ipFpCvDnnPP5T436QkTKEMvByCTGuShN5svRJntrVlQi5F+qQOLkjHx0ktGB0TpwNVVQy4iE0DRQF59uGIlIbaABDf4p9dXEXd3K9S/Gk7H9IEeMQzwnx+3CvYtXL/JDOs7CYl258/FYe5Xv7q5OjH0Ab2xOhrzXFJ8m581VBu8=
+	t=1762955861; cv=none; b=ZVrbRxepKL+eNDwWqWt/yqK5dkBmHVt30pCO9idpxSUsFZXSDmEF33uDwoIyRB2FrRwlAraE8XWUSZnRkmcV2ATIe/w6jEFiWtRPjPQyaoj6uLGYZP0e7FFBT3LKBGPvMoCTfFLfqU3lHI0qyfZ9dpyojrHTiNM2+eCfah8+XOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762955855; c=relaxed/simple;
-	bh=k2G+UAOlxryfN7Ts6BKG6DLQwr8X02cUPkX0Arp69f0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r59UORJHj+IC9/+AC2puxqha8nXUvr7RdsYDVU/jqshWP/C97heou8aVK9RHI2bKgRi3UQdXmLQT77uF+6o4qJGfA480si7FtBl9Jqq2g8NkbrPg62+6EwF8FM7l48KtxyCRUj4iLvfiFuVSQI21XymC9nJoBWbBgIU5VQ7akEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fkQAr3bH; arc=none smtp.client-ip=209.85.210.176
+	s=arc-20240116; t=1762955861; c=relaxed/simple;
+	bh=x1YSbtYbRyTPSIhv0/6W+8ceVWJJTyabUu/t8xJbjYY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KejPZ4qj/zUQWcxbWBeFdAVSQp2kbu12zREpjgn4QPhXpbd2R0XAolvSXUq580Xn0nGvXkWJLzvHZrRQRlyEHtBjx9QSrexsXpF2vZqC+xOr7HTBNVtRFgf3un2DK2m3yf658mNKb62DbXLHracp0QXaZee0OuJGDYt6FlYi0MU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mH5g/mvo; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7a59ec9bef4so1085880b3a.2
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 05:57:33 -0800 (PST)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7b89c1ce9easo146604b3a.2
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 05:57:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762955853; x=1763560653; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lt/l+8Leq/bLhALiuQnMosDsUZRfKXTeoOFBaF6JTLw=;
-        b=fkQAr3bH3AuLuM0DP7CIc02Zg9Iq30NQIVufcrlpZTNRJisyIoHQu0IH88lHd2OtvW
-         fxIKN/UFOiaJMoJ7uK0huTo0Nc3tSZ482+NC1P3hm9Lrl7pmeBbG9TEzKn2eaoyW6Xnf
-         ipWc+7HAg/cWq1sbT91iLPpKRzJfByYX8d5LOTGrNfTFZHUluCdYuvILV2g6Jfp4m+rp
-         nelLGlEmNzpmLhMKKruPNID52ikJIOabNbhcI2Yc48Tr5/gSqn1Vo4/S8mLQfqUrgfMb
-         ny7VR4kKGeL9/34SUfi/jhIy5kaFkAliBx4GmBUpTQaEekLftmJ8kzdc+cYjScV1BYSs
-         JTqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762955853; x=1763560653;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1762955860; x=1763560660; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Lt/l+8Leq/bLhALiuQnMosDsUZRfKXTeoOFBaF6JTLw=;
-        b=NqFFwRnRNP4r2HKG6Ijz8IYpWKHN2ziOu+wUc/Hut6GX7IlO9IKEqM/c8EW0WmzH7r
-         zW/kcOtyQbrA7ssZr7MT2QCOGLhvsw2aVdoYGYvOJnGV52TF8wyDq9Vivb2LevGnQfl2
-         tEA/TttDHi5AssJiBPi692xHTanPqgJTphx2ga5RNRo1wse3y1uepgIYrjQVXV1IHrbN
-         6L+bWXzfu0Y8uAdIWO8hyEak0IwVoieBqNNGfNCMZgr+Ca5Z0bIB7kV6/cokkNzMZ5zr
-         h/r8J96lSiUeZlaNdd/VmpuuFixuxauB0Rn0+5z95RT6R3m7PR+TM/vwvbdePj1FGf18
-         U/AQ==
-X-Gm-Message-State: AOJu0Yz6vuNATd53Dc7FtH/k7kdoHdJGEwUs9b7aIsnRjWdKDdjXns7J
-	ng8r0L45dJQSU4m6npxbXI75pd2z87+fvM0Ppz7IKhUp2hy9S/7KjQrj
-X-Gm-Gg: ASbGncuqPXZCU6ZFQjlLGFHHhJcToaSUe5nj+4rZcQR63XPptkh7Cn2HkcGZ7WMs6Cp
-	qAIie6ze/kklauRLbpRC0Z6tirO0l62MuXg+Tmqj1o5fIoJXghFTJciHJbfAucOVryriWHkHaK7
-	tfWJGAx7WpOgVF43BPzHWhWG/rhZ3r0fvF/kUke4GqMiJ+48h+/JJn0kG6IP48NWEnVDoU5QFNg
-	hzWOTq2YoZFi4AeBkCfDIEG4buRQJejrvKoS/fAB/i404Dmi2nankQpxwgSOlDsFmV+Qe0AZ3yX
-	t1zMKG+jyeXfcXFNJmYYgSZGpKO/4LyCQSKJNrtC7ktzqbPa3e6Cc4n6kNNcGER8vMihQIWJH4N
-	kuegTXU2zPpjvYNMElbI8YJq3y7hFKqweNCtRgFHqut0gctpjoZKHNpcsghmGUaYtAOMKUuY/BO
-	BuUwQZSEa83+tYTdq76R9g
-X-Google-Smtp-Source: AGHT+IHZ/VsvfL1qBauYYeHFVM1I2oce6UrmCkeGZ0waGhdgmzOFEbz48XMrpfJQfxZr/VfEUub6bA==
-X-Received: by 2002:a05:6a00:124e:b0:7b8:758c:7e86 with SMTP id d2e1a72fcca58-7b8759bc702mr941901b3a.15.1762955852653;
-        Wed, 12 Nov 2025 05:57:32 -0800 (PST)
+        bh=iSrL1EoqDUfnyHQYh0k/jlWwCZWampIQnukH68EzSFQ=;
+        b=mH5g/mvo8k/a/WwAJJt9PSQAQFLYAC0cqhaA7TwV5ElIHX0pTFAN1/MG2YyiIQdPrM
+         ay44YH6e2Wb9fzij2PfoWALQ0QeaG4v9QWJVTOPb+yTKbKnxFQmXRxjjfigIwIXBaa6L
+         Oxtpw8Q6mDm8O/GGFFFpykzAzutcWkw2chJbckiChhLl+JvKr9o4IqRDovJviMq8zlEk
+         RZx6HAoMrKM7dL8wNQE9bG2NcCQfKVZYHz/btbIXhd3vJZnvEi35/kLM8VKnNl01DQeL
+         YRRmI0MhbVjjJMjF3zSu1lYePRqfBBQRl6ZbIlAOtc1Wcl1aj+9MM9F9cSXdMgtkYsd5
+         GT0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762955860; x=1763560660;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iSrL1EoqDUfnyHQYh0k/jlWwCZWampIQnukH68EzSFQ=;
+        b=Qoc3jUQ3Kc2uS01rFJQYcbA49X/3POkt57n5zbvpCawiSAu6L5gD9IA35B97PaLYUm
+         yDomCKST0hrQRU7nhOtau3FYNYbtafao2rDczxcSq5dx/EFDAdp9sHVlTvlv5kExHhyf
+         2W8cuWCDhNYe4Y+fkFiirbv8+970kRj6+6UjPAQWzAmRMPN3pympUAJQe0ZJXfiOtSMQ
+         ub7ynGT+kWCK1jerJ10RawiO2Xyjpomuu7iyJAjayaPwuXExgFsMeUR//kv5t4GefVq/
+         JTo5WVyvDMG8MFPJk5w9/iUKG1zesYiX7/QQ+hxFdj3HXvU3lD+iDjosr/vV2eRDlcK8
+         Nv8w==
+X-Gm-Message-State: AOJu0YzAam3Vd3wP80m4wR5B1kn/ClYCrrOOjQNlapB/n+Gortu+Pdcy
+	cwJzLP8x2DHtlEcVEfXarfNZr/Nh4Rmv2g85MYJG2adlV+T7dFJbgiay
+X-Gm-Gg: ASbGncuTGh+Z55J2q5MeHRZqkyt8cl+d9iCjlrIdrF+PBsqZeyT0BmWWh3gqky11bqe
+	hqWVL3FoIUfTQC2LSp8XUe5RavzggsbGboNS5f75lf+Fe5tP4v/pJIk22H5z9Rf3evBrC8JwKeE
+	MVlQ2d/oS7Neaumyn3MWozEOj7vwvYL5FwD7lWL+UCTO5cBuPazMResxgPKG/qjjFRwrH2TTVyY
+	LokQIXX4lxi89FchUTTz6an1mvHGndi8Lfml/IE1wGEcmPtbKT6S811UKA/ou33Zas8+Iu7bmfl
+	7g1CD6yOpooyIbW/om5Tt4sUNUWXw7fPaOndpEe+6J3qtQsRnEhyHG+gkVc+FQHrwMMYTDL/quB
+	pcuwdeKA8QU7AjJPiZEkVdCPYD0J/5pap97rcMp1LLIz35udeqjFB7ekJ1ZU2NIXHxh9bOjdpDf
+	WjJXVtIvtUONYvzi8EgHRa
+X-Google-Smtp-Source: AGHT+IH8wA3xt+CQCkNui2Syc/fmlLx07b5o60cQDt4Q0PQIytlU1FHXoiYwxMvPJRREYg1Iq4EEZg==
+X-Received: by 2002:a05:6a00:855:b0:7ab:78be:3212 with SMTP id d2e1a72fcca58-7b7a4af65bdmr3263452b3a.19.1762955859786;
+        Wed, 12 Nov 2025 05:57:39 -0800 (PST)
 Received: from iku.. ([2401:4900:1c07:5748:1c6:5ce6:4f04:5b55])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0f9aabfc0sm18361299b3a.13.2025.11.12.05.57.25
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0f9aabfc0sm18361299b3a.13.2025.11.12.05.57.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 05:57:31 -0800 (PST)
+        Wed, 12 Nov 2025 05:57:39 -0800 (PST)
 From: Prabhakar <prabhakar.csengg@gmail.com>
 X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -92,10 +94,12 @@ Cc: netdev@vger.kernel.org,
 	Biju Das <biju.das.jz@bp.renesas.com>,
 	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
 	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: [PATCH net-next v4 0/4] net: phy: mscc: Add support for PHY LED control
-Date: Wed, 12 Nov 2025 13:57:11 +0000
-Message-ID: <20251112135715.1017117-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: [PATCH net-next v4 1/4] net: phy: mscc: Simplify LED mode update using phy_modify()
+Date: Wed, 12 Nov 2025 13:57:12 +0000
+Message-ID: <20251112135715.1017117-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251112135715.1017117-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+References: <20251112135715.1017117-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,53 +110,54 @@ Content-Transfer-Encoding: 8bit
 
 From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Hi All,
+The vsc85xx_led_cntl_set() function currently performs a manual
+read-modify-write sequence protected by the PHY lock to update the
+LED mode register (MSCC_PHY_LED_MODE_SEL).
 
-This patch series adds support for controlling the PHY LEDs on the
-VSC85xx family of PHYs from Microsemi (now part of Renesas).
-The first two patches simplify and consolidate existing probe code
-the third patch introduces the LED control functionality.
-The LED control feature allows users to configure the LED behavior
-based on link activity, speed, and other criteria.
+Replace this sequence with a call to phy_modify(), which already
+handles read-modify-write operations with proper locking inside
+the PHY core.
 
+Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
 v3->v4:
-- Sorted the members of vsc85xx_probe_config struct to avoid the
-  holes
-- Fixed Reverse Christmas tree in vsc85xx_led_combine_disable_set()
-- Added Reviewed-by tag
-- Added new patch 4/4 to handle devm_phy_package_join()
-  failure in vsc85xx_probe_common()
+- No change
 
 v2->v3:
-- Added Reviewed-by tag to patches 1/3 and 3/3.
-- Grouped check_rate_magic check in patch 2/3.
-- Formatted the patches with `--diff-algorithm=patience` option to
-  improve readability.
+- Added Reviewed-by tag.
 
 v1->v2:
-- Patches 1/3 and 2/3 are new.
-- Added LED control support to all VSC85xx PHY variants.
-- Renamed led callbacks to vsc85xx_* for consistency.
-- Defaulted the LEDs on probe to the default array before parsing DT.
-- Used phy_modify() in vsc85xx_led_brightness_set()
-- Return value of phy_read() checked in vsc85xx_led_hw_control_get()
-- Reverse Christmas tree in vsc85xx_led_hw_is_supported()
-- Updated the commit message to clarify the LED combine feature behavior.
+- New patch
+---
+ drivers/net/phy/mscc/mscc_main.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
-Cheers,
-Prabhakar
-
-Lad Prabhakar (4):
-  net: phy: mscc: Simplify LED mode update using phy_modify()
-  net: phy: mscc: Consolidate probe functions into a common helper
-  net: phy: mscc: Add support for PHY LED control
-  net: phy: mscc: Handle devm_phy_package_join() failure in
-    vsc85xx_probe_common()
-
- drivers/net/phy/mscc/mscc.h      |   4 +
- drivers/net/phy/mscc/mscc_main.c | 497 +++++++++++++++++++++++--------
- 2 files changed, 379 insertions(+), 122 deletions(-)
-
+diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
+index 8678ebf89cca..032050ec0bc9 100644
+--- a/drivers/net/phy/mscc/mscc_main.c
++++ b/drivers/net/phy/mscc/mscc_main.c
+@@ -177,17 +177,10 @@ static int vsc85xx_led_cntl_set(struct phy_device *phydev,
+ 				u8 led_num,
+ 				u8 mode)
+ {
+-	int rc;
+-	u16 reg_val;
++	u16 mask = LED_MODE_SEL_MASK(led_num);
++	u16 val = LED_MODE_SEL(led_num, mode);
+ 
+-	mutex_lock(&phydev->lock);
+-	reg_val = phy_read(phydev, MSCC_PHY_LED_MODE_SEL);
+-	reg_val &= ~LED_MODE_SEL_MASK(led_num);
+-	reg_val |= LED_MODE_SEL(led_num, (u16)mode);
+-	rc = phy_write(phydev, MSCC_PHY_LED_MODE_SEL, reg_val);
+-	mutex_unlock(&phydev->lock);
+-
+-	return rc;
++	return phy_modify(phydev, MSCC_PHY_LED_MODE_SEL, mask, val);
+ }
+ 
+ static int vsc85xx_mdix_get(struct phy_device *phydev, u8 *mdix)
 -- 
 2.43.0
 
