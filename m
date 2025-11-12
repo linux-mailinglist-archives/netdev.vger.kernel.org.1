@@ -1,139 +1,139 @@
-Return-Path: <netdev+bounces-237938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CB2DC51CDF
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:59:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA9A6C51C4F
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:51:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E695B3B2BDA
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:48:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBE8E1896288
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C982F23ABAA;
-	Wed, 12 Nov 2025 10:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2A530748A;
+	Wed, 12 Nov 2025 10:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ctUSWSzT"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="AdMfaWN0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5762D8DB1
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7313081DE
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762944515; cv=none; b=KRS3QKXtlf2TTya2YOASM7HiAWMGK+ju9hBJat4AkOvmSyYnGakoF7si5Y8oGKMocihWhxwVRiBUyEFYU3GGnL0XNsabxY4tHwFohCXFkYTNBo4yPcMa5hr7womZm7qeLikQhRZL//NAXKvGGE0jLqZ8w24mHWo+dG5xzisoxoU=
+	t=1762944649; cv=none; b=pOPKKDWGuA+le33iRhiBFp8Mcfr8Q4FTHMovLDOaAKAw5uJyOijPCtg50LLEQ/JZU1peGbu+2sVypn4R3Pb74PmvGJOqLeqouyiIAh6oJ3Cm3hQ0i9ZdZTv+aWNWVz40llrsfCSBewOfp3F5Isr4t4TDndXGMnwn7x3OUlOGt0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762944515; c=relaxed/simple;
-	bh=/+aa6fDPTYj+qjzn67oNXlnYeeWJI8tJYBESafgTCLw=;
+	s=arc-20240116; t=1762944649; c=relaxed/simple;
+	bh=5Z/Sel55XGLWWt0Or4aaEmOg0nRkE2Q24yyei396xO4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CfPLMaRb/U5bPefYj6sJFYW+PrJoPnw8grcWJb3MOnZyUVEh0esRSUGNFIwqxlOrbFvnyj5bCuKwtfhZz98YRLUvFC5NagHk7ZAqI6cMuu1hpj9mXc2L2d8gBLvaEGDcncaBY0wm4aqWT9KNjdj1x96u5HQSpAXlvwtbYm7wrTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=ctUSWSzT; arc=none smtp.client-ip=209.85.216.43
+	 To:Cc:Content-Type; b=qs90oj5UnLwFuRm1ASjUoL/EAaAgRb31AlUnT/nKAWlqcmpfSKxNuGUVbFjFWlDHaBrLVwXPxygFMyJcyFkh5V2W66dHxEy8CeaSXv6kS1KBbpMLhvjZI8VZzRX9z3cWi45CZzx/Nh5p74lJ5ZFrSzddD6MkXgoGrBmvi5GfdyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=AdMfaWN0; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3436a97f092so842097a91.3
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 02:48:33 -0800 (PST)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-34101107cc8so558201a91.0
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 02:50:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1762944513; x=1763549313; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1762944648; x=1763549448; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mtWqGtULi5t1U9ILc6RI8y0vqCYzk5D39MUDHMoZVxQ=;
-        b=ctUSWSzTCMNMmGL9Md44P4eP28Ha05/o6+2r8o0ZUcn8/DOj1nn0l0ZjMhKia+b6QR
-         FDRFUInXnByeX4MeQU4aOoLkRtufShmFsEDwjClVgRJ/8Xo/WSVhm3b38ImXDr+ms106
-         QWSR8Yt/Nk60qnhC9GfCrlW67IAl+fSi/25amd89qvqLD4RaqjTNMX7OR6dGrgEZ3GwI
-         NDKX2lFNKy6r4B01tsq3ltASEwB7R0WBPbiHhtAnz3NRgt8Mw0hyL2pGHUa4mBk2DqLA
-         eISp75aiHapF7Hdwrayk0s6XN+GgktAB0+lwL45lXCO7/9YhWPD/C+wgY76TbRVUmVUB
-         gAUA==
+        bh=eDt+PkPIFcOkoVGyNRXMinYtQG6IfGLG4Ne73L8xsnI=;
+        b=AdMfaWN0ZjdHij6ofGKOD8OBBKiPKyuvvgTfm3jsNmNTvQ4qb4qXIBBBanbRne34hI
+         NT99UrkWhkdIwSdY+953owV57Rb1Mm0Br7tNtIok59OCrB6xsxsI6zRHPvv9JT8n0YME
+         XHgpG9gfl6o0D8oghrQaRVKq0SaCzejGX0pTxxJky5VO29pBf4O/vOwoLvhvLAXkBVDp
+         e19cbbnw+3Byp0HAeJcTSzKLPK6sYfiy35FT0cGmIuOC5Jzj7WCooirEQ/vv6VfDM1jC
+         RqCSE8fDES84x3Y4GPmzzrDgIZpgBqvkwMeyiBcX4zCsUxNrMAQVCszaGP+E9knx0pyp
+         m1nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762944513; x=1763549313;
+        d=1e100.net; s=20230601; t=1762944648; x=1763549448;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=mtWqGtULi5t1U9ILc6RI8y0vqCYzk5D39MUDHMoZVxQ=;
-        b=VjdfVoNrWn8NNQwYlJba49rnsHCldNkhDg8W27Y7ebBVY5XJ3Q0JT95e1zsC914PLi
-         QaUXYSQ3lwzKMrt9wsEZ8KP5oDxRaFmNj2vrRste365wwast6bCWkThjclQHf4vr92/Y
-         bHUAJJPo4c9DIxIcq7OkOQdWRD6iygqCbPUmyhpXywCKnOctvJZVCtc0f+FIQaZxXxQ9
-         sewXTWxBBOMoqxm3KfSz7S+OVJqCUCUkFSz2sqMdbZBqMmJhluEjw0kDxvYMP6r7yrfr
-         UaCl4EQeiGb1w2g/lrPywuFvlOZyhwgQY+irQ9kKTwppNWnujFgpZeYT1WENoQGCmsyp
-         2cDg==
-X-Forwarded-Encrypted: i=1; AJvYcCUJITyeELnA9ERwjCImFGlWbW4HmFxNF4h6g31eEc2ifizGrHH14hBjkS3Xuf7DwACyH8RWKzE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMhKd6sj+A8P7cm9wrKkN4lIHjT1INR4aWmuFiWIAGotS5GYgX
-	kDhPAQ5mi6kdAjo5loq36+EHXdnDv442COnr+zx+Nu9Nup5nmjRsUg2XdpKEjmsIZDKv5QifXcP
-	9Y2lCWW8qrCX2u4mOYX5+4rD/OwMVluhPX+NEEDpe
-X-Gm-Gg: ASbGncsC8kHMd9AYVZ0cS/7MkjzP3bJjPL0h925Ztc4QyxOHDaxQlsDGA40qeKEI9fU
-	2q8lmowRId0VtrQOAJ+yDww5L+1WsSL6NtEvLN1W/H4YzH48xqQELwDp30NHyg4IMjDHdEd73vA
-	aTIQWOEe8pI89ipg74YDD3VUqX69uKmnB3zzdt0+uJqqoptiJlnCm6/pdc6Q0PALaRcFkAoEJjU
-	eCXXVymgE5B6YCCuAvVMnP9xXgJMg9VKaOqnXCTAM4rrfD2/BpCj101N8rlgihIxxyafD/PpX/4
-	Lyw=
-X-Google-Smtp-Source: AGHT+IHjY6QQ/hXiL8gNJwMs6BAbuYYs2wjVJm11YnOI4a9isY5eBtqYo1pfzv8eFKkTIgzLqOZOH7UkDi41nFB29gk=
-X-Received: by 2002:a17:90b:3943:b0:340:d1a1:af6d with SMTP id
- 98e67ed59e1d1-343ddefee62mr3130904a91.36.1762944513524; Wed, 12 Nov 2025
- 02:48:33 -0800 (PST)
+        bh=eDt+PkPIFcOkoVGyNRXMinYtQG6IfGLG4Ne73L8xsnI=;
+        b=kfnlksZ7N7E//enulkzShFhky22cznW/lE/vXREQczJtlN/o3U2fL739arV9d4kgIc
+         pF/PUFQg+/hOJ87tBhdrdhXPfn2hhZ9kODlmLaBS7d90cbYHTTmCosQNpWJPBN55g1cC
+         Q9t/Dq59fqrM0RsjP0c1ystxB17XZ2ykEXAgPhEqKLQr2e1Pv7RkXcf6iBObQIhOAYg9
+         H0yc53atQKhQMEiDPE4+sftZ6FRw32IOR6srwxyygO4BckxQr+N8qnWCFeW5SIpakw54
+         FW9rF2rLGZCJVHdh8r+HFYmZ17Rldw7zAy0DID5GO4WECNYoC7YCMnauXreoz6t/mJu7
+         beSA==
+X-Forwarded-Encrypted: i=1; AJvYcCXdic+GdbIILvUFaK/XYRZ034o+/9NfL5DnjaMt+wrtOCfvychl5ETkVbHhzj06I3eAYmZeBdU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGTgeCXG+UDcZ/CpmgDnZ+Oyn/OzmhIfarRufMcW/yFVHqF6rW
+	rJs/Ag7o/Dqp0qMuEhdEFkO3dn5Cbrj1zKxuXBcrvBiDQS2Ev2LHhYAbgZSCh6EUeSQdcNq+6wz
+	mqV9eDPcGX/95tgVN7uMxHHsyhPwSM2mtGibGDMvk
+X-Gm-Gg: ASbGnctuCQW36CZJ4JKLo/QIeDGV2+QzNtb0ehGLavLpFZGt80FMyPFmT/xe28JX1n8
+	qwFzZ07G+ArcjTTd0bcaZaufNhdZC+kSiPIClofFeNxxZOPxvflNxbWMZTPKidjxwU/0SW8cOqk
+	YmMz6NZZMHygVTYXI02tWT33gzX9OTva4ogaT6Nlze4B1HxkfQhEF2bNhV9INKwgbdep9IlF5zt
+	qDdxq/qkh068pkVW+mFu3kzYdu975lQ9T1k9NHkL32/PVXlE29h+iyY202yYXEq5Zwm
+X-Google-Smtp-Source: AGHT+IFd1GAEDD22DSqeZAERmGI0Yy3shnOdbYrZoI4SJAFw9T2NTCYWO4NIIVgty2SrgCXz2TzubvGJOTr/RLGjLss=
+X-Received: by 2002:a17:90b:3e8d:b0:339:ec9c:b275 with SMTP id
+ 98e67ed59e1d1-343dde10f3emr3441534a91.6.1762944647817; Wed, 12 Nov 2025
+ 02:50:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251109161215.2574081-1-edumazet@google.com> <176291340626.3636068.18318642966807737508.git-patchwork-notify@kernel.org>
-In-Reply-To: <176291340626.3636068.18318642966807737508.git-patchwork-notify@kernel.org>
+References: <20251112072709.73755-1-nichen@iscas.ac.cn>
+In-Reply-To: <20251112072709.73755-1-nichen@iscas.ac.cn>
 From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 12 Nov 2025 05:48:22 -0500
-X-Gm-Features: AWmQ_bnHComti2QeZEYOkFv0a1p9BnUFG8ZGieRlZgS6HdYEpIQTlXBNjwFefCs
-Message-ID: <CAM0EoMkSBrbCxdai6Hn=aaeReqRpAcrZ4mA7J+t6dSEe8aM_dQ@mail.gmail.com>
-Subject: Re: [PATCH net] net_sched: limit try_bulk_dequeue_skb() batches
-To: kuba@kernel.org
-Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net, pabeni@redhat.com, 
-	horms@kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	kuniyu@google.com, willemb@google.com, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, hawk@kernel.org, patchwork-bot+netdevbpf@kernel.org, 
-	toke@redhat.com
+Date: Wed, 12 Nov 2025 05:50:36 -0500
+X-Gm-Features: AWmQ_bnhAIJldRZySXFM6YMLqOMoeHsLxRw20K50W9oAJgt68RFCpe5Bg9f-mmQ
+Message-ID: <CAM0EoMnQqNwkdUec0tX4cznZk8teiPRx9iBv5Ff-MeSDASj-zQ@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: act_ife: convert comma to semicolon
+To: Chen Ni <nichen@iscas.ac.cn>
+Cc: xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 11, 2025 at 9:10=E2=80=AFPM <patchwork-bot+netdevbpf@kernel.org=
-> wrote:
+On Wed, Nov 12, 2025 at 2:28=E2=80=AFAM Chen Ni <nichen@iscas.ac.cn> wrote:
 >
-> Hello:
+> Replace comma between expressions with semicolons.
 >
-> This patch was applied to netdev/net.git (main)
-> by Jakub Kicinski <kuba@kernel.org>:
+> Using a ',' in place of a ';' can have unintended side effects.
+> Although that is not the case here, it is seems best to use ';'
+> unless ',' is intended.
 >
-> On Sun,  9 Nov 2025 16:12:15 +0000 you wrote:
-> > After commit 100dfa74cad9 ("inet: dev_queue_xmit() llist adoption")
-> > I started seeing many qdisc requeues on IDPF under high TX workload.
-> >
-> > $ tc -s qd sh dev eth1 handle 1: ; sleep 1; tc -s qd sh dev eth1 handle=
- 1:
-> > qdisc mq 1: root
-> >  Sent 43534617319319 bytes 268186451819 pkt (dropped 0, overlimits 0 re=
-queues 3532840114)
-> >  backlog 1056Kb 6675p requeues 3532840114
-> > qdisc mq 1: root
-> >  Sent 43554665866695 bytes 268309964788 pkt (dropped 0, overlimits 0 re=
-queues 3537737653)
-> >  backlog 781164b 4822p requeues 3537737653
-> >
 
-Hrm. Should this have gone into net-next instead of net? Given that
-the changes causing regression are still in net-next.
-Dont think its a big deal if the merge is about to happen and i can
-manually apply it since i was going to run some tests today.
+IIRC, Simon brought this up in the review as well...
+
+> Found by inspection.
+> No functional change intended.
+> Compile tested only.
+>
+> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+
+Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
 cheers,
 jamal
 
-> > [...]
+> ---
+>  net/sched/act_ife.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
-> Here is the summary with links:
->   - [net] net_sched: limit try_bulk_dequeue_skb() batches
->     https://git.kernel.org/netdev/net/c/0345552a653c
+> diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
+> index 7c6975632fc2..1dfdda6c2d4c 100644
+> --- a/net/sched/act_ife.c
+> +++ b/net/sched/act_ife.c
+> @@ -649,9 +649,9 @@ static int tcf_ife_dump(struct sk_buff *skb, struct t=
+c_action *a, int bind,
 >
-> You are awesome, thank you!
+>         memset(&opt, 0, sizeof(opt));
+>
+> -       opt.index =3D ife->tcf_index,
+> -       opt.refcnt =3D refcount_read(&ife->tcf_refcnt) - ref,
+> -       opt.bindcnt =3D atomic_read(&ife->tcf_bindcnt) - bind,
+> +       opt.index =3D ife->tcf_index;
+> +       opt.refcnt =3D refcount_read(&ife->tcf_refcnt) - ref;
+> +       opt.bindcnt =3D atomic_read(&ife->tcf_bindcnt) - bind;
+>
+>         spin_lock_bh(&ife->tcf_lock);
+>         opt.action =3D ife->tcf_action;
 > --
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
->
+> 2.25.1
 >
 
