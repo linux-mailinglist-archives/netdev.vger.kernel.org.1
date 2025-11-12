@@ -1,147 +1,189 @@
-Return-Path: <netdev+bounces-237974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBFB9C525E0
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 14:03:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60CBEC5257C
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 451083A36A4
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:55:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4B15188FEED
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23DC9328B73;
-	Wed, 12 Nov 2025 12:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2AD63002D4;
+	Wed, 12 Nov 2025 12:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="D6Bcjm/9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HBqw4pgo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4333002D4;
-	Wed, 12 Nov 2025 12:55:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4BA63358CE
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 12:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762952110; cv=none; b=AWDJaTt/vI/eP13Ix3Q4vwSmStpCbuC/FVkfL6TKQeZaQ9hA0kS+zZEJw59ZN0sI62g3l0N1bHiDuUM1zjKHXOyUD9hdF/zMrjcuhYQuJqv1/93DwRoiAFU9XBNqv2EK2tbBBd7Hy/XkMdod1fGAOC/N3b2e1cNgA5wICw1IERM=
+	t=1762952130; cv=none; b=dXk+kg9ggGXB6HybJdglFKkJXPfsrfJbLPfKerfH0rcPNqeUqsVNVKH+msZHfVPe5E87PQ77i/odWPnf6aK7JEd/eRE6Wtfubr275KJ+Ug4G8nM4Im9xRnzfvnDYPzun5Zm29fKxqb/6wNChjTR8JljJkBX4FzdoKwNy83Jk4q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762952110; c=relaxed/simple;
-	bh=GK3S2B+V0tGij54CXCXdL03p1HBPSpt3WcU8s4IwIWk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=boe1WaMaq/qcabACLPdWoOscxwiWwvEs8XdLRt3W9dkF9Pu4TF9Xy5lX8QfuLNHDAvYm1jtBHL7j/UI7T6g3+yEtE9E7QYT0Oj39srWx7/ENF+9V9tZFWZhKgxVa2QSUEGhK7anvlFpRDlCvU5z4iFc5YPQmTtUjc4vWFMAccDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=D6Bcjm/9; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 35840602A5;
-	Wed, 12 Nov 2025 13:55:03 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1762952103;
-	bh=OdNeVeyuucE30sPTpY9njuCBycZpQtt+JjceqnPV0Mw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D6Bcjm/9LmFjtZeCTxPN0DJvz6XRu9Sc37Yb468pSkOpuAsnIIoqNazJRAud1sHoO
-	 mSxY5PM1z7yDgjRQl9NUgocoRUnggPcUSTm+qIXRQkNacOF9yv0AaC9HmSLeQhg7O7
-	 K3Z0/LtLWLjU6+T0X2vO0qu2tfklmPLSEFASLrJhdgG8Z8/lCTEUnS4ApEJUloFdWv
-	 WYudt8DCKioP7oXrFtXWT/e9wbbuAFLc+853qhVQqjTYbZMvUIe9qK8g1wHpYcAmeO
-	 6Ek5GA/lrp4yoZ8pWYiAi7erBgWRy74MIwLvjmxyozW4mQAVOQbb0ri2aMk5XEKYtw
-	 389qt0rQVqprA==
-Date: Wed, 12 Nov 2025 13:55:00 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Phil Sutter <phil@nwl.cc>, Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH nf-next v9 2/3] net: netfilter: Add IPIP flowtable tx sw
- acceleration
-Message-ID: <aRSDjkzMx4Ba7IW8@calendula>
-References: <20251107-nf-flowtable-ipip-v9-0-7cbc4090dfcb@kernel.org>
- <20251107-nf-flowtable-ipip-v9-2-7cbc4090dfcb@kernel.org>
+	s=arc-20240116; t=1762952130; c=relaxed/simple;
+	bh=wl6Xo0IXSzmb0uTVxkVrEryJxhav9P1MiVf1FF2pDsw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HdN/gi2w41nybK7wmYX280ad2+gtYW3aWlTBw0KSJgPj0+ROOZQN1P3TLtnGww/WCDmRhCEylqQ2voT+iJpeyb+6Ax+fopPx08zzYYWizIFeH2Tm/odiLjsaFLCCPk+CwaIN4PqGF42gw8wHHckxK1MjxybeFnB4NnjAgoZJM64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HBqw4pgo; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-7868561eb2dso10160637b3.3
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 04:55:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762952127; x=1763556927; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1VGJUzn5WtQBVoTTrQyM2FX5ydLOnFLFtVi21N9cUAY=;
+        b=HBqw4pgobZwj+V0UGfwqcjoY609yUgTZZ7Q0/3yC4pOZGfMkJBQ872wbJKbVmUuZnn
+         Mxdx6S8dIuzoTKXXfp3FVdCD7fQpOnaUcRQ/ITEBWc8LUxGC87DaTyiMSLNnXg6WN1na
+         sdcD4felEuEVxkYAEpTBdAEOBOpPHHmGckCiNlYrnkBMQ/mAf/JU1KKXtgfWoZMU+iRC
+         i+UD7hnJgpABsHhzYO73NLQal4dgU1/7B8RdTboVCIwnxqpoqjzera3XKaDKq2J7v3ZO
+         1O8D86cJs4tF3fIsMbnuZTDlupUQ8pObkLMXlBrbkGrXWmSpg+DlJcU1TLhHm4T8pwZT
+         x1+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762952127; x=1763556927;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1VGJUzn5WtQBVoTTrQyM2FX5ydLOnFLFtVi21N9cUAY=;
+        b=fErM4Anvc16bpBzB7YwoC3L/WxzjjZU6INsSbz1Jyfy/UPGhjr5vrhJqNh+vRB1vRZ
+         r/6bxZf22SfEVqzO3/nvxUbtqAAJcsyWrH6f2vfhx71tn0aQKVNEnLjUnHY5JO1cOoCU
+         kwfUSfLiLU75rROjnB+8JkUJcZjDAhgDZM+4CWq8u+ThPR9yxUjlCf295+UXzlAJonMm
+         /yNo70LlJSyxfcukDjFMLlxA9G/j6hr6xY7ffUSO+XUhfkXnuasn85zhOhThuRkIqJGD
+         iqiii/T0PYeb+f7rXyEFZCInyL2iUXUGVetxODjlC5i/urH3iuB/h/pytLKbPcIZz90W
+         1m2Q==
+X-Gm-Message-State: AOJu0YxcdXJv0dzyR8A7SWAECb2DYN9qNeLPpd2koiR6HMUupcRqCKUS
+	IygZ5hqZbQMUQMYVRVj6023ekg7E2bgec7MyuUt4vbh/ChXssFpWYa08b8E3xvjrQg5YP6E1MQa
+	j/wX0QDOZb699Mw==
+X-Google-Smtp-Source: AGHT+IFKfHvm1zPt56Z+EIU7I8V5Sxnqk8D6FIACRhXohV4MLib7Je6Hv9q4Dbu8q6IiXFWl/QnGz62pdOGScQ==
+X-Received: from ywll26.prod.google.com ([2002:a05:690c:a1da:b0:787:ce47:7423])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:690c:9692:b0:787:f043:1eed with SMTP id 00721157ae682-788136e4a15mr20671387b3.53.1762952126885;
+ Wed, 12 Nov 2025 04:55:26 -0800 (PST)
+Date: Wed, 12 Nov 2025 12:55:16 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="qIJPGgiRR2AxazJq"
-Content-Disposition: inline
-In-Reply-To: <20251107-nf-flowtable-ipip-v9-2-7cbc4090dfcb@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
+Message-ID: <20251112125516.1563021-1-edumazet@google.com>
+Subject: [PATCH net/bpf] bpf: add bpf_prog_run_data_pointers()
+From: Eric Dumazet <edumazet@google.com>
+To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, 
+	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@redhat.com>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	Paul Blakey <paulb@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 
+syzbot found that cls_bpf_classify() is able to change
+tc_skb_cb(skb)->drop_reason triggering a warning in sk_skb_reason_drop().
 
---qIJPGgiRR2AxazJq
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+WARNING: CPU: 0 PID: 5965 at net/core/skbuff.c:1192 __sk_skb_reason_drop net/core/skbuff.c:1189 [inline]
+WARNING: CPU: 0 PID: 5965 at net/core/skbuff.c:1192 sk_skb_reason_drop+0x76/0x170 net/core/skbuff.c:1214
 
-Hi Lorenzo,
+struct tc_skb_cb has been added in commit ec624fe740b4 ("net/sched:
+Extend qdisc control block with tc control block"), which added a wrong
+interaction with db58ba459202 ("bpf: wire in data and data_end for
+cls_act_bpf").
 
-On Fri, Nov 07, 2025 at 12:14:47PM +0100, Lorenzo Bianconi wrote:
-[...]
-> @@ -565,8 +622,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
->  
->  	dir = tuplehash->tuple.dir;
->  	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
-> +	other_tuple = &flow->tuplehash[!dir].tuple;
->  
-> -	if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
-> +	if (nf_flow_encap_push(state->net, skb, other_tuple))
->  		return NF_DROP;
->  
->  	switch (tuplehash->tuple.xmit_type) {
-> @@ -577,7 +635,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
->  			flow_offload_teardown(flow);
->  			return NF_DROP;
->  		}
-> -		neigh = ip_neigh_gw4(rt->dst.dev, rt_nexthop(rt, flow->tuplehash[!dir].tuple.src_v4.s_addr));
-> +		dest = other_tuple->tun_num ? other_tuple->tun.src_v4.s_addr
-> +					    : other_tuple->src_v4.s_addr;
+drop_reason was added later.
 
-I think this can be simplified if my series use the ip_hdr(skb)->daddr
-for rt_nexthop(), see attached patch. This would be fetched _before_
-pushing the tunnel and layer 2 encapsulation headers. Then, there is
-no need to fetch other_tuple and check if tun_num is greater than
-zero.
+Add bpf_prog_run_data_pointers() helper to save/restore the net_sched
+storage colliding with BPF data_meta/data_end.
 
-See my sketch patch, I am going to give this a try, if this is
-correct, I would need one more iteration from you.
+Fixes: ec624fe740b4 ("net/sched: Extend qdisc control block with tc control block")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Closes: https://lore.kernel.org/netdev/6913437c.a70a0220.22f260.013b.GAE@google.com/
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Paul Blakey <paulb@nvidia.com>
+---
+ include/linux/filter.h | 20 ++++++++++++++++++++
+ net/sched/act_bpf.c    |  7 +++----
+ net/sched/cls_bpf.c    |  6 ++----
+ 3 files changed, 25 insertions(+), 8 deletions(-)
 
---qIJPGgiRR2AxazJq
-Content-Type: text/x-diff; charset=utf-8
-Content-Disposition: attachment; filename="update.patch"
-
-diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-index 8b74fb34998e..ff2b6c16c715 100644
---- a/net/netfilter/nf_flow_table_ip.c
-+++ b/net/netfilter/nf_flow_table_ip.c
-@@ -427,6 +427,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
- 	struct flow_offload *flow;
- 	struct neighbour *neigh;
- 	struct rtable *rt;
-+	__be32 ip_dst;
- 	int ret;
+diff --git a/include/linux/filter.h b/include/linux/filter.h
+index f5c859b8131a3e5fa5111b60cc291cedd44f096d..973233b82dc1fd422f26ac221eeb46c66c47767a 100644
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -901,6 +901,26 @@ static inline void bpf_compute_data_pointers(struct sk_buff *skb)
+ 	cb->data_end  = skb->data + skb_headlen(skb);
+ }
  
- 	tuplehash = nf_flow_offload_lookup(&ctx, flow_table, skb);
-@@ -449,6 +450,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
- 
- 	dir = tuplehash->tuple.dir;
- 	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
-+	ip_dst = ip_hdr(skb)->daddr;
- 
- 	switch (tuplehash->tuple.xmit_type) {
- 	case FLOW_OFFLOAD_XMIT_NEIGH:
-@@ -458,7 +460,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
- 			flow_offload_teardown(flow);
- 			return NF_DROP;
++static inline int bpf_prog_run_data_pointers(
++	const struct bpf_prog *prog,
++	struct sk_buff *skb)
++{
++	struct bpf_skb_data_end *cb = (struct bpf_skb_data_end *)skb->cb;
++	void *save_data_meta, *save_data_end;
++	int res;
++
++	save_data_meta = cb->data_meta;
++	save_data_end = cb->data_end;
++
++	bpf_compute_data_pointers(skb);
++	res = bpf_prog_run(prog, skb);
++
++	cb->data_meta = save_data_meta;
++	cb->data_end = save_data_end;
++
++	return res;
++}
++
+ /* Similar to bpf_compute_data_pointers(), except that save orginal
+  * data in cb->data and cb->meta_data for restore.
+  */
+diff --git a/net/sched/act_bpf.c b/net/sched/act_bpf.c
+index 396b576390d00aad56bca6a18b7796e5324c0aef..3f5a5dc55c29433525b319f1307725d7feb015c6 100644
+--- a/net/sched/act_bpf.c
++++ b/net/sched/act_bpf.c
+@@ -47,13 +47,12 @@ TC_INDIRECT_SCOPE int tcf_bpf_act(struct sk_buff *skb,
+ 	filter = rcu_dereference(prog->filter);
+ 	if (at_ingress) {
+ 		__skb_push(skb, skb->mac_len);
+-		bpf_compute_data_pointers(skb);
+-		filter_res = bpf_prog_run(filter, skb);
++		filter_res = bpf_prog_run_data_pointers(filter, skb);
+ 		__skb_pull(skb, skb->mac_len);
+ 	} else {
+-		bpf_compute_data_pointers(skb);
+-		filter_res = bpf_prog_run(filter, skb);
++		filter_res = bpf_prog_run_data_pointers(filter, skb);
+ 	}
++
+ 	if (unlikely(!skb->tstamp && skb->tstamp_type))
+ 		skb->tstamp_type = SKB_CLOCK_REALTIME;
+ 	if (skb_sk_is_prefetched(skb) && filter_res != TC_ACT_OK)
+diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
+index 7fbe42f0e5c2b7aca0a28c34cd801c3a767c804e..a32754a2658bb7d21e8ceb62c67d6684ed4f9fcc 100644
+--- a/net/sched/cls_bpf.c
++++ b/net/sched/cls_bpf.c
+@@ -97,12 +97,10 @@ TC_INDIRECT_SCOPE int cls_bpf_classify(struct sk_buff *skb,
+ 		} else if (at_ingress) {
+ 			/* It is safe to push/pull even if skb_shared() */
+ 			__skb_push(skb, skb->mac_len);
+-			bpf_compute_data_pointers(skb);
+-			filter_res = bpf_prog_run(prog->filter, skb);
++			filter_res = bpf_prog_run_data_pointers(prog->filter, skb);
+ 			__skb_pull(skb, skb->mac_len);
+ 		} else {
+-			bpf_compute_data_pointers(skb);
+-			filter_res = bpf_prog_run(prog->filter, skb);
++			filter_res = bpf_prog_run_data_pointers(prog->filter, skb);
  		}
--		neigh = ip_neigh_gw4(rt->dst.dev, rt_nexthop(rt, flow->tuplehash[!dir].tuple.src_v4.s_addr));
-+		neigh = ip_neigh_gw4(rt->dst.dev, rt_nexthop(rt, ip_dst));
- 		if (IS_ERR(neigh)) {
- 			flow_offload_teardown(flow);
- 			return NF_DROP;
+ 		if (unlikely(!skb->tstamp && skb->tstamp_type))
+ 			skb->tstamp_type = SKB_CLOCK_REALTIME;
+-- 
+2.51.2.1041.gc1ab5b90ca-goog
 
---qIJPGgiRR2AxazJq--
 
