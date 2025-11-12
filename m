@@ -1,135 +1,123 @@
-Return-Path: <netdev+bounces-237959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C6BC5203C
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:37:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5EADC5209F
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:43:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E77413A6AA7
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:30:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2AB61885319
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B2A30EF71;
-	Wed, 12 Nov 2025 11:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28ED1312830;
+	Wed, 12 Nov 2025 11:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjVdOQYk"
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="sc54x3Mk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CFB430C347
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B0D31282E
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762947037; cv=none; b=o2v2Dxp/8eUOalAliq3j2GpUKsrE+u+X1/Y25vGF4BpjZ+TDv4XuIw7bWVAcbT4s5XXpKpD8byANhTAr3CbfQLMKNJD6OmmBCs+F1WGZOvjhXuG9beHKEIhv7EbQl5QbbMPSjRacmyvMJyey6G/02RWuhjUArincIf1slFd3KqY=
+	t=1762947750; cv=none; b=gdHzS9qmPjJAHjwKhLunLFCZWJQIUM8OV+WaqUfGhuX4Xv50eCDeK0JJCV1vq5j5oycTr6tYnK4W53WvJ1FBCXvhJNf+zXuIneM9C7XPl8o7WnOI/5CjuFAlVQ3TcuB8HAgIhoJCP1fL6fanTCD8Uvpstzu+MyeupmTdQ3So/V8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762947037; c=relaxed/simple;
-	bh=iTAh58xsSTK/DPrCrA9XXO9oOUT/gyUSwdPtMZDZRY4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=STvXr1VDi7jlEm6VGs2IA7ttLxO6l2P02kUu7I4TCLOEbufUrPwEGAi4ynqwuIM4YKdbQdNu8glS4yrq6YYl4YIbKMdAGXIVF/KE5hzZ9SlgYvGn5D9FGBTJsOBVXMmPhNQ9PQYgL4JPy8km1Q4pQOHE4BkkOMeErWHKR6lY8LU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BjVdOQYk; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47775fb6cb4so5145455e9.0
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:30:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762947034; x=1763551834; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=l/oUH46h86/olGMZU+XghYpDhfAZ96DwWr356lECM4A=;
-        b=BjVdOQYkNn1GugyEtpXSuZbkJ+6NMebvOiOl+vQATSk4DKzy9dP0IzIfF7t7DTxIc0
-         h79Cayo4rd1tZHnm3UF6iP16NquA/XmQD1sqR08B0brtBRUm4ITnOXvc+1xwtwV2k7jX
-         IqISyf0r5iDNq2JTyIpuefvmlX6xXMDkd9TrEWPtwqTgWsn4oyqRRTyIYNo4RHtFR6mP
-         09DYULt2CWaTGcv8PemxgkCUZjwV0kIiNzt5YSy402YM+Flyd34wvMhjIH7WNREJLZoB
-         3ZNkEHdsDRfFf3C6aBNo8t5pZGT8AXJXDZZepxyvwuUsqBbgn11CFPp+iptlcxfzy8jr
-         FszA==
+	s=arc-20240116; t=1762947750; c=relaxed/simple;
+	bh=3ez1pFRwtvu6sbZUW1s8KM2i32OeRf3RRHffDNGCt0s=;
+	h=MIME-Version:In-Reply-To:References:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bebjEn/UaDlw1y5QNZlFsdqP7Tv7TEVkB+DWExEM+v0z8P9iWyAwmva/7fJZZJNEioQWoEQDNluAEI5DCJg2Mih7EDQOiHIrf/ZdVvp6758zFO1/i7UPsWjlG2wytFCNfDeGdhsN+GsD3vE2JDL9OP2YdvQB+gh/P8K369UbEgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=sc54x3Mk; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com [209.85.218.69])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id DA2C83F881
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:42:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1762947743;
+	bh=3ez1pFRwtvu6sbZUW1s8KM2i32OeRf3RRHffDNGCt0s=;
+	h=MIME-Version:In-Reply-To:References:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=sc54x3MkVSwGkLeHcjTfQKQAl4yX/22bViLmjlrrKR7MDOe3OvBzquhZdJ3h6LeCY
+	 mE/T26W31wjoaCwPV8g8KXf+IX+vjY98qTgwm1xD62Kz6yAesy6LC97JnGC/g0XIhU
+	 1bopwFkOOY68Lo4eWC3KPner2GAadJZ/4gZ1tuOfppsNk9XQ4Uy2ZxvJbBn0VZhSCF
+	 E+4mpxb8a05FOw4Xg2rY+ibCt30nvfsnfuxiLWOXEqWDD+lyIE3J3LIov4I5/wf9zd
+	 eaaByaAA+FuWrOb/aSoZ4jzqkHqpMfnIOuWcRHoN0U3EpRm+QjNr2HFgq6o8TEEO3q
+	 TKsO0LXQbm7OvmCjbihq3zXPqi2sAj932qC+C8bZeRCa/kTliqSAU/HVnKs0jZp6tH
+	 p8AJ8AppXnImo9osI/r4IY2/qhTv8rHSoJZTjQ6q/CYLpxv6UxxnCtJgAZREm4AcM0
+	 ymJz6gZRkKx+QtTAYdctU3xQROFCwfQAbuTUScpSvK1M5s5UP+dxdiGMPXZj4UXrgQ
+	 SxPvQsQiBYwjnSAxg9einIDfbcgvyYk464NFCimsX1acRRvzGvqeoqevJ+j1AfDhEK
+	 J27UDzQDJTgY1/6jZG+IClmiVIMAJZTqg3y5OgoITM6rr0o2lmF4uuKiKdfCwOgGOS
+	 62hQZOhIi13WJLbRKsx5rN8E=
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b70b21e6cdbso68142566b.1
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:42:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762947034; x=1763551834;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l/oUH46h86/olGMZU+XghYpDhfAZ96DwWr356lECM4A=;
-        b=hW3acGOTbvEQadPq7yssqLcXJb+tadagtuemd9EAqIEhbP0KEKG7FsDWeN+ON8nefR
-         aY2UX2GqiwEWt/KRRZ45Rv5t1PbIq1b6taZmUQaqqLTFE31WB4TqhPeBmwG7C4oGSYyS
-         wnPmY5mOGBJfnIYX9rJ8gk2HunYYKGK0jASTG33haRzMYYuRI6HpXiz3reNzpe6xpkuq
-         Asr/7VrDP8Fr+mm8ST3ilTJLYAPZLQH48B6kx+R/UOobX9dpR/+thoqyYZODY+gztpWk
-         Oe1Wogo0WyGgvNCvfh7rQENf9Rf0oX8ulLN7QwLcqVeBUUHOl4LIu8ojrQcstKOSV9IG
-         874Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXEtWBRg+65ggfmKGb3qk8DpP7QsUZanchyXx6n3rz8zOA8ZGpO8KlxbR2+t2eUeftGhHdZjvw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXbjxIpxMHCm53pIGURJiZxe481xmruVr9dUwwrTV0Rb8dah0D
-	VnOLgUsj0I94oZEnumYbR55NGRjORivEF5UO9bjt3zO/I//gONIU+UH/
-X-Gm-Gg: ASbGncthj5cLxEYviy8dIoPu+eE5QeY3Wu9vjrRLmZhFxDSR9pjNB+Clxpzm2X+/t8b
-	UOIXxCF8/O8OebjqirWBEsMap5e48hpDqf6yDEW2p5Rj0V0Tgdz6P5CsOkIVDYq0MQwjpS0kIaK
-	1JEJw+bPtWbTcK84G3FGXQQwxYMGMsIA5xm7g4IPCG6WsFTfdVUDAJ5qRJKVaH7vtucSMSp2lCz
-	LMPJhWtYb67+Ytb24XOam3cbuaHnvouaNquEm93ywDa7mBr4umEoiNswhM8sYVPYcs+KMI7IdAD
-	4umIg3D9t3EaNIM0gsOH7Sw3oijvBa93jwfbw5JcDTJ61qFIsLbtgSLKn7lnKxeY5r2k4UXKyBx
-	zdXwl0VvZXFta/4XRy6BaZeFt34PnU6RcKYZKCthmbpSD39K17WXELoRuV43ZOHB9fLDs5lkuy6
-	CIZ+LxV5KFzqUUENEck17FZpU=
-X-Google-Smtp-Source: AGHT+IFzZn82+HqmV7Z5oaduLfvBaDy2CYnyKKDWs/rhY5yLhynN3LzPM9CdU2cQ0vUhoC+2FQjWgA==
-X-Received: by 2002:a05:600c:4f93:b0:477:bcb:24cd with SMTP id 5b1f17b1804b1-47787095d98mr24817395e9.22.1762947034215;
-        Wed, 12 Nov 2025 03:30:34 -0800 (PST)
-Received: from [10.125.200.88] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47787e2ad4csm31122115e9.1.2025.11.12.03.30.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Nov 2025 03:30:33 -0800 (PST)
-Message-ID: <89e33ec4-051d-4ca5-8fcd-f500362dee91@gmail.com>
-Date: Wed, 12 Nov 2025 13:30:32 +0200
+        d=1e100.net; s=20230601; t=1762947741; x=1763552541;
+        h=cc:to:subject:message-id:date:user-agent:from:references
+         :in-reply-to:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3ez1pFRwtvu6sbZUW1s8KM2i32OeRf3RRHffDNGCt0s=;
+        b=wGOmDVMTzNOi4zz+l6svwI+IaU2JqcZOyF5bTKb+6m76JBEw88ScdqsiiwiISmf5Iu
+         m1xJNfxTPiF6DE4UoFuUo22Q+vobfZLyhpWu3N+s8us/Aeb5vYyYCULAr9YYDxC7LZ+H
+         a4ht0FN2TrZ9ao8cv5jS57zHEYUDYVo0z2H5+IM8K9NzgkF+wyQtRoFXiaQKPrNo0eb6
+         QMHFi/WLPmptJ268yWqz7oCi6d8KLj/T7cslskfb0izXG3D8lCmAwdL22uFVyJ0OLrOb
+         tBjlMs49h/LrK9zvSmJZaZGJEf/1yXIAGXwLiT9k9aKCf236dOM9rz8nu0n15DcgGNxM
+         t5jw==
+X-Forwarded-Encrypted: i=1; AJvYcCXKI1g8z2yvZEL1NWwgtjPQJmL2jXY2SnCE38sTdcHrhaE+JdMvoQkK+dnQ//K9cb4NanUvzRQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMav15881P7hq6NfZzmqCZ7HZ3wv2wq/PkZyy/4pW2nl2y81dq
+	qrK/xrpl585bj+CM+mGNK0FQTStOlNqEEPXap0Ak1iJlRb/7bivA64g2lmh0lPeFY/wbvgg1s/q
+	dBEkkEpFumqGHuKD1ymd8IcDpDDkcSAMapT1IrpOIE7TRnN44Wf8A1+5TkX0vNIIn14+SULWrz3
+	2YoG1ZsWsG0hxpuY9h5LiJSIJBd32W36ajeBRhRrZDysfIJA09
+X-Gm-Gg: ASbGncs/qS/Mtq8rXnXOyGyDpWziq4v0CK/Oudv1G7H83cFKc+xT3+63q18sbCX5rZa
+	m9tmv56jklws8x8gTEAPyih9ezV1e8caPHey24wzO1+a2AyqMLOhXSBuiMA1+6lDYUwemkt729i
+	xXOUb3uQ4xc0z8CHJURYPrsdoQNBZ+EIGUl7O3Lsb02WbyU5m8XvNcUE+rLOpXgZpHF284BZc/c
+	iXpGSxXl0MZ
+X-Received: by 2002:a17:907:720a:b0:b6d:f416:2f3 with SMTP id a640c23a62f3a-b731d591ea2mr705786466b.19.1762947741624;
+        Wed, 12 Nov 2025 03:42:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG+3IO/2NlBrJx08X6rQMz6PNqtbjwKXovV+gvszbh/YA3hqiRZ0MYX2aiKQ9RBTBWOP5/34tQ/P9NV3zbKqZg=
+X-Received: by 2002:a17:907:720a:b0:b6d:f416:2f3 with SMTP id
+ a640c23a62f3a-b731d591ea2mr705783766b.19.1762947741276; Wed, 12 Nov 2025
+ 03:42:21 -0800 (PST)
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 12 Nov 2025 03:42:20 -0800
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 12 Nov 2025 03:42:20 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/6] net/mlx5e: Speedup channel configuration
- operations
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Mark Bloch <mbloch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
- Leon Romanovsky <leonro@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
- William Tu <witu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- Nimrod Oren <noren@nvidia.com>, Alex Lazar <alazar@nvidia.com>
-References: <1762939749-1165658-1-git-send-email-tariqt@nvidia.com>
- <874iqzldvq.fsf@toke.dk>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <874iqzldvq.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <E1vIjUA-0000000Dqtb-0AfP@rmk-PC.armlinux.org.uk>
+References: <aRLvrfx6tOa-RhrY@shell.armlinux.org.uk> <E1vIjUA-0000000Dqtb-0AfP@rmk-PC.armlinux.org.uk>
+From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+User-Agent: alot/0.0.0
+Date: Wed, 12 Nov 2025 03:42:20 -0800
+X-Gm-Features: AWmQ_bnZR2XzkbNxNxbSAGVNFuRIk1DnPVqrA09Ovj5R5d5xHcMFQU01wJP-xi8
+Message-ID: <CAJM55Z91wvTonahi=8SaGcHAXVrYEpQCzsH0qfecSoFeiBoZCg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 07/13] net: stmmac: starfive: use
+ PHY_INTF_SEL_x to select PHY interface
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Keguang Zhang <keguang.zhang@gmail.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	linux-mips@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	Matthias Brugger <matthias.bgg@gmail.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Minda Chen <minda.chen@starfivetech.com>, netdev@vger.kernel.org, 
+	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
+Quoting Russell King (Oracle) (2025-11-11 09:12:18)
+> Use the common dwmac definitions for the PHY interface selection field.
+>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-
-On 12/11/2025 12:54, Toke Høiland-Jørgensen wrote:
-> Tariq Toukan <tariqt@nvidia.com> writes:
-> 
->> Hi,
->>
->> This series significantly improves the latency of channel configuration
->> operations, like interface up (create channels), interface down (destroy
->> channels), and channels reconfiguration (create new set, destroy old
->> one).
-> 
-> On the topic of improving ifup/ifdown times, I noticed at some point
-> that mlx5 will call synchronize_net() once for every queue when they are
-> deactivated (in mlx5e_deactivate_txqsq()). Have you considered changing
-> that to amortise the sync latency over the full interface bringdown? :)
-> 
-> -Toke
-> 
-> 
-
-Correct!
-This can be improved and I actually have WIP patches for this, as I'm 
-revisiting this code area recently.
+Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
 
