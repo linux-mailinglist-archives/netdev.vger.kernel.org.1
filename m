@@ -1,185 +1,267 @@
-Return-Path: <netdev+bounces-237799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 753F1C504C7
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 03:06:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CAC2C504B8
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 03:05:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A2AAB4E8686
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:06:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 025024E5ADC
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A97292B54;
-	Wed, 12 Nov 2025 02:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7C8255E53;
+	Wed, 12 Nov 2025 02:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hO6F2gkr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SfimH5Ym"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4198B7261B;
-	Wed, 12 Nov 2025 02:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263741EFF9B;
+	Wed, 12 Nov 2025 02:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762913159; cv=none; b=Fk11oRveGL40NNYHddoEL9ZKFyIpWVfjGvM743BeVAc9Yy2PQYqykhShH0AVdO4pqyX/E85AI7+OR2RX8qHgLHSkj+Uzib8X8r28qQpBHpmdYN0Hoo6UGktbQV0rMb704ByNEtLkAgdcYEccbvtpkg/EnC9dLUOzGMotUq20ME4=
+	t=1762913094; cv=none; b=Yfe6Izxoty6B5QMUS6aAB1Y+KJ7v8pS6SERP2DnIGBhH8WMXfNwfXhCQ5OVl+fd9dulfHrFXbk/JvzYFZInWPs8pFj0jIdZodJdMlb7AC06VaBt7LqUXW7Di4JnsdylH8xxoX8pN1Z8+yhCBXHYLsV5S//1N/a+2F1vVOCl5ZYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762913159; c=relaxed/simple;
-	bh=iXo9a81NcpxQrBwVlhIQKSSdxGoVHXdiPTVRhbzilg0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ktguhm+YsaDp8Vqu0a97vHUs+oIYWgvOYhnM+6W2t+4bxTCKdO7HY5rNdM6Cpjg20YkSVB3UEW61soxeYaJewwcE93I7H3ZnXRvt+vgHeoNsuQoFska5WziYGYG+juK0bdGgngMZM+QIQdfCfrS7ZGFC0nSVHe+B1fRP8tJfzCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hO6F2gkr; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762913157; x=1794449157;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=iXo9a81NcpxQrBwVlhIQKSSdxGoVHXdiPTVRhbzilg0=;
-  b=hO6F2gkrHgzr2uLkhMGbftgGAvARCAzAuJ9OsSHKur9mEPbspSOrXlVI
-   JlnSCGTXBI3np9jTHoCCJGWoFYaVrQVHYyWVBuj9BI6MaZKvqHsZ2Dey7
-   dOBQeZTLpeIORNQXdtZreIVZRMMH/epA3BdCZ6hME5C4DWR85ZhbyqbzO
-   hwZJz0+Nr3iqTid4PJ21mitAzSWY0wC/+VAOR1bhqWDwGWngrCxH7TPZ8
-   pCx+c4Y3yJAhO53hM6rioYrLOFN9mE2/R/dnbRFbGoOtNKd82/GZKDTDI
-   BHP1LmjID0dbIewU825dxhcJPUGZcz8Thb8SzfIBbDQ5vHVPs4EeOf7Na
-   g==;
-X-CSE-ConnectionGUID: uD8coVuZSB2Kin2TD1kpfQ==
-X-CSE-MsgGUID: FFX481J3QemgTOoXTPCLTw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11610"; a="64177337"
-X-IronPort-AV: E=Sophos;i="6.19,298,1754982000"; 
-   d="scan'208";a="64177337"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 18:05:56 -0800
-X-CSE-ConnectionGUID: 5sgceOHpRbW7OavioFYyeg==
-X-CSE-MsgGUID: 4dzUsb4mQLObSejwB+iKPw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,298,1754982000"; 
-   d="scan'208";a="219736509"
-Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 11 Nov 2025 18:05:50 -0800
-Received: from kbuild by 7b01c990427b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vJ0F1-0003kp-0T;
-	Wed, 12 Nov 2025 02:05:47 +0000
-Date: Wed, 12 Nov 2025 10:04:49 +0800
-From: kernel test robot <lkp@intel.com>
-To: Aditya Garg <gargaditya@linux.microsoft.com>, kys@microsoft.com,
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
-	shirazsaleem@microsoft.com, leon@kernel.org, mlevitsk@redhat.com,
-	yury.norov@gmail.com, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, gargaditya@microsoft.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Aditya Garg <gargaditya@linux.microsoft.com>
-Subject: Re: [PATCH net-next v3 2/2] net: mana: Drop TX skb on
- post_work_request failure and unmap resources
-Message-ID: <202511120917.rSwJ1zUm-lkp@intel.com>
-References: <1762848781-357-3-git-send-email-gargaditya@linux.microsoft.com>
+	s=arc-20240116; t=1762913094; c=relaxed/simple;
+	bh=Uz5EtMpVn6519xtKF+vC8bmfybmH8hJy0801N8rm/0E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ffmXuF0kbmRCXzOcCtUXu12510jGCk5nXp+Q20B+fg1vH6NaNWbMNDj45WQqkJYUpeSlcYTOTDP3kOFYumOzWrNd/t+nGuVYPNSFopw3m5x3UvmHyLCyEOGn9nFETZ++G6yE+MHkJ5tXAfOaLcoqYpF0Lf25pYy3X1fTUPt8ie8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SfimH5Ym; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 181E9C4CEF5;
+	Wed, 12 Nov 2025 02:04:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762913093;
+	bh=Uz5EtMpVn6519xtKF+vC8bmfybmH8hJy0801N8rm/0E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SfimH5Ymq9+ZbUxv0zM93q32qDniKAP6tfxR1/i/RjL5r7IDdzB55S2ZkvWbTfScU
+	 r/ipl1c8XnG3MaW82bNzP+jBX30kmI+EDfRgbwHC6n4ib19i7CyKtvTb7QGJqoSpuw
+	 c+pItosmZSbf86kKRMrmlVXqQ41EyVw3wqDctH+G9RiYZ/1rJP9+AETWlmMjn0+idI
+	 wFIncnF7vGpvuWtbWgixKjrf/Gvfe0Oeayc8C9CfiYAM9tTgkIx6E2TEzd1oSI6SA0
+	 94Obomw2t+GTBbBQyl831yEhgBOPfYjZKkd+wuGFzIupRD3ilLhFkwJ46U88qUKo00
+	 NcKHrikY/VIiA==
+Date: Tue, 11 Nov 2025 18:04:51 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Fuchs <fuchsfl@gmail.com>
+Cc: Geoff Levand <geoff@infradead.org>, netdev@vger.kernel.org, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Madhavan
+ Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, linuxppc-dev@lists.ozlabs.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: ps3_gelic_net: handle skb allocation failures
+Message-ID: <20251111180451.0ef1dc9c@kernel.org>
+In-Reply-To: <20251110114523.3099559-1-fuchsfl@gmail.com>
+References: <20251110114523.3099559-1-fuchsfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1762848781-357-3-git-send-email-gargaditya@linux.microsoft.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Aditya,
+On Mon, 10 Nov 2025 12:45:23 +0100 Florian Fuchs wrote:
+> Handle skb allocation failures in RX path, to avoid NULL pointer
+> dereference and RX stalls under memory pressure. If the refill fails
+> with -ENOMEM, complete napi polling and wake up later to retry via timer.
+> Also explicitly re-enable RX DMA after oom, so the dmac doesn't remain
+> stopped in this situation.
+> 
+> Previously, memory pressure could lead to skb allocation failures and
+> subsequent Oops like:
+> 
+> 	Oops: Kernel access of bad area, sig: 11 [#2]
+> 	Hardware name: SonyPS3 Cell Broadband Engine 0x701000 PS3
+> 	NIP [c0003d0000065900] gelic_net_poll+0x6c/0x2d0 [ps3_gelic] (unreliable)
+> 	LR [c0003d00000659c4] gelic_net_poll+0x130/0x2d0 [ps3_gelic]
+> 	Call Trace:
+> 	  gelic_net_poll+0x130/0x2d0 [ps3_gelic] (unreliable)
+> 	  __napi_poll+0x44/0x168
+> 	  net_rx_action+0x178/0x290
+> 
+> Steps to reproduce the issue:
+> 	1. Start a continuous network traffic, like scp of a 20GB file
+> 	2. Inject failslab errors using the kernel fault injection:
+> 	    echo -1 > /sys/kernel/debug/failslab/times
+> 	    echo 30 > /sys/kernel/debug/failslab/interval
+> 	    echo 100 > /sys/kernel/debug/failslab/probability
+> 	3. After some time, traces start to appear, kernel Oopses
+> 	   and the system stops
+> 
+> Step 2 is not always necessary, as it is usually already triggered by
+> the transfer of a big enough file.
 
-kernel test robot noticed the following build warnings:
+Have you actually tested this on a real device?
+Please describe the testing you have done rather that "how to test".
 
-[auto build test WARNING on net-next/main]
+> Fixes: 02c1889166b4 ("ps3: gigabit ethernet driver for PS3, take3")
+> Signed-off-by: Florian Fuchs <fuchsfl@gmail.com>
+> ---
+>  drivers/net/ethernet/toshiba/ps3_gelic_net.c | 54 +++++++++++++++-----
+>  drivers/net/ethernet/toshiba/ps3_gelic_net.h |  1 +
+>  2 files changed, 42 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+> index 5ee8e8980393..a8121f7583f9 100644
+> --- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+> +++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+> @@ -259,6 +259,7 @@ void gelic_card_down(struct gelic_card *card)
+>  	mutex_lock(&card->updown_lock);
+>  	if (atomic_dec_if_positive(&card->users) == 0) {
+>  		pr_debug("%s: real do\n", __func__);
+> +		timer_delete_sync(&card->rx_oom_timer);
+>  		napi_disable(&card->napi);
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Aditya-Garg/net-mana-Handle-SKB-if-TX-SGEs-exceed-hardware-limit/20251111-162216
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/1762848781-357-3-git-send-email-gargaditya%40linux.microsoft.com
-patch subject: [PATCH net-next v3 2/2] net: mana: Drop TX skb on post_work_request failure and unmap resources
-config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20251112/202511120917.rSwJ1zUm-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 996639d6ebb86ff15a8c99b67f1c2e2117636ae7)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251112/202511120917.rSwJ1zUm-lkp@intel.com/reproduce)
+I think the ordering here should be inverted
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511120917.rSwJ1zUm-lkp@intel.com/
+>  		/*
+>  		 * Disable irq. Wireless interrupts will
+> @@ -970,7 +971,8 @@ static void gelic_net_pass_skb_up(struct gelic_descr *descr,
+>   * gelic_card_decode_one_descr - processes an rx descriptor
+>   * @card: card structure
+>   *
+> - * returns 1 if a packet has been sent to the stack, otherwise 0
+> + * returns 1 if a packet has been sent to the stack, -ENOMEM on skb alloc
+> + * failure, otherwise 0
+>   *
+>   * processes an rx descriptor by iommu-unmapping the data buffer and passing
+>   * the packet up to the stack
+> @@ -981,16 +983,17 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
+>  	struct gelic_descr_chain *chain = &card->rx_chain;
+>  	struct gelic_descr *descr = chain->head;
+>  	struct net_device *netdev = NULL;
+> -	int dmac_chain_ended;
+> +	int dmac_chain_ended = 0;
+>  
+>  	status = gelic_descr_get_status(descr);
+>  
+>  	if (status == GELIC_DESCR_DMA_CARDOWNED)
+>  		return 0;
+>  
+> -	if (status == GELIC_DESCR_DMA_NOT_IN_USE) {
+> +	if (status == GELIC_DESCR_DMA_NOT_IN_USE || !descr->skb) {
+>  		dev_dbg(ctodev(card), "dormant descr? %p\n", descr);
+> -		return 0;
+> +		dmac_chain_ended = 1;
+> +		goto refill;
+>  	}
+>  
+>  	/* netdevice select */
+> @@ -1048,9 +1051,10 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
+>  refill:
+>  
+>  	/* is the current descriptor terminated with next_descr == NULL? */
+> -	dmac_chain_ended =
+> -		be32_to_cpu(descr->hw_regs.dmac_cmd_status) &
+> -		GELIC_DESCR_RX_DMA_CHAIN_END;
+> +	if (!dmac_chain_ended)
+> +		dmac_chain_ended =
+> +			be32_to_cpu(descr->hw_regs.dmac_cmd_status) &
+> +			GELIC_DESCR_RX_DMA_CHAIN_END;
 
-All warnings (new ones prefixed by >>):
+TBH handling the OOM inside the Rx function seems a little fragile.
+What if there is a packet to Rx as we enter. I don't see any loop here
+it just replaces the used buffer..
 
->> drivers/net/ethernet/microsoft/mana/gdma_main.c:1303:23: warning: variable 'gc' set but not used [-Wunused-but-set-variable]
-    1303 |         struct gdma_context *gc;
-         |                              ^
-   1 warning generated.
+>  	/*
+>  	 * So that always DMAC can see the end
+>  	 * of the descriptor chain to avoid
+> @@ -1062,10 +1066,12 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
+>  	gelic_descr_set_status(descr, GELIC_DESCR_DMA_NOT_IN_USE);
+>  
+>  	/*
+> -	 * this call can fail, but for now, just leave this
+> -	 * descriptor without skb
+> +	 * this call can fail, propagate the error
+>  	 */
+> -	gelic_descr_prepare_rx(card, descr);
+> +	int ret = gelic_descr_prepare_rx(card, descr);
+> +
 
+please dont declare variables half way thru a function and dont
+separate function call from its error check with empty lines
 
-vim +/gc +1303 drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +	if (ret)
+> +		return ret;
+>  
+>  	chain->tail = descr;
+>  	chain->head = descr->next;
+> @@ -1087,6 +1093,17 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
+>  	return 1;
+>  }
+>  
+> +/**
+> + *  gelic_rx_oom_timer - Restart napi poll if oom occurred
+> + *  @t: timer list
+> + */
 
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1297  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1298  int mana_gd_post_work_request(struct gdma_queue *wq,
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1299  			      const struct gdma_wqe_request *wqe_req,
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1300  			      struct gdma_posted_wqe_info *wqe_info)
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1301  {
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1302  	u32 client_oob_size = wqe_req->inline_oob_size;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16 @1303  	struct gdma_context *gc;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1304  	u32 sgl_data_size;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1305  	u32 max_wqe_size;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1306  	u32 wqe_size;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1307  	u8 *wqe_ptr;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1308  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1309  	if (wqe_req->num_sge == 0)
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1310  		return -EINVAL;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1311  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1312  	if (wq->type == GDMA_RQ) {
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1313  		if (client_oob_size != 0)
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1314  			return -EINVAL;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1315  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1316  		client_oob_size = INLINE_OOB_SMALL_SIZE;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1317  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1318  		max_wqe_size = GDMA_MAX_RQE_SIZE;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1319  	} else {
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1320  		if (client_oob_size != INLINE_OOB_SMALL_SIZE &&
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1321  		    client_oob_size != INLINE_OOB_LARGE_SIZE)
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1322  			return -EINVAL;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1323  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1324  		max_wqe_size = GDMA_MAX_SQE_SIZE;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1325  	}
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1326  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1327  	sgl_data_size = sizeof(struct gdma_sge) * wqe_req->num_sge;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1328  	wqe_size = ALIGN(sizeof(struct gdma_wqe) + client_oob_size +
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1329  			 sgl_data_size, GDMA_WQE_BU_SIZE);
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1330  	if (wqe_size > max_wqe_size)
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1331  		return -EINVAL;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1332  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1333  	if (wq->monitor_avl_buf && wqe_size > mana_gd_wq_avail_space(wq)) {
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1334  		gc = wq->gdma_dev->gdma_context;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1335  		return -ENOSPC;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1336  	}
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1337  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1338  	if (wqe_info)
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1339  		wqe_info->wqe_size_in_bu = wqe_size / GDMA_WQE_BU_SIZE;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1340  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1341  	wqe_ptr = mana_gd_get_wqe_ptr(wq, wq->head);
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1342  	wqe_ptr += mana_gd_write_client_oob(wqe_req, wq->type, client_oob_size,
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1343  					    sgl_data_size, wqe_ptr);
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1344  	if (wqe_ptr >= (u8 *)wq->queue_mem_ptr + wq->queue_size)
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1345  		wqe_ptr -= wq->queue_size;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1346  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1347  	mana_gd_write_sgl(wq, wqe_ptr, wqe_req);
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1348  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1349  	wq->head += wqe_size / GDMA_WQE_BU_SIZE;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1350  
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1351  	return 0;
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1352  }
-c8017f5b4856d5 Konstantin Taranov 2025-01-20  1353  EXPORT_SYMBOL_NS(mana_gd_post_work_request, "NET_MANA");
-ca9c54d2d6a5ab Dexuan Cui         2021-04-16  1354  
+This kdoc is worthless 
 
+> +static void gelic_rx_oom_timer(struct timer_list *t)
+> +{
+> +	struct gelic_card *card = timer_container_of(card, t, rx_oom_timer);
+> +
+> +	napi_schedule(&card->napi);
+> +}
+> +
+>  /**
+>   * gelic_net_poll - NAPI poll function called by the stack to return packets
+>   * @napi: napi structure
+> @@ -1099,12 +1116,21 @@ static int gelic_net_poll(struct napi_struct *napi, int budget)
+>  {
+>  	struct gelic_card *card = container_of(napi, struct gelic_card, napi);
+>  	int packets_done = 0;
+> +	int work_result = 0;
+>  
+>  	while (packets_done < budget) {
+> -		if (!gelic_card_decode_one_descr(card))
+> -			break;
+> +		work_result = gelic_card_decode_one_descr(card);
+> +		if (work_result == 1) {
+> +			packets_done++;
+> +			continue;
+> +		}
+> +		break;
+
+common / success path should be the less indented one.
+
+> +	}
+>  
+> -		packets_done++;
+> +	if (work_result == -ENOMEM) {
+> +		napi_complete_done(napi, packets_done);
+> +		mod_timer(&card->rx_oom_timer, jiffies + 1);
+> +		return packets_done;
+>  	}
+>  
+>  	if (packets_done < budget) {
+> @@ -1576,6 +1602,8 @@ static struct gelic_card *gelic_alloc_card_net(struct net_device **netdev)
+>  	mutex_init(&card->updown_lock);
+>  	atomic_set(&card->users, 0);
+>  
+> +	timer_setup(&card->rx_oom_timer, gelic_rx_oom_timer, 0);
+> +
+>  	return card;
+>  }
+>  
+> diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.h b/drivers/net/ethernet/toshiba/ps3_gelic_net.h
+> index f7d7931e51b7..c10f1984a5a1 100644
+> --- a/drivers/net/ethernet/toshiba/ps3_gelic_net.h
+> +++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.h
+> @@ -268,6 +268,7 @@ struct gelic_vlan_id {
+>  struct gelic_card {
+>  	struct napi_struct napi;
+>  	struct net_device *netdev[GELIC_PORT_MAX];
+> +	struct timer_list rx_oom_timer;
+>  	/*
+>  	 * hypervisor requires irq_status should be
+>  	 * 8 bytes aligned, but u64 member is
+> 
+> base-commit: 96a9178a29a6b84bb632ebeb4e84cf61191c73d5
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+pw-bot: cr
 
