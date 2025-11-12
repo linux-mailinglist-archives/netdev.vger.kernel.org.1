@@ -1,108 +1,86 @@
-Return-Path: <netdev+bounces-237917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5F80C517A9
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:53:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A27B2C516BC
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:45:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1974F5026B1
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:40:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4709E188D692
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E282FF150;
-	Wed, 12 Nov 2025 09:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B649A2FD667;
+	Wed, 12 Nov 2025 09:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ZRG+Ddoq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LVB8SZcV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D304C2FE06F
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 09:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2F82D663B
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 09:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762940389; cv=none; b=GciJAIU+oZEvPB2UnZ7k8oYotKNbyA3pBsYMtPb9PEfFGg0AA09oLltY83RFs2XXbyoCHRIHiT2p4fxgcYBrVP4moHt+UBHJloU6oNKqu0Fhp1Qw5fLi3vwhydqHi43/pFyiM/OFOp3+JYjddhQSpo1gLFzCEnnXltDAdYZ2J8I=
+	t=1762940511; cv=none; b=gmWLjWUR4DtKUzmLYFzLqRysHF6kPG2hi2wHTa11rD/MigZdnuTwY7L5PB+JvDEm00dyseVRGFxB23LeKW71dhyq5l1xUfFjfEjAdRegs+h3EdEhj+iwBhtDzO9ql8ncDqmVs/dmG+a4KS+dZe3HHxDSM7P1SxuCEi3Q1hn7Aq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762940389; c=relaxed/simple;
-	bh=XP3zVEDuJXzXClQ0do6m+eEmqEvNrjIuZbPC/rg0ds0=;
+	s=arc-20240116; t=1762940511; c=relaxed/simple;
+	bh=JzWa5cmpuL02EcwiyxuezlKJmiY3ZEmIe+nFZo6Oovs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YoHYMHbYHOfamBp8/6CpG948xM7ln3kLu4NwU+Q/HNdUEPB5g19Ja3SGBH2DrtIBTsaXqk8kQm2r2e2/8KK4zyotIs0UBy6s2/LqYZWzyiJcXT+FjJ76sbeniuMZN/oW9lshGXa+AiBuJl/AfIRZ1EbW42IsbkO+LNlNSOZfSr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ZRG+Ddoq; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6419aaced59so861051a12.0
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 01:39:47 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ppYixyNjBAW3IGJxYWEvb3ZS/CXz8Q/m2i104/OAKDP2jhm9E84gd/+fNRAxdRg/JmnRevQwszo9QHJ+A2ehVeCLyBjkl1Iygi8/odYkD75dMYgfBv/BceFxORgeDP8UpA5m1Fuq06I3C9QEqzxXAjZ5MV6mG7afZvCKl4pN/O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LVB8SZcV; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7810289cd4bso639740b3a.2
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 01:41:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1762940386; x=1763545186; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762940509; x=1763545309; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VMF8ALsV864vheQzgDcfGk5BNkQop27BuXXH8eM/nR4=;
-        b=ZRG+Ddoqz/frIVZQVpDLof3VggCyZD5cXhoM1Vb1XxUWtYIbdg42+Da++jCiMxgloP
-         Gu2I2ESmXOm3UNoDfgR97cTtr85HeWH9h17q/qesQQ7LVh03wKO+w+iVcG6SUNE/YS5Q
-         hfe6qtgUG8Y77lzd9Hp87oAwjpKGYr/cFMNl8QQx63Foopc8MRd9+n+WcEIk96pCAZRk
-         u2DVGN92fKXC9o6pAQaFq5pyhI+D3K3nkfum4ZPnjoO50UTcYYU83anTMcRZbDNyv1xv
-         BvVrzbXVrYjv2+m3uTKnj06wdJnVFzYBLOvbWubSRval9zucwWvvki/r3m8AYyBGf5jr
-         qRFw==
+        bh=ujwbOpQwkx0uyDLqpzauiYWcelx5Hsb+Va99s0w54ek=;
+        b=LVB8SZcVNI28MFMqR5FNganLlCpCzcEfGiV5Kan9RBs0rjQH1YWtxmjdjYeW8UWjtI
+         tRNBTglXmMIjdhmufGoKnGq00T7V7AHgfZZle+tqhxBEHmrb8fA3gg2yqhJeVbaVQsgb
+         31UkNfR/hIlB0xjJDXhZsrQEGG49Ejf3iEwIHjURlrVyngM/j1UpicYvVAkuMdukRara
+         pAifw79o/y1g3FuFk5Hn0z8ntXjKJODo32QcCsK70yqkNxhw6uRL2qKWXW2/Zxeszsh3
+         3t8ZKA4vh0i0dGfDn4U2Jn/wuVvkVOD07GwoHSpvEfNJwFMxnOrm/wWUppO+oyWs9ojV
+         XRdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762940386; x=1763545186;
+        d=1e100.net; s=20230601; t=1762940509; x=1763545309;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VMF8ALsV864vheQzgDcfGk5BNkQop27BuXXH8eM/nR4=;
-        b=vBMmIwWZICXTBBrNEEA/fCtsHc9PxkKlFOoiBZaomLXn7PHf1dnOQJvuXpFeejHUJ+
-         08ssN0TBHhZGY09Smw9QR0vCTtIVnC8AzGbC8X/1/ss9qYRUpS6FcnFlG+CSQeG+6u/M
-         g03Q0Bn07VTtnDJxysXPp1c/aW7svMG47PXQ+iu7QCubPYqIt0j6+P3Nx5brylqnNzFL
-         ezCc1O4FeaOxrC2zRlaTOdjLwdBvODZDn0NsfVGNUe/Zw3qEQOQi4sFGLirUng0hI421
-         zgfBpb4slHTxyeYJV7WzcQFZsVEAG58A//BCwzNLucH2tC2ISNqW1DBN1/3/SNL2TQ8m
-         wRnw==
-X-Forwarded-Encrypted: i=1; AJvYcCVcXHPUz89JE+y5rbVDw4tvCCv/yylpZLjY7KbWBjH/ABT1W2x664sa0xCOoOjh7n5z6MqA++U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzypGmsyDBL2tr98Z4DzVt3+UETow1oC44PNF5UktYpiFZI/Sh
-	g5Gn6skALg6ZUR3a+fLe8AiMD5QqMup6fcA7QJa4uERKDhWCI1S730MSmHzImSGaIzo=
-X-Gm-Gg: ASbGncsw5Y2/Xt35l1+NAcSzQRH49LibgpRxy2iijeCuCjwEVEKKOPyMKQb3auDNHG6
-	VeO6rTi2KkbXePIHQ2c+BAlyEzF9Ue/jJ+tIfudKPlWThMpn36PkVlv236ngwgWbAOeJsOU8ahL
-	uTHfNy1SXIFG1LONdtmTmYX7WqOxJAfcMoEZ/IoalRU88hJY0Ym4c2z67/VZw9ue019pzyi2I6V
-	z56KPS6M7zOL2gOhTfuXuthc/HSXBZhY/Dro8GuUeP5VmKQ8VvpTsUx0lBFRs9xkmXmJBkzqTru
-	IG0BEUJknRWWHvOkLzayvRBeT5LFGy3jiDqlrzah76wnnpIpY1DVunElGoJ16eripmw5HQY3G3t
-	Srudfqz2yknafOR8QywcyXrExclXe7dzj1sw587gDXc+BMoFIgrnr/x0X18k0TZHlmxy53HbLBE
-	L0fN0=
-X-Google-Smtp-Source: AGHT+IHqkOBG3QT37sypafGY0arEyaeulcMIFbw4A7vB4hFyHSAIml6v9aGckPIeEnDDTFYftumN3A==
-X-Received: by 2002:a05:6402:2706:b0:640:b978:efdb with SMTP id 4fb4d7f45d1cf-6431a55e1e8mr1943716a12.25.1762940386139;
-        Wed, 12 Nov 2025 01:39:46 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64166d06531sm9914810a12.27.2025.11.12.01.39.45
+        bh=ujwbOpQwkx0uyDLqpzauiYWcelx5Hsb+Va99s0w54ek=;
+        b=q/D9h/N7PkjQK6Dr0ttOvgi7n8caPUVuh6xqN/7icFttPiQ4OGASyOnh1qOMAYCqlv
+         SC+qT9uB/5v8uhISkgR6bR8P0XJfuBz/rfErT0XRDcsM9RdZF0zNfvUlqQAkVh9GLOzr
+         JYF63+OEtrEBK/QYENqELNDp759gtG5kNfpquyOh/EAWf96iIXOM/IyT1Rue/S+9uELV
+         iPCwTDZDX1WPHTjQyQDIgSrUsWCoKKBNDaaIzO6jdYKuVbxEe55kknpL9GXQeWrL5gjn
+         7BEgYPuEtBHuyKiuOvs3oyR4xCc+atJuftxK8PO48L3ki+QfrZ0uouQzLpkDp8XTZv+O
+         eCOA==
+X-Gm-Message-State: AOJu0Yze/AmIorXSncXYA9ZU83uIYJqgD4qSRUxDimZ2dwDoNEtVCsdO
+	xJ+J84+TG+t83deAxgSL9GzXHwkwV82G6udCCOfLKFxv5BUqD/HFzCq0kj+o+yN73Vw=
+X-Gm-Gg: ASbGnctghljknMveH7ahdm7cj0mVVQ1U6TczzcUNoFfFr8TZfsqmMCe8kAvgj2dh9cW
+	kQRcugUOLOEmBlazDeLIR2+bqVbUInwtP88dUFymw7BqiGTf0P+X1UbduPZ37n5JdSSw7fBaDUf
+	qwwWULaeMWKNoPXRJUTuANkAc+jFHKTxkf9mesMm1K4ZezZXDwnk8MoBQdoGrIwaDv6RZpc6Ssb
+	f733kWU7S1EuNQMSWp9Yhx7zLQc7nrNqkOK78vBMVuGPjF7WGxtYMJPhO6ewyM9lGBSsXOui7NE
+	vB4l6F8y/DaTPio2A7mAywbx+tDDhCSL5PK0rgBlGFvSlJ4V3n98raVXiIt1/HLJeMxBbR5p5vU
+	hnCzwoAG6uewHnKkhRmbie6WBov1cTRtQYC85FAbWR/xRMrX8lhSojhbm0NQt5c1W5hPFWyuQ4y
+	rWn+wG
+X-Google-Smtp-Source: AGHT+IFlN7zA0sO9S824wzejbKS6M3AXrKyVevna1fRk253SlETWibSX61HjTzzCjzwRGiblzdnbPA==
+X-Received: by 2002:a05:6a21:3392:b0:2ff:3752:8375 with SMTP id adf61e73a8af0-3590b5060c5mr3260910637.45.1762940509566;
+        Wed, 12 Nov 2025 01:41:49 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bbf1896a115sm2247871a12.37.2025.11.12.01.41.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 01:39:45 -0800 (PST)
-Date: Wed, 12 Nov 2025 10:39:43 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Junrui Luo <moonafterrain@outlook.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"rostedt@goodmis.org" <rostedt@goodmis.org>,
-	"tiwai@suse.com" <tiwai@suse.com>,
-	"perex@perex.cz" <perex@perex.cz>,
-	"linux-sound@vger.kernel.org" <linux-sound@vger.kernel.org>,
-	"mchehab@kernel.org" <mchehab@kernel.org>,
-	"awalls@md.metrocast.net" <awalls@md.metrocast.net>,
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-	David Laight <david.laight.linux@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH 1/4] lib/sprintf: add scnprintf_append() helper function
-Message-ID: <aRRV3yo9KHZV7sBM@pathway.suse.cz>
-References: <20251107051616.21606-1-moonafterrain@outlook.com>
- <SYBPR01MB788110A77D7F0F7A27F0974FAFC3A@SYBPR01MB7881.ausprd01.prod.outlook.com>
- <20251106213833.546c8eaba8aec6aa6a5e30b6@linux-foundation.org>
- <20251107091246.4e5900f4@pumpkin>
- <aQ29Zzajef81E2DZ@smile.fi.intel.com>
- <aQ3riwUO_3v3UOvj@pathway.suse.cz>
- <20251107175123.70ded89e@pumpkin>
- <aRHzJIFkgfHIilTl@pathway.suse.cz>
- <SYBPR01MB788101676D637353D4E27F64AFCFA@SYBPR01MB7881.ausprd01.prod.outlook.com>
+        Wed, 12 Nov 2025 01:41:48 -0800 (PST)
+Date: Wed, 12 Nov 2025 09:41:42 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	m-karicheri2@ti.com, arvid.brodin@alten.se, bigeasy@linutronix.de
+Subject: Re: [PATCH net 0/2] hsr: Send correct HSRv0 supervision frames
+Message-ID: <aRRWVkY4LghIA7RP@fedora>
+References: <cover.1762876095.git.fmaurer@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -111,86 +89,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SYBPR01MB788101676D637353D4E27F64AFCFA@SYBPR01MB7881.ausprd01.prod.outlook.com>
+In-Reply-To: <cover.1762876095.git.fmaurer@redhat.com>
 
-On Tue 2025-11-11 13:31:00, Junrui Luo wrote:
-> On Mon, Nov 10, 2025 at 03:13:56PM +0100, Petr Mladek wrote:
-> > On Fri 2025-11-07 17:51:23, David Laight wrote:
-> > > On Fri, 7 Nov 2025 13:52:27 +0100
-> > > Petr Mladek <pmladek@suse.com> wrote:
-> > > 
-> > > > On Fri 2025-11-07 11:35:35, Andy Shevchenko wrote:
-> > > > > On Fri, Nov 07, 2025 at 09:12:46AM +0000, David Laight wrote:  
-> > > > > > On Thu, 6 Nov 2025 21:38:33 -0800
-> > > > > > Andrew Morton <akpm@linux-foundation.org> wrote:  
-> > > > > > > On Fri,  7 Nov 2025 13:16:13 +0800 Junrui Luo <moonafterrain@outlook.com> wrote:  
-> > > > > 
-> > > > > ...
-> > > > >   
-> > > > > > That is true for all the snprintf() functions.
-> > > > > >   
-> > > > > > > I wonder if we should instead implement a kasprintf() version of this
-> > > > > > > which reallocs each time and then switch all the callers over to that.  
-> > > > > > 
-> > > > > > That adds the cost of a malloc, and I, like kasprintf() probably ends up
-> > > > > > doing all the work of snprintf twice.
-> > > > > > 
-> > > > > > I'd be tempted to avoid the strlen() by passing in the offset.
-> > > > > > So (say):
-> > > > > > #define scnprintf_at(buf, len, off, ...) \
-> > > > > > 	scnprintf((buf) + off, (len) - off, __VA_ARGS__)  
-> > > > 
-> > > > It does not handle correctly the situation when len < off.
-> > > > Othersise, it looks good.
-> > > 
-> > > That shouldn't happen unless the calling code is really buggy.
-> > > There is also a WARN_ON_ONCE() at the top of snprintf().
-> > 
-> > Fair enough.
-> > 
-> > BTW: I have found there exists a userspace library which implements
-> > this idea, the funtion is called vsnoprintf(), see
-> > https://arpa2.gitlab.io/arpa2common/group__snoprintf.html
-> > 
-> > I know that it is cryptic. But I like the name. The letters "no"
-> > match the ordering of the parameters "size, offset".
-> > 
-> > In our case, it would be scnoprintf() ...
-> > 
+On Tue, Nov 11, 2025 at 05:29:31PM +0100, Felix Maurer wrote:
+> Hangbin recently reported that the hsr selftests were failing and noted
+> that the entries in the node table were not merged, i.e., had
+> 00:00:00:00:00:00 as MacAddressB forever [1].
 > 
-> Thanks for the feedback. Based on the discussion above, I plan to prepare a v2 patch.
-> int scnprintf_append(char *buf, size_t size, const char *fmt, ...)
-> {
-> 	va_list args;
-> 	size_t len;
+> This failure only occured with HSRv0 because it was not sending
+> supervision frames anymore. While debugging this I found that we were
+> not really following the HSRv0 standard for the supervision frames we
+> sent, so I additionally made a few changes to get closer to the standard
+> and restore a more correct behavior we had a while ago.
 > 
-> 	len = strnlen(buf, size);
-> 	if (len == size)
-> 		return len;
-> 	va_start(args, fmt);
-> 	len += vscnprintf(buf + len, size - len, fmt, args);
-> 	va_end(args);
-> 	return len;
-> }
-> EXPORT_SYMBOL(scnprintf_append);
-
-I am fine with this. Just please add a comment that that it can be
-inefficient when using massively because it does strlen().
-I see similar comment in "CAVEATS" section in man 3 strcat.
-
-> I agree that using a macro like David suggested, with an explicit offset, is a reasonable and efficient approach.
-> The `scnprintf_append()` function, however, does not require such a variable; though if used improperly, it could introduce an extra `strlen()` overhead.
+> The selftests can still fail because they take a while and run into the
+> timeout. I did not include a change of the timeout because I have more
+> improvements to the selftests mostly ready that change the test duration
+> but are net-next material.
 > 
-> However, if the consensus is to prefer the macro approach, I can rework the series to use `scnoprintf()`, as suggested by Petr instead.
+> [1]: https://lore.kernel.org/netdev/aMONxDXkzBZZRfE5@fedora/
 > 
-> That said, I believe `scnprintf_append()` also has its merits:
-> it simplifies one-off string constructions and provides built-in bound checking for safety.
-> Some existing code that appends strings in the kernel lacks proper bound checks, and this function could serve as a graceful replacement.
-> The benefits were also demonstrated in other patches.
+> Felix Maurer (2):
+>   hsr: Fix supervision frame sending on HSRv0
+>   hsr: Follow standard for HSRv0 supervision frames
+> 
+>  net/hsr/hsr_device.c  |  5 ++++-
+>  net/hsr/hsr_forward.c | 22 +++++++++++++++-------
+>  2 files changed, 19 insertions(+), 8 deletions(-)
+> 
+> --
+> 2.51.0
+> 
 
-I think that both functions might have their users. You might consider
-adding the other variant when doing the conversions.
-
-Best Regards,
-Petr
+Tested-by: Hangbin Liu <liuhangbin@gmail.com>
 
