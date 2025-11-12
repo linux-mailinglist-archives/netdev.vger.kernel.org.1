@@ -1,139 +1,141 @@
-Return-Path: <netdev+bounces-237939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA9A6C51C4F
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:51:03 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 565D1C51D0E
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:01:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBE8E1896288
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:51:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 848554E34EE
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2A530748A;
-	Wed, 12 Nov 2025 10:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56E83064AE;
+	Wed, 12 Nov 2025 10:54:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="AdMfaWN0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bfFtztmy";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ouS84kuU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7313081DE
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B99A3019C5
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762944649; cv=none; b=pOPKKDWGuA+le33iRhiBFp8Mcfr8Q4FTHMovLDOaAKAw5uJyOijPCtg50LLEQ/JZU1peGbu+2sVypn4R3Pb74PmvGJOqLeqouyiIAh6oJ3Cm3hQ0i9ZdZTv+aWNWVz40llrsfCSBewOfp3F5Isr4t4TDndXGMnwn7x3OUlOGt0Q=
+	t=1762944896; cv=none; b=AbSQXzs7yrCN7BACaeo/YDtU38k+XdF3xsyK8kJ1ZTVqKIntGpXc54woBbFJQnXx4yQkbe3lX5NVM1EBLsHwRj95HQkvJJtsITV8tawkSDdG5hErhQTRQl/EDUdcwTIFdkw6Ttug4zTZJBbXybtmw/DVTDF7oqgtYoTZ4TIjrn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762944649; c=relaxed/simple;
-	bh=5Z/Sel55XGLWWt0Or4aaEmOg0nRkE2Q24yyei396xO4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qs90oj5UnLwFuRm1ASjUoL/EAaAgRb31AlUnT/nKAWlqcmpfSKxNuGUVbFjFWlDHaBrLVwXPxygFMyJcyFkh5V2W66dHxEy8CeaSXv6kS1KBbpMLhvjZI8VZzRX9z3cWi45CZzx/Nh5p74lJ5ZFrSzddD6MkXgoGrBmvi5GfdyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=AdMfaWN0; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-34101107cc8so558201a91.0
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 02:50:48 -0800 (PST)
+	s=arc-20240116; t=1762944896; c=relaxed/simple;
+	bh=+d5+14LmUROJgkDGR1Oe1xzly7s950/vBN51axGk9eE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Bz+GJ1ZiHWPY9neMuHCCSKDUG8OQBdMtp4FThqRNTuQvJ3p/kM4rfc8qG/85e+CYwA/CkXr1HW52hAEL+jce+brDLLO2JzT9ZElPkRsPdEqahzmCZcy3tY6vYhrjfetrqCqJ2Qx0ov6kyncku3vqMPdfpNQrvw9iuc9vo2FPYcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bfFtztmy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ouS84kuU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762944894;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+d5+14LmUROJgkDGR1Oe1xzly7s950/vBN51axGk9eE=;
+	b=bfFtztmytfdE6x5j0yYJYxs6YUPIDZcj+5WogYYuG8w5+0GeptZHB27x6HRjN9m6YitI2U
+	Z0ieIQ4sqY9RLpo4L/LtoFje9/BurODfu9ZvH0u/gxYQQK+OUOj47guZeRP6Kh82zMXoQU
+	8sWwscCmHLX59MsmhWGBsY6lc2ZmJX8=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-77-_KBWYI_mMQyMMgqdJyCoJA-1; Wed, 12 Nov 2025 05:54:53 -0500
+X-MC-Unique: _KBWYI_mMQyMMgqdJyCoJA-1
+X-Mimecast-MFC-AGG-ID: _KBWYI_mMQyMMgqdJyCoJA_1762944892
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-64095d94c2cso807164a12.1
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 02:54:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1762944648; x=1763549448; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eDt+PkPIFcOkoVGyNRXMinYtQG6IfGLG4Ne73L8xsnI=;
-        b=AdMfaWN0ZjdHij6ofGKOD8OBBKiPKyuvvgTfm3jsNmNTvQ4qb4qXIBBBanbRne34hI
-         NT99UrkWhkdIwSdY+953owV57Rb1Mm0Br7tNtIok59OCrB6xsxsI6zRHPvv9JT8n0YME
-         XHgpG9gfl6o0D8oghrQaRVKq0SaCzejGX0pTxxJky5VO29pBf4O/vOwoLvhvLAXkBVDp
-         e19cbbnw+3Byp0HAeJcTSzKLPK6sYfiy35FT0cGmIuOC5Jzj7WCooirEQ/vv6VfDM1jC
-         RqCSE8fDES84x3Y4GPmzzrDgIZpgBqvkwMeyiBcX4zCsUxNrMAQVCszaGP+E9knx0pyp
-         m1nQ==
+        d=redhat.com; s=google; t=1762944892; x=1763549692; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+d5+14LmUROJgkDGR1Oe1xzly7s950/vBN51axGk9eE=;
+        b=ouS84kuUOqxjVYqyd2JOu0jUlGc5vfFvzdwstviQTaLYhw8J2jsATzKrk4pQlzj+nz
+         3SDInp1Oyl2KGpOUK3UAKQDS4CqC1hD0Bc2Fc17OGlOhabo+kx6fxQB8HYLWhtqD80wd
+         YQtI3xqBfZ2Pab0LH9IUp5O5fmI/DngbV2UaT03XJBDCgNXG5Rb6PDN6A3WhDr1u6BqA
+         +xgfr1jlmmfDnceNpGwq6Y0uuZnXPHdksJro8mgAzxx1AW5BvgdAQem08bJa6Nm3HoJH
+         8iwWQwf5Qbq21J84bzKqHSMvYttTQdqOGB2HI+xTkP7MnKlrGNPpL4x3Vea60WT4cPXO
+         1Syw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762944648; x=1763549448;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=eDt+PkPIFcOkoVGyNRXMinYtQG6IfGLG4Ne73L8xsnI=;
-        b=kfnlksZ7N7E//enulkzShFhky22cznW/lE/vXREQczJtlN/o3U2fL739arV9d4kgIc
-         pF/PUFQg+/hOJ87tBhdrdhXPfn2hhZ9kODlmLaBS7d90cbYHTTmCosQNpWJPBN55g1cC
-         Q9t/Dq59fqrM0RsjP0c1ystxB17XZ2ykEXAgPhEqKLQr2e1Pv7RkXcf6iBObQIhOAYg9
-         H0yc53atQKhQMEiDPE4+sftZ6FRw32IOR6srwxyygO4BckxQr+N8qnWCFeW5SIpakw54
-         FW9rF2rLGZCJVHdh8r+HFYmZ17Rldw7zAy0DID5GO4WECNYoC7YCMnauXreoz6t/mJu7
-         beSA==
-X-Forwarded-Encrypted: i=1; AJvYcCXdic+GdbIILvUFaK/XYRZ034o+/9NfL5DnjaMt+wrtOCfvychl5ETkVbHhzj06I3eAYmZeBdU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGTgeCXG+UDcZ/CpmgDnZ+Oyn/OzmhIfarRufMcW/yFVHqF6rW
-	rJs/Ag7o/Dqp0qMuEhdEFkO3dn5Cbrj1zKxuXBcrvBiDQS2Ev2LHhYAbgZSCh6EUeSQdcNq+6wz
-	mqV9eDPcGX/95tgVN7uMxHHsyhPwSM2mtGibGDMvk
-X-Gm-Gg: ASbGnctuCQW36CZJ4JKLo/QIeDGV2+QzNtb0ehGLavLpFZGt80FMyPFmT/xe28JX1n8
-	qwFzZ07G+ArcjTTd0bcaZaufNhdZC+kSiPIClofFeNxxZOPxvflNxbWMZTPKidjxwU/0SW8cOqk
-	YmMz6NZZMHygVTYXI02tWT33gzX9OTva4ogaT6Nlze4B1HxkfQhEF2bNhV9INKwgbdep9IlF5zt
-	qDdxq/qkh068pkVW+mFu3kzYdu975lQ9T1k9NHkL32/PVXlE29h+iyY202yYXEq5Zwm
-X-Google-Smtp-Source: AGHT+IFd1GAEDD22DSqeZAERmGI0Yy3shnOdbYrZoI4SJAFw9T2NTCYWO4NIIVgty2SrgCXz2TzubvGJOTr/RLGjLss=
-X-Received: by 2002:a17:90b:3e8d:b0:339:ec9c:b275 with SMTP id
- 98e67ed59e1d1-343dde10f3emr3441534a91.6.1762944647817; Wed, 12 Nov 2025
- 02:50:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762944892; x=1763549692;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+d5+14LmUROJgkDGR1Oe1xzly7s950/vBN51axGk9eE=;
+        b=tvgM+YzM1ez2pGYKS2QJEk0LYmmD4qvYurOf/8AQsdG0V/YQ1kAcKvjtWmjAT9R4QJ
+         CQzsjtm72Zfak7bU98c7ENT86YVTXy8ijmSYqqJl1Zn/Fp8wLQpEFGGIqFdQXNGSiuSA
+         zndnXZt28JaWEyqPRs4uJpgiFa6uhuVq9lZ+b3gQSZMLDN7bDAnNTQSCRfpUGPJIn/IH
+         eT/kxpjyLrOq6jbe5K11XzpZoKAELiPmSCFl/7ydQnlE3hrCccw33tNDewLyIfOMnpxq
+         7pMCub9TQct4KChwHhZXHuZqMvF/KiNod3yV8H/27GfCotbWDOMTBEWjaJdn5Eekst9W
+         IUQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXXhMdaJvx/Eeg9hDTuq6i2k5FScPHfG+Ryih5wBd0g4LaTh1JdIvpssJCGR79IaawbYvMqbIg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxb93MbQNBA8My9JbA+x/qnDdozlI/u4iaOnsY/lXw8hbNaqC8O
+	4yXHJ880Qogjhu2JSLVeWDAUzN0p55hlZho+fvm6ooyHCQyWDvnuDkCPKMmD9ApTJ8uwKMIY3K/
+	eGGWugzYXnm8IbEwIkUntHUSXi3YHwqdnLB/1QFbwgSVbNG0yWB6NbHhmdg==
+X-Gm-Gg: ASbGncvWo7vFUIKNL3jRZxCK8SGaFVW7yTE174DKPRLwpujx7gEbaGayfTI8E0cwYz3
+	7Zn6JiEXPHmifFfY7g/WGkud0Qkg7Xy8BgPvpfcYCnF0C1t+CKZPcdNcL9vfRUlXjy0p0EcYtt9
+	+Fd0PVuxCqZtIgCjcG+a8ci4/6KP27bzDLHoKu0PqiV4JH/yR9argUZGcmDZPi1wMXshY0HLjsM
+	F2fxmM15Px7iQyvoy7rZMC8qHxwFn9YWwYQumFPbZDOg7rY333uVFngs0yuPgWJbb1CjbnACQy4
+	fj8WTSizf9YSyyKPh3I0OQ7CFhF7XuODIWATtpyMFQGx1BKMRu11jBh7Q4C1xkP0ae2eZZ639XW
+	SxbmYZ6MZndvYirNmQdXi1u4=
+X-Received: by 2002:a05:6402:2689:b0:640:e75a:f95d with SMTP id 4fb4d7f45d1cf-6431a4ca1c7mr2289573a12.15.1762944891868;
+        Wed, 12 Nov 2025 02:54:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH6zPMnNj6//iJFyS3LCsJH7VDDk53FJ+jsm5ERoxaP9Mj04HNN3IWqXw7M8jI38CxB8FzfIA==
+X-Received: by 2002:a05:6402:2689:b0:640:e75a:f95d with SMTP id 4fb4d7f45d1cf-6431a4ca1c7mr2289545a12.15.1762944891443;
+        Wed, 12 Nov 2025 02:54:51 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6411f8578d4sm15715451a12.18.2025.11.12.02.54.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 02:54:50 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 00886329685; Wed, 12 Nov 2025 11:54:49 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
+ <leonro@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, William Tu
+ <witu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Nimrod Oren
+ <noren@nvidia.com>, Alex Lazar <alazar@nvidia.com>
+Subject: Re: [PATCH net-next 0/6] net/mlx5e: Speedup channel configuration
+ operations
+In-Reply-To: <1762939749-1165658-1-git-send-email-tariqt@nvidia.com>
+References: <1762939749-1165658-1-git-send-email-tariqt@nvidia.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 12 Nov 2025 11:54:49 +0100
+Message-ID: <874iqzldvq.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112072709.73755-1-nichen@iscas.ac.cn>
-In-Reply-To: <20251112072709.73755-1-nichen@iscas.ac.cn>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 12 Nov 2025 05:50:36 -0500
-X-Gm-Features: AWmQ_bnhAIJldRZySXFM6YMLqOMoeHsLxRw20K50W9oAJgt68RFCpe5Bg9f-mmQ
-Message-ID: <CAM0EoMnQqNwkdUec0tX4cznZk8teiPRx9iBv5Ff-MeSDASj-zQ@mail.gmail.com>
-Subject: Re: [PATCH] net/sched: act_ife: convert comma to semicolon
-To: Chen Ni <nichen@iscas.ac.cn>
-Cc: xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Wed, Nov 12, 2025 at 2:28=E2=80=AFAM Chen Ni <nichen@iscas.ac.cn> wrote:
->
-> Replace comma between expressions with semicolons.
->
-> Using a ',' in place of a ';' can have unintended side effects.
-> Although that is not the case here, it is seems best to use ';'
-> unless ',' is intended.
->
+Tariq Toukan <tariqt@nvidia.com> writes:
 
-IIRC, Simon brought this up in the review as well...
+> Hi,
+>
+> This series significantly improves the latency of channel configuration
+> operations, like interface up (create channels), interface down (destroy
+> channels), and channels reconfiguration (create new set, destroy old
+> one).
 
-> Found by inspection.
-> No functional change intended.
-> Compile tested only.
->
-> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+On the topic of improving ifup/ifdown times, I noticed at some point
+that mlx5 will call synchronize_net() once for every queue when they are
+deactivated (in mlx5e_deactivate_txqsq()). Have you considered changing
+that to amortise the sync latency over the full interface bringdown? :)
 
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+-Toke
 
-cheers,
-jamal
-
-> ---
->  net/sched/act_ife.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-> index 7c6975632fc2..1dfdda6c2d4c 100644
-> --- a/net/sched/act_ife.c
-> +++ b/net/sched/act_ife.c
-> @@ -649,9 +649,9 @@ static int tcf_ife_dump(struct sk_buff *skb, struct t=
-c_action *a, int bind,
->
->         memset(&opt, 0, sizeof(opt));
->
-> -       opt.index =3D ife->tcf_index,
-> -       opt.refcnt =3D refcount_read(&ife->tcf_refcnt) - ref,
-> -       opt.bindcnt =3D atomic_read(&ife->tcf_bindcnt) - bind,
-> +       opt.index =3D ife->tcf_index;
-> +       opt.refcnt =3D refcount_read(&ife->tcf_refcnt) - ref;
-> +       opt.bindcnt =3D atomic_read(&ife->tcf_bindcnt) - bind;
->
->         spin_lock_bh(&ife->tcf_lock);
->         opt.action =3D ife->tcf_action;
-> --
-> 2.25.1
->
 
