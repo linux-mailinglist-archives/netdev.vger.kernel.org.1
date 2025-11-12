@@ -1,91 +1,96 @@
-Return-Path: <netdev+bounces-238043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A38B0C5336B
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 16:56:27 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FE54C53609
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 17:25:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A91223517A0
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:47:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 96F2E548DAD
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84AF133E360;
-	Wed, 12 Nov 2025 15:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A1B33CEA1;
+	Wed, 12 Nov 2025 15:46:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="eySDEjQm"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E34311C3F;
-	Wed, 12 Nov 2025 15:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDCC22C0279;
+	Wed, 12 Nov 2025 15:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762962312; cv=none; b=OPBW4zxk4gKsPg+XK+QulAQCeevFZvLvecvOAqZ3CFlF21eU/imlOxDvDAINGoc9ogAH2la8iLxDL6Jg4p7grDF+7MmiZWQ5qhbrUbX4esIu3Si1YwAdu+20uCIt/gG0hOSGcF5xzCfrrnu/+xh6Huc0Cssaz6G6cyYASfKPL2c=
+	t=1762962405; cv=none; b=srsh+OT50vY5ZL5fo2qp1h73nvJNZ2BayTpR949kaxtIpNVBsZBFx4YE7cc7CEenqv3QqX0vmC/xrVE5+Y7YeluynkW6TWzQpXauCkV28rmoZOD58cpoKwG03jT0QYA0M26zxk/hv/HE3zaSsjJiZzyfkkRz3guOqFO30REU5FA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762962312; c=relaxed/simple;
-	bh=bBxaeu4UnQrqS05LVUxBDn6qO5PTHZyroer1XV7I2gA=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pKuWUvcbEn2fTmE4a3hgY+2IXL2EijcsX/CMV4EPtja5L3KGIrdZQtRN0bjTFujoRX6VMWyai5Ygg3IvNbD7zg0x8o8pFfurJxATUaGKhKQgkPQmL/SYIFISWkwviCfL+HzPjes1TM/eGtTB5agSnWYj7RH6tGf47uRsxcpHQd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d674v4CL8zHnH7p;
-	Wed, 12 Nov 2025 23:44:47 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id DC2D814038F;
-	Wed, 12 Nov 2025 23:45:06 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 12 Nov
- 2025 15:45:06 +0000
-Date: Wed, 12 Nov 2025 15:45:04 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>, Ben Cheatham
-	<benjamin.cheatham@amd.com>
-Subject: Re: [PATCH v20 07/22] cxl/sfc: Map cxl component regs
-Message-ID: <20251112154504.00007eb8@huawei.com>
-In-Reply-To: <20251110153657.2706192-8-alejandro.lucero-palau@amd.com>
-References: <20251110153657.2706192-1-alejandro.lucero-palau@amd.com>
-	<20251110153657.2706192-8-alejandro.lucero-palau@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1762962405; c=relaxed/simple;
+	bh=+PVoqnnnaIBySDhlth6L4ay7ziIDh5hIKYrDK5UXl8g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JU0M7zQN5bvJuWNvyaWFjH0TKexOCEoCbebZT8rVnj53leBf7UswywbqWqyL5RkAApUmuD35wYrlSw0rfWReg00kp7Fh1LW6QMIH6YloTi/O1g+p32qampIc2+6sy8Ups//ry6nQYDJzzOTNv43ZYwyLSHCvUGraNvh1S2C/Kow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=eySDEjQm; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 3647EC0F55F;
+	Wed, 12 Nov 2025 15:46:18 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id C0E456070B;
+	Wed, 12 Nov 2025 15:46:39 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1946C102F1C26;
+	Wed, 12 Nov 2025 16:46:26 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1762962398; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=cF0rJjJI4tWYdSogXLc0tqn+luRhJBK7q0bCFBP3A48=;
+	b=eySDEjQmTYwi4hV/GI8oe0oOfuB4w3piugQQhn9HLSJu/iIGECK1sH2BE9C3rJNffTJTkS
+	IyslYBrFKrZ80g7jNfIIaJO0QAMy7wZbxcN17QPI0An42QRnJQ39wT+DjOUqxGia03tNbh
+	VK97KbTslzXausYPB12MP7d3Z9n7UiY73Stixcd9TQrcJ0Jw/L8cNY12+gBXxNROw4hsjU
+	mZ5hkD+8XkOtqTb5FdZc0tFFxfqBR/T14zMRm5qBcMzoBNVnfuBtaxRjt/7L75gWB1nsV6
+	TZIImkkN9DcrJeV9TivVQcashNB7Foo33z33h4aShVHWH59Ef01FB8F3pLDfTg==
+Message-ID: <7243ff3e-839f-4ea4-9470-1a16f506b4bc@bootlin.com>
+Date: Wed, 12 Nov 2025 16:46:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 01/13] net: stmmac: loongson1: use
+ PHY_INTF_SEL_x
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Emil Renner Berthing <kernel@esmil.dk>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Keguang Zhang <keguang.zhang@gmail.com>,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-mips@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Minda Chen <minda.chen@starfivetech.com>, netdev@vger.kernel.org,
+ Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <aRLvrfx6tOa-RhrY@shell.armlinux.org.uk>
+ <E1vIjTf-0000000Dqt0-1CZg@rmk-PC.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <E1vIjTf-0000000Dqt0-1CZg@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Mon, 10 Nov 2025 15:36:42 +0000
-alejandro.lucero-palau@amd.com wrote:
 
-> From: Alejandro Lucero <alucerop@amd.com>
+
+On 11/11/2025 09:11, Russell King (Oracle) wrote:
+> Use PHY_INTF_SEL_x definitions for phy_intf_sel bitfield.
 > 
-> Export cxl core functions for a Type2 driver being able to discover and
-> map the device component registers.
-> 
-> Use it in sfc driver cxl initialization.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-> ---
-Side note that it would be really handy when we are down to this last
-version or so before merge to have a short change log in each patch
-(here under the ---)  Saves a bunch of reviewer time checking back on what
-we need to look out for when it might be trivial:
-such as the patch description change in this one
+Maxime
 
