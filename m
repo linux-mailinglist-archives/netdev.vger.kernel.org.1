@@ -1,109 +1,203 @@
-Return-Path: <netdev+bounces-237966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E640C52318
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:11:22 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D046C5233F
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:13:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ACFDF4FDF77
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:01:27 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B7C1D349993
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F44431281C;
-	Wed, 12 Nov 2025 11:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4277E3191CA;
+	Wed, 12 Nov 2025 12:12:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Fd9ANxhC";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="E9tQbbd+"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ff2O0KeH"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013056.outbound.protection.outlook.com [40.107.201.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0422FD667
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762948752; cv=none; b=AIlQT8ENnX24Su8Gp2uzoFPNig/3OFPlZndhx1O//lPPCrv2tf28ci4H2mOmdli4B3V/IQWl8Y6GWaCgSKLzZt0DGdUUKh0/dXkxQ45IpvREmzxGPk7BoYMHT3mcSDjeXXQgHffUYYIXRsdpapqELn/7Ho5ZkQuu8w85vo+fkHg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762948752; c=relaxed/simple;
-	bh=Fomw+xdItHSuhvxKPsm0M/LG9y1l5ZHa+jerqMi0LDY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QgSq0GXXb5eJU3c3LKJuc0J0TFf1/If1Z/QszRSylrnLX8NE1D/SfXuwaZr6yn9L3ha2xEAlkiH27D6FkyVCW5OY6hjvLPtS3iwE+9MBFzExGz8GiWlXMuyDFc/27sRbXPYXANX/YcxoITfvAQH3XWXS2jT4sFIHTpXWPvEO0J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Fd9ANxhC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=E9tQbbd+; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 12 Nov 2025 12:59:06 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1762948748;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bc/FSuXFnewKUWSQYT9lqYkgkpx4GOW5n7HjJDInI10=;
-	b=Fd9ANxhClvZ82/SEXtxCG5cdFcaX0Di42E6DnoSr6+ILbEFLUCwhrPLjL3T5BeTUKOWz0/
-	+FX1HGCYnx6/8h1vQT9yZkf2dhofd6YHOaz13kKfBHkG22dqrhbNu7i37vS3P/uk7kb46Q
-	MTmrOAoItYt5z11jMm9uY2d3DblHHLkwHhMHx4z7SNRpRywlHnaEr1IfrlTJMtHceTarlm
-	PYsBiW9qyDaKGSm4jPFyP3EYz4P6s/my7VBzMhNh1ql8G1xciDFTzCcu8ldnNOhtetTGp1
-	uwMWjgB3+CByPerFSlCavlCpzqa6mJBJYPZhHGgVGZlFIut87kSM9nLMC0040Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1762948748;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bc/FSuXFnewKUWSQYT9lqYkgkpx4GOW5n7HjJDInI10=;
-	b=E9tQbbd+4iB1mnED0zsWkv8C0aZKpXm6ncznFyZXjYTLi7DAa9ngPJmIyDgD5G+WtIeMVe
-	8HugJKibl/jB9YCg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Felix Maurer <fmaurer@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	liuhangbin@gmail.com, m-karicheri2@ti.com, arvid.brodin@alten.se
-Subject: Re: [PATCH net 2/2] hsr: Follow standard for HSRv0 supervision frames
-Message-ID: <20251112115906.esS_ffL3@linutronix.de>
-References: <cover.1762876095.git.fmaurer@redhat.com>
- <ea0d5133cd593856b2fa673d6e2067bf1d4d1794.1762876095.git.fmaurer@redhat.com>
- <20251112102405.8xxcDBuT@linutronix.de>
- <4cb6fcd6-4e0f-47eb-a826-c1af712d33ab@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C837B3176E0;
+	Wed, 12 Nov 2025 12:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762949577; cv=fail; b=mzXU+8YhO7+FLHT93xYrIePZjKUJ/4V77+QNSVpFiU33rsIDBE+CRiIpBB4tFDeHWCBm83sJ/mzgEJWbVqeVbFvjuqzSqUdt+dPIPmjpu80H6dEwhAss3jHBO/7d7eRueOyxtcbCT2siiDSyuGDDLolKW54BWF1JfGUvdY2dGi8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762949577; c=relaxed/simple;
+	bh=3QCX3xpOpAtuqSv5jL82xR2YMZo3nMUTzE/3uRhkVZ8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=neq8JSCnQ1pzGFFZCvuXn+K4ZwMo+VO6Vos6qqzU0fCZOD9ihEAXDWlE5y/XLtgg08zan+ck+FqogEpQe3YaWXMZSz3B9Ofte2dzb1pU8oyzvLrIXQbrFgUD5zXkoJ76t1bQDUqaF0ADTMwT9iOLqkQYJ6VKDoOU1yd8gqTP5uE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ff2O0KeH; arc=fail smtp.client-ip=40.107.201.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XNhykh/K31scJr0Xeo2uQwBIJMZav23Sw+HDiiHPoQF5dexiYqUFqxsGFfaKTkND0oCi0W7lboc6NwYBxY09lXGR12/+UKuBcHw4Fgoa9UqkukosNAIHXkze7fb7siN1RawwQWYyYFoPu9Yg6lJOWHbCljje0Hq9QdN9HXL04aX6df1hZmJO7stM9B1/MqeaX63qinFMQN9DP1OkXCizOSGDLS+8RJQTZiD5+ohlvcYOUlvvsVhZEWDnBeUdzCqyvhtbMka9zfR5ipkpnlewboog+QkSaAHtibHqanPiQxnavIFuj9YAxMzfPvo7rlSLh8b6KrssitDXLiFvAb7sCA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=roz4TLf//9hbY+fQ0h5ew8qbVt1wKQ6zi7dge/IokNQ=;
+ b=j/r/eIzA7fGi38UF7vd/pJRlSq9QDvf5UVxKi3UwWZKKubq77sakYUB93l04AH7qlJ118reCMNrJN65qlOLDESCCHzdi1kSsj4RKqkN23Qpsf8YvOLa2eQCD7lPZPrz7ukzKzo1yANzNeYfs871zLU3LD0pGO8R9oXdlVppCLWLkkytDg6L6PrsQesQIY22nQc0Z5GqBaFkZwVrJ6mCFwJWgga1r80MhrgaPWLU2n4pGaQ09IxDI6faY4lzy4GZk5vrLKBf/bY5Di01bO+mYgh1Tqv91MBe3RikDVJAGBixqzqB/ADArzwRxxbX03OO45+l0b00EtDxwwUa+azguig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.21.194) smtp.rcpttodomain=lists.linaro.org smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=roz4TLf//9hbY+fQ0h5ew8qbVt1wKQ6zi7dge/IokNQ=;
+ b=ff2O0KeHOZ4k52cpw7UtMYKM9seEh1/aaxn+AtFKqhYKcE7n6O6M4r1JFjJ69I8BR1hyu5rupHKKoVKpk3JoxK2bsEYTGMy98Y9mssXfvbawmPH9L5Qf173uQopg12TdPxhOTsRy8okN+anbgRvU1CQNNUR3Kf6Kx0J6u2fuydQ=
+Received: from SN6PR08CA0029.namprd08.prod.outlook.com (2603:10b6:805:66::42)
+ by CO1PR10MB4724.namprd10.prod.outlook.com (2603:10b6:303:96::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.16; Wed, 12 Nov
+ 2025 12:12:52 +0000
+Received: from SN1PEPF0002BA50.namprd03.prod.outlook.com
+ (2603:10b6:805:66:cafe::6f) by SN6PR08CA0029.outlook.office365.com
+ (2603:10b6:805:66::42) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.16 via Frontend Transport; Wed,
+ 12 Nov 2025 12:12:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
+Received: from flwvzet200.ext.ti.com (198.47.21.194) by
+ SN1PEPF0002BA50.mail.protection.outlook.com (10.167.242.73) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9320.13 via Frontend Transport; Wed, 12 Nov 2025 12:12:51 +0000
+Received: from DFLE205.ent.ti.com (10.64.6.63) by flwvzet200.ext.ti.com
+ (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 12 Nov
+ 2025 06:12:45 -0600
+Received: from DFLE212.ent.ti.com (10.64.6.70) by DFLE205.ent.ti.com
+ (10.64.6.63) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 12 Nov
+ 2025 06:12:44 -0600
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE212.ent.ti.com
+ (10.64.6.70) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Wed, 12 Nov 2025 06:12:44 -0600
+Received: from [172.24.231.164] (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.231.164])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 5ACCCc4v2661507;
+	Wed, 12 Nov 2025 06:12:39 -0600
+Message-ID: <6eb4e9c0-debe-4643-a5b6-bd5ef0f72070@ti.com>
+Date: Wed, 12 Nov 2025 17:42:38 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4cb6fcd6-4e0f-47eb-a826-c1af712d33ab@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/7] net: ethernet: ti: am65-cpsw: add AF_XDP
+ zero copy support
+To: Jakub Kicinski <kuba@kernel.org>, Roger Quadros <rogerq@kernel.org>
+CC: Siddharth Vadapalli <s-vadapalli@ti.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, Stanislav
+ Fomichev <sdf@fomichev.me>, "Simon Horman" <horms@kernel.org>, <srk@ti.com>,
+	Meghana Malladi <m-malladi@ti.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<linaro-mm-sig@lists.linaro.org>
+References: <20251109-am65-cpsw-xdp-zc-v2-0-858f60a09d12@kernel.org>
+ <20251111171848.1a4c8c03@kernel.org>
+Content-Language: en-US
+From: Chintan Vankar <c-vankar@ti.com>
+In-Reply-To: <20251111171848.1a4c8c03@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA50:EE_|CO1PR10MB4724:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4b88ebc5-613f-45a6-a1c5-08de21e4cd3a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?MzVrTmNxeFlKOXZXS0dvaDhpYXBCZklXWXhiblEvSEpieHpkakVoNUVZYW5X?=
+ =?utf-8?B?a25mM1JUbWptNHEzOTI5bytqMnhGMjMyamlUTVd3VmJWc2RYUjNIbU1GaTcv?=
+ =?utf-8?B?MVNyb2c2YkRzeDN4NUxMK1VJK0lsWlVhVWNvd09iNXQzV3Y3NUVtL1Fxdy9R?=
+ =?utf-8?B?enVocEJjZ1NmY0Z6TmpMZithb3paN1dRTlNKWlErL1pKWFpWUDFuU25tdlVw?=
+ =?utf-8?B?enZRUU9DdkFoVCtvblZFOTlkLzZ6cUVsODFwQUpmR1RUazZodjF1b29GTm8y?=
+ =?utf-8?B?VElnaTN2UXFrNkxia3RFZXZIQXljdmVBT0FhalhwdUZEZDdBMm1USDFpZkth?=
+ =?utf-8?B?NU5GMkN0QWhiNm5kSVhpOGdsZloybmRac2ttZldGWnBWUjZNZ3NsRVRNc1hJ?=
+ =?utf-8?B?eGZBNEVsRGJqM3gydll4UWRNYlNnbWJqcnl1UHQ2aXhBVzJtL29ST3RYUUtE?=
+ =?utf-8?B?dXdWSzQyaXNGTWNIMkdQWExDL2xtWmxtVEVQWUFmSVdUbEk5amhWUmcxd2Mw?=
+ =?utf-8?B?SHN5dDNoWUY3SzNlV1ZDaUU2OUIwQ3RyeC8yeXUrQ3haczRHc1ljaXNtb1F0?=
+ =?utf-8?B?dE8xTytOSStlVWdqRG1VQm9OOUFGakUwclV1Y3pGcGF1OU9ZS0dvQlEzdWZG?=
+ =?utf-8?B?SWsvaXZnK2NKaUVZM21HMjJ3VEFRS0dWd2pRMEltMTcwT1FnNmVhMkRKbDNy?=
+ =?utf-8?B?NW5HYitLQm9sWlQ4VTdubCtTYm5EVllMYVlMYURGaEVLT3hXN1dnTTBuS3Zi?=
+ =?utf-8?B?TVJQYUhHQnhWWGdwTHovSFJTUmNTWTRBN2NjTkdwWSt5ZXBiUDJ2NkNFRUtG?=
+ =?utf-8?B?aDhYZnZkQjFIazdXeVpqZEE0U1ZXMUZLWE5rd2xiSzE3MmtOciswNG9nSVFZ?=
+ =?utf-8?B?N0hvdGlsTll5M0tGL1BxamVTYU5YTUdoNWhxaE0yS1NUUG94b2hzZytrVmxw?=
+ =?utf-8?B?NE5YZ29JZkphRjJlUnFQQUxxZkNSZWphTUY3djF3VmgyTTR0OGEvRHl4VzRw?=
+ =?utf-8?B?T1lybTgvcTB0Vmd4RmZGZUdXSjZXZ2ZFdHBTZis2clZCOXBhekxVMnV1a1V0?=
+ =?utf-8?B?a3pKTmJLNS9aallqK1hIYmdBNUFGN3l6dEM4Nkl4aTBzZTdWSDNNeVl1amlF?=
+ =?utf-8?B?Rm9mbFFpMlpOdU9xc3BEWlB5ZjJEUlZQUVBaY0E5K2t3bGFIM0xqTm9KbEp6?=
+ =?utf-8?B?cS9vWGdTcVJ1OVdCZGRrSFNyZm9uSW92NmNkTGthcXcvWDZoRXI0dFJlZmZ0?=
+ =?utf-8?B?WjhqRWZjL2hhTTcrcUkwT2E3UlNYTk5WMzAycGc1cG9Qcy9ndDdLQkJpZWFE?=
+ =?utf-8?B?UnZuOW40aEZIeHRMa3RzUWMxR1N1c1lqTFZobU5tdFE1WGpkdU05WFN5TmpV?=
+ =?utf-8?B?KzdXcStLdm9BZ3FmVGZ4UTlNa3BWanBvVjVIUVZqN3JRVkRSbkRFNm1aRFM3?=
+ =?utf-8?B?TDZsODc5TW9CSnVlNTY0ZkVNdEVrWjVPY1BDbGRoRjlPQ2xOcW1aMFpOYTZG?=
+ =?utf-8?B?SmVpMVdWNzBqeUpZWUd0bVVtb2FOanRmcjVoOXZnRjRaSkRJdXduQnpwYTM2?=
+ =?utf-8?B?VVRCWTdsKzIwSHYyM1JTZXZWZ0NxZFpjT1ZFK1h0azlpVTRSbkI2ZWc3T3hG?=
+ =?utf-8?B?bVZHc1lQY2JoeEFWUXgraEFMcU1SOE9SUldOMmI3NXlRclBiYWxZbC91anpz?=
+ =?utf-8?B?WmFXaUh6SzlWdnNwT1dMT3dNSXN3b21FdGNoK2lrYlN0RmRYTU9uZ2xOK0ZR?=
+ =?utf-8?B?Z0cxMWxKdFFqTmN2eFVVN1lQdWhDRk9hWnZMUFlSNitOcXU2TmJSWEVpbE9O?=
+ =?utf-8?B?cXp6TVFPc2ZKclhpYmcveXFRWnU5c2FJcVhWVWtQRjhtTnlndlBSa3cyN05Y?=
+ =?utf-8?B?RHZIQ292VWhhaElGeHM5UG5LSWxKTmlMTDJDZUgxeFlFZTV1OFZ2RC9GYlZx?=
+ =?utf-8?B?YVZmaHkrU2ovZEI3SXlwbWJuK0FKVWI1emgxOGd4YjhMMEdVdmtLNTQ2Vzla?=
+ =?utf-8?B?Uk5JQkVHYWNlL1RlaTVYcTZ0MDlHT1FxRldZRVR2N0M5Ukx1dzVqR0VZTEp5?=
+ =?utf-8?B?U1FYelNaN0FGSnRjMlVnSGdXMCtQc293NmlCYi80NTRYVHJ3Zkx6Y2ZKYUdo?=
+ =?utf-8?Q?oPGY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(7416014)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2025 12:12:51.2090
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b88ebc5-613f-45a6-a1c5-08de21e4cd3a
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002BA50.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4724
 
-On 2025-11-12 12:01:51 [+0100], Felix Maurer wrote:
-> > You say HSRv0 while I don't see this mentioned at all. And you limit the
-> > change to prot_version == 0. So maybe this was once and removed from the
-> > standard.
+Hello Jakub,
+
+On 12/11/25 06:48, Jakub Kicinski wrote:
+> On Sun, 09 Nov 2025 23:37:50 +0200 Roger Quadros wrote:
+>> This series adds AF_XDP zero coppy support to am65-cpsw driver.
+>>
+>> Tests were performed on AM62x-sk with xdpsock application [1].
+>>
+>> A clear improvement is seen in 64 byte packets on Transmit (txonly)
+>> and receive (rxdrop).
+>> 1500 byte test seems to be limited by line rate (1G link) so no
+>> improvement seen there in packet rate. A test on higher speed link
+>> (or PHY-less setup) might be worthwile.
+>>
+>> There is some issue during l2fwd with 64 byte packets and benchmark
+>> results show 0. This issue needs to be debugged further.
+>> A 512 byte l2fwd test result has been added to compare instead.
 > 
-> My description for the path_id is from IEC 62439-3:2010. As far as I
-> know, the HSRv0/HSRv1 terminology is only used in the kernel. AFAIK, our
-> version 0/1 refers to the value in the SupVersion field of the HSR
-> supervision frames. The SupVersion is defined as 0 in IEC 62439-3:2010
-> and defined as 1 in IEC 62439-3:2012 and following.
-
-This is what I assumed. I don't have any older specification, I have
-here SupVersion always defined as 1.
-
-> The definition for the SupVersion field also states: "Implementation of
-> version X of the protocol shall interpret [...] version <=X frames
-> exactly as specified for the version concerned." (in IEC
-> 62439-3:{2010,2012,2016,2021})
+> It appears that the drivers/net/ethernet/ti/am65-* files do not fall
+> under any MAINTAINERS entry. Please add one or extend the existing CPSW
+> entry as the first patch of the series.
 > 
-> I read from this that if we implement HSRv0 we should follow the latest
-> specification for this version, i.e., the latest specification with
-> SupVersion defined as 0 (which would be IEC 62439-3:2010). This is also
-> why I limited the change to prot_version == 0 (maybe we should have some
-> helpers like hsr_is_v{0,1}() to make these conditions a bit more self
-> explanatory).
 
-Based on the explanation, the limit to prot_version is the reasonable
-thing to do.
+I am mainly working on am65-cpsw-nuss.c driver and volunteering myself
+to be the MAINTAINER of am65-cpsw-nuss.c and other CPSW drivers.
 
-> Thanks,
->    Felix
-
-Sebastian
+Regards,
+Chintan.
 
