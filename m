@@ -1,353 +1,164 @@
-Return-Path: <netdev+bounces-238028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46C20C53065
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 16:28:36 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F999C52F05
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 16:17:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3E8234F6C34
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:03:08 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9B7A235346C
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291D226A0DB;
-	Wed, 12 Nov 2025 14:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D0B345CA4;
+	Wed, 12 Nov 2025 14:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Te9q0BZg"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8258D31B11F;
-	Wed, 12 Nov 2025 14:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BDA34573F
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 14:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762959235; cv=none; b=ZovctIHK2cRLMWJmEbBk32e1O7kOzU0HQPMltY5NLQovwdOmET7nJoUVRBAjURejp3o6jFPty4u5rDp3yWZ6SvM4NiYtvPwAJlan9OWl5TlXiHNjgH83TpH1NMxE4xMqZd+NGZ8Iem0MG/ADGYrI4Dr296qhG/yMrbuR2cOMG8s=
+	t=1762959370; cv=none; b=a5fqEl/VP8bi5OATxtmTX7bAdht5YWuUq+D+YxdtkRv7HxZUQQdBVfrjnMsgTohORgHhTpDnWjaK3YTcTCRGsNFOoZwPcZ5VuzToCYfqAByt2xeIDnb1zsJvRjft2i3T3rv7dlWlDmuZaLbQqIy2MzqR/DoJsWIv0q7k0SdhxW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762959235; c=relaxed/simple;
-	bh=rU0MyBBa/qOE8ElCHxl5lBbOyLP/0fAGsE3HWNBfSqw=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rIQqnsbvkLbPxnAQ5D21g240RrdKx4zDjPUm83fP3fT7sU1YEEd7rNKBEaCVzrQoUEP7PokhF3hugFHIsY6By/1f+42XrGw5i7OPDzVVYqCD79CyA7GK52U/TOmZ5sylI/CwVyvm+75nbxDnNMG7CxVN2LBQscZDWOz+KeCMCwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d65xd1BXXzHnGf9;
-	Wed, 12 Nov 2025 22:53:25 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6429C1402CB;
-	Wed, 12 Nov 2025 22:53:44 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 12 Nov
- 2025 14:53:43 +0000
-Date: Wed, 12 Nov 2025 14:53:41 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>
-Subject: Re: [PATCH v20 01/22] cxl/mem: Arrange for always-synchronous
- memdev attach
-Message-ID: <20251112145341.00005b4e@huawei.com>
-In-Reply-To: <20251110153657.2706192-2-alejandro.lucero-palau@amd.com>
-References: <20251110153657.2706192-1-alejandro.lucero-palau@amd.com>
-	<20251110153657.2706192-2-alejandro.lucero-palau@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1762959370; c=relaxed/simple;
+	bh=hFHbE+e2+rqcptscvi53POsdj3oRwme2/t5EaZUq1E0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=hyPIxJMTtICGMtJ8E8eOl/S/kTA9smZwfz4Z+1wwEGpv+BhOcb2M6fdUSv7Sy70V0GL18xJZzo7ZAG0atoVfq7sZ5caPayZr9D3k9ZdlkOKq2eX8e6762Rcwdu9Aa4OfRYi0XVprHJB9Z+jYf0dG2eWkjlAE5zMb35pZNulO2uI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Te9q0BZg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762959367;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MHgkPgcHPX1dFyUxLTbk1czGgEYnwCygEJaWcsX1mJg=;
+	b=Te9q0BZgBY/yB2hNQjpHGm9XtEMF3cvUIEeuuJVYha3HHAG80ZyCbuJuFF1TbUbP0GLiB6
+	06cmo8Sj+In2D0K9PY+DE9EXd3PL7ZmrzOyoFCLP9gMYpnDZGtmEHu8fE3ujbwQe4phDiv
+	0JnKRM/m4McsiLapKyNDVB+3Zie2QdM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-237-p3t-qYRxPlCzWGBkEOIRCA-1; Wed,
+ 12 Nov 2025 09:56:03 -0500
+X-MC-Unique: p3t-qYRxPlCzWGBkEOIRCA-1
+X-Mimecast-MFC-AGG-ID: p3t-qYRxPlCzWGBkEOIRCA_1762959362
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D08AB19773CA;
+	Wed, 12 Nov 2025 14:56:01 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.88.13])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1E3F1196FC8B;
+	Wed, 12 Nov 2025 14:55:58 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
+  linux-kernel@vger.kernel.org,  dev@openvswitch.org,  Eelco Chaudron
+ <echaudro@redhat.com>,  Willy Tarreau <w@1wt.eu>,  LePremierHomme
+ <kwqcheii@proton.me>,  Junvy Yang <zhuque@tencent.com>
+Subject: Re: [PATCH net] net: openvswitch: remove never-working support for
+ setting nsh fields
+In-Reply-To: <20251112112246.95064-1-i.maximets@ovn.org> (Ilya Maximets's
+	message of "Wed, 12 Nov 2025 12:14:03 +0100")
+References: <20251112112246.95064-1-i.maximets@ovn.org>
+Date: Wed, 12 Nov 2025 09:55:57 -0500
+Message-ID: <f7ty0obfgg2.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Mon, 10 Nov 2025 15:36:36 +0000
-alejandro.lucero-palau@amd.com wrote:
+Ilya Maximets <i.maximets@ovn.org> writes:
 
-> From: Dan Williams <dan.j.williams@intel.com>
-> 
-> In preparation for CXL accelerator drivers that have a hard dependency on
-> CXL capability initialization, arrange for the endpoint probe result to be
-> conveyed to the caller of devm_cxl_add_memdev().
-> 
-> As it stands cxl_pci does not care about the attach state of the cxl_memdev
-> because all generic memory expansion functionality can be handled by the
-> cxl_core. For accelerators, that driver needs to know perform driver
-> specific initialization if CXL is available, or exectute a fallback to PCIe
-> only operation.
-> 
-> By moving devm_cxl_add_memdev() to cxl_mem.ko it removes async module
-> loading as one reason that a memdev may not be attached upon return from
-> devm_cxl_add_memdev().
-> 
-> The diff is busy as this moves cxl_memdev_alloc() down below the definition
-> of cxl_memdev_fops and introduces devm_cxl_memdev_add_or_reset() to
-> preclude needing to export more symbols from the cxl_core.
-> 
-> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
-
-Alejandro, read submitting patches again.  Whilst the first sign off should
-indeed by Dan's this also needs one from you as a 'handler' of the patch.
-
-Be very careful checking these tag chains. If they are wrong no one can
-merge the set and it just acts as a silly blocker.
-
-I would have split this up and made the changes to cxl_memdev_alloc in
-a precursor patch (use of __free is obvious one) then could have stated
-that that was simply moved in this patch.
-
-There are other changes in there that are really hard to spot though
-and I think there are some bugs lurking in error paths.
-
-Jonathan
-
+> The validation of the set(nsh(...)) action is completely wrong.
+> It runs through the nsh_key_put_from_nlattr() function that is the
+> same function that validates NSH keys for the flow match and the
+> push_nsh() action.  However, the set(nsh(...)) has a very different
+> memory layout.  Nested attributes in there are doubled in size in
+> case of the masked set().  That makes proper validation impossible.
+>
+> There is also confusion in the code between the 'masked' flag, that
+> says that the nested attributes are doubled in size containing both
+> the value and the mask, and the 'is_mask' that says that the value
+> we're parsing is the mask.  This is causing kernel crash on trying to
+> write into mask part of the match with SW_FLOW_KEY_PUT() during
+> validation, while validate_nsh() doesn't allocate any memory for it:
+>
+>   BUG: kernel NULL pointer dereference, address: 0000000000000018
+>   #PF: supervisor read access in kernel mode
+>   #PF: error_code(0x0000) - not-present page
+>   PGD 1c2383067 P4D 1c2383067 PUD 20b703067 PMD 0
+>   Oops: Oops: 0000 [#1] SMP NOPTI
+>   CPU: 8 UID: 0 Kdump: loaded Not tainted 6.17.0-rc4+ #107 PREEMPT(voluntary)
+>   RIP: 0010:nsh_key_put_from_nlattr+0x19d/0x610 [openvswitch]
+>   Call Trace:
+>    <TASK>
+>    validate_nsh+0x60/0x90 [openvswitch]
+>    validate_set.constprop.0+0x270/0x3c0 [openvswitch]
+>    __ovs_nla_copy_actions+0x477/0x860 [openvswitch]
+>    ovs_nla_copy_actions+0x8d/0x100 [openvswitch]
+>    ovs_packet_cmd_execute+0x1cc/0x310 [openvswitch]
+>    genl_family_rcv_msg_doit+0xdb/0x130
+>    genl_family_rcv_msg+0x14b/0x220
+>    genl_rcv_msg+0x47/0xa0
+>    netlink_rcv_skb+0x53/0x100
+>    genl_rcv+0x24/0x40
+>    netlink_unicast+0x280/0x3b0
+>    netlink_sendmsg+0x1f7/0x430
+>    ____sys_sendmsg+0x36b/0x3a0
+>    ___sys_sendmsg+0x87/0xd0
+>    __sys_sendmsg+0x6d/0xd0
+>    do_syscall_64+0x7b/0x2c0
+>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+> The third issue with this process is that while trying to convert
+> the non-masked set into masked one, validate_set() copies and doubles
+> the size of the OVS_KEY_ATTR_NSH as if it didn't have any nested
+> attributes.  It should be copying each nested attribute and doubling
+> them in size independently.  And the process must be properly reversed
+> during the conversion back from masked to a non-masked variant during
+> the flow dump.
+>
+> In the end, the only two outcomes of trying to use this action are
+> either validation failure or a kernel crash.  And if somehow someone
+> manages to install a flow with such an action, it will most definitely
+> not do what it is supposed to, since all the keys and the masks are
+> mixed up.
+>
+> Fixing all the issues is a complex task as it requires re-writing
+> most of the validation code.
+>
+> Given that and the fact that this functionality never worked since
+> introduction, let's just remove it altogether.  It's better to
+> re-introduce it later with a proper implementation instead of trying
+> to fix it in stable releases.
+>
+> Fixes: b2d0f5d5dc53 ("openvswitch: enable NSH support")
+> Reported-by: Junvy Yang <zhuque@tencent.com>
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
 > ---
->  drivers/cxl/Kconfig       |   2 +-
->  drivers/cxl/core/memdev.c | 101 ++++++++++++++------------------------
->  drivers/cxl/mem.c         |  41 ++++++++++++++++
->  drivers/cxl/private.h     |  10 ++++
->  4 files changed, 90 insertions(+), 64 deletions(-)
->  create mode 100644 drivers/cxl/private.h
 
-> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
-> index e370d733e440..14b4601faf66 100644
-> --- a/drivers/cxl/core/memdev.c
-> +++ b/drivers/cxl/core/memdev.c
-> @@ -8,6 +8,7 @@
->  #include <linux/idr.h>
->  #include <linux/pci.h>
->  #include <cxlmem.h>
-> +#include "private.h"
->  #include "trace.h"
->  #include "core.h"
->  
-> @@ -648,42 +649,25 @@ static void detach_memdev(struct work_struct *work)
->  
->  static struct lock_class_key cxl_memdev_key;
->  
-> -static struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds,
-> -					   const struct file_operations *fops)
-> +int devm_cxl_memdev_add_or_reset(struct device *host, struct cxl_memdev *cxlmd)
->  {
-> -	struct cxl_memdev *cxlmd;
-> -	struct device *dev;
-> -	struct cdev *cdev;
-> +	struct device *dev = &cxlmd->dev;
-> +	struct cdev *cdev = &cxlmd->cdev;
->  	int rc;
->  
-> -	cxlmd = kzalloc(sizeof(*cxlmd), GFP_KERNEL);
-> -	if (!cxlmd)
-> -		return ERR_PTR(-ENOMEM);
-> -
-> -	rc = ida_alloc_max(&cxl_memdev_ida, CXL_MEM_MAX_DEVS - 1, GFP_KERNEL);
-> -	if (rc < 0)
-> -		goto err;
-> -	cxlmd->id = rc;
-> -	cxlmd->depth = -1;
-> -
-> -	dev = &cxlmd->dev;
-> -	device_initialize(dev);
-> -	lockdep_set_class(&dev->mutex, &cxl_memdev_key);
-> -	dev->parent = cxlds->dev;
-> -	dev->bus = &cxl_bus_type;
-> -	dev->devt = MKDEV(cxl_mem_major, cxlmd->id);
-> -	dev->type = &cxl_memdev_type;
-> -	device_set_pm_not_required(dev);
-> -	INIT_WORK(&cxlmd->detach_work, detach_memdev);
-> -
-> -	cdev = &cxlmd->cdev;
-> -	cdev_init(cdev, fops);
-> -	return cxlmd;
-> +	rc = cdev_device_add(cdev, dev);
-> +	if (rc) {
-> +		/*
-> +		 * The cdev was briefly live, shutdown any ioctl operations that
-> +		 * saw that state.
-> +		 */
-> +		cxl_memdev_shutdown(dev);
-> +		return rc;
-> +	}
->  
-> -err:
-> -	kfree(cxlmd);
-> -	return ERR_PTR(rc);
-> +	return devm_add_action_or_reset(host, cxl_memdev_unregister, cxlmd);
->  }
-> +EXPORT_SYMBOL_NS_GPL(devm_cxl_memdev_add_or_reset, "CXL");
->  
->  static long __cxl_memdev_ioctl(struct cxl_memdev *cxlmd, unsigned int cmd,
->  			       unsigned long arg)
-> @@ -1051,50 +1035,41 @@ static const struct file_operations cxl_memdev_fops = {
->  	.llseek = noop_llseek,
->  };
->  
-> -struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
-> -				       struct cxl_dev_state *cxlds)
-> +struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds)
->  {
-> -	struct cxl_memdev *cxlmd;
-> +	struct cxl_memdev *cxlmd __free(kfree) =
-> +		kzalloc(sizeof(*cxlmd), GFP_KERNEL);
+Thanks, this makes sense to me.  As you noted, the "fix" (I don't really
+know if it is the right word since the functionality never worked) is
+quite complex, and still might not be 'good enough' to not have further
+issues.  It makes more sense not to try and support something that never
+worked to begin with - especially since even in the userspace side we
+never really did a set(nsh()) thing (because it doesn't exist as
+functionality).
 
-Trivial and perhaps not worth the hassle.
-I'd pull this out of the declarations block to have
-
- 	struct device *dev;
- 	struct cdev *cdev;
- 	int rc;
-
-	struct cxl_memdev *cxlmd __free(kfree) =
-		kzalloc(sizeof(*cxlmd), GFP_KERNEL);
-	if (!cxlmd)
-		return ERR_PTR(-ENOMEM);
-
-That is treat the __free() related statement as an inline declaration of
-the type we only really allow for these.
-
-
->  	struct device *dev;
->  	struct cdev *cdev;
->  	int rc;
->  
-> -	cxlmd = cxl_memdev_alloc(cxlds, &cxl_memdev_fops);
-> -	if (IS_ERR(cxlmd))
-> -		return cxlmd;
->  
-> -	dev = &cxlmd->dev;
-> -	rc = dev_set_name(dev, "mem%d", cxlmd->id);
-> -	if (rc)
-> -		goto err;
-> +	if (!cxlmd)
-> +		return ERR_PTR(-ENOMEM);
->  
-> -	/*
-> -	 * Activate ioctl operations, no cxl_memdev_rwsem manipulation
-> -	 * needed as this is ordered with cdev_add() publishing the device.
-> -	 */
-> +	rc = ida_alloc_max(&cxl_memdev_ida, CXL_MEM_MAX_DEVS - 1, GFP_KERNEL);
-> +	if (rc < 0)
-> +		return ERR_PTR(rc);
-> +	cxlmd->id = rc;
-> +	cxlmd->depth = -1;
->  	cxlmd->cxlds = cxlds;
->  	cxlds->cxlmd = cxlmd;
-
-These two lines weren't previously in cxl_memdev_alloc()
-I'd like a statement in the commit message of why they are now. It seems
-harmless because they are still ordered before the add and are
-ultimately freed 
-
-I'm not immediately spotting why they now are.  This whole code shift
-and complex diff is enough of a pain I'd be tempted to do the move first
-so that we can then see what is actually changed much more easily.
-
-
->  
-> -	cdev = &cxlmd->cdev;
-> -	rc = cdev_device_add(cdev, dev);
-> -	if (rc)
-> -		goto err;
-> -
-> -	rc = devm_add_action_or_reset(host, cxl_memdev_unregister, cxlmd);
-> -	if (rc)
-> -		return ERR_PTR(rc);
-> -	return cxlmd;
-> +	dev = &cxlmd->dev;
-> +	device_initialize(dev);
-> +	lockdep_set_class(&dev->mutex, &cxl_memdev_key);
-> +	dev->parent = cxlds->dev;
-> +	dev->bus = &cxl_bus_type;
-> +	dev->devt = MKDEV(cxl_mem_major, cxlmd->id);
-> +	dev->type = &cxl_memdev_type;
-> +	device_set_pm_not_required(dev);
-> +	INIT_WORK(&cxlmd->detach_work, detach_memdev);
->  
-> -err:
-> -	/*
-> -	 * The cdev was briefly live, shutdown any ioctl operations that
-> -	 * saw that state.
-> -	 */
-> -	cxl_memdev_shutdown(dev);
-> -	put_device(dev);
-> -	return ERR_PTR(rc);
-> +	cdev = &cxlmd->cdev;
-> +	cdev_init(cdev, &cxl_memdev_fops);
-> +	return_ptr(cxlmd);
->  }
-> -EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, "CXL");
-> +EXPORT_SYMBOL_NS_GPL(cxl_memdev_alloc, "CXL");
->  
->  static void sanitize_teardown_notifier(void *data)
->  {
-> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
-> index d2155f45240d..fa5d901ee817 100644
-> --- a/drivers/cxl/mem.c
-> +++ b/drivers/cxl/mem.c
-> @@ -7,6 +7,7 @@
->  
->  #include "cxlmem.h"
->  #include "cxlpci.h"
-> +#include "private.h"
->  
->  /**
->   * DOC: cxl mem
-> @@ -202,6 +203,45 @@ static int cxl_mem_probe(struct device *dev)
->  	return devm_add_action_or_reset(dev, enable_suspend, NULL);
->  }
->  
-> +static void __cxlmd_free(struct cxl_memdev *cxlmd)
-> +{
-> +	cxlmd->cxlds->cxlmd = NULL;
-> +	put_device(&cxlmd->dev);
-> +	kfree(cxlmd);
-> +}
-> +
-> +DEFINE_FREE(cxlmd_free, struct cxl_memdev *, __cxlmd_free(_T))
-> +
-> +/**
-> + * devm_cxl_add_memdev - Add a CXL memory device
-> + * @host: devres alloc/release context and parent for the memdev
-> + * @cxlds: CXL device state to associate with the memdev
-> + *
-> + * Upon return the device will have had a chance to attach to the
-> + * cxl_mem driver, but may fail if the CXL topology is not ready
-> + * (hardware CXL link down, or software platform CXL root not attached)
-> + */
-> +struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
-> +				       struct cxl_dev_state *cxlds)
-> +{
-> +	struct cxl_memdev *cxlmd __free(cxlmd_free) = cxl_memdev_alloc(cxlds);
-> +	int rc;
-> +
-> +	if (IS_ERR(cxlmd))
-> +		return cxlmd;
-> +
-> +	rc = dev_set_name(&cxlmd->dev, "mem%d", cxlmd->id);
-> +	if (rc)
-> +		return ERR_PTR(rc);
-> +
-> +	rc = devm_cxl_memdev_add_or_reset(host, cxlmd);
-> +	if (rc)
-> +		return ERR_PTR(rc);
-
-Is the reference tracking right here?  If the above call fails
-then it is possible cxl_memdev_unregister() has been called
-or just cxl_memdev_shutdown().
-
-If nothing else (and I suspect there is worse but haven't
-counted references) that will set
-cxlmd->cxlds = NULL;
-s part of cxl_memdev_shutdown()
-The __cxlmd_free() then dereferences that and boom.
-
-
-> +
-> +	return no_free_ptr(cxlmd);
-> +}
-> +EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, "CXL");
+Reviewed-by: Aaron Conole <aconole@redhat.com>
 
 
