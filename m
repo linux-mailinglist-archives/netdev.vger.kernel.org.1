@@ -1,67 +1,59 @@
-Return-Path: <netdev+bounces-237787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13A71C5035F
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:30:27 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851FDC5038C
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:42:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E6ED84E49E7
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:30:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3E2C94E2716
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6CB271447;
-	Wed, 12 Nov 2025 01:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36D627AC4C;
+	Wed, 12 Nov 2025 01:42:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z2wWr4nQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XSnBeDlT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581E62E403;
-	Wed, 12 Nov 2025 01:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93308276050;
+	Wed, 12 Nov 2025 01:42:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762911022; cv=none; b=smi7h95TcGj9oQnT1Yb/dJAgWSRgBqcEbqLJ9fG185vZXyyjl9F8ivNF5JOxw3RFAERpZoCTeG78kQpnf4DUFGOFSCC8NbBx+j5pQNlVS2zwIKb+T4r2UDqkBOMUqu/FORyODgC5RgRXkpT5MTU5dWsUxzQ9nWhOW77c8uGSZPo=
+	t=1762911756; cv=none; b=KKADOQwIXQE37uIHybGaDDoB/74CtjGiOWq2Gcudq0z4c0WnoPussckkDovUEPFK5sBaH+EweruiP0FaEs2LlIefLTMBkmfGkYqO+b8s9cLdYKf+2XnrDpP6sZc0UM+05uOWS3+OqgX4scKIdu4DcYh3zfD6m7wNJcQnAex1LeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762911022; c=relaxed/simple;
-	bh=75PIuoHEXowMg/7egDgGlJsGW/yk5CKxaEHvNzexu6E=;
+	s=arc-20240116; t=1762911756; c=relaxed/simple;
+	bh=K65sgs1DD2NGgj7iE4ACL+5DzhBQLGH7U8L+SZ9papI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TwUTTLGPxABnH/U2OXkVNqalGCotTnJNE1lJi8MUMTX20CRQNc1w8z174XcgbDqGvjm+kjB5gWidAlNb91noH7vWetXZ68455c6Yue7d2L9QbZJ1HApCN9izmbd6h9wVSZVQ174srAt76tkHKCq+Z+yTqJnwy1C4Xcw5VJz6KgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z2wWr4nQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ABC7C116D0;
-	Wed, 12 Nov 2025 01:30:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=nYD68gIYWWjY29h9jFvwvjIv9tOzx0/AsvOhw4dp8vp0JzjWPDxDyBlpbEg9696Hia+lgZeqhUMkNs/eYIsbkAuA+Hh+g5olnCD79OJ7cFrI3a78x6c0b+qsraxp7tJOHcWXYHr/XKBMhTbKHBg+Ta8C0Bh9a6MkEId9wY1Ec+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XSnBeDlT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4C5AC16AAE;
+	Wed, 12 Nov 2025 01:42:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762911021;
-	bh=75PIuoHEXowMg/7egDgGlJsGW/yk5CKxaEHvNzexu6E=;
+	s=k20201202; t=1762911756;
+	bh=K65sgs1DD2NGgj7iE4ACL+5DzhBQLGH7U8L+SZ9papI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z2wWr4nQGufj/mfHfSS5vL/+HsWpj9VwvHN61lPeN3wnv673+R/gZnT9a3gn3GrD0
-	 /svl20KP4/RbOadwddhv2UO2SZwJmSeL84cmiPbj9+c7v3EN/K0mjOH2ZAhaPafZXe
-	 yfpvgIERk9bIaYusDYzqTDonJzYE5LKKOb/EYMkSl6W3sGHa3vOuE8yqNwB38j15Fb
-	 0K4I3/zcqU67oXSlIAwLATwlp+xfoD1/26uBODoPzQikcYqP5mxRMuagFSEZPd9hPK
-	 JuAsEUsQK86luC7uuYq6Srdmvxbh98Qy7EDu7XOCY/JBQd9hu+v9+zPtGT+K6/lhFs
-	 JeN8MvvVKAKgA==
-Date: Tue, 11 Nov 2025 17:30:20 -0800
+	b=XSnBeDlTEcrLuDmBG81Q86x97mw/FZhKmHkUeNlF6VXFQTea5tBJxXISesPs50LUJ
+	 eHaRaQgfuFx3OGdb1ZA4k+qudlLbXts9mlxIkHYMN1ihd4lK5bYCMsdEkVoGlG62dS
+	 2VeOnUHF+l8wLLyMXf1iPvuyX973SORLUnECwPpcy+XT3qM2SA/6Ughacn/iT+AI7o
+	 VtgxJrJ7dMozdjmBGwS/GN5fF+QHWq+dEFkOjHiake5dlCUcGFbDGUMDWrzNSukcOq
+	 5OZ5qIRTIEaIrjEFzoe5aKL+M2BIv3BnhTdshyOYE90+EJkM8bWy0JM3ZOTumH48WK
+	 kvO+9NDAiMQ9g==
+Date: Tue, 11 Nov 2025 17:42:34 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, Stanislav
- Fomichev <sdf@fomichev.me>, Simon Horman <horms@kernel.org>, srk@ti.com,
- Meghana Malladi <m-malladi@ti.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org
-Subject: Re: [PATCH net-next v2 4/7] net: ethernet: ti: am65-cpsw: Add
- AF_XDP zero copy for RX
-Message-ID: <20251111173020.360b1066@kernel.org>
-In-Reply-To: <20251109-am65-cpsw-xdp-zc-v2-4-858f60a09d12@kernel.org>
-References: <20251109-am65-cpsw-xdp-zc-v2-0-858f60a09d12@kernel.org>
-	<20251109-am65-cpsw-xdp-zc-v2-4-858f60a09d12@kernel.org>
+To: Kriish Sharma <kriish.sharma2006@gmail.com>
+Cc: Ivan Vecera <ivecera@redhat.com>, Prathosh Satish
+ <Prathosh.Satish@microchip.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, Arkadiusz Kubalewski
+ <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] dpll: zl3073x: fix kernel-doc name and missing
+ parameter in fw.c
+Message-ID: <20251111174234.53be1a97@kernel.org>
+In-Reply-To: <20251110195030.2248235-1-kriish.sharma2006@gmail.com>
+References: <20251110195030.2248235-1-kriish.sharma2006@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,9 +63,44 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 09 Nov 2025 23:37:54 +0200 Roger Quadros wrote:
-> +			ndev->stats.rx_dropped++;
+On Mon, 10 Nov 2025 19:50:30 +0000 Kriish Sharma wrote:
+> Documentation build reported:
 
-AFAIU the device is multi-queue so using per-device stats looks racy.
-Please create your own per queue stats.
+What do you mean by "documentation build"? make htmldocs?
+
+>   Warning: drivers/dpll/zl3073x/fw.c:365 function parameter 'comp' not described in 'zl3073x_fw_component_flash'
+>   Warning: drivers/dpll/zl3073x/fw.c:365 expecting prototype for zl3073x_flash_bundle_flash(). Prototype was for zl3073x_fw_component_flash() instead
+> 
+> The kernel-doc comment above `zl3073x_fw_component_flash()` used the wrong
+> function name (`zl3073x_flash_bundle_flash`) and omitted the `@comp` parameter.
+> This patch updates the comment to correctly document the
+> `zl3073x_fw_component_flash()` function and its arguments.
+> 
+> Fixes: ca017409da69 ("dpll: zl3073x: Add firmware loading functionality")
+> Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
+> ---
+>  drivers/dpll/zl3073x/fw.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/dpll/zl3073x/fw.c b/drivers/dpll/zl3073x/fw.c
+> index def37fe8d9b0..ca5210c0829d 100644
+> --- a/drivers/dpll/zl3073x/fw.c
+> +++ b/drivers/dpll/zl3073x/fw.c
+> @@ -352,9 +352,9 @@ struct zl3073x_fw *zl3073x_fw_load(struct zl3073x_dev *zldev, const char *data,
+>  }
+>  
+>  /**
+> - * zl3073x_flash_bundle_flash - Flash all components
+> + * zl3073x_fw_component_flash - Flash all components
+>   * @zldev: zl3073x device structure
+> - * @components: pointer to components array
+> + * @comp: pointer to components array
+>   * @extack: netlink extack pointer to report errors
+>   *
+>   * Returns 0 in case of success or negative number otherwise.
+
+This now makes the kernel-doc script realize that the return value is
+not documented. Please also add a : after the Returns on the last line
+-- 
+pw-bot: cr
 
