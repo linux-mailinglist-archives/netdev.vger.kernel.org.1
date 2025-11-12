@@ -1,106 +1,102 @@
-Return-Path: <netdev+bounces-237788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 851FDC5038C
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:42:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E9BBC503B0
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:45:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3E2C94E2716
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:42:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F46E3B324E
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36D627AC4C;
-	Wed, 12 Nov 2025 01:42:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE8C28A1D5;
+	Wed, 12 Nov 2025 01:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XSnBeDlT"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dXvcihTj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93308276050;
-	Wed, 12 Nov 2025 01:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AD628689F
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 01:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762911756; cv=none; b=KKADOQwIXQE37uIHybGaDDoB/74CtjGiOWq2Gcudq0z4c0WnoPussckkDovUEPFK5sBaH+EweruiP0FaEs2LlIefLTMBkmfGkYqO+b8s9cLdYKf+2XnrDpP6sZc0UM+05uOWS3+OqgX4scKIdu4DcYh3zfD6m7wNJcQnAex1LeM=
+	t=1762911913; cv=none; b=apHg8pdCUdw27pNC7cCI2pfW0SdumEE4E1MEY36y/b5plnMUvFTWmjorJNofAnVafpo71CXn3MhkDa12yJM5gyNEsmJ6ahIGsxtlh9TZ+/6C1rSe7FwuXQSdGwPqwylLH1nb6qGgw6FgFKF4HSBd5kciJtww+zPThy6t3CImOLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762911756; c=relaxed/simple;
-	bh=K65sgs1DD2NGgj7iE4ACL+5DzhBQLGH7U8L+SZ9papI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nYD68gIYWWjY29h9jFvwvjIv9tOzx0/AsvOhw4dp8vp0JzjWPDxDyBlpbEg9696Hia+lgZeqhUMkNs/eYIsbkAuA+Hh+g5olnCD79OJ7cFrI3a78x6c0b+qsraxp7tJOHcWXYHr/XKBMhTbKHBg+Ta8C0Bh9a6MkEId9wY1Ec+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XSnBeDlT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4C5AC16AAE;
-	Wed, 12 Nov 2025 01:42:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762911756;
-	bh=K65sgs1DD2NGgj7iE4ACL+5DzhBQLGH7U8L+SZ9papI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XSnBeDlTEcrLuDmBG81Q86x97mw/FZhKmHkUeNlF6VXFQTea5tBJxXISesPs50LUJ
-	 eHaRaQgfuFx3OGdb1ZA4k+qudlLbXts9mlxIkHYMN1ihd4lK5bYCMsdEkVoGlG62dS
-	 2VeOnUHF+l8wLLyMXf1iPvuyX973SORLUnECwPpcy+XT3qM2SA/6Ughacn/iT+AI7o
-	 VtgxJrJ7dMozdjmBGwS/GN5fF+QHWq+dEFkOjHiake5dlCUcGFbDGUMDWrzNSukcOq
-	 5OZ5qIRTIEaIrjEFzoe5aKL+M2BIv3BnhTdshyOYE90+EJkM8bWy0JM3ZOTumH48WK
-	 kvO+9NDAiMQ9g==
-Date: Tue, 11 Nov 2025 17:42:34 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kriish Sharma <kriish.sharma2006@gmail.com>
-Cc: Ivan Vecera <ivecera@redhat.com>, Prathosh Satish
- <Prathosh.Satish@microchip.com>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>, Arkadiusz Kubalewski
- <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dpll: zl3073x: fix kernel-doc name and missing
- parameter in fw.c
-Message-ID: <20251111174234.53be1a97@kernel.org>
-In-Reply-To: <20251110195030.2248235-1-kriish.sharma2006@gmail.com>
-References: <20251110195030.2248235-1-kriish.sharma2006@gmail.com>
+	s=arc-20240116; t=1762911913; c=relaxed/simple;
+	bh=kqsnlqjSa4IhOrl9lShbvf9SEWNTMIYvIgS6Hka5KSc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NS27pssrqkRIFNbrvsw3JqsHuK/xR1/3ml4iEs49RPM+IMCb/zFHTeN86w40T9C13hatm5U+oWhyeZwYQ/NTbHCeA2kAT5rggBXtpJDSM5WXZSo0YaoiEepM45D3hqnb4SiQC1ZbstzV9a7ZpfOg2aiMD+OGCRNVVet3SsguVXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dXvcihTj; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <a85e262d-0e04-41d9-9420-56a1ee1aeed5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762911899;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GPXmbSUrivLtKg3Q34VPnZo217pp+kGwg6tsDxXR0ts=;
+	b=dXvcihTjaPEol0gaKNaafEuJl1ZGcBR4ln4HQke9wnnZPgJTSmjEyH4cuCGESkGMZbFISe
+	ArnYcsnP6PHmie2ZK2i9duAq6VRkxpfIdEC+XlbdT9Vs/I57MZyML+uyb1crP480vVJrtt
+	oelXpEIIzWySypYTVhFIj7UG774mHIY=
+Date: Tue, 11 Nov 2025 17:44:45 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH bpf-next v3] bpf: Clamp trace length in __bpf_get_stack to
+ fix OOB write
+Content-Language: en-GB
+To: Brahmajit Das <listout@listout.xyz>,
+ syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ contact@arnaud-lcm.com, daniel@iogearbox.net, eddyz87@gmail.com,
+ haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org,
+ kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org,
+ syzkaller-bugs@googlegroups.com
+References: <691231dc.a70a0220.22f260.0101.GAE@google.com>
+ <20251111081254.25532-1-listout@listout.xyz>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <20251111081254.25532-1-listout@listout.xyz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 10 Nov 2025 19:50:30 +0000 Kriish Sharma wrote:
-> Documentation build reported:
 
-What do you mean by "documentation build"? make htmldocs?
 
->   Warning: drivers/dpll/zl3073x/fw.c:365 function parameter 'comp' not described in 'zl3073x_fw_component_flash'
->   Warning: drivers/dpll/zl3073x/fw.c:365 expecting prototype for zl3073x_flash_bundle_flash(). Prototype was for zl3073x_fw_component_flash() instead
-> 
-> The kernel-doc comment above `zl3073x_fw_component_flash()` used the wrong
-> function name (`zl3073x_flash_bundle_flash`) and omitted the `@comp` parameter.
-> This patch updates the comment to correctly document the
-> `zl3073x_fw_component_flash()` function and its arguments.
-> 
-> Fixes: ca017409da69 ("dpll: zl3073x: Add firmware loading functionality")
-> Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
-> ---
->  drivers/dpll/zl3073x/fw.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/dpll/zl3073x/fw.c b/drivers/dpll/zl3073x/fw.c
-> index def37fe8d9b0..ca5210c0829d 100644
-> --- a/drivers/dpll/zl3073x/fw.c
-> +++ b/drivers/dpll/zl3073x/fw.c
-> @@ -352,9 +352,9 @@ struct zl3073x_fw *zl3073x_fw_load(struct zl3073x_dev *zldev, const char *data,
->  }
->  
->  /**
-> - * zl3073x_flash_bundle_flash - Flash all components
-> + * zl3073x_fw_component_flash - Flash all components
->   * @zldev: zl3073x device structure
-> - * @components: pointer to components array
-> + * @comp: pointer to components array
->   * @extack: netlink extack pointer to report errors
->   *
->   * Returns 0 in case of success or negative number otherwise.
+On 11/11/25 12:12 AM, Brahmajit Das wrote:
+> syzbot reported a stack-out-of-bounds write in __bpf_get_stack()
+> triggered via bpf_get_stack() when capturing a kernel stack trace.
+>
+> After the recent refactor that introduced stack_map_calculate_max_depth(),
+> the code in stack_map_get_build_id_offset() (and related helpers) stopped
+> clamping the number of trace entries (`trace_nr`) to the number of elements
+> that fit into the stack map value (`num_elem`).
+>
+> As a result, if the captured stack contained more frames than the map value
+> can hold, the subsequent memcpy() would write past the end of the buffer,
+> triggering a KASAN report like:
+>
+>      BUG: KASAN: stack-out-of-bounds in __bpf_get_stack+0x...
+>      Write of size N at addr ... by task syz-executor...
+>
+> Restore the missing clamp by limiting `trace_nr` to `num_elem` before
+> computing the copy length. This mirrors the pre-refactor logic and ensures
+> we never copy more bytes than the destination buffer can hold.
+>
+> No functional change intended beyond reintroducing the missing bound check.
+>
+> Reported-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
+> Fixes: e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into helper function")
+> Signed-off-by: Brahmajit Das <listout@listout.xyz>
 
-This now makes the kernel-doc script realize that the return value is
-not documented. Please also add a : after the Returns on the last line
--- 
-pw-bot: cr
+Acked-by: Yonghong Song <yonghong.song@linux.dev>
+
 
