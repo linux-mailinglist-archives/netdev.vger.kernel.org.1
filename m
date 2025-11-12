@@ -1,146 +1,139 @@
-Return-Path: <netdev+bounces-237934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29748C51BDA
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:44:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBD72C51B65
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:38:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 336433A9DBF
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:35:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1176918817B8
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CA3303A23;
-	Wed, 12 Nov 2025 10:35:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="djVxInjL";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="O/xEfp7Y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020F6303A23;
+	Wed, 12 Nov 2025 10:36:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827782777E0
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07FF2F9D94;
+	Wed, 12 Nov 2025 10:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762943714; cv=none; b=lFSNqWr3+a6PIraLwjuzJDsp1ciK0ZYzgWykd1XXOHWRIEdTRLAeomi8fWM2ABqLuagHDyvCrRMJ5+vTUVR67j5FIHx4CD7jIx7uDpW8Jxjdn0nMtm+HqdpRi2vwV22Hz48DW0wPj0WzFUfpRRMi9UI82QPBUfrp2BjZiyP8b5Y=
+	t=1762943818; cv=none; b=dFhr2yM4MQ2QBpvqLUbTzto3IGlM+4S9zbFlQ4XIzAeiDBYF3P99frS5Ps7Q+AQxQhuzjmdRnaXem9bY7LBqqKvLwA0JqQZxWjoML+WxEcVoRI3AemM9mWfRkm3KGePznnvM6mnn3uhw+gM3cY8EIuPoMK/Nz427AOO6cdXCDJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762943714; c=relaxed/simple;
-	bh=E+tvlKSlf/4Wz9KSvYrxWC/QgGC9Mmj94VvKntU4n/A=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MsIWCHxxRUnH7QiRho4VChg+kBkkJiJcejlKwtEBfeEA39CtrxmMixM+OOoMPbHVTPcJ2tz2tuUf1zN6ouzKxJ9RnBS53sr2dzz4uW2ewWH52SqVq6DcRt2hUknxk56IzljCOGXy5wOrW+hyG42UlQTSfx4AhdDuSEgd0LWa/pI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=djVxInjL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=O/xEfp7Y; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762943711;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E+tvlKSlf/4Wz9KSvYrxWC/QgGC9Mmj94VvKntU4n/A=;
-	b=djVxInjLuLu9rPixoAOJG3jcdCyUpkESYda4kSVX+m5f7FB2FM69sLZ51a6bZAJN5gPTYo
-	DuyOeF8mYB5A1buDhgq64TZM21lGzORUKgofE9zieK6orpUtF6cM7GqPwKut0D41k/gkas
-	HgOvn5IZGjB0A6shTbovZsR7SCLTtx8=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-615-8EeHDCxBOtePY0sgHbodbw-1; Wed, 12 Nov 2025 05:35:10 -0500
-X-MC-Unique: 8EeHDCxBOtePY0sgHbodbw-1
-X-Mimecast-MFC-AGG-ID: 8EeHDCxBOtePY0sgHbodbw_1762943709
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b733a653a8cso24588666b.3
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 02:35:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762943709; x=1763548509; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=E+tvlKSlf/4Wz9KSvYrxWC/QgGC9Mmj94VvKntU4n/A=;
-        b=O/xEfp7YWmTmvHPNePKBPS7LOLgpU6Rh/qjwQolnaee3YDJcfoNHYlc6hLUklp/WQm
-         0cDIiAV5Tg8D6Kgk5Rvdz1/B0rxC9x7xim1rvQ6giiIAZxM7/tYTc5NbyFlClqu4q8Ns
-         D0AelqmdOAZQRFfxLYfgndSoJdfUrd/vlgnypx58P3WqFkz4OdYn6ZFUWxRXp9GYrQtb
-         RciT85XY9v7bTFkaWoI2GCj3AEL7Oo0orIKqtF5YI3DZDyK8xR8HAdl7SrsnacjTm9ir
-         mu88aBxtMmysQSaqE10yFZdNCWrb45I8Bd/Vq0A2JI/Pv8YKnLt8yobxlNa1+568bDG8
-         NxLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762943709; x=1763548509;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E+tvlKSlf/4Wz9KSvYrxWC/QgGC9Mmj94VvKntU4n/A=;
-        b=T6ymiziUtg5+iO2cd2NHs216y71wz4hB1QBzH7j4GSPrQB7T4/RGcn97Z/2BHK6I7q
-         /vnYXEQIohLqno6yRVOFVkB6ea4agy36iVIGl4c6JmntG9QfZC3IMXWLPttjVDuMSgXL
-         Y4fnAx9LQxCYYt+c70Z+NPVJDQ8cXRCKyyavwdJ0Q2wExM/BjQNraBd7pJd6y2eJ9GRw
-         9ZhVix0Q7UWCXX4CP8GmYIPl2CyUF05iuF29tC+F+Ax7lFB8YnYsChCf1RoxFjYRHDm8
-         BYpxHrErebFyK2yFJIe3pPjgrVv0uBKVSht3Io/p0fMwkf0c24MxBwfaL22I3iRSt/wz
-         vTlA==
-X-Forwarded-Encrypted: i=1; AJvYcCUWcGBkLsnUMx82I8veZs97ZYzHRVvncHGlS2k2dJZzrouKSOXGy76F2niV7EFDE7i8WQhIqeY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwudaiHBaRYC96z0h31CMQLUO4eF7fPOTXuIB2Kmdyal7qc2+Qt
-	ZgzyclqjwI0QRo/uPBrDcQ8ykSj4QaoR3qiu6qWEkont3AMf2w/qHJIN1M6Jfwjyk2w7FrZLt8E
-	zsfPLwlfOm/asvLdT2n7C8QQPRQhirLVAkWHdpWFkoRVqVev7xwVAg8+vCg==
-X-Gm-Gg: ASbGncuRv/Lk/6wojEWCIbcP0EBEnd83ouccL0rFryruNrjdqOBQtboT5Yc/EWp+pR+
-	oFN5OqH7O8Q9+ys0+EhyH2DcI0RhmVtcSz6w3nqiUG352jilYSOFHL+bRBig+R1+cuECgQfeF8o
-	vujDcyYNYDgLYUYPoTtZrx9pL3EkMWpU6OjlWSsM1gxa7hGHZUbK4lsyZOoxXDuB3jPisPcPe03
-	keczuwyBuiSPA5cyaJw1dA3ZGgaJF0yA67qfDj7xZtznPwYwg0vgUJKu4+bUOE01YLoJT/wtDSI
-	NXWLlNdCJl8966kdptMJI9xuGidEwS/+/uxgQkAxuBurDb+1V9Ejhl9dCwzQS60avfE/cMf+LTN
-	As9IxYsylJM7Kitea4QS1NMY=
-X-Received: by 2002:a17:907:c1c:b0:b49:5103:c0b4 with SMTP id a640c23a62f3a-b7331ace073mr291846966b.56.1762943709058;
-        Wed, 12 Nov 2025 02:35:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE0/W7QILhc20zuI/PbypJ8sMQLsdF6TH22S7u7UG3VgCM2TlPgQLQWKEl5Bf/jjsWA11F+4Q==
-X-Received: by 2002:a17:907:c1c:b0:b49:5103:c0b4 with SMTP id a640c23a62f3a-b7331ace073mr291842966b.56.1762943708631;
-        Wed, 12 Nov 2025 02:35:08 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64179499189sm8607152a12.8.2025.11.12.02.35.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 02:35:07 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 2C7A2329674; Wed, 12 Nov 2025 11:29:54 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
- <leonro@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, William Tu
- <witu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Nimrod Oren
- <noren@nvidia.com>, Alex Lazar <alazar@nvidia.com>
-Subject: Re: [PATCH net-next 6/6] net/mlx5e: Support XDP target xmit with
- dummy program
-In-Reply-To: <1762939749-1165658-7-git-send-email-tariqt@nvidia.com>
-References: <1762939749-1165658-1-git-send-email-tariqt@nvidia.com>
- <1762939749-1165658-7-git-send-email-tariqt@nvidia.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 12 Nov 2025 11:29:54 +0100
-Message-ID: <877bvvlf19.fsf@toke.dk>
+	s=arc-20240116; t=1762943818; c=relaxed/simple;
+	bh=Acze1rwtk7babDJi3givwJP4IT0+DonopucP8OPEWmo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zdh1HNSwC04a9dRDHLKZcKbNR02hrrZbYcFEm9xQlvxNeoX0PpaIWBE3f6PUsYnU8Q/xWhTuObFXDkWnu26krF0DCdSQQgwkghTLHyLIwZgJc8w/3ZV4VlbjncRkmbcUWVLjEPdHQijCwW6ZCXdtlctAn5QOw/TaFHZadhq/R2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.44.32] (unknown [185.238.219.100])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 496CC617C4FA5;
+	Wed, 12 Nov 2025 11:36:04 +0100 (CET)
+Message-ID: <73e29237-4937-4cc7-9830-427bf7464591@molgen.mpg.de>
+Date: Wed, 12 Nov 2025 11:35:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next] net: ixgbe: convert to use
+ .get_rx_ring_count
+To: Breno Leitao <leitao@debian.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-team@meta.com
+References: <20251112-ixgbe_gxrings-v1-1-960e139697fa@debian.org>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251112-ixgbe_gxrings-v1-1-960e139697fa@debian.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Tariq Toukan <tariqt@nvidia.com> writes:
+Dear Breno,
 
-> Save per-channel resources in default.
->
-> As no better API exist, make the XDP-redirect-target SQ available by
-> loading a dummy XDP program.
 
-This is a user-visible change, though, no? I.e., after this patch
-xdp_redirect mlx5 devices will no longer work as an xdp_redirect target
-out of the box?
+Thank you for your patch.
 
-We have userspace code listing the driver support in various places
-(e.g., here in xdp-tools:
-https://github.com/xdp-project/xdp-tools/commit/1dad1d6e0ccb086b8a31496931f21a165b42b700);
-I'm sure there will be other places. Since such code would up until now
-assume that mlx5 just works, this will end up being a regression in such
-cases, no?
+Am 12.11.25 um 11:23 schrieb Breno Leitao:
+> Convert the ixgbe driver to use the new .get_rx_ring_count ethtool
+> operation for handling ETHTOOL_GRXRINGS command. This simplifies the
+> code by extracting the ring count logic into a dedicated callback.
+> 
+> The new callback provides the same functionality in a more direct way,
+> following the ongoing ethtool API modernization.
 
--Toke
+Maybe add a paragraph how you tested this.
 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 15 ++++++++++-----
+>   1 file changed, 10 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+> index 2d660e9edb80..2ad81f687a84 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+> @@ -2805,6 +2805,14 @@ static int ixgbe_rss_indir_tbl_max(struct ixgbe_adapter *adapter)
+>   		return 64;
+>   }
+>   
+> +static u32 ixgbe_get_rx_ring_count(struct net_device *dev)
+> +{
+> +	struct ixgbe_adapter *adapter = ixgbe_from_netdev(dev);
+> +
+> +	return min_t(u32, adapter->num_rx_queues,
+> +		     ixgbe_rss_indir_tbl_max(adapter));
+> +}
+> +
+>   static int ixgbe_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
+>   			   u32 *rule_locs)
+>   {
+> @@ -2812,11 +2820,6 @@ static int ixgbe_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
+>   	int ret = -EOPNOTSUPP;
+>   
+>   	switch (cmd->cmd) {
+> -	case ETHTOOL_GRXRINGS:
+> -		cmd->data = min_t(int, adapter->num_rx_queues,
+> -				  ixgbe_rss_indir_tbl_max(adapter));
+> -		ret = 0;
+> -		break;
+>   	case ETHTOOL_GRXCLSRLCNT:
+>   		cmd->rule_cnt = adapter->fdir_filter_count;
+>   		ret = 0;
+> @@ -3743,6 +3746,7 @@ static const struct ethtool_ops ixgbe_ethtool_ops = {
+>   	.get_ethtool_stats      = ixgbe_get_ethtool_stats,
+>   	.get_coalesce           = ixgbe_get_coalesce,
+>   	.set_coalesce           = ixgbe_set_coalesce,
+> +	.get_rx_ring_count	= ixgbe_get_rx_ring_count,
+>   	.get_rxnfc		= ixgbe_get_rxnfc,
+>   	.set_rxnfc		= ixgbe_set_rxnfc,
+>   	.get_rxfh_indir_size	= ixgbe_rss_indir_size,
+> @@ -3791,6 +3795,7 @@ static const struct ethtool_ops ixgbe_ethtool_ops_e610 = {
+>   	.get_ethtool_stats      = ixgbe_get_ethtool_stats,
+>   	.get_coalesce           = ixgbe_get_coalesce,
+>   	.set_coalesce           = ixgbe_set_coalesce,
+> +	.get_rx_ring_count	= ixgbe_get_rx_ring_count,
+>   	.get_rxnfc		= ixgbe_get_rxnfc,
+>   	.set_rxnfc		= ixgbe_set_rxnfc,
+>   	.get_rxfh_indir_size	= ixgbe_rss_indir_size,
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
