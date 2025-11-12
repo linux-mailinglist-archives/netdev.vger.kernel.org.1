@@ -1,102 +1,97 @@
-Return-Path: <netdev+bounces-238025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46B8AC52E50
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 16:09:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97B7CC52E90
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 16:11:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4CDDE3504DE
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 14:58:07 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D515B34E5FD
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C7E34887B;
-	Wed, 12 Nov 2025 14:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A9733AD83;
+	Wed, 12 Nov 2025 14:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b="yC2KFtED"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enBY7x6Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F5733F361;
-	Wed, 12 Nov 2025 14:48:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED6333859C;
+	Wed, 12 Nov 2025 14:50:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762958891; cv=none; b=h8U4d0vuUJwCwy17N5ihv31bijZAdmyEYO2rHTt3druUW/NACc19zorj1SVtvaTK9A7UKW2SDM1enSNL0wOaa+RhVdZoPOoccwd11GJ8WT7jt4WtdOpsoYI8a/AwYdXnirZiv0HjQM1C7OBkXSRz0Kcl7VHjqJPULKmEXFMRQzQ=
+	t=1762959037; cv=none; b=AhdGxxUCBpTcw2wChv57KHSfw4zZCe/iOfP7+0mPxQM9IuRxCET+L4XnrykcoFF0Mq2TbUyNOKvv2485TBHJfv3VjjQQwhfbTKC6Cya8PxrLKHavVe/0RhcbG4vJ5Q4clkIn0iW7d+exzJ7Sg24lUYoDlUESCoSTiF5XBSbUSPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762958891; c=relaxed/simple;
-	bh=IQuK8rL97BNEfgMOVveuyFpWPQ5iO0/Fn4mlb+DBFNA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BCJDR5BqyhmIbSK+QbkGT0brWZL5+kYniw1MVfWpn7EAKPA3DTsn7GoY0KG7Qv5NUyA1/rAqUyc3bFv2zUyiyQfnKgEYclydJ4xIG0zn3DBkd8RwNLpur9oR2BIycbLV2/a7ja0GpzCUqEFcWa1dqnDKCYUZDhlTfD6JYvU4Vb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz; spf=pass smtp.mailfrom=listout.xyz; dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b=yC2KFtED; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=listout.xyz
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4d65qM3SY9z9tyC;
-	Wed, 12 Nov 2025 15:47:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=listout.xyz; s=MBO0001;
-	t=1762958879;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ej6O0iHmvQV6vixUAEP8L03Ws5zQ5xmtbhyoD8rFeWw=;
-	b=yC2KFtEDXXB6ScrGVGkvVgkc2eU1Ea1KmmPsdRpGlil2FirEcx+FnYczmyaCfGelUjkUhv
-	GHzLRRXN9iT2lZJ7XntSGWMz16kU1iGvuWMAs43gpGBd/aBv2mWZhkNIMFg7ViiYeyOBQ2
-	Zgxjyh3ueSInG3uf2d+a0UlyLliKyEvhbb/fxD9BGrn+2o83ityVdzh9WkTj1St82/GE6I
-	Cn0vGIxN3Hk7IiKhbvniaQRFQKo+8vlInw1XdnDayozhKBvVqqaUMyuoNADcF3dR0AT/S1
-	ZqtQSGPzVEWWmcQGRn6UxsXzQcpQW0c9JzkQqfjNrCqJLRROFHl2nLBbdW4M4A==
-Date: Wed, 12 Nov 2025 20:17:47 +0530
-From: Brahmajit Das <listout@listout.xyz>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com, 
-	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, contact@arnaud-lcm.com, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org, 
-	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Subject: Re: [PATCH bpf-next v3] bpf: Clamp trace length in __bpf_get_stack
- to fix OOB write
-Message-ID: <u34sykpbi6vw7xyalqnsjqt4aieayjotyppl3dwilv3hq7kghf@prx4ktfpk36o>
-References: <691231dc.a70a0220.22f260.0101.GAE@google.com>
- <20251111081254.25532-1-listout@listout.xyz>
- <20251112133546.4246533f@pumpkin>
+	s=arc-20240116; t=1762959037; c=relaxed/simple;
+	bh=fDyqUYG96cnQY+L9W/+s4ilvkJlQdMXHRO6AeDHlCzI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Yms1R2HM0w1WAc2A1mAinG3VBE+IL/wWShUr4SjVRfZKEZIcOL+GRb/b+JiHxrk71lHLKpY1D7bjzZICP1VKTeVFsVaQks/B1stHYQArOzFgX89084ulE+Jr/JJPLuGjqL4gg6TWOALBI2bS2qFoGVM5bcFvLq6V4/q4kC/qUvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enBY7x6Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C317FC4CEF7;
+	Wed, 12 Nov 2025 14:50:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762959036;
+	bh=fDyqUYG96cnQY+L9W/+s4ilvkJlQdMXHRO6AeDHlCzI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=enBY7x6YOWv87kpNak4NrFB8JtZ3UVXQuLOeCAaj6KUbV7onIs9gxe3f9AeakO/UD
+	 P9eC6n1V+zD9y14jPBKQXNdiwFWCkIL/ENmV5k9VIeu7Q+Nq5Te9yLdQLMd2eAlUeg
+	 oKk8bFYOfMrgnmuXhvcvdgjgoF+jv7G9Npc5uNdflqeXzjDoIFBF0ao7BlTFrDIBER
+	 WPxW+kQ0/k5jeCxf4L1ZlrSQyoyW+ZUsbthCnokc6bNsq/ZCLUjXr6rvA/asAwvQ3B
+	 dN3rWLyryTt87mMkUEJ5I8rcVupgRBgwiglVwJqgR9GZ4BNh0keKckGoqJaKn+y9Tw
+	 PPXSl/G8Y5KVg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE16739EFA4C;
+	Wed, 12 Nov 2025 14:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251112133546.4246533f@pumpkin>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v1] ipv4: route: Prevent rt_bind_exception() from
+ rebinding stale fnhe
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176295900651.38875.8173375178181875394.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Nov 2025 14:50:06 +0000
+References: <20251111064328.24440-1-nashuiliang@gmail.com>
+In-Reply-To: <20251111064328.24440-1-nashuiliang@gmail.com>
+To: Chuang Wang <nashuiliang@gmail.com>
+Cc: stable@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 12.11.2025 13:35, David Laight wrote:
-> On Tue, 11 Nov 2025 13:42:54 +0530
-> Brahmajit Das <listout@listout.xyz> wrote:
-> 
-...snip...
-> 
-> Please can we have no unnecessary min_t().
-> You wouldn't write:
-> 	x = (u32)a < (u32)b ? (u32)a : (u32)b;
-> 
->     David
->  
-> >  	copy_len = trace_nr * elem_size;
-> >  
-> >  	ips = trace->ip + skip;
-> 
+Hello:
 
-Hi David,
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Sorry, I didn't quite get that. Would prefer something like:
-	trace_nr = (trace_nr <= num_elem) ? trace_nr : num_elem;
-The pre-refactor code.
+On Tue, 11 Nov 2025 14:43:24 +0800 you wrote:
+> The sit driver's packet transmission path calls: sit_tunnel_xmit() ->
+> update_or_create_fnhe(), which lead to fnhe_remove_oldest() being called
+> to delete entries exceeding FNHE_RECLAIM_DEPTH+random.
+> 
+> The race window is between fnhe_remove_oldest() selecting fnheX for
+> deletion and the subsequent kfree_rcu(). During this time, the
+> concurrent path's __mkroute_output() -> find_exception() can fetch the
+> soon-to-be-deleted fnheX, and rt_bind_exception() then binds it with a
+> new dst using a dst_hold(). When the original fnheX is freed via RCU,
+> the dst reference remains permanently leaked.
+> 
+> [...]
 
+Here is the summary with links:
+  - [net,v1] ipv4: route: Prevent rt_bind_exception() from rebinding stale fnhe
+    https://git.kernel.org/netdev/net/c/ac1499fcd40f
+
+You are awesome, thank you!
 -- 
-Regards,
-listout
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
