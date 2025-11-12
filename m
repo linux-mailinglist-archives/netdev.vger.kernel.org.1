@@ -1,104 +1,125 @@
-Return-Path: <netdev+bounces-237878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47E45C5113D
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:19:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63EBBC51124
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:16:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 467584EDBFA
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:14:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5C3A3B1985
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:16:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47CAF2F39BD;
-	Wed, 12 Nov 2025 08:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F7782F531F;
+	Wed, 12 Nov 2025 08:16:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="vi/Gk5XL"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDB42DC34B
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 08:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC062F5318;
+	Wed, 12 Nov 2025 08:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762935285; cv=none; b=PiJI7X0szksy/d1CgoPYgj8txsMUepfpFsiYxFsZ+YDT6LIX/GpkA/kqhuiFk73avpObOyQ9WHL6VBmCQBMQIDejeGU8ZMlhg9gmpoL7GVZ+Qm5siJ91iQprpJE4giLfADIFlGFErfKqnPULoApCue0Xwetg3IC56S93hDtwWUw=
+	t=1762935396; cv=none; b=nMYVig8+rRy322MKXtFW6mlzIeynUuAhag+x/SH6PwiFKZSZdK8tfHiP/j6/ha+YaDgcJNjuuuPNiEhz+KLs/6I/afP1hQvlelyWjpciecqf/reom8e4pet9IoUVNHeyA9wEbCS9hWm+nAdtOtg50yXCtlLb+S+IiJrZ1SRtwIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762935285; c=relaxed/simple;
-	bh=BYbdxvWo47kO9Wloo/yIIBxUnP0QEo6by8CzdjsQFZY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PmHYnqiwWaSOs1/aRVXw3kXjJ6e0apPKTKzoWFr8WlkAmyfgwops8lB/oh8eRw0uUTqpIuCbyI62Uzc7sZJWsPAVI+D+l4YZdNBqt20kFrbzr/j8/ZIxgErAC2SpEBBhuczLpeIdEKxg43Q6hBAHLJ4oVBYN/cvrT4GOh1j/GSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vJ5zt-0006c8-K2; Wed, 12 Nov 2025 09:14:33 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vJ5zr-0003AD-0Q;
-	Wed, 12 Nov 2025 09:14:31 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vJ5zq-00GPh9-3D;
-	Wed, 12 Nov 2025 09:14:31 +0100
-Date: Wed, 12 Nov 2025 09:14:30 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 1/2] net: phy: allow drivers to disable EEE
- support via .get_features()
-Message-ID: <aRRB5miRuA57NSk5@pengutronix.de>
-References: <aRMgLmIU1XqLZq4i@shell.armlinux.org.uk>
- <E1vImhq-0000000DrQc-3bMW@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1762935396; c=relaxed/simple;
+	bh=D2VhTMOIho5TF5gmeTYsJz1QMNfT6fyktvgzdUCAGF0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JRHVGAfjFyKx/7KnBcKFIubH0LmvtMIRTXZuzppaMMxVoVAIoehRTYZHvx4Jv2ClX51hwVdgpSCgj2cn5Go6qeLTjz/R3W/Yz20gNVf6vQwMFMWD8gYD5yc9gkdWgF1ypYHzq2Araq9yyN9SPay4pmj+AEpWwb8VbkoXpW9nO/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=vi/Gk5XL; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 41D4D4E4164B;
+	Wed, 12 Nov 2025 08:16:31 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id E91766070B;
+	Wed, 12 Nov 2025 08:16:30 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0D00810371904;
+	Wed, 12 Nov 2025 09:16:20 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1762935389; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=HQnMOSoBh6c02XpaM92rHFo3ekXwzKheXU/0txW3bog=;
+	b=vi/Gk5XLFGdPJ7ioZPuZQMq1Sw+qBGaB2Ibv2uhLkgVRAFIsTHFnB5wiGmnJsH+lEQ6qCV
+	KR3geUy9jHdD3rpPNj0UAev3bdA1gOAkxKr62rt5HgQ/rqbOiOu+5w6Lwcvkgu4R4opMfl
+	qJBgCadS4hhctbc1ioqQJKIFBT/wMdZcNDqamrTovDLBGo2GPEXyGVGiZEk6Gk4EWsCx9v
+	GGVQnQaULWqeyhaaLU5WMJT0oUCnv2qSB8uyBc5bPWmF5xZMNGK5UaJOtagxQ3q/G2wRjt
+	hxnPc6/6K8H8U3baaySQ00ln7aW5kILINmz9UUEtgpMsv0SFu3FAnGXg7rTwQQ==
+Message-ID: <dd488c39-3aa3-43f6-8cf7-abca4af3cc7a@bootlin.com>
+Date: Wed, 12 Nov 2025 09:16:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <E1vImhq-0000000DrQc-3bMW@rmk-PC.armlinux.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v15 01/15] dt-bindings: net: Introduce the
+ ethernet-connector description
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
+ <20251106094742.2104099-2-maxime.chevallier@bootlin.com>
+ <56410c74-3d0e-4cdc-87a0-230cad8f691a@lunn.ch>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <56410c74-3d0e-4cdc-87a0-230cad8f691a@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, Nov 11, 2025 at 11:38:38AM +0000, Russell King (Oracle) wrote:
-> Allow PHY drivers to hook the .get_features() method to disable EEE
-> support. This is useful for TI PHYs, where we have a statement that
-> none of their gigabit products support EEE, yet at least DP83867
-> reports EEE capabilties and implements EEE negotiation.
+
+
+On 11/11/2025 04:34, Andrew Lunn wrote:
+> On Thu, Nov 06, 2025 at 10:47:26AM +0100, Maxime Chevallier wrote:
+>> The ability to describe the physical ports of Ethernet devices is useful
+>> to describe multi-port devices, as well as to remove any ambiguity with
+>> regard to the nature of the port.
+>>
+>> Moreover, describing ports allows for a better description of features
+>> that are tied to connectors, such as PoE through the PSE-PD devices.
+>>
+>> Introduce a binding to allow describing the ports, for now with 2
+>> attributes :
+>>
+>>  - The number of lanes, which is a quite generic property that allows
+>>    differentating between multiple similar technologies such as BaseT1
+>>    and "regular" BaseT (which usually means BaseT4).
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> +/**
-> + * phy_get_Features_no_eee - read the PHY features, disabling all EEE
+> You still use lanes here, but the implementation has moved on to
+> pairs.
+> 
+> Please add my Reviewed-by when you fix this.
 
-s/phy_get_Features_no_eee/phy_get_features_no_eee
+Arg, I've made updates on lanes -> pairs, but as you point out I have
+missed a few :( thanks for spotting this,
 
+Maxime
 
-Otherwise looks good.
+> 
+> 	Andrew
 
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
-
-Thank you.
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
