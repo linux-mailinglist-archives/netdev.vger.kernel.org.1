@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-237833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7CA0C50AAF
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 07:02:37 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B132C50AA0
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 07:01:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 246093A95FB
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 06:02:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 782CC4E9B0E
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 06:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A53752DC32B;
-	Wed, 12 Nov 2025 06:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3399215D1;
+	Wed, 12 Nov 2025 06:00:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EE835CBDC
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 06:02:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523452D5A14
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 06:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762927323; cv=none; b=jyZ4VDdpEcvd9xy4W07FLv8uN3j2R9Gw25F6fzJO1vF3C3aexFAzwvBD/YpZS7N2EKC0UhjmN3RE3IzY5abnlr2EBdlkH0hZpY4x9lUmtSwl8lL1Y/Yd8XXwQl43HEz1cX35J6QyLJvUFYR6LClJN6/Vz3nWWpC2y6Q7tipeY/4=
+	t=1762927253; cv=none; b=Ge3F92rPvCCZYoAKFMJ+YNqvk+yfxhXWQ+bitBBXtk00YXDkfColBNDl/FJ82WgvcPrqTplb5TE29sF7YsJn+5NpDjjV06niz5/598h8h0sZU2l/Vij/95lzPZMMiPbU8DGNKgPRcfr57oBwTvY9K7vCp34wuvapU72WbTX3Zis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762927323; c=relaxed/simple;
-	bh=AN4QvZgdnSi/Y0ZTZszrq7i6ollT2s7f/d5LA7zuY2M=;
+	s=arc-20240116; t=1762927253; c=relaxed/simple;
+	bh=U8IE+RX0LBN7+f6QIGosXwWMBXk4ByYcN7c2fOcgyj0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YQ4mPTPw/topWfVL2LcGYPyxkUXKeIa9FzrBV6+hPUNzgiAFDonj65ldiQzeggY4INZv78Zn5vBbFoz2HLXzURLI4sIx2gWqsQYhrmP+m9AbBs8LrfeZRXqBKNcfaFr9AIBWqXhMM5bYQOIXg1gSA1tcSCxHWXVMUmV7KJAfxaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=52.59.177.22
+	 MIME-Version; b=CNaNlqkB9OdOJIW2VeoK5UHQ6IgRg//OZXGlaAfpzC3Lqace5jfuoBYcNTm+zFei60qOIcZ7Xpz3cSYIY3NWYcFuHA5a63HC3GdHRJaDYPTWPb9+m6PoHKxDQxnT+ivQGUXv8IWy24qgrwMlq3kmFYnzSA0rm/YfqdlUKxo182Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.92.39.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpgz9t1762927134t9a9faee3
-X-QQ-Originating-IP: iMe2JT5Dp1EOiLZPy4E8QhejfeiaCuNBnTn9+Kl8U7E=
+X-QQ-mid: zesmtpgz9t1762927137t1635e5b4
+X-QQ-Originating-IP: RzCBxVltsiCFgea0G3lAIszEP4+RrLVz5ynkWesjDbY=
 Received: from lap-jiawenwu.trustnetic.com ( [115.200.224.204])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 12 Nov 2025 13:58:52 +0800 (CST)
+	id ; Wed, 12 Nov 2025 13:58:55 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 10606117337785882438
+X-BIZMAIL-ID: 10584473408325361022
 EX-QQ-RecipientCnt: 12
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ To: netdev@vger.kernel.org,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next 2/5] net: txgbe: rename the SFP related
-Date: Wed, 12 Nov 2025 13:58:38 +0800
-Message-Id: <20251112055841.22984-3-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next 3/5] net: txgbe: improve functions of AML 40G devices
+Date: Wed, 12 Nov 2025 13:58:39 +0800
+Message-Id: <20251112055841.22984-4-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.21.0.windows.1
 In-Reply-To: <20251112055841.22984-1-jiawenwu@trustnetic.com>
 References: <20251112055841.22984-1-jiawenwu@trustnetic.com>
@@ -66,268 +66,464 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: M182XWJxg1fqYEJ+C2Qo6jK3GJlPbj82hOkBkFJbe8VWVgpN4fpOlO3I
-	qVqMEbKA/0oSSu1QOnxOkDy/ruLQjiiJOMRqu5fdKmAfbpkfxBrVIZ48CmeJhP4D/mxOD0F
-	jcthanezWVzBJc62Tjjlk0T9I/VmPVoRQ83+lJu+DKe3eF/BUu13QzsNM7mRxQjkuIvQFdf
-	9CmEc1cvsN3K10xt16NzGatXcDt9mXFsndHPgHh2UCiclgH4V3snojaKUzCUbrPY+iSnOZ4
-	iA7ODeKVf68QNeyPtRgbNYLmQnG/q9tu07qg/YdBNmt5J4+ybHuLaQYIM74ME/lmD/CUmlM
-	N2Z5KU+JXZCL596tn927HPBMTFZTOHpgndIbP6xN59GpbVmIj1vy2xN3DXQXeRXEylQR/c8
-	R88GZETDiovQXupsQMBlpR1v/ulzkC6tdQhPmczOFdJjE83hUHuekG2FAA4DL7uXRviYl6T
-	GgXOnbZa3k7hDo0YWV4GxJSb41A/FxExGLGSlfia4ArcTzt3g50ffVDubXLF4ycAcd9jtKd
-	v7RYTKZv0GD1rbTCc3H+/5RB/yXt2IXflW6vl5HDn02v3dPPZ4wcWB19gIR9MrUzLgaHsSy
-	gBIakrHyeS2uaeWhgeIj/y5cOhbs01UijCbkx+JTJ4LFTSZdNtCPT9VkUE9VwW7CtiaWooO
-	h0rDIIcDfjf1mWnoQYrIdwK9m3zylSD5pTxMrf+BZda3edFpvP+xmLmsJ8IW9n4MFP98V8Y
-	hN3Z5ThHoSywlJoZTxdXIuxDqXccNt8bwK9p6d2cI0voSSjgAtr81lpmRDSPfFhwj8XRjVX
-	UFL9GCMF5Z0sJOb1fXTL4nhzkBmI04RhE1O+/aLVKq6Bu7kn5LXn3DpGQgShXtbSugG6ylE
-	rFaclDns5Ssj0+ANdRHiphHmLM/p5SDQJKLnNmmdAxmjOXzJRL7y/DNTPKyyj0eZ7rGMiaq
-	a71Uyz2TFdrC5nceyGLJl+zxRdk35lxRSPHCibvyBb5Dwu4CeSM8yECLRyP7O5bY/lFchyp
-	uKvHjETnY8E4A1j9/IUZWBIpwPTwh33P3EPsHqKQ==
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-XMAILINFO: MPEorwW6cFo9JsZTv90VRZbfOqZOPM8b68ND1rEnPdwYFIJetlSkT6ez
+	oOFjM3pnba7wyJDNe0ogvkTNiHip+tAMZFobcGNS7LB/Gm0bYDd2e+66rIGjJwTH2qY0hOo
+	LScdF8/W/qZJfwo+JagvEBZkI4dJtsVSjyFU7Qc9rod2/7Q7BxybC3M0I0++RGMfApD80OZ
+	1fp9q1pGRfdJrl380uX3Bc9Fdw3jXo9t/1UQGEXgLlCQhBDtRAVnMwPXOUpfNr7PASRK/74
+	K3nEAw9DfIyYr3MS81bThKQxDnUGBTkUhf57bE2PioXNC+2V0ZWBcOyw1Ik+3yLpFm1/otA
+	1iabT/XhAYwdUMTJxPF1Y2G32KX/zRfcFQwlanMALiPwE1WPDV/OOK7w8mLNCq5vl7DAWen
+	KvuzKe7SVU1spFlPnQcpMOZvEP1lx3TxvzhmfTICcIwzlfWtcUIOwrqJyWKPlcV3+g0WyiL
+	nV+ZLgmw+o5CorJvXPIS+7C4/E3BTY83qDGfNQnIDim98aEKlPaH1Z8LUizLHfxDK+PHaEN
+	zcKMJXAv19ohbLuGFQXVlXrp+En3LJRuuN1zpUh4hFG/Kx7ycv9ni4KCuoZgWduJH40YzlB
+	wNGIxVxNwOrjeAjhW1kL/TjA+khdFs1hwGBTvPyyxeFFtSjAjwYyKoCk/odUamuYVhX+Oep
+	gwmrPpDPTOvovRe0PRthDMY8NWoVyrgJiRBHIxjD5qK/x3Aw3oZICWRtIkAIGOEnGX2bm66
+	vuD6+VQVvNI3+ywm8UBD+43tM+8GxBmlinqCf/BrQW3PiBsRxQZ6p60YRaIXkYo7fde/DGk
+	JobZrcUbJa1IEQCOFf6cMutlM7VZPG7DxRZal90A7OOR5HH9s16YdBOobWt+oGFRyZILG2J
+	ZgPEzEnJ7jAZF3GP65q3FTaDz2G99l7fDNAK3dSAi9K8KtQrGHXbPBjNEobhTDcuNpUVtrf
+	RjQ9KXaRLrE17Bx8x7s60+J6TMI+73jj2r7XhtRu9segZdNmL0MlJqPjvJPcNekk6/zc1Tg
+	AM8lAYUr3Glu7zpj4HAW9qlBR3lE20HmJtTKoSBXyd5V6yJDdysdARSsqm6URhSxp9V0WsP
+	+McS2LcSq0s
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
 X-QQ-RECHKSPAM: 0
 
-QSFP supported will be introduced for AML 40G devices, the code related
-to identify various modules should be renamed to more appropriate names.
+Support to identify QSFP modules for AML 40G devices. The definition of
+GPIO pins follows the design of the QSFP modules, and TXGBE_GPIOBIT_4 is
+used for module present.
 
-And struct txgbe_hic_i2c_read used to get module information is renamed
-as struct txgbe_hic_get_module_info, because another SW-FW command to
-read I2C will be added later.
+Meanwhile, implement phylink in XLGMII mode by default, and get the link
+state from MAC link.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  2 +-
- .../net/ethernet/wangxun/txgbe/txgbe_aml.c    | 39 ++++++++++---------
- .../net/ethernet/wangxun/txgbe/txgbe_aml.h    |  2 +-
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |  2 +-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 12 +++---
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   | 12 +++---
- 6 files changed, 35 insertions(+), 34 deletions(-)
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |  12 --
+ .../net/ethernet/wangxun/txgbe/txgbe_aml.c    | 136 ++++++++++++++++--
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |   3 -
+ .../net/ethernet/wangxun/txgbe/txgbe_irq.c    |  10 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  11 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |   2 -
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  11 ++
+ 7 files changed, 137 insertions(+), 48 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index b1a6ef5709a9..29e5c5470c94 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1249,7 +1249,7 @@ enum wx_pf_flags {
- 	WX_FLAG_RX_HWTSTAMP_IN_REGISTER,
- 	WX_FLAG_PTP_PPS_ENABLED,
- 	WX_FLAG_NEED_LINK_CONFIG,
--	WX_FLAG_NEED_SFP_RESET,
-+	WX_FLAG_NEED_MODULE_RESET,
- 	WX_FLAG_NEED_UPDATE_LINK,
- 	WX_FLAG_NEED_DO_RESET,
- 	WX_FLAG_RX_MERGE_ENABLED,
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+index 9aa3964187e1..f362e51c73ee 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+@@ -240,9 +240,6 @@ int wx_nway_reset(struct net_device *netdev)
+ {
+ 	struct wx *wx = netdev_priv(netdev);
+ 
+-	if (wx->mac.type == wx_mac_aml40)
+-		return -EOPNOTSUPP;
+-
+ 	return phylink_ethtool_nway_reset(wx->phylink);
+ }
+ EXPORT_SYMBOL(wx_nway_reset);
+@@ -261,9 +258,6 @@ int wx_set_link_ksettings(struct net_device *netdev,
+ {
+ 	struct wx *wx = netdev_priv(netdev);
+ 
+-	if (wx->mac.type == wx_mac_aml40)
+-		return -EOPNOTSUPP;
+-
+ 	return phylink_ethtool_ksettings_set(wx->phylink, cmd);
+ }
+ EXPORT_SYMBOL(wx_set_link_ksettings);
+@@ -273,9 +267,6 @@ void wx_get_pauseparam(struct net_device *netdev,
+ {
+ 	struct wx *wx = netdev_priv(netdev);
+ 
+-	if (wx->mac.type == wx_mac_aml40)
+-		return;
+-
+ 	phylink_ethtool_get_pauseparam(wx->phylink, pause);
+ }
+ EXPORT_SYMBOL(wx_get_pauseparam);
+@@ -285,9 +276,6 @@ int wx_set_pauseparam(struct net_device *netdev,
+ {
+ 	struct wx *wx = netdev_priv(netdev);
+ 
+-	if (wx->mac.type == wx_mac_aml40)
+-		return -EOPNOTSUPP;
+-
+ 	return phylink_ethtool_set_pauseparam(wx->phylink, pause);
+ }
+ EXPORT_SYMBOL(wx_set_pauseparam);
 diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-index a7650f548fa4..432880ccc640 100644
+index 432880ccc640..5725e9557669 100644
 --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
 +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-@@ -38,7 +38,7 @@ irqreturn_t txgbe_gpio_irq_handler_aml(int irq, void *data)
+@@ -17,10 +17,15 @@
+ 
+ void txgbe_gpio_init_aml(struct wx *wx)
+ {
+-	u32 status;
++	u32 status, mod_rst;
++
++	if (wx->mac.type == wx_mac_aml40)
++		mod_rst = TXGBE_GPIOBIT_4;
++	else
++		mod_rst = TXGBE_GPIOBIT_2;
+ 
+-	wr32(wx, WX_GPIO_INTTYPE_LEVEL, TXGBE_GPIOBIT_2);
+-	wr32(wx, WX_GPIO_INTEN, TXGBE_GPIOBIT_2);
++	wr32(wx, WX_GPIO_INTTYPE_LEVEL, mod_rst);
++	wr32(wx, WX_GPIO_INTEN, mod_rst);
+ 
+ 	status = rd32(wx, WX_GPIO_INTSTATUS);
+ 	for (int i = 0; i < 6; i++) {
+@@ -33,13 +38,18 @@ irqreturn_t txgbe_gpio_irq_handler_aml(int irq, void *data)
+ {
+ 	struct txgbe *txgbe = data;
+ 	struct wx *wx = txgbe->wx;
+-	u32 status;
++	u32 status, mod_rst;
++
++	if (wx->mac.type == wx_mac_aml40)
++		mod_rst = TXGBE_GPIOBIT_4;
++	else
++		mod_rst = TXGBE_GPIOBIT_2;
+ 
  	wr32(wx, WX_GPIO_INTMASK, 0xFF);
  	status = rd32(wx, WX_GPIO_INTSTATUS);
- 	if (status & TXGBE_GPIOBIT_2) {
--		set_bit(WX_FLAG_NEED_SFP_RESET, wx->flags);
-+		set_bit(WX_FLAG_NEED_MODULE_RESET, wx->flags);
- 		wr32(wx, WX_GPIO_EOI, TXGBE_GPIOBIT_2);
+-	if (status & TXGBE_GPIOBIT_2) {
++	if (status & mod_rst) {
+ 		set_bit(WX_FLAG_NEED_MODULE_RESET, wx->flags);
+-		wr32(wx, WX_GPIO_EOI, TXGBE_GPIOBIT_2);
++		wr32(wx, WX_GPIO_EOI, mod_rst);
  		wx_service_event_schedule(wx);
  	}
-@@ -63,15 +63,16 @@ int txgbe_test_hostif(struct wx *wx)
- 					WX_HI_COMMAND_TIMEOUT, true);
- }
  
--static int txgbe_identify_sfp_hostif(struct wx *wx, struct txgbe_hic_i2c_read *buffer)
-+static int txgbe_identify_module_hostif(struct wx *wx,
-+					struct txgbe_hic_get_module_info *buffer)
+@@ -51,7 +61,7 @@ int txgbe_test_hostif(struct wx *wx)
  {
--	buffer->hdr.cmd = FW_READ_SFP_INFO_CMD;
--	buffer->hdr.buf_len = sizeof(struct txgbe_hic_i2c_read) -
-+	buffer->hdr.cmd = FW_GET_MODULE_INFO_CMD;
-+	buffer->hdr.buf_len = sizeof(struct txgbe_hic_get_module_info) -
- 			      sizeof(struct wx_hic_hdr);
- 	buffer->hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
+ 	struct txgbe_hic_ephy_getlink buffer;
  
- 	return wx_host_interface_command(wx, (u32 *)buffer,
--					 sizeof(struct txgbe_hic_i2c_read),
-+					 sizeof(struct txgbe_hic_get_module_info),
- 					 WX_HI_COMMAND_TIMEOUT, true);
- }
+-	if (wx->mac.type != wx_mac_aml)
++	if (wx->mac.type == wx_mac_sp)
+ 		return 0;
  
-@@ -109,9 +110,9 @@ static void txgbe_get_link_capabilities(struct wx *wx, int *speed,
+ 	buffer.hdr.cmd = FW_PHY_GET_LINK_CMD;
+@@ -86,6 +96,9 @@ static int txgbe_set_phy_link_hostif(struct wx *wx, int speed, int autoneg, int
+ 	buffer.hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
+ 
+ 	switch (speed) {
++	case SPEED_40000:
++		buffer.speed = TXGBE_LINK_SPEED_40GB_FULL;
++		break;
+ 	case SPEED_25000:
+ 		buffer.speed = TXGBE_LINK_SPEED_25GB_FULL;
+ 		break;
+@@ -110,7 +123,9 @@ static void txgbe_get_link_capabilities(struct wx *wx, int *speed,
  {
  	struct txgbe *txgbe = wx->priv;
  
--	if (test_bit(PHY_INTERFACE_MODE_25GBASER, txgbe->sfp_interfaces))
-+	if (test_bit(PHY_INTERFACE_MODE_25GBASER, txgbe->link_interfaces))
+-	if (test_bit(PHY_INTERFACE_MODE_25GBASER, txgbe->link_interfaces))
++	if (test_bit(PHY_INTERFACE_MODE_XLGMII, txgbe->link_interfaces))
++		*speed = SPEED_40000;
++	else if (test_bit(PHY_INTERFACE_MODE_25GBASER, txgbe->link_interfaces))
  		*speed = SPEED_25000;
--	else if (test_bit(PHY_INTERFACE_MODE_10GBASER, txgbe->sfp_interfaces))
-+	else if (test_bit(PHY_INTERFACE_MODE_10GBASER, txgbe->link_interfaces))
+ 	else if (test_bit(PHY_INTERFACE_MODE_10GBASER, txgbe->link_interfaces))
  		*speed = SPEED_10000;
- 	else
+@@ -128,6 +143,8 @@ static void txgbe_get_mac_link(struct wx *wx, int *speed)
+ 	status = rd32(wx, TXGBE_CFG_PORT_ST);
+ 	if (!(status & TXGBE_CFG_PORT_ST_LINK_UP))
  		*speed = SPEED_UNKNOWN;
-@@ -150,7 +151,7 @@ int txgbe_set_phy_link(struct wx *wx)
++	else if (status & TXGBE_CFG_PORT_ST_LINK_AML_40G)
++		*speed = SPEED_40000;
+ 	else if (status & TXGBE_CFG_PORT_ST_LINK_AML_25G)
+ 		*speed = SPEED_25000;
+ 	else if (status & TXGBE_CFG_PORT_ST_LINK_AML_10G)
+@@ -218,15 +235,86 @@ static int txgbe_sfp_to_linkmodes(struct wx *wx, struct txgbe_sff_id *id)
  	return 0;
  }
  
--static int txgbe_sfp_to_linkmodes(struct wx *wx, struct txgbe_sfp_id *id)
-+static int txgbe_sfp_to_linkmodes(struct wx *wx, struct txgbe_sff_id *id)
- {
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(modes) = { 0, };
- 	DECLARE_PHY_INTERFACE_MASK(interfaces);
-@@ -204,9 +205,9 @@ static int txgbe_sfp_to_linkmodes(struct wx *wx, struct txgbe_sfp_id *id)
- 	phylink_set(modes, Asym_Pause);
- 	phylink_set(modes, FIBRE);
- 
--	if (!linkmode_equal(txgbe->sfp_support, modes)) {
--		linkmode_copy(txgbe->sfp_support, modes);
--		phy_interface_and(txgbe->sfp_interfaces,
++static int txgbe_qsfp_to_linkmodes(struct wx *wx, struct txgbe_sff_id *id)
++{
++	__ETHTOOL_DECLARE_LINK_MODE_MASK(modes) = { 0, };
++	DECLARE_PHY_INTERFACE_MASK(interfaces);
++	struct txgbe *txgbe = wx->priv;
++
++	if (id->transceiver_type & TXGBE_SFF_ETHERNET_40G_CR4) {
++		txgbe->link_port = PORT_DA;
++		phylink_set(modes, Autoneg);
++		phylink_set(modes, 40000baseCR4_Full);
++		phylink_set(modes, 10000baseCR_Full);
++		__set_bit(PHY_INTERFACE_MODE_XLGMII, interfaces);
++		__set_bit(PHY_INTERFACE_MODE_10GBASER, interfaces);
++	}
++	if (id->transceiver_type & TXGBE_SFF_ETHERNET_40G_SR4) {
++		txgbe->link_port = PORT_FIBRE;
++		phylink_set(modes, 40000baseSR4_Full);
++		__set_bit(PHY_INTERFACE_MODE_XLGMII, interfaces);
++	}
++	if (id->transceiver_type & TXGBE_SFF_ETHERNET_40G_LR4) {
++		txgbe->link_port = PORT_FIBRE;
++		phylink_set(modes, 40000baseLR4_Full);
++		__set_bit(PHY_INTERFACE_MODE_XLGMII, interfaces);
++	}
++	if (id->transceiver_type & TXGBE_SFF_ETHERNET_40G_ACTIVE) {
++		txgbe->link_port = PORT_DA;
++		phylink_set(modes, Autoneg);
++		phylink_set(modes, 40000baseCR4_Full);
++		__set_bit(PHY_INTERFACE_MODE_XLGMII, interfaces);
++	}
++	if (id->transceiver_type & TXGBE_SFF_ETHERNET_RSRVD) {
++		if (id->sff_opt1 & TXGBE_SFF_ETHERNET_100G_CR4) {
++			txgbe->link_port = PORT_DA;
++			phylink_set(modes, Autoneg);
++			phylink_set(modes, 40000baseCR4_Full);
++			phylink_set(modes, 25000baseCR_Full);
++			phylink_set(modes, 10000baseCR_Full);
++			__set_bit(PHY_INTERFACE_MODE_XLGMII, interfaces);
++			__set_bit(PHY_INTERFACE_MODE_25GBASER, interfaces);
++			__set_bit(PHY_INTERFACE_MODE_10GBASER, interfaces);
++		}
++	}
++
++	if (phy_interface_empty(interfaces)) {
++		wx_err(wx, "unsupported QSFP module\n");
++		return -EINVAL;
++	}
++
++	phylink_set(modes, Pause);
++	phylink_set(modes, Asym_Pause);
++	phylink_set(modes, FIBRE);
++
 +	if (!linkmode_equal(txgbe->link_support, modes)) {
 +		linkmode_copy(txgbe->link_support, modes);
 +		phy_interface_and(txgbe->link_interfaces,
- 				  wx->phylink_config.supported_interfaces,
- 				  interfaces);
- 		linkmode_copy(txgbe->advertising, modes);
-@@ -217,10 +218,10 @@ static int txgbe_sfp_to_linkmodes(struct wx *wx, struct txgbe_sfp_id *id)
- 	return 0;
- }
- 
--int txgbe_identify_sfp(struct wx *wx)
-+int txgbe_identify_module(struct wx *wx)
++				  wx->phylink_config.supported_interfaces,
++				  interfaces);
++		linkmode_copy(txgbe->advertising, modes);
++
++		set_bit(WX_FLAG_NEED_LINK_CONFIG, wx->flags);
++	}
++
++	return 0;
++}
++
+ int txgbe_identify_module(struct wx *wx)
  {
--	struct txgbe_hic_i2c_read buffer;
--	struct txgbe_sfp_id *id;
-+	struct txgbe_hic_get_module_info buffer;
-+	struct txgbe_sff_id *id;
+ 	struct txgbe_hic_get_module_info buffer;
+ 	struct txgbe_sff_id *id;
  	int err = 0;
++	u32 mod_abs;
  	u32 gpio;
  
-@@ -228,9 +229,9 @@ int txgbe_identify_sfp(struct wx *wx)
- 	if (gpio & TXGBE_GPIOBIT_2)
++	if (wx->mac.type == wx_mac_aml40)
++		mod_abs = TXGBE_GPIOBIT_4;
++	else
++		mod_abs = TXGBE_GPIOBIT_2;
++
+ 	gpio = rd32(wx, WX_GPIO_EXT);
+-	if (gpio & TXGBE_GPIOBIT_2)
++	if (gpio & mod_abs)
  		return -ENODEV;
  
--	err = txgbe_identify_sfp_hostif(wx, &buffer);
-+	err = txgbe_identify_module_hostif(wx, &buffer);
- 	if (err) {
--		wx_err(wx, "Failed to identify SFP module\n");
-+		wx_err(wx, "Failed to identify module\n");
- 		return err;
+ 	err = txgbe_identify_module_hostif(wx, &buffer);
+@@ -236,12 +324,18 @@ int txgbe_identify_module(struct wx *wx)
  	}
  
-@@ -247,10 +248,10 @@ void txgbe_setup_link(struct wx *wx)
- {
- 	struct txgbe *txgbe = wx->priv;
+ 	id = &buffer.id;
+-	if (id->identifier != TXGBE_SFF_IDENTIFIER_SFP) {
+-		wx_err(wx, "Invalid SFP module\n");
++	if (id->identifier != TXGBE_SFF_IDENTIFIER_SFP &&
++	    id->identifier != TXGBE_SFF_IDENTIFIER_QSFP &&
++	    id->identifier != TXGBE_SFF_IDENTIFIER_QSFP_PLUS &&
++	    id->identifier != TXGBE_SFF_IDENTIFIER_QSFP28) {
++		wx_err(wx, "Invalid module\n");
+ 		return -ENODEV;
+ 	}
  
--	phy_interface_zero(txgbe->sfp_interfaces);
--	linkmode_zero(txgbe->sfp_support);
-+	phy_interface_zero(txgbe->link_interfaces);
-+	linkmode_zero(txgbe->link_support);
- 
--	txgbe_identify_sfp(wx);
-+	txgbe_identify_module(wx);
+-	return txgbe_sfp_to_linkmodes(wx, id);
++	if (id->transceiver_type == 0xFF)
++		return txgbe_sfp_to_linkmodes(wx, id);
++
++	return txgbe_qsfp_to_linkmodes(wx, id);
  }
  
- static void txgbe_get_link_state(struct phylink_config *config,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
-index 25d4971ca0d9..7c8fa48e68d3 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
-@@ -8,7 +8,7 @@ void txgbe_gpio_init_aml(struct wx *wx);
- irqreturn_t txgbe_gpio_irq_handler_aml(int irq, void *data);
- int txgbe_test_hostif(struct wx *wx);
- int txgbe_set_phy_link(struct wx *wx);
--int txgbe_identify_sfp(struct wx *wx);
-+int txgbe_identify_module(struct wx *wx);
- void txgbe_setup_link(struct wx *wx);
- int txgbe_phylink_init_aml(struct txgbe *txgbe);
+ void txgbe_setup_link(struct wx *wx)
+@@ -304,6 +398,9 @@ static void txgbe_mac_link_up_aml(struct phylink_config *config,
+ 	txcfg &= ~TXGBE_AML_MAC_TX_CFG_SPEED_MASK;
  
+ 	switch (speed) {
++	case SPEED_40000:
++		txcfg |= TXGBE_AML_MAC_TX_CFG_SPEED_40G;
++		break;
+ 	case SPEED_25000:
+ 		txcfg |= TXGBE_AML_MAC_TX_CFG_SPEED_25G;
+ 		break;
+@@ -368,7 +465,18 @@ int txgbe_phylink_init_aml(struct txgbe *txgbe)
+ 				   MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
+ 	config->get_fixed_state = txgbe_get_link_state;
+ 
+-	phy_mode = PHY_INTERFACE_MODE_25GBASER;
++	if (wx->mac.type == wx_mac_aml40) {
++		config->mac_capabilities |= MAC_40000FD;
++		phy_mode = PHY_INTERFACE_MODE_XLGMII;
++		__set_bit(PHY_INTERFACE_MODE_XLGMII, config->supported_interfaces);
++		state.speed = SPEED_40000;
++		state.duplex = DUPLEX_FULL;
++	} else {
++		phy_mode = PHY_INTERFACE_MODE_25GBASER;
++		state.speed = SPEED_25000;
++		state.duplex = DUPLEX_FULL;
++	}
++
+ 	__set_bit(PHY_INTERFACE_MODE_25GBASER, config->supported_interfaces);
+ 	__set_bit(PHY_INTERFACE_MODE_10GBASER, config->supported_interfaces);
+ 
+@@ -376,8 +484,6 @@ int txgbe_phylink_init_aml(struct txgbe *txgbe)
+ 	if (IS_ERR(phylink))
+ 		return PTR_ERR(phylink);
+ 
+-	state.speed = SPEED_25000;
+-	state.duplex = DUPLEX_FULL;
+ 	err = phylink_set_fixed_link(phylink, &state);
+ 	if (err) {
+ 		wx_err(wx, "Failed to set fixed link\n");
 diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index e8dd277a35c7..d7f905359458 100644
+index d7f905359458..f553ec5f8238 100644
 --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
 +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -32,7 +32,7 @@ int txgbe_get_link_ksettings(struct net_device *netdev,
- 	cmd->base.port = txgbe->link_port;
- 	cmd->base.autoneg = phylink_test(txgbe->advertising, Autoneg) ?
- 			    AUTONEG_ENABLE : AUTONEG_DISABLE;
--	linkmode_copy(cmd->link_modes.supported, txgbe->sfp_support);
-+	linkmode_copy(cmd->link_modes.supported, txgbe->link_support);
- 	linkmode_copy(cmd->link_modes.advertising, txgbe->advertising);
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index daa761e48f9d..91d1b4e68126 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -89,21 +89,21 @@ static int txgbe_enumerate_functions(struct wx *wx)
- 	return physfns;
- }
- 
--static void txgbe_sfp_detection_subtask(struct wx *wx)
-+static void txgbe_module_detection_subtask(struct wx *wx)
- {
+@@ -19,9 +19,6 @@ int txgbe_get_link_ksettings(struct net_device *netdev,
+ 	struct txgbe *txgbe = wx->priv;
  	int err;
  
--	if (!test_bit(WX_FLAG_NEED_SFP_RESET, wx->flags))
-+	if (!test_bit(WX_FLAG_NEED_MODULE_RESET, wx->flags))
- 		return;
- 
--	/* wait for SFP module ready */
-+	/* wait for SFF module ready */
- 	msleep(200);
- 
--	err = txgbe_identify_sfp(wx);
-+	err = txgbe_identify_module(wx);
+-	if (wx->mac.type == wx_mac_aml40)
+-		return -EOPNOTSUPP;
+-
+ 	err = wx_get_link_ksettings(netdev, cmd);
  	if (err)
- 		return;
- 
--	clear_bit(WX_FLAG_NEED_SFP_RESET, wx->flags);
-+	clear_bit(WX_FLAG_NEED_MODULE_RESET, wx->flags);
- }
- 
- static void txgbe_link_config_subtask(struct wx *wx)
-@@ -128,7 +128,7 @@ static void txgbe_service_task(struct work_struct *work)
+ 		return err;
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
+index 3885283681ec..aa14958d439a 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
+@@ -23,7 +23,7 @@ void txgbe_irq_enable(struct wx *wx, bool queues)
  {
- 	struct wx *wx = container_of(work, struct wx, service_task);
+ 	u32 misc_ien = TXGBE_PX_MISC_IEN_MASK;
  
--	txgbe_sfp_detection_subtask(wx);
-+	txgbe_module_detection_subtask(wx);
- 	txgbe_link_config_subtask(wx);
+-	if (wx->mac.type == wx_mac_aml) {
++	if (wx->mac.type != wx_mac_sp) {
+ 		misc_ien |= TXGBE_PX_MISC_GPIO;
+ 		txgbe_gpio_init_aml(wx);
+ 	}
+@@ -201,10 +201,7 @@ static void txgbe_del_irq_domain(struct txgbe *txgbe)
  
- 	wx_service_event_complete(wx);
+ void txgbe_free_misc_irq(struct txgbe *txgbe)
+ {
+-	if (txgbe->wx->mac.type == wx_mac_aml40)
+-		return;
+-
+-	if (txgbe->wx->mac.type == wx_mac_aml)
++	if (txgbe->wx->mac.type != wx_mac_sp)
+ 		free_irq(txgbe->gpio_irq, txgbe);
+ 
+ 	free_irq(txgbe->link_irq, txgbe);
+@@ -219,9 +216,6 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
+ 	struct wx *wx = txgbe->wx;
+ 	int hwirq, err;
+ 
+-	if (wx->mac.type == wx_mac_aml40)
+-		goto skip_sp_irq;
+-
+ 	txgbe->misc.nirqs = TXGBE_IRQ_MAX;
+ 	txgbe->misc.domain = irq_domain_create_simple(NULL, txgbe->misc.nirqs, 0,
+ 						      &txgbe_misc_irq_domain_ops, txgbe);
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index 91d1b4e68126..0de051450a82 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -144,7 +144,6 @@ static void txgbe_init_service(struct wx *wx)
+ static void txgbe_up_complete(struct wx *wx)
+ {
+ 	struct net_device *netdev = wx->netdev;
+-	u32 reg;
+ 
+ 	wx_control_hw(wx, true);
+ 	wx_configure_vectors(wx);
+@@ -155,12 +154,8 @@ static void txgbe_up_complete(struct wx *wx)
+ 
+ 	switch (wx->mac.type) {
+ 	case wx_mac_aml40:
+-		reg = rd32(wx, TXGBE_AML_MAC_TX_CFG);
+-		reg &= ~TXGBE_AML_MAC_TX_CFG_SPEED_MASK;
+-		reg |= TXGBE_AML_MAC_TX_CFG_SPEED_40G;
+-		wr32(wx, WX_MAC_TX_CFG, reg);
+-		txgbe_enable_sec_tx_path(wx);
+-		netif_carrier_on(wx->netdev);
++		txgbe_setup_link(wx);
++		phylink_start(wx->phylink);
+ 		break;
+ 	case wx_mac_aml:
+ 		/* Enable TX laser */
+@@ -276,7 +271,7 @@ void txgbe_down(struct wx *wx)
+ 
+ 	switch (wx->mac.type) {
+ 	case wx_mac_aml40:
+-		netif_carrier_off(wx->netdev);
++		phylink_stop(wx->phylink);
+ 		break;
+ 	case wx_mac_aml:
+ 		phylink_stop(wx->phylink);
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 03f1b9bc604d..8ea7aa07ae4e 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -579,7 +579,6 @@ int txgbe_init_phy(struct txgbe *txgbe)
+ 
+ 	switch (wx->mac.type) {
+ 	case wx_mac_aml40:
+-		return 0;
+ 	case wx_mac_aml:
+ 		return txgbe_phylink_init_aml(txgbe);
+ 	case wx_mac_sp:
+@@ -653,7 +652,6 @@ void txgbe_remove_phy(struct txgbe *txgbe)
+ {
+ 	switch (txgbe->wx->mac.type) {
+ 	case wx_mac_aml40:
+-		return;
+ 	case wx_mac_aml:
+ 		phylink_destroy(txgbe->wx->phylink);
+ 		return;
 diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index b9a4ba48f5b9..c115ed659544 100644
+index c115ed659544..e72edb9ef084 100644
 --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
 +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -341,9 +341,9 @@ void txgbe_do_reset(struct net_device *netdev);
+@@ -98,6 +98,7 @@
+ /* Port cfg registers */
+ #define TXGBE_CFG_PORT_ST                       0x14404
+ #define TXGBE_CFG_PORT_ST_LINK_UP               BIT(0)
++#define TXGBE_CFG_PORT_ST_LINK_AML_40G          BIT(2)
+ #define TXGBE_CFG_PORT_ST_LINK_AML_25G          BIT(3)
+ #define TXGBE_CFG_PORT_ST_LINK_AML_10G          BIT(4)
+ #define TXGBE_CFG_VXLAN                         0x14410
+@@ -317,8 +318,12 @@ void txgbe_do_reset(struct net_device *netdev);
+ #define TXGBE_LINK_SPEED_UNKNOWN        0
+ #define TXGBE_LINK_SPEED_10GB_FULL      4
+ #define TXGBE_LINK_SPEED_25GB_FULL      0x10
++#define TXGBE_LINK_SPEED_40GB_FULL      0x20
  
- #define FW_PHY_GET_LINK_CMD             0xC0
- #define FW_PHY_SET_LINK_CMD             0xC1
--#define FW_READ_SFP_INFO_CMD            0xC5
-+#define FW_GET_MODULE_INFO_CMD          0xC5
+ #define TXGBE_SFF_IDENTIFIER_SFP        0x3
++#define TXGBE_SFF_IDENTIFIER_QSFP       0xC
++#define TXGBE_SFF_IDENTIFIER_QSFP_PLUS  0xD
++#define TXGBE_SFF_IDENTIFIER_QSFP28     0x11
+ #define TXGBE_SFF_DA_PASSIVE_CABLE      0x4
+ #define TXGBE_SFF_DA_ACTIVE_CABLE       0x8
+ #define TXGBE_SFF_DA_SPEC_ACTIVE_LIMIT  0x4
+@@ -331,6 +336,12 @@ void txgbe_do_reset(struct net_device *netdev);
+ #define TXGBE_SFF_25GBASECR_91FEC       0xB
+ #define TXGBE_SFF_25GBASECR_74FEC       0xC
+ #define TXGBE_SFF_25GBASECR_NOFEC       0xD
++#define TXGBE_SFF_ETHERNET_RSRVD        BIT(7)
++#define TXGBE_SFF_ETHERNET_40G_CR4      BIT(3)
++#define TXGBE_SFF_ETHERNET_40G_SR4      BIT(2)
++#define TXGBE_SFF_ETHERNET_40G_LR4      BIT(1)
++#define TXGBE_SFF_ETHERNET_40G_ACTIVE   BIT(0)
++#define TXGBE_SFF_ETHERNET_100G_CR4     0xB
  
--struct txgbe_sfp_id {
-+struct txgbe_sff_id {
- 	u8 identifier;		/* A0H 0x00 */
- 	u8 com_1g_code;		/* A0H 0x06 */
- 	u8 com_10g_code;	/* A0H 0x03 */
-@@ -358,9 +358,9 @@ struct txgbe_sfp_id {
- 	u8 reserved[5];
- };
- 
--struct txgbe_hic_i2c_read {
-+struct txgbe_hic_get_module_info {
- 	struct wx_hic_hdr hdr;
--	struct txgbe_sfp_id id;
-+	struct txgbe_sff_id id;
- };
- 
- struct txgbe_hic_ephy_setlink {
-@@ -451,8 +451,8 @@ struct txgbe {
- 	int fdir_filter_count;
- 	spinlock_t fdir_perfect_lock; /* spinlock for FDIR */
- 
--	DECLARE_PHY_INTERFACE_MASK(sfp_interfaces);
--	__ETHTOOL_DECLARE_LINK_MODE_MASK(sfp_support);
-+	DECLARE_PHY_INTERFACE_MASK(link_interfaces);
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(link_support);
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising);
- 	u8 link_port;
- };
+ #define TXGBE_PHY_FEC_RS                BIT(0)
+ #define TXGBE_PHY_FEC_BASER             BIT(1)
 -- 
 2.48.1
 
