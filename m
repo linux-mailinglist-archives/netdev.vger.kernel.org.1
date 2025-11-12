@@ -1,228 +1,174 @@
-Return-Path: <netdev+bounces-237914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC882C515E7
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:34:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5AC8C51612
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:36:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 148F918979E5
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:34:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE4B8189D65E
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585D5303CB0;
-	Wed, 12 Nov 2025 09:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF319220F5C;
+	Wed, 12 Nov 2025 09:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="G7IywWZu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IjrGDI/N"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010067.outbound.protection.outlook.com [52.101.85.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF95303CA0;
-	Wed, 12 Nov 2025 09:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762939924; cv=fail; b=m+UnJfGlMoPBqAK8NxDhzle8U7mNFCWpTN2z3TxeQDk+xmTwYOqy2lDoKe8lq+3vXQ1m6+jqJ9f3tD5Vy6zN68PwvbZxmE2NjOjIMo93U29fb2O0Gv9DM8VrLNA+jGQu1eEFdpJBVkuokXEvGfKRA2xWgaZ4+6yPRkbk5jGygo0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762939924; c=relaxed/simple;
-	bh=n4v9b+uitHwW4vmRhhhRvdG3/rLVn/O3s5uRc0wx4iI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E+oc8j21BYUwA+2+2zyhJpDuTgKR0C2jAwNmLBiZyd3FhUN8HElpx4W3zbyGSwJ8WKVzEasca8aoTvNBqOBlnBPa1ZdPpq25YokOh61l8cSMByALw3FkEOgULEaGQcYX2iQj6mAxJM46SAVAVP7kxWGWO/FDWT4Lz0iTd1hlgjI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=G7IywWZu; arc=fail smtp.client-ip=52.101.85.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XgX8Aox2h01/teXPjlPJld4fEBbY9dMWouiRMKR+JIZkO8lDACSaidFICeFwmWs4Wz8mUwtOoJMN4dLK4ynNGqQrd6chkjcd7qdkqdNaOYH8QYS2vYTi10MS9aFPD37m9izEyZxfIRLe0PrMMUIRmV19OewU3JgrK9uqp1NNU524K+uaBoIH7RvBfb0DPq+vgLU8NxEwld6oBNu52ApScoRST80BcFTBj09GLssxPxDYlpFW+IJBBqhaFItzmkcS2/Bh1an4E67Lg7Gat4gGSPrkPB6F+eYBNQ291xIfPMtm4v8dR2kHGINp5VC45tUK3/E03pXzUPDDz3aZLYnEqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FZ6d72Q+8KzAtf17ZtvDWts8GkBxVbalnzI7vsz9EIM=;
- b=IbQWVp0nKKZB/lu4ce0AIKFo4OJ2XAlV9uLcGOwubprza6G+VbH0ksSfzSsrnjZ2ELUBAI5TOG3Dh/ZBorHACs7h1YE4ESP/nUQHTJMD1Ber2pLQdTXc/+E88yvmqT42aMk7E6psauB8VVJ8ZYZ3nmLhRdTWINa12oPEF/MALIkYslJ4vM4tQyqAV1yqmFR4TyU2IoaLap6p3nZdpuxAbRL1h07We0eVUYUERitgfAy23AQSCAetwI35+tkI5nfL3EFnEgnKp75xmrm8ZTVdiB6QWSaAzFY3L6ead7EX4MVcSxHIXiCcDbZz1FJhm/lH0a5lO9b/4/7ZCIoriS/fsA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FZ6d72Q+8KzAtf17ZtvDWts8GkBxVbalnzI7vsz9EIM=;
- b=G7IywWZuC1DlnIrj8gPb8RihalNOhl3Rfp/TQtjmNphNQ/hrMapKfSF2GOFiO+V5KAwXVDRT85/ZQx9VZ7BJjF+cWR8uS3WrQG+mvBAzf7DSb1o7ICR8hna+mGJ4Bwab0KJQ5IhwvYIZJN7wwWgyuGQaDKjtPHPP0GstCWsRDik4+9Z/ll1sCotmEtdXYHZwdw/ArBZ3MK70qnL3tVjY/2xIcLoa04olbNqCGiZ+83zQwXBQ2gYSlTD1I0rcWKSmYUs+lqjec5GSdMUktFnTtSdmceiZrJui1fDpwspLdEzyE8doB4sd00bNUFy/bZGjHVmL0eR55/TXkQvCl5d/YA==
-Received: from SN7PR18CA0011.namprd18.prod.outlook.com (2603:10b6:806:f3::19)
- by IA1PR12MB6233.namprd12.prod.outlook.com (2603:10b6:208:3e7::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Wed, 12 Nov
- 2025 09:31:56 +0000
-Received: from SA2PEPF00001504.namprd04.prod.outlook.com
- (2603:10b6:806:f3:cafe::cb) by SN7PR18CA0011.outlook.office365.com
- (2603:10b6:806:f3::19) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.16 via Frontend Transport; Wed,
- 12 Nov 2025 09:31:56 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SA2PEPF00001504.mail.protection.outlook.com (10.167.242.36) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9320.13 via Frontend Transport; Wed, 12 Nov 2025 09:31:56 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 12 Nov
- 2025 01:31:40 -0800
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 12 Nov
- 2025 01:31:39 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Wed, 12
- Nov 2025 01:31:33 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<bpf@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
-	<leonro@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, William Tu
-	<witu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Nimrod Oren
-	<noren@nvidia.com>, Alex Lazar <alazar@nvidia.com>
-Subject: [PATCH net-next 6/6] net/mlx5e: Support XDP target xmit with dummy program
-Date: Wed, 12 Nov 2025 11:29:09 +0200
-Message-ID: <1762939749-1165658-7-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
-In-Reply-To: <1762939749-1165658-1-git-send-email-tariqt@nvidia.com>
-References: <1762939749-1165658-1-git-send-email-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E982FE592
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 09:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762940054; cv=none; b=NKEmFnTVLBUK22b9IMcC1i3pN6L+CCOMadRK6lLkILeEpDaGRZutOZI1pjAYFaqfEnZ+PNwCyuq1R1WwS1we6be93nNXksmVRHq28SNhQtwsUAxAowG4azY8TK6b6nepFzXSqKtIcuX1EC1rWaSCUXwXA9LIjvkeR86mizp5FhY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762940054; c=relaxed/simple;
+	bh=x2jKNqGY/kiVKpHZUUrGXa1xAzr4YMtJ7n2T4FCXCgk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gw5+s50PVuTWAPPKTsHG4xgl99OwD4p46CBvstzoN99TesAHrgFa5jA6xnnyCko3f8vbgbCSQG8fNQCNP9SweRx58CC3QJV9t3sG6b1kf+M3iPzvYYzrzZOgSUt0QESlp45FiMqdEZYxr6jE2TUBwlgCbgs/c9U4PivWjzYYYd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IjrGDI/N; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6419b7b4b80so828844a12.2
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 01:34:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762940051; x=1763544851; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y+ph3n81MNofPspKtp5iN2RLnNXwZpO7ZQr4gG1y+Xg=;
+        b=IjrGDI/NkqhS3NDtElz3W18OJX3jd4A2UQpatWoD5mbm7WgpXK6LHK2+BS/ywFOO4r
+         DTFAwc5R0OC97BVil91RvUWrBewlI0zmsMlhaiynC3DIFunv40a/vyM5CgiCdnLwrn4Y
+         FRQhR6eNToBo8P3Vp9xSlFvXyCGCr6zucmF7HmFoXDYnFsDkA+czHUwzJco+kWxKwtyb
+         EmLZnqg+YhUd9BG1fMaJfRPdTMte0DIN0z1yiL9IaZjv/u8uwB49NZV+GFB1PvqVGhvb
+         HVS5E70BQZk3efWO9HtbKhjbzM4Y/1ey3h/xH/sgRQ4Xpy49cU831BVYd7XgMYZLDhlu
+         ZHpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762940051; x=1763544851;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y+ph3n81MNofPspKtp5iN2RLnNXwZpO7ZQr4gG1y+Xg=;
+        b=El9MeA1qrMn1u3nGplfYxE50qgvctEl7HQpZ/zggtCVk96XauA6TBePuSUlkgwj1pv
+         QSp9RkBwrwEuxKKNJiZNWSsMHDMPYBxlYp3XJ2eVKAo7J+PNTX3S9c+MOGjb6MfOZleX
+         NV0J+WdXNheBZgAUANA6t5xheaYPCCaZh0CftUshf7Bv5J+3vTsD2ngYDyd4c/mZ6fCL
+         b57MuxNxOC/A7PGdXVp4IEZiiKHm09y1Pf3m2p9Zl+wCm5peKYJWIelKpb0nUFq+maOX
+         cMIGBNGsW7yQSqjtyFyKOYcurah8tQktUi+KbHV/qZ4fCv9yERP57Qiybokb8XIwFl7N
+         W+UA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1O3vtZedLP9uOnmrSrrw305STpCIW1sAUpxu9aVnrFd7MnJm+YDisMkYktcTSVUzK0l/uNU4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCgSUKdDTn+5n/b2UWsD5gEf/bJhuHVYoMidLwNl5aNWZWeHr8
+	wOYP9fIkPXZIilrML0aeGSQj7TTh5PWKqqoQ0oNCvXxreKW3KIsPRA8=
+X-Gm-Gg: ASbGncuOxTot66z0yP8AJF5m1zdXTORzSxUC+jGUlwcp8qEVWnD7+6yZFlD+nAYHipq
+	5hH+aTG6rXiO1wI770SeBIa0KGVlYrwwLo9rwRsRhPhPDclF3Tf7+FZ1MYdziC8aONrpeNABTVk
+	cREPrBPOuy17vPypSA+0L/MPj79xySqfedkmAF15WPvU2hcENhN0f147FzDJ4tArc2sLQsrzMEq
+	6rMT28IN0W9LwSHoMV+e9DsztBcLkvWvHAXsqhm2CZ9zQkx0pp5/0VvhNDwFA+Y5GXxNwE4ZfOO
+	/OkYuZyyZ+tOmT4f/ZnAcEXCs2GRCKKfKHG1TkGhrZ4rNitn9MmecmpU2JM8zzwMGe+WhP6WsUO
+	EBGughMZHWsMnB2JbP4+KjdXBGIoxujvT3ld7u8etiyHBVSfhkRMCKChBV49bToKjG+pqKBD1YH
+	iEe4i8x1E0FMFBWadEuiUJTBhAKFQb0OSkwTEBKc6QOcOv+QlyO9BA
+X-Google-Smtp-Source: AGHT+IEbaOVdolpRZRtQY4C4p55uxdFbLWKLEJUaTQ2W0vBS9wly5TtrzUUAVAA7VNF0NNYTPywc0g==
+X-Received: by 2002:a05:6402:3046:10b0:640:b814:bb81 with SMTP id 4fb4d7f45d1cf-6431a55e501mr1856940a12.32.1762940051127;
+        Wed, 12 Nov 2025 01:34:11 -0800 (PST)
+Received: from lithos ([2a02:810d:4a94:b300:ec52:7cf5:e31:cdb7])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64165b2aa03sm9869160a12.6.2025.11.12.01.34.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 01:34:10 -0800 (PST)
+Date: Wed, 12 Nov 2025 10:34:01 +0100
+From: Florian Fuchs <fuchsfl@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Geoff Levand <geoff@infradead.org>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: ps3_gelic_net: handle skb allocation failures
+Message-ID: <aRRUiYIrOcpSiakH@lithos>
+References: <20251110114523.3099559-1-fuchsfl@gmail.com>
+ <20251111180451.0ef1dc9c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00001504:EE_|IA1PR12MB6233:EE_
-X-MS-Office365-Filtering-Correlation-Id: 85baff6c-4c57-4563-1901-08de21ce525f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|36860700013|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?uRnT7w09OMAf0MnOp8HybOGJptA2FXRI8MCV1BvXgvfkb9Ju2EuGcAPrrR03?=
- =?us-ascii?Q?YfnZy+U3WodAy67ji7bE+7uuDGsn3TciWJt0f9RJ6Ew2Di6ErqglwRyrEchK?=
- =?us-ascii?Q?xcN0Pr6dOUKw5h0FZ6boa39Aww1HWSiy49BSMFbznCiwBIyCdcI+wmjtwhiZ?=
- =?us-ascii?Q?BBPl7omCVA7sgcYyPcyYNidnNrBr9UB1mA/kuRWx55NE2hATEEuhsWiy58no?=
- =?us-ascii?Q?O6nrRC1i8+oxIGoHys/c9arWQpw5PQtHQOEv4eYqmaRMgpNYUO3025/AsJE5?=
- =?us-ascii?Q?6lmtoak/8u9PBcdg9aI4R2UPswZ2RBPEufe2+f6PU4Lv9u/IwlstqWCuGMal?=
- =?us-ascii?Q?RVLGZE4xI0864iarLH5+i58VMXxnzT9aJYwblDNz/RDfjsNYq07kOokh0+/Q?=
- =?us-ascii?Q?kamlsVeoVSDY88nI6i6IFm3zKYIczh99JSlzcKykgzTbJ3EQiMOWqobwNwBu?=
- =?us-ascii?Q?aOoDq9LqQxI33Ovf9dqCDdqKAvckACW1K85aAF0uOnQR7u2H21kGgS3b9IhI?=
- =?us-ascii?Q?dG7p0uc1H38rWX16aLSvcky5aSF5Ad35BmPWsNEgXkjRn5KVQU95+l0lyKIJ?=
- =?us-ascii?Q?z8u8/x1kKZpFk4omMyuwYFtWJ/r4NlVDPjdRF3O0bgbzsalFHC5u3/bDT+Bi?=
- =?us-ascii?Q?IuJ3FGMIYsPfQEx540h3fOOhMq7IW7aNQdGP7owFXODOckXZgfniVEky0Tcf?=
- =?us-ascii?Q?2NsxTujcaHrGzK0x0fjZL69bF0f3DusSsmNaNggQB0+OjKXleLigoOP6bt/8?=
- =?us-ascii?Q?BGYckyZ4J32f+9V2zctp5yv3ZSxcXhcwIvsZbYdKS4udOpK+9o/kH0coG0JO?=
- =?us-ascii?Q?JSeWUS0G3wzjSeHWKS624IJJpg9TTq7DE5VWy8n3g1YtqYo/wTmENpTSyqOM?=
- =?us-ascii?Q?rwBexpeZ6qR2b3Xb8EJ0FngHZAEbZiyw6p7mf36Zp7W0piataIKPnKH4SsVv?=
- =?us-ascii?Q?/5XYwsyMkon+Zvxe/uLdCjpyFo8aqH8BJtSaHYSH+rgLj6H5iGn0TbC3LaMN?=
- =?us-ascii?Q?dyL6U+zbQpEpeIP07NS/TeLV/oX2QuXAxGj8ZdxLIO5ctTQLfB+Qj0fRhIRD?=
- =?us-ascii?Q?rJIggCl8Q+ow7EjxujUIe6Zc5ejLrQ6Wg6Kdqdl42VrZC6O/zPFLLxyhB656?=
- =?us-ascii?Q?gFvT+YtMlXWhqBN3aUAf1rp1lk6KOTaMIMtWuUfGs/WyMQmjLtMwuPt50H4z?=
- =?us-ascii?Q?4/4Z1MvqGQj0kLSN/XIkBEXdw4UdpYShRncm2j7nLQuJ9vfidykzKBMImAp0?=
- =?us-ascii?Q?V+QgaXKOGQHVHtmG7Eh+RLyyQfynk/JgMnSBBQBPbLd2vbQRcrtJloYqIAi/?=
- =?us-ascii?Q?syFuOWXO2uLkg1yaOfkLn/OhwF0ijOazAJdKefCvyj1RRd87//cJYfN2ErXb?=
- =?us-ascii?Q?6YzJO4ayXLsXWyRzwEhTLVN7qQWSIMMsIlnuGfDiJfS7O6hJ6VeD5TK9nF0f?=
- =?us-ascii?Q?wYcF/j858z5TXIjM1mxlqlnx0QqBSucFWvNXYPGOeTXGCrGrzXsMDAexWPDW?=
- =?us-ascii?Q?4o5CBs0+2gxYZdiCfhJITZoo2lCG9F9Z8vc4u5x7940r0Pt6KDA7ajbtsTjl?=
- =?us-ascii?Q?NRwXMdn3o+aLCV5Xsw0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2025 09:31:56.0220
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85baff6c-4c57-4563-1901-08de21ce525f
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00001504.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6233
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251111180451.0ef1dc9c@kernel.org>
 
-Save per-channel resources in default.
+Hi Jakub,
 
-As no better API exist, make the XDP-redirect-target SQ available by
-loading a dummy XDP program.
+On 11 Nov 18:04, Jakub Kicinski wrote:
+> On Mon, 10 Nov 2025 12:45:23 +0100 Florian Fuchs wrote:
+> > Steps to reproduce the issue:
+> > 	1. Start a continuous network traffic, like scp of a 20GB file
+> > 	2. Inject failslab errors using the kernel fault injection:
+> > 	    echo -1 > /sys/kernel/debug/failslab/times
+> > 	    echo 30 > /sys/kernel/debug/failslab/interval
+> > 	    echo 100 > /sys/kernel/debug/failslab/probability
+> > 	3. After some time, traces start to appear, kernel Oopses
+> > 	   and the system stops
+> > 
+> > Step 2 is not always necessary, as it is usually already triggered by
+> > the transfer of a big enough file.
+> 
+> Have you actually tested this on a real device?
+> Please describe the testing you have done rather that "how to test".
 
-This improves the latency of interface up/down operations when feature
-is disabled.
+Yes, of course, I intensively tested the patch on a Sony PS3 (CECHL04
+PAL). I ran the final fix for many hours, with continuous system load
+and high network transfer load. I am happy to get feedback on better or
+acceptable testing.
 
-Perf numbers:
-NIC: Connect-X7.
-Setup: 248 channels.
+My testing consisted of:
+1. Produce Oops: Test the kernel without any gelic patches, scp a big
+   file to usb stick and create high cpu/memory load (like compiling
+   some software) or extract verbose, tar xv, a big file via ssh
+2. Safely re-produce the Oops using failslab injection, so I dont need
+   to wait for it
+3. Develop against that failslab injection, high load and network
+   transfer
+4. First solution was to just always refill the chain, which resulted in
+   RX stall after some time, as the dmac seemed to be stopped, when buffer
+   was full and NOT_IN_USE head found and needed rmmod/modprobe to work
+   again
+5. Run the final fix for many hours while injecting failslabs, high load,
+   and high network load with continuous scp and netcat
+6. Further massive improvement is to convert the driver to use
+   napi_gro_receive and napi_skb_alloc, but this would be a separate
+   patch
 
-Interface up + down:
-Before: 2.246 secs
-After:  1.798 secs (1.25x faster)
+> > --- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+> > +++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+> > @@ -259,6 +259,7 @@ void gelic_card_down(struct gelic_card *card)
+> >  	mutex_lock(&card->updown_lock);
+> >  	if (atomic_dec_if_positive(&card->users) == 0) {
+> >  		pr_debug("%s: real do\n", __func__);
+> > +		timer_delete_sync(&card->rx_oom_timer);
+> >  		napi_disable(&card->napi);
+> 
+> I think the ordering here should be inverted
 
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Reviewed-by: William Tu <witu@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 23 +++++++++----------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+I thought, that there might be a race condition in the inverted order
+like that napi gets re-enabled by the timer in between of the down:
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 078fd591c540..23a0b50b9dbd 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -2652,7 +2652,7 @@ static int mlx5e_open_queues(struct mlx5e_channel *c,
- 	if (err)
- 		goto err_close_icosq_cq;
- 
--	if (netdev_ops->ndo_xdp_xmit) {
-+	if (netdev_ops->ndo_xdp_xmit && c->xdp) {
- 		c->xdpsq = mlx5e_open_xdpredirect_sq(c, params, cparam, &ccp);
- 		if (IS_ERR(c->xdpsq)) {
- 			err = PTR_ERR(c->xdpsq);
-@@ -4467,19 +4467,18 @@ void mlx5e_set_xdp_feature(struct mlx5e_priv *priv)
- {
- 	struct mlx5e_params *params = &priv->channels.params;
- 	struct net_device *netdev = priv->netdev;
--	xdp_features_t val;
-+	xdp_features_t val = 0;
- 
--	if (!netdev->netdev_ops->ndo_bpf ||
--	    params->packet_merge.type != MLX5E_PACKET_MERGE_NONE) {
--		xdp_set_features_flag_locked(netdev, 0);
--		return;
--	}
-+	if (netdev->netdev_ops->ndo_bpf &&
-+	    params->packet_merge.type == MLX5E_PACKET_MERGE_NONE)
-+		val = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
-+		      NETDEV_XDP_ACT_XSK_ZEROCOPY |
-+		      NETDEV_XDP_ACT_RX_SG;
-+
-+	if (netdev->netdev_ops->ndo_xdp_xmit && params->xdp_prog)
-+		val |= NETDEV_XDP_ACT_NDO_XMIT |
-+			NETDEV_XDP_ACT_NDO_XMIT_SG;
- 
--	val = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
--	      NETDEV_XDP_ACT_XSK_ZEROCOPY |
--	      NETDEV_XDP_ACT_RX_SG |
--	      NETDEV_XDP_ACT_NDO_XMIT |
--	      NETDEV_XDP_ACT_NDO_XMIT_SG;
- 	xdp_set_features_flag_locked(netdev, val);
- }
- 
--- 
-2.31.1
+1. napi_disable
+2. rx_oom_timer runs and calls napi_schedule again
+3. timer_delete_sync
 
+So the timer is deleted first, to prevent any possibility to run.
+
+> TBH handling the OOM inside the Rx function seems a little fragile.
+> What if there is a packet to Rx as we enter. I don't see any loop here
+> it just replaces the used buffer..
+
+I am not sure, the handling needs to happen, when the skb allocation
+fails, and that happens in the rx function, right? I am open to better
+fitting fix position.
+
+Thank you for your feedback!
+Florian
 
