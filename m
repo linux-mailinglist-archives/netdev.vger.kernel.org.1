@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-238032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 342ECC52F2C
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 16:18:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD58FC530D6
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 16:32:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CC11B542754
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:07:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7BA95679F6
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C15F337BB3;
-	Wed, 12 Nov 2025 15:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iKnqYrDM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF1532C95D;
+	Wed, 12 Nov 2025 15:00:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFEC2750E6
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 15:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9046D34E763;
+	Wed, 12 Nov 2025 15:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762959637; cv=none; b=R5oatG1CdqfgDuckfbU9Mjy3hlTpDUDe3la0mbOQzFmmKmV1VasSL/CtgHgPSGUUnNgY94mqEG/D6ExANy9mwOK0dG+pi80pXMz+zAnDQ4sBaPDPBwpvrDuG2EI7seSHYn8X/Faep3sQXQKDLQHhTSeUsVIrvnEOvlNVLvBTqHA=
+	t=1762959656; cv=none; b=L5ESHQQFHZKA9pmf2Tif7Ebe8fTsxfttNm7tey9z499dnIavHFeN6oW1SxQNqFNHsaPOhJIvJrcTCvDWiMGMJQ5gAuOyjzYVYDrtsY8D9lkPy0mem7NzY4GHwdAHxLwGY+FsxpZeh5XHJJZGKVZRyTvUpcfSzmXs6Vtt98feUWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762959637; c=relaxed/simple;
-	bh=w5Y4fxxWSM3L7vAdmyu49RRzSLoDbKLJrYt8BzwK5YU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Pt8Xjgwdp8eKg/bjScOWTRPzE2yNR8ry5Weo5v247KfEqh5e7NSSWiVAhPdsX3vChHvCPSpVHp3z6j/PYLhpUapBRI6M5g4idruODtU8c8hxMBYapLck63O+Feswgvi1sC8Wgkjs641YJOT25t+7eAcKU+lrk+QlNcnppUJWYq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iKnqYrDM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82777C4CEF1;
-	Wed, 12 Nov 2025 15:00:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762959637;
-	bh=w5Y4fxxWSM3L7vAdmyu49RRzSLoDbKLJrYt8BzwK5YU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iKnqYrDM0Up7VDmNJNHab16lM+exQE+ufP6wEn54L5BTiYRttRbnxLxwkPLKYDXPu
-	 +JHicBQsBB/0TC5ADywpgMEhgJFbg1d2nbanbVx6lwWN2ah1qmgO9NQMxcoWK38P1P
-	 CavFr1EjmI3O1yMS+83jwI+EweaGL7qSYqx9p7A3qWxP+yccljEMzmI9PLfRbR/5cB
-	 kB8ji7vGGa8swy8Oudsy7/qxbC59F5TKo4RFICi0CvMeQ7ZZ+gheZLbmq/WAe6Tf6Y
-	 CPB8olqa3KbiXzlrPzcVJQyCqZvyabqaaxDOkuA1kM55DXPQdHUvDi1gCVnQAagVpr
-	 L2D0UBiXy1DBQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70ECE39EFA4C;
-	Wed, 12 Nov 2025 15:00:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1762959656; c=relaxed/simple;
+	bh=S+PyYYzTuXQCv8RPHj7xGnHIGy7tg7vHYYIK3s3OVDI=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QOsWXkbGdA8rMLSAS33fvj+xAqX5N/I8njDH74XSv540eN+V1jINYvvgULF82NUYLuLYBJpcBl+dydbuz/9S6omBmNvJDxsu6Tmhd0jODQbvtOGRkuuMplzynm9N8xXs2J2ZDKPoIMRxu79UvhoDAKERaahybiQxlAAbMf0MOg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d665r6JDVzHnH95;
+	Wed, 12 Nov 2025 23:00:32 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 232C51402CB;
+	Wed, 12 Nov 2025 23:00:52 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 12 Nov
+ 2025 15:00:51 +0000
+Date: Wed, 12 Nov 2025 15:00:50 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>
+Subject: Re: [PATCH v20 03/22] cxl/mem: Introduce a memdev creation
+ ->probe() operation
+Message-ID: <20251112150050.00000578@huawei.com>
+In-Reply-To: <20251110153657.2706192-4-alejandro.lucero-palau@amd.com>
+References: <20251110153657.2706192-1-alejandro.lucero-palau@amd.com>
+	<20251110153657.2706192-4-alejandro.lucero-palau@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: clear skb->sk in skb_release_head_state()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176295960701.42647.8926319551268174325.git-patchwork-notify@kernel.org>
-Date: Wed, 12 Nov 2025 15:00:07 +0000
-References: <20251111151235.1903659-1-edumazet@google.com>
-In-Reply-To: <20251111151235.1903659-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- kuniyu@google.com, willemb@google.com, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-Hello:
+On Mon, 10 Nov 2025 15:36:38 +0000
+alejandro.lucero-palau@amd.com wrote:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 11 Nov 2025 15:12:35 +0000 you wrote:
-> skb_release_head_state() inlines skb_orphan().
+> From: Dan Williams <dan.j.williams@intel.com>
 > 
-> We need to clear skb->sk otherwise we can freeze TCP flows
-> on a mostly idle host, because skb_fclone_busy() would
-> return true as long as the packet is not yet processed by
-> skb_defer_free_flush().
+> Allow for a driver to pass a routine to be called in cxl_mem_probe()
+> context. This ability mirrors the semantics of faux_device_create() and
+> allows for the caller to run CXL-topology-attach dependent logic on behalf
+> of the caller.
 > 
-> [...]
+> This capability is needed for CXL accelerator device drivers that need to
+> make decisions about enabling CXL dependent functionality in the device, or
+> falling back to PCIe-only operation.
+> 
+> The probe callback runs after the port topology is successfully attached
+> for the given memdev.
+> 
+> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Other than possible churn form patch 1 feedback LGTM.
+If that churn is large, perhaps drop this tag, if not...
 
-Here is the summary with links:
-  - [net-next] net: clear skb->sk in skb_release_head_state()
-    https://git.kernel.org/netdev/net-next/c/26b8986a18c1
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 
