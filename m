@@ -1,87 +1,95 @@
-Return-Path: <netdev+bounces-237920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBE4EC516E6
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:46:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 716C4C51818
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:56:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2648189FABD
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:44:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AB733A3248
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013C82FD7D8;
-	Wed, 12 Nov 2025 09:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922982FC873;
+	Wed, 12 Nov 2025 09:49:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q3rGwrp3"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="TGi4yLAh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD13F29AB1D;
-	Wed, 12 Nov 2025 09:43:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C841FDDC3;
+	Wed, 12 Nov 2025 09:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762940619; cv=none; b=gx2/oNAPwL7GDSJAhTgOGKA3F5SiYBkuQoJ1aELFTr2RNArj2eiiJfY0ttibeY/RQR45BU8FWJ7+Szw+52zUgp0l2VH+p2p2yMDFVdFR7cX4i/tqoGfJIS/PDrOrgwI00vtufcguXcscAwJxSVP5FXFt4cPFSPGHsNK1Q3qmAcc=
+	t=1762940940; cv=none; b=Rw1lBetOBFE7xFJ0BdMHMZMtQVVgfoI6iiOecqXkYG3SXy7NHg9VMrJ+Q46Mf9KZmAFNAGO2igV/dbpfmlrsz544tNIMfqA3PbmT04sbH4nthzQHQ666O7k3l3OuGqG1PHWt+rbJDYwL328x35sgT7mMZWcvprOeE92VT2UYQ9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762940619; c=relaxed/simple;
-	bh=YxRXcxcGSbhL8vl9fWIcTKoE+aw4v1nrR3WfAaIRGQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X/FuGKXKqg17s8LDHu5+Z7/CdLhnDyyAFGKQ7BrD7iZeD8CjjuIP2csob+XxGujDQVElV9XXuNa2ydnI2iJi8kqaSuJgQUWghJIQ98bvJCIyGnn6AKsuLdGhFYG+/mdz5XvsI0XtQ4CgX7HNmhP+23WHQ5Tu9QL2GF8/18gf9og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q3rGwrp3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99029C4CEF8;
-	Wed, 12 Nov 2025 09:43:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762940619;
-	bh=YxRXcxcGSbhL8vl9fWIcTKoE+aw4v1nrR3WfAaIRGQc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q3rGwrp3oBILwz3AFk+DleZqyIjNQO+8i3vTs+AE1EMFfvQVfurHU3d+EjO9/gVJ7
-	 VMTCqITGQgwImURZyrE+Vp1IhqFgngwUjhY4D24MzjfS1kE/3NO/MhJos1QLv0xqJ5
-	 9alRYXkdGZFzM99xalmQad1yUxGXPraZYtmL2o6QLAebptywwnDcEyo37p5JXXglgC
-	 SHlwTbnzcXHJowAY63u+rIOfGDxxPk699Xbm8X9nMOHEOHG0Bg4vvkVXdSY+pKfMOc
-	 3z7TRmRBzcLJxqshXOIACsf2xLiyztE/AGRAlEcWAZJhKkhpG550coD0lBwdMPRTm1
-	 MFHqeDLuP5knA==
-Date: Wed, 12 Nov 2025 11:43:34 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-	linux-rdma@vger.kernel.org
-Subject: Re: [PATCH] RDMA/cm: correct typedef and bad line warnings
-Message-ID: <20251112094334.GB17382@unreal>
-References: <20251112062908.2711007-1-rdunlap@infradead.org>
+	s=arc-20240116; t=1762940940; c=relaxed/simple;
+	bh=2WSQWNHhM0Gl922+NlXasN4YOwZzWZMNz8Hbgrk2yU4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SU/tJoa74ClbhOFgrz2TAVCROBSCM1Uumw0HqilDISKsYod4oi8yIcSwvp6Ift/uO6j4B8QyS6/SDeQlnhwzQtUwGze6YJXuypDh3wDBiPC78viH1vjANKug3D4s52kqy5ZiW3slms/HwRdTnGKR6VJ8oYp9o8lFByO9HoXgYI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=TGi4yLAh; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=X8
+	0gXGAGrGHUuwVP5+P52L1ae3AXnP1NtlQlw6DY/To=; b=TGi4yLAhkGLw2FQmxU
+	AGCGuqnx3cHl+plVruIpMYwHwv0nsF7e4HBFip4lNyqGLlSAQZd+PCu2mwOfqRFh
+	pRt76/F3OYoIvzZ4G4qg0JrzmNE2muq9jo71WSmDX/HDVRsjwc7bN0p2XgxdG/r0
+	iCrxiSKarYK7p8wmKw8aoD5i0=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp4 (Coremail) with SMTP id PygvCgA32a_8VxRpCkthDg--.4901S2;
+	Wed, 12 Nov 2025 17:48:45 +0800 (CST)
+From: Gongwei Li <13875017792@163.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Gongwei Li <ligongwei@kylinos.cn>
+Subject: [PATCH 1/2] Bluetooth: Remove unused hcon->remote_id
+Date: Wed, 12 Nov 2025 17:48:42 +0800
+Message-Id: <20251112094843.173238-1-13875017792@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251112062908.2711007-1-rdunlap@infradead.org>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PygvCgA32a_8VxRpCkthDg--.4901S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrXFW7Xr1UZrWrKw47Xr17GFg_yoWxXFgEyw
+	1IvrZ3ur48Xry3Ar12gF4jvw1jqwn3CF97CFs5XrWYq3srWr4DtryxZr1qvF1fW3srXr13
+	AayDXrykXw18AjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUe7CztUUUUU==
+X-CM-SenderInfo: rprtmlyvqrllizs6il2tof0z/1tbiXA8EumkUUXeHwAAAsx
 
-On Tue, Nov 11, 2025 at 10:29:08PM -0800, Randy Dunlap wrote:
-> In include/rdma/ib_cm.h:
-> 
-> Correct a typedef's kernel-doc notation by adding the 'typedef' keyword
-> to it to avoid a warning.
-> Add a leading " *" to a kernel-doc line to avoid a warning.
-> 
-> Warning: ib_cm.h:289 function parameter 'ib_cm_handler' not described
->  in 'int'
-> Warning: ib_cm.h:289 expecting prototype for ib_cm_handler().  Prototype
->  was for int() instead
-> Warning: ib_cm.h:484 bad line: connection message in case duplicates
->  are received.
-> 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> ---
-> Cc: Jason Gunthorpe <jgg@nvidia.com>
-> Cc: Leon Romanovsky <leonro@nvidia.com>
-> Cc: linux-rdma@vger.kernel.org
-> ---
->  include/rdma/ib_cm.h |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
+From: Gongwei Li <ligongwei@kylinos.cn>
 
-Thanks, applied.
+hcon->remote_id last use was removed in 2024 by
+commit e7b02296fb40 ("Bluetooth: Remove BT_HS").
+
+Remove it.
+
+Signed-off-by: Gongwei Li <ligongwei@kylinos.cn>
+---
+ include/net/bluetooth/hci_core.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b8100dbfe5d7..32b1c08c8bba 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -749,7 +749,6 @@ struct hci_conn {
+ 
+ 	__u8		remote_cap;
+ 	__u8		remote_auth;
+-	__u8		remote_id;
+ 
+ 	unsigned int	sent;
+ 
+-- 
+2.25.1
+
 
