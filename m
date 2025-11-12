@@ -1,104 +1,279 @@
-Return-Path: <netdev+bounces-237995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18E5FC5289F
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 14:48:35 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 661CEC52890
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 14:47:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A7C23B8E4E
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:37:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 472334EA949
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDDE338580;
-	Wed, 12 Nov 2025 13:37:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E893385A3;
+	Wed, 12 Nov 2025 13:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ESP5olPZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FMJuKDZ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE57630C34A
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 13:37:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1F030B517;
+	Wed, 12 Nov 2025 13:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762954632; cv=none; b=P11FmG4V2/1eND+vd67aVr1WtHFB5SjzDA1tTsu3fku81B2vPzdWA2DYVE00knL/2LIwkaRwZ01wfmLinOmZgDGnm8k0LJILSADooH1YgnjZEV2bCnEVJ+JuUhnrRq3HrCrqUHo2VgYr6ma8MGGZZ6buC7mYmROQ2JDAWZIwxJg=
+	t=1762954675; cv=none; b=uBbc2AZ0PbBjKaQrHql7/D1zxSi7e6L+FguwlQzyDOxXuKZqbajfs4qyr7aEUD+4XDnVfvtiWd7qTEGVYQJveqf2Vd5JeZsxktDfxk63tbGXMSkxNhoYMuN1shInmKtUXRPXz9gt0SUsWyon99zPPIqu30G9ZXRwu7RB+DzggOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762954632; c=relaxed/simple;
-	bh=qjoyQ1i0XlHCdmiLtEfyvA2R2Rbp/ZNCi/h43md7ZII=;
+	s=arc-20240116; t=1762954675; c=relaxed/simple;
+	bh=7HScbcnt+U5pMViwPUOapzVnPg1442mpZQQO/UftwMs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XWFbUJvxA6B2ubEp7NdCkak5pBPkWtnc4b4PQscsVYlvtf+kYjs8K8BjL9HG4ozBzM6HlyhyLaYzbQFthuItoX0PyW3I2KUmp0rWYR9F0p6XymQgQbKMfJTkxG/ytIn+e0sz/AGxR/L0gGaY/X42OEaQVl4oIBk/Rfz4lqLSYJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ESP5olPZ; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <09c1ed91-7a04-49b2-a721-2ea9a4b2e44a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762954627;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b5meFDmC+b/galNHRQvPf6ha8mxkRU8mTP4N++xpcLk=;
-	b=ESP5olPZsxJhTOjB3RahqZtuI5Hcj+1ZhXMAwALRyEGmfkEo6tNBNRTF5EL/GPkl5suw8q
-	qT1P2ENxpUnfald2L340mhDufR7GRp6+TL3owTJWK9PCX97qrpoK1MmHtMw7Fl/g7ftKni
-	4uLn341ZR1v/LPXPrKS4N3liihjktGk=
-Date: Wed, 12 Nov 2025 13:37:04 +0000
+	 In-Reply-To:Content-Type; b=KG6oVZxPfzwzBXMCnK+uuos0VekG6QKBsCEqH2U9HwHq6DR1zaMPxpX53mSTB3J8yFGkZy1dRR4KEPWUjwJJW8hfI4LttRRNO8selheUMQUSiYufKYEoVy5kkb6+Si3MktDhh3kldp3gZPIOUQvsHlNNV83i9FmzhSHL3usVH+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FMJuKDZ8; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id B1D2F4E41667;
+	Wed, 12 Nov 2025 13:37:50 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 6ADE06070B;
+	Wed, 12 Nov 2025 13:37:50 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 126FA102F16E2;
+	Wed, 12 Nov 2025 14:37:40 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1762954669; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=SgZfesCetY4oHvl5h838KNujUcn8Vd//cFUVGen2iPY=;
+	b=FMJuKDZ8BinI+FLM8rQQYM1P95xSOnbXoDKeJX1JKeNhlx2VD2Kgvt38kskzvKKYSJ/S78
+	vPGvQGQL/hJ659RvOdvPRl30w0qoHWa/n73nGPqDDVGqRWVzvLvfBF6NK9VrGALfq05uY8
+	nX9KCCokyIq4T5m9kAPBa1/z4YToLM7HYuWEMMpaXbflNe6dzzZwzFXv+2KmDRLEvQR2tY
+	BhxpY5iT3dgg88OczC6vCcb0MSmVTR67/YZTEmmjhgsu7L6DG8O0pA14w6r5bSpYj7ZNbe
+	3CnRca/IH3scqTddJqWPsgBrjX+qcBSFGY+9ac4YjgQn7AnZYl4vlHsTczY/Cw==
+Message-ID: <7c96aca1-ffa7-49b9-9fc2-04229da338b6@bootlin.com>
+Date: Wed, 12 Nov 2025 14:37:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v1 5/7] ptp: ocp: Reuse META's PCI vendor ID
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Richard Cochran <richardcochran@gmail.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20251111165232.1198222-1-andriy.shevchenko@linux.intel.com>
- <20251111165232.1198222-6-andriy.shevchenko@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v15 01/15] dt-bindings: net: Introduce the
+ ethernet-connector description
+To: Rob Herring <robh@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
+ <20251106094742.2104099-2-maxime.chevallier@bootlin.com>
+ <20251112124355.GA1269790-robh@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20251111165232.1198222-6-andriy.shevchenko@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20251112124355.GA1269790-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 11/11/2025 16:52, Andy Shevchenko wrote:
-> The META's PCI vendor ID is listed already in the pci_ids.h.
-> Reuse it here.
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->   drivers/ptp/ptp_ocp.c | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-> index 67a4c60cbbcd..4c4b4a40e9d4 100644
-> --- a/drivers/ptp/ptp_ocp.c
-> +++ b/drivers/ptp/ptp_ocp.c
-> @@ -25,8 +25,7 @@
->   #include <linux/crc16.h>
->   #include <linux/dpll.h>
->   
-> -#define PCI_VENDOR_ID_FACEBOOK			0x1d9b
-> -#define PCI_DEVICE_ID_FACEBOOK_TIMECARD		0x0400
-> +#define PCI_DEVICE_ID_META_TIMECARD		0x0400
->   
->   #define PCI_VENDOR_ID_CELESTICA			0x18d4
->   #define PCI_DEVICE_ID_CELESTICA_TIMECARD	0x1008
-> @@ -1030,7 +1029,7 @@ static struct ocp_resource ocp_adva_resource[] = {
->   };
->   
->   static const struct pci_device_id ptp_ocp_pcidev_id[] = {
-> -	{ PCI_DEVICE_DATA(FACEBOOK, TIMECARD, &ocp_fb_resource) },
-> +	{ PCI_DEVICE_DATA(META, TIMECARD, &ocp_fb_resource) },
->   	{ PCI_DEVICE_DATA(CELESTICA, TIMECARD, &ocp_fb_resource) },
->   	{ PCI_DEVICE_DATA(OROLIA, ARTCARD, &ocp_art_resource) },
->   	{ PCI_DEVICE_DATA(ADVA, TIMECARD, &ocp_adva_resource) },
+Hi Rob,
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+On 12/11/2025 13:43, Rob Herring wrote:
+> On Thu, Nov 06, 2025 at 10:47:26AM +0100, Maxime Chevallier wrote:
+>> The ability to describe the physical ports of Ethernet devices is useful
+>> to describe multi-port devices, as well as to remove any ambiguity with
+>> regard to the nature of the port.
+>>
+>> Moreover, describing ports allows for a better description of features
+>> that are tied to connectors, such as PoE through the PSE-PD devices.
+>>
+>> Introduce a binding to allow describing the ports, for now with 2
+>> attributes :
+>>
+>>  - The number of lanes, which is a quite generic property that allows
+>>    differentating between multiple similar technologies such as BaseT1
+>>    and "regular" BaseT (which usually means BaseT4).
+>>
+>>  - The media that can be used on that port, such as BaseT for Twisted
+>>    Copper, BaseC for coax copper, BaseS/L for Fiber, BaseK for backplane
+>>    ethernet, etc. This allows defining the nature of the port, and
+>>    therefore avoids the need for vendor-specific properties such as
+>>    "micrel,fiber-mode" or "ti,fiber-mode".
+>>
+>> The port description lives in its own file, as it is intended in the
+>> future to allow describing the ports for phy-less devices.
+>>
+>> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+>> ---
+>>  .../bindings/net/ethernet-connector.yaml      | 53 +++++++++++++++++++
+>>  .../devicetree/bindings/net/ethernet-phy.yaml | 18 +++++++
+>>  MAINTAINERS                                   |  1 +
+>>  3 files changed, 72 insertions(+)
+>>  create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/ethernet-connector.yaml b/Documentation/devicetree/bindings/net/ethernet-connector.yaml
+>> new file mode 100644
+>> index 000000000000..2b67907582c7
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/ethernet-connector.yaml
+>> @@ -0,0 +1,53 @@
+>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/ethernet-connector.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Generic Ethernet Connector
+>> +
+>> +maintainers:
+>> +  - Maxime Chevallier <maxime.chevallier@bootlin.com>
+>> +
+>> +description:
+>> +  An Ethernet Connector represents the output of a network component such as
+>> +  a PHY, an Ethernet controller with no PHY, or an SFP module.
+>> +
+>> +properties:
+>> +
+>> +  pairs:
+>> +    description:
+>> +      Defines the number of BaseT pairs that are used on the connector.
+>> +    $ref: /schemas/types.yaml#/definitions/uint32
+> 
+> Constraints? Wouldn't 4 pairs be the max?
+
+Andrew also made that remark on the code, I'll add a constraint on
+1, 2 or 4 pairs.
+
+> 
+> Is it possible you need to know which pairs are wired?
+
+For now I don't think so, except maybe for when 2 pairs are wired
+when 4 are supported on the PHY and connector, but even then I don't
+think HW designers have a choice about which one to use. It's unclear
+to me wether this would be useful.
+
+> 
+>> +
+>> +  media:
+> 
+> Both of these names are a bit generic though I don't have a better 
+> suggestion.
+> 
+>> +    description:
+>> +      The mediums, as defined in 802.3, that can be used on the port.
+>> +    enum:
+>> +      - BaseT
+>> +      - BaseK
+>> +      - BaseS
+>> +      - BaseC
+>> +      - BaseL
+>> +      - BaseD
+>> +      - BaseE
+>> +      - BaseF
+>> +      - BaseV
+>> +      - BaseMLD
+>> +
+>> +required:
+>> +  - media
+>> +
+>> +allOf:
+>> +  - if:
+>> +      properties:
+>> +        media:
+>> +          contains:
+>> +            const: BaseT
+>> +    then:
+>> +      required:
+>> +        - pairs
+> 
+> else:
+>   properties:
+>     pairs: false
+> 
+> ??
+
+Ah I didn't know this was necessary, I'll add that, thanks !
+
+> 
+>> +
+>> +additionalProperties: true
+>> +
+>> +...
+>> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+>> index 2ec2d9fda7e3..f434768d6bae 100644
+>> --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+>> +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+>> @@ -277,6 +277,17 @@ properties:
+>>  
+>>      additionalProperties: false
+>>  
+>> +  mdi:
+>> +    type: object
+>> +
+>> +    patternProperties:
+>> +      '^connector-[a-f0-9]+$':
+> 
+> Unit addresses are hex, index suffixes are decimal: connector-[0-9]+
+
+Ah right, indeed. I'll address that.
+
+> 
+> 
+>> +        $ref: /schemas/net/ethernet-connector.yaml#
+>> +
+>> +        unevaluatedProperties: false
+>> +
+>> +    additionalProperties: false
+>> +
+>>  required:
+>>    - reg
+>>  
+>> @@ -313,5 +324,12 @@ examples:
+>>                      default-state = "keep";
+>>                  };
+>>              };
+>> +            /* Fast Ethernet port, with only 2 pairs wired */
+>> +            mdi {
+>> +                connector-0 {
+>> +                    pairs = <2>;
+>> +                    media = "BaseT";
+>> +                };
+>> +            };
+>>          };
+>>      };
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 1ab7e8746299..19ba82b98616 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -9276,6 +9276,7 @@ R:	Russell King <linux@armlinux.org.uk>
+>>  L:	netdev@vger.kernel.org
+>>  S:	Maintained
+>>  F:	Documentation/ABI/testing/sysfs-class-net-phydev
+>> +F:	Documentation/devicetree/bindings/net/ethernet-connector.yaml
+>>  F:	Documentation/devicetree/bindings/net/ethernet-phy.yaml
+>>  F:	Documentation/devicetree/bindings/net/mdio*
+>>  F:	Documentation/devicetree/bindings/net/qca,ar803x.yaml
+>> -- 
+>> 2.49.0
+>>
+
+Thanks for reviewing !
+
+Maxime
+
 
