@@ -1,190 +1,295 @@
-Return-Path: <netdev+bounces-237820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B059C5090B
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 05:52:35 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 167E3C50978
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 06:14:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6DDE1899F22
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 04:52:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CFD1C4E4548
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 05:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FA02D29C2;
-	Wed, 12 Nov 2025 04:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB6D2D73B9;
+	Wed, 12 Nov 2025 05:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="QNmjdWZX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CE727F01E
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 04:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3D32D5936
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 05:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762923149; cv=none; b=Ocvdzshrb37ZHOaeVz+Jk9Ou0Q9FedMUO3ZjX7Y3QtzFcd2365OgKoMLYntacX3Df8TA2n9DLA1dAFD2tCsgqFdcYBQSUUS+WdAbyP9iJhTihXuziCIvJfu8zLNJHInGz46LyEbM5jUN2KVsNQNNktQgFjEiy8mSM9jOJRS2spI=
+	t=1762924477; cv=none; b=MKYpMQZdoLc5RWyHhIevbWPjYb5kFcnBw6Ybfb64M4bYCbQRIluBTMtYgmxuGnVydDaxDgMUNcej8+L9zNVcr/AjUTADbxfUR1z6UW5gPnnC/XehTth3mhVfyuSltPqSMmLbYm4cC6SpsJ3zLqDVcc/pi3tAJSt2SfIpHrXRC+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762923149; c=relaxed/simple;
-	bh=CIvLkOUS047TucL7cgNJmviXjqebQR1vjTOiVoJgcGA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Vmd+UTCjIwz8g3BvfespyG62Pzr8c+onwu0DXVH3PkvhfzPQEHcqb0PDeNsbS4quXT63UDjv9RNDchOUi5m2CznBUPOWpXquAADBbwDHQByIBJHGyeIP61DEKpHzZDyoMIDiBrdgSOldmAv4BbldtXyo/esGSL2FIAD1eWK8koA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-43300f41682so4050955ab.1
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 20:52:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762923147; x=1763527947;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/xR/S0akTM9IizGbyH/pcTSsfCiAbNA5aO/SzN0S+qc=;
-        b=dUOXHnfei/wa9+mieSt5D9OAfbb67nTqGWSTMx1893ov0DRODkpj18874jPasZBvR/
-         H3jp6+YpWM2XMLol/kapMRg4Rd2P6/GsZv3lk9Ui7xoUen33sCn7OkkTo1o3D4k28MQ8
-         ALMJw3fUBuHm/skSXZnWcCL+7+pyf/LqY9TsxQW4dSkQJ8UzROrXWLij8z5OWeB9LVRS
-         pNhqAF/5uXu/xbQj56ZyozYkK3KpDiOD9uD6ImnYj8VZ+4LYBdxW2EUuo5uRtiBlAx2E
-         dZ7ZrmTQoTihYOdlrsN1o1ogYWcYZwU+qXTtEKlnSbnjtnrwPzGOZcs86r2NXdweckK5
-         GIog==
-X-Forwarded-Encrypted: i=1; AJvYcCWgqTjVNI3nghupi4r7lFT0Vg86JEL5vCm7l/J1cAn6MudN4/oo3L3MoGYmWc5qVefUCV8QM6o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxm8Y6d5ZGntygDuv4q9BC57e8hDsEE7O5EQloYmz+4PWj63qxV
-	AUrkOo2ia1VkyqafAOUREZCE/BILZg1MV8HI9gSQuyDThFAxCxURFL5L+BdP9lzyDEEUkrXvTq6
-	61rwDx7rOkV8Hr1TPnMMBTZU0E7VHl9dDXGx2IqrgTaH6Pt6ml0Nb9JDjfEU=
-X-Google-Smtp-Source: AGHT+IEalNLm4nKk8fLi4y0xYX+5Nao4o3HK0geVhuKlrQfqUMB7hx94C8r2EruYYup9yM47XvRjz6EN4BkpAlS+Fzf0/eO5s8G7
+	s=arc-20240116; t=1762924477; c=relaxed/simple;
+	bh=8aY4Q5FbrKjnoe3TKvkhKx36Ir+taoVdCyNadkhw484=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sE4/IiWaAhAE64Yv2NzMBFfeNliqf5GUUHxXDxdUcNmBLiZuIKqx9NNFhEIc1kpyojyriUZGPLk7qfkZNgK6dOZ7Dv0ShNHkYp4/lb0dO5c1xJ7WDLDlbcmwYrEBRw2BISuVkSkMi2I01zRx3qbmradvhC4Flg61t65nigUS9KQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=QNmjdWZX; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [10.18.184.99] (unknown [167.220.238.131])
+	by linux.microsoft.com (Postfix) with ESMTPSA id B9A1C20120AA;
+	Tue, 11 Nov 2025 21:14:31 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B9A1C20120AA
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1762924474;
+	bh=sjhNLUr/wLRi31ek5npBg3DiXup3HJlhPcEd+jr7tCc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QNmjdWZXynpSoOl4cA/OSjVWP8p8nWyD5aNAe4jZaSF4s3Ezyq1NBZQfJW3jljDiJ
+	 vNUD+/o6YWBe2U6LdzSGdknSM3/MgKTneMps1HUi95n7SsBUwETt83/Uiy2z2KbxnP
+	 cH/7wPCsPWFEWOvU581yjUX42SdOWNXSMJBopwXE=
+Message-ID: <c6e3a182-b326-4a6d-901d-c445d95643eb@linux.microsoft.com>
+Date: Wed, 12 Nov 2025 10:44:28 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fcc:b0:433:7a2f:a40a with SMTP id
- e9e14a558f8ab-43473cff396mr21170735ab.4.1762923147120; Tue, 11 Nov 2025
- 20:52:27 -0800 (PST)
-Date: Tue, 11 Nov 2025 20:52:27 -0800
-In-Reply-To: <68af39ae.a70a0220.3cafd4.002c.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6914128b.050a0220.417c2.0004.GAE@google.com>
-Subject: Re: [syzbot] [hams?] WARNING: ODEBUG bug in handle_softirqs
-From: syzbot <syzbot+60db000b8468baeddbb1@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-hams@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	peterz@infradead.org, syzkaller-bugs@googlegroups.com, tglx@linutronix.de
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] net: fix napi_consume_skb() with alien skbs
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, ssengar@linux.microsoft.com, gargaditya@microsoft.com
+References: <20251106202935.1776179-1-edumazet@google.com>
+ <20251106202935.1776179-3-edumazet@google.com>
+ <20251111165622.GA30112@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <CANn89i+e2XDw4b_iHaj_LPTeg6M2+-+vroECks21Fs7Hfg2Aow@mail.gmail.com>
+Content-Language: en-US
+From: Aditya Garg <gargaditya@linux.microsoft.com>
+In-Reply-To: <CANn89i+e2XDw4b_iHaj_LPTeg6M2+-+vroECks21Fs7Hfg2Aow@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+On 11-11-2025 22:47, Eric Dumazet wrote:
+> On Tue, Nov 11, 2025 at 8:56 AM Aditya Garg
+> <gargaditya@linux.microsoft.com> wrote:
+>>
+>> On Thu, Nov 06, 2025 at 08:29:34PM +0000, Eric Dumazet wrote:
+>>> There is a lack of NUMA awareness and more generally lack
+>>> of slab caches affinity on TX completion path.
+>>>
+>>> Modern drivers are using napi_consume_skb(), hoping to cache sk_buff
+>>> in per-cpu caches so that they can be recycled in RX path.
+>>>
+>>> Only use this if the skb was allocated on the same cpu,
+>>> otherwise use skb_attempt_defer_free() so that the skb
+>>> is freed on the original cpu.
+>>>
+>>> This removes contention on SLUB spinlocks and data structures.
+>>>
+>>> After this patch, I get ~50% improvement for an UDP tx workload
+>>> on an AMD EPYC 9B45 (IDPF 200Gbit NIC with 32 TX queues).
+>>>
+>>> 80 Mpps -> 120 Mpps.
+>>>
+>>> Profiling one of the 32 cpus servicing NIC interrupts :
+>>>
+>>> Before:
+>>>
+>>> mpstat -P 511 1 1
+>>>
+>>> Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
+>>> Average:     511    0.00    0.00    0.00    0.00    0.00   98.00    0.00    0.00    0.00    2.00
+>>>
+>>>      31.01%  ksoftirqd/511    [kernel.kallsyms]  [k] queued_spin_lock_slowpath
+>>>      12.45%  swapper          [kernel.kallsyms]  [k] queued_spin_lock_slowpath
+>>>       5.60%  ksoftirqd/511    [kernel.kallsyms]  [k] __slab_free
+>>>       3.31%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_clean_buf_ring
+>>>       3.27%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_splitq_clean_all
+>>>       2.95%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_splitq_start
+>>>       2.52%  ksoftirqd/511    [kernel.kallsyms]  [k] fq_dequeue
+>>>       2.32%  ksoftirqd/511    [kernel.kallsyms]  [k] read_tsc
+>>>       2.25%  ksoftirqd/511    [kernel.kallsyms]  [k] build_detached_freelist
+>>>       2.15%  ksoftirqd/511    [kernel.kallsyms]  [k] kmem_cache_free
+>>>       2.11%  swapper          [kernel.kallsyms]  [k] __slab_free
+>>>       2.06%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_features_check
+>>>       2.01%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_splitq_clean_hdr
+>>>       1.97%  ksoftirqd/511    [kernel.kallsyms]  [k] skb_release_data
+>>>       1.52%  ksoftirqd/511    [kernel.kallsyms]  [k] sock_wfree
+>>>       1.34%  swapper          [kernel.kallsyms]  [k] idpf_tx_clean_buf_ring
+>>>       1.23%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_all
+>>>       1.15%  ksoftirqd/511    [kernel.kallsyms]  [k] dma_unmap_page_attrs
+>>>       1.11%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_start
+>>>       1.03%  swapper          [kernel.kallsyms]  [k] fq_dequeue
+>>>       0.94%  swapper          [kernel.kallsyms]  [k] kmem_cache_free
+>>>       0.93%  swapper          [kernel.kallsyms]  [k] read_tsc
+>>>       0.81%  ksoftirqd/511    [kernel.kallsyms]  [k] napi_consume_skb
+>>>       0.79%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_hdr
+>>>       0.77%  ksoftirqd/511    [kernel.kallsyms]  [k] skb_free_head
+>>>       0.76%  swapper          [kernel.kallsyms]  [k] idpf_features_check
+>>>       0.72%  swapper          [kernel.kallsyms]  [k] skb_release_data
+>>>       0.69%  swapper          [kernel.kallsyms]  [k] build_detached_freelist
+>>>       0.58%  ksoftirqd/511    [kernel.kallsyms]  [k] skb_release_head_state
+>>>       0.56%  ksoftirqd/511    [kernel.kallsyms]  [k] __put_partials
+>>>       0.55%  ksoftirqd/511    [kernel.kallsyms]  [k] kmem_cache_free_bulk
+>>>       0.48%  swapper          [kernel.kallsyms]  [k] sock_wfree
+>>>
+>>> After:
+>>>
+>>> mpstat -P 511 1 1
+>>>
+>>> Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
+>>> Average:     511    0.00    0.00    0.00    0.00    0.00   51.49    0.00    0.00    0.00   48.51
+>>>
+>>>      19.10%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_hdr
+>>>      13.86%  swapper          [kernel.kallsyms]  [k] idpf_tx_clean_buf_ring
+>>>      10.80%  swapper          [kernel.kallsyms]  [k] skb_attempt_defer_free
+>>>      10.57%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_all
+>>>       7.18%  swapper          [kernel.kallsyms]  [k] queued_spin_lock_slowpath
+>>>       6.69%  swapper          [kernel.kallsyms]  [k] sock_wfree
+>>>       5.55%  swapper          [kernel.kallsyms]  [k] dma_unmap_page_attrs
+>>>       3.10%  swapper          [kernel.kallsyms]  [k] fq_dequeue
+>>>       3.00%  swapper          [kernel.kallsyms]  [k] skb_release_head_state
+>>>       2.73%  swapper          [kernel.kallsyms]  [k] read_tsc
+>>>       2.48%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_start
+>>>       1.20%  swapper          [kernel.kallsyms]  [k] idpf_features_check
+>>>       1.13%  swapper          [kernel.kallsyms]  [k] napi_consume_skb
+>>>       0.93%  swapper          [kernel.kallsyms]  [k] idpf_vport_splitq_napi_poll
+>>>       0.64%  swapper          [kernel.kallsyms]  [k] native_send_call_func_single_ipi
+>>>       0.60%  swapper          [kernel.kallsyms]  [k] acpi_processor_ffh_cstate_enter
+>>>       0.53%  swapper          [kernel.kallsyms]  [k] io_idle
+>>>       0.43%  swapper          [kernel.kallsyms]  [k] netif_skb_features
+>>>       0.41%  swapper          [kernel.kallsyms]  [k] __direct_call_cpuidle_state_enter2
+>>>       0.40%  swapper          [kernel.kallsyms]  [k] native_irq_return_iret
+>>>       0.40%  swapper          [kernel.kallsyms]  [k] idpf_tx_buf_hw_update
+>>>       0.36%  swapper          [kernel.kallsyms]  [k] sched_clock_noinstr
+>>>       0.34%  swapper          [kernel.kallsyms]  [k] handle_softirqs
+>>>       0.32%  swapper          [kernel.kallsyms]  [k] net_rx_action
+>>>       0.32%  swapper          [kernel.kallsyms]  [k] dql_completed
+>>>       0.32%  swapper          [kernel.kallsyms]  [k] validate_xmit_skb
+>>>       0.31%  swapper          [kernel.kallsyms]  [k] skb_network_protocol
+>>>       0.29%  swapper          [kernel.kallsyms]  [k] skb_csum_hwoffload_help
+>>>       0.29%  swapper          [kernel.kallsyms]  [k] x2apic_send_IPI
+>>>       0.28%  swapper          [kernel.kallsyms]  [k] ktime_get
+>>>       0.24%  swapper          [kernel.kallsyms]  [k] __qdisc_run
+>>>
+>>> Signed-off-by: Eric Dumazet <edumazet@google.com>
+>>> ---
+>>>   net/core/skbuff.c | 5 +++++
+>>>   1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+>>> index eeddb9e737ff28e47c77739db7b25ea68e5aa735..7ac5f8aa1235a55db02b40b5a0f51bb3fa53fa03 100644
+>>> --- a/net/core/skbuff.c
+>>> +++ b/net/core/skbuff.c
+>>> @@ -1476,6 +1476,11 @@ void napi_consume_skb(struct sk_buff *skb, int budget)
+>>>
+>>>        DEBUG_NET_WARN_ON_ONCE(!in_softirq());
+>>>
+>>> +     if (skb->alloc_cpu != smp_processor_id() && !skb_shared(skb)) {
+>>> +             skb_release_head_state(skb);
+>>> +             return skb_attempt_defer_free(skb);
+>>> +     }
+>>> +
+>>>        if (!skb_unref(skb))
+>>>                return;
+>>>
+>>> --
+>>> 2.51.2.1041.gc1ab5b90ca-goog
+>>>
+>>
+>> I ran these tests on latest net-next for MANA driver and I am observing a regression here.
+>>
+>> lisatest@lisa--747-e0-n0:~$ iperf3 -c 10.0.0.4 -t 30 -l 1048576
+>> Connecting to host 10.0.0.4, port 5201
+>> [  5] local 10.0.0.5 port 48692 connected to 10.0.0.4 port 5201
+>> [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+>> [  5]   0.00-1.00   sec  4.57 GBytes  39.2 Gbits/sec  586   1.04 MBytes
+>> [  5]   1.00-2.00   sec  4.74 GBytes  40.7 Gbits/sec  520   1.13 MBytes
+>> [  5]   2.00-3.00   sec  5.16 GBytes  44.3 Gbits/sec  191   1.20 MBytes
+>> [  5]   3.00-4.00   sec  5.13 GBytes  44.1 Gbits/sec  520   1.11 MBytes
+>> [  5]   4.00-5.00   sec   678 MBytes  5.69 Gbits/sec   93   1.37 KBytes
+>> [  5]   5.00-6.00   sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]   6.00-7.00   sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]   7.00-8.00   sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]   8.00-9.00   sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]   9.00-10.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  10.00-11.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  11.00-12.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  12.00-13.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  13.00-14.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  14.00-15.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  15.00-16.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  16.00-17.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  17.00-18.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  18.00-19.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  19.00-20.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  20.00-21.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  21.00-22.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  22.00-23.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  23.00-24.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  24.00-25.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  25.00-26.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  26.00-27.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  27.00-28.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  28.00-29.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> [  5]  29.00-30.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
+>> - - - - - - - - - - - - - - - - - - - - - - - - -
+>> [ ID] Interval           Transfer     Bitrate         Retr
+>> [  5]   0.00-30.00  sec  20.3 GBytes  5.80 Gbits/sec  1910             sender
+>> [  5]   0.00-30.00  sec  20.3 GBytes  5.80 Gbits/sec                  receiver
+>>
+>> iperf Done.
+>>
+>>
+>> I tested again by reverting this patch and regression was not there.
+>>
+>> lisatest@lisa--747-e0-n0:~/net-next$ iperf3 -c 10.0.0.4 -t 30 -l 1048576
+>> Connecting to host 10.0.0.4, port 5201
+>> [  5] local 10.0.0.5 port 58188 connected to 10.0.0.4 port 5201
+>> [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+>> [  5]   0.00-1.00   sec  4.95 GBytes  42.5 Gbits/sec  541   1.10 MBytes
+>> [  5]   1.00-2.00   sec  4.92 GBytes  42.3 Gbits/sec  599    878 KBytes
+>> [  5]   2.00-3.00   sec  4.51 GBytes  38.7 Gbits/sec  438    803 KBytes
+>> [  5]   3.00-4.00   sec  4.69 GBytes  40.3 Gbits/sec  647   1.17 MBytes
+>> [  5]   4.00-5.00   sec  4.18 GBytes  35.9 Gbits/sec  1183    715 KBytes
+>> [  5]   5.00-6.00   sec  5.05 GBytes  43.4 Gbits/sec  484    975 KBytes
+>> [  5]   6.00-7.00   sec  5.32 GBytes  45.7 Gbits/sec  520    836 KBytes
+>> [  5]   7.00-8.00   sec  5.29 GBytes  45.5 Gbits/sec  436   1.10 MBytes
+>> [  5]   8.00-9.00   sec  5.27 GBytes  45.2 Gbits/sec  464   1.30 MBytes
+>> [  5]   9.00-10.00  sec  5.25 GBytes  45.1 Gbits/sec  425   1.13 MBytes
+>> [  5]  10.00-11.00  sec  5.29 GBytes  45.4 Gbits/sec  268   1.19 MBytes
+>> [  5]  11.00-12.00  sec  4.98 GBytes  42.8 Gbits/sec  711    793 KBytes
+>> [  5]  12.00-13.00  sec  3.80 GBytes  32.6 Gbits/sec  1255    801 KBytes
+>> [  5]  13.00-14.00  sec  3.80 GBytes  32.7 Gbits/sec  1130    642 KBytes
+>> [  5]  14.00-15.00  sec  4.31 GBytes  37.0 Gbits/sec  1024   1.11 MBytes
+>> [  5]  15.00-16.00  sec  5.18 GBytes  44.5 Gbits/sec  359   1.25 MBytes
+>> [  5]  16.00-17.00  sec  5.23 GBytes  44.9 Gbits/sec  265    900 KBytes
+>> [  5]  17.00-18.00  sec  4.70 GBytes  40.4 Gbits/sec  769    715 KBytes
+>> [  5]  18.00-19.00  sec  3.77 GBytes  32.4 Gbits/sec  1841    889 KBytes
+>> [  5]  19.00-20.00  sec  3.77 GBytes  32.4 Gbits/sec  1084    827 KBytes
+>> [  5]  20.00-21.00  sec  5.01 GBytes  43.0 Gbits/sec  558    994 KBytes
+>> [  5]  21.00-22.00  sec  5.27 GBytes  45.3 Gbits/sec  450   1.25 MBytes
+>> [  5]  22.00-23.00  sec  5.25 GBytes  45.1 Gbits/sec  338   1.18 MBytes
+>> [  5]  23.00-24.00  sec  5.29 GBytes  45.4 Gbits/sec  200   1.14 MBytes
+>> [  5]  24.00-25.00  sec  5.29 GBytes  45.5 Gbits/sec  518   1.02 MBytes
+>> [  5]  25.00-26.00  sec  4.28 GBytes  36.7 Gbits/sec  1258    792 KBytes
+>> [  5]  26.00-27.00  sec  3.87 GBytes  33.2 Gbits/sec  1365    799 KBytes
+>> [  5]  27.00-28.00  sec  4.77 GBytes  41.0 Gbits/sec  530   1.09 MBytes
+>> [  5]  28.00-29.00  sec  5.31 GBytes  45.6 Gbits/sec  419   1.06 MBytes
+>> [  5]  29.00-30.00  sec  5.32 GBytes  45.7 Gbits/sec  222   1.10 MBytes
+>> - - - - - - - - - - - - - - - - - - - - - - - - -
+>> [ ID] Interval           Transfer     Bitrate         Retr
+>> [  5]   0.00-30.00  sec   144 GBytes  41.2 Gbits/sec  20301             sender
+>> [  5]   0.00-30.00  sec   144 GBytes  41.2 Gbits/sec                  receiver
+>>
+>> iperf Done.
+>>
+>>
+>> I am still figuring out technicalities of this patch, but wanted to share initial findings for your input. Please let me know your thoughts on this!
+> 
+> Perhaps try : https://patchwork.kernel.org/project/netdevbpf/patch/20251111151235.1903659-1-edumazet@google.com/
+> 
+> Thanks !
 
-HEAD commit:    2666975a8905 Add linux-next specific files for 20251111
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=13748212580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e82ba9dc816af74c
-dashboard link: https://syzkaller.appspot.com/bug?extid=60db000b8468baeddbb1
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10646b42580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=133eec12580000
+Thanks Eric, it works fine after above fix.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/26ac789d9bdd/disk-2666975a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/fabfe7978a23/vmlinux-2666975a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/82f010d50b37/bzImage-2666975a.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+60db000b8468baeddbb1@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-ODEBUG: free active (active state 0) object: ffff888028ee8090 object type: timer_list hint: rose_t0timer_expiry+0x0/0x350 net/rose/rose_link.c:-1
-WARNING: lib/debugobjects.c:615 at debug_print_object+0x16b/0x1e0 lib/debugobjects.c:612, CPU#1: syz.2.1147/9544
-Modules linked in:
-CPU: 1 UID: 0 PID: 9544 Comm: syz.2.1147 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-RIP: 0010:debug_print_object+0x16b/0x1e0 lib/debugobjects.c:612
-Code: 4c 89 ff e8 d7 19 86 fd 4d 8b 0f 48 c7 c7 80 1b e1 8b 48 8b 34 24 4c 89 ea 89 e9 4d 89 f0 41 54 e8 0a 38 e2 fc 48 83 c4 08 90 <0f> 0b 90 90 ff 05 47 22 1e 0b 48 83 c4 08 5b 41 5c 41 5d 41 5e 41
-RSP: 0018:ffffc90000a08a00 EFLAGS: 00010296
-RAX: cfc2b002eab41900 RBX: dffffc0000000000 RCX: ffff888031311e80
-RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000002
-RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffffbfff1c3a744 R12: ffffffff8a5327d0
-R13: ffffffff8be11d00 R14: ffff888028ee8090 R15: ffffffff8b8cf8e0
-FS:  00007fda22dbb6c0(0000) GS:ffff888125b82000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000020000000d000 CR3: 0000000078a42000 CR4: 00000000003526f0
-Call Trace:
- <IRQ>
- __debug_check_no_obj_freed lib/debugobjects.c:1099 [inline]
- debug_check_no_obj_freed+0x3a2/0x470 lib/debugobjects.c:1129
- slab_free_hook mm/slub.c:2470 [inline]
- slab_free mm/slub.c:6661 [inline]
- kfree+0x10c/0x6e0 mm/slub.c:6869
- rose_neigh_put include/net/rose.h:166 [inline]
- rose_timer_expiry+0x4cb/0x600 net/rose/rose_timer.c:183
- call_timer_fn+0x16e/0x600 kernel/time/timer.c:1747
- expire_timers kernel/time/timer.c:1798 [inline]
- __run_timers kernel/time/timer.c:2372 [inline]
- __run_timer_base+0x61a/0x860 kernel/time/timer.c:2384
- run_timer_base kernel/time/timer.c:2393 [inline]
- run_timer_softirq+0xb7/0x180 kernel/time/timer.c:2403
- handle_softirqs+0x27d/0x880 kernel/softirq.c:626
- __do_softirq kernel/softirq.c:660 [inline]
- invoke_softirq kernel/softirq.c:496 [inline]
- __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:727
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:743
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1055 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1055
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:lock_release+0x2ac/0x3d0 kernel/locking/lockdep.c:5893
-Code: 51 48 c7 44 24 20 00 00 00 00 9c 8f 44 24 20 f7 44 24 20 00 02 00 00 75 56 f7 c3 00 02 00 00 74 01 fb 65 48 8b 05 64 98 1b 11 <48> 3b 44 24 28 0f 85 8b 00 00 00 48 83 c4 30 5b 41 5c 41 5d 41 5e
-RSP: 0018:ffffc90004e8f918 EFLAGS: 00000206
-RAX: cfc2b002eab41900 RBX: 0000000000000283 RCX: cfc2b002eab41900
-RDX: 0000000000000000 RSI: ffffffff8dc71e5c RDI: ffffffff8be111e0
-RBP: ffff8880313129b0 R08: 0000000000000000 R09: ffffffff820eec00
-R10: dffffc0000000000 R11: fffffbfff1f7eeef R12: 0000000000000000
-R13: 0000000000000000 R14: ffff888034a18ca0 R15: ffff888031311e80
- _inline_copy_from_user include/linux/uaccess.h:169 [inline]
- _copy_from_user+0x28/0xb0 lib/usercopy.c:18
- copy_from_user include/linux/uaccess.h:219 [inline]
- snd_rawmidi_kernel_write1+0x3ab/0x650 sound/core/rawmidi.c:1560
- snd_rawmidi_write+0x5a8/0xbc0 sound/core/rawmidi.c:1629
- do_loop_readv_writev fs/read_write.c:850 [inline]
- vfs_writev+0x4b6/0x960 fs/read_write.c:1059
- do_writev+0x14d/0x2d0 fs/read_write.c:1103
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fda21f8f6c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fda22dbb038 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
-RAX: ffffffffffffffda RBX: 00007fda221e5fa0 RCX: 00007fda21f8f6c9
-RDX: 0000000000000002 RSI: 0000200000000840 RDI: 0000000000000004
-RBP: 00007fda22011f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fda221e6038 R14: 00007fda221e5fa0 R15: 00007ffd404da6b8
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	51                   	push   %rcx
-   1:	48 c7 44 24 20 00 00 	movq   $0x0,0x20(%rsp)
-   8:	00 00
-   a:	9c                   	pushf
-   b:	8f 44 24 20          	pop    0x20(%rsp)
-   f:	f7 44 24 20 00 02 00 	testl  $0x200,0x20(%rsp)
-  16:	00
-  17:	75 56                	jne    0x6f
-  19:	f7 c3 00 02 00 00    	test   $0x200,%ebx
-  1f:	74 01                	je     0x22
-  21:	fb                   	sti
-  22:	65 48 8b 05 64 98 1b 	mov    %gs:0x111b9864(%rip),%rax        # 0x111b988e
-  29:	11
-* 2a:	48 3b 44 24 28       	cmp    0x28(%rsp),%rax <-- trapping instruction
-  2f:	0f 85 8b 00 00 00    	jne    0xc0
-  35:	48 83 c4 30          	add    $0x30,%rsp
-  39:	5b                   	pop    %rbx
-  3a:	41 5c                	pop    %r12
-  3c:	41 5d                	pop    %r13
-  3e:	41 5e                	pop    %r14
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Regards,
+Aditya
 
