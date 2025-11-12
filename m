@@ -1,155 +1,325 @@
-Return-Path: <netdev+bounces-238086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 383C8C53F29
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:42:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84570C53FB9
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:49:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6397A3B466A
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:38:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB6923B92CC
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E57234DCC5;
-	Wed, 12 Nov 2025 18:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C52B34B68A;
+	Wed, 12 Nov 2025 18:36:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pZESgGhG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R2S15w9R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED48234B410;
-	Wed, 12 Nov 2025 18:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E797C34CFD7
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 18:36:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762972060; cv=none; b=lYYM1v9EZk+cOrbnB1xwMbzmfotDWj8LeZ3pu2Yj4WmIySkkCy2Ped0yTlYcTtyBHyUH32Ww8TSRifh3H3RTQ2m6TU6QNNugTBEy5Of9XWFbnPUkRs71TbkrKb6vWK8gqC8hyJyp1Y7OpL9lsfn6wgOTwk0aIDxobphsVy9WCFI=
+	t=1762972617; cv=none; b=DbTbW39mxBlMGqsHzCvt2GtWG6G9WVrCQ2VW2IiITswaZlViK+TB4AUSTyU8IVSSvAZFKUEluBPLKVZ8+BSwxK1W7IklTadAnnhUEfpXoZFxMpG3zXMK3o/7Op1o2bhfov4k3uP5L7crq7tvVIc6P8YpeTKT069SGyf6OPXn1W4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762972060; c=relaxed/simple;
-	bh=hpR5/eJy84xl7p8JuOygWtFX0UiA00tX14otHuZG1bg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pq4QFejgHotAOXvuoc+gJN18wJeTkoJSJgsI3+O2sfvQ9L9dRZNF9YLlOULnTcouXuzsD7k30Y0zQY5BEL4AoDghadnltzj4K+gzwA4RYbDBMTaYCd2pzUmwwSHaf+KYYl9GlxweMgpeGA4OegYaoLhNnrfaDhuHc1IWc/oYgP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pZESgGhG; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5ACEacDX003733;
-	Wed, 12 Nov 2025 18:27:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=yL4OSp/QnzWt3dJWOnGVF2xym4tQkPDmZN3+yy/+K
-	mo=; b=pZESgGhGrmWK+EJK4wtGfxGlyoMYV4NlzQuG2rKqy4vAbu4QlnMhbON3h
-	gJkp+HuRtUKO8lu2b5qWP2abAFHljUn1YaYxprwIIqW+6IJH2jntdWywhShHtMt3
-	5GdDMuwgvyiMK/Dj9TmwFJVRKPnClw0q0hqvpZHarWITaWrk6jEKQ7/n7OToFJwf
-	WVlZipQgxX5p4Z+GZoa5aSMYGfgeOdW+qyz99z/dRLcf8CgvwGXE5HzPJqrqrwqu
-	gDjd2Ir8NbO44YjDsESmOXN9FEG+7aqCQ2CDnMDF8QJN8LHkkustm1O29yVRH+JN
-	fvJ92hWoD2obT4x7Ofl3NbppUKBAQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5cjaygm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Nov 2025 18:27:30 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5ACIP80i025729;
-	Wed, 12 Nov 2025 18:27:29 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5cjaygg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Nov 2025 18:27:29 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5ACGNmTc007298;
-	Wed, 12 Nov 2025 18:27:28 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aajdjhn8r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Nov 2025 18:27:28 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ACIRPBu42991956
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 12 Nov 2025 18:27:25 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F1FEC20040;
-	Wed, 12 Nov 2025 18:27:24 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B272620043;
-	Wed, 12 Nov 2025 18:27:24 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 12 Nov 2025 18:27:24 +0000 (GMT)
-From: Aswin Karuvally <aswin@linux.ibm.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>,
-        Aleksei Nikiforov <aleksei.nikiforov@linux.ibm.com>
-Subject: [PATCH net-next] s390/ctcm: Fix double-kfree
-Date: Wed, 12 Nov 2025 19:27:24 +0100
-Message-ID: <20251112182724.1109474-1-aswin@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1762972617; c=relaxed/simple;
+	bh=anYiTffJ9m/afti4TSeL27H7ZE//GYBvoRxBP0Aj56M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TfKGny+3Xt2z/D0unH0lbVQe6p+g96EjKT1ti4U/MrovxaHIV+uiV/l8FJ3e0sFWjpne6m30JIBCSMdYfd1ad7DDE1giGDtL9kl82vSLFOLMvKrxUDblFrZj91gYZ8cbvFNUsBzyidkjgAi4Xt2oI9eRaERv7TeOIZC82GACRtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R2S15w9R; arc=none smtp.client-ip=74.125.224.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-63fbed0f71aso1060465d50.0
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:36:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762972613; x=1763577413; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZKQWigIGEVi0kLFXu6j/x0JtjaxFQvF5YS6wzVMmD9E=;
+        b=R2S15w9R9Yjsvyp5auWxvUg2kOOWxRS1s81NU9V8UQbUVn5zk1LWPh2G82Nf4G5jri
+         2y05p2YE1+tpkn241URtoQTL0et/R3uj//byArFYGoaxdDkt3cfW5ZvEjFNsaZ+onBDw
+         H8/NyFLBa6SrR3fA5zIteZ6my6CeRDHssLbyk0Ui14VzF4p+4NPEEB22enA27BgyelMU
+         qqdVeIFQeliJLEXQvJE5x9WfxrwtZ/NOYYy6jgjxYjlI1tfFhin01hX0n4BVtig0tQE1
+         DSvzUTCAHSFtMn4j9yO18yd/b+hyck1pSQESkzokb7BNX3lpFV2gb+AQWlDNnFhBuMFX
+         k6bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762972613; x=1763577413;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZKQWigIGEVi0kLFXu6j/x0JtjaxFQvF5YS6wzVMmD9E=;
+        b=jyorZsyohdaJriH9dQznzcF/vWKKeqZO+VSFGyYSRv/z0In80bcCT0+vWOQ783lXhT
+         wD69DqOBqBoH+syt5444vUfEQngd378+8qnV5ywsW+QP/8x6wW/1qnvSTxj0T3pXCIYh
+         JEA5nZnbYSVO1WBKsOwf176NYXp2Kb4QmJPlpaocwmLem1BKxzP6VcXwBs446h9FFvXn
+         iXAOU0XnDeXBAcK+KKaBSVaD5MDURAfD744w5m5skOaNQcicZek5biC6ma6dgNX/VicR
+         4UcLcMnUqcwVeSLEZzud8740L43ILlZnUtk34uie4lCMF42yugBur9l+/MFqKqXPsEMM
+         M61w==
+X-Forwarded-Encrypted: i=1; AJvYcCUkIJpJo8CB1QBQFfYIO9WvuZcYRSZXO4WmmjIrwTlm/Kca/LKBJmRz5gd+7UU8CKC3nlTA4pE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywl0hsIsYO2GMnLas9d/G6qX1dLLg51Jhb509dKAsPwRwPcNkhZ
+	1/VFa0ceXdyqImD2ZxbChUED3yST+GwejBxyFk6T4EFKrsz6OweoNxtp
+X-Gm-Gg: ASbGnctWAnVwzqeP4Ty1esjaFz5sGhsRlXBmGSzsQe4QgzSLW5RKt1lICGRALEEz4C9
+	PxD6E1lPYPrqWDWcu/xBHjQeyWirDF/IXqNl+ErAohKlkC93QTv7YBAYQ5XHcDcPyItGOEsQxuZ
+	q2bZG46f+iMPWdq3Q2QZ+Pz+ZkEhiRg7JTA4MFGy0OCct4By1XeFXFGv/D7HOlT4umouKEUi8x2
+	Lh741391So0TTIFdTRZXOozGhBbilvWNv9eno+NuJE9f/dgU03j05vStrspAtuQUec9fst/fnGF
+	se5u8BiqWpA78ccXj94osGqiMSho1SC1sq0DjMDdKK2WmOy6JIbUoljMH1FYrg7jt9edoBsvuyu
+	Anih5a36nG/7vr/InqJ8bAdf+25D1rw1RpzuL6im+iedW5/OoVT3UEEPrAWHHAi8Ys1z5sMhZSf
+	exxRDRJDDtYtyGEDO8cwJ4dr2hzD4uo1j4T5rIyyji3vWVlFk=
+X-Google-Smtp-Source: AGHT+IEjgyAE0Hs+bT3W8DaSfFbFucKGUg6EhDw/PlXyHWRqH89/fss68vyII/g3bMSTQTHDXA7oUA==
+X-Received: by 2002:a05:690e:c4d:b0:63e:1c4c:302b with SMTP id 956f58d0204a3-64101b89ee2mr3345793d50.47.1762972612652;
+        Wed, 12 Nov 2025 10:36:52 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:53::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-641015adefasm1191019d50.1.2025.11.12.10.36.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 10:36:51 -0800 (PST)
+Date: Wed, 12 Nov 2025 10:36:50 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v9 08/14] vsock: reject bad VSOCK_NET_MODE_LOCAL
+ configuration for G2H
+Message-ID: <aRTTwuuXSz5CvNjt@devvm11784.nha0.facebook.com>
+References: <20251111-vsock-vmtest-v9-0-852787a37bed@meta.com>
+ <20251111-vsock-vmtest-v9-8-852787a37bed@meta.com>
+ <ureyl5b2tneivmlce4fdtmuoxgayfxwgewoypb6oyxeh7ozt3i@chygpr2uvtcp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Ss+dKfO0 c=1 sm=1 tr=0 ts=6914d192 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=mK5E5EQbiCHRqPeLpLsA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA5NSBTYWx0ZWRfX9rWG15lTk1A8
- SGd8iwaDnTt5D4pmlz4zCd4erdbczTnElyVt23794RW4CsWRzsrkFA1y9zmxcRmF5jjzuVIEo/4
- 8EScwxFJF0RY1CgRJ1stg+ecp5rwi2ZBgbMxCnz07xsxOzEGKPCkdFdWpdnjAuRXEnc8TUZ1+il
- wNt5pWusvFvNdFRN68dbHSO3lBFUrf6hwM0omO8W2AfGGZiGu38FzC/RJtR1Vu8qpARjVHeBC5V
- 2s2qd5wj//Puuod/mKUypsOHsJWWESfrd903J8VXAHYCLrMsSpm3CKipAvN8N2BfKv0dnAtrHyV
- r/naOdRlFB++0oaS0pOmF3r9elHudvvQGFQ1YaCNNy9wgblpV2uY1rWOGWMv+t9S9GJFnz70cL6
- N1Zg0tUxtTyvk83QB/oWT/YMtlGaHA==
-X-Proofpoint-GUID: N5Q1zVAlqHOIsiTAnsxT2r7BkCD5uw0P
-X-Proofpoint-ORIG-GUID: MPLBTN_jhWxzU3KlOT2xzl11XveEXbMB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-12_06,2025-11-11_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 adultscore=0 priorityscore=1501 spamscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080095
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ureyl5b2tneivmlce4fdtmuoxgayfxwgewoypb6oyxeh7ozt3i@chygpr2uvtcp>
 
-From: Aleksei Nikiforov <aleksei.nikiforov@linux.ibm.com>
+On Wed, Nov 12, 2025 at 03:21:39PM +0100, Stefano Garzarella wrote:
+> On Tue, Nov 11, 2025 at 10:54:50PM -0800, Bobby Eshleman wrote:
+> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > 
+> > Reject setting VSOCK_NET_MODE_LOCAL with -EOPNOTSUPP if a G2H transport
+> > is operational. Additionally, reject G2H transport registration if there
+> > already exists a namespace in local mode.
+> > 
+> > G2H sockets break in local mode because the G2H transports don't support
+> > namespacing yet. The current approach is to coerce packets coming out of
+> > G2H transports into VSOCK_NET_MODE_GLOBAL mode, but it is not possible
+> > to coerce sockets in the same way because it cannot be deduced which
+> > transport will be used by the socket. Specifically, when bound to
+> > VMADDR_CID_ANY in a nested VM (both G2H and H2G available), it is not
+> > until a packet is received and matched to the bound socket that we
+> > assign the transport. This presents a chicken-and-egg problem, because
+> > we need the namespace to lookup the socket and resolve the transport,
+> > but we need the transport to know how to use the namespace during
+> > lookup.
+> > 
+> > For that reason, this patch prevents VSOCK_NET_MODE_LOCAL from being
+> > used on systems that support G2H, even nested systems that also have H2G
+> > transports.
+> > 
+> > Local mode is blocked based on detecting the presence of G2H devices
+> > (when possible, as hyperv is special). This means that a host kernel
+> > with G2H support compiled in (or has the module loaded), will still
+> > support local mode because there is no G2H (e.g., virtio-vsock) device
+> > detected. This enables using the same kernel in the host and in the
+> > guest, as we do in kselftest.
+> > 
+> > Systems with only namespace-aware transports (vhost-vsock, loopback) can
+> > still use both VSOCK_NET_MODE_GLOBAL and VSOCK_NET_MODE_LOCAL modes as
+> > intended.
+> > 
+> > The hyperv transport must be treated specially. Other G2H transports can
+> > can report presence of a device using get_local_cid(). When a device is
+> > present it returns a valid CID; otherwise, it returns VMADDR_CID_ANY.
+> > THe hyperv transport's get_local_cid() always returns VMADDR_CID_ANY,
+> > however, even when a device is present.
+> > 
+> > For that reason, this patch adds an always_block_local_mode flag to
+> > struct vsock_transport. When set to true, VSOCK_NET_MODE_LOCAL is
+> > blocked unconditionally whenever the transport is registered, regardless
+> > of device presence. When false, LOCAL mode is only blocked when
+> > get_local_cid() indicates a device is present (!= VMADDR_CID_ANY).
+> > 
+> > The hyperv transport sets this flag to true to unconditionally block
+> > local mode. Other G2H transports (virtio-vsock, vmci-vsock) leave it
+> > false and continue using device detection via get_local_cid() to block
+> > local mode.
+> > 
+> > These restrictions can be lifted in a future patch series when G2H
+> > transports gain namespace support.
+> 
+> IMO this commit should be before supporting namespaces in any device,
+> so we are sure we don't have commits where this can happen.
 
-The function 'mpc_rcvd_sweep_req(mpcginfo)' is called conditionally
-from function 'ctcmpc_unpack_skb'. It frees passed mpcginfo.
-After that a call to function 'kfree' in function 'ctcmpc_unpack_skb'
-frees it again.
+sgtm!
 
-Remove 'kfree' call in function 'mpc_rcvd_sweep_req(mpcginfo)'.
+> > 
+> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > ---
+> > include/net/af_vsock.h           |  8 +++++++
+> > net/vmw_vsock/af_vsock.c         | 45 +++++++++++++++++++++++++++++++++++++---
+> > net/vmw_vsock/hyperv_transport.c |  1 +
+> > 3 files changed, 51 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > index cfd121bb5ab7..089c61105dda 100644
+> > --- a/include/net/af_vsock.h
+> > +++ b/include/net/af_vsock.h
+> > @@ -108,6 +108,14 @@ struct vsock_transport_send_notify_data {
+> > 
+> > struct vsock_transport {
+> > 	struct module *module;
+> > +	/* If true, block VSOCK_NET_MODE_LOCAL unconditionally when this G2H
+> > +	 * transport is registered. If false, only block LOCAL mode when
+> > +	 * get_local_cid() indicates a device is present (!= VMADDR_CID_ANY).
+> > +	 * Hyperv sets this true because it doesn't offer a callback that
+> > +	 * detects device presence. This only applies to G2H transports; H2G
+> > +	 * transports are unaffected.
+> > +	 */
+> > +	bool always_block_local_mode;
+> > 
+> > 	/* Initialize/tear-down socket. */
+> > 	int (*init)(struct vsock_sock *, struct vsock_sock *);
+> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > index c0b5946bdc95..a2da1810b802 100644
+> > --- a/net/vmw_vsock/af_vsock.c
+> > +++ b/net/vmw_vsock/af_vsock.c
+> > @@ -91,6 +91,11 @@
+> >  *   and locked down by a namespace manager. The default is "global". The mode
+> >  *   is set per-namespace.
+> >  *
+> > + *   Note: LOCAL mode is only supported when using namespace-aware transports
+> > + *   (vhost-vsock, loopback). If a guest-to-host transport (virtio-vsock,
+> > + *   hyperv-vsock, vmci-vsock) is loaded, attempts to set LOCAL mode will fail
+> > + *   with EOPNOTSUPP, as these transports do not support per-namespace
+> > isolation.
+> > + *
+> >  *   The modes affect the allocation and accessibility of CIDs as follows:
+> >  *
+> >  *   - global - access and allocation are all system-wide
+> > @@ -2757,12 +2762,30 @@ static int vsock_net_mode_string(const struct ctl_table *table, int write,
+> > 		if (*lenp >= sizeof(data))
+> > 			return -EINVAL;
+> > 
+> > -		if (!strncmp(data, VSOCK_NET_MODE_STR_GLOBAL, sizeof(data)))
+> > +		if (!strncmp(data, VSOCK_NET_MODE_STR_GLOBAL, sizeof(data))) {
+> > 			mode = VSOCK_NET_MODE_GLOBAL;
+> > -		else if (!strncmp(data, VSOCK_NET_MODE_STR_LOCAL, sizeof(data)))
+> > +		} else if (!strncmp(data, VSOCK_NET_MODE_STR_LOCAL, sizeof(data))) {
+> > +			/* LOCAL mode is not supported when G2H transports
+> > +			 * (virtio-vsock, hyperv, vmci) are active, because
+> > +			 * these transports don't support namespaces. We must
+> > +			 * stay in GLOBAL mode to avoid bind/lookup mismatches.
+> > +			 *
+> > +			 * Check if G2H transport is present and either:
+> > +			 * 1. Has always_block_local_mode set (hyperv), OR
+> > +			 * 2. Has an actual device present (get_local_cid() != VMADDR_CID_ANY)
+> > +			 */
+> > +			mutex_lock(&vsock_register_mutex);
+> > +			if (transport_g2h &&
+> > +			    (transport_g2h->always_block_local_mode ||
+> > +			     transport_g2h->get_local_cid() != VMADDR_CID_ANY)) {
+> 
+> This seems almost like a hack. What about adding a new function in the
+> transports that tells us whether a device is present or not and implement it
+> in all of them?
+> 
+> Or a more specific function to check if the transport can work with local
+> mode (e.g.  netns_local_aware() or something like that - I'm not great with
+> nameming xD)
 
-Bug detected by the clang static analyzer.
+That sounds good to me, I probably prefer option 2 because I think it'll
+be simpler for the hyperv case.
 
-Fixes: 0c0b20587b9f25a2 ("s390/ctcm: fix potential memory leak")
-Reviewed-by: Aswin Karuvally <aswin@linux.ibm.com>
-Signed-off-by: Aleksei Nikiforov <aleksei.nikiforov@linux.ibm.com>
-Signed-off-by: Aswin Karuvally <aswin@linux.ibm.com>
----
- drivers/s390/net/ctcm_mpc.c | 1 -
- 1 file changed, 1 deletion(-)
+> 
+> > +				mutex_unlock(&vsock_register_mutex);
+> > +				return -EOPNOTSUPP;
+> > +			}
+> > +			mutex_unlock(&vsock_register_mutex);
+> 
+> What happen if the G2H is loaded here, just after we release the mutex?
+> 
+> I suspect there could be a race that we may fix postponing the unlock after
+> the vsock_net_write_mode() call.
+> 
+> WDYT?
 
-diff --git a/drivers/s390/net/ctcm_mpc.c b/drivers/s390/net/ctcm_mpc.c
-index 0aeafa772fb1..407b7c516658 100644
---- a/drivers/s390/net/ctcm_mpc.c
-+++ b/drivers/s390/net/ctcm_mpc.c
-@@ -701,7 +701,6 @@ static void mpc_rcvd_sweep_req(struct mpcg_info *mpcginfo)
- 
- 	grp->sweep_req_pend_num--;
- 	ctcmpc_send_sweep_resp(ch);
--	kfree(mpcginfo);
- 	return;
- }
- 
--- 
-2.48.1
+Oh good eye, yeah I think you are right. Writing the net mode should
+definitely be in the critical section.
 
+> 
+> > 			mode = VSOCK_NET_MODE_LOCAL;
+> > -		else
+> > +		} else {
+> > 			return -EINVAL;
+> > +		}
+> > 
+> > 		if (!vsock_net_write_mode(net, mode))
+> > 			return -EPERM;
+> > @@ -2909,6 +2932,7 @@ int vsock_core_register(const struct vsock_transport *t, int features)
+> > {
+> > 	const struct vsock_transport *t_h2g, *t_g2h, *t_dgram, *t_local;
+> > 	int err = mutex_lock_interruptible(&vsock_register_mutex);
+> > +	struct net *net;
+> > 
+> > 	if (err)
+> > 		return err;
+> > @@ -2931,6 +2955,21 @@ int vsock_core_register(const struct vsock_transport *t, int features)
+> > 			err = -EBUSY;
+> > 			goto err_busy;
+> > 		}
+> > +
+> > +		/* G2H sockets break in LOCAL mode namespaces because G2H transports
+> > +		 * don't support them yet. Block registering new G2H transports if we
+> > +		 * already have local mode namespaces on the system.
+> > +		 */
+> > +		rcu_read_lock();
+> > +		for_each_net_rcu(net) {
+> > +			if (vsock_net_mode(net) == VSOCK_NET_MODE_LOCAL) {
+> > +				rcu_read_unlock();
+> > +				err = -EOPNOTSUPP;
+> > +				goto err_busy;
+> > +			}
+> > +		}
+> > +		rcu_read_unlock();
+> > +
+> > 		t_g2h = t;
+> > 	}
+> > 
+> > diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+> > index 432fcbbd14d4..ed48dd1ff19b 100644
+> > --- a/net/vmw_vsock/hyperv_transport.c
+> > +++ b/net/vmw_vsock/hyperv_transport.c
+> > @@ -835,6 +835,7 @@ int hvs_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
+> > 
+> > static struct vsock_transport hvs_transport = {
+> > 	.module                   = THIS_MODULE,
+> > +	.always_block_local_mode  = true,
+> > 
+> > 	.get_local_cid            = hvs_get_local_cid,
+> > 
+> > 
+> > -- 
+> > 2.47.3
+> > 
+> 
 
