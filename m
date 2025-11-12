@@ -1,244 +1,88 @@
-Return-Path: <netdev+bounces-238074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8454CC53B10
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:30:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23EB0C53BEC
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:42:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3A519347D2F
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 17:26:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0164B50019E
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 17:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B9C345729;
-	Wed, 12 Nov 2025 17:26:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F070D343D84;
+	Wed, 12 Nov 2025 17:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lQ4B5p68"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RXafX2jo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941DA343D64
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 17:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C8933F371;
+	Wed, 12 Nov 2025 17:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762968375; cv=none; b=dABLoOZMHkNCla9evTxSKp1sYQbsgvFBgUPMr3u1ycvR1ZHRofVFh5QenZ5CS8VFbb4FOV5MkOm3d6oXLSCQH72EVKiofG92qCRejjLQis0o3XkN1olcONaasHZVHxCvY16R8maXIPi1uhrLdp8HfVh+kW4h+EEbY3gdToEkY7o=
+	t=1762968481; cv=none; b=hie3k2mjjwl0xICDfYd5Nfd4BCU3LFvRAe6/1UqF/JKEVg4ZD67BsNBnzjjzoMWjNENDinmXbBon+jHwHea4TL5Lxn5FvioA4huKJPAMD1z/2AadzZ3y6BBgf97L17nSNShdprMbW9wzf1B5DPGCobMKAgqA9CfPjxObzV6lumA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762968375; c=relaxed/simple;
-	bh=UTMn3Jr9U5c/bocf5dn5VPrb9symhlXBrijN/xQ4mwk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bY4qGnh8TQty9HZhSO6ViiiWyQGEtrxeiHkTmYioOjLoRIku+lrdTkE1zUP4YActTww17hgIay1i7SHuzl498ui3JZo32IfQ+VVvaYDI0Gw2Qwg/hmcdqibdLGSF/XUvWSxK66tFie6/Oh6pkMkbxZwC0lUPeDL2cfQF+fShiFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lQ4B5p68; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762968370;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=C8sXBelngMt47PuS1UwoC1Dy83CQRtJ2MRouV7p2WwI=;
-	b=lQ4B5p68dj8MrO8sLpU+gV4vj99p1U8sp0R8VWmRr8mSAQlg0QEaphMvzJrZCrc10DYmFQ
-	z8F0HW0RDDUjT2K39Zpb+fucTcrgvO51Her1ICoGD577aWMAufXDsvTBHnM2sJrkKhZVOO
-	6VP0oO+nUY8idgoxEeX2IXamilVYTmA=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Michal Kubecek <mkubecek@suse.cz>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH ethtool-next v4] netlink: tsconfig: add HW time stamping configuration
-Date: Wed, 12 Nov 2025 17:26:00 +0000
-Message-ID: <20251112172600.2162003-1-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1762968481; c=relaxed/simple;
+	bh=k3QziyCQz7mmZLVMCZSGgGmIYWRMCxWfFHH6xwU144g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XhAfh9ai/fsq6MXEkpp81XFv9Xk/grD4XM0ONm/k7oDXjfTYWF1RajAkRqqWsp9utw57567zUTEVJp6VtGVrlydsmB0zvTfF2LXjjJRMB6QOAtT1g+OIFLH5fnfIA92tUBcshNtlIpxrEgD3T8ajnN9vez/KA/n7yL4E7+LFxDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RXafX2jo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EDE3C4CEF1;
+	Wed, 12 Nov 2025 17:28:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762968481;
+	bh=k3QziyCQz7mmZLVMCZSGgGmIYWRMCxWfFHH6xwU144g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RXafX2jovIvmYmIUObfRZEtwKeNW0KSuHdpmsBBXA0MOK97tXNMutTeR/f5Yav64v
+	 LUs+WMqLLPC6GXwNNeYqv3OeII1s760mrVVKY5x7iLpgG26lpCUPoF2qPGANQw1F43
+	 0xQiw4+CK+8E9TuV9vUjmLu7WNyqF2Ba2bENsCI7pAlamhr3geCFZVVjVDKJ7BxqOe
+	 hXFA3o789qtCG9yyXJZszqUeX3CzpSP9ZBWX0i8LRcOBc8zQE3Fwk1AHtMySlfOnEB
+	 jX6NSPf70uYAfQJ2UIHgnf6jKlaK9nysyu5VV5MToH1rKZIWe1J45v89sCumCPU2J7
+	 0rsILtenC0wfw==
+Date: Wed, 12 Nov 2025 09:28:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org,
+ kernel@pengutronix.de, Gregor Herburger <gregor.herburger@ew.tq-group.com>,
+ Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>, Manivannan Sadhasivam
+ <mani@kernel.org>
+Subject: Re: [PATCH net-next 07/11] can: mcp251xfd: add workaround for
+ errata 5
+Message-ID: <20251112092800.290282eb@kernel.org>
+In-Reply-To: <20251112091734.74315-8-mkl@pengutronix.de>
+References: <20251112091734.74315-1-mkl@pengutronix.de>
+	<20251112091734.74315-8-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-The kernel supports configuring HW time stamping modes via netlink
-messages, but previous implementation added support for HW time stamping
-source configuration. Add support to configure TX/RX time stamping.
-We keep TX type and RX filter configuration as a bit value, but if we
-will need multibit value to be set in the future, there is an option to
-use "rx-filters" keyword which will be mutually exclusive with current
-"rx-filter" keyword. The same applies to "tx-type".
+On Wed, 12 Nov 2025 10:13:47 +0100 Marc Kleine-Budde wrote:
+> +static int
+> +mcp251xfd_regmap_nocrc_gather_write(void *context,
+> +				    const void *reg_p, size_t reg_len,
+> +				    const void *val, size_t val_len)
+> +{
+> +	const u16 byte_exclude =3D MCP251XFD_REG_IOCON +
+> +				 mcp251xfd_first_byte_set(MCP251XFD_REG_IOCON_GPIO_MASK);
 
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
-v3 -> v4:
-* fix check condition after code style improvements (thanks Kory)
-v2 -> v3:
-* improve code style
-v1 -> v2:
-* improve commit message
----
- ethtool.8.in       | 12 +++++++-
- ethtool.c          |  1 +
- netlink/tsconfig.c | 77 +++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 88 insertions(+), 2 deletions(-)
+Looks like this is added by the next patch :(
 
-diff --git a/ethtool.8.in b/ethtool.8.in
-index 8874ade..1788588 100644
---- a/ethtool.8.in
-+++ b/ethtool.8.in
-@@ -357,6 +357,10 @@ ethtool \- query or control network driver and hardware settings
- .IR N
- .BI qualifier
- .IR precise|approx ]
-+.RB [ tx
-+.IR TX-TYPE ]
-+.RB [ rx-filter
-+.IR RX-FILTER ]
- .HP
- .B ethtool \-x|\-\-show\-rxfh\-indir|\-\-show\-rxfh
- .I devname
-@@ -1287,7 +1291,7 @@ for IEEE 1588 quality and "approx" is for NICs DMA point.
- Show the selected time stamping PTP hardware clock configuration.
- .TP
- .B \-\-set\-hwtimestamp\-cfg
--Select the device's time stamping PTP hardware clock.
-+Sets the device's time stamping PTP hardware clock configuration.
- .RS 4
- .TP
- .BI index \ N
-@@ -1296,6 +1300,12 @@ Index of the ptp hardware clock
- .BI qualifier \ precise | approx
- Qualifier of the ptp hardware clock. Mainly "precise" the default one is
- for IEEE 1588 quality and "approx" is for NICs DMA point.
-+.TP
-+.BI tx \ TX-TYPE
-+Type of TX time stamping to configure
-+.TP
-+.BI rx-filter \ RX-FILTER
-+Type of RX time stamping filter to configure
- .RE
- .TP
- .B \-x \-\-show\-rxfh\-indir \-\-show\-rxfh
-diff --git a/ethtool.c b/ethtool.c
-index bd45b9e..521e6fe 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -6068,6 +6068,7 @@ static const struct option args[] = {
- 		.nlfunc	= nl_stsconfig,
- 		.help	= "Select hardware time stamping",
- 		.xhelp	= "		[ index N qualifier precise|approx ]\n"
-+			  "		[ tx TX-TYPE ] [ rx-filter RX-FILTER ]\n"
- 	},
- 	{
- 		.opts	= "-x|--show-rxfh-indir|--show-rxfh",
-diff --git a/netlink/tsconfig.c b/netlink/tsconfig.c
-index d427c7b..ccc6c2c 100644
---- a/netlink/tsconfig.c
-+++ b/netlink/tsconfig.c
-@@ -17,6 +17,7 @@
- #include "netlink.h"
- #include "bitset.h"
- #include "parser.h"
-+#include "strset.h"
- #include "ts.h"
- 
- /* TSCONFIG_GET */
-@@ -94,6 +95,66 @@ int nl_gtsconfig(struct cmd_context *ctx)
- 
- /* TSCONFIG_SET */
- 
-+int tsconfig_txrx_parser(struct nl_context *nlctx, uint16_t type,
-+			 const void *data __maybe_unused,
-+			 struct nl_msg_buff *msgbuff,
-+			 void *dest __maybe_unused)
-+{
-+	struct nlattr *bits_attr, *bit_attr;
-+	const struct stringset *values;
-+	const char *arg = *nlctx->argp;
-+	unsigned int count, i;
-+
-+	nlctx->argp++;
-+	nlctx->argc--;
-+	if (netlink_init_ethnl2_socket(nlctx) < 0)
-+		return -EIO;
-+
-+	switch (type) {
-+	case ETHTOOL_A_TSCONFIG_TX_TYPES:
-+		values = global_stringset(ETH_SS_TS_TX_TYPES, nlctx->ethnl2_socket);
-+		break;
-+	case ETHTOOL_A_TSCONFIG_RX_FILTERS:
-+		values = global_stringset(ETH_SS_TS_RX_FILTERS, nlctx->ethnl2_socket);
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	count = get_count(values);
-+	for (i = 0; i < count; i++) {
-+		const char *name = get_string(values, i);
-+
-+		if (!strcmp(name, arg))
-+			break;
-+	}
-+
-+	if (i == count)
-+		return -EINVAL;
-+
-+	if (ethnla_put_flag(msgbuff, ETHTOOL_A_BITSET_NOMASK, true))
-+		return -EMSGSIZE;
-+
-+	bits_attr = ethnla_nest_start(msgbuff, ETHTOOL_A_BITSET_BITS);
-+	if (!bits_attr)
-+		return -EMSGSIZE;
-+
-+	bit_attr = ethnla_nest_start(msgbuff, ETHTOOL_A_BITSET_BITS_BIT);
-+	if (!bit_attr) {
-+		ethnla_nest_cancel(msgbuff, bits_attr);
-+		return -EMSGSIZE;
-+	}
-+	if (ethnla_put_u32(msgbuff, ETHTOOL_A_BITSET_BIT_INDEX, i) ||
-+	    ethnla_put_flag(msgbuff, ETHTOOL_A_BITSET_BIT_VALUE, true)) {
-+		ethnla_nest_cancel(msgbuff, bits_attr);
-+		ethnla_nest_cancel(msgbuff, bit_attr);
-+		return -EMSGSIZE;
-+	}
-+	mnl_attr_nest_end(msgbuff->nlhdr, bit_attr);
-+	mnl_attr_nest_end(msgbuff->nlhdr, bits_attr);
-+	return 0;
-+}
-+
- static const struct param_parser stsconfig_params[] = {
- 	{
- 		.arg		= "index",
-@@ -109,6 +170,20 @@ static const struct param_parser stsconfig_params[] = {
- 		.handler	= tsinfo_qualifier_parser,
- 		.min_argc	= 1,
- 	},
-+	{
-+		.arg		= "tx",
-+		.type		= ETHTOOL_A_TSCONFIG_TX_TYPES,
-+		.handler	= tsconfig_txrx_parser,
-+		.group		= ETHTOOL_A_TSCONFIG_TX_TYPES,
-+		.min_argc	= 1,
-+	},
-+	{
-+		.arg		= "rx-filter",
-+		.type		= ETHTOOL_A_TSCONFIG_RX_FILTERS,
-+		.handler	= tsconfig_txrx_parser,
-+		.group		= ETHTOOL_A_TSCONFIG_RX_FILTERS,
-+		.min_argc	= 1,
-+	},
- 	{}
- };
- 
-@@ -134,7 +209,7 @@ int nl_stsconfig(struct cmd_context *ctx)
- 	if (ret < 0)
- 		return ret;
- 	if (ethnla_fill_header(msgbuff, ETHTOOL_A_TSCONFIG_HEADER,
--			       ctx->devname, 0))
-+			       ctx->devname, ETHTOOL_FLAG_COMPACT_BITSETS))
- 		return -EMSGSIZE;
- 
- 	ret = nl_parser(nlctx, stsconfig_params, NULL, PARSER_GROUP_NEST, NULL);
--- 
-2.47.3
+drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c:48:59: error: =E2=80=98MCP=
+251XFD_REG_IOCON_GPIO_MASK=E2=80=99 undeclared (first use in this function)=
+; did you mean =E2=80=98MCP251XFD_REG_IOCON_GPIO0=E2=80=99?
+   48 |                                  mcp251xfd_first_byte_set(MCP251XFD=
+_REG_IOCON_GPIO_MASK);
+      |                                                           ^~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~
+      |                                                           MCP251XFD=
+_REG_IOCON_GPIO0
 
+Do you do rebases or do we have to take it as is?
 
