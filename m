@@ -1,325 +1,149 @@
-Return-Path: <netdev+bounces-238087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84570C53FB9
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:49:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4DEBC54016
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:52:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB6923B92CC
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:41:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63FDC3B03EB
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C52B34B68A;
-	Wed, 12 Nov 2025 18:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R2S15w9R"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9537329368;
+	Wed, 12 Nov 2025 18:43:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E797C34CFD7
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 18:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6BFD2765ED
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 18:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762972617; cv=none; b=DbTbW39mxBlMGqsHzCvt2GtWG6G9WVrCQ2VW2IiITswaZlViK+TB4AUSTyU8IVSSvAZFKUEluBPLKVZ8+BSwxK1W7IklTadAnnhUEfpXoZFxMpG3zXMK3o/7Op1o2bhfov4k3uP5L7crq7tvVIc6P8YpeTKT069SGyf6OPXn1W4=
+	t=1762973037; cv=none; b=H4Gmc3CYec2DJty2EZ/tRMMq9vOjlQXMyGmnfQTNc5AGr0+a2yuitGimFmkAvqUqWNYWRjadq8KbYFNao0nIXLK2ZalLYed41VJveBUO5lenWO0ftmGAa8gHjrw8ln4CuR75lUKe1FIvTJZu4Gv71MHu+rsV6y/s4f0Mjqwoe/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762972617; c=relaxed/simple;
-	bh=anYiTffJ9m/afti4TSeL27H7ZE//GYBvoRxBP0Aj56M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TfKGny+3Xt2z/D0unH0lbVQe6p+g96EjKT1ti4U/MrovxaHIV+uiV/l8FJ3e0sFWjpne6m30JIBCSMdYfd1ad7DDE1giGDtL9kl82vSLFOLMvKrxUDblFrZj91gYZ8cbvFNUsBzyidkjgAi4Xt2oI9eRaERv7TeOIZC82GACRtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R2S15w9R; arc=none smtp.client-ip=74.125.224.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-63fbed0f71aso1060465d50.0
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:36:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762972613; x=1763577413; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZKQWigIGEVi0kLFXu6j/x0JtjaxFQvF5YS6wzVMmD9E=;
-        b=R2S15w9R9Yjsvyp5auWxvUg2kOOWxRS1s81NU9V8UQbUVn5zk1LWPh2G82Nf4G5jri
-         2y05p2YE1+tpkn241URtoQTL0et/R3uj//byArFYGoaxdDkt3cfW5ZvEjFNsaZ+onBDw
-         H8/NyFLBa6SrR3fA5zIteZ6my6CeRDHssLbyk0Ui14VzF4p+4NPEEB22enA27BgyelMU
-         qqdVeIFQeliJLEXQvJE5x9WfxrwtZ/NOYYy6jgjxYjlI1tfFhin01hX0n4BVtig0tQE1
-         DSvzUTCAHSFtMn4j9yO18yd/b+hyck1pSQESkzokb7BNX3lpFV2gb+AQWlDNnFhBuMFX
-         k6bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762972613; x=1763577413;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZKQWigIGEVi0kLFXu6j/x0JtjaxFQvF5YS6wzVMmD9E=;
-        b=jyorZsyohdaJriH9dQznzcF/vWKKeqZO+VSFGyYSRv/z0In80bcCT0+vWOQ783lXhT
-         wD69DqOBqBoH+syt5444vUfEQngd378+8qnV5ywsW+QP/8x6wW/1qnvSTxj0T3pXCIYh
-         JEA5nZnbYSVO1WBKsOwf176NYXp2Kb4QmJPlpaocwmLem1BKxzP6VcXwBs446h9FFvXn
-         iXAOU0XnDeXBAcK+KKaBSVaD5MDURAfD744w5m5skOaNQcicZek5biC6ma6dgNX/VicR
-         4UcLcMnUqcwVeSLEZzud8740L43ILlZnUtk34uie4lCMF42yugBur9l+/MFqKqXPsEMM
-         M61w==
-X-Forwarded-Encrypted: i=1; AJvYcCUkIJpJo8CB1QBQFfYIO9WvuZcYRSZXO4WmmjIrwTlm/Kca/LKBJmRz5gd+7UU8CKC3nlTA4pE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywl0hsIsYO2GMnLas9d/G6qX1dLLg51Jhb509dKAsPwRwPcNkhZ
-	1/VFa0ceXdyqImD2ZxbChUED3yST+GwejBxyFk6T4EFKrsz6OweoNxtp
-X-Gm-Gg: ASbGnctWAnVwzqeP4Ty1esjaFz5sGhsRlXBmGSzsQe4QgzSLW5RKt1lICGRALEEz4C9
-	PxD6E1lPYPrqWDWcu/xBHjQeyWirDF/IXqNl+ErAohKlkC93QTv7YBAYQ5XHcDcPyItGOEsQxuZ
-	q2bZG46f+iMPWdq3Q2QZ+Pz+ZkEhiRg7JTA4MFGy0OCct4By1XeFXFGv/D7HOlT4umouKEUi8x2
-	Lh741391So0TTIFdTRZXOozGhBbilvWNv9eno+NuJE9f/dgU03j05vStrspAtuQUec9fst/fnGF
-	se5u8BiqWpA78ccXj94osGqiMSho1SC1sq0DjMDdKK2WmOy6JIbUoljMH1FYrg7jt9edoBsvuyu
-	Anih5a36nG/7vr/InqJ8bAdf+25D1rw1RpzuL6im+iedW5/OoVT3UEEPrAWHHAi8Ys1z5sMhZSf
-	exxRDRJDDtYtyGEDO8cwJ4dr2hzD4uo1j4T5rIyyji3vWVlFk=
-X-Google-Smtp-Source: AGHT+IEjgyAE0Hs+bT3W8DaSfFbFucKGUg6EhDw/PlXyHWRqH89/fss68vyII/g3bMSTQTHDXA7oUA==
-X-Received: by 2002:a05:690e:c4d:b0:63e:1c4c:302b with SMTP id 956f58d0204a3-64101b89ee2mr3345793d50.47.1762972612652;
-        Wed, 12 Nov 2025 10:36:52 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:53::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-641015adefasm1191019d50.1.2025.11.12.10.36.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 10:36:51 -0800 (PST)
-Date: Wed, 12 Nov 2025 10:36:50 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v9 08/14] vsock: reject bad VSOCK_NET_MODE_LOCAL
- configuration for G2H
-Message-ID: <aRTTwuuXSz5CvNjt@devvm11784.nha0.facebook.com>
-References: <20251111-vsock-vmtest-v9-0-852787a37bed@meta.com>
- <20251111-vsock-vmtest-v9-8-852787a37bed@meta.com>
- <ureyl5b2tneivmlce4fdtmuoxgayfxwgewoypb6oyxeh7ozt3i@chygpr2uvtcp>
+	s=arc-20240116; t=1762973037; c=relaxed/simple;
+	bh=mhvf/Bmx2ne85fPfGbJezJxHzvRseqT3RO1gQQvgQrU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WWvphEc/3s30aOWkj16FYXVbLktXTJ5jaHByIgECl/2BPjq1yA/ivgWDQ26u7U9+mQbNpQmUX/xV6mjrnLmg3u1nDNekRg+pZsN4H/Et3pKFEi3FGHDE+cltikGuZqrbMpdufOzBmroaJ5HI1ucYltfvxdhY5LEVgaK8Ad0ECJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vJFor-0006t1-M6; Wed, 12 Nov 2025 19:43:49 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vJFor-0008CT-0k;
+	Wed, 12 Nov 2025 19:43:49 +0100
+Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id D917549E0C2;
+	Wed, 12 Nov 2025 18:43:48 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/11] pull-request: can-next 2025-11-12
+Date: Wed, 12 Nov 2025 19:40:19 +0100
+Message-ID: <20251112184344.189863-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ureyl5b2tneivmlce4fdtmuoxgayfxwgewoypb6oyxeh7ozt3i@chygpr2uvtcp>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Nov 12, 2025 at 03:21:39PM +0100, Stefano Garzarella wrote:
-> On Tue, Nov 11, 2025 at 10:54:50PM -0800, Bobby Eshleman wrote:
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > Reject setting VSOCK_NET_MODE_LOCAL with -EOPNOTSUPP if a G2H transport
-> > is operational. Additionally, reject G2H transport registration if there
-> > already exists a namespace in local mode.
-> > 
-> > G2H sockets break in local mode because the G2H transports don't support
-> > namespacing yet. The current approach is to coerce packets coming out of
-> > G2H transports into VSOCK_NET_MODE_GLOBAL mode, but it is not possible
-> > to coerce sockets in the same way because it cannot be deduced which
-> > transport will be used by the socket. Specifically, when bound to
-> > VMADDR_CID_ANY in a nested VM (both G2H and H2G available), it is not
-> > until a packet is received and matched to the bound socket that we
-> > assign the transport. This presents a chicken-and-egg problem, because
-> > we need the namespace to lookup the socket and resolve the transport,
-> > but we need the transport to know how to use the namespace during
-> > lookup.
-> > 
-> > For that reason, this patch prevents VSOCK_NET_MODE_LOCAL from being
-> > used on systems that support G2H, even nested systems that also have H2G
-> > transports.
-> > 
-> > Local mode is blocked based on detecting the presence of G2H devices
-> > (when possible, as hyperv is special). This means that a host kernel
-> > with G2H support compiled in (or has the module loaded), will still
-> > support local mode because there is no G2H (e.g., virtio-vsock) device
-> > detected. This enables using the same kernel in the host and in the
-> > guest, as we do in kselftest.
-> > 
-> > Systems with only namespace-aware transports (vhost-vsock, loopback) can
-> > still use both VSOCK_NET_MODE_GLOBAL and VSOCK_NET_MODE_LOCAL modes as
-> > intended.
-> > 
-> > The hyperv transport must be treated specially. Other G2H transports can
-> > can report presence of a device using get_local_cid(). When a device is
-> > present it returns a valid CID; otherwise, it returns VMADDR_CID_ANY.
-> > THe hyperv transport's get_local_cid() always returns VMADDR_CID_ANY,
-> > however, even when a device is present.
-> > 
-> > For that reason, this patch adds an always_block_local_mode flag to
-> > struct vsock_transport. When set to true, VSOCK_NET_MODE_LOCAL is
-> > blocked unconditionally whenever the transport is registered, regardless
-> > of device presence. When false, LOCAL mode is only blocked when
-> > get_local_cid() indicates a device is present (!= VMADDR_CID_ANY).
-> > 
-> > The hyperv transport sets this flag to true to unconditionally block
-> > local mode. Other G2H transports (virtio-vsock, vmci-vsock) leave it
-> > false and continue using device detection via get_local_cid() to block
-> > local mode.
-> > 
-> > These restrictions can be lifted in a future patch series when G2H
-> > transports gain namespace support.
-> 
-> IMO this commit should be before supporting namespaces in any device,
-> so we are sure we don't have commits where this can happen.
+Hello netdev-team,
 
-sgtm!
+this is a pull request of 11 patches for net-next/main.
 
-> > 
-> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> > ---
-> > include/net/af_vsock.h           |  8 +++++++
-> > net/vmw_vsock/af_vsock.c         | 45 +++++++++++++++++++++++++++++++++++++---
-> > net/vmw_vsock/hyperv_transport.c |  1 +
-> > 3 files changed, 51 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> > index cfd121bb5ab7..089c61105dda 100644
-> > --- a/include/net/af_vsock.h
-> > +++ b/include/net/af_vsock.h
-> > @@ -108,6 +108,14 @@ struct vsock_transport_send_notify_data {
-> > 
-> > struct vsock_transport {
-> > 	struct module *module;
-> > +	/* If true, block VSOCK_NET_MODE_LOCAL unconditionally when this G2H
-> > +	 * transport is registered. If false, only block LOCAL mode when
-> > +	 * get_local_cid() indicates a device is present (!= VMADDR_CID_ANY).
-> > +	 * Hyperv sets this true because it doesn't offer a callback that
-> > +	 * detects device presence. This only applies to G2H transports; H2G
-> > +	 * transports are unaffected.
-> > +	 */
-> > +	bool always_block_local_mode;
-> > 
-> > 	/* Initialize/tear-down socket. */
-> > 	int (*init)(struct vsock_sock *, struct vsock_sock *);
-> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> > index c0b5946bdc95..a2da1810b802 100644
-> > --- a/net/vmw_vsock/af_vsock.c
-> > +++ b/net/vmw_vsock/af_vsock.c
-> > @@ -91,6 +91,11 @@
-> >  *   and locked down by a namespace manager. The default is "global". The mode
-> >  *   is set per-namespace.
-> >  *
-> > + *   Note: LOCAL mode is only supported when using namespace-aware transports
-> > + *   (vhost-vsock, loopback). If a guest-to-host transport (virtio-vsock,
-> > + *   hyperv-vsock, vmci-vsock) is loaded, attempts to set LOCAL mode will fail
-> > + *   with EOPNOTSUPP, as these transports do not support per-namespace
-> > isolation.
-> > + *
-> >  *   The modes affect the allocation and accessibility of CIDs as follows:
-> >  *
-> >  *   - global - access and allocation are all system-wide
-> > @@ -2757,12 +2762,30 @@ static int vsock_net_mode_string(const struct ctl_table *table, int write,
-> > 		if (*lenp >= sizeof(data))
-> > 			return -EINVAL;
-> > 
-> > -		if (!strncmp(data, VSOCK_NET_MODE_STR_GLOBAL, sizeof(data)))
-> > +		if (!strncmp(data, VSOCK_NET_MODE_STR_GLOBAL, sizeof(data))) {
-> > 			mode = VSOCK_NET_MODE_GLOBAL;
-> > -		else if (!strncmp(data, VSOCK_NET_MODE_STR_LOCAL, sizeof(data)))
-> > +		} else if (!strncmp(data, VSOCK_NET_MODE_STR_LOCAL, sizeof(data))) {
-> > +			/* LOCAL mode is not supported when G2H transports
-> > +			 * (virtio-vsock, hyperv, vmci) are active, because
-> > +			 * these transports don't support namespaces. We must
-> > +			 * stay in GLOBAL mode to avoid bind/lookup mismatches.
-> > +			 *
-> > +			 * Check if G2H transport is present and either:
-> > +			 * 1. Has always_block_local_mode set (hyperv), OR
-> > +			 * 2. Has an actual device present (get_local_cid() != VMADDR_CID_ANY)
-> > +			 */
-> > +			mutex_lock(&vsock_register_mutex);
-> > +			if (transport_g2h &&
-> > +			    (transport_g2h->always_block_local_mode ||
-> > +			     transport_g2h->get_local_cid() != VMADDR_CID_ANY)) {
-> 
-> This seems almost like a hack. What about adding a new function in the
-> transports that tells us whether a device is present or not and implement it
-> in all of them?
-> 
-> Or a more specific function to check if the transport can work with local
-> mode (e.g.  netns_local_aware() or something like that - I'm not great with
-> nameming xD)
+The first 3 patches are by Vadim Fedorenko and convert the CAN drivers
+to use the ndo_hwtstamp callbacks.
 
-That sounds good to me, I probably prefer option 2 because I think it'll
-be simpler for the hyperv case.
+Maud Spierings contributes a patch for the mcp251x driver that
+converts it to use dev_err_probe().
 
-> 
-> > +				mutex_unlock(&vsock_register_mutex);
-> > +				return -EOPNOTSUPP;
-> > +			}
-> > +			mutex_unlock(&vsock_register_mutex);
-> 
-> What happen if the G2H is loaded here, just after we release the mutex?
-> 
-> I suspect there could be a race that we may fix postponing the unlock after
-> the vsock_net_write_mode() call.
-> 
-> WDYT?
+The next 6 patches target the mcp251xfd driver and are by Gregor
+Herburger and me. They add GPIO controller functionality to the
+driver.
 
-Oh good eye, yeah I think you are right. Writing the net mode should
-definitely be in the critical section.
+The final patch is by Chu Guangqing and fixes a typo in the bxcan
+driver.
 
-> 
-> > 			mode = VSOCK_NET_MODE_LOCAL;
-> > -		else
-> > +		} else {
-> > 			return -EINVAL;
-> > +		}
-> > 
-> > 		if (!vsock_net_write_mode(net, mode))
-> > 			return -EPERM;
-> > @@ -2909,6 +2932,7 @@ int vsock_core_register(const struct vsock_transport *t, int features)
-> > {
-> > 	const struct vsock_transport *t_h2g, *t_g2h, *t_dgram, *t_local;
-> > 	int err = mutex_lock_interruptible(&vsock_register_mutex);
-> > +	struct net *net;
-> > 
-> > 	if (err)
-> > 		return err;
-> > @@ -2931,6 +2955,21 @@ int vsock_core_register(const struct vsock_transport *t, int features)
-> > 			err = -EBUSY;
-> > 			goto err_busy;
-> > 		}
-> > +
-> > +		/* G2H sockets break in LOCAL mode namespaces because G2H transports
-> > +		 * don't support them yet. Block registering new G2H transports if we
-> > +		 * already have local mode namespaces on the system.
-> > +		 */
-> > +		rcu_read_lock();
-> > +		for_each_net_rcu(net) {
-> > +			if (vsock_net_mode(net) == VSOCK_NET_MODE_LOCAL) {
-> > +				rcu_read_unlock();
-> > +				err = -EOPNOTSUPP;
-> > +				goto err_busy;
-> > +			}
-> > +		}
-> > +		rcu_read_unlock();
-> > +
-> > 		t_g2h = t;
-> > 	}
-> > 
-> > diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
-> > index 432fcbbd14d4..ed48dd1ff19b 100644
-> > --- a/net/vmw_vsock/hyperv_transport.c
-> > +++ b/net/vmw_vsock/hyperv_transport.c
-> > @@ -835,6 +835,7 @@ int hvs_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
-> > 
-> > static struct vsock_transport hvs_transport = {
-> > 	.module                   = THIS_MODULE,
-> > +	.always_block_local_mode  = true,
-> > 
-> > 	.get_local_cid            = hvs_get_local_cid,
-> > 
-> > 
-> > -- 
-> > 2.47.3
-> > 
-> 
+regards,
+Marc
+
+---
+
+The following changes since commit ea7d0d60ebc9bddf3ad768557dfa1495bc032bf6:
+
+  Merge branch 'add-cn20k-nix-and-npa-contexts' (2025-10-30 10:44:12 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.19-20251112-2
+
+for you to fetch changes up to b305fbdad4ed7e66b5b3f76b15f71d05fa6af212:
+
+  can: bxcan: Fix a typo error for assign (2025-11-12 19:30:59 +0100)
+
+----------------------------------------------------------------
+linux-can-next-for-6.19-20251112-2
+
+----------------------------------------------------------------
+Chu Guangqing (1):
+      can: bxcan: Fix a typo error for assign
+
+Gregor Herburger (5):
+      can: mcp251xfd: utilize gather_write function for all non-CRC writes
+      can: mcp251xfd: add workaround for errata 5
+      can: mcp251xfd: only configure PIN1 when rx_int is set
+      can: mcp251xfd: add gpio functionality
+      dt-bindings: can: mcp251xfd: add gpio-controller property
+
+Marc Kleine-Budde (3):
+      Merge patch series "convert can drivers to use ndo_hwtstamp callbacks"
+      can: mcp251xfd: move chip sleep mode into runtime pm
+      Merge patch series "can: mcp251xfd: add gpio functionality"
+
+Maud Spierings (1):
+      can: mcp251x: mcp251x_can_probe(): use dev_err_probe()
+
+Vadim Fedorenko (3):
+      can: convert generic HW timestamp ioctl to ndo_hwtstamp callbacks
+      can: peak_canfd: convert to use ndo_hwtstamp callbacks
+      can: peak_usb: convert to use ndo_hwtstamp callbacks
+
+ .../bindings/net/can/microchip,mcp251xfd.yaml      |   5 +
+ drivers/net/can/bxcan.c                            |   2 +-
+ drivers/net/can/dev/dev.c                          |  45 ++--
+ drivers/net/can/esd/esd_402_pci-core.c             |   3 +-
+ drivers/net/can/kvaser_pciefd/kvaser_pciefd_core.c |   3 +-
+ drivers/net/can/peak_canfd/peak_canfd.c            |  35 ++-
+ drivers/net/can/spi/mcp251x.c                      |  31 ++-
+ drivers/net/can/spi/mcp251xfd/Kconfig              |   1 +
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c     | 284 +++++++++++++++++----
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c   | 114 +++++++--
+ drivers/net/can/spi/mcp251xfd/mcp251xfd.h          |   8 +
+ drivers/net/can/usb/etas_es58x/es58x_core.c        |   3 +-
+ drivers/net/can/usb/gs_usb.c                       |  20 +-
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c   |   3 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_core.c       |  35 ++-
+ include/linux/can/dev.h                            |   6 +-
+ 16 files changed, 446 insertions(+), 152 deletions(-)
 
