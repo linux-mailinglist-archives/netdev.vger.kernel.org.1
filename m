@@ -1,56 +1,59 @@
-Return-Path: <netdev+bounces-238127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44DF0C54700
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:26:12 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6B82C54769
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:33:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A4B71345B64
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 20:25:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F10A24E2595
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 20:26:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B652C0299;
-	Wed, 12 Nov 2025 20:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D566D2D8799;
+	Wed, 12 Nov 2025 20:25:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EQSFzRYI"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="27gLFXFC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0769C27B359;
-	Wed, 12 Nov 2025 20:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A952D5946;
+	Wed, 12 Nov 2025 20:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762979048; cv=none; b=WUEUiCHDgULlvrhjQkz8joz/aaDCW+iX/RpxYSMMJ6VC3RxYoLrwaB9zarS0Ce7Cq2zEBqGTrWCmcAm1Bj4aYBSfgjp2xulrqH7MFybG8oEuuthZlfi2IobECKusfDOH0IISb3bhosblvbRYHspK+/ENQ4pNy8iZaXE1Fk7wtfI=
+	t=1762979112; cv=none; b=gxnUPH4A6IPb8s1zsuiN+28U/SaQonX9RhyN4c3g1sao5bKgSrn390T5klgkzXJcpKD7JYm7g9QNegUETVhFlZCFSKcmv4wlQemEruJ06Q/Ifs7bYtsZHoFVDy15GJHtcliAL89AnZlyZ9QvSxOcDkicGmQpP2FVzny+zRBLybU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762979048; c=relaxed/simple;
-	bh=V7Viu4MHlojVqnJ12RNQpm9DyfbuvHsqxBrF6sBFiRg=;
+	s=arc-20240116; t=1762979112; c=relaxed/simple;
+	bh=6KfXkUqVjY+RCtK09kzENlQ2r8qM4kOq6ZPOrS3cBkg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d/iHEtJl9FNbcBubNNYpjYaULagGv9Wn1/vsBHuDVOQ8SwsKD9fdcHSfKViefOU3hXZH5hQ03EHtSyV3EDreiUxuEqF/F/4QWDKX/n2oFOYiPSoDJmcUy3lJ7tr99ivcJzA3lwIkZg1C+rKy583tehnscCEVbksGsoT7Ys3DLcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EQSFzRYI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B4F2C4CEF5;
-	Wed, 12 Nov 2025 20:24:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762979046;
-	bh=V7Viu4MHlojVqnJ12RNQpm9DyfbuvHsqxBrF6sBFiRg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EQSFzRYI9dEBuYpJYxBr7pyiPHx/cRWWYOs4tDdA1IqO6Q9EBpfwrad+jgXqFol9D
-	 iaMIDlxzzlOKr67fOuSvZ24a3yNhudTefFp/yVynWSV6rLVIkrEMlC/FeUvfwKP6iy
-	 CGN04HLsi/T1rbczApWoQocq2o559D8DAa1CCVkeZXzSwuktBoOB9ZIcVDTUkJksVY
-	 f4nUMiL4EwcshakDdw41t40mUPEMgSA6PCO4o15dsO9ELKWizawSnwcJsKybeKJnpe
-	 ObawuvA9V989S5mQKcQBT6GsKHSzzaoJHDo9O+tSpBtcqSBn22tpuDXFM9TdeBsnTA
-	 jJ2ORlThR19ZA==
-Date: Wed, 12 Nov 2025 12:22:25 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
-	linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1
- code instead of AF_ALG
-Message-ID: <20251112202225.GA1760@sol>
-References: <20250929194648.145585-1-ebiggers@kernel.org>
- <20251112121212.66e15a2d@phoenix>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WEguuCqcKwqDoLMyb2iK7xQspXJVpizjSuhum5aJpkcL06P13/Saw8OfPm8g/oyWh9LO73QcaF73XfPf7jIi/O5MSf7hejkS7ssl5ARF2zOPRmgJKCmhDdHQm63WWhR2XCNmO90Jv5aqCdtlE53X9RQWkEGKAC9FWVrLhqXFc3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=27gLFXFC; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=eG1+Z2nINsuHIGlm0g60wcqdI+VY4P5X3ca5A1mTeYE=; b=27gLFXFCSebaEeA2qySyyWyJ/7
+	u8s4mJAHk9vINJ/l1f2otICgKOsRu0OwD0UmZf76VRGer0K4ILgSnaIn1QpDgIJJEpaMNUt41U1r+
+	8hY+oUPXsVXI91FD5e7AC0PGLy3XkCCm3bUfFhQ9C/vlOcUCZc8r+bmq7Ow/8vvgVptU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vJHOn-00DmlJ-O7; Wed, 12 Nov 2025 21:25:01 +0100
+Date: Wed, 12 Nov 2025 21:25:01 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: shenwei.wang@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, eric@nelint.com, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 4/5] net: fec: remove rx_align from
+ fec_enet_private
+Message-ID: <116fd5af-048d-48e1-b2b8-3a42a061e02f@lunn.ch>
+References: <20251111100057.2660101-1-wei.fang@nxp.com>
+ <20251111100057.2660101-5-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,40 +62,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251112121212.66e15a2d@phoenix>
+In-Reply-To: <20251111100057.2660101-5-wei.fang@nxp.com>
 
-On Wed, Nov 12, 2025 at 12:12:12PM -0800, Stephen Hemminger wrote:
-> On Mon, 29 Sep 2025 12:46:48 -0700
-> Eric Biggers <ebiggers@kernel.org> wrote:
+On Tue, Nov 11, 2025 at 06:00:56PM +0800, Wei Fang wrote:
+> The rx_align was introduced by the commit 41ef84ce4c72 ("net: fec: change
+> FEC alignment according to i.mx6 sx requirement"). Because the i.MX6 SX
+> requires RX buffer must be 64 bytes alignment.
 > 
-> > diff --git a/lib/sha1.c b/lib/sha1.c
-> > new file mode 100644
-> > index 00000000..1aa8fd83
-> > --- /dev/null
-> > +++ b/lib/sha1.c
-> > @@ -0,0 +1,108 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/*
-> > + * SHA-1 message digest algorithm
-> > + *
-> > + * Copyright 2025 Google LLC
-> > + */
-> 
-> Not a big fan of having actual crypto in iproute2.
-> It creates even more technical debt.
-> Is there another crypto library that could be used?
+> Since the commit 95698ff6177b ("net: fec: using page pool to manage RX
+> buffers"), the address of the RX buffer is always the page address plus
+> 128 bytes, so RX buffer is always 64-byte aligned.
 
-Currently iproute2 doesn't depend on OpenSSL.  You can make it do that,
-if you want, and then you could use SHA-1 from there.  I suspect that
-doing that would be much more trouble than just adding this SHA-1 code.
+It is not obvious to me where this 128 bytes is added.
 
-If you happen to be planning to pull in OpenSSL as a dependency for
-other reasons, it might make sense then.
-
-> Better yet, is there a reason legacy BPF code needs to still exist
-> in current iproute2? When was the cut over.
-
-No idea.  That's a question for the BPF folks.
-
-- Eric
+	Andrew
 
