@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-237897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E971AC51549
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:24:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0916DC5151F
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:23:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 470473B2AE0
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:18:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 60A1F4F69B6
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD1A2FE06C;
-	Wed, 12 Nov 2025 09:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 249342FF160;
+	Wed, 12 Nov 2025 09:17:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12CC2DC76C
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 09:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6526D2FE06F
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 09:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762939075; cv=none; b=UgoCu8+4EpFvazH8YLRyOwblJ3Ikt1B8BK/VeGtAEeCLDIBeA0JPygdbG8OadSdwQ8LxVLoCYffJ2303tJdUSkacMMGREgQ4+AnqHLNX1xUhCqQPAVcvQ8l1pQcQqxkcc+iApe6Sw5fXiebQuLuKMZ1fybrJI2BX2MFQUYit/8c=
+	t=1762939076; cv=none; b=hMztOaK+uZ8FGDklj+G0hoi/ccbCAVxH54cYrZ24CGVN5bwhp3KKgp9YAAvdIRvuXGNWe0qga6Lh12vesUHHmHLZJnf7ArH9YbgQi0mKS1rJgEolSFLBxTYQGGyMpbj3mBs9fK1RqKyzLMYsGew79Ha6BRaEWe2k1kOj8wUQXL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762939075; c=relaxed/simple;
-	bh=oejafjFCDBu6kV4Ge+lZe21Z78CYydy7QzQpQzDpeqQ=;
+	s=arc-20240116; t=1762939076; c=relaxed/simple;
+	bh=yS5KxhWOIq8laBCLLPL8hY0CywZGKfbT5VvT4aOdYVQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DvHXpMv6XiRo1qb9nATBXmY/jOvze38RUw3Wc4f5kGgBdFGQlKkiyN1wf0PtyXdPWVdxCgCRnSkWvbCSMr9kVge8evSH0BRgdMJL8AyrOyfk9ET/vng+7IwJZA4/kW9SrQjBV/eIm75R7EBhzf2YSWusnjJO+1OfyVopz+6/t3s=
+	 MIME-Version; b=LXalYLLw59te+idx4r/D8f2rzaLTwiLVgWBOy3dqkDiqME744Pt9XXE86bXO/3NTUNP3+Yq02Oh8ij7oN3pDLSx+HCL9ZPuc9boUkUtwR/53vpo1I6lAK/i2X27sco5L59AM9keGnIC39SIMiGF9kUfmZ27ZkZdzgyxWTDT1nSs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,19 +33,19 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vJ6yw-0007VC-Na; Wed, 12 Nov 2025 10:17:38 +0100
+	id 1vJ6yz-0007VD-7Z; Wed, 12 Nov 2025 10:17:41 +0100
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vJ6yw-0003cf-0p;
+	id 1vJ6yw-0003ch-0y;
 	Wed, 12 Nov 2025 10:17:38 +0100
 Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 0223F49D9A1;
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 1370149D9A2;
 	Wed, 12 Nov 2025 09:17:38 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -53,14 +53,12 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
-	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>,
-	Manivannan Sadhasivam <mani@kernel.org>,
+	Chu Guangqing <chuguangqing@inspur.com>,
+	Dario Binacchi <dario.binacchi@amarulasolutions.com>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 10/11] dt-bindings: can: mcp251xfd: add gpio-controller property
-Date: Wed, 12 Nov 2025 10:13:50 +0100
-Message-ID: <20251112091734.74315-11-mkl@pengutronix.de>
+Subject: [PATCH net-next 11/11] can: bxcan: Fix a typo error for assign
+Date: Wed, 12 Nov 2025 10:13:51 +0100
+Message-ID: <20251112091734.74315-12-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251112091734.74315-1-mkl@pengutronix.de>
 References: <20251112091734.74315-1-mkl@pengutronix.de>
@@ -76,37 +74,31 @@ X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Gregor Herburger <gregor.herburger@ew.tq-group.com>
+From: Chu Guangqing <chuguangqing@inspur.com>
 
-The mcp251xfd has two pins that can be used as gpio. Add gpio-controller
-property to binding description.
+Fix the spelling error of "assign".
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Signed-off-by: Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>
-Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
-Link: https://patch.msgid.link/20251001091006.4003841-7-viken.dadhaniya@oss.qualcomm.com
+Signed-off-by: Chu Guangqing <chuguangqing@inspur.com>
+Reviewed-by: Dario Binacchi <dario.binacchi@amarulasolutions.com>
+Link: https://patch.msgid.link/20251103074009.4708-1-chuguangqing@inspur.com
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- .../devicetree/bindings/net/can/microchip,mcp251xfd.yaml     | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/net/can/bxcan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml b/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml
-index c155c9c6db39..2d13638ebc6a 100644
---- a/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml
-+++ b/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml
-@@ -49,6 +49,11 @@ properties:
-       Must be half or less of "clocks" frequency.
-     maximum: 20000000
+diff --git a/drivers/net/can/bxcan.c b/drivers/net/can/bxcan.c
+index 0b579e7bb3b6..baf494d20bef 100644
+--- a/drivers/net/can/bxcan.c
++++ b/drivers/net/can/bxcan.c
+@@ -227,7 +227,7 @@ static void bxcan_enable_filters(struct bxcan_priv *priv, enum bxcan_cfg cfg)
+ 	 * mask mode with 32 bits width.
+ 	 */
  
-+  gpio-controller: true
-+
-+  "#gpio-cells":
-+    const: 2
-+
- required:
-   - compatible
-   - reg
+-	/* Enter filter initialization mode and assing filters to CAN
++	/* Enter filter initialization mode and assign filters to CAN
+ 	 * controllers.
+ 	 */
+ 	regmap_update_bits(priv->gcan, BXCAN_FMR_REG,
 -- 
 2.51.0
 
