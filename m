@@ -1,96 +1,94 @@
-Return-Path: <netdev+bounces-238082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76D13C53DBA
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:08:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6244C53DCC
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:11:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3526D3BFFFF
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:00:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 698124E4CCD
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:04:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142D934A78C;
-	Wed, 12 Nov 2025 17:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB90F347FED;
+	Wed, 12 Nov 2025 18:04:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q1B1zsBv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m1bO5TAF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C155134846A
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 17:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0CE33CEA1
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 18:04:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762970386; cv=none; b=ClgWpHkyh+H+pyK/q5ul2F0UY+cdCU2t11H5gDg0W6UlwA4Epio97RlAEau6F8Wm8JOmjg38sb6dtltKNJSiZKtXZ3fyMM3hn5b4AbEOHKWWXhWYtMJdvvwjKEGjZCL75I3DFoNKOHEENlcJeFmyLZVxg9/q9yrVt7UZi3de8j4=
+	t=1762970677; cv=none; b=Urx4HboCJQnCIMdDq22CubCw+m4pV2MLdurskLJQFnpyrU0plGplf40TTzJzavpIBYDPGLyj/8KI+t73Ry2vpJwIDWCcpW/BJOnExtu6FjtkRWjU6HY/28GMaB+Ng1HcZWpXP3UA6vUHU6EMvjpI5rbfXCMvFQ9gIzYHvfjInao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762970386; c=relaxed/simple;
-	bh=vWtoONmZ0VwNnaTswqjwnWUh3qFcpVePNilMMxFd7K4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rj3S/0fswCjptkQpU1deKgue6OZRGJfcVDslckRs0yGhn7u41SHA1yGr1z8hzPUEagboJtR7ndJK19dpgoLO28r5tanKlquyp2HrntdyQQsBWeDGfyEpRU26SB4sWkb2x0IKxtlHLjcNfFethz+lzzpaE5BLKwelSghTKV5rN7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q1B1zsBv; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1762970677; c=relaxed/simple;
+	bh=35PnpAEJSKZMmmhjKvYkQ215RwpMHnVFMt8P/XdW7lY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wf/ZxC+whnT7nHaJcxkCRqisdGILM/cS49QiAJdxqbw4alcJwM4JWkkm5OGGcU+dTSZpIXI+tVOTfXYo6i0afXDOr7MME3R8HeI41hbf/0A2pC02t+Gyla1Xy30992veFRAcbkh6QJAVwYa+q8ZS1b2VFqnTbILkXfI+pmulkns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m1bO5TAF; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-29516a36affso13619345ad.3
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 09:59:43 -0800 (PST)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-429c7e438a8so983663f8f.2
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:04:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762970383; x=1763575183; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p2KNkDUYof//Po5k7JK7xfFxYMV/PYhc2dbTDebqhi4=;
-        b=Q1B1zsBvlUjxZk/yG3RAaftmkQh89VT2/tt42MLX51AV5wwe6uiJrA547hcJG5Ic1s
-         YHqVOjj4jSDzjoGypnMBfPYJlMDnItI4pAewe9kmWnlCOUvusidBUesglOHAA7P1SIvn
-         GG8kRNKltaRskdg259aF+emTNtmgI3HAjyBvGBTXEEibEXsqaOez6Ww7zUj7barO50Qh
-         iIJ/ZBkv+JaYiiq6+Y9xgtRqRsNW5PkM3/biupSVYX8gPrvyDHQDbI0NNvR/XLpeVwUT
-         u6uDd/0DAG8ICwyiA16WL0En4u+/RbKzhv+IsKkrv8SxcekUS708QkpEYFcfqnSsyFtZ
-         9KCA==
+        d=gmail.com; s=20230601; t=1762970674; x=1763575474; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cjs87PRrJ2JNr9G8+c1Tv8wLpCpPRdNvapIiVHZg5Aw=;
+        b=m1bO5TAForDqWwyl1V9RFjfiFrlWeTvXxSIR5gY7VLAC0xHlzRxWjmHt9cClIPx50Y
+         rC1EX/qXz9tkQGs1THJ5Ir9gGVhGbCGY/OI+IPwhp8N6vBbsrW14WyDJY1KqR9JKElW2
+         f79vAWgNzB7trBK5zghYNUaDIhQzavMep4UF2unjjRUnvAdLvbtdrAahlCX3UWzMeBfi
+         hnB/aXoyk8NuWgbQzT1YyM3ySApxgiLnZMhHlevWfLExlG+ehHaVQ7EfPbA5a1+/uCzJ
+         jvOuB+gT+ZpiALqhlpGN02SvSTh+1lHBA+JwCc9FL8zX3RqWNLqmrLY6bNmbr1BixVGh
+         q65g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762970383; x=1763575183;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=p2KNkDUYof//Po5k7JK7xfFxYMV/PYhc2dbTDebqhi4=;
-        b=RtYS5NCSx126s4C54+48rJAzmsHQbJm2TP6i4/VBHpak+C/IUQWY4dtMKcqFaPOzjE
-         aFNa6kIkfYGNIm8Ej71Se8evNGoqoVDYt8AtRr5XCoUJY8BDKOP3auPnO56G8QO8FYi5
-         dlbtZBtTMxEfSD/RlTDvTDWoA2u3lSxSLtZwTZk8xJfvlvMcGYSifdgN/DmOd1SuGFgw
-         WFjhu62zEtxZphuKj5/J1SDRriowgLg6Kvk1EHShAfgEnUhyyFvoOa4czuLcc8FeM+Zp
-         NIUkY4VctcKxsZeHHa3LROwimAFfkzMPQGHoTt9+yyW8Wa9Rz5KsATQmO2Yp37KomYDQ
-         ZKhw==
-X-Gm-Message-State: AOJu0YyQsRf1dqNgo4VMgmrdJr8JdbMlDPcLd/6MomZrMIOKNq6fjzXw
-	21CyFU5zdIK0rkCb3SWyJZuJ162CXNRKC8m9SR03NZPs03X2eMddcBto
-X-Gm-Gg: ASbGncvpo09Uehoe93i6tIhfvkAnOTXbI+d9pFyG+uOEJtu3tBjGIrHDmAgzulHRrg7
-	qI4FWpbgubTxDVix5oUUSiUFowEkrDvpW3WazhbYnKO0Xl2qtNyxiZT8goJP4gZo38XhK/lNjY5
-	ZEgmdcwFsLxknWBGga1XrLXugL1R8aNpU+FyhD2P4AdkV/veIQKGiOisE7OTEpKApyKlf1enHLj
-	mf0pF+Aqx7taE7Qu9y4vautJr1bi9w87ERHlLGSTKjcfqKqNFeE2TRE4B7nT1NGhsh2tIV9/5C3
-	gSBRekEmHqEpdseKdQ6akDwzNy9edtScZP77ib1knTG+/iQbUZeIH/HrsuTY3i01Vx8hIAsFwnl
-	iNh5Pyf4mz0pyzK+sa2uTEZeUCu4yAfgXsQOPgsLs4qQuvToER4tn9t2iIQ3wF3ImKio=
-X-Google-Smtp-Source: AGHT+IE56+DFtiFyrHKDmwXqenetsq3RDmK09qx+VvFi/9C2zX2mxZequod8bOHOZpD2uxCWjFb0fg==
-X-Received: by 2002:a17:902:ce04:b0:297:f09a:51cd with SMTP id d9443c01a7336-2984ed3e87dmr46142885ad.14.1762970382879;
-        Wed, 12 Nov 2025 09:59:42 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:41::])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bbf165f99e6sm3477147a12.19.2025.11.12.09.59.42
+        d=1e100.net; s=20230601; t=1762970674; x=1763575474;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cjs87PRrJ2JNr9G8+c1Tv8wLpCpPRdNvapIiVHZg5Aw=;
+        b=TktJTEXwulifFnXLuzYoIMtoP/kBrtE6+cj0hxBjee95W8x+NBb7SFGQTH//0E4NUQ
+         0IcYoauzhN5vRGG0ghi+SPmY2O9SYPsIDbFlO/xq7nBN0ZiN+gNETPv53K4pW/Ej736M
+         nrCJEbz7bcvQaylUBpIsnScCrAGvFmhbm4hocZugwS0a4sVy24e1DfResF2vD//wcUfl
+         1We/8foZHhFkZbJ60HZoWqO8jtLwpujoEePXfota6Bu1GRRTXlHbip3m9KFI13WUuY26
+         Kc8jkaRCMwlIykvwU68g3M0agjj1/HB70v57Jv+OQQgy4d6mOR6yEqs5Gzb1AqV4vHFa
+         D9rA==
+X-Gm-Message-State: AOJu0YxkD4Hii1n5a5jMKJZT+xQCN1z4xr6rmJqxNcQbukVUpS6FIzOS
+	DiNu4lPFDML52iTXgGeSwk/tjKht46RGYSBF5P9+CBjTyf453j3aTECAI/tV9cX5
+X-Gm-Gg: ASbGncujVuKJwdRlJbDIINGic6lFE3+d/2NiW7X+etzzwVQ6yCe7CkEtTZWAkN87PWv
+	l6gk7gkEGrPTgjlUofH+bPB6iAt9WdTSKnxgmIyCT0ccIZqdFpII0SsEA9r6bzjbugvs+KpBlFh
+	u0fRQEtQt5SovqU3fFkSI5Rtd0eO0IJWOVltRPWItVhpUdJsvf8briJVZiccmmOTIZr+cyufZFg
+	kOVujNwpAxlEDb2KWxnmwoQbRioOirGrG+KDzP4VZ8o9zGj65Z7rZoFuKgiRMYJqRl7VSNzoEt/
+	5cETGZmu1UEaTNN8fbEPDV3qeuB7YM0ISFV2st3LDE3NxjKz+xAbtgfmM1XLw4l+kJQfNllaAjO
+	Ah4ZcSKi/gI+0t1Idy9+Hv9ob7o2KJvHRDDT29zxTLJLFH6HbXd2vhkpLU2rGMMXgaMmWW8qo
+X-Google-Smtp-Source: AGHT+IHeyVjIewk2nxGI2f/Yo9rnAFD++Txt9J+ZHHi3v+ztQpzxrSPqRixtOX/wT6+GIL73xHFCeQ==
+X-Received: by 2002:a05:6000:26c7:b0:42b:3ab7:b8b9 with SMTP id ffacd0b85a97d-42b4bb981f9mr3973943f8f.20.1762970673365;
+        Wed, 12 Nov 2025 10:04:33 -0800 (PST)
+Received: from localhost ([2a03:2880:31ff:3::])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b316775f2sm25285170f8f.16.2025.11.12.10.04.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 09:59:42 -0800 (PST)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	martin.lau@kernel.org,
-	memxor@gmail.com,
-	kpsingh@kernel.org,
-	yonghong.song@linux.dev,
-	song@kernel.org,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH RFC bpf-next 2/2] bpf: Use kmalloc_nolock() in local storage unconditionally
-Date: Wed, 12 Nov 2025 09:59:36 -0800
-Message-ID: <20251112175939.2365295-3-ameryhung@gmail.com>
+        Wed, 12 Nov 2025 10:04:32 -0800 (PST)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: alexanderduyck@fb.com,
+	almasrymina@google.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	kernel-team@meta.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@armlinux.org.uk,
+	mohsin.bashr@gmail.com,
+	pabeni@redhat.com,
+	rmk+kernel@armlinux.org.uk
+Subject: [PATCH net-next] eth: fbnic: Configure RDE settings for pause frame
+Date: Wed, 12 Nov 2025 10:04:27 -0800
+Message-ID: <20251112180427.2904990-1-mohsin.bashr@gmail.com>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251112175939.2365295-1-ameryhung@gmail.com>
-References: <20251112175939.2365295-1-ameryhung@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,589 +97,145 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Simplify local storage and selem memory alloc/free paths by switching to
-kmalloc_nolock unconditionally.
+fbnic supports pause frames. When pause frames are enabled presumably
+user expects lossless operation from the NIC. Make sure we configure
+RDE (Rx DMA Engine) to DROP_NEVER mode to avoid discards due to delays
+in fetching Rx descriptors from the host.
 
-While it is okay to call bpf_obj_free_fields() immediately in
-bpf_selem_free() when reuse_now == true, it is kept only in
-bpf_selem_free_rcu() to simplify the code. This requires rcu_barrier()
-to be called unconditionally in bpf_local_storage_map_free() since
-bpf_obj_free_fields() may also be called from rcu callbacks.
+While at it enable DROP_NEVER when NIC only has a single queue
+configured. In this case the NIC acts as a FIFO so there's no risk
+of head-of-line blocking other queues by making RDE wait. If pause
+is disabled this just moves the packet loss from the DMA engine to
+the Rx buffer.
 
-In addition, remove the argument, smap, from bpf_selem_free() and rely
-on SDATA(selem)->smap for bpf_obj_free_fields(). This requires
-initializing SDATA(selem)->smap earlier during bpf_selem_alloc() as
-bpf_local_storage_update() can allocate an selem and free it without
-ever linking it to a map.
+Remove redundant call to fbnic_config_drop_mode_rcq(), introduced by
+commit 0cb4c0a13723 ("eth: fbnic: Implement Rx queue
+alloc/start/stop/free"). This call does not add value as
+fbnic_enable_rcq(), which is called immediately afterward, already
+handles this.
 
-Finally, clean up and update comments. Note that, we already free selem
-after an RCU grace period in bpf_local_storage_update() when
-bpf_local_storage_alloc() failed the cmpxchg since commit c0d63f309186
-("bpf: Add bpf_selem_free()").
-
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
+Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/linux/bpf_local_storage.h |  10 +-
- kernel/bpf/bpf_cgrp_storage.c     |   2 +-
- kernel/bpf/bpf_inode_storage.c    |   2 +-
- kernel/bpf/bpf_local_storage.c    | 261 ++++--------------------------
- kernel/bpf/bpf_task_storage.c     |   2 +-
- net/core/bpf_sk_storage.c         |   4 +-
- 6 files changed, 41 insertions(+), 240 deletions(-)
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  2 ++
+ .../net/ethernet/meta/fbnic/fbnic_phylink.c   |  8 +++++-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 26 ++++++++++++++++---
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  1 +
+ 4 files changed, 32 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/bpf_local_storage.h b/include/linux/bpf_local_storage.h
-index 3663eabcc3ff..3c35f0b9b86c 100644
---- a/include/linux/bpf_local_storage.h
-+++ b/include/linux/bpf_local_storage.h
-@@ -53,9 +53,6 @@ struct bpf_local_storage_map {
- 	u32 bucket_log;
- 	u16 elem_size;
- 	u16 cache_idx;
--	struct bpf_mem_alloc selem_ma;
--	struct bpf_mem_alloc storage_ma;
--	bool bpf_ma;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+index b0a87c57910f..e6ca23a9957d 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+@@ -73,6 +73,8 @@ struct fbnic_net {
+ 
+ 	/* Time stamping filter config */
+ 	struct kernel_hwtstamp_config hwtstamp_config;
++
++	bool tx_pause;
  };
  
- struct bpf_local_storage_data {
-@@ -129,8 +126,7 @@ int bpf_local_storage_map_alloc_check(union bpf_attr *attr);
- 
- struct bpf_map *
- bpf_local_storage_map_alloc(union bpf_attr *attr,
--			    struct bpf_local_storage_cache *cache,
--			    bool bpf_ma);
-+			    struct bpf_local_storage_cache *cache);
- 
- void __bpf_local_storage_insert_cache(struct bpf_local_storage *local_storage,
- 				      struct bpf_local_storage_map *smap,
-@@ -186,9 +182,7 @@ struct bpf_local_storage_elem *
- bpf_selem_alloc(struct bpf_local_storage_map *smap, void *owner, void *value,
- 		bool swap_uptrs, gfp_t gfp_flags);
- 
--void bpf_selem_free(struct bpf_local_storage_elem *selem,
--		    struct bpf_local_storage_map *smap,
--		    bool reuse_now);
-+void bpf_selem_free(struct bpf_local_storage_elem *selem, bool reuse_now);
- 
- int
- bpf_local_storage_alloc(void *owner,
-diff --git a/kernel/bpf/bpf_cgrp_storage.c b/kernel/bpf/bpf_cgrp_storage.c
-index 0687a760974a..87d50b6b3673 100644
---- a/kernel/bpf/bpf_cgrp_storage.c
-+++ b/kernel/bpf/bpf_cgrp_storage.c
-@@ -146,7 +146,7 @@ static int notsupp_get_next_key(struct bpf_map *map, void *key, void *next_key)
- 
- static struct bpf_map *cgroup_storage_map_alloc(union bpf_attr *attr)
+ int __fbnic_open(struct fbnic_net *fbn);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
+index 7ce3fdd25282..c9ed13e37d62 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
+@@ -36,8 +36,13 @@ int fbnic_phylink_set_pauseparam(struct net_device *netdev,
+ 				 struct ethtool_pauseparam *pause)
  {
--	return bpf_local_storage_map_alloc(attr, &cgroup_cache, true);
-+	return bpf_local_storage_map_alloc(attr, &cgroup_cache);
- }
- 
- static void cgroup_storage_map_free(struct bpf_map *map)
-diff --git a/kernel/bpf/bpf_inode_storage.c b/kernel/bpf/bpf_inode_storage.c
-index e54cce2b9175..30934f6a66a4 100644
---- a/kernel/bpf/bpf_inode_storage.c
-+++ b/kernel/bpf/bpf_inode_storage.c
-@@ -181,7 +181,7 @@ static int notsupp_get_next_key(struct bpf_map *map, void *key,
- 
- static struct bpf_map *inode_storage_map_alloc(union bpf_attr *attr)
- {
--	return bpf_local_storage_map_alloc(attr, &inode_cache, false);
-+	return bpf_local_storage_map_alloc(attr, &inode_cache);
- }
- 
- static void inode_storage_map_free(struct bpf_map *map)
-diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
-index 400bdf8a3eb2..678bbf45eb57 100644
---- a/kernel/bpf/bpf_local_storage.c
-+++ b/kernel/bpf/bpf_local_storage.c
-@@ -80,23 +80,12 @@ bpf_selem_alloc(struct bpf_local_storage_map *smap, void *owner,
- 	if (mem_charge(smap, owner, smap->elem_size))
- 		return NULL;
- 
--	if (smap->bpf_ma) {
--		selem = bpf_mem_cache_alloc_flags(&smap->selem_ma, gfp_flags);
--		if (selem)
--			/* Keep the original bpf_map_kzalloc behavior
--			 * before started using the bpf_mem_cache_alloc.
--			 *
--			 * No need to use zero_map_value. The bpf_selem_free()
--			 * only does bpf_mem_cache_free when there is
--			 * no other bpf prog is using the selem.
--			 */
--			memset(SDATA(selem)->data, 0, smap->map.value_size);
--	} else {
--		selem = bpf_map_kzalloc(&smap->map, smap->elem_size,
--					gfp_flags | __GFP_NOWARN);
--	}
-+	selem = bpf_map_kmalloc_nolock(&smap->map, smap->elem_size, gfp_flags, NUMA_NO_NODE);
- 
- 	if (selem) {
-+		memset(selem, 0, smap->elem_size);
-+		RCU_INIT_POINTER(SDATA(selem)->smap, smap);
+ 	struct fbnic_net *fbn = netdev_priv(netdev);
++	int err;
 +
- 		if (value) {
- 			/* No need to call check_and_init_map_value as memory is zero init */
- 			copy_map_value(&smap->map, SDATA(selem)->data, value);
-@@ -111,96 +100,35 @@ bpf_selem_alloc(struct bpf_local_storage_map *smap, void *owner,
- 	return NULL;
++	err = phylink_ethtool_set_pauseparam(fbn->phylink, pause);
++	if (!err)
++		fbn->tx_pause = pause->tx_pause ? true : false;
+ 
+-	return phylink_ethtool_set_pauseparam(fbn->phylink, pause);
++	return err;
  }
  
--/* rcu tasks trace callback for bpf_ma == false */
--static void __bpf_local_storage_free_trace_rcu(struct rcu_head *rcu)
-+static void bpf_local_storage_free_rcu(struct rcu_head *rcu)
+ static void
+@@ -208,6 +213,7 @@ fbnic_phylink_mac_link_up(struct phylink_config *config,
+ 	struct fbnic_net *fbn = netdev_priv(netdev);
+ 	struct fbnic_dev *fbd = fbn->fbd;
+ 
++	fbnic_config_drop_mode(fbn, tx_pause);
+ 	fbd->mac->link_up(fbd, tx_pause, rx_pause);
+ }
+ 
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index 57e18a68f5d2..c2d7b67fec28 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -2574,11 +2574,15 @@ static void fbnic_enable_bdq(struct fbnic_ring *hpq, struct fbnic_ring *ppq)
+ }
+ 
+ static void fbnic_config_drop_mode_rcq(struct fbnic_napi_vector *nv,
+-				       struct fbnic_ring *rcq)
++				       struct fbnic_ring *rcq, bool tx_pause)
  {
- 	struct bpf_local_storage *local_storage;
++	struct fbnic_net *fbn = netdev_priv(nv->napi.dev);
+ 	u32 drop_mode, rcq_ctl;
  
--	/* If RCU Tasks Trace grace period implies RCU grace period, do
--	 * kfree(), else do kfree_rcu().
--	 */
- 	local_storage = container_of(rcu, struct bpf_local_storage, rcu);
--	if (rcu_trace_implies_rcu_gp())
--		kfree(local_storage);
--	else
--		kfree_rcu(local_storage, rcu);
-+	kfree_nolock(local_storage);
- }
- 
--static void bpf_local_storage_free_rcu(struct rcu_head *rcu)
-+static void bpf_local_storage_free_trace_rcu(struct rcu_head *rcu)
- {
- 	struct bpf_local_storage *local_storage;
- 
- 	local_storage = container_of(rcu, struct bpf_local_storage, rcu);
--	bpf_mem_cache_raw_free(local_storage);
--}
--
--static void bpf_local_storage_free_trace_rcu(struct rcu_head *rcu)
--{
- 	if (rcu_trace_implies_rcu_gp())
- 		bpf_local_storage_free_rcu(rcu);
- 	else
- 		call_rcu(rcu, bpf_local_storage_free_rcu);
- }
- 
--/* Handle bpf_ma == false */
--static void __bpf_local_storage_free(struct bpf_local_storage *local_storage,
--				     bool vanilla_rcu)
--{
--	if (vanilla_rcu)
--		kfree_rcu(local_storage, rcu);
--	else
--		call_rcu_tasks_trace(&local_storage->rcu,
--				     __bpf_local_storage_free_trace_rcu);
--}
--
- static void bpf_local_storage_free(struct bpf_local_storage *local_storage,
--				   struct bpf_local_storage_map *smap,
--				   bool bpf_ma, bool reuse_now)
-+				   bool reuse_now)
- {
- 	if (!local_storage)
- 		return;
- 
--	if (!bpf_ma) {
--		__bpf_local_storage_free(local_storage, reuse_now);
--		return;
--	}
--
--	if (!reuse_now) {
--		call_rcu_tasks_trace(&local_storage->rcu,
--				     bpf_local_storage_free_trace_rcu);
--		return;
--	}
--
--	if (smap)
--		bpf_mem_cache_free(&smap->storage_ma, local_storage);
--	else
--		/* smap could be NULL if the selem that triggered
--		 * this 'local_storage' creation had been long gone.
--		 * In this case, directly do call_rcu().
--		 */
-+	if (reuse_now)
- 		call_rcu(&local_storage->rcu, bpf_local_storage_free_rcu);
--}
--
--/* rcu tasks trace callback for bpf_ma == false */
--static void __bpf_selem_free_trace_rcu(struct rcu_head *rcu)
--{
--	struct bpf_local_storage_elem *selem;
--
--	selem = container_of(rcu, struct bpf_local_storage_elem, rcu);
--	if (rcu_trace_implies_rcu_gp())
--		kfree(selem);
--	else
--		kfree_rcu(selem, rcu);
--}
--
--/* Handle bpf_ma == false */
--static void __bpf_selem_free(struct bpf_local_storage_elem *selem,
--			     bool vanilla_rcu)
--{
--	if (vanilla_rcu)
--		kfree_rcu(selem, rcu);
- 	else
--		call_rcu_tasks_trace(&selem->rcu, __bpf_selem_free_trace_rcu);
-+		call_rcu_tasks_trace(&local_storage->rcu, bpf_local_storage_free_trace_rcu);
- }
- 
- static void bpf_selem_free_rcu(struct rcu_head *rcu)
-@@ -215,7 +143,7 @@ static void bpf_selem_free_rcu(struct rcu_head *rcu)
- 	migrate_disable();
- 	bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
- 	migrate_enable();
--	bpf_mem_cache_raw_free(selem);
-+	kfree_nolock(selem);
- }
- 
- static void bpf_selem_free_trace_rcu(struct rcu_head *rcu)
-@@ -227,43 +155,17 @@ static void bpf_selem_free_trace_rcu(struct rcu_head *rcu)
- }
- 
- void bpf_selem_free(struct bpf_local_storage_elem *selem,
--		    struct bpf_local_storage_map *smap,
- 		    bool reuse_now)
- {
--	if (!smap->bpf_ma) {
--		/* Only task storage has uptrs and task storage
--		 * has moved to bpf_mem_alloc. Meaning smap->bpf_ma == true
--		 * for task storage, so this bpf_obj_free_fields() won't unpin
--		 * any uptr.
--		 */
--		bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
--		__bpf_selem_free(selem, reuse_now);
--		return;
--	}
--
--	if (reuse_now) {
--		/* reuse_now == true only happens when the storage owner
--		 * (e.g. task_struct) is being destructed or the map itself
--		 * is being destructed (ie map_free). In both cases,
--		 * no bpf prog can have a hold on the selem. It is
--		 * safe to unpin the uptrs and free the selem now.
--		 */
--		bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
--		/* Instead of using the vanilla call_rcu(),
--		 * bpf_mem_cache_free will be able to reuse selem
--		 * immediately.
--		 */
--		bpf_mem_cache_free(&smap->selem_ma, selem);
--		return;
--	}
--
--	call_rcu_tasks_trace(&selem->rcu, bpf_selem_free_trace_rcu);
-+	if (reuse_now)
-+		call_rcu(&selem->rcu, bpf_selem_free_rcu);
+-	drop_mode = FBNIC_QUEUE_RDE_CTL0_DROP_IMMEDIATE;
++	if (!tx_pause && fbn->num_rx_queues > 1)
++		drop_mode = FBNIC_QUEUE_RDE_CTL0_DROP_IMMEDIATE;
 +	else
-+		call_rcu_tasks_trace(&selem->rcu, bpf_selem_free_trace_rcu);
++		drop_mode = FBNIC_QUEUE_RDE_CTL0_DROP_NEVER;
+ 
+ 	/* Specify packet layout */
+ 	rcq_ctl = FIELD_PREP(FBNIC_QUEUE_RDE_CTL0_DROP_MODE_MASK, drop_mode) |
+@@ -2588,6 +2592,21 @@ static void fbnic_config_drop_mode_rcq(struct fbnic_napi_vector *nv,
+ 	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RDE_CTL0, rcq_ctl);
  }
  
- static void bpf_selem_free_list(struct hlist_head *list, bool reuse_now)
- {
- 	struct bpf_local_storage_elem *selem;
--	struct bpf_local_storage_map *smap;
- 	struct hlist_node *n;
- 
- 	/* The "_safe" iteration is needed.
-@@ -271,10 +173,8 @@ static void bpf_selem_free_list(struct hlist_head *list, bool reuse_now)
- 	 * but bpf_selem_free will use the selem->rcu_head
- 	 * which is union-ized with the selem->free_node.
- 	 */
--	hlist_for_each_entry_safe(selem, n, list, free_node) {
--		smap = rcu_dereference_check(SDATA(selem)->smap, bpf_rcu_lock_held());
--		bpf_selem_free(selem, smap, reuse_now);
--	}
-+	hlist_for_each_entry_safe(selem, n, list, free_node)
-+		bpf_selem_free(selem, reuse_now);
- }
- 
- /* local_storage->lock must be held and selem->local_storage == local_storage.
-@@ -334,47 +234,11 @@ static bool bpf_selem_unlink_storage_nolock(struct bpf_local_storage *local_stor
- 	return free_local_storage;
- }
- 
--static bool check_storage_bpf_ma(struct bpf_local_storage *local_storage,
--				 struct bpf_local_storage_map *storage_smap,
--				 struct bpf_local_storage_elem *selem)
--{
--
--	struct bpf_local_storage_map *selem_smap;
--
--	/* local_storage->smap may be NULL. If it is, get the bpf_ma
--	 * from any selem in the local_storage->list. The bpf_ma of all
--	 * local_storage and selem should have the same value
--	 * for the same map type.
--	 *
--	 * If the local_storage->list is already empty, the caller will not
--	 * care about the bpf_ma value also because the caller is not
--	 * responsible to free the local_storage.
--	 */
--
--	if (storage_smap)
--		return storage_smap->bpf_ma;
--
--	if (!selem) {
--		struct hlist_node *n;
--
--		n = rcu_dereference_check(hlist_first_rcu(&local_storage->list),
--					  bpf_rcu_lock_held());
--		if (!n)
--			return false;
--
--		selem = hlist_entry(n, struct bpf_local_storage_elem, snode);
--	}
--	selem_smap = rcu_dereference_check(SDATA(selem)->smap, bpf_rcu_lock_held());
--
--	return selem_smap->bpf_ma;
--}
--
- static void bpf_selem_unlink_storage(struct bpf_local_storage_elem *selem,
- 				     bool reuse_now)
- {
--	struct bpf_local_storage_map *storage_smap;
- 	struct bpf_local_storage *local_storage;
--	bool bpf_ma, free_local_storage = false;
-+	bool free_local_storage = false;
- 	HLIST_HEAD(selem_free_list);
- 	unsigned long flags;
- 
-@@ -384,9 +248,6 @@ static void bpf_selem_unlink_storage(struct bpf_local_storage_elem *selem,
- 
- 	local_storage = rcu_dereference_check(selem->local_storage,
- 					      bpf_rcu_lock_held());
--	storage_smap = rcu_dereference_check(local_storage->smap,
--					     bpf_rcu_lock_held());
--	bpf_ma = check_storage_bpf_ma(local_storage, storage_smap, selem);
- 
- 	raw_spin_lock_irqsave(&local_storage->lock, flags);
- 	if (likely(selem_linked_to_storage(selem)))
-@@ -397,7 +258,7 @@ static void bpf_selem_unlink_storage(struct bpf_local_storage_elem *selem,
- 	bpf_selem_free_list(&selem_free_list, reuse_now);
- 
- 	if (free_local_storage)
--		bpf_local_storage_free(local_storage, storage_smap, bpf_ma, reuse_now);
-+		bpf_local_storage_free(local_storage, reuse_now);
- }
- 
- void bpf_selem_link_storage_nolock(struct bpf_local_storage *local_storage,
-@@ -432,7 +293,6 @@ void bpf_selem_link_map(struct bpf_local_storage_map *smap,
- 	unsigned long flags;
- 
- 	raw_spin_lock_irqsave(&b->lock, flags);
--	RCU_INIT_POINTER(SDATA(selem)->smap, smap);
- 	hlist_add_head_rcu(&selem->map_node, &b->list);
- 	raw_spin_unlock_irqrestore(&b->lock, flags);
- }
-@@ -491,16 +351,14 @@ int bpf_local_storage_alloc(void *owner,
- 	if (err)
- 		return err;
- 
--	if (smap->bpf_ma)
--		storage = bpf_mem_cache_alloc_flags(&smap->storage_ma, gfp_flags);
--	else
--		storage = bpf_map_kzalloc(&smap->map, sizeof(*storage),
--					  gfp_flags | __GFP_NOWARN);
-+	storage = bpf_map_kmalloc_nolock(&smap->map, sizeof(*storage),
-+					 gfp_flags, NUMA_NO_NODE);
- 	if (!storage) {
- 		err = -ENOMEM;
- 		goto uncharge;
- 	}
- 
-+	memset(storage->cache, 0, BPF_LOCAL_STORAGE_CACHE_SIZE * sizeof(storage->cache[0]));
- 	RCU_INIT_POINTER(storage->smap, smap);
- 	INIT_HLIST_HEAD(&storage->list);
- 	raw_spin_lock_init(&storage->lock);
-@@ -526,22 +384,12 @@ int bpf_local_storage_alloc(void *owner,
- 		bpf_selem_unlink_map(first_selem);
- 		err = -EAGAIN;
- 		goto uncharge;
--
--		/* Note that even first_selem was linked to smap's
--		 * bucket->list, first_selem can be freed immediately
--		 * (instead of kfree_rcu) because
--		 * bpf_local_storage_map_free() does a
--		 * synchronize_rcu_mult (waiting for both sleepable and
--		 * normal programs) before walking the bucket->list.
--		 * Hence, no one is accessing selem from the
--		 * bucket->list under rcu_read_lock().
--		 */
- 	}
- 
- 	return 0;
- 
- uncharge:
--	bpf_local_storage_free(storage, smap, smap->bpf_ma, true);
-+	bpf_local_storage_free(storage, true);
- 	mem_uncharge(smap, owner, sizeof(*storage));
- 	return err;
- }
-@@ -586,7 +434,7 @@ bpf_local_storage_update(void *owner, struct bpf_local_storage_map *smap,
- 
- 		err = bpf_local_storage_alloc(owner, smap, selem, gfp_flags);
- 		if (err) {
--			bpf_selem_free(selem, smap, true);
-+			bpf_selem_free(selem, true);
- 			mem_uncharge(smap, owner, smap->elem_size);
- 			return ERR_PTR(err);
- 		}
-@@ -662,7 +510,7 @@ bpf_local_storage_update(void *owner, struct bpf_local_storage_map *smap,
- 	bpf_selem_free_list(&old_selem_free_list, false);
- 	if (alloc_selem) {
- 		mem_uncharge(smap, owner, smap->elem_size);
--		bpf_selem_free(alloc_selem, smap, true);
-+		bpf_selem_free(alloc_selem, true);
- 	}
- 	return err ? ERR_PTR(err) : SDATA(selem);
- }
-@@ -728,16 +576,12 @@ int bpf_local_storage_map_check_btf(const struct bpf_map *map,
- 
- void bpf_local_storage_destroy(struct bpf_local_storage *local_storage)
- {
--	struct bpf_local_storage_map *storage_smap;
- 	struct bpf_local_storage_elem *selem;
--	bool bpf_ma, free_storage = false;
-+	bool free_storage = false;
- 	HLIST_HEAD(free_selem_list);
- 	struct hlist_node *n;
- 	unsigned long flags;
- 
--	storage_smap = rcu_dereference_check(local_storage->smap, bpf_rcu_lock_held());
--	bpf_ma = check_storage_bpf_ma(local_storage, storage_smap, NULL);
--
- 	/* Neither the bpf_prog nor the bpf_map's syscall
- 	 * could be modifying the local_storage->list now.
- 	 * Thus, no elem can be added to or deleted from the
-@@ -767,7 +611,7 @@ void bpf_local_storage_destroy(struct bpf_local_storage *local_storage)
- 	bpf_selem_free_list(&free_selem_list, true);
- 
- 	if (free_storage)
--		bpf_local_storage_free(local_storage, storage_smap, bpf_ma, true);
-+		bpf_local_storage_free(local_storage, true);
- }
- 
- u64 bpf_local_storage_map_mem_usage(const struct bpf_map *map)
-@@ -780,25 +624,13 @@ u64 bpf_local_storage_map_mem_usage(const struct bpf_map *map)
- 	return usage;
- }
- 
--/* When bpf_ma == true, the bpf_mem_alloc is used to allocate and free memory.
-- * A deadlock free allocator is useful for storage that the bpf prog can easily
-- * get a hold of the owner PTR_TO_BTF_ID in any context. eg. bpf_get_current_task_btf.
-- * The task and cgroup storage fall into this case. The bpf_mem_alloc reuses
-- * memory immediately. To be reuse-immediate safe, the owner destruction
-- * code path needs to go through a rcu grace period before calling
-- * bpf_local_storage_destroy().
-- *
-- * When bpf_ma == false, the kmalloc and kfree are used.
-- */
- struct bpf_map *
- bpf_local_storage_map_alloc(union bpf_attr *attr,
--			    struct bpf_local_storage_cache *cache,
--			    bool bpf_ma)
-+			    struct bpf_local_storage_cache *cache)
- {
- 	struct bpf_local_storage_map *smap;
- 	unsigned int i;
- 	u32 nbuckets;
--	int err;
- 
- 	smap = bpf_map_area_alloc(sizeof(*smap), NUMA_NO_NODE);
- 	if (!smap)
-@@ -813,8 +645,8 @@ bpf_local_storage_map_alloc(union bpf_attr *attr,
- 	smap->buckets = bpf_map_kvcalloc(&smap->map, nbuckets,
- 					 sizeof(*smap->buckets), GFP_USER | __GFP_NOWARN);
- 	if (!smap->buckets) {
--		err = -ENOMEM;
--		goto free_smap;
-+		bpf_map_area_free(smap);
-+		return ERR_PTR(-ENOMEM);
- 	}
- 
- 	for (i = 0; i < nbuckets; i++) {
-@@ -825,30 +657,8 @@ bpf_local_storage_map_alloc(union bpf_attr *attr,
- 	smap->elem_size = offsetof(struct bpf_local_storage_elem,
- 				   sdata.data[attr->value_size]);
- 
--	/* In PREEMPT_RT, kmalloc(GFP_ATOMIC) is still not safe in non
--	 * preemptible context. Thus, enforce all storages to use
--	 * bpf_mem_alloc when CONFIG_PREEMPT_RT is enabled.
--	 */
--	smap->bpf_ma = IS_ENABLED(CONFIG_PREEMPT_RT) ? true : bpf_ma;
--	if (smap->bpf_ma) {
--		err = bpf_mem_alloc_init(&smap->selem_ma, smap->elem_size, false);
--		if (err)
--			goto free_smap;
--
--		err = bpf_mem_alloc_init(&smap->storage_ma, sizeof(struct bpf_local_storage), false);
--		if (err) {
--			bpf_mem_alloc_destroy(&smap->selem_ma);
--			goto free_smap;
--		}
--	}
--
- 	smap->cache_idx = bpf_local_storage_cache_idx_get(cache);
- 	return &smap->map;
--
--free_smap:
--	kvfree(smap->buckets);
--	bpf_map_area_free(smap);
--	return ERR_PTR(err);
- }
- 
- void bpf_local_storage_map_free(struct bpf_map *map,
-@@ -910,13 +720,10 @@ void bpf_local_storage_map_free(struct bpf_map *map,
- 	 */
- 	synchronize_rcu();
- 
--	if (smap->bpf_ma) {
--		rcu_barrier_tasks_trace();
--		if (!rcu_trace_implies_rcu_gp())
--			rcu_barrier();
--		bpf_mem_alloc_destroy(&smap->selem_ma);
--		bpf_mem_alloc_destroy(&smap->storage_ma);
--	}
-+	/* Wait for in-flight bpf_obj_free_fields() */
-+	rcu_barrier_tasks_trace();
-+	rcu_barrier();
++void fbnic_config_drop_mode(struct fbnic_net *fbn, bool tx_pause)
++{
++	int i, t;
 +
- 	kvfree(smap->buckets);
- 	bpf_map_area_free(smap);
- }
-diff --git a/kernel/bpf/bpf_task_storage.c b/kernel/bpf/bpf_task_storage.c
-index a1dc1bf0848a..baf5de6104e2 100644
---- a/kernel/bpf/bpf_task_storage.c
-+++ b/kernel/bpf/bpf_task_storage.c
-@@ -308,7 +308,7 @@ static int notsupp_get_next_key(struct bpf_map *map, void *key, void *next_key)
- 
- static struct bpf_map *task_storage_map_alloc(union bpf_attr *attr)
++	for (i = 0; i < fbn->num_napi; i++) {
++		struct fbnic_napi_vector *nv = fbn->napi[i];
++
++		for (t = 0; t < nv->rxt_count; t++) {
++			struct fbnic_q_triad *qt = &nv->qt[nv->txt_count + t];
++
++			fbnic_config_drop_mode_rcq(nv, &qt->cmpl, tx_pause);
++		}
++	}
++}
++
+ static void fbnic_config_rim_threshold(struct fbnic_ring *rcq, u16 nv_idx, u32 rx_desc)
  {
--	return bpf_local_storage_map_alloc(attr, &task_cache, true);
-+	return bpf_local_storage_map_alloc(attr, &task_cache);
+ 	u32 threshold;
+@@ -2637,7 +2656,7 @@ static void fbnic_enable_rcq(struct fbnic_napi_vector *nv,
+ 	u32 hds_thresh = fbn->hds_thresh;
+ 	u32 rcq_ctl = 0;
+ 
+-	fbnic_config_drop_mode_rcq(nv, rcq);
++	fbnic_config_drop_mode_rcq(nv, rcq, fbn->tx_pause);
+ 
+ 	/* Force lower bound on MAX_HEADER_BYTES. Below this, all frames should
+ 	 * be split at L4. It would also result in the frames being split at
+@@ -2700,7 +2719,6 @@ static void __fbnic_nv_enable(struct fbnic_napi_vector *nv)
+ 						  &nv->napi);
+ 
+ 		fbnic_enable_bdq(&qt->sub0, &qt->sub1);
+-		fbnic_config_drop_mode_rcq(nv, &qt->cmpl);
+ 		fbnic_enable_rcq(nv, &qt->cmpl);
+ 	}
  }
- 
- static void task_storage_map_free(struct bpf_map *map)
-diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
-index bd3c686edc0b..92b548246f04 100644
---- a/net/core/bpf_sk_storage.c
-+++ b/net/core/bpf_sk_storage.c
-@@ -67,7 +67,7 @@ static void bpf_sk_storage_map_free(struct bpf_map *map)
- 
- static struct bpf_map *bpf_sk_storage_map_alloc(union bpf_attr *attr)
- {
--	return bpf_local_storage_map_alloc(attr, &sk_cache, false);
-+	return bpf_local_storage_map_alloc(attr, &sk_cache);
- }
- 
- static int notsupp_get_next_key(struct bpf_map *map, void *key,
-@@ -196,7 +196,7 @@ int bpf_sk_storage_clone(const struct sock *sk, struct sock *newsk)
- 		} else {
- 			ret = bpf_local_storage_alloc(newsk, smap, copy_selem, GFP_ATOMIC);
- 			if (ret) {
--				bpf_selem_free(copy_selem, smap, true);
-+				bpf_selem_free(copy_selem, true);
- 				atomic_sub(smap->elem_size,
- 					   &newsk->sk_omem_alloc);
- 				bpf_map_put(map);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+index ca37da5a0b17..27776e844e29 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+@@ -184,6 +184,7 @@ void fbnic_reset_netif_queues(struct fbnic_net *fbn);
+ irqreturn_t fbnic_msix_clean_rings(int irq, void *data);
+ void fbnic_napi_enable(struct fbnic_net *fbn);
+ void fbnic_napi_disable(struct fbnic_net *fbn);
++void fbnic_config_drop_mode(struct fbnic_net *fbn, bool tx_pause);
+ void fbnic_enable(struct fbnic_net *fbn);
+ void fbnic_disable(struct fbnic_net *fbn);
+ void fbnic_flush(struct fbnic_net *fbn);
 -- 
 2.47.3
 
