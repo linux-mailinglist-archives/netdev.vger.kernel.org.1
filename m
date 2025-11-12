@@ -1,174 +1,120 @@
-Return-Path: <netdev+bounces-237888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35F1DC51323
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:52:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77667C512B7
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:47:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4362518974EB
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:51:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25CAF3B71FA
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:46:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893032FE06B;
-	Wed, 12 Nov 2025 08:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05BBD2FD69F;
+	Wed, 12 Nov 2025 08:46:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from plesk.hostmyservers.fr (plesk.hostmyservers.fr [45.145.164.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1812FDC4B;
-	Wed, 12 Nov 2025 08:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.164.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E2F2FC873
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 08:46:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762937413; cv=none; b=T4ztP0kXk6tBNG8NE+s1n+Bd6giid4ElaRqIoIVdyosYsVlu1vcdxrXW9xgJUsiXcRjXldKdwHr4ZZ/f28jTRx96F8z9X0yvGbpZnPHRD8ZzLYK1RLa/FX2FSknCxlC1bGO6pGW13/dXcSoEfawbDE/Fd8WatNnjqlyIBQohnlE=
+	t=1762937163; cv=none; b=EK0PnEk9YndJrtAU5ke5Fc7xRpijKMmD60QEOJbu6f7+Avhz1IrkkrDgtSQq7dRCi1EFvKlvu/hMXbE1XI6jRcHMAGloku7TPyg7shnOPM/2RrZdIjmR3fYYJpoLDA13ZRCyfvgbejmnI9ARp0mNrmthj7slsA5yMcAV0HImF9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762937413; c=relaxed/simple;
-	bh=oSXNIlCJ4nUuItwxkksnV1j0nQ9O8xQlEqMORgnbj3g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SV115SZZHzyFO1dlO7Zz5LWEcOmKOWSJ4UVGbElR5pchX+cWXrtvFhQFZZ9gNH3OxmWFttqGiE8FwHy4v9fX1jawPJLue7CSjCtTTWLg7HiCyozO6BFcOFwmENdYlUOrBP0finnje5ZqH+8XdX0ka5/hv1gWI0fiWR1tjcanIf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com; spf=pass smtp.mailfrom=arnaud-lcm.com; arc=none smtp.client-ip=45.145.164.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arnaud-lcm.com
-Received: from [10.17.112.36] (unknown [15.248.2.224])
-	by plesk.hostmyservers.fr (Postfix) with ESMTPSA id 73D8540037;
-	Wed, 12 Nov 2025 08:40:35 +0000 (UTC)
-Authentication-Results: Plesk;
-        spf=pass (sender IP is 15.248.2.224) smtp.mailfrom=contact@arnaud-lcm.com smtp.helo=[10.17.112.36]
-Received-SPF: pass (Plesk: connection is authenticated)
-Message-ID: <3f79436c-d343-46ff-8559-afb7da24a44d@arnaud-lcm.com>
-Date: Wed, 12 Nov 2025 08:40:34 +0000
+	s=arc-20240116; t=1762937163; c=relaxed/simple;
+	bh=FAKW9/PO4Tviz9rGB02IgVMpyJMsgsoIo7KmmNYxoUI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gLZW5crIuRCCsQ/OlbhUH8n/WEzkM0n19c4bR/IOG+6+H7SJUWqYJbMQ05ciJUJJU4+bE1xvq8+qClR9K0j3TKWzfKNkv6vV+n9MGVII30iME1arZhHQXwMVmxf5x4Hms3TP9FOk2KuKTDY+0757cBcxJ9h3CaKB3F2dOZ99kdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vJ6Ty-00020B-9x; Wed, 12 Nov 2025 09:45:38 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vJ6Tw-0003I3-2y;
+	Wed, 12 Nov 2025 09:45:36 +0100
+Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 9A03C49D925;
+	Wed, 12 Nov 2025 08:45:36 +0000 (UTC)
+Date: Wed, 12 Nov 2025 09:45:36 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Vincent Mailhol <mailhol@kernel.org>, 
+	Stefan =?utf-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>, socketcan@esd.eu, Manivannan Sadhasivam <mani@kernel.org>, 
+	Thomas Kopp <thomas.kopp@microchip.com>, Oliver Hartkopp <socketcan@hartkopp.net>, 
+	Jimmy Assarsson <extja@kvaser.com>, Axel Forsman <axfo@kvaser.com>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Kory Maincent <kory.maincent@bootlin.com>, 
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next 0/3] convert can drivers to use ndo_hwtstamp
+ callbacks
+Message-ID: <20251112-purring-porcelain-hamster-dfc149-mkl@pengutronix.de>
+References: <20251029231620.1135640-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v3] bpf: Clamp trace length in __bpf_get_stack to
- fix OOB write
-To: Brahmajit Das <listout@listout.xyz>,
- syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com,
- john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
- linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org,
- sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com,
- yonghong.song@linux.dev
-References: <691231dc.a70a0220.22f260.0101.GAE@google.com>
- <20251111081254.25532-1-listout@listout.xyz>
-Content-Language: en-US
-From: "Lecomte, Arnaud" <contact@arnaud-lcm.com>
-In-Reply-To: <20251111081254.25532-1-listout@listout.xyz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: <176293683631.16609.1825395533128077628@Plesk>
-X-PPP-Vhost: arnaud-lcm.com
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="xr7ib4q3lr5isf7n"
+Content-Disposition: inline
+In-Reply-To: <20251029231620.1135640-1-vadim.fedorenko@linux.dev>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-I am a not sure this is the right solution and I am scared that by
-forcing this clamping, we are hiding something else.
-If we have a look at the code below:
-```
 
-|
+--xr7ib4q3lr5isf7n
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next 0/3] convert can drivers to use ndo_hwtstamp
+ callbacks
+MIME-Version: 1.0
 
-	if (trace_in) {
-		trace = trace_in;
-		trace->nr = min_t(u32, trace->nr, max_depth);
-	} else if (kernel && task) {
-		trace = get_callchain_entry_for_task(task, max_depth);
-	} else {
-		trace = get_perf_callchain(regs, kernel, user, max_depth,
-					crosstask, false, 0);
-	} ``` trace should be (if I remember correctly) clamped there. If not, 
-it might hide something else. I would like to have a look at the return 
-for each if case through gdb. |
+On 29.10.2025 23:16:17, Vadim Fedorenko wrote:
+> The patchset converts generic ioctl implementation into a pair of
+> ndo_hwtstamp_get/ndo_hwtstamp_set generic callbacks and replaces
+> callbacks in drivers.
 
-On 11/11/2025 08:12, Brahmajit Das wrote:
-> syzbot reported a stack-out-of-bounds write in __bpf_get_stack()
-> triggered via bpf_get_stack() when capturing a kernel stack trace.
->
-> After the recent refactor that introduced stack_map_calculate_max_depth(),
-> the code in stack_map_get_build_id_offset() (and related helpers) stopped
-> clamping the number of trace entries (`trace_nr`) to the number of elements
-> that fit into the stack map value (`num_elem`).
->
-> As a result, if the captured stack contained more frames than the map value
-> can hold, the subsequent memcpy() would write past the end of the buffer,
-> triggering a KASAN report like:
->
->      BUG: KASAN: stack-out-of-bounds in __bpf_get_stack+0x...
->      Write of size N at addr ... by task syz-executor...
->
-> Restore the missing clamp by limiting `trace_nr` to `num_elem` before
-> computing the copy length. This mirrors the pre-refactor logic and ensures
-> we never copy more bytes than the destination buffer can hold.
->
-> No functional change intended beyond reintroducing the missing bound check.
->
-> Reported-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
-> Fixes: e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into helper function")
-> Signed-off-by: Brahmajit Das <listout@listout.xyz>
-> ---
-> Changes in v3:
-> Revert back to num_elem based logic for setting trace_nr. This was
-> suggested by bpf-ci bot, mainly pointing out the chances of underflow
-> when  max_depth < skip.
->
-> Quoting the bot's reply:
-> The stack_map_calculate_max_depth() function can return a value less than
-> skip when sysctl_perf_event_max_stack is lowered below the skip value:
->
->      max_depth = size / elem_size;
->      max_depth += skip;
->      if (max_depth > curr_sysctl_max_stack)
->          return curr_sysctl_max_stack;
->
-> If sysctl_perf_event_max_stack = 10 and skip = 20, this returns 10.
->
-> Then max_depth - skip = 10 - 20 underflows to 4294967286 (u32 wraps),
-> causing min_t() to not limit trace_nr at all. This means the original OOB
-> write is not fixed in cases where skip > max_depth.
->
-> With the default sysctl_perf_event_max_stack = 127 and skip up to 255, this
-> scenario is reachable even without admin changing sysctls.
->
-> Changes in v2:
-> - Use max_depth instead of num_elem logic, this logic is similar to what
-> we are already using __bpf_get_stackid
-> Link: https://lore.kernel.org/all/20251111003721.7629-1-listout@listout.xyz/
->
-> Changes in v1:
-> - RFC patch that restores the number of trace entries by setting
-> trace_nr to trace_nr or num_elem based on whichever is the smallest.
-> Link: https://lore.kernel.org/all/20251110211640.963-1-listout@listout.xyz/
-> ---
->   kernel/bpf/stackmap.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/kernel/bpf/stackmap.c b/kernel/bpf/stackmap.c
-> index 2365541c81dd..cef79d9517ab 100644
-> --- a/kernel/bpf/stackmap.c
-> +++ b/kernel/bpf/stackmap.c
-> @@ -426,7 +426,7 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
->   			    struct perf_callchain_entry *trace_in,
->   			    void *buf, u32 size, u64 flags, bool may_fault)
->   {
-> -	u32 trace_nr, copy_len, elem_size, max_depth;
-> +	u32 trace_nr, copy_len, elem_size, num_elem, max_depth;
->   	bool user_build_id = flags & BPF_F_USER_BUILD_ID;
->   	bool crosstask = task && task != current;
->   	u32 skip = flags & BPF_F_SKIP_FIELD_MASK;
-> @@ -480,6 +480,8 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
->   	}
->   
->   	trace_nr = trace->nr - skip;
-> +	num_elem = size / elem_size;
-> +	trace_nr = min_t(u32, trace_nr, num_elem);
->   	copy_len = trace_nr * elem_size;
->   
->   	ips = trace->ip + skip;
+Applied to linux-can-next.
 
 Thanks,
-Arnaud
+Marc
 
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--xr7ib4q3lr5isf7n
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmkUSS0ACgkQDHRl3/mQ
+kZzzxwgArsFsKQQHeRIjGxCOSMthusW8F/FTUAMB7+MlB+OcgGEzmM2Nu27PozEe
+PTld0SStdW49G+ZnXphfSUIRL5wQOlKJHfmVXM2L0JLJ+q6n8/tEq/VFFnMFcAXK
+FNyTrxinAR0Z4mSQ1e2yd/p94w59QTxiw/3rvMZwnr6sq4vvCbiXVJsm0ezQ8Mz5
+JE1KHQ1lY3UPixB/ZxWFM0JakvLa849NTOHLSeMA/JWnsggien78+s1zgFAt9dhE
+MSAvfYQsFqIHbm8RaNHJsNtUbLBsvKHEuwtujQ9OeQZAST5Xn+6WCkgBZXL8k5WB
+LtuO84NyV+OePlRCfN7ONeHxwOvDWQ==
+=ZgBX
+-----END PGP SIGNATURE-----
+
+--xr7ib4q3lr5isf7n--
 
