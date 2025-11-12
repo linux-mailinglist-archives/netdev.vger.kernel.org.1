@@ -1,79 +1,155 @@
-Return-Path: <netdev+bounces-238128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B82C54769
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:33:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A02C54730
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:29:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F10A24E2595
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 20:26:44 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1B676349F16
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 20:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D566D2D8799;
-	Wed, 12 Nov 2025 20:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0403529ACD7;
+	Wed, 12 Nov 2025 20:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="27gLFXFC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AtvujWCa"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A952D5946;
-	Wed, 12 Nov 2025 20:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF7C290F
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 20:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762979112; cv=none; b=gxnUPH4A6IPb8s1zsuiN+28U/SaQonX9RhyN4c3g1sao5bKgSrn390T5klgkzXJcpKD7JYm7g9QNegUETVhFlZCFSKcmv4wlQemEruJ06Q/Ifs7bYtsZHoFVDy15GJHtcliAL89AnZlyZ9QvSxOcDkicGmQpP2FVzny+zRBLybU=
+	t=1762979288; cv=none; b=BsAnBQQWujSAicfqvTgG7kGttLJwk6Y53pfvbs7s25xph6Pd8f0JZ1Xu1FsZcNgTJCs0WwUP7ssGuXUanSrr/xY4o77f195khOCWZ8R7zh7bbjPO2nANQXg8mR3lmzsRhdU65+cjJhCyEuy3XEyunD+0s34d4PxRmm6gYdigyT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762979112; c=relaxed/simple;
-	bh=6KfXkUqVjY+RCtK09kzENlQ2r8qM4kOq6ZPOrS3cBkg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WEguuCqcKwqDoLMyb2iK7xQspXJVpizjSuhum5aJpkcL06P13/Saw8OfPm8g/oyWh9LO73QcaF73XfPf7jIi/O5MSf7hejkS7ssl5ARF2zOPRmgJKCmhDdHQm63WWhR2XCNmO90Jv5aqCdtlE53X9RQWkEGKAC9FWVrLhqXFc3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=27gLFXFC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=eG1+Z2nINsuHIGlm0g60wcqdI+VY4P5X3ca5A1mTeYE=; b=27gLFXFCSebaEeA2qySyyWyJ/7
-	u8s4mJAHk9vINJ/l1f2otICgKOsRu0OwD0UmZf76VRGer0K4ILgSnaIn1QpDgIJJEpaMNUt41U1r+
-	8hY+oUPXsVXI91FD5e7AC0PGLy3XkCCm3bUfFhQ9C/vlOcUCZc8r+bmq7Ow/8vvgVptU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vJHOn-00DmlJ-O7; Wed, 12 Nov 2025 21:25:01 +0100
-Date: Wed, 12 Nov 2025 21:25:01 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: shenwei.wang@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, eric@nelint.com, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 4/5] net: fec: remove rx_align from
- fec_enet_private
-Message-ID: <116fd5af-048d-48e1-b2b8-3a42a061e02f@lunn.ch>
-References: <20251111100057.2660101-1-wei.fang@nxp.com>
- <20251111100057.2660101-5-wei.fang@nxp.com>
+	s=arc-20240116; t=1762979288; c=relaxed/simple;
+	bh=i+qrJKd5GwqsNPtCvHrfbk/z+JDpoHaiC7DwuG62xA8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=CBvK2C3NYGCbKr+Eb0jsjsPHq9LbITeOGQv0w0Nap409CB32vP0mLKSmVlFsfAOExKm8On+xKTnofMuuVhNVk7YOb3+8C0akf89n7noEgZ+RsDZptwfhDWTYzoqgqks4UcHEDssXU0h2pP/up8GPeIkA+WcfwA9F8wlxg6sDc6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AtvujWCa; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42b3c965ca9so51008f8f.1
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 12:28:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762979284; x=1763584084; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=/1znxgw+VJKsyrPNvtyAbxwzu6c70w6nckL1EyaMxRA=;
+        b=AtvujWCajDvligcZAUdap4Kux5V+0lv+T1IIKeeyaViKmmRhKqOcFr/8rEZwsG1z2p
+         YHjVZU44lyRN8hRAx6D1f6MbWUlsK+ZZ5uyZlDTCZMEh/GmPgPlNEAkTVy3aHLD5kENh
+         B/r/4zxv7V9FPt8DDbetwVuMl5DYNPeudv8GDeukH1DzhWowVuiWROMO+6ooReHhF5pP
+         xbjA0YXUZrqqTGB0zTYPdWjadCJR57PUn0X6vzhHSNjyLdWE3ZoXLjq+Bjljya5zxmkT
+         09pX+IjKBqUEvGY4TxavUn6QEF/N209zEC0Wz/cDc4issPA/MvyMot17qcUuFJaZHWPX
+         qdlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762979284; x=1763584084;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/1znxgw+VJKsyrPNvtyAbxwzu6c70w6nckL1EyaMxRA=;
+        b=xH73O0hkqGWlgbjBMyCzYMzU0mDidb8oaHJ8R012PpTRlaH6IrYz/+L8Q9JrS2HUHM
+         IstkMBE5OlShIaK7qDy/cygpjakusGOjtQMwsd1XIx5va2inNtvdZA/+O8Nos1mj6y38
+         16XBZOgYksUZisNLoZjU+yPqLPwjryhBpUgdBOEvPL/QFG60nQieTiFbG8Mtfex2iC1c
+         mcaxijU6l4vBWSBTcrXPMKMZ+TVtYnXBNc5Y2BR1iQh5JgHMRz34T0wJAJ7sJ5yMQ+SC
+         /g8CtwjVY32oq43f+j1i1Kk/aXeNiomQEabJ69LsmpAVYLLEchuwuiJWspyvaql+pMWT
+         gZDw==
+X-Gm-Message-State: AOJu0YzlH64azBPG9mrk2NJjNuU7CAXFoZK2/sf03ZMjc63ZvBaYZ1dH
+	Vnui/74jhYwcEriRYg9pTgNlVBiPDPQY+d0h+BiwQIOFUs/MXXjV9iEc
+X-Gm-Gg: ASbGnct2a/v2jpg1DvRlsFTVpOznnYusvo8E4Ns3sVaqJVhbk5okFN42NbBhEd0PDFl
+	F/SuUQiUNNjgQX/yfKNqz1XCoVlSNJTuFHtyRHyI2uTWF3A7cx1kB4YyJGFOsfOi1SRP1JAp9/W
+	X+/2gCpN5x2S84uhkNYacYevXnomK/YYkE2mF2uHronHoeQ047PhxWANFOjHDLidyGzQdJRGZpo
+	Cz2ON2q1ALj3ZZuNS19ot+Dg6727mP/OSdQIyWAUnRnyUkGZSchQ54Xm6ovZd/cUaFOMhG+Lo45
+	z3XTKzbZdBEfKFceS10BaMNPujtSCgPorXglPP0kN8i2PAH/AN7Tq4sOmtUSknncVppDEEq0gNT
+	BaWo2sIYzLRIvwp9aKwiypMqnwvRuLtCCiiSK4KQboABgSqqtV4REdDXyCvGPS4U0rkoS61UR2w
+	y+VPRPBC9RSRE2j3zDf7t5xp70bpnUjTe5AfzmuqeytYxKrtfWWxSepR8frg659vf3HyQ0Vd0Jr
+	vWEuoUP7Dc+eGPZJYtwbe9xos2WH/HiC0g1hKfBKcE=
+X-Google-Smtp-Source: AGHT+IH2IEB8eZJepiyBR5s/YNBMx+r71ld8CYJU8TBuwnTgvgBxzat3EQGEstL3Y7mSduN7QqvGWw==
+X-Received: by 2002:a05:6000:420b:b0:426:eef2:fa86 with SMTP id ffacd0b85a97d-42b4bb8b9fcmr3855739f8f.11.1762979284164;
+        Wed, 12 Nov 2025 12:28:04 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f26:f700:b18b:e3d1:83c0:fb24? (p200300ea8f26f700b18be3d183c0fb24.dip0.t-ipconnect.de. [2003:ea:8f26:f700:b18b:e3d1:83c0:fb24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b3123036bsm28168151f8f.28.2025.11.12.12.28.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Nov 2025 12:28:03 -0800 (PST)
+Message-ID: <f3ae628b-4cbd-4075-8e59-7e3d7ee872cf@gmail.com>
+Date: Wed, 12 Nov 2025 21:28:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251111100057.2660101-5-wei.fang@nxp.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phy: fixed_phy: use genphy_read_abilities
+ to simplify the code
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <ed9eb89b-8205-4ca3-9182-d7e091972846@gmail.com>
+Content-Language: en-US
+In-Reply-To: <ed9eb89b-8205-4ca3-9182-d7e091972846@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 11, 2025 at 06:00:56PM +0800, Wei Fang wrote:
-> The rx_align was introduced by the commit 41ef84ce4c72 ("net: fec: change
-> FEC alignment according to i.mx6 sx requirement"). Because the i.MX6 SX
-> requires RX buffer must be 64 bytes alignment.
+On 11/10/2025 10:11 PM, Heiner Kallweit wrote:
+> Populating phy->supported can be achieved easier by using
+> genphy_read_abilities().
 > 
-> Since the commit 95698ff6177b ("net: fec: using page pool to manage RX
-> buffers"), the address of the RX buffer is always the page address plus
-> 128 bytes, so RX buffer is always 64-byte aligned.
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  drivers/net/phy/fixed_phy.c | 23 +----------------------
+>  1 file changed, 1 insertion(+), 22 deletions(-)
+> 
+> diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
+> index 2e46b7aa6..32a9b99af 100644
+> --- a/drivers/net/phy/fixed_phy.c
+> +++ b/drivers/net/phy/fixed_phy.c
+> @@ -18,7 +18,6 @@
+>  #include <linux/of.h>
+>  #include <linux/idr.h>
+>  #include <linux/netdevice.h>
+> -#include <linux/linkmode.h>
+>  
+>  #include "swphy.h"
+>  
+> @@ -157,27 +156,7 @@ struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
+>  	phy->mdio.dev.of_node = np;
+>  	phy->is_pseudo_fixed_link = true;
+>  
+> -	switch (status->speed) {
+> -	case SPEED_1000:
+> -		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT,
+> -				 phy->supported);
+> -		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+> -				 phy->supported);
+> -		fallthrough;
+> -	case SPEED_100:
+> -		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT,
+> -				 phy->supported);
+> -		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+> -				 phy->supported);
+> -		fallthrough;
+> -	case SPEED_10:
+> -	default:
+> -		linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT,
+> -				 phy->supported);
+> -		linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT,
+> -				 phy->supported);
+> -	}
+> -
+> +	genphy_read_abilities(phy);
+>  	phy_advertise_supported(phy);
+>  
+>  	ret = phy_device_register(phy);
 
-It is not obvious to me where this 128 bytes is added.
+After further checking, this code can be removed altogether.
 
-	Andrew
+--
+pw-bot: cr
 
