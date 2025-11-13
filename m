@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-238344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1EF9C57B90
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 14:39:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5491CC57AA7
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 14:31:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 000293AEBFC
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 13:08:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6E6E4A1162
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 13:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8436035029B;
-	Thu, 13 Nov 2025 13:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4AE351FC1;
+	Thu, 13 Nov 2025 13:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5e32cf9Q"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="R4jJCC3A"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD5531A554;
-	Thu, 13 Nov 2025 13:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF7C3BB40;
+	Thu, 13 Nov 2025 13:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763039213; cv=none; b=A571VTbxFThwi8cwLnCjg/tR2ScDCkjdUqZwT+KxnwtcblWrh7d2Im8brswB+fhe0vyFMfeQ8gwlUnh7ckZPyJBZVEyfdVPeqDBzX6RQycvfNVr5dmvN+kSnMGShRmj48FQCm54/DFWs74MXT4X1pdfK/zRf4Yzm9VM0LArhwqo=
+	t=1763039430; cv=none; b=EudYj6xVg7ORtC9s1ItSHZJ9yEA5/GOCF+QGPROjrC85AoVeS58jZXiT/2TzpYloUhttnPKdDf7jN279r4u71CWagYXBYEowzsmGf+DOBbv+y/ZfUuTI5N30o0fkSNaOlolUIgSglueGpXq3MZfG0D1MJ9L8wIsdUzqlMCdaN7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763039213; c=relaxed/simple;
-	bh=MSaoXbofYopsSWhGIFcEbL3FqKPo0g3w0hZnrNaeLQs=;
+	s=arc-20240116; t=1763039430; c=relaxed/simple;
+	bh=5oOe1a4PbomAK6yVAsa9nA3xwjD2FdDgO97kL0K8LI8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y01tudtL89M6Xdvwfxu3cJkBl8HgjaYS8KEuYjpXvL7AU9uhG+mP/Cvvn9+iByaDBjQSyVxgzCZAyKkFXdy7uyfh8w9PM92PypPyG5R3DiYjAJo5sKcK69rtbz6+Yg4pbS4C/3BlNEW9hZUS0vvc9Wz3TyZ4etSzLDOOMYVzQTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5e32cf9Q; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=CsGFe7196AnT00QGCx71KmkN5DtmNWdnXz43eNbY+s4sps3gw6iVJ80nUEb224FB0F4QcMK5TJy4F7LC3RvJGx3tlthSPDpJ0bWzSLNk1RoZ2QOh2Ng72p3c+RlX7h2K0Vg+L8580hFlYJTXtRiru3MEJmB9jPs00y9ramHTGLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=R4jJCC3A; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,34 +36,32 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Z+3/fwdG9bFOzWxb0nd1a0BQGDgCe2gR+4yRHxJTSqA=; b=5e32cf9Q0tSlZ86HUP0jqOvvaH
-	md+rLM1i2WDKpJKq01lw3W4/yiwBf3XTt1r8lbYcfz2vuA4UTKp5Yq4jZP0wEm2g0UowhEUhA0jLW
-	PBbRlCIFuP0zP/zsTsO4txwLVQJ2JZ/ZQV8zvQK38yr7NFKneUeHqXQ+gsdxz40wjqGg=;
+	bh=9Bt+rsMKlH39POr8mMm4yPrVUrElP+dkqHGXrTU3Za4=; b=R4jJCC3AXXxejvPWBxKCZ/Z0Yh
+	c4Pjxx80ZOmzLS1RfCF9cZq1fEgP/OMs1/PMOR3CDQOsuf4vH6vHPgWtI1BPvvsAvg+LJQJ+qPnV+
+	lR/5kBvD8GhkPC219K4/h4MkScO9lWA8hSUClDMo2Ob3UJwartgcXSx6NpzbPC5OcYYE=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vJX1x-00DrY2-Uu; Thu, 13 Nov 2025 14:06:29 +0100
-Date: Thu, 13 Nov 2025 14:06:29 +0100
+	id 1vJX5f-00DrZU-SR; Thu, 13 Nov 2025 14:10:19 +0100
+Date: Thu, 13 Nov 2025 14:10:19 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Parthiban.Veerasooran@microchip.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v4 4/4] net: phy: mscc: Handle
- devm_phy_package_join() failure in vsc85xx_probe_common()
-Message-ID: <9bff0108-8fab-4672-bc6e-58c672cf8a22@lunn.ch>
-References: <20251112135715.1017117-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251112135715.1017117-5-prabhakar.mahadev-lad.rj@bp.renesas.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"eric@nelint.com" <eric@nelint.com>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 4/5] net: fec: remove rx_align from
+ fec_enet_private
+Message-ID: <808e68e6-ba0e-4a2d-8b20-8555f53c586f@lunn.ch>
+References: <20251111100057.2660101-1-wei.fang@nxp.com>
+ <20251111100057.2660101-5-wei.fang@nxp.com>
+ <116fd5af-048d-48e1-b2b8-3a42a061e02f@lunn.ch>
+ <PAXPR04MB85109979C5B15727F510F87188CDA@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,18 +70,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251112135715.1017117-5-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <PAXPR04MB85109979C5B15727F510F87188CDA@PAXPR04MB8510.eurprd04.prod.outlook.com>
 
-On Wed, Nov 12, 2025 at 01:57:15PM +0000, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> Sorry, I misremembered the value of XDP_PACKET_HEADROOM. it should
+> be 256 bytes.
 > 
-> devm_phy_package_join() may fail and return a negative error code.
-> Update vsc85xx_probe_common() to properly handle this failure by
-> checking the return value and propagating the error to the caller.
+> See fec_enet_alloc_rxq_buffers():
 > 
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> phys_addr = page_pool_get_dma_addr(page) + FEC_ENET_XDP_HEADROOM;
+> bdp->cbd_bufaddr = cpu_to_fec32(phys_addr);
+> 
+> I will correct it in v2, thanks
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+So you could add a BUILD_BUG_ON() test which makes sure
+FEC_ENET_XDP_HEADROOM gives you the needed alignment. That way it is
+both "documented" and enforced. And it costs nothing at runtime.
 
-    Andrew
+	Andrew
 
