@@ -1,133 +1,270 @@
-Return-Path: <netdev+bounces-238262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBB07C56ACD
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:47:40 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF48DC56AC7
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:46:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EFED42109F
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:40:09 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6C0A53434E1
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B2F2C327A;
-	Thu, 13 Nov 2025 09:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BFkpbkaM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99D22DEA68;
+	Thu, 13 Nov 2025 09:46:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642732D63E8;
-	Thu, 13 Nov 2025 09:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFDA92C17B6
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 09:46:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763026809; cv=none; b=gWwQChTgqxM0Bu5lR6NSW9JrNeVBeMywnhh34hdBf+RqgwNQ5kzpzs1ocGRjx9HuDgIrhGdxeLZJfVN+Kqu63KgTXvpdDbL3BFtQCFeiWZaEZ14s2NQ2704JQ3jUpAo95sCk6C7Mgw0fLcv0uHj3r54FAeND89UOf7/U1rL9PWg=
+	t=1763027186; cv=none; b=p5LMVyMuF8OUxmls1P1R4M13pLb5a5ozB0qkCApPnaH7JPBXkSdHTrP67Zb5kfDceeRMb3ExwzxkRkE3hvSxoL3W5YRywmJ0o/OOQN8rALGVQVBMsrdAafYrjwQHJXZffOHvfOvPjr+9fVTeq0gImZ0Gsk4uQ/MGMYkk4bLBrFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763026809; c=relaxed/simple;
-	bh=PccSFIPRborUgGL8/VaEy8QTABiLNVFPXAHshkFLtc8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BsRyWUhZ6SLIpIR8C9pN6VZjdntCyqUY6r6FYzAG+UWfUJDYlHVii9eVtFgoD+VyY0nf1IID6YsA5+yfhKfH+P+V0feMVtfh2CH1hISXQYkBdJumvfIi9gC3wSxyIv/XibZrnlD9nXlkixgmfwZfRLHgR7dZ0dk8s2HcmFQlRrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BFkpbkaM; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ACNSQim4032357;
-	Thu, 13 Nov 2025 01:39:42 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=1TbnnwqrjwLHrKFyBzb646u
-	Y0bstDmwiTNtuzxO4hbI=; b=BFkpbkaMv9bc1R9l1G1tvsW6/wlGL3w9Idq/TqI
-	NX7CsDy//w2f5IpimP4wYInjK06+QlVYgJH6MJhTWsDatNGItCUhcapDx04o8P7B
-	2ydycyFzeZKkRvcnLUr7QhVX6xkIqN/qnRmihn20AEIarT+J4NUIIjsfPlMxJaH3
-	ZnJvuQ6SvGi/7qwkuOtZvqcEE0ePf+X9uj7xJOubw6ZJcDlxjxTYaTEkBRXrj0Yc
-	Fe+2MaBLIIfEh4bKK1MyLDsDpC0AvwetWmTljJV1/l3X4FR2vIu+Np2wOL1Xm+Wr
-	eyBVczAQEJAn+veHz6qO+07B4mAlHVNq09Iy2mpeTvOMVkA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ad3xbh62j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Nov 2025 01:39:41 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 13 Nov 2025 01:39:51 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 13 Nov 2025 01:39:51 -0800
-Received: from hyd1vellox1.032marvell.com032caveonetworks.com (unknown [10.29.37.43])
-	by maili.marvell.com (Postfix) with ESMTP id D45FA5B6929;
-	Thu, 13 Nov 2025 01:39:35 -0800 (PST)
-From: Anshumali Gaur <agaur@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Anshumali Gaur <agaur@marvell.com>, Sunil Goutham <sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
-        hariprasad <hkelam@marvell.com>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David
- S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Simon Horman
-	<horms@kernel.org>,
-        Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [net PATCH] octeontx2-af: Skip TM tree print for disabled SQs
-Date: Thu, 13 Nov 2025 15:09:00 +0530
-Message-ID: <20251113093900.1180282-1-agaur@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1763027186; c=relaxed/simple;
+	bh=ln6VIq4hqE6e00jK4/UHhbLOBk4U2Alqi5mu4Ob034c=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=TWqSNP0HBz8WhfWasSipzexRJvvdbFernBJyo+2KkeqEiXU7afFwwAdW5VHnMsVAyYlovjVYfzH+EMnyYilX8xw6+DZ4Zhb+KH6rq+HRuxLOOvtqH1LC3TT99MH4d415+E3l0iiJyBLApvf2/yAj6hdE2rTtnRvQvlysw49nBQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-937e5f9ea74so85312239f.1
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 01:46:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763027184; x=1763631984;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=g+YrH1I1nIv2SkzE+SknOnmyqhffEQ0P6dSf1dmNXQs=;
+        b=NdSdJS7R3WeM4dP6IAEKPvIBs+xUGbdFmNVbLC+RD9vs/6d4COr1NbNVxoW4Ap0W7T
+         ZDwdIJp4MWVDpvTCySLPH6O8yKRJjZI7vpMt9/8tv+FkzVElTMc6s2n75LRUBbbwt8e4
+         toOn7fV7+xFi1QRFCnSnSKPQV72ISzZLeeQqP0ljWUMl8JwsOKlHXQGRKDOKQA8cDDHK
+         hvbSoQTPwBdU5Jhe8D2SZ4JnEtim//MQCDndRvDEK8E2DWOdrERW/15bjt3eJZcjPoBz
+         TptnF9WcK7n62Q+jbu9YYLEPbZ/tEoKZyfAwGqFEKoy+Jn6Ma7TXRTMvbWEGwz1UVqAo
+         FFzw==
+X-Forwarded-Encrypted: i=1; AJvYcCVNE12Q0XtBWKx/6bMEoN1cVaFafHVP6ikeZGLzjXAqSUII0/ATLImCf6OrHcWNM+Ep6ibNpCE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysrRiv4FfN2MqDJchZNLgbzoX+WcND2navqD/gg2AlJuUtH0j9
+	4myG5hS0ivPMsFgVUQ2eIj3V4Q+qvgFfU3u/bqIDd8Kq7ymXedf/DgGwK8BPd/lA/HmCTOWeCVX
+	EGYW22ym122KouXaOHvBYA8MfqZBa/k+juILrO1ADRfC3MTSo3x8iuzns85M=
+X-Google-Smtp-Source: AGHT+IGeKDKwe1Ju884NJus1vBFe0GrHOTAIO1xdsVu5wgDOmJ0OixRcceJUr9Re2oI8zLRgpijY4qYX7TMtqFq5WhE5p11lSyze
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: bSy0wnbNEdTFBStzaxsZzXAK5bK_0M8_
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEzMDA3MCBTYWx0ZWRfX6/eiyOCtlj1h
- JdJ3+3V5B7sezLZdly2OOzEfjP29T5xKxnqIVoBmUXStZ/BbvoGQ+fDm8ECsS5JBWzBi5+0DlKS
- o8FovyJKrBdIJtaGvbQMXhC7LBARvD6myvqbnDbgTay8CLrKxnXX1Zw4ciK9F4yhadQpVaCAQSe
- D0hH4N1qgpWhsT344mGqOPlMV1C8BYS/C3da6AozaV9vmnQaDKxgVb3n/fI5wDS4y7c0+k5TxOH
- rg9ZrGybjOg+lDDJgbYhRd2t54Ccyl7/W41JXtFKR5umyk0LRTr2j6i34pysnOg973VQ+MsbbFN
- r6RnEhaM6x439qx/CyKRIbk6PGOsofhIsm3Q4o146Bl1dTLEoi+mE/SE+CzTOwDluS9hq27UzNq
- soAHSWPakUU4oddX/uQCg7I9lOzfGA==
-X-Authority-Analysis: v=2.4 cv=Qq9THFyd c=1 sm=1 tr=0 ts=6915a75d cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=TDmekW24L8jN3pXCac4A:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: bSy0wnbNEdTFBStzaxsZzXAK5bK_0M8_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-13_01,2025-11-12_01,2025-10-01_01
+X-Received: by 2002:a05:6e02:2192:b0:433:69d8:ac70 with SMTP id
+ e9e14a558f8ab-43473d17d96mr88453865ab.10.1763027183975; Thu, 13 Nov 2025
+ 01:46:23 -0800 (PST)
+Date: Thu, 13 Nov 2025 01:46:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6915a8ef.050a0220.3565dc.0025.GAE@google.com>
+Subject: [syzbot] [netfilter?] possible deadlock in ip_set_nfnl_get_byindex
+From: syzbot <syzbot+aefe8555e94ae62b95c1@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	phil@nwl.cc, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Currently, the TM tree is printing all SQ topology including those
-which are not enabled, this results in redundant output for SQs
-which are not active. This patch adds a check in print_tm_tree()
-to skip printing the TM tree hierarchy if the SQ is not enabled.
+Hello,
 
-Fixes: b907194a5d5b ("octeontx2-af: Add debugfs support to dump NIX TM topology")
-Signed-off-by: Anshumali Gaur <agaur@marvell.com>
+syzbot found the following issue on:
+
+HEAD commit:    e927c520e1ba Merge tag 'loongarch-fixes-6.18-1' of git://g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=110d97cd980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=609c87dcb0628493
+dashboard link: https://syzkaller.appspot.com/bug?extid=aefe8555e94ae62b95c1
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-e927c520.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/216d03ed7180/vmlinux-e927c520.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/63801f21a529/bzImage-e927c520.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+aefe8555e94ae62b95c1@syzkaller.appspotmail.com
+
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Not tainted
+------------------------------------------------------
+syz.9.6420/24339 is trying to acquire lock:
+ffffffff9af8cbd8 (nfnl_subsys_ipset){+.+.}-{4:4}, at: ip_set_nfnl_get_byindex+0x7c/0x290 net/netfilter/ipset/ip_set_core.c:909
+
+but task is already holding lock:
+ffff888026b1e0d8 (&nft_net->commit_mutex){+.+.}-{4:4}, at: nf_tables_valid_genid+0x35/0x140 net/netfilter/nf_tables_api.c:11499
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&nft_net->commit_mutex){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+       __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
+       nf_tables_dumpreset_set+0xcd/0x320 net/netfilter/nf_tables_api.c:6288
+       netlink_dump+0x539/0xd30 net/netlink/af_netlink.c:2327
+       __netlink_dump_start+0x6d6/0x990 net/netlink/af_netlink.c:2442
+       netlink_dump_start include/linux/netlink.h:341 [inline]
+       nft_netlink_dump_start_rcu+0x81/0x1f0 net/netfilter/nf_tables_api.c:1286
+       nf_tables_getsetelem_reset+0x946/0xab0 net/netfilter/nf_tables_api.c:6604
+       nfnetlink_rcv_msg+0x583/0x1200 net/netfilter/nfnetlink.c:290
+       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
+       nfnetlink_rcv+0x1b3/0x430 net/netfilter/nfnetlink.c:669
+       netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
+       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1896
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa98/0xc70 net/socket.c:2630
+       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2684
+       __sys_sendmsg+0x16d/0x220 net/socket.c:2716
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+       __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
+       __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2406
+       netlink_dump_start include/linux/netlink.h:341 [inline]
+       ip_set_dump+0x17f/0x210 net/netfilter/ipset/ip_set_core.c:1717
+       nfnetlink_rcv_msg+0x9fc/0x1200 net/netfilter/nfnetlink.c:302
+       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
+       nfnetlink_rcv+0x1b3/0x430 net/netfilter/nfnetlink.c:669
+       netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
+       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1896
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa98/0xc70 net/socket.c:2630
+       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2684
+       __sys_sendmsg+0x16d/0x220 net/socket.c:2716
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (nfnl_subsys_ipset){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3165 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+       validate_chain kernel/locking/lockdep.c:3908 [inline]
+       __lock_acquire+0x126f/0x1c90 kernel/locking/lockdep.c:5237
+       lock_acquire kernel/locking/lockdep.c:5868 [inline]
+       lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5825
+       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+       __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
+       ip_set_nfnl_get_byindex+0x7c/0x290 net/netfilter/ipset/ip_set_core.c:909
+       set_target_v1_checkentry+0x1ac/0x570 net/netfilter/xt_set.c:313
+       xt_check_target+0x27c/0xa40 net/netfilter/x_tables.c:1038
+       nft_target_init+0x459/0x7d0 net/netfilter/nft_compat.c:267
+       nf_tables_newexpr net/netfilter/nf_tables_api.c:3527 [inline]
+       nf_tables_newrule+0xea9/0x28f0 net/netfilter/nf_tables_api.c:4358
+       nfnetlink_rcv_batch+0x190d/0x2350 net/netfilter/nfnetlink.c:526
+       nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:649 [inline]
+       nfnetlink_rcv+0x3c1/0x430 net/netfilter/nfnetlink.c:667
+       netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
+       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1896
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa98/0xc70 net/socket.c:2630
+       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2684
+       __sys_sendmsg+0x16d/0x220 net/socket.c:2716
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  nfnl_subsys_ipset --> nlk_cb_mutex-NETFILTER --> &nft_net->commit_mutex
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&nft_net->commit_mutex);
+                               lock(nlk_cb_mutex-NETFILTER);
+                               lock(&nft_net->commit_mutex);
+  lock(nfnl_subsys_ipset);
+
+ *** DEADLOCK ***
+
+1 lock held by syz.9.6420/24339:
+ #0: ffff888026b1e0d8 (&nft_net->commit_mutex){+.+.}-{4:4}, at: nf_tables_valid_genid+0x35/0x140 net/netfilter/nf_tables_api.c:11499
+
+stack backtrace:
+CPU: 3 UID: 0 PID: 24339 Comm: syz.9.6420 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_circular_bug+0x275/0x350 kernel/locking/lockdep.c:2043
+ check_noncircular+0x14c/0x170 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3165 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+ validate_chain kernel/locking/lockdep.c:3908 [inline]
+ __lock_acquire+0x126f/0x1c90 kernel/locking/lockdep.c:5237
+ lock_acquire kernel/locking/lockdep.c:5868 [inline]
+ lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5825
+ __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+ __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
+ ip_set_nfnl_get_byindex+0x7c/0x290 net/netfilter/ipset/ip_set_core.c:909
+ set_target_v1_checkentry+0x1ac/0x570 net/netfilter/xt_set.c:313
+ xt_check_target+0x27c/0xa40 net/netfilter/x_tables.c:1038
+ nft_target_init+0x459/0x7d0 net/netfilter/nft_compat.c:267
+ nf_tables_newexpr net/netfilter/nf_tables_api.c:3527 [inline]
+ nf_tables_newrule+0xea9/0x28f0 net/netfilter/nf_tables_api.c:4358
+ nfnetlink_rcv_batch+0x190d/0x2350 net/netfilter/nfnetlink.c:526
+ nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:649 [inline]
+ nfnetlink_rcv+0x3c1/0x430 net/netfilter/nfnetlink.c:667
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0xa98/0xc70 net/socket.c:2630
+ ___sys_sendmsg+0x134/0x1d0 net/socket.c:2684
+ __sys_sendmsg+0x16d/0x220 net/socket.c:2716
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f24a538f6c9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f24a6265038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f24a55e5fa0 RCX: 00007f24a538f6c9
+RDX: 0000000000000800 RSI: 0000200000000100 RDI: 0000000000000004
+RBP: 00007f24a5411f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f24a55e6038 R14: 00007f24a55e5fa0 R15: 00007ffc70b4f688
+ </TASK>
+Cannot find add_set index 0 as target
+
+
 ---
- drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c | 3 +++
- 1 file changed, 3 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index 8375f18c8e07..7e3be0fb8cf6 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -1651,6 +1651,9 @@ static void print_tm_tree(struct seq_file *m,
- 	int blkaddr;
- 	u64 cfg;
- 
-+	if (!sq_ctx->ena)
-+		return;
-+
- 	blkaddr = nix_hw->blkaddr;
- 	schq = sq_ctx->smq;
- 
--- 
-2.25.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
