@@ -1,184 +1,97 @@
-Return-Path: <netdev+bounces-238491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CBFEC59B02
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 20:16:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E71A3C59B14
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 20:16:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5C312359AB0
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 19:12:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 250A53BDBD7
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 19:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A0A31A808;
-	Thu, 13 Nov 2025 19:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D4C31A06C;
+	Thu, 13 Nov 2025 19:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kDhzrdGL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tB3voCBX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6069531A7F0
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 19:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B0A212574
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 19:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763061054; cv=none; b=gA5ulqaW3kOnNLb6s4acLhSARSMhXM1ciB/8hu3amIV+LD92jKFEb3yVgK+U+0MTT2430Gk/Caa+KWBfheI/50iPiMXg5aanOxd2v5vcIoz1N7z6tt+BNd9LYPo39K89PoDLuxZ+ghB7i9hNAwDSoF/ZUzq7VvNVTwKQ8YhJyGc=
+	t=1763061239; cv=none; b=BFkR/e/sKbqFtKojrSVv9WyeP/+VCRr8H9OfPSSpqdr0vqQ+tFvfH08sKffSYZs4VD9RE30TPxr/Acj57CO/CzHfcdodmd+0DYuArl072esRrSDkdCJYAYQonwrXKzX+iN5DwqXfLsP4Qo15qSMQ6nn8cW4jVqrkpnF+dxgEmts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763061054; c=relaxed/simple;
-	bh=K9zxC8rOP0HhJ74SIXWJ6fpPHD24AThD3V6aOOnpsGA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RO393vBiVlTU9swcyN7weF/IxzRCdrOtqEcx3+lyVLFgqN9mcVqBKSTNS8mL9bc3iz1Gf2Q0TEWJS2l3M/RubixQBSMKglvjUhdQSyYpvSLAiGQi0JZAGYbivLgUtgoi1xWEmNo5yS3vmWIPIaAXsnA6RAKVzBQUVCEQfLXxhY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kDhzrdGL; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42b387483bbso972397f8f.1
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 11:10:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763061050; x=1763665850; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kvMijRFL2EQNEqoZ0zYEHf4ZN1SnZIgg9umKg1Y6MRk=;
-        b=kDhzrdGLa//zYMpD57jWIj7yR2cl04QKGvNUgd0qMju7NP6+6kBw0KI182+nWN96e+
-         FWTbtiLd5UUwhL6MRR20DnhLHbBnMnrWNwcQRR9Q53ahAkINCsK6yLQwBfEGwldlL1qT
-         gxkbbtyetsSIXOHKMUcnfqhoIk3GOMBU3BT2QG3P6Qh7g1OrQSZ5BzXMbi2yUiNqvqPo
-         Qode2x/FzgQcqWy6UmxRVWjfLypZUH48XxtiU0+dE72B4Sa5x19v0xroFWYmIGbD8FXC
-         udm5SC246GzqB3YvY6yK409H87XffTwJGq5XfZHTzzAg5Z1NWBHmC+1YvXj1Ggyap1qv
-         pluw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763061050; x=1763665850;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kvMijRFL2EQNEqoZ0zYEHf4ZN1SnZIgg9umKg1Y6MRk=;
-        b=irQOnzvamEKvlqRGuTiAfMHcz+XTx2W14nzGOjRBLo0UNt1WOdVMmD32LHZALwz/iW
-         thOuyHNkuod+W2gEacLNKZnyp3uNBlKmNXEBCS9jlfCHPqIAcre/+deCxIi3pKw9sOlD
-         esdCYFGUA8l+g1ICvzyUvmP4cztRCVy4cP1OgFnql+WWYQQrl29Dj0OMQziO3brhew1n
-         /GKKf+Z/UDhVtIerQXksBDeNeHoqxvlWRZZL1QYB9/9T/PVi+Glzr4uHIKRj8zEY1CwQ
-         amXDpVhGScOGg7JVjfNoUDGP82fI1D5m++GHyxeu9XTIJ2N720hG14E5Y7KPVJjiGxdR
-         0/qA==
-X-Forwarded-Encrypted: i=1; AJvYcCUst4W0MZffbqIc8xrg8uNdP8ZMSx/o/458wUzi7t/zRXK8r/Y8lD6T6CgQAfoIM2JanGeEA9M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzo9ffJeTBKojzEoTqm5pAVxPxjnziM0Kr8sVQg8qu3vUKJAl3E
-	wP3SxJ5Jg0K3ULJLegT+8+ymddb0tsIGDSis7ALzc2E2tTTop4MGnOJM0GLP24he1FCHQcuQLeh
-	rONF63hrZcKY/Tkr2Gf/fy053pPayC9I=
-X-Gm-Gg: ASbGncvGR0S1IhYEz1j+buNPX4pdWbefm7Xa9j8zXQ9mWyJs2Qu9Hz6+zw/efD5HIMw
-	lGSBlYR3f4VMXGMYkmDbhrlRartUqQ+J4C7hQceY/a5y57MEy1zelzqOzwnChMYzIu+s8WMxxrH
-	xcEPgtWWH6SUn6djvtO2kKiPap+52SPH1pW1VBq7a061FL+P4u3VpLeFghNtVI8qExG8T6yG1HN
-	Sx2ajhvamVYXhtCuWDo7DJgsEA7BO09LhK9UmHfE0ES2H6wDuwofKXJOVeji5iV62WhZlgr
-X-Google-Smtp-Source: AGHT+IFj2gcB8Jq/A294dUhBecmRquJTSl2UVaLJoxB4ETslW58PCUzHj3jYFMs2rYa/VkuNoCw16gLMBPhR7DExwx4=
-X-Received: by 2002:a05:6000:1ace:b0:3ff:17ac:a34b with SMTP id
- ffacd0b85a97d-42b59383b2dmr540646f8f.42.1763061049654; Thu, 13 Nov 2025
- 11:10:49 -0800 (PST)
+	s=arc-20240116; t=1763061239; c=relaxed/simple;
+	bh=DUNvaVI3QHwsobRb18SkJSAMmtH9JWMzkGkuBkOcUdA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nUuhD9jaJuws/OBe/RegHaXfSjk49RfM7y2eQ2c6j9QuISB01J2BU6j0J5cvo0nDaef1o3HpiOXabIPpILsU5vT9kHDfAJzsBrEe5Tk8xA1th6g/uT4Vit4MFHY6Pu6qCBvEVpa7NVDlRVtRLJv9aa0xpSpwIHuhhLed1gl8qLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tB3voCBX; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763061234;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DVXMEspK3sVPGc2hxafKHd0CDPjmXDBUNTyhK9hQH+w=;
+	b=tB3voCBXAacKMVKnfikstfQeXC3wlpP5/2JVQjNrwXv63sJmsXSr2NnNNhBwisj+s30547
+	Pm8ODjqbwK6GyRsM8QTtz31Vx0r0PcdngBQcmNmDAXcH2oWmIYtXEUQIRpqzVBexDz+vTi
+	qyS4vVBIju7XiP+gxxIgroPgLcvcAm8=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Manish Chopra <manishc@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v4 0/2] convert drivers to use ndo_hwtstamp callbacks part 4
+Date: Thu, 13 Nov 2025 19:13:23 +0000
+Message-ID: <20251113191325.3929680-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112201937.1336854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251112201937.1336854-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <aRTwz5QHq9U5QbQ-@ninjato> <CA+V-a8s5fg02ZQT4tubJ46iBFtNXJRvTPp2DLJgeFnb3eMQPfg@mail.gmail.com>
- <aRYADfD8QkIw9Fnd@shell.armlinux.org.uk> <CA+V-a8u5QAY2WheMxXhoHd09KTi31ZnVO2T0FmXiVWdH8x=rxA@mail.gmail.com>
-In-Reply-To: <CA+V-a8u5QAY2WheMxXhoHd09KTi31ZnVO2T0FmXiVWdH8x=rxA@mail.gmail.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Thu, 13 Nov 2025 19:10:22 +0000
-X-Gm-Features: AWmQ_bmF7qomPmVVwlpUvSLUHi_QYtSH6ttgrTzZPBxmaCqds2xAW8SBPihV9F8
-Message-ID: <CA+V-a8s39qSBLsbEkGJTjg7cLPHuKTFTONLCLh39KO30Y+1_kg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: pcs: renesas,rzn1-miic:
- Add renesas,miic-phylink-active-low property
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>, 
-	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Russell,
+This patchset is a subset of part 3 patchset to convert bnx2x and qede
+drviers to use ndo callbacks instead ioctl to configure and report time
+stamping. These drivers implemented only SIOCSHWTSTAMP command, but
+converted to also provide configuration back to users. Some logic is
+changed to avoid reporting configuration which is not in sync with the
+HW in case of error happened.
 
-On Thu, Nov 13, 2025 at 7:05=E2=80=AFPM Lad, Prabhakar
-<prabhakar.csengg@gmail.com> wrote:
->
-> Hi Russell,
->
-> On Thu, Nov 13, 2025 at 3:58=E2=80=AFPM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > On Thu, Nov 13, 2025 at 02:45:18PM +0000, Lad, Prabhakar wrote:
-> > > Hi Wolfram,
-> > >
-> > > On Wed, Nov 12, 2025 at 8:40=E2=80=AFPM Wolfram Sang
-> > > <wsa+renesas@sang-engineering.com> wrote:
-> > > >
-> > > > Hi Prabhakar,
-> > > >
-> > > > > Add the boolean DT property `renesas,miic-phylink-active-low` to =
-the RZN1
-> > > >
-> > > > Hmm, we already have "renesas,ether-link-active-low" in
-> > > > renesas,ether.yaml and renesas,etheravb.yaml. Can't we reuse that?
-> > > >
-> > > On the RZ/N1x we have the below architecture
-> > >
-> > >                                                       +----> Ethernet=
- Switch
-> > >                                                       |           |
-> > >                                                       |           v
-> > >     MII Converter ----------------------+      GMAC (Synopsys IP)
-> > >                                                       |
-> > >                                                       +----> EtherCAT
-> > > Slave Controller
-> > >                                                       |
-> > >                                                       +----> SERCOS
-> > > Controller
-> >
-> > I'm not sure that diagram has come out correctly. If you're going to
-> > draw diagrams, make sure you do it using a fixed-width font. To me,
-> > it looks like the MII Converter is bolted to GMAC and only has one
-> > connection, and the GMAC has what seems to be maybe five connections.
-> >
-> Sorry when typing the diagram the mail client showed the diagram OK
-> but when sent everything was messed up. Ive represented now in a
-> different way.
->
->                                     +-----------------------+
->                                     |   MII Converter     |
->                                     +-----------+-----------+
->                                                     |
->            +-----------------------------------------+-------------------=
-------------------------+
->             |                                                  |
->                                                |
->             v                                                 v
->                                              v
->  +---------------------+
-> +---------------------------+
-> +------------------------------+
->  | Ethernet Switch  |                   |  EtherCAT Slave      |
->             |  SERCOS Controller   |
->  +---------+------------+                  |  Controller
-> |                   +------------------------------+
->                |                                  +----------------------=
------+
->                |
->                v
->   +-------------------------+
->  |  GMAC (Synopsys  |
->  |       IP)                     |
->  +--------------------------+
->
-Looks like this was messed up too, Ive pasted the diagram here now
-https://gist.github.com/prabhakarlad/9549df941eaced5b06efc572ff6c82b5
+v3 -> v4:
+- improve tx_type checks to the slightly more resilient variant
+- restore netif_running() check in qede driver
+v2 -> v3:
+- keep bnx2x driver's logic as is. Improvements will be sent as
+  follow-ups
+v1 -> v2:
+- remove unused variable in qede patch
 
-Sorry for the noise.
+Vadim Fedorenko (2):
+  bnx2x: convert to use ndo_hwtstamp callbacks
+  qede: convert to use ndo_hwtstamp callbacks
 
-Cheers,
-Prabhakar
+ .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  | 67 ++++++++++------
+ drivers/net/ethernet/qlogic/qede/qede_main.c  | 22 +-----
+ drivers/net/ethernet/qlogic/qede/qede_ptp.c   | 76 ++++++++++++-------
+ drivers/net/ethernet/qlogic/qede/qede_ptp.h   |  6 +-
+ 4 files changed, 98 insertions(+), 73 deletions(-)
+
+-- 
+2.47.3
+
 
