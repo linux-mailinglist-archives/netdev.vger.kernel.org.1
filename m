@@ -1,443 +1,325 @@
-Return-Path: <netdev+bounces-238229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDF52C56357
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:18:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED0B0C562F1
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:14:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 62CA535126B
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 08:13:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CF8D54E34B4
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 08:14:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1EE7330D24;
-	Thu, 13 Nov 2025 08:13:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E641733033F;
+	Thu, 13 Nov 2025 08:14:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CXT2YJTY";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JG4NPpY/"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="D7hvpvIR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3DCA330B37
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 08:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AE72BEC55;
+	Thu, 13 Nov 2025 08:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763021592; cv=none; b=UgEYClDjUFO8xB4WcDkT0ORIXXrinlvEYGPCIDMTxrAlmuXMKHT3BhwVz+AlMFZuNG8BmpmeVWRWkiZNEOEWmQiKIHJsrfMxIrSZcaZKsyajbnaWSVj8mL2TuzO9pyImt3Vi2aTDJFCQ33vkPxbxlt2QurtAtzZ1SYju9W2uWpw=
+	t=1763021668; cv=none; b=XkVccwULgeYjpVWG/pY5fr4+ga0sw98C10i0jaHzN+/8HgfkWwGu06tYUUK2S+JhXX+yjHmj33X9ZwLGzjkOoF5NVLGbxfZcE/K1vKW67cTiF7EEaqIkuK+18nIYnYOdGdBzgYFRiDL/zuT+8Lts8jXR4tRevsWlj5QWg+RYMEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763021592; c=relaxed/simple;
-	bh=Ap2yBhzXTU6O9fGE+Hj6HPv06KYwiyh5Yi2mJXSIy64=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LaoKZ4/yv3ulEXrFwW6KBVWQn8H0eyAjACmANEOQKD0E5JbSSx6ryqLOHA9NfHSYS+7WkkZul9FM2JhRD234T/YLzoZkdZbZIBvkyFhzpSQi+d3Z5OaeAHa33BIbAJUdLhz6DPYTwdyx6NhhQP9aGAQb0H2Ksyin8R+aN8Am610=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CXT2YJTY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JG4NPpY/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763021588;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4DGVaSw4kPeGIDKxD03tfYFZ4BdD6dssNRKM1w0msCk=;
-	b=CXT2YJTY1Nqk/lRMblEf1ThTmZhqk+8CDp6xVJiLsccz5izRRKz1GAssE17iBPgQwl0yy+
-	oTtGgPrQ9MJyIFlK/we2QuBsSuldxlFYqYbGLWeGZtg9FwZK4iy3wMhRlVZvgJRpdgnE6j
-	Ebd9Wwv+deY7u9OdakQxUYs985309G0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-202-p1ufeAQnMNKTfO_wqaZUYQ-1; Thu, 13 Nov 2025 03:13:07 -0500
-X-MC-Unique: p1ufeAQnMNKTfO_wqaZUYQ-1
-X-Mimecast-MFC-AGG-ID: p1ufeAQnMNKTfO_wqaZUYQ_1763021586
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47106a388cfso2995545e9.0
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 00:13:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763021586; x=1763626386; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4DGVaSw4kPeGIDKxD03tfYFZ4BdD6dssNRKM1w0msCk=;
-        b=JG4NPpY/pitvKVgHpmCUJ6ngI7KeZbA0F11JiU1OEsjYGfWTVzbA11W1ZAZi7g/cDV
-         DjlDfv0iZPatmjrfC3am+fxpZn8qWOBoTY6KDUkZY89GMIvP3smgdBLt6aCoF3Qi4QEY
-         yh+0+rdZG3ZUFBq3kJr8/H4YSVs4xCJescmP3Xem18uKMhVukfgwdSnY/QvgnpkB+eq9
-         vh2Vy/i54aj7zdCjcnY3AMQmkcXUbU1hEV16PWkWVnsPV6fLKLh7SBzuPdTqqCJLWxk2
-         JegsVW8Wj3Ye0NWKJKuh3TknoO16M3sqv6NoajebW7NwkdF4+406rUBGn/GYF//1J/wg
-         TpKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763021586; x=1763626386;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4DGVaSw4kPeGIDKxD03tfYFZ4BdD6dssNRKM1w0msCk=;
-        b=WGZC6MLhBAFG0jUeaqQFETnGLNevXQ6F/9xIY0MU64LGudZEAMhN1n/ig0laohfyu8
-         iPaCNq+3dN47UoajKyIndj5Pj3DxRzwLzr76Ew+OeezAXuhdPEWW37IfsYWoFLl1FpRN
-         +gZ0e+Hy6Tty9NdIFeVatZhi0x91aDrf7VJ5H858NaObf5RaXURpOYK1HGeZNyKl5VEN
-         7XWR5iPebgVG4ONiUq/Dq4cMhtEpaVFYo4mwFR8GUt19MwMkQElE+N2koi3Yx9Kyosz2
-         LcXTPpQ0xu9IWZJ+naTCP9LnGJejNKJPNcNkxyCAymUKkAG5cGIyAOeLc6ri1qrV3pc8
-         QzIA==
-X-Forwarded-Encrypted: i=1; AJvYcCVeRqmxQiw0mRT2nJK6BpTHvXgJEV+yD9OaB8g51cF2HwVGUQ4Gzcjyta/QuPnTZcTY37+uE/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMgCVrd6DjBsojLsMaHLmh2Q3UAd3bxd/37TpzCh+wUYg4fkD+
-	fQaiQ0KJ+HDaJkV8jHbNZNyr7TUxyPY8R6kXtyJvFxfWO8A9HlWoaaJYvLJmH5WTths6W5H/Ku9
-	Y6Egq7sk/dCifHzvVoYOr71zP6xWfD/j0Pm6YThSX3mvlw95b8+23LcmXTA==
-X-Gm-Gg: ASbGncuRJWxr9Z1sG875l5u5U5O128rqV0Jr18YjOLMBnWW0KvAYZj0r5qMsXwY65HE
-	xQEeR5NRrSRmFEmNe9frL8npOKUxkstW/j+LP2GH5dV8M9Jj7X0jYTuH8mkT+LEOKzs0q1mpKtj
-	QlMHf5Ka8GBL6PVeCWqt8QPZ4q6eN7/jKhblnvnWmMa5Kt0Lh7ZiGQPBWdn55+tHiCY6/E+fgSZ
-	5GNphxlYcm8cZICzvFrRZ1reJtjOYVOMmfcgrtMaKRWc/6ZAylrVrtEAooibN2fAUErUnuTB2NG
-	LTNAbIW4E4ORzcfuByg/IMPwfe2idINUAdmlQHSQrbM/Hrrdm7611T3ioxKTf5jWNZEOT+w8zTL
-	gGAdp1uCP1Wl7m8pJVGU=
-X-Received: by 2002:a05:600c:a44:b0:477:832c:86ae with SMTP id 5b1f17b1804b1-4778707ca20mr55192345e9.12.1763021585443;
-        Thu, 13 Nov 2025 00:13:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGIQgN138Wh9SyzvdeVmx3/FSQLTRYGtc1iBG+F/973cdwN4YYhSCw6TLEU3JsjzbHZAdvt9g==
-X-Received: by 2002:a05:600c:a44:b0:477:832c:86ae with SMTP id 5b1f17b1804b1-4778707ca20mr55191905e9.12.1763021584764;
-        Thu, 13 Nov 2025 00:13:04 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4778c8a992bsm20321275e9.16.2025.11.13.00.13.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Nov 2025 00:13:04 -0800 (PST)
-Date: Thu, 13 Nov 2025 03:13:01 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] vhost: rewind next_avail_head while discarding
- descriptors
-Message-ID: <20251113030230-mutt-send-email-mst@kernel.org>
-References: <20251113015420.3496-1-jasowang@redhat.com>
+	s=arc-20240116; t=1763021668; c=relaxed/simple;
+	bh=zvzUpPfmDVuQqXQSGhyc5yWTRuaup4p3qjW2KBnJvto=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TDX5TAHf5gzIW8yvm3j14ieobu0hR7DNaYcfux5HvwpObGOmXLIXPQN92vv5uMMcRKGZESxffGiKe4Zqa/jVvZ0YCx+RyCYcJQbKjGfnkxDs209hrLfUOjDP3QWG27iD/TVd4xnBwh2oPLDWSHOcRNGPjAtiw/HT5Ky4jo3WjmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=D7hvpvIR; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 6DDF1C0F56D;
+	Thu, 13 Nov 2025 08:14:03 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 10E196068C;
+	Thu, 13 Nov 2025 08:14:25 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3BB2A102F1BFF;
+	Thu, 13 Nov 2025 09:14:20 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1763021663; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=aC/YI8pVNBhBAJ0Bm63Vhh0r3zEXsT98uT+P6hsoSMw=;
+	b=D7hvpvIRJ1mxAYpKyp8Epfv8kkxGsnvhYXlfftoYYC9AGHfwCDaO4Q38UXvkRAcAov4yMj
+	dCY8VJCfRkXXVD6QcORNcwnRtEcGHEU2Qa+jx+8MgYwLxXtxAh7EKTRqmqgcKPTrxXkSmp
+	2ZesVv8//jgGYLaodl7u9Tw2VoeMDKXtA5Alp2+efLEuIcyu1G4/x5oMMv9gUNUGD5WrBz
+	9cEDgMNhkfmKgITnoUk5guaCKIfrFcCY7tKjvCACMslt22+fNFWAs+yNK0rJE7q9ihXAU8
+	qsS6npsPUf0S8RIvgWZ4J8KpAp9uyi+NoRC0ZvsyznCfwqjcgN4HWtWZOcmLpg==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>,
+	devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: [PATCH net-next v16 00/15] net: phy: Introduce PHY ports representation
+Date: Thu, 13 Nov 2025 09:14:02 +0100
+Message-ID: <20251113081418.180557-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251113015420.3496-1-jasowang@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, Nov 13, 2025 at 09:54:20AM +0800, Jason Wang wrote:
-> When discarding descriptors with IN_ORDER, we should rewind
-> next_avail_head otherwise it would run out of sync with
-> last_avail_idx. This would cause driver to report
-> "id X is not a head".
-> 
-> Fixing this by returning the number of descriptors that is used for
-> each buffer via vhost_get_vq_desc_n() so caller can use the value
-> while discarding descriptors.
-> 
-> Fixes: 67a873df0c41 ("vhost: basic in order support")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+Hi everyone,
 
-Wow that change really caused a lot of fallout.
+This is v16 of the phy_port work. Changes are typos, a more relaxed
+check when parsing DT pairs, and binding updates. Thanks a lot to Andrew
+and Rob for the reviews on the last round.
 
-Thanks for the patch! Yet something to improve:
+This series conflicts with Romain's series on fiber support for dp83869:
+https://lore.kernel.org/all/20251110-sfp-1000basex-v2-0-dd5e8c1f5652@bootlin.com/
 
+As a remainder, a few important notes :
 
-> ---
->  drivers/vhost/net.c   | 53 ++++++++++++++++++++++++++-----------------
->  drivers/vhost/vhost.c | 43 ++++++++++++++++++++++++-----------
->  drivers/vhost/vhost.h |  9 +++++++-
->  3 files changed, 70 insertions(+), 35 deletions(-)
-> 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 35ded4330431..8f7f50acb6d6 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -592,14 +592,15 @@ static void vhost_net_busy_poll(struct vhost_net *net,
->  static int vhost_net_tx_get_vq_desc(struct vhost_net *net,
->  				    struct vhost_net_virtqueue *tnvq,
->  				    unsigned int *out_num, unsigned int *in_num,
-> -				    struct msghdr *msghdr, bool *busyloop_intr)
-> +				    struct msghdr *msghdr, bool *busyloop_intr,
-> +				    unsigned int *ndesc)
->  {
->  	struct vhost_net_virtqueue *rnvq = &net->vqs[VHOST_NET_VQ_RX];
->  	struct vhost_virtqueue *rvq = &rnvq->vq;
->  	struct vhost_virtqueue *tvq = &tnvq->vq;
->  
-> -	int r = vhost_get_vq_desc(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
-> -				  out_num, in_num, NULL, NULL);
-> +	int r = vhost_get_vq_desc_n(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
-> +				    out_num, in_num, NULL, NULL, ndesc);
->  
->  	if (r == tvq->num && tvq->busyloop_timeout) {
->  		/* Flush batched packets first */
-> @@ -610,8 +611,8 @@ static int vhost_net_tx_get_vq_desc(struct vhost_net *net,
->  
->  		vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, false);
->  
-> -		r = vhost_get_vq_desc(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
-> -				      out_num, in_num, NULL, NULL);
-> +		r = vhost_get_vq_desc_n(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
-> +					out_num, in_num, NULL, NULL, ndesc);
->  	}
->  
->  	return r;
-> @@ -642,12 +643,14 @@ static int get_tx_bufs(struct vhost_net *net,
->  		       struct vhost_net_virtqueue *nvq,
->  		       struct msghdr *msg,
->  		       unsigned int *out, unsigned int *in,
-> -		       size_t *len, bool *busyloop_intr)
-> +		       size_t *len, bool *busyloop_intr,
-> +		       unsigned int *ndesc)
->  {
->  	struct vhost_virtqueue *vq = &nvq->vq;
->  	int ret;
->  
-> -	ret = vhost_net_tx_get_vq_desc(net, nvq, out, in, msg, busyloop_intr);
-> +	ret = vhost_net_tx_get_vq_desc(net, nvq, out, in, msg,
-> +				       busyloop_intr, ndesc);
->  
->  	if (ret < 0 || ret == vq->num)
->  		return ret;
-> @@ -766,6 +769,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
->  	int sent_pkts = 0;
->  	bool sock_can_batch = (sock->sk->sk_sndbuf == INT_MAX);
->  	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
-> +	unsigned int ndesc = 0;
->  
->  	do {
->  		bool busyloop_intr = false;
-> @@ -774,7 +778,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
->  			vhost_tx_batch(net, nvq, sock, &msg);
->  
->  		head = get_tx_bufs(net, nvq, &msg, &out, &in, &len,
-> -				   &busyloop_intr);
-> +				   &busyloop_intr, &ndesc);
->  		/* On error, stop handling until the next kick. */
->  		if (unlikely(head < 0))
->  			break;
-> @@ -806,7 +810,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
->  				goto done;
->  			} else if (unlikely(err != -ENOSPC)) {
->  				vhost_tx_batch(net, nvq, sock, &msg);
-> -				vhost_discard_vq_desc(vq, 1);
-> +				vhost_discard_vq_desc(vq, 1, ndesc);
->  				vhost_net_enable_vq(net, vq);
->  				break;
->  			}
-> @@ -829,7 +833,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
->  		err = sock->ops->sendmsg(sock, &msg, len);
->  		if (unlikely(err < 0)) {
->  			if (err == -EAGAIN || err == -ENOMEM || err == -ENOBUFS) {
-> -				vhost_discard_vq_desc(vq, 1);
-> +				vhost_discard_vq_desc(vq, 1, ndesc);
->  				vhost_net_enable_vq(net, vq);
->  				break;
->  			}
-> @@ -868,6 +872,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
->  	int err;
->  	struct vhost_net_ubuf_ref *ubufs;
->  	struct ubuf_info_msgzc *ubuf;
-> +	unsigned int ndesc = 0;
->  	bool zcopy_used;
->  	int sent_pkts = 0;
->  
-> @@ -879,7 +884,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
->  
->  		busyloop_intr = false;
->  		head = get_tx_bufs(net, nvq, &msg, &out, &in, &len,
-> -				   &busyloop_intr);
-> +				   &busyloop_intr, &ndesc);
->  		/* On error, stop handling until the next kick. */
->  		if (unlikely(head < 0))
->  			break;
-> @@ -941,7 +946,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
->  					vq->heads[ubuf->desc].len = VHOST_DMA_DONE_LEN;
->  			}
->  			if (retry) {
-> -				vhost_discard_vq_desc(vq, 1);
-> +				vhost_discard_vq_desc(vq, 1, ndesc);
->  				vhost_net_enable_vq(net, vq);
->  				break;
->  			}
-> @@ -1045,11 +1050,12 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
->  		       unsigned *iovcount,
->  		       struct vhost_log *log,
->  		       unsigned *log_num,
-> -		       unsigned int quota)
-> +		       unsigned int quota,
-> +		       unsigned int *ndesc)
->  {
->  	struct vhost_virtqueue *vq = &nvq->vq;
->  	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
-> -	unsigned int out, in;
-> +	unsigned int out, in, desc_num, n = 0;
->  	int seg = 0;
->  	int headcount = 0;
->  	unsigned d;
-> @@ -1064,9 +1070,9 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
->  			r = -ENOBUFS;
->  			goto err;
->  		}
-> -		r = vhost_get_vq_desc(vq, vq->iov + seg,
-> -				      ARRAY_SIZE(vq->iov) - seg, &out,
-> -				      &in, log, log_num);
-> +		r = vhost_get_vq_desc_n(vq, vq->iov + seg,
-> +					ARRAY_SIZE(vq->iov) - seg, &out,
-> +					&in, log, log_num, &desc_num);
->  		if (unlikely(r < 0))
->  			goto err;
->  
-> @@ -1093,6 +1099,7 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
->  		++headcount;
->  		datalen -= len;
->  		seg += in;
-> +		n += desc_num;
->  	}
->  
->  	*iovcount = seg;
-> @@ -1113,9 +1120,11 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
->  		nheads[0] = headcount;
->  	}
->  
-> +	*ndesc = n;
-> +
->  	return headcount;
->  err:
-> -	vhost_discard_vq_desc(vq, headcount);
-> +	vhost_discard_vq_desc(vq, headcount, n);
+ - This is only a first phase. It instantiates the port, and leverage
+   that to make the MAC <-> PHY <-> SFP usecase simpler.
 
-So here ndesc and n are the same, but below in vhost_discard_vq_desc
-they are different. Fun.
+ - Next phase will deal with controlling the port state, as well as the
+   netlink uAPI for that.
 
->  	return r;
->  }
->  
-> @@ -1151,6 +1160,7 @@ static void handle_rx(struct vhost_net *net)
->  	struct iov_iter fixup;
->  	__virtio16 num_buffers;
->  	int recv_pkts = 0;
-> +	unsigned int ndesc;
->  
->  	mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
->  	sock = vhost_vq_get_backend(vq);
-> @@ -1182,7 +1192,8 @@ static void handle_rx(struct vhost_net *net)
->  		headcount = get_rx_bufs(nvq, vq->heads + count,
->  					vq->nheads + count,
->  					vhost_len, &in, vq_log, &log,
-> -					likely(mergeable) ? UIO_MAXIOV : 1);
-> +					likely(mergeable) ? UIO_MAXIOV : 1,
-> +					&ndesc);
->  		/* On error, stop handling until the next kick. */
->  		if (unlikely(headcount < 0))
->  			goto out;
-> @@ -1228,7 +1239,7 @@ static void handle_rx(struct vhost_net *net)
->  		if (unlikely(err != sock_len)) {
->  			pr_debug("Discarded rx packet: "
->  				 " len %d, expected %zd\n", err, sock_len);
-> -			vhost_discard_vq_desc(vq, headcount);
-> +			vhost_discard_vq_desc(vq, headcount, ndesc);
->  			continue;
->  		}
->  		/* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
-> @@ -1252,7 +1263,7 @@ static void handle_rx(struct vhost_net *net)
->  		    copy_to_iter(&num_buffers, sizeof num_buffers,
->  				 &fixup) != sizeof num_buffers) {
->  			vq_err(vq, "Failed num_buffers write");
-> -			vhost_discard_vq_desc(vq, headcount);
-> +			vhost_discard_vq_desc(vq, headcount, ndesc);
->  			goto out;
->  		}
->  		nvq->done_idx += headcount;
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 8570fdf2e14a..b56568807588 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -2792,18 +2792,11 @@ static int get_indirect(struct vhost_virtqueue *vq,
->  	return 0;
->  }
->  
-> -/* This looks in the virtqueue and for the first available buffer, and converts
-> - * it to an iovec for convenient access.  Since descriptors consist of some
-> - * number of output then some number of input descriptors, it's actually two
-> - * iovecs, but we pack them into one and note how many of each there were.
-> - *
-> - * This function returns the descriptor number found, or vq->num (which is
-> - * never a valid descriptor number) if none was found.  A negative code is
-> - * returned on error. */
+ - The end-goal is to enable support for complex port MUX. This
+   preliminary work focuses on PHY-driven ports, but this will be
+   extended to support muxing at the MII level (Multi-phy, or compo PHY
+   + SFP as found on Turris Omnia for example).
 
-A new module API with no docs at all is not good.
-Please add documentation to this one. vhost_get_vq_desc
-is a subset and could refer to it.
+ - The naming is definitely not set in stone. I named that "phy_port",
+   but this may convey the false sense that this is phylib-specific.
+   Even the word "port" is not that great, as it already has several
+   different meanings in the net world (switch port, devlink port,
+   etc.). I used the term "connector" in the binding.
 
-> -int vhost_get_vq_desc(struct vhost_virtqueue *vq,
-> -		      struct iovec iov[], unsigned int iov_size,
-> -		      unsigned int *out_num, unsigned int *in_num,
-> -		      struct vhost_log *log, unsigned int *log_num)
-> +int vhost_get_vq_desc_n(struct vhost_virtqueue *vq,
-> +			struct iovec iov[], unsigned int iov_size,
-> +			unsigned int *out_num, unsigned int *in_num,
-> +			struct vhost_log *log, unsigned int *log_num,
-> +			unsigned int *ndesc)
+A bit of history on that work :
 
->  {
->  	bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
->  	struct vring_desc desc;
-> @@ -2921,16 +2914,40 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
->  	vq->last_avail_idx++;
->  	vq->next_avail_head += c;
->  
-> +	if (ndesc)
-> +		*ndesc = c;
-> +
->  	/* Assume notifications from guest are disabled at this point,
->  	 * if they aren't we would need to update avail_event index. */
->  	BUG_ON(!(vq->used_flags & VRING_USED_F_NO_NOTIFY));
->  	return head;
->  }
-> +EXPORT_SYMBOL_GPL(vhost_get_vq_desc_n);
-> +
-> +/* This looks in the virtqueue and for the first available buffer, and converts
-> + * it to an iovec for convenient access.  Since descriptors consist of some
-> + * number of output then some number of input descriptors, it's actually two
-> + * iovecs, but we pack them into one and note how many of each there were.
-> + *
-> + * This function returns the descriptor number found, or vq->num (which is
-> + * never a valid descriptor number) if none was found.  A negative code is
-> + * returned on error.
-> + */
-> +int vhost_get_vq_desc(struct vhost_virtqueue *vq,
-> +		      struct iovec iov[], unsigned int iov_size,
-> +		      unsigned int *out_num, unsigned int *in_num,
-> +		      struct vhost_log *log, unsigned int *log_num)
-> +{
-> +	return vhost_get_vq_desc_n(vq, iov, iov_size, out_num, in_num,
-> +				   log, log_num, NULL);
-> +}
->  EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
->  
->  /* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
-> -void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
-> +void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n,
-> +			   unsigned int ndesc)
+The end goal that I personnaly want to achieve is :
 
-ndesc is number of descriptors? And n is what, in that case?
+            + PHY - RJ45
+            | 
+ MAC - MUX -+ PHY - RJ45
+
+After many discussions here on netdev@, but also at netdevconf[1] and
+LPC[2], there appears to be several analoguous designs that exist out
+there.
+
+[1] : https://netdevconf.info/0x17/sessions/talk/improving-multi-phy-and-multi-port-interfaces.html
+[2] : https://lpc.events/event/18/contributions/1964/ (video isn't the
+right one)
+
+Take the MAchiatobin, it has 2 interfaces that looks like this :
+
+ MAC - PHY -+ RJ45
+            |
+	    + SFP - Whatever the module does
+
+Now, looking at the Turris Omnia, we have :
 
 
->  {
-> +	vq->next_avail_head -= ndesc;
->  	vq->last_avail_idx -= n;
->  }
->  EXPORT_SYMBOL_GPL(vhost_discard_vq_desc);
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index 621a6d9a8791..69a39540df3d 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -230,7 +230,14 @@ int vhost_get_vq_desc(struct vhost_virtqueue *,
->  		      struct iovec iov[], unsigned int iov_size,
->  		      unsigned int *out_num, unsigned int *in_num,
->  		      struct vhost_log *log, unsigned int *log_num);
-> -void vhost_discard_vq_desc(struct vhost_virtqueue *, int n);
-> +
-> +int vhost_get_vq_desc_n(struct vhost_virtqueue *vq,
-> +			struct iovec iov[], unsigned int iov_size,
-> +			unsigned int *out_num, unsigned int *in_num,
-> +			struct vhost_log *log, unsigned int *log_num,
-> +			unsigned int *ndesc);
-> +
-> +void vhost_discard_vq_desc(struct vhost_virtqueue *, int n, unsigned int ndesc);
->  
->  bool vhost_vq_work_queue(struct vhost_virtqueue *vq, struct vhost_work *work);
->  bool vhost_vq_has_work(struct vhost_virtqueue *vq);
-> -- 
-> 2.31.1
+ MAC - MUX -+ PHY - RJ45
+            |
+	    + SFP - Whatever the module does
+
+We can find more example of this kind of designs, the common part is
+that we expose multiple front-facing media ports. This is what this
+current work aims at supporting. As of right now, it does'nt add any
+support for muxing, but this will come later on.
+
+This first phase focuses on phy-driven ports only, but there are already
+quite some challenges already. For one, we can't really autodetect how
+many ports are sitting behind a PHY. That's why this series introduces a
+new binding. Describing ports in DT should however be a last-resort
+thing when we need to clear some ambiguity about the PHY media-side.
+
+The only use-cases that we have today for multi-port PHYs are combo PHYs
+that drive both a Copper port and an SFP (the Macchiatobin case). This
+in itself is challenging and this series only addresses part of this
+support, by registering a phy_port for the PHY <-> SFP connection. The
+SFP module should in the end be considered as a port as well, but that's
+not yet the case.
+
+However, because now PHYs can register phy_ports for every media-side
+interface they have, they can register the capabilities of their ports,
+which allows making the PHY-driver SFP case much more generic.
+
+Let me know what you think, I'm all in for discussions :)
+
+Regards,
+
+Changes in v16:
+ - From Andrew, relaxed the check on the number of pairs so that we only
+   fail when baseT is missing pairs
+ - Add a check for either 1, 2 or 4 pairs
+ - Lots of typos (mostly lanes -> pairs)
+ - Added Andrew's review tags (thanks again)
+ - From Rob, added an "else" statement in the ethernet-connector binding
+ - Changed the node name for ethernet connectors to be decimal
+
+Changes in V15:
+ - Update bindings, docs and code to use pairs instead of lanes
+ - Make pairs only relevant for BaseT
+
+Changes in V14:
+ - Fixed kdoc
+ - Use the sfp module_caps feature.
+
+Changes in V13:
+ - Added phy_caps support for interface selection
+ - Aggregated tested-by tags
+
+Changes in V12:
+ - Moved some of phylink's internal helpers to phy_caps for reuse in
+   phylib
+ - Fixed SFP interface selection
+ - Added Rob's review and changes in patch 6
+
+Changes in V11:
+ - The ti,fiber-mode property was deprecated in favor of the
+   ethernet-connector binding
+ - The .attach_port was split into an MDI and an MII version
+ - I added the warning back in the AR8031 PHY driver
+ - There is now an init-time check on the number of lanes associated to
+   every linkmode, making sure the number of lanes is above or equal to
+   the minimum required
+ - Various typos were fixed all around
+ - We no longer use sfp_select_interface() for SFP interface validation
+
+Changes in V10:
+ - Rebase on net-next
+ - Fix a typo reported by Köry
+ - Aggregate all reviews
+ - Fix the conflict on the qcom driver
+
+Changes in V9:
+ - Removed maxItems and items from the connector binding
+ - Fixed a typo in the binding
+
+Changes in V8:
+ - Added maxItems on the connector media binding
+ - Made sure we parse a single medium
+ - Added a missing bitwise macro
+
+Changes in V7:
+ - Move ethtool_medium_get_supported to phy_caps
+ - support combo-ports, each with a given set of supported modes
+ - Introduce the notion of 'not-described' ports
+
+Changes in V6:
+
+ - Fixed kdoc on patch 3
+ - Addressed a missing port-ops registration for the Marvell 88x2222
+   driver
+ - Addressed a warning reported by Simon on the DP83822 when building
+   without CONFIG_OF_MDIO
+
+Changes in V5 :
+
+ - renamed the bindings to use the term "connector" instead of "port"
+ - Rebased, and fixed some issues reported on the 83822 driver
+ - Use phy_caps
+
+Changes in V4 :
+
+ - Introduced a kernel doc
+ - Reworked the mediums definitions in patch 2
+ - QCA807x now uses the generic SFP support
+ - Fixed some implementation bugs to build the support list based on the
+   interfaces supported on a port
+
+V15: https://lore.kernel.org/all/20251106094742.2104099-1-maxime.chevallier@bootlin.com/
+V14: https://lore.kernel.org/netdev/20251013143146.364919-1-maxime.chevallier@bootlin.com/
+V13: https://lore.kernel.org/netdev/20250921160419.333427-1-maxime.chevallier@bootlin.com/
+V12: https://lore.kernel.org/netdev/20250909152617.119554-1-maxime.chevallier@bootlin.com/
+V11: https://lore.kernel.org/netdev/20250814135832.174911-1-maxime.chevallier@bootlin.com/
+V10: https://lore.kernel.org/netdev/20250722121623.609732-1-maxime.chevallier@bootlin.com/
+V9: https://lore.kernel.org/netdev/20250717073020.154010-1-maxime.chevallier@bootlin.com/
+V8: https://lore.kernel.org/netdev/20250710134533.596123-1-maxime.chevallier@bootlin.com/
+v7: https://lore.kernel.org/netdev/20250630143315.250879-1-maxime.chevallier@bootlin.com/
+V6: https://lore.kernel.org/netdev/20250507135331.76021-1-maxime.chevallier@bootlin.com/
+V5: https://lore.kernel.org/netdev/20250425141511.182537-1-maxime.chevallier@bootlin.com/
+V4: https://lore.kernel.org/netdev/20250213101606.1154014-1-maxime.chevallier@bootlin.com/
+V3: https://lore.kernel.org/netdev/20250207223634.600218-1-maxime.chevallier@bootlin.com/
+RFC V2: https://lore.kernel.org/netdev/20250122174252.82730-1-maxime.chevallier@bootlin.com/
+RFC V1: https://lore.kernel.org/netdev/20241220201506.2791940-1-maxime.chevallier@bootlin.com/
+
+Maxime
+
+Maxime Chevallier (15):
+  dt-bindings: net: Introduce the ethernet-connector description
+  net: ethtool: Introduce ETHTOOL_LINK_MEDIUM_* values
+  net: phy: Introduce PHY ports representation
+  net: phy: dp83822: Add support for phy_port representation
+  dt-bindings: net: dp83822: Deprecate ti,fiber-mode
+  net: phy: Create a phy_port for PHY-driven SFPs
+  net: phy: Introduce generic SFP handling for PHY drivers
+  net: phy: marvell-88x2222: Support SFP through phy_port interface
+  net: phy: marvell: Support SFP through phy_port interface
+  net: phy: marvell10g: Support SFP through phy_port
+  net: phy: at803x: Support SFP through phy_port interface
+  net: phy: qca807x: Support SFP through phy_port interface
+  net: phy: Only rely on phy_port for PHY-driven SFP
+  net: phy: dp83822: Add SFP support through the phy_port interface
+  Documentation: networking: Document the phy_port infrastructure
+
+ .../bindings/net/ethernet-connector.yaml      |  57 +++
+ .../devicetree/bindings/net/ethernet-phy.yaml |  18 +
+ .../devicetree/bindings/net/ti,dp83822.yaml   |   9 +-
+ Documentation/networking/index.rst            |   1 +
+ Documentation/networking/phy-port.rst         | 111 ++++++
+ MAINTAINERS                                   |   3 +
+ drivers/net/phy/Makefile                      |   2 +-
+ drivers/net/phy/dp83822.c                     |  78 ++--
+ drivers/net/phy/marvell-88x2222.c             |  94 ++---
+ drivers/net/phy/marvell.c                     |  92 ++---
+ drivers/net/phy/marvell10g.c                  |  52 +--
+ drivers/net/phy/phy-caps.h                    |   5 +
+ drivers/net/phy/phy-core.c                    |   6 +
+ drivers/net/phy/phy_caps.c                    |  65 ++++
+ drivers/net/phy/phy_device.c                  | 337 +++++++++++++++++-
+ drivers/net/phy/phy_port.c                    | 212 +++++++++++
+ drivers/net/phy/qcom/at803x.c                 |  77 ++--
+ drivers/net/phy/qcom/qca807x.c                |  72 ++--
+ include/linux/ethtool.h                       |  39 +-
+ include/linux/phy.h                           |  63 +++-
+ include/linux/phy_port.h                      |  99 +++++
+ include/uapi/linux/ethtool.h                  |  20 ++
+ net/ethtool/common.c                          | 268 ++++++++------
+ 23 files changed, 1399 insertions(+), 381 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
+ create mode 100644 Documentation/networking/phy-port.rst
+ create mode 100644 drivers/net/phy/phy_port.c
+ create mode 100644 include/linux/phy_port.h
+
+-- 
+2.49.0
 
 
