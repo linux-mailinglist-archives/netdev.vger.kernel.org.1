@@ -1,152 +1,232 @@
-Return-Path: <netdev+bounces-238320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC588C573E7
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:42:40 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6DFFC57411
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:46:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 894C63A48DD
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:38:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 284DF34CA5E
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4733337BB5;
-	Thu, 13 Nov 2025 11:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317933112BB;
+	Thu, 13 Nov 2025 11:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZKYoIPe+";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="F3U0yLAl"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gJVbjZ/o"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011003.outbound.protection.outlook.com [40.93.194.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1094D27B34E
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 11:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763033900; cv=none; b=P4EaFT8+Kg+/yq/qYhdtbfKE6BH2AuiBD9ODDOyAqy/5PBWINhrH4k7O3LPRpIP0B0jfpWZkhtFY/sbp1PlCrYIuIfsSZTspqhQVQEDIdDI9/EwdYhP4BItEJoY3uReCBthdm5HwhgsiA7TRxmFEyLu7fFWLTA4242SjWnU2tkc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763033900; c=relaxed/simple;
-	bh=Pm9l86aVoXbyC3LVoUNlqZ2S5nSTtFLy3SJecOO+0o4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HpSCTBm7WWUymKef3nyD5U2YBgF+dOM8Azj9gFb2mdYVBSyNA7WKwy+MPRKzNYXKxkC7jkNAIlL8llUPbalstXe5rlAKs52R8moHdUzTBHiaqBRPYQTCO6j/3JshJTg4SxXJphOZQPdb7VRTfTwpiV6lzQVRFSP2WUskNNoy3cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZKYoIPe+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=F3U0yLAl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763033897;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MHxO2BrOWyHTXIMfNUmqV/Mty139oF6xYTyw1GhIrkA=;
-	b=ZKYoIPe+BFl5hIVflRM/+GZNJ+UPBvwsxNv9D7cjlr6Ry3R5BFjtJmWsqmeGAtS/F5dJir
-	G1EOgvjIMFJYSO8Dag9qzXU5axh2iW6jzRuxQqTlxHkF8r71F/krL779IjuEFwhV0KMXnU
-	u8nUAkl3U7VcePLjl0zjh/HKZSqHQP8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636-5jHXlV57MAW-C2_ESvjyQg-1; Thu, 13 Nov 2025 06:38:16 -0500
-X-MC-Unique: 5jHXlV57MAW-C2_ESvjyQg-1
-X-Mimecast-MFC-AGG-ID: 5jHXlV57MAW-C2_ESvjyQg_1763033895
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-475e032d81bso4242425e9.3
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 03:38:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763033895; x=1763638695; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MHxO2BrOWyHTXIMfNUmqV/Mty139oF6xYTyw1GhIrkA=;
-        b=F3U0yLAlZrzsFDo9ghLfyfGpnr+A4lBkH94987/Yfs2uQawo91q0Tc9oVeye7HsQeK
-         Wct12LB4sQi4KftYr+TkmOBayeM4R9yqgJuZHJZwT0aMdfSPUS9DOE25Qj6cVpm65APa
-         mtD1zghNfsMJhqUpZKaGnOqIR6bhGAlP/Sa6juDeUspQcr+6R+Nbtj/oaUdUAQE6t/lz
-         pVwIXNZa1MPrOXeN/HoUjf5/lKNs8EMitrreQbyPgxTUs3HbLycfiaCMEKxh0/aA1Ioq
-         aXHl9/SGB7wi2rDU24XJi/2K6m0ZHa9zy21sBDQGPiQZywNnXxnaWGs1fGeN1jv9pw96
-         KJMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763033895; x=1763638695;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MHxO2BrOWyHTXIMfNUmqV/Mty139oF6xYTyw1GhIrkA=;
-        b=Vb+BGy2laz4ewh/B4YZj/ZPMxHWNUZU/0ll4XgQOtksw6HixejHJhjcUFnkSUTnU2w
-         tgzFtJNJZG3r+XXuKmvUAxe5z1fA8aE50EVKRzbzC/f3YwHcH7lY3gVoJHbgWbiqaHDZ
-         awKlYcLbV3mwMnF5rS7YtFRzF6h08DJAjUAwB+CXA9s7a7pTR4CHXF1bcBJsZ+rhM+gt
-         Frb4MQwsCB8Pkd6p85gbQeXivBPGHZ1FLOorZM3cJ6uzylok65kSGObCif6YMtAsks0j
-         ozGRvwN+0DDghyTC40a+w7bcbYZzrFXfUBUiLzK5A1UuwfAuCpeSN3ufl9D22Hqo68MY
-         aczA==
-X-Forwarded-Encrypted: i=1; AJvYcCVxZDiq6GH3JL1Qa6qcbHgCZfWp5YOSTBDnZRDGVPPlZiwEsGlUis0XJ2kPAJ3arDQFClHWW24=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz49QV90t6tUvNIPwGq8dpaqmxTiaKEzlecimBARN//wHiiizuQ
-	X0f41YEQIpcr+zHOtVWIlUyXUqFzUzYZNIbExXX3LX0j/SjmZjE+iIGU4IsQ9XqsC1ebxEbVJGj
-	u+7UX9xMJ7D12B4HV9TEjQyGRjnHl1i/nEmGljZ8ZW92CvFC6uEA9erFo6w==
-X-Gm-Gg: ASbGncvXNKrce7MLI8bey55eHFEd46ftswT10cgl6jojGddYywD7ZRb3l2BjbCpnC0J
-	Hove1FsiNcIn6Pybr/NV5iJZnuykMDqH8Dl9De24F9O8a4kLLm1nA8VDanaOooKs+HXrEvtn4he
-	wc3A6yf8cgO5WDLzZL6npYkEYW8v2bvbbitww1kQfhuXfZ0eJPymScTkylMw5Dm+zzP8Pe7zMVb
-	n5Mdqe5ja7VWVdg1GTqhVpwwLdrX0d0pxJRHF0EzMNhi6sVCTkRgQBfneKKcC2ThKzZF+yNjSLU
-	jcKst31qwW460suCjaPTosvBAN/0fUBsFBpmqJqRas4xHmoBnEqcJYTQYxq8eKfSVRdpn5cAwxx
-	fAsRWbGOtuCKM
-X-Received: by 2002:a05:600c:4593:b0:475:dd7f:f6cd with SMTP id 5b1f17b1804b1-477870b92f6mr62489215e9.35.1763033895416;
-        Thu, 13 Nov 2025 03:38:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGqibAeC+wJMoX0xryKgrYRi/EQVzzHpY8hZdvijoDFG66NmayYcdxhZkGs0YgOU+Yjg5XJCA==
-X-Received: by 2002:a05:600c:4593:b0:475:dd7f:f6cd with SMTP id 5b1f17b1804b1-477870b92f6mr62488765e9.35.1763033895021;
-        Thu, 13 Nov 2025 03:38:15 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.55])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4778c856c95sm30970745e9.7.2025.11.13.03.38.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Nov 2025 03:38:14 -0800 (PST)
-Message-ID: <987c6e54-992e-4074-b46a-b0a3e3aff874@redhat.com>
-Date: Thu, 13 Nov 2025 12:38:13 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8B242A96;
+	Thu, 13 Nov 2025 11:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.3
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763034256; cv=fail; b=K2NWfVxhXzQPPkiMvZ812/lNSuc0uxRPT6tT1uLZpMq64L1Y4Ecwb87lDuU2lcO6aXu+4Qd9Lz6QlijvnlazcPLaR2qFYI/EP8MKHI/fXz9S66TZvHwt1rzPc3GZyrKYAHCpenXXIMctr5APXebyqWELysQ3bjfM8HDOM092RNI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763034256; c=relaxed/simple;
+	bh=OiUFxYmqGoq67NzkPkTDF1RF92tfxM4AXcjTkblZO6c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tugvsY8G7RzOD8QfbZu4jAUVMTxgb5rp+IRGmQYEmnJxTpCQzLiHOyMDkP6q2cZh6f6SrVSg8cn1fE+g7kNl0UQF6p5DeHHRBww5osndJaixHdiC+Hp2W7doNElBVcoLQLtISk/ZSXK65VCzWpvEvOZBt1KOkOF5yXGQqpr8dY0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gJVbjZ/o; arc=fail smtp.client-ip=40.93.194.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MdizPXdwopsIcNGh9Vph+ZnYijpQqG3aAfE2Hwp4r4fARGF3SCTOYOKYN0Yg9PanKpjat2f+mZQmEn40N2eGpOItHnLlrsygL7ou83N/v8hMvJiJiE1+uXKtPMi9VMR8vM6rcaAXMttFwmmkIKkyMDMbOUAAqpRt5Oa27OPILFTAJwQcs2ooWUWGJFjaaXlC593JWuWXhcjQ9DvMQLLiZfhZ9FKaa2weuyuchaU4OMGJGX/d2eW5ovTLuErgiD+0Er3Im+ctZm4yKAmMTX4rOnfh+Vh542YEusIdc3fiKSywNm9ZlhpRknQUArfmHqHHw8yA7+dzbNpqBW4x/M83cw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EVn19GIUGNtQ+tKX4RTyoT/XnXyh0sDLW3Fex7/T9cc=;
+ b=mo8tQ3zGEAHIfyTzkh10UX5w8ZaR4HfjLn6jAs+Ce6Qjaa+IoZLw6fHFGnGfi08dCYD/jCnP8qLBGzguIEzY3KKzHTM7QP8ZT/pjNp/XtX0ejqiNb0cN1pFU4+rPdxpopUXMPBRMcylIOE1ceXVwhY2GeT2g4oYD4d5QbOW/1unX5SGdgr6RTmTzeeNS934sT/DZCGx1xkv00oiv5Oc2yFpTGfrBg54d+GiMcuzCusuljkaJHz6I2l0+sj+HL7ho/jSg/98sxSL/1xOfNHnaAG2JwFKn7SQ18ndF3o7oMwLjf3FMFBg/XET66xYdRA0tGl/RoqhZi+WznIzYYu2U9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=broadcom.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EVn19GIUGNtQ+tKX4RTyoT/XnXyh0sDLW3Fex7/T9cc=;
+ b=gJVbjZ/oVcaWcoSu5nfTPb4ROaVFIWeq0ubEj8Z56Fxo8mmlKgN+rCT/K2n/B+hKRPD3SK5xuFNBBRPGJJu1M5hvpDlx4i09vr6Wq8WiA/LzFokvZmjiDpCLMx38zYm5+D7hOAxka3rVnXlckBdPkW8sTg6W8E7XfHO0E/fI1jfeLN0c7BZDtz9owxoJxbiKZMoRrJSXn7VZVn/Lc9/tTD4etdB1MgJJFPlG1G+W96cYUxxM2bo9lyoSsbFcZjDat1UrgN/WCReUqz2GCw4ON6b8yX6fRNx16bKFSviIUPf3qb+NwWu+qnWF1TrO41sD9yf6uxJwGsRxaw3Z8aMMsQ==
+Received: from BY3PR03CA0007.namprd03.prod.outlook.com (2603:10b6:a03:39a::12)
+ by BN7PPFDE2ACDA69.namprd12.prod.outlook.com (2603:10b6:40f:fc02::6e6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.15; Thu, 13 Nov
+ 2025 11:44:10 +0000
+Received: from CO1PEPF000044F8.namprd21.prod.outlook.com
+ (2603:10b6:a03:39a:cafe::ef) by BY3PR03CA0007.outlook.office365.com
+ (2603:10b6:a03:39a::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9320.15 via Frontend Transport; Thu,
+ 13 Nov 2025 11:44:01 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1PEPF000044F8.mail.protection.outlook.com (10.167.241.198) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.0 via Frontend Transport; Thu, 13 Nov 2025 11:44:09 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 13 Nov
+ 2025 03:43:54 -0800
+Received: from localhost (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 13 Nov
+ 2025 03:43:53 -0800
+Date: Thu, 13 Nov 2025 13:43:48 +0200
+From: Leon Romanovsky <leonro@nvidia.com>
+To: Siva Reddy Kallam <siva.kallam@broadcom.com>
+CC: <jgg@nvidia.com>, <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<vikas.gupta@broadcom.com>, <selvin.xavier@broadcom.com>,
+	<anand.subramanian@broadcom.com>, <usman.ansari@broadcom.com>
+Subject: Re: [PATCH v2 0/8] Introducing Broadcom BNG_RE RoCE Driver
+Message-ID: <20251113114348.GC10544@unreal>
+References: <20250922154303.246809-1-siva.kallam@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 3/5] eea: probe the netdevice and create
- adminq
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Wen Gu <guwen@linux.alibaba.com>,
- Philo Lu <lulie@linux.alibaba.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Lukas Bulwahn <lukas.bulwahn@redhat.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Vivian Wang <wangruikang@iscas.ac.cn>,
- Troy Mitchell <troy.mitchell@linux.spacemit.com>,
- Dust Li <dust.li@linux.alibaba.com>
-References: <20251110114648.8972-1-xuanzhuo@linux.alibaba.com>
- <20251110114648.8972-4-xuanzhuo@linux.alibaba.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251110114648.8972-4-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250922154303.246809-1-siva.kallam@broadcom.com>
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F8:EE_|BN7PPFDE2ACDA69:EE_
+X-MS-Office365-Filtering-Correlation-Id: c3a08aad-f9a9-4000-63ab-08de22a9f54b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?0AqnXUKNn4Uv7ABhSxsXq3DVHsNvGcLa3IE9+uAUnGCy74CthRHjak+D74oh?=
+ =?us-ascii?Q?ZG3e2Ogd5tkkWFIRXTlKTiFViYQa4wN7U71Rsq6bzv2WUkS/3qWzTfFpFK6g?=
+ =?us-ascii?Q?dMigZyt4P+tcUS5wNbfFW1iXlwjAm0v8bOdys2tUxmjERJimd/gzfL/6Sdjm?=
+ =?us-ascii?Q?2r31BYbi9tmOd3PutmwmS2xph6JLZwYfr6gOjBf7i52DSCA9dR2dkGRFMEFw?=
+ =?us-ascii?Q?KgmdMuBxl0o6LpLGXtVr3PXw7OaKXuJ9FesPSggm5Pk9F/LFprHXWR1oE1ZG?=
+ =?us-ascii?Q?Ys0BO8MJc3a3TvteHAtJknujsGQpIU0qNZKmJN2yg9zqLu03cABKF4L/xzUD?=
+ =?us-ascii?Q?0AZkQV0z9lwWycGKbzsC2NpDVSuXUgmtJ+8n8XNK5RFO/tgl4o8YxSFICVu5?=
+ =?us-ascii?Q?MaZCtxWmlibpwzHaOJt9IN+Re0mnWNKwoKHns2kcVVuUIDzdDNU2Fazch7oN?=
+ =?us-ascii?Q?W+UO8ImI7jdpFmXsdJleAp/c3sQePf7JbQn+NU9txvWCN1HqwmyqZGLPhX2A?=
+ =?us-ascii?Q?txc6r0zy+T6ICn70qmEMbfIIa2x22m3QzWD+trgSYpxnqxrV3Y2SYlLw7ysz?=
+ =?us-ascii?Q?gm2P4qlV0IpIa4HhHOaGU/KgGGjuXKciOXtrJt8clQHC78m/fNeF0KdEg5E3?=
+ =?us-ascii?Q?r7LEjWBK3On9CXvdUEmXQn/IQIsFk1RKEiGi5L2IU/wfZ65x8i7oRupvukww?=
+ =?us-ascii?Q?MbgHGkH5LigksZDSTRuy5xaO3eVJhzT3lw7156ij2rQisRbSd+3+CNbmrbRT?=
+ =?us-ascii?Q?m1G/UARlv3xgZbDcxG6b1g6p7C2nUlO3CfA+CULCV7QZveKwVMYdGjxK1cnX?=
+ =?us-ascii?Q?+MAWKC9fVL/PUB02qY8gMFTPVj4VVWOrRLnQ7tZIoaw4Ov3P4mCsoiBSWCYo?=
+ =?us-ascii?Q?TNm2W9MMquUUfanvu/DhFyFpVxavq4D8tC8ivdk+NIfmVuH39YSmFhXjUV1c?=
+ =?us-ascii?Q?YHWAqpmFNiPIY3ez1BuJ2I1i4BNaK7zzGurrrbjI+Y9eV3SNTm0Ow3IsI2Ui?=
+ =?us-ascii?Q?wwF928Gr6ef994Z8IuqkUR8AG+kyEX3Nvg70DM6DMThJDUX6r6QgsAt+caJr?=
+ =?us-ascii?Q?2DKV2EVri4LTMYMRiXMFV5oikYUz0jc0LxpcBuC3ovgHp0KhazC3ITXaOj6f?=
+ =?us-ascii?Q?AIiBaZVt1NAoKzFilNs/4TUSq4gNZ+BJW9QIsUuX8FJ2IwWpb7QP96XIkfsf?=
+ =?us-ascii?Q?BgnflsqSlilDjz1cjEqmD/v7ZBG5BPyDiny1k1ACJDLy8yzN/ekroo2Y2NU3?=
+ =?us-ascii?Q?zwq0zLpyqy+p/jw5j+hxpTvTWvp9b6QoesPXi/jLVzW7p8QOXnvpVYhjbnqI?=
+ =?us-ascii?Q?R2jHruwcvb6CZ+H2M4+/U7CXVNcsJ9wT4lodReNxu98qdhnspUNmlZDEi2K/?=
+ =?us-ascii?Q?0z4m3ewLl+yV+MBrYIFGpoRB0d2zwcp0AsKWCxnPdy8rFLf6QCCA+B1WJFw/?=
+ =?us-ascii?Q?17BRQLEYGQw+67mgNnCF/PaIj5HwQr4AG58XKwHbN/dIwc4geKhOJe3AbHmG?=
+ =?us-ascii?Q?t3qDEPTe4HijYrc46jxitp9LrXqpemOQDYfxa9BGCQfhoYAVDwAatt4wi7GT?=
+ =?us-ascii?Q?XVcGe04ApSKowTTGD1I=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2025 11:44:09.2321
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c3a08aad-f9a9-4000-63ab-08de22a9f54b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044F8.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PPFDE2ACDA69
 
-On 11/10/25 12:46 PM, Xuan Zhuo wrote:
-> +static int eea_netdev_init_features(struct net_device *netdev,
-> +				    struct eea_net *enet,
-> +				    struct eea_device *edev)
-> +{
-> +	struct eea_aq_cfg *cfg;
-> +	int err;
-> +	u32 mtu;
-> +
-> +	cfg = kmalloc(sizeof(*cfg), GFP_KERNEL);
-> +	if (!cfg)
-> +		return -ENOMEM;
-> +
-> +	err = eea_adminq_query_cfg(enet, cfg);
-> +	if (err)
-> +		goto err_free;
-> +
-> +	mtu = le16_to_cpu(cfg->mtu);
-> +	if (mtu < ETH_MIN_MTU) {
-> +		dev_err(edev->dma_dev, "The device gave us an invalid MTU. Here we can only exit the initialization. %d < %d",
+On Mon, Sep 22, 2025 at 03:42:55PM +0000, Siva Reddy Kallam wrote:
+> Hi,
 
-Minor nit: missing trailing '\n'.
+<...>
 
-/P
+> Siva Reddy Kallam (7):
+>   RDMA/bng_re: Add Auxiliary interface
+>   RDMA/bng_re: Register and get the resources from bnge driver
+>   RDMA/bng_re: Allocate required memory resources for Firmware channel
+>   RDMA/bng_re: Add infrastructure for enabling Firmware channel
+>   RDMA/bng_re: Enable Firmware channel and query device attributes
+>   RDMA/bng_re: Add basic debugfs infrastructure
+>   RDMA/bng_re: Initialize the Firmware and Hardware
+> 
+> Vikas Gupta (1):
+>   bng_en: Add RoCE aux device support
 
+There are some nitpicks which I wanted to fix while applying,
+but it doesn't apply to rdma-next.
+
+...
+Applying: bng_en: Add RoCE aux device support
+Patch failed at 0001 bng_en: Add RoCE aux device support
+error: patch failed: drivers/net/ethernet/broadcom/bnge/bnge_core.c:296
+error: drivers/net/ethernet/broadcom/bnge/bnge_core.c: patch does not apply
+error: patch failed: drivers/net/ethernet/broadcom/bnge/bnge_resc.h:72
+error: drivers/net/ethernet/broadcom/bnge/bnge_resc.h: patch does not apply
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
+Press any key to continue...
+
+Thanks
+
+
+> 
+>  MAINTAINERS                                   |   7 +
+>  drivers/infiniband/Kconfig                    |   1 +
+>  drivers/infiniband/hw/Makefile                |   1 +
+>  drivers/infiniband/hw/bng_re/Kconfig          |  10 +
+>  drivers/infiniband/hw/bng_re/Makefile         |   8 +
+>  drivers/infiniband/hw/bng_re/bng_debugfs.c    |  39 +
+>  drivers/infiniband/hw/bng_re/bng_debugfs.h    |  12 +
+>  drivers/infiniband/hw/bng_re/bng_dev.c        | 539 ++++++++++++
+>  drivers/infiniband/hw/bng_re/bng_fw.c         | 767 ++++++++++++++++++
+>  drivers/infiniband/hw/bng_re/bng_fw.h         | 211 +++++
+>  drivers/infiniband/hw/bng_re/bng_re.h         |  86 ++
+>  drivers/infiniband/hw/bng_re/bng_res.c        | 279 +++++++
+>  drivers/infiniband/hw/bng_re/bng_res.h        | 215 +++++
+>  drivers/infiniband/hw/bng_re/bng_sp.c         | 131 +++
+>  drivers/infiniband/hw/bng_re/bng_sp.h         |  47 ++
+>  drivers/infiniband/hw/bng_re/bng_tlv.h        | 128 +++
+>  drivers/net/ethernet/broadcom/bnge/Makefile   |   3 +-
+>  drivers/net/ethernet/broadcom/bnge/bnge.h     |  10 +
+>  .../net/ethernet/broadcom/bnge/bnge_auxr.c    | 258 ++++++
+>  .../net/ethernet/broadcom/bnge/bnge_auxr.h    |  84 ++
+>  .../net/ethernet/broadcom/bnge/bnge_core.c    |  18 +-
+>  .../net/ethernet/broadcom/bnge/bnge_hwrm.c    |  40 +
+>  .../net/ethernet/broadcom/bnge/bnge_hwrm.h    |   2 +
+>  .../net/ethernet/broadcom/bnge/bnge_resc.c    |  12 +
+>  .../net/ethernet/broadcom/bnge/bnge_resc.h    |   1 +
+>  25 files changed, 2907 insertions(+), 2 deletions(-)
+>  create mode 100644 drivers/infiniband/hw/bng_re/Kconfig
+>  create mode 100644 drivers/infiniband/hw/bng_re/Makefile
+>  create mode 100644 drivers/infiniband/hw/bng_re/bng_debugfs.c
+>  create mode 100644 drivers/infiniband/hw/bng_re/bng_debugfs.h
+>  create mode 100644 drivers/infiniband/hw/bng_re/bng_dev.c
+>  create mode 100644 drivers/infiniband/hw/bng_re/bng_fw.c
+>  create mode 100644 drivers/infiniband/hw/bng_re/bng_fw.h
+>  create mode 100644 drivers/infiniband/hw/bng_re/bng_re.h
+>  create mode 100644 drivers/infiniband/hw/bng_re/bng_res.c
+>  create mode 100644 drivers/infiniband/hw/bng_re/bng_res.h
+>  create mode 100644 drivers/infiniband/hw/bng_re/bng_sp.c
+>  create mode 100644 drivers/infiniband/hw/bng_re/bng_sp.h
+>  create mode 100644 drivers/infiniband/hw/bng_re/bng_tlv.h
+>  create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_auxr.c
+>  create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_auxr.h
+> 
+> -- 
+> 2.34.1
+> 
+> 
 
