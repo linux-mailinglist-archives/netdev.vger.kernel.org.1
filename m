@@ -1,374 +1,160 @@
-Return-Path: <netdev+bounces-238253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC54C565C3
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:51:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 603FEC565B4
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:50:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 72AB9354926
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 08:44:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1951B3A37AD
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 08:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F983321AB;
-	Thu, 13 Nov 2025 08:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995B7330316;
+	Thu, 13 Nov 2025 08:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kHKKqH0n"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="MMMQmJQ8";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="eN8MHjZk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECE22550BA
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 08:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE7A22578D
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 08:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763023429; cv=none; b=J+dgkykDIYiogMV5lMLtCfwuwMkh3DiR7yMmsNyyKLa5732mdwsgKjaZZP1suYBd2bLbn/4Nc0MbXw+WApwSEjBHI/yDoqnMJUknNPxjoYrK1sgxJGYeAm/3Rr6uF7UbdmuFXj1oOEMAMq4oMXFk0GEdWhvB5vyxgUyKjshRlqA=
+	t=1763023850; cv=none; b=bH4cc3/ROi1tYPmajWegOcW9m/b4jUA7kJb+6h+IUIL6P4nbIgPzzCGdHODWFBsRTO7zMKPY/OytRqGoQXOqDBoF27CQF7Iu04e6Ta3sBz7/0dT4qG928Sm7i+Mh8R/TrDXxZSmBq6chbzPc02dPhlrJPKOvjqbcEK9knglljfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763023429; c=relaxed/simple;
-	bh=jse6Fvf91Bj1D9bHF1Cetv+Q41yOk1kjQNQ2qIrFsdk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jx0YvaUW3g6aY2fFVwcOXpOYrIGJkwyWd6sKIs6/dRUJQDz+yMI5/tD5Ur+muhnsGQ5g/sxerXzUpJD4+CImSk+PSTdLRCcCHukDTgOT7vKmUsDRtV08tithICHQtZwUflHnw/55HQpbRf93IbuaXT7uQr2a5qp4ta1lm16bohU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kHKKqH0n; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-bc09b3d3afeso354596a12.0
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 00:43:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763023427; x=1763628227; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j82bvNFvImNkIdmXcdyCuYEbPQ6AAn6vtq3RYsevuB0=;
-        b=kHKKqH0nIZQDG3eGZSTEvADc0dv1b0ssYMvK/EUBTSW2DVRHed9bVoB0vHnFVeHhSf
-         UXXWTBiuklCMyLYAXH8B2rvn0zuElNu+dIvJc95oclMSAYb4L3iOkWojjcKFXiB+q7VR
-         GvS92wgIE9kbReQSKH+Ph9TOxLZ5EQ7ltWdtmTzQC6NL5hUMwt34/sTS+nneMRy3PMfJ
-         agj22d2Q2DKSFvQGPSC55NrYTVTP6ewrdNui0YR5Il+JtTeKoBUZEwW3AmieIPe8vryw
-         5NKr7QhGfbzUv4buQdj37Dw40htvafdf93b7pdLiMINKqKZcVloSoN1gv1kW0Pxi1qKE
-         kOTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763023427; x=1763628227;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=j82bvNFvImNkIdmXcdyCuYEbPQ6AAn6vtq3RYsevuB0=;
-        b=EckZWNAngMN+3n/pf6q3BVavLpQnQBYNlEoEsZDl03ZBtJS3cWm+40b9p9n5ASDBo9
-         uziIWu5A9stUaUu1Flnvhw55RCNCInpv/VESEwuTf5ijPPs/Rw9c7yskzZX4gycbbsTF
-         sVBjAx/NHvNXMMqosOVEDaHrtvBf8UKwaXZTKMSpPCdP9txUHsJJXOnw5sSBGCxcf0u/
-         0bDBXSsJIy0EGi8KPAcl/L1nvnwkQELO+yp3kDVizSScSaONfUvEX9MXBYl/lLFZvIn3
-         3D/40u72hlvgAJTGS036MKsnoi3wgR2LxOdf4Cxa+ISc416J61ys2YgLZRTRMV2EKn5z
-         EGBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVoTHdngm0ej1Bcq9TfIw3yMpSLl4Q/XENapj/rYjPz514SJLcxEeykJqiipFlmSuRPFfy6bDE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWFE97nnakYW3EWVn8gl1LSZ3evM5hNhutlEA3t/5sTLx3Lnaz
-	6KJE4hox7MxsKxTyZprGh5oTnbLHri3x6PhRmm2zJNhVPLMgLus0vN7tGLK8ST3ZmhzF0aoFYDF
-	k4wwdLdDOqgO4/O/0x+c1qLMUUI+wCUwGrNj2hBSp
-X-Gm-Gg: ASbGncutCM9MRoT/mwjMlMcdTzafakSeUNq621fC3Q33OLj1ZncQ0WZ+nD4HN4K62kw
-	bAVu40dJGbed3pHCP8rJ5VWgB9gr7IL1KmAqVFQEgBCA8mW0+9v9hApwdm9FS1dz+6g7+EBFHDM
-	hhnkBiCzJlfCh27T2mFEnGyFUlP1Ub53EB53tcb14yjWb/dS2489WaBfDsqojpmFHX87f52/um2
-	2VevZG8+BV14sTRkL623M42irAupcGtA7Mi6SXZGTitwKcpr4MLpePTVDZs9+eIiBIQfhq/MMoM
-	4xREgsvB3nxxzHG3SJzd1iczpK/V1ZaJgR+75ao=
-X-Google-Smtp-Source: AGHT+IFRjxtEMxqTf2ZiPcWD+w/6WxiFP8vWz2ry+bgq6jmCqzkoz3cIoI/9FBit5SMj949e5QZd1XphprmQPlN7Kao=
-X-Received: by 2002:a17:903:2c04:b0:295:68dd:4ebf with SMTP id
- d9443c01a7336-2984ed347bemr84532525ad.16.1763023426416; Thu, 13 Nov 2025
- 00:43:46 -0800 (PST)
+	s=arc-20240116; t=1763023850; c=relaxed/simple;
+	bh=wRWmJzQfRZlbBYAFjeZwhhb7wYbWmM38Ct2Qg7q8OmM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JvYsLJ7jvvdsYtMgk6rdMaidNa9A4Su3sRHfnRK0Tnu+csnQhn07RlMjAw5s3DHrlQnYeplIe1qyFfK6uEK/Xo2iX7xHK3PUU01P6I5vW3OCdwOaNAFvnRYFJM7cm6kXCuhtw9JzXmoXWsQVVH07vOut/UCvQLPk+vfbAizD2jM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=MMMQmJQ8; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=eN8MHjZk; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1763023839;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y1IFQ2dg0dPJUWdefma4qi4mC63g7swvV+DrRqzNNKw=;
+	b=MMMQmJQ8o4QbY9TBBZghK0g8PhH+oeiSTaOehHoRx6d/Icw2555qjAI7pY8rtv4ha32oon
+	C8Tr0ARP7MaL9T8Jc19TNlTtVVbK+YfoVFid+7KdD1jMTgqaxdaDmd+/rxI4v0ySn8CJWo
+	lT0Vn80sdSDcbVNGDdpwWZUGmyW0oTz8ERzLeLcqAB4Cgbjz1E7utfnVjKIvRoNQzJlMbz
+	Awg5luUUC51P4Atm8iRKsasDA1IffVbx8ytvPVF08if4LdbQ+7qJD6lW8Pd2DcaJXr7smk
+	Z4zidAiU2gSuzMt4r+Q7R/l92a23He++pVaWJHj2emCeqgVHxP6Ksqms0wUe1A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1763023839;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y1IFQ2dg0dPJUWdefma4qi4mC63g7swvV+DrRqzNNKw=;
+	b=eN8MHjZkrux92Wbtj4FBA6km95T+17b8daMb10DwgZlP85Cn+ffmnPtfHtrHxcQInxj8yQ
+	KEra8+HcIkpPMaAA==
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next] igc: Restore default Qbv schedule when
+ changing channels
+In-Reply-To: <87ldkblyhd.fsf@intel.com>
+References: <20251107-igc_mqprio_channels-v1-1-42415562d0f8@linutronix.de>
+ <87ldkblyhd.fsf@intel.com>
+Date: Thu, 13 Nov 2025 09:50:38 +0100
+Message-ID: <87bjl6l3j5.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251113071756.40118-1-adelodunolaoluwa.ref@yahoo.com> <20251113071756.40118-1-adelodunolaoluwa@yahoo.com>
-In-Reply-To: <20251113071756.40118-1-adelodunolaoluwa@yahoo.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 13 Nov 2025 00:43:34 -0800
-X-Gm-Features: AWmQ_bledBDMon-7jfxD9YyY1CjbXYKMvQ22CAf96HxnEGlMpnIBxJ-QLZCGer0
-Message-ID: <CAAVpQUBvLN=sRVb8cbMngwm3o=KZkVOeCYdyi2p5sYjjZQU=HQ@mail.gmail.com>
-Subject: Re: [PATCH v5] selftests: af_unix: Add tests for ECONNRESET and EOF semantics
-To: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
-	skhan@linuxfoundation.org, david.hunter.linux@gmail.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, 
-	linux-kernel-mentees@lists.linuxfoundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On Wed, Nov 12, 2025 at 11:19=E2=80=AFPM Sunday Adelodun
-<adelodunolaoluwa@yahoo.com> wrote:
->
-> Add selftests to verify and document Linux=E2=80=99s intended behaviour f=
-or
-> UNIX domain sockets (SOCK_STREAM and SOCK_DGRAM) when a peer closes.
-> The tests verify that:
->
->  1. SOCK_STREAM returns EOF when the peer closes normally.
->  2. SOCK_STREAM returns ECONNRESET if the peer closes with unread data.
->  3. SOCK_SEQPACKET returns EOF when the peer closes normally.
->  4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unread data=
-.
->  5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
->
-> This follows up on review feedback suggesting a selftest to clarify
-> Linux=E2=80=99s semantics.
->
-> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-> Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-> ---
-> Changelog:
->
-> changes made in v4 to v5:
-> 1. Moved the send() call before the socket type check in Test 2 to ensure
->    the unread data behavior is tested for SOCK_DGRAM as well.
->
-> 2. Removed the misleading commend about accept() for clarity.
->
-> 3. Applied indentation fixes for style consistency
->    (alignment with open parenthesis).
->
-> 4. Minor comment and formatting cleanups for clarity and adherence
->    to kernel coding style.
->
->  tools/testing/selftests/net/.gitignore        |   1 +
->  tools/testing/selftests/net/af_unix/Makefile  |   1 +
->  .../selftests/net/af_unix/unix_connreset.c    | 178 ++++++++++++++++++
->  3 files changed, 180 insertions(+)
->  create mode 100644 tools/testing/selftests/net/af_unix/unix_connreset.c
->
-> diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selft=
-ests/net/.gitignore
-> index 439101b518ee..e89a60581a13 100644
-> --- a/tools/testing/selftests/net/.gitignore
-> +++ b/tools/testing/selftests/net/.gitignore
-> @@ -65,3 +65,4 @@ udpgso
->  udpgso_bench_rx
->  udpgso_bench_tx
->  unix_connect
-> +unix_connreset
-> diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing=
-/selftests/net/af_unix/Makefile
-> index de805cbbdf69..5826a8372451 100644
-> --- a/tools/testing/selftests/net/af_unix/Makefile
-> +++ b/tools/testing/selftests/net/af_unix/Makefile
-> @@ -7,6 +7,7 @@ TEST_GEN_PROGS :=3D \
->         scm_pidfd \
->         scm_rights \
->         unix_connect \
-> +       unix_connreset \
->  # end of TEST_GEN_PROGS
->
->  include ../../lib.mk
-> diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/tools=
-/testing/selftests/net/af_unix/unix_connreset.c
-> new file mode 100644
-> index 000000000000..9cb0f48597eb
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
-> @@ -0,0 +1,178 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Selftest for AF_UNIX socket close and ECONNRESET behaviour.
-> + *
-> + * This test verifies:
-> + *  1. SOCK_STREAM returns EOF when the peer closes normally.
-> + *  2. SOCK_STREAM returns ECONNRESET if peer closes with unread data.
-> + *  3. SOCK_SEQPACKET returns EOF when the peer closes normally.
-> + *  4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unread =
-data.
-> + *  5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
-> + *
-> + * These tests document the intended Linux behaviour.
-> + *
-> + */
-> +
-> +#define _GNU_SOURCE
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <fcntl.h>
-> +#include <unistd.h>
-> +#include <errno.h>
-> +#include <sys/socket.h>
-> +#include <sys/un.h>
-> +#include "../../kselftest_harness.h"
-> +
-> +#define SOCK_PATH "/tmp/af_unix_connreset.sock"
-> +
-> +static void remove_socket_file(void)
-> +{
-> +       unlink(SOCK_PATH);
-> +}
-> +
-> +FIXTURE(unix_sock)
-> +{
-> +       int server;
-> +       int client;
-> +       int child;
-> +};
-> +
-> +FIXTURE_VARIANT(unix_sock)
-> +{
-> +       int socket_type;
-> +       const char *name;
-> +};
-> +
-> +FIXTURE_VARIANT_ADD(unix_sock, stream) {
-> +       .socket_type =3D SOCK_STREAM,
-> +       .name =3D "SOCK_STREAM",
-> +};
-> +
-> +FIXTURE_VARIANT_ADD(unix_sock, dgram) {
-> +       .socket_type =3D SOCK_DGRAM,
-> +       .name =3D "SOCK_DGRAM",
-> +};
-> +
-> +FIXTURE_VARIANT_ADD(unix_sock, seqpacket) {
-> +       .socket_type =3D SOCK_SEQPACKET,
-> +       .name =3D "SOCK_SEQPACKET",
-> +};
-> +
-> +FIXTURE_SETUP(unix_sock)
-> +{
-> +       struct sockaddr_un addr =3D {};
-> +       int err;
-> +
-> +       addr.sun_family =3D AF_UNIX;
-> +       strcpy(addr.sun_path, SOCK_PATH);
-> +       remove_socket_file();
-> +
-> +       self->server =3D socket(AF_UNIX, variant->socket_type, 0);
-> +       ASSERT_LT(-1, self->server);
-> +
-> +       err =3D bind(self->server, (struct sockaddr *)&addr, sizeof(addr)=
-);
-> +       ASSERT_EQ(0, err);
-> +
-> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> +               err =3D listen(self->server, 1);
-> +               ASSERT_EQ(0, err);
-> +       }
-> +
-> +       self->client =3D socket(AF_UNIX, variant->socket_type | SOCK_NONB=
-LOCK, 0);
-> +       ASSERT_LT(-1, self->client);
-> +
-> +       err =3D connect(self->client, (struct sockaddr *)&addr, sizeof(ad=
-dr));
-> +       ASSERT_EQ(0, err);
-> +}
-> +
-> +FIXTURE_TEARDOWN(unix_sock)
-> +{
-> +       if ((variant->socket_type =3D=3D SOCK_STREAM ||
-> +            variant->socket_type =3D=3D SOCK_SEQPACKET) & self->child > =
-0)
+--=-=-=
+Content-Type: text/plain
 
-Sorry for missing this one, but NIPA caught this.
-see: https://netdev.bots.linux.dev/static/nipa/1022816/14311938/build_tools=
-/stderr
-
-+unix_connreset.c: In function =E2=80=98unix_sock_teardown=E2=80=99:
-+unix_connreset.c:92:68: warning: suggest parentheses around
-comparison in operand of =E2=80=98&=E2=80=99 [-Wparentheses]
-+   92 |              variant->socket_type =3D=3D SOCK_SEQPACKET) & self->c=
-hild > 0)
-+      |                                                        ~~~~~~~~~~~=
-~^~~
-
-I think you can simply remove the "& self->child >0" part
-because you don't check that for self->server below anyway.
-
-Thanks
-
-
-> +               close(self->child);
-> +
-> +       close(self->client);
-> +       close(self->server);
-> +       remove_socket_file();
-> +}
-> +
-> +/* Test 1: peer closes normally */
-> +TEST_F(unix_sock, eof)
-> +{
-> +       char buf[16] =3D {};
-> +       ssize_t n;
-> +
-> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> +               self->child =3D accept(self->server, NULL, NULL);
-> +               ASSERT_LT(-1, self->child);
-> +
-> +               close(self->child);
-> +       } else {
-> +               close(self->server);
-> +       }
-> +
-> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> +
-> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> +               ASSERT_EQ(0, n);
-> +       } else {
-> +               ASSERT_EQ(-1, n);
-> +               ASSERT_EQ(EAGAIN, errno);
-> +       }
-> +}
-> +
-> +/* Test 2: peer closes with unread data */
-> +TEST_F(unix_sock, reset_unread_behavior)
-> +{
-> +       char buf[16] =3D {};
-> +       ssize_t n;
-> +
-> +       /* Send data that will remain unread */
-> +       send(self->client, "hello", 5, 0);
-> +
-> +       if (variant->socket_type =3D=3D SOCK_DGRAM) {
-> +               /* No real connection, just close the server */
-> +               close(self->server);
-> +       } else {
-> +               /* Accept client connection */
-> +               self->child =3D accept(self->server, NULL, NULL);
-> +               ASSERT_LT(-1, self->child);
-> +
-> +               /* Peer closes before client reads */
-> +               close(self->child);
-> +       }
-> +
-> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> +       ASSERT_EQ(-1, n);
-> +
-> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> +               ASSERT_EQ(ECONNRESET, errno);
-> +       } else {
-> +               ASSERT_EQ(EAGAIN, errno);
-> +       }
-> +}
-> +
-> +/* Test 3: closing unaccepted (embryo) server socket should reset client=
-. */
-> +TEST_F(unix_sock, reset_closed_embryo)
-> +{
-> +       char buf[16] =3D {};
-> +       ssize_t n;
-> +
-> +       if (variant->socket_type =3D=3D SOCK_DGRAM)
-> +               SKIP(return, "This test only applies to SOCK_STREAM and S=
-OCK_SEQPACKET");
-> +
-> +       /* Close server without accept()ing */
-> +       close(self->server);
-> +
-> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> +
-> +       ASSERT_EQ(-1, n);
-> +       ASSERT_EQ(ECONNRESET, errno);
-> +}
-> +
-> +TEST_HARNESS_MAIN
-> +
-> --
-> 2.43.0
+On Wed Nov 12 2025, Vinicius Costa Gomes wrote:
+> Hi,
 >
+> Kurt Kanzenbach <kurt@linutronix.de> writes:
+>
+>> The MQPRIO (and ETF) offload utilizes the TSN Tx mode. This mode is always
+>> coupled to Qbv. Therefore, the driver sets a default Qbv schedule of all gates
+>> opened and a cycle time of 1s. This schedule is set during probe.
+>>
+>> However, the following sequence of events lead to Tx issues:
+>>
+>>  - Boot a dual core system
+>>    probe():
+>>      igc_tsn_clear_schedule():
+>>        -> Default Schedule is set
+>>        Note: At this point the driver has allocated two Tx/Rx queues, because
+>>        there are only two CPU(s).
+>>
+>>  - ethtool -L enp3s0 combined 4
+>>    igc_ethtool_set_channels():
+>>      igc_reinit_queues()
+>>        -> Default schedule is gone, per Tx ring start and end time are zero
+>>
+>>   - tc qdisc replace dev enp3s0 handle 100 parent root mqprio \
+>>       num_tc 4 map 3 3 2 2 0 1 1 1 3 3 3 3 3 3 3 3 \
+>>       queues 1@0 1@1 1@2 1@3 hw 1
+>>     igc_tsn_offload_apply():
+>>       igc_tsn_enable_offload():
+>>         -> Writes zeros to IGC_STQT(i) and IGC_ENDQT(i) -> Boom
+>>
+>> Therefore, restore the default Qbv schedule after changing the amount of
+>> channels.
+>>
+>
+> Couple of questions:
+>  - Would it make sense to mark this patch as a fix?
+
+This only happens if a user uses ETF or MQPRIO and a dual/single core
+system. So I didn't see the need to mark it as a fix.
+
+>
+>  - What would happen if the user added a Qbv schedule (not the default
+>    one) and then changed the number of queues? My concern is that 'tc
+>    qdisc' would show the custom user schedule and the hardware would be
+>    "running" the default schedule, this inconsistency is not ideal. In
+>    any case, it would be a separate patch.
+
+Excellent point. Honestly I'm not sure what to expect when changing the
+number of queues after a user Qbv schedule is added. For MQPRIO we added
+a restriction [1] especially for that case. I'm leaning towards the same
+solution here. What do you think?
+
+Thanks,
+Kurt
+
+[1] - https://elixir.bootlin.com/linux/v6.18-rc5/source/drivers/net/ethernet/intel/igc/igc_ethtool.c#L1564
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmkVm94THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgjIuEAChqQ+nRVq5ukbl7W1RZuG8ZU/XzOgm
+X95Ynd2cAdxMEhTPx3CEVG2/t9nhH4eUv6OI6V2XuDKnm3/FQ8UA7F6VK7R3mfSr
+Crt4RVtODUtET0s6TeHFLAN/ldplPMk3WehEpQJuC5QhJLkhTTzwLcts84tiDjWX
+5erY0MVEnAD0vjOiI6v/k6YrZX1X0IhU7k70V0bHFCUlsRgnvmj2fco8Cy8TJTiP
+Snj5M8syMPnE0pLnEBLklyTt3doUX0bOFUnR45MbTs2Jg6GMQj9QzmSYRKA56qcL
+d2ampDOMECmd0qJUDQz9g/8/d2/6yk2jcqrg27sQsEeOkN0A/wykIkHf0B9hTjrX
+1/AkKsKuvbtqCQSSSvvec4TnT8Tb+aF413UmSTtNQHweTx3FgEm606Neo/N4Boqw
+aPt0qPeqozLH6Mg+X3ODm6D/kIipeWTpwN+/3xIO40ppU3oU89sNQKJUj4ucARfM
+LOrQy3OUyXj+3wn/mvK4OfHnmXXpgB0ga+DLmSOpc50f1kayvXQNlg5bvykr9J/S
+VXVrwUJPwCNtfify7ZL81LN/KuVwlItkMbPg3fjQwf2fphmPL4al+iDOXW4wWfTn
+JytB5bvEHPXFrM78vKDy8PL0ecvdxKrdxWIV9ZibpCN9oZTRAvij9++ivjyj5foe
+BVu7g3dH+PlmfA==
+=PsfW
+-----END PGP SIGNATURE-----
+--=-=-=--
 
