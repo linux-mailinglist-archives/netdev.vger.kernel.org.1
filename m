@@ -1,464 +1,147 @@
-Return-Path: <netdev+bounces-238385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CCCBC58015
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:44:07 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40DB0C5805A
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:47:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 05445353716
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 14:42:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5F9663548F4
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 14:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78CA42D3225;
-	Thu, 13 Nov 2025 14:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2035C275AE8;
+	Thu, 13 Nov 2025 14:45:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LyR4ed1O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BVIpqsSv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B16E2727E3;
-	Thu, 13 Nov 2025 14:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1A9274B53
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 14:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763044945; cv=none; b=NZDWr94Dga8pIq/HPfSXaqLCBK5k4gG5JDGMENrEsb3z/4wI9jPNs8s2NSq7kY5LdEaZPV3+hUAMqF9aRUdagh11QtabnBypI/T0wTduq3sbQ0mYep9C2FYJccWrSUHw+7qH1hR35cPqc2PYpEI9+gJ/0mvMvPjRC/CdDTebAzc=
+	t=1763045149; cv=none; b=aaUN7QyQUot3O0UPrwtAvL+5HT+dIrw+BVb3RJdEin/fQfkE6kxdvlhedDNgTN558BkXiVaLhsJ5eEk0m+h4Q4614jy8Rvj5spXGtfgeDeNDnIxi2HcE4AyKCmKPmppObb8+OyBNOH4km57IHKUKNknegwdzsZbnxqm9OGJ1bZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763044945; c=relaxed/simple;
-	bh=kPzkD+mzHbiOKwWpJHoXl0aqGEAPtHWrATwpYGcScts=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ALbdbRzDjIiG7MB/6omNAJgPhikW7GoQC7M+Rpwyf/k5BfX8nvsh68XNbJQkEwLa6kplWG1JY2U2EUuqE3EMiLTkFvWYQl/U3GQBfXvhNgNFQNHhlmj3FB/8N9d6Js0pm6zHEEJKIGwfneA3wuVEYXccUb3sVnn32VX2syCMPSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LyR4ed1O; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AD8Rdj9014326;
-	Thu, 13 Nov 2025 14:42:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=VI42vXeFgD3OygQjD
-	ahOjhajfMguSReihXy3mp+11iw=; b=LyR4ed1OLZMKvALkRkzpTi6c95jIANceq
-	927QVGZtLSMkwHgiQ/NPUhy3/s2XBoDSNu/Uy5YZchstdmoAx0cLOnGuDU03w9Il
-	5X5BFLCiKIjMdlApOYrbNirQ1bySwjRipaYnP3NBmghQYKUANcEBhNUlk258bxHl
-	Ft4w7uILYgL2YQgyKYcA4Ra+eiLsPs6ODWZ9Qn4jsJ4oVR5F+ehXNPtWxJBu5Ee2
-	mgQhA9GCatepHmPNn5Nemd7eBdHm94k78QWhykpIxHWom0MiegYJ67O7wJuDvzhC
-	53xGwS5UmPb3NgGs+dfOZYrRJKPf9qEPmo+dhwY0Npc2H6mfdS/Vw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5cjfav9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Nov 2025 14:42:15 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5ADEPYdP006978;
-	Thu, 13 Nov 2025 14:42:14 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5cjfav6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Nov 2025 14:42:14 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5ADDETWf011738;
-	Thu, 13 Nov 2025 14:42:13 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aajw1nyrj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Nov 2025 14:42:13 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ADEgAMj42992008
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Nov 2025 14:42:10 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0868720040;
-	Thu, 13 Nov 2025 14:42:10 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C4F5F20043;
-	Thu, 13 Nov 2025 14:42:09 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 13 Nov 2025 14:42:09 +0000 (GMT)
-From: Aswin Karuvally <aswin@linux.ibm.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 2/2] s390/qeth: Handle ambiguous OSA RCs in s390dbf
-Date: Thu, 13 Nov 2025 15:42:09 +0100
-Message-ID: <20251113144209.2140061-3-aswin@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20251113144209.2140061-1-aswin@linux.ibm.com>
-References: <20251113144209.2140061-1-aswin@linux.ibm.com>
+	s=arc-20240116; t=1763045149; c=relaxed/simple;
+	bh=wkSkDdoPDv5abLWccGMVUsi8SiiC/MW5NOpVlGRUPZ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AjJkL2swZETaxN4hxEe9d/4yK6z+aA+KYjV6tvTwM/qPcOHK/upv48JKsXKiv7A5+hLPooJJueOdFAiS/4ELw6Vs30g7xdMw6iI9SkBjayeBhaUq1uSOqtBAQiakH77DQratfS9MbFrdNZ+9115M9BeJ6evRNb2AweSU/TNdI0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BVIpqsSv; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42b312a089fso541655f8f.2
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 06:45:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763045146; x=1763649946; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vcRSJSxeIXWTFrXDIzup6ZeaZadWQ/5Lk5RiitzeLH4=;
+        b=BVIpqsSvB50OcnCbWraQraDCbbOhVax6pDyqrYc4XFvWXjw/xRSUej7kIZ9U5YMWoK
+         NYecwgrGAaBowAUPvzsqIBFS66OLswZutjtZ3naz1XDiy0rEnma6DL+8bE8j7ZE791zz
+         ytj8sDAfy3bv8vkjzQMBMQnNhsDsDvGIVdi2Plvlq7/t3R7TSlF8O3IvE18kBSXBCiwZ
+         q2sQwHCHsf/xEXkMmFpFx/xHvpTUfGGTj5xkqx9kv0WxLHMtKua1KZ0P1Iszm69/iv2j
+         X2MuLriCKfqRiBgP8b6j2OEc/gPgzmHQ8bxcGTZvJecJmu3E7N8AXP6icE2Hsf7Tp+Sz
+         WiqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763045146; x=1763649946;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vcRSJSxeIXWTFrXDIzup6ZeaZadWQ/5Lk5RiitzeLH4=;
+        b=DpE7v0YrmfoaIsEThEs/QLoKRTZpVHoWCaW8ViUgWYTn16CRf/p7shmRp1EoG3S5C7
+         CgbxfelZOaIrvgh2Fcv2sQd+tuXXScCMyHinglXtfTGiaPneIyE2eaOyemK5kJ+mADSI
+         /T6vCNcrSWUeMA7sv8UzxUeL2vg6u4ZS24K0BKfFKQeDxN02URtdaSQUtV3rtR2vrso7
+         jg3SYGcMQLW2qgFol4ZPnB/UUIRPV8SZa253jcp9YRe+PKmSrrQc2Fo4nj1la00P5cdI
+         OTS80ju/J7vUfOwAPJDrI0LNObrcc5eukCGURWbzD6hBRdhhlp7x4YhrBXe2vmgiRuBN
+         eqhw==
+X-Forwarded-Encrypted: i=1; AJvYcCUTnbwxaxPjMnjpENG8Zu0D9Uwz7VKVRzhtDCD7MbHd7tOiGaIiC9fSxcQa3gK9K0A4paIG+sE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7BRffWV+/JtGcC4B1Bv/wq6hB5DzmnuZEIggDFxhXgT2LHpc0
+	mP8FKa1gLsjTUn8trmOtbVPv7QWxK7y4y3zlqgdyVVCWtXF2PF52lUBp8Tb2Wm+dLLSBAAqPmMc
+	jJDpcFvD4DSWz52jck32aHVHOj1PZs0A=
+X-Gm-Gg: ASbGncvaKwRs8dTSGFKRxrjP9EzrsZhzTW02d6qw1kh1mmnozckIayNMSQhLAv3D2E3
+	RB7l5S1Dy0n7kfVL+WiIgtfOHvIt9hZgs4I4WXaZKydLVuUIkHNDjKQKXzF/bOm4PqVxaXzVvJV
+	DfQwiw/M69SW0m8wJ4gCJbj5bn5TIfmwU/DhOy9onY5ksZt6q3idJ2lB9YvpE5/E986SZ6Zdf/k
+	AaGkzUS/htYtlzHIHkTSNmkGsy3wAIECfskA+bibt7BH4xR/ZX8dkBO5QirszQejQ9L6SMsDGCU
+	B0Bfkfk=
+X-Google-Smtp-Source: AGHT+IHqzyBfuyBH24NabztQ2ac7uK3iOL3WFKk1OzQ++QqYz3fMB5HSm7GretKLA+fjTkvrDt20ETT5xK536jmvZdo=
+X-Received: by 2002:a05:6000:240b:b0:42b:3131:5433 with SMTP id
+ ffacd0b85a97d-42b4bb9464amr7328317f8f.26.1763045145342; Thu, 13 Nov 2025
+ 06:45:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Ss+dKfO0 c=1 sm=1 tr=0 ts=6915ee47 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=ofFlFg1OaLejxKYsNrkA:9 a=IKs53RWCGyS3Mz5y:21 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA5NSBTYWx0ZWRfX4zyGTRjUOmed
- 2Sx96JgvIthYwDPcZztMEk8mTc9xTSwB8HwDDuTJfettfTmNp3HkVUgizoXV3b+9AMDDv6/+nN1
- mGzaGvfNLo+ieSFqyeX9HWqCyWlpZ2R2A99iebFjsB4zqk7kxMT1x1R58E3J/45eLXOxK4xlxyT
- TVFdHnurV0ai00XXDonrI1xul9SN0h6JkTyBjyulzhKQmHoVirjIhgcNqUGTFJQFT6i7RAHryEz
- KgeXvHDq5x6eP2Eo35Pqy9PdcIEXZ30gfb5/s5qKyVL0PzEZoCvTT0GLM7ADsDdPehuSYXjeBVR
- 5eKftYNQqD3KvoOgH2Iq30/wxai6uz1FXfeVp9i4vNxFfQILesCgoEn+qYod9+4XnqZDz+qFSyr
- 9kevsDEnY+MPYTfrkowgf41uH0uHKA==
-X-Proofpoint-GUID: crj_NkADv1skKNAZDf19Z-6-tMsjgaBL
-X-Proofpoint-ORIG-GUID: ZyiFWQP-pYmG3h45YDktfQISjkZ9yrgR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-13_02,2025-11-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 adultscore=0 priorityscore=1501 spamscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080095
+References: <20251112201937.1336854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251112201937.1336854-2-prabhakar.mahadev-lad.rj@bp.renesas.com> <aRTwz5QHq9U5QbQ-@ninjato>
+In-Reply-To: <aRTwz5QHq9U5QbQ-@ninjato>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Thu, 13 Nov 2025 14:45:18 +0000
+X-Gm-Features: AWmQ_bm1n4yocnFoXMuN117YgsRe_Rw2NkyCDDLKQDlHn-tEP1dQHcHiTprnds4
+Message-ID: <CA+V-a8s5fg02ZQT4tubJ46iBFtNXJRvTPp2DLJgeFnb3eMQPfg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: pcs: renesas,rzn1-miic:
+ Add renesas,miic-phylink-active-low property
+To: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-OSA Express defines a number of return codes whose meaning is determined
-by the issuing command, making them ambiguous. The important ones are
-reported as debug messages through the s390 debug feature.
+Hi Wolfram,
 
-The qeth driver currently does not take the issuing command into account
-when interpreting the return code which sometimes leads to incorrect
-debug messages.
+On Wed, Nov 12, 2025 at 8:40=E2=80=AFPM Wolfram Sang
+<wsa+renesas@sang-engineering.com> wrote:
+>
+> Hi Prabhakar,
+>
+> > Add the boolean DT property `renesas,miic-phylink-active-low` to the RZ=
+N1
+>
+> Hmm, we already have "renesas,ether-link-active-low" in
+> renesas,ether.yaml and renesas,etheravb.yaml. Can't we reuse that?
+>
+On the RZ/N1x we have the below architecture
 
-Implement a mechanism to interpret and report these return codes
-properly. While at it, remove extern keyword and fix indentation for
-function declarations to be in line with Linux kernel coding style.
+                                                      +----> Ethernet Switc=
+h
+                                                      |           |
+                                                      |           v
+    MII Converter ----------------------+      GMAC (Synopsys IP)
+                                                      |
+                                                      +----> EtherCAT
+Slave Controller
+                                                      |
+                                                      +----> SERCOS
+Controller
 
-Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-Signed-off-by: Aswin Karuvally <aswin@linux.ibm.com>
----
- drivers/s390/net/qeth_core_main.c |   2 +-
- drivers/s390/net/qeth_core_mpc.c  | 247 ++++++++++++++++++++++++------
- drivers/s390/net/qeth_core_mpc.h  |   5 +-
- 3 files changed, 205 insertions(+), 49 deletions(-)
+Each of these IPs has its own link status pin as an input to the SoC:
 
-diff --git a/drivers/s390/net/qeth_core_main.c b/drivers/s390/net/qeth_core_main.c
-index edc0bcd46923..10b53bba373c 100644
---- a/drivers/s390/net/qeth_core_main.c
-+++ b/drivers/s390/net/qeth_core_main.c
-@@ -761,7 +761,7 @@ static void qeth_issue_ipa_msg(struct qeth_ipa_cmd *cmd, int rc,
- 	if (rc)
- 		QETH_DBF_MESSAGE(2, "IPA: %s(%#x) for device %x returned %#x \"%s\"\n",
- 				 ipa_name, com, CARD_DEVID(card), rc,
--				 qeth_get_ipa_msg(rc));
-+				 qeth_get_ipa_msg(com, rc));
- 	else
- 		QETH_DBF_MESSAGE(5, "IPA: %s(%#x) for device %x succeeded\n",
- 				 ipa_name, com, CARD_DEVID(card));
-diff --git a/drivers/s390/net/qeth_core_mpc.c b/drivers/s390/net/qeth_core_mpc.c
-index d9266f7d8187..1add124e033b 100644
---- a/drivers/s390/net/qeth_core_mpc.c
-+++ b/drivers/s390/net/qeth_core_mpc.c
-@@ -139,82 +139,237 @@ struct ipa_rc_msg {
- 	const char *msg;
- };
- 
--static const struct ipa_rc_msg qeth_ipa_rc_msg[] = {
-+static const struct ipa_rc_msg qeth_ipa_rc_def_msg[] = {
- 	{IPA_RC_SUCCESS,		"success"},
- 	{IPA_RC_NOTSUPP,		"Command not supported"},
--	{IPA_RC_IP_TABLE_FULL,		"Add Addr IP Table Full - ipv6"},
--	{IPA_RC_UNKNOWN_ERROR,		"IPA command failed - reason unknown"},
- 	{IPA_RC_UNSUPPORTED_COMMAND,	"Command not supported"},
--	{IPA_RC_VNICC_OOSEQ,		"Command issued out of sequence"},
--	{IPA_RC_INVALID_FORMAT,		"invalid format or length"},
- 	{IPA_RC_DUP_IPV6_REMOTE, "ipv6 address already registered remote"},
--	{IPA_RC_SBP_IQD_NOT_CONFIGURED,	"Not configured for bridgeport"},
- 	{IPA_RC_DUP_IPV6_HOME,		"ipv6 address already registered"},
- 	{IPA_RC_UNREGISTERED_ADDR,	"Address not registered"},
--	{IPA_RC_NO_ID_AVAILABLE,	"No identifiers available"},
- 	{IPA_RC_ID_NOT_FOUND,		"Identifier not found"},
--	{IPA_RC_SBP_IQD_ANO_DEV_PRIMARY, "Primary bridgeport exists already"},
--	{IPA_RC_SBP_IQD_CURRENT_SECOND,	"Bridgeport is currently secondary"},
--	{IPA_RC_SBP_IQD_LIMIT_SECOND, "Limit of secondary bridgeports reached"},
--	{IPA_RC_INVALID_IP_VERSION,	"IP version incorrect"},
--	{IPA_RC_SBP_IQD_CURRENT_PRIMARY, "Bridgeport is currently primary"},
- 	{IPA_RC_LAN_FRAME_MISMATCH,	"LAN and frame mismatch"},
--	{IPA_RC_SBP_IQD_NO_QDIO_QUEUES,	"QDIO queues not established"},
- 	{IPA_RC_L2_UNSUPPORTED_CMD,	"Unsupported layer 2 command"},
--	{IPA_RC_L2_DUP_MAC,		"Duplicate MAC address"},
- 	{IPA_RC_L2_ADDR_TABLE_FULL,	"Layer2 address table full"},
--	{IPA_RC_L2_DUP_LAYER3_MAC,	"Duplicate with layer 3 MAC"},
--	{IPA_RC_L2_GMAC_NOT_FOUND,	"GMAC not found"},
--	{IPA_RC_L2_MAC_NOT_AUTH_BY_HYP,	"L2 mac not authorized by hypervisor"},
- 	{IPA_RC_L2_MAC_NOT_AUTH_BY_ADP,	"L2 mac not authorized by adapter"},
--	{IPA_RC_L2_MAC_NOT_FOUND,	"L2 mac address not found"},
--	{IPA_RC_L2_INVALID_VLAN_ID,	"L2 invalid vlan id"},
--	{IPA_RC_L2_DUP_VLAN_ID,		"L2 duplicate vlan id"},
--	{IPA_RC_L2_VLAN_ID_NOT_FOUND,	"L2 vlan id not found"},
--	{IPA_RC_VNICC_VNICBP,		"VNIC is BridgePort"},
--	{IPA_RC_SBP_OSA_NOT_CONFIGURED,	"Not configured for bridgeport"},
--	{IPA_RC_SBP_OSA_OS_MISMATCH,	"OS mismatch"},
--	{IPA_RC_SBP_OSA_ANO_DEV_PRIMARY, "Primary bridgeport exists already"},
--	{IPA_RC_SBP_OSA_CURRENT_SECOND,	"Bridgeport is currently secondary"},
--	{IPA_RC_SBP_OSA_LIMIT_SECOND, "Limit of secondary bridgeports reached"},
--	{IPA_RC_SBP_OSA_NOT_AUTHD_BY_ZMAN, "Not authorized by zManager"},
--	{IPA_RC_SBP_OSA_CURRENT_PRIMARY, "Bridgeport is currently primary"},
--	{IPA_RC_SBP_OSA_NO_QDIO_QUEUES,	"QDIO queues not established"},
- 	{IPA_RC_DATA_MISMATCH,		"Data field mismatch (v4/v6 mixed)"},
- 	{IPA_RC_INVALID_MTU_SIZE,	"Invalid MTU size"},
- 	{IPA_RC_INVALID_LANTYPE,	"Invalid LAN type"},
- 	{IPA_RC_INVALID_LANNUM,		"Invalid LAN num"},
--	{IPA_RC_DUPLICATE_IP_ADDRESS,	"Address already registered"},
--	{IPA_RC_IP_ADDR_TABLE_FULL,	"IP address table full"},
- 	{IPA_RC_LAN_PORT_STATE_ERROR,	"LAN port state error"},
- 	{IPA_RC_SETIP_NO_STARTLAN,	"Setip no startlan received"},
- 	{IPA_RC_SETIP_ALREADY_RECEIVED,	"Setip already received"},
--	{IPA_RC_IP_ADDR_ALREADY_USED,	"IP address already in use on LAN"},
--	{IPA_RC_MC_ADDR_NOT_FOUND,	"Multicast address not found"},
- 	{IPA_RC_SETIP_INVALID_VERSION,	"SETIP invalid IP version"},
- 	{IPA_RC_UNSUPPORTED_SUBCMD,	"Unsupported assist subcommand"},
- 	{IPA_RC_ARP_ASSIST_NO_ENABLE,	"Only partial success, no enable"},
--	{IPA_RC_PRIMARY_ALREADY_DEFINED, "Primary already defined"},
--	{IPA_RC_SECOND_ALREADY_DEFINED,	"Secondary already defined"},
--	{IPA_RC_INVALID_SETRTG_INDICATOR, "Invalid SETRTG indicator"},
--	{IPA_RC_MC_ADDR_ALREADY_DEFINED, "Multicast address already defined"},
--	{IPA_RC_LAN_OFFLINE,		"STRTLAN_LAN_DISABLED - LAN offline"},
--	{IPA_RC_VEPA_TO_VEB_TRANSITION,	"Adj. switch disabled port mode RR"},
- 	{IPA_RC_INVALID_IP_VERSION2,	"Invalid IP version"},
- 	/* default for qeth_get_ipa_msg(): */
- 	{IPA_RC_FFFF,			"Unknown Error"}
- };
- 
--const char *qeth_get_ipa_msg(enum qeth_ipa_return_codes rc)
-+static const struct ipa_rc_msg qeth_ipa_rc_adp_parms_msg[] = {
-+	{IPA_RC_IP_TABLE_FULL,	"Add Addr IP Table Full - ipv6"}
-+};
-+
-+static const struct ipa_rc_msg qeth_ipa_rc_diag_ass_msg[] = {
-+	{IPA_RC_INVALID_FORMAT,	"invalid format or length"}
-+};
-+
-+static const struct ipa_rc_msg qeth_ipa_rc_addr_msg[] = {
-+	{IPA_RC_UNKNOWN_ERROR,	 "IPA command failed - reason unknown"},
-+	{IPA_RC_NO_ID_AVAILABLE, "No identifiers available"},
-+	{IPA_RC_INVALID_IP_VERSION,	"IP version incorrect"}
-+};
-+
-+static const struct ipa_rc_msg qeth_ipa_rc_vnicc_msg[] = {
-+	{IPA_RC_VNICC_OOSEQ,	"Command issued out of sequence"},
-+	{IPA_RC_VNICC_VNICBP,	"VNIC is BridgePort"}
-+};
-+
-+static const struct ipa_rc_msg qeth_ipa_rc_sbp_iqd_msg[] = {
-+	{IPA_RC_SBP_IQD_NOT_CONFIGURED,	"Not configured for bridgeport"},
-+	{IPA_RC_SBP_IQD_OS_MISMATCH,	"OS mismatch"},
-+	{IPA_RC_SBP_IQD_ANO_DEV_PRIMARY, "Primary bridgeport exists already"},
-+	{IPA_RC_SBP_IQD_CURRENT_SECOND,	"Bridgeport is currently secondary"},
-+	{IPA_RC_SBP_IQD_LIMIT_SECOND, "Limit of secondary bridgeports reached"},
-+	{IPA_RC_SBP_IQD_NOT_AUTHD_BY_ZMAN, "Not authorized by zManager"},
-+	{IPA_RC_SBP_IQD_CURRENT_PRIMARY, "Bridgeport is currently primary"},
-+	{IPA_RC_SBP_IQD_NO_QDIO_QUEUES,	"QDIO queues not established"}
-+};
-+
-+static const struct ipa_rc_msg qeth_ipa_rc_sbp_osa_msg[] = {
-+	{IPA_RC_SBP_OSA_NOT_CONFIGURED,	"Not configured for bridgeport"},
-+	{IPA_RC_SBP_OSA_OS_MISMATCH,	"OS mismatch"},
-+	{IPA_RC_SBP_OSA_ANO_DEV_PRIMARY, "Primary bridgeport exists already"},
-+	{IPA_RC_SBP_OSA_CURRENT_SECOND,	"Bridgeport is currently secondary"},
-+	{IPA_RC_SBP_OSA_LIMIT_SECOND, "Limit of secondary bridgeports reached"},
-+	{IPA_RC_SBP_OSA_NOT_AUTHD_BY_ZMAN, "Not authorized by zManager"},
-+	{IPA_RC_SBP_OSA_CURRENT_PRIMARY, "Bridgeport is currently primary"},
-+	{IPA_RC_SBP_OSA_NO_QDIO_QUEUES,	"QDIO queues not established"}
-+};
-+
-+static const struct ipa_rc_msg qeth_ipa_rc_mac_msg[] = {
-+	{IPA_RC_L2_DUP_MAC,	   "Duplicate MAC address"},
-+	{IPA_RC_L2_DUP_LAYER3_MAC, "Duplicate with layer 3 MAC"},
-+	{IPA_RC_L2_GMAC_NOT_FOUND, "GMAC not found"},
-+	{IPA_RC_L2_MAC_NOT_AUTH_BY_HYP,	"L2 mac not authorized by hypervisor"},
-+	{IPA_RC_L2_MAC_NOT_FOUND,  "L2 mac address not found"}
-+};
-+
-+static const struct ipa_rc_msg qeth_ipa_rc_ip_msg[] = {
-+	{IPA_RC_DUPLICATE_IP_ADDRESS,	"Address already registered"},
-+	{IPA_RC_IP_ADDR_TABLE_FULL,	"IP address table full"},
-+	{IPA_RC_IP_ADDR_ALREADY_USED,	"IP address already in use on LAN"},
-+	{IPA_RC_MC_ADDR_NOT_FOUND,	"Multicast address not found"}
-+};
-+
-+static const struct ipa_rc_msg qeth_ipa_rc_lan_msg[] = {
-+	{IPA_RC_LAN_OFFLINE,		"STRTLAN_LAN_DISABLED - LAN offline"},
-+	{IPA_RC_VEPA_TO_VEB_TRANSITION,	"Adj. switch disabled port mode RR"},
-+};
-+
-+static const struct ipa_rc_msg qeth_ipa_rc_vlan_msg[] = {
-+	{IPA_RC_L2_INVALID_VLAN_ID,	"L2 invalid vlan id"},
-+	{IPA_RC_L2_DUP_VLAN_ID,		"L2 duplicate vlan id"},
-+	{IPA_RC_L2_VLAN_ID_NOT_FOUND,	"L2 vlan id not found"}
-+};
-+
-+static const struct ipa_rc_msg qeth_ipa_rc_rtg_msg[] = {
-+	{IPA_RC_PRIMARY_ALREADY_DEFINED, "Primary already defined"},
-+	{IPA_RC_SECOND_ALREADY_DEFINED,	"Secondary already defined"},
-+	{IPA_RC_INVALID_SETRTG_INDICATOR, "Invalid SETRTG indicator"},
-+	{IPA_RC_MC_ADDR_ALREADY_DEFINED, "Multicast address already defined"}
-+};
-+
-+struct ipa_cmd_rc_map {
-+	enum qeth_ipa_cmds cmd;
-+	const struct ipa_rc_msg *msg_arr;
-+	const size_t arr_len;
-+};
-+
-+static const struct ipa_cmd_rc_map qeth_ipa_cmd_rc_map[] = {
-+	{
-+		.cmd = IPA_CMD_SETADAPTERPARMS,
-+		.msg_arr = qeth_ipa_rc_adp_parms_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_adp_parms_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_SET_DIAG_ASS,
-+		.msg_arr = qeth_ipa_rc_diag_ass_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_diag_ass_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_CREATE_ADDR,
-+		.msg_arr = qeth_ipa_rc_addr_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_addr_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_DESTROY_ADDR,
-+		.msg_arr = qeth_ipa_rc_addr_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_addr_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_VNICC,
-+		.msg_arr = qeth_ipa_rc_vnicc_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_vnicc_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_SETBRIDGEPORT_IQD,
-+		.msg_arr = qeth_ipa_rc_sbp_iqd_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_sbp_iqd_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_SETBRIDGEPORT_OSA,
-+		.msg_arr = qeth_ipa_rc_sbp_osa_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_sbp_osa_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_SETVMAC,
-+		.msg_arr = qeth_ipa_rc_mac_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_mac_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_DELVMAC,
-+		.msg_arr = qeth_ipa_rc_mac_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_mac_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_SETGMAC,
-+		.msg_arr = qeth_ipa_rc_mac_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_mac_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_DELGMAC,
-+		.msg_arr = qeth_ipa_rc_mac_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_mac_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_SETIP,
-+		.msg_arr = qeth_ipa_rc_ip_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_ip_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_SETIPM,
-+		.msg_arr = qeth_ipa_rc_ip_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_ip_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_DELIPM,
-+		.msg_arr = qeth_ipa_rc_ip_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_ip_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_STARTLAN,
-+		.msg_arr = qeth_ipa_rc_lan_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_lan_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_STOPLAN,
-+		.msg_arr = qeth_ipa_rc_lan_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_lan_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_SETVLAN,
-+		.msg_arr = qeth_ipa_rc_vlan_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_vlan_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_DELVLAN,
-+		.msg_arr = qeth_ipa_rc_vlan_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_vlan_msg)
-+	},
-+	{
-+		.cmd = IPA_CMD_SETRTG,
-+		.msg_arr = qeth_ipa_rc_rtg_msg,
-+		.arr_len = ARRAY_SIZE(qeth_ipa_rc_rtg_msg)
-+	}
-+};
-+
-+const char *qeth_get_ipa_msg(enum qeth_ipa_cmds cmd,
-+			     enum qeth_ipa_return_codes rc)
- {
- 	int x;
-+	const struct ipa_rc_msg *msg_arr = NULL;
-+	size_t arr_len = 0;
- 
--	for (x = 0; x < ARRAY_SIZE(qeth_ipa_rc_msg) - 1; x++)
--		if (qeth_ipa_rc_msg[x].rc == rc)
--			return qeth_ipa_rc_msg[x].msg;
--	return qeth_ipa_rc_msg[x].msg;
--}
-+	for (x = 0; x < ARRAY_SIZE(qeth_ipa_cmd_rc_map); x++) {
-+		if (qeth_ipa_cmd_rc_map[x].cmd == cmd) {
-+			msg_arr = qeth_ipa_cmd_rc_map[x].msg_arr;
-+			arr_len = qeth_ipa_cmd_rc_map[x].arr_len;
-+			break;
-+		}
-+	}
- 
-+	for (x = 0; x < arr_len; x++) {
-+		if (msg_arr[x].rc == rc)
-+			return msg_arr[x].msg;
-+	}
-+
-+	for (x = 0; x < ARRAY_SIZE(qeth_ipa_rc_def_msg) - 1; x++) {
-+		if (qeth_ipa_rc_def_msg[x].rc == rc)
-+			return qeth_ipa_rc_def_msg[x].msg;
-+	}
-+	return qeth_ipa_rc_def_msg[x].msg;
-+}
- 
- struct ipa_cmd_names {
- 	enum qeth_ipa_cmds cmd;
-diff --git a/drivers/s390/net/qeth_core_mpc.h b/drivers/s390/net/qeth_core_mpc.h
-index e6904ca9defa..252fc84e6eca 100644
---- a/drivers/s390/net/qeth_core_mpc.h
-+++ b/drivers/s390/net/qeth_core_mpc.h
-@@ -857,8 +857,9 @@ enum qeth_ipa_arp_return_codes {
- 	QETH_IPA_ARP_RC_Q_NO_DATA    = 0x0008,
- };
- 
--extern const char *qeth_get_ipa_msg(enum qeth_ipa_return_codes rc);
--extern const char *qeth_get_ipa_cmd_name(enum qeth_ipa_cmds cmd);
-+const char *qeth_get_ipa_msg(enum qeth_ipa_cmds cmd,
-+			     enum qeth_ipa_return_codes rc);
-+const char *qeth_get_ipa_cmd_name(enum qeth_ipa_cmds cmd);
- 
- /* Helper functions */
- #define IS_IPA_REPLY(cmd) ((cmd)->hdr.initiator == IPA_CMD_INITIATOR_HOST)
--- 
-2.48.1
+SWITCH_MII_LINK: Switch PHY link status input
+S3_MII_LINKP: SERCOS III link status from PHY
+CAT_MII_LINK: EtherCAT link status from PHY
 
+The property "renesas,ether-link-active-low" is specific to the AVB
+IP. The MII converter enables connections between these IPs, and the
+register for controlling the link status signal is part of the MII
+converter block, so this property needs to be part of the MII
+converter.
+
+If I have misunderstood you, did you mean to rename the property to
+"renesas,ether-link-active-low"?
+
+Cheers,
+Prabhakar
 
