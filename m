@@ -1,148 +1,219 @@
-Return-Path: <netdev+bounces-238294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBBEBC57131
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:03:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0406C57193
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:07:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8EE8D344FB0
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:59:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0A91534D58E
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C960D334C17;
-	Thu, 13 Nov 2025 10:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04807338F26;
+	Thu, 13 Nov 2025 11:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQ3gJ3CK"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="k/vHGMR0";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="YuyFlFd5";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="chw1No4n";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ZUKDf9Xf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E39E332ED9
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C2D3346BA
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 11:03:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763031589; cv=none; b=L3hhsuSvbKT43cuXuymSLuwkejzMXq8TSYyDTLKGepAIFSH5OeQoKYDqNmfKknW3f9OQPM1JtHKOFL3/TDEvAWoaEKZxtqEjNSvFUwGXI9dbSwgYyd0Ium+dSOyQitGFpt8qflDtsRAlVkLIkPUUVLSUhRV6WZ9jL1PoNfIxMdY=
+	t=1763031828; cv=none; b=j8nCwNTqiQq7af8s5VK2RW6kjW/HhGKOanOXC4aIy5Mez/kgA1+HZuKnCsxQCaJGHtv11DwPQm8GRKFd6FFyKAOfV6wnttUIM0S1XTn5XlJ1XfkNOlLbqZ2Q02Sgh1W42X15i8fzUxSNYBQpi2P0IWQdRdLpu4bnRBX4JjqDnhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763031589; c=relaxed/simple;
-	bh=ugZFlfc+l2S+0zWCSf1PxybsJPWJGmiF5NzWiKPgTzM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mCDsXlfjErXt0zMpA07WT8GZZX/r0I0ijRyK880WAUMdRCVaB9hJoMmjyxH0sMcyIfsORmp2y+TkGgpp3AqgjSeRU83rXIDnfia4qGt0NPqnu2jamFnVmiSsNKpBjAKXzop7+Vq0WTF6Zkyjwe1NICu2cmS+o4cHixMIB6DJuAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iQ3gJ3CK; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47778704516so3197995e9.3
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 02:59:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763031586; x=1763636386; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DEJC7gRTebDUaxwAOnQ9BV9gIzheu37nMO4ePUyMYEM=;
-        b=iQ3gJ3CK+EvoGocot/Chl1ETCyQHG6GXKwpS32/w52vYJtH8PF+c+cxZV/V6Y1PWxe
-         qQBxxItLa7wBBe1zZ9JtuCwAePN8hF0IEfGpf7mwgZHswAUr5F5z5W2+oHO8d/5u8Kqn
-         ZcpzG3QzVsMaDloGTcuam0H7i2Vx7Tf3pNPAOErn3+NNfXOeDcu5CkOla0vCNq6j0eRq
-         kb7ALrEYpAPxkYAqzmZhzie7mwW91sUlFc0t5W5GEqiI2Wu+s3s92KmvLriUjGRIAv08
-         Sp/gVpLYzBsC4LCG1dy2lrfz5a117+bAMyb8ZQCcKJw3j3+ZsX69A4qprDhlEiWVh4NE
-         qEcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763031586; x=1763636386;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DEJC7gRTebDUaxwAOnQ9BV9gIzheu37nMO4ePUyMYEM=;
-        b=laN6IUG48csLqGOeDTnHOmKezxXBvmkCmAm44FtANgIVbIc8IV1uiauV2iK1y8v4ch
-         LSdJNCoUERxFgqGAvaBtwZ02fQRyl5yq631mYhLzzHmLhz1iVU2xFgNXiMgwmmpPUz8E
-         69cIJieDsSxwA/r1zkW9rgocaJ34WHeQZ054oVZGnq3EJTyT9kJJKv48q4dcRpVnSAfA
-         /H0ElUKL1pIzbdQyFY6/QKg9w1FEsfQ+OoBgfCxOHCWZQcQB94jr3+PgXhYZLX/Hc2tP
-         yxMvcmq8enHJOw1i4cef396krMBSkJuN4dm6SQ4gQFNCIBDg1yPaoi/RLFeA3bOXDYKJ
-         wukw==
-X-Forwarded-Encrypted: i=1; AJvYcCWsl7G5NSJU7oXvQNtJM0Mxu3bldI5Mp7cMWvl/+cJeDEwVCf5PXoVpeoZYzOj50VrTeivZhW8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKLttib7rJ451TEvHgtlHGb+SDTiQQ1wXBF4kUuxu+5o10xdEa
-	DkkHDOZ7/GdrFZmmzTPtMPx3kT2zMupLVo7HQFDiTleFwQPFNR5ezSJN
-X-Gm-Gg: ASbGnctgrKoxWbrGaQtweHPfXPoi41JrRftBnH5RDaOm3+av7zU8KaxYgjh+COdhirZ
-	CkqT/i8PoklcwUNt9k5IsPVEU8kdJoTMWlzCSkOJrgcyKbPQxUEVoAH9bmSsP5ga0gb97lUuEzA
-	A+ZDQGSmC3Ht1LCoGXhYbVOn8XQKAhId7z9Ozl9jHS8WWVvRrTRMrzXrqkQDF9FXdX32wvRAit5
-	yazW0D6aU9eDBVnupQmR4uEWg49r1TNa8rZ/plbgb2LtNPv0K9eZqEzO2K2sxvwlqVkMglmV2we
-	O77v+AIRoCorm7uno7w/IWXUyKZgeOI7q9BEDLz2e85lJ2JRrNLYuPNdokzNJKIBWckmAeYU2bQ
-	iRB+s+mHmhoDBDzlQaIjxt9DDXQsTVqCxbg57zbe/jwDZmUa6A17xu3Zn3uG1h9GJvfxceFEzMD
-	CcYPoZOon+6VAqdmaCjXC2
-X-Google-Smtp-Source: AGHT+IFCpVKEMNGa1TiGFz1du/mkrAjFihX7xaQjFh0qLSpjr6GgH+cPEzn+8D8uBc5acStTR7O0cA==
-X-Received: by 2002:a05:600c:4694:b0:477:7f4a:44ae with SMTP id 5b1f17b1804b1-477870bf2fdmr57386475e9.39.1763031586191;
-        Thu, 13 Nov 2025 02:59:46 -0800 (PST)
-Received: from [10.158.36.109] ([72.25.96.17])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f0b513sm3255195f8f.30.2025.11.13.02.59.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Nov 2025 02:59:45 -0800 (PST)
-Message-ID: <60c0b805-92e9-48c0-a4dc-5ea071728b3d@gmail.com>
-Date: Thu, 13 Nov 2025 12:59:43 +0200
+	s=arc-20240116; t=1763031828; c=relaxed/simple;
+	bh=7pvprqGCaxvYR0EsvIa4Xj239Fj5fSjRW6OvMYmHi1E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CUXB9BvjJ7cWJR8mrCkY9K3wNsR7FudNlEJ6wQXjyFCPTQFJi2kIcblQhRSQ0VB/l4rejKwDk/53NDeuTXEPX9RnSZ53jjId1njALHcBRAKBe+GRWmHeUz/2dttFhK3G/mW7GHY5uLZL7lARcM/2VUFVWaKePhfIoKv8oGEvxak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=k/vHGMR0; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=YuyFlFd5; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=chw1No4n; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ZUKDf9Xf; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D5F642126F;
+	Thu, 13 Nov 2025 11:03:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1763031825; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y/4XRvnt2+9/BGxrNjMgTCeqhd+ANIFzSSFsqPyLNwc=;
+	b=k/vHGMR0+PWvJeo+y7ipIqryMVC8Y8R6I6NPUSmyB+K51V7MF/VHE4nN7ZwTeW1b5ayDpM
+	MRnVV2ZD2yZeZw5fgLuwk4P3Dl42eR4QJBfM5COASPoQhtIG+BadzshiiewgPJBrOPFFRA
+	zfmyxU1dlEHKFY2cSlk/rdE2PNasg3M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1763031825;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y/4XRvnt2+9/BGxrNjMgTCeqhd+ANIFzSSFsqPyLNwc=;
+	b=YuyFlFd5vJr90MC0cQWKSfwNZIDG1txChoSaNQSA2ddOh2ko5fi4FNollB9v2nk3STq8ov
+	xL9XXR/1w0m0EWDg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=chw1No4n;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=ZUKDf9Xf
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1763031824; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y/4XRvnt2+9/BGxrNjMgTCeqhd+ANIFzSSFsqPyLNwc=;
+	b=chw1No4n9v1MzhzqfZtk7TG3kgcaPxaCvjAhmISTlsIK9U7XfUEUIIpLu14xyzV0raqdqW
+	+rm5EEfVil1cvgqm41jtmVXiPtm2Fr0AxIaD2iYOOU0wVarANNtcgALzcxfVeLcQBrJHMr
+	X6a8l2nZYKGNpC26dKQbPDjXd4OF/I0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1763031824;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y/4XRvnt2+9/BGxrNjMgTCeqhd+ANIFzSSFsqPyLNwc=;
+	b=ZUKDf9XfjOZIOuC4/6r+5Q895+NgzMHhaQfiJ7D10yrMHAWhrmNDrp8CehJ+VAi2ICn4E5
+	BDQyJ5d6UCmH7GDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BD1C23EA61;
+	Thu, 13 Nov 2025 11:03:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id tT8yLhC7FWlsUwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 13 Nov 2025 11:03:44 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 47636A0976; Thu, 13 Nov 2025 12:03:44 +0100 (CET)
+Date: Thu, 13 Nov 2025 12:03:44 +0100
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
+	Jeff Layton <jlayton@kernel.org>, Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	bpf@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 00/17] ns: header cleanups and initial namespace
+ reference count improvements
+Message-ID: <byhojbx5x73zxickqy4uje6fmcn3nuugau7afia6thsyomfnlx@exrz3jpwdfgs>
+References: <20251110-work-namespace-nstree-fixes-v1-0-e8a9264e0fb9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/6] net/mlx5e: Speedup channel configuration
- operations
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Mark Bloch <mbloch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
- Leon Romanovsky <leonro@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
- William Tu <witu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- Nimrod Oren <noren@nvidia.com>, Alex Lazar <alazar@nvidia.com>
-References: <1762939749-1165658-1-git-send-email-tariqt@nvidia.com>
- <874iqzldvq.fsf@toke.dk> <89e33ec4-051d-4ca5-8fcd-f500362dee91@gmail.com>
- <87ms4rjjm0.fsf@toke.dk>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <87ms4rjjm0.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251110-work-namespace-nstree-fixes-v1-0-e8a9264e0fb9@kernel.org>
+X-Rspamd-Queue-Id: D5F642126F
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-2.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	RCVD_COUNT_THREE(0.00)[3];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,toxicpanda.com,kernel.org,google.com,yhndnzj.com,in.waw.pl,0pointer.de,gmail.com,cyphar.com,cmpxchg.org,linutronix.de,zeniv.linux.org.uk,suse.cz,arndb.de];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email,suse.cz:email,suse.cz:dkim]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -2.51
+X-Spam-Level: 
 
+On Mon 10-11-25 16:08:12, Christian Brauner wrote:
+> Cleanup the namespace headers by splitting them into types and helpers.
+> Better separate common namepace types and functions from namespace tree
+> types and functions.
+> 
+> Fix the reference counts of initial namespaces so we don't do any
+> pointless cacheline ping-pong for them when we know they can never go
+> away. Add a bunch of asserts for both the passive and active reference
+> counts to catch any changes that would break it.
+> 
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
+FWIW I've read the series and I like it. It looks like very nice cleanups.
+I don't feel *very* confident with this code so it isn't worth much but
+still feel free to add:
 
-On 12/11/2025 18:33, Toke Høiland-Jørgensen wrote:
-> Tariq Toukan <ttoukan.linux@gmail.com> writes:
-> 
->> On 12/11/2025 12:54, Toke Høiland-Jørgensen wrote:
->>> Tariq Toukan <tariqt@nvidia.com> writes:
->>>
->>>> Hi,
->>>>
->>>> This series significantly improves the latency of channel configuration
->>>> operations, like interface up (create channels), interface down (destroy
->>>> channels), and channels reconfiguration (create new set, destroy old
->>>> one).
->>>
->>> On the topic of improving ifup/ifdown times, I noticed at some point
->>> that mlx5 will call synchronize_net() once for every queue when they are
->>> deactivated (in mlx5e_deactivate_txqsq()). Have you considered changing
->>> that to amortise the sync latency over the full interface bringdown? :)
->>>
->>> -Toke
->>>
->>>
->>
->> Correct!
->> This can be improved and I actually have WIP patches for this, as I'm
->> revisiting this code area recently.
-> 
-> Excellent! We ran into some issues with this a while back, so would be
-> great to see this improved.
-> 
-> -Toke
-> 
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Can you elaborate on the test case and issues encountered?
-To make sure I'm addressing them.
+								Honza
+
+> ---
+> Christian Brauner (17):
+>       ns: move namespace types into separate header
+>       nstree: decouple from ns_common header
+>       nstree: move nstree types into separate header
+>       nstree: add helper to operate on struct ns_tree_{node,root}
+>       nstree: switch to new structures
+>       nstree: simplify owner list iteration
+>       nstree: use guards for ns_tree_lock
+>       ns: make is_initial_namespace() argument const
+>       ns: rename is_initial_namespace()
+>       fs: use boolean to indicate anonymous mount namespace
+>       ipc: enable is_ns_init_id() assertions
+>       ns: make all reference counts on initial namespace a nop
+>       ns: add asserts for initial namespace reference counts
+>       ns: add asserts for initial namespace active reference counts
+>       pid: rely on common reference count behavior
+>       ns: drop custom reference count initialization for initial namespaces
+>       selftests/namespaces: fix nsid tests
+> 
+>  fs/mount.h                                     |   3 +-
+>  fs/namespace.c                                 |   9 +-
+>  include/linux/ns/ns_common_types.h             | 196 ++++++++++++++++
+>  include/linux/ns/nstree_types.h                |  55 +++++
+>  include/linux/ns_common.h                      | 266 +++++-----------------
+>  include/linux/nstree.h                         |  38 ++--
+>  include/linux/pid_namespace.h                  |   3 +-
+>  init/version-timestamp.c                       |   2 +-
+>  ipc/msgutil.c                                  |   2 +-
+>  ipc/namespace.c                                |   3 +-
+>  kernel/cgroup/cgroup.c                         |   2 +-
+>  kernel/nscommon.c                              |  15 +-
+>  kernel/nstree.c                                | 304 ++++++++++++++-----------
+>  kernel/pid.c                                   |   2 +-
+>  kernel/pid_namespace.c                         |   2 +-
+>  kernel/time/namespace.c                        |   2 +-
+>  kernel/user.c                                  |   2 +-
+>  tools/testing/selftests/namespaces/nsid_test.c | 107 +++++----
+>  18 files changed, 576 insertions(+), 437 deletions(-)
+> ---
+> base-commit: c9255cbe738098e46c9125c6b409f7f8f4785bf6
+> change-id: 20251110-work-namespace-nstree-fixes-f23931a00ba2
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
