@@ -1,185 +1,110 @@
-Return-Path: <netdev+bounces-238417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 468E1C588A7
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 16:59:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D6EFC58AE8
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:24:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 31B144F834B
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:41:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF37F3BC571
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:42:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74E72F60CA;
-	Thu, 13 Nov 2025 15:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C2252F6598;
+	Thu, 13 Nov 2025 15:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OWL+/Nrw";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wts+n/uy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VoGY2WRp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DDA2F60A5
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 15:31:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73AD2F6566
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 15:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763047900; cv=none; b=pF9cFVwXEalUS6R74L7JlA7AHagFGiZm/D5r876grgm+PwmiNuXoe5JW0Hon0doobMKIqh+V6CuNg6OpUHl343glwg0D2GQIDyItYz2Bq+avgniCIlAm6UJtDjuXcvMcYfx2ijyC7fLwErhqCwztE5yZsHklK6952LJLoAbj0F0=
+	t=1763047942; cv=none; b=fn6n7lj2XzQSMXCOgrN/xF3h7bpdvTY5+hsaM/CujgEaSIWL0wXo+CHwT0mWDc3fnjoMYG4pUd6pjfcEcc/yHpY6jW9Tc9utAgFaLdyg/5FxgYsMifOmbNZi/VTkhBWQpa1I8+ykIECe4M1HXsTe+rsYB9Ur7OeBK+HqLM/Ciko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763047900; c=relaxed/simple;
-	bh=cmUw5fQytCW5K8CgA+45UI+EqXpRzL3G2UrLV2MjQf4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=icut120aZfVoQwH8RTTIAa+jpDZNF0BI/NS2P/7ihgd7YHDfDXcxpeQp3tCZ9gpqv35+JcTs8QIkJkl6wPnFtQZi7kx4FoiLo/1/HcE4pfOyLOTODAeXEtMpCELs1zIc+p9RaAybXVlXXfYgG8ryMfM+GdsqrFFU11S6JqzMSJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OWL+/Nrw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wts+n/uy; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763047897;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z7XY31OsyOl8v7j52xmkmb5uEiW5I0tIphYxwIfznBM=;
-	b=OWL+/NrwaO+TEyNnSsI7RiAmypE6mpsvyYCGA/2vNmcjxG3SIwsjcnPWTFY84MBVz3vWkH
-	cEsVCgYw4FkQ7/Qg6jTGP8tPZKe9AM2tpPyNa/y+cDtXmFkY+trs38HRS46SJ+Kz0r+MjI
-	zlqc2MmoarJM467CKHrEeSc4TE0pAEw=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-197-6PFAl9EaMhmLMcBChWIObA-1; Thu, 13 Nov 2025 10:31:36 -0500
-X-MC-Unique: 6PFAl9EaMhmLMcBChWIObA-1
-X-Mimecast-MFC-AGG-ID: 6PFAl9EaMhmLMcBChWIObA_1763047895
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b70b974b818so106011766b.1
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 07:31:36 -0800 (PST)
+	s=arc-20240116; t=1763047942; c=relaxed/simple;
+	bh=HK/XTH1vs5ogHtDfEDHsy2lCYQYNnOlTeFggXsOVopA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lIk1viBtShs7pOQpOneoiGCGhWKXz0J4ZJMFV73PuhypMAn/MHZQ9Jfy+d0kmy1JID0PIwO0u21YVs/AFph/TnH4pNrWA76e26/lMfgAq4v7/TbXLBd4aAXqZ+SrzwonLuy+mFATP4MMra//iCLaj/eG1U4lx/4qF7fwOchWZXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VoGY2WRp; arc=none smtp.client-ip=209.85.222.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-9374ecdccb4so538229241.3
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 07:32:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763047895; x=1763652695; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z7XY31OsyOl8v7j52xmkmb5uEiW5I0tIphYxwIfznBM=;
-        b=Wts+n/uyvcUEotTfun8PRRCrASIZGOOHVkTuyYceI7X8bx2pYg0FLaS8sVQGFNTYp7
-         AjZFRDNBL6HVJTcTmZmjNQfUsXT4E/+IfRDUPGEuOd69Jfzcx48g6LYVBz/QZ+NtLU8W
-         OS8KVPe4lmiJh0brRUYwjj46Sehjg0U/pmOk1h1wreE8QJGBrdGHjU2BaKQ035SfgOOc
-         YWS/sP5RCj1xE6S158ZsLv+wXrsaBNsV9ap1T5U+SL6cnsAGb/n7MetzoGVKD98FoPTI
-         08vyJEP4MYxeeBKRekzgXZIxolO5mAHhk06b2wfyZIl9Aq2AqtJvIyFT4/WPsXalKB/8
-         fnrg==
+        d=gmail.com; s=20230601; t=1763047940; x=1763652740; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HK/XTH1vs5ogHtDfEDHsy2lCYQYNnOlTeFggXsOVopA=;
+        b=VoGY2WRp5yRxVTVQ32riyXohtSVfxELDM6I+HgSmAshWIggHOjoVQgFogt1jNiU6W+
+         yXjIB0XGBlWXqWLQraK7842v/4Nolpx9bMqH+SEb2xObtfG8lOvoilvotJ2b9Jabnp5D
+         g/uTmF5UuqlZj8lWdhah+1HBYoxqU4dnS3vkvOOxyfqRIjHvW2ynIZc5CjQnHJdXkOds
+         o1MbKETrnKKNgYwik+Az9nfB0DdG2+ysCBJ2uW6wz6EgOgsFPlQiOd6gFbtArQQ9YriH
+         UbUX2tk9WKAG09P3q4G7yOpG9Bv3cUDSwLxDg+w4oyWhFeQaA8mwfR2urejJy+0FWETY
+         qeHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763047895; x=1763652695;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z7XY31OsyOl8v7j52xmkmb5uEiW5I0tIphYxwIfznBM=;
-        b=lplLe81gs6kPEwZMD7EYKrcmQVa7CSL9R4rFlr0jl8JLo6jd58O6C+ShzK8koR/BJ+
-         /1gctYcwAbZsL5agwAXUAq5wJqSBqE3U/FVjtUAEkdTXnbs12fFmr3o36cDwpFpNeSlO
-         gn73AEb+FgZC86/DXl2hlwcbqBtn2N1S9yv01vS8IgfJn8EvoKeu1LLMmbSKUfU9YqZN
-         CTFu0ZCC4WaIIEo39SAOcEGn2mJ2qgUU4TMNulCTJZ2C1/Axe7y1XQdu/U4as0KEkw7E
-         G6dL5m5syG/W6JUGd8zBenQ752swkDYt89JKc9ezN3fKnWiqa+uMKVeLSjwFRs163MuF
-         zS5w==
-X-Forwarded-Encrypted: i=1; AJvYcCU0bo06z2YsxCwyxgENFASsB7/v3BKLmjNVhoYks+DiIzaJ5KuliV86f8blmihAIqomC9qScpg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzE3UnDE/zfRDGHEB99xWqicGxpwI+IOZ7TZ59dLFcpQ6Phq/BD
-	aJYrjXujQxLWY8UvjRGQ4PxobgBx248oIxBWSxmh+JLrP7lIS5SbEpatyPnuYRjS7Bofqv0jCIR
-	/3xk1W36tyqcqUlPkX/mrCiNQWEgAc2eJiFTD6AFrXtYnOe/Boyxd5iQgjw==
-X-Gm-Gg: ASbGncsskIEHX+HdAo2DvyH9rzxVoydIk6S6rho4439Xyppz1RIjJ285Nz9hXqyIEt+
-	duytiOFqiWQAfM4XoyrYFo7zXgP183f8qOCEwmicTRthBmcG78Kwpm2RM1pV+9T1Rq6+AFANgwI
-	nJfPqXh4cwAEq2EA6vitUTFIzRH8IZPYaSEgKe52/uxpEhWRxqB5fuxlv0WJfTe7tqRwmNRL1cY
-	O6ahsBUeurOc79iOsFyT9BbIOqcqq8i6hz+yGjoyztmf/j7WTZHWW7Q6kmlSZ7m3eylciVPOCQt
-	Pamxr1H1Pywp7jLty+Be6+wy3TaSc99r905GhnZorzRAEjw9L73aPGFLoKsC5clAVEn48+dHtTl
-	CBvOlDLo2J7rie8nZt9dR78ZhVNlT3y4L6Xd8nR+kLVNm1XkFKy4=
-X-Received: by 2002:a17:907:c06:b0:b70:6d3a:a08b with SMTP id a640c23a62f3a-b733192f5c5mr808714966b.10.1763047895390;
-        Thu, 13 Nov 2025 07:31:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF8lpe22E3h1TC8hEnHCzisPSR4qLMl80qiAEbaySsAUvtzhvgQRLYBeX2TaGg4WnRojfXASw==
-X-Received: by 2002:a17:907:c06:b0:b70:6d3a:a08b with SMTP id a640c23a62f3a-b733192f5c5mr808708566b.10.1763047894844;
-        Thu, 13 Nov 2025 07:31:34 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fad3edasm184936266b.17.2025.11.13.07.31.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Nov 2025 07:31:34 -0800 (PST)
-Date: Thu, 13 Nov 2025 16:31:28 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com, 
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v9 03/14] vsock/virtio: add netns support to
- virtio transport and virtio common
-Message-ID: <ym7us45wytkmibod5fkxoyss3nl4kxzehlchdm4pqnvvnzreey@dvuwn7olusc2>
-References: <20251111-vsock-vmtest-v9-0-852787a37bed@meta.com>
- <20251111-vsock-vmtest-v9-3-852787a37bed@meta.com>
- <cah4sqsqbdp52byutxngl3ko44kduesbhan6luhk3ukzml7bs6@hlv4ckunx7jj>
- <aRSyPqNo1LhqGLBq@devvm11784.nha0.facebook.com>
- <bhc6s7anskmnnrnpp2r3xzjbesadsex24kmyi5tvsgup7c2rfi@arj4iw5ndnr3>
- <aRTg4/HyOOhYYMzp@devvm11784.nha0.facebook.com>
+        d=1e100.net; s=20230601; t=1763047940; x=1763652740;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HK/XTH1vs5ogHtDfEDHsy2lCYQYNnOlTeFggXsOVopA=;
+        b=UKZY5TVLduYrUyeIg+G0d1S01Shx2kX9Es3dlkl9aoo/wL3nWxJwm7U/z01Vm+qCc6
+         8RXbdEwUfDDpFlaFMSjIP7Jr0bB4F2ku8Eg+ZxjJvikK3jrmaKN2Ps9Qq706PNpMMPcp
+         9FGmP+kDmWdNtbdscj1sH9k76c8m9EGlxm/6CiBGBD3QryYSp4HGremV1tvLElOthzkF
+         93Df2ZDSNz4K28PfJLNy02hX9DZWhOGsi6fh08tg35a8gO51YBH8cpZ4GESvGK/RVH/F
+         HtDD6BnZ6eVfUwzcXfR68aPVxeb5eIU85WbVHN6bnoiqkC0n2rEaJyv+yehfoG9xXiE5
+         gJrA==
+X-Forwarded-Encrypted: i=1; AJvYcCWO5IZ/KmJWXCmsh3rtJ/G1RZXEH3QXKg0NVfZfV9O3X1jBrmie1QhzLwKhU/HXOunJ24HkkQE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6WgzBfiBf5xATcipZSfhMv9k8crSKZUf2TqhZRgwMQaLU5mma
+	4gCIV7vd1T0Ktq/1qJTOrMgz3JmOGvnK6Qc83Dmfg0FE/GAyDYhBMNM8eklnuf0MRlHP2gekign
+	bwYbhVlk+86GPR+vIaUAkKf6j3sF1n/A=
+X-Gm-Gg: ASbGncuILRqufWZPtuc+CX5yjWL+XbUz/qc0+FE9b/H78k6k33bkjDIqCG/SlynE+f0
+	v2U0LPDNb+1rDNeEjaa9vMs5e4sd1l1c5vPA+f6t/4AozwqJOxvqMIAkVOM5K4gNYJt9u3Cl1vp
+	L1tWz+0mdw3ATYhQ3xvy4r17GVald2kYx5bjk8LH8VAGNp93TvCTBpgjB7Kcci/Mlm8nQft9WUq
+	KcvKTILEXWv9QGCBFTbxgCMuADJ5JNDsb+cYS3MQkBSU/HYZs7FFupQQkyKT9c=
+X-Google-Smtp-Source: AGHT+IHjkzaJR98ABGf7JPdxTaIgrD7ydPjrcLBtkfxsqqWMEkSquvfD6fsm6+pA4EMyJmcW5nPIV7Bo8G1boiTHdOs=
+X-Received: by 2002:a05:6102:cc8:b0:5db:ce49:5c71 with SMTP id
+ ada2fe7eead31-5dfc55b0bbfmr17704137.18.1763047939722; Thu, 13 Nov 2025
+ 07:32:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <aRTg4/HyOOhYYMzp@devvm11784.nha0.facebook.com>
+References: <20251113092606.91406-1-scott_mitchell@apple.com> <aRXM079gVzkawQ-y@strlen.de>
+In-Reply-To: <aRXM079gVzkawQ-y@strlen.de>
+From: Scott Mitchell <scott.k.mitch1@gmail.com>
+Date: Thu, 13 Nov 2025 07:32:08 -0800
+X-Gm-Features: AWmQ_bk4Cs4HA_t-WxTixgm-463gTBOmlX39m7CT2eAG1Up1wBQtX5vxCBOeAL0
+Message-ID: <CAFn2buDiAqpdzo=50=QA6zS1TZyFVNHqKdqvoixCuWcGLF=uAw@mail.gmail.com>
+Subject: Re: [PATCH v2] netfilter: nfnetlink_queue: optimize verdict lookup
+ with hash table
+To: Florian Westphal <fw@strlen.de>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, phil@nwl.cc, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Scott Mitchell <scott_mitchell@apple.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 12, 2025 at 11:32:51AM -0800, Bobby Eshleman wrote:
->On Wed, Nov 12, 2025 at 06:39:22PM +0100, Stefano Garzarella wrote:
->> On Wed, Nov 12, 2025 at 08:13:50AM -0800, Bobby Eshleman wrote:
->> > On Wed, Nov 12, 2025 at 03:18:42PM +0100, Stefano Garzarella wrote:
->> > > On Tue, Nov 11, 2025 at 10:54:45PM -0800, Bobby Eshleman wrote:
->> > > > From: Bobby Eshleman <bobbyeshleman@meta.com>
+On Thu, Nov 13, 2025 at 4:19=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
+te:
 >
->[...]
+> Scott Mitchell <scott.k.mitch1@gmail.com> wrote:
+> > Signed-off-by: Scott Mitchell <scott_mitchell@apple.com>
 >
->> > > If it simplifies, I think we can eventually merge all changes to transports
->> > > that depends on virtio_transport_common in a single commit.
->> > > IMO is better to have working commits than better split.
->> >
->> > That would be so much easier. Much of this patch is just me trying to
->> > find a way to keep total patch size reasonably small for review... if
->> > having them all in one commit is preferred then that makes life easier.
->> >
->> > The answer to all of the above is that I was just trying to make the
->> > virtio_common changes in one place, but not break bisect/build by
->> > failing to update the transport-level call sites. So the placeholder
->> > values are primarily there to compile.
->>
->> In theory, they should compile, but they should also properly behave.
->>
->> BTW I strongly believe that having separate commits is a great thing, but we
->> shouldn't take things to extremes and complicate our lives when things are
->> too closely related, as in this case.
->>
->> There is a clear dependency between these patches, so IMO, if the patch
->> doesn't become huge, it's better to have everything together. (I mean
->> between dependencies with virtio_transport_common).
+> Didn't notice this before, these two should match:
 >
->Sounds good, let's give the combined commit a go, I think the
->transport-specific pieces are small enough for it to not balloon?
+> scripts/checkpatch.pl netfilter-nfnetlink_queue-optimize-verdict-lookup-w=
+i.patch
+> WARNING: From:/Signed-off-by: email address mismatch: 'From: Scott Mitche=
+ll <scott.k.mitch1@gmail.com>' !=3D 'Signed-off-by: Scott Mitchell <scott_m=
+itchell@apple.com>'
 
-Yeah, I think so.
-
->
->> What we could perhaps do is have an initial commit where you make the
->> changes, but the behavior remains unchanged (continue to use global
->> everywhere, as for virtio_transport.c in this patch), and then specific
->> commits to just enable support for local/global.
->>
->> Not sure if it's doable, but I'd like to remove the placeholders if
->> possibile. Let's discuss more about it if there are issues.
->
->Sounds good, I'll come back to this thread if the combined commit
->approach above balloons. For the combined commit, should the change log
->start at "Changes in v10" with any new changes, mention combining +
->links to the v9 patches that were combined?
-
-Yep, that would be great. Plus exaplaining why we decided to do that (I 
-mean just in the changelog).
-
-Thanks,
-Stefano
-
+Good catch, will fix in v3 (coming shortly).
 
