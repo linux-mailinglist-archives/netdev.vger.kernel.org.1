@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-238193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D032C55B2A
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 05:50:59 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65ED0C55B21
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 05:50:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13C4A3B3B2F
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 04:50:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9D5A5342E84
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 04:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC30C307AE8;
-	Thu, 13 Nov 2025 04:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A33D309EE9;
+	Thu, 13 Nov 2025 04:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EnqN39dc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ReM0lS5u"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29C0303C97
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 04:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829E9305077
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 04:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763009428; cv=none; b=f7s5xI8Y+w55H+WDcfBYBCD2FraNhkfwMB05rQjiiX+kZCBLbT1S7zMiVaKygDBBknlJJrrftFhAtxRVbkXipYb3xBISNFbVtifboO2LqrYStbPSX8VeRlIGj+BRyGBJV5LS79z3Pvgg89yR2GpW7rKG8InWu/9GdL7diEg+zzI=
+	t=1763009429; cv=none; b=PO9m1x1Xoz2FyhE0/k+nAWSR646WuRe6J6/kxNO1FaI9yob4DaDjfizgdpcD6Uj4g05SY/l/CMbH/C60l3gUlP4wQ9/qb9FHh8tw5kVwdqLRVOfa3EzHbZxspw4koY0Gi4l2EZMB00fJlCOFfTC4vZiKAIxHKost3hiLLlYAA/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763009428; c=relaxed/simple;
-	bh=90ttPY1qI/ixvslP1H1VXQfWx72HxaioAD+B6TMWq8k=;
+	s=arc-20240116; t=1763009429; c=relaxed/simple;
+	bh=omOaESTzC5JdyNOxcqj8pYklVvUg+2CQxKky1CjcYzE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RPKcvH0UWzrNzGmNWJHwkItDZxTiJ8eimtXlv0/KubqK5JYtZIG9DlcJ8YZyARYCceqNgX4B28Oujdoq2OODKxDxlx8OJY0Y9MLB+bh2ujoeLzJlezKVafW9bv5kX8LJGkOUX1FSaXZiY8EXs1VXenRMRZhJLMFInHzaSSrLwSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EnqN39dc; arc=none smtp.client-ip=192.198.163.12
+	 Content-Type:Content-Disposition:In-Reply-To; b=cIh95HKC7cu/5Mxhu2dGlM7+NA0fYeInGEyaYZByx4tfQwk+e6fFvUDaDP/DSPw0OJ1rpOyZgH5besWK5Nb/OCThKorY3ze37LqWDEQsp6Cbg24IhFFaSzthwqR74xeeEECmZBuTLlD4asgirE2eBs4qvQjebZrXi/SqDR9rtrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ReM0lS5u; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763009427; x=1794545427;
+  t=1763009428; x=1794545428;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=90ttPY1qI/ixvslP1H1VXQfWx72HxaioAD+B6TMWq8k=;
-  b=EnqN39dcXHjzf3zTPG2aEcJ4wxMXCbRfTSgnh/Yw52NByP3CkRQSTbIp
-   QrNRuthMRCcqYuKZeb2D18wNBgkFQiV5z0cCS2rXH3Cs1LHljjFUaFX0Q
-   WKb5L18sjh9rfgZf24ehZX+h7AE2CWInCMIrmHx4uD1aPp0YjKAfSuxSx
-   thFeo2zKQ0jY67ZsZZaw8FaqT+v8sKRE8hNkyU+temnl8k8rzHT7HWN2X
-   Ze26l7UNsJ09M3uz9grbgHUPqG18hmVhEvdZtBjhZz0x3y5pBypKEo8XG
-   uYfmvx7oBd49VzkCWK12ZVCVi+UJPz6c28roD5+MtSrneU1lrQylkbMl0
+  bh=omOaESTzC5JdyNOxcqj8pYklVvUg+2CQxKky1CjcYzE=;
+  b=ReM0lS5ulfkzu9b+6arMlT6wPnxTnejmEbdewwx9U13BjrfSx4oKzHCr
+   SCxTioUVZdc4CMDnUvO6M6WHRH4cKskebltnjkSICy1qW/xE73XllDy66
+   URmpAWLmZbUQAfWza6GLYz3AmZmXG6To+47b1+PXd6VywFsn18xmUpls3
+   vsGZrehffuRgeGhyQitsDawA05E/PzooF9CmgAnq+wYafLjHXgHQ57CQI
+   cqI29ZK0Bc/hlqufPZ9dzC0DKpKE4sJsrcUxFj7Yhrl+xFKF4RuexC0ag
+   bw3FQ6GPktbSEtdjnh6hsyySZoT0p2xVGx8YZg827i74V/CYU7FaIYe9r
    w==;
-X-CSE-ConnectionGUID: xQKyZrU4QbuaFVQ1w//Q2g==
-X-CSE-MsgGUID: oh8PsytkRROrzIN3HTtecw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11611"; a="68947848"
+X-CSE-ConnectionGUID: zp0oXkSKSSmT6Mr8NgwRCw==
+X-CSE-MsgGUID: 54w9msXgSZiG5ZEvWSunzA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11611"; a="68947863"
 X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
-   d="scan'208";a="68947848"
+   d="scan'208";a="68947863"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
   by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 20:50:25 -0800
-X-CSE-ConnectionGUID: xZPmvstDSqm4XKzyYbWeug==
-X-CSE-MsgGUID: KFMe4rC1TxmUXAbV/+YC+Q==
+X-CSE-ConnectionGUID: ecAteJ/4Sxa1ScmBr/C/kQ==
+X-CSE-MsgGUID: 4xufap9JQJmtAoHNzMPqyg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
-   d="scan'208";a="212789118"
+   d="scan'208";a="212789121"
 Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
   by fmviesa002.fm.intel.com with ESMTP; 12 Nov 2025 20:50:20 -0800
 Received: from kbuild by 7b01c990427b with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1vJPHm-0004sf-2D;
+	id 1vJPHm-0004sh-2H;
 	Thu, 13 Nov 2025 04:50:18 +0000
-Date: Thu, 13 Nov 2025 12:49:35 +0800
+Date: Thu, 13 Nov 2025 12:49:38 +0800
 From: kernel test robot <lkp@intel.com>
 To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -74,8 +74,8 @@ To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Andrei Botila <andrei.botila@oss.nxp.com>,
 	Richard Cochran <richardcochran@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
 	Vladimir Oltean <vladimir.oltean@nxp.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Kory Maincent <kory.maincent@bootlin.com>,
@@ -83,7 +83,7 @@ Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Subject: Re: [PATCH net-next 1/8] phy: add hwtstamp_get callback to retrieve
  config
-Message-ID: <202511122341.yMQLxKfa-lkp@intel.com>
+Message-ID: <202511130038.ODz0uTOK-lkp@intel.com>
 References: <20251112000257.1079049-2-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -105,22 +105,21 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/phy-add-h
 base:   net-next/main
 patch link:    https://lore.kernel.org/r/20251112000257.1079049-2-vadim.fedorenko%40linux.dev
 patch subject: [PATCH net-next 1/8] phy: add hwtstamp_get callback to retrieve config
-config: arm-allmodconfig (https://download.01.org/0day-ci/archive/20251112/202511122341.yMQLxKfa-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251112/202511122341.yMQLxKfa-lkp@intel.com/reproduce)
+config: arm-defconfig (https://download.01.org/0day-ci/archive/20251113/202511130038.ODz0uTOK-lkp@intel.com/config)
+compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 996639d6ebb86ff15a8c99b67f1c2e2117636ae7)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251113/202511130038.ODz0uTOK-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511122341.yMQLxKfa-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511130038.ODz0uTOK-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   drivers/net/ethernet/ti/netcp_ethss.c: In function 'gbe_hwtstamp_set':
->> drivers/net/ethernet/ti/netcp_ethss.c:2660:37: error: 'struct mii_timestamper' has no member named 'hwtstamp'; did you mean 'rxtstamp'?
+>> drivers/net/ethernet/ti/netcp_ethss.c:2660:23: error: no member named 'hwtstamp' in 'struct mii_timestamper'
     2660 |                 return phy->mii_ts->hwtstamp(phy->mii_ts, cfg, extack);
-         |                                     ^~~~~~~~
-         |                                     rxtstamp
+         |                        ~~~~~~~~~~~  ^
+   1 error generated.
 
 
 vim +2660 drivers/net/ethernet/ti/netcp_ethss.c
