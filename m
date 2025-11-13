@@ -1,201 +1,140 @@
-Return-Path: <netdev+bounces-238505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0FEDC5A118
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 22:13:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4D92C5A1E8
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 22:30:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7C1974E4F58
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 21:12:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4D3864F0834
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 21:24:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0CCB321426;
-	Thu, 13 Nov 2025 21:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2201331195A;
+	Thu, 13 Nov 2025 21:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kE9AvMS2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eI/xzN4m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B920D320CAC
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 21:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D8F3148C2
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 21:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763068331; cv=none; b=Hi+PgakjkwgI8qoeGlsXOQuwu5QghacVqCQfGU4er3N3Yi5UYx6wxUDn0qrUxFZ0Zg4HJRQHAIunfDNg31BnS07vfCk0obinRnyoK6/5L6/fOpI3F2yNZTujNymbmzDtTn1tJQ7SnyiBCLIx31bI6MsEDMoaLyqkexs/OXAw4QI=
+	t=1763069042; cv=none; b=ewa9D1xu3FgKDiGT/c5XJ/1oNaMZw5fx+3x2VA7CPomLJSRmusmPaaZx8DCKcJSgl/Ahsf6ASeRy/2Ml3gFhaAa7vc/Uy0eM3zMiQZm4AQLhyo1fD3VJG9zLHHGilpxjGdfI9Woc3aQ/RM88QqvSG4IRjEwqNO1Qrvhns7peKjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763068331; c=relaxed/simple;
-	bh=VZz8VeGMD34/0SPFsGJY9Zec9mHyRzTy7RjCb0SFz3Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qMvkuQZZTVY1TBf09OtBMAs4oL1+MFBAeYKjMZ4H8GxRU6hP1etGeHOa4EANwR1FxaYxxU6N3YKGGsoT8WUTmx21X0tXCKoHcvu7F3oQuwApEqBapgCxbtO+ys+/L+Z+3rT8PTHW8zaT33bk5AP5m6pejL5FPKOve755NVEkmvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kE9AvMS2; arc=none smtp.client-ip=209.85.218.42
+	s=arc-20240116; t=1763069042; c=relaxed/simple;
+	bh=pO5srCnJ/G8Wtg56D/7o5a0CmnBEcn72CLEb/fHokxE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aDd88fbbdQfj3O9tgs2MMc7+cgIzA/T2ekKK9HCH9u95ouwtgyMX/2wfkHJ+5iP40ToprfygILFJT48C4OaxmxhHhVI7Ak2ECdkF0rYnCzpJP5VNYj+MEgMQSsF1CiUGSFMqN2ydsBbddEDjjef8IvQ64xFKPdTBVDi6EheC0xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eI/xzN4m; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b7260435287so182858366b.3
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 13:12:09 -0800 (PST)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-298039e00c2so16108805ad.3
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 13:23:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763068328; x=1763673128; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wyeY2XNsdqhfXocUSjoPZjzq+oQsyNbMvmr9wItdoUQ=;
-        b=kE9AvMS2cfy+EA9GgKflu/RE3Cuibbu3f1mIhyrSwE8uj2A7XaBfJ20NM3UtQCJ739
-         j/jS01VHINekHbMhjxMlr+U/pE/0OfVXF+5EO4tC3PhgNJBYiOFIHGlZj4wNfGbza5mM
-         T5yog6Lprd0mOTVHCNEm5J8I4+jGySsNVIq7QBhkwFW8KNROXJ+PgUlEWhH1ub3tnb6e
-         gq/92o89EpH2L7udLImGxdVqT01UVSHb/OBI8Kt+nu0Xk7kzI7wrlHAKSWkUcBRU+2Nf
-         KOr+8MpyYIX55vdmugskd6H1wHmi2ZN29O7O0+CCJDVuTygVO968bFuMF42DZ8+rcFEN
-         06ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763068328; x=1763673128;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1763069039; x=1763673839; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wyeY2XNsdqhfXocUSjoPZjzq+oQsyNbMvmr9wItdoUQ=;
-        b=HLIuaWdfbA2V1IXu7PR8b6LGLwDEX94kw1/r9AYIQxnMyEjmwXn4ugkkXC/enSiQ1Z
-         MXUl7D7KyiBnefJ1z92RMXVcOAdU74ae7LqOlpTh9qzQO/40xax8MDWX+coJ5j5EiVpA
-         cafED/t0w1vRmSo1obhEuWmdKZUb+qdXaRHNCW1h9JENw63v2U5EQyaTJWv7ALalw6lu
-         kVqtNhL/yoMPX1f66T8h3R4YaY203iqcBWj/odlaK57J68lKuUMojtOVrFvRcGx3KjmI
-         80wUWT9hrYhUaBh9nAXhOjGR7JyIUuPAw4D/5ElaumjzZxxr8Bsn9hLzRSZ5G84jfV2C
-         YNWw==
-X-Gm-Message-State: AOJu0YwhabyLkfF/PIaVpyGW1lVU80QNVUDgVGhBZYKAx5AROu8UZFZx
-	WqxbSCLc1q1lPtWju6uP78yVM+z/WtfldT5Oqc3FQCbcje7/OidPmxDR
-X-Gm-Gg: ASbGncvTFZJP1V7fdoE1iG1fgVhPRJPh/w+przV6nT2bVNxV3Zte9yyz3m/WgyyaUIT
-	AaqNi0mcxEUv33mG66jP2piJOXg26Zmk9WfkxVL3CrCoXo0yRkPAxFbsvHctnAsxSvvJo9OgehF
-	rup8YO6dlEykiJ8GASgjqQuBOC637ixIbUvOWmxHHY0k2FexjU2ZuzkplABjinJa5QxU8LhZ2AZ
-	rjbppCbenHJxeEGFxiOVFoNp7n+TIGXaQKrh3TfbUH9ylozgb4/0IsrX3Zu9m5XIQ3MFx3KLnpS
-	qU402QBakbIwAcMFzaBoROC/7L2slkiKHEXHr8gVFkDamGxCd2JXGN1OfaqfIVYSQ2GjiRCHcpl
-	CgCxjA7VlSDlxOQSO1wLCQ0IwvAtsYWcLu34dWu/MiswIZKB9aeS3hqIUPWh295lDeCNzS3b3YW
-	x/b69NYtQmvCM=
-X-Google-Smtp-Source: AGHT+IHiDc/7hf9TqjsuwSPQ+FK0WK3MXANc1n+4UzxCZWDV8N5JWcs8yaQjBqEdwkwAyS0qmrlBJg==
-X-Received: by 2002:a17:907:60d4:b0:b6d:5914:30c with SMTP id a640c23a62f3a-b73679841a7mr52617866b.34.1763068327739;
-        Thu, 13 Nov 2025 13:12:07 -0800 (PST)
-Received: from localhost.localdomain ([46.10.223.24])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fda8d69sm237324266b.50.2025.11.13.13.12.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Nov 2025 13:12:07 -0800 (PST)
-From: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
-To: jiri@resnulli.us,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	david.hunter.linux@gmail.com,
-	khalid@kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	"Nikola Z. Ivanov" <zlatistiv@gmail.com>,
-	syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
-Subject: [PATCH net v2] team: Move team device type change at the end of team_port_add
-Date: Thu, 13 Nov 2025 23:11:42 +0200
-Message-ID: <20251113211142.245216-1-zlatistiv@gmail.com>
-X-Mailer: git-send-email 2.51.0
+        bh=Eh73fAdHPRVMVUq30CorTp1R5F8aS3XmyyV4X7uyU7E=;
+        b=eI/xzN4mkntpzlGY6HqBvRBgOqSg58DBIPpzyvWAG3ZWanFkg6Z61zKadGHvxT47Qm
+         UDThgTfgYG12c/mNZeJINbDaBMn2o3LFOjryhdGJxleKL1GoO6utBrU2xCZJgj00UCfA
+         6KdrgH5AnXglxgUNSKEC+Tn1fUXftqkDq9PWjuYbuxIKxBAVxCvtmEKzxKaGd+UZ7KKi
+         vaOYM1LUXjlO74LBFsn2+mm3ohR1+TvfhKkQaKpZRNtbP3zSQlGzftMS/SjT3CkNx6+X
+         244W7EcfWaziUDCX+2o01v8FTEox2GsR8TNGuBhIcLXoIGilOtiACKxhlQlHXNgdznzD
+         yv0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763069039; x=1763673839;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Eh73fAdHPRVMVUq30CorTp1R5F8aS3XmyyV4X7uyU7E=;
+        b=NcO26RwnFpHsDi29IJU0XVNvU2bdlL8P1HnVG12svcaCU2aTMwnJhODGDUIziF3v+W
+         QqXdPxPeAdcjm+OykXoRcIID/EmKjmb9r4c0AJoLD00jibWXJlq/2DMlLudnYZGOlF60
+         iB+jk+mLDW/B1vkM1iQubP2cZAxbkUzlnF0gz3PlyNTv7L4RZVmWXZ8WwmT5xaiKCEG/
+         yzSHF1kwLRNUB2qTySc2Yk/HAXTw47PmEFzuMARGQB0mbg0rbHWevb0NA4BBhJm7y1NP
+         8VMqC9TbSP0WL398ZBA30N/E4biWNWOvI1/e9ucM3E386eI2kvLDpnJU99db0i/yKnBp
+         eZKw==
+X-Gm-Message-State: AOJu0Yysnb/QQnlI0wKaLWy7WZAiamDZm21ASoC0hHrUQ5EP9oOe6xtR
+	oozEJCmfLiktDZ2pgzYZWv8BEzQv1U+6k8NSuA0Emhb6nM/wYfghH3spsHyAdI5AbE6an+YpUAC
+	7nqc+HBjlvfHf3yhPeCnSZ2B5fP4p3xY=
+X-Gm-Gg: ASbGnct2J+qMqJ5rfArZF7oyvp29zit3il0TFcdLcZJvwWN3D40Ek/6c8NvhwaGG4ib
+	umfG6FAfGAw4sZn0bqId3Vensi6/UKyLNx46WzuMgnEOS3eKdT8P8kYRXTRq2p3M+TZtpMM45PS
+	2sX8MCvRf0XKr7Z5QsuoiIHn0zf6edO6GDOq65Ae5E30IBC1h1RWOMy/caBYJgdIsjk91xuqvi6
+	iilrsfqJhDKzhdYoJM474T2bGGWJWadEF93pQpd+Cjw00S5qAlBbtKbSa9O
+X-Google-Smtp-Source: AGHT+IHIy62FYNI2+fsss76ZAxstDpGuH13CcKtwJwf7q37KPjXXhYyeWXtZJfedfcdinC12R6BE741QmBSKtVPCgHU=
+X-Received: by 2002:a17:903:1a10:b0:295:21ac:352b with SMTP id
+ d9443c01a7336-2986a6d6834mr4511285ad.15.1763069038948; Thu, 13 Nov 2025
+ 13:23:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1761748557.git.lucien.xin@gmail.com> <cc874b85134ba00f8d1d334e93633fbfa04b5a9a.1761748557.git.lucien.xin@gmail.com>
+ <3618948d-8372-4f8d-9a0e-97a059bbf6eb@redhat.com> <CADvbK_f9o=_L=K+Vo_MbJk3mXFgriUUtGCSVm6GNo6hFHk5Kzw@mail.gmail.com>
+In-Reply-To: <CADvbK_f9o=_L=K+Vo_MbJk3mXFgriUUtGCSVm6GNo6hFHk5Kzw@mail.gmail.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 13 Nov 2025 16:23:47 -0500
+X-Gm-Features: AWmQ_bl_mzAmk37GvxSMi73Wl76L8rzqwm6CGLE5Z5FgVRtg24EVCmyQJDOWLoo
+Message-ID: <CADvbK_fi6GDOwpo_vRNWDXLn9v7Kys5zuz8RGNxFYEm6y0KcTQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 13/15] quic: add timer management
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Attempting to add a port device that is already up will expectedly fail,
-but not before modifying the team device header_ops.
+On Thu, Nov 6, 2025 at 11:49=E2=80=AFAM Xin Long <lucien.xin@gmail.com> wro=
+te:
+>
+> On Tue, Nov 4, 2025 at 7:33=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+> >
+> > On 10/29/25 3:35 PM, Xin Long wrote:
+> > > +void quic_timer_stop(struct sock *sk, u8 type)
+> > > +{
+> > > +     if (type =3D=3D QUIC_TIMER_PACE) {
+> > > +             if (hrtimer_try_to_cancel(quic_timer(sk, type)) =3D=3D =
+1)
+> > > +                     sock_put(sk);
+> > > +             return;
+> > > +     }
+> > > +     if (timer_delete(quic_timer(sk, type)))
+> >
+> > timer_shutdown()
+> Will update. Thanks.
+timer_shutdown() sets timer->function to NULL, and it causes mod_timer()
+to return 0 without enqueuing the timer. This breaks the code:
 
-In the case of the syzbot reproducer the gre0 device is
-already in state UP when it attempts to add it as a
-port device of team0, this fails but before that
-header_ops->create of team0 is changed from eth_header to ipgre_header
-in the call to team_dev_type_check_change.
+                if (!mod_timer(t, jiffies + usecs_to_jiffies(timeout)))
+                        sock_hold(sk);
 
-Later when we end up in ipgre_header() struct *ip_tunnel points to nonsense
-as the private data of the device still holds a struct team.
+in quic_timer_start(), and cause sk leak.
 
-Example sequence of iproute commands to reproduce the hang/BUG():
-ip link add dev team0 type team
-ip link add dev gre0 type gre
-ip link set dev gre0 up
-ip link set dev gre0 master team0
-ip link set dev team0 up
-ping -I team0 1.1.1.1
+So I will keep timer_delete() here.
 
-Move team_dev_type_check_change down where all other checks have passed
-as it changes the dev type with no way to restore it in case
-one of the checks that follow it fail.
+Thanks.
 
-Also make sure to preserve the origial mtu assignment:
-  - If port_dev is not the same type as dev, dev takes mtu from port_dev
-  - If port_dev is the same type as dev, port_dev takes mtu from dev
-
-Testing:
-  - team device driver in-tree selftests
-  - Add/remove various devices as slaves of team device
-  - syzbot
-
-Reported-by: syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=a2a3b519de727b0f7903
-Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
-Signed-off-by: Nikola Z. Ivanov <zlatistiv@gmail.com>
----
-Changes since v1:
-  - Add a "Fixes" tag
-  - Add a simple reproducer in the commit log
-  https://lore.kernel.org/netdev/20251111171341.4c6d69be@kernel.org/T/#u
-
- drivers/net/team/team_core.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index 29dc04c299a3..94c149e89231 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -1134,10 +1134,6 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 		return -EPERM;
- 	}
- 
--	err = team_dev_type_check_change(dev, port_dev);
--	if (err)
--		return err;
--
- 	if (port_dev->flags & IFF_UP) {
- 		NL_SET_ERR_MSG(extack, "Device is up. Set it down before adding it as a team port");
- 		netdev_err(dev, "Device %s is up. Set it down before adding it as a team port\n",
-@@ -1155,10 +1151,12 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 	INIT_LIST_HEAD(&port->qom_list);
- 
- 	port->orig.mtu = port_dev->mtu;
--	err = dev_set_mtu(port_dev, dev->mtu);
--	if (err) {
--		netdev_dbg(dev, "Error %d calling dev_set_mtu\n", err);
--		goto err_set_mtu;
-+	if (dev->type == port_dev->type) {
-+		err = dev_set_mtu(port_dev, dev->mtu);
-+		if (err) {
-+			netdev_dbg(dev, "Error %d calling dev_set_mtu\n", err);
-+			goto err_set_mtu;
-+		}
- 	}
- 
- 	memcpy(port->orig.dev_addr, port_dev->dev_addr, port_dev->addr_len);
-@@ -1233,6 +1231,10 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 		}
- 	}
- 
-+	err = team_dev_type_check_change(dev, port_dev);
-+	if (err)
-+		goto err_set_dev_type;
-+
- 	if (dev->flags & IFF_UP) {
- 		netif_addr_lock_bh(dev);
- 		dev_uc_sync_multiple(port_dev, dev);
-@@ -1251,6 +1253,7 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 
- 	return 0;
- 
-+err_set_dev_type:
- err_set_slave_promisc:
- 	__team_option_inst_del_port(team, port);
- 
--- 
-2.51.0
-
+>
+> >
+> > Other than that:
+> >
+> > Acked-by: Paolo Abeni <pabeni@redhat.com>
+> >
 
