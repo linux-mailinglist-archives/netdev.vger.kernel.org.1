@@ -1,130 +1,144 @@
-Return-Path: <netdev+bounces-238318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 739BEC5739F
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:38:48 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 357D1C573C9
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:40:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEBC43B4734
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:33:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 96BF6355830
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7354133F381;
-	Thu, 13 Nov 2025 11:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972B2346FD1;
+	Thu, 13 Nov 2025 11:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MRxOWZXZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ub/sFsU6";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="nC9pGQLk"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933F02FF648
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 11:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9F9347BD1
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 11:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763033575; cv=none; b=WvcoZCCVRMGT8qSiuBxuLGFbtdYx1+lh0MgNFuOWhFBt/fG9KI0tRdLVkHXSWiU+AVqC/QvPfeC+HXS+TgIOpTtcHWrvWcdzcc1GjNUOh/XQAwRQfuDebj5q1aoECg0Ysjns7ETd+aepE6EFUI4yMugtnF9w+hJIzpPuCpTgmKA=
+	t=1763033734; cv=none; b=H2u4ogx2sj3x1ZWbtk36plCeC7WxcwRccmH+orK3pUdy/Ed6gXAwdV5sn/JY/Zp1pcxLSD5HyZ3VOILxLb3jjrD3fZyrTnB2kRi334wpdrbwpkhJlThUGCOjhCOF5pfGnsHiA9+VYX62bELL4kWuqx9qq51fLQdfkuexVbonfkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763033575; c=relaxed/simple;
-	bh=YtVQU2/dR/HMmHbX1xQKNnEPAKmqJq9hCsPN6LU/NZ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fj52d1UinBxlNJLEaqQbk+I2bgYqi0RIFtDpwAgAcWY8jm0n63BZnOl79jscHqComHJ4IsP7Gdco7EC41pxafCxZPL4Yb97VXhqZDY7Hp1pr/zOP1Mw8nlyB8nG7ipYzfK/bmQizBt1dsS2MQivDMzkUnJW6XYvMmr1TQ4kOeFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MRxOWZXZ; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763033571;
+	s=arc-20240116; t=1763033734; c=relaxed/simple;
+	bh=fp63++1V0e2rfbzvo0CJD+DkxvCoDYR6emQAJ407hVA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o5Tp3r4shlR5X6QIi/OA/hMMbQoGu+LCt16TTxwCKHSAQ1J89Xp/chgCL7DR2/zU+xQyOxGOV0ZEuupbKtmBObi1n6y2oO5at1lSJCGGqpMaiHyAxmWOscXqvBFcm3dwcw6x255MsUe2ITaDbZ7uuqYWPDlOJAealsn+M0eBEd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ub/sFsU6; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nC9pGQLk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763033731;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Rs0QW+z5X48n3fVCzgY8RZKxvf5A6SWguiEqCblviR8=;
-	b=MRxOWZXZtZF1QZKQQv8RpKKUQhPX1EjzXjsxarcFw9MHfueBFZ2930o7IJNXXrEE8gpI7G
-	7BCaRoMf8ViFdi6xPavdJigj1/tYU0O4D40cOCMUImFSYlMc1HpAROOCp989V8F9qnFQEP
-	26hxmVsmOU184f25U0GMGfyka0IwhiI=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrei Botila <andrei.botila@oss.nxp.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Cc: Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	bcm-kernel-feedback-list@broadcom.com,
-	netdev@vger.kernel.org,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next v2 9/9] ptp: ptp_ines: add HW timestamp configuration reporting
-Date: Thu, 13 Nov 2025 11:32:07 +0000
-Message-ID: <20251113113207.3928966-10-vadim.fedorenko@linux.dev>
-In-Reply-To: <20251113113207.3928966-1-vadim.fedorenko@linux.dev>
-References: <20251113113207.3928966-1-vadim.fedorenko@linux.dev>
+	bh=r6YTfwOkU3WoxTlG9t9+dRYuueXmgcFUpkZem7cnN1c=;
+	b=Ub/sFsU6pUL8lCEE6psqQd3dukT0ucNnofUWDMns0Yl2PDWhzg7T1v415b+mmv1iAa0MKA
+	mYyesEfMZsnIAnQ8Db/ImsFmbM4oG8BGmkS2x2yTlxEg8evgOYfye09HmNPG9FC5BMTGUM
+	7cF836UivTruV88jb9OIyI7JNAzbR8Q=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-591-ZjaI5DsSNeaJ_BYkvf-Acg-1; Thu, 13 Nov 2025 06:35:30 -0500
+X-MC-Unique: ZjaI5DsSNeaJ_BYkvf-Acg-1
+X-Mimecast-MFC-AGG-ID: ZjaI5DsSNeaJ_BYkvf-Acg_1763033729
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4775f51ce36so8510955e9.1
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 03:35:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763033729; x=1763638529; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r6YTfwOkU3WoxTlG9t9+dRYuueXmgcFUpkZem7cnN1c=;
+        b=nC9pGQLk/eKdFjIwarDwmSA0dkU8mZpx9IZH76cv6PChOl0Y4eFOeuEXJFMBmivzaz
+         z+rGBrQwyXZhS5UIEf5lH+IVtQoezzYmkNkzWDfjovRu1tAURe1PIYT8n5W+WBtWQUm1
+         ScUcVcyxyhKUEDqF3aU/jyiBNoecNqPMsshIyQBsCfVZSKxbefXUnhud2ySom7l63vtI
+         wp6lTGbGBSGSwPSzksRICyiZeCLOm6U6RLaiu6P0gEospqmOq2c9O3N4b1CYrcVe/Ekp
+         61sHqVGwd+geskvsMYQf7y90jTz5LcKdfX9uQyjt8hwBkHsfCzUZaMO8+dmX65sPe9fq
+         PbXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763033729; x=1763638529;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r6YTfwOkU3WoxTlG9t9+dRYuueXmgcFUpkZem7cnN1c=;
+        b=AdvGnJOMZ5IsIKIs2wBPqeabClHTn3xeN3+EwwGn7quPdABSXGXRJ9Kv6EgOgvAtJB
+         hsSiCgE979TM6NMkM5uTjU/q/ftipqhrsurspUHXP9eMpogNg5uMcPyFZyLQMSgiFDwf
+         KwPpKkPcVyfbAJzlcsH8Th8UWHAsxRcRhAq8SzHbZMD9+O2P2NygKhArE50lO0kZu3CL
+         ED3W0fyTbyXUoadKqFlPZEBhhFzMwiX7ZrwRXQP3yaTgEP7eenIviMcMsv1oekI79Svm
+         TgL+19UDwRFkpgP+p97gy1pTGyIi3vBGW6wdZ2rt/gLqYx/fa6w11TV2aSg4iullIDNv
+         8iYA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+2ZI8g0pGtYIt3dt6/OQy5/QlWH7uNzM5lhTXGgtIKChVBw6+WZkLZW7VVtEdc+ojvrQr8p4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRFzHo6s5kjgmUkluRG9Cq1PyeQIG160+RHGTA1IGpCu9NhhyB
+	430h/tnqqBFixqsAGGJr0/uLUH5AHuZ80YG9UHCDMdoMbnu2UdbClSdubFIW6VUpIwXLku4aSP4
+	sc6ClyPrh8HFWpUa3V3H23PGuUBQrHE6MB9+baLXUFAkGCQkmB3vXoxhuQg==
+X-Gm-Gg: ASbGncs0Lfsl91DNCQzWH61ZtRXIvZgM7ENuhEPRgkiNVEI2UAHvDF/zHRx/h/huMoX
+	+dJZvCfyoux9Y9abNZ9sEyonnmGjTawwI+GLdDlD42fM/u8NEodkJZlWheWh/5cUN0NIGsOUecV
+	vKlkt1qkUQYiNCYygpi/dJt5Lg8WxavwjbIfCkzaxsTAZAknLllRRVbwfZQYcS406KVU13heoq7
+	azRS+kOKzXg6l1KfiURQTVciOpIDpe8rqbl2EQf1uZIJP155MthnC7GQJe58eK9a7hJCDTXVIUt
+	y6QvxvrznSEkGCgPXwGAy/cz4NydmGVvcR/AgelnDf6Yusxnumz4i7ijsHXUKlHxropxL1S379/
+	Wxdmi/5lc2xfl
+X-Received: by 2002:a05:600c:46c3:b0:46e:59bd:f7d3 with SMTP id 5b1f17b1804b1-47787095d6amr62711145e9.20.1763033729378;
+        Thu, 13 Nov 2025 03:35:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHovgs3xJAaDFCdTRQ+HPHalK2/dJ1kUrjxk/wksurzhmxWxvia+g4dTOLwghiwd15Dld1rTQ==
+X-Received: by 2002:a05:600c:46c3:b0:46e:59bd:f7d3 with SMTP id 5b1f17b1804b1-47787095d6amr62710885e9.20.1763033729021;
+        Thu, 13 Nov 2025 03:35:29 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.55])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4778bebe628sm16644845e9.13.2025.11.13.03.35.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Nov 2025 03:35:28 -0800 (PST)
+Message-ID: <8c6d84bf-fb2f-4096-8725-9c398e7a985e@redhat.com>
+Date: Thu, 13 Nov 2025 12:35:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 4/5] eea: create/destroy rx,tx queues for
+ netdevice open and stop
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Vivian Wang <wangruikang@iscas.ac.cn>,
+ Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+ Dust Li <dust.li@linux.alibaba.com>
+References: <20251110114648.8972-1-xuanzhuo@linux.alibaba.com>
+ <20251110114648.8972-5-xuanzhuo@linux.alibaba.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251110114648.8972-5-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The driver partially stores HW timestamping configuration, but missing
-pieces can be read from HW. Add callback to report configuration.
+On 11/10/25 12:46 PM, Xuan Zhuo wrote:
+> +int eea_poll_tx(struct eea_net_tx *tx, int budget)
+> +{
+> +	struct eea_net *enet = tx->enet;
+> +	u32 index = tx - enet->tx;
+> +	struct netdev_queue *txq;
+> +	u32 cleaned;
+> +
+> +	txq = netdev_get_tx_queue(enet->netdev, index);
+> +
+> +	__netif_tx_lock(txq, raw_smp_processor_id());
 
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
- drivers/ptp/ptp_ines.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+Why are you using the raw_ variant? This should be smp_processor_id(),
+right?
 
-diff --git a/drivers/ptp/ptp_ines.c b/drivers/ptp/ptp_ines.c
-index 56c798e77f20..790eb42b78db 100644
---- a/drivers/ptp/ptp_ines.c
-+++ b/drivers/ptp/ptp_ines.c
-@@ -328,6 +328,28 @@ static u64 ines_find_txts(struct ines_port *port, struct sk_buff *skb)
- 	return ns;
- }
- 
-+static int ines_hwtstamp_get(struct mii_timestamper *mii_ts,
-+			     struct kernel_hwtstamp_config *cfg)
-+{
-+	struct ines_port *port = container_of(mii_ts, struct ines_port, mii_ts);
-+	unsigned long flags;
-+	u32 port_conf;
-+
-+	cfg->rx_filter = port->rxts_enabled ? HWTSTAMP_FILTER_PTP_V2_EVENT
-+					    : HWTSTAMP_FILTER_NONE;
-+	if (port->txts_enabled) {
-+		spin_lock_irqsave(&port->lock, flags);
-+		port_conf = ines_read32(port, port_conf);
-+		spin_unlock_irqrestore(&port->lock, flags);
-+		cfg->tx_type = (port_conf & CM_ONE_STEP) ? HWTSTAMP_TX_ONESTEP_P2P
-+							 : HWTSTAMP_TX_OFF;
-+	} else {
-+		cfg->tx_type = HWTSTAMP_TX_OFF;
-+	}
-+
-+	return 0;
-+}
-+
- static int ines_hwtstamp_set(struct mii_timestamper *mii_ts,
- 			     struct kernel_hwtstamp_config *cfg,
- 			     struct netlink_ext_ack *extack)
-@@ -710,6 +732,7 @@ static struct mii_timestamper *ines_ptp_probe_channel(struct device *device,
- 	port->mii_ts.rxtstamp = ines_rxtstamp;
- 	port->mii_ts.txtstamp = ines_txtstamp;
- 	port->mii_ts.hwtstamp_set = ines_hwtstamp_set;
-+	port->mii_ts.hwtstamp_get = ines_hwtstamp_get;
- 	port->mii_ts.link_state = ines_link_state;
- 	port->mii_ts.ts_info = ines_ts_info;
- 
--- 
-2.47.3
+/P
 
 
