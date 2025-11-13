@@ -1,171 +1,198 @@
-Return-Path: <netdev+bounces-238365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82900C57D49
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:03:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63878C57DE5
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:15:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2BCF4204C3
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 13:44:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFD103BBB82
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 13:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7CF320B7E1;
-	Thu, 13 Nov 2025 13:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F3821883E;
+	Thu, 13 Nov 2025 13:48:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="qog5kLiq"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="LS/L7S7h";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jsZRJWn2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCD41FFC59
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 13:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6219C21D3F3
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 13:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763041467; cv=none; b=QjDiYtnwbmwTgyslPLpirVdG1ykgaK+S8EZjuNYZPsxqIhHP/lfbHbJRq4YpYqzSQAoQzsFQL2+vXya5bHf7igq/M9WxPoDenKZ5yvUgZjQH8TPSQnvs0HDF7jLzvUm9J8GiKwzlVn5q5avkQAtXjdFEEJnX6Upw4DZzh/OPtq0=
+	t=1763041719; cv=none; b=S/8XsPfgNJWo6Cu2YUa6V+qfSpfLVzqQ0tOCJlooMYXPYKCz6hb1MwBs3ovIs0DIZ+pQHlSj4grY6BgrJ7ABSSuxONbHsv/0LrdPqdXe4bDr3lWf/Hlv6Jq0MVePFV7LvdRaNCj9FDM2QC02ju76sPFrlSPB6SSDxIf1SfB7UWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763041467; c=relaxed/simple;
-	bh=n3yn/Qzs/10SowO+cV6IyFirX5NhFXBaRiN32HGuPq0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Wj/j5lqlopUWgNEavFSCCvVLGl03ExwidZwwz/bqurrmIbAFWGyhPRUDFa9W+C1t6+gaaU2dmQlNbnXmm1jpenlBS9/gprJP37P4OC920ixPCZzR2sOvxu6/NsZqzvwQswOTiHTe3Q/6ataxyw0/rZ8OkxofXRawBTMQDb1ZilQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=qog5kLiq; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-591c9934e0cso1181608e87.0
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 05:44:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1763041464; x=1763646264; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gHk2bNA1OTHNC9vr3z2H2JeUdyy+rk3RBEHgiTzG238=;
-        b=qog5kLiqxL98ShFKc/SwX9mP+f24xq3WCQrZs3mf/iNDSxNs9ehsTSA1uZY/PGDKU1
-         f7s24wBBKmrsWq66ZvGC3M1zsmd5PSjUXxIKdkgYLyXyWY3F/svgRipvOnz7FDHyum5U
-         ettEqYXWaNlhAVoG1sUtFdJkaujxjVsOm8/tQmJHYkRiRTP9gOYghyVph0ZDg2/A/M3c
-         eIvhZj3sl2wBX4BhjLdX7LYq2F5xUnmcaFLfpofFiao355Vw6LVJIPG26l16TKfG6m1L
-         KVaSgPP4an0HQ22Zxs1IIMtHs+YdVvdKgqUxLN3uzwoYUPD/NmIANVjkfqCHgIpT9Lju
-         Y+zQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763041464; x=1763646264;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gHk2bNA1OTHNC9vr3z2H2JeUdyy+rk3RBEHgiTzG238=;
-        b=bOSxE0dGyhVFJm6hdi9hkSkKmwdBuAtspUtboVt1pgzxcJM2vQ7TYHaammXpjUvxCb
-         gmsnn+8SDj0WZw9q4XBSlaosW0QCQAKmuoe9+nTQytiok4orcBmZwr34tvCkPHyV2Ak2
-         aHp/iwFj+p5/NIUZkM2Ym+Or0TRIgAPDUTdYkqTUE5A+Ksye9vnHC+zOVjg/AxuzTHZy
-         TL04TSuyY4SinLL0W0jAyedTepbys9uHyfPTgqu2pTCDhEkP5fo5VTMu2WtyOl1w/WNO
-         cZmIxew+H1iy1XRW7g2goT2cCqGrZZg2Kp/MYMRHbO4LeINdP+9/hRMD9WZp9359+OGw
-         dqmw==
-X-Forwarded-Encrypted: i=1; AJvYcCVBXBkmLueNyGbwFOxBZQjGO8A4zNmvCKECQDyqS0OOgPca+wWOPAHwN7a3yKasNdpZtiPtwSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqA+FbfM8kUCaLmGvFrhp0aY7fbqPV6BkCEsCn2Ndjdv08sT0D
-	MBPI67c3msLme5RCpze4xNpNgtNITPJn8XBZ9Mz8Q7tb757TtlRnXlEYMmBI5AmCErvN6NHRfq2
-	mjETBF9DLQe6DAZBSQ7AYkTT7zqE8AyNl/DTF4K/DaA==
-X-Gm-Gg: ASbGncv0BVscZhAttTec44Ac+5PpPEXtpthcKGRy0V6VIYbjo22UhxDpj8lnRUxAbO3
-	DOaf/SR6nx+/63KA2Fw0/u5j56IUbiXj3OEQmfXR/IJRb7VU1/FemPwFvJO+wvKrNmgjqK7N7tt
-	UDeas9q03tsn2cSpaomVdVpjj6cK51LoVq9ecY0jYtsoPu5NSxEpVlFTinFOsPuS+t0Ljm4gJpy
-	72ndKTqAtiwNDZlnK8ro0N/z0rcXhxlgRTdeGD0cDdwIi7ZMqOH4Y/CCtFYeBUkpssqa+A8npMn
-	4xK+p3jBSZBGVhW0
-X-Google-Smtp-Source: AGHT+IF9+pE/QXln9/ghLnXjpwA3j+ZQdhSMaqAds1VqCnmNiZvVcKXj+XjAJW9rczSh1FwGivl5ToawEe+J2/Cq7qU=
-X-Received: by 2002:a05:6512:6d4:b0:592:f7cf:9f6f with SMTP id
- 2adb3069b0e04-59576df5dfemr2184445e87.14.1763041463584; Thu, 13 Nov 2025
- 05:44:23 -0800 (PST)
+	s=arc-20240116; t=1763041719; c=relaxed/simple;
+	bh=gC9xFfMOY9jh1sK28xagC7f/6aBGtYezftueqEsw/xM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BVVsT9Tx56AIJOKmdcrPqE4YKvvpUUE6NXz9YZzRV3ftaSLlhe+gNIWi72vsVA06NIv6lBz4aKTHw9onpAbRDs4DkbsJo/t0FVwqrZGNTNV2K5T2Nny02h+xa/ggYY2TyJFRvyz0cbgW2fDEZjZSBbs1p/jK4a3XEplyryVd6OY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=LS/L7S7h; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jsZRJWn2; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id 4B4D1EC01D7;
+	Thu, 13 Nov 2025 08:48:35 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Thu, 13 Nov 2025 08:48:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1763041715; x=1763128115; bh=l0BSewK8sCblX9qd/K4yWf2C5QtbDG5b
+	Fy7pP0mGw88=; b=LS/L7S7hQNFxSPJE3MBYTgvF40UErn5z0BpkotI0O6SwHZe7
+	rK+7UnDjxhaskbTamrgN9DMR+2Uwb8NYF19O3iAyJJ0yKNvJInkmVjvxIiYsYz6I
+	CwhRsot9wV2ATfdqCt2RM17fE9S7bTFe8tulvjxY6qKXpHV8b1/ztBhpul7A9BA0
+	pguol1i38/RrnHEtzMNfn+pXT/2u5QTCViA5AnamxRYKmAuzZ64uk/5BDy6MvuZw
+	2j6xENhBxYjeE9y/WgtQUP7zJQowQYUH2KWjB0KXidGMPM0Uq9xBbSt6NsaSrKWB
+	g82AitJcGX5dsAgpWFleNUVifJWwrvIHk6jNBA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763041715; x=
+	1763128115; bh=l0BSewK8sCblX9qd/K4yWf2C5QtbDG5bFy7pP0mGw88=; b=j
+	sZRJWn2zrv5xHGJqTmmLmoTV38iV5aSfYLmX9jnwtFRu/YmqPrzvOSwuDz6VfyAk
+	Th5+SodRY2YecnEyhISO7ZD9r43OuFOcfUuDtVZCHjrkm6vy6B2bt1Q7j7IWeQ6H
+	K3NMZ0H71c5B+C8B2/SLY+YoIjiZjP1BOwTpOAm0H68VpNreRBRvxI+fygDLy/63
+	9Zefu0ZeikHYgWuAliAuMiGlQQQ43stPn0fJZ2/zCpFtyRmVAOPFiLy2LM0MwoSF
+	0RR1kEK6C5krqaz067VivIgsFOuPs/6ZNOcBxYQi7jcarriT9UdC+ICDIAQ4+SH+
+	/0t93xxxM0TzHSU2u+Ibg==
+X-ME-Sender: <xms:suEVaRCiKtQghR0o2dUdjmr_XHOpbMr1Q1YDNn6CqnQWtDpn8Fij8Q>
+    <xme:suEVaTOi8uH1OTNd7bZV08alXqp8SoISNDuRZYLdfKw0XTohpcBt4OvI1nlo6iYmQ
+    VRcqUb9-RsYHD9_CUJIGoiI43fLOMdMv8nEgO50z0409dHtMXXc2kB1>
+X-ME-Received: <xmr:suEVaWY80DtfO_SZoLTDvbANkqOW1ilQOk_m7i290tEN9v5EKHF2fBE2ePS4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvtdejuddtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
+    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
+    frrghtthgvrhhnpefgvdegieetffefvdfguddtleegiefhgeeuheetveevgeevjeduleef
+    ffeiheelvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepiedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprhgrlhhfsehmrghnuggvlhgsihhtrdgtoh
+    hmpdhrtghpthhtoheprghnthhonhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthho
+    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumh
+    griigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:suEVaSvL4pMHo-5ZxLU4VSuy3Pjpg2tkY9wzJbGyla2oDs7Owdk3tw>
+    <xmx:suEVaYPyMrYQ2aeCXJPxv6PEwEnqQQLjtSzcxxORlQJ-RokkeqFIrw>
+    <xmx:suEVaZ4ShxP2DkWj1zbouLzi6NJP76iB0FknFc_ZG97o49QkQPCmJQ>
+    <xmx:suEVaeRX7eYiq6iHo4zxrLl6az1E-8zF8aeMHDJGid9Va5KcmFFtew>
+    <xmx:s-EVaZLWkEonM2OZkR5w730UEgk3NzZNIAgXFsouGnTMISEq_quF17e0>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 13 Nov 2025 08:48:34 -0500 (EST)
+Date: Thu, 13 Nov 2025 14:48:32 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Ralf Lici <ralf@mandelbit.com>
+Cc: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 6/8] ovpn: consolidate crypto allocations in one
+ chunk
+Message-ID: <aRXhsFpwTEfne0vF@krikkit>
+References: <20251111214744.12479-1-antonio@openvpn.net>
+ <20251111214744.12479-7-antonio@openvpn.net>
+ <aRS13OqKdhx4aVRo@krikkit>
+ <7315d47ac4cd7510ad9df7760e04c49bddd92383.camel@mandelbit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251107-qcom-sa8255p-emac-v5-0-01d3e3aaf388@linaro.org>
- <20251107-qcom-sa8255p-emac-v5-6-01d3e3aaf388@linaro.org> <14f95efb-0eb0-48ee-9132-df35abddfcc7@oss.qualcomm.com>
-In-Reply-To: <14f95efb-0eb0-48ee-9132-df35abddfcc7@oss.qualcomm.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 13 Nov 2025 14:44:12 +0100
-X-Gm-Features: AWmQ_blnqOG7JKELYBN2x3sW4StFzPpU8xniVnWCV7D_4z_I3CQNMw3VuWKeQ6A
-Message-ID: <CAMRc=Mf03rYoi-C+kMic9RYZdk2vtAW5LDMYNMqg-H5vJccUhA@mail.gmail.com>
-Subject: Re: [PATCH v5 6/8] net: stmmac: qcom-ethqos: split power management
- context into a separate struct
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Vinod Koul <vkoul@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Chen-Yu Tsai <wens@kernel.org>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
-	Matthew Gerlach <matthew.gerlach@altera.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
-	Keguang Zhang <keguang.zhang@gmail.com>, Shawn Guo <shawnguo@kernel.org>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Fabio Estevam <festevam@gmail.com>, Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com, 
-	Romain Gantois <romain.gantois@bootlin.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, Heiko Stuebner <heiko@sntech.de>, 
-	Chen Wang <unicorn_wang@outlook.com>, Inochi Amaoto <inochiama@gmail.com>, 
-	Emil Renner Berthing <kernel@esmil.dk>, Minda Chen <minda.chen@starfivetech.com>, 
-	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>, 
-	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	Maxime Ripard <mripard@kernel.org>, Shuang Liang <liangshuang@eswincomputing.com>, 
-	Zhi Li <lizhi2@eswincomputing.com>, Shangjuan Wei <weishangjuan@eswincomputing.com>, 
-	"G. Jaya Kumaran" <vineetha.g.jaya.kumaran@intel.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	Linux Team <linux-imx@nxp.com>, Frank Li <Frank.Li@nxp.com>, David Wu <david.wu@rock-chips.com>, 
-	Samin Guo <samin.guo@starfivetech.com>, 
-	Christophe Roullier <christophe.roullier@foss.st.com>, Swathi K S <swathi.ks@samsung.com>, 
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, Drew Fustini <dfustini@tenstorrent.com>, 
-	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org, 
-	linux-mips@vger.kernel.org, imx@lists.linux.dev, 
-	linux-renesas-soc@vger.kernel.org, linux-rockchip@lists.infradead.org, 
-	sophgo@lists.linux.dev, linux-riscv@lists.infradead.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7315d47ac4cd7510ad9df7760e04c49bddd92383.camel@mandelbit.com>
 
-On Fri, Nov 7, 2025 at 12:00=E2=80=AFPM Konrad Dybcio
-<konrad.dybcio@oss.qualcomm.com> wrote:
->
-> On 11/7/25 11:29 AM, Bartosz Golaszewski wrote:
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >
-> > With match data split into general and power-management sections, let's
-> > now do the same with runtime device data.
-> >
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > ---
-> >  .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 46 ++++++++++++--=
---------
-> >  1 file changed, 25 insertions(+), 21 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/=
-drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> > index 1f00556bbad997e2ec76b521cffe2eb14fabb79e..09f122062dec87aa11804af=
-2769ddff4964e6596 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> > @@ -105,17 +105,21 @@ struct ethqos_emac_match_data {
-> >       const struct ethqos_emac_pm_data *pm_data;
-> >  };
-> >
-> > +struct ethqos_emac_pm_ctx {
-> > +     struct clk *link_clk;
-> > +     unsigned int link_clk_rate;
-> > +     struct phy *serdes_phy;
->
-> What is the benefit of doing this? PHY APIs happily consume a nullptr
-> and NOP out, and the PHY is already retrieved with _optional(),
-> similarly with clk
->
-> Konrad
+2025-11-13, 11:35:07 +0100, Ralf Lici wrote:
+> On Wed, 2025-11-12 at 17:29 +0100, Sabrina Dubroca wrote:
+> > 2025-11-11, 22:47:39 +0100, Antonio Quartulli wrote:
+> > > +static unsigned int ovpn_aead_crypto_tmp_size(struct crypto_aead
+> > > *tfm,
+> > > +					      const unsigned int
+> > > nfrags)
+> > > +{
+> > > +	unsigned int len = crypto_aead_ivsize(tfm);
+> > > +
+> > > +	if (likely(len)) {
+> > 
+> > Is that right?
+> > 
+> > Previously iv was reserved with a constant size (OVPN_NONCE_SIZE), and
+> > we're always going to write some data into ->iv via
+> > ovpn_pktid_aead_write, but now we're only reserving the crypto
+> > algorithm's IV size (which appear to be 12, ie OVPN_NONCE_SIZE, for
+> > both chachapoly and gcm(aes), so maybe it doesn't matter).
+> 
+> Exactly, I checked and both gcm-aes and chachapoly return an IV size
+> equal to OVPN_NONCE_SIZE, as you noted. I just thought it wouldn't hurt
+> to make the function a bit more generic in case we ever support
+> algorithms without an IV in the future, knowing that OVPN_NONCE_SIZE
+> matches ivsize for all current cases.
 
-Because it clearly divides the driver's logic into the manual and
-firmware-driven variants. Just because we could, doesn't necessarily
-mean we should just call PHY APIs with a nullptr if readability is
-better when we don't.
+IMO there's not much to gain here, since the rest of the code
+(ovpn_aead_encrypt/decrypt) isn't ready for it. It may even be more
+confusing since this bit looks generic but the rest isn't, and
+figuring out why the packets are not being encrypted/decrypted
+correctly could be a bit painful.
 
-Bartosz
+> Also, there's a check in ovpn_aead_init to ensure that
+> crypto_aead_ivsize returns the expected value, so we're covered if
+> anything changes unexpectedly.
+
+Ah, good.
+
+Then I would prefer to just make ovpn_aead_crypto_tmp_size always use
+OVPN_NONCE_SIZE, and maybe add a comment in ovpn_aead_init referencing
+ovpn_aead_crypto_tmp_size.
+
+Something like:
+
+/* basic AEAD assumption
+ * all current algorithms use OVPN_NONCE_SIZE.
+ * ovpn_aead_crypto_tmp_size and ovpn_aead_encrypt/decrypt
+ * expect this.
+ */
+
+
+Or a
+
+    DEBUG_NET_WARN_ON_ONCE(OVPN_NONCE_SIZE != crypto_aead_ivsize(tfm));
+
+in ovpn_aead_crypto_tmp_size, which would fire if the check in
+ovpn_aead_init is ever removed.
+
+
+> > > @@ -130,11 +225,7 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer,
+> > > struct ovpn_crypto_key_slot *ks,
+> > >  	/* AEAD Additional data */
+> > >  	sg_set_buf(sg, skb->data, OVPN_AAD_SIZE);
+> > >  
+> > > -	req = aead_request_alloc(ks->encrypt, GFP_ATOMIC);
+> > > -	if (unlikely(!req))
+> > > -		return -ENOMEM;
+> > > -
+> > > -	ovpn_skb_cb(skb)->req = req;
+> > > +	ovpn_skb_cb(skb)->crypto_tmp = tmp;
+> > 
+> > That should be done immediately after the allocation, so that any
+> > failure before this (skb_to_sgvec_nomark, ovpn_pktid_xmit_next) will
+> > not leak this blob? ovpn_aead_encrypt returns directly and lets
+> > ovpn_encrypt_post handle the error and free the memory, but only after
+> >  ->crypto_tmp has been set.
+> > 
+> > (same thing on the decrypt path)
+> 
+> Right, will fix both paths.
+
+Thanks.
+
+-- 
+Sabrina
 
