@@ -1,426 +1,223 @@
-Return-Path: <netdev+bounces-238208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38626C55FC7
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 07:53:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60F56C55FE9
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 08:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3BEC3AD1C2
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 06:53:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 178C73B4C7A
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 07:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6492F3203A0;
-	Thu, 13 Nov 2025 06:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2409301004;
+	Thu, 13 Nov 2025 07:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z+fGm+Ov"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P17XFAxF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88029221DB6
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 06:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763016788; cv=none; b=f7QYq7m163iZGj+3yZ6CS2b0EeJlBax08StyzPMWiBKOYVL5r/ZixS+mlKz4y9kG6AlwLDWGRhD9/eEBRZf7vk72Y6kXetenRpWH2srmAvcknXncdijYkdyGgcQM27OHy+yBgf+uQNCPXK/HLJmDfU6AvyFE775Qb9A+vxGK8/g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763016788; c=relaxed/simple;
-	bh=zOMRoPVPYQ8ukpjMdMdPE8GhIrZY/aAog6X34k9oJLo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qe3+ZYWj2/mG7yQ0mGdzIZUqJ9DFQFwPZdO2q6J1yIgD8TjVrfIA9yzM33uyjxR6KZ8EGicoTo6wH/NKJYYnPY01pdzbd/mKwF8zJuAmvGO5Ibam+Q46HcZmNPFMmou3Ept3xBrw39lluTMqbrQ7xzE63/eQXBhLlvdYQcw1uqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z+fGm+Ov; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2955623e6faso3991505ad.1
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 22:53:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763016786; x=1763621586; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hVMm38c7OdWDaS6KWkvVH6FzHgi2ZfdMvON3kTvQfvs=;
-        b=Z+fGm+OvosS9gW9s9LX7FaYSerOYE1sfCWXnwepbXm1XYKKB92v94q1Eg9QlcSdhXg
-         KzJQ2FYmwnY/6BW/1qldQrOi4Vp0MhIZo2ksXE3Y3vOiffcSAiqNUYwXJePwLCz7MDmq
-         AmBYIjp7dMoeoW4DBzDWKUPkd6x5fQ+GwckCKLyylO+Z0r85IR9+nkqA8TQwdViOQo1T
-         JpI2ezFbRdAXm8Uw2Fr6A+neFoxtwo0fortRRpuhgbaeZzL7VW5+KtVfS5BE4LGf2g5z
-         UJj0F2DUmumoF3U735+HCC2V2eDdCpHxW3usjmwAJymHlUSYddw2XuLg56gAMJ0w0THD
-         ZLww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763016786; x=1763621586;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hVMm38c7OdWDaS6KWkvVH6FzHgi2ZfdMvON3kTvQfvs=;
-        b=Uln8NE6wMwZXsz3jgxhUmKZOsL/KWUczOE7rJkPo2o1xavYcRO0/QnOrWWOx4E34xq
-         F/0EJTcMUnGoRVDBOk08akk4oz+5eoFoLVcAOwFQw/GePageyj4OI4y/+I44KHWiRqje
-         O3LccAajNaIh69Du36l8uLjMHG+m0f7ooeESdhhAMMnpUDNGNz73XaFb4gOSOzVin44W
-         a/DODgzbetPuaPF3zuVSOhFSClhA38Cm3vtb1/r1Q4U1eKBor1W1I+TETvPhtA7Jey/K
-         cR5oBF2nYQURMHCzDJfBYaoVpv4ksyE2BY8wvBs5Vgb6iMrMg975bsuLRmL8SgS8Just
-         2cVw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6Dut7Nd7AEbo5s1hDwZ/Airz8WUt0jSc/MJqxkLbfTrWW3w58CHSxvf6pOPoz2jecVTtXlB4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6lGE9Lu8Kd+0dP4Ltuwv63OLYDmZKwYVIDPoyUsKfYDhd4H1Y
-	edWPQyIDyb+OMYqM8X1lY+hC4NjXffvcRMYi3Wsp/xwu0sWsrL/h9daK/q2QtUtvxx10cfCWWBU
-	VM4sC1vyxDYiOQ/AGBu+fv+zkTV67au0Py6oSeUfz
-X-Gm-Gg: ASbGncvVF62UpdtGXeKB0gVylC4Ha2H0Nu64ixmUWMNC6VVr/NW8rsMeKqgWINKE0NC
-	urlVMmn3NIgzZeNtpgMMT5McPxgZOt1Wvqt2jPp1VQ5mQimx0JRrfhnM+ta7psy5eCfiE1nGM34
-	BZBv3BgK+hmbJHxxHQhrwgNgDTDaui9nsN50p3fF1FC7AGcDtbEpHLAWE9YOHyJmzMlP8P+wTPn
-	igcYw5zqyAUfeDjTHtzre9skNKoroCwy5kyQDmjuNeKlXTaJelsdOi7SAea2Vqa2gwo6WWJvCtT
-	WDamkeS/weOSBHvdzL99XxUODu90JLff2FplKd8=
-X-Google-Smtp-Source: AGHT+IG2wsNx9NQBfbLeNX7Jh3Qb75bsTSse02cznwHpckC+B6lEAV9oDqzgW+aV2nULcMuZlpOij+cmVn9FUKnq8hY=
-X-Received: by 2002:a17:903:b0b:b0:295:8dbb:b3cd with SMTP id
- d9443c01a7336-2984eda4092mr70785975ad.27.1763016785549; Wed, 12 Nov 2025
- 22:53:05 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216CD2F693E
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 07:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763017465; cv=fail; b=X4486eFhyPSj6YuT0W4INXELYp7HxU8yFIFk/5p6qXF95KQB/65p2Q71GFR2kCJl7l6MASREq0rHtntZvstQiBQ6t8ylHm/FPBYqEwCylvHu7+ed9eF71srCQ3VILJv/OZwJfh4vi8KA2op/QR6lMKiZsUxbwFq3zHWZAq2Roj8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763017465; c=relaxed/simple;
+	bh=otLynibPIYlVusss31DLQDqhrg/oOOuDfH2NVMb/T0E=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=c8NulnO35eDa9Nk+gSDWNfFIDevc790pzOVzCxusxHRfCzu7r+eDR42nrzTo7X0IRm8ErmVx5gTfwDrYNPOt2mq6pbCyJHIZO0H60uQdNUdY1whgk3Ltyu5a5v1xjxZZPYgjHBruDYexpFDwlufw+UnYyO29kY8Jmhi5BFPtwj8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P17XFAxF; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763017464; x=1794553464;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=otLynibPIYlVusss31DLQDqhrg/oOOuDfH2NVMb/T0E=;
+  b=P17XFAxFjQGOO1+ChWxYEqD61EbsVA6IxO3Gt2aewP6RzPoKiWn/oCMY
+   8AnBHgyssFPlCWhCP54GnlEPs9aX+6zn6EAPJpNHCnrkJL2H4z9GZoppn
+   6dEENBUnbQC9qM6Mf3uZd3GQIaAvHrjZ8gCsI7dBzqfv5zNNoHkJQxhOO
+   GaGhIIrw5HUBrl+83tuhf1e4kvXyJDBLu4pkOm7GG1SUhxZHqtNW9e1qV
+   FKVLD33IZ+f/gX0/K4zg5uHuAsp9IG1VgR935NDC7cEZAMbvM5TUb2FUB
+   L3Prkz02JsH2bqptDaqKwoIvrVPhsTBsDwbZhNOa/8I+j9TUbkTSp4jUq
+   A==;
+X-CSE-ConnectionGUID: F4Z9H/bKTi60VGhqCX86GA==
+X-CSE-MsgGUID: jYF9x8AvSPCZR+CrpLkGdg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11611"; a="64975730"
+X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
+   d="scan'208";a="64975730"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 23:04:24 -0800
+X-CSE-ConnectionGUID: 9aRDqqfXTNqp9UKikKxw0A==
+X-CSE-MsgGUID: sCp/veG0RMGUDPpUziw1uA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
+   d="scan'208";a="188712597"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 23:04:22 -0800
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 12 Nov 2025 23:04:22 -0800
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Wed, 12 Nov 2025 23:04:22 -0800
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.50)
+ by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 12 Nov 2025 23:04:22 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ps+PHr46FDrMEwQV/f2yvLdC4e2ySxkyJnMYBPrcOQd5xUnKfuTgq54GaLZ6eNkl6QOXvlsP74mn7KXoUcGDmDG8hVeU7DxZLK81h3INQL/Y5gJs++egiQ2sRpumuaTLIJ5FS0KBZZaSdFiJlsUd7Akb0DchzafosGcsMdTzZtDwKdJLoru6XnH3jS8PkPiVGEoKi0HbCRlg3zuF0NRKq8TSlex3FzdvvCVvW4jaCW5r7J3uJWz528CPGzwG2RoNOx9UjaWOuvenm58TPxVSr20XtRzYNSP8wP0t2PlhVO4QR7qeWBCISCNIjecv7+tZrt55FslJmITpReux8ab7yQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=otLynibPIYlVusss31DLQDqhrg/oOOuDfH2NVMb/T0E=;
+ b=BnuPVYDtbDE36bngYHk7KZQ7lLj9wPUcHXgUHjlitX6xGqB2MKpJQWBH/JQNis/sLxSfPuvjDKzTywWQou0CbNnyIkPv9YdPw4qfC/gcVRO4qczGMf4X9XyYlKj0MgVU5ciC4nnQTVPab6LlF9Nt0zD+dYVEEWryqgf9jK8ZHs1sYL0vmYZzQOm44bscuJ4CQD1/jPWTxbbzmjIkQL+44HWJb/MNKegNWyb39IELYt7huzAOJnGzwiiWxufwnMkZ3HhoI8zqfJ0uN3J6eEp4Dzqd3WTsOcFELPWlgQ75TfqseNYj3RfRVL93Wlc+4Bm+7DUDUkkyVH41QpADeaeA+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by CH3PR11MB8363.namprd11.prod.outlook.com (2603:10b6:610:177::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.16; Thu, 13 Nov
+ 2025 07:04:19 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9320.013; Thu, 13 Nov 2025
+ 07:04:19 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Hay, Joshua A" <joshua.a.hay@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v10 05/10] idpf: reshuffle
+ idpf_vport struct members to avoid holes
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v10 05/10] idpf: reshuffle
+ idpf_vport struct members to avoid holes
+Thread-Index: AQHcVDTivSVghLaauUmwVYus15vGL7TwLvGA
+Date: Thu, 13 Nov 2025 07:04:19 +0000
+Message-ID: <IA3PR11MB89869DF357B3E046C9AE0BCCE5CDA@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20251113004143.2924761-1-joshua.a.hay@intel.com>
+ <20251113004143.2924761-6-joshua.a.hay@intel.com>
+In-Reply-To: <20251113004143.2924761-6-joshua.a.hay@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|CH3PR11MB8363:EE_
+x-ms-office365-filtering-correlation-id: 4dadf61e-2784-4a5e-f9f6-08de2282ddec
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700021|7053199007;
+x-microsoft-antispam-message-info: =?us-ascii?Q?zwHyOYbCHghZMl91JmeMc4AVeWoXk79RJdcJ99QBoePUZzxepueobGkzZBDy?=
+ =?us-ascii?Q?nMdnEcHX41eHtvyJx4KxwXigwTBT3KQASY6VzWuoZfcxqxmVk9mzOQc6NVza?=
+ =?us-ascii?Q?Hs6U9HSpXWL58daqk7mPk2amW6jc5ctwoL1iibV0oov91Dk9S8kg6VFY9w8N?=
+ =?us-ascii?Q?5UwfLGvuk3JorMW3M6m7mU4hm/zvImrcqKGr44m43MUOFOtdTOEpuywlhxKT?=
+ =?us-ascii?Q?o4cogVNR/TrB8ueI0Rjo4fwIdzGESzjazQv+ABSn43mSXo05LAwVUAeIqEXg?=
+ =?us-ascii?Q?EhAgq/l9R/020qhB5npOXAQhVU647Sjv0K6wDO4ZFNYQj3pQ5NF6QlYXBjEq?=
+ =?us-ascii?Q?MzO/zun7te1YW2B9Wp9noQIhBBrd0MTzw1xGGwD3vsq6GYObxg1W9pDf8bAx?=
+ =?us-ascii?Q?9QBVPyOyLl370uZs6S543lrUv3L8VUvo1Cmo1zgbhn3DbiqwdBu5FhYeD2bP?=
+ =?us-ascii?Q?o1skbKobJHtwe9a8L7mIxRalI/9xyiOF9bMpQHwQrZdueEebHdkrhRbdSkZ9?=
+ =?us-ascii?Q?GKurEfHSNorKHH+QmNWeMb52beak43lAQmdY6YR23mtDV+cXgp+Fc90adIG8?=
+ =?us-ascii?Q?+VuudBfTOrMillCDMpSJyVWeKsZJd/AGetEIhoBywwZvFiHzvLO8uLI9MrEN?=
+ =?us-ascii?Q?0vUMPZ14YBVcRrXtqRZuS+uYGhK5eqxRiJ0J7xQ8Ifx3K+fB+bSGeUgyiX+i?=
+ =?us-ascii?Q?YldduLnHQcpDHvA7EW63NVtJsg6lpMCXtbDcfdVIFr20jvCwRMgLtgDusbT6?=
+ =?us-ascii?Q?lIM/IpTeNF4pAbX8DJAWjgZ1ffDqKtsT2v/GRUlyhfKuvueKpLzg7/gDH2Q5?=
+ =?us-ascii?Q?KPxeAAejLJpnsTvc718dH/bDaYhkk/rPyfs5p0OQYYbVGqONHGGsodPIm0Jn?=
+ =?us-ascii?Q?JiVuR5BQXs2v5aezz7Q5rm9+1PbBfqR6dSb/P7J7uPmYI3FSfM33sFLIWrFF?=
+ =?us-ascii?Q?ecA19AHNcL7lPG8Tira4ppYDhomCQ9Fa6kAEnxFbQvcSU1emMqbsYtyU9O7y?=
+ =?us-ascii?Q?45WlYCl0z+AC6TRlSt4hlBEeAkle6P23EGNNpGDNo5pWCJ6a+AR1R/7qccof?=
+ =?us-ascii?Q?ezE6MbQwHwWxebjsQqGyPysoRsylsN2OX/XMWO6XNQwiDXWPfd1QdTKwVStC?=
+ =?us-ascii?Q?T2cGKUeA0LuJiOYpHw42vXihdyEvO/ISYRX9lYX5vjL6eeNHEIRc4WKJnYwn?=
+ =?us-ascii?Q?1pG8GVtSMKr7zcXnMKDYxNlTDD7K3/UBZVzxWdz3yR+IK24PRAR06wOCYRgd?=
+ =?us-ascii?Q?oCZuYdZP/WsO38srIZo0z3CpyuR4zzzWFNKVNSKcOI1GtUjmsscLdDWA1GVz?=
+ =?us-ascii?Q?eE2TISLKyCXZRExCPoxw32r5oL7yOxvq9VYltMxIAeGGupj6IHx9Ql41TKdc?=
+ =?us-ascii?Q?P10ojn9xN8ji8wswHNRES0c8pYo/w36yWGLnUSy9J20tCdPfy3DvyDCiYaZD?=
+ =?us-ascii?Q?pyIYSrpWkzpQOrGsKa9d3aTIZ+QuYq1LvuU0XfkaWg9aPkSId0dLqSfPAGTp?=
+ =?us-ascii?Q?712ok2YLhQ+WWozWPjXBH8g0M8X7x37F54wy?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700021)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ucLq22zpzOSiidKZrt6dn6kk72cZUuc8g+j/tb//vq5N5xJBtfZI2RkvY4oT?=
+ =?us-ascii?Q?0BuHrX44QzvLrizXA7YQLOZRMxmZDz1FMbnPKN/U5EiMAYB31U2dbkKGkFid?=
+ =?us-ascii?Q?LnNX6OtRjr8bF9rzixHe2MKkW1juzMWldWsXoRqm8qI51QFteVLjEeBqVNBg?=
+ =?us-ascii?Q?QmPULDfEL56X4gfsGMoa97TKTd52yYr76DmoHh9tzHqoiw9u+o6UsCv7aFSw?=
+ =?us-ascii?Q?aAGF8wzNzVlK25jSKRx7Rno4gLC8UUeRroD7Iy9JkBPlyewCU3h4+NZdK0JL?=
+ =?us-ascii?Q?QSNUnuTBThAfRq6aa4XBu0wx9/sseQSrUpw85XkARuOKZzx0/kOzctTRtgpv?=
+ =?us-ascii?Q?EuOuaMa2FBPTzTzz81JF+F5fCybAp8NtyynmbyYne91Z80LN6GLvxZwj6ukD?=
+ =?us-ascii?Q?lihBaeo+UNcLCS9e1zK2hGcKUWAMv4+jYyI33OsvBL4vvP/rNYtgKZEG61Tk?=
+ =?us-ascii?Q?/lnT9Xs+ohyQ2fKbj7tmpz6QaTbcAVq/ePNJmhVh6mm9w0ruS9eG/2wn9gbV?=
+ =?us-ascii?Q?/L1DgyZzGJ2rHsFxxkzDVwhq7+6LSqjfoQMka7Ea+3LVIuIXbbDKtpR0MYCQ?=
+ =?us-ascii?Q?PBa4WMhaGsL1W0NTXoHzq2/+IQ3Q8jDNg+h8TU/LbprZrjlwob333De2EAJt?=
+ =?us-ascii?Q?LJBql346oTM19m2jBuyc6sNs0R1S8a1InGwb4JyQjEM232Y5MzgcGaKl4hbp?=
+ =?us-ascii?Q?0GkoUJ9aO8cP6LNoSZ7iqjpshJtEBU0ZAg6S69WcoUtlOSEqD1dIMlBr8JgB?=
+ =?us-ascii?Q?7cSseP2dzHeZweE9OAqyN67WR/CRiDpMmmE5VwbFAqsAFJd0ml+6vJa4OB17?=
+ =?us-ascii?Q?/fKGVi/5+HOURAAY4Z23AwTR8eTeNyry5EIQpG65tAUZRMS5xBOVA3lXtLVG?=
+ =?us-ascii?Q?TWBABZtTdyjdojB1IVYNZ/Z73xNPNGNfSAw001Z/2A+2RTuBHDB/2BmqBHRe?=
+ =?us-ascii?Q?sGlYpC5fSsTsB5KKNC7Zs11DYJKNKl7jXtq55v3yBFOs26ouFMBCdExcYdwa?=
+ =?us-ascii?Q?sRDiQoWteHAUTsfKDGqUnIaPloj1q3KWarQhwONbO4yk1qdIhOVtlXByyLIK?=
+ =?us-ascii?Q?xbKj4XGtxF68ouSBFsGYBSKkFm8K42szPGlLELjQBfIJcSyqSfx3VNNqKhxQ?=
+ =?us-ascii?Q?7dU3t3I8PATJnSkQR5d8fdFa/48+TwOrOYhl3qUtblM//mUk4FwxYmtoGDUE?=
+ =?us-ascii?Q?WlvWBKzSpquqlDk3Ys7VBWBcUr4h74Nc6NmoDy1Enbzw0H2vXwBcXYrf2nNj?=
+ =?us-ascii?Q?knkt+S5oaPmT8sQ/bU5xkzL47++l/XfI84q33m6susQl6mt0xLSKlsO5MDoE?=
+ =?us-ascii?Q?/8hRB0dt8bjbfNTydaiiy3nnGfq745OzmyMD6Xl4bmI33TFknhsYLFYQ4hPv?=
+ =?us-ascii?Q?tdZdc5Yexu/BkpJgG7A4xbsZ0pu0y9P8FLcwmXfuU8NSXFjLJjMq+d3IuH8c?=
+ =?us-ascii?Q?OZYYedPNvbnfSpaBa8ekA2e6Ed392joPfo5N34lRtXO6CDVMNUbxWxEeFctB?=
+ =?us-ascii?Q?5YvpRZfzHYVx+f3xy8UiO9fsFk/eLZwKiPsMOhOb568BZJznZg8+Tf7nnbwC?=
+ =?us-ascii?Q?SBL3y5fPcPYXCAJWu2LpyKfErXk6TMSdTNakHqBbEy0wo+z1SYVX29ZX9+QE?=
+ =?us-ascii?Q?aA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112212026.31441-1-adelodunolaoluwa.ref@yahoo.com>
- <20251112212026.31441-1-adelodunolaoluwa@yahoo.com> <CAAVpQUB97EBnTbA9pKwdhPM0pHadiM3QhP4_1qLSKGg2LAwzkA@mail.gmail.com>
- <295e5440-94eb-447f-b4f0-4943e9d02f1c@yahoo.com> <CAAVpQUAyPwyG=aSnv-2w7g3dqhB3BLXGoo5VmbSNqQ0txpqqWQ@mail.gmail.com>
- <335f64d5-390b-4529-b2da-0af019c7f598@yahoo.com>
-In-Reply-To: <335f64d5-390b-4529-b2da-0af019c7f598@yahoo.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 12 Nov 2025 22:52:54 -0800
-X-Gm-Features: AWmQ_blCkB7sQXMekaUeLv3LH0J3atTUg-0_lPLxJ7EujaG3EvIDORDMP7QTj8Q
-Message-ID: <CAAVpQUDX2LcWu+u5CHSJUoPnHLuGNoPzEZuV+K67WoPUUvymdg@mail.gmail.com>
-Subject: Re: [PATCH v4] selftests: af_unix: Add tests for ECONNRESET and EOF semantics
-To: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
-	skhan@linuxfoundation.org, david.hunter.linux@gmail.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, 
-	linux-kernel-mentees@lists.linuxfoundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4dadf61e-2784-4a5e-f9f6-08de2282ddec
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Nov 2025 07:04:19.6977
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: r4zbVYmF8d087W9bNBXWQXnRdcfm2PIf29VISirNTKzNOJaVQ5JiVSYwt4c9LxQyaQrhom1viPCYBOuBw0JHOHQmu2VqTgtUrbjlNN8AIdo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8363
+X-OriginatorOrg: intel.com
 
-On Wed, Nov 12, 2025 at 10:41=E2=80=AFPM Sunday Adelodun
-<adelodunolaoluwa@yahoo.com> wrote:
->
-> On 11/13/25 07:10, Kuniyuki Iwashima wrote:
-> > On Wed, Nov 12, 2025 at 9:25=E2=80=AFPM Sunday Adelodun
-> > <adelodunolaoluwa@yahoo.com> wrote:
-> >> On 11/12/25 23:04, Kuniyuki Iwashima wrote:
-> >>> On Wed, Nov 12, 2025 at 1:20=E2=80=AFPM Sunday Adelodun
-> >>> <adelodunolaoluwa@yahoo.com> wrote:
-> >>>> Add selftests to verify and document Linux=E2=80=99s intended behavi=
-our for
-> >>>> UNIX domain sockets (SOCK_STREAM and SOCK_DGRAM) when a peer closes.
-> >>>> The tests verify that:
-> >>>>
-> >>>>    1. SOCK_STREAM returns EOF when the peer closes normally.
-> >>>>    2. SOCK_STREAM returns ECONNRESET if the peer closes with unread =
-data.
-> >>>>    3. SOCK_SEQPACKET returns EOF when the peer closes normally.
-> >>>>    4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unre=
-ad data.
-> >>>>    5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
-> >>>>
-> >>>> This follows up on review feedback suggesting a selftest to clarify
-> >>>> Linux=E2=80=99s semantics.
-> >>>>
-> >>>> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-> >>>> Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-> >>>> ---
-> >>>>    tools/testing/selftests/net/.gitignore        |   1 +
-> >>>>    tools/testing/selftests/net/af_unix/Makefile  |   1 +
-> >>>>    .../selftests/net/af_unix/unix_connreset.c    | 178 +++++++++++++=
-+++++
-> >>>>    3 files changed, 180 insertions(+)
-> >>>>    create mode 100644 tools/testing/selftests/net/af_unix/unix_connr=
-eset.c
-> >>>>
-> >>>> diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/=
-selftests/net/.gitignore
-> >>>> index 439101b518ee..e89a60581a13 100644
-> >>>> --- a/tools/testing/selftests/net/.gitignore
-> >>>> +++ b/tools/testing/selftests/net/.gitignore
-> >>>> @@ -65,3 +65,4 @@ udpgso
-> >>>>    udpgso_bench_rx
-> >>>>    udpgso_bench_tx
-> >>>>    unix_connect
-> >>>> +unix_connreset
-> >>>> diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/te=
-sting/selftests/net/af_unix/Makefile
-> >>>> index de805cbbdf69..5826a8372451 100644
-> >>>> --- a/tools/testing/selftests/net/af_unix/Makefile
-> >>>> +++ b/tools/testing/selftests/net/af_unix/Makefile
-> >>>> @@ -7,6 +7,7 @@ TEST_GEN_PROGS :=3D \
-> >>>>           scm_pidfd \
-> >>>>           scm_rights \
-> >>>>           unix_connect \
-> >>>> +       unix_connreset \
-> >>>>    # end of TEST_GEN_PROGS
-> >>>>
-> >>>>    include ../../lib.mk
-> >>>> diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/=
-tools/testing/selftests/net/af_unix/unix_connreset.c
-> >>>> new file mode 100644
-> >>>> index 000000000000..9413f8a0814f
-> >>>> --- /dev/null
-> >>>> +++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
-> >>>> @@ -0,0 +1,178 @@
-> >>>> +// SPDX-License-Identifier: GPL-2.0
-> >>>> +/*
-> >>>> + * Selftest for AF_UNIX socket close and ECONNRESET behaviour.
-> >>>> + *
-> >>>> + * This test verifies:
-> >>>> + *  1. SOCK_STREAM returns EOF when the peer closes normally.
-> >>>> + *  2. SOCK_STREAM returns ECONNRESET if peer closes with unread da=
-ta.
-> >>>> + *  3. SOCK_SEQPACKET returns EOF when the peer closes normally.
-> >>>> + *  4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with un=
-read data.
-> >>>> + *  5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
-> >>>> + *
-> >>>> + * These tests document the intended Linux behaviour.
-> >>>> + *
-> >>>> + */
-> >>>> +
-> >>>> +#define _GNU_SOURCE
-> >>>> +#include <stdlib.h>
-> >>>> +#include <string.h>
-> >>>> +#include <fcntl.h>
-> >>>> +#include <unistd.h>
-> >>>> +#include <errno.h>
-> >>>> +#include <sys/socket.h>
-> >>>> +#include <sys/un.h>
-> >>>> +#include "../../kselftest_harness.h"
-> >>>> +
-> >>>> +#define SOCK_PATH "/tmp/af_unix_connreset.sock"
-> >>>> +
-> >>>> +static void remove_socket_file(void)
-> >>>> +{
-> >>>> +       unlink(SOCK_PATH);
-> >>>> +}
-> >>>> +
-> >>>> +FIXTURE(unix_sock)
-> >>>> +{
-> >>>> +       int server;
-> >>>> +       int client;
-> >>>> +       int child;
-> >>>> +};
-> >>>> +
-> >>>> +FIXTURE_VARIANT(unix_sock)
-> >>>> +{
-> >>>> +       int socket_type;
-> >>>> +       const char *name;
-> >>>> +};
-> >>>> +
-> >>>> +FIXTURE_VARIANT_ADD(unix_sock, stream) {
-> >>>> +       .socket_type =3D SOCK_STREAM,
-> >>>> +       .name =3D "SOCK_STREAM",
-> >>>> +};
-> >>>> +
-> >>>> +FIXTURE_VARIANT_ADD(unix_sock, dgram) {
-> >>>> +       .socket_type =3D SOCK_DGRAM,
-> >>>> +       .name =3D "SOCK_DGRAM",
-> >>>> +};
-> >>>> +
-> >>>> +FIXTURE_VARIANT_ADD(unix_sock, seqpacket) {
-> >>>> +       .socket_type =3D SOCK_SEQPACKET,
-> >>>> +       .name =3D "SOCK_SEQPACKET",
-> >>>> +};
-> >>>> +
-> >>>> +FIXTURE_SETUP(unix_sock)
-> >>>> +{
-> >>>> +       struct sockaddr_un addr =3D {};
-> >>>> +       int err;
-> >>>> +
-> >>>> +       addr.sun_family =3D AF_UNIX;
-> >>>> +       strcpy(addr.sun_path, SOCK_PATH);
-> >>>> +       remove_socket_file();
-> >>>> +
-> >>>> +       self->server =3D socket(AF_UNIX, variant->socket_type, 0);
-> >>>> +       ASSERT_LT(-1, self->server);
-> >>>> +
-> >>>> +       err =3D bind(self->server, (struct sockaddr *)&addr, sizeof(=
-addr));
-> >>>> +       ASSERT_EQ(0, err);
-> >>>> +
-> >>>> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >>>> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> >>>> +               err =3D listen(self->server, 1);
-> >>>> +               ASSERT_EQ(0, err);
-> >>>> +       }
-> >>>> +
-> >>>> +       self->client =3D socket(AF_UNIX, variant->socket_type | SOCK=
-_NONBLOCK, 0);
-> >>>> +       ASSERT_LT(-1, self->client);
-> >>>> +
-> >>>> +       err =3D connect(self->client, (struct sockaddr *)&addr, size=
-of(addr));
-> >>>> +       ASSERT_EQ(0, err);
-> >>>> +}
-> >>>> +
-> >>>> +FIXTURE_TEARDOWN(unix_sock)
-> >>>> +{
-> >>>> +       if ((variant->socket_type =3D=3D SOCK_STREAM ||
-> >>>> +            variant->socket_type =3D=3D SOCK_SEQPACKET) & self->chi=
-ld > 0)
-> >>>> +               close(self->child);
-> >>>> +
-> >>>> +       close(self->client);
-> >>>> +       close(self->server);
-> >>>> +       remove_socket_file();
-> >>>> +}
-> >>>> +
-> >>>> +/* Test 1: peer closes normally */
-> >>>> +TEST_F(unix_sock, eof)
-> >>>> +{
-> >>>> +       char buf[16] =3D {};
-> >>>> +       ssize_t n;
-> >>>> +
-> >>>> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >>>> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> >>>> +               self->child =3D accept(self->server, NULL, NULL);
-> >>>> +               ASSERT_LT(-1, self->child);
-> >>>> +
-> >>>> +               close(self->child);
-> >>>> +       } else {
-> >>>> +               close(self->server);
-> >>>> +       }
-> >>>> +
-> >>>> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> >>>> +
-> >>>> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >>>> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> >>>> +               ASSERT_EQ(0, n);
-> >>>> +       } else {
-> >>>> +               ASSERT_EQ(-1, n);
-> >>>> +               ASSERT_EQ(EAGAIN, errno);
-> >>>> +       }
-> >>>> +}
-> >>>> +
-> >>>> +/* Test 2: peer closes with unread data */
-> >>>> +TEST_F(unix_sock, reset_unread_behavior)
-> >>>> +{
-> >>>> +       char buf[16] =3D {};
-> >>>> +       ssize_t n;
-> >>>> +
-> >>>> +       if (variant->socket_type =3D=3D SOCK_DGRAM) {
-> >>>> +               /* No real connection, just close the server */
-> >>>> +               close(self->server);
-> >>>> +       } else {
-> >>>> +               /* Establish full connection first */
-> >>>> +               self->child =3D accept(self->server, NULL, NULL);
-> >>>> +               ASSERT_LT(-1, self->child);
-> >>>> +
-> >>>> +               /* Send data that will remain unread */
-> >>>> +               send(self->client, "hello", 5, 0);
-> >>> Could you move this send() before "if (...)" because we want
-> >>> to test unread_data behaviour for SOCK_DGRAM too ?
-> >>>
-> >>> Otherwise looks good, so with that fixed:
-> >>>
-> >>> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-> >>>
-> >>> Thanks!
-> >> Thank you for the prompt response.
-> >> I thought of putting the send before the if the statement , but I was =
-afraid
-> >> STREAM and SEQPACKET connections won't be accepted before data sending=
-.
-> > connect() create the paired child socket and accept()
-> > allocates a file descriptor to expose the socket to user
-> > space.
-> Thank you for this explanation.
-> >
-> > In that sense, the comment above accept() sounds a
-> > bit weird ;)
-> I understand.
-> I am changing it to
-> /* Accept client connection */
 
-I'd remove it since it just repeats the code, but up to you.
 
-Thanks!
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Joshua Hay
+> Sent: Thursday, November 13, 2025 1:42 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org
+> Subject: [Intel-wired-lan] [PATCH iwl-next v10 05/10] idpf: reshuffle
+> idpf_vport struct members to avoid holes
+>=20
+> From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+>=20
+> The previous refactor of moving queue and vector resources out of the
+> idpf_vport structure, created few holes. Reshuffle the existing
+> members to avoid holes as much as possible.
+>=20
+> Reviewed-by: Anton Nadezhdin <anton.nadezhdin@intel.com>
+> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+> ---
+> v8: rebase on AF_XDP series
+> ---
 
->
-> If this is accepted, I will send v5 immediately
->
-> Thank you for your guidance.
-> >
-> >
-> >> I will start working on v5.
-> >>
-> >> That part will look like this now:
-> >> /* Test 2: peer closes with unread data */
-> >> TEST_F(unix_sock, reset_unread_behavior)
-> >> {
-> >>           char buf[16] =3D {};
-> >>           ssize_t n;
-> >>
-> >> */* Send data that will remain unread */
-> >>           send(self->client, "hello", 5, 0);*
-> >>
-> >> *if (variant->socket_type =3D=3D SOCK_DGRAM) {
-> >>                   /* No real connection, just close the server */
-> >>                   close(self->server);
-> >>           } else {
-> >>                   /* Establish full connection first */
-> >>                   self->child =3D accept(self->server, NULL, NULL);
-> >>                   ASSERT_LT(-1, self->child);
-> >>
-> >>                   /* Peer closes before client reads */
-> >>                   close(self->child);
-> >>           }*
-> >>
-> >>           n =3D recv(self->client, buf, sizeof(buf), 0);
-> >>           ASSERT_EQ(-1, n);
-> >>
-> >>           if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >>               variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> >>                   ASSERT_EQ(ECONNRESET, errno);
-> >>           } else {
-> >>                   ASSERT_EQ(EAGAIN, errno);
-> >>           }
-> >> }
-> >>
-> >> Thank you once again.
-> >>>
-> >>>> +
-> >>>> +               /* Peer closes before client reads */
-> >>>> +               close(self->child);
-> >>>> +       }
-> >>>> +
-> >>>> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> >>>> +       ASSERT_EQ(-1, n);
-> >>>> +
-> >>>> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >>>> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> >>>> +               ASSERT_EQ(ECONNRESET, errno);
-> >>>> +       } else {
-> >>>> +               ASSERT_EQ(EAGAIN, errno);
-> >>>> +       }
-> >>>> +}
-> >>>> +
-> >>>> +/* Test 3: closing unaccepted (embryo) server socket should reset c=
-lient. */
-> >>>> +TEST_F(unix_sock, reset_closed_embryo)
-> >>>> +{
-> >>>> +       char buf[16] =3D {};
-> >>>> +       ssize_t n;
-> >>>> +
-> >>>> +       if (variant->socket_type =3D=3D SOCK_DGRAM)
-> >>>> +               SKIP(return, "This test only applies to SOCK_STREAM =
-and SOCK_SEQPACKET");
-> >>>> +
-> >>>> +       /* Close server without accept()ing */
-> >>>> +       close(self->server);
-> >>>> +
-> >>>> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> >>>> +
-> >>>> +       ASSERT_EQ(-1, n);
-> >>>> +       ASSERT_EQ(ECONNRESET, errno);
-> >>>> +}
-> >>>> +
-> >>>> +TEST_HARNESS_MAIN
-> >>>> +
-> >>>> --
-> >>>> 2.43.0
-> >>>>
->
+...
+
+> --
+> 2.39.2
+
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
