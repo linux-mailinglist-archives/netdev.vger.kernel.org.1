@@ -1,96 +1,87 @@
-Return-Path: <netdev+bounces-238189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6993EC559A1
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 04:57:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3956BC559FE
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 05:08:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17DC83A5E6A
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 03:57:19 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4F2BD4E3709
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 04:06:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEFB125BEE8;
-	Thu, 13 Nov 2025 03:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC6826461F;
+	Thu, 13 Nov 2025 04:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="htF79OEk"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="go9YtWi4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 491C37E0E4
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 03:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217D11EB9E3
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 04:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763006237; cv=none; b=cLoCF1xECJpXWP4N/RTplZqi3vChXWO3GRZ4mf2CJCUEayiwYvdJPRH8uJlGy1MTRwGV9WOCr8Dk2yyLnfUmvP+d7Trzq30SHO6i1sx543pRzHq03himDSDkgfwEwfJeECMWzsdjqzJA3nVEHcEejhWUqn8WyBUDYLUaSc1Yg38=
+	t=1763006766; cv=none; b=SE0/1K39MWKMt/bYIbk9utIlTWRsY8hZekZiIXtn7A7m31P+Owa1Hm/jP6Y3xP8twbZfxf1UnPnA/APamH+qcu7QQGi2AZsHjfx722n/CgJeXd41kDcahZ3Xm/q7EtIdV0gFz+02zeZV6t+R6MrXs1SIl6LBu4TOcc0ATgM6Epc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763006237; c=relaxed/simple;
-	bh=+P2+2CZfdjKu2J/Pa8JD4SJBhHlacxgRnanOxFShp8g=;
+	s=arc-20240116; t=1763006766; c=relaxed/simple;
+	bh=vx9MWxOi+QmlQCIQgELsJmPGv+V2H68DIRE94Eg8a1k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=glzTQQCrza/+r8xtgUHIf4bOtbD2VhioNDMRkTGWVRlFK6BAYx/yfFsWEj7QlHmyxcVYdIBQRevQgxnwu+lqPW5272QOiwHeK0bv1c/SGGxlUyoS3QWrn8KlCNybtb/h1SCOPzvw7JQrvnUOS/Gv7de6nyq5yNWQuEFUK/EAF/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=htF79OEk; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7ade456b6abso265806b3a.3
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 19:57:16 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=TqpbLUMrDB2aMWZXfwfWK4l0ipcPf7bH0Ig9B9dDDSPyrrP/EhUXiIKhiimEzEr+spIDuD9Ez/9826zTpuXvlDex55u9FI/fgVPWvTNNTRMq/W57T5s+uy0a4pdq9ljT5g+6+UJx9esBGAtGog1SVeNPKeksjiTF3dQst1Hh7yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=go9YtWi4; arc=none smtp.client-ip=209.85.167.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-45030c45371so166510b6e.0
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 20:06:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763006235; x=1763611035; darn=vger.kernel.org;
+        d=asu.edu; s=google; t=1763006761; x=1763611561; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=B748lG1lzdocCvgGvVxib/+kpH4740D2BGTgZy2aY+w=;
-        b=htF79OEkEup16IeU1oRsf7MAby88KfLNujhOSX0caezF/GqbBa3S1+Gxl5CdkQ2Sf8
-         CpLcmQhgtpc+8YNVllGhrC1ENru216SqRaN2vboGu+5dFNmELQ6L13nWE309bXWUXmIl
-         C5D5d/p/5hv74Hy2r1RMRCg4i6fm74hSCikRBl2EkIEAZ1S/ZE97hx2xA7l/AwKkWfaB
-         DaszWqgCVSUi8d+0In8G9X+YfunXVGn2CsYk3f4BK7Ga0jKDNGAGxooxM8LhjaPRFUOB
-         lj1RClkZY+fFcofyCcGcwXUPY+BR103oUcoYBSt3hJSLcCDTR879vRvQg7RKbo4nljux
-         TJPA==
+        bh=I9zz0xslH/LPN0+Jg1QGCGjc2cuXrA8U9GcfZOgWYHM=;
+        b=go9YtWi438y2YWUhcVcAq0KjEczCyPprhKuQe6889MGF8WRh46fXLcirMGC7mLfSPX
+         wuM2VXayKoqKnGOdhHCpK77OClmW6QVmPMIlJp7rAcqRkkY3xBRXtT3tFA7PN+TpAN9f
+         Tt0PwtKJNiZm/bQm3ktm8h48UViFu7JadoKsIPV7iZlhGQ8OQu4pxy8VrX/ogP1Tl30l
+         pAEvyUprT3GJD4EEbLOfqIbku4yV78xcPQQjOQLnH1OuwW5S/PsmGs9mUYvYDB7LZMeM
+         QXR9AWiKWC+FxVBQ75UaZlO00VXA0HTxvUmUly7rHAbm3iP73AWqn8YWesqsW1C63rJg
+         rcRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763006235; x=1763611035;
+        d=1e100.net; s=20230601; t=1763006761; x=1763611561;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=B748lG1lzdocCvgGvVxib/+kpH4740D2BGTgZy2aY+w=;
-        b=J+Kte58p3T2JXj8QBjkLK9tUDx+H2MJXkrEJ/14BbFdmWeURjAC4cctxyFUOPAevyK
-         69iI2Vpn1Rx7nM8YdZ1g0jOaWJ258kb4sAHCTXT1NttuVxXt70dkVEuUlQnVMutfgUrY
-         KeJplMRiCFNqAtFEjVQQN2ry08homc3WYDZylhI+W5WOTQ9iXZdsBOOFnMjvQWDSjFKR
-         27jLpwRVy1KqfI3hty8QS2Nia6zlrqoOVO8h3/+19xPv1bK0qLkmTVDGvtjMIOO73rBX
-         z6vwO+x/E0DmXIit0gAuqCHJz8t0hNRZML56O6hYSbBaupm/SVdvgrnk9KF0l0qXhCV5
-         TU7Q==
-X-Gm-Message-State: AOJu0Yy+3Gm4nuVuCsXkSvkaEPwSw3/bvVyR9v8QEDr3aEekV7FnwRCr
-	8FccTJvs61p1qWJPw6V1JTOWAxgb99eLmKmQ73ek4jpSdAFuWfEceDpO
-X-Gm-Gg: ASbGnctlsi+t3CP/p9QJqIBWMDx75PNVZmCcHG/QG4YCT1kHwoha0LVxRkikrL1Ypj9
-	4lRf+mJLk5AWDxNZ+c4TaTaqA80MM1FCLOwl3B+8gN5ozmsycQCOdJ0LkQLhm9H2e6fTbyIn+y+
-	yW6UY4RsYyIKfeDDu4HcTZNT4zDhj87dkSFKSYWfo8DoAgkZAMtehv1X3mSm4nKX+A9DsLmol2X
-	gDp64tRpOrlvYkn49cfYiW3H8paYqYp2HVkT7Rtt/q5XfsTFr0790uUbLqAHtQ4YIRqUZbPful6
-	eAaU2w7+v7z17TNDIMmfSUYS2PvqMbF1jpT+R8prfi3eIubvP3sPsN2ixyAkbnVvry5G06G80tk
-	X84lz7Nt7mYT9T4NaCtJS6CQ3OlsewaLIE62Y9hsjLGSSpcJd5/bX6rHW7fC1ZPMszEQ3Y3j30g
-	n0ho/G
-X-Google-Smtp-Source: AGHT+IH2R81AWGWCpjBOh/560HEB4c0Cy5SAnffGD4mPqCjqZAspI+d28k/BSrMeJlXih6h5cQPCOA==
-X-Received: by 2002:a05:6a20:9185:b0:340:db9b:cfe8 with SMTP id adf61e73a8af0-35909385f92mr7947566637.12.1763006235413;
-        Wed, 12 Nov 2025 19:57:15 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bc375177be4sm607227a12.19.2025.11.12.19.57.09
+        bh=I9zz0xslH/LPN0+Jg1QGCGjc2cuXrA8U9GcfZOgWYHM=;
+        b=t3paNWj0Y0MqJ00Hh2ko82RV7CdqZKt9VzXTC2vlQdAIQJ4Jj9AO3QknJ3ZSlsA7sT
+         CO7u8F1zTScr5iPgfn//xEn3LQIchZ6IeYwduckul46D7Mwj4AOEl+4M7KWXRU+YoEho
+         v9rHwUwmMuYerxTY1M/Ce80oT6EDgkbDKnQu8u5D3PNG4y3L/9Azo1TslcWST6j27EUI
+         UzYGUId90o/9fF9Y4AHzZSecsL7comxrXDN0/1nDztpJ3l71L9w5ABeR6p3V2AUbd9Jt
+         gZ8Br69fysP7Vk+/3t5rAVmbzkX7fOwFWJmfFABRirRkGo0RIalRN4wsjLM5sf+j8YBj
+         +RBA==
+X-Gm-Message-State: AOJu0YytYrGeVq51YVzt3S6oqcDy8e9neBbUjgrGwCvGPwU+E5x5O+SP
+	lLWhm/43mwQNF0rCWQKX5WKfEpEc3EQu5cpkiutsxLwVbvBlU9xqaNNE1GCBgCaEalXjmVKJXh1
+	ixzI=
+X-Gm-Gg: ASbGncuQDAq2RNOVTPd3iqTE13Gb+NYceVDn/z7A7TxW/xFMYqMSDHP6sSvJPvbE6OI
+	1pt0qgfEZBvOu5AveCR7t7nfqmTuDifjPQR+u5d3Hsc79X1+CWcxQR0QoRG/SdndyjMqPSNvYIK
+	RNa5/ea3GazqgUcQ29riVR6hfATYC8X7wG6RObinUXcZvXGic2pqsFxQdiZ4tuMyHlJc73DEjOD
+	OYBk+SRe8A0gTTmBz3X2QsJBkH6qUDG/v5pgU0wAXQjOEOJ49di8XAPMCmrr5VAfzf+kKrtR0yg
+	s5pTGa4l6I0IPzwalAS5OHopBuOGuBbWaJVniQk8KMXXsP34ijiFaMQa7ocSGfrWFdR1zgobDsh
+	i9GLnzN3NRcxVmwoQDsSMcl/TNUJjRE9uljIj3egZIYlY2Im3dCsMjOuGFpUm9seRCd4j2C+T/u
+	MloGbvr7e3DrGil5Ge
+X-Google-Smtp-Source: AGHT+IFjhw6PEACSVDzbXsL+3dJh/sE0YMUVqW/BTn2ChI57pQzedU1QRn8C1Lugbn+7VEqlX+HHog==
+X-Received: by 2002:a05:6808:4f69:b0:44d:a3ed:ccfc with SMTP id 5614622812f47-45074549bbbmr2332025b6e.36.1763006761164;
+        Wed, 12 Nov 2025 20:06:01 -0800 (PST)
+Received: from p1 (209-147-139-51.nat.asu.edu. [209.147.139.51])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65724dd7c86sm462957eaf.13.2025.11.12.20.06.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 19:57:14 -0800 (PST)
-Date: Thu, 13 Nov 2025 03:57:06 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jan Stancek <jstancek@redhat.com>,
-	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
-	=?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Petr Machata <petrm@nvidia.com>
-Subject: Re: [PATCHv3 net-next 3/3] tools: ynl: add YNL test framework
-Message-ID: <aRVXEmUowd0rqnLU@fedora>
-References: <20251110100000.3837-1-liuhangbin@gmail.com>
- <20251110100000.3837-4-liuhangbin@gmail.com>
- <m27bvwpz1x.fsf@gmail.com>
+        Wed, 12 Nov 2025 20:06:00 -0800 (PST)
+Date: Wed, 12 Nov 2025 21:05:58 -0700
+From: Xiang Mei <xmei5@asu.edu>
+To: security@kernel.org
+Cc: netdev@vger.kernel.org, toke@toke.dk, cake@lists.bufferbloat.net,
+	bestswngs@gmail.com
+Subject: Re: [PATCH net v3] net/sched: sch_cake: Fix incorrect qlen reduction
+ in cake_drop
+Message-ID: <aRVZJmTAWyrnXpCJ@p1>
+References: <20251113035303.51165-1-xmei5@asu.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,83 +90,140 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <m27bvwpz1x.fsf@gmail.com>
+In-Reply-To: <20251113035303.51165-1-xmei5@asu.edu>
 
-On Tue, Nov 11, 2025 at 11:51:38AM +0000, Donald Hunter wrote:
-> > diff --git a/tools/net/ynl/tests/Makefile b/tools/net/ynl/tests/Makefile
-> > new file mode 100644
-> > index 000000000000..4d527f9c3de9
-> > --- /dev/null
-> > +++ b/tools/net/ynl/tests/Makefile
-> > @@ -0,0 +1,38 @@
-> > +# SPDX-License-Identifier: GPL-2.0
-> > +# Makefile for YNL tests
-> > +
-> > +TESTS := \
-> > +	test_ynl_cli.sh \
-> > +	test_ynl_ethtool.sh \
-> > +# end of TESTS
-> > +
-> > +all: $(TESTS)
-> > +
-> > +run_tests:
-> > +	@echo "Running YNL tests..."
-> > +	@failed=0; \
-> > +	echo "Running test_ynl_cli.sh..."; \
-> > +	./test_ynl_cli.sh || failed=$$(($$failed + 1)); \
-> > +	echo "Running test_ynl_ethtool.sh..."; \
-> > +	./test_ynl_ethtool.sh || failed=$$(($$failed + 1)); \
+On Wed, Nov 12, 2025 at 08:53:03PM -0700, Xiang Mei wrote:
+> In cake_drop(), qdisc_tree_reduce_backlog() is called to decrement
+> the qlen of the qdisc hierarchy. However, this can incorrectly reduce
+> qlen when the dropped packet was never enqueued, leading to a possible
+> NULL dereference (e.g., when QFQ is the parent qdisc).
 > 
-> This could iterate through $(TESTS) instead of being hard coded.
+> This happens when cake_enqueue() returns NET_XMIT_CN: the parent
+> qdisc does not enqueue the skb, but cake_drop() still reduces backlog.
 > 
-> > +	if [ $$failed -eq 0 ]; then \
-> > +		echo "All tests passed!"; \
-> > +	else \
-> > +		echo "$$failed test(s) failed!"; \
+> This patch avoids the extra reduction by checking whether the packet
+> was actually enqueued. It also moves qdisc_tree_reduce_backlog()
+> out of cake_drop() to keep backlog accounting consistent.
 > 
-> AFAICS this will never be reported since the scripts only ever exit 0.
-> The message is also a bit misleading since it would be the count of
-> scripts that failed, not individual tests.
+> Fixes: 15de71d06a40 ("net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit")
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> ---
+> v2: add missing cc
+> v3: move qdisc_tree_reduce_backlog out of cake_drop
 > 
-> It would be great if the scripts exited with the number of test failures
-> so the make file could report a total.
-
-Yes, indeed, I will fix it. Thanks!
-
-> > +# Test netdev family operations (dev-get, queue-get)
-> > +cli_netdev_ops() {
-> > +	local dev_output
-> > +	local ifindex
-> > +
-> > +	ifindex=$(ip netns exec "$testns" cat /sys/class/net/"$NSIM_DEV_NAME"/ifindex 2>/dev/null)
-> > +	if [[ -z "$ifindex" ]]; then
-> > +		echo "FAIL: YNL CLI netdev operations (failed to get ifindex)"
+>  net/sched/sch_cake.c | 40 ++++++++++++++++++++++++----------------
+>  1 file changed, 24 insertions(+), 16 deletions(-)
 > 
-> This is a bit misleading, there's no ynl command here so I don't think
-> it should be a FAIL. Can we just report SKIP when it is an infra issue?
+> diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+> index 32bacfc314c2..179cafe05085 100644
+> --- a/net/sched/sch_cake.c
+> +++ b/net/sched/sch_cake.c
+> @@ -1597,7 +1597,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+>  
+>  	qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
+>  	sch->q.qlen--;
+> -	qdisc_tree_reduce_backlog(sch, 1, len);
+>  
+>  	cake_heapify(q, 0);
+>  
+> @@ -1750,7 +1749,9 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+>  	ktime_t now = ktime_get();
+>  	struct cake_tin_data *b;
+>  	struct cake_flow *flow;
+> -	u32 idx, tin;
+> +	u32 dropped = 0;
+> +	u32 idx, tin, prev_qlen, prev_backlog, drop_id;
+> +	bool same_flow = false;
+>  
+>  	/* choose flow to insert into */
+>  	idx = cake_classify(sch, &b, skb, q->flow_mode, &ret);
+> @@ -1927,24 +1928,31 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+>  	if (q->buffer_used > q->buffer_max_used)
+>  		q->buffer_max_used = q->buffer_used;
+>  
+> -	if (q->buffer_used > q->buffer_limit) {
+> -		bool same_flow = false;
+> -		u32 dropped = 0;
+> -		u32 drop_id;
+> +	if (q->buffer_used <= q->buffer_limit)
+> +		return NET_XMIT_SUCCESS;
+>  
+> -		while (q->buffer_used > q->buffer_limit) {
+> -			dropped++;
+> -			drop_id = cake_drop(sch, to_free);
+> +	prev_qlen = sch->q.qlen;
+> +	prev_backlog = sch->qstats.backlog;
+>  
+> -			if ((drop_id >> 16) == tin &&
+> -			    (drop_id & 0xFFFF) == idx)
+> -				same_flow = true;
+> -		}
+> -		b->drop_overlimit += dropped;
+> +	while (q->buffer_used > q->buffer_limit) {
+> +		dropped++;
+> +		drop_id = cake_drop(sch, to_free);
+> +		if ((drop_id >> 16) == tin &&
+> +		    (drop_id & 0xFFFF) == idx)
+> +			same_flow = true;
+> +	}
+> +	b->drop_overlimit += dropped;
+> +
+> +	/* Compute the droppped qlen and pkt length */
+> +	prev_qlen -= sch->q.qlen;
+> +	prev_backlog -= sch->qstats.backlog;
+>  
+> -		if (same_flow)
+> -			return NET_XMIT_CN;
+> +	if (same_flow) {
+> +		qdisc_tree_reduce_backlog(sch, prev_qlen - 1,
+> +					  prev_backlog - len);
+> +		return NET_XMIT_CN;
+>  	}
+> +	qdisc_tree_reduce_backlog(sch, prev_qlen, prev_backlog);
+>  	return NET_XMIT_SUCCESS;
+>  }
+>  
+> -- 
+> 2.43.0
+>
 
-The test reported SKIP for infra issue in setup() function.
-Here the netdevsim device has already setup. The ifindex should be there.
-Maybe I should use ip cmd to get the ifindex number and skip this checking.
+Thank Toke for the suggestion to move qdisc_tree_reduce_backlog out of
+cake_drop. It makes the logic cleaner.
 
-> > +
-> > +# Test rt-* family operations (route, addr, link, neigh, rule)
-> > +cli_rt_ops() {
-> > +	local ifindex
-> > +
-> > +	if ! $ynl --list-families 2>/dev/null | grep -q "rt-"; then
-> > +		echo "SKIP: YNL CLI rt-* operations (no rt-* families available)"
-> > +		return
-> > +	fi
-> > +
-> > +	ifindex=$(ip netns exec "$testns" cat /sys/class/net/"$NSIM_DEV_NAME"/ifindex 2>/dev/null)
-> > +	if [[ -z "$ifindex" ]]; then
-> > +		echo "FAIL: YNL CLI rt-* operations (failed to get ifindex)"
-> 
-> Also FAIL -> SKIP ?
+The patch passed CAKE's self-test:
+```log
+ok 1 1212 - Create CAKE with default setting
+ok 2 3281 - Create CAKE with bandwidth limit
+ok 3 c940 - Create CAKE with autorate-ingress flag
+ok 4 2310 - Create CAKE with rtt time
+ok 5 2385 - Create CAKE with besteffort flag
+ok 6 a032 - Create CAKE with diffserv8 flag
+ok 7 2349 - Create CAKE with diffserv4 flag
+ok 8 8472 - Create CAKE with flowblind flag
+ok 9 2341 - Create CAKE with dsthost and nat flag
+ok 10 5134 - Create CAKE with wash flag
+ok 11 2302 - Create CAKE with flowblind and no-split-gso flag
+ok 12 0768 - Create CAKE with dual-srchost and ack-filter flag
+ok 13 0238 - Create CAKE with dual-dsthost and ack-filter-aggressive flag
+ok 14 6572 - Create CAKE with memlimit and ptm flag
+ok 15 2436 - Create CAKE with fwmark and atm flag
+ok 16 3984 - Create CAKE with overhead and mpu
+ok 17 5421 - Create CAKE with conservative and ingress flag
+ok 18 6854 - Delete CAKE with conservative and ingress flag
+ok 19 2342 - Replace CAKE with mpu
+ok 20 2313 - Change CAKE with mpu
+ok 21 4365 - Show CAKE class
+```
 
-Same here, the dev has created, I will remove this checking.
+There is still one problem I am not very sure since I am not very 
+experienced with cake and gso. It's about the gso branch [1]. The slen 
+is the lenth added to the cake sch and that branch uses 
+`qdisc_tree_reduce_backlog(sch, 1-numsegs, len-slen);` to inform the 
+parent sched. However, when we drop the packet, it could be probmatic 
+since we should reduce slen instead of len. Is this a potential problem?
 
-Thanks
-Hangbin
+[1] https://elixir.bootlin.com/linux/v6.6.116/source/net/sched/sch_cake.c#L1803
+
+Thanks,
+Xiang
 
