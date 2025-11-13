@@ -1,131 +1,165 @@
-Return-Path: <netdev+bounces-238434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B44F2C58C65
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:38:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6271DC58D8B
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:48:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D8139358F8D
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 16:27:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 474413B72E9
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 16:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865313590CE;
-	Thu, 13 Nov 2025 16:18:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1878A358D34;
+	Thu, 13 Nov 2025 16:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g2Hxzr9d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YWvR+5OX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFBB355038
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 16:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712013559EE
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 16:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763050736; cv=none; b=lZ9JRyzv+H4BhDtEjcAxpu1bap1LeFYRCv3x+vpEDlG0OSZ2ht49k8PLqabqMYT4HdoN/KwlxY68AYuibVSZwW8TUzZWL1hBo3Mc+wwAhtLVu+/hm7Q5VMHVC6Zdu2kAoFsvOLb4CwcdCXBXepCexKTXLc2hhBkBixkZiuzg+rs=
+	t=1763051580; cv=none; b=FGkxSQLnLpMYuxpdmYfbHzRJ8ym7BAB7U0RzfZPDKYHlGFfCDTZcL3uxrveSJJo5M4OmVEv8W1//NLt5iz7kZT0jmjSPYXKyYVAoH29axLhU8Nfsq6LYCXDw1ZHM6XL09Ap+efDaXTKtSZBVn+CHLLRivbzga8AUqyY9Udp4JbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763050736; c=relaxed/simple;
-	bh=X+jglSuIcAqBj4r2Yvzejgtem7Zuj3d3HuPiUn8D4x4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UoQWzbDOW7Ah3MKlaMYLWNJOb+aghApQzJeOwISkmHx1Hh01x9QIK0uDqUlYqVmUUTgSBFTbFoyYvPqExEWz4UXk6qQxxOzUYdcgyBVR2r6WBtn59OqSffe6IlZRN9U1KO9iIKfK/u6dXgVoH3SrQuLaJsXGWOFnIneI3WqWMac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g2Hxzr9d; arc=none smtp.client-ip=209.85.221.178
+	s=arc-20240116; t=1763051580; c=relaxed/simple;
+	bh=t6Fmt4wv7oAC0aHrB69ItO8hB+u00274+wAmHaYqlF8=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=n2xL9tGDTbDLETvl9DVxjKxYTzQjvrEDPstQZuAWB9J5GxLOb81b/7wA3cU1rD2w9WrVgRsp0ywmD5bslLBsgzF9QYhdZwU8nX0Wf8edKzBgmJV94AvftelZmNtrDJ20kqTTAapVfe5/KqgGHl/hZJcS4RHh+HsHmOBX+5WDTIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YWvR+5OX; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-559836d04f6so674133e0c.0
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 08:18:54 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-295548467c7so11338855ad.2
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 08:32:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763050734; x=1763655534; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X+jglSuIcAqBj4r2Yvzejgtem7Zuj3d3HuPiUn8D4x4=;
-        b=g2Hxzr9d1+BSv+THQ6Mf2zWVTLYFPfNC0n+CgAzWx4ljQRadWCZssG7VITcPJ/hdwb
-         SfhWo508HygUpzjAoiUc3a1ooLqcasT5utH2z3Dp6muTbYmHa9N6WFd7rZJovYMtDlQu
-         g6xMxN/o7TBprchv4nFV6515aowPDnqKV9QFHMDiwZwssURu7zQzhqAPPjRV8+HA0q2B
-         B/frdEHcLxNCM5LYGwqqzLXv4qBD+dwRoFvmsfrE5HdrL4VKtDUlW/YETWvG1Dc+Obai
-         WE+WCgAAGHYKbBbzsFnRh70tvOoQymvEr181iJFSPQCmhdcV8fYObR/3RdxhIB/A3ogg
-         FhnA==
+        d=gmail.com; s=20230601; t=1763051578; x=1763656378; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:user-agent:message-id:date
+         :cc:to:from:subject:from:to:cc:subject:date:message-id:reply-to;
+        bh=toekOdBn4I50C10qOh4hWmRYNqt393qtwZ6s1C6jTlc=;
+        b=YWvR+5OXMYPBMbpmv0qoTomZ5lvFhY6pEC2RWVA3l36kcbWhq69gS0f5qMENUxOIUM
+         2/6GbaGFevCGi0Fwgv2cvKv4h4XFKgCjrV7Wk+056kN687I9mFZQWe2eC6y7zOILrlFj
+         +QRqvfi0r4hQJsUVopb2GRH+AkP0eT8nJkOMSfKC5oYBmJvsyii7pIPVJ6CLkc+yUGk9
+         j65uUeyMP5MoTebm+dqD7o3K4Q7GAn3oXpTOWqRBfD2GMsr2OLmti8IrUZEZ9BY4V7Uf
+         V4wGNa3mQbiyquaywGJSkuRYizCMBN6iXEEPzWC/oBIuuk+dgKARs1ujPSMxIQJas5zo
+         I8vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763050734; x=1763655534;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=X+jglSuIcAqBj4r2Yvzejgtem7Zuj3d3HuPiUn8D4x4=;
-        b=Zddb/yYER9KElV18tCnbAzH1C+wWlJEH4Q+r7FMzg8ST3GNJ6P02cJGWlZTqeVnYgZ
-         nEYGhSF4iVrsd8a09K8MyzWCmwlLCPCQPO0wQz5lwl+BauBRFdRupUlPNfjT9PBWVPwR
-         dIN2pCf2ljAhiJqjDlFC8YEMRDYASLq9wgdHL9jZ4dTy8NI58Fo6s2qWPq0g0e0gZbL/
-         5WNT1JRQxG0pxoJA3T2QtsFTbzTUbPd0o7hs1irpx8J79XD2zFsVTAEknt+yQQe3SC9k
-         8UUFxHeZpIzU5EtNzlwf8X21enkYKmRPBQqrYsFUaJ/Kw600sP6XEq0ZiHdD+RC0FXR8
-         gg6w==
-X-Forwarded-Encrypted: i=1; AJvYcCWrwkCnobzBqfF8o+cMXnCFuwabfV1E+Xc3ZN0lj8ks18X1c4p3fbN5DIAgJeqcyoqtPSek7ro=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTUWySOdeYQhgDYwxcbPwbbZtPz4ITz3LLZhIK8Bps8zPvq8fF
-	nbGw2vhzzrE6E6ft0LdL+wX5+9ebngeodC3IOD0bC4XdU0BsO9Ha3FNHSJG8sp/wjpEeuLpNZmC
-	DCJQpvmEHZdqttQlbtpkcPxvRg/yE5YI=
-X-Gm-Gg: ASbGncu+1S9uFiFyx41vyE/CXpwZURspUH8LC6mSH8bH54uozV0nkLBfnkh4MGjTKPM
-	6Y45aiIsCxfxAg9UfFP56V2Ee2I1eXNm5Qs/AxtvkDyWFHQsVm/9poIV4Uc0yApOFRZkvnnG9Gh
-	UrsIZyrVk1oDQD4PXS5PSOm2QXPt3rFGRgB2fdFrLRxvyylxFqV0bjfw4rnDH/Sq21Y8TIgWU9Z
-	GTetC/MZbnapwaYeSDKtA98vt30CtvXTiAuHhaQZEmrvqLh/EuL6WKAbHmsL2g=
-X-Google-Smtp-Source: AGHT+IHQlvloEzjKkY5BkMvD2gAnBdnRNb1amCMLvHF1Utj0ORHdSRDHFy5DC5NLvgH60/r/vrHA1AW5hpH3I+XpRwc=
-X-Received: by 2002:a05:6102:4487:b0:5dd:c3ec:b5b with SMTP id
- ada2fe7eead31-5dfc5b72883mr124216137.31.1763050733707; Thu, 13 Nov 2025
- 08:18:53 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763051578; x=1763656378;
+        h=content-transfer-encoding:mime-version:user-agent:message-id:date
+         :cc:to:from:subject:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=toekOdBn4I50C10qOh4hWmRYNqt393qtwZ6s1C6jTlc=;
+        b=VwFuF3Y0oHHmylD92lAh+oU1IN4ReBoS+hHiSIJ+Jq+GCtmfydFTnkIfwFU+Jvomyt
+         GCDA2DRp2OU0YIxpSKPfXJgT4HH7torj1RRKrZA7cCuq2E5oeQ7OJ5+FbW72pT2Fskw2
+         TptmqfehN8BkdXLxI9bMLfIb4HWOwokssSH43BOPxF57NCZyUrSLtSucrRtDF37QSCy4
+         WjKAy4wjMrnGYukVbsaRbP3BoplzWQ2VPAMWRlHOjnpjBAd52DW1RtNF14ihC05/XV7w
+         vL1iSLWDUxSaNdHQqQ9MblqMfc0NGpGAnTrlCccSqTsX3efyus58OA4iIcmYx33KAhV7
+         Mk6g==
+X-Gm-Message-State: AOJu0YxtPJUkU8H8gGM0LavYh2KPoNygFlkk4u5nuxPG1NL8JRahZfLH
+	Y+jcG57YpZUvUgrborvJXaQCxPAwyW1OMELXyEqNcba2ph1Ybxr0EcUR
+X-Gm-Gg: ASbGncuGRyS69FTUHpxUuHKM/S5A3Hh4o+znj2vEAsZcDOL6pZTlpZablMX88D++etw
+	sSFB3+ZBxFhkI6cyj94wVV0Q1fjifrNtnRNH4YeYzxYgKxnrlVgUxIM8IF3+/TSXQjfr38gIusT
+	nF/eB7piKYONOn7mylqGyhlUbkcA3GVf4aON35gnTf1XeWqNhn9CPlPo3PWtP3bB5sl+oTpEJ7D
+	ExEvXEJFwQFN9nXcJm1ZNluI6AwA/0UwmtEl+m2qe11ECtfsHfU3vnCBRdFIDYmK04PHwsds5c0
+	ygMmjAAcfT6VbAJ/GuTRYjj1Wi8sRR45gPd1XTAoY3SWnKue7Qogo4nsr7a0P6E9ootwg/QmzjT
+	XFVQ2Nxr1y7em0dU6t0akD1xPY9cVH/4w7FfEiMdy/qNe2VXc81pmOr2VcjyFufaPuq7Rraib9c
+	D/YmNFs5q/gxHNTWs5EhQ0BqUi3MSJEMDoWA==
+X-Google-Smtp-Source: AGHT+IF0vY/OxXg7W2wdjBEbR03RUrH8rAKJKTOP+B1UmMHh+Lx/bBcILWzv3kE97LxyBvcE3yHVSw==
+X-Received: by 2002:a17:903:1904:b0:297:c638:d7ca with SMTP id d9443c01a7336-2984ed356e1mr79538965ad.14.1763051577767;
+        Thu, 13 Nov 2025 08:32:57 -0800 (PST)
+Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2ccc03sm30020415ad.109.2025.11.13.08.32.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 08:32:57 -0800 (PST)
+Subject: [net-next PATCH v4 00/10] net: phy: Add support for fbnic PHY w/ 25G,
+ 50G, and 100G support
+From: Alexander Duyck <alexander.duyck@gmail.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
+ davem@davemloft.net
+Date: Thu, 13 Nov 2025 08:32:56 -0800
+Message-ID: 
+ <176305128544.3573217.7529629511881918177.stgit@ahduyck-xeon-server.home.arpa>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251113154605.23370-1-scott_mitchell@apple.com> <CANn89iJ_b6hfj96Me-8AZN92W+cA52HpGcu81J0MNtzeahpfXg@mail.gmail.com>
-In-Reply-To: <CANn89iJ_b6hfj96Me-8AZN92W+cA52HpGcu81J0MNtzeahpfXg@mail.gmail.com>
-From: Scott Mitchell <scott.k.mitch1@gmail.com>
-Date: Thu, 13 Nov 2025 08:18:42 -0800
-X-Gm-Features: AWmQ_bnF1bGJN_bDR1NS8Ie2R0lRRCVzMsqRXHPobd7cBDwaINkzoduMtW9VB0s
-Message-ID: <CAFn2buA+uHsRLU-TG9Xy42-pATex9Hh7kD4uCtcVRHAKVCgZow@mail.gmail.com>
-Subject: Re: [PATCH v4] netfilter: nfnetlink_queue: optimize verdict lookup
- with hash table
-To: Eric Dumazet <edumazet@google.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, phil@nwl.cc, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 13, 2025 at 7:50=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Nov 13, 2025 at 7:46=E2=80=AFAM Scott Mitchell <scott.k.mitch1@gm=
-ail.com> wrote:
-> >
-> > From: Scott Mitchell <scott.k.mitch1@gmail.com>
-> >
-> > The current implementation uses a linear list to find queued packets by
-> > ID when processing verdicts from userspace. With large queue depths and
-> > out-of-order verdicting, this O(n) lookup becomes a significant
-> > bottleneck, causing userspace verdict processing to dominate CPU time.
-> >
-> > Replace the linear search with a hash table for O(1) average-case
-> > packet lookup by ID. The hash table size is configurable via the new
-> > NFQA_CFG_HASH_SIZE netlink attribute (default 1024 buckets, matching
-> > NFQNL_QMAX_DEFAULT; max 131072). The size is normalized to a power of
-> > two to enable efficient bitwise masking instead of modulo operations.
-> > Unpatched kernels silently ignore the new attribute, maintaining
-> > backward compatibility.
-> >
-> > The existing list data structure is retained for operations requiring
-> > linear iteration (e.g. flush, device down events). Hot fields
-> > (queue_hash_mask, queue_hash pointer) are placed in the same cache line
-> > as the spinlock and packet counters for optimal memory access patterns.
-> >
-> > Signed-off-by: Scott Mitchell <scott.k.mitch1@gmail.com>
->
-> Please wait ~24 hours between each version.
->
-> Documentation/process/maintainer-netdev.rst
->
-> Thank you.
+To transition the fbnic driver to using the XPCS driver we need to address
+the fact that we need a representation for the FW managed PMA/PMD that is
+actually a SerDes PHY to handle link bouncing during link training.
 
-ack. I will wait 24 hours to address Florian's comments on v3 (unless
-instructed otherwise).
+This patch set first introduces the necessary bits to the
+generic c45 driver code to enable it to read 25G, 50G, and 100G modes from
+the PHY. After that we update the XPCS driver to to do the same.
+
+The rest of this patch set enables the changes to fbnic to make use of these
+interfaces and expose a PMA/PMD that can provide a necessary link delay to
+avoid link flapping in the event that a cable is disconnected and
+reconnected, and to correctly provide the count for the link down events.
+
+With this we have the basic groundwork laid as with this all the bits and
+pieces are in place in terms of reading the configuration. The general plan for
+follow-on patch sets is to start looking at enabling changing the configuration
+in environments where that is supported.
+
+v2: Added XPCS code to the patch set
+    Dropped code adding bits for extended ability registers
+    Switched from enabling code in generic c45 to enabling code in fbnic_phy.c
+    Fixed several bugs related to phy state machine and use of resume
+    Moved PHY assignment into ndo_init/uninit
+    Renamed fbnic_swmii.c to fbnic_mdio.c
+v3: Modified XPCS to have it read link from PMA instead of using a phydev
+    Fixed naming for PCS vs PMA for CTRL1 register speed bit values
+    Added logic to XPCS to get speed from PCS CTRL1 register
+    Swapped fbnic link delay timer from tracking training start to end
+    Dropped driver code for fbnic_phy.c and phydev code from patches
+    Updated patch naming to match expectations for PCS changes
+    Cleaned up dead code and defines from earlier versions
+v4: Added back in UAPI defines for MDIO_CTRL1_SPEED[5G|2_5G] w/ comment
+    Swapped patches 1 and 2 placing the 2.5/5G fixes first
+
+---
+
+Alexander Duyck (10):
+      net: phy: Rename MDIO_CTRL1_SPEED for 2.5G and 5G to reflect PMA values
+      net: phy: Add support for 25, 50 and 100Gbps PMA to genphy_c45_read_pma
+      net: pcs: xpcs: Add support for 25G, 50G, and 100G interfaces
+      net: pcs: xpcs: Fix PMA identifier handling in XPCS
+      net: pcs: xpcs: Add support for FBNIC 25G, 50G, 100G PMA
+      fbnic: Rename PCS IRQ to MAC IRQ as it is actually a MAC interrupt
+      fbnic: Add logic to track PMD state via MAC/PCS signals
+      fbnic: Cleanup handling for link down event statistics
+      fbnic: Add SW shim for MDIO interface to PMA/PMD and PCS
+      fbnic: Replace use of internal PCS w/ Designware XPCS
+
+
+ drivers/net/ethernet/meta/Kconfig             |   1 +
+ drivers/net/ethernet/meta/fbnic/Makefile      |   1 +
+ drivers/net/ethernet/meta/fbnic/fbnic.h       |  15 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |   2 +
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |   9 +
+ drivers/net/ethernet/meta/fbnic/fbnic_irq.c   |  45 +++--
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.c   |  71 ++++---
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.h   |  40 +++-
+ drivers/net/ethernet/meta/fbnic/fbnic_mdio.c  | 190 ++++++++++++++++++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  11 +-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |   6 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |  17 +-
+ .../net/ethernet/meta/fbnic/fbnic_phylink.c   | 163 ++++++++-------
+ drivers/net/pcs/pcs-xpcs.c                    | 135 ++++++++++++-
+ drivers/net/phy/phy-c45.c                     |  17 +-
+ include/linux/pcs/pcs-xpcs.h                  |   4 +-
+ include/uapi/linux/mdio.h                     |  26 ++-
+ 17 files changed, 600 insertions(+), 153 deletions(-)
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
+
+--
+
 
