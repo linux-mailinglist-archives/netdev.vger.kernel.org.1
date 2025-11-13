@@ -1,129 +1,130 @@
-Return-Path: <netdev+bounces-238500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3538C59E54
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 21:03:39 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE2C5C59E9F
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 21:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 721534E1CB8
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 20:03:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3EE9D344B4C
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 20:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27C32417F2;
-	Thu, 13 Nov 2025 20:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A782DA77D;
+	Thu, 13 Nov 2025 20:11:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D1XdgUdp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KfAJmNrW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41AD5126BF7
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 20:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A03218AD4
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 20:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763064214; cv=none; b=D219o74TETr8P3keN9LU+GapALgT7MwfTnHKOUCNwRfewchp3773nBEcfCOdOKoLnH04wr8nm1NOtmlRBURCasN4lKMpXb0ZGNlUUIHcukT8Lcf7FHDI6QSdwMN4dNwx7p3Rk1LQpzxuXeAPsXcxTPo/6KWENBy+wrGaln+87mk=
+	t=1763064692; cv=none; b=Dxous77HjIsoemYoaKb+Xf1nfy7XZ5s6fyQ6/coHOSveC3dQojocphs9WlMy/ZQeEqaleGxbgBGP3ZYF3WKkUdkwcaGXeJHEEbCeRG5j3MtbSLttVJHeGOJnEWuFb8Wcw8tHQpHxZMJv5LXGJTF3wnKSbrzGU01DQUcjxGmCf5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763064214; c=relaxed/simple;
-	bh=czxOFEk2EoFH7TxmVeqYp0bb1SQy5T9pfO5E1MZiwpM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=opoCPFdD+cw0N85WaeTGZUB+6/x+b4FuEcmRKEh2qqYpmzb4nOhxzcQzXsC8p6l7Ok4xxJk3JTVVpqX8HIONZ+8swjOD5FXug5LrbYese9PoQr3otMNtWF0em/C2Wy+fziJYA4DgQgIZL+/tqY7q0vyZs0ZJnFXx31lhMDnB2/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D1XdgUdp; arc=none smtp.client-ip=209.85.221.54
+	s=arc-20240116; t=1763064692; c=relaxed/simple;
+	bh=SDyjdDfdgapcNn9RxwuXEc33H2X/7CakgoMhX8qYlYQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jh/9CaGO/orJ5LnR1WkhnBgmnvVVC4tX6G3Li06qGbc82tez6XCV64/q/75fPKplmBXzCwPCyRoqud14pLSdAxjHr3Szq0HXoWnruBZ0OE1icGPj3wzSuORy5xb+FnmdljjkqmWhbwIhdCpEift+xdMZ3Tg7ZqQ9EKIEVL1SeSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KfAJmNrW; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-42b387483bbso1007901f8f.1
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 12:03:32 -0800 (PST)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47775fb6cb4so9298385e9.0
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 12:11:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763064211; x=1763669011; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ye0E4RBw+o1LJoKzt94uHbmdN/ak/lXrx9F0LU4xd90=;
-        b=D1XdgUdpla8pyi3MgBNo7059dB5u1vOQJJDM+vDgOb9eKR4JTcDP6ZiOsE03/RjxTJ
-         Dy4u0Wx+xYDNTLx12reOae2yHRhxwgmTmRLYRqxI3aRRxjwVJoEPkvFPYelmBbEk+mGz
-         TEqEiM2MZ4LuCm3XRl2tr5OZ7wlXz4iBeE6GA9BG2dbcwPxNbSNwbJeW+B1fWlrgJVqA
-         YEesVlzgh06OlrC/j02RSONVeYdMPloqpuFMQX03djcIGLcQQ4xKR6UQWd40LornRLIv
-         MkQyw3WLHlkNoFxJx368nBRRqh6GGxGINc2HBEFDSQy2FWDZbbttpfvdBkcQeHNnEB6k
-         w3Zw==
+        d=gmail.com; s=20230601; t=1763064689; x=1763669489; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QEGQI3RIdwso1vTokuFkTWMWXMmT7HFgWD7RMVDgsD8=;
+        b=KfAJmNrWH/9yOYiJzh40fDLLtGE87OFrOtOnPiiMezHdjmzB0soIWCLVguR7YeU/uC
+         1J3oYgs3wH0M2xUbpJukYqay7HGgLutPXY9kk0h20TH9yBxcMpoDNYiZVIa5vGZg2DsB
+         m9Z4w+MRXf1zdovRjs0zx4AxzHXXbFUmMB79YmnZC6wgbzkEt+clm9xoFzweBdfobT4Y
+         BQ14HGcfPN2DAoqUjM6dXLYuDKboCFnC41SJZf9u7arr7Tx2CrSxfY8u7wtrfQx5wzLY
+         SRQFdNMgLLicnpfUws2qO1gQYXBqoLTQnsmwvyzqNu0UoTIKk8WbLZMwvrjcXRT+yQac
+         1lzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763064211; x=1763669011;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ye0E4RBw+o1LJoKzt94uHbmdN/ak/lXrx9F0LU4xd90=;
-        b=WYs5RaKKYdg8WFIbrjB1XtXhUAGP1tMZGFExh0+C0plmbG/OEkZJjDwnFCR6ltYOpB
-         MPjEn79DBqt2qdJy5cSk1ephUKXZfuS9cHA8JIMBBCWs+tKr3WBE4HDNI79loCKzw4N1
-         Trs2sDJxQVPULgp6UpPOhA0ibvivQ2GwcvL/zXVGHd6uEuXZEIO2P/91tKHLVwtd0hc0
-         1W0SFAq+vKioxRdidGStx2OjRy/6RAt+ODKP2vhPshWCQAP44enmcMGty1DEWbvL/wj9
-         V44IjTot08jj6XVWdZbzbfGddupVZaIjPzFgh+GaOOOO9+8c0QORfNMgjtQONQew+1bV
-         bp5g==
-X-Forwarded-Encrypted: i=1; AJvYcCXsJtIb9A9GQes7qIhWxHGg/9gaXyt7tvmOp00XFXp2vo47SVVwR/lxS8h+bMCHQdviUSsnkfg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyjvb+ifziAyjUEhbWAnTYWmNqPM52LvCo41wVJdkWCTU3Dj86c
-	tWDjHCzcajeLjwvFysl10F7JRaWp7KkC3szdxiCn4dWaXe6zKrKM4q2z
-X-Gm-Gg: ASbGncs+QKYj9Yhqy3vyeJxMzSaK8GPXPE3i/nrNfqDwsViF1ACC6Kve7SWQpZ90LI/
-	Y3v5J3W6BIuMdEci8zzlFsA/wNf0D+9LdiDCLdbauOum2j6kHprzhDCDR8j1Klufw3RoixfOFHQ
-	jXslOB08HT8wv7medmGBCrHAg+XcnIKoO5mmuNmG8VCJXfOYDm0GT3njKqv10coDPhla1SyxmQG
-	+5Ui98vnG5ysKOT0TDdf3cVUvxjRHWkcpgQax3jyD961+jIuNiVLvGslh6Lgz5WycuxoYfymPK0
-	xu1iOeteIcU2mFOpxvgvP7rV1lP5SzbDYIu01ASrPOt6Jkp6Mt7JpZdReC+DMfi7qPS62Yw5BnP
-	fxAzB2kH14w2dZPQbHv3XC0kVHAxyGH89LyWnjZ3oYP6DE8+3SdExwn+7xAKPQMC4/pRVpYX7qp
-	9Yz03D7laS4uDI2DTQsHWLlH1CvJfNLFW7lt5dE/YCQyy3ZU5Wh76BtC1eQOfQtp4=
-X-Google-Smtp-Source: AGHT+IFJCxRkCERJrK76whAyAd5LSDmi++u8d9NDykfWgzS3IQ2FvgGAjE1h2z5NE2gfLBWZucX9+A==
-X-Received: by 2002:a5d:5d13:0:b0:42b:3ec3:fec3 with SMTP id ffacd0b85a97d-42b59399a79mr566112f8f.62.1763064211437;
-        Thu, 13 Nov 2025 12:03:31 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e7b14bsm5484906f8f.9.2025.11.13.12.03.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Nov 2025 12:03:30 -0800 (PST)
-Date: Thu, 13 Nov 2025 20:03:29 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Dave Hansen <dave.hansen@intel.com>, Thomas Gleixner
- <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
- <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H . Peter Anvin" <hpa@zytor.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, linux-kernel <linux-kernel@vger.kernel.org>, Simon
- Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- netdev@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>
-Subject: Re: [PATCH] x86_64: inline csum_ipv6_magic()
-Message-ID: <20251113200329.37529418@pumpkin>
-In-Reply-To: <CANn89iJzcb_XO9oCApKYfRxsMMmg7BHukRDqWTca3ZLQ8HT0iQ@mail.gmail.com>
-References: <20251113154545.594580-1-edumazet@google.com>
-	<c6020af6-83d0-46c9-aad9-2187b7f07cbe@intel.com>
-	<CANn89iJzcb_XO9oCApKYfRxsMMmg7BHukRDqWTca3ZLQ8HT0iQ@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        d=1e100.net; s=20230601; t=1763064689; x=1763669489;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QEGQI3RIdwso1vTokuFkTWMWXMmT7HFgWD7RMVDgsD8=;
+        b=N2DdkGtC8Kep4UJjpF8x4CoeWg4HDVSy7q6gUwAnLPlGOnJB3cIqf64nAiIwdcVl0T
+         76EMFJLCbmUUJJJj1UOJ26I4angwbjPK2HqrELdhtBuMdwIL65/CfPGVe/ski5RjqJSW
+         lpcmKvt7Llr9XfuzWtbGA4wmRYwM+Mai9+IISDkcST4jFDdavyGd++Vb/k8n46LehDN2
+         +4y4fgTqbqpGkaSiZEOWoU6ipAA7TkRdDKku49RAifdlvfD7Mvj94AWB1gzKlF+3B883
+         jF+m93+O9PshIcu0wdfuvRa7YKxmMN0H23Gsu6MZmAbcjXnCU8QAxh/zPbXkKjSWtDld
+         w3FQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW33nVIpFOVdfJBtv2n5+cTKVtGVFRAKnnElBBEB2xtgoCxseWeCRBH8nAcymwv8aeL0hCAj40=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywg65VoKrG1IjwAz0tU4KhYb/wwp2tIqpyyE/Mu2ceeHYR2CrZz
+	j8Dr/dRvp2XMpMhCMiWLAzlHD8+3NW/7x9xi/C20OyPrRMP9E4I91XVP
+X-Gm-Gg: ASbGncv9fGf+0PHP0fKYhKWQzGtOdvySO/kcJQWLH83MqUJrt+8FE9Ib4Vfty9MYDy7
+	dDVXGo5N2/xNlAovlqICZVC0gL4yUiy64IjmmIzwn25krObxdHbwCLfAsGNRjWz4koJkA9G6BMF
+	iovZnnJXHgolQf9/j2qAenkIdQQhIAa1f3zgVKjSldzSlT3IeUaGH5mEmd+z4Q9Eo01p9iss2Yp
+	QSGexNXV6cRd64WPZoAbse0oLc/umWVUahwn+6p7jRRedEx/ptXhPpAV/vLnwbi5izTaTKM4knT
+	4G/L1Q3zopnH8ft8w1pxYYQqNt+boGtozEMQDzSBflQFgt1EIkTd5ClErzEdjKlqvdHsCkQRnCI
+	Im0gnCB7lpOfcePJ33JO5DEuv0Fdnr1CM9gsR6Ibg54acE55akgx8cp2jOh43rbmeFZ0b9RJYL+
+	t1O9Xme6nZxgkHu/8l2FBCefj7X9A7VxsguXbfdwlt6MH8mK0tr1xcb6P7lIq9b1hwU+IjwYob0
+	N+rEglCTkFOPY3bGr0eSmaDzhFedxP8GIVDdQ0D
+X-Google-Smtp-Source: AGHT+IHk3LnZn/Axp3LgBgZT12t8l1SpTOlpnv+mITPSZMXV+zAxiXcA+5wnvklirnifBUxs6NC8AA==
+X-Received: by 2002:a05:600c:8b38:b0:475:de14:db1e with SMTP id 5b1f17b1804b1-4778fea2de7mr5663575e9.24.1763064688713;
+        Thu, 13 Nov 2025 12:11:28 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f4e:1a00:f17f:a689:d65:e2b2? (p200300ea8f4e1a00f17fa6890d65e2b2.dip0.t-ipconnect.de. [2003:ea:8f4e:1a00:f17f:a689:d65:e2b2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47789ffea1esm84440835e9.13.2025.11.13.12.11.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Nov 2025 12:11:28 -0800 (PST)
+Message-ID: <4ed5da1d-1d2f-49ea-918e-2455573066ee@gmail.com>
+Date: Thu, 13 Nov 2025 21:11:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/2] net: phy: disable EEE on TI PHYs
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
+ Eric Dumazet <edumazet@google.com>, Fabio Estevam <festevam@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+ netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <aRXAnpzsvmHQu7wc@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <aRXAnpzsvmHQu7wc@shell.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-On Thu, 13 Nov 2025 10:18:08 -0800
-Eric Dumazet <edumazet@google.com> wrote:
+On 11/13/2025 12:27 PM, Russell King (Oracle) wrote:
+> Hi,
+> 
+> Towards the end of October, we discussed EEE on TI PHYs which seems to
+> cause problems with the stmmac hardware. This problem was never fully
+> diagnosed, but it was identified that TI PHYs do not support LPI
+> signalling, but report that EEE is supported, and they implement the
+> advertisement registers and that functionality.
+> 
+> This series allows PHY drivers to disable EEE support.
+> 
+> v2:
+> - integrate Oleksij Rempel's review comments, and merge update
+>   into patch 2 to allow EEE on non-1G variants.
+> 
+>  drivers/net/phy/dp83867.c    |  1 +
+>  drivers/net/phy/dp83869.c    |  1 +
+>  drivers/net/phy/phy-core.c   |  2 --
+>  drivers/net/phy/phy_device.c | 32 +++++++++++++++++++++++++++++---
+>  include/linux/phy.h          |  1 +
+>  5 files changed, 32 insertions(+), 5 deletions(-)
+> 
 
-> On Thu, Nov 13, 2025 at 8:26=E2=80=AFAM Dave Hansen <dave.hansen@intel.co=
-m> wrote:
-> >
-> > On 11/13/25 07:45, Eric Dumazet wrote: =20
-> > > Inline this small helper.
-> > >
-> > > This reduces register pressure, as saddr and daddr are often
-> > > back to back in memory.
-> > >
-> > > For instance code inlined in tcp6_gro_receive() will look like: =20
-> >
-> > Could you please double check what the code growth is for this across
-> > the tree? There are 80-ish users of csum_ipv6_magic(). =20
->=20
-> Hi Dave
->=20
-> Sure (allyesconfig build)
-
-Does't allyesconfig pull in all the KASAN stuff as well.
-Which makes it fairly useless for normal build tests.
-
-	David
+Alternatively the PHY driver could call phy_disable_eee()
+in its config_init. Then we wouldn't have to touch core code.
 
