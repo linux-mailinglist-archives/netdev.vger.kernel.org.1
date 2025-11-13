@@ -1,187 +1,183 @@
-Return-Path: <netdev+bounces-238375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75DC1C57E17
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:18:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD615C57F43
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:32:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7AF1B4EB8E4
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 14:12:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F48A3A85E1
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 14:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9EA2727E7;
-	Thu, 13 Nov 2025 14:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="L74V+FxB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48972C3254;
+	Thu, 13 Nov 2025 14:23:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C062264C8
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 14:12:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F372877D5
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 14:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763043167; cv=none; b=WrVJrx02FI6rcX35x7O7LpualWcZ2S3es0DK22WrLL+kiVLqT7ZfwNm4TTccrdb1+Ryu6ErzPLWXaQhhKxm/ryFZeDc6CA+y5X7CQWq/G8vo0UuJKBv39g8opR2lwqWzY+cdbUy7sKqbQLb1I/X/k+DeOAM6mM2RGBcmZVmEx7s=
+	t=1763043818; cv=none; b=OVdvde5lNkJTLmk60y1BPN9j4/Dgs4gbFcNVd3OWK5gVpqz2+6pa9U1aukaqBGV4qMgCBP+f1hzI91LrdTJJBrb5tB0Y5kLEHJW/VF4+EsY7CZ0szrYG8knmVESsDc56zX/L3GUaNFcflDhOprR97SxablmgcPr45coa9090vZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763043167; c=relaxed/simple;
-	bh=F0jKKYZZRnZDY1fDhrJpONHexTetodOpGN4XWnWGsro=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ucMHSjM+KB7Y8PcIlspaUDwRrPwm6D6/1qAcZL3NHMPrfIb/BUYfbE+QVG3wLkJF0MXkmfyRHBy1UQHODf/lzNXK1O/H5J05lBpXMG+aVZAPo3u5upjeLhP8ZJdn8mpwzUcVpwFtzoPTnhYt6/12kv/FHGeRYNEX1LlytexEtYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=L74V+FxB; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6406f3dcc66so1495068a12.3
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 06:12:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1763043164; x=1763647964; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tLyNs0mSb1zxzychypwD8cbR1V9X7Is6zoP3QCo89TU=;
-        b=L74V+FxBAtZSFiHuLLFUZf/H+ij3zaxmV3PpKlncuAMqLqleIwWzD2fp3ft7DwJxuK
-         DsyJzqp2NnQ7iFfpF0wT5/DR1Llw9qQAOybtXOJ9fMeGjYIsbJBXlIs1T7rJz1bRS3MM
-         BAFZcMcEh1C1q7Vg1JtY1Dav9S/bW64roHpaJWwdUYZUNdVgPL0BwNN0ZNlkIaZubEUM
-         t2CbxkXiJfQDr4XZdwLIyITnPNokBU3R1kYRrePiTay/wqQo2kLMYkbcFAweF1WEVo5i
-         WE7pPQcaaAvS4ke/lr1ivMEjjyQKkKDDmrPSU1lH3dGCqohacviwQOY/DDAbAH/UccnZ
-         DNlw==
+	s=arc-20240116; t=1763043818; c=relaxed/simple;
+	bh=z39FuBLfVxg3dxedOWkc+Ia06tLSL22bXsDqvmAO158=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YjQ/gtrSSm3/Ufb5p3W4uThvWXUQZPfUERY2o3AZzmCyj5xbw4m07ljcuMIuqMLULh8Bv/Ecxu4nA90B+hWa0fT5wssU/NkhrNNWcZoX3e9AegkIQeoWCxNHnbxiDAZHqOXhFZEQN0aZVk6JYMscTa1ChEmygVDjuAUM6bTBLAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7c6d3676455so291810a34.2
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 06:23:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763043164; x=1763647964;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1763043815; x=1763648615;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tLyNs0mSb1zxzychypwD8cbR1V9X7Is6zoP3QCo89TU=;
-        b=dT2jqwAgnE0T1UTm57vQzfXWLAVBz1I+THRRZwuDiuDMuuzLTz9hDPKpa+fXvNNG3O
-         Ir5W1nYBa6pKekm6NrW/Bo2NVavkipolM+KABq9MaRh1AvxkWwXITcmdhSOS9pJH0IYm
-         kOLuYnAVfrwD8JSvpzrabPcJJn1VUQ5rrR7iifeSS0G9FwrQY/d9nKebQDfOb77JTz+r
-         JRwo8pk2rkNBj6en5VWfaTAvPRmEgv5dtIkc5fobpmGOWtAH8ut3snqc3h83QuHO36oV
-         xve0qFhWAkqB6+rJbmWRoD3nu2ILm4cfwmOwzXCYZTZExSEv5iN0V3MHTG1Q7NMR3jGq
-         OG5g==
-X-Gm-Message-State: AOJu0YwIc6RMsRxTyFQ8OgBSAxqKZOZ0oHL+HUxgu5SPWQd4lJipp/qr
-	ogX7N7O7f737YQ5ol8fmHqbbepbjaGvBs96LtB+Su6m6AZjSh++VpB/pEv9HmmXxiyXa8JQbuQk
-	fDjQdZHKyEp/pWRCo3+xGdgXF7JaqsCRco7rW3Sm3UazK32FEmAA=
-X-Gm-Gg: ASbGnctRg7DTg1kC4OmLQTk+lSke3IQm+vaLd9NZrYjxpFQ9zPc3uDRxCBUC7hcl4uI
-	Ms6gFnfyWVrDDZ+vMs+HoI/NvYXjWDf5xYF5Lwjmg0RfS27EReKPokz9CQ3tywBFEojT9HNPy49
-	lSkxNAGwyHWbqQBIgFhF3oV/oiPeRFEhfL3/xMbROtM/1hG0Viru2r7gI0TXx9R3Q8OOAlQu0Wp
-	SrrEt2EnxQ6aylgLPNh3k4b24gkiazej2UxUowfKJpr06HPCbM5/PYviXNN64edCnLy+CJGjydH
-	t1nnMOGDw6QlybaLbuH03XOavf1ir+RD9LdalXw3PMZ57ChDHhRjUIRueh4WmF7f65D7sX0Rkr4
-	m2B4/Sp6PnOF+UA/bJXW6PpCbvgVYzsfNLVX2zdzUJltQFXnCcs3v6NsVqmbPidheOJRu+ffksa
-	dM8+9nb4ADVwKQcEQBcu/kjeQKQsl2ejEIG65mXNE=
-X-Google-Smtp-Source: AGHT+IEe0OBYmq5pJEzBJIWGkmDzDRPqnbjj2ufbxd42IWf7W+72H6HBX2SaTRLu1rc7pE+KIXBr0Q==
-X-Received: by 2002:a17:907:94c5:b0:b71:88eb:e60c with SMTP id a640c23a62f3a-b7331ac02eamr753650166b.44.1763043163533;
-        Thu, 13 Nov 2025 06:12:43 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:7016:8c92:f4ad:3b7b? ([2001:67c:2fbc:1:7016:8c92:f4ad:3b7b])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fad41f1sm173507666b.23.2025.11.13.06.12.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Nov 2025 06:12:43 -0800 (PST)
-Message-ID: <461eef90-18b1-4ebb-b929-9f0b3e87154b@openvpn.net>
-Date: Thu, 13 Nov 2025 15:12:41 +0100
+        bh=I5iHf7lLF0gP9n63yXvZFud60lOk/rnCTC36lz7B8T0=;
+        b=jjUSE8V1vvbp08d1wvtovWLjYuKsBLFAntz5FsSFLptSMQNqwd3d2Lhbmk2YJgvcgi
+         WMaRiEeJWsU0n3aBp98LpR+XJY1PgCS+4KT84X61gwVNv/dbH4g807njsOgOz8GOi15L
+         mkSrIwzrFowoSQaWXnTezRRLIM/dw6UvgbVCeZE3EGsMi1xhjwv3dbwoRSb2Gz0cwcuU
+         mzVhcHOv6Eb92o8/BYTYcIL41VD/xlIEIsxDgpswNKntsG4jYliJZM9A4CEpKUASubVK
+         I5UovuuxTX94DENm8+ncLZaZS+PHUxvxAY5snpgvcWjx/81LlWhRJiS0FfpYivFK1cPj
+         fQgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVblxLgN3WiWq6PV1lfWKO9X8Ou2ubFZgNucKPUvXJueyOjEpyhlICnbfVYcRHelrQRUxkDGaU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdKPG0pB9DoPxtMDoE88aLB+uLOHTTA0AIwbCdKSBVD/IL9vH+
+	9DsH0Hjk+HZugfCH0ItOlQY8RbheZlFQnANBCvbmuZl05XYDYnEr+1TP
+X-Gm-Gg: ASbGncvXjxMT+qKXNABdqzWiie9gYCm/VhERtmGMhyBgVKTq6tyfpO2WN81SMjNbP/y
+	gi6E+3zJoE06RDuD649Wx9nZw4TU1ArbcHDhTPwOPRQW2F2cxAUdWBJ/TFraE6v6B5Q5RPc1Lvu
+	izf5GZ2sYxTRTQPSy6PFwU87BnnvJsfbeFbgr3ZOHDvpRbo4UD0MewyRn7uD6tnyrwtGzXpCZhF
+	YtYNqCM1lrDkS2s+MpUbFBCSKlyPZCviJ9eJ/zhd1y3Ro84Jj3stluIwcLXGpZ+McZSCzX3fzSI
+	LgECF2fkLxduaoOL73kob+0MI8ysqICz2ZRNKnhZV7xp9XqUYxtkEZpEr/pd8tj0xMQEiMu+L6W
+	M2tizBDFJfwJJUKqWoTsRcDM3FYfSvj1KKa0HLwXsO0Tgfwecr3XURZhee/TV9cbPB0dldKn0pb
+	eeNsA=
+X-Google-Smtp-Source: AGHT+IEgT8+wwHcUmw+KwdvrC6zpX82dQU5Au6rcvd3OQYcE1aD4NgPaTo8lH5fXD4y/lfrV7Jwu+g==
+X-Received: by 2002:a05:6830:410c:b0:7c5:3798:fa52 with SMTP id 46e09a7af769-7c72e361474mr4284504a34.17.1763043815343;
+        Thu, 13 Nov 2025 06:23:35 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:53::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c73a392f65sm1233807a34.17.2025.11.13.06.23.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 06:23:34 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Thu, 13 Nov 2025 06:23:29 -0800
+Subject: [PATCH net-next v2] net: ixgbe: convert to use .get_rx_ring_count
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/8] ovpn: add support for asymmetric peer IDs
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Ralf Lici <ralf@mandelbit.com>
-References: <20251111214744.12479-1-antonio@openvpn.net>
- <20251111214744.12479-6-antonio@openvpn.net> <aRXj_--Rbimt-5yL@krikkit>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <aRXj_--Rbimt-5yL@krikkit>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20251113-ixgbe_gxrings-v2-1-0ecf57808a78@debian.org>
+X-B4-Tracking: v=1; b=H4sIAODpFWkC/3XNQQqDMBBG4auEf22Kk9KIrnqPIkXNGGcTSxIkR
+ bx7IfuuH3zvROIonDCoE5EPSbIHDMo0Css2Bc9aHAYF05oHERktxc/89iVK8ElbWuzakevIzGg
+ UPpFXKdV7IXDWgUvG2ChskvIev3V0UO1/zIM06d62TPfe9t06PR3PMoXbHj3G67p+2w1edbUAA
+ AA=
+X-Change-ID: 20251112-ixgbe_gxrings-61c6f71d712b
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kernel-team@meta.com, 
+ Paul Menzel <pmenzel@molgen.mpg.de>, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-a6db3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2893; i=leitao@debian.org;
+ h=from:subject:message-id; bh=z39FuBLfVxg3dxedOWkc+Ia06tLSL22bXsDqvmAO158=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpFenm/V5RXfe69npzg+IrvANAHPqq3r8iMqJgy
+ EdiqapJhV+JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaRXp5gAKCRA1o5Of/Hh3
+ bdqwEACcfIVaC73zFQumgX1I6zM7QPZrgZ0fPnN7CpNKfOP1+P/kBANZvn6BWg9/TjIl8fHGwX0
+ IAfdbD2vTfcBg6axmc1U/+ogjVFpN6OaZFihMtypmlafWGhj35oYstjrzEJsuXogQFn+lGa45gP
+ l01qTdZ4hkKbIikbQQ/wbjOSPLC0vYwVvdfCkI5DsI6UovrpMIpZvxCbtTrV02R2Z9TGwZB3BPx
+ KppudrAGq8NpeTmBTsZaV4nA2zmAzgACfSBoG9t/J/bXYI/nur3aoQ92FzMx2nBWQKSNfD4SoEL
+ TRxX0yeVrlnD+H8yOBdTamBfMPl5LdryUacDnzIS7HDAG6G3LxgEvcQAqoEW9h6hCGH0EerIT0D
+ gijW6YB0h4nCRHqqjrd4c/ZnaiMhm2vWv+fzQH3L41X+kPhY3KyJApW3Lhe2kf6xuL0b+s14DSJ
+ qH51uTzUBgOq4r+7//w6OwD5dpb/3rCr1KbnS7dXmvHyXK0qLTZFpp/Ckvl8mUpfRDawf7xFGXK
+ cxC2wBWqQwJCEO9MJgy1kVGd6Pi9+fN2AIbVBRr2IQDxGcIcKtz+49kyRQdWiprW8OI5CJUII5L
+ BpMDxrVObPqcdlUfjhPWxauBhvciXpXfGllnV8W2ho5ug+c2Aqt4lFv+Z1E7fl19Uhe3rI4/Vmx
+ zk41pITloaoJWvQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Hi Sabrina,
+Convert the ixgbe driver to use the new .get_rx_ring_count ethtool
+operation for handling ETHTOOL_GRXRINGS command. This simplifies the
+code by extracting the ring count logic into a dedicated callback.
 
-On 13/11/2025 14:58, Sabrina Dubroca wrote:
-> 2025-11-11, 22:47:38 +0100, Antonio Quartulli wrote:
->> From: Ralf Lici <ralf@mandelbit.com>
->>
->> In order to support the multipeer architecture, upon connection setup
->> each side of a tunnel advertises a unique ID that the other side must
->> include in packets sent to them. Therefore when transmitting a packet, a
->> peer inserts the recipient's advertised ID for that specific tunnel into
->> the peer ID field. When receiving a packet, a peer expects to find its
->> own unique receive ID for that specific tunnel in the peer ID field.
->>
->> Add support for the TX peer ID and embed it into transmitting packets.
->> If no TX peer ID is specified, fallback to using the same peer ID both
->> for RX and TX in order to be compatible with the non-multipeer compliant
->> peers.
->>
->> Signed-off-by: Ralf Lici <ralf@mandelbit.com>
->> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
->> ---
->>   Documentation/netlink/specs/ovpn.yaml | 17 ++++++++++++++++-
->>   drivers/net/ovpn/crypto_aead.c        |  2 +-
->>   drivers/net/ovpn/netlink-gen.c        | 13 ++++++++++---
->>   drivers/net/ovpn/netlink-gen.h        |  6 +++---
->>   drivers/net/ovpn/netlink.c            | 14 ++++++++++++--
->>   drivers/net/ovpn/peer.c               |  4 ++++
->>   drivers/net/ovpn/peer.h               |  4 +++-
->>   include/uapi/linux/ovpn.h             |  1 +
->>   8 files changed, 50 insertions(+), 11 deletions(-)
-> 
-> The patch looks ok, but shouldn't there be a selftest for this
-> feature, and a few others in this series (bound device/address, maybe
-> the RPF patch as well)?
+The new callback provides the same functionality in a more direct way,
+following the ongoing ethtool API modernization.
 
-selftests were indeed extended to check for this feature (and others).
-However, since these extensions required some restructuring, I preferred 
-to keep all selftests patches for a second PR.
+This was compile-tested only.
 
-It's obviously always better to have feature+test shipped together, but 
-the restructuring on the selftests may require a discussion on its own, 
-therefore I decided to go this way.
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changes in v2:
+- Explictly describe that the patch was compile-tested only.
+- Link to v1: https://patch.msgid.link/20251112-ixgbe_gxrings-v1-1-960e139697fa@debian.org
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-I hope it makes sense.
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index 2d660e9edb80..2ad81f687a84 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -2805,6 +2805,14 @@ static int ixgbe_rss_indir_tbl_max(struct ixgbe_adapter *adapter)
+ 		return 64;
+ }
+ 
++static u32 ixgbe_get_rx_ring_count(struct net_device *dev)
++{
++	struct ixgbe_adapter *adapter = ixgbe_from_netdev(dev);
++
++	return min_t(u32, adapter->num_rx_queues,
++		     ixgbe_rss_indir_tbl_max(adapter));
++}
++
+ static int ixgbe_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
+ 			   u32 *rule_locs)
+ {
+@@ -2812,11 +2820,6 @@ static int ixgbe_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
+ 	int ret = -EOPNOTSUPP;
+ 
+ 	switch (cmd->cmd) {
+-	case ETHTOOL_GRXRINGS:
+-		cmd->data = min_t(int, adapter->num_rx_queues,
+-				  ixgbe_rss_indir_tbl_max(adapter));
+-		ret = 0;
+-		break;
+ 	case ETHTOOL_GRXCLSRLCNT:
+ 		cmd->rule_cnt = adapter->fdir_filter_count;
+ 		ret = 0;
+@@ -3743,6 +3746,7 @@ static const struct ethtool_ops ixgbe_ethtool_ops = {
+ 	.get_ethtool_stats      = ixgbe_get_ethtool_stats,
+ 	.get_coalesce           = ixgbe_get_coalesce,
+ 	.set_coalesce           = ixgbe_set_coalesce,
++	.get_rx_ring_count	= ixgbe_get_rx_ring_count,
+ 	.get_rxnfc		= ixgbe_get_rxnfc,
+ 	.set_rxnfc		= ixgbe_set_rxnfc,
+ 	.get_rxfh_indir_size	= ixgbe_rss_indir_size,
+@@ -3791,6 +3795,7 @@ static const struct ethtool_ops ixgbe_ethtool_ops_e610 = {
+ 	.get_ethtool_stats      = ixgbe_get_ethtool_stats,
+ 	.get_coalesce           = ixgbe_get_coalesce,
+ 	.set_coalesce           = ixgbe_set_coalesce,
++	.get_rx_ring_count	= ixgbe_get_rx_ring_count,
+ 	.get_rxnfc		= ixgbe_get_rxnfc,
+ 	.set_rxnfc		= ixgbe_set_rxnfc,
+ 	.get_rxfh_indir_size	= ixgbe_rss_indir_size,
 
-Regards,
+---
+base-commit: bde974ef62569a7da12aa71d182a760cd6223c36
+change-id: 20251112-ixgbe_gxrings-61c6f71d712b
 
--- 
-Antonio Quartulli
-OpenVPN Inc.
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
