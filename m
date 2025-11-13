@@ -1,106 +1,116 @@
-Return-Path: <netdev+bounces-238511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE144C5A3E0
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 22:52:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E91ECC5A3F8
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 22:54:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4E0F84E9220
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 21:40:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DFD674E9D2D
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 21:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11583324B20;
-	Thu, 13 Nov 2025 21:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8489C2D5921;
+	Thu, 13 Nov 2025 21:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIHr7e5x"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ASSQqE1F"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB020244670;
-	Thu, 13 Nov 2025 21:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A294502F
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 21:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763070042; cv=none; b=c5WSygSL7hTN0bW6sKIQkb/8lQ9iPdX1sJDak/wN29Bquo2RXoH7WxQqWTpfWA/8n0P6XxaQhRQD+ATyX0baQ7lUan96dH8q79zmBEw6zcFrcn4Ek27Z1SvrEW/psg2ojyXdjTBjvnNz0tQgPCHqypJ3+1WZxoU03Tz2xtcjmQ0=
+	t=1763070423; cv=none; b=WyttEKbkA1VesSDHPFC4joHNs2VqRAqvt2T/trgTBDUG3iJXZm9UGrSW5+Iyje/+zzH95udxu5tOcSQpV3FnWbkzfFxwScacWAHRWic26H1nzWanPcLNDrYdaIsa48AA/9bzyTsjAJN0MgbIl03GYliX6qNwEb//jblzN7p7rGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763070042; c=relaxed/simple;
-	bh=CvzcH2D9TtcpWhWA42+if0rgeOPmOZeRHXxaeTWupCI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OLfrjq+RB4h+3UuXsQbyQagJJTl+nuqMhIQAGgKY/4prebv1MQO6wEISI+7l/qr7F702LsA1JMV2RKb19j6Lam1ombxyixnMHr2OzepxpDJp5rtMds8PekK5F+mA2yOfLP7t8EuLu1AbHDPcVEvYWerR0VixY9KCnTcJ15ZUDFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MIHr7e5x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30EBFC2BCB1;
-	Thu, 13 Nov 2025 21:40:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763070042;
-	bh=CvzcH2D9TtcpWhWA42+if0rgeOPmOZeRHXxaeTWupCI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MIHr7e5x0wHu/EVCxWB6ZOTBFZbIwJ4yI4RHXYOsqUntu1d/lXhiKkqNK6pIKIbil
-	 GicAcvRKwvPNhzvxtOInTYm7iBk1YqVvLQ5H8luIrN71owBQ2lV9Bi53M20wLKjHcG
-	 vUfWE14KH6pCuDYoeldL/0ruHUGHsQdKAuyDL6SaUDpvCybWJzLKDFHHOb80aGnnH5
-	 VMCWqGOzvO78Z6Y11RSgcBIbdAThilnl94w3YYG3XP2/qU0daIDQ+4NmolHBXlNPwb
-	 xyMV3LdsF4fEIatjcy0/XQ6R8r0peUlpaNOqprMOnWIopeoPn+OpODwPkWl4zJxsZv
-	 9bdm2zURDYFTQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FAA3A549BD;
-	Thu, 13 Nov 2025 21:40:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1763070423; c=relaxed/simple;
+	bh=R0PKj13y2eGWfmcDyUH4hf+6rv+9bVv2mYSmRDkEyJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sVUg5EeKRbprZXKQZ6Z4mREFhU7qAbcOdY0YPcQyxjk7KXOgSWbP9TXNsH5XW+pS5XB7vtyUe9KLSlBzgLmM4+sb4yp2ZeCZy/pTbgCPYNkCBev7lLE1tedR50iuEpuqyBOV2zJjnPshgL/0chUVPhAyLNlavM+Lq+E5ekF7U0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ASSQqE1F; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=vBgdZiZYbDqlhcZubzwVA9BQujHuJ2EGuykdkz8RkGk=; b=ASSQqE1FrRvE3ZGVFQiC9w0/VQ
+	B3VhkYK6HveImXRgTYnaDcwQQQdJoHa37sv3+ebOw300pLDTQ+SorpMnmGH5saNKb/kvY/1haJNH8
+	Nj7OuS40oiW/cMNWcyIOZ6ABpn2dSGtC2g8Xqc8a7OyqsBQrOPGpMC6vmpQQinebklr1EJKaizQ4G
+	DtnfsZrXyVRksBaqMg2RF6rMcUgJcoRbpfvr3KY+zHVyCJdw3Kk12hcwlmK1Z9Ze2kXeOL9VFl5LI
+	uE5Cplk1yq9i2UBTAOFDNaETXry+8XoOJGUaOxThnSbARW0U8UnnHLQz2ghr9h9LdMBW/jOjiCFEX
+	oOBGx/xw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39364)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vJf9a-00000000628-0OIQ;
+	Thu, 13 Nov 2025 21:46:54 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vJf9W-000000005E9-3ZN4;
+	Thu, 13 Nov 2025 21:46:50 +0000
+Date: Thu, 13 Nov 2025 21:46:50 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 0/2] net: phy: disable EEE on TI PHYs
+Message-ID: <aRZRypeHRvks6Hqw@shell.armlinux.org.uk>
+References: <aRXAnpzsvmHQu7wc@shell.armlinux.org.uk>
+ <4ed5da1d-1d2f-49ea-918e-2455573066ee@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5 0/3] mptcp: Fix conflicts between MPTCP and sockmap
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176307001100.1015375.9798268991526020883.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Nov 2025 21:40:11 +0000
-References: <20251111060307.194196-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20251111060307.194196-1-jiayuan.chen@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: mptcp@lists.linux.dev, matttbe@kernel.org, martineau@kernel.org,
- geliang@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, cpaasch@apple.com,
- fw@strlen.de, peter.krystad@linux.intel.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4ed5da1d-1d2f-49ea-918e-2455573066ee@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This series was applied to bpf/bpf.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Tue, 11 Nov 2025 14:02:49 +0800 you wrote:
-> Overall, we encountered a warning [1] that can be triggered by running the
-> selftest I provided.
+On Thu, Nov 13, 2025 at 09:11:32PM +0100, Heiner Kallweit wrote:
+> On 11/13/2025 12:27 PM, Russell King (Oracle) wrote:
+> > Hi,
+> > 
+> > Towards the end of October, we discussed EEE on TI PHYs which seems to
+> > cause problems with the stmmac hardware. This problem was never fully
+> > diagnosed, but it was identified that TI PHYs do not support LPI
+> > signalling, but report that EEE is supported, and they implement the
+> > advertisement registers and that functionality.
+> > 
+> > This series allows PHY drivers to disable EEE support.
+> > 
+> > v2:
+> > - integrate Oleksij Rempel's review comments, and merge update
+> >   into patch 2 to allow EEE on non-1G variants.
+> > 
+> >  drivers/net/phy/dp83867.c    |  1 +
+> >  drivers/net/phy/dp83869.c    |  1 +
+> >  drivers/net/phy/phy-core.c   |  2 --
+> >  drivers/net/phy/phy_device.c | 32 +++++++++++++++++++++++++++++---
+> >  include/linux/phy.h          |  1 +
+> >  5 files changed, 32 insertions(+), 5 deletions(-)
+> > 
 > 
-> sockmap works by replacing sk_data_ready, recvmsg, sendmsg operations and
-> implementing fast socket-level forwarding logic:
-> 1. Users can obtain file descriptors through userspace socket()/accept()
->    interfaces, then call BPF syscall to perform these replacements.
-> 2. Users can also use the bpf_sock_hash_update helper (in sockops programs)
->    to replace handlers when TCP connections enter ESTABLISHED state
->   (BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB/BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB)
-> 
-> [...]
+> Alternatively the PHY driver could call phy_disable_eee()
+> in its config_init. Then we wouldn't have to touch core code.
 
-Here is the summary with links:
-  - [net,v5,1/3] mptcp: disallow MPTCP subflows from sockmap
-    https://git.kernel.org/bpf/bpf/c/fbade4bd08ba
-  - [net,v5,2/3] net,mptcp: fix proto fallback detection with BPF
-    https://git.kernel.org/bpf/bpf/c/c77b3b79a92e
-  - [net,v5,3/3] selftests/bpf: Add mptcp test with sockmap
-    https://git.kernel.org/bpf/bpf/c/cb730e4ac1b4
+If that's what you intend, then please update the kerneldoc for
+phy_disable_eee() so that it doesn't state that it's for MAC use
+(because that implies it's not for PHY drivers.)
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
