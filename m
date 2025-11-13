@@ -1,155 +1,104 @@
-Return-Path: <netdev+bounces-238513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2CC3C5A401
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 22:55:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AD94C5A407
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 22:58:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DED3A3B76B9
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 21:49:10 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2442A34F494
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 21:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81C7322C60;
-	Thu, 13 Nov 2025 21:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429DA31D725;
+	Thu, 13 Nov 2025 21:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fgFcjYQn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="f25tQNVt"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E321714286
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 21:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3DD2F5A05;
+	Thu, 13 Nov 2025 21:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763070542; cv=none; b=cgG4VaEFf/brtK0JtghhF+t1NHEu72HNAc0hqzxiDpQQkThIFq0APmHRBt/2DjM5pfrUOXpVOKVn9Ps14+JR43RLqLJI8n8hfzoXgds73DjG8ms6S2ghyxtFlbvySnYeXNoYxUaeLLDxjmSC+BKGfXdwh+Rp9i3DoM24cI2JmlI=
+	t=1763071102; cv=none; b=b4udQdw04KuwyWLXNw9RKsXEEdvqu1U7rV6UyNZm6R4Uxhx0ewf0YhvCenNWr4ldDVqFpPww+pHnXr4tLJ4WxA92r3bVUdqqMqQGCKXmYrTSZRVdkbG0JRQth9G6kEGYFhVLtLeL7bSd3++/jcJHut5UUtwxfNMzVgpgCB2ut3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763070542; c=relaxed/simple;
-	bh=reUr5vr9UGxA/z5v5hvjsSRJR9k1NeomI4kvfTl5mRw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lrKXtdGAlSw8OI4C9W1AaEkg4Gejqb4Faf3avxAdpfR3wU72zpgkI5Ri9YE2mBzZR9IGbax9GVRC5gOeecacgo+e8l9XlF6lRFBm8FrizgUJAOnaixs/BDaXFMqF/cLf7hPeRPh7zVOAqcvFEzSKXK7lIuTRxg+PxBdlq9fZDRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fgFcjYQn; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a92e2c4a-bfde-4a74-8bb5-5e2b8ca87199@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763070528;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BWxDrNld1/nw1/i6TIgWHQ0YjF/o5aVc62P7yzv+ZHI=;
-	b=fgFcjYQnEUyDVhIeB5QDbAbARXGAxFYqOqQEvNDO5ZhsLMNZhWG968TwoTEdTyiJglExnl
-	pRjkNIkkLGpyppjdDp+hkBDVrCknaPtJKfB4Sfz/AiivhqlEpo3yK1gNgKoYs66SnLl0bc
-	6Immm6dOOxEXWE5eEYPyh7RT4EkwJts=
-Date: Thu, 13 Nov 2025 13:48:40 -0800
+	s=arc-20240116; t=1763071102; c=relaxed/simple;
+	bh=u3RJTEuTMsu/Mh0lzU/eXO9euG6h1ckFdxYoSCZ8rNw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=taz5WQWwDmdf2BNE4aSHGNuVaIhVvHVQQsDKZof3m6cBSTpor4JF15QT6QkAMVGmDhaMRiKdv8Th0Z//XDH4XVNQp/fbBdwH2TCs7XqkJObtcQ5kpXFsi2Hf+BqH1C2g2rWUdyqBiqdd+qQVC8U8Yq54EkohUBWoW040jNGeDco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=f25tQNVt; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Qa18NJB1fJabOG9o5oBBmugYBETJSqlkvD8oDh6fndI=; b=f25tQNVtFX2MKpp463PhWDnU5K
+	XefbmrMPqZwVTWuUsFxuhJE8F71oOZyaBvxwytjY9I3vpRa/rI8JMa9rW8EMiwGmD08QxLqEImeTy
+	ZeamHA1hHPeIhjv7vW9Q7W5Ab6vpcntgXFZXEQkUXh+l885zw9KRgiCEa4BxfFGHiDX0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vJfKP-00DvH3-Gs; Thu, 13 Nov 2025 22:58:05 +0100
+Date: Thu, 13 Nov 2025 22:58:05 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: pcs: renesas,rzn1-miic:
+ Add renesas,miic-phylink-active-low property
+Message-ID: <0d13ed33-cb0b-4cb0-8af3-b54c2ad7537b@lunn.ch>
+References: <20251112201937.1336854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251112201937.1336854-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <de098757-2088-4b34-8a9a-407f9487991c@lunn.ch>
+ <CA+V-a8vgJcJ+EsxSwQzQbprjqhxy-QS84=wE6co+D50wOOOweA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v5 3/3] selftests/bpf: Add mptcp test with sockmap
-To: Jiayuan Chen <jiayuan.chen@linux.dev>,
- Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Florian Westphal <fw@strlen.de>, Christoph Paasch <cpaasch@apple.com>,
- Peter Krystad <peter.krystad@linux.intel.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20251111060307.194196-1-jiayuan.chen@linux.dev>
- <20251111060307.194196-4-jiayuan.chen@linux.dev>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20251111060307.194196-4-jiayuan.chen@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+V-a8vgJcJ+EsxSwQzQbprjqhxy-QS84=wE6co+D50wOOOweA@mail.gmail.com>
 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> index f8eb7f9d4fd2..b976fe626343 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> @@ -6,11 +6,14 @@
->   #include <netinet/in.h>
->   #include <test_progs.h>
->   #include <unistd.h>
-> +#include <error.h>
+> Each of these IPs has its own link status pin as an input to the SoC:
 
-I changed to errno.h to be specific. I think you only need the values of 
-an errno here.
->   #include "cgroup_helpers.h"
->   #include "network_helpers.h"
-> +#include "socket_helpers.h"
->   #include "mptcp_sock.skel.h"
->   #include "mptcpify.skel.h"
->   #include "mptcp_subflow.skel.h"
-> +#include "mptcp_sockmap.skel.h"
->   
->   #define NS_TEST "mptcp_ns"
->   #define ADDR_1	"10.0.1.1"
-> @@ -436,6 +439,142 @@ static void test_subflow(void)
->   	close(cgroup_fd);
->   }
->   
-> +/* Test sockmap on MPTCP server handling non-mp-capable clients. */
-> +static void test_sockmap_with_mptcp_fallback(struct mptcp_sockmap *skel)
-> +{
-> +	int listen_fd = -1, client_fd1 = -1, client_fd2 = -1;
-> +	int server_fd1 = -1, server_fd2 = -1, sent, recvd;
-> +	char snd[9] = "123456789";
-> +	char rcv[10];
-> +
-> +	/* start server with MPTCP enabled */
-> +	listen_fd = start_mptcp_server(AF_INET, NULL, 0, 0);
-> +	if (!ASSERT_OK_FD(listen_fd, "sockmap-fb:start_mptcp_server"))
-> +		return;
-> +
-> +	skel->bss->trace_port = ntohs(get_socket_local_port(listen_fd));
-> +	skel->bss->sk_index = 0;
-> +	/* create client without MPTCP enabled */
-> +	client_fd1 = connect_to_fd_opts(listen_fd, NULL);
-> +	if (!ASSERT_OK_FD(client_fd1, "sockmap-fb:connect_to_fd"))
-> +		goto end;
-> +
-> +	server_fd1 = xaccept_nonblock(listen_fd, NULL, NULL);
-> +	skel->bss->sk_index = 1;
-> +	client_fd2 = connect_to_fd_opts(listen_fd, NULL);
-> +	if (!ASSERT_OK_FD(client_fd2, "sockmap-fb:connect_to_fd"))
-> +		goto end;
-> +
-> +	server_fd2 = xaccept_nonblock(listen_fd, NULL, NULL);
-> +	/* test normal redirect behavior: data sent by client_fd1 can be
-> +	 * received by client_fd2
-> +	 */
-> +	skel->bss->redirect_idx = 1;
-> +	sent = xsend(client_fd1, snd, sizeof(snd), 0);
-> +	if (!ASSERT_EQ(sent, sizeof(snd), "sockmap-fb:xsend(client_fd1)"))
-> +		goto end;
-> +
-> +	/* try to recv more bytes to avoid truncation check */
-> +	recvd = recv_timeout(client_fd2, rcv, sizeof(rcv), MSG_DONTWAIT, 2);
+> The above architecture is for the RZ/N1 SoC. For RZ/T2H SoC we dont
+> have a SERCOS Controller. So in the case of RZ/T2H EVK the
+> SWITCH_MII_LINK status pin is connected to the LED1 of VSC8541 PHY.
+> 
+> The PHYLNK register [0] (section 10.2.5 page 763) allows control of
+> the active level of the link.
+> 0: High active (Default)
+> 1: Active Low
+> 
+> For example the SWITCH requires link-up to be reported to the switch
+> via the SWITCH_MII_LINK input pin.
 
-I removed the socket_helpers.h usage. The _nonblock, _timeout, and
-MSG_DONTWAIT are unnecessary. I replaced them with the regular accept,
-send, and recv. All fds from network_helpers.c have a default 3s
-timeout instead of 30s in xaccept_nonblock. This matches how most of
-the selftests/bpf are doing it as well.
+Why does the switch require this? The switch also needs to know the
+duplex, speed etc. Link on its own is of not enough. So when phylink
+mac_link_up is called, you tell it the speed, duplex and also that the
+link is up. When the link goes down, mac_link_down callback will be
+called and you tell it the link is down.
 
-I also touched up the commit message in patch 2 based on Matt's comment.
+    Andrew
 
-Applied. Thanks.
-
-> +	server_fd = xaccept_nonblock(listen_fd, NULL, NULL);
-> +	err = bpf_map_update_elem(bpf_map__fd(skel->maps.sock_map),
-> +				  &zero, &server_fd, BPF_NOEXIST);
 
