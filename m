@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-238364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 342F4C57C6E
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 14:49:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82900C57D49
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:03:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B1AB234C7E4
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 13:42:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2BCF4204C3
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 13:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3284212564;
-	Thu, 13 Nov 2025 13:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7CF320B7E1;
+	Thu, 13 Nov 2025 13:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="b/rzjPAC"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="qog5kLiq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D76A20B81B
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 13:41:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCD41FFC59
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 13:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763041320; cv=none; b=sQMlCl64KTrCVe7/QmyeUSng9+GvEm2ucyheoHL20ash+aVGbjEjyqVkGttGV3/kC0T/MBg6vKqT0OLyJcUerZqLxnX9MGbqp9839qtQEnya3Xai7L9Z4r6PoTuWyy0vuPu0HbGT4UZKXDrGhA3ZPJ/GZ6VePCRwDd77jedmdbc=
+	t=1763041467; cv=none; b=QjDiYtnwbmwTgyslPLpirVdG1ykgaK+S8EZjuNYZPsxqIhHP/lfbHbJRq4YpYqzSQAoQzsFQL2+vXya5bHf7igq/M9WxPoDenKZ5yvUgZjQH8TPSQnvs0HDF7jLzvUm9J8GiKwzlVn5q5avkQAtXjdFEEJnX6Upw4DZzh/OPtq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763041320; c=relaxed/simple;
-	bh=GLqncc5/5zGkwI1+bv2pb78gB9RyxcsUzYNiDGa3NKc=;
+	s=arc-20240116; t=1763041467; c=relaxed/simple;
+	bh=n3yn/Qzs/10SowO+cV6IyFirX5NhFXBaRiN32HGuPq0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OdvNW8qMd7bBn4WL+W6daXDCSU1vn3WOrhhjGFbWkZ5VNbHgYhqlbiUQQGOJYbjt2wvGA0rZ3FgPKqtbrTEKZRo4FZTCZmCQL5U3miHZUHyTEQvEOKIJI/wERKzJkMi1kcRZMeuFFmf9s3LIw7GR+lSKrB19yWF1ph2ChNnnlOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=b/rzjPAC; arc=none smtp.client-ip=209.85.167.53
+	 To:Cc:Content-Type; b=Wj/j5lqlopUWgNEavFSCCvVLGl03ExwidZwwz/bqurrmIbAFWGyhPRUDFa9W+C1t6+gaaU2dmQlNbnXmm1jpenlBS9/gprJP37P4OC920ixPCZzR2sOvxu6/NsZqzvwQswOTiHTe3Q/6ataxyw0/rZ8OkxofXRawBTMQDb1ZilQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=qog5kLiq; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-59447ca49afso1055804e87.1
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 05:41:58 -0800 (PST)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-591c9934e0cso1181608e87.0
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 05:44:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1763041316; x=1763646116; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1763041464; x=1763646264; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e6YFPbYQaXtcm5LdD7/GneIOXBdjWXCgrgn8VVQE3So=;
-        b=b/rzjPAC2S040culAnBENk6/YqMZYIyWQXPQcGegmnq623g+PTO4bW4p6296vA6Bi3
-         sIXhx1kGeJZd7sjOKnVTidd95r+HgvMYD8HPUFdoowbtK9TUF74eKlL4XWumluttlLFh
-         d9snIpjWWVQ+U+D+OHH9Ub8OvHpAeTjm6kQbx4OTdPAgZzhwgVTdYVCh9SIOkCVP2ItU
-         AwKCD63BYqtSg7h9r7n8CXvDBENBGBhS+AeUUgXWip4Z7tAQ7VJY0LneGzVXKsWEtld9
-         N4bjXEODBpkijQO638Rj5I7waG0ri+WKEUdYsdO/c38Gn8mZ698LjiRfhskBSDqCTmWD
-         aU8Q==
+        bh=gHk2bNA1OTHNC9vr3z2H2JeUdyy+rk3RBEHgiTzG238=;
+        b=qog5kLiqxL98ShFKc/SwX9mP+f24xq3WCQrZs3mf/iNDSxNs9ehsTSA1uZY/PGDKU1
+         f7s24wBBKmrsWq66ZvGC3M1zsmd5PSjUXxIKdkgYLyXyWY3F/svgRipvOnz7FDHyum5U
+         ettEqYXWaNlhAVoG1sUtFdJkaujxjVsOm8/tQmJHYkRiRTP9gOYghyVph0ZDg2/A/M3c
+         eIvhZj3sl2wBX4BhjLdX7LYq2F5xUnmcaFLfpofFiao355Vw6LVJIPG26l16TKfG6m1L
+         KVaSgPP4an0HQ22Zxs1IIMtHs+YdVvdKgqUxLN3uzwoYUPD/NmIANVjkfqCHgIpT9Lju
+         Y+zQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763041316; x=1763646116;
+        d=1e100.net; s=20230601; t=1763041464; x=1763646264;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=e6YFPbYQaXtcm5LdD7/GneIOXBdjWXCgrgn8VVQE3So=;
-        b=oqdXe8bGdRyfAoE5xE4/13s9kY2PUOVOawK49sL7y5I6EXYeYkWfGe+AvGGI6OSObE
-         juOjb0Levj4nrDDeND/lYDqqVgI1C75CdRv3aUw3OJP4mYPaJCWRFMZnKHPggg4c5hU6
-         9kHGJj3kyzbn6DpzrfRNfsQHcMY01R3Z6x9GnHuK+qQ88Bc2C53QwHz1WhUCb70bqdhQ
-         gfiimAPEF2kjkq1ZEf6rjE5ExWI7kmx2v33VgkI9js+jS6+V1NUNd1rM5Nn5XmBhfg4q
-         XVy+tUL8wGvZf5Qae2ZBkzutK7NvCKN4V2L/iuhKEmrhGEwscKPtqIS8ysNypa48Y2TJ
-         cjJA==
-X-Forwarded-Encrypted: i=1; AJvYcCVY6lsR/CYr7jk3bzLOPM+q+zVci0Hlao9qVip5r3ygSLkPGiUw/Fhf/h3a2OB9YpLlVUgNVaQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFUUlhNcAcGEMdGAOQWcnk81s6aQ4Z08+8fhZfvf3McgJuggBl
-	d12FoiC8fNXWQuWrXTW26vMKX5AQz+ypO1lMdOeI8qYDIl4jWQSuWwDkoJQbCvGEGvy/hmgVDtl
-	uQyviqZ91oprFWKZyoO13LwhZHqeKRzrRhgHMgqdR/A==
-X-Gm-Gg: ASbGnct8N0pxYueRb86HzfW2csKCcWZwZ5/TkE9OFw9RERXXX4zG68yh6ZsjjW2KpYX
-	/F3K6CvNKv7Td4Sci77YmN8eksaRZnP72RILTYkRgCR8qVYBEdBLwIKbA5zrQu4oL20eAYf0byJ
-	CowWzf9iWNhATetxRYZpfs5Ftkd1ZflcR2Vqdoolz8yzSCDShtgTSo37pfczCw15LedLxBm79R6
-	lWnh7xkQsIuJNiqCGfsINZgfd4oOGtvtgOKtQKlSktsg24ISnUNdLhaZfFwtQo5mdI78hr51KiN
-	FYs7R24qBoC+DohP
-X-Google-Smtp-Source: AGHT+IGgWlCG9kIv5RM7lpIk9LC7ddziZ8QniI5XBDNtHyHFdpWvdUKYxGgON08x+t3awJ+Cz4M6eIo1aCJcpUc2eyg=
-X-Received: by 2002:a05:6512:3c8c:b0:594:2fde:a159 with SMTP id
- 2adb3069b0e04-59576e552camr2521011e87.43.1763041316428; Thu, 13 Nov 2025
- 05:41:56 -0800 (PST)
+        bh=gHk2bNA1OTHNC9vr3z2H2JeUdyy+rk3RBEHgiTzG238=;
+        b=bOSxE0dGyhVFJm6hdi9hkSkKmwdBuAtspUtboVt1pgzxcJM2vQ7TYHaammXpjUvxCb
+         gmsnn+8SDj0WZw9q4XBSlaosW0QCQAKmuoe9+nTQytiok4orcBmZwr34tvCkPHyV2Ak2
+         aHp/iwFj+p5/NIUZkM2Ym+Or0TRIgAPDUTdYkqTUE5A+Ksye9vnHC+zOVjg/AxuzTHZy
+         TL04TSuyY4SinLL0W0jAyedTepbys9uHyfPTgqu2pTCDhEkP5fo5VTMu2WtyOl1w/WNO
+         cZmIxew+H1iy1XRW7g2goT2cCqGrZZg2Kp/MYMRHbO4LeINdP+9/hRMD9WZp9359+OGw
+         dqmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVBXBkmLueNyGbwFOxBZQjGO8A4zNmvCKECQDyqS0OOgPca+wWOPAHwN7a3yKasNdpZtiPtwSo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqA+FbfM8kUCaLmGvFrhp0aY7fbqPV6BkCEsCn2Ndjdv08sT0D
+	MBPI67c3msLme5RCpze4xNpNgtNITPJn8XBZ9Mz8Q7tb757TtlRnXlEYMmBI5AmCErvN6NHRfq2
+	mjETBF9DLQe6DAZBSQ7AYkTT7zqE8AyNl/DTF4K/DaA==
+X-Gm-Gg: ASbGncv0BVscZhAttTec44Ac+5PpPEXtpthcKGRy0V6VIYbjo22UhxDpj8lnRUxAbO3
+	DOaf/SR6nx+/63KA2Fw0/u5j56IUbiXj3OEQmfXR/IJRb7VU1/FemPwFvJO+wvKrNmgjqK7N7tt
+	UDeas9q03tsn2cSpaomVdVpjj6cK51LoVq9ecY0jYtsoPu5NSxEpVlFTinFOsPuS+t0Ljm4gJpy
+	72ndKTqAtiwNDZlnK8ro0N/z0rcXhxlgRTdeGD0cDdwIi7ZMqOH4Y/CCtFYeBUkpssqa+A8npMn
+	4xK+p3jBSZBGVhW0
+X-Google-Smtp-Source: AGHT+IF9+pE/QXln9/ghLnXjpwA3j+ZQdhSMaqAds1VqCnmNiZvVcKXj+XjAJW9rczSh1FwGivl5ToawEe+J2/Cq7qU=
+X-Received: by 2002:a05:6512:6d4:b0:592:f7cf:9f6f with SMTP id
+ 2adb3069b0e04-59576df5dfemr2184445e87.14.1763041463584; Thu, 13 Nov 2025
+ 05:44:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,14 +77,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20251107-qcom-sa8255p-emac-v5-0-01d3e3aaf388@linaro.org>
- <20251107-qcom-sa8255p-emac-v5-2-01d3e3aaf388@linaro.org> <21a3d269-76e6-4da9-aa25-bfd1fb6dfb07@oss.qualcomm.com>
- <CAMRc=MexMn_GSC2EtMek5hDRLjGYA5HKM8ge9vrxw1pYDqPJgw@mail.gmail.com> <cd7c0490-a2d6-4885-aa36-ee1492f107b8@oss.qualcomm.com>
-In-Reply-To: <cd7c0490-a2d6-4885-aa36-ee1492f107b8@oss.qualcomm.com>
+ <20251107-qcom-sa8255p-emac-v5-6-01d3e3aaf388@linaro.org> <14f95efb-0eb0-48ee-9132-df35abddfcc7@oss.qualcomm.com>
+In-Reply-To: <14f95efb-0eb0-48ee-9132-df35abddfcc7@oss.qualcomm.com>
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 13 Nov 2025 14:41:44 +0100
-X-Gm-Features: AWmQ_bk13TVZ2MEYPAt7pfoLg7e0lkaPcfsA9km-tpYIh11AXtLgw1MABlXNgK4
-Message-ID: <CAMRc=MeuByh=N_-F2+zPiqnh+Qp9u97kiMheLJ-xxcSZSy+_tw@mail.gmail.com>
-Subject: Re: [PATCH v5 2/8] net: stmmac: qcom-ethqos: use generic device properties
+Date: Thu, 13 Nov 2025 14:44:12 +0100
+X-Gm-Features: AWmQ_blnqOG7JKELYBN2x3sW4StFzPpU8xniVnWCV7D_4z_I3CQNMw3VuWKeQ6A
+Message-ID: <CAMRc=Mf03rYoi-C+kMic9RYZdk2vtAW5LDMYNMqg-H5vJccUhA@mail.gmail.com>
+Subject: Re: [PATCH v5 6/8] net: stmmac: qcom-ethqos: split power management
+ context into a separate struct
 To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 Cc: Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
 	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
@@ -126,48 +126,46 @@ Cc: Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.or
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 13, 2025 at 2:33=E2=80=AFPM Konrad Dybcio
+On Fri, Nov 7, 2025 at 12:00=E2=80=AFPM Konrad Dybcio
 <konrad.dybcio@oss.qualcomm.com> wrote:
 >
-> On 11/13/25 2:18 PM, Bartosz Golaszewski wrote:
-> > On Fri, Nov 7, 2025 at 11:49=E2=80=AFAM Konrad Dybcio
-> > <konrad.dybcio@oss.qualcomm.com> wrote:
-> >>
-> >> On 11/7/25 11:29 AM, Bartosz Golaszewski wrote:
-> >>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>>
-> >>> In order to drop the dependency on CONFIG_OF, convert all device prop=
-erty
-> >>> getters from OF-specific to generic device properties and stop pullin=
-g
-> >>> in any linux/of.h symbols.
-> >>>
-> >>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>> ---
-> >>
-> >> [...]
-> >>
-> >>> -     if (of_property_read_bool(np, "snps,tso"))
-> >>> +     if (device_property_present(dev, "snps,tso"))
-> >>
-> >> This is a change in behavior - "snps,tso =3D <0>" would have previousl=
-y
-> >> returned false, it now returns true
-> >>
+> On 11/7/25 11:29 AM, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > >
-> > This property is a boolean flag, it cannot have a value.
+> > With match data split into general and power-management sections, let's
+> > now do the same with runtime device data.
+> >
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > ---
+> >  .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 46 ++++++++++++--=
+--------
+> >  1 file changed, 25 insertions(+), 21 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/=
+drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> > index 1f00556bbad997e2ec76b521cffe2eb14fabb79e..09f122062dec87aa11804af=
+2769ddff4964e6596 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> > @@ -105,17 +105,21 @@ struct ethqos_emac_match_data {
+> >       const struct ethqos_emac_pm_data *pm_data;
+> >  };
+> >
+> > +struct ethqos_emac_pm_ctx {
+> > +     struct clk *link_clk;
+> > +     unsigned int link_clk_rate;
+> > +     struct phy *serdes_phy;
 >
-> Every DT property may have a value, so this is not as obvious as we'd
-> like it to be (IIUC - unless that changed recently)
+> What is the benefit of doing this? PHY APIs happily consume a nullptr
+> and NOP out, and the PHY is already retrieved with _optional(),
+> similarly with clk
 >
+> Konrad
 
-That's new to me. I thought that if a property is a
-/schemas/types.yaml#/definitions/flag then only its boolean form is
-allowed. The fact that the dtc can compile it with a value doesn't
-matter as the bindings are the higher authority for DT sources?
-
-I don't mind changing it to device_property_read_bool() but I'm not
-sure if we really should.
+Because it clearly divides the driver's logic into the manual and
+firmware-driven variants. Just because we could, doesn't necessarily
+mean we should just call PHY APIs with a nullptr if readability is
+better when we don't.
 
 Bartosz
 
