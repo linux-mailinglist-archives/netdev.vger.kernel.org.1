@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-238451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4B2AC58FDD
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:06:15 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F9C3C594D9
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:58:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 847ED4A39F2
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 16:50:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9651A50093E
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 16:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5843559CD;
-	Thu, 13 Nov 2025 16:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85305358D3C;
+	Thu, 13 Nov 2025 16:42:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D2dNwiVh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JRiCSTLs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C526A33DEFE
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 16:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7349C33FE23
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 16:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763052150; cv=none; b=kXPnRGq29bZkUlXwbs0EamBkKAbLQqzn3SIXGJxzcdD/gZPh3X6QOpyHXnbt+uEc9fdxjViuR2mG4ZXCGl2b6W1eA//rrdFaSqueXY+Lj2jcSWioAeb4p5/bNCsQLocvFWfI09xK7b5ZdHB3wl6SPga7nHMvc45lZd1bJhEVDow=
+	t=1763052152; cv=none; b=nmXQ/Gl0XcHiLs0qWSGEYHUNf14pIjrPncn9soDM+Nvq3W7KZ8JkE3ZieYPInHHLTYLy7u3/51iJevkRKfdjHeNQ0sATFrpzvZbb+Z2DzYPSmChZKwY5F0B/07qQbaufVNybvcuCLqOrRasRxT+BI5ppaagXSsnIe087UdTrBDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763052150; c=relaxed/simple;
-	bh=lD7uKF4a/ewK/luXx9qr7X9aeCw/M0HmweHz5Mq9Qrg=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=FrnhpszAGMf8CW9pF91Ww9w1mky1dPTArmP0m7iYXPwU/tFcZr6voDfMviqj0FxsNBb6f9eKBiRdjpdx1fBpZkEp+CqS0a9AWCLmE0wp1stlzKtxnPXbuzvjjMxBH6dAwVnyaNKVZ49mWsjp+IwNks7qH6jd448V/PhTq+qCE+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D2dNwiVh; arc=none smtp.client-ip=209.85.221.54
+	s=arc-20240116; t=1763052152; c=relaxed/simple;
+	bh=4o/RxC43YnVQqRXczuDbSl9ni1pMUIIJIyrl4BDWu78=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=mYnZ4Wpq4hBg+rO7pTjrMXRj6xUI9EvsQ+iPL6QBf9HwztPfkrGTvFrhCKnK63WW+84Z12X/R8fYl/gL9smiqtSNFYljpayCrj2QQzdnOxBE6yWJ0mhSZx6hPP6LVrXDTV/26IS4uP5/9jjfVjDs3dpPDnKVLoBfys2lejMYoaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JRiCSTLs; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-429cbdab700so121436f8f.1
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 08:42:28 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4775dbde730so639305e9.3
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 08:42:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763052147; x=1763656947; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q1iPrEVkt5hq6iKDIzwWz1JLhZGrRKwp4Km+TwvoaLw=;
-        b=D2dNwiVhy+mUgtHvd+YgQq0WZVjbQaIlIyPr/zZZLBhw7I6BljtpWdruZjlY12tgLv
-         UbmebPhfR5p91qeL6c02aKbYCqnWEq38L/fJTclWOF0gOsVR8ELjzwvGOStrV5VYTkjG
-         Rbt03Z+jAnZsgTTP4KoORc8vRhALunufu9A8/wKoI1Ap9UN6P82hN3KXMd1GQKR6ROTk
-         EuJwBkFZMvZdxFvGvIjcmpC2R6iTCdfheRlNqqBXCSIo4UFyiYbNJOup6n8/jB2TNUXg
-         UvTGanMlJqMJgZrWO6eu/IjnrUcVR6prLIDaPVLjZUoMxcc2zF9S2UyE7zzjjsFlBTfb
-         GOFQ==
+        d=gmail.com; s=20230601; t=1763052149; x=1763656949; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aMzRJ5pI2+TptVcafty876sJe4B1nGFvJf6ldhJSevs=;
+        b=JRiCSTLsLq28r+pB2vnZiToDICfanVm+vpzw2y9VtDTkw0a1x2ouIiF1U3YPwLl8bc
+         RcttOI5hl5JJwYKhs9KPrRb2nLYzULRgwnSm0w7SwD7JXwiJSsIolEVhuHZVdJliqRgG
+         2sxYsxejpCA8gvrp1X3rDgwLKxrCeaz6xxH7yIUXaJU53yYNX3QoUmrV6f9QNITGqRXb
+         PZIg8r+T4DckyiV0wtKauMdEhxwo3QscSS0WzYfSJl6TCwtPek6+cw+kCwB/z0h9sCr9
+         7hovGPRVty4ic9mnQJjP3v/0o0FY7mcAL4KEsSz/xFUDzFVcDaFvm3qYdLrYpESdfcNP
+         NNdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763052147; x=1763656947;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q1iPrEVkt5hq6iKDIzwWz1JLhZGrRKwp4Km+TwvoaLw=;
-        b=GT7bHn6/yfuCQYOijy7bmR9zKhHd5JnGjZQaWgQi13SyBjbCBxWtMKyATc9xWXNaCb
-         e5aAcVQUbacDOiVTzuNfa1YDrI+lFXcBX0KXIEEkXD2nknn7DuIbnXiEqlEPbkX7rgo7
-         u5r8Z7vHKv7Z7NnULrk+J6Z+/rCfp9EZx/KOdGDR78YM+nnUZkfgDKjZ82SJ2t8YAEN5
-         gRZdGvO6VoJjXyg1H+JlcFzGiderR6FJlDytPQ31DrbXDHlVgikLmRIVRnrIFrvA+EuR
-         2b5DY2LbV82tF7U5wnMPsnJZZ2M06crOozRVtdHEKfL7U22YrgLjVbgez6MteiqYvNZt
-         INIQ==
-X-Gm-Message-State: AOJu0YzwOQzdRchw+MI0kI2IbkzWEe8if1HjIm9VmjwUCcOI6oEBp13N
-	aDTrDzt7cfKIphY4cwIRrInVdb8I7cMNf4skIwA1+P2JoZXWn1K8FEbk
-X-Gm-Gg: ASbGncvZWJCCZN+qq/RYIvGZ3JaXUglzrHm4H9ZCo34Sg8BTHmjawXarnNCLSBtf2U2
-	VnQ3H2o0h0tdulHtxcwNGzs2chXntGdOpCS2LxeSAuhJRh41ouGM9I1FBkh5WwMSV5BEuTJHXXy
-	+0GDejkzypaR3Twi2QtKvNqgbzs6bpmvaAaTs65OgazshuA9+iyipliNeebM6/0L7QBH7IjvM/l
-	jhj0A5FB31tCtT1JBhAfwQKX6xNNhSPfq55zuaY4GYg9ruosx1uRp0Fq+7iI31UHaG08dwzQdSn
-	zfmfz2UKazl1ALfYnfzfJ9nnCCHWwLApras0DWRYZzQPO7S27Z9xkENm7nJbfy3behsB7Xb1vRh
-	GAyGUjn0sRYTeWYgcJ8OAPyrGIliO5iQqsv5NWg0evl6c7QZzDgODo/ye5h/ZpsK8+i+/T3R7G8
-	X7CFWz+H6jdMeKMZEFvRAeNU/Szw==
-X-Google-Smtp-Source: AGHT+IGclhtkVC+SQIwavEUnzhQXgeen+aHzFX2HGR9pvr4YinanB82JsLHIPDaDDzl6c6Ni7eJakw==
-X-Received: by 2002:a05:600c:4706:b0:477:7bd8:8f2d with SMTP id 5b1f17b1804b1-4778feafe3amr467895e9.8.1763052146552;
-        Thu, 13 Nov 2025 08:42:26 -0800 (PST)
-Received: from localhost ([2a03:2880:31ff:4e::])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4778f247821sm17578525e9.5.2025.11.13.08.42.25
+        d=1e100.net; s=20230601; t=1763052149; x=1763656949;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=aMzRJ5pI2+TptVcafty876sJe4B1nGFvJf6ldhJSevs=;
+        b=qntKaMdgovnPszP3vq94xFb7PXfetMODtPAip3x85+QE+vbGaTQrx03R7U9IVW6svU
+         RwRBV88WaTv04drMbkLd3KElszC5EYYBVfOas/ln+ZS8bHlzD3ef/hSae74yfkn2OK7O
+         wlUD8IH/8BWVF7e/JGfB3Gok7F9cxqQBOLasOcSFQPrMo3ErBYdfLXq0SP+8w3OB8sxP
+         syB8wTBboLFc1yOuW6i5yQbq8JfYrB8MqYeRQgBdYSVAKzyq4no/Qk3/FvXUcojvpiPp
+         JbOFiSF1pDILs48pch7lEdsdSxrA7sWNvU5vZDR9kqhd4nYZtxBjSM9FUlmY5s3SAa11
+         8F1w==
+X-Gm-Message-State: AOJu0YyFXU7QYYXFPONH6Ch4nspBn20AT1ssLTWCf+lzJM0eMrDeGGD2
+	S1d6ZKAEgiyPK+03fsjX1TM/WmQgaONhgCFZlTBFToOUxpVRTukl7jKp
+X-Gm-Gg: ASbGncuvaq3NpZs2YG0ytcf4JJIbbpRDISm53njehl77DP59/y0vCJWCLv8W6JgEIPT
+	gCyKsUICOi51nv4tcqRmybFE/L4M4GfWOQtdGD4mG5yCp4HTJscF5/J73NIZ1Jn8geFq2pFer9l
+	MELYfKPnxJ279z1ClVcIiRBJ1et0id4o2WQ4BCRzelsp/D2VxhhSGv5cYIlrOoZWuqPj5p+e1Hl
+	MqzK95NC6YwsIb/YIoQoHixwLSvhg19BEkBNPFt74Ony9HenBwbPyTcOlZH8c/v/B4EpJ1CgR3v
+	3L5iFJDFY44fTMaomO7WGHH1U/obbkzNXNwY4pBbmPfk1EHauCW4EK0os4lRiy8MdH3Kw5wvqnW
+	QXRzMyoIqeM138akCJHaBAjtnCswJ4jqwCYE64UgcnpW6JKM50sUhIVwtXr1f01xmofG+Przf24
+	2gD7em5aIJqrkFW2A=
+X-Google-Smtp-Source: AGHT+IGRCKn1s1l7XPuZ3WmfDrwdmb84hd7wM1N88NvGU0e/XOAv+o6GyT+T3hJdUvhK0yT5AjMEAg==
+X-Received: by 2002:a05:600c:1f8e:b0:46e:36f9:c57e with SMTP id 5b1f17b1804b1-4778fea51f1mr825465e9.5.1763052148336;
+        Thu, 13 Nov 2025 08:42:28 -0800 (PST)
+Received: from localhost ([2a03:2880:31ff:53::])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e7ae88sm4824499f8f.6.2025.11.13.08.42.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Nov 2025 08:42:25 -0800 (PST)
+        Thu, 13 Nov 2025 08:42:27 -0800 (PST)
 From: Gustavo Luiz Duarte <gustavold@gmail.com>
-Subject: [PATCH net-next v2 0/4] netconsole: Allow userdata buffer to grow
- dynamically
-Date: Thu, 13 Nov 2025 08:42:17 -0800
-Message-Id: <20251113-netconsole_dynamic_extradata-v2-0-18cf7fed1026@meta.com>
+Date: Thu, 13 Nov 2025 08:42:18 -0800
+Subject: [PATCH net-next v2 1/4] netconsole: Simplify
+ send_fragmented_body()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,10 +85,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAGoKFmkC/32NWwrDIBBFtxLmuxa1eX91HyUEo5NmoNGiEhJC9
- l5xAf08XM49JwT0hAH64gSPGwVyNoG8FaAXZd/IyCQGyWUlOG+YxaidDe6DozmsWkmPuEevjIq
- KSTGZzjSyruoW0sXX40x7vn9BMpO9RxjSslCIzh+5u4m854Tg1f/EJhhnopRtx6e57B71c8Wo7
- tqtMFzX9QMD55JW0QAAAA==
+Message-Id: <20251113-netconsole_dynamic_extradata-v2-1-18cf7fed1026@meta.com>
+References: <20251113-netconsole_dynamic_extradata-v2-0-18cf7fed1026@meta.com>
+In-Reply-To: <20251113-netconsole_dynamic_extradata-v2-0-18cf7fed1026@meta.com>
 To: Breno Leitao <leitao@debian.org>, Andre Carvalho <asantostc@gmail.com>, 
  Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -97,55 +97,167 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-kselftest@vger.kernel.org, Gustavo Luiz Duarte <gustavold@gmail.com>
 X-Mailer: b4 0.13.0
 
-The current netconsole implementation allocates a static buffer for
-extradata (userdata + sysdata) with a fixed size of
-MAX_EXTRADATA_ENTRY_LEN * MAX_EXTRADATA_ITEMS bytes for every target,
-regardless of whether userspace actually uses this feature. This forces
-us to keep MAX_EXTRADATA_ITEMS small (16), which is restrictive for
-users who need to attach more metadata to their log messages.
+Refactor send_fragmented_body() to use separate offset tracking for
+msgbody, and extradata instead of complex conditional logic.
+The previous implementation used boolean flags and calculated offsets
+which made the code harder to follow.
 
-This patch series enables dynamic allocation of the userdata buffer,
-allowing it to grow on-demand based on actual usage. The series:
+The new implementation maintains independent offset counters
+(msgbody_offset, extradata_offset) and processes each section
+sequentially, making the data flow more straightforward and the code
+easier to maintain.
 
-1. Refactors send_fragmented_body() to simplify handling of separated
-   userdata and sysdata (patch 1/4)
-2. Splits userdata and sysdata into separate buffers (patch 2/4)
-3. Implements dynamic allocation for the userdata buffer (patch 3/4)
-4. Increases MAX_USERDATA_ITEMS from 16 to 256 now that we can do so
-   without memory waste (patch 4/4)
-
-Benefits:
-- No memory waste when userdata is not used
-- Targets that use userdata only consume what they need
-- Users can attach significantly more metadata without impacting systems
-  that don't use this feature
+This is a preparatory refactoring with no functional changes, which will
+allow easily splitting extradata_complete into separate userdata and
+sysdata buffers in the next patch.
 
 Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
 ---
-Changes in v2:
-- Added null pointer checks for userdata and sysdata buffers
-- Added MAX_SYSDATA_ITEMS to enum sysdata_feature
-- Moved code out of ifdef in send_msg_no_fragmentation()
-- Renamed variables in send_fragmented_body() to make it easier to
-  reason about the code
-- Link to v1: https://lore.kernel.org/r/20251105-netconsole_dynamic_extradata-v1-0-142890bf4936@meta.com
+ drivers/net/netconsole.c | 111 ++++++++++++++++++++---------------------------
+ 1 file changed, 46 insertions(+), 65 deletions(-)
 
----
-Gustavo Luiz Duarte (4):
-      netconsole: Simplify send_fragmented_body()
-      netconsole: Split userdata and sysdata
-      netconsole: Dynamic allocation of userdata buffer
-      netconsole: Increase MAX_USERDATA_ITEMS
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index bb6e03a92956..5fe5896d6ff5 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -1560,89 +1560,70 @@ static void append_release(char *buf)
+ }
+ 
+ static void send_fragmented_body(struct netconsole_target *nt,
+-				 const char *msgbody, int header_len,
++				 const char *msgbody_ptr, int header_len,
+ 				 int msgbody_len, int extradata_len)
+ {
+-	int sent_extradata, preceding_bytes;
+-	const char *extradata = NULL;
+-	int body_len, offset = 0;
++	const char *extradata_ptr = NULL;
++	int data_len, data_sent = 0;
++	int extradata_offset = 0;
++	int msgbody_offset = 0;
+ 
+ #ifdef CONFIG_NETCONSOLE_DYNAMIC
+-	extradata = nt->extradata_complete;
++	extradata_ptr = nt->extradata_complete;
+ #endif
++	if (WARN_ON_ONCE(!extradata_ptr && extradata_len != 0))
++		return;
+ 
+-	/* body_len represents the number of bytes that will be sent. This is
++	/* data_len represents the number of bytes that will be sent. This is
+ 	 * bigger than MAX_PRINT_CHUNK, thus, it will be split in multiple
+ 	 * packets
+ 	 */
+-	body_len = msgbody_len + extradata_len;
++	data_len = msgbody_len + extradata_len;
+ 
+ 	/* In each iteration of the while loop below, we send a packet
+-	 * containing the header and a portion of the body. The body is
++	 * containing the header and a portion of the data. The data is
+ 	 * composed of two parts: msgbody and extradata. We keep track of how
+-	 * many bytes have been sent so far using the offset variable, which
+-	 * ranges from 0 to the total length of the body.
++	 * many bytes have been sent so far using the data_sent variable, which
++	 * ranges from 0 to the total bytes to be sent.
+ 	 */
+-	while (offset < body_len) {
+-		int this_header = header_len;
+-		bool msgbody_written = false;
+-		int this_offset = 0;
++	while (data_sent < data_len) {
++		int extradata_left = extradata_len - extradata_offset;
++		int msgbody_left = msgbody_len - msgbody_offset;
++		int buf_offset = 0;
+ 		int this_chunk = 0;
+ 
+-		this_header += scnprintf(nt->buf + this_header,
+-					 MAX_PRINT_CHUNK - this_header,
+-					 ",ncfrag=%d/%d;", offset,
+-					 body_len);
+-
+-		/* Not all msgbody data has been written yet */
+-		if (offset < msgbody_len) {
+-			this_chunk = min(msgbody_len - offset,
+-					 MAX_PRINT_CHUNK - this_header);
+-			if (WARN_ON_ONCE(this_chunk <= 0))
+-				return;
+-			memcpy(nt->buf + this_header, msgbody + offset,
+-			       this_chunk);
+-			this_offset += this_chunk;
++		/* header is already populated in nt->buf, just append to it */
++		buf_offset = header_len;
++
++		buf_offset += scnprintf(nt->buf + buf_offset,
++					 MAX_PRINT_CHUNK - buf_offset,
++					 ",ncfrag=%d/%d;", data_sent,
++					 data_len);
++
++		/* append msgbody first */
++		this_chunk = min(msgbody_left, MAX_PRINT_CHUNK - buf_offset);
++		memcpy(nt->buf + buf_offset, msgbody_ptr + msgbody_offset,
++		       this_chunk);
++		msgbody_offset += this_chunk;
++		buf_offset += this_chunk;
++		data_sent += this_chunk;
++
++		/* after msgbody, append extradata */
++		if (extradata_ptr && extradata_left) {
++			this_chunk = min(extradata_left,
++					 MAX_PRINT_CHUNK - buf_offset);
++			memcpy(nt->buf + buf_offset,
++			       extradata_ptr + extradata_offset, this_chunk);
++			extradata_offset += this_chunk;
++			buf_offset += this_chunk;
++			data_sent += this_chunk;
+ 		}
+ 
+-		/* msgbody was finally written, either in the previous
+-		 * messages and/or in the current buf. Time to write
+-		 * the extradata.
+-		 */
+-		msgbody_written |= offset + this_offset >= msgbody_len;
+-
+-		/* Msg body is fully written and there is pending extradata to
+-		 * write, append extradata in this chunk
+-		 */
+-		if (msgbody_written && offset + this_offset < body_len) {
+-			/* Track how much user data was already sent. First
+-			 * time here, sent_userdata is zero
+-			 */
+-			sent_extradata = (offset + this_offset) - msgbody_len;
+-			/* offset of bytes used in current buf */
+-			preceding_bytes = this_chunk + this_header;
+-
+-			if (WARN_ON_ONCE(sent_extradata < 0))
+-				return;
+-
+-			this_chunk = min(extradata_len - sent_extradata,
+-					 MAX_PRINT_CHUNK - preceding_bytes);
+-			if (WARN_ON_ONCE(this_chunk < 0))
+-				/* this_chunk could be zero if all the previous
+-				 * message used all the buffer. This is not a
+-				 * problem, extradata will be sent in the next
+-				 * iteration
+-				 */
+-				return;
+-
+-			memcpy(nt->buf + this_header + this_offset,
+-			       extradata + sent_extradata,
+-			       this_chunk);
+-			this_offset += this_chunk;
+-		}
++		/* if all is good, send the packet out */
++		if (WARN_ON_ONCE(data_sent > data_len))
++			return;
+ 
+-		send_udp(nt, nt->buf, this_header + this_offset);
+-		offset += this_offset;
++		send_udp(nt, nt->buf, buf_offset);
+ 	}
+ }
+ 
 
- drivers/net/netconsole.c                           | 370 ++++++++++-----------
- .../selftests/drivers/net/netcons_overflow.sh      |   2 +-
- 2 files changed, 179 insertions(+), 193 deletions(-)
----
-base-commit: 68fa5b092efab37a4f08a47b22bb8ca98f7f6223
-change-id: 20251007-netconsole_dynamic_extradata-21bd9d726568
-
-Best regards,
 -- 
-Gustavo Duarte <gustavold@meta.com>
+2.47.3
 
 
