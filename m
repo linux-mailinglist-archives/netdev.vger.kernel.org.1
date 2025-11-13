@@ -1,116 +1,155 @@
-Return-Path: <netdev+bounces-238512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E91ECC5A3F8
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 22:54:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2CC3C5A401
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 22:55:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DFD674E9D2D
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 21:47:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DED3A3B76B9
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 21:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8489C2D5921;
-	Thu, 13 Nov 2025 21:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81C7322C60;
+	Thu, 13 Nov 2025 21:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ASSQqE1F"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fgFcjYQn"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A294502F
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 21:47:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E321714286
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 21:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763070423; cv=none; b=WyttEKbkA1VesSDHPFC4joHNs2VqRAqvt2T/trgTBDUG3iJXZm9UGrSW5+Iyje/+zzH95udxu5tOcSQpV3FnWbkzfFxwScacWAHRWic26H1nzWanPcLNDrYdaIsa48AA/9bzyTsjAJN0MgbIl03GYliX6qNwEb//jblzN7p7rGg=
+	t=1763070542; cv=none; b=cgG4VaEFf/brtK0JtghhF+t1NHEu72HNAc0hqzxiDpQQkThIFq0APmHRBt/2DjM5pfrUOXpVOKVn9Ps14+JR43RLqLJI8n8hfzoXgds73DjG8ms6S2ghyxtFlbvySnYeXNoYxUaeLLDxjmSC+BKGfXdwh+Rp9i3DoM24cI2JmlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763070423; c=relaxed/simple;
-	bh=R0PKj13y2eGWfmcDyUH4hf+6rv+9bVv2mYSmRDkEyJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sVUg5EeKRbprZXKQZ6Z4mREFhU7qAbcOdY0YPcQyxjk7KXOgSWbP9TXNsH5XW+pS5XB7vtyUe9KLSlBzgLmM4+sb4yp2ZeCZy/pTbgCPYNkCBev7lLE1tedR50iuEpuqyBOV2zJjnPshgL/0chUVPhAyLNlavM+Lq+E5ekF7U0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ASSQqE1F; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=vBgdZiZYbDqlhcZubzwVA9BQujHuJ2EGuykdkz8RkGk=; b=ASSQqE1FrRvE3ZGVFQiC9w0/VQ
-	B3VhkYK6HveImXRgTYnaDcwQQQdJoHa37sv3+ebOw300pLDTQ+SorpMnmGH5saNKb/kvY/1haJNH8
-	Nj7OuS40oiW/cMNWcyIOZ6ABpn2dSGtC2g8Xqc8a7OyqsBQrOPGpMC6vmpQQinebklr1EJKaizQ4G
-	DtnfsZrXyVRksBaqMg2RF6rMcUgJcoRbpfvr3KY+zHVyCJdw3Kk12hcwlmK1Z9Ze2kXeOL9VFl5LI
-	uE5Cplk1yq9i2UBTAOFDNaETXry+8XoOJGUaOxThnSbARW0U8UnnHLQz2ghr9h9LdMBW/jOjiCFEX
-	oOBGx/xw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39364)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vJf9a-00000000628-0OIQ;
-	Thu, 13 Nov 2025 21:46:54 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vJf9W-000000005E9-3ZN4;
-	Thu, 13 Nov 2025 21:46:50 +0000
-Date: Thu, 13 Nov 2025 21:46:50 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 0/2] net: phy: disable EEE on TI PHYs
-Message-ID: <aRZRypeHRvks6Hqw@shell.armlinux.org.uk>
-References: <aRXAnpzsvmHQu7wc@shell.armlinux.org.uk>
- <4ed5da1d-1d2f-49ea-918e-2455573066ee@gmail.com>
+	s=arc-20240116; t=1763070542; c=relaxed/simple;
+	bh=reUr5vr9UGxA/z5v5hvjsSRJR9k1NeomI4kvfTl5mRw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lrKXtdGAlSw8OI4C9W1AaEkg4Gejqb4Faf3avxAdpfR3wU72zpgkI5Ri9YE2mBzZR9IGbax9GVRC5gOeecacgo+e8l9XlF6lRFBm8FrizgUJAOnaixs/BDaXFMqF/cLf7hPeRPh7zVOAqcvFEzSKXK7lIuTRxg+PxBdlq9fZDRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fgFcjYQn; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <a92e2c4a-bfde-4a74-8bb5-5e2b8ca87199@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763070528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BWxDrNld1/nw1/i6TIgWHQ0YjF/o5aVc62P7yzv+ZHI=;
+	b=fgFcjYQnEUyDVhIeB5QDbAbARXGAxFYqOqQEvNDO5ZhsLMNZhWG968TwoTEdTyiJglExnl
+	pRjkNIkkLGpyppjdDp+hkBDVrCknaPtJKfB4Sfz/AiivhqlEpo3yK1gNgKoYs66SnLl0bc
+	6Immm6dOOxEXWE5eEYPyh7RT4EkwJts=
+Date: Thu, 13 Nov 2025 13:48:40 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ed5da1d-1d2f-49ea-918e-2455573066ee@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Subject: Re: [PATCH net v5 3/3] selftests/bpf: Add mptcp test with sockmap
+To: Jiayuan Chen <jiayuan.chen@linux.dev>,
+ Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Florian Westphal <fw@strlen.de>, Christoph Paasch <cpaasch@apple.com>,
+ Peter Krystad <peter.krystad@linux.intel.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20251111060307.194196-1-jiayuan.chen@linux.dev>
+ <20251111060307.194196-4-jiayuan.chen@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20251111060307.194196-4-jiayuan.chen@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Nov 13, 2025 at 09:11:32PM +0100, Heiner Kallweit wrote:
-> On 11/13/2025 12:27 PM, Russell King (Oracle) wrote:
-> > Hi,
-> > 
-> > Towards the end of October, we discussed EEE on TI PHYs which seems to
-> > cause problems with the stmmac hardware. This problem was never fully
-> > diagnosed, but it was identified that TI PHYs do not support LPI
-> > signalling, but report that EEE is supported, and they implement the
-> > advertisement registers and that functionality.
-> > 
-> > This series allows PHY drivers to disable EEE support.
-> > 
-> > v2:
-> > - integrate Oleksij Rempel's review comments, and merge update
-> >   into patch 2 to allow EEE on non-1G variants.
-> > 
-> >  drivers/net/phy/dp83867.c    |  1 +
-> >  drivers/net/phy/dp83869.c    |  1 +
-> >  drivers/net/phy/phy-core.c   |  2 --
-> >  drivers/net/phy/phy_device.c | 32 +++++++++++++++++++++++++++++---
-> >  include/linux/phy.h          |  1 +
-> >  5 files changed, 32 insertions(+), 5 deletions(-)
-> > 
-> 
-> Alternatively the PHY driver could call phy_disable_eee()
-> in its config_init. Then we wouldn't have to touch core code.
+> diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
+> index f8eb7f9d4fd2..b976fe626343 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
+> @@ -6,11 +6,14 @@
+>   #include <netinet/in.h>
+>   #include <test_progs.h>
+>   #include <unistd.h>
+> +#include <error.h>
 
-If that's what you intend, then please update the kerneldoc for
-phy_disable_eee() so that it doesn't state that it's for MAC use
-(because that implies it's not for PHY drivers.)
+I changed to errno.h to be specific. I think you only need the values of 
+an errno here.
+>   #include "cgroup_helpers.h"
+>   #include "network_helpers.h"
+> +#include "socket_helpers.h"
+>   #include "mptcp_sock.skel.h"
+>   #include "mptcpify.skel.h"
+>   #include "mptcp_subflow.skel.h"
+> +#include "mptcp_sockmap.skel.h"
+>   
+>   #define NS_TEST "mptcp_ns"
+>   #define ADDR_1	"10.0.1.1"
+> @@ -436,6 +439,142 @@ static void test_subflow(void)
+>   	close(cgroup_fd);
+>   }
+>   
+> +/* Test sockmap on MPTCP server handling non-mp-capable clients. */
+> +static void test_sockmap_with_mptcp_fallback(struct mptcp_sockmap *skel)
+> +{
+> +	int listen_fd = -1, client_fd1 = -1, client_fd2 = -1;
+> +	int server_fd1 = -1, server_fd2 = -1, sent, recvd;
+> +	char snd[9] = "123456789";
+> +	char rcv[10];
+> +
+> +	/* start server with MPTCP enabled */
+> +	listen_fd = start_mptcp_server(AF_INET, NULL, 0, 0);
+> +	if (!ASSERT_OK_FD(listen_fd, "sockmap-fb:start_mptcp_server"))
+> +		return;
+> +
+> +	skel->bss->trace_port = ntohs(get_socket_local_port(listen_fd));
+> +	skel->bss->sk_index = 0;
+> +	/* create client without MPTCP enabled */
+> +	client_fd1 = connect_to_fd_opts(listen_fd, NULL);
+> +	if (!ASSERT_OK_FD(client_fd1, "sockmap-fb:connect_to_fd"))
+> +		goto end;
+> +
+> +	server_fd1 = xaccept_nonblock(listen_fd, NULL, NULL);
+> +	skel->bss->sk_index = 1;
+> +	client_fd2 = connect_to_fd_opts(listen_fd, NULL);
+> +	if (!ASSERT_OK_FD(client_fd2, "sockmap-fb:connect_to_fd"))
+> +		goto end;
+> +
+> +	server_fd2 = xaccept_nonblock(listen_fd, NULL, NULL);
+> +	/* test normal redirect behavior: data sent by client_fd1 can be
+> +	 * received by client_fd2
+> +	 */
+> +	skel->bss->redirect_idx = 1;
+> +	sent = xsend(client_fd1, snd, sizeof(snd), 0);
+> +	if (!ASSERT_EQ(sent, sizeof(snd), "sockmap-fb:xsend(client_fd1)"))
+> +		goto end;
+> +
+> +	/* try to recv more bytes to avoid truncation check */
+> +	recvd = recv_timeout(client_fd2, rcv, sizeof(rcv), MSG_DONTWAIT, 2);
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I removed the socket_helpers.h usage. The _nonblock, _timeout, and
+MSG_DONTWAIT are unnecessary. I replaced them with the regular accept,
+send, and recv. All fds from network_helpers.c have a default 3s
+timeout instead of 30s in xaccept_nonblock. This matches how most of
+the selftests/bpf are doing it as well.
+
+I also touched up the commit message in patch 2 based on Matt's comment.
+
+Applied. Thanks.
+
+> +	server_fd = xaccept_nonblock(listen_fd, NULL, NULL);
+> +	err = bpf_map_update_elem(bpf_map__fd(skel->maps.sock_map),
+> +				  &zero, &server_fd, BPF_NOEXIST);
 
