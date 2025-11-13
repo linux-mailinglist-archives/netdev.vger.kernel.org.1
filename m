@@ -1,210 +1,160 @@
-Return-Path: <netdev+bounces-238217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AE38C56167
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 08:41:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECFEBC5616A
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 08:41:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4206F3A69FD
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 07:41:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 338513A70FF
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 07:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2213271F2;
-	Thu, 13 Nov 2025 07:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C8832936C;
+	Thu, 13 Nov 2025 07:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxTRbfLa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gm5JGk4t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BD1329368;
-	Thu, 13 Nov 2025 07:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F073324706
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 07:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763019655; cv=none; b=bOi2COpalB0A1XQj6/zcpx9MICVVQgxVrivzglSdoCv8BkWrIDfRtANhbxeA3RojqLhMtHHQGa7vD++1xwzqnuLX/N4NSXfgLkldiBzjaLKoeXY7RsmmQ9Fh6F9Uf4H6LWiC9PKzy4QlfhVHXG0vTMha/VwQNOe/DRDxexNDLPY=
+	t=1763019687; cv=none; b=KaG9WXVhY3p5f/ZeI3TBt47filVaLOzKnvbCPe/D1ulZ7HY9B9yw9y7gdtBduOCXRxZJdGgQUkv/yRxFmbgda2tqXYnQIt/KFMHVotGpgqjoFWrIbh2I3u3T9DU9JKRYbx9R5DLxc06XHPMsiK9kPx0F6/sqS2v6gcBZeuScBoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763019655; c=relaxed/simple;
-	bh=s1s7Q8+rNlO8QATMY6kvX3m8Lb/6Xzhin/P4c/UYLM4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ee02NvB3TsoRv7KHpOKFQefRPM95/5a4jChD3/ILmv0tiPCgoSodBDQ732/UcaSzn+7MRK+Xc3nq9hL6tesimXOu6KWvbH0ZOYPzoOU88X3Va+XWyE+e1qZJru1gd6+yCXPJCaKNZs9kle02GhmoK92sERvhG7i7q8ui6EPiWts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxTRbfLa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9E91C113D0;
-	Thu, 13 Nov 2025 07:40:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763019655;
-	bh=s1s7Q8+rNlO8QATMY6kvX3m8Lb/6Xzhin/P4c/UYLM4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mxTRbfLaxUaVTKO5F7MP9wZIx/9u4dJaIBmMmLNeon2PN3JkuDX0XRLtuTD8Z5XP9
-	 O0EX2Tcn0gMT2dZKEM8Hzbis/M8ciwiZhsPGe4e/40qFti8THAkn6p6hQe5OL3hJji
-	 QxdN9ZXa74FgRJfL8lvVDo/xdt7D29LEF2PHriZfeXaod2UOGWpJYtr3q7eO7yJyMc
-	 bC6n9z7Avew+AU9q32resfln6xKfNCtLgkLrFRZC9Xg3STv5bZaKtRcG58gh3f+DPL
-	 VIKZOaCSAkr1gec1t1rYZI0CPPR1KG+lE0rHzpQPc5pZ68XneUhkCmSbKMslG1EC6j
-	 AuAR3g4Gqhd7g==
-Date: Thu, 13 Nov 2025 08:40:52 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Phil Sutter <phil@nwl.cc>, Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH nf-next v9 2/3] net: netfilter: Add IPIP flowtable tx sw
- acceleration
-Message-ID: <aRWLhLobB4Rz0dA_@lore-desk>
-References: <20251107-nf-flowtable-ipip-v9-0-7cbc4090dfcb@kernel.org>
- <20251107-nf-flowtable-ipip-v9-2-7cbc4090dfcb@kernel.org>
- <aRSDjkzMx4Ba7IW8@calendula>
- <aRSvnfdhO2G1DXJI@lore-desk>
- <aRUT-tFXYbwfZYUk@calendula>
+	s=arc-20240116; t=1763019687; c=relaxed/simple;
+	bh=phG2kdlKFCFGGcrwYKhRxY8z6nAJuhjeRVMV6n1LXVc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FUVSYj6PI9yJgrgsc4pHaJdnEnIOjnbW0mYu0F/MTKvyAHJ6grw2xDQPbImexL38UkwIucjiv1DUnEjq2ufY0r+TioOdTMCUOvCZ6Q4PwWSysgWj7Ce0TL4VQqjYh87QckHcu7peQllXlk31O9yl2ftxTgekrLkZ0HIRsBahqws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gm5JGk4t; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763019676;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gHRWXDU+OQWR7WydISJX/UhlJBRrrdKiQTabNpym4ds=;
+	b=gm5JGk4tdLhsaoq11+GJRahXmo30oDzjgbsecA8HREb7GxgkIawixVe0NDU2whqOInt7SV
+	jTueOE7oRHAyijkG+p3L20ISz4Q1YAi+1ZUa0LlchToR0uXehmk42V1NKnIgHdisENU6Cv
+	k6P15UNNrQ//SonRwL3eORJUgMqD7FU=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-651-NrBwPu2ENm6tEW485LBQog-1; Thu,
+ 13 Nov 2025 02:41:11 -0500
+X-MC-Unique: NrBwPu2ENm6tEW485LBQog-1
+X-Mimecast-MFC-AGG-ID: NrBwPu2ENm6tEW485LBQog_1763019670
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DB55718001FE;
+	Thu, 13 Nov 2025 07:41:09 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.45.224.239])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6F1F73000198;
+	Thu, 13 Nov 2025 07:41:06 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 0/6] dpll: zl3073x: Refactor state management
+Date: Thu, 13 Nov 2025 08:40:59 +0100
+Message-ID: <20251113074105.141379-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5gdp/tkNuL2145vX"
-Content-Disposition: inline
-In-Reply-To: <aRUT-tFXYbwfZYUk@calendula>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
+This patch set is a refactoring of the zl3073x driver to clean up
+state management, improve modularity, and significantly reduce
+on-demand I/O.
 
---5gdp/tkNuL2145vX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The driver's dpll.c implementation previously performed on-demand
+register reads and writes (wrapped in mailbox operations) to get
+or set properties like frequency, phase, and embedded-sync settings.
+This cluttered the DPLL logic with low-level I/O, duplicated locking,
+and led to inefficient bus traffic.
 
-> Hi Lorenzo,
+This series addresses this by:
+1. Splitting the monolithic 'core.c' into logical units ('ref.c',
+   'out.c', 'synth.c').
+2. Implementing a full read/write-back cache for 'zl3073x_ref' and
+   'zl3073x_out' structures.
 
-Hi Pablo,
+All state is now read once during '_state_fetch()' (and status updated
+periodically). DPLL get callbacks read from this cache. Set callbacks
+modify a copy of the state, which is then committed via a new
+'..._state_set()' function. These '_state_set' functions compare
+the new state to the cached state and write *only* the modified
+register values back to the hardware, all within a single mailbox
+sequence.
 
->=20
-> On Wed, Nov 12, 2025 at 05:02:37PM +0100, Lorenzo Bianconi wrote:
-> [...]
-> > > On Fri, Nov 07, 2025 at 12:14:47PM +0100, Lorenzo Bianconi wrote:
-> > > [...]
-> > > > @@ -565,8 +622,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_b=
-uff *skb,
-> > > > =20
-> > > >  	dir =3D tuplehash->tuple.dir;
-> > > >  	flow =3D container_of(tuplehash, struct flow_offload, tuplehash[d=
-ir]);
-> > > > +	other_tuple =3D &flow->tuplehash[!dir].tuple;
-> > > > =20
-> > > > -	if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
-> > > > +	if (nf_flow_encap_push(state->net, skb, other_tuple))
-> > > >  		return NF_DROP;
-> > > > =20
-> > > >  	switch (tuplehash->tuple.xmit_type) {
-> > > > @@ -577,7 +635,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_b=
-uff *skb,
-> > > >  			flow_offload_teardown(flow);
-> > > >  			return NF_DROP;
-> > > >  		}
-> > > > -		neigh =3D ip_neigh_gw4(rt->dst.dev, rt_nexthop(rt, flow->tupleha=
-sh[!dir].tuple.src_v4.s_addr));
-> > > > +		dest =3D other_tuple->tun_num ? other_tuple->tun.src_v4.s_addr
-> > > > +					    : other_tuple->src_v4.s_addr;
-> > >=20
-> > > I think this can be simplified if my series use the ip_hdr(skb)->daddr
-> > > for rt_nexthop(), see attached patch. This would be fetched _before_
-> > > pushing the tunnel and layer 2 encapsulation headers. Then, there is
-> > > no need to fetch other_tuple and check if tun_num is greater than
-> > > zero.
-> > >=20
-> > > See my sketch patch, I am going to give this a try, if this is
-> > > correct, I would need one more iteration from you.
-> > >
-> > > diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow=
-_table_ip.c
-> > > index 8b74fb34998e..ff2b6c16c715 100644
-> > > --- a/net/netfilter/nf_flow_table_ip.c
-> > > +++ b/net/netfilter/nf_flow_table_ip.c
-> > > @@ -427,6 +427,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buf=
-f *skb,
-> > >  	struct flow_offload *flow;
-> > >  	struct neighbour *neigh;
-> > >  	struct rtable *rt;
-> > > +	__be32 ip_dst;
-> > >  	int ret;
-> > > =20
-> > >  	tuplehash =3D nf_flow_offload_lookup(&ctx, flow_table, skb);
-> > > @@ -449,6 +450,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buf=
-f *skb,
-> > > =20
-> > >  	dir =3D tuplehash->tuple.dir;
-> > >  	flow =3D container_of(tuplehash, struct flow_offload, tuplehash[dir=
-]);
-> > > +	ip_dst =3D ip_hdr(skb)->daddr;
-> >=20
-> > I agree this patch will simplify my series (thx :)) but I guess we shou=
-ld move
-> > ip_dst initialization after nf_flow_encap_push() since we need to route=
- the
-> > traffic according to the tunnel dst IP address, right?
->=20
-> Right, I made a quick edit, it looks like this:
->=20
-> @@ -566,9 +624,14 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *=
-skb,
-> =20
->         dir =3D tuplehash->tuple.dir;
->         flow =3D container_of(tuplehash, struct flow_offload, tuplehash[d=
-ir]);
-> +       other_tuple =3D &flow->tuplehash[!dir].tuple;
-> +
-> +       if (nf_flow_tunnel_push(skb, other_tuple) < 0)
-> +               return NF_DROP;
-> +
->         ip_daddr =3D ip_hdr(skb)->daddr;
-> =20
-> -       if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
-> +       if (nf_flow_encap_push(skb, other_tuple) < 0)
->                 return NF_DROP;
-> =20
->         switch (tuplehash->tuple.xmit_type) {
->=20
-> That is, after tunnel header push but before pushing l2 encap (that
-> could possibly modify skb_network_header pointer), fetch the
-> destination address.
->=20
-> I made a few more comestic edits on your series and I pushed them out
-> to this branch:
->=20
-> https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git/log=
-/?h=3Dflowtable-consolidate-xmit%2bipip
-[
+The result is a much cleaner 'dpll.c' that is almost entirely
+free of direct register I/O, and all state logic is properly
+encapsulated in its respective file.
 
-ack, I tested this branch and it works fine running my local tests. Thanks =
-for
-fixing pending bits.
+The series is broken down as follows:
 
-Regards,
-Lorenzo
+* Patch 1: Changes the state structs to store raw register values
+  (e.g., 'config', 'ctrl') instead of parsed booleans, centralizing
+  parsing logic into the helpers.
+* Patch 2: Splits the logic from 'core.c' into new 'ref.c', 'out.c'
+  and 'synth.c' files, creating a 'zl3073x_dev_...' abstraction layer.
+* Patch 3: Introduces the caching concept by reading and caching
+  the reference monitor status periodically, removing scattered
+  reads from 'dpll.c'.
+* Patch 4: Expands the 'zl3073x_ref' struct to cache *all* reference
+  properties and adds 'zl3073x_ref_state_set()' to write back changes.
+* Patch 5: Does the same for the 'zl3073x_out' struct, caching all
+  output properties and adding 'zl3073x_out_state_set()'.
+* Patch 6: A final cleanup that removes the 'zl3073x_dev_...' wrapper
+  functions that became redundant after the refactoring.
 
->=20
-> I just noticed, in nf_flow_tunnel_ipip_push(), that this can be removed:
->=20
->         memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
->=20
-> because this packet never entered the IP layer, the flowtable takes it
-> before it can get there.
+Changes:
+v3:
+- replaced confusing memcpy in zl3073x_ref_state_fetch() [Vadim]
+v2:
+- addressed issues found by patchwork bot (details in each patch)
 
---5gdp/tkNuL2145vX
-Content-Type: application/pgp-signature; name=signature.asc
+Ivan Vecera (6):
+  dpll: zl3073x: Store raw register values instead of parsed state
+  dpll: zl3073x: Split ref, out, and synth logic from core
+  dpll: zl3073x: Cache reference monitor status
+  dpll: zl3073x: Cache all reference properties in zl3073x_ref
+  dpll: zl3073x: Cache all output properties in zl3073x_out
+  dpll: zl3073x: Remove unused dev wrappers
 
------BEGIN PGP SIGNATURE-----
+ drivers/dpll/zl3073x/Makefile |   3 +-
+ drivers/dpll/zl3073x/core.c   | 243 +----------
+ drivers/dpll/zl3073x/core.h   | 184 +++-----
+ drivers/dpll/zl3073x/dpll.c   | 776 ++++++++--------------------------
+ drivers/dpll/zl3073x/out.c    | 157 +++++++
+ drivers/dpll/zl3073x/out.h    |  93 ++++
+ drivers/dpll/zl3073x/prop.c   |  12 +-
+ drivers/dpll/zl3073x/ref.c    | 204 +++++++++
+ drivers/dpll/zl3073x/ref.h    | 134 ++++++
+ drivers/dpll/zl3073x/synth.c  |  87 ++++
+ drivers/dpll/zl3073x/synth.h  |  72 ++++
+ 11 files changed, 1019 insertions(+), 946 deletions(-)
+ create mode 100644 drivers/dpll/zl3073x/out.c
+ create mode 100644 drivers/dpll/zl3073x/out.h
+ create mode 100644 drivers/dpll/zl3073x/ref.c
+ create mode 100644 drivers/dpll/zl3073x/ref.h
+ create mode 100644 drivers/dpll/zl3073x/synth.c
+ create mode 100644 drivers/dpll/zl3073x/synth.h
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaRWLhAAKCRA6cBh0uS2t
-rMv9AQC6xcba9zpJwQtXPC3Xv0ZWz+UeLQNX11CPHmQPmtpheAD8Dvd8xaGktBuv
-saj8xfjPSXw/lIIqLbh70Pu5zLj+1A0=
-=HTPF
------END PGP SIGNATURE-----
+-- 
+2.51.0
 
---5gdp/tkNuL2145vX--
 
