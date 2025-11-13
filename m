@@ -1,167 +1,169 @@
-Return-Path: <netdev+bounces-238329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0E46C57528
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 13:03:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24CE3C57552
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 13:07:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB9053A638F
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:02:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8AEA03437DE
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B50B33DEC0;
-	Thu, 13 Nov 2025 12:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71B1338F54;
+	Thu, 13 Nov 2025 12:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bCbUGeBC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O+T+1AcR";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fq61gwoz"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6775233892C
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 12:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC9933892C
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 12:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763035341; cv=none; b=PKzQMQhlmAKlA2WGlTNn80DCO4US2/CUdFOXgi8bPbqzzC+G1YafbHvjxw9j689uvSMjGmt6gXVUw6+8J0X9AV5ljiB1wncJnUXvRVYFgkvwix7vckKsLDl0x8lWxq9RnGSDlnWhwBbrYZCTgImWRU5m8x72rH2hHm807Dgg2BM=
+	t=1763035405; cv=none; b=g6uTa5ioTzAlTxbBHszmuDe4fN3dqBHmlanG3TGd2M0NmyFzzx1QbT5SDARoDv3pOtv1FrUPKiJSSERCvNJLeTv/ISD9cb7QlUH4hW3vglII+LWqMha1RRom/xXqLP9eZ/GISIZ5DW7w3cEB7r/jDUyXz0qFRmTqC8usA2X8tgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763035341; c=relaxed/simple;
-	bh=1TOjL58t8hJOIqAlBTbaX+TY2ysKOnw7ZyjZxvsciz8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PFCjIlu+0/iRg4tJV144mQi/NnF1goj03GgFZrAv3dtG1tHkuoCcbocjtul4qIEOCn8zMrwoszJXQuT+6m1iaqmIXTTJ6TLpUpeDt5JoRovWvu1zikFJyeThkqbMiKcnNbAmJFwyqzgLQmndRtwJCNCmznsiAPvvLk5Ic+cjhi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bCbUGeBC; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JkDpTFVjjlbMNbEZbH9LlFnd8jd193zd4r9dnypXFHw=; b=bCbUGeBCxZkI2xtXBSXiwD/t/4
-	OWz2rl9R9MoscBqm92x9wMGsYMRaeLa0xqsPl8H6dswCjq6TbPFUOR9sLkDRavJOmqqKDs9QcBU0O
-	zl3vAhoTlXMwuC4LiQ640FNzH9zDHJQikOa8IQOX8eG0aPYh3evnvjWdIWjMsaXJ3RUpTc5gnY8sQ
-	NXY72Q4xU9ph76l+8FjuATBiWKv6Uaz75RHv4RjHEWWNswMcuj2acCYezxHfZfPnxlYF/vPDUjWza
-	J+q40OQp9P+IUSIl1W7K95Ax3WHHAbrk6C9Tg6pzWCRHKzzus3ORiGmHCbH/w7HGu3/qtTzwZMZkJ
-	YuMCbNqA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41954)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vJW1d-000000005PU-1sFc;
-	Thu, 13 Nov 2025 12:02:05 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vJW1Z-000000004px-3wi9;
-	Thu, 13 Nov 2025 12:02:01 +0000
-Date: Thu, 13 Nov 2025 12:02:01 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrei Botila <andrei.botila@oss.nxp.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/9] phy: add hwtstamp_get callback to phy
- drivers
-Message-ID: <aRXIuckumra-3Y0L@shell.armlinux.org.uk>
-References: <20251113113207.3928966-1-vadim.fedorenko@linux.dev>
- <20251113113207.3928966-3-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1763035405; c=relaxed/simple;
+	bh=T0nBFV1j3sxyl0ipSJ6SPeJaiNcrqGNNcEGPgng1Qto=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J7FIxXlYAz7J44kDRVb35tkNiz+WsvVcz0h91KK8ysK/Jod/Z/8wRbqMzyPCyG8yi1pBdWxcI6S0Fr5jKFY94ytIxLFhrmIrZmHblG2TQaSaqKanHZGkA6cXzLZfqidgwEkGwpl5FcaTDpILe5cxbH1YDh5QJlVUozYLdAskGV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O+T+1AcR; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fq61gwoz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763035403;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K1XB13f2T2pQkQVvJDOyaONCU6FYWol//XsfWhfeDek=;
+	b=O+T+1AcRnA2ZqCrpNAFd2WWFZgIN+X2meHE6tEAGnRiCqJaKJr2+kX2DXBXu+cfgNCOizk
+	QIJjfvPDsWfdPWkQ+wiuKGWvgn5V4ANadqmv10KXlwPGxz55yS+outJA1yMsn5SP5L6La9
+	Y31nSC5qMGd3hfUKX25WR/ZaaxRWQos=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-117-SHSFEF74M8mR0I_Fq1dZ1w-1; Thu, 13 Nov 2025 07:03:22 -0500
+X-MC-Unique: SHSFEF74M8mR0I_Fq1dZ1w-1
+X-Mimecast-MFC-AGG-ID: SHSFEF74M8mR0I_Fq1dZ1w_1763035401
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-429c5c8ae3bso536006f8f.0
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 04:03:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763035401; x=1763640201; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=K1XB13f2T2pQkQVvJDOyaONCU6FYWol//XsfWhfeDek=;
+        b=fq61gwoz5tmB3qvVaoI8OPwInCa7u3YCr6JAPtf/YUMxGmbtt+fLOM4oVYza5Avm6U
+         CxluRzX8fGkIsN6yMba4iF/QOQqWO0FdgTzoZxBpyDWwYA6pjpcig8muHkpFeO/gkBNs
+         UE3lC6H3wdJbFLe4uQPqzmdDfBj1WdrPibV1UUNlXmIQd3EVI+Csb4qaO2FaE3yOF6CI
+         0u+UEdmIbgvM7f4votKEqgv6BYt+/sk/X/ApFT3CANwZUIxpwAcul641jQcjW+4ytlx9
+         ZvoRk6I/Yn3DxHluIAX1EiuDQRY2RQVvVEI46F4zY1D5loXFLEKF1IHsfCfE3jka6Xr4
+         +kqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763035401; x=1763640201;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K1XB13f2T2pQkQVvJDOyaONCU6FYWol//XsfWhfeDek=;
+        b=u68IMb+A7ZLFdJ/Q5UeglZStlV/3rPnCHYnD0WARlmV9SPIY7gM7TcmbH+9ixKiESW
+         yjmO/WSwojwjYfqrVMn1VVmvS3DxSHQzSqscSDECBfBC4KFbM/hWMJmJiSBQNv0KZ7CL
+         ri8lOOA2tXU3c/w84miovSIV8X08tssxE4PSjil30zFuS7iuuIfTAElXfN/t9VwOiiWh
+         NBV/0Iu44Tg9DyqofOWB/KrM4ejzn9YCciABPJl74ykF2PzEqyeInyyTIxTHwJBrOuA3
+         Q3vGwYFqo0POXka+Dv0Mv7XxsWbvOLMlO6X3QU+EMHbyl8tWJ3QQZdYG7dP3/KMQcJhq
+         jlog==
+X-Forwarded-Encrypted: i=1; AJvYcCXNz59DpSPNDXzkX6c0JRN0LftOpfEBcYhZIz/wFReIWJL3gvKqsFSwzPdxxC/NumZgOMcdRe8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYh9+O5qyZV2YoWx9EN/XyJzf28XH+gRw7IcDXwlCYydlnvTD9
+	agKKPWK8BjWTg9o7voT7LvThqnzyzJwoT28YT2thkm+Uf+TzDEI4tEjVSSSyhuVDBqLA+bcWG7/
+	Npup5bxQkxaru/UBUfWhmO7UdmUAp9TWydJJ6AdkBeUHqlB5B0D1z6oZdGBRE6pY+Ng==
+X-Gm-Gg: ASbGncs60ELc2iEaIgVSvugymfP6QrU0YQs3oKPeLSII/I8fTJJLMXhYJLplCNCpEjP
+	uRMK7DDM+2+tBZuRXCM+u7WG0Yfdv0PUhnBN1aF/SYZKvJKSnIidKTkN7w3e6MzVvGCcs5Mz+G4
+	bQ+9wzJGqrBDywIpnpHNZw4FyGneZo38/CBn1IpRBGb/Qw5Yz6oGzHgy2Tl8dnNbpGprAfrgrj5
+	p2GjRsD4sJVp1c08RiZnQqDP3+xfiIp/zJv93E9D/wKPBJqwZc7/H1PiVHOuAIfOO0LeqjgNlLm
+	JkbBawjLcKjU+lLjL6qRc7tCOjJ5m1Gt6toyTpOBBbdTNQh+kgk/5lnGR5dI383FSNBP8vNXnz4
+	gOF7/9hjohG8S
+X-Received: by 2002:a05:6000:26c7:b0:42b:3ab7:b8b9 with SMTP id ffacd0b85a97d-42b4bb981f9mr6698091f8f.20.1763035400754;
+        Thu, 13 Nov 2025 04:03:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGrknDMXKWfpxOXL6+Xl4wgtLjfnMpqDum9BcTyTPAiSxqSSpss8LmX77BW1SJ2FLfJ1dle7w==
+X-Received: by 2002:a05:6000:26c7:b0:42b:3ab7:b8b9 with SMTP id ffacd0b85a97d-42b4bb981f9mr6698047f8f.20.1763035400167;
+        Thu, 13 Nov 2025 04:03:20 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.55])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e7b074sm3418217f8f.7.2025.11.13.04.03.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Nov 2025 04:03:19 -0800 (PST)
+Message-ID: <a4c8e0da-700d-4ebe-b5c9-ffc4b9eebc62@redhat.com>
+Date: Thu, 13 Nov 2025 13:03:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251113113207.3928966-3-vadim.fedorenko@linux.dev>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipv6: clear RA flags when adding a static route
+To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, Garri Djavadyan <g.djavadyan@gmail.com>
+References: <20251110230436.5625-1-fmancera@suse.de>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251110230436.5625-1-fmancera@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 13, 2025 at 11:32:00AM +0000, Vadim Fedorenko wrote:
-> PHY devices had lack of hwtstamp_get callback even though most of them
-> are tracking configuration info. Introduce new call back to
-> mii_timestamper.
+On 11/11/25 12:04 AM, Fernando Fernandez Mancera wrote:
+> When an IPv6 Router Advertisement (RA) is received for a prefix, the
+> kernel creates the corresponding on-link route with flags RTF_ADDRCONF
+> and RTF_PREFIX_RT configured and RTF_EXPIRES if lifetime is set.
 > 
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> If later a user configures a static IPv6 address on the same prefix the
+> kernel clears the RTF_EXPIRES flag but it doesn't clear the RTF_ADDRCONF
+> and RTF_PREFIX_RT. When the next RA for that prefix is received, the
+> kernel sees the route as RA-learned and wrongly configures back the
+> lifetime. This is problematic because if the route expires, the static
+> address won't have the corresponding on-link route.
+> 
+> This fix clears the RTF_ADDRCONF and RTF_PREFIX_RT flags preventing that
+> the lifetime is configured when the next RA arrives. If the static
+> address is deleted, the route becomes RA-learned again.
+> 
+> Fixes: 14ef37b6d00e ("ipv6: fix route lookup in addrconf_prefix_rcv()")
+> Reported-by: Garri Djavadyan <g.djavadyan@gmail.com>
+> Closes: https://lore.kernel.org/netdev/ba807d39aca5b4dcf395cc11dca61a130a52cfd3.camel@gmail.com/
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+> ---
+> Note: this has been broken probably since forever but I belive the
+> commit in the fixes tag was aiming to fix this too. Anyway, any
+> recommendation for a fixes tag is welcomed.
+> ---
+>  net/ipv6/ip6_fib.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+> index 02c16909f618..2111af022d94 100644
+> --- a/net/ipv6/ip6_fib.c
+> +++ b/net/ipv6/ip6_fib.c
+> @@ -1138,6 +1138,10 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
+>  					fib6_set_expires(iter, rt->expires);
+>  					fib6_add_gc_list(iter);
+>  				}
+> +				if (!(rt->fib6_flags & (RTF_ADDRCONF | RTF_PREFIX_RT))) {
+> +					iter->fib6_flags &= ~RTF_ADDRCONF;
+> +					iter->fib6_flags &= ~RTF_PREFIX_RT;
+> +				}
+>  
+>  				if (rt->fib6_pmtu)
+>  					fib6_metric_set(iter, RTAX_MTU,
 
-As part of my Marvell PTP work, I have a similar patch, but it's
-way simpler. Is this not sufficient?
+The patch makes sense to me, but I don't want to rush it in the net PR
+I'm going to send soon. Also it would be great to have self-test
+covering this case, could you have a reasonable shot at it?
 
-__phy_hwtstamp_get() is called via phylib_stubs struct and
-phy_hwtstamp_get(), dev_get_hwtstamp_phylib(), dev_get_hwtstamp(),
-and dev_ifsioc().
+Thanks.
 
-Using the phylib ioctl handler means we're implementing a path that
-is already marked as legacy - see dev_get_hwtstamp():
+Paolo
 
-        if (!ops->ndo_hwtstamp_get)
-                return dev_eth_ioctl(dev, ifr, SIOCGHWTSTAMP); /* legacy */
-
-So, I think the below would be the preferred implementation.
-
-8<===
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH net-next] net: phy: add hwtstamp_get() method for mii
- timestampers
-
-Add the missing hwtstamp_get() method for mii timestampers so PHYs can
-report their configuration back to userspace.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/phy.c           | 3 +++
- include/linux/mii_timestamper.h | 5 +++++
- 2 files changed, 8 insertions(+)
-
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 02da4a203ddd..b6fae9299b36 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -476,6 +476,9 @@ int __phy_hwtstamp_get(struct phy_device *phydev,
- 	if (!phydev)
- 		return -ENODEV;
- 
-+	if (phydev->mii_ts && phydev->mii_ts->hwtstamp_get)
-+		return phydev->mii_ts->hwtstamp_get(phydev->mii_ts, config);
-+
- 	return -EOPNOTSUPP;
- }
- 
-diff --git a/include/linux/mii_timestamper.h b/include/linux/mii_timestamper.h
-index 995db62570f9..b6485f602eb9 100644
---- a/include/linux/mii_timestamper.h
-+++ b/include/linux/mii_timestamper.h
-@@ -29,6 +29,8 @@ struct phy_device;
-  *
-  * @hwtstamp:	Handles SIOCSHWTSTAMP ioctl for hardware time stamping.
-  *
-+ * @hwtstamp_get: Handles SIOCGHWTSTAMP ioctl for hardware time stamping.
-+ *
-  * @link_state: Allows the device to respond to changes in the link
-  *		state.  The caller invokes this function while holding
-  *		the phy_device mutex.
-@@ -55,6 +57,9 @@ struct mii_timestamper {
- 			 struct kernel_hwtstamp_config *kernel_config,
- 			 struct netlink_ext_ack *extack);
- 
-+	int  (*hwtstamp_get)(struct mii_timestamper *mii_ts,
-+			     struct kernel_hwtstamp_config *kernel_config);
-+
- 	void (*link_state)(struct mii_timestamper *mii_ts,
- 			   struct phy_device *phydev);
- 
--- 
-2.47.3
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
