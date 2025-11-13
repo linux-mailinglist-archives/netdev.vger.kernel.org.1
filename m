@@ -1,60 +1,73 @@
-Return-Path: <netdev+bounces-238205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6686C55E61
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 07:14:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E80ACC55EE9
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 07:33:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A21D34E52A0
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 06:12:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A13B23AC946
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 06:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6782F318125;
-	Thu, 13 Nov 2025 06:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58DF030215A;
+	Thu, 13 Nov 2025 06:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="dws0MKa6"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="rIUar83v"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B2A248F78;
-	Thu, 13 Nov 2025 06:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081E72D3A72;
+	Thu, 13 Nov 2025 06:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763014315; cv=none; b=ZQrMrkB3/xD3dXZ14eehjETEgIhH8kI9YyYh6rA07f/P5MQLrRtUcHjslj0sXKMbPCE8ZBDfz9zJ747vPUufMUUvQNHHLrrhcpMEdQr+Zq6sfUrd97UTA/XIXoiv1l5UbZoTrG4grsBuemphuXN/kr4E+FxBEcgQh/YBwuJ1h14=
+	t=1763015634; cv=none; b=RQHVx1khtbBHA140MmoVy8ZWZESK5sWKhrWadW38mD8tI5ZyGSNAadtmoedepG9F8XKCaMb0xS0k0ptC+V8z8nWCU96j30ModdwzIyszeUlxbW5yB+H2XZj1pddia9Aihf16YjMIAM/6cJlFU3s7VQS3Ee0ycDD67N7hOX42R/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763014315; c=relaxed/simple;
-	bh=p/TWKniXxrIJZEdQhWm4G+LdvQgEhk1yxaIw68uJ9wg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qGg2kaaILIiqZglyDMGL02ctMVCxP3nJ/WIQUpONFqu0FJyYqOFfI8NfpSKHSgiAzQvDa850DhTka4gZu3o3Oi+LuHpdp/9N/emzs10Cwqh/udjIRNSGKj4QG5D/aflqd4/GJfmS77jhXcg0mB9m6IxOyX/Y6wSc8712zSt1cjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=dws0MKa6; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=5I
-	hcpL6xwu4PKpV5NAlY7RI9Yz2lAk4ESMN0JSYms5o=; b=dws0MKa6RFeLyPmhGW
-	h0XColyo5kivmIEkNbl2f/LzhtreLRFGVGRv05kggsZuT3Do9QF65VPOO/8lLJ9q
-	51KtQw8YH0cXdQ9CQ51CoQnnFWqhwywC4Owx08sO9aaZ792xeEQbKn9swPKerydb
-	NdL6rTSd1rHw5e+2vrqmdSOIQ=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wCHt9uHdhVpWwU7DA--.291S2;
-	Thu, 13 Nov 2025 14:11:20 +0800 (CST)
-From: Gongwei Li <13875017792@163.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Gongwei Li <ligongwei@kylinos.cn>,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH v2 2/2] Bluetooth: Process Read Remote Version evt
-Date: Thu, 13 Nov 2025 14:11:17 +0800
-Message-Id: <20251113061117.114625-1-13875017792@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251112094843.173238-1-13875017792@163.com>
-References: <20251112094843.173238-1-13875017792@163.com>
+	s=arc-20240116; t=1763015634; c=relaxed/simple;
+	bh=rCLe+hr2Yusg3D9SBfWtSb9zi44W4nHl8ejnPsndC0E=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=vBHVTEZYx2WDSI15DwcsXDMNfM9Wncpnu+2PTSekTB/fe+Rmgur3O4eBbzWHxrQyqE0S5nOy+ftZoqV7kpr8zY6twM86YV6z+nGSVfFvFYi5CRcIlopXEY7MAUTRnxfJZw58xQao2h69afGIoQdVaa7cERbImL3MFg8bCiUJ/X8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=rIUar83v; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AD0Xp1f4073532;
+	Wed, 12 Nov 2025 22:33:29 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	PPS06212021; bh=CK9qGSXpWvfZuDgGicN0rtlYZMBHXlyWGYkxgH85G2g=; b=
+	rIUar83vqWyAXG8ZSCt2ZB/DPBqN/+U/vAbRf34EaYfhD4Dw+0sj+FZMNwMoM4Ic
+	/vDW/LYwdKXOG16dL6/GkagLEBubP8OVjpO2DCqsBJ48X1Eo3E8NQwRTy427cWK4
+	iL055KXu16laQQH9gZth6+54HxICXmHYqTeDrxXApYjUCOB/K32JEa8WfDUM4LEl
+	Px93/Mn9hscRNgyamXdvaJmSY2BVxVFpZkdZnL0EpRvr0V5UGyjaZJkdZ64MSiR1
+	vQHNDbteMrjZGSOXIqg4soERAk/hgFhatCT8mOgMVuIos17orblrxpZjJzvAtw0l
+	RDROQhL+PC2i0+dAiiHs0g==
+Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4aa2136sqm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 12 Nov 2025 22:33:29 -0800 (PST)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) by
+ ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Wed, 12 Nov 2025 22:33:28 -0800
+Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
+ ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server id
+ 15.1.2507.61 via Frontend Transport; Wed, 12 Nov 2025 22:33:26 -0800
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <lizhi.xu@windriver.com>
+CC: <dan.carpenter@linaro.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <horms@kernel.org>, <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <syzbot+2860e75836a08b172755@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: Re: [PATCH V4] netrom: Preventing the use of abnormal neighbor
+Date: Thu, 13 Nov 2025 14:33:25 +0800
+Message-ID: <20251113063325.1138331-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251029025904.63619-1-lizhi.xu@windriver.com>
+References: <20251029025904.63619-1-lizhi.xu@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,106 +75,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wCHt9uHdhVpWwU7DA--.291S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxGF1DZF43ArW5WFyDXFy3XFb_yoW5Cr48pa
-	98uasakrWrJrsIqr1xAay8Xan8Zwn7Way8K3y2q34fJwsYvrWktF4DCryjyry5ArWqqFy7
-	ZF1Utr1fWFyDGw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jvjgxUUUUU=
-X-CM-SenderInfo: rprtmlyvqrllizs6il2tof0z/1tbiXBkFumkVcAudwgAAsi
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEzMDA0MyBTYWx0ZWRfX31wMgDQZ78gZ
+ +G/QlkeQfhrCKQEA4aYpRhlGPxN0eZUrppG9wl24HVTXpdwVo53z8LwcvfCMYOaWOlwGlUxHy6j
+ obMs6tSpRvFmt//LysnoynM1sj+zWs6oJhmyQ9iqwl2rHQpXuAyBwjHQ/S0xm2qt2v0PEY9NSo9
+ tC6AQEGq8DczsShQjmiAE0zReYDGGQpy2J9yBbThqlq2rEGPzekbIPs9JJ2kBmsQJf13toY6pQH
+ Uh1C58t2pZPboFyV9hmCb6J7c61bxyojYx/gzmruj9lGIT9scMjUJ9rXm0DZX/U2z6Qng4st6WP
+ 5nzYW2sGPj92qxhtnWk7LSXoIHIyQmnsvh5xlyuH6jDvWfWLjOeegxsRGSzq3xF36eCQd1rru/3
+ mPuarR9CuRZOw1EKVyOIU3lWevqReA==
+X-Proofpoint-ORIG-GUID: FbHNTj-2p3VHIkuMwxWdA5NdTSBoVSUX
+X-Authority-Analysis: v=2.4 cv=XPA9iAhE c=1 sm=1 tr=0 ts=69157bb9 cx=c_pps
+ a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=t7CeM3EgAAAA:8 a=dZbOZ2KzAAAA:8
+ a=f1zZ7Z5adhlBXb41_NkA:9 a=FdTzh2GWekK77mhwV6Dw:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: FbHNTj-2p3VHIkuMwxWdA5NdTSBoVSUX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-12_06,2025-11-12_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 clxscore=1015 malwarescore=0 adultscore=0 bulkscore=0
+ phishscore=0 spamscore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511130043
 
-From: Gongwei Li <ligongwei@kylinos.cn>
+On Wed, 29 Oct 2025 10:59:04 +0800, Lizhi Xu wrote:
+> > > The root cause of the problem is that multiple different tasks initiate
+> > > SIOCADDRT & NETROM_NODE commands to add new routes, there is no lock
+> > > between them to protect the same nr_neigh.
+> > >
+> > > Task0 can add the nr_neigh.refcount value of 1 on Task1 to routes[2].
+> > > When Task2 executes nr_neigh_put(nr_node->routes[2].neighbour), it will
+> > > release the neighbour because its refcount value is 1.
+> > >
+> > > In this case, the following situation causes a UAF on Task2:
+> > >
+> > > Task0					Task1						Task2
+> > > =====					=====						=====
+> > > nr_add_node()
+> > > nr_neigh_get_dev()			nr_add_node()
+> > > 					nr_node_lock()
+> > > 					nr_node->routes[2].neighbour->count--
+> > > 					nr_neigh_put(nr_node->routes[2].neighbour);
+> > > 					nr_remove_neigh(nr_node->routes[2].neighbour)
+> > > 					nr_node_unlock()
+> > > nr_node_lock()
+> > > nr_node->routes[2].neighbour = nr_neigh
+> > > nr_neigh_hold(nr_neigh);								nr_add_node()
+> > > 											nr_neigh_put()
+> > > 											if (nr_node->routes[2].neighbour->count
+> > > Description of the UAF triggering process:
+> > > First, Task 0 executes nr_neigh_get_dev() to set neighbor refcount to 3.
+> > > Then, Task 1 puts the same neighbor from its routes[2] and executes
+> > > nr_remove_neigh() because the count is 0. After these two operations,
+> > > the neighbor's refcount becomes 1. Then, Task 0 acquires the nr node
+> > > lock and writes it to its routes[2].neighbour.
+> > > Finally, Task 2 executes nr_neigh_put(nr_node->routes[2].neighbour) to
+> > > release the neighbor. The subsequent execution of the neighbor->count
+> > > check triggers a UAF.
+> > 
+> > I looked at the code quite a bit and I think this could possibly avoid
+> > the above mentioned race, but this whole area looks quite confusing to me.
+> > 
+> > I think it would be helpful if you could better describe the relevant
+> > scenario starting from the initial setup (no nodes, no neighs).
+> OK. Let me fill in the origin of neigh.
+> 
+> Task3
+> =====
+> nr_add_node()
+> [146]if ((nr_neigh = kmalloc(sizeof(*nr_neigh), GFP_ATOMIC)) == NULL)
+> [253]nr_node->routes[2].neighbour = nr_neigh;
+> [255]nr_neigh_hold(nr_neigh);
+> [256]nr_neigh->count++;
+> 
+> neigh is created on line 146 in nr_add_node(), and added to node on
+> lines 253-256. It occurs before all Task0, Task1, and Task2.
+> 
+> Note:
+> 1. [x], x is line number.
+> 2. During my debugging process, I didn't pay attention to where the node
+> was created, and I apologize that I cannot provide the relevant creation
+> process.
+Hi everyone, 
+Today is my last day at WindRiver. Starting tomorrow, my email address
+lizhi.xu@windriver.com will no longer be used;
+I will use eadavis@qq.com thereafter.
 
-Add processing for HCI Process Read Remote Version event.
-Used to query the lmp version of remote devices.
-
-Signed-off-by: Gongwei Li <ligongwei@kylinos.cn>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
----
-v1->v2: Add bt_dev_dbg to print remote_ver
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_event.c        | 25 +++++++++++++++++++++++++
- net/bluetooth/mgmt.c             |  5 +++++
- 3 files changed, 31 insertions(+)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 9efdefed3..424349b74 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -750,6 +750,7 @@ struct hci_conn {
- 
- 	__u8		remote_cap;
- 	__u8		remote_auth;
-+	__u8		remote_ver;
- 
- 	unsigned int	sent;
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7c4ca14f1..762a3e58b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3738,6 +3738,28 @@ static void hci_remote_features_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_remote_version_evt(struct hci_dev *hdev, void *data,
-+				   struct sk_buff *skb)
-+{
-+	struct hci_ev_remote_version *ev = (void *)skb->data;
-+	struct hci_conn *conn;
-+
-+	bt_dev_dbg(hdev, "");
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-+	if (!conn)
-+		goto unlock;
-+
-+	conn->remote_ver = ev->lmp_ver;
-+
-+	bt_dev_dbg(hdev, "remote_ver 0x%2.2x", conn->remote_ver);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
- static inline void handle_cmd_cnt_and_timer(struct hci_dev *hdev, u8 ncmd)
- {
- 	cancel_delayed_work(&hdev->cmd_timer);
-@@ -7523,6 +7545,9 @@ static const struct hci_ev {
- 	/* [0x0b = HCI_EV_REMOTE_FEATURES] */
- 	HCI_EV(HCI_EV_REMOTE_FEATURES, hci_remote_features_evt,
- 	       sizeof(struct hci_ev_remote_features)),
-+	/* [0x0c = HCI_EV_REMOTE_VERSION] */
-+	HCI_EV(HCI_EV_REMOTE_VERSION, hci_remote_version_evt,
-+	       sizeof(struct hci_ev_remote_version)),
- 	/* [0x0e = HCI_EV_CMD_COMPLETE] */
- 	HCI_EV_REQ_VL(HCI_EV_CMD_COMPLETE, hci_cmd_complete_evt,
- 		      sizeof(struct hci_ev_cmd_complete), HCI_MAX_EVENT_SIZE),
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c11cdef42..9b8add6a2 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -9745,6 +9745,9 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
- {
- 	struct sk_buff *skb;
- 	struct mgmt_ev_device_connected *ev;
-+	struct hci_cp_read_remote_version cp;
-+
-+	memset(&cp, 0, sizeof(cp));
- 	u16 eir_len = 0;
- 	u32 flags = 0;
- 
-@@ -9791,6 +9794,8 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
- 	ev->eir_len = cpu_to_le16(eir_len);
- 
- 	mgmt_event_skb(skb, NULL);
-+
-+	hci_send_cmd(hdev, HCI_OP_READ_REMOTE_VERSION, sizeof(cp), &cp);
- }
- 
- static void unpair_device_rsp(struct mgmt_pending_cmd *cmd, void *data)
--- 
-2.25.1
-
+BR,
+Lizhi
 
