@@ -1,88 +1,129 @@
-Return-Path: <netdev+bounces-238425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3165C58ACA
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:22:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2075C58CE6
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:44:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F002935AF06
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 16:00:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9E05E4EBE7E
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 16:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3FD33587B2;
-	Thu, 13 Nov 2025 15:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C98A2F7ABA;
+	Thu, 13 Nov 2025 15:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="J7URCsAY"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FBB301711;
-	Thu, 13 Nov 2025 15:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70ED2F4A19;
+	Thu, 13 Nov 2025 15:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763049304; cv=none; b=m75iEo3oKbDE+xklqYdU7zNNrKW4/yvJsCtqjs33TPXov6amy0FiCuGdNQm+ygFu7tPTIerA7UumgKEdhnLslK82F3AubeQqwCe5Y/ur5MDDJTW+lNjBW4C2OfTBeAksyvprdSa/LqBVgSdMJeW9TRnJyF0FyoYs1yJfLaUWKm8=
+	t=1763049506; cv=none; b=edzVvkaZwJBuvPXCYQVqAjZxgQkEptT6OsDRo/rASu9GYb1khVX08lhXmin7mw0xIdOsBXsxvCldkWqj7ssViAJPv11mUHX1jQSue6HUcNRUMt736WwUaOzppWcSdzBgMYHfyYnKEXt3FGaK+rrYAV/sMeuOkKd6tkDZR4avl88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763049304; c=relaxed/simple;
-	bh=EjXSmLiUdXFBXpX5/NEfOVUg7CczcI2HaegUvvuil2k=;
+	s=arc-20240116; t=1763049506; c=relaxed/simple;
+	bh=NYeJSyKg8aRuFEhyCnL0JQc7N+mw1OvuhAKAZHnRiGU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oW3VjS1Tbd3BJv14CC0mwFZcJk58jTBzpA5y44+1CIVUrA30KIezpkP1jpo5R5QA+h9I+elNT0Avqac0t08lPfWC47s+Xz2UEIMSEmEfJHqtWogXQYlTBNENZ1ZTonVJkjSIjVYfDuVfFu+hSUcWqB3NRdhCJr1CZhRHMMDzdCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 621A86039D; Thu, 13 Nov 2025 16:55:00 +0100 (CET)
-Date: Thu, 13 Nov 2025 16:55:00 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Scott Mitchell <scott.k.mitch1@gmail.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, phil@nwl.cc,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] netfilter: nfnetlink_queue: optimize verdict lookup
- with hash table
-Message-ID: <aRX_VP61EqRM-8z7@strlen.de>
-References: <20251113153220.16961-1-scott_mitchell@apple.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pbHrLDccZluabgLgpX2v0IzSwza876Bo3pFpluz6uR2bP6b4p6jieSE7e7L9x9+D3n1cuqsDR/8Gcsq+b1X+J91fL83YU3umgIq6ODD0hH8i/gQChAIQsuGAQQP8CpItl05EapygzvreV8s7BebqVJ5EJuXaDVOoyat9shDKXio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=J7URCsAY; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=aWqMO5dgKynFXVsf0PHGotO7feJhY392/1Tkcj5y4X4=; b=J7URCsAY11Fgeyi5sgnO0X8T0v
+	DLtkvJJl3PyIkZ3+pQdqa5PD08pffN0ZsYf84O5wPEbDPpiWRbX+vKOEbp87LAFPiB/mZ3rOhRUev
+	wl/E73KkEUEJOW0cczLixDs89IGZapg8+t4mzKPDkp7aY+fu0dlQCpHoXtiBE7C0V33WqRqWR7Ina
+	pGBEbTpoHbR8kIAbT9jLtTXZHlosI5thcir0tsA3EceaS1T7Iz5jB9+WtF3oM79LWHPkzQX873kD2
+	U6e/ONoRJWyV2KMfNwpRVagYpVP1QRU/T0TRZyKfyznhdLSkKcCxnC3ab9fjEVPKPNTuo4mJ0PCIM
+	jRyeeBKw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59990)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vJZi5-000000005f9-20ny;
+	Thu, 13 Nov 2025 15:58:09 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vJZi1-000000004yz-1Tfu;
+	Thu, 13 Nov 2025 15:58:05 +0000
+Date: Thu, 13 Nov 2025 15:58:05 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: pcs: renesas,rzn1-miic:
+ Add renesas,miic-phylink-active-low property
+Message-ID: <aRYADfD8QkIw9Fnd@shell.armlinux.org.uk>
+References: <20251112201937.1336854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251112201937.1336854-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <aRTwz5QHq9U5QbQ-@ninjato>
+ <CA+V-a8s5fg02ZQT4tubJ46iBFtNXJRvTPp2DLJgeFnb3eMQPfg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251113153220.16961-1-scott_mitchell@apple.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+V-a8s5fg02ZQT4tubJ46iBFtNXJRvTPp2DLJgeFnb3eMQPfg@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Scott Mitchell <scott.k.mitch1@gmail.com> wrote:
-> +static int
-> +nfqnl_hash_resize(struct nfqnl_instance *inst, u32 hash_size)
-> +{
-> +	struct hlist_head *new_hash, *old_hash;
-> +	struct nf_queue_entry *entry;
-> +	unsigned int h, hash_mask;
-> +
-> +	hash_size = nfqnl_normalize_hash_size(hash_size);
-> +	if (hash_size == inst->queue_hash_size)
-> +		return 0;
-> +
-> +	new_hash = kvcalloc(hash_size, sizeof(*new_hash), GFP_KERNEL_ACCOUNT);
+On Thu, Nov 13, 2025 at 02:45:18PM +0000, Lad, Prabhakar wrote:
+> Hi Wolfram,
+> 
+> On Wed, Nov 12, 2025 at 8:40 PM Wolfram Sang
+> <wsa+renesas@sang-engineering.com> wrote:
+> >
+> > Hi Prabhakar,
+> >
+> > > Add the boolean DT property `renesas,miic-phylink-active-low` to the RZN1
+> >
+> > Hmm, we already have "renesas,ether-link-active-low" in
+> > renesas,ether.yaml and renesas,etheravb.yaml. Can't we reuse that?
+> >
+> On the RZ/N1x we have the below architecture
+> 
+>                                                       +----> Ethernet Switch
+>                                                       |           |
+>                                                       |           v
+>     MII Converter ----------------------+      GMAC (Synopsys IP)
+>                                                       |
+>                                                       +----> EtherCAT
+> Slave Controller
+>                                                       |
+>                                                       +----> SERCOS
+> Controller
 
-This doesn't work, please re-test with LOCKDEP enabled before sending
-next version.
+I'm not sure that diagram has come out correctly. If you're going to
+draw diagrams, make sure you do it using a fixed-width font. To me,
+it looks like the MII Converter is bolted to GMAC and only has one
+connection, and the GMAC has what seems to be maybe five connections.
 
-> +	inst->queue_hash = kvcalloc(hash_size, sizeof(*inst->queue_hash),
-> +				    GFP_KERNEL_ACCOUNT);
-
-.. and this doesn't work either, we are holding rcu read lock and
-the queue instance spinlock, so we cannot do a sleeping allocation.
-
-That said, I don't see a compelling reason why rcu read lock is held
-here, but resolving that needs prep work :-/
-
-So there are only two choices:
-1. add a prep patch that pushes the locks to where they are needed,
-   the rebase this patch on top
-2. use GFP_ATOMIC like in v1 and update comment to say that
-   GFP_KERNEL_ACCOUNT would need more work to place allocations
-   outside of the locks.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
