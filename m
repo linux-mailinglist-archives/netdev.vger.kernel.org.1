@@ -1,139 +1,154 @@
-Return-Path: <netdev+bounces-238296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E43D4C571ED
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:14:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EEE5C57257
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:21:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A0BD63436A0
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:11:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4CBF63445CD
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2502DF71D;
-	Thu, 13 Nov 2025 11:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90F2338900;
+	Thu, 13 Nov 2025 11:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="y742DFPU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="lule7x3c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5424335BC1
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 11:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35632D5C6C;
+	Thu, 13 Nov 2025 11:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763032294; cv=none; b=QYHmcM0+/WLvpmFGh+HTXQPBPLbWsw4bQP9OuTwMVwTFqEsCMrG7aosLJtJJCh88Vx6hfA4eOeJcXjBN7MN/7WvPG1aTs4fm8qS4ahFyLrS/fo9VYFGBhkuhwf9LMFtKllogBiD2pQMUAhe79R6LOVAbcLrb6UL4cM4idO3l2ng=
+	t=1763032879; cv=none; b=Edqnq74hyEISfnQf5Eivit3z4+eAjf2amgvW+sxVTXGST7oOssCt3f0J7bhemQA9uaoxYNxxGMNCMpJo0AVFhAgEk6/ISdKPdF8F6ZRF91U+XztVgIzOgQgmnT8SMuOMHV1awvczfcq9R+I3xbTbTe/4O0dfBl7e5aNHiZsjPXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763032294; c=relaxed/simple;
-	bh=OPicjN8qu+hvR6aCIzhEw7I+0bY8tCVqFQeoa5f2gCg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=gjgu8U1854lB25Co0528M0rVahdNVxjMfJeAjhQ7TqqQUVfZ1YZpxdcC9dkFDF72zOMFZS+iIEK9lOh6KGTDt2p1LETcRx/my6YqXRS1er1JBHBISS6xG6EgOYPXv/IeFnAdqjl094yPzrAaCMD2GayBHcEEKse/P0FqTMoKkrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=y742DFPU; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 0B98C4E41682;
-	Thu, 13 Nov 2025 11:11:29 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CCB7C6068C;
-	Thu, 13 Nov 2025 11:11:28 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 68623102F230B;
-	Thu, 13 Nov 2025 12:11:09 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763032273; h=from:subject:date:message-id:to:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=LOJb35hgkf2c9HwiLF/R5/wo9jrGPEQtQfpQyRGK1QM=;
-	b=y742DFPUBjB5daLlQ2ZQc+jNpE3X30+XaV+cmyOLcC8tWAUeb3RmwzR6ZL0iCULPwYKklb
-	bagCYbfP2QWcPOkBSoO/RyyZqIiJ3H5Qbs14eCVYgP91QvPkbWU4n+x4qV2nyeERwEM3KL
-	kqN/DHbmSElfIUGcQ6G8Ryp6XQcbM2G14lp4jmT6IyBLSjFk2mWr8nMJ7tYm3zJpzplSkR
-	1RlQ/+FMH9ApqR6Se6FIqEdyQAxfeBndj+dIxGJlzpG4QbaPMPNoL+t87y197LDFqohSop
-	MS+z6tZGUDE+SEqfipv7bBqb3R/MT9BGA8b+LCFa6PDBJEPNe80n/HwU4cjgKA==
-Message-ID: <843c25c6-dd49-4710-b449-b03303c7cf45@bootlin.com>
-Date: Thu, 13 Nov 2025 12:11:08 +0100
+	s=arc-20240116; t=1763032879; c=relaxed/simple;
+	bh=8CHqPv7wXWbkwcfY8JwF/tXEnpUTJdKgfHsxA2V8yvM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S+5oUR6inrcJsXL6TizNMgtPkXHy3etLyXWk8HRfi0f2whiw7T5vN23GhIEswSAU1kPA5F7YrdFX4l4no3i6JR0xSdW5eOwhWwOZtJaWg9Fk2bNQStb7eZ5ctYvHxyBKaUnpa09bxJdwQA06eqHRFoMM9DKNRg6jigv9D71Rj9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=lule7x3c; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=byDR1fe+RkZbydORahZWwZfPNqQzlEtpY91gu23avaI=; b=lule7x3colzf8Odh4dD0x9UGHv
+	z97LhXsxKEAAzbAH2RETlW3PakkbDniWny6bAs5HkJKq6Lw7V5pSxp+3Yen4Q4J3sSmtVCwoGxwpm
+	B5xX4ZealQMuNNDh85q3vXNkOB1UeZZkhlWSPjXHGBAV9XQxT0CyrFFKrHHTAGdnk9SLvxCWObbNK
+	M6cAuskheyMtRKCmaFL6ORtckmVPnC1x/vKRzmu1Z8J6qzcp6x+kB0aTMhTyQ2kKXF1qGFrpB152/
+	sZLpLLbUXFP3lT1EhHHNW1oFWhjhVkxrHKai5t1y3ZKkgu+0ppkyxepW/OXOieID5d8oHpgO4+tVa
+	Y+lfAm1w==;
+Received: from [122.175.9.182] (port=53373 helo=cypher.couthit.local)
+	by server.couthit.com with esmtpa (Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1vJVO7-0000000Geg5-0y02;
+	Thu, 13 Nov 2025 06:21:15 -0500
+From: Parvathi Pudi <parvathi@couthit.com>
+To: nm@ti.com,
+	vigneshr@ti.com,
+	afd@ti.com,
+	tony@atomide.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	richardcochran@gmail.com
+Cc: andrew@lunn.ch,
+	linux-omap@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	danishanwar@ti.com,
+	pratheesh@ti.com,
+	j-rameshbabu@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	krishna@couthit.com,
+	mohan@couthit.com,
+	pmohan@couthit.com,
+	basharath@couthit.com,
+	parvathi@couthit.com
+Subject: [PATCH v3 0/2] Add support for ICSSM Ethernet on AM57x, AM437x, and AM335x
+Date: Thu, 13 Nov 2025 16:46:01 +0530
+Message-ID: <20251113112049.676806-1-parvathi@couthit.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Ethtool: advance phy debug support
-To: Susheela Doddagoudar <susheelavin@gmail.com>, netdev@vger.kernel.org,
- mkubecek@suse.cz, Hariprasad Kelam <hkelam@marvell.com>,
- Andrew Lunn <andrew@lunn.ch>, Lee Trager <lee@trager.us>,
- Alexander Duyck <alexanderduyck@fb.com>
-References: <CAOdo=cNAy4kTrJ7KxEf2CQ_kiuR5sMD6jG3mJSFeSwqD6RdUtw@mail.gmail.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <CAOdo=cNAy4kTrJ7KxEf2CQ_kiuR5sMD6jG3mJSFeSwqD6RdUtw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
+X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
 Hi,
 
-On 13/11/2025 06:12, Susheela Doddagoudar wrote:
-> Hi All/ Michal Kubecek,
-> 
-> To support Advanced PHY Debug operations like
-> PRBS pattern tests,  EHM tests, TX_EQ settings, Various PHY loopback etc.....
+This series adds support for ICSSM Ethernet on Texas Instruments AM57x,
+AM437x and AM335x platforms.
 
-Added a bunch of people in CC:
+The AM57x and AM437x IDKs support two PRU-ICSS instances, each consisting
+of two PRU cores, with each PRU-ICSS instance capable of handling two
+Ethernet ports. For the AM57x platforms, the PRU-ICSS2 node has been added
+to the am57xx-idk-common.dtsi, while for the AM437x platform, the PRU-ICSS1
+node has been added to the am437x-idk-evm.dts.
 
-I don't have feedback on your current proposition, however people have
-showed interest in what you mention, it may be a good idea to get everyone
-in the loop.
+The AM335x ICE features a single PRU-ICSS instance. A new device tree overlay
+source file, am335x-icev2-prueth-overlay.dtso, has been introduced to define the
+PRU-ICSS node for the AM335x platform.
 
-For the Loopback you're mentionning, there's this effort here [1] that
-Hariprasad is working on, it may be a good idea to sync the effort :)
+This is v3 of the patch series [v1]. It addresses comments made on [v2].
+This series is based on the latest next-20251113 linux-next.
 
-[1] : https://lore.kernel.org/netdev/20251024044849.1098222-1-hkelam@marvell.com/
+Changes from v2 to v3 :
 
-As for the PRBS, there was a discussion on this at the last Netdevconf,
-see the slides and talk here [2], I've added Lee in CC but I don't
-really know what's the state of that work.
+*) Addressed Andrew Davis's comment by placing PRUETH nodes in a new overlay file
+am335x-icev2-prueth-overlay.dtso.
+*) Rebased the series on latest linux-next.
 
-[2] : https://netdevconf.info/0x19/sessions/talk/open-source-tooling-for-phy-management-and-testing.html
+Changes from v1 to v2 :
 
-Maxime
+*) Addressed Andrew Lunn's comment on patch 1 of the series.
+*) Addressed MD Danish Anwar comment on patch 1 of the series.
+*) Rebased the series on latest linux-next.
 
+[v1] https://lore.kernel.org/all/20251013125401.1435486-1-parvathi@couthit.com/
+[v2] https://lore.kernel.org/all/20251103124820.1679167-1-parvathi@couthit.com/
 
-> proposing a solution by custom ethtool extension implementation.
-> 
-> By enhancing below ethtool options
-> 1.ethtool --phy-statistics
-> 2.ethtool --set-phy-tunable
-> 3.ethtool --get-phy-tunable
-> 
-> Currently standard ethtool supports 3 parameters configuration with phy-tunables
-> that are defined in "include/uapi/linux/ethtool.h".
-> --------
-> enum phy_tunable_id {
->         ETHTOOL_PHY_ID_UNSPEC,
->         ETHTOOL_PHY_DOWNSHIFT,
->         ETHTOOL_PHY_FAST_LINK_DOWN,
->         ETHTOOL_PHY_EDPD,
->         /*
->          * Add your fresh new phy tunable attribute above and remember to update
->          * phy_tunable_strings[] in net/ethtool/common.c
->          */
->         __ETHTOOL_PHY_TUNABLE_COUNT,
-> };
-> 
-> 
-> Command example:
-> # Enable PRBS31 transmit pattern
-> ethtool --set-phy-tunable eth0 prbs on pattern 31
-> 
-> # Disable PRBS test
-> ethtool --set-phy-tunable eth0 prbs off
-> 
-> 
-> Let me know if the proposal is a feasible solution or any best
-> alternative options available.
-> 
-> Thanks,
-> Susheela
-> 
+Thanks and Regards,
+Parvathi.
+
+Roger Quadros (2):
+  arm: dts: ti: Adds device tree nodes for PRU Cores, IEP and eCAP
+    modules of PRU-ICSS2 Instance.
+  arm: dts: ti: Adds support for AM335x and AM437x
+
+ arch/arm/boot/dts/ti/omap/Makefile            |   5 +
+ .../ti/omap/am335x-icev2-prueth-overlay.dtso  | 190 ++++++++++++++++++
+ arch/arm/boot/dts/ti/omap/am33xx-l4.dtsi      |  11 +
+ arch/arm/boot/dts/ti/omap/am4372.dtsi         |  11 +
+ arch/arm/boot/dts/ti/omap/am437x-idk-evm.dts  | 137 ++++++++++++-
+ arch/arm/boot/dts/ti/omap/am57-pruss.dtsi     |  11 +
+ arch/arm/boot/dts/ti/omap/am571x-idk.dts      |   8 +-
+ arch/arm/boot/dts/ti/omap/am572x-idk.dts      |  10 +-
+ arch/arm/boot/dts/ti/omap/am574x-idk.dts      |  10 +-
+ .../boot/dts/ti/omap/am57xx-idk-common.dtsi   |  61 ++++++
+ 10 files changed, 444 insertions(+), 10 deletions(-)
+ create mode 100644 arch/arm/boot/dts/ti/omap/am335x-icev2-prueth-overlay.dtso
+
+-- 
+2.43.0
 
 
