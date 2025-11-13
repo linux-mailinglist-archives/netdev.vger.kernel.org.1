@@ -1,163 +1,253 @@
-Return-Path: <netdev+bounces-238381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E30D8C5804E
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:47:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F4ABC58024
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:46:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C2463AE867
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 14:39:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 930DF4E8173
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 14:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 683062C21D4;
-	Thu, 13 Nov 2025 14:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4306E2D1913;
+	Thu, 13 Nov 2025 14:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SRzAFso0";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="c8KpH4BD"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="GahRMcoJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83DC29B8E0
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 14:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AD42D027F
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 14:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763044784; cv=none; b=p1P/YrhxUSZw0H9cRnIVqLnW+LQBcgOOdpAdDmHR5F+YlCr1yinXqmlln+QaEUD0J7ecg7BpHab6128+Rc5U2KiRc2VL4tDC4w/Z2oMbJXZ0EGJb4+zl4Roam7KZcxb42Y1r/OKV23aS8qUbTpd2yXWgH55L3xzpkdJsqRtDRMY=
+	t=1763044805; cv=none; b=Io2WcINQiHdAqYu3ZeJGc240BbWc0ksvixY4oN/XX8WEnyLhJorPjJtLsAJEIi9t/wbEIZKxDw9xGLAYxqsWgv8yIyODuDHNhV4L+PfHWMe9W1oat0me5IfWlI41ceqhlDwQwJId1Mb3Uvk+NektVbgS87jdqKlzXAiTpcBfCZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763044784; c=relaxed/simple;
-	bh=WZlXUh05gtlAY7ujomAKuF63JeA7BJis07HZSFeJXuU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YR7Z7e/qCcNPFUIP2HP9ltZ7TgGNBtYuSVMWLy8UaTK7+6KChK5HH+mqxbxIsyIqjjzpv5iEM9L9KQCcCstZ1WqIo0P/Imhk6+XJIc0Mo66oVZ5lw8dWxUYSv2s6LtL9cgWP/aZU+OvRyc7yChUAnoPOqaW5WDgXsHM4c3mvrbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SRzAFso0; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=c8KpH4BD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763044780;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C6ZlE/8wFoMWAmPveb7rTnuh4QFvGSZOBJ0lkY75WHA=;
-	b=SRzAFso0iznnitrCamVClU22g2/R8Z+KUoJ5VWefviUDPXb26pn51mYc3oYpC1UagfEy8w
-	50vHkjmtfhCHzJzbrcvVXXfb/wgBQ4pPXyaMkg0G6SEuFgjWfBu5Z9zDSmZf7yHuD2QeBP
-	zGqlr92FlR1q8bfhz6U8gAuqq0GW2EY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-443-bfnNUj_9O2erBz5HBFmufA-1; Thu, 13 Nov 2025 09:39:39 -0500
-X-MC-Unique: bfnNUj_9O2erBz5HBFmufA-1
-X-Mimecast-MFC-AGG-ID: bfnNUj_9O2erBz5HBFmufA_1763044778
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-40cfb98eddbso956206f8f.0
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 06:39:39 -0800 (PST)
+	s=arc-20240116; t=1763044805; c=relaxed/simple;
+	bh=LghFzzgYBjyF4DUix/4QjpTX8Cu2IkIHbWjtdoIpPok=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SKw+smVU0/Xoiga5Couj4/N8VZECqM+A7I0BjcN/JgYdTRuQpeuF4x72Sg7QuwUynobIzdVtvr7eqCFGvdAv7FmUBNyMVVjQx+vCEFBbgR7vOHBAbC6H3FLqcfiQX4itYCDXuilqQRazVdc+MqAUmmpn6yYz0AG0jUoP8rC45Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=GahRMcoJ; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-37a2dced861so18517921fa.1
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 06:40:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763044778; x=1763649578; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C6ZlE/8wFoMWAmPveb7rTnuh4QFvGSZOBJ0lkY75WHA=;
-        b=c8KpH4BDQAzXj5yndotz6K96d36bDlywY87h0nqY5QMDRgFs5GAAAX/T5fp3feof2m
-         vkDWwEj2McYRXshkMgIgrF6DqeG7zD2XA05iT3stqcAXwW6WCRYM+0kAPYtn92HvvAYh
-         vLkgdE51I4CHzaCeCE1nEWA4jGpWObCVsKNqEDAEJjH4M+2r/cwboTG+UV/kTMfRaqP6
-         vBJprNV2pkb6ifPQgK6R5PwUsdKiSeuB4e7tJEEmqLDbiplnkWAjQUkeLeY/2h5z5WGn
-         u8O2UGmA2HNoUUA/nkHxqq3qdGrF1+oeb4PBKBLwsVfwMiyUDcRJIjNpsj1n6AP8ufub
-         NGFA==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1763044800; x=1763649600; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wl4571SxJAzignqkvu+iEEF0Pe+/jqH/UWVoWMdIiw4=;
+        b=GahRMcoJi3n7zVWIHvX+LiLzkfo+HKvHAaJJzWiW91ExIvEDeInJDw0hhQSvy3pJtB
+         74l030XK/02bd/yErd+bcq3e02xbBXSRPforr+q6sGYgacQoNvEUzRWVRDopRyCXKsx1
+         oHFFjHx3hfza3oim4JACBu6zmcWSsyUmjlBRtEkUjXvLGPWWM6dCRyfkT4VMovtJROJ5
+         K0iybyc9NVMDnAi50uSHZBJe/2N0t7foBl82mpQSQZSIgweyhgfogdl+OMijlZtN3NZ5
+         Lr2m2Ei+w+r7ncHV3yOHot/YFXNdp+z5dqjyFPr9JhEYQRRZWqiMvO30c7O9iI/98eL3
+         c2Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763044778; x=1763649578;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C6ZlE/8wFoMWAmPveb7rTnuh4QFvGSZOBJ0lkY75WHA=;
-        b=JGjlkVUqA3vJ/2gFOF1o6DQc32XNageLjs8cnr6BhDtfaVBd7X+acyW8y+xG7DJMF1
-         1Ze1azd/EZ/QcV8oqmuOFwJllzbp+wSEd94L+giNZyUXha5oXbD1aLlkF/eV949m5n4H
-         K08Gm7FIAjnbqpDOUE+7mMafSAwCqnk7SC9RdtXymEaWfOvkPTEjxVEt0NXj3n6juY8N
-         gItbKY+djBm5DPxbDJZWqtXFuV8e6wRuxJYNsGIHonwh1NWrjuTs0nZ07P/7K2OCuS3C
-         HmbKFDOGo6QHW8wKwlEMNBCqlBEE5eUiMgcEFFlysqfIfV++1EsPOfoRxL11VG0OYvNg
-         6tWA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTalOoNYyGdWel4TGCMWdy+YUBvnKn4rtVOEGTvnD26BvLPIaAHx9pT5TmWBmFqcYR/llz170=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4oobmq9xw6saNLfHnbo/rpIcf4cnIlpEyEc+Kf/u35jTFFKpl
-	6+oqGkllA96SpCO/b5UBg/9PeFC+kv0NMcsO17fvdiJDCWyXFu3Uvlp4mW9rerfFKfp1J49l9ZL
-	ZW7sDjvnhyawcXpSGv4uqbyPxPtotneK5iUJi9SOBB72TqblItVsFSSbLQA==
-X-Gm-Gg: ASbGncuHnT8Aj8rIyyiXt1eb0Uvadbj8lNR2iws+S2lVZi7tnxmrvnwBjb7MdKJA6lS
-	4na8zAtk4sAog0iPvmYL1zyKdVAuIm0W8VcNPyXP5b35Vow3d3SaMVrJPs+/9C/vnPtC/re/U8N
-	FidYPnIsfXRuSC9OLwrust11ekGGBAnwlYN/Kh9sf3UKIIvUe0wDvGIi57GAr4ANW34xi8y2K5L
-	SWWEJCPPtr1lmab69QMqnsNc2I+nup3ZwnE53nU1kOSsih+BEbVeBafv09t8LSd6eXQ3hyEkQXB
-	vo3pegbHmSHS8chwpTvMUXtHfkeyd0bsjHBL6mq09ARwrowbJmj1uBHoqcH2rrwgpfHIhBYCpek
-	KGPCFc1pBom8y
-X-Received: by 2002:a05:6000:2911:b0:429:cc35:7032 with SMTP id ffacd0b85a97d-42b52821778mr3447024f8f.23.1763044778211;
-        Thu, 13 Nov 2025 06:39:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGec5SZJzkrdZIMQyF+gi07hDcBuVbPd+9nb9X5ZfZ31kZtvs0xZMBq40lgAX06ufK4If5sPw==
-X-Received: by 2002:a05:6000:2911:b0:429:cc35:7032 with SMTP id ffacd0b85a97d-42b52821778mr3446995f8f.23.1763044777793;
-        Thu, 13 Nov 2025 06:39:37 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.55])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f29c5fsm4196462f8f.46.2025.11.13.06.39.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Nov 2025 06:39:37 -0800 (PST)
-Message-ID: <25b05194-63cd-4265-8d2c-e174d801fc3a@redhat.com>
-Date: Thu, 13 Nov 2025 15:39:35 +0100
+        d=1e100.net; s=20230601; t=1763044800; x=1763649600;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=wl4571SxJAzignqkvu+iEEF0Pe+/jqH/UWVoWMdIiw4=;
+        b=a6Lv3ml+jls5LJZrTZru5CpSlzAqz5RHty9Jl+Xcz5vwTakbddRvOIF+S/lomLB9nu
+         rhZSGOaPpLJOpCO303I+1SdcEVdpAcPrNLxD6AMjmpgWthuProhzluoNqjcONKaoyT8x
+         pjwut3O84g+gNU75YxEehAiGMYJ4dOuzw0lF/U1BgKzzdbFo20c/EKMYtYrIleSub5lS
+         we5lZ6NMaTcaosY3pja12jnofLzuadMhpnFJUguckTT08wEdqpsB0Y7Om9xU3tHbWQzE
+         5TMnqa3SToSv7A9sB1ZifhQhycRiCnTDso9oYrPlNbki+4o0SmOXFRneUikzHRQI2Z8i
+         YDXw==
+X-Forwarded-Encrypted: i=1; AJvYcCULGscwtcJ4gV/5QGNDPbB9P1cmyeTAzVoVFg1XwxS4p7dJ6r3FyJM7p0uUmPMfkpH4n67K/HM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1hccWTtgmGq4IvjaCOuXSXRaMaFkkOH3ZKT0ZK9TSrVjVNOmI
+	6mIgS4h93ZtNqUy0fBgYmpuTMLEpz/TxmmgGbqwWWrwv1lY+0oQ0RejjkwZZp6H4x2wc3QWrmia
+	g0tUP/7m9IsVzaJ5adJqeqlhPTwhMNslk0T0VWFKV6w==
+X-Gm-Gg: ASbGnctoIWxLDE43/G9Z954mh2Nyq88WDmiAsd34hl9ppxNhLmo6jV4z8DSs+lGWnER
+	D8ye9u/8mwbXfj0MlcZr9as66XMm2NPawweDYkSPysdMnPnOsTmZi8Mqivx71rUYn5MTILmrhz9
+	HNEAw7BGDXj8YyO4TBxO91airUk3SIWbHw5oG0eAtqxDUd74jlG8Fmc4i+XjQOAb85GfTbOS/dd
+	YI1LaFUsYP2kM1e+0DOSdyHyBQKRIFh28iw5LZuPVT5yam4mn/pKumODXeasvv7VAoDkHvRYh8V
+	UG0RMfRGyKrBztRa
+X-Google-Smtp-Source: AGHT+IHcp5RL49BzQ/EwQ2Jax7wwd/a8PEM1WoZpid3JGwwdtlpJzBmzwt/P9jvyh9TplD5Nus8fFpsIw/K4cuDWoP0=
+X-Received: by 2002:a05:6512:104f:b0:594:2876:c901 with SMTP id
+ 2adb3069b0e04-5957ececcc7mr1012811e87.25.1763044799557; Thu, 13 Nov 2025
+ 06:39:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v5 1/2] virtio-net: correct hdr_len handling for
- VIRTIO_NET_F_GUEST_HDRLEN
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Simon Horman <horms@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
- Alvaro Karsz <alvaro.karsz@solid-run.com>, linux-um@lists.infradead.org,
- virtualization@lists.linux.dev
-References: <20251111111212.102083-1-xuanzhuo@linux.alibaba.com>
- <20251111111212.102083-2-xuanzhuo@linux.alibaba.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251111111212.102083-2-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251107-qcom-sa8255p-emac-v5-0-01d3e3aaf388@linaro.org>
+ <20251107-qcom-sa8255p-emac-v5-8-01d3e3aaf388@linaro.org> <aRMiafCQNPVDOljU@horms.kernel.org>
+In-Reply-To: <aRMiafCQNPVDOljU@horms.kernel.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Thu, 13 Nov 2025 15:39:45 +0100
+X-Gm-Features: AWmQ_bmyO0__RPwdcHgOIMRaFCfnIoYFER6JzR_p2Qqf8fR68sQPWn6kw1o5zWY
+Message-ID: <CAMRc=MfEuAhichw-tPJkj_BKxy7AzvfmVJJyXzHsqa2wf=2EKw@mail.gmail.com>
+Subject: Re: [PATCH v5 8/8] net: stmmac: qcom-ethqos: add support for sa8255p
+To: Simon Horman <horms@kernel.org>
+Cc: Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Vinod Koul <vkoul@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Chen-Yu Tsai <wens@kernel.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Matthew Gerlach <matthew.gerlach@altera.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
+	Keguang Zhang <keguang.zhang@gmail.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Fabio Estevam <festevam@gmail.com>, Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com, 
+	Romain Gantois <romain.gantois@bootlin.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Chen Wang <unicorn_wang@outlook.com>, Inochi Amaoto <inochiama@gmail.com>, 
+	Emil Renner Berthing <kernel@esmil.dk>, Minda Chen <minda.chen@starfivetech.com>, 
+	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>, 
+	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
+	Maxime Ripard <mripard@kernel.org>, Shuang Liang <liangshuang@eswincomputing.com>, 
+	Zhi Li <lizhi2@eswincomputing.com>, Shangjuan Wei <weishangjuan@eswincomputing.com>, 
+	"G. Jaya Kumaran" <vineetha.g.jaya.kumaran@intel.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	Linux Team <linux-imx@nxp.com>, Frank Li <Frank.Li@nxp.com>, David Wu <david.wu@rock-chips.com>, 
+	Samin Guo <samin.guo@starfivetech.com>, 
+	Christophe Roullier <christophe.roullier@foss.st.com>, Swathi K S <swathi.ks@samsung.com>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, Drew Fustini <dfustini@tenstorrent.com>, 
+	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org, 
+	linux-mips@vger.kernel.org, imx@lists.linux.dev, 
+	linux-renesas-soc@vger.kernel.org, linux-rockchip@lists.infradead.org, 
+	sophgo@lists.linux.dev, linux-riscv@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/11/25 12:12 PM, Xuan Zhuo wrote:
-> The commit be50da3e9d4a ("net: virtio_net: implement exact header length
-> guest feature") introduces support for the VIRTIO_NET_F_GUEST_HDRLEN
-> feature in virtio-net.
-> 
-> This feature requires virtio-net to set hdr_len to the actual header
-> length of the packet when transmitting, the number of
-> bytes from the start of the packet to the beginning of the
-> transport-layer payload.
-> 
-> However, in practice, hdr_len was being set using skb_headlen(skb),
-> which is clearly incorrect. This commit fixes that issue.
-> 
-> Fixes: be50da3e9d4a ("net: virtio_net: implement exact header length guest feature")
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+On Tue, Nov 11, 2025 at 12:48=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> On Fri, Nov 07, 2025 at 11:29:58AM +0100, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> ...
+>
+> > +static int qcom_ethqos_pd_init(struct platform_device *pdev, void *pri=
+v)
+> > +{
+> > +     struct qcom_ethqos *ethqos =3D priv;
+> > +     int ret;
+> > +
+> > +     /*
+> > +      * Enable functional clock to prevent DMA reset after timeout due
+> > +      * to no PHY clock being enabled after the hardware block has bee=
+n
+> > +      * power cycled. The actual configuration will be adjusted once
+> > +      * ethqos_fix_mac_speed() is called.
+> > +      */
+> > +     ethqos_set_func_clk_en(ethqos);
+> > +
+> > +     ret =3D qcom_ethqos_domain_on(ethqos, ETHQOS_PD_CORE);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     ret =3D qcom_ethqos_domain_on(ethqos, ETHQOS_PD_MDIO);
+> > +     if (ret) {
+> > +             qcom_ethqos_domain_off(ethqos, ETHQOS_PD_CORE);
+> > +             return ret;
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static void qcom_ethqos_pd_exit(struct platform_device *pdev, void *da=
+ta)
+> > +{
+> > +     struct qcom_ethqos *ethqos =3D data;
+> > +
+> > +     qcom_ethqos_domain_off(ethqos, ETHQOS_PD_MDIO);
+> > +     qcom_ethqos_domain_off(ethqos, ETHQOS_PD_CORE);
+> > +}
+> > +
+> >  static void ethqos_ptp_clk_freq_config(struct stmmac_priv *priv)
+> >  {
+> >       struct plat_stmmacenet_data *plat_dat =3D priv->plat;
+>
+> ...
+>
+> > @@ -852,28 +993,63 @@ static int qcom_ethqos_probe(struct platform_devi=
+ce *pdev)
+> >       ethqos->rgmii_config_loopback_en =3D drv_data->rgmii_config_loopb=
+ack_en;
+> >       ethqos->has_emac_ge_3 =3D drv_data->has_emac_ge_3;
+> >       ethqos->needs_sgmii_loopback =3D drv_data->needs_sgmii_loopback;
+> > -
+> > -     ethqos->pm.link_clk =3D devm_clk_get(dev, clk_name);
+> > -     if (IS_ERR(ethqos->pm.link_clk))
+> > -             return dev_err_probe(dev, PTR_ERR(ethqos->pm.link_clk),
+> > -                                  "Failed to get link_clk\n");
+> > -
+> > -     ret =3D ethqos_clks_config(ethqos, true);
+> > -     if (ret)
+> > -             return ret;
+> > -
+> > -     ret =3D devm_add_action_or_reset(dev, ethqos_clks_disable, ethqos=
+);
+> > -     if (ret)
+> > -             return ret;
+> > -
+> > -     ethqos->pm.serdes_phy =3D devm_phy_optional_get(dev, "serdes");
+> > -     if (IS_ERR(ethqos->pm.serdes_phy))
+> > -             return dev_err_probe(dev, PTR_ERR(ethqos->pm.serdes_phy),
+> > -                                  "Failed to get serdes phy\n");
+> > -
+> > -     ethqos->set_serdes_speed =3D ethqos_set_serdes_speed_phy;
+> >       ethqos->serdes_speed =3D SPEED_1000;
+> > -     ethqos_update_link_clk(ethqos, SPEED_1000);
+> > +
+> > +     if (pm_data && pm_data->use_domains) {
+> > +             ethqos->set_serdes_speed =3D ethqos_set_serdes_speed_pd;
+> > +
+> > +             ret =3D devm_pm_domain_attach_list(dev, &pm_data->pd,
+> > +                                              &ethqos->pd.pd_list);
+> > +             if (ret < 0)
+> > +                     return dev_err_probe(dev, ret, "Failed to attach =
+power domains\n");
+> > +
+> > +             plat_dat->clks_config =3D ethqos_pd_clks_config;
+> > +             plat_dat->serdes_powerup =3D qcom_ethqos_pd_serdes_poweru=
+p;
+> > +             plat_dat->serdes_powerdown =3D qcom_ethqos_pd_serdes_powe=
+rdown;
+> > +             plat_dat->exit =3D qcom_ethqos_pd_exit;
+>
+> Hi Bartosz,
+>
+> It seems that the intention of this is to ensure
+> that domains turned on by qcom_ethqos_pd_init()
+> are turned off again on exit or clean-up in error paths.
+>
+> > +             plat_dat->init =3D qcom_ethqos_pd_init;
+> > +             plat_dat->clk_ptp_rate =3D pm_data->clk_ptp_rate;
+> > +
+> > +             ret =3D qcom_ethqos_pd_init(pdev, ethqos);
+> > +             if (ret)
+> > +                     return ret;
+>
+> And here those domains are turned on.
+>
+> > +
+> > +             ret =3D qcom_ethqos_domain_on(ethqos, ETHQOS_PD_SERDES);
+> > +             if (ret)
+>
+> But it seems that if we reach this error path then the cleanup is not
+> performed. This is because plat_dat and thus it's exit callback are
+> registered until the call to devm_stmmac_pltfr_probe() towards the end of
+> this function.
 
-IMHO this looks like more a new feature - namely,
-VIRTIO_NET_F_GUEST_HDRLEN support - than a fix.
+We can only reach this if devm_stmmac_pltfr_probe() fails. Yeah it
+probably warrants a devres action.
 
-[...]
-> @@ -2361,7 +2362,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
->  	if (vnet_hdr_sz &&
->  	    virtio_net_hdr_from_skb(skb, h.raw + macoff -
->  				    sizeof(struct virtio_net_hdr),
-> -				    vio_le(), true, 0)) {
-> +				    vio_le(), true, false, 0)) {
->  		if (po->tp_version == TPACKET_V3)
->  			prb_clear_blk_fill_status(&po->rx_ring);
->  		goto drop_n_account;
-To reduce the diffstat, what about creating a __virtio_net_hdr_from_skb()
-variant (please find a better name) allowing the extra `hdrlen_negotiated`
-argument, define virtio_net_hdr_from_skb() as a wrapper of such helper
-withthe extra arg == false, and use the helper in the few places that
-really could use hdrlen?
-
+Bartosz
 
