@@ -1,292 +1,182 @@
-Return-Path: <netdev+bounces-238479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D854C597A1
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 19:32:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E81F2C596F6
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 19:24:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B32704EA4CD
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:10:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34C473B960E
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5F8352933;
-	Thu, 13 Nov 2025 18:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79D963587A3;
+	Thu, 13 Nov 2025 18:17:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MFezV8W+"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Fx47icwP";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mk0LHyer"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAF626F2BB
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 18:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5585528150F
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 18:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763057438; cv=none; b=nqkMDAHrXGs+TrIxaVvNKZtussQ0vOt/Lu6wkg9fn9FhNmGLajH6145E7jHBqB1WiUrnGM1VvL4Oth9n2oli6YxY0zoHJ3G08l9hwgB1aWuSzD3bOyAAagi6sQustNHGpVp/JMBjaagt/W/k/yZ9F9ljQ7c5SNz2JMeNmomzsm4=
+	t=1763057851; cv=none; b=O8Z1YCYhx0TaKSE7aXynMrh7pJDJULmZ5wpkSdCjr1Z/p6qo5AGswLeioZ5wfllVID+vxVFzzxqfH0JTtAqvmQkjBwGj2n/0QrXt92etHiLgE/b3RZY6AXbNnBI5LeKtcPiMA1d2NejyZnZg2vZNZy0mff01ZEkJoAcfJKGB5dI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763057438; c=relaxed/simple;
-	bh=0QgMRtdD83RcFucBfkLS2hJinG0DlPzvPLvSV5Q4piU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tbBl39v5hbkGifeSIr4HsVc+qZz79M95sphdbij6JKSY7Q0eMC2D2DQRr2rUypXH7STTuufwrjng/HK5w0S0ChaC3cxJLGHUlOxnXsLw4l15hZGczaYfKT71tQ9nR+FeakO2mGsrYJLRRf/ankpIylnjbwRQDEJbER3hT+hAQtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MFezV8W+; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-641977dc00fso1717775a12.1
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:10:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763057434; x=1763662234; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=87BEAOUBPph3TzBH1vV5g7Ztob9f0IjgY5bWUM5E6Ww=;
-        b=MFezV8W+pt5tBxIuK/g45V+RUbRWbVTPNBLg0Ne5jnSJuOkLBbdksx0FCKLRfbExx1
-         VQ/v1VB1DRXebpofFXevV/mhJubLCJtuD15EATFBK5i/oGa5712pwTAey6Y9OdUPbQO6
-         RNmvysTfbIXdceE9dvzSyjZLLIQJQnLJ/6RXTNm2/l11qknZbfV/6My4MIk7qK36HfnB
-         +PAANYBZ0sANaIt8dRhHNh3LbqhQMdht4/U2L+fX6W1igZIK44PSPOaBHz/Or7XpGHVJ
-         gWKJ+AJZzfE1ZGwHMOj0o+2l9Ams8xDCi/1WhsY3brgXVbv85e2tXwXssS42io/BXT9H
-         QTOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763057434; x=1763662234;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=87BEAOUBPph3TzBH1vV5g7Ztob9f0IjgY5bWUM5E6Ww=;
-        b=fgXpk2DNmN1vrtZey56QcJb0u6BKUSlsCUp0i8VE5irdXQtwNr+zBJ9JGyVW+/u4Zr
-         WepYXXbCurcNhFrB/dy4OWyVi1sRgKEdG39hDgGim8XN9yjnwWMUmPuwlbhhudaSp5AL
-         orNPlIdQ6WcmxCKUEruoXzzDimj3dS8Bz1MTcS7iBsKYUZjS6vpdYStIHxk7/C0oDpx1
-         K8FtVBxBIeHHbH0nCztwPsKPLPtyOafMENOPrCUvtVBFB/exTZso9wmUY70gVEQpGCV6
-         V1e/GruiAOffsvR7BcaIqC0uPAgguR8BvdRbGHEVqjNWGStmUJqla/DvwYrREzLJc/hz
-         ZoMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUR1nVBFmpeGGe5ZT0Up4d7cJjvm0ynKwZSNGduerl8n9AqyqyKQvMdfv4WQQL4ctnPd6RQ0xE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPEfIPA3m5eGr5XM1RtPMYKBIaTerqbDEmXIqQ3054FWQjMSFN
-	n7Kpw7S5HjAu57iotDKfTtB/2rJBmkym10FlzzEy92nZXHdGEwU7qZc=
-X-Gm-Gg: ASbGncvkDCmrPjXkTrIfp7u4Irghf7RZPPtNQS0n5ff/aHWBWMjBkVMHTq33WQe1i4T
-	1PbCd7dHu71I6j+UDRUucCP8WOw98mI/mChsrw8tQy1Yl5/cAZ6KrF5g1l3nuMb1lodwhI3tSOm
-	BhLNc91fXR2ZSwho0OTj9cH7NG+pc6D8tCTqiJzBDfpY2giM1+i1O7Vu1mUGZJapkzTS+PsOXBA
-	6KrtAKOSGEevWBbmFldL2sBpiT1mT+Tm88t8XUw2aIuVqc03Cf4a4piZX740yLty/aPHHpnGiyU
-	GkoZNTUPCWhDVwAeERLZovpYWtf6awzZMTRxIZz8LjFu9eEHYoI6s6b3pY3n2kp+SVqMO0GzJcK
-	HBHbjZ1WM8rnq2f6HbID6rLWH2maWU2AaKC898jpQVcKF2pVrBRACZgM+RmbThCr/nWx8ftQ/QR
-	k/rXXpQn/exUoZQU7NkRovo1d4+c33RhniID8dNGWmR0KlcpPLUsw46UKut1GN6oK/Ba9r
-X-Google-Smtp-Source: AGHT+IGz29WAKXKe+U4nMt5douwl+2MqO7amrWJcnBL9iYqpI8wTmeKa4ANLVfbfh8GHVmaNVscELw==
-X-Received: by 2002:a17:907:78d:b0:b71:cec2:d54 with SMTP id a640c23a62f3a-b736796a61amr13099066b.57.1763057433996;
-        Thu, 13 Nov 2025 10:10:33 -0800 (PST)
-Received: from localhost ([2a02:810d:4a94:b300:bb0e:996a:397f:d689])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b734fd809fasm211020266b.45.2025.11.13.10.10.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Nov 2025 10:10:33 -0800 (PST)
-From: Florian Fuchs <fuchsfl@gmail.com>
-To: Geoff Levand <geoff@infradead.org>,
-	netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	Masakazu Mokuno <mokuno@sm.sony.co.jp>,
-	Jeff Garzik <jeff@garzik.org>,
-	fuchsfl@gmail.com
-Subject: [PATCH net v2] net: ps3_gelic_net: handle skb allocation failures
-Date: Thu, 13 Nov 2025 19:10:00 +0100
-Message-ID: <20251113181000.3914980-1-fuchsfl@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1763057851; c=relaxed/simple;
+	bh=A0NoIlVUmAL7gMLcBA4v0DgCh2ZRH4OMmaH7CnEyLiY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SShYSgz/+gr8TAk0fEfV1jXdP5LzNSEMDQ1xjNc2VWavvKtcElNEfAZ/oC3Dwu6lCYALunVUvu1JnLf88i1T0tZbL0hBwvrHr2Te5Cly0lRljG1JKaOdu7PMFAKWqfK1tfUl1Royl5rp2xgV2KimOJcCU6+CUQp8FCifQYxYhyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Fx47icwP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mk0LHyer; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 4EB2114001EA;
+	Thu, 13 Nov 2025 13:17:27 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Thu, 13 Nov 2025 13:17:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1763057847; x=1763144247; bh=JzGNxqJy/xHIW8t1Z4QVykQPySvfe71+
+	zRXYYiPnPiU=; b=Fx47icwPo7c6hXkuL6H77EQwptxNoUYdGr91lJPQ1eWwgvll
+	1ikct4CxFJXVhKVxEICzZnVUxvXGM49ocu6FBl/DbGohMHPqJdn519rACjsb7MIz
+	PVNCp+WY3zX7U+LmzA21SZHW+dTC7CGr0cvwIkK2g/yll0kqG5M6jOJrrir+jBYm
+	JXvZ0YiH8vSI3ae6GgNbKuhiyvMKh6uYNUtg1PZmgAtLHaVhA4cZ/+CgzE8+3SCT
+	08vMJ7eow2e3axqlRB1wIybGWvPWxMLhaNkmFK4X4CRTrEkY4lpY4EtBJ5WRSADX
+	uYD4mOMhuX1O1UnB7VDTmMrislUq8UTI4P0fEw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763057847; x=
+	1763144247; bh=JzGNxqJy/xHIW8t1Z4QVykQPySvfe71+zRXYYiPnPiU=; b=m
+	k0LHyerKnnEXsjld46FSJ2MEJINN9dzWF6XlBX9kArNzvRjNlOIWDEOq+cUi62XL
+	Rjvw+SUnC+C61nDlZJJL+okxvwKUnQDSQqNC+oSQMvfudGjTAUCrC31czYifrs/L
+	cfQo4K5qFX6UxJ1cJ6M0uloMyvK+sQXDP0apGqvMX3UuEZUUDUHlMaGHMEc8bqy5
+	Y+A6+f3MSe2dLClquCzp34QyXPc20RcO5ImgQguoJ4BLosTyf1HIv68CkyFnq1MN
+	tORIdVMkES0p0Fu/13P1qNK0F/v7p8eORynUlCDNJUMQv/FdnQWhKGROQy5lilnC
+	ZRaMwgCm9wFPitJGLxPmw==
+X-ME-Sender: <xms:tiAWaQxps9NfqSlo626iVFGnkrqruiS4LmU2w6-y3yCAqqOmrmqcQg>
+    <xme:tiAWaX_DRYqkrjKms1b9i22-SlY4Ih0rWcrGrHzu2aZvX9umR-Pzc2EGR2icPFF9I
+    7x45mhxUP9WjxWJQXvqFh7ZXQzhbIkEiXmq5j8lFKbrUGoJF6v691A>
+X-ME-Received: <xmr:tiAWacKxLzHGCdXEjvzi6L3zHsO70jetMswR4L6GVB8T6sN-boUTTbLsvMNz>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvtdejieegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
+    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
+    frrghtthgvrhhnpeevuddvtdevheetkedvieeugeehieevjeekteefgfeffeefjefgvdef
+    tdelueefgeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuih
+    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhl
+    rdhnvghtpdhnsggprhgtphhtthhopeeipdhmohguvgepshhmthhpohhuthdprhgtphhtth
+    hopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepmhhmihgvthhu
+    sheljeeshigrhhhoohdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrd
+    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegu
+    rghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvgh
+    gvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:tiAWaVdryMlyeLaly55ATzjxYF5y_AI0e_vOr1knH3IMbInTjOqxGg>
+    <xmx:tiAWaT-tb8eTfKbwV1LA5XNeThOAEYrL4F0UzT1EsUqZaLv-opiE2Q>
+    <xmx:tiAWaap8dye4DniTniwnFYiXHOZai0a8zdKQTM7YrvZJTepIYFvsPw>
+    <xmx:tiAWaQBHoY7Aj7bG6k0JjTfZapNHfzcpnLpVkVBusBxI0GCbaEAMaA>
+    <xmx:tyAWaZ3e4QhMefHVjhh06bT_KpIXuUGFEH-ZRaMHWM0EqcB-mvLGLP8X>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 13 Nov 2025 13:17:26 -0500 (EST)
+Date: Thu, 13 Nov 2025 19:17:24 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Marek Mietus <mmietus97@yahoo.com>, pabeni@redhat.com, kuba@kernel.org,
+	davem@davemloft.net, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 02/14] net: skb: use dstref for storing dst
+ entry
+Message-ID: <aRYgtN-nToS4MQ3r@krikkit>
+References: <20251112072720.5076-1-mmietus97@yahoo.com>
+ <20251112072720.5076-3-mmietus97@yahoo.com>
+ <aRS_SEUbglrR_MeX@krikkit>
+ <5af3e1bd-6b20-432b-8223-9302a8f9fe44@yahoo.com>
+ <CANn89i+qce6WJYUpjH93SMRKA8cQ6Wt-b81O6gu9V5GGnDeo_A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+qce6WJYUpjH93SMRKA8cQ6Wt-b81O6gu9V5GGnDeo_A@mail.gmail.com>
 
-Handle skb allocation failures in RX path, to avoid NULL pointer
-dereference and RX stalls under memory pressure. If the refill fails
-with -ENOMEM, complete napi polling and wake up later to retry via timer.
-Also explicitly re-enable RX DMA after oom, so the dmac doesn't remain
-stopped in this situation.
+Eric, it seems your email didn't make it to netdev, quoting:
 
-Previously, memory pressure could lead to skb allocation failures and
-subsequent Oops like:
+2025-11-13, 02:38:02 -0800, Eric Dumazet wrote:
+> On Thu, Nov 13, 2025 at 1:37 AM Marek Mietus <mmietus97@yahoo.com> wrote:
+> 
+> > W dniu 11/12/25 o 18:09, Sabrina Dubroca pisze:
+> > > 2025-11-12, 08:27:08 +0100, Marek Mietus wrote:
+> > >> Use the newly introduced dstref object for storing the dst entry
+> > >> in skb instead of using _skb_refdst, and remove code related
+> > >> to _skb_refdst.
+> > >
+> > > This is an important change to a very core part of networking. You
+> > > need to CC all the networking maintainers/reviewers for this series
+> > > (ask scripts/get_maintainer.pl).
+> >
+> > Noted for next time.
+> >
+> > >
+> > >> This is mostly a cosmetic improvement. It improves readability
+> > >
+> > > That rename, and the rest of the changes in this series. is causing
+> > > some non-negligible churn and will take a while to review, to ensure
+> > > all the conversions are correct.
+> > >
+> > > @Maintainers can I get some time to look at this in detail?
+> > >
+> >
+> > I figured it would require a thorough review.
+> > Thank you for taking the time to look at it!
+> >
+> > >
+> > > Also, I'm not sure how we ended up from the previous proposal ("some
+> > > tunnels are under RCU so they don't need a reference" [1]) to this.
+> > >
+> > > [1]
+> > https://lore.kernel.org/netdev/20250922110622.10368-1-mmietus97@yahoo.com/
+> > >
+> >
+> > As previously discussed with Jakub [2], tunnels that use
+> > udp_tunnel_dst_lookup
+> > add notable complexity because the returned dst could either be from
+> > ip_route_output_key (referenced) or from the dst_cache (which I'm changing
+> > to
+> > be noref). There are also other tunnels that follow a similar pattern.
 
-	Oops: Kernel access of bad area, sig: 11 [#2]
-	Hardware name: SonyPS3 Cell Broadband Engine 0x701000 PS3
-	NIP [c0003d0000065900] gelic_net_poll+0x6c/0x2d0 [ps3_gelic] (unreliable)
-	LR [c0003d00000659c4] gelic_net_poll+0x130/0x2d0 [ps3_gelic]
-	Call Trace:
-	  gelic_net_poll+0x130/0x2d0 [ps3_gelic] (unreliable)
-	  __napi_poll+0x44/0x168
-	  net_rx_action+0x178/0x290
+But IMO Jakub's comment about technical debt is not addressed by
+pushing dstref all over the tunnel code.
 
-Steps to reproduce the issue:
-	1. Start a continuous network traffic, like scp of a 20GB file
-	2. Inject failslab errors using the kernel fault injection:
-	    echo -1 > /sys/kernel/debug/failslab/times
-	    echo 30 > /sys/kernel/debug/failslab/interval
-	    echo 100 > /sys/kernel/debug/failslab/probability
-	3. After some time, traces start to appear, kernel Oopses
-	   and the system stops
 
-Step 2 is not always necessary, as it is usually already triggered by
-the transfer of a big enough file.
+> > The cleanest way to keep track of which dst is referenced and which isn't
+> > is to borrow existing refdst concepts. This allows us to more easily track
+> > the ref state of dst_entries in later flows to avoid unnecessarily taking
+> > a reference. I played around with a couple implementations and this turned
+> > out to be the most elegant. It's a big change, but it's mostly semantic.
+> >
+> > [2] https://lore.kernel.org/netdev/20250923184856.6cce6530@kernel.org/
+> 
+> 
+> I have not seen the series, so I had to go to the archives.
+> 
+> Too much code churn for my taste, and a true nightmare for future backports
+> to stable kernels.
+> 
+> Unless I am mistaken, this is your first submission to the linux kernel,
+> please start with more manageable patches.
 
-Fixes: 02c1889166b4 ("ps3: gigabit ethernet driver for PS3, take3")
-Signed-off-by: Florian Fuchs <fuchsfl@gmail.com>
----
-Changes v1->v2:
-- Rename and declare return value of gelic_descr_prepare_rx() in the top
-  of gelic_card_decode_one_descr() ret -> prepare_rx_ret
-- Invert the order of calls in gelic_card_down() run napi_disable()
-  first, then timer_delete_sync()
-- Remove useless kdoc from gelic_rx_oom_timer()
-- Fix gelic_net_poll() to reduce indentation level of success path
-
-v1: https://lore.kernel.org/linuxppc-dev/20251110114523.3099559-1-fuchsfl@gmail.com/
-
-Note: This change has been tested on real hardware Sony PS3 (CECHL04 PAL),
-the patch was tested for many hours, with continuous system load, high
-network transfer load and injected failslab errors.
-
- drivers/net/ethernet/toshiba/ps3_gelic_net.c | 45 +++++++++++++++-----
- drivers/net/ethernet/toshiba/ps3_gelic_net.h |  1 +
- 2 files changed, 35 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-index 5ee8e8980393..591866fc9055 100644
---- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-+++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-@@ -260,6 +260,7 @@ void gelic_card_down(struct gelic_card *card)
- 	if (atomic_dec_if_positive(&card->users) == 0) {
- 		pr_debug("%s: real do\n", __func__);
- 		napi_disable(&card->napi);
-+		timer_delete_sync(&card->rx_oom_timer);
- 		/*
- 		 * Disable irq. Wireless interrupts will
- 		 * be disabled later if any
-@@ -970,7 +971,8 @@ static void gelic_net_pass_skb_up(struct gelic_descr *descr,
-  * gelic_card_decode_one_descr - processes an rx descriptor
-  * @card: card structure
-  *
-- * returns 1 if a packet has been sent to the stack, otherwise 0
-+ * returns 1 if a packet has been sent to the stack, -ENOMEM on skb alloc
-+ * failure, otherwise 0
-  *
-  * processes an rx descriptor by iommu-unmapping the data buffer and passing
-  * the packet up to the stack
-@@ -981,16 +983,18 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
- 	struct gelic_descr_chain *chain = &card->rx_chain;
- 	struct gelic_descr *descr = chain->head;
- 	struct net_device *netdev = NULL;
--	int dmac_chain_ended;
-+	int dmac_chain_ended = 0;
-+	int prepare_rx_ret;
- 
- 	status = gelic_descr_get_status(descr);
- 
- 	if (status == GELIC_DESCR_DMA_CARDOWNED)
- 		return 0;
- 
--	if (status == GELIC_DESCR_DMA_NOT_IN_USE) {
-+	if (status == GELIC_DESCR_DMA_NOT_IN_USE || !descr->skb) {
- 		dev_dbg(ctodev(card), "dormant descr? %p\n", descr);
--		return 0;
-+		dmac_chain_ended = 1;
-+		goto refill;
- 	}
- 
- 	/* netdevice select */
-@@ -1048,9 +1052,10 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
- refill:
- 
- 	/* is the current descriptor terminated with next_descr == NULL? */
--	dmac_chain_ended =
--		be32_to_cpu(descr->hw_regs.dmac_cmd_status) &
--		GELIC_DESCR_RX_DMA_CHAIN_END;
-+	if (!dmac_chain_ended)
-+		dmac_chain_ended =
-+			be32_to_cpu(descr->hw_regs.dmac_cmd_status) &
-+			GELIC_DESCR_RX_DMA_CHAIN_END;
- 	/*
- 	 * So that always DMAC can see the end
- 	 * of the descriptor chain to avoid
-@@ -1062,10 +1067,11 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
- 	gelic_descr_set_status(descr, GELIC_DESCR_DMA_NOT_IN_USE);
- 
- 	/*
--	 * this call can fail, but for now, just leave this
--	 * descriptor without skb
-+	 * this call can fail, propagate the error
- 	 */
--	gelic_descr_prepare_rx(card, descr);
-+	prepare_rx_ret = gelic_descr_prepare_rx(card, descr);
-+	if (prepare_rx_ret)
-+		return prepare_rx_ret;
- 
- 	chain->tail = descr;
- 	chain->head = descr->next;
-@@ -1087,6 +1093,13 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
- 	return 1;
- }
- 
-+static void gelic_rx_oom_timer(struct timer_list *t)
-+{
-+	struct gelic_card *card = timer_container_of(card, t, rx_oom_timer);
-+
-+	napi_schedule(&card->napi);
-+}
-+
- /**
-  * gelic_net_poll - NAPI poll function called by the stack to return packets
-  * @napi: napi structure
-@@ -1099,14 +1112,22 @@ static int gelic_net_poll(struct napi_struct *napi, int budget)
- {
- 	struct gelic_card *card = container_of(napi, struct gelic_card, napi);
- 	int packets_done = 0;
-+	int work_result = 0;
- 
- 	while (packets_done < budget) {
--		if (!gelic_card_decode_one_descr(card))
-+		work_result = gelic_card_decode_one_descr(card);
-+		if (work_result != 1)
- 			break;
- 
- 		packets_done++;
- 	}
- 
-+	if (work_result == -ENOMEM) {
-+		napi_complete_done(napi, packets_done);
-+		mod_timer(&card->rx_oom_timer, jiffies + 1);
-+		return packets_done;
-+	}
-+
- 	if (packets_done < budget) {
- 		napi_complete_done(napi, packets_done);
- 		gelic_card_rx_irq_on(card);
-@@ -1576,6 +1597,8 @@ static struct gelic_card *gelic_alloc_card_net(struct net_device **netdev)
- 	mutex_init(&card->updown_lock);
- 	atomic_set(&card->users, 0);
- 
-+	timer_setup(&card->rx_oom_timer, gelic_rx_oom_timer, 0);
-+
- 	return card;
- }
- 
-diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.h b/drivers/net/ethernet/toshiba/ps3_gelic_net.h
-index f7d7931e51b7..c10f1984a5a1 100644
---- a/drivers/net/ethernet/toshiba/ps3_gelic_net.h
-+++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.h
-@@ -268,6 +268,7 @@ struct gelic_vlan_id {
- struct gelic_card {
- 	struct napi_struct napi;
- 	struct net_device *netdev[GELIC_PORT_MAX];
-+	struct timer_list rx_oom_timer;
- 	/*
- 	 * hypervisor requires irq_status should be
- 	 * 8 bytes aligned, but u64 member is
-
-base-commit: fe82c4f8a228d3b3ec2462ea2d43fa532a20ac67
 -- 
-2.43.0
-
+Sabrina
 
