@@ -1,165 +1,142 @@
-Return-Path: <netdev+bounces-238369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E73DAC57D2B
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:02:17 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A57B9C57D34
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:03:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1F4E1345FF6
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 13:57:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1F91F343CDE
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 13:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30114242D87;
-	Thu, 13 Nov 2025 13:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0997D23C8CD;
+	Thu, 13 Nov 2025 13:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b="K260DBP9"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Up4CoFQl";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HzDJcDNi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx13.kaspersky-labs.com (mx13.kaspersky-labs.com [91.103.66.164])
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F27D23AE62;
-	Thu, 13 Nov 2025 13:57:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.103.66.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D8320B81B
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 13:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763042272; cv=none; b=RSyk4IDJhxf2rLJRte44XzBQYvJ23tgoTvHG3aH90g9KXBo8IE7XBYfg4WVYqTtg5AvTJmL5zZu7DCTM/HHDEIdUKzEI5Tl5NN1aBSkEaw4BtIdCAX79jn3MrVyA8TsOkuAMz4P8hRpMP5dKgw8m4CF6H3XYNuEav2pwCamNQfE=
+	t=1763042308; cv=none; b=HuLK31xiheLmWsXbP9eAN4VacD6kBfk6U1X3/A0cfs4LBfAlEsfVk4aVUVmWe54EScSPWZEhKF39qQqbnhwHpJDnf1WBU17syZz4cZERpXcz0AEmmDQoi8DF9s3LODC7nH9cGgqd5vXS55gtGGC0kC2Hwi+b0HkxD+IfluZkBT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763042272; c=relaxed/simple;
-	bh=TD/yy2xrXMvZ/UI+lPd7eXy664hMoisCsg3sr+ZuWmU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UcxJaUy6Fci9/ygaDr+b/n4i+BrNCCigHnQmNNxvaCWIZNnQR5QObbLf0iPJc8TLwBqJGvMRDe1Si+PufFvH4VaOpxzDFsmnlsqlwdQne5Mryb9UTZ+cPrD5dKUCIY9QP0pJZEuPZB2zftTCBrsDYoJgEmjKse+nM8s+pxPpexQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com; spf=pass smtp.mailfrom=kaspersky.com; dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b=K260DBP9; arc=none smtp.client-ip=91.103.66.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaspersky.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-	s=mail202505; t=1763042267;
-	bh=C7sSsi1ZYZ1fTZwjIwsbLN3ukM79LfIrJOyPDTNA8ns=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=K260DBP99V+SBe1nd3wlqkVxXDoCqsHfqZkFR38at7MnC8NOcuRQz9oSQ6Fp2nzKZ
-	 sjBZKjS/6svh4UnDZbjtT6NK6JG4DxmLNtk3wZCWVLma5FgT9ryDWb8+RVBs6tGF5G
-	 S13wBOyPU00Ouo5hD+NTrHH4g0bfpsF3+RIo45ZOGhJoxY1GV5viEg42o3Azhh8ZvU
-	 AN41ZEtmo2bsGFsAi/Wmi97w9cTGbV+CMCs8nQTVSOAx8YL6BqILZVKPuVdhDpuC0f
-	 5T9hvnnvnup0LYKvogN/kkJotcqM+n7ibITVw4+fUDxWXz/EpNUknZ6nMOpwCEzujI
-	 BGAuiahHria7w==
-Received: from relay13.kaspersky-labs.com (localhost [127.0.0.1])
-	by relay13.kaspersky-labs.com (Postfix) with ESMTP id 1E2AC3E1D86;
-	Thu, 13 Nov 2025 16:57:47 +0300 (MSK)
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-	by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 4A8E03E2663;
-	Thu, 13 Nov 2025 16:57:46 +0300 (MSK)
-Received: from zhigulin-p.avp.ru (10.16.104.190) by HQMAILSRV2.avp.ru
- (10.64.57.52) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.29; Thu, 13 Nov
- 2025 16:57:45 +0300
-From: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
-To: Kurt Kanzenbach <kurt@linutronix.de>
-CC: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>, Andrew Lunn
-	<andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
-	<richardcochran@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH net] net: dsa: hellcreek: fix missing error handling in LED registration
-Date: Thu, 13 Nov 2025 16:57:44 +0300
-Message-ID: <20251113135745.92375-1-Pavel.Zhigulin@kaspersky.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1763042308; c=relaxed/simple;
+	bh=pz5KYoyDMNDddbP8jlD9cjDe8VPGmJ+oWOpNdsbh1LE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N353L9oWAYL+q55Rb9TXb5NRJrWLaforYuHJH4AwmXsSROQVlfE4apTBEltjKYLvXTLAWCBhcGEcvraX9gZsL5XdsuRiXo+Iq6SJ7Emhxi/vx1mawiElZufNEWem/uaitKzlo3PzU5UdCoQ5qcVIzksAQDn1sFl3HQBaUH6CbPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Up4CoFQl; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HzDJcDNi; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id D56051400290;
+	Thu, 13 Nov 2025 08:58:25 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Thu, 13 Nov 2025 08:58:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1763042305; x=
+	1763128705; bh=bGeBTJP2g90UEGJG0nBY039trOaI9HyJDqCuLHJnVGk=; b=U
+	p4CoFQlwCe3HW2e1NzHZBMFh0eVwbIUDCo5KTsZHsnS+ZGqIXSMQlW/EQAK5IOmM
+	lXp4VQsjFBGIH+18Xwaf95S2yQJEIJ5+pKv0tDDbJWd1/P1ZzmaICJVbpPMMg+Pa
+	qriyRVGJbgBN5sB7qVcjP4Q6kaaBx8KuLkwkD0SWSKNwBtZ/OjRkEG5u4S7JhYZ9
+	X+mTi0nHHyOa1SRhOi4z6j3fW0Sm051XbFQRs+bepaH54N3nkZE46ICzPhwUuqnY
+	+FoNpKu3ZkaXQxDJ5lREprqVpIMzwFS8hNocwrvynz5fs3fiia3iIztyZA9Hfyyn
+	hIK5opWv9Zo6/9vf6sL+A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1763042305; x=1763128705; bh=bGeBTJP2g90UEGJG0nBY039trOaI9HyJDqC
+	uLHJnVGk=; b=HzDJcDNi5K0rG8/uJGO/Nbt+tuvMh9EdzP9/Gs4YJL+1RI3a6u5
+	Ubp3SB050s9MgoGw+nfQqZZHiQjp9//AxC9kjJWHO+q4HHbvzQKdRc28L5h5zCYf
+	e49SEvNQZorcDNW9K1MXUjJ0IchOueZiyj7Ssdsyua0Xk4KaRQWU50TLr+YiratX
+	BXGfBkF6KCl+f4Lp8Gq5Xk9f7lwIF6Y66vurj8KJlIv6WAGOfF6620F2SIIpbF2f
+	dr1IPQJ+/n5DZajp0mmjqxEhJbt1TgQs5krkL4+YsxD5dknXD6Ja5auU8Z6QPg1z
+	fqo80aTv/r888KhHFmHme9Xx2Qp3yDhDqfA==
+X-ME-Sender: <xms:AeQVaUwNPh9kAmv5fSCF-06iv157VE0MXosuBbXox9ImNVJXiYPm0Q>
+    <xme:AeQVab8y3y4r3c9AoOM6vL7tvpsbby4mzkk0m1FlVfjhRj9d86RTgnbqsg8TTlJbZ
+    76dR-4grznjf478LJi3XyPGbPNZy5esuC18x2lfroTPL3xiya90sOJc>
+X-ME-Received: <xmr:AeQVaQKQdy9Co5Xvzq8ugL__gd6PYM_eqPh35-5FdTYtV5N2xg4XXPgUMDNz>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvtdejuddvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvg
+    htpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrg
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtgho
+    mhdprhgtphhtthhopehrrghlfhesmhgrnhguvghlsghithdrtghomh
+X-ME-Proxy: <xmx:AeQVaZeMDwOFiRKvTHJG8Z5cXme5V8OQepnya8eGMJyNN1yw8eoqwQ>
+    <xmx:AeQVaX9VmDm10T5mB8Eqzo33v6oMBwTuJnjlTH0mbEtVHrQ5USuktw>
+    <xmx:AeQVaeqf8OQudibUdgvYgacPJoQVqcx-S2iQ5tlrgj0bIDcv8kLD4w>
+    <xmx:AeQVaUDJ4A_dfQ1W6rB7-cu6WXGLzWWH6WUhr9ot0sPjwVuQFNTkUw>
+    <xmx:AeQVaQ7niMuQY2hze7xHx2KsF1wJpK2vnqT97HwlaX3QMEfMdibDkDH5>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 13 Nov 2025 08:58:24 -0500 (EST)
+Date: Thu, 13 Nov 2025 14:58:23 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ralf Lici <ralf@mandelbit.com>
+Subject: Re: [PATCH net-next 5/8] ovpn: add support for asymmetric peer IDs
+Message-ID: <aRXj_--Rbimt-5yL@krikkit>
+References: <20251111214744.12479-1-antonio@openvpn.net>
+ <20251111214744.12479-6-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: HQMAILSRV5.avp.ru (10.64.57.55) To HQMAILSRV2.avp.ru
- (10.64.57.52)
-X-KSE-ServerInfo: HQMAILSRV2.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 11/13/2025 13:38:54
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 198054 [Nov 13 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: Pavel.Zhigulin@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 76 0.3.76
- 6aad6e32ec76b30ee13ccddeafeaa4d1732eef15
-X-KSE-AntiSpam-Info: {Tracking_cluster_exceptions}
-X-KSE-AntiSpam-Info: {Tracking_real_kaspersky_domains}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: zhigulin-p.avp.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;kaspersky.com:7.1.1,5.0.1
-X-KSE-AntiSpam-Info: {Tracking_white_helo}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/13/2025 13:41:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/13/2025 11:57:00 AM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/11/13 09:15:00 #27919685
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 52
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251111214744.12479-6-antonio@openvpn.net>
 
-The LED setup routine registered both led_sync_good
-and led_is_gm devices without checking the return
-values of led_classdev_register(). If either registration
-failed, the function continued silently, leaving the
-driver in a partially-initialized state and leaking
-a registered LED classdev.
+2025-11-11, 22:47:38 +0100, Antonio Quartulli wrote:
+> From: Ralf Lici <ralf@mandelbit.com>
+> 
+> In order to support the multipeer architecture, upon connection setup
+> each side of a tunnel advertises a unique ID that the other side must
+> include in packets sent to them. Therefore when transmitting a packet, a
+> peer inserts the recipient's advertised ID for that specific tunnel into
+> the peer ID field. When receiving a packet, a peer expects to find its
+> own unique receive ID for that specific tunnel in the peer ID field.
+> 
+> Add support for the TX peer ID and embed it into transmitting packets.
+> If no TX peer ID is specified, fallback to using the same peer ID both
+> for RX and TX in order to be compatible with the non-multipeer compliant
+> peers.
+> 
+> Signed-off-by: Ralf Lici <ralf@mandelbit.com>
+> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+> ---
+>  Documentation/netlink/specs/ovpn.yaml | 17 ++++++++++++++++-
+>  drivers/net/ovpn/crypto_aead.c        |  2 +-
+>  drivers/net/ovpn/netlink-gen.c        | 13 ++++++++++---
+>  drivers/net/ovpn/netlink-gen.h        |  6 +++---
+>  drivers/net/ovpn/netlink.c            | 14 ++++++++++++--
+>  drivers/net/ovpn/peer.c               |  4 ++++
+>  drivers/net/ovpn/peer.h               |  4 +++-
+>  include/uapi/linux/ovpn.h             |  1 +
+>  8 files changed, 50 insertions(+), 11 deletions(-)
 
-Add proper error handling
+The patch looks ok, but shouldn't there be a selftest for this
+feature, and a few others in this series (bound device/address, maybe
+the RPF patch as well)?
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Fixes: 7d9ee2e8ff15 ("net: dsa: hellcreek: Add PTP status LEDs")
-Signed-off-by: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
----
- drivers/net/dsa/hirschmann/hellcreek_ptp.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/dsa/hirschmann/hellcreek_ptp.c b/drivers/net/dsa/hirschmann/hellcreek_ptp.c
-index bfe21f9f7dcd..cb23bea9c21b 100644
---- a/drivers/net/dsa/hirschmann/hellcreek_ptp.c
-+++ b/drivers/net/dsa/hirschmann/hellcreek_ptp.c
-@@ -376,8 +376,18 @@ static int hellcreek_led_setup(struct hellcreek *hellcreek)
- 		hellcreek_set_brightness(hellcreek, STATUS_OUT_IS_GM, 1);
-
- 	/* Register both leds */
--	led_classdev_register(hellcreek->dev, &hellcreek->led_sync_good);
--	led_classdev_register(hellcreek->dev, &hellcreek->led_is_gm);
-+	ret = led_classdev_register(hellcreek->dev, &hellcreek->led_sync_good);
-+	if (ret) {
-+		dev_err(hellcreek->dev, "Failed to register sync_good LED\n");
-+		goto out;
-+	}
-+
-+	ret = led_classdev_register(hellcreek->dev, &hellcreek->led_is_gm);
-+	if (ret) {
-+		dev_err(hellcreek->dev, "Failed to register is_gm LED\n");
-+		led_classdev_unregister(&hellcreek->led_sync_good);
-+		goto out;
-+	}
-
- 	ret = 0;
-
---
-2.43.0
-
+-- 
+Sabrina
 
