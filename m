@@ -1,144 +1,152 @@
-Return-Path: <netdev+bounces-238257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45308C5684A
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:13:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8177EC56876
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:15:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60CAD3AE2E6
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:13:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39E283AE487
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDD6C2D7394;
-	Thu, 13 Nov 2025 09:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8353929A33E;
+	Thu, 13 Nov 2025 09:15:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="js1Xtar+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KrN+bVY/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D4729ACC6;
-	Thu, 13 Nov 2025 09:12:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7393330B39
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 09:15:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763025174; cv=none; b=N/koSe17EfYxs//atk8KEInN+I0sbsabdcpi4aqYlGt6JMyDv73X4OmI4WBYbcL0Y7LspobO1jKOND+MkKtiN6kcLdbDcxxntPhuTJ1UCzCTG8bjAWtIfk9FDdgRaDKWMMj16vdr77yAej4ZTtQz5pyQsqyhurwy743qyMf5lik=
+	t=1763025305; cv=none; b=p7/HDbz2e2fqSyq62qVPSCEdrn9Mmk/Y+zlWHs2hTmIEsSU/QGwTNfw5iSZv+MA7gTlpSrx9fCfI5flLSuDIMPVLcHRyyrUpE+F2Y0WjYlzm9+Ih2J9eHclIurpXpau07CRr6uA8+gSHqhNe5O/9P0O3PTinPjfi/RDmMqzay6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763025174; c=relaxed/simple;
-	bh=Z5sCgPCZvSjgs/rZdisIFqpHsRyOQUvFSlrjPGt7aks=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dT2q4+SjXr1RuwdQnZJTGQW7Cdo5Sz+VMc0O5JkrzA0tvlvi1GKmKYFNPIvZyhVn2r3gf8JsqgxHzc/6eD+/jMPF8zqpKSESuEjJPCSbnK2CDkqJIAysvm4xWYzJ6ErWhLyVWhZwnar8kljeZuqegsUbFMVYHGICWLEl8E0Z1lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=js1Xtar+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8961FC116D0;
-	Thu, 13 Nov 2025 09:12:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763025174;
-	bh=Z5sCgPCZvSjgs/rZdisIFqpHsRyOQUvFSlrjPGt7aks=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=js1Xtar+fTSewmsuYTUDV0A10GwT1XwZRx6McGr5fuhCLx+B/K0lhzeuyv2ODyQ8j
-	 dzVDfodH2T1lzzzR+sFgCLZDevpZObzcriZtoI2WR99HzwPJaIBpMEy0AQ1VAcaxnj
-	 XfTge17udmZjuUktYV9iuV0hSYSgEVXueTxrPeZqNNaQLR6cqlcvzCoOULt5ArEyDx
-	 JyFojC1d1oVWBv7fI8DH7ghzws40fd9jgrwPycRAhHLKNg+ve3zsz3TZjloj6gTN3a
-	 NgQgsLYZx8Lcy8GkXyUAdfQKWPPpbV6+ue2pFBnhjlF7/Fev2DyP/9AiVG4/t6rcRt
-	 1fgoxerYV/+WA==
-Message-ID: <4f302c55-b0a2-46c0-8cd3-0eb7bb9bac86@kernel.org>
-Date: Thu, 13 Nov 2025 10:12:44 +0100
+	s=arc-20240116; t=1763025305; c=relaxed/simple;
+	bh=kb8GCBzISZxMBObnJYLcLo1xyRlhTxQlzt5p10iy9/8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Jl/8ZnELLk5Ec3zGsovH/NBZffkRMw2DTVC6kmp0xy/K3Yz9K8o3/ediHaV2Jea7QmDDgWpLQwMlpxl25WFTzCzHnp7nGEhJpD+Knn6uG7Cg39UjqDZ7rEGfgUde/UlykICYkBTDK+RtcRpEegR1K3wRwE554UNbxmCeJ0cRqik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KrN+bVY/; arc=none smtp.client-ip=209.85.222.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-9371aca0a4dso410204241.1
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 01:15:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763025303; x=1763630103; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S9KVozUkK/zJH0JaBiGr0HN/eCPVvCbe07YpCEdnuQg=;
+        b=KrN+bVY/dq99OhtAHYodpmFQIlE31s6hpnjCPIsWXhlRN87kjFkJp8w9wF1XlvOFZo
+         wkQuwTjv5GDKV45YZ168eoF/W7eizMjfjPH69fRpRxXRpbsKlyvTI+lhpkSAEtUP2un4
+         aSmPPWgG1Ed9OkiqvmiiXj3EDu/767C0K4/JNLd4aPh6fNzT7nrJBusvxfOkRcWUGrfO
+         4yAYJGEKxUfzEQbdyDMj9226dafz7+sMwGAQMRNg6bOEcL/Xy/5vGm8erJ9oT5wkLyh4
+         DHaEIGbIiuQ5qnwtomRS0i6gD77KV7SLm5l189HtSANk0qvvjkskXpgyt7DfLLBWoZEa
+         PYrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763025303; x=1763630103;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=S9KVozUkK/zJH0JaBiGr0HN/eCPVvCbe07YpCEdnuQg=;
+        b=AE7+RxKw2qaBQvzl5wEE5TExXZP7LHRnI3gvrQuLa9dgYz4zhq7KliAFowDVwim1wM
+         SLta2ckeTQFzwrUaUtgNE1WAcNZYV/b1PnUpEfkaZkmnhVM6i07x5BDCb69CuCQ6/QFI
+         E/p3RmLrnHBSa2zaMxoAQRTJVCYktXyQcLIp+SkvxA7idM5KMABnIWGE427DZtyd5OJX
+         G0Lr1GEKlF0ZeURkgsbt9ov8JJMxLzri+aI+pcl+Y85823H0KRCLuEADIqH1iB+dEGis
+         Jdf5x9tFgUiN/aFHtLJuAzsHUB3ZuaFbwx7+3oWzebcGDTyN8PQoRAvxxONe9uZ4UTkV
+         SEUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHDtG+7TWt8mqtaPwZKN7lHanITTPUU/A1WIUB+xMIxB2r3VtU7Qf5v2W+h3zL4Q0sth5kFZ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKPLDbpxOnTlI5AmnLTOZi7n69getLcZtMI4byoZccItlXLRrM
+	ZTC0CmCel9oPBj9OBwVpEiGViUeRS7G6Fs378/27EgxqBtfrsN0hOrLoQl8NNImmHD21ZoqtrDc
+	vU+xnkq8yF+0kNUFx+q0mCI6+BX+5HTQ3vtG+YXjiSQ==
+X-Gm-Gg: ASbGncveGJPYTpurvnz42aitJGu7kcWhCAWSjfmLUWZp6ABN3M6z2KG/X536MXytExI
+	0uaq5tSYrVtIzF9izdcrV1j7NzOBevnOp+LXEDDcnxyOUt3oeCeM2KS6nSKMXWotKp2w7bzslkQ
+	dmYjaR+Rj/RpRlsl4IzmQ9sM0BYKzluW156tVeCwsVxWqlIHvdXq+84pkbq9lsPDq/pFhXmdI5T
+	xrlGaGGeQ5BOSdjihaguyM9URM+xJxJ/UwFua0MMqW4DbtEcItqiJaq03vP
+X-Google-Smtp-Source: AGHT+IGCKlT8KlNNXDeE29mhTzV1PY6dXe3xu2it3WaIVDyYn0hULj3RhvJmaX44OFowRvQL1IhQ+AzGvfsm/iLeSEQ=
+X-Received: by 2002:a05:6102:374a:b0:5de:736:71d9 with SMTP id
+ ada2fe7eead31-5de07e15d59mr2473324137.28.1763025302810; Thu, 13 Nov 2025
+ 01:15:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v5 0/3] mptcp: Fix conflicts between MPTCP and sockmap
-Content-Language: en-GB, fr-BE
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, mptcp@lists.linux.dev,
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Christoph Paasch <cpaasch@apple.com>, Florian Westphal <fw@strlen.de>,
- Peter Krystad <peter.krystad@linux.intel.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20251111060307.194196-1-jiayuan.chen@linux.dev>
- <cf035c68-fe96-49e0-acdb-bf813ae71d57@kernel.org>
- <20251112182349.281a6a11@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20251112182349.281a6a11@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251112160333.30883-1-scott_mitchell@apple.com> <aRUT2PIAqo3VY9SJ@strlen.de>
+In-Reply-To: <aRUT2PIAqo3VY9SJ@strlen.de>
+From: Scott Mitchell <scott.k.mitch1@gmail.com>
+Date: Thu, 13 Nov 2025 01:14:52 -0800
+X-Gm-Features: AWmQ_bnfBe6KH2h_Rc9kOZTesdBr9bneRKpm-4Xm2O-RYSOUtmVGAZ2AtJRiAdk
+Message-ID: <CAFn2buBaQNSWtb8eU1Mwm-L2i2vaU4MVSjHi3OTwdd9ZyYx4RA@mail.gmail.com>
+Subject: Re: [PATCH] netfilter: nfnetlink_queue: optimize verdict lookup with
+ hash table
+To: Florian Westphal <fw@strlen.de>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, phil@nwl.cc, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Scott Mitchell <scott_mitchell@apple.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
+On Wed, Nov 12, 2025 at 3:10=E2=80=AFPM Florian Westphal <fw@strlen.de> wro=
+te:
+>
+> Scott Mitchell <scott.k.mitch1@gmail.com> wrote:
+> >  static inline u_int8_t instance_hashfn(u_int16_t queue_num)
+> >  {
+> >       return ((queue_num >> 8) ^ queue_num) % INSTANCE_BUCKETS;
+> > @@ -114,13 +153,63 @@ instance_lookup(struct nfnl_queue_net *q, u_int16=
+_t queue_num)
+> >       return NULL;
+> >  }
+> >
+> > +static int
+> > +nfqnl_hash_resize(struct nfqnl_instance *inst, u32 hash_size)
+> > +{
+> > +     struct hlist_head *new_hash, *old_hash;
+> > +     struct nf_queue_entry *entry;
+> > +     unsigned int h, hash_mask;
+> > +
+> > +     /* lock scope includes kcalloc/kfree to bound memory if concurren=
+t resizes.
+> > +      * lock scope could be reduced to exclude the  kcalloc/kfree at t=
+he cost
+> > +      * of increased code complexity (re-check of hash_size) and relax=
+ed memory
+> > +      * bounds (concurrent resize may each do allocations). since resi=
+ze is
+> > +      * expected to be rare, the broader lock scope is simpler and pre=
+ferred.
+> > +      */
+>
+> I'm all for simplicity. but I don't see how concurrent resizes are
+> possible.  NFQNL_MSG_CONFIG runs under nfnetlink subsystem mutex.
+>
+> Or did I miss something?
 
-On 13/11/2025 03:23, Jakub Kicinski wrote:
-> On Tue, 11 Nov 2025 11:35:04 +0100 Matthieu Baerts wrote:
->> I think this series can be applied directly in 'net', if that's OK for
->> both of you.
-> 
-> Also no preference here, Martin mentioned he will take it via bpf
-> tomorrow. 
-> 
-> Please let us know on the off chance that you have anything that may
-> conflict queued up. These will likely need a week of travel before 
-> they reach net in this case.
+This makes sense, and I will fix this.
 
-No problem for me, this can go to bpf-net first. We don't have pending
-patches modifying these parts.
+>
+> > +     new_hash =3D kcalloc(hash_size, sizeof(*new_hash), GFP_ATOMIC);
+>
+> Since the hash table could be large I would prefer if this could
+> be GFP_KERNEL_ACCOUNT + kvcalloc to permit vmalloc fallback.
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+Good feedback, done.
 
+>
+> > +     if (nfqa[NFQA_CFG_HASH_SIZE]) {
+> > +             hash_size =3D ntohl(nla_get_be32(nfqa[NFQA_CFG_HASH_SIZE]=
+));
+> > +     }
+>
+> Nit, no { } here.
+
+Fixed.
+
+Thanks for the review! I'll send v2 shortly.
 
