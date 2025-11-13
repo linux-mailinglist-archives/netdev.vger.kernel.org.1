@@ -1,411 +1,245 @@
-Return-Path: <netdev+bounces-238202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E133CC55E40
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 07:11:21 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A08C55E5E
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 07:14:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40DBC3A7B21
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 06:10:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E10F74E419B
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 06:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B08063164B1;
-	Thu, 13 Nov 2025 06:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849713161AA;
+	Thu, 13 Nov 2025 06:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TVqSNd4S"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="K7kVmzXE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAA2302CB1
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 06:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EDA23EA8B;
+	Thu, 13 Nov 2025 06:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763014246; cv=none; b=i1cQc6bVyuDrNKn+xU73NVgpkOuSj+XXb2LuUJBSVf+1qgomKOCJcaHJnPRGnuQ/w+MW8bfeH0QQO7SG0Hf5MbSk26u99j7f50NUCGJ8tKc/OUKYwuECx8+e47ymADv1BFV70lzpxQ5xK/YAzBZteKXA7YdZXP5J9iTfL/hPR7Q=
+	t=1763014313; cv=none; b=O0CGwSU4TjUrOT1ZFrTnAZTRPgCJ3CvSBoILcW3C1H38JJjYSocLVMDcJByXD+8bv9uMQKHl6ss9LFEk+odPTsJ4MhxD/omsh0ZEir1mDiqHt4mcnqLeXUCrPOGwwrPfOvEH0b8eSP0MBwCcH+kdPpowtQn16SVdlI7+z7x09ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763014246; c=relaxed/simple;
-	bh=JZgVvkmMqovaXMNVarstuvuRVnP6+Gz5DgI1eqaAwSY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mxpi40iO9tHyvDVQMMiNud0+/dyWrOf4I0mr2ujcIAS6hSUy18fMEUKKM26M9f7LeB437rXiRSsnie6rgkATcm8XVmwcpaPThqWVmbYZjLblI2p2L1rDItb+VlbwRgWt1qYn0VpRiCpaiT3lPE/95leubuB+aWmC2Fkj6Xen0vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TVqSNd4S; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-298145fe27eso4623605ad.1
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 22:10:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763014244; x=1763619044; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gW6r0ASCKhJNFYglngEFExHVzU4sK+KFa1j2mIqWseg=;
-        b=TVqSNd4Sj9961nj8iCyR9/BtFVZ+K0eI5yQEpgHjP0pAC+6T92Tbh+wxv3rcyim+A9
-         nDST8k+4BzESzDuixgdClboBasWuod9cmdr3qrc1sf/dxavZN0eXFJWSP7L9dyBuwRcD
-         ZU5LDkeAFvQq8kmWfDrSt68A4jk78OyqiFtoek2nrBtH3q6z2ARxVRsPsSgLxfGgvjWC
-         6Dbql7gVLR9AH6CTq94Dx4Rp8WIOC4DHzKnFSIxeqI8cvZpdhjMSnRzM3JrvIH8D62vG
-         3jGBU9UdQHzr/wh40OilDMhf/F4xhsYAFzUXtNpHB+ZOLyjnfxNC/9mzzeXIpiEQIczS
-         xOjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763014244; x=1763619044;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gW6r0ASCKhJNFYglngEFExHVzU4sK+KFa1j2mIqWseg=;
-        b=bl4W9SfBkUNOtALNS1udkhTWMOCtf1wzNGeyX3OuD2UJl0e4HFbYRJlL/vP2MH+cJT
-         GPThAvK/Zda9z5yiYC68yIb567mW6BGaHGZ5vmRW6X3Y8q6ax4o9CiMneT6S5AOFlDz0
-         wnme+ewoEc5W8Yoed0arqxYd/hDYwioD2VjsTSJHHq160WwxB/ey3IK5reGVaB6y3+Hf
-         OYWXLBb03KG0IDTCl0NljLQa/yCxmbKvRvKnD17mPy43ZrF5lcoiCtrZeqcfmtKtNGEd
-         cTNrzUhqUCNYa0jErjTsYHpNRar+pD0gvEbDHF8Z0YUF9WpzONcCcWGrHbCGPLAnQYLv
-         l+gQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVOGJjhmfNBAGaZKS5xY/i7UxGzr/5CMnlm2CbStk58pJuqjaw/wb3sZ3DIYC8iKVTZS41JNB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyher0KOV/rz/W7ZwKJzEVjhM8cWQgu+ybCx3KekSiWTpB7FIs+
-	elFkTIf8DC4auhAm2cWD9H63lJCrayRAfhvlJtjzZKM61b//m9TcXWlBcjgc+vH8kTkzdiFbfZw
-	KnC15hlv8ZCSnXDbfYkDhpwM8Y2jA7LPQWJKj4jKE
-X-Gm-Gg: ASbGncs9JDAo3Cxmbhq0WazU7E5qs+r19yKEHm/7MliMYfemD9BiFrxlC4iGJc3qF68
-	AdIgJayaOkBoT7Ruho2VIzt56lYCXegRnoad0/yfR7j7omEjhEa9Ued82im2N/KFIXvrPCXaRDs
-	EilzaM7qt9soKh1eL8olkbMysAGVflZmAfz/fNSy5xqizYlFY2B/njKjZU1kvmeFjIFX3iWVm03
-	oLmGKWWrmbp7OMeQqXnVL8vTfrMhqyg6fdHtJi3dK/6w/3yhSEFm04OgKnTutE7HlXkwMBuCAHS
-	ASPHsmo2LA/WbiYusosuGFksiNi5mPa1AJ0I/5k317DTX4P0MA==
-X-Google-Smtp-Source: AGHT+IEkpbg9A6bZTJrS46SXf+aXP4nce1dlZH6O6I47/5/6XJg9tT3U/fTcOgGzCwTT9hsNgmQrRgGWYCe/Vm0AYvo=
-X-Received: by 2002:a17:902:f684:b0:26a:8171:dafa with SMTP id
- d9443c01a7336-2984ed49524mr74640225ad.21.1763014243968; Wed, 12 Nov 2025
- 22:10:43 -0800 (PST)
+	s=arc-20240116; t=1763014313; c=relaxed/simple;
+	bh=iCQS1gx6YMd7NWCCEwr+9lUwMRBm3bMMcxD1i35iNg0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=panSPqyWwKlENZ7IxOo5IGjBiTujYLeMBep9rZy0l88EyPU/u3TmW6ajMT1rV9lRKEEh75nqWC4v70udU35HJ5nj8SgFisvWpGm1WS9WBjsGst7XHQjwlW5gnaCsXEr37DH5fJ+oRildjOCbLhGI5R/xwL+jum7qIBkOF0uJMCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=K7kVmzXE; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5ACKBMBa022431;
+	Thu, 13 Nov 2025 06:10:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=JtOZ/d
+	mz0spKmG8aZ1fFNGvOFsdNe4+rQ+N7TaW64ic=; b=K7kVmzXENpTAOs4cB0Vzsx
+	vBmpdwyQ0sUXQVr2hcK6ZoHkD+LF8u/gNiy6olIJiQk+7PeUr79CVw5gEOosSOYe
+	2CwaB7UkyRh/OelagtduAcZP/EGaaKcXbgQdYyR2ClWB6qkHXVNa2dp1JltAE/06
+	OwcxGuhWLR55TWYQ/3d6mMD2oL7bTFuM0k4hRJBtwGZi47I+u3pys0yXcV8KPETf
+	3W/p96A0Rb5bnQgqZ1iEA+COf0UQYATEQK4WxpVjarJ/OiSm0Rwyqz56A/w++lta
+	76k4e1mQypJJ5E3KVnGCFixiy1BghrCddjT/Vx/hlRzxp+r5JIKt5avhhLzOQTjg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5tk3sge-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Nov 2025 06:10:54 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5AD6As3p011705;
+	Thu, 13 Nov 2025 06:10:54 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5tk3sg7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Nov 2025 06:10:54 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AD4JFte014759;
+	Thu, 13 Nov 2025 06:10:53 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4aahpkc92f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Nov 2025 06:10:53 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AD6Aqu030671376
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 13 Nov 2025 06:10:53 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B544058057;
+	Thu, 13 Nov 2025 06:10:52 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 843E058058;
+	Thu, 13 Nov 2025 06:10:44 +0000 (GMT)
+Received: from [9.98.111.108] (unknown [9.98.111.108])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 13 Nov 2025 06:10:44 +0000 (GMT)
+Message-ID: <9f4e874a-89d0-4915-ac53-cf5449d9762b@linux.ibm.com>
+Date: Thu, 13 Nov 2025 11:40:42 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112212026.31441-1-adelodunolaoluwa.ref@yahoo.com>
- <20251112212026.31441-1-adelodunolaoluwa@yahoo.com> <CAAVpQUB97EBnTbA9pKwdhPM0pHadiM3QhP4_1qLSKGg2LAwzkA@mail.gmail.com>
- <295e5440-94eb-447f-b4f0-4943e9d02f1c@yahoo.com>
-In-Reply-To: <295e5440-94eb-447f-b4f0-4943e9d02f1c@yahoo.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 12 Nov 2025 22:10:32 -0800
-X-Gm-Features: AWmQ_blByZrqO_WYYCiP3ZG6rhHHMDnOi3dyaVAWeDKqTuxwCCMB3n-6ZZUHouo
-Message-ID: <CAAVpQUAyPwyG=aSnv-2w7g3dqhB3BLXGoo5VmbSNqQ0txpqqWQ@mail.gmail.com>
-Subject: Re: [PATCH v4] selftests: af_unix: Add tests for ECONNRESET and EOF semantics
-To: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
-	skhan@linuxfoundation.org, david.hunter.linux@gmail.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, 
-	linux-kernel-mentees@lists.linuxfoundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Nov 12, 2025 at 9:25=E2=80=AFPM Sunday Adelodun
-<adelodunolaoluwa@yahoo.com> wrote:
->
-> On 11/12/25 23:04, Kuniyuki Iwashima wrote:
-> > On Wed, Nov 12, 2025 at 1:20=E2=80=AFPM Sunday Adelodun
-> > <adelodunolaoluwa@yahoo.com> wrote:
-> >> Add selftests to verify and document Linux=E2=80=99s intended behaviou=
-r for
-> >> UNIX domain sockets (SOCK_STREAM and SOCK_DGRAM) when a peer closes.
-> >> The tests verify that:
-> >>
-> >>   1. SOCK_STREAM returns EOF when the peer closes normally.
-> >>   2. SOCK_STREAM returns ECONNRESET if the peer closes with unread dat=
-a.
-> >>   3. SOCK_SEQPACKET returns EOF when the peer closes normally.
-> >>   4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unread =
-data.
-> >>   5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
-> >>
-> >> This follows up on review feedback suggesting a selftest to clarify
-> >> Linux=E2=80=99s semantics.
-> >>
-> >> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-> >> Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-> >> ---
-> >>   tools/testing/selftests/net/.gitignore        |   1 +
-> >>   tools/testing/selftests/net/af_unix/Makefile  |   1 +
-> >>   .../selftests/net/af_unix/unix_connreset.c    | 178 ++++++++++++++++=
-++
-> >>   3 files changed, 180 insertions(+)
-> >>   create mode 100644 tools/testing/selftests/net/af_unix/unix_connrese=
-t.c
-> >>
-> >> diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/se=
-lftests/net/.gitignore
-> >> index 439101b518ee..e89a60581a13 100644
-> >> --- a/tools/testing/selftests/net/.gitignore
-> >> +++ b/tools/testing/selftests/net/.gitignore
-> >> @@ -65,3 +65,4 @@ udpgso
-> >>   udpgso_bench_rx
-> >>   udpgso_bench_tx
-> >>   unix_connect
-> >> +unix_connreset
-> >> diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/test=
-ing/selftests/net/af_unix/Makefile
-> >> index de805cbbdf69..5826a8372451 100644
-> >> --- a/tools/testing/selftests/net/af_unix/Makefile
-> >> +++ b/tools/testing/selftests/net/af_unix/Makefile
-> >> @@ -7,6 +7,7 @@ TEST_GEN_PROGS :=3D \
-> >>          scm_pidfd \
-> >>          scm_rights \
-> >>          unix_connect \
-> >> +       unix_connreset \
-> >>   # end of TEST_GEN_PROGS
-> >>
-> >>   include ../../lib.mk
-> >> diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/to=
-ols/testing/selftests/net/af_unix/unix_connreset.c
-> >> new file mode 100644
-> >> index 000000000000..9413f8a0814f
-> >> --- /dev/null
-> >> +++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
-> >> @@ -0,0 +1,178 @@
-> >> +// SPDX-License-Identifier: GPL-2.0
-> >> +/*
-> >> + * Selftest for AF_UNIX socket close and ECONNRESET behaviour.
-> >> + *
-> >> + * This test verifies:
-> >> + *  1. SOCK_STREAM returns EOF when the peer closes normally.
-> >> + *  2. SOCK_STREAM returns ECONNRESET if peer closes with unread data=
-.
-> >> + *  3. SOCK_SEQPACKET returns EOF when the peer closes normally.
-> >> + *  4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unre=
-ad data.
-> >> + *  5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
-> >> + *
-> >> + * These tests document the intended Linux behaviour.
-> >> + *
-> >> + */
-> >> +
-> >> +#define _GNU_SOURCE
-> >> +#include <stdlib.h>
-> >> +#include <string.h>
-> >> +#include <fcntl.h>
-> >> +#include <unistd.h>
-> >> +#include <errno.h>
-> >> +#include <sys/socket.h>
-> >> +#include <sys/un.h>
-> >> +#include "../../kselftest_harness.h"
-> >> +
-> >> +#define SOCK_PATH "/tmp/af_unix_connreset.sock"
-> >> +
-> >> +static void remove_socket_file(void)
-> >> +{
-> >> +       unlink(SOCK_PATH);
-> >> +}
-> >> +
-> >> +FIXTURE(unix_sock)
-> >> +{
-> >> +       int server;
-> >> +       int client;
-> >> +       int child;
-> >> +};
-> >> +
-> >> +FIXTURE_VARIANT(unix_sock)
-> >> +{
-> >> +       int socket_type;
-> >> +       const char *name;
-> >> +};
-> >> +
-> >> +FIXTURE_VARIANT_ADD(unix_sock, stream) {
-> >> +       .socket_type =3D SOCK_STREAM,
-> >> +       .name =3D "SOCK_STREAM",
-> >> +};
-> >> +
-> >> +FIXTURE_VARIANT_ADD(unix_sock, dgram) {
-> >> +       .socket_type =3D SOCK_DGRAM,
-> >> +       .name =3D "SOCK_DGRAM",
-> >> +};
-> >> +
-> >> +FIXTURE_VARIANT_ADD(unix_sock, seqpacket) {
-> >> +       .socket_type =3D SOCK_SEQPACKET,
-> >> +       .name =3D "SOCK_SEQPACKET",
-> >> +};
-> >> +
-> >> +FIXTURE_SETUP(unix_sock)
-> >> +{
-> >> +       struct sockaddr_un addr =3D {};
-> >> +       int err;
-> >> +
-> >> +       addr.sun_family =3D AF_UNIX;
-> >> +       strcpy(addr.sun_path, SOCK_PATH);
-> >> +       remove_socket_file();
-> >> +
-> >> +       self->server =3D socket(AF_UNIX, variant->socket_type, 0);
-> >> +       ASSERT_LT(-1, self->server);
-> >> +
-> >> +       err =3D bind(self->server, (struct sockaddr *)&addr, sizeof(ad=
-dr));
-> >> +       ASSERT_EQ(0, err);
-> >> +
-> >> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> >> +               err =3D listen(self->server, 1);
-> >> +               ASSERT_EQ(0, err);
-> >> +       }
-> >> +
-> >> +       self->client =3D socket(AF_UNIX, variant->socket_type | SOCK_N=
-ONBLOCK, 0);
-> >> +       ASSERT_LT(-1, self->client);
-> >> +
-> >> +       err =3D connect(self->client, (struct sockaddr *)&addr, sizeof=
-(addr));
-> >> +       ASSERT_EQ(0, err);
-> >> +}
-> >> +
-> >> +FIXTURE_TEARDOWN(unix_sock)
-> >> +{
-> >> +       if ((variant->socket_type =3D=3D SOCK_STREAM ||
-> >> +            variant->socket_type =3D=3D SOCK_SEQPACKET) & self->child=
- > 0)
-> >> +               close(self->child);
-> >> +
-> >> +       close(self->client);
-> >> +       close(self->server);
-> >> +       remove_socket_file();
-> >> +}
-> >> +
-> >> +/* Test 1: peer closes normally */
-> >> +TEST_F(unix_sock, eof)
-> >> +{
-> >> +       char buf[16] =3D {};
-> >> +       ssize_t n;
-> >> +
-> >> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> >> +               self->child =3D accept(self->server, NULL, NULL);
-> >> +               ASSERT_LT(-1, self->child);
-> >> +
-> >> +               close(self->child);
-> >> +       } else {
-> >> +               close(self->server);
-> >> +       }
-> >> +
-> >> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> >> +
-> >> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> >> +               ASSERT_EQ(0, n);
-> >> +       } else {
-> >> +               ASSERT_EQ(-1, n);
-> >> +               ASSERT_EQ(EAGAIN, errno);
-> >> +       }
-> >> +}
-> >> +
-> >> +/* Test 2: peer closes with unread data */
-> >> +TEST_F(unix_sock, reset_unread_behavior)
-> >> +{
-> >> +       char buf[16] =3D {};
-> >> +       ssize_t n;
-> >> +
-> >> +       if (variant->socket_type =3D=3D SOCK_DGRAM) {
-> >> +               /* No real connection, just close the server */
-> >> +               close(self->server);
-> >> +       } else {
-> >> +               /* Establish full connection first */
-> >> +               self->child =3D accept(self->server, NULL, NULL);
-> >> +               ASSERT_LT(-1, self->child);
-> >> +
-> >> +               /* Send data that will remain unread */
-> >> +               send(self->client, "hello", 5, 0);
-> > Could you move this send() before "if (...)" because we want
-> > to test unread_data behaviour for SOCK_DGRAM too ?
-> >
-> > Otherwise looks good, so with that fixed:
-> >
-> > Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-> >
-> > Thanks!
-> Thank you for the prompt response.
-> I thought of putting the send before the if the statement , but I was afr=
-aid
-> STREAM and SEQPACKET connections won't be accepted before data sending.
-
-connect() create the paired child socket and accept()
-allocates a file descriptor to expose the socket to user
-space.
-
-In that sense, the comment above accept() sounds a
-bit weird ;)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 00/10] powerpc: Implement masked user access
+To: Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Darren Hart <dvhart@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Andre Almeida <andrealmeid@igalia.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Eric Dumazet
+ <edumazet@google.com>,
+        Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemb@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+References: <cover.1762427933.git.christophe.leroy@csgroup.eu>
+Content-Language: en-US
+From: Madhavan Srinivasan <maddy@linux.ibm.com>
+In-Reply-To: <cover.1762427933.git.christophe.leroy@csgroup.eu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: HVKkNxiAx95Rq8CP36ofSk3CJYBVK6my
+X-Proofpoint-ORIG-GUID: dgdJ4fXrU_mvZFiHm7cFP_2C6pdTVRM3
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA5OSBTYWx0ZWRfX4lpCBSV1cTL/
+ gwJxVyQE+tTTZzL6R0egp/xZXaGMZN1L8r0JkR2Wgnb5rfUq7dRQ/b/2QTHBLQevRndGhpydvkx
+ txg70WPnH6kM2X+k/cGoW4kJMDJCJ6hQtZwvBPeMT7mj+8W5aR9knFnspqiPadwYcl2e9cGmJ7L
+ 420jr32HT5TA+24dIv7sdQ/oLO5xT9Lg/i8hDsjaxCQiuBLPboKDiURJwCS8f8qHl/ibHzxEgb9
+ VTJVk9U3grbyyAfjjR6eQFV9kElUu+RZSI2CGCtyuusBqu8y9yLOFOG2kt94xFKhyuzJekCbrEB
+ /F65PGEQJIIZHOblh2TwAdSPRmMIS+aolp5MtsT9Vh/F3DLLlGiMLgSzsUROZ4nfpsWlRB+XPFt
+ kG7crPwyUV2U5VxLNkthMWVojLZSfg==
+X-Authority-Analysis: v=2.4 cv=V6xwEOni c=1 sm=1 tr=0 ts=6915766e cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=paD_15X78B_6zWkLfEcA:9 a=QEXdDO2ut3YA:10 a=nl4s5V0KI7Kw-pW0DWrs:22
+ a=pHzHmUro8NiASowvMSCR:22 a=xoEH_sTeL_Rfw54TyV31:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-12_06,2025-11-12_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 lowpriorityscore=0 adultscore=0 malwarescore=0 impostorscore=0
+ suspectscore=0 priorityscore=1501 phishscore=0 bulkscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080099
 
 
->
-> I will start working on v5.
->
-> That part will look like this now:
-> /* Test 2: peer closes with unread data */
-> TEST_F(unix_sock, reset_unread_behavior)
-> {
->          char buf[16] =3D {};
->          ssize_t n;
->
-> */* Send data that will remain unread */
->          send(self->client, "hello", 5, 0);*
->
-> *if (variant->socket_type =3D=3D SOCK_DGRAM) {
->                  /* No real connection, just close the server */
->                  close(self->server);
->          } else {
->                  /* Establish full connection first */
->                  self->child =3D accept(self->server, NULL, NULL);
->                  ASSERT_LT(-1, self->child);
->
->                  /* Peer closes before client reads */
->                  close(self->child);
->          }*
->
->          n =3D recv(self->client, buf, sizeof(buf), 0);
->          ASSERT_EQ(-1, n);
->
->          if (variant->socket_type =3D=3D SOCK_STREAM ||
->              variant->socket_type =3D=3D SOCK_SEQPACKET) {
->                  ASSERT_EQ(ECONNRESET, errno);
->          } else {
->                  ASSERT_EQ(EAGAIN, errno);
->          }
-> }
->
-> Thank you once again.
-> >
-> >
-> >> +
-> >> +               /* Peer closes before client reads */
-> >> +               close(self->child);
-> >> +       }
-> >> +
-> >> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> >> +       ASSERT_EQ(-1, n);
-> >> +
-> >> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> >> +               ASSERT_EQ(ECONNRESET, errno);
-> >> +       } else {
-> >> +               ASSERT_EQ(EAGAIN, errno);
-> >> +       }
-> >> +}
-> >> +
-> >> +/* Test 3: closing unaccepted (embryo) server socket should reset cli=
-ent. */
-> >> +TEST_F(unix_sock, reset_closed_embryo)
-> >> +{
-> >> +       char buf[16] =3D {};
-> >> +       ssize_t n;
-> >> +
-> >> +       if (variant->socket_type =3D=3D SOCK_DGRAM)
-> >> +               SKIP(return, "This test only applies to SOCK_STREAM an=
-d SOCK_SEQPACKET");
-> >> +
-> >> +       /* Close server without accept()ing */
-> >> +       close(self->server);
-> >> +
-> >> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> >> +
-> >> +       ASSERT_EQ(-1, n);
-> >> +       ASSERT_EQ(ECONNRESET, errno);
-> >> +}
-> >> +
-> >> +TEST_HARNESS_MAIN
-> >> +
-> >> --
-> >> 2.43.0
-> >>
->
+
+On 11/6/25 5:01 PM, Christophe Leroy wrote:
+> This is a rebase on top of commit 6ec821f050e2 (tag: core-scoped-uaccess)
+> from tip tree.
+> 
+> Thomas, Peter, could you please take non-powerpc patches (1, 2, 3)
+> in tip tree for v6.19, then Maddy will take powerpc patches (4-10)
+> into powerpc-next for v6.20.
+
+Thomas/Peter,
+
+If you can please take non-powerpc patches in this series
+in v6.19, I will park the rest of the series (4-10)
+to the v6.20 merge.
+
+Maddy
+
+> 
+> Masked user access avoids the address/size verification by access_ok().
+> Allthough its main purpose is to skip the speculation in the
+> verification of user address and size hence avoid the need of spec
+> mitigation, it also has the advantage to reduce the amount of
+> instructions needed so it also benefits to platforms that don't
+> need speculation mitigation, especially when the size of the copy is
+> not know at build time.
+> 
+> Patches 1,2,4 are cleaning up some redundant barrier_nospec()
+> introduced by commit 74e19ef0ff80 ("uaccess: Add speculation barrier
+> to copy_from_user()"). To do that, a speculation barrier is added to
+> copy_from_user_iter() so that the barrier in powerpc raw_copy_from_user()
+> which is redundant with the one in copy_from_user() can be removed. To
+> avoid impacting x86, copy_from_user_iter() is first converted to using
+> masked user access.
+> 
+> Patch 3 replaces wrong calls to masked_user_access_begin() with calls
+> to masked_user_read_access_begin() and masked_user_write_access_begin()
+> to match with user_read_access_end() and user_write_access_end().
+> 
+> Patches 5,6,7 are cleaning up powerpc uaccess functions.
+> 
+> Patches 8 and 9 prepare powerpc/32 for the necessary gap at the top
+> of userspace.
+> 
+> Last patch implements masked user access.
+> 
+> Changes in v4:
+> - Rebased on top of commit 6ec821f050e2 (tag: core-scoped-uaccess) from tip tree
+> - Patch 3: Simplified as masked_user_read_access_begin() and masked_user_write_access_begin() are already there.
+> - Patch 10: Simplified mask_user_address_simple() as suggested by Gabriel.
+> 
+> Changes in v3:
+> - Rebased on top of v6.18-rc1
+> - Patch 3: Impact on recently modified net/core/scm.c
+> - Patch 10: Rewrite mask_user_address_simple() for a smaller result on powerpc64, suggested by Gabriel
+> 
+> Changes in v2:
+> - Converted copy_from_user_iter() to using masked user access.
+> - Cleaned up powerpc uaccess function to minimise code duplication
+> when adding masked user access
+> - Automated TASK_SIZE calculation to minimise use of BUILD_BUG_ON()
+> - Tried to make some commit messages more clean based on feedback from
+> version 1 of the series.
+> 
+> Christophe Leroy (10):
+>   iter: Avoid barrier_nospec() in copy_from_user_iter()
+>   uaccess: Add speculation barrier to copy_from_user_iter()
+>   uaccess: Use masked_user_{read/write}_access_begin when required
+>   powerpc/uaccess: Move barrier_nospec() out of
+>     allow_read_{from/write}_user()
+>   powerpc/uaccess: Remove unused size and from parameters from
+>     allow_access_user()
+>   powerpc/uaccess: Remove
+>     {allow/prevent}_{read/write/read_write}_{from/to/}_user()
+>   powerpc/uaccess: Refactor user_{read/write/}_access_begin()
+>   powerpc/32s: Fix segments setup when TASK_SIZE is not a multiple of
+>     256M
+>   powerpc/32: Automatically adapt TASK_SIZE based on constraints
+>   powerpc/uaccess: Implement masked user access
+> 
+>  arch/powerpc/Kconfig                          |   3 +-
+>  arch/powerpc/include/asm/barrier.h            |   2 +-
+>  arch/powerpc/include/asm/book3s/32/kup.h      |   3 +-
+>  arch/powerpc/include/asm/book3s/32/mmu-hash.h |   5 +-
+>  arch/powerpc/include/asm/book3s/32/pgtable.h  |   4 -
+>  arch/powerpc/include/asm/book3s/64/kup.h      |   6 +-
+>  arch/powerpc/include/asm/kup.h                |  52 +------
+>  arch/powerpc/include/asm/nohash/32/kup-8xx.h  |   3 +-
+>  arch/powerpc/include/asm/nohash/32/mmu-8xx.h  |   4 -
+>  arch/powerpc/include/asm/nohash/kup-booke.h   |   3 +-
+>  arch/powerpc/include/asm/task_size_32.h       |  28 +++-
+>  arch/powerpc/include/asm/uaccess.h            | 132 +++++++++++++-----
+>  arch/powerpc/kernel/asm-offsets.c             |   2 +-
+>  arch/powerpc/kernel/head_book3s_32.S          |   6 +-
+>  arch/powerpc/mm/book3s32/mmu.c                |   4 +-
+>  arch/powerpc/mm/mem.c                         |   2 -
+>  arch/powerpc/mm/nohash/8xx.c                  |   2 -
+>  arch/powerpc/mm/ptdump/segment_regs.c         |   2 +-
+>  lib/iov_iter.c                                |  22 ++-
+>  lib/strncpy_from_user.c                       |   2 +-
+>  lib/strnlen_user.c                            |   2 +-
+>  net/core/scm.c                                |   2 +-
+>  22 files changed, 161 insertions(+), 130 deletions(-)
+> 
+
 
