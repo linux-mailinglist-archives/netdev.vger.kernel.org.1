@@ -1,200 +1,157 @@
-Return-Path: <netdev+bounces-238468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6A96C59383
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:41:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 470A3C593BF
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:43:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4B00A34EA0C
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:31:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C72843AAAA8
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:35:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A92B2FDC50;
-	Thu, 13 Nov 2025 17:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37D922FBDF0;
+	Thu, 13 Nov 2025 17:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KsOAxkeI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HPuzll1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277802F3601
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 17:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB102F7AD6;
+	Thu, 13 Nov 2025 17:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763055070; cv=none; b=hcmYlaundvxZXxNFVsMt2gjE7gOS7CXoO8F19J7kXZ33gaPsfw3yK33aPDoppNrO9rtbl4ibaEb1MaLQxfZbguXeoEnERXtTUTH7EtAnFIFRpEaXSdQ0J2Wi5l8M/b0UI+x7DNmnjec64lVtxl6T4TfWuQjem+VNjsnTT7ZODBo=
+	t=1763055337; cv=none; b=jb5tOAflzzmBPj+xr/JDxo9Ahu8RLRXFE7vRfkAy4dl+AOp0jKnObTsLzvazX8rmoHGv7/iVmP3Il2LHVxPH84aJbtBx6Z3dUoK7tAHTzPbtMv/jRFKYePuIW6QSGpxOThTsgvey0SEobyTksVYZ0iRJVA94B8wXXfR5KpLoDN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763055070; c=relaxed/simple;
-	bh=XAtOyJI0WQ3sgK78fW2Uwi7DxHqSxXhyLy1fwArqA+I=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=NKuNBlzrMwNE6ZmQUq2j9Y5bX8QrIJJz8lgFrZARxhXGHjJLX8+FEnTjbASPv/UcLOFpv4GRTPRfAcG+3I9FLp4uxkWkyYOFz3y+BtjiBH6gvxW0S/85r4tKiScH74wcsJTvAM0RgXSzHRJVjgXE2KwSnnVR/88xJcr00fxdMcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KsOAxkeI; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-787f586532bso11470137b3.1
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 09:31:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763055063; x=1763659863; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=K7+oD30MonOt9TxD+/IIU01PfOYIQejOmUfS0Y1z+3A=;
-        b=KsOAxkeIV3tribzISi2W6VFkHuEcSSNldz35T5qel/ZFG1EE+f00hoUizn4ez8Qq34
-         dlZxKY3vZ2Q3FczAo8mrE7Cf3dAip1qAy9Klpb/GxNYAPMJNGsmVABlgzPtkJgYyfKL4
-         sKDZWXkXkJTJglE9q9qC6bqvp0ava0dNe71SfO24uLB5H/Mdpn2Pn8uxu2lp9DgapX9j
-         dQNs7r6k981DxC1IDm9/C+HNdKV0BOKSuu6YGX3r1u/CPt1wi8yu39ckfRIl/sjD5Zv5
-         25O5VYaL24ySGnGtvl6RxHbP+lhB3NWXUDh3JNfgBUE0KC3RhV5lS54Hc9j5+PmKK67F
-         xe7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763055063; x=1763659863;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K7+oD30MonOt9TxD+/IIU01PfOYIQejOmUfS0Y1z+3A=;
-        b=Is2hhmrUa7H9JsbsrtOSWyIYuq9f9y/DjKEWMLgIAiu/k2LoXnYBFukmHEa02DfPj3
-         18rdJgzY9y8matAgdxRyIUt8pad+mb/DtvwPEFfybbM9uHABKVf/2ElRswayKJBGymVm
-         9Z5f5q7VhssikzVcjlN2crgGWiikVT46JSOBAeoGZw6QpSMWaQggwwdwZiCWEfM5XMn+
-         3ov1kMtuqO2pIhXRFrooiy7glwPhjTU0iXrdfS3HO8MY11O5NClS5dMHzKK7lLwZvOh9
-         pnoyQ5f35nF2mF+kALe7yJ1LT2RSYaIC2coa+xgh7CK9M69Ov33yqdNG5nyr9SaDVZxO
-         ER9Q==
-X-Gm-Message-State: AOJu0Ywte06WFJ35SY1uOhEhIr47HjB62+KdtehMepOdbyQ+D9qQHt6m
-	QHwrEP4fP6gqa5mjuKptBBTFYyFsiuAg6x9d/DZ7DLivO23arRGxUKSoxoaOhYjHAYviC83ZaIp
-	nJvNtYWqDcYbIhWWnS7PjpcHM5iC8uA0=
-X-Gm-Gg: ASbGnctASybs3Na1qfkcPMXMK+QpsnfM8gYqwt6/0SeA7LueofND256bL6GuOYl1dAg
-	XARMuDIRQ5utSu9P59lbrkVVMNy+wYgMl4JbAjpRgZz79zomkJFNco5NE0yskybYFJBKuligDA3
-	YSVlsRgPABPt/lLH8K9bqzOaDy6ebGkNT6yKX3lpN60WZ4+AhM06l+IO1a09zDxPMN+uujRvkKV
-	CElUDOnlTeNmGi6pfafQ6uOFyVhjMBo9gqqTkGmk9tqYBNKbbw2sC8VE9nFLgSvX8himwJYUVJp
-	wA4pF1JUvUSu1+1INqxjno31Ug==
-X-Google-Smtp-Source: AGHT+IFsidDvuOCz+MG4jnFkcxt8JfyZwP35D2o6eA6gkXKCxY0urqtYVEMTdk14UB4A4mWqHiIo5vbUe9K3bheP8cA=
-X-Received: by 2002:a05:690c:6f8f:b0:788:c07:2518 with SMTP id
- 00721157ae682-78929e66819mr2085127b3.31.1763055062543; Thu, 13 Nov 2025
- 09:31:02 -0800 (PST)
+	s=arc-20240116; t=1763055337; c=relaxed/simple;
+	bh=pnjB2/QfMS1wcR08UjEVufjezdYxJWJrOY8l7Kog+ss=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kuLaBLKYtKfRFe41+5YrOYedqOHA34O7yv5z6oAOTLb95siekXnjIQRwPQwzw3sffN7JeK2UCG/FJTrzDXRI++QlcwEjcZeH709pB1NfABGwdkypbIVLh9uJG3Z6qlv7SqX8MDx1YuPtP/DpE8mLffv+lg7vujfbSs+tAKlEvF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HPuzll1n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90E1EC4CEF7;
+	Thu, 13 Nov 2025 17:35:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763055336;
+	bh=pnjB2/QfMS1wcR08UjEVufjezdYxJWJrOY8l7Kog+ss=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=HPuzll1ny74wtDBA9k+bSGe4zPhMemmefnHO4RUikv7eIlkgMeNruTn6nyDCVLBAv
+	 4hojWmLNjqnimhz6ztfCcinSq4BO4zmrPg0WiaGV2IYhHZgd+027Po/0D75HVDs/Sk
+	 8j/MOAxU2UFHRufgvziwoG2M6KkRcGEzM5j0YScqs/IUlD8+5dJ2ec1jLLGhlu3oXl
+	 lp8J746xj2tEspszqu7SPuRb+EMSb8PlkIu3zUa2853okYe4OUiuq1eNYMQvOPUsfV
+	 YJtmdx+fC7aR9Ky8vnlI/0wa4p82uQjfIRPvXOFrmFpPAx3tyw9WGapeyruRPQ/JkK
+	 sguVGnDlYHCMg==
+Message-ID: <2a8efd6f-34d5-480f-8ca1-efef2959fffd@kernel.org>
+Date: Thu, 13 Nov 2025 18:35:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Michael Zimmermann <sigmaepsilon92@gmail.com>
-Date: Thu, 13 Nov 2025 18:30:51 +0100
-X-Gm-Features: AWmQ_bm6MhuRBoEbeEn02QJrMla9RuqDmDIlbn0Yt7eze9EuiHC6qN1NFtE2XVU
-Message-ID: <CAN9vWDK=36NUdTtZhPMu7Yh15kGv+gkE35A93dU0qg01z5VkbA@mail.gmail.com>
-Subject: RTL8127AF doesn't get a link over SFP+ DAC
-To: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] mptcp: fix race condition in mptcp_schedule_work()
+Content-Language: en-GB, fr-BE
+To: Eric Dumazet <edumazet@google.com>
+Cc: Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang.tang@linux.dev>, Florian Westphal <fw@strlen.de>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+355158e7e301548a1424@syzkaller.appspotmail.com,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, MPTCP Linux <mptcp@lists.linux.dev>
+References: <20251113103924.3737425-1-edumazet@google.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
+ YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
+ c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
+ WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
+ CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
+ nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
+ TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
+ nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
+ VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
+ 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
+ YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
+ AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
+ EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
+ /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
+ MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
+ cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
+ iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
+ jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
+ 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
+ VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
+ BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
+ ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
+ 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
+ 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
+ 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
+ mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
+ Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
+ Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
+ Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
+ x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
+ V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
+ Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
+ HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
+ 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
+ Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
+ voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
+ KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
+ UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
+ vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
+ mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
+ JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20251113103924.3737425-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+Hi Eric,
 
-I have a RT8127AF card from DIEWU:
-https://24wireless.info/diewu-txa403-and-txa405 .
-The card is detected just fine:
-[125201.683763] r8169 0000:08:00.0 eth1: RTL8127A, xx:xx:xx:xx:xx:xx,
-XID 6c9, IRQ 143
-[125201.683770] r8169 0000:08:00.0 eth1: jumbo features [frames: 16362
-bytes, tx checksumming: ko]
-[125201.688543] r8169 0000:08:00.0 enp8s0: renamed from eth1
-[125201.715519] Realtek Internal NBASE-T PHY r8169-0-800:00: attached
-PHY driver (mii_bus:phy_addr=r8169-0-800:00, irq=MAC)
-[125202.277034] r8169 0000:08:00.0 enp8s0: Link is Down
+(+cc MPTCP ML)
 
-This is what ethtool shows:
-Settings for enp8s0:
-        Supported ports: [ TP    MII ]
-        Supported link modes:   10baseT/Half 10baseT/Full
-                                100baseT/Half 100baseT/Full
-                                1000baseT/Full
-                                10000baseT/Full
-                                2500baseT/Full
-                                5000baseT/Full
-        Supported pause frame use: Symmetric Receive-only
-        Supports auto-negotiation: Yes
-        Supported FEC modes: Not reported
-        Advertised link modes:  10baseT/Half 10baseT/Full
-                                100baseT/Half 100baseT/Full
-                                1000baseT/Full
-                                10000baseT/Full
-                                2500baseT/Full
-                                5000baseT/Full
-        Advertised pause frame use: Symmetric Receive-only
-        Advertised auto-negotiation: Yes
-        Advertised FEC modes: Not reported
-        Speed: Unknown!
-        Duplex: Unknown! (255)
-        Auto-negotiation: on
-        master-slave cfg: preferred slave
-        master-slave status: unknown
-        Port: Twisted Pair
-        PHYAD: 0
-        Transceiver: internal
-        MDI-X: Unknown
-        Supports Wake-on: pumbg
-        Wake-on: d
-        Link detected: no
+On 13/11/2025 11:39, Eric Dumazet wrote:
+> syzbot reported use-after-free in mptcp_schedule_work() [1]
+> 
+> Issue here is that mptcp_schedule_work() schedules a work,
+> then gets a refcount on sk->sk_refcnt if the work was scheduled.
+> This refcount will be released by mptcp_worker().
+> 
+> [A] if (schedule_work(...)) {
+> [B]     sock_hold(sk);
+>         return true;
+>     }
+> 
+> Problem is that mptcp_worker() can run immediately and complete before [B]
+> 
+> We need instead :
+> 
+>     sock_hold(sk);
+>     if (schedule_work(...))
+>         return true;
+>     sock_put(sk);
 
-and `ip a`:
-10: enp8s0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc
-fq_codel state DOWN group default qlen 1000
-    link/ether xx:xx:xx:xx:xx:xx brd ff:ff:ff:ff:ff:ff
-    altname enxXXXXXXXXXXXX
+Thank you for having released the syzbot issue with the fix! That's way
+easier for us when the fix is provided with the bug report! :-D
 
-And that's it, the link never comes up. The 10G Mikrotik switch on the
-other side sees that the module is inserted on its side, but doesn't
-show any change when I plug in the RTL8127AF.
+The modifications look good to me:
 
-It works in Windows 11 and it also works with the r8127 Linux driver
-downloaded from Realteks website:
-https://www.realtek.com/Download/List?cate_id=584 :
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-[129318.976134] r8127: This product is covered by one or more of the
-following patents: US6,570,884, US6,115,776, and US6,327,625.
-[129318.976175] r8127  Copyright (C) 2025 Realtek NIC software team
-<nicfae@realtek.com>
-                 This program comes with ABSOLUTELY NO WARRANTY; for
-details, please see <http://www.gnu.org/licenses/>.
-                 This is free software, and you are welcome to
-redistribute it under certain conditions; see
-<http://www.gnu.org/licenses/>.
-[129318.988293] r8127 0000:08:00.0 enp8s0: renamed from eth1
-[129318.997092] enp8s0: 0xffffd49ec9140000, xx:xx:xx:xx:xx:xx, IRQ 137
-[129319.421629] r8127: enp8s0: link up
 
-ethtool with realteks driver shows something quite interesting:
-Settings for enp8s0:
-        Supported ports: [ TP ]
-        Supported link modes:   1000baseT/Full
-                                10000baseT/Full
-        Supported pause frame use: No
-        Supports auto-negotiation: No
-        Supported FEC modes: Not reported
-        Advertised link modes:  1000baseT/Full
-                                10000baseT/Full
-        Advertised pause frame use: No
-        Advertised auto-negotiation: No
-        Advertised FEC modes: Not reported
-        Speed: 10000Mb/s
-        Duplex: Full
-        Auto-negotiation: off
-        Port: Twisted Pair
-        PHYAD: 0
-        Transceiver: internal
-        MDI-X: on
-        Supports Wake-on: pumbg
-        Wake-on: g
-        Current message level: 0x00000033 (51)
-                               drv probe ifdown ifup
-        Link detected: yes
+This patch can be applied to -net directly, ideally with:
 
-auto-negotiation is off, even though it's enabled on my Mikrotik
-switch. "ethtool -s enp8s0 autoneg on" (or off) on the realtek driver
-succeeds but doesn't change what ethtools status shows. "ethtool -s
-enp8s0 autoneg off" on the mainline driver does fail with:
-netlink error: link settings update failed
-netlink error: Invalid argument
+Cc: stable@vger.kernel.org
 
-So while I have no idea why things are not working, my best theory is
-that auto-negotiation isn't supported (properly) and the mainline
-driver doesn't support disabling it.
+(Just for me to be able to track issues with the backports. If it cannot
+be added, I can also track it "manually" if preferred.)
 
-Thanks
-Michael
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
