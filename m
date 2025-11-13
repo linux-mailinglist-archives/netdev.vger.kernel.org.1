@@ -1,428 +1,147 @@
-Return-Path: <netdev+bounces-238260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7655AC5693A
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:26:33 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6AC6C569E3
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:35:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCA673B4503
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:26:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E64494EC3A3
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1449E2C21E2;
-	Thu, 13 Nov 2025 09:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7D32D0C99;
+	Thu, 13 Nov 2025 09:27:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UW3Slt9y"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dkwjFz3S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326FE2D1F7B
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 09:26:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA081531F9;
+	Thu, 13 Nov 2025 09:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763025989; cv=none; b=RQm/yYL+Z7kYMetpSUHdkLdJYd1efEzsGiP5Q8bpgLeIvo/VUgHDWc/JCpqsXnZaO3T9jzDAQgvFiRppjtXXjQ5dNAGkILsMIstMF+njaaeEEtya/8TdS7PvFDNj/cbT3fvUSZJyEYZJg6BfMfGvZ1+4SNyGSQ3bKYcbz42uA7A=
+	t=1763026069; cv=none; b=LlmQpD8eACWLSNto9opOkxp7I4fOFE4hfr5OR0HbpGc87PyYk9biExDdtQXaaZOZMgChX3q9z57YOgQBS6IfnLE49Ey9e9QwG2sdqD8Y7SYD79XI3q+xBCFg02nF1Yf5F8RsNqioBasueqPYubxnz5phIq0TeEDNz6jmvpMOwsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763025989; c=relaxed/simple;
-	bh=IdOxWyLd0ayhqkf2xRr55vkkoVgExwdvYyJZILi5P9A=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=teTyc51nq2elPy9e3MW9SGJ7pKbWJYJ0MyIKPsAnC/aHz1m6/R6Z0DHzBT8ibJxSvJpz3OAKxLhKo0ucZXCR2fGxsBgDqlXWbnzM9aCFSIJ6OQQnqU2DyGbQ0rAiJ/2u6tjwHTJohDEoejsdS5bpkc8Fr5cNHrLSzB5HkM8txj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UW3Slt9y; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7aace33b75bso542681b3a.1
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 01:26:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763025986; x=1763630786; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=R56P5vKc1COv5rnY9hcAHmODH+ib7Zrm7T8bOVpFkAs=;
-        b=UW3Slt9ypPS9QrA3eKGCBwkbN1vSGpwsIXsviBhHo3jqhbo+k33a4AtC8sZ6P17l0F
-         M3ocLCiLMlZcIOMcehmGLA0hHuurd16jupv2aZiAfUAfoKW/8Z8W2hbTUnTHiO9EDSCi
-         2bjMwNCJe5u4G52/jOuGTzfGAR8stRzRSKHvZUxKcBx1QCrfP7PyGJIX6xbpLqnvxFRv
-         rlGtxpuXzWy6R+gemBNhNKjVXOjjiZegj7vOJDK2HTANzhgQteeAajMzKiuFBz/0TIie
-         vOtBXsBfmLdeiIqeI6sQ86mAB9sXqbtaJOWlQllfMuDDicPuyoRsgjN9XMgOLtwnm3tn
-         NDoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763025986; x=1763630786;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R56P5vKc1COv5rnY9hcAHmODH+ib7Zrm7T8bOVpFkAs=;
-        b=aq7AFEk9FqNUhAW5YIdzoT4dTvOhPYSq6vtloqOjcYkiSNOrj73fjMmuzIwjrMALtb
-         SC1sYIdf0DgJP+sUI4R3Ies+A3/NI3pAy/eQ9sNZkPxNK3TspLEkMztiQL3cXiwcQPyD
-         llMkhnqYTGE9R+Mnu2NL0FNGIA5XybRk88nFlEI/Sm7qvDV/l5UVj5il95pQ7xTpBPxu
-         VF3LA1OBXTAKuWm9XWgGOiMNj4H2T0nBFqq0D+Vi8EjelgQAYKiLWTUz041zAeJe/6EB
-         aguEWAdYwkA4BeRa7w68TqRQEVgCY8C1t9aS7pB3xQCukMoMxkPQ8yDRfkoBU84MB4WW
-         7obg==
-X-Forwarded-Encrypted: i=1; AJvYcCWx3j2E1d3NfMpm4rKxGZTBsmM80aLNmH901uI0eZLj7dKImYVZrTf8gKrb/k7oLUzZTA0l0bI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBAZUhzIWjCxpandAUja2YffRd/rotEPiX9FYaRMNGGCt2T1Qz
-	3PENws5nEcG8cYZiTVlxG5DBuYzVegk5xgJ4Mj3guXf3dRFZ/TI50vEh
-X-Gm-Gg: ASbGncuHOwzfIF+Zum7trgr9ckfb2Vyo/LAdjQb5PvCluvia8CGzr/O5ChBUM1cZ8ke
-	p830TwrQt/RpOjjZfLs4LREeXx3qXkTU64tb16bE5/EbJ3dIhWPHKebvzcC6+mt/a31+y7WxIUO
-	HAsV2eAbTyYpQwii6k1YOsAjx6DVtjKqPvtaZ4xxwEzD8XRbbBxSJJK6NgjCzNOcpg2wHqZpROo
-	uM1ZHdrw1l77KUnMzWAHCRF6bWUziCtFmvtZbIGuni1v34oFLi61M/mORge9qvWrys/C35yy6gE
-	KLazRTmFX9ZivJul5USySQshQRyVMHt1s8zE69OYkuekzMPOI32nNw7plmK8aqQMKp1NkzOghku
-	/e98lXlqtf0mRKyOTm7ExJIApJNZm4ZMG64b3ZzhqziWU5KFDJeFWGmE4B9Jp2SfyhmuayJvYyW
-	toUR0H66Pq87b5trKF
-X-Google-Smtp-Source: AGHT+IGF91v9mIPXsZIOO8tb6WHj7OMVG5cVSYSMkMGsz91TA9ThFDhXhovfjMHddvJTtsguP1xuBQ==
-X-Received: by 2002:a05:6a00:c93:b0:781:455:df62 with SMTP id d2e1a72fcca58-7b7a27aad60mr6306522b3a.5.1763025986227;
-        Thu, 13 Nov 2025 01:26:26 -0800 (PST)
-Received: from mac.com ([136.24.82.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b927d1c413sm1634714b3a.69.2025.11.13.01.26.24
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 13 Nov 2025 01:26:25 -0800 (PST)
-From: Scott Mitchell <scott.k.mitch1@gmail.com>
-X-Google-Original-From: Scott Mitchell <scott_mitchell@apple.com>
-To: pablo@netfilter.org
-Cc: kadlec@netfilter.org,
-	fw@strlen.de,
-	phil@nwl.cc,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Scott Mitchell <scott_mitchell@apple.com>
-Subject: [PATCH v2] netfilter: nfnetlink_queue: optimize verdict lookup with hash table
-Date: Thu, 13 Nov 2025 01:26:06 -0800
-Message-Id: <20251113092606.91406-1-scott_mitchell@apple.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1763026069; c=relaxed/simple;
+	bh=fljBpF7iFGdonycP/S1o1Q8eOIRN2uMoEwTrqRJEdcc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BeKZsRzZCQbLhhC/LAe3rOltgpThTekEm9rJiCEVfugLB43qJrRIHNGaFnZ+8kb5/OiPsEuC4BSvZq8ahpdOkN+mSWCCpEMS2lnRg5VWwvbokKF6kmlBKadEQVMLH7KGdPXsgo5S21A9zuAapekJj2rtkTArwu1fuux+qaWcCGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dkwjFz3S; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id B443CC0F57C;
+	Thu, 13 Nov 2025 09:27:22 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 49E6B6068C;
+	Thu, 13 Nov 2025 09:27:44 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5F833102F21A5;
+	Thu, 13 Nov 2025 10:27:39 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1763026063; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=vbkQXEu7w8lfId/GAbvVnvVBMO7rGQpsi1raOuHe1YY=;
+	b=dkwjFz3SfbHAqDqzb02mCIUmRdgYHrR0dSD2zbwWuudHTk7dHCEkuGyqZbjz2MG9uXPMfW
+	YHxBBfI6hbQIPXQoHrQ71PP262mUOv9HpBwYlTup9hQTj7fqbYbBtOxi/iwYo5mA/KeS3S
+	E1lsWwCErhFCFZ/d5TGEeqOpGJRnrP06DoMy9vkh26e3qR/Euy5IC/+2vtokMJJR9AFTev
+	SG14of/lzSYDZPLLQ2Bt05p4HaJMahHBgSJnVh/OWq1F6yCI7Wo8Ut0dxbVMuShVdQWgow
+	lXo+lKXqTxBYCDNbHiYt+EZkBVzWpJGkDTBxzqFvKP1lrR4WE8BMjOIw4bu9gQ==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] net: phy: dp83869: Support 1000Base-X SFP
+Date: Thu, 13 Nov 2025 10:27:34 +0100
+Message-ID: <10753836.nUPlyArG6x@fw-rgant>
+In-Reply-To: <924891c9-fd34-4e7a-bca9-007c80bc327f@lunn.ch>
+References:
+ <20251110-sfp-1000basex-v2-0-dd5e8c1f5652@bootlin.com>
+ <20251110-sfp-1000basex-v2-3-dd5e8c1f5652@bootlin.com>
+ <924891c9-fd34-4e7a-bca9-007c80bc327f@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="nextPart2329569.iZASKD2KPV";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
+X-Last-TLS-Session-Version: TLSv1.3
 
-The current implementation uses a linear list to find queued packets by
-ID when processing verdicts from userspace. With large queue depths and
-out-of-order verdicting, this O(n) lookup becomes a significant
-bottleneck, causing userspace verdict processing to dominate CPU time.
+--nextPart2329569.iZASKD2KPV
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Date: Thu, 13 Nov 2025 10:27:34 +0100
+Message-ID: <10753836.nUPlyArG6x@fw-rgant>
+In-Reply-To: <924891c9-fd34-4e7a-bca9-007c80bc327f@lunn.ch>
+MIME-Version: 1.0
 
-Replace the linear search with a hash table for O(1) average-case
-packet lookup by ID. The hash table size is configurable via the new
-NFQA_CFG_HASH_SIZE netlink attribute (default 1024 buckets, matching
-NFQNL_QMAX_DEFAULT; max 131072). The size is normalized to a power of
-two to enable efficient bitwise masking instead of modulo operations.
-Unpatched kernels silently ignore the new attribute, maintaining
-backward compatibility.
+Hello Andrew,
 
-The existing list data structure is retained for operations requiring
-linear iteration (e.g. flush, device down events). Hot fields
-(queue_hash_mask, queue_hash pointer) are placed in the same cache line
-as the spinlock and packet counters for optimal memory access patterns.
+On Tuesday, 11 November 2025 02:08:05 CET Andrew Lunn wrote:
+...
+> > +	ret = dp83869_configure_mode(phydev, dp83869);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	/* Reconfigure advertisement */
+> > +	if (mutex_trylock(&phydev->lock)) {
+> > +		ret = dp83869_config_aneg(phydev);
+> > +		mutex_unlock(&phydev->lock);
+> 
+> Why is it safe to call dp83869_configure_mode() without the lock, but
+> dp83869_config_aneg() does need the lock? And what are the
+> consequences of not being able to get the lock and so aneg is not
+> configured?
 
-Signed-off-by: Scott Mitchell <scott_mitchell@apple.com>
----
-Changes in v2:
-- Use kvcalloc/kvfree with GFP_KERNEL_ACCOUNT to support larger hash
-  tables with vmalloc fallback (Florian Westphal)
-- Remove incorrect comment about concurrent resizes - nfnetlink subsystem
-  mutex already serializes config operations (Florian Westphal)
-- Fix style: remove unnecessary braces around single-line if (Florian Westphal)
+Yeah the idea here is that if the LP changes, then the autoneg should be 
+restarted afterwards. But doing it in the module_insert() callback of the PHY 
+driver is quite complex as far as locking goes...
 
- include/net/netfilter/nf_queue.h              |   1 +
- .../uapi/linux/netfilter/nfnetlink_queue.h    |   1 +
- net/netfilter/nfnetlink_queue.c               | 129 ++++++++++++++++--
- 3 files changed, 123 insertions(+), 8 deletions(-)
+Maxime's phy_port series will make quite a bit of SFP code generic and will 
+conflict with my series, so maybe it's better that I wait for Maxime's series 
+to be merged before sending v3. Then I can try tackling this in a generic 
+manner.
 
-diff --git a/include/net/netfilter/nf_queue.h b/include/net/netfilter/nf_queue.h
-index 4aeffddb7586..3d0def310523 100644
---- a/include/net/netfilter/nf_queue.h
-+++ b/include/net/netfilter/nf_queue.h
-@@ -11,6 +11,7 @@
- /* Each queued (to userspace) skbuff has one of these. */
- struct nf_queue_entry {
- 	struct list_head	list;
-+	struct hlist_node	hash_node;
- 	struct sk_buff		*skb;
- 	unsigned int		id;
- 	unsigned int		hook_index;	/* index in hook_entries->hook[] */
-diff --git a/include/uapi/linux/netfilter/nfnetlink_queue.h b/include/uapi/linux/netfilter/nfnetlink_queue.h
-index efcb7c044a74..bc296a17e5aa 100644
---- a/include/uapi/linux/netfilter/nfnetlink_queue.h
-+++ b/include/uapi/linux/netfilter/nfnetlink_queue.h
-@@ -107,6 +107,7 @@ enum nfqnl_attr_config {
- 	NFQA_CFG_QUEUE_MAXLEN,		/* __u32 */
- 	NFQA_CFG_MASK,			/* identify which flags to change */
- 	NFQA_CFG_FLAGS,			/* value of these flags (__u32) */
-+	NFQA_CFG_HASH_SIZE,		/* __u32 hash table size (rounded to power of 2) */
- 	__NFQA_CFG_MAX
- };
- #define NFQA_CFG_MAX (__NFQA_CFG_MAX-1)
-diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
-index 8b7b39d8a109..f076609cac32 100644
---- a/net/netfilter/nfnetlink_queue.c
-+++ b/net/netfilter/nfnetlink_queue.c
-@@ -46,7 +46,10 @@
- #include <net/netfilter/nf_conntrack.h>
- #endif
- 
--#define NFQNL_QMAX_DEFAULT 1024
-+#define NFQNL_QMAX_DEFAULT      1024
-+#define NFQNL_MIN_HASH_SIZE     16
-+#define NFQNL_DEFAULT_HASH_SIZE 1024
-+#define NFQNL_MAX_HASH_SIZE     131072
- 
- /* We're using struct nlattr which has 16bit nla_len. Note that nla_len
-  * includes the header length. Thus, the maximum packet length that we
-@@ -65,6 +68,7 @@ struct nfqnl_instance {
- 	unsigned int copy_range;
- 	unsigned int queue_dropped;
- 	unsigned int queue_user_dropped;
-+	unsigned int queue_hash_size;
- 
- 
- 	u_int16_t queue_num;			/* number of this queue */
-@@ -77,6 +81,8 @@ struct nfqnl_instance {
- 	spinlock_t	lock	____cacheline_aligned_in_smp;
- 	unsigned int	queue_total;
- 	unsigned int	id_sequence;		/* 'sequence' of pkt ids */
-+	unsigned int	queue_hash_mask;
-+	struct hlist_head *queue_hash;
- 	struct list_head queue_list;		/* packets in queue */
- };
- 
-@@ -95,6 +101,39 @@ static struct nfnl_queue_net *nfnl_queue_pernet(struct net *net)
- 	return net_generic(net, nfnl_queue_net_id);
- }
- 
-+static inline unsigned int
-+nfqnl_packet_hash(u32 id, unsigned int mask)
-+{
-+	return hash_32(id, 32) & mask;
-+}
-+
-+static inline u32
-+nfqnl_normalize_hash_size(u32 hash_size)
-+{
-+	/* Must be power of two for queue_hash_mask to work correctly.
-+	 * Avoid overflow of is_power_of_2 by bounding NFQNL_MAX_HASH_SIZE.
-+	 */
-+	BUILD_BUG_ON(!is_power_of_2(NFQNL_MIN_HASH_SIZE) ||
-+		     !is_power_of_2(NFQNL_DEFAULT_HASH_SIZE) ||
-+		     !is_power_of_2(NFQNL_MAX_HASH_SIZE) ||
-+		     NFQNL_MAX_HASH_SIZE > 1U << 31);
-+
-+	if (!hash_size)
-+		return NFQNL_DEFAULT_HASH_SIZE;
-+
-+	/* Clamp to valid range before power of two to avoid overflow */
-+	if (hash_size <= NFQNL_MIN_HASH_SIZE)
-+		return NFQNL_MIN_HASH_SIZE;
-+
-+	if (hash_size >= NFQNL_MAX_HASH_SIZE)
-+		return NFQNL_MAX_HASH_SIZE;
-+
-+	if (!is_power_of_2(hash_size))
-+		hash_size = roundup_pow_of_two(hash_size);
-+
-+	return hash_size;
-+}
-+
- static inline u_int8_t instance_hashfn(u_int16_t queue_num)
- {
- 	return ((queue_num >> 8) ^ queue_num) % INSTANCE_BUCKETS;
-@@ -114,13 +153,56 @@ instance_lookup(struct nfnl_queue_net *q, u_int16_t queue_num)
- 	return NULL;
- }
- 
-+static int
-+nfqnl_hash_resize(struct nfqnl_instance *inst, u32 hash_size)
-+{
-+	struct hlist_head *new_hash, *old_hash;
-+	struct nf_queue_entry *entry;
-+	unsigned int h, hash_mask;
-+
-+	hash_size = nfqnl_normalize_hash_size(hash_size);
-+	if (hash_size == inst->queue_hash_size)
-+		return 0;
-+
-+	new_hash = kvcalloc(hash_size, sizeof(*new_hash), GFP_KERNEL_ACCOUNT);
-+	if (!new_hash)
-+		return -ENOMEM;
-+
-+	hash_mask = hash_size - 1;
-+
-+	for (h = 0; h < hash_size; h++)
-+		INIT_HLIST_HEAD(&new_hash[h]);
-+
-+	spin_lock_bh(&inst->lock);
-+
-+	list_for_each_entry(entry, &inst->queue_list, list) {
-+		/* No hlist_del() since old_hash will be freed and we hold lock */
-+		h = nfqnl_packet_hash(entry->id, hash_mask);
-+		hlist_add_head(&entry->hash_node, &new_hash[h]);
-+	}
-+
-+	old_hash = inst->queue_hash;
-+	inst->queue_hash_size = hash_size;
-+	inst->queue_hash_mask = hash_mask;
-+	inst->queue_hash = new_hash;
-+
-+	spin_unlock_bh(&inst->lock);
-+
-+	kvfree(old_hash);
-+
-+	return 0;
-+}
-+
- static struct nfqnl_instance *
--instance_create(struct nfnl_queue_net *q, u_int16_t queue_num, u32 portid)
-+instance_create(struct nfnl_queue_net *q, u_int16_t queue_num, u32 portid,
-+		u32 hash_size)
- {
- 	struct nfqnl_instance *inst;
- 	unsigned int h;
- 	int err;
- 
-+	hash_size = nfqnl_normalize_hash_size(hash_size);
-+
- 	spin_lock(&q->instances_lock);
- 	if (instance_lookup(q, queue_num)) {
- 		err = -EEXIST;
-@@ -133,11 +215,24 @@ instance_create(struct nfnl_queue_net *q, u_int16_t queue_num, u32 portid)
- 		goto out_unlock;
- 	}
- 
-+	inst->queue_hash = kvcalloc(hash_size, sizeof(*inst->queue_hash),
-+				    GFP_KERNEL_ACCOUNT);
-+	if (!inst->queue_hash) {
-+		kfree(inst);
-+		err = -ENOMEM;
-+		goto out_unlock;
-+	}
-+
-+	for (h = 0; h < hash_size; h++)
-+		INIT_HLIST_HEAD(&inst->queue_hash[h]);
-+
- 	inst->queue_num = queue_num;
- 	inst->peer_portid = portid;
- 	inst->queue_maxlen = NFQNL_QMAX_DEFAULT;
- 	inst->copy_range = NFQNL_MAX_COPY_RANGE;
- 	inst->copy_mode = NFQNL_COPY_NONE;
-+	inst->queue_hash_size = hash_size;
-+	inst->queue_hash_mask = hash_size - 1;
- 	spin_lock_init(&inst->lock);
- 	INIT_LIST_HEAD(&inst->queue_list);
- 
-@@ -154,6 +249,7 @@ instance_create(struct nfnl_queue_net *q, u_int16_t queue_num, u32 portid)
- 	return inst;
- 
- out_free:
-+	kvfree(inst->queue_hash);
- 	kfree(inst);
- out_unlock:
- 	spin_unlock(&q->instances_lock);
-@@ -172,6 +268,7 @@ instance_destroy_rcu(struct rcu_head *head)
- 	rcu_read_lock();
- 	nfqnl_flush(inst, NULL, 0);
- 	rcu_read_unlock();
-+	kvfree(inst->queue_hash);
- 	kfree(inst);
- 	module_put(THIS_MODULE);
- }
-@@ -194,13 +291,17 @@ instance_destroy(struct nfnl_queue_net *q, struct nfqnl_instance *inst)
- static inline void
- __enqueue_entry(struct nfqnl_instance *queue, struct nf_queue_entry *entry)
- {
--       list_add_tail(&entry->list, &queue->queue_list);
--       queue->queue_total++;
-+	unsigned int hash = nfqnl_packet_hash(entry->id, queue->queue_hash_mask);
-+
-+	hlist_add_head(&entry->hash_node, &queue->queue_hash[hash]);
-+	list_add_tail(&entry->list, &queue->queue_list);
-+	queue->queue_total++;
- }
- 
- static void
- __dequeue_entry(struct nfqnl_instance *queue, struct nf_queue_entry *entry)
- {
-+	hlist_del(&entry->hash_node);
- 	list_del(&entry->list);
- 	queue->queue_total--;
- }
-@@ -209,10 +310,11 @@ static struct nf_queue_entry *
- find_dequeue_entry(struct nfqnl_instance *queue, unsigned int id)
- {
- 	struct nf_queue_entry *entry = NULL, *i;
-+	unsigned int hash = nfqnl_packet_hash(id, queue->queue_hash_mask);
- 
- 	spin_lock_bh(&queue->lock);
- 
--	list_for_each_entry(i, &queue->queue_list, list) {
-+	hlist_for_each_entry(i, &queue->queue_hash[hash], hash_node) {
- 		if (i->id == id) {
- 			entry = i;
- 			break;
-@@ -407,8 +509,7 @@ nfqnl_flush(struct nfqnl_instance *queue, nfqnl_cmpfn cmpfn, unsigned long data)
- 	spin_lock_bh(&queue->lock);
- 	list_for_each_entry_safe(entry, next, &queue->queue_list, list) {
- 		if (!cmpfn || cmpfn(entry, data)) {
--			list_del(&entry->list);
--			queue->queue_total--;
-+			__dequeue_entry(queue, entry);
- 			nfqnl_reinject(entry, NF_DROP);
- 		}
- 	}
-@@ -1483,6 +1584,7 @@ static const struct nla_policy nfqa_cfg_policy[NFQA_CFG_MAX+1] = {
- 	[NFQA_CFG_QUEUE_MAXLEN]	= { .type = NLA_U32 },
- 	[NFQA_CFG_MASK]		= { .type = NLA_U32 },
- 	[NFQA_CFG_FLAGS]	= { .type = NLA_U32 },
-+	[NFQA_CFG_HASH_SIZE]    = { .type = NLA_U32 },
- };
- 
- static const struct nf_queue_handler nfqh = {
-@@ -1495,11 +1597,15 @@ static int nfqnl_recv_config(struct sk_buff *skb, const struct nfnl_info *info,
- {
- 	struct nfnl_queue_net *q = nfnl_queue_pernet(info->net);
- 	u_int16_t queue_num = ntohs(info->nfmsg->res_id);
-+	u32 hash_size = 0;
- 	struct nfqnl_msg_config_cmd *cmd = NULL;
- 	struct nfqnl_instance *queue;
- 	__u32 flags = 0, mask = 0;
- 	int ret = 0;
- 
-+	if (nfqa[NFQA_CFG_HASH_SIZE])
-+		hash_size = ntohl(nla_get_be32(nfqa[NFQA_CFG_HASH_SIZE]));
-+
- 	if (nfqa[NFQA_CFG_CMD]) {
- 		cmd = nla_data(nfqa[NFQA_CFG_CMD]);
- 
-@@ -1559,11 +1665,12 @@ static int nfqnl_recv_config(struct sk_buff *skb, const struct nfnl_info *info,
- 				goto err_out_unlock;
- 			}
- 			queue = instance_create(q, queue_num,
--						NETLINK_CB(skb).portid);
-+						NETLINK_CB(skb).portid, hash_size);
- 			if (IS_ERR(queue)) {
- 				ret = PTR_ERR(queue);
- 				goto err_out_unlock;
- 			}
-+			hash_size = 0; /* avoid resize later in this function */
- 			break;
- 		case NFQNL_CFG_CMD_UNBIND:
- 			if (!queue) {
-@@ -1586,6 +1693,12 @@ static int nfqnl_recv_config(struct sk_buff *skb, const struct nfnl_info *info,
- 		goto err_out_unlock;
- 	}
- 
-+	if (hash_size > 0) {
-+		ret = nfqnl_hash_resize(queue, hash_size);
-+		if (ret)
-+			goto err_out_unlock;
-+	}
-+
- 	if (nfqa[NFQA_CFG_PARAMS]) {
- 		struct nfqnl_msg_config_params *params =
- 			nla_data(nfqa[NFQA_CFG_PARAMS]);
+Thanks,
+
 -- 
-2.39.5 (Apple Git-154)
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
+--nextPart2329569.iZASKD2KPV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEIcCsAScRrtr7W0x0KCYAIARzeA4FAmkVpIYACgkQKCYAIARz
+eA5eSQ//WtpMLLhBsgL99RREAmHJaMI6ZEJjl8x736YHyaG/7dE1U50SqzAmh8H8
+FijaFWVHiP2XMVOCCjmDLWrj7hISU62VA6V1qCr38DJ1nDeKPkfEcz2B9nwQBvAE
+RBOINiW9VOlYwJaZGnnsXz9pdYLHUrOfkx35uLvKN/tyOA3AbGECApi/v5kkrPxi
+KJvbLUThyP1LvIXqS/Fx7bQG1wYO+HuRxEEsJEyE3T8yy2fvN3PoNLDdS/QDmt6V
+VRl07jjP6m0XQ//6n6FfBATMGtdnlyxyMwvGdjwYUbbckMJypi/ZTYTATMocEZE3
++I4OrOaEIPpLg6rZt79usAzgAku7/SHsUY91n1Wa7Rt5DbKM1Kq706nX74bg6OCb
+JVmCWFafPkUVUxN2x0Zl/PLFnfGp+mpnYPz5GL4xHT2MKafZCCin+wmvxmfTV+1Z
+6WP7PflyrDk3ybg8a+5wq0576j7+KyL6Yf0rKqLGBAcDi/F/SITmmY2NqyuXgNu8
+W7MTrJ2Fih46Op+aIYI0iBa4x/22NTuAbVVfmZgHxkxn5uvr6qFYFqZHrFCRThrc
+TR9XEarKt7Eg4ikWo0OjvjvHJfhWk8fXD5qLWDNl+tEZMPXCqZ/7AA5he2M891sM
+7ZNwdgJZ+WeJP5V/BXVG0MyuBLvGMkTOisCVb3fxG8pmxfPynzA=
+=k9e2
+-----END PGP SIGNATURE-----
+
+--nextPart2329569.iZASKD2KPV--
+
+
 
 
