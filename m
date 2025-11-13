@@ -1,289 +1,191 @@
-Return-Path: <netdev+bounces-238192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08977C55A71
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 05:31:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D032C55B2A
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 05:50:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C14D23B7B39
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 04:31:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13C4A3B3B2F
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 04:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378CF2C033C;
-	Thu, 13 Nov 2025 04:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC30C307AE8;
+	Thu, 13 Nov 2025 04:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PCmvK5Nh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EnqN39dc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5061C29DB61
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 04:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29C0303C97
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 04:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763008269; cv=none; b=sFd36W896/KoZSDRgaOkwmFrAaWvK5Uj5ISkHBAOFxIKUXPf/IrpavtSkwI+D9LEci3F+p/fcVl314n6m7kL4G024PLokuU4SM3vofPN/6umOOxe09qaYdHnBVQekCo2/2MiKIxqkshDv26f+nbV/ZpUqGcuTPe5/AvjmYgFOKU=
+	t=1763009428; cv=none; b=f7s5xI8Y+w55H+WDcfBYBCD2FraNhkfwMB05rQjiiX+kZCBLbT1S7zMiVaKygDBBknlJJrrftFhAtxRVbkXipYb3xBISNFbVtifboO2LqrYStbPSX8VeRlIGj+BRyGBJV5LS79z3Pvgg89yR2GpW7rKG8InWu/9GdL7diEg+zzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763008269; c=relaxed/simple;
-	bh=c263BORVt9zh1SNppfW30PEA0OUxdyPYJ/ly3G1wWyk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lKjZ1yDSJigK5rAACIcMw33QXhyNEZShvlqW7lVDsWDOi6HtuSKHdJbT2kAtWWZ9Gdym4a4selBNslT+i7BoTEfKsXcXmHmGOQUlip7/popVDsfmKd/WmmFs3KBUGm9M3b/BdJ+g6S976DZpmMrVERG8V9CLNcsNJWmAmVGtxK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PCmvK5Nh; arc=none smtp.client-ip=209.85.160.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-3d5bb03d5c2so173282fac.1
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 20:31:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763008263; x=1763613063; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6WDt5Zh4CY8eJs4W8ykxXmnnsDaX4tUrTU5JY25ZhXw=;
-        b=PCmvK5NhK/zfqGEwS+4ra208qV3q15+BPBhh7TEjORYEjnzvtS/KR4D9TpU51awZzi
-         JSoZmEruFEi9rTEtMfqpVBc3n2dMXo8iL/KxVh4x1SbE6rTPoWUQoYEEy7herM5LkAP/
-         2lidpr07JZdYoRuzOyXbEwb0lquKiwlE0ZCvjPs3n+qkH1YZ9tELotIcigdOAx1v69vS
-         009eCrDyrKdM6lCYIKbKUo4PzUvop0U1V2A8+LbFIr6qQLsD9EImDlbMrCmmNr7gYAt/
-         IRMUvTcpUw0dt1R/aw3NbxiCLh/9hpOOb/gM4oG3EfnZ3MC9/kWaLq8E5RM75vt+/VTF
-         kAIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763008263; x=1763613063;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6WDt5Zh4CY8eJs4W8ykxXmnnsDaX4tUrTU5JY25ZhXw=;
-        b=siaupbp9dCncKdzTWYQ/HLAWC43HpfA7h3zcHmqYGXFDSTh0/lMv/qDj09yIDsodN9
-         HQo5WprPpgqP83uWzf1FeqUpe4THchJeiJJFLcYQg2HZ1GnerZxEqlGf8HP00RIrCzfp
-         AvunQZHqHBNveEYAciDfrrquufI/lAWeDPpH9Cw/FqWbdygLf0p3lPrG8dC2jvXIuMpO
-         OXQviKwrJb9XNaqI7YVrMJKsi0cmkNZYLYBtpRQXHsiWVNuhUfJ5YJJEIO/S/CQSetOE
-         xliVnqmypGDGNlIEwO3bSzAPJ9CzE/NTmAHKqc/ZsjahwuSook+E7RFOhFvwhgYWBPof
-         utlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWAXDLoTS3TrnCpc231D/tDg4y/kGxKJhPx5zu4stmFPYkeQvQsJbHqWkZJITvV9g0wD9mSm9o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywlpx4q5t1O5MbYwezSmwnU1lhtakHgxmEZKg/+/unGyBbnjNDy
-	oIT+S2vmr3+Kz+gsTY1fMl+6D91nwmJZImxlXwAq38U7f5dkJqcv8Jv4
-X-Gm-Gg: ASbGncvxa030TIDAzNdOGo+LkYsQ3gR34PofBd82zXl7utEWBSx+X9jSV0xIA7zq4WC
-	VnYyC2bzSSP1INAB09oDq81IqK3+pwGdn4auLgwLgFp/0LUocgad4zsusxtv3sD3f/g6oiBupnE
-	shpxaLV91sPKzMACejlzbwo3VK8XEAGPgn1uwZQ8P4xleGQGchth+/WhGnKCyR2zR5ulh8qs+Ld
-	LckDage9rtB+wOJTq93/J1cHX2hMpg9qbN8zCAUfJNrvO/L4bSNIw3PnMuNFhVeU838kYrLxqex
-	/+jpDs1fnIZ9Fdrpq+uCXiQiL2CXvlz6GS9gqCyJIj9Muj8KRPpJel5ietR1KqPpzbLP3dNPVuM
-	P7/aJl6DOSSElcE4BGrYmvIfMxnLfT37G5E88dKgQbmHDk1VTbdFzQt2RkIb0/ym9AAgamY8884
-	biiVHx+9JqFxdULQ+sI6U=
-X-Google-Smtp-Source: AGHT+IGJ4ELwLXwPJt2nOCnAR00gAs+/s2qXEwZaFNHtL1hCNbx4GfuHDxZu3clFmqhPvKkDtNncdA==
-X-Received: by 2002:a05:6871:c317:b0:3d3:599d:fe98 with SMTP id 586e51a60fabf-3e8341d01bamr2451306fac.41.1763008263207;
-        Wed, 12 Nov 2025 20:31:03 -0800 (PST)
-Received: from localhost ([2a03:2880:12ff:73::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3e851d64d3dsm742607fac.0.2025.11.12.20.31.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 20:31:02 -0800 (PST)
-From: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1763009428; c=relaxed/simple;
+	bh=90ttPY1qI/ixvslP1H1VXQfWx72HxaioAD+B6TMWq8k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RPKcvH0UWzrNzGmNWJHwkItDZxTiJ8eimtXlv0/KubqK5JYtZIG9DlcJ8YZyARYCceqNgX4B28Oujdoq2OODKxDxlx8OJY0Y9MLB+bh2ujoeLzJlezKVafW9bv5kX8LJGkOUX1FSaXZiY8EXs1VXenRMRZhJLMFInHzaSSrLwSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EnqN39dc; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763009427; x=1794545427;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=90ttPY1qI/ixvslP1H1VXQfWx72HxaioAD+B6TMWq8k=;
+  b=EnqN39dcXHjzf3zTPG2aEcJ4wxMXCbRfTSgnh/Yw52NByP3CkRQSTbIp
+   QrNRuthMRCcqYuKZeb2D18wNBgkFQiV5z0cCS2rXH3Cs1LHljjFUaFX0Q
+   WKb5L18sjh9rfgZf24ehZX+h7AE2CWInCMIrmHx4uD1aPp0YjKAfSuxSx
+   thFeo2zKQ0jY67ZsZZaw8FaqT+v8sKRE8hNkyU+temnl8k8rzHT7HWN2X
+   Ze26l7UNsJ09M3uz9grbgHUPqG18hmVhEvdZtBjhZz0x3y5pBypKEo8XG
+   uYfmvx7oBd49VzkCWK12ZVCVi+UJPz6c28roD5+MtSrneU1lrQylkbMl0
+   w==;
+X-CSE-ConnectionGUID: xQKyZrU4QbuaFVQ1w//Q2g==
+X-CSE-MsgGUID: oh8PsytkRROrzIN3HTtecw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11611"; a="68947848"
+X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
+   d="scan'208";a="68947848"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 20:50:25 -0800
+X-CSE-ConnectionGUID: xZPmvstDSqm4XKzyYbWeug==
+X-CSE-MsgGUID: KFMe4rC1TxmUXAbV/+YC+Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
+   d="scan'208";a="212789118"
+Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 12 Nov 2025 20:50:20 -0800
+Received: from kbuild by 7b01c990427b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vJPHm-0004sf-2D;
+	Thu, 13 Nov 2025 04:50:18 +0000
+Date: Thu, 13 Nov 2025 12:49:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrei Botila <andrei.botila@oss.nxp.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
 	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	Amery Hung <ameryhung@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next] selftests: drv-net: xdp: Fix register spill error with clang 20
-Date: Wed, 12 Nov 2025 20:31:02 -0800
-Message-ID: <20251113043102.4062150-1-dimitri.daskalakis1@gmail.com>
-X-Mailer: git-send-email 2.47.3
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	bcm-kernel-feedback-list@broadcom.com,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH net-next 1/8] phy: add hwtstamp_get callback to retrieve
+ config
+Message-ID: <202511122341.yMQLxKfa-lkp@intel.com>
+References: <20251112000257.1079049-2-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251112000257.1079049-2-vadim.fedorenko@linux.dev>
 
-On clang 20.1.8 the XDP program fails to load with a register spill error.
-Since hdr_len is a __u32, the compiler decided it only needed the lower
-32-bits of ctx->data, which later triggers the register spill verifier
-error.
+Hi Vadim,
 
-Suggested-by: Martin KaFai Lau <martin.lau@kernel.org>
-Signed-off-by: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-libbpf: prog 'xdp_prog': BPF program load failed: Permission denied
-libbpf: prog 'xdp_prog': -- BEGIN PROG LOAD LOG --
-0: R1=ctx() R10=fp0
-; return xdp_prog_common(ctx); @ xdp_native.bpf.c:670
-0: (85) call pc+1
-caller:
- R10=fp0
-callee:
- frame1: R1=ctx() R10=fp0
-2: frame1: R1=ctx() R10=fp0
-; static int xdp_prog_common(struct xdp_md *ctx) @ xdp_native.bpf.c:635
-2: (bf) r7 = r1                       ; frame1: R1=ctx() R7_w=ctx()
-3: (b4) w1 = 0                        ; frame1: R1_w=0
-; key = XDP_MODE; @ xdp_native.bpf.c:640
-4: (63) *(u32 *)(r10 -336) = r1       ; frame1: R1_w=0 R10=fp0 fp-336=????0
-5: (bf) r2 = r10                      ; frame1: R2_w=fp0 R10=fp0
-6: (07) r2 += -336                    ; frame1: R2_w=fp-336
-; mode = bpf_map_lookup_elem(&map_xdp_setup, &key); @ xdp_native.bpf.c:641
-7: (18) r1 = 0xff110001099ada00       ; frame1: R1_w=map_ptr(map=map_xdp_setup,ks=4,vs=4)
-9: (85) call bpf_map_lookup_elem#1    ; frame1: R0=map_value(map=map_xdp_setup,ks=4,vs=4)
-10: (bf) r8 = r0                      ; frame1: R0=map_value(map=map_xdp_setup,ks=4,vs=4) R8_w=map_value(map=map_xdp_setup,ks=4,vs=4)
-11: (b4) w6 = 2                       ; frame1: R6_w=2
-; if (!mode) @ xdp_native.bpf.c:642
-12: (15) if r8 == 0x0 goto pc+669     ; frame1: R8_w=map_value(map=map_xdp_setup,ks=4,vs=4)
-13: (b4) w1 = 1                       ; frame1: R1_w=1
-; key = XDP_PORT; @ xdp_native.bpf.c:645
-14: (63) *(u32 *)(r10 -336) = r1      ; frame1: R1_w=1 R10=fp0 fp-336=????1
-15: (bf) r2 = r10                     ; frame1: R2_w=fp0 R10=fp0
-16: (07) r2 += -336                   ; frame1: R2_w=fp-336
-; port = bpf_map_lookup_elem(&map_xdp_setup, &key); @ xdp_native.bpf.c:646
-17: (18) r1 = 0xff110001099ada00      ; frame1: R1_w=map_ptr(map=map_xdp_setup,ks=4,vs=4)
-19: (85) call bpf_map_lookup_elem#1   ; frame1: R0=map_value(map=map_xdp_setup,ks=4,vs=4)
-; if (!port) @ xdp_native.bpf.c:647
-20: (15) if r0 == 0x0 goto pc+661     ; frame1: R0=map_value(map=map_xdp_setup,ks=4,vs=4)
-; switch (*mode) { @ xdp_native.bpf.c:650
-21: (61) r1 = *(u32 *)(r8 +0)         ; frame1: R1_w=scalar(smin=0,smax=umax=0xffffffff,var_off=(0x0; 0xffffffff)) R8=map_value(map=map_xdp_setup,ks=4,vs=4)
-22: (66) if w1 s> 0x1 goto pc+20 43: frame1: R0=map_value(map=map_xdp_setup,ks=4,vs=4) R1=scalar(smin=umin=smin32=umin32=2,smax=umax=umax32=0x7fffffff,var_off=(0x0; 0x7fffffff)) R6=2 R7=ctx() R8=map_value(map=map_xdp_setup,ks=4,vs=4) R10=fp0 fp-336=????1
-; switch (*mode) { @ xdp_native.bpf.c:650
-43: (16) if w1 == 0x2 goto pc+26      ; frame1: R1=scalar(smin=umin=smin32=umin32=3,smax=umax=umax32=0x7fffffff,var_off=(0x0; 0x7fffffff))
-44: (16) if w1 == 0x3 goto pc+123 168: frame1: R0=map_value(map=map_xdp_setup,ks=4,vs=4) R1=3 R6=2 R7=ctx() R8=map_value(map=map_xdp_setup,ks=4,vs=4) R10=fp0 fp-336=????1
-; return xdp_adjst_tail(ctx, (__u16)(*port)); @ xdp_native.bpf.c:658
-168: (61) r2 = *(u32 *)(r0 +0)        ; frame1: R0=map_value(map=map_xdp_setup,ks=4,vs=4) R2_w=scalar(smin=0,smax=umax=0xffffffff,var_off=(0x0; 0xffffffff))
-; udph = filter_udphdr(ctx, port); @ xdp_native.bpf.c:430
-169: (54) w2 &= 65535                 ; frame1: R2_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=0xffff,var_off=(0x0; 0xffff))
-170: (bf) r1 = r7                     ; frame1: R1_w=ctx() R7=ctx()
-171: (85) call pc+512
-caller:
- frame1: R6=2 R7=ctx() R8=map_value(map=map_xdp_setup,ks=4,vs=4) R10=fp0 fp-336=????1
-callee:
- frame2: R1_w=ctx() R2_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=0xffff,var_off=(0x0; 0xffff)) R10=fp0
-684: frame2: R1=ctx() R2=scalar(smin=smin32=0,smax=umax=smax32=umax32=0xffff,var_off=(0x0; 0xffff)) R10=fp0
-; static struct udphdr *filter_udphdr(struct xdp_md *ctx, __u16 port) @ xdp_native.bpf.c:71
-684: (bc) w6 = w2                     ; frame2: R2=scalar(id=54,smin=smin32=0,smax=umax=smax32=umax32=0xffff,var_off=(0x0; 0xffff)) R6_w=scalar(id=54,smin=smin32=0,smax=umax=smax32=umax32=0xffff,var_off=(0x0; 0xffff))
-685: (bf) r7 = r1                     ; frame2: R1=ctx() R7_w=ctx()
-; err = bpf_xdp_pull_data(ctx, sizeof(*eth)); @ xdp_native.bpf.c:78
-686: (b4) w2 = 14                     ; frame2: R2_w=14
-687: (85) call bpf_xdp_pull_data#85514        ; frame2: R0_w=scalar()
-688: (bc) w1 = w0                     ; frame2: R0_w=scalar() R1_w=scalar(smin=0,smax=umax=0xffffffff,var_off=(0x0; 0xffffffff))
-689: (b7) r0 = 0                      ; frame2: R0_w=0
-; if (err) @ xdp_native.bpf.c:79
-690: (56) if w1 != 0x0 goto pc+55     ; frame2: R1_w=0
-; data_end = (void *)(long)ctx->data_end; @ xdp_native.bpf.c:82
-691: (61) r2 = *(u32 *)(r7 +4)        ; frame2: R2_w=pkt_end() R7_w=ctx()
-; data = eth = (void *)(long)ctx->data; @ xdp_native.bpf.c:83
-692: (61) r1 = *(u32 *)(r7 +0)        ; frame2: R1_w=pkt(r=0) R7_w=ctx()
-; if (data + sizeof(*eth) > data_end) @ xdp_native.bpf.c:85
-693: (bf) r3 = r1                     ; frame2: R1_w=pkt(r=0) R3_w=pkt(r=0)
-694: (07) r3 += 14                    ; frame2: R3=pkt(off=14,r=0)
-695: (2d) if r3 > r2 goto pc+50       ; frame2: R2=pkt_end() R3=pkt(off=14,r=14)
-; if (eth->h_proto == bpf_htons(ETH_P_IP)) { @ xdp_native.bpf.c:88
-696: (71) r2 = *(u8 *)(r1 +12)        ; frame2: R1=pkt(r=14) R2_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=255,var_off=(0x0; 0xff))
-697: (71) r1 = *(u8 *)(r1 +13)        ; frame2: R1_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=255,var_off=(0x0; 0xff))
-698: (64) w1 <<= 8                    ; frame2: R1_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=0xff00,var_off=(0x0; 0xff00))
-699: (4c) w1 |= w2                    ; frame2: R1_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=0xffff,var_off=(0x0; 0xffff)) R2_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=255,var_off=(0x0; 0xff))
-700: (16) if w1 == 0xdd86 goto pc+15          ; frame2: R1_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=0xffff,var_off=(0x0; 0xffff))
-701: (56) if w1 != 0x8 goto pc+44     ; frame2: R1_w=8
-; err = bpf_xdp_pull_data(ctx, sizeof(*eth) + sizeof(*iph) + @ xdp_native.bpf.c:91
-702: (bf) r1 = r7                     ; frame2: R1_w=ctx() R7=ctx()
-703: (b4) w2 = 42                     ; frame2: R2_w=42
-704: (85) call bpf_xdp_pull_data#85514        ; frame2: R0=scalar()
-705: (bc) w1 = w0                     ; frame2: R0=scalar() R1_w=scalar(smin=0,smax=umax=0xffffffff,var_off=(0x0; 0xffffffff))
-706: (b7) r0 = 0                      ; frame2: R0_w=0
-; if (err) @ xdp_native.bpf.c:93
-707: (56) if w1 != 0x0 goto pc+38     ; frame2: R1_w=0
-; data_end = (void *)(long)ctx->data_end; @ xdp_native.bpf.c:96
-708: (61) r1 = *(u32 *)(r7 +4)        ; frame2: R1_w=pkt_end() R7=ctx()
-; data = (void *)(long)ctx->data; @ xdp_native.bpf.c:97
-709: (61) r2 = *(u32 *)(r7 +0)        ; frame2: R2_w=pkt(r=0) R7=ctx()
-; if (iph + 1 > (struct iphdr *)data_end || @ xdp_native.bpf.c:101
-710: (bf) r7 = r2                     ; frame2: R2_w=pkt(r=0) R7_w=pkt(r=0)
-711: (07) r7 += 34                    ; frame2: R7_w=pkt(off=34,r=0)
-712: (2d) if r7 > r1 goto pc+33       ; frame2: R1_w=pkt_end() R7_w=pkt(off=34,r=34)
-; iph->protocol != IPPROTO_UDP) @ xdp_native.bpf.c:102
-713: (71) r2 = *(u8 *)(r2 +23)        ; frame2: R2=scalar(smin=smin32=0,smax=umax=smax32=umax32=255,var_off=(0x0; 0xff))
-; if (iph + 1 > (struct iphdr *)data_end || @ xdp_native.bpf.c:101
-714: (16) if w2 == 0x11 goto pc+14 729: frame2: R0=0 R1=pkt_end() R2=17 R6=scalar(id=54,smin=smin32=0,smax=umax=smax32=umax32=0xffff,var_off=(0x0; 0xffff)) R7=pkt(off=34,r=34) R10=fp0
-; if (udph + 1 > (struct udphdr *)data_end) @ xdp_native.bpf.c:128
-729: (bf) r2 = r7                     ; frame2: R2_w=pkt(off=34,r=34) R7=pkt(off=34,r=34)
-730: (07) r2 += 8                     ; frame2: R2=pkt(off=42,r=34)
-731: (2d) if r2 > r1 goto pc+14       ; frame2: R1=pkt_end() R2=pkt(off=42,r=42)
-; if (udph->dest != bpf_htons(port)) @ xdp_native.bpf.c:131
-732: (dc) r6 = be16 r6                ; frame2: R6_w=scalar()
-733: (69) r1 = *(u16 *)(r7 +2)        ; frame2: R1_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=0xffff,var_off=(0x0; 0xffff)) R7=pkt(off=34,r=42)
-734: (5e) if w1 != w6 goto pc+11      ; frame2: R1_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=0xffff,var_off=(0x0; 0xffff)) R6_w=scalar(smax=0x7fffffff0000ffff,umax=0xffffffff0000ffff,smin32=0,smax32=umax32=0xffff,var_off=(0x0; 0xffffffff0000ffff))
-735: (b4) w1 = 0                      ; frame2: R1_w=0
-736: (63) *(u32 *)(r10 -4) = r1       ; frame2: R1_w=0 R10=fp0 fp-8=0000????
-737: (bf) r2 = r10                    ; frame2: R2_w=fp0 R10=fp0
-738: (07) r2 += -4                    ; frame2: R2_w=fp-4
-; count = bpf_map_lookup_elem(&map_xdp_stats, &stat_type); @ xdp_native.bpf.c:65
-739: (18) r1 = 0xff110001099ad200     ; frame2: R1_w=map_ptr(map=map_xdp_stats,ks=4,vs=8)
-741: (85) call bpf_map_lookup_elem#1          ; frame2: R0=map_value(map=map_xdp_stats,ks=4,vs=8)
-; if (count) @ xdp_native.bpf.c:67
-742: (15) if r0 == 0x0 goto pc+2      ; frame2: R0=map_value(map=map_xdp_stats,ks=4,vs=8)
-743: (b7) r1 = 1                      ; frame2: R1_w=1
-; __sync_fetch_and_add(count, 1); @ xdp_native.bpf.c:68
-744: (db) r1 = atomic64_fetch_add((u64 *)(r0 +0), r1)         ; frame2: R0=map_value(map=map_xdp_stats,ks=4,vs=8) R1_w=scalar()
-745: (bf) r0 = r7                     ; frame2: R0_w=pkt(off=34,r=42) R7=pkt(off=34,r=42)
-; } @ xdp_native.bpf.c:137
-746: (95) exit
-returning from callee:
- frame2: R0_w=pkt(off=34,r=42) R1_w=scalar() R6=scalar(smax=0x7fffffff0000ffff,umax=0xffffffff0000ffff,smin32=0,smax32=umax32=0xffff,var_off=(0x0; 0xffffffff0000ffff)) R7=pkt(off=34,r=42) R10=fp0 fp-8=0000????
-to caller at 172:
- frame1: R0_w=pkt(off=34,r=42) R6=2 R7=ctx() R8=map_value(map=map_xdp_setup,ks=4,vs=4) R10=fp0 fp-336=????1
-; udph = filter_udphdr(ctx, port); @ xdp_native.bpf.c:430
-172: (bf) r8 = r0                     ; frame1: R0_w=pkt(off=34,r=42) R8_w=pkt(off=34,r=42)
-; if (!udph) @ xdp_native.bpf.c:431
-173: (15) if r8 == 0x0 goto pc+508    ; frame1: R8_w=pkt(off=34,r=42)
-; hdr_len = (void *)udph - (void *)(long)ctx->data + @ xdp_native.bpf.c:434
-174: (61) r9 = *(u32 *)(r7 +0)        ; frame1: R7=ctx() R9_w=pkt(r=0)
-; key = XDP_ADJST_OFFSET; @ xdp_native.bpf.c:436
-175: (63) *(u32 *)(r10 -328) = r6     ; frame1: R6=2 R10=fp0 fp-328=????2
-176: (bf) r2 = r10                    ; frame1: R2_w=fp0 R10=fp0
-177: (07) r2 += -328                  ; frame1: R2_w=fp-328
-; adjust_offset = bpf_map_lookup_elem(&map_xdp_setup, &key); @ xdp_native.bpf.c:437
-178: (18) r1 = 0xff110001099ada00     ; frame1: R1_w=map_ptr(map=map_xdp_setup,ks=4,vs=4)
-180: (85) call bpf_map_lookup_elem#1          ; frame1: R0=map_value(map=map_xdp_setup,ks=4,vs=4)
-; if (!adjust_offset) @ xdp_native.bpf.c:438
-181: (15) if r0 == 0x0 goto pc+500    ; frame1: R0=map_value(map=map_xdp_setup,ks=4,vs=4)
-182: (63) *(u32 *)(r10 -344) = r9
-invalid size of register spill
-processed 2736 insns (limit 1000000) max_states_per_insn 5 total_states 190 peak_states 156 mark_read 19
--- END PROG LOAD LOG --
-libbpf: prog 'xdp_prog': failed to load: -13
-libbpf: failed to load object '/root/ksft-net-drv/net/lib/xdp_native.bpf.o'
+kernel test robot noticed the following build errors:
 
- tools/testing/selftests/net/lib/xdp_native.bpf.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+[auto build test ERROR on net-next/main]
 
-diff --git a/tools/testing/selftests/net/lib/xdp_native.bpf.c b/tools/testing/selftests/net/lib/xdp_native.bpf.c
-index c368fc045f4b..64f05229ab24 100644
---- a/tools/testing/selftests/net/lib/xdp_native.bpf.c
-+++ b/tools/testing/selftests/net/lib/xdp_native.bpf.c
-@@ -332,7 +332,7 @@ static __u16 csum_fold_helper(__u32 csum)
- }
- 
- static int xdp_adjst_tail_shrnk_data(struct xdp_md *ctx, __u16 offset,
--				     __u32 hdr_len)
-+				     unsigned long hdr_len)
- {
- 	char tmp_buff[MAX_ADJST_OFFSET];
- 	__u32 buff_pos, udp_csum = 0;
-@@ -422,8 +422,9 @@ static int xdp_adjst_tail(struct xdp_md *ctx, __u16 port)
- {
- 	struct udphdr *udph = NULL;
- 	__s32 *adjust_offset, *val;
--	__u32 key, hdr_len;
-+	unsigned long hdr_len;
- 	void *offset_ptr;
-+	__u32 key;
- 	__u8 tag;
- 	int ret;
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/phy-add-hwtstamp_get-callback-to-retrieve-config/20251112-080606
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251112000257.1079049-2-vadim.fedorenko%40linux.dev
+patch subject: [PATCH net-next 1/8] phy: add hwtstamp_get callback to retrieve config
+config: arm-allmodconfig (https://download.01.org/0day-ci/archive/20251112/202511122341.yMQLxKfa-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251112/202511122341.yMQLxKfa-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511122341.yMQLxKfa-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/ti/netcp_ethss.c: In function 'gbe_hwtstamp_set':
+>> drivers/net/ethernet/ti/netcp_ethss.c:2660:37: error: 'struct mii_timestamper' has no member named 'hwtstamp'; did you mean 'rxtstamp'?
+    2660 |                 return phy->mii_ts->hwtstamp(phy->mii_ts, cfg, extack);
+         |                                     ^~~~~~~~
+         |                                     rxtstamp
+
+
+vim +2660 drivers/net/ethernet/ti/netcp_ethss.c
+
+6246168b4a3835 WingMan Kwok    2016-12-08  2645  
+3f02b82725576a Vadim Fedorenko 2025-11-03  2646  static int gbe_hwtstamp_set(void *intf_priv, struct kernel_hwtstamp_config *cfg,
+3f02b82725576a Vadim Fedorenko 2025-11-03  2647  			    struct netlink_ext_ack *extack)
+6246168b4a3835 WingMan Kwok    2016-12-08  2648  {
+3f02b82725576a Vadim Fedorenko 2025-11-03  2649  	struct gbe_intf *gbe_intf = intf_priv;
+3f02b82725576a Vadim Fedorenko 2025-11-03  2650  	struct gbe_priv *gbe_dev;
+3f02b82725576a Vadim Fedorenko 2025-11-03  2651  	struct phy_device *phy;
+3f02b82725576a Vadim Fedorenko 2025-11-03  2652  
+3f02b82725576a Vadim Fedorenko 2025-11-03  2653  	gbe_dev = gbe_intf->gbe_dev;
+6246168b4a3835 WingMan Kwok    2016-12-08  2654  
+3f02b82725576a Vadim Fedorenko 2025-11-03  2655  	if (!gbe_dev->cpts)
+6246168b4a3835 WingMan Kwok    2016-12-08  2656  		return -EOPNOTSUPP;
+6246168b4a3835 WingMan Kwok    2016-12-08  2657  
+3f02b82725576a Vadim Fedorenko 2025-11-03  2658  	phy = gbe_intf->slave->phy;
+3f02b82725576a Vadim Fedorenko 2025-11-03  2659  	if (phy_has_hwtstamp(phy))
+3f02b82725576a Vadim Fedorenko 2025-11-03 @2660  		return phy->mii_ts->hwtstamp(phy->mii_ts, cfg, extack);
+6246168b4a3835 WingMan Kwok    2016-12-08  2661  
+3f02b82725576a Vadim Fedorenko 2025-11-03  2662  	switch (cfg->tx_type) {
+6246168b4a3835 WingMan Kwok    2016-12-08  2663  	case HWTSTAMP_TX_OFF:
+a9423120343cb5 Ivan Khoronzhuk 2018-11-12  2664  		gbe_dev->tx_ts_enabled = 0;
+6246168b4a3835 WingMan Kwok    2016-12-08  2665  		break;
+6246168b4a3835 WingMan Kwok    2016-12-08  2666  	case HWTSTAMP_TX_ON:
+a9423120343cb5 Ivan Khoronzhuk 2018-11-12  2667  		gbe_dev->tx_ts_enabled = 1;
+6246168b4a3835 WingMan Kwok    2016-12-08  2668  		break;
+6246168b4a3835 WingMan Kwok    2016-12-08  2669  	default:
+6246168b4a3835 WingMan Kwok    2016-12-08  2670  		return -ERANGE;
+6246168b4a3835 WingMan Kwok    2016-12-08  2671  	}
+6246168b4a3835 WingMan Kwok    2016-12-08  2672  
+3f02b82725576a Vadim Fedorenko 2025-11-03  2673  	switch (cfg->rx_filter) {
+6246168b4a3835 WingMan Kwok    2016-12-08  2674  	case HWTSTAMP_FILTER_NONE:
+a9423120343cb5 Ivan Khoronzhuk 2018-11-12  2675  		gbe_dev->rx_ts_enabled = HWTSTAMP_FILTER_NONE;
+6246168b4a3835 WingMan Kwok    2016-12-08  2676  		break;
+6246168b4a3835 WingMan Kwok    2016-12-08  2677  	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
+6246168b4a3835 WingMan Kwok    2016-12-08  2678  	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
+6246168b4a3835 WingMan Kwok    2016-12-08  2679  	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
+a9423120343cb5 Ivan Khoronzhuk 2018-11-12  2680  		gbe_dev->rx_ts_enabled = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+3f02b82725576a Vadim Fedorenko 2025-11-03  2681  		cfg->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+6246168b4a3835 WingMan Kwok    2016-12-08  2682  		break;
+6246168b4a3835 WingMan Kwok    2016-12-08  2683  	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
+6246168b4a3835 WingMan Kwok    2016-12-08  2684  	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+6246168b4a3835 WingMan Kwok    2016-12-08  2685  	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
+6246168b4a3835 WingMan Kwok    2016-12-08  2686  	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
+6246168b4a3835 WingMan Kwok    2016-12-08  2687  	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
+6246168b4a3835 WingMan Kwok    2016-12-08  2688  	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
+6246168b4a3835 WingMan Kwok    2016-12-08  2689  	case HWTSTAMP_FILTER_PTP_V2_EVENT:
+6246168b4a3835 WingMan Kwok    2016-12-08  2690  	case HWTSTAMP_FILTER_PTP_V2_SYNC:
+6246168b4a3835 WingMan Kwok    2016-12-08  2691  	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
+a9423120343cb5 Ivan Khoronzhuk 2018-11-12  2692  		gbe_dev->rx_ts_enabled = HWTSTAMP_FILTER_PTP_V2_EVENT;
+3f02b82725576a Vadim Fedorenko 2025-11-03  2693  		cfg->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
+6246168b4a3835 WingMan Kwok    2016-12-08  2694  		break;
+6246168b4a3835 WingMan Kwok    2016-12-08  2695  	default:
+6246168b4a3835 WingMan Kwok    2016-12-08  2696  		return -ERANGE;
+6246168b4a3835 WingMan Kwok    2016-12-08  2697  	}
+6246168b4a3835 WingMan Kwok    2016-12-08  2698  
+6246168b4a3835 WingMan Kwok    2016-12-08  2699  	gbe_hwtstamp(gbe_intf);
+6246168b4a3835 WingMan Kwok    2016-12-08  2700  
+3f02b82725576a Vadim Fedorenko 2025-11-03  2701  	return 0;
+6246168b4a3835 WingMan Kwok    2016-12-08  2702  }
+6246168b4a3835 WingMan Kwok    2016-12-08  2703  
+
 -- 
-2.47.3
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
