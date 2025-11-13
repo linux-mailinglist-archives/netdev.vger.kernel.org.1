@@ -1,90 +1,102 @@
-Return-Path: <netdev+bounces-238466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B028C592C3
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:32:57 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBFE7C5927B
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:29:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0B5714FEDB5
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:22:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0AE9035F3F2
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0DF285C8D;
-	Thu, 13 Nov 2025 17:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8860C1FC0EA;
+	Thu, 13 Nov 2025 17:19:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BpkIEYXU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gEk3/99q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9BE2609CC;
-	Thu, 13 Nov 2025 17:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C6F35CBD2
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 17:19:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763054448; cv=none; b=JEtRe0Yvweh9oz64sV60Cpyj9syARSp79adq8sJCclwG0DPmjqqoOdz+XGWQcw5XcRQQQySrYweeaNDGb2myFsAtn2FtriN0OCsBXGvpYk5x9XygtzCild6rFEp/6HbN1RoxhDfMjRe6fQ414b65aSi5D+DFSatECsIrb74tH7A=
+	t=1763054391; cv=none; b=j9ZCiFO2VSooZ8EP+ULdsHWUH4+BGX2BMEAMmgfJRHDmckDLnq3rvIilhSZ5SnuJtBMRKxVg8nJa25AyrxaaJNzZ8Gp5JYm9+IQx2G56E2lxOt0c4opl93Ghyns++pV9+FbYuFZj1VDtJvh1dAhQfuIcQ13blDio0RQTV9cB8Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763054448; c=relaxed/simple;
-	bh=e4w8F5T0ln8Rha6zvjUQabjHWXT2GZbMyXlv8D2R2e4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EfUmH+2Qgn09m+8gR47+stODgS7p2VQxKSNVzJAGeUdvVYMsCWk4kOUpZWcrw1jqh49GjHfNuf5CVcSy3qCloAOryhfAilyAVfuWmdzqCWCK53BgLpilL3koavR7Ytuwh/7uDwdZmJvKcDc8mOze7KBrtHz8muNud8SnRshmfO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BpkIEYXU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74404C113D0;
-	Thu, 13 Nov 2025 17:20:47 +0000 (UTC)
+	s=arc-20240116; t=1763054391; c=relaxed/simple;
+	bh=YgN1ZBq/zprMvZP9Ny3zoKp3YiLQvdalkDw2OGjAfhk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ZXXAC6KbwTbZs+5ZRAiab2O7kGtGGqFHf220k9yCPxIv2h2Tb4D3jIFUG6Wxd1oTNlyb/tc3XNwaE2BOVsAZcPqCbQ8mDoeEVR2AQEtdHt9N7ecG3DnYoj0FXfADYOnU2kkjb/4F3lAAzu6L7x+IckCcuUtkTwGZtQgJHFI0esQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gEk3/99q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7621FC4CEF5;
+	Thu, 13 Nov 2025 17:19:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763054447;
-	bh=e4w8F5T0ln8Rha6zvjUQabjHWXT2GZbMyXlv8D2R2e4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BpkIEYXUe6cYwg9EkzPKlx03iEjVWmvIjpqVtXudwkoLL4jSSaCkneVYo1rNFLEye
-	 Y5SgDZkNqsfqrvLxPWGqOZsIXakpQnHX/X5lMZxFaxRkIcap2TyXcIGU9TtbzAmwMn
-	 yDet18iw3ds+dqjzeYN1aMeEj+1jOf3S2/AQ9YNd0itg2U0EKPyzMgkN8YJpo2nLyl
-	 3uHISwMmLX9lh3kIFpgIAEVQZRyF9yuP1OHCwjZ8JI0EnTDBZgampMHF+SzsBoLtcS
-	 DFFxZ24Dz31mV0rRlopLYDYn8QyI16vtt16yo5StfHuRFPawmW38zmN0QU/QL4d7+i
-	 6lGsJF13Ru1aw==
-Date: Thu, 13 Nov 2025 09:19:06 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] sctp: Remove unused declaration
- sctp_auth_init_hmacs()
-Message-ID: <20251113171906.GB1792@sol>
-References: <20251113114501.32905-1-yuehaibing@huawei.com>
+	s=k20201202; t=1763054391;
+	bh=YgN1ZBq/zprMvZP9Ny3zoKp3YiLQvdalkDw2OGjAfhk=;
+	h=From:Date:Subject:To:Cc:From;
+	b=gEk3/99qvhItMDJFcO6s/DbvkfrTE+bK/hXx2ga16uTB4dKZb7ESUAWBcUJgqNT+b
+	 tq1cmgodEnrbDGvzdUHUDG2yNRvkcTJGe0JRrB9vtahinldZ0zNupKGsh2ohmkpxtq
+	 BGJew8PK6u4wcocyjYuJ3m/O/x2597arfVwiZnBGRARg2A0MLovNtLBOTb7LFVCnAj
+	 MywOH/o3MwQDnQC/k2x80K/eWDJyO0IvYu8XEMyMXYpt1yPTbkVKbUjmKXVSZcKMWL
+	 Dt610IRqeO/QlvyyKCBEEg6uf11XG9g3CfqTTqHt3Plpwj7wW1hL4sliMaBsV9gUFm
+	 ox3Q64+okmQyg==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Thu, 13 Nov 2025 18:19:38 +0100
+Subject: [PATCH net] net: airoha: Do not loopback traffic to GDM2 if it is
+ available on the device
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251113114501.32905-1-yuehaibing@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251113-airoha-hw-offload-gdm2-fix-v1-1-7e4ca300872f@kernel.org>
+X-B4-Tracking: v=1; b=H4sIACkTFmkC/x3MQQqAIBBA0avErBtIK6iuEi0sZ3KgMhQqkO6et
+ Hx/8RNECkIRhiJBoEui+CNDlQUszhwrodhs0JVulVI1GgneGXQ3eubNG4ur3TWyPKh7brizXLU
+ zQx6cgXL+5+P0vh8gh6zqbAAAAA==
+X-Change-ID: 20251113-airoha-hw-offload-gdm2-fix-29f4f8df05bf
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-On Thu, Nov 13, 2025 at 07:45:01PM +0800, Yue Haibing wrote:
-> Commit bf40785fa437 ("sctp: Use HMAC-SHA1 and HMAC-SHA256 library for chunk
-> authentication") removed the implementation but leave declaration.
-> 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-> ---
->  include/net/sctp/auth.h | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/include/net/sctp/auth.h b/include/net/sctp/auth.h
-> index 3d5879e08e78..6f2cd562b1de 100644
-> --- a/include/net/sctp/auth.h
-> +++ b/include/net/sctp/auth.h
-> @@ -72,7 +72,6 @@ struct sctp_shared_key *sctp_auth_get_shkey(
->  int sctp_auth_asoc_copy_shkeys(const struct sctp_endpoint *ep,
->  				struct sctp_association *asoc,
->  				gfp_t gfp);
-> -int sctp_auth_init_hmacs(struct sctp_endpoint *ep, gfp_t gfp);
->  const struct sctp_hmac *sctp_auth_get_hmac(__u16 hmac_id);
->  const struct sctp_hmac *
->  sctp_auth_asoc_get_hmac(const struct sctp_association *asoc);
+Airoha_eth driver forwards offloaded uplink traffic (packets received on
+GDM1 and forwarded to GDM{3,4}) to GDM2 in order to apply hw QoS.
+This is correct if the device does not support a dedicated GDM2 port. In
+this case, in order to enable hw offloading for uplink traffic, the
+packets should be sent to GDM{3,4} directly.
 
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+Fixes: 9cd451d414f6 ("net: airoha: Add loopback support for GDM2")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/airoha/airoha_ppe.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- Eric
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index c373f21d95f5a610deae365c64bc589c21f5e1a0..0caabb0c3aa06948e46ad087c50eba5babc81994 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -308,7 +308,7 @@ static int airoha_ppe_foe_entry_prepare(struct airoha_eth *eth,
+ 			if (!airoha_is_valid_gdm_port(eth, port))
+ 				return -EINVAL;
+ 
+-			if (dsa_port >= 0)
++			if (dsa_port >= 0 || eth->ports[1])
+ 				pse_port = port->id == 4 ? FE_PSE_PORT_GDM4
+ 							 : port->id;
+ 			else
+
+---
+base-commit: f694d215d34035cc64b1d176fd82db0d1f2428d4
+change-id: 20251113-airoha-hw-offload-gdm2-fix-29f4f8df05bf
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
