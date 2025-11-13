@@ -1,111 +1,121 @@
-Return-Path: <netdev+bounces-238322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEBAEC57435
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:49:19 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56A52C574A1
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:58:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C66B3A1D37
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:48:55 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9FBA83466CD
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5463491F9;
-	Thu, 13 Nov 2025 11:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC7A34D3A9;
+	Thu, 13 Nov 2025 11:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fKSFphfR"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="PeKtV/SG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B90345CC6
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 11:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0491D34AAF9;
+	Thu, 13 Nov 2025 11:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763034531; cv=none; b=q8PPzMZqEZ8TiYWBB0WAMcVUKlWK6PawjcSyWe8hjeivgdRFjcXJr2loYRU76qzb/pTKOsPUL2SU7vOPZnE1PFF3L5BigPC0x2GnH56WhqZ9KxHLJUCwTbnitL/uYg7mDDAR5Fm579XB0ZU6U+3z+SXiiUsApx7+2XXICYB3juc=
+	t=1763034767; cv=none; b=E83o2PxcsPBRlxqipViiNFa/wWGEeu13QVKGWcwtNw+mmEk8IkHyQ3r80JifIWdT03ifuxGhqbN6ih7myXuvARtq7skezYe3i9cdlVEXoHsqM/Fi9f8O7ia6ODtti/6hhnEio2ssBgks5UzUXrNIiYTjo0BKvt9EREE14mi+wD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763034531; c=relaxed/simple;
-	bh=rshe4Y9K3TD4DqVqqxd4CPhZeTlaOd12ylbzuqXsFVY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZHVGykBCBWWcqgX+I2RmLDbo62GYf70WfwEzn4EwvT6CBFlnbDo/K5SnYlmm+GQO2pCkXn0JyzK2huhBFG3pUizn/3wOY/oqkEogsPPUfinW2GWf8zQNgdZs7Am5RNf2sIh4/MsGd8R+WZb6BSzKq6gU43kc9CeKfmsiXm5d8J4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fKSFphfR; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 44CAC4E41682;
-	Thu, 13 Nov 2025 11:48:46 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id EB0DF6068C;
-	Thu, 13 Nov 2025 11:48:45 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 364B5102F2351;
-	Thu, 13 Nov 2025 12:48:37 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763034524; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=ctBc4upCgqzKeJAnk9xRDnJ5/kLYkjPG0jykALkFcYg=;
-	b=fKSFphfRMoXTQ0hCbm1ZC+zPU9x35KzW0zgQCVqecpiOq6xEYaWdAIZgWBuZF8QPSrH1FX
-	3YYtrjz5mnrq3z4tYS1VvV/OGySMGEChlnwlFEyJDXVbq5dwt/nGOKJJiqenF43f3N5PO5
-	Cy1n3L8dQS0ygIIffIDzOsJVKq9HUvt1K/wy3r0GZnrfW3/FYlKtDxAkUFz9Vp6ZCMTP4G
-	rZ0HqUf7mvbhYlwiqp5DoVAd4zM628y/u/ag8d60VzZf2BJkQLMTwf7geYjfcdWG5YqL1s
-	BW5MJffQA8Q0v2iTR+gD7YnJg3fZ6Imtm97MLeP5ezTZaPpEXQw/8EHzYUCcNA==
-Message-ID: <98560fc9-ca90-4c64-980a-472e49a77a13@bootlin.com>
-Date: Thu, 13 Nov 2025 12:48:37 +0100
+	s=arc-20240116; t=1763034767; c=relaxed/simple;
+	bh=Awiqz2gu0Ah82+m/BLSWEZzsIgqVt80s2wCjgM/rli4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lRZOrq2+35lm2XjjMpeIHg/Zg/IITHzafZDCncBAYfPZ0ze7pa+kapl5Awfy3r5NRWeLb+bel+MYu0T7pAfE30mKhlKjTXmB4Q3gphYDiO6coyaWU26r8SVHTD8831O64BsCezZtDG3/6HOmgJk+jqjByyj7ngUTyeAHyvmhkvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=PeKtV/SG; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1763034765; x=1794570765;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Awiqz2gu0Ah82+m/BLSWEZzsIgqVt80s2wCjgM/rli4=;
+  b=PeKtV/SGjSt0ciibY0uG17H3Fn8EiUsslNd6QY0OQkdjFh7RqBAESFem
+   uZz3glhfZ2diRQdPCWz9+uEDqo9uukeaCuuJmq6RiYpw3jeBUC0fGEi31
+   HyryYZyOlhIxBzZ/YUFrcrB6Jei6tnE4dqrh8rR4inIGfv2lFwB1dixKC
+   RA5BvJ+Wt9B6C4mRsb2iM1CrJcVmr9n+PVIoi3Uv/dymj3+nUVL7y3iAO
+   S/330USGBzvUx85TQxyfFaKVqQaw4FDdaNsGqwMXiqplgPtjNDNWGmvXU
+   u4sAP14KuJAPOXbNhyGbW1Y9Jx1TeN/UD2PbUXXgKYEoDEiCxqJy4myaM
+   A==;
+X-CSE-ConnectionGUID: 7GjOUujsQVWXY9ciwl/Q0g==
+X-CSE-MsgGUID: W71mz7AwQhqmprzJvcvrQQ==
+X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
+   d="scan'208";a="55527003"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Nov 2025 04:52:45 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Thu, 13 Nov 2025 04:52:14 -0700
+Received: from che-ll-i17164.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Thu, 13 Nov 2025 04:52:10 -0700
+From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+To: <Parthiban.Veerasooran@microchip.com>, <piergiorgio.beruto@gmail.com>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Parthiban
+ Veerasooran" <parthiban.veerasooran@microchip.com>
+Subject: [PATCH net-next 0/2] Add SQI and SQI+ support for OATC14 10Base-T1S PHYs and Microchip T1S driver
+Date: Thu, 13 Nov 2025 17:22:04 +0530
+Message-ID: <20251113115206.140339-1-parthiban.veerasooran@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] net: stmmac: Fix VLAN 0 deletion in
- vlan_del_hw_rx_fltr()
-To: Ovidiu Panait <ovidiu.panait.rb@renesas.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- rmk+kernel@armlinux.org.uk, boon.khai.ng@altera.com
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20251113112721.70500-1-ovidiu.panait.rb@renesas.com>
- <20251113112721.70500-2-ovidiu.panait.rb@renesas.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251113112721.70500-2-ovidiu.panait.rb@renesas.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+
+This patch series adds Signal Quality Indicator (SQI) and enhanced SQI+
+support for OATC14 10Base-T1S PHYs, along with integration into the
+Microchip T1S PHY driver. These changes enable higher-layer drivers and
+diagnostic tools to assess link quality more accurately.
+
+Patch Summary:
+1. add SQI and SQI+ support for OATC14 10Base-T1S PHYs
+   - Introduces MDIO register definitions for DCQ_SQI and DCQ_SQIPLUS.
+   - Adds genphy_c45_oatc14_get_sqi_max() to report the maximum SQI/SQI+
+     level.
+   - Adds genphy_c45_oatc14_get_sqi() to return the current SQI or SQI+
+     value.
+   - Updates include/linux/phy.h to expose the new APIs.
+   - SQI+ capability is read from the Advanced Diagnostic Features
+     Capability register (ADFCAP). If unsupported, the driver falls back
+     to basic SQI (0–7 levels).
+   - Open Alliance TC14 10BASE-T1S Advanced Diagnostic PHY Features.
+     https://opensig.org/wp-content/uploads/2025/06/OPEN_Alliance_10BASE-T1S_Advanced_PHY_features_for-automotive_Ethernet_V2.1b.pdf
+	
+2. add SQI support for LAN867x Rev.D0 PHYs
+   - Registers .get_sqi and .get_sqi_max callbacks in the Microchip T1S
+     driver.
+   - Enables network drivers and diagnostic tools to query link signal
+     quality for LAN867x Rev.D0 PHYs.
+   - Existing PHY functionality remains unchanged.
+
+Parthiban Veerasooran (2):
+  net: phy: phy-c45: add SQI and SQI+ support for OATC14 10Base-T1S PHYs
+  net: phy: microchip_t1s: add SQI support for LAN867x Rev.D0 PHYs
+
+ drivers/net/phy/mdio-open-alliance.h | 14 +++++
+ drivers/net/phy/microchip_t1s.c      |  2 +
+ drivers/net/phy/phy-c45.c            | 94 ++++++++++++++++++++++++++++
+ include/linux/phy.h                  |  2 +
+ 4 files changed, 112 insertions(+)
 
 
-
-On 13/11/2025 12:27, Ovidiu Panait wrote:
-> When the "rx-vlan-filter" feature is enabled on a network device, the 8021q
-> module automatically adds a VLAN 0 hardware filter when the device is
-> brought administratively up.
-> 
-> For stmmac, this causes vlan_add_hw_rx_fltr() to create a new entry for
-> VID 0 in the mac_device_info->vlan_filter array, in the following format:
-> 
->     VLAN_TAG_DATA_ETV | VLAN_TAG_DATA_VEN | vid
-> 
-> Here, VLAN_TAG_DATA_VEN indicates that the hardware filter is enabled for
-> that VID.
-> 
-> However, on the delete path, vlan_del_hw_rx_fltr() searches the vlan_filter
-> array by VID only, without verifying whether a VLAN entry is enabled. As a
-> result, when the 8021q module attempts to remove VLAN 0, the function may
-> mistakenly match a zero-initialized slot rather than the actual VLAN 0
-> entry, causing incorrect deletions and leaving stale entries in the
-> hardware table.
-> 
-> Fix this by verifying that the VLAN entry's enable bit (VLAN_TAG_DATA_VEN)
-> is set before matching and deleting by VID. This ensures only active VLAN
-> entries are removed and avoids leaving stale entries in the VLAN filter
-> table, particularly for VLAN ID 0.
-> 
-> Fixes: ed64639bc1e08 ("net: stmmac: Add support for VLAN Rx filtering")
-> Signed-off-by: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
+base-commit: 68fa5b092efab37a4f08a47b22bb8ca98f7f6223
+-- 
+2.34.1
 
 
