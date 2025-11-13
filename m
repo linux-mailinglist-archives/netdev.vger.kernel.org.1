@@ -1,63 +1,50 @@
-Return-Path: <netdev+bounces-238414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDA69C58916
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:06:18 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 128B1C5876B
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 16:45:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 71C944EFDED
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:36:03 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E12C634E109
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 15:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A143934D3A9;
-	Thu, 13 Nov 2025 15:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E88A2EC547;
+	Thu, 13 Nov 2025 15:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OnB/RU3e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ve9ULBAW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B73F34A3B1;
-	Thu, 13 Nov 2025 15:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D472EC096
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 15:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763047631; cv=none; b=Pvdlht9MPGmbWZxgxPc66qP4SVxLj0yNzfBG8g1Vje0t7TCzgVtwHQ0jzeTYtpLD2rp1kKMfkt8Nq1iuTz1Nar+/JkioQKYORlBE6n4hp3T4Zpd9aJ83HixvTqcqh1HrnJ9ZFW0bSj7mUb4ZBd1PEbKymFt7ZjerOSWtQNi3VgE=
+	t=1763047840; cv=none; b=lVHbeOFzmiMQaK5U+NtKl05GT5XyyTg6Ey6BM2YUeEVWRXTqKKpZTUAdinV+yPjqweM6UkBl6EbbPwF/CS1WmaebHLhaF3yOUprhASJFCBe++g2b2nsQyHgC5LvpaqpEuPndy4Olm670sR7CGC1Yt7SPAnsMRB1Hz9X1DMueLNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763047631; c=relaxed/simple;
-	bh=5eaPFfI+HlHbNzT3zzfguX5CVQKRrLGDBh5wEdnnF2E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HOa8Bl7ltxXJoDJZUKS5oXSH8ZndmDwlSZTPKp1usyZ5IaaRLepXhy3ClTF7LJeTSRKldqx9DJxkqRnDGwlXYrV6G4y5ZDAM6FN0GDANXV5s0IwygVTeiX8opK/H7nnuIuYeNfZMg/PLE/aVjcUr7ft1L9/P6JNPH+xjXAtqs7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OnB/RU3e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54C36C4CEF5;
-	Thu, 13 Nov 2025 15:27:10 +0000 (UTC)
+	s=arc-20240116; t=1763047840; c=relaxed/simple;
+	bh=OhxaJq+CSaZtOEF9X/5SZSp4GJ9cxUnYJtT36FYVKX8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Qf2zU57JW/wnZBZHue3YGoXYYnAGbRS3haigWqLagnVor/+UTSaLS8ZfVN2v1VTL8F2zuSDPbTKBvSuPXRiDhUovjlhXGM8rvFinvVb/+2BAZy4lg8w20AjxjndVDfjJOR4GoIwuglZIZ6ElwixXCZEh0wtsSbxnyheSLXc4L7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ve9ULBAW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8D17C19424;
+	Thu, 13 Nov 2025 15:30:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763047630;
-	bh=5eaPFfI+HlHbNzT3zzfguX5CVQKRrLGDBh5wEdnnF2E=;
-	h=From:To:Cc:Subject:Date:From;
-	b=OnB/RU3efm8nGAoj6grcx9AIwV2K/Zc94hfJZl2kXYXz+MrWgOwdq631sgp1tDKr7
-	 O+PJKVvxAgUbm+/9sa5AmKmuz+G88Xog3VqhggYlsvn0/dfO1pwFGkw2D7ZtjdH7OA
-	 I+RA77+T8INvxABoCvBLNXHOWcWAGmsiNpMWpjXSmsWhidi6wVRTgzvTxjKL3VbgTs
-	 PufuO8UM6Lfg/KMEkwVS13+0th/tm2zv87ILc+ck8jEWyDVS38XDVowtiE2mV9Kz05
-	 o9osHMQYBtGExiBe0LnxZ96iVYEu4ufDPy+KPNbHEFryE+w35gSS3XiX753r5lQK+/
-	 gYKxKzsk7/uZQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	ast@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests: drv-net: xdp: make the XDP qstats tests less flaky
-Date: Thu, 13 Nov 2025 07:27:03 -0800
-Message-ID: <20251113152703.3819756-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.1
+	s=k20201202; t=1763047839;
+	bh=OhxaJq+CSaZtOEF9X/5SZSp4GJ9cxUnYJtT36FYVKX8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Ve9ULBAWRMkewjx06n5Xg90EPCMWOcAE0Uea9dnoOOvYeqO/WJPnFMnclFa/FTXSd
+	 PPoyg4eMXmkbb+nkUp/r4fhKwiKb1hrHtXALymIfvclx3gvVv8/NaBQVUcDqzjwFhD
+	 QvJqmRh4OPXkcdaNAR0u5ctxe1GOXTOwvxmxTX7D9cWHLbt9buyTmqjE/sIlQZD3DH
+	 9XNBNB4wb7sAupXAkEan+CTm5vw3xhPa7Av0W+lmlnn5u5fRdnB/uXwgXmaDR1mwwA
+	 4UiHUHQB11CEHQWpLN0E2pY0UVqOFAy9tbzlnAFXRYJeOCLaHa9tYhfkSCP+7rkFax
+	 fW+S5JvmbXp2Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E753A54999;
+	Thu, 13 Nov 2025 15:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,67 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] hsr: Send correct HSRv0 supervision frames
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176304780900.895229.13812119920616223673.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Nov 2025 15:30:09 +0000
+References: <cover.1762876095.git.fmaurer@redhat.com>
+In-Reply-To: <cover.1762876095.git.fmaurer@redhat.com>
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, liuhangbin@gmail.com,
+ m-karicheri2@ti.com, arvid.brodin@alten.se, bigeasy@linutronix.de
 
-The XDP qstats tests send 2k packets over a single socket.
-Looks like when netdev CI is busy running those tests in QEMU
-occasionally flakes. The target doesn't get to run at all
-before all 2000 packets are sent.
+Hello:
 
-Lower the number of packets to 1000 and reopen the socket
-every 50 packets, to give RSS a chance to spread the packets
-to multiple queues.
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-For the netdev CI testing either lowering the count or using
-multiple sockets is enough, but let's do both for extra resiliency.
+On Tue, 11 Nov 2025 17:29:31 +0100 you wrote:
+> Hangbin recently reported that the hsr selftests were failing and noted
+> that the entries in the node table were not merged, i.e., had
+> 00:00:00:00:00:00 as MacAddressB forever [1].
+> 
+> This failure only occured with HSRv0 because it was not sending
+> supervision frames anymore. While debugging this I found that we were
+> not really following the HSRv0 standard for the supervision frames we
+> sent, so I additionally made a few changes to get closer to the standard
+> and restore a more correct behavior we had a while ago.
+> 
+> [...]
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: ast@kernel.org
-CC: hawk@kernel.org
-CC: john.fastabend@gmail.com
-CC: sdf@fomichev.me
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/drivers/net/xdp.py | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+Here is the summary with links:
+  - [net,1/2] hsr: Fix supervision frame sending on HSRv0
+    https://git.kernel.org/netdev/net/c/96a3a03abf3d
+  - [net,2/2] hsr: Follow standard for HSRv0 supervision frames
+    https://git.kernel.org/netdev/net/c/b2c26c82f7a9
 
-diff --git a/tools/testing/selftests/drivers/net/xdp.py b/tools/testing/selftests/drivers/net/xdp.py
-index a148004e1c36..834a37ae7d0d 100755
---- a/tools/testing/selftests/drivers/net/xdp.py
-+++ b/tools/testing/selftests/drivers/net/xdp.py
-@@ -687,9 +687,12 @@ from lib.py import ip, bpftool, defer
-         "/dev/null"
-     # Listener runs on "remote" in case of XDP_TX
-     rx_host = cfg.remote if act == XDPAction.TX else None
--    # We want to spew 2000 packets quickly, bash seems to do a good enough job
--    tx_udp =  f"exec 5<>/dev/udp/{cfg.addr}/{port}; " \
--        "for i in `seq 2000`; do echo a >&5; done; exec 5>&-"
-+    # We want to spew 1000 packets quickly, bash seems to do a good enough job
-+    # Each reopening of the socket gives us a differenot local port (for RSS)
-+    tx_udp = "for _ in `seq 20`; do " \
-+        f"exec 5<>/dev/udp/{cfg.addr}/{port}; " \
-+        "for i in `seq 50`; do echo a >&5; done; " \
-+        "exec 5>&-; done"
- 
-     cfg.wait_hw_stats_settle()
-     # Qstats have more clearly defined semantics than rtnetlink.
-@@ -704,11 +707,11 @@ from lib.py import ip, bpftool, defer
-     cfg.wait_hw_stats_settle()
-     after = cfg.netnl.qstats_get({"ifindex": cfg.ifindex}, dump=True)[0]
- 
--    ksft_ge(after['rx-packets'] - before['rx-packets'], 2000)
-+    expected_pkts = 1000
-+    ksft_ge(after['rx-packets'] - before['rx-packets'], expected_pkts)
-     if act == XDPAction.TX:
--        ksft_ge(after['tx-packets'] - before['tx-packets'], 2000)
-+        ksft_ge(after['tx-packets'] - before['tx-packets'], expected_pkts)
- 
--    expected_pkts = 2000
-     stats = _get_stats(prog_info["maps"]["map_xdp_stats"])
-     ksft_eq(stats[XDPStats.RX.value], expected_pkts, "XDP RX stats mismatch")
-     if act == XDPAction.TX:
+You are awesome, thank you!
 -- 
-2.51.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
