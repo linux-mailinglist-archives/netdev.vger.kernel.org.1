@@ -1,81 +1,67 @@
-Return-Path: <netdev+bounces-238455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ACA0C58EDA
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:59:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BE07C58EE0
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 17:59:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BCCE134C561
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 16:51:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9642E3652FF
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 16:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A005F36654F;
-	Thu, 13 Nov 2025 16:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IuJ4IYJX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F31935BDA4;
+	Thu, 13 Nov 2025 16:46:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4373659FC
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 16:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E29359FA9
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 16:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763052157; cv=none; b=p6/neuCLBpw4YQ03JHLTjTlopRnV2uglEAYMwJrmqSEv18ErpqZFEtJiGIZE4Nog0R2ty+OjX21+j2HMg8wE/ZKMbm7daEmWSvnspYTL25ChoECDluWU671LECUgIDScSIbnXC4Rqid4OonKJjMFaUrooOcg3dttNiG8fQ61gr8=
+	t=1763052378; cv=none; b=FvEBBLgvlzMac5ok6W84iOwE26O3C+YPx2eboUP11cOyqMljr+sHigJoJ02k3deeFFtTuzzaQ5oTc0ygMRyWGhx8smWJm7XcTNkTehR9HFfETVk561iUNFX0we0I5MpdhnlHjMuUaudymjBomseqTb+q4NKGoPyFnA1zFvGUwHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763052157; c=relaxed/simple;
-	bh=AZDhgFsJHk/7/ccWHmuKjRVzzDMIUsT8B2xszzmjcS4=;
+	s=arc-20240116; t=1763052378; c=relaxed/simple;
+	bh=poQ2ltGXAGj/R6azLC8+vFrV6fsBn4x8KuYNyoxOTxE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=T+RjydmQmWyDie3qi83OeAP2BjnZtxdlsbhwJFjh9UAwxc1n90NJ/RHrSPgCbCvzLuXzMIGB9nkPzLnyIvR/Z/tgNUXAVQ0o+TjMl8r1w6A7XDzuKcvsl2JRo4R0r6tt6UZnPmtGbU1Y0FP/2SAetRSHaDJJ1xjC7fkVwamEEIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IuJ4IYJX; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	 In-Reply-To:To:Cc; b=GkjMSaZT/gflhi0MY5P7QTx6YDJ1e+6zB74k4MdJkI0MRzPoS6LSNevVhuCqY5CMgCgLaXz6NhUyR6pC96tL7+GzHvCWccPd7l2WWpXOhT35JdoB9BMEB/anDfhhDQ0LPTc9KVLS2Ln981WgiuArstEW2QFMzPLmAvK+92zdiVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-42b2dd19681so187260f8f.3
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 08:42:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763052154; x=1763656954; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Tnv5GvLZO90fssK5mBO/V2ejb0VVnidgq+QHki0NiLw=;
-        b=IuJ4IYJXLJ2V5+7Y5+mRDTUTL2yzgqfIK7tEPsOTetMWojJb6Y1g9LSVir2GIvKVRf
-         Yv+a1pGGPiP6Gfxk16B/uaFurp0SkXbX+hphQNp07ksmvhtcOWOV7mjdOuI0BqjvYYKU
-         zDONzb9C2el/O/eHTD6PIjHk62BdfujD1UdFvbAhW0UuvYcywIzbmM9w7oUWYdX62qrk
-         DFBCpTUbKm+UhP7HXJ7dusVMcE2FsBbdwYrOUlcKBjsaVC2379pTisGc+099x7tO//2V
-         e/1QdPmECdMRPGnOfCRPRTJO4BLRv+D3Hbpl4s0fCD/vFymEydKWRfbkioWs0E5X+Hzt
-         glvQ==
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7c28ff7a42eso395459a34.3
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 08:46:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763052154; x=1763656954;
+        d=1e100.net; s=20230601; t=1763052375; x=1763657175;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Tnv5GvLZO90fssK5mBO/V2ejb0VVnidgq+QHki0NiLw=;
-        b=jc8aWSaGx0pPdkUyvoaCjdVVTEfJakhSbYWwxRO0fR7ldrlhma2mF/4SO/lS8FO7TS
-         a7BUui2K5RSj9u2INzLGmYJ0OE9ZShheF4MRAfBUyRvdI9Wp5qZnBkMoWAquC/8oEloX
-         0NWWUkDiU6o3UklwjiRtXix3pTugSO6QEDasSJ4MiDFB4muluM7YO2BvpuWA8KDWjKyw
-         1kP3+XW0J1VSmTsiD8d5A1jNno7YjUG1qm3ZFPkmmqHt7PrgViCgQXjZqrynxxh6rbxL
-         AEYpZD6qHIdQjhzAsmZDLjHYNIXmyK6HxefVTv2NNgG4pHiw3H3DhCJZNzqDvR8Rb6cl
-         i++w==
-X-Gm-Message-State: AOJu0Yy7s8ZlpIX/n3Ez95GQ1mH3LfNaQkIXaXGLkBKYXvrLdPmtQat3
-	75+Zi9xEiqGUFWqMStMFTKVwuHvqc/nqo5oHnvkjvQ4M8ljDmKM5bide
-X-Gm-Gg: ASbGncu6rTeZRZdYypikOvNRArdi2U3eRF9+cPw0/+/wBN5hZH+FIfoYR3+8mHetfiB
-	LdQwRQ+1lqXM/NkzthFpeIT0q+sDt3PuPOcBm9icRg/MhJ2bYy488xhvRQW97Wmlos2MrUE2sUP
-	Xs43kvwltAH9yvjr2LvUnDUD7eoAX1brATKouxjXCS8CJijEq5USyRLFFYeOfnkOUvhuWJHpcAq
-	7qF79x9HzXoPwUyY6yD7s06imcpO1/xIbLg7XrNyTRL3HOUOALBGJu29U8LJYEPxF3gufC8/7m/
-	/piKxZ7oGlUgYvqWJjIvKw6Xo6iu5i1aCwQO8LuOFdIMJRycL8r418tE6SONOn+u/KZ0H3XmP9M
-	VBIixIDHhUkF2tE6Ko1suA4wnwJoxL1AaMFtqZmYEuE83RKJVOUR5i8YVIcWq2BfO7qzNXMTVgb
-	1mZk5qTBr6RwzRigo=
-X-Google-Smtp-Source: AGHT+IFlJhZQHRbGLobb3YLbAsBiS2Koyw/Ec1i06oLS8N0XCLnx1tPyDdy1oAHB/rz71WT4cMX8YQ==
-X-Received: by 2002:a05:600c:c4b8:b0:477:5b01:7d42 with SMTP id 5b1f17b1804b1-4778fee8183mr614895e9.5.1763052153366;
-        Thu, 13 Nov 2025 08:42:33 -0800 (PST)
-Received: from localhost ([2a03:2880:31ff:50::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f21948sm4877254f8f.43.2025.11.13.08.42.32
+        bh=AMwHal9dzTj8WL52AK+cJ5GudloGhSjkVv/ITspvX8U=;
+        b=dGDKkMxe9aij7CRN8zbtYFJhlPCIErpb4ObgJcrnYH12K8ecgnlAoD+lFtg+JdKmbc
+         lIQuNiD1fWTAsyst+ZKQooDd+40B1f0ucthxdV7va+ps01Gh5BqeHJvvaext87aPTXig
+         4X7ml0zkihhZHWOREbzkD6+xXExcJcDsNvzT9lfnz9DmowNRwGRGH5LHl8H1uOBDrMFM
+         m01JtSUOSPH0zkhzuM5p+Fv/2E4tYXMsS8rh7cFJ6cNvv8zli9TYeU+UlqhXfpKvTyGL
+         9toerm22dPjhora9UD9TaS8n7wtuWZzjiMQetLgCmX/BvLE9WuypAqWN5bFx+8ADZJm9
+         X84g==
+X-Gm-Message-State: AOJu0YwmSf+xTk+vEDwWzQJVurwh6yxwekHdq0YDfs1lnoxIhgdL7qUK
+	5zhxv7y7iymwFpqdpJB8oQW46IDwuSOEXuEB0y+VzDfh6/W+RdtbIj9I
+X-Gm-Gg: ASbGnctfkIEfCuC8msOTMzPNjlmRpaLpxqpp5qQ3jzIpBTcr2CsbjBn4kAE/K90ajN5
+	G/GBr3+zGoCumkauO2gQN9Pd79cCWtPBshZdmWW9I8wx3300GGrGolo7n/XczAQmlhxkvNis4Jd
+	A12TrCoITpUXet0cU/xpq5YiTQEIcvrJYoEzmb1WffjfjFx+RdPLraCSwq29l+KOZNWwL426moP
+	itd3chj/y5joNnDoYOUMQ0PJfG24LfPGbe4gBWer/91+qW+yWVGWmqf/j3+2RT/ZlOHdWC1nkmA
+	tVL6a+5ZGl+xQbBp5pHYq14bkqRQzhNghKwzpHlFaWQ2oc54aduitof/xY2GL4R5gicnF/kYu7n
+	5T87ndcJegMCJi9np0WaepgrIVSR6+vcwDy0PF3q4y2JXxnCrb73Qi0/n0lpN95VW0grYlY4R9t
+	PvV4aaJB2rOOev
+X-Google-Smtp-Source: AGHT+IHwklT+fSAdTS6FhgXRWj9vGB2ajsTuhU7iPf3ZuTDe1HF6NP47ittL43ZGlAOFk7Zre3gEqA==
+X-Received: by 2002:a05:6830:4129:b0:7c7:162:e0c7 with SMTP id 46e09a7af769-7c7442db71dmr128771a34.6.1763052375233;
+        Thu, 13 Nov 2025 08:46:15 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:5::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c73a283a44sm1515045a34.2.2025.11.13.08.46.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Nov 2025 08:42:32 -0800 (PST)
-From: Gustavo Luiz Duarte <gustavold@gmail.com>
-Date: Thu, 13 Nov 2025 08:42:21 -0800
-Subject: [PATCH net-next v2 4/4] netconsole: Increase MAX_USERDATA_ITEMS
+        Thu, 13 Nov 2025 08:46:14 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Thu, 13 Nov 2025 08:46:04 -0800
+Subject: [PATCH 2/2] mlx5: extract GRXRINGS from .get_rxnfc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,62 +70,137 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251113-netconsole_dynamic_extradata-v2-4-18cf7fed1026@meta.com>
-References: <20251113-netconsole_dynamic_extradata-v2-0-18cf7fed1026@meta.com>
-In-Reply-To: <20251113-netconsole_dynamic_extradata-v2-0-18cf7fed1026@meta.com>
-To: Breno Leitao <leitao@debian.org>, Andre Carvalho <asantostc@gmail.com>, 
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+Message-Id: <20251113-mlx_grxrings-v1-2-0017f2af7dd0@debian.org>
+References: <20251113-mlx_grxrings-v1-0-0017f2af7dd0@debian.org>
+In-Reply-To: <20251113-mlx_grxrings-v1-0-0017f2af7dd0@debian.org>
+To: Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Gustavo Luiz Duarte <gustavold@gmail.com>
-X-Mailer: b4 0.13.0
+ Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+ Leon Romanovsky <leon@kernel.org>
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
+ kernel-team@meta.com
+X-Mailer: b4 0.15-dev-a6db3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4074; i=leitao@debian.org;
+ h=from:subject:message-id; bh=poQ2ltGXAGj/R6azLC8+vFrV6fsBn4x8KuYNyoxOTxE=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpFgtUh28966CZumXyyIbtdUKCDXVJ8AGRMjLUp
+ wrz5B/DxWmJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaRYLVAAKCRA1o5Of/Hh3
+ bdFbD/982JwpeO4nF2jB9yp61nX7YvYeLYMRBYZfid29jOZd2WDNUdzO9NVNTaIVbKOZBn5xA1K
+ waiTW2l04raQU0qsjerdzgOWGHtn1q9rYnu6WUN5vkXkocZCBfjfFYv9Cuf9UaEHU2NWgWBlbO3
+ UQatrdWD3FJmrx8ziHaw5u2Z4rYmrhmk8RVLh7SSAbU2zVatHBuMcyd35GMgduFkavNNMk4wMLS
+ 6txW1fGu2VBmEhNbQEJJou+zK7K6jisiFpBqd3jS6k2VRyjCwFoJ+X8zhrQMgwB9YP85IiXTlWH
+ JUCpk/ugnrlTbq58FjFjyUAv8AW+c/EB6e1HGLJWWT22MJtt5dmUkG/6rVDAT0vpRtPkYgt1wxG
+ L+KtiYVC1kkCJpFlPWKpHCLNkzk+TShPOmo7kNjdUeVKpbDKX7Cw71m5PG8Xd1Eqa42n8Jfz1qG
+ 4xTq6TRVw30lZO7oF2ZyHkQHmM8xfVh0pxq/cYgrBQvdWAuMyIMpkrxvhKF3yenZly5Juq5+QH6
+ Dn6pZhTcLMRZRfGja6Z5K7I435aXUUlb7TH1h/W4DdN4fmkzMM/LOlIR19/JcSjiQE8SnWkzJnh
+ bbQDhhKDvL0w67oZG7T8g7VHZ3QtpsJNXvIyuPMp7k36nRXsbHMiw/qU1N2NoALz4N6xYXxvuHE
+ j/fVWMcO1UlhFrw==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Increase MAX_USERDATA_ITEMS from 16 to 256 entries now that the userdata
-buffer is allocated dynamically.
+Commit 84eaf4359c36 ("net: ethtool: add get_rx_ring_count callback to
+optimize RX ring queries") added specific support for GRXRINGS callback,
+simplifying .get_rxnfc.
 
-The previous limit of 16 was necessary because the buffer was statically
-allocated for all targets. With dynamic allocation, we can support more
-entries without wasting memory on targets that don't use userdata.
+Remove the handling of GRXRINGS in .get_rxnfc() by moving it to the new
+.get_rx_ring_count() for both the mlx5 ethernet and IPoIB drivers.
 
-This allows users to attach more metadata to their netconsole messages,
-which is useful for complex debugging and logging scenarios.
+The ETHTOOL_GRXRINGS handling was previously kept in .get_rxnfc() to
+support "ethtool -x" when CONFIG_MLX5_EN_RXNFC=n. With the new
+dedicated .get_rx_ring_count() callback, this is no longer necessary.
 
-Also update the testcase accordingly.
+This simplifies the RX ring count retrieval and aligns mlx5 with the new
+ethtool API for querying RX ring parameters.
 
-Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/netconsole.c                                | 2 +-
- tools/testing/selftests/drivers/net/netcons_overflow.sh | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c   | 18 ++++++++----------
+ .../net/ethernet/mellanox/mlx5/core/ipoib/ethtool.c    | 18 ++++++++----------
+ 2 files changed, 16 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 12fbc303a8240..36ce19936fa39 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -50,7 +50,7 @@ MODULE_LICENSE("GPL");
- /* The number 3 comes from userdata entry format characters (' ', '=', '\n') */
- #define MAX_EXTRADATA_NAME_LEN		(MAX_EXTRADATA_ENTRY_LEN - \
- 					MAX_EXTRADATA_VALUE_LEN - 3)
--#define MAX_USERDATA_ITEMS		16
-+#define MAX_USERDATA_ITEMS		256
- #define MAX_PRINT_CHUNK			1000
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+index 01b8f05a23db..939e274779b3 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+@@ -2492,21 +2492,18 @@ static int mlx5e_set_rxfh_fields(struct net_device *dev,
+ 	return mlx5e_ethtool_set_rxfh_fields(priv, cmd, extack);
+ }
  
- static char config[MAX_PARAM_LENGTH];
-diff --git a/tools/testing/selftests/drivers/net/netcons_overflow.sh b/tools/testing/selftests/drivers/net/netcons_overflow.sh
-index 29bad56448a24..06089643b7716 100755
---- a/tools/testing/selftests/drivers/net/netcons_overflow.sh
-+++ b/tools/testing/selftests/drivers/net/netcons_overflow.sh
-@@ -15,7 +15,7 @@ SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
++static u32 mlx5e_get_rx_ring_count(struct net_device *dev)
++{
++	struct mlx5e_priv *priv = netdev_priv(dev);
++
++	return priv->channels.params.num_channels;
++}
++
+ static int mlx5e_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
+ 			   u32 *rule_locs)
+ {
+ 	struct mlx5e_priv *priv = netdev_priv(dev);
  
- source "${SCRIPTDIR}"/lib/sh/lib_netcons.sh
- # This is coming from netconsole code. Check for it in drivers/net/netconsole.c
--MAX_USERDATA_ITEMS=16
-+MAX_USERDATA_ITEMS=256
+-	/* ETHTOOL_GRXRINGS is needed by ethtool -x which is not part
+-	 * of rxnfc. We keep this logic out of mlx5e_ethtool_get_rxnfc,
+-	 * to avoid breaking "ethtool -x" when mlx5e_ethtool_get_rxnfc
+-	 * is compiled out via CONFIG_MLX5_EN_RXNFC=n.
+-	 */
+-	if (info->cmd == ETHTOOL_GRXRINGS) {
+-		info->data = priv->channels.params.num_channels;
+-		return 0;
+-	}
+-
+ 	return mlx5e_ethtool_get_rxnfc(priv, info, rule_locs);
+ }
  
- # Function to create userdata entries
- function create_userdata_max_entries() {
+@@ -2766,6 +2763,7 @@ const struct ethtool_ops mlx5e_ethtool_ops = {
+ 	.remove_rxfh_context	= mlx5e_remove_rxfh_context,
+ 	.get_rxnfc         = mlx5e_get_rxnfc,
+ 	.set_rxnfc         = mlx5e_set_rxnfc,
++	.get_rx_ring_count = mlx5e_get_rx_ring_count,
+ 	.get_tunable       = mlx5e_get_tunable,
+ 	.set_tunable       = mlx5e_set_tunable,
+ 	.get_pause_stats   = mlx5e_get_pause_stats,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ethtool.c
+index 4b3430ac3905..3b2f54ca30a8 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ethtool.c
+@@ -266,21 +266,18 @@ static int mlx5i_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
+ 	return mlx5e_ethtool_set_rxnfc(priv, cmd);
+ }
+ 
++static u32 mlx5i_get_rx_ring_count(struct net_device *dev)
++{
++	struct mlx5e_priv *priv = mlx5i_epriv(dev);
++
++	return priv->channels.params.num_channels;
++}
++
+ static int mlx5i_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
+ 			   u32 *rule_locs)
+ {
+ 	struct mlx5e_priv *priv = mlx5i_epriv(dev);
+ 
+-	/* ETHTOOL_GRXRINGS is needed by ethtool -x which is not part
+-	 * of rxnfc. We keep this logic out of mlx5e_ethtool_get_rxnfc,
+-	 * to avoid breaking "ethtool -x" when mlx5e_ethtool_get_rxnfc
+-	 * is compiled out via CONFIG_MLX5_EN_RXNFC=n.
+-	 */
+-	if (info->cmd == ETHTOOL_GRXRINGS) {
+-		info->data = priv->channels.params.num_channels;
+-		return 0;
+-	}
+-
+ 	return mlx5e_ethtool_get_rxnfc(priv, info, rule_locs);
+ }
+ 
+@@ -304,6 +301,7 @@ const struct ethtool_ops mlx5i_ethtool_ops = {
+ 	.set_rxfh_fields    = mlx5i_set_rxfh_fields,
+ 	.get_rxnfc          = mlx5i_get_rxnfc,
+ 	.set_rxnfc          = mlx5i_set_rxnfc,
++	.get_rx_ring_count  = mlx5i_get_rx_ring_count,
+ 	.get_link_ksettings = mlx5i_get_link_ksettings,
+ 	.get_link           = ethtool_op_get_link,
+ };
 
 -- 
 2.47.3
