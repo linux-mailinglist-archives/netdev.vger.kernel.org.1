@@ -1,49 +1,50 @@
-Return-Path: <netdev+bounces-238524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1841C5A72B
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 00:02:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD2C9C5A72F
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 00:03:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82E883BB64E
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 23:00:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEA593BBD4A
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 23:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C08732ABF7;
-	Thu, 13 Nov 2025 22:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A91632C923;
+	Thu, 13 Nov 2025 22:58:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bjM8LgMs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Onwb+Sd1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF0532ABC4;
-	Thu, 13 Nov 2025 22:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FDB932C33E;
+	Thu, 13 Nov 2025 22:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763074725; cv=none; b=maK2NIR2/VKwWlvt3tYA7b4OPOd+DqEnIvMCiStSG9Bg2rk8XVgil8I+xLRlvF9YvDhv+M3iu655kJ6i3i297PDaY36xlNfSP9EJLpmHfAzoOihu+6pd+nWjn1QS7onTNLIkLwJd3qEOPp8Ytoi77C07JignjFbeDN7EJ0IxsB0=
+	t=1763074727; cv=none; b=Zlwjpcie6Qg8GewvVwzseI80DgF/U7/XIu2ZgC1jt7DGTUDtAdZzDnd2gpzY82tC0ZFUCQKd99deNnN1TgAtP5+LU9fcAITiQoyrmmdJ7sE/A1903zbYUhiZnkLPXMVP5NtqGP0z/I4xLFtFiBpe7YClyo2Q2h86OQaEd9g8Hcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763074725; c=relaxed/simple;
-	bh=TDbQC3cz/P7H8urLElCL5pCqJC7qpQOo/p+U98dOcyE=;
+	s=arc-20240116; t=1763074727; c=relaxed/simple;
+	bh=IG5415WlYj27eGFCc1Qov/SUbUZaQuNVdXpSkaURsBU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=tHu87Qj7Y+dKqcKbAI/Nmh4oOQOk3Fky/zKU3iOm58efjnsKAv6aAsXqPpP7OeYagAtRg1IVufcgrKpjH5DeHP2PffHsa0yyzuVYv/ppuT1ma1aL9xE4HL4XMslzJ6OY2xmhuwUwqpgpS7a000FHFvbezzP85PAzP2a1yO6L+8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bjM8LgMs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1301C2BC87;
-	Thu, 13 Nov 2025 22:58:42 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=GPdvIYVk723Y781bHDaikT8me5EreAPn7BndpLZhMeBCgaV+f8QgV1VA60ZvwyYYjxdUPlUitgCFswp/Zx4VFWKCsqm3OvLio5oQ6QgNQdLL19nISlga5h31oZ2wv919ElvsSWRjXTGcp4E9RrKD0iZt7RmG4Z6tTVHEV3h1nag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Onwb+Sd1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7ECDC19424;
+	Thu, 13 Nov 2025 22:58:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763074724;
-	bh=TDbQC3cz/P7H8urLElCL5pCqJC7qpQOo/p+U98dOcyE=;
+	s=k20201202; t=1763074726;
+	bh=IG5415WlYj27eGFCc1Qov/SUbUZaQuNVdXpSkaURsBU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=bjM8LgMsh1kZcJO8qk0xMTrSQWVxDNKQxd3opTxRf9entqE0/6vccqIs9sQU+QYUA
-	 dzkTdU2gpjDETOvG5HC7eGsEmR632d783vb6DzR8pJ2li2CbwGvNVJ4WQYBSe6ffBC
-	 8o6PJV7BnImRZisrOtFBQ+HN3/j265ZTcEV/MdNhDQLbMVjUQJziXN8FuxZIGdykBA
-	 NcDyAjzPy7uK8QyGoNXXUDYQuNsPHd0JdujLvcM3U+i0n+L44mkoMmGNBeXYt28Jvj
-	 5meFk8CwFPtIHSTt0Oy1X9bkVFHOFLPWSeQLlGyD7xOnC8qUHMnlcMXFcRVR9Rhq51
-	 7GKV6e9pZ/cAw==
+	b=Onwb+Sd1p2eBcTfzXTeavR9voPMjb5oi40NYelawiwaWEmzVQl60M7Q34fHJPZhV/
+	 KRDSVfr/MEBkiDH5qmXTFaAyslMgWzZsJ4NGF0HouWDvxDBgRU27nwHuQDzrJWYzTk
+	 lPvfC73UOXO1ZJw4chupN3ZLIBm7wLrJqy7jJUMzAeaJYGCRwYT+qBQwlZna2sh1+9
+	 fDDUEYWSV6dCmrzwCxp94GP2OFc11ECKC6MU9xoEzD25iQP6zfL8C9Myk7BzLcoMXp
+	 ntj8ZQ/3x2DLx0h6sZAbYzIzF3Rm22b5KzpkNg7S2UKypP3kxc88AbV+0+tcgGIVAt
+	 LbHTJEMahstiA==
 From: Tamir Duberstein <tamird@kernel.org>
-Date: Thu, 13 Nov 2025 17:58:27 -0500
-Subject: [PATCH v3 4/6] rust: sync: replace `kernel::c_str!` with C-Strings
+Date: Thu, 13 Nov 2025 17:58:28 -0500
+Subject: [PATCH v3 5/6] rust: workqueue: replace `kernel::c_str!` with
+ C-Strings
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251113-core-cstr-cstrings-v3-4-411b34002774@gmail.com>
+Message-Id: <20251113-core-cstr-cstrings-v3-5-411b34002774@gmail.com>
 References: <20251113-core-cstr-cstrings-v3-0-411b34002774@gmail.com>
 In-Reply-To: <20251113-core-cstr-cstrings-v3-0-411b34002774@gmail.com>
 To: Luis Chamberlain <mcgrof@kernel.org>, 
@@ -67,13 +68,13 @@ Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
  netdev@vger.kernel.org, Tamir Duberstein <tamird@gmail.com>, 
  Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1763074713; l=2102;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1763074713; l=1654;
  i=tamird@gmail.com; h=from:subject:message-id;
- bh=jyXJ3mjACJTGdEHDpcd5bnph32X3ATnuiA+Suya9qvw=;
+ bh=5mcnlOdX5skxvzJeMU8gi38lmb4RChkLNrj1vkN6HFg=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
  MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QD0Pz9FRM76NV97+HgJeK/XQhA/D3DbQhAPYmpH0NVZfHVUMQ41CWlTz+X+SN8rO9cgnxaVmFbw
- 44FNPtQfP7gE=
+ QDqaCQq0XDGYeRSTELtgb3YdPIWn/CQSW9NuU/UsbUeSWHCzn1Vd4WrSEBIVtn9rgrsRHh+0Mce
+ GHhiWG4OO4ww=
 X-Developer-Key: i=tamird@gmail.com; a=openssh;
  fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
@@ -87,52 +88,42 @@ Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Reviewed-by: Benno Lossin <lossin@kernel.org>
 Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
- rust/kernel/sync.rs            | 5 ++---
- rust/kernel/sync/completion.rs | 2 +-
- 2 files changed, 3 insertions(+), 4 deletions(-)
+ rust/kernel/workqueue.rs | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/rust/kernel/sync.rs b/rust/kernel/sync.rs
-index cf5b638a097d..4e503036e123 100644
---- a/rust/kernel/sync.rs
-+++ b/rust/kernel/sync.rs
-@@ -48,7 +48,6 @@ impl LockClassKey {
-     ///
-     /// # Examples
-     /// ```
--    /// # use kernel::c_str;
-     /// # use kernel::alloc::KBox;
-     /// # use kernel::types::ForeignOwnable;
-     /// # use kernel::sync::{LockClassKey, SpinLock};
-@@ -60,7 +59,7 @@ impl LockClassKey {
-     /// {
-     ///     stack_pin_init!(let num: SpinLock<u32> = SpinLock::new(
-     ///         0,
--    ///         c_str!("my_spinlock"),
-+    ///         c"my_spinlock",
-     ///         // SAFETY: `key_ptr` is returned by the above `into_foreign()`, whose
-     ///         // `from_foreign()` has not yet been called.
-     ///         unsafe { <Pin<KBox<LockClassKey>> as ForeignOwnable>::borrow(key_ptr) }
-@@ -119,6 +118,6 @@ macro_rules! optional_name {
-         $crate::c_str!(::core::concat!(::core::file!(), ":", ::core::line!()))
-     };
-     ($name:literal) => {
--        $crate::c_str!($name)
-+        $name
-     };
- }
-diff --git a/rust/kernel/sync/completion.rs b/rust/kernel/sync/completion.rs
-index c50012a940a3..97d39c248793 100644
---- a/rust/kernel/sync/completion.rs
-+++ b/rust/kernel/sync/completion.rs
-@@ -34,7 +34,7 @@
- /// impl MyTask {
- ///     fn new() -> Result<Arc<Self>> {
- ///         let this = Arc::pin_init(pin_init!(MyTask {
--///             work <- new_work!("MyTask::work"),
-+///             work <- new_work!(c"MyTask::work"),
- ///             done <- Completion::new(),
- ///         }), GFP_KERNEL)?;
- ///
+diff --git a/rust/kernel/workqueue.rs b/rust/kernel/workqueue.rs
+index 706e833e9702..6dd47095455f 100644
+--- a/rust/kernel/workqueue.rs
++++ b/rust/kernel/workqueue.rs
+@@ -51,7 +51,7 @@
+ //!     fn new(value: i32) -> Result<Arc<Self>> {
+ //!         Arc::pin_init(pin_init!(MyStruct {
+ //!             value,
+-//!             work <- new_work!("MyStruct::work"),
++//!             work <- new_work!(c"MyStruct::work"),
+ //!         }), GFP_KERNEL)
+ //!     }
+ //! }
+@@ -98,8 +98,8 @@
+ //!         Arc::pin_init(pin_init!(MyStruct {
+ //!             value_1,
+ //!             value_2,
+-//!             work_1 <- new_work!("MyStruct::work_1"),
+-//!             work_2 <- new_work!("MyStruct::work_2"),
++//!             work_1 <- new_work!(c"MyStruct::work_1"),
++//!             work_2 <- new_work!(c"MyStruct::work_2"),
+ //!         }), GFP_KERNEL)
+ //!     }
+ //! }
+@@ -337,7 +337,7 @@ pub fn try_spawn<T: 'static + Send + FnOnce()>(
+         func: T,
+     ) -> Result<(), AllocError> {
+         let init = pin_init!(ClosureWork {
+-            work <- new_work!("Queue::try_spawn"),
++            work <- new_work!(c"Queue::try_spawn"),
+             func: Some(func),
+         });
+ 
 
 -- 
 2.51.2
