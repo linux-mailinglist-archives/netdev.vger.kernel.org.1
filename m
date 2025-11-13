@@ -1,147 +1,472 @@
-Return-Path: <netdev+bounces-238274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66231C56D84
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:29:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 666F3C56D8A
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:29:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5EF4F4E7B21
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:25:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2F3E54E7773
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62CCD2FF648;
-	Thu, 13 Nov 2025 10:25:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8682A2F1FC3;
+	Thu, 13 Nov 2025 10:25:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PckbuV7q";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qGdl6ygI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M3Dj0lM/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764412857F6
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:25:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2512E5B0D
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763029509; cv=none; b=MBSXSCFwrtYQGWNCMbQGHX7s3U8P5p1qlcd647xfiudMZbRd+Udky7ribMBFl9JZnetI0aJwM3AJfPHJTIn+Hv0O1Zaisi0ldN4HtEWJNX39d/v5tU6ixiTPPgoes3NhQbkChiCXdvx+NgEfjfnlXFYWhWVhpT9YncyHdjd0Zwc=
+	t=1763029538; cv=none; b=m7P+5f+im0BPJvUWAxelxOPuD2wvJhHIG4465c5OnJ9C+wJ4CpudpdnZnVEVozEO4C3XZ292xQ5Q8IjEgLr8ymDFVjKyQKtfJQxqIach4Nyec5GOevQ+kOAiHAiIE2roYsI/ggIDLnYqwmhLuwICtS7oRC1Zn3gJWYaG7CVtoKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763029509; c=relaxed/simple;
-	bh=AdZ46maKG+L+E8y81GF5NY44lgNBTKlHPWh8vL6SUHM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=th3g7Hi0N+AklBEmYAPoQksc0vdTQTweTI4pPTdmZHq80fbU5SLDNxZF9epv62f3nyHGZOVq2aB+NA23X91hQUjvYgo91IyENAq/ReY3tkR0UhEl2RcI8yj0J9j5PS0YWW7iDQNyaFG1Yy11yL2SWbGJSHlx9IK/EDXkBde/YNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PckbuV7q; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qGdl6ygI; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763029506;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PECF0hu6yUiMcL/Z5zwVr4ADplf8rKig+Vh4qG1P2U0=;
-	b=PckbuV7q93aEYsBDKkb/20wwc5/hG7IRrPCMTdhei8bguaCzjdSCHkflded0rifEamr6ND
-	a0xJgFKR+PbWDwMuvOlU8NkjEctTrwsNnQ0PXIv3KeIlFQ1FNxFi/ZfoBsL9kNrdPss7Uv
-	zJ/rFBJX4yS03Ho6h8CNFkqSXwgIDTU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-587-5RSz8IK6OD-Ov1oKkFtdOg-1; Thu, 13 Nov 2025 05:25:05 -0500
-X-MC-Unique: 5RSz8IK6OD-Ov1oKkFtdOg-1
-X-Mimecast-MFC-AGG-ID: 5RSz8IK6OD-Ov1oKkFtdOg_1763029504
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42b2b9c7ab6so279540f8f.2
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 02:25:04 -0800 (PST)
+	s=arc-20240116; t=1763029538; c=relaxed/simple;
+	bh=aH5rpD0CSM0ilgrGAhZvKLz05628GUg4OJyEeEY3QUM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m2+qThUXCPq4Cyt77lxU+LBryZbwxHGe2AiPgt1vW7oHfUgzkKtrtwtXwZRjgHtv35hIK9ozSYWBQDhOFwgzepuYlN/Vx0GL1VEWwW0l2BZmJtm3Kb25h8Gk+ppckwUA2g7fvdejeq4FIxR3CruJ26DIUqiRPkNr3XFDL0oqZes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M3Dj0lM/; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8b2a4b6876fso89360285a.3
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 02:25:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763029504; x=1763634304; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PECF0hu6yUiMcL/Z5zwVr4ADplf8rKig+Vh4qG1P2U0=;
-        b=qGdl6ygIdRHDbc/NLLnMT8+6Y8TODM7LpZZXogRWnfHgoYu1G5I0MEvi/95I56Efu5
-         yfZV9YXqaJrWaJxwaZeycX9VJ3b7vYZn5CdUTHI/hnr75rXxIdJRHF9WUD9eqwfYcON+
-         BFKolpgO1meAK5ENtBZhMhjGQDFzWcx2+gopIjxn/eGbfbywA7pDzdK4y2kq8u8bNTW5
-         t8NkSJn8mlvzgLUlxBl67Xzz9g40G3/YyQMsolfpLYn6/tM0Xf/wyeklNp3i/WlzTCG4
-         AsZ6DiJYRrVWTBzjsqwPxSrXiNMH5By1SroWcEg/i4tnRqGzgIIeGjM2GUEVkaO2P1sL
-         Oq4A==
+        d=google.com; s=20230601; t=1763029535; x=1763634335; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LxbCJsnQqpyHMhLDpT/LiawaPufi/zcLwtckDWnZsq4=;
+        b=M3Dj0lM/3nDBzbqZreUJdXJhDMfojz1uFRDZVJYN31I8orB/iIuDnhsb8XcM8nj+4H
+         E0FPNiosRcXhrdrvMvJQVVSeHPGQfS7MzJwroT2tpjA3lUxpgfk3iMAG0Z0weoEDXKsM
+         cb8YfatmxkV+be4fCae+kQ41UWJ9/kLXPZrSWhzLGLlidGy+6J6iN/h7OZGMn8nYXkID
+         OJ5FU00Yt1Y7aT6EM7Hucafuu4IU3dJWH7LXswpUu0Kg+2zdo9S0CJnS5CY7T6L8a6by
+         wg9JYCociCk6HSnJX3lU3eY8JU/9aBVaD7s1iQCQvpob3s87s9LoqfGTo4TM6ADGhZfQ
+         74sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763029504; x=1763634304;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PECF0hu6yUiMcL/Z5zwVr4ADplf8rKig+Vh4qG1P2U0=;
-        b=l19lG4pXRSa0PEZ232klfNefcKJTayg8IjhcUjBleKYGiP08SS6HcDPsegxLgrGwfR
-         OCpzVfDpYsKszBjCr/poLdbIM1s8F/RbHnDVhfvH8u0jPez8Yjc2KnR02fsj3rOsKXiG
-         +f1TkzfxQV/NMIF1ke4c1fdi2j9LrKR0J+cbYQ0Swb+XpCze7OGY74pxCt2hsRxynY72
-         TONr7CALJRfSk0NYX6bqm4xm58S28hh1kZOV5/LhCthAL76N7MuXdOuKXHQOSGEv5P8P
-         YYbrF3/TAsemwSetwUYR04oaoKDcTIko2hE3leqSixWxw6OiGGxRSe6MaOmVdxM/zczj
-         gsZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWVcJXxT3mocMoYlVG+yDS+tSdyzPz7CT4NdozQ8PB/F5SUHZpCRiw/8nAV25Qfvf3gOOkIANI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywei5JEUaPr6MfmqSL5N63vvf+NwJmM28fSb4mkjysVDRJjdWsL
-	pr0r9htl/JwuuKnACUQSabHSHWYRAMPai2Zd+Jw5S+U3RzpWZZJddrtyJQ0t7nkTEyqM0arxJ4N
-	rsm1cOljepS9N50XnycYs37P6x1QQjGVq1IhdWT1mwBgxerg+vKuyyYCXiw==
-X-Gm-Gg: ASbGncuTivCHk4cT/Xq58K9o5t/AZ5sokYqGs9C6npVB777pIzXMuAI4Jx6iKN3+aOX
-	6LO8q5asQp4XngxPpj3j/u4+KDFytoiF1LhGSFpN3LCSfDOuzMGm6h3lZ3nChw4DFoGHu7Vnwuf
-	DA/+hwWOUC0/fQWK2ad5YVDZDP+QHQCn8P/AhNOBCNZx5SChQL9JdzGrJv4bkCDpTmGXHlsM/uz
-	lUX7UC9VXBAXTO3xFOPZBeACdbMuaPyJZxJhQvSvydpn9yrhLylpYyJXUIZHGmw0+yCP+nkdYJ5
-	4i8MYT5PDqqPHaOi4L9Hh4ULX2ooxacIjqSyuvnKYGK6cpaWK198XCPHAkooNYjyxjy58Odz69P
-	e5baXn5jrpO5u
-X-Received: by 2002:a05:6000:2a88:b0:42b:39ae:d07b with SMTP id ffacd0b85a97d-42b4bdb85d5mr4745415f8f.50.1763029503896;
-        Thu, 13 Nov 2025 02:25:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFJkaZOemYguID9V6H2FbBGyHiwc5M2Rg6bywmRqobKBF0bhnHhJwhbKd4VWDKKkEMGHc6pWA==
-X-Received: by 2002:a05:6000:2a88:b0:42b:39ae:d07b with SMTP id ffacd0b85a97d-42b4bdb85d5mr4745392f8f.50.1763029503459;
-        Thu, 13 Nov 2025 02:25:03 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.55])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e7ae98sm3040291f8f.2.2025.11.13.02.25.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Nov 2025 02:25:02 -0800 (PST)
-Message-ID: <dc26959a-ee51-4480-9a03-2fe4fc897f70@redhat.com>
-Date: Thu, 13 Nov 2025 11:25:01 +0100
+        d=1e100.net; s=20230601; t=1763029535; x=1763634335;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LxbCJsnQqpyHMhLDpT/LiawaPufi/zcLwtckDWnZsq4=;
+        b=U5xHFgcejH53qa398WnBnRgIKkdS7mLZEMwbxreTf6vIBC5iChSGnutasyReyFPMK1
+         Y2ojd7fp1brLXpohPaDxqIPsUj7723xtBF7tkr/UzHD+roqDAEGQfVUmGRMOskoC4m4/
+         486o0sXkYgZqO/PVkthYdqvrjePjt9A6Us39yMnll+HmLQcv+0ySBJ8IMpP5Ttz1J3ex
+         uZ8r5oDuA0/19N7jjPfqlJHco2trnO+sfTtnd/djF5Uu8kvfQr7tFhZXsKlqdjsV+bYn
+         OSeDTotMOaOkTeA0fHb9dqwWrQ7NX8J8yiXyWr1MlQhRUDtqUM8//MZ1Nn5cRgeiveq2
+         QuNA==
+X-Forwarded-Encrypted: i=1; AJvYcCVv2+CfodJnShEdRz9Opfkqk+a9fT/9FkkgD0cU89JNaqw25X0rqKRyAhnSnFtTRgDOyd+HTRU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJq2Nh/e0f2kQGOUMykF+CMnHfqNoVSa3eUyoXhzgOMTTR0HAE
+	/JKQN4E9E167flDYwhqwydLiW6nPtJOnrbI48cX1RyPMjwZ82K82p/W/Y5ykKzhj5gMVMR78y7s
+	b2Ju6OA+cnca/DvHwqB6Xvjnl1QytadJvaie+bUDQ
+X-Gm-Gg: ASbGncu5sHVV79hZ+rg+aMKh+iwru/DELi393e7s0rWRuW1th0rIZGSIfNN5lyVmn+l
+	S8pBtYf5964CrHZ5EokYyqsNEq9y61OXVW2u4comeTIf5lDVCYw+97nJl2dFJzP+5r0iuzswO3V
+	VsciGLYVeV4mmLOt66qdb6ZyPl4zuQnGk7hhmazUPGsxD6XJjsvTUmiil4/cnSlqdQy2L4SUD9y
+	HzWdk/Y35F8+AiP9zq+sqPVAMYidLn/vk2wLarie6Q7bCE3jEOugZ6kR4Bu4bUNDY4jLAlsUAhz
+	Y44=
+X-Google-Smtp-Source: AGHT+IE1p16rCG95Lk56iPp318mizgbsJa9WfQwtgfs7boT6IWwGbfEBGUUMO5XgkEJaotAF2sFBHvHwALSd+dqLNs0=
+X-Received: by 2002:a05:620a:4112:b0:8b2:1f8d:f115 with SMTP id
+ af79cd13be357-8b29b7df2f6mr871444685a.65.1763029534966; Thu, 13 Nov 2025
+ 02:25:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4] net: bonding: use atomic instead of
- rtnl_mutex, to make sure peer notify updated
-To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Nikolay Aleksandrov <razor@blackwall.org>, Hangbin Liu <liuhangbin@gmail.com>
-References: <20251110091337.43517-1-tonghao@bamaicloud.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251110091337.43517-1-tonghao@bamaicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251113092606.91406-1-scott_mitchell@apple.com>
+In-Reply-To: <20251113092606.91406-1-scott_mitchell@apple.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 13 Nov 2025 02:25:24 -0800
+X-Gm-Features: AWmQ_bkcJa76VC8K88WzD96TmkoMJTfngyd-xFZypacyaJ8EJvpRTfoChfhs6nk
+Message-ID: <CANn89iJAH0-6FiK-wnA=WUS8ddyQ-q2e7vfK=7-Yrqgi_HrXAQ@mail.gmail.com>
+Subject: Re: [PATCH v2] netfilter: nfnetlink_queue: optimize verdict lookup
+ with hash table
+To: Scott Mitchell <scott.k.mitch1@gmail.com>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, phil@nwl.cc, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Scott Mitchell <scott_mitchell@apple.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/10/25 10:13 AM, Tonghao Zhang wrote:
-> @@ -814,4 +814,11 @@ static inline netdev_tx_t bond_tx_drop(struct net_device *dev, struct sk_buff *s
->  	return NET_XMIT_DROP;
+On Thu, Nov 13, 2025 at 1:26=E2=80=AFAM Scott Mitchell <scott.k.mitch1@gmai=
+l.com> wrote:
+>
+> The current implementation uses a linear list to find queued packets by
+> ID when processing verdicts from userspace. With large queue depths and
+> out-of-order verdicting, this O(n) lookup becomes a significant
+> bottleneck, causing userspace verdict processing to dominate CPU time.
+>
+> Replace the linear search with a hash table for O(1) average-case
+> packet lookup by ID. The hash table size is configurable via the new
+> NFQA_CFG_HASH_SIZE netlink attribute (default 1024 buckets, matching
+> NFQNL_QMAX_DEFAULT; max 131072). The size is normalized to a power of
+> two to enable efficient bitwise masking instead of modulo operations.
+> Unpatched kernels silently ignore the new attribute, maintaining
+> backward compatibility.
+>
+> The existing list data structure is retained for operations requiring
+> linear iteration (e.g. flush, device down events). Hot fields
+> (queue_hash_mask, queue_hash pointer) are placed in the same cache line
+> as the spinlock and packet counters for optimal memory access patterns.
+>
+> Signed-off-by: Scott Mitchell <scott_mitchell@apple.com>
+> ---
+> Changes in v2:
+> - Use kvcalloc/kvfree with GFP_KERNEL_ACCOUNT to support larger hash
+>   tables with vmalloc fallback (Florian Westphal)
+> - Remove incorrect comment about concurrent resizes - nfnetlink subsystem
+>   mutex already serializes config operations (Florian Westphal)
+> - Fix style: remove unnecessary braces around single-line if (Florian Wes=
+tphal)
+>
+>  include/net/netfilter/nf_queue.h              |   1 +
+>  .../uapi/linux/netfilter/nfnetlink_queue.h    |   1 +
+>  net/netfilter/nfnetlink_queue.c               | 129 ++++++++++++++++--
+>  3 files changed, 123 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/net/netfilter/nf_queue.h b/include/net/netfilter/nf_=
+queue.h
+> index 4aeffddb7586..3d0def310523 100644
+> --- a/include/net/netfilter/nf_queue.h
+> +++ b/include/net/netfilter/nf_queue.h
+> @@ -11,6 +11,7 @@
+>  /* Each queued (to userspace) skbuff has one of these. */
+>  struct nf_queue_entry {
+>         struct list_head        list;
+> +       struct hlist_node       hash_node;
+>         struct sk_buff          *skb;
+>         unsigned int            id;
+>         unsigned int            hook_index;     /* index in hook_entries-=
+>hook[] */
+> diff --git a/include/uapi/linux/netfilter/nfnetlink_queue.h b/include/uap=
+i/linux/netfilter/nfnetlink_queue.h
+> index efcb7c044a74..bc296a17e5aa 100644
+> --- a/include/uapi/linux/netfilter/nfnetlink_queue.h
+> +++ b/include/uapi/linux/netfilter/nfnetlink_queue.h
+> @@ -107,6 +107,7 @@ enum nfqnl_attr_config {
+>         NFQA_CFG_QUEUE_MAXLEN,          /* __u32 */
+>         NFQA_CFG_MASK,                  /* identify which flags to change=
+ */
+>         NFQA_CFG_FLAGS,                 /* value of these flags (__u32) *=
+/
+> +       NFQA_CFG_HASH_SIZE,             /* __u32 hash table size (rounded=
+ to power of 2) */
+>         __NFQA_CFG_MAX
+>  };
+>  #define NFQA_CFG_MAX (__NFQA_CFG_MAX-1)
+> diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_qu=
+eue.c
+> index 8b7b39d8a109..f076609cac32 100644
+> --- a/net/netfilter/nfnetlink_queue.c
+> +++ b/net/netfilter/nfnetlink_queue.c
+> @@ -46,7 +46,10 @@
+>  #include <net/netfilter/nf_conntrack.h>
+>  #endif
+>
+> -#define NFQNL_QMAX_DEFAULT 1024
+> +#define NFQNL_QMAX_DEFAULT      1024
+> +#define NFQNL_MIN_HASH_SIZE     16
+> +#define NFQNL_DEFAULT_HASH_SIZE 1024
+> +#define NFQNL_MAX_HASH_SIZE     131072
+>
+>  /* We're using struct nlattr which has 16bit nla_len. Note that nla_len
+>   * includes the header length. Thus, the maximum packet length that we
+> @@ -65,6 +68,7 @@ struct nfqnl_instance {
+>         unsigned int copy_range;
+>         unsigned int queue_dropped;
+>         unsigned int queue_user_dropped;
+> +       unsigned int queue_hash_size;
+>
+>
+>         u_int16_t queue_num;                    /* number of this queue *=
+/
+> @@ -77,6 +81,8 @@ struct nfqnl_instance {
+>         spinlock_t      lock    ____cacheline_aligned_in_smp;
+>         unsigned int    queue_total;
+>         unsigned int    id_sequence;            /* 'sequence' of pkt ids =
+*/
+> +       unsigned int    queue_hash_mask;
+> +       struct hlist_head *queue_hash;
+>         struct list_head queue_list;            /* packets in queue */
+>  };
+>
+> @@ -95,6 +101,39 @@ static struct nfnl_queue_net *nfnl_queue_pernet(struc=
+t net *net)
+>         return net_generic(net, nfnl_queue_net_id);
 >  }
->  
-> +static inline void bond_peer_notify_reset(struct bonding *bond)
+>
+> +static inline unsigned int
+> +nfqnl_packet_hash(u32 id, unsigned int mask)
 > +{
-> +	atomic_set(&bond->send_peer_notif,
-> +		bond->params.num_peer_notif *
-> +		max(1, bond->params.peer_notif_delay));
+> +       return hash_32(id, 32) & mask;
+> +}
+> +
 
-The above reads params.* without any due lock; at very least it should
-include READ_ONCE() annotation here (and WRITE_ONCE on the param update
-side).
+(Resent in plaintext for the lists, sorry for duplicates)
 
-But it also mean it could observe inconsistent values for
-params.num_peer_notif and params.peer_notif_delay in case of concurrent
-update.
+I do not think this is an efficient hash function.
 
-The possible race between bond_mii_monitor() and
-bond_change_active_slave() concurrently updating
-send_peer_notif is still avoided by the rtnl lock, so the changelog is
-IMHO confusing WRT the actual code semantic.
+queue->id_sequence is monotonically increasing (controlled by the
+kernel : __nfqnl_enqueue_packet(), not user space).
 
-/P
+I would use   return (id & mask) so that we have better use of cpu
+caches and hardware prefetchers,
+in case a cpu receives a batch of ~64 packets from a busy network device.
 
+Your hash function would require 8x more cache line misses.
+
+
+> +static inline u32
+> +nfqnl_normalize_hash_size(u32 hash_size)
+> +{
+> +       /* Must be power of two for queue_hash_mask to work correctly.
+> +        * Avoid overflow of is_power_of_2 by bounding NFQNL_MAX_HASH_SIZ=
+E.
+> +        */
+> +       BUILD_BUG_ON(!is_power_of_2(NFQNL_MIN_HASH_SIZE) ||
+> +                    !is_power_of_2(NFQNL_DEFAULT_HASH_SIZE) ||
+> +                    !is_power_of_2(NFQNL_MAX_HASH_SIZE) ||
+> +                    NFQNL_MAX_HASH_SIZE > 1U << 31);
+> +
+> +       if (!hash_size)
+> +               return NFQNL_DEFAULT_HASH_SIZE;
+> +
+> +       /* Clamp to valid range before power of two to avoid overflow */
+> +       if (hash_size <=3D NFQNL_MIN_HASH_SIZE)
+> +               return NFQNL_MIN_HASH_SIZE;
+> +
+> +       if (hash_size >=3D NFQNL_MAX_HASH_SIZE)
+> +               return NFQNL_MAX_HASH_SIZE;
+> +
+> +       if (!is_power_of_2(hash_size))
+> +               hash_size =3D roundup_pow_of_two(hash_size);
+> +
+> +       return hash_size;
+> +}
+> +
+>  static inline u_int8_t instance_hashfn(u_int16_t queue_num)
+>  {
+>         return ((queue_num >> 8) ^ queue_num) % INSTANCE_BUCKETS;
+> @@ -114,13 +153,56 @@ instance_lookup(struct nfnl_queue_net *q, u_int16_t=
+ queue_num)
+>         return NULL;
+>  }
+>
+> +static int
+> +nfqnl_hash_resize(struct nfqnl_instance *inst, u32 hash_size)
+> +{
+> +       struct hlist_head *new_hash, *old_hash;
+> +       struct nf_queue_entry *entry;
+> +       unsigned int h, hash_mask;
+> +
+> +       hash_size =3D nfqnl_normalize_hash_size(hash_size);
+> +       if (hash_size =3D=3D inst->queue_hash_size)
+> +               return 0;
+> +
+> +       new_hash =3D kvcalloc(hash_size, sizeof(*new_hash), GFP_KERNEL_AC=
+COUNT);
+> +       if (!new_hash)
+> +               return -ENOMEM;
+> +
+> +       hash_mask =3D hash_size - 1;
+> +
+> +       for (h =3D 0; h < hash_size; h++)
+> +               INIT_HLIST_HEAD(&new_hash[h]);
+> +
+> +       spin_lock_bh(&inst->lock);
+> +
+> +       list_for_each_entry(entry, &inst->queue_list, list) {
+> +               /* No hlist_del() since old_hash will be freed and we hol=
+d lock */
+> +               h =3D nfqnl_packet_hash(entry->id, hash_mask);
+> +               hlist_add_head(&entry->hash_node, &new_hash[h]);
+> +       }
+> +
+> +       old_hash =3D inst->queue_hash;
+> +       inst->queue_hash_size =3D hash_size;
+> +       inst->queue_hash_mask =3D hash_mask;
+> +       inst->queue_hash =3D new_hash;
+> +
+> +       spin_unlock_bh(&inst->lock);
+> +
+> +       kvfree(old_hash);
+> +
+> +       return 0;
+> +}
+> +
+>  static struct nfqnl_instance *
+> -instance_create(struct nfnl_queue_net *q, u_int16_t queue_num, u32 porti=
+d)
+> +instance_create(struct nfnl_queue_net *q, u_int16_t queue_num, u32 porti=
+d,
+> +               u32 hash_size)
+>  {
+>         struct nfqnl_instance *inst;
+>         unsigned int h;
+>         int err;
+>
+> +       hash_size =3D nfqnl_normalize_hash_size(hash_size);
+> +
+>         spin_lock(&q->instances_lock);
+>         if (instance_lookup(q, queue_num)) {
+>                 err =3D -EEXIST;
+> @@ -133,11 +215,24 @@ instance_create(struct nfnl_queue_net *q, u_int16_t=
+ queue_num, u32 portid)
+>                 goto out_unlock;
+>         }
+>
+> +       inst->queue_hash =3D kvcalloc(hash_size, sizeof(*inst->queue_hash=
+),
+> +                                   GFP_KERNEL_ACCOUNT);
+> +       if (!inst->queue_hash) {
+> +               kfree(inst);
+> +               err =3D -ENOMEM;
+> +               goto out_unlock;
+> +       }
+> +
+> +       for (h =3D 0; h < hash_size; h++)
+> +               INIT_HLIST_HEAD(&inst->queue_hash[h]);
+> +
+>         inst->queue_num =3D queue_num;
+>         inst->peer_portid =3D portid;
+>         inst->queue_maxlen =3D NFQNL_QMAX_DEFAULT;
+>         inst->copy_range =3D NFQNL_MAX_COPY_RANGE;
+>         inst->copy_mode =3D NFQNL_COPY_NONE;
+> +       inst->queue_hash_size =3D hash_size;
+> +       inst->queue_hash_mask =3D hash_size - 1;
+>         spin_lock_init(&inst->lock);
+>         INIT_LIST_HEAD(&inst->queue_list);
+>
+> @@ -154,6 +249,7 @@ instance_create(struct nfnl_queue_net *q, u_int16_t q=
+ueue_num, u32 portid)
+>         return inst;
+>
+>  out_free:
+> +       kvfree(inst->queue_hash);
+>         kfree(inst);
+>  out_unlock:
+>         spin_unlock(&q->instances_lock);
+> @@ -172,6 +268,7 @@ instance_destroy_rcu(struct rcu_head *head)
+>         rcu_read_lock();
+>         nfqnl_flush(inst, NULL, 0);
+>         rcu_read_unlock();
+> +       kvfree(inst->queue_hash);
+>         kfree(inst);
+>         module_put(THIS_MODULE);
+>  }
+> @@ -194,13 +291,17 @@ instance_destroy(struct nfnl_queue_net *q, struct n=
+fqnl_instance *inst)
+>  static inline void
+>  __enqueue_entry(struct nfqnl_instance *queue, struct nf_queue_entry *ent=
+ry)
+>  {
+> -       list_add_tail(&entry->list, &queue->queue_list);
+> -       queue->queue_total++;
+> +       unsigned int hash =3D nfqnl_packet_hash(entry->id, queue->queue_h=
+ash_mask);
+> +
+> +       hlist_add_head(&entry->hash_node, &queue->queue_hash[hash]);
+> +       list_add_tail(&entry->list, &queue->queue_list);
+> +       queue->queue_total++;
+>  }
+>
+>  static void
+>  __dequeue_entry(struct nfqnl_instance *queue, struct nf_queue_entry *ent=
+ry)
+>  {
+> +       hlist_del(&entry->hash_node);
+>         list_del(&entry->list);
+>         queue->queue_total--;
+>  }
+> @@ -209,10 +310,11 @@ static struct nf_queue_entry *
+>  find_dequeue_entry(struct nfqnl_instance *queue, unsigned int id)
+>  {
+>         struct nf_queue_entry *entry =3D NULL, *i;
+> +       unsigned int hash =3D nfqnl_packet_hash(id, queue->queue_hash_mas=
+k);
+>
+>         spin_lock_bh(&queue->lock);
+>
+> -       list_for_each_entry(i, &queue->queue_list, list) {
+> +       hlist_for_each_entry(i, &queue->queue_hash[hash], hash_node) {
+>                 if (i->id =3D=3D id) {
+>                         entry =3D i;
+>                         break;
+> @@ -407,8 +509,7 @@ nfqnl_flush(struct nfqnl_instance *queue, nfqnl_cmpfn=
+ cmpfn, unsigned long data)
+>         spin_lock_bh(&queue->lock);
+>         list_for_each_entry_safe(entry, next, &queue->queue_list, list) {
+>                 if (!cmpfn || cmpfn(entry, data)) {
+> -                       list_del(&entry->list);
+> -                       queue->queue_total--;
+> +                       __dequeue_entry(queue, entry);
+>                         nfqnl_reinject(entry, NF_DROP);
+>                 }
+>         }
+> @@ -1483,6 +1584,7 @@ static const struct nla_policy nfqa_cfg_policy[NFQA=
+_CFG_MAX+1] =3D {
+>         [NFQA_CFG_QUEUE_MAXLEN] =3D { .type =3D NLA_U32 },
+>         [NFQA_CFG_MASK]         =3D { .type =3D NLA_U32 },
+>         [NFQA_CFG_FLAGS]        =3D { .type =3D NLA_U32 },
+> +       [NFQA_CFG_HASH_SIZE]    =3D { .type =3D NLA_U32 },
+>  };
+>
+>  static const struct nf_queue_handler nfqh =3D {
+> @@ -1495,11 +1597,15 @@ static int nfqnl_recv_config(struct sk_buff *skb,=
+ const struct nfnl_info *info,
+>  {
+>         struct nfnl_queue_net *q =3D nfnl_queue_pernet(info->net);
+>         u_int16_t queue_num =3D ntohs(info->nfmsg->res_id);
+> +       u32 hash_size =3D 0;
+>         struct nfqnl_msg_config_cmd *cmd =3D NULL;
+>         struct nfqnl_instance *queue;
+>         __u32 flags =3D 0, mask =3D 0;
+>         int ret =3D 0;
+>
+> +       if (nfqa[NFQA_CFG_HASH_SIZE])
+> +               hash_size =3D ntohl(nla_get_be32(nfqa[NFQA_CFG_HASH_SIZE]=
+));
+> +
+>         if (nfqa[NFQA_CFG_CMD]) {
+>                 cmd =3D nla_data(nfqa[NFQA_CFG_CMD]);
+>
+> @@ -1559,11 +1665,12 @@ static int nfqnl_recv_config(struct sk_buff *skb,=
+ const struct nfnl_info *info,
+>                                 goto err_out_unlock;
+>                         }
+>                         queue =3D instance_create(q, queue_num,
+> -                                               NETLINK_CB(skb).portid);
+> +                                               NETLINK_CB(skb).portid, h=
+ash_size);
+>                         if (IS_ERR(queue)) {
+>                                 ret =3D PTR_ERR(queue);
+>                                 goto err_out_unlock;
+>                         }
+> +                       hash_size =3D 0; /* avoid resize later in this fu=
+nction */
+>                         break;
+>                 case NFQNL_CFG_CMD_UNBIND:
+>                         if (!queue) {
+> @@ -1586,6 +1693,12 @@ static int nfqnl_recv_config(struct sk_buff *skb, =
+const struct nfnl_info *info,
+>                 goto err_out_unlock;
+>         }
+>
+> +       if (hash_size > 0) {
+> +               ret =3D nfqnl_hash_resize(queue, hash_size);
+> +               if (ret)
+> +                       goto err_out_unlock;
+> +       }
+> +
+>         if (nfqa[NFQA_CFG_PARAMS]) {
+>                 struct nfqnl_msg_config_params *params =3D
+>                         nla_data(nfqa[NFQA_CFG_PARAMS]);
+> --
+> 2.39.5 (Apple Git-154)
+>
 
