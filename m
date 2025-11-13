@@ -1,117 +1,159 @@
-Return-Path: <netdev+bounces-238324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79121C57462
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:54:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C43C574C2
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 12:59:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9B6024E4ABA
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:53:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C82F63B0FD8
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C06034DB54;
-	Thu, 13 Nov 2025 11:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FD833FE34;
+	Thu, 13 Nov 2025 11:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="tmtGWLb9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kD39OLUE"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A038634D4D4;
-	Thu, 13 Nov 2025 11:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD00299AA3
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 11:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763034755; cv=none; b=XhLYpJpN7ssQGRITcS9kMtaJpZzQB+ADEaZKdfa0PnWIj+ox3oL0c1q8YDmNfUnwej5JZRl12pKHDLuKnaG0oAGXDAAWZ9uSYd86DziSlXV4zp7w9MiNuAAfrocg/LQcYaztztJrF0cWPPpkDuIUWlwX8pkXhbDTBjzMNE2oGwo=
+	t=1763035054; cv=none; b=pECHcmMBOLJb42V239kxhr22uOCfS8aLoNAvy8xAbMtUUCJgfEWiaF4timBsEYI2Mz8OC8wgvUNMPxvk4vAfQWr6XS2DbUgwurqShAjljVq4kTSLCpzDZyt4tf4Yfn5neoDlZ4BKT893OBdovAuWglLOKRI3T8b75jE7zBQDjCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763034755; c=relaxed/simple;
-	bh=GZF8lgeDQC7Hi6xFhfCRpYi6s7kn1kyAv2TSa5O3FrA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EuuV0x6KZDXuDR1KxgITsA3SvDrGfqMbwwba/CEoYL4sqWz+BCFTn01T6HFlAXdg37Prw1f3TKTrwkoSOnePOf+526HSSIRpmxviQbJ77zzEY3i5Pd3h7Y9jIH76t6/yn5WrWLuTtv4INUJ0+q68sdv7CBzwYVtt8lrfnHpfWYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=tmtGWLb9; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1763034753; x=1794570753;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=GZF8lgeDQC7Hi6xFhfCRpYi6s7kn1kyAv2TSa5O3FrA=;
-  b=tmtGWLb964mKwy6i0BFyDdOGsadJnEt9CWnbvHNWKw5O0mZTJkRcrYHE
-   TkEA45msS685sLB0OTOp+OZsG1a3zGivfhMcEY9sVUrzcswuSsIXuVCas
-   DPiZNL0S4Htm/1JGan5mogytQSieIO7TzwN+zbw95+5K5YljLIfQX4c/T
-   NJ0qdePjvF6WVSBRKRu0VK961v8CY3lHpOs8EqaV0BPLH7v9hGaD6Wx8F
-   mIP5YniSVPlmr5NNhpEgoww9cH9rzv3o6f6Zc70SOZri6NgNvowkAdGm4
-   eQjswl/ToLdeA20ZH9EgtQjklwIDOMy1d2MEq3zbs6pwAVlemFx92n8rB
-   Q==;
-X-CSE-ConnectionGUID: 3YIJu1weQma93cjyGpczEw==
-X-CSE-MsgGUID: WJ5Ct3BCSkiGrTsFsPRkSA==
-X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
-   d="scan'208";a="55526998"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2025 04:52:25 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Thu, 13 Nov 2025 04:52:25 -0700
-Received: from che-ll-i17164.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 13 Nov 2025 04:52:20 -0700
-From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-To: <Parthiban.Veerasooran@microchip.com>, <piergiorgio.beruto@gmail.com>,
-	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Parthiban
- Veerasooran" <parthiban.veerasooran@microchip.com>
-Subject: [PATCH net-next 2/2] net: phy: microchip_t1s: add SQI support for LAN867x Rev.D0 PHYs
-Date: Thu, 13 Nov 2025 17:22:06 +0530
-Message-ID: <20251113115206.140339-3-parthiban.veerasooran@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251113115206.140339-1-parthiban.veerasooran@microchip.com>
-References: <20251113115206.140339-1-parthiban.veerasooran@microchip.com>
+	s=arc-20240116; t=1763035054; c=relaxed/simple;
+	bh=okHM3Ga+QlCddHAyWNBL66JzqZ4h3luH1tCYlPxT5uk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=icyayocTpqZsD9Ie942e88g+c+N1AZDNcne+VbychZPrjlk/FTys6pucG4kl6QNK4TJoL60roG8BNopqBQiSftpFy/hKTFLT7ouF4by0tTfx/5owzoYwqlQ9sSqZIT8eez/10NfGnTSdnsZ6QBvUi14o8sRybXOlXVmPBS/j9ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kD39OLUE; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4b9369f2-66fb-4c47-8bae-48577cf18c94@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763035049;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WrZSn3wGbTqcQm6E0Pcl3rE+6joPJ9ezxS2O/g3SFgI=;
+	b=kD39OLUE4icX2riCiznVkpY2IeM3pTGLoidZH3fdXnxAFQrR0BI/Y2I8MtZ+jY+pWRElmo
+	M/7VOdfVdcTL5XOp/2qXR96CCHaeySG0QzZVtoQEPso/9/lL5FTtEX38ftV/TV4tD6zWs0
+	a6AWwaerZdCpNI1daXg8Cc0CcRAHzyY=
+Date: Thu, 13 Nov 2025 11:57:15 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Subject: Re: [PATCH net-next 5/5] net: txgbe: support getting module EEPROM by
+ page
+To: Jiawen Wu <jiawenwu@trustnetic.com>, netdev@vger.kernel.org,
+ 'Andrew Lunn' <andrew+netdev@lunn.ch>,
+ "'David S. Miller'" <davem@davemloft.net>,
+ 'Eric Dumazet' <edumazet@google.com>, 'Jakub Kicinski' <kuba@kernel.org>,
+ 'Paolo Abeni' <pabeni@redhat.com>, 'Russell King' <linux@armlinux.org.uk>,
+ 'Simon Horman' <horms@kernel.org>, 'Jacob Keller' <jacob.e.keller@intel.com>
+Cc: 'Mengyuan Lou' <mengyuanlou@net-swift.com>
+References: <20251112055841.22984-1-jiawenwu@trustnetic.com>
+ <20251112055841.22984-6-jiawenwu@trustnetic.com>
+ <b7702efc-9994-4656-9d4e-29c2c8145ab3@linux.dev>
+ <001401dc5444$3e897f60$bb9c7e20$@trustnetic.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <001401dc5444$3e897f60$bb9c7e20$@trustnetic.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Add support for Signal Quality Index (SQI) reporting in the
-Microchip T1S PHY driver for LAN867x Rev.D0 (OATC14-compliant) PHYs.
+On 13/11/2025 02:21, Jiawen Wu wrote:
+> On Wed, Nov 12, 2025 8:49 PM, Vadim Fedorenko wrote:
+>> On 12/11/2025 05:58, Jiawen Wu wrote:
+>>> Getting module EEPROM has been supported in TXGBE SP devices, since SFP
+>>> driver has already implemented it.
+>>>
+>>> Now add support to read module EEPROM for AML devices. Towards this, add
+>>> a new firmware mailbox command to get the page data.
+>>>
+>>> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 
-This patch registers the following callbacks in the microchip_t1s driver
-structure:
+[...]
 
-- .get_sqi      - returns the current SQI value
-- .get_sqi_max  - returns the maximum SQI value
+>>> +int txgbe_read_eeprom_hostif(struct wx *wx,
+>>> +			     struct txgbe_hic_i2c_read *buffer,
+>>> +			     u32 length, u8 *data)
+>>> +{
+>>> +	u32 buf_size = sizeof(struct txgbe_hic_i2c_read) - sizeof(u8);
+>>> +	u32 total_len = buf_size + length;
+>>> +	u32 dword_len, value, i;
+>>> +	u8 local_data[256];
+>>> +	int err;
+>>> +
+>>> +	if (total_len > sizeof(local_data))
+>>> +		return -EINVAL;
+>>
+>> if it's really possible? SFF pages are 128 bytes, you reserve 256 bytes
+>> of local buffer. What are you protecting from?
+> 
+> It can be changed to 128 + sizeof(struct txgbe_hic_i2c_read).
 
-This allows network drivers and diagnostic tools to query link
-signal quality, improving monitoring and troubleshooting
-capabilities. Existing PHY functionality remains unchanged.
+My point is why do you need this check at all?
+It looks more like defensive programming which is discouraged in kernel.
 
-Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
----
- drivers/net/phy/microchip_t1s.c | 2 ++
- 1 file changed, 2 insertions(+)
+> 
+>>
+>>> +
+>>> +	buffer->hdr.cmd = FW_READ_EEPROM_CMD;
+>>> +	buffer->hdr.buf_len = sizeof(struct txgbe_hic_i2c_read) -
+>>> +			      sizeof(struct wx_hic_hdr);
+>>> +	buffer->hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
+>>> +
+>>> +	err = wx_host_interface_command(wx, (u32 *)buffer,
+>>> +					sizeof(struct txgbe_hic_i2c_read),
+>>> +					WX_HI_COMMAND_TIMEOUT, false);
+>>> +	if (err != 0)
+>>> +		return err;
+>>> +
+>>> +	dword_len = (total_len + 3) / 4;
+>>
+>> round_up()?
+>>
+>>> +
+>>> +	for (i = 0; i < dword_len; i++) {
+>>> +		value = rd32a(wx, WX_FW2SW_MBOX, i);
+>>> +		le32_to_cpus(&value);
+>>> +
+>>> +		memcpy(&local_data[i * 4], &value, 4);
+>>> +	}
+>>
+>> the logic here is not clear from the first read of the code. effectively
+>> in the reply you have the same txgbe_hic_i2c_read struct but without
+>> data field, which is obviously VLA, but then you simply skip the result
+>> of read of txgbe_hic_i2c_read and only provide the real data back to the
+>> caller. Maybe you can organize the code the way it can avoid double copying?
+> 
+> Because the length of real data is variable, now it could be 1 or 128. But the total
+> length of the command buffer is DWORD aligned. So we designed only a 1-byte
+> data field in struct txgbe_hic_i2c_read, to avoid redundant reading and writing
+> during the SW-FW interaction.
+> 
+> For 1-byte data, wx_host_interface_command() can be used to set 'return_data'
+> to true, then page->data = buffer->data. For other cases, I think it would be more
+> convenient to read directly from the mailbox registers.
 
-diff --git a/drivers/net/phy/microchip_t1s.c b/drivers/net/phy/microchip_t1s.c
-index 5a0a66778977..e601d56b2507 100644
---- a/drivers/net/phy/microchip_t1s.c
-+++ b/drivers/net/phy/microchip_t1s.c
-@@ -575,6 +575,8 @@ static struct phy_driver microchip_t1s_driver[] = {
- 		.get_plca_status    = genphy_c45_plca_get_status,
- 		.cable_test_start   = genphy_c45_oatc14_cable_test_start,
- 		.cable_test_get_status = genphy_c45_oatc14_cable_test_get_status,
-+		.get_sqi            = genphy_c45_oatc14_get_sqi,
-+		.get_sqi_max        = genphy_c45_oatc14_get_sqi_max,
- 	},
- 	{
- 		PHY_ID_MATCH_EXACT(PHY_ID_LAN865X_REVB),
--- 
-2.34.1
+With such design you always have your return data starting at offset of
+15, which is absolutely unaligned. And then it needs more buffer
+dancing.
 
+> 
+>>
+>>> +
+>>> +	memcpy(data, &local_data[buf_size], length);
+>>> +	return 0;
+>>> +}
+>>> +
 
