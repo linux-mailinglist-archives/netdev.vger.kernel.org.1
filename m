@@ -1,127 +1,210 @@
-Return-Path: <netdev+bounces-238216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B852C56113
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 08:32:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE38C56167
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 08:41:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 003D534FDA1
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 07:31:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4206F3A69FD
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 07:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9280326D77;
-	Thu, 13 Nov 2025 07:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2213271F2;
+	Thu, 13 Nov 2025 07:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RWBe60xv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxTRbfLa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C897130E83A;
-	Thu, 13 Nov 2025 07:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BD1329368;
+	Thu, 13 Nov 2025 07:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763019056; cv=none; b=OKn59Xlz6aV57aI5Sgt+TXltLrYV4/7R6XCKN8M2SHJ90CPwRQk4EZGYdne8mBalDg8GBBvEI6budDX5jxYuGCqVbFp9rnLZwDitydH0RSoo4TF4PgH5ciBKuC5gmhM5P9h2A9gN4rfiQEe/3rmkus3B1DHeDc9iszb9honIC54=
+	t=1763019655; cv=none; b=bOi2COpalB0A1XQj6/zcpx9MICVVQgxVrivzglSdoCv8BkWrIDfRtANhbxeA3RojqLhMtHHQGa7vD++1xwzqnuLX/N4NSXfgLkldiBzjaLKoeXY7RsmmQ9Fh6F9Uf4H6LWiC9PKzy4QlfhVHXG0vTMha/VwQNOe/DRDxexNDLPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763019056; c=relaxed/simple;
-	bh=GzIg5amColquUoTMfwOgoFFIoLUisEfS5Vm7rZSUjWo=;
+	s=arc-20240116; t=1763019655; c=relaxed/simple;
+	bh=s1s7Q8+rNlO8QATMY6kvX3m8Lb/6Xzhin/P4c/UYLM4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tY9pZOOJCQZ9Ir1nGjI9mLmbiClNFP94fHT7cwsJKTECDBCexsyuot8vidALWnyIXErWVuehxEErBxeUFUg9ujpZ+IP76inaTH1SqM6WOsaXuoR+5qDQylBmwQrpO8UT7/TLVB6YnR9AKlxjdJAIUM/sloqqSNMcjNFtMa8C/1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RWBe60xv; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763019046; x=1794555046;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=GzIg5amColquUoTMfwOgoFFIoLUisEfS5Vm7rZSUjWo=;
-  b=RWBe60xvmdSDxfVHY+Gj5WU8lc5hyAGXDVePvx0ZTxU4Wa9PlJGdjHLq
-   KomZleZq9rqALNrJbrOAMq1ZME60RFFUf+9kjvRUKaO9s855mRui3/1it
-   +4PDpUGLebRaG+hH33i8aWNAz/4zKQ1AHMwIGuTF3TWF+zNWJDbhFphJT
-   g3AnA4+IP3mwyaWq3RE6UM0yu5CZzIgibaMVlCeqKhSe04NhdRmxfy9Ji
-   nk7y8zH0l0Opu1RAQkwFeW5gGnIGElzCZzszN1faum4aBYF9ajq+qvgt7
-   53aKbltuJ9ajYAvSmkS7P+5Lh62OPlmwvRByjXcPiC6dUd5IlF/KMW4ye
-   Q==;
-X-CSE-ConnectionGUID: DWg9Gz8NQyOqbVDvtSWWGA==
-X-CSE-MsgGUID: waPdV/KZReyOpgHO/4oOJA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11611"; a="76437988"
-X-IronPort-AV: E=Sophos;i="6.19,301,1754982000"; 
-   d="scan'208";a="76437988"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 23:30:39 -0800
-X-CSE-ConnectionGUID: WW3GQ4FnQOugtCfe4hw6Zg==
-X-CSE-MsgGUID: d7e/EL1MQNSVnXMXiUQEFQ==
-X-ExtLoop1: 1
-Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 12 Nov 2025 23:30:36 -0800
-Received: from kbuild by 7b01c990427b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vJRms-00051f-0B;
-	Thu, 13 Nov 2025 07:30:34 +0000
-Date: Thu, 13 Nov 2025 15:30:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
-	vikas.gupta@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: Re: [net-next 06/12] bng_en: Add support to handle AGG events
-Message-ID: <202511131515.DHkaAel4-lkp@intel.com>
-References: <20251111205829.97579-7-bhargava.marreddy@broadcom.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ee02NvB3TsoRv7KHpOKFQefRPM95/5a4jChD3/ILmv0tiPCgoSodBDQ732/UcaSzn+7MRK+Xc3nq9hL6tesimXOu6KWvbH0ZOYPzoOU88X3Va+XWyE+e1qZJru1gd6+yCXPJCaKNZs9kle02GhmoK92sERvhG7i7q8ui6EPiWts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxTRbfLa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9E91C113D0;
+	Thu, 13 Nov 2025 07:40:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763019655;
+	bh=s1s7Q8+rNlO8QATMY6kvX3m8Lb/6Xzhin/P4c/UYLM4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mxTRbfLaxUaVTKO5F7MP9wZIx/9u4dJaIBmMmLNeon2PN3JkuDX0XRLtuTD8Z5XP9
+	 O0EX2Tcn0gMT2dZKEM8Hzbis/M8ciwiZhsPGe4e/40qFti8THAkn6p6hQe5OL3hJji
+	 QxdN9ZXa74FgRJfL8lvVDo/xdt7D29LEF2PHriZfeXaod2UOGWpJYtr3q7eO7yJyMc
+	 bC6n9z7Avew+AU9q32resfln6xKfNCtLgkLrFRZC9Xg3STv5bZaKtRcG58gh3f+DPL
+	 VIKZOaCSAkr1gec1t1rYZI0CPPR1KG+lE0rHzpQPc5pZ68XneUhkCmSbKMslG1EC6j
+	 AuAR3g4Gqhd7g==
+Date: Thu, 13 Nov 2025 08:40:52 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Phil Sutter <phil@nwl.cc>, Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH nf-next v9 2/3] net: netfilter: Add IPIP flowtable tx sw
+ acceleration
+Message-ID: <aRWLhLobB4Rz0dA_@lore-desk>
+References: <20251107-nf-flowtable-ipip-v9-0-7cbc4090dfcb@kernel.org>
+ <20251107-nf-flowtable-ipip-v9-2-7cbc4090dfcb@kernel.org>
+ <aRSDjkzMx4Ba7IW8@calendula>
+ <aRSvnfdhO2G1DXJI@lore-desk>
+ <aRUT-tFXYbwfZYUk@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="5gdp/tkNuL2145vX"
+Content-Disposition: inline
+In-Reply-To: <aRUT-tFXYbwfZYUk@calendula>
+
+
+--5gdp/tkNuL2145vX
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251111205829.97579-7-bhargava.marreddy@broadcom.com>
+Content-Transfer-Encoding: quoted-printable
 
-Hi Bhargava,
+> Hi Lorenzo,
 
-kernel test robot noticed the following build warnings:
+Hi Pablo,
 
-[auto build test WARNING on net-next/main]
+>=20
+> On Wed, Nov 12, 2025 at 05:02:37PM +0100, Lorenzo Bianconi wrote:
+> [...]
+> > > On Fri, Nov 07, 2025 at 12:14:47PM +0100, Lorenzo Bianconi wrote:
+> > > [...]
+> > > > @@ -565,8 +622,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_b=
+uff *skb,
+> > > > =20
+> > > >  	dir =3D tuplehash->tuple.dir;
+> > > >  	flow =3D container_of(tuplehash, struct flow_offload, tuplehash[d=
+ir]);
+> > > > +	other_tuple =3D &flow->tuplehash[!dir].tuple;
+> > > > =20
+> > > > -	if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
+> > > > +	if (nf_flow_encap_push(state->net, skb, other_tuple))
+> > > >  		return NF_DROP;
+> > > > =20
+> > > >  	switch (tuplehash->tuple.xmit_type) {
+> > > > @@ -577,7 +635,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_b=
+uff *skb,
+> > > >  			flow_offload_teardown(flow);
+> > > >  			return NF_DROP;
+> > > >  		}
+> > > > -		neigh =3D ip_neigh_gw4(rt->dst.dev, rt_nexthop(rt, flow->tupleha=
+sh[!dir].tuple.src_v4.s_addr));
+> > > > +		dest =3D other_tuple->tun_num ? other_tuple->tun.src_v4.s_addr
+> > > > +					    : other_tuple->src_v4.s_addr;
+> > >=20
+> > > I think this can be simplified if my series use the ip_hdr(skb)->daddr
+> > > for rt_nexthop(), see attached patch. This would be fetched _before_
+> > > pushing the tunnel and layer 2 encapsulation headers. Then, there is
+> > > no need to fetch other_tuple and check if tun_num is greater than
+> > > zero.
+> > >=20
+> > > See my sketch patch, I am going to give this a try, if this is
+> > > correct, I would need one more iteration from you.
+> > >
+> > > diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow=
+_table_ip.c
+> > > index 8b74fb34998e..ff2b6c16c715 100644
+> > > --- a/net/netfilter/nf_flow_table_ip.c
+> > > +++ b/net/netfilter/nf_flow_table_ip.c
+> > > @@ -427,6 +427,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buf=
+f *skb,
+> > >  	struct flow_offload *flow;
+> > >  	struct neighbour *neigh;
+> > >  	struct rtable *rt;
+> > > +	__be32 ip_dst;
+> > >  	int ret;
+> > > =20
+> > >  	tuplehash =3D nf_flow_offload_lookup(&ctx, flow_table, skb);
+> > > @@ -449,6 +450,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buf=
+f *skb,
+> > > =20
+> > >  	dir =3D tuplehash->tuple.dir;
+> > >  	flow =3D container_of(tuplehash, struct flow_offload, tuplehash[dir=
+]);
+> > > +	ip_dst =3D ip_hdr(skb)->daddr;
+> >=20
+> > I agree this patch will simplify my series (thx :)) but I guess we shou=
+ld move
+> > ip_dst initialization after nf_flow_encap_push() since we need to route=
+ the
+> > traffic according to the tunnel dst IP address, right?
+>=20
+> Right, I made a quick edit, it looks like this:
+>=20
+> @@ -566,9 +624,14 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *=
+skb,
+> =20
+>         dir =3D tuplehash->tuple.dir;
+>         flow =3D container_of(tuplehash, struct flow_offload, tuplehash[d=
+ir]);
+> +       other_tuple =3D &flow->tuplehash[!dir].tuple;
+> +
+> +       if (nf_flow_tunnel_push(skb, other_tuple) < 0)
+> +               return NF_DROP;
+> +
+>         ip_daddr =3D ip_hdr(skb)->daddr;
+> =20
+> -       if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
+> +       if (nf_flow_encap_push(skb, other_tuple) < 0)
+>                 return NF_DROP;
+> =20
+>         switch (tuplehash->tuple.xmit_type) {
+>=20
+> That is, after tunnel header push but before pushing l2 encap (that
+> could possibly modify skb_network_header pointer), fetch the
+> destination address.
+>=20
+> I made a few more comestic edits on your series and I pushed them out
+> to this branch:
+>=20
+> https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git/log=
+/?h=3Dflowtable-consolidate-xmit%2bipip
+[
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bhargava-Marreddy/bng_en-Query-PHY-and-report-link-status/20251112-050616
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20251111205829.97579-7-bhargava.marreddy%40broadcom.com
-patch subject: [net-next 06/12] bng_en: Add support to handle AGG events
-config: arc-randconfig-r122-20251113 (https://download.01.org/0day-ci/archive/20251113/202511131515.DHkaAel4-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 13.4.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251113/202511131515.DHkaAel4-lkp@intel.com/reproduce)
+ack, I tested this branch and it works fine running my local tests. Thanks =
+for
+fixing pending bits.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511131515.DHkaAel4-lkp@intel.com/
+Regards,
+Lorenzo
 
-sparse warnings: (new ones prefixed by >>)
-   drivers/net/ethernet/broadcom/bnge/bnge_txrx.c:931:11: sparse: sparse: symbol 'bnge_lhint_arr' was not declared. Should it be static?
-   drivers/net/ethernet/broadcom/bnge/bnge_txrx.c: note: in included file (through drivers/net/ethernet/broadcom/bnge/bnge_resc.h, drivers/net/ethernet/broadcom/bnge/bnge.h):
->> drivers/net/ethernet/broadcom/bnge/bnge_netdev.h:524:34: sparse: sparse: marked inline, but without a definition
+>=20
+> I just noticed, in nf_flow_tunnel_ipip_push(), that this can be removed:
+>=20
+>         memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+>=20
+> because this packet never entered the IP layer, the flowtable takes it
+> before it can get there.
 
-vim +524 drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+--5gdp/tkNuL2145vX
+Content-Type: application/pgp-signature; name=signature.asc
 
-   515	
-   516	u16 bnge_cp_ring_for_rx(struct bnge_rx_ring_info *rxr);
-   517	u16 bnge_cp_ring_for_tx(struct bnge_tx_ring_info *txr);
-   518	void bnge_fill_hw_rss_tbl(struct bnge_net *bn, struct bnge_vnic_info *vnic);
-   519	int bnge_alloc_rx_data(struct bnge_net *bn, struct bnge_rx_ring_info *rxr,
-   520			       u16 prod, gfp_t gfp);
-   521	inline int bnge_alloc_rx_page(struct bnge_net *bn,
-   522				      struct bnge_rx_ring_info *rxr,
-   523				      u16 prod, gfp_t gfp);
- > 524	inline u16 bnge_find_next_agg_idx(struct bnge_rx_ring_info *rxr, u16 idx);
+-----BEGIN PGP SIGNATURE-----
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaRWLhAAKCRA6cBh0uS2t
+rMv9AQC6xcba9zpJwQtXPC3Xv0ZWz+UeLQNX11CPHmQPmtpheAD8Dvd8xaGktBuv
+saj8xfjPSXw/lIIqLbh70Pu5zLj+1A0=
+=HTPF
+-----END PGP SIGNATURE-----
+
+--5gdp/tkNuL2145vX--
 
