@@ -1,138 +1,133 @@
-Return-Path: <netdev+bounces-238268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 804E1C56C36
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:10:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBB07C56ACD
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:47:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E2E8435239B
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:07:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EFED42109F
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA7E2D73B5;
-	Thu, 13 Nov 2025 10:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B2F2C327A;
+	Thu, 13 Nov 2025 09:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="ZwcePGS5"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BFkpbkaM"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic307-56.consmr.mail.ne1.yahoo.com (sonic307-56.consmr.mail.ne1.yahoo.com [66.163.190.31])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB6B29BDB0
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.190.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642732D63E8;
+	Thu, 13 Nov 2025 09:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763028461; cv=none; b=WGOYu9TXBY1inWdIXFbZBz7OzloM1Q2a3I/ii7AMrXJB8cWdfgHinh+Utv3d+sKI3+4UkRAZYu0SnUfH+HQPfPy3+vt2Xs2twRkwFT4UG4kQhkOQZ9wwesXHcG3sNTHJSMgAaUGoN4bUlaI3vpLKdYkZ3LSCwpdMZAEpsSRzFMk=
+	t=1763026809; cv=none; b=gWwQChTgqxM0Bu5lR6NSW9JrNeVBeMywnhh34hdBf+RqgwNQ5kzpzs1ocGRjx9HuDgIrhGdxeLZJfVN+Kqu63KgTXvpdDbL3BFtQCFeiWZaEZ14s2NQ2704JQ3jUpAo95sCk6C7Mgw0fLcv0uHj3r54FAeND89UOf7/U1rL9PWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763028461; c=relaxed/simple;
-	bh=yfBHkXtYZkMnrC2241QVykXVZoThQqOY+KvmC0bm+9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aoV2hYRZfZ6u+MPXMTAaBLGfAWy3XXmWWX/yh+tHt3vNB8zmLBOpQoqoKoqdd0HhzvIQgNCreL4NUeRLnhsJ7pc3q3Ng3f8PrAl7MGv0hruYr3lB6USJE4IrZfhh4urNdfSpBQyGCZqZV36b8eW2KhUAf5isZ/K+B2dzyCd1oss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=ZwcePGS5; arc=none smtp.client-ip=66.163.190.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1763028458; bh=MY75YRxq0WOxOFYKIbvygfAxaaUgS8HMYCOtfJwLLjA=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=ZwcePGS50Il99sx7ze6t9sf7nvC9ZXM9i6D06xC5haRvjv3eSyYKP3NiAStu5tOa6ikOVUZWhPT0qdMRXZVh12Dp8WRS8FH2Y5i2WttxiP/s40JVQBLB2YWnJs9oqccsnSlrdQ0sB3nrepmatRUY9U1l5SSv9iKxehb1CfN3VQqSKmIZTK9ThDjCSm0Vp4fwgMy27wwHFbMEcC7wgdEiNRaAmIMWihv9W8+DuXtssaRO3aCBOZlhsi6znEsZk08+xcnsjAlR9p+gC+ZWS34vzwQPtWnLM8H4l2Z4BOBaAuLnwTuzfdQocub/YS/HgXtV+nInDA9qlqqM2PvW+ueb4Q==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1763028458; bh=J1bScWPUF2K1qxto9E66zHOtraPbeuu/a0iXMvHzCOI=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=OwRk6QpyQnOdS/ExL7HPBHicpzQIE0jwLrKnylBmqQtpdwempq9ywqcfCoP3q/TuXSHSUAv05vbHpEVbLt02Wd5eIuoFndz/3y33JAEYxFAq8zJJeMSEVCF8FixthaMqbD38P3SVxoP9E8d5jz1mLUgbkDqczb8omVoejqQ6nXur1uIi6PAalJJZ3NlCfP47op9c2QiBuuBt2cvkpL7XsHIDlK/yPlxkwDxBueN8DmABAr/WXguQeWlHrz58DyfvQEUH+IEL/qt4MQ6FQ62PNf0CcyXZwjkNH8dGJa50PyfcyRl1SxV0D+326lg894nsTIeL0L0cNQB0zpt41B+ggA==
-X-YMail-OSG: Mr_vfU8VM1mVpk_GNdCfJTpHO7u5QQQZgv5W6zxkrK4F41U.BRZsGysH1lsmGzz
- IbUEmJ3ACvUd5FCXwE_L_hOWdHJfk119XJVn6AUTe_hQbrrwbCspWDy9GiUDlx7QBifTuJMW0DCv
- ZckmvOp90pmTotb5UbH5hEsNNtORV.Kit0gifV8Rpll3VpOinQsXDmjRbbvANxi03Ka.IzlrfjGN
- RxkNTXTqgU_jd.v71sWkYf4LzqCqIgbhj9KoGT.lUqxyg989v6hW2Gfjycz3QxTIp5rnDC69WvZJ
- 3MD78_gaOzHYhiOGrKVUhx1ypz35lZfbt792nA_ju1ny_QBghWySqJJ8U9N9.mXncZyJtYeNmYec
- v.JhlhO78d3VFveZO7TjmsbPZl5BrAbLhwlfzvOmY9FGDfMLDebW.r0yZkAE4FBLahQisi3taj1K
- YHzp6JumozqtJYxZPGS5XSkxkyUjRwHUmsrqnXz173QtiC2R6m.Gua3tkmYjQSu5FIc_N7.huk7j
- Jn5veLhQDSkaDQi7MMchVUONwKh710ZzZukw.PyEUwmYV0EL_wJ.reVHaLJrsU1z306oXTBjonPV
- oPyhOVH3JlBHz8ilJW3xGTQrXkd_vjQNd5a0wwQ_Fpk2IefmDZ56CFcV.uQljsbvquGEM8slTIPa
- deedBR9Mrux500iDhexwMw40DJCgBW7oJ9yMH9u5588Bv1tzChXRgRHcnZenQtBegD4F3AjqeEJm
- fHX5dvgruW6itC5qcEQifkgrmIEtP9mwjsxPZyhXnnU5RvZMCsSnTDJ9Fz9mk_sMVlBHCespOMWZ
- tQuHl.lft9mrkt1SM97_Z9rgat4QIoFwIXUoHUoHEGyuKGS.d1ngUO9xviEy7NRIjY4OuEb_Gpdn
- uyx3BtiyjtpVmmCdWDESRZiVGSQXIBdqMeOV.Ar0mPgWT8DnewIoy602Tk6k8tPBXtjWyzS553.D
- uNl5dS2h.9UdWBFFuQxTvIM.wTQFVHCObpZtOHIgIA1BMK6Zqfwm1_my6x6zz0sdVODsMpU5MF4T
- 9lHWgpfxilDWYCWu_4W9GClikXSpqx7ei.UXr8Hnr5pDLzAlffldf8GKAQbOkYNoXj1IWd3r3Ch.
- ka9PjbJFTZXKgLAXASFCEdwjOUsl6vTP_8uwb.bBXlb_x3_cS6O_LjCVOk70mK0HZ4HLEzmqhaTZ
- wJk5BtnC.CBzjd5p7wbp.TiSsNTYgDzPkz3hIlv7tsyhV6mQ7ZXvqIgjOwkuDW1oGnu.0VlTLK2G
- 2WusiiPsR9RHyah5TTkd5IfAU6kNzjEgl09LqF8DEdVqGSRJDoT1cTvT3QjS60tcle2Dwn0Hnz7a
- cLSI8WLn5vradstXvKSTyBisTq6z9ytvYqND.ja57EQlQvde2FPqz2U78MRyZnPa0SYO3dKnFZXe
- cinqasgbGpwdz_XZ0wpKp0STdFwoXj4usQ6S_Qtazj8gK7QnUpv4S5y9nlt2Zhf4SNnlTi3yVdoO
- r6zTJHM.PWGZ2.apfmhQGFCQuKSmWQA34OVcfiggjfkkCR4QDIWoH9v37h_FyGku_FWy5LAEIIb0
- a7cE_rf7vjggISj7HwfAIw0bZ.XbTr9YQoK1lxWp_0Hm.ZLsMIilbL13aNMsp8b4VPVIu4G44.GX
- 3HykR2ktCTNHhD_2YryfyyOfiwYIfq5MdYo42RzeuhHCx26eBQ8HSbA0eeyDYK3CxDaU6xT1yHYE
- 2921T.xvgBfbaF2bIFBmX0sfFou_Lle7qP._OopuzlXUCkBPV.uGSe7OABhXwYplo524nLOqARxL
- Wt7jtE9VqDG0_5sdC__CCa6IOksEY4dDcQOpd4KmwQFknkNur4W4L4Yqx_VD_SF3932r1ozWA6F5
- oPCGCQgvFCcIbMdhQWnIqPEGF0Iz761qdp5TEUvaDdLmsErhkOfcC3wfLZMuzaTuyJ6vOQdtyWun
- zpFdjY_JFDTfhu0Nb8s13mWUwQ9hSJWRwcZGGS6UZUlKoQXZP_GF0KPiXjfMGzdIZWBzU2ttgpdL
- gWOr10pip88ot5TEahkDX4zdVux9Hh844ViJPgEqm6NDmme5XpY63RDiJ0UIBwct.Z.hna4IrvA6
- zYNJ.ck3ZOzKQUMld0wAxa1GI5Q2.PbewxBlYndvZXhMMgsvcGSCP4AYLhWL_5Wj0o0DRZcyEtaE
- uH.Kpf.VEyfhxkazuQ8UxNcU4EwuOXw.YEVs-
-X-Sonic-MF: <mmietus97@yahoo.com>
-X-Sonic-ID: ee51cfc4-c65b-4680-96fe-584e72dec4fd
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.ne1.yahoo.com with HTTP; Thu, 13 Nov 2025 10:07:38 +0000
-Received: by hermes--production-ir2-5fcfdd8d7f-xjb4h (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID c4610d66785fb1449b69e944a1a3bc0c;
-          Thu, 13 Nov 2025 09:37:09 +0000 (UTC)
-Message-ID: <5af3e1bd-6b20-432b-8223-9302a8f9fe44@yahoo.com>
-Date: Thu, 13 Nov 2025 10:36:55 +0100
+	s=arc-20240116; t=1763026809; c=relaxed/simple;
+	bh=PccSFIPRborUgGL8/VaEy8QTABiLNVFPXAHshkFLtc8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BsRyWUhZ6SLIpIR8C9pN6VZjdntCyqUY6r6FYzAG+UWfUJDYlHVii9eVtFgoD+VyY0nf1IID6YsA5+yfhKfH+P+V0feMVtfh2CH1hISXQYkBdJumvfIi9gC3wSxyIv/XibZrnlD9nXlkixgmfwZfRLHgR7dZ0dk8s2HcmFQlRrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BFkpbkaM; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ACNSQim4032357;
+	Thu, 13 Nov 2025 01:39:42 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=1TbnnwqrjwLHrKFyBzb646u
+	Y0bstDmwiTNtuzxO4hbI=; b=BFkpbkaMv9bc1R9l1G1tvsW6/wlGL3w9Idq/TqI
+	NX7CsDy//w2f5IpimP4wYInjK06+QlVYgJH6MJhTWsDatNGItCUhcapDx04o8P7B
+	2ydycyFzeZKkRvcnLUr7QhVX6xkIqN/qnRmihn20AEIarT+J4NUIIjsfPlMxJaH3
+	ZnJvuQ6SvGi/7qwkuOtZvqcEE0ePf+X9uj7xJOubw6ZJcDlxjxTYaTEkBRXrj0Yc
+	Fe+2MaBLIIfEh4bKK1MyLDsDpC0AvwetWmTljJV1/l3X4FR2vIu+Np2wOL1Xm+Wr
+	eyBVczAQEJAn+veHz6qO+07B4mAlHVNq09Iy2mpeTvOMVkA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ad3xbh62j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Nov 2025 01:39:41 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 13 Nov 2025 01:39:51 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Thu, 13 Nov 2025 01:39:51 -0800
+Received: from hyd1vellox1.032marvell.com032caveonetworks.com (unknown [10.29.37.43])
+	by maili.marvell.com (Postfix) with ESMTP id D45FA5B6929;
+	Thu, 13 Nov 2025 01:39:35 -0800 (PST)
+From: Anshumali Gaur <agaur@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Anshumali Gaur <agaur@marvell.com>, Sunil Goutham <sgoutham@marvell.com>,
+        Linu Cherian <lcherian@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
+        hariprasad <hkelam@marvell.com>,
+        "Subbaraya
+ Sundeep" <sbhatta@marvell.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David
+ S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman
+	<horms@kernel.org>,
+        Wojciech Drewek <wojciech.drewek@intel.com>
+Subject: [net PATCH] octeontx2-af: Skip TM tree print for disabled SQs
+Date: Thu, 13 Nov 2025 15:09:00 +0530
+Message-ID: <20251113093900.1180282-1-agaur@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 02/14] net: skb: use dstref for storing dst
- entry
-To: Sabrina Dubroca <sd@queasysnail.net>, edumazet@google.com,
- pabeni@redhat.com, kuba@kernel.org, davem@davemloft.net
-Cc: netdev@vger.kernel.org
-References: <20251112072720.5076-1-mmietus97@yahoo.com>
- <20251112072720.5076-3-mmietus97@yahoo.com> <aRS_SEUbglrR_MeX@krikkit>
-Content-Language: en-US
-From: Marek Mietus <mmietus97@yahoo.com>
-In-Reply-To: <aRS_SEUbglrR_MeX@krikkit>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Mailer: WebService/1.1.24652 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Type: text/plain
+X-Proofpoint-GUID: bSy0wnbNEdTFBStzaxsZzXAK5bK_0M8_
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEzMDA3MCBTYWx0ZWRfX6/eiyOCtlj1h
+ JdJ3+3V5B7sezLZdly2OOzEfjP29T5xKxnqIVoBmUXStZ/BbvoGQ+fDm8ECsS5JBWzBi5+0DlKS
+ o8FovyJKrBdIJtaGvbQMXhC7LBARvD6myvqbnDbgTay8CLrKxnXX1Zw4ciK9F4yhadQpVaCAQSe
+ D0hH4N1qgpWhsT344mGqOPlMV1C8BYS/C3da6AozaV9vmnQaDKxgVb3n/fI5wDS4y7c0+k5TxOH
+ rg9ZrGybjOg+lDDJgbYhRd2t54Ccyl7/W41JXtFKR5umyk0LRTr2j6i34pysnOg973VQ+MsbbFN
+ r6RnEhaM6x439qx/CyKRIbk6PGOsofhIsm3Q4o146Bl1dTLEoi+mE/SE+CzTOwDluS9hq27UzNq
+ soAHSWPakUU4oddX/uQCg7I9lOzfGA==
+X-Authority-Analysis: v=2.4 cv=Qq9THFyd c=1 sm=1 tr=0 ts=6915a75d cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
+ a=TDmekW24L8jN3pXCac4A:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-ORIG-GUID: bSy0wnbNEdTFBStzaxsZzXAK5bK_0M8_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-13_01,2025-11-12_01,2025-10-01_01
 
-W dniu 11/12/25 o 18:09, Sabrina Dubroca pisze:
-> 2025-11-12, 08:27:08 +0100, Marek Mietus wrote:
->> Use the newly introduced dstref object for storing the dst entry
->> in skb instead of using _skb_refdst, and remove code related
->> to _skb_refdst.
-> 
-> This is an important change to a very core part of networking. You
-> need to CC all the networking maintainers/reviewers for this series
-> (ask scripts/get_maintainer.pl).
+Currently, the TM tree is printing all SQ topology including those
+which are not enabled, this results in redundant output for SQs
+which are not active. This patch adds a check in print_tm_tree()
+to skip printing the TM tree hierarchy if the SQ is not enabled.
 
-Noted for next time.
+Fixes: b907194a5d5b ("octeontx2-af: Add debugfs support to dump NIX TM topology")
+Signed-off-by: Anshumali Gaur <agaur@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> 
->> This is mostly a cosmetic improvement. It improves readability
-> 
-> That rename, and the rest of the changes in this series. is causing
-> some non-negligible churn and will take a while to review, to ensure
-> all the conversions are correct.
-> 
-> @Maintainers can I get some time to look at this in detail?
-> 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+index 8375f18c8e07..7e3be0fb8cf6 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+@@ -1651,6 +1651,9 @@ static void print_tm_tree(struct seq_file *m,
+ 	int blkaddr;
+ 	u64 cfg;
+ 
++	if (!sq_ctx->ena)
++		return;
++
+ 	blkaddr = nix_hw->blkaddr;
+ 	schq = sq_ctx->smq;
+ 
+-- 
+2.25.1
 
-I figured it would require a thorough review.
-Thank you for taking the time to look at it!
-
-> 
-> Also, I'm not sure how we ended up from the previous proposal ("some
-> tunnels are under RCU so they don't need a reference" [1]) to this.
-> 
-> [1] https://lore.kernel.org/netdev/20250922110622.10368-1-mmietus97@yahoo.com/
-> 
-
-As previously discussed with Jakub [2], tunnels that use udp_tunnel_dst_lookup
-add notable complexity because the returned dst could either be from
-ip_route_output_key (referenced) or from the dst_cache (which I'm changing to
-be noref). There are also other tunnels that follow a similar pattern.
-
-The cleanest way to keep track of which dst is referenced and which isn't
-is to borrow existing refdst concepts. This allows us to more easily track
-the ref state of dst_entries in later flows to avoid unnecessarily taking
-a reference. I played around with a couple implementations and this turned
-out to be the most elegant. It's a big change, but it's mostly semantic.
-
-[2] https://lore.kernel.org/netdev/20250923184856.6cce6530@kernel.org/
 
