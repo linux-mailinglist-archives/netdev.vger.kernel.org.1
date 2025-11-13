@@ -1,213 +1,292 @@
-Return-Path: <netdev+bounces-238478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 526ADC597B3
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 19:34:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D854C597A1
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 19:32:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D11144FC221
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:08:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B32704EA4CD
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:10:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C431248F78;
-	Thu, 13 Nov 2025 18:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5F8352933;
+	Thu, 13 Nov 2025 18:10:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EajP37gn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MFezV8W+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1E3239E80
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 18:08:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAF626F2BB
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 18:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763057324; cv=none; b=UOB0hylsJMcrUkTLHOo08qtVv4SIMWcg+Rdz+NJg35y39Jf57SYmPydKDZ5nHGNK7De7SR70J8k58PdPCaYkXDJ6f3RQ3AAV81rbSsPAjNLTK0OcLi6BI6cH03Zj4qL+fLFrBiXTRUP9UvMIOXwcdSB82E9TAH6hv6D9dae3C3A=
+	t=1763057438; cv=none; b=nqkMDAHrXGs+TrIxaVvNKZtussQ0vOt/Lu6wkg9fn9FhNmGLajH6145E7jHBqB1WiUrnGM1VvL4Oth9n2oli6YxY0zoHJ3G08l9hwgB1aWuSzD3bOyAAagi6sQustNHGpVp/JMBjaagt/W/k/yZ9F9ljQ7c5SNz2JMeNmomzsm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763057324; c=relaxed/simple;
-	bh=TPj9owb7ElRzwm4Sf1okokwYt3tx8Ju1RG0RisUx9CA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T1t9wjtD4ddfleWSAQmr6CXBZ5KHtz1H4I61dWERSyHgfsoFPSc/BcqED+CvzwowcfAIsTL9IZTdWdxWKPpx5IILFt6haAayiGtGuk/SEHwNnjJKklzIRb1qfdAYTi8P5qh/0NQoy0uFwHuCW2HRG5TT80I28fsDhZADvEGDQwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EajP37gn; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4e89de04d62so9377201cf.0
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:08:42 -0800 (PST)
+	s=arc-20240116; t=1763057438; c=relaxed/simple;
+	bh=0QgMRtdD83RcFucBfkLS2hJinG0DlPzvPLvSV5Q4piU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tbBl39v5hbkGifeSIr4HsVc+qZz79M95sphdbij6JKSY7Q0eMC2D2DQRr2rUypXH7STTuufwrjng/HK5w0S0ChaC3cxJLGHUlOxnXsLw4l15hZGczaYfKT71tQ9nR+FeakO2mGsrYJLRRf/ankpIylnjbwRQDEJbER3hT+hAQtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MFezV8W+; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-641977dc00fso1717775a12.1
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:10:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763057321; x=1763662121; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TOE+7hjXFDqSPg0qZDe6sqr/yDBVryU/1Dzunle7zHc=;
-        b=EajP37gnYB0Pu5zPvEqHDmlBlBHs1RU6NtbuMxJiPH2lDE7IYi4UtCsRxQBHk3VWzs
-         Uoy4dp9NCpdNE3mGwSfje8ok+Le1l04AYbOY1IL74fk56FxpDAir8ILJixEMLAsf4aom
-         lnkiW9Um/l799hk1eG6o1LpekAyjGvFTq0bAjTby68G7yktuloXXaDIrS8eDtkmukFAv
-         s74tYPwR+xhmTj68uDjllnYHhnUL93cWTSChl1JnzJ+3dKVMw8LaImvnq2YCHKwwivFm
-         0A2nct8kvOp1Y0pDxf8b7BU0WyeiOwKY4dLiRihr/ZFVGl2kmWAX88m5+MsrqxQBtRRR
-         P0Tg==
+        d=gmail.com; s=20230601; t=1763057434; x=1763662234; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=87BEAOUBPph3TzBH1vV5g7Ztob9f0IjgY5bWUM5E6Ww=;
+        b=MFezV8W+pt5tBxIuK/g45V+RUbRWbVTPNBLg0Ne5jnSJuOkLBbdksx0FCKLRfbExx1
+         VQ/v1VB1DRXebpofFXevV/mhJubLCJtuD15EATFBK5i/oGa5712pwTAey6Y9OdUPbQO6
+         RNmvysTfbIXdceE9dvzSyjZLLIQJQnLJ/6RXTNm2/l11qknZbfV/6My4MIk7qK36HfnB
+         +PAANYBZ0sANaIt8dRhHNh3LbqhQMdht4/U2L+fX6W1igZIK44PSPOaBHz/Or7XpGHVJ
+         gWKJ+AJZzfE1ZGwHMOj0o+2l9Ams8xDCi/1WhsY3brgXVbv85e2tXwXssS42io/BXT9H
+         QTOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763057321; x=1763662121;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=TOE+7hjXFDqSPg0qZDe6sqr/yDBVryU/1Dzunle7zHc=;
-        b=CutFnetYes+zyhambMAuxA/eQOxzfqvEbobZj7zpfbqZAo1ehWhcKWQvK6wZcDxvnc
-         g6AtalcVu90gNQhmAbvhQlzthziy5KQXxik4vxpQbzjCVo0tyhY+YszsOnj3MOJzdOTL
-         Y/Ehar3ymm8PCkTNUomNKFWAsbPVX11s2jwOe1piUpBB3arzahVyANTyKyPzU0XUcNrA
-         L2hClqhwBJQBjSudXFTj4bgaZbkOnyv28mO9yF4KMYvlotI3wpAwLUT+qgViE/1hlIY7
-         djZ9AnVCDqyobqIPrFYRcQMVMAjD/BE6n839+KAUuVD/Zf+aW4+L+/SBUJcnLgLS93Z8
-         i3tQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWhV+pgu2SajEsRRL75nP5CaNH7LhTGUNDWY0hDHpZY8CyIMPaHC8UTL5ms0kdEC4qDuUQUQrs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwW7RioVY1GKGExyn54PUpsdT9mXJ30YSk/aLn9JlWmZVOJuWZ/
-	u71bNdWAe4HlI2JsZkZX0N2QiNSxFyCdh/66wklyqgR1KxCxeoyC6/Z5STJTBWEnmHwGoKFWOWh
-	BoxC63CDaNclkZ7UVPoFCLA/cMW5mzfGYUv2LGWst
-X-Gm-Gg: ASbGncv1mBO0igGybjNq8QmAlc6OE3J/ts0Urgyw9C2lCK1BhhWgF5hBmrEoGqkmVDE
-	AsWvXVDh3BfhBG+zLGVxgLLvxo9JTt6FHuctlfDR8iwwOJEcHmn1FWJnFSu5AzrWbKihaCJ9o7a
-	K///OplQWb+nKjzTwiLe4I3NDjTxIQ6UGSpnmNl3J05SUSuIf/TrQxD+m8X4G+Y9PMP7Q/0oALh
-	NDqOrG7kiZnZ9SIiAhasJ1sCXcOEdOxQKU0LnlpLPZV+jxVTiuseeQkEfzp6tNzuwgtYNCNTUua
-	nspiaPo=
-X-Google-Smtp-Source: AGHT+IGYx8qwsgOK6f5BDSlB3h1TSCEInhHLxMEyR8ML0bjOALTl+Joz+vpAEMHTGB6LHiC6/0Sf0Oc1tMGnb5heKr4=
-X-Received: by 2002:a05:622a:e:b0:4e8:9ad9:f3da with SMTP id
- d75a77b69052e-4edf20a188dmr9931171cf.30.1763057320983; Thu, 13 Nov 2025
- 10:08:40 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763057434; x=1763662234;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=87BEAOUBPph3TzBH1vV5g7Ztob9f0IjgY5bWUM5E6Ww=;
+        b=fgXpk2DNmN1vrtZey56QcJb0u6BKUSlsCUp0i8VE5irdXQtwNr+zBJ9JGyVW+/u4Zr
+         WepYXXbCurcNhFrB/dy4OWyVi1sRgKEdG39hDgGim8XN9yjnwWMUmPuwlbhhudaSp5AL
+         orNPlIdQ6WcmxCKUEruoXzzDimj3dS8Bz1MTcS7iBsKYUZjS6vpdYStIHxk7/C0oDpx1
+         K8FtVBxBIeHHbH0nCztwPsKPLPtyOafMENOPrCUvtVBFB/exTZso9wmUY70gVEQpGCV6
+         V1e/GruiAOffsvR7BcaIqC0uPAgguR8BvdRbGHEVqjNWGStmUJqla/DvwYrREzLJc/hz
+         ZoMA==
+X-Forwarded-Encrypted: i=1; AJvYcCUR1nVBFmpeGGe5ZT0Up4d7cJjvm0ynKwZSNGduerl8n9AqyqyKQvMdfv4WQQL4ctnPd6RQ0xE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPEfIPA3m5eGr5XM1RtPMYKBIaTerqbDEmXIqQ3054FWQjMSFN
+	n7Kpw7S5HjAu57iotDKfTtB/2rJBmkym10FlzzEy92nZXHdGEwU7qZc=
+X-Gm-Gg: ASbGncvkDCmrPjXkTrIfp7u4Irghf7RZPPtNQS0n5ff/aHWBWMjBkVMHTq33WQe1i4T
+	1PbCd7dHu71I6j+UDRUucCP8WOw98mI/mChsrw8tQy1Yl5/cAZ6KrF5g1l3nuMb1lodwhI3tSOm
+	BhLNc91fXR2ZSwho0OTj9cH7NG+pc6D8tCTqiJzBDfpY2giM1+i1O7Vu1mUGZJapkzTS+PsOXBA
+	6KrtAKOSGEevWBbmFldL2sBpiT1mT+Tm88t8XUw2aIuVqc03Cf4a4piZX740yLty/aPHHpnGiyU
+	GkoZNTUPCWhDVwAeERLZovpYWtf6awzZMTRxIZz8LjFu9eEHYoI6s6b3pY3n2kp+SVqMO0GzJcK
+	HBHbjZ1WM8rnq2f6HbID6rLWH2maWU2AaKC898jpQVcKF2pVrBRACZgM+RmbThCr/nWx8ftQ/QR
+	k/rXXpQn/exUoZQU7NkRovo1d4+c33RhniID8dNGWmR0KlcpPLUsw46UKut1GN6oK/Ba9r
+X-Google-Smtp-Source: AGHT+IGz29WAKXKe+U4nMt5douwl+2MqO7amrWJcnBL9iYqpI8wTmeKa4ANLVfbfh8GHVmaNVscELw==
+X-Received: by 2002:a17:907:78d:b0:b71:cec2:d54 with SMTP id a640c23a62f3a-b736796a61amr13099066b.57.1763057433996;
+        Thu, 13 Nov 2025 10:10:33 -0800 (PST)
+Received: from localhost ([2a02:810d:4a94:b300:bb0e:996a:397f:d689])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b734fd809fasm211020266b.45.2025.11.13.10.10.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Nov 2025 10:10:33 -0800 (PST)
+From: Florian Fuchs <fuchsfl@gmail.com>
+To: Geoff Levand <geoff@infradead.org>,
+	netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org,
+	Masakazu Mokuno <mokuno@sm.sony.co.jp>,
+	Jeff Garzik <jeff@garzik.org>,
+	fuchsfl@gmail.com
+Subject: [PATCH net v2] net: ps3_gelic_net: handle skb allocation failures
+Date: Thu, 13 Nov 2025 19:10:00 +0100
+Message-ID: <20251113181000.3914980-1-fuchsfl@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251109161215.2574081-1-edumazet@google.com> <176291340626.3636068.18318642966807737508.git-patchwork-notify@kernel.org>
- <CAM0EoMkSBrbCxdai6Hn=aaeReqRpAcrZ4mA7J+t6dSEe8aM_dQ@mail.gmail.com> <CAM0EoMkw11Usx6N2JJDqCoFdBUhLcQ0FYQqMzaSKpnWo1u19Vg@mail.gmail.com>
-In-Reply-To: <CAM0EoMkw11Usx6N2JJDqCoFdBUhLcQ0FYQqMzaSKpnWo1u19Vg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 13 Nov 2025 10:08:29 -0800
-X-Gm-Features: AWmQ_bnAjwR8BctAteuHj1OlBxQYLzHekpkxJbvnAlqSgZOD287eCLVpc8NSjYA
-Message-ID: <CANn89iJ95S3ia=G7uJb-jGnnaJiQcMVHGEpnKMWc=QZh5tUS=w@mail.gmail.com>
-Subject: Re: [PATCH net] net_sched: limit try_bulk_dequeue_skb() batches
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, horms@kernel.org, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, kuniyu@google.com, 
-	willemb@google.com, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	hawk@kernel.org, patchwork-bot+netdevbpf@kernel.org, toke@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 13, 2025 at 9:53=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> [..]
-> Eric,
->
-> So you are correct that requeues exist even before your changes to
-> speed up the tx path - two machines one with 6.5 and another with 6.8
-> variant exhibit this phenoma with very low traffic... which got me a
-> little curious.
-> My initial thought was perhaps it was related to mq/fqcodel combo but
-> a short run shows requeues occur on a couple of other qdiscs (ex prio)
-> and mq children (e.g., pfifo), which rules out fq codel as a
-> contributor to the requeues.
-> Example, this NUC i am typing on right now, after changing the root qdisc=
-:
->
-> --
-> $ uname -r
-> 6.8.0-87-generic
-> $
-> qdisc prio 8004: dev eno1 root refcnt 5 bands 8 priomap 1 2 2 2 1 2 0
-> 0 1 1 1 1 1 1 1 1
->  Sent 360948039 bytes 1015807 pkt (dropped 0, overlimits 0 requeues 1528)
->  backlog 0b 0p requeues 1528
-> ---
->
-> and 20-30  seconds later:
-> ---
-> qdisc prio 8004: dev eno1 root refcnt 5 bands 8 priomap 1 2 2 2 1 2 0
-> 0 1 1 1 1 1 1 1 1
->  Sent 361867275 bytes 1017386 pkt (dropped 0, overlimits 0 requeues 1531)
->  backlog 0b 0p requeues 1531
-> ----
->
-> Reel cheep NIC doing 1G with 4 tx rings:
-> ---
-> $ ethtool -i eno1
-> driver: igc
-> version: 6.8.0-87-generic
-> firmware-version: 1085:8770
-> expansion-rom-version:
-> bus-info: 0000:02:00.0
-> supports-statistics: yes
-> supports-test: yes
-> supports-eeprom-access: yes
-> supports-register-dump: yes
-> supports-priv-flags: yes
->
-> $ ethtool eno1
-> Settings for eno1:
-> Supported ports: [ TP ]
-> Supported link modes:   10baseT/Half 10baseT/Full
->                         100baseT/Half 100baseT/Full
->                         1000baseT/Full
->                         2500baseT/Full
-> Supported pause frame use: Symmetric
-> Supports auto-negotiation: Yes
-> Supported FEC modes: Not reported
-> Advertised link modes:  10baseT/Half 10baseT/Full
->                         100baseT/Half 100baseT/Full
->                         1000baseT/Full
->                         2500baseT/Full
-> Advertised pause frame use: Symmetric
-> Advertised auto-negotiation: Yes
-> Advertised FEC modes: Not reported
-> Speed: 1000Mb/s
-> Duplex: Full
-> Auto-negotiation: on
-> Port: Twisted Pair
-> PHYAD: 0
-> Transceiver: internal
-> MDI-X: off (auto)
-> netlink error: Operation not permitted
->         Current message level: 0x00000007 (7)
->                                drv probe link
-> Link detected: yes
-> ----
->
-> Requeues should only happen if the driver is overwhelmed on the tx
-> side - i.e tx ring of choice has no more space. Back in the day, this
-> was not a very common event.
-> That can certainly be justified today with several explanations if: a)
-> modern processors getting faster b) the tx code path has become more
-> efficient (true from inspection and your results but those patches are
-> not on my small systems) c) (unlikely but) we are misaccounting for
-> requeues (need to look at the code). d) the driver is too eager to
-> return TX BUSY.
->
-> Thoughts?
+Handle skb allocation failures in RX path, to avoid NULL pointer
+dereference and RX stalls under memory pressure. If the refill fails
+with -ENOMEM, complete napi polling and wake up later to retry via timer.
+Also explicitly re-enable RX DMA after oom, so the dmac doesn't remain
+stopped in this situation.
 
-requeues can happen because some drivers do not use skb->len for the
-BQL budget, but something bigger for GSO packets,
-because they want to account for the (N) headers.
+Previously, memory pressure could lead to skb allocation failures and
+subsequent Oops like:
 
-So the core networking stack could pull too many packets from the
-qdisc for one xmit_more batch,
-then ndo_start_xmit() at some point stops the queue before the end of
-the batch, because BQL limit is hit sooner.
+	Oops: Kernel access of bad area, sig: 11 [#2]
+	Hardware name: SonyPS3 Cell Broadband Engine 0x701000 PS3
+	NIP [c0003d0000065900] gelic_net_poll+0x6c/0x2d0 [ps3_gelic] (unreliable)
+	LR [c0003d00000659c4] gelic_net_poll+0x130/0x2d0 [ps3_gelic]
+	Call Trace:
+	  gelic_net_poll+0x130/0x2d0 [ps3_gelic] (unreliable)
+	  __napi_poll+0x44/0x168
+	  net_rx_action+0x178/0x290
 
-I think drivers should not be overzealous, BQL is a best effort, we do
-not care of extra headers.
+Steps to reproduce the issue:
+	1. Start a continuous network traffic, like scp of a 20GB file
+	2. Inject failslab errors using the kernel fault injection:
+	    echo -1 > /sys/kernel/debug/failslab/times
+	    echo 30 > /sys/kernel/debug/failslab/interval
+	    echo 100 > /sys/kernel/debug/failslab/probability
+	3. After some time, traces start to appear, kernel Oopses
+	   and the system stops
 
-drivers/net/ethernet/intel/igc/igc_main.c is one of the overzealous drivers=
- ;)
+Step 2 is not always necessary, as it is usually already triggered by
+the transfer of a big enough file.
 
-igc_tso() ...
+Fixes: 02c1889166b4 ("ps3: gigabit ethernet driver for PS3, take3")
+Signed-off-by: Florian Fuchs <fuchsfl@gmail.com>
+---
+Changes v1->v2:
+- Rename and declare return value of gelic_descr_prepare_rx() in the top
+  of gelic_card_decode_one_descr() ret -> prepare_rx_ret
+- Invert the order of calls in gelic_card_down() run napi_disable()
+  first, then timer_delete_sync()
+- Remove useless kdoc from gelic_rx_oom_timer()
+- Fix gelic_net_poll() to reduce indentation level of success path
 
-/* update gso size and bytecount with header size */
-first->gso_segs =3D skb_shinfo(skb)->gso_segs;
-first->bytecount +=3D (first->gso_segs - 1) * *hdr_len;
+v1: https://lore.kernel.org/linuxppc-dev/20251110114523.3099559-1-fuchsfl@gmail.com/
 
->
-> We will run some forwarding performance tests and let you know if we
-> spot anything..
->
-> cheers,
-> jamal
+Note: This change has been tested on real hardware Sony PS3 (CECHL04 PAL),
+the patch was tested for many hours, with continuous system load, high
+network transfer load and injected failslab errors.
+
+ drivers/net/ethernet/toshiba/ps3_gelic_net.c | 45 +++++++++++++++-----
+ drivers/net/ethernet/toshiba/ps3_gelic_net.h |  1 +
+ 2 files changed, 35 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+index 5ee8e8980393..591866fc9055 100644
+--- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
++++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+@@ -260,6 +260,7 @@ void gelic_card_down(struct gelic_card *card)
+ 	if (atomic_dec_if_positive(&card->users) == 0) {
+ 		pr_debug("%s: real do\n", __func__);
+ 		napi_disable(&card->napi);
++		timer_delete_sync(&card->rx_oom_timer);
+ 		/*
+ 		 * Disable irq. Wireless interrupts will
+ 		 * be disabled later if any
+@@ -970,7 +971,8 @@ static void gelic_net_pass_skb_up(struct gelic_descr *descr,
+  * gelic_card_decode_one_descr - processes an rx descriptor
+  * @card: card structure
+  *
+- * returns 1 if a packet has been sent to the stack, otherwise 0
++ * returns 1 if a packet has been sent to the stack, -ENOMEM on skb alloc
++ * failure, otherwise 0
+  *
+  * processes an rx descriptor by iommu-unmapping the data buffer and passing
+  * the packet up to the stack
+@@ -981,16 +983,18 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
+ 	struct gelic_descr_chain *chain = &card->rx_chain;
+ 	struct gelic_descr *descr = chain->head;
+ 	struct net_device *netdev = NULL;
+-	int dmac_chain_ended;
++	int dmac_chain_ended = 0;
++	int prepare_rx_ret;
+ 
+ 	status = gelic_descr_get_status(descr);
+ 
+ 	if (status == GELIC_DESCR_DMA_CARDOWNED)
+ 		return 0;
+ 
+-	if (status == GELIC_DESCR_DMA_NOT_IN_USE) {
++	if (status == GELIC_DESCR_DMA_NOT_IN_USE || !descr->skb) {
+ 		dev_dbg(ctodev(card), "dormant descr? %p\n", descr);
+-		return 0;
++		dmac_chain_ended = 1;
++		goto refill;
+ 	}
+ 
+ 	/* netdevice select */
+@@ -1048,9 +1052,10 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
+ refill:
+ 
+ 	/* is the current descriptor terminated with next_descr == NULL? */
+-	dmac_chain_ended =
+-		be32_to_cpu(descr->hw_regs.dmac_cmd_status) &
+-		GELIC_DESCR_RX_DMA_CHAIN_END;
++	if (!dmac_chain_ended)
++		dmac_chain_ended =
++			be32_to_cpu(descr->hw_regs.dmac_cmd_status) &
++			GELIC_DESCR_RX_DMA_CHAIN_END;
+ 	/*
+ 	 * So that always DMAC can see the end
+ 	 * of the descriptor chain to avoid
+@@ -1062,10 +1067,11 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
+ 	gelic_descr_set_status(descr, GELIC_DESCR_DMA_NOT_IN_USE);
+ 
+ 	/*
+-	 * this call can fail, but for now, just leave this
+-	 * descriptor without skb
++	 * this call can fail, propagate the error
+ 	 */
+-	gelic_descr_prepare_rx(card, descr);
++	prepare_rx_ret = gelic_descr_prepare_rx(card, descr);
++	if (prepare_rx_ret)
++		return prepare_rx_ret;
+ 
+ 	chain->tail = descr;
+ 	chain->head = descr->next;
+@@ -1087,6 +1093,13 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
+ 	return 1;
+ }
+ 
++static void gelic_rx_oom_timer(struct timer_list *t)
++{
++	struct gelic_card *card = timer_container_of(card, t, rx_oom_timer);
++
++	napi_schedule(&card->napi);
++}
++
+ /**
+  * gelic_net_poll - NAPI poll function called by the stack to return packets
+  * @napi: napi structure
+@@ -1099,14 +1112,22 @@ static int gelic_net_poll(struct napi_struct *napi, int budget)
+ {
+ 	struct gelic_card *card = container_of(napi, struct gelic_card, napi);
+ 	int packets_done = 0;
++	int work_result = 0;
+ 
+ 	while (packets_done < budget) {
+-		if (!gelic_card_decode_one_descr(card))
++		work_result = gelic_card_decode_one_descr(card);
++		if (work_result != 1)
+ 			break;
+ 
+ 		packets_done++;
+ 	}
+ 
++	if (work_result == -ENOMEM) {
++		napi_complete_done(napi, packets_done);
++		mod_timer(&card->rx_oom_timer, jiffies + 1);
++		return packets_done;
++	}
++
+ 	if (packets_done < budget) {
+ 		napi_complete_done(napi, packets_done);
+ 		gelic_card_rx_irq_on(card);
+@@ -1576,6 +1597,8 @@ static struct gelic_card *gelic_alloc_card_net(struct net_device **netdev)
+ 	mutex_init(&card->updown_lock);
+ 	atomic_set(&card->users, 0);
+ 
++	timer_setup(&card->rx_oom_timer, gelic_rx_oom_timer, 0);
++
+ 	return card;
+ }
+ 
+diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.h b/drivers/net/ethernet/toshiba/ps3_gelic_net.h
+index f7d7931e51b7..c10f1984a5a1 100644
+--- a/drivers/net/ethernet/toshiba/ps3_gelic_net.h
++++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.h
+@@ -268,6 +268,7 @@ struct gelic_vlan_id {
+ struct gelic_card {
+ 	struct napi_struct napi;
+ 	struct net_device *netdev[GELIC_PORT_MAX];
++	struct timer_list rx_oom_timer;
+ 	/*
+ 	 * hypervisor requires irq_status should be
+ 	 * 8 bytes aligned, but u64 member is
+
+base-commit: fe82c4f8a228d3b3ec2462ea2d43fa532a20ac67
+-- 
+2.43.0
+
 
