@@ -1,70 +1,61 @@
-Return-Path: <netdev+bounces-238184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65B80C556DE
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 03:27:04 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26BEEC5572F
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 03:35:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 583803A3BFF
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 02:23:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7BD3B4E19D4
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 02:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E64E2F7453;
-	Thu, 13 Nov 2025 02:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1225423ED5B;
+	Thu, 13 Nov 2025 02:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+OhYIvL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JcS8AJcG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094042F6910;
-	Thu, 13 Nov 2025 02:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12B320FA81
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 02:35:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763000632; cv=none; b=e+X1BA7kPYaeAVIlfWuNoxfqM/lnDU5QYHpGUWUTQJvm1F1mPVDqASTG79EL5KGxbKRfdcW6zDUuqOovfwGSm59qbOLx5YEVncus0cxiSgvzfw1fBcy5HmZx5PrZO06xI/pYISeLsGjx3on3wY/XfvKMYCyd4jJ9zmLhCsuKKs4=
+	t=1763001310; cv=none; b=hzaAoZ55aQU0OWvGj3noebyd4KRN5MtEDgXPNoi2q9ZbCqDzIqe05DhBnMRdSa8ScMHuT1zqN46aAv02VhbsozZS4UsLYwQQGPkOndtqpFLI+WBN8XmldgRTWrKWR4OhFkvdNSwqOgwRTWk8BafVXr5yZYcAxWI9EyT7fnD7PzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763000632; c=relaxed/simple;
-	bh=uiIKjmlOaAuVzG/eOCcOMDdAt1BLiAZtilWHaUZlBp0=;
+	s=arc-20240116; t=1763001310; c=relaxed/simple;
+	bh=YO/Ftu/Xg3pmed58glUcL1UBDyJ5Rpx9lMXkwzM4PLo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f05lLaqMIz1HTfdPrfN9jkZY6yGwH1yJHcthBppw0yTXr0m/2X2h0eF8RXMTuxj7DU2oUjaLVTZsymIowLhC5RtDTrMY231bWHwMiXQaBXjeerYYkcQChxT6XQo5e6PbHB6vhj6da5mgwFh+znhdiBI6y3x4PB/FGgZQmYGNdU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+OhYIvL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8E38C4CEF1;
-	Thu, 13 Nov 2025 02:23:50 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rGpyy6V1ApoRiYkJ7fWrWoMRvjN5LPE4QaDSac4x0zMT0BEkGykC4U0mjuAmQOxZjH5zziCROYPzndRXJ7VTTFhamIvpSrQgKlAnmQ9Kp7Y8vueBnmY8HNZG0krFkqyfBV+lX0ha8/Sa7TItNA46T9Sj2vsYp0sJtLy8xsfqsv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JcS8AJcG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1127C19424;
+	Thu, 13 Nov 2025 02:35:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763000631;
-	bh=uiIKjmlOaAuVzG/eOCcOMDdAt1BLiAZtilWHaUZlBp0=;
+	s=k20201202; t=1763001309;
+	bh=YO/Ftu/Xg3pmed58glUcL1UBDyJ5Rpx9lMXkwzM4PLo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I+OhYIvLdMiP1mW5j/cV/kopMRJpCWVRFR3lRntku6GmbCToIZY329xsfRedUegmv
-	 ZxhYT+fg7PhIa080G0AgZYogyz5dCXaPfBHYD3BDCsCIGcyCCYu7lzX2NEYLDH7HDe
-	 7xjxE1e9A63IaO1sTt1dY45Hb+JiqaqzUk3WvqrRjdI8RyWVZVUTOsKZyOk+iLl2mx
-	 hs9T1Zfx1IqwdlhSubVEUHcDgkTeOd6f66Kz8vfWxkhbBM7ypxHVqYvJyFI2UZRVrd
-	 1k9T3H33cEwhKCVKrtFFws+GGDseWphrX51h0gO3rjrQn5rYUi/FsTJH8nyfzdbApQ
-	 n2CUHvBW4mKcw==
-Date: Wed, 12 Nov 2025 18:23:49 -0800
+	b=JcS8AJcG+fbKYyr5ATWCpMcqB/l72/Mp+MvknlzQ7F5QwBO04dO6nRF5u207ilctS
+	 BO2rGLMKd6Ed2yQE3gKZNS/IMYlEyYv71S73DOPzgVRgyzTMDqdz+uCD6smHdZT4DS
+	 /266MmDNrMv6iSBbTD/0QU1biVcThgq3Vx/p+LG46QsDzw2lmpi3UILuMGn3EjhpUj
+	 yX96GXPrWJuiIeAPktbTEinYOndS7oeUR5MuZpc9bb6obtE7u/fyspAvVTU2eRdF1y
+	 JYQZIFIsBj8xk7nA+7um/aKLISLW7H78/yxd1LbA0/pbqB7USApyTwQjKoeVgX9VwY
+	 a1BpJB5MQvcUw==
+Date: Wed, 12 Nov 2025 18:35:08 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, mptcp@lists.linux.dev, Mat
- Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, Christoph Paasch
- <cpaasch@apple.com>, Florian Westphal <fw@strlen.de>, Peter Krystad
- <peter.krystad@linux.intel.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net v5 0/3] mptcp: Fix conflicts between MPTCP and
- sockmap
-Message-ID: <20251112182349.281a6a11@kernel.org>
-In-Reply-To: <cf035c68-fe96-49e0-acdb-bf813ae71d57@kernel.org>
-References: <20251111060307.194196-1-jiayuan.chen@linux.dev>
-	<cf035c68-fe96-49e0-acdb-bf813ae71d57@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Manish Chopra <manishc@marvell.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Simon Horman <horms@kernel.org>, Jacob
+ Keller <jacob.e.keller@intel.com>, Kory Maincent
+ <kory.maincent@bootlin.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] qede: convert to use ndo_hwtstamp
+ callbacks
+Message-ID: <20251112183508.3c20e21d@kernel.org>
+In-Reply-To: <20251111151900.1826871-3-vadim.fedorenko@linux.dev>
+References: <20251111151900.1826871-1-vadim.fedorenko@linux.dev>
+	<20251111151900.1826871-3-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,14 +65,62 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 11 Nov 2025 11:35:04 +0100 Matthieu Baerts wrote:
-> I think this series can be applied directly in 'net', if that's OK for
-> both of you.
+On Tue, 11 Nov 2025 15:19:00 +0000 Vadim Fedorenko wrote:
+> The driver implemented SIOCSHWTSTAMP ioctl cmd only, but it stores
+> configuration in private structure, so it can be reported back to users.
+> Implement both ndo_hwtstamp_set and ndo_hwtstamp_set callbacks.
+> ndo_hwtstamp_set implements a check of unsupported 1-step timestamping
+> and qede_ptp_cfg_filters() becomes void as it cannot fail anymore.
+> 
+> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-Also no preference here, Martin mentioned he will take it via bpf
-tomorrow. 
+> -static int qede_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
+> -{
+> -	struct qede_dev *edev = netdev_priv(dev);
+> -
+> -	if (!netif_running(dev))
+> -		return -EAGAIN;
 
-Please let us know on the off chance that you have anything that may
-conflict queued up. These will likely need a week of travel before 
-they reach net in this case.
+Isn't this running check gone after conversion?
+
+> -	switch (cmd) {
+> -	case SIOCSHWTSTAMP:
+> -		return qede_ptp_hw_ts(edev, ifr);
+> -	default:
+> -		DP_VERBOSE(edev, QED_MSG_DEBUG,
+> -			   "default IOCTL cmd 0x%x\n", cmd);
+> -		return -EOPNOTSUPP;
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+
+> +	switch (config->tx_type) {
+> +	case HWTSTAMP_TX_ONESTEP_SYNC:
+> +	case HWTSTAMP_TX_ONESTEP_P2P:
+> +		NL_SET_ERR_MSG_MOD(extack,
+> +				   "One-step timestamping is not supported");
+> +		return -ERANGE;
+> +	}
+
+Eh, I guess the warning I was imagining isn't actually enabled at W=1 :(
+And config->.x_type does not use enums..
+
+Could you switch this to the slightly more resilient:
+
+	switch (config->tx_type) {
+	case HWTSTAMP_TX_ON:
+	case HWTSTAMP_TX_OFF:
+		break;
+	default:
+		NL_SET_ERR_MSG_MOD(extack,
+				   "One-step timestamping is not supported");
+		return -ERANGE;
+	}
+
+? Guess similar adjustment would also work for patch 1.
+-- 
+pw-bot: cr
 
