@@ -1,270 +1,203 @@
-Return-Path: <netdev+bounces-238263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF48DC56AC7
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:46:52 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAFEDC56AD6
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:49:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6C0A53434E1
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:46:32 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BB601344A40
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99D22DEA68;
-	Thu, 13 Nov 2025 09:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FF72D7DC4;
+	Thu, 13 Nov 2025 09:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XCzsVqHS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010038.outbound.protection.outlook.com [52.101.201.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFDA92C17B6
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 09:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763027186; cv=none; b=p5LMVyMuF8OUxmls1P1R4M13pLb5a5ozB0qkCApPnaH7JPBXkSdHTrP67Zb5kfDceeRMb3ExwzxkRkE3hvSxoL3W5YRywmJ0o/OOQN8rALGVQVBMsrdAafYrjwQHJXZffOHvfOvPjr+9fVTeq0gImZ0Gsk4uQ/MGMYkk4bLBrFU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763027186; c=relaxed/simple;
-	bh=ln6VIq4hqE6e00jK4/UHhbLOBk4U2Alqi5mu4Ob034c=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=TWqSNP0HBz8WhfWasSipzexRJvvdbFernBJyo+2KkeqEiXU7afFwwAdW5VHnMsVAyYlovjVYfzH+EMnyYilX8xw6+DZ4Zhb+KH6rq+HRuxLOOvtqH1LC3TT99MH4d415+E3l0iiJyBLApvf2/yAj6hdE2rTtnRvQvlysw49nBQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-937e5f9ea74so85312239f.1
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 01:46:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763027184; x=1763631984;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=g+YrH1I1nIv2SkzE+SknOnmyqhffEQ0P6dSf1dmNXQs=;
-        b=NdSdJS7R3WeM4dP6IAEKPvIBs+xUGbdFmNVbLC+RD9vs/6d4COr1NbNVxoW4Ap0W7T
-         ZDwdIJp4MWVDpvTCySLPH6O8yKRJjZI7vpMt9/8tv+FkzVElTMc6s2n75LRUBbbwt8e4
-         toOn7fV7+xFi1QRFCnSnSKPQV72ISzZLeeQqP0ljWUMl8JwsOKlHXQGRKDOKQA8cDDHK
-         hvbSoQTPwBdU5Jhe8D2SZ4JnEtim//MQCDndRvDEK8E2DWOdrERW/15bjt3eJZcjPoBz
-         TptnF9WcK7n62Q+jbu9YYLEPbZ/tEoKZyfAwGqFEKoy+Jn6Ma7TXRTMvbWEGwz1UVqAo
-         FFzw==
-X-Forwarded-Encrypted: i=1; AJvYcCVNE12Q0XtBWKx/6bMEoN1cVaFafHVP6ikeZGLzjXAqSUII0/ATLImCf6OrHcWNM+Ep6ibNpCE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysrRiv4FfN2MqDJchZNLgbzoX+WcND2navqD/gg2AlJuUtH0j9
-	4myG5hS0ivPMsFgVUQ2eIj3V4Q+qvgFfU3u/bqIDd8Kq7ymXedf/DgGwK8BPd/lA/HmCTOWeCVX
-	EGYW22ym122KouXaOHvBYA8MfqZBa/k+juILrO1ADRfC3MTSo3x8iuzns85M=
-X-Google-Smtp-Source: AGHT+IGeKDKwe1Ju884NJus1vBFe0GrHOTAIO1xdsVu5wgDOmJ0OixRcceJUr9Re2oI8zLRgpijY4qYX7TMtqFq5WhE5p11lSyze
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F5F2C17B6;
+	Thu, 13 Nov 2025 09:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.38
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763027318; cv=fail; b=co6VyeiJOZT7yceICHWX/mvs+TYOrm3fFZeLQInma/K+9SmMyf32/CInO805ZKiGmqwkdQL9WarrA07XHxnV7d77cdwaqcWk2s6lAG2cjHNYRgY5gux4H+17mVbQ0LbI2pw9lZyFB0WrcbkxmGK94WYqCgWIZWDDExSE1NlFLl8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763027318; c=relaxed/simple;
+	bh=ZZfUclOYXlqErBU5bFcVZbGzUBDFto3WoIkExJ29Q5U=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XDcuF0gETJBhjGN/3b27RnLj47YKpxCsY1LBMip9mDHhV/SuBJ5vLJ0MlLlJrdrbIbwRawda6m0vfOVFJqcrfA4s7quIEgmq5+mpmykgtEl2Nkl5t1jZ4bjvVFKPswxPhpU96yQPnSAPbTxki1BbxHE4nsNCHloMcUxKoEpjblU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XCzsVqHS; arc=fail smtp.client-ip=52.101.201.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=O1K7OTbpG2e8zRHyqg7GMinTc59r4B2KY0SvyJkfulmB+05UACGMh7Gnm91mA6mjFpgtXbxBW1tajPZXzH4rowo/k61XXFwJj4OeujVyv7FrAYXQDvzOUijMXfVLuYW6Rp5lbMzweqdlEo5jL+DHWujWdfFkAE9iZ45My9auJZvpDQiyefO8MH7SeeFU0NG2+EZ2FM1qJh9knBGcanUO3oELnhpmdVyiB8M3Orvrt697KW2nq32UOZOAMG4nR5WLinZKiY4PY8l9aEHZ+XAGy/YJ0MzwyfI9zj+vzRXXi/lBcUfFOdh7xKh+RoqNkmCIZsx3PEC86+KrklR16pq8cw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DoPCaL+TpIFxrizmJ2ziMZyAEcB2VVmpdgOaXAO7V4I=;
+ b=SEK00/O5cUTkQoHC2KQlmP5WKm+98J0dTTgBQevmLbnqD1ry32rNarzRkIn40IWWxoJIb9cNHlriEQSxnDtFDSA7k+4FwaW11sYOmoLl8TwvJyEfftW9Hx9h0PNCTZxtG+uZtGTLtQT9Frx9p94VWPRw/Arz+Z97xUxbHCOrytBUhu4nBRgpFwtdbjSkx2O+LNiLlUA/b6S7vdf8HHBJCW3hp1eHIkAlXCzl34yU2lDRa0la4nT4Xgp5StOLKOjXk4OUn0loD4kidNlZ/4J2ayBvQ+Xv8gAOldJzt/cldp82sYkk7xNRmJxjOT9s6jaJ7WRBgNN5YvImnv3VuDoerA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DoPCaL+TpIFxrizmJ2ziMZyAEcB2VVmpdgOaXAO7V4I=;
+ b=XCzsVqHS2k5fgLGW6Pq6Cx+Jo5ZoCSwmFtJwnXEPpFfZLI5yAm4Q8yVMRBaDi18GJI58fRM9ouF+h3x8vtGgTA+ohjqh9h620+z02zDObWFhynM8J2kOKIHsz6dLhwW9f7AaFk9CTT/6XaGWzmocI1D+8Qlide6Se9vlyqaAl61xxo2zJo8fPfpl7BJWZvTfs5v6OWqsL4go01qurYPkJn9/yr9Ckw777zFprgMtxTEYa7UD4kZR0mQayFBYS3VtwrTFWmIGsIBLB7xD0XlE3qiqd8tSRJWGJDz0SxCt/3OeLz0QstaYVZuqKpG20XSy8HGZRWUpi2VSsSCpJMZXsA==
+Received: from BN9PR03CA0228.namprd03.prod.outlook.com (2603:10b6:408:f8::23)
+ by SA3PR12MB7974.namprd12.prod.outlook.com (2603:10b6:806:307::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.17; Thu, 13 Nov
+ 2025 09:48:29 +0000
+Received: from BN3PEPF0000B36F.namprd21.prod.outlook.com
+ (2603:10b6:408:f8:cafe::6e) by BN9PR03CA0228.outlook.office365.com
+ (2603:10b6:408:f8::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9320.16 via Frontend Transport; Thu,
+ 13 Nov 2025 09:48:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN3PEPF0000B36F.mail.protection.outlook.com (10.167.243.166) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.0 via Frontend Transport; Thu, 13 Nov 2025 09:48:28 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 13 Nov
+ 2025 01:48:14 -0800
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 13 Nov
+ 2025 01:48:14 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Thu, 13
+ Nov 2025 01:48:10 -0800
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [pull-request] mlx5-next updates 2025-11-13
+Date: Thu, 13 Nov 2025 11:47:32 +0200
+Message-ID: <1763027252-1168760-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2192:b0:433:69d8:ac70 with SMTP id
- e9e14a558f8ab-43473d17d96mr88453865ab.10.1763027183975; Thu, 13 Nov 2025
- 01:46:23 -0800 (PST)
-Date: Thu, 13 Nov 2025 01:46:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6915a8ef.050a0220.3565dc.0025.GAE@google.com>
-Subject: [syzbot] [netfilter?] possible deadlock in ip_set_nfnl_get_byindex
-From: syzbot <syzbot+aefe8555e94ae62b95c1@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	fw@strlen.de, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	phil@nwl.cc, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B36F:EE_|SA3PR12MB7974:EE_
+X-MS-Office365-Filtering-Correlation-Id: 14f51913-de61-4a4c-0011-08de2299cc72
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ZK6yMOGZQ04AirLNvXNMH/aDgzLhEzR8rpp6ypNK/QqYeiQvnxQ7gyYg0KGD?=
+ =?us-ascii?Q?CUrDGsHznGGdPOY0xZFF8xdIxlgYomi7VjgfkgZenbxZlAhSYRtouBhr6oMJ?=
+ =?us-ascii?Q?AIj7oVghGKi7jxMDhqSAyjYh16LRCM53LO1FXOjkv6QDyjQpi2BJNXr7keku?=
+ =?us-ascii?Q?yr4noa71P976OK/bXGYUr/A8TMKBJHEVIOWSnfMW2SesUozqI6l8Z7x2W0Xn?=
+ =?us-ascii?Q?+fhOBcM34oo9ZXPk7hioOMVA8idCjfl/KDlIsHbKzq6NJBpULnNnmfzdzhw5?=
+ =?us-ascii?Q?Ia7aRnuJdXCdD2jmMFn+coo2vVSvmC1kURinY/qI8C5hNgxFMBSVPCrok0sX?=
+ =?us-ascii?Q?PmfVYgyLRICth2TTeYVQlnh+f80OOx6BVq2Yp/A3RvWycXy0qIqF21iKsJn5?=
+ =?us-ascii?Q?wnQHv8/INlOAevqHfoD2AzHBiyOyV6+j0kQnI3/sXkBPr9MESNkURsz2CLxR?=
+ =?us-ascii?Q?WC/J8+Qr45gR/kXbsxSBTqIPb6QsfyH7kfDMWXAYsI9jAy9IEu2Wg7kVHqPa?=
+ =?us-ascii?Q?Kwc+VMqym7h2uUXyNt71bdimbRJoJOJZNvdvNDIBGpHv54GSQ/JNaixgA6lx?=
+ =?us-ascii?Q?jJ0uj3gFeVFJSGSmj1RmDIMwr+OJpT9xcrIS0z/9OQZKrf7qHJ1inhsW/16X?=
+ =?us-ascii?Q?vzPgnweOA3Bgiq8qgf7nzyLxINtC++sgx/eI7ZN2EMuyDm6ppy6Upmj3EWsT?=
+ =?us-ascii?Q?rUyO9Cry4fZgyF16At9ZdG7u/YcTfD1EGwTxGFKjtvLXcR91/A5bcHki+c9G?=
+ =?us-ascii?Q?7738tRxb+itD8QryIH87CVMlUl7Y9vgdsZChzQsNwjsoojfwD6KIPJiUAMJB?=
+ =?us-ascii?Q?O1KCe4boIHZdfzuyAIjQ5Uh+Fl8n06sSmtjr++8A142cpAQNo60dxf6puv6o?=
+ =?us-ascii?Q?4di1lmXucebsId2g0m+UouktXWgRert4LdCSjUlKMuVuATNjiMpPDGdIha9V?=
+ =?us-ascii?Q?gyrGQYlfOmiUTQiCoRt7ZZTFOSRmycxuyYL3LLaha7oHqJSL1ISdRMUqiQi8?=
+ =?us-ascii?Q?P2/UIE3Ua1AtnBQJdoQt14RJEPg9Co4DbAqPIV7+ag1juKU7nOgz6U/u9gGM?=
+ =?us-ascii?Q?MNXG61bn6xsGfDNP5rBCgEsF9+rFfvr1mW+/5FNc5508fbQCOIk9Wuku8lqd?=
+ =?us-ascii?Q?+cbgBc5GjFsS6O5KATWuhnVVvCDmdMelAzQ4CCkVB4IhT9es/GSwRzkTH8Qh?=
+ =?us-ascii?Q?Vqj7MXfssC4hIJs9B75U1FgLvKdsgQ41mNipzafTUslL9wVOdq49Y1ptnxB6?=
+ =?us-ascii?Q?XA9DmwKmnzkU7q1bj/p93zRz+tAaweC5DEOPBHM9y6yWw8qULBMhZ6uypOkf?=
+ =?us-ascii?Q?Tt+fFL3DXRA0Qa/hfGdB4SEGLtD3RPndySrDenHgapN2dVZ2tLA/sXnvEjcs?=
+ =?us-ascii?Q?RnqpZzNIl8npCyp0HnefMgW5l2M2SYlunAT88fT7SGzjGtq2T3uuAGaGHg52?=
+ =?us-ascii?Q?F0NmNi1vjiLNJFc3K0RyOtlz1tN8I1SlHWGDULQRMjq19RQpNXt7xPe6whbH?=
+ =?us-ascii?Q?ymm17nBJ4FZ5/pzQ23Dcj0eBsXzSXMfgVf2RYJKUzUDSlY7U1S+mZ+MwOu5/?=
+ =?us-ascii?Q?EKPZPbnDbJlc8nmjqGc=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2025 09:48:28.6567
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14f51913-de61-4a4c-0011-08de2299cc72
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B36F.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7974
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+The following pull-request contains common mlx5 updates
+for your *net-next* tree.
+Please pull and let me know of any problem.
 
-HEAD commit:    e927c520e1ba Merge tag 'loongarch-fixes-6.18-1' of git://g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=110d97cd980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=609c87dcb0628493
-dashboard link: https://syzkaller.appspot.com/bug?extid=aefe8555e94ae62b95c1
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Regards,
+Tariq
 
-Unfortunately, I don't have any reproducer for this issue yet.
+----------------------------------------------------------------
+The following changes since commit 3a8660878839faadb4f1a6dd72c3179c1df56787:
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-e927c520.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/216d03ed7180/vmlinux-e927c520.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/63801f21a529/bzImage-e927c520.xz
+  Linux 6.18-rc1 (2025-10-12 13:42:36 -0700)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+aefe8555e94ae62b95c1@syzkaller.appspotmail.com
+are available in the Git repository at:
 
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Not tainted
-------------------------------------------------------
-syz.9.6420/24339 is trying to acquire lock:
-ffffffff9af8cbd8 (nfnl_subsys_ipset){+.+.}-{4:4}, at: ip_set_nfnl_get_byindex+0x7c/0x290 net/netfilter/ipset/ip_set_core.c:909
+  git://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git mlx5-next
 
-but task is already holding lock:
-ffff888026b1e0d8 (&nft_net->commit_mutex){+.+.}-{4:4}, at: nf_tables_valid_genid+0x35/0x140 net/netfilter/nf_tables_api.c:11499
+for you to fetch changes up to 5422318e27d7a4662701f518e2e51b9f73a331b1:
 
-which lock already depends on the new lock.
+  net/mlx5: Expose definition for 1600Gbps link mode (2025-11-12 03:35:14 -0500)
 
+----------------------------------------------------------------
+Adithya Jayachandran (1):
+      {rdma,net}/mlx5: Query vports mac address from device
 
-the existing dependency chain (in reverse order) is:
+Patrisious Haddad (3):
+      net/mlx5: Add OTHER_ESWITCH HW capabilities
+      net/mlx5: fs, Add other_eswitch support for steering tables
+      net/mlx5: fs, set non default device per namespace
 
--> #2 (&nft_net->commit_mutex){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
-       __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
-       nf_tables_dumpreset_set+0xcd/0x320 net/netfilter/nf_tables_api.c:6288
-       netlink_dump+0x539/0xd30 net/netlink/af_netlink.c:2327
-       __netlink_dump_start+0x6d6/0x990 net/netlink/af_netlink.c:2442
-       netlink_dump_start include/linux/netlink.h:341 [inline]
-       nft_netlink_dump_start_rcu+0x81/0x1f0 net/netfilter/nf_tables_api.c:1286
-       nf_tables_getsetelem_reset+0x946/0xab0 net/netfilter/nf_tables_api.c:6604
-       nfnetlink_rcv_msg+0x583/0x1200 net/netfilter/nfnetlink.c:290
-       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
-       nfnetlink_rcv+0x1b3/0x430 net/netfilter/nfnetlink.c:669
-       netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
-       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
-       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1896
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0xa98/0xc70 net/socket.c:2630
-       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2684
-       __sys_sendmsg+0x16d/0x220 net/socket.c:2716
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Tariq Toukan (1):
+      net/mlx5: Expose definition for 1600Gbps link mode
 
--> #1 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
-       __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
-       __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2406
-       netlink_dump_start include/linux/netlink.h:341 [inline]
-       ip_set_dump+0x17f/0x210 net/netfilter/ipset/ip_set_core.c:1717
-       nfnetlink_rcv_msg+0x9fc/0x1200 net/netfilter/nfnetlink.c:302
-       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
-       nfnetlink_rcv+0x1b3/0x430 net/netfilter/nfnetlink.c:669
-       netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
-       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
-       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1896
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0xa98/0xc70 net/socket.c:2630
-       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2684
-       __sys_sendmsg+0x16d/0x220 net/socket.c:2716
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Yishai Hadas (2):
+      PCI/TPH: Expose pcie_tph_get_st_table_loc()
+      net/mlx5: Add direct ST mode support for RDMA
 
--> #0 (nfnl_subsys_ipset){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3165 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
-       validate_chain kernel/locking/lockdep.c:3908 [inline]
-       __lock_acquire+0x126f/0x1c90 kernel/locking/lockdep.c:5237
-       lock_acquire kernel/locking/lockdep.c:5868 [inline]
-       lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5825
-       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
-       __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
-       ip_set_nfnl_get_byindex+0x7c/0x290 net/netfilter/ipset/ip_set_core.c:909
-       set_target_v1_checkentry+0x1ac/0x570 net/netfilter/xt_set.c:313
-       xt_check_target+0x27c/0xa40 net/netfilter/x_tables.c:1038
-       nft_target_init+0x459/0x7d0 net/netfilter/nft_compat.c:267
-       nf_tables_newexpr net/netfilter/nf_tables_api.c:3527 [inline]
-       nf_tables_newrule+0xea9/0x28f0 net/netfilter/nf_tables_api.c:4358
-       nfnetlink_rcv_batch+0x190d/0x2350 net/netfilter/nfnetlink.c:526
-       nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:649 [inline]
-       nfnetlink_rcv+0x3c1/0x430 net/netfilter/nfnetlink.c:667
-       netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
-       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
-       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1896
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0xa98/0xc70 net/socket.c:2630
-       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2684
-       __sys_sendmsg+0x16d/0x220 net/socket.c:2716
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  nfnl_subsys_ipset --> nlk_cb_mutex-NETFILTER --> &nft_net->commit_mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&nft_net->commit_mutex);
-                               lock(nlk_cb_mutex-NETFILTER);
-                               lock(&nft_net->commit_mutex);
-  lock(nfnl_subsys_ipset);
-
- *** DEADLOCK ***
-
-1 lock held by syz.9.6420/24339:
- #0: ffff888026b1e0d8 (&nft_net->commit_mutex){+.+.}-{4:4}, at: nf_tables_valid_genid+0x35/0x140 net/netfilter/nf_tables_api.c:11499
-
-stack backtrace:
-CPU: 3 UID: 0 PID: 24339 Comm: syz.9.6420 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_circular_bug+0x275/0x350 kernel/locking/lockdep.c:2043
- check_noncircular+0x14c/0x170 kernel/locking/lockdep.c:2175
- check_prev_add kernel/locking/lockdep.c:3165 [inline]
- check_prevs_add kernel/locking/lockdep.c:3284 [inline]
- validate_chain kernel/locking/lockdep.c:3908 [inline]
- __lock_acquire+0x126f/0x1c90 kernel/locking/lockdep.c:5237
- lock_acquire kernel/locking/lockdep.c:5868 [inline]
- lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5825
- __mutex_lock_common kernel/locking/mutex.c:598 [inline]
- __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
- ip_set_nfnl_get_byindex+0x7c/0x290 net/netfilter/ipset/ip_set_core.c:909
- set_target_v1_checkentry+0x1ac/0x570 net/netfilter/xt_set.c:313
- xt_check_target+0x27c/0xa40 net/netfilter/x_tables.c:1038
- nft_target_init+0x459/0x7d0 net/netfilter/nft_compat.c:267
- nf_tables_newexpr net/netfilter/nf_tables_api.c:3527 [inline]
- nf_tables_newrule+0xea9/0x28f0 net/netfilter/nf_tables_api.c:4358
- nfnetlink_rcv_batch+0x190d/0x2350 net/netfilter/nfnetlink.c:526
- nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:649 [inline]
- nfnetlink_rcv+0x3c1/0x430 net/netfilter/nfnetlink.c:667
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0xa98/0xc70 net/socket.c:2630
- ___sys_sendmsg+0x134/0x1d0 net/socket.c:2684
- __sys_sendmsg+0x16d/0x220 net/socket.c:2716
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f24a538f6c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f24a6265038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f24a55e5fa0 RCX: 00007f24a538f6c9
-RDX: 0000000000000800 RSI: 0000200000000100 RDI: 0000000000000004
-RBP: 00007f24a5411f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f24a55e6038 R14: 00007f24a55e5fa0 R15: 00007ffc70b4f688
- </TASK>
-Cannot find add_set index 0 as target
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+ drivers/infiniband/hw/mlx5/main.c                  |  2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.c  | 20 ++----
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |  3 +
+ drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c   | 31 +++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.c  | 74 +++++++++++++++++++---
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.h  | 19 +-----
+ drivers/net/ethernet/mellanox/mlx5/core/lib/st.c   | 29 +++++++--
+ drivers/net/ethernet/mellanox/mlx5/core/vport.c    | 24 +++----
+ drivers/pci/tph.c                                  | 16 ++++-
+ include/linux/mlx5/fs.h                            | 24 +++++++
+ include/linux/mlx5/mlx5_ifc.h                      | 47 +++++++++-----
+ include/linux/mlx5/port.h                          |  1 +
+ include/linux/mlx5/vport.h                         |  3 +-
+ include/linux/pci-tph.h                            |  1 +
+ 14 files changed, 216 insertions(+), 78 deletions(-)
 
