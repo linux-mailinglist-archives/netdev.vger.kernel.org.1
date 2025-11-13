@@ -1,154 +1,248 @@
-Return-Path: <netdev+bounces-238481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2AAEC5969F
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 19:18:26 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77AACC59729
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 19:26:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EBA9434F08A
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:18:25 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D2DC4351F61
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02980346768;
-	Thu, 13 Nov 2025 18:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328E9359F9A;
+	Thu, 13 Nov 2025 18:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="36IUaeQx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j29f4Eqx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF1A358D12
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 18:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F53328B57
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 18:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763057902; cv=none; b=Qhb/MWV8iu8aHY3MDS2mADiAWMJKqNqpHBKAGC0wVKGE8juEIhGP/gpXfUQCwigvIc8RodUKtCH+jJoO0qsjxTPgCIT+wREY0hUQ4Cm6wrJmjPdV+lDYP2e7xzdnz72z6PZum6lm38W6UVlLpgtgn4zpv2iCx6u5m8JAZ8k3/1Y=
+	t=1763058370; cv=none; b=GwU0FmuUCcjvsJSq1q48cx3clJtEVFpsOGbwMXtFYdKSuvhf2yLQ+x+rLVabeXYfFGPvSU9lIGi3TAuBmxEIdINZWEDYEYvgLczY7AJpyll7B4/zDvsR9l7rIlYKAmF6sBI06OIdrKidfUVXVMIEn3/HRcJrBOdIL0mVPsihCgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763057902; c=relaxed/simple;
-	bh=f93A8f9WizXVEioHDGwq53XkWjYdfcGuJMPgZoANb4c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GXA6GO3L/kw9MNHbPV3NYxUh/EFYUEGLLVwdUybntiAAKuEXj6GvvMJQ5tu3aGw9VtE4W9Apeq3RiQ1PB9uvyD1GjaslK2KI2Nwin9te3gEaqgAOM9EYZhwkg4zA8Ws6PNtVvQXsbiHY1bMnKVeR0Sw5YZoFrlYp6UaGXR25Ao0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=36IUaeQx; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ed7024c8c5so8544221cf.3
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:18:21 -0800 (PST)
+	s=arc-20240116; t=1763058370; c=relaxed/simple;
+	bh=NJWfzzFj8vgG4jgYe+zOfuZHD36yc5H5fI4S6VnrPoc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qDx8FS3c8rbl5xAJ2hJCijMJsjrs2TfZGbwlijEqfgjLpODRCKkrelDRpcslvjaNTMI4rHC6Z7u8gO6NEAGWnXzeWIe7FI1qnLNF1shUDSm4B4p76LxWs5Tz3RKmMG5FLjQN70osZ379oATJEvhtQjx8rAm6BMp3OpSxV70a+Bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j29f4Eqx; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-786a822e73aso13386017b3.3
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:26:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763057900; x=1763662700; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/QBuS22KKbiezuFoBj2dmfv64zRYES6WVPNoY+VjaJ4=;
-        b=36IUaeQxb9x+hgJn4O+0r/a0pAa8ZWuIf1qdKFUV1OeAehBQcIHYaZyENRrC5RjryL
-         +EaWvQcxzZYPZbNbplErH3FzNhQMJ3inz9vJizmSqlxNOzpT318EmKAI21J7YooBhe+l
-         PkxLU+HkWtqVeX9A8EkX30uJZ2AdUUlW/VjceselwtvkD2lKOnMTllKHKz9eNDhLbL6U
-         XEU47QHSjeBmIxI5JBraMOyvxQELLzxcz2CLD3r8zCyFaHma40xhv/Qc2f0cUVu2fHP7
-         Hhi7893zLNBBhiP3ngM8wlEm1+xy9XUoCEA/pWaqigZQ0HRauTRwrCmY5Ibzs+UheGCD
-         Qarg==
+        d=gmail.com; s=20230601; t=1763058367; x=1763663167; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PWcA86QhcaogO/P79JJUHrKh+Hv3BICSCdLFq4V4bOY=;
+        b=j29f4EqxVQsnNHPZTIc/ZsF6yW5nheZieAY0YTvbTNA7NcaGk9d5XL1LRU4cd4c5Vq
+         TXhEfhVKNmJPSSq08CSZkOmOWW90xpA3KY3x1LBF7Yu6Cji8Ywn+Ndz/0e/bsDzmckDZ
+         T07KoHeq0VKTMSx4mUKVNhP+g0zz8s+p7MPMZmicCEl8zo3DLgfiuk5m/fORYvKXAfre
+         NsVzyZzDw3Aq24ke268hv0ft+8bvBc9HLoulFWNv3COzLNCQkY94bXCc7WWdN1Pw0YR+
+         LM23D727zBohmrEq7Qi6Zz7m68KYloCKeELI+TXJpKF6ZgGYwWYroHAc4nG68CLQPkJ9
+         RbGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763057900; x=1763662700;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/QBuS22KKbiezuFoBj2dmfv64zRYES6WVPNoY+VjaJ4=;
-        b=egM3w7NuHNactRjvimQOPQ/kvWmo1r8FekAa2xaKL4ztyCHkd0E6OOKyveEYXfLi0R
-         Ygxk8vXDtKdCc2USr2FPQPUNL7EOxctcP2WH5AuUYv8T442buhQSYwYaFbYGKwPy4jsP
-         0NSSuZctb5DJ5Jq848Y38Vz0alh4tZ2evEXRxbvd/zBLzvHkyxfcp/0I7oaQ5IbV/z6N
-         6xcGJfW9PS2sxA5iIW6hzeW//t4BZCnB1e5aF0hin8ihlqsPnBogqeW8QR6qBIV6Rsxd
-         estbJY50aThZo7QSesoN63d0DH9GKuf+ivhn/RgUa3uBcyddFj2jMSsUtLyX9dA4TDyO
-         9jWg==
-X-Forwarded-Encrypted: i=1; AJvYcCVTqs6orERSRLjJIyTAGghL0QUK5XPqWL7jZc58btQS28mlF7UHUS/19d4KxCCEUJ2a+ALs2xQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQjvz+x2eNvvo4VhvLSR6ptiX7no+VfFAyjkvzOtMNYA8yERqX
-	MJD0bejBIdAK5uy3OHHNWPVkfszxMXLYINy2lkfjpn79aAdARszqiqxBt0Y0lHypLO+qkji9OoK
-	mkSr8l10sXMxqwrMREndBI46KsaQxa2Ukepi2XMaC
-X-Gm-Gg: ASbGncvEzGJUQaNE4NF/DMmtCCaNDPSstj+7/QIby5Rc6e/c8v1Ceg55LfhAyOylD56
-	AX3AHquWKc1VyPbKnDn5lxUrHaWcVg0/8sUAnilldO8HLGjInCIaKzTF4CHx3LNE8SIj1T0uDHR
-	urdHdaSo2SRvWjhgiPo80grkM4a/RreibM14kOMsCFHNC5KhYtbK92EJjfDtH+h6NbA76SWesMc
-	vDn0N61feXZqsA4A1Hp9uZ46srfMxUCUNps57Yz5l5Elk4/UFqiHLXw/Ggx7TtSAgDvt4qWRzNt
-	pjbmUXE=
-X-Google-Smtp-Source: AGHT+IEQb04EFItfps7wK3T9VKeqI4lb3lIvgW5wj3WpfUwF+JMSWLO5U+qF/ZS6pMqBD4ypHVy70XyD0uBVStQarWs=
-X-Received: by 2002:ac8:5f4c:0:b0:4e8:9e8a:294a with SMTP id
- d75a77b69052e-4edf214edcemr8281281cf.58.1763057899577; Thu, 13 Nov 2025
- 10:18:19 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763058367; x=1763663167;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PWcA86QhcaogO/P79JJUHrKh+Hv3BICSCdLFq4V4bOY=;
+        b=ImXtt6Rw0Z8jumlYKg6gQTUJgrRJwpS5ttuWX8Bb9m2Cm127kzE+cS8hfISOMsZGae
+         9TDKs/HhiRFF9zKNKcxNlYRHtjpmcwyQXTgOz+da5vh9lkXmOpOy8YpBQ/ilw+Set4CN
+         YHLmFoZ8F+gaH3jj1Xha6SmB/+eLJ8GG5gJwnGSwBusCk/tW8N8nUVSv+A4Jhb70amjc
+         LftGnspfMxagRULEaESPDXw7hm+v5sbbs39MWBaXI1QYLNwefHKi/ZLmuJwJj4+InXTl
+         2FWTJIGYO0/kQl/WKLrEjZ+X3fGFEogP6M5GRQum8rijUnLQOMooTDQ4Ps+5fhpmhthl
+         oMmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVATVEv2CdvNc+nPPcTYwpjRDrkBnRj8bszrYDBC4B+w3jshxSn0+b6FOOoIFZxgFlOXIyhjAw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTI0Yc9Ga42LR6Qw1L09TUY6Dr+vw/Z1iUpToNVeBuy0Y0GimW
+	seUI2yjI3FVDvbNQtcqpx3Dnhw8BRpA9UNtszfqU1EMivekUkauKzDyq
+X-Gm-Gg: ASbGncv2DSppe3A0PpjQ62rNZYZ+329ldZOOubHGPDnHTToKX1hJ2qlmcrTTx1hitPb
+	ZBCNLYDfRMifspwRaB1qihfPLOBlOyR3C8ao14h4ZelXUZJ4QBLL6XrPGGXkLROvFiS9Zo2/l8a
+	V+cUasRyvFp1SRSf3YUKcDTVU0HOCXZ88J9VWuKsKeTDuX6amY0Q3A5Axvs2aaofYAZS6m7Z1CV
+	hag3xWjteG6obeOAwXupaEkSN83Z55N8dR2CBOZq3yLYhuBNGccuswQJEWMX8oV/QtRpWyPYSZS
+	6QMD8syFlT1Yeo8WY25YBI/9oZpDspV/ZmlhfKnqxzeUtMdAUT7/HoXV7ILiAAbFrg6zdWMRVXb
+	+Kv1s3SVSJSnVIPefoERSmV8DST3tZQmEKsICKVB0uMcSyoHTt6tz6ES6hcJWhHHFKH25SCv7bk
+	RzUoeTjFXrkx3CqE3CYjT5oeAuK4u54GM1kG0=
+X-Google-Smtp-Source: AGHT+IGv1NUbsmH0mBFSpcmwoDDPPls56gYuUVpN5OeRP+WyZcaWbsNJTzNc/oyC8pxSybEkxYaXCQ==
+X-Received: by 2002:a05:690c:7008:b0:786:5f03:2b65 with SMTP id 00721157ae682-78929f09730mr3233697b3.33.1763058366513;
+        Thu, 13 Nov 2025 10:26:06 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:6::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78821e76af5sm8637957b3.27.2025.11.13.10.26.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 10:26:06 -0800 (PST)
+Date: Thu, 13 Nov 2025 10:26:04 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v9 06/14] vsock/loopback: add netns support
+Message-ID: <aRYivEKsa44u5Mh+@devvm11784.nha0.facebook.com>
+References: <20251111-vsock-vmtest-v9-0-852787a37bed@meta.com>
+ <20251111-vsock-vmtest-v9-6-852787a37bed@meta.com>
+ <g6bxp6hketbjrddzni2ln37gsezqvxbu2orheorzh7fs66roll@hhcrgsos3ui3>
+ <aRTRhk/ok06YKTEu@devvm11784.nha0.facebook.com>
+ <g5dcyor4aryvtcnqxm5aekldbettetlmog3c7sj7sjx3yp2pgy@hcpxyubied2n>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251113154545.594580-1-edumazet@google.com> <c6020af6-83d0-46c9-aad9-2187b7f07cbe@intel.com>
-In-Reply-To: <c6020af6-83d0-46c9-aad9-2187b7f07cbe@intel.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 13 Nov 2025 10:18:08 -0800
-X-Gm-Features: AWmQ_bm1U-Cyn1UVeB5sUpv_mHKHBP8-jEH0QzQq6Q_vk9iyjpxW3NSAMkJeXvI
-Message-ID: <CANn89iJzcb_XO9oCApKYfRxsMMmg7BHukRDqWTca3ZLQ8HT0iQ@mail.gmail.com>
-Subject: Re: [PATCH] x86_64: inline csum_ipv6_magic()
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H . Peter Anvin" <hpa@zytor.com>, "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-kernel <linux-kernel@vger.kernel.org>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	Eric Dumazet <eric.dumazet@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <g5dcyor4aryvtcnqxm5aekldbettetlmog3c7sj7sjx3yp2pgy@hcpxyubied2n>
 
-On Thu, Nov 13, 2025 at 8:26=E2=80=AFAM Dave Hansen <dave.hansen@intel.com>=
- wrote:
->
-> On 11/13/25 07:45, Eric Dumazet wrote:
-> > Inline this small helper.
-> >
-> > This reduces register pressure, as saddr and daddr are often
-> > back to back in memory.
-> >
-> > For instance code inlined in tcp6_gro_receive() will look like:
->
-> Could you please double check what the code growth is for this across
-> the tree? There are 80-ish users of csum_ipv6_magic().
+On Thu, Nov 13, 2025 at 04:24:44PM +0100, Stefano Garzarella wrote:
+> On Wed, Nov 12, 2025 at 10:27:18AM -0800, Bobby Eshleman wrote:
+> > On Wed, Nov 12, 2025 at 03:19:47PM +0100, Stefano Garzarella wrote:
+> > > On Tue, Nov 11, 2025 at 10:54:48PM -0800, Bobby Eshleman wrote:
+> > > > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > >
+> > > > Add NS support to vsock loopback. Sockets in a global mode netns
+> > > > communicate with each other, regardless of namespace. Sockets in a local
+> > > > mode netns may only communicate with other sockets within the same
+> > > > namespace.
+> > > >
+> > > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 
-Hi Dave
+[...]
 
-Sure (allyesconfig build)
+> > > > @@ -131,7 +136,41 @@ static void vsock_loopback_work(struct work_struct *work)
+> > > > 		 */
+> > > > 		virtio_transport_consume_skb_sent(skb, false);
+> > > > 		virtio_transport_deliver_tap_pkt(skb);
+> > > > -		virtio_transport_recv_pkt(&loopback_transport, skb, NULL, 0);
+> > > > +
+> > > > +		/* In the case of virtio_transport_reset_no_sock(), the skb
+> > > > +		 * does not hold a reference on the socket, and so does not
+> > > > +		 * transitively hold a reference on the net.
+> > > > +		 *
+> > > > +		 * There is an ABA race condition in this sequence:
+> > > > +		 * 1. the sender sends a packet
+> > > > +		 * 2. worker calls virtio_transport_recv_pkt(), using the
+> > > > +		 *    sender's net
+> > > > +		 * 3. virtio_transport_recv_pkt() uses t->send_pkt() passing the
+> > > > +		 *    sender's net
+> > > > +		 * 4. virtio_transport_recv_pkt() free's the skb, dropping the
+> > > > +		 *    reference to the socket
+> > > > +		 * 5. the socket closes, frees its reference to the net
+> > > > +		 * 6. Finally, the worker for the second t->send_pkt() call
+> > > > +		 *    processes the skb, and uses the now stale net pointer for
+> > > > +		 *    socket lookups.
+> > > > +		 *
+> > > > +		 * To prevent this, we acquire a net reference in vsock_loopback_send_pkt()
+> > > > +		 * and hold it until virtio_transport_recv_pkt() completes.
+> > > > +		 *
+> > > > +		 * Additionally, we must grab a reference on the skb before
+> > > > +		 * calling virtio_transport_recv_pkt() to prevent it from
+> > > > +		 * freeing the skb before we have a chance to release the net.
+> > > > +		 */
+> > > > +		net_mode = virtio_vsock_skb_net_mode(skb);
+> > > > +		net = virtio_vsock_skb_net(skb);
+> > > 
+> > > Wait, we are adding those just for loopback (in theory used only for
+> > > testing/debugging)? And only to support virtio_transport_reset_no_sock() use
+> > > case?
+> > 
+> > Yes, exactly, only loopback + reset_no_sock(). The issue doesn't exist
+> > for vhost-vsock because vhost_vsock holds a net reference, and it
+> > doesn't exist for non-reset_no_sock calls because after looking up the
+> > socket we transfer skb ownership to it, which holds down the skb -> sk ->
+> > net reference chain.
+> > 
+> > > 
+> > > Honestly I don't like this, do we have any alternative?
+> > > 
+> > > I'll also try to think something else.
+> > > 
+> > > Stefano
+> > 
+> > 
+> > I've been thinking about this all morning... maybe
+> > we can do something like this:
+> > 
+> > ```
+> > 
+> > virtio_transport_recv_pkt(...,  struct sock *reply_sk) {... }
+> > 
+> > virtio_transport_reset_no_sock(..., reply_sk)
+> > {
+> > 	if (reply_sk)
+> > 		skb_set_owner_sk_safe(reply, reply_sk)
+> 
+> Interesting, but what about if we call skb_set_owner_sk_safe() in
+> vsock_loopback.c just before calling virtio_transport_recv_pkt() for every
+> skb?
 
-Before patch:
+I think the issue with this is that at the time vsock_loopback calls
+virtio_transport_recv_pkt() the reply skb hasn't yet been allocated by
+virtio_transport_reset_no_sock() and we can't wait for it to return
+because the original skb may be freed by then.
 
-size vmlinux
-   text    data     bss     dec     hex filename
-886947242 245613190 40211540 1172771972 45e71484 vmlinux
+We might be able to keep it all in vsock_loopback if we removed the need
+to use the original skb or sk by just using the net. But to do that we
+would need to add a netns_tracker per net somewhere. I guess that would
+end up in a list or hashmap in struct vsock_loopback.
 
-After patch:
- size vmlinux
-   text    data     bss     dec     hex filename
-886947242 245613190 40211540 1172771972 45e71484 vmlinux
+Another option that does simplify a little, but unfortunately still doesn't keep
+everything in loopback:
 
-I found this a bit surprising, so I did a regular build (our Google
-production kernel default config)
+@@ -1205,7 +1205,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
+ 	if (!reply)
+ 		return -ENOMEM;
+ 
+-	return t->send_pkt(reply, net, net_mode);
++	return t->send_pkt(reply, net, net_mode, skb->sk);
+ }
 
-Before:
+@@ -27,11 +27,16 @@ static u32 vsock_loopback_get_local_cid(void)
+ }
 
-size vmlinux
-   text    data     bss     dec     hex filename
-34812872 22177397 5685248 62675517 3bc5a3d vmlinux
+ static int vsock_loopback_send_pkt(struct sk_buff *skb, struct net *net,
+-				   enum vsock_net_mode net_mode)
++				   enum vsock_net_mode net_mode,
++				   struct sock *rst_owner)
+ {
+ 	struct vsock_loopback *vsock = &the_vsock_loopback;
+ 	int len = skb->len;
+ 
++	if (!skb->sk && rst_owner)
++		WARN_ONCE(!skb_set_owner_sk_safe(skb, rst_owner),
++			  "loopback socket has sk_refcnt == 0\n");
++
+ 	virtio_vsock_skb_queue_tail(&vsock->pkt_queue, skb);
+ 	queue_work(vsock->workqueue, &vsock->pkt_work);
 
-After:
+> 
+> Maybe we should refactor a bit virtio_transport_recv_pkt() e.g. moving
+> `skb_set_owner_sk_safe()` to be sure it's called only when we are sure it's
+> the right socket (e.g. after checking SOCK_DONE).
+> 
+> WDYT?
 
- size vmlinux
-   text    data     bss     dec     hex filename
-34812501 22177365 5685248 62675114 3bc58aa vmlinux
+I agree, it is called a little prematurely.
 
-So it would seem the patch saves 371 bytes for this config.
-
->
-> Or, is there a discrete, measurable performance gain from doing this?
-
-IPv6 incoming TCP/UDP paths call this function twice per packet, which is s=
-ad...
-One call per TX packet.
-
-Depending on the cpus I can see csum_ipv6_magic() using up to 0.75 %
-of cpu cycles.
-Then there is the cost in the callers, harder to measure...
-
-Thank you.
+Thanks,
+Bobby
 
