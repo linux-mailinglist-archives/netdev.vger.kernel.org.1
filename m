@@ -1,290 +1,374 @@
-Return-Path: <netdev+bounces-238252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FC3CC56566
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:45:01 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DC54C565C3
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 09:51:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C5B2F3513B5
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 08:39:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 72AB9354926
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 08:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9CE33437B;
-	Thu, 13 Nov 2025 08:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F983321AB;
+	Thu, 13 Nov 2025 08:43:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="aesMCvoo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kHKKqH0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F505331A4E
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 08:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECE22550BA
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 08:43:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763023056; cv=none; b=Ukrl5KLWLCvOmEADXZtBRq13rlLqI3C9poL136tL6KdSNIFF/ZuRLLoEeu22RvpSWoyk0fp4z2oSQWXEZ4q9Sh98QIGayln2HeVZppu6csLnOkZorLPSde8+neRUCQZT/YBfZ4ehjupg2mNNEvPqnP0w3C+k/0kA3WGUx4YHHNo=
+	t=1763023429; cv=none; b=J+dgkykDIYiogMV5lMLtCfwuwMkh3DiR7yMmsNyyKLa5732mdwsgKjaZZP1suYBd2bLbn/4Nc0MbXw+WApwSEjBHI/yDoqnMJUknNPxjoYrK1sgxJGYeAm/3Rr6uF7UbdmuFXj1oOEMAMq4oMXFk0GEdWhvB5vyxgUyKjshRlqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763023056; c=relaxed/simple;
-	bh=Y8ujME5YPq+z8mYj6Yta+rJHrlWOzEAhgEDFwFYlHpU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BFO7VLGGZs6e09QcEts5O9wg3AYisEiZ7usoAIgpMMh3p9AzvGzwQ8Yw9z/WvE2A1CzDxknBoBjBvPjmKhDz9VGMvJIOPg3G+VUyB/J9SYB113IHZrPt62ywYfE7Y5sPum9zKq2CrVFbnBVEQSDxWuHoqC62q2GlynokSXkHzKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=aesMCvoo; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-64175dfc338so969864a12.0
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 00:37:32 -0800 (PST)
+	s=arc-20240116; t=1763023429; c=relaxed/simple;
+	bh=jse6Fvf91Bj1D9bHF1Cetv+Q41yOk1kjQNQ2qIrFsdk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Jx0YvaUW3g6aY2fFVwcOXpOYrIGJkwyWd6sKIs6/dRUJQDz+yMI5/tD5Ur+muhnsGQ5g/sxerXzUpJD4+CImSk+PSTdLRCcCHukDTgOT7vKmUsDRtV08tithICHQtZwUflHnw/55HQpbRf93IbuaXT7uQr2a5qp4ta1lm16bohU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kHKKqH0n; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-bc09b3d3afeso354596a12.0
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 00:43:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1763023051; x=1763627851; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PaRdo5laVENx0qNWKIj3e2Wj2YB7pYrMnrhNZ1Af824=;
-        b=aesMCvoo0RY0c3AQJD9PoEptkoC87JuWMMebH5J65n9pFvzNMLroT9ztFFVegpEUsD
-         ELOI97dkQJOH42/Ao17gyDAv97HqBn0DwYxyPX0OpU9sb4wdRAE4OiKgUXx+v/44+0e4
-         oCYwQim7vTR2Wz1hCtrvGRrN6J9uidVJ4Ow1t/Oe+7XJwvkRVEEccBvt36IXqvojmuwd
-         iK9kCk/sE49BhEsU3IHR+t331eEOyXDvY0Y84A0fRk6/IkLUXHgw+/GBwi9vJk9fyY6U
-         5BK9Gvj1eZa3i0IrZM+J986SvJzS107Otnc3dsuYmz1RkQWq6mcOoaZxjtYenk3kUi0q
-         9f0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763023051; x=1763627851;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1763023427; x=1763628227; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PaRdo5laVENx0qNWKIj3e2Wj2YB7pYrMnrhNZ1Af824=;
-        b=XTxOsISuj1EwKTcuyOzmVoxJHKmPi/NEN0U7FIZYcUEOt3w9gJfuRHP7kkdQegDYoz
-         Ojn9CmR52Onx0bCjkY3/jJNcks3FmFMt0S83LMdeoSC6CUMxMqVZSBYVhZIKdhxxpAEU
-         WmacMRJUwmyDbynpJljhHXRRErJf5/vkb1+NxItKvV0/0Rw8p+zvzIzWnvU9wg3MkAWd
-         klT9diPWxhJIPpuqSBE2FaSsesLPsb9GeQ3avauMjceA9KbQ2Xi4ppCysgfHhK3cGq0c
-         wHp2vdAyKNEgyTQ/PQJH5HyxuCVuKbZQ7QyyrriIHs4g6IdRxv0DojAnnDAZCRtx2Trz
-         mxqg==
-X-Gm-Message-State: AOJu0Yw5psC7p7B050fxlSo2cOQFpuliyZzbBfXArcu/4nvfsHbheKB+
-	8rplt0dPa1DZ2tykoJ4p9Zt891NERrvrsaNdaxcesUkSNMJ+wI9t5vlFY+qsQIdFXUMsiMBak2h
-	AEx3nr11dIS6zOcMykS4bP/YQacT6b+9t7RHJCV5b0VzNbbAbHTIegMGmBs0hrOSFlGo=
-X-Gm-Gg: ASbGncuz+OicpI4dcF1vg4jOyasRDvAz7jqXscVn49CmJsUjoZlApb8I8sg8t1s9rVe
-	jqACLlamWBRciGoQj4z6Pshf24wp+kKYNsuwUORz0OIbrlyH6B4XfVZR6Mi7+dWGFzy2QLdwgXn
-	6CVoktQTLppYA7ZfnCuayb/sF7yg4FZyCE9SJuIEzl/NsHdB5J+8KyXSXOiC0CKiAuqhaQjDtRR
-	ECB0GjrSikW25X6tZJqodFe+C/fv7pySnp8eyYuVfmHE0YQGrmzbsQX+0z9RpgG9Di42GZuvBWR
-	8xhA4I5oZrmzUvixERFSa0tfpn7KT6FSxvaQpUmsgzOs1Lk37NjubxZXaTvDLzqC62qZ/vZUxTr
-	V4Q7DTXfW7m+R7sE0Ce/mYzR/R00WmHxD6Lg6u6CRE6PrhDPPvIlDvU7mR2jE+BossiheRIz+dX
-	uKkGgD9zN9xH2FeJWZvRYeo+t+UYcGouwtx7A3mwQ=
-X-Google-Smtp-Source: AGHT+IGh1I6xM2zO8re4VXPeusjhFgRnAF9eS/Gl7OMH50kJVFWZekU4Id4X8gsG6WzkOr1tZkNsyg==
-X-Received: by 2002:a05:6402:909:b0:63c:1170:656a with SMTP id 4fb4d7f45d1cf-6431a586af8mr5359346a12.37.1763023051378;
-        Thu, 13 Nov 2025 00:37:31 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:7016:8c92:f4ad:3b7b? ([2001:67c:2fbc:1:7016:8c92:f4ad:3b7b])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6433a3f8e6dsm941233a12.10.2025.11.13.00.37.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Nov 2025 00:37:30 -0800 (PST)
-Message-ID: <ffe3eb53-ac49-4049-8508-bd4ffe890ce2@openvpn.net>
-Date: Thu, 13 Nov 2025 09:37:29 +0100
+        bh=j82bvNFvImNkIdmXcdyCuYEbPQ6AAn6vtq3RYsevuB0=;
+        b=kHKKqH0nIZQDG3eGZSTEvADc0dv1b0ssYMvK/EUBTSW2DVRHed9bVoB0vHnFVeHhSf
+         UXXWTBiuklCMyLYAXH8B2rvn0zuElNu+dIvJc95oclMSAYb4L3iOkWojjcKFXiB+q7VR
+         GvS92wgIE9kbReQSKH+Ph9TOxLZ5EQ7ltWdtmTzQC6NL5hUMwt34/sTS+nneMRy3PMfJ
+         agj22d2Q2DKSFvQGPSC55NrYTVTP6ewrdNui0YR5Il+JtTeKoBUZEwW3AmieIPe8vryw
+         5NKr7QhGfbzUv4buQdj37Dw40htvafdf93b7pdLiMINKqKZcVloSoN1gv1kW0Pxi1qKE
+         kOTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763023427; x=1763628227;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=j82bvNFvImNkIdmXcdyCuYEbPQ6AAn6vtq3RYsevuB0=;
+        b=EckZWNAngMN+3n/pf6q3BVavLpQnQBYNlEoEsZDl03ZBtJS3cWm+40b9p9n5ASDBo9
+         uziIWu5A9stUaUu1Flnvhw55RCNCInpv/VESEwuTf5ijPPs/Rw9c7yskzZX4gycbbsTF
+         sVBjAx/NHvNXMMqosOVEDaHrtvBf8UKwaXZTKMSpPCdP9txUHsJJXOnw5sSBGCxcf0u/
+         0bDBXSsJIy0EGi8KPAcl/L1nvnwkQELO+yp3kDVizSScSaONfUvEX9MXBYl/lLFZvIn3
+         3D/40u72hlvgAJTGS036MKsnoi3wgR2LxOdf4Cxa+ISc416J61ys2YgLZRTRMV2EKn5z
+         EGBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVoTHdngm0ej1Bcq9TfIw3yMpSLl4Q/XENapj/rYjPz514SJLcxEeykJqiipFlmSuRPFfy6bDE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWFE97nnakYW3EWVn8gl1LSZ3evM5hNhutlEA3t/5sTLx3Lnaz
+	6KJE4hox7MxsKxTyZprGh5oTnbLHri3x6PhRmm2zJNhVPLMgLus0vN7tGLK8ST3ZmhzF0aoFYDF
+	k4wwdLdDOqgO4/O/0x+c1qLMUUI+wCUwGrNj2hBSp
+X-Gm-Gg: ASbGncutCM9MRoT/mwjMlMcdTzafakSeUNq621fC3Q33OLj1ZncQ0WZ+nD4HN4K62kw
+	bAVu40dJGbed3pHCP8rJ5VWgB9gr7IL1KmAqVFQEgBCA8mW0+9v9hApwdm9FS1dz+6g7+EBFHDM
+	hhnkBiCzJlfCh27T2mFEnGyFUlP1Ub53EB53tcb14yjWb/dS2489WaBfDsqojpmFHX87f52/um2
+	2VevZG8+BV14sTRkL623M42irAupcGtA7Mi6SXZGTitwKcpr4MLpePTVDZs9+eIiBIQfhq/MMoM
+	4xREgsvB3nxxzHG3SJzd1iczpK/V1ZaJgR+75ao=
+X-Google-Smtp-Source: AGHT+IFRjxtEMxqTf2ZiPcWD+w/6WxiFP8vWz2ry+bgq6jmCqzkoz3cIoI/9FBit5SMj949e5QZd1XphprmQPlN7Kao=
+X-Received: by 2002:a17:903:2c04:b0:295:68dd:4ebf with SMTP id
+ d9443c01a7336-2984ed347bemr84532525ad.16.1763023426416; Thu, 13 Nov 2025
+ 00:43:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 6/8] ovpn: consolidate crypto allocations in one
- chunk
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Ralf Lici <ralf@mandelbit.com>
-References: <20251111214744.12479-1-antonio@openvpn.net>
- <20251111214744.12479-7-antonio@openvpn.net> <aRS13OqKdhx4aVRo@krikkit>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <aRS13OqKdhx4aVRo@krikkit>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20251113071756.40118-1-adelodunolaoluwa.ref@yahoo.com> <20251113071756.40118-1-adelodunolaoluwa@yahoo.com>
+In-Reply-To: <20251113071756.40118-1-adelodunolaoluwa@yahoo.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 13 Nov 2025 00:43:34 -0800
+X-Gm-Features: AWmQ_bledBDMon-7jfxD9YyY1CjbXYKMvQ22CAf96HxnEGlMpnIBxJ-QLZCGer0
+Message-ID: <CAAVpQUBvLN=sRVb8cbMngwm3o=KZkVOeCYdyi2p5sYjjZQU=HQ@mail.gmail.com>
+Subject: Re: [PATCH v5] selftests: af_unix: Add tests for ECONNRESET and EOF semantics
+To: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
+	skhan@linuxfoundation.org, david.hunter.linux@gmail.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, 
+	linux-kernel-mentees@lists.linuxfoundation.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Sabrina,
+On Wed, Nov 12, 2025 at 11:19=E2=80=AFPM Sunday Adelodun
+<adelodunolaoluwa@yahoo.com> wrote:
+>
+> Add selftests to verify and document Linux=E2=80=99s intended behaviour f=
+or
+> UNIX domain sockets (SOCK_STREAM and SOCK_DGRAM) when a peer closes.
+> The tests verify that:
+>
+>  1. SOCK_STREAM returns EOF when the peer closes normally.
+>  2. SOCK_STREAM returns ECONNRESET if the peer closes with unread data.
+>  3. SOCK_SEQPACKET returns EOF when the peer closes normally.
+>  4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unread data=
+.
+>  5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
+>
+> This follows up on review feedback suggesting a selftest to clarify
+> Linux=E2=80=99s semantics.
+>
+> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+> ---
+> Changelog:
+>
+> changes made in v4 to v5:
+> 1. Moved the send() call before the socket type check in Test 2 to ensure
+>    the unread data behavior is tested for SOCK_DGRAM as well.
+>
+> 2. Removed the misleading commend about accept() for clarity.
+>
+> 3. Applied indentation fixes for style consistency
+>    (alignment with open parenthesis).
+>
+> 4. Minor comment and formatting cleanups for clarity and adherence
+>    to kernel coding style.
+>
+>  tools/testing/selftests/net/.gitignore        |   1 +
+>  tools/testing/selftests/net/af_unix/Makefile  |   1 +
+>  .../selftests/net/af_unix/unix_connreset.c    | 178 ++++++++++++++++++
+>  3 files changed, 180 insertions(+)
+>  create mode 100644 tools/testing/selftests/net/af_unix/unix_connreset.c
+>
+> diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selft=
+ests/net/.gitignore
+> index 439101b518ee..e89a60581a13 100644
+> --- a/tools/testing/selftests/net/.gitignore
+> +++ b/tools/testing/selftests/net/.gitignore
+> @@ -65,3 +65,4 @@ udpgso
+>  udpgso_bench_rx
+>  udpgso_bench_tx
+>  unix_connect
+> +unix_connreset
+> diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing=
+/selftests/net/af_unix/Makefile
+> index de805cbbdf69..5826a8372451 100644
+> --- a/tools/testing/selftests/net/af_unix/Makefile
+> +++ b/tools/testing/selftests/net/af_unix/Makefile
+> @@ -7,6 +7,7 @@ TEST_GEN_PROGS :=3D \
+>         scm_pidfd \
+>         scm_rights \
+>         unix_connect \
+> +       unix_connreset \
+>  # end of TEST_GEN_PROGS
+>
+>  include ../../lib.mk
+> diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/tools=
+/testing/selftests/net/af_unix/unix_connreset.c
+> new file mode 100644
+> index 000000000000..9cb0f48597eb
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
+> @@ -0,0 +1,178 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Selftest for AF_UNIX socket close and ECONNRESET behaviour.
+> + *
+> + * This test verifies:
+> + *  1. SOCK_STREAM returns EOF when the peer closes normally.
+> + *  2. SOCK_STREAM returns ECONNRESET if peer closes with unread data.
+> + *  3. SOCK_SEQPACKET returns EOF when the peer closes normally.
+> + *  4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unread =
+data.
+> + *  5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
+> + *
+> + * These tests document the intended Linux behaviour.
+> + *
+> + */
+> +
+> +#define _GNU_SOURCE
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <fcntl.h>
+> +#include <unistd.h>
+> +#include <errno.h>
+> +#include <sys/socket.h>
+> +#include <sys/un.h>
+> +#include "../../kselftest_harness.h"
+> +
+> +#define SOCK_PATH "/tmp/af_unix_connreset.sock"
+> +
+> +static void remove_socket_file(void)
+> +{
+> +       unlink(SOCK_PATH);
+> +}
+> +
+> +FIXTURE(unix_sock)
+> +{
+> +       int server;
+> +       int client;
+> +       int child;
+> +};
+> +
+> +FIXTURE_VARIANT(unix_sock)
+> +{
+> +       int socket_type;
+> +       const char *name;
+> +};
+> +
+> +FIXTURE_VARIANT_ADD(unix_sock, stream) {
+> +       .socket_type =3D SOCK_STREAM,
+> +       .name =3D "SOCK_STREAM",
+> +};
+> +
+> +FIXTURE_VARIANT_ADD(unix_sock, dgram) {
+> +       .socket_type =3D SOCK_DGRAM,
+> +       .name =3D "SOCK_DGRAM",
+> +};
+> +
+> +FIXTURE_VARIANT_ADD(unix_sock, seqpacket) {
+> +       .socket_type =3D SOCK_SEQPACKET,
+> +       .name =3D "SOCK_SEQPACKET",
+> +};
+> +
+> +FIXTURE_SETUP(unix_sock)
+> +{
+> +       struct sockaddr_un addr =3D {};
+> +       int err;
+> +
+> +       addr.sun_family =3D AF_UNIX;
+> +       strcpy(addr.sun_path, SOCK_PATH);
+> +       remove_socket_file();
+> +
+> +       self->server =3D socket(AF_UNIX, variant->socket_type, 0);
+> +       ASSERT_LT(-1, self->server);
+> +
+> +       err =3D bind(self->server, (struct sockaddr *)&addr, sizeof(addr)=
+);
+> +       ASSERT_EQ(0, err);
+> +
+> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
+> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
+> +               err =3D listen(self->server, 1);
+> +               ASSERT_EQ(0, err);
+> +       }
+> +
+> +       self->client =3D socket(AF_UNIX, variant->socket_type | SOCK_NONB=
+LOCK, 0);
+> +       ASSERT_LT(-1, self->client);
+> +
+> +       err =3D connect(self->client, (struct sockaddr *)&addr, sizeof(ad=
+dr));
+> +       ASSERT_EQ(0, err);
+> +}
+> +
+> +FIXTURE_TEARDOWN(unix_sock)
+> +{
+> +       if ((variant->socket_type =3D=3D SOCK_STREAM ||
+> +            variant->socket_type =3D=3D SOCK_SEQPACKET) & self->child > =
+0)
 
-On 12/11/2025 17:29, Sabrina Dubroca wrote:
-> 2025-11-11, 22:47:39 +0100, Antonio Quartulli wrote:
->> From: Ralf Lici <ralf@mandelbit.com>
->>
->> Currently ovpn uses three separate dynamically allocated structures to
->> set up cryptographic operations for both encryption and decryption. This
->> adds overhead to performance-critical paths and contribute to memory
->> fragmentation.
->>
->> This commit consolidates those allocations into a single temporary blob,
->> similar to what esp_alloc_temp() does.
-> 
-> nit: esp_alloc_tmp (no 'e')
-> 
->> The resulting performance gain is +7.7% and +4.3% for UDP when using AES
->> and ChaChaPoly respectively, and +4.3% for TCP.
-> 
-> Nice improvement! I didn't think it would be that much.
+Sorry for missing this one, but NIPA caught this.
+see: https://netdev.bots.linux.dev/static/nipa/1022816/14311938/build_tools=
+/stderr
 
-Yep! Quite impressive.
++unix_connreset.c: In function =E2=80=98unix_sock_teardown=E2=80=99:
++unix_connreset.c:92:68: warning: suggest parentheses around
+comparison in operand of =E2=80=98&=E2=80=99 [-Wparentheses]
++   92 |              variant->socket_type =3D=3D SOCK_SEQPACKET) & self->c=
+hild > 0)
++      |                                                        ~~~~~~~~~~~=
+~^~~
 
-> 
-> 
->> Signed-off-by: Ralf Lici <ralf@mandelbit.com>
->> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
-> 
-> BTW, I didn't see any of these patches posted on the openvpn-devel
-> list or on netdev before this pull request. Otherwise I'd have
-> reviewed them earlier.
+I think you can simply remove the "& self->child >0" part
+because you don't check that for self->server below anyway.
 
-You're right. I worked with Ralf to get this patch done and I directly 
-pulled it in my tree.
+Thanks
 
-Next time we will make sure all patches land on the openvpn-devel 
-mailing list before being staged for net-next.
 
-This said, Ralf will get back to you on the questions below.
-
-Thanks!
-
-Regards,
-
-> 
-> 
->>   drivers/net/ovpn/crypto_aead.c | 151 +++++++++++++++++++++++++--------
->>   drivers/net/ovpn/io.c          |   8 +-
->>   drivers/net/ovpn/skb.h         |  13 ++-
->>   3 files changed, 129 insertions(+), 43 deletions(-)
->>
->> diff --git a/drivers/net/ovpn/crypto_aead.c b/drivers/net/ovpn/crypto_aead.c
->> index cb6cdf8ec317..9ace27fc130a 100644
->> --- a/drivers/net/ovpn/crypto_aead.c
->> +++ b/drivers/net/ovpn/crypto_aead.c
->> @@ -36,6 +36,105 @@ static int ovpn_aead_encap_overhead(const struct ovpn_crypto_key_slot *ks)
->>   		crypto_aead_authsize(ks->encrypt);	/* Auth Tag */
->>   }
->>   
->> +/*
-> 
-> nit: missing a 2nd * to make it kdoc?
-> 
->> + * ovpn_aead_crypto_tmp_size - compute the size of a temporary object containing
->> + *			       an AEAD request structure with extra space for SG
->> + *			       and IV.
->> + * @tfm: the AEAD cipher handle
->> + * @nfrags: the number of fragments in the skb
->> + *
->> + * This function calculates the size of a contiguous memory block that includes
->> + * the initialization vector (IV), the AEAD request, and an array of scatterlist
->> + * entries. For alignment considerations, the IV is placed first, followed by
->> + * the request, and then the scatterlist.
->> + * Additional alignment is applied according to the requirements of the
->> + * underlying structures.
->> + *
->> + * Return: the size of the temporary memory that needs to be allocated
->> + */
->> +static unsigned int ovpn_aead_crypto_tmp_size(struct crypto_aead *tfm,
->> +					      const unsigned int nfrags)
->> +{
->> +	unsigned int len = crypto_aead_ivsize(tfm);
->> +
->> +	if (likely(len)) {
-> 
-> Is that right?
-> 
-> Previously iv was reserved with a constant size (OVPN_NONCE_SIZE), and
-> we're always going to write some data into ->iv via
-> ovpn_pktid_aead_write, but now we're only reserving the crypto
-> algorithm's IV size (which appear to be 12, ie OVPN_NONCE_SIZE, for
-> both chachapoly and gcm(aes), so maybe it doesn't matter).
-> 
-> 
->> @@ -71,13 +171,15 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
->>   	if (unlikely(nfrags + 2 > (MAX_SKB_FRAGS + 2)))
->>   		return -ENOSPC;
->>   
->> -	/* sg may be required by async crypto */
->> -	ovpn_skb_cb(skb)->sg = kmalloc(sizeof(*ovpn_skb_cb(skb)->sg) *
->> -				       (nfrags + 2), GFP_ATOMIC);
->> -	if (unlikely(!ovpn_skb_cb(skb)->sg))
->> +	/* allocate temporary memory for iv, sg and req */
->> +	tmp = kmalloc(ovpn_aead_crypto_tmp_size(ks->encrypt, nfrags),
->> +		      GFP_ATOMIC);
->> +	if (unlikely(!tmp))
->>   		return -ENOMEM;
->>   
->> -	sg = ovpn_skb_cb(skb)->sg;
->> +	iv = ovpn_aead_crypto_tmp_iv(ks->encrypt, tmp);
->> +	req = ovpn_aead_crypto_tmp_req(ks->encrypt, iv);
->> +	sg = ovpn_aead_crypto_req_sg(ks->encrypt, req);
->>   
->>   	/* sg table:
->>   	 * 0: op, wire nonce (AD, len=OVPN_OP_SIZE_V2+OVPN_NONCE_WIRE_SIZE),
->> @@ -105,13 +207,6 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
->>   	if (unlikely(ret < 0))
->>   		return ret;
->>   
->> -	/* iv may be required by async crypto */
->> -	ovpn_skb_cb(skb)->iv = kmalloc(OVPN_NONCE_SIZE, GFP_ATOMIC);
->> -	if (unlikely(!ovpn_skb_cb(skb)->iv))
->> -		return -ENOMEM;
->> -
->> -	iv = ovpn_skb_cb(skb)->iv;
->> -
->>   	/* concat 4 bytes packet id and 8 bytes nonce tail into 12 bytes
->>   	 * nonce
->>   	 */
->> @@ -130,11 +225,7 @@ int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
->>   	/* AEAD Additional data */
->>   	sg_set_buf(sg, skb->data, OVPN_AAD_SIZE);
->>   
->> -	req = aead_request_alloc(ks->encrypt, GFP_ATOMIC);
->> -	if (unlikely(!req))
->> -		return -ENOMEM;
->> -
->> -	ovpn_skb_cb(skb)->req = req;
->> +	ovpn_skb_cb(skb)->crypto_tmp = tmp;
-> 
-> That should be done immediately after the allocation, so that any
-> failure before this (skb_to_sgvec_nomark, ovpn_pktid_xmit_next) will
-> not leak this blob? ovpn_aead_encrypt returns directly and lets
-> ovpn_encrypt_post handle the error and free the memory, but only after
->   ->crypto_tmp has been set.
-> 
-> (same thing on the decrypt path)
-> 
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+> +               close(self->child);
+> +
+> +       close(self->client);
+> +       close(self->server);
+> +       remove_socket_file();
+> +}
+> +
+> +/* Test 1: peer closes normally */
+> +TEST_F(unix_sock, eof)
+> +{
+> +       char buf[16] =3D {};
+> +       ssize_t n;
+> +
+> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
+> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
+> +               self->child =3D accept(self->server, NULL, NULL);
+> +               ASSERT_LT(-1, self->child);
+> +
+> +               close(self->child);
+> +       } else {
+> +               close(self->server);
+> +       }
+> +
+> +       n =3D recv(self->client, buf, sizeof(buf), 0);
+> +
+> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
+> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
+> +               ASSERT_EQ(0, n);
+> +       } else {
+> +               ASSERT_EQ(-1, n);
+> +               ASSERT_EQ(EAGAIN, errno);
+> +       }
+> +}
+> +
+> +/* Test 2: peer closes with unread data */
+> +TEST_F(unix_sock, reset_unread_behavior)
+> +{
+> +       char buf[16] =3D {};
+> +       ssize_t n;
+> +
+> +       /* Send data that will remain unread */
+> +       send(self->client, "hello", 5, 0);
+> +
+> +       if (variant->socket_type =3D=3D SOCK_DGRAM) {
+> +               /* No real connection, just close the server */
+> +               close(self->server);
+> +       } else {
+> +               /* Accept client connection */
+> +               self->child =3D accept(self->server, NULL, NULL);
+> +               ASSERT_LT(-1, self->child);
+> +
+> +               /* Peer closes before client reads */
+> +               close(self->child);
+> +       }
+> +
+> +       n =3D recv(self->client, buf, sizeof(buf), 0);
+> +       ASSERT_EQ(-1, n);
+> +
+> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
+> +           variant->socket_type =3D=3D SOCK_SEQPACKET) {
+> +               ASSERT_EQ(ECONNRESET, errno);
+> +       } else {
+> +               ASSERT_EQ(EAGAIN, errno);
+> +       }
+> +}
+> +
+> +/* Test 3: closing unaccepted (embryo) server socket should reset client=
+. */
+> +TEST_F(unix_sock, reset_closed_embryo)
+> +{
+> +       char buf[16] =3D {};
+> +       ssize_t n;
+> +
+> +       if (variant->socket_type =3D=3D SOCK_DGRAM)
+> +               SKIP(return, "This test only applies to SOCK_STREAM and S=
+OCK_SEQPACKET");
+> +
+> +       /* Close server without accept()ing */
+> +       close(self->server);
+> +
+> +       n =3D recv(self->client, buf, sizeof(buf), 0);
+> +
+> +       ASSERT_EQ(-1, n);
+> +       ASSERT_EQ(ECONNRESET, errno);
+> +}
+> +
+> +TEST_HARNESS_MAIN
+> +
+> --
+> 2.43.0
+>
 
