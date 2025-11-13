@@ -1,50 +1,49 @@
-Return-Path: <netdev+bounces-238521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 468FDC5A71F
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 00:02:05 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A79FC5A728
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 00:02:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EFAA64EC537
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 22:59:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D78304F10B8
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 22:59:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE0232936A;
-	Thu, 13 Nov 2025 22:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0F2329C78;
+	Thu, 13 Nov 2025 22:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ci2M8YlR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmPKwgeg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8267B329362;
-	Thu, 13 Nov 2025 22:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF41326D74;
+	Thu, 13 Nov 2025 22:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763074718; cv=none; b=tjImUlON3XYOnrxRBCP7m6PLRgNsJQYnzDeMlvniRLzcU+V/TSeAjDYWfN8d8lK8QcBfwpc/rwLc0GWWf80k9O5WBEqGyHWKFg+wjGiRfLOLH13iKq+adjpmrtzJ7mMRLhEvDX82366IlLmot3/1zzuY6gKFwBYVFheftRPx3r4=
+	t=1763074720; cv=none; b=LyN8eC8f4/q6fuLNY4WJdPytXF2eWQvf0QtD5mcjU1a2affEZTCPh+YJWzrU+oIgrDL8LAtBZYVjd+UDwiGA1hyvrB8hOOdjPJfSSO5QWUUR8xIWz8AfFdJpz6SkUQS1EWS6ETyfgOyVZ3ANGKE/m7Atw7el3ifFebtLFbwTpD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763074718; c=relaxed/simple;
-	bh=HBb0BE/CmfrNz8JEu1arFu71La4LfBFUUZFMR0rFz9I=;
+	s=arc-20240116; t=1763074720; c=relaxed/simple;
+	bh=L478KaUd0Ot1CfjMXE50G5ugMncb3+czlC4iQTj36Nw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DGN7dTl0ap/MI0Xnr9qwAO6XGCKICyACwt5dEmBHHwNo5k2XIdVf80GO80OQULWQpLEluvFSHOnZCocLeWtAHEG7DomGSxSHyrOfKB0iR+t6Ljxo1d0IFCBRxzTL+/neYaVP4gCPtd97StIlOlHVzt6QwUXi7i2hUpRvo/csuXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ci2M8YlR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 296EAC4CEF5;
-	Thu, 13 Nov 2025 22:58:36 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=mnKoJ2aEjXBiKjBPpeqa45FAXZwGlE5iHmfS//9a/OsY+nW3wQMx8e1EPXseASgoSVba5BaM6sjc69tfxob0g+mweWL0Bj9/rCAODdAjmF8yU4vmtrnP2a9VsTkyCJ/RmoZi0yuhExg5J4LLuuZg4efhJwRkOUNO1WoDigc3Fuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmPKwgeg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C86AC19424;
+	Thu, 13 Nov 2025 22:58:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763074718;
-	bh=HBb0BE/CmfrNz8JEu1arFu71La4LfBFUUZFMR0rFz9I=;
+	s=k20201202; t=1763074720;
+	bh=L478KaUd0Ot1CfjMXE50G5ugMncb3+czlC4iQTj36Nw=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ci2M8YlR//71Ag+ahXIUE3oGxeqLs+4XElLvtWFWv9nzU050mn24NoRtISOfb8DCu
-	 43lCDcokruh33enC9ir+d1cJpmsoXsTWn3dDVHxC8Meoj8rInSTTCwNPC8m23n7K9A
-	 dLJ94JWrMTrYhG/z+HQCtAcC7VUW2x1VanRgv7VVLk6y8EQg5OBb73OhFlRzRRCTRT
-	 dNcVBH2Xnhc8Vr0cmxUst3EdyTYxDZ9U/H24XtBfot51MlLjXw49tGZ9oQgQZoX3uU
-	 X3b5qBMQ6NG4YzTuy3tOrTxgRzUoeXQrU3CmxQta72c1UZvWRxXuj/DHggzWxLRdYk
-	 T1JyFOyZ6XT1A==
+	b=SmPKwgegWgdYdQUmSi5HTEpo3jURr2O5yblEgoUaWcMMQHN/pmXyLTtVsu6KpUgZr
+	 vcyfbml8kW5+2IZhXpmnlpRUuGcoHFsAyAp49sLtvM5f5Nosl0M5qo/WPJ8UdykCrJ
+	 gwhzOqhjKFXFkHj6DZ0IVuzUtlzT4R67oeZDL/a8HkovNs1EF5pKEd+FX0dgIj+05i
+	 NcBr9H28u44Xjp9h+j7Lyoie8DV48tIdG8yIPoIVv5phO4zRWULfxYMwwW0WCTq89d
+	 v1hty0Jv760BIOHFewKhtxHbINhjSNmKuro/182AR/hYR2JMjPBKkqG5jXSUWlc3VU
+	 J9pZqWbjPjlMw==
 From: Tamir Duberstein <tamird@kernel.org>
-Date: Thu, 13 Nov 2025 17:58:24 -0500
-Subject: [PATCH v3 1/6] rust: firmware: replace `kernel::c_str!` with
- C-Strings
+Date: Thu, 13 Nov 2025 17:58:25 -0500
+Subject: [PATCH v3 2/6] rust: net: replace `kernel::c_str!` with C-Strings
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251113-core-cstr-cstrings-v3-1-411b34002774@gmail.com>
+Message-Id: <20251113-core-cstr-cstrings-v3-2-411b34002774@gmail.com>
 References: <20251113-core-cstr-cstrings-v3-0-411b34002774@gmail.com>
 In-Reply-To: <20251113-core-cstr-cstrings-v3-0-411b34002774@gmail.com>
 To: Luis Chamberlain <mcgrof@kernel.org>, 
@@ -68,13 +67,13 @@ Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
  netdev@vger.kernel.org, Tamir Duberstein <tamird@gmail.com>, 
  Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1763074712; l=1629;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1763074713; l=1712;
  i=tamird@gmail.com; h=from:subject:message-id;
- bh=4dgd5s5cItkGKitaXqCnLjiqgIDU68VUxn2FkB76slk=;
+ bh=aSWd3FABCzlm4GeQ0LS5TjXQD0VOYCr8DP5mFLTZSyg=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
  MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QAX5YlrubLyTMDqJGWSi2UrRWygI9h86eTz2GXO0nk0VW2JBnnnHCxQNCEpjRV9a3kAs8a5dN6T
- 6SkMjeu2y+ws=
+ QJlFwX4ang7kg64uHGpfyl6rbW0aUYQqEbb1ab+eVuuwuBLNdbrT2BbjovtuI/ftFNmbUzCS8oI
+ P9puVEri04wQ=
 X-Developer-Key: i=tamird@gmail.com; a=openssh;
  fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
@@ -86,41 +85,49 @@ C-String literals were added in Rust 1.77. Replace instances of
 Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Reviewed-by: Benno Lossin <lossin@kernel.org>
-Acked-by: Danilo Krummrich <dakr@kernel.org>
 Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
- rust/kernel/firmware.rs | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ rust/kernel/net/phy.rs | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/rust/kernel/firmware.rs b/rust/kernel/firmware.rs
-index 376e7e77453f..71168d8004e2 100644
---- a/rust/kernel/firmware.rs
-+++ b/rust/kernel/firmware.rs
-@@ -51,13 +51,13 @@ fn request_nowarn() -> Self {
- /// # Examples
+diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+index bf6272d87a7b..3ca99db5cccf 100644
+--- a/rust/kernel/net/phy.rs
++++ b/rust/kernel/net/phy.rs
+@@ -777,7 +777,6 @@ const fn as_int(&self) -> u32 {
  ///
- /// ```no_run
--/// # use kernel::{c_str, device::Device, firmware::Firmware};
-+/// # use kernel::{device::Device, firmware::Firmware};
+ /// ```
+ /// # mod module_phy_driver_sample {
+-/// use kernel::c_str;
+ /// use kernel::net::phy::{self, DeviceId};
+ /// use kernel::prelude::*;
  ///
- /// # fn no_run() -> Result<(), Error> {
- /// # // SAFETY: *NOT* safe, just for the example to get an `ARef<Device>` instance
- /// # let dev = unsafe { Device::get_device(core::ptr::null_mut()) };
+@@ -796,7 +795,7 @@ const fn as_int(&self) -> u32 {
  ///
--/// let fw = Firmware::request(c_str!("path/to/firmware.bin"), &dev)?;
-+/// let fw = Firmware::request(c"path/to/firmware.bin", &dev)?;
- /// let blob = fw.data();
+ /// #[vtable]
+ /// impl phy::Driver for PhySample {
+-///     const NAME: &'static CStr = c_str!("PhySample");
++///     const NAME: &'static CStr = c"PhySample";
+ ///     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x00000001);
+ /// }
+ /// # }
+@@ -805,7 +804,6 @@ const fn as_int(&self) -> u32 {
+ /// This expands to the following code:
  ///
- /// # Ok(())
-@@ -204,7 +204,7 @@ macro_rules! module_firmware {
-     ($($builder:tt)*) => {
-         const _: () = {
-             const __MODULE_FIRMWARE_PREFIX: &'static $crate::str::CStr = if cfg!(MODULE) {
--                $crate::c_str!("")
-+                c""
-             } else {
-                 <LocalModule as $crate::ModuleMetadata>::NAME
-             };
+ /// ```ignore
+-/// use kernel::c_str;
+ /// use kernel::net::phy::{self, DeviceId};
+ /// use kernel::prelude::*;
+ ///
+@@ -825,7 +823,7 @@ const fn as_int(&self) -> u32 {
+ ///
+ /// #[vtable]
+ /// impl phy::Driver for PhySample {
+-///     const NAME: &'static CStr = c_str!("PhySample");
++///     const NAME: &'static CStr = c"PhySample";
+ ///     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x00000001);
+ /// }
+ ///
 
 -- 
 2.51.2
