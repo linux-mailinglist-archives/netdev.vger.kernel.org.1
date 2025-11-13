@@ -1,171 +1,251 @@
-Return-Path: <netdev+bounces-238487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED28CC59927
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 19:54:16 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08413C59954
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 19:56:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A07A3A2DC0
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:54:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 11E6B343613
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D7A313522;
-	Thu, 13 Nov 2025 18:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D503313536;
+	Thu, 13 Nov 2025 18:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WGtumTY5"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wc7E7myc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5913B2FC861
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 18:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54ACE2FDC49
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 18:55:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763060052; cv=none; b=W4hJGg05OHB/Q+lFC+vK5hSq1iZjhJ08cYgHuFQ97KH/OrPhtQUp8Gxkx+Npcmv9hI7DsgMfymWYtecGSkiReAagSgayyG2L57gnRBM+mS/EH1/6qMoRUi5/gq3dJ1CcPMsqwDpUWZWHf8Hz5PSrNjydtyp1wnq7oVpXCF+K1eY=
+	t=1763060145; cv=none; b=HwgVfQmL/CR3yxDx1czbsu0Tuu22r+YaVubOARHQtuLaN6QpBtb05vgz49EV2/CF7hGZcznJaUXk4D0G7t8GEkqjr1TyICc4UF1pAeeXW5T54FATO2plUCTP6zt5MVXHOMjzhgkxNOMG/BpY+fRQFx6IJCi+kxp7fzOe9QoRtyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763060052; c=relaxed/simple;
-	bh=ImyLRSldVokJNTwxQD8uL+Aad8g9eoYs7zgGRDjZ8Ww=;
+	s=arc-20240116; t=1763060145; c=relaxed/simple;
+	bh=htTEOhI9Yz6u6giiwRVyW2C+k1tXyxWTOwXm8pAayK4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lRQLphcTBHvgIOI7d1n/akmfP6zuHOdYWs1ZeCakc6W8K84mjeb+Jx2HY/ZGDsnQvYWIEAlm15oQRRpDjyKKQn1+0TQByPeYbgtQTIQc7RcvcMzumJRCCZ4VT/X/gmW5NZdGnSUSaX+gWH+sCou+i/++5mUjCpaRUAobUCq79VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WGtumTY5; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-42b3b0d76fcso820075f8f.3
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:54:10 -0800 (PST)
+	 To:Cc:Content-Type; b=CSuBRjDzstJwYf2a4NVYayuCSaIo3y7ViGXmJ9Z3lwoWyVfCgyzS8lYV8wPyp/b7Xg4pbWXdAwvIvNLd6wWGMxdZcaK9gQrhasgbZ/SFAuwQoJk691d8RU1cHA9UFLg1f1mWKNk/eQbspE4+NsXyUhRxLaCKXjfVAmWguhbXF7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=wc7E7myc; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-343ee44d89aso1528485a91.2
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:55:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763060049; x=1763664849; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1763060142; x=1763664942; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0za6nc+aCXQm8KF/y6TMG9+/t9XbwHnz+7+385lRJ0w=;
-        b=WGtumTY5f+hp9Jl3OH7Dr9fDE3PVEL2vqCA5IFMUthmdMZ2vAzPHHqsd1JZjizwKFA
-         rLWbMfuOOm/+XU84wemFDsiDbDGvXzgi8dzao4F1xQEcGo+yKLdXWOmQ7Z1dF3+WT6Sg
-         v/Sz1xfR+nbHFtcSzfhr5vI0WG7pjkt0LMp/GR6DSj029wleELq6OasX49G0XN4cfhza
-         OgCQFCS0CTgT1kW3PouAC40a84om8KE6fqtXEUNZPXZuru02BsByFPiyi/Xh2fNpzhGe
-         JksTmgfTe2ahBOfOqYcP/ZNK8MRMivML32XeqKUaIq+W3sEspz6IXNWyg7g/yE3w7Tl5
-         9K0A==
+        bh=JkWinxulOdrO+lKc81tXL3gsW3pquvjBTQ9X/3x2QW4=;
+        b=wc7E7mycZ9m3t+TMyq9fURPjP+pPE/nQ8XOElu7GTehXg7o4a8pgiQDTril7HjK9wB
+         aIkhtPI/tUn4VSgFagsYjcU0DFEaOB1RMX8ecbWxpiSvyrtn64XrAKAXodsybFThfHMw
+         mkaieaFn5XfodDar5FiBu/Z1OIYtVua5WUNgWZKqmoV+aLD+hYzyCTeuQOQ6hUTAJgLq
+         fkNDCmdNM1giSwBITWBFM2j2FWPU432j91v6VjiMW2Gww31mTN5AZRvTeB40ZSKKp/ib
+         HiwAiKPeSjXLDntqKu/s9J5oK+2Y1T20OpD/n4arj/U0BV/GRXomQHVNsn6fxCghHZaJ
+         rkkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763060049; x=1763664849;
+        d=1e100.net; s=20230601; t=1763060142; x=1763664942;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=0za6nc+aCXQm8KF/y6TMG9+/t9XbwHnz+7+385lRJ0w=;
-        b=EnEw+CYgbOR24n/bEupY63/mdEYM0CJ0/FlGUzWmRoKkmaVz6cVeiVt8Xdob/Wd4uI
-         enOooJ1eVKzY1GO9bV/R83RoG2/0oI+5NATkTxRJ9DW3G604hxmyI+Zk2HBL0ckKvttl
-         p/VnrpJRBrGdaeet1hkzj8GlyeEBldi/aRU3uEPU/0Ataebp1PBDxXT7O6ByLnhP/26J
-         wlqBtX4De6cMoITpfoi7tGRge6YxErZ1IGWuO5deBibe8FUR0jhQ5dBfBJzaz1rRusoN
-         v2/BQSwTuQyudAsydgyVVvMLKNVsn7hxJ09OUAI8GI9mAsK1eV3IRInGV4PtDV7ziqTW
-         lllA==
-X-Forwarded-Encrypted: i=1; AJvYcCWnZc6G5YgOxK1ztwUhPABQa8vZr0JJ3fKXyywxg8RW7NMPFtoHf4e0OWIhEZppdNnRuy9Au8o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0vCZErL2hMM/4pxrHxHjTxTB/fqTjsgEsqTzBddn2RCCz+ZOG
-	pq+CKIHjleavE5G4Axky45ftQ27xAbof+8fVLV/A69p+TGFjLvS+jzPlZaAU32geGNacT4LBiUx
-	VqlMlnUCCVfppgyWW+s9snMuKWA3Ng0s=
-X-Gm-Gg: ASbGncuYIMIDVUV//Q56oDn9jolLVH3ktGoPQ0jdEN0rQjBopiVc0A2qbl4u7O+pFY9
-	6iI5UahXJnq0oli3Z7IPCvfx0c6LUNNBzOdqwmRpNb3s7bwhfNFuV10tZ4t+TKEgw/7zaBTY9ka
-	Klw+ILojzat4oiFJ+uhf1K450z71ScWaeE4lqSs/KT4ffrFAJwUyU7m366VdWqJF6iu9D5M3NmY
-	6/ppAkEGehXJGNhDMXj5c0hNps04lEKhMuV7pfvIAFBjx/lae6uPSAmWEj58A==
-X-Google-Smtp-Source: AGHT+IGTSBrTIDYDjncilT4tzbDR8Dtp04aGMzl96p2G9sbZioO58z/jxSqd5HKBnz20COtjN+8hMikzMSLxwBPwrho=
-X-Received: by 2002:a05:6000:26c3:b0:42b:5448:7ae8 with SMTP id
- ffacd0b85a97d-42b59372315mr442629f8f.29.1763060048361; Thu, 13 Nov 2025
- 10:54:08 -0800 (PST)
+        bh=JkWinxulOdrO+lKc81tXL3gsW3pquvjBTQ9X/3x2QW4=;
+        b=n0XGU4qY6Pz1A8H4c6sv4h9VhReCjOj0sngFTKMWGmWX9KShn77YCDVXeCdlnIv/XL
+         +AtBXDIfKI1BET0jKrqr2jetw7kZAsozJjatm7dc+3vf8HUMniboa0kI9dTqvWs1AcJ/
+         jW30csetJMoRJAFT5i+oCnt36QOkOugowMXiqT6EU66pp3HjenNyMFwt+OQpuTPmIbKx
+         e/JmUsVg1OwL7FyvZ3CJq+5xMbSLd5JipcP79PMnx6Koez7jiCMILMg5mwp19CoRa3C1
+         dFl5Ggp3D9zjjqDdg8SgUJRpqCd6Zfwl4W1JgeFtZoO9YjZ5AfFg13qOF1OteNKq2Rmh
+         49ig==
+X-Forwarded-Encrypted: i=1; AJvYcCWkKf0FKmcXAcNf3XFhaobiTmtmVP6G0zzXFITXdaDkpwwXOJ/+ean9ROkhMt7WEXwYj6SKB6I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKs6r0teiTrDVjoTNL4QV6BswLBJHObnWfGP8yqH4qHvPUaa1S
+	ek+mfhH+k9ZZVxDfnNRBXu5KS9PCCACwI0Fsxr3410eamlL5jKwXenBHGRQSw+4c+YfF6B928kY
+	UmJJtgr4QONMRyaYIkGsf1IuVETKD8aGjat/X7wRQ
+X-Gm-Gg: ASbGncsc7WdvQ3iui3/K3yWZ+hHGnHwNRyhs+YEcjtg6EFj37JTUXu4uLA8Mp89tuTW
+	VMqrvrmUMbCvLYlAFh99g0IswUEEc/sLLt+u0EpYwvr4QDAnO2IV1X7cU8/KxbLu65GQDRS+vNt
+	9H1KRcZ399lte+9Pa2OpNIycLrjdmpsY1wl+Q+64piVDmBj58JZ8LjJjJDbqSHkIwxJ5ZjaLPo3
+	q+TrMIIDG/cFooATDWufVK+jrpwsgIVVrbWkMIJF8hWumJllQDcNx90LNllmJ09UVdARXzLn9lP
+	C9I=
+X-Google-Smtp-Source: AGHT+IFIRvvbJ08AJAX500MvawIcLmPmG0exXYYIZPRhP7cWmHWDKlD4WHHbZx/ogJUK5wMpywdbCrt0BEE9uygPhzI=
+X-Received: by 2002:a17:90b:2ccc:b0:343:6d82:9278 with SMTP id
+ 98e67ed59e1d1-343fa76032dmr296405a91.30.1763060142585; Thu, 13 Nov 2025
+ 10:55:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112201937.1336854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251112201937.1336854-2-prabhakar.mahadev-lad.rj@bp.renesas.com> <de098757-2088-4b34-8a9a-407f9487991c@lunn.ch>
-In-Reply-To: <de098757-2088-4b34-8a9a-407f9487991c@lunn.ch>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Thu, 13 Nov 2025 18:53:41 +0000
-X-Gm-Features: AWmQ_bmzRimk8gYF_4YjJuq9mGlvR6GBPwMMkQlI3Mtuob5q5ystweObvaU2JrE
-Message-ID: <CA+V-a8vgJcJ+EsxSwQzQbprjqhxy-QS84=wE6co+D50wOOOweA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: pcs: renesas,rzn1-miic:
- Add renesas,miic-phylink-active-low property
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+References: <20251109161215.2574081-1-edumazet@google.com> <176291340626.3636068.18318642966807737508.git-patchwork-notify@kernel.org>
+ <CAM0EoMkSBrbCxdai6Hn=aaeReqRpAcrZ4mA7J+t6dSEe8aM_dQ@mail.gmail.com>
+ <CAM0EoMkw11Usx6N2JJDqCoFdBUhLcQ0FYQqMzaSKpnWo1u19Vg@mail.gmail.com>
+ <CANn89iJ95S3ia=G7uJb-jGnnaJiQcMVHGEpnKMWc=QZh5tUS=w@mail.gmail.com>
+ <CAM0EoMmPV8U3oNyf3D2F_RGzJgZQiMRBPq1ytokSLo6PcwFJpA@mail.gmail.com> <CANn89iJdK4e-5PCC3fzrC0=7NJm8yXZYcrMckS9oE1sZNmzPPw@mail.gmail.com>
+In-Reply-To: <CANn89iJdK4e-5PCC3fzrC0=7NJm8yXZYcrMckS9oE1sZNmzPPw@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 13 Nov 2025 13:55:31 -0500
+X-Gm-Features: AWmQ_blqG4YCU3Cw4cxGIpLpNg_sHaxrPi1tcUjnUMGGSBZ4xJWqZ-A-WNHXbKc
+Message-ID: <CAM0EoMkw6mKtk-=bRQtjWsTphJHNJ0j4Dk1beYS181c5SHZv4Q@mail.gmail.com>
+Subject: Re: [PATCH net] net_sched: limit try_bulk_dequeue_skb() batches
+To: Eric Dumazet <edumazet@google.com>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, horms@kernel.org, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, kuniyu@google.com, 
+	willemb@google.com, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	hawk@kernel.org, patchwork-bot+netdevbpf@kernel.org, toke@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
-
-On Wed, Nov 12, 2025 at 8:58=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+On Thu, Nov 13, 2025 at 1:36=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-> On Wed, Nov 12, 2025 at 08:19:36PM +0000, Prabhakar wrote:
-> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> On Thu, Nov 13, 2025 at 10:30=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
 > >
-> > Add the boolean DT property `renesas,miic-phylink-active-low` to the RZ=
-N1
-> > MIIC binding schema. This property allows configuring the active level
-> > of the PHY-link signals used by the Switch, EtherCAT, and SERCOS III
-> > interfaces.
+> > On Thu, Nov 13, 2025 at 1:08=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Thu, Nov 13, 2025 at 9:53=E2=80=AFAM Jamal Hadi Salim <jhs@mojatat=
+u.com> wrote:
+> > > >
+> > > > [..]
+> > > > Eric,
+> > > >
+> > > > So you are correct that requeues exist even before your changes to
+> > > > speed up the tx path - two machines one with 6.5 and another with 6=
+.8
+> > > > variant exhibit this phenoma with very low traffic... which got me =
+a
+> > > > little curious.
+> > > > My initial thought was perhaps it was related to mq/fqcodel combo b=
+ut
+> > > > a short run shows requeues occur on a couple of other qdiscs (ex pr=
+io)
+> > > > and mq children (e.g., pfifo), which rules out fq codel as a
+> > > > contributor to the requeues.
+> > > > Example, this NUC i am typing on right now, after changing the root=
+ qdisc:
+> > > >
+> > > > --
+> > > > $ uname -r
+> > > > 6.8.0-87-generic
+> > > > $
+> > > > qdisc prio 8004: dev eno1 root refcnt 5 bands 8 priomap 1 2 2 2 1 2=
+ 0
+> > > > 0 1 1 1 1 1 1 1 1
+> > > >  Sent 360948039 bytes 1015807 pkt (dropped 0, overlimits 0 requeues=
+ 1528)
+> > > >  backlog 0b 0p requeues 1528
+> > > > ---
+> > > >
+> > > > and 20-30  seconds later:
+> > > > ---
+> > > > qdisc prio 8004: dev eno1 root refcnt 5 bands 8 priomap 1 2 2 2 1 2=
+ 0
+> > > > 0 1 1 1 1 1 1 1 1
+> > > >  Sent 361867275 bytes 1017386 pkt (dropped 0, overlimits 0 requeues=
+ 1531)
+> > > >  backlog 0b 0p requeues 1531
+> > > > ----
+> > > >
+> > > > Reel cheep NIC doing 1G with 4 tx rings:
+> > > > ---
+> > > > $ ethtool -i eno1
+> > > > driver: igc
+> > > > version: 6.8.0-87-generic
+> > > > firmware-version: 1085:8770
+> > > > expansion-rom-version:
+> > > > bus-info: 0000:02:00.0
+> > > > supports-statistics: yes
+> > > > supports-test: yes
+> > > > supports-eeprom-access: yes
+> > > > supports-register-dump: yes
+> > > > supports-priv-flags: yes
+> > > >
+> > > > $ ethtool eno1
+> > > > Settings for eno1:
+> > > > Supported ports: [ TP ]
+> > > > Supported link modes:   10baseT/Half 10baseT/Full
+> > > >                         100baseT/Half 100baseT/Full
+> > > >                         1000baseT/Full
+> > > >                         2500baseT/Full
+> > > > Supported pause frame use: Symmetric
+> > > > Supports auto-negotiation: Yes
+> > > > Supported FEC modes: Not reported
+> > > > Advertised link modes:  10baseT/Half 10baseT/Full
+> > > >                         100baseT/Half 100baseT/Full
+> > > >                         1000baseT/Full
+> > > >                         2500baseT/Full
+> > > > Advertised pause frame use: Symmetric
+> > > > Advertised auto-negotiation: Yes
+> > > > Advertised FEC modes: Not reported
+> > > > Speed: 1000Mb/s
+> > > > Duplex: Full
+> > > > Auto-negotiation: on
+> > > > Port: Twisted Pair
+> > > > PHYAD: 0
+> > > > Transceiver: internal
+> > > > MDI-X: off (auto)
+> > > > netlink error: Operation not permitted
+> > > >         Current message level: 0x00000007 (7)
+> > > >                                drv probe link
+> > > > Link detected: yes
+> > > > ----
+> > > >
+> > > > Requeues should only happen if the driver is overwhelmed on the tx
+> > > > side - i.e tx ring of choice has no more space. Back in the day, th=
+is
+> > > > was not a very common event.
+> > > > That can certainly be justified today with several explanations if:=
+ a)
+> > > > modern processors getting faster b) the tx code path has become mor=
+e
+> > > > efficient (true from inspection and your results but those patches =
+are
+> > > > not on my small systems) c) (unlikely but) we are misaccounting for
+> > > > requeues (need to look at the code). d) the driver is too eager to
+> > > > return TX BUSY.
+> > > >
+> > > > Thoughts?
+> > >
+> > > requeues can happen because some drivers do not use skb->len for the
+> > > BQL budget, but something bigger for GSO packets,
+> > > because they want to account for the (N) headers.
+> > >
+> > > So the core networking stack could pull too many packets from the
+> > > qdisc for one xmit_more batch,
+> > > then ndo_start_xmit() at some point stops the queue before the end of
+> > > the batch, because BQL limit is hit sooner.
+> > >
+> > > I think drivers should not be overzealous, BQL is a best effort, we d=
+o
+> > > not care of extra headers.
+> > >
+> > > drivers/net/ethernet/intel/igc/igc_main.c is one of the overzealous d=
+rivers ;)
+> > >
+> > > igc_tso() ...
+> > >
+> > > /* update gso size and bytecount with header size */
+> > > first->gso_segs =3D skb_shinfo(skb)->gso_segs;
+> > > first->bytecount +=3D (first->gso_segs - 1) * *hdr_len;
+> > >
 > >
-> > The signal polarity is controlled by fields in the MIIC_PHYLINK registe=
-r:
-> >   - SWLNK[3:0]: configures the Switch interface link signal level
-> >       0 - Active High
-> >       1 - Active Low
-> >   - CATLNK[6:4]: configures the EtherCAT interface link signal level
-> >       0 - Active Low
-> >       1 - Active High
-> >   - S3LNK[9:8]: configures the SERCOS III interface link signal level
-> >       0 - Active Low
-> >       1 - Active High
 > >
-> > When the `renesas,miic-phylink-active-low` property is present, the
-> > PHY-link signal is configured as active-low. When omitted, the signal
-> > defaults to active-high.
+> > Ok, the 25G i40e driver we are going to run tests on seems to be
+> > suffering from the same enthusiasm ;->
+> > I guess the same codebase..
+> > Very few drivers tho seem to be doing what you suggest. Of course idpf
+> > being one of those ;->
 >
-> Sorry, but i asked in a previous version, what is phy-link? You still
-> don't explain what this signal is. phylib/phylink tells you about the
-> link state, if there is a link partner, what link speed has been
-> negotiated, duplex, pause etc. What does this signal indicate?
+> Note that few requeues are ok.
 >
+> In my case, I had 5 millions requeues per second, and at that point
+> you start noticing something is wrong ;)
 
-                                   +----> Ethernet Switch -------->
-GMAC (Synopsys IP)
-                                    |
-                                    |
-MII Converter ----------+
-                                    |
-                                   +----> EtherCAT Slave Controller
-                                   |
-                                   |
-                                   +----> SERCOS Controller
+That's high ;-> For the nuc with igc, its <1%. Regardless, the
+eagerness for TX BUSY implies reduced performance due to the early
+bailout..
 
-Each of these IPs has its own link status pin as an input to the SoC:
-
-SWITCH_MII_LINK: Switch PHY link status input
-S3_MII_LINKP: SERCOS III link status from PHY
-CAT_MII_LINK: EtherCAT link status from PHY
-
-The above architecture is for the RZ/N1 SoC. For RZ/T2H SoC we dont
-have a SERCOS Controller. So in the case of RZ/T2H EVK the
-SWITCH_MII_LINK status pin is connected to the LED1 of VSC8541 PHY.
-
-The PHYLNK register [0] (section 10.2.5 page 763) allows control of
-the active level of the link.
-0: High active (Default)
-1: Active Low
-
-For example the SWITCH requires link-up to be reported to the switch
-via the SWITCH_MII_LINK input pin.
-
-[0] https://www.renesas.com/en/document/mah/rzn1d-group-rzn1s-group-rzn1l-g=
-roup-users-manual-r-engine-and-ethernet-peripherals?r=3D1054561
-
-Cheers,
-Prabhakar
+cheers,
+jamal
 
