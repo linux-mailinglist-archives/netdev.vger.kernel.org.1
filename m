@@ -1,286 +1,386 @@
-Return-Path: <netdev+bounces-238279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62317C56FCA
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:50:16 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F030C56F6D
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 11:45:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B68F23B6072
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:40:51 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CC535344F22
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 10:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9889833120B;
-	Thu, 13 Nov 2025 10:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742FF3321A4;
+	Thu, 13 Nov 2025 10:43:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b="fjtaHgW9"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dx2IrQE+"
 X-Original-To: netdev@vger.kernel.org
-Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022136.outbound.protection.outlook.com [52.101.126.136])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011026.outbound.protection.outlook.com [40.93.194.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237902DCF44;
-	Thu, 13 Nov 2025 10:40:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C10D334394
+	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.26
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763030444; cv=fail; b=qZqxvmmzj9e1KnfIq1XPDiM5Gixp5xFMtPh6GZw4yv1mtmBNnxcChlK/WFOuHnsDPAgTe9JVpL4Rkqr6WKBa8eYmaGoFc0RnEtDS0jElWBU+q3mar07o9UtF6Ass3Wfb5tPqam/+fp7Jimg0fEEtP6acdbjPD6IIPs1W0rO56Mk=
+	t=1763030639; cv=fail; b=PCIHnfj8jforjFvxi4/jJObdtjKWmbGkUnHdFxKcjNzG3KjqWc1MjMhItFb6aMKrr7ulpC7+Ve+ugCDqomYI0Q+9Ofv2MQ/KyxLkVvWGKB+yOwWXeeP4GkXr36XcnFTujyXBVLmSIwKmio/40dEHrMulgCqtIMMtB3jDml+Igd8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763030444; c=relaxed/simple;
-	bh=OJ2vdMe5V9OCZrXkJ4jtmMgBEz8B1AstvCH+fjIB4mQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bhvXr63mNjXrXTTCLlUnCuAXGAiTJEwVUiZ/yj2AQmxqy+Af/nuCOwWovVGW8EZBgvIrjPzSXNPURUsk29vLFeSzGWm85XbNilcuE/HolcDRG9lJ+mRl15NEUhJA67uoDoEHHHNIj2bKiX4JT/VgfAWh0Vks/s1Tz7O7zk9p0IA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b=fjtaHgW9; arc=fail smtp.client-ip=52.101.126.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+	s=arc-20240116; t=1763030639; c=relaxed/simple;
+	bh=bQ1MNX7fi9QV/EhDXUYayfCGpczJ/IrkesUEIO7r7N8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B/BQsCZg0zfLJDIvIa4IS/wMHzZk3+ogVAl4BhwxCMaxeczj0ll1JaJsBh1hfr2gEzro8Z/XRgi4D4gOSixKPxFuk73Y3fmCRXCEW8FA7OByX2vGIKSdJbB88PI34VHCOfvKWF5+AvBeP/EedhkdIsmfNYRTnn02ouRrWpp1V7c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dx2IrQE+; arc=fail smtp.client-ip=40.93.194.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DjASKpTH7A+swpOe4NLKEo94zHXf0uUiAdYRH6+YQDD0VADjohZozC/y6tKjSHJYByNbWdVRGyU15+vi6KwFmUS6XM1V1Ih6bn4Vig/8be7hhUNfFi/4uR0Jlo4vBvsWxrDbDBLB6EDas4JPvahwXCw0npIxL7h2GYRJW6iAdQ39GJtTxNUIBuwJgtuVvlG9lZx/yfxYg9hjzRWPYlvVE4wM83GfW/BrH+VUhthbZjLQQrYkhk7so0u/vfipJmeABcU92NdZFU2gQQsSg9Gw+Y/AFx0GjQIFLy4LI/3pF55F3jXcGePggMdx1C1eY+fRKmIsoSqUJOjeLGGK3wdTrg==
+ b=Z3unA9lXFuNw9xx06Wvk+DwRtvy/ffymABflXMQ/q7cQzEvgdcFf7MEbuBAr6TndB0+sB3Lwp2CfGKaDGOX+1E5yLTMUB6PxeArm2KUgKi2YpYWi5WMcVZYsvHXZqPi2XPqM8qKHqzqlPAXV+6ruOA57s8KqqmbfleM8YevVkAqjAeDt8S7SlxQdP+chewFlzmffMRN4sNvpjxEjOAIRpSNYE9oEc+uh7pZe4Z2DyKXvpPLt+TNdoHznofA0kkhQAsySS8YLUL+BhIa64atfedElGJanFsmOXw+HR3zjL6Y+XTRRBUUvp59xO6cup7GQHv8ZL2YdcZvgHt78OZvBmg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OJ2vdMe5V9OCZrXkJ4jtmMgBEz8B1AstvCH+fjIB4mQ=;
- b=YS5lr65/1qIzi6MNGsLbRx+7MGq5XfU0XQhwDimUhWOlzPrM5Esu7DI9vqQFIPnSCo1DgV+7842EpLSqS91ypqwR4KQddy0dH7lscBHrGGSwEQ1tJc6wyXBFrJlv04n9dGd17gt/pcl4oif+HQlHcmxvlmk53XfDKYQLGbDcJ3jDaguJ+LhF2IICkKUAWbVQTy4iUYcH5wY8QI8NlrLAcmrlgcHAj5/uPMo+0L5SpLrtrshSqumLm8iF9+de+FiOV2wVwsMlm+bJIVdvbgkrQh9/2Vw+IdmG54P1L5PWp3ycQ07of9GIx/ewo1Z/hekRA3H2riLu1NSYT+b+q/pBBA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
- header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
- s=selector1;
+ bh=WwHsZKrUhf1Acrt/93kmBj+AQoyV3il12XfEX3jq3uw=;
+ b=yEKeSxICZ/eWVeGIdqfAEJHHuiNvN3gkDB/IAH7RhxmgZZxWgoBvKsPTVUKKSUNRlIlHwxNR/voNfBsh+WvSZkczmVzwAoDhEfY9CXE4rYbEK6NFKGhDY0h4ya8HucEAbYuaUCwddy0p+zzC9U6WIdZU13C0k9EON9Ei2mocqXnhLkGn68cZXgMg/Hu/tMFsumg8zhZ7S7HG47Nh0WbuLZSjs6X2Si/qh+ImpuwyF937JiCrmtO//jygPwsEFkRhN3yYkWuf6KdgWvemv03D6GE2oOem3v+ytAWo+p5VCR79QWDPqxTK9yLmkKjzqn0q+GEbNsTZpfYKVpMZrvvBaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OJ2vdMe5V9OCZrXkJ4jtmMgBEz8B1AstvCH+fjIB4mQ=;
- b=fjtaHgW9bvQ6sBYtoH0gchSmOSUbk7JjlO6EwOva/yXpXS7pv8Y13ygsZdhf2EL3DMyw5n1hFvkHqOme3KrV9DYY+XiaQEkiGFfqQJxsxhxpgX0TWjbYu5iQ0ZfjZOlJACvvk+0G88oKRwuVwwFyu4cOzW7ahaMgeqNz+VUF9evsndao7QRp6TXN5b0Y/8yo2qmBVHrRPDUmyIKd+z4Mj/5XF+PfvAzMWKqfwRp43bPoXRLyI9AS1AhGSe9Lvst6J/fH3MfXcxlbWrhSsftIS0RMPY0YpraYtXnJ0UWul26/wW7iQe8ul6WOXP9UY4NYK171ShqhRhkqPtinzwfMIg==
-Received: from SEYPR06MB5134.apcprd06.prod.outlook.com (2603:1096:101:5a::12)
- by TY1PPFC2A7D9DAA.apcprd06.prod.outlook.com (2603:1096:408::923) with
+ bh=WwHsZKrUhf1Acrt/93kmBj+AQoyV3il12XfEX3jq3uw=;
+ b=dx2IrQE+xzY63G+3O+QjdG7QqevRWWyN2b1EzFO7YfKF+a1eWdjBupm0y1qcKyAoB9XFFv3VlNfOCrJE7ZlyywJP2c/qcgcfmwPVRPQUSRhQJwWt3R4PFU62sQ0M8lgGnZ1rx73os/n72VpByUdtlvw4yjMYua0tFH4tmD8Ax9UG0sMJ4XsPajYhgxenSO416M2m84xI7Mbm2zRNAGyWv4s46IBRWK7MfIzETY1EH6j2hbYmmBX6sl5iAdesU+y8Cpgd7zqueR9FieRxb59J5sCJXw+CL4hbSXMBviPEB3pFAiacrM+6SO9W2Yc5FNoEKcXhiK7oLJsw+f1D13RFOA==
+Received: from BLAPR03CA0161.namprd03.prod.outlook.com (2603:10b6:208:32f::8)
+ by PH8PR12MB7181.namprd12.prod.outlook.com (2603:10b6:510:22a::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Thu, 13 Nov
- 2025 10:40:37 +0000
-Received: from SEYPR06MB5134.apcprd06.prod.outlook.com
- ([fe80::6b58:6014:be6e:2f28]) by SEYPR06MB5134.apcprd06.prod.outlook.com
- ([fe80::6b58:6014:be6e:2f28%6]) with mapi id 15.20.9320.013; Thu, 13 Nov 2025
- 10:40:37 +0000
-From: Jacky Chou <jacky_chou@aspeedtech.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Po-Yu Chuang <ratbert@faraday-tech.com>, Joel Stanley
-	<joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-aspeed@lists.ozlabs.org"
-	<linux-aspeed@lists.ozlabs.org>, "taoren@meta.com" <taoren@meta.com>
-Subject: [PATCH net-next v4 4/4] net: ftgmac100: Add RGMII delay support for
- AST2600
-Thread-Topic: [PATCH net-next v4 4/4] net: ftgmac100: Add RGMII delay support
- for AST2600
-Thread-Index: AQHcUjKRp/5wUPPeG0Wo2Pz9fS4A+7TsCtCAgAJeVpCAAKBqgIABWbLA
-Date: Thu, 13 Nov 2025 10:40:37 +0000
-Message-ID:
- <SEYPR06MB51342977EC2246163D14BDC19DCDA@SEYPR06MB5134.apcprd06.prod.outlook.com>
-References: <20251110-rgmii_delay_2600-v4-0-5cad32c766f7@aspeedtech.com>
- <20251110-rgmii_delay_2600-v4-4-5cad32c766f7@aspeedtech.com>
- <68f10ee1-d4c8-4498-88b0-90c26d606466@lunn.ch>
- <SEYPR06MB5134EBA2235B3D4BE39B19359DCCA@SEYPR06MB5134.apcprd06.prod.outlook.com>
- <3af52caa-88a7-4b88-bd92-fd47421cc81a@lunn.ch>
-In-Reply-To: <3af52caa-88a7-4b88-bd92-fd47421cc81a@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=aspeedtech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SEYPR06MB5134:EE_|TY1PPFC2A7D9DAA:EE_
-x-ms-office365-filtering-correlation-id: 6acd2cf3-5459-4316-1471-08de22a11521
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?3B+uB8jIWbLevfibYdxCSBrK53yb3pOWdoBGFQ2cStKUG1c0UwnpViSpqaun?=
- =?us-ascii?Q?egncbUus4Na2rr680+YdWvzEuPrZvZJdiSVufR91fTtLWFCPHRPMswPlmSge?=
- =?us-ascii?Q?Tv8dnFjkLzHqvfEyrkktpqRgnvMH7l9kAfhmCLetSxL3WbaefKTKjIQNO4qT?=
- =?us-ascii?Q?g7GoI9kSEPHurkF4sJeGfZt02Ltcrqq4pcy+2nwKr3daZsEECR8Hgz2AorYq?=
- =?us-ascii?Q?uLa53BVsIMjC+XoTRpFBIaekFoW86btqhzvYIWFOzflkRxdtUVZ77PFWPcSk?=
- =?us-ascii?Q?47miV4V8jiz4VCLtEMb6Zs8rUMDPgNEyE9t95YMVP4rGPsiSFQD9DoghETOW?=
- =?us-ascii?Q?ZkplXzcc0rV8pzZrekouD/MA/eSEWAmsDB8kZJXa+7mIC75xqLSqHX+F7XAY?=
- =?us-ascii?Q?ak8tbnYMdj0VJcNk43gYIO5zVe9H6wJAvzKTWzVXKkmvlkvJldBCU7Q16jn5?=
- =?us-ascii?Q?74rDRiWSZewU1790Y7SYtAeWDbW8soqxUk3xC8q7+w6AS4KU39bxSst7lLzr?=
- =?us-ascii?Q?lrIkfWBxAFgJoyV+f0pKb2ddX5AUTyf60Xhov8tvdNbXzCYrhdTvt6mMQrp9?=
- =?us-ascii?Q?Tyw00BzaJgFh3NOzoJZoskSc47F/5mvGlzsYvQt47jkB37ke/Wh4b+EMZ0Qe?=
- =?us-ascii?Q?LE18MpqYBdTrJOoCg1Z08lsUU2U6H+cerNq1F15Lg8FsbYsYsKDlefBBqxHK?=
- =?us-ascii?Q?dw8UdWEnoezhV66aoV+y6rKIZ1Bb3axeLBbEXy1B9KH7EqtxQIW6RdQ4ZIAE?=
- =?us-ascii?Q?HBt/Pj3bKkhALKRYVcF+XQK8l6kmQaFdT9YfXLaKBJVYpKM8dPnzqA2ClX53?=
- =?us-ascii?Q?G/Hh3TPhk0Bx0+g71acm/kLxFSV3WRQR9/akZuHHDGdiVKvO8b2pb1kYlNNI?=
- =?us-ascii?Q?tzfC3Y/CVrqCmLp/QOLrvy2962M7aIWRTWdgjawDkJCAUARd/jEuQNE7sabA?=
- =?us-ascii?Q?wvNdH5FqneOwd7xk2sMoAUUJUFziBbaXubOkNpAE8g7N5WSz234ulBYunoCF?=
- =?us-ascii?Q?d5Puz/uamhZAtFR9gJpVIF6ruz9+VrY0qYFGCuVh4DKPhU/oE5Un8zMmmHzV?=
- =?us-ascii?Q?lK24ACZTxPQ6LNFCDTlf3RIL3oIDgzabT1eRUPk7d8akqec1zO7r1xFUDO7E?=
- =?us-ascii?Q?WmKrH8z46T5gUkaKC1hLNOdY5D0J27LYH/4qLqVFWgqJRzFO2/bAoNf/TUSk?=
- =?us-ascii?Q?wrlzlc5vTLYPd7KZaDpyykXKGQ4zRh1DALi9KetxVZRdgelTgWJqUB1Hjinb?=
- =?us-ascii?Q?S21PG6De7af/RXyY6bfFDqEdB+2N8WnMH/M/VyYojO1CcVW0cK6M1oEoRLVw?=
- =?us-ascii?Q?U27MCSQ8IigsWKwYJzNcrTyEXoSykV8jaDpdPEbBP1ZvuQlfJflCJi4x88NH?=
- =?us-ascii?Q?x2FN7W8uEj5oGsp6BNDXTuDpM68iF072QEcg3NH90qT0WfVS4Fgc+IKofJZ1?=
- =?us-ascii?Q?6rMt0jI1RMj7nl1gNL0/+yBxhCDLklVUg+5YVG970x2HhMzdXJD/LbPPC7no?=
- =?us-ascii?Q?zwlooHIo0DZl2merl2ZaCQoVU4BaLqne4aa+?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEYPR06MB5134.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?HfRS521P9Mm36ibC8d2At24z9j0BLv3ZUek3YABy8RUXetPVW05+/wjSOxlK?=
- =?us-ascii?Q?62N8Qse1gdmZDeOqoTeLuNnS0yUkaxcyEVDg+7NBvANGIYB1ioA224EDPJK2?=
- =?us-ascii?Q?soLMcMqlmjisQxv3SUVHheWWN5c8kVgJsrra025IrvmGLwFZ/liz+/jn2ju4?=
- =?us-ascii?Q?HIqpyWDMHQ5i1QhDq11/XwcOU2Z8WXssOnval6YHENH8j/h9UbM6teR5AX7P?=
- =?us-ascii?Q?JClzbpliSKHu/GfBmrRaVlyFmn64Gy+1kGDVvbcrLrlfoSNJUbcuK5ozk/Ag?=
- =?us-ascii?Q?HzjsOOZipov2LZ0CzFGgNJTODMH1/AJASyHTEcFfKp69REirWfidp4IvLdV+?=
- =?us-ascii?Q?BKYOFQ1gK9Eq+J+wfRFRvqbNd540LhN9KT/ugSqS2l64GhEp3rH14kiU7xqS?=
- =?us-ascii?Q?mziNfcf+fmkw/N2R2sOG2cd9jCd6rbtTC1hoBn1+QlVL56rtyKZ33kiPzQXJ?=
- =?us-ascii?Q?BSSkDdcDuRCxKWjQLSY3NG5qhjUdbZWbQ+Eai3BL0sy+5T54opC/SZ04kVHM?=
- =?us-ascii?Q?hcmPDYOjs81zVj2DPy2Lda5HVdKcpQ4BPqwN4VgmjpujMr2iN3rsz03/nCa5?=
- =?us-ascii?Q?4YFK5Naxb1qG0gRuEzjLS5Vn2dpNrKo37/YNRXt3rXPbdh/uuoKJCvPjt1fI?=
- =?us-ascii?Q?/uUCR1RbFQEJj4VRDQ4Hsbe0nH8OAjZuXtnrIFhoh6mppalkDpsXqUtWXoV4?=
- =?us-ascii?Q?lqAIKi1Qzpe5bRhzJzO6ruyd0m9cde6BXqNrg95rnRk0b0tTL56pJZ7o71aT?=
- =?us-ascii?Q?Sp9iDRU0wcWtBK/YWalx/bjJFgr4MoJuUzFJJTDuoprxpMWsGdjpHiEWKpg4?=
- =?us-ascii?Q?Dk8MwZk8admvS9FBPHyfL9Z9QREjyTBHtsF+ScLl8aBWmVpoir6Q2z1cViLD?=
- =?us-ascii?Q?xFXcG6aIq+AaUGlGk98aJMNaY9bBmD/m7Y3+fKX4JBf0pRUMk22CBh09qjOo?=
- =?us-ascii?Q?i2QxDCDxDBW7rwBxZweGQNlPWriPdxgbb9oZ5Rw+b8CoSmmbA03OEi7vIqdK?=
- =?us-ascii?Q?Zk0gPDYpFxSZjutyykfn/WQ9hOs7mWEvqkJmlJZ8BqFnHkJySvnjKHoSJ6BW?=
- =?us-ascii?Q?Pn8J0T3E0B0xMDAyFH0f3JBRvq4Qt3UEovwgrQGZ9xnenbpEoP0jVEBmQfal?=
- =?us-ascii?Q?K6c4P2fLpSyC8i1u8gkC/M1WQQlaqX30/xoaJ5nYrq1W8j0E83J8mHtVAA2k?=
- =?us-ascii?Q?ie2NTjxy+QBUefSHaPD9iHfgNHz5UestCx35W1hz8X6+PwAQfYF4SbPUFc7q?=
- =?us-ascii?Q?oDVm6fZu/6E1UTPwFHTpg30hY/aYHhL5s4N0RSIMLqKB8rhNTVc3cV6mtlCu?=
- =?us-ascii?Q?l7eXzJBmupyCG/UvyzolkV8DNkPgcTh+0VAzaQNNUWJReiFd+qwm5NO5X5jg?=
- =?us-ascii?Q?Bi84jv5Vt7ZHAQuJ1SYaqDOih0flbh8T3uJKCuz1uRIIFygcUygALmbA+zIe?=
- =?us-ascii?Q?48DYaU/0VM+JmxGTYN+sbREZ3JRI8CFHoiy1ozFVj9UU4f5aGWesSlbFCq+C?=
- =?us-ascii?Q?Xcy7TaPrzp34PANAbfnqDVa80ts3IYdVRe/1CMjwSTEt0mBh6lHNy51R1I0m?=
- =?us-ascii?Q?UydDYic7+FRl6OnIY12RMzu+Yr8kYGo9Hk9sfeL2?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.12; Thu, 13 Nov
+ 2025 10:43:51 +0000
+Received: from BL6PEPF00020E64.namprd04.prod.outlook.com
+ (2603:10b6:208:32f:cafe::f8) by BLAPR03CA0161.outlook.office365.com
+ (2603:10b6:208:32f::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9320.17 via Frontend Transport; Thu,
+ 13 Nov 2025 10:43:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL6PEPF00020E64.mail.protection.outlook.com (10.167.249.25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9320.13 via Frontend Transport; Thu, 13 Nov 2025 10:43:51 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 13 Nov
+ 2025 02:43:36 -0800
+Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.231.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Thu, 13 Nov 2025 02:43:31 -0800
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Simon
+ Horman" <horms@kernel.org>, Taehee Yoo <ap420073@gmail.com>, Jianbo Liu
+	<jianbol@nvidia.com>, Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, Leon Romanovsky
+	<leonro@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: [PATCH ipsec v2 1/2] bond: Use xfrm_state_migrate to migrate SAs
+Date: Thu, 13 Nov 2025 12:43:09 +0200
+Message-ID: <20251113104310.1243150-1-cratiu@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: aspeedtech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SEYPR06MB5134.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6acd2cf3-5459-4316-1471-08de22a11521
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Nov 2025 10:40:37.2273
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF00020E64:EE_|PH8PR12MB7181:EE_
+X-MS-Office365-Filtering-Correlation-Id: f483cbed-d648-4d7d-73a6-08de22a18916
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|7416014|376014|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ZhI0Z/8et6qGKnCLccbq2YmQPN3xKxkifuMzMpVkbs7Nsm7Yz2u9KQbwnvvO?=
+ =?us-ascii?Q?pKCgvgLRcW/hhXZNnuOd3ppwZpsve7DtH9revONbOJLohDgwnf1m3Yw3q/n9?=
+ =?us-ascii?Q?jPT0A1XTt2iiorbdlRYKmYR3uDNSGnV3Zy7Xgk58ZvPSl2fPjYN3C3u6N1Bn?=
+ =?us-ascii?Q?HWNN7YjdXrRhGRpU8QzVvUB30ZraU3eoMCw3zArK30wyt6SfdC3G4Q12qPLg?=
+ =?us-ascii?Q?NIslWsfCSG/qWeawEZGgNKef12Mgo9menOlW6UGKuLtSkq+6hAmkeMs+y2qY?=
+ =?us-ascii?Q?rYFYY01kRo7ly1vJq/6C1OynBYqxOdR77kcozTKRmmXDzbwMR6Kbp9J586u9?=
+ =?us-ascii?Q?pzDXg0aa56SijYvtY4b/zJvrKnDymNcUNScgZR3oqYS8UaOUz3U+I0SziPMw?=
+ =?us-ascii?Q?5/psb7DYtlZcugNcMfvlMb1rsamtoSRHi36OO8LfYW3wRTcLWx6jdm+REaAg?=
+ =?us-ascii?Q?MROgn7O7aVa26D7pU1GCrggJizaf6utRm2qpyqavrkvLo+mQqiiZ5WiQEtT5?=
+ =?us-ascii?Q?Iv0+CQILXJxPzV4nha6LjXJI5Y6Z6CNTC3QXgIrVTKx3x9jTSuSWBo1S9CkY?=
+ =?us-ascii?Q?i4VWgk0qbEtQvopiX9PTpyxcFRIWbTNakBBF8oQw++lkTlsUQuSrf0y22aKc?=
+ =?us-ascii?Q?EcTmAHO6K81QEiy98oXGOxt2/zvcbgVwapPg2xffkZpZq8az2hrFr7D25t6/?=
+ =?us-ascii?Q?L6rQcyUR4haVBRbE88Jkrjb81B/1wCcE/E/jSXu7LJVaxrF9fRY4r2l5rqNl?=
+ =?us-ascii?Q?DUfIOgp+U7ptimOHWifK6/o5aeoaNDxx4Ylyla2WrePphhjAJX3QYh5Bndus?=
+ =?us-ascii?Q?ahyiftnpQCSyLQng/Cn4Wdq6cVtXpmdf4o5L+14ENSrSF449mJP59OzFG2pU?=
+ =?us-ascii?Q?N14+3uGDHvxTe+vBQgyR9PQaCAIqpUqXUCtsVIyD+cyHgrSsvtlp6DsM/A1b?=
+ =?us-ascii?Q?7ORCacDa5x/TCP9TjDlBj+zZN9NL4cHuXeFa4c+WsH433HWmQ9HkDFtGVF88?=
+ =?us-ascii?Q?fCiLE1oOwRfHPBnn0jVjLYUYAQBi+V0Fpj//Bb6JqRjxogjTDivckuEhBeWG?=
+ =?us-ascii?Q?ye2/ImByoD6i0OeL1zLclMwlVO0qtr8w47xFIB/K8NUv3z0q52WhkJK7dSEQ?=
+ =?us-ascii?Q?M0qDKYjFeZM2yclMtD31gigLIhz8G1pa/K2r7W6ou9wmIjHP5Elafua4Prua?=
+ =?us-ascii?Q?q5VvxO3OU+NgxDftdv2yV/2Kv24Kngc1hfpZC1p4mDV4uizrhEUweIJe2MEk?=
+ =?us-ascii?Q?56CGbm+Nh6z2IYkoFnTHwEvoIN4Zg/jC1Wq/lcM77rFPzw3hTwUEeCbvR6w8?=
+ =?us-ascii?Q?WWECgsIFJu59fiXUnXO916dFPOx/7qjilUJZLeV/jpOcIsJ0ty18MR2zvTfq?=
+ =?us-ascii?Q?WXwIw1w/QG2A+3B8sfiPUJ3PWdSwa0xqtNlx5XT9SCRXwh5HTqCzRxfopuy4?=
+ =?us-ascii?Q?DyPZJshItqd793UgV+/d70FmAiyLb6LPWnKixMDQgg4ci+akZ5REU9rgcnqf?=
+ =?us-ascii?Q?jUO8M3L+lRVsjPR0IFUnKwLNYH9VsmmERYoq/d2s1Zq8VO6dWec5UFgJQd3D?=
+ =?us-ascii?Q?wK3xLFaOrBKDv3NqzT4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2025 10:43:51.6302
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ue/9K4dBC6boI2ClYOKnven0quif8FuMcmRrvuyflVSVSkfUr8jqGeyFJvmEKRjqxE8H8u9g6t/JlT0clz5985u1a5M1grJlKVypdmK9E9M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY1PPFC2A7D9DAA
+X-MS-Exchange-CrossTenant-Network-Message-Id: f483cbed-d648-4d7d-73a6-08de22a18916
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF00020E64.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7181
 
-> > > This is an optional property. If it does not exist, you have an old
-> > > DT blob. It is not an error. So you need to do different things
-> > > depending on what the error code is. If it does not exist, just
-> > > return 0 and leave the hardware alone. If it is some other error repo=
-rt it,
-> and abort the probe.
-> > >
-> >
-> > Based on this for next version, I want to move the "aspeed,scu" from dt=
-si to
-> dts.
-> > Change it to optional and accord it whether existed to decide it is
-> > old or new DT blob.
->=20
-> I think that is the easy way out, not necessarily the correct way.
->=20
+The bonding driver manages offloaded SAs using the following strategy:
 
-Agreed.
-That's easy to implement adding support RGMII delay configuration for AST26=
-00.
-According to aspeed,scu property if it is a new dts.
-If it is old dts, ignore delay setting flow.
-If new one, configure the corresponding value from tx/rx-internal-delay-ps
-properties.
+An xfrm_state offloaded on the bond device with bond_ipsec_add_sa() uses
+'real_dev' on the xfrm_state xs to redirect the offload to the current
+active slave. The corresponding bond_ipsec_del_sa() (called with the xs
+spinlock held) redirects the unoffload call to real_dev. Finally,
+cleanup happens in bond_ipsec_free_sa(), which removes the offload from
+the device. Since the last call happens without the xs spinlock held,
+that is where the real work to unoffload actually happens.
 
-At first, I would just like to support for new dts based on AST2600.
-The existed dts in kernel is as legacy dts for AST2600 and try to bypass
-them. Therefore, I tried to use new compatible or aspeed,scu property to id=
-entify
-which new dts is.
+When the active slave changes to a new device a 3-step process is used
+to migrate all xfrm states to the new device:
+1. bond_ipsec_del_sa_all() unoffloads all states in bond->ipsec_list
+   from the previously active device.
+2. The active slave is flipped to the new device.
+3. bond_ipsec_add_sa_all() offloads all states in bond->ipsec_list to
+   the new device.
 
-> All systems have the aspeed,scu, so it should really be in the .dtsi file=
-.
->=20
-> What are you really trying to solve? That the DT blob says "rgmii", but t=
-he
-> bootloader has configured the MAC to add delays? You should be able to te=
-st
-> for that condition. If it is found, issue as warning, and treat phy-mode =
-as
-> 'rgmii-id'. If the DT blob says 'rgmii-id' and the MAC is configured to a=
-dd the
-> delays, the system is at least consistent, no need for a warning, disable=
- the
-> MAC delays and pass _RGMII_ID to the PHY. And if the blob says 'rgmii-id'=
- and
-> the MAC is not adding delays, no need to touch the MAC delay, and pass
-> _RGMII_ID to the PHY.
->=20
-> Are there any mainline DT .dts files which say rgmii-txid, or rgmii-rxid?=
- They
-> would be rather odd, but occasionally you see them.
-> Assuming there are not lots of them, i would probably just leave everythi=
-ng as
-> is.
->=20
+This patch closes a race that could happen between xfrm_state migration
+and TX, which could result in unencrypted packets going out the wire:
+CPU1 (xfrm_output)                   CPU2 (bond_change_active_slave)
+bond_ipsec_offload_ok -> true
+                                     bond_ipsec_del_sa_all
+bond_xmit_activebackup
+bond_dev_queue_xmit
+dev_queue_xmit on old_dev
+				     bond->curr_active_slave = new_dev
+				     bond_ipsec_add_sa_all
 
-Based on the above information, I have attempted to outline my understandin=
-g.
-1. 'rgmii' + MAC delay:
-Add warming, keep MAC delay and pass "rgmii-id" to PHY driver.
+So the packet makes it out to old_dev after the offloaded xfrm_state is
+deleted from it. The result: an unencrypted IPSec packet on the wire.
 
-2. 'rgmii-id' + MAC delay:
-disable MAC delay and pass "rgmii-id" to PHY driver
+With the new approach, in-use states on old_dev will not be deleted
+until in-flight packets are transmitted. It also makes for cleaner
+bonding code, which no longer needs to care about xfrm_state management
+so much.
 
-3. 'rgmii-id' + no MAC delay:
-Keep disabling MAC delay and pass "rgmii-id" to PHY driver
+Fixes: ("ec13009472f4 bonding: implement xdo_dev_state_free and call it after deletion")
+Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+---
+ drivers/net/bonding/bond_main.c | 126 ++++++++++++--------------------
+ 1 file changed, 45 insertions(+), 81 deletions(-)
 
-4. 'rgmii-txid' or 'rgmii-rxid':
-Keep original setting
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 67fdcbdd2764..e45e89179236 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -513,19 +513,21 @@ static int bond_ipsec_add_sa(struct net_device *bond_dev,
+ 	return err;
+ }
+ 
+-static void bond_ipsec_add_sa_all(struct bonding *bond)
++static void bond_ipsec_migrate_sa_all(struct bonding *bond)
+ {
++	struct slave *new_active = rtnl_dereference(bond->curr_active_slave);
+ 	struct net_device *bond_dev = bond->dev;
++	struct net *net = dev_net(bond_dev);
++	struct bond_ipsec *ipsec, *tmp;
++	struct xfrm_user_offload xuo;
+ 	struct net_device *real_dev;
+-	struct bond_ipsec *ipsec;
+-	struct slave *slave;
++	struct xfrm_migrate m = {};
++	LIST_HEAD(ipsec_list);
+ 
+-	slave = rtnl_dereference(bond->curr_active_slave);
+-	real_dev = slave ? slave->dev : NULL;
+-	if (!real_dev)
++	if (!new_active)
+ 		return;
+ 
+-	mutex_lock(&bond->ipsec_lock);
++	real_dev = new_active->dev;
+ 	if (!real_dev->xfrmdev_ops ||
+ 	    !real_dev->xfrmdev_ops->xdo_dev_state_add ||
+ 	    netif_is_bond_master(real_dev)) {
+@@ -533,36 +535,42 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
+ 			slave_warn(bond_dev, real_dev,
+ 				   "%s: no slave xdo_dev_state_add\n",
+ 				   __func__);
+-		goto out;
++		return;
+ 	}
+ 
+-	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+-		/* If new state is added before ipsec_lock acquired */
+-		if (ipsec->xs->xso.real_dev == real_dev)
+-			continue;
++	/* Prepare the list of xfrm_states to be migrated. */
++	mutex_lock(&bond->ipsec_lock);
++	list_splice_init(&bond->ipsec_list, &ipsec_list);
++	/* Add back states already offloaded on the new device before the
++	 * lock was acquired and hold all remaining states to avoid them
++	 * getting deleted during the migration.
++	 */
++	list_for_each_entry_safe(ipsec, tmp, &ipsec_list, list) {
++		if (unlikely(ipsec->xs->xso.real_dev == real_dev))
++			list_move_tail(&ipsec->list, &bond->ipsec_list);
++		else
++			xfrm_state_hold(ipsec->xs);
++	}
++	mutex_unlock(&bond->ipsec_lock);
+ 
+-		if (real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev,
+-							     ipsec->xs, NULL)) {
+-			slave_warn(bond_dev, real_dev, "%s: failed to add SA\n", __func__);
+-			continue;
+-		}
++	xuo.ifindex = bond_dev->ifindex;
++	list_for_each_entry_safe(ipsec, tmp, &ipsec_list, list) {
++		struct xfrm_state *x = ipsec->xs;
+ 
+-		spin_lock_bh(&ipsec->xs->lock);
+-		/* xs might have been killed by the user during the migration
+-		 * to the new dev, but bond_ipsec_del_sa() should have done
+-		 * nothing, as xso.real_dev is NULL.
+-		 * Delete it from the device we just added it to. The pending
+-		 * bond_ipsec_free_sa() call will do the rest of the cleanup.
+-		 */
+-		if (ipsec->xs->km.state == XFRM_STATE_DEAD &&
+-		    real_dev->xfrmdev_ops->xdo_dev_state_delete)
+-			real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
+-								    ipsec->xs);
+-		ipsec->xs->xso.real_dev = real_dev;
+-		spin_unlock_bh(&ipsec->xs->lock);
++		m.new_family = x->props.family;
++		memcpy(&m.new_daddr, &x->id.daddr, sizeof(x->id.daddr));
++		memcpy(&m.new_saddr, &x->props.saddr, sizeof(x->props.saddr));
++
++		xuo.flags = x->xso.dir == XFRM_DEV_OFFLOAD_IN ?
++			XFRM_OFFLOAD_INBOUND : 0;
++
++		if (!xfrm_state_migrate(x, &m, NULL, net, &xuo, NULL))
++			slave_warn(bond_dev, real_dev,
++				   "%s: xfrm_state_migrate failed\n", __func__);
++		xfrm_state_delete(x);
++		xfrm_state_put(x);
++		kfree(ipsec);
+ 	}
+-out:
+-	mutex_unlock(&bond->ipsec_lock);
+ }
+ 
+ /**
+@@ -590,47 +598,6 @@ static void bond_ipsec_del_sa(struct net_device *bond_dev,
+ 	real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev, xs);
+ }
+ 
+-static void bond_ipsec_del_sa_all(struct bonding *bond)
+-{
+-	struct net_device *bond_dev = bond->dev;
+-	struct net_device *real_dev;
+-	struct bond_ipsec *ipsec;
+-	struct slave *slave;
+-
+-	slave = rtnl_dereference(bond->curr_active_slave);
+-	real_dev = slave ? slave->dev : NULL;
+-	if (!real_dev)
+-		return;
+-
+-	mutex_lock(&bond->ipsec_lock);
+-	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+-		if (!ipsec->xs->xso.real_dev)
+-			continue;
+-
+-		if (!real_dev->xfrmdev_ops ||
+-		    !real_dev->xfrmdev_ops->xdo_dev_state_delete ||
+-		    netif_is_bond_master(real_dev)) {
+-			slave_warn(bond_dev, real_dev,
+-				   "%s: no slave xdo_dev_state_delete\n",
+-				   __func__);
+-			continue;
+-		}
+-
+-		spin_lock_bh(&ipsec->xs->lock);
+-		ipsec->xs->xso.real_dev = NULL;
+-		/* Don't double delete states killed by the user. */
+-		if (ipsec->xs->km.state != XFRM_STATE_DEAD)
+-			real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
+-								    ipsec->xs);
+-		spin_unlock_bh(&ipsec->xs->lock);
+-
+-		if (real_dev->xfrmdev_ops->xdo_dev_state_free)
+-			real_dev->xfrmdev_ops->xdo_dev_state_free(real_dev,
+-								  ipsec->xs);
+-	}
+-	mutex_unlock(&bond->ipsec_lock);
+-}
+-
+ static void bond_ipsec_free_sa(struct net_device *bond_dev,
+ 			       struct xfrm_state *xs)
+ {
+@@ -1221,10 +1188,6 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
+ 	if (old_active == new_active)
+ 		return;
+ 
+-#ifdef CONFIG_XFRM_OFFLOAD
+-	bond_ipsec_del_sa_all(bond);
+-#endif /* CONFIG_XFRM_OFFLOAD */
+-
+ 	if (new_active) {
+ 		new_active->last_link_up = jiffies;
+ 
+@@ -1247,6 +1210,7 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
+ 			if (bond_uses_primary(bond))
+ 				slave_info(bond->dev, new_active->dev, "making interface the new active one\n");
+ 		}
++
+ 	}
+ 
+ 	if (bond_uses_primary(bond))
+@@ -1264,6 +1228,10 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
+ 		rcu_assign_pointer(bond->curr_active_slave, new_active);
+ 	}
+ 
++#ifdef CONFIG_XFRM_OFFLOAD
++	bond_ipsec_migrate_sa_all(bond);
++#endif
++
+ 	if (BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP) {
+ 		if (old_active)
+ 			bond_set_slave_inactive_flags(old_active,
+@@ -1296,10 +1264,6 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
+ 		}
+ 	}
+ 
+-#ifdef CONFIG_XFRM_OFFLOAD
+-	bond_ipsec_add_sa_all(bond);
+-#endif /* CONFIG_XFRM_OFFLOAD */
+-
+ 	/* resend IGMP joins since active slave has changed or
+ 	 * all were sent on curr_active_slave.
+ 	 * resend only if bond is brought up with the affected
+-- 
+2.45.0
 
-
-I have some idea to discuss with you.
-1. On 'rgmii', I want to add warming and directly disable MAC delay and pas=
-s 'rgmii-id'=20
-to PHY driver.
-
-2. On 'rgmii-id', ignore if enabling MAC delay, all disable MAC delay and p=
-ass ' rgmii-id'
-to PHY driver.
-
-3. On 'rgmii-txid' or 'rgmii-rxid', keep the above item 4.
-
-Actually, it's difficult for the driver to determine whether the MAC delay =
-is enabled or not.
-Our design doesn't use a single bit to indicate the delay state. Instead, t=
-he delay setting is=20
-derived from the user's configured delay value.
-
-From what I understand, when the TX delay value is set to zero, the data an=
-d clock signals=20
-are almost aligned to the edge - which likely means the MAC TX delay is dis=
-abled.
-
-Therefore, I'd prefer the driver to simply configure the MAC delay based on=
- the phy-mode=20
-and the tx/rx-internal-delay-ps properties.
-
-As you mentioned before, the v4 behavior results in a network interface tha=
-t can successfully=20
-probe but does not actually work.
-So, I'm also considering another approach on the AST2600:
-to not support rgmii, rgmii-txid, or rgmii-rxid modes directly.
-If any of these are encountered, the driver could automatically treat them =
-as rgmii-id and issue=20
-a warning.
-
-Thanks,
-Jacky
 
