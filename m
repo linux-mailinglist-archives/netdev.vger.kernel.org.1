@@ -1,96 +1,146 @@
-Return-Path: <netdev+bounces-238724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DC47C5E972
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 18:33:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 922C8C5E3CC
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 17:30:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5DE3A3844B6
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:22:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB6733A9EF8
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FF932E75C;
-	Fri, 14 Nov 2025 16:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3AC26E6EB;
+	Fri, 14 Nov 2025 16:23:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U4BLOo8m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8Awmdgx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28F728541A
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 16:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64162285C8D
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 16:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763137216; cv=none; b=GP/wD3MZPTmsZemE/lOl0BL5HOzpyd46+3Fd7udBTFpGfxOGZuYTyf5KOzyqWdEx7x3quf56wzYOyihnyZDiN0Y/PKtoNzghuyzSc9bjk7a+0JNKkKdUV6yBOri2dMS1h+K8Q9C2kHFM9p9YLQROheNakkzU+kQIJYlNmmnAbgU=
+	t=1763137415; cv=none; b=CHn24mGhYsdlhmn86DnftWO4n2dBpF8PREviD6ECOTkKAibqbcmBR2/fSnRmVsfmj8fiXPUKIyoEQYbLvTBFA98C9h74oc/8lZbYt4jSiuIhj09JANlK35NXjkcfGUQTGsMY18aYkorRoXpK4o4Ky9h+8n5V4rzlGhFD9lpKI1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763137216; c=relaxed/simple;
-	bh=eeknFlu9uT6m751Oqqd09j1wEYY1O7NYz8dorQmzB2w=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=belMt7fQ7QBbtwAbrZ7mU6gYXc9g9btu8RAKHvrWWb9XB3FO4yyuoi/wUmeghAFb9VUKeAH4H1/PUDbmoPWWzGxATcGs1mPjIp7QmzzmWV8GWYfWLanjiHh3egaDXd1zotBAsNcWQ7UczMmokswu2tklyJYUe7v8igz1z8xlwEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U4BLOo8m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46C56C4CEFB;
-	Fri, 14 Nov 2025 16:20:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763137215;
-	bh=eeknFlu9uT6m751Oqqd09j1wEYY1O7NYz8dorQmzB2w=;
-	h=Date:From:To:Cc:Subject:From;
-	b=U4BLOo8mq4yodnrJqVfuw5Jodke/5f+tFEJAmvGhl8J9JQJTb0sU9YI4efjOp+BjI
-	 0gkDyp8M+ktADvYLYhGwclOS8R0X7VLnr9Il1I8nS6aIy00tOcDSUEfmnYZF3tq57b
-	 ZeO1VRU396lFYMI1orWTvMC2Rww2lp3NjLXNy7EQqTb2ZUNK/BUZbCxGqolN4Ymsxk
-	 s9VJiZy5shdN38PaHAlDW+R9D74gpcyGNTymEmPoqfpCCFNZfygJ16Jlxi+kcZVh6S
-	 EprQ+zLHjUnwOY9u7SxWkzp6bZSulqLFLittRylrbE9m4RQiCJS0gsdvSjYKQVbKoE
-	 a4djMsYquldvg==
-Date: Fri, 14 Nov 2025 08:20:14 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: [TEST] bond_macvlan_ipvlan.sh flakiness
-Message-ID: <20251114082014.750edfad@kernel.org>
+	s=arc-20240116; t=1763137415; c=relaxed/simple;
+	bh=08UMhVekfnzODHg258j6v7alIEul93sizWVdqDK755I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pewS3i7JQnMf8GlXJCjtTUPduRzAjNZ58RUivkNzxJ8UdEGy96S69N96Q7dchcQSn8g3AcylmBk1Q7MotLs2/CQKoETmmWAO3wRSd8GI21qpbs25lu/3fQ6K7SxfjhztzTHEi+B2kGaB3Q+YI/ttPF2xEJjTWtSpK5/mFxbvmYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f8Awmdgx; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3434700be69so2747452a91.1
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 08:23:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763137414; x=1763742214; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/YlbrZzTl/MWfTO6W+9TMn8CctXsku7j8hxAqkLvD38=;
+        b=f8AwmdgxSj9eznwehU65Xpfe113Vl494Cehacz8/OilpO2fZMb2QgIDXwhZ9GuJsMf
+         NBtqlAHbhwf5XKXHxS+IEP5l9hEi4uhe8Hx6pjm3IkcITB4AY0c2AHaV26VO+CKyeMtU
+         3D826JKSqgye5b8aizBshN1NhDziQBDyucTefC57YgG6za3U1DoWhqTvve8jp8avessN
+         b7n1zVS2bX82OZzusK3r7Zdjp1TQsNbrOl6rIAyBWlIRofEieprgk3JouLKYjeMXJxe/
+         TxlZXNRE7KYPJtW5nQE6DwTipfdB7KPozN7Y3M4xKLCI5ic7VmYvaR7ME0AmmwGgEjs+
+         S5jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763137414; x=1763742214;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/YlbrZzTl/MWfTO6W+9TMn8CctXsku7j8hxAqkLvD38=;
+        b=H/XVTCOAejklXgpka4yZwzaGWVyqMTkvj8WbVG/o2h/SxYkOFXFlzb3A3yu84aUJyw
+         GfnhRs49Wgu7vflGOISTSaA1YJ/03lf+wTWsiTzoa5cW7QB6eibyyo+Z01iZmVRWtXDo
+         CPCjIMZDS6mG9YP88N/jnmaMJME+jzJuKqDd9SSanMHiqaOAfT680DeGRTaoJD/DEjoR
+         8pMgjr/J5mAC0Zg3D06cVAjNf0XzIkXrTAevmwWyyBh9SjjPckWm3XO/rmdW4ASl42gU
+         +j+kB0UE8adwumg2uMZVCu1WrV0o9x+TRGSc0/MhoNM9WiihweKhztUkb9aqvCJgvIb7
+         9qOg==
+X-Forwarded-Encrypted: i=1; AJvYcCWlEDV6lPCNsMPGJ+/owUoHggwSMGs1B0B8LnPV/X7B2v+g7IwTGmP4yuD6mKEhM95zEhdaNBA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzL04+APbAEmy4TJJPKGIzoZ2CuyOHUWDN3iRAdlrsJsX6UWhCK
+	gZmwzo6bS2iBSX2blt4gz+ZJilqL7hWZksfmeH0sO+SdPbUFtOUIMexWMeIk
+X-Gm-Gg: ASbGncuaAf/G+1bIVeO9VvFB/SAg6h55ToWSt248U55TIBlCNV+iDyZF1yY/LG5H/ox
+	GEegZ68QPo7aFD0AwxF0RDNqS8/Ok3Kn+swps+OEO4asqbg5kHEL1ABRoibGs70RsOmLspOzEEn
+	gZbFF1/00f5hGnBZln+RYankTjCS3Wh6GdXhcyXn62GCa00ul3TCqakbasmasdmbByIh/udApj4
+	1aCwuPXCunnYUs1NaQjIkym7dcHqyE9lOxt5ZukbQ3XAqA3uWR83JBzVsqu45GFuJ8M9n04u7Jc
+	6kwybnzMCRPPLMv2nD1O/3GZSZuBTMrwxCDL8y7gY2MdXaY1l5esn3Le/CxQyAtcqWP+pbaeZ9d
+	S0lhbA7rzClk1qzTuaGdpqVaNzw+U8IMFMbJ2yxQhinQgduEUS/ISo3D33lveBLRJfIv1aSP2A6
+	ieWb566e8aHzhmrB0cCJBPHYUVual+Ixs1e8z6Ie5pgCHjPAh1KfDC+WeDAEb/K79XXMpOJ0AfZ
+	k/twhJIs8C60y6h7K8ox/xNZKsDtmuXjAgVbB6v7V9O9MsyREOrRoJHrsIZV55gZIg6tXPXR2vp
+	wg==
+X-Google-Smtp-Source: AGHT+IGmHmCEt7ubcY4pkEZLszbXZLk6Ci4T9fQqgSf5JbWXKIXcZ0Pqm/APxGewYx9HSHzcYBRGmQ==
+X-Received: by 2002:a17:90b:2dca:b0:340:c179:3657 with SMTP id 98e67ed59e1d1-343fa7569femr4452805a91.33.1763137413401;
+        Fri, 14 Nov 2025 08:23:33 -0800 (PST)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3456511fa6fsm949975a91.1.2025.11.14.08.23.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Nov 2025 08:23:33 -0800 (PST)
+Date: Fri, 14 Nov 2025 08:23:32 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shuah@kernel.org, ast@kernel.org, hawk@kernel.org,
+	john.fastabend@gmail.com, sdf@fomichev.me,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next] selftests: drv-net: xdp: make the XDP qstats
+ tests less flaky
+Message-ID: <aRdXhE0a-P3Ep1YE@mini-arch>
+References: <20251113152703.3819756-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251113152703.3819756-1-kuba@kernel.org>
 
-Hi Hangbin!
+On 11/13, Jakub Kicinski wrote:
+> The XDP qstats tests send 2k packets over a single socket.
+> Looks like when netdev CI is busy running those tests in QEMU
+> occasionally flakes. The target doesn't get to run at all
+> before all 2000 packets are sent.
+> 
+> Lower the number of packets to 1000 and reopen the socket
+> every 50 packets, to give RSS a chance to spread the packets
+> to multiple queues.
+> 
+> For the netdev CI testing either lowering the count or using
+> multiple sockets is enough, but let's do both for extra resiliency.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: shuah@kernel.org
+> CC: ast@kernel.org
+> CC: hawk@kernel.org
+> CC: john.fastabend@gmail.com
+> CC: sdf@fomichev.me
+> CC: linux-kselftest@vger.kernel.org
+> ---
+>  tools/testing/selftests/drivers/net/xdp.py | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/xdp.py b/tools/testing/selftests/drivers/net/xdp.py
+> index a148004e1c36..834a37ae7d0d 100755
+> --- a/tools/testing/selftests/drivers/net/xdp.py
+> +++ b/tools/testing/selftests/drivers/net/xdp.py
+> @@ -687,9 +687,12 @@ from lib.py import ip, bpftool, defer
+>          "/dev/null"
+>      # Listener runs on "remote" in case of XDP_TX
+>      rx_host = cfg.remote if act == XDPAction.TX else None
+> -    # We want to spew 2000 packets quickly, bash seems to do a good enough job
+> -    tx_udp =  f"exec 5<>/dev/udp/{cfg.addr}/{port}; " \
+> -        "for i in `seq 2000`; do echo a >&5; done; exec 5>&-"
+> +    # We want to spew 1000 packets quickly, bash seems to do a good enough job
+> +    # Each reopening of the socket gives us a differenot local port (for RSS)
+> +    tx_udp = "for _ in `seq 20`; do " \
+> +        f"exec 5<>/dev/udp/{cfg.addr}/{port}; " \
+> +        "for i in `seq 50`; do echo a >&5; done; " \
+> +        "exec 5>&-; done"
 
-The flakiness of bond_macvlan_ipvlan.sh has increased quite a lot
-recently. Not sure if there's any correlation with kernel changes,
-I didn't spot anything in bonding itself. Here's the history of runs:
+TIL about bash's /dev/udp, interesting..
 
-https://netdev.bots.linux.dev/contest.html?executor=vmksft-bonding&test=bond-macvlan-ipvlan-sh
-
-It looks like it's gotten much worse starting around the 9th?
-
-Only the non-debug kernel build is flaking, debug builds are completely
-clear:
-
-https://netdev.bots.linux.dev/flakes.html?min-flip=0&tn-needle=bond-macvlan-ipvlan-sh
-
-A few things that stood out to me, all the failures are like this:
-
-# TEST: balance-$lb/$$$vlan_bridge: IPv4: client->$$$vlan_2   [FAIL]
-
-Always IPv4 ping to the second interface, always fails neighbor
-resolution:
-
-# 192.0.2.12 dev eth0 FAILED 
-
-If it's ipvlan that fails rather than macvlan there is a bunch of
-otherhost drops:
-
-# 17: ipvlan0@if15: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-#     link/ether 00:0a:0b:0c:0d:01 brd ff:ff:ff:ff:ff:ff link-netns s-8BLcCn
-#     RX:  bytes packets errors dropped  missed   mcast           
-#            702      10      0       0       0       3 
-#     RX errors:  length    crc   frame    fifo overrun otherhost
-#                      0      0       0       0       0         4
-
-FWIW here's the contents of the branches if you want to look thru:
-https://netdev.bots.linux.dev/static/nipa/branch_deltas/net-next-2025-11-09--12-00.html
-but 9th was the weekend, and the failure just got more frequent,
-we've been trying to track this down for a while..
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
