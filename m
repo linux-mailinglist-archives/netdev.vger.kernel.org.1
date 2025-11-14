@@ -1,202 +1,161 @@
-Return-Path: <netdev+bounces-238708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 737BFC5E532
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 17:49:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0913CC5E07E
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 47CC43A7B66
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 15:42:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3531D4266E2
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 15:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225133358CC;
-	Fri, 14 Nov 2025 15:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4468532693F;
+	Fri, 14 Nov 2025 15:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MLVrMTf4"
+	dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b="VvTWjdu/"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx12.kaspersky-labs.com (mx12.kaspersky-labs.com [91.103.66.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DA033375F
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 15:29:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B23324B37;
+	Fri, 14 Nov 2025 15:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.103.66.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763134170; cv=none; b=I7GHg354NPjEJuFnUzTPaNN3S0IHrCkS3aZaaGv4pqhdBy1mrKjLo5J7KZqZrcf5CMFS/AV7XIHlxkBRa92KK2wTNWlbd0l9dOywlpBFD/ACmKuaf6hbXZ8u0eriLVl9KD8rRwcLdNBFcT0/okR+b+gdmoHHX03YE9p7wa5+phU=
+	t=1763134640; cv=none; b=GAWgBHU1t5EEfD6JjVeSXYdWuJ76ZLT44lJjDnyRzKLQW5Hc6oKEj2hviX2jWa0kw1vYLZN4poAcKFCt8s9IIXM5dJkGPH/K+0Hjm05aUavwSLx5o+BUxJGJvLP6hbAYgK0FxYJRUwwVi/pg2r0K8B0kpibrHGJpe0XMFEA4JrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763134170; c=relaxed/simple;
-	bh=buLEXxKTio/q7yy+nF9f8FXb1Aqqxw5iQi6XWS+mvN8=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=TDvTkCs0JUNYAlOr0lFJNLX1JwIFXJg2mfDVDQ7HlbhACmYGsUpVPzRqXqflR+aumSsb0/dFCVq2MkUUe73272zjYmv375/sm8XfAH5tlQcHuS/rWoAgkLVJIxnWiSLYMwDBYVe4onqA2emre95SBc8ucvd1IKNRa7+q5w7nGHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MLVrMTf4; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qmAr7y1MZIR7+UMwfpzen+bn9PyappMKRUAOO+ujmB0=; b=MLVrMTf4O/qqzJTMxOQnuOj8K0
-	cmyBJ65/oaZbjSaRY+CfruCbgSfG9Dze66kdVsNBnMrfsmtHlfmZLv5hUxJQRnPoKpuT1wEfLybk7
-	mK7mcfC9K9pJXie7IOkXZL2wLZb/SuE2JigLEVDfF4ByYjg/gb4D5Gr1fZlutfa/cQIlq4bSwPNQF
-	RrTCfbZEhJnw/rK+PQOKJfveRVD2Lp2aUMthPwnnMbKCfeDHiWzG/OTGTUqGmTn7F55H7fFYuEOkp
-	5b3+A4rATAPtjujPtlb6Qxml3R5BwfGxEVCnhD5EahynJvS8ylhaAHKeWIRSVaQ3gKKRaRcEEl+K+
-	SiQNTjBw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:58390 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vJvjh-0000000079N-1Iao;
-	Fri, 14 Nov 2025 15:29:17 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vJvjf-0000000EVkO-1ZaO;
-	Fri, 14 Nov 2025 15:29:15 +0000
-In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
-References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Inochi Amaoto <inochiama@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	sophgo@lists.linux.dev
-Subject: [PATCH net-next 11/11] net: stmmac: remove unnecessary .pkt_route
- queue initialisation
+	s=arc-20240116; t=1763134640; c=relaxed/simple;
+	bh=cQ7eMejPaewNvutj2v8yiSjRQ6v7SnuGpQRvXwOm5xo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kn5bs/4DqXnHz7ugFNOMfal/ugRPoODuQR2I/cZBuWzrlI1xnIaV6aruul5CzIq3UXdghzWtMx/1+hRxlxBXOLNGwnXEBtr94Hd0DyHhTomE8FcqliZXH91atX6QUuBq2/YSmI4ummVdKXen6Zzsi01RWfCBx5F7VJpXPAJCOyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com; spf=pass smtp.mailfrom=kaspersky.com; dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b=VvTWjdu/; arc=none smtp.client-ip=91.103.66.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaspersky.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+	s=mail202505; t=1763134635;
+	bh=GGOj8LlQdVsREg5vvYEETdm1mSAlF0ngl/ZOJBGxSJs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=VvTWjdu/ISRuIB5RTiEqVOs9EObXaQMUjfUZ+rUocxBbF9IkSJf9REnaFueTUCgpv
+	 iHleMoal6VAIn7xPHpxh4ivgeOOqmd16w9ZzQ+K5w16jYVjcSMXtNJ8LpmmaBWS7P9
+	 UMUAZqHt8LvvHgoNCVIFkyVOSJkgiAkdTUmoYoK4r28sj7HDejdZMXipH0eN0bikGr
+	 VlCUhAeLssrDJvSm4zsnDPrjBfz5LI2OYr/G4ZeBuMy4hRnzHP2ld0Y8DdMy743WSF
+	 W20OcmTIlMJRRmGqLzl4xkwjzkLmGN93owEcSmHLSwwQlaVun4dcK9E/yOPh9dFams
+	 +iDa5qDpTIW6g==
+Received: from relay12.kaspersky-labs.com (localhost [127.0.0.1])
+	by relay12.kaspersky-labs.com (Postfix) with ESMTP id 12BD55A17B1;
+	Fri, 14 Nov 2025 18:37:15 +0300 (MSK)
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+	by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 0863A5A1A93;
+	Fri, 14 Nov 2025 18:37:13 +0300 (MSK)
+Received: from zhigulin-p.avp.ru (10.16.104.190) by HQMAILSRV2.avp.ru
+ (10.64.57.52) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.29; Fri, 14 Nov
+ 2025 18:36:16 +0300
+From: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
+To: Byungho An <bh74.an@samsung.com>
+CC: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Siva Reddy <siva.kallam@samsung.com>, Girish K S
+	<ks.giri@samsung.com>, Vipul Pandya <vipul.pandya@samsung.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH net] net: samsung: sxgbe: handle clk_prepare_enable() failures in sxgbe_open()
+Date: Fri, 14 Nov 2025 18:36:14 +0300
+Message-ID: <20251114153616.3278623-1-Pavel.Zhigulin@kaspersky.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vJvjf-0000000EVkO-1ZaO@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 14 Nov 2025 15:29:15 +0000
+Content-Type: text/plain
+X-ClientProxiedBy: HQMAILSRV2.avp.ru (10.64.57.52) To HQMAILSRV2.avp.ru
+ (10.64.57.52)
+X-KSE-ServerInfo: HQMAILSRV2.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 11/14/2025 15:25:01
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 198109 [Nov 14 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: Pavel.Zhigulin@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 76 0.3.76
+ 6aad6e32ec76b30ee13ccddeafeaa4d1732eef15
+X-KSE-AntiSpam-Info: {Tracking_cluster_exceptions}
+X-KSE-AntiSpam-Info: {Tracking_real_kaspersky_domains}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: kaspersky.com:5.0.1,7.1.1;zhigulin-p.avp.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: {Tracking_white_helo}
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/14/2025 15:28:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/14/2025 2:08:00 PM
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/11/14 12:42:00 #27925085
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 52
 
-PCI drivers explicitly set .pkt_route to zero. However, as the struct
-is allocated using devm_kzalloc(), all members default to zero unless
-explicitly initialised. Thus, explicitly setting these to zero is
-unnecessary. Remove these. This leaves only stmmac_platform.c where
-this is explicitly initialised depending on DT properties.
+sxgbe_open() didn't check result of clk_prepare_enable() call.
 
-$ grep '\.pkt_route =' *.c
-dwmac-intel.c: plat->rx_queues_cfg[0].pkt_route = 0x0;
-dwmac-intel.c: plat->rx_queues_cfg[i].pkt_route = 0x0;
-dwmac-loongson.c: plat->rx_queues_cfg[0].pkt_route = 0x0;
-stmmac_main.c: if (priv->plat->rx_queues_cfg[queue].pkt_route == 0x0)
-stmmac_pci.c: plat->rx_queues_cfg[0].pkt_route = 0x0;
-stmmac_pci.c: plat->rx_queues_cfg[i].pkt_route = 0x0;
-stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = PACKET_AVCPQ;
-stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = PACKET_PTPQ;
-stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = PACKET_DCBCPQ;
-stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = PACKET_UPQ;
-stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = PACKET_MCBCQ;
-stmmac_platform.c: plat->rx_queues_cfg[queue].pkt_route = 0x0;
+Add missing check
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Fixes: 1edb9ca69e8a ("net: sxgbe: add basic framework for Samsung 10Gb ethernet driver")
+Signed-off-by: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c     | 9 +--------
- drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c  | 3 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c      | 7 +------
- drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 2 --
- 4 files changed, 2 insertions(+), 19 deletions(-)
+ drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-index 72f6acde544f..8938e7a59925 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-@@ -569,9 +569,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
- 	plat->force_sf_dma_mode = 1;
- 
- 	plat->mdio_bus_data->needs_reset = true;
--
--	/* Disable RX queues routing by default */
--	plat->rx_queues_cfg[0].pkt_route = 0x0;
+diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c b/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c
+index 75bad561b352..6b8e54391d7f 100644
+--- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c
++++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c
+@@ -1063,7 +1063,12 @@ static int sxgbe_open(struct net_device *dev)
+ 	struct sxgbe_priv_data *priv = netdev_priv(dev);
+ 	int ret, queue_num;
+
+-	clk_prepare_enable(priv->sxgbe_clk);
++	ret = clk_prepare_enable(priv->sxgbe_clk);
++	if (ret < 0) {
++		netdev_err(dev, "%s: Cannot enable clock (error: %d)\n",
++			   __func__, ret);
++		goto clk_error;
++	}
+
+ 	sxgbe_check_ether_addr(priv);
+
+@@ -1195,6 +1200,7 @@ static int sxgbe_open(struct net_device *dev)
+ phy_error:
+ 	clk_disable_unprepare(priv->sxgbe_clk);
+
++clk_error:
+ 	return ret;
  }
- 
- static struct phylink_pcs *intel_mgbe_select_pcs(struct stmmac_priv *priv,
-@@ -612,13 +609,9 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
- 
- 	plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
- 
--	for (i = 0; i < plat->rx_queues_to_use; i++) {
-+	for (i = 0; i < plat->rx_queues_to_use; i++)
- 		plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
- 
--		/* Disable RX queues routing by default */
--		plat->rx_queues_cfg[i].pkt_route = 0x0;
--	}
--
- 	for (i = 0; i < plat->tx_queues_to_use; i++) {
- 		plat->tx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index c64a24bb060f..5f9472f47e35 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -98,9 +98,6 @@ static void loongson_default_data(struct pci_dev *pdev,
- 	/* Increase the default value for multicast hash bins */
- 	plat->multicast_filter_bins = 256;
- 
--	/* Disable RX queues routing by default */
--	plat->rx_queues_cfg[0].pkt_route = 0x0;
--
- 	plat->clk_ref_rate = 125000000;
- 	plat->clk_ptp_rate = 125000000;
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-index 2f45b7986903..2fd4660838bb 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-@@ -27,9 +27,6 @@ static void common_default_data(struct plat_stmmacenet_data *plat)
- 	plat->force_sf_dma_mode = 1;
- 
- 	plat->mdio_bus_data->needs_reset = true;
--
--	/* Disable RX queues routing by default */
--	plat->rx_queues_cfg[0].pkt_route = 0x0;
- }
- 
- static int stmmac_default_data(struct pci_dev *pdev,
-@@ -77,10 +74,8 @@ static int snps_gmac5_default_data(struct pci_dev *pdev,
- 	}
- 
- 	plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
--	for (i = 0; i < plat->rx_queues_to_use; i++) {
-+	for (i = 0; i < plat->rx_queues_to_use; i++)
- 		plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
--		plat->rx_queues_cfg[i].pkt_route = 0x0;
--	}
- 
- 	plat->bus_id = 1;
- 	plat->phy_interface = PHY_INTERFACE_MODE_GMII;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index e769638586fe..1fefa6c55db1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -196,8 +196,6 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
- 			plat->rx_queues_cfg[queue].pkt_route = PACKET_UPQ;
- 		else if (of_property_read_bool(q_node, "snps,route-multi-broad"))
- 			plat->rx_queues_cfg[queue].pkt_route = PACKET_MCBCQ;
--		else
--			plat->rx_queues_cfg[queue].pkt_route = 0x0;
- 
- 		queue++;
- 	}
--- 
-2.47.3
+
+--
+2.43.0
 
 
