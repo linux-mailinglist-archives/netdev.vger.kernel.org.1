@@ -1,69 +1,76 @@
-Return-Path: <netdev+bounces-238714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDF47C5E21A
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 17:13:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 890E6C5E7BD
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 18:14:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEF1A42488C
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:05:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A0AF73A0A8B
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBAFF31B83B;
-	Fri, 14 Nov 2025 15:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5169D32D7DB;
+	Fri, 14 Nov 2025 16:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b="KlFJoQtC"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="j8UpDDNZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx12.kaspersky-labs.com (mx12.kaspersky-labs.com [91.103.66.155])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A8B315777;
-	Fri, 14 Nov 2025 15:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.103.66.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1BE032D449;
+	Fri, 14 Nov 2025 16:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763135783; cv=none; b=iW+coIV/Hl9Dt1aG82oOzbVu0dkNJWBa/wZEErABNW1jLjBXGSWonpmGm9zQcCcueFSYPTOuWn/7gqPGNr6i4+JfqFSHM5PW7tE2CNWx/+d6pNA8H3g019Ml20s3zQVMd+hQ3x4p8cAosQ1w5eJOiTvmnWPh0ZbDmXYYFMeiQ9c=
+	t=1763136219; cv=none; b=IlF880fYH63aSgwEtin9erpbTEVkeCxCT3C8EYuAEFNNOzXrPn2OTCAkKYY6Xhs2qsB4X6qLacjAtINOWjljcmPdHNnSlB7WdlIYbWCc3y0ElLV+GK0Yw1wJyJ1MUMz4c5N32Ujoc186e91AMkM+lCMiyXXw/Uk40axsyk4FoBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763135783; c=relaxed/simple;
-	bh=GTe7rjQArXm9Jvhr/1+AaZMCTV37ChVrtVknGqvvavo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Geg+mzuCHxyU9pDd16Hr5mtUQotiDLzNcxijm+uW9xIVlRyI6tXRAYpIJ7umBxXD2CJLrNEkPQR7SpnPWmtCff/vu+7Z6bEuw4eEmI9Axke2PoXebdgNeX7Op0SH+2tFq+ius2C6Jyf2sSnml8w9XAvpCNa2iLZsUie/s94DrA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com; spf=pass smtp.mailfrom=kaspersky.com; dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b=KlFJoQtC; arc=none smtp.client-ip=91.103.66.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaspersky.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-	s=mail202505; t=1763135780;
-	bh=y4SDX/1GdpbWKhuMsarQXHUPLRNPCdexVegUqbW62Vs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=KlFJoQtC22dpCNQqqa7/IWbq3YawzGIKtcf9PX40ZxKVhveuUlpevQjVEcPbjg4y3
-	 pxaj5BSxRrAiDGGBc28OoUo2M8Zsi+eSxBHFQ8iGv0siYFOFmmxla1GwQxG8GVOjBr
-	 nEzvCM6mK4iVdRTn982gzKLv9CbuTw4L3voo3/f1tQi7P5EyUMhoCHO021NkZrH9hL
-	 ziWnVInYJHWehL5TzMu2yfyuWXcMJacq2tSwiIkNOx5QkZFIuKb8xybyexN9jU+L0o
-	 9E48oZ5JzxxQEBk/6mZOn6nL9ZWPMoslpu2f13b2CDVrboVrwccLMc1B0dlI8il9C6
-	 elAU9ELmU5I5g==
-Received: from relay12.kaspersky-labs.com (localhost [127.0.0.1])
-	by relay12.kaspersky-labs.com (Postfix) with ESMTP id 0BBBB5A5483;
-	Fri, 14 Nov 2025 18:56:20 +0300 (MSK)
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-	by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 080615A49C8;
-	Fri, 14 Nov 2025 18:56:19 +0300 (MSK)
-Received: from zhigulin-p.avp.ru (10.16.104.190) by HQMAILSRV2.avp.ru
- (10.64.57.52) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.29; Fri, 14 Nov
- 2025 18:55:19 +0300
-From: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>
-CC: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Michal Simek
-	<michal.simek@amd.com>, Esben Haabendal <esben@geanix.com>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH net] net: xilinx: ll_temac: handle of_address_to_resource() failure in MDIO setup
-Date: Fri, 14 Nov 2025 18:55:18 +0300
-Message-ID: <20251114155519.3524628-1-Pavel.Zhigulin@kaspersky.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1763136219; c=relaxed/simple;
+	bh=UQvfqMIxn+7USSiP0F4nA0IVKN2RF+Ag4N9jiQjtM9g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SAqTiLWyt/VUT8nzgldwgHDiE2srzifVYgeWXn41dbRr9Mz5Jlb22wq3aX1ySAt+ZnLmh84zuylWEUrbsDByowiVfWuF1UQINJpOKmONBwsa5h3Vifet1/yw3Beva06b0vE6eUDEALFTB75iNCTtfIRqTenQvB3IrU+7++cATnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=j8UpDDNZ; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AECv49t001403;
+	Fri, 14 Nov 2025 16:03:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=7KBzqYMar8raGBq7LNnXBQEaX4aZg
+	mfqEFaee1HkP1E=; b=j8UpDDNZ5kEeIq5rUuBeGby6b1wCNOurvgomGcEig/1mS
+	9C978H3HfKuQYrfafb+sDcVaMEr5nBrbLJaYts3Y0+4Qdg6avSYgiWQ4gnlUYfGk
+	IF9S4DoVurTJjZmRAFGxrcG3Mp4MWHpp2urgnN/b12oLze/OqtwJxf7rQ47nrNGh
+	SqWg4DoysO6pjPR/DSW21bcqrrf+0OqMvy3tMMamQ6wgk9pDlyTEYxaJ5YbN9t+W
+	IN4lcWmgsPi89Ms1sJcCU4BZiopMutOL1JXjdpVLWSAdKIXjxcz52jShdMVBK+ut
+	7jtwQ1v0hNC6HpqD5t/SH1l+8BuEcEjGNrKvcz3oQ==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4adr8s9edn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 14 Nov 2025 16:03:19 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AEEFS15022034;
+	Fri, 14 Nov 2025 16:03:19 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4a9vadpv3h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 14 Nov 2025 16:03:19 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AEG3IZB029266;
+	Fri, 14 Nov 2025 16:03:18 GMT
+Received: from oracle (dhcp-10-154-173-166.vpn.oracle.com [10.154.173.166])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4a9vadpv0s-1;
+	Fri, 14 Nov 2025 16:03:18 +0000
+From: gregory.herrero@oracle.com
+To: aleksandr.loktionov@intel.com, anthony.l.nguyen@intel.com,
+        przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Gregory Herrero <gregory.herrero@oracle.com>
+Subject: [PATCH v3 0/1] i40e: additional safety check
+Date: Fri, 14 Nov 2025 17:03:03 +0100
+Message-ID: <20251114160304.2576306-1-gregory.herrero@oracle.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,82 +78,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: HQMAILSRV4.avp.ru (10.64.57.54) To HQMAILSRV2.avp.ru
- (10.64.57.52)
-X-KSE-ServerInfo: HQMAILSRV2.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 11/14/2025 15:35:04
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 198111 [Nov 14 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: Pavel.Zhigulin@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 76 0.3.76
- 6aad6e32ec76b30ee13ccddeafeaa4d1732eef15
-X-KSE-AntiSpam-Info: {Tracking_cluster_exceptions}
-X-KSE-AntiSpam-Info: {Tracking_real_kaspersky_domains}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: kaspersky.com:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;zhigulin-p.avp.ru:7.1.1,5.0.1
-X-KSE-AntiSpam-Info: {Tracking_white_helo}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/14/2025 15:36:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/14/2025 2:08:00 PM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/11/14 12:42:00 #27925085
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 52
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-14_04,2025-11-13_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 phishscore=0
+ mlxlogscore=999 spamscore=0 suspectscore=0 bulkscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
+ definitions=main-2511140129
+X-Authority-Analysis: v=2.4 cv=VqQuwu2n c=1 sm=1 tr=0 ts=691752c8 b=1 cx=c_pps
+ a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
+ a=9rXuIt3xGVaoFKTACzIA:9
+X-Proofpoint-ORIG-GUID: vU9oM9JmRxHYy9ZW7VZbdLPD5efe2-wm
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEzMDE3OCBTYWx0ZWRfX2uMUE8vU6QV5
+ i66lk5VJa8+3tuHNR1Xi599A0zy3PId/Kjp3pVY4X9KleMk/1EiEJ4deidUe3VtY0Cn3bsXhzwd
+ 3plo10r7ZLDrrH3jsZmMlFwrfDWxcnJQsJRwzd6gJo/fArDEKhSwCkuB359HFuDybWfJfkVnGoX
+ 83FHnkBnfskpVBb8TohlX4Mwwuj8yGlvlcEA25Elbo8LEaXi0AlbAcIYZDuEeVjvtb4UDM+lnx5
+ fYUskLrjwdJbGyq51/6aFw6I9MgOl/tarK7UOtSFubglzTqMOdBsG5Vvh/Fc8Hbzhy6XXpJgU6R
+ pDDP4JnkEP1Imi24eACDbxQ9UvG9PkLNPEo/UPd8xgf2vT2Ccky0eoJc9/S3pdz8G2Uk4wLmwF9
+ OChzwnnyugfPPO4wa1rETR0kglikPQ==
+X-Proofpoint-GUID: vU9oM9JmRxHYy9ZW7VZbdLPD5efe2-wm
 
-temac_mdio_setup() ignores potential errors from
-of_address_to_resource() call and continues with
-an uninitialized resource.
+From: Gregory Herrero <gregory.herrero@oracle.com>
 
-Add return value check for of_address_to_resource()
-call in temac_mdio_setup().
+On code inspection, I realized we may want to check ring_len parameter
+against hardware specific values in i40e_config_vsi_tx_queue() and
+i40e_config_vsi_rx_queue().
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+v3:
+- drop trailing period from the subject
+- reword commit description
+- remove u32 cast in i40e_config_vsi_rx_queue()
+v2:
+- make i40e_get_max_num_descriptors() 'pf' argument const.
+- reword i40e_get_max_num_descriptors() description.
+- modify commit description to explain potential behavior change.
 
-Fixes: 8425c41d1ef7 ("net: ll_temac: Extend support to non-device-tree platforms")
-Signed-off-by: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
----
- drivers/net/ethernet/xilinx/ll_temac_mdio.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Gregory Herrero (1):
+  i40e: validate ring_len parameter against hardware-specific values
 
-diff --git a/drivers/net/ethernet/xilinx/ll_temac_mdio.c b/drivers/net/ethernet/xilinx/ll_temac_mdio.c
-index 07a9fb49eda1..ab23dc233768 100644
---- a/drivers/net/ethernet/xilinx/ll_temac_mdio.c
-+++ b/drivers/net/ethernet/xilinx/ll_temac_mdio.c
-@@ -98,7 +98,9 @@ int temac_mdio_setup(struct temac_local *lp, struct platform_device *pdev)
- 		return -ENOMEM;
+ drivers/net/ethernet/intel/i40e/i40e.h          | 17 +++++++++++++++++
+ drivers/net/ethernet/intel/i40e/i40e_ethtool.c  | 12 ------------
+ .../net/ethernet/intel/i40e/i40e_virtchnl_pf.c  |  4 ++--
+ 3 files changed, 19 insertions(+), 14 deletions(-)
 
- 	if (np) {
--		of_address_to_resource(np, 0, &res);
-+		rc = of_address_to_resource(np, 0, &res);
-+		if (rc)
-+			return rc;
- 		snprintf(bus->id, MII_BUS_ID_SIZE, "%.8llx",
- 			 (unsigned long long)res.start);
- 	} else if (pdata) {
---
-2.43.0
+-- 
+2.51.0
 
 
