@@ -1,196 +1,210 @@
-Return-Path: <netdev+bounces-238639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8D24C5C6CB
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 11:03:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DCC2AC5C776
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 11:10:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2E98B4EBE60
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 09:37:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C82C94F9B66
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 10:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C22306D52;
-	Fri, 14 Nov 2025 09:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029E030AD10;
+	Fri, 14 Nov 2025 10:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cy5pyOOW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LhX5vnil"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3F827D782;
-	Fri, 14 Nov 2025 09:37:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC20A2D73A3;
+	Fri, 14 Nov 2025 10:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763113042; cv=none; b=USI5Jrb1K7VWh81BEXiJCfMXqHxVIb0xkd5haVV5Ax87kdgEedLPQsRaOg9uinkxX1lstcRVSY3sa6STdcjcBY5JUiQ8fZL+i2i8kQsr1E9jHELpoicK6Xc8JNL4YvGkSCuMiAWRfHTbRt0wcdIJ2nL8E01PnDAQtZASBob1vxc=
+	t=1763114453; cv=none; b=kSv3clbLPuyaAWreWKDKUoxdJj8kWW4SwzpKMpO3TS153mrul8NJd1Irm7klIOhP/hdFoO71NSCkK6lTufpH0uvj4ieey/g0m/czV0Ao4i8ABl6tKYoK4tW3f+/pBRP2lsQFqvyOsiBKrM/5XearHZLp0Sak9Dn5IjIc6HsMaJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763113042; c=relaxed/simple;
-	bh=VVIqPEqnNo0EhTLfDg/0eZ9CprIn3SbGY9+ZPeN0Utc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AfAOmnzhHh18uhNbu48C+jm+ER89qtWOPvqn5eka14jcvC0Tb07DfMM4OLqWfETRS8GRn7ISuRuqJ5pDZMhyt0aR5z545YCOh5xKhm0GjO98/RwqPXyZoTEeNS0rBNqQas5H++DsVeUSdFXFudzHiU1LfxnawYQLvVGrMsIRGAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cy5pyOOW; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763113040; x=1794649040;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VVIqPEqnNo0EhTLfDg/0eZ9CprIn3SbGY9+ZPeN0Utc=;
-  b=cy5pyOOWZEVnJZASCUI1zz6vXcjN7uUqs8UOVMJeZfx3cMqaIlxzurkP
-   8YVcgyqduY81vpWdnTOwo/KbP7Z0y+aA7nfGYbdMvodO1Y+c1YYyy8gko
-   Z6Psjqv04JsoZGnTxLl/sxtWiS599fsPXehE2aQujYUgsboTZxV9t5aEu
-   jGF6ZA34rQ/L6u5t7a7gMMcSeCk+kdz9ehpGPrtwu07kw9cAbL0jMhbJk
-   k57LO3gLn25mmZI8jZkihv7aTO3k0v0sm2Juyj6N69XleHtpIz+tfSpX6
-   ZJD0cFi+PXLQxC0NCWa0cBF5EhQ0y1wFBFG5q/hNLwPShJoiR97wXx7nw
-   g==;
-X-CSE-ConnectionGUID: +mnZg9JaQLqnvBeMZMwxnQ==
-X-CSE-MsgGUID: jpRJI2BrQtGdBMjslrOSbQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11612"; a="65092737"
-X-IronPort-AV: E=Sophos;i="6.19,304,1754982000"; 
-   d="scan'208";a="65092737"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 01:37:19 -0800
-X-CSE-ConnectionGUID: C3+0W0jSRQaX7Eh3jk8OUA==
-X-CSE-MsgGUID: AaynQJoFQ06GVme5Xvfr7g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,304,1754982000"; 
-   d="scan'208";a="189001449"
-Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 14 Nov 2025 01:37:17 -0800
-Received: from kbuild by 7b01c990427b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vJqF0-0006Pv-1s;
-	Fri, 14 Nov 2025 09:37:14 +0000
-Date: Fri, 14 Nov 2025 17:36:49 +0800
-From: kernel test robot <lkp@intel.com>
-To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Shiva Tripathi <s-tripathi1@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 3/4] crypto: ti - Add support for AES-GCM in DTHEv2
- driver
-Message-ID: <202511141721.73B0pu4H-lkp@intel.com>
-References: <20251111112137.976121-4-t-pratham@ti.com>
+	s=arc-20240116; t=1763114453; c=relaxed/simple;
+	bh=yXdik3qblw9W6slk3JMRfjEQ0RUHvUCkdnP6MjfqTyQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ItqddqtER3MAESFdSQMnWzM7/twx40Zt1DGNbRf26myRJCSsi5vaKCWIZxfEzUL9PSDO51pjfPvi5UQaF3bmpnsiCxyxwIHdPUTkCQk+n+WuZBblZFFND2Hn43EGv8m8dtTZewOxD+zPP0zcXRIALGAYNKXH4hDWcheL1Wi8gNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LhX5vnil; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94636C4CEFB;
+	Fri, 14 Nov 2025 10:00:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763114453;
+	bh=yXdik3qblw9W6slk3JMRfjEQ0RUHvUCkdnP6MjfqTyQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LhX5vnilJoGh37ITgXmtVtpeAIFV40wNBTpoHD95YQ7qYwJuirQ83Q+BZ/mEDesaP
+	 cSThoCZCqjLJtEcQ7XYxw0c4OOgpTdVNXbv8eMB7L6UCGnMDLJrx5K0XQyWZxFlVBJ
+	 GoNdEOcBj7YbIIkAAtv/DJDOAvOls5oa3AkK6thO5ISCDAbWUqepaGtFyeqFq6oARD
+	 h1Fp6tICwFb39b0vWCNFMCTchszVJ/BarS/TVXU3xnxobEx/7lZ92RNOlN6ssaF0GL
+	 wfduLhPtPw8gLgpeF5NJUwe9DdAqZu1LdJ0sQBcxubmB41ahQpdU8ioNeUGi3PdhKC
+	 kkn4HBP/VzBjw==
+Message-ID: <545ef721-8e86-4b1f-9333-41e37b46e4d6@kernel.org>
+Date: Fri, 14 Nov 2025 11:00:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251111112137.976121-4-t-pratham@ti.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v5 3/3] selftests/bpf: Add mptcp test with sockmap
+Content-Language: en-GB, fr-BE
+To: Martin KaFai Lau <martin.lau@linux.dev>,
+ Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Florian Westphal <fw@strlen.de>, Christoph Paasch <cpaasch@apple.com>,
+ Peter Krystad <peter.krystad@linux.intel.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20251111060307.194196-1-jiayuan.chen@linux.dev>
+ <20251111060307.194196-4-jiayuan.chen@linux.dev>
+ <a92e2c4a-bfde-4a74-8bb5-5e2b8ca87199@linux.dev>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <a92e2c4a-bfde-4a74-8bb5-5e2b8ca87199@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Pratham,
+Hi Martin,
 
-kernel test robot noticed the following build errors:
+On 13/11/2025 22:48, Martin KaFai Lau wrote:
+>> diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/
+>> testing/selftests/bpf/prog_tests/mptcp.c
+>> index f8eb7f9d4fd2..b976fe626343 100644
+>> --- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
+>> +++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
+>> @@ -6,11 +6,14 @@
+>>   #include <netinet/in.h>
+>>   #include <test_progs.h>
+>>   #include <unistd.h>
+>> +#include <error.h>
+> 
+> I changed to errno.h to be specific. I think you only need the values of
+> an errno here.
+>>   #include "cgroup_helpers.h"
+>>   #include "network_helpers.h"
+>> +#include "socket_helpers.h"
+>>   #include "mptcp_sock.skel.h"
+>>   #include "mptcpify.skel.h"
+>>   #include "mptcp_subflow.skel.h"
+>> +#include "mptcp_sockmap.skel.h"
+>>     #define NS_TEST "mptcp_ns"
+>>   #define ADDR_1    "10.0.1.1"
+>> @@ -436,6 +439,142 @@ static void test_subflow(void)
+>>       close(cgroup_fd);
+>>   }
+>>   +/* Test sockmap on MPTCP server handling non-mp-capable clients. */
+>> +static void test_sockmap_with_mptcp_fallback(struct mptcp_sockmap *skel)
+>> +{
+>> +    int listen_fd = -1, client_fd1 = -1, client_fd2 = -1;
+>> +    int server_fd1 = -1, server_fd2 = -1, sent, recvd;
+>> +    char snd[9] = "123456789";
+>> +    char rcv[10];
+>> +
+>> +    /* start server with MPTCP enabled */
+>> +    listen_fd = start_mptcp_server(AF_INET, NULL, 0, 0);
+>> +    if (!ASSERT_OK_FD(listen_fd, "sockmap-fb:start_mptcp_server"))
+>> +        return;
+>> +
+>> +    skel->bss->trace_port = ntohs(get_socket_local_port(listen_fd));
+>> +    skel->bss->sk_index = 0;
+>> +    /* create client without MPTCP enabled */
+>> +    client_fd1 = connect_to_fd_opts(listen_fd, NULL);
+>> +    if (!ASSERT_OK_FD(client_fd1, "sockmap-fb:connect_to_fd"))
+>> +        goto end;
+>> +
+>> +    server_fd1 = xaccept_nonblock(listen_fd, NULL, NULL);
+>> +    skel->bss->sk_index = 1;
+>> +    client_fd2 = connect_to_fd_opts(listen_fd, NULL);
+>> +    if (!ASSERT_OK_FD(client_fd2, "sockmap-fb:connect_to_fd"))
+>> +        goto end;
+>> +
+>> +    server_fd2 = xaccept_nonblock(listen_fd, NULL, NULL);
+>> +    /* test normal redirect behavior: data sent by client_fd1 can be
+>> +     * received by client_fd2
+>> +     */
+>> +    skel->bss->redirect_idx = 1;
+>> +    sent = xsend(client_fd1, snd, sizeof(snd), 0);
+>> +    if (!ASSERT_EQ(sent, sizeof(snd), "sockmap-fb:xsend(client_fd1)"))
+>> +        goto end;
+>> +
+>> +    /* try to recv more bytes to avoid truncation check */
+>> +    recvd = recv_timeout(client_fd2, rcv, sizeof(rcv), MSG_DONTWAIT, 2);
+> 
+> I removed the socket_helpers.h usage. The _nonblock, _timeout, and
+> MSG_DONTWAIT are unnecessary. I replaced them with the regular accept,
+> send, and recv. All fds from network_helpers.c have a default 3s
+> timeout instead of 30s in xaccept_nonblock. This matches how most of
+> the selftests/bpf are doing it as well.
+> 
+> I also touched up the commit message in patch 2 based on Matt's comment.
 
-[auto build test ERROR on herbert-crypto-2.6/master]
-[also build test ERROR on linus/master v6.18-rc5]
-[cannot apply to herbert-cryptodev-2.6/master next-20251114]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Thank you for having applied the patches, and for the modifications you did!
 
-url:    https://github.com/intel-lab-lkp/linux/commits/T-Pratham/crypto-ti-Add-support-for-AES-XTS-in-DTHEv2-driver/20251111-192827
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
-patch link:    https://lore.kernel.org/r/20251111112137.976121-4-t-pratham%40ti.com
-patch subject: [PATCH v6 3/4] crypto: ti - Add support for AES-GCM in DTHEv2 driver
-config: s390-randconfig-002-20251114 (https://download.01.org/0day-ci/archive/20251114/202511141721.73B0pu4H-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 11.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251114/202511141721.73B0pu4H-lkp@intel.com/reproduce)
+> Applied. Thanks.
+> 
+>> +    server_fd = xaccept_nonblock(listen_fd, NULL, NULL);
+>> +    err = bpf_map_update_elem(bpf_map__fd(skel->maps.sock_map),
+>> +                  &zero, &server_fd, BPF_NOEXIST);
+> 
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511141721.73B0pu4H-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_init_tfm':
->> drivers/crypto/ti/dthev2-aes.c:573:24: error: implicit declaration of function 'crypto_alloc_sync_aead'; did you mean 'crypto_alloc_aead'? [-Werror=implicit-function-declaration]
-     573 |         ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
-         |                        ^~~~~~~~~~~~~~~~~~~~~~
-         |                        crypto_alloc_aead
-   drivers/crypto/ti/dthev2-aes.c:573:22: warning: assignment to 'struct crypto_sync_aead *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-     573 |         ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
-         |                      ^
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_exit_tfm':
->> drivers/crypto/ti/dthev2-aes.c:588:9: error: implicit declaration of function 'crypto_free_sync_aead'; did you mean 'crypto_free_aead'? [-Werror=implicit-function-declaration]
-     588 |         crypto_free_sync_aead(ctx->aead_fb);
-         |         ^~~~~~~~~~~~~~~~~~~~~
-         |         crypto_free_aead
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_setkey':
->> drivers/crypto/ti/dthev2-aes.c:831:9: error: implicit declaration of function 'crypto_sync_aead_clear_flags'; did you mean 'crypto_aead_clear_flags'? [-Werror=implicit-function-declaration]
-     831 |         crypto_sync_aead_clear_flags(ctx->aead_fb, CRYPTO_TFM_REQ_MASK);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         |         crypto_aead_clear_flags
->> drivers/crypto/ti/dthev2-aes.c:832:9: error: implicit declaration of function 'crypto_sync_aead_set_flags'; did you mean 'crypto_aead_set_flags'? [-Werror=implicit-function-declaration]
-     832 |         crypto_sync_aead_set_flags(ctx->aead_fb,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-         |         crypto_aead_set_flags
->> drivers/crypto/ti/dthev2-aes.c:836:16: error: implicit declaration of function 'crypto_sync_aead_setkey'; did you mean 'crypto_aead_setkey'? [-Werror=implicit-function-declaration]
-     836 |         return crypto_sync_aead_setkey(ctx->aead_fb, key, keylen);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~
-         |                crypto_aead_setkey
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_setauthsize':
->> drivers/crypto/ti/dthev2-aes.c:846:16: error: implicit declaration of function 'crypto_sync_aead_setauthsize'; did you mean 'crypto_aead_setauthsize'? [-Werror=implicit-function-declaration]
-     846 |         return crypto_sync_aead_setauthsize(ctx->aead_fb, authsize);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         |                crypto_aead_setauthsize
-   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_do_fallback':
->> drivers/crypto/ti/dthev2-aes.c:854:9: error: implicit declaration of function 'SYNC_AEAD_REQUEST_ON_STACK'; did you mean 'SYNC_SKCIPHER_REQUEST_ON_STACK'? [-Werror=implicit-function-declaration]
-     854 |         SYNC_AEAD_REQUEST_ON_STACK(subreq, ctx->aead_fb);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-         |         SYNC_SKCIPHER_REQUEST_ON_STACK
->> drivers/crypto/ti/dthev2-aes.c:854:36: error: 'subreq' undeclared (first use in this function)
-     854 |         SYNC_AEAD_REQUEST_ON_STACK(subreq, ctx->aead_fb);
-         |                                    ^~~~~~
-   drivers/crypto/ti/dthev2-aes.c:854:36: note: each undeclared identifier is reported only once for each function it appears in
-   drivers/crypto/ti/dthev2-aes.c:863:1: warning: control reaches end of non-void function [-Wreturn-type]
-     863 | }
-         | ^
-   cc1: some warnings being treated as errors
-
-
-vim +573 drivers/crypto/ti/dthev2-aes.c
-
-   563	
-   564	static int dthe_aead_init_tfm(struct crypto_aead *tfm)
-   565	{
-   566		struct dthe_tfm_ctx *ctx = crypto_aead_ctx(tfm);
-   567		struct dthe_data *dev_data = dthe_get_dev(ctx);
-   568	
-   569		ctx->dev_data = dev_data;
-   570	
-   571		const char *alg_name = crypto_tfm_alg_name(crypto_aead_tfm(tfm));
-   572	
- > 573		ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
-   574						      CRYPTO_ALG_NEED_FALLBACK);
-   575		if (IS_ERR(ctx->aead_fb)) {
-   576			dev_err(dev_data->dev, "fallback driver %s couldn't be loaded\n",
-   577				alg_name);
-   578			return PTR_ERR(ctx->aead_fb);
-   579		}
-   580	
-   581		return 0;
-   582	}
-   583	
-   584	static void dthe_aead_exit_tfm(struct crypto_aead *tfm)
-   585	{
-   586		struct dthe_tfm_ctx *ctx = crypto_aead_ctx(tfm);
-   587	
- > 588		crypto_free_sync_aead(ctx->aead_fb);
-   589	}
-   590	
-
+Cheers,
+Matt
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Sponsored by the NGI0 Core fund.
+
 
