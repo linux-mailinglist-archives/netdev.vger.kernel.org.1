@@ -1,198 +1,264 @@
-Return-Path: <netdev+bounces-238789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3D02C5F7AC
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 23:14:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 349C0C5F7A6
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 23:14:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C18F535BA5A
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:14:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 17A8B4E27E2
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 626F633469F;
-	Fri, 14 Nov 2025 22:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66848345731;
+	Fri, 14 Nov 2025 22:14:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uj4Y1tHg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PePrhLLT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77D8305962
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E49315D46
 	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 22:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763158444; cv=none; b=c2VDvDDPP6c+iie1w5Rvsrt5TfwU2fx8QpInkkMrBxVypf/SPEFcRVkdEHDvDgJZIbORcVLxzPQPbZuYOZOEShmtl9BNDjp+OgWw52V9NsLk4ZaqFT3yGbzFZZ0sP4wKNfrIw6TsSxgYB9UpR8xCca2+cMSZQs2NAmXiDGd2Igk=
+	t=1763158445; cv=none; b=B8OQHWzrv1IAm60coMV73yItEYdCqz2Is0NIihwl5mRr0fpsfmWhoZLO1vZableBfKIQcsW0y8xpyj4Cwkv7NxNYHQrMqj/BDArFQ1eXlAZkTEulmzlKWxb0AY6Fva96d/7+BfvX8Vmm8I0i+UhrLA0HnYg0QbLyYd7xx/CTQRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763158444; c=relaxed/simple;
-	bh=Owby5H7jdngP852ftk9fRAmiepxGeMpEc0LbSSSgKWM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uN9CZouJdlTSOgtrrv9YXSuUBAPIzYDBCuNv7JftGV9jKbUrJBrf662O5Vr6WARsToa+Qdg2ue0h9RQoMi9phQ8Vifxo8IAVzgvtlfgO4GK856r4uz9CiBLVXD0feFmJs4jOXdHTapxiiY6sbznDI8l0mq7EP+snRSUM2C0Cb9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uj4Y1tHg; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1763158445; c=relaxed/simple;
+	bh=YFL5fxxxqEKSNlrulASCd7JeiIbvYBc7XWyMFO10QBg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NRi5PmIsXuTLimJqqD8QclxFldCNjHUdb93crPRdSjCn7bRaWykn8CivK9aK/vXQccbsPQIzM0l9jSN9ejHlk48cpZBYCldvpYRqw7wqgLHehWHcULn4O7Ns73GHcEa+A2FLw3n25fuhKDRKwf7GluV5/8Wo8WQBCsWI7lcpPKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PePrhLLT; arc=none smtp.client-ip=209.85.128.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-29516a36affso26480175ad.3
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-71d60157747so21506217b3.0
         for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 14:14:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1763158442; x=1763763242; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fbJf7s0/EWM//OleC4de+kmb2AQITT3NnIaKxfa60oc=;
-        b=Uj4Y1tHgWEeX17l7piy/iEO4e1Qey0/H32dm1Kd24WlII4dIZcK8Qi/pKzVCXpGevM
-         a1xWkb/+KT9h/8ymK5mSkSqQmKMp9gNP5WIesQMM9QE/DTLKDS54XFKf/CeWGBquhSaA
-         v0y+GO3fw7D54TM+xxfeslt0xS3E+ua3Ke21z62xihfbCjCdJsj71r8WgBKraZ7xSVei
-         r6q6XqJg8L78gU/Xhl3Z79m5KqCV1XSbko0SuUYWbHMZ51wO2dLDMjdyrt8eYs6O4SVS
-         dt24YUyvX5i/BEQqbqoFikn8vbMMEBAfMO0LtfNorVzU1Ej/n9EKQARoqYdYoFmOd4xY
-         0EZQ==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Hykq0AZOv3Mcxta5MvKVi28KK2hR4lRzOujGk7TFas=;
+        b=PePrhLLTUfQKtexRSDhq0+vDtTlm8UAtG/uf2zh9cA+PrBKJxVesO866zg8Z2GfUu5
+         L9jJ683+mjToHB0dZPr0hHg3CDKtoSRxpelPY11Jf89hueGcpka8XspVLMb26GH8BFxh
+         tWyeRoY9KgAXWjfVUJA3mdg+W9PRITh64Txaa2MFr7UyiXy81VLB53P5sZ2Ym4pClIG3
+         xrAL5sYYYUvd2I2cEUNGP/g3nmq6KpaXFqCdSiLnClhV3WMT4rW9XJbT9Gnxpo522th0
+         vwoZVCrX1PK42Ay8ln8cSZ1MUWgZMPNiIMbMb4KNqxT0h5TVOoFT9sobhP6X7koat3u9
+         fNSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1763158442; x=1763763242;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fbJf7s0/EWM//OleC4de+kmb2AQITT3NnIaKxfa60oc=;
-        b=moVc5a+GLVtr8g/XESmyLFJBRcxElAKaXeO4Ty/RwZS7n0PFq03/2y/w/hYeTv48xX
-         xeP22nFGTwZR3/TByaifIpNxpLellUVjL7ZwAyl/SP8y/lgc0Bpn0IqYAUxEP+kaVSBF
-         3WQNWAo3EjAJ/E4yNqInd3s+O0IklOGaBg5DmUsafawcsorF6R+VAfhY5O77blHiIH4C
-         7GwzdeYBrF6HIB2/Jboinu0l7Hz9xfeOzTWF5X8rVAyPRmbuTybqKDQFkoU9TjtZAA0h
-         xnWx5/0zmQLTu7VR/KxCK7DVBfYRH4sFICecN2MHM5mw86U+zIQtAN5bcy00DzfQq4N/
-         Tf6w==
-X-Forwarded-Encrypted: i=1; AJvYcCWS+9wN7LPKqG9xv4D+JvPL8qCuB03gk6eRsWvbalaSzv4bTEIEC7MS+nKiAaPN3ba811XS288=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPzxPEWa4cWb3YKVmqRAF+8qDl9UdWyyHvk7dtnC2e9nWNBpsQ
-	heyOu9zVaMstubp/K0oPaMQBRlgeJDlTkL3zAzfaCm6joBkP5M7UsvH+Gtqimg==
-X-Gm-Gg: ASbGncu/QApJ7aWIqOJFdB2IDJdkWKSeyRMsV09sDmQJUjMV2YKhqeicdkdLV7dXnF1
-	zq1PD830In7RW9+CRni2zIkMCviJOH6AScCOw/oF2XRn2QW7O3ZlClMEQzM7HjQXYHrXmjcNYGJ
-	qS3vdWJTb/hULozOBGxcemFEv/Cz99FyxR72qtBaBt6k+eanWZKCpUcVxNM97y/644eJt7e3I4G
-	f7gX32wzfYM+oZWp9pE7mH+NAWObc+DvPN/nYNoWzDopmoHS7Vt4GI2aWCT77wRr3aocoCYlZNt
-	hYm0+OrZoTiKwD3os1FXc2jG0b1Oc7+HqJVKbtaZCV7UtdBjg2B4DPC/bhMMOoyahH5sqXgW5NM
-	2xo47xTF89/CwnhR+LWG/PvE2qBpFJwVTeFfuviEiAIMzV56yuxc60jObcMsbCEyxnUJA311HAT
-	5EqbZarkJK5ggtU2rKprw/kCGgN/dnYbDCJ70MrXTBzt3hV1axUMA7+8s=
-X-Google-Smtp-Source: AGHT+IGuxdj+fzFRvUVpJ7iYQV1JoWBB3KHH+LT2fxfC8hIV1ONVxBgHeL2VgTF68P8xAO8jeo7NRg==
-X-Received: by 2002:a17:902:ce01:b0:269:4759:904b with SMTP id d9443c01a7336-2986a7569f4mr47611075ad.58.1763158441682;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5Hykq0AZOv3Mcxta5MvKVi28KK2hR4lRzOujGk7TFas=;
+        b=Tnnn+RDFayB55eSUWIEfLc39740ZE3h1aYD8+Okb1a2ozUJROu5tFvyUZpJfxELTTC
+         RY8r8mjcK1JyMVma8rxf1/kcaVgAHEKVCFB/O3vrJcpfXweZplAf5FDnLucmsENJ7nyp
+         HPo3GT1zuSDBd26omfrjmE8nLQKYYAnFHhX7TUrxB9QGgEdS3BCHY/PiuQPopHMWk6MF
+         OPms+dHTxOBsP8gDPTokzdJULP04GKNHu2S0iJeOPtTFwE32PMB2V3FLAHZcW90PREsD
+         uRCyfvTgucam8zV1laCValQGqQZj2pGS56h+zsksW6ppduITXYmnclwDs+lU+g0xOrLA
+         SXdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVF7ftRZ+Dg6KvayN6YJfT2mpeSE38weFXGgXhyN7l8Y/PZuhj0etIcLW9UoMpR+PJbwze/x18=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx61kAJRW43cPIMClpaHQdASZiZ8liZO+XFA6nbrNvw3NjhLSwh
+	HxoOOPxru3yzqh7f5VkspWKPSffqCr6+N1FEIei2ymlVXjAQLwDAyjO5
+X-Gm-Gg: ASbGncsfXMJ4P/j4COPdbVhx6s+dh1jq3cZD/UW1CRu+Myy31g9mAqSBOeTDLBPbt/J
+	2fscjnyx8Sok/CXbDGeppZaqQy3lfAgBX3/5IvJrYTIId2L+V/7VTe+KlJiS3yiXVz4oaKqHYim
+	NOhUVXP0J9bt3UoLbDPit7EqskhPtlGX0K++lnQ+7mpu8lJEKduDI7oeHoAurBhRdurmtpxV+sK
+	wLNSHBTAGENNLAfF7/DPodz1MawcTo7LucGprtV2IJs7ML38XYhh5qV6SboKHltVnkXXwkXjPAO
+	sOV7mcafhnuI7wVMoXP1FcbgbwHNBX8W8kFXjtjCFIGujSF/TFiMpYcLRd3eaNHienyBR035yEE
+	EkVXIWILmwzUg88MXJ2uGrvVYHK6GY7cxuBRXyqRbdnqtrV7P/Kc8Z0x1CqfBlaTiwccFVm+zJp
+	p4CVRq+m5Q/kP8AW7K8JHTMNsZVWkPeKS7ZBzrsm9YWvAhOg==
+X-Google-Smtp-Source: AGHT+IGcJZO4HUiY70v/QCO/xzK+nTyMf7KdDebKqAftSKwEa0NHlBS6WCaAwow7uyA9ZmNwfg0Gcg==
+X-Received: by 2002:a05:690c:7603:b0:788:ee99:f125 with SMTP id 00721157ae682-78929e0d4a5mr32556247b3.2.1763158441752;
         Fri, 14 Nov 2025 14:14:01 -0800 (PST)
-Received: from localhost.localdomain ([2601:600:837f:c6b0:18cf:ab6c:cac0:3007])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2348afsm66154105ad.3.2025.11.14.14.13.59
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 14 Nov 2025 14:14:00 -0800 (PST)
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: torvalds@linux-foundation.org
-Cc: bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@kernel.org,
-	netdev@vger.kernel.org,
-	rostedt@goodmis.org
-Subject: [GIT PULL] BPF fixes for 6.18-rc6
-Date: Fri, 14 Nov 2025 14:13:58 -0800
-Message-ID: <20251114221358.71656-1-alexei.starovoitov@gmail.com>
-X-Mailer: git-send-email 2.50.1
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:c::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78822151d43sm19410627b3.46.2025.11.14.14.14.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Nov 2025 14:14:01 -0800 (PST)
+Date: Fri, 14 Nov 2025 14:13:59 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v9 06/14] vsock/loopback: add netns support
+Message-ID: <aRepp4Weuhaxgn6W@devvm11784.nha0.facebook.com>
+References: <20251111-vsock-vmtest-v9-0-852787a37bed@meta.com>
+ <20251111-vsock-vmtest-v9-6-852787a37bed@meta.com>
+ <g6bxp6hketbjrddzni2ln37gsezqvxbu2orheorzh7fs66roll@hhcrgsos3ui3>
+ <aRTRhk/ok06YKTEu@devvm11784.nha0.facebook.com>
+ <g5dcyor4aryvtcnqxm5aekldbettetlmog3c7sj7sjx3yp2pgy@hcpxyubied2n>
+ <aRYivEKsa44u5Mh+@devvm11784.nha0.facebook.com>
+ <kwgjzpxxqpkgwafydp65vlj6jlf7h7kcnhwgtwrrhzp2qtgkkq@z3xfl26ejspl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <kwgjzpxxqpkgwafydp65vlj6jlf7h7kcnhwgtwrrhzp2qtgkkq@z3xfl26ejspl>
 
-Hi Linus,
+On Fri, Nov 14, 2025 at 10:33:42AM +0100, Stefano Garzarella wrote:
+> On Thu, Nov 13, 2025 at 10:26:04AM -0800, Bobby Eshleman wrote:
+> > On Thu, Nov 13, 2025 at 04:24:44PM +0100, Stefano Garzarella wrote:
+> > > On Wed, Nov 12, 2025 at 10:27:18AM -0800, Bobby Eshleman wrote:
+> > > > On Wed, Nov 12, 2025 at 03:19:47PM +0100, Stefano Garzarella wrote:
+> > > > > On Tue, Nov 11, 2025 at 10:54:48PM -0800, Bobby Eshleman wrote:
+> > > > > > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > > > >
+> > > > > > Add NS support to vsock loopback. Sockets in a global mode netns
+> > > > > > communicate with each other, regardless of namespace. Sockets in a local
+> > > > > > mode netns may only communicate with other sockets within the same
+> > > > > > namespace.
+> > > > > >
+> > > > > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > 
+> > [...]
+> > 
+> > > > > > @@ -131,7 +136,41 @@ static void vsock_loopback_work(struct work_struct *work)
+> > > > > > 		 */
+> > > > > > 		virtio_transport_consume_skb_sent(skb, false);
+> > > > > > 		virtio_transport_deliver_tap_pkt(skb);
+> > > > > > -		virtio_transport_recv_pkt(&loopback_transport, skb, NULL, 0);
+> > > > > > +
+> > > > > > +		/* In the case of virtio_transport_reset_no_sock(), the skb
+> > > > > > +		 * does not hold a reference on the socket, and so does not
+> > > > > > +		 * transitively hold a reference on the net.
+> > > > > > +		 *
+> > > > > > +		 * There is an ABA race condition in this sequence:
+> > > > > > +		 * 1. the sender sends a packet
+> > > > > > +		 * 2. worker calls virtio_transport_recv_pkt(), using the
+> > > > > > +		 *    sender's net
+> > > > > > +		 * 3. virtio_transport_recv_pkt() uses t->send_pkt() passing the
+> > > > > > +		 *    sender's net
+> > > > > > +		 * 4. virtio_transport_recv_pkt() free's the skb, dropping the
+> > > > > > +		 *    reference to the socket
+> > > > > > +		 * 5. the socket closes, frees its reference to the net
+> > > > > > +		 * 6. Finally, the worker for the second t->send_pkt() call
+> > > > > > +		 *    processes the skb, and uses the now stale net pointer for
+> > > > > > +		 *    socket lookups.
+> > > > > > +		 *
+> > > > > > +		 * To prevent this, we acquire a net reference in vsock_loopback_send_pkt()
+> > > > > > +		 * and hold it until virtio_transport_recv_pkt() completes.
+> > > > > > +		 *
+> > > > > > +		 * Additionally, we must grab a reference on the skb before
+> > > > > > +		 * calling virtio_transport_recv_pkt() to prevent it from
+> > > > > > +		 * freeing the skb before we have a chance to release the net.
+> > > > > > +		 */
+> > > > > > +		net_mode = virtio_vsock_skb_net_mode(skb);
+> > > > > > +		net = virtio_vsock_skb_net(skb);
+> > > > >
+> > > > > Wait, we are adding those just for loopback (in theory used only for
+> > > > > testing/debugging)? And only to support virtio_transport_reset_no_sock() use
+> > > > > case?
+> > > >
+> > > > Yes, exactly, only loopback + reset_no_sock(). The issue doesn't exist
+> > > > for vhost-vsock because vhost_vsock holds a net reference, and it
+> > > > doesn't exist for non-reset_no_sock calls because after looking up the
+> > > > socket we transfer skb ownership to it, which holds down the skb -> sk ->
+> > > > net reference chain.
+> > > >
+> > > > >
+> > > > > Honestly I don't like this, do we have any alternative?
+> > > > >
+> > > > > I'll also try to think something else.
+> > > > >
+> > > > > Stefano
+> > > >
+> > > >
+> > > > I've been thinking about this all morning... maybe
+> > > > we can do something like this:
+> > > >
+> > > > ```
+> > > >
+> > > > virtio_transport_recv_pkt(...,  struct sock *reply_sk) {... }
+> > > >
+> > > > virtio_transport_reset_no_sock(..., reply_sk)
+> > > > {
+> > > > 	if (reply_sk)
+> > > > 		skb_set_owner_sk_safe(reply, reply_sk)
+> > > 
+> > > Interesting, but what about if we call skb_set_owner_sk_safe() in
+> > > vsock_loopback.c just before calling virtio_transport_recv_pkt() for every
+> > > skb?
+> > 
+> > I think the issue with this is that at the time vsock_loopback calls
+> > virtio_transport_recv_pkt() the reply skb hasn't yet been allocated by
+> > virtio_transport_reset_no_sock() and we can't wait for it to return
+> > because the original skb may be freed by then.
+> 
+> Right!
+> 
+> > 
+> > We might be able to keep it all in vsock_loopback if we removed the need
+> > to use the original skb or sk by just using the net. But to do that we
+> > would need to add a netns_tracker per net somewhere. I guess that would
+> > end up in a list or hashmap in struct vsock_loopback.
+> > 
+> > Another option that does simplify a little, but unfortunately still doesn't keep
+> > everything in loopback:
+> > 
+> > @@ -1205,7 +1205,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
+> > 	if (!reply)
+> > 		return -ENOMEM;
+> > 
+> > -	return t->send_pkt(reply, net, net_mode);
+> > +	return t->send_pkt(reply, net, net_mode, skb->sk);
+> > }
+> > 
+> > @@ -27,11 +27,16 @@ static u32 vsock_loopback_get_local_cid(void)
+> > }
+> > 
+> > static int vsock_loopback_send_pkt(struct sk_buff *skb, struct net *net,
+> > -				   enum vsock_net_mode net_mode)
+> > +				   enum vsock_net_mode net_mode,
+> > +				   struct sock *rst_owner)
+> > {
+> > 	struct vsock_loopback *vsock = &the_vsock_loopback;
+> > 	int len = skb->len;
+> > 
+> > +	if (!skb->sk && rst_owner)
+> > +		WARN_ONCE(!skb_set_owner_sk_safe(skb, rst_owner),
+> > +			  "loopback socket has sk_refcnt == 0\n");
+> > +
+> 
+> This doesn't seem too bad IMO, but at this point, why we can't do that
+> in virtio_transport_reset_no_sock() for any kind of transport?
+> 
+> I mean, in any case the RST packet should be handled by the same net of the
+> "sender", no?
+> 
+> At this point, can we just put the `vsk` of the sender in the `info` and
+> virtio_transport_alloc_skb() will already do that.
+> 
+> WDYT?
+> Am I missing something?
 
-The following changes since commit 6146a0f1dfae5d37442a9ddcba012add260bceb0:
+This is the right answer... I'm pretty sure this works out-of-the-box
+for all transports.
 
-  Linux 6.18-rc4 (2025-11-02 11:28:02 -0800)
+I'll implement it and report back with a new rev if all good or come
+back to this thread to discuss if any issues arise.
 
-are available in the Git repository at:
+Have a good weekend!
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-fixes
-
-for you to fetch changes up to 6c762611fed7365790000925f3d14f20037d0061:
-
-  selftests/bpf: Test widen_imprecise_scalars() with different stack depth (2025-11-14 09:26:28 -0800)
-
-----------------------------------------------------------------
-- Fix interaction between livepatch and BPF fexit programs (Song Liu)
-  With Steven and Masami acks.
-
-- Fix stack ORC unwind from BPF kprobe_multi (Jiri Olsa)
-  With Steven and Masami acks.
-
-- Fix out of bounds access in widen_imprecise_scalars() in the verifier
-  (Eduard Zingerman)
-
-- Fix conflicts between MPTCP and BPF sockmap (Jiayuan Chen)
-
-- Fix net_sched storage collision with BPF data_meta/data_end (Eric Dumazet)
-
-- Add _impl suffix to BPF kfuncs with implicit args to avoid
-  breaking them in bpf-next when KF_IMPLICIT_ARGS is added (Mykyta Yatsenko)
-
-Signed-off-by: Alexei Starovoitov <ast@kernel.org>
-----------------------------------------------------------------
-Alexei Starovoitov (3):
-      Merge branch 'fix-ftrace-for-livepatch-bpf-fexit-programs'
-      Merge branch 'bpf-add-_impl-suffix-for-kfuncs-with-implicit-args'
-      Merge branch 'x86-fgraph-bpf-fix-orc-stack-unwind-from-return-probe'
-
-Eduard Zingerman (2):
-      bpf: account for current allocated stack depth in widen_imprecise_scalars()
-      selftests/bpf: Test widen_imprecise_scalars() with different stack depth
-
-Eric Dumazet (1):
-      bpf: Add bpf_prog_run_data_pointers()
-
-Jiayuan Chen (3):
-      mptcp: Disallow MPTCP subflows from sockmap
-      mptcp: Fix proto fallback detection with BPF
-      selftests/bpf: Add mptcp test with sockmap
-
-Jiri Olsa (4):
-      Revert "perf/x86: Always store regs->ip in perf_callchain_kernel()"
-      x86/fgraph,bpf: Fix stack ORC unwind from kprobe_multi return probe
-      selftests/bpf: Add stacktrace ips test for kprobe_multi/kretprobe_multi
-      selftests/bpf: Add stacktrace ips test for raw_tp
-
-Martin KaFai Lau (1):
-      Merge branch 'mptcp-fix-conflicts-between-mptcp-and-sockmap'
-
-Mykyta Yatsenko (2):
-      bpf:add _impl suffix for bpf_task_work_schedule* kfuncs
-      bpf: add _impl suffix for bpf_stream_vprintk() kfunc
-
-Song Liu (3):
-      ftrace: Fix BPF fexit with livepatch
-      ftrace: bpf: Fix IPMODIFY + DIRECT in modify_ftrace_direct()
-      selftests/bpf: Add tests for livepatch + bpf trampoline
-
- arch/x86/events/core.c                             |  10 +-
- arch/x86/include/asm/ftrace.h                      |   5 +
- arch/x86/kernel/ftrace_64.S                        |   8 +-
- include/linux/filter.h                             |  20 +++
- include/linux/ftrace.h                             |  10 +-
- kernel/bpf/helpers.c                               |  26 ++--
- kernel/bpf/stream.c                                |   3 +-
- kernel/bpf/trampoline.c                            |   5 -
- kernel/bpf/verifier.c                              |  18 +--
- kernel/trace/ftrace.c                              |  60 ++++++---
- net/mptcp/protocol.c                               |   6 +-
- net/mptcp/subflow.c                                |   8 ++
- net/sched/act_bpf.c                                |   6 +-
- net/sched/cls_bpf.c                                |   6 +-
- tools/bpf/bpftool/Documentation/bpftool-prog.rst   |   2 +-
- tools/lib/bpf/bpf_helpers.h                        |  28 ++--
- tools/testing/selftests/bpf/config                 |   3 +
- .../bpf/prog_tests/livepatch_trampoline.c          | 107 +++++++++++++++
- tools/testing/selftests/bpf/prog_tests/mptcp.c     | 140 +++++++++++++++++++
- .../selftests/bpf/prog_tests/stacktrace_ips.c      | 150 +++++++++++++++++++++
- tools/testing/selftests/bpf/progs/iters_looping.c  |  53 ++++++++
- .../selftests/bpf/progs/livepatch_trampoline.c     |  30 +++++
- tools/testing/selftests/bpf/progs/mptcp_sockmap.c  |  43 ++++++
- tools/testing/selftests/bpf/progs/stacktrace_ips.c |  49 +++++++
- tools/testing/selftests/bpf/progs/stream_fail.c    |   6 +-
- tools/testing/selftests/bpf/progs/task_work.c      |   6 +-
- tools/testing/selftests/bpf/progs/task_work_fail.c |   8 +-
- .../testing/selftests/bpf/progs/task_work_stress.c |   4 +-
- .../testing/selftests/bpf/test_kmods/bpf_testmod.c |  26 ++++
- 29 files changed, 762 insertions(+), 84 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/livepatch_trampoline.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/stacktrace_ips.c
- create mode 100644 tools/testing/selftests/bpf/progs/livepatch_trampoline.c
- create mode 100644 tools/testing/selftests/bpf/progs/mptcp_sockmap.c
- create mode 100644 tools/testing/selftests/bpf/progs/stacktrace_ips.c
+Best,
+Bobby
 
