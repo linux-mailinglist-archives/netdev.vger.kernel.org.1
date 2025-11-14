@@ -1,169 +1,85 @@
-Return-Path: <netdev+bounces-238550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB4B0C5AEDF
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 02:36:59 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42FDAC5AEF1
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 02:38:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CEE274E054B
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 01:36:55 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BD21E3448E2
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 01:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A0A2571A5;
-	Fri, 14 Nov 2025 01:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6E3261B98;
+	Fri, 14 Nov 2025 01:38:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t/xuhW6c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1jzjRRK"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626FF1DE2C9
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 01:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70099261B71;
+	Fri, 14 Nov 2025 01:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763084210; cv=none; b=UNQvR1UM2dQaMn1eCInG5u/bsg1/lmIEuY1G+huaDvh8bzfM0MrG1x2+Dx/20J3kBOC08b7cmsfjE3Dhgzb1/uXFhYoxHbFe/KASRj9ZJVDaZyO9rsQIOCToq3BdJFzGNsYXbvitUEZdfSOcgn1sQLjo4SIvk+cMoEjq2v2f9g4=
+	t=1763084289; cv=none; b=OHg0TgWDr572rlLkAcp2lXI4AroHlcyV+Jd/J6OEWdoa57M4DzGBMIhxftuuVJSSsTlMsP0SGrLXAIarmmzwuV6EDe2eyQi7z5s3DVWsAHu/Vhy3AhurgceTLqODshy1e3QH6jLen6cnAaTJo4r1xGn68LgJqacy+Sk5Z0sj7Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763084210; c=relaxed/simple;
-	bh=184T6RWPKkrI9yGxqY80YK5leWWcLPxzmE9thnr28BY=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=mZUMtsNlgPzQ4IrQHNYTLULqgs+bklQZ27SkwWR/kSulkxHslNhmCrrd2BaHvFprc44Nfng+IvQ1uoDMeLlKGbCaWjK/jVdJFtDTMt5W/EtANTJ+p/F6oTRpLoY5+Ftbqpd7hcq36KZOw0p9SFDjRkcMkupDcRHn/OFOvE8oezk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t/xuhW6c; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1763084289; c=relaxed/simple;
+	bh=EORKdZAeeFLicUHtkebsHBnjT09RMj8tOEs/adAHAfQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OJEF0pfpnwkyboIAjNcjB7ZJ4W9WKybax73FprARCnOBFQdsFd17Buil89rk82kuNf4IOSa92gZpR3cuNivX5C3y1ZLI+SveMwMM6a2SD50PjcS+lnh5hb5tVL+VjSldUhDDsE8QGmLKw4Wdzf6JunliUKr+fsx1tGLNJHr4YgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1jzjRRK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5995DC4CEF8;
+	Fri, 14 Nov 2025 01:38:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763084288;
+	bh=EORKdZAeeFLicUHtkebsHBnjT09RMj8tOEs/adAHAfQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=K1jzjRRKoA02Sq/DP3gRL0vEFXgM/49xW3vlcMAwWMYf8s20feLit7RWXjYynGJ6M
+	 Z8s8dh28a2B7KABWNdWD1HUU0wSRHJPOk2Tcc7KsNF14cTQFQRDxGECY8R2+c8gWBw
+	 66ND/FDA733jXDG5jzsva9NfcY4aOW8RcwWdNORdG42/CTD/Ersil4+5SeDWY9kAVM
+	 X7J85Gr4cnsLTIm3m9fdm9vhM6IHC4WOgFBcSFsCRSMV8I3VOwoauGuINA/X0QpgfO
+	 p+HuBAM0a5rgknYcDCWGdmSn6gBZanPGcLqzTgyWPDOUypMNO0yZPt12LYABIT7F3l
+	 2M3W0vqHOesTw==
+Date: Thu, 13 Nov 2025 17:38:07 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuQ==?=
+ <a.vatoropin@crpt.ru>
+Cc: Ajit Khaparde <ajit.khaparde@broadcom.com>, Sriharsha Basavapatna
+ <sriharsha.basavapatna@broadcom.com>, Somnath Kotur
+ <somnath.kotur@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Venkata Duvvuru
+ <VenkatKumar.Duvvuru@Emulex.Com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
+ <lvc-project@linuxtesting.org>
+Subject: Re: [PATCH net] be2net: check wrb_params for NULL value
+Message-ID: <20251113173807.32a2ba2f@kernel.org>
+In-Reply-To: <20251112092051.851163-1-a.vatoropin@crpt.ru>
+References: <20251112092051.851163-1-a.vatoropin@crpt.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763084195;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rhAvhoW0qGIKNwEfFjd214od0HqLgMRWs7YHTP4WZaA=;
-	b=t/xuhW6cYzNRhoXeqwXsrq+DVpCFpEEZ10t9Hro34mdAneBTjRM8fcvOodXL4GzWCL08QT
-	w5yBZIDqjrzULT/Bml/Q14gUs+7099w1Lo6UWJV/hf+EAI+ry5Q8OoKTumBnDTAaCcoI57
-	h0iRQ7TrtIz0Fbe6Uq3NbwiDiI7zRGo=
-Date: Fri, 14 Nov 2025 01:36:32 +0000
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <c052bf6e1e5584b806c41dcb63a1d67f6aafa293@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net v5 3/3] selftests/bpf: Add mptcp test with sockmap
-To: "Martin KaFai Lau" <martin.lau@linux.dev>, "Matthieu Baerts"
- <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, "Mat Martineau" <martineau@kernel.org>, "Geliang
- Tang" <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
- "Alexei Starovoitov" <ast@kernel.org>, "Daniel Borkmann"
- <daniel@iogearbox.net>, "Andrii Nakryiko" <andrii@kernel.org>, "Eduard
- Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong
- Song" <yonghong.song@linux.dev>, "John Fastabend"
- <john.fastabend@gmail.com>, "KP Singh" <kpsingh@kernel.org>, "Stanislav
- Fomichev" <sdf@fomichev.me>, "Hao Luo" <haoluo@google.com>, "Jiri Olsa"
- <jolsa@kernel.org>, "Shuah Khan" <shuah@kernel.org>, "Florian Westphal"
- <fw@strlen.de>, "Christoph Paasch" <cpaasch@apple.com>, "Peter Krystad"
- <peter.krystad@linux.intel.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-In-Reply-To: <a92e2c4a-bfde-4a74-8bb5-5e2b8ca87199@linux.dev>
-References: <20251111060307.194196-1-jiayuan.chen@linux.dev>
- <20251111060307.194196-4-jiayuan.chen@linux.dev>
- <a92e2c4a-bfde-4a74-8bb5-5e2b8ca87199@linux.dev>
-X-Migadu-Flow: FLOW_OUT
 
-2025/11/14 05:48, "Martin KaFai Lau" <martin.lau@linux.dev mailto:martin.=
-lau@linux.dev?to=3D%22Martin%20KaFai%20Lau%22%20%3Cmartin.lau%40linux.dev=
-%3E > =E5=86=99=E5=88=B0:
+On Wed, 12 Nov 2025 09:21:04 +0000 =D0=92=D0=B0=D1=82=D0=BE=D1=80=D0=BE=D0=
+=BF=D0=B8=D0=BD =D0=90=D0=BD=D0=B4=D1=80=D0=B5=D0=B9 wrote:
+> Another way would be to pass a valid wrb_params from be_xmit(), but that
+> seems to be redundant as the corresponding bit in wrb_params should have
+> been already set there in advance with a call to be_xmit_workarounds().
 
+I don't think so, or at least I don't see that for all cases..
 
->=20
->=20>=20
->=20> diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools=
-/testing/selftests/bpf/prog_tests/mptcp.c
-> >  index f8eb7f9d4fd2..b976fe626343 100644
-> >  --- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> >  +++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> >  @@ -6,11 +6,14 @@
-> >  #include <netinet/in.h>
-> >  #include <test_progs.h>
-> >  #include <unistd.h>
-> >  +#include <error.h>
-> >=20
->=20I changed to errno.h to be specific. I think you only need the values=
- of an errno here.
->=20
->=20>=20
->=20> #include "cgroup_helpers.h"
-> >  #include "network_helpers.h"
-> >  +#include "socket_helpers.h"
-> >  #include "mptcp_sock.skel.h"
-> >  #include "mptcpify.skel.h"
-> >  #include "mptcp_subflow.skel.h"
-> >  +#include "mptcp_sockmap.skel.h"
-> >  > #define NS_TEST "mptcp_ns"
-> >  #define ADDR_1 "10.0.1.1"
-> >  @@ -436,6 +439,142 @@ static void test_subflow(void)
-> >  close(cgroup_fd);
-> >  }
-> >  > +/* Test sockmap on MPTCP server handling non-mp-capable clients. =
-*/
-> >  +static void test_sockmap_with_mptcp_fallback(struct mptcp_sockmap *=
-skel)
-> >  +{
-> >  + int listen_fd =3D -1, client_fd1 =3D -1, client_fd2 =3D -1;
-> >  + int server_fd1 =3D -1, server_fd2 =3D -1, sent, recvd;
-> >  + char snd[9] =3D "123456789";
-> >  + char rcv[10];
-> >  +
-> >  + /* start server with MPTCP enabled */
-> >  + listen_fd =3D start_mptcp_server(AF_INET, NULL, 0, 0);
-> >  + if (!ASSERT_OK_FD(listen_fd, "sockmap-fb:start_mptcp_server"))
-> >  + return;
-> >  +
-> >  + skel->bss->trace_port =3D ntohs(get_socket_local_port(listen_fd));
-> >  + skel->bss->sk_index =3D 0;
-> >  + /* create client without MPTCP enabled */
-> >  + client_fd1 =3D connect_to_fd_opts(listen_fd, NULL);
-> >  + if (!ASSERT_OK_FD(client_fd1, "sockmap-fb:connect_to_fd"))
-> >  + goto end;
-> >  +
-> >  + server_fd1 =3D xaccept_nonblock(listen_fd, NULL, NULL);
-> >  + skel->bss->sk_index =3D 1;
-> >  + client_fd2 =3D connect_to_fd_opts(listen_fd, NULL);
-> >  + if (!ASSERT_OK_FD(client_fd2, "sockmap-fb:connect_to_fd"))
-> >  + goto end;
-> >  +
-> >  + server_fd2 =3D xaccept_nonblock(listen_fd, NULL, NULL);
-> >  + /* test normal redirect behavior: data sent by client_fd1 can be
-> >  + * received by client_fd2
-> >  + */
-> >  + skel->bss->redirect_idx =3D 1;
-> >  + sent =3D xsend(client_fd1, snd, sizeof(snd), 0);
-> >  + if (!ASSERT_EQ(sent, sizeof(snd), "sockmap-fb:xsend(client_fd1)"))
-> >  + goto end;
-> >  +
-> >  + /* try to recv more bytes to avoid truncation check */
-> >  + recvd =3D recv_timeout(client_fd2, rcv, sizeof(rcv), MSG_DONTWAIT,=
- 2);
-> >=20
->=20I removed the socket_helpers.h usage. The _nonblock, _timeout, and
-> MSG_DONTWAIT are unnecessary. I replaced them with the regular accept,
-> send, and recv. All fds from network_helpers.c have a default 3s
-> timeout instead of 30s in xaccept_nonblock. This matches how most of
-> the selftests/bpf are doing it as well.
->=20
->=20I also touched up the commit message in patch 2 based on Matt's comme=
-nt.
->=20
->=20Applied. Thanks.
->=20
+Since there's just one caller and it has the struct handy I think=20
+it's better to just pass it and avoid the NULL.
 
-Thanks=20for the cleanup and applying!
+BTW there are hard spaces in your commit msg, please try to fix
+that for v2.
+--=20
+pw-bot: cr
 
