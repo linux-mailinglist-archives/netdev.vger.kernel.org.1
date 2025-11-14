@@ -1,85 +1,94 @@
-Return-Path: <netdev+bounces-238551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42FDAC5AEF1
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 02:38:28 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37D72C5AEF7
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 02:40:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BD21E3448E2
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 01:38:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1D5F94E1517
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 01:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6E3261B98;
-	Fri, 14 Nov 2025 01:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C2CB2580FB;
+	Fri, 14 Nov 2025 01:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1jzjRRK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NDbBix69"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70099261B71;
-	Fri, 14 Nov 2025 01:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42384254B19;
+	Fri, 14 Nov 2025 01:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763084289; cv=none; b=OHg0TgWDr572rlLkAcp2lXI4AroHlcyV+Jd/J6OEWdoa57M4DzGBMIhxftuuVJSSsTlMsP0SGrLXAIarmmzwuV6EDe2eyQi7z5s3DVWsAHu/Vhy3AhurgceTLqODshy1e3QH6jLen6cnAaTJo4r1xGn68LgJqacy+Sk5Z0sj7Q0=
+	t=1763084440; cv=none; b=FeG+PNf+v/H07WCVKFBSZPjLh2zscqx+rhKBUMQlj+YMP0R/Ji9mEcfQRVGCMJgeZpNVm8JB9gCcnoUayBvX4MPZooEYlAg8EBrs35comDqX/7nUGSFIGBstN5ducOwLi6HmlbGJ+xlllZ4NZC7ixj0q5j6aDEL3VA7hzjZmdGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763084289; c=relaxed/simple;
-	bh=EORKdZAeeFLicUHtkebsHBnjT09RMj8tOEs/adAHAfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OJEF0pfpnwkyboIAjNcjB7ZJ4W9WKybax73FprARCnOBFQdsFd17Buil89rk82kuNf4IOSa92gZpR3cuNivX5C3y1ZLI+SveMwMM6a2SD50PjcS+lnh5hb5tVL+VjSldUhDDsE8QGmLKw4Wdzf6JunliUKr+fsx1tGLNJHr4YgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1jzjRRK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5995DC4CEF8;
-	Fri, 14 Nov 2025 01:38:08 +0000 (UTC)
+	s=arc-20240116; t=1763084440; c=relaxed/simple;
+	bh=bjWJTG/mURONCI56zoKGanwvp1+pG3xgMrZSoIPl6M8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mQdeC/GKNExIR8VBAWRdgRVlSdJ3m0oSZmZhXZhP7pSIO8YHJI+4m/VdTW6UZ9gzB/iaFfZS0U19YBpEma7HGK4FSJ9ka4izD1lgsvpKo2Am3+x+bj9sNPubwnlF9D8beNEZII9DOYZSiEWXmm5nQDk91hVKdx7hRSUMQHL0WCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NDbBix69; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCF5FC19424;
+	Fri, 14 Nov 2025 01:40:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763084288;
-	bh=EORKdZAeeFLicUHtkebsHBnjT09RMj8tOEs/adAHAfQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K1jzjRRKoA02Sq/DP3gRL0vEFXgM/49xW3vlcMAwWMYf8s20feLit7RWXjYynGJ6M
-	 Z8s8dh28a2B7KABWNdWD1HUU0wSRHJPOk2Tcc7KsNF14cTQFQRDxGECY8R2+c8gWBw
-	 66ND/FDA733jXDG5jzsva9NfcY4aOW8RcwWdNORdG42/CTD/Ersil4+5SeDWY9kAVM
-	 X7J85Gr4cnsLTIm3m9fdm9vhM6IHC4WOgFBcSFsCRSMV8I3VOwoauGuINA/X0QpgfO
-	 p+HuBAM0a5rgknYcDCWGdmSn6gBZanPGcLqzTgyWPDOUypMNO0yZPt12LYABIT7F3l
-	 2M3W0vqHOesTw==
-Date: Thu, 13 Nov 2025 17:38:07 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuQ==?=
- <a.vatoropin@crpt.ru>
-Cc: Ajit Khaparde <ajit.khaparde@broadcom.com>, Sriharsha Basavapatna
- <sriharsha.basavapatna@broadcom.com>, Somnath Kotur
- <somnath.kotur@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Venkata Duvvuru
- <VenkatKumar.Duvvuru@Emulex.Com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
- <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH net] be2net: check wrb_params for NULL value
-Message-ID: <20251113173807.32a2ba2f@kernel.org>
-In-Reply-To: <20251112092051.851163-1-a.vatoropin@crpt.ru>
-References: <20251112092051.851163-1-a.vatoropin@crpt.ru>
+	s=k20201202; t=1763084439;
+	bh=bjWJTG/mURONCI56zoKGanwvp1+pG3xgMrZSoIPl6M8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NDbBix69liiDS81vmGIRt1t5h0DdpUZUGu+fRWfFoPBhtYrQ4inUgu9QAhViXtIbr
+	 JjxCRD3j+Rb71AVrSeXLqCRsBadmDAy1C31xEYzO21Pd3LnnhM3KYkoQxb3h2NCyce
+	 PphbEMkgrrPL8D9dcvoho0Ne21D7hXBUdMfNSQOP8VfGsJMFGMZtvcsvF4/RCI9LvQ
+	 FxAf8XysT5uu/CEMPfvsGeJaHtlqTbtbJF/uvoFjf1d++fG8ORj4iI7bbY4JR0a7/J
+	 DCweEF56Kv0L++EhbBg/uyxOko4rRl6jgzOddCC0EO10EQSEk4/9DXtH/ulj9Lqkr1
+	 q16VNyVzRY3gg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0D43A55F84;
+	Fri, 14 Nov 2025 01:40:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] mlxsw: spectrum: Fix memory leak in
+ mlxsw_sp_flower_stats()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176308440876.1078849.9405097045494975338.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Nov 2025 01:40:08 +0000
+References: <20251112052114.1591695-1-zilin@seu.edu.cn>
+In-Reply-To: <20251112052114.1591695-1-zilin@seu.edu.cn>
+To: Zilin Guan <zilin@seu.edu.cn>
+Cc: idosch@nvidia.com, petrm@nvidia.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
 
-On Wed, 12 Nov 2025 09:21:04 +0000 =D0=92=D0=B0=D1=82=D0=BE=D1=80=D0=BE=D0=
-=BF=D0=B8=D0=BD =D0=90=D0=BD=D0=B4=D1=80=D0=B5=D0=B9 wrote:
-> Another way would be to pass a valid wrb_params from be_xmit(), but that
-> seems to be redundant as the corresponding bit in wrb_params should have
-> been already set there in advance with a call to be_xmit_workarounds().
+Hello:
 
-I don't think so, or at least I don't see that for all cases..
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Since there's just one caller and it has the struct handy I think=20
-it's better to just pass it and avoid the NULL.
+On Wed, 12 Nov 2025 05:21:14 +0000 you wrote:
+> The function mlxsw_sp_flower_stats() calls mlxsw_sp_acl_ruleset_get() to
+> obtain a ruleset reference. If the subsequent call to
+> mlxsw_sp_acl_rule_lookup() fails to find a rule, the function returns
+> an error without releasing the ruleset reference, causing a memory leak.
+> 
+> Fix this by using a goto to the existing error handling label, which
+> calls mlxsw_sp_acl_ruleset_put() to properly release the reference.
+> 
+> [...]
 
-BTW there are hard spaces in your commit msg, please try to fix
-that for v2.
---=20
-pw-bot: cr
+Here is the summary with links:
+  - mlxsw: spectrum: Fix memory leak in mlxsw_sp_flower_stats()
+    https://git.kernel.org/netdev/net/c/407a06507c23
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
