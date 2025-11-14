@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-238563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CCE8C5AFF8
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 03:22:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37CE1C5B00A
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 03:25:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4888E34BFF3
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 02:22:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8DBB3B4712
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 02:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B705122A4FE;
-	Fri, 14 Nov 2025 02:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81A7022B8CB;
+	Fri, 14 Nov 2025 02:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JKGatMz8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P/k2Vp3d"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931361F5842
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 02:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFD721E087
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 02:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763086917; cv=none; b=LtPv82MrPLVtruKbx6cYSyeghC/vCvcwHaDxNdDj7iFA1lfsUjmDdtymdvoJYGQc5EElNUwQr6Kp+Hbw7Gy9pd7iCloaZbbYt2reUZrsWYHoV5KU/ZYtd8h0J1Iwp0Zr23E1uEEKQ5fODvQgSaJes732t4Ttt/vbyZUvefNJ6uQ=
+	t=1763087117; cv=none; b=YDxQbjCTw6OLqUpzT3a2tjD8bXgnWg4G9BASw/N3OJp0XGsAhAjuH+79u7vU28UEu01dFrKJfvBGQG9ib79ukPa/dRUXq+VS7TYfZWG1gr3DWfry72yLifu2LxcfDp3ToE2HEdc/7w21WtYWO5i3udKZNYnnCtrYPTpqw0DZMCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763086917; c=relaxed/simple;
-	bh=Na5EgauIczybJfHY94CEiIchGKaNn7AFHLj2EN5ClGE=;
+	s=arc-20240116; t=1763087117; c=relaxed/simple;
+	bh=CvykzJHEwP9AP747SyPRIjR49qQc4nF8hrUyqgVYcDk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K7LlMhr8zmvHSwdTTrM1EAXKYxz8DyJrWrPX32S4pQ2aYfeTf8tUBihV5D/vx8XPXdevcWifNWLIFcoWKDEceGcrNNIt1R5UY1/Zn9WjOsM5yM7TB7mpTHdkfF/e2cg7Bx7mzoqjPFkoRirqfvIYj6AP0RRNVfvSql9WJe2KC8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JKGatMz8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D778DC4CEF1;
-	Fri, 14 Nov 2025 02:21:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jbcHUmfRvbFpGizxEESkv5tP1qjxF0zaMFWTCCyOupCoCbr5E0wJzihu6UJxuCKbOjDvcRGcRT2ac8vbaXACmJhbWDExToIS5shQCCnTVpSwQyooe5Dq5WXPVeAhFtEePKaOFuodiDgd2n4sy074Eq7xTYrgIBeOUYvBtfBd1Pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P/k2Vp3d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B70B4C19424;
+	Fri, 14 Nov 2025 02:25:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763086917;
-	bh=Na5EgauIczybJfHY94CEiIchGKaNn7AFHLj2EN5ClGE=;
+	s=k20201202; t=1763087117;
+	bh=CvykzJHEwP9AP747SyPRIjR49qQc4nF8hrUyqgVYcDk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JKGatMz8L+FuTmUoppWVXtNitcUn5qETVGngVjyD6rAFLI4pP2ngrClgh/gCIe/GP
-	 p/LUv+w0zPIKzH2ZgLL6uRP77tWytLbBT4pn5G46Y5cZrHx+8kwLC0AjfpZq6D2e4x
-	 0EfgP4f0ggIMpOoBbh/QUjAECAdc7IEEliJRVHpsjFj86CRhe6pFYP122Ux4iJ/FFS
-	 HQtlabgmGdg5llBpZyNgPSpg2KacE3Nl7x7b9YMvB7f9aRaBATDc3/+uP7vndLg0Vu
-	 sBOxoZayeTAtwByQKrSOmOauFgAZZZXLsJ3UxMtqffGKnjUSNi6tAbmOb3bmbtNwCR
-	 NI9fFrp5V+v9Q==
-Date: Thu, 13 Nov 2025 18:21:55 -0800
+	b=P/k2Vp3dHFrmVm/4ABvdtB4lGhNX7CVR22e1743wtEX8GxUDpIOnnjhOGxekvc8y2
+	 7cA3eFCjDx/VbJY0709+rPki0ucqm7Jfu9V2RzX8xrCR5QM2DXwD3hKqjIXu/NWvlb
+	 iWW4Oebw33DXfEI+H1wWJwz4fsxzbMmot/HffKUfHCwMvQOfPz+9y1jxcYM0XvlHW0
+	 F3UBRshTSOqfsEzXhzLpxur7Z0SGhQH8FF7HzWOie1GR7Xf6aj+TJQNqNtm6xkwH0e
+	 7kZe3YbrlD7FkFHAz9dwwjQSmh8XSSCJYhGU47ADgic4QNGmHcAFSs0Tp8tEWTnM48
+	 FQnJQ+HxjazKg==
+Date: Thu, 13 Nov 2025 18:25:15 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Antonio Quartulli <antonio@openvpn.net>
 Cc: netdev@vger.kernel.org, Sabrina Dubroca <sd@queasysnail.net>, Eric
  Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ralf Lici
  <ralf@mandelbit.com>
-Subject: Re: [PATCH net-next 3/8] ovpn: notify userspace on client float
- event
-Message-ID: <20251113182155.26d69123@kernel.org>
-In-Reply-To: <20251111214744.12479-4-antonio@openvpn.net>
+Subject: Re: [PATCH net-next 6/8] ovpn: consolidate crypto allocations in
+ one chunk
+Message-ID: <20251113182515.1b488301@kernel.org>
+In-Reply-To: <20251111214744.12479-7-antonio@openvpn.net>
 References: <20251111214744.12479-1-antonio@openvpn.net>
-	<20251111214744.12479-4-antonio@openvpn.net>
+	<20251111214744.12479-7-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,25 +62,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 11 Nov 2025 22:47:36 +0100 Antonio Quartulli wrote:
-> +	if (ss->ss_family == AF_INET) {
-> +		sa = (struct sockaddr_in *)ss;
-> +		if (nla_put_in_addr(msg, OVPN_A_PEER_REMOTE_IPV4,
-> +				    sa->sin_addr.s_addr) ||
-> +		    nla_put_net16(msg, OVPN_A_PEER_REMOTE_PORT, sa->sin_port))
-> +			goto err_cancel_msg;
-> +	} else if (ss->ss_family == AF_INET6) {
-> +		sa6 = (struct sockaddr_in6 *)ss;
-> +		if (nla_put_in6_addr(msg, OVPN_A_PEER_REMOTE_IPV6,
-> +				     &sa6->sin6_addr) ||
-> +		    nla_put_u32(msg, OVPN_A_PEER_REMOTE_IPV6_SCOPE_ID,
-> +				sa6->sin6_scope_id) ||
-> +		    nla_put_net16(msg, OVPN_A_PEER_REMOTE_PORT, sa6->sin6_port))
-> +			goto err_cancel_msg;
-> +	} else {
+On Tue, 11 Nov 2025 22:47:39 +0100 Antonio Quartulli wrote:
+> +	/* adds enough space for nfrags + 2 scatterlist entries */
+> +	len += sizeof(struct scatterlist) * (nfrags + 2);
 
-presumably on this branch ret should be set to something?
+nit: array_size() ?
 
-> +		goto err_cancel_msg;
-> +	}
+> +	return len;
+> +}
+> +
+> +/**
+> + * ovpn_aead_crypto_tmp_iv - retrieve the pointer to the IV within a temporary
+> + *			     buffer allocated using ovpn_aead_crypto_tmp_size
+> + * @aead: the AEAD cipher handle
+> + * @tmp: a pointer to the beginning of the temporary buffer
+> + *
+> + * This function retrieves a pointer to the initialization vector (IV) in the
+> + * temporary buffer. If the AEAD cipher specifies an IV size, the pointer is
+> + * adjusted using the AEAD's alignment mask to ensure proper alignment.
+> + *
+> + * Returns: a pointer to the IV within the temporary buffer
+> + */
+> +static inline u8 *ovpn_aead_crypto_tmp_iv(struct crypto_aead *aead, void *tmp)
+
+nit: does the compiler really not inline this? the long standing kernel
+preference is to avoid using "inline" unless it's actually making 
+a different. Trivial static function will be inlined anyway.
 
