@@ -1,233 +1,191 @@
-Return-Path: <netdev+bounces-238669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67FC1C5D305
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 13:57:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B5ADC5D34B
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 14:00:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 48E613529EE
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 12:57:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC58E3BE4BE
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 12:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4FC23EAA5;
-	Fri, 14 Nov 2025 12:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA40248868;
+	Fri, 14 Nov 2025 12:59:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="ghEVhZwM";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lNagvqi4"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ZbqfK4m0"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D045212FAA
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 12:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B591244685
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 12:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763125015; cv=none; b=BhyX7enbMBFkdX+bgJf7x60L67HSu7VKkDjuaUyPW/fa7zNDLucBz0not6a8NWEtpQklqU1E0ks5P+8/6e1qszZSyq17yK6tJtR/HDBlZmj0K6FH8owI3aGokIlLBz1JuUevDs7Fdn0XFSIr2a+HFLfcmuNZ8igGQYBur1edLmA=
+	t=1763125187; cv=none; b=KpVJyMMgn+91+E1xp70470SqIpRm1q9HAVGS1LtGylBHIrV0Xb0fb6Yg2gP6567BQ4gdpAOehcORqJp9qBC40tBO+6j8P1wZ+lufGBA3EMXXRvM7CO7hRJ+pS0bqcDLMAa18ggNjc9BIMJvHm0aCmBE4OH23DxDlOUjCy4bIY1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763125015; c=relaxed/simple;
-	bh=UTku9nwDQaVR+pu1XDF7Fe1Y4umnqy/ePCHiKbXkjaA=;
+	s=arc-20240116; t=1763125187; c=relaxed/simple;
+	bh=OwXqaVYjP+AYjhrqdV/iUf65lNBgi6i65jcAVuzkims=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dlgVr2degWtEmvqKjQBtWHHUMC/5hNCBMXAOfyCg16OFBKdadj2Cv4OzyruuUKWh5mkYjX+q7SyF3dkf6c/PcuUFvk62GMYAgJb9TbHSbM8CRwK3M7Kf+Nt1yza5Jo/H8wnu1bG4jtFSu+kd5OePETf4kny/j0kMqBW53jBrCoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ghEVhZwM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lNagvqi4; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 0382E140009B;
-	Fri, 14 Nov 2025 07:56:51 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Fri, 14 Nov 2025 07:56:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1763125010; x=
-	1763211410; bh=nozmRXu+m5XI7HSVkIswlrEu1gbQy0lrGOuBuqN2kUI=; b=g
-	hEVhZwMG7gyRxsWBHlZ8PwZ9tZ6AI2TI3Qzc7V1fQeQSigEm9kiV4NoPL5uBTcrF
-	DF3jXoLsc74kQ0YupEkNQhtr7caRGgvpeeUH8TlxvlshVo6pACSzusuuyx/X1Fux
-	3Il/r/9vAcAJxMyRR/PXSPnyjH3WKwRIrgvTFZV/h6yWobyvOQhH32vpnJHfokGs
-	Kh7Ekpf00OlMrQE7mXgMKBvvpYc0M1xUnlniZgdpn/qkG6Qa5fkj6mCU16Rz3v9U
-	ZwuIdXjilLNrSAjy5da3mRlA/uUjHAxrEshXrJtK849k3YmHs1XTn7CA7OZgZxxf
-	65tHJTf7xS6CTCkJKdaZQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1763125010; x=1763211410; bh=nozmRXu+m5XI7HSVkIswlrEu1gbQy0lrGOu
-	BuqN2kUI=; b=lNagvqi4JwHkwwNCQPVqao45LjOzBhDKS7amVgpHWIQ6Dmd9n2U
-	Biq/Qq5IjNVaCq5Kr+jmT92Fl7jKhOgZ6hLW5dOdMH83WEctZec2WIkDmsYvODDh
-	TD1NyUYPIiQaVo2o18JPFAcMrd5PCeOTMB/8KYWn2YlRCJ3GTsBlc4ntfI4shWWY
-	CsUGxleV+ZAcgGd41BzOiJUDePptI96AGJPU4ne78PPCKCOkkjFurTAN9dEjQ+Bt
-	Ykei0ZtATu11DXohYmKl5vkqDxthVf8gOJ0WJ5iKgSeP/CiKVtWkgctdf6pzA825
-	VvIVVw/sTwqUEaLhYn7iWbl6Xg7jadnz6+g==
-X-ME-Sender: <xms:EScXaThz1e2NJcV8RBQBtBuPPwpnpntGVcJnkC5XWc9BNfgdWzV-zQ>
-    <xme:EScXafmdJG8Ai6dCvB4fhVcRWwhOgsAnjA8lULiLFGjD_WSj7HcR1nK7XZDZb_Kr0
-    5BfnHx9LKR5lr1Bg6i_VHFGYdUCrXpxcGHC_UOId4qRSE8ckY9J6Q>
-X-ME-Received: <xmr:EScXaXaMjKrSWDZIXr6nq1Kl_xPYhq-AxtxJFjVFLF6KaKmtu6Fs_dvPEhv5>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvtdelkeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedugedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheptghrrghtihhusehnvhhiughirgdrtghomh
-    dprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehjvhesjhhvohhssghurhhghhdrnhgvthdprhgtphhtthhopegrnhgurhgvfidonh
-    gvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhf
-    thdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtg
-    hpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihes
-    rhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:EScXaSxSsvXOcpCDZRv6zBYyzE9pv2UU_DZD07wWIuiWkeS_AxLpVQ>
-    <xmx:EScXaeYVDP54Dmvd1-m6hefbH6KyObanM5ImpLZNNbb6E9b4XZ6QKA>
-    <xmx:EScXabwLDzIYY6WNl7MVSQeXSfSgOq5ThUwpLF5zS-Yef_jOrFqmaA>
-    <xmx:EScXafGGCVt9Qt3wAh9ZQUr-JHT_tw9s4JIMlYUkxQFtPBKK4dx3Ow>
-    <xmx:EicXaX_7G2FqpEX7eriVwScRoi5L5ncGqSmnCyHuTmCvXt424mDHeYJ->
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 14 Nov 2025 07:56:49 -0500 (EST)
-Date: Fri, 14 Nov 2025 13:56:47 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=HjZJjE5gbb4LKu8UGUbKuoSuW5Snyrz7xioSAUDhAOPYpwxGt8A/2GU9HON6jHQJ/xDcxS7L2d7EVt5EdQZip3kfkmPq8Wn0IamV0R7bbIFYWEMFgeps5tTi7MdHwpfalO/xf5xxsa+GU12UYKV/Tfpg2+eURAtujE2ELdEE7Ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ZbqfK4m0; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b735487129fso288066966b.0
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 04:59:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1763125183; x=1763729983; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lIa30kEZfIOzXn6c2Ch+jzSexECrPYWXzGffwwy3r9Q=;
+        b=ZbqfK4m0Vk3QZZMUhnZ65dzeU/GFengPpj80uV976TTNT6cF3kLVFLU8dNGFNmtTBM
+         4qOp9/GpfWs9OKiNwe0QHH/jcW19OTYlr1meSgMwyMFng3k0InkVtUKHBwfo5BNYqFr+
+         4lFMJhMGNriMqn3fozHBGzFjOKEU5kUtemJ7mYPxBLflIyzVat1J4pYAXgbN4B2YnyYG
+         82UWE3kzLCNGqMlMm3yvbYBMH3F7S7iX89IYp4nrzQpu+C75oEGN3b+p3276ZuRBY6eY
+         kmTlfbRGGr9zKGdLcC+V/1s+Tfa76MlJmsfSuKTulTxUlUvcI4E9GKJuCGZhh00S7xuu
+         FnVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763125184; x=1763729984;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lIa30kEZfIOzXn6c2Ch+jzSexECrPYWXzGffwwy3r9Q=;
+        b=V35vyPIjlLAhUOgdCvbeqwXXbhbjShrLCtGQxEcUWXr8OZhZksuOwMEm3xC87B0HJc
+         ehoqFh3xjJuGoL5iC4u0RmapiNrOig9q+/64S3miQYr63C/1SGj2tDaU/9r1bb/motIl
+         uwRXv2UxevOPE/+b+/wuZvBlc6rwIwKsgj2IneNqiXmcA3xvgF4xHY6cz6EuKYtSflAe
+         WNZejN8LyqCdOyy2AwMlJm7tjnDUSJd6J4dvAUOULrJp8XJ61pf9SMlZOYQmdwJTjQU1
+         FRLNLUfz1UL30N0cXQX4cGoSPEom2hnGelETZCjrSURUr90JgaV6Rgg/EstLflX52A4N
+         9T4w==
+X-Forwarded-Encrypted: i=1; AJvYcCW6EGt6ihBJtXx/bSguyJlABcwSHCh/1p0DnqH/SSlPaJGH3rVN0p9ESdlpSL4log02oZQUo9A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWBlPc1zzkyIlVjdT/OHUJvm3nwpkmd8q517DSPIbCGn+W/O+m
+	8dMoFKH1mNRpFl5uRSaOE+oSHvCpPXdFPY+nv76rz3X0wHc53jT+hsEOnS8U2c42exo=
+X-Gm-Gg: ASbGncuZ11d1AMv0u2oc+ArwPlATk9jy9QwvsejgDWM3EeZQg+rutwFqJZN+K9Y/ucB
+	IuEC6HoUuzQpeoKH3xiD7qS2Jif1BrIhQXnq2TCaqy8SwXI1KVTF+4PJL8Py2hOjZC6blBjt1D1
+	ol1mnF2LaJHDIVYw1BiKdEXykUSnu5HsQ0BS/JPNXg+SNRMESLKDZVJGeu8ZBTrn1/Z48oS60DA
+	7B8clmv3cnafDZyuvnFR2CnovFMJ8IUK/b6dbZ9ljlXR6x0nXL9CHhUSBG8HcHYPiA0kKLBg+ls
+	3Li1sIfowT3PekUztlzu/Nmuc3AI2H1ECQDDcw3KBrmSh+PtfQIf17ZaYfNtOqsRwj2aUMm73Gd
+	JoCNKP3//UYlIV9ePIvN4BoKVzY4YKkdZD8cjF07hH1EeAKRL1hfjj7wBt4qtaKMI7DbKJrwa25
+	jzv8M=
+X-Google-Smtp-Source: AGHT+IH6H5eoyoDiGCawX8hcyfAIsFqjcgfKx5GqQ3M5ZUeRqB23EXgoQaPPEhXoJ1r2rQPfP0tLQA==
+X-Received: by 2002:a17:906:f105:b0:b73:7652:ef9e with SMTP id a640c23a62f3a-b737652f76bmr38125366b.55.1763125183501;
+        Fri, 14 Nov 2025 04:59:43 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fd80a3asm382714666b.37.2025.11.14.04.59.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Nov 2025 04:59:42 -0800 (PST)
+Date: Fri, 14 Nov 2025 13:59:38 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Corey Minyard <corey@minyard.net>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Rob Clark <robin.clark@oss.qualcomm.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Vitaly Lifshits <vitaly.lifshits@intel.com>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>, Calvin Owens <calvin@wbinvd.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Sagi Maimon <maimon.sagi@gmail.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Karan Tilak Kumar <kartilak@cisco.com>,
+	Hans Verkuil <hverkuil+cisco@kernel.org>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>,
+	Max Kellermann <max.kellermann@ionos.com>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	openipmi-developer@lists.sourceforge.net,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, amd-gfx@lists.freedesktop.org,
+	linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org, linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-pci@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+	ceph-devel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Dmitry Baryshkov <lumag@kernel.org>,
+	Abhinav Kumar <abhinav.kumar@linux.dev>,
+	Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
+	Marijn Suijten <marijn.suijten@somainline.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Taehee Yoo <ap420073@gmail.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH ipsec v2 1/2] bond: Use xfrm_state_migrate to migrate SAs
-Message-ID: <aRcnDwyMn11TfRUG@krikkit>
-References: <20251113104310.1243150-1-cratiu@nvidia.com>
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Rodolfo Giometti <giometti@enneenne.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Stefan Haberland <sth@linux.ibm.com>,
+	Jan Hoeppner <hoeppner@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Satish Kharat <satishkh@cisco.com>,
+	Sesidhar Baddela <sebaddel@cisco.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v3 01/21] lib/vsprintf: Add specifier for printing struct
+ timespec64
+Message-ID: <aRcnug35DOZ3IGNi@pathway.suse.cz>
+References: <20251113150217.3030010-1-andriy.shevchenko@linux.intel.com>
+ <20251113150217.3030010-2-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251113104310.1243150-1-cratiu@nvidia.com>
+In-Reply-To: <20251113150217.3030010-2-andriy.shevchenko@linux.intel.com>
 
-2025-11-13, 12:43:09 +0200, Cosmin Ratiu wrote:
-> The bonding driver manages offloaded SAs using the following strategy:
+On Thu 2025-11-13 15:32:15, Andy Shevchenko wrote:
+> A handful drivers want to print a content of the struct timespec64
+> in a format of %lld:%09ld. In order to make their lives easier, add
+> the respecting specifier directly to the printf() implementation.
 > 
-> An xfrm_state offloaded on the bond device with bond_ipsec_add_sa() uses
-> 'real_dev' on the xfrm_state xs to redirect the offload to the current
-> active slave. The corresponding bond_ipsec_del_sa() (called with the xs
-> spinlock held) redirects the unoffload call to real_dev.
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
+Looks goor to me:
 
-> Finally,
-> cleanup happens in bond_ipsec_free_sa(), which removes the offload from
-> the device. Since the last call happens without the xs spinlock held,
-> that is where the real work to unoffload actually happens.
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Tested-by: Petr Mladek <pmladek@suse.com>
 
-Not on all devices (some don't even implement xdo_dev_state_free).
+I wonder how to move forward. I could take the whole patchset via
+printk tree. There is no conflict with linux-next at the moment.
 
+It seems that only 3 patches haven't got any ack yet. I am going
+to wait for more feedback and push it later the following week
+(Wednesday or so) unless anyone complains.
 
-> 
-> When the active slave changes to a new device a 3-step process is used
-> to migrate all xfrm states to the new device:
->
-> 1. bond_ipsec_del_sa_all() unoffloads all states in bond->ipsec_list
->    from the previously active device.
-> 2. The active slave is flipped to the new device.
-> 3. bond_ipsec_add_sa_all() offloads all states in bond->ipsec_list to
->    the new device.
-> 
-> This patch closes a race that could happen between xfrm_state migration
-> and TX, which could result in unencrypted packets going out the wire:
-> CPU1 (xfrm_output)                   CPU2 (bond_change_active_slave)
-> bond_ipsec_offload_ok -> true
->                                      bond_ipsec_del_sa_all
-> bond_xmit_activebackup
-> bond_dev_queue_xmit
-> dev_queue_xmit on old_dev
-> 				     bond->curr_active_slave = new_dev
-> 				     bond_ipsec_add_sa_all
-> 
-> So the packet makes it out to old_dev after the offloaded xfrm_state is
-> deleted from it. The result: an unencrypted IPSec packet on the wire.
-> 
-> With the new approach, in-use states on old_dev will not be deleted
-> until in-flight packets are transmitted.
-
-How does this guarantee it? It would be good to describe how the new
-approach closes the race with a bit more info than "use
-xfrm_state_migrate".
-
-And I don't think we currently guarantee that packets using offload
-will be fully transmitted before xdo_dev_state_delete was called in
-case of deletion. But ok, the bond case is worse due to the add/delete
-dance when we change the active slave (and there's still the possible
-issue Steffen mentioned a while ago, that this delete/add dance may
-not be valid at all depending on how the HW behaves wrt IVs).
-
-
-> It also makes for cleaner
-> bonding code, which no longer needs to care about xfrm_state management
-> so much.
-
-But using the migrate code for that feels kind of hacky, and the 2nd
-patch in this set also looks quite hacky.
-
-And doing all that without protection against admin operations on the
-xfrm state objects doesn't seem safe.
-
-
-Thinking about the migrate behavior, if we fail to create/offload the
-new state:
- - old state will be deleted
- - new state won't be created
-
-So any packet we send afterwards that would need to use this SA will
-just get dropped? (while the old behavior was "no more offload until
-we change the active slave again"?)
-
-
-> Fixes: ("ec13009472f4 bonding: implement xdo_dev_state_free and call it after deletion")
-
-nit: wrong formatting of the Fixes tag
-
-
-[just one comment on the diff, I'll look at it again if we decide to
-proceed with this patch]
-
-> @@ -533,36 +535,42 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
->  			slave_warn(bond_dev, real_dev,
->  				   "%s: no slave xdo_dev_state_add\n",
->  				   __func__);
-> -		goto out;
-> +		return;
->  	}
->  
-> -	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
-> -		/* If new state is added before ipsec_lock acquired */
-> -		if (ipsec->xs->xso.real_dev == real_dev)
-> -			continue;
-> +	/* Prepare the list of xfrm_states to be migrated. */
-> +	mutex_lock(&bond->ipsec_lock);
-> +	list_splice_init(&bond->ipsec_list, &ipsec_list);
-> +	/* Add back states already offloaded on the new device before the
-> +	 * lock was acquired and hold all remaining states to avoid them
-> +	 * getting deleted during the migration.
-
-Even with hold(), they could still be deleted (but not destroyed)?
-
-> +	 */
-> +	list_for_each_entry_safe(ipsec, tmp, &ipsec_list, list) {
-> +		if (unlikely(ipsec->xs->xso.real_dev == real_dev))
-> +			list_move_tail(&ipsec->list, &bond->ipsec_list);
-> +		else
-> +			xfrm_state_hold(ipsec->xs);
-> +	}
-> +	mutex_unlock(&bond->ipsec_lock);
-
--- 
-Sabrina
+Best Regards,
+Petr
 
