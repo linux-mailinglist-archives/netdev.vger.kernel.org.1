@@ -1,255 +1,171 @@
-Return-Path: <netdev+bounces-238765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53512C5F238
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 20:56:34 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BB68C5F310
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 21:13:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 322B135B8C0
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 19:56:15 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0A18E4E21BB
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 20:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF55034D920;
-	Fri, 14 Nov 2025 19:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83E634677D;
+	Fri, 14 Nov 2025 20:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="T3QOT7TA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iIZ2hNVy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f227.google.com (mail-pg1-f227.google.com [209.85.215.227])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22FA31D723
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 19:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49890326952
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 20:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763150085; cv=none; b=UUXDkfdcMt825wtGwCViu5ca9JNtcK1Mcw0mFOp6QXdN6CX4bXnSu2sQjall4KTd3bnFmHsrpB0e+AtjwgmvNVpMxgxTJWLRzulJzwofBn2Egp1Pj6Ud0wvudVXAQFkt4cQBgJZBmZB8IZPo+N9bHn1R4ASu5C8ZWAOTjxHyRjQ=
+	t=1763151212; cv=none; b=gO3sED3ky/KOpA6gBNNdFD/vLTB1c6z8wruyU3beNwqv0bD6amBP5ZEOI/3mKP6ufR0M1b9iE/kyXVk4jsy9diwkl+aNQNt5knIxL/kRDXXQMcN3bMk5pc37bmRrox6L/DF5R7SSQf1wcKCipdd7roeYldIPSrBWG3DWSZkjmhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763150085; c=relaxed/simple;
-	bh=SMmxb//ePUD3hFrfAsPMLLG0BwdXmv2Mg0jkVsYrPVE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TZ05HOFcnZOIw28WwDIZBXcid9F0WCw1+6KCEFh9YdCN3KHuX1tfJTxzg/62XOB52GZvBT4t/huGpw3DoK798u++E2BVc9UEwdbbQuraxyJ3vUdw97NIdp+2UdAwGf1zrgkVg8HyqjhHVhMsisjLqTEZu3J1NBEXKUMCaIz/JQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=T3QOT7TA; arc=none smtp.client-ip=209.85.215.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f227.google.com with SMTP id 41be03b00d2f7-bbbc58451a3so1437556a12.0
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 11:54:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763150083; x=1763754883;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EJeHjbo0rkg1+MXurwHM1VKiMZc+qaqYqidGa0aqX60=;
-        b=jhPyhNjxjMSGWFiWybctHx4WB14ZXhfiHS9gF2XWfgqIIQIOZ9He6mx6FrhND5CfQ0
-         UXxin9MbgT3xvQ4u4tmGi306ZPV1CXzHQ5llS88MujhZXj6H3bEdc6sBNPxAuf4FNMps
-         l2D+M9PjjEz39TnTAudlXZigL36ZI+VAh+ET/iTp6TwmdRPd6ckQZ+OAcaBmECgpJMfB
-         kbmxymxxnSiq0bImVDHzAkgpCRPvXKxxMfNrHQD3LsvdLIH1fw3KJmuBtI0EyB1YyLf8
-         +gmO0mMADb0W8oq4aR1Mn7Q61/AKT0NZtJJxQqqCK3UL4WDGHiNkHfbs7U312wYGoKYL
-         eoDQ==
-X-Gm-Message-State: AOJu0Yw5xV0Z1talOkLy2bMANc7TUjIAUrMTNfvVe38Qi0RTIIZ3bG+2
-	YI6v7+rhLzVfmYsg38Wh+xrDicvD5exj/i4KGccEsSw8l1Ip3OZGOeuxn0KFoWfhpzwSunMlxgZ
-	E9G2P0Ru9sMSESO1yyPQAxxW3KAKi7pFPSUw/NG2JryCqIZ1/WqvjwdUKKDGXUKh1ZcEEBh3IwA
-	pUReO/rZoFtQzdVc0LuFQO1fODBYgWIjL8xi71aBQeWslIdRF48TGBUtFkY3cV6y1an1d+YuCcB
-	LmA20ANAXFpgUxD0g==
-X-Gm-Gg: ASbGncvhQDxtXH/t7H42esxn1Mc7/u1IqhFUPgNfiFJeG/qA6Co8kIoyQmPDgVBjbQi
-	qQLvG5vq4JUAa/R+gfSXTk6pBC3sQdMnbDQsljPDx18rmbDHv2Ip4rRCTdEERPqeHPJVDP3tsxZ
-	28jp+ef2d7VQYar15W9ly6fijSxR5XaLPzTL1nQtWAAGUuO0N626T9QuuEiOaxiEbwS4hJnoHyK
-	qFdyEvG2jdNkUpzHtRuBwsa0x60Sr8KNVQIr6UmyXfcrVVDcYmjJ12sZkWrYFQv6QlQn1TIx647
-	YWXZK8H3Fo8Ww/5CBIakNjbyUy3jH+l/W+30C9ph9nsfKMu5z2JuBUiQlUEBupw7YvEL81UY6X5
-	aDB6W5N67soyZ8Hu842+p7TwXP87fFkadKJlUWHZuhkTLvatetcsDSLQ4OmyxUbqT20H9RqHMmC
-	Hn2iieZNn6zO2CoqnweQeqBjzFJ9fHmI4q+XrU+90+VOI=
-X-Google-Smtp-Source: AGHT+IHM0goRHb6hCpqm3XFvRgZjf3O6LsGJNaC94zOVXro3uWQUFKlXcIVv5DI7n3o2YErxixAQMYPc1+cE
-X-Received: by 2002:a05:7300:bc1a:b0:2a4:3593:6466 with SMTP id 5a478bee46e88-2a4abb1cf05mr2435511eec.22.1763150083135;
-        Fri, 14 Nov 2025 11:54:43 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
-        by smtp-relay.gmail.com with ESMTPS id 5a478bee46e88-2a49daf833fsm400241eec.3.2025.11.14.11.54.42
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Nov 2025 11:54:43 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-295fbc7d4abso25311995ad.1
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 11:54:42 -0800 (PST)
+	s=arc-20240116; t=1763151212; c=relaxed/simple;
+	bh=gfsEfam1TnFDHwHfKeJ/eALWiVqPybvUIuBzruEQW+k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kwK0S9ykgNW7xelz3wN+CXcnTKQVURppVaqPP6cCaSZ1LBkUMQB3vNZt50nk539EIRbKFEoTLqcNEOixiE7iv4FNRHvzh1echki7xFsJej2HFofcebW5yDMJT+AIxcbNYPSoXdsVhpsSq2G0Yo6jPV1TySkh53Mu3pxBsMzzB8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iIZ2hNVy; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7ba49f92362so1346241b3a.1
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 12:13:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1763150081; x=1763754881; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1763151210; x=1763756010; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uf3BUSzSZCJoavzKn2m+Jz/HGUOS/A8evMUw5+t52po=;
+        b=iIZ2hNVyg2oJCn/9hzCj5MwhOjKE6SckaxoxOpzSDKRNjPjxsO9/d41qauIsVODR7h
+         V3cXtal55vsxmsVXMWmy15D9xDu/WHcYVkRrjaqJxDSO3d/1ji20OPmHgt/zAphQ97ME
+         OVyez6xaLu4lt4+iXlPQXwzDudTTQZ2VlcHJm3s5T0z1C1OfbtSt2mHIJSJ0Pbv0ZLnE
+         dbjtgvDyMY/P5SEYiAkR0jTeNGiKujwAskF+yRlBLCTP9CuAc2KiBX5dzNYRLn2hkLkd
+         b1/DGO6T+91ipSUwnHjeRQZBRJ5iZ260wgVWgLY7wxyIYprUXQbz0MtJFpWi7naeB8AR
+         1Beg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763151210; x=1763756010;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EJeHjbo0rkg1+MXurwHM1VKiMZc+qaqYqidGa0aqX60=;
-        b=T3QOT7TA4iDP3fyAvLX6GMtLWt3qwzM89whTDtF5FcoLUjed62xixIIhW8d7cph8e9
-         9+FbpO5k+xLehC2JW4MB7fqfycoGnc64mmBnr66a7fpG0nI51P5xgUpSJ9rkWZPZse1z
-         ZCjzsEwArI50iLgwa4LmSe3zgGBoaRHIMmtlE=
-X-Received: by 2002:a17:903:18c:b0:297:df8f:b056 with SMTP id d9443c01a7336-2986a6ba482mr61214845ad.11.1763150081378;
-        Fri, 14 Nov 2025 11:54:41 -0800 (PST)
-X-Received: by 2002:a17:903:18c:b0:297:df8f:b056 with SMTP id d9443c01a7336-2986a6ba482mr61214535ad.11.1763150080968;
-        Fri, 14 Nov 2025 11:54:40 -0800 (PST)
-Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-343ea5f9fa4sm3108113a91.0.2025.11.14.11.54.36
+        bh=uf3BUSzSZCJoavzKn2m+Jz/HGUOS/A8evMUw5+t52po=;
+        b=kkxcvM7g0GCkOO39f3oldqFAKGugNKPoAVRO4z4k9Epclyahj+u0H/+PJZUGwQ+okh
+         IJDlqFPoIZPpgQ7ItE2oMhhoTBFShGBH0jsA6ff/7+h12PnFTcnmwzhEsRr3JIASD/52
+         YvNKT12fQHx54jar/KgkTf7IFbDoxri76xLksIydd9DWgW/QU79SQ+uSrmsXjeJrIqQl
+         +MfwcItADw4YcWJUU/MBjOG33ieyoFizcepIzi0E6t9lNtAp1rm3B0n39jqeSUiKd0+2
+         vhtXNpOHvy+Cc3cCywxzr15jABrLcUzR7zCYdqXSibKXzz/7jh6+okkyh1l0Z0WVQ2NU
+         HO6g==
+X-Gm-Message-State: AOJu0YwuxzAwgRKTCJlZgDY+OcjeI03L3vEzzUgCNB77lFo+cnAqihLv
+	JGvLiyKSOfbRUn8sdzd2v+Dz87C+HBpnLmphA6N1NbErJbhevwZDDLQ/
+X-Gm-Gg: ASbGncvp3RuVy1gItboK/Tui0FuoV8gzgom2l2i5vrReh0ShvRR2uvhDbVXGMMrgrO/
+	o++YIu+lFF47nn1dlD3ZeRCPgg0oxUTzVbJAuX3Hyp3jO6YiEEGFVUQPZvwvRfbV05iV3ZFPWoP
+	EmnHpctYyi9NllTjyrnOxICfjLsAwbp+TvCuThLxGcWOheu6UWfdCRBfNOGR7Wk3ywU0ngIqgOI
+	7yPdGTHbB0coJyTY8ALQgK33iCvzBqh19FGtQycBRgul+kqK4ChyiUDpiPmL8MisdhirTuwX/Bc
+	mpW3TujUwHmzWMulapxbTOw1rruB63JmMrLlnYYOiUPxrCDGupeC5kUBIBJD5zOlnrBVGUaJiqe
+	IbMX5PP3xdyqZG8C899M+RnL9+FVQI715KCYRhL1TzIZSk+jrfJ83Di3CZlRgUY2C9JN79HANKg
+	ToRowsidlF7F9O5A==
+X-Google-Smtp-Source: AGHT+IGL6d/Bnb4w2lmsKjgdb6AVcFSnWvfPhyiBt4Hqj7GOAjqk2+JskkwiYum6+UOIV5MTWdmo7g==
+X-Received: by 2002:a05:6a20:431e:b0:2cd:fbcf:147f with SMTP id adf61e73a8af0-35a516a9b22mr11012015637.14.1763151210372;
+        Fri, 14 Nov 2025 12:13:30 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:14::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bc375081023sm5559248a12.21.2025.11.14.12.13.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 11:54:40 -0800 (PST)
-From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org
+        Fri, 14 Nov 2025 12:13:29 -0800 (PST)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com,
-	vikas.gupta@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: [v2, net-next 12/12] bng_en: Query firmware for statistics and accumulate
-Date: Sat, 15 Nov 2025 01:23:00 +0530
-Message-ID: <20251114195312.22863-13-bhargava.marreddy@broadcom.com>
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	martin.lau@kernel.org,
+	memxor@gmail.com,
+	kpsingh@kernel.org,
+	yonghong.song@linux.dev,
+	song@kernel.org,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH v2 bpf-next 0/4] Replace BPF memory allocator with kmalloc_nolock() in local storage
+Date: Fri, 14 Nov 2025 12:13:22 -0800
+Message-ID: <20251114201329.3275875-1-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251114195312.22863-1-bhargava.marreddy@broadcom.com>
-References: <20251114195312.22863-1-bhargava.marreddy@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-Use the per-PF workqueue and timer infrastructure to asynchronously fetch
-statistics from firmware and accumulate them in the PF context. With this
-patch, ethtool -S exposes all hardware stats.
+Hi,
 
-Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+This patchset tries to simplify bpf_local_storage.c by adopting
+kmalloc_nolock(). This removes memory preallocation and reduces the
+dependency of smap in bpf_selem_free() and bpf_local_storage_free().
+The later will simplify a future refactor that replaces
+local_storage->lock and b->lock [1].
+
+RFC v1 tried to switch to kmalloc_nolock() unconditionally. However,
+as there is substantial performance loss in socket local storage due to
+1) defer_free() in kfree_nolock() and 2) no kfree_rcu() batching,
+replacing kzalloc() is postponed until necessary improvements in mm
+land.
+
+Benchmark
+
+./bench -p 1 local-storage-create --storage-type <socket,task> \
+  --batch-size <16,32,64>
+
+The benchmark is a microbenchmark stress-testing how fast local storage
+can be created. For task local storage, switching from BPF memory
+allocator to kmalloc_nolock() yields a small amount of improvement. For
+socket local storage, it remains roughly the same as nothing has changed.
+
+Socket local storage
+memory alloc     batch  creation speed              creation speed diff
+---------------  ----   ------------------                         ----
+kzalloc           16    144.149 ± 0.642k/s  3.10 kmallocs/create
+(before)          32    144.379 ± 1.070k/s  3.08 kmallocs/create
+                  64    144.491 ± 0.818k/s  3.13 kmallocs/create
+                  
+kzalloc           16    146.180 ± 1.403k/s  3.10 kmallocs/create  +1.4%
+(not changed)     32    146.245 ± 1.272k/s  3.10 kmallocs/create  +1.3%
+                  64    145.012 ± 1.545k/s  3.10 kmallocs/create  +0.4%
+                   
+Task local storage
+memory alloc     batch  creation speed              creation speed diff
+---------------  ----   ------------------                         ----
+BPF memory        16     24.668 ± 0.121k/s  2.54 kmallocs/create
+allocator         32     22.899 ± 0.097k/s  2.67 kmallocs/create
+(before)          64     22.559 ± 0.076k/s  2.56 kmallocs/create
+                  
+kmalloc_nolock    16     25.796 ± 0.059k/s  2.52 kmallocs/create  +4.6%
+(after)           32     23.412 ± 0.069k/s  2.50 kmallocs/create  +2.2%
+                  64     23.717 ± 0.108k/s  2.60 kmallocs/create  +5.1%
+
+
+[1] https://lore.kernel.org/bpf/20251002225356.1505480-1-ameryhung@gmail.com/
+
+
+v1 -> v2
+  - Only replace BPF memory allocator with kmalloc_nolock()
+  Link: https://lore.kernel.org/bpf/20251112175939.2365295-1-ameryhung@gmail.com/
+
 ---
- .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 95 +++++++++++++++++++
- 1 file changed, 95 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-index 872c8b6a9be..dbca011db33 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-@@ -253,6 +253,17 @@ static int bnge_alloc_ring_stats(struct bnge_net *bn)
- 	return rc;
- }
- 
-+static void __bnge_queue_sp_work(struct bnge_dev *bd)
-+{
-+	queue_work(bd->bnge_pf_wq, &bd->sp_task);
-+}
-+
-+static void bnge_queue_sp_work(struct bnge_dev *bd, unsigned int event)
-+{
-+	set_bit(event, &bd->sp_event);
-+	__bnge_queue_sp_work(bd);
-+}
-+
- void bnge_timer(struct timer_list *t)
- {
- 	struct bnge_dev *bd = timer_container_of(bd, t, timer);
-@@ -265,16 +276,100 @@ void bnge_timer(struct timer_list *t)
- 	if (atomic_read(&bn->intr_sem) != 0)
- 		goto bnge_restart_timer;
- 
-+	if (BNGE_LINK_IS_UP(bd) && bn->stats_coal_ticks)
-+		bnge_queue_sp_work(bd, BNGE_PERIODIC_STATS_SP_EVENT);
-+
- bnge_restart_timer:
- 	mod_timer(&bd->timer, jiffies + bd->current_interval);
- }
- 
-+static void bnge_add_one_ctr(u64 hw, u64 *sw, u64 mask)
-+{
-+	u64 sw_tmp;
-+
-+	hw &= mask;
-+	sw_tmp = (*sw & ~mask) | hw;
-+	if (hw < (*sw & mask))
-+		sw_tmp += mask + 1;
-+	WRITE_ONCE(*sw, sw_tmp);
-+}
-+
-+static void __bnge_accumulate_stats(__le64 *hw_stats, u64 *sw_stats, u64 *masks,
-+				    int count)
-+{
-+	int i;
-+
-+	for (i = 0; i < count; i++) {
-+		u64 hw = le64_to_cpu(READ_ONCE(hw_stats[i]));
-+
-+		if (masks[i] == -1ULL)
-+			sw_stats[i] = hw;
-+		else
-+			bnge_add_one_ctr(hw, &sw_stats[i], masks[i]);
-+	}
-+}
-+
-+static void bnge_accumulate_stats(struct bnge_stats_mem *stats)
-+{
-+	if (!stats->hw_stats)
-+		return;
-+
-+	__bnge_accumulate_stats(stats->hw_stats, stats->sw_stats,
-+				stats->hw_masks, stats->len / 8);
-+}
-+
-+static void bnge_accumulate_all_stats(struct bnge_dev *bd)
-+{
-+	struct bnge_net *bn = netdev_priv(bd->netdev);
-+	struct bnge_stats_mem *ring0_stats;
-+	int i;
-+
-+	for (i = 0; i < bd->nq_nr_rings; i++) {
-+		struct bnge_napi *bnapi = bn->bnapi[i];
-+		struct bnge_nq_ring_info *nqr;
-+		struct bnge_stats_mem *stats;
-+
-+		nqr = &bnapi->nq_ring;
-+		stats = &nqr->stats;
-+		if (!i)
-+			ring0_stats = stats;
-+		__bnge_accumulate_stats(stats->hw_stats, stats->sw_stats,
-+					ring0_stats->hw_masks,
-+					ring0_stats->len / 8);
-+	}
-+	if (bn->flags & BNGE_FLAG_PORT_STATS) {
-+		struct bnge_stats_mem *stats = &bn->port_stats;
-+		__le64 *hw_stats = stats->hw_stats;
-+		u64 *sw_stats = stats->sw_stats;
-+		u64 *masks = stats->hw_masks;
-+		int cnt;
-+
-+		cnt = sizeof(struct rx_port_stats) / 8;
-+		__bnge_accumulate_stats(hw_stats, sw_stats, masks, cnt);
-+
-+		hw_stats += BNGE_TX_PORT_STATS_BYTE_OFFSET / 8;
-+		sw_stats += BNGE_TX_PORT_STATS_BYTE_OFFSET / 8;
-+		masks += BNGE_TX_PORT_STATS_BYTE_OFFSET / 8;
-+		cnt = sizeof(struct tx_port_stats) / 8;
-+		__bnge_accumulate_stats(hw_stats, sw_stats, masks, cnt);
-+	}
-+	if (bn->flags & BNGE_FLAG_PORT_STATS_EXT) {
-+		bnge_accumulate_stats(&bn->rx_port_stats_ext);
-+		bnge_accumulate_stats(&bn->tx_port_stats_ext);
-+	}
-+}
-+
- void bnge_sp_task(struct work_struct *work)
- {
- 	struct bnge_dev *bd = container_of(work, struct bnge_dev, sp_task);
- 
- 	set_bit(BNGE_STATE_IN_SP_TASK, &bd->state);
- 	smp_mb__after_atomic();
-+	if (test_and_clear_bit(BNGE_PERIODIC_STATS_SP_EVENT, &bd->sp_event)) {
-+		bnge_hwrm_port_qstats(bd, 0);
-+		bnge_hwrm_port_qstats_ext(bd, 0);
-+		bnge_accumulate_all_stats(bd);
-+	}
- 
- 	smp_mb__before_atomic();
- 	clear_bit(BNGE_STATE_IN_SP_TASK, &bd->state);
+Amery Hung (4):
+  bpf: Always charge/uncharge memory when allocating/unlinking storage
+    elements
+  bpf: Remove smap argument from bpf_selem_free()
+  bpf: Save memory alloction info in bpf_local_storage
+  bpf: Replace bpf memory allocator with kmalloc_nolock() in local
+    storage
+
+ include/linux/bpf_local_storage.h |  10 +-
+ kernel/bpf/bpf_local_storage.c    | 235 +++++++++---------------------
+ net/core/bpf_sk_storage.c         |   4 +-
+ 3 files changed, 74 insertions(+), 175 deletions(-)
+
 -- 
 2.47.3
 
