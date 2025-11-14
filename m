@@ -1,403 +1,485 @@
-Return-Path: <netdev+bounces-238646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0022C5CB6D
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 11:57:52 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25E80C5CCB2
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 12:15:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3857D4E32B8
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 10:52:01 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 890B3353D3D
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 11:11:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C7A9311973;
-	Fri, 14 Nov 2025 10:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10312C1786;
+	Fri, 14 Nov 2025 11:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iiE4Z7di"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="n7Z+bM8H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010058.outbound.protection.outlook.com [52.101.85.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DE526E703;
-	Fri, 14 Nov 2025 10:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763117519; cv=none; b=FvwQcCgcWkpKaCzhjZtGqUpsfi2SV2CffDgKP7MAIuHj2eZkk7L0FPS5VeAZxxX1YNeVQR1mTtFyD8gzRRkhespSafU32KUHSgGwiVUTy/NsueaUMzkt1Irc+Hx2qDxlmGScUCBCPIqy3WVRCxmYA7Oi03i13vm7qTqTcZJWOos=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763117519; c=relaxed/simple;
-	bh=K2BXCX3kDyE4cwc2z5urjlXij8gU5+0GWSrPBEn1sFc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=dKg4Q7W2ffpFChR+miNcz5UNPk/7LGDjQNrrHni6DNVEx1+VZ3OH2B4ti/5hATwvsm+HLj6utrIz1X2Bg+ij0feAoGtcM9lfMT/DkK9PN44s7gZvv278mQDhKfzLWbEaQfYKS8RLlFATpxllrzPfgetjSx6+QqOKtlAfbxkQMO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iiE4Z7di; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00614C116D0;
-	Fri, 14 Nov 2025 10:51:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763117518;
-	bh=K2BXCX3kDyE4cwc2z5urjlXij8gU5+0GWSrPBEn1sFc=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=iiE4Z7dinpClndLDrs1qifrJ40ZNJoyMUmxHo96S14BMYXNmXr+z/F8y/OCrYW2Da
-	 rH7gA8L6avnWOXG78D9p3QFcg4X2KKDCyDj8ILHo18/ta7KJ6QbkvbkQei3Higavqj
-	 UHuWzGvNTDWXj2pq4i8m5DHgXp4KwPEDbiJK0QVXDOjVnTWwBBiqXFCs0qNF5BOjnw
-	 b/Wt6FWCAmmhWQGU1Z/Ro8G1pnX1YQ/BmaEtTE9aic/u5VkJqZSkHN7ema33mBhe+L
-	 jb52FlPiRfwylVtolLV3Bnur9PL+fWNBp19I79egqRuoTpAihFBOEzRKLIZRuawRJ5
-	 8l8+TJEQv8Kvw==
-Message-ID: <a59e81d0-35a3-4acf-a123-30cc1c659d03@kernel.org>
-Date: Fri, 14 Nov 2025 11:51:53 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B6C242D6B;
+	Fri, 14 Nov 2025 11:10:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763118663; cv=fail; b=iRHVkA6S6kMK7dGPy+IsOPM/KXugkSeqhqpvc+bQv4lmjVos7WfbAtRJHe/HW+SN6evHe79NJj8aE3ZDEbqs5ZcV99iEHdzT1vfA3RwwX8XwIK2sObEXUnROZ0RZst769MFcNdRGlXmY7EayIV+auRAxOy2/Pydukmy66lsNKJ8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763118663; c=relaxed/simple;
+	bh=l6P8q+zwUV2zEAo8sFk/FpfP4iU7uAN0Ba9bMsVR8YA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=bn/HXSCBrfb7vEmIGWNFhToUBbdhb9MjnHk1459IeIQIIb3Qkl7K6ygHXssP2jGG8XsWE46f5IUagqrR/BJSPYZqLEE+UFa1I3MJZXI/BqY9judFHOFRLnN1vS51SiEYpjVXV88iSZdm67A+GigzlNTDx/3UOZhTikLpfJ3On2A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=n7Z+bM8H; arc=fail smtp.client-ip=52.101.85.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hWuQ4rXGy7bEctaxQQ5KAFi1BHAtdQ+nIxpCogJISDSAAIOC+SaLe3JArhLpeOJDg9i10IHukj8vLl+EgrId6ZBG1v4niCRFvK1GFdGNE2RwMYuGpOkzJde2wzIQJvfawJQEd2cBC3BPaR+13ZXD8l6IkmyZl8ZITOGtbiCycU57QYBSr9iy6OTVO8m6m9usCHwjQ4+zqO3CsqrsZZ9N3HX02DR2Yr3RSZ8/wdFMiGGCqgdPgBKgc85knKLcjQxQttoRIEdDEdqtYNWfIcu0c5glkTtdP2Orzci98Ip8SEj/DInwwGwwIBEOXIXF67BKNc/C+6oHD5cXUJraMqHwhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tidcarM2rDv6Hblg/ZcrB48L9fzoDIZWPonVaz8asaQ=;
+ b=Un37SnHmJ6mINnqSON0PfBH3WPqvG1VzeSVz2Ps6bw1An9yesUnqbFa1hU7oFdV2x1O3eUrfJg5xU+AhFJRej33GWwWjd4R4ZYcyNCrTgPbeDgvoWNhhYmcvWQADjcbhzvOtfUweJFNnCrXyFS8HKfEHUvzgKaAFHRIDlJrkPdF0WFFtUPb3fYJLjMPrOWYmjXcd5/DJJ5eG5KheUSkuOPLTDka1OECsK2m4tq9mWTjTt78vm39DVg67OCkMX2PX5EsvlC5gk7rd6FGUgAHdF4a74hAXgKKGnBUqtyNBUsJJiGBUUpBmNiOfI+thMPiWnxkuL2IsU1BfuoOFVUNmog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tidcarM2rDv6Hblg/ZcrB48L9fzoDIZWPonVaz8asaQ=;
+ b=n7Z+bM8H7gd9nByESzgEXf9XXp9l5ky9mOuEa2IN7cc1INo8CqaH/E+J+y089XN5L8bxMS9RLN9LPK7AFdpMIuPkvj86aEq4NnE3KEKrAxdiZMxQuMe76WMSJ4K1ZrCT+Bw1fEaNuVPgPREzpjPHi0Qzp2OklIAKiOUs6wR9ecg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by PH0PR12MB7095.namprd12.prod.outlook.com (2603:10b6:510:21d::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.18; Fri, 14 Nov
+ 2025 11:10:56 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.9320.013; Fri, 14 Nov 2025
+ 11:10:55 +0000
+Message-ID: <374f8a2c-df06-4df9-8816-d91d3236cd58@amd.com>
+Date: Fri, 14 Nov 2025 11:10:50 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v20 01/22] cxl/mem: Arrange for always-synchronous memdev
+ attach
+Content-Language: en-US
+To: Jonathan Cameron <jonathan.cameron@huawei.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
+References: <20251110153657.2706192-1-alejandro.lucero-palau@amd.com>
+ <20251110153657.2706192-2-alejandro.lucero-palau@amd.com>
+ <20251112145341.00005b4e@huawei.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20251112145341.00005b4e@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P265CA0199.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:318::16) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [mptcp?] possible deadlock in mptcp_pm_nl_add_addr_doit
-Content-Language: en-GB, fr-BE
-To: syzbot <syzbot+7fb125d1bae280dc4749@syzkaller.appspotmail.com>,
- davem@davemloft.net, edumazet@google.com, geliang@kernel.org,
- horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
- martineau@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
- pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-References: <68e3a493.a00a0220.298cc0.045f.GAE@google.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <68e3a493.a00a0220.298cc0.045f.GAE@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|PH0PR12MB7095:EE_
+X-MS-Office365-Filtering-Correlation-Id: c6413db6-bbe4-410d-9b98-08de236e7ac9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?M0Z6cUlFQTRyTmNIbUxJQ0gzYXFlL0ErSkhPQk8vVFJhcnJkcU5qZlFZdmVM?=
+ =?utf-8?B?UFVhTVZWTEJHT2JjSWtpYncvNzVYWlJNWDRpV3NiRFl5T0lhQlh5RjRuendW?=
+ =?utf-8?B?bFk2RXZHUzM0eW42LzJNSGZmSDVjRHZ1T2pZcUx3SGNTYXZkc2c4eWg0QVpR?=
+ =?utf-8?B?djlDRkl1d1p0RjdkYUlhbjd2YmliZEZ0aVp5MEpaV3lMa2MvZk5VdmZUVDdG?=
+ =?utf-8?B?K1BlT0NSQmdrNExZYUJsZ2d4RE05blhjR0I5ZEZUYWpEaTNERWZXSUpOMGp5?=
+ =?utf-8?B?cHkzNVQrcEpYZ2h4R3lQMDlnY3pEL2MvbkxWS29HeThyR3lVaVdnY3pSOXJn?=
+ =?utf-8?B?TGc5c1V0TzVlYUcrOXZwYkFlZGEwVUZ1cnJRVE50SW1pdEgrRzRJOC9yaHdN?=
+ =?utf-8?B?eVNzaEZRQkM1K3ljZERoREdVK3diaSs0TEhzVlZtYjVGUFg1ejMwa0hmbnVN?=
+ =?utf-8?B?LzJQQUZxL1ZGamx5UUZYL2paK2VIa2xleCtKcXVZekJFMGM5ZTlFSEltUFE4?=
+ =?utf-8?B?QnJPLzZSOEJsOFVqYVA1UFpaZHBGUGx0a1FIcHFFR202UGNZNVFEQi9TZ1ov?=
+ =?utf-8?B?azdRVk40OXlDS2FzcXV1UTJxZ1RodzdhMkhsbm1PVEZDZ0xuejFwRXp2QlUv?=
+ =?utf-8?B?WmZFNWc3L0d4NzN0b1JQSmQrTHAra2RCTHowdjNKdzJEeThvMjU0a09rNjM4?=
+ =?utf-8?B?djFHdjJvSWhrdzh1ZWtJYUNUUVFvSlVGNkx2SE1pN2JrZUN6TWd4U0FFVzBW?=
+ =?utf-8?B?Ymk2eHQzZkhuK0NBN0krWFRSdGpCWWJabUVIS3BsK3kxRzVka2k3bGNONWlP?=
+ =?utf-8?B?cUhlU0EzRWVyK1Q4cWx4Uzc5eTlpQ2pDM1kydTFNZnI3YmIySFRSWU1xZVRn?=
+ =?utf-8?B?NDQwdGNOc0FhVitGenpBRW5TMEo5L3Q2Z2JYVzFTUW1NR0VUMkNYM3YxY0c0?=
+ =?utf-8?B?a3VuVWYya1VzTWluUkFEYzFQUWZVOW5zODV0WEpRYTJYYnJMQjVLMTB1NWtE?=
+ =?utf-8?B?M1ZDUUZ0MDVVZ2ZSdVVmbk4wM3RHRENyUkxRWCs2K2ZQNzI1Y2FaQi8zcGd6?=
+ =?utf-8?B?d2h0ZWYwZE02a1p3M2RFR2xNQzFvL251VWE0VTdqRjFTUWtCaTB4UWVldW5q?=
+ =?utf-8?B?WkNBWVJ4Q29Gb3A3eWhlMTRiYklMek5GQ0duSTNZYVFwRlVGY01TRDE2MUhC?=
+ =?utf-8?B?aHlMeDFQVDRmcndYQ3UxWlM5OFBMZHY5OE9jb3pBbW5DUWpFZUxFSGxPZUFt?=
+ =?utf-8?B?UGI5c3VWaTVmNi9PeENLWEllYUh1b0puNHBLSnZ5azN1US85Z284MzVLdWVZ?=
+ =?utf-8?B?aGJ6ZG92R20rcDlFMkZrVTFoZjAza3lmMnVmRjdyNE9neXowNlZUK3RiN3d2?=
+ =?utf-8?B?aC9GVzFhdUR3VUoyY09tV2FxeEpoN29TYlgwRSszRnRnSTl0VzdxQUtsdWZV?=
+ =?utf-8?B?cGpLa0svc21sZjgvWnEvSHFYSDZoa1d6eEJaTTNrM3laL1VVYWtvT0p1VWlh?=
+ =?utf-8?B?K3J6ZkJpbitzVDJnNmp5T0NyM0w3WWMxMFUvcTlrZTU3SzBXNzk5SWk2QWpZ?=
+ =?utf-8?B?K1FvL0Z2SStPNDhRMTllRzJOS1lwL3F5WlVxY3BOMW9wYjMzZDJqMktXRUZo?=
+ =?utf-8?B?Z0lBdCszUnNXVWM2KzBRcjc5akdQU2xkT3ZNb1Z3WGc4dXpaemtuaytpdEh3?=
+ =?utf-8?B?WGQ2cHRIR2ZGVnh3M09VVHhpYk9pcGI2emNLdzNpbUZQcnp2N3h2azVUdXVk?=
+ =?utf-8?B?SytsMm9YYWhKZHZuZFpxczVLTk9xaWlLRU52aXRaeHZJY0w2ajJrTFVPcXZJ?=
+ =?utf-8?B?bkFRR2Q3QmFWTUNLcmR3c0dXNDZDNXZaejNIRUVKM2VHU3hDeEo0ZW5xZ2FT?=
+ =?utf-8?B?YnJvYjZ6SXhsYTJTQ3laTVBFK0tvS3dPMkF3T3BBNmhLUUJFTEtJK0kxUGg3?=
+ =?utf-8?Q?y8TMH2hS91s3PhfrworFLWWJ2tmVZ2dt?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MUgrVHFmOFh6ZEJYVnJTQkVQWnNuL1RYcjFjN0diMmpVaDB3Y2hZbTQ4TktH?=
+ =?utf-8?B?N0ZIMUlTK3FEN1pqMk1ldDZDNUVnbGYvN2NyamVaN0g2MVF2dU9maCt6MkZM?=
+ =?utf-8?B?UVpXL0FHc1Q3bTVGMVZ0bWIzQjFITDJqc3AvcmlQd0M4b0cvVXNnNGsra2Qw?=
+ =?utf-8?B?QmQ4a0JtNm0yWFAvWE1EZXVTTSt2SXVoOXBQME1OY0RoZHhvNFRPa1dIc0cw?=
+ =?utf-8?B?MHhXUCtadmUwdWpVNnA3SVZDL0h2Q3Yzb1pvbVFJSmxHUkFJdU53b0hRSmhY?=
+ =?utf-8?B?VGhpZ0poc1hwNkJxNi84RTV1VjRxVGl6N1pDUTVqSTNRZk5HTnVLSTFUdE9B?=
+ =?utf-8?B?aHlNcHQvbFpXNmdWTitZeGpMSVRURXFud1R3ZXlGeGE3cExGakI3U3VYQ2NQ?=
+ =?utf-8?B?aWpXWVJjamZFQllaTmpueGNJb2g3QlExS0hSQlZjSFNjWXZlcjEwMnB4L1h6?=
+ =?utf-8?B?dGkrazQ4Nmg1SXZMQzhVR3lNWWFGQU5lYzBVWDMweTdTZXF6RFliK0VjYTZV?=
+ =?utf-8?B?NWs2aUl6eGNiUkE1ckJCM2JOUjRRVms3a09ZQlFqL0kzTitiNjFyRXdZcjVM?=
+ =?utf-8?B?a2c5Z2xLNi9rSFlVS1dlTXJEaXEwcUpXTWl6TlZUcEdjMStvR1NhMjlOSTlO?=
+ =?utf-8?B?cGhGWi9BNDFJWjdUT3N4UG1vd2l6dmpKa2hPWGFncERGUnkyc3IzaUdIb3pK?=
+ =?utf-8?B?ekZzWjVRQkJqLzd6eFJQanpuZjFMMUttTnJoZXdmZlVyVXpxdUFHMXdtWkV0?=
+ =?utf-8?B?Rk9EakpIbmVzQnVZaGgyOFJrWGdENjBtb01UOEY2Y1NRQWNSVE1zUVd1TTlL?=
+ =?utf-8?B?Z2ZkQjFORXQ4TDNhczdlbmtSZmdYaEk5S2h0UnBlSFRnbUUyUHFnNjRDQ3ZR?=
+ =?utf-8?B?dXV1RW4zNHN0eXMvRC9KckFOeDZDb0F0RUdqRVVsMUlhck9CWFhSVmNLTlZX?=
+ =?utf-8?B?Z1dHOStnekZnVmhYNmZ3eUo4ZFUrMnh3NUoxaFlMdGIxcnhWN015YTIvTCs1?=
+ =?utf-8?B?TGVUT01OSXg1TExLTlZKZDhGY0hCSGdSazhERkQxK01rNzJrcXhFa1ZmWGN3?=
+ =?utf-8?B?K3pqVDJ1S0J3ZE9FZ0s1UUdFQStDOUovVHJLZnluNE1PT2UwdytwU0xXem9G?=
+ =?utf-8?B?NUdUUjl0b0t4ZnFMV3djcXdmbEl0ZDFZR0pPTnhOZ0pzRHcvN2JoTEphSktQ?=
+ =?utf-8?B?RlA2Tlp1OSsvU05jMHNrRXMxeWtLcVBNcjh2NkRIeHphRzZnSUdQVFc3V3ZN?=
+ =?utf-8?B?enlzVUdFbDcwSHcyenFwNVpBSDRMbktwaTRVRzRWQmhxOEtGTzlTS2dTR0N0?=
+ =?utf-8?B?TGRycHY1MlVYcjQzM1BkTUs1UkpUVWk0SkNVSVdNMnFFeUU3aGY0aVl4Wkk3?=
+ =?utf-8?B?UEFFcHA2a2hwYkdXNTUxc2Q5M1B0ZXdTazhJVzRZbDJLVXZza0EvaGw1eFRG?=
+ =?utf-8?B?eUptTGRtc3Y3V1YvMWlTSldGOXVVcnNwSDlSWit4RWNUR0FPWDcvNU1zVnNP?=
+ =?utf-8?B?dXRSVDNjNlRNd2ltU3BjNUxGYWVjUEI3bzF6ZkZvUHJkTWYrbXIweUZYL1Zn?=
+ =?utf-8?B?YnpNRmoyYmxrNGlJR3ZVZFdhOXRhdkFhb0tEaUpRWVJidHBHMEdGc2x0eS9J?=
+ =?utf-8?B?ZkliaG9QVXVmNmlVb3RMUFl4S3M2Z256UU5BSml1dk5DMHU0ZDlQN1ZoUVB0?=
+ =?utf-8?B?ai9DT0xhWTQ3OFhlay9OS3lJdVA5S2YyVms5TWJMTjhNOTBFVUpTdWJsTW9T?=
+ =?utf-8?B?M0FHTGN0QnN3Q0NHMWFNcHJsZGlDV1BIdUlBblNabmZLTXE1SWlBS2IvR0s4?=
+ =?utf-8?B?UmJKYkErRDVXcG5OYitaZFlnVC84Z2wyNmxRTWN1NFhNdVRETzQ2UGVGa1Bj?=
+ =?utf-8?B?bVpLZE1BT0IyYXBkY24vZzJsVSs3UlBJaWFWd1dpUWd2SlZRU0VWcm9zYzBk?=
+ =?utf-8?B?UEkxeUprSlMvUERHUDhSSnE2akZnZkg4YWt0RDdONURUUFg3UlFHcExlbCto?=
+ =?utf-8?B?SGprek1pSzRXRDZiYitHQTlKaVZHQU8wTVc2NGVXZmpnWExYdFRsaXI4ZldE?=
+ =?utf-8?B?QmFOQ21ZaG82MGdGSm5vTk1ncTFoTTdBaUhxeFRBcmQ5SkV4RW1ZRVJTUlEr?=
+ =?utf-8?Q?CqFZKDnfVR+c9ewFtq5SROnub?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6413db6-bbe4-410d-9b98-08de236e7ac9
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2025 11:10:55.8232
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OBdQu29kaCtJnNlkJO4BeIpNWjO+HxvtnivQ1UpIwRRNDBLBfzlKkeJVnp83eFCrAO1vFSnEcGvIrYoW0u4ajw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7095
 
-Hello,
 
-On 06/10/2025 13:14, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    3b9b1f8df454 Add linux-next specific files for 20250929
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=133df05b980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3c7c078c891391b1
-> dashboard link: https://syzkaller.appspot.com/bug?extid=7fb125d1bae280dc4749
-> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/1ccfc1a8eb22/disk-3b9b1f8d.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/c4e52fa84079/vmlinux-3b9b1f8d.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/9eacf34feeec/bzImage-3b9b1f8d.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+7fb125d1bae280dc4749@syzkaller.appspotmail.com
-> 
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> syzkaller #0 Not tainted
-> ------------------------------------------------------
-> syz.5.3503/26785 is trying to acquire lock:
-> ffffffff8e645220 (fs_reclaim){+.+.}-{0:0}, at: might_alloc include/linux/sched/mm.h:318 [inline]
-> ffffffff8e645220 (fs_reclaim){+.+.}-{0:0}, at: slab_pre_alloc_hook mm/slub.c:4897 [inline]
-> ffffffff8e645220 (fs_reclaim){+.+.}-{0:0}, at: slab_alloc_node mm/slub.c:5221 [inline]
-> ffffffff8e645220 (fs_reclaim){+.+.}-{0:0}, at: kmem_cache_alloc_node_noprof+0x48/0x710 mm/slub.c:5297
-> 
-> but task is already holding lock:
-> ffff888066ee0f18 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1679 [inline]
-> ffff888066ee0f18 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_pm_nl_create_listen_socket net/mptcp/pm_kernel.c:866 [inline]
-> ffff888066ee0f18 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_pm_nl_add_addr_doit+0x1150/0x1460 net/mptcp/pm_kernel.c:1005
-> 
-> which lock already depends on the new lock.
-> 
-> 
-> the existing dependency chain (in reverse order) is:
-> 
-> -> #7 (k-sk_lock-AF_INET){+.+.}-{0:0}:
->        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
->        lock_sock_nested+0x48/0x100 net/core/sock.c:3720
->        lock_sock include/net/sock.h:1679 [inline]
->        __inet_bind+0x392/0xa90 net/ipv4/af_inet.c:524
->        mptcp_bind+0x128/0x1d0 net/mptcp/protocol.c:3846
->        __sys_bind_socket net/socket.c:1861 [inline]
->        __sys_bind+0x2c6/0x3e0 net/socket.c:1892
->        __do_sys_bind net/socket.c:1897 [inline]
->        __se_sys_bind net/socket.c:1895 [inline]
->        __x64_sys_bind+0x7a/0x90 net/socket.c:1895
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #6 (sk_lock-AF_INET){+.+.}-{0:0}:
->        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
->        lock_sock_nested+0x48/0x100 net/core/sock.c:3720
->        lock_sock include/net/sock.h:1679 [inline]
->        inet_shutdown+0x6a/0x390 net/ipv4/af_inet.c:907
->        nbd_mark_nsock_dead+0x2e9/0x560 drivers/block/nbd.c:318
->        sock_shutdown+0x15e/0x260 drivers/block/nbd.c:411
->        nbd_clear_sock drivers/block/nbd.c:1424 [inline]
->        nbd_config_put+0x342/0x790 drivers/block/nbd.c:1448
->        nbd_release+0xfe/0x140 drivers/block/nbd.c:1753
->        bdev_release+0x536/0x650 block/bdev.c:-1
->        blkdev_release+0x15/0x20 block/fops.c:702
->        __fput+0x44c/0xa70 fs/file_table.c:468
->        task_work_run+0x1d4/0x260 kernel/task_work.c:227
->        resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
->        exit_to_user_mode_loop+0xe9/0x130 kernel/entry/common.c:43
->        exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
->        syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
->        syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
->        do_syscall_64+0x2bd/0xfa0 arch/x86/entry/syscall_64.c:100
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #5 (&nsock->tx_lock){+.+.}-{4:4}:
->        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
->        __mutex_lock_common kernel/locking/mutex.c:598 [inline]
->        __mutex_lock+0x187/0x1350 kernel/locking/mutex.c:760
->        nbd_handle_cmd drivers/block/nbd.c:1140 [inline]
->        nbd_queue_rq+0x257/0xf10 drivers/block/nbd.c:1204
->        blk_mq_dispatch_rq_list+0x4c0/0x1900 block/blk-mq.c:2129
->        __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
->        blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
->        __blk_mq_sched_dispatch_requests+0xda4/0x1570 block/blk-mq-sched.c:307
->        blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
->        blk_mq_run_hw_queue+0x348/0x4f0 block/blk-mq.c:2367
->        blk_mq_dispatch_list+0xd0c/0xe00 include/linux/spinlock.h:-1
->        blk_mq_flush_plug_list+0x469/0x550 block/blk-mq.c:2976
->        __blk_flush_plug+0x3d3/0x4b0 block/blk-core.c:1225
->        blk_finish_plug block/blk-core.c:1252 [inline]
->        __submit_bio+0x2d3/0x5a0 block/blk-core.c:651
->        __submit_bio_noacct_mq block/blk-core.c:724 [inline]
->        submit_bio_noacct_nocheck+0x2fb/0xa50 block/blk-core.c:755
->        submit_bh fs/buffer.c:2829 [inline]
->        block_read_full_folio+0x599/0x830 fs/buffer.c:2447
->        filemap_read_folio+0x117/0x380 mm/filemap.c:2444
->        do_read_cache_folio+0x350/0x590 mm/filemap.c:4024
->        read_mapping_folio include/linux/pagemap.h:999 [inline]
->        read_part_sector+0xb6/0x2b0 block/partitions/core.c:722
->        adfspart_check_ICS+0xa4/0xa50 block/partitions/acorn.c:360
->        check_partition block/partitions/core.c:141 [inline]
->        blk_add_partitions block/partitions/core.c:589 [inline]
->        bdev_disk_changed+0x75f/0x14b0 block/partitions/core.c:693
->        blkdev_get_whole+0x380/0x510 block/bdev.c:748
->        bdev_open+0x31e/0xd30 block/bdev.c:957
->        blkdev_open+0x457/0x600 block/fops.c:694
->        do_dentry_open+0x953/0x13f0 fs/open.c:965
->        vfs_open+0x3b/0x340 fs/open.c:1097
->        do_open fs/namei.c:3975 [inline]
->        path_openat+0x2ee5/0x3830 fs/namei.c:4134
->        do_filp_open+0x1fa/0x410 fs/namei.c:4161
->        do_sys_openat2+0x121/0x1c0 fs/open.c:1437
->        do_sys_open fs/open.c:1452 [inline]
->        __do_sys_openat fs/open.c:1468 [inline]
->        __se_sys_openat fs/open.c:1463 [inline]
->        __x64_sys_openat+0x138/0x170 fs/open.c:1463
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #4 (&cmd->lock){+.+.}-{4:4}:
->        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
->        __mutex_lock_common kernel/locking/mutex.c:598 [inline]
->        __mutex_lock+0x187/0x1350 kernel/locking/mutex.c:760
->        nbd_queue_rq+0xc8/0xf10 drivers/block/nbd.c:1196
->        blk_mq_dispatch_rq_list+0x4c0/0x1900 block/blk-mq.c:2129
->        __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
->        blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
->        __blk_mq_sched_dispatch_requests+0xda4/0x1570 block/blk-mq-sched.c:307
->        blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
->        blk_mq_run_hw_queue+0x348/0x4f0 block/blk-mq.c:2367
->        blk_mq_dispatch_list+0xd0c/0xe00 include/linux/spinlock.h:-1
->        blk_mq_flush_plug_list+0x469/0x550 block/blk-mq.c:2976
->        __blk_flush_plug+0x3d3/0x4b0 block/blk-core.c:1225
->        blk_finish_plug block/blk-core.c:1252 [inline]
->        __submit_bio+0x2d3/0x5a0 block/blk-core.c:651
->        __submit_bio_noacct_mq block/blk-core.c:724 [inline]
->        submit_bio_noacct_nocheck+0x2fb/0xa50 block/blk-core.c:755
->        submit_bh fs/buffer.c:2829 [inline]
->        block_read_full_folio+0x599/0x830 fs/buffer.c:2447
->        filemap_read_folio+0x117/0x380 mm/filemap.c:2444
->        do_read_cache_folio+0x350/0x590 mm/filemap.c:4024
->        read_mapping_folio include/linux/pagemap.h:999 [inline]
->        read_part_sector+0xb6/0x2b0 block/partitions/core.c:722
->        adfspart_check_ICS+0xa4/0xa50 block/partitions/acorn.c:360
->        check_partition block/partitions/core.c:141 [inline]
->        blk_add_partitions block/partitions/core.c:589 [inline]
->        bdev_disk_changed+0x75f/0x14b0 block/partitions/core.c:693
->        blkdev_get_whole+0x380/0x510 block/bdev.c:748
->        bdev_open+0x31e/0xd30 block/bdev.c:957
->        blkdev_open+0x457/0x600 block/fops.c:694
->        do_dentry_open+0x953/0x13f0 fs/open.c:965
->        vfs_open+0x3b/0x340 fs/open.c:1097
->        do_open fs/namei.c:3975 [inline]
->        path_openat+0x2ee5/0x3830 fs/namei.c:4134
->        do_filp_open+0x1fa/0x410 fs/namei.c:4161
->        do_sys_openat2+0x121/0x1c0 fs/open.c:1437
->        do_sys_open fs/open.c:1452 [inline]
->        __do_sys_openat fs/open.c:1468 [inline]
->        __se_sys_openat fs/open.c:1463 [inline]
->        __x64_sys_openat+0x138/0x170 fs/open.c:1463
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #3 (set->srcu){.+.+}-{0:0}:
->        lock_sync+0xba/0x160 kernel/locking/lockdep.c:5916
->        srcu_lock_sync include/linux/srcu.h:173 [inline]
->        __synchronize_srcu+0x96/0x3a0 kernel/rcu/srcutree.c:1439
->        elevator_switch+0x12b/0x640 block/elevator.c:588
->        elevator_change+0x315/0x4c0 block/elevator.c:691
->        elevator_set_default+0x186/0x260 block/elevator.c:767
->        blk_register_queue+0x34e/0x3f0 block/blk-sysfs.c:942
->        __add_disk+0x677/0xd50 block/genhd.c:528
->        add_disk_fwnode+0xfc/0x480 block/genhd.c:597
->        add_disk include/linux/blkdev.h:775 [inline]
->        nbd_dev_add+0x717/0xae0 drivers/block/nbd.c:1981
->        nbd_init+0x168/0x1f0 drivers/block/nbd.c:2688
->        do_one_initcall+0x236/0x820 init/main.c:1283
->        do_initcall_level+0x104/0x190 init/main.c:1345
->        do_initcalls+0x59/0xa0 init/main.c:1361
->        kernel_init_freeable+0x334/0x4b0 init/main.c:1593
->        kernel_init+0x1d/0x1d0 init/main.c:1483
->        ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
->        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-> 
-> -> #2 (&q->elevator_lock){+.+.}-{4:4}:
->        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
->        __mutex_lock_common kernel/locking/mutex.c:598 [inline]
->        __mutex_lock+0x187/0x1350 kernel/locking/mutex.c:760
->        elevator_change+0x1e5/0x4c0 block/elevator.c:689
->        elevator_set_none+0x42/0xb0 block/elevator.c:782
->        blk_mq_elv_switch_none block/blk-mq.c:5032 [inline]
->        __blk_mq_update_nr_hw_queues block/blk-mq.c:5075 [inline]
->        blk_mq_update_nr_hw_queues+0x598/0x1ab0 block/blk-mq.c:5133
->        nbd_start_device+0x17f/0xb10 drivers/block/nbd.c:1486
->        nbd_genl_connect+0x135b/0x18f0 drivers/block/nbd.c:2236
->        genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
->        genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
->        genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
->        netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
->        genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
->        netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
->        netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
->        netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
->        sock_sendmsg_nosec net/socket.c:714 [inline]
->        __sock_sendmsg+0x21c/0x270 net/socket.c:729
->        ____sys_sendmsg+0x505/0x830 net/socket.c:2617
->        ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2671
->        __sys_sendmsg net/socket.c:2703 [inline]
->        __do_sys_sendmsg net/socket.c:2708 [inline]
->        __se_sys_sendmsg net/socket.c:2706 [inline]
->        __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2706
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #1 (&q->q_usage_counter(io)#49){++++}-{0:0}:
->        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
->        blk_alloc_queue+0x538/0x620 block/blk-core.c:461
->        blk_mq_alloc_queue block/blk-mq.c:4399 [inline]
->        __blk_mq_alloc_disk+0x15c/0x340 block/blk-mq.c:4446
->        nbd_dev_add+0x46c/0xae0 drivers/block/nbd.c:1951
->        nbd_init+0x168/0x1f0 drivers/block/nbd.c:2688
->        do_one_initcall+0x236/0x820 init/main.c:1283
->        do_initcall_level+0x104/0x190 init/main.c:1345
->        do_initcalls+0x59/0xa0 init/main.c:1361
->        kernel_init_freeable+0x334/0x4b0 init/main.c:1593
->        kernel_init+0x1d/0x1d0 init/main.c:1483
->        ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
->        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-> 
-> -> #0 (fs_reclaim){+.+.}-{0:0}:
->        check_prev_add kernel/locking/lockdep.c:3165 [inline]
->        check_prevs_add kernel/locking/lockdep.c:3284 [inline]
->        validate_chain+0xb9b/0x2140 kernel/locking/lockdep.c:3908
->        __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
->        lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
->        __fs_reclaim_acquire mm/page_alloc.c:4269 [inline]
->        fs_reclaim_acquire+0x72/0x100 mm/page_alloc.c:4283
->        might_alloc include/linux/sched/mm.h:318 [inline]
->        slab_pre_alloc_hook mm/slub.c:4897 [inline]
->        slab_alloc_node mm/slub.c:5221 [inline]
->        kmem_cache_alloc_node_noprof+0x48/0x710 mm/slub.c:5297
->        __alloc_skb+0x112/0x2d0 net/core/skbuff.c:660
->        alloc_skb include/linux/skbuff.h:1383 [inline]
->        nlmsg_new include/net/netlink.h:1055 [inline]
->        mptcp_event_pm_listener+0x134/0x520 net/mptcp/pm_netlink.c:532
->        mptcp_pm_nl_create_listen_socket net/mptcp/pm_kernel.c:870 [inline]
->        mptcp_pm_nl_add_addr_doit+0x11da/0x1460 net/mptcp/pm_kernel.c:1005
->        genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
->        genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
->        genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
->        netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
->        genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
->        netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
->        netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
->        netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
->        sock_sendmsg_nosec net/socket.c:714 [inline]
->        __sock_sendmsg+0x21c/0x270 net/socket.c:729
->        ____sys_sendmsg+0x505/0x830 net/socket.c:2617
->        ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2671
->        __sys_sendmsg net/socket.c:2703 [inline]
->        __do_sys_sendmsg net/socket.c:2708 [inline]
->        __se_sys_sendmsg net/socket.c:2706 [inline]
->        __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2706
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> other info that might help us debug this:
-> 
-> Chain exists of:
->   fs_reclaim --> sk_lock-AF_INET --> k-sk_lock-AF_INET
+On 11/12/25 14:53, Jonathan Cameron wrote:
+> On Mon, 10 Nov 2025 15:36:36 +0000
+> alejandro.lucero-palau@amd.com wrote:
+>
+>> From: Dan Williams <dan.j.williams@intel.com>
+>>
+>> In preparation for CXL accelerator drivers that have a hard dependency on
+>> CXL capability initialization, arrange for the endpoint probe result to be
+>> conveyed to the caller of devm_cxl_add_memdev().
+>>
+>> As it stands cxl_pci does not care about the attach state of the cxl_memdev
+>> because all generic memory expansion functionality can be handled by the
+>> cxl_core. For accelerators, that driver needs to know perform driver
+>> specific initialization if CXL is available, or exectute a fallback to PCIe
+>> only operation.
+>>
+>> By moving devm_cxl_add_memdev() to cxl_mem.ko it removes async module
+>> loading as one reason that a memdev may not be attached upon return from
+>> devm_cxl_add_memdev().
+>>
+>> The diff is busy as this moves cxl_memdev_alloc() down below the definition
+>> of cxl_memdev_fops and introduces devm_cxl_memdev_add_or_reset() to
+>> preclude needing to export more symbols from the cxl_core.
+>>
+>> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+> Alejandro, read submitting patches again.  Whilst the first sign off should
+> indeed by Dan's this also needs one from you as a 'handler' of the patch.
+>
+> Be very careful checking these tag chains. If they are wrong no one can
+> merge the set and it just acts as a silly blocker.
 
-As noted by Paolo offline, it looks like this issue is due to nbd
-introducing a lockdep dependency between reclaim and af_socket, and this
-is similar to a previous report:
 
-#syz dup: [syzbot] [mptcp?] possible deadlock in mptcp_subflow_create_socket (2)
+Hi Jonathan,
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
 
+I did the amend but it is true I did some work on it. Would it be enough 
+to add my signed-off-by along with Dan's one?
+
+
+> I would have split this up and made the changes to cxl_memdev_alloc in
+> a precursor patch (use of __free is obvious one) then could have stated
+> that that was simply moved in this patch.
+
+
+OK. I think I was fixing a bug in original Dan's patch regarding cxlmd 
+release in case of error inside devm_cxl_add_memdev, but I think the bug 
+is in the current code of that function as it is not properly released 
+if error after a successful allocation. So splitting the patch could 
+allow to make this clearer and adding the Fixes tag as well.
+
+
+> There are other changes in there that are really hard to spot though
+> and I think there are some bugs lurking in error paths.
+
+
+I did spot one after your comment, checking cxlmd pointer is not an 
+error pointer inside __cxlmd_free. If you spotted something else, please 
+tell me :-)
+
+
+Thank you!
+
+
+> Jonathan
+>
+>> ---
+>>   drivers/cxl/Kconfig       |   2 +-
+>>   drivers/cxl/core/memdev.c | 101 ++++++++++++++------------------------
+>>   drivers/cxl/mem.c         |  41 ++++++++++++++++
+>>   drivers/cxl/private.h     |  10 ++++
+>>   4 files changed, 90 insertions(+), 64 deletions(-)
+>>   create mode 100644 drivers/cxl/private.h
+>> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+>> index e370d733e440..14b4601faf66 100644
+>> --- a/drivers/cxl/core/memdev.c
+>> +++ b/drivers/cxl/core/memdev.c
+>> @@ -8,6 +8,7 @@
+>>   #include <linux/idr.h>
+>>   #include <linux/pci.h>
+>>   #include <cxlmem.h>
+>> +#include "private.h"
+>>   #include "trace.h"
+>>   #include "core.h"
+>>   
+>> @@ -648,42 +649,25 @@ static void detach_memdev(struct work_struct *work)
+>>   
+>>   static struct lock_class_key cxl_memdev_key;
+>>   
+>> -static struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds,
+>> -					   const struct file_operations *fops)
+>> +int devm_cxl_memdev_add_or_reset(struct device *host, struct cxl_memdev *cxlmd)
+>>   {
+>> -	struct cxl_memdev *cxlmd;
+>> -	struct device *dev;
+>> -	struct cdev *cdev;
+>> +	struct device *dev = &cxlmd->dev;
+>> +	struct cdev *cdev = &cxlmd->cdev;
+>>   	int rc;
+>>   
+>> -	cxlmd = kzalloc(sizeof(*cxlmd), GFP_KERNEL);
+>> -	if (!cxlmd)
+>> -		return ERR_PTR(-ENOMEM);
+>> -
+>> -	rc = ida_alloc_max(&cxl_memdev_ida, CXL_MEM_MAX_DEVS - 1, GFP_KERNEL);
+>> -	if (rc < 0)
+>> -		goto err;
+>> -	cxlmd->id = rc;
+>> -	cxlmd->depth = -1;
+>> -
+>> -	dev = &cxlmd->dev;
+>> -	device_initialize(dev);
+>> -	lockdep_set_class(&dev->mutex, &cxl_memdev_key);
+>> -	dev->parent = cxlds->dev;
+>> -	dev->bus = &cxl_bus_type;
+>> -	dev->devt = MKDEV(cxl_mem_major, cxlmd->id);
+>> -	dev->type = &cxl_memdev_type;
+>> -	device_set_pm_not_required(dev);
+>> -	INIT_WORK(&cxlmd->detach_work, detach_memdev);
+>> -
+>> -	cdev = &cxlmd->cdev;
+>> -	cdev_init(cdev, fops);
+>> -	return cxlmd;
+>> +	rc = cdev_device_add(cdev, dev);
+>> +	if (rc) {
+>> +		/*
+>> +		 * The cdev was briefly live, shutdown any ioctl operations that
+>> +		 * saw that state.
+>> +		 */
+>> +		cxl_memdev_shutdown(dev);
+>> +		return rc;
+>> +	}
+>>   
+>> -err:
+>> -	kfree(cxlmd);
+>> -	return ERR_PTR(rc);
+>> +	return devm_add_action_or_reset(host, cxl_memdev_unregister, cxlmd);
+>>   }
+>> +EXPORT_SYMBOL_NS_GPL(devm_cxl_memdev_add_or_reset, "CXL");
+>>   
+>>   static long __cxl_memdev_ioctl(struct cxl_memdev *cxlmd, unsigned int cmd,
+>>   			       unsigned long arg)
+>> @@ -1051,50 +1035,41 @@ static const struct file_operations cxl_memdev_fops = {
+>>   	.llseek = noop_llseek,
+>>   };
+>>   
+>> -struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>> -				       struct cxl_dev_state *cxlds)
+>> +struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds)
+>>   {
+>> -	struct cxl_memdev *cxlmd;
+>> +	struct cxl_memdev *cxlmd __free(kfree) =
+>> +		kzalloc(sizeof(*cxlmd), GFP_KERNEL);
+> Trivial and perhaps not worth the hassle.
+> I'd pull this out of the declarations block to have
+>
+>   	struct device *dev;
+>   	struct cdev *cdev;
+>   	int rc;
+>
+> 	struct cxl_memdev *cxlmd __free(kfree) =
+> 		kzalloc(sizeof(*cxlmd), GFP_KERNEL);
+> 	if (!cxlmd)
+> 		return ERR_PTR(-ENOMEM);
+>
+> That is treat the __free() related statement as an inline declaration of
+> the type we only really allow for these.
+>
+>
+>>   	struct device *dev;
+>>   	struct cdev *cdev;
+>>   	int rc;
+>>   
+>> -	cxlmd = cxl_memdev_alloc(cxlds, &cxl_memdev_fops);
+>> -	if (IS_ERR(cxlmd))
+>> -		return cxlmd;
+>>   
+>> -	dev = &cxlmd->dev;
+>> -	rc = dev_set_name(dev, "mem%d", cxlmd->id);
+>> -	if (rc)
+>> -		goto err;
+>> +	if (!cxlmd)
+>> +		return ERR_PTR(-ENOMEM);
+>>   
+>> -	/*
+>> -	 * Activate ioctl operations, no cxl_memdev_rwsem manipulation
+>> -	 * needed as this is ordered with cdev_add() publishing the device.
+>> -	 */
+>> +	rc = ida_alloc_max(&cxl_memdev_ida, CXL_MEM_MAX_DEVS - 1, GFP_KERNEL);
+>> +	if (rc < 0)
+>> +		return ERR_PTR(rc);
+>> +	cxlmd->id = rc;
+>> +	cxlmd->depth = -1;
+>>   	cxlmd->cxlds = cxlds;
+>>   	cxlds->cxlmd = cxlmd;
+> These two lines weren't previously in cxl_memdev_alloc()
+> I'd like a statement in the commit message of why they are now. It seems
+> harmless because they are still ordered before the add and are
+> ultimately freed
+>
+> I'm not immediately spotting why they now are.  This whole code shift
+> and complex diff is enough of a pain I'd be tempted to do the move first
+> so that we can then see what is actually changed much more easily.
+>
+>
+>>   
+>> -	cdev = &cxlmd->cdev;
+>> -	rc = cdev_device_add(cdev, dev);
+>> -	if (rc)
+>> -		goto err;
+>> -
+>> -	rc = devm_add_action_or_reset(host, cxl_memdev_unregister, cxlmd);
+>> -	if (rc)
+>> -		return ERR_PTR(rc);
+>> -	return cxlmd;
+>> +	dev = &cxlmd->dev;
+>> +	device_initialize(dev);
+>> +	lockdep_set_class(&dev->mutex, &cxl_memdev_key);
+>> +	dev->parent = cxlds->dev;
+>> +	dev->bus = &cxl_bus_type;
+>> +	dev->devt = MKDEV(cxl_mem_major, cxlmd->id);
+>> +	dev->type = &cxl_memdev_type;
+>> +	device_set_pm_not_required(dev);
+>> +	INIT_WORK(&cxlmd->detach_work, detach_memdev);
+>>   
+>> -err:
+>> -	/*
+>> -	 * The cdev was briefly live, shutdown any ioctl operations that
+>> -	 * saw that state.
+>> -	 */
+>> -	cxl_memdev_shutdown(dev);
+>> -	put_device(dev);
+>> -	return ERR_PTR(rc);
+>> +	cdev = &cxlmd->cdev;
+>> +	cdev_init(cdev, &cxl_memdev_fops);
+>> +	return_ptr(cxlmd);
+>>   }
+>> -EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, "CXL");
+>> +EXPORT_SYMBOL_NS_GPL(cxl_memdev_alloc, "CXL");
+>>   
+>>   static void sanitize_teardown_notifier(void *data)
+>>   {
+>> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
+>> index d2155f45240d..fa5d901ee817 100644
+>> --- a/drivers/cxl/mem.c
+>> +++ b/drivers/cxl/mem.c
+>> @@ -7,6 +7,7 @@
+>>   
+>>   #include "cxlmem.h"
+>>   #include "cxlpci.h"
+>> +#include "private.h"
+>>   
+>>   /**
+>>    * DOC: cxl mem
+>> @@ -202,6 +203,45 @@ static int cxl_mem_probe(struct device *dev)
+>>   	return devm_add_action_or_reset(dev, enable_suspend, NULL);
+>>   }
+>>   
+>> +static void __cxlmd_free(struct cxl_memdev *cxlmd)
+>> +{
+>> +	cxlmd->cxlds->cxlmd = NULL;
+>> +	put_device(&cxlmd->dev);
+>> +	kfree(cxlmd);
+>> +}
+>> +
+>> +DEFINE_FREE(cxlmd_free, struct cxl_memdev *, __cxlmd_free(_T))
+>> +
+>> +/**
+>> + * devm_cxl_add_memdev - Add a CXL memory device
+>> + * @host: devres alloc/release context and parent for the memdev
+>> + * @cxlds: CXL device state to associate with the memdev
+>> + *
+>> + * Upon return the device will have had a chance to attach to the
+>> + * cxl_mem driver, but may fail if the CXL topology is not ready
+>> + * (hardware CXL link down, or software platform CXL root not attached)
+>> + */
+>> +struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>> +				       struct cxl_dev_state *cxlds)
+>> +{
+>> +	struct cxl_memdev *cxlmd __free(cxlmd_free) = cxl_memdev_alloc(cxlds);
+>> +	int rc;
+>> +
+>> +	if (IS_ERR(cxlmd))
+>> +		return cxlmd;
+>> +
+>> +	rc = dev_set_name(&cxlmd->dev, "mem%d", cxlmd->id);
+>> +	if (rc)
+>> +		return ERR_PTR(rc);
+>> +
+>> +	rc = devm_cxl_memdev_add_or_reset(host, cxlmd);
+>> +	if (rc)
+>> +		return ERR_PTR(rc);
+> Is the reference tracking right here?  If the above call fails
+> then it is possible cxl_memdev_unregister() has been called
+> or just cxl_memdev_shutdown().
+>
+> If nothing else (and I suspect there is worse but haven't
+> counted references) that will set
+> cxlmd->cxlds = NULL;
+> s part of cxl_memdev_shutdown()
+> The __cxlmd_free() then dereferences that and boom.
+>
+>
+>> +
+>> +	return no_free_ptr(cxlmd);
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, "CXL");
 
