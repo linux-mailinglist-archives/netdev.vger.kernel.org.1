@@ -1,264 +1,217 @@
-Return-Path: <netdev+bounces-238790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 349C0C5F7A6
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 23:14:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7984BC5F7E0
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 23:17:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 17A8B4E27E2
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:14:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AFCE3A03B2
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66848345731;
-	Fri, 14 Nov 2025 22:14:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12115302746;
+	Fri, 14 Nov 2025 22:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PePrhLLT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fTpXg+H2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E49315D46
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 22:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9492D0C76
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 22:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763158445; cv=none; b=B8OQHWzrv1IAm60coMV73yItEYdCqz2Is0NIihwl5mRr0fpsfmWhoZLO1vZableBfKIQcsW0y8xpyj4Cwkv7NxNYHQrMqj/BDArFQ1eXlAZkTEulmzlKWxb0AY6Fva96d/7+BfvX8Vmm8I0i+UhrLA0HnYg0QbLyYd7xx/CTQRs=
+	t=1763158665; cv=none; b=luKXIw0NuUzq+aS+Fqkm8keX53SREv4zdpHTcvUnG0Ffj7yRb4V4Ogp3xNoDj0WEsUgePxhj5jwaaniCC0p6HGVeQSAAv/eUCb7zLCuRa58cjjdTjwI6hf67Acwdy0z2NTAriO9zzX9Ec9tw+hbaUPdcidjgHDwNqGeGwRqO4kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763158445; c=relaxed/simple;
-	bh=YFL5fxxxqEKSNlrulASCd7JeiIbvYBc7XWyMFO10QBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NRi5PmIsXuTLimJqqD8QclxFldCNjHUdb93crPRdSjCn7bRaWykn8CivK9aK/vXQccbsPQIzM0l9jSN9ejHlk48cpZBYCldvpYRqw7wqgLHehWHcULn4O7Ns73GHcEa+A2FLw3n25fuhKDRKwf7GluV5/8Wo8WQBCsWI7lcpPKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PePrhLLT; arc=none smtp.client-ip=209.85.128.177
+	s=arc-20240116; t=1763158665; c=relaxed/simple;
+	bh=Dzmx0YBJyLeugHh/HjszbcoKuh5grFiBKyTcFy/3q/U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QQ88LJDt6XqLIAGkkN+XGcjfCtbgKmL6IA6SiGg60FWIWyk2Mgl13pltM0Y3BHwKk8ILvblx8o/mYXj54rs6Jp0LZMLDnkBFSm3CIKIE0ycl5es+i5ecLfWz+w+kotVxkIHovgBanq1v0NMk2imVuepKsg4f/Zrka1KuFd2EPdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fTpXg+H2; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-71d60157747so21506217b3.0
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 14:14:02 -0800 (PST)
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-34361025290so2025083a91.1
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 14:17:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763158442; x=1763763242; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5Hykq0AZOv3Mcxta5MvKVi28KK2hR4lRzOujGk7TFas=;
-        b=PePrhLLTUfQKtexRSDhq0+vDtTlm8UAtG/uf2zh9cA+PrBKJxVesO866zg8Z2GfUu5
-         L9jJ683+mjToHB0dZPr0hHg3CDKtoSRxpelPY11Jf89hueGcpka8XspVLMb26GH8BFxh
-         tWyeRoY9KgAXWjfVUJA3mdg+W9PRITh64Txaa2MFr7UyiXy81VLB53P5sZ2Ym4pClIG3
-         xrAL5sYYYUvd2I2cEUNGP/g3nmq6KpaXFqCdSiLnClhV3WMT4rW9XJbT9Gnxpo522th0
-         vwoZVCrX1PK42Ay8ln8cSZ1MUWgZMPNiIMbMb4KNqxT0h5TVOoFT9sobhP6X7koat3u9
-         fNSA==
+        d=gmail.com; s=20230601; t=1763158663; x=1763763463; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uIJ4sH8KrnjSYwejHwnXnjY+R7Br7R8cnGubWv7YLN0=;
+        b=fTpXg+H2zulhZwXVuB2l1LSo9jBqK3+wRgRFfw6uXANfT9x9TqWC/uK+SOvUsTcyUx
+         ASoiKwiCQMcLDgNRJZ0brxidsI9mX1SHrNw8yhL04PnqFjFsORUb/f/ZRu8aXlkVglg+
+         6ffEFCTrctKRI3wiaXDqg4Ta1h8NC2vec7z6y7lICRKRWZhgD5Y8uAYMcC3+slfl0h+I
+         GG4fxkbxlTwFkAFj7kBmxu+HBhGoXqfMzqhPBQfl6VVqxuyjPUkebgnXOZFuaXB0kmFu
+         bgGLeU6nK5iD/W3z3NhR+VhiPoW6TtL/gt5X29eFYWxot7N+gj4cXi5hyxyBaMrQ3whI
+         9Q+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763158442; x=1763763242;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5Hykq0AZOv3Mcxta5MvKVi28KK2hR4lRzOujGk7TFas=;
-        b=Tnnn+RDFayB55eSUWIEfLc39740ZE3h1aYD8+Okb1a2ozUJROu5tFvyUZpJfxELTTC
-         RY8r8mjcK1JyMVma8rxf1/kcaVgAHEKVCFB/O3vrJcpfXweZplAf5FDnLucmsENJ7nyp
-         HPo3GT1zuSDBd26omfrjmE8nLQKYYAnFHhX7TUrxB9QGgEdS3BCHY/PiuQPopHMWk6MF
-         OPms+dHTxOBsP8gDPTokzdJULP04GKNHu2S0iJeOPtTFwE32PMB2V3FLAHZcW90PREsD
-         uRCyfvTgucam8zV1laCValQGqQZj2pGS56h+zsksW6ppduITXYmnclwDs+lU+g0xOrLA
-         SXdA==
-X-Forwarded-Encrypted: i=1; AJvYcCVF7ftRZ+Dg6KvayN6YJfT2mpeSE38weFXGgXhyN7l8Y/PZuhj0etIcLW9UoMpR+PJbwze/x18=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx61kAJRW43cPIMClpaHQdASZiZ8liZO+XFA6nbrNvw3NjhLSwh
-	HxoOOPxru3yzqh7f5VkspWKPSffqCr6+N1FEIei2ymlVXjAQLwDAyjO5
-X-Gm-Gg: ASbGncsfXMJ4P/j4COPdbVhx6s+dh1jq3cZD/UW1CRu+Myy31g9mAqSBOeTDLBPbt/J
-	2fscjnyx8Sok/CXbDGeppZaqQy3lfAgBX3/5IvJrYTIId2L+V/7VTe+KlJiS3yiXVz4oaKqHYim
-	NOhUVXP0J9bt3UoLbDPit7EqskhPtlGX0K++lnQ+7mpu8lJEKduDI7oeHoAurBhRdurmtpxV+sK
-	wLNSHBTAGENNLAfF7/DPodz1MawcTo7LucGprtV2IJs7ML38XYhh5qV6SboKHltVnkXXwkXjPAO
-	sOV7mcafhnuI7wVMoXP1FcbgbwHNBX8W8kFXjtjCFIGujSF/TFiMpYcLRd3eaNHienyBR035yEE
-	EkVXIWILmwzUg88MXJ2uGrvVYHK6GY7cxuBRXyqRbdnqtrV7P/Kc8Z0x1CqfBlaTiwccFVm+zJp
-	p4CVRq+m5Q/kP8AW7K8JHTMNsZVWkPeKS7ZBzrsm9YWvAhOg==
-X-Google-Smtp-Source: AGHT+IGcJZO4HUiY70v/QCO/xzK+nTyMf7KdDebKqAftSKwEa0NHlBS6WCaAwow7uyA9ZmNwfg0Gcg==
-X-Received: by 2002:a05:690c:7603:b0:788:ee99:f125 with SMTP id 00721157ae682-78929e0d4a5mr32556247b3.2.1763158441752;
-        Fri, 14 Nov 2025 14:14:01 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:c::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78822151d43sm19410627b3.46.2025.11.14.14.14.00
+        d=1e100.net; s=20230601; t=1763158663; x=1763763463;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uIJ4sH8KrnjSYwejHwnXnjY+R7Br7R8cnGubWv7YLN0=;
+        b=AdZTHjOud6sJOArTZysrbIpUMvgCe0fBvlh9Gw0k07TzMvSsCljpCPQr5/uwSoDxj7
+         OazmSBJv/B+LnySF44/t5ZJtzKZGgAyrLdUxs/6XAp5zBkDnr9YmSuzppVajxwODhTaz
+         BSOI/a37bu68tXCzyYKk2vdKSLHBI1NB+GFMPQlsTTJu2WDGJdG+HjDautz6mwv0tQdk
+         N9YL7tirC/rdJVxOGmMGkN9roajbQB+NzrhgGb2hsXqrXw0FalCOFIKn25FX6IM71YEN
+         yA+fX8jfSndiSjlnws0Ly6T+EiCblWdpQICi15a89uZfgD9Ozbl9h+lbKivUgctZ4s6S
+         /4wQ==
+X-Gm-Message-State: AOJu0YyY6xli4Wq4QgEangmCOhngH2uog5IM8nmmtI9NmVkJEzJvnuXe
+	5i6g6HA39zqgY700MAFCYBdW2pwpUGrTlEqOY92Y5KxWCe2WtkzqDRwe
+X-Gm-Gg: ASbGnctSrue9qFEBvR643GVvsUPDRiN7d7wAzmvvWCETd963mz90Rzu1G39xiDAY4hS
+	JBMHxfpASnthvD8/F7Z34UCijMZGkf8kvdL6sNOGXvOSEfvcHLT+YmGSfS7ODxWGJD+5d8nVREG
+	Rx0evhkn0Bp5ecyf4MaQ3m0NbGvQseMokj66bw83sLuhOAyr+ZvJBHJmrARFuHQMLdkVQ0Ky+g0
+	oB6ZKMG9SGnp5OezoljHYnV0/1U0u/jiqteVVFa+FRLPPdN4NVcntELS9b09Ior3Ymiexg9Bv7z
+	DlteFVl1IuswEnIXGjSyIsKXG2FrFLFp31NvoUU/Pk6rZ2MgireG/zSnRQ13bRJw2WHv1aTPCh4
+	Tt8D54gHhbVvDPEQHzeEJo4AYkt0YR5WcMKhkNECh3fkhRKDE3JMErC3sabeVKLu1/+eMP9NOx/
+	xwrgk=
+X-Google-Smtp-Source: AGHT+IF6Cnknnt0DiYSboO3T3fLnYTky9FlLP4usktu2QdJMJ/eApKLyCMfz/X/OUV6+hEoD9+uKJQ==
+X-Received: by 2002:a17:90a:e185:b0:33f:f22c:8602 with SMTP id 98e67ed59e1d1-343fa6373c5mr5158804a91.26.1763158662580;
+        Fri, 14 Nov 2025 14:17:42 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:43::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3456513f0eesm1568894a91.7.2025.11.14.14.17.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 14:14:01 -0800 (PST)
-Date: Fri, 14 Nov 2025 14:13:59 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v9 06/14] vsock/loopback: add netns support
-Message-ID: <aRepp4Weuhaxgn6W@devvm11784.nha0.facebook.com>
-References: <20251111-vsock-vmtest-v9-0-852787a37bed@meta.com>
- <20251111-vsock-vmtest-v9-6-852787a37bed@meta.com>
- <g6bxp6hketbjrddzni2ln37gsezqvxbu2orheorzh7fs66roll@hhcrgsos3ui3>
- <aRTRhk/ok06YKTEu@devvm11784.nha0.facebook.com>
- <g5dcyor4aryvtcnqxm5aekldbettetlmog3c7sj7sjx3yp2pgy@hcpxyubied2n>
- <aRYivEKsa44u5Mh+@devvm11784.nha0.facebook.com>
- <kwgjzpxxqpkgwafydp65vlj6jlf7h7kcnhwgtwrrhzp2qtgkkq@z3xfl26ejspl>
+        Fri, 14 Nov 2025 14:17:42 -0800 (PST)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	tj@kernel.org,
+	martin.lau@kernel.org,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v6 0/7] Support associating BPF programs with struct_ops
+Date: Fri, 14 Nov 2025 14:17:35 -0800
+Message-ID: <20251114221741.317631-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <kwgjzpxxqpkgwafydp65vlj6jlf7h7kcnhwgtwrrhzp2qtgkkq@z3xfl26ejspl>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 14, 2025 at 10:33:42AM +0100, Stefano Garzarella wrote:
-> On Thu, Nov 13, 2025 at 10:26:04AM -0800, Bobby Eshleman wrote:
-> > On Thu, Nov 13, 2025 at 04:24:44PM +0100, Stefano Garzarella wrote:
-> > > On Wed, Nov 12, 2025 at 10:27:18AM -0800, Bobby Eshleman wrote:
-> > > > On Wed, Nov 12, 2025 at 03:19:47PM +0100, Stefano Garzarella wrote:
-> > > > > On Tue, Nov 11, 2025 at 10:54:48PM -0800, Bobby Eshleman wrote:
-> > > > > > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > > > > >
-> > > > > > Add NS support to vsock loopback. Sockets in a global mode netns
-> > > > > > communicate with each other, regardless of namespace. Sockets in a local
-> > > > > > mode netns may only communicate with other sockets within the same
-> > > > > > namespace.
-> > > > > >
-> > > > > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > [...]
-> > 
-> > > > > > @@ -131,7 +136,41 @@ static void vsock_loopback_work(struct work_struct *work)
-> > > > > > 		 */
-> > > > > > 		virtio_transport_consume_skb_sent(skb, false);
-> > > > > > 		virtio_transport_deliver_tap_pkt(skb);
-> > > > > > -		virtio_transport_recv_pkt(&loopback_transport, skb, NULL, 0);
-> > > > > > +
-> > > > > > +		/* In the case of virtio_transport_reset_no_sock(), the skb
-> > > > > > +		 * does not hold a reference on the socket, and so does not
-> > > > > > +		 * transitively hold a reference on the net.
-> > > > > > +		 *
-> > > > > > +		 * There is an ABA race condition in this sequence:
-> > > > > > +		 * 1. the sender sends a packet
-> > > > > > +		 * 2. worker calls virtio_transport_recv_pkt(), using the
-> > > > > > +		 *    sender's net
-> > > > > > +		 * 3. virtio_transport_recv_pkt() uses t->send_pkt() passing the
-> > > > > > +		 *    sender's net
-> > > > > > +		 * 4. virtio_transport_recv_pkt() free's the skb, dropping the
-> > > > > > +		 *    reference to the socket
-> > > > > > +		 * 5. the socket closes, frees its reference to the net
-> > > > > > +		 * 6. Finally, the worker for the second t->send_pkt() call
-> > > > > > +		 *    processes the skb, and uses the now stale net pointer for
-> > > > > > +		 *    socket lookups.
-> > > > > > +		 *
-> > > > > > +		 * To prevent this, we acquire a net reference in vsock_loopback_send_pkt()
-> > > > > > +		 * and hold it until virtio_transport_recv_pkt() completes.
-> > > > > > +		 *
-> > > > > > +		 * Additionally, we must grab a reference on the skb before
-> > > > > > +		 * calling virtio_transport_recv_pkt() to prevent it from
-> > > > > > +		 * freeing the skb before we have a chance to release the net.
-> > > > > > +		 */
-> > > > > > +		net_mode = virtio_vsock_skb_net_mode(skb);
-> > > > > > +		net = virtio_vsock_skb_net(skb);
-> > > > >
-> > > > > Wait, we are adding those just for loopback (in theory used only for
-> > > > > testing/debugging)? And only to support virtio_transport_reset_no_sock() use
-> > > > > case?
-> > > >
-> > > > Yes, exactly, only loopback + reset_no_sock(). The issue doesn't exist
-> > > > for vhost-vsock because vhost_vsock holds a net reference, and it
-> > > > doesn't exist for non-reset_no_sock calls because after looking up the
-> > > > socket we transfer skb ownership to it, which holds down the skb -> sk ->
-> > > > net reference chain.
-> > > >
-> > > > >
-> > > > > Honestly I don't like this, do we have any alternative?
-> > > > >
-> > > > > I'll also try to think something else.
-> > > > >
-> > > > > Stefano
-> > > >
-> > > >
-> > > > I've been thinking about this all morning... maybe
-> > > > we can do something like this:
-> > > >
-> > > > ```
-> > > >
-> > > > virtio_transport_recv_pkt(...,  struct sock *reply_sk) {... }
-> > > >
-> > > > virtio_transport_reset_no_sock(..., reply_sk)
-> > > > {
-> > > > 	if (reply_sk)
-> > > > 		skb_set_owner_sk_safe(reply, reply_sk)
-> > > 
-> > > Interesting, but what about if we call skb_set_owner_sk_safe() in
-> > > vsock_loopback.c just before calling virtio_transport_recv_pkt() for every
-> > > skb?
-> > 
-> > I think the issue with this is that at the time vsock_loopback calls
-> > virtio_transport_recv_pkt() the reply skb hasn't yet been allocated by
-> > virtio_transport_reset_no_sock() and we can't wait for it to return
-> > because the original skb may be freed by then.
-> 
-> Right!
-> 
-> > 
-> > We might be able to keep it all in vsock_loopback if we removed the need
-> > to use the original skb or sk by just using the net. But to do that we
-> > would need to add a netns_tracker per net somewhere. I guess that would
-> > end up in a list or hashmap in struct vsock_loopback.
-> > 
-> > Another option that does simplify a little, but unfortunately still doesn't keep
-> > everything in loopback:
-> > 
-> > @@ -1205,7 +1205,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
-> > 	if (!reply)
-> > 		return -ENOMEM;
-> > 
-> > -	return t->send_pkt(reply, net, net_mode);
-> > +	return t->send_pkt(reply, net, net_mode, skb->sk);
-> > }
-> > 
-> > @@ -27,11 +27,16 @@ static u32 vsock_loopback_get_local_cid(void)
-> > }
-> > 
-> > static int vsock_loopback_send_pkt(struct sk_buff *skb, struct net *net,
-> > -				   enum vsock_net_mode net_mode)
-> > +				   enum vsock_net_mode net_mode,
-> > +				   struct sock *rst_owner)
-> > {
-> > 	struct vsock_loopback *vsock = &the_vsock_loopback;
-> > 	int len = skb->len;
-> > 
-> > +	if (!skb->sk && rst_owner)
-> > +		WARN_ONCE(!skb_set_owner_sk_safe(skb, rst_owner),
-> > +			  "loopback socket has sk_refcnt == 0\n");
-> > +
-> 
-> This doesn't seem too bad IMO, but at this point, why we can't do that
-> in virtio_transport_reset_no_sock() for any kind of transport?
-> 
-> I mean, in any case the RST packet should be handled by the same net of the
-> "sender", no?
-> 
-> At this point, can we just put the `vsk` of the sender in the `info` and
-> virtio_transport_alloc_skb() will already do that.
-> 
-> WDYT?
-> Am I missing something?
+Hi,
 
-This is the right answer... I'm pretty sure this works out-of-the-box
-for all transports.
+This patchset adds a new BPF command BPF_PROG_ASSOC_STRUCT_OPS to
+the bpf() syscall to allow associating a BPF program with a struct_ops.
+The command is introduced to address a emerging need from struct_ops
+users. As the number of subsystems adopting struct_ops grows, more
+users are building their struct_ops-based solution with some help from
+other BPF programs. For example, scx_layer uses a syscall program as
+a user space trigger to refresh layers [0]. It also uses tracing program
+to infer whether a task is using GPU and needs to be prioritized [1]. In
+these use cases, when there are multiple struct_ops instances, the
+struct_ops kfuncs called from different BPF programs, whether struct_ops
+or not needs to be able to refer to a specific one, which currently is
+not possible.
 
-I'll implement it and report back with a new rev if all good or come
-back to this thread to discuss if any issues arise.
+The new BPF command will allow users to explicitly associate a BPF
+program with a struct_ops map. The libbpf wrapper can be called after
+loading programs and before attaching programs and struct_ops.
 
-Have a good weekend!
+Internally, it will set prog->aux->st_ops_assoc to the struct_ops
+map. struct_ops kfuncs can then get the associated struct_ops struct
+by calling bpf_prog_get_assoc_struct_ops() with prog->aux, which can
+be acquired from a "__prog" argument. The value of the special
+argument will be fixed up by the verifier during verification.
 
-Best,
-Bobby
+The command conceptually associates the implementation of BPF programs
+with struct_ops map, not the attachment. A program associated with the
+map will take a refcount of it so that st_ops_assoc always points to a
+valid struct_ops struct. struct_ops implementers can use the helper,
+bpf_prog_get_assoc_struct_ops to get the pointer. The returned
+struct_ops if not NULL is guaranteed to be valid and initialized.
+However, it is not guaranteed that the struct_ops is attached. The
+struct_ops implementer still need to take steps to track and check the
+state of the struct_ops in kdata, if the use case demand the struct_ops
+to be attached.
+
+We can also consider support associating struct_ops link with BPF
+programs, which on one hand make struct_ops implementer's job easier,
+but might complicate libbpf workflow and does not apply to legacy
+struct_ops attachment.
+
+[0] https://github.com/sched-ext/scx/blob/main/scheds/rust/scx_layered/src/bpf/main.bpf.c#L557
+[1] https://github.com/sched-ext/scx/blob/main/scheds/rust/scx_layered/src/bpf/main.bpf.c#L754
+
+---
+
+v5 -> v6
+   - Drop refcnt bumping for async callbacks and add RCU annotation (Martin)
+   - Fix libbpf bug and update comments (Andrii)
+   - Fix refcount bug in bpf_prog_assoc_struct_ops() (AI)
+   Link: https://lore.kernel.org/bpf/20251104172652.1746988-1-ameryhung@gmail.com/
+
+
+v4 -> v5
+   - Simplify the API for getting associated struct_ops and dont't
+     expose struct_ops map lifecycle management (Andrii, Alexei)
+   Link: https://lore.kernel.org/bpf/20251024212914.1474337-1-ameryhung@gmail.com/
+
+v3 -> v4
+   - Fix potential dangling pointer in timer callback. Protect
+     st_ops_assoc with RCU. The get helper now needs to be paired with
+     bpf_struct_ops_put()
+   - The command should only increase refcount once for a program
+     (Andrii)
+   - Test a struct_ops program reused in two struct_ops maps
+   - Test getting associated struct_ops in timer callback
+   Link: https://lore.kernel.org/bpf/20251017215627.722338-1-ameryhung@gmail.com/
+
+v2 -> v3
+   - Change the type of st_ops_assoc from void* (i.e., kdata) to bpf_map
+     (Andrii)
+   - Fix a bug that clears BPF_PTR_POISON when a struct_ops map is freed
+     (Andrii)
+   - Return NULL if the map is not fully initialized (Martin)
+   - Move struct_ops map refcount inc/dec into internal helpers (Martin)
+   - Add libbpf API, bpf_program__assoc_struct_ops (Andrii)
+   Link: https://lore.kernel.org/bpf/20251016204503.3203690-1-ameryhung@gmail.com/
+
+v1 -> v2
+   - Poison st_ops_assoc when reusing the program in more than one
+     struct_ops maps and add a helper to access the pointer (Andrii)
+   - Minor style and naming changes (Andrii)
+   Link: https://lore.kernel.org/bpf/20251010174953.2884682-1-ameryhung@gmail.com/
+
+---
+
+Amery Hung (6):
+  bpf: Allow verifier to fixup kernel module kfuncs
+  bpf: Support associating BPF program with struct_ops
+  libbpf: Add support for associating BPF program with struct_ops
+  selftests/bpf: Test BPF_PROG_ASSOC_STRUCT_OPS command
+  selftests/bpf: Test ambiguous associated struct_ops
+  selftests/bpf: Test getting associated struct_ops in timer callback
+
+ include/linux/bpf.h                           |  16 ++
+ include/uapi/linux/bpf.h                      |  17 ++
+ kernel/bpf/bpf_struct_ops.c                   |  92 +++++++++
+ kernel/bpf/core.c                             |   3 +
+ kernel/bpf/syscall.c                          |  46 +++++
+ kernel/bpf/verifier.c                         |   3 +-
+ tools/include/uapi/linux/bpf.h                |  17 ++
+ tools/lib/bpf/bpf.c                           |  19 ++
+ tools/lib/bpf/bpf.h                           |  21 ++
+ tools/lib/bpf/libbpf.c                        |  31 +++
+ tools/lib/bpf/libbpf.h                        |  16 ++
+ tools/lib/bpf/libbpf.map                      |   2 +
+ .../bpf/prog_tests/test_struct_ops_assoc.c    | 191 ++++++++++++++++++
+ .../selftests/bpf/progs/struct_ops_assoc.c    | 105 ++++++++++
+ .../bpf/progs/struct_ops_assoc_in_timer.c     |  77 +++++++
+ .../bpf/progs/struct_ops_assoc_reuse.c        |  75 +++++++
+ .../selftests/bpf/test_kmods/bpf_testmod.c    |  17 ++
+ .../bpf/test_kmods/bpf_testmod_kfunc.h        |   1 +
+ 18 files changed, 747 insertions(+), 2 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_assoc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_assoc_in_timer.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_assoc_reuse.c
+
+-- 
+2.47.3
+
 
