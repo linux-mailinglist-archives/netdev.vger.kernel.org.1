@@ -1,119 +1,324 @@
-Return-Path: <netdev+bounces-238802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A0E3C5F8F0
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 00:06:23 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB511C5F9EE
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 00:47:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 126703452DF
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 23:06:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 94EC0359C4C
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 23:47:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228892E0410;
-	Fri, 14 Nov 2025 23:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A42E30BB96;
+	Fri, 14 Nov 2025 23:47:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TaH5msNO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R5vIV5Pi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF0B1B983F;
-	Fri, 14 Nov 2025 23:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D083302CD8
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 23:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763161578; cv=none; b=Rrt3k+yImfB+/Q5A/+ijTvUNZAfN76utBzmF0XVYzecLbob6bkZ9hV4MduW0789QOPhVhV7H2RrD9jI/i4JBaGrU0v+Ia1LllrgJB5mUTVvvMUwP1hNQh6DiQs5S9HEq3oZ0EkNdzN/UxPDtP3lgBdVqbP10jt4ysX/6xQXdrL4=
+	t=1763164040; cv=none; b=Jz1E7OL7R8kgI5OlkxXFkrof9FIDePniCkBPwJq2mpXmS/zdOnDvPOtnK6T4+gdGgP11aBD4lBSCJnaVFyIPJvRpgeZLFVlnosS8tmYPfsx7jVMEbtGCtS+FLiDKMFdvdGgcDA3M72EjaLmHfq9V/vmieJ0jGkB+9/T9McS+6K0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763161578; c=relaxed/simple;
-	bh=hEDuyAiDrTdxoKB/4W6+M34yHjsrvyXle5Kktqo/mUk=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=TckwOk8dk+FayVoRGbgoS0Ojhdgt8DShrirPTJR9gS5bC+5iIKBUfn0y6ryDB733mMMMDX/eLZcc8U1N0m9LGmzSueH1J8UKs2ojbwn+FBwtO6UwFdcBpkE8EpgpnDAUQMrq7Invx8ZoIh8jf5S44w6NHqlaX1rcXqRz5OHrWSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TaH5msNO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27069C4CEF5;
-	Fri, 14 Nov 2025 23:06:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763161577;
-	bh=hEDuyAiDrTdxoKB/4W6+M34yHjsrvyXle5Kktqo/mUk=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=TaH5msNOFGWjM7rudpfM8YVoBYFENvZwNzHNUBEAgzRowD0QwbKsT6jH02FAaBEM1
-	 YIqY2U9DqUGbUj1Oy0I3o3LqQ7JLrmdQpeBSFUnH+JNYcyk8OFsMwrIvjL/sIFxQsx
-	 uhyVhZp9mpy/KOVzKQM3jFxr+smazKlPP65IGjdqfupkwKQxsL85WAtPKaBWIXdhnG
-	 bFMZ1JSMcHw9LWYEvl0Lh6n00eMd8NJuvkJLNanMzH1i+HdPBVnAx7S7LlPOZ5xGzC
-	 ONnG5JB57RWsJzAHDXOS8V6FK90nRiiRxu1+5hs2/chCIPI0D7NN5oKYF2451TILf7
-	 RM2o9UUAmTMow==
-Content-Type: multipart/mixed; boundary="===============8752093551188557916=="
+	s=arc-20240116; t=1763164040; c=relaxed/simple;
+	bh=rRiNUuD82Njtw9Az/Jlw5gsSX+Uoa10hCquppI1qFlc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IEaQa9QuvTSw57Wrtb4YXpnp6eLr7Xhgb5zggwxzcLo71r2gANfocHQnk9TVrFBn4gE3Nr/OQRS3dvDBS9+amC/1eqr+3fOrE7NqPRSBxzUqzuOBEmWpGOtGuHrACkoa4QZsiDqccu63oY5C32o1uZFs21ucA/8SjB1+3esZnZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R5vIV5Pi; arc=none smtp.client-ip=209.85.166.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-43320651e53so17614715ab.3
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 15:47:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763164037; x=1763768837; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f+dHTSELWOX4g1S+bypOQNMHFzVUwDSPYwKAJt/DTjk=;
+        b=R5vIV5Pi1nGiXwtnF6lYM4RNg3+csju9S8Yf+Nnxk99U6D9poXMISAukJBwFTYHiEw
+         7YGJsnihEa8AsTWEKvB5oQQlgkv2B5/Gk0T0jyewUSFoSPqxhrlCRO1rBz12zqoAFvsR
+         KOUNQKGc4jpOQX/Jzte+4IqovA+GMyxKhP9XGsbNcg8J39FTnTRaUeHd6ZY7+jED7hoo
+         tPszwvHZ+XYq2tBe9LIyJ6D1XO6qsUpxVCIhMUDQV/sQC6gS4gUsKi0if61XvukIHHnt
+         ZEPirGMrUlZ4FkkwF9XHx7Yc6XJnBnM+BE2pnXMkcA0Ad+BQZkltG+6GVyN+rg1omrfi
+         Rnxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763164037; x=1763768837;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=f+dHTSELWOX4g1S+bypOQNMHFzVUwDSPYwKAJt/DTjk=;
+        b=PyOKd5gde+PjkjTiYZ9mLbQ54bFT5wO/Xg1RldcxUDPCZIvr3uVVy3bCnZv05CJAy0
+         YwjQcWyHmLroCQIv+7CwaUiFwzaegkOVSyJVu7tyz11EaDV+XI7od3yjm9u9tMA0kPp1
+         fmNiL6mrlR/9U5nXMfETc8U6zZY+0DV2/j5wsMofjYpIzOBSeHksjq73oJCc8vNrBneq
+         OFDCcqiPtPbWanCo3Bu3oOD554LnFHRxokvsw6f957i+o5/0Z8RhidHGv4lplVXvU8E2
+         DPv+85demGfG3/gFRTZ7weQn1ACI2+YheNxeJ67PSbEFOY1HVP1167C3A4AOZzCVSwOz
+         /tug==
+X-Forwarded-Encrypted: i=1; AJvYcCX9pRWGQMlGvD0pdW8zpW+k5z+eeRGUYgnsAjHXkZcS7brwyKGDgyk48nmITmpAXLur90fLCxg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzj8MUCS0Mar+5HYI8p70vZORuPFoCIkOHdQLNYFAX32EBdMZeW
+	zssCaRwH4bL8QEpObT9A59QyvOANjvATahsDawbf525Wq39aYh+zTBY9Z+v5fNHNd7e+BxXp4Q8
+	S9UYp3nIyi9z2zP0EKVr0XfEbyu+QRLs=
+X-Gm-Gg: ASbGncv3/Rklap276EUKOTz9chikEodceQdGclJAqTIwEmcv3/UwQwESXZVeV0M4R9R
+	1EkmygtfHJod77xZTRnXr/qOWxWm/qdf93MVukZOw2PyKYoipX6dsXN+QS9NrcVPiPU4J/gM03U
+	a7xNaOWU1CdfNRTBDmttqmZxMGBMuiuGYHaFSAd5pNkZX45LEJ/lrkPDD7+kC5VZ8zA2MNgcNg5
+	QiM2zLGKuXaHIGHekALm6L+65NaMjdMO3Rzgl0kk7SN2TzvdwOzCdYFrUAhgIE4n8AR/zKtCKI=
+X-Google-Smtp-Source: AGHT+IGjxGDpylUhD4H15y1sXE9Da+4lAPuUV8p09QpDzb1wC0FtsMIgVaCJT5YLn1xuxFKV7DJaqis12R1X1hOck5M=
+X-Received: by 2002:a05:6e02:214e:b0:433:6f20:32cc with SMTP id
+ e9e14a558f8ab-4348c93e8d2mr68092675ab.16.1763164037337; Fri, 14 Nov 2025
+ 15:47:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <ea0d6de3aa0a0370e1ac7328db2b09ead3f8ce1effa9a04f37fb09e1f87a5643@mail.kernel.org>
-In-Reply-To: <20251114221741.317631-2-ameryhung@gmail.com>
-References: <20251114221741.317631-2-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf-next v6 1/6] bpf: Allow verifier to fixup kernel module kfuncs
-From: bot+bpf-ci@kernel.org
-To: ameryhung@gmail.com,bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,tj@kernel.org,martin.lau@kernel.org,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri, 14 Nov 2025 23:06:17 +0000 (UTC)
+References: <20251031093230.82386-1-kerneljasonxing@gmail.com>
+ <20251031093230.82386-3-kerneljasonxing@gmail.com> <aQTBajODN3Nnskta@boxer>
+ <CAL+tcoDGiYogC=xiD7=K6HBk7UaOWKCFX8jGC=civLDjsBb3fA@mail.gmail.com>
+ <aQjDjaQzv+Y4U6NL@boxer> <CAL+tcoBkO98eBGX0uOUo_bvsPFbnGvSYvY-ZaKJhSn7qac464g@mail.gmail.com>
+ <CAJ8uoz2ZaJ5uYhd-MvSuYwmWUKKKBSfkq17rJGO98iTJ+iUrQg@mail.gmail.com>
+ <CAL+tcoBw4eS8QO+AxSk=-vfVSb-7VtZMMNfZTZtJCp=SMpy0GQ@mail.gmail.com> <aRdQWqKs29U7moXq@boxer>
+In-Reply-To: <aRdQWqKs29U7moXq@boxer>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 15 Nov 2025 07:46:40 +0800
+X-Gm-Features: AWmQ_bmE0Z-PLAEtPZn1VZOb_K3RvYs9-GPON81ZsU8OyeGoKWJSSfERxIMSg_M
+Message-ID: <CAL+tcoAv+dTK-Z=HNGUJNohxRu_oWCPQ4L1BRQT9nvB4WZMd7Q@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next 2/2] xsk: introduce a cached cq to
+ temporarily store descriptor addrs
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Magnus Karlsson <magnus.karlsson@gmail.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
+	magnus.karlsson@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
+	fmancera@suse.de, csmate@nop.hu, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============8752093551188557916==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index 99d62d765..d7702b9c6 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -22416,8 +22416,7 @@ static int fixup_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
+On Fri, Nov 14, 2025 at 11:53=E2=80=AFPM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
 >
->  	if (!bpf_jit_supports_far_kfunc_call())
->  		insn->imm = BPF_CALL_IMM(desc->addr);
-> -	if (insn->off)
-> -		return 0;
-> +
+> On Tue, Nov 11, 2025 at 10:02:58PM +0800, Jason Xing wrote:
+> > Hi Magnus,
+> >
+> > On Tue, Nov 11, 2025 at 9:44=E2=80=AFPM Magnus Karlsson
+> > <magnus.karlsson@gmail.com> wrote:
+> > >
+> > > On Tue, 11 Nov 2025 at 14:06, Jason Xing <kerneljasonxing@gmail.com> =
+wrote:
+> > > >
+> > > > Hi Maciej,
+> > > >
+> > > > On Mon, Nov 3, 2025 at 11:00=E2=80=AFPM Maciej Fijalkowski
+> > > > <maciej.fijalkowski@intel.com> wrote:
+> > > > >
+> > > > > On Sat, Nov 01, 2025 at 07:59:36AM +0800, Jason Xing wrote:
+> > > > > > On Fri, Oct 31, 2025 at 10:02=E2=80=AFPM Maciej Fijalkowski
+> > > > > > <maciej.fijalkowski@intel.com> wrote:
+> > > > > > >
+> > > > > > > On Fri, Oct 31, 2025 at 05:32:30PM +0800, Jason Xing wrote:
+> > > > > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > > > > >
+> > > > > > > > Before the commit 30f241fcf52a ("xsk: Fix immature cq descr=
+iptor
+> > > > > > > > production"), there is one issue[1] which causes the wrong =
+publish
+> > > > > > > > of descriptors in race condidtion. The above commit fixes t=
+he issue
+> > > > > > > > but adds more memory operations in the xmit hot path and in=
+terrupt
+> > > > > > > > context, which can cause side effect in performance.
+> > > > > > > >
+> > > > > > > > This patch tries to propose a new solution to fix the probl=
+em
+> > > > > > > > without manipulating the allocation and deallocation of mem=
+ory. One
+> > > > > > > > of the key points is that I borrowed the idea from the abov=
+e commit
+> > > > > > > > that postpones updating the ring->descs in xsk_destruct_skb=
+()
+> > > > > > > > instead of in __xsk_generic_xmit().
+> > > > > > > >
+> > > > > > > > The core logics are as show below:
+> > > > > > > > 1. allocate a new local queue. Only its cached_prod member =
+is used.
+> > > > > > > > 2. write the descriptors into the local queue in the xmit p=
+ath. And
+> > > > > > > >    record the cached_prod as @start_addr that reflects the
+> > > > > > > >    start position of this queue so that later the skb can e=
+asily
+> > > > > > > >    find where its addrs are written in the destruction phas=
+e.
+> > > > > > > > 3. initialize the upper 24 bits of destructor_arg to store =
+@start_addr
+> > > > > > > >    in xsk_skb_init_misc().
+> > > > > > > > 4. Initialize the lower 8 bits of destructor_arg to store h=
+ow many
+> > > > > > > >    descriptors the skb owns in xsk_update_num_desc().
+> > > > > > > > 5. write the desc addr(s) from the @start_addr from the cac=
+hed cq
+> > > > > > > >    one by one into the real cq in xsk_destruct_skb(). In tu=
+rn sync
+> > > > > > > >    the global state of the cq.
+> > > > > > > >
+> > > > > > > > The format of destructor_arg is designed as:
+> > > > > > > >  ------------------------ --------
+> > > > > > > > |       start_addr       |  num   |
+> > > > > > > >  ------------------------ --------
+> > > > > > > > Using upper 24 bits is enough to keep the temporary descrip=
+tors. And
+> > > > > > > > it's also enough to use lower 8 bits to show the number of =
+descriptors
+> > > > > > > > that one skb owns.
+> > > > > > > >
+> > > > > > > > [1]: https://lore.kernel.org/all/20250530095957.43248-1-e.k=
+ubanski@partner.samsung.com/
+> > > > > > > >
+> > > > > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > > > > > ---
+> > > > > > > > I posted the series as an RFC because I'd like to hear more=
+ opinions on
+> > > > > > > > the current rought approach so that the fix[2] can be avoid=
+ed and
+> > > > > > > > mitigate the impact of performance. This patch might have b=
+ugs because
+> > > > > > > > I decided to spend more time on it after we come to an agre=
+ement. Please
+> > > > > > > > review the overall concepts. Thanks!
+> > > > > > > >
+> > > > > > > > Maciej, could you share with me the way you tested jumbo fr=
+ame? I used
+> > > > > > > > ./xdpsock -i enp2s0f1 -t -q 1 -S -s 9728 but the xdpsock ut=
+ilizes the
+> > > > > > > > nic more than 90%, which means I cannot see the performance=
+ impact.
+> > > > > >
+> > > > > > Could you provide the command you used? Thanks :)
+> > > > > >
+> > > > > > > >
+> > > > > > > > [2]:https://lore.kernel.org/all/20251030140355.4059-1-fmanc=
+era@suse.de/
+> > > > > > > > ---
+> > > > > > > >  include/net/xdp_sock.h      |   1 +
+> > > > > > > >  include/net/xsk_buff_pool.h |   1 +
+> > > > > > > >  net/xdp/xsk.c               | 104 ++++++++++++++++++++++++=
+++++--------
+> > > > > > > >  net/xdp/xsk_buff_pool.c     |   1 +
+> > > > > > > >  4 files changed, 84 insertions(+), 23 deletions(-)
+> > > > > > >
+> > > > > > > (...)
+> > > > > > >
+> > > > > > > > diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_poo=
+l.c
+> > > > > > > > index aa9788f20d0d..6e170107dec7 100644
+> > > > > > > > --- a/net/xdp/xsk_buff_pool.c
+> > > > > > > > +++ b/net/xdp/xsk_buff_pool.c
+> > > > > > > > @@ -99,6 +99,7 @@ struct xsk_buff_pool *xp_create_and_assig=
+n_umem(struct xdp_sock *xs,
+> > > > > > > >
+> > > > > > > >       pool->fq =3D xs->fq_tmp;
+> > > > > > > >       pool->cq =3D xs->cq_tmp;
+> > > > > > > > +     pool->cached_cq =3D xs->cached_cq;
+> > > > > > >
+> > > > > > > Jason,
+> > > > > > >
+> > > > > > > pool can be shared between multiple sockets that bind to same=
+ <netdev,qid>
+> > > > > > > tuple. I believe here you're opening up for the very same iss=
+ue Eryk
+> > > > > > > initially reported.
+> > > > > >
+> > > > > > Actually it shouldn't happen because the cached_cq is more of t=
+he
+> > > > > > temporary array that helps the skb store its start position. Th=
+e
+> > > > > > cached_prod of cached_cq can only be increased, not decreased. =
+In the
+> > > > > > skb destruction phase, only those skbs that go to the end of li=
+fe need
+> > > > > > to sync its desc from cached_cq to cq. For some skbs that are r=
+eleased
+> > > > > > before the tx completion, we don't need to clear its record in
+> > > > > > cached_cq at all and cq remains untouched.
+> > > > > >
+> > > > > > To put it in a simple way, the patch you proposed uses kmem_cac=
+hed*
+> > > > > > helpers to store the addr and write the addr into cq at the end=
+ of
+> > > > > > lifecycle while the current patch uses a pre-allocated memory t=
+o
+> > > > > > store. So it avoids the allocation and deallocation.
+> > > > > >
+> > > > > > Unless I'm missing something important. If so, I'm still convin=
+ced
+> > > > > > this temporary queue can solve the problem since essentially it=
+'s a
+> > > > > > better substitute for kmem cache to retain high performance.
+>
+> Back after health issues!
 
-Are the special kfunc comparisons below safe for module kfuncs?
+Hi Maciej,
 
-The code after this change compares desc->func_id against
-special_kfunc_list[] entries without checking desc->offset. Since
-special_kfunc_list[] contains BTF IDs from kernel BTF, and module kfuncs
-have BTF IDs from their own module BTF, could a module kfunc with a BTF
-ID that happens to match a special kernel kfunc ID be incorrectly
-processed?
+Hope you're fully recovered:)
 
-In fixup_kfunc_call():
-  desc = find_kfunc_desc(env->prog, insn->imm, insn->off);
-  [...]
-  if (desc->func_id == special_kfunc_list[KF_bpf_obj_new_impl] || ...)
+>
+> Jason, I am still not convinced about this solution.
+>
+> In shared pool setups, the temp cq will also be shared, which means that
+> two parallel processes can produce addresses onto temp cq and therefore
+> expose address to a socket that it does not belong to. In order to make
+> this work you would have to know upfront the descriptor count of given
+> frame and reserve this during processing the first descriptor.
+>
+> socket 0                        socket 1
+> prod addr 0xAA
+> prod addr 0xBB
+>                                 prod addr 0xDD
+> prod addr 0xCC
+>                                 prod addr 0xEE
+>
+> socket 0 calls skb destructor with num desc =3D=3D 3, placing 0xDD onto c=
+q
+> which has not been sent yet, therefore potentially corrupting it.
 
-The desc->func_id contains a BTF-local ID (set at line 3373), while
-special_kfunc_list[] contains kernel BTF IDs. Module BTF IDs start from
-1 independently, so collision is architecturally possible.
+Thanks for spotting this case!
 
-During verification, check_special_kfunc() at line 13691 checks "if
-(meta->btf != btf_vmlinux) return 0;" which prevents aux_data fields
-like kptr_struct_meta from being set for module kfuncs. But at fixup
-time, if a module kfunc's BTF ID collides with a special kernel kfunc
-ID, won't it enter these paths and read uninitialized aux_data fields?
+Yes, it can happen, so let's turn into a per-xsk granularity? If each
+xsk has its own temp queue, then the problem would disappear and good
+news is that we don't need extra locks like pool->cq_lock to prevent
+multiple parallel xsks accessing the temp queue.
 
-Would adding "desc->offset == 0 &&" or "insn->off == 0 &&" to the
-comparisons at lines 22420, 22437, 22460, 22481 ensure we only match
-kernel kfuncs?
+Hope you can agree with this method. It borrows your idea and then
+only uses a _pre-allocated buffer_ to replace kmem_cache_alloc() in
+the hot path. This solution will direct us more to a high performance
+direction. IMHO, I=E2=80=98d rather not see any degradation in performance
+because of some issues.
 
->  	if (desc->func_id == special_kfunc_list[KF_bpf_obj_new_impl] ||
->  	    desc->func_id == special_kfunc_list[KF_bpf_percpu_obj_new_impl]) {
->  		struct btf_struct_meta *kptr_struct_meta = env->insn_aux_data[insn_idx].kptr_struct_meta;
+Thanks,
+Jason
 
-[ ... ]
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19379369447
-
---===============8752093551188557916==--
+>
+> For now, I think we should move forward with Fernando's fix as there have
+> been multiple reports already regarding broken state of xsk copy mode.
+>
+> > > > >
+> > > > > I need a bit more time on this, probably I'll respond tomorrow.
+> > > >
+> > > > I'd like to know if you have any further comments on this? And shou=
+ld
+> > > > I continue to post as an official series?
+> > >
+> > > Hi Jason,
+> > >
+> > > Maciej has been out-of-office for a couple of days. He should
+> > > hopefully be back later this week, so please wait for his comments.
+> >
+> > Thanks for letting me know. I will wait :)
+> >
+> > Thanks,
+> > Jason
 
