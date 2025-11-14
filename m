@@ -1,687 +1,475 @@
-Return-Path: <netdev+bounces-238586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC73BC5B7FE
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 07:20:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D422C5B80A
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 07:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 35E7334F535
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 06:20:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 375973BB284
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 06:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA15B2E7648;
-	Fri, 14 Nov 2025 06:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728322EBDC7;
+	Fri, 14 Nov 2025 06:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="B3h5v3gE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N98Rhfxv";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IxwNDyNi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9912821C167
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 06:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F4C2EAB8D
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 06:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763101235; cv=none; b=npHMOfUSN5s68lKffb5G5OPKDgUOl+/rmRAFwIS3n2Q8ElaMNm0CrBDT+qnmKEBwjIRhytcuUpBiZ34rBH81AFXQAtRNLy3ZJ1a9gy6FbBrMD0IMnmL7Wjz2fT8KHGW6FMfAmpTK506ucUKuaZ4bG1xJieYVW3EIoaUdMc79yIo=
+	t=1763101532; cv=none; b=AUUvHI0cBSHRLlILiKmwyjwYlCNlN1VjiKuGXP3Xd1eomYrvpdEsPTGgXCr9aTtsrb+OjnMNAIpbI+XIvu/5yuWPSiPsnJqDGQyVlBUtP3Mn+fp0OU8bG+uSmMf7WI0El+aU2XGBNAvSy6w6G2nX9J+5tlY3rCKK1b7zgqMo6dM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763101235; c=relaxed/simple;
-	bh=8KMHd0ggwCv9LTgUOVa0UkusCerLljLL2VmMmMfehvs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E0VDpTg46TU08tfYKsnLuosh2MjCkd9sZLuOedms8RfA3DkZh1CNhp1yEOXTHcm9zc32BQ8i5zcZKew/ikgWF9B5yufvx8ViLLudkgh60YiVb79LFgoUdePrzUt0eklrnW1NTDl/cFvVGSz9m3ecKtcx9r7orygpoCWXzQpslEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=B3h5v3gE; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1763101229; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=OQ9bBQrONjLXqk1eCCP4K6QDMhzfdS6PgXTneePPWVs=;
-	b=B3h5v3gEU4yJ6EcPDCM+nXZVUtWJ8XqlHLZ9+HagCA28DDrWJJR5viwYcvdR+O4qVSK4bEgniD6tabIPyU7VzsGNHuI1CiDZVL/sWTwzjpVLMnTmGklqT2rVS0fq1fsxIX7pEZWkKK31tgNs4NJZVV68ktfimKU/IvCukfUqtck=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WsM2m6W_1763100911 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 14 Nov 2025 14:15:11 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Dong Yibo <dong100@mucse.com>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Vivian Wang <wangruikang@iscas.ac.cn>,
-	MD Danish Anwar <danishanwar@ti.com>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next v14 5/5] eea: introduce ethtool support
-Date: Fri, 14 Nov 2025 14:15:06 +0800
-Message-Id: <20251114061506.45978-6-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20251114061506.45978-1-xuanzhuo@linux.alibaba.com>
-References: <20251114061506.45978-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1763101532; c=relaxed/simple;
+	bh=3vKFCQLofr/1zoURho0koJUA0rngLWCIwZTyV7pvcjE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nEBqkn2hj7I0k0NJcJdX/c0SZXwZ/gZhdC6wo+/EgrmZozNPWk08Y2YAnAJWxIQ/XV18xQ2sX89a2e0lXIwCHsprasw6NB4J6hw9pe8nl89CkJM8B76ICGfqTjBzIgGc90/54pfHzYAlA4NqbBIgGKi615cbX/jDYTqYNtREFLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N98Rhfxv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IxwNDyNi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763101528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WgMHjHM098UEawzFUi7lVEISE+9xrVfyLeIqI26gUB8=;
+	b=N98RhfxvmjqDSAmlfKTVGK5AL2LIk7UZ2oE0wi/YDzqoe97tR7Nb21O+D3Ekys5Fy++Muk
+	CiYpPdm859fjIidWw6dw8T7Pz/m/OqpKo9vhIAIgODc5zuSnuxIG/mbxAV9cGBuvlcjxjJ
+	dpfLPZ+KFLfYsb6HDq7G0qO6nTsmAcM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-246-rkvRn_uHMouVVn0QFNT3xg-1; Fri, 14 Nov 2025 01:25:26 -0500
+X-MC-Unique: rkvRn_uHMouVVn0QFNT3xg-1
+X-Mimecast-MFC-AGG-ID: rkvRn_uHMouVVn0QFNT3xg_1763101525
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47777158a85so15387805e9.3
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 22:25:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763101525; x=1763706325; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WgMHjHM098UEawzFUi7lVEISE+9xrVfyLeIqI26gUB8=;
+        b=IxwNDyNiMgMLpqx4LGmFIHWTSYmoPCVzIHPOTaJN9WmrveyEfNdzFP9wT+7EUEPYc3
+         MqMNtgr/zjukxkSqm0ITcV/KEShAdrzd3iGoTLJ6R6nvfs72snXDkNtLZI8Q+GU3chLR
+         tdlkM9dX/FkmyA74gx4WlltGDhWbLIY4jtyvx0uQKq2o/Faa5b23HfIKt1t+/FHMic2A
+         Y2nhNRjHLt8xshv9Fy/pTY0lSptIKfDmv0NnPA0HJfn173EYbw+J/VDmq/zyvgjSHjIy
+         cyawRPGDn0uMn+WfKgXfERr5cKhUve+hJfX3dsj/qYoKD8cfSox/S9eTopKoipk/yGcf
+         x2aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763101525; x=1763706325;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WgMHjHM098UEawzFUi7lVEISE+9xrVfyLeIqI26gUB8=;
+        b=FJW+Fm4Y8rhhZEkTis6Kw6mgJbzTBCsZiPSHlSMz3Q55FC9jn2rhcwm4/xPdUgP+0n
+         0DZhicNqtXprFIjeE8vE4A3vK0Nk0x5fOK/lv2PuObP72BmJ473BUDfQgpnHLzDAWlNn
+         pjfh6ITk4x+gfAR1uVdVl1DwZnUiqewBwQlK8j5UEF83CJYbQT1NzAz4EcU/A+2r9J87
+         MIgnWSyWRTMQJY6nYirdr3hUgnboQkXXvSl4M3bwa7/3s2juARz7L2trKvYdm5l0X2Yt
+         NMNINbin3c7Z0Ru8MqnAu78fuBAG5f/fTt8vz74pFM1wzOx/gUPlATwLicmA07UMk3kd
+         ZBWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVtKlEVCNG46UQXxvFXHERBf1pgSUREwHSkU6mSMCw4v1eaYjz8geCv2s75QpoH7+wfLb+gmAY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw11UqE6hRfbdyF2pAjzHZSuo9KXCuvLwERxsrPfrskKOmrcgY8
+	huzYn8mU+hgTuRByIC9y+z6amr/Dus0Q9qb4F/RmX0QhfTUPat8921f9ttpTciEpqp4lQVK5y48
+	pFY6ji9Xjde+HnJpWy18Ay1yBmyCWkfOv1b0NlM/8pCT+81uYT2QV8duNTQ==
+X-Gm-Gg: ASbGncvsfSuxRDnMzu53ppq9xLvA6LmkR4ufN1O4fBmLo9FYiPi5WCFYrl9niBQsyWB
+	SUqcVawBpTTVyriNU5arc68DLnxHvwaYoYC3OhQ+yN8aOSvFWld2PS+C87bpXDIskW0s+jSfDQR
+	DiYg37urZM1v2A4hmR7DuW1gz+e81OoGBIb1lDn5+EBn+Uz2NjcOq3cXUbJRkHmHq3eRIUpn+Hk
+	XfZ6jx4gth0PI7YuIXKKr/qeNfuaF58Kr7ZGDeklTgeE+YCcU6o0fnFl2gLBZrm6Wa3cJyFHpcx
+	UWpNUA5F0YFYQ5sTIB54hPm+Q7csMr7+fmHGpLbikwhqEnptDTAacoMl7vaZebZUYXiE5Vsv/gN
+	S6+Gk3FrWp/MaKgOvcSI=
+X-Received: by 2002:a05:600c:1f91:b0:475:dae5:d972 with SMTP id 5b1f17b1804b1-4778fe9aaadmr15340115e9.23.1763101524976;
+        Thu, 13 Nov 2025 22:25:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE6S93JtbCMSal0KnBjGm2eMz3lOM+4qbxORtWQqZJWiZ7XE1mt0dK8Yd6AKfkCy8ztRoHcLw==
+X-Received: by 2002:a05:600c:1f91:b0:475:dae5:d972 with SMTP id 5b1f17b1804b1-4778fe9aaadmr15339855e9.23.1763101524271;
+        Thu, 13 Nov 2025 22:25:24 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4778c857311sm77984885e9.8.2025.11.13.22.25.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 22:25:23 -0800 (PST)
+Date: Fri, 14 Nov 2025 01:25:21 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] vhost: rewind next_avail_head while discarding
+ descriptors
+Message-ID: <20251114012141-mutt-send-email-mst@kernel.org>
+References: <20251113015420.3496-1-jasowang@redhat.com>
+ <20251113030230-mutt-send-email-mst@kernel.org>
+ <CACGkMEtnihOt=g+zs0gVQ=wnx8_YF_F=QSuLQ4RGWBVuOeFi7w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: 5464bf8dd816
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEtnihOt=g+zs0gVQ=wnx8_YF_F=QSuLQ4RGWBVuOeFi7w@mail.gmail.com>
 
-Add basic driver framework for the Alibaba Elastic Ethernet Adapter(EEA).
+On Fri, Nov 14, 2025 at 09:53:12AM +0800, Jason Wang wrote:
+> On Thu, Nov 13, 2025 at 4:13 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Thu, Nov 13, 2025 at 09:54:20AM +0800, Jason Wang wrote:
+> > > When discarding descriptors with IN_ORDER, we should rewind
+> > > next_avail_head otherwise it would run out of sync with
+> > > last_avail_idx. This would cause driver to report
+> > > "id X is not a head".
+> > >
+> > > Fixing this by returning the number of descriptors that is used for
+> > > each buffer via vhost_get_vq_desc_n() so caller can use the value
+> > > while discarding descriptors.
+> > >
+> > > Fixes: 67a873df0c41 ("vhost: basic in order support")
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> >
+> > Wow that change really caused a lot of fallout.
+> >
+> > Thanks for the patch! Yet something to improve:
+> >
+> >
+> > > ---
+> > >  drivers/vhost/net.c   | 53 ++++++++++++++++++++++++++-----------------
+> > >  drivers/vhost/vhost.c | 43 ++++++++++++++++++++++++-----------
+> > >  drivers/vhost/vhost.h |  9 +++++++-
+> > >  3 files changed, 70 insertions(+), 35 deletions(-)
+> > >
+> > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> > > index 35ded4330431..8f7f50acb6d6 100644
+> > > --- a/drivers/vhost/net.c
+> > > +++ b/drivers/vhost/net.c
+> > > @@ -592,14 +592,15 @@ static void vhost_net_busy_poll(struct vhost_net *net,
+> > >  static int vhost_net_tx_get_vq_desc(struct vhost_net *net,
+> > >                                   struct vhost_net_virtqueue *tnvq,
+> > >                                   unsigned int *out_num, unsigned int *in_num,
+> > > -                                 struct msghdr *msghdr, bool *busyloop_intr)
+> > > +                                 struct msghdr *msghdr, bool *busyloop_intr,
+> > > +                                 unsigned int *ndesc)
+> > >  {
+> > >       struct vhost_net_virtqueue *rnvq = &net->vqs[VHOST_NET_VQ_RX];
+> > >       struct vhost_virtqueue *rvq = &rnvq->vq;
+> > >       struct vhost_virtqueue *tvq = &tnvq->vq;
+> > >
+> > > -     int r = vhost_get_vq_desc(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
+> > > -                               out_num, in_num, NULL, NULL);
+> > > +     int r = vhost_get_vq_desc_n(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
+> > > +                                 out_num, in_num, NULL, NULL, ndesc);
+> > >
+> > >       if (r == tvq->num && tvq->busyloop_timeout) {
+> > >               /* Flush batched packets first */
+> > > @@ -610,8 +611,8 @@ static int vhost_net_tx_get_vq_desc(struct vhost_net *net,
+> > >
+> > >               vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, false);
+> > >
+> > > -             r = vhost_get_vq_desc(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
+> > > -                                   out_num, in_num, NULL, NULL);
+> > > +             r = vhost_get_vq_desc_n(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
+> > > +                                     out_num, in_num, NULL, NULL, ndesc);
+> > >       }
+> > >
+> > >       return r;
+> > > @@ -642,12 +643,14 @@ static int get_tx_bufs(struct vhost_net *net,
+> > >                      struct vhost_net_virtqueue *nvq,
+> > >                      struct msghdr *msg,
+> > >                      unsigned int *out, unsigned int *in,
+> > > -                    size_t *len, bool *busyloop_intr)
+> > > +                    size_t *len, bool *busyloop_intr,
+> > > +                    unsigned int *ndesc)
+> > >  {
+> > >       struct vhost_virtqueue *vq = &nvq->vq;
+> > >       int ret;
+> > >
+> > > -     ret = vhost_net_tx_get_vq_desc(net, nvq, out, in, msg, busyloop_intr);
+> > > +     ret = vhost_net_tx_get_vq_desc(net, nvq, out, in, msg,
+> > > +                                    busyloop_intr, ndesc);
+> > >
+> > >       if (ret < 0 || ret == vq->num)
+> > >               return ret;
+> > > @@ -766,6 +769,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+> > >       int sent_pkts = 0;
+> > >       bool sock_can_batch = (sock->sk->sk_sndbuf == INT_MAX);
+> > >       bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
+> > > +     unsigned int ndesc = 0;
+> > >
+> > >       do {
+> > >               bool busyloop_intr = false;
+> > > @@ -774,7 +778,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+> > >                       vhost_tx_batch(net, nvq, sock, &msg);
+> > >
+> > >               head = get_tx_bufs(net, nvq, &msg, &out, &in, &len,
+> > > -                                &busyloop_intr);
+> > > +                                &busyloop_intr, &ndesc);
+> > >               /* On error, stop handling until the next kick. */
+> > >               if (unlikely(head < 0))
+> > >                       break;
+> > > @@ -806,7 +810,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+> > >                               goto done;
+> > >                       } else if (unlikely(err != -ENOSPC)) {
+> > >                               vhost_tx_batch(net, nvq, sock, &msg);
+> > > -                             vhost_discard_vq_desc(vq, 1);
+> > > +                             vhost_discard_vq_desc(vq, 1, ndesc);
+> > >                               vhost_net_enable_vq(net, vq);
+> > >                               break;
+> > >                       }
+> > > @@ -829,7 +833,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+> > >               err = sock->ops->sendmsg(sock, &msg, len);
+> > >               if (unlikely(err < 0)) {
+> > >                       if (err == -EAGAIN || err == -ENOMEM || err == -ENOBUFS) {
+> > > -                             vhost_discard_vq_desc(vq, 1);
+> > > +                             vhost_discard_vq_desc(vq, 1, ndesc);
+> > >                               vhost_net_enable_vq(net, vq);
+> > >                               break;
+> > >                       }
+> > > @@ -868,6 +872,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+> > >       int err;
+> > >       struct vhost_net_ubuf_ref *ubufs;
+> > >       struct ubuf_info_msgzc *ubuf;
+> > > +     unsigned int ndesc = 0;
+> > >       bool zcopy_used;
+> > >       int sent_pkts = 0;
+> > >
+> > > @@ -879,7 +884,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+> > >
+> > >               busyloop_intr = false;
+> > >               head = get_tx_bufs(net, nvq, &msg, &out, &in, &len,
+> > > -                                &busyloop_intr);
+> > > +                                &busyloop_intr, &ndesc);
+> > >               /* On error, stop handling until the next kick. */
+> > >               if (unlikely(head < 0))
+> > >                       break;
+> > > @@ -941,7 +946,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+> > >                                       vq->heads[ubuf->desc].len = VHOST_DMA_DONE_LEN;
+> > >                       }
+> > >                       if (retry) {
+> > > -                             vhost_discard_vq_desc(vq, 1);
+> > > +                             vhost_discard_vq_desc(vq, 1, ndesc);
+> > >                               vhost_net_enable_vq(net, vq);
+> > >                               break;
+> > >                       }
+> > > @@ -1045,11 +1050,12 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+> > >                      unsigned *iovcount,
+> > >                      struct vhost_log *log,
+> > >                      unsigned *log_num,
+> > > -                    unsigned int quota)
+> > > +                    unsigned int quota,
+> > > +                    unsigned int *ndesc)
+> > >  {
+> > >       struct vhost_virtqueue *vq = &nvq->vq;
+> > >       bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
+> > > -     unsigned int out, in;
+> > > +     unsigned int out, in, desc_num, n = 0;
+> > >       int seg = 0;
+> > >       int headcount = 0;
+> > >       unsigned d;
+> > > @@ -1064,9 +1070,9 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+> > >                       r = -ENOBUFS;
+> > >                       goto err;
+> > >               }
+> > > -             r = vhost_get_vq_desc(vq, vq->iov + seg,
+> > > -                                   ARRAY_SIZE(vq->iov) - seg, &out,
+> > > -                                   &in, log, log_num);
+> > > +             r = vhost_get_vq_desc_n(vq, vq->iov + seg,
+> > > +                                     ARRAY_SIZE(vq->iov) - seg, &out,
+> > > +                                     &in, log, log_num, &desc_num);
+> > >               if (unlikely(r < 0))
+> > >                       goto err;
+> > >
+> > > @@ -1093,6 +1099,7 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+> > >               ++headcount;
+> > >               datalen -= len;
+> > >               seg += in;
+> > > +             n += desc_num;
+> > >       }
+> > >
+> > >       *iovcount = seg;
+> > > @@ -1113,9 +1120,11 @@ static int get_rx_bufs(struct vhost_net_virtqueue *nvq,
+> > >               nheads[0] = headcount;
+> > >       }
+> > >
+> > > +     *ndesc = n;
+> > > +
+> > >       return headcount;
+> > >  err:
+> > > -     vhost_discard_vq_desc(vq, headcount);
+> > > +     vhost_discard_vq_desc(vq, headcount, n);
+> >
+> > So here ndesc and n are the same, but below in vhost_discard_vq_desc
+> > they are different. Fun.
+> 
+> Not necessarily the same, a buffer could contain more than 1 descriptor.
 
-This commit introduces ethtool support.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- drivers/net/ethernet/alibaba/eea/Makefile     |   1 +
- .../net/ethernet/alibaba/eea/eea_ethtool.c    | 276 ++++++++++++++++++
- .../net/ethernet/alibaba/eea/eea_ethtool.h    |  50 ++++
- drivers/net/ethernet/alibaba/eea/eea_net.c    |   2 +
- drivers/net/ethernet/alibaba/eea/eea_net.h    |   5 +
- drivers/net/ethernet/alibaba/eea/eea_rx.c     |  29 +-
- drivers/net/ethernet/alibaba/eea/eea_tx.c     |  24 +-
- 7 files changed, 383 insertions(+), 4 deletions(-)
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+*ndesc = n kinda guarantees it's the same, no?
 
-diff --git a/drivers/net/ethernet/alibaba/eea/Makefile b/drivers/net/ethernet/alibaba/eea/Makefile
-index fa34a005fa01..8f8fbb8d2d9a 100644
---- a/drivers/net/ethernet/alibaba/eea/Makefile
-+++ b/drivers/net/ethernet/alibaba/eea/Makefile
-@@ -4,5 +4,6 @@ eea-y := eea_ring.o \
- 	eea_net.o \
- 	eea_pci.o \
- 	eea_adminq.o \
-+	eea_ethtool.o \
- 	eea_tx.o \
- 	eea_rx.o
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_ethtool.c b/drivers/net/ethernet/alibaba/eea/eea_ethtool.c
-new file mode 100644
-index 000000000000..16621c1bec2d
---- /dev/null
-+++ b/drivers/net/ethernet/alibaba/eea/eea_ethtool.c
-@@ -0,0 +1,276 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Driver for Alibaba Elastic Ethernet Adapter.
-+ *
-+ * Copyright (C) 2025 Alibaba Inc.
-+ */
-+
-+#include <linux/ethtool.h>
-+#include <linux/ethtool_netlink.h>
-+
-+#include "eea_adminq.h"
-+
-+struct eea_stat_desc {
-+	char desc[ETH_GSTRING_LEN];
-+	size_t offset;
-+};
-+
-+#define EEA_TX_STAT(m)	{#m, offsetof(struct eea_tx_stats, m)}
-+#define EEA_RX_STAT(m)	{#m, offsetof(struct eea_rx_stats, m)}
-+
-+static const struct eea_stat_desc eea_rx_stats_desc[] = {
-+	EEA_RX_STAT(descs),
-+	EEA_RX_STAT(kicks),
-+};
-+
-+static const struct eea_stat_desc eea_tx_stats_desc[] = {
-+	EEA_TX_STAT(descs),
-+	EEA_TX_STAT(kicks),
-+};
-+
-+#define EEA_TX_STATS_LEN	ARRAY_SIZE(eea_tx_stats_desc)
-+#define EEA_RX_STATS_LEN	ARRAY_SIZE(eea_rx_stats_desc)
-+
-+static void eea_get_drvinfo(struct net_device *netdev,
-+			    struct ethtool_drvinfo *info)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	struct eea_device *edev = enet->edev;
-+
-+	strscpy(info->driver,   KBUILD_MODNAME,     sizeof(info->driver));
-+	strscpy(info->bus_info, eea_pci_name(edev), sizeof(info->bus_info));
-+}
-+
-+static void eea_get_ringparam(struct net_device *netdev,
-+			      struct ethtool_ringparam *ring,
-+			      struct kernel_ethtool_ringparam *kernel_ring,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+
-+	ring->rx_max_pending = enet->cfg_hw.rx_ring_depth;
-+	ring->tx_max_pending = enet->cfg_hw.tx_ring_depth;
-+	ring->rx_pending = enet->cfg.rx_ring_depth;
-+	ring->tx_pending = enet->cfg.tx_ring_depth;
-+
-+	kernel_ring->tcp_data_split = enet->cfg.split_hdr ?
-+				      ETHTOOL_TCP_DATA_SPLIT_ENABLED :
-+				      ETHTOOL_TCP_DATA_SPLIT_DISABLED;
-+}
-+
-+static int eea_set_ringparam(struct net_device *netdev,
-+			     struct ethtool_ringparam *ring,
-+			     struct kernel_ethtool_ringparam *kernel_ring,
-+			     struct netlink_ext_ack *extack)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	struct eea_net_init_ctx ctx;
-+	bool need_update = false;
-+	struct eea_net_cfg *cfg;
-+	bool sh;
-+
-+	enet_init_ctx(enet, &ctx);
-+
-+	cfg = &ctx.cfg;
-+
-+	if (ring->rx_pending != cfg->rx_ring_depth)
-+		need_update = true;
-+
-+	if (ring->tx_pending != cfg->tx_ring_depth)
-+		need_update = true;
-+
-+	sh = kernel_ring->tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED;
-+	if (sh != !!(cfg->split_hdr))
-+		need_update = true;
-+
-+	if (!need_update)
-+		return 0;
-+
-+	cfg->rx_ring_depth = ring->rx_pending;
-+	cfg->tx_ring_depth = ring->tx_pending;
-+
-+	cfg->split_hdr = sh ? enet->cfg_hw.split_hdr : 0;
-+
-+	return eea_reset_hw_resources(enet, &ctx);
-+}
-+
-+static int eea_set_channels(struct net_device *netdev,
-+			    struct ethtool_channels *channels)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u16 queue_pairs = channels->combined_count;
-+	struct eea_net_init_ctx ctx;
-+	struct eea_net_cfg *cfg;
-+
-+	enet_init_ctx(enet, &ctx);
-+
-+	cfg = &ctx.cfg;
-+
-+	cfg->rx_ring_num = queue_pairs;
-+	cfg->tx_ring_num = queue_pairs;
-+
-+	return eea_reset_hw_resources(enet, &ctx);
-+}
-+
-+static void eea_get_channels(struct net_device *netdev,
-+			     struct ethtool_channels *channels)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+
-+	channels->combined_count = enet->cfg.rx_ring_num;
-+	channels->max_combined   = enet->cfg_hw.rx_ring_num;
-+}
-+
-+static void eea_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u8 *p = data;
-+	u32 i, j;
-+
-+	if (stringset != ETH_SS_STATS)
-+		return;
-+
-+	for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+		for (j = 0; j < EEA_RX_STATS_LEN; j++)
-+			ethtool_sprintf(&p, "rx%u_%s", i,
-+					eea_rx_stats_desc[j].desc);
-+	}
-+
-+	for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+		for (j = 0; j < EEA_TX_STATS_LEN; j++)
-+			ethtool_sprintf(&p, "tx%u_%s", i,
-+					eea_tx_stats_desc[j].desc);
-+	}
-+}
-+
-+static int eea_get_sset_count(struct net_device *netdev, int sset)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+
-+	if (sset != ETH_SS_STATS)
-+		return -EOPNOTSUPP;
-+
-+	return enet->cfg.rx_ring_num * EEA_RX_STATS_LEN +
-+		enet->cfg.tx_ring_num * EEA_TX_STATS_LEN;
-+}
-+
-+static void eea_stats_fill_for_q(struct u64_stats_sync *syncp, u32 num,
-+				 const struct eea_stat_desc *desc,
-+				 u64 *data, u32 idx)
-+{
-+	void *stats_base = syncp;
-+	u32 start, i;
-+
-+	do {
-+		start = u64_stats_fetch_begin(syncp);
-+		for (i = 0; i < num; i++)
-+			data[idx + i] =
-+				u64_stats_read(stats_base + desc[i].offset);
-+
-+	} while (u64_stats_fetch_retry(syncp, start));
-+}
-+
-+static void eea_get_ethtool_stats(struct net_device *netdev,
-+				  struct ethtool_stats *stats, u64 *data)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u32 i, idx = 0;
-+
-+	for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+		struct eea_net_rx *rx = enet->rx[i];
-+
-+		eea_stats_fill_for_q(&rx->stats.syncp, EEA_RX_STATS_LEN,
-+				     eea_rx_stats_desc, data, idx);
-+
-+		idx += EEA_RX_STATS_LEN;
-+	}
-+
-+	for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+		struct eea_net_tx *tx = &enet->tx[i];
-+
-+		eea_stats_fill_for_q(&tx->stats.syncp, EEA_TX_STATS_LEN,
-+				     eea_tx_stats_desc, data, idx);
-+
-+		idx += EEA_TX_STATS_LEN;
-+	}
-+}
-+
-+void eea_update_rx_stats(struct eea_rx_stats *rx_stats,
-+			 struct eea_rx_ctx_stats *stats)
-+{
-+	u64_stats_update_begin(&rx_stats->syncp);
-+	u64_stats_add(&rx_stats->descs,             stats->descs);
-+	u64_stats_add(&rx_stats->packets,           stats->packets);
-+	u64_stats_add(&rx_stats->bytes,             stats->bytes);
-+	u64_stats_add(&rx_stats->drops,             stats->drops);
-+	u64_stats_add(&rx_stats->split_hdr_bytes,   stats->split_hdr_bytes);
-+	u64_stats_add(&rx_stats->split_hdr_packets, stats->split_hdr_packets);
-+	u64_stats_add(&rx_stats->length_errors,     stats->length_errors);
-+	u64_stats_update_end(&rx_stats->syncp);
-+}
-+
-+void eea_stats(struct net_device *netdev, struct rtnl_link_stats64 *tot)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u64 packets, bytes;
-+	u32 start;
-+	int i;
-+
-+	if (enet->rx) {
-+		for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+			struct eea_net_rx *rx = enet->rx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&rx->stats.syncp);
-+				packets = u64_stats_read(&rx->stats.packets);
-+				bytes = u64_stats_read(&rx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&rx->stats.syncp,
-+						       start));
-+
-+			tot->rx_packets += packets;
-+			tot->rx_bytes   += bytes;
-+		}
-+	}
-+
-+	if (enet->tx) {
-+		for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+			struct eea_net_tx *tx = &enet->tx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&tx->stats.syncp);
-+				packets = u64_stats_read(&tx->stats.packets);
-+				bytes = u64_stats_read(&tx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&tx->stats.syncp,
-+						       start));
-+
-+			tot->tx_packets += packets;
-+			tot->tx_bytes   += bytes;
-+		}
-+	}
-+}
-+
-+static int eea_get_link_ksettings(struct net_device *netdev,
-+				  struct ethtool_link_ksettings *cmd)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+
-+	cmd->base.speed  = enet->speed;
-+	cmd->base.duplex = enet->duplex;
-+	cmd->base.port   = PORT_OTHER;
-+
-+	return 0;
-+}
-+
-+const struct ethtool_ops eea_ethtool_ops = {
-+	.supported_ring_params = ETHTOOL_RING_USE_TCP_DATA_SPLIT,
-+	.get_drvinfo        = eea_get_drvinfo,
-+	.get_link           = ethtool_op_get_link,
-+	.get_ringparam      = eea_get_ringparam,
-+	.set_ringparam      = eea_set_ringparam,
-+	.set_channels       = eea_set_channels,
-+	.get_channels       = eea_get_channels,
-+	.get_strings        = eea_get_strings,
-+	.get_sset_count     = eea_get_sset_count,
-+	.get_ethtool_stats  = eea_get_ethtool_stats,
-+	.get_link_ksettings = eea_get_link_ksettings,
-+};
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_ethtool.h b/drivers/net/ethernet/alibaba/eea/eea_ethtool.h
-new file mode 100644
-index 000000000000..1ee89b49addd
---- /dev/null
-+++ b/drivers/net/ethernet/alibaba/eea/eea_ethtool.h
-@@ -0,0 +1,50 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Driver for Alibaba Elastic Ethernet Adapter.
-+ *
-+ * Copyright (C) 2025 Alibaba Inc.
-+ */
-+
-+#ifndef __EEA_ETHTOOL_H__
-+#define __EEA_ETHTOOL_H__
-+
-+struct eea_tx_stats {
-+	struct u64_stats_sync syncp;
-+	u64_stats_t descs;
-+	u64_stats_t packets;
-+	u64_stats_t bytes;
-+	u64_stats_t drops;
-+	u64_stats_t kicks;
-+};
-+
-+struct eea_rx_ctx_stats {
-+	u64 descs;
-+	u64 packets;
-+	u64 bytes;
-+	u64 drops;
-+	u64 split_hdr_bytes;
-+	u64 split_hdr_packets;
-+
-+	u64 length_errors;
-+};
-+
-+struct eea_rx_stats {
-+	struct u64_stats_sync syncp;
-+	u64_stats_t descs;
-+	u64_stats_t packets;
-+	u64_stats_t bytes;
-+	u64_stats_t drops;
-+	u64_stats_t kicks;
-+	u64_stats_t split_hdr_bytes;
-+	u64_stats_t split_hdr_packets;
-+
-+	u64_stats_t length_errors;
-+};
-+
-+void eea_update_rx_stats(struct eea_rx_stats *rx_stats,
-+			 struct eea_rx_ctx_stats *stats);
-+void eea_stats(struct net_device *netdev, struct rtnl_link_stats64 *tot);
-+
-+extern const struct ethtool_ops eea_ethtool_ops;
-+
-+#endif
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
-index a9a48571d3b6..9bf0d823d610 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
-@@ -437,6 +437,7 @@ static const struct net_device_ops eea_netdev = {
- 	.ndo_stop           = eea_netdev_stop,
- 	.ndo_start_xmit     = eea_tx_xmit,
- 	.ndo_validate_addr  = eth_validate_addr,
-+	.ndo_get_stats64    = eea_stats,
- 	.ndo_features_check = passthru_features_check,
- 	.ndo_tx_timeout     = eea_tx_timeout,
- };
-@@ -454,6 +455,7 @@ static struct eea_net *eea_netdev_alloc(struct eea_device *edev, u32 pairs)
- 	}
- 
- 	netdev->netdev_ops = &eea_netdev;
-+	netdev->ethtool_ops = &eea_ethtool_ops;
- 	SET_NETDEV_DEV(netdev, edev->dma_dev);
- 
- 	enet = netdev_priv(netdev);
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
-index b451f6765480..d98a1a94d86e 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.h
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
-@@ -12,6 +12,7 @@
- #include <linux/netdevice.h>
- 
- #include "eea_adminq.h"
-+#include "eea_ethtool.h"
- #include "eea_ring.h"
- 
- #define EEA_VER_MAJOR		1
-@@ -38,6 +39,8 @@ struct eea_net_tx {
- 	u32 index;
- 
- 	char name[16];
-+
-+	struct eea_tx_stats stats;
- };
- 
- struct eea_rx_meta {
-@@ -90,6 +93,8 @@ struct eea_net_rx {
- 
- 	struct napi_struct napi;
- 
-+	struct eea_rx_stats stats;
-+
- 	u16 irq_n;
- 
- 	char name[16];
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_rx.c b/drivers/net/ethernet/alibaba/eea/eea_rx.c
-index 4a802cf87de0..e0a0a9e29e99 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_rx.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_rx.c
-@@ -32,6 +32,8 @@ struct eea_rx_ctx {
- 	u32 frame_sz;
- 
- 	struct eea_rx_meta *meta;
-+
-+	struct eea_rx_ctx_stats stats;
- };
- 
- static struct eea_rx_meta *eea_rx_meta_get(struct eea_net_rx *rx)
-@@ -199,6 +201,7 @@ static int eea_harden_check_overflow(struct eea_rx_ctx *ctx,
- 		pr_debug("%s: rx error: len %u exceeds truesize %u\n",
- 			 enet->netdev->name, ctx->len,
- 			 ctx->meta->truesize - ctx->meta->room);
-+		++ctx->stats.length_errors;
- 		return -EINVAL;
- 	}
- 
-@@ -215,6 +218,7 @@ static int eea_harden_check_size(struct eea_rx_ctx *ctx, struct eea_net *enet)
- 
- 	if (unlikely(ctx->hdr_len + ctx->len < ETH_HLEN)) {
- 		pr_debug("%s: short packet %u\n", enet->netdev->name, ctx->len);
-+		++ctx->stats.length_errors;
- 		return -EINVAL;
- 	}
- 
-@@ -356,6 +360,7 @@ static int process_remain_buf(struct eea_net_rx *rx, struct eea_rx_ctx *ctx)
- 
- err:
- 	dev_kfree_skb(rx->pkt.head_skb);
-+	++ctx->stats.drops;
- 	rx->pkt.do_drop = true;
- 	rx->pkt.head_skb = NULL;
- 	return 0;
-@@ -384,6 +389,7 @@ static int process_first_buf(struct eea_net_rx *rx, struct eea_rx_ctx *ctx)
- 	return 0;
- 
- err:
-+	++ctx->stats.drops;
- 	rx->pkt.do_drop = true;
- 	return 0;
- }
-@@ -415,9 +421,12 @@ static void eea_rx_desc_to_ctx(struct eea_net_rx *rx,
- 	ctx->flags = le16_to_cpu(desc->flags);
- 
- 	ctx->hdr_len = 0;
--	if (ctx->flags & EEA_DESC_F_SPLIT_HDR)
-+	if (ctx->flags & EEA_DESC_F_SPLIT_HDR) {
- 		ctx->hdr_len = le16_to_cpu(desc->len_ex) &
- 			EEA_RX_CDESC_HDR_LEN_MASK;
-+		ctx->stats.split_hdr_bytes += ctx->hdr_len;
-+		++ctx->stats.split_hdr_packets;
-+	}
- 
- 	ctx->more = ctx->flags & EEA_RING_DESC_F_MORE;
- }
-@@ -445,6 +454,8 @@ static int eea_cleanrx(struct eea_net_rx *rx, int budget,
- 
- 		eea_rx_meta_dma_sync_for_cpu(rx, meta, ctx->len);
- 
-+		ctx->stats.bytes += ctx->len;
-+
- 		if (!rx->pkt.idx)
- 			process_first_buf(rx, ctx);
- 		else
-@@ -462,17 +473,20 @@ static int eea_cleanrx(struct eea_net_rx *rx, int budget,
- skip:
- 		eea_rx_meta_put(rx, meta);
- 		ering_cq_ack_desc(rx->ering, 1);
-+		++ctx->stats.descs;
- 
- 		if (!ctx->more)
- 			memset(&rx->pkt, 0, sizeof(rx->pkt));
- 	}
- 
-+	ctx->stats.packets = packets;
-+
- 	return packets;
- }
- 
- static bool eea_rx_post(struct eea_net *enet, struct eea_net_rx *rx)
- {
--	u32 tailroom, headroom, room, len;
-+	u32 tailroom, headroom, room, flags, len;
- 	struct eea_rx_meta *meta;
- 	struct eea_rx_desc *desc;
- 	int err = 0, num = 0;
-@@ -512,9 +526,14 @@ static bool eea_rx_post(struct eea_net *enet, struct eea_net_rx *rx)
- 		++num;
- 	}
- 
--	if (num)
-+	if (num) {
- 		ering_kick(rx->ering);
- 
-+		flags = u64_stats_update_begin_irqsave(&rx->stats.syncp);
-+		u64_stats_inc(&rx->stats.kicks);
-+		u64_stats_update_end_irqrestore(&rx->stats.syncp, flags);
-+	}
-+
- 	/* true means busy, napi should be called again. */
- 	return !!err;
- }
-@@ -535,6 +554,8 @@ int eea_poll(struct napi_struct *napi, int budget)
- 	if (rx->ering->num_free > budget)
- 		busy |= eea_rx_post(enet, rx);
- 
-+	eea_update_rx_stats(&rx->stats, &ctx.stats);
-+
- 	busy |= received >= budget;
- 
- 	if (!busy) {
-@@ -720,6 +741,8 @@ struct eea_net_rx *eea_alloc_rx(struct eea_net_init_ctx *ctx, u32 idx)
- 	rx->index = idx;
- 	sprintf(rx->name, "rx.%u", idx);
- 
-+	u64_stats_init(&rx->stats.syncp);
-+
- 	/* ering */
- 	ering = ering_alloc(idx * 2, ctx->cfg.rx_ring_depth, ctx->edev,
- 			    ctx->cfg.rx_sq_desc_size,
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_tx.c b/drivers/net/ethernet/alibaba/eea/eea_tx.c
-index dc63fb995317..fa1be337a171 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_tx.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_tx.c
-@@ -114,6 +114,13 @@ static u32 eea_clean_tx(struct eea_net_tx *tx)
- 		eea_tx_meta_put_and_unmap(tx, meta);
- 	}
- 
-+	if (stats.packets) {
-+		u64_stats_update_begin(&tx->stats.syncp);
-+		u64_stats_add(&tx->stats.bytes, stats.bytes);
-+		u64_stats_add(&tx->stats.packets, stats.packets);
-+		u64_stats_update_end(&tx->stats.syncp);
-+	}
-+
- 	return stats.packets;
- }
- 
-@@ -247,6 +254,10 @@ static int eea_tx_post_skb(struct eea_net_tx *tx, struct sk_buff *skb)
- 	meta->num = shinfo->nr_frags + 1;
- 	ering_sq_commit_desc(tx->ering);
- 
-+	u64_stats_update_begin(&tx->stats.syncp);
-+	u64_stats_add(&tx->stats.descs, meta->num);
-+	u64_stats_update_end(&tx->stats.syncp);
-+
- 	return 0;
- 
- err_cancel:
-@@ -258,6 +269,10 @@ static int eea_tx_post_skb(struct eea_net_tx *tx, struct sk_buff *skb)
- static void eea_tx_kick(struct eea_net_tx *tx)
- {
- 	ering_kick(tx->ering);
-+
-+	u64_stats_update_begin(&tx->stats.syncp);
-+	u64_stats_inc(&tx->stats.kicks);
-+	u64_stats_update_end(&tx->stats.syncp);
- }
- 
- netdev_tx_t eea_tx_xmit(struct sk_buff *skb, struct net_device *netdev)
-@@ -282,8 +297,13 @@ netdev_tx_t eea_tx_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	skb_tx_timestamp(skb);
- 
- 	err = eea_tx_post_skb(tx, skb);
--	if (unlikely(err))
-+	if (unlikely(err)) {
-+		u64_stats_update_begin(&tx->stats.syncp);
-+		u64_stats_inc(&tx->stats.drops);
-+		u64_stats_update_end(&tx->stats.syncp);
-+
- 		dev_kfree_skb_any(skb);
-+	}
- 
- 	if (!netdev_xmit_more() || netif_xmit_stopped(txq))
- 		eea_tx_kick(tx);
-@@ -346,6 +366,8 @@ int eea_alloc_tx(struct eea_net_init_ctx *ctx, struct eea_net_tx *tx, u32 idx)
- 	struct eea_ring *ering;
- 	u32 i;
- 
-+	u64_stats_init(&tx->stats.syncp);
-+
- 	sprintf(tx->name, "tx.%u", idx);
- 
- 	ering = ering_alloc(idx * 2 + 1, ctx->cfg.tx_ring_depth, ctx->edev,
--- 
-2.32.0.3.g01195cf9f
+> >
+> > >       return r;
+> > >  }
+> > >
+> > > @@ -1151,6 +1160,7 @@ static void handle_rx(struct vhost_net *net)
+> > >       struct iov_iter fixup;
+> > >       __virtio16 num_buffers;
+> > >       int recv_pkts = 0;
+> > > +     unsigned int ndesc;
+> > >
+> > >       mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
+> > >       sock = vhost_vq_get_backend(vq);
+> > > @@ -1182,7 +1192,8 @@ static void handle_rx(struct vhost_net *net)
+> > >               headcount = get_rx_bufs(nvq, vq->heads + count,
+> > >                                       vq->nheads + count,
+> > >                                       vhost_len, &in, vq_log, &log,
+> > > -                                     likely(mergeable) ? UIO_MAXIOV : 1);
+> > > +                                     likely(mergeable) ? UIO_MAXIOV : 1,
+> > > +                                     &ndesc);
+> > >               /* On error, stop handling until the next kick. */
+> > >               if (unlikely(headcount < 0))
+> > >                       goto out;
+> > > @@ -1228,7 +1239,7 @@ static void handle_rx(struct vhost_net *net)
+> > >               if (unlikely(err != sock_len)) {
+> > >                       pr_debug("Discarded rx packet: "
+> > >                                " len %d, expected %zd\n", err, sock_len);
+> > > -                     vhost_discard_vq_desc(vq, headcount);
+> > > +                     vhost_discard_vq_desc(vq, headcount, ndesc);
+> > >                       continue;
+> > >               }
+> > >               /* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
+> > > @@ -1252,7 +1263,7 @@ static void handle_rx(struct vhost_net *net)
+> > >                   copy_to_iter(&num_buffers, sizeof num_buffers,
+> > >                                &fixup) != sizeof num_buffers) {
+> > >                       vq_err(vq, "Failed num_buffers write");
+> > > -                     vhost_discard_vq_desc(vq, headcount);
+> > > +                     vhost_discard_vq_desc(vq, headcount, ndesc);
+> > >                       goto out;
+> > >               }
+> > >               nvq->done_idx += headcount;
+> > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > > index 8570fdf2e14a..b56568807588 100644
+> > > --- a/drivers/vhost/vhost.c
+> > > +++ b/drivers/vhost/vhost.c
+> > > @@ -2792,18 +2792,11 @@ static int get_indirect(struct vhost_virtqueue *vq,
+> > >       return 0;
+> > >  }
+> > >
+> > > -/* This looks in the virtqueue and for the first available buffer, and converts
+> > > - * it to an iovec for convenient access.  Since descriptors consist of some
+> > > - * number of output then some number of input descriptors, it's actually two
+> > > - * iovecs, but we pack them into one and note how many of each there were.
+> > > - *
+> > > - * This function returns the descriptor number found, or vq->num (which is
+> > > - * never a valid descriptor number) if none was found.  A negative code is
+> > > - * returned on error. */
+> >
+> > A new module API with no docs at all is not good.
+> > Please add documentation to this one. vhost_get_vq_desc
+> > is a subset and could refer to it.
+> 
+> Fixed.
+> 
+> >
+> > > -int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+> > > -                   struct iovec iov[], unsigned int iov_size,
+> > > -                   unsigned int *out_num, unsigned int *in_num,
+> > > -                   struct vhost_log *log, unsigned int *log_num)
+> > > +int vhost_get_vq_desc_n(struct vhost_virtqueue *vq,
+> > > +                     struct iovec iov[], unsigned int iov_size,
+> > > +                     unsigned int *out_num, unsigned int *in_num,
+> > > +                     struct vhost_log *log, unsigned int *log_num,
+> > > +                     unsigned int *ndesc)
+> >
+> > >  {
+> > >       bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
+> > >       struct vring_desc desc;
+> > > @@ -2921,16 +2914,40 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+> > >       vq->last_avail_idx++;
+> > >       vq->next_avail_head += c;
+> > >
+> > > +     if (ndesc)
+> > > +             *ndesc = c;
+> > > +
+> > >       /* Assume notifications from guest are disabled at this point,
+> > >        * if they aren't we would need to update avail_event index. */
+> > >       BUG_ON(!(vq->used_flags & VRING_USED_F_NO_NOTIFY));
+> > >       return head;
+> > >  }
+> > > +EXPORT_SYMBOL_GPL(vhost_get_vq_desc_n);
+> > > +
+> > > +/* This looks in the virtqueue and for the first available buffer, and converts
+> > > + * it to an iovec for convenient access.  Since descriptors consist of some
+> > > + * number of output then some number of input descriptors, it's actually two
+> > > + * iovecs, but we pack them into one and note how many of each there were.
+> > > + *
+> > > + * This function returns the descriptor number found, or vq->num (which is
+> > > + * never a valid descriptor number) if none was found.  A negative code is
+> > > + * returned on error.
+> > > + */
+> > > +int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+> > > +                   struct iovec iov[], unsigned int iov_size,
+> > > +                   unsigned int *out_num, unsigned int *in_num,
+> > > +                   struct vhost_log *log, unsigned int *log_num)
+> > > +{
+> > > +     return vhost_get_vq_desc_n(vq, iov, iov_size, out_num, in_num,
+> > > +                                log, log_num, NULL);
+> > > +}
+> > >  EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
+> > >
+> > >  /* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
+> > > -void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
+> > > +void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n,
+> > > +                        unsigned int ndesc)
+> >
+> > ndesc is number of descriptors? And n is what, in that case?
+> 
+> The semantic of n is not changed which is the number of buffers, ndesc
+> is the number of descriptors.
+
+History is not that relevant. To make the core readable pls
+change the names to readable ones.
+
+Specifically n is really nbufs, maybe?
+
+
+
+
+> >
+> >
+> > >  {
+> > > +     vq->next_avail_head -= ndesc;
+> > >       vq->last_avail_idx -= n;
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(vhost_discard_vq_desc);
+> > > diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> > > index 621a6d9a8791..69a39540df3d 100644
+> > > --- a/drivers/vhost/vhost.h
+> > > +++ b/drivers/vhost/vhost.h
+> > > @@ -230,7 +230,14 @@ int vhost_get_vq_desc(struct vhost_virtqueue *,
+> > >                     struct iovec iov[], unsigned int iov_size,
+> > >                     unsigned int *out_num, unsigned int *in_num,
+> > >                     struct vhost_log *log, unsigned int *log_num);
+> > > -void vhost_discard_vq_desc(struct vhost_virtqueue *, int n);
+> > > +
+> > > +int vhost_get_vq_desc_n(struct vhost_virtqueue *vq,
+> > > +                     struct iovec iov[], unsigned int iov_size,
+> > > +                     unsigned int *out_num, unsigned int *in_num,
+> > > +                     struct vhost_log *log, unsigned int *log_num,
+> > > +                     unsigned int *ndesc);
+> > > +
+> > > +void vhost_discard_vq_desc(struct vhost_virtqueue *, int n, unsigned int ndesc);
+> > >
+> > >  bool vhost_vq_work_queue(struct vhost_virtqueue *vq, struct vhost_work *work);
+> > >  bool vhost_vq_has_work(struct vhost_virtqueue *vq);
+> > > --
+> > > 2.31.1
+> >
+> 
+> Thanks
 
 
