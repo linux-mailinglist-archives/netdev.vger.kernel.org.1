@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-238734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 582BCC5EC15
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 19:09:06 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 620D7C5EC61
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 19:11:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C69B3A720A
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 18:00:32 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 974BC363037
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 18:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E564B34677A;
-	Fri, 14 Nov 2025 18:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CCF42D9EE4;
+	Fri, 14 Nov 2025 18:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XKCWRw13"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c0lX28/j"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8901345CD7
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 18:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657F92D6E4B
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 18:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763143209; cv=none; b=aXNkoha4qowRKKlgstQ2zK7KW/Bjgxm9WrwzRjDvgyJUlCQUjJZ6aKr3nVaEWCmRzykEjjpdskmFKNf+9NOtZz/KDxCWWVB4Zvcw8sl0E1Gv9l/rhQpDEBDZYhzKlw74zSqO+dGU3yXtpMSjRvxIPMKAgT4VKCxFRBGOcT0PKzM=
+	t=1763143452; cv=none; b=n4Ui6ttcGgysOroVkCNC/l/a6uQWjCSyis9jiwc6B1LxPQ2D7GzExv/uqgPb6tnPmxnWW5Q/+rNbu0B0tByi0rWUzmsVq3wGEAgNlLvtFoZ7uSLDwUXXW25xoZUYg4+uPsbnpK3a9BhHzpG+6/ZfzCR2LgLeTj87+AUJDf8hLbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763143209; c=relaxed/simple;
-	bh=ZJX1DmRveCnnf7EP6Rj/m+1FwNvs2kuIwyWt16OrAH4=;
+	s=arc-20240116; t=1763143452; c=relaxed/simple;
+	bh=QFU7JWjWMiS12OfEDzIu2u4dBSRUh0rMOXA3nwPt5DA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mrD4UnUTO7Zjos8c8kV2V2eX1gRLhuRSzbAPTcmooYHWYRdtK5jFqkhOznn/bfPj2mb0EDtQx+dsTMFCpAyVagLFcPYdLfYGwCERF1yKwzG78p8N4VKH1okIGbwwo9GwbdGwchVYjVj+maWC30h/n/MPMKEJZgT3qgKoKd+dXzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XKCWRw13; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FB04C4CEF8;
-	Fri, 14 Nov 2025 18:00:06 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=jO+ozWvmJVqVRitU0rGMfx+N/kzRWxsxRjlAf8Zt3n+7mc6o5j2DaRMzrajOFGClkW1Vf9L/yrx8OlKpxYJOUAMuhELQgi6c2JGfWTy+5hyZj3FdXtOUbpybOXGrVA3ztNKtYw2JxKTbzrrx4F89bTsHM9nNjEP9iURggjqMDdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c0lX28/j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1AF2C4CEF5;
+	Fri, 14 Nov 2025 18:04:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763143209;
-	bh=ZJX1DmRveCnnf7EP6Rj/m+1FwNvs2kuIwyWt16OrAH4=;
+	s=k20201202; t=1763143451;
+	bh=QFU7JWjWMiS12OfEDzIu2u4dBSRUh0rMOXA3nwPt5DA=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XKCWRw13YdKWTKn9ORewry8gXaPuSQuZ3MVdAIGmsdsrN7O1Brc1STm0bBGf2HSBJ
-	 Z4YLtUOHxZzhWi1MvTVr/K/KtJKNzQbXpvQEQITq+RvOpFq2yhiyEDgKXr6RPJ4etJ
-	 Pq7/GLh7OfH0tRAEGxTBmqEqKXorHSD3LBtuvKtKd3hjQ+W7JzqyGGDoBhfV6J01Q3
-	 SMYwfStz23Uwrw5ChLpFue8z8LWjcpbXBaQCBzixh7Q1i2jQ0g/ykEzYC8zy6ne0Ih
-	 zGMJxNsClwLQXXMzCVuymLbKHP3cwejWHL0DbEX4XiZZu2WI/ZX4TCRkkv5SjNv8n4
-	 3dHImQ6rOIrFg==
-Message-ID: <9f8487ee-be04-4198-9fae-042facbf0883@kernel.org>
-Date: Fri, 14 Nov 2025 19:00:02 +0100
+	b=c0lX28/jG4iaHHWu76LTcIruE0v4vGgVXAj0BmnPsJj/XgLrTbqGiu9iGQQYkwHhJ
+	 B8qaCMtJ4V0Hx7XVdv/T50lZKplfRlsEPSi26zvkW2YNb/6P5W0F/aMV2BZ9c2HApN
+	 CiV91Vdbgu3k/yRAZfCaf8jfirdGrGa/qp2F7DjG4vwcUM++tEZgBscFKA93CRTl4K
+	 6z6kdvwS76NylDP9/MWtxorwdPW9AZ5s+tjmufBMRQ3mINbuGVbZXYOKBrons97xxr
+	 N/41dB3N5fRN//+GRcdJfxRqyazNonmyzAFFNT/+eqa6mNp01Iut/xSRd2aoFUdIEM
+	 gJ/NLfpqWmYag==
+Message-ID: <3f3ecb14-88ce-4de3-91b7-d1b84867c182@kernel.org>
+Date: Fri, 14 Nov 2025 19:04:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,17 +52,17 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCHv4 net-next 3/3] tools: ynl: add YNL test framework
 Content-Language: en-GB, fr-BE
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jan Stancek <jstancek@redhat.com>,
- =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>,
- Stanislav Fomichev <sdf@fomichev.me>, Ido Schimmel <idosch@nvidia.com>,
- Guillaume Nault <gnault@redhat.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Petr Machata <petrm@nvidia.com>
+To: Donald Hunter <donald.hunter@gmail.com>,
+ Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jan Stancek <jstancek@redhat.com>, =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnes?=
+ =?UTF-8?Q?en?= <ast@fiberby.net>, Stanislav Fomichev <sdf@fomichev.me>,
+ Ido Schimmel <idosch@nvidia.com>, Guillaume Nault <gnault@redhat.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, Petr Machata <petrm@nvidia.com>
 References: <20251114034651.22741-1-liuhangbin@gmail.com>
- <20251114034651.22741-4-liuhangbin@gmail.com>
+ <20251114034651.22741-4-liuhangbin@gmail.com> <m2pl9komz5.fsf@gmail.com>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -108,88 +108,54 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <20251114034651.22741-4-liuhangbin@gmail.com>
+In-Reply-To: <m2pl9komz5.fsf@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Hangbin,
+Hi Donald,
 
-On 14/11/2025 04:46, Hangbin Liu wrote:
-> Add a test framework for YAML Netlink (YNL) tools, covering both CLI and
-> ethtool functionality. The framework includes:
+On 14/11/2025 12:46, Donald Hunter wrote:
+> Hangbin Liu <liuhangbin@gmail.com> writes:
+>>
+>> +cleanup() {
+>> +	if [[ -n "$testns" ]]; then
+>> +		ip netns exec "$testns" bash -c "echo $NSIM_ID > /sys/bus/netdevsim/del_device" 2>/dev/null || true
+>> +		ip netns del "$testns" 2>/dev/null || true
+>> +	fi
+>> +}
+>> +
+>> +# Check if ynl command is available
+>> +if ! command -v $ynl &>/dev/null && [[ ! -x $ynl ]]; then
+>> +	ktap_skip_all "ynl command not found: $ynl"
+>> +	exit "$KSFT_SKIP"
+>> +fi
+>> +
+>> +trap cleanup EXIT
+>> +
+>> +ktap_print_header
+>> +ktap_set_plan 9>> +setup
+>> +
+>> +# Run all tests
+>> +cli_list_families
+>> +cli_netdev_ops
+>> +cli_ethtool_ops
+>> +cli_rt_route_ops
+>> +cli_rt_addr_ops
+>> +cli_rt_link_ops
+>> +cli_rt_neigh_ops
+>> +cli_rt_rule_ops
+>> +cli_nlctrl_ops
+>> +
+>> +ktap_finished
 > 
-> 1) cli: family listing, netdev, ethtool, rt-* families, and nlctrl
->    operations
-> 2) ethtool: device info, statistics, ring/coalesce/pause parameters, and
->    feature gettings
-> 
-> The current YNL syntax is a bit obscure, and end users may not always know
-> how to use it. This test framework provides usage examples and also serves
-> as a regression test to catch potential breakages caused by future changes.
+> minor nit: ktap_finished should probably be in the 'cleanup' trap handler
 
-Thank you for the new version!
-
-I have two minor comments, up to you to fix that or not.
-
-(...)
-
-> diff --git a/tools/net/ynl/tests/test_ynl_cli.sh b/tools/net/ynl/tests/test_ynl_cli.sh
-> new file mode 100755
-> index 000000000000..f40eecbb9701
-> --- /dev/null
-> +++ b/tools/net/ynl/tests/test_ynl_cli.sh
-> @@ -0,0 +1,309 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Test YNL CLI functionality
-> +
-> +# Load KTAP test helpers
-> +KSELFTEST_KTAP_HELPERS="$(dirname "$(realpath "$0")")/../../../testing/selftests/kselftest/ktap_helpers.sh"
-> +# shellcheck disable=SC1090
-
-nit: maybe you can use this instead?
-
-# shellcheck source=../../../testing/selftests/kselftest/ktap_helpers.sh
-
-(If not, it might be good to always document why something is disabled
-by adding a comment on the same line or before.)
-
-(Same for the other test.)
-
-(...)
-> +ktap_print_header
-> +ktap_set_plan 9
-
-I think you should print the plan after the setup, to avoid this in case
-of errors during the setup:
-
-  TAP version 13
-  1..9
-  1..0 # SKIP (...)
-  <exit 4>
-
-
-Note that it might be interesting to add a dedicated variable for the
-tests counter that you increment after having declared each test, just
-not to forget modifying the plan when a new test is added, e.g.
-
-  TESTS_NO=0
-
-  (...)
-
-  cli_list_families() {
-      (...)
-  }
-  TESTS_NO=$((TESTS_NO + 1))
-
-  (...)
-
-  # Run all tests
-  ktap_set_plan "${TESTS_NO}"
-  cli_list_families
-  (...)
-
-(Same for the other test.)
+@Donald: I don't think 'ktap_finished' should be called there: in case
+of errors with an early exit during the setup phase, the two scripts
+will call 'ktap_skip_all', then 'exit "$KSFT_SKIP"'. If 'ktap_finished'
+is called in the 'cleanup' trap, it will print a total with everything
+set to 0 and call 'exit' again with other values (and no effects). So I
+think it is not supposed to be called from the exit trap.
 
 Cheers,
 Matt
