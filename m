@@ -1,202 +1,225 @@
-Return-Path: <netdev+bounces-238575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1E7AC5B41C
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 04:59:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4859C5B46E
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 05:12:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 43B3F4E039A
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 03:59:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CE5D3AE54F
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 04:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD9C26F2A0;
-	Fri, 14 Nov 2025 03:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFAB27F18B;
+	Fri, 14 Nov 2025 04:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XT8ekLg9"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="WcdvIvc3";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="S6ehArPl"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010039.outbound.protection.outlook.com [40.93.198.39])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2932B270541
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 03:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.39
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763092748; cv=fail; b=DTJ/UokDFz+2tIS+dgWL/Y3IJ2G0nfkqqnss+YHDVJiOV8Sw+DjB5UySwn+SecHaw9cBmP8I6YjMekL2I1ZQbOLF2jHpubLZpQYarW8eygwfyHR8QUAKmYlHtRqZPMqpKeWlqVORYBhft3Wy9Jsb9fTu9iZ/nAGVqK0Fb1X/2wg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763092748; c=relaxed/simple;
-	bh=0EPrSYeLDHWi13lA1FIa2q+3adlJJMDOfwVdWUKJpqs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A1jV55Iu5rITgVLYZtINatoSx3+gb+tSxMXmdyWtt9FjcfeDomInGuSSTboZnkA4fIOj83G6B3fmp4bzt1ROrSFhy1Svk6JsC916sXHQ+lFlYrvGerPbjmDGMdim+4FhS5b/Neu8fjJhrXQDpUyY/vjVAk7HHKZ5UjtnnlZcMjc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XT8ekLg9; arc=fail smtp.client-ip=40.93.198.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=F4KZh5jBTwfBl6fHIEjkk//EysAm5CiWdV4ahji8I+w7GPKsf0pQHRW+ZkKohcXn8L9nyoneMKuS1lIq7F6Zwu95eeLUBXu0epjs90h5fXdxFeBztB+yPoX8Nz7FkSO3DwU3W65mI4yFiaWR5lOYIJRUGYMUX7lUEQFN2mGJUjnx0D2xfh5z+wTTxa4OdVYZvsNf9aKVezYt+2T8zsDZf1nSBtalmTC08YQeOGEK5MpFFj6up1PcKmjqxCwp1yN/UgicNQ1DdYCxnM6GD6MUhRm1HWrcgG2FhlOBT59R/weqHjiiYiNan8IktIn9i9oLD/F0yhYx3toK8oMGbxtNSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4yTSraXOJmZP+DpQeJgH+aU8dnEEMTojbiN1x9Affxw=;
- b=PgQoYKIo02rYU0B6z0pbr+TYijUUPodFGeW2p5K9w2t9F4j4o9euYT3jqLT/AaYUWvLyWyZuIDi3Tr2UGu1ljUChdQDmnQ0+clsDjGeuA8Fz13YxhZwSDjBRRijf1+l9YftPM+dO5pTGVoCatE1aqJLaAnjcjL6T+ZqHFvyVpz/CuB+M3HWxtEiZ9GtipbYw9fFpdW2itnJIKasmjnLvLINtthefa3wksptkPaX6XmcC1bxToIXh0wwaLgYtIzZ1CobFjrmQXNEIoHehkAT/gFpmUF8uaowsLGq8lY56tZtwqEyjykssurPfWC4OkKj9Fg7on4Xlu1U/cxwdohrt4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4yTSraXOJmZP+DpQeJgH+aU8dnEEMTojbiN1x9Affxw=;
- b=XT8ekLg9sD3wzCUG0F8CexEwck+h1h8FqLErT76UcB3HPY3DYCcImvxMc132ERnm68S8aT1FUEmyZimAj+KRMQXoj5ECnpodAiKhgIchEVB76vE0dbtSIn1sv1qdoE7at4wZY9/0RwEfQOVDk4L3qlppcaPY68I1xlQ0ITJ5GMtuJBbrw/jGMVkz5Yy+Cswv34g/nJ3iQvzYlrheqYizl+F1lXB5GqXPIhypwaFSXLEKcRt/V9X8tb63o+L0AoIYPIJ5Xd3d9Jb6G7BT1FGB5dwJN7/LVbbCwuhkq6d2/JaKdZ7h6za2FdLd3ZaeDjBzadlKO8qhjHc10fNDG5mlnw==
-Received: from MW4PR03CA0244.namprd03.prod.outlook.com (2603:10b6:303:b4::9)
- by SJ0PR12MB7473.namprd12.prod.outlook.com (2603:10b6:a03:48d::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.17; Fri, 14 Nov
- 2025 03:59:00 +0000
-Received: from SJ1PEPF0000231F.namprd03.prod.outlook.com
- (2603:10b6:303:b4:cafe::f6) by MW4PR03CA0244.outlook.office365.com
- (2603:10b6:303:b4::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9320.15 via Frontend Transport; Fri,
- 14 Nov 2025 03:58:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ1PEPF0000231F.mail.protection.outlook.com (10.167.242.235) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9320.13 via Frontend Transport; Fri, 14 Nov 2025 03:59:00 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 13 Nov
- 2025 19:58:46 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 13 Nov
- 2025 19:58:45 -0800
-Received: from mtl-vdi-603.wap.labs.mlnx (10.127.8.13) by mail.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Thu, 13 Nov 2025 19:58:42 -0800
-From: Jianbo Liu <jianbol@nvidia.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<steffen.klassert@secunet.com>
-CC: Jianbo Liu <jianbol@nvidia.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, "Paolo
- Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Sabrina Dubroca
-	<sd@queasysnail.net>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: [PATCH ipsec] xfrm: Fix inner mode lookup in tunnel mode GSO segmentation
-Date: Fri, 14 Nov 2025 05:56:17 +0200
-Message-ID: <20251114035824.22293-1-jianbol@nvidia.com>
-X-Mailer: git-send-email 2.49.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C080A27CCE0
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 04:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763093555; cv=none; b=rdAjW6kHovZ+eV0BBZCIOZwi23iscikXlgkqZpKndvVBLmxV6NuTZcqWs36BeuFr5ENmYVFc33Io3LtN5hXg+QY843fTGV7/nl6hvrg+dspwEUwztSmc+M4MzcN4YkIf5ODqAwTacOkNZ7ksA1/lzYwsBapnZ2EC3F/qRnThY0s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763093555; c=relaxed/simple;
+	bh=vqxQ3dK7VdFS3PT/6Q6WjwlGkrU2MdtNuweZl3H6mBs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=By4DkUr9Ha15vK/WDpL6Y6YOKnp34+CnDbJu6iiUsly4xVit1yRR4pthvp7oA8CEg/Tl8Ti6mVQrbLohzowH1iDU+oChpCu+h+mwvxNNVT8hwXZ7k/AtMW5yXqXxl7cBmBNpnbyvqHOYBast+gMgvb9CX/qofX5ldN0v8CjMOJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=WcdvIvc3; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=S6ehArPl; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ADMaxaI1614442
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 04:12:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=l9FUBbeUidxIV00pdQyQahKH
+	PpoxkuEk9fyNczKyhZ4=; b=WcdvIvc3sMDYJHBly1X7GlPj50GGKCEK4vrDj8k0
+	5eaZ80++Ws3b6M4a/w2eVgp5fBZPqpReXJ6xcZvCuGqlyHQVAUPNMJplXDtRkmjR
+	y6847o+zGxT2XJUEtVt8QOs1dNpy77MXiVZuOJgYMs0BamIgUtjw2hTVBYrDWjPI
+	ByZ746JdSL8Gv5MgaoTNMk2yzeUNW4jCf/D2j643Vd/vNt+46rBlvy+jz4Ihw0Z+
+	fTd/SLbn6SPCPWVriGZp93nSNSFJRad1vxT6ksE51c5WW0OqhiOxjWbi0pFY79Eh
+	201wVoknTjIeNpA4GWGoZTCf94s18YBclqS5YUrFYMV7Vg==
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4adr9h0rw6-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 04:12:32 +0000 (GMT)
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8b24383b680so727364285a.0
+        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 20:12:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1763093552; x=1763698352; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=l9FUBbeUidxIV00pdQyQahKHPpoxkuEk9fyNczKyhZ4=;
+        b=S6ehArPlA6Y4Y2WhGL5tW8g9/P+SLUq8P/kEOUNHMBNtktCmPsFqnHMd7TRn04iPvO
+         3UXvPPUHTZFrNRaz15CaNWcEokgpflDA4lHpPu+L9wZx06AZC8GrhZtLXNVTJk+CMbdu
+         11zsB1uyN//YAxP5Y6B6mKG39c9o8KpIfLjHmkBiFb3K71khvkuwX4igh8z8to2voa3p
+         zeYb6yua1xQrJTcS/hZVKWsHoARpHWPg+pAKO80q7A1M9sFReG2WhdDHevHZdxs/91T0
+         ILNhpfgX4oj303aRnl5T51TBtUVEF1XALli3nQ25MOMx2STZunr5JokL0gQauX1zO4qz
+         pY5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763093552; x=1763698352;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l9FUBbeUidxIV00pdQyQahKHPpoxkuEk9fyNczKyhZ4=;
+        b=GT4YSAxZu+gy4O40BfNvYpQZK1ztoWdirJotKQ0aru9spcbjjnehpudtY/m74Phgf5
+         hJv4pzJhbTAieKInNmbApnT170ctI/K36YxeQXo0JdLwqmNJa8yVgnkEm6c8VTjUXXfE
+         4BfLW3erVYCc2aX0vhOgGuP4HtAMLyptXdLg7ilMxSg8zwRhNSDVL+OeI5MHCTZYsY4s
+         q0G8g0H1zePlMJPdUZXLdCqhkbwfWf5sDq3BHC7vEjZXEKJd4XU2a1v6Fbn9AU9oFS1a
+         Db/o0ahEBLOpT6lz/TZMHBKfGa9kaYnTL+0txiRaTbkbcOkk2Hwy7QjGy2lp5xsZ0isI
+         lhZg==
+X-Forwarded-Encrypted: i=1; AJvYcCWGeBURYRtvMiYwF8NuU/nwWi6HEmvfjuVbEOc23GOtLbNLwdknUmFylqtKp3+vX6g1kNZY0rw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9sNuC+M77nw75NWc+dW4FuK4EoqJim9Wtv13m86e5+4GewV3Z
+	VRbAC5+zV9AG8ILbZhdAzL/g09DUqaGffzzogwbeQq1/AyqA9LlU58p149zBuZ+qqmGIKkO5axb
+	DSnLn/rGLMaHeElrQs3aGrFuIczR43E05RAQQ9Ro1PSOzN3o4vjzrOddk1yc=
+X-Gm-Gg: ASbGnct+hWPnq8gDkmGGT+FUXPStTvLAKdlP8TeXxdD1ZR9KngOPDCT/9kvG7mb4ZOK
+	jpEzZy/sVngVJiEpHu2sq8k2XLgdLKdKQnsSxR5vumTdzsq26meLT97ilKpzO4v3foivqosGdJw
+	uga20olgfefyvixbO0Xn23wPlq4knZcKzO2G+2j99R/ICH6pkZrvfBSTV/Y57q7D0syO9EfsG/Q
+	r2VwfmjdF7BziN6Sb4f4qHExN8yoeSIuUVvp9E4QJCXsqbJn0pCMEBXSsDAOtCYHdssmoukiuxm
+	6vcggzrZfy1HTF1zaJ++igN3H4qXrWYvDKrzvBxhbNH+S7thXtCiD3kYxEaRF2POS3risykuOPm
+	NgnqfLuCg198nRLcbTrsbuFPAjUiq6q7ZIpH3InvrMecfXPBiGLkjoaJUWcsSL1Eu83SXjNSCag
+	bw2mBH6RqCTDTy
+X-Received: by 2002:a05:620a:4628:b0:8b1:ed55:e4f1 with SMTP id af79cd13be357-8b2c3175d59mr235427785a.39.1763093551901;
+        Thu, 13 Nov 2025 20:12:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGRBRFxxiAD30mEJm55HBtKCBqJwVeb/nqEO1wa7PZ+U+vRFrL3SI4k/Rw4EJ92OxtkmKQ+nw==
+X-Received: by 2002:a05:620a:4628:b0:8b1:ed55:e4f1 with SMTP id af79cd13be357-8b2c3175d59mr235424485a.39.1763093551352;
+        Thu, 13 Nov 2025 20:12:31 -0800 (PST)
+Received: from umbar.lan (2001-14ba-a0c3-3a00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a0c3:3a00:264b:feff:fe8b:be8a])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59580405a4esm784867e87.95.2025.11.13.20.12.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 20:12:30 -0800 (PST)
+Date: Fri, 14 Nov 2025 06:12:28 +0200
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Corey Minyard <corey@minyard.net>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        "Dr. David Alan Gilbert" <linux@treblig.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Rob Clark <robin.clark@oss.qualcomm.com>,
+        Matthew Brost <matthew.brost@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+        Vitaly Lifshits <vitaly.lifshits@intel.com>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Niklas Cassel <cassel@kernel.org>, Calvin Owens <calvin@wbinvd.org>,
+        Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Sagi Maimon <maimon.sagi@gmail.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Karan Tilak Kumar <kartilak@cisco.com>,
+        Hans Verkuil <hverkuil+cisco@kernel.org>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Steven Rostedt <rostedt@goodmis.org>, Petr Mladek <pmladek@suse.com>,
+        Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>,
+        Max Kellermann <max.kellermann@ionos.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, openipmi-developer@lists.sourceforge.net,
+        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linaro-mm-sig@lists.linaro.org, amd-gfx@lists.freedesktop.org,
+        linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
+        intel-xe@lists.freedesktop.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-pci@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        ceph-devel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Dmitry Baryshkov <lumag@kernel.org>,
+        Abhinav Kumar <abhinav.kumar@linux.dev>,
+        Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
+        Marijn Suijten <marijn.suijten@somainline.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Lucas De Marchi <lucas.demarchi@intel.com>,
+        Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+        Kishon Vijay Abraham I <kishon@kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Rodolfo Giometti <giometti@enneenne.com>,
+        Jonathan Lemon <jonathan.lemon@gmail.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Satish Kharat <satishkh@cisco.com>,
+        Sesidhar Baddela <sebaddel@cisco.com>,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v3 06/21] drm/msm: Switch to use %ptSp
+Message-ID: <ngzyqzrjg2msv6odahkirdipjizbpaecfscfgnic3su5fl6hs7@qgdb53svq64p>
+References: <20251113150217.3030010-1-andriy.shevchenko@linux.intel.com>
+ <20251113150217.3030010-7-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF0000231F:EE_|SJ0PR12MB7473:EE_
-X-MS-Office365-Filtering-Correlation-Id: 409892f9-44c2-494b-e0d2-08de233224ab
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?jbLMj9IQGd1JxsgmSBFkjW8xzo8ATn6vBVr0RFVycagwhKQfP/1EWoWkKqSU?=
- =?us-ascii?Q?PMi3/HEpzt8mbB5UOAEajq5KHKHpqrxTk97BLEOYkUFYk5OLce/fcn+ssBVp?=
- =?us-ascii?Q?aBGscePQHTcfUClrMIlpHmij3lLuUuNkDATHX4ocMKTRifRerT1vkyCuPLHF?=
- =?us-ascii?Q?Xg3nEjIQbAxRocrRrgKxgY2O1u6zOzHqq8OF2LpSVNX+uGlfAPSirke2n0D7?=
- =?us-ascii?Q?c73lL9zu8g47pFerACDjWq262P4FENUOlqVXSoa8oxKzHHaByphtd7GZz23v?=
- =?us-ascii?Q?ANSmTuEJd6t/gA4SFqIlIYduNwidv/0ZWGzF30nwAXQHdygqjsZ/SU/nUlM7?=
- =?us-ascii?Q?p6OQRS5kzVIotqQjBLAtnkT96SCdFl++r2LiGVF1Ps8EpwCAAfoafn615SuL?=
- =?us-ascii?Q?K9bW/I6oCFKdZhzOV/wi7UWrRz97A0/LeTnVXecqx/nzBUcJXj5mlwOmUKqG?=
- =?us-ascii?Q?BlTaVBQUolxH8Py1BlU63s0eiBnpqINWkKASczlGxFPEdKqcOhcwXq75Ld3e?=
- =?us-ascii?Q?3OF1PJgOGag7WI6e5TgEOkm5O6gZOCKmc2WKpEQSEyTHAj1KuE7Azl1RBrMK?=
- =?us-ascii?Q?YWefWqQCBNh5flkNojq+A30pWpkpImH1jK1kTo3mu6zEvt/IIVmSxMDd0HF6?=
- =?us-ascii?Q?x5r3233Yv1p1Qpo8QtfngsiThqzo2b78wpsNLtcMNxkND2qz2bod56puZo0s?=
- =?us-ascii?Q?f9NEuxmq0haDkDa3htZ3HhUvuCk9P4hxy1HYJu8y3EORUS5QWUA0XlSduBcD?=
- =?us-ascii?Q?e4MV1MgG4p6DiAhBPY69B6CxrHPDgu2OA61ydAAR1S1jbeqY+GTuXw9+fcbA?=
- =?us-ascii?Q?lPC8CXAWjzTRj/Lz9jw0NJDVrT8EwY66jvbaJHZAf3x4beBdY0+F1WOCE82+?=
- =?us-ascii?Q?A/sMDfMq7FaGZaxcAuZSaI7SjWpfxMP2ohHsNxOg74sIcRQtghrQFk57NI6R?=
- =?us-ascii?Q?iIFD32q0/je5bvEZO4ENnAYm4+ydCj3fOtlCi99c0PNGuDtk/fr+SI/LlpE3?=
- =?us-ascii?Q?jAWCeuP0oIGSAwxOTvD9HxFfjdz8vH0tRXfl9CwljU2iurFvP0N/mmf8Uv1o?=
- =?us-ascii?Q?K/8IOFpbH/Ln5eMWMvAAmOZMSLrETZuTmHGwS0+kXAgvCypfx03cyiF6Z5Zi?=
- =?us-ascii?Q?sN5vTL10bjPbwahVND383JNIk0UP1t9cK6CvbrnqBxz1hhIgvL2+oPt4LyhV?=
- =?us-ascii?Q?kdxYvAOE03bjE3OQtBY0CqGDWsV3ye1RpHyWeerCS8xCdPNc994ImAzI/iSX?=
- =?us-ascii?Q?i6E+Nw+db4nW8JOM10Yrpx9fbjzpKLALvDSPFcYhg7dGuRD7i2LjRsr5LQD9?=
- =?us-ascii?Q?pnkGIu4dyA4stM3TUnvpGcIad8UVYrcF6zAr23oE0bxr/JiwHWPHGFVDQ/Ko?=
- =?us-ascii?Q?9M1y2Unnlbv0y4pJluEl6yaJ3cy/VBJUl2LIyrAm4AUbggZZic6sL2b+W2KX?=
- =?us-ascii?Q?Pe0dgOqnPjmSeXDgUvNsbfsoHZttTE7e6iTb4ixJ1QpRqmU6es51RJAMXa3V?=
- =?us-ascii?Q?qg26rj+KXoCY4zyi00SwZuYxdYRTQsRkl8NIIjCFARQ02vos241+bkJRbD74?=
- =?us-ascii?Q?87r9IsQUyMQ8GaudwU0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2025 03:59:00.3448
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 409892f9-44c2-494b-e0d2-08de233224ab
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF0000231F.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7473
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251113150217.3030010-7-andriy.shevchenko@linux.intel.com>
+X-Proofpoint-ORIG-GUID: ZbJ3VokFsY9Iv7N3E_Ct6oKfFOhspJbC
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE0MDAzMCBTYWx0ZWRfX/ibHxHj/yN1y
+ f/H1BGbee5fyoyl3v83lX5gveHVRbi83vWJo/79hM4l8bzj+OXGHoL8/dLoGBTyqaNKJZRWkTiY
+ SwHrqrjNP6fNd3bNXIwQWj0A9VBzOMAWqI4U90dOjJ8Mcro5trXQ3rXQhz3yhgIlpkUuVqbxy0Y
+ eG1+0sP/FudVYYQi2dm7NWwwIo7e84DAhhEIOJ7n0D2k0Q27WwQ5rvmCT6oa7/1n2/TzSpMHq1H
+ 5XRIulek4GB1F/cwX3r/L9icruh6Mm3eJCQcQiX1aKFIfASX/Z4H2YnW1yTinDPFPfEgtdk1/3Q
+ 9F5PfWvrdWuDLJbX9LHWjnzsS4gd+RJi6M+mVLUgmjWKK5Jggn6BUkYC8eWQGoR2r00GTzCTAHz
+ 1EMCftRIdBi7XNjOPNGJMMawjRVuFA==
+X-Proofpoint-GUID: ZbJ3VokFsY9Iv7N3E_Ct6oKfFOhspJbC
+X-Authority-Analysis: v=2.4 cv=V+1wEOni c=1 sm=1 tr=0 ts=6916ac30 cx=c_pps
+ a=HLyN3IcIa5EE8TELMZ618Q==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=QyXUC8HyAAAA:8 a=EUspDBNiAAAA:8 a=JNz3O4sEs4oywJvo4n4A:9 a=CjuIK1q_8ugA:10
+ a=bTQJ7kPSJx9SKPbeHEYW:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-13_07,2025-11-13_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 bulkscore=0 suspectscore=0 phishscore=0 clxscore=1015
+ spamscore=0 priorityscore=1501 impostorscore=0 adultscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511140030
 
-Commit 61fafbee6cfe ("xfrm: Determine inner GSO type from packet
-inner protocol") attempted to fix GSO segmentation by reading the
-inner protocol from XFRM_MODE_SKB_CB(skb)->protocol. This was
-incorrect as the XFRM_MODE_SKB_CB(skb)->protocol field is not assigned
-a value in this code path and led to selecting the wrong inner mode.
+On Thu, Nov 13, 2025 at 03:32:20PM +0100, Andy Shevchenko wrote:
+> Use %ptSp instead of open coded variants to print content of
+> struct timespec64 in human readable format.
+> 
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+>  drivers/gpu/drm/msm/disp/msm_disp_snapshot_util.c | 3 +--
+>  drivers/gpu/drm/msm/msm_gpu.c                     | 3 +--
+>  2 files changed, 2 insertions(+), 4 deletions(-)
+> 
 
-The correct value is in xfrm_offload(skb)->proto, which is set from
-the outer tunnel header's protocol field by esp[4|6]_gso_encap(). It
-is initialized by xfrm[4|6]_tunnel_encap_add() to either IPPROTO_IPIP
-or IPPROTO_IPV6, using xfrm_af2proto() and correctly reflects the
-inner packet's address family.
+Acked-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
 
-Fixes: 61fafbee6cfe ("xfrm: Determine inner GSO type from packet inner protocol")
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
----
- net/ipv4/esp4_offload.c | 4 ++--
- net/ipv6/esp6_offload.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
-index 05828d4cb6cd..abd77162f5e7 100644
---- a/net/ipv4/esp4_offload.c
-+++ b/net/ipv4/esp4_offload.c
-@@ -122,8 +122,8 @@ static struct sk_buff *xfrm4_tunnel_gso_segment(struct xfrm_state *x,
- 						struct sk_buff *skb,
- 						netdev_features_t features)
- {
--	const struct xfrm_mode *inner_mode = xfrm_ip2inner_mode(x,
--					XFRM_MODE_SKB_CB(skb)->protocol);
-+	struct xfrm_offload *xo = xfrm_offload(skb);
-+	const struct xfrm_mode *inner_mode = xfrm_ip2inner_mode(x, xo->proto);
- 	__be16 type = inner_mode->family == AF_INET6 ? htons(ETH_P_IPV6)
- 						     : htons(ETH_P_IP);
- 
-diff --git a/net/ipv6/esp6_offload.c b/net/ipv6/esp6_offload.c
-index 22410243ebe8..22895521a57d 100644
---- a/net/ipv6/esp6_offload.c
-+++ b/net/ipv6/esp6_offload.c
-@@ -158,8 +158,8 @@ static struct sk_buff *xfrm6_tunnel_gso_segment(struct xfrm_state *x,
- 						struct sk_buff *skb,
- 						netdev_features_t features)
- {
--	const struct xfrm_mode *inner_mode = xfrm_ip2inner_mode(x,
--					XFRM_MODE_SKB_CB(skb)->protocol);
-+	struct xfrm_offload *xo = xfrm_offload(skb);
-+	const struct xfrm_mode *inner_mode = xfrm_ip2inner_mode(x, xo->proto);
- 	__be16 type = inner_mode->family == AF_INET ? htons(ETH_P_IP)
- 						    : htons(ETH_P_IPV6);
- 
 -- 
-2.49.0
-
+With best wishes
+Dmitry
 
