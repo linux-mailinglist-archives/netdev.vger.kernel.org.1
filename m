@@ -1,130 +1,189 @@
-Return-Path: <netdev+bounces-238612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94098C5BC5B
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 08:23:59 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F679C5BD9D
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 08:53:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AF083B1771
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 07:21:48 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D6641357F32
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 07:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E2592EDD7D;
-	Fri, 14 Nov 2025 07:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503C72F6924;
+	Fri, 14 Nov 2025 07:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UdoxGSHG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BGy/gvXA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8591C2E613C
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 07:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105BF2C0F71;
+	Fri, 14 Nov 2025 07:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763104843; cv=none; b=ZWlZyZ+S6rN1P/vT7vzLrHz1UNpCHbyxPJHtV6kgbh86okxmAsqSf/BYT40emycNBJBsgUW9vpYrI0wsODhsNT0O4RVotr5PUvbc8xRP9sHRmMmF1KNbTuKuRjdhwQE2DTINFJHE1mIQKUH8OKjsesiUbAuazuaPQY4o4GufIMY=
+	t=1763106793; cv=none; b=NMABHGzfXZWBC4OGoGlEyesMZPYN2s30T+aFlga7Kva+NSxDtbw6UHWxYp3pnDvqjrX7dwuJTNljn8vLJZGzovrOtbkSoqCb5pQEQ0an9+5xrocfb3a8Sx9zQUe74aEBTz7fiRJscyXKWv7qz8y6ysQLW7RJ44XOub5jZ37wu3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763104843; c=relaxed/simple;
-	bh=NGRwkgSxolK/2c9dDLpj5CBW0FVd4LmMQwPSXORDZoY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Tv4IJt2bgZ/0EkDPIiZ5V+I6mh3FqRiMNjwjD6BEQiFsfL915hmipbmnAcy0iPNKJFvTNkPt8WRF0+5eMUrWc4CLJQ9Ijc/MZcD4eJaeVdEd2Rn0CkN/id31u17JqqpAUuvZzambw/RWCmaUA+CuSlxxpgIrvaG8GOcWQtT3wg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UdoxGSHG; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 0C9ADC10F5A;
-	Fri, 14 Nov 2025 07:20:12 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CC45D6060E;
-	Fri, 14 Nov 2025 07:20:33 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9C172102F292F;
-	Fri, 14 Nov 2025 08:20:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763104833; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=IO1xnDzOycn8GAViF9q7Sa/lIVw19nSLvwRtLk30Ywc=;
-	b=UdoxGSHGz5bOyPjqKHdiAmIhGwIxJTTHvkrUpZOR8GLVX1Bfidvv4QL2INTjpTTcRDLUll
-	IuCgtW4pVXLTe1qUXx7LTHJGPcq+SvVeqa7CDKy1U0Zyrk6D0eoKMUxnJpkys9NO7wApBl
-	xLiFGtJtwimlSmhqgcsFnEpYGgmWa5NXP8zoeirojRwxeycnyR0GSq4R1rRKMssneyyHaf
-	hRKY8T5+ciBnLRbKGqSpY03OheghjiEB4lRXMCwQK+T64NpcslZF5igepfCZsbZVZXnhp4
-	Sn+rVCru6t4y0TEsN4Ep0xRX/furoO9g77xD++QjCMNJsU5trZjtlTCl0v+Suw==
-From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Fri, 14 Nov 2025 08:20:23 +0100
-Subject: [PATCH net v3 4/4] net: dsa: microchip: Immediately assing IRQ
- numbers
+	s=arc-20240116; t=1763106793; c=relaxed/simple;
+	bh=n6gisGumhyHm0iSyc++Fqi4mMumUiPc9QS0LMIYv9n4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TMsO02wxBqL6vH86rK8lLxre/EGKFA4aSXCje9qkEPdCdASFzGxMdMwnxDkbSXCvmhrKzQKnVK5V1ufzRE5p8aDbQGBeasCCEoj+nIkbwidxlGsYLL2xe46M+rjB/oWosO5KaaHDWkIsKKMGLUU86U8riyOucvgAfB1yuYMF/Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BGy/gvXA; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763106790; x=1794642790;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=n6gisGumhyHm0iSyc++Fqi4mMumUiPc9QS0LMIYv9n4=;
+  b=BGy/gvXAiTHy83fV+BltFXDvWVQyt/xMowtSER/uBFhsPcdqgiLXiysP
+   s5Fibn+97OiT8f64Q3TF7Wa/2kHHF/QNRsxhHS7k530XAJLsSOLiAB2E1
+   60xAhrrjgkqxTjLosLWFgOhfmXGG4oSYVud9/m9PSpADKfDPsiZe5mkS7
+   a2ZNvIu/XUJA1RRw+7RG/MRfUTQmS95xxBD9tbAp7ijGtsP6J/+igdKjo
+   C9+MpMD60+zlJXx96KqoN1AkVZRBbg7bGvyGp3oF76B2tjOTSSobPxsco
+   E+mi9piRD3m7+/9i1YF1eatGQnJcoTT8d7hC2NRbgkn5JvePI7hgGdwgY
+   g==;
+X-CSE-ConnectionGUID: 2Yt4MDW+QBOObQCIhfgoRQ==
+X-CSE-MsgGUID: Ei6bErOOT6qNEQNLHw12og==
+X-IronPort-AV: E=McAfee;i="6800,10657,11612"; a="65232174"
+X-IronPort-AV: E=Sophos;i="6.19,304,1754982000"; 
+   d="scan'208";a="65232174"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2025 23:53:09 -0800
+X-CSE-ConnectionGUID: 4kz7Zil0R3iSmEZ6LDgM2w==
+X-CSE-MsgGUID: EcrnkQxzTeShHK/4jn8r7Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,304,1754982000"; 
+   d="scan'208";a="190497773"
+Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 13 Nov 2025 23:53:07 -0800
+Received: from kbuild by 7b01c990427b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vJocC-0006Jn-1p;
+	Fri, 14 Nov 2025 07:53:04 +0000
+Date: Fri, 14 Nov 2025 15:52:18 +0800
+From: kernel test robot <lkp@intel.com>
+To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Manorit Chawdhry <m-chawdhry@ti.com>,
+	Kamlesh Gurudasani <kamlesh@ti.com>,
+	Shiva Tripathi <s-tripathi1@ti.com>,
+	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
+	Vishal Mahaveer <vishalm@ti.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 3/4] crypto: ti - Add support for AES-GCM in DTHEv2
+ driver
+Message-ID: <202511141528.zox1IMuF-lkp@intel.com>
+References: <20251111112137.976121-4-t-pratham@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251114-ksz-fix-v3-4-acbb3b9cc32f@bootlin.com>
-References: <20251114-ksz-fix-v3-0-acbb3b9cc32f@bootlin.com>
-In-Reply-To: <20251114-ksz-fix-v3-0-acbb3b9cc32f@bootlin.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
- =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.2
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251111112137.976121-4-t-pratham@ti.com>
 
-The IRQ numbers created through irq_create_mapping() are only assigned
-to ptpmsg_irq[n].num at the end of the IRQ setup. So if an error occurs
-between their creation and their assignment (for instance during the
-request_threaded_irq() step), we enter the error path and fail to
-release the newly created virtual IRQs because they aren't yet assigned
-to ptpmsg_irq[n].num.
+Hi Pratham,
 
-Assign the IRQ number at mapping creation.
+kernel test robot noticed the following build warnings:
 
-Fixes: cc13ab18b201 ("net: dsa: microchip: ptp: enable interrupt for timestamping")
-Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
----
- drivers/net/dsa/microchip/ksz_ptp.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+[auto build test WARNING on herbert-crypto-2.6/master]
+[also build test WARNING on linus/master v6.18-rc5]
+[cannot apply to herbert-cryptodev-2.6/master next-20251113]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
-index c8bfbe5e2157323ecf29149d1907b77e689aa221..a8ad99c6ee35ff60fb56cc5770520a793c86ff66 100644
---- a/drivers/net/dsa/microchip/ksz_ptp.c
-+++ b/drivers/net/dsa/microchip/ksz_ptp.c
-@@ -1102,10 +1102,6 @@ static int ksz_ptp_msg_irq_setup(struct ksz_port *port, u8 n)
- 
- 	strscpy(ptpmsg_irq->name, name[n]);
- 
--	ptpmsg_irq->num = irq_find_mapping(port->ptpirq.domain, n);
--	if (ptpmsg_irq->num < 0)
--		return ptpmsg_irq->num;
--
- 	return request_threaded_irq(ptpmsg_irq->num, NULL,
- 				    ksz_ptp_msg_thread_fn, IRQF_ONESHOT,
- 				    ptpmsg_irq->name, ptpmsg_irq);
-@@ -1135,8 +1131,13 @@ int ksz_ptp_irq_setup(struct dsa_switch *ds, u8 p)
- 	if (!ptpirq->domain)
- 		return -ENOMEM;
- 
--	for (irq = 0; irq < ptpirq->nirqs; irq++)
--		irq_create_mapping(ptpirq->domain, irq);
-+	for (irq = 0; irq < ptpirq->nirqs; irq++) {
-+		port->ptpmsg_irq[irq].num = irq_create_mapping(ptpirq->domain, irq);
-+		if (!port->ptpmsg_irq[irq].num) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+	}
- 
- 	ptpirq->irq_num = irq_find_mapping(port->pirq.domain, PORT_SRC_PTP_INT);
- 	if (!ptpirq->irq_num) {
+url:    https://github.com/intel-lab-lkp/linux/commits/T-Pratham/crypto-ti-Add-support-for-AES-XTS-in-DTHEv2-driver/20251111-192827
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
+patch link:    https://lore.kernel.org/r/20251111112137.976121-4-t-pratham%40ti.com
+patch subject: [PATCH v6 3/4] crypto: ti - Add support for AES-GCM in DTHEv2 driver
+config: s390-randconfig-002-20251114 (https://download.01.org/0day-ci/archive/20251114/202511141528.zox1IMuF-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 11.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251114/202511141528.zox1IMuF-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511141528.zox1IMuF-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_init_tfm':
+   drivers/crypto/ti/dthev2-aes.c:573:24: error: implicit declaration of function 'crypto_alloc_sync_aead'; did you mean 'crypto_alloc_aead'? [-Werror=implicit-function-declaration]
+     573 |         ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
+         |                        ^~~~~~~~~~~~~~~~~~~~~~
+         |                        crypto_alloc_aead
+>> drivers/crypto/ti/dthev2-aes.c:573:22: warning: assignment to 'struct crypto_sync_aead *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+     573 |         ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
+         |                      ^
+   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_exit_tfm':
+   drivers/crypto/ti/dthev2-aes.c:588:9: error: implicit declaration of function 'crypto_free_sync_aead'; did you mean 'crypto_free_aead'? [-Werror=implicit-function-declaration]
+     588 |         crypto_free_sync_aead(ctx->aead_fb);
+         |         ^~~~~~~~~~~~~~~~~~~~~
+         |         crypto_free_aead
+   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_setkey':
+   drivers/crypto/ti/dthev2-aes.c:831:9: error: implicit declaration of function 'crypto_sync_aead_clear_flags'; did you mean 'crypto_aead_clear_flags'? [-Werror=implicit-function-declaration]
+     831 |         crypto_sync_aead_clear_flags(ctx->aead_fb, CRYPTO_TFM_REQ_MASK);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         |         crypto_aead_clear_flags
+   drivers/crypto/ti/dthev2-aes.c:832:9: error: implicit declaration of function 'crypto_sync_aead_set_flags'; did you mean 'crypto_aead_set_flags'? [-Werror=implicit-function-declaration]
+     832 |         crypto_sync_aead_set_flags(ctx->aead_fb,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+         |         crypto_aead_set_flags
+   drivers/crypto/ti/dthev2-aes.c:836:16: error: implicit declaration of function 'crypto_sync_aead_setkey'; did you mean 'crypto_aead_setkey'? [-Werror=implicit-function-declaration]
+     836 |         return crypto_sync_aead_setkey(ctx->aead_fb, key, keylen);
+         |                ^~~~~~~~~~~~~~~~~~~~~~~
+         |                crypto_aead_setkey
+   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_setauthsize':
+   drivers/crypto/ti/dthev2-aes.c:846:16: error: implicit declaration of function 'crypto_sync_aead_setauthsize'; did you mean 'crypto_aead_setauthsize'? [-Werror=implicit-function-declaration]
+     846 |         return crypto_sync_aead_setauthsize(ctx->aead_fb, authsize);
+         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         |                crypto_aead_setauthsize
+   drivers/crypto/ti/dthev2-aes.c: In function 'dthe_aead_do_fallback':
+   drivers/crypto/ti/dthev2-aes.c:854:9: error: implicit declaration of function 'SYNC_AEAD_REQUEST_ON_STACK'; did you mean 'SYNC_SKCIPHER_REQUEST_ON_STACK'? [-Werror=implicit-function-declaration]
+     854 |         SYNC_AEAD_REQUEST_ON_STACK(subreq, ctx->aead_fb);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+         |         SYNC_SKCIPHER_REQUEST_ON_STACK
+   drivers/crypto/ti/dthev2-aes.c:854:36: error: 'subreq' undeclared (first use in this function)
+     854 |         SYNC_AEAD_REQUEST_ON_STACK(subreq, ctx->aead_fb);
+         |                                    ^~~~~~
+   drivers/crypto/ti/dthev2-aes.c:854:36: note: each undeclared identifier is reported only once for each function it appears in
+>> drivers/crypto/ti/dthev2-aes.c:863:1: warning: control reaches end of non-void function [-Wreturn-type]
+     863 | }
+         | ^
+   cc1: some warnings being treated as errors
+
+
+vim +573 drivers/crypto/ti/dthev2-aes.c
+
+   563	
+   564	static int dthe_aead_init_tfm(struct crypto_aead *tfm)
+   565	{
+   566		struct dthe_tfm_ctx *ctx = crypto_aead_ctx(tfm);
+   567		struct dthe_data *dev_data = dthe_get_dev(ctx);
+   568	
+   569		ctx->dev_data = dev_data;
+   570	
+   571		const char *alg_name = crypto_tfm_alg_name(crypto_aead_tfm(tfm));
+   572	
+ > 573		ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
+   574						      CRYPTO_ALG_NEED_FALLBACK);
+   575		if (IS_ERR(ctx->aead_fb)) {
+   576			dev_err(dev_data->dev, "fallback driver %s couldn't be loaded\n",
+   577				alg_name);
+   578			return PTR_ERR(ctx->aead_fb);
+   579		}
+   580	
+   581		return 0;
+   582	}
+   583	
 
 -- 
-2.51.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
