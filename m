@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-238608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C84FC5BC37
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 08:22:35 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2356CC5BC3E
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 08:23:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 952543A71F8
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 07:20:42 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 819CF35C2AE
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 07:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56F62F25E6;
-	Fri, 14 Nov 2025 07:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF4A2F618C;
+	Fri, 14 Nov 2025 07:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fEVKbwMf"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dVnGOGwc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE34288514
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 07:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8AE270541
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 07:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763104838; cv=none; b=l1fPR3upxMPYrSNxVfcUnfwnWY5fQ5V29YfiN5knv/A1y+31Ih+CzNLWFzD7Q8Xq2ZkHMd1dVI3W4G8NYohM5JHib1Ce6mPnkTwqgZ47cLjzmt5umdL0btAxhBCdiiksonOm8Ol4E/s0GUmDXoDCWbx5net+vuE9jloK47/Zf/I=
+	t=1763104840; cv=none; b=WxkqgiXU51F4G1UYInYQPI0uUUfCDKuzA08SHdMzsQDysk90HobsC7QQKUAo9fCpT48KAZIkJukVmEreVc9+DDupKE1mZF615zgSe2AuPaQxRNOnzg6f0SNO7PGovkoTTOu4vhqiwbMNyBWki95Tfd/FEipLyMAxau4hyzOwARU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763104838; c=relaxed/simple;
-	bh=bA81shltpQIqo6ERwe+YEEDiuPrqc/y6ChY0B4cSbI8=;
+	s=arc-20240116; t=1763104840; c=relaxed/simple;
+	bh=Jl90UdEr8NC9NQJHRyLWV6kpPFz4gyUYS0h9z2g368U=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Y1SJzdhLULmqG9L8yfaiauCzmrxvTK7BwtjS9GU0JWN5KqaF2vCHz9weNZWlyYKFSgPV+qnCkmPE8NP4EtbWBhT6t72ezbhmqy/WjpCPxVqrlXD6Q6TmU6CMwhmMyt2VRgkq+/14T9iwMh+6AtwcuJnf4g+Bc82Dbh0qJOmDiaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fEVKbwMf; arc=none smtp.client-ip=185.246.84.56
+	 In-Reply-To:To:Cc; b=J3Aw2xnd3uZ7eE/F0IpiVtLlu1K596wF5s1eqCjY4lxxTITFZQWa7tfBOU4stBsq+eYG3aDhWq73POqPsNL7G6OchwHl/3HyvF3H74Gqxpmx5TrKLWXtOB0cs4JVggu+IHTgCFpGAzg8PKgkOZUT5pvKpQYTe5prvJzki7NGSc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dVnGOGwc; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 0379A1A1A95;
-	Fri, 14 Nov 2025 07:20:29 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id A710E4E416AD;
+	Fri, 14 Nov 2025 07:20:30 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CE2E56060E;
-	Fri, 14 Nov 2025 07:20:28 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B198A102F27C7;
-	Fri, 14 Nov 2025 08:20:26 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 7DFD16060E;
+	Fri, 14 Nov 2025 07:20:30 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 45D2F102F291C;
+	Fri, 14 Nov 2025 08:20:28 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763104828; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1763104829; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=JWi0y84NUpIkh/iErh4hngLnIokL0fky07nZkrhPRJc=;
-	b=fEVKbwMfVc7aKOdKe4z+6mtD+AyLbUv/ysVYDkAkX0X5qo1FvJGhq+oHAwYJ84shynfYCT
-	ZHn0Phc3qn/rI7gyQwKtN4AxuOWjZIBFMlA3ZyWowXIjuC0EptssI0OwzPaLQ9ucuphKs2
-	e2MNUrE7hn3pgeZcwb5eeQZIBQA+tYfoELq2uhsE6h6cHvW2EKlA8cdm12iAXDrN/5Koe+
-	qYtckMU7Z6Uo9LwKY7Rc8iPTuJqTh3Mm0DX66Xk649qvg4TgyxkgwOfuOgYpADvt0+uJFM
-	eZKWYYrpJoiRwUGAImB4Vsbmc2OpjXIZdD81Ps/odSoMJP14bTC1WKx1Cp0bhA==
+	bh=RTnapVv6Kq237V0+NqTV4P/zgR2L1d18jSkpYpEllMQ=;
+	b=dVnGOGwcwe4M9KEGgf15/UOcqd1SPIo96q37GYcbRYtmy0B2ccfF/RdtZvcoumyWoPfCfd
+	OS69ACjkAZwiCkLZ58uGj5qXi/IhXSnAd9cTu1Ub20jH0KsTLrB3cBwdItBtfRBqFqxGNE
+	XXZk6qXMWi17PLha5ypKe+liMVnl1cgFSpaXr9fLnnxnCmjxJgquhrK+8cRdgcdJPk8u7Y
+	JhCeQ8I3pHnEqQUit3O4IQEv6h4+JXevwb18G6WCYARXw0UyAQLIjO4lfsvwBFLkLn4kE0
+	XsTHw7fo0CHzCe964iO7F5fdXpmlVw1es0XV1kME6eTdIKEZJN/623UuHsWCpQ==
 From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Fri, 14 Nov 2025 08:20:20 +0100
-Subject: [PATCH net v3 1/4] net: dsa: microchip: common: Fix checks on
+Date: Fri, 14 Nov 2025 08:20:21 +0100
+Subject: [PATCH net v3 2/4] net: dsa: microchip: ptp: Fix checks on
  irq_find_mapping()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,7 +60,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251114-ksz-fix-v3-1-acbb3b9cc32f@bootlin.com>
+Message-Id: <20251114-ksz-fix-v3-2-acbb3b9cc32f@bootlin.com>
 References: <20251114-ksz-fix-v3-0-acbb3b9cc32f@bootlin.com>
 In-Reply-To: <20251114-ksz-fix-v3-0-acbb3b9cc32f@bootlin.com>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
@@ -78,45 +78,33 @@ X-Mailer: b4 0.14.2
 X-Last-TLS-Session-Version: TLSv1.3
 
 irq_find_mapping() returns a positive IRQ number or 0 if no IRQ is found
-but it never returns a negative value. However, on each
-irq_find_mapping() call, we verify that the returned value isn't
-negative.
+but it never returns a negative value. However, during the PTP IRQ setup,
+we verify that its returned value isn't negative.
 
-Fix the irq_find_mapping() checks to enter error paths when 0 is
-returned. Return -EINVAL in such cases.
+Fix the irq_find_mapping() check to enter the error path when 0 is
+returned. Return -EINVAL in such case.
 
-Fixes: c9cd961c0d43 ("net: dsa: microchip: lan937x: add interrupt support for port phy link")
+Fixes: cc13ab18b201 ("net: dsa: microchip: ptp: enable interrupt for timestamping")
 Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 ---
- drivers/net/dsa/microchip/ksz_common.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/dsa/microchip/ksz_ptp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index a962055bfdbd8fbfc135b2dec73c222a213985c4..3a4516d32aa5f99109853ed400e64f8f7e2d8016 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2583,8 +2583,8 @@ static int ksz_irq_phy_setup(struct ksz_device *dev)
+diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
+index 35fc21b1ee48a47daa278573bfe8749c7b42c731..c8bfbe5e2157323ecf29149d1907b77e689aa221 100644
+--- a/drivers/net/dsa/microchip/ksz_ptp.c
++++ b/drivers/net/dsa/microchip/ksz_ptp.c
+@@ -1139,8 +1139,8 @@ int ksz_ptp_irq_setup(struct dsa_switch *ds, u8 p)
+ 		irq_create_mapping(ptpirq->domain, irq);
  
- 			irq = irq_find_mapping(dev->ports[port].pirq.domain,
- 					       PORT_SRC_PHY_INT);
--			if (irq < 0) {
--				ret = irq;
-+			if (!irq) {
-+				ret = -EINVAL;
- 				goto out;
- 			}
- 			ds->user_mii_bus->irq[phy] = irq;
-@@ -2948,8 +2948,8 @@ static int ksz_pirq_setup(struct ksz_device *dev, u8 p)
- 	snprintf(pirq->name, sizeof(pirq->name), "port_irq-%d", p);
+ 	ptpirq->irq_num = irq_find_mapping(port->pirq.domain, PORT_SRC_PTP_INT);
+-	if (ptpirq->irq_num < 0) {
+-		ret = ptpirq->irq_num;
++	if (!ptpirq->irq_num) {
++		ret = -EINVAL;
+ 		goto out;
+ 	}
  
- 	pirq->irq_num = irq_find_mapping(dev->girq.domain, p);
--	if (pirq->irq_num < 0)
--		return pirq->irq_num;
-+	if (!pirq->irq_num)
-+		return -EINVAL;
- 
- 	return ksz_irq_common_setup(dev, pirq);
- }
 
 -- 
 2.51.1
