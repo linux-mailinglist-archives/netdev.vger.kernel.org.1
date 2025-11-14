@@ -1,313 +1,269 @@
-Return-Path: <netdev+bounces-238797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F797C5F7EF
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 23:18:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF472C5F84F
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 23:31:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5247E3B0D56
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:18:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90B813B36A3
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:31:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53E56302746;
-	Fri, 14 Nov 2025 22:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4673F19D8A8;
+	Fri, 14 Nov 2025 22:31:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GADDbBDW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a0A3gFCD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93790305E33
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 22:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7028C35898
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 22:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763158674; cv=none; b=XhoF44Z9zR0KvPyhVjFw1Bj5SV9YcQ1G5n40EK7wj4+ZTzHg6ijwg0LOwZFZ9gCJbLVHTNfq8Qsy5DKh2xQpDBpvaws92ekjMMh6EKETrb9iEl4EoJ6yzsol8nsJEprwu+b2MP2Biw+iIPIZgFljRHFMjUaO5ESpp0uiVrQ5tG0=
+	t=1763159500; cv=none; b=a/JIv9Ny23zphccdYkUqVpUp6s9yz0PqsrTEVTOF5XZX07+SlZaI8igbdkj9pjHcCI1agcojPBw/r86IF4aeOPzK3lUNFSOjEaxNC6P/0sd+Oelu9VwoJCU+AgWVmtPZG1sBPjnlaTGRgt5pN+ojRtYTVpouBdddLYmM9IhQ/ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763158674; c=relaxed/simple;
-	bh=eAzR6OfhG/nKMvSrfLLK+T8VinbPiWt9HkWUfFC2YGM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PDbmf6ll2Qa9F2dHQRu87acqnGlB2tj2qcJ0Ea08U9RYcd+Bctyy33f1RIy7jZ7NPKN2ZyTJtAhk06axQ8xnw4WBwyYIuTigGjhAAUL9m3jlVi76XtDvHZhHynXvdpqaX6VzShHewFLYKTAB/oqxBLwXbCqYll1c6VIsIH0tmVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GADDbBDW; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7bb3092e4d7so875175b3a.0
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 14:17:51 -0800 (PST)
+	s=arc-20240116; t=1763159500; c=relaxed/simple;
+	bh=Ie+Cg2zzS6zLcsdlKDTQx0Jn3xbqxSYosjb+yuWDV/8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=j6Lpgc0CY5utiCLvKeXFqtzwB92YJvGH8ReSth3nWbUCK0ftnapVaUy504Grq9vZwcAS3xi1fuN4EZBwUzvw8EE9aORTs8V1+d8NGfwB5BiMLaXmzrXNPQ0hPY8ki5wUzGtsoONUwkFd+590Now6FOqNbWqMvuSZP32u1UrjZ+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a0A3gFCD; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4ed5f5a2948so63354891cf.2
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 14:31:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763158671; x=1763763471; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3gZKszhlKtmiGlrkeF64jf+z7a8MZgR3nm4zhRfB1nM=;
-        b=GADDbBDW5NzofQYrNK7WnxgceBoOQhfSS/rC7zYCLddbAjCrYpnZ4AhsI0/4T0S0bZ
-         lWdEO+bk/70vFPqXuWaoyaTO9cImimC2IbRdCpK56VAmAUR2HSPfPQSs42sdA5GtYq+J
-         yMhw0GCAWj+Jg61SqIPNYxqFX8atEhtyzj+spaJDHkqG5FhuaRb+DkQT7h/2MEwiezH2
-         yk0MstHTAfMWkN5QiEy76EsBvFIjS3iwz+XyfJx2SU8CnJrPnvjidGrLPovtu5m+A4km
-         yQDMSdwJU5LAd/ErOOdO05g6qZ8dnC+WXBeDa9E4G9CkOIFji8e0Ey2lL1P77DVneR2Q
-         5SwA==
+        d=google.com; s=20230601; t=1763159497; x=1763764297; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZSYE5tglUSkbQNwjjzhpSr8SR6hBVLgOxzTFe+maUVc=;
+        b=a0A3gFCDWUAKesfG8fc6O2K5gUCMSK5MO9OvuD9lFnHZ886sXew/P7PUVXH7W2pdAM
+         puaWPuhPwKig2qc/0p7ESo5JIfthfK8hhvYu7YHB9I/2nK4MaMVhU0Q525J1EO9sOSzv
+         4oED7CgP7I/JEyjK7E1TUvayPqTBI/5mxXFbcoGLfzxj/dF75xJG7zMBikppcMnvsWDq
+         KpVHowjViAt/aESBp5ldv3AGUt+QHe93vLPhk3Z0R/SRLsvhqSK3IhUlaHpgQsQ+9Xm0
+         qFJjDCXfLlZzX3+lkK7rV5idlizrK5Zqr95Qtq10qrUuHn+TriLUxDoyn6s60x9UdEvn
+         GV/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763158671; x=1763763471;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3gZKszhlKtmiGlrkeF64jf+z7a8MZgR3nm4zhRfB1nM=;
-        b=j/5DF3+r3RaGkWEdAyALrPi65CwOJkT0Fb6aROsV4V2g95tytcmstr2nY8kjJM+q21
-         qU/eZjUj18A141bY8f55cjcGRd3eYzZM5PDd0kcD5i+WTxBQIa+M7qtUmxLUqt9PeZWv
-         JeEZlDGvy3hv6IR0sGvamz7yOonxs/o+jKWm3Yv8Q6Xsfcf7fxLbHOWwcWJx+5jVY6U6
-         aD+e+12kuLDRN1zOfrIReKsn3HWtDLvacMx8fzX4v9ad7YESh0T4VOYZDJCjFgNb7pGx
-         cggf4JVsG617GGleMn//iLdjpVV5EvwYLLtXvbv9isjwBC7WZOUu/S3i5GQI8rYMkC3C
-         Ytjw==
-X-Gm-Message-State: AOJu0YxmfEfXWzbUrmxR5c6CwqEAIWEC4zb5LdzzT/jWuZgPTOMC8xJI
-	E1m7W32QzGaoGXFgdE0tCLCEBcVMYRMAhzyy1v44j13S++v/g8NPoW0y
-X-Gm-Gg: ASbGncuuhJdBWYxplyXO7GZODH4JC8IOIVY0CHiENdmNf3VGg54yVATXJUIvLeputdJ
-	Ih7DMnULYN/wWWEmwG7o9vK7SkLDbMCUMa3FvGJMbkSJIV+zFwMVIMq/jSpEPnMUfq2PIEP4l5o
-	IaAobThGxTcroITH0lGp6H36D+yNbNWo/Q/sH2fZrWRO8ns3uFKSaqQabs4Udarz12I/GX9GbYq
-	Zh6gUNjEelL1h/y3oMpAsBFr3IKbDe+iXzHNsxLCDxoDUyX9Va5N+E5t7wQDjPdS0/gbdk1R+Y2
-	gykg1e1mPSSUojusm8sHT3OKmB8S2/FdCHL7DqjXrFcXsZQmEQJAn58stNa4NcHU/G1N2u+GBb3
-	T5MsOPJ5TVqt06jjmjlOLkUImb3mPAL1nPS3hDDUgoddVy54p+a7FqWlZfnidjbeig4SJNLGQvh
-	euGA==
-X-Google-Smtp-Source: AGHT+IG9wWL6lqEYB7UBlbg9LN9TJyfr0tOzNiC+rSDOYMa4+tQoCcSEimXGm5X0HBhL6XSyo0Qo/Q==
-X-Received: by 2002:a05:6a00:80f:b0:781:1b5a:95b2 with SMTP id d2e1a72fcca58-7ba3c275690mr6273239b3a.28.1763158669446;
-        Fri, 14 Nov 2025 14:17:49 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:2::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b924aed60bsm6253136b3a.4.2025.11.14.14.17.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 14:17:49 -0800 (PST)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	tj@kernel.org,
-	martin.lau@kernel.org,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v6 6/6] selftests/bpf: Test getting associated struct_ops in timer callback
-Date: Fri, 14 Nov 2025 14:17:41 -0800
-Message-ID: <20251114221741.317631-7-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251114221741.317631-1-ameryhung@gmail.com>
-References: <20251114221741.317631-1-ameryhung@gmail.com>
+        d=1e100.net; s=20230601; t=1763159497; x=1763764297;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZSYE5tglUSkbQNwjjzhpSr8SR6hBVLgOxzTFe+maUVc=;
+        b=HpYJQd3WtEJ6jXev0vfdL/YCfY0SXY1ms9LxVMknYDVQmdqKU41sE1XhFjT0yGVsMI
+         dc+D1q/VUwwKISCDgM8+grw9J2j89tC0XEVOtSUi2I+bvuFX3LYPvYQdsriFFqGr6wGy
+         YqI5pxuCRasg10LTT1/4u6GE5jpx3rF1kk3U4vi4He83Kb7RYVeWLm40FUw9XR5Fhgeh
+         2iatclRR875mI5ud7f6l9xzdd2DXM+zqnVLPIn8CVubJHpomPXWpDSZZeGixvxh+Fo3/
+         wvvx1F8CN2y6IoxJu+s3wcTrEQUXTg0oOjQsM08Yi0lXbbDIVa4XZZWZptbdS0FSMyYM
+         zm6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUpLR1eXMzDcPJ1HOjn0fNH8XSAYdGfJwNDfHcMDUFA+EbSjbP/9+CLcnEwZfL2Yp+DidqVv+0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0c87ed3oN+v5/GK3US7fCYfCv0BrJ9QN7NOYHcpjRkWHKHORM
+	/Ta/qkuRvYHfXjcP3A+sAkByC1GEi9aUB4PQAmTOYKjR5v10yon5h3uYXZV4tDvE/tsKdvAds6R
+	Hqm3MhU5hVUsh9g==
+X-Google-Smtp-Source: AGHT+IE9GCC1DPwscGZBpKGI4Az8DX0Qpi316pXEgfFeE2NdP7ujHmZl1/HTCpr0smPSYHgC8JmBZ9gaQypqcA==
+X-Received: from qvbrb8.prod.google.com ([2002:a05:6214:4e08:b0:882:4d92:8045])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:49:b0:4e2:ea31:1a with SMTP id d75a77b69052e-4edf212edd7mr77159231cf.68.1763159497220;
+ Fri, 14 Nov 2025 14:31:37 -0800 (PST)
+Date: Fri, 14 Nov 2025 22:31:36 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
+Message-ID: <20251114223136.113011-1-edumazet@google.com>
+Subject: [PATCH net] mptcp: fix a race in mptcp_pm_del_add_timer()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang.tang@linux.dev>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	syzbot <syzkaller@googlegroups.com>, Geliang Tang <geliang@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Make sure 1) a timer callback can also reference the associated
-struct_ops, and then make sure 2) the timer callback cannot get a
-dangled pointer to the struct_ops when the map is freed.
+mptcp_pm_del_add_timer() can call sk_stop_timer_sync(sk, &entry->add_timer)
+while another might have free entry already, as reported by syzbot.
 
-The test schedules a timer callback from a struct_ops program since
-struct_ops programs do not pin the map. It is possible for the timer
-callback to run after the map is freed. The timer callback calls a
-kfunc that runs .test_1() of the associated struct_ops, which should
-return MAP_MAGIC when the map is still alive or -1 when the map is
-gone.
+Add RCU protection to fix this issue.
 
-The first subtest added in this patch schedules the timer callback to
-run immediately, while the map is still alive. The second subtest added
-schedules the callback to run 500ms after syscall_prog runs and then
-frees the map right after syscall_prog runs. Both subtests then wait
-until the callback runs to check the return of the kfunc.
+Also change confusing add_timer variable with stop_timer boolean.
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
+syzbot report:
+
+BUG: KASAN: slab-use-after-free in __timer_delete_sync+0x372/0x3f0 kernel/time/timer.c:1616
+Read of size 4 at addr ffff8880311e4150 by task kworker/1:1/44
+
+CPU: 1 UID: 0 PID: 44 Comm: kworker/1:1 Not tainted syzkaller #0 PREEMPT_{RT,(full)}
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
+Workqueue: events mptcp_worker
+Call Trace:
+ <TASK>
+  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+  print_address_description mm/kasan/report.c:378 [inline]
+  print_report+0xca/0x240 mm/kasan/report.c:482
+  kasan_report+0x118/0x150 mm/kasan/report.c:595
+  __timer_delete_sync+0x372/0x3f0 kernel/time/timer.c:1616
+  sk_stop_timer_sync+0x1b/0x90 net/core/sock.c:3631
+  mptcp_pm_del_add_timer+0x283/0x310 net/mptcp/pm.c:362
+  mptcp_incoming_options+0x1357/0x1f60 net/mptcp/options.c:1174
+  tcp_data_queue+0xca/0x6450 net/ipv4/tcp_input.c:5361
+  tcp_rcv_established+0x1335/0x2670 net/ipv4/tcp_input.c:6441
+  tcp_v4_do_rcv+0x98b/0xbf0 net/ipv4/tcp_ipv4.c:1931
+  tcp_v4_rcv+0x252a/0x2dc0 net/ipv4/tcp_ipv4.c:2374
+  ip_protocol_deliver_rcu+0x221/0x440 net/ipv4/ip_input.c:205
+  ip_local_deliver_finish+0x3bb/0x6f0 net/ipv4/ip_input.c:239
+  NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
+  NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
+  __netif_receive_skb_one_core net/core/dev.c:6079 [inline]
+  __netif_receive_skb+0x143/0x380 net/core/dev.c:6192
+  process_backlog+0x31e/0x900 net/core/dev.c:6544
+  __napi_poll+0xb6/0x540 net/core/dev.c:7594
+  napi_poll net/core/dev.c:7657 [inline]
+  net_rx_action+0x5f7/0xda0 net/core/dev.c:7784
+  handle_softirqs+0x22f/0x710 kernel/softirq.c:622
+  __do_softirq kernel/softirq.c:656 [inline]
+  __local_bh_enable_ip+0x1a0/0x2e0 kernel/softirq.c:302
+  mptcp_pm_send_ack net/mptcp/pm.c:210 [inline]
+ mptcp_pm_addr_send_ack+0x41f/0x500 net/mptcp/pm.c:-1
+  mptcp_pm_worker+0x174/0x320 net/mptcp/pm.c:1002
+  mptcp_worker+0xd5/0x1170 net/mptcp/protocol.c:2762
+  process_one_work kernel/workqueue.c:3263 [inline]
+  process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
+  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
+  kthread+0x711/0x8a0 kernel/kthread.c:463
+  ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+Allocated by task 44:
+  kasan_save_stack mm/kasan/common.c:56 [inline]
+  kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+  poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
+  __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:417
+  kasan_kmalloc include/linux/kasan.h:262 [inline]
+  __kmalloc_cache_noprof+0x1ef/0x6c0 mm/slub.c:5748
+  kmalloc_noprof include/linux/slab.h:957 [inline]
+  mptcp_pm_alloc_anno_list+0x104/0x460 net/mptcp/pm.c:385
+  mptcp_pm_create_subflow_or_signal_addr+0xf9d/0x1360 net/mptcp/pm_kernel.c:355
+  mptcp_pm_nl_fully_established net/mptcp/pm_kernel.c:409 [inline]
+  __mptcp_pm_kernel_worker+0x417/0x1ef0 net/mptcp/pm_kernel.c:1529
+  mptcp_pm_worker+0x1ee/0x320 net/mptcp/pm.c:1008
+  mptcp_worker+0xd5/0x1170 net/mptcp/protocol.c:2762
+  process_one_work kernel/workqueue.c:3263 [inline]
+  process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
+  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
+  kthread+0x711/0x8a0 kernel/kthread.c:463
+  ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Freed by task 6630:
+  kasan_save_stack mm/kasan/common.c:56 [inline]
+  kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+  __kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:587
+  kasan_save_free_info mm/kasan/kasan.h:406 [inline]
+  poison_slab_object mm/kasan/common.c:252 [inline]
+  __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
+  kasan_slab_free include/linux/kasan.h:234 [inline]
+  slab_free_hook mm/slub.c:2523 [inline]
+  slab_free mm/slub.c:6611 [inline]
+  kfree+0x197/0x950 mm/slub.c:6818
+  mptcp_remove_anno_list_by_saddr+0x2d/0x40 net/mptcp/pm.c:158
+  mptcp_pm_flush_addrs_and_subflows net/mptcp/pm_kernel.c:1209 [inline]
+  mptcp_nl_flush_addrs_list net/mptcp/pm_kernel.c:1240 [inline]
+  mptcp_pm_nl_flush_addrs_doit+0x593/0xbb0 net/mptcp/pm_kernel.c:1281
+  genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
+  genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+  genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
+  netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
+  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+  netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+  netlink_unicast+0x846/0xa10 net/netlink/af_netlink.c:1346
+  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+  sock_sendmsg_nosec net/socket.c:727 [inline]
+  __sock_sendmsg+0x21c/0x270 net/socket.c:742
+  ____sys_sendmsg+0x508/0x820 net/socket.c:2630
+  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
+  __sys_sendmsg net/socket.c:2716 [inline]
+  __do_sys_sendmsg net/socket.c:2721 [inline]
+  __se_sys_sendmsg net/socket.c:2719 [inline]
+  __x64_sys_sendmsg+0x1a1/0x260 net/socket.c:2719
+  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Geliang Tang <geliang@kernel.org>
 ---
- .../bpf/prog_tests/test_struct_ops_assoc.c    | 81 +++++++++++++++++++
- .../bpf/progs/struct_ops_assoc_in_timer.c     | 77 ++++++++++++++++++
- 2 files changed, 158 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_assoc_in_timer.c
+ net/mptcp/pm.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c b/tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
-index f69306cb8974..e09436442d07 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
-@@ -3,6 +3,7 @@
- #include <test_progs.h>
- #include "struct_ops_assoc.skel.h"
- #include "struct_ops_assoc_reuse.skel.h"
-+#include "struct_ops_assoc_in_timer.skel.h"
+diff --git a/net/mptcp/pm.c b/net/mptcp/pm.c
+index 2ff1b949956834aa5c78a1fcb40087aed43225ef..9604b91902b8bc3b831547cd693c28a4890aea31 100644
+--- a/net/mptcp/pm.c
++++ b/net/mptcp/pm.c
+@@ -18,6 +18,7 @@ struct mptcp_pm_add_entry {
+ 	u8			retrans_times;
+ 	struct timer_list	add_timer;
+ 	struct mptcp_sock	*sock;
++	struct rcu_head		rcu;
+ };
  
- static void test_st_ops_assoc(void)
+ static DEFINE_SPINLOCK(mptcp_pm_list_lock);
+@@ -155,7 +156,7 @@ bool mptcp_remove_anno_list_by_saddr(struct mptcp_sock *msk,
+ 
+ 	entry = mptcp_pm_del_add_timer(msk, addr, false);
+ 	ret = entry;
+-	kfree(entry);
++	kfree_rcu(entry, rcu);
+ 
+ 	return ret;
+ }
+@@ -345,22 +346,27 @@ mptcp_pm_del_add_timer(struct mptcp_sock *msk,
  {
-@@ -101,10 +102,90 @@ static void test_st_ops_assoc_reuse(void)
- 	struct_ops_assoc_reuse__destroy(skel);
+ 	struct mptcp_pm_add_entry *entry;
+ 	struct sock *sk = (struct sock *)msk;
+-	struct timer_list *add_timer = NULL;
++	bool stop_timer = false;
++
++	rcu_read_lock();
+ 
+ 	spin_lock_bh(&msk->pm.lock);
+ 	entry = mptcp_lookup_anno_list_by_saddr(msk, addr);
+ 	if (entry && (!check_id || entry->addr.id == addr->id)) {
+ 		entry->retrans_times = ADD_ADDR_RETRANS_MAX;
+-		add_timer = &entry->add_timer;
++		stop_timer = true;
+ 	}
+ 	if (!check_id && entry)
+ 		list_del(&entry->list);
+ 	spin_unlock_bh(&msk->pm.lock);
+ 
+-	/* no lock, because sk_stop_timer_sync() is calling timer_delete_sync() */
+-	if (add_timer)
+-		sk_stop_timer_sync(sk, add_timer);
++	/* Note: entry might have been removed by another thread.
++	 * We hold rcu_read_lock() to ensure it is not freed under us.
++	 */
++	if (stop_timer)
++		sk_stop_timer_sync(sk, &entry->add_timer);
+ 
++	rcu_read_unlock();
+ 	return entry;
  }
  
-+static void test_st_ops_assoc_in_timer(void)
-+{
-+	struct struct_ops_assoc_in_timer *skel = NULL;
-+	int err;
-+
-+	skel = struct_ops_assoc_in_timer__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "struct_ops_assoc_reuse__open"))
-+		goto out;
-+
-+	err = bpf_program__assoc_struct_ops(skel->progs.syscall_prog,
-+					    skel->maps.st_ops_map, NULL);
-+	ASSERT_OK(err, "bpf_program__assoc_struct_ops");
-+
-+	err = struct_ops_assoc_in_timer__attach(skel);
-+	if (!ASSERT_OK(err, "struct_ops_assoc__attach"))
-+		goto out;
-+
-+	/*
-+	 * Run .test_1 by calling kfunc bpf_kfunc_multi_st_ops_test_1_prog_arg() and checks
-+	 * the return value. .test_1 will also schedule timer_cb that runs .test_1 again
-+	 * immediately.
-+	 */
-+	err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.syscall_prog), NULL);
-+	ASSERT_OK(err, "bpf_prog_test_run_opts");
-+
-+	/* Check the return of the kfunc after timer_cb runs */
-+	while (!READ_ONCE(skel->bss->timer_cb_run))
-+		sched_yield();
-+	ASSERT_EQ(skel->bss->timer_test_1_ret, 1234, "skel->bss->timer_test_1_ret");
-+	ASSERT_EQ(skel->bss->test_err, 0, "skel->bss->test_err_a");
-+out:
-+	struct_ops_assoc_in_timer__destroy(skel);
-+}
-+
-+static void test_st_ops_assoc_in_timer_no_uref(void)
-+{
-+	struct struct_ops_assoc_in_timer *skel = NULL;
-+	struct bpf_link *link;
-+	int err;
-+
-+	skel = struct_ops_assoc_in_timer__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "struct_ops_assoc_reuse__open"))
-+		goto out;
-+
-+	err = bpf_program__assoc_struct_ops(skel->progs.syscall_prog,
-+					    skel->maps.st_ops_map, NULL);
-+	ASSERT_OK(err, "bpf_program__assoc_struct_ops");
-+
-+	link = bpf_map__attach_struct_ops(skel->maps.st_ops_map);
-+	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops"))
-+		goto out;
-+
-+	/*
-+	 * Run .test_1 by calling kfunc bpf_kfunc_multi_st_ops_test_1_prog_arg() and checks
-+	 * the return value. .test_1 will also schedule timer_cb that runs .test_1 again.
-+	 * timer_cb will run 500ms after syscall_prog runs, when the user space no longer
-+	 * holds a reference to st_ops_map.
-+	 */
-+	skel->bss->timer_ns = 500000000;
-+	err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.syscall_prog), NULL);
-+	ASSERT_OK(err, "bpf_prog_test_run_opts");
-+
-+	/* Detach and close struct_ops map to cause it to be freed */
-+	bpf_link__destroy(link);
-+	close(bpf_program__fd(skel->progs.syscall_prog));
-+	close(bpf_map__fd(skel->maps.st_ops_map));
-+
-+	/* Check the return of the kfunc after timer_cb runs */
-+	while (!READ_ONCE(skel->bss->timer_cb_run))
-+		sched_yield();
-+	ASSERT_EQ(skel->bss->timer_test_1_ret, -1, "skel->bss->timer_test_1_ret");
-+	ASSERT_EQ(skel->bss->test_err, 0, "skel->bss->test_err_a");
-+out:
-+	struct_ops_assoc_in_timer__destroy(skel);
-+}
-+
- void test_struct_ops_assoc(void)
- {
- 	if (test__start_subtest("st_ops_assoc"))
- 		test_st_ops_assoc();
- 	if (test__start_subtest("st_ops_assoc_reuse"))
- 		test_st_ops_assoc_reuse();
-+	if (test__start_subtest("st_ops_assoc_in_timer"))
-+		test_st_ops_assoc_in_timer();
-+	if (test__start_subtest("st_ops_assoc_in_timer_no_uref"))
-+		test_st_ops_assoc_in_timer_no_uref();
+@@ -415,7 +421,7 @@ static void mptcp_pm_free_anno_list(struct mptcp_sock *msk)
+ 
+ 	list_for_each_entry_safe(entry, tmp, &free_list, list) {
+ 		sk_stop_timer_sync(sk, &entry->add_timer);
+-		kfree(entry);
++		kfree_rcu(entry, rcu);
+ 	}
  }
-diff --git a/tools/testing/selftests/bpf/progs/struct_ops_assoc_in_timer.c b/tools/testing/selftests/bpf/progs/struct_ops_assoc_in_timer.c
-new file mode 100644
-index 000000000000..9d4e427568b2
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/struct_ops_assoc_in_timer.c
-@@ -0,0 +1,77 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <vmlinux.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_misc.h"
-+#include "../test_kmods/bpf_testmod.h"
-+#include "../test_kmods/bpf_testmod_kfunc.h"
-+
-+char _license[] SEC("license") = "GPL";
-+
-+struct elem {
-+	struct bpf_timer timer;
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 1);
-+	__type(key, int);
-+	__type(value, struct elem);
-+} array_map SEC(".maps");
-+
-+#define MAP_MAGIC 1234
-+int recur;
-+int test_err;
-+int timer_ns;
-+int timer_test_1_ret;
-+int timer_cb_run;
-+
-+__noinline static int timer_cb(void *map, int *key, struct bpf_timer *timer)
-+{
-+	struct st_ops_args args = {};
-+
-+	recur++;
-+	timer_test_1_ret = bpf_kfunc_multi_st_ops_test_1_prog_arg(&args, NULL);
-+	recur--;
-+
-+	timer_cb_run++;
-+
-+	return 0;
-+}
-+
-+SEC("struct_ops")
-+int BPF_PROG(test_1, struct st_ops_args *args)
-+{
-+	struct bpf_timer *timer;
-+	int key = 0;
-+
-+	if (!recur) {
-+		timer = bpf_map_lookup_elem(&array_map, &key);
-+		if (!timer)
-+			return 0;
-+
-+		bpf_timer_init(timer, &array_map, 1);
-+		bpf_timer_set_callback(timer, timer_cb);
-+		bpf_timer_start(timer, timer_ns, 0);
-+	}
-+
-+	return MAP_MAGIC;
-+}
-+
-+SEC("syscall")
-+int syscall_prog(void *ctx)
-+{
-+	struct st_ops_args args = {};
-+	int ret;
-+
-+	ret = bpf_kfunc_multi_st_ops_test_1_prog_arg(&args, NULL);
-+	if (ret != MAP_MAGIC)
-+		test_err++;
-+
-+	return 0;
-+}
-+
-+SEC(".struct_ops.link")
-+struct bpf_testmod_multi_st_ops st_ops_map = {
-+	.test_1 = (void *)test_1,
-+};
+ 
 -- 
-2.47.3
+2.52.0.rc1.455.g30608eb744-goog
 
 
