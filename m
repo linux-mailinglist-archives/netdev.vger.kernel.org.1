@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-238554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB034C5AF06
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 02:41:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D7831C5AF2D
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 02:50:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9070334EB1D
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 01:41:21 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1A3A135209D
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 01:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD0226E173;
-	Fri, 14 Nov 2025 01:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84EB22F75E;
+	Fri, 14 Nov 2025 01:50:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I7I/BeJi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fYxiToFw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07CE026CE11;
-	Fri, 14 Nov 2025 01:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32375B5AB
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 01:50:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763084446; cv=none; b=nKCUTAoGOmqyouWa/49V382AKwU1bG1Niz1akIHqvJ2K0NSNWFHu96qlsOTApyDXDv/SFS/Kdk52Ac7VBO4TuAB2e+lCkSUFZNGsm9Gokd0SU9GjQ5NgNQ75L7Hodzf3oOPIEBvu4wsGHsJN7VVRKpE6HiPqF6v7lIH4xCg9I1A=
+	t=1763085040; cv=none; b=smTrhPnPh0ZEmItW6Gr7VtAmzm+Znp3oSf0FnrZ57P1/WciJX8ua2vKr30Thhh9P7J+VZAelZWPc2BQq+MKWuRORY8i3o6VJRqx5PveLUS7DwwlgWq3f/cruQJBu8K156Mcao8BixC/MR4AHt7ArfeEX8DzxmS/dMgEG6IQEGx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763084446; c=relaxed/simple;
-	bh=LaF+FboAeGrVapEztH66xcfvLoTglFWcOUFkPFL/kKg=;
+	s=arc-20240116; t=1763085040; c=relaxed/simple;
+	bh=MjejStzeENykaPHKV1turDkqL/oE3Bju/H0W5Tzo3b8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fHN4EoKIPr3dSOd9SYGUsemgST6FAxWlT1ALlVD4pGzuXfMf4+eN2G292yPfacrF3j93jaT7p3TZAZV9g0sqaDEjzKP9f2m1HJs+G75TteoWADgH3kaRmwd1Jv9m+f62d7pnlzzvKqmS+afYaKa53eXkj+lASawxxN6Xge5n7wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I7I/BeJi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B25FC19422;
-	Fri, 14 Nov 2025 01:40:45 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=RNUbWOl24ygt5KDrIflH7zuIP4VbLLV2JxvnsdScsdXy2UbwuNc90h3VExDIuA2RKCS8CyonXkQCX9wzqvnp//E4w6YLycyQv5KavtG1+6jK1vlBR3jurQu+fIhu6/o7Cz/SU8gTmnrGPAnf7OD9bYPOEMIr9gj3k7XiUnCHMU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fYxiToFw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C4D7C4CEF1;
+	Fri, 14 Nov 2025 01:50:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763084445;
-	bh=LaF+FboAeGrVapEztH66xcfvLoTglFWcOUFkPFL/kKg=;
+	s=k20201202; t=1763085040;
+	bh=MjejStzeENykaPHKV1turDkqL/oE3Bju/H0W5Tzo3b8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=I7I/BeJiOyyl3K3SRcVHytvREoci11kW0ci9iOJE9YESZTeitF2NUZWrwpCxm5G5T
-	 3FNTfXA1V7IQIC/7UYGvIPn24ncJ6bTkrhq3z31pD3fkMlMQf8j9qYM1QxNzYtXU3m
-	 D6z/CD8hKR0fn26vJcwYnR9fua8c4FZhWmgCr7d59CPMvrWcugDCBTKnUZ7ZCIvJrx
-	 DNd+7oykd0l8SJJGNCByUwVkn6K/QDKqJzc1VCYKd6iJVjydeu/Cdk5AYsPOU/XiKU
-	 y5iPhdMWp/C9nxKIhWJ8RdKJHm9EJ2eEt1a0r3m4DER+3Ro9E5V580Bto5SrBONUoa
-	 mL7ybTult0d9Q==
+	b=fYxiToFwPbcEw40J6Lespxn9vp/mJM4sMZq1V2BskOcGeHBbW6UBxaWH1Jn37w/at
+	 /WoNCV91C5W4eXV7IdRSdxyO4YZLMgTAf3Lqrf2F6J//okxkFW0zlPIALSCtiXC3hR
+	 zznM/wenBoN8rO6swJvsDgAUroUrA4VtXaHmHkTb9RVZlpniNzywSi/S05Src69p/B
+	 S+FvzeQL4KYx8ypDVRWbRs5qH7DBRVsff7P1trHaPJRn+TSDmT+pmoYvAFIfxv3fnk
+	 DLygrREIoFHE2Wb7lPX+waAibRYgtYpG/ukGI5yIXtEE2C/2GQYRNeJN9bT3Lht3Zp
+	 MYpSvrdT7dP2Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFE43A55F84;
-	Fri, 14 Nov 2025 01:40:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F283A55F84;
+	Fri, 14 Nov 2025 01:50:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] dpll: zl3073x: fix kernel-doc name and missing
- parameter
- in fw.c
+Subject: Re: [PATCH net-next] netlink: specs: rt-link: Add attributes for hsr
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176308441424.1078849.2137986445668378761.git-patchwork-notify@kernel.org>
-Date: Fri, 14 Nov 2025 01:40:14 +0000
-References: <20251112055642.2597450-1-kriish.sharma2006@gmail.com>
-In-Reply-To: <20251112055642.2597450-1-kriish.sharma2006@gmail.com>
-To: Kriish Sharma <kriish.sharma2006@gmail.com>
-Cc: ivecera@redhat.com, Prathosh.Satish@microchip.com,
- vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com, jiri@resnulli.us,
- kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <176308500929.1080966.16549265991450881438.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Nov 2025 01:50:09 +0000
+References: 
+ <926077a70de614f1539c905d06515e258905255e.1762968225.git.fmaurer@redhat.com>
+In-Reply-To: 
+ <926077a70de614f1539c905d06515e258905255e.1762968225.git.fmaurer@redhat.com>
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, donald.hunter@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 12 Nov 2025 05:56:42 +0000 you wrote:
-> Documentation build reported:
+On Wed, 12 Nov 2025 18:29:53 +0100 you wrote:
+> YNL wasn't able to decode the linkinfo from hsr interfaces. Add the
+> linkinfo attribute definitions for hsr interfaces. Example output now
+> looks like this:
 > 
->   Warning: drivers/dpll/zl3073x/fw.c:365 function parameter 'comp' not described in 'zl3073x_fw_component_flash'
->   Warning: drivers/dpll/zl3073x/fw.c:365 expecting prototype for zl3073x_flash_bundle_flash(). Prototype was for zl3073x_fw_component_flash() instead
->   Warning: drivers/dpll/zl3073x/fw.c:365 No description found for return value of 'zl3073x_fw_component_flash'
-> 
-> The kernel-doc comment above `zl3073x_fw_component_flash()` used the wrong
-> function name (`zl3073x_flash_bundle_flash`) and omitted the `@comp` parameter.
-> This patch updates the comment to correctly document the
-> `zl3073x_fw_component_flash()` function and its arguments.
+> $ ynl --spec Documentation/netlink/specs/rt-link.yaml --do getlink \
+>     --json '{"ifname": "hsr0"}' --output-json | jq .linkinfo
+> {
+>   "kind": "hsr",
+>   "data": {
+>     "slave1": 15,
+>     "slave2": 13,
+>     "supervision-addr": "01:15:4e:00:01:00",
+>     "seq-nr": 64511,
+>     "version": 1,
+>     "protocol": 0
+>   }
+> }
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] dpll: zl3073x: fix kernel-doc name and missing parameter in fw.c
-    https://git.kernel.org/netdev/net-next/c/992b7d5fd8a8
+  - [net-next] netlink: specs: rt-link: Add attributes for hsr
+    https://git.kernel.org/netdev/net-next/c/c294432be150
 
 You are awesome, thank you!
 -- 
