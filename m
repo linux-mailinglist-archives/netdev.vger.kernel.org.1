@@ -1,188 +1,163 @@
-Return-Path: <netdev+bounces-238786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255FDC5F615
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:34:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20FBDC5F631
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:38:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC21F3BE056
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 21:33:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D64184E11D8
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 21:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB5B35BDAB;
-	Fri, 14 Nov 2025 21:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C736E2F0690;
+	Fri, 14 Nov 2025 21:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QYmLdc+f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y0w1qzZ6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC09F35BDD2
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 21:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0788D2D190C
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 21:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763156013; cv=none; b=EmhafZZ9wwTt5BIOWyxcvErWbd4Kjlli61t/28tveU/yM4zrVBvViw5iC1kXx1YJ+abNkPCGYOYse+wqUYRx/8wMT1Uy1ZhyXPiQRIVvBxYncNntVyVqoJhWn+nGcdRWT0Ho+raQ9zLixhz7OBNmIqu7Goa/HEZNfSyH4zSzlLE=
+	t=1763156293; cv=none; b=fu18e5QGNMZT0+7KP+u7x3lt3duUdHhDYo+kdg4KujGiJ4kK3HQOHr0uQhQ3KxZ7+2hQ63Pg/beyfzzwBPgoLviQaVw7sawH18en/bYv31vFq6Ne3+V5H6QIZIqDXG6N/uMAzras2tff/XBKjcnPAOZJ7p2o1XBhjvIw2BydWwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763156013; c=relaxed/simple;
-	bh=MOYTVcDtzKsEkfeemMCLvem2CzJMXD4U6pATpCM/TyI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eiL/V5p3JyjDQ+arU9KbugAmDUE7PwMq/29NP7OotpxIiqtL88lBaYXSDdwT4lkJve6N2uEwLzqpX41pvPidXQa2HAAQk404Tjbqe/+kktBKfHUktiKHGt8unPCrdkblurvKboQwFPpy4hbTZsx9CxfBfWvQAVOad+snsWof0Uc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QYmLdc+f; arc=none smtp.client-ip=209.85.128.41
+	s=arc-20240116; t=1763156293; c=relaxed/simple;
+	bh=NdC5qsF+daIwhv+jfvY4zcENzV+hiW0SWRKdXrzUDDM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gZKEQeiCXLRol8LvozH15hfvygsuByg00T3ITozYx8uBsJ8RcT5uDTIMtlo9odpeTzQF9Pn7YAAKtTJolXVaj1UbvyG81aLtI+uiXgS2jojAgVel6AoqMEOYg6Ifd6zOpuuVtx1KzTO9TFsf3glDTACP/UedhPThnS6QzpDw05o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y0w1qzZ6; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47755de027eso18413795e9.0
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 13:33:27 -0800 (PST)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42b3c965cc4so1248402f8f.0
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 13:38:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763156006; x=1763760806; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qxt593s46vsT8zi56aoiZDVkzPOtzTy1Y0D8TbVwB9Y=;
-        b=QYmLdc+f+Y8ZFaPOk/IbaU1Yy4h7/gUGDY0dfuRs/JZ4+JE2aD5Cwd6O9up2097Y87
-         cuhRDxVjrH4SYbvPIHhBUwm9E1YYyrYpK1Fq52bP7wacC7Seyp/0ffWsDvkY1xz6n8se
-         cwotyJpjjtj6n/UlW0lhz7pL5t/a6kGkBBitNRUmDSvMasy5Ee9l870rxy28qzXeVwFX
-         bapAo7IZYY65BF2aCmOaRRJ0hRC98p7x02zVA9FXvx8bfMg32FsEkiVEbKNxo1hhhHwo
-         5BChRLmC+KHEk4m053D6hSVdWbhjSp6H0BLyNqraVyoPndvDiaTaF9vwEgxTq2gnXgq6
-         nkXg==
+        d=gmail.com; s=20230601; t=1763156290; x=1763761090; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2AdOzp3Vu6NN0uDZN6wbKPsm+e3bm/G64aFJ2Czz/Dc=;
+        b=Y0w1qzZ6IlxQlawgOU5uPcNW+qSEYGq/KcYSZKgMdHYozWsNQQ2Re6dTx9V67bURxh
+         l0bPakAcvxyuyaLUfh6TsPF4D8f2yZ0EXSUprukx1c6oI0cOuWrOsgRltQuNpLAs7vkn
+         UJfAOS7/pjceW7qpq+NEKsHAEPzAK7qyEIX/XpeFuBF2XGAhYoFweYfGrV8Yh02opHuJ
+         h09ANC+HPQ8JRNVu9MHlYYYzanOQqUq6yQSppXWSXD8snwSnFEkZujJgqCpMJePplX+5
+         zBso7EkKxyibBvPbIVPGVmni37f1hf93bh2duHi9MoKTlG+Z+NLk2xnetafht8MZUo99
+         B6Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763156006; x=1763760806;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qxt593s46vsT8zi56aoiZDVkzPOtzTy1Y0D8TbVwB9Y=;
-        b=Or/njxoPFbBWIeG/lHAbcBgGHlLz3nmN0OO8bNWrDTzavwFKLYmVROTVSUu6kjlAiK
-         zT+8U2H8WOYTWhEL14Ax9eR8u2T7ZzsO00ZC+Yr8c39AeQsMmM7lCDOCeqWNekIqu2pg
-         oSHQd8S0tjgrzB31fW1VsUdum52nkbV4wJ3u+2Ogx8TRviiRiuXHzW1r1coucCpfzq98
-         hKn6EoZqFMZxqCfhEVC8Sx0B/zXe8twjGnZMx8p+Xd1jTEQp7psHE8lnTTcn9kQMGjW4
-         VtyJRZO92iqFKADMN3ccmOHo5QH2Xpjz7BYu6AdhcFQVlEOBwcLTBrcwHJjcwYcbAVSO
-         Cqhg==
-X-Forwarded-Encrypted: i=1; AJvYcCWT6ZmNQLfPLnU3ZZt+79tW0xJraKA1AZbg7hUR7EyA5D7KxYmwc9I5I2A8cVBkgJMf6BxQ88g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxX8z+WzR+qqZMpe6h4hdG6qApVBvCZvJIWxN/ItkJocDOwJ1SV
-	7LdsmNoBKAi4BAQ470G1SPp74UAQrs2tDhEmUyoJ4tI/Yd7oJ4iao8E7
-X-Gm-Gg: ASbGncs2dx11INptj6/nyzSEpUWwI5eTs1srdKussLMOTFErAA6sTRivatcAVvZ9XPV
-	rDUpERa22utuUrUe+6mx7UhgTj0n96bXRpeKL6wRAxwuB7LtZOIAzyfg8CErrNkXycdfbnNsWMS
-	j1NQYqexZVsVlm+LYOGPhQZ0vxZyCRIPLA76YSMqgR6YyhMl3uid6MNF+1hXx5uOrmga0BJ5oPU
-	xhjiJ5+yzI1yO66/Bj9jai4hwiN/3HOtPWUEY7Hx031fxCOgCeOSTfs9d8Rc4pfeX1fnJzkUN8c
-	sntxso1Jnz711f1k49hkEcfutZgZINhT+GyaX1xlfbL7ChGdvcq+9aFxbUowk4m45MvYtw9uIzg
-	vpEIoppB4QqSXa2pN8bO6wCyYs7/8dIoB+Lp9S+dnVSUe53JPA7D77MDeDtoHqikS0uQ+NgPLpl
-	h5+zcwtkGLdkSRSBcxAEJ3nnYh+USalyEuR60Angd7i8za6rB4LajEXW/+ofMxEW21w54ldCbVh
-	D2va/IcvBpBOvbDbWO1eol/Y/seLA8Cut5txCOnQfE=
-X-Google-Smtp-Source: AGHT+IEOz0ZvjVSAEWnPoK+yFW6gvAByu0+IX8Nl1UGJkCVwFbBy1TSoJIPro4wzaqCTp8EEwAxxwQ==
-X-Received: by 2002:a05:600c:3593:b0:477:557b:6917 with SMTP id 5b1f17b1804b1-4778fe4fdecmr47017405e9.18.1763156005922;
-        Fri, 14 Nov 2025 13:33:25 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f28:ae00:8196:7cf4:6cfc:c017? (p200300ea8f28ae0081967cf46cfcc017.dip0.t-ipconnect.de. [2003:ea:8f28:ae00:8196:7cf4:6cfc:c017])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47787e35b7esm175416715e9.4.2025.11.14.13.33.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Nov 2025 13:33:25 -0800 (PST)
-Message-ID: <1ec7a98b-ed61-4faf-8a0f-ec0443c9195e@gmail.com>
-Date: Fri, 14 Nov 2025 22:33:31 +0100
+        d=1e100.net; s=20230601; t=1763156290; x=1763761090;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=2AdOzp3Vu6NN0uDZN6wbKPsm+e3bm/G64aFJ2Czz/Dc=;
+        b=lIoqvVzdTrwVtxsR22yblJHDn+EG5imf3EPDtw5LkESS8ttAtuYj2AlGaKXwVBPCyn
+         3MULfBmfmr5XApXYWv7udJjB98fB3UTiTBVxMKCcjYbS9gx5MVEyM7NYk3NNYMj0t3Aa
+         E3UtsmxKcgdSZv9KGHn8VHeoTngJ90ZiEf2xWrJ3MbBeLprBRthoc6Vv6aGnjhc/TR0T
+         rpN8BzITFjX6lSM9RIEYOqS4Rx69OxHYyp04KR7H50VlKLUvmBj+TMysOj3/udM5ybZS
+         NhuDMOhr1Ro18S2cteQ5hzmsX0uX/F7botNTMdyNTFDQkjc4JmyavYc5ZurxjHOnvkKi
+         jaAg==
+X-Forwarded-Encrypted: i=1; AJvYcCWp0FZu7cd4nXeyZePA03JcNupcTl8aOBIV7+Z1ekl5T5K/FaOLmzE29OJ6pr0d4N6O20zG3KI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJn5d5auxYHwzOSIMtet37UbbeNfNSnQqFPUSBOGUi/3CbwJOy
+	AoFYdsF8hIvyhAM9EOoVw8nRgpkwwjVEHacoOmeLyg13u6FQ+7RQ+ar5
+X-Gm-Gg: ASbGnctrShi4eXQUR1AtBF+5jsuket83kw2yyheFgbk0/HX8D88qc+7m8p+ERRXHOTH
+	a8hZCQDf1/v8QvQZfoQr7HDqBRI156qX+p1piyc9mVeZvHIC7P8EvaLUv3oZI0Gb1zB/hh1Ph9S
+	rq2Fxg78zbxOvQCmtff5/CICogPz4pyj7DW/qdkMGl9zPXCfUxNrWlXFSCMmEZ+9ep+Kp8TSxys
+	j4eq4d7onDOv211u2eqONQq5hK1A/UzKbTbLh1iWixI94dNsC2rvcQfqjHLBERN5QpYKzBBA7UF
+	NrDhPXJhA0aFRFbiu9t/EZbQ14EKhRL0MpgJnn1F781S9H5O5Svsc4OtFHp+vt+PU7iq7VltpM2
+	tdzcRJol9EHjQvLmhd/jpnlAkB6JrbajjVW0nobYEY0mV43UIkH3sodSEab4tGNdZasVN4CTian
+	Z372Z4AzeFKAdt8h3zsKGDHx+WQSw1aykXxTBI8r1Busb1lpzsml1PctRfRsjSQxc=
+X-Google-Smtp-Source: AGHT+IF4RUaKrhCIq/a+CQuzQOczqQ1I8RVr8VKrQgygddIe/fx8JxhllhOhRwXR1khsOJv2FxFapw==
+X-Received: by 2002:a5d:584a:0:b0:429:cfa3:5fde with SMTP id ffacd0b85a97d-42b527be676mr8873626f8f.11.1763156290271;
+        Fri, 14 Nov 2025 13:38:10 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f206e2sm12158736f8f.41.2025.11.14.13.38.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Nov 2025 13:38:10 -0800 (PST)
+Date: Fri, 14 Nov 2025 21:38:08 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Jon Kohler <jon@nutanix.com>, Jason Wang <jasowang@redhat.com>, "Michael
+ S. Tsirkin" <mst@redhat.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
+ <eperezma@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Borislav
+ Petkov <bp@alien8.de>, Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH net-next] vhost: use "checked" versions of get_user()
+ and put_user()
+Message-ID: <20251114213808.252fc8eb@pumpkin>
+In-Reply-To: <CAHk-=whJ0T_0SMegsbssgtWgO85+nJPapn6B893JQkJ7x6K0Kw@mail.gmail.com>
+References: <20251113005529.2494066-1-jon@nutanix.com>
+	<CACGkMEtQZ3M-sERT2P8WV=82BuXCbBHeJX+zgxx+9X7OUTqi4g@mail.gmail.com>
+	<E1226897-C6D1-439C-AB3B-012F8C4A72DF@nutanix.com>
+	<CAHk-=whkVPGpfNFLnBv7YG__P4uGYWtG6AXLS5xGpjXGn8=orA@mail.gmail.com>
+	<20251114190856.7e438d9d@pumpkin>
+	<CAHk-=whJ0T_0SMegsbssgtWgO85+nJPapn6B893JQkJ7x6K0Kw@mail.gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: LAN8720: RX errors / packet loss when using smsc PHY driver on
- i.MX6Q
-To: Fabio Estevam <festevam@gmail.com>
-Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
- edumazet <edumazet@google.com>, netdev <netdev@vger.kernel.org>,
- Andrew Lunn <andrew@lunn.ch>
-References: <CAOMZO5DFxJSK=XP5OwRy0_osU+UUs3bqjhT2ZT3RdNttv1Mo4g@mail.gmail.com>
- <e9c5ef6c-9b4c-4216-b626-c07e20bb0b6f@lunn.ch>
- <CAOMZO5BEcoQSLJpGUtsfiNXPUMVP3kbs1n9KXZxaWBzifZHoZw@mail.gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <CAOMZO5BEcoQSLJpGUtsfiNXPUMVP3kbs1n9KXZxaWBzifZHoZw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 11/14/2025 10:15 PM, Fabio Estevam wrote:
-> Hi Andrew,
-> 
-> On Thu, Nov 13, 2025 at 7:35 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> 
->> Maybe dump all 32 registers when genphy and smsc driver are being used
->> and compare them?
-> 
-> The dump of all the 32 registers are identical in both cases:
-> 
-> ./mii-diag -vvv
-> mii-diag.c:v2.11 3/21/2005 Donald Becker (becker@scyld.com)
->  http://www.scyld.com/diag/index.html
-> Using the default interface 'eth0'.
->   Using the new SIOCGMIIPHY value on PHY 0 (BMCR 0x3100).
->  The autonegotiated capability is 01e0.
-> The autonegotiated media type is 100baseTx-FD.
->  Basic mode control register 0x3100: Auto-negotiation enabled.
->  You have link beat, and everything is working OK.
->    This transceiver is capable of  100baseTx-FD 100baseTx 10baseT-FD 10baseT.
->    Able to perform Auto-negotiation, negotiation complete.
->  Your link partner advertised cde1: Flow-control 100baseTx-FD
-> 100baseTx 10baseT-FD 10baseT, w/ 802.3X flow control.
->    End of basic transceiver information.
-> 
-> libmii.c:v2.11 2/28/2005  Donald Becker (becker@scyld.com)
->  http://www.scyld.com/diag/index.html
->  MII PHY #0 transceiver registers:
->    3100 782d 0007 c0f1 05e1 cde1 0009 ffff
->    ffff ffff ffff ffff ffff ffff ffff 0000
->    0040 0002 60e0 ffff 0000 0000 0000 0000
->    ffff ffff 0000 000a 0000 00c8 0000 1058.
->  Basic mode control register 0x3100: Auto-negotiation enabled.
->  Basic mode status register 0x782d ... 782d.
->    Link status: established.
->    Capable of  100baseTx-FD 100baseTx 10baseT-FD 10baseT.
->    Able to perform Auto-negotiation, negotiation complete.
->  Vendor ID is 00:01:f0:--:--:--, model 15 rev. 1.
->    No specific information is known about this transceiver type.
->  I'm advertising 05e1: Flow-control 100baseTx-FD 100baseTx 10baseT-FD 10baseT
->    Advertising no additional info pages.
->    IEEE 802.3 CSMA/CD protocol.
->  Link partner capability is cde1: Flow-control 100baseTx-FD 100baseTx
-> 10baseT-FD 10baseT.
->    Negotiation  completed.
-> 
-> After pinging with the Generic PHY driver:
-> 
-> # ethtool -S eth0 | grep error
->      tx_crc_errors: 0
->      rx_crc_errors: 0
->      rx_xdp_tx_errors: 0
->      tx_xdp_xmit_errors: 0
-> 
-> After pinging with the SMSC PHY driver:
-> 
-> # ethtool -S eth0 | grep err
->      tx_crc_errors: 0
->      IEEE_tx_macerr: 0
->      IEEE_tx_cserr: 0
->      rx_crc_errors: 19
->      IEEE_rx_macerr: 0
->      rx_xdp_tx_errors: 0
->      tx_xdp_xmit_errors: 0
-> 
-> Any ideas?
-> 
-The smsc PHY driver for LAN8720 has a number of callbacks and flags.
-Try commenting them out one after the other until it works.
+On Fri, 14 Nov 2025 12:48:52 -0800
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-.read_status	= lan87xx_read_status,
-.config_init	= smsc_phy_config_init,
-.soft_reset	= smsc_phy_reset,
-.config_aneg	= lan95xx_config_aneg_ext,
-.suspend	= genphy_suspend,
-.resume		= genphy_resume,
-.flags		= PHY_RST_AFTER_CLK_EN,
+> On Fri, 14 Nov 2025 at 11:09, David Laight <david.laight.linux@gmail.com> wrote:
+> >
+> > I think that is currently only x86-64?
+> > There are patches in the pipeline for ppc.
+> > I don't think I've seen anything for arm32 or arm64.  
+> 
+> Honestly, the fact that it's mainly true on x86-64 is simply because
+> that's the only architecture that has cared enough.
+> 
+> Pretty much everybody else is affected by the exact same speculation
+> bugs. Sometimes the speculation window might be so small that it
+> doesn't matter, but in most cases it's just that the architecture is
+> so irrelevant that it doesn't matter.
+> 
+> So no, this is not a "x86 only" issue. It might be a "only a couple of
+> architectures have cared enough for it to have any practical impact".
+> 
+> End result: if some other architecture still has a __get_user() that
+> is noticeably faster than get_user(), it's not an argument for keeping
+> __get_user() - it's an argument that that architecture likely isn't
+> very important.
 
-All of them are optional. If all are commented out, you should have
-the behavior of the genphy driver.
+I was really thinking it was a justification to get the 'address masking'
+implemented for other architectures.
 
-Once we know which callback is problematic, we have a starting point.
+It wouldn't surprise me if some of the justifications for the 'guard page'
+at the top of x86-64 userspace (like speculative execution across the
+user-kernel boundary) aren't a more general problem.
 
-> Thanks
+So adding support to arm32, arm64, riscV and 32bit x86 might be reasonable.
+What does that really leave? sparc, m68k?
+
+At that point requiring a guard page for all architectures starts looking
+reasonable, and the non 'address masking' user access checks can all be
+thrown away.
+That isn't going to happen quickly, but seems a reasonable aim.
+
+Architectures without speculation issues (old ones) can use a C compare.
+I think this works for 32bit x86 (without cmov):
+	mov $-guard_page, %guard_off
+	add %user_addr, %guard_off
+	sbb %mask, %mask
+	and %mask, %guard_off
+	sub %guard_off, %user_addr
+mips-like architectures (no flags) probably require a 'cmp' and 'dec'
+to generate the mask value.
+(I'm not sure how that compares to any of the ppc asm blocks.)
+
+	David
+
+> 
+>            Linus
 
 
