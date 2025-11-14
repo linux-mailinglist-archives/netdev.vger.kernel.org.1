@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-238699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D551C5E030
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:54:24 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6549AC5DFE5
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:52:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E5A4638622D
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 15:39:25 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3A814366D0C
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 15:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A198232E746;
-	Fri, 14 Nov 2025 15:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C908932ED5A;
+	Fri, 14 Nov 2025 15:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="CoIURsqa"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="f+2PkKjc"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA1B32E759
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 15:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB6332ED55
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 15:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763134119; cv=none; b=cGsUVHdwYRIbqLPkXyO/BNhjJoxAv+9KGRUTlR0OvbkncFBAN/c4fd9+zqBh28deP56lEKnrw8PzCX4s/e9EnXPxQvqIznaZPZhTAuEzyF+9cSNRb9YYxhiZJHXp0pvoasdGXsFth5SymrTFl1v4it7t206ZWCx0PwPK03Kx7Gw=
+	t=1763134126; cv=none; b=MRYhp7EkuekZZDCA5wEyMLfRyi6K0SY5S+b8hIFWvQ+iPiJbJBKUElowP6yOHjFfhKLKJhYI6B5UBEscg2A+KHAaMpFS3HEs5JRsUNzDUyaQrnuDCtWOt8CT7EmJMuodDaftonyx1JnbVsomTKdon93XZFbSjotEWUFhj5Ki210=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763134119; c=relaxed/simple;
-	bh=PVr1L0b81HzhBcHzGYnykFnTdu3V0jxtcN4CXQqihHc=;
+	s=arc-20240116; t=1763134126; c=relaxed/simple;
+	bh=Jqh1EmWNb426rN+Fedf20x1RQrEEALLGgD/8jdAqgXw=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=RPdft2ZHEDqUmpEnJXaivdihjMvp9d15Jctc3V+YzoUHQIdDJHjoo3MYQe+cHk7GXUEbT0PZ6mMiD20DioJzOjg1s1EPJl/xjv0JNqCk+Fmu8PZvVxL508pW7hQnn3wapILXfko7YC89IM56HFU23XpaEWU0cDI4B4rM1onxH18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=CoIURsqa; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=MGBCefFHtMXTUiZ5c+4BW/hwmJuOxzln975oXBF+Vy1KHVrd2QR15N5zOzuF5VrxzvOMFW3Pq5LS6NHEFIyHoLA14RhzdahPl4mAnbM+G+2jJs8faYTgPPnYXHUujgnW2s14fvK+tMqVYdfhEK138ymk/N5/j/2qzT21IsW8UkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=f+2PkKjc; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,22 +37,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hlhOTxorkK0qWym+ups7Cpvw3GcGPEKIQshOQKtZsh8=; b=CoIURsqaLonDZQIr7hNe5QLTC3
-	Zki421bzvxpYIlkPP96GOBXFo1ZjrWQX80V8EgWCwwbS5gdNI91EutnRT0PhAugTq5HnLb1EXJlFY
-	cJPTik65dStS/dfMzt9O+cKPqMC17DS2fhheFYfRlDYo6artH0WBjJwQtg4dypAWZ6sVGwKEe7uLD
-	9yudhi0e76Q9SngQ4192JV4h/ZL9YZvfF+76c9BgdZsFaWWSPP7EhdeaCBsz7DJpXVG44S3BI7bE9
-	rFiO2+cSqFFeYr2SCKUYLgNjE90rmOYqUvxbO9S5JCp+L5392lo5caxR//wG5waRWuXteaqesoDtP
-	a20ptMqw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36182 helo=rmk-PC.armlinux.org.uk)
+	bh=Twus3sbrBSG7NY/CIFTfFSuDbIZ0IfgbuuTAgR3/MuY=; b=f+2PkKjcyy0ZBt+PQ+qC5DuZpm
+	LR6aELWhmN121eH9u1WrcaH/3M/jFdUpLigQfEJ8XMHbBrHs1c/NNqiMx78+jEiZk9G0Dgx69YWNz
+	VAKW/s9wYIBiHm6YHuQNgzWcBEXYy9+Qy6dFZnF4NQuAnfqOP6D8PZMBCcTfq7QNd69KuGiGBIdNa
+	FEMulAkxlJMI85h+oDOmTp3TGH8z6maWTvKgp3IeFMDvYpdbDkypgZWn0pAlea+4zg2GwL3jYc/ty
+	08MsZ6zwcnhZIoVoAG312whj+SsMjKxfrP7JeAb505AI2lJLJSvCtXy2FpZwBxqv7BMsEBNNk0ctj
+	aM0DcADA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36184 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vJviw-0000000076H-16Rl;
-	Fri, 14 Nov 2025 15:28:30 +0000
+	id 1vJvj1-0000000076b-2knP;
+	Fri, 14 Nov 2025 15:28:35 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vJviv-0000000EVjV-1CLF;
-	Fri, 14 Nov 2025 15:28:29 +0000
+	id 1vJvj0-0000000EVjb-1jDh;
+	Fri, 14 Nov 2025 15:28:34 +0000
 In-Reply-To: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
 References: <aRdKVMPHXlIn457m@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -71,8 +71,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	sophgo@lists.linux.dev
-Subject: [PATCH net-next 02/11] net: stmmac: move initialisation of phy_addr
- to stmmac_plat_dat_alloc()
+Subject: [PATCH net-next 03/11] net: stmmac: move initialisation of clk_csr to
+ stmmac_plat_dat_alloc()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,76 +82,50 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vJviv-0000000EVjV-1CLF@rmk-PC.armlinux.org.uk>
+Message-Id: <E1vJvj0-0000000EVjb-1jDh@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 14 Nov 2025 15:28:29 +0000
+Date: Fri, 14 Nov 2025 15:28:34 +0000
 
-Move the default initialisation of plat_dat->phy_addr to
+Move the default initialisation of plat_dat->clk_csr to
 stmmac_plat_dat_alloc().
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c  | 3 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 5 +++++
- drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c      | 1 -
- drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 2 --
- 4 files changed, 5 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 5 -----
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index 2d803fa37e21..8593411844bc 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -114,9 +114,6 @@ static void loongson_default_data(struct pci_dev *pdev,
- 	plat->clk_ref_rate = 125000000;
- 	plat->clk_ptp_rate = 125000000;
- 
--	/* Default to phy auto-detection */
--	plat->phy_addr = -1;
--
- 	plat->dma_cfg->pbl = 32;
- 	plat->dma_cfg->pblx8 = true;
- 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 400b4b955820..1851f7d0702d 100644
+index 1851f7d0702d..a36e8a90fcaa 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7563,6 +7563,11 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
- 	if (!plat_dat)
- 		return NULL;
+@@ -7565,8 +7565,10 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
  
-+	/* Set the defaults:
-+	 * - phy autodetection
-+	 */
-+	plat_dat->phy_addr = -1;
-+
+ 	/* Set the defaults:
+ 	 * - phy autodetection
++	 * - determine GMII_Address CR field from CSR clock
+ 	 */
+ 	plat_dat->phy_addr = -1;
++	plat_dat->clk_csr = -1;
+ 
  	return plat_dat;
  }
- EXPORT_SYMBOL_GPL(stmmac_plat_dat_alloc);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-index 622cdbeca20f..b981a9dd511d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-@@ -112,7 +112,6 @@ static int snps_gmac5_default_data(struct pci_dev *pdev,
- 	}
- 
- 	plat->bus_id = 1;
--	plat->phy_addr = -1;
- 	plat->phy_interface = PHY_INTERFACE_MODE_GMII;
- 
- 	plat->dma_cfg->pbl = 32;
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 38d574907a04..745032fd46ce 100644
+index 745032fd46ce..fe3d95274fd6 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -480,8 +480,6 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+@@ -480,11 +480,6 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
  		plat->bus_id = ++bus_id;
  	}
  
--	/* Default to phy auto-detection */
--	plat->phy_addr = -1;
+-
+-	/* Default to get clk_csr from stmmac_clk_csr_set(),
+-	 * or get clk_csr from device tree.
+-	 */
+-	plat->clk_csr = -1;
+ 	if (of_property_read_u32(np, "snps,clk-csr", &plat->clk_csr))
+ 		of_property_read_u32(np, "clk_csr", &plat->clk_csr);
  
- 	/* Default to get clk_csr from stmmac_clk_csr_set(),
- 	 * or get clk_csr from device tree.
 -- 
 2.47.3
 
