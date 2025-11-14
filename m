@@ -1,222 +1,372 @@
-Return-Path: <netdev+bounces-238711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68F54C5E196
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 17:09:27 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26126C5E47D
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 17:39:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 162B03AD28D
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 15:54:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 42BFC505DC4
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF3633556C;
-	Fri, 14 Nov 2025 15:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAEE832D449;
+	Fri, 14 Nov 2025 15:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KRmLISRO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IgddwB4d"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11748335544;
-	Fri, 14 Nov 2025 15:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763134963; cv=none; b=QWRdlaK0i2Pz/y0l72D0EYwk9v/TEztuBCfQcrW+/qXQvus4Iaj0v60C58TFj8ZO3WfLcRrfZfZ+B0siGnrGn6T57Vv6HlKXOF6K7VINjIQdJIbxqJSESx9TmCBPsVta8Y1+bEhJg7Ep/DVyRjBOhbHnJJof710Cr5PWPnzq6I4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763134963; c=relaxed/simple;
-	bh=76dQDYrxFlZYTWgBOCAcsW5pKpLVkooxKOviGeLe+tE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tkUuOOvvBnEtPl9Uyazze1O9/vBStAaHSaSyERN1MSL5htbPJby/7z6sGn1ncs0dlUfFEmyvIDsQ4l39WT79xf5IVYglpd8DOvbSn62s6SJuPv4e3XoBiS40DbPwojX7Zh+JmNBWK+sAA42uX9FVxg+4S17tU9Nj4V9MBDMSceY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KRmLISRO; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=eC6OGBRTA7nrYJUx7cUDBT/GbqIp+1YhpGa3vb0UIMs=; b=KRmLISROn8hRZcvjcjKpulIlrW
-	Xo5h9tKze6hdE6/Rh3wvUuSvIqBGlEx46xK4LQm+9hd0xWdhfe5ys1T3mnbrKyRVEd2gf6RoehCgW
-	qUyH5vK2eA4HEFxtUEKkMA8J8aLRpPa5tOYSt8ReHZzJu4ZTqEEe1oVqVIXGK7SEGRZ8xGF0Uz1+T
-	YbLwskNkclJZx0INHuLJg4Dp3g+7Z5MsvqHtyXofUrWWuyGPLwAPDnikP7FlPD9+SYp/Bkq3HBhtt
-	SQJPUv+Wch4bosb3K8aF2EOamMjjuJuYqU0SNu5YSN1DmsE4pasBhdsad2/JdogGbhU1OzAI5D6ew
-	zUwxknNw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54608)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vJvwc-000000007BU-2XjE;
-	Fri, 14 Nov 2025 15:42:38 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vJvwb-000000005xb-0ex6;
-	Fri, 14 Nov 2025 15:42:37 +0000
-Date: Fri, 14 Nov 2025 15:42:36 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maud Spierings <maudspierings@gocontroll.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: fix doc for rgii_clock()
-Message-ID: <aRdN7B64g8VJVDlj@shell.armlinux.org.uk>
-References: <20251114-rgmii_clock-v1-1-e5c12d6cafa6@gocontroll.com>
- <aRclKDeHzfJSzpQ3@shell.armlinux.org.uk>
- <7ecd1c96-a039-4b4a-887e-10f01d5fbc68@gocontroll.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23FC329E6E;
+	Fri, 14 Nov 2025 15:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763135597; cv=fail; b=K4sN0MXxL5L5dOOGawKZRUhw4OnAgS+o834ZY5VuY88pibPmoAFR4rqzeykltUyhWm0hxgFmSicMV8NdoYZfc55rolnJ41HCehPsSustihpY2KMOOu6KIZ6A+6jlPd7TQVgJb4+QV066iAVz7avagK8PYmKFZL8kKaPhF/HaxFw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763135597; c=relaxed/simple;
+	bh=ypY4Hb+H74sRIDm+gQqybCEg4F1RT60jLcc5KCorc+Y=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=YcemNpje2bBi9wo0cxlSGUAbM1nutEddma6VWEi1leqgNhgf+vSYzCe9rEMHrL91rQnF8fWntHykUdM7m1GtPR7kW/EC6q+kJH6dPhbdE7W0WAss15zq6oA3n3JYcwWoC8Njzdn9sufvFLr5N+Ow9ousd7bM/RZPKitAVUcJVuw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IgddwB4d; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763135596; x=1794671596;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=ypY4Hb+H74sRIDm+gQqybCEg4F1RT60jLcc5KCorc+Y=;
+  b=IgddwB4drmSd8eAdoM+ubnOIrMVK5e860P5L+yAJ0S/pTEX2YAoFi2Vv
+   nBgZ6y+ebu5MgZm5hBt2nM7LuV//OtwDxBM6VgiTtMOMh+WAF8FPWDkA6
+   AfQp4irNz+rztw+j0eMoSIOmQVycH7JGs3eBtK+dTOHjml9fpm6DeP1+5
+   AcG2QNKpZCnK13/SoqAOeJVh3ojxhAD0lK9jTbzTr+WvYuO8n2JSy88vw
+   73RKGfma0Lb3+MuGIwURPJ3APYeAnEzb7+UgU5FrgshYtkO0kF/mxSr9l
+   +18RZC/+7Axdwqe4XEH/RAT9cspENaN6XRq7MzYw/ygm5UhtlBb2mfhO6
+   w==;
+X-CSE-ConnectionGUID: EiJneawhSVCKEY3yQxDyfQ==
+X-CSE-MsgGUID: VbsvKugnT0K1+7K5fwdVVQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11613"; a="75912670"
+X-IronPort-AV: E=Sophos;i="6.19,305,1754982000"; 
+   d="scan'208";a="75912670"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 07:53:15 -0800
+X-CSE-ConnectionGUID: ZSTte16gSjChH41QhKF/iA==
+X-CSE-MsgGUID: x9MxKLV4QaGAfIoQM3fC9g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,305,1754982000"; 
+   d="scan'208";a="220448294"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 07:53:15 -0800
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 14 Nov 2025 07:53:14 -0800
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Fri, 14 Nov 2025 07:53:14 -0800
+Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.5) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 14 Nov 2025 07:53:14 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qNg62bb3Cl4L4vRGfpCXoIGbmu9eZwdfCHXaMyZGOR4I4AAYE4XOX/EU7uQ1uOkWAHjWitjWw9zzoqme4sbfIwdQYVXoqghLWqw22cqvDfbb8t2nAk2JdB6kfhu2IhsM/m4ZskoQvdhqdVxO58aH848SkgPQYJgsFQOUtCXTofMPtocD37gsfPfuj9/RXk5rkJ7YCPJAfHnGxknlaYtXZdwiAHIAg3c8oGzTCugRjk3wwJ39ZcQ/Uwk/6pknn+TJJijYFlSIykuglCzjrSD3zkcEsGVBH6fQE26bse5IeSgvRzN+viWZIUvBgV5sAlMaPxXiZS/mvVr+ubsLta7v4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BHQpPxywcv6QbqQd8yS2+klE+0iCCB/5EnzS4/5mB8Q=;
+ b=qPZ35xe/FawGsqVMiMjgRnluWywFNclyZCE6uT162jPaIQwH7+zWijYiF6QFwjDzi3f/DB3V6JBWM3swTNSWy9iNm64ZArfGA+S8QK93xlzSRqRmflB/FEjWO0kOgwZdQHY9eNdofoSfWvSr1r3HQ7SqtE0422Jldef6zZgWMXwVGoGDO/GMBTcblW3ApmEc/KNOjovHHDdVAaoptZc6hl/HW1Ot/fQlJvdZOAMVJeca7ba8TuudVLJQjmOmmzLmhoKu69gQbtPPrZxmVEXPBBCeO+z7158pMHgPwTsImJW88KQ4L0AkrojRIiaEBh7lLn3oEFAwPu3JmX4hv5GPXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from IA1PR11MB6097.namprd11.prod.outlook.com (2603:10b6:208:3d7::17)
+ by SA1PR11MB7132.namprd11.prod.outlook.com (2603:10b6:806:29e::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.17; Fri, 14 Nov
+ 2025 15:53:09 +0000
+Received: from IA1PR11MB6097.namprd11.prod.outlook.com
+ ([fe80::61e9:afe6:c2c0:722]) by IA1PR11MB6097.namprd11.prod.outlook.com
+ ([fe80::61e9:afe6:c2c0:722%3]) with mapi id 15.20.9320.013; Fri, 14 Nov 2025
+ 15:53:09 +0000
+Date: Fri, 14 Nov 2025 16:52:58 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+CC: Magnus Karlsson <magnus.karlsson@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<bjorn@kernel.org>, <magnus.karlsson@intel.com>, <jonathan.lemon@gmail.com>,
+	<sdf@fomichev.me>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<hawk@kernel.org>, <john.fastabend@gmail.com>, <joe@dama.to>,
+	<willemdebruijn.kernel@gmail.com>, <fmancera@suse.de>, <csmate@nop.hu>,
+	<bpf@vger.kernel.org>, <netdev@vger.kernel.org>, Jason Xing
+	<kernelxing@tencent.com>
+Subject: Re: [PATCH RFC net-next 2/2] xsk: introduce a cached cq to
+ temporarily store descriptor addrs
+Message-ID: <aRdQWqKs29U7moXq@boxer>
+References: <20251031093230.82386-1-kerneljasonxing@gmail.com>
+ <20251031093230.82386-3-kerneljasonxing@gmail.com>
+ <aQTBajODN3Nnskta@boxer>
+ <CAL+tcoDGiYogC=xiD7=K6HBk7UaOWKCFX8jGC=civLDjsBb3fA@mail.gmail.com>
+ <aQjDjaQzv+Y4U6NL@boxer>
+ <CAL+tcoBkO98eBGX0uOUo_bvsPFbnGvSYvY-ZaKJhSn7qac464g@mail.gmail.com>
+ <CAJ8uoz2ZaJ5uYhd-MvSuYwmWUKKKBSfkq17rJGO98iTJ+iUrQg@mail.gmail.com>
+ <CAL+tcoBw4eS8QO+AxSk=-vfVSb-7VtZMMNfZTZtJCp=SMpy0GQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoBw4eS8QO+AxSk=-vfVSb-7VtZMMNfZTZtJCp=SMpy0GQ@mail.gmail.com>
+X-ClientProxiedBy: DB8P191CA0027.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:10:130::37) To IA1PR11MB6097.namprd11.prod.outlook.com
+ (2603:10b6:208:3d7::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7ecd1c96-a039-4b4a-887e-10f01d5fbc68@gocontroll.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR11MB6097:EE_|SA1PR11MB7132:EE_
+X-MS-Office365-Filtering-Correlation-Id: b8a5b0eb-dd6c-493b-82cf-08de2395e8ab
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?TW5DbU9sQlh6eEhlaFJud2dGVjNuOEZMeU9CYXB2VXQ3OVIxTE5vODVxS0Vv?=
+ =?utf-8?B?SnNqVWNseDlwdDJadWZCL1VQRUo2emlqYUFPbWNvdTRGcXY3TkpmbkpvZU1J?=
+ =?utf-8?B?cDRkdFJJNmJZQkEzY0IyYmlnUW0yeGFDUk10Vk5oaStxUVFTUTlOdUMyV1Rx?=
+ =?utf-8?B?WVE4aXFuSzNycE0zYkNRR0JoUEJ4WG02cWxpRlFKdUFvWkpyU2VYSjFua0tk?=
+ =?utf-8?B?cHVOMWJ3dFNHR1VWN3c1UkRwV2c5U1pVYVUyV0twOFpHWkhZRHFCQ1lWSENj?=
+ =?utf-8?B?YnNPcWlUeUVRL3pSODJVbld0TXlIRWZxU0hEU0pHZTJhN1JGL3pnaURQeXJJ?=
+ =?utf-8?B?YlpmaHV5cHpnL01QK3dLS1IvZktLTkd6bGgyb2lBdjRYN2l2ejExTllOeTBt?=
+ =?utf-8?B?b2xrSlM3T3BZc1VMOEk0R29OQWJ4MmNEeHpKbHBXanNwMlZ3MDZxWlF3emR2?=
+ =?utf-8?B?UUdjYlgySTVzWGtrSGozdHZ5ZlZUN2VTS1dwaHBBcGdMZ1ZZS0lQSC9yRERt?=
+ =?utf-8?B?ZUxteUhEUVMxdzRjTUNDdWErdTNvMS84VGxWbTZYek5RbGZVdWM4WVp5SW0x?=
+ =?utf-8?B?NExSVUFYcWJtbEVpMll2NUo5cFRWbE90dUczWUNtK3B6M1JzSTBmY1VsNHdC?=
+ =?utf-8?B?N1ViN3RrSEpZWUtDZE1lUXdnV0oyMFVFdG1TOThKeFRYS0JJNEdNVEFsemRD?=
+ =?utf-8?B?Mm56Z21mYVE2cGtRWVdMOEZTY2Q3V3VUZkZGdlRlazdIYVRZQmhaVm92b0lz?=
+ =?utf-8?B?QlU1OG00TXlPcFAyQ3ZOdjExbHV4VmtBSW0yaXVTNGVKbDJxVHo0Ty8vbCtZ?=
+ =?utf-8?B?Y3p5OVVmK0NyazZJa1VvZ1pzZHFpbk1HV1NSMGtURllLQTVXRlozQUY4ZFdC?=
+ =?utf-8?B?dExwVWo4UUszbjNPLzR3OUVMVUJIN1lIOUxRaTZYSDc3cDNHNzhTWmlwVCtR?=
+ =?utf-8?B?Vkl1WjNCclBzVzh0RTAzbjZ3bDQ4ZzV1UCtvYlR5dnNNb0pRSlV2dUt6eXJS?=
+ =?utf-8?B?TVZqK2h0Z0RNKzhpbGt6YVhtdXZYUTlzNDQxZnhGeXRSZ0xSZnpuZVByUUFM?=
+ =?utf-8?B?bTVUekk0d1ZraGZwMnV0ejVXc0R0MjZ3cmJheGQvYlBESFozaVp5K2hjMytX?=
+ =?utf-8?B?c0h3ZlZicTZINUlvK0xYQ211U05nOVlieEZ1SEQ5T0RoYndKS3dVb2YycUtm?=
+ =?utf-8?B?VllUL2ppRTdHM2hMNkh3L3RlaFVQOVkwVkdpMlJmQnZqckJNN0FyNTlxdzEv?=
+ =?utf-8?B?SHlNRDRvRm9IWGs0c2FLdEFyOVEybnVBY0dnc0lKZERyRTI5NktnTEdnSnpZ?=
+ =?utf-8?B?bnNadFJVZ3RMdEhCbkhheWErQTFKZUtUSlVLVXdLK0w0QVBnUFZCTjhvdjJT?=
+ =?utf-8?B?NDcxS1J6cjJIYmlwQUE1ZnRxM3FTSXRiVzArdUtXU05QM2ZKNjlYWFJ4U2py?=
+ =?utf-8?B?OFJuZFVLbk5RNjByQUFxbld1NG92cy8rYmFEc2ZuVks3RW5oZ2lpaERqYkEz?=
+ =?utf-8?B?N2ZUWklTMWNoV1pDNkFJMHRvVVpmUHZnNndQT05jd09OM3NCbU10MEZWN2hW?=
+ =?utf-8?B?RjFLSEFwSFFCVWhDd0QzaFg1UWJFQTNLbCtpSUJIQ1YremdnZVV2SXFIeHdJ?=
+ =?utf-8?B?TE5uMEx1YVdVV2NpYWw3Z2ZPZjEyWnp6MjFqUEk2ZzE0NkNUUzlLYm1ObFJK?=
+ =?utf-8?B?blFrajdNTXNZdXJhdm5aOXU5b2pCTi9BMFUyM3ZqU1dTUEFVSW5Ld0k4TStW?=
+ =?utf-8?B?b3lmamIxbmIzYnN1Qy9WelhxM1lyUjNuWng1ZW0yamYrSiszUTBSMXNNbWs1?=
+ =?utf-8?B?b3poMHBDM3NWeXpVdStmekNQVFE3NVlMY1FXbHkwVmdtSVV4OU1EdTBSL0N5?=
+ =?utf-8?B?d0RTeHB4WkhhOU9DRjFIUS8rYy8zU1VLZlFocWtzUTlHSDlKOTZtaXlzcEdn?=
+ =?utf-8?B?enFYM21laGFLNktkekh2Sk1vcjVUOTBTbTBjd0JCNkNhdkxRTjBUdWRWa2FB?=
+ =?utf-8?B?SFJEcVNTczBRPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6097.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M1JsMFdIOHR0QnVaYlYrUGpTNVNVMmprTGhGOE9BUC9ZUWFyZEFvaElwTC9s?=
+ =?utf-8?B?THRvRGdVaytjdWwwbSthQU5kSHVhYUkxMzJ6UGFlVFFNbDd1V0RINzNnZ3Rx?=
+ =?utf-8?B?allJQWpGL1NTTTYra2FySXhKVE5MZWFaWGkvUHlHMWhmUTNpUTZ4ZEJSeUwx?=
+ =?utf-8?B?YUMxYzRpU3haSjl6UUwvRDdaR0grVzFac2tLcmtXSSs2aitRNWFuUzI0Tk9T?=
+ =?utf-8?B?ZnMyL1JXZUxXZVVrVnYwdlF4QmtLOW5oVmREcTdqWnlwYW9XQTE3QTg1ck03?=
+ =?utf-8?B?UHpEOEFoQXF2UUp0TXZVaXdZVE5FY0xrUXRSNkNkdU9va05XaWszL1ZWRDdz?=
+ =?utf-8?B?V1NBSWU3OWZ2cWdHUjlldHF6WmFRK3Nxd0VzU1FuMDVPcjVQdFp5WGhLdDVk?=
+ =?utf-8?B?UGtpdlZPOTFZQzZ1cXEzOE1YMUJRYkpWUllkVmVUNjdESVFnRkdaWHBBV0Vx?=
+ =?utf-8?B?L3dEcll6OERGQ2VneDh0SVVVYmxDbFBLb1R6RmpEM3V3S010VGxmdW5WMWlG?=
+ =?utf-8?B?SXprUnlJaWtOUEVDa0owNTdwNTNRTzJGTEtZVHg5QWd2OFFTODNvak5TMi80?=
+ =?utf-8?B?enlWTk9ONEJDTEw2b255YmlhZThvaWdaVTVHaWt4TVNRK011OGZGZ2dCaG80?=
+ =?utf-8?B?WkJBNmxjYS9pRWNscklsRmZYZ3liWDJrbzVVdzNnc0d4bXZMY25hTEI0UXg1?=
+ =?utf-8?B?amI5WDUxSFZReG1KMEZRSFBNMUZQUVdpWlRDZEQ5dWc4TVFvakVTYkhlVndB?=
+ =?utf-8?B?SkNoNXZiVjZHRGtIdTZvK0N5blg5VmN2V0h4S0UzWTdXT3FCckR5c0FOMmVE?=
+ =?utf-8?B?ZmpobkhyZncwdXZEZTRTWEU0eUFuNjhkUlJOeFFmTEtKQjFvRGNmbUpPUHli?=
+ =?utf-8?B?dFBoRjdFLzJxWk96VDIzVWNEMEgrOHV6V0gzY2ZjWWlMTXBVNjEyWEZnc0Z6?=
+ =?utf-8?B?VTJPS09PZ1FzR2JFVzlaQStkNGw0ZnRpVSttMmZkL2FUWm5vRE1mQ1doMlhP?=
+ =?utf-8?B?UnhvRndFVE5yVEJRaExhMjlPRkVKSk1JMi96cVBTaVVZeTlyWENyTDdjaUFv?=
+ =?utf-8?B?R3B5OGM3SitsRWZ2MTdiUTBia2RFVUZHS1NrSHR1OXBXWm90RDZyUVA5cWtJ?=
+ =?utf-8?B?QlZkWUFnazhyZ3JSdUdRVWhNMzJRTkwxK09jclp5Q0VRaGhoRGJINitweXYz?=
+ =?utf-8?B?RFB3QUNQNDU0eU1BM1JZWU51SFVFblMrdDNwb1VPdzBMM0tLYnZmQTBvc0li?=
+ =?utf-8?B?UlRRNkxsTEpHS3loQVU3S0xUVEpaZ010N1ZMcTdWaWVEK1RzKzcwUFpEYWhL?=
+ =?utf-8?B?d0loK2ZZQ21oYjdFL1B1Y2F0U0gxMDVsUExKaUV6K1RtMjh5TDVnYW1mRU8w?=
+ =?utf-8?B?UzVBc0lqUTRqTHFubXFaNEJWaFFmai95VXFwMFRBUVYvSG5KOFNaYkZLY3E5?=
+ =?utf-8?B?ZG1rZ08vZEFRVjJmOXY0STRucFVQSnZUYVpVMTFkc1N3cVhzM2c0RFNlNnBY?=
+ =?utf-8?B?S3lLM0cyMmMzNHRQRXp2VC9Uby9aenpUMkZBN29kL1ZlV29XdWlNdXJiUTZ6?=
+ =?utf-8?B?Mml5QW9OcHVSMjg0YVVXclBkeUxUMEp1Q3ZXdHFsVHNvYnVIWDVYMW5LaG95?=
+ =?utf-8?B?c3l3L2syT3Fxd2NDcGRVcHVnTCtQaU5HRGNYcEJDNXRmWld6U05tQ3gzeElO?=
+ =?utf-8?B?akdoNDZWQVJ6WklZN0ZkSlQ5a3Z3UmZJdnlPYkUvM3RNcnRoWmptbkhWOGlr?=
+ =?utf-8?B?ZGtQdlIwY1hkRk5NV09HTllxTTFDSHh5L00wekwwb2dhSUltcTRQT1hKY0x1?=
+ =?utf-8?B?ZE9BZEk0MUE4eXhTZjk0TVp2dG5kN2JCcUlnU3lWRFZQUnAzQ1BUWEdYZE1N?=
+ =?utf-8?B?emJSUUJRMmh3OGNMZ0RJU3BtZnhmQzRNQkh1R1VCVTVDRllSb3dLZk5Dc0w0?=
+ =?utf-8?B?RXFab2RuZGh1bGsvV2Flcm83NnZYVmhSS3BkLy84dENTZ3VGU242M09EV29W?=
+ =?utf-8?B?amNsdWkyWGtQVmpNRGl2Y1hZeVZxWmtKM3ZJQUR1MTRVQXlNZm5EZ0pBQ1pa?=
+ =?utf-8?B?MjFmRzFnSGkvU01xaE80bmoxSDI1cEI1WGZKMkl5c25GZW80RnJKSkM4Z1ZC?=
+ =?utf-8?B?UEIxV1BmOGYzQThYNUVsdWEzV3BDeXJkTkViYUxKMUJnb3prb1p0N3N2MEEw?=
+ =?utf-8?B?VHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b8a5b0eb-dd6c-493b-82cf-08de2395e8ab
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6097.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2025 15:53:09.6743
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sfb4noajm2se+tslG9UfUkyrr176wv6OQJq7mwXrh6xFqQ6LPl3rjEF+Txq09kZVv7RIWKd8VmFaBtcqLWFtkVIdo436YHpGqXa2BziZRxM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7132
+X-OriginatorOrg: intel.com
 
-On Fri, Nov 14, 2025 at 03:10:23PM +0100, Maud Spierings wrote:
-> Hi Russel,
+On Tue, Nov 11, 2025 at 10:02:58PM +0800, Jason Xing wrote:
+> Hi Magnus,
 > 
-> Thanks for the response!
-> 
-> On 11/14/25 13:48, Russell King (Oracle) wrote:
-> > On Fri, Nov 14, 2025 at 12:39:32PM +0100, Maud Spierings via B4 Relay wrote:
-> > > From: Maud Spierings <maudspierings@gocontroll.com>
-> > > 
-> > > The doc states that the clock values also apply to the rmii mode,
-> > > "as the clock rates are identical". But as far as I can find the
-> > > clock rate for rmii is 50M at both 10 and 100 mbits/s [1].
-> > 
-> > RGMII uses 2.5MHz, 25MHz and 125MHz (ddr) for its RXC and TXC.
-> > 
-> > RMII uses 50MHz for the reference clock. The stmmac RMII block requires
-> > a 50MHz clock for clk_rmii_i. However, the transmit (clk_tx_i) and
-> > receive (clk_rx_i) clocks are required to be /2 or /20 depending on the
-> > speed, making the 2.5MHz or 25MHz, as these clocks control data paths
-> > that have four lanes whereas the external RMII interface is two lanes.
-> > 
-> > MII uses a 4 lanes, has TX_CLK and RX_CLK which are required to be
-> > 2.5MHz for 10M and 25MHz for 100M.
-> > 
-> > So yes, for RMII the comment is a little misleading. Maybe it should
-> > state that it can be used for 4-lane data paths for 10M, 100M and 1G.
-> > 
-> > > Link: https://en.wikipedia.org/wiki/Media-independent_interface [1]
-> > > 
-> > > Signed-off-by: Maud Spierings <maudspierings@gocontroll.com>
-> > > ---
-> > > This patch is also part question, I am working on an imx8mp based device
-> > > with the dwmac-imx driver. In imx_dwmac_set_clk_tx_rate() and
-> > > imx_dwmac_fix_speed() both rmii and mii are excluded from setting the
-> > > clock rate with this function.
-> > > 
-> > > But from what I can read only rmii should be excluded, I am not very
-> > > knowledgable with regards to networkinging stuff so my info is
-> > > coming from wikipedia.
-> > 
-> > It depends how iMX8MP wires up the clocks. From what I see in DT:
-> > 
-> >                                  clocks = <&clk IMX8MP_CLK_ENET_QOS_ROOT>,
-> >                                           <&clk IMX8MP_CLK_QOS_ENET_ROOT>,
-> >                                           <&clk IMX8MP_CLK_ENET_QOS_TIMER>,
-> >                                           <&clk IMX8MP_CLK_ENET_QOS>;
-> >                                  clock-names = "stmmaceth", "pclk", "ptp_ref", "tx";
-> > 
-> >  From include/dt-bindings/clock/imx8mp-clock.h:
-> > #define IMX8MP_CLK_ENET_QOS           129
-> > #define IMX8MP_CLK_ENET_QOS_TIMER     130
-> > #define IMX8MP_CLK_QOS_ENET_ROOT      225
-> > #define IMX8MP_CLK_ENET_QOS_ROOT      237
-> > 
-> >  From drivers/clk/imx/clk-imx8mp.c:
-> > IMX8MP_CLK_ENET_QOS is controlled by ccm_base + 0xa880
-> > IMX8MP_CLK_ENET_QOS_TIMER ... ccm_base + 0xa900
-> > IMX8MP_CLK_ENET_QOS_ROOT ... ccm_base + 0x43b0
-> > IMX8MP_CLK_QOS_ENET_ROOT ... ccm_base + 0x42e0
-> > 
-> > Referring to the iMX8MP documentation:
-> > IMX8MP_CLK_ENET_QOS is root clock slice 81, and is known as
-> > ENET_QOS_CLK_ROOT in the documentation.
-> > IMX8MP_CLK_ENET_QOS_TIMER is root clock slice 82, and is known as
-> > ENET_QOS_TIMER_CLK_ROOT in the documentation.
-> > IMX8MP_CLK_ENET_QOS_ROOT is CCM_CCGR59 and is known as ENET_QoS in the
-> > documentation.
-> > IMX8MP_CLK_QOS_ENET_ROOT is CCM_CCGR46 and is known as QoS_ENET in the
-> > documentation.
-> > 
-> > So, we end up with this mapping:
-> > 
-> > driver:			iMX8MP:
-> > stmmaceth		ENET_QoS
-> > pclk			QoS_ENET
-> > ptp_ref			ENET_QOS_TIMER_CLK_ROOT
-> > tx			ENET_QOS_CLK_ROOT
-> > 
-> > Now, looking at table 5-2, CCM_CCGR59 affects five clocks provided to
-> > the QOS:
-> > 
-> > enet_qos.aclk_i - derived from ENET_AXI_CLK_ROOT, this is the dwmac
-> > application clock for AXI buses.
-> > enet_qos.clk_csr_i - derived from ENET_AXI_CLK_ROOT, this is the dwmac
-> > CSR (for registers).
-> > enet_qos.clk_ptp_ref_i - derived from ENET_QOS_TIMER_CLK_ROOT, this
-> > clocks the PTP section of dwmac.
-> > enet_qos_mem.mem_clk and enet_qos_mem.clk_ptp_ref_i - I'm guessing
-> > are to do with the memory that's provided to dwmac.
-> > 
-> > For CCM_CCGR46, no useful information is given in the iMX8MP
-> > documentation in terms of what it corresponds to with the dwmac.
-> > 
-> > Looking at AN14149, this also doesn't give much information on the
-> > RGMII clock setup, and claims that RGMII requires a 125MHz clock.
-> > While true for 1G, it isn't true for slower speeds, so I'm not sure
-> > what's going on there.
-> > 
-> > For RMII, we get a bit more information, and figure 1 in this
-> > document suggests that the 50MHz RMII clock comes from slice 81, aka
-> > IMX8MP_CLK_ENET_QOS, and "tx" in DT. This uses the ENET_TD2 for the
-> > clock, which states ENET_QOS_INPUT=ENET_QOS_TX_CLK,
-> > OUTPUT=CCM_ENET_QOS_REF_CLK_ROOT.
-> > 
-> > This doesn't make sense - as I state, dwmac requires a 2.5MHz or 25MHz
-> > clock for clk_tx_i in RMII mode, but if ENET_TD2 is RMII refclk, it
-> > can't be fed back to clk_tx_i without going through a /2 or /20
-> > divider, controlled by signals output from the dwmac depending on the
-> > speed.
-> > 
-> > So... not sure what should be going on in the iMX glue driver for
-> > this clock, how it corresponds with clk_tx_i for the various
-> > interface modes.
-> > 
-> > However, I think calling the slice 81 clock "tx" in DT is very
-> > misleading.
-> > 
-> > Maybe someone can shed some light.
-> > 
-> 
-> maybe for some extra info, the device is the imx8mp-tx8p-ml81.dtsi som:
-> 
-> &eqos {
-> 	assigned-clocks = <&clk IMX8MP_CLK_ENET_AXI>,
-> 			  <&clk IMX8MP_CLK_ENET_QOS_TIMER>,
-> 			  <&clk IMX8MP_CLK_ENET_QOS>;
-> 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_266M>,
-> 				 <&clk IMX8MP_SYS_PLL2_100M>,
-> 				 <&clk IMX8MP_SYS_PLL2_50M>;
-> 	assigned-clock-rates = <266000000>, <100000000>, <50000000>;
+> On Tue, Nov 11, 2025 at 9:44 PM Magnus Karlsson
+> <magnus.karlsson@gmail.com> wrote:
+> >
+> > On Tue, 11 Nov 2025 at 14:06, Jason Xing <kerneljasonxing@gmail.com> wrote:
+> > >
+> > > Hi Maciej,
+> > >
+> > > On Mon, Nov 3, 2025 at 11:00 PM Maciej Fijalkowski
+> > > <maciej.fijalkowski@intel.com> wrote:
+> > > >
+> > > > On Sat, Nov 01, 2025 at 07:59:36AM +0800, Jason Xing wrote:
+> > > > > On Fri, Oct 31, 2025 at 10:02 PM Maciej Fijalkowski
+> > > > > <maciej.fijalkowski@intel.com> wrote:
+> > > > > >
+> > > > > > On Fri, Oct 31, 2025 at 05:32:30PM +0800, Jason Xing wrote:
+> > > > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > > > >
+> > > > > > > Before the commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+> > > > > > > production"), there is one issue[1] which causes the wrong publish
+> > > > > > > of descriptors in race condidtion. The above commit fixes the issue
+> > > > > > > but adds more memory operations in the xmit hot path and interrupt
+> > > > > > > context, which can cause side effect in performance.
+> > > > > > >
+> > > > > > > This patch tries to propose a new solution to fix the problem
+> > > > > > > without manipulating the allocation and deallocation of memory. One
+> > > > > > > of the key points is that I borrowed the idea from the above commit
+> > > > > > > that postpones updating the ring->descs in xsk_destruct_skb()
+> > > > > > > instead of in __xsk_generic_xmit().
+> > > > > > >
+> > > > > > > The core logics are as show below:
+> > > > > > > 1. allocate a new local queue. Only its cached_prod member is used.
+> > > > > > > 2. write the descriptors into the local queue in the xmit path. And
+> > > > > > >    record the cached_prod as @start_addr that reflects the
+> > > > > > >    start position of this queue so that later the skb can easily
+> > > > > > >    find where its addrs are written in the destruction phase.
+> > > > > > > 3. initialize the upper 24 bits of destructor_arg to store @start_addr
+> > > > > > >    in xsk_skb_init_misc().
+> > > > > > > 4. Initialize the lower 8 bits of destructor_arg to store how many
+> > > > > > >    descriptors the skb owns in xsk_update_num_desc().
+> > > > > > > 5. write the desc addr(s) from the @start_addr from the cached cq
+> > > > > > >    one by one into the real cq in xsk_destruct_skb(). In turn sync
+> > > > > > >    the global state of the cq.
+> > > > > > >
+> > > > > > > The format of destructor_arg is designed as:
+> > > > > > >  ------------------------ --------
+> > > > > > > |       start_addr       |  num   |
+> > > > > > >  ------------------------ --------
+> > > > > > > Using upper 24 bits is enough to keep the temporary descriptors. And
+> > > > > > > it's also enough to use lower 8 bits to show the number of descriptors
+> > > > > > > that one skb owns.
+> > > > > > >
+> > > > > > > [1]: https://lore.kernel.org/all/20250530095957.43248-1-e.kubanski@partner.samsung.com/
+> > > > > > >
+> > > > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > > > > ---
+> > > > > > > I posted the series as an RFC because I'd like to hear more opinions on
+> > > > > > > the current rought approach so that the fix[2] can be avoided and
+> > > > > > > mitigate the impact of performance. This patch might have bugs because
+> > > > > > > I decided to spend more time on it after we come to an agreement. Please
+> > > > > > > review the overall concepts. Thanks!
+> > > > > > >
+> > > > > > > Maciej, could you share with me the way you tested jumbo frame? I used
+> > > > > > > ./xdpsock -i enp2s0f1 -t -q 1 -S -s 9728 but the xdpsock utilizes the
+> > > > > > > nic more than 90%, which means I cannot see the performance impact.
+> > > > >
+> > > > > Could you provide the command you used? Thanks :)
+> > > > >
+> > > > > > >
+> > > > > > > [2]:https://lore.kernel.org/all/20251030140355.4059-1-fmancera@suse.de/
+> > > > > > > ---
+> > > > > > >  include/net/xdp_sock.h      |   1 +
+> > > > > > >  include/net/xsk_buff_pool.h |   1 +
+> > > > > > >  net/xdp/xsk.c               | 104 ++++++++++++++++++++++++++++--------
+> > > > > > >  net/xdp/xsk_buff_pool.c     |   1 +
+> > > > > > >  4 files changed, 84 insertions(+), 23 deletions(-)
+> > > > > >
+> > > > > > (...)
+> > > > > >
+> > > > > > > diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+> > > > > > > index aa9788f20d0d..6e170107dec7 100644
+> > > > > > > --- a/net/xdp/xsk_buff_pool.c
+> > > > > > > +++ b/net/xdp/xsk_buff_pool.c
+> > > > > > > @@ -99,6 +99,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
+> > > > > > >
+> > > > > > >       pool->fq = xs->fq_tmp;
+> > > > > > >       pool->cq = xs->cq_tmp;
+> > > > > > > +     pool->cached_cq = xs->cached_cq;
+> > > > > >
+> > > > > > Jason,
+> > > > > >
+> > > > > > pool can be shared between multiple sockets that bind to same <netdev,qid>
+> > > > > > tuple. I believe here you're opening up for the very same issue Eryk
+> > > > > > initially reported.
+> > > > >
+> > > > > Actually it shouldn't happen because the cached_cq is more of the
+> > > > > temporary array that helps the skb store its start position. The
+> > > > > cached_prod of cached_cq can only be increased, not decreased. In the
+> > > > > skb destruction phase, only those skbs that go to the end of life need
+> > > > > to sync its desc from cached_cq to cq. For some skbs that are released
+> > > > > before the tx completion, we don't need to clear its record in
+> > > > > cached_cq at all and cq remains untouched.
+> > > > >
+> > > > > To put it in a simple way, the patch you proposed uses kmem_cached*
+> > > > > helpers to store the addr and write the addr into cq at the end of
+> > > > > lifecycle while the current patch uses a pre-allocated memory to
+> > > > > store. So it avoids the allocation and deallocation.
+> > > > >
+> > > > > Unless I'm missing something important. If so, I'm still convinced
+> > > > > this temporary queue can solve the problem since essentially it's a
+> > > > > better substitute for kmem cache to retain high performance.
 
-This sets IMX8MP_CLK_ENET_QOS to use the 50MHz at the root mux. I
-understand that this provides the RMII 50MHz clock to the TD2 pin, but
-I still question whether this clock should be labelled in DT as "tx"
-when it _isn't_ clk_tx_i.
+Back after health issues!
 
-Also, the above looks over-engineered. Surely assigning the parents
-of these clocks as specified should result in their clock rates
-automatically being set, thus making the "assigned-clock-rates"
-redundant? Don't know, binding documentation for these properties
-do not appear to be part of the kernel tree.
+Jason, I am still not convinced about this solution.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+In shared pool setups, the temp cq will also be shared, which means that
+two parallel processes can produce addresses onto temp cq and therefore
+expose address to a socket that it does not belong to. In order to make
+this work you would have to know upfront the descriptor count of given
+frame and reserve this during processing the first descriptor.
+
+socket 0			socket 1
+prod addr 0xAA
+prod addr 0xBB
+				prod addr 0xDD
+prod addr 0xCC
+				prod addr 0xEE
+
+socket 0 calls skb destructor with num desc == 3, placing 0xDD onto cq
+which has not been sent yet, therefore potentially corrupting it.
+
+For now, I think we should move forward with Fernando's fix as there have
+been multiple reports already regarding broken state of xsk copy mode.
+
+> > > >
+> > > > I need a bit more time on this, probably I'll respond tomorrow.
+> > >
+> > > I'd like to know if you have any further comments on this? And should
+> > > I continue to post as an official series?
+> >
+> > Hi Jason,
+> >
+> > Maciej has been out-of-office for a couple of days. He should
+> > hopefully be back later this week, so please wait for his comments.
+> 
+> Thanks for letting me know. I will wait :)
+> 
+> Thanks,
+> Jason
 
