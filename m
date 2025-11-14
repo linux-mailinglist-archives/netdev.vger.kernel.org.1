@@ -1,178 +1,410 @@
-Return-Path: <netdev+bounces-238720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FAD6C5E742
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 18:09:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A23DC5E369
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 17:25:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EF5D036616A
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:17:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA0A73A9980
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3925242D87;
-	Fri, 14 Nov 2025 16:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 692172620DE;
+	Fri, 14 Nov 2025 16:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ZUpzm2zW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Orv+XU13"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E713B26E6EB
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 16:14:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10885258CDA;
+	Fri, 14 Nov 2025 16:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763136854; cv=none; b=NJTx2kiGFtNB6D1nmFNfvnS8DtBr43xYU+03rE2pL1U9UHzt05zgNP2FqrSPYZ22fSoJjCJTj1TnW4GRTNEtU9i0rUj7Az7uHWQgzYqFkHRjWO/8f9e+MoOAYpvXSfCSR2n2TGpY37QnIPS1wijaB4PR4MihUSCpfvz2zQhEcn8=
+	t=1763136919; cv=none; b=Jc6mzdfu9Q88Ic2c5anf5xsTidBOMmz+70AXFYSarp4nqJdVBUA1A44CVW28MafedSxQs/9oxeal6T5imKpmsLb239ykJIWd/YeAMOg2A7h3OYaV26w/66DBMoSr9yqyOY9VoqCdaQfgiq9rNK8W1oCLA7qrPZnWMXRdXN3UmHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763136854; c=relaxed/simple;
-	bh=5lKV4Y+j49e0b1pu/nvsfUUw8hChddDWW7l3NIKv478=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DOKCVg7ckA52LMhtjzpkawIDLAG6/Dyc6n8+9P6smfmsHwpuoN4uDVvnRuSeJyg6xdlfkNh+VMPnHDI0jFXSMYK5VbzmBmTI2YNlrvlJBjwL5z4yt83fLF5MmKjmSxwjpnqj8KPhvnq2vikHFZhyMEn1QeReWe8blndzdNyJ7a8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ZUpzm2zW; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-bc59a785697so1288142a12.0
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 08:14:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1763136852; x=1763741652; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZcmcsjG0Vmq1cJ/V9G5VQfTPwMeVB+rpRTIdjOpBVcg=;
-        b=ZUpzm2zWGxuZmgpOuFml0BS/tFyRUXQu9jq8Qn1JbWKz+++At518cbxweqB978Irun
-         iSFCeRjXuyK3vDU5VE9MIR41hrSWGGFQWOFcHd+pzJcaoJnu+4zsOALgyl5ywjW6Fscc
-         evExM2IVEkWPtcSZt3y5bzF8GZ1JFky7BQ+TmIn3Rd5LQtkbkja87X98FhG0bNVXnDv6
-         fHXqF6eHuAsCtBWQZiGY0YXCcAoteK58knJXQJ6/nVRcReKkccIH1jl9ur+AjN8sH0e5
-         8CpIxRq5rxvc0JGJaB7gOUK/VazouyfYqQ+EgI9Xd8s0uSb25tgeLM5c3xbrQ3Y/4DUB
-         H86A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763136852; x=1763741652;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZcmcsjG0Vmq1cJ/V9G5VQfTPwMeVB+rpRTIdjOpBVcg=;
-        b=AJ17gBtPDmnBM1hCyWQrB5/2B8pjR4a1Vh/dpJv8QtKdyjwtIL8dNbAfv51zQvxjW6
-         S4smYG5dbTA4Gq0pIDXr2DKKBLgmsXO9A4PeRPYe/T6p8uoZwHKua2AHPnynGMbF9GbP
-         9oWYQwSogjdRtGMKZnVlM1RcUdkC8jQPnWGs+tH7dm1YQaWS9imOYaRa81tDlgDPMVBO
-         Izbnj8SeElA+lOzFiH0Ytc4SGPpiyRkyPHJxGxbyaTPbGSQDMcCWsLg8RSRZKZ3PwUxs
-         VsZIw18b/tv+Txn21PUlglWzHu156ePMXJWfOT01mPcPujv87VoV5l6RUMkY7/m68FJA
-         O1Pg==
-X-Gm-Message-State: AOJu0YxApnLL/QrliNDIZS+fmnN0gw6yiShsGr8/mQsUE+q7zHB+GMZC
-	gzCCsq3QgMR5x4JPMiuH1hRAuDUk4zzXOLQbJCy4jU6PJBDM0PH0GRyH9b11y3Dc6fE=
-X-Gm-Gg: ASbGncvOSwhvAxBha8nlcZ4j0JvZtUcr/eycloGJ4djR8+2HarJK2Sv2ZQC56ZaKt1q
-	9Gautc6aeKim6tAUyrEwtchCClIayt1ugK8aRgP4+oI1PE1EqJC6QV8RELbGKVkrZkD83t1MZnT
-	SENJjEOsuwLuPzzxQSGmwz/6iStrtfqi+hQ3CrmnDnYkcq3YH7nbs+4p8RVhJMl0IwiTkjOdIhA
-	jmRzaCzLeKHD86ARww0X13r9ElslEqf3Qk1PnZD5aQgGvDoG45HyhJ5JpnVzj5mD/asBmTheWt2
-	5u/VlahMSCgiILaaKNfQZEsWXVPEL9GiaujTUiEHWffoSigMt/v4NB+a1n+Na5YzOyeBcu1kRV2
-	Vtm2z/zXA8hbnxMVh9wbI0h2EBMhQuHMsGxztHwqP1zK1wo20CDLAfX/k1aeY0U6yy3qeQ5ljGo
-	apWBHsD7HfmjRG/VcFaAVmAVMkLbWoYrz8zhHurwrZgksW
-X-Google-Smtp-Source: AGHT+IE8bdCIyH7sjzOZVreKmA3z+GwUQgVKIUwM/vo+syd1ifMZ6Rl67PXqnl2WbSH0EAAHyjnrXA==
-X-Received: by 2002:a05:693c:250a:b0:2a4:4e38:9a39 with SMTP id 5a478bee46e88-2a4abd7b970mr1015465eec.34.1763136852066;
-        Fri, 14 Nov 2025 08:14:12 -0800 (PST)
-Received: from phoenix (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a49d9ead79sm16735767eec.1.2025.11.14.08.14.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 08:14:11 -0800 (PST)
-Date: Fri, 14 Nov 2025 08:14:09 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Petr Oros <poros@redhat.com>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, ivecera@redhat.com,
- jiri@resnulli.us, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH iproute2-next v3 3/3] dpll: Add dpll command
-Message-ID: <20251114081409.302dd29c@phoenix>
-In-Reply-To: <20251114120555.2430520-4-poros@redhat.com>
-References: <20251114120555.2430520-1-poros@redhat.com>
-	<20251114120555.2430520-4-poros@redhat.com>
+	s=arc-20240116; t=1763136919; c=relaxed/simple;
+	bh=e5aUWmKoJ/GDDVDKCdlQagVxdoKcDmzMr4HHGHsJUcM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YHUJubgs3oq19AgI5VsSuFZPJHHy2H3MY0Aw6gmla/2b1L8C6T0dHSB2fkChtv5UK23gG/X77s8We7uCcMKWGBEyKFruXEv/bwfSUNlaUpKXPxmK7WzCKDlK/MPYL07yp5JogJI+tv7OO/nd476lRsslaPKzsaqTAtXiv/acfxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Orv+XU13; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763136918; x=1794672918;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=e5aUWmKoJ/GDDVDKCdlQagVxdoKcDmzMr4HHGHsJUcM=;
+  b=Orv+XU138jKsAVEf5+FJvQ42cdCboqlMen5/6F+swo2mMQdghHwUvlCD
+   pZ948iAHDDonGPK/6c/79RrfNTLBg6BLj8tXAFzWjoxWQH+bCPOFyLSBQ
+   AvgwiWcMiL99Lg+bTSXdL2p+jADvseVlCi7PZIWlmYuOWcOHhFhzIKRax
+   LDYx1OIhUQK2YEqmni0rw4o8fJrs8ciKv5AD/Aeace2j25InJlPSC1MWI
+   RlLPCdq9l1l4qr9CJgqvAR42WsmI3c6EjmGTCjA+t/KLTO5IkeA7lXzcR
+   cO2YEJfYrmXRI63kuEU5X+7L8Bj4CLc3o7rt0j0YVqgtKce+KlnBEKLRI
+   A==;
+X-CSE-ConnectionGUID: jzGIvZRRQPSwMFv+yBEeig==
+X-CSE-MsgGUID: qA9Np/NDRry7wIpb8h96pQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11613"; a="75555408"
+X-IronPort-AV: E=Sophos;i="6.19,305,1754982000"; 
+   d="scan'208";a="75555408"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 08:15:17 -0800
+X-CSE-ConnectionGUID: 1z7yMVmwSSiJDqX1d+XrQg==
+X-CSE-MsgGUID: mIl5FuzOQM6X+/PQUczpQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,305,1754982000"; 
+   d="scan'208";a="189651184"
+Received: from vverma7-desk1.amr.corp.intel.com (HELO [10.125.108.188]) ([10.125.108.188])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 08:15:15 -0800
+Message-ID: <712b09ac-53e0-4674-a3e2-d126f27c524f@intel.com>
+Date: Fri, 14 Nov 2025 09:15:14 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v20 06/22] cxl: Move pci generic code
+To: Alison Schofield <alison.schofield@intel.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ Alejandro Lucero <alucerop@amd.com>, Ben Cheatham
+ <benjamin.cheatham@amd.com>, Fan Ni <fan.ni@samsung.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>
+References: <20251110153657.2706192-1-alejandro.lucero-palau@amd.com>
+ <20251110153657.2706192-7-alejandro.lucero-palau@amd.com>
+ <aRZ25zHGGDyhqUlS@aschofie-mobl2.lan>
+From: Dave Jiang <dave.jiang@intel.com>
+Content-Language: en-US
+In-Reply-To: <aRZ25zHGGDyhqUlS@aschofie-mobl2.lan>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Fri, 14 Nov 2025 13:05:55 +0100
-Petr Oros <poros@redhat.com> wrote:
 
-> +#define DPLL_PR_SINT_FMT(tb, attr_id, name, format_str)                        \
-> +	do {                                                                   \
-> +		if (tb[attr_id])                                               \
-> +			print_s64(PRINT_ANY, name, format_str,                 \
-> +				  mnl_attr_get_sint(tb[attr_id]));             \
-> +	} while (0)
-> +
-> +#define DPLL_PR_SINT(tb, attr_id, name)                                        \
-> +	DPLL_PR_SINT_FMT(tb, attr_id, name, "  " name ": %" PRId64 "\n")
-> +
-> +#define DPLL_PR_STR(tb, attr_id, name)                                         \
-> +	DPLL_PR_STR_FMT(tb, attr_id, name, "  " name ": %s\n")
-> +
-> +/* Temperature macro - JSON prints raw millidegrees, human prints formatted */
-> +#define DPLL_PR_TEMP(tb, attr_id)                                              \
-> +	do {                                                                   \
-> +		if (tb[attr_id]) {                                             \
-> +			__s32 temp = mnl_attr_get_u32(tb[attr_id]);            \
-> +			if (is_json_context()) {                               \
-> +				print_int(PRINT_JSON, "temp", NULL, temp);     \
-> +			} else {                                               \
-> +				div_t d = div(temp, 1000);                     \
-> +				pr_out("  temp: %d.%03d C\n", d.quot, d.rem);  \
-> +			}                                                      \
-> +		}                                                              \
-> +	} while (0)
-> +
-> +/* Generic version with custom format */
-> +#define DPLL_PR_ENUM_STR_FMT(tb, attr_id, name, format_str, name_func)         \
-> +	do {                                                                   \
-> +		if (tb[attr_id])                                               \
-> +			print_string(                                          \
-> +				PRINT_ANY, name, format_str,                   \
-> +				name_func(mnl_attr_get_u32(tb[attr_id])));     \
-> +	} while (0)
-> +
-> +/* Simple version with auto-generated format */
-> +#define DPLL_PR_ENUM_STR(tb, attr_id, name, name_func)                         \
-> +	DPLL_PR_ENUM_STR_FMT(tb, attr_id, name, "  " name ": %s\n", name_func)
-> +
-> +/* Multi-attr enum printer - handles multiple occurrences of same attribute */
-> +#define DPLL_PR_MULTI_ENUM_STR(nlh, attr_id, name, name_func)                  \
-> +	do {                                                                   \
-> +		struct nlattr *__attr;                                         \
-> +		bool __first = true;                                           \
-> +                                                                               \
-> +		if (!nlh)                                                      \
-> +			break;                                                 \
-> +                                                                               \
-> +		mnl_attr_for_each(__attr, nlh, sizeof(struct genlmsghdr))      \
-> +		{                                                              \
-> +			if (mnl_attr_get_type(__attr) == (attr_id)) {          \
-> +				__u32 __val = mnl_attr_get_u32(__attr);        \
-> +				if (__first) {                                 \
-> +					if (is_json_context()) {               \
-> +						open_json_array(PRINT_JSON,    \
-> +								name);         \
-> +					} else {                               \
-> +						pr_out("  " name ":");         \
-> +					}                                      \
-> +					__first = false;                       \
-> +				}                                              \
-> +				print_string(PRINT_ANY, NULL, " %s",           \
-> +					     name_func(__val));                \
-> +			}                                                      \
-> +		}                                                              \
-> +		if (__first)                                                   \
-> +			break;                                                 \
-> +		if (is_json_context()) {                                       \
-> +			close_json_array(PRINT_JSON, NULL);                    \
-> +		} else {                                                       \
-> +			pr_out("\n");                                          \
-> +		}                                                              \
-> +	} while (0)
-> +
 
-Please don't write large macros. Why are these not functions.
-Don't use pr_out, instead use print_nl() which allows for handling one line mode.
+On 11/13/25 5:25 PM, Alison Schofield wrote:
+> On Mon, Nov 10, 2025 at 03:36:41PM +0000, alejandro.lucero-palau@amd.com wrote:
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> Inside cxl/core/pci.c there are helpers for CXL PCIe initialization
+>> meanwhile cxl/pci.c implements the functionality for a Type3 device
+>> initialization.
+> 
+> Hi Alejandro,
+> 
+> I'v been looking at Terry's set and the cxl-test build circular
+> dependencies. I think this patch may be 'stale', at least in
+> the comments, maybe in the wrapped function it removes.
+> 
+>>
+>> Move helper functions from cxl/pci.c to cxl/core/pci.c in order to be
+>> exported and shared with CXL Type2 device initialization.
+> 
+> Terry moves the whole file cxl/pci.c to cxl/core/pci_drv.c.
+> That is reflected in what you actually do below, but not in this
+> comment.
+> 
+>>
+>> Fix cxl mock tests affected by the code move, deleting a function which
+>> indeed was not being used since commit 733b57f262b0("cxl/pci: Early
+>> setup RCH dport component registers from RCRB").
+> 
+> This I'm having trouble figuring out. I see __wrap_cxl_rcd_component_reg_phys()
+> deleted below. Why is that OK? The func it wraps is still in use below, ie it's
+> one you move from core/pci_drv.c to core/pci.c.
+> 
+> For my benefit, what is the intended difference between what will be
+> in core/pci.c and core/pci_drv.c ?
 
-As much as possible do not split json code (is_json_context)
+I can answer this part since I asked Terry to do this. core/pci_drv.c contains everything that was in drivers/cxl/pci.c originally. It got moved in order to be able to access 'cxl_pci_drv' for the RAS component to check if the expected PCI driver is bound before handling the CXL RAS. And core/pci.c contains the core PCI lib calls and nothing changed there.
+
+DJ
+ > 
+> --Alison
+> 
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+>> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
+>> Reviewed-by: Fan Ni <fan.ni@samsung.com>
+>> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+>> Reviewed-by: Alison Schofield <alison.schofield@intel.com>
+>> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+>> ---
+>>  drivers/cxl/core/core.h       |  3 ++
+>>  drivers/cxl/core/pci.c        | 62 +++++++++++++++++++++++++++++++
+>>  drivers/cxl/core/pci_drv.c    | 70 -----------------------------------
+>>  drivers/cxl/core/regs.c       |  1 -
+>>  drivers/cxl/cxl.h             |  2 -
+>>  drivers/cxl/cxlpci.h          | 13 +++++++
+>>  tools/testing/cxl/Kbuild      |  1 -
+>>  tools/testing/cxl/test/mock.c | 17 ---------
+>>  8 files changed, 78 insertions(+), 91 deletions(-)
+>>
+>> diff --git a/drivers/cxl/core/core.h b/drivers/cxl/core/core.h
+>> index a7a0838c8f23..2b2d3af0b5ec 100644
+>> --- a/drivers/cxl/core/core.h
+>> +++ b/drivers/cxl/core/core.h
+>> @@ -232,4 +232,7 @@ static inline bool cxl_pci_drv_bound(struct pci_dev *pdev) { return false; };
+>>  static inline int cxl_pci_driver_init(void) { return 0; }
+>>  static inline void cxl_pci_driver_exit(void) { }
+>>  #endif
+>> +
+>> +resource_size_t cxl_rcd_component_reg_phys(struct device *dev,
+>> +					   struct cxl_dport *dport);
+>>  #endif /* __CXL_CORE_H__ */
+>> diff --git a/drivers/cxl/core/pci.c b/drivers/cxl/core/pci.c
+>> index a66f7a84b5c8..566d57ba0579 100644
+>> --- a/drivers/cxl/core/pci.c
+>> +++ b/drivers/cxl/core/pci.c
+>> @@ -775,6 +775,68 @@ bool cxl_endpoint_decoder_reset_detected(struct cxl_port *port)
+>>  }
+>>  EXPORT_SYMBOL_NS_GPL(cxl_endpoint_decoder_reset_detected, "CXL");
+>>  
+>> +static int cxl_rcrb_get_comp_regs(struct pci_dev *pdev,
+>> +				  struct cxl_register_map *map,
+>> +				  struct cxl_dport *dport)
+>> +{
+>> +	resource_size_t component_reg_phys;
+>> +
+>> +	*map = (struct cxl_register_map) {
+>> +		.host = &pdev->dev,
+>> +		.resource = CXL_RESOURCE_NONE,
+>> +	};
+>> +
+>> +	struct cxl_port *port __free(put_cxl_port) =
+>> +		cxl_pci_find_port(pdev, &dport);
+>> +	if (!port)
+>> +		return -EPROBE_DEFER;
+>> +
+>> +	component_reg_phys = cxl_rcd_component_reg_phys(&pdev->dev, dport);
+>> +	if (component_reg_phys == CXL_RESOURCE_NONE)
+>> +		return -ENXIO;
+>> +
+>> +	map->resource = component_reg_phys;
+>> +	map->reg_type = CXL_REGLOC_RBI_COMPONENT;
+>> +	map->max_size = CXL_COMPONENT_REG_BLOCK_SIZE;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +int cxl_pci_setup_regs(struct pci_dev *pdev, enum cxl_regloc_type type,
+>> +			      struct cxl_register_map *map)
+>> +{
+>> +	int rc;
+>> +
+>> +	rc = cxl_find_regblock(pdev, type, map);
+>> +
+>> +	/*
+>> +	 * If the Register Locator DVSEC does not exist, check if it
+>> +	 * is an RCH and try to extract the Component Registers from
+>> +	 * an RCRB.
+>> +	 */
+>> +	if (rc && type == CXL_REGLOC_RBI_COMPONENT && is_cxl_restricted(pdev)) {
+>> +		struct cxl_dport *dport;
+>> +		struct cxl_port *port __free(put_cxl_port) =
+>> +			cxl_pci_find_port(pdev, &dport);
+>> +		if (!port)
+>> +			return -EPROBE_DEFER;
+>> +
+>> +		rc = cxl_rcrb_get_comp_regs(pdev, map, dport);
+>> +		if (rc)
+>> +			return rc;
+>> +
+>> +		rc = cxl_dport_map_rcd_linkcap(pdev, dport);
+>> +		if (rc)
+>> +			return rc;
+>> +
+>> +	} else if (rc) {
+>> +		return rc;
+>> +	}
+>> +
+>> +	return cxl_setup_regs(map);
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(cxl_pci_setup_regs, "CXL");
+>> +
+>>  int cxl_pci_get_bandwidth(struct pci_dev *pdev, struct access_coordinate *c)
+>>  {
+>>  	int speed, bw;
+>> diff --git a/drivers/cxl/core/pci_drv.c b/drivers/cxl/core/pci_drv.c
+>> index 18ed819d847d..a35e746e6303 100644
+>> --- a/drivers/cxl/core/pci_drv.c
+>> +++ b/drivers/cxl/core/pci_drv.c
+>> @@ -467,76 +467,6 @@ static int cxl_pci_setup_mailbox(struct cxl_memdev_state *mds, bool irq_avail)
+>>  	return 0;
+>>  }
+>>  
+>> -/*
+>> - * Assume that any RCIEP that emits the CXL memory expander class code
+>> - * is an RCD
+>> - */
+>> -static bool is_cxl_restricted(struct pci_dev *pdev)
+>> -{
+>> -	return pci_pcie_type(pdev) == PCI_EXP_TYPE_RC_END;
+>> -}
+>> -
+>> -static int cxl_rcrb_get_comp_regs(struct pci_dev *pdev,
+>> -				  struct cxl_register_map *map,
+>> -				  struct cxl_dport *dport)
+>> -{
+>> -	resource_size_t component_reg_phys;
+>> -
+>> -	*map = (struct cxl_register_map) {
+>> -		.host = &pdev->dev,
+>> -		.resource = CXL_RESOURCE_NONE,
+>> -	};
+>> -
+>> -	struct cxl_port *port __free(put_cxl_port) =
+>> -		cxl_pci_find_port(pdev, &dport);
+>> -	if (!port)
+>> -		return -EPROBE_DEFER;
+>> -
+>> -	component_reg_phys = cxl_rcd_component_reg_phys(&pdev->dev, dport);
+>> -	if (component_reg_phys == CXL_RESOURCE_NONE)
+>> -		return -ENXIO;
+>> -
+>> -	map->resource = component_reg_phys;
+>> -	map->reg_type = CXL_REGLOC_RBI_COMPONENT;
+>> -	map->max_size = CXL_COMPONENT_REG_BLOCK_SIZE;
+>> -
+>> -	return 0;
+>> -}
+>> -
+>> -static int cxl_pci_setup_regs(struct pci_dev *pdev, enum cxl_regloc_type type,
+>> -			      struct cxl_register_map *map)
+>> -{
+>> -	int rc;
+>> -
+>> -	rc = cxl_find_regblock(pdev, type, map);
+>> -
+>> -	/*
+>> -	 * If the Register Locator DVSEC does not exist, check if it
+>> -	 * is an RCH and try to extract the Component Registers from
+>> -	 * an RCRB.
+>> -	 */
+>> -	if (rc && type == CXL_REGLOC_RBI_COMPONENT && is_cxl_restricted(pdev)) {
+>> -		struct cxl_dport *dport;
+>> -		struct cxl_port *port __free(put_cxl_port) =
+>> -			cxl_pci_find_port(pdev, &dport);
+>> -		if (!port)
+>> -			return -EPROBE_DEFER;
+>> -
+>> -		rc = cxl_rcrb_get_comp_regs(pdev, map, dport);
+>> -		if (rc)
+>> -			return rc;
+>> -
+>> -		rc = cxl_dport_map_rcd_linkcap(pdev, dport);
+>> -		if (rc)
+>> -			return rc;
+>> -
+>> -	} else if (rc) {
+>> -		return rc;
+>> -	}
+>> -
+>> -	return cxl_setup_regs(map);
+>> -}
+>> -
+>>  static int cxl_pci_ras_unmask(struct pci_dev *pdev)
+>>  {
+>>  	struct cxl_dev_state *cxlds = pci_get_drvdata(pdev);
+>> diff --git a/drivers/cxl/core/regs.c b/drivers/cxl/core/regs.c
+>> index fb70ffbba72d..fc7fbd4f39d2 100644
+>> --- a/drivers/cxl/core/regs.c
+>> +++ b/drivers/cxl/core/regs.c
+>> @@ -641,4 +641,3 @@ resource_size_t cxl_rcd_component_reg_phys(struct device *dev,
+>>  		return CXL_RESOURCE_NONE;
+>>  	return __rcrb_to_component(dev, &dport->rcrb, CXL_RCRB_UPSTREAM);
+>>  }
+>> -EXPORT_SYMBOL_NS_GPL(cxl_rcd_component_reg_phys, "CXL");
+>> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
+>> index 1517250b0ec2..536c9d99e0e6 100644
+>> --- a/drivers/cxl/cxl.h
+>> +++ b/drivers/cxl/cxl.h
+>> @@ -222,8 +222,6 @@ int cxl_find_regblock(struct pci_dev *pdev, enum cxl_regloc_type type,
+>>  		      struct cxl_register_map *map);
+>>  int cxl_setup_regs(struct cxl_register_map *map);
+>>  struct cxl_dport;
+>> -resource_size_t cxl_rcd_component_reg_phys(struct device *dev,
+>> -					   struct cxl_dport *dport);
+>>  int cxl_dport_map_rcd_linkcap(struct pci_dev *pdev, struct cxl_dport *dport);
+>>  
+>>  #define CXL_RESOURCE_NONE ((resource_size_t) -1)
+>> diff --git a/drivers/cxl/cxlpci.h b/drivers/cxl/cxlpci.h
+>> index 3526e6d75f79..24aba9ff6d2e 100644
+>> --- a/drivers/cxl/cxlpci.h
+>> +++ b/drivers/cxl/cxlpci.h
+>> @@ -74,6 +74,17 @@ static inline bool cxl_pci_flit_256(struct pci_dev *pdev)
+>>  	return lnksta2 & PCI_EXP_LNKSTA2_FLIT;
+>>  }
+>>  
+>> +/*
+>> + * Assume that the caller has already validated that @pdev has CXL
+>> + * capabilities, any RCiEP with CXL capabilities is treated as a
+>> + * Restricted CXL Device (RCD) and finds upstream port and endpoint
+>> + * registers in a Root Complex Register Block (RCRB).
+>> + */
+>> +static inline bool is_cxl_restricted(struct pci_dev *pdev)
+>> +{
+>> +	return pci_pcie_type(pdev) == PCI_EXP_TYPE_RC_END;
+>> +}
+>> +
+>>  int devm_cxl_port_enumerate_dports(struct cxl_port *port);
+>>  struct cxl_dev_state;
+>>  void read_cdat_data(struct cxl_port *port);
+>> @@ -89,4 +100,6 @@ static inline void cxl_uport_init_ras_reporting(struct cxl_port *port,
+>>  						struct device *host) { }
+>>  #endif
+>>  
+>> +int cxl_pci_setup_regs(struct pci_dev *pdev, enum cxl_regloc_type type,
+>> +		       struct cxl_register_map *map);
+>>  #endif /* __CXL_PCI_H__ */
+>> diff --git a/tools/testing/cxl/Kbuild b/tools/testing/cxl/Kbuild
+>> index d8b8272ef87b..d422c81cefa3 100644
+>> --- a/tools/testing/cxl/Kbuild
+>> +++ b/tools/testing/cxl/Kbuild
+>> @@ -7,7 +7,6 @@ ldflags-y += --wrap=nvdimm_bus_register
+>>  ldflags-y += --wrap=devm_cxl_port_enumerate_dports
+>>  ldflags-y += --wrap=cxl_await_media_ready
+>>  ldflags-y += --wrap=devm_cxl_add_rch_dport
+>> -ldflags-y += --wrap=cxl_rcd_component_reg_phys
+>>  ldflags-y += --wrap=cxl_endpoint_parse_cdat
+>>  ldflags-y += --wrap=cxl_dport_init_ras_reporting
+>>  ldflags-y += --wrap=devm_cxl_endpoint_decoders_setup
+>> diff --git a/tools/testing/cxl/test/mock.c b/tools/testing/cxl/test/mock.c
+>> index 995269a75cbd..92fd5c69bef3 100644
+>> --- a/tools/testing/cxl/test/mock.c
+>> +++ b/tools/testing/cxl/test/mock.c
+>> @@ -226,23 +226,6 @@ struct cxl_dport *__wrap_devm_cxl_add_rch_dport(struct cxl_port *port,
+>>  }
+>>  EXPORT_SYMBOL_NS_GPL(__wrap_devm_cxl_add_rch_dport, "CXL");
+>>  
+>> -resource_size_t __wrap_cxl_rcd_component_reg_phys(struct device *dev,
+>> -						  struct cxl_dport *dport)
+>> -{
+>> -	int index;
+>> -	resource_size_t component_reg_phys;
+>> -	struct cxl_mock_ops *ops = get_cxl_mock_ops(&index);
+>> -
+>> -	if (ops && ops->is_mock_port(dev))
+>> -		component_reg_phys = CXL_RESOURCE_NONE;
+>> -	else
+>> -		component_reg_phys = cxl_rcd_component_reg_phys(dev, dport);
+>> -	put_cxl_mock_ops(index);
+>> -
+>> -	return component_reg_phys;
+>> -}
+>> -EXPORT_SYMBOL_NS_GPL(__wrap_cxl_rcd_component_reg_phys, "CXL");
+>> -
+>>  void __wrap_cxl_endpoint_parse_cdat(struct cxl_port *port)
+>>  {
+>>  	int index;
+>> -- 
+>> 2.34.1
+>>
+
 
