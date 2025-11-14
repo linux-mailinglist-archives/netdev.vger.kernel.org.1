@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-238762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7B5EC5F1D5
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 20:55:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD2E0C5F241
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 20:57:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 80C6E35620B
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 19:55:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B4B9423525
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 19:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57935348896;
-	Fri, 14 Nov 2025 19:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B277534A771;
+	Fri, 14 Nov 2025 19:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JXW5Ojpr"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Zbdqjrh5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f226.google.com (mail-il1-f226.google.com [209.85.166.226])
+Received: from mail-pl1-f228.google.com (mail-pl1-f228.google.com [209.85.214.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72768348867
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 19:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698302D1303
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 19:54:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763150073; cv=none; b=ZDoXEfIccuWVy0vE0tYzV+e5mOKAl0q0OmmS0ODQv5WIr1wDXE/qr63QmE0IT0Jhl+dn5sU/ZskRdY9LWpS3s0oVvU5hn4T/6AXmlLgei6EsRlQH5yHL4RWi/d8sPTwPhV5rqHOwI2ndt4cq3hyhG0Wxgj1pt6qrHebSaAo+0Io=
+	t=1763150078; cv=none; b=joXlngWw80N6ruDBNxxPS0I8Ai1KfR6orel1O8Ql7zf4Bwiu6IoE3sKC/7xFeIvU+5KEloIAGh+e9FHIuxjXRMqFnnPo/FGw+4qSoX1j/H6j4wyUexIfbJ+ce8/IGCmnb3dz1gJTq91vs3IBkTDw+P1AW11c/645rnBgb1Qimxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763150073; c=relaxed/simple;
-	bh=K2FSoGuvlJSKB87wcSn5V1wNVoLcL+oSCeK8Sjg4rys=;
+	s=arc-20240116; t=1763150078; c=relaxed/simple;
+	bh=nkveM0LXIBBiQMT8+bzEYpFWZQy1fjVuDO22kZQXLAs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nu7TbWEsd3Rai4OAa7I/vQB72YAP/NJzilbFVYNuEy0p0c3AQId3NF2cZGTkhA9FfaWE0vaV9uuKAuzYivhjEwhTZvTo4PshwawhQexTgJOEIajgMUQuk93r3S3Muvs6M1Zligzy1XIdTK2FLxBZcKpm12UoQg9HMVMdquuayVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JXW5Ojpr; arc=none smtp.client-ip=209.85.166.226
+	 MIME-Version; b=M7AGjTnKl0Sfj/EQnOdoLzKq3vOBuixmBn+3GdKxSaUwE/bJBc8hblYeN1SUqKOJXQasu5QIUltLdmBIF6IZeHDGVwPy5odr9JRHs8Iaa+ZpLiOIZ+gOcjJlgK08Dyl4CXRTvxXuLw+h6flFj8JtNAJpaHIAxCSOF1bQVfeVGGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Zbdqjrh5; arc=none smtp.client-ip=209.85.214.228
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-il1-f226.google.com with SMTP id e9e14a558f8ab-4331d3eea61so17495015ab.2
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 11:54:30 -0800 (PST)
+Received: by mail-pl1-f228.google.com with SMTP id d9443c01a7336-295548467c7so27353405ad.2
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 11:54:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763150069; x=1763754869;
+        d=1e100.net; s=20230601; t=1763150075; x=1763754875;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/rONH+mHxU+7n/URgcC6mVyOgTaF1ltIKNlpmdHCPnY=;
-        b=LhL/oAMij8sLENXmm74WWu68a5UY3NFncxW9sOFuFKPUdHMiDGDSBMfyaIbHq52JKg
-         ZxDyU0e9a2ASOvvNDpTNw2v3graoX8kBLzIPtNX/sz8iavlmi2l3L4EHkEjN7Hjg47sm
-         vdBxvtSV4KLqsqA1fMz6siyN/R9ugGbVzD+JTNrxHQpBWj+dQEVVw96bcOrpVYAVkdnO
-         jBUuH9tISCmsDj7tM+U1u6lSFtwkMpSWbhxsesajtZA+IReE3JIkKnj1RNTLAf9f7DWh
-         G+GBNDMw548/KhY0pYLbT7NoUEaACioVPt8oRP+09WmyFTImeZ0lxupQJo/i+RxGRuS2
-         5Vkw==
-X-Gm-Message-State: AOJu0YzxOuDxqUNNPe90m960qUKMY17/48PweTmIhFx7vOPowBw7OJ/e
-	UI21WNyzTCuess8PYpR8583Q+7v7Sonl2f07aV/a9xCcLEzcWAxL1mH5z3hoGCN1p3RRGF7344k
-	SiWczryKUdQxGnFasH4j78xEMlajAzqSMTXSqKV8dp8gsVB2FGX57KwCqqdgowvvomnEZa4nzT0
-	4TcumNxq3zjSNqrA70GlX84phnuS2ztj6M1IvjUAUjU2LfkRaWn+w2wmkuPjNjyJ4KYSLCAfIAw
-	R9gg9/e7JeSmpi4cg==
-X-Gm-Gg: ASbGncsGXjqWGYLNxxh6LHHLllBqOhqfycqT97a9XHQihL1ExhOLi95r9U/ZQnVef9b
-	SSjob38Ct+qc3eOAStefha7KtMn96UFZYtuikcuMItmvZSqdIxfkkhM/MBfbfQvTU/hpG8tD9CZ
-	mvc2JiPuzTy44Ow0tE+YTBjy1HUCoL5LDd2Lojh5GLgc/BTXNuiHiKvjz1okqQ2bJC07K4e7/mj
-	xajzr5z7TSkTyl3+5UZGFnslDFaQCXvbFQiqyKrxXgrswPv1TfGnvgA9iLXPvwbrgY0X7+b9Bv5
-	Q6JDGQwHxpo9Dnbq9pBFaqr3BDkeh9HlV+BGEeLRzoF/hr1w1C3PPHJwe5hvlG9Ij42lRIgjEHD
-	lelv+bMUWW3w43AF/iedNGX8VGWaZwobqlCULIHT9FFnLFHgKco7qIb3UHADF4BnN1v/UyHaraw
-	zP4ffJ1M7PApNLeo+TSfwj5IuIbXhPoM3F4zlrYjoO5gQ=
-X-Google-Smtp-Source: AGHT+IFlkauKsMK5d0QQyMH3sblTmPityN0MxkNp6SDQ9ev/ILg4H3aQ+JHxAIj5H9c6J7QgvOn3YhgBKw7Q
-X-Received: by 2002:a05:6e02:3b86:b0:432:fbe2:35ef with SMTP id e9e14a558f8ab-4348c95496amr72258615ab.30.1763150069603;
-        Fri, 14 Nov 2025 11:54:29 -0800 (PST)
+        bh=vQVO73+HBWs9eFaMKwMyj6D7GGGPJfUrZhWAHWZgwOk=;
+        b=YH3rbSvi0pDvmXIZzvnaMSa2IK9MGQNZ15X3PCWxc2JPFmlSpQtX2rMwpgVt6PH/NE
+         ptyiBJP/tR3KwQSew78uKBtNZvqKfowrCZmuXyBJhO+cx19ou0uFJmIP9wid9rl6XOZa
+         tXcSJ7vGClx/KA+liMHFAZqeHfWCAamdVSPi3tunvnSRE3tB2TJcvFYqZF++p7JV/IDB
+         AdhgqamXTnV3dE4eolNFZRWcOWu6n1otIPyVstCFpxnU6cZ+ROKeiSwPm90m/pZgWLFJ
+         /Lt6Ohx1FlarMNBZ7qw9SutjimgxiqDegMf5tDXwbVBf8AjcFpZpMTWQSu2mSSErOeOh
+         Nw8g==
+X-Gm-Message-State: AOJu0Yz+nDlHQHeiKrfXLhsBAnx3Fji+4NP3vGTQFqjcAU1FTgBBYV/r
+	4R81siQJoRKdTcBlxzMoKNuIRmBHjpGI6SBhY8Oj4RdU4i69e7EEVkAWSRnNgoLiS0ZCFtF1x4E
+	tKYNoiv/2Jj1KXlz1U5FUMMiHljroG2uREeIn5PSxWb5fh4ZXGMNzNqojaruB4/WAvqF6gKRszM
+	qrTp81p7iOnffeULCQDm4RNbQuS0+b3oOHiK1lteZxEb1M80i/PLMBy9RkCowZReOaAs7Q9IoJf
+	aLV0ESiS2+jIdeEYQ==
+X-Gm-Gg: ASbGncvdwunwwD60Ql6OgVmtVpyC/khGUw+yVKfFKnnowUkNucCFmAfFuFJ/2V3umRz
+	0uHvyqjT+T8JF9IqOqM1V+eIHosMQ+k0/XmkSvwiPHYBdw9efT5hDGruysxyl2VHClEeRTjY+hv
+	nKn2H9SzTUn6q2nVVeo3oXutwHSkqH8N6A7ko9zmBeOrLhT9eVXYn4/V10A2LljM1PZ04b+wzKy
+	i5iyEAOHUq591azHuquKo2oED5iJHwTVW8173r0s/BOxEs347tdzkasnh4wq0vT1urKN/6qRcoZ
+	f2D3aCq+udtnokJb7ajrCRnRdThwn18Zt+T2RBFSF44IS8n6MpFMfC8pn7BVkxiboGNFHh2x76e
+	IwBXXOFXudoTN3pJIrdsXnbn+dvnAtA6vkOJUYJzVO69QjktelD4b1vKyEBX/yrA/f6CivbLAMi
+	+9uCu2TYedUYdeLmghIZUICMPEPN3j4LMf5zmrXHi2TwY=
+X-Google-Smtp-Source: AGHT+IFCsAsQ7W/HQAdzADVAKh6RnmAoR8YepiYqqjUWZ39kSheBAebFVpk/lhxR9JEXs/9bW/3i1hawbNbe
+X-Received: by 2002:a17:903:1211:b0:28d:18d3:46cb with SMTP id d9443c01a7336-2986a6bf9a7mr48645085ad.20.1763150074731;
+        Fri, 14 Nov 2025 11:54:34 -0800 (PST)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-101.dlp.protect.broadcom.com. [144.49.247.101])
-        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-434833c613csm5216385ab.5.2025.11.14.11.54.29
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2985c2345a2sm6171025ad.5.2025.11.14.11.54.34
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Nov 2025 11:54:29 -0800 (PST)
+        Fri, 14 Nov 2025 11:54:34 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-297dde580c8so72118165ad.1
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 11:54:28 -0800 (PST)
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-3436d81a532so5158847a91.3
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 11:54:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1763150068; x=1763754868; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1763150073; x=1763754873; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/rONH+mHxU+7n/URgcC6mVyOgTaF1ltIKNlpmdHCPnY=;
-        b=JXW5Ojpr/l3iDXLYeqNC0+EmS8OcTnKF+Sl10lmEja86s3eaKPwQOvmi6XrbmJMDcO
-         UMybMoWhPYNt+JPk+4TL1l3+G1awmBCwZ2WtQR4mRVcPW5TKsBPYLxlqZ5tf8kGe9WvN
-         lv5R7HdNm2qjW7P7p1c/5UYZ9U6kHldUAfzag=
-X-Received: by 2002:a17:902:f690:b0:297:e231:f40c with SMTP id d9443c01a7336-2986a6d2268mr42625565ad.19.1763150067722;
-        Fri, 14 Nov 2025 11:54:27 -0800 (PST)
-X-Received: by 2002:a17:902:f690:b0:297:e231:f40c with SMTP id d9443c01a7336-2986a6d2268mr42625295ad.19.1763150067264;
-        Fri, 14 Nov 2025 11:54:27 -0800 (PST)
+        bh=vQVO73+HBWs9eFaMKwMyj6D7GGGPJfUrZhWAHWZgwOk=;
+        b=Zbdqjrh5ZkbPXSys5tU49U09JusCSKp4WpdxB55fqfjPV2iapy/9VCqFZjlL9RSgcG
+         3r5x8YBJc/ZI/M86YOie+LM1ll/AVucJAqo6I6tW/tJYHA02wudVRBBO1LGB/Xs2u7Mx
+         qpVNlstIdt2dZNMn9rC85WCyHGelXQm7gWkrQ=
+X-Received: by 2002:a17:90b:2f8c:b0:343:6c71:6d31 with SMTP id 98e67ed59e1d1-343f9ec8d2bmr4881258a91.11.1763150072415;
+        Fri, 14 Nov 2025 11:54:32 -0800 (PST)
+X-Received: by 2002:a17:90b:2f8c:b0:343:6c71:6d31 with SMTP id 98e67ed59e1d1-343f9ec8d2bmr4881228a91.11.1763150071897;
+        Fri, 14 Nov 2025 11:54:31 -0800 (PST)
 Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-343ea5f9fa4sm3108113a91.0.2025.11.14.11.54.22
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-343ea5f9fa4sm3108113a91.0.2025.11.14.11.54.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 11:54:26 -0800 (PST)
+        Fri, 14 Nov 2025 11:54:31 -0800 (PST)
 From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -101,9 +101,9 @@ Cc: netdev@vger.kernel.org,
 	vikas.gupta@broadcom.com,
 	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
 	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: [v2, net-next 09/12] bng_en: Add ethtool link settings and capabilities support
-Date: Sat, 15 Nov 2025 01:22:57 +0530
-Message-ID: <20251114195312.22863-10-bhargava.marreddy@broadcom.com>
+Subject: [v2, net-next 10/12] bng_en: Add initial support for ethtool stats display
+Date: Sat, 15 Nov 2025 01:22:58 +0530
+Message-ID: <20251114195312.22863-11-bhargava.marreddy@broadcom.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251114195312.22863-1-bhargava.marreddy@broadcom.com>
 References: <20251114195312.22863-1-bhargava.marreddy@broadcom.com>
@@ -116,924 +116,1224 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-Adds ethtool ops to query and configure link speed, duplex, autoneg,
-report link status, and advertise lane support.
+This patch adds support for displaying ethtool statistics.
+Currently, only the display functionality is implemented.
+
+All stat counters remain at 0, as support for updating the
+counters will be added in subsequent patches.
 
 Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
 Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnge/bnge.h     |   2 +
- .../net/ethernet/broadcom/bnge/bnge_ethtool.c |  25 +
- .../net/ethernet/broadcom/bnge/bnge_link.c    | 818 ++++++++++++++++++
- .../net/ethernet/broadcom/bnge/bnge_link.h    |   6 +
- 4 files changed, 851 insertions(+)
+ .../net/ethernet/broadcom/bnge/bnge_ethtool.c | 612 ++++++++++++++++++
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    | 143 ++++
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |   3 +
+ .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 186 +++++-
+ .../net/ethernet/broadcom/bnge/bnge_netdev.h  |  94 ++-
+ 5 files changed, 1028 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge.h b/drivers/net/ethernet/broadcom/bnge/bnge.h
-index 56cc97ca492..33b42408b1d 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge.h
-@@ -224,6 +224,8 @@ struct bnge_dev {
- #define BNGE_PHY_FL_NO_FCS		PORT_PHY_QCAPS_RESP_FLAGS_NO_FCS
- #define BNGE_PHY_FL_SPEEDS2		\
- 	(PORT_PHY_QCAPS_RESP_FLAGS2_SPEEDS2_SUPPORTED << 8)
-+#define BNGE_PHY_FL_NO_PAUSE		\
-+	(PORT_PHY_QCAPS_RESP_FLAGS2_PAUSE_UNSUPPORTED << 8)
- 
- 	u32                     msg_enable;
- };
 diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-index 569371c1b4f..b985799051b 100644
+index b985799051b..a82271492d7 100644
 --- a/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
 +++ b/drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
-@@ -11,6 +11,26 @@
+@@ -32,6 +32,374 @@ static int bnge_nway_reset(struct net_device *dev)
+ }
  
- #include "bnge.h"
- #include "bnge_ethtool.h"
-+#include "bnge_hwrm_lib.h"
+ 
++static const char * const bnge_ring_rx_stats_str[] = {
++	"rx_ucast_packets",
++	"rx_mcast_packets",
++	"rx_bcast_packets",
++	"rx_discards",
++	"rx_errors",
++	"rx_ucast_bytes",
++	"rx_mcast_bytes",
++	"rx_bcast_bytes",
++};
 +
-+static int bnge_nway_reset(struct net_device *dev)
++static const char * const bnge_ring_tx_stats_str[] = {
++	"tx_ucast_packets",
++	"tx_mcast_packets",
++	"tx_bcast_packets",
++	"tx_errors",
++	"tx_discards",
++	"tx_ucast_bytes",
++	"tx_mcast_bytes",
++	"tx_bcast_bytes",
++};
++
++static const char * const bnge_ring_tpa_stats_str[] = {
++	"tpa_packets",
++	"tpa_bytes",
++	"tpa_events",
++	"tpa_aborts",
++};
++
++static const char * const bnge_ring_tpa2_stats_str[] = {
++	"rx_tpa_eligible_pkt",
++	"rx_tpa_eligible_bytes",
++	"rx_tpa_pkt",
++	"rx_tpa_bytes",
++	"rx_tpa_errors",
++	"rx_tpa_events",
++};
++
++static const char * const bnge_rx_sw_stats_str[] = {
++	"rx_l4_csum_errors",
++	"rx_resets",
++	"rx_buf_errors",
++};
++
++#define BNGE_RX_STATS_ENTRY(counter)	\
++	{ BNGE_RX_STATS_OFFSET(counter), __stringify(counter) }
++
++#define BNGE_TX_STATS_ENTRY(counter)	\
++	{ BNGE_TX_STATS_OFFSET(counter), __stringify(counter) }
++
++#define BNGE_RX_STATS_EXT_ENTRY(counter)	\
++	{ BNGE_RX_STATS_EXT_OFFSET(counter), __stringify(counter) }
++
++#define BNGE_TX_STATS_EXT_ENTRY(counter)	\
++	{ BNGE_TX_STATS_EXT_OFFSET(counter), __stringify(counter) }
++
++#define BNGE_RX_STATS_EXT_PFC_ENTRY(n)				\
++	BNGE_RX_STATS_EXT_ENTRY(pfc_pri##n##_rx_duration_us),	\
++	BNGE_RX_STATS_EXT_ENTRY(pfc_pri##n##_rx_transitions)
++
++#define BNGE_TX_STATS_EXT_PFC_ENTRY(n)				\
++	BNGE_TX_STATS_EXT_ENTRY(pfc_pri##n##_tx_duration_us),	\
++	BNGE_TX_STATS_EXT_ENTRY(pfc_pri##n##_tx_transitions)
++
++#define BNGE_RX_STATS_EXT_PFC_ENTRIES				\
++	BNGE_RX_STATS_EXT_PFC_ENTRY(0),				\
++	BNGE_RX_STATS_EXT_PFC_ENTRY(1),				\
++	BNGE_RX_STATS_EXT_PFC_ENTRY(2),				\
++	BNGE_RX_STATS_EXT_PFC_ENTRY(3),				\
++	BNGE_RX_STATS_EXT_PFC_ENTRY(4),				\
++	BNGE_RX_STATS_EXT_PFC_ENTRY(5),				\
++	BNGE_RX_STATS_EXT_PFC_ENTRY(6),				\
++	BNGE_RX_STATS_EXT_PFC_ENTRY(7)
++
++#define BNGE_TX_STATS_EXT_PFC_ENTRIES				\
++	BNGE_TX_STATS_EXT_PFC_ENTRY(0),				\
++	BNGE_TX_STATS_EXT_PFC_ENTRY(1),				\
++	BNGE_TX_STATS_EXT_PFC_ENTRY(2),				\
++	BNGE_TX_STATS_EXT_PFC_ENTRY(3),				\
++	BNGE_TX_STATS_EXT_PFC_ENTRY(4),				\
++	BNGE_TX_STATS_EXT_PFC_ENTRY(5),				\
++	BNGE_TX_STATS_EXT_PFC_ENTRY(6),				\
++	BNGE_TX_STATS_EXT_PFC_ENTRY(7)
++
++#define BNGE_RX_STATS_EXT_COS_ENTRY(n)				\
++	BNGE_RX_STATS_EXT_ENTRY(rx_bytes_cos##n),		\
++	BNGE_RX_STATS_EXT_ENTRY(rx_packets_cos##n)
++
++#define BNGE_TX_STATS_EXT_COS_ENTRY(n)				\
++	BNGE_TX_STATS_EXT_ENTRY(tx_bytes_cos##n),		\
++	BNGE_TX_STATS_EXT_ENTRY(tx_packets_cos##n)
++
++#define BNGE_RX_STATS_EXT_COS_ENTRIES				\
++	BNGE_RX_STATS_EXT_COS_ENTRY(0),				\
++	BNGE_RX_STATS_EXT_COS_ENTRY(1),				\
++	BNGE_RX_STATS_EXT_COS_ENTRY(2),				\
++	BNGE_RX_STATS_EXT_COS_ENTRY(3),				\
++	BNGE_RX_STATS_EXT_COS_ENTRY(4),				\
++	BNGE_RX_STATS_EXT_COS_ENTRY(5),				\
++	BNGE_RX_STATS_EXT_COS_ENTRY(6),				\
++	BNGE_RX_STATS_EXT_COS_ENTRY(7)				\
++
++#define BNGE_TX_STATS_EXT_COS_ENTRIES				\
++	BNGE_TX_STATS_EXT_COS_ENTRY(0),				\
++	BNGE_TX_STATS_EXT_COS_ENTRY(1),				\
++	BNGE_TX_STATS_EXT_COS_ENTRY(2),				\
++	BNGE_TX_STATS_EXT_COS_ENTRY(3),				\
++	BNGE_TX_STATS_EXT_COS_ENTRY(4),				\
++	BNGE_TX_STATS_EXT_COS_ENTRY(5),				\
++	BNGE_TX_STATS_EXT_COS_ENTRY(6),				\
++	BNGE_TX_STATS_EXT_COS_ENTRY(7)				\
++
++#define BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(n)			\
++	BNGE_RX_STATS_EXT_ENTRY(rx_discard_bytes_cos##n),	\
++	BNGE_RX_STATS_EXT_ENTRY(rx_discard_packets_cos##n)
++
++#define BNGE_RX_STATS_EXT_DISCARD_COS_ENTRIES				\
++	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(0),				\
++	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(1),				\
++	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(2),				\
++	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(3),				\
++	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(4),				\
++	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(5),				\
++	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(6),				\
++	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRY(7)
++
++#define BNGE_RX_STATS_PRI_ENTRY(counter, n)		\
++	{ BNGE_RX_STATS_EXT_OFFSET(counter##_cos0),	\
++	  __stringify(counter##_pri##n) }
++
++#define BNGE_TX_STATS_PRI_ENTRY(counter, n)		\
++	{ BNGE_TX_STATS_EXT_OFFSET(counter##_cos0),	\
++	  __stringify(counter##_pri##n) }
++
++#define BNGE_RX_STATS_PRI_ENTRIES(counter)		\
++	BNGE_RX_STATS_PRI_ENTRY(counter, 0),		\
++	BNGE_RX_STATS_PRI_ENTRY(counter, 1),		\
++	BNGE_RX_STATS_PRI_ENTRY(counter, 2),		\
++	BNGE_RX_STATS_PRI_ENTRY(counter, 3),		\
++	BNGE_RX_STATS_PRI_ENTRY(counter, 4),		\
++	BNGE_RX_STATS_PRI_ENTRY(counter, 5),		\
++	BNGE_RX_STATS_PRI_ENTRY(counter, 6),		\
++	BNGE_RX_STATS_PRI_ENTRY(counter, 7)
++
++#define BNGE_TX_STATS_PRI_ENTRIES(counter)		\
++	BNGE_TX_STATS_PRI_ENTRY(counter, 0),		\
++	BNGE_TX_STATS_PRI_ENTRY(counter, 1),		\
++	BNGE_TX_STATS_PRI_ENTRY(counter, 2),		\
++	BNGE_TX_STATS_PRI_ENTRY(counter, 3),		\
++	BNGE_TX_STATS_PRI_ENTRY(counter, 4),		\
++	BNGE_TX_STATS_PRI_ENTRY(counter, 5),		\
++	BNGE_TX_STATS_PRI_ENTRY(counter, 6),		\
++	BNGE_TX_STATS_PRI_ENTRY(counter, 7)
++
++enum {
++	RX_TOTAL_DISCARDS,
++	TX_TOTAL_DISCARDS,
++	RX_NETPOLL_DISCARDS,
++};
++
++static const char *const bnge_ring_err_stats_arr[] = {
++	"rx_total_l4_csum_errors",
++	"rx_total_resets",
++	"rx_total_buf_errors",
++	"rx_total_oom_discards",
++	"rx_total_netpoll_discards",
++	"rx_total_ring_discards",
++	"tx_total_resets",
++	"tx_total_ring_discards",
++};
++
++#define NUM_RING_RX_SW_STATS		ARRAY_SIZE(bnge_rx_sw_stats_str)
++#define NUM_RING_RX_HW_STATS		ARRAY_SIZE(bnge_ring_rx_stats_str)
++#define NUM_RING_TX_HW_STATS		ARRAY_SIZE(bnge_ring_tx_stats_str)
++
++static const struct {
++	long offset;
++	char string[ETH_GSTRING_LEN];
++} bnge_tx_port_stats_ext_arr[] = {
++	BNGE_TX_STATS_EXT_COS_ENTRIES,
++	BNGE_TX_STATS_EXT_PFC_ENTRIES,
++};
++
++static const struct {
++	long base_off;
++	char string[ETH_GSTRING_LEN];
++} bnge_rx_bytes_pri_arr[] = {
++	BNGE_RX_STATS_PRI_ENTRIES(rx_bytes),
++};
++
++static const struct {
++	long base_off;
++	char string[ETH_GSTRING_LEN];
++} bnge_rx_pkts_pri_arr[] = {
++	BNGE_RX_STATS_PRI_ENTRIES(rx_packets),
++};
++
++static const struct {
++	long base_off;
++	char string[ETH_GSTRING_LEN];
++} bnge_tx_bytes_pri_arr[] = {
++	BNGE_TX_STATS_PRI_ENTRIES(tx_bytes),
++};
++
++static const struct {
++	long base_off;
++	char string[ETH_GSTRING_LEN];
++} bnge_tx_pkts_pri_arr[] = {
++	BNGE_TX_STATS_PRI_ENTRIES(tx_packets),
++};
++
++static const struct {
++	long offset;
++	char string[ETH_GSTRING_LEN];
++} bnge_port_stats_arr[] = {
++	BNGE_RX_STATS_ENTRY(rx_64b_frames),
++	BNGE_RX_STATS_ENTRY(rx_65b_127b_frames),
++	BNGE_RX_STATS_ENTRY(rx_128b_255b_frames),
++	BNGE_RX_STATS_ENTRY(rx_256b_511b_frames),
++	BNGE_RX_STATS_ENTRY(rx_512b_1023b_frames),
++	BNGE_RX_STATS_ENTRY(rx_1024b_1518b_frames),
++	BNGE_RX_STATS_ENTRY(rx_good_vlan_frames),
++	BNGE_RX_STATS_ENTRY(rx_1519b_2047b_frames),
++	BNGE_RX_STATS_ENTRY(rx_2048b_4095b_frames),
++	BNGE_RX_STATS_ENTRY(rx_4096b_9216b_frames),
++	BNGE_RX_STATS_ENTRY(rx_9217b_16383b_frames),
++	BNGE_RX_STATS_ENTRY(rx_total_frames),
++	BNGE_RX_STATS_ENTRY(rx_ucast_frames),
++	BNGE_RX_STATS_ENTRY(rx_mcast_frames),
++	BNGE_RX_STATS_ENTRY(rx_bcast_frames),
++	BNGE_RX_STATS_ENTRY(rx_fcs_err_frames),
++	BNGE_RX_STATS_ENTRY(rx_ctrl_frames),
++	BNGE_RX_STATS_ENTRY(rx_pause_frames),
++	BNGE_RX_STATS_ENTRY(rx_pfc_frames),
++	BNGE_RX_STATS_ENTRY(rx_align_err_frames),
++	BNGE_RX_STATS_ENTRY(rx_ovrsz_frames),
++	BNGE_RX_STATS_ENTRY(rx_jbr_frames),
++	BNGE_RX_STATS_ENTRY(rx_mtu_err_frames),
++	BNGE_RX_STATS_ENTRY(rx_tagged_frames),
++	BNGE_RX_STATS_ENTRY(rx_double_tagged_frames),
++	BNGE_RX_STATS_ENTRY(rx_good_frames),
++	BNGE_RX_STATS_ENTRY(rx_pfc_ena_frames_pri0),
++	BNGE_RX_STATS_ENTRY(rx_pfc_ena_frames_pri1),
++	BNGE_RX_STATS_ENTRY(rx_pfc_ena_frames_pri2),
++	BNGE_RX_STATS_ENTRY(rx_pfc_ena_frames_pri3),
++	BNGE_RX_STATS_ENTRY(rx_pfc_ena_frames_pri4),
++	BNGE_RX_STATS_ENTRY(rx_pfc_ena_frames_pri5),
++	BNGE_RX_STATS_ENTRY(rx_pfc_ena_frames_pri6),
++	BNGE_RX_STATS_ENTRY(rx_pfc_ena_frames_pri7),
++	BNGE_RX_STATS_ENTRY(rx_undrsz_frames),
++	BNGE_RX_STATS_ENTRY(rx_eee_lpi_events),
++	BNGE_RX_STATS_ENTRY(rx_eee_lpi_duration),
++	BNGE_RX_STATS_ENTRY(rx_bytes),
++	BNGE_RX_STATS_ENTRY(rx_runt_bytes),
++	BNGE_RX_STATS_ENTRY(rx_runt_frames),
++	BNGE_RX_STATS_ENTRY(rx_stat_discard),
++	BNGE_RX_STATS_ENTRY(rx_stat_err),
++
++	BNGE_TX_STATS_ENTRY(tx_64b_frames),
++	BNGE_TX_STATS_ENTRY(tx_65b_127b_frames),
++	BNGE_TX_STATS_ENTRY(tx_128b_255b_frames),
++	BNGE_TX_STATS_ENTRY(tx_256b_511b_frames),
++	BNGE_TX_STATS_ENTRY(tx_512b_1023b_frames),
++	BNGE_TX_STATS_ENTRY(tx_1024b_1518b_frames),
++	BNGE_TX_STATS_ENTRY(tx_good_vlan_frames),
++	BNGE_TX_STATS_ENTRY(tx_1519b_2047b_frames),
++	BNGE_TX_STATS_ENTRY(tx_2048b_4095b_frames),
++	BNGE_TX_STATS_ENTRY(tx_4096b_9216b_frames),
++	BNGE_TX_STATS_ENTRY(tx_9217b_16383b_frames),
++	BNGE_TX_STATS_ENTRY(tx_good_frames),
++	BNGE_TX_STATS_ENTRY(tx_total_frames),
++	BNGE_TX_STATS_ENTRY(tx_ucast_frames),
++	BNGE_TX_STATS_ENTRY(tx_mcast_frames),
++	BNGE_TX_STATS_ENTRY(tx_bcast_frames),
++	BNGE_TX_STATS_ENTRY(tx_pause_frames),
++	BNGE_TX_STATS_ENTRY(tx_pfc_frames),
++	BNGE_TX_STATS_ENTRY(tx_jabber_frames),
++	BNGE_TX_STATS_ENTRY(tx_fcs_err_frames),
++	BNGE_TX_STATS_ENTRY(tx_err),
++	BNGE_TX_STATS_ENTRY(tx_fifo_underruns),
++	BNGE_TX_STATS_ENTRY(tx_pfc_ena_frames_pri0),
++	BNGE_TX_STATS_ENTRY(tx_pfc_ena_frames_pri1),
++	BNGE_TX_STATS_ENTRY(tx_pfc_ena_frames_pri2),
++	BNGE_TX_STATS_ENTRY(tx_pfc_ena_frames_pri3),
++	BNGE_TX_STATS_ENTRY(tx_pfc_ena_frames_pri4),
++	BNGE_TX_STATS_ENTRY(tx_pfc_ena_frames_pri5),
++	BNGE_TX_STATS_ENTRY(tx_pfc_ena_frames_pri6),
++	BNGE_TX_STATS_ENTRY(tx_pfc_ena_frames_pri7),
++	BNGE_TX_STATS_ENTRY(tx_eee_lpi_events),
++	BNGE_TX_STATS_ENTRY(tx_eee_lpi_duration),
++	BNGE_TX_STATS_ENTRY(tx_total_collisions),
++	BNGE_TX_STATS_ENTRY(tx_bytes),
++	BNGE_TX_STATS_ENTRY(tx_xthol_frames),
++	BNGE_TX_STATS_ENTRY(tx_stat_discard),
++	BNGE_TX_STATS_ENTRY(tx_stat_error),
++};
++
++static const struct {
++	long offset;
++	char string[ETH_GSTRING_LEN];
++} bnge_port_stats_ext_arr[] = {
++	BNGE_RX_STATS_EXT_ENTRY(link_down_events),
++	BNGE_RX_STATS_EXT_ENTRY(continuous_pause_events),
++	BNGE_RX_STATS_EXT_ENTRY(resume_pause_events),
++	BNGE_RX_STATS_EXT_ENTRY(continuous_roce_pause_events),
++	BNGE_RX_STATS_EXT_ENTRY(resume_roce_pause_events),
++	BNGE_RX_STATS_EXT_COS_ENTRIES,
++	BNGE_RX_STATS_EXT_PFC_ENTRIES,
++	BNGE_RX_STATS_EXT_ENTRY(rx_bits),
++	BNGE_RX_STATS_EXT_ENTRY(rx_buffer_passed_threshold),
++	BNGE_RX_STATS_EXT_ENTRY(rx_pcs_symbol_err),
++	BNGE_RX_STATS_EXT_ENTRY(rx_corrected_bits),
++	BNGE_RX_STATS_EXT_DISCARD_COS_ENTRIES,
++	BNGE_RX_STATS_EXT_ENTRY(rx_fec_corrected_blocks),
++	BNGE_RX_STATS_EXT_ENTRY(rx_fec_uncorrectable_blocks),
++	BNGE_RX_STATS_EXT_ENTRY(rx_filter_miss),
++};
++
++static int bnge_get_num_tpa_ring_stats(struct bnge_dev *bd)
++{
++	if (BNGE_SUPPORTS_TPA(bd))
++		return BNGE_NUM_TPA_RING_STATS;
++	return 0;
++}
++
++#define BNGE_NUM_RING_ERR_STATS	ARRAY_SIZE(bnge_ring_err_stats_arr)
++#define BNGE_NUM_PORT_STATS ARRAY_SIZE(bnge_port_stats_arr)
++#define BNGE_NUM_STATS_PRI			\
++	(ARRAY_SIZE(bnge_rx_bytes_pri_arr) +	\
++	 ARRAY_SIZE(bnge_rx_pkts_pri_arr) +	\
++	 ARRAY_SIZE(bnge_tx_bytes_pri_arr) +	\
++	 ARRAY_SIZE(bnge_tx_pkts_pri_arr))
++
++static int bnge_get_num_ring_stats(struct bnge_dev *bd)
++{
++	int rx, tx;
++
++	rx = NUM_RING_RX_HW_STATS + NUM_RING_RX_SW_STATS +
++	     bnge_get_num_tpa_ring_stats(bd);
++	tx = NUM_RING_TX_HW_STATS;
++	return rx * bd->rx_nr_rings +
++	       tx * bd->tx_nr_rings_per_tc;
++}
++
++static int bnge_get_num_stats(struct bnge_net *bn)
++{
++	int num_stats = bnge_get_num_ring_stats(bn->bd);
++	int len;
++
++	num_stats += BNGE_NUM_RING_ERR_STATS;
++
++	if (bn->flags & BNGE_FLAG_PORT_STATS)
++		num_stats += BNGE_NUM_PORT_STATS;
++
++	if (bn->flags & BNGE_FLAG_PORT_STATS_EXT) {
++		len = min_t(int, bn->fw_rx_stats_ext_size,
++			    ARRAY_SIZE(bnge_port_stats_ext_arr));
++		num_stats += len;
++		len = min_t(int, bn->fw_tx_stats_ext_size,
++			    ARRAY_SIZE(bnge_tx_port_stats_ext_arr));
++		num_stats += len;
++		if (bn->pri2cos_valid)
++			num_stats += BNGE_NUM_STATS_PRI;
++	}
++
++	return num_stats;
++}
++
+ static void bnge_get_drvinfo(struct net_device *dev,
+ 			     struct ethtool_drvinfo *info)
+ {
+@@ -41,6 +409,247 @@ static void bnge_get_drvinfo(struct net_device *dev,
+ 	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+ 	strscpy(info->fw_version, bd->fw_ver_str, sizeof(info->fw_version));
+ 	strscpy(info->bus_info, pci_name(bd->pdev), sizeof(info->bus_info));
++	info->n_stats = bnge_get_num_stats(bn);
++}
++
++static int bnge_get_sset_count(struct net_device *dev, int sset)
++{
++	struct bnge_net *bn = netdev_priv(dev);
++
++	switch (sset) {
++	case ETH_SS_STATS:
++		return bnge_get_num_stats(bn);
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
++static bool is_rx_ring(struct bnge_dev *bd, u16 ring_num)
++{
++	return ring_num < bd->rx_nr_rings;
++}
++
++static bool is_tx_ring(struct bnge_dev *bd, u16 ring_num)
++{
++	u16 tx_base = 0;
++
++	if (!(bd->flags & BNGE_EN_SHARED_CHNL))
++		tx_base = bd->rx_nr_rings;
++
++	if (ring_num >= tx_base && ring_num < (tx_base + bd->tx_nr_rings))
++		return true;
++	return false;
++}
++
++static void bnge_get_ethtool_stats(struct net_device *dev,
++				   struct ethtool_stats *stats, u64 *buf)
++{
++	struct bnge_total_ring_err_stats ring_err_stats = {0};
++	struct bnge_net *bn = netdev_priv(dev);
++	struct bnge_dev *bd = bn->bd;
++	u64 *curr, *prev;
++	u32 tpa_stats;
++	u32 i, j = 0;
++
++	if (!bn->bnapi) {
++		j += bnge_get_num_ring_stats(bd);
++		goto skip_ring_stats;
++	}
++
++	tpa_stats = bnge_get_num_tpa_ring_stats(bd);
++	for (i = 0; i < bd->nq_nr_rings; i++) {
++		struct bnge_napi *bnapi = bn->bnapi[i];
++		struct bnge_nq_ring_info *nqr = &bnapi->nq_ring;
++		u64 *sw_stats = nqr->stats.sw_stats;
++		u64 *sw;
++		int k;
++
++		if (is_rx_ring(bd, i)) {
++			for (k = 0; k < NUM_RING_RX_HW_STATS; j++, k++)
++				buf[j] = sw_stats[k];
++		}
++		if (is_tx_ring(bd, i)) {
++			k = NUM_RING_RX_HW_STATS;
++			for (; k < NUM_RING_RX_HW_STATS + NUM_RING_TX_HW_STATS;
++			       j++, k++)
++				buf[j] = sw_stats[k];
++		}
++		if (!tpa_stats || !is_rx_ring(bd, i))
++			goto skip_tpa_ring_stats;
++
++		k = NUM_RING_RX_HW_STATS + NUM_RING_TX_HW_STATS;
++		for (; k < NUM_RING_RX_HW_STATS + NUM_RING_TX_HW_STATS +
++			   tpa_stats; j++, k++)
++			buf[j] = sw_stats[k];
++
++skip_tpa_ring_stats:
++		sw = (u64 *)&nqr->sw_stats->rx;
++		if (is_rx_ring(bd, i)) {
++			for (k = 0; k < NUM_RING_RX_SW_STATS; j++, k++)
++				buf[j] = sw[k];
++		}
++	}
++
++	bnge_get_ring_err_stats(bn, &ring_err_stats);
++
++skip_ring_stats:
++	curr = &ring_err_stats.rx_total_l4_csum_errors;
++	prev = &bn->ring_err_stats_prev.rx_total_l4_csum_errors;
++	for (i = 0; i < BNGE_NUM_RING_ERR_STATS; i++, j++, curr++, prev++)
++		buf[j] = *curr + *prev;
++
++	if (bn->flags & BNGE_FLAG_PORT_STATS) {
++		u64 *port_stats = bn->port_stats.sw_stats;
++
++		for (i = 0; i < BNGE_NUM_PORT_STATS; i++, j++)
++			buf[j] = *(port_stats + bnge_port_stats_arr[i].offset);
++	}
++	if (bn->flags & BNGE_FLAG_PORT_STATS_EXT) {
++		u64 *rx_port_stats_ext = bn->rx_port_stats_ext.sw_stats;
++		u64 *tx_port_stats_ext = bn->tx_port_stats_ext.sw_stats;
++		u32 len;
++
++		len = min_t(u32, bn->fw_rx_stats_ext_size,
++			    ARRAY_SIZE(bnge_port_stats_ext_arr));
++		for (i = 0; i < len; i++, j++) {
++			buf[j] = *(rx_port_stats_ext +
++				   bnge_port_stats_ext_arr[i].offset);
++		}
++		len = min_t(u32, bn->fw_tx_stats_ext_size,
++			    ARRAY_SIZE(bnge_tx_port_stats_ext_arr));
++		for (i = 0; i < len; i++, j++) {
++			buf[j] = *(tx_port_stats_ext +
++				   bnge_tx_port_stats_ext_arr[i].offset);
++		}
++		if (bn->pri2cos_valid) {
++			for (i = 0; i < 8; i++, j++) {
++				long n = bnge_rx_bytes_pri_arr[i].base_off +
++					 bn->pri2cos_idx[i];
++
++				buf[j] = *(rx_port_stats_ext + n);
++			}
++			for (i = 0; i < 8; i++, j++) {
++				long n = bnge_rx_pkts_pri_arr[i].base_off +
++					 bn->pri2cos_idx[i];
++
++				buf[j] = *(rx_port_stats_ext + n);
++			}
++			for (i = 0; i < 8; i++, j++) {
++				long n = bnge_tx_bytes_pri_arr[i].base_off +
++					 bn->pri2cos_idx[i];
++
++				buf[j] = *(tx_port_stats_ext + n);
++			}
++			for (i = 0; i < 8; i++, j++) {
++				long n = bnge_tx_pkts_pri_arr[i].base_off +
++					 bn->pri2cos_idx[i];
++
++				buf[j] = *(tx_port_stats_ext + n);
++			}
++		}
++	}
++}
++
++static void bnge_get_strings(struct net_device *dev, u32 stringset, u8 *buf)
 +{
 +	struct bnge_net *bn = netdev_priv(dev);
 +	struct bnge_dev *bd = bn->bd;
-+	int rc = 0;
++	u32 i, j, num_str;
++	const char *str;
 +
-+	if (!BNGE_PHY_CFG_ABLE(bd))
-+		return -EOPNOTSUPP;
++	switch (stringset) {
++	case ETH_SS_STATS:
++		for (i = 0; i < bd->nq_nr_rings; i++) {
++			if (is_rx_ring(bd, i))
++				for (j = 0; j < NUM_RING_RX_HW_STATS; j++) {
++					str = bnge_ring_rx_stats_str[j];
++					ethtool_sprintf(&buf, "[%d]: %s", i,
++							str);
++				}
++			if (is_tx_ring(bd, i))
++				for (j = 0; j < NUM_RING_TX_HW_STATS; j++) {
++					str = bnge_ring_tx_stats_str[j];
++					ethtool_sprintf(&buf, "[%d]: %s", i,
++							str);
++				}
++			num_str = bnge_get_num_tpa_ring_stats(bd);
++			if (!num_str || !is_rx_ring(bd, i))
++				goto skip_tpa_stats;
 +
-+	if (!(bn->eth_link_info.autoneg & BNGE_AUTONEG_SPEED))
-+		return -EINVAL;
++			if (bd->max_tpa_v2)
++				for (j = 0; j < num_str; j++) {
++					str = bnge_ring_tpa2_stats_str[j];
++					ethtool_sprintf(&buf, "[%d]: %s", i,
++							str);
++				}
++			else
++				for (j = 0; j < num_str; j++) {
++					str = bnge_ring_tpa_stats_str[j];
++					ethtool_sprintf(&buf, "[%d]: %s", i,
++							str);
++				}
++skip_tpa_stats:
++			if (is_rx_ring(bd, i))
++				for (j = 0; j < NUM_RING_RX_SW_STATS; j++) {
++					str = bnge_rx_sw_stats_str[j];
++					ethtool_sprintf(&buf, "[%d]: %s", i,
++							str);
++				}
++		}
++		for (i = 0; i < BNGE_NUM_RING_ERR_STATS; i++)
++			ethtool_puts(&buf, bnge_ring_err_stats_arr[i]);
 +
-+	if (netif_running(dev))
-+		rc = bnge_hwrm_set_link_setting(bn, true);
++		if (bn->flags & BNGE_FLAG_PORT_STATS)
++			for (i = 0; i < BNGE_NUM_PORT_STATS; i++) {
++				str = bnge_port_stats_arr[i].string;
++				ethtool_puts(&buf, str);
++			}
 +
-+	return rc;
-+}
++		if (bn->flags & BNGE_FLAG_PORT_STATS_EXT) {
++			u32 len;
 +
- 
- static void bnge_get_drvinfo(struct net_device *dev,
- 			     struct ethtool_drvinfo *info)
-@@ -24,7 +44,12 @@ static void bnge_get_drvinfo(struct net_device *dev,
++			len = min_t(u32, bn->fw_rx_stats_ext_size,
++				    ARRAY_SIZE(bnge_port_stats_ext_arr));
++			for (i = 0; i < len; i++) {
++				str = bnge_port_stats_ext_arr[i].string;
++				ethtool_puts(&buf, str);
++			}
++
++			len = min_t(u32, bn->fw_tx_stats_ext_size,
++				    ARRAY_SIZE(bnge_tx_port_stats_ext_arr));
++			for (i = 0; i < len; i++) {
++				str = bnge_tx_port_stats_ext_arr[i].string;
++				ethtool_puts(&buf, str);
++			}
++
++			if (bn->pri2cos_valid) {
++				for (i = 0; i < 8; i++) {
++					str = bnge_rx_bytes_pri_arr[i].string;
++					ethtool_puts(&buf, str);
++				}
++
++				for (i = 0; i < 8; i++) {
++					str = bnge_rx_pkts_pri_arr[i].string;
++					ethtool_puts(&buf, str);
++				}
++
++				for (i = 0; i < 8; i++) {
++					str = bnge_tx_bytes_pri_arr[i].string;
++					ethtool_puts(&buf, str);
++				}
++
++				for (i = 0; i < 8; i++) {
++					str = bnge_tx_pkts_pri_arr[i].string;
++					ethtool_puts(&buf, str);
++				}
++			}
++		}
++		break;
++	default:
++		netdev_err(bd->netdev, "%s invalid request %x\n",
++			   __func__, stringset);
++		break;
++	}
  }
  
  static const struct ethtool_ops bnge_ethtool_ops = {
-+	.cap_link_lanes_supported	= 1,
-+	.get_link_ksettings	= bnge_get_link_ksettings,
-+	.set_link_ksettings	= bnge_set_link_ksettings,
+@@ -50,6 +659,9 @@ static const struct ethtool_ops bnge_ethtool_ops = {
  	.get_drvinfo		= bnge_get_drvinfo,
-+	.get_link		= bnge_get_link,
-+	.nway_reset		= bnge_nway_reset,
+ 	.get_link		= bnge_get_link,
+ 	.nway_reset		= bnge_nway_reset,
++	.get_sset_count		= bnge_get_sset_count,
++	.get_strings		= bnge_get_strings,
++	.get_ethtool_stats	= bnge_get_ethtool_stats,
  };
  
  void bnge_set_ethtool_ops(struct net_device *dev)
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_link.c b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-index b4a5ed00db2..8e18b247650 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_link.c
-@@ -7,6 +7,63 @@
- #include "bnge_link.h"
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+index 8d5ca057a48..144d9467b14 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+@@ -14,6 +14,7 @@
  #include "bnge_hwrm_lib.h"
+ #include "bnge_rmem.h"
+ #include "bnge_resc.h"
++#include "bnge_netdev.h"
+ #include "bnge_link.h"
  
-+enum bnge_media_type {
-+	BNGE_MEDIA_UNKNOWN = 0,
-+	BNGE_MEDIA_TP,
-+	BNGE_MEDIA_CR,
-+	BNGE_MEDIA_SR,
-+	BNGE_MEDIA_LR_ER_FR,
-+	BNGE_MEDIA_KR,
-+	BNGE_MEDIA_KX,
-+	BNGE_MEDIA_X,
-+	__BNGE_MEDIA_END,
-+};
-+
-+static const enum bnge_media_type bnge_phy_types[] = {
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_BASECR] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_BASEKR4] =  BNGE_MEDIA_KR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_BASELR] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_BASESR] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_BASEKR2] = BNGE_MEDIA_KR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_BASEKX] = BNGE_MEDIA_KX,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_BASEKR] = BNGE_MEDIA_KR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_BASET] = BNGE_MEDIA_TP,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_BASETE] = BNGE_MEDIA_TP,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASECR4] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASESR4] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASELR4] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASEER4] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASESR10] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASECR4] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASESR4] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASELR4] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASEER4] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_50G_BASECR] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_50G_BASESR] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_50G_BASELR] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_50G_BASEER] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASECR2] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASESR2] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASELR2] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASEER2] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASECR] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASESR] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASELR] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASEER] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASECR2] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASESR2] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASELR2] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASEER2] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASECR8] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASESR8] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASELR8] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASEER8] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASECR4] = BNGE_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASESR4] = BNGE_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASELR4] = BNGE_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASEER4] = BNGE_MEDIA_LR_ER_FR,
-+};
-+
- u32 bnge_fw_to_ethtool_speed(u16 fw_link_speed)
- {
- 	switch (fw_link_speed) {
-@@ -469,3 +526,764 @@ void bnge_report_link(struct bnge_dev *bd)
- 		netdev_err(bd->netdev, "NIC Link is Down\n");
- 	}
+ int bnge_hwrm_ver_get(struct bnge_dev *bd)
+@@ -596,6 +597,10 @@ int bnge_hwrm_func_qcaps(struct bnge_dev *bd)
+ 		bd->flags |= BNGE_EN_ROCE_V1;
+ 	if (flags & FUNC_QCAPS_RESP_FLAGS_ROCE_V2_SUPPORTED)
+ 		bd->flags |= BNGE_EN_ROCE_V2;
++	if (flags & FUNC_QCAPS_RESP_FLAGS_EXT_STATS_SUPPORTED)
++		bd->fw_cap |= BNGE_FW_CAP_EXT_STATS_SUPPORTED;
++	if (flags & FUNC_QCAPS_RESP_FLAGS_PCIE_STATS_SUPPORTED)
++		bd->fw_cap |= BNGE_FW_CAP_PCIE_STATS_SUPPORTED;
+ 
+ 	pf->fw_fid = le16_to_cpu(resp->fid);
+ 	pf->port_id = le16_to_cpu(resp->port_id);
+@@ -1435,3 +1440,141 @@ int bnge_hwrm_vnic_set_tpa(struct bnge_dev *bd, struct bnge_vnic_info *vnic,
+ 
+ 	return bnge_hwrm_req_send(bd, req);
  }
 +
-+static void bnge_get_ethtool_modes(struct bnge_net *bn,
-+				   struct ethtool_link_ksettings *lk_ksettings)
++int bnge_hwrm_func_qstat_ext(struct bnge_dev *bd, struct bnge_stats_mem *stats)
 +{
-+	struct bnge_dev *bd = bn->bd;
-+	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-+	struct bnge_link_info *link_info = &bd->link_info;
++	struct hwrm_func_qstats_ext_output *resp;
++	struct hwrm_func_qstats_ext_input *req;
++	__le64 *hw_masks;
++	int rc;
 +
-+	if (!(bd->phy_flags & BNGE_PHY_FL_NO_PAUSE)) {
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT,
-+				 lk_ksettings->link_modes.supported);
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-+				 lk_ksettings->link_modes.supported);
++	rc = bnge_hwrm_req_init(bd, req, HWRM_FUNC_QSTATS_EXT);
++	if (rc)
++		return rc;
++
++	req->fid = cpu_to_le16(0xffff);
++	req->flags = FUNC_QSTATS_EXT_REQ_FLAGS_COUNTER_MASK;
++
++	resp = bnge_hwrm_req_hold(bd, req);
++	rc = bnge_hwrm_req_send(bd, req);
++	if (!rc) {
++		hw_masks = &resp->rx_ucast_pkts;
++		bnge_copy_hw_masks(stats->hw_masks, hw_masks, stats->len / 8);
 +	}
-+
-+	if (link_info->support_auto_speeds || link_info->support_auto_speeds2 ||
-+	    link_info->support_pam4_auto_speeds)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-+				 lk_ksettings->link_modes.supported);
-+
-+	if (~elink_info->autoneg & BNGE_AUTONEG_FLOW_CTRL)
-+		return;
-+
-+	if (link_info->auto_pause_setting & BNGE_LINK_PAUSE_RX)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+	if (hweight8(link_info->auto_pause_setting & BNGE_LINK_PAUSE_BOTH) == 1)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+	if (link_info->lp_pause & BNGE_LINK_PAUSE_RX)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT,
-+				 lk_ksettings->link_modes.lp_advertising);
-+	if (hweight8(link_info->lp_pause & BNGE_LINK_PAUSE_BOTH) == 1)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-+				 lk_ksettings->link_modes.lp_advertising);
-+}
-+
-+u32 bnge_get_link(struct net_device *dev)
-+{
-+	struct bnge_net *bn = netdev_priv(dev);
-+
-+	/* TODO: handle MF, VF, driver close case */
-+	return BNGE_LINK_IS_UP(bn->bd);
-+}
-+
-+static enum bnge_media_type
-+bnge_get_media(struct bnge_link_info *link_info)
-+{
-+	switch (link_info->media_type) {
-+	case PORT_PHY_QCFG_RESP_MEDIA_TYPE_TP:
-+		return BNGE_MEDIA_TP;
-+	case PORT_PHY_QCFG_RESP_MEDIA_TYPE_DAC:
-+		return BNGE_MEDIA_CR;
-+	default:
-+		if (link_info->phy_type < ARRAY_SIZE(bnge_phy_types))
-+			return bnge_phy_types[link_info->phy_type];
-+		return BNGE_MEDIA_UNKNOWN;
-+	}
-+}
-+
-+enum bnge_link_speed_indices {
-+	BNGE_LINK_SPEED_UNKNOWN = 0,
-+	BNGE_LINK_SPEED_50GB_IDX,
-+	BNGE_LINK_SPEED_100GB_IDX,
-+	BNGE_LINK_SPEED_200GB_IDX,
-+	BNGE_LINK_SPEED_400GB_IDX,
-+	BNGE_LINK_SPEED_800GB_IDX,
-+	__BNGE_LINK_SPEED_END
-+};
-+
-+static enum bnge_link_speed_indices bnge_fw_speed_idx(u16 speed)
-+{
-+	switch (speed) {
-+	case BNGE_LINK_SPEED_50GB:
-+	case BNGE_LINK_SPEED_50GB_PAM4:
-+		return BNGE_LINK_SPEED_50GB_IDX;
-+	case BNGE_LINK_SPEED_100GB:
-+	case BNGE_LINK_SPEED_100GB_PAM4:
-+	case BNGE_LINK_SPEED_100GB_PAM4_112:
-+		return BNGE_LINK_SPEED_100GB_IDX;
-+	case BNGE_LINK_SPEED_200GB:
-+	case BNGE_LINK_SPEED_200GB_PAM4:
-+	case BNGE_LINK_SPEED_200GB_PAM4_112:
-+		return BNGE_LINK_SPEED_200GB_IDX;
-+	case BNGE_LINK_SPEED_400GB:
-+	case BNGE_LINK_SPEED_400GB_PAM4:
-+	case BNGE_LINK_SPEED_400GB_PAM4_112:
-+		return BNGE_LINK_SPEED_400GB_IDX;
-+	case BNGE_LINK_SPEED_800GB:
-+	case BNGE_LINK_SPEED_800GB_PAM4_112:
-+		return BNGE_LINK_SPEED_800GB_IDX;
-+	default: return BNGE_LINK_SPEED_UNKNOWN;
-+	}
-+}
-+
-+static const enum ethtool_link_mode_bit_indices
-+bnge_link_modes[__BNGE_LINK_SPEED_END][BNGE_SIG_MODE_MAX][__BNGE_MEDIA_END] = {
-+	[BNGE_LINK_SPEED_50GB_IDX] = {
-+		[BNGE_SIG_MODE_PAM4] = {
-+			[BNGE_MEDIA_CR] = ETHTOOL_LINK_MODE_50000baseCR_Full_BIT,
-+			[BNGE_MEDIA_SR] = ETHTOOL_LINK_MODE_50000baseSR_Full_BIT,
-+			[BNGE_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_50000baseLR_ER_FR_Full_BIT,
-+			[BNGE_MEDIA_KR] = ETHTOOL_LINK_MODE_50000baseKR_Full_BIT,
-+		},
-+	},
-+	[BNGE_LINK_SPEED_100GB_IDX] = {
-+		[BNGE_SIG_MODE_NRZ] = {
-+			[BNGE_MEDIA_CR] = ETHTOOL_LINK_MODE_100000baseCR4_Full_BIT,
-+			[BNGE_MEDIA_SR] = ETHTOOL_LINK_MODE_100000baseSR4_Full_BIT,
-+			[BNGE_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_100000baseLR4_ER4_Full_BIT,
-+			[BNGE_MEDIA_KR] = ETHTOOL_LINK_MODE_100000baseKR4_Full_BIT,
-+		},
-+		[BNGE_SIG_MODE_PAM4] = {
-+			[BNGE_MEDIA_CR] = ETHTOOL_LINK_MODE_100000baseCR2_Full_BIT,
-+			[BNGE_MEDIA_SR] = ETHTOOL_LINK_MODE_100000baseSR2_Full_BIT,
-+			[BNGE_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_100000baseLR2_ER2_FR2_Full_BIT,
-+			[BNGE_MEDIA_KR] = ETHTOOL_LINK_MODE_100000baseKR2_Full_BIT,
-+		},
-+		[BNGE_SIG_MODE_PAM4_112] = {
-+			[BNGE_MEDIA_CR] = ETHTOOL_LINK_MODE_100000baseCR_Full_BIT,
-+			[BNGE_MEDIA_SR] = ETHTOOL_LINK_MODE_100000baseSR_Full_BIT,
-+			[BNGE_MEDIA_KR] = ETHTOOL_LINK_MODE_100000baseKR_Full_BIT,
-+			[BNGE_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_100000baseLR_ER_FR_Full_BIT,
-+		},
-+	},
-+	[BNGE_LINK_SPEED_200GB_IDX] = {
-+		[BNGE_SIG_MODE_PAM4] = {
-+			[BNGE_MEDIA_CR] = ETHTOOL_LINK_MODE_200000baseCR4_Full_BIT,
-+			[BNGE_MEDIA_SR] = ETHTOOL_LINK_MODE_200000baseSR4_Full_BIT,
-+			[BNGE_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_200000baseLR4_ER4_FR4_Full_BIT,
-+			[BNGE_MEDIA_KR] = ETHTOOL_LINK_MODE_200000baseKR4_Full_BIT,
-+		},
-+		[BNGE_SIG_MODE_PAM4_112] = {
-+			[BNGE_MEDIA_CR] = ETHTOOL_LINK_MODE_200000baseCR2_Full_BIT,
-+			[BNGE_MEDIA_KR] = ETHTOOL_LINK_MODE_200000baseKR2_Full_BIT,
-+			[BNGE_MEDIA_SR] = ETHTOOL_LINK_MODE_200000baseSR2_Full_BIT,
-+			[BNGE_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_200000baseLR2_ER2_FR2_Full_BIT,
-+		},
-+	},
-+	[BNGE_LINK_SPEED_400GB_IDX] = {
-+		[BNGE_SIG_MODE_PAM4] = {
-+			[BNGE_MEDIA_CR] = ETHTOOL_LINK_MODE_400000baseCR8_Full_BIT,
-+			[BNGE_MEDIA_KR] = ETHTOOL_LINK_MODE_400000baseKR8_Full_BIT,
-+			[BNGE_MEDIA_SR] = ETHTOOL_LINK_MODE_400000baseSR8_Full_BIT,
-+			[BNGE_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_400000baseLR8_ER8_FR8_Full_BIT,
-+		},
-+		[BNGE_SIG_MODE_PAM4_112] = {
-+			[BNGE_MEDIA_CR] = ETHTOOL_LINK_MODE_400000baseCR4_Full_BIT,
-+			[BNGE_MEDIA_KR] = ETHTOOL_LINK_MODE_400000baseKR4_Full_BIT,
-+			[BNGE_MEDIA_SR] = ETHTOOL_LINK_MODE_400000baseSR4_Full_BIT,
-+			[BNGE_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_400000baseLR4_ER4_FR4_Full_BIT,
-+		},
-+	},
-+	[BNGE_LINK_SPEED_800GB_IDX] = {
-+		[BNGE_SIG_MODE_PAM4_112] = {
-+			[BNGE_MEDIA_CR] = ETHTOOL_LINK_MODE_800000baseCR8_Full_BIT,
-+			[BNGE_MEDIA_KR] = ETHTOOL_LINK_MODE_800000baseKR8_Full_BIT,
-+			[BNGE_MEDIA_SR] = ETHTOOL_LINK_MODE_800000baseSR8_Full_BIT,
-+		},
-+	},
-+};
-+
-+#define BNGE_LINK_MODE_UNKNOWN -1
-+
-+static enum ethtool_link_mode_bit_indices
-+bnge_get_link_mode(struct bnge_net *bn)
-+{
-+	struct bnge_dev *bd = bn->bd;
-+	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-+	struct bnge_link_info *link_info = &bd->link_info;
-+	enum ethtool_link_mode_bit_indices link_mode;
-+	enum bnge_link_speed_indices speed;
-+	enum bnge_media_type media;
-+	u8 sig_mode;
-+
-+	if (link_info->phy_link_status != BNGE_LINK_LINK)
-+		return BNGE_LINK_MODE_UNKNOWN;
-+
-+	media = bnge_get_media(link_info);
-+	if (BNGE_AUTO_MODE(link_info->auto_mode)) {
-+		speed = bnge_fw_speed_idx(link_info->link_speed);
-+		sig_mode = link_info->active_fec_sig_mode &
-+			PORT_PHY_QCFG_RESP_SIGNAL_MODE_MASK;
-+	} else {
-+		speed = bnge_fw_speed_idx(elink_info->req_link_speed);
-+		sig_mode = elink_info->req_signal_mode;
-+	}
-+	if (sig_mode >= BNGE_SIG_MODE_MAX)
-+		return BNGE_LINK_MODE_UNKNOWN;
-+
-+	/* Note ETHTOOL_LINK_MODE_10baseT_Half_BIT == 0 is a legal Linux
-+	 * link mode, but since no such devices exist, the zeroes in the
-+	 * map can be conveniently used to represent unknown link modes.
-+	 */
-+	link_mode = bnge_link_modes[speed][sig_mode][media];
-+	if (!link_mode)
-+		return BNGE_LINK_MODE_UNKNOWN;
-+
-+	switch (link_mode) {
-+	case ETHTOOL_LINK_MODE_100baseT_Full_BIT:
-+		if (~link_info->duplex & BNGE_LINK_DUPLEX_FULL)
-+			link_mode = ETHTOOL_LINK_MODE_100baseT_Half_BIT;
-+		break;
-+	case ETHTOOL_LINK_MODE_1000baseT_Full_BIT:
-+		if (~link_info->duplex & BNGE_LINK_DUPLEX_FULL)
-+			link_mode = ETHTOOL_LINK_MODE_1000baseT_Half_BIT;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	return link_mode;
-+}
-+
-+static const u16 bnge_nrz_speed_masks[] = {
-+	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEED_MSK_100GB,
-+	[__BNGE_LINK_SPEED_END - 1] = 0 /* make any legal speed a valid index */
-+};
-+
-+static const u16 bnge_pam4_speed_masks[] = {
-+	[BNGE_LINK_SPEED_50GB_IDX] = BNGE_LINK_PAM4_SPEED_MSK_50GB,
-+	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_PAM4_SPEED_MSK_100GB,
-+	[BNGE_LINK_SPEED_200GB_IDX] = BNGE_LINK_PAM4_SPEED_MSK_200GB,
-+	[__BNGE_LINK_SPEED_END - 1] = 0 /* make any legal speed a valid index */
-+};
-+
-+static const u16 bnge_nrz_speeds2_masks[] = {
-+	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEEDS2_MSK_100GB,
-+	[__BNGE_LINK_SPEED_END - 1] = 0 /* make any legal speed a valid index */
-+};
-+
-+static const u16 bnge_pam4_speeds2_masks[] = {
-+	[BNGE_LINK_SPEED_50GB_IDX] = BNGE_LINK_SPEEDS2_MSK_50GB_PAM4,
-+	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEEDS2_MSK_100GB_PAM4,
-+	[BNGE_LINK_SPEED_200GB_IDX] = BNGE_LINK_SPEEDS2_MSK_200GB_PAM4,
-+	[BNGE_LINK_SPEED_400GB_IDX] = BNGE_LINK_SPEEDS2_MSK_400GB_PAM4,
-+};
-+
-+static const u16 bnge_pam4_112_speeds2_masks[] = {
-+	[BNGE_LINK_SPEED_100GB_IDX] = BNGE_LINK_SPEEDS2_MSK_100GB_PAM4_112,
-+	[BNGE_LINK_SPEED_200GB_IDX] = BNGE_LINK_SPEEDS2_MSK_200GB_PAM4_112,
-+	[BNGE_LINK_SPEED_400GB_IDX] = BNGE_LINK_SPEEDS2_MSK_400GB_PAM4_112,
-+	[BNGE_LINK_SPEED_800GB_IDX] = BNGE_LINK_SPEEDS2_MSK_800GB_PAM4_112,
-+};
-+
-+static enum bnge_link_speed_indices
-+bnge_encoding_speed_idx(u8 sig_mode, u16 phy_flags, u16 speed_msk)
-+{
-+	const u16 *speeds;
-+	int idx, len;
-+
-+	switch (sig_mode) {
-+	case BNGE_SIG_MODE_NRZ:
-+		if (phy_flags & BNGE_PHY_FL_SPEEDS2) {
-+			speeds = bnge_nrz_speeds2_masks;
-+			len = ARRAY_SIZE(bnge_nrz_speeds2_masks);
-+		} else {
-+			speeds = bnge_nrz_speed_masks;
-+			len = ARRAY_SIZE(bnge_nrz_speed_masks);
-+		}
-+		break;
-+	case BNGE_SIG_MODE_PAM4:
-+		if (phy_flags & BNGE_PHY_FL_SPEEDS2) {
-+			speeds = bnge_pam4_speeds2_masks;
-+			len = ARRAY_SIZE(bnge_pam4_speeds2_masks);
-+		} else {
-+			speeds = bnge_pam4_speed_masks;
-+			len = ARRAY_SIZE(bnge_pam4_speed_masks);
-+		}
-+		break;
-+	case BNGE_SIG_MODE_PAM4_112:
-+		speeds = bnge_pam4_112_speeds2_masks;
-+		len = ARRAY_SIZE(bnge_pam4_112_speeds2_masks);
-+		break;
-+	default:
-+		return BNGE_LINK_SPEED_UNKNOWN;
-+	}
-+
-+	for (idx = 0; idx < len; idx++) {
-+		if (speeds[idx] == speed_msk)
-+			return idx;
-+	}
-+
-+	return BNGE_LINK_SPEED_UNKNOWN;
-+}
-+
-+#define BNGE_FW_SPEED_MSK_BITS 16
-+
-+static void
-+__bnge_get_ethtool_speeds(unsigned long fw_mask, enum bnge_media_type media,
-+			  u8 sig_mode, u16 phy_flags, unsigned long *et_mask)
-+{
-+	enum ethtool_link_mode_bit_indices link_mode;
-+	enum bnge_link_speed_indices speed;
-+	u8 bit;
-+
-+	for_each_set_bit(bit, &fw_mask, BNGE_FW_SPEED_MSK_BITS) {
-+		speed = bnge_encoding_speed_idx(sig_mode, phy_flags, 1 << bit);
-+		if (!speed)
-+			continue;
-+
-+		link_mode = bnge_link_modes[speed][sig_mode][media];
-+		if (!link_mode)
-+			continue;
-+
-+		linkmode_set_bit(link_mode, et_mask);
-+	}
-+}
-+
-+static void
-+bnge_get_ethtool_speeds(unsigned long fw_mask, enum bnge_media_type media,
-+			u8 sig_mode, u16 phy_flags, unsigned long *et_mask)
-+{
-+	if (media) {
-+		__bnge_get_ethtool_speeds(fw_mask, media, sig_mode, phy_flags,
-+					  et_mask);
-+		return;
-+	}
-+
-+	/* list speeds for all media if unknown */
-+	for (media = 1; media < __BNGE_MEDIA_END; media++)
-+		__bnge_get_ethtool_speeds(fw_mask, media, sig_mode, phy_flags,
-+					  et_mask);
-+}
-+
-+static void
-+bnge_get_all_ethtool_support_speeds(struct bnge_dev *bd,
-+				    enum bnge_media_type media,
-+				    struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnge_link_info *link_info = &bd->link_info;
-+	u16 sp_nrz, sp_pam4, sp_pam4_112 = 0;
-+	u16 phy_flags = bd->phy_flags;
-+
-+	if (phy_flags & BNGE_PHY_FL_SPEEDS2) {
-+		sp_nrz = link_info->support_speeds2;
-+		sp_pam4 = link_info->support_speeds2;
-+		sp_pam4_112 = link_info->support_speeds2;
-+	} else {
-+		sp_nrz = link_info->support_speeds;
-+		sp_pam4 = link_info->support_pam4_speeds;
-+	}
-+	bnge_get_ethtool_speeds(sp_nrz, media, BNGE_SIG_MODE_NRZ, phy_flags,
-+				lk_ksettings->link_modes.supported);
-+	bnge_get_ethtool_speeds(sp_pam4, media, BNGE_SIG_MODE_PAM4, phy_flags,
-+				lk_ksettings->link_modes.supported);
-+	bnge_get_ethtool_speeds(sp_pam4_112, media, BNGE_SIG_MODE_PAM4_112,
-+				phy_flags, lk_ksettings->link_modes.supported);
-+}
-+
-+static void
-+bnge_get_all_ethtool_adv_speeds(struct bnge_net *bn,
-+				enum bnge_media_type media,
-+				struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnge_dev *bd = bn->bd;
-+	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-+	u16 sp_nrz, sp_pam4, sp_pam4_112 = 0;
-+	u16 phy_flags = bd->phy_flags;
-+
-+	sp_nrz = elink_info->advertising;
-+	if (phy_flags & BNGE_PHY_FL_SPEEDS2) {
-+		sp_pam4 = elink_info->advertising;
-+		sp_pam4_112 = elink_info->advertising;
-+	} else {
-+		sp_pam4 = elink_info->advertising_pam4;
-+	}
-+	bnge_get_ethtool_speeds(sp_nrz, media, BNGE_SIG_MODE_NRZ, phy_flags,
-+				lk_ksettings->link_modes.advertising);
-+	bnge_get_ethtool_speeds(sp_pam4, media, BNGE_SIG_MODE_PAM4, phy_flags,
-+				lk_ksettings->link_modes.advertising);
-+	bnge_get_ethtool_speeds(sp_pam4_112, media, BNGE_SIG_MODE_PAM4_112,
-+				phy_flags, lk_ksettings->link_modes.advertising);
-+}
-+
-+static void
-+bnge_get_all_ethtool_lp_speeds(struct bnge_dev *bd,
-+			       enum bnge_media_type media,
-+			       struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnge_link_info *link_info = &bd->link_info;
-+	u16 phy_flags = bd->phy_flags;
-+
-+	bnge_get_ethtool_speeds(link_info->lp_auto_link_speeds, media,
-+				BNGE_SIG_MODE_NRZ, phy_flags,
-+				lk_ksettings->link_modes.lp_advertising);
-+	bnge_get_ethtool_speeds(link_info->lp_auto_pam4_link_speeds, media,
-+				BNGE_SIG_MODE_PAM4, phy_flags,
-+				lk_ksettings->link_modes.lp_advertising);
-+}
-+
-+static void bnge_update_speed(u32 *delta, bool installed_media, u16 *speeds,
-+			      u16 speed_msk, const unsigned long *et_mask,
-+			      enum ethtool_link_mode_bit_indices mode)
-+{
-+	bool mode_desired = linkmode_test_bit(mode, et_mask);
-+
-+	if (!mode)
-+		return;
-+
-+	/* enabled speeds for installed media should override */
-+	if (installed_media && mode_desired) {
-+		*speeds |= speed_msk;
-+		*delta |= speed_msk;
-+		return;
-+	}
-+
-+	/* many to one mapping, only allow one change per fw_speed bit */
-+	if (!(*delta & speed_msk) && (mode_desired == !(*speeds & speed_msk))) {
-+		*speeds ^= speed_msk;
-+		*delta |= speed_msk;
-+	}
-+}
-+
-+static void bnge_set_ethtool_speeds(struct bnge_net *bn,
-+				    const unsigned long *et_mask)
-+{
-+	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-+	u16 const *sp_msks, *sp_pam4_msks, *sp_pam4_112_msks;
-+	struct bnge_dev *bd = bn->bd;
-+	struct bnge_link_info *link_info = &bd->link_info;
-+	enum bnge_media_type media = bnge_get_media(link_info);
-+	u16 *adv, *adv_pam4, *adv_pam4_112 = NULL;
-+	u32 delta_pam4_112 = 0;
-+	u32 delta_pam4 = 0;
-+	u32 delta_nrz = 0;
-+	int i, m;
-+
-+	adv = &elink_info->advertising;
-+	if (bd->phy_flags & BNGE_PHY_FL_SPEEDS2) {
-+		adv_pam4 = &elink_info->advertising;
-+		adv_pam4_112 = &elink_info->advertising;
-+		sp_msks = bnge_nrz_speeds2_masks;
-+		sp_pam4_msks = bnge_pam4_speeds2_masks;
-+		sp_pam4_112_msks = bnge_pam4_112_speeds2_masks;
-+	} else {
-+		adv_pam4 = &elink_info->advertising_pam4;
-+		sp_msks = bnge_nrz_speed_masks;
-+		sp_pam4_msks = bnge_pam4_speed_masks;
-+	}
-+	for (i = 1; i < __BNGE_LINK_SPEED_END; i++) {
-+		/* accept any legal media from user */
-+		for (m = 1; m < __BNGE_MEDIA_END; m++) {
-+			bnge_update_speed(&delta_nrz, m == media,
-+					  adv, sp_msks[i], et_mask,
-+					  bnge_link_modes[i][BNGE_SIG_MODE_NRZ][m]);
-+			bnge_update_speed(&delta_pam4, m == media,
-+					  adv_pam4, sp_pam4_msks[i], et_mask,
-+					  bnge_link_modes[i][BNGE_SIG_MODE_PAM4][m]);
-+			if (!adv_pam4_112)
-+				continue;
-+
-+			bnge_update_speed(&delta_pam4_112, m == media,
-+					  adv_pam4_112, sp_pam4_112_msks[i], et_mask,
-+					  bnge_link_modes[i][BNGE_SIG_MODE_PAM4_112][m]);
-+		}
-+	}
-+}
-+
-+static void
-+bnge_fw_to_ethtool_advertised_fec(struct bnge_link_info *link_info,
-+				  struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	u16 fec_cfg = link_info->fec_cfg;
-+
-+	if ((fec_cfg & BNGE_FEC_NONE) || !(fec_cfg & BNGE_FEC_AUTONEG)) {
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_NONE_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+		return;
-+	}
-+	if (fec_cfg & BNGE_FEC_ENC_BASE_R)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_BASER_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+	if (fec_cfg & BNGE_FEC_ENC_RS)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_RS_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+	if (fec_cfg & BNGE_FEC_ENC_LLRS)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_LLRS_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+}
-+
-+static void
-+bnge_fw_to_ethtool_support_fec(struct bnge_link_info *link_info,
-+			       struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	u16 fec_cfg = link_info->fec_cfg;
-+
-+	if (fec_cfg & BNGE_FEC_NONE) {
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_NONE_BIT,
-+				 lk_ksettings->link_modes.supported);
-+		return;
-+	}
-+	if (fec_cfg & BNGE_FEC_ENC_BASE_R_CAP)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_BASER_BIT,
-+				 lk_ksettings->link_modes.supported);
-+	if (fec_cfg & BNGE_FEC_ENC_RS_CAP)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_RS_BIT,
-+				 lk_ksettings->link_modes.supported);
-+	if (fec_cfg & BNGE_FEC_ENC_LLRS_CAP)
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FEC_LLRS_BIT,
-+				 lk_ksettings->link_modes.supported);
-+}
-+
-+static void bnge_get_default_speeds(struct bnge_net *bn,
-+				    struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnge_dev *bd = bn->bd;
-+	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-+	struct ethtool_link_settings *base = &lk_ksettings->base;
-+	struct bnge_link_info *link_info = &bd->link_info;
-+
-+	if (link_info->link_state == BNGE_LINK_STATE_UP) {
-+		base->speed = bnge_fw_to_ethtool_speed(link_info->link_speed);
-+		base->duplex = DUPLEX_HALF;
-+		if (link_info->duplex & BNGE_LINK_DUPLEX_FULL)
-+			base->duplex = DUPLEX_FULL;
-+		lk_ksettings->lanes = link_info->active_lanes;
-+	} else if (!elink_info->autoneg) {
-+		base->speed = bnge_fw_to_ethtool_speed(elink_info->req_link_speed);
-+		base->duplex = DUPLEX_HALF;
-+		if (elink_info->req_duplex == BNGE_LINK_DUPLEX_FULL)
-+			base->duplex = DUPLEX_FULL;
-+	}
-+}
-+
-+int bnge_get_link_ksettings(struct net_device *dev,
-+			    struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnge_net *bn = netdev_priv(dev);
-+	struct ethtool_link_settings *base = &lk_ksettings->base;
-+	enum ethtool_link_mode_bit_indices link_mode;
-+	struct bnge_link_info *link_info;
-+	struct bnge_dev *bd = bn->bd;
-+	enum bnge_media_type media;
-+
-+	ethtool_link_ksettings_zero_link_mode(lk_ksettings, lp_advertising);
-+	ethtool_link_ksettings_zero_link_mode(lk_ksettings, advertising);
-+	ethtool_link_ksettings_zero_link_mode(lk_ksettings, supported);
-+	base->duplex = DUPLEX_UNKNOWN;
-+	base->speed = SPEED_UNKNOWN;
-+	link_info = &bd->link_info;
-+
-+	mutex_lock(&bd->link_lock);
-+	bnge_get_ethtool_modes(bn, lk_ksettings);
-+	media = bnge_get_media(link_info);
-+	bnge_get_all_ethtool_support_speeds(bd, media, lk_ksettings);
-+	bnge_fw_to_ethtool_support_fec(link_info, lk_ksettings);
-+	link_mode = bnge_get_link_mode(bn);
-+	if (link_mode != BNGE_LINK_MODE_UNKNOWN)
-+		ethtool_params_from_link_mode(lk_ksettings, link_mode);
-+	else
-+		bnge_get_default_speeds(bn, lk_ksettings);
-+
-+	if (bn->eth_link_info.autoneg) {
-+		bnge_fw_to_ethtool_advertised_fec(link_info, lk_ksettings);
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+		base->autoneg = AUTONEG_ENABLE;
-+		bnge_get_all_ethtool_adv_speeds(bn, media, lk_ksettings);
-+		if (link_info->phy_link_status == BNGE_LINK_LINK)
-+			bnge_get_all_ethtool_lp_speeds(bd, media, lk_ksettings);
-+	} else {
-+		base->autoneg = AUTONEG_DISABLE;
-+	}
-+
-+	base->port = PORT_NONE;
-+	if (link_info->media_type == PORT_PHY_QCFG_RESP_MEDIA_TYPE_TP) {
-+		base->port = PORT_TP;
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_TP_BIT,
-+				 lk_ksettings->link_modes.supported);
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_TP_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+	} else {
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT,
-+				 lk_ksettings->link_modes.supported);
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT,
-+				 lk_ksettings->link_modes.advertising);
-+
-+		if (link_info->media_type == PORT_PHY_QCFG_RESP_MEDIA_TYPE_DAC)
-+			base->port = PORT_DA;
-+		else
-+			base->port = PORT_FIBRE;
-+	}
-+	base->phy_address = link_info->phy_addr;
-+	mutex_unlock(&bd->link_lock);
-+
-+	return 0;
-+}
-+
-+static int
-+bnge_force_link_speed(struct net_device *dev, u32 ethtool_speed, u32 lanes)
-+{
-+	struct bnge_net *bn = netdev_priv(dev);
-+	struct bnge_dev *bd = bn->bd;
-+	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-+	struct bnge_link_info *link_info = &bd->link_info;
-+	u16 support_pam4_spds = link_info->support_pam4_speeds;
-+	u16 support_spds2 = link_info->support_speeds2;
-+	u16 support_spds = link_info->support_speeds;
-+	u8 sig_mode = BNGE_SIG_MODE_NRZ;
-+	u32 lanes_needed = 1;
-+	u16 fw_speed = 0;
-+
-+	switch (ethtool_speed) {
-+	case SPEED_50000:
-+		if (((support_spds & BNGE_LINK_SPEED_MSK_50GB) ||
-+		     (support_spds2 & BNGE_LINK_SPEEDS2_MSK_50GB)) &&
-+		    lanes != 1) {
-+			fw_speed = PORT_PHY_CFG_REQ_FORCE_LINK_SPEED_50GB;
-+			lanes_needed = 2;
-+		} else if (support_pam4_spds & BNGE_LINK_PAM4_SPEED_MSK_50GB) {
-+			fw_speed = PORT_PHY_CFG_REQ_FORCE_PAM4_LINK_SPEED_50GB;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+		} else if (support_spds2 & BNGE_LINK_SPEEDS2_MSK_50GB_PAM4) {
-+			fw_speed = BNGE_LINK_SPEED_50GB_PAM4;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+		}
-+		break;
-+	case SPEED_100000:
-+		if (((support_spds & BNGE_LINK_SPEED_MSK_100GB) ||
-+		     (support_spds2 & BNGE_LINK_SPEEDS2_MSK_100GB)) &&
-+		    lanes != 2 && lanes != 1) {
-+			fw_speed = PORT_PHY_CFG_REQ_FORCE_LINK_SPEED_100GB;
-+			lanes_needed = 4;
-+		} else if (support_pam4_spds & BNGE_LINK_PAM4_SPEED_MSK_100GB) {
-+			fw_speed = PORT_PHY_CFG_REQ_FORCE_PAM4_LINK_SPEED_100GB;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+			lanes_needed = 2;
-+		} else if ((support_spds2 & BNGE_LINK_SPEEDS2_MSK_100GB_PAM4) &&
-+			   lanes != 1) {
-+			fw_speed = BNGE_LINK_SPEED_100GB_PAM4;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+			lanes_needed = 2;
-+		} else if (support_spds2 & BNGE_LINK_SPEEDS2_MSK_100GB_PAM4_112) {
-+			fw_speed = BNGE_LINK_SPEED_100GB_PAM4_112;
-+			sig_mode = BNGE_SIG_MODE_PAM4_112;
-+		}
-+		break;
-+	case SPEED_200000:
-+		if (support_pam4_spds & BNGE_LINK_PAM4_SPEED_MSK_200GB) {
-+			fw_speed = PORT_PHY_CFG_REQ_FORCE_PAM4_LINK_SPEED_200GB;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+			lanes_needed = 4;
-+		} else if ((support_spds2 & BNGE_LINK_SPEEDS2_MSK_200GB_PAM4) &&
-+			   lanes != 2) {
-+			fw_speed = BNGE_LINK_SPEED_200GB_PAM4;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+			lanes_needed = 4;
-+		} else if (support_spds2 & BNGE_LINK_SPEEDS2_MSK_200GB_PAM4_112) {
-+			fw_speed = BNGE_LINK_SPEED_200GB_PAM4_112;
-+			sig_mode = BNGE_SIG_MODE_PAM4_112;
-+			lanes_needed = 2;
-+		}
-+		break;
-+	case SPEED_400000:
-+		if ((support_spds2 & BNGE_LINK_SPEEDS2_MSK_400GB_PAM4) &&
-+		    lanes != 4) {
-+			fw_speed = BNGE_LINK_SPEED_400GB_PAM4;
-+			sig_mode = BNGE_SIG_MODE_PAM4;
-+			lanes_needed = 8;
-+		} else if (support_spds2 & BNGE_LINK_SPEEDS2_MSK_400GB_PAM4_112) {
-+			fw_speed = BNGE_LINK_SPEED_400GB_PAM4_112;
-+			sig_mode = BNGE_SIG_MODE_PAM4_112;
-+			lanes_needed = 4;
-+		}
-+		break;
-+	case SPEED_800000:
-+		if (support_spds2 & BNGE_LINK_SPEEDS2_MSK_800GB_PAM4_112) {
-+			fw_speed = BNGE_LINK_SPEED_800GB_PAM4_112;
-+			sig_mode = BNGE_SIG_MODE_PAM4_112;
-+			lanes_needed = 8;
-+		}
-+	}
-+
-+	if (!fw_speed) {
-+		netdev_err(dev, "unsupported speed!\n");
-+		return -EINVAL;
-+	}
-+
-+	if (lanes && lanes != lanes_needed) {
-+		netdev_err(dev, "unsupported number of lanes for speed\n");
-+		return -EINVAL;
-+	}
-+
-+	if (elink_info->req_link_speed == fw_speed &&
-+	    elink_info->req_signal_mode == sig_mode &&
-+	    elink_info->autoneg == 0)
-+		return -EALREADY;
-+
-+	elink_info->req_link_speed = fw_speed;
-+	elink_info->req_signal_mode = sig_mode;
-+	elink_info->req_duplex = BNGE_LINK_DUPLEX_FULL;
-+	elink_info->autoneg = 0;
-+	elink_info->advertising = 0;
-+	elink_info->advertising_pam4 = 0;
-+
-+	return 0;
-+}
-+
-+int bnge_set_link_ksettings(struct net_device *dev,
-+			    const struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	const struct ethtool_link_settings *base = &lk_ksettings->base;
-+	struct bnge_net *bn = netdev_priv(dev);
-+	struct bnge_dev *bd = bn->bd;
-+	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-+	struct bnge_link_info *link_info = &bd->link_info;
-+	bool set_pause = false;
-+	u32 speed, lanes = 0;
-+	int rc = 0;
-+
-+	if (!BNGE_PHY_CFG_ABLE(bd))
-+		return -EOPNOTSUPP;
-+
-+	mutex_lock(&bd->link_lock);
-+	if (base->autoneg == AUTONEG_ENABLE) {
-+		bnge_set_ethtool_speeds(bn,
-+					lk_ksettings->link_modes.advertising);
-+		elink_info->autoneg |= BNGE_AUTONEG_SPEED;
-+		if (!elink_info->advertising && !elink_info->advertising_pam4) {
-+			elink_info->advertising = link_info->support_auto_speeds;
-+			elink_info->advertising_pam4 =
-+				link_info->support_pam4_auto_speeds;
-+		}
-+		/* any change to autoneg will cause link change, therefore the
-+		 * driver should put back the original pause setting in autoneg
-+		 */
-+		if (!(bd->phy_flags & BNGE_PHY_FL_NO_PAUSE))
-+			set_pause = true;
-+	} else {
-+		u8 phy_type = link_info->phy_type;
-+
-+		if (phy_type == PORT_PHY_QCFG_RESP_PHY_TYPE_BASET  ||
-+		    phy_type == PORT_PHY_QCFG_RESP_PHY_TYPE_BASETE ||
-+		    link_info->media_type == PORT_PHY_QCFG_RESP_MEDIA_TYPE_TP) {
-+			netdev_err(dev, "10GBase-T devices must autoneg\n");
-+			rc = -EINVAL;
-+			goto set_setting_exit;
-+		}
-+		if (base->duplex == DUPLEX_HALF) {
-+			netdev_err(dev, "HALF DUPLEX is not supported!\n");
-+			rc = -EINVAL;
-+			goto set_setting_exit;
-+		}
-+		speed = base->speed;
-+		lanes = lk_ksettings->lanes;
-+		rc = bnge_force_link_speed(dev, speed, lanes);
-+		if (rc) {
-+			if (rc == -EALREADY)
-+				rc = 0;
-+			goto set_setting_exit;
-+		}
-+	}
-+
-+	if (netif_running(dev))
-+		rc = bnge_hwrm_set_link_setting(bn, set_pause);
-+
-+set_setting_exit:
-+	mutex_unlock(&bd->link_lock);
++	bnge_hwrm_req_drop(bd, req);
 +	return rc;
 +}
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_link.h b/drivers/net/ethernet/broadcom/bnge/bnge_link.h
-index 65da27c510b..995ca731879 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_link.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_link.h
-@@ -182,4 +182,10 @@ void bnge_init_ethtool_link_settings(struct bnge_net *bn);
- u32 bnge_fw_to_ethtool_speed(u16 fw_link_speed);
- int bnge_probe_phy(struct bnge_net *bd, bool fw_dflt);
- bool bnge_phy_qcaps_no_speed(struct hwrm_port_phy_qcaps_output *resp);
-+int bnge_set_link_ksettings(struct net_device *dev,
-+			    const struct ethtool_link_ksettings *lk_ksettings);
-+int bnge_get_link_ksettings(struct net_device *dev,
-+			    struct ethtool_link_ksettings *lk_ksettings);
-+u32 bnge_get_link(struct net_device *dev);
-+u16 bnge_get_force_speed(struct bnge_link_info *link_info);
- #endif /* _BNGE_LINK_H_ */
++
++int bnge_hwrm_port_qstats_ext(struct bnge_dev *bd, u8 flags)
++{
++	struct hwrm_queue_pri2cos_qcfg_output *resp_qc;
++	struct bnge_net *bn = netdev_priv(bd->netdev);
++	struct hwrm_queue_pri2cos_qcfg_input *req_qc;
++	struct hwrm_port_qstats_ext_output *resp_qs;
++	struct hwrm_port_qstats_ext_input *req_qs;
++	struct bnge_pf_info *pf = &bd->pf;
++	u32 tx_stat_size;
++	int rc;
++
++	if (!(bn->flags & BNGE_FLAG_PORT_STATS_EXT))
++		return 0;
++
++	if (flags && !(bd->fw_cap & BNGE_FW_CAP_EXT_HW_STATS_SUPPORTED))
++		return -EOPNOTSUPP;
++
++	rc = bnge_hwrm_req_init(bd, req_qs, HWRM_PORT_QSTATS_EXT);
++	if (rc)
++		return rc;
++
++	req_qs->flags = flags;
++	req_qs->port_id = cpu_to_le16(pf->port_id);
++	req_qs->rx_stat_size = cpu_to_le16(sizeof(struct rx_port_stats_ext));
++	req_qs->rx_stat_host_addr =
++		cpu_to_le64(bn->rx_port_stats_ext.hw_stats_map);
++	tx_stat_size = bn->tx_port_stats_ext.hw_stats ?
++		       sizeof(struct tx_port_stats_ext) : 0;
++	req_qs->tx_stat_size = cpu_to_le16(tx_stat_size);
++	req_qs->tx_stat_host_addr =
++		cpu_to_le64(bn->tx_port_stats_ext.hw_stats_map);
++	resp_qs = bnge_hwrm_req_hold(bd, req_qs);
++	rc = bnge_hwrm_req_send(bd, req_qs);
++	if (!rc) {
++		bn->fw_rx_stats_ext_size =
++			le16_to_cpu(resp_qs->rx_stat_size) / 8;
++		bn->fw_tx_stats_ext_size = tx_stat_size ?
++			le16_to_cpu(resp_qs->tx_stat_size) / 8 : 0;
++	} else {
++		bn->fw_rx_stats_ext_size = 0;
++		bn->fw_tx_stats_ext_size = 0;
++	}
++	bnge_hwrm_req_drop(bd, req_qs);
++
++	if (flags)
++		return rc;
++
++	if (bn->fw_tx_stats_ext_size <=
++	    offsetof(struct tx_port_stats_ext, pfc_pri0_tx_duration_us) / 8) {
++		bn->pri2cos_valid = 0;
++		return rc;
++	}
++
++	rc = bnge_hwrm_req_init(bd, req_qc, HWRM_QUEUE_PRI2COS_QCFG);
++	if (rc)
++		return rc;
++
++	req_qc->flags = cpu_to_le32(QUEUE_PRI2COS_QCFG_REQ_FLAGS_IVLAN);
++
++	resp_qc = bnge_hwrm_req_hold(bd, req_qc);
++	rc = bnge_hwrm_req_send(bd, req_qc);
++	if (!rc) {
++		u8 *pri2cos;
++		int i, j;
++
++		pri2cos = &resp_qc->pri0_cos_queue_id;
++		for (i = 0; i < 8; i++) {
++			u8 queue_id = pri2cos[i];
++			u8 queue_idx;
++
++			/* Per port queue IDs start from 0, 10, 20, etc */
++			queue_idx = queue_id % 10;
++			if (queue_idx > BNGE_MAX_QUEUE) {
++				bn->pri2cos_valid = false;
++				bnge_hwrm_req_drop(bd, req_qc);
++				return rc;
++			}
++			for (j = 0; j < bd->max_q; j++) {
++				if (bd->q_ids[j] == queue_id)
++					bn->pri2cos_idx[i] = queue_idx;
++			}
++		}
++		bn->pri2cos_valid = true;
++	}
++	bnge_hwrm_req_drop(bd, req_qc);
++
++	return rc;
++}
++
++int bnge_hwrm_port_qstats(struct bnge_dev *bd, u8 flags)
++{
++	struct bnge_net *bn = netdev_priv(bd->netdev);
++	struct hwrm_port_qstats_input *req;
++	struct bnge_pf_info *pf = &bd->pf;
++	int rc;
++
++	if (!(bn->flags & BNGE_FLAG_PORT_STATS))
++		return 0;
++
++	if (flags && !(bd->fw_cap & BNGE_FW_CAP_EXT_HW_STATS_SUPPORTED))
++		return -EOPNOTSUPP;
++
++	rc = bnge_hwrm_req_init(bd, req, HWRM_PORT_QSTATS);
++	if (rc)
++		return rc;
++
++	req->flags = flags;
++	req->port_id = cpu_to_le16(pf->port_id);
++	req->tx_stat_host_addr = cpu_to_le64(bn->port_stats.hw_stats_map +
++					     BNGE_TX_PORT_STATS_BYTE_OFFSET);
++	req->rx_stat_host_addr = cpu_to_le64(bn->port_stats.hw_stats_map);
++	return bnge_hwrm_req_send(bd, req);
++}
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
+index f947ca66111..d43ccd4c7b3 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
+@@ -61,4 +61,7 @@ int bnge_hwrm_set_link_setting(struct bnge_net *bn, bool set_pause);
+ int bnge_hwrm_set_pause(struct bnge_net *bn);
+ int bnge_hwrm_vnic_set_tpa(struct bnge_dev *bd, struct bnge_vnic_info *vnic,
+ 			   u32 tpa_flags);
++int bnge_hwrm_port_qstats(struct bnge_dev *bd, u8 flags);
++int bnge_hwrm_port_qstats_ext(struct bnge_dev *bd, u8 flags);
++int bnge_hwrm_func_qstat_ext(struct bnge_dev *bd, struct bnge_stats_mem *stats);
+ #endif /* _BNGE_HWRM_LIB_H_ */
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+index 4e033271d33..f00576dd5e0 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+@@ -41,6 +41,10 @@ static void bnge_free_stats_mem(struct bnge_net *bn,
+ {
+ 	struct bnge_dev *bd = bn->bd;
+ 
++	kfree(stats->hw_masks);
++	stats->hw_masks = NULL;
++	kfree(stats->sw_stats);
++	stats->sw_stats = NULL;
+ 	if (stats->hw_stats) {
+ 		dma_free_coherent(bd->dev, stats->len, stats->hw_stats,
+ 				  stats->hw_stats_map);
+@@ -49,7 +53,7 @@ static void bnge_free_stats_mem(struct bnge_net *bn,
+ }
+ 
+ static int bnge_alloc_stats_mem(struct bnge_net *bn,
+-				struct bnge_stats_mem *stats)
++				struct bnge_stats_mem *stats, bool alloc_masks)
+ {
+ 	struct bnge_dev *bd = bn->bd;
+ 
+@@ -58,7 +62,20 @@ static int bnge_alloc_stats_mem(struct bnge_net *bn,
+ 	if (!stats->hw_stats)
+ 		return -ENOMEM;
+ 
++	stats->sw_stats = kzalloc(stats->len, GFP_KERNEL);
++	if (!stats->sw_stats)
++		goto stats_mem_err;
++
++	if (alloc_masks) {
++		stats->hw_masks = kzalloc(stats->len, GFP_KERNEL);
++		if (!stats->hw_masks)
++			goto stats_mem_err;
++	}
+ 	return 0;
++
++stats_mem_err:
++	bnge_free_stats_mem(bn, stats);
++	return -ENOMEM;
+ }
+ 
+ static void bnge_free_ring_stats(struct bnge_net *bn)
+@@ -74,9 +91,107 @@ static void bnge_free_ring_stats(struct bnge_net *bn)
+ 		struct bnge_nq_ring_info *nqr = &bnapi->nq_ring;
+ 
+ 		bnge_free_stats_mem(bn, &nqr->stats);
++
++		kfree(nqr->sw_stats);
++		nqr->sw_stats = NULL;
++	}
++}
++
++static void bnge_fill_masks(u64 *mask_arr, u64 mask, int count)
++{
++	int i;
++
++	for (i = 0; i < count; i++)
++		mask_arr[i] = mask;
++}
++
++void bnge_copy_hw_masks(u64 *mask_arr, __le64 *hw_mask_arr, int count)
++{
++	int i;
++
++	for (i = 0; i < count; i++)
++		mask_arr[i] = le64_to_cpu(hw_mask_arr[i]);
++}
++
++static void bnge_init_stats(struct bnge_net *bn)
++{
++	struct bnge_napi *bnapi = bn->bnapi[0];
++	struct bnge_nq_ring_info *nqr;
++	struct bnge_stats_mem *stats;
++	struct bnge_dev *bd = bn->bd;
++	__le64 *rx_stats, *tx_stats;
++	int rc, rx_count, tx_count;
++	u64 *rx_masks, *tx_masks;
++	u8 flags;
++
++	nqr = &bnapi->nq_ring;
++	stats = &nqr->stats;
++	rc = bnge_hwrm_func_qstat_ext(bd, stats);
++	if (rc) {
++		u64 mask = (1ULL << 48) - 1;
++
++		bnge_fill_masks(stats->hw_masks, mask, stats->len / 8);
++	}
++	if (bn->flags & BNGE_FLAG_PORT_STATS) {
++		stats = &bn->port_stats;
++		rx_stats = stats->hw_stats;
++		rx_masks = stats->hw_masks;
++		rx_count = sizeof(struct rx_port_stats) / 8;
++		tx_stats = rx_stats + BNGE_TX_PORT_STATS_BYTE_OFFSET / 8;
++		tx_masks = rx_masks + BNGE_TX_PORT_STATS_BYTE_OFFSET / 8;
++		tx_count = sizeof(struct tx_port_stats) / 8;
++
++		flags = PORT_QSTATS_REQ_FLAGS_COUNTER_MASK;
++		rc = bnge_hwrm_port_qstats(bd, flags);
++		if (rc) {
++			u64 mask = (1ULL << 40) - 1;
++
++			bnge_fill_masks(rx_masks, mask, rx_count);
++			bnge_fill_masks(tx_masks, mask, tx_count);
++		} else {
++			bnge_copy_hw_masks(rx_masks, rx_stats, rx_count);
++			bnge_copy_hw_masks(tx_masks, tx_stats, tx_count);
++			bnge_hwrm_port_qstats(bd, 0);
++		}
++	}
++	if (bn->flags & BNGE_FLAG_PORT_STATS_EXT) {
++		stats = &bn->rx_port_stats_ext;
++		rx_stats = stats->hw_stats;
++		rx_masks = stats->hw_masks;
++		rx_count = sizeof(struct rx_port_stats_ext) / 8;
++		stats = &bn->tx_port_stats_ext;
++		tx_stats = stats->hw_stats;
++		tx_masks = stats->hw_masks;
++		tx_count = sizeof(struct tx_port_stats_ext) / 8;
++
++		flags = PORT_QSTATS_EXT_REQ_FLAGS_COUNTER_MASK;
++		rc = bnge_hwrm_port_qstats_ext(bd, flags);
++		if (rc) {
++			u64 mask = (1ULL << 40) - 1;
++
++			bnge_fill_masks(rx_masks, mask, rx_count);
++			if (tx_stats)
++				bnge_fill_masks(tx_masks, mask, tx_count);
++		} else {
++			bnge_copy_hw_masks(rx_masks, rx_stats, rx_count);
++			if (tx_stats)
++				bnge_copy_hw_masks(tx_masks, tx_stats,
++						   tx_count);
++			bnge_hwrm_port_qstats_ext(bd, 0);
++		}
+ 	}
+ }
+ 
++static void bnge_free_port_stats(struct bnge_net *bn)
++{
++	bn->flags &= ~BNGE_FLAG_PORT_STATS;
++	bn->flags &= ~BNGE_FLAG_PORT_STATS_EXT;
++
++	bnge_free_stats_mem(bn, &bn->port_stats);
++	bnge_free_stats_mem(bn, &bn->rx_port_stats_ext);
++	bnge_free_stats_mem(bn, &bn->tx_port_stats_ext);
++}
++
+ static int bnge_alloc_ring_stats(struct bnge_net *bn)
+ {
+ 	struct bnge_dev *bd = bn->bd;
+@@ -89,13 +204,48 @@ static int bnge_alloc_ring_stats(struct bnge_net *bn)
+ 		struct bnge_napi *bnapi = bn->bnapi[i];
+ 		struct bnge_nq_ring_info *nqr = &bnapi->nq_ring;
+ 
++		nqr->sw_stats = kzalloc(sizeof(*nqr->sw_stats), GFP_KERNEL);
++		if (!nqr->sw_stats) {
++			rc = -ENOMEM;
++			goto err_free_ring_stats;
++		}
++
+ 		nqr->stats.len = size;
+-		rc = bnge_alloc_stats_mem(bn, &nqr->stats);
++		rc = bnge_alloc_stats_mem(bn, &nqr->stats, !i);
+ 		if (rc)
+ 			goto err_free_ring_stats;
+ 
+ 		nqr->hw_stats_ctx_id = INVALID_STATS_CTX_ID;
+ 	}
++
++	if (!bn->port_stats.hw_stats) {
++		bn->port_stats.len = BNGE_PORT_STATS_SIZE;
++		rc = bnge_alloc_stats_mem(bn, &bn->port_stats, true);
++		if (rc)
++			goto err_free_ring_stats;
++
++		bn->flags |= BNGE_FLAG_PORT_STATS;
++	}
++
++	if (!(bd->fw_cap & BNGE_FW_CAP_EXT_STATS_SUPPORTED))
++		return 0;
++
++	if (!bn->rx_port_stats_ext.hw_stats) {
++		bn->rx_port_stats_ext.len = sizeof(struct rx_port_stats_ext);
++		/* Extended stats are optional */
++		rc = bnge_alloc_stats_mem(bn, &bn->rx_port_stats_ext, true);
++		if (!rc)
++			return 0;
++	}
++
++	if (!bn->tx_port_stats_ext.hw_stats) {
++		bn->tx_port_stats_ext.len = sizeof(struct tx_port_stats_ext);
++		/* Extended stats are optional */
++		rc = bnge_alloc_stats_mem(bn, &bn->tx_port_stats_ext, true);
++		if (!rc)
++			return 0;
++	}
++	bn->flags |= BNGE_FLAG_PORT_STATS_EXT;
+ 	return 0;
+ 
+ err_free_ring_stats:
+@@ -868,6 +1018,7 @@ static void bnge_free_core(struct bnge_net *bn)
+ 	bnge_free_nq_arrays(bn);
+ 	bnge_free_ring_stats(bn);
+ 	bnge_free_ring_grps(bn);
++	bnge_free_port_stats(bn);
+ 	bnge_free_vnics(bn);
+ 	kfree(bn->tx_ring_map);
+ 	bn->tx_ring_map = NULL;
+@@ -959,6 +1110,8 @@ static int bnge_alloc_core(struct bnge_net *bn)
+ 	if (rc)
+ 		goto err_free_core;
+ 
++	bnge_init_stats(bn);
++
+ 	rc = bnge_alloc_vnics(bn);
+ 	if (rc)
+ 		goto err_free_core;
+@@ -2581,6 +2734,35 @@ static int bnge_close(struct net_device *dev)
+ 	return 0;
+ }
+ 
++static void bnge_get_one_ring_err_stats(struct bnge_dev *bd,
++					struct bnge_total_ring_err_stats *stats,
++					struct bnge_nq_ring_info *nqr)
++{
++	struct bnge_sw_stats *sw_stats = nqr->sw_stats;
++	u64 *hw_stats = nqr->stats.sw_stats;
++
++	stats->rx_total_l4_csum_errors += sw_stats->rx.rx_l4_csum_errors;
++	stats->rx_total_resets += sw_stats->rx.rx_resets;
++	stats->rx_total_buf_errors += sw_stats->rx.rx_buf_errors;
++	stats->rx_total_oom_discards += sw_stats->rx.rx_oom_discards;
++	stats->rx_total_netpoll_discards += sw_stats->rx.rx_netpoll_discards;
++	stats->rx_total_ring_discards +=
++		BNGE_GET_RING_STATS64(hw_stats, rx_discard_pkts);
++	stats->tx_total_resets += sw_stats->tx.tx_resets;
++	stats->tx_total_ring_discards +=
++		BNGE_GET_RING_STATS64(hw_stats, tx_discard_pkts);
++}
++
++void bnge_get_ring_err_stats(struct bnge_net *bn,
++			     struct bnge_total_ring_err_stats *stats)
++{
++	int i;
++
++	for (i = 0; i < bn->bd->nq_nr_rings; i++)
++		bnge_get_one_ring_err_stats(bn->bd, stats,
++					    &bn->bnapi[i]->nq_ring);
++}
++
+ static const struct net_device_ops bnge_netdev_ops = {
+ 	.ndo_open		= bnge_open,
+ 	.ndo_stop		= bnge_close,
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+index 0292fe0a4f3..1b66e44c3b9 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+@@ -225,6 +225,72 @@ struct bnge_tpa_info {
+ #define BNGE_NQ_HDL_IDX(hdl)	((hdl) & BNGE_NQ_HDL_IDX_MASK)
+ #define BNGE_NQ_HDL_TYPE(hdl)	(((hdl) & BNGE_NQ_HDL_TYPE_MASK) >>	\
+ 				 BNGE_NQ_HDL_TYPE_SHIFT)
++#define BNGE_GET_RING_STATS64(sw, counter)		\
++	(*((sw) + offsetof(struct ctx_hw_stats, counter) / 8))
++
++#define BNGE_GET_RX_PORT_STATS64(sw, counter)		\
++	(*((sw) + offsetof(struct rx_port_stats, counter) / 8))
++
++#define BNGE_GET_TX_PORT_STATS64(sw, counter)		\
++	(*((sw) + offsetof(struct tx_port_stats, counter) / 8))
++
++#define BNGE_PORT_STATS_SIZE				\
++	(sizeof(struct rx_port_stats) + sizeof(struct tx_port_stats) + 1024)
++
++#define BNGE_TX_PORT_STATS_BYTE_OFFSET			\
++	(sizeof(struct rx_port_stats) + 512)
++
++#define BNGE_RX_STATS_OFFSET(counter)			\
++	(offsetof(struct rx_port_stats, counter) / 8)
++
++#define BNGE_TX_STATS_OFFSET(counter)			\
++	((offsetof(struct tx_port_stats, counter) +	\
++	  BNGE_TX_PORT_STATS_BYTE_OFFSET) / 8)
++
++#define BNGE_RX_STATS_EXT_OFFSET(counter)		\
++	(offsetof(struct rx_port_stats_ext, counter) / 8)
++
++#define BNGE_RX_STATS_EXT_NUM_LEGACY                   \
++	BNGE_RX_STATS_EXT_OFFSET(rx_fec_corrected_blocks)
++
++#define BNGE_TX_STATS_EXT_OFFSET(counter)		\
++	(offsetof(struct tx_port_stats_ext, counter) / 8)
++
++struct bnge_total_ring_err_stats {
++	u64			rx_total_l4_csum_errors;
++	u64			rx_total_resets;
++	u64			rx_total_buf_errors;
++	u64			rx_total_oom_discards;
++	u64			rx_total_netpoll_discards;
++	u64			rx_total_ring_discards;
++	u64			tx_total_resets;
++	u64			tx_total_ring_discards;
++};
++
++struct bnge_rx_sw_stats {
++	u64			rx_l4_csum_errors;
++	u64			rx_resets;
++	u64			rx_buf_errors;
++	u64			rx_oom_discards;
++	u64			rx_netpoll_discards;
++};
++
++struct bnge_tx_sw_stats {
++	u64			tx_resets;
++};
++
++struct bnge_stats_mem {
++	u64		*sw_stats;
++	u64		*hw_masks;
++	void		*hw_stats;
++	dma_addr_t	hw_stats_map;
++	int		len;
++};
++
++struct bnge_sw_stats {
++	struct bnge_rx_sw_stats rx;
++	struct bnge_tx_sw_stats tx;
++};
+ 
+ struct bnge_net {
+ 	struct bnge_dev		*bd;
+@@ -292,6 +358,22 @@ struct bnge_net {
+ 	__be16			vxlan_port;
+ 	__be16			nge_port;
+ 	__be16			vxlan_gpe_port;
++
++	u64			flags;
++#define BNGE_FLAG_PORT_STATS		0x1
++#define BNGE_FLAG_PORT_STATS_EXT	0x2
++
++	struct bnge_total_ring_err_stats ring_err_stats_prev;
++
++	struct bnge_stats_mem	port_stats;
++	struct bnge_stats_mem	rx_port_stats_ext;
++	struct bnge_stats_mem	tx_port_stats_ext;
++	u16			fw_rx_stats_ext_size;
++	u16			fw_tx_stats_ext_size;
++
++	u8			pri2cos_idx[8];
++	u8			pri2cos_valid;
++
+ };
+ 
+ #define BNGE_DEFAULT_RX_RING_SIZE	511
+@@ -605,14 +687,6 @@ struct rx_tpa_end_cmp_ext {
+ 	  ASYNC_EVENT_CMPL_ERROR_REPORT_INVALID_SIGNAL_EVENT_DATA2_PIN_ID_MASK) >>\
+ 	 ASYNC_EVENT_CMPL_ERROR_REPORT_INVALID_SIGNAL_EVENT_DATA2_PIN_ID_SFT)
+ 
+-struct bnge_stats_mem {
+-	u64		*sw_stats;
+-	u64		*hw_masks;
+-	void		*hw_stats;
+-	dma_addr_t	hw_stats_map;
+-	int		len;
+-};
+-
+ struct nqe_cn {
+ 	__le16	type;
+ 	#define NQ_CN_TYPE_MASK           0x3fUL
+@@ -656,6 +730,7 @@ struct bnge_nq_ring_info {
+ 	struct bnge_db_info	nq_db;
+ 
+ 	struct bnge_stats_mem	stats;
++	struct bnge_sw_stats	*sw_stats;
+ 	u32			hw_stats_ctx_id;
+ 	u8			has_more_work:1;
+ 
+@@ -816,4 +891,7 @@ u8 *__bnge_alloc_rx_frag(struct bnge_net *bn, dma_addr_t *mapping,
+ 			 struct bnge_rx_ring_info *rxr, gfp_t gfp);
+ int bnge_alloc_rx_netmem(struct bnge_net *bn, struct bnge_rx_ring_info *rxr,
+ 			 u16 prod, gfp_t gfp);
++void bnge_get_ring_err_stats(struct bnge_net *bn,
++			     struct bnge_total_ring_err_stats *stats);
++void bnge_copy_hw_masks(u64 *mask_arr, __le64 *hw_mask_arr, int count);
+ #endif /* _BNGE_NETDEV_H_ */
 -- 
 2.47.3
 
