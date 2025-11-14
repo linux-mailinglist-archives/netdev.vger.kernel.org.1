@@ -1,116 +1,150 @@
-Return-Path: <netdev+bounces-238686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BCCBC5D943
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 15:28:11 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 044A7C5D96D
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 15:30:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D94264ECE3B
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 14:22:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EBDB034A591
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 14:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20777325485;
-	Fri, 14 Nov 2025 14:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3698E3161B3;
+	Fri, 14 Nov 2025 14:22:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KEkav2q6"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="eorJUrvf";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="BuNg/fGI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A4132470A
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 14:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F8023B627
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 14:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763130154; cv=none; b=qanu9j0SMKyOyHoAkr3pUyuRCR2EiveXCHriBHjVFxVyIsr9qq9HhPrrl+if9FfY6GEdlcnBRd5Py69V5k0QkPSYT1LPf7L7/Jc3wyTLP0QqmXFzSEpLuaN0RFspHlkQ6SDwS2XawhYGfnTOmnjs1JB+mpjkSmNEIPBjontcrYc=
+	t=1763130151; cv=none; b=IGVvR/WeAXgJ5Hs9ZDZXVCilPV8lmiPTbwIlFM0Z/9T3Ei0Hhkd4qRvdgz151Z2lM4ygpFj4DPrBfisMWffbviaUA/Hy5KRx2A5bkF4BvKcRY+LG7plcmf61tHko+bEy+RSYtCEpPvVNfQrFR0WGBx/oTYj7C/3yjdx/wmH1040=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763130154; c=relaxed/simple;
-	bh=xMi7tdbDldaq8tmCgjFjHSKBStfhME+c3/30YcUqNG0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YLJ+biZ61fgdo6I9pBhBPKBgad8sqF3EHRjRz1jICqGlXHnihB4Eq82JKJcl8IoBiEE9vYO7l8huqCW3pao1CxMznxxoGRSuNnzWzmiKJSPwFGxsPGtF4Myng+QhUkiJTeZJloymkTwHbcpTatWXI8h6KW+b2z4CgeiNaS/NVdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KEkav2q6; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4edb8d6e98aso424491cf.0
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 06:22:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763130151; x=1763734951; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xMi7tdbDldaq8tmCgjFjHSKBStfhME+c3/30YcUqNG0=;
-        b=KEkav2q6w6Q+zEHmF3Ozj5QWswzclWWRDTYfO0wf1qH+4d4/mBnON4Fj/2ynlCHSz9
-         399g8VMzlHBevV+KKKV7bY+aWfd9uC1wJSt6raWJXr0TVu4HRs353nAsqN+aLdtEs2Oa
-         IpHbKbnI1d2+hZvMnOmlVp0HgggjeSI0aEmXt7t+XRTR/E170L5s9I4ZowvGXkCRul+V
-         zDTz7vj6kOv95q+lcxPGA+5GZ5UGfwbXaahXapmXW6qMAGnTHp9sOsZ5FRTy8f0NGQyj
-         Vg02VOWgm9SM1DrUr05pdCMJxk3Fn0BriskkaX3kHElzDhderGv7Glk2oTlCuY9Cjawp
-         ZKpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763130151; x=1763734951;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xMi7tdbDldaq8tmCgjFjHSKBStfhME+c3/30YcUqNG0=;
-        b=FRBG0YlewsyIJR+li6NSmwGp4Bf1tVHZJahO3mSYfXdpDJMP3Vn/JWJ0bEi1o97hm5
-         gEdwvOUBmDZJO2RveOuKesi7WMZtx4eSLlTdV0T36jWJlWtTJw5NtIrjCWMyN8OKtKPw
-         NOFwKk2hkckc5v1xx2SC+8+Usw6hqBaEinbEMNVY7jIKwUcPmawLtaxkv3zFHLyi3+7v
-         J4Et45+Krj5jGB+nRuaD/zM0rRz0WWm1IPUKtGw1LHQcrqiB0/tcBFdFoCCF8i4J1L39
-         9bWSJ1f4mQBIrcKhEax1Yq46F9S1EIp/lERupIFxdXua7+JTzZsqGUwmJUkN466Wjaxn
-         h0nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU64Ln7uOecFFiWX7IjX+KaHY16w1DSGiZG1IxA4k0m4S98LAKJfE/RSIvBLW0RwoQI8jXdvzw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMxyEK5504A65B/mtfz/ErKEzUd9saCodRxHRQ9dTgpZvBP1iV
-	RHED74EDeNCi+3nNzjNGyHi1nxR9AmKVSVpXHUrze4hUFqFlz/LeWeeX1CC031VEXdWQ65W6Tmd
-	DW6QNbb/64GE+R4dHRxtAUIKjYB4wsRS9vray4Uu8
-X-Gm-Gg: ASbGncu0TeOmGrOskG+UIOf6BpFXctjdsZFKs6m4FVlAZTBN/Z3hLKkyogm0jtqTs5E
-	EIIPIjV/6seIHIVHBdYuK9U4xsiRokPM48Cq2idr8JxWOl5yoKTk2Z+83qfMON28rY2UPOnX/Zn
-	/tNc0hhzSIGKsCjoUe0tAR4pttMVnQPHoiEjfv3CfkFthWM++CLWLV8f5gYMytXDpVtG46aqBAL
-	8lI1uFF+jJKURZlKT4ZLGus2ymQnzUtgUbs9QJk0iKaIcmwTlTgF7nSy26NrMWLfUM3y9bBIJnI
-	5l2zmOnmEt/SnjsrPRjA0Lwo6+jwE9qxLaxwKun70jQnMPCySknxc7J0bB1By6/x7bJKyg==
-X-Google-Smtp-Source: AGHT+IGSHOlWwONdBnBLRt8lmhOkguNkP/2DkFuurLWk0ejJpkatNcYjoDZhEHKldYGOKQCva29nUx0FHT+xwuf6WgY=
-X-Received: by 2002:ac8:7fd3:0:b0:4ed:70d6:6618 with SMTP id
- d75a77b69052e-4edf3231a3emr6591291cf.10.1763130151056; Fri, 14 Nov 2025
- 06:22:31 -0800 (PST)
+	s=arc-20240116; t=1763130151; c=relaxed/simple;
+	bh=MUJqG9FNSj4zKBQ/7HERCgXmej3DMBRw0bkzlZyTOco=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=csgx73PzDZXSwdrucE+uZdAWOA7HcIM99Fh6yCqYaDv3OfhSnEnyPT9wxTttNHOo9mUsTYbtFKQbXfGLPeEy8Bdm5SzUtd73P0FTB05Y4Knk+fAQUCvfUM28hzqNGsI+s7jvxyZjQL9D6bCKxHEQY+/RnMy9V0M4EsDhtp07wus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=eorJUrvf; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=BuNg/fGI; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id 81D2BEC006A;
+	Fri, 14 Nov 2025 09:22:26 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Fri, 14 Nov 2025 09:22:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1763130146; x=1763216546; bh=fTTUqkqm6SFKpxYDy0i6AFHBZrl7maee
+	3/4QOe6vXeI=; b=eorJUrvfOSG698A+sqi5FZbaa+/ym+h8LlD8yAT/KgAelwNK
+	Z+eMZd62HIh9CRaHihXawADkGfitkQwyQdT9tOs4mcmXGmO8w4R8maCx+QgtChG/
+	rEln41UxjVwA/F6HGdxedxDgiQ8ranjmFc12dO9ptgPaNurmlRH242wkYLOllAO1
+	OvybrlJaKTLisQPGsHa0VglShlkJmsOhhh+N2/wxcjOzy16yVhzU/kNZEcjAxI8C
+	4Mo+G/zHmMj8jhK6m7hZxWnT6c9E9x+iMU10pSGHVzl4+rnmI3XR8tKOKUCw2/uY
+	r2M76vSwhrCx0ueCTna6mtwj0u8dV2/9yzHs3A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763130146; x=
+	1763216546; bh=fTTUqkqm6SFKpxYDy0i6AFHBZrl7maee3/4QOe6vXeI=; b=B
+	uNg/fGI2t9Kny+iI2RkjiN6Rws8YeKuSaBYu/uvSNiEeHw1u2EgCpNFlJjQ4dxVd
+	K5BshyDbH/6YjTtpH5462fYckrCXBDIV0pgib1ilRsD8PCZbFzaS01qjIfOoSl4y
+	KjhJ+JU5i2rQ1mK03EuYHNVbnLc0HQo5Gc4ycqF9HEsixrF9KWpsEQW9EuIwMPOi
+	lJSYYxYelgG2dbot4PDQIBPkglaUXVkAItlnLT3baCkYt2+i6x1dlCeQPL6a/CCe
+	UZGEjupmttTgeZR+NsX3fBinWD5SWElDAhfz0Opuikdcb75itKqwmlmBBmJgwdKA
+	0x+9JLcX+bvc6qB3QdSYQ==
+X-ME-Sender: <xms:IjsXaVQibvZ3R3FA7iZzKX6cAjlKgaLo9XXiq65yXk3RRtnFd9vZSw>
+    <xme:IjsXaSdXnVTUf5VJ1K1_grop8ruPNka4DyGybk2GOPqX1DiNu6I0rnlVZbhOOLrVQ
+    TfStGinRonEpqLx85sI_Z_O4qhTjIcAtft4zsSdtrvhWAyV5FUC7g>
+X-ME-Received: <xmr:IjsXaUqAAtbrjYXfhPCLL83WHsBZfEHVtpq74wmaLHlj6KfV3tdegbjt8C_3>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvuddttdehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
+    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
+    frrghtthgvrhhnpefgvdegieetffefvdfguddtleegiefhgeeuheetveevgeevjeduleef
+    ffeiheelvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepiedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprhgrlhhfsehmrghnuggvlhgsihhtrdgtoh
+    hmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhht
+    ohhnihhosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
+    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdr
+    tghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:IjsXaT-LeLK28osc-pWEbGjBvurdXsZhBfcjwxXG_qwtrysJfjymRg>
+    <xmx:IjsXaQez97CAHm7MlWzcL511iw9MQPJe4HjDJx9LEmAlKSqAJ1Y0jQ>
+    <xmx:IjsXadKi84_o0GV22kccQCfn9_CDQVFyIh4i2gvYyww7XzZKbryjoA>
+    <xmx:IjsXaQh2pXJYjyav5_gWGi1KWyDNWaykCjKG2j1iTWct5kyNqniNjQ>
+    <xmx:IjsXaZYZ4wy10paKLcqZOrwGts4h-TXH6xioypP--dDoI84a6a4lGhZ0>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 14 Nov 2025 09:22:25 -0500 (EST)
+Date: Fri, 14 Nov 2025 15:22:23 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Ralf Lici <ralf@mandelbit.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 3/8] ovpn: notify userspace on client float event
+Message-ID: <aRc7H4ne5cCgZvyL@krikkit>
+References: <20251111214744.12479-1-antonio@openvpn.net>
+ <20251111214744.12479-4-antonio@openvpn.net>
+ <20251113182155.26d69123@kernel.org>
+ <fdf87820e364dda792a962486bef595cd6428354.camel@mandelbit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251114135141.3810964-1-edumazet@google.com>
-In-Reply-To: <20251114135141.3810964-1-edumazet@google.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Fri, 14 Nov 2025 09:22:13 -0500
-X-Gm-Features: AWmQ_bm8n9B3aR_gX134eF_yU81uB3HRDlPNoE_cC-VMRQHPPk-5LnNb8l4r3rc
-Message-ID: <CADVnQykywEZ90j3UfM0p3=FbbApAKKA95dHO_vP1x+Nb2XphPg@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: reduce tcp_comp_sack_slack_ns default value to
- 10 usec
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fdf87820e364dda792a962486bef595cd6428354.camel@mandelbit.com>
 
-On Fri, Nov 14, 2025 at 8:51=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> net.ipv4.tcp_comp_sack_slack_ns current default value is too high.
->
-> When a flow has many drops (1 % or more), and small RTT, adding 100 usec
-> before sending SACK stalls the sender relying on getting SACK
-> fast enough to keep the pipe busy.
->
-> Decrease the default to 10 usec.
->
-> This is orthogonal to Congestion Control heuristics to determine
-> if drops are caused by congestion or not.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
+2025-11-14, 10:26:31 +0100, Ralf Lici wrote:
+> On Thu, 2025-11-13 at 18:21 -0800, Jakub Kicinski wrote:
+> > On Tue, 11 Nov 2025 22:47:36 +0100 Antonio Quartulli wrote:
+> > > +	if (ss->ss_family == AF_INET) {
+> > > +		sa = (struct sockaddr_in *)ss;
+> > > +		if (nla_put_in_addr(msg, OVPN_A_PEER_REMOTE_IPV4,
+> > > +				    sa->sin_addr.s_addr) ||
+> > > +		    nla_put_net16(msg, OVPN_A_PEER_REMOTE_PORT, sa-
+> > > >sin_port))
+> > > +			goto err_cancel_msg;
+> > > +	} else if (ss->ss_family == AF_INET6) {
+> > > +		sa6 = (struct sockaddr_in6 *)ss;
+> > > +		if (nla_put_in6_addr(msg, OVPN_A_PEER_REMOTE_IPV6,
+> > > +				     &sa6->sin6_addr) ||
+> > > +		    nla_put_u32(msg,
+> > > OVPN_A_PEER_REMOTE_IPV6_SCOPE_ID,
+> > > +				sa6->sin6_scope_id) ||
+> > > +		    nla_put_net16(msg, OVPN_A_PEER_REMOTE_PORT,
+> > > sa6->sin6_port))
+> > > +			goto err_cancel_msg;
+> > > +	} else {
+> > 
+> > presumably on this branch ret should be set to something?
+> 
+> You're right, otherwise it would return -EMSGSIZE which is not what we
+> want here.
 
-Reviewed-by: Neal Cardwell <ncardwell@google.com>
+But that should never happen with the current code, since
+ovpn_nl_peer_float_notify is only called by ovpn_peer_endpoints_update
+when salen != 0, and in that case we can only have ss_family = AF_INET
+or ss_family = AF_INET6? (and otherwise it'd be an unitialized value
+from ovpn_peer_endpoints_update)
 
-Thanks, Eric!
+(no objection to making ovpn_nl_peer_float_notify handle that
+situation better in case it grows some other callers/contexts)
 
-neal
+-- 
+Sabrina
 
