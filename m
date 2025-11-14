@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-238559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74391C5AF72
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 03:00:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 932A7C5AF7B
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 03:01:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C8503BB2E3
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 02:00:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7714E4E6C07
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 02:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85E818024;
-	Fri, 14 Nov 2025 02:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C6A263C8F;
+	Fri, 14 Nov 2025 02:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ao/9NrpN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pEUdLhZt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB59435CBBC;
-	Fri, 14 Nov 2025 02:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093D825D546;
+	Fri, 14 Nov 2025 02:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763085643; cv=none; b=aPU08HupuDsrxmbvctAZL5iyCHcoR2d9C6HfMjG3wGQtgj5agCg6EEkDh6gs/TXgd6200E8n6e7d92ralbIxbBj4Dme8F5rT03/BmjGYx7D+i/VKs2UdGwcyqQC9t+B7sycGpYq4K0QYkitpVIgn5jPVM83gnE99FrSBV+uuGYw=
+	t=1763085645; cv=none; b=d+X3smzXqBxCV8EHZ8i4X7XTwuXMtMfGd3sJTQFsPdEbKw9T9l7sDsxxErJZ2e3MExQgEgLJlBemXurfG1i1GVoS41Jx8RIC5vNadLgtd2sUkZesqITcfBt8AkTKgjbRxrqa77zuKFS8FYk8E/OLB3tWKP3Z9kuG5q9No7EMxjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763085643; c=relaxed/simple;
-	bh=hgLeirv24sSKgLUQUIUCllXdjV3fWHMNoHK00Xj9qsw=;
+	s=arc-20240116; t=1763085645; c=relaxed/simple;
+	bh=tc44Q84nwM31UzYk9NTTob1nNXu1W5I3T15GmcbBzPE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OEJGhpb2yq+QtwL0q4zK/c1w4NQBZ01JkWQVINGKiPye8YqXtCpFhEcaVZiOjo2qI3+zwiZ+SBDYEuR58Pg1jRqkUnum2n28zDeAgBKiGMKF7WrBU9HxGSza+gU5nwJnG+gawOsZla0K65LS0X9x2SskKvANBN1Yv4kQU2KAZVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ao/9NrpN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50F7CC4CEF7;
-	Fri, 14 Nov 2025 02:00:43 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=MClwyOvJku+JJeHUpNwmDD7Iw8uk3ZV0hFumwDd8IEdIYLRDP22toUO1AkvKo5WN4kH/aFFp/+ozEUFCcs2Xfr4aeZXGgoi4DQ7I/aXfQ5DpnOESlE/5XnLdEw96lQoUJyHktx78hrF1Uh8EFBz8ddP0R5T1ToUtgSrm/0pkzT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pEUdLhZt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAFA6C19422;
+	Fri, 14 Nov 2025 02:00:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763085643;
-	bh=hgLeirv24sSKgLUQUIUCllXdjV3fWHMNoHK00Xj9qsw=;
+	s=k20201202; t=1763085644;
+	bh=tc44Q84nwM31UzYk9NTTob1nNXu1W5I3T15GmcbBzPE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ao/9NrpNTFLdUthL00PkrQ1mT1qpRaMaxUMHEUbQHfpCKCvGvSm2gB294X9jh4ZG/
-	 XytI/eVZx98dhCIyJ4IrKKXYMBN4o3z4kDarUQcaHP+kBuI70ZxJm0IqYidQlfucKz
-	 NsMmTCpwgvPKifDPi+GyjkWNbaNDyzzpiHA7iU90N1BXn3gsKjflRwsu1Ifb3mmR3i
-	 K5UTbJ0+NNdvwovEfV+APMd28PYE/Q/lzc8MbI2WbSnTFhDVEmIvWsjNdqM5Qx4+3K
-	 ZYND7GXpA+KBHDDe/NaGUCiou2oAgWdxZzcAtI4iRj3pjFfm2TwXROHEB7dq2uVITJ
-	 OtCCb0fMEF92A==
+	b=pEUdLhZt+S6AtvKiSAUgjQzgLaDgU4RdpnZSRB1Vyk0lMve6CRAvyp6CwDXtw0/nv
+	 HUnOPO1WcPqnCgeM68xMzQpJue/Z4q4EeHGKFQPExeGiE/ccd/7Vm57lFMDINpHu7L
+	 TZGXfWU8OaCIjMpZ/BBDzFElhXSW3ydlE451IPBAxo/Sti1K5Ui4Djihc21IgDoii1
+	 cmnzD+ZUEToUTAA99bewbGDSqjtL1HjX95KKhxAkTnOulV9RCbj460x4GkTnmyaCjR
+	 BLIRFLuaLpMRhOHEoiDOjATHwvP/fH149hczv7vDuIMz4rhbID/hBRh3MWkVkUpB6i
+	 TzXO00Wpf9zVg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EB93A55F84;
-	Fri, 14 Nov 2025 02:00:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFAF3A55F84;
+	Fri, 14 Nov 2025 02:00:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,53 +52,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/4] net: phy: mscc: Add support for PHY LED
- control
+Subject: Re: [PATCH net-next v1 1/1] net: usb: usbnet: adhere to style
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176308561226.1083043.7639792003725622974.git-patchwork-notify@kernel.org>
-Date: Fri, 14 Nov 2025 02:00:12 +0000
-References: <20251112135715.1017117-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-In-Reply-To: 
- <20251112135715.1017117-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: Lad@codeaurora.org, Prabhakar <prabhakar.csengg@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horatiu.vultur@microchip.com, geert+renesas@glider.be,
- vladimir.oltean@nxp.com, vadim.fedorenko@linux.dev,
- Parthiban.Veerasooran@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- biju.das.jz@bp.renesas.com, fabrizio.castro.jz@renesas.com,
- prabhakar.mahadev-lad.rj@bp.renesas.com
+ <176308561350.1083043.5727485598090319213.git-patchwork-notify@kernel.org>
+Date: Fri, 14 Nov 2025 02:00:13 +0000
+References: <20251112102610.281565-1-oneukum@suse.com>
+In-Reply-To: <20251112102610.281565-1-oneukum@suse.com>
+To: Oliver Neukum <oneukum@suse.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-usb@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 12 Nov 2025 13:57:11 +0000 you wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Wed, 12 Nov 2025 11:25:00 +0100 you wrote:
+> This satisfies the coding style.
 > 
-> Hi All,
-> 
-> This patch series adds support for controlling the PHY LEDs on the
-> VSC85xx family of PHYs from Microsemi (now part of Renesas).
-> The first two patches simplify and consolidate existing probe code
-> the third patch introduces the LED control functionality.
-> The LED control feature allows users to configure the LED behavior
-> based on link activity, speed, and other criteria.
-> 
-> [...]
+> Signed-off-by: Oliver Neukum <oneukum@suse.com>
+> ---
+>  drivers/net/usb/usbnet.c | 233 ++++++++++++++++++++-------------------
+>  1 file changed, 120 insertions(+), 113 deletions(-)
 
 Here is the summary with links:
-  - [net-next,v4,1/4] net: phy: mscc: Simplify LED mode update using phy_modify()
-    (no matching commit)
-  - [net-next,v4,2/4] net: phy: mscc: Consolidate probe functions into a common helper
-    https://git.kernel.org/netdev/net-next/c/217eb2d60f56
-  - [net-next,v4,3/4] net: phy: mscc: Add support for PHY LED control
-    https://git.kernel.org/netdev/net-next/c/eb47c5c4888d
-  - [net-next,v4,4/4] net: phy: mscc: Handle devm_phy_package_join() failure in vsc85xx_probe_common()
-    https://git.kernel.org/netdev/net-next/c/df397943196f
+  - [net-next,v1,1/1] net: usb: usbnet: adhere to style
+    https://git.kernel.org/netdev/net-next/c/de9c41624c9c
 
 You are awesome, thank you!
 -- 
