@@ -1,163 +1,180 @@
-Return-Path: <netdev+bounces-238787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20FBDC5F631
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:38:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E38EBC5F6D7
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:51:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D64184E11D8
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 21:38:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B7F064E3DEF
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 21:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C736E2F0690;
-	Fri, 14 Nov 2025 21:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020C5302142;
+	Fri, 14 Nov 2025 21:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y0w1qzZ6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ck58+xfa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0788D2D190C
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 21:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C292F7456
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 21:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763156293; cv=none; b=fu18e5QGNMZT0+7KP+u7x3lt3duUdHhDYo+kdg4KujGiJ4kK3HQOHr0uQhQ3KxZ7+2hQ63Pg/beyfzzwBPgoLviQaVw7sawH18en/bYv31vFq6Ne3+V5H6QIZIqDXG6N/uMAzras2tff/XBKjcnPAOZJ7p2o1XBhjvIw2BydWwI=
+	t=1763156888; cv=none; b=Fckb0Tse7a0ZjgTBlF7gj+i5gNYmug5VI9QsnN1ZRvFSySXddbf/9SexMnh6sEDxMb9N4JorKoYvYsYSu+J21MFH9QyhUklZ4NBXFFl2ivtpRbxm4WlteXa634mstZA3K6hA9hZ1OKgdPJgFMIkqN/bRuUMfVqzYclnzTJLaCr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763156293; c=relaxed/simple;
-	bh=NdC5qsF+daIwhv+jfvY4zcENzV+hiW0SWRKdXrzUDDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gZKEQeiCXLRol8LvozH15hfvygsuByg00T3ITozYx8uBsJ8RcT5uDTIMtlo9odpeTzQF9Pn7YAAKtTJolXVaj1UbvyG81aLtI+uiXgS2jojAgVel6AoqMEOYg6Ifd6zOpuuVtx1KzTO9TFsf3glDTACP/UedhPThnS6QzpDw05o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y0w1qzZ6; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1763156888; c=relaxed/simple;
+	bh=qcxHIl3eJNcjKPwXvgB1OEh1kpfHHertbtutjHP8Bd0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mOe4zkPDb/8Ighxq3ry1wvaiJt1tRfmVRR8q70oX+jS36cm6hWhKioViRg1RASqwDbj8SM9RXkpiUnnHQI6VakIltmGKJW1PQYnfg26Z4+koKJxDiUGigmAGSFQB8Tjvhn/bSuvbX8O+OtEUr+ld00Ac+si/yq4TrufcR0/gbNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ck58+xfa; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42b3c965cc4so1248402f8f.0
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 13:38:11 -0800 (PST)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7b6dd81e2d4so2237266b3a.0
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 13:48:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763156290; x=1763761090; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2AdOzp3Vu6NN0uDZN6wbKPsm+e3bm/G64aFJ2Czz/Dc=;
-        b=Y0w1qzZ6IlxQlawgOU5uPcNW+qSEYGq/KcYSZKgMdHYozWsNQQ2Re6dTx9V67bURxh
-         l0bPakAcvxyuyaLUfh6TsPF4D8f2yZ0EXSUprukx1c6oI0cOuWrOsgRltQuNpLAs7vkn
-         UJfAOS7/pjceW7qpq+NEKsHAEPzAK7qyEIX/XpeFuBF2XGAhYoFweYfGrV8Yh02opHuJ
-         h09ANC+HPQ8JRNVu9MHlYYYzanOQqUq6yQSppXWSXD8snwSnFEkZujJgqCpMJePplX+5
-         zBso7EkKxyibBvPbIVPGVmni37f1hf93bh2duHi9MoKTlG+Z+NLk2xnetafht8MZUo99
-         B6Yw==
+        d=gmail.com; s=20230601; t=1763156883; x=1763761683; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ndWlFPbjxzRxRxDcI3I/Qsa3cvxWeCbP+0DJwpTI8QY=;
+        b=Ck58+xfaNnYqNoI04woOAroxHxFj+kLesyD/g6IhTBJcROA0upLVnGDJ7AIXXvo5gQ
+         TbUhgVyH5hrswGpgynBjjYYP0zlRNR3tct/v5QgF3zazBESZ0Ii2OLEZLr+zurarpm3e
+         TrT4N7sDxk2pz5LVpbk7bYDffr1WcRO4cuIRYI4sp6u6NwE1c5VvcF5CANfTKr0q0+RO
+         M3MQ04RgyS52h5vdkXxxh05Qa/1i1PVsVU1jXOxxS0x3a4NfBxeC97JgBvps0SE+HmEo
+         d6j0I2WYIGp/XFwmnEfIy2vpJ77Si/a6Cbg6MFhMduyu/nJ5tulxsKHT6cuVeqJd8WLM
+         U6jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763156290; x=1763761090;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=2AdOzp3Vu6NN0uDZN6wbKPsm+e3bm/G64aFJ2Czz/Dc=;
-        b=lIoqvVzdTrwVtxsR22yblJHDn+EG5imf3EPDtw5LkESS8ttAtuYj2AlGaKXwVBPCyn
-         3MULfBmfmr5XApXYWv7udJjB98fB3UTiTBVxMKCcjYbS9gx5MVEyM7NYk3NNYMj0t3Aa
-         E3UtsmxKcgdSZv9KGHn8VHeoTngJ90ZiEf2xWrJ3MbBeLprBRthoc6Vv6aGnjhc/TR0T
-         rpN8BzITFjX6lSM9RIEYOqS4Rx69OxHYyp04KR7H50VlKLUvmBj+TMysOj3/udM5ybZS
-         NhuDMOhr1Ro18S2cteQ5hzmsX0uX/F7botNTMdyNTFDQkjc4JmyavYc5ZurxjHOnvkKi
-         jaAg==
-X-Forwarded-Encrypted: i=1; AJvYcCWp0FZu7cd4nXeyZePA03JcNupcTl8aOBIV7+Z1ekl5T5K/FaOLmzE29OJ6pr0d4N6O20zG3KI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJn5d5auxYHwzOSIMtet37UbbeNfNSnQqFPUSBOGUi/3CbwJOy
-	AoFYdsF8hIvyhAM9EOoVw8nRgpkwwjVEHacoOmeLyg13u6FQ+7RQ+ar5
-X-Gm-Gg: ASbGnctrShi4eXQUR1AtBF+5jsuket83kw2yyheFgbk0/HX8D88qc+7m8p+ERRXHOTH
-	a8hZCQDf1/v8QvQZfoQr7HDqBRI156qX+p1piyc9mVeZvHIC7P8EvaLUv3oZI0Gb1zB/hh1Ph9S
-	rq2Fxg78zbxOvQCmtff5/CICogPz4pyj7DW/qdkMGl9zPXCfUxNrWlXFSCMmEZ+9ep+Kp8TSxys
-	j4eq4d7onDOv211u2eqONQq5hK1A/UzKbTbLh1iWixI94dNsC2rvcQfqjHLBERN5QpYKzBBA7UF
-	NrDhPXJhA0aFRFbiu9t/EZbQ14EKhRL0MpgJnn1F781S9H5O5Svsc4OtFHp+vt+PU7iq7VltpM2
-	tdzcRJol9EHjQvLmhd/jpnlAkB6JrbajjVW0nobYEY0mV43UIkH3sodSEab4tGNdZasVN4CTian
-	Z372Z4AzeFKAdt8h3zsKGDHx+WQSw1aykXxTBI8r1Busb1lpzsml1PctRfRsjSQxc=
-X-Google-Smtp-Source: AGHT+IF4RUaKrhCIq/a+CQuzQOczqQ1I8RVr8VKrQgygddIe/fx8JxhllhOhRwXR1khsOJv2FxFapw==
-X-Received: by 2002:a5d:584a:0:b0:429:cfa3:5fde with SMTP id ffacd0b85a97d-42b527be676mr8873626f8f.11.1763156290271;
-        Fri, 14 Nov 2025 13:38:10 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f206e2sm12158736f8f.41.2025.11.14.13.38.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 13:38:10 -0800 (PST)
-Date: Fri, 14 Nov 2025 21:38:08 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Jon Kohler <jon@nutanix.com>, Jason Wang <jasowang@redhat.com>, "Michael
- S. Tsirkin" <mst@redhat.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
- <eperezma@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Borislav
- Petkov <bp@alien8.de>, Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH net-next] vhost: use "checked" versions of get_user()
- and put_user()
-Message-ID: <20251114213808.252fc8eb@pumpkin>
-In-Reply-To: <CAHk-=whJ0T_0SMegsbssgtWgO85+nJPapn6B893JQkJ7x6K0Kw@mail.gmail.com>
-References: <20251113005529.2494066-1-jon@nutanix.com>
-	<CACGkMEtQZ3M-sERT2P8WV=82BuXCbBHeJX+zgxx+9X7OUTqi4g@mail.gmail.com>
-	<E1226897-C6D1-439C-AB3B-012F8C4A72DF@nutanix.com>
-	<CAHk-=whkVPGpfNFLnBv7YG__P4uGYWtG6AXLS5xGpjXGn8=orA@mail.gmail.com>
-	<20251114190856.7e438d9d@pumpkin>
-	<CAHk-=whJ0T_0SMegsbssgtWgO85+nJPapn6B893JQkJ7x6K0Kw@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        d=1e100.net; s=20230601; t=1763156883; x=1763761683;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ndWlFPbjxzRxRxDcI3I/Qsa3cvxWeCbP+0DJwpTI8QY=;
+        b=niV5HXXWWk8FLC3f0Y+507BOApM2+szvBx9it+mp2pZKBuXneK6vhjtmVpwYTZxGM4
+         pxhh8jlmJ2wrw9sS89uz8cfdSxkJQb5ZpgFctY7BXN2G4Xt5Py7Tfp1xYhrMjljX3yx0
+         BlMyE2VtjOnIfsOQRj+Ihk7PvEwIULmcVLXLGNB3djL6WpvJC+6su9YcVLIkJZyU0TBf
+         D+yxYjGhFMhg/IIqrIuEhn9l67bF05uiBzczh8Z4O0K50XjQ36xMercQ+2iz1DTDr73Z
+         5l3G5ebfkWW2/JZ3ECDYOTbMMxiUX3m64uMoNgciayFZaa8F7KfUVWYHDtcflZwqWg0e
+         X9iQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX0UKugyaJ7H3Kjd2vKSB0ew08IekmMshucvxpMcG91E8OsLlLfSgpodH4kcG4x58yPUAP2v+M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaBbHKKi9vfSXphB6SZjZcdxOvQ1t9nQLJoMpFkQ1pIuZ/lja1
+	+QBjnpbfkT+2wFwsiIRZNd6+46bITeUmluMMe7MWKc9315xIk/EohN5t
+X-Gm-Gg: ASbGnct7KEchPI9qf2q9dRPaWfs8nTNZ1BOsAq6YsgbLQI1R91Nb1UBAfoVC7ZNDy26
+	0nx4RdfA95gSNcOZ4HxamW1yXgicNxV0TTTNHPG43epzja8qQdgo96pHzK+yyQcNKmyTYDEbEPY
+	bZ9I5rS86Dq/+wffSPZfmqB5e5sQbwM4kmoTtxHwDtx8KqiTUpXffQRBKc3jiJvWf40SsOdOJA5
+	gGu493bs3/43J0/Ps5ecP5nPaDITRcTE7psh1IN5tFEyj/wOdIkzreZQOruq/ap83lV3rn7/xMd
+	dlHatPQLVBPO5K8fIBzz+4I9KGf9UuIgZAZ4zJowu94UNcBVQxtPr3zcwq6GinHdAs9vfpVyvCu
+	ZbdlkErMtbnhDX4VKJjPHuA7I0kdYlOoT5Vuvyy4i+NwsxxZqHquymNENEwDQSUrJzAbiN4B9Zk
+	Sd1y2W5G7kZVAJoMK0WS8bYx9yB1c=
+X-Google-Smtp-Source: AGHT+IFk2x7IEtAE2pW3ym3rkCFWB6IEtl35YOk+cFtHho6dgH5SfU1vSAmzp4x4mGkmdZkQZBx1Hg==
+X-Received: by 2002:a05:6a00:234b:b0:7ad:1e4:bef0 with SMTP id d2e1a72fcca58-7ba39ce56c7mr5152569b3a.4.1763156882938;
+        Fri, 14 Nov 2025 13:48:02 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b927150b13sm6144036b3a.46.2025.11.14.13.48.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Nov 2025 13:48:02 -0800 (PST)
+Message-ID: <11991339-711b-442d-a1e4-8c3393b12b0a@gmail.com>
+Date: Fri, 14 Nov 2025 13:48:01 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: LAN8720: RX errors / packet loss when using smsc PHY driver on
+ i.MX6Q
+To: Heiner Kallweit <hkallweit1@gmail.com>, Fabio Estevam <festevam@gmail.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
+ edumazet <edumazet@google.com>, netdev <netdev@vger.kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>
+References: <CAOMZO5DFxJSK=XP5OwRy0_osU+UUs3bqjhT2ZT3RdNttv1Mo4g@mail.gmail.com>
+ <e9c5ef6c-9b4c-4216-b626-c07e20bb0b6f@lunn.ch>
+ <CAOMZO5BEcoQSLJpGUtsfiNXPUMVP3kbs1n9KXZxaWBzifZHoZw@mail.gmail.com>
+ <1ec7a98b-ed61-4faf-8a0f-ec0443c9195e@gmail.com>
+Content-Language: en-US, fr-FR
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <1ec7a98b-ed61-4faf-8a0f-ec0443c9195e@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, 14 Nov 2025 12:48:52 -0800
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+On 11/14/25 13:33, Heiner Kallweit wrote:
+> On 11/14/2025 10:15 PM, Fabio Estevam wrote:
+>> Hi Andrew,
+>>
+>> On Thu, Nov 13, 2025 at 7:35 PM Andrew Lunn <andrew@lunn.ch> wrote:
+>>
+>>> Maybe dump all 32 registers when genphy and smsc driver are being used
+>>> and compare them?
+>>
+>> The dump of all the 32 registers are identical in both cases:
+>>
+>> ./mii-diag -vvv
+>> mii-diag.c:v2.11 3/21/2005 Donald Becker (becker@scyld.com)
+>>   http://www.scyld.com/diag/index.html
+>> Using the default interface 'eth0'.
+>>    Using the new SIOCGMIIPHY value on PHY 0 (BMCR 0x3100).
+>>   The autonegotiated capability is 01e0.
+>> The autonegotiated media type is 100baseTx-FD.
+>>   Basic mode control register 0x3100: Auto-negotiation enabled.
+>>   You have link beat, and everything is working OK.
+>>     This transceiver is capable of  100baseTx-FD 100baseTx 10baseT-FD 10baseT.
+>>     Able to perform Auto-negotiation, negotiation complete.
+>>   Your link partner advertised cde1: Flow-control 100baseTx-FD
+>> 100baseTx 10baseT-FD 10baseT, w/ 802.3X flow control.
+>>     End of basic transceiver information.
+>>
+>> libmii.c:v2.11 2/28/2005  Donald Becker (becker@scyld.com)
+>>   http://www.scyld.com/diag/index.html
+>>   MII PHY #0 transceiver registers:
+>>     3100 782d 0007 c0f1 05e1 cde1 0009 ffff
+>>     ffff ffff ffff ffff ffff ffff ffff 0000
+>>     0040 0002 60e0 ffff 0000 0000 0000 0000
+>>     ffff ffff 0000 000a 0000 00c8 0000 1058.
+>>   Basic mode control register 0x3100: Auto-negotiation enabled.
+>>   Basic mode status register 0x782d ... 782d.
+>>     Link status: established.
+>>     Capable of  100baseTx-FD 100baseTx 10baseT-FD 10baseT.
+>>     Able to perform Auto-negotiation, negotiation complete.
+>>   Vendor ID is 00:01:f0:--:--:--, model 15 rev. 1.
+>>     No specific information is known about this transceiver type.
+>>   I'm advertising 05e1: Flow-control 100baseTx-FD 100baseTx 10baseT-FD 10baseT
+>>     Advertising no additional info pages.
+>>     IEEE 802.3 CSMA/CD protocol.
+>>   Link partner capability is cde1: Flow-control 100baseTx-FD 100baseTx
+>> 10baseT-FD 10baseT.
+>>     Negotiation  completed.
+>>
+>> After pinging with the Generic PHY driver:
+>>
+>> # ethtool -S eth0 | grep error
+>>       tx_crc_errors: 0
+>>       rx_crc_errors: 0
+>>       rx_xdp_tx_errors: 0
+>>       tx_xdp_xmit_errors: 0
+>>
+>> After pinging with the SMSC PHY driver:
+>>
+>> # ethtool -S eth0 | grep err
+>>       tx_crc_errors: 0
+>>       IEEE_tx_macerr: 0
+>>       IEEE_tx_cserr: 0
+>>       rx_crc_errors: 19
 
-> On Fri, 14 Nov 2025 at 11:09, David Laight <david.laight.linux@gmail.com> wrote:
-> >
-> > I think that is currently only x86-64?
-> > There are patches in the pipeline for ppc.
-> > I don't think I've seen anything for arm32 or arm64.  
-> 
-> Honestly, the fact that it's mainly true on x86-64 is simply because
-> that's the only architecture that has cared enough.
-> 
-> Pretty much everybody else is affected by the exact same speculation
-> bugs. Sometimes the speculation window might be so small that it
-> doesn't matter, but in most cases it's just that the architecture is
-> so irrelevant that it doesn't matter.
-> 
-> So no, this is not a "x86 only" issue. It might be a "only a couple of
-> architectures have cared enough for it to have any practical impact".
-> 
-> End result: if some other architecture still has a __get_user() that
-> is noticeably faster than get_user(), it's not an argument for keeping
-> __get_user() - it's an argument that that architecture likely isn't
-> very important.
+The CRC errors should be a clear sign that you have a serious electrical 
+issue here as the MAC is not capable of de-framing what is coming out of 
+the PHY properly.
 
-I was really thinking it was a justification to get the 'address masking'
-implemented for other architectures.
+Given that you use RMII this would indicate that your PHY's TX CLK, 
+which is a RX CLK on the MAC side may not be stable, do you have a scope 
+you could use to check that it looks correct? Anything on the PCB itself 
+that could hinder the clock signal quality?
 
-It wouldn't surprise me if some of the justifications for the 'guard page'
-at the top of x86-64 userspace (like speculative execution across the
-user-kernel boundary) aren't a more general problem.
-
-So adding support to arm32, arm64, riscV and 32bit x86 might be reasonable.
-What does that really leave? sparc, m68k?
-
-At that point requiring a guard page for all architectures starts looking
-reasonable, and the non 'address masking' user access checks can all be
-thrown away.
-That isn't going to happen quickly, but seems a reasonable aim.
-
-Architectures without speculation issues (old ones) can use a C compare.
-I think this works for 32bit x86 (without cmov):
-	mov $-guard_page, %guard_off
-	add %user_addr, %guard_off
-	sbb %mask, %mask
-	and %mask, %guard_off
-	sub %guard_off, %user_addr
-mips-like architectures (no flags) probably require a 'cmp' and 'dec'
-to generate the mask value.
-(I'm not sure how that compares to any of the ppc asm blocks.)
-
-	David
-
-> 
->            Linus
-
+Given that you don't see it at 10Mbits/sec, this would suggest you have 
+an issue with data sampling and rise/fall times of the clock being 
+misaligned with when the data is present on the data lines.
+-- 
+Florian
 
