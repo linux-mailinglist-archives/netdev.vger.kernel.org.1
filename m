@@ -1,107 +1,157 @@
-Return-Path: <netdev+bounces-238800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD57EC5F891
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 23:52:15 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CC91C5F8A3
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 23:59:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5B50E4E1B2A
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:51:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 044BB356F85
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:58:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B9F2F6582;
-	Fri, 14 Nov 2025 22:51:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB12308F39;
+	Fri, 14 Nov 2025 22:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PVez5jdh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="flG+wGhK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D1E235898;
-	Fri, 14 Nov 2025 22:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054D8304BC4;
+	Fri, 14 Nov 2025 22:58:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763160697; cv=none; b=F8Yg7axEVNSD0KUI6oTkY5YV41pDgkcLE9gIF2xPCl358+93CWFzaiSoHRxzlRebUd6MArGTZrHL0kKMXIjsgULHZgvF1ihgKhf7PbkPamRa/S0ozxFX9cfj92A1S41iNd7EeRLgUWkxeQ7QCTXa8my5HdMUlCksKIg3jzRc7xM=
+	t=1763161135; cv=none; b=L8Qo1p0edwrHQKM2Qaq6lH6Q08umdAKZmLMeniK0cc8dh7tDPQtaJTTBr6L8CDzmmtryVL4VK3OcRJ3k+7XCbr1Ns1bgSoPhcDzC+p8Mv17UQhIsh4n5nsDOO/gTKn47kWQVWsWQCjog+XbUIWTrOct446ArpzkHuXSuTV9EQTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763160697; c=relaxed/simple;
-	bh=2yV8JhWlv0Astt8KudvmzHYW8ACcv0aWPv9YfTnG/SU=;
+	s=arc-20240116; t=1763161135; c=relaxed/simple;
+	bh=UK2/RGXrtuN+aWxxMx7vp0pWryOiraTw48WILwPFn9o=;
 	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=rXNQgJm8efJ3VyDYOpX1doluIcfI6xnbuGO/EcyXmoKgbD9a585L7T6Nf+541KgTUnr2woZstWJT5uOHgJUvA9JWW4b1eJiUJVpSRYvvpsECt1bgEtFtXmq0/xM8lEbHfODuCsLTONxRBD4vgI4Bebz6J44qPI9esZlPswHlPKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PVez5jdh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3232EC4CEF1;
-	Fri, 14 Nov 2025 22:51:36 +0000 (UTC)
+	 Subject:From:To:Cc:Date; b=ph05XkZ/q2jRw9WUtq6NtW92cDxJ+zccVhG8pmcJeRCI5KPCfI8w+hnqULtl9KkKct1kqD3FTzcGfwnE8PgOPHBZBmQJs+fO8zQx01Z1oSfmLYa7wXWvqGXfdZMqLVco0NOErhawxnWsXyKcHFxjHGuepBCNN7yHMFIXtS9n/88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=flG+wGhK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458A5C16AAE;
+	Fri, 14 Nov 2025 22:58:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763160696;
-	bh=2yV8JhWlv0Astt8KudvmzHYW8ACcv0aWPv9YfTnG/SU=;
+	s=k20201202; t=1763161134;
+	bh=UK2/RGXrtuN+aWxxMx7vp0pWryOiraTw48WILwPFn9o=;
 	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=PVez5jdhnquBOsRtoJC/1Gdrmaxix9KCUaKCcCTN7P6exoZJ606REXqEtRHC1weIs
-	 xrHa3pJ4ikSPb3fVzok0bRjAcWwAhL+Ecr2rzHnJ3mH6yHxg/or5NFDyENkCP6JeJM
-	 aQF9nx1gu1nkdGwkRT+GDU8hvMgm6f2FKlFI+l4NQQuFZYbU46Tq+c1eYNPlDEN1m9
-	 Q/wvRJJnr2UbpXl3fHaGJBVJrvSSfvKGR7w7WwhfeJ3VMlsa6Tny7kG2m5+XFKqFmg
-	 jRZcnGhuS7qXokgNCiYMDdzW1lQQR/MVZSkRqsEOopdzuRIQq6r5EXVduuMehkF2Mo
-	 /Iv6N1rxbRzEw==
-Content-Type: multipart/mixed; boundary="===============1933662450940188420=="
+	b=flG+wGhK41qW596pdygaolXJ1Gp4yVI3yxEK1fP5GSKjyDYUWk7FnoLTXQECP3Yh6
+	 BMYbKgJQLFqMZPZc/c/T9bLn5DSbHq1Sdb5WQb9dbHktNJ+12BvBDPFC6gqSkjHKfG
+	 X6wlA9zGpA+DH6OiN2r0/W8lmA2Xd5SCPSg/88nJqZmSFGSGxhGoI+vZICNlU0Zlwr
+	 78tys4yfqUff7sxIJDMp2gMbTFg02ptiu7tdDLKiBmIqae4GAoQrb9PlBh6QFYqR2A
+	 XwA4xIsqDbFu5buESkgBLTvvEtePIC1JpCNinbNg32oNQ9HAZBYk++NeMnrDbWdKrs
+	 pzgOn1Z+JU70w==
+Content-Type: multipart/mixed; boundary="===============6247975378476743638=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <16d43cdc90504cad5143df62b3d40f325a271aeca0adc521c6fef711023f90ef@mail.kernel.org>
-In-Reply-To: <20251114221741.317631-3-ameryhung@gmail.com>
-References: <20251114221741.317631-3-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf-next v6 2/6] bpf: Support associating BPF program with struct_ops
+Message-Id: <90d4a3da144059c5d680eef68ca0979662e35e31adc0f8076fff364ed80757b0@mail.kernel.org>
+In-Reply-To: <20251114221741.317631-4-ameryhung@gmail.com>
+References: <20251114221741.317631-4-ameryhung@gmail.com>
+Subject: Re: [PATCH bpf-next v6 3/6] libbpf: Add support for associating BPF program with struct_ops
 From: bot+bpf-ci@kernel.org
 To: ameryhung@gmail.com,bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,tj@kernel.org,martin.lau@kernel.org,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri, 14 Nov 2025 22:51:36 +0000 (UTC)
+Date: Fri, 14 Nov 2025 22:58:54 +0000 (UTC)
 
---===============1933662450940188420==
+--===============6247975378476743638==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-> index a41e6730e..626aa9197 100644
-> --- a/kernel/bpf/bpf_struct_ops.c
-> +++ b/kernel/bpf/bpf_struct_ops.c
+> diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
+> index b66f5fbfb..21b57a629 100644
+> --- a/tools/lib/bpf/bpf.c
+> +++ b/tools/lib/bpf/bpf.c
 
 [ ... ]
 
-> @@ -811,6 +822,12 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->  		bpf_link_init(&link->link, BPF_LINK_TYPE_STRUCT_OPS,
->  			      &bpf_struct_ops_link_lops, prog, prog->expected_attach_type);
->  		*plink++ = &link->link;
+> +int bpf_prog_assoc_struct_ops(int prog_fd, int map_fd,
+> +			      struct bpf_prog_assoc_struct_ops_opts *opts)
+> +{
+> +	const size_t attr_sz = offsetofend(union bpf_attr, prog_assoc_struct_ops);
+> +	union bpf_attr attr;
+> +	int err;
 > +
-> +		err = bpf_prog_assoc_struct_ops(prog, &st_map->map);
-> +		if (err) {
-> +			bpf_prog_put(prog);
-> +			goto reset_unlock;
-> +		}
+> +	if (!OPTS_VALID(opts, bpf_prog_assoc_struct_ops_opts))
+> +		return libbpf_err(-EINVAL);
+> +
+> +	memset(&attr, 0, attr_sz);
+> +	attr.prog_assoc_struct_ops.map_fd = map_fd;
+> +	attr.prog_assoc_struct_ops.prog_fd = prog_fd;
+> +	attr.prog_assoc_struct_ops.flags = OPTS_GET(opts, flags, 0);
+> +
+> +	err = sys_bpf(BPF_PROG_ASSOC_STRUCT_OPS, &attr, attr_sz);
+> +	return libbpf_err_errno(err);
+> +}
 
-Can this double-put the prog reference? In bpf_struct_ops_map_update_elem:
+[ ... ]
 
-  prog = bpf_prog_get(prog_fd);              // refcnt = 1
-  bpf_link_init(..., prog, ...);             // link takes ownership
-  *plink++ = &link->link;                    // link stored in st_map
-  err = bpf_prog_assoc_struct_ops(prog, ...);
-  if (err) {
-    bpf_prog_put(prog);                      // refcnt = 0, prog freed
-    goto reset_unlock;
-  }
+> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+> index 706e7481b..1d5424276 100644
+> --- a/tools/lib/bpf/libbpf.c
+> +++ b/tools/lib/bpf/libbpf.c
 
-Then at reset_unlock:
+[ ... ]
 
-  bpf_struct_ops_map_put_progs(st_map);      // calls bpf_link_put(link)
+> +int bpf_program__assoc_struct_ops(struct bpf_program *prog, struct bpf_map *map,
+> +				  struct bpf_prog_assoc_struct_ops_opts *opts)
+> +{
+> +	int prog_fd, map_fd;
+> +
+> +	prog_fd = bpf_program__fd(prog);
+> +	if (prog_fd < 0) {
+> +		pr_warn("prog '%s': can't associate BPF program without FD (was it loaded?)\n",
+> +			prog->name);
+                     ^^^^^^^^^^
+Can this crash if prog is NULL? bpf_program__fd() handles NULL by
+returning libbpf_err(-EINVAL), so prog_fd will be negative and we
+enter this error path. Then prog->name dereferences the NULL pointer.
 
-The bpf_link_put will eventually call bpf_link_dealloc()->bpf_prog_put(link->prog),
-attempting to put the already-freed prog reference. This looks like a use-after-free
-if bpf_prog_assoc_struct_ops fails (which can happen when a non-struct_ops program
-is already associated and returns -EBUSY).
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (prog->type == BPF_PROG_TYPE_STRUCT_OPS) {
+            ^^^^^^^^^
+Similarly, is prog guaranteed non-NULL here? We know prog_fd is valid,
+but that doesn't prove prog itself was checked.
 
-Should the error path skip the bpf_prog_put and let bpf_struct_ops_map_put_progs
-handle the cleanup via the link?
+> +		pr_warn("prog '%s': can't associate struct_ops program\n", prog->name);
+> +		return -EINVAL;
+> +	}
+> +
+> +	map_fd = bpf_map__fd(map);
+> +	if (map_fd < 0) {
+> +		pr_warn("map '%s': can't associate BPF map without FD (was it created?)\n", map->name);
+                    ^^^^^^^^^^
+Same issue with map - bpf_map__fd() handles NULL by returning an error,
+but then we dereference map->name in the error message.
+
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!bpf_map__is_struct_ops(map)) {
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+bpf_map__is_struct_ops() also dereferences map->def.type without a NULL
+check, which would crash here if map is NULL.
+
+> +		pr_warn("map '%s': can't associate non-struct_ops map\n", map->name);
+> +		return -EINVAL;
+> +	}
+> +
+> +	return bpf_prog_assoc_struct_ops(prog_fd, map_fd, opts);
+> +}
+
+Note: This follows the same pattern as existing functions like
+bpf_program__pin() which also dereference prog->name without checking
+prog for NULL. However, since the helper functions (bpf_program__fd,
+bpf_map__fd) do handle NULL, it seems inconsistent to crash in the
+error message when reporting that NULL was passed.
+
+[ ... ]
 
 
 ---
@@ -110,5 +160,5 @@ See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
 CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19379369447
 
---===============1933662450940188420==--
+--===============6247975378476743638==--
 
