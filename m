@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-238776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 538A7C5F52B
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:13:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92F73C5F534
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 22:13:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1E72E35CDE1
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 21:12:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CF78535CE92
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 21:13:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB763446CF;
-	Fri, 14 Nov 2025 21:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDE8134B1A3;
+	Fri, 14 Nov 2025 21:12:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hLMy7JoI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q3MCqg8T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397A2301486
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 21:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 572C73491EB
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 21:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763154745; cv=none; b=XHLgIuZ+2SHtu9McD9DEAs4sVdEqhMIPqEbQLThXGCEQ9jahaHEuWyq5OqVcl41z1m6riJko5/UsjrxDQVd4+BEzIlMCGLud6q4C78iU4v8MAq0J2Ygjx1d9LcvhRv9PLWXnBzGqwybHczF+tXIG6YmcngzfDEKDgO6nRayGMhM=
+	t=1763154747; cv=none; b=NWcS1TqHNV44/oiVcXoPu7HUc4ogCvirEGlGJBt+oD1C1REQQHHy8KYJHlCHCP3RAa/Et5jH9V3SznpKeZDwIadykgdbxJGkBBwDoMoynrcSgpIJ4pE16DnLdKCjj0v2YGrwSl2d8ywut/k6vW/7Btg+nmyEWsWLtt62pw+AhF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763154745; c=relaxed/simple;
-	bh=ByKZPuk2HGQW6OhN65KtLVsYzAqmXFSrQnJxwSyHvLI=;
+	s=arc-20240116; t=1763154747; c=relaxed/simple;
+	bh=T6+d668CY7Ck7eZvXYmqIoDhdMFjjZNlShKvRnyo6yo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZL+DXxL1+zVIDUCQSWMM5zH9Lf8KeFXvT3zlcT7ArlNoX0t9aO/4hYr/Bke4MSk2zvxGS4PAowao/Oe4WAH0X5PMkgeSNEElrae3abmNNFEIlqJnIGGCrKdY1J9yMhfqSHOvUW2yE9Hf89DpxRGCAlPsYuQXtrzKWvniAjyBmw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hLMy7JoI; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=XXNR0/+wknDrRpF5El0dNHZKHe0GaxBWzaZYdlf3AGu0toyFghyl4nRiXbyqwfe0v9uQ+QF+Ht2py4Xmktdc9GoY4T/HWZ/t9KhHnQ1sjDzP5t0bJumsygKxCh4KBsMMC+8O9Bjnfu6R/b33RpGiVxuJdeCT/evpG2Ayzp74DoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q3MCqg8T; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-343725e6243so3688813a91.1
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 13:12:24 -0800 (PST)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7bad1cef9bcso2121341b3a.1
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 13:12:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763154743; x=1763759543; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763154746; x=1763759546; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QKBHl2B0t2rsNVRLaKmcfcEl1iIRuO5Q1cRjHVhm6UQ=;
-        b=hLMy7JoICx8hjCHoeyfhipxGfrq8dFXdrwbUYzuqzmbBmucoAvJt9sp8jOJhaFdy9f
-         w24d3hticl5H3hjsgPf8zlWh0/KOFwY3c5hBbSzLTYGZJ8I+Prk3kywUL4pqzPQASGJn
-         cJe0xEGpKT1+RXvARBAMzrnAv/RNmYIzyjdpNKr5zuL7i3yc/bCEZ58+4QvjfsjTK7Il
-         SZSLdvEqemTJaHyIu1kpDlvswhzCrIdz8YTtOTElZgpJVqd/aysNiqCabuoE6iZKSOJ2
-         ws2oY9AWxwFFPV7PuHE8TTQfcqqWwSMki5GKdzWDrTtCzunNYn3Eg/Pp6ppRa5x+N+Wu
-         jNvA==
+        bh=pmEQOsW5fdEOM8rVgZL0f19iMNBD1EWCqYTBFjDAENI=;
+        b=q3MCqg8TX33FBuYmaeNw0Don1lwRfeiwXe5XqCUOd8Vm9RdZOjDI3dl/s2iq78sygQ
+         OgBaep0SGsoyciTq+O8R8MX8lZDgbuL0PcvZKTdJg1lJzVcJIFqVG2OluTWpbtFx020M
+         rba7H2RZqrZUW7Q8Jqf29TqbNnYNiRAbxa3W/+PuuuQ8jJWj10oZvpewCs8vDp5x6BRh
+         5YpMwOxe00zAfUKgPR/yy2nxkzFP5UN23znsPKO5hjDfLzcmVDWzWwop9DFi5FDSraPx
+         pT33/Ys26FULmZ95ZXUwMNOiTW2QmlNuxMM1BNuYSkHb3VVxQ3JErGY65drBGNkPFbeu
+         QWJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763154743; x=1763759543;
+        d=1e100.net; s=20230601; t=1763154746; x=1763759546;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QKBHl2B0t2rsNVRLaKmcfcEl1iIRuO5Q1cRjHVhm6UQ=;
-        b=WcAlnIHXhNDDxQiQaLy/g6G4BUBrSXkdUZhREF7GX5Y5yJTuRE9MzomMvfzqsQ4ir0
-         SC4WZuIlUZD6c+ivrd962jYAUXrnkc3FhMCGwQkPUnvDIFLhJw7pVOAZ+IZ0yhksJiiu
-         MP+ug1nk2PnYkRxzn/9gwj/R6J0CjV8rDyGYi0zOd+BZbtkfE3Vwnq4tWHq7zqVbOHu7
-         rCdXlibP9EnMQEkZJMXNAGtd2ixGPLk/Wd3AikPES8K73T0huj9fO6KzGVcEGShrRZAC
-         9bB6/azi0Fq7wtRmMTgFwtR+aT24yBM2sN3PxztroWCdOTg5bBC3T2QZ1AjqnxbEvUVe
-         F0kQ==
-X-Gm-Message-State: AOJu0YyPH+FfYP2C54r1f7UMw3dqONKVUzGbeEgu9cj0bbc4yIkDKhIM
-	wZ8G9yj1+q3x/ExVpkjevL2oQ/EwvVjiVOeinnob50Y9ts72IFvPBlEGtqZPAfbuQDp8YJ7JUBZ
-	j9+hd8ttMzmU4rw64QguDOhq3dWlP6LQpEgpPmXhVicessoOx1EcItEoM1p+QvKDRv8AcCzqejB
-	zW652VwlUHO/n9mnPoQ5b3WqqNj0+GzPLyNv1rc7/A/m/O4l4=
-X-Google-Smtp-Source: AGHT+IGWVBv3Pww1t7WePIYslvvfU7cKUspRKFbH+20W0IFFp4fY2S5t4bjF/WQt153NaTPY5mB4phKvdG0f9g==
-X-Received: from pjbms13.prod.google.com ([2002:a17:90b:234d:b0:341:adc3:c051])
+        bh=pmEQOsW5fdEOM8rVgZL0f19iMNBD1EWCqYTBFjDAENI=;
+        b=jypGih2BzFKibu+jQL+qLdMlF6fDeyw3MH3L46p5iZ7DTNhIeH0CoIIp5Jt3d8KeYD
+         7OKOMLim8T6QNfUDwJd3zyWMI3U0/Pl3cu60wt23esWJAlyY6IeKdeuuZYMs/2A+E09U
+         1ljQy6BmAv0JvhfVe5Enboj5/GdsmJr58GosXZ3tOfAak+y/CzQTxM3rQsZ2sbtqLG8c
+         itjWU8KUhKh5YzAViNpjfh9oyIlFgkI32fZMuO0P+Vr3NXRXG8hsSnd9VVtgOJX9EGxC
+         GNb2TiJFKyrGlyrfn+RCra95pnaH6HdW+s8BSjUORumbFkP4V1roLQyk8rg3bcyHK+0d
+         gdcg==
+X-Gm-Message-State: AOJu0YyCxyBAydTBssZeiqPECpsEqKj0qecgrgynWHfc+xkrX+GnKpgm
+	5/zBpTT53Iu7gnSIunZZaaLCkwz0zWprLu309ns4fv3t4tvkVWxiLHTe2sClGF/3VcRgZI6qPDL
+	U8ZOhZF1lCdvp2kgLqXTubJbbTjGN50/P92kraFGzBa2lbY2OW2c2JLHH2k9laJMmmGCB9ZOU94
+	Wqs6+GrKqVtAjrtWbMEBPe6aK64F6jMZFY6FwUUrKHRoOljgA=
+X-Google-Smtp-Source: AGHT+IFZzfB2L/hPLfcxvKwlFateyylLJARdQKfDv09tdbnT7hsReWajdQtkS8JbmkPJUWMTInKqnF2TjKYjTQ==
+X-Received: from pgag19.prod.google.com ([2002:a05:6a02:2f13:b0:bc7:bb77:3836])
  (user=joshwash job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:1811:b0:341:1a50:2ea9 with SMTP id 98e67ed59e1d1-343eacbf2e9mr9594441a91.16.1763154743307;
- Fri, 14 Nov 2025 13:12:23 -0800 (PST)
-Date: Fri, 14 Nov 2025 13:11:43 -0800
+ 2002:a05:6a20:7484:b0:34f:28f7:ed79 with SMTP id adf61e73a8af0-35b9fd7be60mr5841238637.19.1763154744982;
+ Fri, 14 Nov 2025 13:12:24 -0800 (PST)
+Date: Fri, 14 Nov 2025 13:11:44 -0800
 In-Reply-To: <20251114211146.292068-1-joshwash@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251114211146.292068-1-joshwash@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251114211146.292068-2-joshwash@google.com>
-Subject: [PATCH net-next 1/4] gve: Move ptp_schedule_worker to gve_init_clock
+Message-ID: <20251114211146.292068-3-joshwash@google.com>
+Subject: [PATCH net-next 2/4] gve: Wrap struct xdp_buff
 From: joshwash@google.com
 To: netdev@vger.kernel.org
 Cc: Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
@@ -91,71 +91,72 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Tim Hostetler <thostet@google.com>
 
-Previously, gve had been only initializing ptp aux work when
-hardware timestamping was initialized through ndo_hwtsatmp_set. As this
-patch series introduces XDP hardware timestamp metadata which will
-require the ptp aux work, the work can't be gated on the
-kernel_hwtstamp_config being set and must be initialized elsewhere.
-
-For simplicity, ptp_schedule_worker is invoked right after the ptp_clock
-is registered with the kernel (which happens during gve_probe or
-following reset). The worker is scheduled in GVE_NIC_TS_SYNC_INTERVAL_MS
-as the synchronous call to gve_clock_nic_ts_read makes the worker
-redundant if scheduled immediately.
-
-If gve cannot read the device clock immediately, it errors out of
-gve_init_clock.
+RX timestamping will need to keep track of extra temporary information
+per-packet. In preparation for this, introduce gve_xdp_buff to wrap the
+xdp_buff. This is similar in function to stmmac_xdp_buff and
+ice_xdp_buff.
 
 Signed-off-by: Tim Hostetler <thostet@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 Signed-off-by: Joshua Washington <joshwash@google.com>
 ---
- drivers/net/ethernet/google/gve/gve_main.c |  4 ----
- drivers/net/ethernet/google/gve/gve_ptp.c  | 12 ++++++++++++
- 2 files changed, 12 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/google/gve/gve.h        |  5 +++++
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c | 16 ++++++++--------
+ 2 files changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 6fb8fbb38a7d..2b41a42fb516 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -2188,10 +2188,6 @@ static int gve_set_ts_config(struct net_device *dev,
+diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+index a33b44c1eb86..a21e599cf710 100644
+--- a/drivers/net/ethernet/google/gve/gve.h
++++ b/drivers/net/ethernet/google/gve/gve.h
+@@ -205,6 +205,11 @@ struct gve_rx_buf_state_dqo {
+ 	s16 next;
+ };
+ 
++/* Wrapper for XDP Rx metadata */
++struct gve_xdp_buff {
++	struct xdp_buff xdp;
++};
++
+ /* `head` and `tail` are indices into an array, or -1 if empty. */
+ struct gve_index_list {
+ 	s16 head;
+diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+index 1aff3bbb8cfc..76b26896f572 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+@@ -840,23 +840,23 @@ static int gve_rx_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
+ 	}
+ 
+ 	if (xprog) {
+-		struct xdp_buff xdp;
++		struct gve_xdp_buff gve_xdp;
+ 		void *old_data;
+ 		int xdp_act;
+ 
+-		xdp_init_buff(&xdp, buf_state->page_info.buf_size,
++		xdp_init_buff(&gve_xdp.xdp, buf_state->page_info.buf_size,
+ 			      &rx->xdp_rxq);
+-		xdp_prepare_buff(&xdp,
++		xdp_prepare_buff(&gve_xdp.xdp,
+ 				 buf_state->page_info.page_address +
+ 				 buf_state->page_info.page_offset,
+ 				 buf_state->page_info.pad,
+ 				 buf_len, false);
+-		old_data = xdp.data;
+-		xdp_act = bpf_prog_run_xdp(xprog, &xdp);
+-		buf_state->page_info.pad += xdp.data - old_data;
+-		buf_len = xdp.data_end - xdp.data;
++		old_data = gve_xdp.xdp.data;
++		xdp_act = bpf_prog_run_xdp(xprog, &gve_xdp.xdp);
++		buf_state->page_info.pad += gve_xdp.xdp.data - old_data;
++		buf_len = gve_xdp.xdp.data_end - gve_xdp.xdp.data;
+ 		if (xdp_act != XDP_PASS) {
+-			gve_xdp_done_dqo(priv, rx, &xdp, xprog, xdp_act,
++			gve_xdp_done_dqo(priv, rx, &gve_xdp.xdp, xprog, xdp_act,
+ 					 buf_state);
+ 			return 0;
  		}
- 
- 		kernel_config->rx_filter = HWTSTAMP_FILTER_ALL;
--		gve_clock_nic_ts_read(priv);
--		ptp_schedule_worker(priv->ptp->clock, 0);
--	} else {
--		ptp_cancel_worker_sync(priv->ptp->clock);
- 	}
- 
- 	priv->ts_config.rx_filter = kernel_config->rx_filter;
-diff --git a/drivers/net/ethernet/google/gve/gve_ptp.c b/drivers/net/ethernet/google/gve/gve_ptp.c
-index a384a9ed4914..073677d82ee8 100644
---- a/drivers/net/ethernet/google/gve/gve_ptp.c
-+++ b/drivers/net/ethernet/google/gve/gve_ptp.c
-@@ -133,9 +133,21 @@ int gve_init_clock(struct gve_priv *priv)
- 		err = -ENOMEM;
- 		goto release_ptp;
- 	}
-+	err = gve_clock_nic_ts_read(priv);
-+	if (err) {
-+		dev_err(&priv->pdev->dev, "failed to read NIC clock %d\n", err);
-+		goto release_nic_ts_report;
-+	}
-+	ptp_schedule_worker(priv->ptp->clock,
-+			    msecs_to_jiffies(GVE_NIC_TS_SYNC_INTERVAL_MS));
- 
- 	return 0;
- 
-+release_nic_ts_report:
-+	dma_free_coherent(&priv->pdev->dev,
-+			  sizeof(struct gve_nic_ts_report),
-+			  priv->nic_ts_report, priv->nic_ts_report_bus);
-+	priv->nic_ts_report = NULL;
- release_ptp:
- 	gve_ptp_release(priv);
- 	return err;
 -- 
 2.51.2.1041.gc1ab5b90ca-goog
 
