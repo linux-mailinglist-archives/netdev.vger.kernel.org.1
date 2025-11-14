@@ -1,132 +1,164 @@
-Return-Path: <netdev+bounces-238676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00678C5D6F5
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 14:51:48 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E7AC5D771
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 15:05:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC81E4215DC
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 13:51:47 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AC87434ADF1
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 13:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8A5531A7EA;
-	Fri, 14 Nov 2025 13:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C87CE31C595;
+	Fri, 14 Nov 2025 13:58:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Msb0e0qK"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vfU0gKvS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53FF031A553
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 13:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE02F31BCA4
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 13:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763128305; cv=none; b=rVjr4yaATFXHs4PdbvjC4rBu+lsS6vIcZohKgydeY8H1ZtSpfKWB/BoAq6imBIgA8B/9DhkCVMigRwmJAl1FkS8UoYYaj4jmnaB0ZGgle5iDson91xJupMAs7zMwBqThhTUHo2LpV8/U6r4KkW82CuoHKjqrGxJWVZkLiCZoHc4=
+	t=1763128712; cv=none; b=rp2f2rWQfZrUtbxiewkCPS3fA1CCTC9ySJqQ5Y32XG660LnTaIxOZ5OW7w/K85NUM5V5tP1NhB6My032xekDPPUPe/h4rB/rZH1Jm6CNcuZ4q6HT+w2luWu0aggtwxrvQ6uYGc2c5SoNRH6V7MRCV/YtWBXIwUAPwSKSEgufhfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763128305; c=relaxed/simple;
-	bh=sJoCOb59lek2MtBa9ms3bGQWiJQ+5zr3mMwP0lE+I9A=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=XYMNr9t2Y7/VkbuwDSw6gWEqIyODs+Vq213qP7G1xJlmfGworjnCCm9nvqgN1WQAfELLJbp7TOHZ9uoWeC4XttPPyvlRSCbwfoatqZyj++gtbz8Owo4oZQVzLYoxYA0XswXgmvlS4ckt521UZbRIqtsUXwA9dc7G/vXfEPuJDU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Msb0e0qK; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-89090e340bfso449665085a.0
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 05:51:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763128303; x=1763733103; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8fX7j3pxh3AWoBREo0gN87yLz1wqkWYDWnfHdqYzH+Y=;
-        b=Msb0e0qKVyFaT+NLHssxiXpbY7lFnupTo3N/lEYx0Jt6chilKVyeaX6kjxQfxmMRZp
-         itwRBGgfHbZxUlH4cztbOTzJFLd+zQfamoq9laMT8jAW45gVknX4f6RareKySuP9FHZH
-         S1iOglVMWlaqUpl5UKXhPFyJKa9FzYcwybqvBVE/SLsEANeIrzsctzeQ1F7hoaWa5aQV
-         q94tsoAtnDkb8H7keyXJYlNg2NOB6eCtYxf/FDp5QeJNFbRgtHjeVt5hf2qNYtmD6H9/
-         8IBBT+S+bZ+OdLlJPriTBKu5qnFayqvAMzuh99sQ9lufGOKEELn3ZduAvatHV4pRdlit
-         nffg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763128303; x=1763733103;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8fX7j3pxh3AWoBREo0gN87yLz1wqkWYDWnfHdqYzH+Y=;
-        b=ssj76kQzHF0zllzgp3XCXVFCRQNsUOR3m3+lFGU22vir/EaZEebK282Ygdcg0xPC9U
-         KFDaDYNAEj9wTWLbDn/A/LYURsZK4UWnyYeO080rSVa5mKC+/nEMs194U6pDQQXt+x4g
-         /kcIq55/d5kNKB8k5b5VSD0WvDuM5K/F8oKQrDPzK3QoGTVeYf/WX7vMRldVdq3i+lIM
-         yBI5HGuoij/JGsaCOcSTp35mvLsU8KrRZofXEcgNzPCoXrOk8mOKo3CbYXXit+NrDJam
-         SAArIImJpAmMhaxh3sDnkUA/JwV05OiSBl5nXK29QeQgYTWdNp/eC0odHipg18ilvCQx
-         xMwg==
-X-Forwarded-Encrypted: i=1; AJvYcCV1djkSPp3sy+7xTzNwBkjM62hVi6ygwgztjNWJPlH5IJZck5BU6HELeLNffbyej05B9WcGDvE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnMhdwPgXkeQTTj1har/E/HIdshXvPj+h2iaCFp2GwhRnUH7LC
-	T4e/QYgxi1pCXkbS/z9ZwcKwyBhh6KOfitJQY0qHiq1x/8dX2ymtqOM2RWVfKURGCdDFMWrAPhy
-	TF0dbGoVBT6BgBw==
-X-Google-Smtp-Source: AGHT+IH/bGLaBYGJmvGcff6xjJOqDbAniO1UK6/H7NPkITktEOjBWMrxzylwrCD0ob9MI71MPEnK/9NJIF7EFg==
-X-Received: from qkay13.prod.google.com ([2002:a05:620a:a08d:b0:8b2:bc65:3f17])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:710a:b0:8b2:6ac5:bcb1 with SMTP id af79cd13be357-8b2c315e7a5mr389180685a.31.1763128303193;
- Fri, 14 Nov 2025 05:51:43 -0800 (PST)
-Date: Fri, 14 Nov 2025 13:51:41 +0000
+	s=arc-20240116; t=1763128712; c=relaxed/simple;
+	bh=RtzQFfjPAzangbiodWHMnNaIZGuBL3zeXgZRurVswBI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ETz4ZdPPduXuXZOI6E3dv7zlrpsmEecVSeqqpgbm/IwxOc9HDMPIyw1mrR5FnMK2l93agRkp7jbVUHl5Kcatss8PyfinTqq4n4z9dOIXG3XuWNItZXitjmwXZBeDCJmmHrWS8aE/UF11HA4AD8Z3t4TIWHqw6U2xXoOpS22f4IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vfU0gKvS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=lPOwklkCGtez7a9SRfMbUWXkwlNFM50+PMIKsxzKfOk=; b=vfU0gKvSuJS6wHtgR029QHVKYo
+	U+xqTYYrX96F4jtrX3FxTB+xSK/WL766fz0zKECAILprBHGgk2RY9PH44mDm1Jn+f/D//1Nkhpxyr
+	2+tGpQwroSECOKmiOFavGPyX25yybvGo8AtMbXCor1GxMg/KUm10lkgh58v60h3WyNp4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vJuJY-00Dz1V-G8; Fri, 14 Nov 2025 14:58:12 +0100
+Date: Fri, 14 Nov 2025 14:58:12 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lee Trager <lee@trager.us>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Susheela Doddagoudar <susheelavin@gmail.com>,
+	netdev@vger.kernel.org, mkubecek@suse.cz,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Alexander Duyck <alexanderduyck@fb.com>
+Subject: Re: Ethtool: advance phy debug support
+Message-ID: <401e9d39-2c28-480e-b1c4-d3601131c1fb@lunn.ch>
+References: <CAOdo=cNAy4kTrJ7KxEf2CQ_kiuR5sMD6jG3mJSFeSwqD6RdUtw@mail.gmail.com>
+ <843c25c6-dd49-4710-b449-b03303c7cf45@bootlin.com>
+ <eca707a6-7161-4efc-9831-69fbfa56eb93@lunn.ch>
+ <52e1917a-2030-4019-bb9f-a836dc47bda9@trager.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251114135141.3810964-1-edumazet@google.com>
-Subject: [PATCH net] tcp: reduce tcp_comp_sack_slack_ns default value to 10 usec
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <52e1917a-2030-4019-bb9f-a836dc47bda9@trager.us>
 
-net.ipv4.tcp_comp_sack_slack_ns current default value is too high.
+> I have PRBS testing and configuring TX coefficent support working in an
+> internal version of the fbnic driver. The problem is the interface. Right
+> now I'm using DebugFS, my understanding is write access in DebugFS is
+> frowned upon which is why it hasn't been up streamed yet. My original idea
+> was to extend ethtool, similar to what Susheela suggested, to add support
+> but I got some push back on that at netdev.
 
-When a flow has many drops (1 % or more), and small RTT, adding 100 usec
-before sending SACK stalls the sender relying on getting SACK
-fast enough to keep the pipe busy.
+I would say ethtool is the correct API to use. At minimum it needs to
+be netlink.
 
-Decrease the default to 10 usec.
+> I received the suggestion that
+> this is really something that should be part of the phy subsystem which
+> would require a new tool to be written.
 
-This is orthogonal to Congestion Control heuristics to determine
-if drops are caused by congestion or not.
+phylib uses netlink/ethtool, e.g. cable test is purely in phylib, and
+it uses ethtool. ethtool also has --set-phy-tunable, --get-phy-tunable,
+--phy-statistics, etc.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- Documentation/networking/ip-sysctl.rst | 3 ++-
- net/ipv4/tcp_ipv4.c                    | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+Also, PRBS is not just a PHY thing, 802.3 defines it as part of the
+PCS, and i don't see why a MAC could also implement it, not that i
+have seen such a thing.
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 2bae61be18593a8111a83d9f034517e4646eb653..f4ad739a6b532914e4091c425828b329ee342bc6 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -875,8 +875,9 @@ tcp_comp_sack_slack_ns - LONG INTEGER
- 	timer used by SACK compression. This gives extra time
- 	for small RTT flows, and reduces system overhead by allowing
- 	opportunistic reduction of timer interrupts.
-+	Too big values might reduce goodput.
+And maybe other networking technologies also have something like PRBS?
+Is there an 802.11 equivalent, used for testing the analogue front
+end? CAN?
+
+> 
+> Alex had started to onboard fbnic to phy as part of his work to onboard
+> fbnic to phylink. My understanding is that Alex was recently asked to not
+> use the phy subsystem. So the question is where does this go? What user
+> space tool interacts with the API?
+
+Linux's understanding of a PHY is a device which takes the bitstream
+from the MAC and turns it into analogue signals on twisted pairs,
+mostly for an RJ45 connector, but automotive uses other
+connectors. Its copper, and 802.3 C22 and parts of C45 define how such
+a PHY should work. There is a second use case, where a PHY converts
+between say RGMII and SGMII, but it basically uses the same registers.
+
+fbnic is not copper. It has an SFP cage. Linux has a different
+architecture for that, MAC, PCS and SFP driver. Alex abused the design
+and put a PHY into it as a shortcut. It not surprising there was push
+back.
+
+So, i still think ethtool is the correct API. In general, that
+connects to the MAC driver, although it can shortcut to a PHY
+connected to a MAC. But such a short cut has caused issues in the
+past. So i would probably not do that. Add an API to phylink, which
+the MAC can use. And an API to the PCS driver, which phylink can
+use. And for when the PHY implements PRBS, add an API to phylib and
+get phylib to call the PHY driver.
+
+I'm not saying you need to implement all that, just the bits you need
+for a PCS packet generator. But lay out the architecture such that it
+can be extended with packet generators in other places.
  
--	Default : 100,000 ns (100 us)
-+	Default : 10,000 ns (10 us)
- 
- tcp_comp_sack_nr - INTEGER
- 	Max number of SACK that can be compressed.
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index a7d9fec2950b915e24f0586b2cb964e0e68866ed..6fcaecb67284ecade97b623d955dbbe2cd02a831 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -3593,7 +3593,7 @@ static int __net_init tcp_sk_init(struct net *net)
- 		       sizeof(init_net.ipv4.sysctl_tcp_wmem));
- 	}
- 	net->ipv4.sysctl_tcp_comp_sack_delay_ns = NSEC_PER_MSEC;
--	net->ipv4.sysctl_tcp_comp_sack_slack_ns = 100 * NSEC_PER_USEC;
-+	net->ipv4.sysctl_tcp_comp_sack_slack_ns = 10 * NSEC_PER_USEC;
- 	net->ipv4.sysctl_tcp_comp_sack_nr = 44;
- 	net->ipv4.sysctl_tcp_comp_sack_rtt_percent = 33;
- 	net->ipv4.sysctl_tcp_backlog_ack_defer = 1;
--- 
-2.52.0.rc1.455.g30608eb744-goog
+> > For PRBS pattern tests testing i think there needs to be a framework
+> > around it.
+> > 
+> > When you enable testing, the netif becomes usable, so its state needs
+> > changing to "under test" as defined in RFC2863. We ideally want it
+> > revert to normal operation after a time period. There are a number of
+> > different PRBS patterns, so you need to be able to select one, and
+> > maybe pass the test duration. It can also be performed in different
+> > places. 802.3 defines a number of registers in the PCS for this. I
+> > would expect to see a library that any standards conforming PCS can
+> > use. There are also PHYs which support this features, but each vendor
+> > implements it differently, so we need some sort of generic API for
+> > PHYs. I expect we will also end up with a set of netlink message,
+> > similar to how cable testing working.
+> 
+> Nothing can touch the comphy while PRBS testing is running. The fbnic driver
+> rejects starting testing if the link is up.
 
+That actually seems odd to me. I assume you need to set the link mode
+you want. Having it default to 10/Half is probably not what you
+want. You want to use ethtool_ksettings_set to force the MAC and PCS
+into a specific link mode. Most MAC drivers don't do anything if that
+call is made when the interface is admin down. And if you look at how
+most MAC drivers are structured, they don't bind to phylink/phylib
+until open() is called. So when admin down, you don't even have a
+PCS/PHY. And some designs have multiple PCSes, and you select the one
+you need based on the link mode, set by ethtool_ksettings_set or
+autoneg. And if admin down, the phylink will turn the SFP laser off.
+
+> When I spoke with test engineers internally in Meta I could not come up with
+> a time period and over night testing came up as a requirement. I decided to
+> just let the user start and stop testing with no time requirement. If
+> firmware loses the host heartbeat it automatically disables PRBS testing.
+
+O.K. So i would probably go for a blocking netlink call, and when ^C
+is used, to exits PRBS and allows normal traffic. You then need to
+think about RTNL, which you cannot hold for hours.
+
+	Andrew
 
