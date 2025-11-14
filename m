@@ -1,130 +1,255 @@
-Return-Path: <netdev+bounces-238772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE737C5F458
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 21:49:25 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31030C5F4E5
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 21:59:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 491E73BFF31
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 20:49:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5B1E54E25A0
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 20:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E44942FB0AA;
-	Fri, 14 Nov 2025 20:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D9E2FBDF5;
+	Fri, 14 Nov 2025 20:58:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="I7SD02dd"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="XTM1Wogw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F9F2F6906
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 20:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 607EC2FB99A;
+	Fri, 14 Nov 2025 20:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763153356; cv=none; b=OWVq0DwEmKio7g8EpAjUYIBEwoajicRZVFrsXOoYrHAmKuDhPqGu1QlQGiUXvcFKjm0mfsz/SZYPKJGOLB39x9Uf8B3xrny6MjMASD55aRoiBLs7uI/n2/lJPvIBb6eUBv0f7HhwBeCdn/ds46YzrmEi2rRqY64yFC4dFGsd1Ts=
+	t=1763153910; cv=none; b=D0PD+s6Ay3BmbloKy4U9wtrL2tjRgKwLJvA4bm2QKj4HGMxzLzhMQEqLl4MkgfLFk4HMGP2KW9XEwS6jwzT03+j/FIQZQdBS99a9Q4BO+TUeJHPjWOPMSfJVz5MtFmofNu3mfApHZ9MA0J6BDUlROgd5UtB6MnlfG3JqLJ8Z4bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763153356; c=relaxed/simple;
-	bh=tE7fP22dB2vlNTuE6sh0FMu1Pi5aw/zDuijOpLixHCM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f3S1KZbmh7xzgVAWicpO8gvyBoPWQEhkEaGTRjpL97pQiny25Tcj8ABaxEprByeUwqk+gCFKdw8kJoDMUJY/AjKrJOnLYwZvi0AFxKR9TOuvmcaufQ+itTg7i7zav2qN8Wl3QmC8jnPpNfZwpM1EL+Ib1jmw4eIZskbscV2pX/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=I7SD02dd; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6419b7b4b80so3492047a12.2
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 12:49:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1763153353; x=1763758153; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=nIotG2TBVJHtLyVkQ1nV/V4Ve4TP77XPvYjhlVaFGps=;
-        b=I7SD02dduulIMTZgiOxk+ct4qf7IEh6W4XivWMAxhtr3sxMNqrHJmNX+bGNvXHn5UH
-         phsHPRW6Gy2dI04H2xefZRIPWOX5IHZkmr24zzGMWjQjaOjwX3c4eH0qp50Nt6S0NwXE
-         bBt7B8PWmmvQB7mknjzZNkYPoR5wKGqx6bWFA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763153353; x=1763758153;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nIotG2TBVJHtLyVkQ1nV/V4Ve4TP77XPvYjhlVaFGps=;
-        b=RwwPNxj8ltAFYN9FLnS5C/V4R8nP2b8BtRaBcJcBCIfcUg6qGJ7GRnj0u4kzZpTvZk
-         2Pyfj1nbJPdRF3z8ybfRI4HXuacebcQx8eCyqLV70X/4MjPBJQAkTjr+8Kuc249rOTbS
-         hHFiMl7zXsORo8XIiWAJjLUwKZ1mMRa92AlazN8TotuPjwnjfH3YKxfyE+fNSHZ5WX3A
-         ecvsPisLO6WWbEmC6wZmZifTtQ5gZUGWTG3FX5nnM3gczekSdKnMdDyHgtyE850K+yGh
-         Tvp1nw2b36n4BE4G84WYhsMvc1APKedO2UAvWlONlA+IMpRVMVMs+cqf0qi4+xQl6lZx
-         +ANQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXWfwi1oHeOH2tul3DBDIEXeSZK41Dwx9VorheX72A2HBAJjRCvkYTK1RZBji7ajphURIEPDIU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yypw5JpLMhcdgae1xx89A9QAtfnW9o6VMAgT5OxrZF7WMuT9CgK
-	eyT+EKsRKHwYuhu5b3uerP7nP1l1ZA3wTPEFbu3ZZgUqE4C1pGFEFrF5ldioNrA9f5+kAWBvR0V
-	Oda6Oiao=
-X-Gm-Gg: ASbGncuq2fBJTz06wYxMyNOnWpYQtLxrwRQzt7FklH0aUJuXwP9PzuVmBaRPDBwp044
-	om8sjRZDYwmG35rOwHaEi9Sow4QSjct6nc0pp00yLL0GUg89PW2Fw6EMn470s0o5pjqA8hVEyq3
-	FnbkOGDuylL6ywMA6OW49dTwrUGQwVUVXrntahFx0iqrWl4ZFB7wp4f68ap3DiERHHIlaDxejDi
-	M33HNE6Il0PYoJwmhWdDUJ1yVGFY6iqOono479cP/lJNaVNT4sBrWeel+zTrpb6b9ELeX6HfEMr
-	TBI/OYjnz1s32OhOQrjK+7WAt2x0b/Fn5Tr6odfFKiGYY2ydbQmEKTtJdonWaz/ax1mqzfdS/Df
-	EYkmhftqtCsIpKn5thzds8k8j2f0GXsfkDGrJ4Iosa/uwwB9lvaQIarVh8SvqXjOE1JjWb+nUh7
-	Azpa5jlGSG0aIJcprehKAobffqHM+Yd02xdb/2GQHrFFBG9o65kA==
-X-Google-Smtp-Source: AGHT+IEq1J4TTM4lMn29vLx3pg/TBGwCXrx7hHBuZ+tbRkia7MCiX+vsF9QXhS99Q14DJIhUl6HGcA==
-X-Received: by 2002:a05:6402:42ca:b0:63c:690d:6a46 with SMTP id 4fb4d7f45d1cf-64350e222femr3976746a12.13.1763153351619;
-        Fri, 14 Nov 2025 12:49:11 -0800 (PST)
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com. [209.85.218.46])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6433a4c5834sm4290952a12.33.2025.11.14.12.49.09
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Nov 2025 12:49:11 -0800 (PST)
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-afcb7ae6ed0so372128566b.3
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 12:49:09 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWduqLngQR6Hl/lFGOzURGGM0uv7IkC6p71YQweLAkjKjSJGmm1Z2tqatwpzsWW0A7UBeKpAnE=@vger.kernel.org
-X-Received: by 2002:a17:907:1b27:b0:b70:bc2e:a6f0 with SMTP id
- a640c23a62f3a-b73677edbcemr485389666b.5.1763153349232; Fri, 14 Nov 2025
- 12:49:09 -0800 (PST)
+	s=arc-20240116; t=1763153910; c=relaxed/simple;
+	bh=NU8I6DFBBDxSVvP0Y1JJZ4FZjERpbk7xEGubtlerNL0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JlgEutXfv6BCXOneol7zbDr5buce6rMugWnte/CQMhUA3d860lJr2Z3bFByH7zl+0PHHsjLr7XwkK4hoadOO5hNn3sMUglBVl3j7LEvH+Lg3A8GPgKnpNRYN3eiw3kdVYXVZwkPKVXIsxrmmm9JqUrozs5MBwK3SWVnOMEPr2KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=XTM1Wogw; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [100.79.200.7] (unknown [4.194.122.170])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 65761201AE5A;
+	Fri, 14 Nov 2025 12:58:15 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 65761201AE5A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1763153901;
+	bh=hXU5XnfCF/cwE4/J20YkIzYBKcMQJTB9H9fJo5UCttM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XTM1Wogwg1tNwyDj0aOA0i2Bh6FmczbUmImLlDtPjLdf4eXncF2OVIk9slIMF6ga2
+	 fK8YS735k+PuWOGUiJPYC1l/qTYOspzEToDFiCoF5Zlq1G6/BahDITQSVGIGx85YMl
+	 QO3wL87A0LffXqD7tIiFaPWp9ipgCUfBTQaX3Fy4=
+Message-ID: <18ee6a8b-21fd-49c6-964a-2eb1b0b61c1d@linux.microsoft.com>
+Date: Sat, 15 Nov 2025 02:28:11 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251113005529.2494066-1-jon@nutanix.com> <CACGkMEtQZ3M-sERT2P8WV=82BuXCbBHeJX+zgxx+9X7OUTqi4g@mail.gmail.com>
- <E1226897-C6D1-439C-AB3B-012F8C4A72DF@nutanix.com> <CAHk-=whkVPGpfNFLnBv7YG__P4uGYWtG6AXLS5xGpjXGn8=orA@mail.gmail.com>
- <20251114190856.7e438d9d@pumpkin>
-In-Reply-To: <20251114190856.7e438d9d@pumpkin>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 14 Nov 2025 12:48:52 -0800
-X-Gmail-Original-Message-ID: <CAHk-=whJ0T_0SMegsbssgtWgO85+nJPapn6B893JQkJ7x6K0Kw@mail.gmail.com>
-X-Gm-Features: AWmQ_bkW5f2iQA-30H7SfZ-1SPQdVwpCHIQwF379qtfjWrYcgYHuVtfQQYOnQPg
-Message-ID: <CAHk-=whJ0T_0SMegsbssgtWgO85+nJPapn6B893JQkJ7x6K0Kw@mail.gmail.com>
-Subject: Re: [PATCH net-next] vhost: use "checked" versions of get_user() and put_user()
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Jon Kohler <jon@nutanix.com>, Jason Wang <jasowang@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/2] net: mana: Handle SKB if TX SGEs exceed
+ hardware limit
+To: Eric Dumazet <edumazet@google.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+ kotaranov@microsoft.com, horms@kernel.org, shradhagupta@linux.microsoft.com,
+ ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
+ dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com, leon@kernel.org,
+ mlevitsk@redhat.com, yury.norov@gmail.com, sbhatta@marvell.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ gargaditya@microsoft.com
+References: <1762952506-23593-1-git-send-email-gargaditya@linux.microsoft.com>
+ <1762952506-23593-2-git-send-email-gargaditya@linux.microsoft.com>
+ <CANn89iL-RJ84WB9W8SoZn6_UMko8sLBb_FEGjjGZTEO+9KOpAg@mail.gmail.com>
+Content-Language: en-US
+From: Aditya Garg <gargaditya@linux.microsoft.com>
+In-Reply-To: <CANn89iL-RJ84WB9W8SoZn6_UMko8sLBb_FEGjjGZTEO+9KOpAg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, 14 Nov 2025 at 11:09, David Laight <david.laight.linux@gmail.com> wrote:
->
-> I think that is currently only x86-64?
-> There are patches in the pipeline for ppc.
-> I don't think I've seen anything for arm32 or arm64.
+On 12-11-2025 19:25, Eric Dumazet wrote:
+> On Wed, Nov 12, 2025 at 5:11 AM Aditya Garg
+> <gargaditya@linux.microsoft.com> wrote:
+>>
+>> The MANA hardware supports a maximum of 30 scatter-gather entries (SGEs)
+>> per TX WQE. Exceeding this limit can cause TX failures.
+>> Add ndo_features_check() callback to validate SKB layout before
+>> transmission. For GSO SKBs that would exceed the hardware SGE limit, clear
+>> NETIF_F_GSO_MASK to enforce software segmentation in the stack.
+>> Add a fallback in mana_start_xmit() to linearize non-GSO SKBs that still
+>> exceed the SGE limit.
+>>
+>> Also, Add ethtool counter for SKBs linearized
+>>
+>> Co-developed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+>> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+>> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
+>> ---
+>>   drivers/net/ethernet/microsoft/mana/mana_en.c | 37 ++++++++++++++++++-
+>>   .../ethernet/microsoft/mana/mana_ethtool.c    |  2 +
+>>   include/net/mana/gdma.h                       |  6 ++-
+>>   include/net/mana/mana.h                       |  1 +
+>>   4 files changed, 43 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+>> index cccd5b63cee6..67ae5421f9ee 100644
+>> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+>> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+>> @@ -11,6 +11,7 @@
+>>   #include <linux/mm.h>
+>>   #include <linux/pci.h>
+>>   #include <linux/export.h>
+>> +#include <linux/skbuff.h>
+>>
+>>   #include <net/checksum.h>
+>>   #include <net/ip6_checksum.h>
+>> @@ -329,6 +330,20 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>>          cq = &apc->tx_qp[txq_idx].tx_cq;
+>>          tx_stats = &txq->stats;
+>>
+>> +       if (MAX_SKB_FRAGS + 2 > MAX_TX_WQE_SGL_ENTRIES &&
+>> +           skb_shinfo(skb)->nr_frags + 2 > MAX_TX_WQE_SGL_ENTRIES) {
+>> +               /* GSO skb with Hardware SGE limit exceeded is not expected here
+>> +                * as they are handled in mana_features_check() callback
+>> +                */
+>> +               if (skb_linearize(skb)) {
+>> +                       netdev_warn_once(ndev, "Failed to linearize skb with nr_frags=%d and is_gso=%d\n",
+>> +                                        skb_shinfo(skb)->nr_frags,
+>> +                                        skb_is_gso(skb));
+>> +                       goto tx_drop_count;
+>> +               }
+>> +               apc->eth_stats.linear_pkt_tx_cnt++;
+>> +       }
+>> +
+>>          pkg.tx_oob.s_oob.vcq_num = cq->gdma_id;
+>>          pkg.tx_oob.s_oob.vsq_frame = txq->vsq_frame;
+>>
+>> @@ -442,8 +457,6 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>>                  }
+>>          }
+>>
+>> -       WARN_ON_ONCE(pkg.wqe_req.num_sge > MAX_TX_WQE_SGL_ENTRIES);
+>> -
+>>          if (pkg.wqe_req.num_sge <= ARRAY_SIZE(pkg.sgl_array)) {
+>>                  pkg.wqe_req.sgl = pkg.sgl_array;
+>>          } else {
+>> @@ -518,6 +531,25 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>>          return NETDEV_TX_OK;
+>>   }
+>>
+> 
+> 
+> #if MAX_SKB_FRAGS + 2 > MAX_TX_WQE_SGL_ENTRIES
+> 
+>> +static netdev_features_t mana_features_check(struct sk_buff *skb,
+>> +                                            struct net_device *ndev,
+>> +                                            netdev_features_t features)
+>> +{
+>> +       if (MAX_SKB_FRAGS + 2 > MAX_TX_WQE_SGL_ENTRIES &&
+>> +           skb_shinfo(skb)->nr_frags + 2 > MAX_TX_WQE_SGL_ENTRIES) {
+>> +               /* Exceeds HW SGE limit.
+>> +                * GSO case:
+>> +                *   Disable GSO so the stack will software-segment the skb
+>> +                *   into smaller skbs that fit the SGE budget.
+>> +                * Non-GSO case:
+>> +                *   The xmit path will attempt skb_linearize() as a fallback.
+>> +                */
+>> +               if (skb_is_gso(skb))
+> 
+> No need to test skb_is_gso(skb), you can clear bits, this will be a
+> NOP if the packet is non GSO anyway.
+> 
+>> +                       features &= ~NETIF_F_GSO_MASK;
+>> +       }
+>> +       return features;
+>> +}
+> 
+> #endif
+> 
+>> +
+>>   static void mana_get_stats64(struct net_device *ndev,
+>>                               struct rtnl_link_stats64 *st)
+>>   {
+>> @@ -878,6 +910,7 @@ static const struct net_device_ops mana_devops = {
+>>          .ndo_open               = mana_open,
+>>          .ndo_stop               = mana_close,
+>>          .ndo_select_queue       = mana_select_queue,
+>> +       .ndo_features_check     = mana_features_check,
+> 
+> Note that if your mana_features_check() is a nop if MAX_SKB_FRAGS is
+> small enough,
+> you could set a non NULL .ndo_features_check based on a preprocessor condition
+> 
+> #if MAX_SKB_FRAGS + 2 > MAX_TX_WQE_SGL_ENTRIES
+>      .ndo_features_check = ....
+> #endif
+> 
+> This would avoid an expensive indirect call when possible.
+> 
+> 
+>>          .ndo_start_xmit         = mana_start_xmit,
+>>          .ndo_validate_addr      = eth_validate_addr,
+>>          .ndo_get_stats64        = mana_get_stats64,
+>> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+>> index a1afa75a9463..fa5e1a2f06a9 100644
+>> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+>> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+>> @@ -71,6 +71,8 @@ static const struct mana_stats_desc mana_eth_stats[] = {
+>>          {"tx_cq_err", offsetof(struct mana_ethtool_stats, tx_cqe_err)},
+>>          {"tx_cqe_unknown_type", offsetof(struct mana_ethtool_stats,
+>>                                          tx_cqe_unknown_type)},
+>> +       {"linear_pkt_tx_cnt", offsetof(struct mana_ethtool_stats,
+>> +                                       linear_pkt_tx_cnt)},
+>>          {"rx_coalesced_err", offsetof(struct mana_ethtool_stats,
+>>                                          rx_coalesced_err)},
+>>          {"rx_cqe_unknown_type", offsetof(struct mana_ethtool_stats,
+>> diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+>> index 637f42485dba..84614ebe0f4c 100644
+>> --- a/include/net/mana/gdma.h
+>> +++ b/include/net/mana/gdma.h
+>> @@ -592,6 +592,9 @@ enum {
+>>   #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
+>>   #define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
+>>
+>> +/* Driver supports linearizing the skb when num_sge exceeds hardware limit */
+>> +#define GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE BIT(20)
+>> +
+>>   #define GDMA_DRV_CAP_FLAGS1 \
+>>          (GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+>>           GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
+>> @@ -601,7 +604,8 @@ enum {
+>>           GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
+>>           GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
+>>           GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
+>> -        GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE)
+>> +        GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE | \
+>> +        GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE)
+>>
+>>   #define GDMA_DRV_CAP_FLAGS2 0
+>>
+>> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+>> index 8906901535f5..50a532fb30d6 100644
+>> --- a/include/net/mana/mana.h
+>> +++ b/include/net/mana/mana.h
+>> @@ -404,6 +404,7 @@ struct mana_ethtool_stats {
+>>          u64 hc_tx_err_gdma;
+>>          u64 tx_cqe_err;
+>>          u64 tx_cqe_unknown_type;
+>> +       u64 linear_pkt_tx_cnt;
+>>          u64 rx_coalesced_err;
+>>          u64 rx_cqe_unknown_type;
+>>   };
+>> --
+>> 2.43.0
+>>
 
-Honestly, the fact that it's mainly true on x86-64 is simply because
-that's the only architecture that has cared enough.
+Thanks for the review Eric. I will incorporate these changes in next 
+revision.
 
-Pretty much everybody else is affected by the exact same speculation
-bugs. Sometimes the speculation window might be so small that it
-doesn't matter, but in most cases it's just that the architecture is
-so irrelevant that it doesn't matter.
-
-So no, this is not a "x86 only" issue. It might be a "only a couple of
-architectures have cared enough for it to have any practical impact".
-
-End result: if some other architecture still has a __get_user() that
-is noticeably faster than get_user(), it's not an argument for keeping
-__get_user() - it's an argument that that architecture likely isn't
-very important.
-
-           Linus
+Regards,
+Aditya
 
