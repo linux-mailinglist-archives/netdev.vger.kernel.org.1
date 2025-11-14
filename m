@@ -1,163 +1,162 @@
-Return-Path: <netdev+bounces-238666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1BFAC5D0AF
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 13:14:36 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DBA7C5D2AC
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 13:48:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 551B73B61F9
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 12:13:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2D9B13418F3
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 12:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 037333148D9;
-	Fri, 14 Nov 2025 12:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vFCyGJ9I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017FD176ADE;
+	Fri, 14 Nov 2025 12:44:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08A0313E16
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 12:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536851E505
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 12:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763122405; cv=none; b=B6VXhZMujD667c1v6ARo5FFe04a0Bh/93Ki0/A6ubLIqkH5yMFbb237dv4GNCsGaCMwu/YqOXEBT9LKXvqrSdfnnK5/9jlzGbHxl+RjEaOyg/AyLQrUw5FJn89BnFtINW0M+BQhdo1WblVFJAykcxXBHXmC9miG7prDDMAltXpA=
+	t=1763124275; cv=none; b=KdR6LHKroldcQAevLKdIdrvIwudu8YF3/HC4b5h5ivhPdX1GZLnqgaowL9tQ7K/WsmaQOhqTQqybFFpkc6ZRiUb9bRnuQIKCeEoX15l0BxIYxIlR/i9tN9PHglJYHh2WZbk4ja+ebMnkuZMYMkQ9wI7dtcJY/ljLGx9rnopIzm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763122405; c=relaxed/simple;
-	bh=5I0F7Lk270HlfQS3v6Sw31jwqLfCir/VQOrCBc5zdi4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jih95ATlnCymO9qXM3prkxiO6hm3x2o5I44SCt+eG8ZUEM0yFjgYlZRYFPnM+xQLwNMI1d6zqbDE8T3WQXm403rgNWNr43S6nFAuiCYoGzYw0e/A8UFwj2VcWlcaHwzvtbO/M9YkPrfkvm/ygB/v8r4pvJN6H/ZppA3VWwCPrDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vFCyGJ9I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AF42C2BCB9
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 12:13:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763122405;
-	bh=5I0F7Lk270HlfQS3v6Sw31jwqLfCir/VQOrCBc5zdi4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=vFCyGJ9IK/JNHwvQFMCw/BHNieBWTmjv3dMBHLRUH1QVfPIBEzFEMhp5fNPszRCwG
-	 IbOoJOmHcisOHy9lMOxQYQblP+DEh4AMnkzfZwncdrkbiyCN70ch4rBq0E1amHMSVI
-	 NwDzxls2anQR7oz9FHl1gCC2WMkkz5URK0GYhUs+4grlDF5lADeLEb20ht3BCP6vY0
-	 BbZxQkmX2t0fOJcwHav8XJpFXUW57J007LRZA6wSO7C52lX+Zj9bCXKbp5vIqwCjUX
-	 c++cAw3Cn5mdagh04K1BxhoAbdHiKEpEnupju0k+iLBLJZhOlkBF4/w9gQ2vF7fdGX
-	 lFSOt4sDo9xQg==
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-3e3dac349easo998873fac.2
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 04:13:25 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV+jVF6yFdWMux2WmPSkYLCs4Ui6oIxzS/twtiy8/Fro2VZphHAzH/qPg9jRFhPWuhGh3gccPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywp5dlHzYBnEVg0jCSw4JPNcemFMyeqp252DMvLUCw5qJC8IKxg
-	DqjDACnQkuQEXHYqQIOVYXhjlwS+MQQ2inZaDrxfnTzncmLuV0ROzXvT0Ajn2U8/qIYy4sJMG9i
-	aoB7sH3VIHRG5QIyptrL4sN6BMkweVvo=
-X-Google-Smtp-Source: AGHT+IGrNkWHSVx3CmYADKr0S6TGq/XxOF6zay1uOoUOn8a60tpM1BgphUydUyCNyc9Vh0GmlV+21RabCzXA2tdcTXs=
-X-Received: by 2002:a05:6870:30f:b0:375:db59:20e4 with SMTP id
- 586e51a60fabf-3e868ef8743mr1267901fac.13.1763122404195; Fri, 14 Nov 2025
- 04:13:24 -0800 (PST)
+	s=arc-20240116; t=1763124275; c=relaxed/simple;
+	bh=eXrSxF7g8VtEK9XfVtc1KHkvCDAGmL1xr6MqPdBG0yw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CPlrqy/z8eppH/eql9Px8D7p8XxBlsdQqCdywOFwb3kekc0abN1CTEb8bPVG74Q7STf4Lb3wxbWhl55c40MU+p/kJh7Mcmpucmu3HWYME5qwvstBGAMUjNTa+Ud+iqt0mJE10yEzL3yYE1KL2mpBtmyA0/5hwqeRA/2j3G3IVV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-3e7ead70738so996426fac.0
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 04:44:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763124273; x=1763729073;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KoHpWXitx47FldIpJvkbxLdcbiPOnWRFPRWqGQ7Zchc=;
+        b=UjVAglLH2ALyHIaXvYfm9D3QN8ZJdUAIDCBomXYQnuELh3+vK7T3POgrByOM948cHN
+         ppMnP69Hc43DSabU4IKhMZnB78/iFFUTaZqmEZQ45GnEojVDErmU2K1jJx72BSzw9q4s
+         HujBsI3oFis1oID95vMAsrwCqA8t7sZiqZjsBG+gFNOTpIaCjzFrdjVgl8RrpKsRhozd
+         MDF23Oo+cf4KWLexDIPGrnHAE+3peOIQK3xFlBweOS1ZmVQBbRCaSUuw8rUjH7zVIPiQ
+         tv6DkNfI2JBBxz513w9g7PRULsX56eTDFso37FawtY7mhnl1NpNgZ39GjPtvlxRYPCOB
+         hNgw==
+X-Forwarded-Encrypted: i=1; AJvYcCU1ucQffuYC6euWQluQBlRMhxBs0e5u0PwdGRnXy1BF0YA8Pcq2D1fCtnXqwYUs5FDufZUkWbE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysC1ypC8lGOyqHZPyj6A+8qA8aG+zA70WBHNFddbQzK0qv71J4
+	bigPnI7ltyArHMiR4tH7lgsn5e9R82Luj/pNhj7NY2S+1G5GpbizOZ0C
+X-Gm-Gg: ASbGncuj28xzgoo8WI5X7HaizTJb+fEl4GQfOOoQlJ+HZMySxpTA1/4vWrn2lbS6R+M
+	K2ZvSQLbWRQ6y8b4FgGN7l2qp1bRNaS7byGvmuSVUvikJ1tIyJrSC4icHUH3aZs/jZjU2HxaBOe
+	hzkBBg4HO8VReX2+CuaTFZg9jKE4CMaD0wtjjYRtUh+PaffD95VsBF7sRHvYhNG63kNZL3Qyl/d
+	76f/hjYRHdPfjzAe1NWed8isV+S3PYl0Cnun4lU4SnDkiWaQlSeJXM1+IsUal2Vr4CbNvGGbALq
+	RmV3hluFKweFG9j3dcNVPSB2RvQvR5EFYm4nzU57vdRw4ApxtdWyY+Ju4gC2gH4J57lB5fVYVkp
+	5qMP5P0tjObBBIUtRvWGJwlCL6+lpPaaRC790OIksA6Lo7MAW3XiEvYDcPNDByHu14NyvjFjM2B
+	i0Uw==
+X-Google-Smtp-Source: AGHT+IGdY4QN+y+T94GClU1TS4vz/RxaQrGP+Y+G4NtveS2PNDD2vRqD3caT+pzwZRqBcbYn2m77xw==
+X-Received: by 2002:a05:6871:2b17:b0:30b:e02b:c7f5 with SMTP id 586e51a60fabf-3e8691844c7mr1423649fac.40.1763124273396;
+        Fri, 14 Nov 2025 04:44:33 -0800 (PST)
+Received: from gmail.com ([2a03:2880:10ff:7::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3e8522ae6e2sm2610556fac.16.2025.11.14.04.44.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Nov 2025 04:44:32 -0800 (PST)
+Date: Fri, 14 Nov 2025 04:44:30 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Gustavo Luiz Duarte <gustavold@gmail.com>
+Cc: Andre Carvalho <asantostc@gmail.com>, Simon Horman <horms@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/4] netconsole: Split userdata and sysdata
+Message-ID: <nmtyovnsn4edb2leysure4hjriwdkcjpvppcaatqbqifohupw5@osqesr4xh3y6>
+References: <20251113-netconsole_dynamic_extradata-v2-0-18cf7fed1026@meta.com>
+ <20251113-netconsole_dynamic_extradata-v2-2-18cf7fed1026@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251114-thermal-device-v1-0-d8b442aae38b@gmx.de>
-In-Reply-To: <20251114-thermal-device-v1-0-d8b442aae38b@gmx.de>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Fri, 14 Nov 2025 13:13:12 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0gZ7+i+irhaq2jQpTt++HuVRjqz8==Ov9VmQ9Q1J1TM0w@mail.gmail.com>
-X-Gm-Features: AWmQ_bm6idj_L4n1xVkRGWkVqmFdJz-PXS5UU4gyN5tQNhsjMISGTiEJyqtTR8w
-Message-ID: <CAJZ5v0gZ7+i+irhaq2jQpTt++HuVRjqz8==Ov9VmQ9Q1J1TM0w@mail.gmail.com>
-Subject: Re: [PATCH RFC 0/8] thermal: core: Allow setting the parent device of
- thermal zone/cooling devices
-To: Armin Wolf <W_Armin@gmx.de>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>, 
-	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>, 
-	Lucas Stach <l.stach@pengutronix.de>, Russell King <linux+etnaviv@armlinux.org.uk>, 
-	Christian Gmeiner <christian.gmeiner@gmail.com>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Amit Daniel Kachhap <amit.kachhap@gmail.com>, 
-	Viresh Kumar <viresh.kumar@linaro.org>, Thierry Reding <thierry.reding@gmail.com>, 
-	Jonathan Hunter <jonathanh@nvidia.com>, Len Brown <lenb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jeff Johnson <jjohnson@kernel.org>, Miri Korenblit <miriam.rachel.korenblit@intel.com>, 
-	Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, 
-	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Peter Kaestle <peter@piie.net>, 
-	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Potnuri Bharat Teja <bharat@chelsio.com>, Sebastian Reichel <sre@kernel.org>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, 
-	Support Opensource <support.opensource@diasemi.com>, Shawn Guo <shawnguo@kernel.org>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Fabio Estevam <festevam@gmail.com>, =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	etnaviv@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
-	linux-tegra@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
-	ath11k@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, platform-driver-x86@vger.kernel.org, 
-	linux-pci@vger.kernel.org, imx@lists.linux.dev, 
-	linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251113-netconsole_dynamic_extradata-v2-2-18cf7fed1026@meta.com>
 
-On Fri, Nov 14, 2025 at 4:24=E2=80=AFAM Armin Wolf <W_Armin@gmx.de> wrote:
->
-> Drivers registering thermal zone/cooling devices are currently unable
-> to tell the thermal core what parent device the new thermal zone/
-> cooling device should have, potentially causing issues with suspend
-> ordering
+On Thu, Nov 13, 2025 at 08:42:19AM -0800, Gustavo Luiz Duarte wrote:
+> Separate userdata and sysdata into distinct buffers to enable independent
+> management. Previously, both were stored in a single extradata_complete
+> buffer with a fixed size that accommodated both types of data.
+> 
+> This separation allows:
+> - userdata to grow dynamically (in subsequent patch)
+> - sysdata to remain in a small static buffer
+> - removal of complex entry counting logic that tracked both types together
+> 
+> The split also simplifies the code by eliminating the need to check total
+> entry count across both userdata and sysdata when enabling features,
+> which allows to drop holding su_mutex on sysdata_*_enabled_store().
+> 
+> No functional change in this patch, just structural preparation for
+> dynamic userdata allocation.
+> 
+> Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
 
-Do you have any examples of this?
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
-> and making it impossible for user space appications to
-> associate a given thermal zone device with its parent device.
->
-> This patch series aims to fix this issue by extending the functions
-> used to register thermal zone/cooling devices to also accept a parent
-> device pointer. The first six patches convert all functions used for
-> registering cooling devices, while the functions used for registering
-> thermal zone devices are converted by the remaining two patches.
->
-> I tested this series on various devices containing (among others):
-> - ACPI thermal zones
-> - ACPI processor devices
-> - PCIe cooling devices
-> - Intel Wifi card
-> - Intel powerclamp
-> - Intel TCC cooling
->
-> I also compile-tested the remaining affected drivers, however i would
-> still be happy if the relevant maintainers (especially those of the
-> mellanox ethernet switch driver) could take a quick glance at the
-> code and verify that i am using the correct device as the parent
-> device.
->
-> This work is also necessary for extending the ACPI thermal zone driver
-> to support the _TZD ACPI object in the future.
+<snip>
+> @@ -1608,13 +1575,24 @@ static void send_fragmented_body(struct netconsole_target *nt,
+>  		buf_offset += this_chunk;
+>  		data_sent += this_chunk;
+>  
+> -		/* after msgbody, append extradata */
+> -		if (extradata_ptr && extradata_left) {
+> -			this_chunk = min(extradata_left,
+> +		/* after msgbody, append userdata */
+> +		if (userdata_ptr && userdata_left) {
+> +			this_chunk = min(userdata_left,
+>  					 MAX_PRINT_CHUNK - buf_offset);
+>  			memcpy(nt->buf + buf_offset,
+> -			       extradata_ptr + extradata_offset, this_chunk);
+> -			extradata_offset += this_chunk;
+> +			       userdata_ptr + userdata_offset, this_chunk);
+> +			userdata_offset += this_chunk;
+> +			buf_offset += this_chunk;
+> +			data_sent += this_chunk;
+> +		}
+> +
+> +		/* after userdata, append sysdata */
+> +		if (sysdata_ptr && sysdata_left) {
+> +			this_chunk = min(sysdata_left,
+> +					 MAX_PRINT_CHUNK - buf_offset);
+> +			memcpy(nt->buf + buf_offset,
+> +			       sysdata_ptr + sysdata_offset, this_chunk);
+> +			sysdata_offset += this_chunk;
 
-Can you please elaborate a bit here?
+This seems all correct and improved, but, I would like to improve this a bit
+better.
 
-_TZD is a list of devices that belong to the given thermal zone, so
-how is it connected to the thermal zone parent?
+I would like to have a function to append_msg_body(), append_sysdata() and append_userdata(),
+which is not possible today given these variables.
 
-> Signed-off-by: Armin Wolf <W_Armin@gmx.de>
-> ---
-> Armin Wolf (8):
->       thermal: core: Allow setting the parent device of cooling devices
->       thermal: core: Set parent device in thermal_of_cooling_device_regis=
-ter()
->       ACPI: processor: Stop creating "device" sysfs link
->       ACPI: fan: Stop creating "device" sysfs link
->       ACPI: video: Stop creating "device" sysfs link
->       thermal: core: Set parent device in thermal_cooling_device_register=
-()
->       ACPI: thermal: Stop creating "device" sysfs link
->       thermal: core: Allow setting the parent device of thermal zone devi=
-ces
+A possibility is to have a local "struct fat_buffer" that contains all these
+pointers and offset, then we can pass the struct to these append_XXXXX(struct
+fat_buffer *) in a row.
 
-I can only see the first three patches in the series ATM as per
+I envision something as:
 
-https://lore.kernel.org/linux-pm/20251114-thermal-device-v1-0-d8b442aae38b@=
-gmx.de/T/#r605b23f2e27e751d8406e7949dad6f5b5b112067
+	int buf_offset = 0;
+
+	while (data_sent < data_len) {
+		buf_offset += append_msgbody(&fat_buffer)
+		buf_offset += append_sysdata(&fat_buffer)
+		buf_offset += append_userdata(&fat_buffer)
+
+		send_udp(nt, nt->buf, buf_offset);
+	}
+
+Not sure it will be possible to be as simple as  above, but, it will definitely
+make review easier.
+
+Just to be clear, this is not a request for this patch, but, something that I'd
+love to have.
 
