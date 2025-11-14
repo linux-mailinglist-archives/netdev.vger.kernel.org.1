@@ -1,124 +1,379 @@
-Return-Path: <netdev+bounces-238695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94F41C5DF4C
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:44:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E805C5E29D
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 17:20:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5771238052F
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 15:22:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D392154146A
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 15:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712DF325717;
-	Fri, 14 Nov 2025 15:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99DB320CAF;
+	Fri, 14 Nov 2025 15:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y3zntbql"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DKp5/jK5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F9C265CAD;
-	Fri, 14 Nov 2025 15:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877B023C8C7;
+	Fri, 14 Nov 2025 15:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763133088; cv=none; b=d5EkyPIzYe/h4sK8zbJndRNdXWja9rmmYx8EAfThCvC0Jk90RXBFxfCTwyEDW88wsb0CxYeAsXGuTzNm5KhtEd66pB9670zWHFlBhHtpANTOHv1WAGKzAoFxKYE3lkvvctpa14bgtHA+e0Zt9HXMmKvi+5VFQvKBk/1d1Y6DSIE=
+	t=1763133885; cv=none; b=btzCtc+7XCjwHno0Dz+SI0ghSS3v21kEFdOTiGFCGrzZPEPGXay0DIxc2N0qRV/RdUUVafvtSpIXYQ5BjVdBfdV5eiANIjF5lRe5u1TmC7gi4aod0Yy2tK0gcmRrn2MYqG0D71G1KKKhcMRmpgZTY9qQBd5gamjSBicrQ8F5Ckw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763133088; c=relaxed/simple;
-	bh=2yfQIuv0KwgKkZJnXSEdpNNId/bOn5snEr6YBjY1alQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OZs5vqGR7qO8Xqxp5kZXC+dByNM9eAcUQUv5f1jU32udD0d7IuiRnH1GMLWNT48ausEOCzlslO6hq2SoKUeG4QkjWStwx8mqApY24Krk0dyDa/W9BiGaK/ZAsHXKVAmQ4/Qqsl32hgzcyp7sjej8+NrvrSL47G8h8u2budJgZjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y3zntbql; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lkf/NIV+zn/9c9VyQW91H6NJo+JDIv4n97HVo442nMs=; b=Y3zntbqlAXnrFIPEoy7AObTnLI
-	+MCw0KIotibKRlNKGi/K5a0jmwCHh7DqYzMpHuTY9tbgzffKYTzMlDbpQ/NYrYqFfGbHU0OR0qrF4
-	ijRr85nAf7eFCDBp8gD/MRC2y7xOnQw0dXKbRyRQdBtalBFoWWDd+duZlRS+BK0F8WNA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vJvSE-00DzVq-SG; Fri, 14 Nov 2025 16:11:14 +0100
-Date: Fri, 14 Nov 2025 16:11:14 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Pascal Eberhard <pascal.eberhard@se.com>,
-	=?iso-8859-1?Q?Miqu=E8l?= Raynal <miquel.raynal@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v3 4/4] net: dsa: microchip: Immediately assing IRQ
- numbers
-Message-ID: <aeba78cf-a220-4a40-964c-08b9d852ef17@lunn.ch>
-References: <20251114-ksz-fix-v3-0-acbb3b9cc32f@bootlin.com>
- <20251114-ksz-fix-v3-4-acbb3b9cc32f@bootlin.com>
+	s=arc-20240116; t=1763133885; c=relaxed/simple;
+	bh=BPIcm4BPS8JNbDaHuf77kx4MaMajI1d4wnZLXgFJ14o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hk9hmpAd0Zv7CcQXzf2d+VrEa3v4D1WcHAVYJyNED0JTA+7SB+B4vQdA8o0wKNA7WlYKYEWo8xA64LSjm+GXRpZsDJ9p0MV6Yms8qDpWhQGkkBm2iy0i8Sd325/YE4piRCNzv+oCS3sQGQyNMgML3V9yvzdrpd+A5aOxiEfTDnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DKp5/jK5; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763133884; x=1794669884;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=BPIcm4BPS8JNbDaHuf77kx4MaMajI1d4wnZLXgFJ14o=;
+  b=DKp5/jK5kJ4Xgf4GxoQqAvH/mz+Gk4AJ+ON3o2ukKnTCiqTepJMeuqEv
+   7UVfjsCNg3kW5Az3TwBDgG+qgeAhn4ooL8PSccSWkXXl9HyLFiOiBg/lg
+   7joQWPwkYNDxqUkoEiMUEV/17doGPx/zhpPuylSRgrz7vMRl7l4xWQjKj
+   1ORIu7HGfsyO6VbIYrWF/r/AaYgFCMTEnyf9zS+2Lmb6lw4WzU8HN9AJ3
+   vNm24+ths/NAkGE7b2uqnuhY2lHPJ29DakJqJ7CRYAtJp8TpLwTSn+40M
+   s4HKQfejUVP6zw5LLCVNbF1J/wiEYeNUy5wHG7kPGCddfKpi73r9/+SWh
+   w==;
+X-CSE-ConnectionGUID: HShXmaY9QiK9JG/1AqEAcA==
+X-CSE-MsgGUID: myeIAUGqSF+B8UCZEZxATA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="65160988"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="65160988"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 07:24:43 -0800
+X-CSE-ConnectionGUID: K2Z8wWIJQ7iS0yDw6R4XTg==
+X-CSE-MsgGUID: IfnXatAjQ0Sku25vLBP7KA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,305,1754982000"; 
+   d="scan'208";a="189094560"
+Received: from vverma7-desk1.amr.corp.intel.com (HELO [10.125.108.188]) ([10.125.108.188])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 07:24:42 -0800
+Message-ID: <688bd79c-91aa-4d67-8291-dd0b222bebbf@intel.com>
+Date: Fri, 14 Nov 2025 08:24:41 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251114-ksz-fix-v3-4-acbb3b9cc32f@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v20 01/22] cxl/mem: Arrange for always-synchronous memdev
+ attach
+To: Alejandro Lucero Palau <alucerop@amd.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+References: <20251110153657.2706192-1-alejandro.lucero-palau@amd.com>
+ <20251110153657.2706192-2-alejandro.lucero-palau@amd.com>
+ <20251112145341.00005b4e@huawei.com>
+ <374f8a2c-df06-4df9-8816-d91d3236cd58@amd.com>
+From: Dave Jiang <dave.jiang@intel.com>
+Content-Language: en-US
+In-Reply-To: <374f8a2c-df06-4df9-8816-d91d3236cd58@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 14, 2025 at 08:20:23AM +0100, Bastien Curutchet (Schneider Electric) wrote:
-> The IRQ numbers created through irq_create_mapping() are only assigned
-> to ptpmsg_irq[n].num at the end of the IRQ setup. So if an error occurs
-> between their creation and their assignment (for instance during the
-> request_threaded_irq() step), we enter the error path and fail to
-> release the newly created virtual IRQs because they aren't yet assigned
-> to ptpmsg_irq[n].num.
+
+
+On 11/14/25 4:10 AM, Alejandro Lucero Palau wrote:
 > 
-> Assign the IRQ number at mapping creation.
+> On 11/12/25 14:53, Jonathan Cameron wrote:
+>> On Mon, 10 Nov 2025 15:36:36 +0000
+>> alejandro.lucero-palau@amd.com wrote:
+>>
+>>> From: Dan Williams <dan.j.williams@intel.com>
+>>>
+>>> In preparation for CXL accelerator drivers that have a hard dependency on
+>>> CXL capability initialization, arrange for the endpoint probe result to be
+>>> conveyed to the caller of devm_cxl_add_memdev().
+>>>
+>>> As it stands cxl_pci does not care about the attach state of the cxl_memdev
+>>> because all generic memory expansion functionality can be handled by the
+>>> cxl_core. For accelerators, that driver needs to know perform driver
+>>> specific initialization if CXL is available, or exectute a fallback to PCIe
+>>> only operation.
+>>>
+>>> By moving devm_cxl_add_memdev() to cxl_mem.ko it removes async module
+>>> loading as one reason that a memdev may not be attached upon return from
+>>> devm_cxl_add_memdev().
+>>>
+>>> The diff is busy as this moves cxl_memdev_alloc() down below the definition
+>>> of cxl_memdev_fops and introduces devm_cxl_memdev_add_or_reset() to
+>>> preclude needing to export more symbols from the cxl_core.
+>>>
+>>> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+>> Alejandro, read submitting patches again.  Whilst the first sign off should
+>> indeed by Dan's this also needs one from you as a 'handler' of the patch.
+>>
+>> Be very careful checking these tag chains. If they are wrong no one can
+>> merge the set and it just acts as a silly blocker.
 > 
-> Fixes: cc13ab18b201 ("net: dsa: microchip: ptp: enable interrupt for timestamping")
-> Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
-> ---
->  drivers/net/dsa/microchip/ksz_ptp.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
 > 
-> diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
-> index c8bfbe5e2157323ecf29149d1907b77e689aa221..a8ad99c6ee35ff60fb56cc5770520a793c86ff66 100644
-> --- a/drivers/net/dsa/microchip/ksz_ptp.c
-> +++ b/drivers/net/dsa/microchip/ksz_ptp.c
-> @@ -1102,10 +1102,6 @@ static int ksz_ptp_msg_irq_setup(struct ksz_port *port, u8 n)
->  
->  	strscpy(ptpmsg_irq->name, name[n]);
->  
-> -	ptpmsg_irq->num = irq_find_mapping(port->ptpirq.domain, n);
-> -	if (ptpmsg_irq->num < 0)
-> -		return ptpmsg_irq->num;
-> -
->  	return request_threaded_irq(ptpmsg_irq->num, NULL,
->  				    ksz_ptp_msg_thread_fn, IRQF_ONESHOT,
->  				    ptpmsg_irq->name, ptpmsg_irq);
+> Hi Jonathan,
+> 
+> 
+> I did the amend but it is true I did some work on it. Would it be enough to add my signed-off-by along with Dan's one?
 
-static void ksz_ptp_msg_irq_free(struct ksz_port *port, u8 n)
-{
-	struct ksz_ptp_irq *ptpmsg_irq;
+Yes. Essentially whenever you are posting someone else's patches as part of your series, you need to add your sign off after theirs for those patches. Similar to I sign off all the patches I ask Linus to pull even though I did not work on them.
 
-	ptpmsg_irq = &port->ptpmsg_irq[n];
+DJ> 
+> 
+>> I would have split this up and made the changes to cxl_memdev_alloc in
+>> a precursor patch (use of __free is obvious one) then could have stated
+>> that that was simply moved in this patch.
+> 
+> 
+> OK. I think I was fixing a bug in original Dan's patch regarding cxlmd release in case of error inside devm_cxl_add_memdev, but I think the bug is in the current code of that function as it is not properly released if error after a successful allocation. So splitting the patch could allow to make this clearer and adding the Fixes tag as well.
+> 
+> 
+>> There are other changes in there that are really hard to spot though
+>> and I think there are some bugs lurking in error paths.
+> 
+> 
+> I did spot one after your comment, checking cxlmd pointer is not an error pointer inside __cxlmd_free. If you spotted something else, please tell me :-)
+> 
+> 
+> Thank you!
+> 
+> 
+>> Jonathan
+>>
+>>> ---
+>>>   drivers/cxl/Kconfig       |   2 +-
+>>>   drivers/cxl/core/memdev.c | 101 ++++++++++++++------------------------
+>>>   drivers/cxl/mem.c         |  41 ++++++++++++++++
+>>>   drivers/cxl/private.h     |  10 ++++
+>>>   4 files changed, 90 insertions(+), 64 deletions(-)
+>>>   create mode 100644 drivers/cxl/private.h
+>>> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+>>> index e370d733e440..14b4601faf66 100644
+>>> --- a/drivers/cxl/core/memdev.c
+>>> +++ b/drivers/cxl/core/memdev.c
+>>> @@ -8,6 +8,7 @@
+>>>   #include <linux/idr.h>
+>>>   #include <linux/pci.h>
+>>>   #include <cxlmem.h>
+>>> +#include "private.h"
+>>>   #include "trace.h"
+>>>   #include "core.h"
+>>>   @@ -648,42 +649,25 @@ static void detach_memdev(struct work_struct *work)
+>>>     static struct lock_class_key cxl_memdev_key;
+>>>   -static struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds,
+>>> -                       const struct file_operations *fops)
+>>> +int devm_cxl_memdev_add_or_reset(struct device *host, struct cxl_memdev *cxlmd)
+>>>   {
+>>> -    struct cxl_memdev *cxlmd;
+>>> -    struct device *dev;
+>>> -    struct cdev *cdev;
+>>> +    struct device *dev = &cxlmd->dev;
+>>> +    struct cdev *cdev = &cxlmd->cdev;
+>>>       int rc;
+>>>   -    cxlmd = kzalloc(sizeof(*cxlmd), GFP_KERNEL);
+>>> -    if (!cxlmd)
+>>> -        return ERR_PTR(-ENOMEM);
+>>> -
+>>> -    rc = ida_alloc_max(&cxl_memdev_ida, CXL_MEM_MAX_DEVS - 1, GFP_KERNEL);
+>>> -    if (rc < 0)
+>>> -        goto err;
+>>> -    cxlmd->id = rc;
+>>> -    cxlmd->depth = -1;
+>>> -
+>>> -    dev = &cxlmd->dev;
+>>> -    device_initialize(dev);
+>>> -    lockdep_set_class(&dev->mutex, &cxl_memdev_key);
+>>> -    dev->parent = cxlds->dev;
+>>> -    dev->bus = &cxl_bus_type;
+>>> -    dev->devt = MKDEV(cxl_mem_major, cxlmd->id);
+>>> -    dev->type = &cxl_memdev_type;
+>>> -    device_set_pm_not_required(dev);
+>>> -    INIT_WORK(&cxlmd->detach_work, detach_memdev);
+>>> -
+>>> -    cdev = &cxlmd->cdev;
+>>> -    cdev_init(cdev, fops);
+>>> -    return cxlmd;
+>>> +    rc = cdev_device_add(cdev, dev);
+>>> +    if (rc) {
+>>> +        /*
+>>> +         * The cdev was briefly live, shutdown any ioctl operations that
+>>> +         * saw that state.
+>>> +         */
+>>> +        cxl_memdev_shutdown(dev);
+>>> +        return rc;
+>>> +    }
+>>>   -err:
+>>> -    kfree(cxlmd);
+>>> -    return ERR_PTR(rc);
+>>> +    return devm_add_action_or_reset(host, cxl_memdev_unregister, cxlmd);
+>>>   }
+>>> +EXPORT_SYMBOL_NS_GPL(devm_cxl_memdev_add_or_reset, "CXL");
+>>>     static long __cxl_memdev_ioctl(struct cxl_memdev *cxlmd, unsigned int cmd,
+>>>                      unsigned long arg)
+>>> @@ -1051,50 +1035,41 @@ static const struct file_operations cxl_memdev_fops = {
+>>>       .llseek = noop_llseek,
+>>>   };
+>>>   -struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>>> -                       struct cxl_dev_state *cxlds)
+>>> +struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds)
+>>>   {
+>>> -    struct cxl_memdev *cxlmd;
+>>> +    struct cxl_memdev *cxlmd __free(kfree) =
+>>> +        kzalloc(sizeof(*cxlmd), GFP_KERNEL);
+>> Trivial and perhaps not worth the hassle.
+>> I'd pull this out of the declarations block to have
+>>
+>>       struct device *dev;
+>>       struct cdev *cdev;
+>>       int rc;
+>>
+>>     struct cxl_memdev *cxlmd __free(kfree) =
+>>         kzalloc(sizeof(*cxlmd), GFP_KERNEL);
+>>     if (!cxlmd)
+>>         return ERR_PTR(-ENOMEM);
+>>
+>> That is treat the __free() related statement as an inline declaration of
+>> the type we only really allow for these.
+>>
+>>
+>>>       struct device *dev;
+>>>       struct cdev *cdev;
+>>>       int rc;
+>>>   -    cxlmd = cxl_memdev_alloc(cxlds, &cxl_memdev_fops);
+>>> -    if (IS_ERR(cxlmd))
+>>> -        return cxlmd;
+>>>   -    dev = &cxlmd->dev;
+>>> -    rc = dev_set_name(dev, "mem%d", cxlmd->id);
+>>> -    if (rc)
+>>> -        goto err;
+>>> +    if (!cxlmd)
+>>> +        return ERR_PTR(-ENOMEM);
+>>>   -    /*
+>>> -     * Activate ioctl operations, no cxl_memdev_rwsem manipulation
+>>> -     * needed as this is ordered with cdev_add() publishing the device.
+>>> -     */
+>>> +    rc = ida_alloc_max(&cxl_memdev_ida, CXL_MEM_MAX_DEVS - 1, GFP_KERNEL);
+>>> +    if (rc < 0)
+>>> +        return ERR_PTR(rc);
+>>> +    cxlmd->id = rc;
+>>> +    cxlmd->depth = -1;
+>>>       cxlmd->cxlds = cxlds;
+>>>       cxlds->cxlmd = cxlmd;
+>> These two lines weren't previously in cxl_memdev_alloc()
+>> I'd like a statement in the commit message of why they are now. It seems
+>> harmless because they are still ordered before the add and are
+>> ultimately freed
+>>
+>> I'm not immediately spotting why they now are.  This whole code shift
+>> and complex diff is enough of a pain I'd be tempted to do the move first
+>> so that we can then see what is actually changed much more easily.
+>>
+>>
+>>>   -    cdev = &cxlmd->cdev;
+>>> -    rc = cdev_device_add(cdev, dev);
+>>> -    if (rc)
+>>> -        goto err;
+>>> -
+>>> -    rc = devm_add_action_or_reset(host, cxl_memdev_unregister, cxlmd);
+>>> -    if (rc)
+>>> -        return ERR_PTR(rc);
+>>> -    return cxlmd;
+>>> +    dev = &cxlmd->dev;
+>>> +    device_initialize(dev);
+>>> +    lockdep_set_class(&dev->mutex, &cxl_memdev_key);
+>>> +    dev->parent = cxlds->dev;
+>>> +    dev->bus = &cxl_bus_type;
+>>> +    dev->devt = MKDEV(cxl_mem_major, cxlmd->id);
+>>> +    dev->type = &cxl_memdev_type;
+>>> +    device_set_pm_not_required(dev);
+>>> +    INIT_WORK(&cxlmd->detach_work, detach_memdev);
+>>>   -err:
+>>> -    /*
+>>> -     * The cdev was briefly live, shutdown any ioctl operations that
+>>> -     * saw that state.
+>>> -     */
+>>> -    cxl_memdev_shutdown(dev);
+>>> -    put_device(dev);
+>>> -    return ERR_PTR(rc);
+>>> +    cdev = &cxlmd->cdev;
+>>> +    cdev_init(cdev, &cxl_memdev_fops);
+>>> +    return_ptr(cxlmd);
+>>>   }
+>>> -EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, "CXL");
+>>> +EXPORT_SYMBOL_NS_GPL(cxl_memdev_alloc, "CXL");
+>>>     static void sanitize_teardown_notifier(void *data)
+>>>   {
+>>> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
+>>> index d2155f45240d..fa5d901ee817 100644
+>>> --- a/drivers/cxl/mem.c
+>>> +++ b/drivers/cxl/mem.c
+>>> @@ -7,6 +7,7 @@
+>>>     #include "cxlmem.h"
+>>>   #include "cxlpci.h"
+>>> +#include "private.h"
+>>>     /**
+>>>    * DOC: cxl mem
+>>> @@ -202,6 +203,45 @@ static int cxl_mem_probe(struct device *dev)
+>>>       return devm_add_action_or_reset(dev, enable_suspend, NULL);
+>>>   }
+>>>   +static void __cxlmd_free(struct cxl_memdev *cxlmd)
+>>> +{
+>>> +    cxlmd->cxlds->cxlmd = NULL;
+>>> +    put_device(&cxlmd->dev);
+>>> +    kfree(cxlmd);
+>>> +}
+>>> +
+>>> +DEFINE_FREE(cxlmd_free, struct cxl_memdev *, __cxlmd_free(_T))
+>>> +
+>>> +/**
+>>> + * devm_cxl_add_memdev - Add a CXL memory device
+>>> + * @host: devres alloc/release context and parent for the memdev
+>>> + * @cxlds: CXL device state to associate with the memdev
+>>> + *
+>>> + * Upon return the device will have had a chance to attach to the
+>>> + * cxl_mem driver, but may fail if the CXL topology is not ready
+>>> + * (hardware CXL link down, or software platform CXL root not attached)
+>>> + */
+>>> +struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>>> +                       struct cxl_dev_state *cxlds)
+>>> +{
+>>> +    struct cxl_memdev *cxlmd __free(cxlmd_free) = cxl_memdev_alloc(cxlds);
+>>> +    int rc;
+>>> +
+>>> +    if (IS_ERR(cxlmd))
+>>> +        return cxlmd;
+>>> +
+>>> +    rc = dev_set_name(&cxlmd->dev, "mem%d", cxlmd->id);
+>>> +    if (rc)
+>>> +        return ERR_PTR(rc);
+>>> +
+>>> +    rc = devm_cxl_memdev_add_or_reset(host, cxlmd);
+>>> +    if (rc)
+>>> +        return ERR_PTR(rc);
+>> Is the reference tracking right here?  If the above call fails
+>> then it is possible cxl_memdev_unregister() has been called
+>> or just cxl_memdev_shutdown().
+>>
+>> If nothing else (and I suspect there is worse but haven't
+>> counted references) that will set
+>> cxlmd->cxlds = NULL;
+>> s part of cxl_memdev_shutdown()
+>> The __cxlmd_free() then dereferences that and boom.
+>>
+>>
+>>> +
+>>> +    return no_free_ptr(cxlmd);
+>>> +}
+>>> +EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, "CXL");
 
-	free_irq(ptpmsg_irq->num, ptpmsg_irq);
-	irq_dispose_mapping(ptpmsg_irq->num);
-}
-
-This is supposed to be the opposite of ksz_ptp_msg_irq_setup()? The
-opposite of irq_dispose_mapping() is irq_create_mapping()? But that
-does not happen in ksz_ptp_msg_irq_setup()? 
-
-Maybe this change is enough to fix the issue, but it seems like there
-is more asymmetry to correct in this code.
-
-	Andrew
 
