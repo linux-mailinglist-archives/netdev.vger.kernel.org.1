@@ -1,131 +1,111 @@
-Return-Path: <netdev+bounces-238649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 442E2C5CE7B
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 12:44:21 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 772CEC5CECF
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 12:49:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 364BF4E312E
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 11:39:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AA1B84E7DFA
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 11:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA3D313543;
-	Fri, 14 Nov 2025 11:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8A84313E02;
+	Fri, 14 Nov 2025 11:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="URWkSUCi"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="l2kZZHrs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B9F2877D5;
-	Fri, 14 Nov 2025 11:39:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9DA35CBC3;
+	Fri, 14 Nov 2025 11:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763120378; cv=none; b=sFv8JxqxCzo1/MVDsxtH/w39/13cSD3d6JfN9YAubFB5A0qVuTps3RzDXZr4vD+aUGIe8JtC23PqaWbBdG4ilTJHfDdOki3vlNjM2kYRnlTnpg5UFb4rozHikFaG66j7SaV1SeFNis0jKk0/Ql9d2M4/Jf+TNwY9hqr0Xi7Lq+E=
+	t=1763120602; cv=none; b=bGbO9q9VNkDxtaQziSC9Wepjmj+NJJ2TaZtJFLHI/OMx/BLZTdsBxBJ2ZELj6Hed3KGFQZjaOsc5OOCXHYHHd6oMBCEZiZAtiO3ZkDTEQCKsSWAOvN/72cf/SOiaR9VOvjGpghZwnUcau750DIawP7ZQM5oA4aw+ECNZ0GqqJlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763120378; c=relaxed/simple;
-	bh=QMn+aqsnHLN2238UDQHPXzt6ZSS3mIIatXxiqp40HW0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=A+lABnaTW1W7sCxKCIP4hHzSzxKAnGJCOeTJAApcbY/+CcS9EtTO/ltVoxX19xN1wrZRd2fbTj2IUNUxmo0BS0g7v6/JitkH6sdleMnPaNtyDgN1nPq+wb+r21ORQy+0z+mNElsCUEg/eMuz785rZGnkLjpMPi9hgXANUWkDFi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=URWkSUCi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AB379C19421;
-	Fri, 14 Nov 2025 11:39:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763120377;
-	bh=QMn+aqsnHLN2238UDQHPXzt6ZSS3mIIatXxiqp40HW0=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=URWkSUCip83/WH4peliK+3vcsyvf5bK0ysiCJVFiaAzQ+/7NkBz+W615wWGLOr6yN
-	 0k7Ksbixju9HrgO+Twq/wN8PUcxHAT34mmcKIEDEnULIp1+CFk0ME/0oOibSRgzjyx
-	 /0uaq/NyCOLUZUDOJa4YsHtt0NwHnhuJ6P2xC9c+YGfpmmCDGj1roFxENkFQFTZNDt
-	 kpEUElXB69G8Yb6hO3HMbUJ/OzfwfEZ1ytxKZpgfkpQoEQaJWiKq6vQAaoFHeU8QyT
-	 +p7wD0fxMRCOd11vyz+xXq96u/NA3pnH18wXrHsASEvz3979bUlBKS1ebNiemaOM55
-	 1R9hetdomonHw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96EBACDE022;
-	Fri, 14 Nov 2025 11:39:37 +0000 (UTC)
-From: Maud Spierings via B4 Relay <devnull+maudspierings.gocontroll.com@kernel.org>
-Date: Fri, 14 Nov 2025 12:39:32 +0100
-Subject: [PATCH] net: phy: fix doc for rgii_clock()
+	s=arc-20240116; t=1763120602; c=relaxed/simple;
+	bh=kaZhosVkcLQ9u1crvdgctTGMxfSng1jWp0o5JU5YM7I=;
+	h=From:To:Subject:Date:Message-Id; b=hHC0B3ZqO1w2P0a+sjGldzN1keDnDu90EQ5h7EQ8fusAtOJl9lqeZzEDLKVWs+IQuQSD52zQzjdVNVnadc6gNBFYsBN2Set/yevvLP+84kuzld4o/54OPwMV2fAGg4OAZzPqUOHZmss6zUk6c+CBjKPHZMQ9jYp96rY3JqMZ2FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=l2kZZHrs; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id F2748201AE58; Fri, 14 Nov 2025 03:43:20 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F2748201AE58
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1763120601;
+	bh=IJCs1GggzDg4PCbZwM5u0znB/62duwjasTJIVQPyjY0=;
+	h=From:To:Subject:Date:From;
+	b=l2kZZHrsm6cjdmfnQ1xX0YPjAXUm8rraUpUiiRTPBvBDf9klTOdo7XxwkSC26KNZd
+	 Fk7Hlrm72kauCfoFipuGfnu8Q4hSuc7mPhxMURKq2rhpXy8LJIkQlJGv4Sf+UAa3gb
+	 oh68fnrt7XuCEmsnh4hvoDtmjw+xbbVrNru5D+Og=
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	shirazsaleem@microsoft.com,
+	sbhatta@marvell.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net-next v3 0/2] net: mana: Refactor GF stats handling and add rx_missed_errors counter
+Date: Fri, 14 Nov 2025 03:43:17 -0800
+Message-Id: <1763120599-6331-1-git-send-email-ernis@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251114-rgmii_clock-v1-1-e5c12d6cafa6@gocontroll.com>
-X-B4-Tracking: v=1; b=H4sIAPMUF2kC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1NDQ0MT3aL03MzM+OSc/ORsXUNjC8sUAzMz86Q0cyWgjoKi1LTMCrBp0bG
- 1tQDDHgxRXQAAAA==
-X-Change-ID: 20251114-rgmii_clock-1389d0667bf7
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Maud Spierings <maudspierings@gocontroll.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1763120376; l=1933;
- i=maudspierings@gocontroll.com; s=20250214; h=from:subject:message-id;
- bh=UQyyfUMTpe4dFX3C6T5OVzvfPF16qoNqoI0Ju4mbbZc=;
- b=diLkiXi59gVwA0zYEyEXxtzWagQqnkw7B+Hdj9ZJ3wX5GBFQdTmVFaEE5WCY6ztO+9rJPuaxD
- tyNHKdC92yqCvofN5jwszOP97mpWkqNu770RMJEoiU7oVwa+Hdynp+h
-X-Developer-Key: i=maudspierings@gocontroll.com; a=ed25519;
- pk=7chUb8XpaTQDvWhzTdHC0YPMkTDloELEC7q94tOUyPg=
-X-Endpoint-Received: by B4 Relay for maudspierings@gocontroll.com/20250214
- with auth_id=341
-X-Original-From: Maud Spierings <maudspierings@gocontroll.com>
-Reply-To: maudspierings@gocontroll.com
 
-From: Maud Spierings <maudspierings@gocontroll.com>
+Restructure mana_query_gf_stats() to operate on the per-VF mana_context,
+instead of per-port statistics. Introduce mana_ethtool_hc_stats to
+isolate hardware counter statistics and update the
+"ethtool -S <interface>" output to expose all relevant counters while
+preserving backward compatibility.
 
-The doc states that the clock values also apply to the rmii mode,
-"as the clock rates are identical". But as far as I can find the
-clock rate for rmii is 50M at both 10 and 100 mbits/s [1].
-
-Link: https://en.wikipedia.org/wiki/Media-independent_interface [1]
-
-Signed-off-by: Maud Spierings <maudspierings@gocontroll.com>
----
-This patch is also part question, I am working on an imx8mp based device
-with the dwmac-imx driver. In imx_dwmac_set_clk_tx_rate() and
-imx_dwmac_fix_speed() both rmii and mii are excluded from setting the
-clock rate with this function.
-
-But from what I can read only rmii should be excluded, I am not very
-knowledgable with regards to networkinging stuff so my info is
-coming from wikipedia.
-
-I am adding this exclusion to the barebox bootloader, but I am not sure
-if I should also be excluding mii as is being done upstream.
----
- include/linux/phy.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index bf5457341ca8..e941b280c196 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -296,9 +296,9 @@ static inline const char *phy_modes(phy_interface_t interface)
-  * @speed: link speed value
-  *
-  * Description: maps RGMII supported link speeds into the clock rates.
-- * This can also be used for MII, GMII, and RMII interface modes as the
-- * clock rates are identical, but the caller must be aware that errors
-- * for unsupported clock rates will not be signalled.
-+ * This can also be used for MII and GMII interface modes as the clock rates
-+ * are identical, but the caller must be aware that errors for unsupported
-+ * clock rates will not be signalled.
-  *
-  * Returns: clock rate or negative errno
-  */
+Add support for the standard rx_missed_errors counter by mapping it to
+the hardware's hc_rx_discards_no_wqe metric. Introduce a
+global workqueue that refreshes statistics every 2 seconds, ensuring
+timely and consistent updates of hardware counters.
 
 ---
-base-commit: 0f2995693867bfb26197b117cd55624ddc57582f
-change-id: 20251114-rgmii_clock-1389d0667bf7
+Changes in v3:
+* Use schedule_delayed_work (global workqueue) instead of
+  queue_delayed_work (dedicated workqueue for MANA driver).
+* Update commit message for more readability.
+* Use reverse x-mas tree format in mana_query_gf_stats.
+Changes in v2:
+* Update commit message.
+* Stop rescheduling workqueue only when HWC timeout is observed.
+* Introduce new variable in mana_context for detecting HWC timeout.
+* Warn once in mana_get_stat64 when HWC timeout is observed.
+---
+Erni Sri Satya Vennela (2):
+  net: mana: Move hardware counter stats from per-port to per-device
+    context
+  net: mana: Add standard counter rx_missed_errors
 
-Best regards,
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 101 ++++++++++++------
+ .../ethernet/microsoft/mana/mana_ethtool.c    |  85 ++++++++-------
+ include/net/mana/gdma.h                       |   6 +-
+ include/net/mana/mana.h                       |  18 +++-
+ 4 files changed, 130 insertions(+), 80 deletions(-)
+
 -- 
-Maud Spierings <maudspierings@gocontroll.com>
-
-
+2.34.1
+For internal review only. 
 
