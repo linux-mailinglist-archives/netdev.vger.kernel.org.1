@@ -1,81 +1,87 @@
-Return-Path: <netdev+bounces-238729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF26FC5E739
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 18:09:37 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B12D1C5E727
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 18:09:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 70AC34F1547
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:45:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D270D388D7E
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 16:58:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9559298CC4;
-	Fri, 14 Nov 2025 16:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A5DC2C21FE;
+	Fri, 14 Nov 2025 16:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rTAgPFuu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b="QBQjoEYw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from exactco.de (exactco.de [176.9.10.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9084128934F;
-	Fri, 14 Nov 2025 16:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3812C15A3
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 16:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.10.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763138726; cv=none; b=T05cjIh0yUH/KvSwk/ZjN0pPcJK9RgbBTYLDI8WIUVNv/Bj1c+6GUJ3JxctrfB6cg3S0ZKhf/B0HrV1zPbw3V/hWHSADw/fakPkOHmy17JWVrtrThkHknrtaEAzgIB3YGQAK2kdxz0BmQffyp8OUcoNolAKvuE0emdScysSxfAU=
+	t=1763139350; cv=none; b=RLzikKs0PcQycJNjcUcPc4knGkZvk5tWLQQ11qEPKXGpNO8GRbWeEMouyjY6lAYOT48e+uaFZm+O63EY+2ohd2J7Y9BNUgVQ/eaIWAI0JljowvLLC8y7IjTwNeSQyMz3qPVg2mC2AxE5jbs8q/l+QrqTgXblPj44ntaCfkU9ocs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763138726; c=relaxed/simple;
-	bh=tyQ4CiJcUc+21AjGAuoXulpVqk8DHy06PL/Fy3PLj7E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R6PpSF4ee0iLYZsev4IIHnfxUew+OUm37uhOxz5vIAdTMjXhIQMfJe99M90eK9yfMk8H0PjRVUxJCEf4/gyFnJps3SJC13MyCJT7pwJBIA/O3vrx12PNePWRegQjTepCUSFPn9oarlZYbg2dVYK9rUFuz1LReuEWaWRVr4Qtohc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rTAgPFuu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D077DC116D0;
-	Fri, 14 Nov 2025 16:45:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763138726;
-	bh=tyQ4CiJcUc+21AjGAuoXulpVqk8DHy06PL/Fy3PLj7E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rTAgPFuuXqLm10IeMFXRELduRW17vEVmcEGp6r1MGazrRgLPpTFHXYmBCFj+UBqmW
-	 K/yTFkUYY3C+StUxHrJQySrHpsGGGz6tbf17LgIEX5GrtWcK6p1331FNZAhxRdz/GN
-	 mFRdHTHh+g0LGkM2yC8ptQEjLZZ9jn4a2OXMWCcrClgRuzyIVzs1HcnNQ7pd4I0Ucy
-	 wXaOwjuTG5aLekV0fJ4IC/jTsDhOnEspe+RVy1iDnE+x/cLe7HukU8mabTGGjpUunO
-	 emtsJ2TsqXsr/HTolaqFiVwpF3jFPedE9mmFRUN8VL0/3EpA7OvzBuZUTst5KKFdZw
-	 Tn2G2yIvzvKUA==
-Date: Fri, 14 Nov 2025 16:45:21 +0000
-From: Simon Horman <horms@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-team@meta.com
-Subject: Re: [PATCH net-next] net: bnx2x: convert to use get_rx_ring_count
-Message-ID: <aRdcoSNrFF_aIvjk@horms.kernel.org>
-References: <20251112-bnx_grxrings-v1-1-1c2cb73979e2@debian.org>
+	s=arc-20240116; t=1763139350; c=relaxed/simple;
+	bh=0NpKQbRnEq6Ge72Q1npDXwt6avqaNS3pmhXp3LTOsvk=;
+	h=Date:Message-Id:To:Subject:From:Mime-Version:Content-Type; b=qLKdgBCmuftz5H0398QOgTtFQXmHTY+JDpXaJ/S0uvOP3txn17heZ8rGLhnZlEuVip8tTKJh1PI6dQzr9GvgYJLGY+76+qeG4EHJ+ooCGgDv7Qq2RK1PQwDq+g1S+25O4I5EQ8HG/XGsOTxTVvN6Oz89NpMPNhMoh5doOjdjmkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de; spf=pass smtp.mailfrom=exactco.de; dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b=QBQjoEYw; arc=none smtp.client-ip=176.9.10.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=exactco.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=exactco.de;
+	s=x; h=Content-Transfer-Encoding:Content-Type:Mime-Version:From:Subject:To:
+	Message-Id:Date:Sender:Reply-To:Cc:Content-ID:Content-Description:Resent-Date
+	:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
+	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
+	List-Owner:List-Archive; bh=zOFvCXLKtANp7HnUMV9wvcD5WtzEt+e0awruKuGK5gk=; b=Q
+	BQjoEYwNxxK0aLJ/r0IFJdRdD1ley+B1PclSPTRZRRBFpdgynE7gpi1rXC0ybJaJkVkXlHOe26cCg
+	pG38ve8s8CYG5XMjQ9HLLIgDQrG/a8KLZ3dq4aIGyUmp6bvsG6V3rEI+FKeVdAPNuCfSiqF5MMMqd
+	4yqXOmRSuG72eJouXia+7sU9nnRfZcgZkVop6Y/chQbmrp7BGc4+vB7xFgZADOHGboCnwNxa4Pjbj
+	PFmSAchqeIdsKGP5jYCUVUeN8EimvTF/gI3+eIIB+jTUq+Rem1EPIAZtos9K445khdY+53kZ6oWnR
+	gYbXcvsov0uoYv8MHzS4Jz2fLvKdyo1/A==;
+Date: Fri, 14 Nov 2025 17:55:43 +0100 (CET)
+Message-Id: <20251114.175543.1553030512147056405.rene@exactco.de>
+To: netdev@vger.kernel.org
+Subject: [PATCH] fix 3com/3c515 build error
+From: =?iso-8859-1?Q?Ren=E9?= Rebe <rene@exactco.de>
+X-Mailer: Mew version 6.10 on Emacs 30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251112-bnx_grxrings-v1-1-1c2cb73979e2@debian.org>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 12, 2025 at 01:50:23AM -0800, Breno Leitao wrote:
-> Convert the bnx2x driver to use the new .get_rx_ring_count ethtool
-> operation instead of implementing .get_rxnfc solely for handling
-> ETHTOOL_GRXRINGS command. This simplifies the code by replacing the
-> switch statement with a direct return of the queue count.
-> 
-> The new callback provides the same functionality in a more direct way,
-> following the ongoing ethtool API modernization.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+3c515 stopped building for me some months ago, fix:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+drivers/net/ethernet/3com/3c515.o: error: objtool: cleanup_module(): Magic init_module() function name is deprecated, use module_init(fn) instead
+make[6]: *** [scripts/Makefile.build:203: drivers/net/ethernet/3com/3c515.o] Error 255
 
+Signed-off-by: René Rebe <rene@exactco.de>
+
+--- a/drivers/net/ethernet/3com/3c515.c	2025-05-26 19:16:50.055582886 +0200
++++ b/drivers/net/ethernet/3com/3c515.c	2025-05-26 19:27:45.400746652 +0200
+@@ -1549,7 +1549,7 @@
+ 
+ 
+ #ifdef MODULE
+-void cleanup_module(void)
++static void corkscrew_cleanup_module(void)
+ {
+ 	while (!list_empty(&root_corkscrew_dev)) {
+ 		struct net_device *dev;
+@@ -1563,4 +1563,5 @@
+ 		free_netdev(dev);
+ 	}
+ }
++module_exit(corkscrew_cleanup_module);
+ #endif				/* MODULE */
+
+-- 
+  René Rebe, ExactCODE GmbH, Lietzenburger Str. 42, DE-10789 Berlin
+  https://exactco.de | https://t2linux.com | https://rene.rebe.de
 
