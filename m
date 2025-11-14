@@ -1,58 +1,78 @@
-Return-Path: <netdev+bounces-238655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85E43C5D040
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 13:07:53 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7724C5D048
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 13:08:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D30464E9732
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 12:02:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3AE484EA9E8
+	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 12:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9995314D2C;
-	Fri, 14 Nov 2025 12:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V3Pnieip"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968B23128AB;
+	Fri, 14 Nov 2025 12:02:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C49231065A;
-	Fri, 14 Nov 2025 12:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A8A236A8B
+	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 12:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763121726; cv=none; b=YaUKUA2+iXGE60A1r8SrP3EWDb0eYfvqV06nxbn0vShhOSKtTk3KNuas5Un7EYqs2/106xRbrNojyw9OFH38Joz5ZB4R27CKIA8GPIVfhx2/W0kTiz5hqXRMZTKG9Bc3ECKAohMh+F9KKIpeUB3roAAYrbiyIShaH1lJvDg3GGQ=
+	t=1763121750; cv=none; b=mlkL0p+bOSJYC0OvUu0odTxtvM2624msthK7SotFzgZQ6kElusNVFuAhEw6IsLUkWadhanFoFJVKWL2H4fXOoy3V7gB7DIqLdRVTxed/yyegfuziVAfnAFowJVi2VjvqlQG8aicyGOauE/D+wttDwv9sC4wolF426BT3QCYZ2rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763121726; c=relaxed/simple;
-	bh=RcOIrza22pQbeEe4PPAk8KoX4dKtq9BnjNAjCwPPzLo=;
+	s=arc-20240116; t=1763121750; c=relaxed/simple;
+	bh=P2rDbxLN99bxs6YPpinBiTSsEfXXewl5hHR6vjb3rvc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ihPn1m2ArqwdgTMYWAGlXVCnlJ7UToFQOQiARr96884jZmfiya1iUYroph+qyOYV+G6a9HqDO1Ae8nAi3AR2n7jcSEuO/mHXOH+XmBi81zfIoMl0qSk5hCsL2OZGiYcfb+tldviKI7hiw/ZVUhg5tlZeQYVCi+KQ1HRHzgbvOFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V3Pnieip; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBEA4C4CEFB;
-	Fri, 14 Nov 2025 12:02:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763121726;
-	bh=RcOIrza22pQbeEe4PPAk8KoX4dKtq9BnjNAjCwPPzLo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V3PnieipHYUUHcmnuNUlP7qNnl4dAYVySltj5L82uJj+Zj2PhVTomjJO9l8aXBtKm
-	 WrQSYWwZxnM6Qx6JYPZ72VHI93r76g27SDW+ZC524cHwhEsAJp96v7kcELQkIXmZ5s
-	 UVIxXrLlmoTXZg7IcMKjn+U1kI/WG9Gzc4lYDzOjKteyO8e5ezGr+YGbeDHBhJDdHp
-	 8GlGeXdITJH7bD0Kc1ZGqEOoy7kaSVKzDMbVfiIm7IbY0SZuVKOab3At/b2g6VuXHt
-	 BDTwEk8yi9o7kSPP1fym2dwjy7THo9vl9syjiKb9N10o0hngCr8R3lUzaWJuwrWFP7
-	 PfBb+nOKyOujQ==
-Date: Fri, 14 Nov 2025 12:02:01 +0000
-From: Simon Horman <horms@kernel.org>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>, Hyunchul Lee <hyc.lee@gmail.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Stefan Metzmacher <metze@samba.org>
-Subject: Re: [PATCH v2] ksmbd: server: avoid busy polling in accept loop
-Message-ID: <aRcaOZ79iQwqMTZI@horms.kernel.org>
-References: <20251111104750.25739-1-dqfext@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bSUqRMCx5Hkw1W+GtJS5Tx9XgGiMK6p9V2W4wjYUZtvDm1ciPBwbaO+q4odpQMNaFKXmIJwmEZda6ObzheeBAKZ386ghADn5iCQBpN27DrfS6TR/mNHA3WHICyOXsAULClaQ+jlR3Qc0R3jXgr7UrsOa4ruHYat6+ngJJtzwMog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7c6d1ebb0c4so1384368a34.1
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 04:02:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763121748; x=1763726548;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qUMb8rT5vzNFBptKdq2Qr+S+DTsITygruouKMFYJoco=;
+        b=ugsLTySGKGZIZbq5yiN71GgIFcalh0RQC/MSADzGhF4homPHTtTPtKQJPBXnMdzXle
+         u1TZEjHgvCtSN1pInckxfom9lGGDwlmUu+ZO3iWtB5NY7BtWR5wbdOFD8UddXWQM9m4X
+         UpllP4p/IYNc48MMLvUYRzgknDPiNa7lbZ5pijPxqxpABoIlxSUu0KeDktiI0PDV29ed
+         uSGcGk+ShtqNJdk9IDgUPxgrr4b3j+uRHbIaT7nzmFe7LmC8nSH4692rgeOdFNeO4HOz
+         1JlRlB+T6OO2/a9PegshbSNQwIXYN2dWhJDVM0Sch6OGnlA6w8zgowKMXQz5c4DOPtcr
+         nvJg==
+X-Forwarded-Encrypted: i=1; AJvYcCVq3yfBBMmyiAzWfwc9aRGWgWpR1OXBBEnN5wlFd5q3Atc1448YczlRJuGtlPJXKW1Zj7SuM0A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJLXUSAb00OFEe6wU45KerWLBDwnzLdD8czuvYG11uHZNE5JTN
+	4hZxE/tawZZsicl7pukmrbuxBJzzTTjVIz0/JoysEOL5CpHe/CGPtd+T
+X-Gm-Gg: ASbGnctEik1BA1wJ2PD7rqIPMu0lSn8yX4qE75P+mPa+7zkaJJPmUV5f5qlD97tVYXI
+	eYtMwGGnzVN3w7ClrKogun8USDkMUDOQULEBOvF7uAhDj87Ef0ng8AoxRUWrLGEFpYC8Ta0UdoR
+	n/I2u3p6hjdXlDU4r8u2PpAHiC203E6b5kyh0vE6L8frOTBw8U0TISXGfLa9es2V18XWE6oYncF
+	ZOPdUpJsop0P/260+r+A37ENETcLGR/MpqJCPgzSAxPtpdHRONoHPZpozFSPHjusUSRrtsABHKQ
+	QvgaErdNJWUgHcwZQkXQkP80wTeoi0U7QgK2BsW+gcJ3Hy0IGrDKN/WWw1p7TsxjGoA6bBIRX6p
+	AGh0L0YYuTvesiTlb/bXha4OMWY2vp+54qcPvYJjwtEDLDu1fWV8kxAraAjXE1GtAHmNAoRDNR4
+	K4AOU=
+X-Google-Smtp-Source: AGHT+IFj5d1/PW8sqxWgMu4/IMgSKSuw1jOqaWOp4Y/7Javx+X8Crn+xn0RTmUXT0VZYyIRBs2mAcQ==
+X-Received: by 2002:a05:6830:920:b0:7c2:779a:5c4f with SMTP id 46e09a7af769-7c7442aed40mr1473379a34.2.1763121748040;
+        Fri, 14 Nov 2025 04:02:28 -0800 (PST)
+Received: from gmail.com ([2a03:2880:10ff:43::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c73a3bddd2sm2421111a34.25.2025.11.14.04.02.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Nov 2025 04:02:27 -0800 (PST)
+Date: Fri, 14 Nov 2025 04:02:25 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Gustavo Luiz Duarte <gustavold@gmail.com>
+Cc: Andre Carvalho <asantostc@gmail.com>, Simon Horman <horms@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/4] netconsole: Simplify
+ send_fragmented_body()
+Message-ID: <f3zsfjju6gsnpkq7ikxamlkncmirtvbt2fdieyqbpfbfyjjmkg@d3ezd47cqwip>
+References: <20251113-netconsole_dynamic_extradata-v2-0-18cf7fed1026@meta.com>
+ <20251113-netconsole_dynamic_extradata-v2-1-18cf7fed1026@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,29 +81,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251111104750.25739-1-dqfext@gmail.com>
+In-Reply-To: <20251113-netconsole_dynamic_extradata-v2-1-18cf7fed1026@meta.com>
 
-On Tue, Nov 11, 2025 at 06:47:49PM +0800, Qingfang Deng wrote:
+On Thu, Nov 13, 2025 at 08:42:18AM -0800, Gustavo Luiz Duarte wrote:
+> Refactor send_fragmented_body() to use separate offset tracking for
+> msgbody, and extradata instead of complex conditional logic.
+> The previous implementation used boolean flags and calculated offsets
+> which made the code harder to follow.
+> 
+> The new implementation maintains independent offset counters
+> (msgbody_offset, extradata_offset) and processes each section
+> sequentially, making the data flow more straightforward and the code
+> easier to maintain.
+> 
+> This is a preparatory refactoring with no functional changes, which will
+> allow easily splitting extradata_complete into separate userdata and
+> sysdata buffers in the next patch.
+> 
+> Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
 
-...
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
-> @@ -458,10 +451,6 @@ static void tcp_destroy_socket(struct socket *ksmbd_socket)
->  	if (!ksmbd_socket)
->  		return;
->  
-> -	/* set zero to timeout */
-> -	ksmbd_tcp_rcv_timeout(ksmbd_socket, 0);
-> -	ksmbd_tcp_snd_timeout(ksmbd_socket, 0);
-> -
-
-Hi Qingfang Deng,
-
-W=1 builds tell me that ksmbd_tcp_rcv_timeout() is now unused:
-I expect it can be removed.
-
->  	ret = kernel_sock_shutdown(ksmbd_socket, SHUT_RDWR);
->  	if (ret)
->  		pr_err("Failed to shutdown socket: %d\n", ret);
-
-...
+Thanks for this refactor.
+--breno
 
