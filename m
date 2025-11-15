@@ -1,331 +1,187 @@
-Return-Path: <netdev+bounces-238805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D401C5FA23
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 00:55:09 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BB13C5FD35
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 02:23:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B69593BFDD8
-	for <lists+netdev@lfdr.de>; Fri, 14 Nov 2025 23:54:33 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 94E2A3406A2
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 01:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A3730BB96;
-	Fri, 14 Nov 2025 23:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62D1C19644B;
+	Sat, 15 Nov 2025 01:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MMS7f57I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8YqCfLn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9731D35898
-	for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 23:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763164471; cv=fail; b=lh1CBKRWbowcsKGWJgtw8QM6LyttEKtRN29Iiiog+vtxJO7ojVO3EYWkXHjYUDaN5UES/XQ6WpuDWoJdqQQ2asSb/EnDInKT56mfmTFeD41CkKu8kag/sGmO4FkpaTbER9oHZKrFDLCPOHeA6mGOJA0Ad/JyAXNpUittco/HCgU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763164471; c=relaxed/simple;
-	bh=Za1WXQv4zY5qRFI5AL+XTFegVxQeW27gCv5cdAE91rg=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=VohKKd5zQnpVtwOhxOW1uMeXasTWK0ODYeT8HLQb1ddjR5B18njx1lVryyW83hBQC3yd0czO+vHPRMq8GrBabCuRsSCBueAPPCRDAR5U8vdO9qWXOdWGlNM5/bHZIxUmMF93R4wc6GGpbRxNFgqJ5G8/b7cFSsyo2v4MhZbVzuY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MMS7f57I; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763164470; x=1794700470;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:mime-version;
-  bh=Za1WXQv4zY5qRFI5AL+XTFegVxQeW27gCv5cdAE91rg=;
-  b=MMS7f57IQLLIAPI63Vifk27E3sIYD75qcPAty0IYoNc6pZE+yogJ6Ve3
-   qCyar+LXWVdNJaq4+ZQDql6cyeMCTL24ULeYkl8PVa9whiQi+frPYEpRl
-   UpHW25WohFVlTEKlWRkJEpvIjIVe+3roNlT1sPtvwaBKERaUaQ26dJzFv
-   Pydd8Qwn1x2souzp14LSnZyVdsVWyDYNyyN31ZKYP1DTs/Y/2bhW04F40
-   i45t3KlWrUhCdU1Mg4YjdLusm72clReEmVw/aFv/QQTsN78QMIlVkYZA1
-   AVmTg4Yx5R0mravChwuQ+/4ucr5vVmPnv05iWnLDnVdfv0UfL+0SSswoq
-   g==;
-X-CSE-ConnectionGUID: O2IgT414RbqIquNGa0lvNQ==
-X-CSE-MsgGUID: e//c8bnvS96dLc1i+JVq1A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11613"; a="64266888"
-X-IronPort-AV: E=Sophos;i="6.19,306,1754982000"; 
-   d="asc'?scan'208";a="64266888"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 15:54:29 -0800
-X-CSE-ConnectionGUID: hbcGplibS0mQXfyURSOWyw==
-X-CSE-MsgGUID: J5M0/OqRScqSwt7BHdNK2g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,306,1754982000"; 
-   d="asc'?scan'208";a="220542572"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2025 15:54:29 -0800
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 14 Nov 2025 15:54:28 -0800
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Fri, 14 Nov 2025 15:54:28 -0800
-Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.56) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 14 Nov 2025 15:54:27 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=r9bzQVe1UGaiNUCNR1wyJCkqy7BXQ7RamB1As06pIYGC3KTnMaQL0suoFjpnAabLUENd30ShwKz6M04Jz2W+R7P/Wl8QF9lJhenAAHDz7mDF8YLhT8o/Sw9W1uiuf1jrTzZxUzjQalz0egAKYBcY9H6+wfb+RXv3MJbc9ommDQTb91fCb9CgfCMjP1hBG5f4xJFPmMhEkRKqtdD07hOaDexy1bRjNJN9UJ2MyQTEDDO5PzthRA80dUM1pRTL7vncciw3uicERE1VWv82KiVTCSX955XVyJG0LM/wWAiUsG9uSChRyroRFBGABI+/smp9pzwyWAGZErC48lVaBCa5QA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UuYv2RV1CRWvEG7gXSpZMmtS9XPou5urrYvc2r/eb+I=;
- b=veaX/c8W5fz9kVDNy3XZrji5yrk2STHbYzQ33PW4JECh6Do4/eeUyNGJHf+IHylGsIPjB0uucBmjwYddQPBs1UREqPwj5sQYyf44iWZh89qyaUsoViLET48iNgfZ+IMvps+dgD0gydL01COzZfUGNBdZaRbKEer64OveO293AgEuYQMSKAZBqqqrOiDLsGgjbj+Uz+sQxheDjAuID3R5+6FyjL9Y3tXR28y3Ti4ERFjpdikrKseyKKf4K/U/PAAavQWSyEL0BrCgOmjmt4GZqklwhdU+qPG9KwgCse91RzTN+kh8NfNuoKotmZVXYnbKPkoeV8lazO58zQYBjuzMwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by MN2PR11MB4741.namprd11.prod.outlook.com (2603:10b6:208:26a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.18; Fri, 14 Nov
- 2025 23:54:21 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%3]) with mapi id 15.20.9320.018; Fri, 14 Nov 2025
- 23:54:21 +0000
-Message-ID: <c1d1b328-2a2d-4b74-86b7-df4584b0eb22@intel.com>
-Date: Fri, 14 Nov 2025 15:54:11 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v3 2/9] ice: use cacheline groups for ice_rx_ring
- structure
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>
-CC: Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Simon Horman <horms@kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
-References: <20251107-jk-refactor-queue-stats-v3-0-771ae1414b2e@intel.com>
- <20251107-jk-refactor-queue-stats-v3-2-771ae1414b2e@intel.com>
- <828b75f2-6717-4f30-a62a-4992b03ef74f@intel.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <828b75f2-6717-4f30-a62a-4992b03ef74f@intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="------------02iLKxzNOEiSBa000f400RHU"
-X-ClientProxiedBy: SI2P153CA0011.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:140::14) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6FE15539A
+	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 01:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763169729; cv=none; b=J9u5T8dtF354TSuvNxn1mcAzgSVOKC2b+VGCMRZ1+jD4V7E2/kaZg6YZ1UwF4Fhp9TNXy+Imyg/Q/KawjoNMtjork3xjopSlltSAh9I9SPKkbZ23F5aeLFSk+PID0OP/xdr0s9MmW5JvYgx1qnQYB34fcjE59AEIDA77wm/36BQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763169729; c=relaxed/simple;
+	bh=nAjPGSMykcwfyvHEItbOrzVRxjFJAgO0MMaKaJ7s6Is=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h3kDVoEO6iooosiBRLiztFMUsfmjWfyZjUU763bJ1ht3y1AP588onhFsmrDCHCQoc0o4QNbfsAEpSiEIdvF9moDcWvc2F02p3m+SIg0Oil+BvWbdump2nIClnKQUQ0SthGRLBUWNyQWEhyI6RqZKwp7Iiiy8luVsb2KjSmUZ+KA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f8YqCfLn; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-9486251090eso98226839f.2
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 17:22:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763169725; x=1763774525; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=az6gEsJkxHovFWKMSLmwg49QAnCBp+806sYXLoWT6UE=;
+        b=f8YqCfLnRnmEWeRDDxof/uJ5Cxn6kNyJbqAsLf7OXf4FuQmz0M/SgFyiVSR5mH37/y
+         JkuGKR1G+hyBM/0F2K867Jy/WfXHMwM26Gt8lQxHkjgMyIhj995ognO8SicEOlkBuqpf
+         4p5WxxyR4hXyrkh1w7Fuh7puQOG13dwl79u3OLfKPfXRlTlidHIdPwBkf8+Iq5OmqBHF
+         /rADynZ/wDu3JsioBo93Waw49VmSZuVozlK5LiWmFuDhHaOVB8NeTJEimUgrp1SHMzJj
+         amn6w/e3J+3Y/WinxfB4Vt/uiBvpyDPJ6rDvjYe2e7B5j+oZYKciImPSPFvCoNbgA0o8
+         mcfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763169725; x=1763774525;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=az6gEsJkxHovFWKMSLmwg49QAnCBp+806sYXLoWT6UE=;
+        b=FBdM4b1xb4p5ax/gWONMPjOBOI6050xUlxyROlfPVd8UlfkFQdWdOEInSNZUXSQ5Cp
+         Ws8fekaw+KBqd0ByWQ7G+x6iHSQJbI9TTHp5zYsyjsrhRRoiFCpW+fA2kvmhxdZmEzck
+         rpoiboFDV2lvTieUX6hdbJfHtUyfDC4+C7FeqWfvCHAyZMQLsGCZI0aWwd+ZbhZcgXDV
+         pFfRTw268SWagLezC56Mpkq3cvT3u0+qngo3kryk2ZN12NuuxD5jUx6idm+zW6KWZjJz
+         D3F5A6U97nC7lGaEWsgEh4K0mYyjJKTud9C95yzcZhIeplnCU9i2GpyFCLgoRh80IPML
+         rqMg==
+X-Forwarded-Encrypted: i=1; AJvYcCWVBmBWBolu5o38t94rF50iDIHjopGyfVyHyRDceMK9m5rW7ydLjV917UCZoJgMq607NWe3ln8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1aZgWMBqjg+onVelUCLAoNP14U3YC9dZqjQJfawe/E22Iw3lK
+	XnmpkNbAdp5vr3S4vU5MGpkOZQ592z/+wyXH0P0mkMNOjxzAHBBL+gCITwqFQg==
+X-Gm-Gg: ASbGncthKYD46rHFZECSi96pHPnlDV6hOGVHfoI0CBfA8YnEHsF7sn5B0vA8+vo6Gfs
+	QvVs8gSydc6Rvi+c+2nKACitWNj+xG8FMMjYM3ZAwN6uwvE7d8+L+Q8WhMlLSB1dUODrvInSWW9
+	pZkiw10V+jsVNrlRv0p8C90xtaQP2yebmuTp1jPBQkESKzwfHRJCwuJyKOHKb0t9pSYPuohI83t
+	u6RYab/CC3Jsu9ScahaFc6RZ8MDiGB5WrkmLYCHK6mzpjxTqN6xBlP8pl1dqV0PkWr4efVvR+2F
+	nG4K7+U6W6s6NqV2mxOV7qDwEcFLI1KZVUbRexHjdcjZRUOwPw/pbZszdvSUpG7AI+B9aYOJySD
+	eMVfnsi9SPMTU1mDtujlUkPcVJh7ZivFEsJwkojXnH68qVoYTaiCfFyF8X/WzqDGHzdLxbxTu6k
+	65rXgMo6UMblibpBj7iGPT4eqSHkQmIJaG5/tcwBi3tDwr36ShGyPWcEogyX/xexUDPrD2gtO+y
+	JN/1g==
+X-Google-Smtp-Source: AGHT+IE8eigWzoEE9t3mDIDQms9qFe71psPrdvja2/GrWq64P3LmSHdQvvcjXhpM4eeOF92EMZl02g==
+X-Received: by 2002:a02:cc84:0:b0:5b7:24c7:e78 with SMTP id 8926c6da1cb9f-5b7c9db5213mr738532173.12.1763169724671;
+        Fri, 14 Nov 2025 17:22:04 -0800 (PST)
+Received: from ?IPV6:2601:282:1e02:1040:85e7:c261:d08f:ac20? ([2601:282:1e02:1040:85e7:c261:d08f:ac20])
+        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-5b7bd3171cbsm1577116173.32.2025.11.14.17.22.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Nov 2025 17:22:03 -0800 (PST)
+Message-ID: <296bed71-34b3-48df-8799-0701083712f4@gmail.com>
+Date: Fri, 14 Nov 2025 18:22:01 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|MN2PR11MB4741:EE_
-X-MS-Office365-Filtering-Correlation-Id: 035f3b68-3f3d-46c8-b4bc-08de23d92137
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?aW05QVlVU3hSNldFdlNaMm52V3JURzZ0TFZ1dzV1V0dQMU9jWkpoak04bmZx?=
- =?utf-8?B?N1oxZTRJT3hEaTQ1WVdueE5YTitTZ3JOR3EvbzJmZ05kK1JuRnE4eUpJZjZj?=
- =?utf-8?B?ZHlKREZma3RmY3RIOGxGTkF3Q3JLZnhrNGN0ZWp1WDVpa3QvKzZBVEN0SzJa?=
- =?utf-8?B?VUx5T3dCQWdzWktyVWNoK2RmSHZBdXl1ZVp2QldSRnpTLzB1YXo0UlFZMk90?=
- =?utf-8?B?TndvL1pKSjlaM1lDdzlWTUFsdjh4R0pkelNjZ3Rra1FDNXNudURsWmxtaEpj?=
- =?utf-8?B?RTJ0Y3BleTlWVGQ4dFU1UzMxQ1IwSXVMU01jZmMzeXpsVE9SaXQ0UkZSUEo5?=
- =?utf-8?B?TWpTaWd2VDJVbnRZMUVPVmxOSDNGM2F4VWdJTVFLMnJmQXcxc3ZqYXpCTDZU?=
- =?utf-8?B?a3g3TEdtdzFLcTM5aVJydFdFZ0pzVFgzQXQwQ0E4NmV0TmtSdFFSY3VId0tX?=
- =?utf-8?B?NVFjSEpycmZPWGI0anJVUk5wRzVvb2NCLzVnUXFNNXBRd2d6cUV1RnRrVkFE?=
- =?utf-8?B?dXFlVFVzSjlpNnkxbmNoeWM4MC95MjZLWnpXN2I3SldWYUVMTzh2WjJhOW9p?=
- =?utf-8?B?SmxTSUNRcDBIZzVIOWZVM2JkaDZnZnJGbVQrVzFzNlgvdDhqRzhGMnZZTWlB?=
- =?utf-8?B?ZVZEYkVDckcyTVB6QkNYUnhNTU9wQ3lwdU1ySnBJRXVyZWk0RVRDbXhINzkv?=
- =?utf-8?B?djRzUXBHazB5OXg0SGpSQmdRb0tMcENFUkMxSHBna0xoZ05Nd2t4ZTlGMlRR?=
- =?utf-8?B?V2E1VmN5WXZRYkpOaGZjdlpOMzlNNHNZYk03SEZoL21FQW5ZaTJNeVdIb3FZ?=
- =?utf-8?B?eGljSXAxM0N5MVE5OTdSQWg3dUs2ZUdITUx2TGVTSXpQZmxiQWFlWXpkYUhE?=
- =?utf-8?B?SjZqTmFXUXFnNWhyMlRBR00rd09DVXowQVMzbEZXR2VXbHlaTVpYNGhJYmxI?=
- =?utf-8?B?RWR2WHJnODhCakZmcjN2UWFMd2pvTGRFbm44TTBLNW95ZjhsdG44U3M4Rkh5?=
- =?utf-8?B?K2ZnVVFqSjZIR3dURkE0M3ZlR2VpNTBzdEh4WlNmUjc5UHRhK3gzL2R0V0tp?=
- =?utf-8?B?dmJjSFJPZHFIa0Q3ZzcvY2hhVlpSQndPTURoYUpadmVQMEk4MGNUblJXSGs4?=
- =?utf-8?B?TXlvS0lvMU8waFBBa3FPdHA3Q1AwRFg2L0tudTJBMVpVYzY5ZnJVRkVCZURa?=
- =?utf-8?B?VjBkVS9kbHRZaGlVSGRPTE9TMnQvbkVnM0hxY29ySlRwdGxBUGhqK09Gd3hX?=
- =?utf-8?B?V0llaWFzNnFsbFk0OHp0anNNRVMzU2pJWFZTYWFxQk5MMDJ0NlBQZjlyYWxz?=
- =?utf-8?B?UEo1TWYwdGl4NlZqc0lYS1ljWmJXL2lnV0J1elp6ZzduV0loV1FQMkRsd3lX?=
- =?utf-8?B?MGFtTjZNdEVSd3RGd3FRdUFJb05uTDJLbzBjUlNoTCtFSHR3ZlRqTWtnek1w?=
- =?utf-8?B?N0Q1VFpIdUNqL0pKNkl6aHBBZW5jWkZkZzBBMFVaRlRFbmYvZXBYOVJhVG01?=
- =?utf-8?B?cmVtK2Q4QWc3TlVQMHJkL2dGREtEUGsydHp1T1ZQcHZSZ3ovOHlwMUxEaUhl?=
- =?utf-8?B?MFMxODV0eiszQ0ZUTituZGlxZVNSaWQwWXpQY0tHWkNMbGxGYnFxaGJueUNw?=
- =?utf-8?B?dFRBMFRiNjU0cklxak1IMXFtQ01jZG5BSWJVa05WSkdhUmNtQVBVL3ZtZWx6?=
- =?utf-8?B?R1Y0NjFzbExLbzU4T1JuWU5odTYzMEpIcDJlc0ZFQndRdXZINjkxTjM4RGVl?=
- =?utf-8?B?VFA5emo5RkV2VFhNU0hJNFh4anJiZ0FiOURnaERVTDdzQXlRQ1pQdVpwOVh2?=
- =?utf-8?B?Qk8xcGFyN203VlJqOG5UU1lIeHl2RXdLdFRLbG5ZTWdUTGl6TEVjQmFIYjBm?=
- =?utf-8?B?bWJhakdLbERjckc2eW1WcjIvcDZ4TFNhbHQrMGVUK0pkMUEwS1cxenNxMWdC?=
- =?utf-8?Q?YhV/m+KmeCDyYId54oAnPi995IuZNvc6?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?elY5Ymo4clZERSsrSzJyTHg4bklkWTgxR01HRU16Y0lsYTRJcTlLdW13b0Ro?=
- =?utf-8?B?NlVzcExmVmtnL0d2Z21kT2NQREVhcFA5U0xFaEREZ3JlS0tpTHVEL3YyWC9P?=
- =?utf-8?B?OExUQzBYZmpNbEU4dGQrVmJ6MjNEZFU1blZBZjF5N0toU2Z2ZExMSDFUOGtv?=
- =?utf-8?B?L25vbHBQdlB3Yk9NZ0NROUx3WUR1VHg4VXg1OWZVRmdPQzh6ZEZWT2R6ZHRG?=
- =?utf-8?B?ZGxsRElNaHBBemQwZkh1S1ZYUlQ3QUowT203THZhTkRmaVVHSDhsakRDOVF3?=
- =?utf-8?B?ejEwbXlBUVV2em91UkRKaGdocDcvRFkydWJ4OTVaa2NrdXdHQU1hQVF3MTdV?=
- =?utf-8?B?QnppaEduTDRMTEhSakUrN29pZkVyMmc1VXdjQ21LSXFRaEk2dU5UaWhDaG9B?=
- =?utf-8?B?QU9LNWtuV1lSS3NuNlg0TTdJWEl2UGZZMzcrNzBpdVJtN1d6eDFYemY2TkJT?=
- =?utf-8?B?V0Zocmc3SjdoVUFlUFZvb0IxYnA4aVZiaHJtUkNuejNsakFKcTYwQ0lhOWhk?=
- =?utf-8?B?QnN1YklTNzdPZWJjem5vaWpzTWFlM05FU3kyQlVGMmhMaTJYc3UrYWh4Smpl?=
- =?utf-8?B?WE1IeGpNK0ZrVkRrZ2FFYzdIWng3SnNnU2FaZXBTNmNMSVkva0JuajRHUiti?=
- =?utf-8?B?THVxL01Jd3RudXBrSVdlZjd3d1Q2aUhaeHVITU9QZWxXMkJmSjlxVWVoMDNL?=
- =?utf-8?B?a1F0U1dJRXdnVUNkQlM2YXU4Z0U0eXB6NDN5ZXRMaTZ0amtHeXZKRVdXelBY?=
- =?utf-8?B?Y0MzZTVmaFdnbEJXd3FvZjhHckNUQ0t1ZnlxcHVGN2dUMTltRjA3VDg3eUla?=
- =?utf-8?B?YkNuYzRseWlieDVsUkM1dHQwbWh1aU1LenBNbDJ5ZzVpN0IvUFF5Rk4yNHlG?=
- =?utf-8?B?by83czJTUVg1aE9VYjhKaVhuTlZRTURtZFZzSmxpWmtPV0NGOUFEK0ZwYlBR?=
- =?utf-8?B?dWhUOWt1Y2tiNUpDbExvQ0dpNTJsNDV0eEVUV1VWY2wycllMZldnWkV3SFdD?=
- =?utf-8?B?bXppeklORlJISjFUeHFiRUExOEJkc1V3VzN4ZGl3L0JxTlpRV2xaWHJqWTJk?=
- =?utf-8?B?SDBPN09kaEJ4b2ZmMEdqOFVybTE1RjBNUEVaQVhNZkNBMjRDRjgvaWhWQU95?=
- =?utf-8?B?OU11dnlUT01ITjdpM0NKMDBMQnlseEtoZ1VtNmlyVllxMlcvblZNa3pJWG9T?=
- =?utf-8?B?dDE0K3NER1FQbFlxbExDSFU1Y0V3dC84VlBGY3lhZjRQaW83WFRrc0RVYU00?=
- =?utf-8?B?QVMveHh0V2pONENyY0NHRkY0Y2dUN1V2L1JVNDBCTGVEU1AvWVZDOUhxcHl6?=
- =?utf-8?B?RWhqTXNBRy91dnFkaVNpNjJ0V2dPNisrNHlDaWZJcVdJc29GT0JNNVNVZnZH?=
- =?utf-8?B?Q1JkZkZnZTJNUGF4ZXFvMks0WTZaNjFuY2hIQmpvV1p6YmlzbnJGcWdIeGw0?=
- =?utf-8?B?RVcwUGthQ3BwOXQ1djlTRGZ0WXNMNGhkVHg3Rm5hTlBBY0RtaGZNOFVRRHdh?=
- =?utf-8?B?V3h1c1JuVmJzcXRFTkNJd3pQa2lvQ2RwZ1QrSlI2MkZ1WmduQTVPQjJiallR?=
- =?utf-8?B?ZmRQOFBBK2RqOTE3MjNzMGpnK3hDZXBxZjJNWnZPUjBkQVBnSzVyMnNFVGpn?=
- =?utf-8?B?UFFCQUJyKzUwNlZhM2Z6UHZMVTlBNGl0Z1JqeWZPUklRaGNoa3RxUzFJbDBV?=
- =?utf-8?B?UmxwT05FZ1pOd2RlMEtDdzVpek9ndVl6cWtoVEZYaTUzbFNBTHJLZ2ZQWU5o?=
- =?utf-8?B?bUcvU0VKdXhRbnFjS2NKTGRHdklmZjJnRmpzcXpUZUZGSXphd3FRckZFU0xu?=
- =?utf-8?B?UEtxM2hFbXI0REFFZEFBajBGQ0dGcVpwQ0dnMWRzY1EySWlwVEVGbFd2dHFP?=
- =?utf-8?B?MWh4OS9xbHNyOTdMYm50UmVSQmQyQ3cyV3AxcHRsYzBLd3k0N0pNTHBmbTIr?=
- =?utf-8?B?cHB6aDBLT2tVRWowRnJ1YjlrczFLZjFDSndwcEJlekVUQXlvNHNja2NmWENH?=
- =?utf-8?B?dWFmS1lRbjlzRllTWVVYQWZLOUpQNUdOcEZFYjJEaDAzL3U5dFpIZDd3bzJD?=
- =?utf-8?B?SUM3VVdQZHd5TDE1a0VzZi9LYjQyVDdmcUQwTFlWY0VoTWJzT05IMTlsbXgy?=
- =?utf-8?B?YXVTdFhJTGZiWXFSSFZKZjc4K3BsNytoUFUyMmkzdGtIUFFkQ21scjQzdHJ3?=
- =?utf-8?B?Mmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 035f3b68-3f3d-46c8-b4bc-08de23d92137
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2025 23:54:20.8942
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h2hutH2nEllSBUcaBMUW50a5n0Y1ZlO5VPSTjzlPfhuI3z6tJT/SxmXvPieOonLaxbLgetLQTvaI/OzqetX0ITFEO3bhjcDnvyIP89r0xEc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4741
-X-OriginatorOrg: intel.com
-
---------------02iLKxzNOEiSBa000f400RHU
-Content-Type: multipart/mixed; boundary="------------Rvfgs30om46cYZatTZxGYcEr";
- protected-headers="v1"
-Message-ID: <c1d1b328-2a2d-4b74-86b7-df4584b0eb22@intel.com>
-Date: Fri, 14 Nov 2025 15:54:11 -0800
-MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v3 2/9] ice: use cacheline groups for ice_rx_ring
- structure
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Simon Horman <horms@kernel.org>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org
-References: <20251107-jk-refactor-queue-stats-v3-0-771ae1414b2e@intel.com>
- <20251107-jk-refactor-queue-stats-v3-2-771ae1414b2e@intel.com>
- <828b75f2-6717-4f30-a62a-4992b03ef74f@intel.com>
+Subject: Re: [PATCH iproute2] devlink: Support
+ DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE
+To: Saeed Mahameed <saeed@kernel.org>, netdev@vger.kernel.org
+Cc: stephen@networkplumber.org, Jiri Pirko <jiri@nvidia.com>,
+ Saeed Mahameed <saeedm@nvidia.com>
+References: <20251107001435.160260-1-saeed@kernel.org>
 Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <828b75f2-6717-4f30-a62a-4992b03ef74f@intel.com>
-
---------------Rvfgs30om46cYZatTZxGYcEr
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20251107001435.160260-1-saeed@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
+On 11/6/25 5:14 PM, Saeed Mahameed wrote:
+> From: Saeed Mahameed <saeedm@nvidia.com>
+> 
+> Add support for the new inactive switchdev mode [1].
+> 
+> A user can start the eswitch in switchdev or switchdev_inactive mode.
+> 
+> Active: Traffic is enabled on this eswitch FDB.
+> Inactive: Traffic is ignored/dropped on this eswitch FDB.
+> 
+> An example use case:
+> $ devlink dev eswitch set pci/0000:08:00.1 mode switchdev_inactive
+> Setup FDB pipeline and netdev representors
+> ...
+> Once ready to start receiving traffic
+> $ devlink dev eswitch set pci/0000:08:00.1 mode switchdev
+> 
+> [1] https://lore.kernel.org/all/20251107000831.157375-1-saeed@kernel.org/
+> 
+> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+> ---
+>  devlink/devlink.c            | 7 ++++++-
+>  include/uapi/linux/devlink.h | 1 +
+>  2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/devlink/devlink.c b/devlink/devlink.c
+> index 35128083..fd9fac21 100644
+> --- a/devlink/devlink.c
+> +++ b/devlink/devlink.c
+> @@ -45,6 +45,7 @@
+>  
+>  #define ESWITCH_MODE_LEGACY "legacy"
+>  #define ESWITCH_MODE_SWITCHDEV "switchdev"
+> +#define ESWITCH_MODE_SWITCHDEV_INACTIVE "switchdev_inactive"
+>  #define ESWITCH_INLINE_MODE_NONE "none"
+>  #define ESWITCH_INLINE_MODE_LINK "link"
+>  #define ESWITCH_INLINE_MODE_NETWORK "network"
 
+These modes really should be an array that is used for both set and
+show. Then eswitch_mode_get and eswitch_mode_get would not need to be
+touched; just update arrays and the new entries take effect.
 
-On 11/14/2025 7:36 AM, Alexander Lobakin wrote:
-> From: Jacob Keller <jacob.e.keller@intel.com>
-> Date: Fri, 7 Nov 2025 15:31:46 -0800
->=20
->> The ice ring structure was reorganized back by commit 65124bbf980c ("i=
-ce:
->> Reorganize tx_buf and ring structs"), and later split into a separate
->> ice_rx_ring structure by commit e72bba21355d ("ice: split ice_ring ont=
-o
->> Tx/Rx separate structs")
->>
->> The ice_rx_ring structure has comments left over from this prior
->> reorganization indicating which fields belong to which cachelines.
->> Unfortunately, these comments are not all accurate. The intended layou=
-t is
->> for x86_64 systems with a 64-byte cache.
->>
->>  * Cacheline 1 spans from the start of the struct to the end of the rx=
-_fqes
->>    and xdp_buf union. The comments correctly match this.
->>
->>  * Cacheline 2 spans from hdr_fqes to the end of hdr_truesize, but the=
+> @@ -1428,6 +1429,8 @@ static int eswitch_mode_get(const char *typestr,
+>  		*p_mode = DEVLINK_ESWITCH_MODE_LEGACY;
+>  	} else if (strcmp(typestr, ESWITCH_MODE_SWITCHDEV) == 0) {
+>  		*p_mode = DEVLINK_ESWITCH_MODE_SWITCHDEV;
+> +	} else if (strcmp(typestr, ESWITCH_MODE_SWITCHDEV_INACTIVE) == 0) {
+> +		*p_mode = DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE;
+>  	} else {
+>  		pr_err("Unknown eswitch mode \"%s\"\n", typestr);
+>  		return -EINVAL;
+> @@ -2848,7 +2851,7 @@ static bool dl_dump_filter(struct dl *dl, struct nlattr **tb)
+>  static void cmd_dev_help(void)
+>  {
+>  	pr_err("Usage: devlink dev show [ DEV ]\n");
+> -	pr_err("       devlink dev eswitch set DEV [ mode { legacy | switchdev } ]\n");
+> +	pr_err("       devlink dev eswitch set DEV [ mode { legacy | switchdev | switchdev_inactive } ]\n");
+>  	pr_err("                               [ inline-mode { none | link | network | transport } ]\n");
+>  	pr_err("                               [ encap-mode { none | basic } ]\n");
+>  	pr_err("       devlink dev eswitch show DEV\n");
+> @@ -3284,6 +3287,8 @@ static const char *eswitch_mode_name(uint32_t mode)
+>  	switch (mode) {
+>  	case DEVLINK_ESWITCH_MODE_LEGACY: return ESWITCH_MODE_LEGACY;
+>  	case DEVLINK_ESWITCH_MODE_SWITCHDEV: return ESWITCH_MODE_SWITCHDEV;
+> +	case DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE:
+> +		return ESWITCH_MODE_SWITCHDEV_INACTIVE;
+>  	default: return "<unknown mode>";
+>  	}
+>  }
+> diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+> index bcd5fde1..317c088b 100644
+> --- a/include/uapi/linux/devlink.h
+> +++ b/include/uapi/linux/devlink.h
+> @@ -181,6 +181,7 @@ enum devlink_sb_threshold_type {
+>  enum devlink_eswitch_mode {
+>  	DEVLINK_ESWITCH_MODE_LEGACY,
+>  	DEVLINK_ESWITCH_MODE_SWITCHDEV,
+> +	DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE,
+>  };
+>  
+>  enum devlink_eswitch_inline_mode {
 
->>    comment indicates it should end xdp and xsk union.
->>
->>  * Cacheline 3 spans from the truesize field to the xsk_pool, but the
->>    comment wants this to be from the pkt_ctx down to the rcu head fiel=
-d.
->>
->>  * Cacheline 4 spans from the rx_hdr_len down to the flags field, but =
-the
->>    comment indicates that it starts back at the ice_channel structure
->>    pointer.
->>
->>  * Cacheline 5 is indicated to cover the xdp_rxq. Because this field i=
-s
->>    aligned to 64 bytes, this is actually true. However, there is a lar=
-ge 45
->>    byte gap at the end of cacheline 4.
->=20
-> Sorry for reviewing this so late, but these comments really are outdate=
-d
-> as hell and don't really reflect what we'd like to achieve.
->=20
-> I would like to work together with you on rearranging and packing both
-> structures in an optimal way, the same what I did quite a bit ago for i=
-dpf.
->=20
-> Maybe we could drop the series from the next-queue for now?
->=20
+uapi changes should be a separate patch that I can drop when applying
+the rest of the changes.
 
-Sounds good. I can probably also respin the other parts to avoid needing
-to rely on this change, and we can work together to fix this properly.
+Requests for future patches; i applied this one to iproute2-next.
 
-Thanks,
-Jake
-
---------------Rvfgs30om46cYZatTZxGYcEr--
-
---------------02iLKxzNOEiSBa000f400RHU
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaRfBJAUDAAAAAAAKCRBqll0+bw8o6BLG
-AP9KHxDB9nqLS11MaIlqGGF1//atATKcPTASjbz5Bw7NkwEAphqBugPWyXA57MQ/PxxxfIwLUcmW
-Fw72YSKWDP8urAM=
-=HeBg
------END PGP SIGNATURE-----
-
---------------02iLKxzNOEiSBa000f400RHU--
 
