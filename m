@@ -1,124 +1,135 @@
-Return-Path: <netdev+bounces-238856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BB30C60433
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 12:47:02 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74E35C6051E
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 13:34:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E18DE4E2683
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 11:47:00 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A39DA35E0E8
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 12:34:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7404429A9CD;
-	Sat, 15 Nov 2025 11:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E26929B20D;
+	Sat, 15 Nov 2025 12:34:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="Sf7odPhe"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Aw9az22K"
 X-Original-To: netdev@vger.kernel.org
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4E935CBB7;
-	Sat, 15 Nov 2025 11:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FAF3208
+	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 12:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763207217; cv=none; b=R93wh8zIgF+YaLzx4YCOTimlf9aYS8vnV1QlOt2QgRZxIvzUKuEvS2HRbwmTQaJPyDn1lx+ZScmdHVYCpLmGpG4rPEPfXN+v4PuQh95g7rv0/FO3jDAWJo6+PZq2hk2iFXLR8FCsG0YwpkgqeybSWPyFNwJKET3qasLfx/uo8Rw=
+	t=1763210041; cv=none; b=KOYvC2h2OiKVk36WG6qXwkxN121B7FKt2kKQ9TttuA+bKw7s2jbBX1nsVxAHM8rtNUvVn9xnalJWGBqdPn380315q8WE4+tXWkvXK57b+A3QxAsGMZCCACB0PUWuwriIlmgvBTONll5wWEPI6Gc2p7eJReQ0JYmcVkBrGHyTMbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763207217; c=relaxed/simple;
-	bh=ifBTFXbo+mdIwhRyM4hFGuC/7YhMyELVxSTyy1UrOxI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ppk51hSAhjYfqkJYX2spxwNoJAjIneabfbG4RUh80BZeYUvsQ8L6POs4BuZ4sOoeqRp4NPHKWtIcqumWA/eWVO9xRMp02qNDHxAtwWxUUz/YIUKRWkSo0ovdLU5jpyYYMFswKjHQSxbnClJ5HoTLLZDGB1L+NMU/DZRuBCaaPoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=Sf7odPhe; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
-Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id E2F2525F18;
-	Sat, 15 Nov 2025 12:46:52 +0100 (CET)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id EnpjLnXyXJYg; Sat, 15 Nov 2025 12:46:50 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1763207210; bh=ifBTFXbo+mdIwhRyM4hFGuC/7YhMyELVxSTyy1UrOxI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Sf7odPheAjPyTd/T0HsALQvzOEm1fjJwtNHY2Ruu3r6cUFUKKmT/Sa8e16vMH9SHS
-	 HREo4z1h/x5u1l0N8Z5uYVay6SS0Ie4agMEzRnrWRrPG/mYWOi8TuCEvc58TFAkMxj
-	 cCz/OSummn7u7h4acDnw1ild2pyvZtD4nl72xd2HKmD+JmoaAGjAlKVSoe7uCXUgoD
-	 /GaX1mIK7kax37IYB8vjba2jLn/FHwtpXv5qM/UCghj6OXEDD4QG+qqTBEgmyUgpsx
-	 CjTCpYYRxKqhpx0AobM/KZcFztUh3//FlKCyFCxaUdWNBYe79gnzyn8T9P8RpKySwY
-	 wavvX5bckfMiA==
-Date: Sat, 15 Nov 2025 11:46:36 +0000
-From: Yao Zi <ziyao@disroot.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Frank <Frank.Sae@motor-comm.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
-	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
-	Runhua He <hua@aosc.io>, Xi Ruoyao <xry111@xry111.site>
-Subject: Re: [PATCH net-next v2 2/3] net: stmmac: Add glue driver for
- Motorcomm YT6801 ethernet controller
-Message-ID: <aRhoHJioqvfT2tEv@pie>
-References: <20251111105252.53487-1-ziyao@disroot.org>
- <20251111105252.53487-3-ziyao@disroot.org>
- <aRMs-B2KndX-JNks@shell.armlinux.org.uk>
+	s=arc-20240116; t=1763210041; c=relaxed/simple;
+	bh=ZRDa7X2qOhicNkRilum7iyXjYeDr0de0UFoOarn43C4=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:References:
+	 From:In-Reply-To; b=Q4/I7myY1iyOjCnwPVgx7IxRnRke1cA3iea12uxpZWk1QEJNJUegHLR9dpvs1Bgcy+zGJ3Es0q9X73/9lCXbmOAi6hNFpoGxqLNwn+LWu3ZPnHUWbZQ+PP+iXQi+/Nk9FmHnKZzdPSjgpSZudoeHbIoR7I/n4T6OQ+aThRIWvW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Aw9az22K; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42bb288c1bfso488183f8f.2
+        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 04:33:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1763210036; x=1763814836; darn=vger.kernel.org;
+        h=in-reply-to:from:content-language:references:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dtqnf19rAxKhCMnKuxFk3VQ746Xnyg0osYpHgquPOsc=;
+        b=Aw9az22KkHe7C9tQxGS4SOET8ahdp9wxEWBgTx0JdXC1ZmJP+MCWkC10NdqxyJkYaT
+         o1F1d4cqCpP6q0LEgBBb6kuhzpB1t4QwlhvVRAnB+qAkBDeWPwm7Iruu1a0rn33OJUNN
+         LxzbTvrfX8ulm76Vdyi3/RQH1fCmZxaHiAS/y7U7ukCLe4AX7iirW44FUfC8MMJ1/jOI
+         qGPaAm8/VjXzaM3Nx4Nf1nzm7Essl/1DU6OLT6T6osbvbqxvV421rExJ5Jax/HRonruh
+         BRVw4OWxmzvBov3WjSvk+EA+BIulxyMa2+9zoIxY3g7niZBeu91dohhCO8GVAt0Au53f
+         Wx9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763210036; x=1763814836;
+        h=in-reply-to:from:content-language:references:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dtqnf19rAxKhCMnKuxFk3VQ746Xnyg0osYpHgquPOsc=;
+        b=C6VaunVaEl7noVuyrG9A6yyUZWCpAgY3R6b2fanG6F16Bi1xyQZp9a56cw7fngXt+m
+         OTtmSWuCYHDJbHWo1lchKKqznm/iiviS+PP5IlO1csz+KnIU2Tclme/CqyIJr5RzP8BZ
+         67EhqrTSf7wK2NvoUvf2xvX4ILmkE7SS908Uj/sVDtpkCb/3vH3zfUz9hVjSp4HaTrtG
+         Z2Y3WlnfIzVtrgVMjm4tN8oiP4/kqOX/629/2VMFQLwSqyiP6oZD3s0n7SR88TIGjw+T
+         VR/2FvY8ndnxk7Rs4gFOq/ZorQYOlOCN4s8Btl/Th4O4f6mfmwfYy0Eo/y1ZljVIWt0r
+         Ih6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXtSruydUVEYMZGusFHkkkyzy4+Y6NDkf4IIILWFJPHyoSMLs8XuEjFsdTPTfgpLESVQVXIOFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySy90rNmIu3Q6Fxh6Zn3Xg4kQ5PD+ZWjS10/VeO5smBu9hNJbW
+	oR74XEunqchS/wwZANHam+91uaCpqXkejg1EI+IotYXQxn5YNkzloP32IZh4CF41e4c=
+X-Gm-Gg: ASbGnctl2b32XVYp1+I5lB0s4BffAPyd0ZEgT5vLmXMKOjDmEZtw7MUPzIVb+uJ/e3b
+	0UOsLlcUfNdHfB9WsNsY+185C/4vH+Ye+MnJX3N9jAzysrvT648fZQbfl4Q96PDHds8eGbHVnov
+	eVTj09ndrnx4B3KZdep0lULbgBIbrp9KWwVUE1zv7GObbj4Ts0DUqzFf4HIVmngBDCMue0NkxEl
+	9o9PWuj/P+/hdBjYRO27KkgPG989TXMuNbzcgVRPFeoIN2GPZMcEATzz4G2DuF2TELtZSF3IQZS
+	HmR6TIPuZ8blD2TuJq314HRjUrWwDt5DKxNm8tx7jJY391Ch49m//aidW5l6V/GazXr9mXT0NVn
+	2K3ByWUR+9Qaz31zGu6MC+66TfM+lXXH20RFt51R7kJ9cJKfEQIy3bs0SuvZ123oa/F7yeJtt+8
+	edobJssa3wEI6qLgwFE9rp6fmLtJN9YEbIb984+sQ27gVaDh9oAyXubw==
+X-Google-Smtp-Source: AGHT+IH68hNngwZhYpd9vquoCIPlgcJ1vPhNd3/4WnrvDBsF+8EDaoeM+ZvmKTzsA5mzG3phFO2Aaw==
+X-Received: by 2002:a5d:64e3:0:b0:42b:3878:beb7 with SMTP id ffacd0b85a97d-42b5939896amr6087952f8f.43.1763210036197;
+        Sat, 15 Nov 2025 04:33:56 -0800 (PST)
+Received: from ?IPV6:2001:a61:134c:8401:9dee:c6d3:2820:beac? ([2001:a61:134c:8401:9dee:c6d3:2820:beac])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e85e6fsm16011805f8f.18.2025.11.15.04.33.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 15 Nov 2025 04:33:55 -0800 (PST)
+Content-Type: multipart/mixed; boundary="------------nHX7CPgwLi0J9jNmBXoWSU3W"
+Message-ID: <701e5678-a992-45be-9be3-df68dfe14705@suse.com>
+Date: Sat, 15 Nov 2025 13:33:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRMs-B2KndX-JNks@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: cdc_ncm doesn't detect link unless ethtool is run (ASIX AX88179B)
+To: WGH <da-wgh@ya.ru>, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <1c3f0582-4c92-41b3-a3db-5158661d4e1a@ya.ru>
+Content-Language: en-US
+From: Oliver Neukum <oneukum@suse.com>
+In-Reply-To: <1c3f0582-4c92-41b3-a3db-5158661d4e1a@ya.ru>
 
-On Tue, Nov 11, 2025 at 12:32:56PM +0000, Russell King (Oracle) wrote:
-> On Tue, Nov 11, 2025 at 10:52:51AM +0000, Yao Zi wrote:
-> > +	plat->bus_id		= pci_dev_id(pdev);
-> > +	plat->phy_addr		= -1;
-> > +	plat->phy_interface	= PHY_INTERFACE_MODE_GMII;
-> > +	plat->clk_csr		= STMMAC_CSR_20_35M;
+This is a multi-part message in MIME format.
+--------------nHX7CPgwLi0J9jNmBXoWSU3W
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 15.11.25 09:58, WGH wrote:
+> Hello.
 > 
-> Could you include a comment indicating what the stmmac clock rate
-> actually is (the rate which is used to derive this divider) ? As
-> this is PCI, I'm guessing it's 33MHz, which fits with your divider
-> value.
-
-The divider is taken from vendor driver, and the clock path isn't
-mentioned in the datasheet, either. I don't think it's 33MHz since it's
-a PCIe chip, and there's no 33MHz clock supplied by PCIe.
-
-The datasheet[1] (Chinese website, requires login) mentions that the
-controller requires a 25MHz external clock input/oscillator to function,
-
-> 25MHz Crystal Input pin.
->
-> If use external oscillator or clock from another device.
->   1. When connect an external 25MHz oscillator or clock from another
->   device to XTAL_O pin, XTAL_I must be shorted to GND.
->   2. When connect an external 25MHz oscillator or clock from another
->   device to XTAL_I pin, keep the XTAL_O floating.
-
-25MHz fits in STMMAC_CSR_20_35M, too, so it's more likely the clock
-source.
-
-I don't think this guess could be confirmed without vendor's help,
-should the information be included as comment?
-
-Best regards,
-Yao Zi
-
-[1]: https://www.motor-comm.com/download?kw=&category=606&wd=1&tp=1
-
-> Thanks.
+> I'm running Linux 6.17.7, and recently obtained a UGREEN 6 in 1 hub containing an AX88179B chip.
 > 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> By default, it uses the generic cdc_ncm driver, and it works mostly okay.
+> 
+> The annoying problem I have is that most of the time the kernel doesn't notice that the link is up. ip link reports NO-CARRIER, network management daemon doesn't configure the interface, and so on.
+
+Hi,
+
+that strongly points to a race condition.
+Could you try the attached diagnostic patch?
+
+	Regards
+		Oliver
+
+--------------nHX7CPgwLi0J9jNmBXoWSU3W
+Content-Type: text/x-patch; charset=UTF-8; name="ncm_bind_uncond.patch"
+Content-Disposition: attachment; filename="ncm_bind_uncond.patch"
+Content-Transfer-Encoding: base64
+
+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L3VzYi91c2JuZXQuYyBiL2RyaXZlcnMvbmV0L3Vz
+Yi91c2JuZXQuYwppbmRleCAxZDlmYWE3MGJhM2IuLmQwNDJiYTU3NDIxNyAxMDA2NDQKLS0t
+IGEvZHJpdmVycy9uZXQvdXNiL3VzYm5ldC5jCisrKyBiL2RyaXZlcnMvbmV0L3VzYi91c2Ju
+ZXQuYwpAQCAtMTg5Miw3ICsxODkyLDcgQEAgdXNibmV0X3Byb2JlKHN0cnVjdCB1c2JfaW50
+ZXJmYWNlICp1ZGV2LCBjb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZCAqcHJvZCkKIAogCW5l
+dGlmX2RldmljZV9hdHRhY2gobmV0KTsKIAotCWlmIChkZXYtPmRyaXZlcl9pbmZvLT5mbGFn
+cyAmIEZMQUdfTElOS19JTlRSKQorCS8vaWYgKGRldi0+ZHJpdmVyX2luZm8tPmZsYWdzICYg
+RkxBR19MSU5LX0lOVFIpCiAJCXVzYm5ldF9saW5rX2NoYW5nZShkZXYsIDAsIDApOwogCiAJ
+cmV0dXJuIDA7Cg==
+
+--------------nHX7CPgwLi0J9jNmBXoWSU3W--
 
