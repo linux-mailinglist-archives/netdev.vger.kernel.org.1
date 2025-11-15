@@ -1,381 +1,147 @@
-Return-Path: <netdev+bounces-238839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ADE3C6000E
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 05:35:42 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A4FAC60088
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 07:19:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9118235C1B0
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 04:35:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A90EE35FE30
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 06:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518922B9A4;
-	Sat, 15 Nov 2025 04:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 547081B0439;
+	Sat, 15 Nov 2025 06:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l7zXSNM6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j094hZ1q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85ADD1B7F4
-	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 04:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85BA970814
+	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 06:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763181337; cv=none; b=ncgZJ2j2IMh//AhUPQztGZ/DuWa7jgxg895uvtvn3A8nr+RHG2lURYBRFq3GCVbh2A+PkbJKWySYH0CBmGnJK5SndO4sl08tupdjPyrZ/RoHxPVjoeRijg7LrRpfi4OjYE3GwOYKHMf6Qfc8bd2uE8rQF2g7dtd+9QBM6LrPApE=
+	t=1763187551; cv=none; b=gN8LQn5cTJrMrFgWUtiNvq1HRBIJQb+Aw0qcl/rkzOaDw4pqyXxP0EABZ9e6PVPURwlN4u4Ty8ZU+0yauSsXNrApJusyfDhqFCvR/PINtJ4y4CTQ4B8kbdoqL4VMm0zFsRx3pZACBq2+YXheX6s6jhAX0yBp29VN4wXzijda9lQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763181337; c=relaxed/simple;
-	bh=hylTYYkVPhcARjzp061F7B87PyfZiJe6MSdABJ48VyQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TQIGTCE/rQ25B0WrdNN25huUGjfYjcCCyt5RjVPWQdmNa5spNmTZGnUTyN6RnDenTJBid2GL2x3WiTCAbXCxHYRz3sGKdkxpzh0qFRu1j2HYzecSQIb6ukn7xh1wFxanmMx2drJEA7FrPd+ORz7ohrxbGA2hQ4PWiSgNxKd6Y+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l7zXSNM6; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34188ba5990so7961442a91.0
-        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 20:35:35 -0800 (PST)
+	s=arc-20240116; t=1763187551; c=relaxed/simple;
+	bh=T5JnLJO7ZiL2KDY4QUdV27phVZ668Cgm5xcsNh9svn0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RaIwX/bghF1nnXcEPWx6iTrBflrudiIqKTonr9mS2cCuuJ0tJkcKeP0zHLrejF+k3kUElaLTNRnpscppCnx+TDwRsWhnUWjc3VJwvdFkV0B3GHWCzB4PA1C0UgSltiZjcwccgxDEE2wXK7/ctleFG4+Ya5a83pfrrkkVD8nIMt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j094hZ1q; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-429ce7e79f8so2019033f8f.0
+        for <netdev@vger.kernel.org>; Fri, 14 Nov 2025 22:19:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763181335; x=1763786135; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IrFSMX6rsnXXQ3BE+NZt7lQ85vIY1x/4wbBO9Bg9Lmw=;
-        b=l7zXSNM6tr55JYobZnv27/Wwha5n4ZvzVkBcvH32NBDetQap8b7Zwesxj4pTSCFvRV
-         ayKE9C3P/hBGxfxO9xveVZpdCcX8MR47DgJrAxfZLe3VaX1iTGGtBh62QS6C/1W0TZi8
-         JVfKjlsrJVxzVq6yG9lmyDeoHsFMajLWOdkQ0QM3kkfiSxR9mN0t8nQAhLJAs0h/SEVi
-         jlknj62G3z+LU63hV90R1F0GX22/MWUStTjWX7EL+aARcENbxAukHTW6TKZTkwi84LH+
-         RD2vkVCB5ujp5PU9pmDIA/DhEUgCHB4c9Alzud01pNquY0SMTmMmUtwlyAYw05LgKxle
-         YPAg==
+        d=gmail.com; s=20230601; t=1763187547; x=1763792347; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o3mbPgaryrxeNqtX+QZzwKqYuiwR5t4mAID+C3myv2o=;
+        b=j094hZ1qOXoG/28yz2AzOChxUL/hzoL4U4QK7ozM3y0nXlkFj4kd0io9MUQdrdE+WH
+         /glT23UNPcKXsxLZZh4rH1MqKvXHajCnTrnrcOarpG61CtMY4CwlZi84llFTARtLTk6g
+         cd5EE8IqocXk8PiiYTKmGV/PlF4/B56B/soIyZXzLiq7XdurXxjtSvEnRC3KmhSqV94C
+         DgWHBBzDgAW9pAb0ctP0OQR1nUsNZs5DLpoSFHxWEXB1VRJpxvD7ahvunTOMUaza5R6J
+         G+G+PbmWbrcqjuCs9ZlW5dDk1StsPuFQwY83fXib6QDmlAXFBNPYSx291IzhffRAU7wL
+         OQZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763181335; x=1763786135;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IrFSMX6rsnXXQ3BE+NZt7lQ85vIY1x/4wbBO9Bg9Lmw=;
-        b=VOn35uUel15IZOApjxv/KonDHMtk9hpDv9GT6Rs9mST/3Fh9FPOeN+5wMDOY2hNJ13
-         35VNuiE5zOP/dTAYo9FB+Gg5wyim1iXvRCFRwyxsmCoKsecHVLgaLJlpHtR8UDQdYB2L
-         2/NSum1CEpvE2JfwErwlnIVd6eUraWVReBIFg2OYQuNlPJhmh7E6CjjIwcsRopqkokEL
-         mVIkjORiongXPIqXt2WdVkjEU+q+htM9JQvic0J5VEQMvyfvWANAs+7k15vQaeTr+OWV
-         axjFNWugIXiIPo3lba1jQmVW4Uvd8nS4JCC80OMC07zJmlqrCKZkH6CCwqT5h48QPuaL
-         yJXA==
-X-Gm-Message-State: AOJu0YxrNCUXBL52ohXQtbQNc+VICig7MJHqFtS/lIVWNTcCFLlhOHzS
-	XTvPEOXiaYBhF3STm+ZoD8wrA7aAd0hGUwiHjejKGoM+1CJVpcUPRSsbEI3RJyaNjzZ6ZFAjhws
-	mtXy8Pg==
-X-Google-Smtp-Source: AGHT+IGN6jWS2HZfjJKOcF51O52+OlIz9jHkCNL1rsy/gafOHSNfQzLuQJaQZHgwbgdOS/xOlSQL7UjlOSU=
-X-Received: from pjbmy6.prod.google.com ([2002:a17:90b:4c86:b0:340:bd70:e76])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d0e:b0:341:315:f4ec
- with SMTP id 98e67ed59e1d1-343f9d921c0mr6724212a91.7.1763181334697; Fri, 14
- Nov 2025 20:35:34 -0800 (PST)
-Date: Sat, 15 Nov 2025 04:33:25 +0000
-In-Reply-To: <3B969F90-F51F-4B9D-AB1A-994D9A54D460@gmail.com>
+        d=1e100.net; s=20230601; t=1763187547; x=1763792347;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=o3mbPgaryrxeNqtX+QZzwKqYuiwR5t4mAID+C3myv2o=;
+        b=h8VVoiK97mWxW5PZ6ynee5W+DJ4Bq0gxGOdFdwlCw7XqVS/PM4hAKk1fvE8neOX41v
+         F6bEPpNUlPSJhrQPNc3gynJEOih/H3pFemrsVSZCj+qUSOVL3054JNDE7drQxpa31/JE
+         GVkw5iLCUEL5gfhqK6tEGMJxF4lxm3+PUguF9tJF9sg1725ML7+7vach0ZOInMdx6Tfj
+         kC1rSaWm7faRHW9m9Y5Gv1G5HF5kaiJchKVS/1ts5ALI0eafjdTX+YreMVX8EaQIVXQG
+         cUE3I8ci4csZ2U29CnQzzQRVOxoxVBvUrLchIglTg7ni9RA+9gGYn1EtC36AKBXffaQQ
+         fq9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWqaH+s4Q634eo32EBlTsIYowwRJy0jTD7SAnaFgqNSTUN8wJ7NTW0Q5sif+PHm30pqi3LlJ9I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZf4k5Mp68uTLdtgM72ycfkrfXzGoTnNk5AhlgrZFmWaz+atIs
+	B4WDCm9g/1tB4GE9l28ZMQePjvAl+QvrG5ij/n4X3hJ23br+IhBpP84oNVkIlZM5GJIQDQSIcvG
+	QZIYOSS613FlgHxvryMQcSSObrCnlONk=
+X-Gm-Gg: ASbGncu1C4NGCuOnCPSpTrADzE6k2jYcWKJd1Q+WXPnvV9eWdokjv4PQanG25ZstO+N
+	6RiWak4VR7Ao+13mNzcQ+qS9Ak8xmVVTH96Et9pd+QlhFg8rsU6ySUBkc+xSX74mGvarmgT0c5M
+	SPFhSc4zSfwWu5+7cL/OTSAT1xK9O4HE6K8um9RfuNheq7IqtahTEjzuyUGFL0iC5WbWL7HFpBb
+	pE7aOhgYFXV6eTV60qfm5XhYuNsQIRxFMKjWxQesZdfNpLEN4mGGmxaAzi6wyRScZecTFjXRJ72
+	MslgBHYDbZdKiQl/
+X-Google-Smtp-Source: AGHT+IGgbhBNt76q0a21kqRU/jA2zxiMhImDf+L2zCuJZ3aYlwFcVIl5jXYXcUXtUYa0efMWoxr/yX75BoMpdYNX+2s=
+X-Received: by 2002:a05:6000:2405:b0:42b:32c3:3949 with SMTP id
+ ffacd0b85a97d-42b593821f8mr4741547f8f.31.1763187546656; Fri, 14 Nov 2025
+ 22:19:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <3B969F90-F51F-4B9D-AB1A-994D9A54D460@gmail.com>
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251115043533.2689857-1-kuniyu@google.com>
-Subject: Re: [Question] Unexpected SO_PEEK_OFF behavior
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: shankerwangmiao@gmail.com
-Cc: netdev@vger.kernel.org, kuniyu@google.com
+MIME-Version: 1.0
+References: <CAOdo=cNAy4kTrJ7KxEf2CQ_kiuR5sMD6jG3mJSFeSwqD6RdUtw@mail.gmail.com>
+ <843c25c6-dd49-4710-b449-b03303c7cf45@bootlin.com> <eca707a6-7161-4efc-9831-69fbfa56eb93@lunn.ch>
+ <52e1917a-2030-4019-bb9f-a836dc47bda9@trager.us> <401e9d39-2c28-480e-b1c4-d3601131c1fb@lunn.ch>
+ <62469297-d873-46cb-9c44-0467fd49b732@bootlin.com>
+In-Reply-To: <62469297-d873-46cb-9c44-0467fd49b732@bootlin.com>
+From: Susheela Doddagoudar <susheelavin@gmail.com>
+Date: Sat, 15 Nov 2025 11:48:54 +0530
+X-Gm-Features: AWmQ_bkRrB-5eH3o9KXk8c_u27kaL7tiHcaM9SwrFtMgLUHQYUMbQMUo5ZC4tcE
+Message-ID: <CAOdo=cPFTR+1OWPNwo0E8LsyoMWo3BoAMDQhe9YfPZ=jN3aUNw@mail.gmail.com>
+Subject: Re: Ethtool: advance phy debug support
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Lee Trager <lee@trager.us>, netdev@vger.kernel.org, 
+	mkubecek@suse.cz, Hariprasad Kelam <hkelam@marvell.com>, 
+	Alexander Duyck <alexanderduyck@fb.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Miao Wang <shankerwangmiao@gmail.com>
-Date: Sat, 15 Nov 2025 05:03:44 +0800
-> Hi, all
-> 
-> I learned from the Kernel documents that SO_PEEK_OFF manages an offset for a
-> socket. When using recv(MSG_PEEK), the returning data should start from the
-> offset. As stated in the manual, suppose the incoming data for a socket is
-> aaaabbbb, and the initial SO_PEEK_OFF is 0. Two calls of recv(fd, buf, 4, 
-> MSG_PEEK) will return aaaa and bbbb respectively. However, I noticed that when 
-> the incoming data is supplied in two batches, the second recv() will return in 
-> total all the 8 bytes, instead of 4. As shown below:
-> 
-> Receiver                     Sender
-> --------                     ------
->                              send(fd, "aaaabbbb", 8)
-> recv(fd, buf, 4, MSG_PEEK)
-> Get "aaaa" in buf
-> recv(fd, buf, 100, MSG_PEEK)
-> Get "bbbb" in buf
-> ------------------------------------------------
-> recv(fd, buf, 4, MSG_PEEK)
->                              send(fd, "aaaa", 4)
-> Get "aaaa" in buf
-> recv(fd, buf, 100, MSG_PEEK)
->                              send(fd, "bbbb", 4)
-> Get "aaaabbbb" in buf
-> 
-> 
-> I also notice that this only happens to the unix socket. I wonder if it is the
-> expected behavior? If so, how can one tell that if the returned data from
-> recv(MSG_PEEK) contains data before SO_PEEK_OFF?
+Hi everyone,
+A big thank you to the community, especially Maxime ,  Andrew and Lee,
+for the excellent support with my recent query.
+Thanks again for the valuable assistance. The information you provided
+will certainly help my team better. I'm grateful for the time you set
+aside despite your busy schedule to help me with this.
 
-Thanks for the report !
+I anticipate receiving responses from others regarding the inquiries posted=
+.
 
-It is definitely the bug in the kernel.
+We'll work on the recommendations and propose a solution.
 
-If you remove sleep(2) in your program, you will not see
-the weird behaviour.
-
-The problem is that once we peek the last skb (aaaa) and
-sleep (goto again; -> goto redo;), we need to reset @skip.
-
-This should fix the problem:
-
----8<---
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index e518116f8171..9e93bebff4ba 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -3000,6 +3000,8 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
- 			}
- 
- 			mutex_lock(&u->iolock);
-+
-+			skip = max(sk_peek_offset(sk, flags), 0);
- 			goto redo;
- unlock:
- 			unix_state_unlock(sk);
----8<---
-
-We could move the redo: label out of the loop but I need
-to check the history a bit more (18eceb818dc3, etc).
+Thanks,
+Susheela
 
 
-> 
-> The code used to carry out the test is modified from sk_so_peek_off.c from the
-> Kernel test suite.
-> 
-> #include <stdio.h>
-> #include <stdlib.h>
-> #include <string.h>
-> #include <unistd.h>
-> #include <errno.h>
-> #include <sys/types.h>
-> #include <netinet/in.h>
-> #include <arpa/inet.h>
-> #include <sys/wait.h>
-> 
-> static void sk_peek_offset_set(int s, int offset)
-> {
->         if (setsockopt(s, SOL_SOCKET, SO_PEEK_OFF, &offset, sizeof(offset)))
->                 perror("Failed to set SO_PEEK_OFF value");
-> }
-> 
-> static int sk_peek_offset_get(int s)
-> {
->         int offset = -0xbeef;
->         socklen_t len = sizeof(offset);
-> 
->         if (getsockopt(s, SOL_SOCKET, SO_PEEK_OFF, &offset, &len))
->                 perror("Failed to get SO_PEEK_OFF value");
->         return offset;
-> }
-> 
-> void test(int af, int type, int proto, int do_sleep){
->         int s[2] = {0, 0};
->         int r = 0;
->         int offset;
->         pid_t sender = -1;
->         char buf[100];
->         if (af == AF_UNIX){
->                 r = socketpair(af, type, proto, s);
->                 if (r < 0) {
->                         perror("Temporary socket creation failed");
->                         return;
->                 }
->         } else {
->                 r = socket(af, type, proto);
->                 if (r < 0) {
->                         perror("Temporary socket creation failed");
->                         return;
->                 }
->                 s[0] = r;
->                 r = socket(af, type, proto);
->                 if (r < 0) {
->                         perror("Temporary socket creation failed");
->                         close(s[0]);
->                         return;
->                 }
->                 s[1] = r;
->                 union {
->                         struct sockaddr sa;
->                         struct sockaddr_in a4;
->                         struct sockaddr_in6 a6;
->                 } addr;
->                 memset(&addr, 0, sizeof(addr));
->                 addr.sa.sa_family = af;
->                 r = bind(s[0], &addr.sa, sizeof(addr));
->                 if (r < 0) {
->                         perror("Socket bind failed");
->                         goto out;
->                 }
->                 r = getsockname(s[0], &addr.sa, &(socklen_t){sizeof(addr)});
->                 if (r < 0) {
->                         perror("getsockname() failed");
->                         goto out;
->                 }
->                 if (proto == IPPROTO_TCP) {
->                         r = listen(s[0], 1);
->                         if (r < 0) {
->                                 perror("Socket listen failed");
->                                 goto out;
->                         }
->                 }
->                 r = connect(s[1], &addr.sa, sizeof(addr));
->                 if (r < 0) {
->                         perror("Socket connect failed");
->                         goto out;
->                 }
->                 if (proto == IPPROTO_TCP) {
->                         r = accept(s[0], NULL, NULL);
->                         if (r < 0) {
->                                 perror("Socket accept failed");
->                                 goto out;
->                         }
->                         close(s[0]);
->                         s[0] = r;
->                 }
->         }
->         offset = sk_peek_offset_get(s[1]);
->         if (offset == -0xbeef) {
->                 printf("SO_PEEK_OFF not supported");
->                 goto out;
->         }
->         printf("Initial offset: %d\n", offset);
->         sk_peek_offset_set(s[1], 0);
->         offset = sk_peek_offset_get(s[1]);
->         printf("Offset after set to 0: %d\n", offset);
->         sender = fork();
->         if (sender == 0) {
->                 /* Transfer a message */
->                 if (do_sleep){
->                         if (send(s[0], (char *)("aaaa"), 4, 0) < 0) {
->                                 perror("Temporary probe socket send() failed");
->                                 abort();
->                         }
->                         sleep(2);
->                         if (send(s[0], (char *)("bbbb"), 4, 0) < 0) {
->                                 perror("Temporary probe socket send() failed");
->                                 abort();
->                         }
->                 } else {
->                         if (send(s[0], (char *)("aaaabbbb"), 8, 0) < 0) {
->                                 perror("Temporary probe socket send() failed");
->                                 abort();
->                         }
->                 }
->                 exit(0);
->         }
->         int len = recv(s[1], buf, 4, MSG_PEEK);
->         if (len < 0) {
->                 perror("recv() failed");
->                 goto out;
->         }
->         printf("Read %d bytes: %.*s\n", len, (int)len, buf);
->         offset = sk_peek_offset_get(s[1]);
->         printf("Offset after reading first 4 bytes: %d\n", offset);
->         len = recv(s[1], buf, 100, MSG_PEEK);
->         if (len < 0) {
->                 perror("recv() failed");
->                 goto out;
->         }
->         printf("Read %d bytes: %.*s\n", len, (int)len, buf);
->         offset = sk_peek_offset_get(s[1]);
->         printf("Offset after reading all bytes: %d\n", offset);
->         len = recv(s[1], buf, 100, 0);
->         if (len < 0) {
->                 perror("recv() failed");
->                 goto out;
->         }
->         printf("Flushed %d bytes: %.*s\n", len, (int)len, buf);
->         offset = sk_peek_offset_get(s[1]);
->         printf("Offset after flushing all bytes: %d\n", offset);
-> out:
->         close(s[0]);
->         close(s[1]);
->         if(sender > 0) {
->                 int st;
->                 waitpid(sender, &st, 0);
->         }
-> }
-> 
-> int main(void) {
->         printf("=== Test SO_PEEK_OFF with AF_UNIX, SOCK_STREAM, No sleep ===\n");
->         test(AF_UNIX, SOCK_STREAM, 0, 0);
->         printf("=== Test SO_PEEK_OFF with AF_UNIX, SOCK_STREAM, Sleep ===\n");
->         test(AF_UNIX, SOCK_STREAM, 0, 1);
->         printf("=== Test SO_PEEK_OFF with AF_INET, SOCK_STREAM, IPPROTO_TCP, No sleep ===\n");
->         test(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0);
->         printf("=== Test SO_PEEK_OFF with AF_INET, SOCK_STREAM, IPPROTO_TCP, Sleep ===\n");
->         test(AF_INET, SOCK_STREAM, IPPROTO_TCP, 1);
->         printf("=== Test SO_PEEK_OFF with AF_INET6, SOCK_STREAM, IPPROTO_TCP, No sleep ===\n");
->         test(AF_INET6, SOCK_STREAM, IPPROTO_TCP, 0);
->         printf("=== Test SO_PEEK_OFF with AF_INET6, SOCK_STREAM, IPPROTO_TCP, Sleep ===\n");
->         test(AF_INET6, SOCK_STREAM, IPPROTO_TCP, 1);
->         return 0;
-> }
-> 
-> My execution result on 6.12.48 kernel (Debian 6.12.48+deb13-amd64) is:
-> 
-> === Test SO_PEEK_OFF with AF_UNIX, SOCK_STREAM, No sleep ===
-> Initial offset: -1
-> Offset after set to 0: 0
-> Read 4 bytes: aaaa
-> Offset after reading first 4 bytes: 4
-> Read 4 bytes: bbbb
-> Offset after reading all bytes: 8
-> Flushed 8 bytes: aaaabbbb
-> Offset after flushing all bytes: 0
-> === Test SO_PEEK_OFF with AF_UNIX, SOCK_STREAM, Sleep ===
-> Initial offset: -1
-> Offset after set to 0: 0
-> Read 4 bytes: aaaa
-> Offset after reading first 4 bytes: 4
-> Read 8 bytes: aaaabbbb
-> Offset after reading all bytes: 12
-> Flushed 8 bytes: aaaabbbb
-> Offset after flushing all bytes: 4
-> === Test SO_PEEK_OFF with AF_INET, SOCK_STREAM, IPPROTO_TCP, No sleep ===
-> Initial offset: -1
-> Offset after set to 0: 0
-> Read 4 bytes: aaaa
-> Offset after reading first 4 bytes: 4
-> Read 4 bytes: bbbb
-> Offset after reading all bytes: 8
-> Flushed 8 bytes: aaaabbbb
-> Offset after flushing all bytes: 0
-> === Test SO_PEEK_OFF with AF_INET, SOCK_STREAM, IPPROTO_TCP, Sleep ===
-> Initial offset: -1
-> Offset after set to 0: 0
-> Read 4 bytes: aaaa
-> Offset after reading first 4 bytes: 4
-> Read 4 bytes: bbbb
-> Offset after reading all bytes: 8
-> Flushed 8 bytes: aaaabbbb
-> Offset after flushing all bytes: 0
-> === Test SO_PEEK_OFF with AF_INET6, SOCK_STREAM, IPPROTO_TCP, No sleep ===
-> Initial offset: -1
-> Offset after set to 0: 0
-> Read 4 bytes: aaaa
-> Offset after reading first 4 bytes: 4
-> Read 4 bytes: bbbb
-> Offset after reading all bytes: 8
-> Flushed 8 bytes: aaaabbbb
-> Offset after flushing all bytes: 0
-> === Test SO_PEEK_OFF with AF_INET6, SOCK_STREAM, IPPROTO_TCP, Sleep ===
-> Initial offset: -1
-> Offset after set to 0: 0
-> Read 4 bytes: aaaa
-> Offset after reading first 4 bytes: 4
-> Read 4 bytes: bbbb
-> Offset after reading all bytes: 8
-> Flushed 8 bytes: aaaabbbb
-> Offset after flushing all bytes: 0
-> 
-> 
-> Cheers,
-> Miao Wang
+
+On Fri, Nov 14, 2025 at 9:48=E2=80=AFPM Maxime Chevallier
+<maxime.chevallier@bootlin.com> wrote:
+>
+> > Linux's understanding of a PHY is a device which takes the bitstream
+> > from the MAC and turns it into analogue signals on twisted pairs,
+> > mostly for an RJ45 connector, but automotive uses other
+> > connectors. Its copper, and 802.3 C22 and parts of C45 define how such
+> > a PHY should work. There is a second use case, where a PHY converts
+> > between say RGMII and SGMII, but it basically uses the same registers.
+> >
+> > fbnic is not copper. It has an SFP cage. Linux has a different
+> > architecture for that, MAC, PCS and SFP driver. Alex abused the design
+> > and put a PHY into it as a shortcut. It not surprising there was push
+> > back.
+> >
+> > So, i still think ethtool is the correct API. In general, that
+> > connects to the MAC driver, although it can shortcut to a PHY
+> > connected to a MAC. But such a short cut has caused issues in the
+> > past. So i would probably not do that. Add an API to phylink, which
+> > the MAC can use. And an API to the PCS driver, which phylink can
+> > use. And for when the PHY implements PRBS, add an API to phylib and
+> > get phylib to call the PHY driver.
+>
+> I also think ethtool is the right spot. In the above explanation, there
+> may be one more bridge to make between the net world (i.e. the MAC
+> driver) and the Generic PHY subsystem (drivers/phy). The Comphy driver
+> for Marvell devices for example is implemented there, for the really low
+> level, Serdes configuration operations.
+>
+> If PRBS is implemented there, we may end-up in a situation where ethtool
+> asks the netdev for PRBS (either directly, or through phylink), which
+> will in turn ask the generic phy framework for that.
+>
+> Maxime
 
