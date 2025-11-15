@@ -1,100 +1,91 @@
-Return-Path: <netdev+bounces-238852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A902C60328
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 11:10:39 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CC17C60338
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 11:23:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCA763B13F1
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 10:10:37 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4E30434F4BF
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 10:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C1ED283C93;
-	Sat, 15 Nov 2025 10:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06AAA2580E1;
+	Sat, 15 Nov 2025 10:23:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="v0kgQ+xl";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="qucjSHzF"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="CF4bSo70"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A581487E9
-	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 10:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC6D1ACDFD
+	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 10:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763201435; cv=none; b=FgUAl1alNQhYnC29Jdbs2kjgA/KRoXqXi7bXPmJ0fCFMU00eBhTx9Tyf/YoMTV6dJecxbqv2/N0zdwnkUkmH2UPoS9U8p1kTJ2mj2Apkj2/Rnv91Nyr4a4j9Rc8x6kSzEleZ8OSpDgjSeWxgqrp8BvSPiX+iMAPODVBjULOhjiw=
+	t=1763202229; cv=none; b=Crv1gQigGCZUCeYrQ4POV0r9wk8eX2FTizD37MxSe0dauDACzmLK57qbaxjEzyRHFIrUSTly/PHB4VcE6FYtI0OdqkCJichzwwYTZ7Y3wpFLpLxdwRllzHEsr+txQWIn+9BVcNoZxxdvEWX+t+FYITZ4rh90x8iZsqPoOjCW0r4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763201435; c=relaxed/simple;
-	bh=en9RN9gKO8uLT8gb+MfFpjmc5oqaL1VNbhRC+0i+Zz8=;
+	s=arc-20240116; t=1763202229; c=relaxed/simple;
+	bh=AQyFcGYH0/5CWgghrxdPWpEv6+2cgz1bE5+gwzLzzzU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=al0/XEHxn/e5GeO5YgfuTqlqwu5QCVbOWont/0r5tXZY6BH2pX1pECwWjFZgg7CBzAskP6SGfjIFUscX1H+TI71RERy2YXJiiMRaf1K8l0T7BRWM8304M3veOGdi74OnVVxYvJRjX+C8Mm/fnZd/5TtG7T+wdTxmveN2M6TuFIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=v0kgQ+xl; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=qucjSHzF; arc=none smtp.client-ip=202.12.124.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id A2EC17A0128;
-	Sat, 15 Nov 2025 05:10:30 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Sat, 15 Nov 2025 05:10:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1763201430; x=
-	1763287830; bh=2xuxKu4nxr0J9aEhpUQBq4IG4Yl680QSuPg6JW3vQyA=; b=v
-	0kgQ+xlnTcEkUnxaoZewYYh/R/x+EQR1cfBYY6udPP7xAbWEip7qqvikP0D+qfgY
-	1X8Dy436PR2h73Bom8H5N132V9ztNm1uZXrVZ7EXgtpFjmI9/KA3WF8cnmgzQSyS
-	K05HRHQzYd3PC3oZPEIzUw+Ei3xAcgvBfRWyoJhU6YckrCB8G3damZKixPNYbyKL
-	Bff0v3JRnF2YP5UBij8mcBBBKkDjpHm+/C8sZAEcRpyJSo2WXpZD7abfix1pttaM
-	cQ6+f2XANXLoRqZGwHujWE3C2qH8mgzlI54KlV9PeQiUaskWRWv4Z+jKrxj/j7ih
-	/Zsr68DupU1zMPt1lDs3Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1763201430; x=1763287830; bh=2xuxKu4nxr0J9aEhpUQBq4IG4Yl680QSuPg
-	6JW3vQyA=; b=qucjSHzF8ltyaVoAdtzzWmG0qxGOsL5zuQAuIAsRDHRJY7oIQbA
-	/0Y44TkyFrDJQ7oky9UACASwbdu44u6vlOEGn4U7TJ2DswmW1atiwkFRx9U8wHqG
-	4vkg+bQEmYkQ+tZdXeJT7ZxDGMWZhsJb7eznkLBjefZEVdGm5zT/4HrwEnphxqkI
-	9SuvxR1EZif2wlwFKxbL6bxnnRsh1+pi+x3cjWA7nJCxiDxyZFEZjNyEn7XTrTzP
-	sXzKTInM6P01uvEKefPzNEpjyD5s7cCxlddPqZDXiVVVdLFZN/RHYRP4DIQU/UqY
-	XSTIcsgIzwQDDrGtgMqEGMOvF2ySRUjZxsg==
-X-ME-Sender: <xms:llEYaffS0KTCc8SjSC7029lrUzALUDp1i9_wMck5hgB5DZJMetcwVg>
-    <xme:llEYadoX68CWuLY9MWtKG5dzLtYfOdoM9g_8RMNBYWnCFQQQyIuNyfNlj0jWrOivA
-    gd5ECZjA53KVrXmm7bNhvHTSr09goFirgIna8FNgkygdghMkVjF>
-X-ME-Received: <xmr:llEYaY9zbEivYoMrLfohMSpNtFz3mebm93Q7jupQ_1lDI4ZWQHlcphUjdrpX>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvuddvgedvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtrodttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepjeekleevleekfefgueehveejueekvdehvdeugedvkeelgefhleegieev
-    ffdtuedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvg
-    htpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrg
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtgho
-    mhdprhgtphhtthhopeguqhhfvgigthesghhmrghilhdrtghomh
-X-ME-Proxy: <xmx:llEYaRd9STZVVC8bNkdflYs3GsibtJdMfskrs0KbcIWaXrLS-Zzbgg>
-    <xmx:llEYaaILEfYXN4SQkAQpf8DxwzBVhT8jHgSk9txG6zlhIGqpXDjy5Q>
-    <xmx:llEYaZj2FVletsJ2ifEvHLs0y8ehuJhV31-XL4Zk_zu5nuePEiBpgA>
-    <xmx:llEYaQST1MyqMXY2TqY23lDC0YFSdSwSuu1xtZz0zlTTQKDIlvIPnw>
-    <xmx:llEYafTfk91UsNlmRidJEN3fiuisedeBZ7ZEQ6U0n_HneSpYlKypQSly>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 15 Nov 2025 05:10:29 -0500 (EST)
-Date: Sat, 15 Nov 2025 11:10:28 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Qingfang Deng <dqfext@gmail.com>
-Subject: Re: [PATCH net-next 2/8] ovpn: pktid: use bitops.h API
-Message-ID: <aRhRlFmgfoEQoTRW@krikkit>
-References: <20251111214744.12479-1-antonio@openvpn.net>
- <20251111214744.12479-3-antonio@openvpn.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eWtiMCLMYAIV8JRhvLp4zkVAOWaEUTZZirEAaNcv+YCbCzHQmAkYP+AMnQo7oq460viR/b3GM/Y+vmpDEZ974p8cFXOPBbHktkS+/AKUjbWNj540JPbmMGSGUx3xqFUMQZ4oHZWVwA1ZVN8qA9a0/StSLc5/+mQhBFLQlJA6d+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=CF4bSo70; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-29812589890so35843515ad.3
+        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 02:23:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1763202227; x=1763807027; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fYOc0IUNPX85RhlM2z4VxJh51pDy+UaQAYdPvoblagA=;
+        b=CF4bSo701YzNDbcZWXKKayInL/CvUCwEzak3knXFLOlFobicH2jmxjchvQlO+TdoM6
+         Jqg2RDwqMJugb72UreTqyykRKs8agEn9OtaAV5qFbc5RBZifE6qZTzjAHdZzt6HtRmp5
+         yYBXsXIYnYEAiMw3g/aLqtTsD2557LLFLJXWFHwOswPsiPVKDL5nEHRSKE5zY0H6QlHj
+         8G2X6baS5TrlXSqa6Uw6FVfLyfhadSazLwmLjVgRyTmcF1zZq2xfHdlbh7xaWv590MGM
+         +rQ0cWdYIGJMXUy+kwASsKRkRrR/a55xLV5SJUi4qksz36doFVtVKehCW7x5dzDSGxtI
+         ou2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763202227; x=1763807027;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fYOc0IUNPX85RhlM2z4VxJh51pDy+UaQAYdPvoblagA=;
+        b=T1ODG1WTaM30nsezYWD/n/pjC2UDVGJWGTbEQU8ze3gAxGafqiAvMXiJZHsx3QBneT
+         clHw5xBgiIOx0lxsy3zKPfTw1piXOJqvZkAuem920/MLCq0J5rXiTGFH6mVuRY8XYb7P
+         By5c5OdwDLTr42F9+/g0gxs0Sef/lfRnUpgDaRP9KeEg8/9TreRTCDpUbuA+sImJTnrU
+         /8TqKm1hwT7u98Zul6Baj372ATS8kQ2avTB+9OzmHECJO5eiwTru6U1VF0UM78VsqZeN
+         lIDW4ch//3L1AvIJMXEe+afIGMAF5krS2/RTH6pC0575i10hTXInhkddYlKxGt30X/Zn
+         CFSw==
+X-Forwarded-Encrypted: i=1; AJvYcCVVJMMesHOfHHngl2KYTiPis3thY1HBHrfNRDS7KuA8AcCiG+7vR3jwDHkTpZx36bD+RyzIFec=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJnt+hdj0QutoZWcu8C3aWQjOwcGHHv9m90WYgWiT0QK51EWbf
+	gdpsm2tQZUbmLpiallZZhXgJZkczRlS3uNWTUNO7TEgALua5Y6OyxiM16JpefrTWbIsawoS1inZ
+	rb4o=
+X-Gm-Gg: ASbGncsES03GwGPWzIeVnvZtCxpdw0q/KJPckNthCMc1re7pNtAoP60jb11CUUcDlof
+	s2pxUvBQ0/HX/Oei0T0FBDuQBeGSfv7L86BVokqf0PXx2S0rA2MfVrLpMSyHdIOPEtZj8Gtz0cf
+	PQMWubQsAPHpsvKjfQJ+PAqcWLbBgF/cPK9UdLPvuIVClhLjvhZd9gdWydvOd3ykg3LtEJHc8YX
+	4/efRG7Wh7hw3KbIZcBjlwkATMUkrCnoNIU1d/MzpyNwYWAZLTq1Fquf5NEH0WQy+A8ABIo5dBN
+	FzTQNEm0eSEzaqiOw7QquFpLQRahmaZCDUpSrI4rN78Bx4+SS1tOlOfjihuTZjE4jveRAJhCBQZ
+	zmtqjbC52yLRGL7iJF42dM/V3DSLMnw55MkvBWIF7D7sPsl5UMElj1og6cSqF8nVLo/Kj9YGlMq
+	T5I2Sx
+X-Google-Smtp-Source: AGHT+IHrBU43wvC6gMDgSE5qM+edUPrS5jQNdJRECY2EPUfuN1+iqG0qBZBMUYHmlhgLOuBycVT5uA==
+X-Received: by 2002:a05:7022:62a9:b0:119:e569:fbb1 with SMTP id a92af1059eb24-11b411ff1b8mr3401108c88.32.1763202227360;
+        Sat, 15 Nov 2025 02:23:47 -0800 (PST)
+Received: from p1 ([2600:8800:1e80:41a0:1665:bc8c:7762:7ff2])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11b060885eesm20398145c88.1.2025.11.15.02.23.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Nov 2025 02:23:47 -0800 (PST)
+Date: Sat, 15 Nov 2025 03:23:45 -0700
+From: Xiang Mei <xmei5@asu.edu>
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>
+Cc: security@kernel.org, netdev@vger.kernel.org, cake@lists.bufferbloat.net,
+	bestswngs@gmail.com
+Subject: Re: [PATCH net v3] net/sched: sch_cake: Fix incorrect qlen reduction
+ in cake_drop
+Message-ID: <aRhUsbR6DT1F0bqc@p1>
+References: <20251113035303.51165-1-xmei5@asu.edu>
+ <aRVZJmTAWyrnXpCJ@p1>
+ <87346ijbs9.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,23 +94,101 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251111214744.12479-3-antonio@openvpn.net>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87346ijbs9.fsf@toke.dk>
 
-2025-11-11, 22:47:35 +0100, Antonio Quartulli wrote:
-> From: Qingfang Deng <dqfext@gmail.com>
+On Thu, Nov 13, 2025 at 02:35:18PM +0100, Toke Høiland-Jørgensen wrote:
+> Xiang Mei <xmei5@asu.edu> writes:
 > 
-> Use bitops.h for replay window to simplify code.
+> > There is still one problem I am not very sure since I am not very 
+> > experienced with cake and gso. It's about the gso branch [1]. The slen 
+> > is the lenth added to the cake sch and that branch uses 
+> > `qdisc_tree_reduce_backlog(sch, 1-numsegs, len-slen);` to inform the 
+> > parent sched. However, when we drop the packet, it could be probmatic 
+> > since we should reduce slen instead of len. Is this a potential
+> > problem?
 > 
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
-> [antonio@openvpn.net: extended commit message]
-> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
-> ---
->  drivers/net/ovpn/pktid.c | 11 ++++-------
->  drivers/net/ovpn/pktid.h |  2 +-
->  2 files changed, 5 insertions(+), 8 deletions(-)
+> Hmm, no I think it's fine? The qdisc_tree_reduce_backlog(sch, 1-numsegs,
+> len-slen) *increases* the backlog with the difference between the
+> original length and the number of new segments. And then we *decrease*
+> the backlog with the number of bytes we dropped.
+> 
+> The compensation we're doing is for the backlog update of the parent,
+> which is still using the original packet length regardless of any
+> splitting, so that doesn't change the compensation value.
+> 
+> -Toke
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+I still think current method to reduce backlog may be problematic:
+What you said is stated for the GSO branch when cake_queue returns
+NET_XMIT_SUCCESS, but it may lead to issues when it returns NET_XMIT_CN.
+For the normal case where no dropping happens, the current implementation
+is correct. We can see how qlen and backlog change as follows:
 
--- 
-Sabrina
+backlog:
+	-(len - slen)  Reason: qdisc_tree_reduce_backlog(sch, 1 - numsegs, len - slen);
+	+len           Reason: parent enqueue)
+	Total: slen
+qlen:
+	-(1 - numsegs) Reason: qdisc_tree_reduce_backlog(sch, 1 - numsegs, len - slen);
+	+1 	       Reason: parent enqueue
+	Total: numsegs
+
+This makes sense because we split one packet into numsegs packets of total
+length slen and enqueue them all. When a drop happens, we must fix both 
+qlen and backlog.
+
+In the not patched code, cake_drop() calls qdisc_tree_reduce_backlog() for
+dropped packets. This works in most cases but ignores the scenario where 
+we drop (parts of) the incoming packet, meaning the expected:
+
+```
+backlog += len
+qlen += 1
+```
+
+will not run because the parent scheduler stops enqueueing after seeing
+NET_XMIT_CN. For normal packets (non-GSO), it's easy to fix: just do
+qdisc_tree_reduce_backlog(sch, 1, len). However, GSO splitting makes this
+difficult because we may have already added multiple segments into the
+flow, and we don’t know how many of them were dequeued.
+
+The number of dequeued segments can be anywhere in [0, numsegs], and the
+dequeued length in [0, slen]. We cannot know the exact number without 
+checking the tin/flow index of each dropped packet. Therefore, we should
+check inside the loop (as v1 did):
+
+```
+cake_drop(...)
+{
+    ...
+    if (likely(current_flow != idx + (tin << 16)))
+        qdisc_tree_reduce_backlog(sch, 1, len);
+    ...
+}
+```
+
+This solution also has a problem, as you mentioned:
+if the flow already contains packets, dropping those packets should
+trigger backlog reduction, but our check would incorrectly skip that. One
+possible solution is to track the number of packets/segments enqueued
+in the current cake_enqueue (numsegs or 1), and then avoid calling
+`qdisc_tree_reduce_backlog(sch, 1, len)` for the 1 or numsegs dropped
+packets. If that makes sense, I'll make the patch and test it.
+
+-----
+
+Besides, I have a question about the condition for returning NET_XMIT_CN.
+Do we return NET_XMIT_CN when:
+
+The incoming packet itself is dropped? (makes more sense to me)
+or
+The same flow dequeued once? (This is the current logic)
+
+If we keep the current logic, the above patch approach works. If not, we 
+need additional checks because we append the incoming packet to the tail
+but drops occur at the head.
+
+Thanks,
+Xiang
 
