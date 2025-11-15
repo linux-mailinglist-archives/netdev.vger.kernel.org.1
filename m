@@ -1,136 +1,139 @@
-Return-Path: <netdev+bounces-238894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B34C60BC2
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 22:38:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35A73C60BC9
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 22:46:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 412A34E0EC3
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 21:38:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B8A964E0FA8
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 21:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6952223DCF;
-	Sat, 15 Nov 2025 21:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8631419D8AC;
+	Sat, 15 Nov 2025 21:46:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YTEt+d9Q"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BqUkofmW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6586D75809
-	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 21:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE3675809;
+	Sat, 15 Nov 2025 21:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763242682; cv=none; b=VYMaji60AOG+CZp6duYDZ0PYUJxkLCNkl8NWzE0fG4x8ypw0U8AcptghuC+bYvFnG+bs5sLdMF8pDoKUpJ43dGsYk8c46SSzbrxS8yihfwN+AeulquJLOAOVVBRgIG5aeu0hzEOKWZUNYEqe3DqcgxnDJXt2nxH1KEd3QgP6B9k=
+	t=1763243201; cv=none; b=E6wo+/TQoDQt6ECS0UVmAzTFv4lRrdMhX1TKRDgZrEW9gsbTIOBMgleNA2VzSAtmJG0gLQHy4mVv0ziTUACHjUEiuVSM5Av3b23kcICvrYWB1d/IsBIFHvComt5It5ITjopFjNv75BrKn3gr3K254YeHvQqMfINeKT24NvD3AsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763242682; c=relaxed/simple;
-	bh=G6JRxuM9z/0jb0sS+FjWV71r2IJ7KX6IbR+KD0Ndu7M=;
+	s=arc-20240116; t=1763243201; c=relaxed/simple;
+	bh=DS7jnr7LQcK8wBxZTxE00YtiWyfNkU3wGfkFfgB9S2w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F7yfLhsqyg8tOoLBFtpE8FXWg9c/xzUYeHVqVmHMr3F2dq5tDn8G+P0yyT9Mh+t41wdj3W3vJGdTxf5RbxCtLyL/TeeNpY7d9XDQNj+RN86I4mVXG8tE0hjbEIr7OWBan6Ye/bDZW+iJA/mTtK/kGsmTVsgo2cTVWZpsKtYqEw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YTEt+d9Q; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fV/XR/ayVhz3T4nEC3nc0xxXiQ9siMQyFBX5ezYei0Q=; b=YTEt+d9Q9Ypbe0EH1lkI+iQ+uf
-	MinpZYFSLxrYvyqXxtUjs7u+gQVFCDEsPX+ki1S//wq9mn/wK1Tft4XWxdfZwraPsiZaeKmMN3Jpl
-	A+2fB5mUG1dWE/fVsRiHdyBKTPd0xSTaj3tURc/rhgiZp6ExpA7V9BicCreDksDMzwpxrs0mbyQcL
-	96/60D7HHVhvxJv0qWy8emdQ6wOCUX/6eXp+vHU0xKJKoVMj+e66fD09bjilkJX+VI+DkrVI6img3
-	LO5DpnwUzA0SkwuFz8oMJbEib21RdDgmHxoMTpSNO5piSDwYxkLiHdRtH/e3MHWHr1MxiGkxF7Q4l
-	erZGLSTg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51448)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vKNy2-000000000MI-0mwz;
-	Sat, 15 Nov 2025 21:37:58 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vKNy0-0000000077t-3UL4;
-	Sat, 15 Nov 2025 21:37:56 +0000
-Date: Sat, 15 Nov 2025 21:37:56 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Fabio Estevam <festevam@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, edumazet <edumazet@google.com>,
-	netdev <netdev@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: LAN8720: RX errors / packet loss when using smsc PHY driver on
- i.MX6Q
-Message-ID: <aRjytF103DHLnmEQ@shell.armlinux.org.uk>
-References: <CAOMZO5DFxJSK=XP5OwRy0_osU+UUs3bqjhT2ZT3RdNttv1Mo4g@mail.gmail.com>
- <e9c5ef6c-9b4c-4216-b626-c07e20bb0b6f@lunn.ch>
- <CAOMZO5BEcoQSLJpGUtsfiNXPUMVP3kbs1n9KXZxaWBzifZHoZw@mail.gmail.com>
- <1ec7a98b-ed61-4faf-8a0f-ec0443c9195e@gmail.com>
- <CAOMZO5CbNEspuYTUVfMysNkzzMXgTZaRxCTKSXfT0=WmoK=i5Q@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eKUrWEyRtYJfgG8Tl9P797rL14kTYM0cdbJomJl0Lsa8YxIIEN4DASEeHeQOkMlA8CqQAIlHg+pPSLNbX5qSBJRM4KNxfo1HtBnje4suYIljzmQPUeUX90J39oT5BwhZFiLFFWuCHLMrQcBY3bB8EtYKzpgpXG7p9uyUiwmkNtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BqUkofmW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/whuAK3kZgLzmadCmNYa4Vh8RN8Z7SP1J4SvcMcHv2Q=; b=BqUkofmWLA/5XsBL3zG6W2CG9A
+	2w8hAJDCdvu170jvmqVCh3C7wzLAfwYwGsO7TlSjv4QZyuFKHdKFjBZt+zm705bTebsUzav8cupwK
+	AUWns5itZzZxccGXPwG6PL43hFGPs/s9dw/D5mG+LY37jHakJ8jsJNv+muqE7HUbJMJw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vKO60-00E7C7-S7; Sat, 15 Nov 2025 22:46:12 +0100
+Date: Sat, 15 Nov 2025 22:46:12 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Po-Yu Chuang <ratbert@faraday-tech.com>,
+	Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+	"taoren@meta.com" <taoren@meta.com>
+Subject: Re: [PATCH net-next v4 4/4] net: ftgmac100: Add RGMII delay support
+ for AST2600
+Message-ID: <041e23a2-67e6-4ebb-aee5-14400491f99c@lunn.ch>
+References: <20251110-rgmii_delay_2600-v4-0-5cad32c766f7@aspeedtech.com>
+ <20251110-rgmii_delay_2600-v4-4-5cad32c766f7@aspeedtech.com>
+ <68f10ee1-d4c8-4498-88b0-90c26d606466@lunn.ch>
+ <SEYPR06MB5134EBA2235B3D4BE39B19359DCCA@SEYPR06MB5134.apcprd06.prod.outlook.com>
+ <3af52caa-88a7-4b88-bd92-fd47421cc81a@lunn.ch>
+ <SEYPR06MB51342977EC2246163D14BDC19DCDA@SEYPR06MB5134.apcprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOMZO5CbNEspuYTUVfMysNkzzMXgTZaRxCTKSXfT0=WmoK=i5Q@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <SEYPR06MB51342977EC2246163D14BDC19DCDA@SEYPR06MB5134.apcprd06.prod.outlook.com>
 
-On Sat, Nov 15, 2025 at 06:01:38PM -0300, Fabio Estevam wrote:
-> Hi Heiner,
+> Based on the above information, I have attempted to outline my understanding.
+> 1. 'rgmii' + MAC delay:
+> Add warming, keep MAC delay and pass "rgmii-id" to PHY driver.
+
+Think about that. What delays do you get as a result?
+
+> 2. 'rgmii-id' + MAC delay:
+> disable MAC delay and pass "rgmii-id" to PHY driver
 > 
-> On Fri, Nov 14, 2025 at 6:33 PM Heiner Kallweit <hkallweit1@gmail.com> wrote:
+> 3. 'rgmii-id' + no MAC delay:
+> Keep disabling MAC delay and pass "rgmii-id" to PHY driver
 > 
-> > The smsc PHY driver for LAN8720 has a number of callbacks and flags.
-> > Try commenting them out one after the other until it works.
-> >
-> > .read_status    = lan87xx_read_status,
-> > .config_init    = smsc_phy_config_init,
-> > .soft_reset     = smsc_phy_reset,
-> > .config_aneg    = lan95xx_config_aneg_ext,
-> > .suspend        = genphy_suspend,
-> > .resume         = genphy_resume,
-> > .flags          = PHY_RST_AFTER_CLK_EN,
-> >
-> > All of them are optional. If all are commented out, you should have
-> > the behavior of the genphy driver.
-> >
-> > Once we know which callback is problematic, we have a starting point.
+> 4. 'rgmii-txid' or 'rgmii-rxid':
+> Keep original setting
+
+> I have some idea to discuss with you.
+> 1. On 'rgmii', I want to add warming and directly disable MAC delay and pass 'rgmii-id' 
+> to PHY driver.
+
+Yep.
+
 > 
-> Thanks for the suggestion.
+> 2. On 'rgmii-id', ignore if enabling MAC delay, all disable MAC delay and pass ' rgmii-id'
+> to PHY driver.
 > 
-> After removing the '.soft_reset = smsc_phy_reset,' line, there is no
-> packet loss anymore.
+> 3. On 'rgmii-txid' or 'rgmii-rxid', keep the above item 4.
 > 
-> If you have any other suggestions regarding smsc_phy_reset(), please
-> let me know.
+> Actually, it's difficult for the driver to determine whether the MAC delay is enabled or not.
+> Our design doesn't use a single bit to indicate the delay state. Instead, the delay setting is 
+> derived from the user's configured delay value.
 
-What happens if you replace this with genphy_soft_reset() ?
+But you can turn it back to ps. I would say, if it is > 1000, the
+intention is it provides the 2ns delay. If it is < 1000 it is just a
+minor tuning value because of bad board design.
 
-Is the hardware reset signal wired on this PHY, and does the kernel
-control the hardware reset?
+Do you have experience from the field, what do real boards use? Are
+they all inserting the same 2ns? Or is each customer tuning their
+bootloader to configure the hardware differently per board design?
 
-I note that phy_init_hw() will deassert the hardware reset, and with
-.soft_reset populated, we will immediately thump the PHY with a
-soft reset unless a reset_deassert_delay is specified (e.g. via DT
-reset-deassert-us prioerty). This is probably not a good idea if the
-PHY is still recovering from hardware reset.
+You might even need a more complex solution. If the bootloader is
+adding a delay between say 200ps and 1600ps, it suggests a poorly
+designed board, and the PHY adding 2ns is not going to work. There is
+a need for rx-internal-delay-ps or tx-internal-delay-ps in DT. You can
+give a warning, and indicate what values are needed, but leave the
+hardware alone. If the bootloader is setting the delay > 1600, passing
+_RGMII_ID to the PHY, and disabling MAC delays is likely to work, so
+you just need to warn about phy-mode being wrong. If the bootloader is
+inserting < 200ps, and phy-mode is rgmii-id, that is just fine
+tuning. Maybe suggest rx-internal-delay-ps or tx-internal-delay-ps be
+added in DT, but leave it alone.
 
-For reference, LAN8720 requires a minimum period of 100µs for hardware
-reset assertion, and then between 2 and 800ns before the PHY starts
-driving the configuration pin outputs. This _probably_ (it's not
-specified) means we shouldn't be talking to the PHY for approx. the
-first 1µs.
+Whatever you do, you need a lot of comments in the code and the commit
+message to help developers understand why they are seeing warnings and
+what they need to do.
 
-Finally, and this is probably not relevant given that the PHY works
-with the genphy driver, the PHY requires the XTAL1/CLKIN to be running
-during a hardware reset.
-
-This is from https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/DataSheets/LAN8720A-LAN8720Ai-Data-Sheet-DS00002165.pdf
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+	Andrew
 
