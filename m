@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-238891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2AAEC60BAE
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 22:08:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8E66C60BB4
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 22:16:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5BF23B3AEC
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 21:08:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CDDA84E14AB
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 21:16:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A1F257844;
-	Sat, 15 Nov 2025 21:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8CA022FE11;
+	Sat, 15 Nov 2025 21:16:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rMLHQUEi"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OCM3iKo6"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F651A256B;
-	Sat, 15 Nov 2025 21:08:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4313594F;
+	Sat, 15 Nov 2025 21:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763240919; cv=none; b=ByO13bxYimdhEIaw5Tnpde6DdXKA+K5XCKeuwP9T4NGXPa466A66pIW5+8OZT0jw+IRbVSRRNxSSUEPJ+ZaXLnQOYG8V78jEkNrdEHoRhNxrGJ6uft2z6JXyHVhatad3MgJAlP7iNJzCqyFdosRoWPgAcyJC5mHp+1cKHFgoakc=
+	t=1763241363; cv=none; b=DDwIw1HsvI2TGUGZAsauz2RntBjBsRsYg3KGCKcwKuzqM1q20kWXBDbbhoXyeTc86ouWW1Wd2N19+2hJrclEJsC6/Q5FjQgHE9b1KBe2WT37VyDgTwhbY1J3RnjwqFJDhNzU7TnA6MjSFtQt5KxluwXwOry5xkERUxtZrTk2O1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763240919; c=relaxed/simple;
-	bh=JrUmzbpT7hshDrSRW07pHmYBu3wHOEJ/MNkWENAIBWs=;
+	s=arc-20240116; t=1763241363; c=relaxed/simple;
+	bh=9Z733u5Ow5KX/0wGU+juH/ehU3LkKn/YGRAFyBH4t3E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LCUzFUZdujLdSD4HmyNd5p97Ofv0iyQnehw1BKXGN31FnrRppWjDkTxF4oEezdZ3VZNKeiK6jWVsjxnBkSKNF9m7S4Pb2Mu2Tc7B7wzk+Or4YXhtuHQg49tb859bMsbPiP2u4zG/p2gfwKQLHHu+Avg/FvI2V3Uo+jtVXY8UwpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rMLHQUEi; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=P3Sgro7aaOIWdoau7AY4cAqG0UmEuSt54Muyo4nG+EeUAyem4sR1vVDpjGZKWIQ58fUjDe4tzAt7U+oOoPhgLGUtNawiioX+VHX2cnUi4TNgKttrai363QNB7BkFQaOTPS5S5NfknFWIs/RBpdK1UGSrNAnvMtA8sIhgm+MoTWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OCM3iKo6; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,26 +36,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TAHKZHDBYWaKN+9z8GE0EBzEAgkLP88krH4g5YdlDis=; b=rMLHQUEinpnN2QsteMc1lUZaHJ
-	ZXijh2MYAGpdCIFKQuSbz6nlcL9lUsBZZ1w57OocPD0tjgXQC2UVBzXJg0D6byYAHh7I7py33X+4q
-	gWcSTQtygTxis6AYyoIuBeIlO0ao8iFDxMyyzRZmEvYp4PpX+4TCPTNKpLtzdWDy7FzE=;
+	bh=khPgDsVJrdOTw5XRZdidZ350ZJ9XgdNzhpLeT83/DIo=; b=OCM3iKo6z5eLZeUF3b5Se3eu4P
+	24OzwFf8tBoieqvXawQWCnUvnlCLLaRt+B/Xl6VgVyrIZ2XQGkfOQ2Uy+HoFw8vGXRThD6t3HO3Rt
+	IorisFz7KnK+q0cUGfL3yh45+u7v4gSZLySpaGFJpRjpJG0xZOffYM42fvUCLAa0lqUg=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vKNVV-00E76X-2W; Sat, 15 Nov 2025 22:08:29 +0100
-Date: Sat, 15 Nov 2025 22:08:29 +0100
+	id 1vKNca-00E78A-Nh; Sat, 15 Nov 2025 22:15:48 +0100
+Date: Sat, 15 Nov 2025 22:15:48 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com, vikas.gupta@broadcom.com,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: Re: [v2, net-next 09/12] bng_en: Add ethtool link settings and
- capabilities support
-Message-ID: <49930724-74b8-41fe-8f5c-482afc976b82@lunn.ch>
-References: <20251114195312.22863-1-bhargava.marreddy@broadcom.com>
- <20251114195312.22863-10-bhargava.marreddy@broadcom.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Wei Fang <wei.fang@nxp.com>, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	eric@nelint.com, maxime.chevallier@bootlin.com, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: phylink: add missing supported link modes for
+ the fixed-link
+Message-ID: <a3886abf-5ed5-436a-8f92-7c010beced13@lunn.ch>
+References: <20251114052808.1129942-1-wei.fang@nxp.com>
+ <fc57fba2-26c2-4b8a-b0f5-1b3c4d1b9bef@lunn.ch>
+ <aRjqLN8eQDIQfBjS@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,41 +63,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251114195312.22863-10-bhargava.marreddy@broadcom.com>
+In-Reply-To: <aRjqLN8eQDIQfBjS@shell.armlinux.org.uk>
 
-> +static void bnge_get_ethtool_modes(struct bnge_net *bn,
-> +				   struct ethtool_link_ksettings *lk_ksettings)
-> +{
-> +	struct bnge_dev *bd = bn->bd;
-> +	struct bnge_ethtool_link_info *elink_info = &bn->eth_link_info;
-> +	struct bnge_link_info *link_info = &bd->link_info;
+> No, not for fixed links. (I have a patch which enables this, but we
+> mutually agreed not to push it into mainline - I think you've forgotten
+> that discussion.)
 
-Reverse Christmas tree please. And other functions have the same
-problem.
+Not too surprising, given the number of discussions...
 
-> +
-> +	if (!(bd->phy_flags & BNGE_PHY_FL_NO_PAUSE)) {
-> +		linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT,
-> +				 lk_ksettings->link_modes.supported);
-> +		linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-> +				 lk_ksettings->link_modes.supported);
-> +	}
-> +
-> +	if (link_info->support_auto_speeds || link_info->support_auto_speeds2 ||
-> +	    link_info->support_pam4_auto_speeds)
-> +		linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-> +				 lk_ksettings->link_modes.supported);
+> So, the patch is the correct approach. The only thing that is missing
+> is the detailed explanation about the problem the regression is
+> causing. We have too many patches that fix regressions without
+> explaining what the effect of the regression was... which is bad when
+> we look back at the history.
 
-autoneg is more than speed. In fact, 1000BaseX only works are 1G, no
-link speed negotiation, but you can negotiate pause. Do any of the
-link modes you support work like this?
+Agreed.
 
-> +	/* Note ETHTOOL_LINK_MODE_10baseT_Half_BIT == 0 is a legal Linux
-> +	 * link mode, but since no such devices exist
-
-10BaseT Half devices definitely do exist, and there are actually more
-appearing in the automotive field.
-
+I often like Vladimirs patches. Two pages of commit message for a one
+line change.
 
     Andrew
 
