@@ -1,163 +1,93 @@
-Return-Path: <netdev+bounces-238871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACBFCC60A42
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 19:59:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBE50C60AAE
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 21:22:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 337544E1103
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 18:59:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA2FF3A9B0D
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 20:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFFE83090CC;
-	Sat, 15 Nov 2025 18:59:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E33530AAC9;
+	Sat, 15 Nov 2025 20:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ng0mue8b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34CFD302149
-	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 18:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70FDB3093C3;
+	Sat, 15 Nov 2025 20:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763233162; cv=none; b=cvk4O4iq1DMKRcSJxNhY1aUZNtrqYTMFzQljcblCY4CUZP3Pw6XrBBsbJl2oir0YusREHJr0MqtnlurqCvUTY9kpEx0+1K3xjpce8jg5qYHV7PBENASomJSPOWXAJpVxY+OdkPZ9tSr35yQTimW+oyWDVAsmoVB8J7QrMIBGnic=
+	t=1763238135; cv=none; b=fkz0T2XojKAzd39EaUsBSD3bdnuL1Uqg6MSwIi1vkwTrioIoVYQjRUdaG23NNZ2uStvjXj82+sjXY2+Pf/x5OyjSu7tTqLSPya2bSl0+9RZCZ4+Wf162BADknkQLZ80almX9n396OJq5uI+Tm4SEL4D8/eWKppyxAuRFnxWj72M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763233162; c=relaxed/simple;
-	bh=e/LG2V68qjr6KYs1x+hk24Fd2s7sou2OoKXylbs/Xqw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LyDYSiljywPEcQNDgLyIpT7ok9195x/MJbmiVUbgLLJgpcudDOo76mKzLO/KHom0NXXhHweUrHNXVnJjzVaRYZQR6aWCTvcekuE/6NC4DXgsnujaMiOnNMig+5snZwfGhhQS7ukzWplJ+qD5fE3XYzobztxKqYL453qgnkqYoRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-948c64d216cso299604839f.1
-        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 10:59:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763233160; x=1763837960;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nrPZGbyCBd7pxlNyCqNfhdlpQ1jsL6PNLDxiOB2ByCU=;
-        b=Kru6HXcpLtB2cHVkiqexoaBT2xSf/IdFMJju4kmoQGSB6ytr6g5W+mI6kwMIPFAHwf
-         Fl/tFFHi6gsWOyaYm10PUCpqusG2G0AP7D5lWK9ndTEIV5/bLtnhUpAC1p+zbq8ic58u
-         nE/ZSekgt8I6txY00LCreQ3foha7kFqLIWapcOsPoXQP7T10xolXwtbk7ygt2/ZMFYEC
-         slLzex+d1HuELG9fQxsUK5L0O+aPryrron39Ej8JKjSEk/Y4lKw6dOiBweFbqHuZDH1Z
-         mzT0ACEbmUceSUr99MNuBEUM1akPi4uvLcSdbFP5DfJCw5CaJxLGNHkDuPoFvyoozxJx
-         6o0A==
-X-Forwarded-Encrypted: i=1; AJvYcCWAnKIcMN3u1JAFkZICyCr1owlsmopUYAvOrtmQfqCXwT5LhW9uHjS5O0TqatxMVWbrIC8GDAw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjwEZBrcgfhEb+mowbTkrY4fSbPr2C18WiQd3XJ8GdCn5Z7Ic4
-	AC960FQ3T+Rasp1aKV9q08WuFSatOOtdVW1A+gBCcRBiY+BfLbRbfXwKl4y0PHKFncb6l0QGIib
-	PBAqnva8xgo6MjnDRgiFanO0Rva9FgM5H9vr1laIGAxRzq/oKRs3J1pU/w0A=
-X-Google-Smtp-Source: AGHT+IGIvtH7/W2TzbqSnewRt4yal/nomyGfj2RzYewF4jvQdhiNwfk/CchVrF7sKV3yjwCUgoVZbp0XeVLoZaJzFRI0IV2rDvCY
+	s=arc-20240116; t=1763238135; c=relaxed/simple;
+	bh=IDqY+BCoTcRpIKKZYMg89/PLmloZZEWFwyU1e0K6GS0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dKFWzwHXNPTK4htlyhdigCmYx8Ddy8f1tQT2KgCYsbejV6cp4Yw5C8TNC3KXC11H3cxpoI85dqTR6ZEhcO4H2PE1e+cBslXqwnJ6R+rRmEywkYpMrtF4gs0cWfgY649UOHZriWnJghFYTionLSM4zQSYTrHb4e0bXalG79ipr8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ng0mue8b; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=z2fwFa6QVnJuwOffEsHvva2/nbcKBkz0dp/B4EMubRY=; b=Ng0mue8bpuBdK/pxtP5fakYkI4
+	i49atV8mpzZT9KCHV4MC66YC6nzdsuI2WDQ2yWGnRbQ8UaqTHzuavYq9me5SXjx29KP8/sPyE+sKU
+	iv9rcRSq3QjvKvGGl3cz4X3TZwz7nJVan9ZLjq9+yx+x4+2SBbTunbKX4PmV6VHlUzZU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vKMmP-00E6rv-1y; Sat, 15 Nov 2025 21:21:53 +0100
+Date: Sat, 15 Nov 2025 21:21:53 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, almasrymina@google.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	horms@kernel.org, kernel-team@meta.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, linux@armlinux.org.uk,
+	pabeni@redhat.com, rmk+kernel@armlinux.org.uk
+Subject: Re: [PATCH net-next V2] eth: fbnic: Configure RDE settings for pause
+ frame
+Message-ID: <825c2171-1f35-4ded-b049-edb52323238b@lunn.ch>
+References: <20251113232610.1151712-1-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1947:b0:434:78d0:86a6 with SMTP id
- e9e14a558f8ab-4348c954efbmr107252825ab.30.1763233160379; Sat, 15 Nov 2025
- 10:59:20 -0800 (PST)
-Date: Sat, 15 Nov 2025 10:59:20 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6918cd88.050a0220.1c914e.0045.GAE@google.com>
-Subject: [syzbot] [net?] kernel BUG in ip6_pol_route (2)
-From: syzbot <syzbot+9b35e9bc0951140d13e6@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251113232610.1151712-1-mohsin.bashr@gmail.com>
 
-Hello,
+On Thu, Nov 13, 2025 at 03:26:10PM -0800, Mohsin Bashir wrote:
+> fbnic supports pause frames. When pause frames are enabled presumably
+> user expects lossless operation from the NIC. Make sure we configure
+> RDE (Rx DMA Engine) to DROP_NEVER mode to avoid discards due to delays
+> in fetching Rx descriptors from the host.
+> 
+> While at it enable DROP_NEVER when NIC only has a single queue
+> configured. In this case the NIC acts as a FIFO so there's no risk
+> of head-of-line blocking other queues by making RDE wait. If pause
+> is disabled this just moves the packet loss from the DMA engine to
+> the Rx buffer.
+> 
+> Remove redundant call to fbnic_config_drop_mode_rcq(), introduced by
+> commit 0cb4c0a13723 ("eth: fbnic: Implement Rx queue
+> alloc/start/stop/free"). This call does not add value as
+> fbnic_enable_rcq(), which is called immediately afterward, already
+> handles this.
+> 
+> Although we do not support autoneg at this time, preserve tx_pause in
+> .mac_link_up instead of fbnic_phylink_get_pauseparam()
+> 
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 
-syzbot found the following issue on:
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-HEAD commit:    7a0892d2836e Merge tag 'pci-v6.18-fixes-5' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10b9a658580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=41ad820f608cb833
-dashboard link: https://syzkaller.appspot.com/bug?extid=9b35e9bc0951140d13e6
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/168b5b7f897a/disk-7a0892d2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5d6e756ca306/vmlinux-7a0892d2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d497b0a7a1f5/bzImage-7a0892d2.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9b35e9bc0951140d13e6@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-kernel BUG at net/ipv6/route.c:1473!
-Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
-CPU: 0 UID: 0 PID: 9293 Comm: kworker/0:9 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Workqueue: wg-crypt-wg0 wg_packet_tx_worker
-RIP: 0010:rt6_make_pcpu_route net/ipv6/route.c:1473 [inline]
-RIP: 0010:ip6_pol_route+0x117d/0x1180 net/ipv6/route.c:2305
-Code: ab f8 e9 f4 fa ff ff 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c 03 fb ff ff 48 89 df e8 ae 04 ab f8 e9 f6 fa ff ff e8 b4 44 49 f8 90 <0f> 0b 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e
-RSP: 0018:ffffc90004a073c0 EFLAGS: 00010293
-RAX: ffffffff8975687c RBX: ffff888126df7000 RCX: ffff888024dd1e00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc90004a074d0 R08: ffffe8ffffc4cdd7 R09: 1ffffd1ffff899ba
-R10: dffffc0000000000 R11: fffff91ffff899bb R12: ffff88823bf78f00
-R13: ffffffff89755862 R14: dffffc0000000000 R15: 0000607ed8e55dd0
-FS:  0000000000000000(0000) GS:ffff888126df7000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffdadd5ac18 CR3: 00000000370c4000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- pol_lookup_func include/net/ip6_fib.h:617 [inline]
- fib6_rule_lookup+0x1fc/0x6f0 net/ipv6/fib6_rules.c:120
- ip6_route_output_flags_noref net/ipv6/route.c:2684 [inline]
- ip6_route_output_flags+0x364/0x5d0 net/ipv6/route.c:2696
- ip6_dst_lookup_tail+0x299/0x1510 net/ipv6/ip6_output.c:1169
- ip6_dst_lookup_flow+0x47/0xe0 net/ipv6/ip6_output.c:1272
- send6+0x4ce/0x8d0 drivers/net/wireguard/socket.c:139
- wg_socket_send_skb_to_peer+0x128/0x200 drivers/net/wireguard/socket.c:178
- wg_packet_create_data_done drivers/net/wireguard/send.c:251 [inline]
- wg_packet_tx_worker+0x1c8/0x7c0 drivers/net/wireguard/send.c:276
- process_one_work kernel/workqueue.c:3263 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:rt6_make_pcpu_route net/ipv6/route.c:1473 [inline]
-RIP: 0010:ip6_pol_route+0x117d/0x1180 net/ipv6/route.c:2305
-Code: ab f8 e9 f4 fa ff ff 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c 03 fb ff ff 48 89 df e8 ae 04 ab f8 e9 f6 fa ff ff e8 b4 44 49 f8 90 <0f> 0b 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e
-RSP: 0018:ffffc90004a073c0 EFLAGS: 00010293
-RAX: ffffffff8975687c RBX: ffff888126df7000 RCX: ffff888024dd1e00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc90004a074d0 R08: ffffe8ffffc4cdd7 R09: 1ffffd1ffff899ba
-R10: dffffc0000000000 R11: fffff91ffff899bb R12: ffff88823bf78f00
-R13: ffffffff89755862 R14: dffffc0000000000 R15: 0000607ed8e55dd0
-FS:  0000000000000000(0000) GS:ffff888126df7000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffdadd5ac18 CR3: 00000000370c4000 CR4: 00000000003526f0
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+    Andrew
 
