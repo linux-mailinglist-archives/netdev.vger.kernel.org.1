@@ -1,139 +1,120 @@
-Return-Path: <netdev+bounces-238895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35A73C60BC9
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 22:46:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D91DC60BD8
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 22:54:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B8A964E0FA8
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 21:46:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B53944E1218
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 21:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8631419D8AC;
-	Sat, 15 Nov 2025 21:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC10227EA7;
+	Sat, 15 Nov 2025 21:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BqUkofmW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jrG0PVe8"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE3675809;
-	Sat, 15 Nov 2025 21:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11152CCC0
+	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 21:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763243201; cv=none; b=E6wo+/TQoDQt6ECS0UVmAzTFv4lRrdMhX1TKRDgZrEW9gsbTIOBMgleNA2VzSAtmJG0gLQHy4mVv0ziTUACHjUEiuVSM5Av3b23kcICvrYWB1d/IsBIFHvComt5It5ITjopFjNv75BrKn3gr3K254YeHvQqMfINeKT24NvD3AsU=
+	t=1763243663; cv=none; b=i1Wwx3pQZ6LmN3J3eiz9f8SEBQGCPVypntgq97gtJzOVxRdKoNSH9/J8WH7JFdhMmBc04fe7YaAC4nB0SpFiWuNdUdY7PVxEmGSxiayoSeDSmRo7OcqDRMpE87qth7JI0bDH9Vq2Culni39boNXorZ37WX7AZQOBpDt1V6tQ4Go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763243201; c=relaxed/simple;
-	bh=DS7jnr7LQcK8wBxZTxE00YtiWyfNkU3wGfkFfgB9S2w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eKUrWEyRtYJfgG8Tl9P797rL14kTYM0cdbJomJl0Lsa8YxIIEN4DASEeHeQOkMlA8CqQAIlHg+pPSLNbX5qSBJRM4KNxfo1HtBnje4suYIljzmQPUeUX90J39oT5BwhZFiLFFWuCHLMrQcBY3bB8EtYKzpgpXG7p9uyUiwmkNtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BqUkofmW; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/whuAK3kZgLzmadCmNYa4Vh8RN8Z7SP1J4SvcMcHv2Q=; b=BqUkofmWLA/5XsBL3zG6W2CG9A
-	2w8hAJDCdvu170jvmqVCh3C7wzLAfwYwGsO7TlSjv4QZyuFKHdKFjBZt+zm705bTebsUzav8cupwK
-	AUWns5itZzZxccGXPwG6PL43hFGPs/s9dw/D5mG+LY37jHakJ8jsJNv+muqE7HUbJMJw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vKO60-00E7C7-S7; Sat, 15 Nov 2025 22:46:12 +0100
-Date: Sat, 15 Nov 2025 22:46:12 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Po-Yu Chuang <ratbert@faraday-tech.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-	"taoren@meta.com" <taoren@meta.com>
-Subject: Re: [PATCH net-next v4 4/4] net: ftgmac100: Add RGMII delay support
- for AST2600
-Message-ID: <041e23a2-67e6-4ebb-aee5-14400491f99c@lunn.ch>
-References: <20251110-rgmii_delay_2600-v4-0-5cad32c766f7@aspeedtech.com>
- <20251110-rgmii_delay_2600-v4-4-5cad32c766f7@aspeedtech.com>
- <68f10ee1-d4c8-4498-88b0-90c26d606466@lunn.ch>
- <SEYPR06MB5134EBA2235B3D4BE39B19359DCCA@SEYPR06MB5134.apcprd06.prod.outlook.com>
- <3af52caa-88a7-4b88-bd92-fd47421cc81a@lunn.ch>
- <SEYPR06MB51342977EC2246163D14BDC19DCDA@SEYPR06MB5134.apcprd06.prod.outlook.com>
+	s=arc-20240116; t=1763243663; c=relaxed/simple;
+	bh=h/D+0cPQv0yTtx3AqzqzgEIjlEU+lWJTGeVD+H497GQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U93+ceGyxrx6P7Eroq3se6qhLhidXDTUb+GM+WHR5qnOkswx9MtBS/lDxdRa3sjefYnwXd2MxeLvHDXUHPFq1XHv0A5JYZh+TQHlCkfxiYtTOr+Bj7ZPz+D1+Lsolo3o+H4SB2lJPV9MRgn2RCovwn0gxURLw7y3ed9OoZnblvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jrG0PVe8; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-37b97e59520so22403661fa.2
+        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 13:54:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763243660; x=1763848460; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AhiRZGRZUaljPmUDOqzazXcrEsnTyVCYslWVoh4MNLU=;
+        b=jrG0PVe8Ui+cmXUZuMEIg8Ly1mW6sMgGcLjMw/qIrlUIdrSU945AOsyrRWxi59Bb/7
+         S+zXJVBVSAvWJ8qPvp1Ys8i2mcBtpWDqXQyA098ENsh0mtGsp2E2qmtRaTqCmQFf5Ucd
+         W1occdpbNdJS0RnV5zdy7Xr5EVF+cMF/fKT9TjZ56DVqU2w8l2jfQx8FLljTL7t03V8c
+         KmmzNmvFB5DYTjE6HW1d17y5uT6fXsjaYxg+Fnp7zQy/b7R4Bav9P+/gkgMWGP5j6Ax0
+         LNR8+L9JV94BVMhiwewZcxU5382qb13ahCyFkKR8VFR0aF+vrvpxOX+egZ0jGHGrq9jC
+         RV+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763243660; x=1763848460;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=AhiRZGRZUaljPmUDOqzazXcrEsnTyVCYslWVoh4MNLU=;
+        b=QZ0L0haXXhBCUQrOXy66y6io466k8bH8I9fOGtWlBM87643G0mHvSlOF0I7q5N7K8/
+         coKPFqfvZ46nANyHwlpF1Zot1wgYAC3tQV1ur6wijvkIBhGASjKDw10OJmo96gvcRaop
+         SyZEsf/DprkGF6DTW2Kc7KWc3w+fSIPyPXj20nWJLGILgh88cRUZvHzuHuN7CZSUU0yQ
+         MRKbGEVyvYrpz1z2z7ovZGaEMPaYEukwM2W3dYkRShPQOGPgrA9N5hXlbroZNnOoKB3z
+         9mwVVOFJE/N078Fmz2kfuphuXrwEriFbev4QcKXGgGBLVci/4AyRvtKcSZhpyfd6X7as
+         AavA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+3Dj5o53owIaRb6j6ByI7wXF/9B52gLepULSsKHb44fm5EV6FwAQLyqL+WT2rO+H/WHcaPlI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3prtrWWpkRGwXRNR52P2BtZ2wu6/HVq7bBAv5gIlO64rPFVu4
+	lIBaEEaHOg9KXBB5oPJTEpnymDDD2UNLJ/DilQ5OiFRgYoTTEwtAr1onCxXGITLH7xm3oNpBKDM
+	1maL1gMhlLAYFCl68ze/LWhIrtImeTho=
+X-Gm-Gg: ASbGnct4SyxrD6t1PqEcIX72YvoZgYs3ZHV8/Ea8IeAP+kJdYIV0aMippAyTKdosNG+
+	KSc67q91hw7+f3DZaE1zq6Mm8KcTkyKCy7HwIJR9OGoJRXNqq731XePxsJ0CAj6yWoHGzPE4jSC
+	IJe8/bBCV/ChKsRQuJk7W8f0ccJMiY/m0sgZ1mzrddOSjdHszCpq8R6FgZa9t+QzQ17E6ROSKNW
+	BJyFpUa0TdbCRLAIyq/DBp6X6OZWJZ1M0WW7KW0YVykIEgjwRtHTdktPbFqe5Imh+QGSH94UN/G
+	g3H7k3Km9JJHhq2TI5sDxvTamyzWS5QRhhnD6U93TgJz9XEl
+X-Google-Smtp-Source: AGHT+IFDk8MTG35SUzb3bRIXkilk8VDC1Q8vyF7dJu+iCyupdmY4oNMuD63lty9E8ejIsVZfJw8GJVpeTGhUKD1jNog=
+X-Received: by 2002:a05:6512:3b98:b0:594:27c6:9ea with SMTP id
+ 2adb3069b0e04-5958423ef90mr2168586e87.35.1763243659637; Sat, 15 Nov 2025
+ 13:54:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SEYPR06MB51342977EC2246163D14BDC19DCDA@SEYPR06MB5134.apcprd06.prod.outlook.com>
+References: <CAOMZO5DFxJSK=XP5OwRy0_osU+UUs3bqjhT2ZT3RdNttv1Mo4g@mail.gmail.com>
+ <e9c5ef6c-9b4c-4216-b626-c07e20bb0b6f@lunn.ch> <CAOMZO5BEcoQSLJpGUtsfiNXPUMVP3kbs1n9KXZxaWBzifZHoZw@mail.gmail.com>
+ <1ec7a98b-ed61-4faf-8a0f-ec0443c9195e@gmail.com> <CAOMZO5CbNEspuYTUVfMysNkzzMXgTZaRxCTKSXfT0=WmoK=i5Q@mail.gmail.com>
+ <7082e2d0-a5a9-4b00-950f-dc513975af1c@gmail.com>
+In-Reply-To: <7082e2d0-a5a9-4b00-950f-dc513975af1c@gmail.com>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Sat, 15 Nov 2025 18:54:08 -0300
+X-Gm-Features: AWmQ_bkylFEux-3bKEM8kjLfKsf51uvRa6BzdS9tZrxp84P96-tFZyvYObMCFJ0
+Message-ID: <CAOMZO5CLvDMgxi+VUVgiTy=TsK75QMYrTYZDEOzY4Y7eN=CRMw@mail.gmail.com>
+Subject: Re: LAN8720: RX errors / packet loss when using smsc PHY driver on i.MX6Q
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>, edumazet <edumazet@google.com>, 
+	netdev <netdev@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Based on the above information, I have attempted to outline my understanding.
-> 1. 'rgmii' + MAC delay:
-> Add warming, keep MAC delay and pass "rgmii-id" to PHY driver.
+On Sat, Nov 15, 2025 at 6:26=E2=80=AFPM Heiner Kallweit <hkallweit1@gmail.c=
+om> wrote:
 
-Think about that. What delays do you get as a result?
+> smsc_phy_reset() does two things:
+> 1. set PHY to "all capable" mode if in power-down
+> 2. genphy_soft_reset()
+>
+> Again, as the genphy driver works fine for you, both parts should be opti=
+onal.
+> Check with part is causing the packet loss.
 
-> 2. 'rgmii-id' + MAC delay:
-> disable MAC delay and pass "rgmii-id" to PHY driver
-> 
-> 3. 'rgmii-id' + no MAC delay:
-> Keep disabling MAC delay and pass "rgmii-id" to PHY driver
-> 
-> 4. 'rgmii-txid' or 'rgmii-rxid':
-> Keep original setting
+It is the genphy_soft_reset() that causes the packet loss.
 
-> I have some idea to discuss with you.
-> 1. On 'rgmii', I want to add warming and directly disable MAC delay and pass 'rgmii-id' 
-> to PHY driver.
+If I comment it out like this, there is no packet loss:
 
-Yep.
+--- a/drivers/net/phy/smsc.c
++++ b/drivers/net/phy/smsc.c
+@@ -149,8 +149,7 @@ static int smsc_phy_reset(struct phy_device *phydev)
+                phy_write(phydev, MII_LAN83C185_SPECIAL_MODES, rc);
+        }
 
-> 
-> 2. On 'rgmii-id', ignore if enabling MAC delay, all disable MAC delay and pass ' rgmii-id'
-> to PHY driver.
-> 
-> 3. On 'rgmii-txid' or 'rgmii-rxid', keep the above item 4.
-> 
-> Actually, it's difficult for the driver to determine whether the MAC delay is enabled or not.
-> Our design doesn't use a single bit to indicate the delay state. Instead, the delay setting is 
-> derived from the user's configured delay value.
-
-But you can turn it back to ps. I would say, if it is > 1000, the
-intention is it provides the 2ns delay. If it is < 1000 it is just a
-minor tuning value because of bad board design.
-
-Do you have experience from the field, what do real boards use? Are
-they all inserting the same 2ns? Or is each customer tuning their
-bootloader to configure the hardware differently per board design?
-
-You might even need a more complex solution. If the bootloader is
-adding a delay between say 200ps and 1600ps, it suggests a poorly
-designed board, and the PHY adding 2ns is not going to work. There is
-a need for rx-internal-delay-ps or tx-internal-delay-ps in DT. You can
-give a warning, and indicate what values are needed, but leave the
-hardware alone. If the bootloader is setting the delay > 1600, passing
-_RGMII_ID to the PHY, and disabling MAC delays is likely to work, so
-you just need to warn about phy-mode being wrong. If the bootloader is
-inserting < 200ps, and phy-mode is rgmii-id, that is just fine
-tuning. Maybe suggest rx-internal-delay-ps or tx-internal-delay-ps be
-added in DT, but leave it alone.
-
-Whatever you do, you need a lot of comments in the code and the commit
-message to help developers understand why they are seeing warnings and
-what they need to do.
-
-	Andrew
+-       /* reset the phy */
+-       return genphy_soft_reset(phydev);
++       return 0
+ }
 
