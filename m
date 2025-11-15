@@ -1,151 +1,139 @@
-Return-Path: <netdev+bounces-238901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CC9BC60CB1
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 00:27:53 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CC30C60CBD
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 00:33:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F33C3AD2B8
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 23:27:17 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C95D1351D12
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 23:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA93121CC68;
-	Sat, 15 Nov 2025 23:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCD923372C;
+	Sat, 15 Nov 2025 23:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XyhNtvsw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VH22xkVp"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7470818EAB
-	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 23:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CCCA24A069
+	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 23:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763249234; cv=none; b=n84+uqi4S2d4sanO+Mt0DnokiQM7go/vO/9kujS0jyBO9RTWKwTxc4hWe1p5xygvv8hcvpsA37JJAPeFYMnq8KOPOuBcNOjU1izW+NFvS6IgvvJjgmHeHrvODz53K9y+AWB24ut8pgs5fYIFZYs2lfa4o8BDUKdVgKakmeY6Bao=
+	t=1763249633; cv=none; b=GUEvJtlxD2Smq8W76BuBz4kloCBwQBoDTEBjnQbHN7f5IlCRqVDjWumHVg2DLiWl9sJ9ZjoaeHyrXkmpJQwwM90RAN8ae0EjM7t5YwCHKx6sIbEJNaqoBQlPsoLWS6rJdq7s0M1tUQf54dwe8UwwNFvecxQNMuEAxqhPEJHHp34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763249234; c=relaxed/simple;
-	bh=5SIkcrHpVfQkJCfOim36ZGxZeZZvIIcbhm65bidYmJI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WFpmqIou1mRROoB/vaZtpoHg/IWThU8g0mWyCMWfLcJYsPeZJPMdIQpYUlKMwoTpzaDmfKrdxmAbMDQ4d8IHfqzaESnsCxeQ/FGagWnyGCFdEgLZrrHvYhvYN4Ww0Vksq8JlKVsAhCjKcaIYGvv5un8xGkMZ4f+Z7oDj+iwYeDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XyhNtvsw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5X8suHKD8ooe7QZd86ThpOqubLlZ+yx/kWOd+TWEfu4=; b=XyhNtvswwzkZxAUPrju/tJERo5
-	WzBPjzJpLjPqxYRZuSLH9yj0024x+Xxs/Cxi5maTqEz2EiKm9qIHliJCN+yxnrbY4xvTnnyC9qa3r
-	wFIG97CDA644Q8savKvkrT/N+SJsblwdATlWzdor2Mo8mPfg8ia/JW7DnvqxGrs2//qo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vKPfc-00E7VI-9I; Sun, 16 Nov 2025 00:27:04 +0100
-Date: Sun, 16 Nov 2025 00:27:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lee Trager <lee@trager.us>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Susheela Doddagoudar <susheelavin@gmail.com>,
-	netdev@vger.kernel.org, mkubecek@suse.cz,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Alexander Duyck <alexanderduyck@fb.com>
-Subject: Re: Ethtool: advance phy debug support
-Message-ID: <2fcc7d12-b1cf-4a24-ac39-a3257e407ef7@lunn.ch>
-References: <CAOdo=cNAy4kTrJ7KxEf2CQ_kiuR5sMD6jG3mJSFeSwqD6RdUtw@mail.gmail.com>
- <843c25c6-dd49-4710-b449-b03303c7cf45@bootlin.com>
- <eca707a6-7161-4efc-9831-69fbfa56eb93@lunn.ch>
- <52e1917a-2030-4019-bb9f-a836dc47bda9@trager.us>
- <401e9d39-2c28-480e-b1c4-d3601131c1fb@lunn.ch>
- <399ca61a-abf0-4b37-af32-018a9ef08312@trager.us>
+	s=arc-20240116; t=1763249633; c=relaxed/simple;
+	bh=mD8u1LEgv/Ni0dgfjs1uXMPs6B8V3YQPUlTdJGGqCUw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z4tlKtMqCTAAzs/SKlUdKjLYv9hsNsMFJOljsFxxApftOm9PkjAiRI9y/fCMafUa9ZkMPXUtU4d0mmxmT7B8aExkm0p2m6FM7ABKCeiZ1PSdN4W4LpJRY12Oo9fr5vvvJY2xL3+wwKT8Rl1MHWbP1KfKMU0uNBaoT/+l+z9svxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VH22xkVp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763249631;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZcYWD9dF+zfshn2OXyGUnjoKzc4InY3fRLHBkUYH4FQ=;
+	b=VH22xkVpUtZfhMCJV99VbxdK3V4gosF21nH/Z1/s2pi4rsvPsMuClk2tabshB7Bgk9jJFJ
+	gHI1IQujcavZWOjKLP09kxtt2R5QtCimp+BxP7LEOID1LtI7oqiiHnS6d+IXk1o2oTxLsR
+	ghzFvZEEznVNdMaG3U/tvqYcNbEFfOw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-550-6YEts9qJPGawS9RYvFzJ1w-1; Sat,
+ 15 Nov 2025 18:33:48 -0500
+X-MC-Unique: 6YEts9qJPGawS9RYvFzJ1w-1
+X-Mimecast-MFC-AGG-ID: 6YEts9qJPGawS9RYvFzJ1w_1763249628
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5C2A81956088;
+	Sat, 15 Nov 2025 23:33:47 +0000 (UTC)
+Received: from ShadowPeak.redhat.com (unknown [10.44.32.88])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0840019560A7;
+	Sat, 15 Nov 2025 23:33:44 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: dsahern@kernel.org,
+	stephen@networkplumber.org,
+	ivecera@redhat.com,
+	jiri@resnulli.us,
+	Petr Oros <poros@redhat.com>
+Subject: [PATCH iproute2-next v4 0/3] Add DPLL subsystem management tool
+Date: Sun, 16 Nov 2025 00:33:38 +0100
+Message-ID: <20251115233341.2701607-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <399ca61a-abf0-4b37-af32-018a9ef08312@trager.us>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-> PRBS testing can be used as a signal integrity test between any two end
-> points, not just networking. For example we have CSRs to allow PRBS testing
-> on PCIE with fbnic. My thought was always to limit the scope to network use
-> case. The feedback I received at Netdev was we need to handle this
-> generically for any phy, thus the suggestion to do this on phy. That adds a
-> ton of complexity so I'd be supportive to narrow this down to just
-> networking and leverage ethtool.
+This patch series adds a new userspace tool for managing and monitoring
+DPLL (Digital Phase-Locked Loop) devices via the Linux kernel DPLL
+subsystem.
 
-We need to be careful with terms here. We have PHYs driven by phylib,
-bitstreams to signals on twisted pairs, drivers/net/phy
+The series includes preparatory patches to move shared code to lib/ and
+the main dpll tool implementation with full support for device/pin
+management, monitoring, and JSON output.
 
-And we have generic PHYs, which might contain a SERDES, for PCIE,
-SATA, USB, /drivers/phy.
+Changes in v4:
+- Replace DPLL_PR_MULTI_ENUM_STR macro with dpll_pr_multi_enum_str() function
+- Replace pr_out("\n") with print_nl() for one-line mode support
+- Remove all is_json_context() code splitting, use PRINT_FP/PRINT_JSON/PRINT_ANY
+- Add dpll_pr_freq_range() helper function to reduce code duplication
+- Remove trivial comments
 
-Maxime reference to comphy for Marvell is a generic PHY, and they do
-implement SATA, USB and networking.
+Changes in v3:
+- Use shared mnlg and str_to_bool helpers from lib
+- Use str_num_map for bidirectional string/enum mapping
+- Remove unnecessary else after return
+- Remove misleading "legacy" comments
+- Simplify DPLL_PR_MULTI_ENUM_STR macro
+- Convert json_output to global json variable
+- Use appropriate mnl helpers with proper type casting for signed integers
+- Use DPLL_PR_INT_FMT for phase-adjust-gran to respect signed integer type
+- Remove dpll_link from Makefile (mistake in v2)
 
-Having said that, i don't see why you should not narrow it down to
-networking, and ethtool. It might well be Marvell MAC drivers could
-call into the generic PHY, and the API needed for that should be
-reusable for anybody wanting to do testing of PCIE via a PRBS within a
-generic PHY.
+Changes in v2:
+- Added testing notes
+- Added MAINTAINERS entry
+- Removed unused -n parameter from man page
 
-As i said before, what is important is we have an architecture that
-allows for PRBS in different locations. You don't need to implement
-all those locations, just the plumbing you need for your use case. So
-MAC calling phylink, calling into the PCS driver. We might also need
-some enumeration of where the PRBSes are, and being able to select
-which one you want to use, e.g. you could have a PCS with PRBS, doing
-SGMII connecting to a Marvell PHY which also has PRBS.
+Petr Oros (3):
+  lib: Move mnlg to lib for shared use
+  lib: Add str_to_bool helper function
+  dpll: Add dpll command
 
-> > That actually seems odd to me. I assume you need to set the link mode
-> > you want. Having it default to 10/Half is probably not what you
-> > want. You want to use ethtool_ksettings_set to force the MAC and PCS
-> > into a specific link mode. Most MAC drivers don't do anything if that
-> > call is made when the interface is admin down. And if you look at how
-> > most MAC drivers are structured, they don't bind to phylink/phylib
-> > until open() is called. So when admin down, you don't even have a
-> > PCS/PHY. And some designs have multiple PCSes, and you select the one
-> > you need based on the link mode, set by ethtool_ksettings_set or
-> > autoneg. And if admin down, the phylink will turn the SFP laser off.
-> 
-> fbnic does not currently support autoneg
+ MAINTAINERS                 |    5 +
+ Makefile                    |    3 +-
+ bash-completion/dpll        |  316 ++++++
+ devlink/Makefile            |    2 +-
+ devlink/devlink.c           |   22 +-
+ dpll/.gitignore             |    1 +
+ dpll/Makefile               |   38 +
+ dpll/dpll.c                 | 1933 +++++++++++++++++++++++++++++++++++
+ {devlink => include}/mnlg.h |    0
+ include/utils.h             |    1 +
+ lib/Makefile                |    2 +-
+ {devlink => lib}/mnlg.c     |    0
+ lib/utils.c                 |   17 +
+ man/man8/dpll.8             |  428 ++++++++
+ 14 files changed, 2746 insertions(+), 22 deletions(-)
+ create mode 100644 bash-completion/dpll
+ create mode 100644 dpll/.gitignore
+ create mode 100644 dpll/Makefile
+ create mode 100644 dpll/dpll.c
+ rename {devlink => include}/mnlg.h (100%)
+ rename {devlink => lib}/mnlg.c (100%)
+ create mode 100644 man/man8/dpll.8
 
-autoneg does not really come into this. Yes, ksettings_set can be used
-to configure what autoneg offers to the link partner. But if you call
-ksettings_set with the autoneg parameter set to off, it is used to
-directly set the link mode. So this is going to be the generic way you
-set the link to the correct mode before starting the test.
+-- 
+2.51.0
 
-fbnic is actually very odd in that the link mode is hard wired at
-production time. I don't know of any other device that does
-that. Because fbnic is odd, while designing this, you probably want to
-ignore it, consider 'normal' devices making use of the normal
-APIs. Maybe go buy a board using stmmac and the XPCS_PCS driver, so
-you have a normal system to work on? And then make sure the oddball
-fbnic can be somehow coerced to do the right thing like normal
-devices.
-
-> > > When I spoke with test engineers internally in Meta I could not come up with
-> > > a time period and over night testing came up as a requirement. I decided to
-> > > just let the user start and stop testing with no time requirement. If
-> > > firmware loses the host heartbeat it automatically disables PRBS testing.
-> > O.K. So i would probably go for a blocking netlink call, and when ^C
-> > is used, to exits PRBS and allows normal traffic. You then need to
-> > think about RTNL, which you cannot hold for hours.
-> RTNL() is only held when starting testing, its released once testing has
-> begun. We could set a flag on the netdev to say PRBS testing is running,
-> don't do anything else with this device until the flag is reset.
-
-Its the ^C bit which makes it interesting. The idea is used other
-places in the stack. mrouted(1) and the kernel side for multicast
-routing does something similar. So long at the user space daemon holds
-the socket open, the kernel maintains the multicast routing
-cache. Once the socket is closed, because the daemon as died/exited,
-the kernel flushes the cache. But this is an old BSD sockets
-behaviour, not netlink sockets. I've no idea if you can do the same
-with netlink, get a notification when a process closes such a socket.
-
-	Andrew
 
