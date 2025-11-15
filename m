@@ -1,101 +1,253 @@
-Return-Path: <netdev+bounces-238866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD3A4C60819
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 16:53:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2327EC60843
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 17:01:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BA2B3B5B83
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 15:53:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C06534E446F
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 16:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0272737E3;
-	Sat, 15 Nov 2025 15:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CE2F2877FA;
+	Sat, 15 Nov 2025 16:00:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SLEtXJs9";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fCWvnkFh"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="CoBMien1"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E77C221F13;
-	Sat, 15 Nov 2025 15:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F173AD515;
+	Sat, 15 Nov 2025 16:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763222014; cv=none; b=YOaRKnLceNphbc3EbUzul39tmSNdxf3ra1vdu8xtQeL5R8jJB/qfW2II3N/7PM9nPIzkGJE/OzwYiD54o01Xvzx20fKSxbE7ffQRp5AEBRBkkYVLxCroU+/aklGgkHlbiVq+brvnRSE7/lRKRnkNTurqDvG/IqXANyp64NCzgmY=
+	t=1763222458; cv=none; b=bsfrdYBTY3GG+olaRQrkXSd8pjmDlOagiGNur62RG74tnv/ggjYb5PqjMyqewSK9iDYXaCtEwAkyZKwVadRmY0AZpwKl7mM0SbkYV7/IQKPUpHmJgRI7vRulum7yB5DYbT3ZbDGo4/MkrE9OEwXfMdOP9FCrq9ViqucZLW4pVRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763222014; c=relaxed/simple;
-	bh=EwI8Hmw+254IZUwdLgVMHCQUgGZu/DpRy2TKDt3lpxg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=cA4KvByywCF0279xvn0aqkG44ePnQMyvJ2Fa1KUbuyRBYHkQlno35KTmLADG3AOrB3/AFF8Yss83UBJJi8G2mPwNRm43FoM6kis7X76bhrHzskPlcKX2+8tR2Jik9L/2ghHKguj29yI9MIpKctzmULjdOOXwdQZJ6A/Fl8eJ5LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SLEtXJs9; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fCWvnkFh; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1763222011;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xZ3ruAdoiAVL5AiOWMufuanCJT2Hk+KKUqr8L/GImxg=;
-	b=SLEtXJs90G/7NF9CrSjBMolaz51zpek96DGbr3R8BvIftzWculk19f97DkjJIqgyyOE5b1
-	rJq4JYu+8eltZRC6K+Ky57qlhN2irEA0MVU6CbJrmV6I2WxV6d7H4STn3FmW2Nm2iAukJ1
-	Lb8+gYcxQTz8PXfTHVLntDKFeg/wHLmYTUNXVU7q8+YKUJOK7GGJ4Ht7pDCTSTNrD9qetm
-	bwZVGPoW3pSFcoWuUh5ciT5paxc6cOtYOyWcMyrDIjB0kKPRd+w9rnUbKiuawGL22julqt
-	2tsXicGSHUzzZFnVkQbPDZJumodu0COCelq70rNBeeac/Ib2X38KS/w1VXZucw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1763222011;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xZ3ruAdoiAVL5AiOWMufuanCJT2Hk+KKUqr8L/GImxg=;
-	b=fCWvnkFhaCE05joawZuvor/UjHcnZb/Uv1cgWtTEj3z+VMFBzvtxj4oixCLjs41kiNl59I
-	ipV96EcnsYStGXCg==
-To: Christophe Leroy <christophe.leroy@csgroup.eu>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan
- Kara <jack@suse.cz>, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra
- <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, Davidlohr
- Bueso <dave@stgolabs.net>, Andre Almeida <andrealmeid@igalia.com>, Andrew
- Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman
- <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Dave Hansen
- <dave.hansen@linux.intel.com>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v4 03/10] uaccess: Use
- masked_user_{read/write}_access_begin when required
-In-Reply-To: <5effda898b110d413dc84a53c5664d4c9d11c1bf.1762427933.git.christophe.leroy@csgroup.eu>
-References: <cover.1762427933.git.christophe.leroy@csgroup.eu>
- <5effda898b110d413dc84a53c5664d4c9d11c1bf.1762427933.git.christophe.leroy@csgroup.eu>
-Date: Sat, 15 Nov 2025 16:53:30 +0100
-Message-ID: <87h5uv9ts5.ffs@tglx>
+	s=arc-20240116; t=1763222458; c=relaxed/simple;
+	bh=cnTdkt+FylY6A9BQ3tCHUmifMXiuKWjX+ttDWqiF3d4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=IpQaix8jHeTKsBXZh5h13MIAXQ0m8NGfSmP+ALHakVzXpVb7dNmkYY38Ogl5NycvbOKYaHg582CiQBaGQvesh7R+lddZ5Qg2aXSH+0XnukDDlLdBkOC1GmlMSi8YSdvTnyXcWFoaCY/Tgy7/43rLHWoPDnS8fHJdeXOfrimOQl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=CoBMien1; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1vKIhb-00BbZ6-Ur; Sat, 15 Nov 2025 17:00:39 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=Y1+0I5DNaklRmiPaKQneT6QdBuDFdaUb1T3q9FwoyRw=; b=CoBMien1HX4yz7iKV4ijFHz83k
+	blUPV1FGv52Yw8IT8efrKyipnSopg85cSe/tTTkAZeS5uZQEbBdIqhktE5GaD9tl5AxEpqdJf+RF4
+	FbULrpCJSzbZjuL+oaZ/DvBCzvB/G9pdQmGoQ2rcqKCxdczs2UMv8fGs1O1l4dkfyZViuRX//WL5k
+	gkJK+kRMLkzOJ6JAmcLsxbpz3CoKWdG/S/iv3MA33i9yN9EFzBEX6iUnVLYRFm2RUQmq1nL9mFfuY
+	3s/DcoTyPkjAxTzszyXEMfpW3jA9hds7LAFCZEUOp3ObE71kAoTPvHwo99ksV39rae5BObqI/L+I0
+	qUqGAPrA==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1vKIhb-0002Zy-0f; Sat, 15 Nov 2025 17:00:39 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vKIhS-005hIo-7j; Sat, 15 Nov 2025 17:00:30 +0100
+Message-ID: <60f1b7db-3099-4f6a-875e-af9f6ef194f6@rbox.co>
+Date: Sat, 15 Nov 2025 17:00:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [syzbot] [virt?] [net?] possible deadlock in vsock_linger
+To: Stefano Garzarella <sgarzare@redhat.com>,
+ syzbot <syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
+ virtualization@lists.linux.dev
+References: <68f6cdb0.a70a0220.205af.0039.GAE@google.com>
+ <pehr4umqwjv3a7p4uudrz3uuqacu3ut66kmazw2ovm73gimyry@oevxmd4o664k>
+ <CAGxU2F5y+kdByEwAq-t15fyrfrgQGpmapmLgkmDmY4xH4TJSDw@mail.gmail.com>
+ <CAGxU2F6KaqmmK7qP55Rs8YHLOX62HyT77wY-RU1qPFpjhgV4jg@mail.gmail.com>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <CAGxU2F6KaqmmK7qP55Rs8YHLOX62HyT77wY-RU1qPFpjhgV4jg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 06 2025 at 12:31, Christophe Leroy wrote:
-> diff --git a/net/core/scm.c b/net/core/scm.c
-> index 66eaee783e8be..4a65f9baa87e7 100644
-> --- a/net/core/scm.c
-> +++ b/net/core/scm.c
-> @@ -274,7 +274,7 @@ int put_cmsg(struct msghdr * msg, int level, int type, int len, void *data)
->  		check_object_size(data, cmlen - sizeof(*cm), true);
->  
->  		if (can_do_masked_user_access())
-> -			cm = masked_user_access_begin(cm);
-> +			cm = masked_user_write_access_begin(cm);
->  		else if (!user_write_access_begin(cm, cmlen))
->  			goto efault;
+On 10/21/25 14:19, Stefano Garzarella wrote:
+> On Tue, 21 Oct 2025 at 12:48, Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> On Tue, 21 Oct 2025 at 10:27, Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>>
+>>> Hi Michal,
+>>>
+>>> On Mon, Oct 20, 2025 at 05:02:56PM -0700, syzbot wrote:
+>>>> Hello,
+>>>>
+>>>> syzbot found the following issue on:
+>>>>
+>>>> HEAD commit:    d9043c79ba68 Merge tag 'sched_urgent_for_v6.18_rc2' of git..
+>>>> git tree:       upstream
+>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=130983cd980000
+>>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=f3e7b5a3627a90dd
+>>>> dashboard link: https://syzkaller.appspot.com/bug?extid=10e35716f8e4929681fa
+>>>> compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+>>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17f0f52f980000
+>>>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11ea9734580000
+>>>>
+>>>> Downloadable assets:
+>>>> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-d9043c79.raw.xz
+>>>> vmlinux: https://storage.googleapis.com/syzbot-assets/0546b6eaf1aa/vmlinux-d9043c79.xz
+>>>> kernel image: https://storage.googleapis.com/syzbot-assets/81285b4ada51/bzImage-d9043c79.xz
+>>>>
+>>>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>>>> Reported-by: syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com
+>>>>
+>>>> ======================================================
+>>>> WARNING: possible circular locking dependency detected
+>>>> syzkaller #0 Not tainted
+>>>> ------------------------------------------------------
+>>>> syz.0.17/6098 is trying to acquire lock:
+>>>> ffff8880363b8258 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1679 [inline]
+>>>> ffff8880363b8258 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: vsock_linger+0x25e/0x4d0 net/vmw_vsock/af_vsock.c:1066
+>>>
+>>> Could this be related to our recent work on linger in vsock?
+>>>
+>>>>
+>>>> but task is already holding lock:
+>>>> ffffffff906260a8 (vsock_register_mutex){+.+.}-{4:4}, at: vsock_assign_transport+0xf2/0x900 net/vmw_vsock/af_vsock.c:469
+>>>>
+>>>> which lock already depends on the new lock.
+>>>>
+>>>>
+>>>> the existing dependency chain (in reverse order) is:
+>>>>
+>>>> -> #1 (vsock_register_mutex){+.+.}-{4:4}:
+>>>>       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+>>>>       __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
+>>>>       vsock_registered_transport_cid net/vmw_vsock/af_vsock.c:560 [inline]
+>>>
+>>> Ah, no maybe this is related to commit 209fd720838a ("vsock:
+>>> Fix transport_{g2h,h2g} TOCTOU") where we added locking in
+>>> vsock_find_cid().
+>>>
+>>> Maybe we can just move the checks on top of __vsock_bind() to the
+>>> caller. I mean:
+>>>
+>>>         /* First ensure this socket isn't already bound. */
+>>>         if (vsock_addr_bound(&vsk->local_addr))
+>>>                 return -EINVAL;
+>>>
+>>>         /* Now bind to the provided address or select appropriate values if
+>>>          * none are provided (VMADDR_CID_ANY and VMADDR_PORT_ANY).  Note that
+>>>          * like AF_INET prevents binding to a non-local IP address (in most
+>>>          * cases), we only allow binding to a local CID.
+>>>          */
+>>>         if (addr->svm_cid != VMADDR_CID_ANY && !vsock_find_cid(addr->svm_cid))
+>>>                 return -EADDRNOTAVAIL;
+>>>
+>>> We have 2 callers: vsock_auto_bind() and vsock_bind().
+>>>
+>>> vsock_auto_bind() is already checking if the socket is already bound,
+>>> if not is setting VMADDR_CID_ANY, so we can skip those checks.
+>>>
+>>> In vsock_bind() we can do the checks before lock_sock(sk), at least the
+>>> checks on vm_addr, calling vsock_find_cid().
+>>>
+>>> I'm preparing a patch to do this.
+>>
+>> mmm, no, this is more related to vsock_linger() where sk_wait_event()
+>> releases and locks again the sk_lock.
+>> So, it should be related to commit 687aa0c5581b ("vsock: Fix
+>> transport_* TOCTOU") where we take vsock_register_mutex in
+>> vsock_assign_transport() while calling vsk->transport->release().
+>>
+>> So, maybe we need to move the release and vsock_deassign_transport()
+>> after unlocking vsock_register_mutex.
+> 
+> I implemented this here:
+> https://lore.kernel.org/netdev/20251021121718.137668-1-sgarzare@redhat.com/
+> 
+> sysbot successfully tested it.
+> 
+> Stefano
 
-Shouldn't this be converted to scoped_....() ?
+Hi Stefano
+
+Apologies for missing this, I was away for a couple of weeks.
+
+Turns out it's vsock_connect()'s reset-on-signal that strikes again. While
+you've fixed the lock order inversion (thank you), being able to reset an
+established socket, combined with SO_LINGER's lock-release-lock dance,
+still leads to crashes.
+
+I think it goes like this: if user hits connect() with a signal right after
+connection is established (which implies an assigned transport), `sk_state`
+gets set to TCP_CLOSING and `state` to SS_UNCONNECTED. SS_UNCONNECTED means
+connect() can be retried. If re-connect() is for a different CID, transport
+reassignment takes place. That involves transport->release() of the old
+transport. Because `sk_state == TCP_CLOSING`, vsock_linger() is called.
+Lingering temporarily releases socket lock. Which can be raced by another
+thread doing connect(). Basically thread-1 can release resources from under
+thread-0. That breaks the assumptions, e.g. virtio_transport_unsent_bytes()
+does not expect a disappearing transport.
+
+BUG: KASAN: slab-use-after-free in _raw_spin_lock_bh+0x34/0x40
+Read of size 1 at addr ffff888107c99420 by task a.out/1385
+CPU: 6 UID: 1000 PID: 1385 Comm: a.out Tainted: G            E
+6.18.0-rc5+ #241 PREEMPT(voluntary)
+Call Trace:
+ dump_stack_lvl+0x7e/0xc0
+ print_report+0x170/0x4de
+ kasan_report+0xc2/0x180
+ __kasan_check_byte+0x3a/0x50
+ lock_acquire+0xb2/0x300
+ _raw_spin_lock_bh+0x34/0x40
+ virtio_transport_unsent_bytes+0x3b/0x80
+ vsock_linger+0x263/0x370
+ virtio_transport_release+0x3ff/0x510
+ vsock_assign_transport+0x358/0x780
+ vsock_connect+0x5a2/0xc40
+ __sys_connect+0xde/0x110
+ __x64_sys_connect+0x6e/0xc0
+ do_syscall_64+0x94/0xbb0
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
+
+Allocated by task 1384:
+ kasan_save_stack+0x1c/0x40
+ kasan_save_track+0x10/0x30
+ __kasan_kmalloc+0x92/0xa0
+ virtio_transport_do_socket_init+0x48/0x320
+ vsock_assign_transport+0x4ff/0x780
+ vsock_connect+0x5a2/0xc40
+ __sys_connect+0xde/0x110
+ __x64_sys_connect+0x6e/0xc0
+ do_syscall_64+0x94/0xbb0
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
+
+Freed by task 1384:
+ kasan_save_stack+0x1c/0x40
+ kasan_save_track+0x10/0x30
+ __kasan_save_free_info+0x37/0x50
+ __kasan_slab_free+0x63/0x80
+ kfree+0x142/0x6a0
+ virtio_transport_destruct+0x86/0x170
+ vsock_assign_transport+0x3a8/0x780
+ vsock_connect+0x5a2/0xc40
+ __sys_connect+0xde/0x110
+ __x64_sys_connect+0x6e/0xc0
+ do_syscall_64+0x94/0xbb0
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
+
+I suppose there are many ways this chain of events can be stopped, but I
+see it as yet another reason to simplify vsock_connect(): do not let it
+"reset" an already established socket. I guess that would do the trick.
+What do you think?
+
+Thanks,
+Michal
 
