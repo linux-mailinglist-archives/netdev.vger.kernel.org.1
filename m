@@ -1,156 +1,124 @@
-Return-Path: <netdev+bounces-238889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D663C60BA8
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 22:05:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF96C60BAB
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 22:05:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6EA9B35A68A
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 21:03:04 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5BCEB35A8B4
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 21:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01E529AAFD;
-	Sat, 15 Nov 2025 21:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E5272F6188;
+	Sat, 15 Nov 2025 21:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wJ6Vtn25"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A/RX29eu"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E80B299AB5;
-	Sat, 15 Nov 2025 21:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38CDD2BE7BB
+	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 21:01:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763240513; cv=none; b=AAB3Q7qT+xUyzs/offTwh5+NK60FmXCMsFgjTkL5c6C6yL+BM5F9HmUGVUH2j15C5mr1B4265XS8Ez02zo6JgnYBgUScxqe+vKK3eK2j1kCrKz31MW/9e8JXykHdX/Nb3s8RCVSc4lBByFQwLGrEwH97MTdZqExzpUrErkeR0EY=
+	t=1763240513; cv=none; b=P08Hy0xGI+d0vmqPbexR3kE5e6briHYp3Q/FNW8SMdyenFd6OKrOJCcHdmOfr2zrir4N6LHJW0swEh/RKBmbjn1N2FQo2W7XeVm5AwC8e5dEOtvdnaEu8KCDUCVcx/h8+lWVpkwXZEb3+mK67OMKcX39qAJVflzoMyYFjhjGxfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763240513; c=relaxed/simple;
-	bh=KAaOFr9VMNCdfZiXbOB2v11q96MZ7OkvnzWZrGHZOmc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rN1Ih+MJIF7d0JAfvfadW4DdevAvgX0cAuOXImGrDQon/d0IBLGM3UJymV8ho/naZM+sUWc8WUBZ/8G4XyFOwfSmqYriogZlHcGMycRG9JMqCYgr8UyHL14J0fI/yLq2sVXJJOz6gAskwyiBzZrSaSn2zDJ7sQ7FcezGiRbjMzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wJ6Vtn25; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5svlvKH8KW5n0ke7qMCkQqdtMc7ntU+Iap0Fwxi0NiU=; b=wJ6Vtn257KknkrNwpYIgruGiyp
-	c6pSVlISmcwRmM7OBKq8PVpcngqp8RxPjp5X2bM4VwNXUZT4Pfsa6KWKZcGeH18Tw0Yl9ICWXTjlm
-	2OSVIQ3iyHRSlOeNqRNIDuKt7cALcR4CJOWf2iM1T+8nW3gb/lj3jrHoRg1ZkzpCdioLq3MeZvx8B
-	Zoizq1Uo0UntpjvGYw4rPSVpChBPuWB7G0VDqASp+k5s2CvLpb+ROatb/Xh5/TiXI5d12TsfZCd8w
-	RhwJYHzoSvhmPJp9v1itPemqGFYxKWNZkEyFKsaqBjzOSTYwtlg0J0mL5t4dr3xckSm7ednPzIFYh
-	fi5QksKA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52092)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vKNOp-000000000Km-3tB9;
-	Sat, 15 Nov 2025 21:01:35 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vKNOm-0000000076k-3af1;
-	Sat, 15 Nov 2025 21:01:32 +0000
-Date: Sat, 15 Nov 2025 21:01:32 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Wei Fang <wei.fang@nxp.com>, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	eric@nelint.com, maxime.chevallier@bootlin.com, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phylink: add missing supported link modes for
- the fixed-link
-Message-ID: <aRjqLN8eQDIQfBjS@shell.armlinux.org.uk>
-References: <20251114052808.1129942-1-wei.fang@nxp.com>
- <fc57fba2-26c2-4b8a-b0f5-1b3c4d1b9bef@lunn.ch>
+	bh=vg3gbestzVXx0SThS5/X0QDmDfhe6au3myuFItq7V7U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AKmS7aWE0w/nGe28pyBIp/hm9GDFZGXz9pBJoyz+xR95LDEXopJC9/tRdQ3aHdm+0euvPGFQ8gVAxUNqWNVif6M0OxKypFDsWSMDDHcxfKldbtElL2EHOgXiNxsYPK5wE5rs7CVTVB+/BzTwvSlpwfGJT1AuJeTtCMoANhDEJD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A/RX29eu; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5958aa58d25so671245e87.2
+        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 13:01:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763240510; x=1763845310; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0eOqhJe7V67LuZ9x4q+dQgJYcSjs+Um3FJGGzYuOEgg=;
+        b=A/RX29euQY6B4Tof0D1fw1PAaFDw9/IZY2XF2LzyasNIuidqRiFH6Djxe2+dXm4eJh
+         OecqcGX0TBlnL/KmqyPZ6jm6VMIVXUGxz0Woe7ivQqYl8OXIAD8ATOgUIZT3FcQrn/FP
+         6/S+WKAgrpVR0PpI2N5CObd2vVGjm7Js6hIN19kk6zJjODflERv/LVXBd52p6nlQYkPC
+         xa9RWgzRYubnkAMm89bp47TmyaxChwZAIQ20SSBUsL1PxisuyzGY3rsgp7rcJcbib6/W
+         1p7v2d249pnIcSVFZYA1B4HsmU6AoPK36Dbd+TiZ2czOp56FFwwk8oxxB/JGAdv6OPhT
+         QmFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763240510; x=1763845310;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0eOqhJe7V67LuZ9x4q+dQgJYcSjs+Um3FJGGzYuOEgg=;
+        b=WYo97aJy/MoPnzlVS8oCd6Ui/lS5ehAR6v1t0xX3TVWbplWGQ7Srg0XU8s0ODerawY
+         uSBbp9rMBt9o5HEVdSxiF7TT0pdptwDafz+aP19hx6sgiTsZXnkAyGuC7XWvmOdGVbcH
+         M4wUlMmqbGjLE+05Y88I1Aj1mQ0zUbHt+tSwi9kbANCX7hHhzaOIIUkuJyX0zjm5tLCK
+         DCQ8GddcpVXLZrR2eIwHTwtBgN1qXtu29u6PkeX8ACrdq6FoGiOe7JcwkycslAUdCOZR
+         rIq+G0bLh8r++L07Ti6hgjhCaXtlzsYd7b36CdW1QATfGSPzqxzgMKR3TVViQBoYGdCO
+         fBxw==
+X-Forwarded-Encrypted: i=1; AJvYcCW00oBPNwy741o73hB8GuCGCssNbRgQogC9/dxL5Ao5scWt/SKPaWdEANc4jXAOxmz3m7+a/IY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeQW1KyvbhNAFm71GC2dmvECe0nwpiTKYG9s3eSajiXokHcTx0
+	uHkLV9InDJj1e2KBDi+Vg2ckuOAuP37y8dGufFEyV0thuCZ03leVgTBxykxKwqrJ9JQvGGrJPvI
+	d8dECNyh5uHIl9aQ/sITWhzk0Gl1sFXE=
+X-Gm-Gg: ASbGnctjvbXiGSRRUhqrDDvQvIkJK4Hx3cKQmfOqSxzhZImw6hvPTAha4LOerVMMAEp
+	Kegnsj6clWon8iFqjF0wDWVcK7V3qk+SwRN2C/Ju4ANYAK0C8w9BT1NTM4NtT/nWiSzlaOrQ+rF
+	3WcpB4P9DJ1G0tzAPYhNl7ukqejDZa6Gcgg41d/ripNaOYCSUaXzOQHxp2yfLZFBSKP0j5boY/h
+	5Zy2X0U4bj6RzwpClQcRoc1MaPBlFKyfwjGmLRn3bamPz+13oKZca54oWMYkEom2GvB3y6s4b3f
+	tZe1q9Dt7j0RSoVArC4ick85geUtUgnAN0KWZQ==
+X-Google-Smtp-Source: AGHT+IFub9Izja/SggOJpABtW81ImrYhzmA+2yy2M1jQsIXepddbCF3gmailhZ4ArAV3zr86xGQE3AQ+yz5WzUGUB2k=
+X-Received: by 2002:a05:6512:3da0:b0:594:282d:f42a with SMTP id
+ 2adb3069b0e04-595841bb263mr2309504e87.22.1763240509957; Sat, 15 Nov 2025
+ 13:01:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc57fba2-26c2-4b8a-b0f5-1b3c4d1b9bef@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <CAOMZO5DFxJSK=XP5OwRy0_osU+UUs3bqjhT2ZT3RdNttv1Mo4g@mail.gmail.com>
+ <e9c5ef6c-9b4c-4216-b626-c07e20bb0b6f@lunn.ch> <CAOMZO5BEcoQSLJpGUtsfiNXPUMVP3kbs1n9KXZxaWBzifZHoZw@mail.gmail.com>
+ <1ec7a98b-ed61-4faf-8a0f-ec0443c9195e@gmail.com>
+In-Reply-To: <1ec7a98b-ed61-4faf-8a0f-ec0443c9195e@gmail.com>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Sat, 15 Nov 2025 18:01:38 -0300
+X-Gm-Features: AWmQ_bktASDloQZH9539LTWjwPB8uS5ZQ7vMeUetJjpcvEjJ-M2gAV4JbWS7pnA
+Message-ID: <CAOMZO5CbNEspuYTUVfMysNkzzMXgTZaRxCTKSXfT0=WmoK=i5Q@mail.gmail.com>
+Subject: Re: LAN8720: RX errors / packet loss when using smsc PHY driver on i.MX6Q
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>, edumazet <edumazet@google.com>, 
+	netdev <netdev@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 15, 2025 at 09:36:44PM +0100, Andrew Lunn wrote:
-> On Fri, Nov 14, 2025 at 01:28:08PM +0800, Wei Fang wrote:
-> > Pause, Asym_Pause and Autoneg bits are not set when pl->supported is
-> > initialized, so these link modes will not work for the fixed-link.
-> > 
-> > Fixes: de7d3f87be3c ("net: phylink: Use phy_caps_lookup for fixed-link configuration")
-> > Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> > ---
-> >  drivers/net/phy/phylink.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> > index 9d7799ea1c17..918244308215 100644
-> > --- a/drivers/net/phy/phylink.c
-> > +++ b/drivers/net/phy/phylink.c
-> > @@ -637,6 +637,9 @@ static int phylink_validate(struct phylink *pl, unsigned long *supported,
-> >  
-> >  static void phylink_fill_fixedlink_supported(unsigned long *supported)
-> >  {
-> > +	linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, supported);
-> > +	linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, supported);
-> > +	linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, supported);
-> 
-> Do these make sense? There is no PHY, so there is no autoneg? So why
-> is autoneg in supported?
-> 
-> You can force pause at the MAC with ethtool:
-> 
-> ethtool -A|--pause devname [autoneg on|off] [rx on|off] [tx on|off]
+Hi Heiner,
 
-No, not for fixed links. (I have a patch which enables this, but we
-mutually agreed not to push it into mainline - I think you've forgotten
-that discussion.)
+On Fri, Nov 14, 2025 at 6:33=E2=80=AFPM Heiner Kallweit <hkallweit1@gmail.c=
+om> wrote:
 
-> Maybe you should explain what problem you are seeing?
+> The smsc PHY driver for LAN8720 has a number of callbacks and flags.
+> Try commenting them out one after the other until it works.
+>
+> .read_status    =3D lan87xx_read_status,
+> .config_init    =3D smsc_phy_config_init,
+> .soft_reset     =3D smsc_phy_reset,
+> .config_aneg    =3D lan95xx_config_aneg_ext,
+> .suspend        =3D genphy_suspend,
+> .resume         =3D genphy_resume,
+> .flags          =3D PHY_RST_AFTER_CLK_EN,
+>
+> All of them are optional. If all are commented out, you should have
+> the behavior of the genphy driver.
+>
+> Once we know which callback is problematic, we have a starting point.
 
-As explained in this thread, it's the lack of pause. Not having the
-pause bits in the supported mask means that phylink can't evaluate
-the pause modes to use, because even if they are present in DT,
-they get cleared because they're cleared in the supported mask.
+Thanks for the suggestion.
 
-At least Pause and Asym_Pause need to be set.
+After removing the '.soft_reset =3D smsc_phy_reset,' line, there is no
+packet loss anymore.
 
-This is because the fixed-link pause specification is in terms of
-Pause and Asym_Pause. Having one set of these bits is meaningless in
-terms of "should we transmit pause frames" and "should we receive
-pause frames" which is what hardware wants to know. It would've
-been better had the DT binding defined pause in terms of tx/rx not
-the Pause/Asym_Pause bits.
+If you have any other suggestions regarding smsc_phy_reset(), please
+let me know.
 
-However, with that definition, the only way to give these bits any
-sane meaning is to treat them as the capabilities of a virtual link
-partner, use the Pause and Asym_Pause capabilities of the local MAC,
-and evaluate them according to the 802.3 rules.
-
-However, as we end up masking off the local MAC's Pause and Asym_Pause
-bits, this results in that evaluation deciding that pause is
-unsupported. This is a *regression* that needs fixing, caused by the
-blamed commit.
-
-There is no question that this needs fixing.
-
-The question is whether Autoneg should be set or not. As the
-advertising and lp_advertising bitmasks have to be non-empty, and the
-swphy reports aneg capable, aneg complete, and AN enabled, then for
-consistency with that state, Autoneg should be set. This is how it was
-prior to the blamed commit.
-
-So, the patch is the correct approach. The only thing that is missing
-is the detailed explanation about the problem the regression is
-causing. We have too many patches that fix regressions without
-explaining what the effect of the regression was... which is bad when
-we look back at the history.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks
 
