@@ -1,89 +1,143 @@
-Return-Path: <netdev+bounces-238892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8E66C60BB4
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 22:16:08 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50765C60BBF
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 22:28:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CDDA84E14AB
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 21:16:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7FE1E4E1707
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 21:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8CA022FE11;
-	Sat, 15 Nov 2025 21:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C502523BD1D;
+	Sat, 15 Nov 2025 21:26:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OCM3iKo6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ax88SKCQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4313594F;
-	Sat, 15 Nov 2025 21:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F2C21A447
+	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 21:26:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763241363; cv=none; b=DDwIw1HsvI2TGUGZAsauz2RntBjBsRsYg3KGCKcwKuzqM1q20kWXBDbbhoXyeTc86ouWW1Wd2N19+2hJrclEJsC6/Q5FjQgHE9b1KBe2WT37VyDgTwhbY1J3RnjwqFJDhNzU7TnA6MjSFtQt5KxluwXwOry5xkERUxtZrTk2O1g=
+	t=1763241993; cv=none; b=lZvE9pAg5kzf8yHqggrn3srGrNIbGW60yYPCdO5r9t25ZiptVSg8kYG5hnB2U8Fq+VvhNUCpsSzq3u2om3DjgaNwTQv+OnHEnM4pm/MD9nplfbzMCZX7Jc0UXfvckh/JsyW1MQLFo1k3RSib0Q+qVsae/QqSTgjl3k887u2tpyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763241363; c=relaxed/simple;
-	bh=9Z733u5Ow5KX/0wGU+juH/ehU3LkKn/YGRAFyBH4t3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P3Sgro7aaOIWdoau7AY4cAqG0UmEuSt54Muyo4nG+EeUAyem4sR1vVDpjGZKWIQ58fUjDe4tzAt7U+oOoPhgLGUtNawiioX+VHX2cnUi4TNgKttrai363QNB7BkFQaOTPS5S5NfknFWIs/RBpdK1UGSrNAnvMtA8sIhgm+MoTWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OCM3iKo6; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=khPgDsVJrdOTw5XRZdidZ350ZJ9XgdNzhpLeT83/DIo=; b=OCM3iKo6z5eLZeUF3b5Se3eu4P
-	24OzwFf8tBoieqvXawQWCnUvnlCLLaRt+B/Xl6VgVyrIZ2XQGkfOQ2Uy+HoFw8vGXRThD6t3HO3Rt
-	IorisFz7KnK+q0cUGfL3yh45+u7v4gSZLySpaGFJpRjpJG0xZOffYM42fvUCLAa0lqUg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vKNca-00E78A-Nh; Sat, 15 Nov 2025 22:15:48 +0100
-Date: Sat, 15 Nov 2025 22:15:48 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Wei Fang <wei.fang@nxp.com>, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	eric@nelint.com, maxime.chevallier@bootlin.com, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phylink: add missing supported link modes for
- the fixed-link
-Message-ID: <a3886abf-5ed5-436a-8f92-7c010beced13@lunn.ch>
-References: <20251114052808.1129942-1-wei.fang@nxp.com>
- <fc57fba2-26c2-4b8a-b0f5-1b3c4d1b9bef@lunn.ch>
- <aRjqLN8eQDIQfBjS@shell.armlinux.org.uk>
+	s=arc-20240116; t=1763241993; c=relaxed/simple;
+	bh=8v9uIOmgdamqV3ZY3x/o9FqEarHVPOy2KCPRn0Uxb0c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lpfnDa/hRQ9tXRitKPNhSlYRc+IHpyyNCHMBc9vyB3L0jHKMD2RKhIs4HfVnX93myiwz1TkXjTYlS75U+Wq4b/EotBvY7rYQBSBYnxteHgnBsY416o12vUy56X1brd4u3BWQZci1u9xB+BaFbv+CViOJ2IBYN6DDgqka+CcAAC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ax88SKCQ; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4710022571cso28682405e9.3
+        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 13:26:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763241990; x=1763846790; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TWLafe1CiEVI/z5NIFCryV2L73Psg30K8oiuqEJMvYM=;
+        b=ax88SKCQc7HUrx+2vQwUyEe1dNfWGQAc1G+anLK67EX549qVEgqwIThBu6+XrfvX+8
+         5wOMR3yoDfrzA5ns2VIX7p16AYkMLVOj/VN8agWBe16J3v1aG2gva946rGT4SOyiPqZ3
+         7G35DwGRUeJ5t4Kvaoo/QsosvHcLCtip+95NQoe+V4QTmcbzr9TzSuS6mz5spyFsmS9a
+         W2/LIwWiHtzx0M3rihAMDuY4447y8+NLba181jFGgvWtE4CK7/vbudAWK/AK/3ddizTG
+         Dlz4aGZXGnDvOBDodBbKOmliMki+p61c2dDbA+Xs2On/O2oAAg1Q6wT0rAeZUYG1Fvp8
+         xodA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763241990; x=1763846790;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TWLafe1CiEVI/z5NIFCryV2L73Psg30K8oiuqEJMvYM=;
+        b=Qgsmdt0X2RcvrMWVr22tvSYr4SEyAlF8bXs5/wC1gy4lf7Huhvji/y709pV/pUWrr5
+         WpPkEL+JnuVX9SK+iohNIDMQW0vOy+PF7vyxhgMjCdyacA43SnESy+9fdFNo/8AJo+mC
+         CBuKmGqXZbj5DZzE4uuRRdPjejp4aiKfoiU5CUOMGmlZ5kw53ibqJiGT1NutSCG2usJV
+         OBalLFMzMXkPdSqTmRIYYpvbwVuxpghbcM4OdKuM7KG31ppKZAWm9qTPbQ7+yc3O8lh7
+         8d3ckbY1Jc0ia0fqvruDhg6eImmH2tVMmW3q5X55Rv/cM0MVBfvLwTnPPO2HweFa1NIA
+         KxZg==
+X-Forwarded-Encrypted: i=1; AJvYcCUYoNgDw905+gwl1Lmezs1V7afmYahR+CHB25cywCVV6Mt7kiAFTBih0378iRbUq/LmebWiimU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJ2bKur9zLvfZWXkFecKiSyWc3oK5kfWhAABMuX3tWxR23/nLU
+	Iuu3oT1sRmXZIa54XtsE7Y5EZMgvicm+67O5BQBWPu3yuCwSj/RY7Qg1
+X-Gm-Gg: ASbGncsNW3qnpRyoKCFfbPOgkFG4a0kFiRlVVTvrM2pOOYeF02Mwha0QlKHI6CGo6xU
+	353CIKF0pULURjsK8eF3ujqQDCTr2D8lMLw+AfW3DqniwzCM1Vo2XrzaasZihGWD9FC/U3CPkT9
+	jL+fjXK5rMgBaG7ETztU9nWDOBsKjWfsLPSAG1vQH8Hyo7qM9+0iM8Bz2ipryUGG9FmJcoTXIs9
+	F0PDmjjqss3BljpTVUmMRVB6ZKTsoU7Bm6mwFouHeBWzi1cVDEdA6S0I/0JYETLHMREPhHwSlaw
+	BvtjadU/ulO0QgxbBU8dDgrkYS3QkQcCM3jRzH1L+fZAIc3vjfKe3Uy096Rlwb0wi/lxt4toeuE
+	P6I2Ha0cWqJCLwwpg8l0Qv1PlCq60Y6GbR1Ulm1lO0WovPsq/YyKTasiLrSUkvPaBoGUNengXc0
+	p7KIIHOhJ6rxiig1bbigkj+ry1x/VYekKM0hCwcfh0Nj/is9eZ75zqSWWkK2RLoQo170PO5iVwB
+	uFwlKgZzA/467BYOR7sG33ASSsxjbbzXNl78kM3v+xnLl3l3z8wMA==
+X-Google-Smtp-Source: AGHT+IGKrjZPx8IPhI+FCjOQPz7YWtS6e3WDJ0qObbYagWG9XJrsK2RByxJEXWrQejpNgiVaT/wxJQ==
+X-Received: by 2002:a05:600c:c4a3:b0:477:fcb:2256 with SMTP id 5b1f17b1804b1-4778fe6094cmr75421095e9.17.1763241990080;
+        Sat, 15 Nov 2025 13:26:30 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f21:db00:e03a:ae7c:84f9:38f2? (p200300ea8f21db00e03aae7c84f938f2.dip0.t-ipconnect.de. [2003:ea:8f21:db00:e03a:ae7c:84f9:38f2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4778bb30eacsm80157425e9.2.2025.11.15.13.26.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 15 Nov 2025 13:26:28 -0800 (PST)
+Message-ID: <7082e2d0-a5a9-4b00-950f-dc513975af1c@gmail.com>
+Date: Sat, 15 Nov 2025 22:26:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRjqLN8eQDIQfBjS@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: LAN8720: RX errors / packet loss when using smsc PHY driver on
+ i.MX6Q
+To: Fabio Estevam <festevam@gmail.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
+ edumazet <edumazet@google.com>, netdev <netdev@vger.kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>
+References: <CAOMZO5DFxJSK=XP5OwRy0_osU+UUs3bqjhT2ZT3RdNttv1Mo4g@mail.gmail.com>
+ <e9c5ef6c-9b4c-4216-b626-c07e20bb0b6f@lunn.ch>
+ <CAOMZO5BEcoQSLJpGUtsfiNXPUMVP3kbs1n9KXZxaWBzifZHoZw@mail.gmail.com>
+ <1ec7a98b-ed61-4faf-8a0f-ec0443c9195e@gmail.com>
+ <CAOMZO5CbNEspuYTUVfMysNkzzMXgTZaRxCTKSXfT0=WmoK=i5Q@mail.gmail.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <CAOMZO5CbNEspuYTUVfMysNkzzMXgTZaRxCTKSXfT0=WmoK=i5Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-> No, not for fixed links. (I have a patch which enables this, but we
-> mutually agreed not to push it into mainline - I think you've forgotten
-> that discussion.)
+On 11/15/2025 10:01 PM, Fabio Estevam wrote:
+> Hi Heiner,
+> 
+> On Fri, Nov 14, 2025 at 6:33 PM Heiner Kallweit <hkallweit1@gmail.com> wrote:
+> 
+>> The smsc PHY driver for LAN8720 has a number of callbacks and flags.
+>> Try commenting them out one after the other until it works.
+>>
+>> .read_status    = lan87xx_read_status,
+>> .config_init    = smsc_phy_config_init,
+>> .soft_reset     = smsc_phy_reset,
+>> .config_aneg    = lan95xx_config_aneg_ext,
+>> .suspend        = genphy_suspend,
+>> .resume         = genphy_resume,
+>> .flags          = PHY_RST_AFTER_CLK_EN,
+>>
+>> All of them are optional. If all are commented out, you should have
+>> the behavior of the genphy driver.
+>>
+>> Once we know which callback is problematic, we have a starting point.
+> 
+> Thanks for the suggestion.
+> 
+> After removing the '.soft_reset = smsc_phy_reset,' line, there is no
+> packet loss anymore.
+> 
+> If you have any other suggestions regarding smsc_phy_reset(), please
+> let me know.
+> 
+smsc_phy_reset() does two things:
+1. set PHY to "all capable" mode if in power-down
+2. genphy_soft_reset()
 
-Not too surprising, given the number of discussions...
+Again, as the genphy driver works fine for you, both parts should be optional.
+Check with part is causing the packet loss.
 
-> So, the patch is the correct approach. The only thing that is missing
-> is the detailed explanation about the problem the regression is
-> causing. We have too many patches that fix regressions without
-> explaining what the effect of the regression was... which is bad when
-> we look back at the history.
+> Thanks
 
-Agreed.
-
-I often like Vladimirs patches. Two pages of commit message for a one
-line change.
-
-    Andrew
-
----
-pw-bot: cr
 
