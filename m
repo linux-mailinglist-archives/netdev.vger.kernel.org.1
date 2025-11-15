@@ -1,194 +1,225 @@
-Return-Path: <netdev+bounces-238853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CC17C60338
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 11:23:55 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06CFC603C4
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 12:20:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4E30434F4BF
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 10:23:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B21E94E1D3C
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 11:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06AAA2580E1;
-	Sat, 15 Nov 2025 10:23:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE31298CA5;
+	Sat, 15 Nov 2025 11:20:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="CF4bSo70"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hGxwWuz3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC6D1ACDFD
-	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 10:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6092264BD
+	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 11:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763202229; cv=none; b=Crv1gQigGCZUCeYrQ4POV0r9wk8eX2FTizD37MxSe0dauDACzmLK57qbaxjEzyRHFIrUSTly/PHB4VcE6FYtI0OdqkCJichzwwYTZ7Y3wpFLpLxdwRllzHEsr+txQWIn+9BVcNoZxxdvEWX+t+FYITZ4rh90x8iZsqPoOjCW0r4=
+	t=1763205652; cv=none; b=C512RF4KrFtdcS+KsK7TP4FLAf3Nw1YoOc/Z8W6/XNcSkoBfS99KS6uXx1/z+CT+yPdYKh4GHQMvWhjDkgpsOMzG3yEt8VMA7AVd5GHjkeAuN/5ZKMWxC7tg3Z4KE7e7d8IQ58T/gU2WFz2yt97WcJX/7d8N70ec0g9sgD56WO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763202229; c=relaxed/simple;
-	bh=AQyFcGYH0/5CWgghrxdPWpEv6+2cgz1bE5+gwzLzzzU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eWtiMCLMYAIV8JRhvLp4zkVAOWaEUTZZirEAaNcv+YCbCzHQmAkYP+AMnQo7oq460viR/b3GM/Y+vmpDEZ974p8cFXOPBbHktkS+/AKUjbWNj540JPbmMGSGUx3xqFUMQZ4oHZWVwA1ZVN8qA9a0/StSLc5/+mQhBFLQlJA6d+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=CF4bSo70; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-29812589890so35843515ad.3
-        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 02:23:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1763202227; x=1763807027; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fYOc0IUNPX85RhlM2z4VxJh51pDy+UaQAYdPvoblagA=;
-        b=CF4bSo701YzNDbcZWXKKayInL/CvUCwEzak3knXFLOlFobicH2jmxjchvQlO+TdoM6
-         Jqg2RDwqMJugb72UreTqyykRKs8agEn9OtaAV5qFbc5RBZifE6qZTzjAHdZzt6HtRmp5
-         yYBXsXIYnYEAiMw3g/aLqtTsD2557LLFLJXWFHwOswPsiPVKDL5nEHRSKE5zY0H6QlHj
-         8G2X6baS5TrlXSqa6Uw6FVfLyfhadSazLwmLjVgRyTmcF1zZq2xfHdlbh7xaWv590MGM
-         +rQ0cWdYIGJMXUy+kwASsKRkRrR/a55xLV5SJUi4qksz36doFVtVKehCW7x5dzDSGxtI
-         ou2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763202227; x=1763807027;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fYOc0IUNPX85RhlM2z4VxJh51pDy+UaQAYdPvoblagA=;
-        b=T1ODG1WTaM30nsezYWD/n/pjC2UDVGJWGTbEQU8ze3gAxGafqiAvMXiJZHsx3QBneT
-         clHw5xBgiIOx0lxsy3zKPfTw1piXOJqvZkAuem920/MLCq0J5rXiTGFH6mVuRY8XYb7P
-         By5c5OdwDLTr42F9+/g0gxs0Sef/lfRnUpgDaRP9KeEg8/9TreRTCDpUbuA+sImJTnrU
-         /8TqKm1hwT7u98Zul6Baj372ATS8kQ2avTB+9OzmHECJO5eiwTru6U1VF0UM78VsqZeN
-         lIDW4ch//3L1AvIJMXEe+afIGMAF5krS2/RTH6pC0575i10hTXInhkddYlKxGt30X/Zn
-         CFSw==
-X-Forwarded-Encrypted: i=1; AJvYcCVVJMMesHOfHHngl2KYTiPis3thY1HBHrfNRDS7KuA8AcCiG+7vR3jwDHkTpZx36bD+RyzIFec=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJnt+hdj0QutoZWcu8C3aWQjOwcGHHv9m90WYgWiT0QK51EWbf
-	gdpsm2tQZUbmLpiallZZhXgJZkczRlS3uNWTUNO7TEgALua5Y6OyxiM16JpefrTWbIsawoS1inZ
-	rb4o=
-X-Gm-Gg: ASbGncsES03GwGPWzIeVnvZtCxpdw0q/KJPckNthCMc1re7pNtAoP60jb11CUUcDlof
-	s2pxUvBQ0/HX/Oei0T0FBDuQBeGSfv7L86BVokqf0PXx2S0rA2MfVrLpMSyHdIOPEtZj8Gtz0cf
-	PQMWubQsAPHpsvKjfQJ+PAqcWLbBgF/cPK9UdLPvuIVClhLjvhZd9gdWydvOd3ykg3LtEJHc8YX
-	4/efRG7Wh7hw3KbIZcBjlwkATMUkrCnoNIU1d/MzpyNwYWAZLTq1Fquf5NEH0WQy+A8ABIo5dBN
-	FzTQNEm0eSEzaqiOw7QquFpLQRahmaZCDUpSrI4rN78Bx4+SS1tOlOfjihuTZjE4jveRAJhCBQZ
-	zmtqjbC52yLRGL7iJF42dM/V3DSLMnw55MkvBWIF7D7sPsl5UMElj1og6cSqF8nVLo/Kj9YGlMq
-	T5I2Sx
-X-Google-Smtp-Source: AGHT+IHrBU43wvC6gMDgSE5qM+edUPrS5jQNdJRECY2EPUfuN1+iqG0qBZBMUYHmlhgLOuBycVT5uA==
-X-Received: by 2002:a05:7022:62a9:b0:119:e569:fbb1 with SMTP id a92af1059eb24-11b411ff1b8mr3401108c88.32.1763202227360;
-        Sat, 15 Nov 2025 02:23:47 -0800 (PST)
-Received: from p1 ([2600:8800:1e80:41a0:1665:bc8c:7762:7ff2])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11b060885eesm20398145c88.1.2025.11.15.02.23.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Nov 2025 02:23:47 -0800 (PST)
-Date: Sat, 15 Nov 2025 03:23:45 -0700
-From: Xiang Mei <xmei5@asu.edu>
-To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>
-Cc: security@kernel.org, netdev@vger.kernel.org, cake@lists.bufferbloat.net,
-	bestswngs@gmail.com
-Subject: Re: [PATCH net v3] net/sched: sch_cake: Fix incorrect qlen reduction
- in cake_drop
-Message-ID: <aRhUsbR6DT1F0bqc@p1>
-References: <20251113035303.51165-1-xmei5@asu.edu>
- <aRVZJmTAWyrnXpCJ@p1>
- <87346ijbs9.fsf@toke.dk>
+	s=arc-20240116; t=1763205652; c=relaxed/simple;
+	bh=a8zCqIg7DE+0VPor1GAOjQGzNWpE+HKnKxcO6M7EKE4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hw47HOghNoHNaeYVdeRNo3WLnN8LIYGYeqKNsdr+fWb9dekI3ujhv+r6QQe+boZwib3YQOt331QBfeznjusldEiasklSXV9udU1FSNwM5caL3c77UjzdVfnP1INJQZL4KqgHySt7t5bZmneW/GIRimy9w8Z/ZHRfB9sEl3dOZ8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hGxwWuz3; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763205636;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DHY1FSfrYIqLGp9tQiy6g3OoqpujTA3vHoKoRYU4M2E=;
+	b=hGxwWuz3S7aEPKKNbWJUTV/CINF11bwQa3o7gBLYALvRZSTQvmn4OAePi5vV12pg8A1Wnz
+	OmInpg7wlFeCEtwe8+xEpA4xtQJydV21PU89WQobEQb90mXuUq0iT+kmwOIvAcEtGok9z/
+	8vLAKROGZ46VrCGRaefYmYrRXpeoWlQ=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ bpf <bpf@vger.kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Eduard <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
+ John Fastabend <john.fastabend@gmail.com>, Jiri Olsa <jolsa@kernel.org>,
+ KP Singh <kpsingh@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Network Development <netdev@vger.kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Song Liu <song@kernel.org>,
+ syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ syzbot <syzbot+18b26edb69b2e19f3b33@syzkaller.appspotmail.com>
+Subject: Re: [syzbot] [bpf?] possible deadlock in bpf_lru_push_free (2)
+Date: Sat, 15 Nov 2025 19:20:12 +0800
+Message-ID: <5938862.DvuYhMxLoT@7950hx>
+In-Reply-To:
+ <CAADnVQK8Viv9DTtfSQTm8T4Nuy2zoUyqRvhqTtzZWNc3By2Xpg@mail.gmail.com>
+References:
+ <69155df5.a70a0220.3124cb.0018.GAE@google.com> <9537276.CDJkKcVGEf@7950hx>
+ <CAADnVQK8Viv9DTtfSQTm8T4Nuy2zoUyqRvhqTtzZWNc3By2Xpg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87346ijbs9.fsf@toke.dk>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Nov 13, 2025 at 02:35:18PM +0100, Toke Høiland-Jørgensen wrote:
-> Xiang Mei <xmei5@asu.edu> writes:
-> 
-> > There is still one problem I am not very sure since I am not very 
-> > experienced with cake and gso. It's about the gso branch [1]. The slen 
-> > is the lenth added to the cake sch and that branch uses 
-> > `qdisc_tree_reduce_backlog(sch, 1-numsegs, len-slen);` to inform the 
-> > parent sched. However, when we drop the packet, it could be probmatic 
-> > since we should reduce slen instead of len. Is this a potential
-> > problem?
-> 
-> Hmm, no I think it's fine? The qdisc_tree_reduce_backlog(sch, 1-numsegs,
-> len-slen) *increases* the backlog with the difference between the
-> original length and the number of new segments. And then we *decrease*
-> the backlog with the number of bytes we dropped.
-> 
-> The compensation we're doing is for the backlog update of the parent,
-> which is still using the original packet length regardless of any
-> splitting, so that doesn't change the compensation value.
-> 
-> -Toke
+On 2025/11/15 10:36, Alexei Starovoitov wrote:
+> On Thu, Nov 13, 2025 at 11:08=E2=80=AFPM Menglong Dong <menglong.dong@lin=
+ux.dev> wrote:
+> >
+> >
+> > Hmm...I have not figure out a good idea, and maybe we can
+> > use some transaction process here. Is there anyone else
+> > that working on this issue?
+>=20
+> yeah. it's not easy. rqspinlock is not a drop-in replacement.
+> But before we move any further, can you actually reproduce?
+> I tried the repro.c with lockdep, kasan and all other debug configs
+> and it doesn't repro.
+> Maybe it was fixed already by nokprobe-ing lru, but syzbot didn't notice.
 
-I still think current method to reduce backlog may be problematic:
-What you said is stated for the GSO branch when cake_queue returns
-NET_XMIT_SUCCESS, but it may lead to issues when it returns NET_XMIT_CN.
-For the normal case where no dropping happens, the current implementation
-is correct. We can see how qlen and backlog change as follows:
+I think it's not fix yet. After pulling the latest bpf-next, it can
+still be reproduced in my environment by running the ./test_progs
+for several times, and following is the log.
 
-backlog:
-	-(len - slen)  Reason: qdisc_tree_reduce_backlog(sch, 1 - numsegs, len - slen);
-	+len           Reason: parent enqueue)
-	Total: slen
-qlen:
-	-(1 - numsegs) Reason: qdisc_tree_reduce_backlog(sch, 1 - numsegs, len - slen);
-	+1 	       Reason: parent enqueue
-	Total: numsegs
+We can still use the lru map in NMI context now, right? So I guess
+the problem exists.
 
-This makes sense because we split one packet into numsegs packets of total
-length slen and enqueue them all. When a drop happens, we must fix both 
-qlen and backlog.
+[  230.458271] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[  230.458272] WARNING: inconsistent lock state
+[  230.458273] 6.18.0-rc5-g0d1fd0291e7a #82 Tainted: G        W  OE    N=20
+[  230.458274] --------------------------------
+[  230.458275] inconsistent {INITIAL USE} -> {IN-NMI} usage.
+[  230.458275] new_name/10710 [HC1[1]:SC0[0]:HE0:SE1] takes:
+[  230.458277] ffffe8ffffbeade0 (&loc_l->lock){....}-{2:2}, at: bpf_lru_pop=
+_free+0xea/0x620
+[  230.458282] {INITIAL USE} state was registered at:
+[  230.458283]   lock_acquire+0xbc/0x2e0
+[  230.458285]   _raw_spin_lock_irqsave+0x39/0x60
+[  230.458288]   bpf_lru_pop_free+0xea/0x620
+[  230.458289]   htab_lru_map_update_elem+0x7e/0x430
+[  230.458290]   bpf_map_update_value+0x341/0x7d0
+[  230.458292]   __sys_bpf+0x2360/0x3090
+[  230.458293]   __x64_sys_bpf+0x21/0x30
+[  230.458295]   do_syscall_64+0xbb/0x380
+[  230.458297]   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[  230.458299] irq event stamp: 186
+[  230.458299] hardirqs last  enabled at (185): [<ffffffff8282d75b>] irqent=
+ry_exit+0x3b/0x90
+[  230.458301] hardirqs last disabled at (186): [<ffffffff8282a3ef>] exc_nm=
+i+0x7f/0x110
+[  230.458302] softirqs last  enabled at (0): [<ffffffff8131ae53>] copy_pro=
+cess+0xa03/0x20a0
+[  230.458305] softirqs last disabled at (0): [<0000000000000000>] 0x0
+[  230.458306]=20
+[  230.458306] other info that might help us debug this:
+[  230.458307]  Possible unsafe locking scenario:
+[  230.458307]=20
+[  230.458307]        CPU0
+[  230.458308]        ----
+[  230.458308]   lock(&loc_l->lock);
+[  230.458309]   <Interrupt>
+[  230.458309]     lock(&loc_l->lock);
+[  230.458310]=20
+[  230.458310]  *** DEADLOCK ***
+[  230.458310]=20
+[  230.458310] no locks held by new_name/10710.
+[  230.458311]=20
+[  230.458311] stack backtrace:
+[  230.458312] CPU: 3 UID: 0 PID: 10710 Comm: new_name Tainted: G        W =
+ OE    N  6.18.0-rc5-g0d1fd0291e7a #82 PREEMPT(full)=20
+[  230.458315] Tainted: [W]=3DWARN, [O]=3DOOT_MODULE, [E]=3DUNSIGNED_MODULE=
+, [N]=3DTEST
+[  230.458315] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
+Arch Linux 1.17.0-2-2 04/01/2014
+[  230.458316] Call Trace:
+[  230.458317]  <NMI>
+[  230.458318]  dump_stack_lvl+0x5d/0x80
+[  230.458322]  print_usage_bug.part.0+0x22b/0x2d0
+[  230.458324]  lock_acquire+0x269/0x2e0
+[  230.458326]  ? bpf_lru_pop_free+0xea/0x620
+[  230.458329]  _raw_spin_lock_irqsave+0x39/0x60
+[  230.458330]  ? bpf_lru_pop_free+0xea/0x620
+[  230.458332]  bpf_lru_pop_free+0xea/0x620
+[  230.458336]  htab_lru_map_update_elem+0x7e/0x430
+[  230.458338]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  230.458340]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  230.458341]  ? __htab_map_lookup_elem+0x39/0xf0
+[  230.458344]  bpf_prog_11d2424ce61f7f6c_oncpu_lru_map+0xe4/0x168
+[  230.458346]  __perf_event_overflow+0x387/0x590
+[  230.458351]  amd_pmu_v2_handle_irq+0x383/0x400
+[  230.458363]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  230.458364]  ? look_up_lock_class+0x64/0x150
+[  230.458365]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  230.458366]  ? lock_acquire+0x1e0/0x2e0
+[  230.458368]  ? nmi_handle.part.0+0x30/0x230
+[  230.458372]  perf_event_nmi_handler+0x34/0x60
+[  230.458374]  nmi_handle.part.0+0xc9/0x230
+[  230.458378]  default_do_nmi+0x10e/0x170
+[  230.458379]  exc_nmi+0xe3/0x110
+[  230.458381]  end_repeat_nmi+0xf/0x53
+[  230.458383] RIP: 0010:debug_check_no_locks_freed+0x1a/0x130
+[  230.458384] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f =
+1e fa 8b 15 0a 69 22 03 85 d2 0f 84 86 00 00 00 41 56 41 54 55 53 9c 5d <fa=
+> 65 48 8b 05 55 8d d4 03 48 63 80 40 0b 00 00 85 c0 7e 43 65 48
+[  230.458385] RSP: 0018:ffffc9000277be08 EFLAGS: 00000202
+[  230.458386] RAX: 0000000000000007 RBX: ffff88811d749c00 RCX: 00000000000=
+00009
+[  230.458387] RDX: 0000000000000001 RSI: 0000000000000400 RDI: ffff88811d7=
+49c00
+[  230.458388] RBP: 0000000000000202 R08: ffff88812659b500 R09: 00000000000=
+38e72
+[  230.458388] R10: 0000000000000000 R11: 00000000000025d6 R12: ffff8881000=
+45200
+[  230.458389] R13: ffffea000475d200 R14: ffffffff8170e3d6 R15: 00000000000=
+00000
+[  230.458390]  ? free_pipe_info+0xa6/0xb0
+[  230.458397]  ? debug_check_no_locks_freed+0x1a/0x130
+[  230.458399]  ? debug_check_no_locks_freed+0x1a/0x130
+[  230.458401]  </NMI>
+[  230.458401]  <TASK>
+[  230.458402]  ? free_pipe_info+0xa6/0xb0
+[  230.458404]  kfree+0xdc/0x4f0
+[  230.458406]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  230.458408]  ? __free_frozen_pages+0x1e3/0x600
+[  230.458411]  ? free_pipe_info+0xa6/0xb0
+[  230.458412]  free_pipe_info+0xa6/0xb0
+[  230.458414]  pipe_release+0x10a/0x120
+[  230.458416]  __fput+0x103/0x2c0
+[  230.458419]  __x64_sys_close+0x3d/0x80
+[  230.458422]  do_syscall_64+0xbb/0x380
+[  230.458424]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[  230.458425] RIP: 0033:0x7f2a8be9f042
+[  230.458426] Code: 08 0f 85 d1 40 ff ff 49 89 fb 48 89 f0 48 89 d7 48 89 =
+ce 4c 89 c2 4d 89 ca 4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3=
+> 66 2e 0f 1f 84 00 00 00 00 00 66 2e 0f 1f 84 00 00 00 00 00 66
+[  230.458427] RSP: 002b:00007ffdf8ab3118 EFLAGS: 00000246 ORIG_RAX: 000000=
+0000000003
+[  230.458428] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f2a8be=
+9f042
+[  230.458428] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000000=
+00087
+[  230.458429] RBP: 00007ffdf8ab3140 R08: 0000000000000000 R09: 00000000000=
+00000
+[  230.458429] R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffdf8a=
+b3548
+[  230.458430] R13: 0000000000000001 R14: 00007f2a95a18000 R15: 000055c8da5=
+fdd70
 
-In the not patched code, cake_drop() calls qdisc_tree_reduce_backlog() for
-dropped packets. This works in most cases but ignores the scenario where 
-we drop (parts of) the incoming packet, meaning the expected:
+>=20
 
-```
-backlog += len
-qlen += 1
-```
 
-will not run because the parent scheduler stops enqueueing after seeing
-NET_XMIT_CN. For normal packets (non-GSO), it's easy to fix: just do
-qdisc_tree_reduce_backlog(sch, 1, len). However, GSO splitting makes this
-difficult because we may have already added multiple segments into the
-flow, and we don’t know how many of them were dequeued.
 
-The number of dequeued segments can be anywhere in [0, numsegs], and the
-dequeued length in [0, slen]. We cannot know the exact number without 
-checking the tin/flow index of each dropped packet. Therefore, we should
-check inside the loop (as v1 did):
 
-```
-cake_drop(...)
-{
-    ...
-    if (likely(current_flow != idx + (tin << 16)))
-        qdisc_tree_reduce_backlog(sch, 1, len);
-    ...
-}
-```
-
-This solution also has a problem, as you mentioned:
-if the flow already contains packets, dropping those packets should
-trigger backlog reduction, but our check would incorrectly skip that. One
-possible solution is to track the number of packets/segments enqueued
-in the current cake_enqueue (numsegs or 1), and then avoid calling
-`qdisc_tree_reduce_backlog(sch, 1, len)` for the 1 or numsegs dropped
-packets. If that makes sense, I'll make the patch and test it.
-
------
-
-Besides, I have a question about the condition for returning NET_XMIT_CN.
-Do we return NET_XMIT_CN when:
-
-The incoming packet itself is dropped? (makes more sense to me)
-or
-The same flow dequeued once? (This is the current logic)
-
-If we keep the current logic, the above patch approach works. If not, we 
-need additional checks because we append the incoming packet to the tail
-but drops occur at the head.
-
-Thanks,
-Xiang
 
