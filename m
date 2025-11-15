@@ -1,82 +1,54 @@
-Return-Path: <netdev+bounces-238857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E35C6051E
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 13:34:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55754C605DF
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 14:24:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A39DA35E0E8
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 12:34:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7DB6C4E914D
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 13:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E26929B20D;
-	Sat, 15 Nov 2025 12:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Aw9az22K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C5F2C15A9;
+	Sat, 15 Nov 2025 13:21:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FAF3208
-	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 12:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02DEE2C11FA;
+	Sat, 15 Nov 2025 13:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763210041; cv=none; b=KOYvC2h2OiKVk36WG6qXwkxN121B7FKt2kKQ9TttuA+bKw7s2jbBX1nsVxAHM8rtNUvVn9xnalJWGBqdPn380315q8WE4+tXWkvXK57b+A3QxAsGMZCCACB0PUWuwriIlmgvBTONll5wWEPI6Gc2p7eJReQ0JYmcVkBrGHyTMbA=
+	t=1763212861; cv=none; b=pscPb8SEcng1A5PksV6d7lkHqMWf0AeQyC7a5ltwzpYGu444wumKO3zVVQ2t7FQjrY9heFsJNlOL3WXEmXGiJz9YVqFY0gidgq2dtATyI08RJduq5Bro7fdgAhiFW5re3On65lDWfqUZnCuZ+epDvPwDqh+qaRUGpQ+2z6OB0Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763210041; c=relaxed/simple;
-	bh=ZRDa7X2qOhicNkRilum7iyXjYeDr0de0UFoOarn43C4=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:References:
-	 From:In-Reply-To; b=Q4/I7myY1iyOjCnwPVgx7IxRnRke1cA3iea12uxpZWk1QEJNJUegHLR9dpvs1Bgcy+zGJ3Es0q9X73/9lCXbmOAi6hNFpoGxqLNwn+LWu3ZPnHUWbZQ+PP+iXQi+/Nk9FmHnKZzdPSjgpSZudoeHbIoR7I/n4T6OQ+aThRIWvW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Aw9az22K; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42bb288c1bfso488183f8f.2
-        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 04:33:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1763210036; x=1763814836; darn=vger.kernel.org;
-        h=in-reply-to:from:content-language:references:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dtqnf19rAxKhCMnKuxFk3VQ746Xnyg0osYpHgquPOsc=;
-        b=Aw9az22KkHe7C9tQxGS4SOET8ahdp9wxEWBgTx0JdXC1ZmJP+MCWkC10NdqxyJkYaT
-         o1F1d4cqCpP6q0LEgBBb6kuhzpB1t4QwlhvVRAnB+qAkBDeWPwm7Iruu1a0rn33OJUNN
-         LxzbTvrfX8ulm76Vdyi3/RQH1fCmZxaHiAS/y7U7ukCLe4AX7iirW44FUfC8MMJ1/jOI
-         qGPaAm8/VjXzaM3Nx4Nf1nzm7Essl/1DU6OLT6T6osbvbqxvV421rExJ5Jax/HRonruh
-         BRVw4OWxmzvBov3WjSvk+EA+BIulxyMa2+9zoIxY3g7niZBeu91dohhCO8GVAt0Au53f
-         Wx9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763210036; x=1763814836;
-        h=in-reply-to:from:content-language:references:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dtqnf19rAxKhCMnKuxFk3VQ746Xnyg0osYpHgquPOsc=;
-        b=C6VaunVaEl7noVuyrG9A6yyUZWCpAgY3R6b2fanG6F16Bi1xyQZp9a56cw7fngXt+m
-         OTtmSWuCYHDJbHWo1lchKKqznm/iiviS+PP5IlO1csz+KnIU2Tclme/CqyIJr5RzP8BZ
-         67EhqrTSf7wK2NvoUvf2xvX4ILmkE7SS908Uj/sVDtpkCb/3vH3zfUz9hVjSp4HaTrtG
-         Z2Y3WlnfIzVtrgVMjm4tN8oiP4/kqOX/629/2VMFQLwSqyiP6oZD3s0n7SR88TIGjw+T
-         VR/2FvY8ndnxk7Rs4gFOq/ZorQYOlOCN4s8Btl/Th4O4f6mfmwfYy0Eo/y1ZljVIWt0r
-         Ih6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXtSruydUVEYMZGusFHkkkyzy4+Y6NDkf4IIILWFJPHyoSMLs8XuEjFsdTPTfgpLESVQVXIOFs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySy90rNmIu3Q6Fxh6Zn3Xg4kQ5PD+ZWjS10/VeO5smBu9hNJbW
-	oR74XEunqchS/wwZANHam+91uaCpqXkejg1EI+IotYXQxn5YNkzloP32IZh4CF41e4c=
-X-Gm-Gg: ASbGnctl2b32XVYp1+I5lB0s4BffAPyd0ZEgT5vLmXMKOjDmEZtw7MUPzIVb+uJ/e3b
-	0UOsLlcUfNdHfB9WsNsY+185C/4vH+Ye+MnJX3N9jAzysrvT648fZQbfl4Q96PDHds8eGbHVnov
-	eVTj09ndrnx4B3KZdep0lULbgBIbrp9KWwVUE1zv7GObbj4Ts0DUqzFf4HIVmngBDCMue0NkxEl
-	9o9PWuj/P+/hdBjYRO27KkgPG989TXMuNbzcgVRPFeoIN2GPZMcEATzz4G2DuF2TELtZSF3IQZS
-	HmR6TIPuZ8blD2TuJq314HRjUrWwDt5DKxNm8tx7jJY391Ch49m//aidW5l6V/GazXr9mXT0NVn
-	2K3ByWUR+9Qaz31zGu6MC+66TfM+lXXH20RFt51R7kJ9cJKfEQIy3bs0SuvZ123oa/F7yeJtt+8
-	edobJssa3wEI6qLgwFE9rp6fmLtJN9YEbIb984+sQ27gVaDh9oAyXubw==
-X-Google-Smtp-Source: AGHT+IH68hNngwZhYpd9vquoCIPlgcJ1vPhNd3/4WnrvDBsF+8EDaoeM+ZvmKTzsA5mzG3phFO2Aaw==
-X-Received: by 2002:a5d:64e3:0:b0:42b:3878:beb7 with SMTP id ffacd0b85a97d-42b5939896amr6087952f8f.43.1763210036197;
-        Sat, 15 Nov 2025 04:33:56 -0800 (PST)
-Received: from ?IPV6:2001:a61:134c:8401:9dee:c6d3:2820:beac? ([2001:a61:134c:8401:9dee:c6d3:2820:beac])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e85e6fsm16011805f8f.18.2025.11.15.04.33.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 15 Nov 2025 04:33:55 -0800 (PST)
-Content-Type: multipart/mixed; boundary="------------nHX7CPgwLi0J9jNmBXoWSU3W"
-Message-ID: <701e5678-a992-45be-9be3-df68dfe14705@suse.com>
-Date: Sat, 15 Nov 2025 13:33:48 +0100
+	s=arc-20240116; t=1763212861; c=relaxed/simple;
+	bh=4s7nVQlxdDCMUraekTHf79alBAvvx1I64y5IhZZARAg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gIPVRAtZ0iuYfPKHG9rdqq4uHvPvgpGTy4DWPEz6pOfHj7HHBVISyqnYNYY25ttdi53mPzjLhT14on0/ML2Ej7PThZX+zKjMinuIv+G9E6a6i4sC8c67iTv4nqFXeHq6d8FEIhTUiYf7qAurxYnz9fsx3sCJMTN7aOqqTGznE/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4d7v6G0cFvz9sSy;
+	Sat, 15 Nov 2025 13:52:06 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id PGr5geNtPDyH; Sat, 15 Nov 2025 13:52:05 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4d7v6F6R1mz9sSv;
+	Sat, 15 Nov 2025 13:52:05 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id BE1708B770;
+	Sat, 15 Nov 2025 13:52:05 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id OkSLQJsfn8js; Sat, 15 Nov 2025 13:52:05 +0100 (CET)
+Received: from [192.168.235.99] (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 0FFDE8B76E;
+	Sat, 15 Nov 2025 13:52:03 +0100 (CET)
+Message-ID: <95bb5163-a9f0-4d70-b647-a069483b1168@csgroup.eu>
+Date: Sat, 15 Nov 2025 13:52:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,52 +56,183 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: cdc_ncm doesn't detect link unless ethtool is run (ASIX AX88179B)
-To: WGH <da-wgh@ya.ru>, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <1c3f0582-4c92-41b3-a3db-5158661d4e1a@ya.ru>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <1c3f0582-4c92-41b3-a3db-5158661d4e1a@ya.ru>
-
-This is a multi-part message in MIME format.
---------------nHX7CPgwLi0J9jNmBXoWSU3W
+Subject: Re: [PATCH net-next v16 01/15] dt-bindings: net: Introduce the
+ ethernet-connector description
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+References: <20251113081418.180557-1-maxime.chevallier@bootlin.com>
+ <20251113081418.180557-2-maxime.chevallier@bootlin.com>
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+Content-Language: fr-FR
+In-Reply-To: <20251113081418.180557-2-maxime.chevallier@bootlin.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 15.11.25 09:58, WGH wrote:
-> Hello.
+
+
+Le 13/11/2025 à 09:14, Maxime Chevallier a écrit :
+> The ability to describe the physical ports of Ethernet devices is useful
+> to describe multi-port devices, as well as to remove any ambiguity with
+> regard to the nature of the port.
 > 
-> I'm running Linux 6.17.7, and recently obtained a UGREEN 6 in 1 hub containing an AX88179B chip.
+> Moreover, describing ports allows for a better description of features
+> that are tied to connectors, such as PoE through the PSE-PD devices.
 > 
-> By default, it uses the generic cdc_ncm driver, and it works mostly okay.
+> Introduce a binding to allow describing the ports, for now with 2
+> attributes :
 > 
-> The annoying problem I have is that most of the time the kernel doesn't notice that the link is up. ip link reports NO-CARRIER, network management daemon doesn't configure the interface, and so on.
+>   - The number of pairs, which is a quite generic property that allows
+>     differentating between multiple similar technologies such as BaseT1
+>     and "regular" BaseT (which usually means BaseT4).
+> 
+>   - The media that can be used on that port, such as BaseT for Twisted
+>     Copper, BaseC for coax copper, BaseS/L for Fiber, BaseK for backplane
+>     ethernet, etc. This allows defining the nature of the port, and
+>     therefore avoids the need for vendor-specific properties such as
+>     "micrel,fiber-mode" or "ti,fiber-mode".
+> 
+> The port description lives in its own file, as it is intended in the
+> future to allow describing the ports for phy-less devices.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Hi,
+Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 
-that strongly points to a race condition.
-Could you try the attached diagnostic patch?
+> ---
+>   .../bindings/net/ethernet-connector.yaml      | 57 +++++++++++++++++++
+>   .../devicetree/bindings/net/ethernet-phy.yaml | 18 ++++++
+>   MAINTAINERS                                   |  1 +
+>   3 files changed, 76 insertions(+)
+>   create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-connector.yaml b/Documentation/devicetree/bindings/net/ethernet-connector.yaml
+> new file mode 100644
+> index 000000000000..2ccac24bd8d6
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/ethernet-connector.yaml
+> @@ -0,0 +1,57 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/ethernet-connector.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Generic Ethernet Connector
+> +
+> +maintainers:
+> +  - Maxime Chevallier <maxime.chevallier@bootlin.com>
+> +
+> +description:
+> +  An Ethernet Connector represents the output of a network component such as
+> +  a PHY, an Ethernet controller with no PHY, or an SFP module.
+> +
+> +properties:
+> +
+> +  pairs:
+> +    description:
+> +      Defines the number of BaseT pairs that are used on the connector.
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    enum: [1, 2, 4]
+> +
+> +  media:
+> +    description:
+> +      The mediums, as defined in 802.3, that can be used on the port.
+> +    enum:
+> +      - BaseT
+> +      - BaseK
+> +      - BaseS
+> +      - BaseC
+> +      - BaseL
+> +      - BaseD
+> +      - BaseE
+> +      - BaseF
+> +      - BaseV
+> +      - BaseMLD
+> +
+> +required:
+> +  - media
+> +
+> +allOf:
+> +  - if:
+> +      properties:
+> +        media:
+> +          contains:
+> +            const: BaseT
+> +    then:
+> +      required:
+> +        - pairs
+> +    else:
+> +      properties:
+> +        pairs: false
+> +
+> +additionalProperties: true
+> +
+> +...
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> index bb4c49fc5fd8..58634fee9fc4 100644
+> --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> @@ -281,6 +281,17 @@ properties:
+>   
+>       additionalProperties: false
+>   
+> +  mdi:
+> +    type: object
+> +
+> +    patternProperties:
+> +      '^connector-[0-9]+$':
+> +        $ref: /schemas/net/ethernet-connector.yaml#
+> +
+> +        unevaluatedProperties: false
+> +
+> +    additionalProperties: false
+> +
+>   required:
+>     - reg
+>   
+> @@ -317,5 +328,12 @@ examples:
+>                       default-state = "keep";
+>                   };
+>               };
+> +            /* Fast Ethernet port, with only 2 pairs wired */
+> +            mdi {
+> +                connector-0 {
+> +                    pairs = <2>;
+> +                    media = "BaseT";
+> +                };
+> +            };
+>           };
+>       };
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0dc4aa37d903..92d6309a968d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -9277,6 +9277,7 @@ R:	Russell King <linux@armlinux.org.uk>
+>   L:	netdev@vger.kernel.org
+>   S:	Maintained
+>   F:	Documentation/ABI/testing/sysfs-class-net-phydev
+> +F:	Documentation/devicetree/bindings/net/ethernet-connector.yaml
+>   F:	Documentation/devicetree/bindings/net/ethernet-phy.yaml
+>   F:	Documentation/devicetree/bindings/net/mdio*
+>   F:	Documentation/devicetree/bindings/net/qca,ar803x.yaml
 
-	Regards
-		Oliver
-
---------------nHX7CPgwLi0J9jNmBXoWSU3W
-Content-Type: text/x-patch; charset=UTF-8; name="ncm_bind_uncond.patch"
-Content-Disposition: attachment; filename="ncm_bind_uncond.patch"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L3VzYi91c2JuZXQuYyBiL2RyaXZlcnMvbmV0L3Vz
-Yi91c2JuZXQuYwppbmRleCAxZDlmYWE3MGJhM2IuLmQwNDJiYTU3NDIxNyAxMDA2NDQKLS0t
-IGEvZHJpdmVycy9uZXQvdXNiL3VzYm5ldC5jCisrKyBiL2RyaXZlcnMvbmV0L3VzYi91c2Ju
-ZXQuYwpAQCAtMTg5Miw3ICsxODkyLDcgQEAgdXNibmV0X3Byb2JlKHN0cnVjdCB1c2JfaW50
-ZXJmYWNlICp1ZGV2LCBjb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZCAqcHJvZCkKIAogCW5l
-dGlmX2RldmljZV9hdHRhY2gobmV0KTsKIAotCWlmIChkZXYtPmRyaXZlcl9pbmZvLT5mbGFn
-cyAmIEZMQUdfTElOS19JTlRSKQorCS8vaWYgKGRldi0+ZHJpdmVyX2luZm8tPmZsYWdzICYg
-RkxBR19MSU5LX0lOVFIpCiAJCXVzYm5ldF9saW5rX2NoYW5nZShkZXYsIDAsIDApOwogCiAJ
-cmV0dXJuIDA7Cg==
-
---------------nHX7CPgwLi0J9jNmBXoWSU3W--
 
