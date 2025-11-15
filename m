@@ -1,326 +1,237 @@
-Return-Path: <netdev+bounces-238862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4EFFC605BE
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 14:22:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36735C607A9
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 16:00:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5486A3B1161
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 13:22:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id D53B224211
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 15:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6016B2C08A1;
-	Sat, 15 Nov 2025 13:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9FE42F60CA;
+	Sat, 15 Nov 2025 15:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kkTmjLcI"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027532C0296;
-	Sat, 15 Nov 2025 13:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E488829D266;
+	Sat, 15 Nov 2025 15:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763212857; cv=none; b=D2Eb/kkeBIo+Q7wcUYdGOCl9/vPwC1V4XePJbslbn00ebIUHnOozWO63RJUhe7Ad0kQ5P0/pcCaKJS6ngdeUSztoZV1D7/xuyyipOogGpeTK+RQvuMiBi3iqOudQKawdyG9lI/Xc4gu7tm+8yTuohiWjkQEMDEOMYqOB7AnbB4c=
+	t=1763218820; cv=none; b=Cw8zgdbtygwjzvS2KSpFKG+wYcQ+UwavTYKnIZ6YiwIQ3uErZqrtRweLY3BnSp/FX153AX5m/coM08A/BCH2dDqJyw3vJdphW0YmbdsfGGf9V5Nap/T2nw1fmjs2K49unFmzIo0i9gmsP3kCrKuFyvrVXeMYK/Tuavt+rguns8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763212857; c=relaxed/simple;
-	bh=NZOU2pdchDrd59AXbQMYen063c1FMdYvNq7KuWjU+/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HPY1Cx/DOCymhDcWNvhEEcUDXd16evIHVCbmOddlUI2z+a1GEZzZ+OuEF6yZYCGlIXrbeE7dpFJulKc3+OlbUZo+M0bs4MVS8ixaSfTsCcEkUuRMy1+jfbLMEajwxP25eb5GGcWHY1xJheVdVVsohmB7RkFAOtvQ5eUhEub4YEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4d7v9f6SNyz9sTW;
-	Sat, 15 Nov 2025 13:55:02 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Trl3BISnWbBX; Sat, 15 Nov 2025 13:55:02 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4d7v9f5Lv9z9sTS;
-	Sat, 15 Nov 2025 13:55:02 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id A12408B770;
-	Sat, 15 Nov 2025 13:55:02 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id pGy1IFFuN1zE; Sat, 15 Nov 2025 13:55:02 +0100 (CET)
-Received: from [192.168.235.99] (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 38C568B76E;
-	Sat, 15 Nov 2025 13:55:01 +0100 (CET)
-Message-ID: <b5c3a2d0-da1a-4333-a749-64a79acb5b44@csgroup.eu>
-Date: Sat, 15 Nov 2025 13:55:00 +0100
+	s=arc-20240116; t=1763218820; c=relaxed/simple;
+	bh=ndcPSZW3JOVHmw7oovdYbGWmn8uW+fs4og7Ao3WKs/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AVW5ek2EH9rtTwfcEsP4UVqb7W+hlIntHOmSZhV8qV5IOfbb/idkXjy/1Pbi3k+wCwXRVUh8jLPfcs1CQnA6dvA/Y2lU8QbZtLb1X39Sa8oEEwzauMwI2I9zHTyj5bcH7zR1kMuFiGNYKaBOVkLr+/7fY8IZzEYrN6U1zYl+ceI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kkTmjLcI; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763218819; x=1794754819;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ndcPSZW3JOVHmw7oovdYbGWmn8uW+fs4og7Ao3WKs/4=;
+  b=kkTmjLcIoz68Yp6e/FeXZUGYUhQWtU1f3ope+hyioONuTnssxXNTOCeW
+   90nWA1sJB7t5XHVVYAvPFcmXgtaXZ2NX7WnrEhgRjzkuXI1sv5To8K2a6
+   7xvC4lgC/Yz/PFEDcVrtbcRH92EWYpBaNR1RdHIAnPS2dowUyvxQeEgpP
+   7x+I78qMewinY9d8hTaPeFp9OpmPy/hV+eik03bD1jROP8qxhGtUTm3Nk
+   9LnlV5RwJUolYcuvY2FGcq5VnD/76Xj9Q4q36hJDss5ROf4nGioTd337j
+   3Zq06Jv4GRiKpJFm3U+UhB6n5O2BrpOZwfC90anWKVL54k9UYxvu3mYly
+   Q==;
+X-CSE-ConnectionGUID: DBOXzB+NS8qTrbm/tS3A3g==
+X-CSE-MsgGUID: IipgK5b6RxWrYcHM9ptTQA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11614"; a="82916820"
+X-IronPort-AV: E=Sophos;i="6.19,307,1754982000"; 
+   d="scan'208";a="82916820"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2025 07:00:19 -0800
+X-CSE-ConnectionGUID: bV69B+1GRr+QOuViJSOWHQ==
+X-CSE-MsgGUID: 7ORA28maSR2i67CxfehwsA==
+X-ExtLoop1: 1
+Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 15 Nov 2025 07:00:14 -0800
+Received: from kbuild by 7b01c990427b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vKHl6-00082o-1s;
+	Sat, 15 Nov 2025 15:00:12 +0000
+Date: Sat, 15 Nov 2025 22:59:16 +0800
+From: kernel test robot <lkp@intel.com>
+To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
+	vikas.gupta@broadcom.com,
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+Subject: Re: [v2, net-next 08/12] bng_en: Add support for TPA events
+Message-ID: <202511152221.4M9h7dkH-lkp@intel.com>
+References: <20251114195312.22863-9-bhargava.marreddy@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v16 00/15] net: phy: Introduce PHY ports
- representation
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
- Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-References: <20251113081418.180557-1-maxime.chevallier@bootlin.com>
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-Content-Language: fr-FR
-In-Reply-To: <20251113081418.180557-1-maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251114195312.22863-9-bhargava.marreddy@broadcom.com>
+
+Hi Bhargava,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Bhargava-Marreddy/bng_en-Query-PHY-and-report-link-status/20251115-040224
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251114195312.22863-9-bhargava.marreddy%40broadcom.com
+patch subject: [v2, net-next 08/12] bng_en: Add support for TPA events
+config: parisc-randconfig-001-20251115 (https://download.01.org/0day-ci/archive/20251115/202511152221.4M9h7dkH-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251115/202511152221.4M9h7dkH-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511152221.4M9h7dkH-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/broadcom/bnge/bnge_txrx.c: In function 'bnge_tpa_end':
+>> drivers/net/ethernet/broadcom/bnge/bnge_txrx.c:548:7: warning: variable 'gro' set but not used [-Wunused-but-set-variable]
+     bool gro;
+          ^~~
 
 
+vim +/gro +548 drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
 
-Le 13/11/2025 à 09:14, Maxime Chevallier a écrit :
-> Hi everyone,
-> 
-> This is v16 of the phy_port work. Changes are typos, a more relaxed
-> check when parsing DT pairs, and binding updates. Thanks a lot to Andrew
-> and Rob for the reviews on the last round.
-> 
-> This series conflicts with Romain's series on fiber support for dp83869:
-> https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F20251110-sfp-1000basex-v2-0-dd5e8c1f5652%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692158446%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=fbKgJgNn%2FaI%2BH3p9hjlVl7sQnVRtVtoFA3DEzKborUU%3D&reserved=0
-> 
-> As a remainder, a few important notes :
-> 
->   - This is only a first phase. It instantiates the port, and leverage
->     that to make the MAC <-> PHY <-> SFP usecase simpler.
-> 
->   - Next phase will deal with controlling the port state, as well as the
->     netlink uAPI for that.
-> 
->   - The end-goal is to enable support for complex port MUX. This
->     preliminary work focuses on PHY-driven ports, but this will be
->     extended to support muxing at the MII level (Multi-phy, or compo PHY
->     + SFP as found on Turris Omnia for example).
-> 
->   - The naming is definitely not set in stone. I named that "phy_port",
->     but this may convey the false sense that this is phylib-specific.
->     Even the word "port" is not that great, as it already has several
->     different meanings in the net world (switch port, devlink port,
->     etc.). I used the term "connector" in the binding.
-> 
-> A bit of history on that work :
-> 
-> The end goal that I personnaly want to achieve is :
-> 
->              + PHY - RJ45
->              |
->   MAC - MUX -+ PHY - RJ45
-> 
-> After many discussions here on netdev@, but also at netdevconf[1] and
-> LPC[2], there appears to be several analoguous designs that exist out
-> there.
-> 
-> [1] : https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fnetdevconf.info%2F0x17%2Fsessions%2Ftalk%2Fimproving-multi-phy-and-multi-port-interfaces.html&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692180471%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=HJZwQP6qPup6YH1XU4WOmMY%2BLekJdvClUFIoT4ieC8s%3D&reserved=0
-> [2] : https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flpc.events%2Fevent%2F18%2Fcontributions%2F1964%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692199016%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=GfYNvE46zApzJzglRQ5xmrpVnbnFF2Q7ZkvDY84evos%3D&reserved=0 (video isn't the
-> right one)
-> 
-> Take the MAchiatobin, it has 2 interfaces that looks like this :
-> 
->   MAC - PHY -+ RJ45
->              |
-> 	    + SFP - Whatever the module does
-> 
-> Now, looking at the Turris Omnia, we have :
-> 
-> 
->   MAC - MUX -+ PHY - RJ45
->              |
-> 	    + SFP - Whatever the module does
-> 
-> We can find more example of this kind of designs, the common part is
-> that we expose multiple front-facing media ports. This is what this
-> current work aims at supporting. As of right now, it does'nt add any
-> support for muxing, but this will come later on.
-> 
-> This first phase focuses on phy-driven ports only, but there are already
-> quite some challenges already. For one, we can't really autodetect how
-> many ports are sitting behind a PHY. That's why this series introduces a
-> new binding. Describing ports in DT should however be a last-resort
-> thing when we need to clear some ambiguity about the PHY media-side.
-> 
-> The only use-cases that we have today for multi-port PHYs are combo PHYs
-> that drive both a Copper port and an SFP (the Macchiatobin case). This
-> in itself is challenging and this series only addresses part of this
-> support, by registering a phy_port for the PHY <-> SFP connection. The
-> SFP module should in the end be considered as a port as well, but that's
-> not yet the case.
-> 
-> However, because now PHYs can register phy_ports for every media-side
-> interface they have, they can register the capabilities of their ports,
-> which allows making the PHY-driver SFP case much more generic.
-> 
-> Let me know what you think, I'm all in for discussions :)
-> 
-> Regards,
+   530	
+   531	static inline struct sk_buff *bnge_tpa_end(struct bnge_net *bn,
+   532						   struct bnge_cp_ring_info *cpr,
+   533						   u32 *raw_cons,
+   534						   struct rx_tpa_end_cmp *tpa_end,
+   535						   struct rx_tpa_end_cmp_ext *tpa_end1,
+   536						   u8 *event)
+   537	{
+   538		struct bnge_napi *bnapi = cpr->bnapi;
+   539		struct bnge_rx_ring_info *rxr = bnapi->rx_ring;
+   540		struct net_device *dev = bn->netdev;
+   541		struct bnge_tpa_info *tpa_info;
+   542		u8 *data_ptr, agg_bufs;
+   543		struct sk_buff *skb;
+   544		u16 idx = 0, agg_id;
+   545		dma_addr_t mapping;
+   546		unsigned int len;
+   547		void *data;
+ > 548		bool gro;
+   549	
+   550		agg_id = TPA_END_AGG_ID(tpa_end);
+   551		agg_id = bnge_lookup_agg_idx(rxr, agg_id);
+   552		agg_bufs = TPA_END_AGG_BUFS(tpa_end1);
+   553		tpa_info = &rxr->rx_tpa[agg_id];
+   554		if (unlikely(agg_bufs != tpa_info->agg_count)) {
+   555			netdev_warn(bn->netdev, "TPA end agg_buf %d != expected agg_bufs %d\n",
+   556				    agg_bufs, tpa_info->agg_count);
+   557			agg_bufs = tpa_info->agg_count;
+   558		}
+   559		tpa_info->agg_count = 0;
+   560		*event |= BNGE_AGG_EVENT;
+   561		bnge_free_agg_idx(rxr, agg_id);
+   562		idx = agg_id;
+   563		gro = !!(bn->priv_flags & BNGE_NET_EN_GRO);
+   564		data = tpa_info->data;
+   565		data_ptr = tpa_info->data_ptr;
+   566		prefetch(data_ptr);
+   567		len = tpa_info->len;
+   568		mapping = tpa_info->mapping;
+   569	
+   570		if (unlikely(agg_bufs > MAX_SKB_FRAGS || TPA_END_ERRORS(tpa_end1))) {
+   571			bnge_abort_tpa(cpr, idx, agg_bufs);
+   572			if (agg_bufs > MAX_SKB_FRAGS)
+   573				netdev_warn(bn->netdev, "TPA frags %d exceeded MAX_SKB_FRAGS %d\n",
+   574					    agg_bufs, (int)MAX_SKB_FRAGS);
+   575			return NULL;
+   576		}
+   577	
+   578		if (len <= bn->rx_copybreak) {
+   579			skb = bnge_copy_skb(bnapi, data_ptr, len, mapping);
+   580			if (!skb) {
+   581				bnge_abort_tpa(cpr, idx, agg_bufs);
+   582				return NULL;
+   583			}
+   584		} else {
+   585			u8 *new_data;
+   586			dma_addr_t new_mapping;
+   587	
+   588			new_data = __bnge_alloc_rx_frag(bn, &new_mapping, rxr,
+   589							GFP_ATOMIC);
+   590			if (!new_data) {
+   591				bnge_abort_tpa(cpr, idx, agg_bufs);
+   592				return NULL;
+   593			}
+   594	
+   595			tpa_info->data = new_data;
+   596			tpa_info->data_ptr = new_data + bn->rx_offset;
+   597			tpa_info->mapping = new_mapping;
+   598	
+   599			skb = napi_build_skb(data, bn->rx_buf_size);
+   600			dma_sync_single_for_cpu(bn->bd->dev, mapping,
+   601						bn->rx_buf_use_size, bn->rx_dir);
+   602	
+   603			if (!skb) {
+   604				page_pool_free_va(rxr->head_pool, data, true);
+   605				bnge_abort_tpa(cpr, idx, agg_bufs);
+   606				return NULL;
+   607			}
+   608			skb_mark_for_recycle(skb);
+   609			skb_reserve(skb, bn->rx_offset);
+   610			skb_put(skb, len);
+   611		}
+   612	
+   613		if (agg_bufs) {
+   614			skb = bnge_rx_agg_netmems_skb(bn, cpr, skb, idx, agg_bufs,
+   615						      true);
+   616			/* Page reuse already handled by bnge_rx_agg_netmems_skb(). */
+   617			if (!skb)
+   618				return NULL;
+   619		}
+   620	
+   621		skb->protocol = eth_type_trans(skb, dev);
+   622	
+   623		if (tpa_info->hash_type != PKT_HASH_TYPE_NONE)
+   624			skb_set_hash(skb, tpa_info->rss_hash, tpa_info->hash_type);
+   625	
+   626		if (tpa_info->vlan_valid &&
+   627		    (dev->features & BNGE_HW_FEATURE_VLAN_ALL_RX)) {
+   628			__be16 vlan_proto = htons(tpa_info->metadata >>
+   629						  RX_CMP_FLAGS2_METADATA_TPID_SFT);
+   630			u16 vtag = tpa_info->metadata & RX_CMP_FLAGS2_METADATA_TCI_MASK;
+   631	
+   632			if (eth_type_vlan(vlan_proto)) {
+   633				__vlan_hwaccel_put_tag(skb, vlan_proto, vtag);
+   634			} else {
+   635				dev_kfree_skb(skb);
+   636				return NULL;
+   637			}
+   638		}
+   639	
+   640		skb_checksum_none_assert(skb);
+   641		if (likely(tpa_info->flags2 & RX_TPA_START_CMP_FLAGS2_L4_CS_CALC)) {
+   642			skb->ip_summed = CHECKSUM_UNNECESSARY;
+   643			skb->csum_level =
+   644				(tpa_info->flags2 & RX_CMP_FLAGS2_T_L4_CS_CALC) >> 3;
+   645		}
+   646	
 
-For the series:
-
-Tested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-
-
-> 
-> Changes in v16:
->   - From Andrew, relaxed the check on the number of pairs so that we only
->     fail when baseT is missing pairs
->   - Add a check for either 1, 2 or 4 pairs
->   - Lots of typos (mostly lanes -> pairs)
->   - Added Andrew's review tags (thanks again)
->   - From Rob, added an "else" statement in the ethernet-connector binding
->   - Changed the node name for ethernet connectors to be decimal
-> 
-> Changes in V15:
->   - Update bindings, docs and code to use pairs instead of lanes
->   - Make pairs only relevant for BaseT
-> 
-> Changes in V14:
->   - Fixed kdoc
->   - Use the sfp module_caps feature.
-> 
-> Changes in V13:
->   - Added phy_caps support for interface selection
->   - Aggregated tested-by tags
-> 
-> Changes in V12:
->   - Moved some of phylink's internal helpers to phy_caps for reuse in
->     phylib
->   - Fixed SFP interface selection
->   - Added Rob's review and changes in patch 6
-> 
-> Changes in V11:
->   - The ti,fiber-mode property was deprecated in favor of the
->     ethernet-connector binding
->   - The .attach_port was split into an MDI and an MII version
->   - I added the warning back in the AR8031 PHY driver
->   - There is now an init-time check on the number of lanes associated to
->     every linkmode, making sure the number of lanes is above or equal to
->     the minimum required
->   - Various typos were fixed all around
->   - We no longer use sfp_select_interface() for SFP interface validation
-> 
-> Changes in V10:
->   - Rebase on net-next
->   - Fix a typo reported by Köry
->   - Aggregate all reviews
->   - Fix the conflict on the qcom driver
-> 
-> Changes in V9:
->   - Removed maxItems and items from the connector binding
->   - Fixed a typo in the binding
-> 
-> Changes in V8:
->   - Added maxItems on the connector media binding
->   - Made sure we parse a single medium
->   - Added a missing bitwise macro
-> 
-> Changes in V7:
->   - Move ethtool_medium_get_supported to phy_caps
->   - support combo-ports, each with a given set of supported modes
->   - Introduce the notion of 'not-described' ports
-> 
-> Changes in V6:
-> 
->   - Fixed kdoc on patch 3
->   - Addressed a missing port-ops registration for the Marvell 88x2222
->     driver
->   - Addressed a warning reported by Simon on the DP83822 when building
->     without CONFIG_OF_MDIO
-> 
-> Changes in V5 :
-> 
->   - renamed the bindings to use the term "connector" instead of "port"
->   - Rebased, and fixed some issues reported on the 83822 driver
->   - Use phy_caps
-> 
-> Changes in V4 :
-> 
->   - Introduced a kernel doc
->   - Reworked the mediums definitions in patch 2
->   - QCA807x now uses the generic SFP support
->   - Fixed some implementation bugs to build the support list based on the
->     interfaces supported on a port
-> 
-> V15: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F20251106094742.2104099-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692220733%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=SBossM1KcxSldiNhV71oehI66tKkBsYryLXLVuu9JWs%3D&reserved=0
-> V14: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20251013143146.364919-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692237443%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=QvbbA%2BUzln1JQTwT4Hhn8SXropD4pQ8Ss8UkIAggpH0%3D&reserved=0
-> V13: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250921160419.333427-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692252741%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=vJvKSHr8SSa9L9dU4rGkoWUcKxpnG%2FxZ2zoR7FOyeYE%3D&reserved=0
-> V12: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250909152617.119554-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692268301%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=ZcyGywWFEONxQYbNszGbv57WK5KxWPP2%2FJFYVeu5ev4%3D&reserved=0
-> V11: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250814135832.174911-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692283514%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=wRthSrgiu5zV4pV6Wj6rrRp4Zj3Y%2FU7pCWuJq3Kkmi4%3D&reserved=0
-> V10: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250722121623.609732-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692298054%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=AF7a%2FNgMAoFZKQf1oURLWqCYglsKG%2FnmLkuyYc1ubMM%3D&reserved=0
-> V9: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250717073020.154010-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692316899%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=X8olmChjGo3BtOADzrwW6H5Ho9C15OB%2FTmCgYWnRdos%3D&reserved=0
-> V8: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250710134533.596123-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692334432%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=cInZohiCGoQVoSaAOw4ym7ahfyMYuVTFsWvo4fi500A%3D&reserved=0
-> v7: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250630143315.250879-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692351034%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=uvaVASBiuBBG01svghO%2BSey7q95F3LzfxDz%2FmPOGB1Q%3D&reserved=0
-> V6: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250507135331.76021-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692371801%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=gu5JPp%2BYLJwgiqvD8axB2ipjHa1ICHJlPBjvzm5mU70%3D&reserved=0
-> V5: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250425141511.182537-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692389327%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=Os1hQJEu4LbqdPMdAuwBArekFd7OfRuTG%2Fgq0CzmqY8%3D&reserved=0
-> V4: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250213101606.1154014-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692405507%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=ve3LPTeQ5KEQbIfCB8sS2mxAMIeT2nvHFa0srBqSS6M%3D&reserved=0
-> V3: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250207223634.600218-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692420383%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=gN36neiSqhj%2FslVSU8oWrOvdam2nZ08I2tVW1BjGqNQ%3D&reserved=0
-> RFC V2: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20250122174252.82730-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692435564%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=ae3RoCo5SF0u5vvruXV9UGgXojDP0Xy%2BCKnMEZxXaL0%3D&reserved=0
-> RFC V1: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fnetdev%2F20241220201506.2791940-1-maxime.chevallier%40bootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cc3434ae46bd540e2e87708de228ca8e0%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638986184692450191%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=wXdzjfHVActY7No3GBa%2BA%2FWSIS9OXtmLwGqebXEcJvc%3D&reserved=0
-> 
-> Maxime
-> 
-> Maxime Chevallier (15):
->    dt-bindings: net: Introduce the ethernet-connector description
->    net: ethtool: Introduce ETHTOOL_LINK_MEDIUM_* values
->    net: phy: Introduce PHY ports representation
->    net: phy: dp83822: Add support for phy_port representation
->    dt-bindings: net: dp83822: Deprecate ti,fiber-mode
->    net: phy: Create a phy_port for PHY-driven SFPs
->    net: phy: Introduce generic SFP handling for PHY drivers
->    net: phy: marvell-88x2222: Support SFP through phy_port interface
->    net: phy: marvell: Support SFP through phy_port interface
->    net: phy: marvell10g: Support SFP through phy_port
->    net: phy: at803x: Support SFP through phy_port interface
->    net: phy: qca807x: Support SFP through phy_port interface
->    net: phy: Only rely on phy_port for PHY-driven SFP
->    net: phy: dp83822: Add SFP support through the phy_port interface
->    Documentation: networking: Document the phy_port infrastructure
-> 
->   .../bindings/net/ethernet-connector.yaml      |  57 +++
->   .../devicetree/bindings/net/ethernet-phy.yaml |  18 +
->   .../devicetree/bindings/net/ti,dp83822.yaml   |   9 +-
->   Documentation/networking/index.rst            |   1 +
->   Documentation/networking/phy-port.rst         | 111 ++++++
->   MAINTAINERS                                   |   3 +
->   drivers/net/phy/Makefile                      |   2 +-
->   drivers/net/phy/dp83822.c                     |  78 ++--
->   drivers/net/phy/marvell-88x2222.c             |  94 ++---
->   drivers/net/phy/marvell.c                     |  92 ++---
->   drivers/net/phy/marvell10g.c                  |  52 +--
->   drivers/net/phy/phy-caps.h                    |   5 +
->   drivers/net/phy/phy-core.c                    |   6 +
->   drivers/net/phy/phy_caps.c                    |  65 ++++
->   drivers/net/phy/phy_device.c                  | 337 +++++++++++++++++-
->   drivers/net/phy/phy_port.c                    | 212 +++++++++++
->   drivers/net/phy/qcom/at803x.c                 |  77 ++--
->   drivers/net/phy/qcom/qca807x.c                |  72 ++--
->   include/linux/ethtool.h                       |  39 +-
->   include/linux/phy.h                           |  63 +++-
->   include/linux/phy_port.h                      |  99 +++++
->   include/uapi/linux/ethtool.h                  |  20 ++
->   net/ethtool/common.c                          | 268 ++++++++------
->   23 files changed, 1399 insertions(+), 381 deletions(-)
->   create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
->   create mode 100644 Documentation/networking/phy-port.rst
->   create mode 100644 drivers/net/phy/phy_port.c
->   create mode 100644 include/linux/phy_port.h
-> 
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
