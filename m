@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-238834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5AB7C5FEAF
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 03:40:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2C35C5FEDF
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 03:50:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 987F33BAC42
-	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 02:40:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2C3093588D7
+	for <lists+netdev@lfdr.de>; Sat, 15 Nov 2025 02:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4C619EEC2;
-	Sat, 15 Nov 2025 02:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB5D1F099C;
+	Sat, 15 Nov 2025 02:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JcMTQWxz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gfShCk5O"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0636735CBD3
-	for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 02:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5720917A300;
+	Sat, 15 Nov 2025 02:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763174444; cv=none; b=HFHVeBZ1iujxEfDu+T3ghJHBU0rSmNlq4pROto3NntBNa/YNF39G2mMgTNUUBMcynKCiv2LBRWqgUSyxNia+C2XxQgwQBIHqdnzIIjbDe+o8roEO/vQAxWqokoYMXiroyaVebfzYl8j1pVd9RsrI0fDFGU5jKIcakZm1UtwmaVA=
+	t=1763175039; cv=none; b=Ij7x6svWRmcDLq4/hHptDWoJFF0AVDjzEQJ99UncXkWujuUi1uC7NlPDWdCI0RRFY59QbeS6LKzuHkVKx+xudBtR+56tEKBrdkwdSSteIwZY4lthU09OiBbpPh2VtElWz3dAMYTJUDGqrft5u8VsbDSYQUQzZDp2pfnXmCVDyP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763174444; c=relaxed/simple;
-	bh=FsDd8OSRS1boKHVWER5PG2YUTZRXls0/bADOA6JY/pU=;
+	s=arc-20240116; t=1763175039; c=relaxed/simple;
+	bh=lqlikqc6upKV4nc1GVwY2mIKnTu9RyjWOKut9sHDbQw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=H/LebdA9kNWnkgcOC9l63gFCsNTLgrgOP4H6mHtDDo/NqkxTncq44bFJUojTkyp6H7a7GEdCuz/SaKE2uCoknr4i2euG0ukJeQKuQyhbBoGOSoVkkNdBh0N5PhYpo+EkepbRioVYrckp9lZOEzMPXGSj2M0S79Jtm6mevZXj5DU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JcMTQWxz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95060C4CEF1;
-	Sat, 15 Nov 2025 02:40:43 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=B3UZTuPi7axJ25PBVZlKyfIqWETbly4ChEZUo16u2LfUVzFmscjaI1fioqnC/aCqID2OOvbugeGd2ZSjM08yyWJ5fB4ZeHtuZJQ8FjI+bUDoQzWNiezfcBOnOPyKfivwSz+PSuMDqY+jemoct4XcKjCZ8qHDpUrTb+1ZM4me3q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gfShCk5O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDDCFC4CEF1;
+	Sat, 15 Nov 2025 02:50:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763174443;
-	bh=FsDd8OSRS1boKHVWER5PG2YUTZRXls0/bADOA6JY/pU=;
+	s=k20201202; t=1763175038;
+	bh=lqlikqc6upKV4nc1GVwY2mIKnTu9RyjWOKut9sHDbQw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JcMTQWxzJFH3zV8FtzNtiE+MXJ1ME/2xY9p13ILTSIxmpCrtP/mTB2/EoQ8rQTNyO
-	 8HAEEFb/3lRkkLfo69tKXVBt2fPVtQf3FUdQKOQoHshkYVPfLwPyrTiYH9pIqzOoZw
-	 2GoNgSSXuuR6cZKqTsa4XqRr0OfQF8Q9me1LuoTeobgFnK5NG9lHUje8qZMyZqhkwv
-	 TzEwmaaXqYeMcWyG3SUSwePS3UbWDZFPwBszJuHCUJr55TWW4ky9MeM1nnz1tUeai8
-	 afSiU0jeB0pm0spKensp0YkzN2mFjqbJvanuyoPC04HREhGSrByF6IOKpVUZ/BiLPF
-	 FNw8jEVewMYzA==
+	b=gfShCk5O27sbcv69fGiW7yIHXtgiXtDnrmCSqZbfyIm403OHoCoGqG72gyZNIa9tz
+	 megzMajp8uGGn1Cug2ZmPlGkcWDHrrJe5QANR2CKvHywf/QZ+A+5Wo8HDSyucPG7ua
+	 oxHPZwQpt3h07O2pw1WSm2buZLVu9g/QuLBMNQHXnE9ZpwsUU3bEJIHoEmPrKKEr1w
+	 N17eWolz6r0WeJUu6hzAUmenDvdqp1kM5sCoO54Qt8qey6YfU9dy16aPFEICXvlZAx
+	 S8EuUR5wZFlB8XDslOTCfUm673GVcmRrsSkSq+DCEfyiwVYioWAw87zaK+5aeofWkS
+	 2H91VYg2eDnmg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E203A78A62;
-	Sat, 15 Nov 2025 02:40:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D4A3A78A62;
+	Sat, 15 Nov 2025 02:50:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/4] net: stmmac: rk: use PHY_INTF_SEL_x
+Subject: Re: [PATCH bpf-next 1/2] bpf: Check skb->transport_header is set in
+ bpf_skb_check_mtu
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176317441200.1916016.12907239609584301623.git-patchwork-notify@kernel.org>
-Date: Sat, 15 Nov 2025 02:40:12 +0000
-References: <aRYZaKTIvfYoV3wE@shell.armlinux.org.uk>
-In-Reply-To: <aRYZaKTIvfYoV3wE@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- heiko@sntech.de, kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com,
- mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
+ <176317500727.1918140.1454108210011393739.git-patchwork-notify@kernel.org>
+Date: Sat, 15 Nov 2025 02:50:07 +0000
+References: <20251112232331.1566074-1-martin.lau@linux.dev>
+In-Reply-To: <20251112232331.1566074-1-martin.lau@linux.dev>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, ast@kernel.org, andrii@kernel.org,
+ daniel@iogearbox.net, netdev@vger.kernel.org, hawk@kernel.org,
+ M202472210@hust.edu.cn, dddddd@hust.edu.cn
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-On Thu, 13 Nov 2025 17:46:16 +0000 you wrote:
-> This series is a minimal conversion of the dwmac-rk huge driver to use
-> PHY_INTF_SEL_x constants.
+On Wed, 12 Nov 2025 15:23:30 -0800 you wrote:
+> From: Martin KaFai Lau <martin.lau@kernel.org>
 > 
-> Patch 2 appears to reorder the output functions making diffing the
-> generated code impossible.
+> The bpf_skb_check_mtu helper needs to use skb->transport_header when
+> the BPF_MTU_CHK_SEGS flag is used:
 > 
->  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 245 +++++++++++--------------
->  1 file changed, 109 insertions(+), 136 deletions(-)
+> 	bpf_skb_check_mtu(skb, ifindex, &mtu_len, 0, BPF_MTU_CHK_SEGS)
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next,1/4] net: stmmac: rk: replace HIWORD_UPDATE() with GRF_FIELD()
-    https://git.kernel.org/netdev/net-next/c/ebb07edf9738
-  - [net-next,2/4] net: stmmac: rk: convert all bitfields to GRF_FIELD*()
-    https://git.kernel.org/netdev/net-next/c/764ebe423ef9
-  - [net-next,3/4] net: stmmac: rk: use PHY_INTF_SEL_x constants
-    https://git.kernel.org/netdev/net-next/c/5e37047f745b
-  - [net-next,4/4] net: stmmac: rk: use PHY_INTF_SEL_x in functions
-    https://git.kernel.org/netdev/net-next/c/1188741cb5a2
+  - [bpf-next,1/2] bpf: Check skb->transport_header is set in bpf_skb_check_mtu
+    https://git.kernel.org/bpf/bpf-next/c/d946f3c98328
+  - [bpf-next,2/2] selftests/bpf: Test bpf_skb_check_mtu(BPF_MTU_CHK_SEGS) when transport_header is not set
+    https://git.kernel.org/bpf/bpf-next/c/6cc73f35406c
 
 You are awesome, thank you!
 -- 
