@@ -1,139 +1,170 @@
-Return-Path: <netdev+bounces-238906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45AC6C60E29
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 01:57:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7477BC60E36
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 02:08:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6C7F3A438C
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 00:57:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 31346241E4
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 01:08:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B811D31B9;
-	Sun, 16 Nov 2025 00:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9B41DFDE;
+	Sun, 16 Nov 2025 01:08:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N0x6DWOg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mfqG6LuO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEA4183CC3
-	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 00:57:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145C635CBC5
+	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 01:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763254655; cv=none; b=aKQHkGOtgI4EHN2kROrecKZk3OBpmQ93T8NIbvZkZ80K52Jwl+lLB/Ulce6qYU+hq5OM5LZ7x6clpbJ76mJxQATIybE26H7j8FpKCDPCtL1yTqNxIIUVWrtYdww8ZZCCmrzPaZPEpwY4Oqlq9vm+CVmNG3y1OlzFpmTdPY1JIX8=
+	t=1763255312; cv=none; b=mDVF3r1xyiYzAmWMED+5EqaIXbk68DTHllhGSA7pUKLu1f4Yc5JNKwqsqz3Falz/EB2t8YDmfX/YXQdJfR++b0PcDSs17UzBiLht/Anj8kRtNUd36YiHyaKmC3dBbquoXhBp2cYqo26775Tc7AD5IgUulAIcWMEvUINwVuL7RSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763254655; c=relaxed/simple;
-	bh=s0AmmzyABWD4Oq9M0188bm0asRW+bjv/4AsappBKzo0=;
+	s=arc-20240116; t=1763255312; c=relaxed/simple;
+	bh=gymZunq3ztjTX2tDOwRswf7M7gjU58xCtU93U59orx0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qU14Hwwh02O7SE1g7k9RbT3FuvZ2GjEplobM+4vSuGKWfRXO00lG8VCMF7F72Sd2Bo7cV0xB0PBTzIcH/ZgIAvpQatDD/HZYBJB5zsAr/z/L1dmtM33CiGV+IgP9Xz7U3hvCCxIhLUAdLquEUzg9gnH2ESN+suqdnefwoOm7XQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N0x6DWOg; arc=none smtp.client-ip=209.85.167.48
+	 To:Cc:Content-Type; b=SUhEsHUSnGY3WUy5ckXAZRGHawmUWzlAWUWiPHOyR4oEP86FzMEb2OiY8x0Si7j0GBQ3sEXBdUYrvFTJu2KBaL4FRoTO35aHpLGCoOjythVPGCjUr4mlG7tPAMlum38n3MD8xQPOeuf8bCR+9MHIZmPdD14LJndC10tEbOWczNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mfqG6LuO; arc=none smtp.client-ip=209.85.166.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5957d86f800so3173691e87.1
-        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 16:57:33 -0800 (PST)
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-4336f8e97c3so27577115ab.3
+        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 17:08:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763254652; x=1763859452; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763255310; x=1763860110; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ajg4HS+BMsNbtABrkTDYlU3vNspmGsLPkfbzb+ywu1c=;
-        b=N0x6DWOgmvF17YrpYcr0M0ZU7WDip9bGUL2m2DKO1S4/0dxihqQX/jJahhpazpHwUN
-         gMarM0MUv9tRt7MiPfUpspnHwNsF8TZwwiJaFCpY/d8wCA75t7kmVDgA2g2sqTQpq3oz
-         2dY1oFMBZmb2eBoPA/dTwWDa4AlfivQSk0Bf/x56IhPWkQz/jc4Nl01r3uXZxn4rJUUN
-         6O4gg7EOU0NcxQl/LX2biZ33gu3HYEG5u61EmDky8C1k5aVaT4uZVKr3pVvSRCy/fvEo
-         LQfTsV+jf2LxQ0e6Jn9LI1I1pnb6W6ZOpDNUoUuntOnzVEiZobULr0mVwlDpTG6wByhZ
-         CKqg==
+        bh=DL3u+BBPsl4zXBqOXf7sCWnLpw1c6IddzzOF6gyZC6Q=;
+        b=mfqG6LuOtjaPxJjxHc9C+zNyR24a5dr3Aiq10ocHOGSnF+xzIfNDlq9PvxIU/4NzDC
+         BP/VCbliiuYwA8Mn5aeNR3PiBx2kxi9PV9UtoV5eAt+AjSulMrtiLFokSQaIazCb+DxR
+         kAttLkNoXi+JuWKEGtoxaDRcDxdfCjxPOmrHWFTOUCfbbcajeU+dlx/x+GygqalHmdhM
+         SXbxiFOnnGjzFqFAGMCRbQQmijknnyXlAy9SlQEqZdd1h9ojDszuaZUWDxitzz54/8Hn
+         JIG9u0ul49wUj3kLeldpCG+xIAUTZoFsmvTOr4Ky4sD4v6JCASjbQWlpq5GrtYbV9XgL
+         ORPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763254652; x=1763859452;
+        d=1e100.net; s=20230601; t=1763255310; x=1763860110;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Ajg4HS+BMsNbtABrkTDYlU3vNspmGsLPkfbzb+ywu1c=;
-        b=Bxgdlxla7UQbTy7gbjS8PARdoeOAU94j49Y8Wu69ELHxz/qqDRlNJX3L90LB6S2KoU
-         mhe8bnQuJfHW6kRrYI5mK0lrhN6zp/ydL/yoj2Qc2o4iKvaLjT++mgLpMIH70o+VZUt6
-         jh/Gnk8Gjf9VbCaSTzkg78ahcEaHqLYAuprgkFf9vfpDRtJvBDC2FkO366NjA+R4u3b1
-         GQRcFsmHvYW8+Xr4vAOk5JtbaB8QmwdsrRC11f3yBZ0xcffdUxI3864h+pIHV9dbMs1W
-         dOVU9yWsPNyYyZPcgFqGvuFGycrqmwsF+JMwPftPapJGP4aVsjDVcQTBvmYcfl2UyHn+
-         9zSw==
-X-Forwarded-Encrypted: i=1; AJvYcCVA4YfR7Sf0bZg+s2YAwMgXbwUq+5wbly+Zs1ohlqj82PyIfSMF2+iL62+tBII/nv33fGi4EMc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5O3yFxXb7ir25FK3PWq5hZUxhsc2BZZs+iAbptaxASg935j41
-	vcDH2eLFynPlnM7xw7LgplUoQvbb8uy+uo3IsVr1C2XP2LgqoIAQqD9ldmjZMl0n134tSA6BgoP
-	sIa2+JU+zt2mhAIHmC+DbS5UKwNkFAIA=
-X-Gm-Gg: ASbGnctesMmVxKEQGoSpdO+P7N0CrlaPPXAkciiCSeHyZTqwuwM21J/hUHpXYj5RbXT
-	oaqS9qfp1mp+jE8sPCsdyMEvqbqsmcoG0dxRpPGjGuNldtQX0fei5u+x7gQ0S7FeLFSysvAoeJE
-	5LpESYq7Ls2r/v+LeEzQ9edr68jmwoTFOpDmquU345okVmrgyyrM70q84TartYhqQK/b3MWT4iO
-	YWVP/a2aWhXZQ0FmBaYdyeM66ylPOGRcQWKgbRXnq0oCnDdyGQeD45AnzIjKN3ZsNRWyYpCmW5R
-	ugproJ9CJnEsCwMU3kBwiwclywX+eKNHaDc9kA==
-X-Google-Smtp-Source: AGHT+IEmIP5t/YzkeE4RNxRjNVshIk6A50pUHMKvQdQq4FTod6TW7aNT49/QK/nViigx6ccY70RNW1vuQOKgnVRv/V8=
-X-Received: by 2002:a05:6512:3b9c:b0:594:27fb:e7f5 with SMTP id
- 2adb3069b0e04-59584200d84mr2721624e87.42.1763254651569; Sat, 15 Nov 2025
- 16:57:31 -0800 (PST)
+        bh=DL3u+BBPsl4zXBqOXf7sCWnLpw1c6IddzzOF6gyZC6Q=;
+        b=QCUbPygJo8NcOYy0QlNynh1Sh5ihsGd5ZlJxhRHe/fiBAR2JxHONYZDsN73pwTPQS1
+         ENkPtKr3pRvIY780pTvTv8G7+guHV/DyqgaNN4qefnNllHxR2t5hNZjq5v2pb5z6F/Bq
+         Sy6lZVlmeJ0giTRTBp1qV3JWjh84Kcyr5USuPt1iFjCngBOh01hsK88vQ4jBBVSjGVFj
+         m04LPet/WzqTYkK5SQ59x06/JQhyTvTz0GxWQkqqG02vy7BNfGXv9MyZma+L+YRoVLqx
+         2yNQA05fz0ci4Y+usbjmvPYsUcKZ537YhDy+DdILJySKuLQm/+UC0NCmHifZwGGblf9a
+         y5yQ==
+X-Forwarded-Encrypted: i=1; AJvYcCULeH2G5abvYIvfRYrBJbDUFnvmxKHyd4G/Nr11czPTFPU12I7nzu+NrHfkW0jZ//I7W8vSgEY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDY51wN+Sh4LnytjkyNQIC/95NGiyPyFGIfFfP1HcoIHelp94x
+	KKqrh7c6QIUUmsnDBCIqlMYzbTlWEZIV9QChPWOqrHIF7iFjkQaBPhFStb2RScvl3eMHYzAEwIN
+	RR4WtvqZ/EEDGRxpXg0E95OyRtqTE2nQ=
+X-Gm-Gg: ASbGncsL5ze0YvmoMhIcoiBZ8YWtXOVkoQ1u2hKCCpf4ijnMGW9kZhKI0GByMhhNYO+
+	+1C34L3Fgsc9n8BEHZkrb2IHBwu7Ukv8RQpKC0Ya8T3UMs8wEVryfAM8UerVA9vP2A2NgOF1HrJ
+	MSTR8FJkwP5HetaULvMGWLJjhiWTlJbKzit866krKkQWJMUxWG4oREpvLifYt70mJzB9HGtO1IS
+	/WdTGx/+JzagQHVKRxFNk5VLnsymUZUXUv1K2m+sOVS635PC4b1HOBrOpu22t0=
+X-Google-Smtp-Source: AGHT+IEVOxO7i1rsULg4ASQaC7ScDou2N3DXE16FWmTGhHwOaHa6bRuYC6D/qxKJLyQuYUN+xgShQ5qcawdTXV+2whc=
+X-Received: by 2002:a05:6e02:1542:b0:434:96ea:ff79 with SMTP id
+ e9e14a558f8ab-43496eb02e3mr82737015ab.33.1763255310012; Sat, 15 Nov 2025
+ 17:08:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAOMZO5DFxJSK=XP5OwRy0_osU+UUs3bqjhT2ZT3RdNttv1Mo4g@mail.gmail.com>
- <e9c5ef6c-9b4c-4216-b626-c07e20bb0b6f@lunn.ch> <CAOMZO5BEcoQSLJpGUtsfiNXPUMVP3kbs1n9KXZxaWBzifZHoZw@mail.gmail.com>
- <1ec7a98b-ed61-4faf-8a0f-ec0443c9195e@gmail.com> <CAOMZO5CbNEspuYTUVfMysNkzzMXgTZaRxCTKSXfT0=WmoK=i5Q@mail.gmail.com>
- <aRjytF103DHLnmEQ@shell.armlinux.org.uk>
-In-Reply-To: <aRjytF103DHLnmEQ@shell.armlinux.org.uk>
-From: Fabio Estevam <festevam@gmail.com>
-Date: Sat, 15 Nov 2025 21:57:20 -0300
-X-Gm-Features: AWmQ_bl66ws4cdagWjPJO_XmL7LGy76fJ7om8bsyr6WZNGCxAhZM9Hde7Hu_BS0
-Message-ID: <CAOMZO5DfK1kxhtbYR3bDbwinpCKotBgHnY-B+YUknnHivUPYDA@mail.gmail.com>
-Subject: Re: LAN8720: RX errors / packet loss when using smsc PHY driver on i.MX6Q
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, edumazet <edumazet@google.com>, 
-	netdev <netdev@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>
+References: <20251114121243.3519133-1-edumazet@google.com> <20251114121243.3519133-3-edumazet@google.com>
+In-Reply-To: <20251114121243.3519133-3-edumazet@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 16 Nov 2025 09:07:53 +0800
+X-Gm-Features: AWmQ_bnVlRbgFRVODceR9HNKa4S1efXTTfnCOp8UhHGvsLEYunEZIX4igFdvaKo
+Message-ID: <CAL+tcoCdLA2_N4sC-08X8d+UbE50g-Jf-CTkg-LSi4drVi2ENw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 2/3] net: __alloc_skb() cleanup
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 15, 2025 at 6:37=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
-
-> What happens if you replace this with genphy_soft_reset() ?
-
-Packet loss is also observed.
-
-> Is the hardware reset signal wired on this PHY, and does the kernel
-> control the hardware reset?
-
-Yes, there is an i.MX6Q GPIO that is connected to the LAN8720 reset pin.
-
-> I note that phy_init_hw() will deassert the hardware reset, and with
-> .soft_reset populated, we will immediately thump the PHY with a
-> soft reset unless a reset_deassert_delay is specified (e.g. via DT
-> reset-deassert-us prioerty). This is probably not a good idea if the
-> PHY is still recovering from hardware reset.
-
-The original dts had the PHY reset described in the FEC node:
-
-&fec {
-      phy-reset-gpios =3D <&gpio2 4 GPIO_ACTIVE_LOW>;
-      phy-reset-duration =3D <100>;
-
-I have also tried describing it inside the ethernet-phy node with:
-reset-assert-us; reset-deassert-us; and reset-gpios, but it did not help.
-
-I agree that the combination of a software reset and hardware may be
-causing the issue here.
-
-> For reference, LAN8720 requires a minimum period of 100=C2=B5s for hardwa=
-re
-> reset assertion, and then between 2 and 800ns before the PHY starts
-> driving the configuration pin outputs. This _probably_ (it's not
-> specified) means we shouldn't be talking to the PHY for approx. the
-> first 1=C2=B5s.
+On Fri, Nov 14, 2025 at 8:12=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-> Finally, and this is probably not relevant given that the PHY works
-> with the genphy driver, the PHY requires the XTAL1/CLKIN to be running
-> during a hardware reset.
+> This patch refactors __alloc_skb() to prepare the following one,
+> and does not change functionality.
 
-A 25MHz oscillator is connected to XTAL1 and XTAL2.
+Well, I think it changes a little bit. Please find below.
 
-Thanks
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/core/skbuff.c | 26 ++++++++++++++++----------
+>  1 file changed, 16 insertions(+), 10 deletions(-)
+>
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 88b5530f9c460d86e12c98e410774444367e0404..c6b065c0a2af265159ee61884=
+69936767a295729 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -646,25 +646,31 @@ static void *kmalloc_reserve(unsigned int *size, gf=
+p_t flags, int node,
+>  struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
+>                             int flags, int node)
+>  {
+> +       struct sk_buff *skb =3D NULL;
+>         struct kmem_cache *cache;
+> -       struct sk_buff *skb;
+>         bool pfmemalloc;
+>         u8 *data;
+>
+> -       cache =3D (flags & SKB_ALLOC_FCLONE)
+> -               ? net_hotdata.skbuff_fclone_cache : net_hotdata.skbuff_ca=
+che;
+> -
+>         if (sk_memalloc_socks() && (flags & SKB_ALLOC_RX))
+>                 gfp_mask |=3D __GFP_MEMALLOC;
+>
+> -       /* Get the HEAD */
+> -       if ((flags & (SKB_ALLOC_FCLONE | SKB_ALLOC_NAPI)) =3D=3D SKB_ALLO=
+C_NAPI &&
+> -           likely(node =3D=3D NUMA_NO_NODE || node =3D=3D numa_mem_id())=
+)
+> +       if (flags & SKB_ALLOC_FCLONE) {
+> +               cache =3D net_hotdata.skbuff_fclone_cache;
+> +               goto fallback;
+> +       }
+> +       cache =3D net_hotdata.skbuff_cache;
+> +       if (unlikely(node !=3D NUMA_NO_NODE && node !=3D numa_mem_id()))
+> +               goto fallback;
+> +
+> +       if (flags & SKB_ALLOC_NAPI)
+>                 skb =3D napi_skb_cache_get(true);
+
+IIUC, if it fails to allocate the skb, then...
+
+> -       else
+> +
+> +       if (!skb) {
+> +fallback:
+>                 skb =3D kmem_cache_alloc_node(cache, gfp_mask & ~GFP_DMA,=
+ node);
+
+...it will retry another way to allocate skb?
+
+Thanks,
+Jason
+
+> -       if (unlikely(!skb))
+> -               return NULL;
+> +               if (unlikely(!skb))
+> +                       return NULL;
+> +       }
+>         prefetchw(skb);
+>
+>         /* We do our best to align skb_shared_info on a separate cache
+> --
+> 2.52.0.rc1.455.g30608eb744-goog
+>
 
