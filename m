@@ -1,162 +1,144 @@
-Return-Path: <netdev+bounces-238926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 696F0C611D9
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 09:48:37 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3FF4C611E6
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 10:05:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8B2B3A0365
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 08:48:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 63DF04E1FE6
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 09:05:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5041225779;
-	Sun, 16 Nov 2025 08:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41BB723B63F;
+	Sun, 16 Nov 2025 09:04:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C4KPjtZV"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="vjcR0Dx4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-231.mail.qq.com (out203-205-221-231.mail.qq.com [203.205.221.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D7120FAAB
-	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 08:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D4F6FBF;
+	Sun, 16 Nov 2025 09:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763282913; cv=none; b=rseT9e+hk3fUYizbOqb17VzaZeqL+boXS1khX/u9jn78/rYwdhXayIQB81hVXJcMQcGgzsJd8ct5ZdZwqHJkKB3DpQWZdDzsFYCv4gttkm4nXY5yanyEpWKA9mYKwSRdozfSxLTVeh65rVyTCOWUB7vPEueUgC21bCudp24twzk=
+	t=1763283897; cv=none; b=QcvbMD3pbedCSE4nMX2d8oaz03S6F7bSzQevCl0AjFnXs05eviRFUfKQ5Ef4wVkt+Ki5I9+G9kZxccuEI8A8JoXeQf1/69f0Xxv2xgFnWRr59uU0R32HmvDI81cCn5WnUMSe7jqIsjiGt1ZWZ5IktLJIFkxq1tAFtdL24LG8q64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763282913; c=relaxed/simple;
-	bh=slKdwHafhow7dloL59W+zFaQY0w00Mq7xViexOU5RQM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O4oZYuchTn0Pv3KhiY3jejRwzDNjn5zBe3ftAdmQcweFhH1jVN94RMKiwmyRDPVxy3mc79wATZIXava0E292LtBgZbDiJPPYAVplGPrrG4X0UIPif2fDQUMJ1rlm+5EWj1Dw8NhhQU5wodvDdqr8nGtp4DuNRmOL/oWzB/rRfPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C4KPjtZV; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ee1879e6d9so5988541cf.1
-        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 00:48:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763282911; x=1763887711; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DoqFw6oCCnUpU9ChJ0lDJZrZlLUp+Vj4PSkyuiVNz04=;
-        b=C4KPjtZVs1KGJbPQHwNaf0l05LdptTvNNjIk6iVEo5hA08QXCypUY6MpPEBocRvopm
-         DlD2uCS7HqHjaWueNIIFQe3Emfe9//vhg4tEaKMhri1HFUKrNqyabe9mmzEYgyzynqbp
-         h5csXZCmR61TKmuEEnj3/LSvo6V/ssBye2zKuEYORfn7xkgEgPRRdAgG6dXQcFgy9Q7X
-         ceEGPb7sUTdAC7iunMe4juIOmPhd3Qvot1jXAFUvQ2A9wqMUyx3XJt/OuMjNbpVbVYvI
-         udBfmYeIyI6K06rDvUNpvTojpafzNOJP305rGgrrWyV9IYXZmJ4ZIg6gmC5Jd/V1FGPL
-         qO1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763282911; x=1763887711;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DoqFw6oCCnUpU9ChJ0lDJZrZlLUp+Vj4PSkyuiVNz04=;
-        b=u40EYafABEiWgU/24yFbAUvczTeu9CFONcyJqB/13jEfWwvjnCDxE/jMFEm4B0kYRm
-         oZ+vzrqyNs+b9uU8CCXZfADVceppY5ZIhK/DqGrc8FhOS/KXCuu4yEc6Y9yXiCkAMRIf
-         MU4/3zRCTZerlhEL7UdCLlW7e0p9USd1mQT5zs8ORYYnjoxpj8MNc0G8rxK09hQWVFcn
-         SgMYoRFFhty+rYdZkueCYYK4lPk5uOsGC3Xtjk0Wx1b+Fvp0X8NCdoziTjwQnuNjZFXJ
-         L9NpOnsHi7jww3jv7+MkiGhNjn2WMiNy0dATcBoQyWUebUTrmHgk6Z9WM/UkHKdC5Cnu
-         cbww==
-X-Forwarded-Encrypted: i=1; AJvYcCUIn5oSpzUYc0wrhTCMOxBjwJejx+3oG43KyelYOLJoifFs7r8+c+znZsJDrsqspm18CtG2WBo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6NBtqdl0MQlLAmFlz7jPb7BtJMoFl22+E80Eibx7frTzL3qkF
-	0lEquUvAOF2blsqZlUgPxYPG1aUkEgqqlLACbDF2S5zSM94IMBIqrshxclzdPAqiDfi5bCbXEyC
-	n8udoSJT98Xx/zfNkqjzeprjhU3cXAOcgshuLVTPy
-X-Gm-Gg: ASbGncu8Y+XX2S4U4pxUk34+PbR/wWzyjxv8gQwkmWQ1jmzIXlCJEkR/Al8NPAPLqkS
-	jkKf1/mmhlxkPsb+ROrZ4jw3kFOPuzJxKwSH6XwPbpJoGbs2PtXNgDnnbKSRoX2C1Q0YPZCgQif
-	Hvsq7H7DOYU1FSoQnNuE6G1COH/7KBTR6yeDjS0l/RKOtHdgJiZ3DE/wmCzNr0Pwh+17BLOJiZk
-	hfRy+rKFeVqVDpFDKqyjdE3hOk8e4YREJJgxji+rMz6vexrpthBoFnKBoxM8QiJXld3HV4=
-X-Google-Smtp-Source: AGHT+IGo19LSVHXDsKRaBIcXYJY7d55xpGeiLKotjtdnGxL1jC98YuIxoB0p72+YWPVLP33hkkPjSAmt+y3LhlZXqQw=
-X-Received: by 2002:ac8:5d8f:0:b0:4ec:e1aa:ba4a with SMTP id
- d75a77b69052e-4edf20487d5mr123157171cf.1.1763282910518; Sun, 16 Nov 2025
- 00:48:30 -0800 (PST)
+	s=arc-20240116; t=1763283897; c=relaxed/simple;
+	bh=bMAovyXQ5Jl2Bqfqm4OhLklP2RmlDOwRJrVYcNtJTnU=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=jHA+x7DUwOHwx3/WlLg6C3GKQuSR8y239/O8st+15OikPLu3pM7dbPOZOMb8uWgdCNFksvlvyw27nqS25TuPsrExfXGe1iR/83SvFTPAfhQS8drpL/UhxqrquB6N28HdE8rhhF/fFsC4ecE5znz9TDrhnTa98K/e3+tFk6TwEzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=vjcR0Dx4; arc=none smtp.client-ip=203.205.221.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1763283885; bh=1KDMtZ2uqJgZB/2vth/TRG5ypYnqKb/ZVL+aTW9r1bY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=vjcR0Dx4mq7DFSDiXzpVuQ/H0h/jf5hGu4n8H1fVsZ/RA1+0zgMk0OuSwg7PjKdki
+	 Px18fZX7fDGJlgBFKIGTws1yKL1EZrhDqyKPz4HCwHqett93ILWHxDtET7DR6ZgBla
+	 TG7HGsyh8J7Vcr2JSYjSCR6nZDQ9G+tOe2d2H/UM=
+Received: from lxu-ped-host.. ([111.201.7.117])
+	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
+	id 12B240D3; Sun, 16 Nov 2025 17:04:43 +0800
+X-QQ-mid: xmsmtpt1763283883tg2uawld0
+Message-ID: <tencent_279508EB2AECDECC2C79466F582D896E980A@qq.com>
+X-QQ-XMAILINFO: MqG4KXyEKpQyuCgPqWrEYZ39If+J0XxCosFEmMtYywoi8JFEGQ2u43jBsC36G+
+	 gpWyfXtvkFx21ZREFkbfim6+Mf/SKD1QaGip6HtPGjldjvi4yssG4WLDpFWywGTjKHxZInbyGHCB
+	 flyfrwMJs/rPw8IgN6TU4aVbB9ku+gHLsVPD7Eg4qe65s83jsOAAwAf1urWbQdefpgLJ+TSwkwQ7
+	 IGWwQD0FTTMBtgxGAujJpsZEzWHoHQzhtkVZwhQjbDeprtyMiEViaQF5aMOsAHSJm9cKkTUKfINr
+	 KcLv6toM53CllFX0HskBlby+/ELmPTWK4UrtPJlVPNOEqmb12WfVt2KGeunIrLtEz3WSlhol34TA
+	 d7icEEB11XY9MyQmqLZ2Lerqm6j0K7wNVx+myOfHKY3U4S+uS6e2VLcys6gHENbneYh62m+1t9cz
+	 hqm4uoKfuHq9kvU0sTnv6OBgo6/3brl/Yjjv6MVqtepPzprdRuwZ6bG+IVY7yBktYaz2NOwkaTmO
+	 1Wu9MrhOjcD+wvsjobkG2eDrkBmBznMt63ZWm+3GERoiJ8d6A81Q7JzaSphuRj1spl8f9Eyp/zqQ
+	 RXwTdkGNn0aX5FHX2Wpmx121r/oRdDi11X5oNTe+jbljOcjyl/VIUzYFsci7Zdwv9o+jX7XH3DRt
+	 NfZGh5+pF2WzWnSPPehrbjmJVqU8SAmfbsHH4sftzD7Dk9GDM4AaqYuVV9aNb4PiqVRngroQ9y2g
+	 I/QWF2gqnYKQKGycRsv12GQ2kViX6qUZLCHIFb8E1rk+SMU6TybE+Cmuel3l3hA0XgpIF3zp2eIe
+	 JW/woTwf8KSI9eqrZHXtYw6X0Ryqpl7yGszcEqwvOWTUwDQU0ON86FsBviDLRjgBFWkZkzwmlg7I
+	 +ubu7mXeAAW5l1+p8/khmkgSOfRH/1jnWTFGs/6cd7YulItYD5xq+SacrC6YIrbDd+MjKsHqs4Uz
+	 PiwdEjZ23G9GiWg9eZGgN74AodveakKoqn8jd4PnzB5GCM51bJbUGrVk70bA/LEME/LWm0IBQ=
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+9aa47cd4633a3cf92a80@syzkaller.appspotmail.com
+Cc: johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] Bluetooth: hci_sock: Prevent race in socket write iter and sock bind
+Date: Sun, 16 Nov 2025 17:04:43 +0800
+X-OQ-MSGID: <20251116090442.49103-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <69197079.a70a0220.3124cb.0070.GAE@google.com>
+References: <69197079.a70a0220.3124cb.0070.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251114121243.3519133-1-edumazet@google.com> <20251114121243.3519133-3-edumazet@google.com>
- <CAL+tcoCdLA2_N4sC-08X8d+UbE50g-Jf-CTkg-LSi4drVi2ENw@mail.gmail.com>
-In-Reply-To: <CAL+tcoCdLA2_N4sC-08X8d+UbE50g-Jf-CTkg-LSi4drVi2ENw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 16 Nov 2025 00:48:19 -0800
-X-Gm-Features: AWmQ_bn9LHqJeAljDgweB0QUI4YkOxGxDvCzxEs3bCHpm6F9GKlTapcH-XXSLMM
-Message-ID: <CANn89iKbV=mmPacj2d0parv9PKyWhKqasU=ufLBvrY90Lbs3Yg@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 2/3] net: __alloc_skb() cleanup
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Nov 15, 2025 at 5:08=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Fri, Nov 14, 2025 at 8:12=E2=80=AFPM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > This patch refactors __alloc_skb() to prepare the following one,
-> > and does not change functionality.
->
-> Well, I think it changes a little bit. Please find below.
->
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > ---
-> >  net/core/skbuff.c | 26 ++++++++++++++++----------
-> >  1 file changed, 16 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index 88b5530f9c460d86e12c98e410774444367e0404..c6b065c0a2af265159ee618=
-8469936767a295729 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -646,25 +646,31 @@ static void *kmalloc_reserve(unsigned int *size, =
-gfp_t flags, int node,
-> >  struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
-> >                             int flags, int node)
-> >  {
-> > +       struct sk_buff *skb =3D NULL;
-> >         struct kmem_cache *cache;
-> > -       struct sk_buff *skb;
-> >         bool pfmemalloc;
-> >         u8 *data;
-> >
-> > -       cache =3D (flags & SKB_ALLOC_FCLONE)
-> > -               ? net_hotdata.skbuff_fclone_cache : net_hotdata.skbuff_=
-cache;
-> > -
-> >         if (sk_memalloc_socks() && (flags & SKB_ALLOC_RX))
-> >                 gfp_mask |=3D __GFP_MEMALLOC;
-> >
-> > -       /* Get the HEAD */
-> > -       if ((flags & (SKB_ALLOC_FCLONE | SKB_ALLOC_NAPI)) =3D=3D SKB_AL=
-LOC_NAPI &&
-> > -           likely(node =3D=3D NUMA_NO_NODE || node =3D=3D numa_mem_id(=
-)))
-> > +       if (flags & SKB_ALLOC_FCLONE) {
-> > +               cache =3D net_hotdata.skbuff_fclone_cache;
-> > +               goto fallback;
-> > +       }
-> > +       cache =3D net_hotdata.skbuff_cache;
-> > +       if (unlikely(node !=3D NUMA_NO_NODE && node !=3D numa_mem_id())=
-)
-> > +               goto fallback;
-> > +
-> > +       if (flags & SKB_ALLOC_NAPI)
-> >                 skb =3D napi_skb_cache_get(true);
->
-> IIUC, if it fails to allocate the skb, then...
->
-> > -       else
-> > +
-> > +       if (!skb) {
-> > +fallback:
-> >                 skb =3D kmem_cache_alloc_node(cache, gfp_mask & ~GFP_DM=
-A, node);
->
-> ...it will retry another way to allocate skb?
+There is a potential race condition between sock bind and socket write
+iter. bind may free the same cmd via mgmt_pending before write iter sends
+the cmd, just as syzbot reported in UAF[1].
 
-Yeah, I guess we can avoid a retry.
+Here we use hci_dev_lock to synchronize the two, thereby avoiding the
+UAF mentioned in [1].
+
+[1]
+syzbot reported:
+BUG: KASAN: slab-use-after-free in mgmt_pending_remove+0x3b/0x210 net/bluetooth/mgmt_util.c:316
+Read of size 8 at addr ffff888077164818 by task syz.0.17/5989
+Call Trace:
+ mgmt_pending_remove+0x3b/0x210 net/bluetooth/mgmt_util.c:316
+ set_link_security+0x5c2/0x710 net/bluetooth/mgmt.c:1918
+ hci_mgmt_cmd+0x9c9/0xef0 net/bluetooth/hci_sock.c:1719
+ hci_sock_sendmsg+0x6ca/0xef0 net/bluetooth/hci_sock.c:1839
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:742
+ sock_write_iter+0x279/0x360 net/socket.c:1195
+
+Allocated by task 5989:
+ mgmt_pending_add+0x35/0x140 net/bluetooth/mgmt_util.c:296
+ set_link_security+0x557/0x710 net/bluetooth/mgmt.c:1910
+ hci_mgmt_cmd+0x9c9/0xef0 net/bluetooth/hci_sock.c:1719
+ hci_sock_sendmsg+0x6ca/0xef0 net/bluetooth/hci_sock.c:1839
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:742
+ sock_write_iter+0x279/0x360 net/socket.c:1195
+
+Freed by task 5991:
+ mgmt_pending_free net/bluetooth/mgmt_util.c:311 [inline]
+ mgmt_pending_foreach+0x30d/0x380 net/bluetooth/mgmt_util.c:257
+ mgmt_index_removed+0x112/0x2f0 net/bluetooth/mgmt.c:9477
+ hci_sock_bind+0xbe9/0x1000 net/bluetooth/hci_sock.c:1314
+
+Fixes: 6fe26f694c82 ("Bluetooth: MGMT: Protect mgmt_pending list with its own lock")
+Reported-by: syzbot+9aa47cd4633a3cf92a80@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=9aa47cd4633a3cf92a80
+Tested-by: syzbot+9aa47cd4633a3cf92a80@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/bluetooth/hci_sock.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index fc866759910d..ad19022ae127 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1311,7 +1311,9 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 			goto done;
+ 		}
+ 
++		hci_dev_lock(hdev);
+ 		mgmt_index_removed(hdev);
++		hci_dev_unlock(hdev);
+ 
+ 		err = hci_dev_open(hdev->id);
+ 		if (err) {
+-- 
+2.43.0
+
 
