@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-238941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70D64C617E4
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 16:57:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9701BC617E7
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 16:58:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EBF283596FF
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 15:57:17 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4B95B36306F
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 15:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0A630C62B;
-	Sun, 16 Nov 2025 15:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D6330CDB7;
+	Sun, 16 Nov 2025 15:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JQJ8AMob"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hq80fUw8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5C13C1F
-	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 15:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4008430CD8F
+	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 15:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763308627; cv=none; b=dPMNvTjour3/gXNcFSE4VAK5lClHLPY+vN4ct5CRxz51vERBhlO4IPHBOUJJ692a1NSncaH4VQTxqOCStaPBl6zfsp51Di4/GsNg22nwh2V9qAI9UfuQGftqn9qd9Zsf5T4OzET+S0cc08DEaYzMkVmw5un1FPlkZkQ07uc4/yE=
+	t=1763308632; cv=none; b=qOYj36t8yTBQ4GXhBVSQBcSrWBCuRVkok4gieyNFyQ77ksokELe+HCwrEyXD8b11RRxHESN7g5Sf+TnLabNNla4RoCMsoSQ1whGGNtmwDqAbwGODS2uDVh8MskwLxziPoLNE22GlZByctYaGg3pKbAom/nNgbEcVObog8o0zl8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763308627; c=relaxed/simple;
-	bh=ufCbvxIRBVQHCzUSRhXUdWL2YVW5ycqhQc1EXb99qW8=;
+	s=arc-20240116; t=1763308632; c=relaxed/simple;
+	bh=Usqx83ivKY4w0KNMbSY7X0Z+d+La037+pNfmug8W6AY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YRNCA+UI3EfuvMYrqRO/ATg+F6ZtFSXjxqBdcTRq34tXmM9sM70dJg3rEjPTZ8JOTDDZxgSbKwlUJLFVRQ3zneBqzwhKCNBUaSVp0fWXcpX/wZozOl1qg1R6ov6KON8eHQpX75RlOpAMRJCQuhFAByr5IJXpI/8+Vszro7SX8CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JQJ8AMob; arc=none smtp.client-ip=209.85.210.173
+	 In-Reply-To:To:Cc; b=ok+OO5YTDOsXfwFbJNuzxxwuKlqMgszE2zc51GGUuhBdKhiydCDV2bhttOYKbz1YrGJGeSvSn5Ac2BR/AuNqndO9aHSB9zErzc/oTcOndJf6/wN9fWDOKLp+nYgOw/R843slDWA3yT0s0VxNKk7nrrUJh1PN+5XnfVRozCGWOjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hq80fUw8; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7b9387df58cso4740534b3a.3
-        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 07:57:04 -0800 (PST)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7ba55660769so1936378b3a.1
+        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 07:57:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763308624; x=1763913424; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763308630; x=1763913430; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=R+K9MAxb4ZBBa8U7x004Sm9bCoWfglzoRMNcWRH1ZAc=;
-        b=JQJ8AMobBU7f8PU3aj6iVS2Cqyoi/eAX6SxA7yabzfcqg/6Y+zjHPN7RDEI6V+RCCH
-         dyT0ync1+AiDIDrvFk+ymgfCbYxoNkwQ3LtmL4iQ9y78yuXqYcD3lztNevdt16QTuDdP
-         D5BuvlU+1M4cgrZC2XO79fx3h9fFFljD3qtOwoViXpFFfQU5JCxbrlzOmfNHKBPbbaD6
-         JJHI2XBDDXruOpDYgjjYXAd6yHULeFca7jk9168joIepezt9SZyhW0pmzhwK2soSKbUk
-         /PjyxBCU3GV+08U/qQNEG4fgZ/UNsW7v4BDIbM8VPFzbpi/JogcaRPLbh1YfdrzlCA1i
-         itKw==
+        bh=I1gxk1DsHCEeyciyJk4Gm3Xoh1TUbmw4WS4h5BWbH44=;
+        b=hq80fUw8PfSCSFLH+N69BcSS1hnZGek4jZrmWdC+bn3I6SbeWuPCsAX21TPNC0pgRU
+         zqQ5VS4kQXS/jWrPVSjBYWPWz47msMHazcsWud+vQcVWVxgYPDSniihp4EwZOPuIKzkI
+         u3XfxfHGBNroVYBb3RQTkzAaK3+Onjf1PpwkE1MiiuuwLOSG/hzSVmi6peVy0G2wAi5M
+         rx5uLuyeCg7CciwQi66YFBe2xtvaVWKsdMCrymMnBJ8zp4g1Wy8fQ50Et+h+Jsc4esHF
+         JUvlQhQ4gDIyuuxCuwZAg/xsCNIxpjY37tdPnlHq7ZooGB05WoWVRXZTXFZEAgjAdSGR
+         z/tA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763308624; x=1763913424;
+        d=1e100.net; s=20230601; t=1763308630; x=1763913430;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=R+K9MAxb4ZBBa8U7x004Sm9bCoWfglzoRMNcWRH1ZAc=;
-        b=H7cAIKelnwm2MqJ0JHI6xRL3J5i6n/Cx6YxjTEG9xwPAUW2htYOxiOwNXI7QqmR4A6
-         6qUdE/1g5SbS03Fwfv/QGyu1WGqAPVcTL0OqNjojUFBfk81Vspv4w9tcIBb87gYZZchu
-         79Tw5SpYPwfEX0OnKS5QAc+uTYkWageJz3n42oHbMkbeWd9973ge1HJ7rUr2bwR1sI5h
-         PPK20i9S4W2+8sluriNaDr0ichfND4nmT+hY4iepC14yAzY74wvQpB6+4gAa8/W1oQeH
-         QLXsHA6FuHWrnSeOTwblM21hYvGrCeQGE1Htl8KijvDTDIGuBbdVMzNA7vawVRX0dHTZ
-         E1yw==
-X-Forwarded-Encrypted: i=1; AJvYcCUkKk5lFobuaHKiRjpSqh6PdR4XR3u/H9fe2jhtemPGyC6C9X9Bq8P0yzk3NLHwA+qtnbiUqVU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySlvxR9nKVh1dsE3f6dRjyfgbkWB3O5wssZDQI2qyIg/8wqplU
-	nkB7ux2z5gXqJDl/fE24DTJITeSKvCVNBzeDHX1Hc0mQxKEFGeKl6aBX
-X-Gm-Gg: ASbGncuGqsAHEwSEYRvpwD9VZe+bFRw1KpDH3BYEGKgfeLdi5S49A6m1Uhsv91C8mrc
-	TTTYPCP3Mh3Q9ilZCcS2uVI/PcFO/uF2NusPiW202XJvQgEDn2TP/CDpo10nByIrRfEsSyDzzhQ
-	Q31G1qP0zSQeAlaJTyZj0ksTpXlc+jM4BTO4MD/x9WWvYdmTyjuCLNXy6e3Vk3l1hihGpoPKNOj
-	0Ql8SWiJqkHThTIV0s9KIalTTp2uI091vK4K5zHqPYBIrCB82PS+IOwxbYpwSRHthgcabzDW762
-	AhK9Mq/ltMY0V1N1TtZCU9z1edoq+CQQj8NklNKIH5qA+xltmQAvH1V1xcMO2bpJAm3+s5AFblG
-	NV3jqc03WzuS1sbfPr2h4ibp6egv7coSikU3cVcWVPYsxvAFs3R+dY7xt6jmpCDrkE6FIXBIfRx
-	jSJTKupcSeaZss11+PO2Q=
-X-Google-Smtp-Source: AGHT+IEBONigJXUH6CJN+6b8wVtJBo3FEOVEJ//SL5EdSu5yo0atK7Q9DdGnua5zoxWDyWpCtDj7FQ==
-X-Received: by 2002:a05:6a00:4fcf:b0:7b9:d7c2:fdf6 with SMTP id d2e1a72fcca58-7ba3b89ed15mr12770157b3a.24.1763308624240;
-        Sun, 16 Nov 2025 07:57:04 -0800 (PST)
+        bh=I1gxk1DsHCEeyciyJk4Gm3Xoh1TUbmw4WS4h5BWbH44=;
+        b=EtL4k5/aZtnFAdaqoZkFYDWZFU2h/sR1xs3qQv1ESQ2DmNxBbo4nneVR6/Dc6m7BLs
+         jzSHo7pXBH0chHk2jDehU53X3aNIvz0bRB9To7HJ8ZTkvwknzsnhN6bTDRVT26swOJ2F
+         8jWvVPZVKtUfJd49lQB4JbjRr1xwYPRa53TVC0u515Af1+Zjjltv4SB8ewABAb5/LQvA
+         TcNWwQPE1pVz83NowoRvv/5/AnCK/r3MmKaes8oTEAgQXC4EIOZcnipcSGwLdMLJ2deX
+         jD5YqGo7M18ux821PxkIKq9wXomgsBXcYvD34yekmWoM4CauQhaCeScjVkQmhH3qt0B4
+         ak7A==
+X-Forwarded-Encrypted: i=1; AJvYcCV11tHemaVL4Xq51DKCA0y4H0r6MczTd9QTtBEpNEranZlHAcDeZmW9xHNbclpfFmBbS2TSwHE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzX3clwQXjj0ucnMj5Rakr+CySPkdXQI6R2xg+5M0m2aZQpfUfR
+	aK10ZbsaSNS9KdifpDMkUpkJx+aeD4p5c4aRoco0EfahXbfJzoxZV5aerLxOrA==
+X-Gm-Gg: ASbGncv+3M2owYPHguaKZJ8ELetleov1slde/lbil9ObtTnoRlDPGxDPlRyM4ZjaSMk
+	Sca2sQn1a4U8YV5j7XaT8ysZ4lkyQ8xDQw5atA2dF9AjKh4X8EodLpHPZ8xIbjqlr8kZottshpp
+	lhr+z/zIG2LCYk1in1pBd65v9hrFx2k6TnxWdaPwASOw3l4nGcpEupi1jpPq7EJ/VcbxunJl+YC
+	VazOyrCXgPjU1oUUICuWG+cAnYAO+NfkX6e5ibq2eVmQ+arxoIzPWt8xbOqUGVqfEx681CzqKXR
+	bIUgOMZZ2tlJgFvEJ+CHx8Jna2m4/BwX4X+hvafiXkqur7h03zdNghEASGS+ImAiFgvkY8H1lfE
+	V85f6f4oAg1RqZS0YwLy4tIJgFVAi7t0tOG1/EYEZkqUr3yM1aBF+o1R2/gcdxxuacnWpWDzlMD
+	WwCpj+U+72
+X-Google-Smtp-Source: AGHT+IFqBdx4R6YTOp0JDgvcZZT5ZiiWX5oMnR2HQmFdpl5m0+SbCTbe9kbJBhTtWt3ynBIXX091MQ==
+X-Received: by 2002:a05:6a00:a95:b0:7b9:df65:93a9 with SMTP id d2e1a72fcca58-7ba3ce6b3a7mr11792143b3a.32.1763308630509;
+        Sun, 16 Nov 2025 07:57:10 -0800 (PST)
 Received: from aheev.home ([106.215.173.137])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b924ae6943sm10677038b3a.6.2025.11.16.07.56.59
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b924ae6943sm10677038b3a.6.2025.11.16.07.57.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Nov 2025 07:57:03 -0800 (PST)
+        Sun, 16 Nov 2025 07:57:10 -0800 (PST)
 From: Ally Heev <allyheev@gmail.com>
-Date: Sun, 16 Nov 2025 21:26:48 +0530
-Subject: [PATCH RFT net-next 1/2] ice: remove __free usage in ice_flow
+Date: Sun, 16 Nov 2025 21:26:49 +0530
+Subject: [PATCH RFT net-next 2/2] idpf: remove __free usage in
+ idpf_virtchnl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +86,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251116-aheev-fix-free-uninitialized-ptrs-ethernet-intel-v1-1-0ddc81be6a4c@gmail.com>
+Message-Id: <20251116-aheev-fix-free-uninitialized-ptrs-ethernet-intel-v1-2-0ddc81be6a4c@gmail.com>
 References: <20251116-aheev-fix-free-uninitialized-ptrs-ethernet-intel-v1-0-0ddc81be6a4c@gmail.com>
 In-Reply-To: <20251116-aheev-fix-free-uninitialized-ptrs-ethernet-intel-v1-0-0ddc81be6a4c@gmail.com>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
@@ -97,17 +98,19 @@ Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, Ally Heev <allyheev@gmail.com>, 
  Simon Horman <horms@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1688; i=allyheev@gmail.com;
- h=from:subject:message-id; bh=ufCbvxIRBVQHCzUSRhXUdWL2YVW5ycqhQc1EXb99qW8=;
- b=owGbwMvMwCU2zXbRFfvr1TKMp9WSGDIlv7hsWbJ8z5+NfBeCFsRmXr8eKFP1Xzd55veX3yav9
- t7w19WitqOUhUGMi0FWTJGFUVTKT2+T1IS4w0nfYOawMoEMYeDiFICJ2DYxMnzIq9Ey0A2copeu
- KZkZxzi7rnD2sfVTnplmCtxcGMTTdZrhfxJnvwKX7/75Hl9XnLUtd+Jec07pl2Lk1zT1tjWibC6
- FDAA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2680; i=allyheev@gmail.com;
+ h=from:subject:message-id; bh=Usqx83ivKY4w0KNMbSY7X0Z+d+La037+pNfmug8W6AY=;
+ b=owGbwMvMwCU2zXbRFfvr1TKMp9WSGDIlv7jmnYv3fraqfI7mvJ7YxevY13mlb7vk3NBbuq3tv
+ cqLjFO5HaUsDGJcDLJiiiyMolJ+epukJsQdTvoGM4eVCWQIAxenAEyk7SXDH44Jk9c4TXmmyRQY
+ 2fS1qcYz4M4bR/t5J77N2vFm8n3GuAyGv9JqC4K+3/BbHjM1+scGjinaW0XXVbn+WteXqrXTMev
+ 9Jm4A
 X-Developer-Key: i=allyheev@gmail.com; a=openpgp;
  fpr=01151A4E2EB21A905EC362F6963DA2D43FD77B1C
 
 usage of cleanup attributes is discouraged in net [1], achieve cleanup
-using goto
+using goto. In this patch though, only uninitialized pointers with __free
+attribute are cleaned as they can cause undefined behavior when they
+go out of scope
 
 Suggested-by: Simon Horman <horms@kernel.org>
 Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
@@ -118,36 +121,67 @@ Signed-off-by: Ally Heev <allyheev@gmail.com>
 
 Signed-off-by: Ally Heev <allyheev@gmail.com>
 ---
- drivers/net/ethernet/intel/ice/ice_flow.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 28 +++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
-index 6d5c939dc8a515c252cd2b77d155b69fa264ee92..dd62f5f14d60401d6a24cb9f86664425db1532d0 100644
---- a/drivers/net/ethernet/intel/ice/ice_flow.c
-+++ b/drivers/net/ethernet/intel/ice/ice_flow.c
-@@ -1573,7 +1573,7 @@ ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
- 			 struct ice_parser_profile *prof, enum ice_block blk)
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+index cbb5fa30f5a0ec778c1ee30470da3ca21cc1af24..5b2bf8c3205bc1ea0746f78afa2a24f3f8ad2a8c 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+@@ -1012,7 +1012,7 @@ static int idpf_send_get_caps_msg(struct idpf_adapter *adapter)
+  */
+ static int idpf_send_get_lan_memory_regions(struct idpf_adapter *adapter)
  {
- 	u64 id = find_first_bit(prof->ptypes, ICE_FLOW_PTYPE_MAX);
--	struct ice_flow_prof_params *params __free(kfree);
-+	struct ice_flow_prof_params *params = NULL;
- 	u8 fv_words = hw->blk[blk].es.fvw;
- 	int status;
- 	int i, idx;
-@@ -1621,12 +1621,14 @@ ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
- 			      params->attr, params->attr_cnt,
- 			      params->es, params->mask, false, false);
- 	if (status)
--		return status;
-+		goto out;
+-	struct virtchnl2_get_lan_memory_regions *rcvd_regions __free(kfree);
++	struct virtchnl2_get_lan_memory_regions *rcvd_regions = NULL;
+ 	struct idpf_vc_xn_params xn_params = {
+ 		.vc_op = VIRTCHNL2_OP_GET_LAN_MEMORY_REGIONS,
+ 		.recv_buf.iov_len = IDPF_CTLQ_MAX_BUF_LEN,
+@@ -1029,21 +1029,29 @@ static int idpf_send_get_lan_memory_regions(struct idpf_adapter *adapter)
  
- 	status = ice_flow_assoc_fdir_prof(hw, blk, dest_vsi, fdir_vsi, id);
- 	if (status)
- 		ice_rem_prof(hw, blk, id);
+ 	xn_params.recv_buf.iov_base = rcvd_regions;
+ 	reply_sz = idpf_vc_xn_exec(adapter, &xn_params);
+-	if (reply_sz < 0)
+-		return reply_sz;
++	if (reply_sz < 0) {
++		err = reply_sz;
++		goto out;
++	}
+ 
+ 	num_regions = le16_to_cpu(rcvd_regions->num_memory_regions);
+ 	size = struct_size(rcvd_regions, mem_reg, num_regions);
+-	if (reply_sz < size)
+-		return -EIO;
++	if (reply_sz < size) {
++		err = -EIO;
++		goto out;
++	}
+ 
+-	if (size > IDPF_CTLQ_MAX_BUF_LEN)
+-		return -EINVAL;
++	if (size > IDPF_CTLQ_MAX_BUF_LEN) {
++		err = -EINVAL;
++		goto out;
++	}
+ 
+ 	hw = &adapter->hw;
+ 	hw->lan_regs = kcalloc(num_regions, sizeof(*hw->lan_regs), GFP_KERNEL);
+-	if (!hw->lan_regs)
+-		return -ENOMEM;
++	if (!hw->lan_regs) {
++		err = -ENOMEM;
++		goto out;
++	}
+ 
+ 	for (int i = 0; i < num_regions; i++) {
+ 		hw->lan_regs[i].addr_len =
+@@ -1053,6 +1061,8 @@ static int idpf_send_get_lan_memory_regions(struct idpf_adapter *adapter)
+ 	}
+ 	hw->num_lan_regs = num_regions;
  
 +out:
-+	kfree(params);
- 	return status;
++	kfree(rcvd_regions);
+ 	return err;
  }
  
 
