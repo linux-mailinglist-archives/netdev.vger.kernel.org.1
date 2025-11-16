@@ -1,170 +1,157 @@
-Return-Path: <netdev+bounces-238946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEF9FC618F4
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 18:08:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B3F6C618FC
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 18:09:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 126A94E47F9
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 17:08:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 112D54E6905
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 17:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776CD2F0C6D;
-	Sun, 16 Nov 2025 17:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1782F0C6D;
+	Sun, 16 Nov 2025 17:09:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="afeQBXIe"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="hXRvsL/W"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF1E207A3A
-	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 17:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D2025333F
+	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 17:09:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763312913; cv=none; b=aGBux1Ur6XaVT9m1JsQnqHZ+7NEhMuDrdOgcyk5LHgu5s4NabEcIirNsBplu3HbyrTtCbYt8rkbzx8tCVnkwsFNSHqMfaokSvOH4gXcqJB3krlPf6EJmhVlBXGzkRwFa0KumZVlLvS3SNO9tZejLzKJfQetOiNXlBNOICFkhiL4=
+	t=1763312971; cv=none; b=d5eUJol3FB/+ZDEKTZ5ulv1nEfOp9n34PZSRCh6UAacm4i+jLxIZ5TdfBHmCBTSldH3oEtB6x8vt5PaAXHWIqckQSz3af3S9X86xipA6v09PURtqsIP5B/dKBikqPQPKl8cgHUzH5VXiRLWjADLjI3f/fiYGIWgvf4kN1vVF0gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763312913; c=relaxed/simple;
-	bh=IH4Wd4wwBj4XVtZAszRTJdc4LKSeWQqsPHNwO71S5Lo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ofBHkXnyYvlXjjEJei/hOVAftkNuptWJdQkfRxi6DNpFTn4DEz0axdnVmuShw8TSJPs9JvQU5Yq4soc0cLNLsWqQvRPmCypV6KnjSmT6BFfV8cOStXGR7LIz5tGlzjiDIdmf+V9lSllOg7HNcjBTxNAwMalFOpwTp0XZ0yu8/Ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=afeQBXIe; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=RtD681wK2A+vgOBzQr53VV8dMi9WiMUCj8nWm+68CZA=; b=afeQBXIe543kMvYOZToB+Dhg1l
-	aRw9GXzAy6V4fsYkcNZzUbz9Uec1058AxSIK7NW48QoQ3Fjc6YVDA3hPP+tkFK3X6fcHr3QwawrwX
-	H6ATv++Peb+L9CA72zPdM0xGyrE3s8hHo+dIvOMZjp8wOv4j3vYmLgvS7f/M5Y+BtayFAUF5yXL/P
-	cZrOgVQR2DfuWqa2grN5Upqrh3L6nj7bKp38/Vt040WMQGCOb1A/lkWK34wvwEzxLroFLxcGdv8xG
-	HEWpftLuVfbOo3Gigtwf5IteDx3GueyZ9DYVTK0r4NnfEun+vM/X7rfBsHkqCWKflH3zb9AmwfKN7
-	8qHwuQjA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57846)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vKgEk-0000000011M-0CUn;
-	Sun, 16 Nov 2025 17:08:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vKgEh-000000000eO-3Rzh;
-	Sun, 16 Nov 2025 17:08:23 +0000
-Date: Sun, 16 Nov 2025 17:08:23 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Fabio Estevam <festevam@gmail.com>
-Cc: kuba@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	manfred.schlaegl@ginzinger.com, netdev@vger.kernel.org,
-	edumazet@google.com, pabeni@redhat.com, f.fainelli@gmail.com
-Subject: Re: [PATCH net] net: phy: smsc: Skip soft reset when a hardware
- reset GPIO is provided
-Message-ID: <aRoFB3MunCS-_Qvl@shell.armlinux.org.uk>
-References: <20251116154824.3799310-1-festevam@gmail.com>
+	s=arc-20240116; t=1763312971; c=relaxed/simple;
+	bh=TUz/go8J+qPOebTt30XBqY4M9/navzJE1WqOt9D7aRI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SR4sLtLKYskk3hg41MVOYUlfqNJBuq87m3Y2uIrvgdrAh9DqDu7q+uqq9Ax6GkCQESzYzKoewEzb5zvUMZRL//1T7yHJ9XHrciQu4oE/sw88BWxEx6pLNHal9G188vEgwmlh32zlbCq2kgq53R0aqaUam2BXnI/ZFhenh5vnRAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=hXRvsL/W; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b99bfb451e5so2120011a12.2
+        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 09:09:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1763312969; x=1763917769; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IcjT+pMab7Q2hqz/bv9mPGg2SHjUkPMu35rj7wMSjDA=;
+        b=hXRvsL/WuCSzP4b62J1mnAY9Zz/jmwL0OZNVCOtKKaSzKM303cubs6vwetdrkGXpbh
+         e5KwguA4A0+PZ4nV7NZERpthTm8+8mH9C1WczpgHdKMthcZMI46CONfH04GAHY+FnlWk
+         cBzc9RXXGwB9KF9XnKpw1dxwKFM9IjYAUCGzHgfTozIeMkANHsZw1Ko1Ph++I1nZREzV
+         kPaFqrNhhjtFN6MdQYUYCVd9ox29ePGa1ynGyuTQ8rrJV0gV4cFWq817d9DskVj+8apv
+         WLlvIo8ujz9ziwONr2xV3LWMU2qiiHHALQqmt1q/TkysxEePvIOfOxjPJBvfr/EcCB+G
+         AAIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763312969; x=1763917769;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IcjT+pMab7Q2hqz/bv9mPGg2SHjUkPMu35rj7wMSjDA=;
+        b=p3WCP2rJZpuw5/63lALTNq6sa8j5URI/FJY/NiR4jSOm1qh3PdoK3dtrmAEwcGxw/n
+         XjK1u4hZv3WDlgt0gvmOe2ddX43/P1IZdRZdtCl8Ll+MyoYtQ4GzCoI4nZU1Hd1xUAR6
+         fhvQdU+wqusiLieb003yC/40cGFZFzVCyaCdev/wd9lgL6JXIciwAnT4wCCSBEs0eVku
+         7gnEkkZalbbUKVi1S9QBmWZVLkpemdQ+Wz/wX7ltoNonCGAqxtMg/fyWE32vsoC0GdmW
+         DHQzplRSJMddRItRn3eStszM/LhWYeYmTVCBGRmlNpUXS4D1QYqlLeU5QCJy8QYX2PL9
+         Neyg==
+X-Gm-Message-State: AOJu0YywCPJAbgWKCIK5TYTra20AjzJrrKcezaK3TqqAVi9mdTbWPKgD
+	InCv3UCHL6kvbES7dIp9Y31FrRqg2zv5KP+y5QI5f3Rhcn8f6zLCzMvhceBdL1MnYujNT76mP+8
+	JXC6B
+X-Gm-Gg: ASbGncuUeibhO4P88OVDtGYaOk4Na1f8g3Lim0fWmv+gckoMHcsCXw6j5OIPvsxwZm6
+	zF5F4RbYzwhdCoHLkNRRTUoSYHDeFXzNkkliNDqZAEEgCLchYGFbOtQjCf7zJZceUvjMrTayaLO
+	XHY0Hghgr9x/WXU+9BGYzAgBIXK8VPXqMptPMSWYV41wwmb9qf3jriZoy34yxSguqwIQhr9y9fn
+	CYCeMp2oF5BKY7ecAn13WeiVdFHVIOrcGjGDy7EBntelbpd/xxjbZ00FEoCWFG6Fk8zKeeQRP8D
+	zGdZKf8IHdV8iZlJrOnYwyGf0J+i8bJjCh9bCDaYA7eO8y1r+lsDAW16z6ugsz1cY26IBhkHzSj
+	q/qDwVl2XyRlmHmmCnFyQ3lRxVWgL2eBzSgG0qqyPnfUp2N6MKAsB9BFHCTnJ8+OFT6xbPBz5Sq
+	Zi7omtasRWvYfsTs1FCwZX3eQZrPt0N0G58zBvxm8Y1ThON/g27RtGHCI=
+X-Google-Smtp-Source: AGHT+IFQLmMRJTKRVW59ZzA03cCRyPyrVteZ2udRj+FnFuzhWXzrr6j2rQgPRMVYHFgckjp7saDH/w==
+X-Received: by 2002:a05:7022:619e:b0:119:e56b:98b0 with SMTP id a92af1059eb24-11b411ff197mr3470108c88.23.1763312968951;
+        Sun, 16 Nov 2025 09:09:28 -0800 (PST)
+Received: from phoenix (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11b0608861asm25116030c88.9.2025.11.16.09.09.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Nov 2025 09:09:28 -0800 (PST)
+Date: Sun, 16 Nov 2025 09:09:26 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Petr Oros <poros@redhat.com>
+Cc: netdev@vger.kernel.org, dsahern@kernel.org, ivecera@redhat.com,
+ jiri@resnulli.us, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH iproute2-next v4 3/3] dpll: Add dpll command
+Message-ID: <20251116090926.130f3b9e@phoenix>
+In-Reply-To: <20251115233341.2701607-4-poros@redhat.com>
+References: <20251115233341.2701607-1-poros@redhat.com>
+	<20251115233341.2701607-4-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251116154824.3799310-1-festevam@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 16, 2025 at 12:48:24PM -0300, Fabio Estevam wrote:
-> On platforms using the LAN8720 in RMII mode, issuing a soft reset through
-> genphy_soft_reset() can temporarily disrupt the PHY output clock (REF_CLK).
-> 
-> Boards that source ENET_REF_CLK from the LAN8720 are therefore sensitive
-> to PHY soft resets, as the MAC receives an unstable or missing RMII clock
-> during the transition.
-> 
-> When a "reset-gpios" property is present, the MDIO core already performs a
-> hardware reset using this GPIO before calling the driver's ->reset() hook.
-> Issuing an additional soft reset in smsc_phy_reset() is redundant and may
-> result in RX CRC/frame errors, packet loss, and general link instability at
-> 100 Mbps.
-> 
-> Change smsc_phy_reset() so that:
-> 
-> - If reset-gpios is present: rely solely on the hardware reset and skip
-> the soft reset.
-> - If reset-gpios is absent: fall back to genphy_soft_reset(), preserving
-> the existing behavior.
-> 
-> The soft reset to remove the PHY from power down is kept, as this is
-> a requirement mentioned in the LAN8720 datasheet.
-> 
-> This fixes packet loss observed on i.MX6 platforms using LAN8720 without
-> breaking boards that rely on the existing soft reset path.
-> 
-> Fixes: fc0f7e3317c5 ("net: phy: smsc: reintroduced unconditional soft reset")
-> Signed-off-by: Fabio Estevam <festevam@gmail.com>
-> ---
->  drivers/net/phy/smsc.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/phy/smsc.c b/drivers/net/phy/smsc.c
-> index 48487149c225..3840b658a996 100644
-> --- a/drivers/net/phy/smsc.c
-> +++ b/drivers/net/phy/smsc.c
-> @@ -54,6 +54,7 @@ struct smsc_phy_priv {
->  	unsigned int edpd_mode_set_by_user:1;
->  	unsigned int edpd_max_wait_ms;
->  	bool wol_arp;
-> +	bool reset_gpio;
->  };
->  
->  static int smsc_phy_ack_interrupt(struct phy_device *phydev)
-> @@ -136,6 +137,7 @@ EXPORT_SYMBOL_GPL(smsc_phy_config_init);
->  
->  static int smsc_phy_reset(struct phy_device *phydev)
->  {
-> +	struct smsc_phy_priv *priv = phydev->priv;
->  	int rc = phy_read(phydev, MII_LAN83C185_SPECIAL_MODES);
->  	if (rc < 0)
->  		return rc;
-> @@ -147,9 +149,17 @@ static int smsc_phy_reset(struct phy_device *phydev)
->  		/* set "all capable" mode */
->  		rc |= MII_LAN83C185_MODE_ALL;
->  		phy_write(phydev, MII_LAN83C185_SPECIAL_MODES, rc);
-> +		/* reset the phy */
+On Sun, 16 Nov 2025 00:33:41 +0100
+Petr Oros <poros@redhat.com> wrote:
 
-This would be a more useful comment here:
+> +	/* Setup signal handler for graceful exit */
+> +	memset(&sa, 0, sizeof(sa));
 
-		/* The LAN7820 datasheet states that a soft reset causes
-		 * the PHY to reconfigure according to the MODE bits in
-		 * MII_LAN83C185_SPECIAL_MODES. Thus, a soft reset is
-		 * necessary for the above write to take effect.
-		 */
+Personal preference, but I like initialization vs memset.
+To be pedantic use:
+	sigemptyset(&sa.sa_mask);
 
-Please also insert a blank line prior to the comment to make the code
-more readable.
+> +	sa.sa_handler = monitor_sig_handler;
+> +	sigaction(SIGINT, &sa, NULL);
+> +	sigaction(SIGTERM, &sa, NULL);
+> +
 
-> +		return genphy_soft_reset(phydev);
->  	}
->  
-> -	/* reset the phy */
-> +	/* If the reset-gpios property exists, hardware reset will be
-> +	 * performed by the MDIO core, so do NOT issue a soft reset here.
-> +	 */
-> +	if (priv->reset_gpio)
-> +		return 0;
+Current code is good enough, no need to change.
 
-Have you tried adding a 1ms delay before the soft reset, in case the
-hard reset hasn't completed?
+If you are going to use signal for exit, why not use signalfd() which
+avoids lots of problems with interrupts in the middle of the loop.
 
-As Andrew's feedback states to the thread that we were discussing it
-(and now we have a forked discussion which is far from ideal) we
-still don't know "why" the PHY is failing, and without knowing why,
-we don't know whether someone else will run into the same issue and
-end up patching the kernel in a different way (e.g. the network
-driver.)
+Checkpatch has some advice, most of it is not applicable but probably
+want to look at:
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+WARNING: Missing a blank line after declarations
+#1146: FILE: dpll/dpll.c:554:
++	bool need_nl = true;
++	if (argc > 0 && strcmp(argv[0], "help") == 0)
+
+WARNING: Missing a blank line after declarations
+#1725: FILE: dpll/dpll.c:1133:
++		struct nlattr *tb_parent[DPLL_A_PIN_MAX + 1] = {};
++		mnl_attr_parse_nested(ctx->entries[i], attr_pin_cb, tb_parent);
+
+WARNING: Missing a blank line after declarations
+#1761: FILE: dpll/dpll.c:1169:
++		struct nlattr *tb_parent[DPLL_A_PIN_MAX + 1] = {};
++		mnl_attr_parse_nested(ctx->entries[i], attr_pin_cb, tb_parent);
+
+WARNING: Missing a blank line after declarations
+#1790: FILE: dpll/dpll.c:1198:
++		struct nlattr *tb_ref[DPLL_A_PIN_MAX + 1] = {};
++		mnl_attr_parse_nested(ctx->entries[i], attr_pin_cb, tb_ref);
+
+
+WARNING: braces {} are not necessary for single statement blocks
+#2480: FILE: dpll/dpll.c:1888:
++	if (json) {
++		open_json_array(PRINT_JSON, "monitor");
++	}
+
+WARNING: Block comments use a trailing */ on a separate line
+#2508: FILE: dpll/dpll.c:1916:
++			 * If monitor_running is false, we're shutting down gracefully. */
+
+WARNING: braces {} are not necessary for single statement blocks
+#2516: FILE: dpll/dpll.c:1924:
++	if (json) {
++		close_json_array(PRINT_JSON, NULL);
++	}
+
+
 
