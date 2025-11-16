@@ -1,351 +1,225 @@
-Return-Path: <netdev+bounces-238923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A2A7C6116F
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 08:46:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54674C61181
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 08:50:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7C733B06D3
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 07:46:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01FB23B1996
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 07:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA667287267;
-	Sun, 16 Nov 2025 07:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G+TvnYqC";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="mOxsfcOV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3561D23185D;
+	Sun, 16 Nov 2025 07:50:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0C028640B
-	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 07:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6FB154425
+	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 07:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763279131; cv=none; b=ojLJ9+5LLWRqcxgdEApW8W8d10lKz5g98mZGCwpVRixKjhWldfPR7KjqNL8MPfBYYcETIi+2pHlsd8/MUYzgdHhzb7sm3UysWZWJSfxaIau35hcrIQZbudnjjq3KvUR+/Wpvm0JHbNs+q5ccijVmXO0gcCp24iR1SbOgSCd87ao=
+	t=1763279431; cv=none; b=BBa5eOsyAS+iCSEe+tmjV2f9NJcn4m9IMiJRJ0m96v2AVcAQxqZquOizz1201mm3JSDfmPfBxMcis5zGcd//m2gji8VYKfZfOyDRdHV/+mM4e/nozfdc40XRlACDV1FnI7R/z+Rp/rzB4GUNmmJlZEu3ClYWg4ratiZ2gsVBeBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763279131; c=relaxed/simple;
-	bh=y8wCZBoR8voYmXOKUgsqLzpqBH63+zG9KD2XjWV0Mfw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zg9w/OxFK5709Pb9bJXW737lC7LT+Ta/VS6ExQbLYpdR0eCo0WxseYp+jUT4+dVHri+tVw3jklLtg1d8MM3fYw/pRxkAZrLyuiFzrnrYvwVtbpqzr2+2iquTG/LUctp9YAJtcyZv9qwV9u580q1O6MEqVC2p8qPOzUa4rUoSWrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G+TvnYqC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=mOxsfcOV; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763279128;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=trQJ3e9sH2/7p6hcj43E7jvSF+i5hK8jJlCsMQnk8Kw=;
-	b=G+TvnYqCVjRqTV4Oth4aH9EqvDefwIpQZwdkxnfBGz++mM7MS2fB+J71dIrm4V616dyoHk
-	bT/vxnAQm8Ugy0LVUINrN9cqy/AYb6yW3P9gQKP70r1HpYcIndKXApPZU9MepGE2ErCNdf
-	2aog0evizhGlrm/ZEdYtO8Mx9JYmLvU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-355-sBBiAxgZOHqGuZNQRCbQig-1; Sun, 16 Nov 2025 02:45:27 -0500
-X-MC-Unique: sBBiAxgZOHqGuZNQRCbQig-1
-X-Mimecast-MFC-AGG-ID: sBBiAxgZOHqGuZNQRCbQig_1763279126
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-429cdb0706aso2926050f8f.0
-        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 23:45:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763279126; x=1763883926; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=trQJ3e9sH2/7p6hcj43E7jvSF+i5hK8jJlCsMQnk8Kw=;
-        b=mOxsfcOVN7c1Nmpzw6izHM6CsPcO9/erni1F62AwNw7Ls/ckzf6XVbD3dc5VFiaPZL
-         Hy/QTk6Ze5z/y8zPXe8CqBLhwy42tj7c1NORelQ+BtpLSfcUIGECxTNuu0oqVZoh5YRy
-         YE60X65iaamZtJUNQ/T112Or5La17ci5I2fqvQwsqSV3eTgtN9qS9hX2rvzFgNaPxZru
-         cf79SPbkKzhlJfBOXgonl0vm+U5+GhAI1KDs6qsy4Q4TAdBLcSGq9zak+VP7t/DUd/mn
-         zoUPNYxLAANUqYHzePFuwubPpbHX5Gfw//O8qzA7sz/SirhqV7GEf1wIvmDGsr7ApsOi
-         aJvg==
+	s=arc-20240116; t=1763279431; c=relaxed/simple;
+	bh=1ScHlRguvyLpssPcQoqoRtHj0dx8Rb7SW1QqzYtM17A=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=GeN9cugc5pip9e0wWs7zoRwTw2+nEtkdQOfx+BJsTNwdFwGOYq47Jt95Fe8NpCe/7K8l6X4cIBQ8SYhSSEnR/MMJQ2zSDRi6PmQe5wjBF7LJ5uucO1urUfJvkhvTZFwYW73gVGBeNj3BfQd/+tdYe/71LF0sPIZRO3P/Wjkv/i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-43323ffc26bso33017925ab.0
+        for <netdev@vger.kernel.org>; Sat, 15 Nov 2025 23:50:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763279126; x=1763883926;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=trQJ3e9sH2/7p6hcj43E7jvSF+i5hK8jJlCsMQnk8Kw=;
-        b=d78WVTxF+FPpAMwv5G6c4zT66wub4RMmlnYELgXCGCMCa/9VBJP6KyNqbaODI2AR+f
-         kp56iFsHk+uVpipD7m+JQ20D9xdvgBn1bNs5bU2sXcXiMMNx6imnpXW5C+w5jvtMhwVr
-         weCtRqvZBjnjXX7dk9dgNzkyA38tgOGqa9A52RgLuAhU8LUknXuN1VfFT/P0MBr177k3
-         Y1ZSud+Z07be5LLVUqcYiYjPriGueDKKGDzUT6jX7nXxvi68c5bmD8MCb28oAY8Blk1A
-         nsHvnE55rFXSMjqZW+hwjijhc+Wfj/mp98gzgaaoELm2dqVkHdE3Qmbh8TSx8CbldSmH
-         RHQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV7zlwrrUcf9f2Gh32jwE2E3pnHXsxPUpgoLSwKBPgQx2M6tpxFmdWaQl3bFnw3SdOU4R+gKa8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY4bPKtQqmVLQ2AB+gJhwrF7SRbFdN2tEwbgbv9jZhPYR50hiD
-	S9JEU7UWxj3SH5+JDURnZjPCmz9JF4NzSVyunfkTPfQDLIUUesjz3w/Pc5HS3bseeOpBCspnWHd
-	yWVl7xyp6kbCbBr9Mv4wiWta7JE01C4phjpVWBzG/nGbObKaR8NX3PIH3SQ==
-X-Gm-Gg: ASbGncsf+N2VGGUJIA0VJ1kQoePAhZr5+B0tri5YBUKNfFuMyZXcxiESI22RTaYNIpQ
-	MJ0XMR4ZyXqKBMkEECtq6HUV/KwoIcpCjlW1LFszU8QBibRCWNQwJY8tj3cXNEToVHuilHT1VAU
-	Ds4Lj+xXG4uBzsZn4O+38r7PUV6/VNnMBYX6IcFkYSoaYqeDYzbfphL7g0tN6uGrA38bK50CAMF
-	i5Hw02hV1A/RX1Vf6y1aw9uA6gP1/8wF8xDtYzDivVSdVRzTrCXXEDJF23YRA6oVUwzWjp6LapY
-	9ihipvu0NRvYD9GKqhDYrG6gvbdmvPE2Ydne+xpZMsUcq08yW4Zj49Of89TUxgsV9b2tbdC41Pv
-	0Gq0Q24fNDshjLzi64lQ=
-X-Received: by 2002:a05:6000:61e:b0:429:d6dc:ae1a with SMTP id ffacd0b85a97d-42b59377f5cmr7143992f8f.30.1763279126254;
-        Sat, 15 Nov 2025 23:45:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFavbSLEzC3fzGZlFNcbplKoDaGAFf6xm82Dmpuac8kJ0YL87asozxTpPgyhKXE0Otxlq6lXg==
-X-Received: by 2002:a05:6000:61e:b0:429:d6dc:ae1a with SMTP id ffacd0b85a97d-42b59377f5cmr7143962f8f.30.1763279125674;
-        Sat, 15 Nov 2025 23:45:25 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f2084dsm20221273f8f.42.2025.11.15.23.45.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Nov 2025 23:45:24 -0800 (PST)
-Date: Sun, 16 Nov 2025 02:45:22 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Mike Christie <michael.christie@oracle.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH v4 2/2] vhost: switch to arrays of feature bits
-Message-ID: <17c98c7304b6d78d2d59893ba7295c2f64ab1224.1763278904.git.mst@redhat.com>
-References: <cover.1763278904.git.mst@redhat.com>
+        d=1e100.net; s=20230601; t=1763279428; x=1763884228;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WSE7tbnyT8yHLKZelbvCvqJRwe/XWgTAjkYpbvaaXvI=;
+        b=p8GTB3fxt/uV1scU2/ZmMgXarUoX3TJgrEq/HwTINy7nJ8AjGUSfAYArFt+eXQpMyL
+         IGDTQffnvCU/B2dN3K9QFoCmqenaplbUzP+4i0k8zDftIyQWHar5rQ1d6s7aBwrec9i4
+         AGkZMoAFCFCNIK4drYfURL1mZv/XUef4DdaDjQwPBX+l4BYXJ/7BAvkNgCCbGIfbu7Cx
+         aNOkDrKFkTdI6KLKttKGlD7hvElR0YoN8FklIBuznnsKLSAIm+QVjknOGwXUg+XAxBEW
+         RjlFyFDwarIjCvBU2Pki8WRmvnNmjcf64VCWEt03Ty1ArOS8ZihqqedQCpYEatlPxZ/o
+         Ot8g==
+X-Forwarded-Encrypted: i=1; AJvYcCX+mbNeFbP/4me4qAeX4IKA1wu4r7KV0txHOTevfLNtoi6/ysYZECnrcu70jnYNmDcSTKhLnwY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqQ5FOVDu80EOWCalkGFpjJqiIbQ4rbIzjk8Q3bhpU5XJv5t5k
+	uR8rZL5/KNKrCYI6+6OiOiWcp4XNaViFZTsc57yPmZJO6jjJr1+7HDb6+n5y3rPICeKha2P1buG
+	xvw8KTzDHj3Ji4vHtLVHOA8P2R2+9wxWktxLVMbWgkeEHQLACi+/sTFEVRxY=
+X-Google-Smtp-Source: AGHT+IFVzDZwUP3HOsGuAQa5qm+yx1mBmZkTDB1dUcZSsHKog6LyGnrhiCQPYoSrI5AAoq722QKU46EUn4zIraH2L2JkKgeg2MD3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1763278904.git.mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+X-Received: by 2002:a05:6e02:3388:b0:432:10f9:5e0a with SMTP id
+ e9e14a558f8ab-4348c93b625mr104669375ab.19.1763279428565; Sat, 15 Nov 2025
+ 23:50:28 -0800 (PST)
+Date: Sat, 15 Nov 2025 23:50:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69198244.a70a0220.3124cb.0074.GAE@google.com>
+Subject: [syzbot] [wireless?] KASAN: slab-out-of-bounds Read in ieee80211_add_virtual_monitor
+From: syzbot <syzbot+bc1aabf52d0a31e91f96@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The current interface where caller has to know in which 64 bit chunk
-each bit is, is inelegant and fragile.
-Let's simply use arrays of bits.
-By using unroll macros text size grows only slightly.
+Hello,
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+syzbot found the following issue on:
+
+HEAD commit:    04ca7a69a35b net: bnx2x: convert to use get_rx_ring_count
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1330a914580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4dda49799a90cd0f
+dashboard link: https://syzkaller.appspot.com/bug?extid=bc1aabf52d0a31e91f96
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fe2c1ac0be7e/disk-04ca7a69.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b6c6a173a173/vmlinux-04ca7a69.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8a163d4feba0/bzImage-04ca7a69.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+bc1aabf52d0a31e91f96@syzkaller.appspotmail.com
+
+tipc: Resetting bearer <eth:syzkaller0>
+==================================================================
+BUG: KASAN: slab-out-of-bounds in ieee80211_add_virtual_monitor+0xa52/0xd00 net/mac80211/iface.c:1255
+Read of size 1 at addr ffff888047b63d50 by task syz.3.4250/20835
+
+CPU: 0 UID: 0 PID: 20835 Comm: syz.3.4250 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x240 mm/kasan/report.c:482
+ kasan_report+0x118/0x150 mm/kasan/report.c:595
+ ieee80211_add_virtual_monitor+0xa52/0xd00 net/mac80211/iface.c:1255
+ ieee80211_do_stop+0x1786/0x1f60 net/mac80211/iface.c:746
+ ieee80211_stop+0x1b1/0x240 net/mac80211/iface.c:828
+ __dev_close_many+0x364/0x6f0 net/core/dev.c:1756
+ netif_close_many+0x225/0x410 net/core/dev.c:1781
+ netif_close+0x158/0x210 net/core/dev.c:1798
+ dev_close+0x10a/0x220 net/core/dev_api.c:220
+ cfg80211_shutdown_all_interfaces+0xd4/0x220 net/wireless/core.c:280
+ cfg80211_rfkill_set_block+0x2d/0x50 net/wireless/core.c:310
+ rfkill_set_block+0x1d2/0x440 net/rfkill/core.c:346
+ rfkill_fop_write+0x44b/0x570 net/rfkill/core.c:1301
+ vfs_write+0x27e/0xb30 fs/read_write.c:684
+ ksys_write+0x145/0x250 fs/read_write.c:738
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fbbceb8f6c9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fbbcfa30038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007fbbcede5fa0 RCX: 00007fbbceb8f6c9
+RDX: 0000000000000008 RSI: 0000200000000080 RDI: 0000000000000008
+RBP: 00007fbbcec11f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fbbcede6038 R14: 00007fbbcede5fa0 R15: 00007ffd05a68698
+ </TASK>
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff888047b63a80 pfn:0x47b60
+head: order:2 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: f8(unknown)
+raw: 00fff00000000040 0000000000000000 dead000000000122 0000000000000000
+raw: ffff888047b63a80 0000000000000000 00000000f8000000 0000000000000000
+head: 00fff00000000040 0000000000000000 dead000000000122 0000000000000000
+head: ffff888047b63a80 0000000000000000 00000000f8000000 0000000000000000
+head: 00fff00000000002 ffffea00011ed801 00000000ffffffff 00000000ffffffff
+head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000004
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 2, migratetype Unmovable, gfp_mask 0x446dc0(GFP_KERNEL_ACCOUNT|__GFP_ZERO|__GFP_NOWARN|__GFP_RETRY_MAYFAIL|__GFP_COMP), pid 12532, tgid 12532 (syz-executor), ts 337218700996, free_ts 297447370395
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1850
+ prep_new_page mm/page_alloc.c:1858 [inline]
+ get_page_from_freelist+0x2365/0x2440 mm/page_alloc.c:3884
+ __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5183
+ alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
+ ___kmalloc_large_node+0x5f/0x1b0 mm/slub.c:5591
+ __kmalloc_large_node_noprof+0x18/0x90 mm/slub.c:5622
+ __do_kmalloc_node mm/slub.c:5638 [inline]
+ __kvmalloc_node_noprof+0x6e/0x910 mm/slub.c:7108
+ alloc_netdev_mqs+0xa6/0x11b0 net/core/dev.c:11989
+ ieee80211_if_add+0x46c/0x1390 net/mac80211/iface.c:2227
+ ieee80211_register_hw+0x35a5/0x40d0 net/mac80211/main.c:1607
+ mac80211_hwsim_new_radio+0x2f9a/0x5260 drivers/net/wireless/virtual/mac80211_hwsim.c:5810
+ hwsim_new_radio_nl+0xf5b/0x1bd0 drivers/net/wireless/virtual/mac80211_hwsim.c:6504
+ genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+page last free pid 5833 tgid 5833 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1394 [inline]
+ __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2906
+ discard_slab mm/slub.c:3330 [inline]
+ __put_partials+0x146/0x170 mm/slub.c:3876
+ put_cpu_partial+0x1f2/0x2e0 mm/slub.c:3951
+ __slab_free+0x2b9/0x390 mm/slub.c:5929
+ qlink_free mm/kasan/quarantine.c:163 [inline]
+ qlist_free_all+0x97/0x140 mm/kasan/quarantine.c:179
+ kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
+ __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:352
+ kasan_slab_alloc include/linux/kasan.h:252 [inline]
+ slab_post_alloc_hook mm/slub.c:4978 [inline]
+ slab_alloc_node mm/slub.c:5288 [inline]
+ __do_kmalloc_node mm/slub.c:5649 [inline]
+ __kvmalloc_node_noprof+0x577/0x910 mm/slub.c:7108
+ xt_jumpstack_alloc net/netfilter/x_tables.c:1356 [inline]
+ xt_replace_table+0x18a/0x790 net/netfilter/x_tables.c:1395
+ __do_replace+0x163/0xaa0 net/ipv4/netfilter/arp_tables.c:912
+ do_replace net/ipv4/netfilter/arp_tables.c:989 [inline]
+ do_arpt_set_ctl+0xa2a/0xf10 net/ipv4/netfilter/arp_tables.c:1429
+ nf_setsockopt+0x26f/0x290 net/netfilter/nf_sockopt.c:101
+ do_sock_setsockopt+0x17c/0x1b0 net/socket.c:2360
+ __sys_setsockopt net/socket.c:2385 [inline]
+ __do_sys_setsockopt net/socket.c:2391 [inline]
+ __se_sys_setsockopt net/socket.c:2388 [inline]
+ __x64_sys_setsockopt+0x13f/0x1b0 net/socket.c:2388
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Memory state around the buggy address:
+ ffff888047b63c00: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe
+ ffff888047b63c80: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe
+>ffff888047b63d00: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe
+                                                 ^
+ ffff888047b63d80: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe
+ ffff888047b63e00: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe
+==================================================================
+
+
 ---
- drivers/vhost/net.c   | 34 +++++++++++++++++++---------------
- drivers/vhost/scsi.c  |  9 ++++++---
- drivers/vhost/test.c  | 10 ++++++++--
- drivers/vhost/vhost.h | 42 ++++++++++++++++++++++++++++++++++--------
- drivers/vhost/vsock.c | 10 ++++++----
- 5 files changed, 73 insertions(+), 32 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index d057ea55f5ad..00d00034a97e 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -69,15 +69,15 @@ MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero Copy TX;"
- 
- #define VHOST_DMA_IS_DONE(len) ((__force u32)(len) >= (__force u32)VHOST_DMA_DONE_LEN)
- 
--static const u64 vhost_net_features[VIRTIO_FEATURES_U64S] = {
--	VHOST_FEATURES |
--	(1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
--	(1ULL << VIRTIO_NET_F_MRG_RXBUF) |
--	(1ULL << VIRTIO_F_ACCESS_PLATFORM) |
--	(1ULL << VIRTIO_F_RING_RESET) |
--	(1ULL << VIRTIO_F_IN_ORDER),
--	VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
--	VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
-+static const int vhost_net_features[] = {
-+	VHOST_FEATURES,
-+	VHOST_NET_F_VIRTIO_NET_HDR,
-+	VIRTIO_NET_F_MRG_RXBUF,
-+	VIRTIO_F_ACCESS_PLATFORM,
-+	VIRTIO_F_RING_RESET,
-+	VIRTIO_F_IN_ORDER,
-+	VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO,
-+	VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO
- };
- 
- enum {
-@@ -1734,14 +1734,14 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 			return -EFAULT;
- 		return vhost_net_set_backend(n, backend.index, backend.fd);
- 	case VHOST_GET_FEATURES:
--		features = vhost_net_features[0];
-+		features = VHOST_FEATURES_U64(vhost_net_features, 0);
- 		if (copy_to_user(featurep, &features, sizeof features))
- 			return -EFAULT;
- 		return 0;
- 	case VHOST_SET_FEATURES:
- 		if (copy_from_user(&features, featurep, sizeof features))
- 			return -EFAULT;
--		if (features & ~vhost_net_features[0])
-+		if (features & ~VHOST_FEATURES_U64(vhost_net_features, 0))
- 			return -EOPNOTSUPP;
- 
- 		virtio_features_from_u64(all_features, features);
-@@ -1753,9 +1753,13 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 		/* Copy the net features, up to the user-provided buffer size */
- 		argp += sizeof(u64);
- 		copied = min(count, (u64)VIRTIO_FEATURES_U64S);
--		if (copy_to_user(argp, vhost_net_features,
--				 copied * sizeof(u64)))
--			return -EFAULT;
-+
-+		{
-+			const DEFINE_VHOST_FEATURES_ARRAY(features, vhost_net_features);
-+
-+			if (copy_to_user(argp, features, copied * sizeof(u64)))
-+				return -EFAULT;
-+		}
- 
- 		/* Zero the trailing space provided by user-space, if any */
- 		if (clear_user(argp, size_mul(count - copied, sizeof(u64))))
-@@ -1784,7 +1788,7 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 		}
- 
- 		for (i = 0; i < VIRTIO_FEATURES_U64S; i++)
--			if (all_features[i] & ~vhost_net_features[i])
-+			if (all_features[i] & ~VHOST_FEATURES_U64(vhost_net_features, i))
- 				return -EOPNOTSUPP;
- 
- 		return vhost_net_set_features(n, all_features);
-diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index 98e4f68f4e3c..04fcbe7efd77 100644
---- a/drivers/vhost/scsi.c
-+++ b/drivers/vhost/scsi.c
-@@ -197,11 +197,14 @@ enum {
- };
- 
- /* Note: can't set VIRTIO_F_VERSION_1 yet, since that implies ANY_LAYOUT. */
--enum {
--	VHOST_SCSI_FEATURES = VHOST_FEATURES | (1ULL << VIRTIO_SCSI_F_HOTPLUG) |
--					       (1ULL << VIRTIO_SCSI_F_T10_PI)
-+static const int vhost_scsi_features[] = {
-+	VHOST_FEATURES,
-+	VIRTIO_SCSI_F_HOTPLUG,
-+	VIRTIO_SCSI_F_T10_PI
- };
- 
-+#define VHOST_SCSI_FEATURES VHOST_FEATURES_U64(vhost_scsi_features, 0)
-+
- #define VHOST_SCSI_MAX_TARGET	256
- #define VHOST_SCSI_MAX_IO_VQ	1024
- #define VHOST_SCSI_MAX_EVENT	128
-diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-index 42c955a5b211..af727fccfe40 100644
---- a/drivers/vhost/test.c
-+++ b/drivers/vhost/test.c
-@@ -308,6 +308,12 @@ static long vhost_test_set_backend(struct vhost_test *n, unsigned index, int fd)
- 	return r;
- }
- 
-+static const int vhost_test_features[] = {
-+	VHOST_FEATURES
-+};
-+
-+#define VHOST_TEST_FEATURES VHOST_FEATURES_U64(vhost_test_features, 0)
-+
- static long vhost_test_ioctl(struct file *f, unsigned int ioctl,
- 			     unsigned long arg)
- {
-@@ -328,14 +334,14 @@ static long vhost_test_ioctl(struct file *f, unsigned int ioctl,
- 			return -EFAULT;
- 		return vhost_test_set_backend(n, backend.index, backend.fd);
- 	case VHOST_GET_FEATURES:
--		features = VHOST_FEATURES;
-+		features = VHOST_TEST_FEATURES;
- 		if (copy_to_user(featurep, &features, sizeof features))
- 			return -EFAULT;
- 		return 0;
- 	case VHOST_SET_FEATURES:
- 		if (copy_from_user(&features, featurep, sizeof features))
- 			return -EFAULT;
--		if (features & ~VHOST_FEATURES)
-+		if (features & ~VHOST_TEST_FEATURES)
- 			return -EOPNOTSUPP;
- 		return vhost_test_set_features(n, features);
- 	case VHOST_RESET_OWNER:
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index 621a6d9a8791..d8f1af9a0ff1 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -14,6 +14,7 @@
- #include <linux/atomic.h>
- #include <linux/vhost_iotlb.h>
- #include <linux/irqbypass.h>
-+#include <linux/unroll.h>
- 
- struct vhost_work;
- struct vhost_task;
-@@ -279,14 +280,39 @@ void vhost_iotlb_map_free(struct vhost_iotlb *iotlb,
- 				eventfd_signal((vq)->error_ctx);\
- 	} while (0)
- 
--enum {
--	VHOST_FEATURES = (1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) |
--			 (1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
--			 (1ULL << VIRTIO_RING_F_EVENT_IDX) |
--			 (1ULL << VHOST_F_LOG_ALL) |
--			 (1ULL << VIRTIO_F_ANY_LAYOUT) |
--			 (1ULL << VIRTIO_F_VERSION_1)
--};
-+#define VHOST_FEATURES \
-+	VIRTIO_F_NOTIFY_ON_EMPTY, \
-+	VIRTIO_RING_F_INDIRECT_DESC, \
-+	VIRTIO_RING_F_EVENT_IDX, \
-+	VHOST_F_LOG_ALL, \
-+	VIRTIO_F_ANY_LAYOUT, \
-+	VIRTIO_F_VERSION_1
-+
-+static inline u64 vhost_features_u64(const int *features, int size, int idx)
-+{
-+	unsigned long res = 0;
-+
-+	unrolled_count(VIRTIO_FEATURES_BITS)
-+	for (int i = 0; i < size; ++i) {
-+		int bit = features[i];
-+
-+		if (virtio_features_chk_bit(bit) && VIRTIO_U64(bit) == idx)
-+			res |= VIRTIO_BIT(bit);
-+	}
-+	return res;
-+}
-+
-+#define VHOST_FEATURES_U64(features, idx) \
-+	vhost_features_u64(features, ARRAY_SIZE(features), idx)
-+
-+#define DEFINE_VHOST_FEATURES_ARRAY_ENTRY(idx, features) \
-+	[idx] = VHOST_FEATURES_U64(features, idx),
-+
-+#define DEFINE_VHOST_FEATURES_ARRAY(array, features) \
-+	u64 array[VIRTIO_FEATURES_U64S] = { \
-+		UNROLL(VIRTIO_FEATURES_U64S, \
-+		       DEFINE_VHOST_FEATURES_ARRAY_ENTRY, features) \
-+	}
- 
- /**
-  * vhost_vq_set_backend - Set backend.
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index ae01457ea2cd..16662f2b87c1 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -29,12 +29,14 @@
-  */
- #define VHOST_VSOCK_PKT_WEIGHT 256
- 
--enum {
--	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
--			       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
--			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET)
-+static const int vhost_vsock_features[] = {
-+	VHOST_FEATURES,
-+	VIRTIO_F_ACCESS_PLATFORM,
-+	VIRTIO_VSOCK_F_SEQPACKET
- };
- 
-+#define VHOST_VSOCK_FEATURES VHOST_FEATURES_U64(vhost_vsock_features, 0)
-+
- enum {
- 	VHOST_VSOCK_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
- };
--- 
-MST
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
