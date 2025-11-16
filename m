@@ -1,144 +1,181 @@
-Return-Path: <netdev+bounces-238937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A8BBC6179F
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 16:40:05 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84E32C617B4
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 16:48:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A10BB35AD82
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 15:40:04 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E80AE360B2B
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 15:48:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13A130C377;
-	Sun, 16 Nov 2025 15:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A3C2C234E;
+	Sun, 16 Nov 2025 15:48:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="ehaiAA51"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZCH4NPbs"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic305-21.consmr.mail.ne1.yahoo.com (sonic305-21.consmr.mail.ne1.yahoo.com [66.163.185.147])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF1486277
-	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 15:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.185.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336D61799F
+	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 15:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763307600; cv=none; b=JH/6ky6cQuQF7wF4AlHiwlG5ZpXGcSP8j62Yai8NEhxxifGVzItHBa99iAKDz+G5ecFg7JIbfJYI8BZYiQRzcXvY8Zb9i6sk7tGWUFJqN85nW66wOF5SswQGRhtL9/bFrdcyKrzAB8qvjI7UlMl3eyCiU4mBFESk5QftFjlx2wU=
+	t=1763308118; cv=none; b=pzbCg0ipzt7SagSrUqCWXe42RzlC+m5cEmy98sFU7GAnNClv2eUkGU1btxGteholHL5FF1ZrpDMvYSrkKmboIkn85zLG/DhjzyCDQhfEEu+u3PmRxXRD91YqN3kJD8nhux2DrjPOg2Tae3MYj6dEdqCpPKsAyqvrX2Vcff2BfLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763307600; c=relaxed/simple;
-	bh=WzsAL97xxnLZa4HC2bSfwRjz/+VmJIMewbmXzEFmQ5g=;
-	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type:
-	 References; b=S48itVnPhrL88u0befJG0dTGQ8TcBMYAofBXjG63JJOo3dtYiJ48hwEwdvlD8qvNG1JLaXAhtyOqf3vdWochTvocN3bTiyNBJsfUOH8Folku4EDH3hw8Bwqo0oLxLJ3M3qT358UHi7777VKL6XEP9iljXPrrDhubTH8XyujQ0BI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=ehaiAA51; arc=none smtp.client-ip=66.163.185.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1763307598; bh=WzsAL97xxnLZa4HC2bSfwRjz/+VmJIMewbmXzEFmQ5g=; h=Date:From:To:Cc:Subject:References:From:Subject:Reply-To; b=ehaiAA51rO91loZZkwervezrXpnPSIIT0qdRXnWB29g1A4TRQTw5LLlCF7BKzWiLZFoA2jcJgcGmh+IneSO/hrvyfNxLpQMMSnSnAtScFp3UcHzhig2DrpR/cOwvDWS04UTmiV9fYavUcV+q7g2QRKQDqZ6Tdatr+Xzr7XpaD714auHLFGsW7l2z3jKJZMvKI41AMw+y1X7TLBSqfkfEh1BIAsz84ci6SXZ+Ll/RahGuWb1oHYaVNB8Ub0BAlUi13VV6XsZEsRTOAvtd1nhTmW+920/CJQmMF+iLoV4suhZ6cby4EI4CVKfNDrEl43tuv4L1fUgXl1DHDrEGWYg2cQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1763307598; bh=ryGfLL3CFaHiU63ysdUMTpQQxQMft/sZeFja4L7CeTX=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=BnRV2DuZDs3adkHI9IaOu6WIeIv3qNFnc6a5PGw94qFnN1AWQ8xy7mU3l8rsB2YhYnyo77I6tNOOVKMYBU8PWOZhqTSsYzt3VoNRRdfQG4w1dab1bF0flgfpog2IyTNUYmKyzgLvxgJln94LdHxBpuKKeYi/eJw0oKfTuohIo/G1RBuE4RMBBRlcFHfLlF9xWaVSdbjneQdMwH7g/0sJjtVP/tObDJCq40xE/bZcJ08dSJZKoSsvJhzR5H5xoAgFq18zJlScvFQmz53gAS3ASY2snAyWy1M2moSYOuwDn+CspxWAg/R+NYTAZAyP73gvsHSsL0fSBEn6eZuhlF9FrQ==
-X-YMail-OSG: 0JAX2pUVM1mRZ4mwtUZhICyR9iY.ybAiwFenN6g4qtMbAgWurKjEoD9q4Lh4Fz7
- Ddk7PjZJ91ifgk.Xu8wy0bH_.5tRnvZFof7UzTE37PGbPvfNuF4h1b.tzZtPTiV9X.DffElTDvNN
- K1iJvwXq0hxzGxY2H412h2mtrOfMilvY6pUfJpWLqnCSMy3YHDncCoYGObeT6XHuaEG5XyOKb2oX
- VVhD2Ds3OPPu2PDl81F_Vkb77HiQuwu00WUv_GZFQCFvySCpBPNJZslHJMSfkngNravUIkNH1asS
- cgbA4iyxwqLRYUNAaAkFd6bt72MPekkzNccwhTI_9zXH860lE5_nWjaAZBSNgJgZRwXg9ZAR.l9w
- SOohtvihIKvFQmNThw6nogmUF.yIRPz0g87Rj3v.L1m_m2YNqNVBHC65.fVBwZ.uCIxbOl0wUKLS
- ZaWwL3Nt7JETU1qbwtNHSpNcfcSfYctWSf80FNxxuWzSf7qrxPUt9uGr8u3M0XYNoVFpwDwORaEn
- AyjD8VZSUlheHQb_GWYh1D5s_u.UC8WiXvMsVskbHHjds7CCAIxppw4jRSnlrMqQLWREGNZrTHsG
- SEyh4Im4fFFrm8pDFma1UYTPZGHQXEYfrLfqdZ7kuTDC0_AztSIAWO5qaRTQlcImtjKfQQ.w6PHa
- F1rhnFtf4B1W1CKuKDBelOO8P8lvcvJiknAeoFBt5fbs0o6Me9aiGhggPvxTvLEhOg771BDPw8Gf
- 4SnxsWnyPnweWxR418bim_4oEqwrry_M6ACK8GbQcAAWNmHp__IHGdk87UENzuM0OIPZbTn6XWdJ
- fLbcIPKrBm.lNgpqZXVkD33JpjgYUM63W6oLsJ9PaGW2t4DsNYlbHD7asknGjRi0Xh7VKUmpyYRi
- wvM3amtIyfw4HBp_hKgCTBPq5.PLDGRuUWpnH9h9ho_Xtl7ZgqyeIxSO6edX.PIRpJGKx.XsLO_l
- 1anj8L8JGD5m4sRdrxzZHZGY2nfsLPaqt8w8ooKGPlmavpnchMf9Y.jAMRyUVZoMPyspaDXvU8z8
- GQQNDQrTUquY9CxtCW7miCi2TMuG0S0DOWxMZjeN1.HvQnfDIS50SC4L0WebBy8JAAfR4U1yJjVu
- Fpv7SCBI_VWrKZffx1Q_vgbf4aIcgVVIQ9jQcie_UfQeqA9PoJSQLWrbpqvxwGYl7fZvR2yjzEtO
- hnU3wRdK39bHc_6Qp38sidMs3QOMr2KAt8I6GjIwG9OMplCSjSZoWseCCTy7Ha2V213Bj0NWu28c
- a7WvMyDk9ZWLctolbgl8NmxQ_NNb7ZXMWNei0BSws85gFkz4Xl8yte55DLrFs_nKqAkrJANpIdyr
- dOVMc3QVMEGwlKEuweUlR_e6zOZPXtyqKJgGjT0M_DMdqz63NQv8aPE855khguxWdlP8UXk7i0Hu
- fkcoXSBiPBBPwwi.CMzRco9zOPlnV9MQS_Q4_W1G1WwgCSWDnq.R0QHPgJcsWkZ3VGX_zTQ9mD5G
- .gyamkof2f1i_Xm0ibXzzo8Xm_GcatgtRsw7VmI5WiYOhl6L8cPOmQAdL.yS4B7ZDR9XqZVLNSs9
- vB7G5TTi_fs_SDa9fjo.2fpoCyNsFqlWev31As80CGHWV073Da1ZJ_2aSpvXQKTQhhKeBNBVlRmf
- e4Vq2.jqGRk.ImweC.iv7GD8flY5jerfeBrA8jY6ThmYIZN1zuWyLLVyQl9kI3UKvCYB_1Lpnqve
- .3bwXYRlAnYV1EszlXeSTks3AU3QPw2sH0I2cj6V4Uvcc1dzgQOU0lxd8us8N41rzBslh0egp0RH
- _9fP2mOicg34veukmMI_B69eRgh3VsMnCJon1VB_ZDhc8sGun0ym_.SONaz3KnqR3sNIVsnwssIj
- W4y51FWcY2VAWh0YVAqJslcvO2IxpC5Ekp7VlKjCcikNbv6BEYxGuEV8IGh7qa5LOb9P136UloYy
- i.YhpIupWzKis7zpbYzhVoKXmr7JtJtJ_l1y.hCsukg2ll3T8281umJ3nGiXJmt2tGX6OZiyD5OF
- 3A3lO7x910j8K1zE58boESICzlmig8hmXUtYxydmMP41RYNyoMogqVSJ7_clZXQVokgbFzWGQAqx
- vfxctworDvArh1tS9zV9kb2vkae_lET4zeW2.ekJWIO8cnbEpUWEyHbIf.ANbVvgdX7yTUNk.heq
- qVfDC7dcFyr4ztfkVsT.7eEdQFEIDLphd7F48KWKyQNAxTgSfv9UQiBftNVGQGPpq1xJD2Dbk.wv
- R64hpfbJHWHMTaqP3X7G4Dxpf3NrtZArZALwfsshh6k7WHHhrwuW_XA--
-X-Sonic-MF: <namiltd@yahoo.com>
-X-Sonic-ID: 93d1412e-098c-46be-bf34-efdd093e267f
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic305.consmr.mail.ne1.yahoo.com with HTTP; Sun, 16 Nov 2025 15:39:58 +0000
-Date: Sun, 16 Nov 2025 15:29:45 +0000 (UTC)
-From: Mietek N <namiltd@yahoo.com>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "linus.walleij@linaro.org" <linus.walleij@linaro.org>, 
-	"alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>, 
-	"andrew@lunn.ch" <andrew@lunn.ch>, 
-	"olteanv@gmail.com" <olteanv@gmail.com>, 
-	"davem@davemloft.net" <davem@davemloft.net>, 
-	"edumazet@google.com" <edumazet@google.com>, 
-	"kuba@kernel.org" <kuba@kernel.org>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>
-Message-ID: <686180077.8704812.1763306985880@mail.yahoo.com>
-Subject: [PATCH] rtl8365mb: initialize ret in phy_ocp_read and return ret in
- phy_ocp_write
+	s=arc-20240116; t=1763308118; c=relaxed/simple;
+	bh=4oXlextiRJJRwsBjtdpSqU6dtRWPa4mBeft5xC7uZ0g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=j17mzGPU7hUM+ragGJ6Q2EjB/DIYhuHAs3yy3T1HoiYb5wswdiHrN5EsKcjMbIVh2grUBnitxZGqNERIlOtu2RjE/5QsMEQGWRPIBsjc42GbN6lYS8hbchE+RI+yNIH7dJu0JfuSgFx6iI1pM19ApdF1qArPKRB1Tko556mdqNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZCH4NPbs; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b4755f37c3eso2409618a12.3
+        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 07:48:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763308116; x=1763912916; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+9C0XlnYWqrrvJ+b7cMsy53XPbtZDNWszrWBCC6jDbY=;
+        b=ZCH4NPbsIQxNkJqXK4LHHsDj/fNl0sf/HTX+V9ztq0gn1caCYTQrUfb18j2LtLYju7
+         4G0Kmld2vY0kCPsqLiBfG5XTOdwU2QyhUNaBtMd7/h9jzckfpHTlnxHtWOudr3SeSNJj
+         RwD83HKYsCdWUTaDJsq4bGNQ3rXkFblXllavM+ljn+AWwcPyp+GtYWadG+rBbTOsrKmw
+         ybz6Mxtz7N6PEuGlYmOrpg/1WkabLxi8OJYjgjzYpS0RYkfKvYB1+hTIwD3OZm1+eLkB
+         viaaTYFg2Oj+Ofrz1VXacVPpjT6XuNWzRPsANrr1IQjmacFZV/Qn6qX8PEGJFOZE+3s/
+         MJOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763308116; x=1763912916;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+9C0XlnYWqrrvJ+b7cMsy53XPbtZDNWszrWBCC6jDbY=;
+        b=FUpwX2I5sADn5CUV0BT7DTWyjfub3YNtnfzi6d6R+FAUss+DqH62eWSSqiokuVxZkg
+         Xfq9T2uydoIA6fbvNhSslq0iJeN5mSFFwU7uNy1IGjMJpPIIRR3A7PGw6cf7Bg6Cgha1
+         cD+XCDzaHzgTa0w9QcdTj5uwDpvDJ4ed0rVTU7dESm0J+fXdm5OcPhCGY5cmZ5gni/cA
+         +yIN1tZZrmIh1b/nVM3AybbuxFkIz8EX8LepYpph17sjCWHN1z2SGIzfu52wb0zgjngz
+         4n7Bdq1+HPerS+8epn+xGbwEkMlav2MylakUEY/6HLljhmkn4/cc0OUs+63H0tUZGvSX
+         j96A==
+X-Forwarded-Encrypted: i=1; AJvYcCVn8/ORHBsaa/+IW7AG6oYjmieebSN7Wf5fSHz9F2Ql4WXOEsiQPe+wmVn44es58ZZHQlvBG8o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIT3c8YMxfzz5wge/tMoWY0AQ9QrTBz6H7fPmxU2hGE9EqNlwr
+	QdoGe2ieHKosqp/tgtmEkbpBPWqeJRBXYV0f+xVWgiDGY0ol8dK6D5Pd
+X-Gm-Gg: ASbGncsj82P1fwaykEowQHT5eyPd0urko2XUFsC9wWUBYy/84DAJbX6QLWClyluXpo4
+	+0uchWitl6AQFUZrAdbKuoUFx1qjSMrDtf+DtsB9loZq6U//9WNg/JsfnN2OGms5QBgi1xw0OJE
+	BmvQRIEMatyljyZzBL7vPgm9zsiT9XPtIvAcxsMJunIb6MBYS2KcfSzgbW2aiWD5FSYmmpNSGer
+	0v9vj9f3up9MsjZnCtSoDNzqHkuNVOiAoJZMhx/rOMprZrVNd7CuRJq5gpjHqcaNDMYUzMIKkk9
+	1NaRWW/cSrOkxAMfsm+g6PtrJR28wzJoZgzAlLqJm3DiCbkPwMDL+6ZMlZBQ3/xtR9q+ghYMu4a
+	EWVX76yaLBmEQ3vIRKhiDKVJCeDVpxswPOQBX5M0LQxYx5CTdnUKhM8tjJayjvhc7PvnFaa+Vf6
+	7UTa03LkcDm2TZEkiQWuAsva7R9YepjlCggy4=
+X-Google-Smtp-Source: AGHT+IFkWYisrb2xcJo476JFklBq3dIkrtQHUQ5qETlCQAfQ9WaZAtMPLEq2qUkNERv1Xzuh9Rc/PQ==
+X-Received: by 2002:a05:7022:3d0d:b0:11b:adb3:ff9f with SMTP id a92af1059eb24-11badb40060mr2275242c88.36.1763308116169;
+        Sun, 16 Nov 2025 07:48:36 -0800 (PST)
+Received: from fabio-Precision-3551.. ([2804:14c:485:4b61:c36f:6205:ec94:7cc1])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11b80fd6790sm17179763c88.10.2025.11.16.07.48.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Nov 2025 07:48:35 -0800 (PST)
+From: Fabio Estevam <festevam@gmail.com>
+To: kuba@kernel.org
+Cc: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	manfred.schlaegl@ginzinger.com,
+	netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	f.fainelli@gmail.com,
+	Fabio Estevam <festevam@gmail.com>
+Subject: [PATCH net] net: phy: smsc: Skip soft reset when a hardware reset GPIO is provided
+Date: Sun, 16 Nov 2025 12:48:24 -0300
+Message-Id: <20251116154824.3799310-1-festevam@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-References: <686180077.8704812.1763306985880.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.24652 YMailNorrin
+Content-Transfer-Encoding: 8bit
 
-This patch fixes two issues in the RTL8365MB driver:
+On platforms using the LAN8720 in RMII mode, issuing a soft reset through
+genphy_soft_reset() can temporarily disrupt the PHY output clock (REF_CLK).
 
-=C2=A0- Initialize the 'ret' variable in rtl8365mb_phy_ocp_read() to 0 to a=
-void
-=C2=A0 =C2=A0using an uninitialized automatic variable on some execution pa=
-ths.
-=C2=A0- Propagate the return value from rtl8365mb_phy_ocp_write() by return=
-ing
-=C2=A0 =C2=A0'ret' instead of always returning 0, so write failures are not=
- silently
-=C2=A0 =C2=A0ignored.
+Boards that source ENET_REF_CLK from the LAN8720 are therefore sensitive
+to PHY soft resets, as the MAC receives an unstable or missing RMII clock
+during the transition.
 
-No other changes are made and the PHY OCP helper functions themselves
-remain functionally identical except for the corrected return behaviour.
+When a "reset-gpios" property is present, the MDIO core already performs a
+hardware reset using this GPIO before calling the driver's ->reset() hook.
+Issuing an additional soft reset in smsc_phy_reset() is redundant and may
+result in RX CRC/frame errors, packet loss, and general link instability at
+100 Mbps.
 
-Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Change smsc_phy_reset() so that:
 
+- If reset-gpios is present: rely solely on the hardware reset and skip
+the soft reset.
+- If reset-gpios is absent: fall back to genphy_soft_reset(), preserving
+the existing behavior.
+
+The soft reset to remove the PHY from power down is kept, as this is
+a requirement mentioned in the LAN8720 datasheet.
+
+This fixes packet loss observed on i.MX6 platforms using LAN8720 without
+breaking boards that rely on the existing soft reset path.
+
+Fixes: fc0f7e3317c5 ("net: phy: smsc: reintroduced unconditional soft reset")
+Signed-off-by: Fabio Estevam <festevam@gmail.com>
 ---
-=C2=A0drivers/net/dsa/realtek/rtl8365mb.c | 6 +++---
-=C2=A01 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/phy/smsc.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff -ruN a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/r=
-tl8365mb.c
---- a/drivers/net/dsa/realtek/rtl8365mb.c=C2=A0 =C2=A0 2025-10-12 22:42:36.=
-000000000 +0200
-+++ b/drivers/net/dsa/realtek/rtl8365mb.c=C2=A0 =C2=A0 2025-11-16 14:02:57.=
-000000000 +0100
-@@ -690,7 +690,7 @@
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0u32 oc=
-p_addr, u16 *data)
-=C2=A0{
-=C2=A0 =C2=A0 =C2=A0u32 val;
--=C2=A0 =C2=A0 int ret;
-+=C2=A0 =C2=A0 int ret =3D 0;
-=C2=A0
-=C2=A0 =C2=A0 =C2=A0rtl83xx_lock(priv);
-=C2=A0
-@@ -769,7 +769,7 @@
-=C2=A0out:
-=C2=A0 =C2=A0 =C2=A0rtl83xx_unlock(priv);
-=C2=A0
--=C2=A0 =C2=A0 return 0;
-+=C2=A0 =C2=A0 return ret;
-=C2=A0}
-=C2=A0
-=C2=A0static int rtl8365mb_phy_read(struct realtek_priv *priv, int phy, int=
- regnum)
---=C2=A0
-2.39.3
+diff --git a/drivers/net/phy/smsc.c b/drivers/net/phy/smsc.c
+index 48487149c225..3840b658a996 100644
+--- a/drivers/net/phy/smsc.c
++++ b/drivers/net/phy/smsc.c
+@@ -54,6 +54,7 @@ struct smsc_phy_priv {
+ 	unsigned int edpd_mode_set_by_user:1;
+ 	unsigned int edpd_max_wait_ms;
+ 	bool wol_arp;
++	bool reset_gpio;
+ };
+ 
+ static int smsc_phy_ack_interrupt(struct phy_device *phydev)
+@@ -136,6 +137,7 @@ EXPORT_SYMBOL_GPL(smsc_phy_config_init);
+ 
+ static int smsc_phy_reset(struct phy_device *phydev)
+ {
++	struct smsc_phy_priv *priv = phydev->priv;
+ 	int rc = phy_read(phydev, MII_LAN83C185_SPECIAL_MODES);
+ 	if (rc < 0)
+ 		return rc;
+@@ -147,9 +149,17 @@ static int smsc_phy_reset(struct phy_device *phydev)
+ 		/* set "all capable" mode */
+ 		rc |= MII_LAN83C185_MODE_ALL;
+ 		phy_write(phydev, MII_LAN83C185_SPECIAL_MODES, rc);
++		/* reset the phy */
++		return genphy_soft_reset(phydev);
+ 	}
+ 
+-	/* reset the phy */
++	/* If the reset-gpios property exists, hardware reset will be
++	 * performed by the MDIO core, so do NOT issue a soft reset here.
++	 */
++	if (priv->reset_gpio)
++		return 0;
++
++	/* No reset GPIO found: fall back to soft reset */
+ 	return genphy_soft_reset(phydev);
+ }
+ 
+@@ -671,6 +681,9 @@ int smsc_phy_probe(struct phy_device *phydev)
+ 	if (device_property_present(dev, "smsc,disable-energy-detect"))
+ 		priv->edpd_enable = false;
+ 
++	if (device_property_present(dev, "reset-gpios"))
++		priv->reset_gpio = true;
++
+ 	phydev->priv = priv;
+ 
+ 	/* Make clk optional to keep DTB backward compatibility. */
+-- 
+2.34.1
 
