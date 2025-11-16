@@ -1,157 +1,176 @@
-Return-Path: <netdev+bounces-238947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B3F6C618FC
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 18:09:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F29C61908
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 18:14:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 112D54E6905
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 17:09:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 98F734EB265
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 17:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1782F0C6D;
-	Sun, 16 Nov 2025 17:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EAF30EF97;
+	Sun, 16 Nov 2025 17:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="hXRvsL/W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQzquzNc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D2025333F
-	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 17:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A7E30EF8E
+	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 17:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763312971; cv=none; b=d5eUJol3FB/+ZDEKTZ5ulv1nEfOp9n34PZSRCh6UAacm4i+jLxIZ5TdfBHmCBTSldH3oEtB6x8vt5PaAXHWIqckQSz3af3S9X86xipA6v09PURtqsIP5B/dKBikqPQPKl8cgHUzH5VXiRLWjADLjI3f/fiYGIWgvf4kN1vVF0gw=
+	t=1763313254; cv=none; b=laF9278GcFQYH75bscbvkhL70kk99d17MrYQ8rIWEcoy0zkjV5GQCPE+w1flOUJOIHKkQosBARUWFbXb2kKTmHNF2B527L93IIcQxZw6F3Q8UrLAsdMh6EiqRs4CJy+21zm5WyBuMc2Mo+5IaoQpj7I8xC/oUjF0vVOcXjBFCko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763312971; c=relaxed/simple;
-	bh=TUz/go8J+qPOebTt30XBqY4M9/navzJE1WqOt9D7aRI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SR4sLtLKYskk3hg41MVOYUlfqNJBuq87m3Y2uIrvgdrAh9DqDu7q+uqq9Ax6GkCQESzYzKoewEzb5zvUMZRL//1T7yHJ9XHrciQu4oE/sw88BWxEx6pLNHal9G188vEgwmlh32zlbCq2kgq53R0aqaUam2BXnI/ZFhenh5vnRAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=hXRvsL/W; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b99bfb451e5so2120011a12.2
-        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 09:09:29 -0800 (PST)
+	s=arc-20240116; t=1763313254; c=relaxed/simple;
+	bh=oDdFLe5G68zDI/sfiRVRE5RmonM/lY3XGU8guYjTuSs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hu2IiO4HJ6a1SEkkHdI+b4yHoROeqMLaFmGLBLOQA/6Rl3kSD/yxlToXgly1TkP6dBow2McxD+GDhZdkDyrA4TzRs2Pvku1ihoznxRh2frjJGwmpWJb0KJr8wAlw/M6dwS9J8KRN3UEk1NxbAw0o/eYdcI9xfrBieln0FW1JcaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gQzquzNc; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-477619f8ae5so24027335e9.3
+        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 09:14:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1763312969; x=1763917769; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IcjT+pMab7Q2hqz/bv9mPGg2SHjUkPMu35rj7wMSjDA=;
-        b=hXRvsL/WuCSzP4b62J1mnAY9Zz/jmwL0OZNVCOtKKaSzKM303cubs6vwetdrkGXpbh
-         e5KwguA4A0+PZ4nV7NZERpthTm8+8mH9C1WczpgHdKMthcZMI46CONfH04GAHY+FnlWk
-         cBzc9RXXGwB9KF9XnKpw1dxwKFM9IjYAUCGzHgfTozIeMkANHsZw1Ko1Ph++I1nZREzV
-         kPaFqrNhhjtFN6MdQYUYCVd9ox29ePGa1ynGyuTQ8rrJV0gV4cFWq817d9DskVj+8apv
-         WLlvIo8ujz9ziwONr2xV3LWMU2qiiHHALQqmt1q/TkysxEePvIOfOxjPJBvfr/EcCB+G
-         AAIg==
+        d=gmail.com; s=20230601; t=1763313250; x=1763918050; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=noTei/m84Gtc2e5bHzdK47PXkQjkwMARKvT/7gOqaU0=;
+        b=gQzquzNcXmwKs4dEyw3xxIf29qHiW32RPVENd5C0J68bHUijI+9ZKntHrn2ZxvS8hn
+         ImO2GPQa/XHfL2zSGSkglBIYZSfWXVUejhpR0Ndq5L/vmjY0Jj4wcwBeexFPAoDyOJvE
+         D3Ez64P2RXY11jhcnxvCjZDlh5MsEawSEwkqu8ymkK8+qTD3bTN/LoRqz8ghmk9SQBAV
+         kZ8b+tgxhnBhni1TxWB+vyviWlM6WZ5GpORJJGAfQmhJiIsUCWZQXoffpnSyjgy075l9
+         gsmHACRduklQEKGJ13lFB7DfDjWhBJ62ZZqzXNgh8ysdpqGu244oqrUoZIETtixVLt99
+         eFrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763312969; x=1763917769;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IcjT+pMab7Q2hqz/bv9mPGg2SHjUkPMu35rj7wMSjDA=;
-        b=p3WCP2rJZpuw5/63lALTNq6sa8j5URI/FJY/NiR4jSOm1qh3PdoK3dtrmAEwcGxw/n
-         XjK1u4hZv3WDlgt0gvmOe2ddX43/P1IZdRZdtCl8Ll+MyoYtQ4GzCoI4nZU1Hd1xUAR6
-         fhvQdU+wqusiLieb003yC/40cGFZFzVCyaCdev/wd9lgL6JXIciwAnT4wCCSBEs0eVku
-         7gnEkkZalbbUKVi1S9QBmWZVLkpemdQ+Wz/wX7ltoNonCGAqxtMg/fyWE32vsoC0GdmW
-         DHQzplRSJMddRItRn3eStszM/LhWYeYmTVCBGRmlNpUXS4D1QYqlLeU5QCJy8QYX2PL9
-         Neyg==
-X-Gm-Message-State: AOJu0YywCPJAbgWKCIK5TYTra20AjzJrrKcezaK3TqqAVi9mdTbWPKgD
-	InCv3UCHL6kvbES7dIp9Y31FrRqg2zv5KP+y5QI5f3Rhcn8f6zLCzMvhceBdL1MnYujNT76mP+8
-	JXC6B
-X-Gm-Gg: ASbGncuUeibhO4P88OVDtGYaOk4Na1f8g3Lim0fWmv+gckoMHcsCXw6j5OIPvsxwZm6
-	zF5F4RbYzwhdCoHLkNRRTUoSYHDeFXzNkkliNDqZAEEgCLchYGFbOtQjCf7zJZceUvjMrTayaLO
-	XHY0Hghgr9x/WXU+9BGYzAgBIXK8VPXqMptPMSWYV41wwmb9qf3jriZoy34yxSguqwIQhr9y9fn
-	CYCeMp2oF5BKY7ecAn13WeiVdFHVIOrcGjGDy7EBntelbpd/xxjbZ00FEoCWFG6Fk8zKeeQRP8D
-	zGdZKf8IHdV8iZlJrOnYwyGf0J+i8bJjCh9bCDaYA7eO8y1r+lsDAW16z6ugsz1cY26IBhkHzSj
-	q/qDwVl2XyRlmHmmCnFyQ3lRxVWgL2eBzSgG0qqyPnfUp2N6MKAsB9BFHCTnJ8+OFT6xbPBz5Sq
-	Zi7omtasRWvYfsTs1FCwZX3eQZrPt0N0G58zBvxm8Y1ThON/g27RtGHCI=
-X-Google-Smtp-Source: AGHT+IFQLmMRJTKRVW59ZzA03cCRyPyrVteZ2udRj+FnFuzhWXzrr6j2rQgPRMVYHFgckjp7saDH/w==
-X-Received: by 2002:a05:7022:619e:b0:119:e56b:98b0 with SMTP id a92af1059eb24-11b411ff197mr3470108c88.23.1763312968951;
-        Sun, 16 Nov 2025 09:09:28 -0800 (PST)
-Received: from phoenix (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11b0608861asm25116030c88.9.2025.11.16.09.09.28
+        d=1e100.net; s=20230601; t=1763313250; x=1763918050;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=noTei/m84Gtc2e5bHzdK47PXkQjkwMARKvT/7gOqaU0=;
+        b=hdw8C2NqpaBuCtD1Bz4EPvSslkU+kL8I/IKhTfrUa+pL2OvsKuFh4oNNByfnBjSYhQ
+         V4DAtBIV/0uQCPFBMiWzTneTG86MmEJRjHVBjINLkPdIKOrxgpC9vEqv6obq7TaeEVep
+         JvRr76CLLQkWcaRLHt868ZSKqPVff+nHgEJvffYBi0/51OGSwZ7INS5VZFHeWrWV9k8f
+         ne95O+mkYZmGjV4JOGlem5Rg94E8Sk28bWZWqzKBdB41C/AFlXKZLmmQZsUPRJXzLv8I
+         xFCXBk2ra04noRY6n/AWqxkldg1C0E7ZpU/ex4tM5Dwey/gtYsb57fx9EO/rncEvvDlK
+         lBWw==
+X-Gm-Message-State: AOJu0YzM+847Uva22MYrm8BZ4guL+FmoTCvy1m4tC8b2LpUpDsSOu20m
+	3lGB/5tdexOGr8C9MAWCP21Ybn7C7hJtkWBpSkvmDLT71dxGymsF3yYr
+X-Gm-Gg: ASbGncvHxT54xo5RdTt1Umqxdudb+6mBS4w8bRZQWVmjTBjQebyocXKNmO+rz+P1Z7L
+	ESfYnWrNtpf6TyMyCFuqXrqd5/N92IV+0/GtHamTZEh8wkV769nUyLaLXrgviLA6aa2DcvKZ4HH
+	IGqSwyehQ5z0YIBEHeUDUdqBMtvDL5HK+JiKRkbRK/ttu1rz3731E5qWLrBSRjtKVq501to8oIA
+	kDOeFSmV3AoPitYWXwE+mib4pJykeccwm9NXFGLIkL+AbULS9jCf0bPvxF1ewR7hMQ9nabY4tbn
+	ggRhC6pjK1xNTiRjKHBTHXCwRUU5bTQOJCCeRctXzrFsqtOH5TmYfzvPfXiTibK/G0dcLrFVYqD
+	fKanSd3G5lL9czi3Jw5NTzpxLt5/VL6UG4ErYezgKjynxaBH9hqc7rdLovcCLpQ7MqVlGWiM4+0
+	zJsXWpM4lNuuHzIwc=
+X-Google-Smtp-Source: AGHT+IGL6AV0B1oaIWHJgmVKpOsmeJef5gUQUkTvD4yoafh0RmKM+J8VrAy/OW0rZjNvWxx3l8Cgcg==
+X-Received: by 2002:a05:600c:4695:b0:477:63b4:ef7a with SMTP id 5b1f17b1804b1-4778feaa8a1mr75576025e9.20.1763313250287;
+        Sun, 16 Nov 2025 09:14:10 -0800 (PST)
+Received: from [192.168.1.243] ([143.58.192.81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4779d722bc5sm70874245e9.2.2025.11.16.09.14.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Nov 2025 09:09:28 -0800 (PST)
-Date: Sun, 16 Nov 2025 09:09:26 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Petr Oros <poros@redhat.com>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, ivecera@redhat.com,
- jiri@resnulli.us, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH iproute2-next v4 3/3] dpll: Add dpll command
-Message-ID: <20251116090926.130f3b9e@phoenix>
-In-Reply-To: <20251115233341.2701607-4-poros@redhat.com>
-References: <20251115233341.2701607-1-poros@redhat.com>
-	<20251115233341.2701607-4-poros@redhat.com>
+        Sun, 16 Nov 2025 09:14:09 -0800 (PST)
+From: Andre Carvalho <asantostc@gmail.com>
+Subject: [PATCH net-next v4 0/5] netconsole: support automatic target
+ recovery
+Date: Sun, 16 Nov 2025 17:14:00 +0000
+Message-Id: <20251116-netcons-retrigger-v4-0-5290b5f140c2@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFgGGmkC/23OQQrDIBAF0KsU17WMxpikq96jdGHsaIQmFpWQE
+ nL3iosSaJbDn/9mVhIxOIzkelpJwNlF56c8iPOJ6EFNFql75plw4DW0TNIJk/ZTpAFTcNZioEq
+ YWjS90a1sSO69Axq3FPNO8nquLIk8cjK4mHz4lGMzK3lxO+gO3JlRoJVC1YHouNTmZkflXhftx
+ 6LNfCdwdiTwLCjAVgBIXjV/QvUTGDv+ocoCk7XQvIW+R7kXtm37AsRCTh1AAQAA
+X-Change-ID: 20250816-netcons-retrigger-a4f547bfc867
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Andre Carvalho <asantostc@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1763313249; l=2901;
+ i=asantostc@gmail.com; s=20250807; h=from:subject:message-id;
+ bh=oDdFLe5G68zDI/sfiRVRE5RmonM/lY3XGU8guYjTuSs=;
+ b=qDpY74269FCf6ORW4bh+saJsR8WmukkNxzemVggUzDTskMBBpzndZkqmYgjOCScEDgT/MRwVo
+ JZyji65/7M0Ab77dITwWeYelMniS+2PuH8PY4n9kEHWK5NjoHQm8I3B
+X-Developer-Key: i=asantostc@gmail.com; a=ed25519;
+ pk=eWre+RwFHCxkiaQrZLsjC67mZ/pZnzSM/f7/+yFXY4Q=
 
-On Sun, 16 Nov 2025 00:33:41 +0100
-Petr Oros <poros@redhat.com> wrote:
+This patchset introduces target resume capability to netconsole allowing
+it to recover targets when underlying low-level interface comes back
+online.
 
-> +	/* Setup signal handler for graceful exit */
-> +	memset(&sa, 0, sizeof(sa));
+The patchset starts by refactoring netconsole state representation in
+order to allow representing deactivated targets (targets that are
+disabled due to interfaces going down).
 
-Personal preference, but I like initialization vs memset.
-To be pedantic use:
-	sigemptyset(&sa.sa_mask);
+It then modifies netconsole to handle NETDEV_UP events for such targets
+and setups netpoll. Targets are matched with incoming interfaces
+depending on how they were initially bound in netconsole (by mac or
+interface name).
 
-> +	sa.sa_handler = monitor_sig_handler;
-> +	sigaction(SIGINT, &sa, NULL);
-> +	sigaction(SIGTERM, &sa, NULL);
-> +
+The patchset includes a selftest that validates netconsole target state
+transitions and that target is functional after resumed.
 
-Current code is good enough, no need to change.
+Signed-off-by: Andre Carvalho <asantostc@gmail.com>
+---
+Changes in v4:
+- Simplify selftest cleanup, removing trap setup in loop.
+- Drop netpoll helper (__setup_netpoll_hold) and manage reference inside
+  netconsole.
+- Move resume_list processing logic to separate function.
+- Link to v3: https://lore.kernel.org/r/20251109-netcons-retrigger-v3-0-1654c280bbe6@gmail.com
 
-If you are going to use signal for exit, why not use signalfd() which
-avoids lots of problems with interrupts in the middle of the loop.
+Changes in v3:
+- Resume by mac or interface name depending on how target was created.
+- Attempt to resume target without holding target list lock, by moving
+  the target to a temporary list. This is required as netpoll may
+  attempt to allocate memory.
+- Link to v2: https://lore.kernel.org/r/20250921-netcons-retrigger-v2-0-a0e84006237f@gmail.com
 
-Checkpatch has some advice, most of it is not applicable but probably
-want to look at:
+Changes in v2:
+- Attempt to resume target in the same thread, instead of using
+workqueue .
+- Add wrapper around __netpoll_setup (patch 4).
+- Renamed resume_target to maybe_resume_target and moved conditionals to
+inside its implementation, keeping code more clear.
+- Verify that device addr matches target mac address when target was
+setup using mac.
+- Update selftest to cover targets bound by mac and interface name.
+- Fix typo in selftest comment and sort tests alphabetically in
+  Makefile.
+- Link to v1:
+https://lore.kernel.org/r/20250909-netcons-retrigger-v1-0-3aea904926cf@gmail.com
 
-WARNING: Missing a blank line after declarations
-#1146: FILE: dpll/dpll.c:554:
-+	bool need_nl = true;
-+	if (argc > 0 && strcmp(argv[0], "help") == 0)
+---
+Andre Carvalho (3):
+      netconsole: convert 'enabled' flag to enum for clearer state management
+      netconsole: resume previously deactivated target
+      selftests: netconsole: validate target resume
 
-WARNING: Missing a blank line after declarations
-#1725: FILE: dpll/dpll.c:1133:
-+		struct nlattr *tb_parent[DPLL_A_PIN_MAX + 1] = {};
-+		mnl_attr_parse_nested(ctx->entries[i], attr_pin_cb, tb_parent);
+Breno Leitao (2):
+      netconsole: add target_state enum
+      netconsole: add STATE_DEACTIVATED to track targets disabled by low level
 
-WARNING: Missing a blank line after declarations
-#1761: FILE: dpll/dpll.c:1169:
-+		struct nlattr *tb_parent[DPLL_A_PIN_MAX + 1] = {};
-+		mnl_attr_parse_nested(ctx->entries[i], attr_pin_cb, tb_parent);
+ drivers/net/netconsole.c                           | 145 ++++++++++++++++-----
+ tools/testing/selftests/drivers/net/Makefile       |   1 +
+ .../selftests/drivers/net/lib/sh/lib_netcons.sh    |  35 ++++-
+ .../selftests/drivers/net/netcons_resume.sh        |  97 ++++++++++++++
+ 4 files changed, 244 insertions(+), 34 deletions(-)
+---
+base-commit: c9dfb92de0738eb7fe6a591ad1642333793e8b6e
+change-id: 20250816-netcons-retrigger-a4f547bfc867
 
-WARNING: Missing a blank line after declarations
-#1790: FILE: dpll/dpll.c:1198:
-+		struct nlattr *tb_ref[DPLL_A_PIN_MAX + 1] = {};
-+		mnl_attr_parse_nested(ctx->entries[i], attr_pin_cb, tb_ref);
-
-
-WARNING: braces {} are not necessary for single statement blocks
-#2480: FILE: dpll/dpll.c:1888:
-+	if (json) {
-+		open_json_array(PRINT_JSON, "monitor");
-+	}
-
-WARNING: Block comments use a trailing */ on a separate line
-#2508: FILE: dpll/dpll.c:1916:
-+			 * If monitor_running is false, we're shutting down gracefully. */
-
-WARNING: braces {} are not necessary for single statement blocks
-#2516: FILE: dpll/dpll.c:1924:
-+	if (json) {
-+		close_json_array(PRINT_JSON, NULL);
-+	}
-
+Best regards,
+-- 
+Andre Carvalho <asantostc@gmail.com>
 
 
