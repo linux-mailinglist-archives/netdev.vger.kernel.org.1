@@ -1,124 +1,144 @@
-Return-Path: <netdev+bounces-238936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E382FC616F8
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 15:39:15 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8BBC6179F
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 16:40:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 5DB65242BD
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 14:39:12 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A10BB35AD82
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 15:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5781D258CCC;
-	Sun, 16 Nov 2025 14:39:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13A130C377;
+	Sun, 16 Nov 2025 15:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jxpj4tne"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="ehaiAA51"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic305-21.consmr.mail.ne1.yahoo.com (sonic305-21.consmr.mail.ne1.yahoo.com [66.163.185.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310E21FD4
-	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 14:39:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF1486277
+	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 15:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.185.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763303949; cv=none; b=pT1X2TnufeF7Onv7/AomAqzgAgDXEkP5O0pGiJzIQYBwiTbNrEFFjgXlAbt5xoYjOVdeohcY8CBYkeOSqQ5k7wG5XDSCnCMmHspiPJ+ym8gltHpkiMOe8nXYYqiuy/HjzdWV28fs2k6xZ6qHFwxXkqyboouFQNTmA+ipH45TGGY=
+	t=1763307600; cv=none; b=JH/6ky6cQuQF7wF4AlHiwlG5ZpXGcSP8j62Yai8NEhxxifGVzItHBa99iAKDz+G5ecFg7JIbfJYI8BZYiQRzcXvY8Zb9i6sk7tGWUFJqN85nW66wOF5SswQGRhtL9/bFrdcyKrzAB8qvjI7UlMl3eyCiU4mBFESk5QftFjlx2wU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763303949; c=relaxed/simple;
-	bh=1BQvqHbMWhFdMhkvlin/swbUaSMeIxYJ0qRWFN3gNtU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=FgODMmbWtzAXQ8UXPzD9LiAx2uMUrKakPAMf2Zr4fqZz4JOWZyl9+W33pD0goQgctCLLAlbzwHm8qcBhQW+aKXlwjbPJmLw0U0U+XQLvRkVLo4Ym4qkA+AjlnpYU8q5G5SFHPbMYw4BeRgD1e163zaOFvY5DX+BoKZcKUhijLq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jxpj4tne; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBCCDC4CEF1;
-	Sun, 16 Nov 2025 14:39:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763303945;
-	bh=1BQvqHbMWhFdMhkvlin/swbUaSMeIxYJ0qRWFN3gNtU=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=Jxpj4tneur4mRJK1yGVo7i10ljyvvZME/AEJ0TZK4uU48lyHN7sU8+EWylKCBk9Y0
-	 CarxjelZui70bnrE9C2rdQXVlhrAzXaoCo9I+ghb+U3cenf795YheVAnMwWY5ISOsE
-	 3vW8J0XBO+KHVos+MrcATXHAVDLe7nPdZIq0TtBGtWfQuMbvpIQ4HICPLQAGx5CHof
-	 Oa5K49sttk0s53RnhT89hfrxV0wcO6jAXiY2+7TRTO8VSBUtAKjIQH6ZIA+6xRQaMl
-	 RkXtmonwgDDrrdwg68ZgIuiO+ryqTkF6QJHsXbP0cbnIdqPU/nnFz/3S8b/rOixqaC
-	 SOCKbaJrWohwg==
-Message-ID: <fc1dfd5b-2ec7-4bad-bdc2-22890d214993@kernel.org>
-Date: Sun, 16 Nov 2025 15:39:02 +0100
+	s=arc-20240116; t=1763307600; c=relaxed/simple;
+	bh=WzsAL97xxnLZa4HC2bSfwRjz/+VmJIMewbmXzEFmQ5g=;
+	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type:
+	 References; b=S48itVnPhrL88u0befJG0dTGQ8TcBMYAofBXjG63JJOo3dtYiJ48hwEwdvlD8qvNG1JLaXAhtyOqf3vdWochTvocN3bTiyNBJsfUOH8Folku4EDH3hw8Bwqo0oLxLJ3M3qT358UHi7777VKL6XEP9iljXPrrDhubTH8XyujQ0BI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=ehaiAA51; arc=none smtp.client-ip=66.163.185.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1763307598; bh=WzsAL97xxnLZa4HC2bSfwRjz/+VmJIMewbmXzEFmQ5g=; h=Date:From:To:Cc:Subject:References:From:Subject:Reply-To; b=ehaiAA51rO91loZZkwervezrXpnPSIIT0qdRXnWB29g1A4TRQTw5LLlCF7BKzWiLZFoA2jcJgcGmh+IneSO/hrvyfNxLpQMMSnSnAtScFp3UcHzhig2DrpR/cOwvDWS04UTmiV9fYavUcV+q7g2QRKQDqZ6Tdatr+Xzr7XpaD714auHLFGsW7l2z3jKJZMvKI41AMw+y1X7TLBSqfkfEh1BIAsz84ci6SXZ+Ll/RahGuWb1oHYaVNB8Ub0BAlUi13VV6XsZEsRTOAvtd1nhTmW+920/CJQmMF+iLoV4suhZ6cby4EI4CVKfNDrEl43tuv4L1fUgXl1DHDrEGWYg2cQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1763307598; bh=ryGfLL3CFaHiU63ysdUMTpQQxQMft/sZeFja4L7CeTX=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=BnRV2DuZDs3adkHI9IaOu6WIeIv3qNFnc6a5PGw94qFnN1AWQ8xy7mU3l8rsB2YhYnyo77I6tNOOVKMYBU8PWOZhqTSsYzt3VoNRRdfQG4w1dab1bF0flgfpog2IyTNUYmKyzgLvxgJln94LdHxBpuKKeYi/eJw0oKfTuohIo/G1RBuE4RMBBRlcFHfLlF9xWaVSdbjneQdMwH7g/0sJjtVP/tObDJCq40xE/bZcJ08dSJZKoSsvJhzR5H5xoAgFq18zJlScvFQmz53gAS3ASY2snAyWy1M2moSYOuwDn+CspxWAg/R+NYTAZAyP73gvsHSsL0fSBEn6eZuhlF9FrQ==
+X-YMail-OSG: 0JAX2pUVM1mRZ4mwtUZhICyR9iY.ybAiwFenN6g4qtMbAgWurKjEoD9q4Lh4Fz7
+ Ddk7PjZJ91ifgk.Xu8wy0bH_.5tRnvZFof7UzTE37PGbPvfNuF4h1b.tzZtPTiV9X.DffElTDvNN
+ K1iJvwXq0hxzGxY2H412h2mtrOfMilvY6pUfJpWLqnCSMy3YHDncCoYGObeT6XHuaEG5XyOKb2oX
+ VVhD2Ds3OPPu2PDl81F_Vkb77HiQuwu00WUv_GZFQCFvySCpBPNJZslHJMSfkngNravUIkNH1asS
+ cgbA4iyxwqLRYUNAaAkFd6bt72MPekkzNccwhTI_9zXH860lE5_nWjaAZBSNgJgZRwXg9ZAR.l9w
+ SOohtvihIKvFQmNThw6nogmUF.yIRPz0g87Rj3v.L1m_m2YNqNVBHC65.fVBwZ.uCIxbOl0wUKLS
+ ZaWwL3Nt7JETU1qbwtNHSpNcfcSfYctWSf80FNxxuWzSf7qrxPUt9uGr8u3M0XYNoVFpwDwORaEn
+ AyjD8VZSUlheHQb_GWYh1D5s_u.UC8WiXvMsVskbHHjds7CCAIxppw4jRSnlrMqQLWREGNZrTHsG
+ SEyh4Im4fFFrm8pDFma1UYTPZGHQXEYfrLfqdZ7kuTDC0_AztSIAWO5qaRTQlcImtjKfQQ.w6PHa
+ F1rhnFtf4B1W1CKuKDBelOO8P8lvcvJiknAeoFBt5fbs0o6Me9aiGhggPvxTvLEhOg771BDPw8Gf
+ 4SnxsWnyPnweWxR418bim_4oEqwrry_M6ACK8GbQcAAWNmHp__IHGdk87UENzuM0OIPZbTn6XWdJ
+ fLbcIPKrBm.lNgpqZXVkD33JpjgYUM63W6oLsJ9PaGW2t4DsNYlbHD7asknGjRi0Xh7VKUmpyYRi
+ wvM3amtIyfw4HBp_hKgCTBPq5.PLDGRuUWpnH9h9ho_Xtl7ZgqyeIxSO6edX.PIRpJGKx.XsLO_l
+ 1anj8L8JGD5m4sRdrxzZHZGY2nfsLPaqt8w8ooKGPlmavpnchMf9Y.jAMRyUVZoMPyspaDXvU8z8
+ GQQNDQrTUquY9CxtCW7miCi2TMuG0S0DOWxMZjeN1.HvQnfDIS50SC4L0WebBy8JAAfR4U1yJjVu
+ Fpv7SCBI_VWrKZffx1Q_vgbf4aIcgVVIQ9jQcie_UfQeqA9PoJSQLWrbpqvxwGYl7fZvR2yjzEtO
+ hnU3wRdK39bHc_6Qp38sidMs3QOMr2KAt8I6GjIwG9OMplCSjSZoWseCCTy7Ha2V213Bj0NWu28c
+ a7WvMyDk9ZWLctolbgl8NmxQ_NNb7ZXMWNei0BSws85gFkz4Xl8yte55DLrFs_nKqAkrJANpIdyr
+ dOVMc3QVMEGwlKEuweUlR_e6zOZPXtyqKJgGjT0M_DMdqz63NQv8aPE855khguxWdlP8UXk7i0Hu
+ fkcoXSBiPBBPwwi.CMzRco9zOPlnV9MQS_Q4_W1G1WwgCSWDnq.R0QHPgJcsWkZ3VGX_zTQ9mD5G
+ .gyamkof2f1i_Xm0ibXzzo8Xm_GcatgtRsw7VmI5WiYOhl6L8cPOmQAdL.yS4B7ZDR9XqZVLNSs9
+ vB7G5TTi_fs_SDa9fjo.2fpoCyNsFqlWev31As80CGHWV073Da1ZJ_2aSpvXQKTQhhKeBNBVlRmf
+ e4Vq2.jqGRk.ImweC.iv7GD8flY5jerfeBrA8jY6ThmYIZN1zuWyLLVyQl9kI3UKvCYB_1Lpnqve
+ .3bwXYRlAnYV1EszlXeSTks3AU3QPw2sH0I2cj6V4Uvcc1dzgQOU0lxd8us8N41rzBslh0egp0RH
+ _9fP2mOicg34veukmMI_B69eRgh3VsMnCJon1VB_ZDhc8sGun0ym_.SONaz3KnqR3sNIVsnwssIj
+ W4y51FWcY2VAWh0YVAqJslcvO2IxpC5Ekp7VlKjCcikNbv6BEYxGuEV8IGh7qa5LOb9P136UloYy
+ i.YhpIupWzKis7zpbYzhVoKXmr7JtJtJ_l1y.hCsukg2ll3T8281umJ3nGiXJmt2tGX6OZiyD5OF
+ 3A3lO7x910j8K1zE58boESICzlmig8hmXUtYxydmMP41RYNyoMogqVSJ7_clZXQVokgbFzWGQAqx
+ vfxctworDvArh1tS9zV9kb2vkae_lET4zeW2.ekJWIO8cnbEpUWEyHbIf.ANbVvgdX7yTUNk.heq
+ qVfDC7dcFyr4ztfkVsT.7eEdQFEIDLphd7F48KWKyQNAxTgSfv9UQiBftNVGQGPpq1xJD2Dbk.wv
+ R64hpfbJHWHMTaqP3X7G4Dxpf3NrtZArZALwfsshh6k7WHHhrwuW_XA--
+X-Sonic-MF: <namiltd@yahoo.com>
+X-Sonic-ID: 93d1412e-098c-46be-bf34-efdd093e267f
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic305.consmr.mail.ne1.yahoo.com with HTTP; Sun, 16 Nov 2025 15:39:58 +0000
+Date: Sun, 16 Nov 2025 15:29:45 +0000 (UTC)
+From: Mietek N <namiltd@yahoo.com>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: "linus.walleij@linaro.org" <linus.walleij@linaro.org>, 
+	"alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>, 
+	"andrew@lunn.ch" <andrew@lunn.ch>, 
+	"olteanv@gmail.com" <olteanv@gmail.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, 
+	"edumazet@google.com" <edumazet@google.com>, 
+	"kuba@kernel.org" <kuba@kernel.org>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>
+Message-ID: <686180077.8704812.1763306985880@mail.yahoo.com>
+Subject: [PATCH] rtl8365mb: initialize ret in phy_ocp_read and return ret in
+ phy_ocp_write
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] NFC: mei_phy: fix kernel-doc warnings
-To: Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org
-References: <20251116070959.85055-1-rdunlap@infradead.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20251116070959.85055-1-rdunlap@infradead.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+References: <686180077.8704812.1763306985880.ref@mail.yahoo.com>
+X-Mailer: WebService/1.1.24652 YMailNorrin
 
-On 16/11/2025 08:09, Randy Dunlap wrote:
-> Fix kernel-doc warnings in mei_phy.h to avoid build warnings and to
-> improve and documentation:
-> 
-> mei_phy.h:15: warning: missing initial short description on line:
->  * struct nfc_mei_phy
-> mei_phy.h:19: warning: bad line:
-> 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> ---
-> Cc: Krzysztof Kozlowski <krzk@kernel.org>
-> ---
+This patch fixes two issues in the RTL8365MB driver:
 
+=C2=A0- Initialize the 'ret' variable in rtl8365mb_phy_ocp_read() to 0 to a=
+void
+=C2=A0 =C2=A0using an uninitialized automatic variable on some execution pa=
+ths.
+=C2=A0- Propagate the return value from rtl8365mb_phy_ocp_write() by return=
+ing
+=C2=A0 =C2=A0'ret' instead of always returning 0, so write failures are not=
+ silently
+=C2=A0 =C2=A0ignored.
 
+No other changes are made and the PHY OCP helper functions themselves
+remain functionally identical except for the corrected return behaviour.
 
-Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
 
-Best regards,
-Krzysztof
+---
+=C2=A0drivers/net/dsa/realtek/rtl8365mb.c | 6 +++---
+=C2=A01 file changed, 3 insertions(+), 3 deletions(-)
+
+diff -ruN a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/r=
+tl8365mb.c
+--- a/drivers/net/dsa/realtek/rtl8365mb.c=C2=A0 =C2=A0 2025-10-12 22:42:36.=
+000000000 +0200
++++ b/drivers/net/dsa/realtek/rtl8365mb.c=C2=A0 =C2=A0 2025-11-16 14:02:57.=
+000000000 +0100
+@@ -690,7 +690,7 @@
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0u32 oc=
+p_addr, u16 *data)
+=C2=A0{
+=C2=A0 =C2=A0 =C2=A0u32 val;
+-=C2=A0 =C2=A0 int ret;
++=C2=A0 =C2=A0 int ret =3D 0;
+=C2=A0
+=C2=A0 =C2=A0 =C2=A0rtl83xx_lock(priv);
+=C2=A0
+@@ -769,7 +769,7 @@
+=C2=A0out:
+=C2=A0 =C2=A0 =C2=A0rtl83xx_unlock(priv);
+=C2=A0
+-=C2=A0 =C2=A0 return 0;
++=C2=A0 =C2=A0 return ret;
+=C2=A0}
+=C2=A0
+=C2=A0static int rtl8365mb_phy_read(struct realtek_priv *priv, int phy, int=
+ regnum)
+--=C2=A0
+2.39.3
 
