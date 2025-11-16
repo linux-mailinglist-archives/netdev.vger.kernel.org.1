@@ -1,275 +1,104 @@
-Return-Path: <netdev+bounces-238929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCB2EC61227
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 10:46:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66363C612A2
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 11:39:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2EEAA35F559
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 09:46:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21EE63A2A22
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 10:39:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91091215F5C;
-	Sun, 16 Nov 2025 09:46:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D94823F429;
+	Sun, 16 Nov 2025 10:39:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gxrFCO50"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MmMgaCoL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AAE723372C
-	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 09:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADED2309B2
+	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 10:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763286393; cv=none; b=bSVPtn/1iONwP/FcDHOMhwHGW3raBsbXWsyNlN+/wRhua0AhdkImvSStEoEN8jFS73dtO2T4hj13viWAA7zhgWf6SSsWEXNhzYbLZpqlVwlcYy8OBUEvT7qqImj0QV593vE3CAZaaOm9GRXf3Qq3cStJIIcUI7kml0Zqs+0GWi4=
+	t=1763289548; cv=none; b=M2MPP4NHnfXkqfPVKRLmOTfbxNLxZ6eU81pzENLphF4Wa2C+0V6CivBe070uCK//Xq7I/X1DbnNJUSakzBNSGUF18xVxRx5ND8PDYS1L/yDm3kDS2/GUF0PAyrrWZq+0PRH8uJxpbXkimw3lP5WVFVMnsLyg/xuOE4l9AgixMvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763286393; c=relaxed/simple;
-	bh=pQOFacc/6pRj+ytn8qyiq4d21QgkEQFOtLsH9oNa840=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JZVQcnuqKxizyRWHGI+XnDb7wqt8olTG/mcVCoYLmyBz0DOAvUMXLrt7rw1YxWE5L8vBOGiH3A9xTtDEU6Xh2i9qsRFYXUb++dwJgYHQZIBk8lOkMnc2N9GepHb8q6po+2TLmr41wyqJKLG0qctXmY2icugTt/zxhzCt8iG4Z6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gxrFCO50; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763286389;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gOKdmAS+pSStXuuMqPxHavhtunygIwQ9eh2TmLglcKg=;
-	b=gxrFCO50k9FYSJNEdPIo4UTsWVbJPMjj5tPRfXLFYp5YKzc08XnwbcEfkSM32erTDdVxXk
-	B7HppslroekJ4y4QxRl8qXSZAy9WCnpydhSqEEEdznS0dYty1wZup6RiuJgLZsQjOLvWzp
-	gwmTP6mOdPiSBpk9esH/tthycTFHwlU=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: Manish Chopra <manishc@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v5 2/2] qede: convert to use ndo_hwtstamp callbacks
-Date: Sun, 16 Nov 2025 09:46:10 +0000
-Message-ID: <20251116094610.3932005-3-vadim.fedorenko@linux.dev>
-In-Reply-To: <20251116094610.3932005-1-vadim.fedorenko@linux.dev>
-References: <20251116094610.3932005-1-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1763289548; c=relaxed/simple;
+	bh=eUooGoIK3p0HDkJHI44CQC5dCUwh7Ui3R3yP/HMUo7o=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=W0m7ERRJ9BRM1jcu1cxoIVX+jnEtDOmKIP5rO40OYG4rMuI/789Sva0LlCfOMka2/ZDQSHMKftPyJpLThMWgI2te79m6oCaxzTJvoIY82OAdxADn+BcqfgzEFs6I0O/Oc47r5R4BOXz+II7GtdYJEU+OrnUnryYW8z0+CHiW2Ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MmMgaCoL; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-477a219db05so157295e9.2
+        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 02:39:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763289544; x=1763894344; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eUooGoIK3p0HDkJHI44CQC5dCUwh7Ui3R3yP/HMUo7o=;
+        b=MmMgaCoL9Gw8wGi6SOiSdRAQoeRGk275mdhAkS3qdEWAyNXQdojX7I6NkxvS/KD2ci
+         8z3C3HZM4aEmjZV6MYGUiz6+hNvur2O71a/2HJy1UXrCSww/cvPF5rS5Rwb3CB9otFSI
+         ahow5XiG/sTT3Paowoq6ORDSj08B7uOaV1eWDyw38IuVZ5oCzr1rb3bMpC9S4eJhRVSr
+         h5xchwULR27Cykpo1WG1FT7OM5b84XmY1I875eeSAX2qDGWmSzdF40MMoPTARTVFlhN0
+         Hzo6iJjy0Y+1WBclqrkPpteji6JXbMZ0dCkWqYTwV3YvAFWNX79/xKVpt9Ujqs+dkgFI
+         r4BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763289544; x=1763894344;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eUooGoIK3p0HDkJHI44CQC5dCUwh7Ui3R3yP/HMUo7o=;
+        b=TSTRgv1Rmjpa1qHMYshVAqPx5SL0oNMs4KpxWv5xC/LMJbk07vMMRhl7wKiFNHVlfQ
+         ekFvS9y/kk2jUSh1WRHgnydOLmsODZtjStPQdZdLLbExDAXXS+U29e+cpWM+AxPm0A1k
+         YIKq/7V/pbm75NYjb51nB0W5n9bTp5nuUPUYjXcVASXv4l+X8hhr2Nenc6uDYOHSbZZq
+         V1mPfECuh09ci6dJfNnL/Z0glnWB8hhkWmgMgRbHu0vJbx6132JzNC++8PWKkjzTYIdV
+         f5o1RvABSHJZyA7SSi4LFvuNjq6Hb2KfnqvPFVKjEKE5SpVkvMH8nvIAz8enNlpOkDzm
+         WYtg==
+X-Forwarded-Encrypted: i=1; AJvYcCXym4YwxDkRvyX6EpSOJc+AnagKTq9tJadtPFyLzt/Jsuipc+Hy1nwNOEDaqSGEZP7qPkd3i8E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzT4RP6Zj6P8QX/jeuUyD2UFljU3bwAPQcXHP87YLnKZpaoy67Z
+	yqJ3r/oqWE2f0x5FLWHDJ880sDUhW3+QvTjRWu1j8nhYe4js6IshhOwX
+X-Gm-Gg: ASbGncuckStL6tV2uKtyUrTq7CpQdWwvoWGJGUjQVyfNGVAguFufa1B/aepPJLMN1AK
+	Qp8DbLfFEzYufv67rrltrFfQagArId4VjGYnGxG5vkeKtyeLWUXrW8XHcVStUvPhilLdN+RVqSU
+	wJ6UpkecRi4KNwsvqfcyNUE9Gt04m7JEdZ9WmhH+ENTFG7cLm5OvxHVN/HQVs6NERoIG3yAkxvC
+	1sj9pLsymOvPWS4YGOOJbkPHJuczUfXgLEdLObGr3SH5zPp0QJ5yLfZMlCR6+HwNg1W7ieAoEQa
+	cC1btpRURU9NnpdJ+k3k+NKYqqSR9/T5QwZHXI78oqRbT6GClouTSeals7LXpr+DKEGkcsWuC6l
+	7tZE+kTXIHF1d8QkYaaNUEnWj5pcCOk9fRmEoRqNuyHIsuXN6i6Jkjs4vrtX51fIX68Irjlsh/b
+	T+ygpWZoqtZv+y8zG1XBXaJEc6AdMO4gRmkw==
+X-Google-Smtp-Source: AGHT+IHUgA14e0djNX2e3oM4Gvg+pve85sKiv5fjYxtKFgTIDLrC8YQXvlm3ko1cndGmvyw773o/eg==
+X-Received: by 2002:a05:600c:1382:b0:471:114e:5894 with SMTP id 5b1f17b1804b1-4778fea3098mr65089985e9.25.1763289543502;
+        Sun, 16 Nov 2025 02:39:03 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:adf2:6bca:3da5:f30d])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477981347f1sm35447105e9.6.2025.11.16.02.39.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Nov 2025 02:39:02 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
+  sdf@fomichev.me
+Subject: Re: [PATCH net-next] tools: ynltool: remove -lmnl from link flags
+In-Reply-To: <20251115225508.1000072-1-kuba@kernel.org>
+Date: Sun, 16 Nov 2025 10:31:40 +0000
+Message-ID: <m2h5uunu9f.fsf@gmail.com>
+References: <20251115225508.1000072-1-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 
-The driver implemented SIOCSHWTSTAMP ioctl cmd only, but it stores
-configuration in private structure, so it can be reported back to users.
-Implement both ndo_hwtstamp_set and ndo_hwtstamp_set callbacks.
-ndo_hwtstamp_set implements a check of unsupported 1-step timestamping
-and qede_ptp_cfg_filters() becomes void as it cannot fail anymore.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
- drivers/net/ethernet/qlogic/qede/qede_main.c | 22 +-----
- drivers/net/ethernet/qlogic/qede/qede_ptp.c  | 76 ++++++++++++--------
- drivers/net/ethernet/qlogic/qede/qede_ptp.h  |  6 +-
- 3 files changed, 54 insertions(+), 50 deletions(-)
+> The libmnl dependency has been removed from libynl back in
+> commit 73395b43819b ("tools: ynl: remove the libmnl dependency")
+> Remove it from the ynltool Makefile.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-diff --git a/drivers/net/ethernet/qlogic/qede/qede_main.c b/drivers/net/ethernet/qlogic/qede/qede_main.c
-index b5d744d2586f..66ab1b9d65a1 100644
---- a/drivers/net/ethernet/qlogic/qede/qede_main.c
-+++ b/drivers/net/ethernet/qlogic/qede/qede_main.c
-@@ -506,25 +506,6 @@ static int qede_set_vf_trust(struct net_device *dev, int vfidx, bool setting)
- }
- #endif
- 
--static int qede_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
--{
--	struct qede_dev *edev = netdev_priv(dev);
--
--	if (!netif_running(dev))
--		return -EAGAIN;
--
--	switch (cmd) {
--	case SIOCSHWTSTAMP:
--		return qede_ptp_hw_ts(edev, ifr);
--	default:
--		DP_VERBOSE(edev, QED_MSG_DEBUG,
--			   "default IOCTL cmd 0x%x\n", cmd);
--		return -EOPNOTSUPP;
--	}
--
--	return 0;
--}
--
- static void qede_fp_sb_dump(struct qede_dev *edev, struct qede_fastpath *fp)
- {
- 	char *p_sb = (char *)fp->sb_info->sb_virt;
-@@ -717,7 +698,6 @@ static const struct net_device_ops qede_netdev_ops = {
- 	.ndo_set_mac_address	= qede_set_mac_addr,
- 	.ndo_validate_addr	= eth_validate_addr,
- 	.ndo_change_mtu		= qede_change_mtu,
--	.ndo_eth_ioctl		= qede_ioctl,
- 	.ndo_tx_timeout		= qede_tx_timeout,
- #ifdef CONFIG_QED_SRIOV
- 	.ndo_set_vf_mac		= qede_set_vf_mac,
-@@ -742,6 +722,8 @@ static const struct net_device_ops qede_netdev_ops = {
- #endif
- 	.ndo_xdp_xmit		= qede_xdp_transmit,
- 	.ndo_setup_tc		= qede_setup_tc_offload,
-+	.ndo_hwtstamp_get	= qede_hwtstamp_get,
-+	.ndo_hwtstamp_set	= qede_hwtstamp_set,
- };
- 
- static const struct net_device_ops qede_netdev_vf_ops = {
-diff --git a/drivers/net/ethernet/qlogic/qede/qede_ptp.c b/drivers/net/ethernet/qlogic/qede/qede_ptp.c
-index a38f1e72c62b..d351be5fbda1 100644
---- a/drivers/net/ethernet/qlogic/qede/qede_ptp.c
-+++ b/drivers/net/ethernet/qlogic/qede/qede_ptp.c
-@@ -199,18 +199,15 @@ static u64 qede_ptp_read_cc(struct cyclecounter *cc)
- 	return phc_cycles;
- }
- 
--static int qede_ptp_cfg_filters(struct qede_dev *edev)
-+static void qede_ptp_cfg_filters(struct qede_dev *edev)
- {
- 	enum qed_ptp_hwtstamp_tx_type tx_type = QED_PTP_HWTSTAMP_TX_ON;
- 	enum qed_ptp_filter_type rx_filter = QED_PTP_FILTER_NONE;
- 	struct qede_ptp *ptp = edev->ptp;
- 
--	if (!ptp)
--		return -EIO;
--
- 	if (!ptp->hw_ts_ioctl_called) {
- 		DP_INFO(edev, "TS IOCTL not called\n");
--		return 0;
-+		return;
- 	}
- 
- 	switch (ptp->tx_type) {
-@@ -223,11 +220,6 @@ static int qede_ptp_cfg_filters(struct qede_dev *edev)
- 		clear_bit(QEDE_FLAGS_TX_TIMESTAMPING_EN, &edev->flags);
- 		tx_type = QED_PTP_HWTSTAMP_TX_OFF;
- 		break;
--
--	case HWTSTAMP_TX_ONESTEP_SYNC:
--	case HWTSTAMP_TX_ONESTEP_P2P:
--		DP_ERR(edev, "One-step timestamping is not supported\n");
--		return -ERANGE;
- 	}
- 
- 	spin_lock_bh(&ptp->lock);
-@@ -286,39 +278,65 @@ static int qede_ptp_cfg_filters(struct qede_dev *edev)
- 	ptp->ops->cfg_filters(edev->cdev, rx_filter, tx_type);
- 
- 	spin_unlock_bh(&ptp->lock);
--
--	return 0;
- }
- 
--int qede_ptp_hw_ts(struct qede_dev *edev, struct ifreq *ifr)
-+int qede_hwtstamp_set(struct net_device *netdev,
-+		      struct kernel_hwtstamp_config *config,
-+		      struct netlink_ext_ack *extack)
- {
--	struct hwtstamp_config config;
-+	struct qede_dev *edev = netdev_priv(netdev);
- 	struct qede_ptp *ptp;
--	int rc;
-+
-+	if (!netif_running(netdev)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Device is down");
-+		return -EAGAIN;
-+	}
- 
- 	ptp = edev->ptp;
--	if (!ptp)
-+	if (!ptp) {
-+		NL_SET_ERR_MSG_MOD(extack, "HW timestamping is not supported");
- 		return -EIO;
--
--	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
--		return -EFAULT;
-+	}
- 
- 	DP_VERBOSE(edev, QED_MSG_DEBUG,
--		   "HWTSTAMP IOCTL: Requested tx_type = %d, requested rx_filters = %d\n",
--		   config.tx_type, config.rx_filter);
-+		   "HWTSTAMP SET: Requested tx_type = %d, requested rx_filters = %d\n",
-+		   config->tx_type, config->rx_filter);
-+
-+	switch (config->tx_type) {
-+	case HWTSTAMP_TX_ON:
-+	case HWTSTAMP_TX_OFF:
-+		break;
-+	default:
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "One-step timestamping is not supported");
-+		return -ERANGE;
-+	}
- 
- 	ptp->hw_ts_ioctl_called = 1;
--	ptp->tx_type = config.tx_type;
--	ptp->rx_filter = config.rx_filter;
-+	ptp->tx_type = config->tx_type;
-+	ptp->rx_filter = config->rx_filter;
- 
--	rc = qede_ptp_cfg_filters(edev);
--	if (rc)
--		return rc;
-+	qede_ptp_cfg_filters(edev);
-+
-+	config->rx_filter = ptp->rx_filter;
-+
-+	return 0;
-+}
- 
--	config.rx_filter = ptp->rx_filter;
-+int qede_hwtstamp_get(struct net_device *netdev,
-+		      struct kernel_hwtstamp_config *config)
-+{
-+	struct qede_dev *edev = netdev_priv(netdev);
-+	struct qede_ptp *ptp;
- 
--	return copy_to_user(ifr->ifr_data, &config,
--			    sizeof(config)) ? -EFAULT : 0;
-+	ptp = edev->ptp;
-+	if (!ptp)
-+		return -EIO;
-+
-+	config->tx_type = ptp->tx_type;
-+	config->rx_filter = ptp->rx_filter;
-+
-+	return 0;
- }
- 
- int qede_ptp_get_ts_info(struct qede_dev *edev, struct kernel_ethtool_ts_info *info)
-diff --git a/drivers/net/ethernet/qlogic/qede/qede_ptp.h b/drivers/net/ethernet/qlogic/qede/qede_ptp.h
-index adafc894797e..88f168395812 100644
---- a/drivers/net/ethernet/qlogic/qede/qede_ptp.h
-+++ b/drivers/net/ethernet/qlogic/qede/qede_ptp.h
-@@ -14,7 +14,11 @@
- 
- void qede_ptp_rx_ts(struct qede_dev *edev, struct sk_buff *skb);
- void qede_ptp_tx_ts(struct qede_dev *edev, struct sk_buff *skb);
--int qede_ptp_hw_ts(struct qede_dev *edev, struct ifreq *req);
-+int qede_hwtstamp_get(struct net_device *netdev,
-+		      struct kernel_hwtstamp_config *config);
-+int qede_hwtstamp_set(struct net_device *netdev,
-+		      struct kernel_hwtstamp_config *config,
-+		      struct netlink_ext_ack *extack);
- void qede_ptp_disable(struct qede_dev *edev);
- int qede_ptp_enable(struct qede_dev *edev);
- int qede_ptp_get_ts_info(struct qede_dev *edev, struct kernel_ethtool_ts_info *ts);
--- 
-2.47.3
-
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
