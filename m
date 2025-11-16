@@ -1,163 +1,115 @@
-Return-Path: <netdev+bounces-238960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 295B5C61ADB
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 19:32:27 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1CDBC61AF9
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 19:43:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 24C494E1A70
-	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 18:32:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 922C54E2D36
+	for <lists+netdev@lfdr.de>; Sun, 16 Nov 2025 18:41:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C1B21FF2E;
-	Sun, 16 Nov 2025 18:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A77FA30EF69;
+	Sun, 16 Nov 2025 18:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b="S5fbB9H8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n2gks8oc"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-of-o57.zoho.eu (sender-of-o57.zoho.eu [136.143.169.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAD3227E82
-	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 18:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763317942; cv=pass; b=W7TWRKv82A/PAl6HcnDXjDdKpQyn78NPLCOYfhE09tLrCWIyd+jQAAdwE9bqxvt0YagdtZESnBB5p+pmvyd6wfuZexGjLlhFtOyN8bpx1snoKUbG8il5JOjaBdHKkGTLMdm+yFl96hM0vICGdJgAsmBMBTzi0bXJ2vlvYz8EeoA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763317942; c=relaxed/simple;
-	bh=rEiIRKkMLGqBwGdE7Gj7GqFHzPl22jS+GhACtHUk6Sc=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=KUc1vNmLICgm67hBY9CrHYWCAo7BAu94WGTBkhS3YJpWnig8Q3DQv+CIG21v7Cdp7lOdM+Ly3KD6xXVPVFLIuylNqZ9yyw2ygySTQ1r0aAYMAvxtWMzwnPNbVdahXMAd7NRjOh34KOTU07vS8byuwQeuty81pVRPpc+5F0Hr6z8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net; spf=pass smtp.mailfrom=azey.net; dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b=S5fbB9H8; arc=pass smtp.client-ip=136.143.169.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=azey.net
-ARC-Seal: i=1; a=rsa-sha256; t=1763317902; cv=none; 
-	d=zohomail.eu; s=zohoarc; 
-	b=aiWshKQ2yJzkQlariOTRFzSueiG1PjtATml0zNnuwTQKNM2iKeQxIXNPTyB/uAAKhvyFSLg3rT1R7VrDkLIb/seJPry4hBTNLUfKtaW02NXEW2ALV0sro+iN3lnjg8GL2GnrXvG56DhAGKRy0UCQEXvDPyKm8mRDj8jnMSgLfpM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1763317902; h=Content-Type:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
-	bh=ABKLWa5Pu+BrlG/3XiCL2WxzTPtAPncvZnlySWX08D0=; 
-	b=Tt8eUFJFWmYU0h8I8qwv8Yax/oZniuPq0sRf6hXqw8AuuUL/m3laIctXpALRJdPp96tbXWcVGM9ibORQ1RN1Aj6K0LnfxqFsqQqtvI+qC76+uLeOwKs38BLqzec2+FWHPS8gm+JhmorDfgtbSkqRH36PJxgGoFQ9H9+WKBC7xpA=
-ARC-Authentication-Results: i=1; mx.zohomail.eu;
-	dkim=pass  header.i=azey.net;
-	spf=pass  smtp.mailfrom=me@azey.net;
-	dmarc=pass header.from=<me@azey.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1763317902;
-	s=zmail; d=azey.net; i=me@azey.net;
-	h=Date:Date:From:From:To:To:Subject:Subject:Message-ID:MIME-Version:Content-Type:Message-Id:Reply-To:Cc;
-	bh=ABKLWa5Pu+BrlG/3XiCL2WxzTPtAPncvZnlySWX08D0=;
-	b=S5fbB9H8ZgR8NFQDD6pZhFrgbOpBUxardCumJawsxkTyYoMhiS2zcbK6/gwjL/ec
-	I21uqh8uXIY8cnpey1CtGoUzVJn2JO0v3URI/9yTBjaGc2DsMwd2T+cBT9a61kUThIV
-	RgXxEH6pCuB4QsmVWUmBRiXhyB8W4aZemvtY9fe0=
-Received: by mx.zoho.eu with SMTPS id 1763317900435202.658144284562;
-	Sun, 16 Nov 2025 19:31:40 +0100 (CET)
-Date: Sun, 16 Nov 2025 19:31:35 +0100
-From: azey <me@azey.net>
-To: "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] net/ipv6: allow device-only routes via the multipath API
-Message-ID: <a6vmtv3ylu224fnj5awi6xrgnjoib5r2jm3kny672hemsk5ifi@ychcxqnmy5us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9D82F6569
+	for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 18:41:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763318505; cv=none; b=hNnoeOtUztHlEFjiOl8gTiYLvhUTBgjRssdwL/+GA7BtwfPNhlbirLa84r1HsWYzSPDmSDJKD7O1+XAKWfIoK6sKozU6ADxKmJOGFvdIcBN9sEacW+d4qYWRPOxt7YzsGJA4MVSxmJPVjg2LITcEIno1Krp0vjKnyg7zzZ51mwM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763318505; c=relaxed/simple;
+	bh=OX2dz1IsuZ3u/q04PmVqNF4uqRvtSGeeaPBG/449gtU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aZ3XFsqRJ38NEVbQuGDhvW3Q6XX70YbH4Kf0mTiO9VxJwrKpBbEmeiOFaLvUDsW3+9eQtJ8nTcCbwpXkCrPikyMLfO30f9kCR9akTg2K1rvyjaQmSIbaDVNPiiKGVO4g7jC6kjOSIFTr7FtTm2j+0mFCsxsaFvNBefPLoJPvnfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n2gks8oc; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-787eb2d8663so49058297b3.0
+        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 10:41:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763318503; x=1763923303; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OX2dz1IsuZ3u/q04PmVqNF4uqRvtSGeeaPBG/449gtU=;
+        b=n2gks8ocI7b0lcXw7i9zMPXsFldCrKZMIQv6G+GUh2D82mQsSTX8ry3A0o0SSnoWQN
+         OASN3++JITKDTDKIDiEADo6gbNrh94e4Cc+gzVJ0A1t5leDeev8EdqVv6ZbjwDBh6wfW
+         1yIawcxpP4oPAv7zIimXNChN2UKbIi24YllSbUzRDeQjAbrdxMoycDZ6pBn5DmW+nCyH
+         PtIhZemAoJp0d+tC0mc+yeTCCnnkVtxqX6UhzjfhTRzMpt9+pacwozR64/2ntZAT2LP6
+         ym2NTR8OKqdwQHFHEc8DmqXRRPmR3sT99B8gWpfZtCCQsoz5IEEju9sIim3qcQ/gfnkN
+         zB0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763318503; x=1763923303;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OX2dz1IsuZ3u/q04PmVqNF4uqRvtSGeeaPBG/449gtU=;
+        b=bvls8WMsPhT8UOodXNVdcp4u985MKDoSB0G/6vZHNJ7O43hLc2+qD9L1m3Uz3EjAou
+         +mgtdaPL6i9FBM7Op7XMKDCUtSJESST/6rf1wLRj3bRLgbgG6f1LFfds6X2OSUyVwvDy
+         TQtALhuofLfKaVC5MOXJ8GRDGzflLjs7dnQz2nml/q0TywIduGDvPG0fMl4m1GL6H79u
+         sqm9KN4T9DQ24/4zNg/jBep18thuo/87p63QPRsU61UtRfvkkDCnmXG+YcRWhy2HuK2n
+         IEl2Q8/6rCCLpR3lybWwPKpi7D+xappkuvIs7rUF8iGasUbGSU/5bVXxFZyx084X98sE
+         Lcig==
+X-Forwarded-Encrypted: i=1; AJvYcCWmSxvZmMr9LdQCYloMwlGDSi/A98hv7KI4ssNhz4gLaZY1Cuuq1vYuQpsNqZSnVaQWu6xGtTg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0VsIdsi+kXslv0S5filmavO6kSmS2XrqnkPjzlox2HTQBonS+
+	8hhINa97ItJBswqhIsxziuaW9zwpnYvdfYR8dzqzmU9+Y/xcPgMSb41/1YJYmiIt1/8i7trvvZX
+	ZMGrMJ3n1MRPun4nvWa5oRoC0QNEw09FS7qpnUqy9qOhnsSmrHA3gjTGL
+X-Gm-Gg: ASbGnctXNq7jWxtgGbDcuBSlrSW7OHgSKszesF960NcsMIa3BRR50MxLruxewVHxmfc
+	Kr4BcMojgEpB6Bcl4Q1F6XgFBiOjXPPXRMKgmMUPF8+t0WWq7KRpk13vMDEnwR7JmYs9jj+vIqR
+	NDb4pYAB6op5XohqpZOxL85mCng/9QzY6Z4tUODTVP15BeyuDs8rQjPIkUuHRInwnzFX8mElEv7
+	QY9pbhdGUJgyVMq55uTbIEXoCd8N8v9ZlDoaD2Nxpl6EYIn2VQu0iTiDuKByIe76FBmEQ228Tet
+	ssGSXQ==
+X-Google-Smtp-Source: AGHT+IFB+VMK3mBchE7T2LiMjAFB3uN/r0/XXcBBJ7eTTs8zXYY16FK+MFVUgaljz/oh+/k/NSVgB4FqyVk+KlVw1QI=
+X-Received: by 2002:a05:690c:e3cd:b0:786:504a:4fef with SMTP id
+ 00721157ae682-78820702922mr114009647b3.33.1763318502748; Sun, 16 Nov 2025
+ 10:41:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="f4vydkeg6t2uco7g"
-Content-Disposition: inline
-X-Zoho-Virus-Status: 1
-X-Zoho-Virus-Status: 1
-X-Zoho-AV-Stamp: zmail-av-1.4.3/263.283.95
-X-ZohoMailClient: External
-
-
---f4vydkeg6t2uco7g
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
+References: <20251114140646.3817319-1-edumazet@google.com> <aRoRKp4yDGOsZ4o0@google.com>
+In-Reply-To: <aRoRKp4yDGOsZ4o0@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 16 Nov 2025 10:41:31 -0800
+X-Gm-Features: AWmQ_bl1bFoubc5fIZb7tDV24DFTjwW3_ND966Wj0fPv4FdoVwIVjYlFpVHRk08
+Message-ID: <CANn89iKYLf1AWi_YvK47NvQXb0B31NHxF736dXYg=2E5Xxg0Ew@mail.gmail.com>
+Subject: Re: [PATCH 0/2] rbree: inline rb_first() and rb_last()
+To: Kuan-Wei Chiu <visitorckw@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Eric Dumazet <eric.dumazet@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [PATCH] net/ipv6: allow device-only routes via the multipath API
-MIME-Version: 1.0
 
-At some point after b5d2d75e079a ("net/ipv6: Do not allow device only
-routes via the multipath API"), the IPv6 stack was updated such that
-device-only multipath routes can be installed and work correctly, but
-still weren't allowed in the code.
+On Sun, Nov 16, 2025 at 10:00=E2=80=AFAM Kuan-Wei Chiu <visitorckw@gmail.co=
+m> wrote:
+>
+> Hi Eric,
+>
+> On Fri, Nov 14, 2025 at 02:06:44PM +0000, Eric Dumazet wrote:
+> > Inline these two small helpers, heavily used in TCP and FQ packet sched=
+uler,
+> > and in many other places.
+> >
+> > This reduces kernel text size, and brings an 1.5 % improvement on netwo=
+rk
+> > TCP stress test.
+>
+> Thanks for the patch!
+>
+> Just out of curiosity, do you think rb_first() and rb_last() would be
+> worth marking with __always_inline?
 
-This change removes the has_gateway check from rtm_to_fib6_multipath_config=
-()
-and the fib_nh_gw_family check from rt6_qualify_for_ecmp(), allowing
-device-only multipath routes to be installed again.
-
-Signed-off-by: azey <me@azey.net>
----
-
-I tested this on a VM with two wireguard interfaces, and it seems to
-work as expected. It also causes fe80::/64 and ff00::/8 to be installed as
-multipath routes if there are multiple interfaces, but from my (somewhat
-limited) testing that doesn't cause any issues.
-
-I'm also not completely sure whether there are any other places in the
-code that assume multipath nexthops must have a gateway addr, but I
-didn't immediately find any.
-
-PS: This is my very first contribution to the kernel (and indeed first time
-sending a patch via mail), so sorry in advance if I messed anything up.
----
- include/net/ip6_route.h | 3 +--
- net/ipv6/route.c        | 6 ------
- 2 files changed, 1 insertion(+), 8 deletions(-)
-
-diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
-index 7c5512baa4b2..07e131f9fcf5 100644
---- a/include/net/ip6_route.h
-+++ b/include/net/ip6_route.h
-@@ -73,8 +73,7 @@ static inline bool rt6_need_strict(const struct in6_addr =
-*daddr)
- static inline bool rt6_qualify_for_ecmp(const struct fib6_info *f6i)
- {
- 	/* the RTF_ADDRCONF flag filters out RA's */
--	return !(f6i->fib6_flags & RTF_ADDRCONF) && !f6i->nh &&
--		f6i->fib6_nh->fib_nh_gw_family;
-+	return !(f6i->fib6_flags & RTF_ADDRCONF) && !f6i->nh;
- }
-=20
- void ip6_route_input(struct sk_buff *skb);
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index aee6a10b112a..40763b90e22c 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -5138,12 +5138,6 @@ static int rtm_to_fib6_multipath_config(struct fib6_=
-config *cfg,
- 			}
- 		}
-=20
--		if (newroute && (cfg->fc_nh_id || !has_gateway)) {
--			NL_SET_ERR_MSG(extack,
--				       "Device only routes can not be added for IPv6 using the multipa=
-th API.");
--			return -EINVAL;
--		}
--
- 		rtnh =3D rtnh_next(rtnh, &remaining);
- 	} while (rtnh_ok(rtnh, remaining));
-=20
---=20
-2.51.0
-
-
---f4vydkeg6t2uco7g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQQsyzQDQ/6KK5HOf3X5T0pxxcIejwUCaRoYgwAKCRD5T0pxxcIe
-j0d+AP4mT61wII0s4ibBC8MC7NuiGUJInVhq06SabAZmiYLNfgD5AcEgTXl4RbHS
-SXKvYW2SRT5++tffxIy7IQ/UmkOQogo=
-=K1DH
------END PGP SIGNATURE-----
-
---f4vydkeg6t2uco7g--
+I have not seen any difference, what compilers are you using that
+would not inline this ?
 
