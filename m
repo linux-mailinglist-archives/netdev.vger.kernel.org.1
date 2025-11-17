@@ -1,233 +1,116 @@
-Return-Path: <netdev+bounces-239182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2706AC65112
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:14:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8949FC65297
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:33:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EBD8E4E5BD9
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:12:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 937994F0858
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA7827FB21;
-	Mon, 17 Nov 2025 16:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D72F2D1936;
+	Mon, 17 Nov 2025 16:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Km6+Fm08";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JKnh4CN4";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Km6+Fm08";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JKnh4CN4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="prOrLcL6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6331328D83D
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:11:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E382D0C98;
+	Mon, 17 Nov 2025 16:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763395919; cv=none; b=PvrrcMpr1QEb8XOwAIIutqgv9W8SJ2sp1L/1ytrMh3nFn5B2S0oYCiXrbE4brQZnH10T6ibhaYT6IrHTal9Q7kBNI6GB47N2tY/xVDHkwIztDjdgJ0rhvzadVinW+zZtBGFpCq72Hid0O1V93DrCjFYBHH/r5JMSX7zw7DnGE4A=
+	t=1763396693; cv=none; b=R2Qny9wq/8kBWx4YSCdhW/F0FeiJJIVXHBZmzIB9UjINIpcLEzbzYIl/mr6/0BaKlW6Jagjn9fbSK1mMaqd+v8/LMe2v55b+lhXUq8msKKYyDvRmHPIZZG+EI8GgXhQIDwuoaq0mjDUeYXeDOrvNTQ0wG00cLphWWfFb9lTszeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763395919; c=relaxed/simple;
-	bh=ot8gjWm1bgwLw+5eMeJ/IER6zzTWkz2LXpbS4mcWXQI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VdanLpf0rYAtaofbSIq9Iq3VPQDX/rREmTCE7WgsN2XQjVpqTDH4xU1dBKQ4UiH26vD48cofsvY+QvRkCOg53t/7h6y/NzEhzYnLXkj3Hj98LABs2NfvMLJu5aJtS3CkSN9w+MKKV63Zo20Z7eCs8WHZYLPaeiWXYa4H3qIq4Ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Km6+Fm08; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JKnh4CN4; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Km6+Fm08; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JKnh4CN4; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 615411F7B4;
-	Mon, 17 Nov 2025 16:11:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1763395915; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mBUBnaTIzsm0SlnbQPCeTBjXpAcWxSMAN7X2xrq3Ku0=;
-	b=Km6+Fm08CJbPSGJJRSwsUeprWBfb41+VzR5/8vTwC+Pw66bFiLYxAZVu5yoM0tbYk/Xb0J
-	hZf5LezDbcQHsY1767JQj+Tk0w26P+QyGbYuM6fOSjOpuFL4nB2hnEWvE5q7m4J3kibq+t
-	0aMUEBvLt3a641InUixHn1ujV6v7Gz8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1763395915;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mBUBnaTIzsm0SlnbQPCeTBjXpAcWxSMAN7X2xrq3Ku0=;
-	b=JKnh4CN4ISrbverMx5dO9YV7cgGUAb4CvPTzB7yyf9mhhioZQvx/7d/Qsg71FXiK89hYeL
-	HGHtGOu4cqoSvcAw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Km6+Fm08;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=JKnh4CN4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1763395915; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mBUBnaTIzsm0SlnbQPCeTBjXpAcWxSMAN7X2xrq3Ku0=;
-	b=Km6+Fm08CJbPSGJJRSwsUeprWBfb41+VzR5/8vTwC+Pw66bFiLYxAZVu5yoM0tbYk/Xb0J
-	hZf5LezDbcQHsY1767JQj+Tk0w26P+QyGbYuM6fOSjOpuFL4nB2hnEWvE5q7m4J3kibq+t
-	0aMUEBvLt3a641InUixHn1ujV6v7Gz8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1763395915;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mBUBnaTIzsm0SlnbQPCeTBjXpAcWxSMAN7X2xrq3Ku0=;
-	b=JKnh4CN4ISrbverMx5dO9YV7cgGUAb4CvPTzB7yyf9mhhioZQvx/7d/Qsg71FXiK89hYeL
-	HGHtGOu4cqoSvcAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A4D513EA61;
-	Mon, 17 Nov 2025 16:11:54 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 85pXJUpJG2meFAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 17 Nov 2025 16:11:54 +0000
-Message-ID: <4cf22f51-c3d4-4c02-b5b6-0cb38985d0f8@suse.de>
-Date: Mon, 17 Nov 2025 17:11:48 +0100
+	s=arc-20240116; t=1763396693; c=relaxed/simple;
+	bh=WO9cmkqeffZyHvtjs530916CcqsLtTtvOC0BcbAPs/g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VSRmbN0bMP04qUJa2yXQOaXNB7QJzyGj+KuoL+9ejkHS3mQOnZITirbzFu4NkyDvlyedobNrV5Ymyfxw8/z5EV9I1xOYDgBxXVcPdtQfMc5xFJDqPl7Dy4ZDQyZqOm7UxZJV2g60ZXv79s5UpMZnC+e51U363kl3A5aRe7qEJbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=prOrLcL6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5014AC2BC87;
+	Mon, 17 Nov 2025 16:24:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763396693;
+	bh=WO9cmkqeffZyHvtjs530916CcqsLtTtvOC0BcbAPs/g=;
+	h=From:To:Cc:Subject:Date:From;
+	b=prOrLcL6/hGTU8HydS480jFcyIfMpWrPO+qqX9FyWPIO+qmCiRZFNys8efJfsGUoM
+	 LPmGJfrE2phaW6yjaz9nG6ygPe6Vw9ZQy/kcd0iNq/CHHiKRJLC0zJhIny6guP5mZf
+	 +OSsP9RWXK0Npz1k2jdBViClrm364b0GN8JIvEnJKYoVp0vIO96DMWQsuQ8meOrSE2
+	 lDc69gQkW2rf3JohLzd6gcekyEImdgnqWEtL2FAD7HG14uQ+EOeky9yTdfCUIzv36g
+	 RmKO/75F/3UZ7dK4AOl+lnZovgqE7dEMQpVYYqFCc7cjwUFNU4gV/Du02eU9jAEqqT
+	 B8ZlT511XfsVg==
+From: Conor Dooley <conor@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: conor@kernel.org,
+	Pierre-Henry Moussay <pierre-henry.moussay@microchip.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: [net-next] dt-bindings: net: cdns,macb: Add pic64gx compatibility
+Date: Mon, 17 Nov 2025 16:24:33 +0000
+Message-ID: <20251117-easter-machine-37851f20aaf3@spud>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] xsk: avoid data corruption on cq descriptor number
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: netdev@vger.kernel.org, csmate@nop.hu, kerneljasonxing@gmail.com,
- bjorn@kernel.org, sdf@fomichev.me, jonathan.lemon@gmail.com,
- bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-References: <20251030140355.4059-1-fmancera@suse.de> <aRtIiIvfVwJCmcn1@boxer>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <aRtIiIvfVwJCmcn1@boxer>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 615411F7B4
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nop.hu,gmail.com,kernel.org,fomichev.me,davemloft.net,google.com,redhat.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,intel.com:email,suse.de:email,suse.de:mid,suse.de:dkim]
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1667; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=4jfXTL0V77L5MgdXnQ2+Bnzxx45wqj60pFdPHRDnEqQ=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJnSPvZKjBPZzkc9WX+AN8az8LPQyyzJU0u7vy+fFV354 7N+msXujlIWBjEuBlkxRZbE230tUuv/uOxw7nkLM4eVCWQIAxenAEzkbicjw0kFzyVxbTrmZb13 t6ulWygocW0SOHzLof/FjKS9nwL4dzIy3Lg8fylL6v79pRHKHWLOYjtc30y+/WrS3/ULOFuFVov XMgIA
+X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
+Content-Transfer-Encoding: 8bit
 
+From: Pierre-Henry Moussay <pierre-henry.moussay@microchip.com>
 
+The pic64gx uses an identical integration of the macb IP to mpfs.
 
-On 11/17/25 5:08 PM, Maciej Fijalkowski wrote:
-> On Thu, Oct 30, 2025 at 03:03:55PM +0100, Fernando Fernandez Mancera wrote:
->> Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
->> production"), the descriptor number is stored in skb control block and
->> xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
->> pool's completion queue.
->>
->> skb control block shouldn't be used for this purpose as after transmit
->> xsk doesn't have control over it and other subsystems could use it. This
->> leads to the following kernel panic due to a NULL pointer dereference.
->>
->>   BUG: kernel NULL pointer dereference, address: 0000000000000000
->>   #PF: supervisor read access in kernel mode
->>   #PF: error_code(0x0000) - not-present page
->>   PGD 0 P4D 0
->>   Oops: Oops: 0000 [#1] SMP NOPTI
->>   CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
->>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
->>   RIP: 0010:xsk_destruct_skb+0xd0/0x180
->>   [...]
->>   Call Trace:
->>    <IRQ>
->>    ? napi_complete_done+0x7a/0x1a0
->>    ip_rcv_core+0x1bb/0x340
->>    ip_rcv+0x30/0x1f0
->>    __netif_receive_skb_one_core+0x85/0xa0
->>    process_backlog+0x87/0x130
->>    __napi_poll+0x28/0x180
->>    net_rx_action+0x339/0x420
->>    handle_softirqs+0xdc/0x320
->>    ? handle_edge_irq+0x90/0x1e0
->>    do_softirq.part.0+0x3b/0x60
->>    </IRQ>
->>    <TASK>
->>    __local_bh_enable_ip+0x60/0x70
->>    __dev_direct_xmit+0x14e/0x1f0
->>    __xsk_generic_xmit+0x482/0xb70
->>    ? __remove_hrtimer+0x41/0xa0
->>    ? __xsk_generic_xmit+0x51/0xb70
->>    ? _raw_spin_unlock_irqrestore+0xe/0x40
->>    xsk_sendmsg+0xda/0x1c0
->>    __sys_sendto+0x1ee/0x200
->>    __x64_sys_sendto+0x24/0x30
->>    do_syscall_64+0x84/0x2f0
->>    ? __pfx_pollwake+0x10/0x10
->>    ? __rseq_handle_notify_resume+0xad/0x4c0
->>    ? restore_fpregs_from_fpstate+0x3c/0x90
->>    ? switch_fpu_return+0x5b/0xe0
->>    ? do_syscall_64+0x204/0x2f0
->>    ? do_syscall_64+0x204/0x2f0
->>    ? do_syscall_64+0x204/0x2f0
->>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
->>    </TASK>
->>   [...]
->>   Kernel panic - not syncing: Fatal exception in interrupt
->>   Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
->>
->> Instead use the skb destructor_arg pointer along with pointer tagging.
->> As pointers are always aligned to 8B, use the bottom bit to indicate
->> whether this a single address or an allocated struct containing several
->> addresses.
->>
->> Fixes: 30f241fcf52a ("xsk: Fix immature cq descriptor production")
->> Closes: https://lore.kernel.org/netdev/0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu/
->> Suggested-by: Jakub Kicinski <kuba@kernel.org>
->> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-> 
-> Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> 
-> Fernando thanks for stepping in and providing this fix!
-> And thanks Jakub for ptr tagging trick.
-> 
-> @BPF maintainers, please apply this patch.
-> 
+Signed-off-by: Pierre-Henry Moussay <pierre-henry.moussay@microchip.com>
+Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+---
+CC: Andrew Lunn <andrew+netdev@lunn.ch>
+CC: David S. Miller <davem@davemloft.net>
+CC: Eric Dumazet <edumazet@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>
+CC: Rob Herring <robh@kernel.org>
+CC: Krzysztof Kozlowski <krzk+dt@kernel.org>
+CC: Conor Dooley <conor+dt@kernel.org>
+CC: Nicolas Ferre <nicolas.ferre@microchip.com>
+CC: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+CC: netdev@vger.kernel.org
+CC: devicetree@vger.kernel.org
+CC: linux-kernel@vger.kernel.org
+ Documentation/devicetree/bindings/net/cdns,macb.yaml | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Thank you, please note that if rebasing is needed I can send a rebased 
-version. Just let me know.
+diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+index 1029786a855c..07ede706a8c6 100644
+--- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
++++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+@@ -38,7 +38,10 @@ properties:
+               - cdns,sam9x60-macb     # Microchip sam9x60 SoC
+               - microchip,mpfs-macb   # Microchip PolarFire SoC
+           - const: cdns,macb          # Generic
+-
++      - items:
++          - const: microchip,pic64gx-macb # Microchip PIC64GX SoC
++          - const: microchip,mpfs-macb    # Microchip PolarFire SoC
++          - const: cdns,macb              # Generic
+       - items:
+           - enum:
+               - atmel,sama5d3-macb    # 10/100Mbit IP on Atmel sama5d3 SoCs
+-- 
+2.51.0
 
-Thanks,
-Fernando.
 
