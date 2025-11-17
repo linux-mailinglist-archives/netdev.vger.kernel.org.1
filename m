@@ -1,410 +1,273 @@
-Return-Path: <netdev+bounces-239241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05752C662EB
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 21:59:49 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7A27C662FE
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 22:00:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id CE9E2297DB
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 20:59:47 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CDF5B34438F
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 21:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C43234D91D;
-	Mon, 17 Nov 2025 20:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1CCE34C121;
+	Mon, 17 Nov 2025 21:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Elp2nWWD"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="QEzTPtGI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639D534D916;
-	Mon, 17 Nov 2025 20:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26EC220F37;
+	Mon, 17 Nov 2025 21:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763413124; cv=none; b=CbkeaSeiEA5jYJgzAfFIaqlUOv3sM/Hcl2PHEA4aF0AtaSPhrBreg57K/AXM6lcgh3apSvySxsAkWHorBJjbZ5TyM+7HVDkSv7b6cpya9yLwmE3ElwHxVheUBZFwSUHTJ60T045up1N5RqtWx5OiJAtuw7G/sOsrinslOrdbL24=
+	t=1763413250; cv=none; b=m3v4kBMATexy/+IwbFEpx4wLKssVlsdzEhQCRrpGORQeq3r2h074Mo5lBzKJ4xHHyNWYaoWDAg2fTMVwz9SIN3uEEYxtcxfZo1WozPcHSGXIWAvqw/jlj3mRaUS0t49b8YCyEGubtpAzIhzzloWdtlONS6MZhSV/nGz9PiSyBrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763413124; c=relaxed/simple;
-	bh=Glzre0rVJ+ceucmuK0IqptdBvaXhlLhJ4h/pLYOtp64=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Uz84LHyBnjXTHHqfewFbMfMzsPMwmw8CW10D7A55f1jok3K0rYW5Lz11NrvHlV9muyUI9/nv1Nb67KPsuN06d3LZUxsPExSiq1U6VCZrFDZtzeQv6/RvfP10t8y+XQRopgWUBX6EHYaqrtYl9UVjeOAf7NzP+RCIapEH14AhwUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Elp2nWWD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3BDCC4AF10;
-	Mon, 17 Nov 2025 20:58:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763413124;
-	bh=Glzre0rVJ+ceucmuK0IqptdBvaXhlLhJ4h/pLYOtp64=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Elp2nWWDSd7coKwqIK+cJIJ9eT/QC9Qnm/aqtnNqwXUWi/JzXxTLsj1ipAqlPLGSr
-	 ae0hYz1FXWBBzOXo1Zl+He6d4o/nr97zQzmWD4swhSrhpf7xpZsElptpe96kaNrM7b
-	 yplJiM0p+f4A65Ts1Bx6jxePYxESsmT1Dl9CfcTEdqnrltvmhjg9ghthc1cqcghnev
-	 38dmluff0p+TzWO03lCbiyWBr0cxCbtOkDFrmZPRttmRTgW9Loh73RyEZM78yYD92A
-	 7lUz5WmAbJtaiNk6JBMgFPndAPgf41V8NvwyMqvEDIT4AphBY0Ep6Kl4b6kOlXMvTP
-	 nUMBHIb8wvc1Q==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	shuah@kernel.org,
-	sdf@fomichev.me,
-	krakauer@google.com,
-	linux-kselftest@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 12/12] selftests: net: remove old setup_* scripts
-Date: Mon, 17 Nov 2025 12:58:10 -0800
-Message-ID: <20251117205810.1617533-13-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251117205810.1617533-1-kuba@kernel.org>
-References: <20251117205810.1617533-1-kuba@kernel.org>
+	s=arc-20240116; t=1763413250; c=relaxed/simple;
+	bh=1PUojN2f7AR7h9+eE7KCQXOtrKuqH62g74kcAO7+TLA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LqTKCROJFN4+SEKQ+nGhFuI+yc9C7sJAs4gknaGdcD3FteNOsXFeqyzcbbeYRpM02l5ptEbsf5dkkipTxqj54xjGRD4XCfxesRBZWImy3hspq/93AV5lxXURlaQZ9rjl64VpFYi+X77A6W2WepfkKrGSSwE9ajuY3bStc7VWeMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=QEzTPtGI; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1vL6Kx-000RQ3-VA; Mon, 17 Nov 2025 22:00:35 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=RrSJqj+hLAZcTqrceEpKG/9yU8WQ+bJidKLcFOYJpWg=; b=QEzTPtGIOrfpu0LdVl6PaWsRrZ
+	pzBO30+LvC8WlqRp/Ttnxl9p6PnpmYtosmgtLXxWQ4cEk6vEsx1RdaJZXScaqqBXqwQa5U2AoxTG7
+	P42Uk+cmvpHbBS6GN573maWJgt77lnC+MQrW/yrqrgA9xfLTzhTS0Lpx7sRNw0FlV3iE9Bkzpw7AL
+	jlTk7NS7N0rrurvxXYSvFmokOCWDQjkfnpjCH5KyxpbHc3vgVDJ4wVUWUY/ZZ60d/8ECoYaAaT68F
+	V0g4frcqoNUSTNR3EkiaRApPdZQ1A+RR7Z+bBaH2uRBdTNdHz77UsboVEHbbKTjedk62wpSn/SgdU
+	jKfvdNbQ==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1vL6Kw-0004XU-SF; Mon, 17 Nov 2025 22:00:35 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vL6Ki-00Atjo-93; Mon, 17 Nov 2025 22:00:20 +0100
+Message-ID: <9a0daed1-fd18-4fef-99e9-4058fd4abe18@rbox.co>
+Date: Mon, 17 Nov 2025 22:00:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [virt?] [net?] possible deadlock in vsock_linger
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: syzbot <syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com>,
+ davem@davemloft.net, edumazet@google.com, horms@kernel.org, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
+References: <68f6cdb0.a70a0220.205af.0039.GAE@google.com>
+ <pehr4umqwjv3a7p4uudrz3uuqacu3ut66kmazw2ovm73gimyry@oevxmd4o664k>
+ <CAGxU2F5y+kdByEwAq-t15fyrfrgQGpmapmLgkmDmY4xH4TJSDw@mail.gmail.com>
+ <CAGxU2F6KaqmmK7qP55Rs8YHLOX62HyT77wY-RU1qPFpjhgV4jg@mail.gmail.com>
+ <60f1b7db-3099-4f6a-875e-af9f6ef194f6@rbox.co>
+ <awg7m76nw234dqgbe5e3tzuwpr6aznj6htvypwoulg5sjwax36@z6wqmopayakt>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <awg7m76nw234dqgbe5e3tzuwpr6aznj6htvypwoulg5sjwax36@z6wqmopayakt>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-gro.sh and toeplitz.sh used to source in two setup scripts
-depending on whether the test was expected to be run against
-veth or a real device. veth testing is replaced by netdevsim
-and existing "remote endpoint" support in our Python tests.
-Add a script which sets up loopback mode.
+On 11/17/25 10:57, Stefano Garzarella wrote:
+> On Sat, Nov 15, 2025 at 05:00:28PM +0100, Michal Luczaj wrote:
+>> On 10/21/25 14:19, Stefano Garzarella wrote:
+>>> On Tue, 21 Oct 2025 at 12:48, Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>>>
+>>>> On Tue, 21 Oct 2025 at 10:27, Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>>>>
+>>>>> Hi Michal,
+>>>>>
+>>>>> On Mon, Oct 20, 2025 at 05:02:56PM -0700, syzbot wrote:
+>>>>>> Hello,
+>>>>>>
+>>>>>> syzbot found the following issue on:
+>>>>>>
+>>>>>> HEAD commit:    d9043c79ba68 Merge tag 'sched_urgent_for_v6.18_rc2' of git..
+>>>>>> git tree:       upstream
+>>>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=130983cd980000
+>>>>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=f3e7b5a3627a90dd
+>>>>>> dashboard link: https://syzkaller.appspot.com/bug?extid=10e35716f8e4929681fa
+>>>>>> compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+>>>>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17f0f52f980000
+>>>>>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11ea9734580000
+>>>>>>
+>>>>>> Downloadable assets:
+>>>>>> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-d9043c79.raw.xz
+>>>>>> vmlinux: https://storage.googleapis.com/syzbot-assets/0546b6eaf1aa/vmlinux-d9043c79.xz
+>>>>>> kernel image: https://storage.googleapis.com/syzbot-assets/81285b4ada51/bzImage-d9043c79.xz
+>>>>>>
+>>>>>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>>>>>> Reported-by: syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com
+>>>>>>
+>>>>>> ======================================================
+>>>>>> WARNING: possible circular locking dependency detected
+>>>>>> syzkaller #0 Not tainted
+>>>>>> ------------------------------------------------------
+>>>>>> syz.0.17/6098 is trying to acquire lock:
+>>>>>> ffff8880363b8258 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1679 [inline]
+>>>>>> ffff8880363b8258 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: vsock_linger+0x25e/0x4d0 net/vmw_vsock/af_vsock.c:1066
+>>>>>
+>>>>> Could this be related to our recent work on linger in vsock?
+>>>>>
+>>>>>>
+>>>>>> but task is already holding lock:
+>>>>>> ffffffff906260a8 (vsock_register_mutex){+.+.}-{4:4}, at: vsock_assign_transport+0xf2/0x900 net/vmw_vsock/af_vsock.c:469
+>>>>>>
+>>>>>> which lock already depends on the new lock.
+>>>>>>
+>>>>>>
+>>>>>> the existing dependency chain (in reverse order) is:
+>>>>>>
+>>>>>> -> #1 (vsock_register_mutex){+.+.}-{4:4}:
+>>>>>>       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+>>>>>>       __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
+>>>>>>       vsock_registered_transport_cid net/vmw_vsock/af_vsock.c:560 [inline]
+>>>>>
+>>>>> Ah, no maybe this is related to commit 209fd720838a ("vsock:
+>>>>> Fix transport_{g2h,h2g} TOCTOU") where we added locking in
+>>>>> vsock_find_cid().
+>>>>>
+>>>>> Maybe we can just move the checks on top of __vsock_bind() to the
+>>>>> caller. I mean:
+>>>>>
+>>>>>         /* First ensure this socket isn't already bound. */
+>>>>>         if (vsock_addr_bound(&vsk->local_addr))
+>>>>>                 return -EINVAL;
+>>>>>
+>>>>>         /* Now bind to the provided address or select appropriate values if
+>>>>>          * none are provided (VMADDR_CID_ANY and VMADDR_PORT_ANY).  Note that
+>>>>>          * like AF_INET prevents binding to a non-local IP address (in most
+>>>>>          * cases), we only allow binding to a local CID.
+>>>>>          */
+>>>>>         if (addr->svm_cid != VMADDR_CID_ANY && !vsock_find_cid(addr->svm_cid))
+>>>>>                 return -EADDRNOTAVAIL;
+>>>>>
+>>>>> We have 2 callers: vsock_auto_bind() and vsock_bind().
+>>>>>
+>>>>> vsock_auto_bind() is already checking if the socket is already bound,
+>>>>> if not is setting VMADDR_CID_ANY, so we can skip those checks.
+>>>>>
+>>>>> In vsock_bind() we can do the checks before lock_sock(sk), at least the
+>>>>> checks on vm_addr, calling vsock_find_cid().
+>>>>>
+>>>>> I'm preparing a patch to do this.
+>>>>
+>>>> mmm, no, this is more related to vsock_linger() where sk_wait_event()
+>>>> releases and locks again the sk_lock.
+>>>> So, it should be related to commit 687aa0c5581b ("vsock: Fix
+>>>> transport_* TOCTOU") where we take vsock_register_mutex in
+>>>> vsock_assign_transport() while calling vsk->transport->release().
+>>>>
+>>>> So, maybe we need to move the release and vsock_deassign_transport()
+>>>> after unlocking vsock_register_mutex.
+>>>
+>>> I implemented this here:
+>>> https://lore.kernel.org/netdev/20251021121718.137668-1-sgarzare@redhat.com/
+>>>
+>>> sysbot successfully tested it.
+>>>
+>>> Stefano
+>>
+>> Hi Stefano
+> 
+> Hi Michal!
+> 
+>>
+>> Apologies for missing this, I was away for a couple of weeks.
+> 
+> Don't worry at all!
+> 
+>>
+>> Turns out it's vsock_connect()'s reset-on-signal that strikes again. While
+>> you've fixed the lock order inversion (thank you), being able to reset an
+>> established socket, combined with SO_LINGER's lock-release-lock dance,
+>> still leads to crashes.
+> 
+> Yeah, I see!
+> 
+>>
+>> I think it goes like this: if user hits connect() with a signal right after
+>> connection is established (which implies an assigned transport), `sk_state`
+>> gets set to TCP_CLOSING and `state` to SS_UNCONNECTED. SS_UNCONNECTED means
+>> connect() can be retried. If re-connect() is for a different CID, transport
+>> reassignment takes place. That involves transport->release() of the old
+>> transport. Because `sk_state == TCP_CLOSING`, vsock_linger() is called.
+>> Lingering temporarily releases socket lock. Which can be raced by another
+>> thread doing connect(). Basically thread-1 can release resources from under
+>> thread-0. That breaks the assumptions, e.g. virtio_transport_unsent_bytes()
+>> does not expect a disappearing transport.
+> 
+> Makes sense to me!
+> 
+>>
+>> BUG: KASAN: slab-use-after-free in _raw_spin_lock_bh+0x34/0x40
+>> Read of size 1 at addr ffff888107c99420 by task a.out/1385
+>> CPU: 6 UID: 1000 PID: 1385 Comm: a.out Tainted: G            E
+>> 6.18.0-rc5+ #241 PREEMPT(voluntary)
+>> Call Trace:
+>> dump_stack_lvl+0x7e/0xc0
+>> print_report+0x170/0x4de
+>> kasan_report+0xc2/0x180
+>> __kasan_check_byte+0x3a/0x50
+>> lock_acquire+0xb2/0x300
+>> _raw_spin_lock_bh+0x34/0x40
+>> virtio_transport_unsent_bytes+0x3b/0x80
+>> vsock_linger+0x263/0x370
+>> virtio_transport_release+0x3ff/0x510
+>> vsock_assign_transport+0x358/0x780
+>> vsock_connect+0x5a2/0xc40
+>> __sys_connect+0xde/0x110
+>> __x64_sys_connect+0x6e/0xc0
+>> do_syscall_64+0x94/0xbb0
+>> entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>>
+>> Allocated by task 1384:
+>> kasan_save_stack+0x1c/0x40
+>> kasan_save_track+0x10/0x30
+>> __kasan_kmalloc+0x92/0xa0
+>> virtio_transport_do_socket_init+0x48/0x320
+>> vsock_assign_transport+0x4ff/0x780
+>> vsock_connect+0x5a2/0xc40
+>> __sys_connect+0xde/0x110
+>> __x64_sys_connect+0x6e/0xc0
+>> do_syscall_64+0x94/0xbb0
+>> entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>>
+>> Freed by task 1384:
+>> kasan_save_stack+0x1c/0x40
+>> kasan_save_track+0x10/0x30
+>> __kasan_save_free_info+0x37/0x50
+>> __kasan_slab_free+0x63/0x80
+>> kfree+0x142/0x6a0
+>> virtio_transport_destruct+0x86/0x170
+>> vsock_assign_transport+0x3a8/0x780
+>> vsock_connect+0x5a2/0xc40
+>> __sys_connect+0xde/0x110
+>> __x64_sys_connect+0x6e/0xc0
+>> do_syscall_64+0x94/0xbb0
+>> entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>>
+>> I suppose there are many ways this chain of events can be stopped, but I
+>> see it as yet another reason to simplify vsock_connect(): do not let it
+>> "reset" an already established socket. I guess that would do the trick.
+>> What do you think?
+> 
+> I agree, we should do that. Do you have time to take a look?
 
-The usage is a little bit more complicated than running
-the scripts used to be. Testing used to work like this:
+Sure, here's a patch:
+https://lore.kernel.org/netdev/20251117-vsock-interrupted-connect-v1-1-bc021e907c3f@rbox.co/
 
-  ./../gro.sh -i eth0 ...
-
-now the "setup script" has to be run explicitly:
-
-  NETIF=eth0 ./../ksft_setup_loopback.sh ./../gro.sh
-
-But the functionality itself is retained.
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/net/lib/Makefile      |   3 +-
- .../selftests/net/lib/ksft_setup_loopback.sh  | 111 ++++++++++++++++
- .../selftests/net/lib/setup_loopback.sh       | 120 ------------------
- tools/testing/selftests/net/lib/setup_veth.sh |  45 -------
- 4 files changed, 112 insertions(+), 167 deletions(-)
- create mode 100755 tools/testing/selftests/net/lib/ksft_setup_loopback.sh
- delete mode 100644 tools/testing/selftests/net/lib/setup_loopback.sh
- delete mode 100644 tools/testing/selftests/net/lib/setup_veth.sh
-
-diff --git a/tools/testing/selftests/net/lib/Makefile b/tools/testing/selftests/net/lib/Makefile
-index c10796933d42..5339f56329e1 100644
---- a/tools/testing/selftests/net/lib/Makefile
-+++ b/tools/testing/selftests/net/lib/Makefile
-@@ -8,8 +8,7 @@ CFLAGS += -I../../
- TEST_FILES := \
- 	../../../../net/ynl \
- 	../../../../../Documentation/netlink/specs \
--	setup_loopback.sh \
--	setup_veth.sh \
-+	ksft_setup_loopback.sh \
- # end of TEST_FILES
- 
- TEST_GEN_FILES := \
-diff --git a/tools/testing/selftests/net/lib/ksft_setup_loopback.sh b/tools/testing/selftests/net/lib/ksft_setup_loopback.sh
-new file mode 100755
-index 000000000000..3defbb1919c5
---- /dev/null
-+++ b/tools/testing/selftests/net/lib/ksft_setup_loopback.sh
-@@ -0,0 +1,111 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# Setup script for running ksft tests over a real interface in loopback mode.
-+# This scripts replaces the historical setup_loopback.sh. It puts
-+# a (presumably) real hardware interface into loopback mode, creates macvlan
-+# interfaces on top and places them in a network namespace for isolation.
-+#
-+# NETIF env variable must be exported to indicate the real target device.
-+# Note that the test will override NETIF with one of the macvlans, the
-+# actual ksft test will only see the macvlans.
-+#
-+# Example use:
-+#   export NETIF=eth0
-+#   ./net/lib/ksft_setup_loopback.sh ./drivers/net/gro.py
-+
-+if [ -z "$NETIF" ]; then
-+    echo "Error: NETIF variable not set"
-+    exit 1
-+fi
-+if ! [ -d "/sys/class/net/$NETIF" ]; then
-+    echo "Error: Can't find $NETIF, invalid netdevice"
-+    exit 1
-+fi
-+
-+# Save original settings for cleanup
-+readonly FLUSH_PATH="/sys/class/net/${NETIF}/gro_flush_timeout"
-+readonly IRQ_PATH="/sys/class/net/${NETIF}/napi_defer_hard_irqs"
-+FLUSH_TIMEOUT="$(< "${FLUSH_PATH}")"
-+readonly FLUSH_TIMEOUT
-+HARD_IRQS="$(< "${IRQ_PATH}")"
-+readonly HARD_IRQS
-+
-+SERVER_NS=$(mktemp -u server-XXXXXXXX)
-+readonly SERVER_NS
-+CLIENT_NS=$(mktemp -u client-XXXXXXXX)
-+readonly CLIENT_NS
-+readonly SERVER_MAC="aa:00:00:00:00:02"
-+readonly CLIENT_MAC="aa:00:00:00:00:01"
-+
-+# ksft expects addresses to communicate with remote
-+export  LOCAL_V6=2001:db8:1::1
-+export REMOTE_V6=2001:db8:1::2
-+
-+cleanup() {
-+    local exit_code=$?
-+
-+    echo "Cleaning up..."
-+
-+    # Remove macvlan interfaces and namespaces
-+    ip -netns "${SERVER_NS}" link del dev server 2>/dev/null || true
-+    ip netns del "${SERVER_NS}" 2>/dev/null || true
-+    ip -netns "${CLIENT_NS}" link del dev client 2>/dev/null || true
-+    ip netns del "${CLIENT_NS}" 2>/dev/null || true
-+
-+    # Disable loopback
-+    ethtool -K "${NETIF}" loopback off 2>/dev/null || true
-+    sleep 1
-+
-+    echo "${FLUSH_TIMEOUT}" >"${FLUSH_PATH}"
-+    echo "${HARD_IRQS}" >"${IRQ_PATH}"
-+
-+    exit $exit_code
-+}
-+
-+trap cleanup EXIT INT TERM
-+
-+# Enable loopback mode
-+echo "Enabling loopback on ${NETIF}..."
-+ethtool -K "${NETIF}" loopback on || {
-+    echo "Failed to enable loopback mode"
-+    exit 1
-+}
-+# The interface may need time to get carrier back, but selftests
-+# will wait for carrier, so no need to wait / sleep here.
-+
-+# Use timer on  host to trigger the network stack
-+# Also disable device interrupt to not depend on NIC interrupt
-+# Reduce test flakiness caused by unexpected interrupts
-+echo 100000 >"${FLUSH_PATH}"
-+echo 50 >"${IRQ_PATH}"
-+
-+# Create server namespace with macvlan
-+ip netns add "${SERVER_NS}"
-+ip link add link "${NETIF}" dev server address "${SERVER_MAC}" type macvlan
-+ip link set dev server netns "${SERVER_NS}"
-+ip -netns "${SERVER_NS}" link set dev server up
-+ip -netns "${SERVER_NS}" addr add $LOCAL_V6/64 dev server
-+ip -netns "${SERVER_NS}" link set dev lo up
-+
-+# Create client namespace with macvlan
-+ip netns add "${CLIENT_NS}"
-+ip link add link "${NETIF}" dev client address "${CLIENT_MAC}" type macvlan
-+ip link set dev client netns "${CLIENT_NS}"
-+ip -netns "${CLIENT_NS}" link set dev client up
-+ip -netns "${CLIENT_NS}" addr add $REMOTE_V6/64 dev client
-+ip -netns "${CLIENT_NS}" link set dev lo up
-+
-+echo "Setup complete!"
-+echo "  Device: ${NETIF}"
-+echo "  Server NS: ${SERVER_NS}"
-+echo "  Client NS: ${CLIENT_NS}"
-+echo ""
-+
-+# Setup environment variables for tests
-+export NETIF=server
-+export REMOTE_TYPE=netns
-+export REMOTE_ARGS="${CLIENT_NS}"
-+
-+# Run the command
-+ip netns exec "${SERVER_NS}" "$@"
-diff --git a/tools/testing/selftests/net/lib/setup_loopback.sh b/tools/testing/selftests/net/lib/setup_loopback.sh
-deleted file mode 100644
-index 2070b57849de..000000000000
---- a/tools/testing/selftests/net/lib/setup_loopback.sh
-+++ /dev/null
-@@ -1,120 +0,0 @@
--#!/bin/bash
--# SPDX-License-Identifier: GPL-2.0
--
--readonly FLUSH_PATH="/sys/class/net/${dev}/gro_flush_timeout"
--readonly IRQ_PATH="/sys/class/net/${dev}/napi_defer_hard_irqs"
--readonly FLUSH_TIMEOUT="$(< ${FLUSH_PATH})"
--readonly HARD_IRQS="$(< ${IRQ_PATH})"
--readonly server_ns=$(mktemp -u server-XXXXXXXX)
--readonly client_ns=$(mktemp -u client-XXXXXXXX)
--
--netdev_check_for_carrier() {
--	local -r dev="$1"
--
--	for i in {1..5}; do
--		carrier="$(cat /sys/class/net/${dev}/carrier)"
--		if [[ "${carrier}" -ne 1 ]] ; then
--			echo "carrier not ready yet..." >&2
--			sleep 1
--		else
--			echo "carrier ready" >&2
--			break
--		fi
--	done
--	echo "${carrier}"
--}
--
--# Assumes that there is no existing ipvlan device on the physical device
--setup_loopback_environment() {
--	local dev="$1"
--
--	# Fail hard if cannot turn on loopback mode for current NIC
--	ethtool -K "${dev}" loopback on || exit 1
--	sleep 1
--
--	# Check for the carrier
--	carrier=$(netdev_check_for_carrier ${dev})
--	if [[ "${carrier}" -ne 1 ]] ; then
--		echo "setup_loopback_environment failed"
--		exit 1
--	fi
--}
--
--setup_macvlan_ns(){
--	local -r link_dev="$1"
--	local -r ns_name="$2"
--	local -r ns_dev="$3"
--	local -r ns_mac="$4"
--	local -r addr="$5"
--
--	ip link add link "${link_dev}" dev "${ns_dev}" \
--		address "${ns_mac}" type macvlan
--	exit_code=$?
--	if [[ "${exit_code}" -ne 0 ]]; then
--		echo "setup_macvlan_ns failed"
--		exit $exit_code
--	fi
--
--	[[ -e /var/run/netns/"${ns_name}" ]] || ip netns add "${ns_name}"
--	ip link set dev "${ns_dev}" netns "${ns_name}"
--	ip -netns "${ns_name}" link set dev "${ns_dev}" up
--	if [[ -n "${addr}" ]]; then
--		ip -netns "${ns_name}" addr add dev "${ns_dev}" "${addr}"
--	fi
--
--	sleep 1
--}
--
--cleanup_macvlan_ns(){
--	while (( $# >= 2 )); do
--		ns_name="$1"
--		ns_dev="$2"
--		ip -netns "${ns_name}" link del dev "${ns_dev}"
--		ip netns del "${ns_name}"
--		shift 2
--	done
--}
--
--cleanup_loopback(){
--	local -r dev="$1"
--
--	ethtool -K "${dev}" loopback off
--	sleep 1
--
--	# Check for the carrier
--	carrier=$(netdev_check_for_carrier ${dev})
--	if [[ "${carrier}" -ne 1 ]] ; then
--		echo "setup_loopback_environment failed"
--		exit 1
--	fi
--}
--
--setup_interrupt() {
--	# Use timer on  host to trigger the network stack
--	# Also disable device interrupt to not depend on NIC interrupt
--	# Reduce test flakiness caused by unexpected interrupts
--	echo 100000 >"${FLUSH_PATH}"
--	echo 50 >"${IRQ_PATH}"
--}
--
--setup_ns() {
--	# Set up server_ns namespace and client_ns namespace
--	setup_macvlan_ns "${dev}" ${server_ns} server "${SERVER_MAC}"
--	setup_macvlan_ns "${dev}" ${client_ns} client "${CLIENT_MAC}"
--}
--
--cleanup_ns() {
--	cleanup_macvlan_ns ${server_ns} server ${client_ns} client
--}
--
--setup() {
--	setup_loopback_environment "${dev}"
--	setup_interrupt
--}
--
--cleanup() {
--	cleanup_loopback "${dev}"
--
--	echo "${FLUSH_TIMEOUT}" >"${FLUSH_PATH}"
--	echo "${HARD_IRQS}" >"${IRQ_PATH}"
--}
-diff --git a/tools/testing/selftests/net/lib/setup_veth.sh b/tools/testing/selftests/net/lib/setup_veth.sh
-deleted file mode 100644
-index 152bf4c65747..000000000000
---- a/tools/testing/selftests/net/lib/setup_veth.sh
-+++ /dev/null
-@@ -1,45 +0,0 @@
--#!/bin/bash
--# SPDX-License-Identifier: GPL-2.0
--
--readonly server_ns=$(mktemp -u server-XXXXXXXX)
--readonly client_ns=$(mktemp -u client-XXXXXXXX)
--
--setup_veth_ns() {
--	local -r link_dev="$1"
--	local -r ns_name="$2"
--	local -r ns_dev="$3"
--	local -r ns_mac="$4"
--
--	[[ -e /var/run/netns/"${ns_name}" ]] || ip netns add "${ns_name}"
--	echo 200000 > "/sys/class/net/${ns_dev}/gro_flush_timeout"
--	echo 1 > "/sys/class/net/${ns_dev}/napi_defer_hard_irqs"
--	ip link set dev "${ns_dev}" netns "${ns_name}" mtu 65535
--	ip -netns "${ns_name}" link set dev "${ns_dev}" up
--
--	ip netns exec "${ns_name}" ethtool -K "${ns_dev}" gro on tso off
--}
--
--setup_ns() {
--	# Set up server_ns namespace and client_ns namespace
--	ip link add name server type veth peer name client
--
--	setup_veth_ns "${dev}" ${server_ns} server "${SERVER_MAC}"
--	setup_veth_ns "${dev}" ${client_ns} client "${CLIENT_MAC}"
--}
--
--cleanup_ns() {
--	local ns_name
--
--	for ns_name in ${client_ns} ${server_ns}; do
--		[[ -e /var/run/netns/"${ns_name}" ]] && ip netns del "${ns_name}"
--	done
--}
--
--setup() {
--	# no global init setup step needed
--	:
--}
--
--cleanup() {
--	cleanup_ns
--}
--- 
-2.51.1
+Michal
 
 
