@@ -1,335 +1,229 @@
-Return-Path: <netdev+bounces-239057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAF8AC63244
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:22:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25B76C6325F
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:24:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C8186350A98
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:17:31 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F108634A102
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3447231A577;
-	Mon, 17 Nov 2025 09:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC4C325723;
+	Mon, 17 Nov 2025 09:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ddJ+kvs6"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="vYccNuXM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013013.outbound.protection.outlook.com [40.107.201.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C1E324B3E
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 09:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763371029; cv=none; b=AoZNoJ7zMOab0NfLpFKr/lpR4ZdMukkgFLOVOJTLm/X1DvCbYaFKQzPnc34ZW0KVQNPuMgHUbFLtU4E54jZvMJjppVvm9563osMg60iO8G1m1NpE+QlsW1zaHUitxFJnidtcAhPd6OsAyI7k/iT+Y4gd2GSlx6acakVoF/D3IxY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763371029; c=relaxed/simple;
-	bh=2HMw2c61mmfFj0QXcDy5d5wdzf45tCU1MNgoW03okoQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Kt2PFHBNxTwL7E4txqCoqufz5e6Pb1qKSzRkRyT7TStjJrNJ0p4XZxxPWQq5E3YWoG+4L98rc+AtW167x1qrwcEjfHJWvIp3jekvH2M2cu5Kg/3e93JQCWsDokw5pCK5IPK4Mq86ZclVPbgf6e1XUP9rgpihguExtN/O1lfIjZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ddJ+kvs6; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-4336f492d75so21150965ab.1
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 01:17:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763371023; x=1763975823; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iiIZ091FZRo0EWuHbVoKq1pZLOP9KZWUy48AUIWb6p8=;
-        b=ddJ+kvs6ovRb51moPc7AlcxuvlmSuCn0ZpH74tjR+Oh96n6/e0dZqRqe8gdHk6c9PL
-         DyUhUFvXFMFVCqNYrYhe/jV1AfXJKGtNTnEnNqNcXtNPkQbPzEIkP8BZqjwWVgznfo2w
-         0MBVoxyBiLMPUl5su1JnsEMoLdsaH54GVsfuXKUA7chQY1iQJEFQ9HjNNFmkXTExgUA5
-         BxqMciSV53bOdbn6DtTKUlN5qlHImWc8RwAuwkVB3AfzLwewT1kN9KQbgbVnDl0tJoVU
-         zNMMkiyZifqSJFuhOC2HlRbxP2zu1glDuWveMTvMLY98RZfsAgOAvR5OM3FvrpVu+eH5
-         sVDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763371023; x=1763975823;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=iiIZ091FZRo0EWuHbVoKq1pZLOP9KZWUy48AUIWb6p8=;
-        b=JWNPXRZ7/MVU4BdDIsL/dtpxBLbxKEp60gf2Vu/KnrSOKS/GOOxbfIYdHrd3e//NL+
-         dn3rF+zFYOP+3IVvwvY+X7ZOtcMuLy89NAVJ99KAunpuOIayCCnc64G7e2O/zZJhlW5o
-         4jrKrIZ73EfrzaHuTS6hDOacAeNfikdgLpsuiL9aI9k0dHX70wa5qdNNxBgi87nM/wGJ
-         KKz0nWCpulUkEJ+3qFSpusTnERkc3vjJGjbvXqorSVeYQOUuophfrgqDKOBWrqsgcGzR
-         7Ofa700WefZIif6tdVh7fGpoKI8Lvumic+7N97QHoJXj4Deq8c6LYOsOrfm996dlN7mJ
-         aRvg==
-X-Forwarded-Encrypted: i=1; AJvYcCVnjr0RHrU8C14+P6vA6DuVzcvjtfY1CRUpOjFWjvy6Sy8TqHJGqECHRIceR33+TxHEjhzdszY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyr1/GfMEUMx3gUpIMUYWd+UWQ0lGcEty/POJo0RPP2sjMtPQaj
-	sXE25hHvV7rsbwfSgC4GSlsN2q1R6i4hTcfQgqqUt/yI12pZY09tfQhHR8+Bl3f7wXnjAvdvL7T
-	LcXIjtJI8gDnbNYGt2b/gGgs3tEuiL63M0oSMngo=
-X-Gm-Gg: ASbGnct3EjPAZ2hag+gFZCv26leg46pDze5QpnoKZg1+eRr3Yyq9hY1F20UV8ptY4NU
-	u6a5BxX27s2KAF247FOHxvHO2L7Nu7ZERACOHqRRiW/ME0ESs4kxL2A5E0i+8L8Sm6Y6G9eo4bW
-	HQSs6D3fKWigyQJ1pgcqQYhRqjDQwXkpIFhojo5a7yaEBcw1GLwGZaITxB0iaKEDJI1uX3UvLOW
-	FE8zbXJOHyHjH/qQtjrSvxDbGJ1KKceQNFUApLDUiSGgwDaX3N36JEtpcM=
-X-Google-Smtp-Source: AGHT+IFbXxbspTn7RRSkJwsGwwbchGeFvqw2CByphSyDoz1rhDkuSZ8oa52gw6JxAFMqddWpgEUw04ayc/vDUzRmScE=
-X-Received: by 2002:a05:6e02:2501:b0:430:aea6:833f with SMTP id
- e9e14a558f8ab-4348c8b63fdmr133865755ab.8.1763371023327; Mon, 17 Nov 2025
- 01:17:03 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46A9324B1C;
+	Mon, 17 Nov 2025 09:19:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763371168; cv=fail; b=hSh3oaWQhOwRZtgcFbsU/Qrnh0WsQStiuxch1dKJPSmjtcmZUB2mgXgG9Pa5Re3qo7XU8bDqIwT3g7T2JpjT4R8Zli1FqZS0mhfAMlt+PB0XLAMijuvB/NjD9XUw2WC9PGSpDn/wdUZ9MFvR/wfDCdjVZXnBlNNy1XS6hLfcP94=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763371168; c=relaxed/simple;
+	bh=sSwAimri53ZpqaxGMofsug+mGOlCKaqv1drZ6Kq1Qq0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lRkA3PZPuhconuKA3ilRisVxdm7J5Ra/LPn8kN2rFfjb39lJwgGAw0BWMMVj21YteFgYRucBZnCOdXv2QN2pUNZy8SsCU683QNOMuBOKBZtEx3O95C1UrKW3IwmXRrBFhRlO83V5kyVZzaM29IQCIY6ZpUcFDoVA3wDtQ+urmPk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=vYccNuXM; arc=fail smtp.client-ip=40.107.201.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=M1xho5q6gK6nLoM26l+75eOBMu7tFMNcUdnsViOMem1mrViu1Ox/HR1BumuKjH2Kzpdk7tJtp1cYVoH1e313EVyLDME6jhs/jZ14L6k1ZXLopaI/cKxsfvFXMy1Zw0jeHWwIcEh5MUdQLnjAmn5KehChA+qe4z2bGxn66A03eTvzJBQ55YAAf62nn0Vud6F4Nv+/En6MZRt4EFKyYGztxjJ6/ULHpRMSl3fvc1Xg4qxEzMvu/e/AZd5nEfrEkDXFsWckhzaqVWwstC4le9TwpHfcTE9u/+VJ4uxvgudv5QxhYLbmoefLFJ+tb3OFeXG9pjFqzqzze4HaiGFUncSx8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5vXWvCvUE0dOVfLT8XLz/Xwe5MDyHfj8CzkR4lEGFMI=;
+ b=kY9LXlJm8g2kDkkqpCQxpbe+Lx2gDvs0v48QZS30eppmyItE3LOKrpd03t3u+Y9cDe+iqo0W/vwmrT8MA1wytBQJc3nevrO6tKbcV5BP4ZS76+AYmIqgFXxrK9rSztvd7Zi4C022cGXonXdMMiidwkcyHU8aFeGHmT+FK/C0+GdDm0WEeSGXrh9HtqPI9ajS3iG5+ZdnFqX3SBDav3gw+z0pjMV4pvi+YVmxcx283jJXOgXOpiSqDdvcmrpfN857IO6TFnVkM7cgfWeX5JPMedbdAlkEUyz6O5R/jTDDBlztzP3No7MwtPuBglwexBYE3e26KAchBFNr1QsOG6QlPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.194) smtp.rcpttodomain=kernel.org smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5vXWvCvUE0dOVfLT8XLz/Xwe5MDyHfj8CzkR4lEGFMI=;
+ b=vYccNuXM5PJC2uBCDdtWlpTvUKNzTVSwcqYbpy8maMmGUFE9F+hiDggk9O4orqHg98a80yA8e18nQ8KYdcuPwze8f09BqfDIO5um1uUin4f1MLlwlDYFJve3xHhXUq2aOj38/w+kmOZOwpA1riXlRqqnpagW8RDAFaTijU6q82Y=
+Received: from SJ2PR07CA0002.namprd07.prod.outlook.com (2603:10b6:a03:505::25)
+ by DS7PR10MB4878.namprd10.prod.outlook.com (2603:10b6:5:3a8::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.20; Mon, 17 Nov
+ 2025 09:19:21 +0000
+Received: from SJ1PEPF00002324.namprd03.prod.outlook.com
+ (2603:10b6:a03:505:cafe::14) by SJ2PR07CA0002.outlook.office365.com
+ (2603:10b6:a03:505::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9320.22 via Frontend Transport; Mon,
+ 17 Nov 2025 09:19:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
+Received: from lewvzet200.ext.ti.com (198.47.23.194) by
+ SJ1PEPF00002324.mail.protection.outlook.com (10.167.242.87) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.9 via Frontend Transport; Mon, 17 Nov 2025 09:19:21 +0000
+Received: from DLEE201.ent.ti.com (157.170.170.76) by lewvzet200.ext.ti.com
+ (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 17 Nov
+ 2025 03:19:18 -0600
+Received: from DLEE211.ent.ti.com (157.170.170.113) by DLEE201.ent.ti.com
+ (157.170.170.76) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 17 Nov
+ 2025 03:19:18 -0600
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE211.ent.ti.com
+ (157.170.170.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Mon, 17 Nov 2025 03:19:18 -0600
+Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 5AH9J89Y2242206;
+	Mon, 17 Nov 2025 03:19:09 -0600
+Message-ID: <b547779d-8dad-4e01-b9f4-a291d70ba6be@ti.com>
+Date: Mon, 17 Nov 2025 14:49:07 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251116202717.1542829-1-edumazet@google.com> <20251116202717.1542829-4-edumazet@google.com>
- <CAL+tcoD3-qtq4Kcmo9eb4mw6bdSYCCjxzNB3qov5LDYoe_gtkw@mail.gmail.com>
- <CAL+tcoBpUg=ggf6nQpYeZyAcMbXobuJtyUdN98G1HpcuUqFZ+w@mail.gmail.com> <CANn89iJb8hLw7Mx1+Td_BK7gGm5guRaUe6zdhqRqtfdw_0gLzA@mail.gmail.com>
-In-Reply-To: <CANn89iJb8hLw7Mx1+Td_BK7gGm5guRaUe6zdhqRqtfdw_0gLzA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 17 Nov 2025 17:16:26 +0800
-X-Gm-Features: AWmQ_bkeufONasDAQzphMBpMIqr8zCpLVF5ku_h3nTHR8iA8_BgCh39yirG0oAg
-Message-ID: <CAL+tcoBeEXmyugUrqxct9VuYrSErVDA61nZ1Y62w8-NSwgdxjw@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 3/3] net: use napi_skb_cache even in process context
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 5/6] net: ti: icssg-prueth: Add AF_XDP zero
+ copy for RX
+To: Simon Horman <horms@kernel.org>
+CC: <namcao@linutronix.de>, <vadim.fedorenko@linux.dev>,
+	<jacob.e.keller@intel.com>, <christian.koenig@amd.com>,
+	<sumit.semwal@linaro.org>, <sdf@fomichev.me>, <john.fastabend@gmail.com>,
+	<hawk@kernel.org>, <daniel@iogearbox.net>, <ast@kernel.org>,
+	<pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+	<davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+	<linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
+	<linux-media@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
+	<vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+References: <20251111101523.3160680-1-m-malladi@ti.com>
+ <20251111101523.3160680-6-m-malladi@ti.com>
+ <aRcFb-vsoLw24MbU@horms.kernel.org>
+Content-Language: en-US
+From: Meghana Malladi <m-malladi@ti.com>
+In-Reply-To: <aRcFb-vsoLw24MbU@horms.kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002324:EE_|DS7PR10MB4878:EE_
+X-MS-Office365-Filtering-Correlation-Id: dc9abde0-0dc2-455c-dbaf-08de25ba645b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SGxld001YmhKVFlsTDl5VmFpOGNvWFlrTlVtUG9qZVRMTTRoYXE2d2ZDMTA2?=
+ =?utf-8?B?Qm9kTDdEMzlYdW1mMVhucmk2dkw2cjMrdjZDdjcwOWlWSmJ5Ky9peWFjeWhB?=
+ =?utf-8?B?NnJ4NHdaS3ZidVYrSHdMRnMyeVVteUZ1eTFsejMxeUhwQjlIcmhyN01YaUZ6?=
+ =?utf-8?B?VUNpSGRxdDNWa2s0KzVBNzUyZUlaam9FSVF1WFFnczl1T3hFUnNnNm4wNWMv?=
+ =?utf-8?B?OXYzNUh2WXFWTFNJK0lVL1pQd2RpMWh3eFBkQXdsaDFpUjMxOEpJTk1YajVJ?=
+ =?utf-8?B?OFBnUWU2WmJtd0k2Y2MxcW83cWpta2RDc2hPQXJLYTdzY211c255UWJPREx1?=
+ =?utf-8?B?dVlYY3FJWmJDK3M3WWhXWXZ6QnhVdnd1cTYvd0R5SmQwODBhMTgwQlhVSC9Q?=
+ =?utf-8?B?M1A2dFBnNTRCS1N6eDR0Tm9iMEFFZkp2Rk9mVFJOTm1Lc3NTV3RDanUzMWJo?=
+ =?utf-8?B?TU1wMlk5aFNnMHFYS2NNa0xHVlhOMmNLNkhuUENGaUw0NzYvOFBVUDB1ZzZZ?=
+ =?utf-8?B?YnQ5WXk4WmR4ekFLbzEvU2RYU3ZzZElxT2p3Y3FDNUhFVnZkdktGWWhBeEdH?=
+ =?utf-8?B?QUxMLzBaYVlBaWdrd3p2TzhNRWdabkNhQ0hta0p4aUh5WVdNeG85ZjFQSmFE?=
+ =?utf-8?B?cnlPTTVoMXNYdlFlK0R0a2czelhTT0hvUWcrMURvZmd3dlJhRC8zRnVyS2VV?=
+ =?utf-8?B?L3VrN2k1OXhyL3l1WkdIdHhTL0x6SWs0V215YVkxc3AwZlNiOXJMdHhRaWFN?=
+ =?utf-8?B?aDhKVXg3LzVTWm9BQnJCUldOYm82RTg3dXJ0UDhNN3hEZVJjV0p4elczcU13?=
+ =?utf-8?B?THNEU3pkV1pkL2plU0ZUU0JYUUNBY2xDSjBwUm9HOUtOWlpCSWRGYnFINUFy?=
+ =?utf-8?B?eXpFMHg5K3dOdUw1QjlkSzRWb245REhVc0hpSjJHb0R5UGZVbUszYmtTc2x6?=
+ =?utf-8?B?dE9uRW9WYW9zbkNMd3ppblRZMVljbFIyUGE2eFk4dkpFTWFCM3ZaeU51Y1Mv?=
+ =?utf-8?B?dTZUWWt3ZG5RUy9jWkV2dW5vQjkzZ1YzT2VndEN3UmV4ZmN6eElHTDEwYlkr?=
+ =?utf-8?B?SlI2d1lrQ082U2RvN2Z5SWh3eXpLczdneU5CNzBKelNqdjduWWxSWGpRWFhP?=
+ =?utf-8?B?SHYxRUZ2SzM4U0FkSlhhQXhxcFdVZjlpb1ZSaEdmVTVQNHo4amNlcURxaGJz?=
+ =?utf-8?B?dTBTM0FqZ0VZQTR1eERnbmZBaHdBeVhRenR0M2wvaDNSdTMveTdjQ3hnNnQ2?=
+ =?utf-8?B?eUNJYTViVTdqTTFUektuSTNYbFBmWEcydExWSlgxU0twMWRuRkxGQ21iTTlZ?=
+ =?utf-8?B?bFEvWUFwY0ZGdFFCWW4wa1UwSUhIMEFMdk9qeFpkUCtZcVpBQitvYk1TaGYr?=
+ =?utf-8?B?RTJtVXF0Qjd0MW5wZUR2ZmFiZEIwNUZWWTg1QVM4dEFxa3NBTURLNHA3MkVU?=
+ =?utf-8?B?MVlxMG1MeUZ5ZnJHYTlxbFoxNTlCdEkxQXo5YU8xTDJXZTBXVlliUXBWZkgy?=
+ =?utf-8?B?MStQbzZYVHN6aTJIN2crM0NVOTh3SjRYZGMzN2RlSTd4N2dDUTkrci9xSGJm?=
+ =?utf-8?B?OUZHdkkrSDlDd1Q4c0JKdTBXTUxOOHZMYXNwNzYzSm15K0w2WmxhdEZSWGZh?=
+ =?utf-8?B?L3N4UUJwVFEvb3MycXhINU5pTFZ3UzY1dklvWG1IY1Mvd0xBeFZFUWo4Znlr?=
+ =?utf-8?B?eTBYNzRyUXFTc2NFalF2SGw2c1djTUh4d0hic0hSakpSVmN1bzNpMDZud3ph?=
+ =?utf-8?B?enlCNGpta1U4dEVoaGFSSmN5Tkc1WXg2NmVoM2JDZ0tJMlJrMXRmMTZDbmpj?=
+ =?utf-8?B?d2tidFRpVDNNSElTelkwZy96R2pkUEFRWjFJOXN5NGV0M0piYkJOWnBzUjBQ?=
+ =?utf-8?B?VzFrUGg2ZUZGVmVuSkQ2TUp1aUdhT2RObE1QSFcvTlZldTdXRWlVSjFFNDBM?=
+ =?utf-8?B?VTVzNnNNeDJkSitkdlh1RXpBZ2hzWHdsWUJXbi9NcHhjUHplVkdnR3hZdUp1?=
+ =?utf-8?B?TS95eGlyQlN3VlJlb05vam9OMTZHZENOS0ZDRVp2dXoxNE9ObTZXZmVJbXRa?=
+ =?utf-8?B?VEx6Smd5Si9OQk0yL3FqL3FlQ0xTbHhITVNoL0pwc2x4QWtwTDNNdjZRL0Yr?=
+ =?utf-8?Q?RIw4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2025 09:19:21.0396
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc9abde0-0dc2-455c-dbaf-08de25ba645b
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002324.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB4878
 
-On Mon, Nov 17, 2025 at 4:57=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Mon, Nov 17, 2025 at 12:41=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
-> >
-> > On Mon, Nov 17, 2025 at 9:07=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
-> > >
-> > > On Mon, Nov 17, 2025 at 4:27=E2=80=AFAM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > > >
-> > > > This is a followup of commit e20dfbad8aab ("net: fix napi_consume_s=
-kb()
-> > > > with alien skbs").
-> > > >
-> > > > Now the per-cpu napi_skb_cache is populated from TX completion path=
-,
-> > > > we can make use of this cache, especially for cpus not used
-> > > > from a driver NAPI poll (primary user of napi_cache).
-> > > >
-> > > > We can use the napi_skb_cache only if current context is not from h=
-ard irq.
-> > > >
-> > > > With this patch, I consistently reach 130 Mpps on my UDP tx stress =
-test
-> > > > and reduce SLUB spinlock contention to smaller values.
-> > > >
-> > > > Note there is still some SLUB contention for skb->head allocations.
-> > > >
-> > > > I had to tune /sys/kernel/slab/skbuff_small_head/cpu_partial
-> > > > and /sys/kernel/slab/skbuff_small_head/min_partial depending
-> > > > on the platform taxonomy.
-> > > >
-> > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > >
-> > > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-> > >
-> > > Thanks for working on this. Previously I was thinking about this as
-> > > well since it affects the hot path for xsk (please see
-> > > __xsk_generic_xmit()->xsk_build_skb()->sock_alloc_send_pskb()). But I
-> > > wasn't aware of the benefits between disabling irq and allocating
-> > > memory. AFAIK, I once removed an enabling/disabling irq pair and saw =
-a
-> > > minor improvement as this commit[1] says. Would you share your
-> > > invaluable experience with us in this case?
-> > >
-> > > In the meantime, I will do more rounds of experiments to see how they=
- perform.
-> >
-> > Tested-by: Jason Xing <kerneljasonxing@gmail.com>
-> > Done! I managed to see an improvement. The pps number goes from
-> > 1,458,644 to 1,647,235 by running [2].
-> >
-> > But sadly the news is that the previous commit [3] leads to a huge
-> > decrease in af_xdp from 1,980,000 to 1,458,644. With commit [3]
-> > applied, I observed and found xdpsock always allocated the skb on cpu
-> > 0 but the napi poll triggered skb_attempt_defer_free() on another
-> > call[4], which affected the final results.
-> >
-> > [2]
-> > taskset -c 0 ./xdpsock -i enp2s0f1 -q 1 -t -S -s 64
-> >
-> > [3]
-> > commit e20dfbad8aab2b7c72571ae3c3e2e646d6b04cb7
-> > Author: Eric Dumazet <edumazet@google.com>
-> > Date:   Thu Nov 6 20:29:34 2025 +0000
-> >
-> >     net: fix napi_consume_skb() with alien skbs
-> >
-> >     There is a lack of NUMA awareness and more generally lack
-> >     of slab caches affinity on TX completion path.
-> >
-> > [4]
-> > @c[
-> >     skb_attempt_defer_free+1
-> >     ixgbe_clean_tx_irq+723
-> >     ixgbe_poll+119
-> >     __napi_poll+48
-> > , ksoftirqd/24]: 1964731
-> >
-> > @c[
-> >     kick_defer_list_purge+1
-> >     napi_consume_skb+333
-> >     ixgbe_clean_tx_irq+723
-> >     ixgbe_poll+119
-> > , 34, swapper/34]: 123779
-> >
-> > Thanks,
-> > Jason
->
-> Hi Jason.
->
-> It is a bit hard to guess without more details (cpu you are using),
-> and perhaps perf profiles.
+Hi Simon,
 
-Xdpsock only calculates the speed on the cpu where it sends packets.
-To put in more details, it will check if the packets are sent by
-inspecting the completion queue and then send another group of packets
-over and over again.
+On 11/14/25 16:03, Simon Horman wrote:
+> On Tue, Nov 11, 2025 at 03:45:22PM +0530, Meghana Malladi wrote:
+> 
+> ...
+> 
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+> 
+> ...
+> 
+>> +static int prueth_dma_rx_push_mapped_zc(struct prueth_emac *emac,
+>> +					struct prueth_rx_chn *rx_chn,
+>> +					struct xdp_buff *xdp)
+>> +{
+>> +	struct net_device *ndev = emac->ndev;
+>> +	struct cppi5_host_desc_t *desc_rx;
+>> +	struct prueth_swdata *swdata;
+>> +	dma_addr_t desc_dma;
+>> +	dma_addr_t buf_dma;
+>> +	int buf_len;
+>> +
+>> +	buf_dma = xsk_buff_xdp_get_dma(xdp);
+>> +	desc_rx = k3_cppi_desc_pool_alloc(rx_chn->desc_pool);
+>> +	if (!desc_rx) {
+>> +		netdev_err(ndev, "rx push: failed to allocate descriptor\n");
+>> +		return -ENOMEM;
+>> +	}
+>> +	desc_dma = k3_cppi_desc_pool_virt2dma(rx_chn->desc_pool, desc_rx);
+>> +
+>> +	cppi5_hdesc_init(desc_rx, CPPI5_INFO0_HDESC_EPIB_PRESENT,
+>> +			 PRUETH_NAV_PS_DATA_SIZE);
+>> +	k3_udma_glue_rx_dma_to_cppi5_addr(rx_chn->rx_chn, &buf_dma);
+>> +	buf_len = xsk_pool_get_rx_frame_size(rx_chn->xsk_pool);
+>> +	cppi5_hdesc_attach_buf(desc_rx, buf_dma, buf_len, buf_dma, buf_len);
+>> +	swdata = cppi5_hdesc_get_swdata(desc_rx);
+>> +	swdata->type = PRUETH_SWDATA_XSK;
+>> +	swdata->data.xdp = xdp;
+>> +
+>> +	return k3_udma_glue_push_rx_chn(rx_chn->rx_chn, PRUETH_RX_FLOW_DATA,
+>> +					desc_rx, desc_dma);
+>> +
+>> +	return 0;
+> 
+> nit: The line above is dead code.
+> 
 
-My test env is relatively old:
-[root@localhost ~]# lscpu
-Architecture:                x86_64
-  CPU op-mode(s):            32-bit, 64-bit
-  Address sizes:             46 bits physical, 48 bits virtual
-  Byte Order:                Little Endian
-CPU(s):                      48
-  On-line CPU(s) list:       0-47
-Vendor ID:                   GenuineIntel
-  BIOS Vendor ID:            Intel(R) Corporation
-  Model name:                Intel(R) Xeon(R) CPU E5-2670 v3 @ 2.30GHz
-    BIOS Model name:         Intel(R) Xeon(R) CPU E5-2670 v3 @ 2.30GHz
- CPU @ 2.3GHz
-    BIOS CPU family:         179
-    CPU family:              6
-    Model:                   63
-    Thread(s) per core:      2
-    Core(s) per socket:      12
-    Socket(s):               2
-    Stepping:                2
-    CPU(s) scaling MHz:      84%
-    CPU max MHz:             3100.0000
-    CPU min MHz:             1200.0000
+Yes, this is a silly miss. Thanks for pointing this out. Will fix it for 
+v6. Thanks.
 
-After that commit [3], the perf differs because of the interrupts
-jumping in the tx path frequently:
--   98.72%     0.09%  xdpsock          libc.so.6          [.]
-__libc_sendto
-      =E2=96=92
-   - __libc_sendto
-                                                                    =E2=97=
-=86
-      - 98.28% entry_SYSCALL_64_after_hwframe
-                                                                    =E2=96=
-=92
-         - 98.19% do_syscall_64
-                                                                    =E2=96=
-=92
-            - 97.94% x64_sys_call
-                                                                    =E2=96=
-=92
-               - 97.91% __x64_sys_sendto
-                                                                    =E2=96=
-=92
-                  - 97.80% __sys_sendto
-                                                                    =E2=96=
-=92
-                     - 97.28% xsk_sendmsg
-                                                                    =E2=96=
-=92
-                        - 97.18% __xsk_sendmsg.constprop.0.isra.0
-                                                                    =E2=96=
-=92
-                           - 87.85% __xsk_generic_xmit
-                                                                    =E2=96=
-=92
-                              - 41.71% xsk_build_skb
-                                                                    =E2=96=
-=92
-                                 - 33.06% sock_alloc_send_pskb
-                                                                    =E2=96=
-=92
-                                    + 22.06% alloc_skb_with_frags
-                                                                    =E2=96=
-=92
-                                    + 7.61% skb_set_owner_w
-                                                                    =E2=96=
-=92
-                                    + 0.58%
-asm_sysvec_call_function_single
-                        =E2=96=92
-                                   1.66% skb_store_bits
-                                                                    =E2=96=
-=92
-                                   1.60% memcpy_orig
-                                                                    =E2=96=
-=92
-                                   0.69% xp_raw_get_data
-                                                                    =E2=96=
-=92
-                              - 32.56% __dev_direct_xmit
-                                                                    =E2=96=
-=92
-                                 + 15.62% 0xffffffffa064e5ac
-                                                                    =E2=96=
-=92
-                                 - 7.33% __local_bh_enable_ip
-                                                                    =E2=96=
-=92
-                                    + 6.18% do_softirq
-                                                                    =E2=96=
-=92
-                                    + 0.70%
-asm_sysvec_call_function_single
-                        =E2=96=92
-                                 + 5.78% validate_xmit_skb
-                                                                    =E2=96=
-=92
-                              - 6.08% asm_sysvec_call_function_single
-                                                                    =E2=96=
-=92
-                                 + sysvec_call_function_single
-                                                                    =E2=96=
-=92
-                              + 1.62% xp_raw_get_data
-                                                                    =E2=96=
-=92
-                           - 8.29% _raw_spin_lock
-                                                                    =E2=96=
-=92
-                              + 3.01% asm_sysvec_call_function_single
+>> +}
+> 
+> ...
 
-Prior to that patch, I didn't see any interrupts coming in, so I
-assume the defer part caused the problem.
-
-> In particular which cpu is the bottleneck ?
->
-> 1) There is still the missing part about tuning NAPI_SKB_CACHE_SIZE /
-> NAPI_SKB_CACHE_BULK, I was hoping you could send the patch we
-> discussed earlier ?
-
-Sure thing :) I've done that part locally, thinking I will post it as
-long as the current series gets merged?
-
->
-> 2) I am also working on allowing batches of skbs for skb_attempt_defer_fr=
-ee().
->
-> Another item I am working on is to let the qdisc being serviced
-> preferably not by the cpu performing TX completion,
-> I mentioned about making qdisc->running a sequence that we can latch
-> in __netif_schedule().
-> (Idea is to be able to not spin on qdisc spinlock from net_tx_action()
-> if another cpu was able to call qdisc_run())
-
-Awesome work. Hope to see it very soon :)
-
-Thanks,
-Jason
 
