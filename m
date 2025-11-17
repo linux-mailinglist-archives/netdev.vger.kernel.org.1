@@ -1,64 +1,69 @@
-Return-Path: <netdev+bounces-239167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 098DDC64D7F
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:21:34 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7F44C64D8E
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:22:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 19FCE35F17F
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 15:16:42 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EE69A346B3C
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 15:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B65339B43;
-	Mon, 17 Nov 2025 15:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DEE8334697;
+	Mon, 17 Nov 2025 15:17:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wqWVApOf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RGH5vJur"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3A125486D;
-	Mon, 17 Nov 2025 15:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3604A332EAB;
+	Mon, 17 Nov 2025 15:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763392596; cv=none; b=s17x4RmlGOKiJo2Xf92v847uJ8PhZ8Jxq78KI9ZgrRE5wMmWtP/hjVNJ3unzfoIekitewEgN6lMHi+2+eQs7fsKuMK+wT2NENb1bWSDlo2dO0Yp4pOKu8v4iMo55tiAwC1cKhelWTDMVeS/NFI3ApnY1Ryna+XtJheG3dCzKcbc=
+	t=1763392658; cv=none; b=YTdFnbnYMUkr2fXRn+ky0F694jtSr/Lrpabmmiij1tn11b88vQODDpvBsuZQIkcLcoWjfkUoLmnwLDKs6L3RDUoohapgWy0hKAPrtIem9EkKPI/hJ83+8F6ZjTW+yBEsegk1EOiW8c3grXVq+6Hemp6SQbQzluRNS0+zwhq21oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763392596; c=relaxed/simple;
-	bh=XEvEWMteZPfye3qixtrCv2y8U7IJBzphP6dKiKxBf5c=;
+	s=arc-20240116; t=1763392658; c=relaxed/simple;
+	bh=kDGyyd8Er/yb517j7UsDdklFoTkfzigvta3V0wORQKc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CYeV/bwFmihUUncKmFTSBkBBG8nBMvC78gn25as+4Y9iza74dzbWG7N5Dfi0NL9qIGzxvWYhjHiDZ8tzoiKnLE1r5VqdLTcgS2cVivFUQjbUSqcPkiQBLw3AfUZHh944+f/uOVGNu3YnQDoOwVQWOKBQc+ZkIARSphkbmjzn6r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wqWVApOf; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0iPLRHgS6teleSKYRRbynIml90CWfijVv5vx60t7mdE=; b=wqWVApOflz6/2YeFRZijMKpFC3
-	kxr0LeMyGxuDRXdKNadAFH5Ep2wcA2SWmB7SHTaHsYuArBNuEFfK6j9XFLD53AsbmsQKcsv2EZoye
-	p9JI01lg5vvcwvxmX+cVlaxQnNzUEhlt+dAFSEVlc0W7lgwsC7Ftv9Sraov86hm+px1g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vL0xm-00EFoa-Pa; Mon, 17 Nov 2025 16:16:18 +0100
-Date: Mon, 17 Nov 2025 16:16:18 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Peter Enderborg <peterend@axis.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH for net-next] if_ether.h: Clarify ethertype validity for
- gsw1xx dsa
-Message-ID: <b072d237-2bc0-4930-a8f0-2adb7eb81043@lunn.ch>
-References: <20251114135935.2710873-1-peterend@axis.com>
- <3feaff7a-fcec-49d9-a738-fa2e00439b28@lunn.ch>
- <5a7f0105-801d-41d9-850c-03783d76f3e1@axis.com>
- <7000f777-d082-4b06-88dd-67f947c85d2a@lunn.ch>
- <5b0bd2a0-c1cb-40f0-9226-3038ea9eb294@axis.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=a/PLbe0zNlImn3jPE2xW0vBR0EcOd7SQmm3iI8gfBAvtf3LGnBedq55soGVaCRIAEikv30pjOdmrLn1HHw7nbgv8peGuGa2hRnIG0gv5QbyIdK5U7ylTMvuxTvMUN88u9kRo3l27gfUTqrPJZoyrCfHFZNrFZeKqcRA1bf2yJQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=RGH5vJur; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=nzvzRJlLUC8pZrf+NlP+OfBgD+MtzcdLwyPjZghTrJA=; b=RGH5vJurGySe2u3t0dXxK9dyJk
+	HLEnGO/qJppfVBzuU1PQ20LB5ZBkV3IKxz+U7W+TAjZRbvbjUoyrDftH7RFdOwJYlWlSd6fTW2VzW
+	sM5lyOFDRjNhFqRHVsX79AWtF2gtV9hYxpkKfd2J6JfFWkmOiFWeb/GBPZayCWRgjDh0e5CxhhTVQ
+	yICOIckDw4Z3FmtVAgcyZrQjAvVB7ZBNlbqCzdf0Gkbs7RBn8UFldwW3csvqHicBOQTPBZBoplscG
+	OvSibN5pGDwr9pvuyLtz99WYAX1hKcNqARE4E62bwXw4/x71inPntzhNeRfmC3t9YiFfhbPGiFvxF
+	ugIhpYYQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34848)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vL0yp-00000000209-40oZ;
+	Mon, 17 Nov 2025 15:17:24 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vL0ym-000000001Zb-3zCC;
+	Mon, 17 Nov 2025 15:17:20 +0000
+Date: Mon, 17 Nov 2025 15:17:20 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	eric@nelint.com, maxime.chevallier@bootlin.com, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: phylink: add missing supported link modes for
+ the fixed-link
+Message-ID: <aRs8gMOyC9ZbqMfe@shell.armlinux.org.uk>
+References: <20251116023823.1445099-1-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,52 +72,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5b0bd2a0-c1cb-40f0-9226-3038ea9eb294@axis.com>
+In-Reply-To: <20251116023823.1445099-1-wei.fang@nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Nov 17, 2025 at 03:59:13PM +0100, Peter Enderborg wrote:
-> You have to pay us$4000 to get a ethertype.
+On Sun, Nov 16, 2025 at 10:38:23AM +0800, Wei Fang wrote:
+> Pause, Asym_Pause and Autoneg bits are not set when pl->supported is
+> initialized, so these link modes will not work for the fixed-link. This
+> leads to a TCP performance degradation issue observed on the i.MX943
+> platform.
 > 
-> On 11/17/25 14:28, Andrew Lunn wrote:
-> > On Mon, Nov 17, 2025 at 10:02:05AM +0100, Peter Enderborg wrote:
-> > > (resend due to html bounce)
-> > > On 11/15/25 21:41, Andrew Lunn wrote:
-> > > > On Fri, Nov 14, 2025 at 02:59:36PM +0100, Peter Enderborg wrote:
-> > > > > Ref https://standards-oui.ieee.org/ethertype/eth.txt
-> > > > > 
-> > > > > 
-> > > > Is this actually registered with IANA?
-> > > No.
-> > > 
-> > > > https://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml
-> > > > 
-> > > > Does not list it. Please keep the "NOT AN OFFICIALLY REGISTERED ID" if
-> > > > it is not.
-> > > IEEE is the official source to use for ethertype number assignment.
-> > What i want to make clear is, if IEEE officially allocate this to
-> > something else, this is an unofficial allocation, and the official use
-> > can replace it. We have a few ID like this, and never had a collision
-> > yet, but it could happen.
+> The switch CPU port of i.MX943 is connected to an ENETC MAC, this link
+> is a fixed link and the link speed is 2.5Gbps. And one of the switch
+> user ports is the RGMII interface, and its link speed is 1Gbps. If the
+> flow-control of the fixed link is not enabled, we can easily observe
+> the iperf performance of TCP packets is very low. Because the inbound
+> rate on the CPU port is greater than the outbound rate on the user port,
+> the switch is prone to congestion, leading to the loss of some TCP
+> packets and requiring multiple retransmissions.
 > 
-> This is the public list from IEEE. It wont get more official. Yes, official
-> allocation can be changed in non backward compatible way. It happen
-> in 1983 so it can happen again. If the standard changes we need to adopt.
+> Solving this problem should be as simple as setting the Asym_Pause and
+> Pause bits. The reason why the Autoneg bit needs to be set is because
+> it was already set before the blame commit. Moreover, Russell provides
+> a very good explanation of why it needs to be set in the thread [1].
 > 
-> "NOT AN OFFICIALLY REGISTERED ID" is wrong, it is "Infineon Technologies Corporate Research ST".
+> [1] https://lore.kernel.org/all/aRjqLN8eQDIQfBjS@shell.armlinux.org.uk/
+> 
+> Fixes: de7d3f87be3c ("net: phylink: Use phy_caps_lookup for fixed-link configuration")
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Ah. Let me see if i have this correct.....
+Even though discussion is still going on, we do need to fix this
+regression. So:
 
-Infineon made a spin off called Lantiq.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Lantiq was acquired by Intel
+Thanks!
 
-MaxLinear acquired Intels Connected Home division.
-
-Assuming the rights to this ID transferred along the way, it is
-O.K. for MaxLinear to use this ID. But, IANAL...
-
-Please expand the commit message with this history, which is then a
-justification for removing the NOT AN OFFICIALLY REGISTERED ID, and
-why it is O.K. for MaxLinear to use it.
-
-	Andrew
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
