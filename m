@@ -1,167 +1,335 @@
-Return-Path: <netdev+bounces-239056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7E67C63235
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:22:15 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAF8AC63244
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:22:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CE2DE365767
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:16:58 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C8186350A98
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464C4324B31;
-	Mon, 17 Nov 2025 09:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3447231A577;
+	Mon, 17 Nov 2025 09:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eTvBQK6D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ddJ+kvs6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9530131E107
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 09:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C1E324B3E
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 09:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763370978; cv=none; b=t5UCtwtxmGq1ENWpUBz56BOngCUC6p6vJel5AJwyVV5ZTZMGZjB69WWexXqLfaShlN1vHvwXqsvr+S86CQu7kJby/De3jg+icw/mCrtXbINJF7V5kixbWUvG7ngqHt0Ryc4ZUTzjOrCRMpITja+CD3XEIsTz3YU8vCQS90Yn3lU=
+	t=1763371029; cv=none; b=AoZNoJ7zMOab0NfLpFKr/lpR4ZdMukkgFLOVOJTLm/X1DvCbYaFKQzPnc34ZW0KVQNPuMgHUbFLtU4E54jZvMJjppVvm9563osMg60iO8G1m1NpE+QlsW1zaHUitxFJnidtcAhPd6OsAyI7k/iT+Y4gd2GSlx6acakVoF/D3IxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763370978; c=relaxed/simple;
-	bh=5MFng18vOcqANoAFQkR1r8zkL4CbAXVQoCMVANVbrzs=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ixkObSlbxxdrWbYuMj+ngzo2XWBZsOksdF2Ym9pBfZyxtfKIxLEd4HLM9X1Kv/0KYZ8toxlPi7yr6wqntFn3PJghEPr0wDDrjcdNAHW3eWkyjjMo/JlRpft+CHgC3zTnIdAQX8an83NkMSaj1rdm+wIVzwgjrsn3RgqFbuPrJCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eTvBQK6D; arc=none smtp.client-ip=74.125.224.41
+	s=arc-20240116; t=1763371029; c=relaxed/simple;
+	bh=2HMw2c61mmfFj0QXcDy5d5wdzf45tCU1MNgoW03okoQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Kt2PFHBNxTwL7E4txqCoqufz5e6Pb1qKSzRkRyT7TStjJrNJ0p4XZxxPWQq5E3YWoG+4L98rc+AtW167x1qrwcEjfHJWvIp3jekvH2M2cu5Kg/3e93JQCWsDokw5pCK5IPK4Mq86ZclVPbgf6e1XUP9rgpihguExtN/O1lfIjZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ddJ+kvs6; arc=none smtp.client-ip=209.85.166.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-640d790d444so3463602d50.0
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 01:16:16 -0800 (PST)
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-4336f492d75so21150965ab.1
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 01:17:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763370975; x=1763975775; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=g96HcGbNRGbYzJFo72qg9V3gq9qDoK8b63Kpk0gWdjE=;
-        b=eTvBQK6DirpO4xanKt8aqrYs8ciGpnjUqVlKy+ATPUlcBW2GZXbaHPSDRvuX7Q5Pp3
-         5N0ZkKDS+oWGs7sHBFD462+lkd0C+9v0/ffH6U0Jg1Dth2hBPi64X87WzeJaeQeaycKx
-         059DR268wine7vrvpg4yDGVrLawOeiFLD1pedYtb6ivffrxyf1D0rMgHmQPI1tUeCWqW
-         b8VonLMRsAh7dAmonGPLwI1vN0Kd35j6Zw1yf1LXzzWG1YXQu0lzNWT5yC0ZILV/KjXo
-         D/C/gN5sTpV0vvO5pTr0dT9FL5kb5XPOaz5LziDsTszfSAQJ4GMWiQsoI0rrBiEZFCG9
-         paIg==
+        d=gmail.com; s=20230601; t=1763371023; x=1763975823; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iiIZ091FZRo0EWuHbVoKq1pZLOP9KZWUy48AUIWb6p8=;
+        b=ddJ+kvs6ovRb51moPc7AlcxuvlmSuCn0ZpH74tjR+Oh96n6/e0dZqRqe8gdHk6c9PL
+         DyUhUFvXFMFVCqNYrYhe/jV1AfXJKGtNTnEnNqNcXtNPkQbPzEIkP8BZqjwWVgznfo2w
+         0MBVoxyBiLMPUl5su1JnsEMoLdsaH54GVsfuXKUA7chQY1iQJEFQ9HjNNFmkXTExgUA5
+         BxqMciSV53bOdbn6DtTKUlN5qlHImWc8RwAuwkVB3AfzLwewT1kN9KQbgbVnDl0tJoVU
+         zNMMkiyZifqSJFuhOC2HlRbxP2zu1glDuWveMTvMLY98RZfsAgOAvR5OM3FvrpVu+eH5
+         sVDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763370975; x=1763975775;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g96HcGbNRGbYzJFo72qg9V3gq9qDoK8b63Kpk0gWdjE=;
-        b=Yp3hrsqW04hfMO8VGJR8h2yAZ7MTPRi4dqr3526fJdMv+AUtTVzdh/BJUMIZkucNFk
-         a2XJZsPbzXzk8mJOFhSypJvyZrPRORp8wQfshr8sQBr2WvS3s6kD0Oc6MdRbTX2yJ+8L
-         YV0hVud9P56OlcPCgsyb/Oyw+MF/yoCtldd/1qts1j2+bPg6ds+OO96CPkMSMdoVuPzs
-         AUaYGtQ8e0d8pXIUt5HNbORY9ZveNVUQLWDQwJLYmZ0QOuKtcwYDyKkLmErDTJ3vRvf8
-         +nA8K6PSi8pzquBWkZtqZ2t3ehNY5GVkNUgq5jVmlHL1lwzUkLIrpdQDyE7MCOCO6WMw
-         shxg==
-X-Gm-Message-State: AOJu0Yx36fAx5pyUgao56XOI4pTtgvNgZzsN/4s8nj/cCPeRNIJJ4TSc
-	Tbqvkx3lXvM4WAgxcms66OTvNhNoQxMH/oBV/t4QH9JXMUBQxl/GMtEbH92p4Qh4CNmAX1ati9r
-	lBZOPm21wqdd9CQfam4dyArLMfBmoIpA=
-X-Gm-Gg: ASbGncvMg9f2JZiUGdLwSVG73cdKc++X8LXJKdymwG+EqOTukt5x4EY1tQ/P/EbOC4P
-	AS/wQnYM2YPRfOEd6yz1vmsODU5y3+5xRgVTgBr+qr46i7ilO2kTfFFMSuU7OmKI+wf6cTh+pOU
-	8xzwNktEMgEeV0t+8uKzYDfMWJ4I2VdPf6AC00rilT5XdgDb7bmW+1fbVLEx1Uy1mtuFuF71XPH
-	65gthQMIpAO5XVdRjidr0OCbHPw47cBsQTZpY9S+IkrcD+m+UlSH0L7Nv6BQBHxBEyYmdZnXj1c
-	2TDn4Eg=
-X-Google-Smtp-Source: AGHT+IFFAlF4RCFfUjsd4DmDBBQogTcxh5jNqRI3S314lJm0TIqbMA3mxfj3C+NRPQw1DK95EH9ZqSz4/HeSfTTu9VM=
-X-Received: by 2002:a05:690e:1519:b0:63f:556b:5b7 with SMTP id
- 956f58d0204a3-641e75974d8mr10832505d50.15.1763370975601; Mon, 17 Nov 2025
- 01:16:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763371023; x=1763975823;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iiIZ091FZRo0EWuHbVoKq1pZLOP9KZWUy48AUIWb6p8=;
+        b=JWNPXRZ7/MVU4BdDIsL/dtpxBLbxKEp60gf2Vu/KnrSOKS/GOOxbfIYdHrd3e//NL+
+         dn3rF+zFYOP+3IVvwvY+X7ZOtcMuLy89NAVJ99KAunpuOIayCCnc64G7e2O/zZJhlW5o
+         4jrKrIZ73EfrzaHuTS6hDOacAeNfikdgLpsuiL9aI9k0dHX70wa5qdNNxBgi87nM/wGJ
+         KKz0nWCpulUkEJ+3qFSpusTnERkc3vjJGjbvXqorSVeYQOUuophfrgqDKOBWrqsgcGzR
+         7Ofa700WefZIif6tdVh7fGpoKI8Lvumic+7N97QHoJXj4Deq8c6LYOsOrfm996dlN7mJ
+         aRvg==
+X-Forwarded-Encrypted: i=1; AJvYcCVnjr0RHrU8C14+P6vA6DuVzcvjtfY1CRUpOjFWjvy6Sy8TqHJGqECHRIceR33+TxHEjhzdszY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyr1/GfMEUMx3gUpIMUYWd+UWQ0lGcEty/POJo0RPP2sjMtPQaj
+	sXE25hHvV7rsbwfSgC4GSlsN2q1R6i4hTcfQgqqUt/yI12pZY09tfQhHR8+Bl3f7wXnjAvdvL7T
+	LcXIjtJI8gDnbNYGt2b/gGgs3tEuiL63M0oSMngo=
+X-Gm-Gg: ASbGnct3EjPAZ2hag+gFZCv26leg46pDze5QpnoKZg1+eRr3Yyq9hY1F20UV8ptY4NU
+	u6a5BxX27s2KAF247FOHxvHO2L7Nu7ZERACOHqRRiW/ME0ESs4kxL2A5E0i+8L8Sm6Y6G9eo4bW
+	HQSs6D3fKWigyQJ1pgcqQYhRqjDQwXkpIFhojo5a7yaEBcw1GLwGZaITxB0iaKEDJI1uX3UvLOW
+	FE8zbXJOHyHjH/qQtjrSvxDbGJ1KKceQNFUApLDUiSGgwDaX3N36JEtpcM=
+X-Google-Smtp-Source: AGHT+IFbXxbspTn7RRSkJwsGwwbchGeFvqw2CByphSyDoz1rhDkuSZ8oa52gw6JxAFMqddWpgEUw04ayc/vDUzRmScE=
+X-Received: by 2002:a05:6e02:2501:b0:430:aea6:833f with SMTP id
+ e9e14a558f8ab-4348c8b63fdmr133865755ab.8.1763371023327; Mon, 17 Nov 2025
+ 01:17:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jiefeng <jiefeng.z.zhang@gmail.com>
-Date: Mon, 17 Nov 2025 17:16:04 +0800
-X-Gm-Features: AWmQ_bk9YWmMEQLFsH1VDRHw-ATqZ-Skc5eqWOUiPwK2AC4_m4qnimQ9Aabt-uc
-Message-ID: <CADEc0q4c_dG6UhfdSge21rSeJ9Q2pghWSCLGNauOAa_dr7NjeA@mail.gmail.com>
-Subject: [PATCH] net: atlantic: fix fragment overflow handling in RX path
-To: irusskikh@marvell.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, edumazet@google.com, 
-	linux-kernel@vger.kernel.org
+References: <20251116202717.1542829-1-edumazet@google.com> <20251116202717.1542829-4-edumazet@google.com>
+ <CAL+tcoD3-qtq4Kcmo9eb4mw6bdSYCCjxzNB3qov5LDYoe_gtkw@mail.gmail.com>
+ <CAL+tcoBpUg=ggf6nQpYeZyAcMbXobuJtyUdN98G1HpcuUqFZ+w@mail.gmail.com> <CANn89iJb8hLw7Mx1+Td_BK7gGm5guRaUe6zdhqRqtfdw_0gLzA@mail.gmail.com>
+In-Reply-To: <CANn89iJb8hLw7Mx1+Td_BK7gGm5guRaUe6zdhqRqtfdw_0gLzA@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 17 Nov 2025 17:16:26 +0800
+X-Gm-Features: AWmQ_bkeufONasDAQzphMBpMIqr8zCpLVF5ku_h3nTHR8iA8_BgCh39yirG0oAg
+Message-ID: <CAL+tcoBeEXmyugUrqxct9VuYrSErVDA61nZ1Y62w8-NSwgdxjw@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 3/3] net: use napi_skb_cache even in process context
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jiefeng Zhang <jiefeng.z.zhang@gmail.com>
-Date: Mon, 17 Nov 2025 16:17:37 +0800
-Subject: [PATCH]  net: atlantic: fix fragment overflow handling in RX path
+On Mon, Nov 17, 2025 at 4:57=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Mon, Nov 17, 2025 at 12:41=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
+l.com> wrote:
+> >
+> > On Mon, Nov 17, 2025 at 9:07=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
+> > >
+> > > On Mon, Nov 17, 2025 at 4:27=E2=80=AFAM Eric Dumazet <edumazet@google=
+.com> wrote:
+> > > >
+> > > > This is a followup of commit e20dfbad8aab ("net: fix napi_consume_s=
+kb()
+> > > > with alien skbs").
+> > > >
+> > > > Now the per-cpu napi_skb_cache is populated from TX completion path=
+,
+> > > > we can make use of this cache, especially for cpus not used
+> > > > from a driver NAPI poll (primary user of napi_cache).
+> > > >
+> > > > We can use the napi_skb_cache only if current context is not from h=
+ard irq.
+> > > >
+> > > > With this patch, I consistently reach 130 Mpps on my UDP tx stress =
+test
+> > > > and reduce SLUB spinlock contention to smaller values.
+> > > >
+> > > > Note there is still some SLUB contention for skb->head allocations.
+> > > >
+> > > > I had to tune /sys/kernel/slab/skbuff_small_head/cpu_partial
+> > > > and /sys/kernel/slab/skbuff_small_head/min_partial depending
+> > > > on the platform taxonomy.
+> > > >
+> > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > >
+> > > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+> > >
+> > > Thanks for working on this. Previously I was thinking about this as
+> > > well since it affects the hot path for xsk (please see
+> > > __xsk_generic_xmit()->xsk_build_skb()->sock_alloc_send_pskb()). But I
+> > > wasn't aware of the benefits between disabling irq and allocating
+> > > memory. AFAIK, I once removed an enabling/disabling irq pair and saw =
+a
+> > > minor improvement as this commit[1] says. Would you share your
+> > > invaluable experience with us in this case?
+> > >
+> > > In the meantime, I will do more rounds of experiments to see how they=
+ perform.
+> >
+> > Tested-by: Jason Xing <kerneljasonxing@gmail.com>
+> > Done! I managed to see an improvement. The pps number goes from
+> > 1,458,644 to 1,647,235 by running [2].
+> >
+> > But sadly the news is that the previous commit [3] leads to a huge
+> > decrease in af_xdp from 1,980,000 to 1,458,644. With commit [3]
+> > applied, I observed and found xdpsock always allocated the skb on cpu
+> > 0 but the napi poll triggered skb_attempt_defer_free() on another
+> > call[4], which affected the final results.
+> >
+> > [2]
+> > taskset -c 0 ./xdpsock -i enp2s0f1 -q 1 -t -S -s 64
+> >
+> > [3]
+> > commit e20dfbad8aab2b7c72571ae3c3e2e646d6b04cb7
+> > Author: Eric Dumazet <edumazet@google.com>
+> > Date:   Thu Nov 6 20:29:34 2025 +0000
+> >
+> >     net: fix napi_consume_skb() with alien skbs
+> >
+> >     There is a lack of NUMA awareness and more generally lack
+> >     of slab caches affinity on TX completion path.
+> >
+> > [4]
+> > @c[
+> >     skb_attempt_defer_free+1
+> >     ixgbe_clean_tx_irq+723
+> >     ixgbe_poll+119
+> >     __napi_poll+48
+> > , ksoftirqd/24]: 1964731
+> >
+> > @c[
+> >     kick_defer_list_purge+1
+> >     napi_consume_skb+333
+> >     ixgbe_clean_tx_irq+723
+> >     ixgbe_poll+119
+> > , 34, swapper/34]: 123779
+> >
+> > Thanks,
+> > Jason
+>
+> Hi Jason.
+>
+> It is a bit hard to guess without more details (cpu you are using),
+> and perhaps perf profiles.
 
-The atlantic driver can receive packets with more than
-MAX_SKB_FRAGS (17) fragments when handling large multi-descriptor packets.
-This causes an out-of-bounds write in skb_add_rx_frag_netmem() leading to
-kernel panic.
+Xdpsock only calculates the speed on the cpu where it sends packets.
+To put in more details, it will check if the packets are sent by
+inspecting the completion queue and then send another group of packets
+over and over again.
 
-The issue occurs because the driver doesn't check the total number of
-fragments before calling skb_add_rx_frag(). When a packet requires more
-than MAX_SKB_FRAGS fragments, the fragment index exceeds the array bounds.
+My test env is relatively old:
+[root@localhost ~]# lscpu
+Architecture:                x86_64
+  CPU op-mode(s):            32-bit, 64-bit
+  Address sizes:             46 bits physical, 48 bits virtual
+  Byte Order:                Little Endian
+CPU(s):                      48
+  On-line CPU(s) list:       0-47
+Vendor ID:                   GenuineIntel
+  BIOS Vendor ID:            Intel(R) Corporation
+  Model name:                Intel(R) Xeon(R) CPU E5-2670 v3 @ 2.30GHz
+    BIOS Model name:         Intel(R) Xeon(R) CPU E5-2670 v3 @ 2.30GHz
+ CPU @ 2.3GHz
+    BIOS CPU family:         179
+    CPU family:              6
+    Model:                   63
+    Thread(s) per core:      2
+    Core(s) per socket:      12
+    Socket(s):               2
+    Stepping:                2
+    CPU(s) scaling MHz:      84%
+    CPU max MHz:             3100.0000
+    CPU min MHz:             1200.0000
 
-Add a check in __aq_ring_rx_clean() to ensure the total number of fragments
-(including the initial header fragment and subsequent descriptor fragments)
-does not exceed MAX_SKB_FRAGS. If it does, drop the packet gracefully
-and increment the error counter.
+After that commit [3], the perf differs because of the interrupts
+jumping in the tx path frequently:
+-   98.72%     0.09%  xdpsock          libc.so.6          [.]
+__libc_sendto
+      =E2=96=92
+   - __libc_sendto
+                                                                    =E2=97=
+=86
+      - 98.28% entry_SYSCALL_64_after_hwframe
+                                                                    =E2=96=
+=92
+         - 98.19% do_syscall_64
+                                                                    =E2=96=
+=92
+            - 97.94% x64_sys_call
+                                                                    =E2=96=
+=92
+               - 97.91% __x64_sys_sendto
+                                                                    =E2=96=
+=92
+                  - 97.80% __sys_sendto
+                                                                    =E2=96=
+=92
+                     - 97.28% xsk_sendmsg
+                                                                    =E2=96=
+=92
+                        - 97.18% __xsk_sendmsg.constprop.0.isra.0
+                                                                    =E2=96=
+=92
+                           - 87.85% __xsk_generic_xmit
+                                                                    =E2=96=
+=92
+                              - 41.71% xsk_build_skb
+                                                                    =E2=96=
+=92
+                                 - 33.06% sock_alloc_send_pskb
+                                                                    =E2=96=
+=92
+                                    + 22.06% alloc_skb_with_frags
+                                                                    =E2=96=
+=92
+                                    + 7.61% skb_set_owner_w
+                                                                    =E2=96=
+=92
+                                    + 0.58%
+asm_sysvec_call_function_single
+                        =E2=96=92
+                                   1.66% skb_store_bits
+                                                                    =E2=96=
+=92
+                                   1.60% memcpy_orig
+                                                                    =E2=96=
+=92
+                                   0.69% xp_raw_get_data
+                                                                    =E2=96=
+=92
+                              - 32.56% __dev_direct_xmit
+                                                                    =E2=96=
+=92
+                                 + 15.62% 0xffffffffa064e5ac
+                                                                    =E2=96=
+=92
+                                 - 7.33% __local_bh_enable_ip
+                                                                    =E2=96=
+=92
+                                    + 6.18% do_softirq
+                                                                    =E2=96=
+=92
+                                    + 0.70%
+asm_sysvec_call_function_single
+                        =E2=96=92
+                                 + 5.78% validate_xmit_skb
+                                                                    =E2=96=
+=92
+                              - 6.08% asm_sysvec_call_function_single
+                                                                    =E2=96=
+=92
+                                 + sysvec_call_function_single
+                                                                    =E2=96=
+=92
+                              + 1.62% xp_raw_get_data
+                                                                    =E2=96=
+=92
+                           - 8.29% _raw_spin_lock
+                                                                    =E2=96=
+=92
+                              + 3.01% asm_sysvec_call_function_single
 
-Signed-off-by: Jiefeng Zhang <jiefeng.z.zhang@gmail.com>
----
- .../net/ethernet/aquantia/atlantic/aq_ring.c  | 26 ++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+Prior to that patch, I didn't see any interrupts coming in, so I
+assume the defer part caused the problem.
 
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
-b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
-index f21de0c21e52..51e0c6cc71d7 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
-@@ -538,6 +538,7 @@ static int __aq_ring_rx_clean(struct aq_ring_s
-*self, struct napi_struct *napi,
-  bool is_ptp_ring = aq_ptp_ring(self->aq_nic, self);
-  struct aq_ring_buff_s *buff_ = NULL;
-  struct sk_buff *skb = NULL;
-+ unsigned int frag_cnt = 0U;
-  unsigned int next_ = 0U;
-  unsigned int i = 0U;
-  u16 hdr_len;
-@@ -546,7 +547,6 @@ static int __aq_ring_rx_clean(struct aq_ring_s
-*self, struct napi_struct *napi,
-  continue;
+> In particular which cpu is the bottleneck ?
+>
+> 1) There is still the missing part about tuning NAPI_SKB_CACHE_SIZE /
+> NAPI_SKB_CACHE_BULK, I was hoping you could send the patch we
+> discussed earlier ?
 
-  if (!buff->is_eop) {
-- unsigned int frag_cnt = 0U;
-  buff_ = buff;
-  do {
-  bool is_rsc_completed = true;
-@@ -628,6 +628,30 @@ static int __aq_ring_rx_clean(struct aq_ring_s
-*self, struct napi_struct *napi,
-    aq_buf_vaddr(&buff->rxdata),
-    AQ_CFG_RX_HDR_SIZE);
+Sure thing :) I've done that part locally, thinking I will post it as
+long as the current series gets merged?
 
-+ /* Check if total fragments exceed MAX_SKB_FRAGS limit.
-+ * The total fragment count consists of:
-+ * - One fragment from the first buffer if (buff->len > hdr_len)
-+ * - frag_cnt fragments from subsequent descriptors
-+ * If the total exceeds MAX_SKB_FRAGS (17), we must drop the
-+ * packet to prevent an out-of-bounds write in skb_add_rx_frag().
-+ */
-+ if (unlikely(((buff->len - hdr_len) > 0 ? 1 : 0) + frag_cnt >
-MAX_SKB_FRAGS)) {
-+ /* Drop packet: fragment count exceeds kernel limit */
-+ if (!buff->is_eop) {
-+ buff_ = buff;
-+ do {
-+ next_ = buff_->next;
-+ buff_ = &self->buff_ring[next_];
-+ buff_->is_cleaned = 1;
-+ } while (!buff_->is_eop);
-+ }
-+ u64_stats_update_begin(&self->stats.rx.syncp);
-+ ++self->stats.rx.errors;
-+ u64_stats_update_end(&self->stats.rx.syncp);
-+ dev_kfree_skb_any(skb);
-+ continue;
-+ }
-+
-  memcpy(__skb_put(skb, hdr_len), aq_buf_vaddr(&buff->rxdata),
-         ALIGN(hdr_len, sizeof(long)));
+>
+> 2) I am also working on allowing batches of skbs for skb_attempt_defer_fr=
+ee().
+>
+> Another item I am working on is to let the qdisc being serviced
+> preferably not by the cpu performing TX completion,
+> I mentioned about making qdisc->running a sequence that we can latch
+> in __netif_schedule().
+> (Idea is to be able to not spin on qdisc spinlock from net_tx_action()
+> if another cpu was able to call qdisc_run())
 
--- 
-2.39.5
+Awesome work. Hope to see it very soon :)
+
+Thanks,
+Jason
 
