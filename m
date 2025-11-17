@@ -1,121 +1,84 @@
-Return-Path: <netdev+bounces-239221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC283C65F3B
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 20:26:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFB86C65FDA
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 20:38:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 701CC4E544C
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 19:22:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 9C7E229652
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 19:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 522282F2916;
-	Mon, 17 Nov 2025 19:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649E43126B3;
+	Mon, 17 Nov 2025 19:38:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SaZRkxyr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bKUUkUxp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D7F2D0638
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 19:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD29309F09;
+	Mon, 17 Nov 2025 19:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763407331; cv=none; b=qGKVvs6EicoKFprGP6q/G0VZBP6qPR88GrR+b7J0BOknIkwCB9GYwPJI0HV1LGS2PEyELrJ3KbNkEaAQgvu1macDEubSt6gMu46tfFAaR3N/RfDVnNEwY3Vk/1jjJbuFUXshM+qcZ8S0hSb5pb7I8UG2R/oAgyW/RT1nIYq0+NI=
+	t=1763408280; cv=none; b=May2N1R/bEppeo+jTotXe73kaF+6UvkQhDdcvPoALV8HX2MXOA41yQMwuYQfM9ssGuXPo+ttNC3MQzoTfpnih0rTazg0B+whvMqCn4ghDiFx3Bm/gEx1BapnlNiaPy9bnvYuCLgqtsXYhnmXrlS3+RTkexOy2YMvI8zGRvq1Bn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763407331; c=relaxed/simple;
-	bh=6OzAaa8iDws0lcwjqF+XKbYPhYhAfB1q4BqeCW3R5JQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ovBKYE1588kBX6ZIU73zhUobFzx9iKS1FU7CrlhX+wPmnXWn6bpDORBk2SL3SdzJk3TbAzZEu+XErM8IGtHBCQ5NskDf6GcHoq+gpEYfynh7QwP9yV//vwU5FO15NGMtZDJVZ/WhRV9SZmFtxqXCfpDQmDNliaRGkhYbZSEv/kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SaZRkxyr; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ebbf8915-1404-4d4f-9b5a-b2f3924ec43a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763407323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cbe+9JyBXKDiB3Lmr5harb1LuYhqhGndoF1DwtiK2Wc=;
-	b=SaZRkxyrfN0vRx6wzM50Jmklt08m7NIoAgk4YCVnJUPh9TNLat3ooxU+Jl+8namMz/jRw3
-	VJ4rLD9/6dbgiVBuDVc0/BOG/3GTs90YdonudQiN7Je433jZ8w0ce8ySzUU01ywS26P+JY
-	o6U7fvsAOJn7Qw7CkSk25glE4jkV04o=
-Date: Mon, 17 Nov 2025 11:21:57 -0800
+	s=arc-20240116; t=1763408280; c=relaxed/simple;
+	bh=BL6kQAxMiMA7Yro/dmHN9DlWSpOewGHyvVsJZYWLQ8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r0h1iwm+MqUc7QZh2R9n5hecv4TK+QgsaHAcgOhQVGumvalPapEdZ2WfbIBt5B7ExOtmh9WHjKlW0u5QbNnRMtnSsMit1XNoi0+FNnEgeXSkYPsffRJ3P9ykD2Gdm3/+DQPMkBrzfhQ3cujXarI2RrHXCOSq4TrO2oi3pO8xxMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bKUUkUxp; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=aLkH5EkqMFLrYkdoNe8fL9zWn0q42zqbxvQwbRLzdGE=; b=bKUUkUxpKAVE0Iau4lH7xH9i0F
+	n/qZXVcCgQM7UX0chIQxz72Izx66+8PYeCpSOYNM91rcs/72bC48R/wfzKwfmj2qCGHD10fE0X3e2
+	XUZTtZFQB529WnXPPaSwQFqWFVRd5c5G7+R0p6Z1T3U0NzAt5cv4FrJvsB/Nph0kZPbo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vL52j-00EH4o-6n; Mon, 17 Nov 2025 20:37:41 +0100
+Date: Mon, 17 Nov 2025 20:37:41 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Fabio Baltieri <fabio.baltieri@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] r8169: add support for RTL8127ATF
+Message-ID: <c6beb0d4-f65e-4181-80e6-212b0a938a15@lunn.ch>
+References: <20251117191657.4106-1-fabio.baltieri@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 bpf-next 4/4] bpf: Replace bpf memory allocator with
- kmalloc_nolock() in local storage
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Amery Hung <ameryhung@gmail.com>, bpf <bpf@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@kernel.org>,
- Kumar Kartikeya Dwivedi <memxor@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, Song Liu <song@kernel.org>,
- Kernel Team <kernel-team@meta.com>
-References: <20251114201329.3275875-1-ameryhung@gmail.com>
- <20251114201329.3275875-5-ameryhung@gmail.com>
- <CAADnVQJD0xLa=bWUerdYsRg8R4S54yqnPnuwkHWL1R663U3Xcg@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAADnVQJD0xLa=bWUerdYsRg8R4S54yqnPnuwkHWL1R663U3Xcg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251117191657.4106-1-fabio.baltieri@gmail.com>
 
-On 11/14/25 6:01 PM, Alexei Starovoitov wrote:
-> On Fri, Nov 14, 2025 at 12:13 PM Amery Hung <ameryhung@gmail.com> wrote:
->>
->>
->> -       if (smap->bpf_ma) {
->> +       if (smap->use_kmalloc_nolock) {
->>                  rcu_barrier_tasks_trace();
->> -               if (!rcu_trace_implies_rcu_gp())
->> -                       rcu_barrier();
->> -               bpf_mem_alloc_destroy(&smap->selem_ma);
->> -               bpf_mem_alloc_destroy(&smap->storage_ma);
->> +               rcu_barrier();
-> 
-> Why unconditional rcu_barrier() ?
-> It's implied in rcu_barrier_tasks_trace().
-> What am I missing?
+> +	if (tp->fiber_mode) {
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_100baseT_Full_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_2500baseT_Full_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_5000baseT_Full_BIT);
 
-Amery probably can confirm. I think the bpf_obj_free_fields() may only need to
-wait for a rcu gp without going through a rcu_tasks_trace gp and the tasks_trace
-cb, so it needs to ensure all rcu callbacks has finished.
+An SFP module can support baseT modes, if the SFP module has a PHY
+inside it. But it could also be it is a fibre module with a laser and
+so uses 100baseFX, 1000baseX, 2500BaseX, etc.
 
-@@ -247,18 +231,11 @@ void bpf_selem_free(struct bpf_local_storage_elem *selem,
-  	}
-  
-  	if (reuse_now) {
--		/* reuse_now == true only happens when the storage owner
--		 * (e.g. task_struct) is being destructed or the map itself
--		 * is being destructed (ie map_free). In both cases,
--		 * no bpf prog can have a hold on the selem. It is
--		 * safe to unpin the uptrs and free the selem now.
--		 */
--		bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
--		/* Instead of using the vanilla call_rcu(),
--		 * bpf_mem_cache_free will be able to reuse selem
--		 * immediately.
-+		/*
-+		 * While it is okay to call bpf_obj_free_fields() that unpins uptr when
-+		 * reuse_now == true, keep it in bpf_selem_free_rcu() for simplicity.
-  		 */
--		bpf_mem_cache_free(&smap->selem_ma, selem);
-+		call_rcu(&selem->rcu, bpf_selem_free_rcu);
-  		return;
-  	}
+To do this properly, you need to be able to read the SFP EERPOMs
+content, to know what sort of SFP module you have plugged in. Then you
+can list the correct modes.
 
-
-Others lgtm also,
-
-Reviewed-by: Martin KaFai Lau <martin.lau@kernel.org>
+	Andrew
 
