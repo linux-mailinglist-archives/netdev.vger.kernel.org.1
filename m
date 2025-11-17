@@ -1,228 +1,409 @@
-Return-Path: <netdev+bounces-239251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36AC9C66444
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 22:22:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4488C66441
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 22:21:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D608C4EDB86
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 21:21:29 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3A28F35C13F
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 21:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE573233E3;
-	Mon, 17 Nov 2025 21:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5A5322A29;
+	Mon, 17 Nov 2025 21:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ltAZi8C1"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="t6giJ5Ge"
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010039.outbound.protection.outlook.com [52.101.46.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B87D2322537
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 21:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.39
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763414479; cv=fail; b=K/nDYvwE0+C5UOr7zTHJzJvFRyBVHtfLjc3fh9Fz4JJWKK6abpwpTr7yPsDhCZl5WnUU6Wp5w6oKqTBUZ6f22MTObMAEohdk6ExTOQ5iEPMHb8o5AlLhalQ7NEt6O/Nk6Httdae51aMtrthwNF+I9bR7fdMwCU5fPrLzH/7sr4U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763414479; c=relaxed/simple;
-	bh=TPh3Euwtk6s/rQvJ7/UfVRQkhygJq2urTKrFWt7DyZo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=oPIWf0y83DlpJXrntyPTtwLajk+2ZbUJ0CdQW+aXlL01XJlogNlCdtsNiJhxS+SCNhPiZcXBN7bV9YR14CMibox2qRjfd3do1CcGZtHQ4Mi9+PzfnVJI8EF9gLXgZUrS9Wu2RbUccxkGmmGBNJYJDo4DjCLOUMjFYyTOD42DgFk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ltAZi8C1; arc=fail smtp.client-ip=52.101.46.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rLhIU/S1Fmrvc5nOst4bqYiow42IlIoCJW+qAdXh1QBtWHRUPAwJERg8AiYSr692ufzzJJtMceex+QBuy+MettJ8wfuflJdl9m5VUMb7zQw/JVgCM3xQyw6BLyR7/xnjD028raM13SWiryV/QZmrkjbvS05V76r6nuRju2Fve7iJRJ0p8lwsJcGMlhqt7B+0mYqCY2TvnEDMwIGPQjmRQO/CsPhU0fk/ktaheCL0Ww2IxBzSiG3S8oMd7VFYcwX1OnBiLyRN4IrD5UymoF4Emwld/ApPrq87nhVdvOjoB6oNdnPricSHAtWiYciVzWYOxFQ+nLsElqJ2IOQFFW8gCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MjzajBb4oNFdh1orYfRxmbOZ8blXH04i9Hxt7yAUNcs=;
- b=v+732PB62mZK1SahIOZk65919BSi5CEFJRMxq4Y08ak4EnVPNOmv5R6trye/yz8/3nyioChgjwjjhRW/vZ/gyp0ZO+mUbbLgbQHwnhKgwZgx5IPJEmE8497Q4RGaYbHmdXKTUdQDSQTHpFxLs8XplxFfj2NSAi5MxSPStRCGr0RRk/gyGKiP03Gqxv/ODLQus5CkVxu5Eks3JxC40hr1f/XrDZA/VgbM08Dpj+zcRI6qSeRtPUFnHhqWWU8y0wFvu4qAfFjuaX6HKPSQicAJls4s4fnMpm1tE2FCYGBFmqaYD90putJ4UNqA06btbX0K1WoS7mxrmuphsLTH+o7phw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MjzajBb4oNFdh1orYfRxmbOZ8blXH04i9Hxt7yAUNcs=;
- b=ltAZi8C1JKy2C/We+XrCTzDsHB2AcxYtiAnAoRo7yI+jSoaVGFS2WWhTY50fy1/vdjg0U2wlEc+jVgDgEefUEccCDYZ0tIMnNUU+s6n/+SgluBXjLd0yH3WbnMUM3mrZJG6HT2BN1larlz6yBbgokafDp6W0Qi5C9TZFG3uZyhriDkOx/m7jmTGC113vupUbGv9J3goXzIp9AMPRykrli9iG6qz6eYn5aRWHwOWisQzrcPXscsyB5WK3ScBQBgdZeLzgeUUMYBWGYkg+42LvnWX7X4NP5hm5DVy+/jgbOXTgWVMpA33eqYiWkt4xyB+690yYxq4G2A2mU4R8FguvPQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MW4PR12MB7309.namprd12.prod.outlook.com (2603:10b6:303:22f::17)
- by CH3PR12MB8972.namprd12.prod.outlook.com (2603:10b6:610:169::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.22; Mon, 17 Nov
- 2025 21:21:11 +0000
-Received: from MW4PR12MB7309.namprd12.prod.outlook.com
- ([fe80::ea00:2082:ce2d:74c]) by MW4PR12MB7309.namprd12.prod.outlook.com
- ([fe80::ea00:2082:ce2d:74c%5]) with mapi id 15.20.9320.021; Mon, 17 Nov 2025
- 21:21:11 +0000
-Message-ID: <8b4325db-4237-46fb-aa54-bda65168f016@nvidia.com>
-Date: Mon, 17 Nov 2025 15:21:08 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 05/12] virtio_net: Query and set flow filter
- caps
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
- pabeni@redhat.com, virtualization@lists.linux.dev, parav@nvidia.com,
- shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
- eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com, jgg@ziepe.ca,
- kevin.tian@intel.com, kuba@kernel.org, andrew+netdev@lunn.ch,
- edumazet@google.com
-References: <20251112193435.2096-2-danielj@nvidia.com>
- <20251112193435.2096-6-danielj@nvidia.com>
- <aRtYgplAuUnCxj2U@horms.kernel.org>
- <0483aaba-0b93-41d7-bf09-5430b5520395@nvidia.com>
- <aRuRGD-d7kImAKb3@horms.kernel.org>
-Content-Language: en-US
-From: Dan Jurgens <danielj@nvidia.com>
-In-Reply-To: <aRuRGD-d7kImAKb3@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR13CA0022.namprd13.prod.outlook.com
- (2603:10b6:806:21::27) To MW4PR12MB7309.namprd12.prod.outlook.com
- (2603:10b6:303:22f::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E472D3237
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 21:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763414494; cv=none; b=A3KzFpUNFnZpoEqeuk4drzUxFKFrIqVun2mjoPOW64m3ySaZAoCXLtv6b8lN13uV2zEzmxxsojaBwvX8RXe3NXqz4c0KcYshmoBay5d2SahkW3Mo0eW1DJpc/rhxcWd++2fSqCQk0znKhZw/vy7cMz1Nwg1GnekM4aGUp2yCUKk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763414494; c=relaxed/simple;
+	bh=FYaGwZEmtC/XpMZDljsOIBgE/U0kJlNbPcFwZxP1z0U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RgFtd8hEegVuFUxQgA8RfLoSMziXfRMdlz3uYwT1vmCNoP8jLJziUXWZEEigVCCxlfdAUkvnS4GwQTK6iG1n4JNwB2xRFudI9NzeCV/Fa6DQVLRYP5ieslD8vrvdjWIVm61ek01/WKN/GZ4IQV+cJaPGB9UR+1cSRguG2fpyZK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=t6giJ5Ge; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3437ea05540so4493453a91.0
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 13:21:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1763414492; x=1764019292; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NV2J8xbVL3KhSXmpiKGmph7hscHeFTDaYlZXtNZbovI=;
+        b=t6giJ5GeKpQVPSXFgtJ3XonUqOlE6Fifhrjtnjf9j+3UbjCiI42xvAwQ71tiXCIG7t
+         2IJsqCvkejj84jdlvY6ITGf9XC5Mf+LeWSjAlsRl41U1R4fCw5eeqMsRMjhk9VIh2RUf
+         W459g+0oVwoDJeMQ3xuL6MjYu93huuDDIl4f5mwyT0tI1g2TMViZgAVxAjz7VA1A8QAB
+         Z6KVp38ocDPGwXlg52gbWaZl2/NWTpTLK8sdx22gbBXFKjqOw8ixe8vDtO4yt+slbGQ2
+         LSNu7U4jhjAO0Qk8uKKEXLFlyblBBHBCpbhPPTJfwIcI5RmCVF4PK2Rh7NpcLuIZHpkr
+         8LNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763414492; x=1764019292;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=NV2J8xbVL3KhSXmpiKGmph7hscHeFTDaYlZXtNZbovI=;
+        b=Cybir2goVApqMEYfuhhK1+Km0j8gCPJXtqVB73LDlvNryGouEGTcWj4t67yHonbOyL
+         dS+H4DE4Mg4BAboGORxVFIy/0Vy2aS0ODV6T2BO7sQGkBuhVMbFipwAVbbfRIge6NhvW
+         D4nhqaG9vTCxDJ/31hTI6/dpkmO5UxSpUexoCcK2NsnRnkO1DGGvSEJot4Vams7pfBf4
+         JuvxjwPrLEgb4+6xJjubbvAjyCa2MRpOPjWqhACDZaSDRBk/nuWWHUxKPAgCFUTh8BYh
+         nL3MWzHq1cql6EOt2hiWDcEiTXRkdlRmvvtzz8dxUl/UXhlxVKAYikrZ6v2lwQQgHyMM
+         N2Pg==
+X-Forwarded-Encrypted: i=1; AJvYcCVN/2/zb2ZrBqYClCpcs6m90cAK1sDCit0/QE0iBuG/ObrBSga53hrf0NLU+qN9wSR3ADUAmXc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWS3A9eLz9p8VAEkv/b4dnakbnQ5Sfi1aY7HrmdPjulmy5RAwv
+	53MZslerqaM3GrjrR9zPgiN1fLBY5rGtJ7wdfnvWklFM5EXP8fwIfEgG3dKsppsTrMysssgXgxc
+	4RRWyPZSmmewhBCeL2v9xOLRa59A4j9Hicpdu+kWC
+X-Gm-Gg: ASbGnct0vDPTWb23wZzylqJx0OK3zNfsHikw8LXQFbbnN4+sGvZB8IseupZD6ELcVDw
+	1hQiW3vulxgdm/EU5d3op/w/GWrAJ8UKKaZRylSg7ASRApL+JZDhzNZeOibXWPzGvAT6elJJtkn
+	ywrGNFnwue/FPfVSxJiZPPUZT2aNFo4L5MkKvMF/a+YppXM1wq14yItmooBfAnD3MyCk2zDf8/C
+	dTpdZBTjtSJjItCsua1le+87LPYrKftn/M8SIWqhizS4qrZY1wtXZzlBifHZkF6HeJZ0vZWXqoc
+	hw4=
+X-Google-Smtp-Source: AGHT+IFUfMaSyaowLULeNAnsLI2I8x9lh/KtvEqapayfV7WqjvUPcXjR3us2nieOcO5vWHxznXxtjF9itw+vHemjZAc=
+X-Received: by 2002:a17:90b:2dc6:b0:343:eb40:8e01 with SMTP id
+ 98e67ed59e1d1-343fa63dc9cmr15298969a91.27.1763414492170; Mon, 17 Nov 2025
+ 13:21:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR12MB7309:EE_|CH3PR12MB8972:EE_
-X-MS-Office365-Filtering-Correlation-Id: ab51a2b2-199a-4d68-3c43-08de261f3afd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Uk5RUEQzSHIwcEQzOVQ2V3JYcXVYci9oZEdOckhTeTAzUUs1Y1owZWd6bFln?=
- =?utf-8?B?WGRpK2hSbzFDcWdSNlJqY3I5bnF2TXhLRjlXaVlSU3V5Y2s4SDlxRFdMVnht?=
- =?utf-8?B?cEpreUxyZERTL1BZLzVUaFFuMVRsTlo1L252d1VPU3hCL2xVZDRuTzZUeWV1?=
- =?utf-8?B?M1pBUUpLZzYwNUQ1RU5yRWJFVDBJelRYZTg3MndWcCtmcVlJQTRxeXdOSlZU?=
- =?utf-8?B?TUFvalBRamovVzgwVitidEZ2clZsZ005RFRiVVphUzN2SDZwVVVPc0pMdCt4?=
- =?utf-8?B?UTduUXFucWVvWFFBTDFFQmRKV0VEbGlyVWVNZTA4SnN3K1lSVU9hK2FVUkNo?=
- =?utf-8?B?cktvelhDN2pkWFA5cUxiWlBJVjl0Y0xTS3FleEo2UmUvTVhaZXVZcE5Kek1h?=
- =?utf-8?B?ckxsdUc5U1Q0dG1pRHpkd2lsZ3dtQW1pVzdsbGs1ZWtMM2h1MDJZN3BqeExq?=
- =?utf-8?B?MTc2OEd3TUhFU2tQenlzMUhVdmZTVThubGtoVHJndjF0K3BTblY4YVkxcmNM?=
- =?utf-8?B?eEhjS3l4MzRQMWxkY0FEaVRITGZvRCtjalNkWkVCcytRYWRtL3BDbXFUb0dR?=
- =?utf-8?B?UUZEeXFnQUFVSk5uWm9tci82a2lWT3dhd0NsNElTK3hjVnVPWk9ldlUvRDFC?=
- =?utf-8?B?bWlhZzJPVnJvbEEvNFJnQmNSRU5Fa3VGQ0wrQ2xGN1o1RXhudzZHMGRuRmw4?=
- =?utf-8?B?Nm9TVklOdnVZTWdYZ3A5Mmo3dkl3RUZodVh1YkorOE1wNDc4WUhmTytWMVBr?=
- =?utf-8?B?Nm9Tb0IyRFJzUk8zbVYxRy9SK3ZRVUJNcG8xdS82eDhpcGtZMjZjWnUraXBu?=
- =?utf-8?B?bC8wYzNkSVVGS3J5V1pNangvcllla285aTFKNmJQWkt1YWRrSHg4dHoyNGxH?=
- =?utf-8?B?ajBXY3p5L2NhMWFub3FtZUM2Vkx1OHhscHJDRm5XWUNOVHpLbXlyWnBlR3Ey?=
- =?utf-8?B?YWVWa3FSdVZqOGN3OVh6ZHpnc3REenFRSWFiMDdsTm02MjFsdHJzd0lyWXNq?=
- =?utf-8?B?c0JpR0RsbkU3ZTRnMjV4VUxFazljVDQ2ekJnV203cUpZMS9WNXoxNVR3OVNV?=
- =?utf-8?B?VVVmL2tCb2kvYnVFWFQrRGk4MkZORDZEKzF2NlRNc21majQ4Q0ZocmgvS2ZG?=
- =?utf-8?B?QXNEbm1VWkN4OTlZVkRCbFdZd21KMFF3ZFZaVHFoZWY0WlNEL05sR2hhK0Q1?=
- =?utf-8?B?a25nT1pUUUE3QVMzMEdRbWt4aStRVjV2QlRKVzBQNEROeGRobHFwaWxkd0pt?=
- =?utf-8?B?cGk4WE50QUlUeWRsRWcraFBvaXFwVUlkaEpHZ0g5Qkgra1lvd2dYSHdvL0lt?=
- =?utf-8?B?akdFSW44aWlva3VHMnJHYURVdzJ6OUZwQXM3VTF5eHNLckVKZzVERmRxREY2?=
- =?utf-8?B?UHB2Sm5GelY2L1pIUFFpRDJUM290eERqRmloeDBybVVpMmcvc01maEw5bE9W?=
- =?utf-8?B?NEZhbXBwOXJSVWpQdHEzZUF0N0lObTl0dzBJS1c4VXUvMnNwbS9jT0JsOVha?=
- =?utf-8?B?ZEhxNCtLdjk0bFhCOXQrWHhRV1hiMXUyZ0JpeUkvd3ZlbHBkQ05kSFpVZmZi?=
- =?utf-8?B?QmROTTcvUjh4L3BXVTYvYVgzSGU1R0hjQ2pNZXZteUtlM01wbHliMFBUZ1I3?=
- =?utf-8?B?ZEQ1NXZoQm84TWF4SWtWZVEvdDhPU2k1Slp6bC9BOXRIMlJIQWJrbFRnV0pX?=
- =?utf-8?B?TnpTUFhBOHhWZWQxTGpvd3dOMTk3enJsSGs4M2FzVkpFbjBQK3VLUGNwK3BZ?=
- =?utf-8?B?Z1c0TjhnMzIrdHkzUFUxQVNWVFlwWE85dEVYcXhBajBZSVlibjh5RE53cGRa?=
- =?utf-8?B?azYzaGwySExtRUdtWVJ6VnlQb3E1Qis0dFl0Qmx5K3dscW5ZRWFRVnRsQmtM?=
- =?utf-8?B?M2dTRS9abTEzSGVndTVRM3FYMXhxVHIycmY5Wlk3b05RM3Q1TFBaVm9kVWk1?=
- =?utf-8?B?QmRKNmlCaE5hL1ZlTjZ0YW5HRGZSYlBlZzZTTTNWS010WW90T0ZZV21BUzdp?=
- =?utf-8?B?YmgyZCtsUHFRPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?akM4Q3YyVkk2cUhzbXdCM09wT0oybjZnM0ZKaXU1QUNYNU45MXd4V3g3c0tC?=
- =?utf-8?B?NllpdXlTWFRpMzFPdS85WlRreXJyQ1ZlOHhubDJQYnhVOG8reVRTdmpaMnpF?=
- =?utf-8?B?Ymh2dmdjZy8vS2VZb2RYL1FqdHozdzdtNTQ0MEM2Ump5cDFWb0ZqL1FTdHJC?=
- =?utf-8?B?WGl5NmZKb1RrbHA3SWk2V2N4SUdBQ3BOV1YwQVdtcFRtbUNNamNMalhjM2JH?=
- =?utf-8?B?Vm1qeU43SzBjUTcrbHNvWTNNaUJXblordFhrbWFSeUxYakptU2pnTVdCVStE?=
- =?utf-8?B?T3draXBqZHVqeDlxME9xOXpVMWxWMUhXcDZSRVZyZE1JRkdEVG1jZE5zaGVo?=
- =?utf-8?B?QlU5bnF6NktybUdnZTRyNVgvZGl5T3pGUUFuSEVsRWpCUEJmNCtXSkNFWUwx?=
- =?utf-8?B?d3NHMnhsWXZ0OFBhU1pPV3QvNEZyVjdzYXhoNUFmZGgxTlE5aWxvbzFPOVJO?=
- =?utf-8?B?Wm9ZeWZ1Q0c5dEZZayt1amRiM3Yyd1pVTlZqM2plNjNCU3IxVXZlbThncHpO?=
- =?utf-8?B?UzZTcXo3T0VLQXRBK05hTHZuVCtuelFTZjVQSXl6YkdrYmd3WVdIYTUwN2ZL?=
- =?utf-8?B?QlVYcDcrSnY0QmFRallCenJxLzJOd3lLZDVXbENrVGpCZWpObVZrRWJvQWps?=
- =?utf-8?B?TEwzV0tNWm96VS9FVHpEbDVKUzBrOXRWa1F2SVNKMXBFYVFqZE1QQnYvUVNJ?=
- =?utf-8?B?Vjl6YVVKZkozdUI3eHIySXJrTVRaZi9uc0hPRHQwQTVqL2FYMWFFWUtNODh4?=
- =?utf-8?B?VUJWZHFsWFhqbEdFek1EVk93TWpQNk16ejhGZW5wKzkwb09RWkJyaDJxVGVy?=
- =?utf-8?B?c0s5bVJsOWdnVFd5OGZBQkwzSDNOaGxsRkw0TFJHaUtUYmZxTlJUWS9yODcy?=
- =?utf-8?B?NXRxVXBXUVY4ckhDa0MwYnRGZFFRNGpwNXhCOC9VdCtmVTlWNy9hcnRVVkVn?=
- =?utf-8?B?ZmpMUXhNYXppdmg2b0hmUFlrV2d0MlFDSnZvVDN1UTdLTTZUSVBkemcrRSti?=
- =?utf-8?B?SjUzT0haRzBUMnhOQWxNamN2NjczNEJTMzNMR1J0S1l6ZHFlMDJNeWNLbHh4?=
- =?utf-8?B?ekRDT0RMbXNWcDVPcDgvbWtoQ1dKWFhnMThZQzJEZktTV0czM293aGIwdFQv?=
- =?utf-8?B?Rm5GeFFIN0Q5bUhRTE5pb3ZxUkVVQ252VWRxVFREaTV5a1AzN1NLZTBTNXV5?=
- =?utf-8?B?NFUzZS8yL2xJMHI3YVlERUxlbERBdERkYitaQmVqdTNNZXJtblQyVEJMdUFV?=
- =?utf-8?B?b25QRlkyby8zSGlIMVR2QmpCeWk2OEtnT0lLaWU4TTFWNm1HMUVlSmNHcmIv?=
- =?utf-8?B?K25yYU5YUVU5NDg4N1JKVmNIWTF1NlJVMVRzTFh3cTZGSHNiWjFPV0d6MjAy?=
- =?utf-8?B?aDFPTGV1Q1lHNXJhZW5ZcWdJcTYzVTVva01wRXlLY0Y5eGxpakd5Zys5M01n?=
- =?utf-8?B?eFpyTkNtbUJpQWpiUW5SRU1CSFg1YW5oN2J3RnhEREt2Q1NjSGt3bjNXSjkw?=
- =?utf-8?B?czRzelVscHp2RndMejFoMGp3ZVN3MmkzZm9oS2Z2L0xoMkhMQ3Rnd0o2dDhh?=
- =?utf-8?B?TkNPMWxFZnVMWTIwTnJ2TVZmbnB0SEFSbjV5K3NCV1psRzFNeWx5UWFlTGI1?=
- =?utf-8?B?UG43S00zMHowVk4ySU1tR2RYcTZNWDNhZ1A5WWdONmtvdXhsckMxbTZ5blRQ?=
- =?utf-8?B?WDB6NmU4UWMzZng5ZTNsNkJNU1JuTVZqMEtKNHgvUmNBcmJRcnhvR2tCZEhi?=
- =?utf-8?B?Y0RSV0p0YjZpMFRLY3ZFeFpvKzkrT3FsMjR5ZWJ1OS8xaFYwTHdPTTc5SzRu?=
- =?utf-8?B?cm4xZC83K3U5SHN4RG45NklBRGppd1lWWHNCQjc1Y0k3N3poNi91bXZvSnZ0?=
- =?utf-8?B?RCt5UWhZWHZFQmdpb21XRnJ4UmxXUG42bXpwMTJxcmJEQmIvZ0E1Q0lmYitn?=
- =?utf-8?B?MDBpcEJ1NTVKelhhRm5IT1Z4TlF6RmdlUzFaZWYxNFpNTlhlTW5TeUR0WUlR?=
- =?utf-8?B?REl4MFhQNStnOE5xWE5LRVJUUWhHUFNYMGdsZ1hBSzEwMHM4bDJyRWpPQ0Rx?=
- =?utf-8?B?WmZZaUVhelFFT2FJWTNtN1NyYVlndG9zYVFZU2RFRWNnMCtZZmFpMS9HMFFv?=
- =?utf-8?Q?qg7oFrwSVcvGjq/+a2N15//pa?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ab51a2b2-199a-4d68-3c43-08de261f3afd
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2025 21:21:11.1196
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ckLvX684mudJ4AnhHSht/kd+a25uY3OWViROG9JmOPBMY/7HcQ7LPFhQOxiaghlE4P5fSquPPCj6soMyoRHbeQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8972
+References: <20251109161215.2574081-1-edumazet@google.com> <176291340626.3636068.18318642966807737508.git-patchwork-notify@kernel.org>
+ <CAM0EoMkSBrbCxdai6Hn=aaeReqRpAcrZ4mA7J+t6dSEe8aM_dQ@mail.gmail.com>
+ <CAM0EoMkw11Usx6N2JJDqCoFdBUhLcQ0FYQqMzaSKpnWo1u19Vg@mail.gmail.com>
+ <CANn89iJ95S3ia=G7uJb-jGnnaJiQcMVHGEpnKMWc=QZh5tUS=w@mail.gmail.com>
+ <CAM0EoMmPV8U3oNyf3D2F_RGzJgZQiMRBPq1ytokSLo6PcwFJpA@mail.gmail.com>
+ <CANn89iJdK4e-5PCC3fzrC0=7NJm8yXZYcrMckS9oE1sZNmzPPw@mail.gmail.com>
+ <CAM0EoMkw6mKtk-=bRQtjWsTphJHNJ0j4Dk1beYS181c5SHZv4Q@mail.gmail.com>
+ <CAM0EoMm37h3Puh=vFxWqh1jFR3ByctOXiK86d=MjUMiQLB-z0Q@mail.gmail.com>
+ <CANn89iKv7QcSqUjSVDSuZgn+tobBdaH8tszirY8nYm2C0Mk4UQ@mail.gmail.com>
+ <CAM0EoMkD1QTJjrtZH3w4vG0Q_MFVA2Daqs5nbuT6GAbT-2XUhQ@mail.gmail.com> <CANn89iKD725z-AAWjUxB4F5U1nM_3fB37mLx8nNojCHEHb9B6g@mail.gmail.com>
+In-Reply-To: <CANn89iKD725z-AAWjUxB4F5U1nM_3fB37mLx8nNojCHEHb9B6g@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 17 Nov 2025 16:21:21 -0500
+X-Gm-Features: AWmQ_bnhhZ-avkmNQVM8-lQLg81XhEowdrxIF7rm1-Yi4ukHtR1B_G6yHMQ8Zk4
+Message-ID: <CAM0EoMk6CWor=djYMCj4hV+cAA52TFb7yh7RNLMHTiQjEjwEOw@mail.gmail.com>
+Subject: Re: [PATCH net] net_sched: limit try_bulk_dequeue_skb() batches
+To: Eric Dumazet <edumazet@google.com>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, horms@kernel.org, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, kuniyu@google.com, 
+	willemb@google.com, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	hawk@kernel.org, patchwork-bot+netdevbpf@kernel.org, toke@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/17/25 3:18 PM, Simon Horman wrote:
-> On Mon, Nov 17, 2025 at 11:49:54AM -0600, Dan Jurgens wrote:
->> On 11/17/25 11:16 AM, Simon Horman wrote:
->>> On Wed, Nov 12, 2025 at 01:34:28PM -0600, Daniel Jurgens wrote:
-> 
-> ...
-> 
->>>> +	for (i = 0; i < ff->ff_mask->count; i++) {
->>>> +		if (sel->length > MAX_SEL_LEN) {
->>>> +			err = -EINVAL;
->>>> +			goto err_ff_action;
->>>> +		}
->>>> +		real_ff_mask_size += sizeof(struct virtio_net_ff_selector) + sel->length;
->>>> +		sel = (void *)sel + sizeof(*sel) + sel->length;
->>>> +	}
->>>
->>> Hi Daniel,
->>>
->>> I'm not sure that the bounds checking in the loop above is adequate.
->>> For example, if ff->ff_mask->count is larger than expected.
->>> Or sel->length returns MAX_SEL_LEN each time then it seems
->>> than sel could overrun the space allocated for ff->ff_mask.
->>>
->>> Flagged by Claude Code with https://github.com/masoncl/review-prompts/
->>>
->>
->> I can also bound the loop by VIRTIO_NET_FF_MASK_TYPE_MAX. I'll also
->> address your comments about classifier and rules limits on patch 7 here,
->> by checking the rules and classifier limits are > 0.
-> 
-> Thanks.
-> 
-> I think that even if the loop is bounded there is still (a much smaller)
-> scope for an overflow. This is because selectors isn't large enough for
-> VIRTIO_NET_FF_MASK_TYPE_MAX entries if all of them have length ==
-> MAX_SEL_LEN.
-> 
->>
->> I'll wait to push a new version until I hear back from Michael about the
->> threading comment he made on the cover letter.
->>
+Hi Eric,
+Sorry - was distracted.
 
-I actually moved the if (real_ff_mask_size > ff_mask_size) check into
-the loop, before updating the selector pointer.
+On Fri, Nov 14, 2025 at 1:52=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Fri, Nov 14, 2025 at 9:13=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
+> >
+> > On Fri, Nov 14, 2025 at 11:36=E2=80=AFAM Eric Dumazet <edumazet@google.=
+com> wrote:
+> > >
+> > > On Fri, Nov 14, 2025 at 8:28=E2=80=AFAM Jamal Hadi Salim <jhs@mojatat=
+u.com> wrote:
+> > > >
+> > > > On Thu, Nov 13, 2025 at 1:55=E2=80=AFPM Jamal Hadi Salim <jhs@mojat=
+atu.com> wrote:
+> > > > >
+> > > > > On Thu, Nov 13, 2025 at 1:36=E2=80=AFPM Eric Dumazet <edumazet@go=
+ogle.com> wrote:
+> > > > > >
+> > > > > > On Thu, Nov 13, 2025 at 10:30=E2=80=AFAM Jamal Hadi Salim <jhs@=
+mojatatu.com> wrote:
+> > > > > > >
+> > > > > > > On Thu, Nov 13, 2025 at 1:08=E2=80=AFPM Eric Dumazet <edumaze=
+t@google.com> wrote:
+> > > > > > > >
+> > > > > > > > On Thu, Nov 13, 2025 at 9:53=E2=80=AFAM Jamal Hadi Salim <j=
+hs@mojatatu.com> wrote:
+> > > > > > > > >
+> > > > > > > > > [..]
+> > > > > > > > > Eric,
+> > > > > > > > >
+> > > > > > > > > So you are correct that requeues exist even before your c=
+hanges to
+> > > > > > > > > speed up the tx path - two machines one with 6.5 and anot=
+her with 6.8
+> > > > > > > > > variant exhibit this phenoma with very low traffic... whi=
+ch got me a
+> > > > > > > > > little curious.
+> > > > > > > > > My initial thought was perhaps it was related to mq/fqcod=
+el combo but
+> > > > > > > > > a short run shows requeues occur on a couple of other qdi=
+scs (ex prio)
+> > > > > > > > > and mq children (e.g., pfifo), which rules out fq codel a=
+s a
+> > > > > > > > > contributor to the requeues.
+> > > > > > > > > Example, this NUC i am typing on right now, after changin=
+g the root qdisc:
+> > > > > > > > >
+> > > > > > > > > --
+> > > > > > > > > $ uname -r
+> > > > > > > > > 6.8.0-87-generic
+> > > > > > > > > $
+> > > > > > > > > qdisc prio 8004: dev eno1 root refcnt 5 bands 8 priomap 1=
+ 2 2 2 1 2 0
+> > > > > > > > > 0 1 1 1 1 1 1 1 1
+> > > > > > > > >  Sent 360948039 bytes 1015807 pkt (dropped 0, overlimits =
+0 requeues 1528)
+> > > > > > > > >  backlog 0b 0p requeues 1528
+> > > > > > > > > ---
+> > > > > > > > >
+> > > > > > > > > and 20-30  seconds later:
+> > > > > > > > > ---
+> > > > > > > > > qdisc prio 8004: dev eno1 root refcnt 5 bands 8 priomap 1=
+ 2 2 2 1 2 0
+> > > > > > > > > 0 1 1 1 1 1 1 1 1
+> > > > > > > > >  Sent 361867275 bytes 1017386 pkt (dropped 0, overlimits =
+0 requeues 1531)
+> > > > > > > > >  backlog 0b 0p requeues 1531
+> > > > > > > > > ----
+> > > > > > > > >
+> > > > > > > > > Reel cheep NIC doing 1G with 4 tx rings:
+> > > > > > > > > ---
+> > > > > > > > > $ ethtool -i eno1
+> > > > > > > > > driver: igc
+> > > > > > > > > version: 6.8.0-87-generic
+> > > > > > > > > firmware-version: 1085:8770
+> > > > > > > > > expansion-rom-version:
+> > > > > > > > > bus-info: 0000:02:00.0
+> > > > > > > > > supports-statistics: yes
+> > > > > > > > > supports-test: yes
+> > > > > > > > > supports-eeprom-access: yes
+> > > > > > > > > supports-register-dump: yes
+> > > > > > > > > supports-priv-flags: yes
+> > > > > > > > >
+> > > > > > > > > $ ethtool eno1
+> > > > > > > > > Settings for eno1:
+> > > > > > > > > Supported ports: [ TP ]
+> > > > > > > > > Supported link modes:   10baseT/Half 10baseT/Full
+> > > > > > > > >                         100baseT/Half 100baseT/Full
+> > > > > > > > >                         1000baseT/Full
+> > > > > > > > >                         2500baseT/Full
+> > > > > > > > > Supported pause frame use: Symmetric
+> > > > > > > > > Supports auto-negotiation: Yes
+> > > > > > > > > Supported FEC modes: Not reported
+> > > > > > > > > Advertised link modes:  10baseT/Half 10baseT/Full
+> > > > > > > > >                         100baseT/Half 100baseT/Full
+> > > > > > > > >                         1000baseT/Full
+> > > > > > > > >                         2500baseT/Full
+> > > > > > > > > Advertised pause frame use: Symmetric
+> > > > > > > > > Advertised auto-negotiation: Yes
+> > > > > > > > > Advertised FEC modes: Not reported
+> > > > > > > > > Speed: 1000Mb/s
+> > > > > > > > > Duplex: Full
+> > > > > > > > > Auto-negotiation: on
+> > > > > > > > > Port: Twisted Pair
+> > > > > > > > > PHYAD: 0
+> > > > > > > > > Transceiver: internal
+> > > > > > > > > MDI-X: off (auto)
+> > > > > > > > > netlink error: Operation not permitted
+> > > > > > > > >         Current message level: 0x00000007 (7)
+> > > > > > > > >                                drv probe link
+> > > > > > > > > Link detected: yes
+> > > > > > > > > ----
+> > > > > > > > >
+> > > > > > > > > Requeues should only happen if the driver is overwhelmed =
+on the tx
+> > > > > > > > > side - i.e tx ring of choice has no more space. Back in t=
+he day, this
+> > > > > > > > > was not a very common event.
+> > > > > > > > > That can certainly be justified today with several explan=
+ations if: a)
+> > > > > > > > > modern processors getting faster b) the tx code path has =
+become more
+> > > > > > > > > efficient (true from inspection and your results but thos=
+e patches are
+> > > > > > > > > not on my small systems) c) (unlikely but) we are misacco=
+unting for
+> > > > > > > > > requeues (need to look at the code). d) the driver is too=
+ eager to
+> > > > > > > > > return TX BUSY.
+> > > > > > > > >
+> > > > > > > > > Thoughts?
+> > > > > > > >
+> > > > > > > > requeues can happen because some drivers do not use skb->le=
+n for the
+> > > > > > > > BQL budget, but something bigger for GSO packets,
+> > > > > > > > because they want to account for the (N) headers.
+> > > > > > > >
+> > > > > > > > So the core networking stack could pull too many packets fr=
+om the
+> > > > > > > > qdisc for one xmit_more batch,
+> > > > > > > > then ndo_start_xmit() at some point stops the queue before =
+the end of
+> > > > > > > > the batch, because BQL limit is hit sooner.
+> > > > > > > >
+> > > > > > > > I think drivers should not be overzealous, BQL is a best ef=
+fort, we do
+> > > > > > > > not care of extra headers.
+> > > > > > > >
+> > > > > > > > drivers/net/ethernet/intel/igc/igc_main.c is one of the ove=
+rzealous drivers ;)
+> > > > > > > >
+> > > > > > > > igc_tso() ...
+> > > > > > > >
+> > > > > > > > /* update gso size and bytecount with header size */
+> > > > > > > > first->gso_segs =3D skb_shinfo(skb)->gso_segs;
+> > > > > > > > first->bytecount +=3D (first->gso_segs - 1) * *hdr_len;
+> > > > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > Ok, the 25G i40e driver we are going to run tests on seems to=
+ be
+> > > > > > > suffering from the same enthusiasm ;->
+> > > > > > > I guess the same codebase..
+> > > > > > > Very few drivers tho seem to be doing what you suggest. Of co=
+urse idpf
+> > > > > > > being one of those ;->
+> > > > > >
+> > > > > > Note that few requeues are ok.
+> > > > > >
+> > > > > > In my case, I had 5 millions requeues per second, and at that p=
+oint
+> > > > > > you start noticing something is wrong ;)
+> > > > >
+> > > > > That's high ;-> For the nuc with igc, its <1%. Regardless, the
+> > > > > eagerness for TX BUSY implies reduced performance due to the earl=
+y
+> > > > > bailout..
+> > > >
+> > > > Ok, we are going to do some testing RSN, however, my adhd wont let
+> > > > this requeue thing go ;->
+> > > >
+> > > > So on at least i40e when you start sending say >2Mpps (forwarding o=
+r
+> > > > tc mirred redirect ) - the TX BUSY is most certainly not because of
+> > > > the driver is enthusiastically bailing out. Rather, this is due to =
+BQL
+> > > > - and specifically because netdev_tx_sent_queue() stops the queue;
+> > > > Subsequent packets from the stack will get the magic TX_BUSY label =
+in
+> > > > sch_direct_xmit().
+> > > >
+> > > > Some context:
+> > > > For forwarding use case benchmarking, the typical idea is to use RS=
+S
+> > > > and IRQ binding to a specific CPU then craft some traffic patterns =
+on
+> > > > the sender so that the test machine has a very smooth distribution
+> > > > across the different CPUs i.e goal is to have almost perfect load
+> > > > balancing.
+> > > >
+> > > > Q: In that case, would the defer list ever accumulate more than one
+> > > > packet? Gut feeling says no.
+> > >
+> > > It can accumulate  way more, when there is a mix of very small packet=
+s
+> > > and big TSO ones.
+> > >
+> > > IIf you had a lot of large TSO packets being sent, the queue bql/limi=
+t
+> > > can reach 600,000 easily.
+> > > TX completion happens, queue is empty, but latched limit is 600,000
+> > > based on the last tx-completion round.
+> > >
+> > > Then you have small packets of 64 bytes being sent very fast (say fro=
+m pktgen)
+> > >
+> > > 600,000 / 64 =3D 9375
+> > >
+> > > But most TX queues have a limit of 1024 or 2048 skbs... so they will
+> > > stop the queue _before_ BQL does.
+> > >
+> >
+> > Nice description, will check.
+> > Remember, our use case is a middle box which receives pkts on one
+> > netdev, does some processing, and sends to another. Essentially, we
+> > pull from rx ring of src netdev, process and send to tx ring of the
+> > other netdev. No batching or multiple CPUs funnelig to one txq and
+> > very little if any TSO or locally generated traffic - and of course
+> > benchmark is on 64B pkts.
+>
+> One thing that many drivers get wrong is that they limit the number of
+> packets that a napi_poll() can tx-complete at a time.
+>
+
+I suppose drivers these days do the replenishing at napi_poll() time -
+but it could also be done in the tx path when a driver fails to get
+space on tx ring. I think at one point another strategy was to turn on
+thresholds for TX completion interrupts, and you get the trigger to
+replenish - my gut feel is this last one probably was deemed bad for
+performance.
+
+> BQL was meant to adjust its limit based on the number of bytes per round,
+> and the fact that the queue has been stopped (because of BQL limit) in
+> the last round.
+>
+
+For our benchmarking i dont think BQL is adding much value - more below..
+
+> So really, a driver must dequeue as many packets as possible.
+>
+
+IIUC, the i40e will replenish up to 256 descriptor which is > than the
+default NAPI weight (64).
+So should be fine there?
+is 256 a good number for a weight of 64? I'm not sure how these
+thresholds are chosen; Is it a factor of tx ring size (default of 512,
+so 256 is 50%)  or is it based on napi weight? The max size i40e can
+do is tx/rx is 8160, it defaults to 512/512.
+
+It used to be that you knew your hardware and its limitations and your
+strategy of when and where to replenish was based sometimes on
+experimentation.
+i40e_clean_tx_irq() is entered on every napi poll for example...
+
+> Otherwise you may have spikes, even if your load is almost constant,
+> when under stress.
+
+I see.
+So the trick is to use max tx size then then increase the weight for
+every replenish? We can set the TX ring to be the max and increase the
+replenish size to all..
+
+> In fact I am a bit lost on what your problem is...
+
+Well, it started with observation that there are many requeues ;-> And
+in my initial thought was the tx side was not keeping up. And then it
+turned out that it was bql that was causing the requeues.
+
+A forwarding example:
+--> rx ring x on eth0 --> tc mirred -->tx ring y on eth1 ("tc mirred"
+could be replaced with forwarding/bridging)
+
+As you can see the rx softirq will likely run from napi poll all the
+way to completion on tx side. Our tests are for 16 flows which are
+crafted to distribute nicely via RSS to hit 16 cpus on 16 rx rings
+(one per cpu) then fprwarding to 16 tx rings. Each packet is 64B. That
+way 16 CPUs are kept busy in parallel. If it all works out there
+should be zero lock contention on the tx side..
+
+If we turn off BQL, there should be _zero_ requeues, which in my
+thinking should make things faster..
+we'll compare with/out bql.
+
+Motivation for all this was your work to add the defer list - i would
+like to check if we have a regression for forwarding workloads.
+In theory, for our benchmark, we should never be able to accumulate
+more than one packet on that defer list (if ever), so all that extra
+code is not going to be useful for us.
+That is fine as long as the new additional lines of code we are
+hitting dont affect us as much..
+
+cheers,
+jamal
 
