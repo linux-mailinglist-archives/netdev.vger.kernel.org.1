@@ -1,82 +1,101 @@
-Return-Path: <netdev+bounces-239212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD0D0C65A73
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 19:04:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F976C65AF7
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 19:17:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 39197355BA6
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:57:08 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C1A74348A88
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 18:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885372D12EF;
-	Mon, 17 Nov 2025 17:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC612FF675;
+	Mon, 17 Nov 2025 18:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bg0FGkgt"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hHtLGW3k"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767062BDC09
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 17:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26ADE3016F9
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 18:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763402223; cv=none; b=DkniEJiwtfXcyrwTumbOqmQXn1tTMm7FtyXgwLEA6NuAMICeC8PTC47PtiacS45WUCutYc/xIKCHoLkZHCgyze5vjo/noKW7/l6OAyWtYFCGgVpWVwk07kRdeQHQILD1euGHM+TmqTTlsw+uyWLfAs1FfAH9ss0WDnm9rw4ngqU=
+	t=1763403112; cv=none; b=cwqy5Gq/Qz44Mh/jZGlcIF2N9wZRk8Ag6FupRxlR68Ks5Cpp6pe1g1JS09uwXd5SIgL4pg+13lkLIZuiVmQi4mKNxae4QrfW4F4hhFVG+gR0uOozYILuOqLt89uOCPOIvMnz9a0yeRsaM2J7SOZZ1pucLj9ZI7py5j/nsB/zEC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763402223; c=relaxed/simple;
-	bh=qtgDMuI9ppSdL57vp39h3gV/WxaG9tHaLj6hrAsQKg4=;
+	s=arc-20240116; t=1763403112; c=relaxed/simple;
+	bh=O7RpA/KmSd4G/hqnUQJhF6HWLcZQ2ssf+Cm4ZqmVphY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gs+NA3VFAqp9EPIUQRfjA8bzQkacDkb2dFll3zTVCtdGVo8bQ4/NBs4c5znp/mVZJmimlSR7h06VCxzr8mNMoGXUdSntg4wHkgRpyUl53ooB9R8bOyDIDkVBBNzrtC+rUO6BEmHdzEiIViL5S4fCnGrZBKEv9P4zL67dLCOzqfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bg0FGkgt; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=/CQBdIDq7AnRqi6ox1D+rkE9waZnjoqLfUgiBPQHr6c=; b=bg0FGkgtuYkdKsskX7/JlcdC2T
-	NH2fXNph00xzIDTnEc/LmmY8hAxK/1vuNRxDU0RualLBj16VAwtZ7szoTPpOve0eQeQ+fBIG6Bup5
-	rzj7PaDHiYHa1EiwIY7VsaSbda2l6U9K4train0E+1aNYSXPnAx4lWDmC23tkpe1yrIQke2S8XFq5
-	nDffbcSPm+Od011dEpLE5hlFwdhiAYx3pG2AxAkbph8mjQupjBu82zVWbP+fTOq4M0YulRcExTTjy
-	rl2Qii6OF+nq8UhtG4FB13+c4zVMPJCAOsU+GRpZ8o013+NggMxaJcJC1gvx92VCSZ1sRC14DvsGP
-	622ue9UA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39322)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vL3Sx-000000002B3-2DTc;
-	Mon, 17 Nov 2025 17:56:39 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vL3Ss-000000001ek-2cSr;
-	Mon, 17 Nov 2025 17:56:34 +0000
-Date: Mon, 17 Nov 2025 17:56:34 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=aFBfo/unX0g7HTWA8U0KU/kzToLOnJQlzlDOqqabFxhP+Do+j1y07G90clz78oixSuHKif2iu1OtFF7K3Gi0ginImzG5as8Qb/RZSsrMtRjinN84LfKb0J97JwIqMGeCZxn6zuiiCUTVAg8erSEXQq5tRfeZG98L0nWQcVX7QD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hHtLGW3k; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42b3ad51fecso3346974f8f.1
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 10:11:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1763403108; x=1764007908; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xkXn2uf2BmayOa330xtRb/7V5dbi6gpwEITJjIUhIzo=;
+        b=hHtLGW3k92cOOb73mCpjPZ3mmvetgZBtDXyLluAqL8sZ3UdRC7P9A6XMnTkuwy1ADQ
+         5lKs/Zp0166Gd2R+f4K382mgZoZGocmipZGDUf7ocLmSpLTp9cgFml9YRU9ZLGpGPikl
+         Nbk1PodKoZM3ubMKzh8+1JfspwAPZf+pSSJZdzhV8Cdrfrk8HQ8YDFQA5NMCdNBJm0gK
+         I+4m8VhuebJlJHzJBzd1LkUu7GyxNwtAXEuPBwvG543RNAhNWRdR5z2pSdKJWJ0KY6ZA
+         SBOuM3syn5FtI4kMLwlBh665N9cIJzsZ3hdFA4eiFopUsmMgci2d1A5oTsOIKh3k3B1F
+         SLYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763403108; x=1764007908;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xkXn2uf2BmayOa330xtRb/7V5dbi6gpwEITJjIUhIzo=;
+        b=IMK+RzBIpj90D9SBRWgvK8M70xF2Uy6kqjLK918ac27FS+ffZYyPnKrXAVWS7+SHVR
+         Exr4raIX7OmSI8sWJodzROaQ9SPz18xzGA4Uw4lfCaNqqxVBapbFFNoqCaLrXieVjoA3
+         To2VaCBdPZ6GLu4QPvE0AD/swSqN4iuvOq697/rTE25QEdRz9JDsw3zrcLOFckAw8PAb
+         vIZ5Cr26BVOuIfxLn6i2ZccrNtHa0vb/7vQDD/IQciFWBmfYAcU72vfG/DoVzdezL2VN
+         q/dpcxsoJU9M1kIsBnpfVqXHQ0RpJ1PE5aqCfHa1fw60I7NMiC+gLz1nkf042R1sEvCP
+         9X/w==
+X-Forwarded-Encrypted: i=1; AJvYcCVwgw4BcYgKrQQp12SKzeL8HbWHptPzjw1pv2MQ7xRxUTcgkCAz/uMvFypCoMfqpGJC/JmOLC0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIKRrp4lnKanLQqh1r4YHCTCQrVkvCbSbYesLO+1L1rQ/HvSaC
+	0Hvg9rO3p28s0z+tvx2vw+dSA/tQatxnxeBvavHjdYKbw42zQ8vqqd13rC6zyvPgQew=
+X-Gm-Gg: ASbGncvCikGktWRqYQ+6FTtUMe8OQnGcSaC6V5BaXLGGcKnTb4M249zlbkpWJyp81UA
+	K41FkX2G+WYCpiksylgpGHeEZEFBHLwZ3RG1f7wu1zl+qL3NR1B4baVYb6MM9OoRak41+tjIF3q
+	lSLLDQ46xMNT1aUfW2w3dQJdwKjGyoDnBF6Ef00eG+r5/u7KFe/eassN2Sfx7/SVv8ZW+q8Vdjv
+	Wt+zSe/TNrqmkY/6YhVgqk2dVOYmBrbWI85m2Q9yRYkEG0avf7MtLEft8SPUCZSNxfZYrtMEkE6
+	fuyioaXjiF4d9J4lIjG5aWjU5FgYv4KCvAgUV1WVn3XlfJNdmNbc81IJPr39pJs6y/uXrdUM7Nf
+	ITHmJsUoyedqxao0Za09wGP/35rkxjfX7QXGA0iPVkz2wabei+IV0XI88ouJFgJD6ZG0yRgFFkZ
+	jVr/z3JbpzFJtf9dmK49uatAISp9g=
+X-Google-Smtp-Source: AGHT+IGHhEQCJaDM/zq/AjpMPqh+c0eOHsOAgGFxOiztiCVkL4Xu6fzfIxyiuFP74BN85ttgdB3SyQ==
+X-Received: by 2002:a05:6000:1849:b0:42b:394a:9e0 with SMTP id ffacd0b85a97d-42b5937879bmr12050647f8f.32.1763403108288;
+        Mon, 17 Nov 2025 10:11:48 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-42b53f0b617sm27141178f8f.31.2025.11.17.10.11.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 10:11:47 -0800 (PST)
+Date: Mon, 17 Nov 2025 21:11:44 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Ally Heev <allyheev@gmail.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Andrei Botila <andrei.botila@oss.nxp.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/9] phy: add hwtstamp_get callback to phy
- drivers
-Message-ID: <aRth0lfz4QMC8F6s@shell.armlinux.org.uk>
-References: <20251113113207.3928966-1-vadim.fedorenko@linux.dev>
- <20251113113207.3928966-3-vadim.fedorenko@linux.dev>
- <aRXIuckumra-3Y0L@shell.armlinux.org.uk>
- <12c8b9e9-4375-4d52-b8f4-afccba49448c@linux.dev>
- <aRXN61oICP3Vkk84@shell.armlinux.org.uk>
- <59d08292-6f38-4784-b12b-520fd24600a7@linux.dev>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH v3] net: ethernet: fix uninitialized
+ pointers with free attribute
+Message-ID: <aRtlYIZ2XOQKMGd_@stanley.mountain>
+References: <20251106-aheev-uninitialized-free-attr-net-ethernet-v3-1-ef2220f4f476@gmail.com>
+ <575bfdb1-8fc4-4147-8af7-33c40e619b66@intel.com>
+ <aRsfBDC3Y8OHOnOl@stanley.mountain>
+ <dd88462f-19cb-4fde-b1f0-5caf7e6c6ce6@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,74 +104,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <59d08292-6f38-4784-b12b-520fd24600a7@linux.dev>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <dd88462f-19cb-4fde-b1f0-5caf7e6c6ce6@intel.com>
 
-On Mon, Nov 17, 2025 at 05:39:13PM +0000, Vadim Fedorenko wrote:
-> On 13/11/2025 12:24, Russell King (Oracle) wrote:
-> > On Thu, Nov 13, 2025 at 12:12:44PM +0000, Vadim Fedorenko wrote:
-> > > On 13/11/2025 12:02, Russell King (Oracle) wrote:
-> > > > On Thu, Nov 13, 2025 at 11:32:00AM +0000, Vadim Fedorenko wrote:
-> > > > > PHY devices had lack of hwtstamp_get callback even though most of them
-> > > > > are tracking configuration info. Introduce new call back to
-> > > > > mii_timestamper.
-> > > > > 
-> > > > > Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> > > > 
-> > > > As part of my Marvell PTP work, I have a similar patch, but it's
-> > > > way simpler. Is this not sufficient?
-> > > > 
-> > > > __phy_hwtstamp_get() is called via phylib_stubs struct and
-> > > > phy_hwtstamp_get(), dev_get_hwtstamp_phylib(), dev_get_hwtstamp(),
-> > > > and dev_ifsioc().
-> > > > 
-> > > > Using the phylib ioctl handler means we're implementing a path that
-> > > > is already marked as legacy - see dev_get_hwtstamp():
-> > > > 
-> > > >           if (!ops->ndo_hwtstamp_get)
-> > > >                   return dev_eth_ioctl(dev, ifr, SIOCGHWTSTAMP); /* legacy */
-> > > > 
-> > > > So, I think the below would be the preferred implementation.
-> > > 
-> > > You mean do not add SIOCGHWTSTAMP case in phy_mii_ioctl() as we should
-> > > never reach this legacy option?
+On Mon, Nov 17, 2025 at 03:37:30PM +0100, Alexander Lobakin wrote:
+> From: Dan Carpenter <dan.carpenter@linaro.org>
+> Date: Mon, 17 Nov 2025 16:11:32 +0300
+> 
+> > On Thu, Nov 06, 2025 at 03:07:26PM +0100, Alexander Lobakin wrote:
+> >>> diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
+> >>> index 6d5c939dc8a515c252cd2b77d155b69fa264ee92..3590dacf3ee57879b3809d715e40bb290e40c4aa 100644
+> >>> --- a/drivers/net/ethernet/intel/ice/ice_flow.c
+> >>> +++ b/drivers/net/ethernet/intel/ice/ice_flow.c
+> >>> @@ -1573,12 +1573,13 @@ ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
+> >>>  			 struct ice_parser_profile *prof, enum ice_block blk)
+> >>>  {
+> >>>  	u64 id = find_first_bit(prof->ptypes, ICE_FLOW_PTYPE_MAX);
+> >>> -	struct ice_flow_prof_params *params __free(kfree);
+> >>>  	u8 fv_words = hw->blk[blk].es.fvw;
+> >>>  	int status;
+> >>>  	int i, idx;
+> >>>  
+> >>> -	params = kzalloc(sizeof(*params), GFP_KERNEL);
+> >>> +	struct ice_flow_prof_params *params __free(kfree) =
+> >>> +		kzalloc(sizeof(*params), GFP_KERNEL);
+> >>
+> >> Please don't do it that way. It's not C++ with RAII and
+> >> declare-where-you-use.
+> >> Just leave the variable declarations where they are, but initialize them
+> >> with `= NULL`.
+> >>
+> >> Variable declarations must be in one block and sorted from the longest
+> >> to the shortest.
+> >>
 > > 
-> > We _can_ reach phy_mii_ioctl() for SIOCGHWTSTAMP where drivers do not
-> > provide the ndo_hwtstamp_get() method. However, as this is legacy code,
-> > the question is: should we add it?
-> > 
-> > > Technically, some drivers are (yet) not
-> > > converted to ndo_hwtstamp callbacks and this part can potentially work
-> > > for bnx2x driver, until the other series lands.
-> > 
-> > Right, but providing new features to legacy paths gives less reason for
-> > people to stop using the legacy paths.
-> > 
-> > > I was planning to remove SIOCSHWTSTAMP/SIOCGHWTSTAMP dev_eth_ioctl calls
-> > > later once everything has landed and we have tests confirming that ioctl
-> > > and netlink interfaces work exactly the same way.
-> > 
-> > However, implementations that do populate non-legacy ndo_hwtstamp_get()
-> > won't work correctly with your conversion, since we'll fall through to
-> > the path which calls __phy_hwtstamp_get() which won't do anything.
-> > 
-> > So I disagree with your patch - it only adds support for legacy net
-> > drivers to get the hwtstamp settings from the PHY. Non-legacy won't be
-> > supported.
-> > 
-> > At minimum, we should be adding support for non-legacy, and _possibly_
-> > legacy.
-> > 
-> > Let's wait for others to comment on my point about adding this for the
-> > legacy drivers/code path.
-> As there was no conversation for a couple of days, and Andrew expressed
-> the same thought about not going to implement SIOCGHWTSTAMP, I'm going
-> to publish new version with this part removed.
+> > These days, with __free the trend is to say yes this is RAII and we
+> > should declare it where you use it.  I personally don't have a strong
+> 
+> Sorta, but we can't "declare it where you use it" since we don't allow
+> declaration-after-statement in the kernel.
 
-Let's see the code, because I stopped engaging with you because I
-couldn't understand what you were saying.
+That changed when we merged cleanup.h.  It is allowed now.  I still don't
+like to declare variables anywhere unless it's a __free() variable and I
+think almost everyone else agrees.  The only subsystem which I know that
+completely moved to declaring variables willy-nilly was bcachefs.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+regards,
+dan carpenter
+
 
