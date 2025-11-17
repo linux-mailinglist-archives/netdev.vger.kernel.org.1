@@ -1,137 +1,91 @@
-Return-Path: <netdev+bounces-239273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7ABDC66951
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:46:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7803AC6695A
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:47:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3C6293419D8
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 23:46:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 3699529889
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 23:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A7D2139C9;
-	Mon, 17 Nov 2025 23:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE3929D268;
+	Mon, 17 Nov 2025 23:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X8NPKQ/5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fJErVpZR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AD9018DB0D;
-	Mon, 17 Nov 2025 23:46:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725012949E0
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 23:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763423184; cv=none; b=esYRTprNipsDMXBY8CXcUAgMIBBSli7Y3PsVv5mHnGaUk9C8DcgjQt8C0+0CJW962ewZ9lBrkwVJXtYREXZ4PVsI0dvbOJFVUpDuz43n4aUze0GNIiVG1xOeCSOi7sQSDmu5OvEeCXSBOdt/8jsjMLnCG2s3MGjFOPNIR0M0r78=
+	t=1763423234; cv=none; b=EiF9+cO0Ym1VX+RcwCb2Mt6krllraeDQDeG09iH9kDUTg9exk3OkJ70E49M2vJCmhD60qiD3J+c+dtq2QuOww7RYD9kFciAtiLaxyY6F/wPl8i1sssszUD3+Dr9Ry+doXhYJCI0kkf12VgfSZxYwICa9uBNMx1svwaQ6v3QkpSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763423184; c=relaxed/simple;
-	bh=h8zdLGuMXoJ1AATJQy+jizkonDPrLs1wk+Dp2A4h2aE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ShJU0YbmKHLxaDaXDTB0bSSts/0panQ7kToPGqegkTLUZ8q0jleeAj3uS99ZEj5PofgQC7t9tT+Y/1qwI4Ozi7fail3MDoEwSYfmf2OpmJVu+nGRfj5l+qccDFMwWo1UD6tVhRvZIBTsBduq3L0i3hNjL/nkNOFFWy3EmsNzjYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X8NPKQ/5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAE31C2BC9E;
-	Mon, 17 Nov 2025 23:46:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763423182;
-	bh=h8zdLGuMXoJ1AATJQy+jizkonDPrLs1wk+Dp2A4h2aE=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=X8NPKQ/5fJdY914fGKC79q+G2bL33MtGUxsDVpxNYTBE3FSsJOfUNwdL6BihNjetd
-	 8+qd8DQKPC2D+HBSgVc1Y6kPK192H9XPXsuWZ6R7uaIWzU9f8XUJO2wcNrtBp6ddHV
-	 asjb8VHtHDKU1iFDNCH+DHK+9FimSZ5todL9woOjOjiBr3DSw4Yy3IDVFQbtVboUit
-	 zlFUTGihEJDKjWJUZvtiJrxqNgx8NXr8Uu27b266UmFUVT5rCHbdtU/+5LkagC8j3C
-	 8kNz20IkGTErPqeR2TELBxz2QzADb35wa8AdfNSfScv096BDpQVtwEQWLfu+S9FyGv
-	 GI0VAAJ4KmJMA==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 68C74CE0B6A; Mon, 17 Nov 2025 15:46:21 -0800 (PST)
-Date: Mon, 17 Nov 2025 15:46:21 -0800
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Amery Hung <ameryhung@gmail.com>, bpf <bpf@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>, Song Liu <song@kernel.org>,
-	Kernel Team <kernel-team@meta.com>
-Subject: Re: [PATCH v2 bpf-next 4/4] bpf: Replace bpf memory allocator with
- kmalloc_nolock() in local storage
-Message-ID: <450751b2-5bc4-4c76-b9ca-019b87b96074@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20251114201329.3275875-1-ameryhung@gmail.com>
- <20251114201329.3275875-5-ameryhung@gmail.com>
- <CAADnVQJD0xLa=bWUerdYsRg8R4S54yqnPnuwkHWL1R663U3Xcg@mail.gmail.com>
- <CAMB2axPEmykdt2Wcvb49j1iG8b+ZTxvDoRgRYKmJAnTvbLsN9g@mail.gmail.com>
- <CAADnVQ+FC5dscjW0MQbG2qYP7KSQ2Ld6LCt5uK8+M2xreyeU7w@mail.gmail.com>
+	s=arc-20240116; t=1763423234; c=relaxed/simple;
+	bh=qHbQWa8oDveacpXLroAVyPiK+q4rhR02EvggKBZ4N/4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=sF8Qc4zpeAwc3u7WDz+iZxoLVZyI6dA9jzon69nSnm7Te4/XVswA2LpnDrWctXw/BqlqkE6s6HLPH4oLbv2epBb9k3kJ+8rjk4v3lfDpW/sYuAJtYdx0FtwRYRwXtamWufVyF5Zyx/4jcsw/k7kVgixQgt8btS8OIU4eS0MmF5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fJErVpZR; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b0df39ab-fdee-4b48-8739-74192cf5a26c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763423216;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5L3fmoWKUNAJOBUlqJ5Dno0qPktD8xRVoa8UchMFYCk=;
+	b=fJErVpZRKABGxPpie+A08Vfho4Iaf6MQGGFqMVml5yEQ4p9k2kWSB3N+W0U9EGbiVgVsQL
+	VvHOz/efoWVx2yrXPQtwZ/nnPbSaBQl7z8MMGbQdjt8cJEAGqekgp3OQ5rEn7BWDUxN2kz
+	LM6dJ8vy9N9uTPXDyUgc/UygpOlW0cs=
+Date: Mon, 17 Nov 2025 15:46:51 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQ+FC5dscjW0MQbG2qYP7KSQ2Ld6LCt5uK8+M2xreyeU7w@mail.gmail.com>
+Subject: Re: Announcement: BPF CI is down
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Ihor Solodrai <ihor.solodrai@linux.dev>
+To: bpf <bpf@vger.kernel.org>, netdev@vger.kernel.org
+References: <938dbf1c-d2b5-42db-8ceb-0121e0cac698@linux.dev>
+Content-Language: en-US
+In-Reply-To: <938dbf1c-d2b5-42db-8ceb-0121e0cac698@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Nov 17, 2025 at 03:36:08PM -0800, Alexei Starovoitov wrote:
-> On Mon, Nov 17, 2025 at 12:37 PM Amery Hung <ameryhung@gmail.com> wrote:
-> >
-> > On Fri, Nov 14, 2025 at 6:01 PM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Fri, Nov 14, 2025 at 12:13 PM Amery Hung <ameryhung@gmail.com> wrote:
-> > > >
-> > > >
-> > > > -       if (smap->bpf_ma) {
-> > > > +       if (smap->use_kmalloc_nolock) {
-> > > >                 rcu_barrier_tasks_trace();
-> > > > -               if (!rcu_trace_implies_rcu_gp())
-> > > > -                       rcu_barrier();
-> > > > -               bpf_mem_alloc_destroy(&smap->selem_ma);
-> > > > -               bpf_mem_alloc_destroy(&smap->storage_ma);
-> > > > +               rcu_barrier();
-> > >
-> > > Why unconditional rcu_barrier() ?
-> > > It's implied in rcu_barrier_tasks_trace().
-> >
-> > Hmm, I am not sure.
-> >
-> > > What am I missing?
-> >
-> > I hit a UAF in v1 in bpf_selem_free_rcu() when running selftests and
-> > making rcu_barrier() unconditional addressed it. I think the bug was
-> > due to map_free() not waiting for bpf_selem_free_rcu() (an RCU
-> > callback) to finish.
-> >
-> > Looking at rcu_barrier() and rcu_barrier_tasks_trace(), they pass
-> > different rtp to rcu_barrier_tasks_generic() so I think both are
-> > needed to make sure in-flight RCU and RCU tasks trace callbacks are
-> > done.
-> >
-> > Not an expert in RCU so I might be wrong and it was something else.
+On 11/17/25 8:26 AM, Ihor Solodrai wrote:
+> Hello everyone,
 > 
-> Paul,
+> BPF CI has been down since Friday, November 15, because GitHub appears
+> to have disabled the "GitHub Actions" feature for the kernel-patches
+> GitHub organization without any prior notice. We do not yet know the
+> reason for this.
 > 
-> Please help us here.
-> Does rcu_barrier_tasks_trace() imply rcu_barrier() ?
+> Currently, the dashboard [1] shows the following message:
+> 
+> "GitHub Actions is currently disabled for this repository. Please
+> reach out to GitHub Support for assistance."
+> 
+> This means that no BPF CI jobs, including AI reviews, will run for an
+> unknown period of time.
+> 
+> In the meantime, please be patient with patch reviews, as maintainers
+> will need to run the selftests manually.
+> 
+> [1] https://github.com/kernel-patches/bpf/actions
 
-I am sorry, but no, it does not.
+GitHub support re-enabled access to GitHub actions for kernel-patches
+after a manual review of the account.
 
-If latency proves to be an issue, one approach is to invoke rcu_barrier()
-and rcu_barrier_tasks_trace() each in its own workqueue handler.  But as
-always, I suggest invoking them one after the other to see if a latency
-problem really exists before adding complexity.
+The workflows are able to launch now.
 
-Except that rcu_barrier_tasks_trace() is never invoked by rcu_barrier(),
-only rcu_barrier_tasks() and rcu_barrier_tasks_trace().  So do you really
-mean rcu_barrier()?  Or rcu_barrier_tasks()?
-
-Either way, rcu_barrier_tasks() and rcu_barrier_tasks_trace() are also
-independent of each other in the sense that if you need tw wait on
-callbacks from both call_rcu_tasks() and call_rcu_tasks_trace(), you
-need both rcu_barrier_tasks() and rcu_barrier_tasks_trace() to be invoked.
-
-							Thanx, Paul
+However please note that BPF CI did not automatically run for patch series
+submitted between approximately Nov 15 @ 1am PST and Nov 17 @ 3pm PST.
 
