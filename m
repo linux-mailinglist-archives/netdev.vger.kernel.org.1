@@ -1,154 +1,140 @@
-Return-Path: <netdev+bounces-239192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38BE4C65414
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:52:05 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 807BEC6542C
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:54:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id EC07A2907D
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:52:03 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7268F3504A3
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:47:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB6730146D;
-	Mon, 17 Nov 2025 16:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D78B42F12D3;
+	Mon, 17 Nov 2025 16:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I4mLEid5"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995C62FC02F;
-	Mon, 17 Nov 2025 16:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A2D2F068F;
+	Mon, 17 Nov 2025 16:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763398256; cv=none; b=fQ6ytzf9kCSbo7KQCdmgQ46i7jC4HwwPHG8FetkMlcdL9SfD9s0BovgFDLbbzubHX7ui64FhVcRb07rBDdIhs66bL59TkjnJRtVy63MTxnA0iavIarQYcZ+XZ41JAWLt0sefZrggnRo0O9F9mKPH7EcRYTBZXKYKMDE7KqcCzUA=
+	t=1763398039; cv=none; b=aoGhyOf7jLKJMeYe7eBV6wWxaYHoprUnLhNtBqn/XD71OmV1V9uMp7lTofZ1ZqPa6kJEhNL0YSr6grWvuuOCGtgpKy7eL3Ghw+ERsQ16ewJJ8AWSobHmsCjcLIXRpssVYIYWC9ayRJpzfn+Zr24931CrBwtrtpc1FqbPNGONJQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763398256; c=relaxed/simple;
-	bh=qDckhyWd5Xp/iUbxoRJgosMNjecj8byVLupzPsFbxdU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l/9oyjZvJMhJZ741l9iecsMdhMhgZcdmlEAxHoKri3QiUniULuaOcgrgRKgJgcFGj9gSKAE4JmAz7xtfrvntMQKIqP+jbnvbUVkSzTim2LOduJb2IXEfDvxjJOa0xMcecUTVC2mqqn1RZ5CDnrfIJKI5Ki90WUS2CVjpd/MJW1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4d9D9B0fVlz9sTk;
-	Mon, 17 Nov 2025 17:44:14 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eU0hj9tte4dv; Mon, 17 Nov 2025 17:44:14 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4d9D996cx9z9sTj;
-	Mon, 17 Nov 2025 17:44:13 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id CE2E78B763;
-	Mon, 17 Nov 2025 17:44:13 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id tff4OGSdT2mn; Mon, 17 Nov 2025 17:44:13 +0100 (CET)
-Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id A48D28B768;
-	Mon, 17 Nov 2025 17:44:12 +0100 (CET)
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Peter Zijlstra <peterz@infradead.org>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	Ingo Molnar <mingo@redhat.com>,
-	Darren Hart <dvhart@infradead.org>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	"Andre Almeida" <andrealmeid@igalia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nichlas Piggin <npiggin@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v5 4/4] lib/strn*,uaccess: Use masked_user_{read/write}_access_begin when required
-Date: Mon, 17 Nov 2025 17:43:44 +0100
-Message-ID: <cb5e4b0fa49ea9c740570949d5e3544423389757.1763396724.git.christophe.leroy@csgroup.eu>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cover.1763396724.git.christophe.leroy@csgroup.eu>
-References: <cover.1763396724.git.christophe.leroy@csgroup.eu>
+	s=arc-20240116; t=1763398039; c=relaxed/simple;
+	bh=VDPU8WBpaSMdog+Adn5C5R/6IBPWeQhuaPBSI4eT7Ko=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VAsAYPEaQjJEAOlb8qYfBp+dHLWMMeBcO3WBARYh5YacGJws6ma3E+kL1UZgUaoq/ezXZCqPOLBJXoXUmtlCugw8FJXXJBoMZhrMTB1OGQ3ZVd9J592Dz4L4YCU8bkWl8ETymCLZZlPjD1rPefLzNGgKfT62KUtXAO9R5kH18Ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I4mLEid5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 818FDC4AF0B;
+	Mon, 17 Nov 2025 16:47:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763398039;
+	bh=VDPU8WBpaSMdog+Adn5C5R/6IBPWeQhuaPBSI4eT7Ko=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=I4mLEid5UB2vfOwQXMYCyyiehnTm4dhzeg8ijCEtfD2upmwu1wXdOEhJ+MLKn5PyL
+	 XWjEQLi4Gkzt61V91UBFEXN4IvveVwebdp3HmwNGmDyTT3QB4mXI5bbIo+K+MmoMNn
+	 LgsO/tTrW0XgeARy9TG+bmFaCZbslP/UdD/1PnRitn2CLZfBffpDBprSsOJ/9yJEL0
+	 5G7QezrhBDd/ytSQhI+YTKE0+c7cXgDd5CnuaNKFtHucUrNJE4J+3snXSh/O5y+7ju
+	 5mJjRxcNDM8F9XTrK87uvomDx9F2hDcRKfm4olTCbOTtGNf6+tq4xFxicNH+bG1uM4
+	 6zkTWIT+Y7vaQ==
+Message-ID: <e470c73a-9867-4387-9a9a-a63cd3b2654f@kernel.org>
+Date: Mon, 17 Nov 2025 17:47:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2306; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=qDckhyWd5Xp/iUbxoRJgosMNjecj8byVLupzPsFbxdU=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWRKB5zwcf5XZ8nQsPWQR3SBdCH7ipUnHdxv1zv7Ku9On 1xYOe1CRykLgxgXg6yYIsvx/9y7ZnR9Sc2fuksfZg4rE8gQBi5OAZjIyQJGhg+x8vzW+28u3+X+ ZFGOZmr8v6hj/g/nf9VfOM1v700nrukM/71WCtXdYlPy+rWCe77xJ9dct9gfnaqndGPERLYczlm gxQkA
-X-Developer-Key: i=christophe.leroy@csgroup.eu; a=openpgp; fpr=10FFE6F8B390DE17ACC2632368A92FEB01B8DD78
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC mm v6] mm: introduce a new page type for page pool in page
+ type
+To: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+ harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+ davem@davemloft.net, kuba@kernel.org, john.fastabend@gmail.com,
+ sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
+ pabeni@redhat.com, akpm@linux-foundation.org, lorenzo.stoakes@oracle.com,
+ Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com,
+ mhocko@suse.com, horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
+ ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
+ brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
+ usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
+ almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
+ bpf@vger.kernel.org, linux-rdma@vger.kernel.org, sfr@canb.auug.org.au,
+ dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com
+References: <20251117052041.52143-1-byungchul@sk.com>
+ <f25a95a4-5371-40bd-8cc8-d5f7ede9a6ac@kernel.org>
+From: "David Hildenbrand (Red Hat)" <david@kernel.org>
+Content-Language: en-US
+In-Reply-To: <f25a95a4-5371-40bd-8cc8-d5f7ede9a6ac@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Properly use masked_user_read_access_begin() and
-masked_user_write_access_begin() instead of masked_user_access_begin()
-in order to match user_read_access_end() and user_write_access_end().
-This is important for architectures like powerpc that enable
-separately user reads and user writes.
+On 17.11.25 17:02, Jesper Dangaard Brouer wrote:
+> 
+> On 17/11/2025 06.20, Byungchul Park wrote:
+>> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+>> index 600d9e981c23..01dd14123065 100644
+>> --- a/mm/page_alloc.c
+>> +++ b/mm/page_alloc.c
+>> @@ -1041,7 +1041,6 @@ static inline bool page_expected_state(struct page *page,
+>>    #ifdef CONFIG_MEMCG
+>>    			page->memcg_data |
+>>    #endif
+>> -			page_pool_page_is_pp(page) |
+>>    			(page->flags.f & check_flags)))
+>>    		return false;
+>>    
+>> @@ -1068,8 +1067,6 @@ static const char *page_bad_reason(struct page *page, unsigned long flags)
+>>    	if (unlikely(page->memcg_data))
+>>    		bad_reason = "page still charged to cgroup";
+>>    #endif
+>> -	if (unlikely(page_pool_page_is_pp(page)))
+>> -		bad_reason = "page_pool leak";
+>>    	return bad_reason;
+>>    }
+> 
+> This code have helped us catch leaks in the past.
+> When this happens the result is that the page is marked as a bad page.
+> 
+>>    
+>> @@ -1378,9 +1375,12 @@ __always_inline bool free_pages_prepare(struct page *page,
+>>    		mod_mthp_stat(order, MTHP_STAT_NR_ANON, -1);
+>>    		folio->mapping = NULL;
+>>    	}
+>> -	if (unlikely(page_has_type(page)))
+>> +	if (unlikely(page_has_type(page))) {
+>> +		/* networking expects to clear its page type before releasing */
+>> +		WARN_ON_ONCE(PageNetpp(page));
+>>    		/* Reset the page_type (which overlays _mapcount) */
+>>    		page->page_type = UINT_MAX;
+>> +	}
+>>    
+>>    	if (is_check_pages_enabled()) {
+>>    		if (free_page_is_bad(page))
+> 
+> What happens to the page? ... when it gets marked with:
+>     page->page_type = UINT_MAX
+> 
+> Will it get freed and allowed to be used by others?
+> - if so it can result in other hard-to-catch bugs
 
-That means masked_user_read_access_begin() is used when user memory is
-exclusively read during the window and masked_user_write_access_begin()
-is used when user memory is exclusively writen during the window.
-masked_user_access_begin() remains and is used when both reads and
-writes are performed during the open window. Each of them is expected
-to be terminated by the matching user_read_access_end(),
-user_write_access_end() and user_access_end().
+Yes, just like most other use-after-free from any other subsystem in the 
+kernel :)
 
-Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
-v5:
-- Removed net/core/scm.c which is converted to scope user access by previous patch
-- Renamed the patch as it now only handles lib/strncpy_from_user.c and lib/strnlen_user.c
+The expectation is that such BUGs are found early during testing 
+(triggering a WARN) such that they can be fixed early.
 
-v4: Rebased on top of core-scoped-uaccess tag
+But we could also report a bad page here and just stop (return false).
 
-v3: Rebased on top of v6.18-rc1 ==> change in net/core/scm.c
-
-v2: Added more explanations in the commit message following comments received.
----
- lib/strncpy_from_user.c | 2 +-
- lib/strnlen_user.c      | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/lib/strncpy_from_user.c b/lib/strncpy_from_user.c
-index 6dc234913dd5..5bb752ff7c61 100644
---- a/lib/strncpy_from_user.c
-+++ b/lib/strncpy_from_user.c
-@@ -126,7 +126,7 @@ long strncpy_from_user(char *dst, const char __user *src, long count)
- 	if (can_do_masked_user_access()) {
- 		long retval;
- 
--		src = masked_user_access_begin(src);
-+		src = masked_user_read_access_begin(src);
- 		retval = do_strncpy_from_user(dst, src, count, count);
- 		user_read_access_end();
- 		return retval;
-diff --git a/lib/strnlen_user.c b/lib/strnlen_user.c
-index 6e489f9e90f1..4a6574b67f82 100644
---- a/lib/strnlen_user.c
-+++ b/lib/strnlen_user.c
-@@ -99,7 +99,7 @@ long strnlen_user(const char __user *str, long count)
- 	if (can_do_masked_user_access()) {
- 		long retval;
- 
--		str = masked_user_access_begin(str);
-+		str = masked_user_read_access_begin(str);
- 		retval = do_strnlen_user(str, count, count);
- 		user_read_access_end();
- 		return retval;
 -- 
-2.49.0
+Cheers
 
+David
 
