@@ -1,127 +1,158 @@
-Return-Path: <netdev+bounces-239194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 797CAC6573B
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 18:23:17 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22D11C657B0
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 18:28:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D6A974E29D1
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:16:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4A8C74EE0C9
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4ED830C612;
-	Mon, 17 Nov 2025 17:12:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB553019A6;
+	Mon, 17 Nov 2025 17:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rj+T6bvq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DMHLwdZ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C650D309F18
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 17:12:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420942D29C2;
+	Mon, 17 Nov 2025 17:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763399532; cv=none; b=nfOLEbamGsr5t02HjoGHzJtcmnqRIP3Vpnw7mvgHr+jHYljxnN4zAEVrQsb/7aifpcoLpKjUO3AsovEl0eyp5iuKKr5CfVWdyxM6Rbp5xs8ECnHLd76GmdxffHtlDXkdlhy874G7lsWKeeubK+hB3MslTJ3ey6u9uw0p1Wc0qjM=
+	t=1763399756; cv=none; b=pEXXZcgLImk8GV5o9x1N16Yv5C5HTSov0AZK4b1Kwr2ZZBdDwrDXtVb5+Lidz2W4PPQ5JDoKnYTmg6BEHobxstdDToMAU6OvF2FSG/8/dr0ACf0Wc+nOVNYtBfc3kqO3SGybwnDh6Hs2P39unLZWaF2adhOddxVqabR338Q9Yxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763399532; c=relaxed/simple;
-	bh=zlUc4wrkb7uexfNnlaJ0X3CQbC6SS+1/TLUIDSJM034=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QT77ItMx6zDrh2XtdEDtclLNTH7Rh14sUi4vGEkhJp73dpanBu7lsg3Uqkj7CyTlRsah8B68urOAohTv6m7m1zm5IsCZqk54RNUiVs3dOlmwNL4S+4MjLSgPfkWq2IH+jKor9nvDrhOHYexAAApCHXEMt3b/knMKDGXJ+tXrgqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rj+T6bvq; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-376466f1280so49815251fa.0
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 09:12:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763399529; x=1764004329; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RFsQ1+FNuisUabhvP8EGuIN9Ox5iFHJYhKLw4CzRep4=;
-        b=Rj+T6bvqG6OHsjc41HGGOhKju5nGYsRg1YeE8BKybh1xcZHP0IfB9q0MOnwnfDUF5u
-         LJWLGUJkJpOba/mIVvp//tz+npf/rqtu1P2DcphTWYnRsQOzjZzEIuWmytzq8ftUcdVV
-         64wg53EHYAsFmunUnFU3CijJNaDWRcZvWXBpFCTTE1H6Agjx0WCy+JTE/u5mDcsnZyBh
-         ikgDi03ytdChF+6V/a07p90f226NinYg62MWRludjco9gjWzAs+LAtAZk6tVGIGvsL0K
-         xIKOODHOHgdE5FAbrSNWsFcy/5NkYZADe8T0Z31BffZbRs7D6LiEnIOU+k457y8zSeGw
-         F9lA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763399529; x=1764004329;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=RFsQ1+FNuisUabhvP8EGuIN9Ox5iFHJYhKLw4CzRep4=;
-        b=xR37B9uYL6JNAdw0XgVYKedfYLtNamCgAtqWE2YTR0n42/MRbgiGos6+GYISy3pz1f
-         z9OEdbYJ33zpEPjNA/hvU7eAbuZ8UVvYaic6vNYIjwlKcFlStqOIlew0RyTwqiTpK3ju
-         2cEXjr5f+MCE9g5EfpI/b8lRyQi4vgk4ypqnA3znxifzme07bqbyNaiX+bkjebtJIsbx
-         WnChAmjxshBHpanjYTD6H+rcbGtU+A9nOqZcAqxN2jK4fvp7zVmK3fQufDyCnkiIXw4U
-         Uuxj0UDMZOHGk8iY3Ipm/PX0Jb8qF32ogWn06Plbvr+m2NcQRRAJX9JuS4Dae8l6/KyP
-         1LJw==
-X-Forwarded-Encrypted: i=1; AJvYcCU07FuuLdiJkhRd5PUgpF+JFjo7EdOyKkxEvpUHr7hY3BtQZQ2v1GifKxGgke1AqMJDKC+gNEs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwTzOEkYP0v6AjXDBOciyyJAjzB41jl4vFgCaiEzurDlAF9QsU
-	cQHmL52L6VoSQd1NfvA8TGsJw7RSRr8AC8DGhI9aavdf+w1O7RHUkaw1X/dtZTJ7cR9cJxJTVTo
-	9omOLbUffbG+qhIKudL1DHNfAAPWJZ74=
-X-Gm-Gg: ASbGncsEvU1sWu+z+PnUzlEMlDk1wXed+XjrjaMD5ftdHwbGLBns1cqf297njYT/aJn
-	Vmopa/oPGnzZTmhESnGD80Ill1TW3/E60cjfKdG3T6ewqrmSOaf+4XW6z/aWoTLARgp9hcWQsRi
-	eN5mRmmp+ig2xbl68lwxJCwun3TVQcw7NLimM2uUvdknHOBjIXChsXmmo4XIm6dpHPJZS6jy5PX
-	kd7aupebMSH2wqcsWDP2wFOG/9RfRwsyfHRZA3PObpSylaFEygL2YFlgsZtSPRme3KJaPiONl64
-	Ji0x6sp7nH4btfBEP9mQMt/VSAyDy+bmSAvUQqlTdU/M/8vxkdNfUA9YmWc0xUUlRdofKM+AkmB
-	QKW/veg==
-X-Google-Smtp-Source: AGHT+IFszS39w4gyBp/ehwuAxtCUH8C08PjzRvdcYZ7F1mfYB9spnDw3ySKrBPh6xcHzbycXp1H7Lxw5DqNHFEAdHik=
-X-Received: by 2002:a2e:8a9c:0:b0:37b:b8c0:b5ec with SMTP id
- 38308e7fff4ca-37bb8c0b6e2mr15580541fa.24.1763399528680; Mon, 17 Nov 2025
- 09:12:08 -0800 (PST)
+	s=arc-20240116; t=1763399756; c=relaxed/simple;
+	bh=/guVKY3NacRISrw7vY7R/cHB5q9scX6T19T5UB+/qX0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rbVCLl839Qg3d7NchdVtvm34o7B+QCvrk5txxw9x+HfqWKLuJmvuonVajL+W5I/fgH/DU6Q4SAu7Y2D1PJp5pAb/r4rKj+0BNtAgq22ByTNSgOlKTActyrIIBVVKoOD1N+cSCL17zTcSbJQu1ZFKB09ngWZUTv+eLsv7bGOTlOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DMHLwdZ7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79C14C4AF09;
+	Mon, 17 Nov 2025 17:15:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763399755;
+	bh=/guVKY3NacRISrw7vY7R/cHB5q9scX6T19T5UB+/qX0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DMHLwdZ7Aju7H0sjsb5YNVFBmJy7+Ak2GF5V0XkhLfAkxQCT2SkTGQ4NrNF2ZTsoU
+	 CFNIerAzjd8Z4pK5eusA6U2jTD9OiccMmWiBl7OrO6mRf5XDdFHmoSV/7XHZZlI07/
+	 WrvNfHqf7j8PcI6Xc9X1FG+8cEsMIvR/COKBABg4nc4zHnUj65DJkMNvKKfkSFFMVy
+	 Uys51FOv1BP36F24WepHf1w1ML2ZMF1JJn9oFHEp+HY1OSmfiE0CEgdU5pzbPW2old
+	 DAORsm7Ysg+G/nXjs4CkI6GgZhiypkqbq6iR6OARXqIDmZ1vcbfTFfks1kw/JCbkCy
+	 8tYelu9obiVdQ==
+Date: Mon, 17 Nov 2025 17:15:50 +0000
+From: Simon Horman <horms@kernel.org>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+	pabeni@redhat.com, virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
+	andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v10 07/12] virtio_net: Implement layer 2 ethtool
+ flow rules
+Message-ID: <aRtYRhKK8lbvREcy@horms.kernel.org>
+References: <20251112193435.2096-2-danielj@nvidia.com>
+ <20251112193435.2096-8-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251113-core-cstr-cstrings-v3-0-411b34002774@gmail.com>
- <20251113-core-cstr-cstrings-v3-4-411b34002774@gmail.com> <CANiq72mBfKwXEbyaw=pBAw37d7gCLVJqHcLcd6H7vNKey1UXfA@mail.gmail.com>
- <CANiq72nQhR2iToP8ZauwAjM2p1OWEK1G5cjsEXqs=91s7jOxMQ@mail.gmail.com> <aRs1-KshwnBjIIuQ@google.com>
-In-Reply-To: <aRs1-KshwnBjIIuQ@google.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Mon, 17 Nov 2025 12:11:32 -0500
-X-Gm-Features: AWmQ_bmRFAqmfhrzkLnE8yUQroFLwLVQEZRKlJSh6ngKy6V9tYibsuHi6Nvh8Js
-Message-ID: <CAJ-ks9=whG4K2s0vhBetGAaCHtFBXcHETWqQjVh2DWciYK4Xdw@mail.gmail.com>
-Subject: Re: [PATCH v3 4/6] rust: sync: replace `kernel::c_str!` with C-Strings
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Danilo Krummrich <dakr@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Trevor Gross <tmgross@umich.edu>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	netdev@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251112193435.2096-8-danielj@nvidia.com>
 
-On Mon, Nov 17, 2025 at 9:49=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> w=
-rote:
->
-> On Mon, Nov 17, 2025 at 12:52:22AM +0100, Miguel Ojeda wrote:
-> > On Mon, Nov 17, 2025 at 12:09=E2=80=AFAM Miguel Ojeda
-> > <miguel.ojeda.sandonis@gmail.com> wrote:
-> > >
-> > > This requires the next commit plus it needs callers of `new_spinlock!=
-`
-> > > in Binder to be fixed at the same time.
-> >
-> > Actually, do we even want callers to have to specify `c`?
-> >
-> > For instance, in the `module!` macro we originally had `b`, and
-> > removed it for simplicity of callers:
-> >
-> >     b13c9880f909 ("rust: macros: take string literals in `module!`")
->
-> Yeah I think ideally the new_spinlock! macro invokes c_str! on the
-> provided string literal to avoid users of the macro from needing the
-> c prefix.
->
-> Alice
+On Wed, Nov 12, 2025 at 01:34:30PM -0600, Daniel Jurgens wrote:
 
-Makes sense and done in v4 (which contains only a small portion of
-this patch and no others).
+...
+
+> +static int setup_classifier(struct virtnet_ff *ff, struct virtnet_classifier *c)
+> +{
+> +	int err;
+> +
+> +	err = xa_alloc(&ff->classifiers, &c->id, c,
+> +		       XA_LIMIT(0, le32_to_cpu(ff->ff_caps->classifiers_limit) - 1),
+> +		       GFP_KERNEL);
+
+Hi Daniel,
+
+I am wondering if some sort of bounds checking should be done for
+classifiers_limit. E.g. if it is 0, then this will set the
+maximum limit to -1 (UINT_MAX), which seems somewhat large,
+assuming classifiers_limit of 0 doesn't mean unlimited.
+
+Flagged by Claude Code with https://github.com/masoncl/review-prompts/
+
+> +	if (err)
+> +		return err;
+> +
+> +	err = virtio_admin_obj_create(ff->vdev,
+> +				      VIRTIO_NET_RESOURCE_OBJ_FF_CLASSIFIER,
+> +				      c->id,
+> +				      VIRTIO_ADMIN_GROUP_TYPE_SELF,
+> +				      0,
+> +				      &c->classifier,
+> +				      c->size);
+> +	if (err)
+> +		goto err_xarray;
+> +
+> +	return 0;
+> +
+> +err_xarray:
+> +	xa_erase(&ff->classifiers, c->id);
+> +
+> +	return err;
+> +}
+
+...
+
+> +static int virtnet_ethtool_flow_insert(struct virtnet_ff *ff,
+> +				       struct ethtool_rx_flow_spec *fs,
+> +				       u16 curr_queue_pairs)
+> +{
+> +	struct virtnet_ethtool_rule *eth_rule;
+> +	int err;
+> +
+> +	if (!ff->ff_supported)
+> +		return -EOPNOTSUPP;
+> +
+> +	err = validate_flow_input(ff, fs, curr_queue_pairs);
+> +	if (err)
+> +		return err;
+> +
+> +	eth_rule = kzalloc(sizeof(*eth_rule), GFP_KERNEL);
+> +	if (!eth_rule)
+> +		return -ENOMEM;
+> +
+> +	err = xa_alloc(&ff->ethtool.rules, &fs->location, eth_rule,
+> +		       XA_LIMIT(0, le32_to_cpu(ff->ff_caps->rules_limit) - 1),
+> +		       GFP_KERNEL);
+
+Likewise for rules_limit.
+
+> +	if (err)
+> +		goto err_rule;
+> +
+> +	eth_rule->flow_spec = *fs;
+> +
+> +	err = build_and_insert(ff, eth_rule);
+> +	if (err)
+> +		goto err_xa;
+> +
+> +	return err;
+> +
+> +err_xa:
+> +	xa_erase(&ff->ethtool.rules, eth_rule->flow_spec.location);
+> +
+> +err_rule:
+> +	fs->location = RX_CLS_LOC_ANY;
+> +	kfree(eth_rule);
+> +
+> +	return err;
+> +}
+
+...
 
