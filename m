@@ -1,207 +1,183 @@
-Return-Path: <netdev+bounces-239171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F483C64F7A
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:50:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D885AC65085
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:06:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 02F834E1C1E
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 15:49:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 927A028FCC
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4CF28640C;
-	Mon, 17 Nov 2025 15:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339532C0F7F;
+	Mon, 17 Nov 2025 16:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Un7Gp+qc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X24Peyfv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CDA28D8DF
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 15:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E6F2C032E
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763394541; cv=none; b=uNzBx4gs4q7XTSCLUsrj7pJtBAxrfsg8aLRu5kyaewCB44GUENvhwGjL8itMFyhOZZ3DdpII6OcP8iMzxi1C/oTWpQc//O0HRVFjOx9w0V5E7v/VUPZgzSV42ZxVxzngMSbDuvZBDAXEWSd5scRJjEsqp2NUpR6WcXvE/Qdfhq8=
+	t=1763395547; cv=none; b=bwjLWZF246ETLNJb6iWS7vcDfzqfu/WIkBE9DigQ3Bo9tb5ijLHm5ya4R8zrMviTiwPsxXQLzaQdWQ8SVgWDCIDlIGuU/ZK8X1RA0hQ1UjKjvVsajOUdlUrYZ+eByBRw6U+9/iXtBYvWf51gS/6syjgbfOLGqQvwLvSghRy8i4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763394541; c=relaxed/simple;
-	bh=dW17Xtf60yMPT5ps4T8sOTJvB9Wdvt1Dcr9Gkv/rbrI=;
-	h=From:To:Subject:Message-ID:Date:MIME-Version:Content-Type; b=TbY1XGSuFmsVKNN54lfVuLU2pJ74HAs3tQqfB/TSbbzTHq/WsYsrYZbgoh1zXHLij9fUlPoMz42Eb3557CTsmOU4i9lKLDneKYns4LR/c/cQYQQJkey/gnP6u/cl31yQFZIU+Z/TQVRSXU5qaVjmAl9pHsFSW+y6aN+lvYEp158=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Un7Gp+qc; arc=none smtp.client-ip=209.85.208.172
+	s=arc-20240116; t=1763395547; c=relaxed/simple;
+	bh=UXuVTbFZfxhi/CrUJ0m3gOEFVfhuQjoRzNtauAvd7JQ=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=FhhHm342L8TLC1yrMiaSoZICRbd3R0doJoTNguBX+O9XVgR/F9KhjIdui+zb1CFkLJ66fXmchjVV40OItONQoJCNMvXAcV6lFmY7drB5FDt0PfjaXhTXr1btypRkNekkiQwlI7BG+Q2Ng+ab5jQRial/KrhFdhIHgy8peC3KfNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X24Peyfv; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-37bbb36c990so13238671fa.0
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 07:48:59 -0800 (PST)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4775ae5684fso22794475e9.1
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 08:05:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763394538; x=1763999338; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:date:message-id
-         :subject:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LGblZlAzPFW/2WQFRjSDWi5Fba28kD07gZJ1IX2a3nA=;
-        b=Un7Gp+qclTuRZv7ffd9KVRG0N07pMeLxqFb3tdXaAzhmZ4RFxGI/HnESxhKvsuvQYB
-         YjoN/gU6n8aobsy7pbc2oX+C5sil5VqcUL8iuybnkcG8amQz9mnsPp3qygqoOPM5XBx/
-         svro+HtVAWKrpdmrz8DA14zQpi8Oo0bzsgA94dBkYDEoULrssCy64KymCM9rNkZyeXef
-         PY3Y4l347ivLqrPz7LnpHpN9HgeKNhNcXS4oirsMnn+TnfpzlKOye3i85FwsotL1XXtt
-         JlnsGaoWW30c6RPGxOaz26v4Cc7IeCNh7PJvbmOfY6JovuxphT2CTevzV3nDGel5CMba
-         UMBA==
+        d=gmail.com; s=20230601; t=1763395543; x=1764000343; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dv25gH3/0ppvFW0ahX017ugBnCLfGg5eMQGqgnwTcyQ=;
+        b=X24PeyfvRZp2RguBNMgmmF+dVokStvtag656iu8St9CqCe79eMN5BaHNgrT1kEz0Re
+         YtoMq8JQHOv8s5E9ywpCAedbwzVzfQxcNEVrx/0w+QYl2LW11yiD/BlHJWW/D+KyvbG+
+         6iKtcgcjMnNLNnuQUw1VLrLPSDo1VGCCrdR8jLl6/Cx3Z//Ef4dE/yENUSurAuVs5bBR
+         odXsnGPqSFdpxiXp0nx6KSURVdV3JWRwZeV9TI5buLjD8DRVC04CIZLa+GpnoCkk3OaE
+         Nr4p856KEqm+xhsxW2jNGF4OMj6Th6wrIvrnA6vBR8lJvUiUaRoSm+TFMOhZ+I8fLWIV
+         Gqkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763394538; x=1763999338;
-        h=content-transfer-encoding:mime-version:user-agent:date:message-id
-         :subject:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LGblZlAzPFW/2WQFRjSDWi5Fba28kD07gZJ1IX2a3nA=;
-        b=VAmerSHOZ3E+3uitFeD/Nc/DAEVkexoDSXcloje/so2MD+9DrSAAf8xgbnZsINHAke
-         U6L/TetDeXN9I1JQI3K+DtVnE80QJ8Ea+dKeTc+TkNX4YC8f2ajzXdfiVwtq7M95pWuB
-         zLbRtYvlfqM99RQuCuJTfXjNnSgZWQh+3cSzBEsv4b0ueCS3MtQajJcV8EwBTqC81DUk
-         VkqI0CUVHUQbNFUQwI4apoM0n99mGfmgqkmNnzWxIAM0mZd2YH6hn8iVBwTCfzlhWw8e
-         KGdH7kQvmtZ0jQpTUhfIti+2L0cgZQPZ06Gci2A60EXlHbgl+6rVivY7Z8n0Kk9Dy6xE
-         hoiA==
-X-Forwarded-Encrypted: i=1; AJvYcCU7/DMcQrEnj4DunS6clLKAXhLhGSFfmsBXrIEVHLrTs5YTMAlokWXhx7t8NUCZ8E4aZvvFQNo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvR44id247DSrQdevCoM5RAYI51mljsbmakKPJQWfY+QWPFjRt
-	537xBvNeq0h0zpf63VHR7LCS5NVCnKgr4nPa01C5zAdbdHs20BcxpzAuGKaQSF3H
-X-Gm-Gg: ASbGncvHrOEY7LZgbDPimDgqA2jSzOU1Yv+/jryU+qUV21Esv3TM/Kq6i41Oxf3C0Ic
-	NNZT8rx2N7/TwEKb+vRWJcOs0IYoFSLIH1lKruCNXXG7ETcUEHOQD+sV9mb08pL2VCdFdQ15DGr
-	7Ax6Z+NTrI26gJ8vAf4SH0I4CcqQ1xBl3GTiiAAC6xHI64LhTKx9hobQiFTni09exEsPTLgn4/N
-	ThQDcNnOgJHr8TX0oSK3UmsAlQPTOQAqSBlC2YUNvMDuC7m8+TyNmkmubRNgP5VuOLuRrSXL72m
-	Nu+aHuixlDdICVjIqn9jqos9hx11oKdwYuWtN2khgcG85YU+Ny2TToM7O26zDV9udnHOOa4qvAy
-	7tVQ2JtQlJjeQ/E0cbmeBLSv4hE26Hcu8trgc5KBcbR/vZdf3WEj3DLcqRGMQK356sa/LeJMKcn
-	Pg+LOUlB1V/DnYko5/XwNWkkY=
-X-Google-Smtp-Source: AGHT+IF1rpPVTmlQvY0tbCs1bx4/RNae4dLLTTWFHwfN3jpYicr+8cuN8Uv57cOfRwrbAVJg0vGaGg==
-X-Received: by 2002:a05:651c:310:b0:37b:986a:fc1 with SMTP id 38308e7fff4ca-37b9b16d83amr29417181fa.22.1763394537247;
-        Mon, 17 Nov 2025 07:48:57 -0800 (PST)
-Received: from lilem.mirepesht ([89.40.241.109])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-37b9cee2beesm29047651fa.43.2025.11.17.07.48.55
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 17 Nov 2025 07:48:56 -0800 (PST)
-From: Ali Gholami Rudi <aligrudi@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Eugenio P=?UTF-8?B?w6k=?=rez" <eperezma@redhat.com>,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Kernel Crashes When Using VHOST/VIRTIO
-Message-ID: <20251711154506@laper.mirepesht>
-Date: Mon, 17 Nov 2025 15:45:06 -0000
-User-Agent: Neatmail/1.1 (https://github.com/aligrudi/neatmail)
+        d=1e100.net; s=20230601; t=1763395543; x=1764000343;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Dv25gH3/0ppvFW0ahX017ugBnCLfGg5eMQGqgnwTcyQ=;
+        b=WGKuJFgSBn0RKscEuKID67TZwnHespsqa9jCTHGz3tFlFA036lgwZr5DWjcjE+bYlX
+         LABxr4thIff4E8ub37YsbmEq/Cmdqq14E4Jqc6CCRIo27mW9P5Fp+2wsz7n0+Y+YBMhU
+         5gfblswMs1YSFxIEkN2VMch5l4KZwYsY65TuDyuGTkTwhNo/N4/TALzMxyAQeH6rna7h
+         CeKGMIMOiNaJs35qlnBGlqHbwG81fxLsBKZHESYEPraU5iH8LJ8Yr6uqFWY/vbqFmtSY
+         pa9epAGPRhiIgldoxwrVwGPHrAApaupaeD4st4SMQkYUGdLsByI+nx1xrLLqa+bTQpzf
+         7VBw==
+X-Forwarded-Encrypted: i=1; AJvYcCWSTdvDH5m6SDSAheySXEnqngZnYJQgr0FdbZfvCdHT5ehEUvWmFW46KGhFXjq7QhAcu4KXslI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/l2dFjWqebDIeZHtSSaa+DVaiFrd9gO/I1JZsPwVPJF1YEdRN
+	7BZrXVdgSO2R+e+v1i40PCfVg21zA4pryQP77rMZi+IU658IQibJUgnQ
+X-Gm-Gg: ASbGncuaNzLh1GuxqVVxd+G4IDqWvJn5fkL34KEuS8okaHgTGh4DyaFsV8wmcoU7ELI
+	cK7jabX1xya+A58A6P1tsC8XCf/s3ulhSiLc3NHI427TQ8cRuKQmS8BMlnTOn9Tlaz+BQbYgtvP
+	gQu9hzRcYog9GsvTGjSKFNeUjb0YSMllG4n33qxEvtMwUv7fFM2qzI8QDZs18mw0AvuufW4wpWJ
+	bc8ESeFoMD/baqYKViVvLbHY7ZJ29C2o14Jw4QLlDQuKmx9ZLX89bpZ5LlFQd7a5uiGtBaUWdpc
+	IxAVlg9p5xXwdGOwo4tcG5xktz6bmaCdV5bcbwLlFl3nV5IqH6DB62oKX/KEFOuhxIaMZCoJAGH
+	PZ1fd/jLic3hP7r+pQx8QEzcZJ5mEBPWr7+G4XX2oWp3MguCndwboYsa2yorpwuqq9yM8FsP1Pg
+	fCkf4W7REwIrAhJkEOErJVJqdnVS/X1vi4Bw==
+X-Google-Smtp-Source: AGHT+IFjKArWkw1DSxq8VyVfr3BAgiXDtfD7+MsJ0RaIGRQ1j4scrOis/SC3f5RBEf1d1A5CQWt8Rw==
+X-Received: by 2002:a05:600c:8b4b:b0:477:63a4:88fe with SMTP id 5b1f17b1804b1-4778fe50df1mr117952345e9.2.1763395543365;
+        Mon, 17 Nov 2025 08:05:43 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:7408:290d:f7fc:41bd])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47796a8a695sm152861485e9.13.2025.11.17.08.05.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 08:05:42 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Gal Pressman <gal@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Andrew Lunn <andrew+netdev@lunn.ch>,
+  <netdev@vger.kernel.org>,  Simon Horman <horms@kernel.org>,  Alexei
+ Starovoitov <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,
+  Jesper Dangaard Brouer <hawk@kernel.org>,  John Fastabend
+ <john.fastabend@gmail.com>,  Stanislav Fomichev <sdf@fomichev.me>,
+  <bpf@vger.kernel.org>,  Nimrod Oren <noren@nvidia.com>
+Subject: Re: [PATCH net-next 1/3] tools: ynl: cli: Add --list-attrs option
+ to show operation attributes
+In-Reply-To: <20251116192845.1693119-2-gal@nvidia.com>
+Date: Mon, 17 Nov 2025 15:56:17 +0000
+Message-ID: <m2seecmz4u.fsf@gmail.com>
+References: <20251116192845.1693119-1-gal@nvidia.com>
+	<20251116192845.1693119-2-gal@nvidia.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Hi,
+Gal Pressman <gal@nvidia.com> writes:
 
-The problem happens if a Qemu VM using vhost/virtio receives packets at
-a very high rate.  After Qemu's quit command or when the VM is rebooted,
-the kernel panics.  The problem is easy to reproduce; we tried different
-kernel versions, including 6.1.158 and the mainline, with the same result.
-We also reproduced the problem with both Mellanox ConnectX-6 and Intel
-XL710 NICs.  The VM is run in Debian 12 using Qemu-7.2.19, on a machine
-with AMD Ryzen 9 processor and 192GB of memory.
+> Add a --list-attrs option to the YNL CLI that displays information about
+> netlink operations, including request and reply attributes.
+> This eliminates the need to manually inspect YAML spec files to
+> determine the JSON structure required for operations, or understand the
+> structure of the reply.
 
-I have to note that while Qemu's quit command triggers the problem,
-if Qemu is killed with SIGTERM, nothing happens.  Kernel's call trace
-is included at the end of this email.
+Thanks for the contribution, it's been on my wishlist for a while.
 
-Thanks,
-Ali
+[...]
 
-------------[ cut here ]------------
-kernel BUG at mm/slub.c:419!
-invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
-CPU: 119 PID: 0 Comm: swapper/119 Not tainted 6.1.0-30-amd64 #1  Debian 6.1.124-1
-Hardware name: Supermicro AS -1023US-TR4/H11DSU-iN, BIOS 2.5 10/25/2022
-RIP: 0010:__slab_free+0x118/0x2d0
-Code: 74 35 49 8b 06 48 89 4c 24 20 48 c1 e8 36 4c 8b a4 c3 d8 00 00 00 4c 89 e7 e8 e4 e3 71 00 48 8b 4c 24 20 48 89 44 24 18 eb 8f <0f> 0b f7 43 08 00 0d 21 00 75 cd eb c6 80 4c 24 53 80 e9 75 ff ff
-RSP: 0018:ffffbbfedab8c8c8 EFLAGS: 00010246
-RAX: ffff96e7c0c89070 RBX: ffff962c5000e700 RCX: 0000000080400026
-RDX: ffffbbfedab8c8f0 RSI: fffffb5d6f032200 RDI: ffffbbfedab8c930
-RBP: ffff96e7c0c89000 R08: 0000000000000001 R09: ffffffffc0ecafe5
-R10: 000000000000037c R11: 0000000000000370 R12: 0000000000000000
-R13: ffff96e7c0c89000 R14: fffffb5d6f032200 R15: ffff96e7c0c89000
-FS:  0000000000000000(0000) GS:ffff97284e7c0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffd109bccb7010 CR3: 0000000fce206000 CR4: 0000000000350ee0
-Call Trace:
- <IRQ>
- ? __die_body.cold+0x1a/0x1f
- ? die+0x2a/0x50
- ? do_trap+0xc5/0x110
- ? __slab_free+0x118/0x2d0
- ? do_error_trap+0x6a/0x90
- ? __slab_free+0x118/0x2d0
- ? exc_invalid_op+0x4c/0x60
- ? __slab_free+0x118/0x2d0
- ? asm_exc_invalid_op+0x16/0x20
- ? tun_net_xmit+0x2c5/0x4f0 [tun]
- ? __slab_free+0x118/0x2d0
- ? __slab_free+0xbf/0x2d0
- tun_net_xmit+0x2c5/0x4f0 [tun]
- dev_hard_start_xmit+0x63/0x1d0
- sch_direct_xmit+0xa0/0x370
- __qdisc_run+0x145/0x590
- __dev_queue_xmit+0x7e9/0xd90
- ? srso_return_thunk+0x5/0x10
- br_dev_queue_push_xmit+0xb7/0x1d0 [bridge]
- br_handle_frame_finish+0x365/0x5b0 [bridge]
- ? srso_return_thunk+0x5/0x10
- ? nft_do_chain_netdev+0x15f/0x2f0 [nf_tables]
- ? srso_return_thunk+0x5/0x10
- br_handle_frame+0x2a6/0x3c0 [bridge]
- ? br_handle_frame_finish+0x5b0/0x5b0 [bridge]
- __netif_receive_skb_core.constprop.0+0x263/0xef0
- ? srso_return_thunk+0x5/0x10
- ? asm_sysvec_call_function_single+0x16/0x20
- __netif_receive_skb_list_core+0x13a/0x2c0
- ? srso_return_thunk+0x5/0x10
- netif_receive_skb_list_internal+0x1cd/0x300
- ? dev_gro_receive+0x3b1/0x730
- napi_complete_done+0x6d/0x1a0
- i40e_napi_poll+0xe27/0x1330 [i40e]
- __napi_poll+0x2b/0x160
- net_rx_action+0x2a0/0x350
- ? srso_return_thunk+0x5/0x10
- handle_softirqs+0xd7/0x280
- ? handle_edge_irq+0x87/0x220
- __irq_exit_rcu+0xac/0xe0
- common_interrupt+0x82/0xa0
- </IRQ>
- <TASK>
- asm_common_interrupt+0x22/0x40
-RIP: 0010:finish_task_switch.isra.0+0x96/0x2d0
-Code: 45 34 00 00 00 00 0f 1f 44 00 00 49 8b 9c 24 20 0a 00 00 48 85 db 0f 85 aa 00 00 00 4c 89 e7 e8 b0 a5 96 00 fb 0f 1f 44 00 00 <65> 48 8b 04 25 80 fb 01 00 eb 42 4d 85 f6 74 21 65 48 8b 04 25 80
-RSP: 0018:ffffbbfed0adfe50 EFLAGS: 00000282
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000002
-RDX: 0000000000000000 RSI: ffff962c5ccc1980 RDI: ffff97284e7f1a40
-RBP: ffffbbfed0adfe78 R08: 0000000000000000 R09: 0000000000000000
-R10: 00000000fffffffb R11: 0000000000000000 R12: ffff97284e7f1a40
-R13: ffff95424d908000 R14: 0000000000000000 R15: 0000000000000001
- __schedule+0x355/0x9e0
- schedule_idle+0x26/0x40
- do_idle+0x172/0x2a0
- cpu_startup_entry+0x26/0x30
- start_secondary+0x12a/0x150
- secondary_startup_64_no_verify+0xe5/0xeb
- </TASK>
-Modules linked in: nfsd nfs_acl nbd act_police cls_matchall sch_ingress vhost_net vhost vhost_iotlb tap sch_tbf tun nft_ct nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nft_limit nft_meta_bridge nf_tables nfnetlink rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace fscache netfs bridge stp llc bonding msr cpufreq_powersave cpufreq_ondemand cpufreq_userspace cpufreq_conservative tls intel_rapl_msr intel_rapl_common amd64_edac edac_mce_amd kvm_amd kvm irqbypass ghash_clmulni_intel sha512_ssse3 sha512_generic sha256_ssse3 sha1_ssse3 aesni_intel ipmi_ssif crypto_simd cryptd rapl pcspkr sunrpc binfmt_misc nls_ascii ast nls_cp437 drm_vram_helper vfat drm_ttm_helper fat ttm drm_kms_helper sr_mod cdrom acpi_ipmi sp5100_tco ccp sg watchdog k10temp ipmi_si ipmi_devintf ipmi_msghandler evdev joydev acpi_cpufreq button drm fuse loop efi_pstore dm_mod configfs ip_tables x_tables autofs4 ext4 crc16 mbcache jbd2 efivarfs raid456 async_raid6_recov async_memcpy async_pq async_xor
- async_tx xor raid6_pq libcrc32c crc32c_generic raid1 raid0 multipath linear raid10 hid_generic usbhid uas md_mod hid usb_storage crc32_pclmul crc32c_intel nvme nvme_core ahci xhci_pci libahci t10_pi xhci_hcd crc64_rocksoft libata crc64 igb crc_t10dif i40e usbcore scsi_mod crct10dif_generic i2c_algo_bit crct10dif_pclmul crct10dif_common dca scsi_common i2c_piix4 usb_common
----[ end trace 0000000000000000 ]---
-RIP: 0010:__slab_free+0x118/0x2d0
-Code: 74 35 49 8b 06 48 89 4c 24 20 48 c1 e8 36 4c 8b a4 c3 d8 00 00 00 4c 89 e7 e8 e4 e3 71 00 48 8b 4c 24 20 48 89 44 24 18 eb 8f <0f> 0b f7 43 08 00 0d 21 00 75 cd eb c6 80 4c 24 53 80 e9 75 ff ff
-RSP: 0018:ffffbbfedab8c8c8 EFLAGS: 00010246
-RAX: ffff96e7c0c89070 RBX: ffff962c5000e700 RCX: 0000000080400026
-RDX: ffffbbfedab8c8f0 RSI: fffffb5d6f032200 RDI: ffffbbfedab8c930
-RBP: ffff96e7c0c89000 R08: 0000000000000001 R09: ffffffffc0ecafe5
-R10: 000000000000037c R11: 0000000000000370 R12: 0000000000000000
-R13: ffff96e7c0c89000 R14: fffffb5d6f032200 R15: ffff96e7c0c89000
-FS:  0000000000000000(0000) GS:ffff97284e7c0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffd109bccb7010 CR3: 0000000fce206000 CR4: 0000000000350ee0
-Kernel panic - not syncing: Fatal exception in interrupt
-Kernel Offset: 0x22a00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> +    def print_attr_list(attr_names, attr_set):
+> +        """Print a list of attributes with their types and documentation."""
+> +        for attr_name in attr_names:
+> +            if attr_name in attr_set.attrs:
+> +                attr = attr_set.attrs[attr_name]
+> +                attr_info = f'  - {attr_name}: {attr.type}'
+> +                if 'enum' in attr.yaml:
+> +                    attr_info += f" (enum: {attr.yaml['enum']})"
+> +                if attr.yaml.get('doc'):
+> +                    doc_text = textwrap.indent(attr.yaml['doc'], '    ')
+> +                    attr_info += f"\n{doc_text}"
+> +                print(attr_info)
+> +            else:
+> +                print(f'  - {attr_name}')
 
+Does this line execute? I think this scenario indicates a malformed
+spec that would fail codegen.
+
+> +    def print_mode_attrs(mode, mode_spec, attr_set, print_request=True):
+> +        """Print a given mode (do/dump/event/notify)."""
+> +        mode_title = mode.capitalize()
+> +
+> +        if print_request and 'request' in mode_spec and 'attributes' in mode_spec['request']:
+> +            print(f'\n{mode_title} request attributes:')
+> +            print_attr_list(mode_spec['request']['attributes'], attr_set)
+> +
+> +        if 'reply' in mode_spec and 'attributes' in mode_spec['reply']:
+> +            print(f'\n{mode_title} reply attributes:')
+> +            print_attr_list(mode_spec['reply']['attributes'], attr_set)
+> +
+> +        if 'attributes' in mode_spec:
+> +            print(f'\n{mode_title} attributes:')
+> +            print_attr_list(mode_spec['attributes'], attr_set)
+> +
+> +        if 'mcgrp' in mode_spec:
+> +                print(f"Multicast group: {op.yaml['mcgrp']}")
+> +
+>      if args.list_ops:
+>          for op_name, op in ynl.ops.items():
+>              print(op_name, " [", ", ".join(op.modes), "]")
+> @@ -135,6 +172,24 @@ def main():
+>          for op_name, op in ynl.msgs.items():
+>              print(op_name, " [", ", ".join(op.modes), "]")
+>  
+> +    if args.list_attrs:
+> +        op = ynl.msgs.get(args.list_attrs)
+> +        if not op:
+> +            print(f'Operation {args.list_attrs} not found')
+> +            exit(1)
+> +
+> +        print(f'Operation: {op.name}')
+> +
+> +        for mode in ['do', 'dump', 'event']:
+> +            if mode in op.yaml:
+> +                print_mode_attrs(mode, op.yaml[mode], op.attr_set, True)
+> +
+> +        if 'notify' in op.yaml:
+> +            mode_spec = op.yaml['notify']
+> +            ref_spec = ynl.msgs.get(mode_spec).yaml.get('do')
+> +            if ref_spec:
+> +                print_mode_attrs(mode, ref_spec, op.attr_set, False)
+
+I guess mode is set to 'event' after the for loop. I'd prefer to not
+see it used outside the loop, and just use literal 'event' here.
+
+> +
+>      try:
+>          if args.do:
+>              reply = ynl.do(args.do, attrs, args.flags)
 
