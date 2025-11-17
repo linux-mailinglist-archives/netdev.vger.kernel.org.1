@@ -1,229 +1,180 @@
-Return-Path: <netdev+bounces-239008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C277C62112
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 03:13:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C3D0C6223E
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 03:45:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1F2D54E549E
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 02:13:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id A29E622EE2
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 02:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F44024BBF4;
-	Mon, 17 Nov 2025 02:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B38C2494F0;
+	Mon, 17 Nov 2025 02:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="D979VUdv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jSStujHv"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010059.outbound.protection.outlook.com [52.101.56.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB283246793
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 02:12:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763345576; cv=fail; b=EfxWcYv2HUk0DHN2bOcwuBWnu7p0bLPP2Qo67LwXlcoGHDU66v+T/j5eJxtykJUy0uaOah7ErAd/h3L0cTil68Wh45oV6gH1FOMx1alB9EK191gaRBs4HpLK9S08NaQFekBzuAkUf6pTtWQVq2UB3qrX44Ydn2R5Giq6gRtKTcw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763345576; c=relaxed/simple;
-	bh=UqsvxrGFxwnp0iLRes7PQMvf/C8p35Oi5vpuucfMlnM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=FLC7F7i7uDqu3LYyFGmZWbdlP2gLeh8JmHud6W2wKYLIH7/WTh0Cj8UKEoFKD1uuC4gmzcQl4lnZaty2DfScsym5Zv5VnGd3onJAVAVc6ThyK7LQnfOhoehgdbJDIU2z5MQ+T0bFlib7dEORY4G/rbu6F6dLsQx7NgRYXfRarwU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=D979VUdv; arc=fail smtp.client-ip=52.101.56.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cx1uek+iF6rTQItqvsfqsAMwAQ18hC5VXWQAylWPqsSnbPfA3uORuiostcW054zQAfMe2o1vIv/fvb7NDFluxCOUiTnL6OjllPym/Ott9JXS56N83UdugEs5MUq5BW2UkvM1737tUPiT2086o6+ZtdwgdiZDKhBretxLLVK0mhEwHSdh89Y6fdRnVsTeTzPT9Klttn1Dfj0ppolzE6RHvbDfwS78ZF4Y+d6YmJbXFCpWDZQ7BB38q7QKvbxhtEt6GhUzzBLCLVGot+3d5UKQGx5a3SarmC2UBlwugQFbQ7gXJqi6PL4HixhMExzosYfQ1Pikd1apzpGE/Nb6PpPu1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e7VBE6wAB+UpqIweJHn2OxSEo2ePBDvU+DrR0BG4s1E=;
- b=TwjrVFTaJ7l9ex9YD/In3mBSM6kgyfoOUxGP9ryNUU/zMTO4TfL8vIe0fHlp05tQbkZz0eJXl5d12GBb/fEiK2/aPxSzHhJNc9GFBurVBF9rjYnu+wwHaJX/kpnpANYpDteYjqFV48Mi7+2YKD0GgTYYp1U5NThOsaFon0RQvwACHzrV64Dm9CU6UHKew5p1qtVKb75CtHfX9YjWizrVE7u7Ggo8b1CdpGbjmwSZUmSI50LZ21gUPa32shbVAhZ0HPcoJhGrXoiaGQknpcGYekYkHb7czF2PET0cZiv5e1732xX4dEEnIJeiycebT4FbaTFzKhDJZhvLeO1z6vfl+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=queasysnail.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e7VBE6wAB+UpqIweJHn2OxSEo2ePBDvU+DrR0BG4s1E=;
- b=D979VUdvyI4kCKOwoVy8DLbYDZbIkrVHqx7AM2cSjfn5hGsUWOd56CNlXOSY+YLRY4RnIa3+9mLWfo7RsII/YjzP4zUhNYQcrpJpi89PpV83fLhbrgx5L0Tc8OaixpYG9ofwlYW0iTfT/WmPGts2NZOp31bbXstRl8AiwSFom5+gL4Loih2bCGzpD3XQprq5u2zQq5ncY1+B/15A4NkkdOCFiQpVaoERve6DOdJKSLo76IpifSaJZpHgzr75pG8GAIB5qBz/1urvqiHpie2vW4p3WywuGDab2Eo0tLkLa8W+UU0dUWvynXMMR5o02hreGaT9bbwwvHULoScScbT7sw==
-Received: from BL1P223CA0004.NAMP223.PROD.OUTLOOK.COM (2603:10b6:208:2c4::9)
- by CH2PR12MB4309.namprd12.prod.outlook.com (2603:10b6:610:a4::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.21; Mon, 17 Nov
- 2025 02:12:51 +0000
-Received: from BL6PEPF0001AB75.namprd02.prod.outlook.com
- (2603:10b6:208:2c4:cafe::62) by BL1P223CA0004.outlook.office365.com
- (2603:10b6:208:2c4::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9320.21 via Frontend Transport; Mon,
- 17 Nov 2025 02:12:24 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL6PEPF0001AB75.mail.protection.outlook.com (10.167.242.168) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9343.9 via Frontend Transport; Mon, 17 Nov 2025 02:12:50 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 16 Nov
- 2025 18:12:38 -0800
-Received: from [172.29.249.233] (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 16 Nov
- 2025 18:12:35 -0800
-Message-ID: <d18ab53f-b91b-4c64-926f-4a1466d2d31e@nvidia.com>
-Date: Mon, 17 Nov 2025 10:12:32 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7AB23BF91
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 02:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763347511; cv=none; b=deEONA6pujWE2H25hfgEqGFGvuGXMT5hPh+1N+W+UEgk5nRZi5e6KezD7s3COPbFgg3Ag0gP//dDzsBrGfQLVwootKpS1uba7g7EVDObHJrWw9j5n3RNbvh4X5GIcNEg2XBljZR5QE+/MAJhLriLF/LtopMujI35/vl9GpPZvtA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763347511; c=relaxed/simple;
+	bh=ZVUTfDhTT/GOlvzjT3r/C0OfmEYwDYEsAH2JocXB04o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gKpMpoRbPYTAgm4nlXY8qx41doR8ilDzdpUAYn3dCHLUB9QPQ9OLpRUn4ez7PkFcgFypeKsM6qxB9nrVKkOeExAi+00HWRdEfaMgDhq7qlVdBGFGqvnCmm2azQFarnQ98k87tIUakuHt50wRiA3Ie9jb2KwnX+2lft9dPM2+HJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jSStujHv; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2958db8ae4fso34757055ad.2
+        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 18:45:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763347508; x=1763952308; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oepM6P0+Z/yp3y3nzv3XvDuV7EmlyvaBGIywVHHDMYc=;
+        b=jSStujHvqf++85Y0e270zBheBgmqwJJ3snlJP72HUSY6DUZrGbGiKqKcI9wmiPiCU4
+         cX+XoQcEWjYbkTk2YKjWvyF/Bs/+CsQ1Pt6/ITaY+NlvCPCQTB9eBb6CrDi+nEB+h57i
+         SGfuC5YxJwr6LJJkMSJVAKsbGSaNrZv7Lk/LnG2SRkDU6ESjAlGtl63PJFmWajshWqco
+         hK6El/0hxAjwRTHutIPX1cCtaTNNaiLlZZLGvZ0eu6iESCBHxRzc8KvFHRhECpBt2jiP
+         SyMPp6lkeU5zUL4HXcYCQpkWa+lxBo7PXLL9SyPhZQ8pvUrS+h/9vAA3Zn4VipS+c7rv
+         0K0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763347508; x=1763952308;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oepM6P0+Z/yp3y3nzv3XvDuV7EmlyvaBGIywVHHDMYc=;
+        b=YzDHIRfO/SclH14To+EcaFKMnjACImJMAUG9wgNkzwp7HWH2LzKh13sEWXy4WYJtgZ
+         Yy15C82qaIGQpxyMY4YzDpxn8NjGNHFRYaLj61SLUas+f9+2t0PvUpTidypBwCJ5n2Ee
+         lXFSx6LOEfYsAz4uG3lwJNrugJFZYwmYxt9ct2c6ac0h5VG+b5B4lVvG5Sm9RmJ0tzL5
+         Xoq3jBTUoRMX0SiuelzUcNMbF1WW61mbLT5glA/FJ/ejSjPh9LW9KEWinQQyCkII7a3O
+         mUbnbXaSoafb4PnhDyVmnBoLYwcbPUaFKBmSjNtROlfSyLDVZ/2RmpcsgzaTK6wwK0cN
+         W4sg==
+X-Gm-Message-State: AOJu0Yxcxv3P6X04D69KdnWV0qjQNTLZX4ULmb6WulpLv2vHoub+aM3Q
+	HqlCvOYuZ/38jO7qGjBejy0RPGpt4Q5pbty4X+t4TpZaX/em5qbKyR0a7R5NXGeV
+X-Gm-Gg: ASbGncvERSgwMIDClzJu/Y7Lf9GttYdWMM5g9jWYKpOjWcbU31gV+y6ze7dwO+FVp4l
+	IH6zC6mc4GPddQDiGGeeE7gpwyPW3DZ8KrpwLdrePNWJ6x/fKBK4RtanQqfYirg34qkvqXanC6a
+	Mls1IiK+gpAzrovbNzeDylcD48/qy3M9wBbYrvv5l/FoTs5m6aK54w1+O7+mGvl8GiMrNwuy8rC
+	V9bf+7xNclkjVH5Dxu0FpK+4LXwI82eZfl5t1t1QETKHYCIBjHvZOI8kAHI7rWX1n3GLpdhM/0i
+	0gKtrCU0YCqej1AICx3qj2UWWTk18fxI2SyOXI7w0RRoUf5mwjC5LmoowD5gZt9ir7TahrXq8E5
+	eN+tBDxWkKXgDboRf5JZLEH6v2sQ52kwrrXxijwALltCRbVs/VKgYloy3t0geAlLpLiM49zasMK
+	oJpJARK6hjMFP9P3Q=
+X-Google-Smtp-Source: AGHT+IFmc12LBLI+wPXxTBCBbV5nW6D84rkWmG1TtyXKTarka+BZ4+yNnGUgJxNc7UKyKRTH6CsO9g==
+X-Received: by 2002:a17:903:2350:b0:298:616b:b2d with SMTP id d9443c01a7336-2986a75275fmr116940015ad.51.1763347507621;
+        Sun, 16 Nov 2025 18:45:07 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2986e5ef32asm85041885ad.39.2025.11.16.18.45.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Nov 2025 18:45:07 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jan Stancek <jstancek@redhat.com>,
+	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	=?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Petr Machata <petrm@nvidia.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv5 net-next 0/3] Add YNL test framework and library improvements
+Date: Mon, 17 Nov 2025 02:44:54 +0000
+Message-ID: <20251117024457.3034-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH ipsec] xfrm: Fix inner mode lookup in tunnel mode GSO
- segmentation
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, "Paolo
- Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Cosmin Ratiu
-	<cratiu@nvidia.com>
-References: <20251114035824.22293-1-jianbol@nvidia.com>
- <aRpaNMxGlyV_eAHe@krikkit>
-Content-Language: en-US
-From: Jianbo Liu <jianbol@nvidia.com>
-In-Reply-To: <aRpaNMxGlyV_eAHe@krikkit>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB75:EE_|CH2PR12MB4309:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9aca0a0f-0168-4669-731a-08de257ecf93
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Z2thangrNFo3SlN5Y2w4eUVCR0pwNXNqUGs0TXBVQW5ianhLdTBWU29aMGJz?=
- =?utf-8?B?dkNMWGNvLzZ3Q2JVejhLdncyK3hjV2ViNTFMRUhjRUNISUl5ditkNytIeDdj?=
- =?utf-8?B?MkdoZHFjakRTbE5nQUlENWNHSkVRanNJZGQzcnlQNkI4czA1eHdHR2ZQQXFX?=
- =?utf-8?B?ejBjeE82THgvc0l0cG1NakhnMk9oMTFsMFNhNzhzY2lYN1o5TWx0azFodFFi?=
- =?utf-8?B?RjJWTXNTV0YzUHZRenVJRzNIYTdyVXpPS1R3MmRZejlJSUFOQkRVL043YUtD?=
- =?utf-8?B?MkFZR1VSN2NpcGljUUdCU3lNTmd6dVJwM3pKdm9UVHNXUUU0SDErMUVpcnd2?=
- =?utf-8?B?c3ZHdk53WEJjLzRjNHl1UXA4TjRmWDNoQm9rOWZIVFJJbVpvUnZicGIyKzRy?=
- =?utf-8?B?R3phbXVGTFdFNWdzUEZiZEtlOWVLOWtrQnVjcndybVdlZk4rdGRhZFRUd1hZ?=
- =?utf-8?B?VHYySDJpMXNnSnlsQ0lNbkdocUlsVTNuRWl1SUNaN3lQQm0zelMyYVg5Q3Yr?=
- =?utf-8?B?R0VDSm5zQ3VFbHVva25SMlg2SG9BQkUwRWx5OVB5S2cwNEd1dUZCZ1NIdTcy?=
- =?utf-8?B?d1Y1d2xyRkhaVkRPUkdPZk16ZlY4bEtzT0t1dVl6VU8wRkpvQ1o3ME5YRjlV?=
- =?utf-8?B?RHpibWFTWHM5OHJzK1FQYVF4R1RxdG9aMU5JclVJL3RVaVRDZ29Cc1NXWnNK?=
- =?utf-8?B?NDAyVEl6MjNVY0JIa2pYcG0vNmoxY21jOE4xc0RFNGJ3bmJlRnRRdzVRZEs2?=
- =?utf-8?B?OFFlUm1hcUZSaVBMWEV6dkVPbHI5VGFGOGVqN0JrOEFzK1ArS0lDb2lLMmJz?=
- =?utf-8?B?U29tUXNBNVdIUXEvaUwxeUI5c2pNU20zbHkzNldsNjE0OFFIcDkzREdEbWE5?=
- =?utf-8?B?UExKU05JUmo0S01EV1lNQ0ljZDc2R1FJempHL1h1OGpTOFZLMUJqaDJJck1h?=
- =?utf-8?B?UTVvUk1mNmN5QnhVQjgrRXhVVk14STdyK0pVR0R4Mk1oMHhUTEFlWkowYXFz?=
- =?utf-8?B?b2NvaXFrc1RPaXlraG02bXE3cUhaYmMwOEVEd2RWYVgxY1VOYUg3YkhOR3A1?=
- =?utf-8?B?V1RGK0hsWXdJUjJpKzFYK0JqYUFwWXJvTDZwbG5ydkhzaHl4YU0xWGJFenZT?=
- =?utf-8?B?T21Va01leW0va2FBOTlEOC9pdDd2eG5ieVI2R0x4WTd3Z0ZxMm1rT0RCKzhM?=
- =?utf-8?B?REhrSTFrTjFWSjhtWUtDcmFSbktrbllYMFljUzVpcCs5dXJlQUJPOFYyZ0hi?=
- =?utf-8?B?YldkOEZ6L3NVWklkM0doc1JsbFhFVUsrUC9zNklUNWpjR0N3di9SSStoK2hz?=
- =?utf-8?B?bVFLYUVTT1BMMC9tVVN0TGxyOUFVUW9RT3RvVjZwL0dGak9ld0FaNVg2Q1RP?=
- =?utf-8?B?bnNCRHA4QzYwZ1NPZmRUWE5HbC9zSFR0RmpxV2k0QkxyT3dkWWcvL1VkUjd5?=
- =?utf-8?B?d0dwd0lHbDR3cnFhbFRhQkYxZUI5WGVVUFpnTnJjelEvOTlOTVRYUDJHTFc4?=
- =?utf-8?B?MFVlNis0a25aYTlWWmxnbVJCZGFvcjIxMzErbkFVUlNhcnJSa1ZWYzNvakhn?=
- =?utf-8?B?QkwyWFBuZEl1TkFqWEs5b054NE5FN1hhSnd6azBiV3d4T1NnRHlabGNnaHpE?=
- =?utf-8?B?ME9jd2R2MGNSN2pBWTlhZjBEckNkSXgxdXIyTU55Z0UxR2RnOUUxMmh1b3JG?=
- =?utf-8?B?UysrOW9FU2hEdy9BTDVCSDFpeUVLbVZwMjYvK3JhVGIyL24vaVlrV3RlOC9C?=
- =?utf-8?B?UjcrZkhCRDlPVXNxa1BuUnczNW4xM2VCOHY3Tksyc3A3WkoyTFFQZUkvWnJa?=
- =?utf-8?B?RFJTQjNqVTYyaSs1Y3FscXRhSG9LNXZpUHVwM2FqMCtINHhYYWRhWG9HTlNF?=
- =?utf-8?B?RGwrVWJMZGVIaFd2RVBIU2F5SlMxRlFVRVZSdFUzb2JFV1VuZGJZWjFLcDUz?=
- =?utf-8?B?alJkY3pyZkl0SnlSUThKV3FTZTRWOEhEY2wzSGlpK1E3T3YyQ2xNUDhCMDI5?=
- =?utf-8?B?dmt2L0p5dWo3OHliNWRjeFY4V1prM2pSWWU3N1I1YXQ1Mmg1QWF5bnNCMmdy?=
- =?utf-8?B?c0lpczgvN0l3TDRJdk8va3laaW1tSW5pVmxTdU90NkV1UDNFemYyTG5odUh2?=
- =?utf-8?Q?wOIM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2025 02:12:50.9892
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9aca0a0f-0168-4669-731a-08de257ecf93
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB75.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4309
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+This series enhances YNL tools with some functionalities and adds
+YNL test framework.
 
+Changes include:
+- Add MAC address parsing support in YNL library
+- Support ipv4-or-v6 display hint for dual-stack fields
+- Add tests covering CLI and ethtool functionality
 
-On 11/17/2025 7:11 AM, Sabrina Dubroca wrote:
-> 2025-11-14, 05:56:17 +0200, Jianbo Liu wrote:
->> Commit 61fafbee6cfe ("xfrm: Determine inner GSO type from packet
->> inner protocol") attempted to fix GSO segmentation by reading the
->> inner protocol from XFRM_MODE_SKB_CB(skb)->protocol. This was
->> incorrect as the XFRM_MODE_SKB_CB(skb)->protocol field is not assigned
->> a value in this code path and led to selecting the wrong inner mode.
-> 
-> Your testing didn't catch it before the patch was submitted? :(
-> 
+The tests provide usage examples and regression testing for YNL tools.
+  # make run_tests
+  TAP version 13
+  1..9
+  ok 1 YNL CLI list families
+  ok 2 YNL CLI netdev operations
+  ok 3 YNL CLI ethtool operations
+  ok 4 YNL CLI rt-route operations
+  ok 5 YNL CLI rt-addr operations
+  ok 6 YNL CLI rt-link operations
+  ok 7 YNL CLI rt-neigh operations
+  ok 8 YNL CLI rt-rule operations
+  ok 9 YNL CLI nlctrl getfamily
+  # Totals: pass:9 fail:0 xfail:0 xpass:0 skip:0 error:0
+  TAP version 13
+  1..8
+  ok 1 YNL ethtool device info
+  ok 2 YNL ethtool statistics
+  ok 3 YNL ethtool ring parameters (show/set)
+  ok 4 YNL ethtool coalesce parameters (show/set)
+  ok 5 YNL ethtool pause parameters (show/set)
+  ok 6 YNL ethtool features info (show/set)
+  ok 7 YNL ethtool channels info (show/set)
+  ok 8 YNL ethtool time stamping
+  # Totals: pass:8 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-I admit I didn't test all the cases for the previous submission, but I 
-have tested all the cases now with this fix.
+v5: add a comment about why disable shellcheck (Matthieu Baerts)
+    move ktap_set_plan after setup (Matthieu Baerts)
+    Use TESTS_NO to track the test number (Matthieu Baerts)
+v4: Use KTAP helper to report the test result (Matthieu Baerts)
+    iterate through $(TESTS) instead of being hard coded (Donald Hunter)
+    Link: https://lore.kernel.org/netdev/20251114034651.22741-1-liuhangbin@gmail.com
+v3: add `make run_tests` to run all the tests at a time (Jakub Kicinski)
+    use ipv4-or-v6 display hint for dual-stack fields (Jakub Kicinski)
+    check sysfs in case of netdevsim buildin (Sabrina Dubroca)
+    Link: https://lore.kernel.org/netdev/20251110100000.3837-1-liuhangbin@gmail.com
+v2: move test from selftest to ynl folder (Jakub Kicinski)
+    Link: https://lore.kernel.org/netdev/20251105082841.165212-1-liuhangbin@gmail.com
+v1: Link: https://lore.kernel.org/netdev/20251029082245.128675-1-liuhangbin@gmail.com
 
-> 
->> The correct value is in xfrm_offload(skb)->proto, which is set from
->> the outer tunnel header's protocol field by esp[4|6]_gso_encap(). It
->> is initialized by xfrm[4|6]_tunnel_encap_add() to either IPPROTO_IPIP
->> or IPPROTO_IPV6, using xfrm_af2proto() and correctly reflects the
->> inner packet's address family.
-> 
-> What's the call sequence that leads to calling
-> xfrm4_tunnel_gso_segment without setting
-> XFRM_MODE_SKB_CB(skb)->protocol? I'm seeing
-> 
-> xfrm_output -> xfrm_output2 -> xfrm_output_one
->   -> xfrm_outer_mode_output -> xfrm4_prepare_output
->   -> xfrm_inner_extract_output -> xfrm4_extract_output
-> 
-> (almost same as what ends up calling xfrm[4|6]_tunnel_encap_add)
-> so XFRM_MODE_SKB_CB(skb)->protocol should be set?
-> 
+Hangbin Liu (3):
+  tools: ynl: Add MAC address parsing support
+  netlink: specs: support ipv4-or-v6 for dual-stack fields
+  tools: ynl: add YNL test framework
 
-I think we both made mistaken.
-a. XFRM_MODE_SKB_CB(skb)->protocol is assigned in that path, but it is 
-assigned the value from ip_hdr(skb)->protocol. This means it holds the 
-L4 protocol (e.g., IPPROTO_TCP or IPPROTO_UDP). However, to correctly 
-determine the inner mode family, we need the tunnel protocols 
-(IPPROTO_IPIP or IPPROTO_IPV6), which xfrm_af2proto() expects.
+ Documentation/netlink/genetlink-c.yaml    |   2 +-
+ Documentation/netlink/genetlink.yaml      |   2 +-
+ Documentation/netlink/netlink-raw.yaml    |   2 +-
+ Documentation/netlink/specs/rt-addr.yaml  |   6 +-
+ Documentation/netlink/specs/rt-link.yaml  |  16 +-
+ Documentation/netlink/specs/rt-neigh.yaml |   2 +-
+ Documentation/netlink/specs/rt-route.yaml |   8 +-
+ Documentation/netlink/specs/rt-rule.yaml  |   6 +-
+ tools/net/ynl/Makefile                    |   8 +-
+ tools/net/ynl/pyynl/lib/ynl.py            |   9 +
+ tools/net/ynl/tests/Makefile              |  32 +++
+ tools/net/ynl/tests/config                |   6 +
+ tools/net/ynl/tests/test_ynl_cli.sh       | 327 ++++++++++++++++++++++
+ tools/net/ynl/tests/test_ynl_ethtool.sh   | 222 +++++++++++++++
+ 14 files changed, 625 insertions(+), 23 deletions(-)
+ create mode 100644 tools/net/ynl/tests/Makefile
+ create mode 100644 tools/net/ynl/tests/config
+ create mode 100755 tools/net/ynl/tests/test_ynl_cli.sh
+ create mode 100755 tools/net/ynl/tests/test_ynl_ethtool.sh
 
-b. Furthermore, XFRM_MODE_SKB_CB(skb) shares the same memory layout as 
-XFRM_SKB_CB(skb). This area can be overwritten during the transformation 
-process (for example, in xfrm_replay_overflow and others), making the 
-value in XFRM_MODE_SKB_CB unreliable by the time we reach GSO segmentation.
-
-> 
-> Also, after thinking about it more, I'm not so sure that
-> xfrm_ip2inner_mode is wanted/needed in this context. Since we already
-> have the inner protocol (whether it's via xo->proto or
-> XFRM_MODE_SKB_CB(skb)->protocol), and all we care about is the inner
-> family (to get the corresponding ethertype), we can just get it
-> directly from the inner protocol without looking at
-> x->inner_mode{,_iaf}? (pretty much just the reverse of xfrm_af2proto)
-> 
-
-I still prefer to reuse the logic in xfrm_af2proto()/xfrm_ip2inner_mode 
-for two main reasons: a. It keeps the code easier to understand by using 
-standard helpers rather than open-coding the reverse mapping. b. It 
-keeps the logic directly related to the xfrm configuration and state 
-properties.
-
-Thanks!
-Jianbo
+-- 
+2.50.1
 
 
