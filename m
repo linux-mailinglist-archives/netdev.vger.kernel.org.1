@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-239176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D885AC65085
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:06:03 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41119C650AC
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:09:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 927A028FCC
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:06:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9B83B4E5C0B
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339532C0F7F;
-	Mon, 17 Nov 2025 16:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D57822C159E;
+	Mon, 17 Nov 2025 16:05:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X24Peyfv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Loh+SqJY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E6F2C032E
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186D02C0F73
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763395547; cv=none; b=bwjLWZF246ETLNJb6iWS7vcDfzqfu/WIkBE9DigQ3Bo9tb5ijLHm5ya4R8zrMviTiwPsxXQLzaQdWQ8SVgWDCIDlIGuU/ZK8X1RA0hQ1UjKjvVsajOUdlUrYZ+eByBRw6U+9/iXtBYvWf51gS/6syjgbfOLGqQvwLvSghRy8i4A=
+	t=1763395548; cv=none; b=s6Q/43S038HcDrFOlp5iArvWkPjvKOb8+FQ8fYLAPZ8vSIwgZeL3Q5X0L/b1jiIWSlpSU3jHjPaKLvuBR5r+PfNut89JZ4PZ0sEsopYQRV+y/LWtSPNhSTwF/FSiYHKWiTpUNQd+w3gJlM8dU1z5aZEE6HyauvRG+LRaBgOKMrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763395547; c=relaxed/simple;
-	bh=UXuVTbFZfxhi/CrUJ0m3gOEFVfhuQjoRzNtauAvd7JQ=;
+	s=arc-20240116; t=1763395548; c=relaxed/simple;
+	bh=zR11PadUKffBVoAS2I53jVhWoEUv6Rds+RYWfmCWtD4=;
 	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=FhhHm342L8TLC1yrMiaSoZICRbd3R0doJoTNguBX+O9XVgR/F9KhjIdui+zb1CFkLJ66fXmchjVV40OItONQoJCNMvXAcV6lFmY7drB5FDt0PfjaXhTXr1btypRkNekkiQwlI7BG+Q2Ng+ab5jQRial/KrhFdhIHgy8peC3KfNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X24Peyfv; arc=none smtp.client-ip=209.85.128.53
+	 MIME-Version:Content-Type; b=GArd3GdUrnOFdFrHAUHB/nOTUBh+K0gbs8j06Gee4+ecfK+rCCTjAQiClpHVk9DHlkSLw1HDkaUcNAgG5LK8DsFnX7/gqLcmo3tqNoSKrSGKr/Y6ZVzDnYsKxHwpUf7dbDPku4fb1BGoCdJbZ22+WYpLjydsWWk9u6l2N9fXXDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Loh+SqJY; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4775ae5684fso22794475e9.1
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 08:05:44 -0800 (PST)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47795f6f5c0so17729555e9.1
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 08:05:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763395543; x=1764000343; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763395545; x=1764000345; darn=vger.kernel.org;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dv25gH3/0ppvFW0ahX017ugBnCLfGg5eMQGqgnwTcyQ=;
-        b=X24PeyfvRZp2RguBNMgmmF+dVokStvtag656iu8St9CqCe79eMN5BaHNgrT1kEz0Re
-         YtoMq8JQHOv8s5E9ywpCAedbwzVzfQxcNEVrx/0w+QYl2LW11yiD/BlHJWW/D+KyvbG+
-         6iKtcgcjMnNLNnuQUw1VLrLPSDo1VGCCrdR8jLl6/Cx3Z//Ef4dE/yENUSurAuVs5bBR
-         odXsnGPqSFdpxiXp0nx6KSURVdV3JWRwZeV9TI5buLjD8DRVC04CIZLa+GpnoCkk3OaE
-         Nr4p856KEqm+xhsxW2jNGF4OMj6Th6wrIvrnA6vBR8lJvUiUaRoSm+TFMOhZ+I8fLWIV
-         Gqkg==
+        bh=veP6ZsFPLmRwgmCdpo5pE77+0E1WbpqRaQfM3K7/5S0=;
+        b=Loh+SqJYiVGQEAVFX0kxXdZpT4MKZ3u7QInsz1A2u/ZPjbwsFHAFD1x8ta4i/soq7D
+         uEZgOgQm4DXKF64R3TE9ROsAQPdCkFJXKFdabHY0jYzVNyLjX4TD/W4bEnsZNxY5YWt7
+         rTH6hufZsCMPPOxwMpeNW/UoG4VTYsh6cRfFwDps6hf4QZuWPx3MrAXB5zU+q6Cs9B4C
+         jBfRtyCwuA607Se5to40ev1ec9AbrA9Xp05tIjDkj9TlMQgDkmJ35tZ4smi5G1UEanr2
+         smiagnzpf6tw2mLcMp8uigGK1J2DEQJwoqdc8waNBalKJoMoR1SheZXw0an9dp+1Anhg
+         6wYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763395543; x=1764000343;
+        d=1e100.net; s=20230601; t=1763395545; x=1764000345;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=Dv25gH3/0ppvFW0ahX017ugBnCLfGg5eMQGqgnwTcyQ=;
-        b=WGKuJFgSBn0RKscEuKID67TZwnHespsqa9jCTHGz3tFlFA036lgwZr5DWjcjE+bYlX
-         LABxr4thIff4E8ub37YsbmEq/Cmdqq14E4Jqc6CCRIo27mW9P5Fp+2wsz7n0+Y+YBMhU
-         5gfblswMs1YSFxIEkN2VMch5l4KZwYsY65TuDyuGTkTwhNo/N4/TALzMxyAQeH6rna7h
-         CeKGMIMOiNaJs35qlnBGlqHbwG81fxLsBKZHESYEPraU5iH8LJ8Yr6uqFWY/vbqFmtSY
-         pa9epAGPRhiIgldoxwrVwGPHrAApaupaeD4st4SMQkYUGdLsByI+nx1xrLLqa+bTQpzf
-         7VBw==
-X-Forwarded-Encrypted: i=1; AJvYcCWSTdvDH5m6SDSAheySXEnqngZnYJQgr0FdbZfvCdHT5ehEUvWmFW46KGhFXjq7QhAcu4KXslI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/l2dFjWqebDIeZHtSSaa+DVaiFrd9gO/I1JZsPwVPJF1YEdRN
-	7BZrXVdgSO2R+e+v1i40PCfVg21zA4pryQP77rMZi+IU658IQibJUgnQ
-X-Gm-Gg: ASbGncuaNzLh1GuxqVVxd+G4IDqWvJn5fkL34KEuS8okaHgTGh4DyaFsV8wmcoU7ELI
-	cK7jabX1xya+A58A6P1tsC8XCf/s3ulhSiLc3NHI427TQ8cRuKQmS8BMlnTOn9Tlaz+BQbYgtvP
-	gQu9hzRcYog9GsvTGjSKFNeUjb0YSMllG4n33qxEvtMwUv7fFM2qzI8QDZs18mw0AvuufW4wpWJ
-	bc8ESeFoMD/baqYKViVvLbHY7ZJ29C2o14Jw4QLlDQuKmx9ZLX89bpZ5LlFQd7a5uiGtBaUWdpc
-	IxAVlg9p5xXwdGOwo4tcG5xktz6bmaCdV5bcbwLlFl3nV5IqH6DB62oKX/KEFOuhxIaMZCoJAGH
-	PZ1fd/jLic3hP7r+pQx8QEzcZJ5mEBPWr7+G4XX2oWp3MguCndwboYsa2yorpwuqq9yM8FsP1Pg
-	fCkf4W7REwIrAhJkEOErJVJqdnVS/X1vi4Bw==
-X-Google-Smtp-Source: AGHT+IFjKArWkw1DSxq8VyVfr3BAgiXDtfD7+MsJ0RaIGRQ1j4scrOis/SC3f5RBEf1d1A5CQWt8Rw==
-X-Received: by 2002:a05:600c:8b4b:b0:477:63a4:88fe with SMTP id 5b1f17b1804b1-4778fe50df1mr117952345e9.2.1763395543365;
-        Mon, 17 Nov 2025 08:05:43 -0800 (PST)
+        bh=veP6ZsFPLmRwgmCdpo5pE77+0E1WbpqRaQfM3K7/5S0=;
+        b=lFns6xybASguhIN+AjY7dScSYMlpRveAzcLhC/Tu13ZdKXjIAhmm4oWpnJlqE9axMp
+         bZgO+LT2yjM/EpNMgYkHHrSmy4Zeqh1rq3KKKgdF39DbfCmusG9dJdp6hzFbxiVJ0L3y
+         temiy8tW41PMnk2t6YvdqLHN5Kos/iWnAZ5CBZH1vAIdyUfIyQhZX/FJM5+XTM8vq8JJ
+         F/r1z/6Axx67z6b1s1nIHsI5UVNkZJtTrKnJ8pmx6qjRzLcB+RQR9EbAozpVc3Uhmw9D
+         Yd7i04f2mObV6IRqpP1Lh3TdKBPnAj/s85WGK5kCePlUH5Lwhou3M9lPZMDNBgEwlUKi
+         tzug==
+X-Forwarded-Encrypted: i=1; AJvYcCW/mhGEClaFqFHBG7W1yrTneC0/Lg4RmOnZIYBXyrSILNm5PZZHC29AfKpwfAAfxENbFei5tFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCjH0xCGVtKEvJ4rTBylyBEGrdoUQrVWiLFPCOoD9EczCXSn9K
+	1Nyf2fX4F3uOoS8lLGfhBQwPtNgF/zMWATonFTwFYTux8VvrP+YPXSHB
+X-Gm-Gg: ASbGncvIfAXaa2pPGCdgGI1bxXnFGbHQhup3uHWmvo4hQwAtQWtV9WaaU2KrP0jE1KF
+	VoG57478ZT1+Ado4ZZboUuRbLlXc0UOfYjK4WM8lWGT9V+uS2+x1CwVxFIQlceV400fHWsdZK1x
+	5KHu3uyrJd5nqsYhHN83f+c4x4DtfC+br6gDZEBBV8BEcfsjjZq9ML6cT2WaYw8m8MEUVV582jJ
+	JH6QIMltHR3hNp9n9N5Yq8V+CaNR5E5jjqgbZ6LyupTQFhzfYS81AuU22wXOppkefZc/epl+cWK
+	dgd6DFXRMN47PKHcFJWeW34q9flFmCCP2UMLVYbXJfuYo/gU4jgBBqQm21rFJEyiVUqWtZNKPxM
+	STYXSDAtYQBP7n1HpGv1N9aLnxRrS3VkhRBwt7zEY49xRV9Jq760ZW7u4wp4kOaneIKPkfdVol2
+	g3ChLu1KwTvkYZczx0Tae97kAv1AkyfhPfpA==
+X-Google-Smtp-Source: AGHT+IELmBtYaKQJWSaqOyfivRd23QI/DFTaZg6tiH7/6qdQirofoDu9HP7b5w4rLfETnNrziPkg1g==
+X-Received: by 2002:a7b:c014:0:b0:477:994b:dbb8 with SMTP id 5b1f17b1804b1-477994bddeemr52518145e9.11.1763395545080;
+        Mon, 17 Nov 2025 08:05:45 -0800 (PST)
 Received: from imac ([2a02:8010:60a0:0:7408:290d:f7fc:41bd])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47796a8a695sm152861485e9.13.2025.11.17.08.05.42
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4779cec0f2fsm51154305e9.10.2025.11.17.08.05.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 08:05:42 -0800 (PST)
+        Mon, 17 Nov 2025 08:05:44 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Gal Pressman <gal@nvidia.com>
 Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
@@ -83,13 +83,13 @@ Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
   Jesper Dangaard Brouer <hawk@kernel.org>,  John Fastabend
  <john.fastabend@gmail.com>,  Stanislav Fomichev <sdf@fomichev.me>,
   <bpf@vger.kernel.org>,  Nimrod Oren <noren@nvidia.com>
-Subject: Re: [PATCH net-next 1/3] tools: ynl: cli: Add --list-attrs option
- to show operation attributes
-In-Reply-To: <20251116192845.1693119-2-gal@nvidia.com>
-Date: Mon, 17 Nov 2025 15:56:17 +0000
-Message-ID: <m2seecmz4u.fsf@gmail.com>
+Subject: Re: [PATCH net-next 2/3] tools: ynl: cli: Parse nested attributes
+ in --list-attrs output
+In-Reply-To: <20251116192845.1693119-3-gal@nvidia.com>
+Date: Mon, 17 Nov 2025 15:57:21 +0000
+Message-ID: <m2o6p0mz32.fsf@gmail.com>
 References: <20251116192845.1693119-1-gal@nvidia.com>
-	<20251116192845.1693119-2-gal@nvidia.com>
+	<20251116192845.1693119-3-gal@nvidia.com>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -101,83 +101,24 @@ Content-Type: text/plain
 
 Gal Pressman <gal@nvidia.com> writes:
 
-> Add a --list-attrs option to the YNL CLI that displays information about
-> netlink operations, including request and reply attributes.
-> This eliminates the need to manually inspect YAML spec files to
-> determine the JSON structure required for operations, or understand the
-> structure of the reply.
+> Enhance the --list-attrs option to recursively display nested attributes
+> instead of just showing "nest" as the type.
+> Nested attributes now show their attribute set name and expand to
+> display their contents.
+>
+>   # ./cli.py --family ethtool --list-attrs rss-get
+>   [..]
+>   Do request attributes:
+>     - header: nest -> header
+>         - dev-index: u32
+>         - dev-name: string
+>         - flags: u32 (enum: header-flags)
+>         - phy-index: u32
+>     - context: u32
+>   [..]
+>
+> Reviewed-by: Nimrod Oren <noren@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
 
-Thanks for the contribution, it's been on my wishlist for a while.
-
-[...]
-
-> +    def print_attr_list(attr_names, attr_set):
-> +        """Print a list of attributes with their types and documentation."""
-> +        for attr_name in attr_names:
-> +            if attr_name in attr_set.attrs:
-> +                attr = attr_set.attrs[attr_name]
-> +                attr_info = f'  - {attr_name}: {attr.type}'
-> +                if 'enum' in attr.yaml:
-> +                    attr_info += f" (enum: {attr.yaml['enum']})"
-> +                if attr.yaml.get('doc'):
-> +                    doc_text = textwrap.indent(attr.yaml['doc'], '    ')
-> +                    attr_info += f"\n{doc_text}"
-> +                print(attr_info)
-> +            else:
-> +                print(f'  - {attr_name}')
-
-Does this line execute? I think this scenario indicates a malformed
-spec that would fail codegen.
-
-> +    def print_mode_attrs(mode, mode_spec, attr_set, print_request=True):
-> +        """Print a given mode (do/dump/event/notify)."""
-> +        mode_title = mode.capitalize()
-> +
-> +        if print_request and 'request' in mode_spec and 'attributes' in mode_spec['request']:
-> +            print(f'\n{mode_title} request attributes:')
-> +            print_attr_list(mode_spec['request']['attributes'], attr_set)
-> +
-> +        if 'reply' in mode_spec and 'attributes' in mode_spec['reply']:
-> +            print(f'\n{mode_title} reply attributes:')
-> +            print_attr_list(mode_spec['reply']['attributes'], attr_set)
-> +
-> +        if 'attributes' in mode_spec:
-> +            print(f'\n{mode_title} attributes:')
-> +            print_attr_list(mode_spec['attributes'], attr_set)
-> +
-> +        if 'mcgrp' in mode_spec:
-> +                print(f"Multicast group: {op.yaml['mcgrp']}")
-> +
->      if args.list_ops:
->          for op_name, op in ynl.ops.items():
->              print(op_name, " [", ", ".join(op.modes), "]")
-> @@ -135,6 +172,24 @@ def main():
->          for op_name, op in ynl.msgs.items():
->              print(op_name, " [", ", ".join(op.modes), "]")
->  
-> +    if args.list_attrs:
-> +        op = ynl.msgs.get(args.list_attrs)
-> +        if not op:
-> +            print(f'Operation {args.list_attrs} not found')
-> +            exit(1)
-> +
-> +        print(f'Operation: {op.name}')
-> +
-> +        for mode in ['do', 'dump', 'event']:
-> +            if mode in op.yaml:
-> +                print_mode_attrs(mode, op.yaml[mode], op.attr_set, True)
-> +
-> +        if 'notify' in op.yaml:
-> +            mode_spec = op.yaml['notify']
-> +            ref_spec = ynl.msgs.get(mode_spec).yaml.get('do')
-> +            if ref_spec:
-> +                print_mode_attrs(mode, ref_spec, op.attr_set, False)
-
-I guess mode is set to 'event' after the for loop. I'd prefer to not
-see it used outside the loop, and just use literal 'event' here.
-
-> +
->      try:
->          if args.do:
->              reply = ynl.do(args.do, attrs, args.flags)
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
