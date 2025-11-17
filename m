@@ -1,250 +1,233 @@
-Return-Path: <netdev+bounces-239181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F1D4C650CA
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:12:35 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2706AC65112
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 17:14:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C71C54E97C6
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:10:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EBD8E4E5BD9
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E487E2C21F6;
-	Mon, 17 Nov 2025 16:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA7827FB21;
+	Mon, 17 Nov 2025 16:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="A/7NbQmg"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Km6+Fm08";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JKnh4CN4";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Km6+Fm08";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JKnh4CN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012052.outbound.protection.outlook.com [52.101.66.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DAB14AD0D;
-	Mon, 17 Nov 2025 16:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763395816; cv=fail; b=qtkhG3d2RmdZHOeI362cmEgRFyZ8mFjwWoO2OV070MY4aqqNsxXfHbZJxOKtBRCmTz/SLINEcHsBL9BI5yoLG+6qn6UnLHgzbF96uloMsPJodak+ZNKshZL8/jgtCe2wnQELMWKuas5p4bDUVYLEnuek4Pu/Doo9i1AeOIinTl4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763395816; c=relaxed/simple;
-	bh=ZNbSR1HWQ8MuHkYyQ6b/l8n+VgReoh0NVENwcTMLL3A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=JGtjYXz/Dmy1JhhUfL/BeRUJ6YLCHwydgepuH0EYxvcELuUPC9iNlvFd5XD4oz09Ir4nMkDt3A+SFfQ7W1/cr5ZUGOPIPO3OkGqNSrcF8f5jL4cCx2+usLPcWXCFQJ9u2TCKz0le4wP5W8B6XmCKHvKFymw4ZT2n+GpDfuXRTmY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=A/7NbQmg; arc=fail smtp.client-ip=52.101.66.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=b0eqAqoMoAhkSB7obco3/Qk9JckRxIcIDf3iCO1XpEpdI17TtOayS7P5n1tgsVuhWFtx4wJxLsmNf7dKKZKC5HoY8qPRho+H9o9tHPNDkGMjrOyIra8NZY2q73UeGoH0S5ieZ/0zAUXkKb6ZEfafc3uiold0Dv6zFL2uW8vPlnPekx9oJ6m7Zg4C+mI1YRuSSfC6ZxvO/rI2QzA246erLOx6eayChUHeim0jhcZcvMZX58R66kajiFopoN2R56nw22IpEQtl+oudL9MKCENYh5bMvDDRvkjnEQliZkzgYGe+iibVwNEJ4TFkvvYO1lA1IoHg5JtPcySUlKgXO1SbGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TxF8iNO4ggMWSBP1bAdd8QmR7p5tDuddGhLTRtzDsA0=;
- b=ZncQ1m2PSwU4l7yE04kMGa/aU7DLNI5PMg4PGvkBBtVKkJ949Tcz8+AXrAoJDdQ+rfT5MZeyyslG3SeuxResJqOKz8PhTUkk4j09iqX7iBYntlp8A3qZMbooVVWnVE0dzWhnVFTSr24iVlpEn7Yq1WUho61wOjQDOXZj3Dyb7ejxTPNYEBghMLda4TRMv2Ustw0hddRS4lJFkGizXZxXkDnErki+/u+394pfCDgHglNI/9wwN4EiNc1iEEPxojBE86/XtoQgIrS7rq8cEfHlpZv77eLJYBvALcQCEYik/1uDk37sq4YtbH3CPHwr8/gc+sjJj/q99sbWgTwCatgjOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TxF8iNO4ggMWSBP1bAdd8QmR7p5tDuddGhLTRtzDsA0=;
- b=A/7NbQmgHwMrbfyb3kHqZ9BPWwKzCMpxPnB2FLW1uH5UPsKoi7ugPQxjOdR9iRBIRGNzA4cCqtFJMs30s+URoarZZnfWfeT0IH2SWNKi0K3a/ERtxMWuqN67LtYBUN1qKFfDAOrM3jmtYK8JvUdY0p10tPkExoy7jS+8QtDQTBqkIVaEWupPXDsg8IjzWKN/1rltverAxPGAWc0+DNQHCKQC/45ZhD2HS6/JNNwTmKWxbtZtQ1P9TIZsd61xOYo/U6PJ2ZQLRhVwWG06wJQuXYok3o0low2YGLhd/XGq3FqJ7J9ik68pGgT5MJWkVJXKNSMyFJ9BYy8b09wR+nSmww==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DB9PR04MB9626.eurprd04.prod.outlook.com (2603:10a6:10:309::18)
- by AM9PR04MB8811.eurprd04.prod.outlook.com (2603:10a6:20b:40a::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.22; Mon, 17 Nov
- 2025 16:10:11 +0000
-Received: from DB9PR04MB9626.eurprd04.prod.outlook.com
- ([fe80::55ef:fa41:b021:b5dd]) by DB9PR04MB9626.eurprd04.prod.outlook.com
- ([fe80::55ef:fa41:b021:b5dd%4]) with mapi id 15.20.9320.018; Mon, 17 Nov 2025
- 16:10:11 +0000
-Date: Mon, 17 Nov 2025 11:10:03 -0500
-From: Frank Li <Frank.li@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: shenwei.wang@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, eric@nelint.com, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 3/5] net: fec: remove struct
- fec_enet_priv_txrx_info
-Message-ID: <aRtI2/RuIaZaeChX@lizhi-Precision-Tower-5810>
-References: <20251117101921.1862427-1-wei.fang@nxp.com>
- <20251117101921.1862427-4-wei.fang@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251117101921.1862427-4-wei.fang@nxp.com>
-X-ClientProxiedBy: PH8PR07CA0033.namprd07.prod.outlook.com
- (2603:10b6:510:2cf::20) To DB9PR04MB9626.eurprd04.prod.outlook.com
- (2603:10a6:10:309::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6331328D83D
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763395919; cv=none; b=PvrrcMpr1QEb8XOwAIIutqgv9W8SJ2sp1L/1ytrMh3nFn5B2S0oYCiXrbE4brQZnH10T6ibhaYT6IrHTal9Q7kBNI6GB47N2tY/xVDHkwIztDjdgJ0rhvzadVinW+zZtBGFpCq72Hid0O1V93DrCjFYBHH/r5JMSX7zw7DnGE4A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763395919; c=relaxed/simple;
+	bh=ot8gjWm1bgwLw+5eMeJ/IER6zzTWkz2LXpbS4mcWXQI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VdanLpf0rYAtaofbSIq9Iq3VPQDX/rREmTCE7WgsN2XQjVpqTDH4xU1dBKQ4UiH26vD48cofsvY+QvRkCOg53t/7h6y/NzEhzYnLXkj3Hj98LABs2NfvMLJu5aJtS3CkSN9w+MKKV63Zo20Z7eCs8WHZYLPaeiWXYa4H3qIq4Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Km6+Fm08; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JKnh4CN4; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Km6+Fm08; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JKnh4CN4; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 615411F7B4;
+	Mon, 17 Nov 2025 16:11:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1763395915; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mBUBnaTIzsm0SlnbQPCeTBjXpAcWxSMAN7X2xrq3Ku0=;
+	b=Km6+Fm08CJbPSGJJRSwsUeprWBfb41+VzR5/8vTwC+Pw66bFiLYxAZVu5yoM0tbYk/Xb0J
+	hZf5LezDbcQHsY1767JQj+Tk0w26P+QyGbYuM6fOSjOpuFL4nB2hnEWvE5q7m4J3kibq+t
+	0aMUEBvLt3a641InUixHn1ujV6v7Gz8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1763395915;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mBUBnaTIzsm0SlnbQPCeTBjXpAcWxSMAN7X2xrq3Ku0=;
+	b=JKnh4CN4ISrbverMx5dO9YV7cgGUAb4CvPTzB7yyf9mhhioZQvx/7d/Qsg71FXiK89hYeL
+	HGHtGOu4cqoSvcAw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Km6+Fm08;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=JKnh4CN4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1763395915; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mBUBnaTIzsm0SlnbQPCeTBjXpAcWxSMAN7X2xrq3Ku0=;
+	b=Km6+Fm08CJbPSGJJRSwsUeprWBfb41+VzR5/8vTwC+Pw66bFiLYxAZVu5yoM0tbYk/Xb0J
+	hZf5LezDbcQHsY1767JQj+Tk0w26P+QyGbYuM6fOSjOpuFL4nB2hnEWvE5q7m4J3kibq+t
+	0aMUEBvLt3a641InUixHn1ujV6v7Gz8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1763395915;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mBUBnaTIzsm0SlnbQPCeTBjXpAcWxSMAN7X2xrq3Ku0=;
+	b=JKnh4CN4ISrbverMx5dO9YV7cgGUAb4CvPTzB7yyf9mhhioZQvx/7d/Qsg71FXiK89hYeL
+	HGHtGOu4cqoSvcAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A4D513EA61;
+	Mon, 17 Nov 2025 16:11:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 85pXJUpJG2meFAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 17 Nov 2025 16:11:54 +0000
+Message-ID: <4cf22f51-c3d4-4c02-b5b6-0cb38985d0f8@suse.de>
+Date: Mon, 17 Nov 2025 17:11:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB9PR04MB9626:EE_|AM9PR04MB8811:EE_
-X-MS-Office365-Filtering-Correlation-Id: aae4cc14-8c3c-4211-17a8-08de25f3c8a6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|19092799006|52116014|376014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?SCg1GYCYOi25A+MeEv8M6if913Xqb6UrlG+bdD+op7WMv3K4ZEi6N9zkFP3e?=
- =?us-ascii?Q?fAqfn78ZJ33zA2r1Z2khGC0UF8hQsyy1UT5PxPnrffx9PgTFz3ZnALd3JmTX?=
- =?us-ascii?Q?UzCclTxKzQW/a4g3Y76fXKGqO0FvYM+QJKqahFzMptEMBcFBlWUYAWG++f1Q?=
- =?us-ascii?Q?B3Hgrcg44HJXAAfQQ861IDSEgBwo8xnSutWBm/FHWsF4Hq0R67bcoplNoflr?=
- =?us-ascii?Q?5EO0Tq3W7rQr0k7f7x2MrCMgT+V7TtQSvJh0kLobiqxwkUQF7vlaELKqAU4c?=
- =?us-ascii?Q?T4L1idr5RZHPr1iVxkQ8Q3Sm8GF9zY+N099QFaY205wkyt9cP2k34U0wXSBn?=
- =?us-ascii?Q?6+sbGCTLABD3I5ZfXQ1uSakzzW9BaGmSmVLhw/hQwNJ7LIJYhAM1VHVycFzF?=
- =?us-ascii?Q?wmdppkco5mSMkNpa4oETA/aMiFoof7GX4r8faTCQI5UF2A7bXlc75kKDgjKC?=
- =?us-ascii?Q?F4nVZnLNTpspZZDxTmdPExZ4eK624oAytcVRCh1RXrAVfbDHoYTA0smQU22h?=
- =?us-ascii?Q?wes5CI3ZQBF5fHvS3d99tvVZdv9XqchwC4bDgMlAtm1pHVTwFxnzdWBrZUGr?=
- =?us-ascii?Q?3dRNGVi1aI9nu4AwIoLzorBjLJ/2Wm4L/4w0VFc/5zmOudlZCW8OeiiF7tKd?=
- =?us-ascii?Q?zRBTimwGFN6zYA2fx/nao+iCFjISe9zvSfW+IeyNbac2K3gV3UDfbVWreX/0?=
- =?us-ascii?Q?PSPPUMw/TcsvV9kbSHB7f3eRDkWqIzNJgftcBNhN3d9uO3LHZIOGDfziZsGy?=
- =?us-ascii?Q?cOCbP7Zc+h2fer1J74bz+v3vxtlZMJIYieJwspKKSTCiK4iVrDCBAeuxM96d?=
- =?us-ascii?Q?JpcTGu0rB0WNYXe6BIFa2fkNsYwhZuRJ6UvxE9+z+xr8ck+sfjjiP5moPZCk?=
- =?us-ascii?Q?usfvbYWrnmymjbJYwqKhXW7ad9iBMCUzjJUMbiG9/qCuH7pb57DlqEHjDTF3?=
- =?us-ascii?Q?zYqOC8s5DGgC7BWsBg2gq3R3TQ1zED3yDhlyE7AYMDvNC5h+gaD6IzDrSpAD?=
- =?us-ascii?Q?FkfHsSegNF8v1YRpYi1NNgbsQBOQo1AEz4ZfmvvReJWAISHwjFTfKBqhdayQ?=
- =?us-ascii?Q?CSxNadnCcXsf4CPUlgVssX/FGt01XOys6SiMhiRZ4wjEaTvaWteP8sHGkV8P?=
- =?us-ascii?Q?Bcg+t6RMwqELRGDiQv/XN767rpVzWaY7nLHjLQn/z/EmAzFWl4EAcf9TNR+M?=
- =?us-ascii?Q?V7wZsvKKbdQtdLMsY6P4JGSPgE7VuSswPjue6hOsujdyHhqA+PmT0J5agRvA?=
- =?us-ascii?Q?EEqXOS+V8+iKGAiaJSqGe+lspxHTMcJ3saiiLp+t2AI6lPCgQnFlt80Pgo+i?=
- =?us-ascii?Q?TupK9FqHWg6PJ6OryLsAf9ssaxJYxWvWj8/Cft1OADimoY6Qpcx+pdXwvPm3?=
- =?us-ascii?Q?kxZbpChSuNIcyH8tO4xS3CHWM6A3ESi3wbOP4jZqUuONfcWubaZKbT5cKYDj?=
- =?us-ascii?Q?lZV0k7QWHQNSW660MV+1sb+GC8W5W5b7NhiZ1hnMpj4Ptyglvhk47H0HN9ZB?=
- =?us-ascii?Q?oEJ5rnwYripE07QTPSYXh8RyPOMSLoGV1eKm?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB9626.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(52116014)(376014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?bHNeGj2grG1NlD3C0hr039rTlT0VmgtqxMcU2mMjxsrJEGiVsznITgxXEZKH?=
- =?us-ascii?Q?2V5fJt8SxweCbZjvjzavnXNyUc2LupsyKBGYbdcu5b3foWJhqvGr6UpSCkfi?=
- =?us-ascii?Q?p68yVw4FjS3mTpAdI0s5bAgk3D4NoSL89SMqBFY+U9ADQCJ5LB+b87UcXEtc?=
- =?us-ascii?Q?mU74K4Y7MIqEdKFqVJmS7oTE8kIt68cFSToRJkE1PMU/kkbXflvzDopsjdgl?=
- =?us-ascii?Q?swY1qp3LlPRswIgt/f/KikIA+f8Xx2uR4MoKFoPuD7KSHqDtWDcoYKJsyq+Q?=
- =?us-ascii?Q?KIsfKIsD1fEiTsVxG3Fqvg4nEfqNZwYt2oyaQ2DLDhCAdqKAAtMOXCpLUJHN?=
- =?us-ascii?Q?Y3Lz14GudN/qeS10NbbQbujkm8y9R/vh8My43pwDGf6vbERKVvqyS0yHR9kG?=
- =?us-ascii?Q?R0R3ljdJsbSKL0/Ix1FtV+NEPbCncKR6sGGpwzwFoSzKTUJjwNlX/eAjDK8m?=
- =?us-ascii?Q?nUA158oYrrfXNkAhQrdCyqa0w+EZ08i5GcdF8ACwQXIWLq1o4L5GE8MsFtqg?=
- =?us-ascii?Q?Srf4nHTHLkQSJz5coDX9oKcIgscIeB/ZF79lkty7Jd3sPQxOniXmk49PvBqC?=
- =?us-ascii?Q?qsnBJ3W+s15f6+7DMJM/mUT1vK/A9pZINlfIcDk0WwOl1xn5eMJhCW225cXC?=
- =?us-ascii?Q?zVjqH60SsMasg4fx0xNqfIE6VR+hvtJFrszRX+FSU1+aRtMM+okb4/oXwCV6?=
- =?us-ascii?Q?Qzwhbp9Bhw7OlKgdRkmF/lOzTyUqev2C0w1SruKyMbNP780Z1/69MjN5D/TG?=
- =?us-ascii?Q?mucxd3tjIbeV5kGijWtlvRs9J2XHNh2/E5uRB5GkuJhOMmJWc9N9QDh+oBJY?=
- =?us-ascii?Q?ZZRd982hxckfkzSM57P9rUHXOZihB5FwzQYmzN1KzRXQuA2Ak/TiC+dkfoAO?=
- =?us-ascii?Q?Nsgex0yVK+Dx1uenE+VDESO5cNj/LuwDFfkzqc/qx+Z3JtmvQAB3lRhtlDER?=
- =?us-ascii?Q?ojSklTLKL1A2k/oaq/OF9gmtZlKwGGqYeATlVV1ltimHV6hX5/CaAq9Kmxq2?=
- =?us-ascii?Q?tI/PDjiD7PATNTgdboEDpjn76tpPuhxq6vpxl7Fsvdzw7El9dC3hdT6s6chA?=
- =?us-ascii?Q?m9jAghB84WRM4kGL7CUzEuY+3VKdef0jE5nZLfww8yRblUGry7qkVgGCaIF6?=
- =?us-ascii?Q?rukfvuUFvTPpVGJRRP077d9L1kIZE7M/lRI84wZfHofBp2ZeSAoy37jmPlVh?=
- =?us-ascii?Q?iDIACB5N5wo2/fjD9IeoEYknpnKtCFN6VlFMdXSlpVEcUTMsD4p4g48eWqqz?=
- =?us-ascii?Q?Sb+3oe9Uy0IlFVDxYOX2OjcQgEwHH1eEHZsvsDTzkO2VxxagHrWKCrqKxnY/?=
- =?us-ascii?Q?BAG4rMpOzg+tbqVn1t89YecqPzSGdJDsFldUuAK+uGoonHJZrScMtvQH98Vu?=
- =?us-ascii?Q?WJHZK48eSuYsYmxURQ3Td27a0I7liV+Ff6HF10/rYbvFzu3x/8jWULy0iw3z?=
- =?us-ascii?Q?EzbxttBiC1noeH+UvsBejWrvqCnU+Eq4Iy+Oz7NLw4H1JdIRV72JGJRz888c?=
- =?us-ascii?Q?CqnH6S0/iVPoyXwWjd6j02sQgN7B3W2P6gVPF6UvXclX6vPSzbHpQnqyzsxC?=
- =?us-ascii?Q?b8RmNEPaTe/bMKRhabbq+5lAl1fCrNeD0Ot1fI70?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aae4cc14-8c3c-4211-17a8-08de25f3c8a6
-X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB9626.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2025 16:10:10.8591
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: u5lTNBWOnLTr6M/xMEATOoFq9Ajzojk3maLMDA3ZpsK+EG4xnfupk/Zh1TaNEOHm4KrPVFx/7pHHaGV0f4Pwww==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8811
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] xsk: avoid data corruption on cq descriptor number
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: netdev@vger.kernel.org, csmate@nop.hu, kerneljasonxing@gmail.com,
+ bjorn@kernel.org, sdf@fomichev.me, jonathan.lemon@gmail.com,
+ bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+References: <20251030140355.4059-1-fmancera@suse.de> <aRtIiIvfVwJCmcn1@boxer>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <aRtIiIvfVwJCmcn1@boxer>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 615411F7B4
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nop.hu,gmail.com,kernel.org,fomichev.me,davemloft.net,google.com,redhat.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,intel.com:email,suse.de:email,suse.de:mid,suse.de:dkim]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
 
-On Mon, Nov 17, 2025 at 06:19:19PM +0800, Wei Fang wrote:
-> The struct fec_enet_priv_txrx_info has three members: offset, page and
-> skb. The offset is only initialized in the driver and is not used, the
-> skb is never initialized and used in the driver. The both will not be
-> used in the future. Therefore, replace struct fec_enet_priv_txrx_info
-> bedirectly with struct page.
 
-directly?
 
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
+On 11/17/25 5:08 PM, Maciej Fijalkowski wrote:
+> On Thu, Oct 30, 2025 at 03:03:55PM +0100, Fernando Fernandez Mancera wrote:
+>> Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+>> production"), the descriptor number is stored in skb control block and
+>> xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
+>> pool's completion queue.
+>>
+>> skb control block shouldn't be used for this purpose as after transmit
+>> xsk doesn't have control over it and other subsystems could use it. This
+>> leads to the following kernel panic due to a NULL pointer dereference.
+>>
+>>   BUG: kernel NULL pointer dereference, address: 0000000000000000
+>>   #PF: supervisor read access in kernel mode
+>>   #PF: error_code(0x0000) - not-present page
+>>   PGD 0 P4D 0
+>>   Oops: Oops: 0000 [#1] SMP NOPTI
+>>   CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
+>>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
+>>   RIP: 0010:xsk_destruct_skb+0xd0/0x180
+>>   [...]
+>>   Call Trace:
+>>    <IRQ>
+>>    ? napi_complete_done+0x7a/0x1a0
+>>    ip_rcv_core+0x1bb/0x340
+>>    ip_rcv+0x30/0x1f0
+>>    __netif_receive_skb_one_core+0x85/0xa0
+>>    process_backlog+0x87/0x130
+>>    __napi_poll+0x28/0x180
+>>    net_rx_action+0x339/0x420
+>>    handle_softirqs+0xdc/0x320
+>>    ? handle_edge_irq+0x90/0x1e0
+>>    do_softirq.part.0+0x3b/0x60
+>>    </IRQ>
+>>    <TASK>
+>>    __local_bh_enable_ip+0x60/0x70
+>>    __dev_direct_xmit+0x14e/0x1f0
+>>    __xsk_generic_xmit+0x482/0xb70
+>>    ? __remove_hrtimer+0x41/0xa0
+>>    ? __xsk_generic_xmit+0x51/0xb70
+>>    ? _raw_spin_unlock_irqrestore+0xe/0x40
+>>    xsk_sendmsg+0xda/0x1c0
+>>    __sys_sendto+0x1ee/0x200
+>>    __x64_sys_sendto+0x24/0x30
+>>    do_syscall_64+0x84/0x2f0
+>>    ? __pfx_pollwake+0x10/0x10
+>>    ? __rseq_handle_notify_resume+0xad/0x4c0
+>>    ? restore_fpregs_from_fpstate+0x3c/0x90
+>>    ? switch_fpu_return+0x5b/0xe0
+>>    ? do_syscall_64+0x204/0x2f0
+>>    ? do_syscall_64+0x204/0x2f0
+>>    ? do_syscall_64+0x204/0x2f0
+>>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>>    </TASK>
+>>   [...]
+>>   Kernel panic - not syncing: Fatal exception in interrupt
+>>   Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+>>
+>> Instead use the skb destructor_arg pointer along with pointer tagging.
+>> As pointers are always aligned to 8B, use the bottom bit to indicate
+>> whether this a single address or an allocated struct containing several
+>> addresses.
+>>
+>> Fixes: 30f241fcf52a ("xsk: Fix immature cq descriptor production")
+>> Closes: https://lore.kernel.org/netdev/0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu/
+>> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+>> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+> 
+> Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> 
+> Fernando thanks for stepping in and providing this fix!
+> And thanks Jakub for ptr tagging trick.
+> 
+> @BPF maintainers, please apply this patch.
+> 
 
->
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> ---
->  drivers/net/ethernet/freescale/fec.h      |  8 +-------
->  drivers/net/ethernet/freescale/fec_main.c | 11 +++++------
->  2 files changed, 6 insertions(+), 13 deletions(-)
->
-> diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
-> index 8e438f6e7ec4..c5bbc2c16a4f 100644
-> --- a/drivers/net/ethernet/freescale/fec.h
-> +++ b/drivers/net/ethernet/freescale/fec.h
-> @@ -528,12 +528,6 @@ struct bufdesc_prop {
->  	unsigned char dsize_log2;
->  };
->
-> -struct fec_enet_priv_txrx_info {
-> -	int	offset;
-> -	struct	page *page;
-> -	struct  sk_buff *skb;
-> -};
-> -
->  enum {
->  	RX_XDP_REDIRECT = 0,
->  	RX_XDP_PASS,
-> @@ -573,7 +567,7 @@ struct fec_enet_priv_tx_q {
->
->  struct fec_enet_priv_rx_q {
->  	struct bufdesc_prop bd;
-> -	struct  fec_enet_priv_txrx_info rx_skb_info[RX_RING_SIZE];
-> +	struct page *rx_buf[RX_RING_SIZE];
->
->  	/* page_pool */
->  	struct page_pool *page_pool;
-> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-> index 9cf579a8ac0f..1408e3e6650a 100644
-> --- a/drivers/net/ethernet/freescale/fec_main.c
-> +++ b/drivers/net/ethernet/freescale/fec_main.c
-> @@ -1655,8 +1655,7 @@ static int fec_enet_update_cbd(struct fec_enet_priv_rx_q *rxq,
->  	if (unlikely(!new_page))
->  		return -ENOMEM;
->
-> -	rxq->rx_skb_info[index].page = new_page;
-> -	rxq->rx_skb_info[index].offset = FEC_ENET_XDP_HEADROOM;
-> +	rxq->rx_buf[index] = new_page;
->  	phys_addr = page_pool_get_dma_addr(new_page) + FEC_ENET_XDP_HEADROOM;
->  	bdp->cbd_bufaddr = cpu_to_fec32(phys_addr);
->
-> @@ -1834,7 +1833,7 @@ fec_enet_rx_queue(struct net_device *ndev, u16 queue_id, int budget)
->  		ndev->stats.rx_bytes += pkt_len;
->
->  		index = fec_enet_get_bd_index(bdp, &rxq->bd);
-> -		page = rxq->rx_skb_info[index].page;
-> +		page = rxq->rx_buf[index];
->  		cbd_bufaddr = bdp->cbd_bufaddr;
->  		if (fec_enet_update_cbd(rxq, bdp, index)) {
->  			ndev->stats.rx_dropped++;
-> @@ -3309,7 +3308,8 @@ static void fec_enet_free_buffers(struct net_device *ndev)
->  	for (q = 0; q < fep->num_rx_queues; q++) {
->  		rxq = fep->rx_queue[q];
->  		for (i = 0; i < rxq->bd.ring_size; i++)
-> -			page_pool_put_full_page(rxq->page_pool, rxq->rx_skb_info[i].page, false);
-> +			page_pool_put_full_page(rxq->page_pool, rxq->rx_buf[i],
-> +						false);
->
->  		for (i = 0; i < XDP_STATS_TOTAL; i++)
->  			rxq->stats[i] = 0;
-> @@ -3443,8 +3443,7 @@ fec_enet_alloc_rxq_buffers(struct net_device *ndev, unsigned int queue)
->  		phys_addr = page_pool_get_dma_addr(page) + FEC_ENET_XDP_HEADROOM;
->  		bdp->cbd_bufaddr = cpu_to_fec32(phys_addr);
->
-> -		rxq->rx_skb_info[i].page = page;
-> -		rxq->rx_skb_info[i].offset = FEC_ENET_XDP_HEADROOM;
-> +		rxq->rx_buf[i] = page;
->  		bdp->cbd_sc = cpu_to_fec16(BD_ENET_RX_EMPTY);
->
->  		if (fep->bufdesc_ex) {
-> --
-> 2.34.1
->
+Thank you, please note that if rebasing is needed I can send a rebased 
+version. Just let me know.
+
+Thanks,
+Fernando.
 
