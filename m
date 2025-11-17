@@ -1,150 +1,114 @@
-Return-Path: <netdev+bounces-239051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 937C7C62FE0
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:55:14 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7F32C63015
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:57:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C109F3AD905
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:54:52 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3169E34ECFD
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3153164DF;
-	Mon, 17 Nov 2025 08:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EmDlOwFf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61CF831E0EF;
+	Mon, 17 Nov 2025 08:56:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031E130E84D
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 08:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F21531AF18;
+	Mon, 17 Nov 2025 08:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763369690; cv=none; b=sXU5fvJsgshalmkb6FqgqwewU0EfScjqx/qPdi3xeAcsSXbftCPcRPnsVVf7TVngAr+31Zc+Xk/RNaGoIb5HulEqNnSNsEkTyI3mHhlVuhucDJgxmA1Ejg+Kv5ZWGAhDdoZj7iIE7MN/UMrpG8FNz9UIC0GywVJOw7XIE0lJ/sk=
+	t=1763369816; cv=none; b=j03V8ANKx6n1jcRS9UwejVUygEwtDlLxLHKuZnlCykhictOtQax1/IFTgZiOS50Qb1z80gZd7U3uLgSo1L9Am329p0clAi//kCoksKdOPFJjMKLKmAvBSB9Xn0meA0qTSyS8DfA8i3oYNkqF8ec7N8CLPmU1D0Nc7JKluZjDbz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763369690; c=relaxed/simple;
-	bh=S9skhitPqR1K90Ta/FOI+xvdgP7Uf7ls4Pz5r89g6QM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R9+RwKjrNjKgS8/I9gVHQ1Am5FU66wfdyOqgDw8u3r2xxAC7Ngpy7c58C/5PISxq+53o/8tw2KC+n3G16JGE5UGah1+LZKj4Km4QtrVmoFIgZcyixpqUATBj7wz8Er9sNxGLsNPOQojqsEMOoe1H7J+PGLnEPjC7ELekgnVACvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EmDlOwFf; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-43470d98f77so17221385ab.2
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 00:54:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763369687; x=1763974487; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S9skhitPqR1K90Ta/FOI+xvdgP7Uf7ls4Pz5r89g6QM=;
-        b=EmDlOwFf+gBXfTvN5ZUHCohBPRrtqd6pEAV9ReE2+KG2Dn4BNFPaNASWLN2yIPqP1X
-         RZTdCH7U+LA/QGlCuUQ3wMB6PIIgW+EDDGQvNFYGYPHwBnxNr4z37td0CXy8BfVmZVUa
-         qh26SzGm/lXVwxx0PWiaNqTPXDdxmhFDHUFjKpAjgbVnK6V2MQGqJjnHilAQOTrg4bNy
-         YoOGgSZlhhMCMB4weTlj1h9J99nnvfSjDGgUed1PnxepEns3L618sCnkWqn4N6ArayiZ
-         7j+yiV9XUBx8My27TWVtpQusID6oC/bVOB0n1EoJssdOo7yIDjDD3eCZcECAiPyLrE5q
-         PHcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763369687; x=1763974487;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=S9skhitPqR1K90Ta/FOI+xvdgP7Uf7ls4Pz5r89g6QM=;
-        b=HvEsn0JDGvsdUWRrb30G17UpMrhxNKCbr0cqnLGwCBrrYk5rfNJKUb5h5L5bQjxmmN
-         PtJja/znYjW6/krbWKX7S4mpQ80QQuYTa4PtZl1oKRSX9d4OUnxAma/vomEbgJqo47LZ
-         7xosPzH8AC+mR0wNtlt0iHE8r6NDu7Odsi9DwnAu+Xu+zmm9c/YD+3bEIhBN9ZPzi6TR
-         ajSNVMSNyJyMXmUd59hv/km81vhH7rvZZ9g+Zs6YYesoaOW+YDmj/UaOQOCxU8Ss0s/F
-         fM26SBdmvib/boV0kXD3tXhsXksqiHrHyBSniuinabFHXWqboUgHF3zt99kJxEbUqKds
-         UdfA==
-X-Forwarded-Encrypted: i=1; AJvYcCV1rZaffEhSiZ1lz/xpyAPKEOCfowcYqhiLG2DE76G6C4zKhsw5Jz0foDRppivDL4+iSgsRCo0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUTotI/a/8QeH2RFge85tDYwr76Asr7xlzB+t7PbesIqj8Np7w
-	UI+EMa7QLI4hIgszFu2VC9iQJMQJfgwaz6RJnTZET/HK/5uMYJBws3GJoqOxnLoxTB93iIRCqqz
-	NW81bj3j7FQ9ew/gh9h/RU8vC78l2ZdI=
-X-Gm-Gg: ASbGncvcVDdyplyVRS3VtjaQ7TUl5SN/iA3G3gjBnqcvNwLx+XqlbpoCmRlgzkXVhqY
-	gA9JCJbTFfa6nJtBzMs1mtK86FF6VitpQeIJW7Bqg2E6F3v0DpGyta2xzJbXjJApGxrOfHsmfSz
-	v4yrowZvmJ/WwDm/yO8Ufm9KRF+iwK//i02Sq0IGbfDuY2R7evkQAD41hA4VsOckiGWiYwoXhHA
-	UZbvPDzEBkR9P9bjqSulI6U/Lba3WxOnmY6aTdpTub3IJZWXi7I4/izErXYqShblxBUNfY=
-X-Google-Smtp-Source: AGHT+IHz9NvlpLoLcWPMBiQI6RyPTekx4psmH9imhcaxFkFLILMONjdf7tAbNcGCdhCd+/zMrWjafg02z5NEh/NL7Sg=
-X-Received: by 2002:a05:6e02:dd2:b0:434:96ea:ff57 with SMTP id
- e9e14a558f8ab-43496eb00f8mr82788195ab.40.1763369686831; Mon, 17 Nov 2025
- 00:54:46 -0800 (PST)
+	s=arc-20240116; t=1763369816; c=relaxed/simple;
+	bh=zeNRmRHWtUOX6I8TzEx3xaRMSJ4fHKEsFIP53qGol6k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WxXPFGJaPW92Ry6M6r3s6Q6/iMTYWV4prjRWExHHb0Q6d5vQ0gy2QAPgadyhXg/g8PhywJ4X8GUXXM9SG9TYjIZU4AavePZT0D9WfOnj2vhmmMqFPrD5DANpAOFOMdir3AVRLSksO5y54c58FzGveCBA+0l82MtM5jOoAR69kCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 57291b98c39311f0a38c85956e01ac42-20251117
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
+	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NAME
+	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED, SA_EXISTED
+	SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
+	CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU
+	AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.6,REQID:0c023d73-c0c8-4c77-ad45-099326e89bc9,IP:10,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:5
+X-CID-INFO: VERSION:1.3.6,REQID:0c023d73-c0c8-4c77-ad45-099326e89bc9,IP:10,URL
+	:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:5
+X-CID-META: VersionHash:a9d874c,CLOUDID:c1d9d1ac3ac19c751748fda4e8ba206e,BulkI
+	D:251117165644OW1UUAGY,BulkQuantity:0,Recheck:0,SF:17|19|38|66|78|102|850,
+	TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,
+	BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 57291b98c39311f0a38c85956e01ac42-20251117
+X-User: zhaochenguang@kylinos.cn
+Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
+	(envelope-from <zhaochenguang@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 999051287; Mon, 17 Nov 2025 16:56:43 +0800
+From: Chenguang Zhao <zhaochenguang@kylinos.cn>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH linux] netfilter: conntrack: Add missing modification about data-race around ct->timeout
+Date: Mon, 17 Nov 2025 16:56:32 +0800
+Message-Id: <20251117085632.429735-1-zhaochenguang@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251116202717.1542829-1-edumazet@google.com> <20251116202717.1542829-4-edumazet@google.com>
- <CAL+tcoD3-qtq4Kcmo9eb4mw6bdSYCCjxzNB3qov5LDYoe_gtkw@mail.gmail.com> <CAL+tcoBpUg=ggf6nQpYeZyAcMbXobuJtyUdN98G1HpcuUqFZ+w@mail.gmail.com>
-In-Reply-To: <CAL+tcoBpUg=ggf6nQpYeZyAcMbXobuJtyUdN98G1HpcuUqFZ+w@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 17 Nov 2025 16:54:09 +0800
-X-Gm-Features: AWmQ_blBLihwhOwO58YvnNFCJUVN-78Z2XLaIpKDibIb_3-Tat281M2zSTbexog
-Message-ID: <CAL+tcoDaB+ghuLZyGgcjubqobKuh0Qsfr5eKYdrOzEnCq9nCUQ@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 3/3] net: use napi_skb_cache even in process context
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 17, 2025 at 4:41=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Mon, Nov 17, 2025 at 9:07=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > On Mon, Nov 17, 2025 at 4:27=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > This is a followup of commit e20dfbad8aab ("net: fix napi_consume_skb=
-()
-> > > with alien skbs").
-> > >
-> > > Now the per-cpu napi_skb_cache is populated from TX completion path,
-> > > we can make use of this cache, especially for cpus not used
-> > > from a driver NAPI poll (primary user of napi_cache).
-> > >
-> > > We can use the napi_skb_cache only if current context is not from har=
-d irq.
-> > >
-> > > With this patch, I consistently reach 130 Mpps on my UDP tx stress te=
-st
-> > > and reduce SLUB spinlock contention to smaller values.
-> > >
-> > > Note there is still some SLUB contention for skb->head allocations.
-> > >
-> > > I had to tune /sys/kernel/slab/skbuff_small_head/cpu_partial
-> > > and /sys/kernel/slab/skbuff_small_head/min_partial depending
-> > > on the platform taxonomy.
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> >
-> > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-> >
-> > Thanks for working on this. Previously I was thinking about this as
-> > well since it affects the hot path for xsk (please see
-> > __xsk_generic_xmit()->xsk_build_skb()->sock_alloc_send_pskb()). But I
-> > wasn't aware of the benefits between disabling irq and allocating
-> > memory. AFAIK, I once removed an enabling/disabling irq pair and saw a
-> > minor improvement as this commit[1] says. Would you share your
-> > invaluable experience with us in this case?
-> >
-> > In the meantime, I will do more rounds of experiments to see how they p=
-erform.
->
-> Tested-by: Jason Xing <kerneljasonxing@gmail.com>
-> Done! I managed to see an improvement. The pps number goes from
-> 1,458,644 to 1,647,235 by running [2].
->
-> But sadly the news is that the previous commit [3] leads to a huge
-> decrease in af_xdp from 1,980,000 to 1,458,644. With commit [3]
-> applied, I observed and found xdpsock always allocated the skb on cpu
-> 0 but the napi poll triggered skb_attempt_defer_free() on another
-> call[4], which affected the final results.
+Add missing modification about data-race around ct->timeout
 
-Typo: on another cpu.
+Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
+
+Fixes: 802a7dc5cf1b ("netfilter: conntrack: annotate data-races around ct->timeout")
+---
+ net/netfilter/nf_conntrack_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+index 344f88295976..0b26d53f3b65 100644
+--- a/net/netfilter/nf_conntrack_core.c
++++ b/net/netfilter/nf_conntrack_core.c
+@@ -1297,7 +1297,7 @@ __nf_conntrack_confirm(struct sk_buff *skb)
+ 	/* Timeout is relative to confirmation time, not original
+ 	   setting time, otherwise we'd get timer wrap in
+ 	   weird delay cases. */
+-	ct->timeout += nfct_time_stamp;
++	WRITE_ONCE(ct->timeout, ct->timeout + nfct_time_stamp);
+ 
+ 	__nf_conntrack_insert_prepare(ct);
+ 
+-- 
+2.25.1
+
 
