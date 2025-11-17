@@ -1,101 +1,48 @@
-Return-Path: <netdev+bounces-239070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B2CEC63803
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:21:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDA08C63818
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:21:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 75DB3381DDA
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:13:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D068C4F4600
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA14258EE9;
-	Mon, 17 Nov 2025 10:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355D9258CD0;
+	Mon, 17 Nov 2025 10:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AgBjRhiv";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZKDL81uZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VOmlPux6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05A22773E5
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 10:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC66246BD8;
+	Mon, 17 Nov 2025 10:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763374349; cv=none; b=s9WYfC5DQfmuWoqAM25nVx4Pl44YX+Gp8sGNtHqbdF5K56kfNfp10GvKWZeF9SUf94TKfGuMwUqNPSMrhNJpRZcabjt3rqMuQpb2DiP524DSbj8dT37FODfO3o6iSAj9mQP2vtdHBKQMkzwNOMlfxsCdXLxZ01MgpptSledIgmg=
+	t=1763374513; cv=none; b=lS+8w4XQGd1rnFljxmIRUR88MD5J399xdtLc/YPdTr9atIq+4R021Ie8Jor3c2dOfJ70XHTKFFs+PUi8/2UgBL2GEXOYZmDtJ7RGYxxH9PqZ0fLe/Jjs7yFOdH7SZVEO9OEvg7mgeNy8vyTsnbebdwTUBq/xTOMG0z0019PDKEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763374349; c=relaxed/simple;
-	bh=CbXx2MwDmeepoNsVAnv/ib6Yv8SpxnAp2vU/CztUC0Q=;
+	s=arc-20240116; t=1763374513; c=relaxed/simple;
+	bh=XVbbG4imr6HzX5iLiSFcVh0dofyN7KdappAN0sNfiR4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M6SDlinP7jYFRr1pBifqsBNTxcr+td/MMHSEXEzmP54LQyJITUESxavNdxSbjbkhmEiXH+fjwAXH83eg7Q++3/897EtsA6jBYrRjNBsLWJHIn7ZR9VwvwT6EHkcqcA/3UHyvP6L6Cg2/l+kI+ixNojOnH+tmTI4NPWw+klUeTKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AgBjRhiv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZKDL81uZ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763374346;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zncjTQqPZzk4cXbDtL+l/by7XSRLqUhrGuMEs2VfYmc=;
-	b=AgBjRhiv9cjnX++cLpewVJ5slou3Qv0YaVfWhn8w4wST2fCljo5YecUTxd2CYlMZBbe2i7
-	Xf0wkqqJuzDyk+/xxdKj0u7jVp3pSEFtOLXDTP+VPua60x15z12MMVCVC4tQUGh/58a49D
-	bG3jNxFAqfVhLkMgXfvKOXSuwil+fYA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-36-neahLrFnNiyAq3HEAgekjA-1; Mon, 17 Nov 2025 05:12:25 -0500
-X-MC-Unique: neahLrFnNiyAq3HEAgekjA-1
-X-Mimecast-MFC-AGG-ID: neahLrFnNiyAq3HEAgekjA_1763374344
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-429c95fdba8so2145813f8f.0
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 02:12:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763374344; x=1763979144; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zncjTQqPZzk4cXbDtL+l/by7XSRLqUhrGuMEs2VfYmc=;
-        b=ZKDL81uZLmoakBmVPrhO0lE6nX0qjV2w9Ss3kFFwGfO0DKgf7h6v1pbkJtN0PqaeEK
-         434FhEM10PNo5ZmS99M+6nOnt6LsFOF6vxo3mzRDk84HAtzkOAtYGOrQ//rTrCC8jexx
-         h7YYuRGPx/SCP5zbMeLKxaPWuTv+At1HlIalJu0Ca2Rg9aDYyJRGwgzPrJZzM1cxRtpW
-         +GT/y2y1+j57d+LdOGLBitisOFX3KMiRlDLQssiSvytjd68Jrrph0ALBTM6KcRT6BBkt
-         npJ3crnnj2m+CRriSVjZPBwN/1aXKk0TASxRAFsJFd1ymy/w74T1oIsrKW8c0dv5l7Tu
-         x7yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763374344; x=1763979144;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zncjTQqPZzk4cXbDtL+l/by7XSRLqUhrGuMEs2VfYmc=;
-        b=RZybbraF9NToMxsjE7NgfctEiaKiL2P7jr3ZBi+c8gmcKosmhjpxx07GO+J21Ug+vj
-         PddELxmVeuf8Qx/mAAQovOejj6HlZXKeJq0+X6lIGtbRin6P4f8IAMsJ4zQEEcTcDy74
-         7qi678QVRk9Zwji7tILPpF9Qskr4Mn5SmFr39Mvqmd0VOz72Mk3lfKWohrZQVcusx1Ql
-         ZQAD3C17XXK31XqeqkDjZSD0spKlXwB7sAZe14odcceo9aHtF0gbGN/iT33KWq5iKyKi
-         XOmq33JEHGIYI4x6PapoICNBlIcT47mPr7G7SDiqRzqFMmpb4F93qXTMKHvON9LdPTxU
-         Q4Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCUoWeqMGkPnBV/AhPi2anWXOfCDUXmKti/1Ke5GcbS5ifItELwjNxhMhokIWYT74lWlMfFcc3s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCklDHYWHlgUM7XuPYduq8HTYTFOG+cniI62qTJY8UkLiRYcA1
-	cnD5Z51HrixjxX03rD77uKo2/YFVpwQo/fabRNJwLO+79c+ZSkhxzyzKG38kHvzOHq0pfjwuBHQ
-	Zl3Cffh+Rl+KhV4YbOeLiAnd7n9uva0VE5PQSdVI6HtjNWDb/pTt/y4BK6A==
-X-Gm-Gg: ASbGnctOnMYuuAiPgCH+huFB29V33L9Agq6Ldm3SFuVgiFZsRRZkdnQ3Dx6UbPbUOZ+
-	Uxqj5AQjQlsEA69nlUvbkuPnuf5Q75cBEziSOJNLp7wXcb63uzaZ4ckSkaeuk1DWPcLM13xUqLQ
-	bvXj5z4P3eVnlw6NcUIrRGzGrQo4egN+9osgFWElwSQVU0bRvYrOeRw2f7XMotdV/dQ752vd4IJ
-	l2iIBabcuhxHFjwlFcuW7ri2WEM+am4lmMvgKMKy4RUCUfmPKvRzPiidKVuZcoOZYKqysdPMJ5l
-	Du4aDD8exp4jXDvtYcAt2Y6FSLkahVYCpoVrwUJ47rMAhrA+mKftWeTDer0GaqGXJQ4U1MGfTGc
-	rHXzGhbitBLn5
-X-Received: by 2002:a05:6000:2509:b0:42b:3978:158e with SMTP id ffacd0b85a97d-42b5936c71cmr9947370f8f.30.1763374343653;
-        Mon, 17 Nov 2025 02:12:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF4u81kWSQMevYnWrt/EGAk8IS9/Yiw+ZaDletTZC7VriVAPpg2eZbzSNPe7qG5leF2xm4aBQ==
-X-Received: by 2002:a05:6000:2509:b0:42b:3978:158e with SMTP id ffacd0b85a97d-42b5936c71cmr9947331f8f.30.1763374343261;
-        Mon, 17 Nov 2025 02:12:23 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.41])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e7ae47sm24872955f8f.4.2025.11.17.02.12.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Nov 2025 02:12:22 -0800 (PST)
-Message-ID: <74e58481-91fc-470e-9e5d-959289c8ab2c@redhat.com>
-Date: Mon, 17 Nov 2025 11:12:21 +0100
+	 In-Reply-To:Content-Type; b=rBi45E2r8jhmLP4LMYl+RZ0O1JVNAIwDKJXqilrBbwOEVtcdY6oEn1/mFF5BjcqAU+SzsURSXlFylWCqnk7sQGRBFHV7oz9NS6CzmcAre+FPV44LD5hhG35Av2dvsrmvbhuyW5ox+wGEx1R16Dm315RE0jE/kV52hLlX5SuX5k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VOmlPux6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F523C113D0;
+	Mon, 17 Nov 2025 10:15:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763374511;
+	bh=XVbbG4imr6HzX5iLiSFcVh0dofyN7KdappAN0sNfiR4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VOmlPux6bfpytdmEbJP38bvwwEWuXzCkA/bkNlhMWeXZs48XXitKZHaDMR/bU8pZs
+	 0M//2Q4KvBCCtqZuxtbJXQveQeLU2OKfh3sH/BGaAijp252rZy8eobu1mTEvPUGcrv
+	 zIDXL/4wISnQHMAmFvS8z5B0Fw1hFtvTbm9RjrEkEKfMhb5e3Jh/UhhJMhVDgRRg/j
+	 uHicaFE6SfciSoltS+wfcWooRXgDGHVFr0H6uMZ1YvTAb/zFoOoVfiuZLbwjgKHAkV
+	 ny4HY72lBvq9N5fTeCOYF4d4oj2Tz22jOjMP1pzXounvApNFlxJuoU5U3Dxov/QdSb
+	 B9Wo9/lV9oZaQ==
+Message-ID: <c378da30-4916-4fd6-8981-4ab2ffa17482@kernel.org>
+Date: Mon, 17 Nov 2025 11:15:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,47 +50,115 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 3/3] net: use napi_skb_cache even in process
- context
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Jason Xing <kerneljasonxing@gmail.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20251114121243.3519133-1-edumazet@google.com>
- <20251114121243.3519133-4-edumazet@google.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251114121243.3519133-4-edumazet@google.com>
+Subject: Re: [PATCH v2 net] mptcp: fix a race in mptcp_pm_del_add_timer()
+Content-Language: en-GB, fr-BE
+To: Eric Dumazet <edumazet@google.com>
+Cc: Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang.tang@linux.dev>, Florian Westphal <fw@strlen.de>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+2a6fbf0f0530375968df@syzkaller.appspotmail.com,
+ Geliang Tang <geliang@kernel.org>, MPTCP Linux <mptcp@lists.linux.dev>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20251117100745.1913963-1-edumazet@google.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20251117100745.1913963-1-edumazet@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/14/25 1:12 PM, Eric Dumazet wrote:
-> This is a followup of commit e20dfbad8aab ("net: fix napi_consume_skb()
-> with alien skbs").
-> 
-> Now the per-cpu napi_skb_cache is populated from TX completion path,
-> we can make use of this cache, especially for cpus not used
-> from a driver NAPI poll (primary user of napi_cache).
-> 
-> We can use the napi_skb_cache only if current context is not from hard irq.
-> 
-> With this patch, I consistently reach 130 Mpps on my UDP tx stress test
-> and reduce SLUB spinlock contention to smaller values.
-> 
-> Note there is still some SLUB contention for skb->head allocations.
-> 
-> I had to tune /sys/kernel/slab/skbuff_small_head/cpu_partial
-> and /sys/kernel/slab/skbuff_small_head/min_partial depending
-> on the platform taxonomy.
+Hi Eric,
 
-Double checking I read the above correctly: you did the tune to reduce
-the SLUB contention on skb->head and reach the 130Mpps target, am I correct?
+(+cc MPTCP ML)
 
-If so, could you please share the used values for future memory?
+On 17/11/2025 11:07, Eric Dumazet wrote:
+> mptcp_pm_del_add_timer() can call sk_stop_timer_sync(sk, &entry->add_timer)
+> while another might have free entry already, as reported by syzbot.
+> 
+> Add RCU protection to fix this issue.
 
-Thanks!
+Thank you for the report and even more for the fix!
 
-Paolo
+> Also change confusing add_timer variable with stop_timer boolean.
+
+Indeed, this name was confusing: 'add_timer' is in fact a (too) short
+version of "additional address signalling retransmission timer". This
+new 'stop_timer' boolean makes sense!
+
+> syzbot report:
+
+(...)
+
+> Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
+> Reported-by: syzbot+2a6fbf0f0530375968df@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/691ad3c3.a70a0220.f6df1.0004.GAE@google.com/
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Geliang Tang <geliang@kernel.org>
+
+The modification looks good to me:
+
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
+While at it, just to help me to manage the backports:
+
+Cc: stable@vger.kernel.org
+
+> v2: Updated/Added Reported-by:/Closes: tags now syzbot report finally reached netdev@ mailing list.
+
+Out of curiosity, is it not OK to reply to the patch with the new
+Reported-by & Closes tags to have them automatically added when applying
+the patch? (I was going to do that on the v1, then I saw the v2 just
+when I was going to press 'Send' :) )
+
+I don't mind having a v2, it is just to save you time later, but maybe
+there is another reason.
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
