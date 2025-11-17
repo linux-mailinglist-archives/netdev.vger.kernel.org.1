@@ -1,199 +1,231 @@
-Return-Path: <netdev+bounces-239053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88F63C63021
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:58:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD38FC63036
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:59:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2DA554EBF9B
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:57:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D1813A8118
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7153164DF;
-	Mon, 17 Nov 2025 08:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36E1321F54;
+	Mon, 17 Nov 2025 08:59:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EWvrEJto"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AWBuz3RO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DA431AF18
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 08:57:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0D6320CC2
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 08:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763369839; cv=none; b=Ww2bve4EucVCf5m+Aw8V7cPZZAlyuyUR5wh+ZLicQ+3IC8oeV5+LF9qi7CdrfMb6EjgqikejcH/VOOwJ91gYvxociXR5/zX6MkQY4YFkqgEwt68u2jlTV5p/9Er38K5aU1FqPEl+4b769bN3Rq4FueTJXarLRIJ38/03heEjTgY=
+	t=1763369951; cv=none; b=GjHNQKH2ChAg5pQrRcwi1kBqcQxrurqfRR6TH/M8qi6VNU8iwuCFZo5RWVDxk/8uBxQcEhn1r+7yrUKKMkqPPkoK9wrqrV0fZaiiRku2G4nBW523GN9xDWq9KKj+7pnnWOeq3i2dhZsjXoxs0+PmKvRQIMmb0HcX3OFCA+fk/p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763369839; c=relaxed/simple;
-	bh=ioLqS8GalwouGEb8GwvwRo/Kypwm0iU7NAc0liG+Fho=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CsHLTTgnZgwGX/Rt3SpOdTHbBT+sri7guiOGbuAKBj6wBmjrA1HDH7vmvnY72dCKbYUorWX0gNk2mxDh0DbOYeOJmO+SGwersqe1cZqA1zNeVDJ9UPt5T7HELcHxhW3e34InhAe5QeJ7KoCXg1rUgD81nMc7x8zGGV03JXevunc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EWvrEJto; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4eda6a8cc12so39845901cf.0
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 00:57:17 -0800 (PST)
+	s=arc-20240116; t=1763369951; c=relaxed/simple;
+	bh=VZVYXZiasLZnAdgwiZQjRFK6cFmwg476sxAlwN9WXyI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kyBNE7DjM22ImYUxdWmS6cF0mVupAfzHxS5zlGOPBkjV2TGNWFy0Z2aSyMwhfqHPvftoj+JM17EUWMUUtDO/e74AdOaK5SGSI/dHTGSX5OY5nzAsNGwwerTvJ147J+GKgzroZKcmvyZN3/ypGgtwVoKMUhDW5QJ9ctItW4NXD8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AWBuz3RO; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-bcfd82f55ebso662883a12.1
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 00:59:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763369837; x=1763974637; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CqLaryFBsf9Rs16adOP0tBnlMP/PcQYIuEQ8NalL6s8=;
-        b=EWvrEJtofMsjGLVnZ3QTZqyrFO01+s+3+Luns6wyDZhHBYBNL1X72GA0aDRpLhqTTM
-         9MXgXYwcl8mxtGatJhRfeX0VjVRlfqv4eYc8Tq2MSXzGQPfsHM8/ky9V4oX2CnOqjr0+
-         6LDvnPvMbUlJn4c8gQPD2K6Xnl5cEAjS8aVlD0IWMGUJCfd5fNpeWMO2DADYd28mMjC+
-         zXWb4hCHpAWbdkwoPw9asTpjV6GL/5MogVjl9SMj7tH7wip1TAeK1tEX2lPLF6lS4Eou
-         pVnpNROBou546fZKC9TQVaqV6yM3SjiHLAPH64fds6b04EwMTqZ09Vo9iqx/j++MpEky
-         RZ8A==
+        d=gmail.com; s=20230601; t=1763369949; x=1763974749; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YuJplMGmt4Z1RMroFnaRWRB664GXXcGAXvTcG99zx6o=;
+        b=AWBuz3ROOTHrZEJQOhE1ewWTUTXnThNRc6tjzybuMCSHswuSyV7siYK5tqqy+PRnwp
+         Wq2SYrx2KSCKXRikf/QN63i95jzmb+dLHTqs/letcXKmuErzIp8xNdGkIDcaGcF25nX6
+         rVoU/x9eDBK8tJP7KO7U1lu0sAnmc9lffzsIMZl3tpgY5EuyAPVuLPO0UJDwL7IZokHe
+         b4UFctK5GRkrHn9X4og3Cr7JsPvhY6oIgaybPQ0BRim2rOOlKNz+5nty0glZm6/a3g/k
+         v8MGuK4ImZ3y1pE9tcKZpRkTJHS0ATjc2DsjcIdzbkjRr7c/T3qNQs5H+7M1jyztIcQ9
+         UIkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763369837; x=1763974637;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CqLaryFBsf9Rs16adOP0tBnlMP/PcQYIuEQ8NalL6s8=;
-        b=sr0dXPhAQ/RALRU/H3epW3g8YsjdRp606WBFWBYMvRgQpnGrxFrrPVvee5Y0+cJhEK
-         VGoXtiUOoEXjUbrLo45U70R/AUChBEL7Me+f8VOyLE9/SViaSFwirvwcUllT3hrqK5jq
-         9GqwO1rhlXFgfQ96M67hFOrKVLMjLv88fSNgpkzrmK+U3Hl1WErd4j5q+PDpb4yPvX5y
-         ymJ+fvjhbGE1ovwEW9lUOcVObXxwbnbyB9nP3BsuBi9o79xQUAl84zHu6FwMiPDXayo4
-         UQaqhu+CRIhEygPXk8XL7NGVzi2YiRvc/V1a90BRNidQ0dmh6OBzLGmv7vQHpqetBg1/
-         Le9w==
-X-Forwarded-Encrypted: i=1; AJvYcCU0PZQ7eyE7ix8K/5W1QegP0wLnx6o1uc3i+iWwdpFG80DkyNUShQQyx+xFt+HICL0r2/MrM9Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxieZvDg4qdhZ9SYsARIvzTqWdgGjsJR8IV5Jtajc6b/bmJJmSt
-	kuep+Q2cU/lKrjQBFCjvqxzazUkYZmyA67xj8pupfoLRhhzcR/JHwkZAAP1zA3+0QGglLK0H0xC
-	Vk+NnnHNYt9L6QmuPFbiWp9dD8aBgi6nWLMmEhgsy
-X-Gm-Gg: ASbGncvqWTcO8nYAZHAXIp9nL1BZia/xADGxaZHV0B2TpGjiKQ3I1tMz0JzYUCf2OGb
-	li2Cs9Fpqq99dtGQcdkApyGw3FL2mL3ca+tlhhiVnqKAe3/P9/FkeEdheaQ0SFh0Kxz30rngUpz
-	E0pD4tXSUoy+5FPWU7VclI1g9MxZX+UBVJdbEpI4wboZoHyEjnAmx+W9KJfgJdN8jDF0KdJSbcy
-	W6Scjl427dsWIeHzsWu5b9Ucytu09QsoqgG7gf7wnAgMrgM/cHRWIEjrJNipJMY/XeJ/4U=
-X-Google-Smtp-Source: AGHT+IGraBqR+kJP4I1VEqI9z+PmUJlE4sJnaGmANAYG4lhcJqdWQMGpcDOhEDbHSP/r8qPeFQXt1senDrB+P1dfXyo=
-X-Received: by 2002:a05:622a:87:b0:4ee:1c10:729f with SMTP id
- d75a77b69052e-4ee1c1076admr44182261cf.35.1763369836456; Mon, 17 Nov 2025
- 00:57:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763369949; x=1763974749;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YuJplMGmt4Z1RMroFnaRWRB664GXXcGAXvTcG99zx6o=;
+        b=SeGgEG3DemzP4jDflgWc9LvxXJFohRHxjH26gc2geVS3VTBZ65F71eOeIe7d/cLIGO
+         +1HF2KYeQOK6zhG+Gmc7qWh3vZjI+QuTTlhp/9vbRRz1w3NJEkcNqxoGt+2HOkSwQlBN
+         7pJ33SXKk0hPgduajAjJjGhIdng/3wzBU4p4KSN8rachMItWJQMT2e9tKRVW7GTgq1Cl
+         T0Jvm3Z7kClC7n02/lqDjmwaJcBAv1pg0t3iKQKQpMGPJZwQjrCc+gh81n114bau4rml
+         JCbT3a6ZD5vNTQm5oMQw+QgySEHKox5XJMllgkGjvBbI9fblKZsYnvAOycWMf0nS+waQ
+         lbEQ==
+X-Gm-Message-State: AOJu0YwpwXwlOpqZ6WaCy2Tg/0fsV66PdnHWNJAJ0qgDyRDuVT5lzUf7
+	t6IazV6vEsOlLF6/TyP4pOjwc4uqW+70SPSksEg2YtYntOHm2sjVuKdi
+X-Gm-Gg: ASbGnctE31jgcnMkbnAxKj26p4AQybzhiZ+EjknzATp7iW0Ob4SUSuyDJA0JjZW0Fa2
+	sO4O5vsO1k4K93B7AdlY+aJDdMpkJX4U306BSycQ48WwGAKi5YnG5JW2MZxZOg8oFbh/A18W2hk
+	Q5OcxZN0Ey8Z2zREqGDlp0W/xV82Mwm2UqVNPvh47sJEqDIQL4rsTD+WiHCU73PpFsf7ZOIN9pT
+	GDBh9gIqbkp+AFFyGv58JcdNdU3fUMIfB/kkrVExnXWZWKK6RMQmIjiwZyw8GEEj/trLQo06L1u
+	vzJMRtQulHdrR0tQs5xdeqWoBcUYBeAMc/wHgD2VPOVbg4Yk6sILEGtcb+t+NzTMP1CFCCO+Nvi
+	TcipN3k1IOrr9/fc8K7mQr1u+l5Cee8QKOuS+dng3NidFZ0UOOWwW6hEk
+X-Google-Smtp-Source: AGHT+IGp2eFIcvLZaV/ERruGqC1K/JzVyco8Knc+w5+BBpuOr4rj5S1fp6JgJARKZIMqdZXObbFw4w==
+X-Received: by 2002:a05:693c:60c6:b0:2a4:86e5:6b2a with SMTP id 5a478bee46e88-2a49af801a3mr4072122eec.14.1763369949408;
+        Mon, 17 Nov 2025 00:59:09 -0800 (PST)
+Received: from gmail.com ([2a09:bac5:1f0a:281e::3ff:5a])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a49db102f5sm35562982eec.4.2025.11.17.00.59.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 00:59:08 -0800 (PST)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	Ronnie Sahlberg <lsahlber@redhat.com>,
+	Hyunchul Lee <hyc.lee@gmail.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	Stefan Metzmacher <metze@samba.org>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH v3] ksmbd: server: avoid busy polling in accept loop
+Date: Mon, 17 Nov 2025 16:59:00 +0800
+Message-ID: <20251117085900.466432-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251116202717.1542829-1-edumazet@google.com> <20251116202717.1542829-4-edumazet@google.com>
- <CAL+tcoD3-qtq4Kcmo9eb4mw6bdSYCCjxzNB3qov5LDYoe_gtkw@mail.gmail.com> <CAL+tcoBpUg=ggf6nQpYeZyAcMbXobuJtyUdN98G1HpcuUqFZ+w@mail.gmail.com>
-In-Reply-To: <CAL+tcoBpUg=ggf6nQpYeZyAcMbXobuJtyUdN98G1HpcuUqFZ+w@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 17 Nov 2025 00:57:04 -0800
-X-Gm-Features: AWmQ_bmG17gbJq3shqejaPuM4Ja_ptmKw5Og12lq2yIJwUPCMpms4jnbYWzFByM
-Message-ID: <CANn89iJb8hLw7Mx1+Td_BK7gGm5guRaUe6zdhqRqtfdw_0gLzA@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 3/3] net: use napi_skb_cache even in process context
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 17, 2025 at 12:41=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
->
-> On Mon, Nov 17, 2025 at 9:07=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > On Mon, Nov 17, 2025 at 4:27=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > This is a followup of commit e20dfbad8aab ("net: fix napi_consume_skb=
-()
-> > > with alien skbs").
-> > >
-> > > Now the per-cpu napi_skb_cache is populated from TX completion path,
-> > > we can make use of this cache, especially for cpus not used
-> > > from a driver NAPI poll (primary user of napi_cache).
-> > >
-> > > We can use the napi_skb_cache only if current context is not from har=
-d irq.
-> > >
-> > > With this patch, I consistently reach 130 Mpps on my UDP tx stress te=
-st
-> > > and reduce SLUB spinlock contention to smaller values.
-> > >
-> > > Note there is still some SLUB contention for skb->head allocations.
-> > >
-> > > I had to tune /sys/kernel/slab/skbuff_small_head/cpu_partial
-> > > and /sys/kernel/slab/skbuff_small_head/min_partial depending
-> > > on the platform taxonomy.
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> >
-> > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-> >
-> > Thanks for working on this. Previously I was thinking about this as
-> > well since it affects the hot path for xsk (please see
-> > __xsk_generic_xmit()->xsk_build_skb()->sock_alloc_send_pskb()). But I
-> > wasn't aware of the benefits between disabling irq and allocating
-> > memory. AFAIK, I once removed an enabling/disabling irq pair and saw a
-> > minor improvement as this commit[1] says. Would you share your
-> > invaluable experience with us in this case?
-> >
-> > In the meantime, I will do more rounds of experiments to see how they p=
-erform.
->
-> Tested-by: Jason Xing <kerneljasonxing@gmail.com>
-> Done! I managed to see an improvement. The pps number goes from
-> 1,458,644 to 1,647,235 by running [2].
->
-> But sadly the news is that the previous commit [3] leads to a huge
-> decrease in af_xdp from 1,980,000 to 1,458,644. With commit [3]
-> applied, I observed and found xdpsock always allocated the skb on cpu
-> 0 but the napi poll triggered skb_attempt_defer_free() on another
-> call[4], which affected the final results.
->
-> [2]
-> taskset -c 0 ./xdpsock -i enp2s0f1 -q 1 -t -S -s 64
->
-> [3]
-> commit e20dfbad8aab2b7c72571ae3c3e2e646d6b04cb7
-> Author: Eric Dumazet <edumazet@google.com>
-> Date:   Thu Nov 6 20:29:34 2025 +0000
->
->     net: fix napi_consume_skb() with alien skbs
->
->     There is a lack of NUMA awareness and more generally lack
->     of slab caches affinity on TX completion path.
->
-> [4]
-> @c[
->     skb_attempt_defer_free+1
->     ixgbe_clean_tx_irq+723
->     ixgbe_poll+119
->     __napi_poll+48
-> , ksoftirqd/24]: 1964731
->
-> @c[
->     kick_defer_list_purge+1
->     napi_consume_skb+333
->     ixgbe_clean_tx_irq+723
->     ixgbe_poll+119
-> , 34, swapper/34]: 123779
->
-> Thanks,
-> Jason
+The ksmbd listener thread was using busy waiting on a listening socket by
+calling kernel_accept() with SOCK_NONBLOCK and retrying every 100ms on
+-EAGAIN. Since this thread is dedicated to accepting new connections,
+there is no need for non-blocking mode.
 
-Hi Jason.
+Switch to a blocking accept() call instead, allowing the thread to sleep
+until a new connection arrives. This avoids unnecessary wakeups and CPU
+usage. During teardown, call shutdown() on the listening socket so that
+accept() returns -EINVAL and the thread exits cleanly.
 
-It is a bit hard to guess without more details (cpu you are using),
-and perhaps perf profiles.
-In particular which cpu is the bottleneck ?
+The socket release mutex is redundant because kthread_stop() blocks until
+the listener thread returns, guaranteeing safe teardown ordering.
 
-1) There is still the missing part about tuning NAPI_SKB_CACHE_SIZE /
-NAPI_SKB_CACHE_BULK, I was hoping you could send the patch we
-discussed earlier ?
+Also remove sk_rcvtimeo and sk_sndtimeo assignments, which only caused
+accept() to return -EAGAIN prematurely.
 
-2) I am also working on allowing batches of skbs for skb_attempt_defer_free=
-().
+Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+---
+v2 -> v3: https://lore.kernel.org/linux-cifs/20251111104750.25739-1-dqfext@gmail.com
+ Remove unused functions.
 
-Another item I am working on is to let the qdisc being serviced
-preferably not by the cpu performing TX completion,
-I mentioned about making qdisc->running a sequence that we can latch
-in __netif_schedule().
-(Idea is to be able to not spin on qdisc spinlock from net_tx_action()
-if another cpu was able to call qdisc_run())
+v1 -> v2: https://lore.kernel.org/linux-cifs/20251030064736.24061-1-dqfext@gmail.com
+ Do not remove TCP_NODELAY, as accepted sockets inherits from it.
+ Fix accept() blocking forever on older kernel versions.
+ Remove a redundant mutex
+
+ fs/smb/server/transport_tcp.c | 41 +++++------------------------------
+ 1 file changed, 6 insertions(+), 35 deletions(-)
+
+diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
+index 6e03e93321b8..4bb07937d7ef 100644
+--- a/fs/smb/server/transport_tcp.c
++++ b/fs/smb/server/transport_tcp.c
+@@ -22,7 +22,6 @@ struct interface {
+ 	struct socket		*ksmbd_socket;
+ 	struct list_head	entry;
+ 	char			*name;
+-	struct mutex		sock_release_lock;
+ 	int			state;
+ };
+ 
+@@ -56,19 +55,6 @@ static inline void ksmbd_tcp_reuseaddr(struct socket *sock)
+ 	sock_set_reuseaddr(sock->sk);
+ }
+ 
+-static inline void ksmbd_tcp_rcv_timeout(struct socket *sock, s64 secs)
+-{
+-	if (secs && secs < MAX_SCHEDULE_TIMEOUT / HZ - 1)
+-		WRITE_ONCE(sock->sk->sk_rcvtimeo, secs * HZ);
+-	else
+-		WRITE_ONCE(sock->sk->sk_rcvtimeo, MAX_SCHEDULE_TIMEOUT);
+-}
+-
+-static inline void ksmbd_tcp_snd_timeout(struct socket *sock, s64 secs)
+-{
+-	sock_set_sndtimeo(sock->sk, secs);
+-}
+-
+ static struct tcp_transport *alloc_transport(struct socket *client_sk)
+ {
+ 	struct tcp_transport *t;
+@@ -236,20 +222,14 @@ static int ksmbd_kthread_fn(void *p)
+ 	unsigned int max_ip_conns;
+ 
+ 	while (!kthread_should_stop()) {
+-		mutex_lock(&iface->sock_release_lock);
+ 		if (!iface->ksmbd_socket) {
+-			mutex_unlock(&iface->sock_release_lock);
+ 			break;
+ 		}
+-		ret = kernel_accept(iface->ksmbd_socket, &client_sk,
+-				    SOCK_NONBLOCK);
+-		mutex_unlock(&iface->sock_release_lock);
+-		if (ret) {
+-			if (ret == -EAGAIN)
+-				/* check for new connections every 100 msecs */
+-				schedule_timeout_interruptible(HZ / 10);
++		ret = kernel_accept(iface->ksmbd_socket, &client_sk, 0);
++		if (ret == -EINVAL)
++			break;
++		if (ret)
+ 			continue;
+-		}
+ 
+ 		if (!server_conf.max_ip_connections)
+ 			goto skip_max_ip_conns_limit;
+@@ -458,10 +438,6 @@ static void tcp_destroy_socket(struct socket *ksmbd_socket)
+ 	if (!ksmbd_socket)
+ 		return;
+ 
+-	/* set zero to timeout */
+-	ksmbd_tcp_rcv_timeout(ksmbd_socket, 0);
+-	ksmbd_tcp_snd_timeout(ksmbd_socket, 0);
+-
+ 	ret = kernel_sock_shutdown(ksmbd_socket, SHUT_RDWR);
+ 	if (ret)
+ 		pr_err("Failed to shutdown socket: %d\n", ret);
+@@ -532,9 +508,6 @@ static int create_socket(struct interface *iface)
+ 		goto out_error;
+ 	}
+ 
+-	ksmbd_socket->sk->sk_rcvtimeo = KSMBD_TCP_RECV_TIMEOUT;
+-	ksmbd_socket->sk->sk_sndtimeo = KSMBD_TCP_SEND_TIMEOUT;
+-
+ 	ret = kernel_listen(ksmbd_socket, KSMBD_SOCKET_BACKLOG);
+ 	if (ret) {
+ 		pr_err("Port listen() error: %d\n", ret);
+@@ -604,12 +577,11 @@ static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
+ 		if (iface && iface->state == IFACE_STATE_CONFIGURED) {
+ 			ksmbd_debug(CONN, "netdev-down event: netdev(%s) is going down\n",
+ 					iface->name);
++			kernel_sock_shutdown(iface->ksmbd_socket, SHUT_RDWR);
+ 			tcp_stop_kthread(iface->ksmbd_kthread);
+ 			iface->ksmbd_kthread = NULL;
+-			mutex_lock(&iface->sock_release_lock);
+-			tcp_destroy_socket(iface->ksmbd_socket);
++			sock_release(iface->ksmbd_socket);
+ 			iface->ksmbd_socket = NULL;
+-			mutex_unlock(&iface->sock_release_lock);
+ 
+ 			iface->state = IFACE_STATE_DOWN;
+ 			break;
+@@ -672,7 +644,6 @@ static struct interface *alloc_iface(char *ifname)
+ 	iface->name = ifname;
+ 	iface->state = IFACE_STATE_DOWN;
+ 	list_add(&iface->entry, &iface_list);
+-	mutex_init(&iface->sock_release_lock);
+ 	return iface;
+ }
+ 
+-- 
+2.43.0
+
 
