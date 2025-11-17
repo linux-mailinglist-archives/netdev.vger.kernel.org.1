@@ -1,180 +1,105 @@
-Return-Path: <netdev+bounces-239124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A897BC64573
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 14:25:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80F8BC645D0
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 14:31:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ADD914E8110
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 13:24:19 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 382A44EC4AF
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 13:30:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF923328E0;
-	Mon, 17 Nov 2025 13:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1A2331A7E;
+	Mon, 17 Nov 2025 13:28:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="sld5GOH1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c9AbPNQI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10FE331A7A
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 13:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F403321B2
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 13:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763385834; cv=none; b=ICPqUsPFq0pQHPSDnoDzoQ+fCUOz/LHN9t80CP6gZ1jv7kWhBpsJxi6o7NyTWe3y1akPmAhA8TELNmLvB/ptSwdZ5h49m3Hg00K8282corVQyiB9RfIm2pIxKOaQmwamOtM00CbxPpCnp21yxBTcY5j42+wJKRD+f9eU8s/WwbY=
+	t=1763386087; cv=none; b=W5NNCBGJqudTmM48O7lwa7d+DsqEPWNAoZltrHxdG++xwB8Fw+8fo+evb7nXpd/8/nibqWnQuMClKfQgE2S65ZadAALgt9Mbg1eeKboOqxoIpsSF5TkuWUOqiam3xuve6wyenEs8yiEyPqaIa0bpqi+p13206vznIhB2SyoPdoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763385834; c=relaxed/simple;
-	bh=xc3v1AyoRURQTanMjViwCpxZz23hwtZqB8PsZ4KUMKk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=CvuRNTEsd3KO975gtyPUE72CAuSVxTh6mVmeJegFxVE5BWLUd5tdYJQ5An9l2DfmItqNbQLUBQcVsD+JNeQ8IyvrFzG0v3CYotrDVdpwd+vF/54RGUl6fbkIyDcOmiFpzyXlgpD5Y4yg0BE49sb2ltvyi5+NvXLlkGpZmqwU+7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=sld5GOH1; arc=none smtp.client-ip=45.145.95.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
-	t=1763385829; bh=xc3v1AyoRURQTanMjViwCpxZz23hwtZqB8PsZ4KUMKk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=sld5GOH1Br0rljc6YQGHJ9RHvVV0KTKJMmG1wuab2Py+6CvzWDEfzAvxjo3IWK6gi
-	 awv7R5Y71h5c6vv+mli/owthV7cICMIaHs+hczeODvxSkKi/paeogS+fDZzx1Y0v+K
-	 AjRW8c8E8YgUp0Xng2ozXLrR3kxhKC8hAutVveiuxcXIWGzz0+s9zfiMmdhbS6y0eO
-	 lgKgJ+Y6VD2i3lXk/2jlWZHeUDMmJzpNqhzIwQbcxuIYYLLnjOHngreupdC6mNXbt2
-	 YGpX206g1EiHojwrkRxxBxr58ZzdtMJtbRKZA2xOKlp7Ca6Ej44ABgDYHv/mdDlg3G
-	 tvZ6uzlTR0SVg==
-To: Xiang Mei <xmei5@asu.edu>
-Cc: security@kernel.org, netdev@vger.kernel.org, cake@lists.bufferbloat.net,
- bestswngs@gmail.com
-Subject: Re: [PATCH net v3] net/sched: sch_cake: Fix incorrect qlen
- reduction in cake_drop
-In-Reply-To: <aRhUsbR6DT1F0bqc@p1>
-References: <20251113035303.51165-1-xmei5@asu.edu> <aRVZJmTAWyrnXpCJ@p1>
- <87346ijbs9.fsf@toke.dk> <aRhUsbR6DT1F0bqc@p1>
-Date: Mon, 17 Nov 2025 14:23:45 +0100
-X-Clacks-Overhead: GNU Terry Pratchett
-Message-ID: <87a50kokri.fsf@toke.dk>
+	s=arc-20240116; t=1763386087; c=relaxed/simple;
+	bh=xuSXvN7Twlta8+kFiKEmi39jOrRyIqwxCDIA5Nf2hfg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Q9ZWnektKy4AU4dxdDmCgVI4HqDLGXrHvVWA0COQbZ+gO1TFi2M+DZgQQeRc/QAcx/G9hJKXCIo0ZcDEWUpvFUzJRmpnAi12SuFQHUjBjlIbgMUsvF5fYPTwPlIqnxjJP7vjpnuc4I4w9GeuaAXuPb9EObdbRjPnyVYR+kAwmjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c9AbPNQI; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8a1c15daa69so1412988185a.1
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 05:28:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763386084; x=1763990884; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YkPBlZ99mSg6BHCkMS1VbkS792zlY57mJH7RSu9Whfc=;
+        b=c9AbPNQIXOoM53dLZVu26xJSe+2g3RuTk8gEuvK4Gzh/kLzCNCI1LPmqjdKWjYAcmG
+         8DYLhjI/dn4TNudSWvqiZzdfvrqmtF7Z1R0M++SUlswQ6dRyKPa4ZnMjwm2x8Ody+zwC
+         yh8PGhWah52sReGRVFv9IeaU94F7fb/7jJmscGeAS/7alsPKhY+GIHvATH28XFAm/xJ7
+         Q5QErOASfFqb7qE/UqJup7sHoHa+HCyn4E4D+uCfb/9mJeEB70Eh04MGh6zmU++ERMoj
+         sXUGOgQo1EzV5ewLWwINaVonbB5hBXheySibHbrSiXJ2HXK4kyvxR1FLDHabQF+Ktn5v
+         C9fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763386084; x=1763990884;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YkPBlZ99mSg6BHCkMS1VbkS792zlY57mJH7RSu9Whfc=;
+        b=G3thTwL8EtKbRgjbPCz6pU9qB7010L8Iw8ZY0UhDjjmW/hhzV6uYXxQTdfTGw/EjOx
+         1ecvKZLyiDnqzjJQX/Q+laB3LEhKnobpZDXc8JWwL4aUZEOvSfP4imAhR2RWXUiGfoCI
+         D24QPv3tPO4l3m2Bzp8d9h+LL7csCgZmJfQiMaQHhIhRtwnTM4YtNIwKEpVV2evC6BDu
+         FbIbB9mX81xxkwy6pryv36z0IJ7NlXf/nUE5Dn16lur9RE1Gsaj5FKiKXnPGuPTcI+fL
+         ikFURAPx4iHqAqj//VthRLTgSG7ZGASMYTZrl+J1cnrJo1/AqgN9gAyQHJ7jU+nL5DF+
+         7mKA==
+X-Forwarded-Encrypted: i=1; AJvYcCXSuu6qqP8SOrxH1wMmn24PIjmqJDLhyb3+8EnUr6nq/qM+crkxsIsQ1xYa56Gclz5FJtq+oPA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrlRFDC55cDPoofLHpoKoAzXTtp+1EgoKMtmVTewtcMcCZPzVI
+	FZ1kiEf0LnSRdGh01vKbRhYd9bEsjbrj9728bHvAZmT3dma3dkxM6daERSlPoJ4TmTmSW0qxnqA
+	EEyt75P6u9Wy05Q==
+X-Google-Smtp-Source: AGHT+IHkBS4P4mPgzcEfZhoX+bGFuokuL5VbHlIWSf+HworK8a2alJO2mjxgHtduiBULAK8RAV7xR9f41VdQKA==
+X-Received: from qvboo33.prod.google.com ([2002:a05:6214:4521:b0:87f:bcd9:e4e8])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:f6a:b0:880:4bf6:21d0 with SMTP id 6a1803df08f44-88292658ac9mr179224406d6.36.1763386084198;
+ Mon, 17 Nov 2025 05:28:04 -0800 (PST)
+Date: Mon, 17 Nov 2025 13:28:00 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
+Message-ID: <20251117132802.2083206-1-edumazet@google.com>
+Subject: [PATCH net-next 0/2] tcp: tcp_rcvbuf_grow() changes
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-> will not run because the parent scheduler stops enqueueing after seeing
-> NET_XMIT_CN. For normal packets (non-GSO), it's easy to fix: just do
-> qdisc_tree_reduce_backlog(sch, 1, len). However, GSO splitting makes this
-> difficult because we may have already added multiple segments into the
-> flow, and we don=E2=80=99t know how many of them were dequeued.
+First pach is minor and moves tcp_moderate_rcvbuf in appropriate group.
 
-Huh, dequeued? This is all running under the qdisc lock, nothing gets
-dequeued in the meantime.
+Second patch is another attempt to keep small sk->sk_rcvbuf for DC
+(small RT) TCP flows for optimal performance.
 
-Besides, the ACK thinning is irrelevant to the drop compensation. Here's
-an example:
+Eric Dumazet (2):
+  tcp: tcp_moderate_rcvbuf is only used in rx path
+  tcp: add net.ipv4.tcp_rtt_threshold sysctl
 
-Without ACK splitting - we enqueue 1 packet of 100 bytes, then drop 1
-packet of 200 bytes, so we should end up with the same qlen, but 100
-fewer bytes in the queue:
+ Documentation/networking/ip-sysctl.rst         | 10 ++++++++++
+ .../net_cachelines/netns_ipv4_sysctl.rst       |  3 ++-
+ include/net/netns/ipv4.h                       |  3 ++-
+ net/core/net_namespace.c                       | 11 ++++-------
+ net/ipv4/sysctl_net_ipv4.c                     |  9 +++++++++
+ net/ipv4/tcp_input.c                           | 18 ++++++++++++++----
+ net/ipv4/tcp_ipv4.c                            |  1 +
+ 7 files changed, 42 insertions(+), 13 deletions(-)
 
-start: parent qlen =3D X, parent backlog =3D Y
+-- 
+2.52.0.rc1.455.g30608eb744-goog
 
-len =3D 100;
-cake_drop() drops 1 pkt / 200 bytes
-
-if (same_flow) {
-  qdisc_reduce_backlog(0, 100) // parent qlen =3D=3D X, parent backlog =3D=
-=3D Y - 100
-  return NET_XMIT_CN;
-  // no change in parent, so parent qlen =3D=3D X, parent backlog =3D=3D Y =
-- 100
-} else {
-  qdisc_reduce_backlog(1, 200); // parent qlen =3D=3D X - 1, backlog =3D=3D=
- Y - 200
-  return NET_XMIT_SUCCESS;
-  // parent does qlen +=3D1, backlog +=3D 100, so parent qlen =3D=3D x, par=
-ent backlog =3D=3D Y - 100
-}
-
-With ACK splitting - we enqueue 10 segments totalling 110 bytes, then
-drop 1 packet of 200 bytes, so we should end up with 9 packets more in
-the queue, but 90 bytes less:
-
-start: parent qlen =3D X, parent backlog =3D Y
-
-len =3D 100;
-/* split ack: slen =3D=3D 110, numsegs =3D=3D 10 */
-qdisc_tree_reduce_backlog(-9, -10); // parent qlen =3D=3D X + 9, backlog =
-=3D=3D Y + 10
-
-cake_drop() drops 1 pkt / 200 bytes
-
-if (same_flow) {
-  qdisc_reduce_backlog(0, 100)   // parent qlen =3D=3D X + 9, backlog =3D=
-=3D Y - 90
-  return NET_XMIT_CN;
-  // no change in parent, so parent qlen =3D=3D X + 9, backlog =3D=3D Y - 90
-
-} else {
-  qdisc_reduce_backlog(1, 200); // parent qlen =3D=3D X + 8, backlog =3D=3D=
- Y - 190
-  return NET_XMIT_SUCCESS;
-  // parent does qlen +=3D1, backlog +=3D 100, so parent qlen =3D=3D X + 9,=
- backlog =3D=3D Y - 90
-}
-
-
-In both cases, what happens is that we drop one or more packets, reduce
-the backlog by the number of packets/bytes dropped *while compensating
-for what the parent qdisc does on return*. So the adjustments made by
-the segmentation makes no difference to the final outcome.
-
-However, we do have one problem with the ACK thinning code: in the 'if
-(ack)' branch, we currently adjust 'len' if we drop an ACK. Meaning that
-if we use that value later to adjust for what the parent qdisc, the
-value will no longer agree with what the parent does. So we'll have to
-introduce a new variable for the length used in the ACK thinning
-calculation.
-
-> The number of dequeued segments can be anywhere in [0, numsegs], and the
-> dequeued length in [0, slen]. We cannot know the exact number without=20
-> checking the tin/flow index of each dropped packet. Therefore, we should
-> check inside the loop (as v1 did):
->
-> ```
-> cake_drop(...)
-> {
->     ...
->     if (likely(current_flow !=3D idx + (tin << 16)))
->         qdisc_tree_reduce_backlog(sch, 1, len);
->     ...
-> }
-> ```
-
-No, this is not needed - the calculation involving prev_qlen and
-prev_backlog will correctly give us the total number of packets/bytes
-dropped.
->
-> This solution also has a problem, as you mentioned:
-> if the flow already contains packets, dropping those packets should
-> trigger backlog reduction, but our check would incorrectly skip that. One
-> possible solution is to track the number of packets/segments enqueued
-> in the current cake_enqueue (numsegs or 1), and then avoid calling
-> `qdisc_tree_reduce_backlog(sch, 1, len)` for the 1 or numsegs dropped
-> packets. If that makes sense, I'll make the patch and test it.
-
-It does not - see above.
-
-> -----
->
-> Besides, I have a question about the condition for returning NET_XMIT_CN.
-> Do we return NET_XMIT_CN when:
->
-> The incoming packet itself is dropped? (makes more sense to me)
-> or
-> The same flow dequeued once? (This is the current logic)
-
-The same flow. The current logic it correct.
-
--Toke
 
