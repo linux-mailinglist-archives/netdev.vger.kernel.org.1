@@ -1,94 +1,97 @@
-Return-Path: <netdev+bounces-239162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1D44C64BAD
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 15:55:49 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B90EBC64BCE
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 15:57:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C350F4E9A5F
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 14:52:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 26E1534EDF2
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 14:53:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28672336EE3;
-	Mon, 17 Nov 2025 14:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EE330CD85;
+	Mon, 17 Nov 2025 14:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="BgbXCrLZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TMarKb/Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EB5337108;
-	Mon, 17 Nov 2025 14:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F279309DDC;
+	Mon, 17 Nov 2025 14:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763391159; cv=none; b=X4A4+H/bNuEAGDyYBHnjDwzii+IqfFSi+kjQfV+BV+EVFse3bpbHLKd8IPZzBL0JmFLqSbV2+dro+JzuxPLxvAN8H2qSVzFunRZhAX9WJAWwK9VU/Nf8En848eLb4vvNr6Q98tjwS6NZ9xu84crwSVbvpRw2sNM0AhvJH0+fMtY=
+	t=1763391217; cv=none; b=j8aPo+kXQoAn7u9PRShyG9gd+jflIj99VWMWN0PR+3OT5kVRrEppQuUK/yayEpsT+Kh57nzc98sd6W8ENEcLNMofZFG5ulG2sA+fULz+G1ZS9Qcyv+WCHmcH/cZoY3wQ7tcntRN2309Orgew/s+4RzmnRGIqf6c+Jycf5swu+eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763391159; c=relaxed/simple;
-	bh=d0gJRFe5O5oxyfdofN6O/gPpe8rbSohYEpWcmPKF9fE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cT2G08fkwaVDkfMQ25gUCwT8wyaHKNiof4Agt19NZvbCbGNaAatUhrE9VeRu75tkst+Mh/IhuWXM7VfhpIEtOn/P3GEG8C1F5CzrkBEc67hpFhLL/7pHFu0wGc9z/LJ7KDLN7cXhc019AuEyX39czGaGtxBYsJQ1MxwSbK1f7Vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=BgbXCrLZ; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=IyCngOossDPyBLMWLzMAJqaoi2OoRGy3Rcpb86+lvr8=; b=BgbXCrLZROEZYf/vnpjgp1FFOs
-	7O30kOwROiOrpCKUv3imsp6Pmu1BooWYQu2dGPNe0pEhnCYpD21e1lIPKEgl/fnyEZR0wejDU190X
-	dNc6MsdpdnFzLG3XtVsxah9Y6kM3sjJS3JjsFVWbgk3mXa/MC9YI1QqA1R3t2i/FahzautgQU95nh
-	MRjZycc7INttfqOmpeDA25KeZTSR3djUyWlED11KHCq6T5VuDOFS9dsmOzdu/m5O6B9iBJRhj5oQZ
-	K0AaKumdOVxPhbPMz1RJU1Nj5Fsg8ycbbwhdJHyZNmj6R/XHU4a2FfnIMCPnOKx8QP9R5okO459he
-	P3i/VMmioabpYfSJGDKsvQ7il5oYZpx6k0vd4ebgTxrDCAMIqmVz3D96ceyN1CiUngEX4DYRl9Q7k
-	d9qUpqxMVU4bR0XMXgY5OI7z5BZahka6EzGW6eVS70CBBmeobi5ybprlSFK/j8vtzlMq02Aw5Q2BD
-	cwwWbIJQyWsTh61dUw/hMoeZ;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vL0af-00EOL2-27;
-	Mon, 17 Nov 2025 14:52:25 +0000
-Message-ID: <cc80596c-f08d-465e-a503-bdb42fddbbae@samba.org>
-Date: Mon, 17 Nov 2025 15:52:24 +0100
+	s=arc-20240116; t=1763391217; c=relaxed/simple;
+	bh=CHi0nZZGkEKprMC9PR3vEJeM8myBm8l4zKjYk7NDfDk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iTCs+wP2DORDBzuX/yBOokWSG7KN1+Jb39Yr8E5lySPCiD8uD39+zKislfkBDAsD4z0U7C3cS0Z5sQ7eWkUO5fQHIKCgMz732rO349ncj3RSQBMf5hr0CTLDu28QNYcijufV3cBcbiDt/CGUJEW2dPm/93j7wa+eJfBmEHFKod4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TMarKb/Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF043C116B1;
+	Mon, 17 Nov 2025 14:53:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763391216;
+	bh=CHi0nZZGkEKprMC9PR3vEJeM8myBm8l4zKjYk7NDfDk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TMarKb/Z5rBknb0rKMyIkFUcJJ5v9u/EYFS5nGXSS2MpoexBCe61hPwmb0D4wm/ZZ
+	 aSjhdkPSXBoXXBgXuSYpe1+zJlJAHBaX5tObj2hQdHkDY3hMbgbV1hedc5elweNJ9Q
+	 QSIUvhXes/XZCBEJi1mm3Wesf9AcXr4sSEwMbRqOCY9dKkMEAhnAHKyjjybfMVXq0V
+	 82rOUgd6wrzD1C9N/QxYhgCIPL+z1pXoOiYRIblOaxv19D1hIO/RjYcbOubxyHtXA0
+	 woON4FTFQ2irFmFh9M6C7CDxgUoekO7bDlDL+2SsnWDV5OPKswdszqmcB+vkrsM2sO
+	 iKaNDeNz2KyGg==
+Date: Mon, 17 Nov 2025 14:53:31 +0000
+From: Simon Horman <horms@kernel.org>
+To: Aswin Karuvally <aswin@linux.ibm.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Aleksei Nikiforov <aleksei.nikiforov@linux.ibm.com>
+Subject: Re: [PATCH net-next] s390/ctcm: Fix double-kfree
+Message-ID: <aRs26yy7xkr3Ln54@horms.kernel.org>
+References: <20251112182724.1109474-1-aswin@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] ksmbd: server: avoid busy polling in accept loop
-To: Qingfang Deng <dqfext@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
- Steve French <smfrench@gmail.com>,
- Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>,
- Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>,
- linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>
-References: <20251117085900.466432-1-dqfext@gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20251117085900.466432-1-dqfext@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251112182724.1109474-1-aswin@linux.ibm.com>
 
-Am 17.11.25 um 09:59 schrieb Qingfang Deng:
-> The ksmbd listener thread was using busy waiting on a listening socket by
-> calling kernel_accept() with SOCK_NONBLOCK and retrying every 100ms on
-> -EAGAIN. Since this thread is dedicated to accepting new connections,
-> there is no need for non-blocking mode.
+On Wed, Nov 12, 2025 at 07:27:24PM +0100, Aswin Karuvally wrote:
+> From: Aleksei Nikiforov <aleksei.nikiforov@linux.ibm.com>
 > 
-> Switch to a blocking accept() call instead, allowing the thread to sleep
-> until a new connection arrives. This avoids unnecessary wakeups and CPU
-> usage. During teardown, call shutdown() on the listening socket so that
-> accept() returns -EINVAL and the thread exits cleanly.
+> The function 'mpc_rcvd_sweep_req(mpcginfo)' is called conditionally
+> from function 'ctcmpc_unpack_skb'. It frees passed mpcginfo.
+> After that a call to function 'kfree' in function 'ctcmpc_unpack_skb'
+> frees it again.
 > 
-> The socket release mutex is redundant because kthread_stop() blocks until
-> the listener thread returns, guaranteeing safe teardown ordering.
+> Remove 'kfree' call in function 'mpc_rcvd_sweep_req(mpcginfo)'.
 > 
-> Also remove sk_rcvtimeo and sk_sndtimeo assignments, which only caused
-> accept() to return -EAGAIN prematurely.
+> Bug detected by the clang static analyzer.
 > 
-> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+> Fixes: 0c0b20587b9f25a2 ("s390/ctcm: fix potential memory leak")
+> Reviewed-by: Aswin Karuvally <aswin@linux.ibm.com>
+> Signed-off-by: Aleksei Nikiforov <aleksei.nikiforov@linux.ibm.com>
+> Signed-off-by: Aswin Karuvally <aswin@linux.ibm.com>
 
-Reviewed-by: Stefan Metzmacher <metze@samba.org>
+Thanks,
 
+I agree with this analysis.
+And this change brings mpc_rcvd_sweep_req()
+into line with other functions that ctcmpc_unpack_skb()
+passes mpcginfo - they don't free it either.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
