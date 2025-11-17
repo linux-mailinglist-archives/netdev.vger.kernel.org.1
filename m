@@ -1,306 +1,280 @@
-Return-Path: <netdev+bounces-239067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8463FC63629
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:00:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B36CC636CE
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:09:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBF313B0C03
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:58:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A0D704EEBA8
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:03:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1713271EE;
-	Mon, 17 Nov 2025 09:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F2A328618;
+	Mon, 17 Nov 2025 10:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FZUqKwsO";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HbAzanKn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h1/Zi+0O";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="g1QOUBc3"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51F4328241
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 09:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA3D32860A
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 10:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763373458; cv=none; b=uvPjSHZGxEgB/03KxqhU+Ygy8O9x/U4h+uXax63gzSlIjY5Gwk/wFp1nd1Ju5V2fTvoKjEQyaQRWj3vKLf317JU1BjoYQ9OaE9mVPpQBLVW6IUV2YoKJBKUGcn94BpFm/wKeYb4aCoSl2SyDGC8+zNqPwUhAz5L0jEB4if9aWzw=
+	t=1763373787; cv=none; b=erir/AjPSOtP7MPVuVulEv5jZbUtC1DPRpYx1LvxZyxxof0O4Pu6bZtvN3KvQPQu5RpZ55/FaKQKbTtuL5U3R5bCFaLwv4Ou8Pvnfu0GtbtjyNZ6nwx5jp8/Vl5aiVnZ0FQP6ASe3f5qrWLg2ArNVyRxwfLDaW7QLvMtr3PkMTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763373458; c=relaxed/simple;
-	bh=28pFU7amwJNudkLV4ASV8uVjtueADNX6pTrvQXgsL8E=;
+	s=arc-20240116; t=1763373787; c=relaxed/simple;
+	bh=Jjg4Iyd/07DTsm5qkOr6BIQlspwf+2NqiRbHnRlshMQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gRoK1iVKG/KgPa7CJ1dXycMX1HwA5fSyv7QEOEeOM+/oKuZiDi1Q+wqIOnBX7Pl+2EWh7/kwoblRGGGNVlNsheal6iy1gsWVbC+wQtLkNY1eWM+b7BK1BScsYC0icRBMmfev2w7GhuRL0pYuBPP9M38hesLVwagDyMuF8wDUjjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FZUqKwsO; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HbAzanKn; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=LyyA3qJLrET8de0oWyEwpyQvHoKtU3WRauxXhjkFlAaBziQl0Dckt1w6yPBK+Hp1QAY2xStIqfbRipZAhUQmr0zXFEkyBJFzrTt8k0LQjkfaGcXc0brKZXvxzUrYfdpgM7WB63APKgvdSsTXeBLwA7sSyeugZ4AqH/KzU3bUijc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h1/Zi+0O; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=g1QOUBc3; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763373454;
+	s=mimecast20190719; t=1763373783;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KXL+8AkvBN5xmyuybLdZ8RubjN7nYDtLBw5DrAt1WDc=;
-	b=FZUqKwsOjjRGyUhI2FZErRn+CJe6HiaZJWMK0D7g31zjx/XUVcuUP0JQRgYFqQcl5Nst6Y
-	DBcado5LAUhmOJ6fXOUvY/DaFwBCk4UMvaWBggwDXzwMPWGoZw3pVAVeNYu6TB8jwBEwvC
-	9jPp+2VLb4jW0iDAoVHLNRZMYIlJ1Jk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=9OoW97iXrHDq8mXDdV4L+0O0Y0xQp8TMPGSKNutW8hk=;
+	b=h1/Zi+0OTvSk40ZUokYkayI6cK20XupbHnTiTLWYbGnOqnTOI5UYk63Pf1Rpb/+6zwNegL
+	w2plvM/M+/hOJWiY66a5MbXKKEf5w7yEBAXY4aax0gOG8bOl0WEmkwLPNz8P1gecuvlUlL
+	Q/tY1CQ9qlD2gJ+TC6uHA/s5fx9V3kM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-549-rHJWG-D6P4eI6Z_IxJuULw-1; Mon, 17 Nov 2025 04:57:32 -0500
-X-MC-Unique: rHJWG-D6P4eI6Z_IxJuULw-1
-X-Mimecast-MFC-AGG-ID: rHJWG-D6P4eI6Z_IxJuULw_1763373452
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-477964c22e0so14772335e9.0
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 01:57:32 -0800 (PST)
+ us-mta-679-6oE2parvOR2f5PtpAQ3k8Q-1; Mon, 17 Nov 2025 05:03:02 -0500
+X-MC-Unique: 6oE2parvOR2f5PtpAQ3k8Q-1
+X-Mimecast-MFC-AGG-ID: 6oE2parvOR2f5PtpAQ3k8Q_1763373781
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4779393221aso13853215e9.2
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 02:03:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763373450; x=1763978250; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1763373781; x=1763978581; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KXL+8AkvBN5xmyuybLdZ8RubjN7nYDtLBw5DrAt1WDc=;
-        b=HbAzanKn3RzICkToQFeXOi/R8nuxVh824AjMl3G6pU1347PoPkaFDTZ99rDaYeC4mh
-         upx5xCyKwFEZsW46uJ2LzMdnZF8yXzX0OWmia5xu82eXe82BX0AYjEWkABgkiG6GNpQG
-         mMYrcpIYEOaYWyOZNy0jh+oq4FoHk6gNNWo7gE9807SGiN3Fn+6Y+QiF2h1Ul1Liku+8
-         6Qkx5k9D/tt6ALFhP+0r2KfnCsPO8qWAhTCCHQn+09DpH0cC6R1ReequF6vpvuBcjHW2
-         pLdoi6FWD0JXdQDYe4MnCQxX8sylYsA9ylUxgRxjbrM44JqprR0VYCeJbqOiB/Lle4+G
-         UcAw==
+        bh=9OoW97iXrHDq8mXDdV4L+0O0Y0xQp8TMPGSKNutW8hk=;
+        b=g1QOUBc3V4moGJym0Gnut9FJ2IZqAwsxKd7fRZI0kcl8Oha0Bpii3wKoEWrlndiLt0
+         LO2/X3ws/FFfeMAbc7lPW8vn2VzmnXp6KfrhwaQOrDBQaKKoaRJZESkCjTNgW1ItW/MS
+         Q32F2OTziuZGmAU+TrnArni/w/SwI4m0IxXz4HCb4TlmD4Ua+nLzbofH8jIe3SZDVAwK
+         XrOSkQ3iExlHK7y4hzZ16ay3AiFu3eDT6KyI0uqUBmn0GdDqGE+SjACvTAIAFt60ioR7
+         TTVxtpHK7gLaYuD1qQHNcgICCkdkvTg5gNTnwHF4fcOWV77ws9v0qU5p8Enbw6zl4LIx
+         j6RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763373450; x=1763978250;
+        d=1e100.net; s=20230601; t=1763373781; x=1763978581;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KXL+8AkvBN5xmyuybLdZ8RubjN7nYDtLBw5DrAt1WDc=;
-        b=Qxt0/2cn66/bwjBxBKsG4DS+dUOJDC9zORw7Em1wqWzC0MaHXxWrnftR5hypzgQfmH
-         6B2Xf3n8MVQA4luTlQSr3COg00tUw3YLSAnIzaLCfogTVJfWsSuO2m6jU2Pw8oX37Dw4
-         mSP4VYr7wQAbX+N+tQZad4t8HkhU84e5Ma/Ga4jd1FwJh1fQAtq3LS8E7tF8/iyH3nmc
-         CW8FrhSlAZrv5XSuhrrslhUqluCT8dH2QIMhX+R5ITCUiUwDwEbiCXF6HMuOpdDTjQxD
-         Vww/zMEloGy1ztM8QqIySjtO/CE3+p2WeeBdaGZqS66lTEj2lUTID2HKd6FXSLWH5Eu2
-         zGxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4PjcTEmu68PPlvHk/c152zRzlo05FHWOJIH7ckxjkHlvafsnj3UsTya2U7nRYOPosk3w5BrY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQiywxR6nvzJNXI61KisWvmM/Lj2B7sxQiLb3iNpJ1DTNhF56N
-	vJgDJIqB0464iJGQIi5dd1mTaXbPTpk9+dcUKvyk6HTugoQj0HAhBbjHPNi8JXfiz5GeG5g2cBO
-	f5445avy+SJL3a21oSuv6hGaWDldFWoOIxCHjVk3KA5Z3Yna/RQi7vbx8/g==
-X-Gm-Gg: ASbGncsLHzlJJagLALSd9Yc/VDDj4hG0oFqgB0BRZBG3WzIVAzfwQi3keh1iJoJHQf/
-	miL7CsrqQp4gbPnEyoOOpO+GNhgXdYt3R6Mwq9KkNlaDb/uPpjqED07V/m2yLU7FPikB1g4b43u
-	9locdGAKsky7XGHpqSW8yeRBkkXNznABvsP4lvUVqDRA4QU3u0LLcMyi/v2rhOidGHUNz46GuJl
-	NOZdK0McZ8PhoQp4fehw1+QKIR82tmiHN4aDt3xwhOlyn3Gf8djbqNSxIZZNpGXvu7RgaP2GG6M
-	K4VScaiM6wTVN5GhQl3Fnlk/1Pb29simogb9qdDD7yNTIOeh4y5HMR6Ndm59MpeK1StKF/wkOhh
-	FU4kFmcEwI0kG0ZXICPbOs1w6bZWvSYwBG1pUKZxp19ETUXzTE60=
-X-Received: by 2002:a05:600c:4c14:b0:477:9d88:2da6 with SMTP id 5b1f17b1804b1-4779d88318amr36265105e9.0.1763373449836;
-        Mon, 17 Nov 2025 01:57:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGJ4w6NACEVONq7vBMQgMk6jVaCUQPhHegE9Q9L5O4oMC+7xXcdXI7Bcs+2joXwdJwTRVfM0A==
-X-Received: by 2002:a05:600c:4c14:b0:477:9d88:2da6 with SMTP id 5b1f17b1804b1-4779d88318amr36264835e9.0.1763373449311;
-        Mon, 17 Nov 2025 01:57:29 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47799768409sm129895385e9.3.2025.11.17.01.57.27
+        bh=9OoW97iXrHDq8mXDdV4L+0O0Y0xQp8TMPGSKNutW8hk=;
+        b=uvljVT8xW29S6kWAqPJmaptaeF+Er+ztPt+mFaYwBLDQFbGk5b/XYxUZTZhHUIZSMO
+         QY/yAti8hCHxx/KkKX8YkB5/KOrcaorMHw39vdahLZXy6QB33Jprj8CTzE/9a7/WRO0I
+         6xnTm53+i9r2FtGxhyxawoOUpS7XB7xI+SbjIFP3AwnrAgI6raD9++zx/wd/fZcUs+Cf
+         9WqNfcoNMiPKIXZpqPH4EUa/3xKYYaFtXNKcVm6XJnYPULvQB+3wUfNyV3E2BCgb2IPW
+         G10W2ZbhW8aUt5k7ukuxFFlV7ZeGj+4TkmHE67OpRbfsJjo7HAK6Rx8fxUWsG8cgdzDP
+         116g==
+X-Gm-Message-State: AOJu0YxQuo2vM/Em2YEgjCvlqJlMZ1GBL3xqqnMb3+BzPSmyFtxEEDFc
+	DtKyjMRKF1sNHl/LDYUbDLtVN3R1n+qpgPsUYeu2jDFKMTXtzqPCW5sLlc/GpDuHVtzuK7zMYls
+	wVY/0IMxkxREK105DnYrfYXL0qyJxHmQKGMIrOscK19bvcetH5suoPRARuw==
+X-Gm-Gg: ASbGncsoadrp7BHLTuAMYUBBf3B8GKc+wv79Hob0KP/xvAjBI1xpniz3GZaizW9x0Hw
+	ur9PNxBp1r541Dg6gw2nzAeIs0vEiw/ANPHQm7dFY0hHyHkFgFF87mTrpDVITpJN1B2ra4NYKDI
+	qcKmMM9lT6zIVjnjguB32QMuxBMzVsXuLj8wIN2FWPvNa1tqc301TlOfurxuK4cmZ93elL+gd+m
+	syzn0L0jbcDNfEtLY19r1bVIpTDaDc5LechwhcvxBN1bbb8wJ44PVtDvPf88/H8edNTAXSu9FEO
+	fHIHhpdXOocVO2gfYRwU+mvEBupo2RDLSf81fHXCtOUy5M6jTh5bL6BhsnYBZ2dfREE7kb8tLp+
+	j7HiV8xFqt1xzdQ08agI=
+X-Received: by 2002:a05:600c:3baa:b0:477:54b3:3484 with SMTP id 5b1f17b1804b1-4778febd2eamr102341645e9.37.1763373780646;
+        Mon, 17 Nov 2025 02:03:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHsCVRVH8yi3mxQpF+a3sceLn+huBmPLQphd4cPau/Xd1zOyTQvr9xQ1+/sl1GzpkLtclk+xQ==
+X-Received: by 2002:a05:600c:3baa:b0:477:54b3:3484 with SMTP id 5b1f17b1804b1-4778febd2eamr102341085e9.37.1763373779845;
+        Mon, 17 Nov 2025 02:02:59 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f0b8d6sm26300205f8f.28.2025.11.17.02.02.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 01:57:28 -0800 (PST)
-Date: Mon, 17 Nov 2025 10:57:23 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: syzbot <syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com>, 
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
-Subject: Re: [syzbot] [virt?] [net?] possible deadlock in vsock_linger
-Message-ID: <awg7m76nw234dqgbe5e3tzuwpr6aznj6htvypwoulg5sjwax36@z6wqmopayakt>
-References: <68f6cdb0.a70a0220.205af.0039.GAE@google.com>
- <pehr4umqwjv3a7p4uudrz3uuqacu3ut66kmazw2ovm73gimyry@oevxmd4o664k>
- <CAGxU2F5y+kdByEwAq-t15fyrfrgQGpmapmLgkmDmY4xH4TJSDw@mail.gmail.com>
- <CAGxU2F6KaqmmK7qP55Rs8YHLOX62HyT77wY-RU1qPFpjhgV4jg@mail.gmail.com>
- <60f1b7db-3099-4f6a-875e-af9f6ef194f6@rbox.co>
+        Mon, 17 Nov 2025 02:02:59 -0800 (PST)
+Date: Mon, 17 Nov 2025 05:02:56 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
+	virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
+	andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v10 00/12] virtio_net: Add ethtool flow rules
+ support
+Message-ID: <20251117050228-mutt-send-email-mst@kernel.org>
+References: <20251112193132.1909-1-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <60f1b7db-3099-4f6a-875e-af9f6ef194f6@rbox.co>
+In-Reply-To: <20251112193132.1909-1-danielj@nvidia.com>
 
-On Sat, Nov 15, 2025 at 05:00:28PM +0100, Michal Luczaj wrote:
->On 10/21/25 14:19, Stefano Garzarella wrote:
->> On Tue, 21 Oct 2025 at 12:48, Stefano Garzarella <sgarzare@redhat.com> wrote:
->>>
->>> On Tue, 21 Oct 2025 at 10:27, Stefano Garzarella <sgarzare@redhat.com> wrote:
->>>>
->>>> Hi Michal,
->>>>
->>>> On Mon, Oct 20, 2025 at 05:02:56PM -0700, syzbot wrote:
->>>>> Hello,
->>>>>
->>>>> syzbot found the following issue on:
->>>>>
->>>>> HEAD commit:    d9043c79ba68 Merge tag 'sched_urgent_for_v6.18_rc2' of git..
->>>>> git tree:       upstream
->>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=130983cd980000
->>>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=f3e7b5a3627a90dd
->>>>> dashboard link: https://syzkaller.appspot.com/bug?extid=10e35716f8e4929681fa
->>>>> compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
->>>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17f0f52f980000
->>>>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11ea9734580000
->>>>>
->>>>> Downloadable assets:
->>>>> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-d9043c79.raw.xz
->>>>> vmlinux: https://storage.googleapis.com/syzbot-assets/0546b6eaf1aa/vmlinux-d9043c79.xz
->>>>> kernel image: https://storage.googleapis.com/syzbot-assets/81285b4ada51/bzImage-d9043c79.xz
->>>>>
->>>>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->>>>> Reported-by: syzbot+10e35716f8e4929681fa@syzkaller.appspotmail.com
->>>>>
->>>>> ======================================================
->>>>> WARNING: possible circular locking dependency detected
->>>>> syzkaller #0 Not tainted
->>>>> ------------------------------------------------------
->>>>> syz.0.17/6098 is trying to acquire lock:
->>>>> ffff8880363b8258 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1679 [inline]
->>>>> ffff8880363b8258 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: vsock_linger+0x25e/0x4d0 net/vmw_vsock/af_vsock.c:1066
->>>>
->>>> Could this be related to our recent work on linger in vsock?
->>>>
->>>>>
->>>>> but task is already holding lock:
->>>>> ffffffff906260a8 (vsock_register_mutex){+.+.}-{4:4}, at: vsock_assign_transport+0xf2/0x900 net/vmw_vsock/af_vsock.c:469
->>>>>
->>>>> which lock already depends on the new lock.
->>>>>
->>>>>
->>>>> the existing dependency chain (in reverse order) is:
->>>>>
->>>>> -> #1 (vsock_register_mutex){+.+.}-{4:4}:
->>>>>       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
->>>>>       __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
->>>>>       vsock_registered_transport_cid net/vmw_vsock/af_vsock.c:560 [inline]
->>>>
->>>> Ah, no maybe this is related to commit 209fd720838a ("vsock:
->>>> Fix transport_{g2h,h2g} TOCTOU") where we added locking in
->>>> vsock_find_cid().
->>>>
->>>> Maybe we can just move the checks on top of __vsock_bind() to the
->>>> caller. I mean:
->>>>
->>>>         /* First ensure this socket isn't already bound. */
->>>>         if (vsock_addr_bound(&vsk->local_addr))
->>>>                 return -EINVAL;
->>>>
->>>>         /* Now bind to the provided address or select appropriate values if
->>>>          * none are provided (VMADDR_CID_ANY and VMADDR_PORT_ANY).  Note that
->>>>          * like AF_INET prevents binding to a non-local IP address (in most
->>>>          * cases), we only allow binding to a local CID.
->>>>          */
->>>>         if (addr->svm_cid != VMADDR_CID_ANY && !vsock_find_cid(addr->svm_cid))
->>>>                 return -EADDRNOTAVAIL;
->>>>
->>>> We have 2 callers: vsock_auto_bind() and vsock_bind().
->>>>
->>>> vsock_auto_bind() is already checking if the socket is already bound,
->>>> if not is setting VMADDR_CID_ANY, so we can skip those checks.
->>>>
->>>> In vsock_bind() we can do the checks before lock_sock(sk), at least the
->>>> checks on vm_addr, calling vsock_find_cid().
->>>>
->>>> I'm preparing a patch to do this.
->>>
->>> mmm, no, this is more related to vsock_linger() where sk_wait_event()
->>> releases and locks again the sk_lock.
->>> So, it should be related to commit 687aa0c5581b ("vsock: Fix
->>> transport_* TOCTOU") where we take vsock_register_mutex in
->>> vsock_assign_transport() while calling vsk->transport->release().
->>>
->>> So, maybe we need to move the release and vsock_deassign_transport()
->>> after unlocking vsock_register_mutex.
->>
->> I implemented this here:
->> https://lore.kernel.org/netdev/20251021121718.137668-1-sgarzare@redhat.com/
->>
->> sysbot successfully tested it.
->>
->> Stefano
->
->Hi Stefano
+On Wed, Nov 12, 2025 at 01:31:20PM -0600, Daniel Jurgens wrote:
+> This series implements ethtool flow rules support for virtio_net using the
+> virtio flow filter (FF) specification. The implementation allows users to
+> configure packet filtering rules through ethtool commands, directing
+> packets to specific receive queues, or dropping them based on various
+> header fields.
 
-Hi Michal!
+Bad threading here Daniel, so tools that rely on threading break.
 
->
->Apologies for missing this, I was away for a couple of weeks.
 
-Don't worry at all!
-
->
->Turns out it's vsock_connect()'s reset-on-signal that strikes again. While
->you've fixed the lock order inversion (thank you), being able to reset an
->established socket, combined with SO_LINGER's lock-release-lock dance,
->still leads to crashes.
-
-Yeah, I see!
-
->
->I think it goes like this: if user hits connect() with a signal right after
->connection is established (which implies an assigned transport), `sk_state`
->gets set to TCP_CLOSING and `state` to SS_UNCONNECTED. SS_UNCONNECTED means
->connect() can be retried. If re-connect() is for a different CID, transport
->reassignment takes place. That involves transport->release() of the old
->transport. Because `sk_state == TCP_CLOSING`, vsock_linger() is called.
->Lingering temporarily releases socket lock. Which can be raced by another
->thread doing connect(). Basically thread-1 can release resources from under
->thread-0. That breaks the assumptions, e.g. virtio_transport_unsent_bytes()
->does not expect a disappearing transport.
-
-Makes sense to me!
-
->
->BUG: KASAN: slab-use-after-free in _raw_spin_lock_bh+0x34/0x40
->Read of size 1 at addr ffff888107c99420 by task a.out/1385
->CPU: 6 UID: 1000 PID: 1385 Comm: a.out Tainted: G            E
->6.18.0-rc5+ #241 PREEMPT(voluntary)
->Call Trace:
-> dump_stack_lvl+0x7e/0xc0
-> print_report+0x170/0x4de
-> kasan_report+0xc2/0x180
-> __kasan_check_byte+0x3a/0x50
-> lock_acquire+0xb2/0x300
-> _raw_spin_lock_bh+0x34/0x40
-> virtio_transport_unsent_bytes+0x3b/0x80
-> vsock_linger+0x263/0x370
-> virtio_transport_release+0x3ff/0x510
-> vsock_assign_transport+0x358/0x780
-> vsock_connect+0x5a2/0xc40
-> __sys_connect+0xde/0x110
-> __x64_sys_connect+0x6e/0xc0
-> do_syscall_64+0x94/0xbb0
-> entry_SYSCALL_64_after_hwframe+0x4b/0x53
->
->Allocated by task 1384:
-> kasan_save_stack+0x1c/0x40
-> kasan_save_track+0x10/0x30
-> __kasan_kmalloc+0x92/0xa0
-> virtio_transport_do_socket_init+0x48/0x320
-> vsock_assign_transport+0x4ff/0x780
-> vsock_connect+0x5a2/0xc40
-> __sys_connect+0xde/0x110
-> __x64_sys_connect+0x6e/0xc0
-> do_syscall_64+0x94/0xbb0
-> entry_SYSCALL_64_after_hwframe+0x4b/0x53
->
->Freed by task 1384:
-> kasan_save_stack+0x1c/0x40
-> kasan_save_track+0x10/0x30
-> __kasan_save_free_info+0x37/0x50
-> __kasan_slab_free+0x63/0x80
-> kfree+0x142/0x6a0
-> virtio_transport_destruct+0x86/0x170
-> vsock_assign_transport+0x3a8/0x780
-> vsock_connect+0x5a2/0xc40
-> __sys_connect+0xde/0x110
-> __x64_sys_connect+0x6e/0xc0
-> do_syscall_64+0x94/0xbb0
-> entry_SYSCALL_64_after_hwframe+0x4b/0x53
->
->I suppose there are many ways this chain of events can be stopped, but I
->see it as yet another reason to simplify vsock_connect(): do not let it
->"reset" an already established socket. I guess that would do the trick.
->What do you think?
-
-I agree, we should do that. Do you have time to take a look?
-
-Thanks for the help!
-Stefano
+> The series starts with infrastructure changes to expose virtio PCI admin
+> capabilities and object management APIs. It then creates the virtio_net
+> directory structure and implements the flow filter functionality with support
+> for:
+> 
+> - Layer 2 (Ethernet) flow rules
+> - IPv4 and IPv6 flow rules  
+> - TCP and UDP flow rules (both IPv4 and IPv6)
+> - Rule querying and management operations
+> 
+> Setting, deleting and viewing flow filters, -1 action is drop, positive
+> integers steer to that RQ:
+> 
+> $ ethtool -u ens9
+> 4 RX rings available
+> Total 0 rules
+> 
+> $ ethtool -U ens9 flow-type ether src 1c:34:da:4a:33:dd action 0
+> Added rule with ID 0
+> $ ethtool -U ens9 flow-type udp4 dst-port 5001 action 3
+> Added rule with ID 1
+> $ ethtool -U ens9 flow-type tcp6 src-ip fc00::2 dst-port 5001 action 2
+> Added rule with ID 2
+> $ ethtool -U ens9 flow-type ip4 src-ip 192.168.51.101 action 1
+> Added rule with ID 3
+> $ ethtool -U ens9 flow-type ip6 dst-ip fc00::1 action -1
+> Added rule with ID 4
+> $ ethtool -U ens9 flow-type ip6 src-ip fc00::2 action -1
+> Added rule with ID 5
+> $ ethtool -U ens9 delete 4
+> $ ethtool -u ens9
+> 4 RX rings available
+> Total 5 rules
+> 
+> Filter: 0
+>         Flow Type: Raw Ethernet
+>         Src MAC addr: 1C:34:DA:4A:33:DD mask: 00:00:00:00:00:00
+>         Dest MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
+>         Ethertype: 0x0 mask: 0xFFFF
+>         Action: Direct to queue 0
+> 
+> Filter: 1
+>         Rule Type: UDP over IPv4
+>         Src IP addr: 0.0.0.0 mask: 255.255.255.255
+>         Dest IP addr: 0.0.0.0 mask: 255.255.255.255
+>         TOS: 0x0 mask: 0xff
+>         Src port: 0 mask: 0xffff
+>         Dest port: 5001 mask: 0x0
+>         Action: Direct to queue 3
+> 
+> Filter: 2
+>         Rule Type: TCP over IPv6
+>         Src IP addr: fc00::2 mask: ::
+>         Dest IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+>         Traffic Class: 0x0 mask: 0xff
+>         Src port: 0 mask: 0xffff
+>         Dest port: 5001 mask: 0x0
+>         Action: Direct to queue 2
+> 
+> Filter: 3
+>         Rule Type: Raw IPv4
+>         Src IP addr: 192.168.51.101 mask: 0.0.0.0
+>         Dest IP addr: 0.0.0.0 mask: 255.255.255.255
+>         TOS: 0x0 mask: 0xff
+>         Protocol: 0 mask: 0xff
+>         L4 bytes: 0x0 mask: 0xffffffff
+>         Action: Direct to queue 1
+> 
+> Filter: 5
+>         Rule Type: Raw IPv6
+>         Src IP addr: fc00::2 mask: ::
+>         Dest IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+>         Traffic Class: 0x0 mask: 0xff
+>         Protocol: 0 mask: 0xff
+>         L4 bytes: 0x0 mask: 0xffffffff
+>         Action: Drop
+> 
+> ---
+> v2: https://lore.kernel.org/netdev/20250908164046.25051-1-danielj@nvidia.com/
+>   - Fix sparse warnings
+>   - Fix memory leak on subsequent failure to allocate
+>   - Fix some Typos
+> 
+> v3: https://lore.kernel.org/netdev/20250923141920.283862-1-danielj@nvidia.com/
+>   - Added admin_ops to virtio_device kdoc.
+> 
+> v4:
+>   - Fixed double free bug inserting flows
+>   - Fixed incorrect protocol field check parsing ip4 headers.
+>   - (u8 *) changed to (void *)
+>   - Added kdoc comments to UAPI changes.
+>   - No longer split up virtio_net.c
+>   - Added config op to execute admin commands.
+>       - virtio_pci assigns vp_modern_admin_cmd_exec to this callback.
+>   - Moved admin command API to new core file virtio_admin_commands.c
+> 
+> v5: 
+>   - Fixed compile error
+>   - Fixed static analysis warning on () after macro
+>   - Added missing fields to kdoc comments
+>   - Aligned parameter name between prototype and kdoc
+> 
+> v6:
+>   - Fix sparse warning "array of flexible structures" Jakub K/Simon H
+>   - Use new variable and validate ff_mask_size before set_cap. MST
+> 
+> v7:
+>   - Change virtnet_ff_init to return a value. Allow -EOPNOTSUPP. Xuan
+>   - Set ff->ff_{caps, mask, actions} NULL in error path. Paolo Abini
+>   - Move for (int i removal hung back a patch. Paolo Abini
+> 
+> v8
+>   - Removed unused num_classifiers. Jason Wang
+>   - Use real_ff_mask_size when setting the selector caps. Jason Wang
+> 
+> v9:
+>   - Set err to -ENOMEM after alloc failures in virtnet_ff_init. Simon H
+> 
+> v10:
+>   - Return -EOPNOTSUPP in virnet_ff_init before allocing any memory.
+>     Jason Wang/Paolo Abeni
+> 
+> 
+> Daniel Jurgens (12):
+>   virtio_pci: Remove supported_cap size build assert
+>   virtio: Add config_op for admin commands
+>   virtio: Expose generic device capability operations
+>   virtio: Expose object create and destroy API
+>   virtio_net: Query and set flow filter caps
+>   virtio_net: Create a FF group for ethtool steering
+>   virtio_net: Implement layer 2 ethtool flow rules
+>   virtio_net: Use existing classifier if possible
+>   virtio_net: Implement IPv4 ethtool flow rules
+>   virtio_net: Add support for IPv6 ethtool steering
+>   virtio_net: Add support for TCP and UDP ethtool rules
+>   virtio_net: Add get ethtool flow rules ops
+> 
+>  drivers/net/virtio_net.c               | 1147 ++++++++++++++++++++++++
+>  drivers/virtio/Makefile                |    2 +-
+>  drivers/virtio/virtio_admin_commands.c |  165 ++++
+>  drivers/virtio/virtio_pci_common.h     |    1 -
+>  drivers/virtio/virtio_pci_modern.c     |   10 +-
+>  include/linux/virtio_admin.h           |  125 +++
+>  include/linux/virtio_config.h          |    6 +
+>  include/uapi/linux/virtio_net_ff.h     |  156 ++++
+>  include/uapi/linux/virtio_pci.h        |    7 +-
+>  9 files changed, 1608 insertions(+), 11 deletions(-)
+>  create mode 100644 drivers/virtio/virtio_admin_commands.c
+>  create mode 100644 include/linux/virtio_admin.h
+>  create mode 100644 include/uapi/linux/virtio_net_ff.h
+> 
+> -- 
+> 2.50.1
 
 
