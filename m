@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-239128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8FCCC64666
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 14:38:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF43CC645FA
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 14:34:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 93B93365D5F
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 13:30:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55E083B20A5
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 13:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7008332ED7;
-	Mon, 17 Nov 2025 13:29:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D121132721C;
+	Mon, 17 Nov 2025 13:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bUMGmjsw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bT3xSquk"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0CE330324;
-	Mon, 17 Nov 2025 13:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8BB3328F2
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 13:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763386146; cv=none; b=sQHeKa/qhWyyKFcEhpBzrScsHkS2V+X3drniQAtycoaN6lHygwPDkyiHAUBbhTcozISz8uoqh/5kJtbCKDcIeIUE5c/Y4TSv0jMZajHWvIgSY6NYfC1v4a3cLkjkci4c/qLpNuY3057jfNv22ZGNo/X3KpjUjO13th6tIg+sGNs=
+	t=1763386214; cv=none; b=Ep8DSjBmtqmLRFbdE+VcwHtotlIkJSO+n+UYjQUfTMsc5zwO1TMoUVP2qFKnDU8pSHoPACQvvLcXh9j5vujAMHuyuMPTXEqYx3MeeDqijLwyi1/HYEGsJJuHYBRH7hdxSn8iFMYJo5GNzVyAKuIGYICGdlxpWtnCWKevvpzGj7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763386146; c=relaxed/simple;
-	bh=r0mT2qQ0b3k2TZklBcbxQxGJldXI7F0tS8ZouuXPOBM=;
+	s=arc-20240116; t=1763386214; c=relaxed/simple;
+	bh=2V7NVpfc1s1+Myu0JVYwtYQSDehoPIgapU89P9C9+xk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u9IXSb+G5w9VeqJ7OvlP1IhzEDsU9eRs8kxW8FTxEW4fl3alKFLshR5aWXOn8krFBNmRwk3Wd+zp/lOsxUNdT87YBUNtZny6yqL7nTqKyRFvSF0A+OFg9ITvuTQelkJrQqYNjokdKND2fF+r0+BksmrfNiq0gJPzHq+G7ds+ADg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bUMGmjsw; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=R2mky7IlPt1mJw0+d5TZ6EMbm53wvhOVZCUegt7M7+zc7qCZdclDfxidBKY3jyoKThmWi9vhXEJFPw07Hkaor+eWbeH0ffP2mRUfmqz42dpowg20EYGlONVxunOiJ5Ppe/3Cs8x7AUVQnB/RIXVma2YGvzWXmqT0jx9pENf7IJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bT3xSquk; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,27 +36,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=A86QsamHKtu4PAbqkMwXXYKtkpb5hxUQyesNI8ffJ3o=; b=bUMGmjswKa3gjoXHxI8k8cBNqA
-	UPNpzgkBrLzcyaXKTWAXWNQe1VJzr6yX1qs4tM32ea1CvdkD96wYMEpwXphCugDIZtwTYdKdD13It
-	A1C9iZvPAUB+P2IhxZJ1cqNwGocWzEV/YYCeumvLnG8vDuabIBNmNzCCuSqrPCUPum+8=;
+	bh=tpLNnsnm0koe6mSAB3y4t2c36dTPYWXi2fRTKGqLquE=; b=bT3xSqukPvpjBwq4LiLabs0cJb
+	pglOTlFTFxebEvuGlIs7rVeIv1AiFgN3LW+OGABPvpV9a1cA183BO1i07R2N6UgxprOv/hpuFrWBL
+	1xFi8p7N7uzSgtRozeEX5rML9dh7YQeP1N5uLIEGkXe8Plar3I0FQ4Tq3inZjaQmH04g=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vKzHr-00EF8b-36; Mon, 17 Nov 2025 14:28:55 +0100
-Date: Mon, 17 Nov 2025 14:28:55 +0100
+	id 1vKzIw-00EF9Z-TX; Mon, 17 Nov 2025 14:30:02 +0100
+Date: Mon, 17 Nov 2025 14:30:02 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Peter Enderborg <peterend@axis.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH for net-next] if_ether.h: Clarify ethertype validity for
- gsw1xx dsa
-Message-ID: <7000f777-d082-4b06-88dd-67f947c85d2a@lunn.ch>
-References: <20251114135935.2710873-1-peterend@axis.com>
- <3feaff7a-fcec-49d9-a738-fa2e00439b28@lunn.ch>
- <5a7f0105-801d-41d9-850c-03783d76f3e1@axis.com>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: linus.walleij@linaro.org, olteanv@gmail.com, kuba@kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	horms@kernel.org, netdev@vger.kernel.org,
+	alok.a.tiwarilinux@gmail.com
+Subject: Re: [PATCH net-next] net: dsa: ks8995: Fix incorrect OF match table
+ name
+Message-ID: <c9ab8606-66a9-47d7-ad98-7ad0a3e5810e@lunn.ch>
+References: <20251117095356.2099772-1-alok.a.tiwari@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,30 +61,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5a7f0105-801d-41d9-850c-03783d76f3e1@axis.com>
+In-Reply-To: <20251117095356.2099772-1-alok.a.tiwari@oracle.com>
 
-On Mon, Nov 17, 2025 at 10:02:05AM +0100, Peter Enderborg wrote:
-> (resend due to html bounce)
-> On 11/15/25 21:41, Andrew Lunn wrote:
-> > On Fri, Nov 14, 2025 at 02:59:36PM +0100, Peter Enderborg wrote:
-> > > Ref https://standards-oui.ieee.org/ethertype/eth.txt
-> > > 
-> > > 
-> > Is this actually registered with IANA?
+On Mon, Nov 17, 2025 at 01:53:50AM -0800, Alok Tiwari wrote:
+> The driver declares an OF match table named ks8895_spi_of_match, even
+> though it describes compatible strings for the KS8995 and related Micrel
+> switches. This is a leftover typo, the correct name should match the
+> chip family handled by this driver ks8995, and also match the variable
+> used in spi_driver.of_match_table.
 > 
-> No.
-> 
-> > https://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml
-> > 
-> > Does not list it. Please keep the "NOT AN OFFICIALLY REGISTERED ID" if
-> > it is not.
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 
-> IEEE is the official source to use for ethertype number assignment.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-What i want to make clear is, if IEEE officially allocate this to
-something else, this is an unofficial allocation, and the official use
-can replace it. We have a few ID like this, and never had a collision
-yet, but it could happen.
-
-	Andrew
+    Andrew
 
