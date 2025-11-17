@@ -1,379 +1,163 @@
-Return-Path: <netdev+bounces-239098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFE8BC63C18
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 12:18:06 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D48C63CD2
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 12:27:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 129D24EF9D6
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:15:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 69995380334
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:18:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24EF330B2E;
-	Mon, 17 Nov 2025 11:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B411DE2D8;
+	Mon, 17 Nov 2025 11:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="qP8SReAN"
 X-Original-To: netdev@vger.kernel.org
-Received: from localhost.localdomain (unknown [147.136.157.3])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAA1330323;
-	Mon, 17 Nov 2025 11:08:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.136.157.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C87211CBA;
+	Mon, 17 Nov 2025 11:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763377696; cv=none; b=uMKzzXA+EwV8Y+ON35+u9gi36n2hzK4ZhqBxRaRb8ioGK9bE8isx/9esc6twWcL4vxGuD1TiC7V6KqghBYChRdu+cZecRlFf/p3vGF2GzF9g5ihmIou6KXlg1nEnOdiZ3MT0oiCrsNZPnXE2jxVLRc67B3ss1UIR4XfjRBiT0Ug=
+	t=1763378321; cv=none; b=bGIn/XNP4Jhw1CzWcXhyxAG/UZYzrizXt0vqiWmqWg8eZjv4hxIcqLfoHZhMRUdhtDNNQ4WBsCAZqTmYljijlURz/ecckU5YPtzQen7nv87BYarUnHQNfE1TIeRSc3uaRSDhNyVOAmyEdO00JtV9dcge7p+04kDkUgPkHAsK4Og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763377696; c=relaxed/simple;
-	bh=2xuQUNjye5SH0spf/BntnQEjEUG+Ko7KqGYOWawkBnM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SuiMHXfcxzvpX14xFixBvqf1LA/NEWscjU93p/sr/roDvY2/rIyC8hC9Fpw2Ybd0qZu3nkdbv1o5SctvTkQ3BzvGxhn4Et4iTm6EkYKHquyMlDgoOA04Ijw0Qptj+Vp26gWTY832I69A7dcOXPE2GhcjLQSx8z0zpzlnOxzJ/0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=none smtp.mailfrom=localhost.localdomain; arc=none smtp.client-ip=147.136.157.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=localhost.localdomain
-Received: by localhost.localdomain (Postfix, from userid 1007)
-	id 1CBBD8B2A0F; Mon, 17 Nov 2025 19:08:05 +0800 (+08)
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org
-Cc: jiayuan.chen@linux.dev,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Michal Luczaj <mhal@rbox.co>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Cong Wang <cong.wang@bytedance.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next v1 3/3] bpf, selftest: Add tests for FIONREAD and copied_seq
-Date: Mon, 17 Nov 2025 19:07:07 +0800
-Message-ID: <20251117110736.293040-4-jiayuan.chen@linux.dev>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251117110736.293040-1-jiayuan.chen@linux.dev>
-References: <20251117110736.293040-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1763378321; c=relaxed/simple;
+	bh=5wLLJVB66wca9v8xVdIHb23PUiY2YkW+I6ixqL5yXxY=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=em3Y/I1IW2/hPkN6jJ8/tUqJ9jEdAbxLgWP3/+eMtNBt51gK+UcyuBAYx8yJqxyiEePT6opXmhu0YSwBHq+M2J9bZrbys4rvTrZmOXGtuAn2VoL0CwvQ222GdNwgT1cNVSJcUNkFcWX3alT7sNo8Iyquxi20KFbfXiXGlxDpJR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=qP8SReAN; arc=none smtp.client-ip=80.241.56.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4d94xR54l8z9tPN;
+	Mon, 17 Nov 2025 12:18:35 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1763378315;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3/yUxH07BZ7z6RY7qPh9V7bK+ouYzlYaoiAPzW2PwTA=;
+	b=qP8SReAN+DvwGXLfoMM3KkUe58s99DnzSDTAf1XxGfRjnYhfBORD1wZDUFwm37CoPG+IVJ
+	O08FKzwSJLvbAl0N4Q6FzdxDEq1ZmrcMdLshQgzorqd8wC9rN3tEwSxmFb63fhJv5AgP7C
+	jJIPdLAy0KQvz2srB1P1+KVdFKLEVA7tMYGKSVcrYb/lRPFmQfnvatOujR7q1fgYR9rWoN
+	Z79MzL8sEK57SET0sx5yYtTf64twTb1UE11oLnNU6fgrZ/LTyE65tN4gTczxLU3DFKlUrP
+	BpBpjvxWVERm0uPoD13NFIYTTZ9qZt4pfdr1K3VOYzTb8vbZtxVTu9zU4+dV7g==
+Message-ID: <b4ba27e5-a1cc-4477-a254-a318e586ef2a@mailbox.org>
+Date: Mon, 17 Nov 2025 12:18:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] leds: trigger: netdev: Check offload ability on interface
+ up
+From: Marek Vasut <marek.vasut@mailbox.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-leds@vger.kernel.org,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Christian Marangi <ansuelsmth@gmail.com>,
+ Christophe Roullier <christophe.roullier@foss.st.com>,
+ Daniel Golle <daniel@makrotopia.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Lee Jones <lee@kernel.org>,
+ Pavel Machek <pavel@ucw.cz>, kernel@dh-electronics.com,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org
+References: <20241001024731.140069-1-marex@denx.de>
+ <1d72f370-3409-4b0f-b971-8f194cf1644b@lunn.ch>
+ <d0411d89-5c83-47b4-bef9-904b63cbc2c0@denx.de>
+Content-Language: en-US
+In-Reply-To: <d0411d89-5c83-47b4-bef9-904b63cbc2c0@denx.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-MBO-RS-ID: c634c576c82130d98b2
+X-MBO-RS-META: z4y1gngkuhdep4ypa3wmytu8h5dof3xm
 
-This commit adds two new test functions: one to reproduce the bug reported
-by syzkaller [1], and another to cover the calculation of copied_seq.
+On 10/3/24 2:47 AM, Marek Vasut wrote:
 
-The tests primarily involve installing  and uninstalling sockmap on
-sockets, then reading data to verify proper functionality.
+Hello again,
 
-Additionally, extend the do_test_sockmap_skb_verdict_fionread() function
-to support UDP FIONREAD testing.
+>>> On STM32MP13xx with RTL8211F, it is enough to have the following udev 
+>>> rule
+>>> in place, boot the machine with cable plugged in, and the LEDs won't 
+>>> work
+>>> without this patch once the interface is brought up, even if they 
+>>> should:
+>>> "
+>>> ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:green:wan", 
+>>> ATTR{trigger}="netdev", ATTR{link_10}="1", ATTR{link_100}="1", 
+>>> ATTR{link_1000}="1", ATTR{device_name}="end0"
+>>> ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:yellow:wan", 
+>>> ATTR{trigger}="netdev", ATTR{rx}="1", ATTR{tx}="1", ATTR{device_name} 
+>>> ="end0"
+>>> "
+>>
+>> Nice use of udev. I had not thought about using it for this.
 
-[1] https://syzkaller.appspot.com/bug?extid=06dbd397158ec0ea4983
+I might have been a bit too hasty with this. The following is only a 
+quick preliminary FYI, I am still investigating the details.
 
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- .../selftests/bpf/prog_tests/sockmap_basic.c  | 192 +++++++++++++++++-
- .../bpf/progs/test_sockmap_pass_prog.c        |   8 +
- 2 files changed, 194 insertions(+), 6 deletions(-)
+I observe on 6.18-rc6 (ST STM32MP13xx , so STM32 DWMAC ethernet, and 
+RTL8211F PHY), that if I use the these udev rules (SoC has two MACs, 
+there are two rules for each MAC, and 2 rules for each of two LEDs on 
+each MAC PHY , therefore four rules in total ; the rules for both MACs 
+are identical):
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-index 1e3e4392dcca..e6cff25f4b75 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-@@ -1,7 +1,8 @@
- // SPDX-License-Identifier: GPL-2.0
- // Copyright (c) 2020 Cloudflare
- #include <error.h>
--#include <netinet/tcp.h>
-+#include <linux/tcp.h>
-+#include <linux/socket.h>
- #include <sys/epoll.h>
- 
- #include "test_progs.h"
-@@ -22,6 +23,16 @@
- #define TCP_REPAIR_ON		1
- #define TCP_REPAIR_OFF_NO_WP	-1	/* Turn off without window probes */
- 
-+/**
-+ * SOL_TCP is defined in <netinet/tcp.h> while field
-+ * copybuf_address of tcp_zerocopy_receive is not in it
-+ * Although glibc has merged my patch to sync headers,
-+ * the fix will take time to propagate, hence this workaround.
-+ */
-+#ifndef SOL_TCP
-+#define SOL_TCP 6
-+#endif
-+
- static int connected_socket_v4(void)
- {
- 	struct sockaddr_in addr = {
-@@ -536,13 +547,14 @@ static void test_sockmap_skb_verdict_shutdown(void)
- }
- 
- 
--static void test_sockmap_skb_verdict_fionread(bool pass_prog)
-+static void do_test_sockmap_skb_verdict_fionread(int sotype, bool pass_prog)
- {
- 	int err, map, verdict, c0 = -1, c1 = -1, p0 = -1, p1 = -1;
- 	int expected, zero = 0, sent, recvd, avail;
- 	struct test_sockmap_pass_prog *pass = NULL;
- 	struct test_sockmap_drop_prog *drop = NULL;
- 	char buf[256] = "0123456789";
-+	int split_len = sizeof(buf) / 2;
- 
- 	if (pass_prog) {
- 		pass = test_sockmap_pass_prog__open_and_load();
-@@ -550,7 +562,10 @@ static void test_sockmap_skb_verdict_fionread(bool pass_prog)
- 			return;
- 		verdict = bpf_program__fd(pass->progs.prog_skb_verdict);
- 		map = bpf_map__fd(pass->maps.sock_map_rx);
--		expected = sizeof(buf);
-+		if (sotype == SOCK_DGRAM)
-+			expected = split_len; /* FIONREAD for UDP is different from TCP */
-+		else
-+			expected = sizeof(buf);
- 	} else {
- 		drop = test_sockmap_drop_prog__open_and_load();
- 		if (!ASSERT_OK_PTR(drop, "open_and_load"))
-@@ -566,7 +581,7 @@ static void test_sockmap_skb_verdict_fionread(bool pass_prog)
- 	if (!ASSERT_OK(err, "bpf_prog_attach"))
- 		goto out;
- 
--	err = create_socket_pairs(AF_INET, SOCK_STREAM, &c0, &c1, &p0, &p1);
-+	err = create_socket_pairs(AF_INET, sotype, &c0, &c1, &p0, &p1);
- 	if (!ASSERT_OK(err, "create_socket_pairs()"))
- 		goto out;
- 
-@@ -574,8 +589,9 @@ static void test_sockmap_skb_verdict_fionread(bool pass_prog)
- 	if (!ASSERT_OK(err, "bpf_map_update_elem(c1)"))
- 		goto out_close;
- 
--	sent = xsend(p1, &buf, sizeof(buf), 0);
--	ASSERT_EQ(sent, sizeof(buf), "xsend(p0)");
-+	sent = xsend(p1, &buf, split_len, 0);
-+	sent += xsend(p1, &buf, sizeof(buf) - split_len, 0);
-+	ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
- 	err = ioctl(c1, FIONREAD, &avail);
- 	ASSERT_OK(err, "ioctl(FIONREAD) error");
- 	ASSERT_EQ(avail, expected, "ioctl(FIONREAD)");
-@@ -597,6 +613,12 @@ static void test_sockmap_skb_verdict_fionread(bool pass_prog)
- 		test_sockmap_drop_prog__destroy(drop);
- }
- 
-+static void test_sockmap_skb_verdict_fionread(bool pass_prog)
-+{
-+	do_test_sockmap_skb_verdict_fionread(SOCK_STREAM, pass_prog);
-+	do_test_sockmap_skb_verdict_fionread(SOCK_DGRAM, pass_prog);
-+}
-+
- static void test_sockmap_skb_verdict_change_tail(void)
- {
- 	struct test_sockmap_change_tail *skel;
-@@ -1042,6 +1064,160 @@ static void test_sockmap_vsock_unconnected(void)
- 	xclose(map);
- }
- 
-+/* it used to reproduce WARNING */
-+static void test_sockmap_zc(void)
-+{
-+	int map, err, sent, recvd, zero = 0, one = 1, on = 1;
-+	char buf[10] = "0123456789", rcv[11], addr[100];
-+	struct test_sockmap_pass_prog *skel = NULL;
-+	int c0 = -1, p0 = -1, c1 = -1, p1 = -1;
-+	struct tcp_zerocopy_receive zc;
-+	socklen_t zc_len = sizeof(zc);
-+	struct bpf_program *prog;
-+
-+	skel = test_sockmap_pass_prog__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	if (create_socket_pairs(AF_INET, SOCK_STREAM, &c0, &c1, &p0, &p1))
-+		goto end;
-+
-+	prog = skel->progs.prog_skb_verdict_ingress;
-+	map = bpf_map__fd(skel->maps.sock_map_rx);
-+
-+	err = bpf_prog_attach(bpf_program__fd(prog), map, BPF_SK_SKB_STREAM_VERDICT, 0);
-+	if (!ASSERT_OK(err, "bpf_prog_attach"))
-+		goto end;
-+
-+	err = bpf_map_update_elem(map, &zero, &p0, BPF_ANY);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem"))
-+		goto end;
-+
-+	err = bpf_map_update_elem(map, &one, &p1, BPF_ANY);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem"))
-+		goto end;
-+
-+	sent = xsend(c0, buf, sizeof(buf), 0);
-+	if (!ASSERT_EQ(sent, sizeof(buf), "xsend"))
-+		goto end;
-+
-+	/* trigger tcp_bpf_recvmsg_parser and inc copied_seq of p1 */
-+	recvd = recv_timeout(p1, rcv, sizeof(rcv), MSG_DONTWAIT, 1);
-+	if (!ASSERT_EQ(recvd, sent, "recv_timeout(p1)"))
-+		goto end;
-+
-+	/* uninstall sockmap of p1 */
-+	bpf_map_delete_elem(map, &one);
-+
-+	/* trigger tcp stack and the rcv_nxt of p1 is less than copied_seq */
-+	sent = xsend(c1, buf, sizeof(buf) - 1, 0);
-+	if (!ASSERT_EQ(sent, sizeof(buf) - 1, "xsend"))
-+		goto end;
-+
-+	err = setsockopt(p1, SOL_SOCKET, SO_ZEROCOPY, &on, sizeof(on));
-+	if (!ASSERT_OK(err, "setsockopt"))
-+		goto end;
-+
-+	memset(&zc, 0, sizeof(zc));
-+	zc.copybuf_address = (__u64)((unsigned long)addr);
-+	zc.copybuf_len = sizeof(addr);
-+
-+	err = getsockopt(p1, IPPROTO_TCP, TCP_ZEROCOPY_RECEIVE, &zc, &zc_len);
-+	if (!ASSERT_OK(err, "getsockopt"))
-+		goto end;
-+
-+end:
-+	if (c0 >= 0)
-+		close(c0);
-+	if (p0 >= 0)
-+		close(p0);
-+	if (c1 >= 0)
-+		close(c1);
-+	if (p1 >= 0)
-+		close(p1);
-+	test_sockmap_pass_prog__destroy(skel);
-+}
-+
-+/* it used to check whether copied_seq of sk is correct */
-+static void test_sockmap_copied_seq(void)
-+{
-+	int map, err, sent, recvd, zero = 0, one = 1;
-+	struct test_sockmap_pass_prog *skel = NULL;
-+	int c0 = -1, p0 = -1, c1 = -1, p1 = -1;
-+	char buf[10] = "0123456789", rcv[11];
-+	struct bpf_program *prog;
-+
-+	skel = test_sockmap_pass_prog__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	if (create_socket_pairs(AF_INET, SOCK_STREAM, &c0, &c1, &p0, &p1))
-+		goto end;
-+
-+	prog = skel->progs.prog_skb_verdict_ingress;
-+	map = bpf_map__fd(skel->maps.sock_map_rx);
-+
-+	err = bpf_prog_attach(bpf_program__fd(prog), map, BPF_SK_SKB_STREAM_VERDICT, 0);
-+	if (!ASSERT_OK(err, "bpf_prog_attach"))
-+		goto end;
-+
-+	err = bpf_map_update_elem(map, &zero, &p0, BPF_ANY);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem(p0)"))
-+		goto end;
-+
-+	err = bpf_map_update_elem(map, &one, &p1, BPF_ANY);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem(p1)"))
-+		goto end;
-+
-+	/* just trigger sockamp: data sent by c0 will be received by p1 */
-+	sent = xsend(c0, buf, sizeof(buf), 0);
-+	if (!ASSERT_EQ(sent, sizeof(buf), "xsend(c0), bpf"))
-+		goto end;
-+
-+	recvd = recv_timeout(p1, rcv, sizeof(rcv), MSG_DONTWAIT, 1);
-+	if (!ASSERT_EQ(recvd, sent, "recv_timeout(p1), bpf"))
-+		goto end;
-+
-+	/* uninstall sockmap of p1 and p0 */
-+	err = bpf_map_delete_elem(map, &one);
-+	if (!ASSERT_OK(err, "bpf_map_delete_elem(1)"))
-+		goto end;
-+	err = bpf_map_delete_elem(map, &zero);
-+	if (!ASSERT_OK(err, "bpf_map_delete_elem(0)"))
-+		goto end;
-+
-+	/* now all sockets become plain socket, they should work */
-+
-+	/* test copied_seq of p1 by running tcp native stack */
-+	sent = xsend(c1, buf, sizeof(buf), 0);
-+	if (!ASSERT_EQ(sent, sizeof(buf), "xsend(c1), native"))
-+		goto end;
-+
-+	recvd = recv(p1, rcv, sizeof(rcv), MSG_DONTWAIT);
-+	if (!ASSERT_EQ(recvd, sent, "recv_timeout(p1), native"))
-+		goto end;
-+
-+	/* p0 previously redirected skb to p1, we also check copied_seq of p0 */
-+	sent = xsend(c0, buf, sizeof(buf), 0);
-+	if (!ASSERT_EQ(sent, sizeof(buf), "xsend(c0), native"))
-+		goto end;
-+
-+	recvd = recv(p0, rcv, sizeof(rcv), MSG_DONTWAIT);
-+	if (!ASSERT_EQ(recvd, sent, "recv_timeout(p0), native"))
-+		goto end;
-+
-+end:
-+	if (c0 >= 0)
-+		close(c0);
-+	if (p0 >= 0)
-+		close(p0);
-+	if (c1 >= 0)
-+		close(c1);
-+	if (p1 >= 0)
-+		close(p1);
-+	test_sockmap_pass_prog__destroy(skel);
-+}
-+
- void test_sockmap_basic(void)
- {
- 	if (test__start_subtest("sockmap create_update_free"))
-@@ -1108,4 +1284,8 @@ void test_sockmap_basic(void)
- 		test_sockmap_skb_verdict_vsock_poll();
- 	if (test__start_subtest("sockmap vsock unconnected"))
- 		test_sockmap_vsock_unconnected();
-+	if (test__start_subtest("sockmap with zc"))
-+		test_sockmap_zc();
-+	if (test__start_subtest("sockmap recover"))
-+		test_sockmap_copied_seq();
- }
-diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_pass_prog.c b/tools/testing/selftests/bpf/progs/test_sockmap_pass_prog.c
-index 69aacc96db36..4bc97da15a69 100644
---- a/tools/testing/selftests/bpf/progs/test_sockmap_pass_prog.c
-+++ b/tools/testing/selftests/bpf/progs/test_sockmap_pass_prog.c
-@@ -44,4 +44,12 @@ int prog_skb_parser(struct __sk_buff *skb)
- 	return SK_PASS;
- }
- 
-+SEC("sk_skb/stream_parser")
-+int prog_skb_verdict_ingress(struct __sk_buff *skb)
-+{
-+	int one = 1;
-+
-+	return bpf_sk_redirect_map(skb, &sock_map_rx, one, BPF_F_INGRESS);
-+}
-+
- char _license[] SEC("license") = "GPL";
--- 
-2.43.0
+"
+ACTION=="add|change", SUBSYSTEM=="leds", 
+KERNEL=="stmmac-0:01:green:wan", ATTR{trigger}="netdev", 
+ATTR{link_10}="1", ATTR{link_100}="1", ATTR{link_1000}="1", 
+ATTR{device_name}="ethsom0"
+ACTION=="add|change", SUBSYSTEM=="leds", 
+KERNEL=="stmmac-0:01:yellow:wan", ATTR{trigger}="netdev", ATTR{rx}="1", 
+ATTR{tx}="1", ATTR{device_name}="ethsom0"
 
+ACTION=="add|change", SUBSYSTEM=="leds", 
+KERNEL=="stmmac-1:01:green:lan", ATTR{trigger}="netdev", 
+ATTR{link_10}="1", ATTR{link_100}="1", ATTR{link_1000}="1", 
+ATTR{device_name}="ethsom1"
+ACTION=="add|change", SUBSYSTEM=="leds", 
+KERNEL=="stmmac-1:01:yellow:lan", ATTR{trigger}="netdev", ATTR{rx}="1", 
+ATTR{tx}="1", ATTR{device_name}="ethsom1"
+"
+
+I get this backtrace. Notice the "sysfs: cannot create duplicate 
+filename ..." part , I suspect there is some subtle race condition ?
+
+"
+sysfs: cannot create duplicate filename 
+'/devices/platform/soc/5c007000.bus/5800e000.ethernet/mdio_bus/stmmac-1/stmmac-1:01/leds/stmmac-1:01:green:lan/link_10'
+CPU: 0 UID: 0 PID: 153 Comm: (udev-worker) Not tainted 6.18.0-rc6 #1 
+PREEMPT
+Hardware name: STM32 (Device Tree Support)
+Call trace:
+  unwind_backtrace from show_stack+0x18/0x1c
+  show_stack from dump_stack_lvl+0x54/0x68
+  dump_stack_lvl from sysfs_warn_dup+0x58/0x6c
+  sysfs_warn_dup from sysfs_add_file_mode_ns+0xf0/0x130
+  sysfs_add_file_mode_ns from internal_create_group+0x344/0x480
+  internal_create_group from internal_create_groups+0x48/0x6c
+  internal_create_groups from led_trigger_set+0x1e4/0x278
+  led_trigger_set from led_trigger_write+0xe0/0x118
+  led_trigger_write from sysfs_kf_bin_write+0x98/0xa0
+  sysfs_kf_bin_write from kernfs_fop_write_iter+0x14c/0x198
+  kernfs_fop_write_iter from vfs_write+0x170/0x1d4
+  vfs_write from ksys_write+0x7c/0xd0
+  ksys_write from ret_fast_syscall+0x0/0x54
+Exception stack(0xedbf1fa8 to 0xedbf1ff0)
+1fa0:                   00000006 bec4476c 00000015 bec4476c 00000006 
+00000001
+1fc0: 00000006 bec4476c 000e7698 00000004 00000006 fffffff7 00000000 
+000d1710
+1fe0: 00000004 bec44578 b6c34397 b6bb15e6
+leds stmmac-1:01:green:lan: Failed to add trigger attributes
+"
+
+If I find out more, I will get back to this thread.
 
