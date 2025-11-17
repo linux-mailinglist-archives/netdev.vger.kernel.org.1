@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-239245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E405FC6638C
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 22:11:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A347CC66408
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 22:18:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DC54A4EFDFE
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 21:10:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E19BA4E7A4F
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 21:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A843446BC;
-	Mon, 17 Nov 2025 21:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9ECB31A55E;
+	Mon, 17 Nov 2025 21:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RXL+7Frd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SYjOMSOO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CB530217B;
-	Mon, 17 Nov 2025 21:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA0F265621;
+	Mon, 17 Nov 2025 21:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763413765; cv=none; b=fvEZ6SkSp+J3Nj8bM7LwegObG2RePGo6yeOkaSTQZ2uDVmwMCHAfY/psE9iq6xZHB3FMoqqoUqxFnAfo79NbzXN1Jf9QqXpkFaI3HQ2lQBnf/9VsVrsxNTgJEepD3RZ5pLyjmNUbfkDPfM1rt/yMsM1mRwTBirn4I0+xetzbQlo=
+	t=1763414304; cv=none; b=InY52UStShYepthTZggF9bTbAv2YlwJOfvCyk1ksQcy9AKaQ/1/JF8g9cY4PBWvmR0hyeQxdWylbWdct1Cw/URJzsCzcH05/DA4Fcet0KxtKl0bsfnwF3RL3CaPAxbjJEFyY9nWlOu3YfpKh0XhLkEDfvQti8Tmc3QelRb4srx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763413765; c=relaxed/simple;
-	bh=v2TilITkDJ2tL/jDdt/62ng7+B27BobzbCQT9r0dXfA=;
+	s=arc-20240116; t=1763414304; c=relaxed/simple;
+	bh=s9NJSnnIjp3k6gOrnjt/F3iXufnlnMDqC8rDPNES57A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P4ezE3/CkeFJhl6luEXm6b+I5puOkZTm2zWREYF1c9eHhGiZ1Gr7Axov+Tl10AmJfPQw5I0htM6Ru547vs6MpQ1EA/a7rXe1ScJgjQ8QKo2qB24uzHTzYtzgYTzUlxTqbTmn5FT7SfzBF+9DdbviWkKixijyVzuXu05gh/gqZ7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RXL+7Frd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43548C2BCB8;
-	Mon, 17 Nov 2025 21:09:20 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=P8epBob92awwDPRPr9mGThDF9LyOWYFYrR+Be9bNMmuylNe0dJ33nXWSBPf5cOPdZrTET9abr8icsNUe8eGVsIwiuTBRoSehThy8jtmcPBscyVxHxQ0ZvyzbxcPGjWLhJhRPew3iFINczBuRqVjLjSoc5h1c1bnCWjtyHU1ms0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SYjOMSOO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6F99C4CEF5;
+	Mon, 17 Nov 2025 21:18:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763413765;
-	bh=v2TilITkDJ2tL/jDdt/62ng7+B27BobzbCQT9r0dXfA=;
+	s=k20201202; t=1763414303;
+	bh=s9NJSnnIjp3k6gOrnjt/F3iXufnlnMDqC8rDPNES57A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RXL+7FrdEV6yxxSYUFmr0AfsRnRWEYsHOhHygW0gdgzKY8vBpISSFg1ZrrskbLaqD
-	 PmL4jLGu2rgdUDj/VoS2npQM+95FsS3OpUasQJFCkqrivJKxfTohSkS4l7l7lKLR+F
-	 ghTWjod7PnP3ecHjfnxwEEFpjVZ1aNjBhfWN7zdAfdcXQ1WS0ulgGLEaF+N+NIeg9A
-	 lGzI59z+RWYnQfiGGobEFKOI0D1l0Z9Ta2PMeCgliJkjRZto/9holuIC/6yEJPlmOR
-	 P2YE6p933CwqY0aJKEj/+k909FoQPqBcSbN5w7rrUlKQkx+vd5ucWdTJT6ZBQ8JCal
-	 NLXX7PfBjaC8A==
-Date: Mon, 17 Nov 2025 21:09:14 +0000
+	b=SYjOMSOOO0Zo4vFEHP0j+f8ZhUv62zdlh7kbeemU0EyCg0OW/N+qIroVyYV0tNPJA
+	 q4LCIKf3etWgUouF439HAQmduH4lDS9COnrduDOmnyzpXP+20EHoCnSnFvQk+Al16Z
+	 OaqQcaEp5rxj0nIkghsCSd6JSNhpnikzSOWjwIzLpeZReNasQQkY6pWVG1TSVqCXv3
+	 h6EoN7w6hXLjgv0MruTwDk0WW8yHGUk9Y/jwlcjTBqwIKIJPmKq0bgzDdfNShR94Hx
+	 tkSa5Q0oVBc87DS9aW3f+5ZHJGER08fkeXRZDN8w5UmqczcJbNvctkqxADO/86AIaK
+	 fWjeEYIElU7/w==
+Date: Mon, 17 Nov 2025 21:18:16 +0000
 From: Simon Horman <horms@kernel.org>
-To: Parvathi Pudi <parvathi@couthit.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, danishanwar@ti.com,
-	rogerq@kernel.org, pmohan@couthit.com, basharath@couthit.com,
-	afd@ti.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, alok.a.tiwari@oracle.com,
-	pratheesh@ti.com, j-rameshbabu@ti.com, vigneshr@ti.com,
-	praneeth@ti.com, srk@ti.com, rogerq@ti.com, krishna@couthit.com,
-	mohan@couthit.com
-Subject: Re: [PATCH net-next v5 3/3] net: ti: icssm-prueth: Adds support for
- ICSSM RSTP switch
-Message-ID: <aRuO-ib0us1JCrxc@horms.kernel.org>
-References: <20251113101229.675141-1-parvathi@couthit.com>
- <20251113101229.675141-4-parvathi@couthit.com>
+To: Dan Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+	pabeni@redhat.com, virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
+	andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v10 05/12] virtio_net: Query and set flow filter
+ caps
+Message-ID: <aRuRGD-d7kImAKb3@horms.kernel.org>
+References: <20251112193435.2096-2-danielj@nvidia.com>
+ <20251112193435.2096-6-danielj@nvidia.com>
+ <aRtYgplAuUnCxj2U@horms.kernel.org>
+ <0483aaba-0b93-41d7-bf09-5430b5520395@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,47 +65,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251113101229.675141-4-parvathi@couthit.com>
+In-Reply-To: <0483aaba-0b93-41d7-bf09-5430b5520395@nvidia.com>
 
-On Thu, Nov 13, 2025 at 03:40:23PM +0530, Parvathi Pudi wrote:
-
-...
-
-> @@ -1012,17 +1074,77 @@ static int icssm_emac_ndo_stop(struct net_device *ndev)
->  	hrtimer_cancel(&emac->tx_hrtimer);
->  
->  	/* stop the PRU */
-> -	rproc_shutdown(emac->pru);
-> +	if (!PRUETH_IS_EMAC(prueth))
-> +		icssm_prueth_sw_shutdown_prus(emac, ndev);
-> +	else
-> +		rproc_shutdown(emac->pru);
-> +
-> +	/* free table memory of the switch */
-> +	if (PRUETH_IS_SWITCH(emac->prueth))
-> +		icssm_prueth_sw_free_fdb_table(prueth);
-
-The conditional block above appears to open-code icssm_prueth_free_memory()
-which is also called below. I don't think this this duplication causes
-any harm, as it looks like the second, indirect, call to
-icssm_prueth_sw_free_fdb_table() will be a noop. But it does seem
-unnecessary.
-
->  
->  	/* free rx interrupts */
->  	free_irq(emac->rx_irq, ndev);
->  
-> +	/* free memory related to sw */
-> +	icssm_prueth_free_memory(emac->prueth);
-> +
-> +	if (!prueth->emac_configured)
-> +		icss_iep_exit(prueth->iep);
-> +
->  	if (netif_msg_drv(emac))
->  		dev_notice(&ndev->dev, "stopped\n");
->  
->  	return 0;
->  }
+On Mon, Nov 17, 2025 at 11:49:54AM -0600, Dan Jurgens wrote:
+> On 11/17/25 11:16 AM, Simon Horman wrote:
+> > On Wed, Nov 12, 2025 at 01:34:28PM -0600, Daniel Jurgens wrote:
 
 ...
+
+> >> +	for (i = 0; i < ff->ff_mask->count; i++) {
+> >> +		if (sel->length > MAX_SEL_LEN) {
+> >> +			err = -EINVAL;
+> >> +			goto err_ff_action;
+> >> +		}
+> >> +		real_ff_mask_size += sizeof(struct virtio_net_ff_selector) + sel->length;
+> >> +		sel = (void *)sel + sizeof(*sel) + sel->length;
+> >> +	}
+> > 
+> > Hi Daniel,
+> > 
+> > I'm not sure that the bounds checking in the loop above is adequate.
+> > For example, if ff->ff_mask->count is larger than expected.
+> > Or sel->length returns MAX_SEL_LEN each time then it seems
+> > than sel could overrun the space allocated for ff->ff_mask.
+> > 
+> > Flagged by Claude Code with https://github.com/masoncl/review-prompts/
+> > 
+> 
+> I can also bound the loop by VIRTIO_NET_FF_MASK_TYPE_MAX. I'll also
+> address your comments about classifier and rules limits on patch 7 here,
+> by checking the rules and classifier limits are > 0.
+
+Thanks.
+
+I think that even if the loop is bounded there is still (a much smaller)
+scope for an overflow. This is because selectors isn't large enough for
+VIRTIO_NET_FF_MASK_TYPE_MAX entries if all of them have length ==
+MAX_SEL_LEN.
+
+> 
+> I'll wait to push a new version until I hear back from Michael about the
+> threading comment he made on the cover letter.
+> 
 
