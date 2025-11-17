@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-239029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B129CC6282C
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:26:25 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92C7FC6282F
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:26:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 344F9360074
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 06:26:03 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1D80535E85E
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 06:26:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E9E31579B;
-	Mon, 17 Nov 2025 06:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA66A315D4D;
+	Mon, 17 Nov 2025 06:25:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fr04KARk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PIMLxekq"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646F7315D55
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 06:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F3431618C
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 06:25:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763360746; cv=none; b=TGk6oFyrvFSfoVSSlzpr0WqhKgP2BGMXP7YwqHI6Q/qia9KzY7khSZgxl7z7vXLLey85qOtkkDWJJmucT+spC6mJH4YaP+/cAzdhdU6ZaHyCO5VVxKUeCwdN76bSGkCPS2LVGUOHWpvDLw32PX/kEKOpeYVXPhExKW6IvEHwdQI=
+	t=1763360748; cv=none; b=DzFr3JkaHk/IFA0zbHfQH7l05YoQcJ0nyxZAk4y54pmsoxcgYd/1x6CbpMyvOBE9jzcrreGm2DaZDYYJrjvRoFMSphxD8IN8Y79apxloZ7m6a+2Zs49bXhW/wjO1fPFb0AiktK3O7Yj2K7xG3JgRAVQzSWlJCz03jjJLB/YEvLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763360746; c=relaxed/simple;
-	bh=4looNXpGLoSmtcZ5WlbX7y0DgDiuIWdO8s+ahMmrFWQ=;
+	s=arc-20240116; t=1763360748; c=relaxed/simple;
+	bh=CzCE6iffjJBcHOkgOdB+jW2/ZtMIGGLvns1XLohIiPQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TUyLIP0D2vY5X+bck22x6LjhDJAtuZ5q/b8a1y21/ODv13AXwhlwsc6GK41terFq9RsBRk1ORieudRS8SH7QUXPlRSxs39aQ5IkRh56HZPbsKyXKBj2R6RR2xi5lKqssUOHUd19UTHhMIqOcuc66ci8RinOfKQuujzq54mfNqvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fr04KARk; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=RuG9F1hNT7ihGVAYZ68ofGv4qOttZwVdAUb5LXI2jxQTcaTyOP8nhWRMZ229xH+zlSmpik4Dd0Tzto/HRHKK/YEB5T6l7nWX+ekQ/3wRxk+gQ+BawEHe5rgqPMlA1oah+t37ehorZG5pbXA9KHWDLhaVOn2wkYSrBv/Uoh+iTFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PIMLxekq; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763360743;
+	s=mimecast20190719; t=1763360746;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7p/uN1NmdXMB1RvfnCsUt8vjTG2E3v92qcAJea3Mqiw=;
-	b=Fr04KARkse1IyiGWHxExxPrnGCbTXb5cn81XzWRF2pRGZ93Hl9lT4rNhWLmANmqitFznBA
-	QiLEb3YZGcFJnkmmGnsU7FW3PVnhG59erCp5T9QSM/CfBalqkyHLKNaNT/3zXG6h/1KI8i
-	n3i8uhRnE6LFF9OUsYzwTSBKfvp/5cU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=A8qf1U5yJ1j9WoRVM6uiYCSJRKy6gXrFMrO/9Old+6A=;
+	b=PIMLxekqRBbxE05O7K+5tbA9XZUXI8PYUPVOTOi30oEfzmkf7PT56aMOYa04UmKMu6Hu/v
+	vlO5zeKcZsxM6T+o0cIlXW4N8kEK747WXKmlMhGpfo3NFWEs3zINsyYiNSR97d6ZKeCUXq
+	3yhvnFIvRzLxKn2ghXzJjZxgeLYEtsU=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-47-YsgJ-p4_MO2LYHx0QTMJvA-1; Mon,
- 17 Nov 2025 01:25:39 -0500
-X-MC-Unique: YsgJ-p4_MO2LYHx0QTMJvA-1
-X-Mimecast-MFC-AGG-ID: YsgJ-p4_MO2LYHx0QTMJvA_1763360738
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-259-K39949vDOyKYUe81_OMv1Q-1; Mon,
+ 17 Nov 2025 01:25:42 -0500
+X-MC-Unique: K39949vDOyKYUe81_OMv1Q-1
+X-Mimecast-MFC-AGG-ID: K39949vDOyKYUe81_OMv1Q_1763360741
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 01499195609D;
-	Mon, 17 Nov 2025 06:25:38 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5A9501956089;
+	Mon, 17 Nov 2025 06:25:41 +0000 (UTC)
 Received: from xudu-thinkpadx1carbongen9.nay.csb (unknown [10.72.116.141])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4F57A195608E;
-	Mon, 17 Nov 2025 06:25:34 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B2AA0195608E;
+	Mon, 17 Nov 2025 06:25:38 +0000 (UTC)
 From: xu du <xudu@redhat.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
 Cc: netdev@vger.kernel.org
-Subject: [PATCH net-next 6/8] selftest: tun: Add test for sending gso packet into tun
-Date: Mon, 17 Nov 2025 14:25:02 +0800
-Message-ID: <2a2666256b330348437cde92a6bff24ae70e2b46.1763345426.git.xudu@redhat.com>
+Subject: [PATCH net-next 7/8] selftest: tun: Add test for receiving gso packet from tun
+Date: Mon, 17 Nov 2025 14:25:03 +0800
+Message-ID: <919a03f216afac7250f30259caf37be2c32d962c.1763345426.git.xudu@redhat.com>
 In-Reply-To: <cover.1763345426.git.xudu@redhat.com>
 References: <cover.1763345426.git.xudu@redhat.com>
 Precedence: bulk
@@ -77,196 +77,245 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-The test constructs a raw packet, prepends a virtio_net_hdr,
-and writes the result to the TUN device. This mimics the behavior
-of a vm forwarding a guest's packet to the host networking stack.
+The test validate that GSO information are correctly exposed
+when reading packets from a TUN device.
 
 Signed-off-by: xu du <xudu@redhat.com>
 ---
- tools/testing/selftests/net/tun.c | 149 ++++++++++++++++++++++++++++--
- 1 file changed, 140 insertions(+), 9 deletions(-)
+ tools/testing/selftests/net/tun.c | 209 ++++++++++++++++++++++++++++++
+ 1 file changed, 209 insertions(+)
 
 diff --git a/tools/testing/selftests/net/tun.c b/tools/testing/selftests/net/tun.c
-index 8f0188ccb9fb..870697a0d9e8 100644
+index 870697a0d9e8..19524748db44 100644
 --- a/tools/testing/selftests/net/tun.c
 +++ b/tools/testing/selftests/net/tun.c
-@@ -75,6 +75,31 @@ static struct in6_addr param_ipaddr6_inner_src = {
- 
- #define TUN_VNET_TNL_SIZE sizeof(struct virtio_net_hdr_v1_hash_tunnel)
- 
-+#define MAX_VNET_TUNNEL_PACKET_SZ (TUN_VNET_TNL_SIZE + ETH_HLEN + ETH_MAX_MTU)
-+
-+#define UDP_TUNNEL_VXLAN_4IN4_HDRLEN \
-+	(ETH_HLEN + 2 * sizeof(struct iphdr) + 8 + 2 * sizeof(struct udphdr))
-+#define UDP_TUNNEL_VXLAN_6IN6_HDRLEN \
-+	(ETH_HLEN + 2 * sizeof(struct ipv6hdr) + 8 + 2 * sizeof(struct udphdr))
-+#define UDP_TUNNEL_VXLAN_4IN6_HDRLEN                                    \
-+	(ETH_HLEN + sizeof(struct iphdr) + sizeof(struct ipv6hdr) + 8 + \
-+	 2 * sizeof(struct udphdr))
-+#define UDP_TUNNEL_VXLAN_6IN4_HDRLEN                                    \
-+	(ETH_HLEN + sizeof(struct ipv6hdr) + sizeof(struct iphdr) + 8 + \
-+	 2 * sizeof(struct udphdr))
-+
-+#define UDP_TUNNEL_HDRLEN(type)                                           \
-+	((type) == UDP_TUNNEL_VXLAN_4IN4 ? UDP_TUNNEL_VXLAN_4IN4_HDRLEN : \
-+	 (type) == UDP_TUNNEL_VXLAN_6IN4 ? UDP_TUNNEL_VXLAN_6IN4_HDRLEN : \
-+	 (type) == UDP_TUNNEL_VXLAN_4IN6 ? UDP_TUNNEL_VXLAN_4IN6_HDRLEN : \
-+	 (type) == UDP_TUNNEL_VXLAN_6IN6 ? UDP_TUNNEL_VXLAN_6IN6_HDRLEN : \
-+					   0)
-+
-+#define UDP_TUNNEL_MSS(type) (ETH_DATA_LEN - UDP_TUNNEL_HDRLEN(type))
-+
-+#define UDP_TUNNEL_MAX(type, is_tap) \
-+	(ETH_MAX_MTU - UDP_TUNNEL_HDRLEN(type) - ((is_tap) ? ETH_HLEN : 0))
-+
- union vxlan_addr {
- 	struct sockaddr_in sin;
- 	struct sockaddr_in6 sin6;
-@@ -384,15 +409,23 @@ FIXTURE(tun_vnet_udptnl)
- FIXTURE_VARIANT(tun_vnet_udptnl)
- {
- 	int tunnel_type;
--	bool is_tap;
-+	int gso_size;
-+	int data_size;
-+	int r_num_mss;
-+	bool is_tap, no_gso;
- };
- 
- /* clang-format off */
- #define TUN_VNET_UDPTNL_VARIANT_ADD(type, desc)                              \
--	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##udptnl) {                 \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_1mss) {                  \
-+		/* send a single MSS: fall back to no GSO */                 \
- 		.tunnel_type = type,                                         \
-+		.gso_size = UDP_TUNNEL_MSS(type),                            \
-+		.data_size = UDP_TUNNEL_MSS(type),                           \
-+		.r_num_mss = 1,                                              \
- 		.is_tap = true,                                              \
--	}
-+		.no_gso = true,                                              \
-+	};
- /* clang-format on */
- 
- TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_VXLAN_4IN4, 4in4);
-@@ -510,14 +543,112 @@ FIXTURE_TEARDOWN(tun_vnet_udptnl)
- 	EXPECT_EQ(ret, 0);
+@@ -338,6 +338,116 @@ static int udp_socket_open(struct sockaddr_storage *sockaddr, bool can_frag)
+ 	return -1;
  }
  
--TEST_F(tun_vnet_udptnl, basic)
-+static int build_gso_packet_into_tun(const FIXTURE_VARIANT(tun_vnet_udptnl) *
-+					     variant,
-+				     uint8_t *buf)
- {
--	int ret;
--	char cmd[256] = { 0 };
-+	int tunnel_type = variant->tunnel_type;
-+	int payload_len = variant->data_size;
-+	int gso_size = variant->gso_size;
-+	int inner_family, outer_family;
-+	bool is_tap = variant->is_tap;
-+	uint8_t *outer_udph = NULL;
++static int send_gso_udp_msg(int socket, struct sockaddr_storage *addr,
++			    uint8_t *send_buf, int send_len, int gso_size)
++{
++	char control[CMSG_SPACE(sizeof(uint16_t))] = { 0 };
++	int alen = sockaddr_len(addr->ss_family);
++	struct msghdr msg = { 0 };
++	struct iovec iov = { 0 };
++	int ret;
++
++	iov.iov_base = send_buf;
++	iov.iov_len = send_len;
++
++	msg.msg_iov = &iov;
++	msg.msg_iovlen = 1;
++	msg.msg_name = addr;
++	msg.msg_namelen = alen;
++
++	if (gso_size > 0) {
++		struct cmsghdr *cmsg;
++
++		msg.msg_control = control;
++		msg.msg_controllen = sizeof(control);
++
++		cmsg = CMSG_FIRSTHDR(&msg);
++		cmsg->cmsg_level = SOL_UDP;
++		cmsg->cmsg_type = UDP_SEGMENT;
++		cmsg->cmsg_len = CMSG_LEN(sizeof(uint16_t));
++		*(uint16_t *)CMSG_DATA(cmsg) = gso_size;
++	}
++
++	ret = sendmsg(socket, &msg, 0);
++	if (ret < 0)
++		perror("sendmsg");
++
++	return ret;
++}
++
++static int validate_hdrlen(uint8_t **cur, int *len, int x)
++{
++	if (*len < x)
++		return -1;
++	*cur += x;
++	*len -= x;
++	return 0;
++}
++
++static int parse_udp_tunnel_vnet_packet(uint8_t *buf, int len, int tunnel_type,
++					bool is_tap)
++{
++	struct ipv6hdr *iph6;
++	struct udphdr *udph;
++	struct iphdr *iph4;
 +	uint8_t *cur = buf;
-+	int len, proto;
 +
-+	len = (is_tap ? ETH_HLEN : 0) + UDP_TUNNEL_HDRLEN(tunnel_type);
-+	inner_family = (tunnel_type & UDP_TUNNEL_INNER_IPV4) ? AF_INET :
-+							       AF_INET6;
-+	outer_family = (tunnel_type & UDP_TUNNEL_OUTER_IPV4) ? AF_INET :
-+							       AF_INET6;
-+
-+	cur += build_virtio_net_hdr_v1_hash_tunnel(cur, is_tap, len, gso_size,
-+						   outer_family, inner_family);
++	if (validate_hdrlen(&cur, &len, TUN_VNET_TNL_SIZE))
++		return -1;
 +
 +	if (is_tap) {
-+		proto = outer_family == AF_INET ? ETH_P_IP : ETH_P_IPV6;
-+		cur += build_eth(cur, proto, param_hwaddr_outer_dst,
-+				 param_hwaddr_outer_src);
-+		len -= ETH_HLEN;
++		if (validate_hdrlen(&cur, &len, ETH_HLEN))
++			return -1;
 +	}
++
++	if (tunnel_type & UDP_TUNNEL_OUTER_IPV4) {
++		iph4 = (struct iphdr *)cur;
++		if (validate_hdrlen(&cur, &len, sizeof(struct iphdr)))
++			return -1;
++		if (iph4->version != 4 || iph4->protocol != IPPROTO_UDP)
++			return -1;
++	} else {
++		iph6 = (struct ipv6hdr *)cur;
++		if (validate_hdrlen(&cur, &len, sizeof(struct ipv6hdr)))
++			return -1;
++		if (iph6->version != 6 || iph6->nexthdr != IPPROTO_UDP)
++			return -1;
++	}
++
++	udph = (struct udphdr *)cur;
++	if (validate_hdrlen(&cur, &len, sizeof(struct udphdr)))
++		return -1;
++	if (ntohs(udph->dest) != VN_PORT)
++		return -1;
++
++	if (validate_hdrlen(&cur, &len, 8))
++		return -1;
++	if (validate_hdrlen(&cur, &len, ETH_HLEN))
++		return -1;
++
++	if (tunnel_type & UDP_TUNNEL_INNER_IPV4) {
++		iph4 = (struct iphdr *)cur;
++		if (validate_hdrlen(&cur, &len, sizeof(struct iphdr)))
++			return -1;
++		if (iph4->version != 4 || iph4->protocol != IPPROTO_UDP)
++			return -1;
++	} else {
++		iph6 = (struct ipv6hdr *)cur;
++		if (validate_hdrlen(&cur, &len, sizeof(struct ipv6hdr)))
++			return -1;
++		if (iph6->version != 6 || iph6->nexthdr != IPPROTO_UDP)
++			return -1;
++	}
++
++	udph = (struct udphdr *)cur;
++	if (validate_hdrlen(&cur, &len, sizeof(struct udphdr)))
++		return -1;
++	if (ntohs(udph->dest) != UDP_DST_PORT)
++		return -1;
++
++	return len;
++}
++
+ FIXTURE(tun)
+ {
+ 	char ifname[IFNAMSIZ];
+@@ -635,6 +745,83 @@ recieve_gso_packet_from_tunnel(FIXTURE_DATA(tun_vnet_udptnl) * self,
+ 	return total_len;
+ }
  
--	sprintf(cmd, "ip addr show %s > /dev/null 2>&1", param_dev_vxlan_name);
--	ret = system(cmd);
--	ASSERT_EQ(ret, 0);
-+	if (outer_family == AF_INET) {
-+		len = len - sizeof(struct iphdr) + payload_len;
-+		cur += build_ipv4_header(cur, IPPROTO_UDP, len,
-+					 &param_ipaddr4_outer_dst,
-+					 &param_ipaddr4_outer_src);
++static int send_gso_packet_into_tunnel(FIXTURE_DATA(tun_vnet_udptnl) * self,
++				       const FIXTURE_VARIANT(tun_vnet_udptnl) *
++					       variant)
++{
++	uint8_t buf[MAX_VNET_TUNNEL_PACKET_SZ] = { 0 };
++	struct sockaddr_storage addr = { 0 };
++	int payload_len = variant->data_size;
++	int gso_size = variant->gso_size;
++	int family;
++
++	family = (variant->tunnel_type & UDP_TUNNEL_INNER_IPV4) ? AF_INET :
++								  AF_INET6;
++	if (family == AF_INET) {
++		struct sockaddr_in *addr4 = (struct sockaddr_in *)&addr;
++
++		addr4->sin_family = AF_INET;
++		addr4->sin_addr = param_ipaddr4_inner_dst;
++		addr4->sin_port = htons(UDP_DST_PORT);
 +	} else {
-+		len = len - sizeof(struct ipv6hdr) + payload_len;
-+		cur += build_ipv6_header(cur, IPPROTO_UDP, 0, len,
-+					 &param_ipaddr6_outer_dst,
-+					 &param_ipaddr6_outer_src);
++		struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&addr;
++
++		addr6->sin6_family = AF_INET6;
++		addr6->sin6_addr = param_ipaddr6_inner_dst;
++		addr6->sin6_port = htons(UDP_DST_PORT);
 +	}
 +
-+	outer_udph = cur;
-+	len -= sizeof(struct udphdr);
-+	proto = inner_family == AF_INET ? ETH_P_IP : ETH_P_IPV6;
-+	cur += build_udp_header(cur, UDP_SRC_PORT, VN_PORT, len);
-+	cur += build_vxlan_header(cur, VN_ID);
-+	cur += build_eth(cur, proto, param_hwaddr_inner_dst,
-+			 param_hwaddr_inner_src);
-+
-+	len = sizeof(struct udphdr) + payload_len;
-+	if (inner_family == AF_INET) {
-+		cur += build_ipv4_header(cur, IPPROTO_UDP, len,
-+					 &param_ipaddr4_inner_dst,
-+					 &param_ipaddr4_inner_src);
-+	} else {
-+		cur += build_ipv6_header(cur, IPPROTO_UDP, 0, len,
-+					 &param_ipaddr6_inner_dst,
-+					 &param_ipaddr6_inner_src);
-+	}
-+
-+	cur += build_udp_packet(cur, UDP_DST_PORT, UDP_SRC_PORT, payload_len,
-+				inner_family, false);
-+
-+	build_udp_packet_csum(outer_udph, outer_family, false);
-+
-+	return cur - buf;
++	return send_gso_udp_msg(self->sock, &addr, buf, payload_len, gso_size);
 +}
 +
 +static int
-+recieve_gso_packet_from_tunnel(FIXTURE_DATA(tun_vnet_udptnl) * self,
-+			       const FIXTURE_VARIANT(tun_vnet_udptnl) * variant,
-+			       int *r_num_mss)
++recieve_gso_packet_from_tun(FIXTURE_DATA(tun_vnet_udptnl) * self,
++			    const FIXTURE_VARIANT(tun_vnet_udptnl) * variant,
++			    struct virtio_net_hdr_v1_hash_tunnel *vnet_hdr)
 +{
-+	uint8_t packet_buf[MAX_VNET_TUNNEL_PACKET_SZ];
-+	int len, total_len = 0, socket = self->sock;
++	struct timeval timeout = { .tv_sec = TIMEOUT_SEC };
++	uint8_t buf[MAX_VNET_TUNNEL_PACKET_SZ];
++	int tunnel_type = variant->tunnel_type;
 +	int payload_len = variant->data_size;
++	bool is_tap = variant->is_tap;
++	int ret, len, total_len = 0;
++	int tun_fd = self->fd;
++	fd_set fdset;
 +
 +	while (total_len < payload_len) {
-+		len = recv(socket, packet_buf, sizeof(packet_buf), 0);
++		FD_ZERO(&fdset);
++		FD_SET(tun_fd, &fdset);
++
++		ret = select(tun_fd + 1, &fdset, NULL, NULL, &timeout);
++		if (ret <= 0) {
++			perror("select");
++			break;
++		}
++		if (!FD_ISSET(tun_fd, &fdset))
++			continue;
++
++		len = read(tun_fd, buf, sizeof(buf));
 +		if (len < 0) {
-+			if (errno != EAGAIN && errno != EWOULDBLOCK)
-+				perror("recv");
-+			return total_len;
++			if (errno == EAGAIN || errno == EWOULDBLOCK)
++				continue;
++			perror("read");
++			break;
 +		}
 +
-+		(*r_num_mss)++;
++		len = parse_udp_tunnel_vnet_packet(buf, len, tunnel_type,
++						   is_tap);
++		if (len < 0)
++			continue;
++
++		if (total_len == 0)
++			memcpy(vnet_hdr, buf, TUN_VNET_TNL_SIZE);
++
 +		total_len += len;
 +	}
 +
 +	return total_len;
 +}
 +
-+TEST_F(tun_vnet_udptnl, send_gso_packet)
-+{
-+	uint8_t pkt[MAX_VNET_TUNNEL_PACKET_SZ];
-+	int r_num_mss = 0;
-+	int ret, off;
-+
-+	memset(pkt, 0, sizeof(pkt));
-+	off = build_gso_packet_into_tun(variant, pkt);
-+	ret = write(self->fd, pkt, off);
-+	ASSERT_EQ(ret, off);
-+
-+	ret = recieve_gso_packet_from_tunnel(self, variant, &r_num_mss);
-+	ASSERT_EQ(ret, variant->data_size);
-+	ASSERT_EQ(r_num_mss, variant->r_num_mss);
+ TEST_F(tun_vnet_udptnl, send_gso_packet)
+ {
+ 	uint8_t pkt[MAX_VNET_TUNNEL_PACKET_SZ];
+@@ -651,4 +838,26 @@ TEST_F(tun_vnet_udptnl, send_gso_packet)
+ 	ASSERT_EQ(r_num_mss, variant->r_num_mss);
  }
  
++TEST_F(tun_vnet_udptnl, recv_gso_packet)
++{
++	struct virtio_net_hdr_v1_hash_tunnel vnet_hdr = { 0 };
++	struct virtio_net_hdr_v1 *vh = &vnet_hdr.hash_hdr.hdr;
++	int ret, gso_type = VIRTIO_NET_HDR_GSO_UDP_L4;
++
++	ret = send_gso_packet_into_tunnel(self, variant);
++	ASSERT_EQ(ret, variant->data_size)
++
++	memset(&vnet_hdr, 0, sizeof(vnet_hdr));
++	ret = recieve_gso_packet_from_tun(self, variant, &vnet_hdr);
++	ASSERT_EQ(ret, variant->data_size);
++
++	if (!variant->no_gso) {
++		ASSERT_EQ(vh->gso_size, variant->gso_size);
++		gso_type |= (variant->tunnel_type & UDP_TUNNEL_OUTER_IPV4) ?
++				    (VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4) :
++				    (VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6);
++		ASSERT_EQ(vh->gso_type, gso_type);
++	}
++}
++
  TEST_HARNESS_MAIN
 -- 
 2.49.0
