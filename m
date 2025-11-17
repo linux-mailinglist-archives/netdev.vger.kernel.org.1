@@ -1,120 +1,137 @@
-Return-Path: <netdev+bounces-239033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFE48C62A39
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:04:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 282D7C62A72
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:06:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 33ABE4E71A4
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:04:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAB813AB28B
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B073168F6;
-	Mon, 17 Nov 2025 07:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8535930DD03;
+	Mon, 17 Nov 2025 07:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WafxGHBB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ajEn9Lum"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCDC1946DA;
-	Mon, 17 Nov 2025 07:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538CA1946DA;
+	Mon, 17 Nov 2025 07:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763363070; cv=none; b=N40jaBsHrG15sZNJtWBsfL0ZSanrXjLj3C2C5ALfGQJFvTXuUzdPdQ8lwu1aFDlhVNryHgPPYViSRWcoe38plaEMNyWNdVKuPcYgCOnnymqL12xz56UhVApxqzpS0zpL1avjwKJewddM3hBgv9KOI9fpltzOsl8MBCW2hQKoCTo=
+	t=1763363193; cv=none; b=cSMN9nzGhfcuNJQuY+5f2aGC96LbOYL0Za7eDB1QDWeY+9niUluBZL3K4fkaY5cZyU1sTr5QOEHra9T+PW95ACPIgbvHKRDUTKxTj3aZaSLy2OddktyWCfQgEQKZicUXkMgeSvKGCwJRKLJnMMsX+j4KAdlcQGdu6+IcyF+sITk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763363070; c=relaxed/simple;
-	bh=dAkB/zPq+9yCAeJRIc2n358wVTyQGSnb5GkGxbn5VtQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g/axhZ7NP630jcfz1zkqa3qarX5yw8oz2y8yI8ut93Ne8qXTQWSu/MHlm5icMeFyhj3jGxQ1Pp6Aa4FfhSfc4Ml9i2kbCbI7zjs/GPUGD1ukYDjoSwNdPlX/obQSIkILLDfBB9dUPnae3g1ozxCbzR+7xsZHNZSKFJ7gQ11OXF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WafxGHBB; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763363068; x=1794899068;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=dAkB/zPq+9yCAeJRIc2n358wVTyQGSnb5GkGxbn5VtQ=;
-  b=WafxGHBBaZSnZlqU+xeYxyrmxqyzslOBTTw0vi6tPk7CuCtBS2ANBgMN
-   7JM9MU9CH9OG1RLPYDKW0WQObhKTZVs3NqV7wtB55EunYde4b/6o7jMBA
-   wkULvzkA1Fi3ieTSJOOpFItpZNv82zQM4cR7WNQlwcA2ZqQ8w71rTwsB8
-   gyhnWKBCUOcSMN1Zj0ixDyDz+54bkTjHRN4VHPePgbpdMQR0n6B0KZK6T
-   vLg7CntLgyqF8UghZWVrvo0JEt+UnSal5BZHnqVfTjwq+5Bs4CjJg3yGX
-   4UGetjaDwvKL2MFlPD4tlNt5rRCxjQkb4PsBwZbrqLsMYdHZeOsifztQG
-   A==;
-X-CSE-ConnectionGUID: 3U+Lbi6IRLmvvRnFtvEeWw==
-X-CSE-MsgGUID: m5LJKQ9tQ3+Jy6d55ET0JA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11615"; a="65508106"
-X-IronPort-AV: E=Sophos;i="6.19,311,1754982000"; 
-   d="scan'208";a="65508106"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2025 23:04:28 -0800
-X-CSE-ConnectionGUID: DR7IFLaZQWOwO9AuIQ7/3g==
-X-CSE-MsgGUID: QGJntOxRQuiBvCqrUR6USg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,311,1754982000"; 
-   d="scan'208";a="221265651"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa001.fm.intel.com with ESMTP; 16 Nov 2025 23:04:25 -0800
-Received: from mglak.igk.intel.com (mglak.igk.intel.com [10.237.112.146])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 87FE434334;
-	Mon, 17 Nov 2025 07:04:23 +0000 (GMT)
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Emil Tantilov <emil.s.tantilov@intel.com>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Josh Hay <joshua.a.hay@intel.com>
-Subject: [PATCH iwl-net] idpf: fix aux device unplugging when rdma is not supported by vport
-Date: Mon, 17 Nov 2025 08:03:49 +0100
-Message-ID: <20251117070350.34152-1-larysa.zaremba@intel.com>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1763363193; c=relaxed/simple;
+	bh=KDZd9YTazDXwxaHEWm8apDVEeSXEzTkuHWdA30q5ZJI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qwrhTCyBYk2J5FBVnyWqPJEDtapVx98RPB55/ErPg0YneUpCIw47vFxEYrzvnA7a2RSuujKnX8SDfvHX+qeL9FqQrHGdRJ+QysCR5MoiddE886kIYRhOFIibv6ZdcMCyFQagQUkUGEXd4MpxV177++Fteg7hJjeKmiX+Zy3qk1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ajEn9Lum; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61424C4CEFB;
+	Mon, 17 Nov 2025 07:06:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763363193;
+	bh=KDZd9YTazDXwxaHEWm8apDVEeSXEzTkuHWdA30q5ZJI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ajEn9LumigFa0k/MwaUalDCto9I/GU9myHvWejQEoX/l4a5N70RlXaG4RM8zdYQ5V
+	 q5AlLAiLHNyw8Auc2iXYWyjirLMUunXwVIJRBBTSm0CsBXfuSu+xp1aeJvKRvQOeP5
+	 IKKHSlAPe9WWC46RAq6JRoE5JZyQo7+xG0bXflZgM0Vh+hwzedx+BQgFK7ZKX1Y8mW
+	 MqbF7TvBfY0nFt0925Qvz0X/J+9PSYlxmYZlqngxcu/xVebBja/rs6K5Vnqat89cNL
+	 a0nVh6f8/YD5O81vU7tSUxSptEbbzIYEPaX4S8SbDgBkl70ZW1Da/53BDrTYOLa7hN
+	 kFR5h3B1TFZxg==
+Message-ID: <af101dba-b02f-4863-a893-789fa08124d0@kernel.org>
+Date: Mon, 17 Nov 2025 08:06:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 02/10] uaccess: Add speculation barrier to
+ copy_from_user_iter()
+To: Thomas Gleixner <tglx@linutronix.de>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Darren Hart <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>,
+ Andre Almeida <andrealmeid@igalia.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
+ <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org
+References: <cover.1762427933.git.christophe.leroy@csgroup.eu>
+ <598e9ec31716ce351f1456c81eee140477d4ecc4.1762427933.git.christophe.leroy@csgroup.eu>
+ <87jyzr9tuo.ffs@tglx>
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+Content-Language: fr-FR
+In-Reply-To: <87jyzr9tuo.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-If vport flags do not contain VIRTCHNL2_VPORT_ENABLE_RDMA, driver does not
-allocate vdev_info for this vport. This leads to kernel NULL pointer
-dereference in idpf_idc_vport_dev_down(), which references vdev_info for
-every vport regardless.
 
-Check, if vdev_info was ever allocated before unplugging aux device.
 
-Fixes: be91128c579c ("idpf: implement RDMA vport auxiliary dev create, init, and destroy")
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_idc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Le 15/11/2025 à 16:51, Thomas Gleixner a écrit :
+> On Thu, Nov 06 2025 at 12:31, Christophe Leroy wrote:
+>> The results of "access_ok()" can be mis-speculated.  The result is that
+>> you can end speculatively:
+>>
+>> 	if (access_ok(from, size))
+>> 		// Right here
+> 
+> This is actually the wrong patch ordering as the barrier is missing in
+> the current code. So please add the missing barrier first.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-index c1b963f6bfad..4b1037eb2623 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-@@ -322,7 +322,7 @@ static void idpf_idc_vport_dev_down(struct idpf_adapter *adapter)
- 	for (i = 0; i < adapter->num_alloc_vports; i++) {
- 		struct idpf_vport *vport = adapter->vports[i];
- 
--		if (!vport)
-+		if (!vport || !vport->vdev_info)
- 			continue;
- 
- 		idpf_unplug_aux_dev(vport->vdev_info->adev);
--- 
-2.47.0
+Patch 1 is there because Linus was worried with the performance 
+degradation brought by the barrier on x86, see [1]
 
+[1] 
+https://lore.kernel.org/all/CAHk-=wj4P6p1kBVW7aJbWAOGJZkB7fXFmwaXLieBRhjmvnWgvQ@mail.gmail.com/
+
+If we change the order, it means we first degrade performance on x86 
+with patch 1 then we fix that degradation with patch 2. It seems more 
+natural to first ensure that the barrier won't degrade x86 then add the 
+barrier.
+
+An alternative is to squash both patches together, after all they touch 
+the exact same part of the code.
+
+Let me know what you prefer:
+1/ Leave in that order to avoid intermediaite performance degradation on x86
+2/ Change order
+3/ Squash both patches together.
+
+> 
+> As a bonus the subject of the first patch makes actually sense
+> then. Right now it does not because there is nothing to avoid :)
+> 
+> Also please use the same prefix for these two patches which touch the
+> iter code.
+
+Sure I'll do that.
+
+> 
+>> For the same reason as done in copy_from_user() by
+>> commit 74e19ef0ff80 ("uaccess: Add speculation barrier to
+>> copy_from_user()"), add a speculation barrier to copy_from_user_iter().
+>>
+>> See commit 74e19ef0ff80 ("uaccess: Add speculation barrier to
+>> copy_from_user()") for more details.
+> 
+> No need to repeat that. Anyone with more than two braincells can look at
+> that commit, which you mentioned already two lines above already.
+
+Ok
+
+Thanks
+Christophe
 
