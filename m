@@ -1,273 +1,149 @@
-Return-Path: <netdev+bounces-239069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E1DC6373F
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:14:02 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B2CEC63803
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:21:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 916DA35776F
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:08:01 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 75DB3381DDA
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29984313264;
-	Mon, 17 Nov 2025 10:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA14258EE9;
+	Mon, 17 Nov 2025 10:12:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qb1uGttM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AgBjRhiv";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZKDL81uZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4103E273D6C
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 10:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05A22773E5
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 10:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763374071; cv=none; b=ubKh4LqgYwGaVnV05HPldnWfbRpWPDeR3cC0Aeg1WjKCFmemSP5yTEHo/v8J89kSoDvB4kk7x9D5XHAVbonEZMBFFeGftClL0Q8QV1aTmdynzGS7ZSwiTqXapRqPUZFIkrpOk47lw2h74E+4sEH+NNV4bDJ9jRib8xS0F+jdzRg=
+	t=1763374349; cv=none; b=s9WYfC5DQfmuWoqAM25nVx4Pl44YX+Gp8sGNtHqbdF5K56kfNfp10GvKWZeF9SUf94TKfGuMwUqNPSMrhNJpRZcabjt3rqMuQpb2DiP524DSbj8dT37FODfO3o6iSAj9mQP2vtdHBKQMkzwNOMlfxsCdXLxZ01MgpptSledIgmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763374071; c=relaxed/simple;
-	bh=IF6yvK2ms+70+OciBFn2fLgXZznNiC8VoinCIhoa4cU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PIq9L6hqjUMYgCsXxtPUT1HfshGqnlOY6f6pYVZs+l/sgRfmrnMtobXCi6D+BnxJfIj0c/8lmBl/iefjduPZMTKGjnmJDxbT71u1TZ5i7DOqO+baxRT0rIAOviGIzrD/CBUEVlhgO/f017lG4aeg1p0nSxOh8dzbvXDrRH1M0Nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qb1uGttM; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8823acf4db3so122164816d6.3
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 02:07:48 -0800 (PST)
+	s=arc-20240116; t=1763374349; c=relaxed/simple;
+	bh=CbXx2MwDmeepoNsVAnv/ib6Yv8SpxnAp2vU/CztUC0Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M6SDlinP7jYFRr1pBifqsBNTxcr+td/MMHSEXEzmP54LQyJITUESxavNdxSbjbkhmEiXH+fjwAXH83eg7Q++3/897EtsA6jBYrRjNBsLWJHIn7ZR9VwvwT6EHkcqcA/3UHyvP6L6Cg2/l+kI+ixNojOnH+tmTI4NPWw+klUeTKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AgBjRhiv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZKDL81uZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763374346;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zncjTQqPZzk4cXbDtL+l/by7XSRLqUhrGuMEs2VfYmc=;
+	b=AgBjRhiv9cjnX++cLpewVJ5slou3Qv0YaVfWhn8w4wST2fCljo5YecUTxd2CYlMZBbe2i7
+	Xf0wkqqJuzDyk+/xxdKj0u7jVp3pSEFtOLXDTP+VPua60x15z12MMVCVC4tQUGh/58a49D
+	bG3jNxFAqfVhLkMgXfvKOXSuwil+fYA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-36-neahLrFnNiyAq3HEAgekjA-1; Mon, 17 Nov 2025 05:12:25 -0500
+X-MC-Unique: neahLrFnNiyAq3HEAgekjA-1
+X-Mimecast-MFC-AGG-ID: neahLrFnNiyAq3HEAgekjA_1763374344
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-429c95fdba8so2145813f8f.0
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 02:12:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763374067; x=1763978867; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=F0LYgygcsjHje5ViQfQk9D0oGIeqekNR095M51xnun8=;
-        b=qb1uGttMVgImjcgyrkK6sj5rEnx/BCNpLoSHudxBxQr3lmu0HcqjHP4VANRAGterbO
-         FZvellG6S/XeoKjMkE8fr4xQQRCYnIYTO8xiiKAVM4MJEN1fqvNeS9kJxAXi97iKAx0D
-         kCw0Z6dl8pZIx4wsoOVIVbEfobEKUs9RsT9le7nB70d3vgNHuiB8+XE9Po9AgPDsOaAO
-         YxGQ2f7T0mC+25vJAltlBKL3K/N3H+FzXHABdydPbfF8+4QidW0/7L1qndqt/RhNvmer
-         dvIvIRga7BDoc9avJAtOS/dh/FtGxCZyy7+PWoB/wBh1LBzokhTCAgIoHfyB567H1NDb
-         2NTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763374067; x=1763978867;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=redhat.com; s=google; t=1763374344; x=1763979144; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=F0LYgygcsjHje5ViQfQk9D0oGIeqekNR095M51xnun8=;
-        b=bmk3bspWvHDXmQX77OpYi/JiAbxUH9nLDIHNjNQnHWwBmXYmjaL/FqrLIwovwjEDrj
-         5HKYMRdmmuH/lBD+XrqO4FteMT7z/YwbIR1zwk+3qwWNJyPDBut3iXk2H3c8xp20bqMF
-         jZmt2N0yNSvPQ0ClzMu73v72fWpDcMRYOKCGSYEDU6iy2gGgeUpx2KzkHM6eCyqnQsaE
-         +hAebCzkuKItMYRdmrlu9ItsedH6buI2fmsckuSmhMQVb4/RymrhgZRIBFCN9IbBeDPA
-         O2baiKzDa6PJRoqRtOWBX2VrGWoid1Vk3q9NLFU/P9q9J+C6clfyRUNVJLGGcqMnnyzv
-         LCeA==
-X-Forwarded-Encrypted: i=1; AJvYcCWFxqUZypIJ1KrdmBm8Z9DhpECna8SzjbZxl+16FCqtZpotSaCGSVOf4iUoYoQC/S0AFl1saXo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoNqflydBeQGv8QzwgwjHd0Zwv9mKrkB3apgNsU43lR+RWSmOI
-	keg3OUjaFi/odopBhWY6sod4tfLNCcccMjXH2hgKxyVDTc4lJo49ajV/OqFLPt56AkA1/kN+RaI
-	Eg2bOOnuHpzR2rw==
-X-Google-Smtp-Source: AGHT+IGrN1v6A7xJ7CammKKbWqq+b7c2XeEQ/te8T8JrbWLJzjvNlg4FyPaEt5J0fpgWhZ+SaAGQiJUQVdscoQ==
-X-Received: from qvag10.prod.google.com ([2002:a0c:f08a:0:b0:882:388c:d179])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:e48:b0:880:4d78:89ea with SMTP id 6a1803df08f44-882926cc205mr159362756d6.60.1763374067102;
- Mon, 17 Nov 2025 02:07:47 -0800 (PST)
-Date: Mon, 17 Nov 2025 10:07:44 +0000
+        bh=zncjTQqPZzk4cXbDtL+l/by7XSRLqUhrGuMEs2VfYmc=;
+        b=ZKDL81uZLmoakBmVPrhO0lE6nX0qjV2w9Ss3kFFwGfO0DKgf7h6v1pbkJtN0PqaeEK
+         434FhEM10PNo5ZmS99M+6nOnt6LsFOF6vxo3mzRDk84HAtzkOAtYGOrQ//rTrCC8jexx
+         h7YYuRGPx/SCP5zbMeLKxaPWuTv+At1HlIalJu0Ca2Rg9aDYyJRGwgzPrJZzM1cxRtpW
+         +GT/y2y1+j57d+LdOGLBitisOFX3KMiRlDLQssiSvytjd68Jrrph0ALBTM6KcRT6BBkt
+         npJ3crnnj2m+CRriSVjZPBwN/1aXKk0TASxRAFsJFd1ymy/w74T1oIsrKW8c0dv5l7Tu
+         x7yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763374344; x=1763979144;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zncjTQqPZzk4cXbDtL+l/by7XSRLqUhrGuMEs2VfYmc=;
+        b=RZybbraF9NToMxsjE7NgfctEiaKiL2P7jr3ZBi+c8gmcKosmhjpxx07GO+J21Ug+vj
+         PddELxmVeuf8Qx/mAAQovOejj6HlZXKeJq0+X6lIGtbRin6P4f8IAMsJ4zQEEcTcDy74
+         7qi678QVRk9Zwji7tILPpF9Qskr4Mn5SmFr39Mvqmd0VOz72Mk3lfKWohrZQVcusx1Ql
+         ZQAD3C17XXK31XqeqkDjZSD0spKlXwB7sAZe14odcceo9aHtF0gbGN/iT33KWq5iKyKi
+         XOmq33JEHGIYI4x6PapoICNBlIcT47mPr7G7SDiqRzqFMmpb4F93qXTMKHvON9LdPTxU
+         Q4Nw==
+X-Forwarded-Encrypted: i=1; AJvYcCUoWeqMGkPnBV/AhPi2anWXOfCDUXmKti/1Ke5GcbS5ifItELwjNxhMhokIWYT74lWlMfFcc3s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCklDHYWHlgUM7XuPYduq8HTYTFOG+cniI62qTJY8UkLiRYcA1
+	cnD5Z51HrixjxX03rD77uKo2/YFVpwQo/fabRNJwLO+79c+ZSkhxzyzKG38kHvzOHq0pfjwuBHQ
+	Zl3Cffh+Rl+KhV4YbOeLiAnd7n9uva0VE5PQSdVI6HtjNWDb/pTt/y4BK6A==
+X-Gm-Gg: ASbGnctOnMYuuAiPgCH+huFB29V33L9Agq6Ldm3SFuVgiFZsRRZkdnQ3Dx6UbPbUOZ+
+	Uxqj5AQjQlsEA69nlUvbkuPnuf5Q75cBEziSOJNLp7wXcb63uzaZ4ckSkaeuk1DWPcLM13xUqLQ
+	bvXj5z4P3eVnlw6NcUIrRGzGrQo4egN+9osgFWElwSQVU0bRvYrOeRw2f7XMotdV/dQ752vd4IJ
+	l2iIBabcuhxHFjwlFcuW7ri2WEM+am4lmMvgKMKy4RUCUfmPKvRzPiidKVuZcoOZYKqysdPMJ5l
+	Du4aDD8exp4jXDvtYcAt2Y6FSLkahVYCpoVrwUJ47rMAhrA+mKftWeTDer0GaqGXJQ4U1MGfTGc
+	rHXzGhbitBLn5
+X-Received: by 2002:a05:6000:2509:b0:42b:3978:158e with SMTP id ffacd0b85a97d-42b5936c71cmr9947370f8f.30.1763374343653;
+        Mon, 17 Nov 2025 02:12:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF4u81kWSQMevYnWrt/EGAk8IS9/Yiw+ZaDletTZC7VriVAPpg2eZbzSNPe7qG5leF2xm4aBQ==
+X-Received: by 2002:a05:6000:2509:b0:42b:3978:158e with SMTP id ffacd0b85a97d-42b5936c71cmr9947331f8f.30.1763374343261;
+        Mon, 17 Nov 2025 02:12:23 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.41])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e7ae47sm24872955f8f.4.2025.11.17.02.12.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Nov 2025 02:12:22 -0800 (PST)
+Message-ID: <74e58481-91fc-470e-9e5d-959289c8ab2c@redhat.com>
+Date: Mon, 17 Nov 2025 11:12:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251117100745.1913963-1-edumazet@google.com>
-Subject: [PATCH v2 net] mptcp: fix a race in mptcp_pm_del_add_timer()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang.tang@linux.dev>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	syzbot+2a6fbf0f0530375968df@syzkaller.appspotmail.com, 
-	Geliang Tang <geliang@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 3/3] net: use napi_skb_cache even in process
+ context
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Jason Xing <kerneljasonxing@gmail.com>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20251114121243.3519133-1-edumazet@google.com>
+ <20251114121243.3519133-4-edumazet@google.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251114121243.3519133-4-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-mptcp_pm_del_add_timer() can call sk_stop_timer_sync(sk, &entry->add_timer)
-while another might have free entry already, as reported by syzbot.
+On 11/14/25 1:12 PM, Eric Dumazet wrote:
+> This is a followup of commit e20dfbad8aab ("net: fix napi_consume_skb()
+> with alien skbs").
+> 
+> Now the per-cpu napi_skb_cache is populated from TX completion path,
+> we can make use of this cache, especially for cpus not used
+> from a driver NAPI poll (primary user of napi_cache).
+> 
+> We can use the napi_skb_cache only if current context is not from hard irq.
+> 
+> With this patch, I consistently reach 130 Mpps on my UDP tx stress test
+> and reduce SLUB spinlock contention to smaller values.
+> 
+> Note there is still some SLUB contention for skb->head allocations.
+> 
+> I had to tune /sys/kernel/slab/skbuff_small_head/cpu_partial
+> and /sys/kernel/slab/skbuff_small_head/min_partial depending
+> on the platform taxonomy.
 
-Add RCU protection to fix this issue.
+Double checking I read the above correctly: you did the tune to reduce
+the SLUB contention on skb->head and reach the 130Mpps target, am I correct?
 
-Also change confusing add_timer variable with stop_timer boolean.
+If so, could you please share the used values for future memory?
 
-syzbot report:
+Thanks!
 
-BUG: KASAN: slab-use-after-free in __timer_delete_sync+0x372/0x3f0 kernel/time/timer.c:1616
-Read of size 4 at addr ffff8880311e4150 by task kworker/1:1/44
-
-CPU: 1 UID: 0 PID: 44 Comm: kworker/1:1 Not tainted syzkaller #0 PREEMPT_{RT,(full)}
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-Workqueue: events mptcp_worker
-Call Trace:
- <TASK>
-  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
-  print_address_description mm/kasan/report.c:378 [inline]
-  print_report+0xca/0x240 mm/kasan/report.c:482
-  kasan_report+0x118/0x150 mm/kasan/report.c:595
-  __timer_delete_sync+0x372/0x3f0 kernel/time/timer.c:1616
-  sk_stop_timer_sync+0x1b/0x90 net/core/sock.c:3631
-  mptcp_pm_del_add_timer+0x283/0x310 net/mptcp/pm.c:362
-  mptcp_incoming_options+0x1357/0x1f60 net/mptcp/options.c:1174
-  tcp_data_queue+0xca/0x6450 net/ipv4/tcp_input.c:5361
-  tcp_rcv_established+0x1335/0x2670 net/ipv4/tcp_input.c:6441
-  tcp_v4_do_rcv+0x98b/0xbf0 net/ipv4/tcp_ipv4.c:1931
-  tcp_v4_rcv+0x252a/0x2dc0 net/ipv4/tcp_ipv4.c:2374
-  ip_protocol_deliver_rcu+0x221/0x440 net/ipv4/ip_input.c:205
-  ip_local_deliver_finish+0x3bb/0x6f0 net/ipv4/ip_input.c:239
-  NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
-  NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
-  __netif_receive_skb_one_core net/core/dev.c:6079 [inline]
-  __netif_receive_skb+0x143/0x380 net/core/dev.c:6192
-  process_backlog+0x31e/0x900 net/core/dev.c:6544
-  __napi_poll+0xb6/0x540 net/core/dev.c:7594
-  napi_poll net/core/dev.c:7657 [inline]
-  net_rx_action+0x5f7/0xda0 net/core/dev.c:7784
-  handle_softirqs+0x22f/0x710 kernel/softirq.c:622
-  __do_softirq kernel/softirq.c:656 [inline]
-  __local_bh_enable_ip+0x1a0/0x2e0 kernel/softirq.c:302
-  mptcp_pm_send_ack net/mptcp/pm.c:210 [inline]
- mptcp_pm_addr_send_ack+0x41f/0x500 net/mptcp/pm.c:-1
-  mptcp_pm_worker+0x174/0x320 net/mptcp/pm.c:1002
-  mptcp_worker+0xd5/0x1170 net/mptcp/protocol.c:2762
-  process_one_work kernel/workqueue.c:3263 [inline]
-  process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
-  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
-  kthread+0x711/0x8a0 kernel/kthread.c:463
-  ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-Allocated by task 44:
-  kasan_save_stack mm/kasan/common.c:56 [inline]
-  kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
-  poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
-  __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:417
-  kasan_kmalloc include/linux/kasan.h:262 [inline]
-  __kmalloc_cache_noprof+0x1ef/0x6c0 mm/slub.c:5748
-  kmalloc_noprof include/linux/slab.h:957 [inline]
-  mptcp_pm_alloc_anno_list+0x104/0x460 net/mptcp/pm.c:385
-  mptcp_pm_create_subflow_or_signal_addr+0xf9d/0x1360 net/mptcp/pm_kernel.c:355
-  mptcp_pm_nl_fully_established net/mptcp/pm_kernel.c:409 [inline]
-  __mptcp_pm_kernel_worker+0x417/0x1ef0 net/mptcp/pm_kernel.c:1529
-  mptcp_pm_worker+0x1ee/0x320 net/mptcp/pm.c:1008
-  mptcp_worker+0xd5/0x1170 net/mptcp/protocol.c:2762
-  process_one_work kernel/workqueue.c:3263 [inline]
-  process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
-  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
-  kthread+0x711/0x8a0 kernel/kthread.c:463
-  ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Freed by task 6630:
-  kasan_save_stack mm/kasan/common.c:56 [inline]
-  kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
-  __kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:587
-  kasan_save_free_info mm/kasan/kasan.h:406 [inline]
-  poison_slab_object mm/kasan/common.c:252 [inline]
-  __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
-  kasan_slab_free include/linux/kasan.h:234 [inline]
-  slab_free_hook mm/slub.c:2523 [inline]
-  slab_free mm/slub.c:6611 [inline]
-  kfree+0x197/0x950 mm/slub.c:6818
-  mptcp_remove_anno_list_by_saddr+0x2d/0x40 net/mptcp/pm.c:158
-  mptcp_pm_flush_addrs_and_subflows net/mptcp/pm_kernel.c:1209 [inline]
-  mptcp_nl_flush_addrs_list net/mptcp/pm_kernel.c:1240 [inline]
-  mptcp_pm_nl_flush_addrs_doit+0x593/0xbb0 net/mptcp/pm_kernel.c:1281
-  genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
-  genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
-  genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
-  netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
-  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
-  netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
-  netlink_unicast+0x846/0xa10 net/netlink/af_netlink.c:1346
-  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
-  sock_sendmsg_nosec net/socket.c:727 [inline]
-  __sock_sendmsg+0x21c/0x270 net/socket.c:742
-  ____sys_sendmsg+0x508/0x820 net/socket.c:2630
-  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
-  __sys_sendmsg net/socket.c:2716 [inline]
-  __do_sys_sendmsg net/socket.c:2721 [inline]
-  __se_sys_sendmsg net/socket.c:2719 [inline]
-  __x64_sys_sendmsg+0x1a1/0x260 net/socket.c:2719
-  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
-Reported-by: syzbot+2a6fbf0f0530375968df@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/691ad3c3.a70a0220.f6df1.0004.GAE@google.com/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Geliang Tang <geliang@kernel.org>
----
-v2: Updated/Added Reported-by:/Closes: tags now syzbot report finally reached netdev@ mailing list.
-
- net/mptcp/pm.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/net/mptcp/pm.c b/net/mptcp/pm.c
-index 2ff1b949956834aa5c78a1fcb40087aed43225ef..9604b91902b8bc3b831547cd693c28a4890aea31 100644
---- a/net/mptcp/pm.c
-+++ b/net/mptcp/pm.c
-@@ -18,6 +18,7 @@ struct mptcp_pm_add_entry {
- 	u8			retrans_times;
- 	struct timer_list	add_timer;
- 	struct mptcp_sock	*sock;
-+	struct rcu_head		rcu;
- };
- 
- static DEFINE_SPINLOCK(mptcp_pm_list_lock);
-@@ -155,7 +156,7 @@ bool mptcp_remove_anno_list_by_saddr(struct mptcp_sock *msk,
- 
- 	entry = mptcp_pm_del_add_timer(msk, addr, false);
- 	ret = entry;
--	kfree(entry);
-+	kfree_rcu(entry, rcu);
- 
- 	return ret;
- }
-@@ -345,22 +346,27 @@ mptcp_pm_del_add_timer(struct mptcp_sock *msk,
- {
- 	struct mptcp_pm_add_entry *entry;
- 	struct sock *sk = (struct sock *)msk;
--	struct timer_list *add_timer = NULL;
-+	bool stop_timer = false;
-+
-+	rcu_read_lock();
- 
- 	spin_lock_bh(&msk->pm.lock);
- 	entry = mptcp_lookup_anno_list_by_saddr(msk, addr);
- 	if (entry && (!check_id || entry->addr.id == addr->id)) {
- 		entry->retrans_times = ADD_ADDR_RETRANS_MAX;
--		add_timer = &entry->add_timer;
-+		stop_timer = true;
- 	}
- 	if (!check_id && entry)
- 		list_del(&entry->list);
- 	spin_unlock_bh(&msk->pm.lock);
- 
--	/* no lock, because sk_stop_timer_sync() is calling timer_delete_sync() */
--	if (add_timer)
--		sk_stop_timer_sync(sk, add_timer);
-+	/* Note: entry might have been removed by another thread.
-+	 * We hold rcu_read_lock() to ensure it is not freed under us.
-+	 */
-+	if (stop_timer)
-+		sk_stop_timer_sync(sk, &entry->add_timer);
- 
-+	rcu_read_unlock();
- 	return entry;
- }
- 
-@@ -415,7 +421,7 @@ static void mptcp_pm_free_anno_list(struct mptcp_sock *msk)
- 
- 	list_for_each_entry_safe(entry, tmp, &free_list, list) {
- 		sk_stop_timer_sync(sk, &entry->add_timer);
--		kfree(entry);
-+		kfree_rcu(entry, rcu);
- 	}
- }
- 
--- 
-2.52.0.rc1.455.g30608eb744-goog
+Paolo
 
 
