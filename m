@@ -1,129 +1,146 @@
-Return-Path: <netdev+bounces-239080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0467BC638C6
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:30:42 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F0B7C63958
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:37:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7236A358940
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:23:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F34FC35562A
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:29:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43AFE2D6620;
-	Mon, 17 Nov 2025 10:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26323326D62;
+	Mon, 17 Nov 2025 10:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Ljua8/tf"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="GU+tdo9d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEF530F957
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 10:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675F23246F4;
+	Mon, 17 Nov 2025 10:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763374990; cv=none; b=fcwd5aCNOGqcLOtGkEa7eqmk3Ho+O+K8prD0nNoRa9+8vTtSmfFe9HEWHetLkN8jMdMAlvXvZmEfkLcRpvMQWgRJtPS5h29+0gh/o2+zssFTdiTuHtEmdUPmvJiKz0887NMNw6a4hlVqRUqISOE1fL0B1bXbd5aAYGnASXLt+7M=
+	t=1763375390; cv=none; b=nV2fCDRJFy70ApROdjTlZzPLOc+/ks3vvIB0mz95lAGvfI07l4US4daR9vNGOMoJwbq+wAghZd8kDnDWmD5/vkmq+MH1PyGBdlGwFDsJ5IbrqGf9P/kgvu5KRWtEdVxy27TT0gg92Yry8fkGCBRTnlWw7/1IPQL+RU3F/PDH0aU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763374990; c=relaxed/simple;
-	bh=qpXIJgb3AgYnf28XYf0pACQ8tP7TbIr0r51h3GEwpsc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MlbkIS6uBKL+X1JRRolNr9uinfhZWcNAUpNzrSuf1LsjmbjM1b2z5eNBN/wsJIHM0oNmi7uWjXVoZhH8XSmtG5tEUWVF18dELwP1Bz2KCG1jNjdgJZC1obHJjtGevaoY9ikFLomkdspZjyjllCb5OIKQ+Jt2nY/G+VW9p/hBJvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Ljua8/tf; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AH9uoLI012025;
-	Mon, 17 Nov 2025 10:22:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=DDnGEVSvCpUNQAbRmBxXcKjjqev9m
-	c/oqa07zTkHqPo=; b=Ljua8/tfbi+ggaLOKsDAQ4QvH7a7BGYdoGYYmlTXRUCty
-	Ctrrjg2PRdMk7kFgNIlh5qSM03qomd0IHnKM0MZMeW7RFd0D+RRjM4Po7K3eOkNa
-	JproPJTfMlMh9T4kXhPsfwh6dDldVSphkfkDtM3pYyFKUG2BRLziI24c6yOluJCp
-	xN40yDdNiE2WfhxqaH6/ozfxKaAV123dfwIoBhvMG5AahCEbNM//+Le0ph8BxhvG
-	t07LE/AISLDBo5PD4srytS6O97WngaF/SimtgDHzqWdLFEgfAXNnKu8mIC8Hvdg6
-	yJIhywBdSg0OjreQpOzxX4ZEffORYnQRyG51/yWog==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4aej8j27dd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 17 Nov 2025 10:22:51 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AH84Ebf039880;
-	Mon, 17 Nov 2025 10:22:51 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4aefyhs7w7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 17 Nov 2025 10:22:51 +0000
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AHAMoOf004472;
-	Mon, 17 Nov 2025 10:22:50 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4aefyhs7vh-1;
-	Mon, 17 Nov 2025 10:22:50 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: michal.kubiak@intel.com, przemyslaw.kitszel@intel.com,
-        aleksander.lobakin@intel.com, anthony.l.nguyen@intel.com,
-        andrew+netdev@lunn.ch, kuba@kernel.org, davem@davemloft.net,
-        edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
-Subject: [PATCH net] idpf: Fix incorrect NULL check in completion descriptor release
-Date: Mon, 17 Nov 2025 02:22:25 -0800
-Message-ID: <20251117102244.9188-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1763375390; c=relaxed/simple;
+	bh=11WCVSQi7WSMcRA/kPRYCx0+lw6fEUZxQC+T62+OzpM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KTsPYAEIV+NXlZfKnX2k3NyKq7JExM5qXUzX2BsclTyCE38v/0EHxWWBFl5T3ak6quoe8TSANO8Xm8xZUVknGC/VFpUl9z2ZeYpI3w0xERYQ2mXa/gcqUWip1hf6CoP/vYhL9vc6B3BW1v3BY/wpFCSJT/pRBqiLrFhMLnkkNk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=GU+tdo9d; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=rv6MtM2pUN156UE3QyvoPDKfGCrRCp91YMwWq3nhOp0=; b=GU+tdo9dWfId+JgLjJRh0foncP
+	IJ7dKaFnvBArq722OOdHnV8J1hx6/s803gpwA4hMLDSF1afJ6/vyLohvPhE6hl1HmrUUqwoUJZRoi
+	FMND60yvZjRMyJEvxE9j1+EB2epGuVnJs2Fb+Iec2iy5V5D9ODrsI54HswovIOFPYlKGgAEvACVD9
+	oWYDTHWjGFR4GqM2fxM6NLnkhjRTNdH0Em4TQ/bNM0wdyDgFmUC8so5RbFnnzJNYGXYspoEsCk8Md
+	cLlnzJaXQgiuZtvjHHBBI6O0NDz3jrZG9JWdtuikNzzJhbNsMg9ch2sLXQx0JmV6sbKzye0j1N0yc
+	YGpH3dnQ==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vKwUG-00EN0c-N7; Mon, 17 Nov 2025 10:29:32 +0000
+Date: Mon, 17 Nov 2025 02:29:28 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Andre Carvalho <asantostc@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v4 4/5] netconsole: resume previously
+ deactivated target
+Message-ID: <vkeh46iukvsensit3vrqxolz5vxvgs2bvbuprkmpznqvefm4wj@bdz4buh3r3cb>
+References: <20251116-netcons-retrigger-v4-0-5290b5f140c2@gmail.com>
+ <20251116-netcons-retrigger-v4-4-5290b5f140c2@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-17_02,2025-11-13_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0 spamscore=0
- adultscore=0 mlxscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
- definitions=main-2511170087
-X-Proofpoint-ORIG-GUID: C8xvwBz8nwkZQ88fkuFvTqnZg8T1qbSL
-X-Proofpoint-GUID: C8xvwBz8nwkZQ88fkuFvTqnZg8T1qbSL
-X-Authority-Analysis: v=2.4 cv=I7xohdgg c=1 sm=1 tr=0 ts=691af77b b=1 cx=c_pps
- a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
- a=uA2SwY9BN-IQXUrAw9wA:9 cc=ntf awl=host:12099
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMSBTYWx0ZWRfX0I51Wzgbvs3a
- 6g6X2dcxbZq+oazeh2Xg1loFoK10MRWWUSWE0Jvx+1vkJSXOwzc1Q61ZjjEX5tsurMyI1d6q+1s
- r68mOL/GtfOJjDCa15WNuywWgHwVfOZEop4UNey4Ierj5vCp0q8whg67kgWImutMPEmYZAD7Not
- cUtUvCXzGpNFWnZvEO/FTepjc7CVHcV61N2AyzBijs3eI8HYhr1/voqtSs02fFq319A+AYwlPHS
- Tz99yL5Q7GMtk3etbZF4uScWG59RvWId2QjH3y0vfWJG4+tmUZ/ECfwfwY9r5080nexgJhz46fp
- /cNgYTvLKYHk5M+KOP4myEPizF8LANWSh6poIq8oMHZ/iE9IDfFaKPuRIRp5UHlpvCOSwkNarqw
- RUdM7RGKfAr+KAawyjHx0ca1AObiEs5y5HNJ5mWGHeDcSRxQltE=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251116-netcons-retrigger-v4-4-5290b5f140c2@gmail.com>
+X-Debian-User: leitao
 
-idpf_compl_queue uses a union for comp, comp_4b, and desc_ring.
-The release path should check complq->desc_ring to determine whether the
-DMA descriptor ring was allocated. The existing check against
-complq->comp is incorrect, as only desc_ring reliably reflects the
-allocation status.
+Hello Andre,
 
-Fixes: cfe5efec9177 ("idpf: add 4-byte completion descriptor definition")
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Given you are going to respin this oen due to the NIPA errors, let me
+get some nits I found.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 828f7c444d30..1e7ae6f969ac 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -134,7 +134,7 @@ static void idpf_compl_desc_rel(struct idpf_compl_queue *complq)
- {
- 	idpf_xsk_clear_queue(complq, VIRTCHNL2_QUEUE_TYPE_TX_COMPLETION);
- 
--	if (!complq->comp)
-+	if (!complq->desc_ring)
- 		return;
- 
- 	dma_free_coherent(complq->netdev->dev.parent, complq->size,
--- 
-2.50.1
+On Sun, Nov 16, 2025 at 05:14:04PM +0000, Andre Carvalho wrote:
 
+> +/* Attempts to resume logging to a deactivated target. */
+> +static void maybe_resume_target(struct netconsole_target *nt,
+> +				struct net_device *ndev)
+
+nit: s/maybe_resume_target/resume_target/
+
+> +{
+> +	int ret;
+> +
+> +	ret = __netpoll_setup(&nt->np, ndev);
+> +	if (ret) {
+> +		/* netpoll fails setup once, do not try again. */
+> +		nt->state = STATE_DISABLED;
+> +		return;
+> +	}
+> +
+> +	netdev_hold(ndev, &nt->np.dev_tracker, GFP_KERNEL);
+
+In netpoll_setup(), it calls netdev_hold() first, and then
+call __netpoll_setup(). Shouldn't net device be held before trying to to
+setup netpoll()?
+
+> +static bool deactivated_target_match(struct netconsole_target *nt,
+> +				     struct net_device *ndev)
+> +{
+> +	if (nt->state != STATE_DEACTIVATED)
+> +		return false;
+> +
+> +	if (bound_by_mac(nt))
+> +		return !memcmp(nt->np.dev_mac, ndev->dev_addr, ETH_ALEN);
+> +	return !strncmp(nt->np.dev_name, ndev->name, IFNAMSIZ);
+> +}
+> +
+> +/* Process targets in resume_list and returns then to target_list */
+
+s/then/them
+
+> +static void process_resumable_targets(struct list_head *resume_list,
+> +				      struct net_device *ndev)
+
+nit: s/process_resumable_targets/netconsole_process_resumable_tagets/
+
+The name is not the best, but it matches a similar function
+(netconsole_process_cleanups_core())
+
+> @@ -1475,6 +1537,11 @@ static int netconsole_netdev_event(struct notifier_block *this,
+>  				stopped = true;
+>  			}
+>  		}
+> +		if (event == NETDEV_UP && deactivated_target_match(nt, dev))
+> +			/* maybe_resume_target is IRQ unsafe, remove target from
+> +			 * target_list in order to resume it with IRQ enabled.
+> +			 */
+> +			list_move(&nt->list, &resume_list);
+>  		netconsole_target_put(nt);
+>  	}
+>  	spin_unlock_irqrestore(&target_list_lock, flags);
+> @@ -1498,6 +1565,8 @@ static int netconsole_netdev_event(struct notifier_block *this,
+>  			dev->name, msg);
+>  	}
+>  
+> +	process_resumable_targets(&resume_list, dev);
+
+Nice, this new approach looks cleaner now.
+
+--breno
 
