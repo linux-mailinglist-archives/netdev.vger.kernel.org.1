@@ -1,155 +1,129 @@
-Return-Path: <netdev+bounces-239079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E5D5C638CF
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:31:19 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0467BC638C6
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:30:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6CDB84F607A
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:22:37 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7236A358940
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F6E2D47E4;
-	Mon, 17 Nov 2025 10:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43AFE2D6620;
+	Mon, 17 Nov 2025 10:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ffXqzCbi"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Ljua8/tf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA1828506C
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 10:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEF530F957
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 10:23:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763374914; cv=none; b=nNlSwLMwj4ZIsqYzSpiutvzZztV53CDbhxLhdJrGmmYsn6JyBBitE4NisE3fNek8EI48G+Y6pZXYa++tqe3XBTOepMWQ3ZCJ69SkVd9I632Ka1+b0TE0PQL47d+4h+go28EY7U8DLCqAKXDzDZXXR/SXtEql+fvy6CzyzEwa13g=
+	t=1763374990; cv=none; b=fcwd5aCNOGqcLOtGkEa7eqmk3Ho+O+K8prD0nNoRa9+8vTtSmfFe9HEWHetLkN8jMdMAlvXvZmEfkLcRpvMQWgRJtPS5h29+0gh/o2+zssFTdiTuHtEmdUPmvJiKz0887NMNw6a4hlVqRUqISOE1fL0B1bXbd5aAYGnASXLt+7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763374914; c=relaxed/simple;
-	bh=CscepbcOC8+QzaBdcyDmuDNMM7WVrlZmU0atPfWVUdI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hRMatt3LNlroOwlFqOCFzIeoYJl631uR3hV4obqMizZ/pCx4pzawfPk8zOOvhfkUH0VcRc5QIhOQXPl/tVrXoqysaqQDSp9K4dU3DZvvmzKt9Y3n9QxKZMtZ7RubIz2cRI5G5Wo4f95HWjGS91FsACnkLDV1IgzlMEp/FARsrUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ffXqzCbi; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4ee2014c228so6332401cf.2
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 02:21:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763374912; x=1763979712; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CscepbcOC8+QzaBdcyDmuDNMM7WVrlZmU0atPfWVUdI=;
-        b=ffXqzCbiqDP92IyKiDiYvM9J/YeTgdd+iFHRHjxlOzSVeERVhi3SDxvBXmGHZspN6t
-         i+Z9baPwov4/webpt7RxOMp2ykf+VmiuKjeTA+nEPy4MmMh2F8TQt2GKsBdSjLTm30JQ
-         kgnqMzdp2RIccIyoj6jv6TpvemQBhymfcU2qdQTH6ljcG7So9H0Uv5Tkf+I8yeNWS8Jt
-         rGfrpBx1EU24Zqnr35tEM/6do4Tx6V/CZFsrEd7E9R80fRvmG4G6twT9YwUVUa2QdbS0
-         MihGszn2kQ/D4m0FkQ+KzDM9qAD2+n041fgn3XMjYEc2HN0mhWfPJJD5+qAm01j8ciMS
-         MTcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763374912; x=1763979712;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CscepbcOC8+QzaBdcyDmuDNMM7WVrlZmU0atPfWVUdI=;
-        b=bdR5ypnJuRQ5C+3lQBDJ4ylEAUqvRS5lNVnOzd0zA7qOtE1RCBExsSNsOOQjjqVL7Z
-         Y4IlDbSec9TKS9q02Xr1BTO+VQbCEwvM8RCiV+kMIBzdCCuRkACuUhKtx2+XA0Dz8JS0
-         xqINcp604a6VZe8fudKiZYsCyEt3yXgVHnWjjIabxRG/x91gf+sxBr2ZBxpJsFiuC704
-         ZMqPS6h5EPo7vORMp84OvZ5qyrR94xb4bpHQgye1ZJrkpW5ulc6p5+rqd7nwJKSF+xqH
-         fQ1L8CZu4gwJVkNX3rwsWA9Z1R9exnbTihVlqmlP15O+cjhCXpCJmaAV0GfAdg57Zp2T
-         CLiw==
-X-Forwarded-Encrypted: i=1; AJvYcCXEE8gJiL47o64gVO9xm9dnAXwYsVFpP7o/M6jasY0kXT3BFxA6VnR/JBsJ+Nm0iSP1Fbmiaow=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8lBOJiVGyw85Z8lgCLgsQ908+OlQtNHHmTAzoVvbJKQq0Mz0u
-	mENAM5nDNEOs9rKkITKqiaQ1HewZDXj963awvY0wnXk5E8YTtWogsWC1Evr4UTqS3Q6rzaWh+cF
-	wNww81Gs7g74OjCoXWPVvJcq2jvmkaHs4U0+umXZ2
-X-Gm-Gg: ASbGncuh5CAd3qsAUVmSxuFr3ooGAaQBX/VDaTlFudL8sAxGAU0XvibbSyLGyXyCDVr
-	0cTXhnHcoU8Lt02jugOLBssgBdIZdScx2CqFJI2huMxSAlSDQC/n8PpOmH3ebTbTmTIB67VqbeA
-	XS1e9CW3pZJ0eqJm88XvAKITtmjQdTcCHSezRcSRQ2ZEDV8pBedz91tG7Z+91kJSy1vL+2rwD47
-	WPqFBk2SpfnGaGLy7YeWkL3BXSY3NSORFNSZCUCwaRiX4Xp+6lITtChKAvh7Mopo73sB/U=
-X-Google-Smtp-Source: AGHT+IFuyeGLLK13zsnocUzaJFJkkgmncQZ5EJyPpMfJYBBiLNIQzzaWJF6Xzmc1TFVxKe5vOTDTGf7jMugC9Qgz+cc=
-X-Received: by 2002:ac8:7dd3:0:b0:4ee:2541:6540 with SMTP id
- d75a77b69052e-4ee2541b583mr19702501cf.55.1763374911520; Mon, 17 Nov 2025
- 02:21:51 -0800 (PST)
+	s=arc-20240116; t=1763374990; c=relaxed/simple;
+	bh=qpXIJgb3AgYnf28XYf0pACQ8tP7TbIr0r51h3GEwpsc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MlbkIS6uBKL+X1JRRolNr9uinfhZWcNAUpNzrSuf1LsjmbjM1b2z5eNBN/wsJIHM0oNmi7uWjXVoZhH8XSmtG5tEUWVF18dELwP1Bz2KCG1jNjdgJZC1obHJjtGevaoY9ikFLomkdspZjyjllCb5OIKQ+Jt2nY/G+VW9p/hBJvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Ljua8/tf; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AH9uoLI012025;
+	Mon, 17 Nov 2025 10:22:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=DDnGEVSvCpUNQAbRmBxXcKjjqev9m
+	c/oqa07zTkHqPo=; b=Ljua8/tfbi+ggaLOKsDAQ4QvH7a7BGYdoGYYmlTXRUCty
+	Ctrrjg2PRdMk7kFgNIlh5qSM03qomd0IHnKM0MZMeW7RFd0D+RRjM4Po7K3eOkNa
+	JproPJTfMlMh9T4kXhPsfwh6dDldVSphkfkDtM3pYyFKUG2BRLziI24c6yOluJCp
+	xN40yDdNiE2WfhxqaH6/ozfxKaAV123dfwIoBhvMG5AahCEbNM//+Le0ph8BxhvG
+	t07LE/AISLDBo5PD4srytS6O97WngaF/SimtgDHzqWdLFEgfAXNnKu8mIC8Hvdg6
+	yJIhywBdSg0OjreQpOzxX4ZEffORYnQRyG51/yWog==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4aej8j27dd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 17 Nov 2025 10:22:51 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AH84Ebf039880;
+	Mon, 17 Nov 2025 10:22:51 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4aefyhs7w7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 17 Nov 2025 10:22:51 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AHAMoOf004472;
+	Mon, 17 Nov 2025 10:22:50 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4aefyhs7vh-1;
+	Mon, 17 Nov 2025 10:22:50 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: michal.kubiak@intel.com, przemyslaw.kitszel@intel.com,
+        aleksander.lobakin@intel.com, anthony.l.nguyen@intel.com,
+        andrew+netdev@lunn.ch, kuba@kernel.org, davem@davemloft.net,
+        edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
+Subject: [PATCH net] idpf: Fix incorrect NULL check in completion descriptor release
+Date: Mon, 17 Nov 2025 02:22:25 -0800
+Message-ID: <20251117102244.9188-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251117100745.1913963-1-edumazet@google.com> <c378da30-4916-4fd6-8981-4ab2ffa17482@kernel.org>
-In-Reply-To: <c378da30-4916-4fd6-8981-4ab2ffa17482@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 17 Nov 2025 02:21:40 -0800
-X-Gm-Features: AWmQ_bnU5NstPoC22fhtPKBluYRKne26knFThnGv-8-dn_lLDtNWHNSVtBVnj30
-Message-ID: <CANn89iLxt+F+SrpgXGvYh9CZ8GNmbbowv5Ce80P1gsWjaXf+CA@mail.gmail.com>
-Subject: Re: [PATCH v2 net] mptcp: fix a race in mptcp_pm_del_add_timer()
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang.tang@linux.dev>, 
-	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot+2a6fbf0f0530375968df@syzkaller.appspotmail.com, 
-	Geliang Tang <geliang@kernel.org>, MPTCP Linux <mptcp@lists.linux.dev>, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-17_02,2025-11-13_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0 spamscore=0
+ adultscore=0 mlxscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
+ definitions=main-2511170087
+X-Proofpoint-ORIG-GUID: C8xvwBz8nwkZQ88fkuFvTqnZg8T1qbSL
+X-Proofpoint-GUID: C8xvwBz8nwkZQ88fkuFvTqnZg8T1qbSL
+X-Authority-Analysis: v=2.4 cv=I7xohdgg c=1 sm=1 tr=0 ts=691af77b b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
+ a=uA2SwY9BN-IQXUrAw9wA:9 cc=ntf awl=host:12099
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMSBTYWx0ZWRfX0I51Wzgbvs3a
+ 6g6X2dcxbZq+oazeh2Xg1loFoK10MRWWUSWE0Jvx+1vkJSXOwzc1Q61ZjjEX5tsurMyI1d6q+1s
+ r68mOL/GtfOJjDCa15WNuywWgHwVfOZEop4UNey4Ierj5vCp0q8whg67kgWImutMPEmYZAD7Not
+ cUtUvCXzGpNFWnZvEO/FTepjc7CVHcV61N2AyzBijs3eI8HYhr1/voqtSs02fFq319A+AYwlPHS
+ Tz99yL5Q7GMtk3etbZF4uScWG59RvWId2QjH3y0vfWJG4+tmUZ/ECfwfwY9r5080nexgJhz46fp
+ /cNgYTvLKYHk5M+KOP4myEPizF8LANWSh6poIq8oMHZ/iE9IDfFaKPuRIRp5UHlpvCOSwkNarqw
+ RUdM7RGKfAr+KAawyjHx0ca1AObiEs5y5HNJ5mWGHeDcSRxQltE=
 
-On Mon, Nov 17, 2025 at 2:15=E2=80=AFAM Matthieu Baerts <matttbe@kernel.org=
-> wrote:
->
-> Hi Eric,
->
-> (+cc MPTCP ML)
->
-> On 17/11/2025 11:07, Eric Dumazet wrote:
-> > mptcp_pm_del_add_timer() can call sk_stop_timer_sync(sk, &entry->add_ti=
-mer)
-> > while another might have free entry already, as reported by syzbot.
-> >
-> > Add RCU protection to fix this issue.
->
-> Thank you for the report and even more for the fix!
->
-> > Also change confusing add_timer variable with stop_timer boolean.
->
-> Indeed, this name was confusing: 'add_timer' is in fact a (too) short
-> version of "additional address signalling retransmission timer". This
-> new 'stop_timer' boolean makes sense!
->
-> > syzbot report:
->
-> (...)
->
-> > Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
-> > Reported-by: syzbot+2a6fbf0f0530375968df@syzkaller.appspotmail.com
-> > Closes: https://lore.kernel.org/netdev/691ad3c3.a70a0220.f6df1.0004.GAE=
-@google.com/
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > Cc: Geliang Tang <geliang@kernel.org>
->
-> The modification looks good to me:
->
-> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
->
-> While at it, just to help me to manage the backports:
->
-> Cc: stable@vger.kernel.org
->
-> > v2: Updated/Added Reported-by:/Closes: tags now syzbot report finally r=
-eached netdev@ mailing list.
->
-> Out of curiosity, is it not OK to reply to the patch with the new
-> Reported-by & Closes tags to have them automatically added when applying
-> the patch? (I was going to do that on the v1, then I saw the v2 just
-> when I was going to press 'Send' :) )
+idpf_compl_queue uses a union for comp, comp_4b, and desc_ring.
+The release path should check complq->desc_ring to determine whether the
+DMA descriptor ring was allocated. The existing check against
+complq->comp is incorrect, as only desc_ring reliably reflects the
+allocation status.
 
-I am not sure patchwork has been finally changed to understand these two ta=
-gs.
+Fixes: cfe5efec9177 ("idpf: add 4-byte completion descriptor definition")
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->
-> I don't mind having a v2, it is just to save you time later, but maybe
-> there is another reason.
->
-> Cheers,
-> Matt
-> --
-> Sponsored by the NGI0 Core fund.
->
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 828f7c444d30..1e7ae6f969ac 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -134,7 +134,7 @@ static void idpf_compl_desc_rel(struct idpf_compl_queue *complq)
+ {
+ 	idpf_xsk_clear_queue(complq, VIRTCHNL2_QUEUE_TYPE_TX_COMPLETION);
+ 
+-	if (!complq->comp)
++	if (!complq->desc_ring)
+ 		return;
+ 
+ 	dma_free_coherent(complq->netdev->dev.parent, complq->size,
+-- 
+2.50.1
+
 
