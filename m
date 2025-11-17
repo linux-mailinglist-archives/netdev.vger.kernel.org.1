@@ -1,177 +1,193 @@
-Return-Path: <netdev+bounces-239092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECC6DC63AE0
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:59:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F18AC63B14
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 12:02:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 991EB3503B3
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:59:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 054144E9552
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726FC30F7E2;
-	Mon, 17 Nov 2025 10:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04ECD248166;
+	Mon, 17 Nov 2025 11:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gs/ubxC0"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="id4994FU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BBFD275AFD
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 10:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C829827280F
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 11:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763377181; cv=none; b=dtLkmMwlxFjit2A8AvDK1NttAXl8deIlbvm/hh0/JYz1X9BnvWVIwr1pCkhuHNz6JsW3cGDNyx51on+HkYOi0eLIr1wmTojlE+STgcMmKnM3MbtUvvlFyKESCM5Uh8hqkDrpnp9fDqc33oazUjkl7P8ijFZMWWQrT8DBIxYNn4s=
+	t=1763377277; cv=none; b=FzOiT4ZyW63DaVQgenD7aJP7m05PR9HkX/UOPtWIFM/Oy0ygfz8OKutntxEsEpkWYbLQFYaJcEYqj8XfpQQxkR5yA3oyhfWYOlsKhUsudWEx03sj74CfiEar3KihdYxv/BD4KsKyfXcV8TmYOGWW9NHuadzVrrPFpHkAeOj+cTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763377181; c=relaxed/simple;
-	bh=KdvwBPY7AetBGEMf1EuZxOlNview9UcQHeOfhC2vhmM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qhc0Xs4RruUsJPhmvCJTIpsFKMXrFw2oa7Im9tDIS+P+DUmhKOXI6McYJPCtCj1t49qsOuzi731JrrSDya6MFHc7geL9EKiMdM5yYwu+dM05lnmwgCDRo4bxpUaBxQlLU0+jFarh7AMWutD+jy6AAYFiIvXgA92jpudTFRgKoBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gs/ubxC0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4752C2BC86;
-	Mon, 17 Nov 2025 10:59:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763377180;
-	bh=KdvwBPY7AetBGEMf1EuZxOlNview9UcQHeOfhC2vhmM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Gs/ubxC0sXHiTk8JuVAnmRBe9VymFiAjlIO19TMjmHZ7D1QFCa4EXztwBtFEc6yqe
-	 +gAn0RgweM2kYPdnNinmVCBcxe7umwtYpjQtriEa3lpKjJ3+HDuWIOX5hoaVkEFFm0
-	 J7/o4rBTB+jlRzS9okD73/inqzdhHhSEGU9C/pSpsddKBG5T2rBzdWOsbb4jpPjxGk
-	 hz65VRDYzRsan1VKQzXIV1nhWTwbQJoU0dRuGFOWdTVnQUhhd51R3poTBjmm1P+Hq8
-	 tEjBVOIzDHq9FP+rSywniGEFiIoDIETgA9EGM7JbZ5cHMmmyeScj9EsM7fSiusoHD4
-	 1NYhHGVpcWEZQ==
-Message-ID: <b3041d17-8191-4039-a307-d7b5fb3ea864@kernel.org>
-Date: Mon, 17 Nov 2025 11:59:32 +0100
+	s=arc-20240116; t=1763377277; c=relaxed/simple;
+	bh=7DAQpoB3R+EJpl7MbBOx5A+ZlzdqP6pGt/EDi4xzIlE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tQWGGjt0utb/9eAcIDxy08JFGX/2X6WTvUUlRxruDZtyg9SZsGD6cAf8Gmy5PVSe8EG5yzYNpwHwMcvF8T6o5Pb3Dxn0CElXcbGY0YiZb5n/8irjJHEB7Sz7dx7gNn0fipVuAD8VJzeY+HFtILkWSV9HmcIEi5n2w3bwjpf999s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=id4994FU; arc=none smtp.client-ip=74.125.224.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-64107188baeso3653925d50.3
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 03:01:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1763377274; x=1763982074; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=/RSfdrwfxNJQiZz80hQXf9twz6yOQXKrW5ZfA5HxaxE=;
+        b=id4994FUPu51IRxHSspL9L3GiejmCAA8gq+5m8V5Qy/ts2ASYoQqTsF8SrZu1qJCqD
+         GUQLU1kAdP494s0MaMxk3g+bRWbLLQ5BPI6XIxP0wC9S3V9humxsjMA8QeCi1B/LHm5w
+         AXkpQrcUklRFpcssfQSH+obec9yFZUY19vuPSsAFftk2+3eEeuw6/DJGcfvHxXox61cA
+         i/3/UzvFQ9JdBpOWPQhGbPX5FT90aWLV8Y+ch9DgbpdNXYBbMtOxJibX6lfYdgRopu1w
+         tz3NewpHxpPpKQS3POc517AagIYVuMrvQtXQ5yFz/1WKQ5Nws47JvpRs7mMY5pTSnsWK
+         jK+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763377274; x=1763982074;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/RSfdrwfxNJQiZz80hQXf9twz6yOQXKrW5ZfA5HxaxE=;
+        b=DnV49uN0AtSn4FjNftoPA4vDRMILWGwzUDaIBLRK9r+7FZE+TPe+QjJJ+tOIRX85I1
+         s+ksxCfbsbctIWrFTq6+aIevPgFbpw/grYmzo3Y6T/1r+nBHRVMscMS3MmJo5mTsZ+0T
+         amNnP2+JAlPN3McjdEvvZ0QIu6XJ5lG+Zf97HEEEsII8LXmdwn0cpudokxkZwv3S91Gv
+         jRgSI9ZoGgnnz4awp6N3k8wOnnmMnkEF3ttr1boVbWFb/4Z/0jXACbjN2HsJDarzGau0
+         gxogb1XWD6bpMgwnpU+qLVNTUvg85DHYXlL57wv9uStP+GDFzjhA5kDq676wG5V6ppBF
+         uFSA==
+X-Forwarded-Encrypted: i=1; AJvYcCVphdjkykS5CkFxZ8/sQGYAbjFPj0BuDeGBDrvl0JQ1719mNj2spgouQ5cX5NNdV+kEAefDUco=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy23DoC5TCFAelJb4xmXSLPICXTnRTnT5fQL3yfp8dcbRnYqfy3
+	ziEwjdOJH3IReEW06DbG93kV0s+jtLtrD/aizYCidD5XMb6NG8SzWeBufUbxdBolS5uyo/hylL2
+	25I3XM/tzjlvf0qNYUlf4h6qFE7ji25EJOMgPLpvb6w==
+X-Gm-Gg: ASbGncv2K07BzCfCxQ9kBJ2kLaKHf6NPCdrtTg/y0fz4i/VMTZ87EIzzF80h6ruI2Q2
+	uNAu82z2qO+u+nyC0m2pxRYR4exSqq7UWA04V2/DXFQZAdW0/0IoWHlAlL6p6XzkPE80kDYHhnP
+	BZ51rUvAmE9vXZaC3r2RhlGrursWxyrftVxzTISfXWDenMEL3IW/tAk0ujLVWNR3pIqxqzjbJw8
+	QUH7TNa4S/V5tmmkEhwJk7/+HPrlYJ+eznmMk+7h0dHdBOvVZVWrdC5hGJqD4tT3jJ66KU0YUzS
+	j5K8Y60=
+X-Google-Smtp-Source: AGHT+IEjvegoUIWfi8UaBD0jEKwHtT+y2Cbu5UHhJ+VHUPJu6okR0AoxTFiIq+cxtmlIxdFEnLzs3e2dtieQR/hKIVs=
+X-Received: by 2002:a05:690e:d86:b0:642:84a:7ba4 with SMTP id
+ 956f58d0204a3-642084a7c6bmr1567493d50.85.1763377273901; Mon, 17 Nov 2025
+ 03:01:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv5 net-next 3/3] tools: ynl: add YNL test framework
-Content-Language: en-GB, fr-BE
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jan Stancek <jstancek@redhat.com>,
- =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>,
- Stanislav Fomichev <sdf@fomichev.me>, Ido Schimmel <idosch@nvidia.com>,
- Guillaume Nault <gnault@redhat.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Petr Machata <petrm@nvidia.com>
-References: <20251117024457.3034-1-liuhangbin@gmail.com>
- <20251117024457.3034-4-liuhangbin@gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20251117024457.3034-4-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251113150217.3030010-1-andriy.shevchenko@linux.intel.com> <20251113150217.3030010-14-andriy.shevchenko@linux.intel.com>
+In-Reply-To: <20251113150217.3030010-14-andriy.shevchenko@linux.intel.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Mon, 17 Nov 2025 12:00:38 +0100
+X-Gm-Features: AWmQ_bk2fwrMGKoLr3e8DW_NORum6cYwB-Ynf9Wgckyt3WUUk5QWFuYE7vXt0wM
+Message-ID: <CAPDyKFotmQyHzBim-8nib-KVvQaQgA_ELbgdC_Q4Y95-GrvRSw@mail.gmail.com>
+Subject: Re: [PATCH v3 13/21] mmc: mmc_test: Switch to use %ptSp
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Corey Minyard <corey@minyard.net>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	"Dr. David Alan Gilbert" <linux@treblig.org>, Alex Deucher <alexander.deucher@amd.com>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+	Rob Clark <robin.clark@oss.qualcomm.com>, Matthew Brost <matthew.brost@intel.com>, 
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Vitaly Lifshits <vitaly.lifshits@intel.com>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Niklas Cassel <cassel@kernel.org>, Calvin Owens <calvin@wbinvd.org>, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Sagi Maimon <maimon.sagi@gmail.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Karan Tilak Kumar <kartilak@cisco.com>, 
+	Hans Verkuil <hverkuil+cisco@kernel.org>, Casey Schaufler <casey@schaufler-ca.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Petr Mladek <pmladek@suse.com>, 
+	Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>, Max Kellermann <max.kellermann@ionos.com>, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	openipmi-developer@lists.sourceforge.net, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+	amd-gfx@lists.freedesktop.org, linux-arm-msm@vger.kernel.org, 
+	freedreno@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
+	linux-mmc@vger.kernel.org, netdev@vger.kernel.org, 
+	intel-wired-lan@lists.osuosl.org, linux-pci@vger.kernel.org, 
+	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-staging@lists.linux.dev, ceph-devel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, 
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	Gustavo Padovan <gustavo@padovan.org>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Dmitry Baryshkov <lumag@kernel.org>, Abhinav Kumar <abhinav.kumar@linux.dev>, 
+	Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>, 
+	Marijn Suijten <marijn.suijten@somainline.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Lucas De Marchi <lucas.demarchi@intel.com>, 
+	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Rodolfo Giometti <giometti@enneenne.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Stefan Haberland <sth@linux.ibm.com>, 
+	Jan Hoeppner <hoeppner@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, 
+	Satish Kharat <satishkh@cisco.com>, Sesidhar Baddela <sebaddel@cisco.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	Mauro Carvalho Chehab <mchehab@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Andrew Morton <akpm@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Hangbin,
+On Thu, 13 Nov 2025 at 16:03, Andy Shevchenko
+<andriy.shevchenko@linux.intel.com> wrote:
+>
+> Use %ptSp instead of open coded variants to print content of
+> struct timespec64 in human readable format.
+>
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-On 17/11/2025 03:44, Hangbin Liu wrote:
-> Add a test framework for YAML Netlink (YNL) tools, covering both CLI and
-> ethtool functionality. The framework includes:
-> 
-> 1) cli: family listing, netdev, ethtool, rt-* families, and nlctrl
->    operations
-> 2) ethtool: device info, statistics, ring/coalesce/pause parameters, and
->    feature gettings
-> 
-> The current YNL syntax is a bit obscure, and end users may not always know
-> how to use it. This test framework provides usage examples and also serves
-> as a regression test to catch potential breakages caused by future changes.
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-Thank you for the v5!
+Kind regards
+Uffe
 
-The new version looks good to me:
-
-Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
-
-I just have one question below, but that's not blocking.
-
-(...)
-
-> diff --git a/tools/net/ynl/tests/test_ynl_cli.sh b/tools/net/ynl/tests/test_ynl_cli.sh
-> new file mode 100755
-> index 000000000000..cccab336e9a6
-> --- /dev/null
-> +++ b/tools/net/ynl/tests/test_ynl_cli.sh
-> @@ -0,0 +1,327 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Test YNL CLI functionality
-> +
-> +# Load KTAP test helpers
-> +KSELFTEST_KTAP_HELPERS="$(dirname "$(realpath "$0")")/../../../testing/selftests/kselftest/ktap_helpers.sh"
-> +# shellcheck source=/dev/null
-
-Out of curiosity, why did you put source=/dev/null? It is equivalent to
-"disable=SC1090" and there is no comment explaining why: was it not OK
-to use this?
-
-  shellcheck source=../../../testing/selftests/kselftest/ktap_helpers.sh
-
-> +source "$KSELFTEST_KTAP_HELPERS"
-
-(...)
-
-> +cleanup()
-
-Note that with shellcheck 0.11, you will need to disable SC2329 here.
-But NIPA is not using this version yet, so no need to change now.
-
-https://www.shellcheck.net/wiki/SC2329
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+> ---
+>  drivers/mmc/core/mmc_test.c | 20 ++++++++------------
+>  1 file changed, 8 insertions(+), 12 deletions(-)
+>
+> diff --git a/drivers/mmc/core/mmc_test.c b/drivers/mmc/core/mmc_test.c
+> index a74089df4547..01d1e62c2ce7 100644
+> --- a/drivers/mmc/core/mmc_test.c
+> +++ b/drivers/mmc/core/mmc_test.c
+> @@ -586,14 +586,11 @@ static void mmc_test_print_avg_rate(struct mmc_test_card *test, uint64_t bytes,
+>         rate = mmc_test_rate(tot, &ts);
+>         iops = mmc_test_rate(count * 100, &ts); /* I/O ops per sec x 100 */
+>
+> -       pr_info("%s: Transfer of %u x %u sectors (%u x %u%s KiB) took "
+> -                        "%llu.%09u seconds (%u kB/s, %u KiB/s, "
+> -                        "%u.%02u IOPS, sg_len %d)\n",
+> -                        mmc_hostname(test->card->host), count, sectors, count,
+> -                        sectors >> 1, (sectors & 1 ? ".5" : ""),
+> -                        (u64)ts.tv_sec, (u32)ts.tv_nsec,
+> -                        rate / 1000, rate / 1024, iops / 100, iops % 100,
+> -                        test->area.sg_len);
+> +       pr_info("%s: Transfer of %u x %u sectors (%u x %u%s KiB) took %ptSp seconds (%u kB/s, %u KiB/s, %u.%02u IOPS, sg_len %d)\n",
+> +               mmc_hostname(test->card->host), count, sectors, count,
+> +               sectors >> 1, (sectors & 1 ? ".5" : ""), &ts,
+> +               rate / 1000, rate / 1024, iops / 100, iops % 100,
+> +               test->area.sg_len);
+>
+>         mmc_test_save_transfer_result(test, count, sectors, ts, rate, iops);
+>  }
+> @@ -3074,10 +3071,9 @@ static int mtf_test_show(struct seq_file *sf, void *data)
+>                 seq_printf(sf, "Test %d: %d\n", gr->testcase + 1, gr->result);
+>
+>                 list_for_each_entry(tr, &gr->tr_lst, link) {
+> -                       seq_printf(sf, "%u %d %llu.%09u %u %u.%02u\n",
+> -                               tr->count, tr->sectors,
+> -                               (u64)tr->ts.tv_sec, (u32)tr->ts.tv_nsec,
+> -                               tr->rate, tr->iops / 100, tr->iops % 100);
+> +                       seq_printf(sf, "%u %d %ptSp %u %u.%02u\n",
+> +                                  tr->count, tr->sectors, &tr->ts, tr->rate,
+> +                                  tr->iops / 100, tr->iops % 100);
+>                 }
+>         }
+>
+> --
+> 2.50.1
+>
 
