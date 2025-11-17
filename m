@@ -1,117 +1,150 @@
-Return-Path: <netdev+bounces-239050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84746C62FCC
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:54:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 937C7C62FE0
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:55:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0F3CA34871C
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:52:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C109F3AD905
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6010F31DD98;
-	Mon, 17 Nov 2025 08:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3153164DF;
+	Mon, 17 Nov 2025 08:54:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Zr7QG6p2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EmDlOwFf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29341320CA4
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 08:51:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031E130E84D
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 08:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763369523; cv=none; b=Fc/DNBl61sRrfUZMkWpR9JcpL3VV5J2HJmB3p2wmnpVihRwlyYL2TKmAuRYYhrs5towVrZJA1IzxZtrx4njZ4m3w7DBLPr1o1tuzVbx0vN3llasEmxpPqfVRVx3MsYtK0RJdcbj4k/g2xbnqqHMLMrbWOqZI3GSshXrQnZmgq0A=
+	t=1763369690; cv=none; b=sXU5fvJsgshalmkb6FqgqwewU0EfScjqx/qPdi3xeAcsSXbftCPcRPnsVVf7TVngAr+31Zc+Xk/RNaGoIb5HulEqNnSNsEkTyI3mHhlVuhucDJgxmA1Ejg+Kv5ZWGAhDdoZj7iIE7MN/UMrpG8FNz9UIC0GywVJOw7XIE0lJ/sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763369523; c=relaxed/simple;
-	bh=8Z6d1ejx0Uj/IrkRl7yBKSEwL+DAa0E6NOlwx0oQ3LA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wnk9YdImbt5KDXyjO/6A63CeRgjTl9dcIuDQT0iBaiuy5aNuwkMjpL/H9B7IIKUTsczpWGqRhWFXS7hg2FziDlM+4Ftu76xzjweHkmY7TeMvdYAvlqNUkJe6eaEBAW9VuuSmv2Akp+/Q8O+F/+uS0Z5gPkEYIUT+zPcUjkRgmTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Zr7QG6p2; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 40AC6C12647;
-	Mon, 17 Nov 2025 08:51:34 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4F743606B9;
-	Mon, 17 Nov 2025 08:51:56 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A77E910371D05;
-	Mon, 17 Nov 2025 09:51:50 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763369515; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=QY1oVustpLjb4kKFlpFbNvuK8JxAlKLUqgiQYWDRY+w=;
-	b=Zr7QG6p2SPrrbofu079EyUFbMCnif2UE/TvjsAKm8EewlOgH8M8FOtrgdERiqhZwOly52c
-	tmX4oANKUNzfuIBxDQOGJiyN1vJFBpBVcLBkxGEWJ+yjpdLibzAU4XD5JjBa8a+DqscNzT
-	tEb8HazfE/pG24U1XSqfrNmd8APCInMkEzAw5cOKNazQK0iUUk+W589XxZfLi02s8+OKSL
-	ZWsItmcP0xhUC7KS34vNi7QStbTt40HwVd0Nsniwp3qO8yW0RNBvw7a+6H7n8tvBm0z6po
-	6p+vXU54Cax1Cl8r910eylu9ki9uxJ7slOIEv+7djZ36fe5e01WnqYsmprXYkQ==
-Message-ID: <dc492850-6e6b-4c2e-9869-321045c1f1c1@bootlin.com>
-Date: Mon, 17 Nov 2025 09:51:50 +0100
+	s=arc-20240116; t=1763369690; c=relaxed/simple;
+	bh=S9skhitPqR1K90Ta/FOI+xvdgP7Uf7ls4Pz5r89g6QM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R9+RwKjrNjKgS8/I9gVHQ1Am5FU66wfdyOqgDw8u3r2xxAC7Ngpy7c58C/5PISxq+53o/8tw2KC+n3G16JGE5UGah1+LZKj4Km4QtrVmoFIgZcyixpqUATBj7wz8Er9sNxGLsNPOQojqsEMOoe1H7J+PGLnEPjC7ELekgnVACvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EmDlOwFf; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-43470d98f77so17221385ab.2
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 00:54:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763369687; x=1763974487; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S9skhitPqR1K90Ta/FOI+xvdgP7Uf7ls4Pz5r89g6QM=;
+        b=EmDlOwFf+gBXfTvN5ZUHCohBPRrtqd6pEAV9ReE2+KG2Dn4BNFPaNASWLN2yIPqP1X
+         RZTdCH7U+LA/QGlCuUQ3wMB6PIIgW+EDDGQvNFYGYPHwBnxNr4z37td0CXy8BfVmZVUa
+         qh26SzGm/lXVwxx0PWiaNqTPXDdxmhFDHUFjKpAjgbVnK6V2MQGqJjnHilAQOTrg4bNy
+         YoOGgSZlhhMCMB4weTlj1h9J99nnvfSjDGgUed1PnxepEns3L618sCnkWqn4N6ArayiZ
+         7j+yiV9XUBx8My27TWVtpQusID6oC/bVOB0n1EoJssdOo7yIDjDD3eCZcECAiPyLrE5q
+         PHcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763369687; x=1763974487;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=S9skhitPqR1K90Ta/FOI+xvdgP7Uf7ls4Pz5r89g6QM=;
+        b=HvEsn0JDGvsdUWRrb30G17UpMrhxNKCbr0cqnLGwCBrrYk5rfNJKUb5h5L5bQjxmmN
+         PtJja/znYjW6/krbWKX7S4mpQ80QQuYTa4PtZl1oKRSX9d4OUnxAma/vomEbgJqo47LZ
+         7xosPzH8AC+mR0wNtlt0iHE8r6NDu7Odsi9DwnAu+Xu+zmm9c/YD+3bEIhBN9ZPzi6TR
+         ajSNVMSNyJyMXmUd59hv/km81vhH7rvZZ9g+Zs6YYesoaOW+YDmj/UaOQOCxU8Ss0s/F
+         fM26SBdmvib/boV0kXD3tXhsXksqiHrHyBSniuinabFHXWqboUgHF3zt99kJxEbUqKds
+         UdfA==
+X-Forwarded-Encrypted: i=1; AJvYcCV1rZaffEhSiZ1lz/xpyAPKEOCfowcYqhiLG2DE76G6C4zKhsw5Jz0foDRppivDL4+iSgsRCo0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUTotI/a/8QeH2RFge85tDYwr76Asr7xlzB+t7PbesIqj8Np7w
+	UI+EMa7QLI4hIgszFu2VC9iQJMQJfgwaz6RJnTZET/HK/5uMYJBws3GJoqOxnLoxTB93iIRCqqz
+	NW81bj3j7FQ9ew/gh9h/RU8vC78l2ZdI=
+X-Gm-Gg: ASbGncvcVDdyplyVRS3VtjaQ7TUl5SN/iA3G3gjBnqcvNwLx+XqlbpoCmRlgzkXVhqY
+	gA9JCJbTFfa6nJtBzMs1mtK86FF6VitpQeIJW7Bqg2E6F3v0DpGyta2xzJbXjJApGxrOfHsmfSz
+	v4yrowZvmJ/WwDm/yO8Ufm9KRF+iwK//i02Sq0IGbfDuY2R7evkQAD41hA4VsOckiGWiYwoXhHA
+	UZbvPDzEBkR9P9bjqSulI6U/Lba3WxOnmY6aTdpTub3IJZWXi7I4/izErXYqShblxBUNfY=
+X-Google-Smtp-Source: AGHT+IHz9NvlpLoLcWPMBiQI6RyPTekx4psmH9imhcaxFkFLILMONjdf7tAbNcGCdhCd+/zMrWjafg02z5NEh/NL7Sg=
+X-Received: by 2002:a05:6e02:dd2:b0:434:96ea:ff57 with SMTP id
+ e9e14a558f8ab-43496eb00f8mr82788195ab.40.1763369686831; Mon, 17 Nov 2025
+ 00:54:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 3/4] net: dsa: microchip: Ensure a ksz_irq is
- initialized before freeing it
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Arun Ramadoss <arun.ramadoss@microchip.com>,
- Pascal Eberhard <pascal.eberhard@se.com>,
- =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251114-ksz-fix-v3-0-acbb3b9cc32f@bootlin.com>
- <20251114-ksz-fix-v3-3-acbb3b9cc32f@bootlin.com>
- <f13d7a80-d7cc-46c4-99f4-ea42f419b252@lunn.ch>
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <f13d7a80-d7cc-46c4-99f4-ea42f419b252@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20251116202717.1542829-1-edumazet@google.com> <20251116202717.1542829-4-edumazet@google.com>
+ <CAL+tcoD3-qtq4Kcmo9eb4mw6bdSYCCjxzNB3qov5LDYoe_gtkw@mail.gmail.com> <CAL+tcoBpUg=ggf6nQpYeZyAcMbXobuJtyUdN98G1HpcuUqFZ+w@mail.gmail.com>
+In-Reply-To: <CAL+tcoBpUg=ggf6nQpYeZyAcMbXobuJtyUdN98G1HpcuUqFZ+w@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 17 Nov 2025 16:54:09 +0800
+X-Gm-Features: AWmQ_blBLihwhOwO58YvnNFCJUVN-78Z2XLaIpKDibIb_3-Tat281M2zSTbexog
+Message-ID: <CAL+tcoDaB+ghuLZyGgcjubqobKuh0Qsfr5eKYdrOzEnCq9nCUQ@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 3/3] net: use napi_skb_cache even in process context
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Mon, Nov 17, 2025 at 4:41=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Mon, Nov 17, 2025 at 9:07=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > On Mon, Nov 17, 2025 at 4:27=E2=80=AFAM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > This is a followup of commit e20dfbad8aab ("net: fix napi_consume_skb=
+()
+> > > with alien skbs").
+> > >
+> > > Now the per-cpu napi_skb_cache is populated from TX completion path,
+> > > we can make use of this cache, especially for cpus not used
+> > > from a driver NAPI poll (primary user of napi_cache).
+> > >
+> > > We can use the napi_skb_cache only if current context is not from har=
+d irq.
+> > >
+> > > With this patch, I consistently reach 130 Mpps on my UDP tx stress te=
+st
+> > > and reduce SLUB spinlock contention to smaller values.
+> > >
+> > > Note there is still some SLUB contention for skb->head allocations.
+> > >
+> > > I had to tune /sys/kernel/slab/skbuff_small_head/cpu_partial
+> > > and /sys/kernel/slab/skbuff_small_head/min_partial depending
+> > > on the platform taxonomy.
+> > >
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> >
+> > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+> >
+> > Thanks for working on this. Previously I was thinking about this as
+> > well since it affects the hot path for xsk (please see
+> > __xsk_generic_xmit()->xsk_build_skb()->sock_alloc_send_pskb()). But I
+> > wasn't aware of the benefits between disabling irq and allocating
+> > memory. AFAIK, I once removed an enabling/disabling irq pair and saw a
+> > minor improvement as this commit[1] says. Would you share your
+> > invaluable experience with us in this case?
+> >
+> > In the meantime, I will do more rounds of experiments to see how they p=
+erform.
+>
+> Tested-by: Jason Xing <kerneljasonxing@gmail.com>
+> Done! I managed to see an improvement. The pps number goes from
+> 1,458,644 to 1,647,235 by running [2].
+>
+> But sadly the news is that the previous commit [3] leads to a huge
+> decrease in af_xdp from 1,980,000 to 1,458,644. With commit [3]
+> applied, I observed and found xdpsock always allocated the skb on cpu
+> 0 but the napi poll triggered skb_attempt_defer_free() on another
+> call[4], which affected the final results.
 
-On 11/14/25 4:00 PM, Andrew Lunn wrote:
-> On Fri, Nov 14, 2025 at 08:20:22AM +0100, Bastien Curutchet (Schneider Electric) wrote:
->> Sometimes ksz_irq_free() can be called on uninitialized ksz_irq (for
->> example when ksz_ptp_irq_setup() fails). It leads to freeing
->> uninitialized IRQ numbers and/or domains.
->>
->> Ensure that IRQ numbers or domains aren't null before freeing them.
->> In our case the IRQ number of an initialized ksz_irq is never 0. Indeed,
->> it's either the device's IRQ number and we enter the IRQ setup only when
->> this dev->irq is strictly positive, or a virtual IRQ assigned with
->> irq_create_mapping() which returns strictly positive IRQ numbers.
->>
->> Fixes: cc13ab18b201 ("net: dsa: microchip: ptp: enable interrupt for timestamping")
->> Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
->> --
->> Regarding the Fixes tag here, IMO before cc13ab18b201 it was safe to
->> not check the domain and the IRQ number because I don't see any path
->> where ksz_irq_free() would be called on a non-initialized ksz_irq
-> 
-> I would say the caller is wrong, not ksz_irq_free().
-> 
-> Functions like this come in pairs: ksz_irq_setup() & ksz_irq_free().
-> _free() should not be called if _setup() was not successful.
-> 
-> Please take a look if you can fix the caller. If the change is big,
-> maybe we need this as a minimal fix for net, but make the bigger
-> change in net-next?
-
-Ok, I'll look at it, I think the change won't be that big.
-
-Best regards,
-Bastien
+Typo: on another cpu.
 
