@@ -1,75 +1,142 @@
-Return-Path: <netdev+bounces-239094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11746C63BD6
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 12:13:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72971C63BF9
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 12:16:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DF22134E6B5
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:07:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C98513B7B52
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:14:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78493330B1D;
-	Mon, 17 Nov 2025 11:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7718032E749;
+	Mon, 17 Nov 2025 11:07:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from localhost.localdomain (unknown [147.136.157.0])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C881533033A;
-	Mon, 17 Nov 2025 11:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3862328B50;
+	Mon, 17 Nov 2025 11:07:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.136.157.0
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763377377; cv=none; b=mwtjV3xqwgMlccYVnHTOv6ckw4cotieXde1eXmHxlI26MNSjWC/qIJov5/9UyLwTpOaTMen0eYCJjDuKRZULxFYg4J5mJa+Mh9zEzgT8tUkYY9f/QcOVJ/VCVEkOYBUuBQn+u6eLdHwxRCJaYo8Jz24P43L4jnZ7+96rJA9CZM0=
+	t=1763377675; cv=none; b=XDRkF73srWZ9TgOKM+/0TC1RJeWMFOQwHwAGQsyxe1aExXi+n135GcndL2sLhtBa3Dxmoys1XMtPjP2gx1E++Gwi9wFcH5Dn2JWKeXrzGB7nupewMrSjQD7qBdAwXLmIn9u8p2QhIodlrGXntU7roAe1dNabOx1Bq1ZTB1VexMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763377377; c=relaxed/simple;
-	bh=uf55DI7mt8cpW8qwSpLbKkU+vOUxm/se2QFByOaarFY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cpch3Y2GoT4o6dfP/hxQrtQxKGpu/8xABfSlFwD2w/DdQcFwhPBaFjyeQb70+9SnBXP210f5A/Cc04AjznYzPF7vEWbrTe48vIx08LeF3mLWHmZJaNU9YCGxYxT1MWM72l1BwHJQ2mqyxv+VHt0sAd6luxggXjma774QIAC9qtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 5C19B604C1; Mon, 17 Nov 2025 12:02:45 +0100 (CET)
-Date: Mon, 17 Nov 2025 12:02:45 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Chenguang Zhao <zhaochenguang@kylinos.cn>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+	s=arc-20240116; t=1763377675; c=relaxed/simple;
+	bh=77dXaZcfE04ua8WiSdvAOylJQVXPQIEskS3PfLhEXPg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bbxmRs2gI+EuBKQo271eg8tOgSBuaapeEXXwOfxDVNehC4EISG4Z9S2ktWOjiCABbJu56orEkS8Ec9epoEUOYJRoj6vvOfSk9q6D/5F+3yPwjSWPQrrL2AaEKl23kP1N5qrho7rfh0KL+28E+YNuqt/pg3Y086kOtctSMGKD5Vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=none smtp.mailfrom=localhost.localdomain; arc=none smtp.client-ip=147.136.157.0
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=localhost.localdomain
+Received: by localhost.localdomain (Postfix, from userid 1007)
+	id 114408B2A0C; Mon, 17 Nov 2025 19:07:45 +0800 (+08)
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: jiayuan.chen@linux.dev,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH linux] netfilter: conntrack: Add missing modification
- about data-race around ct->timeout
-Message-ID: <aRsA1a-1_NWsYst3@strlen.de>
-References: <20251117085632.429735-1-zhaochenguang@kylinos.cn>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Michal Luczaj <mhal@rbox.co>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Cong Wang <cong.wang@bytedance.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next v1 0/3] bpf: Fix FIONREAD and copied_seq issues
+Date: Mon, 17 Nov 2025 19:07:04 +0800
+Message-ID: <20251117110736.293040-1-jiayuan.chen@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251117085632.429735-1-zhaochenguang@kylinos.cn>
+Content-Transfer-Encoding: 8bit
 
-Chenguang Zhao <zhaochenguang@kylinos.cn> wrote:
-> Add missing modification about data-race around ct->timeout
+syzkaller reported a bug [1] where a socket using sockmap, after being
+unloaded, exposed incorrect copied_seq calculation. The selftest I
+provided can be used to reproduce the issue reported by syzkaller.
 
-This could use a bit more verbose explanation.
+TCP recvmsg seq # bug 2: copied E92C873, seq E68D125, rcvnxt E7CEB7C, fl 40
+WARNING: CPU: 1 PID: 5997 at net/ipv4/tcp.c:2724 tcp_recvmsg_locked+0xb2f/0x2910 net/ipv4/tcp.c:2724
+Call Trace:
+ <TASK>
+ receive_fallback_to_copy net/ipv4/tcp.c:1968 [inline]
+ tcp_zerocopy_receive+0x131a/0x2120 net/ipv4/tcp.c:2200
+ do_tcp_getsockopt+0xe28/0x26c0 net/ipv4/tcp.c:4713
+ tcp_getsockopt+0xdf/0x100 net/ipv4/tcp.c:4812
+ do_sock_getsockopt+0x34d/0x440 net/socket.c:2421
+ __sys_getsockopt+0x12f/0x260 net/socket.c:2450
+ __do_sys_getsockopt net/socket.c:2457 [inline]
+ __se_sys_getsockopt net/socket.c:2454 [inline]
+ __x64_sys_getsockopt+0xbd/0x160 net/socket.c:2454
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
->  	   weird delay cases. */
-> -	ct->timeout += nfct_time_stamp;
-> +	WRITE_ONCE(ct->timeout, ct->timeout + nfct_time_stamp);
-                                ~~~~~~~~~~~
+A sockmap socket maintains its own receive queue (ingress_msg) which may
+contain data from either its own protocol stack or forwarded from other
+sockets.
 
-Shouldn't that be
+                                                     FD1:read()
+                                                     --  FD1->copied_seq++
+                                                         |  [read data]
+                                                         |
+                                [enqueue data]           v
+                  [sockmap]     -> ingress to self ->  ingress_msg queue
+FD1 native stack  ------>                                 ^
+-- FD1->rcv_nxt++               -> redirect to other      | [enqueue data]
+                                       |                  |
+                                       |             ingress to FD1
+                                       v                  ^
+                                      ...                 |  [sockmap]
+                                                     FD2 native stack
 
-WRITE_ONCE(ct->timeout, READ_ONCE(ct->timeout) + nfct_time_stamp); ?
+The issue occurs when reading from ingress_msg: we update tp->copied_seq
+by default, but if the data comes from other sockets (not the socket's
+own protocol stack), tcp->rcv_nxt remains unchanged. Later, when
+converting back to a native socket, reads may fail as copied_seq could
+be significantly larger than rcv_nxt.
 
-Furthermore, patch subject should list either [nf] or [nf-next] to
-indicate the tree you want this patch applied to.
+Additionally, FIONREAD calculation based on copied_seq and rcv_nxt is
+insufficient for sockmap sockets, requiring separate field tracking.
+
+[1] https://syzkaller.appspot.com/bug?extid=06dbd397158ec0ea4983
+
+Jiayuan Chen (3):
+  bpf, sockmap: Fix incorrect copied_seq calculation
+  bpf, sockmap: Fix FIONREAD for sockmap
+  bpf, selftest: Add tests for FIONREAD and copied_seq
+
+ include/linux/skmsg.h                         |  71 ++++++-
+ net/core/skmsg.c                              |  20 +-
+ net/ipv4/tcp_bpf.c                            |  26 ++-
+ net/ipv4/udp_bpf.c                            |  25 ++-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  | 192 +++++++++++++++++-
+ .../bpf/progs/test_sockmap_pass_prog.c        |   8 +
+ 6 files changed, 325 insertions(+), 17 deletions(-)
+
+-- 
+2.43.0
+
 
