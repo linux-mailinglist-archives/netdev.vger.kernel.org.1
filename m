@@ -1,231 +1,228 @@
-Return-Path: <netdev+bounces-239054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD38FC63036
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:59:55 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61040C6307A
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:04:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D1813A8118
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:59:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C2B4034986B
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:02:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36E1321F54;
-	Mon, 17 Nov 2025 08:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D810E3246F7;
+	Mon, 17 Nov 2025 09:02:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AWBuz3RO"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="jizN2vai"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013031.outbound.protection.outlook.com [52.101.72.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0D6320CC2
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 08:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763369951; cv=none; b=GjHNQKH2ChAg5pQrRcwi1kBqcQxrurqfRR6TH/M8qi6VNU8iwuCFZo5RWVDxk/8uBxQcEhn1r+7yrUKKMkqPPkoK9wrqrV0fZaiiRku2G4nBW523GN9xDWq9KKj+7pnnWOeq3i2dhZsjXoxs0+PmKvRQIMmb0HcX3OFCA+fk/p4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763369951; c=relaxed/simple;
-	bh=VZVYXZiasLZnAdgwiZQjRFK6cFmwg476sxAlwN9WXyI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kyBNE7DjM22ImYUxdWmS6cF0mVupAfzHxS5zlGOPBkjV2TGNWFy0Z2aSyMwhfqHPvftoj+JM17EUWMUUtDO/e74AdOaK5SGSI/dHTGSX5OY5nzAsNGwwerTvJ147J+GKgzroZKcmvyZN3/ypGgtwVoKMUhDW5QJ9ctItW4NXD8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AWBuz3RO; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-bcfd82f55ebso662883a12.1
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 00:59:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763369949; x=1763974749; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YuJplMGmt4Z1RMroFnaRWRB664GXXcGAXvTcG99zx6o=;
-        b=AWBuz3ROOTHrZEJQOhE1ewWTUTXnThNRc6tjzybuMCSHswuSyV7siYK5tqqy+PRnwp
-         Wq2SYrx2KSCKXRikf/QN63i95jzmb+dLHTqs/letcXKmuErzIp8xNdGkIDcaGcF25nX6
-         rVoU/x9eDBK8tJP7KO7U1lu0sAnmc9lffzsIMZl3tpgY5EuyAPVuLPO0UJDwL7IZokHe
-         b4UFctK5GRkrHn9X4og3Cr7JsPvhY6oIgaybPQ0BRim2rOOlKNz+5nty0glZm6/a3g/k
-         v8MGuK4ImZ3y1pE9tcKZpRkTJHS0ATjc2DsjcIdzbkjRr7c/T3qNQs5H+7M1jyztIcQ9
-         UIkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763369949; x=1763974749;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YuJplMGmt4Z1RMroFnaRWRB664GXXcGAXvTcG99zx6o=;
-        b=SeGgEG3DemzP4jDflgWc9LvxXJFohRHxjH26gc2geVS3VTBZ65F71eOeIe7d/cLIGO
-         +1HF2KYeQOK6zhG+Gmc7qWh3vZjI+QuTTlhp/9vbRRz1w3NJEkcNqxoGt+2HOkSwQlBN
-         7pJ33SXKk0hPgduajAjJjGhIdng/3wzBU4p4KSN8rachMItWJQMT2e9tKRVW7GTgq1Cl
-         T0Jvm3Z7kClC7n02/lqDjmwaJcBAv1pg0t3iKQKQpMGPJZwQjrCc+gh81n114bau4rml
-         JCbT3a6ZD5vNTQm5oMQw+QgySEHKox5XJMllgkGjvBbI9fblKZsYnvAOycWMf0nS+waQ
-         lbEQ==
-X-Gm-Message-State: AOJu0YwpwXwlOpqZ6WaCy2Tg/0fsV66PdnHWNJAJ0qgDyRDuVT5lzUf7
-	t6IazV6vEsOlLF6/TyP4pOjwc4uqW+70SPSksEg2YtYntOHm2sjVuKdi
-X-Gm-Gg: ASbGnctE31jgcnMkbnAxKj26p4AQybzhiZ+EjknzATp7iW0Ob4SUSuyDJA0JjZW0Fa2
-	sO4O5vsO1k4K93B7AdlY+aJDdMpkJX4U306BSycQ48WwGAKi5YnG5JW2MZxZOg8oFbh/A18W2hk
-	Q5OcxZN0Ey8Z2zREqGDlp0W/xV82Mwm2UqVNPvh47sJEqDIQL4rsTD+WiHCU73PpFsf7ZOIN9pT
-	GDBh9gIqbkp+AFFyGv58JcdNdU3fUMIfB/kkrVExnXWZWKK6RMQmIjiwZyw8GEEj/trLQo06L1u
-	vzJMRtQulHdrR0tQs5xdeqWoBcUYBeAMc/wHgD2VPOVbg4Yk6sILEGtcb+t+NzTMP1CFCCO+Nvi
-	TcipN3k1IOrr9/fc8K7mQr1u+l5Cee8QKOuS+dng3NidFZ0UOOWwW6hEk
-X-Google-Smtp-Source: AGHT+IGp2eFIcvLZaV/ERruGqC1K/JzVyco8Knc+w5+BBpuOr4rj5S1fp6JgJARKZIMqdZXObbFw4w==
-X-Received: by 2002:a05:693c:60c6:b0:2a4:86e5:6b2a with SMTP id 5a478bee46e88-2a49af801a3mr4072122eec.14.1763369949408;
-        Mon, 17 Nov 2025 00:59:09 -0800 (PST)
-Received: from gmail.com ([2a09:bac5:1f0a:281e::3ff:5a])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a49db102f5sm35562982eec.4.2025.11.17.00.59.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 00:59:08 -0800 (PST)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Hyunchul Lee <hyc.lee@gmail.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	Stefan Metzmacher <metze@samba.org>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH v3] ksmbd: server: avoid busy polling in accept loop
-Date: Mon, 17 Nov 2025 16:59:00 +0800
-Message-ID: <20251117085900.466432-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13045322768;
+	Mon, 17 Nov 2025 09:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.31
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763370136; cv=fail; b=NCYBl16EBnN3X6OYinhxP+EvQ0OW1ZJuXEHvHhh/3W/T6N+hQ7EXuAQ3bdQI9agyLTFqkeWQRNAf50jThLVCrnlCzxq9Vxjc+vyin41V8B5iWLRTrKQ94zIHVlfMdKx6qQYYmhdixHJiPymxpQ2tm6euyldzKL7hKiTs+fpO+D8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763370136; c=relaxed/simple;
+	bh=GxR5RcpiizHWdTHygQdc0xX6g5wKgKg/5BpsDkyc4ds=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=scpIxA5OQ83VK09kHNoSXXMg8XQzyhXp8g+UYt0DIEPpH5frKrJIP4pvLpwVSczo105p0g5t5Fq9ewpEm7gIqb1otgfMsC+ALDXezqIW4OlBI694H+Vid9oM5HoXWcXPnR0r8qlIY6EuT33KU5jmB45LK4DIHVSr8LwaPPAR2RA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=jizN2vai; arc=fail smtp.client-ip=52.101.72.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pz/AeS3dOGrghM5Wy9hSbCmLOJiprLZ50e1jpRh95TsQz0X/5Q041JV779wAWbwy9kGZT4bElptqSBAFliVTvk1fsbqRTYK2Ppq9VODFsCZGu+63CvktiaJqCn4SRhUUTPdh6gSvIFiHrQEs6DkIDLjSdlxpiJQyhgLwIJ9MB1xGxT8NOcUfQSErhbJvyNtfR8LFmKA2P4XlcQi81WTGC1tw2KvfpaGL+ABJhXrA4f3/sWFMbxn3rUBiBOUxqu9AEXv/cYvY5q42WsnIjGHW0P+V8htmc3XNoNeM1xOdKbS2S0NWou6iyyGR+Dw5urr0vKF6tJn9hzbqdE5Vg16x3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=I/KpDe138Yphn990VjLJCTnBaTu18YPGJTrMNc8BXuk=;
+ b=tcbaR6QrrzrdbXHJWxD+e2SlGbRHUjsZkB7nB1c35WJndXloboIsxwY8qG+vG0SsFK9eVq5/xyGyEF8jRoSLwlILlEr48XGJrkltrB9F553CjBCPbi+4Xnn/Qe3Mo+nrq5YHN+MI3GY6CAoNPkANu31VCmiX8iUrNHt3q0iClv+YoU4ccP6poR3kXyd+7Vb+zAjMkmV6PnTOiNyKSpXiC0Tfs/33eUP6Ui3gMGQeJVY0hwrGtxUrRXnL+lsmn0h//U5LuDfSwasyQoQU9zRVkJcHzD+NRikFYQOSsnmG6b2qkNv5Q6EWkib1dT5dwZvDIXglZRelsdQou/u69hdSKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=axis.com; dmarc=pass action=none header.from=axis.com;
+ dkim=pass header.d=axis.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=I/KpDe138Yphn990VjLJCTnBaTu18YPGJTrMNc8BXuk=;
+ b=jizN2vaisVNjhITEYM7U5EydXOYgekF+zicjiH0Mu0DtTNf2JXCq5OMJxQvDFBeCQegmTUn8YpWJKuKJ4zqResvNFfiibixl7+o6m5y3JjzKPmAXAXi0F82O9vcAGLJ4SDfsfykq575ifouz3mHOnbiUAYu61vWIvsuXPBVIKio=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=axis.com;
+Received: from DB7PR02MB4661.eurprd02.prod.outlook.com (2603:10a6:10:57::23)
+ by AS8PR02MB9768.eurprd02.prod.outlook.com (2603:10a6:20b:61c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.21; Mon, 17 Nov
+ 2025 09:02:07 +0000
+Received: from DB7PR02MB4661.eurprd02.prod.outlook.com
+ ([fe80::e783:31c6:c373:2ec9]) by DB7PR02MB4661.eurprd02.prod.outlook.com
+ ([fe80::e783:31c6:c373:2ec9%7]) with mapi id 15.20.9320.021; Mon, 17 Nov 2025
+ 09:02:07 +0000
+Message-ID: <5a7f0105-801d-41d9-850c-03783d76f3e1@axis.com>
+Date: Mon, 17 Nov 2025 10:02:05 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH for net-next] if_ether.h: Clarify ethertype validity for
+ gsw1xx dsa
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Daniel Golle <daniel@makrotopia.org>, linux-kernel@vger.kernel.org
+References: <20251114135935.2710873-1-peterend@axis.com>
+ <3feaff7a-fcec-49d9-a738-fa2e00439b28@lunn.ch>
+Content-Language: en-US
+From: Peter Enderborg <peterend@axis.com>
+In-Reply-To: <3feaff7a-fcec-49d9-a738-fa2e00439b28@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MM0P280CA0006.SWEP280.PROD.OUTLOOK.COM
+ (2603:10a6:190:a::12) To DB7PR02MB4661.eurprd02.prod.outlook.com
+ (2603:10a6:10:57::23)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB7PR02MB4661:EE_|AS8PR02MB9768:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6265e74b-dcf6-4ca7-0097-08de25b7fc0f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UFlHUzJrOXRBQ0RpVzROODN6WlRXT1JndVNlaXI3WXlEcUhKbjRPdWsxMFZi?=
+ =?utf-8?B?VlEzYWk4OEhSa2dKV2Z6R3J4TEFEZ3J6OExTUkhnUEZTWE1xWTUvTXp3L2tZ?=
+ =?utf-8?B?NTR3dWdGUmRsdGRmRnlYVU0ybjlEWFczc0ZYckFwZ1Awd2tSYVk5YkdhOHFk?=
+ =?utf-8?B?UXcvOC9vS2VrQ0FyckIwM1BGVUtGcVBOZkUwbC92dzlNYzA0Vm5XVCtFL21X?=
+ =?utf-8?B?QXVVbnF4N3JIdVpXTG56aUNpRnNhMVRnVWhBOW05K2NmQ1E3eFQzRnRlbUIx?=
+ =?utf-8?B?WFNZWWEzRUVFNENDdjYveUNvcUFVb1M5WlpMdWdRMGxvbGpKZEFVTTRwbHMy?=
+ =?utf-8?B?eTdrWHJIU0xuaXFsSEYyZVBQM1dyUnh2TGU5Y25kWUlTYm51bWttaWVPWTdJ?=
+ =?utf-8?B?NkQ1SkNRclRKOGpLa3B5YmVaSkpDWXNwbDZMZzNaQzROaTJTRlllbmh5UzZQ?=
+ =?utf-8?B?Q3hJUFBlYjZzWllLWnlRV3RlcnNxTEdZQUN0QWhrR2o1RkpYOUlva2RwSHRw?=
+ =?utf-8?B?ei8rcDlJWHRoTUZJZjFOTTd1dXZKOGwvZ2dHckIyK3c0SThvQUp3M0JlekxQ?=
+ =?utf-8?B?TTlwbEd4U0xyU0x3c2lCeDFZeTFhcThKS1o2NmNFZkptSGtqSU9LbWVDbjJB?=
+ =?utf-8?B?VkZRcFpCeHd0OTNMeVFIYm0yUTdxMWYzSEFhWHpsVkZFT3oyZUhaMjlwT0xD?=
+ =?utf-8?B?L21ZUmFldm0vSHpZbFRIMlBjc2dIdEtna25kVE9QczlxeEg2Yjd2YlVzSWhE?=
+ =?utf-8?B?M0xpZXZsd21DdjZGcVRBWlpGSXNYTlBOVnJNOFE3b0tJenRzczBZZTYxbWNH?=
+ =?utf-8?B?dGFzMGpJVC9tV1ZlaHpXUjRLTWFXSWRHcTlqTDdSbURsTStUanBGdjUwY1Jh?=
+ =?utf-8?B?KzJLWkpxOHRidmpPVXM0enUxbXc2eUdlM0Z4T2Q0YzBEYlRsZmVqN0RLTWxR?=
+ =?utf-8?B?R0lVdFFnWEdweERDL1dldnpWcXBhWHJaZnpoek9WWmxYY1AvUHJXd0lUU3Mz?=
+ =?utf-8?B?OTdVNTNHTTI4Z09NNnJSQzZGZTc3Sjk1dWdQM0xHcDByWGxsYW9YdHFBeDc5?=
+ =?utf-8?B?UHRlenpaZ3hEaVVlTmZ6RlU5NW1KTnhobXF4bzYxazMvOFdUcEV1YkhjaXAw?=
+ =?utf-8?B?Mm13YzE3Zmt4TGo3Tkt5TlN1OFppU0h5clZ2VXozZWZsTStWS1NrWDE3cjB4?=
+ =?utf-8?B?VjJ6Njl6YmhJNEN3SlZVb3I5UzlOZ1J1eDdxelJrWlpLRnFxZ1ZqVW93eXJl?=
+ =?utf-8?B?K29IYWIzdGc4M0Q1eTBzWDdReHoxNm1Felp2RHAzVlRpbndxTlZNb1RyUVFI?=
+ =?utf-8?B?bjhVdjhrVlIvY0c0RVBPUzdCamNFMjdaU1l3OTFwd0JjSDVGVCsySEp4UVlH?=
+ =?utf-8?B?aStCb08xeXUvZkluSHhJYW55L1c1WEhCZERVb1VpSDB0TkR2Qm9qTzhRNmlo?=
+ =?utf-8?B?ZUV4Z1dSZlRjSEowSTk5TU1mSnY5Ym1RYW1NOGEvVUwyYzVWZzBhQ0FFL1Az?=
+ =?utf-8?B?bzAwbEQ3clZOMmxiL2hRVVYrckhscHNBeEF3WGVzUnRBcXJqckh5blZyK2lW?=
+ =?utf-8?B?VEZmZDUzQXM3bklZZGZaR1k4SzhmNnc3NlQzaFFNRU53a3E1ck54c0J5andQ?=
+ =?utf-8?B?WlFuL2IzTUt6RHYybXkrd05Fb3JibVl3YnJDRE9oR2ZLUUZQaDdzb2NQSWhU?=
+ =?utf-8?B?QVViSDFwdGtsNUY5TFpya0hLVkMzc0dwM1loWnpPb3hmVjliaFVvUk5wcDdW?=
+ =?utf-8?B?ZjhQTHhPd0JqYmljKzlQSlRlaW03ODNvNFI1anJtQ09vcW82N3RZQm94NjlG?=
+ =?utf-8?B?VkwwaHh3SzlIcm5nb21yS1BvbysySW0xSVVhZFlaWnhRdXFGYUlQVUF6b1FS?=
+ =?utf-8?B?TWtjYlRYYVFCSkpMeFJkWG9IUldwWVJzTnZmWVN3dnNhaFlFdW56a1lFS3Rp?=
+ =?utf-8?Q?NSY3zN12LnTLdY+iWEscH4ce/o1W9qH4?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR02MB4661.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(13003099007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UnErRHdLWnl6SnZlRkgySys0RUpXOXg3S0lvREhXMmF0b09TbGgybEYxb3Mz?=
+ =?utf-8?B?WkpDV2JLcEY0c2szRmNyejdMMGJnT0w3OWlsK25tRm0wanBKZEtUaTd3NkR5?=
+ =?utf-8?B?bVpJdkIzOHhZRmkvbmJiWTdiYXovRG8yTG1LQzRQYS9PY0plNGRpOTNYbkpQ?=
+ =?utf-8?B?ZXR3M2pqdGppc2pOSG5rbFFsWnJ3Sy9HMXN4UnQ0OFRVS3pQSk5TOTJOY1pZ?=
+ =?utf-8?B?N3lrRTk2Q1ZWWVFPMHpVZCtmbVM1NDF3dFU5WlFpT3F4MHpYYS9Yd3lmZUtE?=
+ =?utf-8?B?ZHo5bS9td0VHZDVoaTN1dUUyWFlDNCt4L20wNkVVNVVmbGpyWWJvdit0cHEy?=
+ =?utf-8?B?V3c4ZHhoSDJ2a2wzNEdqRkRwOThkYVR4clFBUVVUQ0I3RHk0MlJUNlVHRkFK?=
+ =?utf-8?B?d0RKT2p1TkYxQjFZNDZZaFNFaHlDNHpxUmRDd251M09QTjBHYk92MGQ5N3dY?=
+ =?utf-8?B?cm0rOVYxL21IVE1vNEZmMWJ6SG5RNXY1QklYZFVqMmNVWnNNSk92aWdYRnlC?=
+ =?utf-8?B?bGFJcDVYcHNteTh4WitPTU1IZDJ2YXYzcGpWSnFDYkp4YUZZTTZTU1pPc1ZD?=
+ =?utf-8?B?QTZ4MXJKTEtwYlUxWE9wNTViOFBSMjR3eERQcTk3NWgwSTBYVkNYSk9LU2NG?=
+ =?utf-8?B?S2FVWGRENUlta0x2a0Q5NjgyajFjSlcvVWZwUjBwUk5KejZxcjQrS1dBdU5M?=
+ =?utf-8?B?L0dYUlpacGZjeWVZZzlYVGhJaEM0QVZQSm0rVFNxZmNUd0JhQ2pUT1Z2NEVu?=
+ =?utf-8?B?MUlraGhpcWUvSU5qQjFza090bWtxQTBWMG11blE3bWl0MDQ0NFl0UndIQnFT?=
+ =?utf-8?B?MGF0bDkwOXhZUlFsZEZVMXFyUXVNODR1RkpmT0p2aUgzUWRlOVRSVE1HT3gy?=
+ =?utf-8?B?TFVZNmxkRzl5TVo3bDVJOVMyOVJhSUJrYUlqOUFZdUltNkpQVUtoaWFHZkkv?=
+ =?utf-8?B?ZXBNbUIyOGhMUmRnMnFWdG5nNm0zc0Noa0c1WUdzUDJSQkxFZnVsMTE5U3h2?=
+ =?utf-8?B?bm15NTZNTjRLUTZ5VjhvaStiSzBsNkdydVdqSjRLSnJZS09OSnpsMisxcWxm?=
+ =?utf-8?B?Y2ZhdW9vWkJ3U1VzN0FDdzZTSGpORW5xeXlpVVRSTU9UQTM1UnA3UlJYTE43?=
+ =?utf-8?B?bU9SMTFuUEFUK0tFTkJ3SzVQaU5ndFpreFBld1JkSjhPRkVjYTJvZmFBTzBy?=
+ =?utf-8?B?U3E5bnFqcUFGbGpBbEh2dittWUdQK1M1c3piNTQwai9TazJheS9OZHh3cy9H?=
+ =?utf-8?B?d2FSYStTYVhvUnc3VStIWGE4djVJTk0xbEZXb2V5MVRUOWVrWE9NcXFzMVIx?=
+ =?utf-8?B?ZVkwVFpoQTRuMVl1M2dyVHJKV2V0WSt3b29FVXlXVHlTN2VXZzQwemNVSGdy?=
+ =?utf-8?B?VWRPRWQ5QmxwVnlEUklGczcwQWpxS01qN3ZSa0N4TWtFNGtRSEJIbXh0cGw1?=
+ =?utf-8?B?QnNpRlVaZmlPdlZJek04ZkRYR2NEN0Z0WUdnNEYvKythWEZNZVRoeW80Vm5s?=
+ =?utf-8?B?bWJZSUdrWVBVYzQ5c04xdit2R1NmTnJHaStMMmgxcSt4MnZjYU5UOUJzRWN6?=
+ =?utf-8?B?MDZBTnpVZENJOWFxWVNTUTJlS1BXRVN3Sm1GRGQvM1FTRnFXaXovOVFibjdS?=
+ =?utf-8?B?OStQSWwxdWZLNjBZSXNmWjVCOUx2NGZZdWQ1VVdvQ2R2ODJlbnU2ZXVKWHdu?=
+ =?utf-8?B?MnFuRHkrZWUzdkdlQm9ZY1g2N1J1azU0K3VKN01OOGpWWSs4UkhNYTJZeGtN?=
+ =?utf-8?B?QXl5VHprUHMyY3N0ODNISzFZUUxPVE1CRytZNGxDMFFyZnRPaENLNTAwSUwy?=
+ =?utf-8?B?L0gxUG0yTTBsemdkeXFJb0FmbnFZdjJ1NzltWWhYbWtDajR4cWtFeG1hNmMw?=
+ =?utf-8?B?NGMzOWtGd2Q3dUZPbkc0UkhkNjRSTkh3bkJZMDJlUjdRUThCZy85d0dkanB5?=
+ =?utf-8?B?WUxkM2FSaDFsbWREdld6emZzaUxrWWtiYUNaQjZoYyt4bk41OTkvSDRCaERl?=
+ =?utf-8?B?NW1NTVg0NlNMKzF6a1FwYS9aSmxJTEJhTGkyNmNiWitNNWVaWmxSdEoxcVky?=
+ =?utf-8?B?ekswQlJ3dXFzK3lPRnZrYVVxdk1oQTdlVENydU5iWmpacEQraHRuMjVoejdq?=
+ =?utf-8?Q?kKFYq5T7Gq5xnwBGScOnM88xK?=
+X-OriginatorOrg: axis.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6265e74b-dcf6-4ca7-0097-08de25b7fc0f
+X-MS-Exchange-CrossTenant-AuthSource: DB7PR02MB4661.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2025 09:02:07.2116
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ohZ0fBP+pRyIIOZ/gDxnsXHBvJfKyc0PY3r0JQmkM3t6XtIrzvjwuPBzoDYs6GqpaWp3cGuAuy5iEusa7Tn58A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR02MB9768
 
-The ksmbd listener thread was using busy waiting on a listening socket by
-calling kernel_accept() with SOCK_NONBLOCK and retrying every 100ms on
--EAGAIN. Since this thread is dedicated to accepting new connections,
-there is no need for non-blocking mode.
+(resend due to html bounce)
+On 11/15/25 21:41, Andrew Lunn wrote:
+> On Fri, Nov 14, 2025 at 02:59:36PM +0100, Peter Enderborg wrote:
+>> Ref https://standards-oui.ieee.org/ethertype/eth.txt
+>>
+>>
+> Is this actually registered with IANA?
 
-Switch to a blocking accept() call instead, allowing the thread to sleep
-until a new connection arrives. This avoids unnecessary wakeups and CPU
-usage. During teardown, call shutdown() on the listening socket so that
-accept() returns -EINVAL and the thread exits cleanly.
+No.
 
-The socket release mutex is redundant because kthread_stop() blocks until
-the listener thread returns, guaranteeing safe teardown ordering.
+> https://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml
+>
+> Does not list it. Please keep the "NOT AN OFFICIALLY REGISTERED ID" if
+> it is not.
 
-Also remove sk_rcvtimeo and sk_sndtimeo assignments, which only caused
-accept() to return -EAGAIN prematurely.
+Let med quote  text from your link.
 
-Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
----
-v2 -> v3: https://lore.kernel.org/linux-cifs/20251111104750.25739-1-dqfext@gmail.com
- Remove unused functions.
+Note
 
-v1 -> v2: https://lore.kernel.org/linux-cifs/20251030064736.24061-1-dqfext@gmail.com
- Do not remove TCP_NODELAY, as accepted sockets inherits from it.
- Fix accept() blocking forever on older kernel versions.
- Remove a redundant mutex
+    This page has assignments under the control of the IEEE
+    Registration Authority that are of primarily historic interest
+    that and have traditionally been on the IANA web pages.
+    For allocations under the IANA OUI [RFC9542 <https://www.iana.org/go/rfc9542>], see the "Ethernet
+    Numbers" IANA web page.  Contact information for the IEEE
+    Registration Authority is as follows:http://standards.ieee.org/develop/regauth
 
- fs/smb/server/transport_tcp.c | 41 +++++------------------------------
- 1 file changed, 6 insertions(+), 35 deletions(-)
+Ethertypes:
 
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index 6e03e93321b8..4bb07937d7ef 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -22,7 +22,6 @@ struct interface {
- 	struct socket		*ksmbd_socket;
- 	struct list_head	entry;
- 	char			*name;
--	struct mutex		sock_release_lock;
- 	int			state;
- };
- 
-@@ -56,19 +55,6 @@ static inline void ksmbd_tcp_reuseaddr(struct socket *sock)
- 	sock_set_reuseaddr(sock->sk);
- }
- 
--static inline void ksmbd_tcp_rcv_timeout(struct socket *sock, s64 secs)
--{
--	if (secs && secs < MAX_SCHEDULE_TIMEOUT / HZ - 1)
--		WRITE_ONCE(sock->sk->sk_rcvtimeo, secs * HZ);
--	else
--		WRITE_ONCE(sock->sk->sk_rcvtimeo, MAX_SCHEDULE_TIMEOUT);
--}
--
--static inline void ksmbd_tcp_snd_timeout(struct socket *sock, s64 secs)
--{
--	sock_set_sndtimeo(sock->sk, secs);
--}
--
- static struct tcp_transport *alloc_transport(struct socket *client_sk)
- {
- 	struct tcp_transport *t;
-@@ -236,20 +222,14 @@ static int ksmbd_kthread_fn(void *p)
- 	unsigned int max_ip_conns;
- 
- 	while (!kthread_should_stop()) {
--		mutex_lock(&iface->sock_release_lock);
- 		if (!iface->ksmbd_socket) {
--			mutex_unlock(&iface->sock_release_lock);
- 			break;
- 		}
--		ret = kernel_accept(iface->ksmbd_socket, &client_sk,
--				    SOCK_NONBLOCK);
--		mutex_unlock(&iface->sock_release_lock);
--		if (ret) {
--			if (ret == -EAGAIN)
--				/* check for new connections every 100 msecs */
--				schedule_timeout_interruptible(HZ / 10);
-+		ret = kernel_accept(iface->ksmbd_socket, &client_sk, 0);
-+		if (ret == -EINVAL)
-+			break;
-+		if (ret)
- 			continue;
--		}
- 
- 		if (!server_conf.max_ip_connections)
- 			goto skip_max_ip_conns_limit;
-@@ -458,10 +438,6 @@ static void tcp_destroy_socket(struct socket *ksmbd_socket)
- 	if (!ksmbd_socket)
- 		return;
- 
--	/* set zero to timeout */
--	ksmbd_tcp_rcv_timeout(ksmbd_socket, 0);
--	ksmbd_tcp_snd_timeout(ksmbd_socket, 0);
--
- 	ret = kernel_sock_shutdown(ksmbd_socket, SHUT_RDWR);
- 	if (ret)
- 		pr_err("Failed to shutdown socket: %d\n", ret);
-@@ -532,9 +508,6 @@ static int create_socket(struct interface *iface)
- 		goto out_error;
- 	}
- 
--	ksmbd_socket->sk->sk_rcvtimeo = KSMBD_TCP_RECV_TIMEOUT;
--	ksmbd_socket->sk->sk_sndtimeo = KSMBD_TCP_SEND_TIMEOUT;
--
- 	ret = kernel_listen(ksmbd_socket, KSMBD_SOCKET_BACKLOG);
- 	if (ret) {
- 		pr_err("Port listen() error: %d\n", ret);
-@@ -604,12 +577,11 @@ static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
- 		if (iface && iface->state == IFACE_STATE_CONFIGURED) {
- 			ksmbd_debug(CONN, "netdev-down event: netdev(%s) is going down\n",
- 					iface->name);
-+			kernel_sock_shutdown(iface->ksmbd_socket, SHUT_RDWR);
- 			tcp_stop_kthread(iface->ksmbd_kthread);
- 			iface->ksmbd_kthread = NULL;
--			mutex_lock(&iface->sock_release_lock);
--			tcp_destroy_socket(iface->ksmbd_socket);
-+			sock_release(iface->ksmbd_socket);
- 			iface->ksmbd_socket = NULL;
--			mutex_unlock(&iface->sock_release_lock);
- 
- 			iface->state = IFACE_STATE_DOWN;
- 			break;
-@@ -672,7 +644,6 @@ static struct interface *alloc_iface(char *ifname)
- 	iface->name = ifname;
- 	iface->state = IFACE_STATE_DOWN;
- 	list_add(&iface->entry, &iface_list);
--	mutex_init(&iface->sock_release_lock);
- 	return iface;
- }
- 
--- 
-2.43.0
+Registration Procedure(s)
+
+    Not assigned by IANA. Per [RFC9542 <https://www.iana.org/go/rfc9542>], updates to this registry
+    are coordinated with the expert.
+
+Note
+
+    The following list of Ethertypes is contributed unverified
+    information from various sources.  See the IEEE Registration
+    Authority web pages at [http://standards.ieee.org/develop/regauth]
+    for a public list of Ethertypes.
+
+    Another list of Ethertypes is maintained by Michael A. Patton
+    and is accessible at:http://www.cavebear.com/archive/cavebear/Ethernet/index.html
+         
+
+> 	Andrew
+
+IEEE is the official source to use for ethertype number assignment.
+
+/Peter
 
 
