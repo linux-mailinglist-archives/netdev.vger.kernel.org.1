@@ -1,230 +1,134 @@
-Return-Path: <netdev+bounces-239276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E82BEC66997
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:54:29 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41997C669F9
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:10:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5B2CA4EC79F
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 23:53:59 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 23713361AE8
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4FA30F944;
-	Mon, 17 Nov 2025 23:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64C82B9B7;
+	Tue, 18 Nov 2025 00:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E8BdIzAP"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="EHYMEOdv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic304-22.consmr.mail.ne1.yahoo.com (sonic304-22.consmr.mail.ne1.yahoo.com [66.163.191.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308E830E822;
-	Mon, 17 Nov 2025 23:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159C529A1
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.191.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763423597; cv=none; b=gyUVGb0Dfs/apq6syjANI+3htd5YBK6LvMHMed++DK3j4Mwn6oxma5WK55EKy//qaZGDNA/NOthST25tftW4Zi9iDBQB7DbK5CCdkl0JWcRivb4uzF/C8txpCjALC7eaWUDzJq6q4QWcgl3BkVSWfzSJ3cNmFyZliHTTNFirnSs=
+	t=1763424560; cv=none; b=qqi0899Lhxexeu45rBLlP73oW94bqOE+VYa49KaynycdqYk/NU1QGloGf+LYqAoI91QGYA3NkDwq7yLempptXM97Tp9LIKhtdETg0PKyM27mddYrMeyrZBhfEXtn2/C3X/sDmam/H4be+1esBR0Qlh4+bOS/w6QwChDK+eIm/Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763423597; c=relaxed/simple;
-	bh=+40SYsJpAQOkn3DRJWhnXLXBCZYMk+TJGUfJCa6Luwk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tawyuL39iuxEHwaocBUVajWkZ75hSPY6LOwMGdPudad0KEZpeHPotl0icK32x09MsoPkTQB2oakdCEGquVO3QG4We7mIgf2/2/aJ2siPAV2pmb7sRjeqe+Rqk9WjXZxgOVdmyTV5RSICB2d7R2KygUI5pLu2bi4xOXjCw59qfKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E8BdIzAP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9AD5C19423;
-	Mon, 17 Nov 2025 23:53:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763423596;
-	bh=+40SYsJpAQOkn3DRJWhnXLXBCZYMk+TJGUfJCa6Luwk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=E8BdIzAPdMseKwqqf2eRwH+rqidCj3sfGIUNpSluBBuZYG5oI2GmKXHAxTHQhVsCA
-	 MRFeoOsWnsP8xfxTeH5r8H5ZXcnaGjg/k4G9gpMBtopW7RUDjRbhZ2EefONFnMAuV0
-	 2h6+W7vZ3vgReMGVyK8AF05dkkrtk95Fo0pYmo+YhTGX1poe4dHxUf2DIX113MGlyJ
-	 reUtOl63+okRr9Y3GvnfzAjjxhGaWYiVeKXteL51uhnz36hmVDvVCQqhmrLD/gzWYf
-	 aGLSUNoxCXutWAZGkgjCak6Fok1hoRbJDCP8qB93v//lAokelVYmsvo159eOWAvKuO
-	 a94DaLEJ9Wafg==
-Date: Tue, 18 Nov 2025 00:53:12 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Phil Sutter <phil@nwl.cc>, Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH nf-next v9 2/3] net: netfilter: Add IPIP flowtable tx sw
- acceleration
-Message-ID: <aRu1aFVwT_FPDeZ1@lore-desk>
-References: <20251107-nf-flowtable-ipip-v9-0-7cbc4090dfcb@kernel.org>
- <20251107-nf-flowtable-ipip-v9-2-7cbc4090dfcb@kernel.org>
- <aRSDjkzMx4Ba7IW8@calendula>
- <aRSvnfdhO2G1DXJI@lore-desk>
- <aRUT-tFXYbwfZYUk@calendula>
- <aRWLhLobB4Rz0dA_@lore-desk>
- <aRunjT-HYQ-UeR_-@calendula>
+	s=arc-20240116; t=1763424560; c=relaxed/simple;
+	bh=sDS8nJ+7QRCBIWiF+ZSg+ecSQqk6Tlavgg7jd/hTqoA=;
+	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type:
+	 References; b=PJE2G5SoXWz3+aYkPNuMhb+1OBJC+ggu71HPtH/cnzPriqYkaCOhI/mK50niWc0i1xKsQe2v6sppaxhPXvGFpiXxkrk8x8P6gOWDPBTn0BEjdFNQh0jqDRYX4uGFY/r9eqMFyBNTY4xqnpeB95Jf5qFsbiRQSEf+lbQKBRbnLNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=EHYMEOdv; arc=none smtp.client-ip=66.163.191.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1763424552; bh=sDS8nJ+7QRCBIWiF+ZSg+ecSQqk6Tlavgg7jd/hTqoA=; h=Date:From:To:Cc:Subject:References:From:Subject:Reply-To; b=EHYMEOdvpVOi9L36D0nkFOw4EJOEa3aJ7u2i2kgXlgWX4tq9euOXHyBBpZrNTWyM76DYisxBFTgsO1FD8e+SFONwqEbpuGP8IKjHaEwkN1RUG1CWLQHWFDuZ73dqusMPKe8sjMmXiDqxRXbxLybJQwtWEhb1nnKh+d1VpBp+rMEhBvgm1c1g5Ke6RUdzELWo6kHSeJPEBtostRSIiNPH3Zp0o+r9S9lVL3crHBYThYjQK8eBQfzIVcN6A6G4DIXF55171f8JSZHE6IDOQoKsBefpYwayWtmP+FBINM7bEhyVpiaJNXrOYtHUXK42AS/XVn3WUhDpiwoYt3GOyvsKDA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1763424552; bh=vze8TQ1BPHp04ZoMXi/n86ndl1ZGSwHA/rRfKtya2RK=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=FLw1raEHMjjopAxtzZb+vJYK4pzp/w0YrAdigGuY2q9BPSkXzI1xrCSDXkpZVh3LDdc5EdiQ5d+Ix4tHsa+N+VgtD9Xazm1gmAumuGtgV6UuTvKqvJLvsKEg++r11WNoO7RLkIKygkM8m2CXn/+eyiX0dh30aX92lvknLg2C+TZqRdKjT+8CzoMSEHfqAWwnFs1PW41X9jDixv4ub/RWqNlk808FbFrxaI4Ru4A/egGAMr8vi2gEeMERum3H848srUbbc80qCB794F+hxLLFiVnQSc9+PR6/F75qGQGqGpaK7tfl9X250HvuozAKz9vPbOR3qV7SNgRsYAsJEUOF9Q==
+X-YMail-OSG: fCdAucQVM1kC2IMkKG7KhCOR.lUjDlctwhQM8nA2R7aRk33x1VRV1aAqp34L249
+ KOBjSXE2nXek5y_Rju9RzSxEiZwgLRRI..WSUxxt8ebqhITRCD0wxL3tnT_KbsCew0BINxkGj44g
+ jrsIMuR1v4AMIhiTmO_OMj726Lf40NAmVR4oLix7Z_XhIx1QYDo7EP9VMld8xEEPTsm_EWEe8FbS
+ FYWf0i7WhAKV.Bfb.WkvOBFfDX.W8SfVU1MeHBw7NlzQlXD9fMc0qpTCPy3t2gXXVHbYTowQIn2G
+ h3Vdr_Tt0QQRakpexY0wdGUIA7qUKe4sjF7Tb1LoK0UFbYRPZt6gvNVI9HbUWX2jzKBFsvfpQ7s1
+ W17jESgSikYZZYKoHZ1W8MSqAvFoV26uu4KfdxrjdSTh5_BsmDc9IyFGOMXJj7BxewKbEjRCXsgQ
+ qHrebBpN4.fRfA9A1VGKXk.DTO_ifYtP4rXy41BtG02qWPB4eadBLE9UJ4HQ0bS_l9nQ48c0LGVo
+ vB_gpM1V52Hsv31Z7z8uqUUoD6mWSUBRYpqcr0T13jZOLpAbjSoeWmGlJjyMEecZ88l8ZUyf2rPN
+ nDmrnBByn5q38FxYLgKx.1grpnaKwP2whsrc2AsmlUf8OLeyFRiH2h8wvq_zV1.T.4GZqufrWnQ3
+ VM70i5XUtWTDOh7O5iTTX0upS52Ycb7f.mD4Y5eE7AKqDHjlWLgOtBvR6hhkAoTctZx83bxKuw.W
+ 8.Pya_kwZ8ZaW2cOPvqp_pab0_j11pt29oXookRZj3Y_IsskipiKu3u7gOdnGHfpN9eE1BNB_4dR
+ Xp5gXWsxZ7OjSgvuC76Baz6esrUrKRnkJk9psOMJwtPrbebnutbehHfdF.71r5kk_xdOgL0UBCwW
+ 4Cod9jUb8uMo5y3PNw47jZXlQ5WY_XqDmsL4IU8IAEG1LAn.wkJ91KkPHwGtG3rFX44JeRF5vWQl
+ Aeok4nlysQOcILwaYpD1YTACK9485HDEGs_40sn2VpPzBU_KZh_oNYmv4FDVbd5SifepLiBmviGQ
+ O7_5izRQ4XmsTRLK87._I_1k2F6KWri.TKfUfVf35oxiVXu4V3e_DiCGZTravAUIxsls4F6ZJlce
+ f8bDp2E2vZ3wmWtImnKRrEfYZIQ1pmpeaROLKt6wvJpVuEDXGuW6W.p5Bgz544pDQ4fTk6KWbaj5
+ he08vx0Pe1_Hwlk2ZoUptn46mWFdqoBSwoDlUu6fNo_w64ihN12c4e7fiN9u8RYYMYLJJ6L3tFEG
+ LfJXH7O6Enc4KEU_hdGPBbKd6_HQx8Q_.mTpJyexPT.3D52Un45a9zHl7md7H.BESXlJXZ_Rwwwf
+ DuAUM8uhPvSXv919_lpggFaU7yZD1PPRh44EKWSmedvnQawTm43fqoqLRxbllNbgluiXcJIaX634
+ 0f6jE_zKf6G6MZ2ekZtOvyjDnwRR5gtEXwOnojgk5XnoCeB0KoLErhnwnE9du04ER6Q9kcSvyg7V
+ YQ9.5hbfcIR3A9XzdTTNA7effhNs11mXdzFQG8xZKwkaBIrVCsW1C.y0CkfqXaW3V636lguBRlti
+ Iean5sxLvyJxdfgXZGi4pR1J.4mN5QCiKiA2zYTOSGJJB1EXcm9wxfG1IweBgb.uvtH400jZakRm
+ DXhAkBF_hIWL_TSojJHJc9.VHhtNH7fMQJn_iPgecTJgv6B7cFDt_EULICjit1S4vE5JYUT2ENIV
+ de_yOs3jt1Lt8.cD6h7PqwaHWtcQsVpHFKZJ_DLG3q2ZPmIXvSjp3oaTvfG9q5dJl3a_66NGJdez
+ uJdMVzF5wYkSuoM0su3CbFgDeyYw1XzCNGXt9XEAysAUrv4.2OBP8UWuKZWEb8PrL3JSKy_Hl2Qk
+ s474OvFZhDpWYi2dMJRKn9zbf9hbShKR0z_M84142QTEXwpEnjjP7vErrUtGBalErYyUBOZ5KsBy
+ _ZfzQXTiK70cqZZ.dV..aVJo7aojIXyd1rnfNWkhQGsggtEvtJ_q7niBiNHR4EYeRmUyrib3rF5Z
+ O_oWk2gti8Rhk6dcukpZPVScBUUXisiKnstQN6raFCSzW_RmRKeF3Uy0Q8XBeB75PYb0sxjABWzy
+ iMQzswLERupo34oqdk2ZaBgA.8mbMrW4J.A.VYclNl4i92cRCv_NGP2xM5CL6neQx6StYzbFAzKN
+ Atru25SwvwJF1xp.x_2c3Piv7bYVlUayxe8F4Ny093_CC8ggrH8jSCedAjSqurpSUyHZiZ4YA42S
+ ZZqhOvQI0rcRgOrAMhWKFAAqe.PRmfAAyYngr6ZFAH1ZzUw--
+X-Sonic-MF: <namiltd@yahoo.com>
+X-Sonic-ID: 9b51e3e3-4e7d-4543-8491-80db4875e8d7
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic304.consmr.mail.ne1.yahoo.com with HTTP; Tue, 18 Nov 2025 00:09:12 +0000
+Date: Mon, 17 Nov 2025 23:58:48 +0000 (UTC)
+From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+To: Netdev <netdev@vger.kernel.org>
+Cc: "inus.walleij@linaro.org" <inus.walleij@linaro.org>, 
+	"edumazet@google.com" <edumazet@google.com>, 
+	"alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>, 
+	"olteanv@gmail.com" <olteanv@gmail.com>, 
+	"kuba@kernel.org" <kuba@kernel.org>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, 
+	Andrew Lunn <andrew@lunn.ch>
+Message-ID: <878777925.105015.1763423928520@mail.yahoo.com>
+Subject: [PATCH] net: dsa: realtek: rtl8365mb: Do not subtract ifOutDiscards
+ from rx_packets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="G18J24CSxAvkYMcc"
-Content-Disposition: inline
-In-Reply-To: <aRunjT-HYQ-UeR_-@calendula>
-
-
---G18J24CSxAvkYMcc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+References: <878777925.105015.1763423928520.ref@mail.yahoo.com>
+X-Mailer: WebService/1.1.24652 YMailNorrin
 
-> On Thu, Nov 13, 2025 at 08:40:52AM +0100, Lorenzo Bianconi wrote:
-> > > Hi Lorenzo,
-> >=20
-> > Hi Pablo,
-> >=20
-> > >=20
-> > > On Wed, Nov 12, 2025 at 05:02:37PM +0100, Lorenzo Bianconi wrote:
-> > > [...]
-> > > > > On Fri, Nov 07, 2025 at 12:14:47PM +0100, Lorenzo Bianconi wrote:
-> > > > > [...]
-> > > > > > @@ -565,8 +622,9 @@ nf_flow_offload_ip_hook(void *priv, struct =
-sk_buff *skb,
-> > > > > > =20
-> > > > > >  	dir =3D tuplehash->tuple.dir;
-> > > > > >  	flow =3D container_of(tuplehash, struct flow_offload, tupleha=
-sh[dir]);
-> > > > > > +	other_tuple =3D &flow->tuplehash[!dir].tuple;
-> > > > > > =20
-> > > > > > -	if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
-> > > > > > +	if (nf_flow_encap_push(state->net, skb, other_tuple))
-> > > > > >  		return NF_DROP;
-> > > > > > =20
-> > > > > >  	switch (tuplehash->tuple.xmit_type) {
-> > > > > > @@ -577,7 +635,9 @@ nf_flow_offload_ip_hook(void *priv, struct =
-sk_buff *skb,
-> > > > > >  			flow_offload_teardown(flow);
-> > > > > >  			return NF_DROP;
-> > > > > >  		}
-> > > > > > -		neigh =3D ip_neigh_gw4(rt->dst.dev, rt_nexthop(rt, flow->tup=
-lehash[!dir].tuple.src_v4.s_addr));
-> > > > > > +		dest =3D other_tuple->tun_num ? other_tuple->tun.src_v4.s_ad=
-dr
-> > > > > > +					    : other_tuple->src_v4.s_addr;
-> > > > >=20
-> > > > > I think this can be simplified if my series use the ip_hdr(skb)->=
-daddr
-> > > > > for rt_nexthop(), see attached patch. This would be fetched _befo=
-re_
-> > > > > pushing the tunnel and layer 2 encapsulation headers. Then, there=
- is
-> > > > > no need to fetch other_tuple and check if tun_num is greater than
-> > > > > zero.
-> > > > >=20
-> > > > > See my sketch patch, I am going to give this a try, if this is
-> > > > > correct, I would need one more iteration from you.
-> > > > >
-> > > > > diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_=
-flow_table_ip.c
-> > > > > index 8b74fb34998e..ff2b6c16c715 100644
-> > > > > --- a/net/netfilter/nf_flow_table_ip.c
-> > > > > +++ b/net/netfilter/nf_flow_table_ip.c
-> > > > > @@ -427,6 +427,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk=
-_buff *skb,
-> > > > >  	struct flow_offload *flow;
-> > > > >  	struct neighbour *neigh;
-> > > > >  	struct rtable *rt;
-> > > > > +	__be32 ip_dst;
-> > > > >  	int ret;
-> > > > > =20
-> > > > >  	tuplehash =3D nf_flow_offload_lookup(&ctx, flow_table, skb);
-> > > > > @@ -449,6 +450,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk=
-_buff *skb,
-> > > > > =20
-> > > > >  	dir =3D tuplehash->tuple.dir;
-> > > > >  	flow =3D container_of(tuplehash, struct flow_offload, tuplehash=
-[dir]);
-> > > > > +	ip_dst =3D ip_hdr(skb)->daddr;
-> > > >=20
-> > > > I agree this patch will simplify my series (thx :)) but I guess we =
-should move
-> > > > ip_dst initialization after nf_flow_encap_push() since we need to r=
-oute the
-> > > > traffic according to the tunnel dst IP address, right?
-> > >=20
-> > > Right, I made a quick edit, it looks like this:
-> > >=20
-> > > @@ -566,9 +624,14 @@ nf_flow_offload_ip_hook(void *priv, struct sk_bu=
-ff *skb,
-> > > =20
-> > >         dir =3D tuplehash->tuple.dir;
-> > >         flow =3D container_of(tuplehash, struct flow_offload, tupleha=
-sh[dir]);
-> > > +       other_tuple =3D &flow->tuplehash[!dir].tuple;
-> > > +
-> > > +       if (nf_flow_tunnel_push(skb, other_tuple) < 0)
-> > > +               return NF_DROP;
-> > > +
-> > >         ip_daddr =3D ip_hdr(skb)->daddr;
-> > > =20
-> > > -       if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
-> > > +       if (nf_flow_encap_push(skb, other_tuple) < 0)
-> > >                 return NF_DROP;
-> > > =20
-> > >         switch (tuplehash->tuple.xmit_type) {
-> > >=20
-> > > That is, after tunnel header push but before pushing l2 encap (that
-> > > could possibly modify skb_network_header pointer), fetch the
-> > > destination address.
-> > >=20
-> > > I made a few more comestic edits on your series and I pushed them out
-> > > to this branch:
-> > >=20
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git=
-/log/?h=3Dflowtable-consolidate-xmit%2bipip
-> > [
-> >=20
-> > ack, I tested this branch and it works fine running my local tests. Tha=
-nks for
-> > fixing pending bits.
->=20
-> I need this one more little change below.
->=20
-> > > I just noticed, in nf_flow_tunnel_ipip_push(), that this can be remov=
-ed:
-> > >=20
-> > >         memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
-> > >=20
-> > > because this packet never entered the IP layer, the flowtable takes it
-> > > before it can get there.
->=20
-> I have removed this memset and pushed out a new branch:
->=20
-> flowtable-consolidate-xmit+ipip2
+rx_packets should report the number of frames successfully received:
+unicast + multicast + broadcast. Subtracting ifOutDiscards (a TX
+counter) is incorrect and can undercount RX packets. RX drops are
+already reported via rx_dropped (e.g. etherStatsDropEvents), so
+there is no need to adjust rx_packets.
 
-ack, it works fine for me.
+This patch removes the subtraction of ifOutDiscards from rx_packets
+in rtl8365mb_stats_update().
 
-Regards,
-Lorenzo
+Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+---
+=C2=A0drivers/net/dsa/realtek/rtl8365mb.c | 3 +--
+=C2=A01 file changed, 1 insertion(+), 2 deletions(-)
 
->=20
-> This should be good to go.
->=20
-> Thanks.
-
---G18J24CSxAvkYMcc
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaRu1aAAKCRA6cBh0uS2t
-rB5RAQClR98PxzwNtjjXo/hXwY/JOJcQSRS/UnxtyYV7UbGZxwEAkAq75owpSCVL
-NbGw/GXOg9iszX3kiYz9B9EmeNJ9awY=
-=+xCp
------END PGP SIGNATURE-----
-
---G18J24CSxAvkYMcc--
+diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/=
+rtl8365mb.c
+index 964a56e..af0d84d 100644
+--- a/drivers/net/dsa/realtek/rtl8365mb.c
++++ b/drivers/net/dsa/realtek/rtl8365mb.c
+@@ -1480,8 +1480,7 @@ static void rtl8365mb_stats_update(struct realtek_pri=
+v *priv, int port)
+=C2=A0
+=C2=A0 =C2=A0 =C2=A0stats->rx_packets =3D cnt[RTL8365MB_MIB_ifInUcastPkts] =
++
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cnt[RTL8365MB=
+_MIB_ifInMulticastPkts] +
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cnt[RTL8365MB_MIB_=
+ifInBroadcastPkts] -
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cnt[RTL8365MB_MIB_=
+ifOutDiscards];
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cnt[RTL8365MB_MIB_=
+ifInBroadcastPkts];
+=C2=A0
+=C2=A0 =C2=A0 =C2=A0stats->tx_packets =3D cnt[RTL8365MB_MIB_ifOutUcastPkts]=
+ +
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cnt[RTL8365MB=
+_MIB_ifOutMulticastPkts] +
+--=C2=A0
+2.46.0
 
