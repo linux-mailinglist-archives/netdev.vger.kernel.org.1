@@ -1,48 +1,43 @@
-Return-Path: <netdev+bounces-239035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D9B3C62ACC
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:11:27 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1888CC62B75
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 58A69350C26
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:11:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 44A794EAF17
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05A8317708;
-	Mon, 17 Nov 2025 07:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DsfQNHX4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A0A30EF66;
+	Mon, 17 Nov 2025 07:26:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8250D316909;
-	Mon, 17 Nov 2025 07:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B372E156661;
+	Mon, 17 Nov 2025 07:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763363478; cv=none; b=EnG8EjoAq3+1f5YGySY1V4ZUeV18mVh4+ftQH2MmHlc7fytqQnJejRDSLInXtPsFeHOkUne0E8cD3EKwhQXadLfX7ERz6Yd1RvS9hweh8DJMZmhvLK7F45+PyHeMRynUSY2Gbfa3CAo+nSUaA5T3TAONq3GJjXAaa/TZJQSxC8s=
+	t=1763364413; cv=none; b=XiAhzjpEHANTiI4z0il9ZOljgpCOGUZmEkKWk9+57lwSqxZvxMYWcYAskb7IPGscVTQnmkdmfMunmX8QjDcRIV9iMCUe++0czAHBaM32Jg4BL8L+0VLp4vFWuD0eo5DKgDo7h4MD/V1Kt48Koco8oNzj52oiShGNxO1gquPHjYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763363478; c=relaxed/simple;
-	bh=n/Lorf00oIeL8NcXXfKtNjzNM8fzyT8fT3D731d/Zfg=;
+	s=arc-20240116; t=1763364413; c=relaxed/simple;
+	bh=tWBXgKy9oEsdWFTCNVD9n4cGX778aInFhrpLM35q0HA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MZ00IuCvuAWA9HDjVp6EOUbRXohenGvVGa7otddcNwDSlmfw6HEcoS3z1TVVz4vnffpWA/TkVWGGmujvgrYm9URmoocw7wCy73ytCjhl8Q29dOiE9mZbZAZ4Ozz27vC3a/0fDgvWxO6oufSIfXiXm09N95+7GWQtCXUzEJMUOPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DsfQNHX4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45CB7C4CEF1;
-	Mon, 17 Nov 2025 07:11:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763363478;
-	bh=n/Lorf00oIeL8NcXXfKtNjzNM8fzyT8fT3D731d/Zfg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=DsfQNHX4yHKMEuQNzivLmPSvNg1GT14FSWM8cLhfJduQojTUVNLgOs8iq/0syOojh
-	 WuGuaPAGYKsQdP/DTSQDb9+unoP5KJ0tkl6le5fgCvcevJvCeiN2D95pWt0LwJP735
-	 ZRKVcx3qQ2zWb+seVPgj7YbVDiWyFqhO5+ePRYpWWGZeufxCZ665RjJd9ewM4tNyON
-	 ip5+0Cpbucoq/0HGmYoAtYsApisjo0N6ae+W9VbkZP/HwJhrARilXWfQH4AykjNS+t
-	 5ZdX7Yoj0rZio3OoCbYdkDqfe9H07IfcFHZWl5/1biRvZIH/VBh4qBvczCi+LqtEEJ
-	 rKmC312gtIFWQ==
-Message-ID: <4758205a-14ae-498e-8dcd-6770787ddb3f@kernel.org>
-Date: Mon, 17 Nov 2025 08:11:11 +0100
+	 In-Reply-To:Content-Type; b=K5yeGK3YwBRNZ2X/jPoXmcuzblLBfyTmsV99M1I/LQ8jr5L5OaMC93gdy/YQ0foCGE4a61lmv/LrwFLRyJ0qfAZ/L1X8jB3IoMEiZTkwBdoKTO88JJuldVA3iUtsluLpmsuTX6xAyXoorpBSCtPEXNBM6MrDT1zYtCaw+ZJunv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.216] (p5dc55243.dip0.t-ipconnect.de [93.197.82.67])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 600AF61CC3FDE;
+	Mon, 17 Nov 2025 08:25:56 +0100 (CET)
+Message-ID: <09f58140-8d9c-42f3-a9f4-380c30d7c11e@molgen.mpg.de>
+Date: Mon, 17 Nov 2025 08:25:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,59 +45,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 03/10] uaccess: Use
- masked_user_{read/write}_access_begin when required
-To: Thomas Gleixner <tglx@linutronix.de>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Darren Hart <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>,
- Andre Almeida <andrealmeid@igalia.com>,
- Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
- <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org
-References: <cover.1762427933.git.christophe.leroy@csgroup.eu>
- <5effda898b110d413dc84a53c5664d4c9d11c1bf.1762427933.git.christophe.leroy@csgroup.eu>
- <87h5uv9ts5.ffs@tglx>
-From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-Content-Language: fr-FR
-In-Reply-To: <87h5uv9ts5.ffs@tglx>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: fix aux device unplugging
+ when rdma is not supported by vport
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ intel-wired-lan@lists.osuosl.org,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Emil Tantilov <emil.s.tantilov@intel.com>,
+ Madhu Chittim <madhu.chittim@intel.com>, Josh Hay <joshua.a.hay@intel.com>
+References: <20251117070350.34152-1-larysa.zaremba@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251117070350.34152-1-larysa.zaremba@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+
+Dear Larysa,
 
 
+Thank you for your patch.
 
-Le 15/11/2025 à 16:53, Thomas Gleixner a écrit :
-> On Thu, Nov 06 2025 at 12:31, Christophe Leroy wrote:
->> diff --git a/net/core/scm.c b/net/core/scm.c
->> index 66eaee783e8be..4a65f9baa87e7 100644
->> --- a/net/core/scm.c
->> +++ b/net/core/scm.c
->> @@ -274,7 +274,7 @@ int put_cmsg(struct msghdr * msg, int level, int type, int len, void *data)
->>   		check_object_size(data, cmlen - sizeof(*cm), true);
->>   
->>   		if (can_do_masked_user_access())
->> -			cm = masked_user_access_begin(cm);
->> +			cm = masked_user_write_access_begin(cm);
->>   		else if (!user_write_access_begin(cm, cmlen))
->>   			goto efault;
+Am 17.11.25 um 08:03 schrieb Larysa Zaremba:
+> If vport flags do not contain VIRTCHNL2_VPORT_ENABLE_RDMA, driver does not
+> allocate vdev_info for this vport. This leads to kernel NULL pointer
+> dereference in idpf_idc_vport_dev_down(), which references vdev_info for
+> every vport regardless.
+
+Please paste part of the Oops log lines.
+
+> Check, if vdev_info was ever allocated before unplugging aux device.
+
+Please describe your test system.
+
+> Fixes: be91128c579c ("idpf: implement RDMA vport auxiliary dev create, init, and destroy")
+> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+>   drivers/net/ethernet/intel/idpf/idpf_idc.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Shouldn't this be converted to scoped_....() ?
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
+> index c1b963f6bfad..4b1037eb2623 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
+> @@ -322,7 +322,7 @@ static void idpf_idc_vport_dev_down(struct idpf_adapter *adapter)
+>   	for (i = 0; i < adapter->num_alloc_vports; i++) {
+>   		struct idpf_vport *vport = adapter->vports[i];
+>   
+> -		if (!vport)
+> +		if (!vport || !vport->vdev_info)
+>   			continue;
+>   
+>   		idpf_unplug_aux_dev(vport->vdev_info->adev);
 
-Sure. I made the same comment to you when reviewing your series, see [1]
+The diff looks good.
 
-[1] 
-https://lore.kernel.org/all/e0795f90-1030-4954-aefc-be137e9db49e@csgroup.eu/
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-Do you prefer me to do it as part of my series ?
 
-Christophe
+Kind regards,
+
+Paul
 
