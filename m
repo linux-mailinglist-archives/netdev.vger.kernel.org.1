@@ -1,132 +1,101 @@
-Return-Path: <netdev+bounces-239165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81D20C64C43
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:01:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83212C64C49
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 16:01:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id CEC0129373
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 15:00:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 888F7241DA
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 15:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347E725524C;
-	Mon, 17 Nov 2025 15:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67BA3246793;
+	Mon, 17 Nov 2025 15:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TrbAwHvH"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2PdKD+Jp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2003023F439;
-	Mon, 17 Nov 2025 15:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8029D1FA272;
+	Mon, 17 Nov 2025 15:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763391631; cv=none; b=phaAjX/cxnmvAb/QrQce6BXRrQAG/DVk1R53xaGIpWob/wnd7s8x3MHPqlxg+3hWbifZqVSRcaUDhZXAFC6xUac35GZfy3wE2/VrlOnzBcjpxEDFU5nuL8Kx4pEGUmv80QjHN2av72QNL9gvuLOLUAXuZkX/xeeOLl7Fpiv4JDQ=
+	t=1763391680; cv=none; b=iLgin7VcuSAARrGwE1U2toiWBs3hSrZ1CiD3xrDyN7pSqUR0qIs6pALqBV34I3U8LDhWb+D1J+r3GgmVrpFVynf5aVqVhLnWHZg8PPhleXUa6PsZ34Z3wUZIaKpxS8Fq48jR234z4kXv4zhp8paXKJag8z7U9/I28jG8YYIsXUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763391631; c=relaxed/simple;
-	bh=hmMEbfTFN5n4CBo7J7vCAo90FSilyOzfTyWJPEvu0pw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xk2SVXOVti5LtdzbC+WQ+FX0QbqQg3HoizFnmW6OMdCgeOK2AEOBh5D/3179LktedgPC9HQtneL8vehChl39nLu80g9rNQTXEUAN/8iSVr56tQ3gc7l4JP+QD6piy2TaiCyd1MwS0023K+PPGXBLMEovVHXrDi7Zo9PXNXrDFlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TrbAwHvH; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763391629; x=1794927629;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hmMEbfTFN5n4CBo7J7vCAo90FSilyOzfTyWJPEvu0pw=;
-  b=TrbAwHvHHwOhDRbAQHXqadnhxkEx1unaHmh1vvvY4M/7XRcCpx0htGWI
-   GiUSvpINXBJyfe0y2FYAY91kQaxSS1bCsyD/nBqLInzTMMVVjpj5VusE1
-   c0kCNbZ02J/65vgTy2OVRuoM9FPVmLyjmLvvU2Ks1LeIesTAr2lkhY7Ht
-   46ANLYbWO4oM2EIxUtZJz2HS5gps0h0wGzI456RdVVgxDuIC7afWrVNHb
-   ylMojHN0DvXvF4kCWq78NooaVqnrrm/OkAjgYDrcRVTm0tdtG8XWLJhDj
-   0HTQ4FNY1wgmVt8l23+GDuC2auoiCOsJRqWDLuZQkzzjVxvGhyL0kRSjX
-   w==;
-X-CSE-ConnectionGUID: wcx/rsR9S92I8ppBFxq0Ig==
-X-CSE-MsgGUID: 0joTU6b/Rrao/Y8Py7hd8w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="76494758"
-X-IronPort-AV: E=Sophos;i="6.19,312,1754982000"; 
-   d="scan'208";a="76494758"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 07:00:28 -0800
-X-CSE-ConnectionGUID: 67tIj6PyS6e/Mbr+45zG3w==
-X-CSE-MsgGUID: w/9CJWlwShy9SNemyIRH6A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,312,1754982000"; 
-   d="scan'208";a="194569126"
-Received: from vverma7-desk1.amr.corp.intel.com (HELO [10.125.109.43]) ([10.125.109.43])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 07:00:27 -0800
-Message-ID: <3ef9ee39-b568-4f08-ba4f-82be65248cf6@intel.com>
-Date: Mon, 17 Nov 2025 08:00:26 -0700
+	s=arc-20240116; t=1763391680; c=relaxed/simple;
+	bh=oFOJO1GyFZlMuqC0ktZY+DppGZ5JUYf1B9IWZppeLa0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MFufVHqXw8U7gXyJzpkSp4GdgxS1q8au3bpuXQvhJ6all7GPxYah36gS6NjnLCr3RdbHmLvUqDqU51vb2s9jtz53jD0gLEx2YcWaaBsNn1y3qS4VKOMdjAWktjGyq5QhdC56r+MXKDxrFg9e0QbSercPKnZj8fXsHIT4T5bZf5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2PdKD+Jp; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=I8Qibn9z0+hnfsoUujz9XHvfnzb7ts/AzJXWKnTf/J4=; b=2PdKD+JprUcfEfy0JkVepWwooA
+	2zRbObiQzWJbPzfRjcrxJidDhEdxMQp+Np4CscDffUr7+x3myaK3Gd+miOTQQyioC9R80thmocEsr
+	6wvA57mu1zb9hGASFu6pGCtpLTsmjYa+AzF/2ClSe2axcU3IBuspQySuY+iDqqkILeLA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vL0j1-00EFj8-8i; Mon, 17 Nov 2025 16:01:03 +0100
+Date: Mon, 17 Nov 2025 16:01:03 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"eric@nelint.com" <eric@nelint.com>,
+	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] net: phylink: add missing supported link modes for
+ the fixed-link
+Message-ID: <f6324260-f019-4e1b-87c0-b57e862e28b4@lunn.ch>
+References: <20251116023823.1445099-1-wei.fang@nxp.com>
+ <30e0b7ba-ac60-49e0-8a6d-a830f00f8bbc@lunn.ch>
+ <PAXPR04MB8510785AF26E765088D1631788C9A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <9f9df3b3-ea08-43d7-8075-68b4fe19e6a0@lunn.ch>
+ <PAXPR04MB851071D8B6E7F1FBCBA656CA88C9A@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 06/22] cxl: Move pci generic code
-To: Alejandro Lucero Palau <alucerop@amd.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- Ben Cheatham <benjamin.cheatham@amd.com>, Fan Ni <fan.ni@samsung.com>,
- Alison Schofield <alison.schofield@intel.com>
-References: <20251110153657.2706192-1-alejandro.lucero-palau@amd.com>
- <20251110153657.2706192-7-alejandro.lucero-palau@amd.com>
- <20251112154103.000025fd@huawei.com>
- <8d0b9a21-c1bd-453f-903b-22aa302b3639@amd.com>
-From: Dave Jiang <dave.jiang@intel.com>
-Content-Language: en-US
-In-Reply-To: <8d0b9a21-c1bd-453f-903b-22aa302b3639@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PAXPR04MB851071D8B6E7F1FBCBA656CA88C9A@PAXPR04MB8510.eurprd04.prod.outlook.com>
 
-
-
-On 11/15/25 1:12 AM, Alejandro Lucero Palau wrote:
+> The default TCP block size sent by iperf is 128KB. ENETC then fragments
+> the packet via TSO and sends the fragments to the switch. Because the
+> link speed between ENETC and the switch CPU port is 2.5Gbps, it takes
+> approximately 420 us for the TCP block to be sent to the switch. However,
+> the link speed of the switch's user port is only 1Gbps, and the switch takes
+> approximately 1050 us to send the packets out. Therefore, packets
+> accumulate within the switch. Without flow control enabled, this can
+> exhaust the switch's buffer, eventually leading to congestion.
 > 
-> On 11/12/25 15:41, Jonathan Cameron wrote:
->> On Mon, 10 Nov 2025 15:36:41 +0000
->> alejandro.lucero-palau@amd.com wrote:
->>
->>> From: Alejandro Lucero <alucerop@amd.com>
->>>
->>> Inside cxl/core/pci.c there are helpers for CXL PCIe initialization
->>> meanwhile cxl/pci.c implements the functionality for a Type3 device
->>> initialization.
->>>
->>> Move helper functions from cxl/pci.c to cxl/core/pci.c in order to be
->>> exported and shared with CXL Type2 device initialization.
->>>
->>> Fix cxl mock tests affected by the code move, deleting a function which
->>> indeed was not being used since commit 733b57f262b0("cxl/pci: Early
->>> setup RCH dport component registers from RCRB").
->> As I replied late to v19, I'd like to understand more about this comment.
->> If it was not being used, why can't we remove it before this patch?
-> 
-> 
-> I replied back then, but if you think this is what I should do with no exception, I'll do it.
-> 
-> Should it be part of this patchset or something I should send independently?
+> Debugging results from the switch show that many packets are being
+> dropped on the CPU port, and the reason of packet loss is precisely
+> due to congestion.
 
-Alison is out this week due to a personal matter. I would just send this ahead and be done with it if it's just a function removal cleanup. 
+BQL might help you. It could break the 128KB burst up into a number of
+smaller bursts, helping avoid the congestion.
 
-DJ
+Are there any parameters you can change with TSO? This is one
+stream. Sending it out at 2.5G line rate makes no sense when you know
+it is going to hit a 1G egress. You might as well limit TSO to
+1G. That will help single stream traffic. If you have multiple streams
+it will not help, you will still hit congestion, assuming you can do
+multiple TSOs in parallel.
 
-> 
-> 
->>
->>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->>> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
->>> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
->>> Reviewed-by: Fan Ni <fan.ni@samsung.com>
->>> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
->>> Reviewed-by: Alison Schofield <alison.schofield@intel.com>
->>> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-
+	Andrew
 
