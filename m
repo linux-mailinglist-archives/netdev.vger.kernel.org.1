@@ -1,280 +1,273 @@
-Return-Path: <netdev+bounces-239068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B36CC636CE
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:09:11 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65E1DC6373F
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 11:14:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A0D704EEBA8
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:03:58 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 916DA35776F
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 10:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F2A328618;
-	Mon, 17 Nov 2025 10:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29984313264;
+	Mon, 17 Nov 2025 10:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h1/Zi+0O";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="g1QOUBc3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qb1uGttM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA3D32860A
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 10:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4103E273D6C
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 10:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763373787; cv=none; b=erir/AjPSOtP7MPVuVulEv5jZbUtC1DPRpYx1LvxZyxxof0O4Pu6bZtvN3KvQPQu5RpZ55/FaKQKbTtuL5U3R5bCFaLwv4Ou8Pvnfu0GtbtjyNZ6nwx5jp8/Vl5aiVnZ0FQP6ASe3f5qrWLg2ArNVyRxwfLDaW7QLvMtr3PkMTE=
+	t=1763374071; cv=none; b=ubKh4LqgYwGaVnV05HPldnWfbRpWPDeR3cC0Aeg1WjKCFmemSP5yTEHo/v8J89kSoDvB4kk7x9D5XHAVbonEZMBFFeGftClL0Q8QV1aTmdynzGS7ZSwiTqXapRqPUZFIkrpOk47lw2h74E+4sEH+NNV4bDJ9jRib8xS0F+jdzRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763373787; c=relaxed/simple;
-	bh=Jjg4Iyd/07DTsm5qkOr6BIQlspwf+2NqiRbHnRlshMQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LyyA3qJLrET8de0oWyEwpyQvHoKtU3WRauxXhjkFlAaBziQl0Dckt1w6yPBK+Hp1QAY2xStIqfbRipZAhUQmr0zXFEkyBJFzrTt8k0LQjkfaGcXc0brKZXvxzUrYfdpgM7WB63APKgvdSsTXeBLwA7sSyeugZ4AqH/KzU3bUijc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h1/Zi+0O; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=g1QOUBc3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763373783;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9OoW97iXrHDq8mXDdV4L+0O0Y0xQp8TMPGSKNutW8hk=;
-	b=h1/Zi+0OTvSk40ZUokYkayI6cK20XupbHnTiTLWYbGnOqnTOI5UYk63Pf1Rpb/+6zwNegL
-	w2plvM/M+/hOJWiY66a5MbXKKEf5w7yEBAXY4aax0gOG8bOl0WEmkwLPNz8P1gecuvlUlL
-	Q/tY1CQ9qlD2gJ+TC6uHA/s5fx9V3kM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-6oE2parvOR2f5PtpAQ3k8Q-1; Mon, 17 Nov 2025 05:03:02 -0500
-X-MC-Unique: 6oE2parvOR2f5PtpAQ3k8Q-1
-X-Mimecast-MFC-AGG-ID: 6oE2parvOR2f5PtpAQ3k8Q_1763373781
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4779393221aso13853215e9.2
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 02:03:01 -0800 (PST)
+	s=arc-20240116; t=1763374071; c=relaxed/simple;
+	bh=IF6yvK2ms+70+OciBFn2fLgXZznNiC8VoinCIhoa4cU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PIq9L6hqjUMYgCsXxtPUT1HfshGqnlOY6f6pYVZs+l/sgRfmrnMtobXCi6D+BnxJfIj0c/8lmBl/iefjduPZMTKGjnmJDxbT71u1TZ5i7DOqO+baxRT0rIAOviGIzrD/CBUEVlhgO/f017lG4aeg1p0nSxOh8dzbvXDrRH1M0Nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qb1uGttM; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8823acf4db3so122164816d6.3
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 02:07:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763373781; x=1763978581; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9OoW97iXrHDq8mXDdV4L+0O0Y0xQp8TMPGSKNutW8hk=;
-        b=g1QOUBc3V4moGJym0Gnut9FJ2IZqAwsxKd7fRZI0kcl8Oha0Bpii3wKoEWrlndiLt0
-         LO2/X3ws/FFfeMAbc7lPW8vn2VzmnXp6KfrhwaQOrDBQaKKoaRJZESkCjTNgW1ItW/MS
-         Q32F2OTziuZGmAU+TrnArni/w/SwI4m0IxXz4HCb4TlmD4Ua+nLzbofH8jIe3SZDVAwK
-         XrOSkQ3iExlHK7y4hzZ16ay3AiFu3eDT6KyI0uqUBmn0GdDqGE+SjACvTAIAFt60ioR7
-         TTVxtpHK7gLaYuD1qQHNcgICCkdkvTg5gNTnwHF4fcOWV77ws9v0qU5p8Enbw6zl4LIx
-         j6RQ==
+        d=google.com; s=20230601; t=1763374067; x=1763978867; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=F0LYgygcsjHje5ViQfQk9D0oGIeqekNR095M51xnun8=;
+        b=qb1uGttMVgImjcgyrkK6sj5rEnx/BCNpLoSHudxBxQr3lmu0HcqjHP4VANRAGterbO
+         FZvellG6S/XeoKjMkE8fr4xQQRCYnIYTO8xiiKAVM4MJEN1fqvNeS9kJxAXi97iKAx0D
+         kCw0Z6dl8pZIx4wsoOVIVbEfobEKUs9RsT9le7nB70d3vgNHuiB8+XE9Po9AgPDsOaAO
+         YxGQ2f7T0mC+25vJAltlBKL3K/N3H+FzXHABdydPbfF8+4QidW0/7L1qndqt/RhNvmer
+         dvIvIRga7BDoc9avJAtOS/dh/FtGxCZyy7+PWoB/wBh1LBzokhTCAgIoHfyB567H1NDb
+         2NTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763373781; x=1763978581;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9OoW97iXrHDq8mXDdV4L+0O0Y0xQp8TMPGSKNutW8hk=;
-        b=uvljVT8xW29S6kWAqPJmaptaeF+Er+ztPt+mFaYwBLDQFbGk5b/XYxUZTZhHUIZSMO
-         QY/yAti8hCHxx/KkKX8YkB5/KOrcaorMHw39vdahLZXy6QB33Jprj8CTzE/9a7/WRO0I
-         6xnTm53+i9r2FtGxhyxawoOUpS7XB7xI+SbjIFP3AwnrAgI6raD9++zx/wd/fZcUs+Cf
-         9WqNfcoNMiPKIXZpqPH4EUa/3xKYYaFtXNKcVm6XJnYPULvQB+3wUfNyV3E2BCgb2IPW
-         G10W2ZbhW8aUt5k7ukuxFFlV7ZeGj+4TkmHE67OpRbfsJjo7HAK6Rx8fxUWsG8cgdzDP
-         116g==
-X-Gm-Message-State: AOJu0YxQuo2vM/Em2YEgjCvlqJlMZ1GBL3xqqnMb3+BzPSmyFtxEEDFc
-	DtKyjMRKF1sNHl/LDYUbDLtVN3R1n+qpgPsUYeu2jDFKMTXtzqPCW5sLlc/GpDuHVtzuK7zMYls
-	wVY/0IMxkxREK105DnYrfYXL0qyJxHmQKGMIrOscK19bvcetH5suoPRARuw==
-X-Gm-Gg: ASbGncsoadrp7BHLTuAMYUBBf3B8GKc+wv79Hob0KP/xvAjBI1xpniz3GZaizW9x0Hw
-	ur9PNxBp1r541Dg6gw2nzAeIs0vEiw/ANPHQm7dFY0hHyHkFgFF87mTrpDVITpJN1B2ra4NYKDI
-	qcKmMM9lT6zIVjnjguB32QMuxBMzVsXuLj8wIN2FWPvNa1tqc301TlOfurxuK4cmZ93elL+gd+m
-	syzn0L0jbcDNfEtLY19r1bVIpTDaDc5LechwhcvxBN1bbb8wJ44PVtDvPf88/H8edNTAXSu9FEO
-	fHIHhpdXOocVO2gfYRwU+mvEBupo2RDLSf81fHXCtOUy5M6jTh5bL6BhsnYBZ2dfREE7kb8tLp+
-	j7HiV8xFqt1xzdQ08agI=
-X-Received: by 2002:a05:600c:3baa:b0:477:54b3:3484 with SMTP id 5b1f17b1804b1-4778febd2eamr102341645e9.37.1763373780646;
-        Mon, 17 Nov 2025 02:03:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHsCVRVH8yi3mxQpF+a3sceLn+huBmPLQphd4cPau/Xd1zOyTQvr9xQ1+/sl1GzpkLtclk+xQ==
-X-Received: by 2002:a05:600c:3baa:b0:477:54b3:3484 with SMTP id 5b1f17b1804b1-4778febd2eamr102341085e9.37.1763373779845;
-        Mon, 17 Nov 2025 02:02:59 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f0b8d6sm26300205f8f.28.2025.11.17.02.02.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 02:02:59 -0800 (PST)
-Date: Mon, 17 Nov 2025 05:02:56 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
-	virtualization@lists.linux.dev, parav@nvidia.com,
-	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
-	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
-	andrew+netdev@lunn.ch, edumazet@google.com
-Subject: Re: [PATCH net-next v10 00/12] virtio_net: Add ethtool flow rules
- support
-Message-ID: <20251117050228-mutt-send-email-mst@kernel.org>
-References: <20251112193132.1909-1-danielj@nvidia.com>
+        d=1e100.net; s=20230601; t=1763374067; x=1763978867;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=F0LYgygcsjHje5ViQfQk9D0oGIeqekNR095M51xnun8=;
+        b=bmk3bspWvHDXmQX77OpYi/JiAbxUH9nLDIHNjNQnHWwBmXYmjaL/FqrLIwovwjEDrj
+         5HKYMRdmmuH/lBD+XrqO4FteMT7z/YwbIR1zwk+3qwWNJyPDBut3iXk2H3c8xp20bqMF
+         jZmt2N0yNSvPQ0ClzMu73v72fWpDcMRYOKCGSYEDU6iy2gGgeUpx2KzkHM6eCyqnQsaE
+         +hAebCzkuKItMYRdmrlu9ItsedH6buI2fmsckuSmhMQVb4/RymrhgZRIBFCN9IbBeDPA
+         O2baiKzDa6PJRoqRtOWBX2VrGWoid1Vk3q9NLFU/P9q9J+C6clfyRUNVJLGGcqMnnyzv
+         LCeA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFxqUZypIJ1KrdmBm8Z9DhpECna8SzjbZxl+16FCqtZpotSaCGSVOf4iUoYoQC/S0AFl1saXo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoNqflydBeQGv8QzwgwjHd0Zwv9mKrkB3apgNsU43lR+RWSmOI
+	keg3OUjaFi/odopBhWY6sod4tfLNCcccMjXH2hgKxyVDTc4lJo49ajV/OqFLPt56AkA1/kN+RaI
+	Eg2bOOnuHpzR2rw==
+X-Google-Smtp-Source: AGHT+IGrN1v6A7xJ7CammKKbWqq+b7c2XeEQ/te8T8JrbWLJzjvNlg4FyPaEt5J0fpgWhZ+SaAGQiJUQVdscoQ==
+X-Received: from qvag10.prod.google.com ([2002:a0c:f08a:0:b0:882:388c:d179])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:e48:b0:880:4d78:89ea with SMTP id 6a1803df08f44-882926cc205mr159362756d6.60.1763374067102;
+ Mon, 17 Nov 2025 02:07:47 -0800 (PST)
+Date: Mon, 17 Nov 2025 10:07:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251112193132.1909-1-danielj@nvidia.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
+Message-ID: <20251117100745.1913963-1-edumazet@google.com>
+Subject: [PATCH v2 net] mptcp: fix a race in mptcp_pm_del_add_timer()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang.tang@linux.dev>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	syzbot+2a6fbf0f0530375968df@syzkaller.appspotmail.com, 
+	Geliang Tang <geliang@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Nov 12, 2025 at 01:31:20PM -0600, Daniel Jurgens wrote:
-> This series implements ethtool flow rules support for virtio_net using the
-> virtio flow filter (FF) specification. The implementation allows users to
-> configure packet filtering rules through ethtool commands, directing
-> packets to specific receive queues, or dropping them based on various
-> header fields.
+mptcp_pm_del_add_timer() can call sk_stop_timer_sync(sk, &entry->add_timer)
+while another might have free entry already, as reported by syzbot.
 
-Bad threading here Daniel, so tools that rely on threading break.
+Add RCU protection to fix this issue.
 
+Also change confusing add_timer variable with stop_timer boolean.
 
-> The series starts with infrastructure changes to expose virtio PCI admin
-> capabilities and object management APIs. It then creates the virtio_net
-> directory structure and implements the flow filter functionality with support
-> for:
-> 
-> - Layer 2 (Ethernet) flow rules
-> - IPv4 and IPv6 flow rules  
-> - TCP and UDP flow rules (both IPv4 and IPv6)
-> - Rule querying and management operations
-> 
-> Setting, deleting and viewing flow filters, -1 action is drop, positive
-> integers steer to that RQ:
-> 
-> $ ethtool -u ens9
-> 4 RX rings available
-> Total 0 rules
-> 
-> $ ethtool -U ens9 flow-type ether src 1c:34:da:4a:33:dd action 0
-> Added rule with ID 0
-> $ ethtool -U ens9 flow-type udp4 dst-port 5001 action 3
-> Added rule with ID 1
-> $ ethtool -U ens9 flow-type tcp6 src-ip fc00::2 dst-port 5001 action 2
-> Added rule with ID 2
-> $ ethtool -U ens9 flow-type ip4 src-ip 192.168.51.101 action 1
-> Added rule with ID 3
-> $ ethtool -U ens9 flow-type ip6 dst-ip fc00::1 action -1
-> Added rule with ID 4
-> $ ethtool -U ens9 flow-type ip6 src-ip fc00::2 action -1
-> Added rule with ID 5
-> $ ethtool -U ens9 delete 4
-> $ ethtool -u ens9
-> 4 RX rings available
-> Total 5 rules
-> 
-> Filter: 0
->         Flow Type: Raw Ethernet
->         Src MAC addr: 1C:34:DA:4A:33:DD mask: 00:00:00:00:00:00
->         Dest MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
->         Ethertype: 0x0 mask: 0xFFFF
->         Action: Direct to queue 0
-> 
-> Filter: 1
->         Rule Type: UDP over IPv4
->         Src IP addr: 0.0.0.0 mask: 255.255.255.255
->         Dest IP addr: 0.0.0.0 mask: 255.255.255.255
->         TOS: 0x0 mask: 0xff
->         Src port: 0 mask: 0xffff
->         Dest port: 5001 mask: 0x0
->         Action: Direct to queue 3
-> 
-> Filter: 2
->         Rule Type: TCP over IPv6
->         Src IP addr: fc00::2 mask: ::
->         Dest IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
->         Traffic Class: 0x0 mask: 0xff
->         Src port: 0 mask: 0xffff
->         Dest port: 5001 mask: 0x0
->         Action: Direct to queue 2
-> 
-> Filter: 3
->         Rule Type: Raw IPv4
->         Src IP addr: 192.168.51.101 mask: 0.0.0.0
->         Dest IP addr: 0.0.0.0 mask: 255.255.255.255
->         TOS: 0x0 mask: 0xff
->         Protocol: 0 mask: 0xff
->         L4 bytes: 0x0 mask: 0xffffffff
->         Action: Direct to queue 1
-> 
-> Filter: 5
->         Rule Type: Raw IPv6
->         Src IP addr: fc00::2 mask: ::
->         Dest IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
->         Traffic Class: 0x0 mask: 0xff
->         Protocol: 0 mask: 0xff
->         L4 bytes: 0x0 mask: 0xffffffff
->         Action: Drop
-> 
-> ---
-> v2: https://lore.kernel.org/netdev/20250908164046.25051-1-danielj@nvidia.com/
->   - Fix sparse warnings
->   - Fix memory leak on subsequent failure to allocate
->   - Fix some Typos
-> 
-> v3: https://lore.kernel.org/netdev/20250923141920.283862-1-danielj@nvidia.com/
->   - Added admin_ops to virtio_device kdoc.
-> 
-> v4:
->   - Fixed double free bug inserting flows
->   - Fixed incorrect protocol field check parsing ip4 headers.
->   - (u8 *) changed to (void *)
->   - Added kdoc comments to UAPI changes.
->   - No longer split up virtio_net.c
->   - Added config op to execute admin commands.
->       - virtio_pci assigns vp_modern_admin_cmd_exec to this callback.
->   - Moved admin command API to new core file virtio_admin_commands.c
-> 
-> v5: 
->   - Fixed compile error
->   - Fixed static analysis warning on () after macro
->   - Added missing fields to kdoc comments
->   - Aligned parameter name between prototype and kdoc
-> 
-> v6:
->   - Fix sparse warning "array of flexible structures" Jakub K/Simon H
->   - Use new variable and validate ff_mask_size before set_cap. MST
-> 
-> v7:
->   - Change virtnet_ff_init to return a value. Allow -EOPNOTSUPP. Xuan
->   - Set ff->ff_{caps, mask, actions} NULL in error path. Paolo Abini
->   - Move for (int i removal hung back a patch. Paolo Abini
-> 
-> v8
->   - Removed unused num_classifiers. Jason Wang
->   - Use real_ff_mask_size when setting the selector caps. Jason Wang
-> 
-> v9:
->   - Set err to -ENOMEM after alloc failures in virtnet_ff_init. Simon H
-> 
-> v10:
->   - Return -EOPNOTSUPP in virnet_ff_init before allocing any memory.
->     Jason Wang/Paolo Abeni
-> 
-> 
-> Daniel Jurgens (12):
->   virtio_pci: Remove supported_cap size build assert
->   virtio: Add config_op for admin commands
->   virtio: Expose generic device capability operations
->   virtio: Expose object create and destroy API
->   virtio_net: Query and set flow filter caps
->   virtio_net: Create a FF group for ethtool steering
->   virtio_net: Implement layer 2 ethtool flow rules
->   virtio_net: Use existing classifier if possible
->   virtio_net: Implement IPv4 ethtool flow rules
->   virtio_net: Add support for IPv6 ethtool steering
->   virtio_net: Add support for TCP and UDP ethtool rules
->   virtio_net: Add get ethtool flow rules ops
-> 
->  drivers/net/virtio_net.c               | 1147 ++++++++++++++++++++++++
->  drivers/virtio/Makefile                |    2 +-
->  drivers/virtio/virtio_admin_commands.c |  165 ++++
->  drivers/virtio/virtio_pci_common.h     |    1 -
->  drivers/virtio/virtio_pci_modern.c     |   10 +-
->  include/linux/virtio_admin.h           |  125 +++
->  include/linux/virtio_config.h          |    6 +
->  include/uapi/linux/virtio_net_ff.h     |  156 ++++
->  include/uapi/linux/virtio_pci.h        |    7 +-
->  9 files changed, 1608 insertions(+), 11 deletions(-)
->  create mode 100644 drivers/virtio/virtio_admin_commands.c
->  create mode 100644 include/linux/virtio_admin.h
->  create mode 100644 include/uapi/linux/virtio_net_ff.h
-> 
-> -- 
-> 2.50.1
+syzbot report:
+
+BUG: KASAN: slab-use-after-free in __timer_delete_sync+0x372/0x3f0 kernel/time/timer.c:1616
+Read of size 4 at addr ffff8880311e4150 by task kworker/1:1/44
+
+CPU: 1 UID: 0 PID: 44 Comm: kworker/1:1 Not tainted syzkaller #0 PREEMPT_{RT,(full)}
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
+Workqueue: events mptcp_worker
+Call Trace:
+ <TASK>
+  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+  print_address_description mm/kasan/report.c:378 [inline]
+  print_report+0xca/0x240 mm/kasan/report.c:482
+  kasan_report+0x118/0x150 mm/kasan/report.c:595
+  __timer_delete_sync+0x372/0x3f0 kernel/time/timer.c:1616
+  sk_stop_timer_sync+0x1b/0x90 net/core/sock.c:3631
+  mptcp_pm_del_add_timer+0x283/0x310 net/mptcp/pm.c:362
+  mptcp_incoming_options+0x1357/0x1f60 net/mptcp/options.c:1174
+  tcp_data_queue+0xca/0x6450 net/ipv4/tcp_input.c:5361
+  tcp_rcv_established+0x1335/0x2670 net/ipv4/tcp_input.c:6441
+  tcp_v4_do_rcv+0x98b/0xbf0 net/ipv4/tcp_ipv4.c:1931
+  tcp_v4_rcv+0x252a/0x2dc0 net/ipv4/tcp_ipv4.c:2374
+  ip_protocol_deliver_rcu+0x221/0x440 net/ipv4/ip_input.c:205
+  ip_local_deliver_finish+0x3bb/0x6f0 net/ipv4/ip_input.c:239
+  NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
+  NF_HOOK+0x30c/0x3a0 include/linux/netfilter.h:318
+  __netif_receive_skb_one_core net/core/dev.c:6079 [inline]
+  __netif_receive_skb+0x143/0x380 net/core/dev.c:6192
+  process_backlog+0x31e/0x900 net/core/dev.c:6544
+  __napi_poll+0xb6/0x540 net/core/dev.c:7594
+  napi_poll net/core/dev.c:7657 [inline]
+  net_rx_action+0x5f7/0xda0 net/core/dev.c:7784
+  handle_softirqs+0x22f/0x710 kernel/softirq.c:622
+  __do_softirq kernel/softirq.c:656 [inline]
+  __local_bh_enable_ip+0x1a0/0x2e0 kernel/softirq.c:302
+  mptcp_pm_send_ack net/mptcp/pm.c:210 [inline]
+ mptcp_pm_addr_send_ack+0x41f/0x500 net/mptcp/pm.c:-1
+  mptcp_pm_worker+0x174/0x320 net/mptcp/pm.c:1002
+  mptcp_worker+0xd5/0x1170 net/mptcp/protocol.c:2762
+  process_one_work kernel/workqueue.c:3263 [inline]
+  process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
+  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
+  kthread+0x711/0x8a0 kernel/kthread.c:463
+  ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+Allocated by task 44:
+  kasan_save_stack mm/kasan/common.c:56 [inline]
+  kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+  poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
+  __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:417
+  kasan_kmalloc include/linux/kasan.h:262 [inline]
+  __kmalloc_cache_noprof+0x1ef/0x6c0 mm/slub.c:5748
+  kmalloc_noprof include/linux/slab.h:957 [inline]
+  mptcp_pm_alloc_anno_list+0x104/0x460 net/mptcp/pm.c:385
+  mptcp_pm_create_subflow_or_signal_addr+0xf9d/0x1360 net/mptcp/pm_kernel.c:355
+  mptcp_pm_nl_fully_established net/mptcp/pm_kernel.c:409 [inline]
+  __mptcp_pm_kernel_worker+0x417/0x1ef0 net/mptcp/pm_kernel.c:1529
+  mptcp_pm_worker+0x1ee/0x320 net/mptcp/pm.c:1008
+  mptcp_worker+0xd5/0x1170 net/mptcp/protocol.c:2762
+  process_one_work kernel/workqueue.c:3263 [inline]
+  process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
+  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
+  kthread+0x711/0x8a0 kernel/kthread.c:463
+  ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Freed by task 6630:
+  kasan_save_stack mm/kasan/common.c:56 [inline]
+  kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+  __kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:587
+  kasan_save_free_info mm/kasan/kasan.h:406 [inline]
+  poison_slab_object mm/kasan/common.c:252 [inline]
+  __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
+  kasan_slab_free include/linux/kasan.h:234 [inline]
+  slab_free_hook mm/slub.c:2523 [inline]
+  slab_free mm/slub.c:6611 [inline]
+  kfree+0x197/0x950 mm/slub.c:6818
+  mptcp_remove_anno_list_by_saddr+0x2d/0x40 net/mptcp/pm.c:158
+  mptcp_pm_flush_addrs_and_subflows net/mptcp/pm_kernel.c:1209 [inline]
+  mptcp_nl_flush_addrs_list net/mptcp/pm_kernel.c:1240 [inline]
+  mptcp_pm_nl_flush_addrs_doit+0x593/0xbb0 net/mptcp/pm_kernel.c:1281
+  genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
+  genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+  genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
+  netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
+  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+  netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+  netlink_unicast+0x846/0xa10 net/netlink/af_netlink.c:1346
+  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+  sock_sendmsg_nosec net/socket.c:727 [inline]
+  __sock_sendmsg+0x21c/0x270 net/socket.c:742
+  ____sys_sendmsg+0x508/0x820 net/socket.c:2630
+  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
+  __sys_sendmsg net/socket.c:2716 [inline]
+  __do_sys_sendmsg net/socket.c:2721 [inline]
+  __se_sys_sendmsg net/socket.c:2719 [inline]
+  __x64_sys_sendmsg+0x1a1/0x260 net/socket.c:2719
+  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
+Reported-by: syzbot+2a6fbf0f0530375968df@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/691ad3c3.a70a0220.f6df1.0004.GAE@google.com/
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Geliang Tang <geliang@kernel.org>
+---
+v2: Updated/Added Reported-by:/Closes: tags now syzbot report finally reached netdev@ mailing list.
+
+ net/mptcp/pm.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/net/mptcp/pm.c b/net/mptcp/pm.c
+index 2ff1b949956834aa5c78a1fcb40087aed43225ef..9604b91902b8bc3b831547cd693c28a4890aea31 100644
+--- a/net/mptcp/pm.c
++++ b/net/mptcp/pm.c
+@@ -18,6 +18,7 @@ struct mptcp_pm_add_entry {
+ 	u8			retrans_times;
+ 	struct timer_list	add_timer;
+ 	struct mptcp_sock	*sock;
++	struct rcu_head		rcu;
+ };
+ 
+ static DEFINE_SPINLOCK(mptcp_pm_list_lock);
+@@ -155,7 +156,7 @@ bool mptcp_remove_anno_list_by_saddr(struct mptcp_sock *msk,
+ 
+ 	entry = mptcp_pm_del_add_timer(msk, addr, false);
+ 	ret = entry;
+-	kfree(entry);
++	kfree_rcu(entry, rcu);
+ 
+ 	return ret;
+ }
+@@ -345,22 +346,27 @@ mptcp_pm_del_add_timer(struct mptcp_sock *msk,
+ {
+ 	struct mptcp_pm_add_entry *entry;
+ 	struct sock *sk = (struct sock *)msk;
+-	struct timer_list *add_timer = NULL;
++	bool stop_timer = false;
++
++	rcu_read_lock();
+ 
+ 	spin_lock_bh(&msk->pm.lock);
+ 	entry = mptcp_lookup_anno_list_by_saddr(msk, addr);
+ 	if (entry && (!check_id || entry->addr.id == addr->id)) {
+ 		entry->retrans_times = ADD_ADDR_RETRANS_MAX;
+-		add_timer = &entry->add_timer;
++		stop_timer = true;
+ 	}
+ 	if (!check_id && entry)
+ 		list_del(&entry->list);
+ 	spin_unlock_bh(&msk->pm.lock);
+ 
+-	/* no lock, because sk_stop_timer_sync() is calling timer_delete_sync() */
+-	if (add_timer)
+-		sk_stop_timer_sync(sk, add_timer);
++	/* Note: entry might have been removed by another thread.
++	 * We hold rcu_read_lock() to ensure it is not freed under us.
++	 */
++	if (stop_timer)
++		sk_stop_timer_sync(sk, &entry->add_timer);
+ 
++	rcu_read_unlock();
+ 	return entry;
+ }
+ 
+@@ -415,7 +421,7 @@ static void mptcp_pm_free_anno_list(struct mptcp_sock *msk)
+ 
+ 	list_for_each_entry_safe(entry, tmp, &free_list, list) {
+ 		sk_stop_timer_sync(sk, &entry->add_timer);
+-		kfree(entry);
++		kfree_rcu(entry, rcu);
+ 	}
+ }
+ 
+-- 
+2.52.0.rc1.455.g30608eb744-goog
 
 
