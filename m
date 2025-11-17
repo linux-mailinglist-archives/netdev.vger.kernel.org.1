@@ -1,214 +1,113 @@
-Return-Path: <netdev+bounces-239042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2349C62CBF
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:50:38 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DCE7C62CD4
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:51:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 4765B24180
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:50:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 078CD4E5C81
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F1431A577;
-	Mon, 17 Nov 2025 07:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F82031CA68;
+	Mon, 17 Nov 2025 07:50:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F049F30C350
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 07:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9BD31A556
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 07:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763365830; cv=none; b=NvP1lq+vDC288nWdKELUBC0RcNXAStLZZHCumtIIIhteguMRSqPqjdHYRdfTw55eDoT+6ro7eFnZRnEx0bNvFzD6LhQz3z7n3Uy4C9VLcI2dccnDObBRCxtuleA8GNevO7MnUVoiAn1ZhPkG59Jm18eYZ/HHhP2y548atSX2gNk=
+	t=1763365832; cv=none; b=vBgqXNX2oVwAHXqo1IDmK8VDICmqxVBWlO9R7LA750iUP+g3YYjxxSxT2F+LmfoHOnYHSYe8DBurxVrMUwFrwYWThAMRnHjLKN1E2qRjTEhDYONa568Q+/VVUXvw5vkEZV9WV5x4ZU7edBII1XqoXRhM9g+ey53wLcRn0NjejZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763365830; c=relaxed/simple;
-	bh=exFxZ3Dp9XithKleRlTYAXSbYBc8o1depYcp8ANM0SM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=GwjVByZQ1v1b2X1HZZxG4xvdDTTFg05HwNLgsjqkBeHePz5gJAk/Ax1zg6rhkkT2+2Mw3ZJRvKjIgiNZCuIjloQ++8Kumo5G4dKtUl8l18YasOMnqcwjA7I5BgvNdr0X1CrD+cN28gGe9kkHxZuCLmGIkgDPtBCSkGje/PTtf3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+	s=arc-20240116; t=1763365832; c=relaxed/simple;
+	bh=Y8wB5ZxrHztDsFTZWNBUOw5uR5hPhpOcMrCCbU99oKI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hkiBZG2Z/2M6NcV7/MLESW0qO2ogvO0C3OCCY1i3rsaju+HRg5jC63HciREvaVSAKUojvQ1gplW78rH7qz8KMNs7tWff2cHVTSHMYvRhlYSEAyhXcJ6et406tS3MX6iXgGGeYsrEZXWN/8w65muqnKldwagKuI+hkSkNscmWclk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-9490b354644so64225739f.1
-        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 23:50:28 -0800 (PST)
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-9487904aeccso279835439f.1
+        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 23:50:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763365828; x=1763970628;
+        d=1e100.net; s=20230601; t=1763365829; x=1763970629;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=SR48UPog8jJajspAE3Vve4DfAYEMOezKWsvRTEEqnyI=;
-        b=U7//9n/KkljWSVPDdIzPglZYe4LEyyCl8K5oIPQkgTH3+ymxxJBSIR6xbF1dHvVl3E
-         dhCIuo8fZrfvw1AGJmVPqfZsFwGXd12WgGv1kUoMpwJDFENfTtP04EpXYjLR3epXFZxg
-         X+PtQHHBhyqValCeNWJOuOmqcb9u3P6AirT+sPpUNWpNBDQo1ZWk4nusWLjc1oQHJMpg
-         Msw0dr4pk3Mz5PCuCylQN+TKoeffTazBAWU1qGcj4fmFDcW8C/GV7hoFBJPkmm33ooM/
-         aaYOlJ7VULI2/3OE8H5cL/t//5xIe3QfAYIB9BJg9fqEf6G21aOPx1gcatbDu49hbmfp
-         HM3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWtmqGfCvmerAdMuz5kg70awFV2tFEcpjGhECr7v7kEHZ0VPJu5ecKdh85WKiusIN6P0n5poR8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGcGASulmkCzMAT27+TJYje8OA4hMEbLmzeWClbdT0fDtuErTH
-	QUekrdrr87IRWb9qUPDuj0XxrTNXpdCG6m/6ZuTQ1CeJH3CPAji2QCR6aIWXXuBCm7pgrFrFrc7
-	pjNU2FUL5QDypx+a8HqcKjjMg7SXE/wdxC3t+BusDf0Ero8RDlQfy6z4/FE4=
-X-Google-Smtp-Source: AGHT+IGrxDGbCrzyXwSMXCo3r/6yUwB/4Wqa/qnuv7gyhBqhtBsxhDT3Tlb1v2YfKkjoZFzpt7c4eF7yI+GaJq7VZS7SLfQ0buyO
+        bh=ey1+m+0PpA+X8cyQeg5Cw9TKZCceb1snYR4S8Zq1UtY=;
+        b=J5Pz+vJseJizSOFOV862QeHK4y2CFUQV1BFlB/sIw2KTv0cGwdv0h5vluMxEQ2tx5R
+         ePNqZ2Xf/0sv5lJK7288Q7T67rhFaWfhd3AsG4U7+o29NwZZA4Wnp4wnHaGQHkOEp2pb
+         W/AuDl8rFANZ4OubpD3A25ydCfo6JXBAtVAnCKD0hYFNq6kcGqJdtBJQnPFcAv6AUQh7
+         4YTcqrdQsDTRDlNekoZ8nFDhkY3HvyGYV14bMpYuiNeYx62Z+vBg4giAShJGBy/GhyXE
+         vpO5EoAULKChDCgbqrtxIii2gM6GgletmrKjb014+Mit+8wYgwcqfNzoy1DUKTC2dC/A
+         jOZw==
+X-Forwarded-Encrypted: i=1; AJvYcCXfELozweUqkck1nqUTbHKehmavTHzsrwbC7fBLjQ0ulNbZCNmGEh5q0jQgTQKmJmITM4qhMJo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqNGf9Vc75Es4NYccQoLoDngu4geAZTSA0fO26DJIfeWQjxUuh
+	UWdP/lrtr4rntVclNrS6Sj0WR4aN+lFwdCMn6jkVFkdMp147GXJc1TUB2+/ii+5wX8ho0WvENgs
+	3RIAMac8sUuhkAh+cBxrNurc04mRGUG6DzQtOL1D5hSqXSDdCndMNsNRars8=
+X-Google-Smtp-Source: AGHT+IF4Ax7KDGsQ3/G5Um9Hq7UFEsiFYZmNZZrQEigC52suQIGaiib8cbPHnExXI7K/ZnrhQ9AH49U4Bm4ILaNe/BjfS7iya07M
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:dd2:b0:434:96ea:ff6e with SMTP id
- e9e14a558f8ab-43496eb01cbmr74910925ab.39.1763365828007; Sun, 16 Nov 2025
- 23:50:28 -0800 (PST)
-Date: Sun, 16 Nov 2025 23:50:27 -0800
+X-Received: by 2002:a92:c242:0:b0:434:96ea:ca18 with SMTP id
+ e9e14a558f8ab-43496eacaa0mr92275175ab.16.1763365829199; Sun, 16 Nov 2025
+ 23:50:29 -0800 (PST)
+Date: Sun, 16 Nov 2025 23:50:29 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <691ad3c3.a70a0220.f6df1.0005.GAE@google.com>
-Subject: [syzbot] [sctp?] WARNING: refcount bug in sctp_transport_put (5)
-From: syzbot <syzbot+e94b93511bda261f4c43@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	lucien.xin@gmail.com, marcelo.leitner@gmail.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Message-ID: <691ad3c5.a70a0220.f6df1.0009.GAE@google.com>
+Subject: [syzbot] Monthly net report (Nov 2025)
+From: syzbot <syzbot+listc0722b57ae1d515c34f7@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+Hello net maintainers/developers,
 
-syzbot found the following issue on:
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
 
-HEAD commit:    2ccec5944606 Merge tag 'erofs-for-6.18-rc6-fixes' of git:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=179c497c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=19d831c6d0386a9c
-dashboard link: https://syzkaller.appspot.com/bug?extid=e94b93511bda261f4c43
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
+During the period, 8 new issues were detected and 7 were fixed.
+In total, 99 issues are still open and 1640 have already been fixed.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Some of the still happening issues:
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-2ccec594.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a29a7f4d52f4/vmlinux-2ccec594.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1557802e0ae5/bzImage-2ccec594.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e94b93511bda261f4c43@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-refcount_t: underflow; use-after-free.
-WARNING: CPU: 0 PID: 0 at lib/refcount.c:28 refcount_warn_saturate+0x14a/0x210 lib/refcount.c:28
-Modules linked in:
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:refcount_warn_saturate+0x14a/0x210 lib/refcount.c:28
-Code: ff 89 de e8 88 82 1a fd 84 db 0f 85 66 ff ff ff e8 9b 87 1a fd c6 05 82 fe c8 0b 01 90 48 c7 c7 80 c3 ef 8b e8 b7 09 d9 fc 90 <0f> 0b 90 90 e9 43 ff ff ff e8 78 87 1a fd 0f b6 1d 5d fe c8 0b 31
-RSP: 0018:ffffc90000007c30 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff817adc48
-RDX: ffffffff8e097a00 RSI: ffffffff817adc55 RDI: 0000000000000001
-RBP: ffff88806af5f820 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: ffff88806af5f820
-R13: 0000000000000101 R14: ffffffff8a96c630 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff88809780d000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000003010cffc CR3: 000000005fddc000 CR4: 0000000000352ef0
-Call Trace:
- <IRQ>
- __refcount_sub_and_test include/linux/refcount.h:400 [inline]
- __refcount_dec_and_test include/linux/refcount.h:432 [inline]
- refcount_dec_and_test include/linux/refcount.h:450 [inline]
- sctp_transport_put+0x12a/0x170 net/sctp/transport.c:476
- call_timer_fn+0x19a/0x620 kernel/time/timer.c:1747
- expire_timers kernel/time/timer.c:1798 [inline]
- __run_timers+0x6ef/0x960 kernel/time/timer.c:2372
- __run_timer_base kernel/time/timer.c:2384 [inline]
- __run_timer_base kernel/time/timer.c:2376 [inline]
- run_timer_base+0x114/0x190 kernel/time/timer.c:2393
- run_timer_softirq+0x1a/0x40 kernel/time/timer.c:2403
- handle_softirqs+0x219/0x8e0 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- invoke_softirq kernel/softirq.c:496 [inline]
- __irq_exit_rcu+0x109/0x170 kernel/softirq.c:723
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1052 [inline]
- sysvec_apic_timer_interrupt+0xa4/0xc0 arch/x86/kernel/apic/apic.c:1052
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:pv_native_safe_halt+0xf/0x20 arch/x86/kernel/paravirt.c:82
-Code: 97 6f 02 c3 cc cc cc cc 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa eb 07 0f 00 2d 83 b3 2c 00 fb f4 <e9> 3c 0a 03 00 66 2e 0f 1f 84 00 00 00 00 00 66 90 90 90 90 90 90
-RSP: 0018:ffffffff8e007df8 EFLAGS: 00000286
-RAX: 0000000000c7ee29 RBX: 0000000000000000 RCX: ffffffff8b5d72a9
-RDX: 0000000000000000 RSI: ffffffff8da28539 RDI: ffffffff8bf075c0
-RBP: fffffbfff1c12f40 R08: 0000000000000001 R09: ffffed1005646655
-R10: ffff88802b2332ab R11: 0000000000000001 R12: 0000000000000000
-R13: ffffffff8e097a00 R14: ffffffff908244d0 R15: 0000000000000000
- arch_safe_halt arch/x86/include/asm/paravirt.h:107 [inline]
- default_idle+0x13/0x20 arch/x86/kernel/process.c:767
- default_idle_call+0x6c/0xb0 kernel/sched/idle.c:122
- cpuidle_idle_call kernel/sched/idle.c:190 [inline]
- do_idle+0x38d/0x500 kernel/sched/idle.c:330
- cpu_startup_entry+0x4f/0x60 kernel/sched/idle.c:428
- rest_init+0x16b/0x2b0 init/main.c:757
- start_kernel+0x3f6/0x4e0 init/main.c:1111
- x86_64_start_reservations+0x18/0x30 arch/x86/kernel/head64.c:310
- x86_64_start_kernel+0x130/0x190 arch/x86/kernel/head64.c:291
- common_startup_64+0x13e/0x148
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	97                   	xchg   %eax,%edi
-   1:	6f                   	outsl  %ds:(%rsi),(%dx)
-   2:	02 c3                	add    %bl,%al
-   4:	cc                   	int3
-   5:	cc                   	int3
-   6:	cc                   	int3
-   7:	cc                   	int3
-   8:	0f 1f 00             	nopl   (%rax)
-   b:	90                   	nop
-   c:	90                   	nop
-   d:	90                   	nop
-   e:	90                   	nop
-   f:	90                   	nop
-  10:	90                   	nop
-  11:	90                   	nop
-  12:	90                   	nop
-  13:	90                   	nop
-  14:	90                   	nop
-  15:	90                   	nop
-  16:	90                   	nop
-  17:	90                   	nop
-  18:	90                   	nop
-  19:	90                   	nop
-  1a:	90                   	nop
-  1b:	f3 0f 1e fa          	endbr64
-  1f:	eb 07                	jmp    0x28
-  21:	0f 00 2d 83 b3 2c 00 	verw   0x2cb383(%rip)        # 0x2cb3ab
-  28:	fb                   	sti
-  29:	f4                   	hlt
-* 2a:	e9 3c 0a 03 00       	jmp    0x30a6b <-- trapping instruction
-  2f:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
-  36:	00 00 00
-  39:	66 90                	xchg   %ax,%ax
-  3b:	90                   	nop
-  3c:	90                   	nop
-  3d:	90                   	nop
-  3e:	90                   	nop
-  3f:	90                   	nop
-
+Ref  Crashes Repro Title
+<1>  20003   Yes   WARNING in xfrm6_tunnel_net_exit (4)
+                   https://syzkaller.appspot.com/bug?extid=3df59a64502c71cab3d5
+<2>  15678   Yes   KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
+                   https://syzkaller.appspot.com/bug?extid=5fe14f2ff4ccbace9a26
+<3>  14160   Yes   BUG: workqueue lockup (5)
+                   https://syzkaller.appspot.com/bug?extid=f0b66b520b54883d4b9d
+<4>  7864    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<5>  3393    Yes   INFO: task hung in linkwatch_event (4)
+                   https://syzkaller.appspot.com/bug?extid=2ba2d70f288cf61174e4
+<6>  2760    Yes   WARNING in rcu_check_gp_start_stall
+                   https://syzkaller.appspot.com/bug?extid=111bc509cd9740d7e4aa
+<7>  1916    Yes   KMSAN: uninit-value in bpf_prog_run_generic_xdp
+                   https://syzkaller.appspot.com/bug?extid=0e6ddb1ef80986bdfe64
+<8>  1894    Yes   INFO: task hung in del_device_store
+                   https://syzkaller.appspot.com/bug?extid=6d10ecc8a97cc10639f9
+<9>  1580    Yes   INFO: task hung in addrconf_dad_work (5)
+                   https://syzkaller.appspot.com/bug?extid=82ccd564344eeaa5427d
+<10> 1537    Yes   INFO: task hung in synchronize_rcu (4)
+                   https://syzkaller.appspot.com/bug?extid=222aa26d0a5dbc2e84fe
 
 ---
 This report is generated by a bot. It may contain errors.
 See https://goo.gl/tpsmEJ for more information about syzbot.
 syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+You may send multiple commands in a single email message.
 
