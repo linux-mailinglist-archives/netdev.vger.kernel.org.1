@@ -1,113 +1,117 @@
-Return-Path: <netdev+bounces-239037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1888CC62B75
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:29:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D8B6C62B6C
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:28:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 44A794EAF17
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:26:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 029FF4E729A
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A0A30EF66;
-	Mon, 17 Nov 2025 07:26:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D99C317712;
+	Mon, 17 Nov 2025 07:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OR+v8Zu1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B372E156661;
-	Mon, 17 Nov 2025 07:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0F4156661
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 07:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763364413; cv=none; b=XiAhzjpEHANTiI4z0il9ZOljgpCOGUZmEkKWk9+57lwSqxZvxMYWcYAskb7IPGscVTQnmkdmfMunmX8QjDcRIV9iMCUe++0czAHBaM32Jg4BL8L+0VLp4vFWuD0eo5DKgDo7h4MD/V1Kt48Koco8oNzj52oiShGNxO1gquPHjYU=
+	t=1763364371; cv=none; b=RRwkO4hXIQM6k/CQxNvb5n9HjTLkbsCSiXHM6lq8eqVWUuY976++vOI9imDZGoFsnBbwURzPXQTmczi8WFRni8NDsDdhg39jWzFJIRQZ72ZRj7B1J9uU7qHtVIu2uaoPfP7DwT9mbhnm8vMx1X1tE8kZZEaSoOnzqRE4Sf9WNO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763364413; c=relaxed/simple;
-	bh=tWBXgKy9oEsdWFTCNVD9n4cGX778aInFhrpLM35q0HA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K5yeGK3YwBRNZ2X/jPoXmcuzblLBfyTmsV99M1I/LQ8jr5L5OaMC93gdy/YQ0foCGE4a61lmv/LrwFLRyJ0qfAZ/L1X8jB3IoMEiZTkwBdoKTO88JJuldVA3iUtsluLpmsuTX6xAyXoorpBSCtPEXNBM6MrDT1zYtCaw+ZJunv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.216] (p5dc55243.dip0.t-ipconnect.de [93.197.82.67])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 600AF61CC3FDE;
-	Mon, 17 Nov 2025 08:25:56 +0100 (CET)
-Message-ID: <09f58140-8d9c-42f3-a9f4-380c30d7c11e@molgen.mpg.de>
-Date: Mon, 17 Nov 2025 08:25:50 +0100
+	s=arc-20240116; t=1763364371; c=relaxed/simple;
+	bh=+vhgx0R2+nwdQ0jhqDjY7+bnmgnFuoC37OlpyAX2iS8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A6gPDurRz2tR29VOi27BtIDF8M/WA4YOZKACGt6N70VNb7hBBvxhv4arncFJfQwG4/vBkbrrnqRqi7P2toRqqCaD9HPfpwb6rFDBwkI6opxvJyIDIj9rSolTbRWPBJ+sdgDmsnwi3rm8W6108KNycugruC5PuWcBrXpYJzlCn/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OR+v8Zu1; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-297ea4c2933so2644015ad.0
+        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 23:26:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763364370; x=1763969170; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5hi18ADCLMdmNrGkhvncpabdBE25t2pUlhbnTlAMD3k=;
+        b=OR+v8Zu1KqtuZuCaHVvodxsUV+Lh2vC/g3p+gAvaRZiaGr494hK0l7f+xJH50Z+HRT
+         QLH1Do1pd5q+tlBHcZ2ePzx48UCnu6WzpaJh6CWPzhk8NzhHtlK54Y3zOXsPLGsTyTaD
+         k8GMfnUYkJof30V82UMqLZJQeBqwb8+3VUv0+O19Xtx/5KhlAOkT/5GYNOJsUNHpzvdK
+         cYTBOSCUbAjzpZVZmTlu51D0oqmaLH+heMc6fXBHNcnW6G7UegT5yoQfi52NAPys+MjD
+         XD+6HuSW3ES3N50ibzLHy6b02fIFaZ+F8RyqUYCuo2yhsefSdo0MUyjMg7d2J1bKZHNF
+         gp3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763364370; x=1763969170;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5hi18ADCLMdmNrGkhvncpabdBE25t2pUlhbnTlAMD3k=;
+        b=LiRfsl3WDOsIVt2IaXCNoHWBODbclFP3u5cuTiNYyDV25hrUHwn8PpEp8+6lkMADNi
+         UlUGnC3qi/FQcR7A0gIxUuaXkFkON29CCr6gy/4kdJH8o0VD7wqyVnPFZKP6RvtUjKIu
+         wMa7082D+xAyMfryudl5GeXcqQmcZLQxAPqpH/d1UjYVYlhU1HHPvSlIHnuGmw4JE0Tz
+         sPX+duYQa4fkR9fgp0v41HEfrl+d/prQr8WDmk7GZWapwj6FImXiB4o+sd1EPrBWsL6h
+         L9fuWO1MyEy68vUYKPjwBWqYNtLOG97BBHAKlzPDOFOsLtf++0/ZiSHnFbgLWb2kosQV
+         1qZA==
+X-Forwarded-Encrypted: i=1; AJvYcCVHlTOkPAmBlFu4K+IOtIMT5yCoAjmM8gSvXE78pfbSzilGHtzXB0UdCcKwKr32/RLhOGimNfw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFg6SASSz1pkXj+xvafvBpK6FfhpouqF5+lsWTdg2dh97UxYzO
+	EabAEdbBuLbxlZy38CUv0iJ7glqZhDZYwQJA7pOJfC1xyzMjbOSfZo2A0CLHgMWk5/Pr9fr/X/v
+	GJG0R8NjzRxR/GKQzFpW382hk8uWYwvE=
+X-Gm-Gg: ASbGncujX1tEuDR/tEB0Kpe6XnA80AD3MhtXa6zwgNZCkkDngREJTosFb6JbkMzXGhJ
+	NCwrOevD8DmxiV3fxWYVdY5kPZpNJTQxo/+goYRjq2EzKxb6UNPyJ8VDWZD0SmqKowrz+BfTIrH
+	q2tKc35yCIJjNuZMUKfQe2I49s9lCVH5oOP676AMXNM7szWfI4AZ4CGLf/SoL3ouYcgHiEj8RjE
+	ULbt/hARw3OH/yznOEoB8WmnEba8pC4gaHOfZ5GzLTN+MWX5gFvEctTW5Bky7PfindfFIkx9GWm
+	0cGe1L9WcyLlpbB1wycZiIuMGs1bhL8FYN5DuqkBlwGsuOiE44eu3C/hnCuC4phXcDPgNS61i3S
+	qEcw=
+X-Google-Smtp-Source: AGHT+IF/PIYQj3gjc7VlpoF69ig9CzVeFN3TyJZEsBlNeiFlQfYqKERjgC4a6WV9Yx8KiSnMrhRF9MgfZc32gGYqcwY=
+X-Received: by 2002:a05:7300:d0a7:b0:2a4:3593:5fc7 with SMTP id
+ 5a478bee46e88-2a4ab8a954cmr3839409eec.1.1763364369738; Sun, 16 Nov 2025
+ 23:26:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: fix aux device unplugging
- when rdma is not supported by vport
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- intel-wired-lan@lists.osuosl.org,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Emil Tantilov <emil.s.tantilov@intel.com>,
- Madhu Chittim <madhu.chittim@intel.com>, Josh Hay <joshua.a.hay@intel.com>
-References: <20251117070350.34152-1-larysa.zaremba@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251117070350.34152-1-larysa.zaremba@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20251113-core-cstr-cstrings-v3-0-411b34002774@gmail.com>
+In-Reply-To: <20251113-core-cstr-cstrings-v3-0-411b34002774@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 17 Nov 2025 08:25:57 +0100
+X-Gm-Features: AWmQ_blfzP7tgtY8Fku5O9Ya-p4__2p5hyhk5bTEZBAj4wCrgnbPLXyOe9G6FRM
+Message-ID: <CANiq72=aqJYSqqDkkn3v0F1N26rv+z_1+1+WgmU0Yg8_S-+Oqg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/6] rust: replace `kernel::c_str!` with C-Strings
+To: Tamir Duberstein <tamird@kernel.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	Danilo Krummrich <dakr@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, 
+	Tamir Duberstein <tamird@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dear Larysa,
+On Thu, Nov 13, 2025 at 11:58=E2=80=AFPM Tamir Duberstein <tamird@kernel.or=
+g> wrote:
+>
+>       rust: firmware: replace `kernel::c_str!` with C-Strings
+>       rust: str: replace `kernel::c_str!` with C-Strings
+>       rust: macros: replace `kernel::c_str!` with C-Strings
 
+Applied (these three only) to `rust-next` -- thanks everyone!
 
-Thank you for your patch.
+    [ Removed unused `c_str` import in doctest. - Miguel ]
 
-Am 17.11.25 um 08:03 schrieb Larysa Zaremba:
-> If vport flags do not contain VIRTCHNL2_VPORT_ENABLE_RDMA, driver does not
-> allocate vdev_info for this vport. This leads to kernel NULL pointer
-> dereference in idpf_idc_vport_dev_down(), which references vdev_info for
-> every vport regardless.
+Given how many transformations there were, perhaps the Reviewed-by's
+should have been reset at some point, but given they are simple
+patches and you carried them and nobody complained, I kept them.
 
-Please paste part of the Oops log lines.
-
-> Check, if vdev_info was ever allocated before unplugging aux device.
-
-Please describe your test system.
-
-> Fixes: be91128c579c ("idpf: implement RDMA vport auxiliary dev create, init, and destroy")
-> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> ---
->   drivers/net/ethernet/intel/idpf/idpf_idc.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-> index c1b963f6bfad..4b1037eb2623 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-> @@ -322,7 +322,7 @@ static void idpf_idc_vport_dev_down(struct idpf_adapter *adapter)
->   	for (i = 0; i < adapter->num_alloc_vports; i++) {
->   		struct idpf_vport *vport = adapter->vports[i];
->   
-> -		if (!vport)
-> +		if (!vport || !vport->vdev_info)
->   			continue;
->   
->   		idpf_unplug_aux_dev(vport->vdev_info->adev);
-
-The diff looks good.
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
+Cheers,
+Miguel
 
