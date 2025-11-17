@@ -1,115 +1,108 @@
-Return-Path: <netdev+bounces-239022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A713AC627CE
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:14:54 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C13C6281A
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:25:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2619E4E65D8
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 06:14:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8C0C235E598
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 06:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C7A30F95C;
-	Mon, 17 Nov 2025 06:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8A2314D19;
+	Mon, 17 Nov 2025 06:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W0PLjFoU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC6328695
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 06:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A191DE4F1
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 06:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763360083; cv=none; b=RfWCMpSa76TojLbcfIKW2MVO/jgYqI5LYiSMxgx5x6sqBMlBdNNiud6OYE0gJ0BH+FxCi8+EdAzsro5kxROSGoWqojXkzf+2qoCUHcHMXp0NRJtM9hvXNXs1qL4/udz+l2ggxpudGybzC9ztHmY4anjHzi23+6HLFnh6UhGoVKQ=
+	t=1763360722; cv=none; b=U7Ohf0YGllh1gcamTD3pa/OWoKDFv/E88ouPy2kSOBVxKNjk6IHPICZLCwT5VBic+ZTOy8lq8ukjNA5zJ4g3eG/dJXIudtOOmdgxoiO4kFz3UpJa4gUJVJ4nKbR6BvX6GCcTQFQB6y0cKdok9460Z/1+/roRHzC3fer98kYHIcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763360083; c=relaxed/simple;
-	bh=4agCmcXpYxMBHHl5QUK6ZxgX0C1+K8nZA6TLFHrMHbw=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=TSoDKkC2nKDwbAhjs0yhUcHWnHHUEN4T3CnQ0kY4YiDHwxOBvkGWGwbf9v0IJc5orE2xL0fS7z98VUOVWtqblRkFaLn2NNL2KKFTfW7uH6ZyJNKmH7OewB70f7f7Ziu/nYL54sEOjwZYxzT/+ez8AtnFIoyLj2bunn4Vges4WCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas7t1763360070t251t24988
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.120.152.51])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 4017320020957605270
-To: "'Andrew Lunn'" <andrew@lunn.ch>
-Cc: "'Vadim Fedorenko'" <vadim.fedorenko@linux.dev>,
-	<netdev@vger.kernel.org>,
-	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Russell King'" <linux@armlinux.org.uk>,
-	"'Simon Horman'" <horms@kernel.org>,
-	"'Jacob Keller'" <jacob.e.keller@intel.com>,
-	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
-	"'Vadim Fedorenko'" <vadim.fedorenko@linux.dev>,
-	<netdev@vger.kernel.org>,
-	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Russell King'" <linux@armlinux.org.uk>,
-	"'Simon Horman'" <horms@kernel.org>,
-	"'Jacob Keller'" <jacob.e.keller@intel.com>,
-	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>
-References: <20251112055841.22984-1-jiawenwu@trustnetic.com> <20251112055841.22984-6-jiawenwu@trustnetic.com> <b7702efc-9994-4656-9d4e-29c2c8145ab3@linux.dev> <001401dc5444$3e897f60$bb9c7e20$@trustnetic.com> <f7d7ed12-0c52-4b82-80eb-948b77b0ddaf@lunn.ch>
-In-Reply-To: <f7d7ed12-0c52-4b82-80eb-948b77b0ddaf@lunn.ch>
-Subject: RE: [PATCH net-next 5/5] net: txgbe: support getting module EEPROM by page
-Date: Mon, 17 Nov 2025 14:14:29 +0800
-Message-ID: <012801dc5789$6ea20440$4be60cc0$@trustnetic.com>
+	s=arc-20240116; t=1763360722; c=relaxed/simple;
+	bh=itp2jCFtVxFpObkMuTkoz/PFN6kuVYIVR1oWSNUaQHU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RjwrdEYftMQ5UqIBaGS4KpFejz4mjeadidK31PMo+08nDJG8fFKiq1+FBlmwcTBPCWpq6hZdQs+GAr4BTixIofo2fjOS3T5Y7Q/UEj2r8XbyG6/Pul+yCCfDBaN7WQUR3AMFCpTm624d8JRevfwGFha6Ahhh1i27KJSMYLh9dMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W0PLjFoU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763360718;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LdWeIGPKRT0xHtD/pd9bR3mN2YoBO/Vu4W5sYnjuBDI=;
+	b=W0PLjFoUdTuwptevt1QvRL0mzg0olQ4rX+8nR6egsEu1DQMjuMyvhVhWrJYUl4F4v08CPm
+	39MtZXzLbFBRrWqdbJjfg0CY/yKHRrddhT7nJD8ONzIpurhrHE3WBp2uc5iWatd7+SrIZL
+	Qq+spB8ifucoKDr3kNNGsqdYV49uL54=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-82-kAOJ7JabPze7Y0PYryvPUg-1; Mon,
+ 17 Nov 2025 01:25:17 -0500
+X-MC-Unique: kAOJ7JabPze7Y0PYryvPUg-1
+X-Mimecast-MFC-AGG-ID: kAOJ7JabPze7Y0PYryvPUg_1763360715
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 671011956095;
+	Mon, 17 Nov 2025 06:25:15 +0000 (UTC)
+Received: from xudu-thinkpadx1carbongen9.nay.csb (unknown [10.72.116.141])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A2B7E1955F1B;
+	Mon, 17 Nov 2025 06:25:12 +0000 (UTC)
+From: xu du <xudu@redhat.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org
+Subject: [PATCH net-next 0/8] selftest: Extend tun/virtio coverage for GSO over UDP tunnels
+Date: Mon, 17 Nov 2025 14:24:56 +0800
+Message-ID: <cover.1763345426.git.xudu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQIM7yZFIqUFPQBkfWoGGA7engjSjgHLnukhAszbvKkDQik1TwIdbyePtEVv84A=
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: NQoDnqplJoTK3pCt+JsGvJQdf/XTpK0c6Gvz/tY+vtzrpHJwMf82tTAB
-	DLo7FKnjRrpwVDtWd1o2erz0JtNCg4Gx8WYP0wuX7N7Qsch8plYcLX9DKxauusup1jcFJnH
-	6AYRvDCTncD2Wcy5tsc8zjfCbR7aXg2JEEu/gMXnkfFvcEmVbe2tSAzsvVu1ocdDN32VhCq
-	Y9GE3HU0xaQ7w0LMr3+jJVAEKy4ljLPFeC3rsmBKozZg9YZ5+UC90x6dvE/6cfa8viZPIFw
-	K89dZAqHr76PgSvQ+3St145TGR57lhmrOtZrkBJHlXy0VUHX7BQi6ClcBlXS7FcRBHc2tel
-	tjaxkRq/24/29nHP4EycUBQJEnA2AoqA/jYaWylyNWJFIHy97MLRIFv4mBUdI7aZMyLILjh
-	jtwmksX1nZX0YiX1t0oYJMv0V0QsW6+r4E8UyCdx4LhH6+iN6zTLErZkeyaTm3pCFXICVOu
-	HJNy7OVx/vuzSNii9E8XTaZPTeHnc/lmEzIN5AwkJiihCumwo3ut5NBQGnoQ5Gym4ef4pRL
-	0Y104pnhfVhdk32GRiORCBpkCFJFHptQpOK+qH+is1Oid6r9LiSKe+M6XWklB4ToMcFYiVg
-	JFvUzKIsHv82mbePxgcrkJka1XP7Xi2pxmE0lTBtmgQVhhGWVk2HY5jAfJhLQhF3M1Je0QJ
-	OD4OLAmJ4vxC00TroCrAS3BTqLaAgYW1x7zCSt7bdS5iiTWHVv3Q6cYQUBfiNI+UGdA/Ov4
-	jAdXzfW7W5u5bD1H3iOuLIEuHKdtBbyNXO4wUD3wcIjMH/400SYPtaxk+84eoz79/HHny6W
-	wWhD7Q88SsqQzRWEZXodoi+Qv8jyIMMtv+1l+cYBaUltkiXEbgAR9gfYEnMKKQLnkaZxO6Y
-	Nq7LBJYeLuPnncZKEhl9VF9p+KyJp1yhgEno8Qafy7Tfh5LgI5GvsaY7JeJj66tnXiPvL9L
-	FtHPwJlfZS7UXfOyxxmMV//YmCHtPraSwR5tjYAX3BLiZ/QFsAa4XeF+n1hYJ1/uXukkOzV
-	k5thT+MwbXvcX8khJrAd2/x6PAIbk=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Fri, Nov 14, 2025 6:19 AM, Andrew Lunn wrote:
-> > For 1-byte data, wx_host_interface_command() can be used to set 'return_data'
-> > to true, then page->data = buffer->data. For other cases, I think it would be more
-> > convenient to read directly from the mailbox registers.
-> 
-> For 1-byte data, you need to careful where it is used. All the sensor
-> values are u16 and you need to read a u16 otherwise you are not
-> guaranteed to get consistent upper/lower bytes.
-> 
-> So i would not recommend 1 byte read, unless you have an SFP module
-> which is known to be broken, and only supports 1 byte reads.
+This patch series increases test coverage for the tun/virtio use-case.
 
-Thanks for the reminder.
+The primary goal is to add test validation for GSO when operating over 
+UDP tunnels, a scenario which is not currently covered.
 
-But when I use 'ethtool -m', .get_module_eeprom_by_page() is always
-invoked multiple times, with 'page->length = 1' in the first time.
+The design strategy is to extend the existing tun/tap testing infrastructure
+to support this new use-case, rather than introducing a new or parallel framework.
+This allows for better integration and re-use of existing test logic.
+
+*** BLURB HERE ***
+
+xu du (8):
+  selftest: tun: Format tun.c existing code
+  selftest: tun: Introduce tuntap_helpers.h header for TUN/TAP testing
+  selftest: tun: Refactor tun_delete to use tuntap_helpers
+  selftest: tap: Refactor tap test to use tuntap_helpers
+  selftest: tun: Add helpers for GSO over UDP tunnel
+  selftest: tun: Add test for sending gso packet into tun
+  selftest: tun: Add test for receiving gso packet from tun
+  selftest: tun: Add test data for success and failure paths
+
+ tools/testing/selftests/net/tap.c            | 286 +-----
+ tools/testing/selftests/net/tun.c            | 884 ++++++++++++++++++-
+ tools/testing/selftests/net/tuntap_helpers.h | 495 +++++++++++
+ 3 files changed, 1383 insertions(+), 282 deletions(-)
+ create mode 100644 tools/testing/selftests/net/tuntap_helpers.h
+
+
+base-commit: df58ee7d8faf353ebf5d4703c35fcf3e578e9b1b
+-- 
+2.49.0
 
 
