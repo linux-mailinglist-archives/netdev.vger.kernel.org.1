@@ -1,394 +1,401 @@
-Return-Path: <netdev+bounces-239153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A753C64A5B
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 15:29:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D287C64A63
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 15:32:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2E0B84E2391
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 14:29:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 224F128BBE
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 14:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC53233722;
-	Mon, 17 Nov 2025 14:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A35328B6E;
+	Mon, 17 Nov 2025 14:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n8ZOMWun"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UmNsJ4Tm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54945334C1A;
-	Mon, 17 Nov 2025 14:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763389738; cv=fail; b=iOqRyJr7dDgipyxbirjCY7GKY9yu68EjJLnNZYFPkycETt/XG8Bs7A8fvx+26E1Y/zP7izhs4BANq39kKCBiAVMSRiiDdWaZzeJ6SvR2pBdrtuDG1c1oh0GWfgvQcp8LyGygAsgmAZVFoQYEtg+Xg+Qo4A0PNB3DaZRe2IN44Bs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763389738; c=relaxed/simple;
-	bh=SRFnMX0G61Qvf3AOel5e9vy3SJpZqt7dnxcDlscBDOQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=E2jkLmoCt1mwGbkF5ekaO/kkSCZhh4ScwadOhujM+b29PyYzrgCoGYNLArKY926pXosM82GN7B9uYyjsHSSnpEbIUKbLJQFQaG8S6TDbFod3izrXXLxifmx7NxWBCqwEuQ/TyGx1YtVkHDeVplo50olKAUPJ8LR6OpMcf5ihkx0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n8ZOMWun; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763389735; x=1794925735;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=SRFnMX0G61Qvf3AOel5e9vy3SJpZqt7dnxcDlscBDOQ=;
-  b=n8ZOMWuney78yp4E0OU1yV/6GCQAqkUtpRrsZyS74rtaiEw/nJy+8wfL
-   8I/6TS/HNdxnV3f6+S+RoIbT2L6MWM58hm1ixPulNBNvhu7Y7KTkGFcQU
-   S2HQMhKXESIkawhXzyKGHnA6oVMu6GSgs0UW0EW2uYUH+c6C1kDrFrXrL
-   OLMPRv13hY4HS6yfgsqWJzOQCi/CAz0wLOksBiSKNjnijnO26Da4Wo4Vc
-   jjQ70A6WNhaw9eat1eZa17qV19z64IASVJZDiA7VoP3oshlrGICFXocUE
-   u0gMbCk/jNQI3liUmHqnEzmU283yDAw2lk/PnFCLpBTLIYAqzte4c6kR8
-   w==;
-X-CSE-ConnectionGUID: Gd56NHuPR8WSBhfULIhxGg==
-X-CSE-MsgGUID: ShEyiIrMQRSE/wc8GaTpaA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="65323101"
-X-IronPort-AV: E=Sophos;i="6.19,312,1754982000"; 
-   d="scan'208";a="65323101"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 06:28:52 -0800
-X-CSE-ConnectionGUID: O1OFOTOARTSpY3WvhPo9tA==
-X-CSE-MsgGUID: q2u9+bLDQRmIgzFvcUukGw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,312,1754982000"; 
-   d="scan'208";a="189714026"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 06:28:52 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 17 Nov 2025 06:28:51 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Mon, 17 Nov 2025 06:28:51 -0800
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.34) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 17 Nov 2025 06:28:50 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qYPcR9HysgpB4yRJHFTAMGgcDE285fn6noN1XZUBoOCjBKNvAe1qJsilt9OBpH7d0EZz89OSfIqt6GleFFjtpeJQmX6oQisgmy2DT86SmEkpnz5UGGkUldzt5FwjmEXBJqr+nY5KLxq/BVJtQpiJCU3U2DarpSdIUrr/f69bmuwpDRR46qyFAt+wms5w3mJ/8QFkBJirGThssQcr53i8Dcsjs0g/qgETRM3jgaP7JjgmthCrTBovjHPA8FBaqx4AaqTh9XFXlK0DrWroGrQ3/V/ampyEbiBnNkr15mP9oBJpJGNnF2bFZxKwSWJ/kUuFXX13VpFbBoveJ4vty0Enjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=56d68pUraSb0/UpPT3OLtnPTGjF68IBIvU/6srX8iZU=;
- b=vEtBFCPP7CPdvz5rHWnFDbzOTG+jfTB4gsJIYZwkRA6ypjcJYVUr+kdLN5bylgFb/fX483fDQR2LRxnjx5TLIM6X4Ie9hJefzSL8mik0fiFP6tBUaGxaVBhXM1K3DdpqmdrAxD3fEoumS0fVms8my8gIrq76kxgVxcFDzplEUXDcdqf6ObfOi0ohCMyOLS+XVdDLA+L1W05alKvrp7kLYFr6R9f43jPSE2YPH+KmfpCEyXiCAeA/+/EdiwNUC/p5DQU5ObERa44EdrGn+i0tVX5Y2p9DooiY8u5VB4Hh60o0aAny+hXRWeUI6oPWUn+TY1yqak8rLinyjKZvR59VwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS4PPF7551E6552.namprd11.prod.outlook.com
- (2603:10b6:f:fc02::31) by SJ5PPF6E07EBAE7.namprd11.prod.outlook.com
- (2603:10b6:a0f:fc02::832) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.22; Mon, 17 Nov
- 2025 14:28:48 +0000
-Received: from DS4PPF7551E6552.namprd11.prod.outlook.com
- ([fe80::67f8:8630:9f17:7876]) by DS4PPF7551E6552.namprd11.prod.outlook.com
- ([fe80::67f8:8630:9f17:7876%6]) with mapi id 15.20.9320.021; Mon, 17 Nov 2025
- 14:28:48 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Zaremba, Larysa" <larysa.zaremba@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
-CC: "Lobakin, Aleksander" <aleksander.lobakin@intel.com>, "Samudrala, Sridhar"
-	<sridhar.samudrala@intel.com>, "Singhai, Anjali" <anjali.singhai@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, "Zaremba, Larysa"
-	<larysa.zaremba@intel.com>, "Fijalkowski, Maciej"
-	<maciej.fijalkowski@intel.com>, "Tantilov, Emil S"
-	<emil.s.tantilov@intel.com>, "Chittim, Madhu" <madhu.chittim@intel.com>,
-	"Hay, Joshua A" <joshua.a.hay@intel.com>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>, "Shanmugam, Jayaprakash"
-	<jayaprakash.shanmugam@intel.com>, "Wochtman, Natalia"
-	<natalia.wochtman@intel.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Richard Cochran
-	<richardcochran@gmail.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v5 15/15] ixd: add devlink
- support
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v5 15/15] ixd: add devlink
- support
-Thread-Index: AQHcV8klLZ4RM4Sk1kWLqtFsrPW1J7T27CXg
-Date: Mon, 17 Nov 2025 14:28:48 +0000
-Message-ID: <DS4PPF7551E65529FAD5462AFC6A95035D7E5C9A@DS4PPF7551E6552.namprd11.prod.outlook.com>
-References: <20251117134912.18566-1-larysa.zaremba@intel.com>
- <20251117134912.18566-16-larysa.zaremba@intel.com>
-In-Reply-To: <20251117134912.18566-16-larysa.zaremba@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS4PPF7551E6552:EE_|SJ5PPF6E07EBAE7:EE_
-x-ms-office365-filtering-correlation-id: 9b02c441-fba2-4a5e-55d4-08de25e59f63
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7416014|38070700021|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?XsqD+e8R/sh3fZLZ1h0F/6LS/ESGae1Fw8W7YG03Ne/43w7/L/sA7gKJ5GBT?=
- =?us-ascii?Q?gNG8JpBaWZnrik71md6JJWpZKKprtQrGbAr2gcJBqu6fgKS+srzs5sphPCbg?=
- =?us-ascii?Q?c7sQqa5nYm8jI6nOZiSX2UPZ7P+tPCuhcUpaKrZybDTpntkqrnE4VKX3etPm?=
- =?us-ascii?Q?/yEtBgo6ju02jqJxI5Sn/hS7fAQ9oooJWSWh/Ba9nccyTeoubG3cwg3dn/Ch?=
- =?us-ascii?Q?snBZNGBywwn1E7e+jOr6jFPhGkplULYfUnK5KfjN02smP8muq+4qBD0oSTC1?=
- =?us-ascii?Q?KqT4en0t2xV8TPoH1emCZNmM8Sy0cl454g6PjdjkQp95ySfVaM8o1MdxAgfV?=
- =?us-ascii?Q?5BbE50Fc5do0AVPgJHmnWGKiPs/oEoU/QHON7p5MMlgFKfSvYHjGN3tmInRg?=
- =?us-ascii?Q?EtjE4XhoqY+5RDZmOwPthWWhNEmDS6Cd3XJ0UcRWuATIuIGFwaJHNDLWY/WQ?=
- =?us-ascii?Q?58Y7f7uYrLIqUhjdrPTHyzqzkafqPOisUjBTI6Q2dbbAwptWKL3ZvgI0gGsQ?=
- =?us-ascii?Q?ffgMK+bMEWPUbWgz25DxogGw4WvOBzHVEmuOtRKV/cZoJdJAQWgle60GR4fn?=
- =?us-ascii?Q?b/pGS+jkcqp+rkp6xu/OehqDUkzr/oUE6E8HeSKcdhZgeCUWmfEn4NcupzyT?=
- =?us-ascii?Q?0VuTtshzy1OIvHlA52NEoen82yJjWXSF82PDXezDbOqLyzOSAFMbsmEgGumU?=
- =?us-ascii?Q?51RCp6Ex2rNm4WGwQfsM7gI76il73/3MQ+Ovzg/7NPmtzaEAn3/Pl9t4Blq/?=
- =?us-ascii?Q?WwvggHtvLqHA/7X1mvOR5qn74CZ6iHOURJTU/BdlaXpsHM0pbEyx5GjQrWDL?=
- =?us-ascii?Q?fJt+z4ygSq3fTPWPT+iCE2moCA8EXy2ewJh1dzxVqd6kaj3W+6649GOIvxns?=
- =?us-ascii?Q?1Ni134asrthA+ChUYAgcXZ1K1po/hehNgc9D9xTWzZYcHf7JCrXRBXY9Ah7B?=
- =?us-ascii?Q?Cwpsds3PQf3mwS0Qq4GdU5XGtah8zrO7IENVtGRUKd2kbdMLUuYdzdCq4Ynx?=
- =?us-ascii?Q?ozQBx3uloosfxByDRe5qtZ/MFuwujya/HwwRKKqgcxfaazEAvaYb0ts/jhWi?=
- =?us-ascii?Q?tJKyqURAyNc+B7Mko9edrm5XmOriw7kXgZZVGdeQ2Vo1oSPvioSnUn7J/xpP?=
- =?us-ascii?Q?mJRa0qYy9dfyI0n23l0j6hK37WMCXgTIBTw/k50FKtczufOAtPjH9F1b8H+2?=
- =?us-ascii?Q?s9v+3Uc9pvLNeuk4elGKkCeoQG0KFj/4TqR0Po7iD7V7KXsH0psIcuFiaJcn?=
- =?us-ascii?Q?ARxQOw8hvX8Wza06zoknW7pH9aVgTmhlcsaZ7SsdPqAo4WWLEhI0m08fIZqJ?=
- =?us-ascii?Q?1MwOW3DXZbEpxEjjNDFpMVCY8MDqCAYI8p11fShMuGocmR8YPJ3SIhgmI5Kt?=
- =?us-ascii?Q?uvY/1C0gcodThK5SN+a4cLM2OHJVZkcj0F7zjFHKwURn7A5OVt31NZEwJzmY?=
- =?us-ascii?Q?pwNguGbPk+c8Tk1OYNIpLPtaU6cBXFIpX44qpfLq9TAtD3Wuw9ARgocIXbPk?=
- =?us-ascii?Q?saRp+08niKZfaYynvNiqH6Sud2qHUuDFwB5j?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS4PPF7551E6552.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014)(38070700021)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?rBr6OHh30wbtkX+JTE852q2ZJnl9GBpt0Sx/e5ykobLtCMHwElzI4r6oTdiX?=
- =?us-ascii?Q?Vv6fb8ZuT9/lBr/otAXz3XBlNFSTEaz8VtsN0mBRJALyrRnFJ4cFHVdX8ARx?=
- =?us-ascii?Q?11HDLu/c964HtpcLz00VbBBoiAG+uJKs1rDR3t7RMoUdIJ5hwPjAkazQP/dM?=
- =?us-ascii?Q?oCjWM7DCYPQbBLX+YsB/6JHN+T6xuf5tGHmQEqkQOhSxNS5W2mxKd60ei0XB?=
- =?us-ascii?Q?qpzxtY4ZHqSYF7/JYA4Izt5mfNhkgtAxWihxc6LpY82gOnbdFtt+ZtY1f5ss?=
- =?us-ascii?Q?eJpQfq7+5Xrh+at6MvpBiN0LWQWY4EyyA2Ji2xUSPkwG/9ZEhHnDwQ6AGZMy?=
- =?us-ascii?Q?sTwjyy/XpnYREMgllVlI7/+JLamkWnZSvitfW4yxNfvkZUNFdMWeGUptpz4S?=
- =?us-ascii?Q?MqUSYKwRemlXUlknVhr7/K7yXQEXskY5AwivrlGkHVgbBGnYBXvFKST8TKpv?=
- =?us-ascii?Q?njiMhI1qWA3rrkNn2zycKCpBX4oyOuY0tkvWqlj+Sbd3y1YyuXxIG1vU//9Q?=
- =?us-ascii?Q?4Sagxi6Nlqo7R83KKtGZPM2WiKz6kHz+H0ELN3e4Hr2FqInhW/+KMG2xpeED?=
- =?us-ascii?Q?BXkIGMOnSauBuItNT/RHORbaMCj8N1eMm5BPUeDJf2w+Xqr8oeUhPjcpUX8q?=
- =?us-ascii?Q?ueurUDB/U+wZBkI0DzySePTd+IIQvIdIjAWc90g/QKZapOJ4mgoaDYKWiL4x?=
- =?us-ascii?Q?s7H6kgziflUFmghavZdPGoyXRxAw7vBq8f3hqQDABnBpQhEWYpRPMzrcNMSC?=
- =?us-ascii?Q?YaDcERVjz8RBZjH7xJP/kyOs7tMjIXAnWQMVjL+QMXf75HjqXFX1tVVX3RLt?=
- =?us-ascii?Q?tt1yLjyyzWgfPzGtnkmpmx6JO65gIwHpFqHetyYQKvbNaIep9JR0fhINdC3b?=
- =?us-ascii?Q?IiYLY5hL1NaS6GA3pyLOr6UAqj1RnDqPcRWw+zPedNmWfHFmSTzy0CmKLdUw?=
- =?us-ascii?Q?YqLIlKKVc15lhRZTh/e8aDkJLpZd0TIt4TA6jqaQBsQ8S04VOaFJdrqc/zs0?=
- =?us-ascii?Q?0+Esb/5GPELpC8hvW5B3z6h7IzzfCDndd+0qPsNzQg6DWj4uuyOz86TxaVQT?=
- =?us-ascii?Q?lnmZHyo91femEhi1buJlPYlHQE79NQi93w92FlWc10CHJWSEOJMhkRQlxGOk?=
- =?us-ascii?Q?zxm2kLjBZZuTVGJr6qCMcU2/MTI1CXNFbqw/lmbgZJzcnJUNv8lO05+khEa2?=
- =?us-ascii?Q?2o7fWGY3qTmE6DsTTqw6IENNdoN9Fj+PhzwUANnFL4NkL2Z9oXNVTUv2io5D?=
- =?us-ascii?Q?VeADVB1fXFb/Mu853E3s7VrZqcmt0MTsGIBIIMwuEgeJIdHcQL0hOMqSZGq5?=
- =?us-ascii?Q?9nfenb5A4oEKOUuk6PAbL2M1xmGBLU7OZkoi9zH8h8cAi7vqFyNWYid9Dvfe?=
- =?us-ascii?Q?oG2WQsDK9i6gVNp6jBbjGONfo86HAdhcRlPnt7dA+dGAAuDLCiWW0dikrj/t?=
- =?us-ascii?Q?1O8DWQBJ8M/h6Yb8vxFvSWusOt+QScVd8yzS2EAp5cXv4fY0A3+4vIw/vn0k?=
- =?us-ascii?Q?UF4YK0yj5B2vOgpH2GgBeVBDvSRZVGVi4LqSAuftgZ4vYsbPMHQ4sJ/TzMf8?=
- =?us-ascii?Q?2ZK18v4I4oTX0Ypmeq/oOKDUFWedZAXiIhHJgMgHBOIe0F6y5r6C+oR1oEt9?=
- =?us-ascii?Q?iQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D7C24C676
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 14:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763389936; cv=none; b=j9oPl2cH/sYc6l+580yelElmpQ3mlXAIsnQGh5xq7FvBScAgGu2z9sDA+/Gvj9fZwoDmInZzf2j0st11uddJ9vb/47dwzy0zJIYWHD9gb8bMHBAOcuqVvOp+boTweogyqcj+J58qbTGYVG5NycWa+5SykN2HVCyycj5jHzl7Ht0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763389936; c=relaxed/simple;
+	bh=3B7oQYQXxISpc0yFEceVqJz2wkI4hp4t6apF7PARqaE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Tz069ZNz/dhOwr3WusvXx10l9WbQynLLQYHNZwbsfP19NigEW4iqomqwXu6ccBPRO0ByPwnfX+fj6sA8jfWKNnmHAmj4IyAVNNK0cKtl5YoYmKshJNzZJC+v0vfgGxVY1oNRsBwywQy8bgB0eVtV3Q6kTQcV3rPkkaVd61vOMyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UmNsJ4Tm; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-4331709968fso15859565ab.2
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 06:32:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763389934; x=1763994734; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rphyKd6lx5vXiMn4wS+v0AFlFan4k7wZ5A0z4ZjVXvQ=;
+        b=UmNsJ4TmzPdwkQYp+WSw7xh1ws7+A7ZpEXpNfbwEz13wsRhMW9S86cs9UGM42fezJH
+         pTDtjan7x1HezaP2IEIK0VJ4aUB9ebBVFDxzDGUfhzsrK4Qnhc/7oQ7MjTC5+T5pr/yP
+         AnBo6a45IPwfGXO5g3HvoZV/VPtPYLmP8RGqIgxQQAiCR5hNCETBuyyXuco44HE/2/2s
+         1HE7dac4QKrNM27MK4b/LgeUaaWaQPJtqb2sO9AweEOlRRjq5iE87/UvC/Gr0Fp0X2Bw
+         +P1fTqX2kez12fcrSFIkzS0yW3IgRoEOW9N7rjGqs1IrEuFBq9x/5PqsBjYnXsTRQ4k2
+         zBPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763389934; x=1763994734;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rphyKd6lx5vXiMn4wS+v0AFlFan4k7wZ5A0z4ZjVXvQ=;
+        b=QKmIjf6bezKF4jpvQj6yCMGjgjoJTYgix+0n0zWfPItVLoYN3LRQwBOTGxgVpuGqiK
+         zBw7gBtQv6Z7wAc+Ee8jsOjzEiA8uLwNlx7aAIz4mhipHVLkXbnKs33IhVAPnkm3edL5
+         Tymi1pfSjoxLIfD6x+HvbFhs3zLmh0yQnJ18Bzws+vppQ0bCS0PRxVFrfOK9UF5kBKKe
+         FooVz79ZNPCPPagOn2Q8P6uXJKo5yIBFdW4He6ZQBhVAmQeEjjavM202ppnt7tohzicD
+         789yZh1iT27UF9sSy+WkM2nCRhi3qzVxB8wtXqjZGvFvHO2idftdGy2BMZTT/FT2lJQX
+         KhlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVV+sy8GdibgtUVR4pI3u9mYVp/ap2eI8uBNvm7bgdapmSEF9rbpDzTFLUizLhBV8pmGEd9rOU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyl9uSfIRIPq93kMaZvRvr5Ukq7Uj+oPKnfEdATnY0d+8H1aUxq
+	D0JcYh4gkuDera7YPA+phpt9bnU3bU6GQcN0SiTz32gIjNJNJLsMiFsxA1r2JP86pdln2FhDnIR
+	UIanWDqCLQ85IryLBJdBTt/9YXyFkRGI=
+X-Gm-Gg: ASbGncuFql7aZxxjnLOljlf7N3bAOUedCRTKXr5dj4qoFhLRxTwZ9ScAfAP9BhlJ+oj
+	/POR5QDpjnaQvXMHwiOSWe/a+NCn58sFD70uwoBbPh+EMeILphu+amvFrBEIwVa8gbzgOlD4kER
+	RLoiOJF6Y3mLctRFjWf9x8pQJZNo5KRrxAKeRuuRDQ9O3gYvfp3zolq//mabzB7fsDpEACOi3UC
+	SFIugT6wjg5zPtbdMpESpv0NXGynndV9nZ+8pJxonVR5y407X/ptkZoyv3bR48MVVmU+Rk=
+X-Google-Smtp-Source: AGHT+IF0MlryiRyh2cGtu1dYZK5+v+yYd1YN4/TITZfb7WUGfWDVF5Xk5Vki95YCRShyRiYKoDkUGdNYitAZ1KHry+0=
+X-Received: by 2002:a05:6e02:156c:b0:433:4f9c:96a7 with SMTP id
+ e9e14a558f8ab-4348c864ab4mr171162245ab.10.1763389933765; Mon, 17 Nov 2025
+ 06:32:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS4PPF7551E6552.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b02c441-fba2-4a5e-55d4-08de25e59f63
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Nov 2025 14:28:48.4636
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 26h8/mNdGNvZ8wn50JPeKJomx82p87PvkcZvttiyoa/+mZ9r9dVILuW2zgjwfQfsix8NYuQXLLRu6FAsXpi7IBeLd2f6DsYwqc8O7XfEbZ4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF6E07EBAE7
-X-OriginatorOrg: intel.com
+References: <20251116202717.1542829-1-edumazet@google.com> <20251116202717.1542829-4-edumazet@google.com>
+ <CAL+tcoD3-qtq4Kcmo9eb4mw6bdSYCCjxzNB3qov5LDYoe_gtkw@mail.gmail.com>
+ <CAL+tcoBpUg=ggf6nQpYeZyAcMbXobuJtyUdN98G1HpcuUqFZ+w@mail.gmail.com>
+ <CANn89iJb8hLw7Mx1+Td_BK7gGm5guRaUe6zdhqRqtfdw_0gLzA@mail.gmail.com>
+ <CAL+tcoBeEXmyugUrqxct9VuYrSErVDA61nZ1Y62w8-NSwgdxjw@mail.gmail.com> <CANn89iJec+7ssKpAp0Um5pNecfzxohRJBKQybSYS=e-9pQjqag@mail.gmail.com>
+In-Reply-To: <CANn89iJec+7ssKpAp0Um5pNecfzxohRJBKQybSYS=e-9pQjqag@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 17 Nov 2025 22:31:36 +0800
+X-Gm-Features: AWmQ_bm_KExQz8ccKCiAUEDGoM_HdAph8snpO2Jjoch1rLDw3g8O-CROBqQBcMY
+Message-ID: <CAL+tcoAJR3Du1ZsJC5KU=pNB7G9FP+qYVe8314GXu8xv7-PC3g@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 3/3] net: use napi_skb_cache even in process context
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Nov 17, 2025 at 5:48=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Mon, Nov 17, 2025 at 1:17=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > On Mon, Nov 17, 2025 at 4:57=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Mon, Nov 17, 2025 at 12:41=E2=80=AFAM Jason Xing <kerneljasonxing@=
+gmail.com> wrote:
+> > > >
+> > > > On Mon, Nov 17, 2025 at 9:07=E2=80=AFAM Jason Xing <kerneljasonxing=
+@gmail.com> wrote:
+> > > > >
+> > > > > On Mon, Nov 17, 2025 at 4:27=E2=80=AFAM Eric Dumazet <edumazet@go=
+ogle.com> wrote:
+> > > > > >
+> > > > > > This is a followup of commit e20dfbad8aab ("net: fix napi_consu=
+me_skb()
+> > > > > > with alien skbs").
+> > > > > >
+> > > > > > Now the per-cpu napi_skb_cache is populated from TX completion =
+path,
+> > > > > > we can make use of this cache, especially for cpus not used
+> > > > > > from a driver NAPI poll (primary user of napi_cache).
+> > > > > >
+> > > > > > We can use the napi_skb_cache only if current context is not fr=
+om hard irq.
+> > > > > >
+> > > > > > With this patch, I consistently reach 130 Mpps on my UDP tx str=
+ess test
+> > > > > > and reduce SLUB spinlock contention to smaller values.
+> > > > > >
+> > > > > > Note there is still some SLUB contention for skb->head allocati=
+ons.
+> > > > > >
+> > > > > > I had to tune /sys/kernel/slab/skbuff_small_head/cpu_partial
+> > > > > > and /sys/kernel/slab/skbuff_small_head/min_partial depending
+> > > > > > on the platform taxonomy.
+> > > > > >
+> > > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > >
+> > > > > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+> > > > >
+> > > > > Thanks for working on this. Previously I was thinking about this =
+as
+> > > > > well since it affects the hot path for xsk (please see
+> > > > > __xsk_generic_xmit()->xsk_build_skb()->sock_alloc_send_pskb()). B=
+ut I
+> > > > > wasn't aware of the benefits between disabling irq and allocating
+> > > > > memory. AFAIK, I once removed an enabling/disabling irq pair and =
+saw a
+> > > > > minor improvement as this commit[1] says. Would you share your
+> > > > > invaluable experience with us in this case?
+> > > > >
+> > > > > In the meantime, I will do more rounds of experiments to see how =
+they perform.
+> > > >
+> > > > Tested-by: Jason Xing <kerneljasonxing@gmail.com>
+> > > > Done! I managed to see an improvement. The pps number goes from
+> > > > 1,458,644 to 1,647,235 by running [2].
+> > > >
+> > > > But sadly the news is that the previous commit [3] leads to a huge
+> > > > decrease in af_xdp from 1,980,000 to 1,458,644. With commit [3]
 
+I have to rephrase a bit. What I did is on top of the commit just
+before [3], I tried out the tests to see the number w/o [3] series, so
+the numbers were respectively 1,458,644 and 1,980,000. That means
+reverting commit [3] brought back that much performance.
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Larysa Zaremba
-> Sent: Monday, November 17, 2025 2:49 PM
-> To: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>
-> Cc: Lobakin, Aleksander <aleksander.lobakin@intel.com>; Samudrala,
-> Sridhar <sridhar.samudrala@intel.com>; Singhai, Anjali
-> <anjali.singhai@intel.com>; Michal Swiatkowski
-> <michal.swiatkowski@linux.intel.com>; Zaremba, Larysa
-> <larysa.zaremba@intel.com>; Fijalkowski, Maciej
-> <maciej.fijalkowski@intel.com>; Tantilov, Emil S
-> <emil.s.tantilov@intel.com>; Chittim, Madhu <madhu.chittim@intel.com>;
-> Hay, Joshua A <joshua.a.hay@intel.com>; Keller, Jacob E
-> <jacob.e.keller@intel.com>; Shanmugam, Jayaprakash
-> <jayaprakash.shanmugam@intel.com>; Wochtman, Natalia
-> <natalia.wochtman@intel.com>; Jiri Pirko <jiri@resnulli.us>; David S.
-> Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>;
-> Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
-> Simon Horman <horms@kernel.org>; Jonathan Corbet <corbet@lwn.net>;
-> Richard Cochran <richardcochran@gmail.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
-> netdev@vger.kernel.org; linux-doc@vger.kernel.org; linux-
-> kernel@vger.kernel.org
-> Subject: [Intel-wired-lan] [PATCH iwl-next v5 15/15] ixd: add devlink
-> support
->=20
-> From: Amritha Nambiar <amritha.nambiar@intel.com>
->=20
-> Enable initial support for the devlink interface with the ixd driver.
-> The ixd hardware is a single function PCIe device. So, the PCIe
-> adapter gets its own devlink instance to manage device-wide resources
-> or configuration.
->=20
-> $ devlink dev show
-> pci/0000:83:00.6
->=20
-> $ devlink dev info pci/0000:83:00.6
-> pci/0000:83:00.6:
->   driver ixd
->   serial_number 00-a0-c9-ff-ff-23-45-67
->   versions:
->       fixed:
->         device.type MEV
->       running:
->         cp 0.0
->         virtchnl 2.0
->=20
-This commit mentions MEV without expansion.
-Kernel docs require expanding uncommon abbreviations.
+Furthermore, I did a few more tests and my env changed:
+1) I tried the latest kernel, the number is around 1,680,000. And then
+revert commit [3], it's increased to 1,850,000.
+2) I tried to apply the current series, the number was around 1,730,000.
+3) I tried to apply the current series and reverted [3], the number
+was still around 1,730,000.
 
+That means the current series negates the benefits of that commit [3].
+I've done many rounds of tests, so the above numbers are quite stable.
+I feel I need to directly use the fallback memory allocation instead
+of trying napi_skb_cache_get for xsk? I'm not sure if any theory
+supports which one is good or not. From my instinct, trying
+disabling/enabling is saving time while using napi_skb_cache_get is
+also saving time...
 
-> Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> ---
->  Documentation/networking/devlink/index.rst   |   1 +
->  Documentation/networking/devlink/ixd.rst     |  35 +++++++
->  drivers/net/ethernet/intel/ixd/Kconfig       |   1 +
->  drivers/net/ethernet/intel/ixd/Makefile      |   1 +
->  drivers/net/ethernet/intel/ixd/ixd_devlink.c | 105
-> +++++++++++++++++++  drivers/net/ethernet/intel/ixd/ixd_devlink.h |
-> 44 ++++++++
->  drivers/net/ethernet/intel/ixd/ixd_main.c    |  16 ++-
->  7 files changed, 200 insertions(+), 3 deletions(-)  create mode
-> 100644 Documentation/networking/devlink/ixd.rst
->  create mode 100644 drivers/net/ethernet/intel/ixd/ixd_devlink.c
->  create mode 100644 drivers/net/ethernet/intel/ixd/ixd_devlink.h
->=20
-> diff --git a/Documentation/networking/devlink/index.rst
-> b/Documentation/networking/devlink/index.rst
-> index 35b12a2bfeba..efd138d8e7d3 100644
-> --- a/Documentation/networking/devlink/index.rst
-> +++ b/Documentation/networking/devlink/index.rst
-> @@ -87,6 +87,7 @@ parameters, info versions, and other features it
-> supports.
->     ionic
->     iosm
->     ixgbe
-> +   ixd
->     kvaser_pciefd
->     kvaser_usb
->     mlx4
-> diff --git a/Documentation/networking/devlink/ixd.rst
-> b/Documentation/networking/devlink/ixd.rst
-> new file mode 100644
-> index 000000000000..81b28ffb00f6
-> --- /dev/null
-> +++ b/Documentation/networking/devlink/ixd.rst
-> @@ -0,0 +1,35 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +ixd devlink support
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +This document describes the devlink features implemented by the
-> ``ixd``
-> +device driver.
-> +
-> +Info versions
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +The ``ixd`` driver reports the following versions
-> +
-> +.. list-table:: devlink info versions implemented
-> +    :widths: 5 5 5 90
-> +
-> +    * - Name
-> +      - Type
-> +      - Example
-> +      - Description
-> +    * - ``device.type``
-> +      - fixed
-> +      - MEV
-> +      - The hardware type for this device
-> +    * - ``cp``
-> +      - running
-> +      - 0.0
-> +      - Version number (major.minor) of the Control Plane software
-> +        running on the device.
-> +    * - ``virtchnl``
-> +      - running
-> +      - 2.0
-> +      - 2-digit version number (major.minor) of the communication
-> channel
-> +        (virtchnl) used by the device.
+> > > > applied, I observed and found xdpsock always allocated the skb on c=
+pu
+> > > > 0 but the napi poll triggered skb_attempt_defer_free() on another
+> > > > call[4], which affected the final results.
+> > > >
+> > > > [2]
+> > > > taskset -c 0 ./xdpsock -i enp2s0f1 -q 1 -t -S -s 64
+> > > >
+> > > > [3]
+> > > > commit e20dfbad8aab2b7c72571ae3c3e2e646d6b04cb7
+> > > > Author: Eric Dumazet <edumazet@google.com>
+> > > > Date:   Thu Nov 6 20:29:34 2025 +0000
+> > > >
+> > > >     net: fix napi_consume_skb() with alien skbs
+> > > >
+> > > >     There is a lack of NUMA awareness and more generally lack
+> > > >     of slab caches affinity on TX completion path.
+> > > >
+> > > > [4]
+> > > > @c[
+> > > >     skb_attempt_defer_free+1
+> > > >     ixgbe_clean_tx_irq+723
+> > > >     ixgbe_poll+119
+> > > >     __napi_poll+48
+> > > > , ksoftirqd/24]: 1964731
+> > > >
+> > > > @c[
+> > > >     kick_defer_list_purge+1
+> > > >     napi_consume_skb+333
+> > > >     ixgbe_clean_tx_irq+723
+> > > >     ixgbe_poll+119
+> > > > , 34, swapper/34]: 123779
+> > > >
+> > > > Thanks,
+> > > > Jason
+> > >
+> > > Hi Jason.
+> > >
+> > > It is a bit hard to guess without more details (cpu you are using),
+> > > and perhaps perf profiles.
+> >
+> > Xdpsock only calculates the speed on the cpu where it sends packets.
+> > To put in more details, it will check if the packets are sent by
+> > inspecting the completion queue and then send another group of packets
+> > over and over again.
+> >
+> > My test env is relatively old:
+> > [root@localhost ~]# lscpu
+> > Architecture:                x86_64
+> >   CPU op-mode(s):            32-bit, 64-bit
+> >   Address sizes:             46 bits physical, 48 bits virtual
+> >   Byte Order:                Little Endian
+> > CPU(s):                      48
+> >   On-line CPU(s) list:       0-47
+> > Vendor ID:                   GenuineIntel
+> >   BIOS Vendor ID:            Intel(R) Corporation
+> >   Model name:                Intel(R) Xeon(R) CPU E5-2670 v3 @ 2.30GHz
+> >     BIOS Model name:         Intel(R) Xeon(R) CPU E5-2670 v3 @ 2.30GHz
+> >  CPU @ 2.3GHz
+> >     BIOS CPU family:         179
+> >     CPU family:              6
+> >     Model:                   63
+> >     Thread(s) per core:      2
+> >     Core(s) per socket:      12
+> >     Socket(s):               2
+> >     Stepping:                2
+> >     CPU(s) scaling MHz:      84%
+> >     CPU max MHz:             3100.0000
+> >     CPU min MHz:             1200.0000
+> >
+> > After that commit [3], the perf differs because of the interrupts
+> > jumping in the tx path frequently:
+> > -   98.72%     0.09%  xdpsock          libc.so.6          [.]
+> > __libc_sendto
+> >       =E2=96=92
+> >    - __libc_sendto
+> >                                                                     =E2=
+=97=86
+> >       - 98.28% entry_SYSCALL_64_after_hwframe
+> >                                                                     =E2=
+=96=92
+> >          - 98.19% do_syscall_64
+> >                                                                     =E2=
+=96=92
+> >             - 97.94% x64_sys_call
+> >                                                                     =E2=
+=96=92
+> >                - 97.91% __x64_sys_sendto
+> >                                                                     =E2=
+=96=92
+> >                   - 97.80% __sys_sendto
+> >                                                                     =E2=
+=96=92
+> >                      - 97.28% xsk_sendmsg
+> >                                                                     =E2=
+=96=92
+> >                         - 97.18% __xsk_sendmsg.constprop.0.isra.0
+> >                                                                     =E2=
+=96=92
+> >                            - 87.85% __xsk_generic_xmit
+> >                                                                     =E2=
+=96=92
+> >                               - 41.71% xsk_build_skb
+> >                                                                     =E2=
+=96=92
+> >                                  - 33.06% sock_alloc_send_pskb
+> >                                                                     =E2=
+=96=92
+> >                                     + 22.06% alloc_skb_with_frags
+> >                                                                     =E2=
+=96=92
+> >                                     + 7.61% skb_set_owner_w
+> >                                                                     =E2=
+=96=92
+> >                                     + 0.58%
+> > asm_sysvec_call_function_single
+> >                         =E2=96=92
+> >                                    1.66% skb_store_bits
+> >                                                                     =E2=
+=96=92
+> >                                    1.60% memcpy_orig
+> >                                                                     =E2=
+=96=92
+> >                                    0.69% xp_raw_get_data
+> >                                                                     =E2=
+=96=92
+> >                               - 32.56% __dev_direct_xmit
+> >                                                                     =E2=
+=96=92
+> >                                  + 15.62% 0xffffffffa064e5ac
+> >                                                                     =E2=
+=96=92
+> >                                  - 7.33% __local_bh_enable_ip
+> >                                                                     =E2=
+=96=92
+> >                                     + 6.18% do_softirq
+> >                                                                     =E2=
+=96=92
+> >                                     + 0.70%
+> > asm_sysvec_call_function_single
+> >                         =E2=96=92
+> >                                  + 5.78% validate_xmit_skb
+> >                                                                     =E2=
+=96=92
+> >                               - 6.08% asm_sysvec_call_function_single
+> >                                                                     =E2=
+=96=92
+> >                                  + sysvec_call_function_single
+> >                                                                     =E2=
+=96=92
+> >                               + 1.62% xp_raw_get_data
+> >                                                                     =E2=
+=96=92
+> >                            - 8.29% _raw_spin_lock
+> >                                                                     =E2=
+=96=92
+> >                               + 3.01% asm_sysvec_call_function_single
+> >
+> > Prior to that patch, I didn't see any interrupts coming in, so I
+> > assume the defer part caused the problem.
+>
+> This is a trade off.
+>
+> If you are using a single cpu to send packets, then it will not really
+> have contention on SLUB structures.
+>
+> A bit like RFS : If you want to reach max throughput on a single flow,
+> it is probably better _not_ using RFS/RPS,
+> so that more than one cpu can be involved in the rx work.
 
-...
+Point taken!
 
-> +++ b/drivers/net/ethernet/intel/ixd/ixd_devlink.c
-> @@ -0,0 +1,105 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) 2025, Intel Corporation. */
-> +
-> +#include "ixd.h"
-> +#include "ixd_devlink.h"
-> +
-> +#define IXD_DEVLINK_INFO_LEN	128
-> +
-> +/**
-> + * ixd_fill_dsn - Get the serial number for the ixd device
-> + * @adapter: adapter to query
-> + * @buf: storage buffer for the info request  */ static void
-> +ixd_fill_dsn(struct ixd_adapter *adapter, char *buf) {
-> +	u8 dsn[8];
-> +
-> +	/* Copy the DSN into an array in Big Endian format */
-> +	put_unaligned_be64(pci_get_dsn(adapter->cp_ctx.mmio_info.pdev),
-> dsn);
-> +
-> +	snprintf(buf, IXD_DEVLINK_INFO_LEN, "%8phD", dsn); }
-> +
-Hardcoded buffer length.
-Better pass len as a parameter.
+>
+> We can add a static key to enable/disable the behaviors that are most
+> suited to a particular workload.
 
+Are we going to introduce a new knob to control this snippet in
+napi_consume_skb()?
 
-> +/**
-> + * ixd_fill_device_name - Get the name of the underlying hardware
-> + * @adapter: adapter to query
-> + * @buf: storage buffer for the info request
-> + * @buf_size: size of the storage buffer  */ static void
-> +ixd_fill_device_name(struct ixd_adapter *adapter, char *buf,
-> +				 size_t buf_size)
-> +{
-> +	if (adapter->caps.device_type =3D=3D VIRTCHNL2_MEV_DEVICE)
-> +		snprintf(buf, buf_size, "%s", "MEV");
-> +	else
-> +		snprintf(buf, buf_size, "%s", "UNKNOWN"); }
-> +
-I'd recommend to use strscpy() for fixed strings instead of snprintf() with=
- "%s".
+>
+> We could also call skb_defer_free_flush() (now it is IRQ safe) from
+> napi_skb_cache_get() before
+> we attempt to allocate new sk_buff. This would prevent IPI from being sen=
+t.
 
-...
+Well, it can but it adds more complexity into the allocation phase. I
+would prefer the static key approach :)
 
-> --
-> 2.47.0
+Thanks,
+Jason
 
+>
+> >
+> > > In particular which cpu is the bottleneck ?
+> > >
+> > > 1) There is still the missing part about tuning NAPI_SKB_CACHE_SIZE /
+> > > NAPI_SKB_CACHE_BULK, I was hoping you could send the patch we
+> > > discussed earlier ?
+> >
+> > Sure thing :) I've done that part locally, thinking I will post it as
+> > long as the current series gets merged?
+> >
+> > >
+> > > 2) I am also working on allowing batches of skbs for skb_attempt_defe=
+r_free().
+> > >
+> > > Another item I am working on is to let the qdisc being serviced
+> > > preferably not by the cpu performing TX completion,
+> > > I mentioned about making qdisc->running a sequence that we can latch
+> > > in __netif_schedule().
+> > > (Idea is to be able to not spin on qdisc spinlock from net_tx_action(=
+)
+> > > if another cpu was able to call qdisc_run())
+> >
+> > Awesome work. Hope to see it very soon :)
+> >
+> > Thanks,
+> > Jason
 
