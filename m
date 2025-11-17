@@ -1,113 +1,137 @@
-Return-Path: <netdev+bounces-239043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DCE7C62CD4
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:51:09 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8DE7C62E1C
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 09:24:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 078CD4E5C81
-	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 07:51:08 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1FFC534DEE4
+	for <lists+netdev@lfdr.de>; Mon, 17 Nov 2025 08:24:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F82031CA68;
-	Mon, 17 Nov 2025 07:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F8030F957;
+	Mon, 17 Nov 2025 08:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dJFKk2vl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9BD31A556
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 07:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06135280328
+	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 08:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763365832; cv=none; b=vBgqXNX2oVwAHXqo1IDmK8VDICmqxVBWlO9R7LA750iUP+g3YYjxxSxT2F+LmfoHOnYHSYe8DBurxVrMUwFrwYWThAMRnHjLKN1E2qRjTEhDYONa568Q+/VVUXvw5vkEZV9WV5x4ZU7edBII1XqoXRhM9g+ey53wLcRn0NjejZs=
+	t=1763367877; cv=none; b=gTJock2bFSuX/3SLpbb+4gtBZJsiE17WhvMJf3SXicjg17a+clkmLsSwf38EoVTRG0WYkryBwomIjoSwVs8B08S+vG3+O4UaRGrVNggspX76fwqsMuQ6vC4Uk5UL8pzrn4nWrHtOz2RXmCLXsjXhToMrNuRkE7RXqm+LvKakBgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763365832; c=relaxed/simple;
-	bh=Y8wB5ZxrHztDsFTZWNBUOw5uR5hPhpOcMrCCbU99oKI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hkiBZG2Z/2M6NcV7/MLESW0qO2ogvO0C3OCCY1i3rsaju+HRg5jC63HciREvaVSAKUojvQ1gplW78rH7qz8KMNs7tWff2cHVTSHMYvRhlYSEAyhXcJ6et406tS3MX6iXgGGeYsrEZXWN/8w65muqnKldwagKuI+hkSkNscmWclk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-9487904aeccso279835439f.1
-        for <netdev@vger.kernel.org>; Sun, 16 Nov 2025 23:50:29 -0800 (PST)
+	s=arc-20240116; t=1763367877; c=relaxed/simple;
+	bh=g0P39zuPBvil9H9ZQrrobutdtWRGFDikvYxHxZzmnmc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=liyLw+6Ny1zczRctnpz4pB9jVPK/CtbKBPA8WsjDrkz0tcqAjB5Fqeo8MYgE412mWSjDqqBt9Ngb4wgPVMyYbZ4XvGxN6dYH1cwiwiJXThKhOU9V1zJa+o7/+pWDTaQt9+P9DnbabvWBKT2rEK2lj0HmEinSxRF8Ap/Uk/8xoCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dJFKk2vl; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2984dfae043so36725855ad.0
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 00:24:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763367875; x=1763972675; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TlfmmfbGgNs1vo+va+CLQu5LDEdNLZpb4q1hX8mhWak=;
+        b=dJFKk2vlg2yUIykBozSFJDvWxJKRV208CVgk9oKXM4HJUpcQcyLAG7hlmIMg6LzPbw
+         0UrJVmQFOoxB4DxdVAJ9oI99z8wKMltwVe2GeaRtgIcWz/OIe8zeNdFwYqU20LQoa+l/
+         BMFnBpPcafAO8uMxjsZpBp8pHg4jnyxvlWiNkcLEkJXQMlZOMzLi6rYogbxCad2Np9xj
+         F2eBPmGh7CQys4ANBjAGo42LiBRGjOq+Xz0HnfznU3FwHwMrkWfJXr1XWInOIvv3B54e
+         X551O+ttf6w2Cte0D0Sea6G98KRO4NI0stJGtUTm8Z48dHYe2WYMHF9UQNZ3ncmD2AE/
+         tiMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763365829; x=1763970629;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ey1+m+0PpA+X8cyQeg5Cw9TKZCceb1snYR4S8Zq1UtY=;
-        b=J5Pz+vJseJizSOFOV862QeHK4y2CFUQV1BFlB/sIw2KTv0cGwdv0h5vluMxEQ2tx5R
-         ePNqZ2Xf/0sv5lJK7288Q7T67rhFaWfhd3AsG4U7+o29NwZZA4Wnp4wnHaGQHkOEp2pb
-         W/AuDl8rFANZ4OubpD3A25ydCfo6JXBAtVAnCKD0hYFNq6kcGqJdtBJQnPFcAv6AUQh7
-         4YTcqrdQsDTRDlNekoZ8nFDhkY3HvyGYV14bMpYuiNeYx62Z+vBg4giAShJGBy/GhyXE
-         vpO5EoAULKChDCgbqrtxIii2gM6GgletmrKjb014+Mit+8wYgwcqfNzoy1DUKTC2dC/A
-         jOZw==
-X-Forwarded-Encrypted: i=1; AJvYcCXfELozweUqkck1nqUTbHKehmavTHzsrwbC7fBLjQ0ulNbZCNmGEh5q0jQgTQKmJmITM4qhMJo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqNGf9Vc75Es4NYccQoLoDngu4geAZTSA0fO26DJIfeWQjxUuh
-	UWdP/lrtr4rntVclNrS6Sj0WR4aN+lFwdCMn6jkVFkdMp147GXJc1TUB2+/ii+5wX8ho0WvENgs
-	3RIAMac8sUuhkAh+cBxrNurc04mRGUG6DzQtOL1D5hSqXSDdCndMNsNRars8=
-X-Google-Smtp-Source: AGHT+IF4Ax7KDGsQ3/G5Um9Hq7UFEsiFYZmNZZrQEigC52suQIGaiib8cbPHnExXI7K/ZnrhQ9AH49U4Bm4ILaNe/BjfS7iya07M
+        d=1e100.net; s=20230601; t=1763367875; x=1763972675;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TlfmmfbGgNs1vo+va+CLQu5LDEdNLZpb4q1hX8mhWak=;
+        b=SFSQX0ORlof9ycIheXYQb5jM0saYdAIOHX8UiEBG/ODaNNT8IqSZhgkYOpZJfBU7gD
+         lqwh53es8jK2987h6ZVVTDNAKB19+ZaxvU/ramdbMAqeMdQi08yNH3suIHNAOeQ8qhKO
+         6P1g7eHD+qzZuxUo+9bE2hytCKZlE34jEWPCUj+07sM3vaVxRxWMdCMF68w1KqodGPGg
+         hg0de5GN4wUuXRFnqTihjmgIuXjb4a8SJMjbKB121A3sYy15ZJ0hXFxpnP0bZZ49N01m
+         EXvetjQ1aZRmGvWyVB7kU0VDUkT8J1wcI9mDX6KYn8+0LEx7/r5ONYx09kom5sOPEa7e
+         mdfw==
+X-Gm-Message-State: AOJu0YzJ2y5sHFSGBwZaxAjeRYtNigv79YbVEKO8U/Z/DG4jJcgUj/fR
+	jpplWxaz44qisvdGIw/wKYb2m7+UEZ+hKHB2rWAeJaoPlmwKxJVFeEZH4hWHrZzn
+X-Gm-Gg: ASbGnctvAsZMIuHQE7O2yy9/ia3qj8vbBlR3qfF7p5yLGMdPbbbZmuSlC760k/UlVnC
+	r3V2M9M8YEmSDlk7ar//iO+Y+7II5utcbXddpu4lqyR1GqUKDKqh6TAuPpW2oHgdWsr+avuFuvK
+	DmtO7/Jcyi2bVjr1A6gJw8vieE9KPBeipEbxyrCau0pdVCDJzITeki4yy552kScbER3ne7aPi5r
+	NgkpGffom+sTFM/SZ8yCQzJtmqcuKarxauCkQXA3QHEebbhQa8UdQbErx/1JNCpno+eA8hadKpk
+	Z2khbYuNoZqxvkg9H76Qa5lDAxTIkUGlRAS57ILqzsvTn1EjTgigRTjrkR18AqJUvA+K+nkD0Oi
+	T5o0z4c8R9MQCnCZDP0di4l6eb/bWBUTGkhFo/mvrwwC77RRHC13FJ3yYgw9qrSHlkiMAXDD+6P
+	9u0rlQ
+X-Google-Smtp-Source: AGHT+IFny+clG8GAy78kZX2QdQJTBoEqQ91J/6wiFTu6JFEwoASZ/l2czrMSsgkDxealyUSo4KOSzg==
+X-Received: by 2002:a17:903:13ce:b0:295:105:c87d with SMTP id d9443c01a7336-2986a73b3b6mr127372435ad.32.1763367875069;
+        Mon, 17 Nov 2025 00:24:35 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2bf0d8sm131437745ad.85.2025.11.17.00.24.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 00:24:34 -0800 (PST)
+Date: Mon, 17 Nov 2025 08:24:30 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [TEST] bond_macvlan_ipvlan.sh flakiness
+Message-ID: <aRrbvkW1_TnCNH-y@fedora>
+References: <20251114082014.750edfad@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c242:0:b0:434:96ea:ca18 with SMTP id
- e9e14a558f8ab-43496eacaa0mr92275175ab.16.1763365829199; Sun, 16 Nov 2025
- 23:50:29 -0800 (PST)
-Date: Sun, 16 Nov 2025 23:50:29 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <691ad3c5.a70a0220.f6df1.0009.GAE@google.com>
-Subject: [syzbot] Monthly net report (Nov 2025)
-From: syzbot <syzbot+listc0722b57ae1d515c34f7@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251114082014.750edfad@kernel.org>
 
-Hello net maintainers/developers,
+On Fri, Nov 14, 2025 at 08:20:14AM -0800, Jakub Kicinski wrote:
+> Hi Hangbin!
+> 
+> The flakiness of bond_macvlan_ipvlan.sh has increased quite a lot
+> recently. Not sure if there's any correlation with kernel changes,
+> I didn't spot anything in bonding itself. Here's the history of runs:
+> 
+> https://netdev.bots.linux.dev/contest.html?executor=vmksft-bonding&test=bond-macvlan-ipvlan-sh
+> 
+> It looks like it's gotten much worse starting around the 9th?
+> 
+> Only the non-debug kernel build is flaking, debug builds are completely
+> clear:
+> 
+> https://netdev.bots.linux.dev/flakes.html?min-flip=0&tn-needle=bond-macvlan-ipvlan-sh
+> 
+> A few things that stood out to me, all the failures are like this:
+> 
+> # TEST: balance-$lb/$$$vlan_bridge: IPv4: client->$$$vlan_2   [FAIL]
+> 
+> Always IPv4 ping to the second interface, always fails neighbor
+> resolution:
+> 
+> # 192.0.2.12 dev eth0 FAILED 
+> 
+> If it's ipvlan that fails rather than macvlan there is a bunch of
+> otherhost drops:
+> 
+> # 17: ipvlan0@if15: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+> #     link/ether 00:0a:0b:0c:0d:01 brd ff:ff:ff:ff:ff:ff link-netns s-8BLcCn
+> #     RX:  bytes packets errors dropped  missed   mcast           
+> #            702      10      0       0       0       3 
+> #     RX errors:  length    crc   frame    fifo overrun otherhost
+> #                      0      0       0       0       0         4
 
-This is a 31-day syzbot report for the net subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/net
+Hmm, this one is suspicious. I can reproduce the ping fail on local.
+But no "otherhost" issue. I will check the failure recently.
 
-During the period, 8 new issues were detected and 7 were fixed.
-In total, 99 issues are still open and 1640 have already been fixed.
-
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  20003   Yes   WARNING in xfrm6_tunnel_net_exit (4)
-                   https://syzkaller.appspot.com/bug?extid=3df59a64502c71cab3d5
-<2>  15678   Yes   KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
-                   https://syzkaller.appspot.com/bug?extid=5fe14f2ff4ccbace9a26
-<3>  14160   Yes   BUG: workqueue lockup (5)
-                   https://syzkaller.appspot.com/bug?extid=f0b66b520b54883d4b9d
-<4>  7864    Yes   KMSAN: uninit-value in eth_type_trans (2)
-                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
-<5>  3393    Yes   INFO: task hung in linkwatch_event (4)
-                   https://syzkaller.appspot.com/bug?extid=2ba2d70f288cf61174e4
-<6>  2760    Yes   WARNING in rcu_check_gp_start_stall
-                   https://syzkaller.appspot.com/bug?extid=111bc509cd9740d7e4aa
-<7>  1916    Yes   KMSAN: uninit-value in bpf_prog_run_generic_xdp
-                   https://syzkaller.appspot.com/bug?extid=0e6ddb1ef80986bdfe64
-<8>  1894    Yes   INFO: task hung in del_device_store
-                   https://syzkaller.appspot.com/bug?extid=6d10ecc8a97cc10639f9
-<9>  1580    Yes   INFO: task hung in addrconf_dad_work (5)
-                   https://syzkaller.appspot.com/bug?extid=82ccd564344eeaa5427d
-<10> 1537    Yes   INFO: task hung in synchronize_rcu (4)
-                   https://syzkaller.appspot.com/bug?extid=222aa26d0a5dbc2e84fe
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Thanks
+Hangbin
+> 
+> FWIW here's the contents of the branches if you want to look thru:
+> https://netdev.bots.linux.dev/static/nipa/branch_deltas/net-next-2025-11-09--12-00.html
+> but 9th was the weekend, and the failure just got more frequent,
+> we've been trying to track this down for a while..
 
