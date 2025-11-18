@@ -1,140 +1,111 @@
-Return-Path: <netdev+bounces-239532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B601C6963F
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 13:32:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CEFEC6976B
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 13:49:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 781084E38C4
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 12:32:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 835624F168D
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 12:47:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6EB34DCEA;
-	Tue, 18 Nov 2025 12:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A39922D793;
+	Tue, 18 Nov 2025 12:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U9u+Zopz";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="iwqCrtrg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qKFy5mLY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F06337690
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 12:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84340205E25
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 12:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763469156; cv=none; b=Rnc2ZWcgMnJl8UM/vVbQJlGyKno9QH/yCj4iF5L42wp2rpQIpTZl4vtpvSN2WP6yxvIktuyTKI/OF4+vl3VjVDdxqk6e03IIU2SIcQgXMmzmyx+WZNpJhvWYqKTJyEj8ScWCzzfKRO6q6kiZkyIJe2210A1uC7MZtGkSONPjpLA=
+	t=1763470038; cv=none; b=PhWejtskP/nASnk1WwDwWagdd0meLHVbwJguBMxbkkLuoovVRy+DBVNxMXQkZjR/T2/jWik/3UZs2c5GptUyFALshl+iN4bkglgvFqiICm4p+2XUWqgsc4O9FP1j9xT7Yizgo1dKR5hyK3cWahrTYMESjmhu2ozNJfm28pWKvQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763469156; c=relaxed/simple;
-	bh=DTaU0Q9eSCt9Q5BWyjMoRvlzd8ouWytjAvoYZ3iv3cM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Y2IaGzdpUNSznLUJ+QQ6/UlVBtiQ41rOi9H8F9eX3pEiLF6hC2szkKVn5gj8nMT/HPRfS51/hnJLvAPKTU4PtKeC7k2fnrruFNBLTFir3RIW/IJg/EL8TNFNzqWkglA6gyCTfAMC44mCrHdJDxyjl2wl3XKJA1ovDmjoCmenfmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U9u+Zopz; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=iwqCrtrg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763469154;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8bFq98UfncIM6fG2qDwD7snvwH11yQoURKT7uFfWCO8=;
-	b=U9u+ZopzuetLY3x7AyM+7zlxNP0uf5Ti3/G7CR278Bvysr5/886HWj4YA1R7O4K9GbulBw
-	zIGq/GnTuGBb6zYUDb7POJYF8/KfzJZl0/RTJNrruQbf9Oj7gd1XUA3T1FvrAf10HrKq9v
-	vjyZeREnASE2Osix317aT0zGlqENCtA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-596-_YUDK_GvOMa8KkILtQLzrg-1; Tue, 18 Nov 2025 07:32:32 -0500
-X-MC-Unique: _YUDK_GvOMa8KkILtQLzrg-1
-X-Mimecast-MFC-AGG-ID: _YUDK_GvOMa8KkILtQLzrg_1763469152
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42b2fb13b79so2597978f8f.3
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 04:32:32 -0800 (PST)
+	s=arc-20240116; t=1763470038; c=relaxed/simple;
+	bh=NWQxp9KBiLHRWrgCkXUCI83WZYSSzpaVRI03tm6xh+c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lqGQBM4UhfNe1OwKEQm/aYMq/TbhQT54ru5b74MwpnFNuwRrR0E7/lEUiOAjjLRhu7aJkTXJLQnf+GMwjdzuSQIGV5NXqd2EI16mQ0BcL9zbz9d94g8Fn8VouID0ro872DLgtryiyCmkeMfBUa0L46NCESPlJtF1XGyKY2UwMTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qKFy5mLY; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-8b1e54aefc5so462433085a.1
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 04:47:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763469152; x=1764073952; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8bFq98UfncIM6fG2qDwD7snvwH11yQoURKT7uFfWCO8=;
-        b=iwqCrtrg7psXJc5aG3UI3sOmVFNyH8/zw6dP4ZJjQXT7mjUf0MpCi68UwMPZZqqdBm
-         PK9WF3u++OnG/K4TJXffXrrR5Xp1C1Szg6pQFVwPTcG4FsO65agIiO5PFfwtNuDuYkKr
-         rMAsZfiJ/owxxHYSo8LJFkoaxlW1pjwmsKsbwbrL7prPLhmq2UDhUiu85FywogOJtHyy
-         1i8EJj30NiQgJD/CwXAMvbrGYW6PBUJvEzMdgwmdp/3VMeEYmT+6dpTFGf/CxYTya4h5
-         PO4aZXQfR10+O3XTEQ/nBpihDWQdwMjc3yIE8Ne8OvJlzOWUxaNYvGsPCkBaWFs7ZWVt
-         zANg==
+        d=google.com; s=20230601; t=1763470035; x=1764074835; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NWQxp9KBiLHRWrgCkXUCI83WZYSSzpaVRI03tm6xh+c=;
+        b=qKFy5mLY9eMdIrf3qnKu1ntAaK8ianu1MJRVXBK5KsVS1Td4X6Kp34ZM9MtkBj1hIE
+         0md2VKTJN3AJShzVv11fDMi00tGZ3t0ATKPNZ5m8pi8RZeJm4X8UsUepJi25VtOkKiE/
+         NzaHarlEpblOQuQkIz7w1hIfiBj7iwdfIa6yyKNQgQmXfLdmAVM3eAgtYAHELKdq/0/g
+         hUYvULAWv0zIFWiAoPNYGbkaAsZzjwudKz9TO24BMIYiD8nFCXgvWNd6NOmCmbT2xwgp
+         Ol3TJBJd3kJo4/dGBf+cmPVNugPJOQL9BliwsHZE0+T7fDRddokMA8hwJHwSiHWWUsKP
+         +WmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763469152; x=1764073952;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8bFq98UfncIM6fG2qDwD7snvwH11yQoURKT7uFfWCO8=;
-        b=fSFAQsbkNb2C6dhb/4JlnH77fayeW9nPG6Ukh8BVOfHAq08fB8JJQB8ujCOcOYJ5lp
-         4zpcme4aVgtzqtgeuMFy6/dji9icxfyN/lXvHUZggTKYQfDrNo3sssmDSodHADe0RQ57
-         nLOX0MQBjS1rt2S5HMYNKbzievsliLWOVAcpwC3fiZ6Lkg4NniN9Jf5oj/3h+gLei/EF
-         GUbKUYpv6//mlIfVgS1zRSR0y7BQW94IUs0neVqr34nKRbGD+bZ6BMsAmNZxC4NZN1cP
-         /16IJum+GlMoiIX+lRaIigKVbLBtXUc8TbdbLFpzM0UeFs1qFinYL5HXcflXmHBdMSlT
-         sqhw==
-X-Forwarded-Encrypted: i=1; AJvYcCULOsV4jQyuHS2CRgxq/f9M5OUQDMVnHI3uu4np2ClUHHjDHJ97xAfaz63QRDka/IZEAyW0oqg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy57qBsbJiBGnFp3v5Fi9RyHIOwaHfWbWKQrRFG4gzJRQj+uCnQ
-	LZoW+7mmnoGGZ1z2gCrZSiUn15fLyhVn/nPmX6HP7AsH/x5DDY/K7xxXDZpwuc3MyJvxd0ua6mJ
-	njYnp15QEbzGJ+1TeMrvfy3WnR4mQrZERsOPke/P5E7OyuqMgwLaEzFYF5A==
-X-Gm-Gg: ASbGncsj6++6h/kyNES7LhfIIxwZY40fU9t4jTMz01C+01NYDwkkbI64klFn6snwD+u
-	XnSwdWB02/KWoGu1geuVmffmTnskmzlECmX91i7rIKtKJvbE2of/v53qaVEdbvCLLVIhVS4+NPB
-	k3si0ET3EiKnsLaAbRq6Sk0Wh8orxqisB8yq+0LniPXv46TKnanFBKpLJc7mafiY+e5az/Gz0KB
-	5lBe6CrFWczfg4d/aPtRjaPQyPrncVDeD3+540y1qRv+MODDppRRjhjWV8J1LVXj3P8kXjDiC1G
-	IK3HroZyW76dorQfvhCpFJhMWVzaZmzzlz0guOW1hf8dT+jdukYX7ZJHD1xATDaiH8j/FA262hh
-	uvgWHljNCPm8X
-X-Received: by 2002:a05:600c:46ca:b0:471:14af:c715 with SMTP id 5b1f17b1804b1-4778fe4f06dmr157483325e9.3.1763469151615;
-        Tue, 18 Nov 2025 04:32:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGHFPZWLtIKBW62/sV/sykL4J1KL6tvHkeTFz5Ymr6cDp9e0U+MBYs0Z/GsHEyfY0VQ+h19FA==
-X-Received: by 2002:a05:600c:46ca:b0:471:14af:c715 with SMTP id 5b1f17b1804b1-4778fe4f06dmr157482965e9.3.1763469151084;
-        Tue, 18 Nov 2025 04:32:31 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.41])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4779a2892c8sm187622705e9.1.2025.11.18.04.32.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Nov 2025 04:32:30 -0800 (PST)
-Message-ID: <6332df88-2d49-4dd6-8089-567129f1ef83@redhat.com>
-Date: Tue, 18 Nov 2025 13:32:27 +0100
+        d=1e100.net; s=20230601; t=1763470035; x=1764074835;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=NWQxp9KBiLHRWrgCkXUCI83WZYSSzpaVRI03tm6xh+c=;
+        b=Ruj4y+fpDc1NN3qrAO3H7gk+24bDq1ZZftm5vnsNIScSpqNIyK+Csbqy9XyFsistqB
+         HaoW/WHxAuo0QaJklN/YLkRrKEwXVDxZAfsTToOd7wfjcGf+mPWacQD4y0nx2C4cfmxb
+         kQTuu090j6PSFWA7RMEdU2ygSkU02P57Ioyf7ddZYD5maF8fyIyb9aAQ/2y0ZbWirY3A
+         DTFqmXIeDS42aEHctxCIRgV/CHCASisWvFxnb3+qS82MKHllHnfdhrlZF13a/9D/Jk/5
+         fzed7gTDwTd16D6Sq64AD9S5ZMLjIIagZzOW5V9SI9XgailhSCPjosIW1evbv8mfD9Yi
+         RbnA==
+X-Gm-Message-State: AOJu0YwtdyHsHCX5v4KPAOAaC/8bwWx9t0eIPE29os6WW2ofJjLg1WCg
+	UAP+UMlhBMqB5zroz3NDNMEajuug+Imyycbazb0vs9xyoFvkbqYHp5lbT8PM+Q5/v7QB/FGXhvF
+	mx9jviT6rj9/xlF9VF5tVbnqLFORkU20jXUFkyDFR
+X-Gm-Gg: ASbGncu3GBAN5d78K4FUm1MfXVL2Vs3gsILZYDgvgzXoFTpDIhAs8hJ64/9py6ILK9h
+	NpEQo3vdezqcopq+Bevs/fLXyQgl77tivuW5RAhSNelpy1DFyxncr7JQNu17PBFHBII5gPgVT6P
+	enQSF+ZyJBmiz1uKud8sd2ty/NMtdoSf2AivbWo40Yp9PmEY8jxy3j6B34pzhPpJPbk0ph6v1Bo
+	/ogxiffn3xnhY4q9gNf4LOLFCC1NEoADsn8afjQpSxrBvYuaxybmvrO5DgBUvpptqKJ5ixPNXvJ
+	bvUNC78=
+X-Google-Smtp-Source: AGHT+IFel95ndo5/P6oZ48XEw/AOQFsYKTmNuIvvHxjsqkubiBKUuDFHrQTgQQddEqpHrJ7r0NhqhlRpU2kZ199P89U=
+X-Received: by 2002:a05:620a:190d:b0:893:1c7:4b with SMTP id
+ af79cd13be357-8b2c314c1c6mr1906693185a.31.1763470034950; Tue, 18 Nov 2025
+ 04:47:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 09/14] tcp: add TCP_SYNACK_RETRANS synack_type
-To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com, parav@nvidia.com,
- linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
- dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
- kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20251114071345.10769-1-chia-yu.chang@nokia-bell-labs.com>
- <20251114071345.10769-10-chia-yu.chang@nokia-bell-labs.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251114071345.10769-10-chia-yu.chang@nokia-bell-labs.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251118100046.2944392-1-skorodumov.dmitry@huawei.com> <20251118100046.2944392-6-skorodumov.dmitry@huawei.com>
+In-Reply-To: <20251118100046.2944392-6-skorodumov.dmitry@huawei.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 18 Nov 2025 04:47:03 -0800
+X-Gm-Features: AWmQ_bmAarW5E4irh7uh5Ba7FubcEKyQjHRluFoVESDgKHjzVHZCbWcO4di10Bw
+Message-ID: <CANn89iJvwF==Kz5GGMxdgM6E8tF8mOk0gUqSt2Lgse-Cvpo9=g@mail.gmail.com>
+Subject: Re: [PATCH net-next 05/13] ipvlan: Fix compilation warning about
+ __be32 -> u32
+To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	andrey.bokhanko@huawei.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/14/25 8:13 AM, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> 
-> Before this patch, retransmitted SYN/ACK did not have a specific synack_type;
-> however, the upcoming patch needs to distinguish between retransmitted and
-> non-retransmitted SYN/ACK for AccECN negotiation to transmit the fallback
-> SYN/ACK during AccECN negotiation. Therefore, this patch introduces a new
-> synack_type (TCP_SYNACK_RETRANS).
-> 
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+On Tue, Nov 18, 2025 at 2:01=E2=80=AFAM Dmitry Skorodumov
+<skorodumov.dmitry@huawei.com> wrote:
+>
+> Fixed a compilation warning:
+>
+> ipvlan_core.c:56: warning: incorrect type in argument 1
+> (different base types) expected unsigned int [usertype] a
+> got restricted __be32 const [usertype] s_addr
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+This is not a compilation warning, but a sparse related one ?
 
+This patch does not belong to this series, this is a bit distracting.
+
+Send a standalone patch targeting net tree, with an appropriate Fixes: tag
+
+Fixes: 2ad7bf363841 ("ipvlan: Initial check-in of the IPVLAN driver.")
+
+Thank you.
 
