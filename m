@@ -1,107 +1,65 @@
-Return-Path: <netdev+bounces-239564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34D9AC69C3F
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:00:18 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06532C69CA4
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:02:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 90FF24F4AA2
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 13:57:44 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 182ED3526D4
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:01:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54AD35A138;
-	Tue, 18 Nov 2025 13:56:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5944E35F8C1;
+	Tue, 18 Nov 2025 13:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="HVYBoUEI"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="C5PA66UR"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010057.outbound.protection.outlook.com [52.101.85.57])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F144835C183;
-	Tue, 18 Nov 2025 13:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763474176; cv=fail; b=YhEjLAiQBOPXlQRBkNGHHlCBwfaBtdKezyXQEqOOK7Iop/lGH9dbt2IhsTYx4oPcEBwJC6Yrkbv3m6bTsdRDXGVHHh2iwMKyQQwNtQQ37ndS55nf1WdoO0wea/bSt074WeGL4khYRnjr7K10H4TysiuYIcQ4YgvGXj6jcoXmT6o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763474176; c=relaxed/simple;
-	bh=d8XuRsTVRt/6tCehsPJwcTrmHQeWtvV1lXYHsX+/il8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R8Ta4SA9gDzYepm6iqHBYOY9LsKvG48FRJOnlI4f0BwHO1jXMq6paMaTmQ/glkQtnxWfWTiY50v8YQmdjrJ6VWDYBTb+jUfCqKB1zUSImY87raN4bYTNLgvua6xm+gRjj9CqInSSLnLCLbtcekSgcf2uHqZlUQMCSNa/07xoAmg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=HVYBoUEI; arc=fail smtp.client-ip=52.101.85.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GZ/lXjAKoRk0iDpadU+PFfWYUfeDHlNAiDYn2IFehv+RhPpVtTI6K0bSuGaO0dAn8az9k0ZVPSBTbnKy0jqbwthTlfN5CRdFqeToV8Tbcp3Undov6cHhKPmnhrl4kjN7wKz1yRfFVC1os10VL8qKipX+9zPbgvcJIPKbH1z0/wELmFqLs5+xnJvAKAdjNTkqNZKqSWP3ASg0CVdVnZx61jfYkZopdUBKwyAKa0W5z6uz88rr//rijd3D2Fp9wIJcYgUp+wOze3ZQyozv5LSW+Otya3IqzQBSyja7wEJRxmc3H8Fw7hNRpantIPvEtiukjNyu+qgUmxwIRhVNJ/PHwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fxLTEw1wbmrYbdIYn+VHy3lKwPk7oPIOcjhjOIOC5uI=;
- b=GBfnnbiXqDfyCBg5doo2BBkxuKS8voHGcfjwYBna0FQ075232GR7vBoAd9mi80Z7Rhsftjg+NsFTt0TxE7al/mUO2nRL9XT1l/+uSOBDmbaWqBkaII/HkAyYma1RwmwI7U609a4E6P1HykwSDiftIvYbBam6EV8GaUay9LEBlN/2V1SRWEb2ATVc4UrzkARrYmBRT8LMDProOMIN2112dlp+zkMTK5CuBE6JiicfdSqzC6aYFcrF+T0EJiQLESjjaUE/Y8mxdvU/bJG9vT8SZZrLNiYClmlxZziVB9/OAYUax7aByFC4oWcATsnpM5ZjHrfi5/JJ5XJhL9VdKU2Yow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.23.194) smtp.rcpttodomain=kernel.org smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fxLTEw1wbmrYbdIYn+VHy3lKwPk7oPIOcjhjOIOC5uI=;
- b=HVYBoUEIvnBpD8Ccdq0HvmRSGZdw34svYRADKmmQeumS+9G/IgRgShsf46eiINsWn4fcvjlqnYjSnjmw/vhpl+xgn7TCcBtmpM7AR4zo1UrEpmbfxKuHuHx0CTThPrmRKzZlGJpsnQPujBYfjBbfvyrPvMyQcM7c+tX/zYOvVLU=
-Received: from SA0PR11CA0200.namprd11.prod.outlook.com (2603:10b6:806:1bc::25)
- by CO1PR10MB4756.namprd10.prod.outlook.com (2603:10b6:303:9b::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.21; Tue, 18 Nov
- 2025 13:56:11 +0000
-Received: from SA2PEPF00003AE6.namprd02.prod.outlook.com
- (2603:10b6:806:1bc:cafe::66) by SA0PR11CA0200.outlook.office365.com
- (2603:10b6:806:1bc::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Tue,
- 18 Nov 2025 13:56:10 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
-Received: from lewvzet200.ext.ti.com (198.47.23.194) by
- SA2PEPF00003AE6.mail.protection.outlook.com (10.167.248.6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9343.9 via Frontend Transport; Tue, 18 Nov 2025 13:56:10 +0000
-Received: from DLEE210.ent.ti.com (157.170.170.112) by lewvzet200.ext.ti.com
- (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 18 Nov
- 2025 07:56:06 -0600
-Received: from DLEE211.ent.ti.com (157.170.170.113) by DLEE210.ent.ti.com
- (157.170.170.112) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 18 Nov
- 2025 07:56:05 -0600
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE211.ent.ti.com
- (157.170.170.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Tue, 18 Nov 2025 07:56:05 -0600
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 5AIDu5c5153023;
-	Tue, 18 Nov 2025 07:56:05 -0600
-Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 5AIDu4Uu004206;
-	Tue, 18 Nov 2025 07:56:05 -0600
-From: Meghana Malladi <m-malladi@ti.com>
-To: <horms@kernel.org>, <namcao@linutronix.de>, <vadim.fedorenko@linux.dev>,
-	<jacob.e.keller@intel.com>, <m-malladi@ti.com>, <christian.koenig@amd.com>,
-	<sumit.semwal@linaro.org>, <sdf@fomichev.me>, <john.fastabend@gmail.com>,
-	<hawk@kernel.org>, <daniel@iogearbox.net>, <ast@kernel.org>,
-	<pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-	<davem@davemloft.net>, <andrew+netdev@lunn.ch>
-CC: <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
-	<linux-media@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
-	<vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next v6 6/6] net: ti: icssg-prueth: Enable zero copy in XDP features
-Date: Tue, 18 Nov 2025 19:25:42 +0530
-Message-ID: <20251118135542.380574-7-m-malladi@ti.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251118135542.380574-1-m-malladi@ti.com>
-References: <20251118135542.380574-1-m-malladi@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD3935B125;
+	Tue, 18 Nov 2025 13:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763474353; cv=none; b=C+8azI59Y6Bj5cjfDWG3No1E+d3E0ww8liuGwMDmeWER7eqU3rlvEyG0QYk40+nTq4CaXDSjmfsXdBT4u04CgN+7nzgyVEQ44y4lQolj2p7e/2Uf4cygHtKh/sXrNoPnkzr6MAgOXpufRf7sJ45GQIK3C9hjaRVc3RixUAd2kJU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763474353; c=relaxed/simple;
+	bh=/kfyfjuQ5n0IH/aYEemxpYHUmdsZlDBfDSs5LLqcHqU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Qq6fPvNPYs3z/LOQeQQiuV6k8oGXAfDfRR4pX1S10hDY9cTkFJSgpwYZ+sAEM7IsNrmUJVqkNk1olVrc71x/RTG94Fz69icEW3WVtj2Gibni4jK2ermOBNSkU1P+jiZDzQzbrOM68hC4micTPRg165aYPwma7FlVZSqPS0Ylm+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=C5PA66UR; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id B3849A0AF4;
+	Tue, 18 Nov 2025 14:58:57 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=gN2mY/hU1/7FlAUcf4fk0TAUShm1I90RcvBTt7uJC6g=; b=
+	C5PA66URIGzu0hBicZa6CwAlmRw7eShlCi3aYhUnxrMswUP62piep3KpnnwdEE24
+	7AEtRa31uUiYJcH0W4Fdh96PEoWJY2/p0DVbQ5ZLTi4YEJcgVQkjOyV7B7nS2S7j
+	WW5yqLERoyKvKa+aF8MNBusR+f2VXM0S3tsuv/6KuzVTn86fy/7CEvxcq9NZztE+
+	XeNQYC27BQ4u2hmofBR/EfsdgD3uBW2mKpCli8LVxoZ2LD640XiDcub6iHp1S1/D
+	Sz/f+BwsP7Qwwul2boFmXA3Y+VXiS3R4wtO2A6w/gm0qxqbqzmaKXzuB2c1CRjTa
+	vfawa+jeH/O84kMNWg2Xim+KfXjEg88Ryizzihmy7q8Nqf33W7I7frcIzmmNM+/D
+	6obAgmCPiJc7EuwHwoTYBgD7sCXEJt09rnt81MmzdkONWlyc27l5jg6OV00s4X3Y
+	fJCYypjSWvnoFTkfL6Ryvt6oWrFHLucUgm1giT4rIRDmKOA10j7Q5rShfdpe27gk
+	B5Dcu4Lcc2jW4cOiviXW460sB7q5d76EWpY57RRkHlJhmLGclciNSH5esZ3Iyhrx
+	9VrJVlpsrg1b2x81dZmWagLiXDpzCum33FYpl29Z3BamKJV1zXIl1N4Pv9xH/NNH
+	plA57vBNRl2DHSP6y74zCuPA1jVtBzZX5/8TBB5zA58=
+From: Buday Csaba <buday.csaba@prolan.hu>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Philipp Zabel
+	<p.zabel@pengutronix.de>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+CC: Buday Csaba <buday.csaba@prolan.hu>
+Subject: [PATCH net-next v3 0/3] net: mdio: improve reset handling of mdio devices
+Date: Tue, 18 Nov 2025 14:58:51 +0100
+Message-ID: <cover.1763473655.git.buday.csaba@prolan.hu>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,82 +68,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003AE6:EE_|CO1PR10MB4756:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3068230c-339c-4521-e158-08de26aa3ada
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+i9xOXwKXy/BAY3oF2z7Ot8SQD/Q4pWo2OI8n4un9AwcR2mVUd9dHGTO32Zk?=
- =?us-ascii?Q?7GLNdGDOzP2+xSKPt5rN7Eo7aflYaudklZtIfegX2pOdEJo7d/FDk7+Uw8ol?=
- =?us-ascii?Q?Np86eBMgIAf/V8vw6PoamWyNsMakvf15E+3i9GMW3B0ZoarM5mSR/b63lHyn?=
- =?us-ascii?Q?aw9byXCrcyebvb5T1gBsrP+3plwXNxGwUb0+/zclywd2uxouQBr7VvPyKzAt?=
- =?us-ascii?Q?KKVfciMAqEBsv0a/3rt+N7EgYSPxz/1sWTi8fzMM2OFMYiULag6Ey6Dj3esi?=
- =?us-ascii?Q?Hh7MjR1RcajZjjQeacF9dlSGhiaE45M+L/Qf3iFIAjEhochSk2JLY33fjk2t?=
- =?us-ascii?Q?7cAAA82Pq+8WggHwwFoLGdXSozK5ZLV42zYmQqqC549gk/rgJlpUlc/vfprP?=
- =?us-ascii?Q?zwgRwYQ+WAN6QTITwQA9qTA5HY16aJJ6oEB9ULNpPtvuiU+fRPafPBQA/o71?=
- =?us-ascii?Q?VycAK8APkKcXLeN8o/1V0525nRgu4Hb7xe7q2Sg5oBfEeeibfApSMerfODXV?=
- =?us-ascii?Q?E/yDMUH77tq7/HmlWn4b66VagT7Of1PrbL2UeN+9Y6ERFLjsTGRZx0pIJFaV?=
- =?us-ascii?Q?+GTwPdIDeqxfJaVTDascN9vRyAt2wuveXkfgi2vSy2vSXjxAeF3OPoEFTTXW?=
- =?us-ascii?Q?8lQs3Ti34rhInhsXlSZRku6L6NT/O7BIAWrBaKbBnJFCuFn7MZ2A18o/dj0u?=
- =?us-ascii?Q?BgkHsX1okkhKWHZ0u7SbDlrRKOhPbHHiTXDstPMS7qJy7E1wNutjuAvJpSWh?=
- =?us-ascii?Q?hz4oe6iyF7vcLk6ymxwdiiUU/itAzvsNfCnE7mjf3tMdES8Edtlk7EQwONKF?=
- =?us-ascii?Q?YrY39qy3QdafiKooq+oVjMU2ldo+kXWY7fTPWQFveR1kz/jpSFYKEme04kcg?=
- =?us-ascii?Q?Rk5aD/xzLKwvi+t9A6ZtO3KEYwCLxQXR1u+r7s4k1dzGCKbZwlf9abAsMVla?=
- =?us-ascii?Q?+OV70WPN/aqR8p2hJuGEyCX63YDUg4ZCjCt8qoM/vAwsPmxXPxdTmXbh3Yy3?=
- =?us-ascii?Q?nelOMu1Wu+RG4s8tLO3HGnac50Rn/2Ax1y/3iGADCjEeOLyUk+25lnBLAK2U?=
- =?us-ascii?Q?wTxvMLSGdjXU/e6Eb+ozv5Q2O8TfO31Ilk96rplHozr26iTBoETotEx8OpAp?=
- =?us-ascii?Q?YODgyZsfx7N5tSMyo4ZN61JjkB68JH7/Wk86k1oC4f38ljSGnwggIeXDfEGh?=
- =?us-ascii?Q?ADVavkaBGWj6jVJ6R4FgsD23s6y84qASC1kvEwbvi9OzZr2yEal0XM71M5MB?=
- =?us-ascii?Q?BQxEDb/mMTXsdteSe4SnDb9P0BUoja8F5sGP7fwIIPqKpMGkv7JqtWhK/w/R?=
- =?us-ascii?Q?khl5h1Dgnrai9M24sbCFF6WrGB1ZLpzcr6gaDV217IkDYZDaemHrhIEk21Pd?=
- =?us-ascii?Q?ubAiYLDgEWGm6e+lQHQqLHM0E+YTA4wrUnfX5YSsriTf6keTurFG02ENvaMq?=
- =?us-ascii?Q?1DdNcfELLu4o9NX3D9d4/gg/MBmZqRN6C7sxHF0nk72eC1iwCrgR5aYnTFk+?=
- =?us-ascii?Q?kv3OjS3Js4as7FGgofXFkINuHEHjo5VzgqYWK+UXcwqNBa5NTnjp8I7dI6FH?=
- =?us-ascii?Q?C2Gwy7xlxeqpqIDr7L8=3D?=
-X-Forefront-Antispam-Report:
-	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2025 13:56:10.6481
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3068230c-339c-4521-e158-08de26aa3ada
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003AE6.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4756
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1763474336;VERSION=8002;MC=2401629834;ID=69548;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2998FD515F617266
 
-Enable the zero copy feature flag in xdp_set_features_flag()
-for a given ndev to get the AF-XDP zero copy support running
-for both Tx and Rx.
+This patchset refactors and slightly improves the reset handling of
+`mdio_device`.
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Meghana Malladi <m-malladi@ti.com>
----
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+The patches were split from a larger series, discussed previously in the
+links below.
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 22de04ac18cb..f65041662173 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1554,7 +1554,8 @@ static int prueth_netdev_init(struct prueth *prueth,
- 	xdp_set_features_flag(ndev,
- 			      NETDEV_XDP_ACT_BASIC |
- 			      NETDEV_XDP_ACT_REDIRECT |
--			      NETDEV_XDP_ACT_NDO_XMIT);
-+			      NETDEV_XDP_ACT_NDO_XMIT |
-+			      NETDEV_XDP_ACT_XSK_ZEROCOPY);
- 
- 	netif_napi_add(ndev, &emac->napi_rx, icssg_napi_rx_poll);
- 	hrtimer_setup(&emac->rx_hrtimer, &emac_rx_timer_callback, CLOCK_MONOTONIC,
+The difference between v2 and v3, is that the helper function declarations
+have been moved to a new header file: drivers/net/phy/mdio-private.h
+See links for the previous versions, and for the now separate leak fix.
+
+Link: https://lore.kernel.org/all/cover.1761732347.git.buday.csaba@prolan.hu/
+Link: https://lore.kernel.org/all/cover.1761909948.git.buday.csaba@prolan.hu/
+Link: https://lore.kernel.org/all/4b419377f8dd7d2f63f919d0f74a336c734f8fff.1762584481.git.buday.csaba@prolan.hu/
+Link: https://lore.kernel.org/all/cover.1763371003.git.buday.csaba@prolan.hu/
+
+Buday Csaba (3):
+  net: mdio: move device reset functions to mdio_device.c
+  net: mdio: common handling of phy device reset properties
+  net: mdio: improve reset handling in mdio_device.c
+
+ drivers/net/mdio/fwnode_mdio.c |  5 ----
+ drivers/net/phy/mdio-private.h | 11 +++++++
+ drivers/net/phy/mdio_bus.c     | 40 ++-----------------------
+ drivers/net/phy/mdio_device.c  | 54 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 68 insertions(+), 42 deletions(-)
+ create mode 100644 drivers/net/phy/mdio-private.h
+
+
+base-commit: c9dfb92de0738eb7fe6a591ad1642333793e8b6e
 -- 
-2.43.0
+2.39.5
+
 
 
