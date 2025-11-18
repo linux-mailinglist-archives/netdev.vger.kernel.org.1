@@ -1,56 +1,128 @@
-Return-Path: <netdev+bounces-239284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBF3FC66A1B
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:17:03 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22F2AC66A45
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:24:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5A2AA4E60E2
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:16:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 23B6528D36
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:24:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEF021ABA2;
-	Tue, 18 Nov 2025 00:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A342B264FB5;
+	Tue, 18 Nov 2025 00:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b="HA22x6VC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Atn02gD1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgate01.uberspace.is (mailgate01.uberspace.is [95.143.172.20])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B2E2E645
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:16:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.172.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1987263889
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763424997; cv=none; b=CLRCx/TozquoQ1fwgx+U7RtqACU+yVlll13fmFhH9IVUfQ/6zXhoz4rfyqUSd15/eVMSmebyGRa57MhSnAhsg0woWAQhCN8IKz30NClnugvduY9lOoPbbMrhMoOGkiQFXGnujsplLTzhpBV6/6H+GK8Ihkfwq692n/4C4oJsCno=
+	t=1763425479; cv=none; b=gxuz9/uFtTqSGP5/eblSGGb1R/qFYe4vEVa6M8BAxqaXiK1g+VD6zpdzuvxOSTCgDl0sn6Uj7ffjGir6CDsNEtNFgxtHhPoUxDPXJybcOgn10OOoiCffNBTsazphiUKNxhskB60E9khr/8PPvQKqyMZ3IRFtrzdagtb7lSRSqck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763424997; c=relaxed/simple;
-	bh=DDGuu2D8ExkKnAg4J88nsp/CSylvEn10dWjv/5AdhFU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AwAexse5On6vDJ0qcUf7uqckB6FFjhOo3e4WNrXGsH3oCTMEQAHWpcsfymjiRLs/ZqlcQpQKeT899t8JSNi3C/QP8Qxbt0ZwoAeP7TJ5z+KwbmIH4VZUVyJDeMtW7im6w8VsuEozGf+JucbIalYJFiuEgQQLOhnNZOKKtmKvCI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=david-bauer.net; spf=pass smtp.mailfrom=david-bauer.net; dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b=HA22x6VC; arc=none smtp.client-ip=95.143.172.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=david-bauer.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=david-bauer.net
-Received: from perseus.uberspace.de (perseus.uberspace.de [95.143.172.134])
-	by mailgate01.uberspace.is (Postfix) with ESMTPS id 8AF1860BB2
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 01:16:24 +0100 (CET)
-Received: (qmail 29016 invoked by uid 988); 18 Nov 2025 00:16:24 -0000
-Authentication-Results: perseus.uberspace.de;
-	auth=pass (plain)
-Received: from unknown (HELO unkown) (::1)
-	by perseus.uberspace.de (Haraka/3.0.1) with ESMTPSA; Tue, 18 Nov 2025 01:16:22 +0100
-From: David Bauer <mail@david-bauer.net>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1763425479; c=relaxed/simple;
+	bh=t5qlC/z0jbPcIgQmc6xi5TA+xYD1USfzHwCFjZ9ECdc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MC1ycVLEGaeZwgqU937uyIuUM3I5LxCYgCIoSvzvWrw1TPnP4sVh06BCprSxPdXrhSSfP0bqcjjmuFGeym4tnMyOXgvV9PAZz8F7lciteXHy33ZupxIVt1RoOyNX5mTKlo8xS5FIMU71z3eGUefdnj6En2BicQ9CfkytJYBSBhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Atn02gD1; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-787da30c50fso44892987b3.3
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:24:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763425477; x=1764030277; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=p0UP7FJ+3v7dtudpFsNUQFNBayZALtyMMn0oBcAVymM=;
+        b=Atn02gD1chJz74pkB+VhtbATPQAw40Z1z5+lfhVcacqsDIxGrmy/XXAVaBVXgVR33z
+         XHvA4m4GiP3feC6y1ohPbnDZOA0wkgB9gY2gtl3xuN29y3WIQJHilANxwkLbtulJ8w8j
+         bQ5+i9+cIMwaqetz79Sb3AcUssQeGX12xngb2Wj8sJv/U6H3GK6BEuWEXFGZS6+pqsg3
+         YuCUI2NLHl3gBcDtac4KM5nbxpS0AFLALCe+x/VyQG88h6WlRyFYrBgzM3d+aeCxAzJv
+         Xu6CftzfLIJjBpwwoorFt61NNgb07/Xes0iKKFhFjSd1rwSqxxEqhkU7NCOVmjLdmiPG
+         CQaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763425477; x=1764030277;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p0UP7FJ+3v7dtudpFsNUQFNBayZALtyMMn0oBcAVymM=;
+        b=cFAxlL8LqQKPIuNMBVPEa/vnv7+iQWi443zx3s5vitufEuI4HSWc1+PRvvRLncuUnx
+         b0tDJju5M1JqaZF7vzyNuRabb2G2MwJoqMPdjPtl6MEeZnW6vN8RpqL4mqbSvYixtAhl
+         NGxjcSPkoGO6ngcL7lr60Ah2vx1i0fZjT+XNvYw/5BAPJDrhOOCmRFeFFiAcdLbWMrAw
+         SP41AdBWrOeDe+/UC6jYXttHvwkhtB59SN183RI0jQ0DOUcnC4YF34a8YsjP7M4lv60j
+         L2wb/0+UZ3h8vM0TLo6ljO6RhYJozOxxMZHwWXDW7cmlBI7rq+XnahEKlmvmcl3wd9Zt
+         s5yQ==
+X-Gm-Message-State: AOJu0YzhtwjSNxuQ3HqUdUwQSXx2Zcz866paU4UceJ7da5N1i71ISwSR
+	5VCoMOvLRunPbyz8dyHV0Z/gz87IDsVDXKwQN+bQPcLsoZaCFilHbPCW
+X-Gm-Gg: ASbGncseGWVlYQ1eRwU5br0RBgb0sy+qnFhrvy75u+Gie6eEBjGas3NKvjU8d5shD/5
+	YkIXugpVEWxJuWGJ/UBbriTvLWRNc7XjXhlQIHIlJEvzNFF/PJok+T1qmhf0DYf0nC43MLUmhpU
+	sKScsFsgPI4aBcX054P4hBkodMSkBT7TUSrG7Aayy/18edlR4WjNPfwOXhe3VJpt/Czv2io+6VL
+	n+OA3HZySlQ1wRVL9Xb8Ec01IfXfzgyQ0TfyK/jK8O1i/farr0+KqfreuxagKii2Z0tzAQj+OXM
+	TaIaG8hjlTE+b+WguvdvmurMbyANnUkbwHppJgdgn2vWF4ruZ6TCu/V/1igs8oTPVL0dS+nBV3u
+	G+K3MST+X52Dsqr2CbNUGrrPoSv+pQ2KzPBonMcHgco+0EJ5o5u+NcZe+RywLkEbxbEbTHzPEb/
+	jIbazuKQ5Crp47TMxgXn0Ano33WO5u/8U=
+X-Google-Smtp-Source: AGHT+IF09w2yBxQlT5cuZ8Zztc5mXfSzI+lOaJf05Wl57QjCQS10rQlMLicMrBGLYzfxkfyy4w2WyA==
+X-Received: by 2002:a05:690c:6810:b0:786:5f03:2b33 with SMTP id 00721157ae682-78929dff31dmr252313157b3.1.1763425476694;
+        Mon, 17 Nov 2025 16:24:36 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:70::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78821e5d6d3sm46794597b3.25.2025.11.17.16.24.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 16:24:35 -0800 (PST)
+From: Daniel Zahka <daniel.zahka@gmail.com>
+To: Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Patrick McHardy <kaber@trash.net>
+	Jonathan Corbet <corbet@lwn.net>,
+	Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	Vlad Dumitrescu <vdumitrescu@nvidia.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] l2tp: reset skb control buffer on xmit
-Date: Tue, 18 Nov 2025 01:16:18 +0100
-Message-ID: <20251118001619.242107-1-mail@david-bauer.net>
-X-Mailer: git-send-email 2.51.0
+	linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net-next v4 0/6] devlink: net/mlx5: implement swp_l4_csum_mode via devlink params
+Date: Mon, 17 Nov 2025 16:24:26 -0800
+Message-ID: <20251118002433.332272-1-daniel.zahka@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,63 +130,153 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Bar: -
-X-Rspamd-Report: MID_CONTAINS_FROM(1) BAYES_HAM(-3) MIME_GOOD(-0.1) R_MISSING_CHARSET(0.5)
-X-Rspamd-Score: -1.6
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=david-bauer.net; s=uberspace;
-	h=from:to:cc:subject:date;
-	bh=DDGuu2D8ExkKnAg4J88nsp/CSylvEn10dWjv/5AdhFU=;
-	b=HA22x6VCTJezMbZQzJy4zNS+yUrN+WpC+/rtViSerliwv82YC8CZVAgyeGuTcEyziBdCY3B+5q
-	jvuRpXj+jn0K7WlHOYfTyTfGIPBq+jj4zV+kTE4LeUoESzNIqo7i2cL/u1oemzvfsX/LbjebJxMT
-	VLr6wuS7Al2Ml/oiff72TWG2CJqdr+gCVmtmObJwZk8rmyzQI8UUt1rDL3oGVB5tLp2+pD2JqTd+
-	1dNXW2q2Lwwj+CzjCUVLcWelqhb+27kKBKb2s5luE7Hm0vGj52jIoD6qavbLfuxKT6ozxfeRexxI
-	RiGp0mPJ2g83GElSyYVOI1TjbYcu1Hppv23EA3q/FhEwQSdS9Y1Qx1fIDA0/TKyo3KMBVKlvUumk
-	v6JAwp4MdLnoE5Q4KUZ2CbUNThI4Q8E0RIR5LtwrCMKorHBOIUMUjgZH3XqXznCmPj1CrcS5S0e/
-	n8IE7zaFL4wJWxRJ3nlEzBkrqNmg1MLugBnI7CUYB+H1ap5n0FwqfIhGP6Pcbwv35R60PDzVrZvc
-	b0KQnVZrlBDzEFySaTSyfEtVWX8XgMPijHzeVIiOEXmugot+exAjA7j7YiCFpcOio0TFR1DFpgFL
-	tFtoWf45CLv22cv+VN+dBlagw31x13EnM5uhkPIqqn2l4QwTwdDV0Epg0waDJMwnJ71lDDCnbVYx
-	M=
 
-The L2TP stack did not reset the skb control buffer before sending the
-encapsulated package.
+This series introduces a new devlink feature for querying param
+default values, and resetting params to their default values. This
+feature is then used to implement a new mlx5 driver param.
 
-In a setup with an ath10k radio and batman-adv over an L2TP tunnel
-massive fragmentations happen sporadically if the L2TP tunnel is
-established over IPv4.
+The series starts with two pure refactor patches: one that passes
+through the extack to devlink_param::get() implementations. And a
+second small refactor that prepares the netlink tlv handling code in
+the devlink_param::get() path to better handle default parameter
+values.
 
-L2TP might reset some of the fields in the IP control buffer, but L2TP
-assumes the type of the control buffer to be of an IPv4 packet.
+The third patch introduces the uapi and driver api for default
+parameter values. The driver api is opt-in, and both the uapi and
+driver api preserve existing behavior when not used by drivers or
+older userapace binaries.
 
-In case the L2TP interface is used as a batadv hardif or the packet is
-an IPv6 packet, this assumption breaks.
+The fourth patch introduces the a new mlx5 driver param,
+swp_l4_csum_mode, for controlling tx csum behavior. The "l4_only"
+value of this param is a dependency for PSP initialization on CX7
+NICs.
 
-Clear the entire control buffer to avoid such mishaps altogether.
+Lastly, the series introduces a new driver param with cmode runtime to
+netdevsim, and then uses this param in a new testcase for netdevsim
+devlink params.
 
-Fixes: f77ae9390438 ("[PPPOL2TP]: Reset meta-data in xmit function")
-Signed-off-by: David Bauer <mail@david-bauer.net>
----
- net/l2tp/l2tp_core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Here are some examples of using the default param uapi with the devlink
+cli. Note the devlink cli binary I am using has changes which I am
+posting in accompanying series targeting iproute2-next:
 
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index 369a2f2e459cd..0710281dd95aa 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -1246,9 +1246,9 @@ static int l2tp_xmit_core(struct l2tp_session *session, struct sk_buff *skb, uns
- 	else
- 		l2tp_build_l2tpv3_header(session, __skb_push(skb, session->hdr_len));
- 
--	/* Reset skb netfilter state */
--	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
--	IPCB(skb)->flags &= ~(IPSKB_XFRM_TUNNEL_SIZE | IPSKB_XFRM_TRANSFORMED | IPSKB_REROUTED);
-+	/* Reset control buffer */
-+	memset(skb->cb, 0, sizeof(skb->cb));
-+
- 	nf_reset_ct(skb);
- 
- 	/* L2TP uses its own lockdep subclass to avoid lockdep splats caused by
+  # netdevsim
+./devlink dev param show netdevsim/netdevsim0
+netdevsim/netdevsim0:
+  name max_macs type generic
+    values:
+      cmode driverinit value 32 default 32
+  name test1 type driver-specific
+    values:
+      cmode driverinit value true default true
+
+  # set to false
+./devlink dev param set netdevsim/netdevsim0 name test1 value false cmode driverinit
+./devlink dev param show netdevsim/netdevsim0
+netdevsim/netdevsim0:
+  name max_macs type generic
+    values:
+      cmode driverinit value 32 default 32
+  name test1 type driver-specific
+    values:
+      cmode driverinit value false default true
+
+  # set back to default
+./devlink dev param set netdevsim/netdevsim0 name test1 default cmode driverinit
+./devlink dev param show netdevsim/netdevsim0
+netdevsim/netdevsim0:
+  name max_macs type generic
+    values:
+      cmode driverinit value 32 default 32
+  name test1 type driver-specific
+    values:
+      cmode driverinit value true default true
+
+ # mlx5 params on cx7
+./devlink dev param show pci/0000:01:00.0
+pci/0000:01:00.0:
+  name max_macs type generic
+    values:
+      cmode driverinit value 128 default 128
+...
+  name swp_l4_csum_mode type driver-specific
+    values:
+      cmode permanent value default default default
+
+  # set to l4_only
+./devlink dev param set pci/0000:01:00.0 name swp_l4_csum_mode value l4_only cmode permanent
+./devlink dev param show pci/0000:01:00.0 name swp_l4_csum_mode
+pci/0000:01:00.0:
+  name swp_l4_csum_mode type driver-specific
+    values:
+      cmode permanent value l4_only default default
+
+  # reset to default
+./devlink dev param set pci/0000:01:00.0 name swp_l4_csum_mode default cmode permanent
+./devlink dev param show pci/0000:01:00.0 name swp_l4_csum_mode
+pci/0000:01:00.0:
+  name swp_l4_csum_mode type driver-specific
+    values:
+      cmode permanent value default default default
+
+CHANGES:
+v4:
+  - add test case for default params.
+  - add new cmode runtime test param to netdevsim.
+  - introduce uapi and driver api for supporting default param values.
+  - rename device_default to default in mlx5 patch.
+v3: https://lore.kernel.org/netdev/20251107204347.4060542-1-daniel.zahka@gmail.com/
+  - fix warnings about undocumented param in intel ice driver
+v2: https://lore.kernel.org/netdev/20251103194554.3203178-1-daniel.zahka@gmail.com/
+  - fix indentation issue in new mlx5.rst entry
+  - use extack in mlx5_nv_param_devlink_swp_l4_csum_mode_get()
+  - introduce extack patch.
+v1: https://lore.kernel.org/netdev/20251022190932.1073898-1-daniel.zahka@gmail.com/
+
+Daniel Zahka (6):
+  devlink: pass extack through to devlink_param::get()
+  devlink: refactor devlink_nl_param_value_fill_one()
+  devlink: support default values for param-get and param-set
+  net/mlx5: implement swp_l4_csum_mode via devlink params
+  netdevsim: register a new devlink param with default value interface
+  selftest: netdevsim: test devlink default params
+
+ Documentation/netlink/specs/devlink.yaml      |   9 +
+ .../networking/devlink/devlink-params.rst     |  10 +
+ Documentation/networking/devlink/mlx5.rst     |  14 ++
+ .../marvell/octeontx2/otx2_cpt_devlink.c      |   6 +-
+ drivers/net/ethernet/amd/pds_core/core.h      |   3 +-
+ drivers/net/ethernet/amd/pds_core/devlink.c   |   3 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   6 +-
+ .../net/ethernet/intel/i40e/i40e_devlink.c    |   3 +-
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  14 +-
+ .../marvell/octeontx2/af/rvu_devlink.c        |  15 +-
+ .../marvell/octeontx2/nic/otx2_devlink.c      |   6 +-
+ drivers/net/ethernet/mellanox/mlx4/main.c     |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/devlink.h |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c |   3 +-
+ .../mellanox/mlx5/core/eswitch_offloads.c     |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c |   3 +-
+ .../ethernet/mellanox/mlx5/core/fw_reset.c    |   3 +-
+ .../mellanox/mlx5/core/lib/nv_param.c         | 238 +++++++++++++++++-
+ .../mellanox/mlxsw/spectrum_acl_tcam.c        |   3 +-
+ .../ethernet/netronome/nfp/devlink_param.c    |   3 +-
+ drivers/net/ethernet/qlogic/qed/qed_devlink.c |   3 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   3 +-
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c      |   3 +-
+ drivers/net/ethernet/ti/cpsw_new.c            |   6 +-
+ drivers/net/netdevsim/dev.c                   |  55 ++++
+ drivers/net/netdevsim/netdevsim.h             |   1 +
+ drivers/net/wwan/iosm/iosm_ipc_devlink.c      |   3 +-
+ include/net/devlink.h                         |  45 +++-
+ include/net/dsa.h                             |   3 +-
+ include/uapi/linux/devlink.h                  |   3 +
+ net/devlink/netlink_gen.c                     |   5 +-
+ net/devlink/param.c                           | 180 +++++++++----
+ net/dsa/devlink.c                             |   3 +-
+ .../drivers/net/netdevsim/devlink.sh          | 113 ++++++++-
+ 34 files changed, 689 insertions(+), 91 deletions(-)
+
 -- 
-2.51.0
+2.47.3
 
 
