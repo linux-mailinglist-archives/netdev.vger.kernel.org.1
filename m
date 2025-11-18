@@ -1,76 +1,50 @@
-Return-Path: <netdev+bounces-239373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A4AC673D9
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 05:23:34 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5276BC6742A
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 05:31:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 022584EE89D
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 04:23:13 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E1063364DDF
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 04:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D446C286402;
-	Tue, 18 Nov 2025 04:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C5B264A77;
+	Tue, 18 Nov 2025 04:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YnJzuDVL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kHr0Uw0B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04EA916F265
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 04:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BE61459FA;
+	Tue, 18 Nov 2025 04:30:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763439791; cv=none; b=PyU9j/WkHdtGkruSwcLPW1ujKO7lZU/RTV9kExCrdmJphx63eT9QTNuq0ytmDIjh+r76VgHvC4t+UE3LntZlPUvcIsPjK6YQC+oF1GyBbLjpYk2RI/ZHh09H10uv8kdAMwf13AwmIrYmikgsHE1qKrpnKxrfVMQ/hp0KnI0h7H8=
+	t=1763440259; cv=none; b=k9Zfcog4Kv1oyWqXC/0uXLHlzrUFeL/GfDC2gS5CnkGFut9UamW4hxGCrvEj0m4Ayd4rZVCSsH3N98dVfL18FxWtJXYvn2wq4q9GfZ5EgR3zksHsx6UMgnRrMFEwHhdp7qacSNOqrwSNmpExZJQXRqePSxptELgSI+14kzoLGjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763439791; c=relaxed/simple;
-	bh=3h8C7ms2lT0gGRut8mfr73o9Zzge0iofG1ntEd0Mzfk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AAXRtjmHqFUlIf9Bo/4ldljNt+TwsEgMVjsMZyYDPf7wWTCDesTSEI13sPwd1hgI/RYWXAdMeaKvg4NtgWbQlBNAytdbjT0FXa+fS3QobeFaz4SO7nIiQFwvx79EW3rEZc5EhU/xzr8ULuYc4zFlyTsnnlM9Xw0O/jS+Gw/qGhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YnJzuDVL; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763439790; x=1794975790;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3h8C7ms2lT0gGRut8mfr73o9Zzge0iofG1ntEd0Mzfk=;
-  b=YnJzuDVL4vBpXZcB2BLhdS5MWuWTenc6Cufv/8lBx8Z7LYY/oqPNkUWo
-   rhbdxBneUJwntCJshuf8JzCiegKp5Y5tL5RiKPCfg26qGPJunWoNjbXy4
-   Kp8kihT9WNxxdzk2jpHEpXPYsOAWSDsJ4jAGG3peZt+jMH5e0gGS7KE8g
-   UzZupiYjjzHrnGR5S4J+et5naxBymDaxLuMhreIHwkeyMRy+ltcTSIRif
-   pbQ25tVMigJaV5Gz1qqRH7QvWcadnRMFH1fx4KcaMEpmsvbHrfEo5Escq
-   7UIZKPO9cgdVbsbn8kAXyhNIAxI0Aqwb0vqlY7fpITfLssaljdSRYdZ2f
-   w==;
-X-CSE-ConnectionGUID: Pz1zqwwQRsmXf+29TuzUYQ==
-X-CSE-MsgGUID: iq8jeylERoi+S+Vm+3EGkw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="82843607"
-X-IronPort-AV: E=Sophos;i="6.19,313,1754982000"; 
-   d="scan'208";a="82843607"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 20:23:10 -0800
-X-CSE-ConnectionGUID: 4OULdYgHRZ+mqaJyWvqtmA==
-X-CSE-MsgGUID: 4MZ+bLfKRGGNMeU2TYok5Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,313,1754982000"; 
-   d="scan'208";a="191086607"
-Received: from aus-labsrv3.an.intel.com ([10.123.116.23])
-  by fmviesa009.fm.intel.com with ESMTP; 17 Nov 2025 20:23:08 -0800
-From: Sreedevi Joshi <sreedevi.joshi@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Sreedevi Joshi <sreedevi.joshi@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Emil Tantilov <emil.s.tantilov@intel.com>
-Subject: [PATCH iwl-net 3/3] idpf: Fix RSS LUT NULL ptr issue after soft reset
-Date: Mon, 17 Nov 2025 22:22:28 -0600
-Message-Id: <20251118042228.381667-4-sreedevi.joshi@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251118042228.381667-1-sreedevi.joshi@intel.com>
-References: <20251118042228.381667-1-sreedevi.joshi@intel.com>
+	s=arc-20240116; t=1763440259; c=relaxed/simple;
+	bh=b0tK/QFOidIQQqfzTvlAPr1kSgWygac/TGHNviqWPbU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LfWQ4sFJUgok0ont+/wk3W6QRTxdz+waK9VUoyycEVjSPagO+fj28Hfr4cEY4fvOn/yGOc6YsWhKOcffQgTAnEOiIs69Yu/L7aynOtKjDBnvDQSEH+8Vwa+cgzssLOM6vBrc1Mna/hflZy+HbJykIzhxdCsoMkeQO756TWFk7S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kHr0Uw0B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C70AC116B1;
+	Tue, 18 Nov 2025 04:30:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763440258;
+	bh=b0tK/QFOidIQQqfzTvlAPr1kSgWygac/TGHNviqWPbU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kHr0Uw0Bjoa7ZnKIST07TsbWvMUE7coMCj+Mn+sszlvaBiJPkR45qgQEmyH0T33cJ
+	 vwa7fSHLmtvdybBP8E9lnjb8zlIqCfSaX1NxNseYS5YrH/eYTQd93gQ723mIJBV310
+	 ZgzPP2k+/Xwc8SWo1C8oQKmD35q/G2YJdMssggnMOVtQw7aqQiGRvccfxmBHeg953M
+	 0mgNR3xgmJveKIbcHjMeyrqs4AmOtS4MG5/K829TC3wKSShgH5UwTqFEe9F29OXhvD
+	 WAVk2GvaqYjeqeBkHMB5Sl/2kk+3JcERe3sAQQzaOTFgSRZZMBfuqugbkGF6/7/xR1
+	 +DPh6QTK1f7Eg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E143809A1E;
+	Tue, 18 Nov 2025 04:30:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,115 +52,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v8 0/3] net: stmmac: dwmac-sophgo: Add phy interface
+ filter
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176344022426.3968687.3804479598141783177.git-patchwork-notify@kernel.org>
+Date: Tue, 18 Nov 2025 04:30:24 +0000
+References: <20251114003805.494387-1-inochiama@gmail.com>
+In-Reply-To: <20251114003805.494387-1-inochiama@gmail.com>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: rabenda.cn@gmail.com, uwu@icenowy.me, wangruikang@iscas.ac.cn,
+ ziyao@disroot.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, unicorn_wang@outlook.com,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, rmk+kernel@armlinux.org.uk,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org, sophgo@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, dlan@gentoo.org, looong.bin@gmail.com
 
-During soft reset, the RSS LUT is freed and not restored unless the
-interface is up. If an ethtool command that accesses the rss lut is
-attempted immediately after reset, it will result in NULL ptr
-dereference. Also, there is no need to reset the rss lut if the soft reset
-does not involve queue count change.
+Hello:
 
-After soft reset, set the RSS LUT to default values based on the updated
-queue count only if the reset was a result of a queue count change. For
-all other reset causes, don't touch the LUT.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Steps to reproduce:
+On Fri, 14 Nov 2025 08:38:02 +0800 you wrote:
+> As the SG2042 has an internal rx delay, the delay should be remove
+> when init the mac, otherwise the phy will be misconfigurated.
+> 
+> Since this delay fix is common for other MACs, add a common helper
+> for it. And use it to fix SG2042.
+> 
+> Change from v7:
+> - https://lore.kernel.org/all/20251107111715.3196746-1-inochiama@gmail.com
+> 1. patch 1: fix a mistake that using rgmii-txid instead of rgmii-rxid
+>             for SG2042
+> 
+> [...]
 
-** Bring the interface down (if up)
-ifconfig eth1 down
+Here is the summary with links:
+  - [v8,1/3] dt-bindings: net: sophgo,sg2044-dwmac: add phy mode restriction
+    https://git.kernel.org/netdev/net-next/c/6b1aa3c87fcb
+  - [v8,2/3] net: phy: Add helper for fixing RGMII PHY mode based on internal mac delay
+    https://git.kernel.org/netdev/net-next/c/24afd7827efb
+  - [v8,3/3] net: stmmac: dwmac-sophgo: Add phy interface filter
+    https://git.kernel.org/netdev/net-next/c/db37c6e510de
 
-** update the queue count (eg., 27->20)
-ethtool -L eth1 combined 20
-
-** display the RSS LUT
-ethtool -x eth1
-
-[82375.558338] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[82375.558373] #PF: supervisor read access in kernel mode
-[82375.558391] #PF: error_code(0x0000) - not-present page
-[82375.558408] PGD 0 P4D 0
-[82375.558421] Oops: Oops: 0000 [#1] SMP NOPTI
-<snip>
-[82375.558516] RIP: 0010:idpf_get_rxfh+0x108/0x150 [idpf]
-[82375.558786] Call Trace:
-[82375.558793]  <TASK>
-[82375.558804]  rss_prepare.isra.0+0x187/0x2a0
-[82375.558827]  rss_prepare_data+0x3a/0x50
-[82375.558845]  ethnl_default_doit+0x13d/0x3e0
-[82375.558863]  genl_family_rcv_msg_doit+0x11f/0x180
-[82375.558886]  genl_rcv_msg+0x1ad/0x2b0
-[82375.558902]  ? __pfx_ethnl_default_doit+0x10/0x10
-[82375.558920]  ? __pfx_genl_rcv_msg+0x10/0x10
-[82375.558937]  netlink_rcv_skb+0x58/0x100
-[82375.558957]  genl_rcv+0x2c/0x50
-[82375.558971]  netlink_unicast+0x289/0x3e0
-[82375.558988]  netlink_sendmsg+0x215/0x440
-[82375.559005]  __sys_sendto+0x234/0x240
-[82375.559555]  __x64_sys_sendto+0x28/0x30
-[82375.560068]  x64_sys_call+0x1909/0x1da0
-[82375.560576]  do_syscall_64+0x7a/0xfa0
-[82375.561076]  ? clear_bhb_loop+0x60/0xb0
-[82375.561567]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-<snip>
-
-Fixes: 02cbfba1add5 ("idpf: add ethtool callbacks")
-Signed-off-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Reviewed-by: Emil Tantilov <emil.s.tantilov@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_lib.c  | 4 +++-
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 2 +-
- drivers/net/ethernet/intel/idpf/idpf_txrx.h | 1 +
- 3 files changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 7359677d8a3d..51e1fccfb6d1 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -2061,7 +2061,6 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 		idpf_vport_stop(vport, false);
- 	}
- 
--	idpf_deinit_rss_lut(vport);
- 	/* We're passing in vport here because we need its wait_queue
- 	 * to send a message and it should be getting all the vport
- 	 * config data out of the adapter but we need to be careful not
-@@ -2087,6 +2086,9 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 	if (err)
- 		goto err_open;
- 
-+	if (reset_cause == IDPF_SR_Q_CHANGE)
-+		idpf_fill_dflt_rss_lut(vport);
-+
- 	if (current_state == __IDPF_VPORT_UP)
- 		err = idpf_vport_open(vport, false);
- 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 11f711997db8..214e7c93b106 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -4643,7 +4643,7 @@ int idpf_config_rss(struct idpf_vport *vport)
-  * idpf_fill_dflt_rss_lut - Fill the indirection table with the default values
-  * @vport: virtual port structure
-  */
--static void idpf_fill_dflt_rss_lut(struct idpf_vport *vport)
-+void idpf_fill_dflt_rss_lut(struct idpf_vport *vport)
- {
- 	struct idpf_adapter *adapter = vport->adapter;
- 	u16 num_active_rxq = vport->num_rxq;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 2bfb87b82a9b..423cc9486dce 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -1086,6 +1086,7 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector);
- void idpf_vport_intr_deinit(struct idpf_vport *vport);
- int idpf_vport_intr_init(struct idpf_vport *vport);
- void idpf_vport_intr_ena(struct idpf_vport *vport);
-+void idpf_fill_dflt_rss_lut(struct idpf_vport *vport);
- int idpf_config_rss(struct idpf_vport *vport);
- int idpf_init_rss_lut(struct idpf_vport *vport);
- void idpf_deinit_rss_lut(struct idpf_vport *vport);
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
