@@ -1,187 +1,121 @@
-Return-Path: <netdev+bounces-239605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45C39C6A0E4
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:42:47 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72CE0C6A18C
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:50:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id DB4692A472
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:42:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DDA6C3579AF
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB383546EC;
-	Tue, 18 Nov 2025 14:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD97835BDC5;
+	Tue, 18 Nov 2025 14:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eXJ1bdUq";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wtfvm222"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o7rOXQoI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F67316194
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 14:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A24355020;
+	Tue, 18 Nov 2025 14:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763476963; cv=none; b=hNOE8T4jRVfzzzwIQKzhap9i5WN2OoqdDunFfr/ASExtAbBT1NfTOZFHW5/qy85Jp5zpEhFm/MpfbrWWzQp7oRXKwQRiBqKxCQciWL9JW+fX2+wuW7rwj8G5koiVMM+nMrlJ/wvr0xq04a/e4n7tKV+NafT6JnGzrfH8Yf0EmDY=
+	t=1763477428; cv=none; b=f9Yurk8j65ChgcXvj6SvmLUuB3teiZ2zHPlO7quFfPVDWUO52UvWZ4uX436G9bGDyscrWCd0HybLnFu8U0570ua+/qpwfPX0xqW5Hv7g1FLLQRh7Cr2LiqgaFyChpl3pMOLxM2fC2x3MWZfoKGavYELAp4GQU2WSCn+Vv6X+y20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763476963; c=relaxed/simple;
-	bh=Pu9ixYZsFQItNRYJLylft6nHxSMZveZVAFQIAqMTqLg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ZCUl1FddHyNZlG/dt0QkwQIvECVNha/XvZpyTrA6R+pXYpVgWVdf13+yf4TM0bXp3NZ3bp1tdhpy91yHI9dFD1cABV4Xcg6NXHI/KNnAhHoSzExbMfpQeKc4i5AiIx7kZH98SMpS3lPTZZRtgDMCRH/g1N2Wbo07N7lBpJgbde4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eXJ1bdUq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wtfvm222; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763476960;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KcIjluc6CF4ch514Lk0ctcAIz2wl4W9d5ngSIs1tzo4=;
-	b=eXJ1bdUqf49FF6ndjyOR9UwJVTF3oT23GWkFZRWSPXdAbbY3xCjTEgc8TlHYumSigpOvxq
-	6MpUiMG4kOPVHO0kZOQicTyG6ZKcunYAQoprfIKoidhNmq/0gQYS7zzg+Dk3vpPxcAhY5j
-	f2vWQRmaQWnAfkBTuUh//am+hAEItjY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-396-tIHoLFSLMvaCnYiSpXsrHQ-1; Tue, 18 Nov 2025 09:42:39 -0500
-X-MC-Unique: tIHoLFSLMvaCnYiSpXsrHQ-1
-X-Mimecast-MFC-AGG-ID: tIHoLFSLMvaCnYiSpXsrHQ_1763476958
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47799717212so26932485e9.3
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 06:42:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763476958; x=1764081758; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KcIjluc6CF4ch514Lk0ctcAIz2wl4W9d5ngSIs1tzo4=;
-        b=Wtfvm222xsbY46cxLBDmisKxUJ+vS1Dsnb6JHq/NjxfN36hDT6vdJ/iNmfUtDuO1ih
-         vAoS4FyclYHJdi2l3Dl1rTT2jQnbn+8a+KI7hgzkg3tHYRJu8RP9i5YTAd7xtFcjSzlJ
-         DZ/rICeAguRJfv8OQORo3TZHMVmVinKzkprDg9EIxsMXbmKNZXtqtEpdOFYrCMM/SozH
-         zPK9BseTQTuKv9MoOuBBu9coa4qvIvXOwOZuvgM4xfWF+OvBvTiaHdFqIyPFaxPnCemF
-         9ppBA+Ha1eP46VFG76gfYWnqaidFfPrmBhftfaa62BsFSXI7UpZBcobo3+AdTnfhtllU
-         u1Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763476958; x=1764081758;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KcIjluc6CF4ch514Lk0ctcAIz2wl4W9d5ngSIs1tzo4=;
-        b=uZF6xyX7AF8upD5FGFFE0gy7TLiwaqmbFC5QeivetW6aV3ERv/RNOvTSw1tAEcXCuW
-         94X6CTlG+JuDsUFqpFkdFCCXydWZ4UlyFHN3843Qe5WcjSP+TGnIWSDKVUvr08BM025D
-         qcjegQpv740NHsI8tD/YfFfO1XynZZ4i9YPeqrWAEcK6G5MuHU/hxbCbmUMKeL+ddyL6
-         D+VFKUJFdxIuMvQapjRuTm9HvuxmB4Bt8dWqzKAaBzZa0ZGVIL2o+dIDBtCVvRBjfdT/
-         4VtJ3PkJE7t7uR6tmoFVf5Nww0PtABstpgOy/rjym2pSq2D6uHybAdZ9K2WEu1tBqjw+
-         hX4w==
-X-Forwarded-Encrypted: i=1; AJvYcCWw0WFv+g+PUOpaF9vVRz70hwSYweTstcENweQ0D98S5M1fR52LwqjYpLopsFHDSOnnvT8AOS4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtB3aLkpmnPsnG72sGHwIB/gkvjzmpq1Ch99fweJLxaEv/nq+k
-	7f4o/87wynI7aSdRZbUeyEIuhXyLovgpF+szDlBNLrSjAEDSV4gAKChv5TRUIuAIsbPoWAw2x3/
-	cxsNPZ4R37b0IzYet3Qgsv6mdpZSryGNeCu1X+kDBxL1YENcZ85IOFC5OoA==
-X-Gm-Gg: ASbGncvDovgfXVfQKunHP0zl6y83zS7fpk4SntZ/Q5o1UoRVYuc1Cr6fa/MYhg88UpX
-	lZu2KiEHwknwzkpcMyW50BliNmYOvPCc/rALji3pkXhmfR+6C09dHLwG0w2VOKk8UatDZ+VZsfE
-	AEh4uBdR/xyRSYzMdAq+vOkU7A7EdLRYMJkff604Xgyhwa8zlPBuwev1vL6dW5b3itKUAvLZy+u
-	rVUdWuVecpiEbI/6nSIQlZyA/UqXhmG4KPQxAwBkgldifS5tpbOQxbC50j9LIiRlQ9UcvDOp3Gm
-	00YtkJb3MvFDXr66DIfqHZ4sWaO47P5DhhyCxVxwFNEJygHTHs0aq61OIRNXIzKZdUFKZ/QlG/7
-	ESicVQTYCUD+g
-X-Received: by 2002:a05:600c:c177:b0:471:13dd:baef with SMTP id 5b1f17b1804b1-4778fea3048mr167899285e9.26.1763476958168;
-        Tue, 18 Nov 2025 06:42:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG0CCY6x+8bA07W4MfE2Q3iuNu7PIm0BhBaWtRwjXdbvpokwwW2evCf1FYfJCFjxSD0LjK6Ug==
-X-Received: by 2002:a05:600c:c177:b0:471:13dd:baef with SMTP id 5b1f17b1804b1-4778fea3048mr167899055e9.26.1763476957729;
-        Tue, 18 Nov 2025 06:42:37 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.41])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a9741cbfsm19503645e9.6.2025.11.18.06.42.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Nov 2025 06:42:37 -0800 (PST)
-Message-ID: <53b3ac97-830a-47fc-a83c-3d12dac2e21a@redhat.com>
-Date: Tue, 18 Nov 2025 15:42:35 +0100
+	s=arc-20240116; t=1763477428; c=relaxed/simple;
+	bh=1E4X4gefkIzYTETLSk5bvLuWm/KtogFFY1CDdvW0meU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V3q+m+pOaXE/Iia3/DQBwXd+Hh5oh0wW+DanmpcbItQ/5uhMU7eg6++RQ+pApObah5TUGCUMUdPY25Wudk6loeqTdmBfc4Oi2HCa5cuwVZmQpaI9AJ6RJRFVWG9Pwfq1zE2eYuvqaY9rQGjLVuzLQdtlWhSPgY9Z8iHZtco4rJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o7rOXQoI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2768C4CEF1;
+	Tue, 18 Nov 2025 14:50:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763477428;
+	bh=1E4X4gefkIzYTETLSk5bvLuWm/KtogFFY1CDdvW0meU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o7rOXQoIC0LO3wczFpoOQkwAuSw/7ccNNDU0xkAt6kMBsNFiC7Grv6uzr3Jdg+aJf
+	 xatZa4QuZIveV8uod2MgfDR/jbedLBEq3f0wVmruwv/5JoErT9nXzlOSErGMQZ/hBE
+	 Jpl6chGel83nyc3+/mxHgkG6T2tOEOd8tXDH+VzOyVHZbuqZ4BNziVcJ47R7Gh2e+J
+	 uc8sxipRcDiRMPEPJ0bg7yLwLlrpRzM2pFiaS+nRTy68gAuYu5/atdRyaIWFKe70ch
+	 AN/Gx0+4HQkh8zegPQvCEBX2GPDpAjghwXKS0ENrlouwlQJcfSE+MhTp05ax1fMsD0
+	 PdRSVsPzP6kPg==
+Date: Tue, 18 Nov 2025 08:50:26 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Romain Gantois <romain.gantois@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>, davem@davemloft.net,
+	linux-arm-msm@vger.kernel.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next v16 01/15] dt-bindings: net: Introduce the
+ ethernet-connector description
+Message-ID: <176347742560.3223087.13861755734926034941.robh@kernel.org>
+References: <20251113081418.180557-1-maxime.chevallier@bootlin.com>
+ <20251113081418.180557-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: stmmac: add clk_prepare_enable() error
- handling
-From: Paolo Abeni <pabeni@redhat.com>
-To: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Inochi Amaoto <inochiama@gmail.com>,
- Quentin Schulz <quentin.schulz@cherry.de>,
- Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
- Rayagond Kokatanur <rayagond@vayavyalabs.com>,
- Giuseppe CAVALLARO <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- lvc-project@linuxtesting.org
-References: <20251114142351.2189106-1-Pavel.Zhigulin@kaspersky.com>
- <4a3a8ba2-2535-461d-a0a5-e29873f538a4@redhat.com>
-Content-Language: en-US
-In-Reply-To: <4a3a8ba2-2535-461d-a0a5-e29873f538a4@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251113081418.180557-2-maxime.chevallier@bootlin.com>
 
-On 11/18/25 3:30 PM, Paolo Abeni wrote:
-> On 11/14/25 3:23 PM, Pavel Zhigulin wrote:
->> The driver previously ignored the return value of 'clk_prepare_enable()'
->> for both the CSR clock and the PCLK in 'stmmac_probe_config_dt()' function.
->>
->> Add 'clk_prepare_enable()' return value checks.
->>
->> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->>
->> Fixes: bfab27a146ed ("stmmac: add the experimental PCI support")
->> Signed-off-by: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
->> ---
->> v2: Fix 'ret' value initialization after build bot notification.
->> v1: https://lore.kernel.org/all/20251113134009.79440-1-Pavel.Zhigulin@kaspersky.com/
->>
->>  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 11 +++++++++--
->>  1 file changed, 9 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
->> index 27bcaae07a7f..8f9eb9683d2b 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
->> @@ -632,7 +632,9 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
->>  			dev_warn(&pdev->dev, "Cannot get CSR clock\n");
->>  			plat->stmmac_clk = NULL;
->>  		}
->> -		clk_prepare_enable(plat->stmmac_clk);
->> +		rc = clk_prepare_enable(plat->stmmac_clk);
->> +		if (rc < 0)
->> +			dev_warn(&pdev->dev, "Cannot enable CSR clock: %d\n", rc);
->>  	}
->>
->>  	plat->pclk = devm_clk_get_optional(&pdev->dev, "pclk");
->> @@ -640,7 +642,12 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
->>  		ret = plat->pclk;
->>  		goto error_pclk_get;
->>  	}
->> -	clk_prepare_enable(plat->pclk);
->> +	rc = clk_prepare_enable(plat->pclk);
->> +	if (rc < 0) {
->> +		ret = ERR_PTR(rc);
->> +		dev_err(&pdev->dev, "Cannot enable pclk: %d\n", rc);
->> +		goto error_pclk_get;
->> +	}
+
+On Thu, 13 Nov 2025 09:14:03 +0100, Maxime Chevallier wrote:
+> The ability to describe the physical ports of Ethernet devices is useful
+> to describe multi-port devices, as well as to remove any ambiguity with
+> regard to the nature of the port.
 > 
-> It looks like the driver is supposed to handle the
-> IS_ERR_OR_NULL(plat->pclk) condition. This check could cause regression
-> on existing setup currently failing to initialize the (optional) clock
-> and still being functional.
+> Moreover, describing ports allows for a better description of features
+> that are tied to connectors, such as PoE through the PSE-PD devices.
+> 
+> Introduce a binding to allow describing the ports, for now with 2
+> attributes :
+> 
+>  - The number of pairs, which is a quite generic property that allows
+>    differentating between multiple similar technologies such as BaseT1
+>    and "regular" BaseT (which usually means BaseT4).
+> 
+>  - The media that can be used on that port, such as BaseT for Twisted
+>    Copper, BaseC for coax copper, BaseS/L for Fiber, BaseK for backplane
+>    ethernet, etc. This allows defining the nature of the port, and
+>    therefore avoids the need for vendor-specific properties such as
+>    "micrel,fiber-mode" or "ti,fiber-mode".
+> 
+> The port description lives in its own file, as it is intended in the
+> future to allow describing the ports for phy-less devices.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
+>  .../bindings/net/ethernet-connector.yaml      | 57 +++++++++++++++++++
+>  .../devicetree/bindings/net/ethernet-phy.yaml | 18 ++++++
+>  MAINTAINERS                                   |  1 +
+>  3 files changed, 76 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
+> 
 
-I'm sorry, ENOCOFFEE above, ->pclk is not NULL nor ERR when
-clk_prepare_enable() fails. Still I don't stmmac  code depending pclk
-being successfully initialized, and the eventual regression looks like a
-real possibility.
-
-/P
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
 
