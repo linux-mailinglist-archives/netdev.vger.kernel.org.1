@@ -1,105 +1,105 @@
-Return-Path: <netdev+bounces-239346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA327C67080
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 03:35:14 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65889C670B6
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 03:44:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D3FA14E06D4
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 02:35:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 9F96B24270
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 02:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D3A1D2F42;
-	Tue, 18 Nov 2025 02:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KbEkU+vK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC238327798;
+	Tue, 18 Nov 2025 02:44:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6E41A9F9D;
-	Tue, 18 Nov 2025 02:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8612D0631;
+	Tue, 18 Nov 2025 02:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763433309; cv=none; b=UNJygIuu2ghLjRYHSK6qhhySmOe/71zi9OaYTVVP9n5Iufy5d8kqt5f4INA8wcVoDfcPffMo3qZywc6yqbJ0bmGNAMSSK0b4Yh1Gevt/Z3ciL+0pZcq0GkwOXIv8E4S5Ep5WBK9t8mB75mPftBwL3Du/KbnDYrr0mS90iWcMvkU=
+	t=1763433857; cv=none; b=dgTgrLfKhkSQ6cdmq1Ftx0TATScw1QG8BrhLe/FmBi8gj2ZALy+GDycqPJN6SKyEjFuQGASfEQYykrhdbM17dBWLi+gabXjVBskHDY/DaSlUYlxf9oa1WkxMgLdhf0LA53NEM3samUKsYdvNzM1WaHCEibn2qQaBOAhfClPK3R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763433309; c=relaxed/simple;
-	bh=unEI2uhhjW5eYfpjHH3xZyxUa780fWtiM4vIAPvgu0s=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=oArwIEOAE7y6oc/bm9NtqsNxJBY0a+NiGfVOTl28l5OJCIfBGEdWn9OKGlD/4i4PU73X6LkoU6/+h9hG3q3/Bs3UYORIhIkBqaPnJH15sUPsQhc6ez5T3J991BaoEhdo2/YM8eVjRdPzbxctbvZJA9awHhvxfZ1LXphk0SJDjm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KbEkU+vK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BC38C2BCAF;
-	Tue, 18 Nov 2025 02:35:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763433309;
-	bh=unEI2uhhjW5eYfpjHH3xZyxUa780fWtiM4vIAPvgu0s=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=KbEkU+vKBZPRe4ynAmIGePSLWzkRnccklCwaTHYUWfu6JsaxVMNtlqeiVGQeDtFB8
-	 VBOCY0BygSA9fSxAMLzEhZCA31fNtH7hcbK1gTvxgLdAfpwDVnYXEb5PmhD2YcF7E5
-	 2XayufdDzN8QTADIdopwIxh6su98tFZDRSlwdWQs5MascbQ7knp1zfK3kqM0kNd2yT
-	 gOu9vdR027RDvpEwz72C7uv8SM5lTvcvzU+wnafBGWbpZQQYJ4CjsJSu5Vex7ufo9s
-	 E7N83+BkeQut/+UUEcvIFIrOl5kG3a7kooIb2WNXmBaJv83RQ/tVZ1Dauc8XS7KmWU
-	 riX9AQ+tuGNFw==
-Date: Tue, 18 Nov 2025 03:35:00 +0100 (GMT+01:00)
-From: Matthieu Baerts <matttbe@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang.tang@linux.dev>,
-	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com,
-	syzbot+2a6fbf0f0530375968df@syzkaller.appspotmail.com,
-	Geliang Tang <geliang@kernel.org>,
-	MPTCP Linux <mptcp@lists.linux.dev>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>
-Message-ID: <e7200954-ce62-42fe-853a-49127b2f129d@kernel.org>
-In-Reply-To: <20251117170508.4ffe043f@kernel.org>
-References: <20251117100745.1913963-1-edumazet@google.com> <c378da30-4916-4fd6-8981-4ab2ffa17482@kernel.org> <CANn89iLxt+F+SrpgXGvYh9CZ8GNmbbowv5Ce80P1gsWjaXf+CA@mail.gmail.com> <a155bf8b-08cd-4cd9-91d9-f49180f19f6c@kernel.org> <20251117170508.4ffe043f@kernel.org>
-Subject: Re: [PATCH v2 net] mptcp: fix a race in mptcp_pm_del_add_timer()
+	s=arc-20240116; t=1763433857; c=relaxed/simple;
+	bh=yUCY5RXHtv4MfMtZ2NRPs4k6yDKbRkNz9OStVLEyHAc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e0R3DigkMGIr8HDxIvbIFxuGOA+P2y27PgaccIc/aoBbXFoH0Sf8CgIkVE13WuCdueGfX5fkTk90iKHOh/zBfc8mNDDEvo1F51vIJ9zH4eXGhqiLMj8UQfDiap7ZQA1wyM0OEU8X+l0keIyNfQWLfgqS8mnezVQz68dYnpCMotY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vLBhM-0000000052Y-26KM;
+	Tue, 18 Nov 2025 02:44:04 +0000
+Date: Tue, 18 Nov 2025 02:43:55 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Xu Liang <lxu@maxlinear.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: phy: mxl-gpy: add MxL862xx support
+Message-ID: <aRvdaxBjIOzspkCa@makrotopia.org>
+References: <92e7bdac9a581276219b5c985ab3814d65e0a7b5.1762813829.git.daniel@makrotopia.org>
+ <5e61cac4897c8deec35a4032b5be8f85a5e45650.1762813829.git.daniel@makrotopia.org>
+ <e064f831-1fe9-42d2-96fc-d901c5be66a4@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Correlation-ID: <e7200954-ce62-42fe-853a-49127b2f129d@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e064f831-1fe9-42d2-96fc-d901c5be66a4@lunn.ch>
 
-Hi Jakub,
+On Tue, Nov 11, 2025 at 02:32:38AM +0100, Andrew Lunn wrote:
+> On Mon, Nov 10, 2025 at 10:35:00PM +0000, Daniel Golle wrote:
+> > Add PHY driver support for Maxlinear 86252 and 86282 switches.
+> > The PHYs built-into those switches are just like any other GPY 2.5G PHYs
+> > with the exception of the temperature sensor data being encoded in a
+> > different way.
+> 
+> Is there a temperature sensor per PHY, or just one for the whole
+> package?
+> 
+> Marvell did something similar for there SoHo switches. The temperature
+> sensor is mapped to each of internal PHYs register space, but in fact
+> there is a single sensor, not one per PHY.
 
-Thank you for your reply!
+It very much looks like it is also done in the way your are describing.
+The temperature reading on all 8 PHYs is almost exactly the same, even
+if eg. port 1 and 2 are connected to 2.5G link partners and doing some
+traffic and all other ports are disconnected the temperature stays the
+same value for all of them.
 
-18 Nov 2025 02:05:12 Jakub Kicinski <kuba@kernel.org>:
+Should this hence be implemented as a single sensor of the phy package?
 
-> On Mon, 17 Nov 2025 11:42:31 +0100 Matthieu Baerts wrote:
->>>> Out of curiosity, is it not OK to reply to the patch with the new
->>>> Reported-by & Closes tags to have them automatically added when applyi=
-ng
->>>> the patch? (I was going to do that on the v1, then I saw the v2 just
->>>> when I was going to press 'Send' :) )=C2=A0
->>>
->>> I am not sure patchwork has been finally changed to understand these tw=
-o tags.=C2=A0
->>
->> Ah yes, thank you! If there is a dependence on Patchwork, I think
->> indeed, it doesn't recognise the 'Closes' tag (but I think 'Reported-by'
->> is OK).
->>
->> While at it, I forgot to add: this patch can be applied in net directly.
->
-> FWIW I have a local script which extracts them from patchwork comments
-> and applies them (same for Fixes tags).
+> 
+> > @@ -541,7 +581,7 @@ static int gpy_update_interface(struct phy_device *phydev)
+> >  	/* Interface mode is fixed for USXGMII and integrated PHY */
+> >  	if (phydev->interface == PHY_INTERFACE_MODE_USXGMII ||
+> >  	    phydev->interface == PHY_INTERFACE_MODE_INTERNAL)
+> > -		return -EINVAL;
+> > +		return 0;
+> 
+> This change is not obvious. There is no mention of it in the commit
+> message. Why has something which was an error become not an error?
 
-Great, good to know, thanks!
+The interface mode doesn't need to be updated on PHYs connected with
+USXGMII and integrated PHYs, and gpy_update_interface() should just
+return 0 in this case rather than -EINVAL, which has wrongly been
+introduced by commit 7a495dde27ebc ("net: phy: mxl-gpy: Change
+gpy_update_interface() function return type"), as this breaks support
+for those PHYs. The result is that read_status() will always return
+-EINVAL for those interface modes.
 
-(So similar to what "b4 shazam -Msl" would do then.)
-
-> But it's always safer to resend.
-
-Indeed.
-
-Cheers,
-Matt
+I'll move this change into a separate patch with an appropriate
+Fixes:-tag as the before mentioned commit actually breaks things.
 
