@@ -1,58 +1,63 @@
-Return-Path: <netdev+bounces-239317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8589C66D4B
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 02:27:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95C34C66D78
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 02:35:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3E4EC4E177E
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:26:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 585A929CD1
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050E026B2D2;
-	Tue, 18 Nov 2025 01:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF17E2FF660;
+	Tue, 18 Nov 2025 01:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="seYmfsyF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iwf//n6i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C867526A1AF
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 01:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3142F99BC;
+	Tue, 18 Nov 2025 01:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763429193; cv=none; b=lNIxeAOuVR7Uami188Vgaof1q7kV25MAaHHHSIU240j4KvGaFGUAlVQ/DPBAAtIEbxHZIIX8uI3F7nd+n4lKoZd7VWfdInUzzo/14jScBuldKw2fUa5c3o1rr0SQOX0YDMSxK3QCXi0wyVnDDf1rpNime0NmCy6kaBNAafbDI0Q=
+	t=1763429710; cv=none; b=s2VGItO4UFZfAlFviTeukyopEGXrlGHCdamPXgtXLeOZ0z4JDLqbYRLGmHuoHbW5rmbdu+JuDyVzjtI+G7nJHptsb85zK5n3QK1TGKERXHOllykScGGPGpYS58EqbnXyEZUGObi0pKxNmgCzJZW1fxh86ckJ/iDmaXy+VdKS53M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763429193; c=relaxed/simple;
-	bh=KibZQ92mBKeJ8dueQTgMwBP40CZhKLGoQAU/W8Ix6XI=;
+	s=arc-20240116; t=1763429710; c=relaxed/simple;
+	bh=JEldkYSYqKrhysB+OxSUUdm8FS63jp4ava4/O4/bmU4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kQmMONJrGq71C8mEYBS5PzP98W6JRPtl7LJPhG99vbXBFFMM2Bc6qmM7GqWQ29ZlJhxPZwb7dJu2md8FoMc3H+uLUFfwYkLqhGWpaYbojhvZgfTFa8gPfcu4KUU3cWjeX8UH+iqHNExw7EfsigjtSE2zDT4TK6QdvEjBHaevEPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=seYmfsyF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B906DC19425;
-	Tue, 18 Nov 2025 01:26:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qQ2tmIJFnBnIIf/zhaWLeIDoHbs7a9gw+s1tUX7mbhsB6WmuvPZurnglLZ+Rg9kN3jPPpIZytsQBnDH2yAjgngcI2O8oDrYtXlqhbeFijVarHSkcRkGxCVuCxHoAZkMGzGRmbj9Kv/NzP38gd0TADVgDHGMnl11xIMJSYbXfir4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iwf//n6i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26FD3C4AF0E;
+	Tue, 18 Nov 2025 01:35:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763429191;
-	bh=KibZQ92mBKeJ8dueQTgMwBP40CZhKLGoQAU/W8Ix6XI=;
+	s=k20201202; t=1763429706;
+	bh=JEldkYSYqKrhysB+OxSUUdm8FS63jp4ava4/O4/bmU4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=seYmfsyFqXdfDfWICAckOa1pqJ8eE20aZb50A1sT+anCiyWRQwLlVKM2ZoNRyv9Zi
-	 WNKpn+7rWDG7UWzz11zzekUMRmFBPgOH2nojuHKkpUfgjUCAKvYbnq8bKeQ+dnf4oZ
-	 lAj2+RfDhzlAuOchkz4LcmKVh4+NsIY1e+2bu4kfiQnORo1JiMiWkcRM1iLJGVk9ya
-	 NxNna8pPsY3oflDpRLwvODH1behPX//7VgrNj5Kf4O2laNKfZ+okc2vV7aYKPkGfS4
-	 xCKLnjJ7yZeewcLzn0G37bVGO/ZhHUCWMpErHiMXsyE9771SC2fbCRdlizUlxaEloa
-	 odjmTT3OzjH9Q==
-Date: Mon, 17 Nov 2025 17:26:28 -0800
+	b=iwf//n6iKHpX5+o6LWDkVl+rzwkPYEyAvpVcp9IhYXejF0HoVKkJ9f74rxO7+217y
+	 Y6Ee9vakQrToNrlcDx9v5S4dDX2NZpFH2BA1cM8iY8wtN8FXST0jVojioknx9MCEww
+	 SIpmBJZbGSWDhb6HMgoNPuEG/WKGKSI7xeYD5gtc6Aqc3tdFlRhQylOS7KBoays0vL
+	 qqTaz8IGO+msjsttIQRcIAXJSWtohH4/IHKvM5fWkIZ9SS9uxRcvBVtYRdOr/5x0gB
+	 Nw0/gki6NIEb03ZPDXI15ud0hBvY+B9S4A1/ed3BVhLxvAoNf53olrMP+rBJu9lPAC
+	 /qvMyFrz0cX2A==
+Date: Mon, 17 Nov 2025 17:35:03 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Aaron Conole <aconole@bytheb.org>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v1 net 2/2] selftest: af_unix: Add test for SO_PEEK_OFF.
-Message-ID: <20251117172628.784c23a4@kernel.org>
-In-Reply-To: <20251117174740.3684604-3-kuniyu@google.com>
-References: <20251117174740.3684604-1-kuniyu@google.com>
-	<20251117174740.3684604-3-kuniyu@google.com>
+To: Gal Pressman <gal@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>, Donald Hunter
+ <donald.hunter@gmail.com>, Simon Horman <horms@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ <bpf@vger.kernel.org>, Nimrod Oren <noren@nvidia.com>
+Subject: Re: [PATCH net-next 1/3] tools: ynl: cli: Add --list-attrs option
+ to show operation attributes
+Message-ID: <20251117173503.3774c532@kernel.org>
+In-Reply-To: <20251116192845.1693119-2-gal@nvidia.com>
+References: <20251116192845.1693119-1-gal@nvidia.com>
+	<20251116192845.1693119-2-gal@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,33 +67,99 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 17 Nov 2025 17:47:11 +0000 Kuniyuki Iwashima wrote:
-> diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
-> index 439101b518ee..8f9850a71f54 100644
-> --- a/tools/testing/selftests/net/.gitignore
-> +++ b/tools/testing/selftests/net/.gitignore
-> @@ -45,6 +45,7 @@ skf_net_off
->  socket
->  so_incoming_cpu
->  so_netns_cookie
-> +so_peek_off
+On Sun, 16 Nov 2025 21:28:43 +0200 Gal Pressman wrote:
+> Add a --list-attrs option to the YNL CLI that displays information about
+> netlink operations, including request and reply attributes.
+> This eliminates the need to manually inspect YAML spec files to
+> determine the JSON structure required for operations, or understand the
+> structure of the reply.
+> 
+> Example usage:
+>   # ./cli.py --family netdev --list-attrs dev-get
+>   Operation: dev-get
+> 
+>   Do request attributes:
+>     - ifindex: u32
+>       netdev ifindex
+> 
+>   Do reply attributes:
+>     - ifindex: u32
+>       netdev ifindex
+>     - xdp-features: u64 (enum: xdp-act)
+>       Bitmask of enabled xdp-features.
+>     - xdp-zc-max-segs: u32
+>       max fragment count supported by ZC driver
+>     - xdp-rx-metadata-features: u64 (enum: xdp-rx-metadata)
+>       Bitmask of supported XDP receive metadata features. See Documentation/networking/xdp-rx-metadata.rst for more details.
+>     - xsk-features: u64 (enum: xsk-flags)
+>       Bitmask of enabled AF_XDP features.
+> 
+>   Dump reply attributes:
+>     - ifindex: u32
+>       netdev ifindex
+>     - xdp-features: u64 (enum: xdp-act)
+>       Bitmask of enabled xdp-features.
+>     - xdp-zc-max-segs: u32
+>       max fragment count supported by ZC driver
+>     - xdp-rx-metadata-features: u64 (enum: xdp-rx-metadata)
+>       Bitmask of supported XDP receive metadata features. See Documentation/networking/xdp-rx-metadata.rst for more details.
+>     - xsk-features: u64 (enum: xsk-flags)
+>       Bitmask of enabled AF_XDP features.
 
-NIPA is complaining that we're missing the binary name in gitignore.
-Probably not worth respinning for this but in the future let's start
-using af_unix/.gitignore rather than the parent's .gitignore?
+Could you try to detect that do and dump replies are identical 
+and combine them? They are the same more often than not so 
+I think it'd be nice to avoid printing the same info twice.
 
->  so_txtime
->  so_rcv_listener
->  stress_reuseport_listen
-> diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing/selftests/net/af_unix/Makefile
-> index de805cbbdf69..528d14c598bb 100644
-> --- a/tools/testing/selftests/net/af_unix/Makefile
-> +++ b/tools/testing/selftests/net/af_unix/Makefile
-> @@ -6,6 +6,7 @@ TEST_GEN_PROGS := \
->  	scm_inq \
->  	scm_pidfd \
->  	scm_rights \
-> +	so_peek_off \
->  	unix_connect \
->  # end of TEST_GEN_PROGS
+> Reviewed-by: Nimrod Oren <noren@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> ---
+>  tools/net/ynl/pyynl/cli.py | 55 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 55 insertions(+)
+> 
+> diff --git a/tools/net/ynl/pyynl/cli.py b/tools/net/ynl/pyynl/cli.py
+> index 8c192e900bd3..7ac3b4627f1b 100755
+> --- a/tools/net/ynl/pyynl/cli.py
+> +++ b/tools/net/ynl/pyynl/cli.py
+> @@ -7,6 +7,7 @@ import os
+>  import pathlib
+>  import pprint
+>  import sys
+> +import textwrap
+>  
+>  sys.path.append(pathlib.Path(__file__).resolve().parent.as_posix())
+>  from lib import YnlFamily, Netlink, NlError
+> @@ -70,6 +71,8 @@ def main():
+>      group.add_argument('--dump', dest='dump', metavar='DUMP-OPERATION', type=str)
+>      group.add_argument('--list-ops', action='store_true')
+>      group.add_argument('--list-msgs', action='store_true')
+> +    group.add_argument('--list-attrs', dest='list_attrs', metavar='OPERATION', type=str,
+> +                       help='List attributes for an operation')
+>  
+>      parser.add_argument('--duration', dest='duration', type=int,
+>                          help='when subscribed, watch for DURATION seconds')
+> @@ -128,6 +131,40 @@ def main():
+>      if args.ntf:
+>          ynl.ntf_subscribe(args.ntf)
+>  
+> +    def print_attr_list(attr_names, attr_set):
+
+It nesting functions inside main() a common pattern for Python?
+Having a function declared in the middle of another function,
+does not seem optimal to me, but for some reason Claude loves
+to do that.
+
+> +        """Print a list of attributes with their types and documentation."""
+> +        for attr_name in attr_names:
+> +            if attr_name in attr_set.attrs:
+> +                attr = attr_set.attrs[attr_name]
+> +                attr_info = f'  - {attr_name}: {attr.type}'
+> +                if 'enum' in attr.yaml:
+> +                    attr_info += f" (enum: {attr.yaml['enum']})"
+> +                if attr.yaml.get('doc'):
+> +                    doc_text = textwrap.indent(attr.yaml['doc'], '    ')
+> +                    attr_info += f"\n{doc_text}"
+> +                print(attr_info)
+> +            else:
+> +                print(f'  - {attr_name}')
+> +
 
