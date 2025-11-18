@@ -1,129 +1,129 @@
-Return-Path: <netdev+bounces-239385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72A34C679A5
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 06:43:48 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5565AC67A58
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 07:05:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 84F6129C3E
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 05:43:47 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BF5DB351977
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 06:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E9A2D640A;
-	Tue, 18 Nov 2025 05:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19CD82641CA;
+	Tue, 18 Nov 2025 06:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="XNPABXOQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W2GTRwhP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F65C2BD5B4;
-	Tue, 18 Nov 2025 05:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4454C98
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 06:03:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763444609; cv=none; b=I6gHj2eab5qYwdmHpzQamyTR1s88PCEMU8vIgTGkf2QY1MXTVHPcxE8eTivzz9zIvh3WYG7ttHF8DiCnKBW6laDDGu4I1s4Ld4055UC2OedwNDmUJghbMG+icd7wZs3kFmfCjlLpiP7Z/uEwTPvQgqsYoWFHkPzDjJFj5rA7X70=
+	t=1763445805; cv=none; b=ZReefn5o4PYO0tOShcPsRMiGKxYxkANaaNZY9OLZDxOWRH9IX1iw9jt2ZCCUYqAjPofUtoWsXBWxOycIDXgP6ds3+ckc6wHjdNW1ML4vBerXbrjqvmiab09q3fAdRuBDGjOA0vafc3veRrqnuv1qkKEwhA4lWzkWjs2kygID51A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763444609; c=relaxed/simple;
-	bh=gIavelo5vm1snqJlIZMMnz3SvaQtBBy3AuuY6f7eANc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AgWyjb5OxvJX7IwZ170KDTlavlu38iVMftAxJ7KP+H2DL+GlLfXsmXxGh2ClrC9OsvUXGoHAHUe+f0jKZlZIngCLGFHMgPYEQtyjUhzCA6qicpKATT/TJ3pw/LdgqYoWHLpED4Hf00q3oCsCtbB9CJ4pxE3ycMg1t/sTrnHi/v0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=XNPABXOQ; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AHNS02a4159140;
-	Mon, 17 Nov 2025 21:42:57 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=TdnGE+ISE6hJTJvQtA+FsQc
-	gGsuBOsi8qKi8AxWIp5Y=; b=XNPABXOQKjOytdqtjQQXmXtyquvWq7VP7PJAG9T
-	jvNfcs/ozaxcMlN7ueuNJ3nEGacNKMwKtsXoaa0hfTi3TyKNSLClxlZov0kae6Ug
-	KPp+uU3gfmExCIm1f7+CIjekCWxud2LmQ/uQzqi3f0sRS2p7TCXMak2geYa/4AY3
-	6JuiVKH3OVQBfU9bva8GU2MEJhAr+Ga3IlOzJJaxp9Qw840M5z2Q62gHNGHEF0ar
-	CB5fOi6atblKcAjC8i9Xp/68IjrSQlGoM/h9TzavaP1dUXm+VrnSsZI1YGhaB9oE
-	siD0BYuKENuDTRkypnFskryj1wDU//Ije8++EnoQobj2ETg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4agddc0r6k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Nov 2025 21:42:57 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 17 Nov 2025 21:43:08 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 17 Nov 2025 21:43:08 -0800
-Received: from hyd1vellox1.032marvell.com032caveonetworks.com (unknown [10.29.37.43])
-	by maili.marvell.com (Postfix) with ESMTP id 1480E3F70C8;
-	Mon, 17 Nov 2025 21:42:40 -0800 (PST)
-From: Anshumali Gaur <agaur@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Anshumali Gaur <agaur@marvell.com>, Sunil Goutham <sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
-        hariprasad <hkelam@marvell.com>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David
- S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: [net-next PATCH] octeontx2-af: Skip TM tree print for disabled SQs
-Date: Tue, 18 Nov 2025 11:12:34 +0530
-Message-ID: <20251118054235.1599714-1-agaur@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1763445805; c=relaxed/simple;
+	bh=92rPwNkA0wp1/CPkIGi3GfljIJFTaGsXO1IEOosvvgw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pTGP7UYgCKcAJatgFtnSgMezpaP/7Wesc5jTPAII0InVIrMm9hsBzeY1vFbzLkTpwGltTwlkSm5/YFM6NRpFR2VEBQDt2gqirFXuA6J9ukCBVLDFR7Y8Bd0qIqz+/a1yqWsQSXJDu6kPGjbDkkhDbtkzI2KWRoHxJHJxxytVNXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W2GTRwhP; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-29845b06dd2so58820745ad.2
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 22:03:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763445803; x=1764050603; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DmOTsXlYB7MqzlZh37ZZ/xq7r16Vb6eepjVqfs+L0Uk=;
+        b=W2GTRwhPAjNfIsQ7bWBroOabHGrkxCnq2ASOf1H0gmpPYAe1IhntD5ClP6Nhh96Moj
+         yEy6SFcUgHM2gjVHF3+omGX8RZbjw7Xa1vyx9Tqdw6isiFHzhkSO6aMFy9G3dvlO/h0e
+         eZu+CWHhvPBqbtJk+exS11j2cGzOJnRkElVJOiwH5KQnhbLu+FUHhIazbiJYOhTGphOG
+         4VPmUq3nIe5HztAIGLdohFsZDuDRDz4CUDHjqQ4VopRJ3Pc5WTMs+j2IxFD7T0s2tnAj
+         wEuq/zEDpbOH3A8qJrvFsvYhUeWWOnUcHHHAr1tD4jD0bBIgUcZDsF93cLO5GVg+CvMj
+         EYyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763445803; x=1764050603;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DmOTsXlYB7MqzlZh37ZZ/xq7r16Vb6eepjVqfs+L0Uk=;
+        b=kSxVsHsKcjnLmHWMSXJpBscf0jJfpvqCP06HPbaXQjPrebp1PaL1ba/+f6kTsEF9LT
+         rcR8eaPuogu4RR4pDe6IR4Z5wylEfB/FN0/c9RPRgc4bfSb2eAsn8K2cg0v4A2l7IlMk
+         ZioMng9yMme0b/gMvIsIPDgFpftSBLgF4bJQbEXTn/HGex4B8qlAXYBRSoYKumvPTsk3
+         PcPhWYAHdEl/e/wZJblP9N+rMARfA3LeQVehPYwP3C2JNaHH46vgBlvZCgtVpRLHaDbk
+         PcUdF9cX1BRgTUBzaJ0Rr9Yl+0kVWBKQz4OJctZa9au+ogNaD4lZZzXxhjQ4Xe4tXC+u
+         vL0Q==
+X-Gm-Message-State: AOJu0YwKZ0gaLKnGOLqCVapaHCKOcUXqlDZU91zxTxbMAHOEpQYx+X73
+	QzrC/G+Oo1tna/Ltwhmt8bgx9uWaQ2XLyV5Evniq0YRLx2QvdJ1o+Uiq
+X-Gm-Gg: ASbGncs+FbLh5LgqCHpH6oYfm026ZYrvv+shJKZ8Xnje+3WlB0NI5U2w32Jyp4C6VxD
+	0uQfOQL8vyM/X0QhpnMygRRTThiiNid9TC6UryWGSoZJjXdrmkMx5/qLmW65BvoaqxL2ZuL7soW
+	IP0QsPWnoA9irWIA4pJoW4wDtTViH7aRFJh8GznWX6jNIhX5dC6oMQaVnGWCb86LQFsgjf5qCYD
+	jRXlcTtjkKLkpKleqToyDFnz9epDWyl27X9rOM36FbGO9pt0/Pb3z196dA2RKPnHsPfPggZ4P7f
+	CwZRgCErkA06SLh/vEihyncS1LjE2GSCEzgvIpjm9x/hPJ9jgRZWR1CfU07b/hmcDrUjg31YhoJ
+	7dRikgftN6qLboq+kkzb3tyZjvhBO0YMVueYFU0iVE4NbWy+NLgn6v+qeUOXhzK8ZS+3xo2BQiJ
+	muRMZED96cl5LWP4+PKecHb5KVig==
+X-Google-Smtp-Source: AGHT+IGHUXnOuD9R0UxFil9hakpET24GotmTi34Iuyulno4NPRLkJHjKqG0ucMiG1w2XUeb6BblN1w==
+X-Received: by 2002:a17:903:120b:b0:295:613f:3d6a with SMTP id d9443c01a7336-2986a72ca49mr173170525ad.29.1763445802779;
+        Mon, 17 Nov 2025 22:03:22 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2b0d17sm160149605ad.72.2025.11.17.22.03.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 22:03:21 -0800 (PST)
+Date: Tue, 18 Nov 2025 06:03:17 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [TEST] bond_macvlan_ipvlan.sh flakiness
+Message-ID: <aRwMJWzy6f1OEUdy@fedora>
+References: <20251114082014.750edfad@kernel.org>
+ <aRrbvkW1_TnCNH-y@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE4MDA0MiBTYWx0ZWRfX8taIM19y7voy
- bT18C4VjbyTUw+UK1gtkFJuthbwiFiqne5D490dCrp9hBvqdjyjdIPOCiFWbNcxkjFTfUTW4XCp
- 6iO+SbRaPiHHVQkkB55R27xuEqHk1054HgTENPb6OlPomUhBbzntHLEGdep4xaQ6OL+kHIj0zbY
- u4JAXm5RqPSvH6GLPyp9Wj/52O3zMOd7r7lbvZdOf4xFdxTdkgIJByqPAY7HnqJV/gBCOzLDiwP
- 5Tdu7qoCnd6wCVGyvL708AXMKOzdye8fl8CAENVoy9JCwVoUN+GZROfMtAVRiJjy+wQNKtbJMOy
- LfdPYZdiHDVTBAvbJTy/qKYv1gDYHr2kduG/KEtnYdbzVds7ghv6Pi983YBIMSq++J9Ipo7jFVe
- wva+gJ8qRQbIPLsaXJCrhQ4h7WQjOg==
-X-Authority-Analysis: v=2.4 cv=WNVyn3sR c=1 sm=1 tr=0 ts=691c0761 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=VXwXFphZWUwt223JmCYA:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: 8d2AIAhUmDjQjBY93P-jE5Xy13fNkm-O
-X-Proofpoint-ORIG-GUID: 8d2AIAhUmDjQjBY93P-jE5Xy13fNkm-O
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-17_04,2025-11-13_02,2025-10-01_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aRrbvkW1_TnCNH-y@fedora>
 
-Currently, the TM tree is printing all SQ topology including those
-which are not enabled, this results in redundant output for SQs
-which are not active. This patch adds a check in print_tm_tree()
-to skip printing the TM tree hierarchy if the SQ is not enabled.
+On Mon, Nov 17, 2025 at 08:24:35AM +0000, Hangbin Liu wrote:
+> > If it's ipvlan that fails rather than macvlan there is a bunch of
+> > otherhost drops:
+> > 
+> > # 17: ipvlan0@if15: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+> > #     link/ether 00:0a:0b:0c:0d:01 brd ff:ff:ff:ff:ff:ff link-netns s-8BLcCn
+> > #     RX:  bytes packets errors dropped  missed   mcast           
+> > #            702      10      0       0       0       3 
+> > #     RX errors:  length    crc   frame    fifo overrun otherhost
+> > #                      0      0       0       0       0         4
+> 
+> Hmm, this one is suspicious. I can reproduce the ping fail on local.
+> But no "otherhost" issue. I will check the failure recently.
 
-Signed-off-by: Anshumali Gaur <agaur@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c | 3 +++
- 1 file changed, 3 insertions(+)
+This looks like a time-sensitive issue, with
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index 7370812ece2a..15d3cb0b9da6 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -1663,6 +1663,9 @@ static void print_tm_tree(struct seq_file *m,
- 	int blkaddr;
- 	u64 cfg;
- 
-+	if (!sq_ctx->ena)
-+		return;
-+
- 	blkaddr = nix_hw->blkaddr;
- 	schq = sq_ctx->smq;
- 
--- 
-2.25.1
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond_macvlan_ipvlan.sh b/tools/testing/selftests/drivers/net/bonding/bond_macvlan_ipvlan.sh
+index c4711272fe45..947c85ec2cbb 100755
+--- a/tools/testing/selftests/drivers/net/bonding/bond_macvlan_ipvlan.sh
++++ b/tools/testing/selftests/drivers/net/bonding/bond_macvlan_ipvlan.sh
+@@ -30,6 +30,7 @@ check_connection()
+        local message=${3}
+        RET=0
 
++       sleep 1
+        ip netns exec ${ns} ping ${target} -c 4 -i 0.1 &>/dev/null
+        check_err $? "ping failed"
+        log_test "${bond_mode}/${xvlan_type}_${xvlan_mode}: ${message}"
+
+I run the test 100 times (vng with 4 cpus) and not able to reproduce it anymore.
+That maybe why debug kernel works good.
+
+I need some time to figure out what configure affect the issue.
+
+Thanks
+Hangbin
 
