@@ -1,166 +1,119 @@
-Return-Path: <netdev+bounces-239471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8814CC689E3
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:45:17 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0AF0C68A3A
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:49:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 5A5502AA61
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:45:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 625AA4EE228
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:45:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD0432573B;
-	Tue, 18 Nov 2025 09:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7952526FDBF;
+	Tue, 18 Nov 2025 09:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HH8mv5Ae"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525D4325704
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 09:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB8C25D216;
+	Tue, 18 Nov 2025 09:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763459110; cv=none; b=V8Q+aYs2hWYkGGMddWmfBP5JO/wgtlgEelFkadmcda4fgaiDlSNcJZn7E+Tfxd05U5+CkS2uHjqUcALxvAAiFUCYvhQaEybOpVotp1F4XbkboGI+ZURwiXxrovxvUqZgcXsoSNAOX0jPytzo03kF/9TWAjZlVjefgG7tna0VEHw=
+	t=1763459153; cv=none; b=H6VWcE6cJbOLIjLAG31/SbDfNZZtHker6AvX7GzOFPMCceZzY5HF4VJKv/Ro9UyLkBsWSgIbi8j5GjwUhRXIaQ4WVPHwiQMlUJGoaga6ZZvvaH6ybh5xWKef3KZ8+BlPkif2Nj8CXBiR24hDCaHi8UAFUjV491WfMh+UPCU5mWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763459110; c=relaxed/simple;
-	bh=s1BMpFDktgmZz1QYM2zLBfUSrIIsdKv/b3E9kSp9X4E=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=MwH7rTbGNdo45smA7fqJyHPsmXOkOebYNjL5Bs4xxisKbs5mrXsI01AZChB2gJTTJdtfElqpdGWpMftLl58fzg6MrvtkolqJDJQ7soUd4GmKE2Efkal2gdCXFB3WQwoZ0x79E4ZvOikg34fM0Wc6PyA71OEEfzujYARs7I7tUhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7c75387bb27so870658a34.1
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 01:45:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763459107; x=1764063907;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wEqiAfhejULIq7AeszpWEVxYz/7fly7wkHF1NCGerrI=;
-        b=dYE4U8+ON6cGiiJ6c0V8ByJbH+UGsp2/TMmDSYmiWqg7uWw4FQ7aZy2SD6rygKFkaT
-         sEWEIgUiyVbc1d2u0pJr96mWGbwN0H3AWthjfhyNJpXRWJsk+HRbeh+x2vgmqIKh8pf1
-         FHrvGywxh+IqTFp5l954Tr+gWQnngps13u8LiYJqxrCLyjXVQdYVWHyd6EZmwTv/dsg1
-         oMl48jpPL2SwhcpnKgC6ZwnoZ1H08UmjS7Glzb5Het0WtxLiRLdJlNIXn2tvv7XBiS9/
-         QW01amv3KQzrLA93QpmzIcki6EYXZ1UbgijdBzR2+69VDXC7dwe8Fe19eoyDjb0jFJMV
-         uT/g==
-X-Gm-Message-State: AOJu0Yz/mxibyJdx7KO4g3Hoe43xHfAfh4EUAoewgOG6LBrdSU9Mt3DO
-	nBhlfmn/3QE6QtL4pqppRgJEyBJdfnCI+zrWdCSiH1nLueDf5lnNGhy201oPPR12
-X-Gm-Gg: ASbGncv0qTPZKlNSEnPXDn5LcPjdPk5QSL9oPz09zqQbMkjKr3PMYBo0ebxIouAKmqZ
-	doEKq6csfOzVqolDwsu0YfDS9Dl95dIK6LZJRnGLj+LiviDUScBmklM0/GkfeQjAjQdeoty9Qwp
-	i1XwM/M89C+D5QhRxiREYUrx9y7/KKr4aRsDJ9jG6uHoWrNgC3Jo1ata5V1v1c4KY+0jqo9Q7Hx
-	K8UjabzTwM+enyV3Lb01IC8d9JFq9ZVhNrF2s/dDwo9qzWvG1v9TWKdoCpzs/wpW38+/TLb7/Ej
-	dPx7Th7+MpK46hkrxfu5rY8LdtW/MOrnCmxw3s/oApSAMaMRv3NBmHHZW7DnmZWj6OCYn/0SyPU
-	cB2ZPBzxMLBcLMmgn39oXONIxDKEKaAYXxocvjCuHn1VO/vyLmVeSxP4zhWjw09V/92OPlNO5EL
-	SfQjY=
-X-Google-Smtp-Source: AGHT+IFcvyWv+gPFEikWeC+1OA77TExWgSa2A4nRhXG+RmBX/vB/apO4zRsF0+nH+vIw1Gtvys+kZA==
-X-Received: by 2002:a05:6830:40c4:b0:7ab:e111:1a57 with SMTP id 46e09a7af769-7c74455634emr9923987a34.31.1763459107359;
-        Tue, 18 Nov 2025 01:45:07 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:49::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c73a3be41csm6481914a34.29.2025.11.18.01.45.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 01:45:06 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Tue, 18 Nov 2025 01:44:56 -0800
-Subject: [PATCH net-next] net: vmxnet3: convert to use .get_rx_ring_count
+	s=arc-20240116; t=1763459153; c=relaxed/simple;
+	bh=ZnIb+vqSEb7lTYH4cwtyQNe5tMNyAgxBs1z9v9LIcEA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FhOxr+fqS+CFZ800S53l/E9q0uUQ9u8theXcpdcX6KirtzD7K2V9wAykea994LR3PQNznoM/iUcB9xjmEj7ayMklc/Z8Igw0p9A9YcSqGaclB32eAL37UbT/MNl1oC0IA4oBiYSm+leA56FTugehSrzcl3BJhH7XNChnIBzJTgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HH8mv5Ae; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2394EC19423;
+	Tue, 18 Nov 2025 09:45:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763459152;
+	bh=ZnIb+vqSEb7lTYH4cwtyQNe5tMNyAgxBs1z9v9LIcEA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HH8mv5Ae1sJ31byHFmgoo7ZVA8jAGJh+6T65S3oBFkfsWKU3xv9d0dnXzQRvtckJv
+	 F4JESZa2RZDzcYQLkftLyvQxDtP+6muYlnAoiUR9LzrCvrOfqJBizbrCqYOhlbMc0O
+	 ll8MGiw5coI7U/ZHMvY7BQ0vQVjPEGP4BBiLFx9jeoEInyBDLlp9g/d99zkRF0wjaD
+	 gl/cLYMorxLiuBoYXYtgFHG20TXgfuxpNwkETpJqQduAJr4mZHjLQX5N4chsfFfEv8
+	 3J4DhdkHJWSB8RCnkTRVMZTZxGc16Cqz59S6+uRdfjDZgjChWVq/JnynyyrKzyxcoV
+	 MbpuoSkwCzEAg==
+Date: Tue, 18 Nov 2025 09:45:45 +0000
+From: Simon Horman <horms@kernel.org>
+To: Dan Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+	pabeni@redhat.com, virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
+	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
+	andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v10 05/12] virtio_net: Query and set flow filter
+ caps
+Message-ID: <aRxASQDUgfhKo6ki@horms.kernel.org>
+References: <20251112193435.2096-2-danielj@nvidia.com>
+ <20251112193435.2096-6-danielj@nvidia.com>
+ <aRtYgplAuUnCxj2U@horms.kernel.org>
+ <0483aaba-0b93-41d7-bf09-5430b5520395@nvidia.com>
+ <aRuRGD-d7kImAKb3@horms.kernel.org>
+ <8b4325db-4237-46fb-aa54-bda65168f016@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251118-vmxnet3_grxrings-v1-1-ed8abddd2d52@debian.org>
-X-B4-Tracking: v=1; b=H4sIABdAHGkC/x3MUQrCMAwG4KuE/3kFs62ivYqIuC3WPBglLaMwd
- ndh3wG+DUVcpSDRBpdVi34NibgjzO+nZQm6IBH6Ux+Z+RLWTzOpwyN7c7VcQhyu08jTLOcxoiP
- 8XF7ajvIGkxpMWsV93/9dO4aZbAAAAA==
-X-Change-ID: 20251118-vmxnet3_grxrings-539b41bce645
-To: Ronak Doshi <ronak.doshi@broadcom.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-a6db3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2030; i=leitao@debian.org;
- h=from:subject:message-id; bh=s1BMpFDktgmZz1QYM2zLBfUSrIIsdKv/b3E9kSp9X4E=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpHEAii/7ZxLpQiVwyyuy8W3hVOYPT9WSAyDPAj
- KtdrLC9sASJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaRxAIgAKCRA1o5Of/Hh3
- bdw6D/sFSJ4HSLABOA1bA8MZ8HyvQ/OeF7Jy+DbEx9K9XkZOrHDU2G7K3U9TD2nth5bvx5QyYly
- d4T3TqDEhnrr4RNvN4PQz7i4mPDd+IxGNxsu7jcrL9P/Tc+s8vrwh5GMz3VAnAq15ZyGM9zD/Ww
- LKYhBltQliYjB2CUVWbPpjnHNqp0QeUyIvzncgjLjX9roAHy1IQGFAizqVy8rTI0PJMI64iBPcM
- Qts9c0pCP4cULTA/et1E5e3jgF7464PBf0P00Z4BcqNncY8Kw7xxmlS2EU5ldYzKI0jhcOhBZgk
- hLgqjIDd4z4aoeWjxpvzwkdiKDWXxAj5K51BkNjmJssGHoNejPbDDWQOk0ttmRzyOH5qattIHhv
- WjbYL6QkG85yXuWCPXFH9/+4Xmq7XedMZXvthyUeooAFsq70lAmyU/qdPjF9SDu0HvBlT6UMwuH
- KbK6LeTOrhyssEPJRY5g8Knv7etFlpsYYgg5jGRL77Maf+TwLIrORw/AlSTIyRGA3gyDaHbZoJF
- iA/5j1uavPm+EW8T+RYT+nta4UUOxIbi7toF4cL7IlbzMlcpBOnr18n1VJN5754mfk9ZIy3ehFw
- ett6EiiSpQTSCCmFjkLCj46m+KGGQKYXXpegHDBubwo80O6O1NgqbPFDqPuSZGCkVl1Q3aHAoIU
- 2n2aff3n4B9jcJQ==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b4325db-4237-46fb-aa54-bda65168f016@nvidia.com>
 
-Convert the vmxnet3 driver to use the new .get_rx_ring_count ethtool
-operation instead of implementing .get_rxnfc solely for handling
-ETHTOOL_GRXRINGS command. This simplifies the code by removing the
-switch statement and replacing it with a direct return of the queue
-count.
+On Mon, Nov 17, 2025 at 03:21:08PM -0600, Dan Jurgens wrote:
+> On 11/17/25 3:18 PM, Simon Horman wrote:
+> > On Mon, Nov 17, 2025 at 11:49:54AM -0600, Dan Jurgens wrote:
+> >> On 11/17/25 11:16 AM, Simon Horman wrote:
+> >>> On Wed, Nov 12, 2025 at 01:34:28PM -0600, Daniel Jurgens wrote:
+> > 
+> > ...
+> > 
+> >>>> +	for (i = 0; i < ff->ff_mask->count; i++) {
+> >>>> +		if (sel->length > MAX_SEL_LEN) {
+> >>>> +			err = -EINVAL;
+> >>>> +			goto err_ff_action;
+> >>>> +		}
+> >>>> +		real_ff_mask_size += sizeof(struct virtio_net_ff_selector) + sel->length;
+> >>>> +		sel = (void *)sel + sizeof(*sel) + sel->length;
+> >>>> +	}
+> >>>
+> >>> Hi Daniel,
+> >>>
+> >>> I'm not sure that the bounds checking in the loop above is adequate.
+> >>> For example, if ff->ff_mask->count is larger than expected.
+> >>> Or sel->length returns MAX_SEL_LEN each time then it seems
+> >>> than sel could overrun the space allocated for ff->ff_mask.
+> >>>
+> >>> Flagged by Claude Code with https://github.com/masoncl/review-prompts/
+> >>>
+> >>
+> >> I can also bound the loop by VIRTIO_NET_FF_MASK_TYPE_MAX. I'll also
+> >> address your comments about classifier and rules limits on patch 7 here,
+> >> by checking the rules and classifier limits are > 0.
+> > 
+> > Thanks.
+> > 
+> > I think that even if the loop is bounded there is still (a much smaller)
+> > scope for an overflow. This is because selectors isn't large enough for
+> > VIRTIO_NET_FF_MASK_TYPE_MAX entries if all of them have length ==
+> > MAX_SEL_LEN.
+> > 
+> >>
+> >> I'll wait to push a new version until I hear back from Michael about the
+> >> threading comment he made on the cover letter.
+> >>
+> 
+> I actually moved the if (real_ff_mask_size > ff_mask_size) check into
+> the loop, before updating the selector pointer.
 
-The new callback provides the same functionality in a more direct way,
-following the ongoing ethtool API modernization.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-Note: This was compile-tested only.
----
- drivers/net/vmxnet3/vmxnet3_ethtool.c | 18 +++---------------
- 1 file changed, 3 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/net/vmxnet3/vmxnet3_ethtool.c b/drivers/net/vmxnet3/vmxnet3_ethtool.c
-index cc4d7573839d..a14d0ad978e1 100644
---- a/drivers/net/vmxnet3/vmxnet3_ethtool.c
-+++ b/drivers/net/vmxnet3/vmxnet3_ethtool.c
-@@ -1081,23 +1081,11 @@ vmxnet3_set_rss_hash_opt(struct net_device *netdev,
- 	return 0;
- }
- 
--static int
--vmxnet3_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *info,
--		  u32 *rules)
-+static u32 vmxnet3_get_rx_ring_count(struct net_device *netdev)
- {
- 	struct vmxnet3_adapter *adapter = netdev_priv(netdev);
--	int err = 0;
--
--	switch (info->cmd) {
--	case ETHTOOL_GRXRINGS:
--		info->data = adapter->num_rx_queues;
--		break;
--	default:
--		err = -EOPNOTSUPP;
--		break;
--	}
- 
--	return err;
-+	return adapter->num_rx_queues;
- }
- 
- #ifdef VMXNET3_RSS
-@@ -1335,7 +1323,7 @@ static const struct ethtool_ops vmxnet3_ethtool_ops = {
- 	.get_ethtool_stats = vmxnet3_get_ethtool_stats,
- 	.get_ringparam     = vmxnet3_get_ringparam,
- 	.set_ringparam     = vmxnet3_set_ringparam,
--	.get_rxnfc         = vmxnet3_get_rxnfc,
-+	.get_rx_ring_count = vmxnet3_get_rx_ring_count,
- #ifdef VMXNET3_RSS
- 	.get_rxfh_indir_size = vmxnet3_get_rss_indir_size,
- 	.get_rxfh          = vmxnet3_get_rss,
-
----
-base-commit: c9dfb92de0738eb7fe6a591ad1642333793e8b6e
-change-id: 20251118-vmxnet3_grxrings-539b41bce645
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
-
+Sounds good, thanks.
 
