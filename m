@@ -1,111 +1,123 @@
-Return-Path: <netdev+bounces-239670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F23F6C6B3FF
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 19:37:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA5DC6B57A
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 20:05:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id A689129F4D
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 18:37:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DED534E074C
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 19:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2930D2C21C1;
-	Tue, 18 Nov 2025 18:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6DD2D73AB;
+	Tue, 18 Nov 2025 19:05:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NpETt1aw"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="mrTstzpA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic322-56.consmr.mail.ne1.yahoo.com (sonic322-56.consmr.mail.ne1.yahoo.com [66.163.189.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8192C2349;
-	Tue, 18 Nov 2025 18:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5EF927B4E1
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 19:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.189.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763491047; cv=none; b=MAc45CuhL6sNNdNPyH/MVLcxfAIQ3um/Yt7ddj3qLduPmAFh3rnCQgDhnrCDH08VrbeoWNa4w8+ZgBXOUmL7ALLQ498nO+xXdLuzy/V08bW0uqZUWNZ2kbyEtPsxNWYyHH5qJz/A2LIlzTGFuqYgd2cNz0+JrpqM1sEa/BN5ZCE=
+	t=1763492745; cv=none; b=igtZs4O8t0fKbbidhh2g7gT/eIYgWhU78LpW1SVlqJlcGTf0xxTtaLIlHtf+xgUk+sftlRhe+jH8y04esdQCbRvaHEV9vu4Bhn1k/hhfE0Yk9SJHsPBBI0q5a2nMjWRGm8hSgtMR7eLCDLuocPaYsArU1KZSFx00bzMk0gqCBlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763491047; c=relaxed/simple;
-	bh=iIYEMQjx/M1XUrR5hgrjP+2FqsUWRotw30++B0tJHME=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=AIK6h3yegxDZjUMKd9IwfbE4Ww5+EOLjM9PYIRVQGswLuBaEmkvn6OsXfR/2i8ztj3YSC2N3Z4nsDCpFfGriwA85+y4M8PLmNEFR9KSej96ZIat/UWU7lhCeahFBSJiL3h3zUF05ihbJs1j9cuvxj7u9MQABnisZ8clgC2TTqlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NpETt1aw; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763491045; x=1795027045;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=iIYEMQjx/M1XUrR5hgrjP+2FqsUWRotw30++B0tJHME=;
-  b=NpETt1aw5iFXwLlWhSCW8Kr6Fy2jmoqNzaTxMUP1NpOOAAeTZV5+KqhT
-   wtJf4KUQSvaojysytvWQVLXYlJkck/cIO28pEsq6f4yCJHQoEHfMwV8e7
-   /eFuUUosDBD3Mpy71r9d8CptkR9bLr85eYE5kMERTS5FBKbVu7IQ/B3jP
-   jRAddhTFCqxkXdCsVU6/CSpQIp+VEOUuerrjAL5d+LN7F7CtEFq/ai8Be
-   z2s5NGZxmQkF/719r0mC1Lj9+uoNJVqWXTXOROZcQSfqNsQg09lQwAALH
-   jtIzbZeeh037lsZTN/tjZycmsoWt77Yq04NRuAqNnGvkBF+W9LTwsbwGe
-   A==;
-X-CSE-ConnectionGUID: 1laKZg9HQlCYOcuNnIZIbQ==
-X-CSE-MsgGUID: AxDzOP6CSj60+B2SRyg1UA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11617"; a="90999881"
-X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
-   d="scan'208";a="90999881"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 10:37:24 -0800
-X-CSE-ConnectionGUID: 5jsUiwQYTZ+aZm1TcLT33A==
-X-CSE-MsgGUID: F02ZlehpSQKaQESX8lqbDg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
-   d="scan'208";a="190488586"
-Received: from dalessan-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.97])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 10:37:22 -0800
-Date: Tue, 18 Nov 2025 20:37:20 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH v1 0/7] ptp: ocp: A fix and refactoring
-Message-ID: <aRy84Cm8Wo84SIpo@ashevche-desk.local>
+	s=arc-20240116; t=1763492745; c=relaxed/simple;
+	bh=Am0w0O1oTsJ2baWsUCyBeBsShTL4A1mKbqTg6dcE8h0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=b42N/6uGEbc8fyiD7ig7KHxeQ1sHgRSt/GVUFgdZgHJNZ0PMxFNa2M7BNI4AEugeeZz0V9WaOO8D3pNMiNR23eijPeeNQHNj2aMLkAGySnonrqO8OuVOtMlJ5mxm9So8p13JOdgRPhcJ7dmATuPKPNKB1zqgo1BXKWaa/p/97C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=mrTstzpA; arc=none smtp.client-ip=66.163.189.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1763492737; bh=Am0w0O1oTsJ2baWsUCyBeBsShTL4A1mKbqTg6dcE8h0=; h=Date:From:To:Cc:In-Reply-To:References:Subject:From:Subject:Reply-To; b=mrTstzpActELPdisgN3sGZsN0MVBxGRUzPOoZljaCf09Kwvt+66WrTyLdFrIiEiHLHxTBF5v6VDjvKGqNvGxnKXBNaRvgtDJARcVBTJEldEvaIXsaAPRWxEpsVEr4CgchGN+/vhxu52HeVcFKQm0sBnn40icab/tXYcfOGtywuW+wyGbcxBfmS9DKX8nRfdoFsk0KXjkfagXf+V81Ou2ZIgx44ZHocZbL+/47hWTlwNt9bocBov/8sSug/wgH5hoXjVsswSu8dhJ2vhnlgojFBBR4s8BWDrHCIJflDNqWJHr8HhabNhEPB8Vcvrp8R175wHGWIj90cxdetvtVAZh8Q==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1763492737; bh=GBwICHr35mgQfakXpWJ7uDCO6Y2ed+Mp00WNJvgsMCC=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=jBwPhg40G4RudwznVXhDAPbNKz5wGdWa11TmV7zIKxzV1WoCtipjjfus84IOxQJOpj8RGY/iUJb2Y2whblLVHTadKBOzhp2EZiwfBKbJji3NQjpPV48iTa9Ti8d22sAMKujFTB7modJZUsrDpML8aYPM8TgJP5t7ZIOfqU32Tx73AXtfl4VNEa1ccQ4ITCXmChounCykc7WHd9Qfe8Fylb17Fe1exhobHCPdyvBmv/QNeVnXAfq2HvcljqFzkaqqKmDWue+Ol3ahoLgdpc6psCSr/rjeKRqH58xOiEffozVQWhNnJ7feaDdaiBx4uSzA981E5Rd0wEa9qfUJj66SiA==
+X-YMail-OSG: UW1DNcgVM1leZSAd99BqObY.9bhOdZbhYJs5OGbKkl0daNUIY7pTMayzjkuJxnL
+ iMvDaWrfza94fesuEd583QyMpHLf9JR77G5pFJHQr4MVJaY..8dL.xzbAm2HLJGSwtIw.m4WfpZw
+ PqgymtJXa9NH5WpJ2zpOIb8MlJbDQRVOxLCkhPJjhF1jWKqiA2QFeCpOU0hW3v1lo5CQUvb9YTSD
+ kKF7Rj5qGXzUmJsK3Cii4YphsbCjfm0D4MfEHHmvhiX8mDNPSgsRdJCzXL5CDUBnO27Hxn.icVz8
+ XzPJ_UMQI2Oc1N6Vo6FMrrIn9cOOYX.TCZyXpUPRupFO0hPER82EY.l61klR5FqQ_V4OHXpXviI1
+ tE4wCiLHEcfOgaTNebgaIPIeIJRvsmkvw.JFgw62Ok8VINT7.ZeKG_2ccavTu1.TEjwipya5BWOI
+ FBnuegX_a_ZX1e3BPMp1wDNwX.DujJYtsAiwasqjjzBhYiUbXKBZtoxgO5R53hq3fDaOlgVqJg1B
+ HSvRuR_zyfUBRb4p0smd2PhrRKnZ4Qn222hZ9vcYzHgZnHke_zh_nrzu_tXxZ5LY58sc48fJ0fBj
+ FWXFdQfnur.UPEqPB_LUjnMM4UITjKD_fylpjPmja0XaJqyFNjABPuU7S.1b0xX4asDI1.GPKY.0
+ HJL2lgVfhThOJb0ppNtI7uKAHvC2BsdcpNeWzhRuYrdEnX1GlFTaiXv4E8a9d78imcylQCca0EoO
+ dAATWHM.9bj8As67FkXQyL8nnppwAemEdyBHs4P9.DOV5rc2PU8bniphHiFRxV.58kxlS3Hd7NeC
+ ysgmB.yYl9oM__qJG9yfxpUzZiR4c.x6BJRxjTATnT21yYHQphYmWxHUtL.lgn3p95NpI37Xnt0l
+ P41AiYnY5Hbj87QhLYJLNbaCnQfIfCF6JisbbhHLMVxtTrv5lHtfArwJT.TbqQDqJ5LbF5YRjEDG
+ ABO2_Wj_ZMcRA25Dx1NyC9R7ber_o1dOLqahRPTOQsqqXeWIyv9q7Rz2kY2yeOEAu8ZWCzz6O4RT
+ RkS12X9s_vy9s4PcEIqR9b8HbseiXtjCj6cGp7NnVX0XGUX_kXRcsHvxq0LvbPX8rwduY4te.xBh
+ Hvw6NIFRqT0GVLyMNh_noxGbyp3FauSM_QZKz90kd6lSGKyxXEVvMaFK6o4YurmGzY5iPnyKfLMM
+ WixY2rwqKlN3HOt0EFo1g6hfcthBW1usSL6crwivIDAt1Zp9q3l73axCo5Bu5intN8.rKUU97r_V
+ EtElzZ8PGrqlLQi5ehHU1QkyG5qiWwIn4KK_pYQo2q51V4kbRJjrMESlConiRT.ECJrH9.ri7bOC
+ jC3.rQvLTe05lNEvXt2Xvlt62igm4npJxFpXQcwZ5qQQts9ybkyEgcaQFRYrsjoNglVTWBE0YbJM
+ C8c7jWHwi8sAapdOdgKaIX6vAIqdChstsWz1fIQFxBBfn0pEMyTu3GaIyYlt8MoTgwylvikK9qYf
+ VBrfa86daccAicqDm09gAs2QawI9OhLqleIWtJ64AWJkNUavreOJmC45Y0s58_9trwFe5luCxBzX
+ va_JQdeWWS1YMZWySeKGVwPRhCH0yehiry6nsJBQ_bJ0BGJ_EPdswyAsWHtPBtH633QEDM_aDwYB
+ vSmgTL.5K1Ce8qcgl2MW_hNbPYlKX2s1Gk5PmsmdXGIhuxX9.lsKjdovt0NrqDKTRwaG4KU3Hztg
+ 4hI2LSjiNV.CS6IppVnAvTYyPYfN5FUVGzz1fto..n7QhMgcnntodNAWuTbAolL.nYLsdZ9F7mcb
+ ThQUlUHSCGQE3efrvmLdMEMtZPuTwMRQdq4DxejUt91PE4UpqViA3MpMiwVj42T5kBIt0qiYIoEq
+ Cuk701WOAcOPYDYSP0lii4Ssj5NVQEHmzgGpC1TST0DzSM_4N5sUAzIUkpBBY_QuS6md4mNoecf_
+ u0UbVVWXsBAZ4QrOXKkiSgXkdLoFD25RVmL6hP10Tr2BFC876jhqxnfd8UAfBFXCV2mazL4xo.D2
+ eBHmGwZfL2fF.dRni32f71fJOxd2GPGSwsdSCvR4vpNgqJrrQJltRolP3SfySdVFIPGVyQbdl9H1
+ myey7RTStSo4UE.Gfc8d35jy30qGawXztuxKYAUtAazZS4xMytcfj1IkS1srMS9cy_pcJKGhyox.
+ Sdu0iS6a7K0rtiOzATkLFY4BAa7dDLqZNIa0ik_A_zJemC1S0V.GfMzKe4JMaAfPrCvpHaWLZ2fO
+ vR.MvDMossrSPJ35tsPKIAwk96ow_TF1asfkb2jR5.4_P7_Z79Ro-
+X-Sonic-MF: <namiltd@yahoo.com>
+X-Sonic-ID: 5079ac9d-e548-4166-af4f-1af55b70a763
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic322.consmr.mail.ne1.yahoo.com with HTTP; Tue, 18 Nov 2025 19:05:37 +0000
+Date: Tue, 18 Nov 2025 18:45:19 +0000 (UTC)
+From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Netdev <netdev@vger.kernel.org>, 
+	"inus.walleij@linaro.org" <inus.walleij@linaro.org>, 
+	"edumazet@google.com" <edumazet@google.com>, 
+	"alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>, 
+	"olteanv@gmail.com" <olteanv@gmail.com>, 
+	"kuba@kernel.org" <kuba@kernel.org>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>
+Message-ID: <527355522.9591320.1763491519924@mail.yahoo.com>
+In-Reply-To: <a31ffe45-5457-42a2-aac5-2f2da9368408@lunn.ch>
+References: <878777925.105015.1763423928520.ref@mail.yahoo.com> <878777925.105015.1763423928520@mail.yahoo.com> <a31ffe45-5457-42a2-aac5-2f2da9368408@lunn.ch>
+Subject: Re: [PATCH] net: dsa: realtek: rtl8365mb: Do not subtract
+ ifOutDiscards from rx_packets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: WebService/1.1.24652 YMailNorrin
 
-On Wed, Nov 12, 2025 at 03:27:14PM +0000, Vadim Fedorenko wrote:
-> On 11/11/2025 16:52, Andy Shevchenko wrote:
-> 
-> >    ptp: ocp: Sort headers alphabetically
-> >    ptp: ocp: don't use "proxy" headers
-> I don't see benefits of these 2 patches, what's the reason?
-
-I may give these reasons:
-
-1. Makes clear what headers are in use (avoids dups and improves long-term
-maintenance experience).
-
-2. Makes sure we don't "include everything". This might (slightly) improve
-the module build time, but also shows that we use what we use.
-
-There are patches in the history of the Linux kernel for both scenarios
-in C files (yes, for the h files such a change is much more important).
-
-...
-
-TBH, the driver is written in a bad style, it has so-o-o many issues,
-I even don't know where to start... Oh, wait.
-
--- 
-With Best Regards,
-Andy Shevchenko
+I can't pinpoint the commit that caused this error. The file's history on G=
+itHub starts on October 18, 2021, and this error is already occurring.
 
 
+W wtorek, 18 listopada 2025 17:55:26 CET, Andrew Lunn <andrew@lunn.ch> napi=
+sa=C5=82(-a):=20
+
+On Mon, Nov 17, 2025 at 11:58:48PM +0000, Mieczyslaw Nalewaj wrote:
+> rx_packets should report the number of frames successfully received:
+> unicast + multicast + broadcast. Subtracting ifOutDiscards (a TX
+> counter) is incorrect and can undercount RX packets. RX drops are
+> already reported via rx_dropped (e.g. etherStatsDropEvents), so
+> there is no need to adjust rx_packets.
+>=20
+> This patch removes the subtraction of ifOutDiscards from rx_packets
+> in rtl8365mb_stats_update().
+
+It does look like a cut/paste error of some sort.
+
+Please could you figure out a Fixes: tag, and submit this to net.
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+=C2=A0 =C2=A0 Andrew
+
+---
+pw-bot: cr
 
