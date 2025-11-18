@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-239394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 229BDC67D7E
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 08:10:52 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94DD9C67D66
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 08:10:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A6EBA4F1441
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 07:07:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5B34D354616
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 07:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88E92FB966;
-	Tue, 18 Nov 2025 07:07:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B392FB97D;
+	Tue, 18 Nov 2025 07:07:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3xDL1SL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c5lGP3Td"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C822FB0B1
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 07:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75AD2F531A
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 07:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763449631; cv=none; b=jQ9Mt7kxBts9K5qFSSDImtvwHfzYfp5dHv4cZ3MCYjDZjJenRp+4RzkQL/XmrW+WU7uw0tenF373LnRt2ESmAn8noffYItpwsaF2/SsdYVXbUUvAeFC0B/zhMCI517WW0eNUtpL18DaOLBYXi8URUmvt2zc5ykvBzIkcao0nZ98=
+	t=1763449634; cv=none; b=Z7XmwKytT6jaYdY/g8VkcSII9ANwNoTOPM5LY9DCd4Hjgyu+JNW0vi7TrzhVDnxE2GDPGl0E2iW5DvdMaeHVHC/JbQCRHiUgqgBXjVgoC6nStO4C+z0G1iLBRsDU1HgJskwb+xa982fVY7MGFckLWmCtlrqdPvG7w/sIp4K10iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763449631; c=relaxed/simple;
-	bh=6weB9aHe65jBlGKdtfiZgtwSJ8azAGKpP5WFxbjSTZA=;
+	s=arc-20240116; t=1763449634; c=relaxed/simple;
+	bh=3RED3YqVVZqWfs4npKZKtaBwJGrtnDirzNNEGnJpL7Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EkjpjDmYrCyZoRWc1CghzutSqDL0pSqobsaS8x60XdHPtQ+OdsnnsmDAzaV+rQCIXfYo2/CdGUctkC3ir2YPNvnjZwdH88WuhOgKJh+Hg7BkdcLDMSJpzUgXkv5wndtxiKFoKNPVHrnjcy1nCtqLaBJ/24raci5MiaBID5wCbcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G3xDL1SL; arc=none smtp.client-ip=209.85.216.50
+	 MIME-Version; b=Ik555bShIpf2XgbVswNdT77sqf3zoPGXJEZyhy7OLdzsdBoC3TKnPdBW+Cu8sozb7XkDwPki/O7A79kxM7iOY0NwMP3io0CtHd3Y6Xf201D09xFW/LfORDLgVgQwhZdOlnfvq+xK2gfIreLjxx7ZIIvtMgY1OJfJf5QqRaI4A6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c5lGP3Td; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-343ee44d89aso7415601a91.2
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 23:07:09 -0800 (PST)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3410c86070dso3887772a91.1
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 23:07:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763449629; x=1764054429; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763449632; x=1764054432; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E0LPZtU7RvgJepCeFQJuUiwu9eeUPZS9eny8TQyB8Io=;
-        b=G3xDL1SLPb4Ybxr7p7k8CYBU2byYadc7EYUnCXWDqEJd/QIDhHTyxLuideS/nIURRw
-         qA7KZquHvhJMAex+qtYLjbKiYvTLaWDDto/4Kiaz8IQpAy/9TksFBusRnInk69X7KCMf
-         WWv9lfAkwO/bAmoky3vdmdWXfS4SwqfLtT9B/kq3EjzhZWCN1zvLbeZg3nZA0Q5nNOFf
-         M7KyW660rPw77h42FxruvzPvkA5rI8kmOLW0HprQGuG+fI7jZmOn1/B1UQHWsjh1kIzM
-         WhKyLi3bh/3NLpm8IKN9lknDjnVExkT26vZCkgxyUy3vKdPCSN0R1Z+hGZXG+0K5LWL+
-         w/Lg==
+        bh=Cox+QGAKOZb0FZ+q6lv8UkSqGpKkoFZtrVzvrKo4ouQ=;
+        b=c5lGP3TdXVH4Q5uoi8TZreYVNjMBniSbaKJYzlqQ2kyoGlQhitO4Jbda2LmXMxk5qV
+         /y4ZKOhhnurSxGKvDXUN3OGr4h6HS/3eB16YI82zAuq58MuW5Ddr9UbZqTJoKUAlKN+p
+         dDK6quGQ/kvr7ha2dzIXH9ziY7518vdmT4iwzxzaKa1yDJVn3YrGnUiqvk4es++2mRq3
+         i3wqWhyoc+Cr0GNeJwdTlcDOd+4shjTzF3xUkBcU2YY7UPJbLmdQOWuAk022TrJSb0A/
+         rgDMNIXXAMvxJU7A989Zgi7Pj0lHcWZ12kv79GryYMESdUKSUZErcy7YNwAPMfydes+b
+         Vxwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763449629; x=1764054429;
+        d=1e100.net; s=20230601; t=1763449632; x=1764054432;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=E0LPZtU7RvgJepCeFQJuUiwu9eeUPZS9eny8TQyB8Io=;
-        b=Topseo/y+Dp6coKmzBJExDD9AJGSZdWL7rWaYfwrqYeyTtsOPC1tICj/vBGJV1jIDA
-         9HJSFwMHaJTsQB4wMZ8VJLB1VpQAA7gGJLyCea9fgpIruhZxfQXLMH/EplDCfMczAvbU
-         fIIhZ77QR+V9eVWTwFL3KaXhsLlj28tlybAZiKfGJvjLU4RwQAwzb4g6dLPL8kHbjKZK
-         PXWuJnYdLP/Pkz03ckcb6CRNCIejtcPdKepbif5srqs5WMxp5+E9GDHSMIKEnG6D5wp2
-         OvaTcY8NZxvXghWx0DebaPckUnFdvXsxUcCs2ZBweMMM1k1BvVImriQLbsRhJGukzc9u
-         Rftw==
-X-Gm-Message-State: AOJu0YyX/HOM9DvV1NS3nf+lAXiZAuKsfHUPkOMyBcXHHELxf+Lo3rYZ
-	64Trxk1ee0Hir8hDOYSjdwrEYZgs41sQO4Dk49KfngqvK5kuTUhdbz0kzrbSAU0T
-X-Gm-Gg: ASbGncssBGwqM4WAt6A61Wlo2GQ0FGv/Bmv6v5tzSuy0GaDXXVdrZsmDtBp8kVU9mne
-	cov7/8HZh4c1qbvnduiSKBL9SXn6JMTfTHSdKfCGMMmAtkZtSeDFm8c9dPpHm+ihFnE7J/T6/ck
-	Ae48klMMUwAysNMWKc9rlYD0fJcaY9Vax3CmOJ7wldfvIp8yLeo+GTuZYO1AU/ltbGg3khM5rtw
-	ZMhi1eqFh7S9t7lpe7aubbV9x5wxz4xfN1eXc5ZZvNrNbC9R3LX+9Xa3HDAROFOqty2wZUA85S7
-	9sMLY0YHf7SBfAHpCnCLmhPAJJQywg5OhxtiXr0EFLA7/EQcsH2k17vkNGcLs9RsdKMoEwKJuT3
-	UsZty0t/JZNJX7y9MZmGqobTzH1p7s+povK2NdOQVedj/L8xibu1KkkioyXP1/d2Ei4rb9fyjCg
-	3bkYDtcaSHQlW+gH+mFXdIZJOSj4P7avJ4o/KQC6zvuPjFye+g3ugfzz+7Iw==
-X-Google-Smtp-Source: AGHT+IFjvrR9NWJ0ET76jkSe2dYBBOUrO0B1pgK6aHxa//cB2I4Ols4pyaslI1/Guedp8Ur2fKHmcQ==
-X-Received: by 2002:a17:90b:4c85:b0:343:66e2:5f9b with SMTP id 98e67ed59e1d1-343fa73b681mr18306503a91.24.1763449629357;
-        Mon, 17 Nov 2025 23:07:09 -0800 (PST)
+        bh=Cox+QGAKOZb0FZ+q6lv8UkSqGpKkoFZtrVzvrKo4ouQ=;
+        b=iZy2cPbH8BP190Pc5+tA9vxOSEB2X4ed1ON83L20Q1dKPd36Wqf5pbYt+CVg12vldf
+         iVv2sDAai7AA0dIIEPt73GvYX8gaSzPtBu4RUjlTfoxoBwFrVWSJRpQsGaqxItXqiUDv
+         Wm1EP3mnLOblrfV80n/8KzFKnUk9KToz4RwZXKjWir2xBqMdFNi4q4m7weGmdQkln3Ey
+         78VtgkmEES7ASqDeL3cfRHRr+rgfdsaBfGLqCTHOUyvpt3U9H6zlffOmWqJDeeOcxuog
+         dbOG+jcXY5DqZexDOr9mJdkU8jUV06CPEZTUjUlTdN3R9om3wmLEV0+YRfGJsP+CR0o8
+         /xfQ==
+X-Gm-Message-State: AOJu0YwnvUCvs8ZNWr1JxZ+Z5KN/OC6TR0Y/VAgfSeIqN+JGFmj1i+x+
+	7n5h+hoKcRc7BEDR4kV/uWwHnvJvbZfT6XMqj1TrqVrYrxlgYH3XlMGd
+X-Gm-Gg: ASbGncuvFUOTfzVsJQBrdwoR37RmD1yHoFvF+8YeJ3BWQJrv5aUTgO0ROz4DDwL6qb4
+	Co9yG4E8dHWEydY4OSBbbGx7AavDl/+inBTMkYIGNxGdm7uHQm4Ks0vOTXc4P/qdw2DLV7xNMhc
+	kaia0iUt3jS6X/1dcWRMi1vcr33t9dIt97xyfGCkaa2qm6v3/ipXJJ/3oqBIl4mHCU5WRAawLLo
+	tGk1nqM/mUqg23IlQAyNngvjHoT/stCq0o4KM6jSL6siW+mE6AB7z7IQEJqfOnGv2cllNrptQEE
+	kTkEPvzO9urqg9sXjaKy+51MLlr8JcBHbxd0o+7c6k/sgyh4fuH8z32tOFTpXZJdLs8ycis58Ln
+	5tqno+2LoWEYF1jtDKW+vEEnHfPPRHDx0EmaL1J1Y3CGT4VyK7QRDPORpPmTUSrlGpeRGj8dE95
+	VQ76x/ciXLlXIPenjnhMMe5lk4DDJ2+mSdDEd3S9MhO6MNrdY=
+X-Google-Smtp-Source: AGHT+IGhN6YS+jHampvyhEZt253P0eaNhUc1BOQA57xlR/xLHJdePDApMnfuel430mxolKjANOr7DQ==
+X-Received: by 2002:a17:90b:1a8a:b0:341:69e3:785a with SMTP id 98e67ed59e1d1-343f9fdf8efmr20032430a91.16.1763449632102;
+        Mon, 17 Nov 2025 23:07:12 -0800 (PST)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-345651183b2sm11868494a91.2.2025.11.17.23.07.07
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-345651183b2sm11868494a91.2.2025.11.17.23.07.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 23:07:08 -0800 (PST)
+        Mon, 17 Nov 2025 23:07:11 -0800 (PST)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -81,9 +81,9 @@ To: davem@davemloft.net,
 	horms@kernel.org
 Cc: netdev@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 3/4] net: use NAPI_SKB_CACHE_FREE to keep 32 as default to do bulk free
-Date: Tue, 18 Nov 2025 15:06:45 +0800
-Message-Id: <20251118070646.61344-4-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next 4/4] net: prefetch the next skb in napi_skb_cache_get()
+Date: Tue, 18 Nov 2025 15:06:46 +0800
+Message-Id: <20251118070646.61344-5-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20251118070646.61344-1-kerneljasonxing@gmail.com>
 References: <20251118070646.61344-1-kerneljasonxing@gmail.com>
@@ -97,65 +97,28 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-- Replace NAPI_SKB_CACHE_HALF with NAPI_SKB_CACHE_FREE
-- Only free 32 skbs in napi_skb_cache_put()
-
-Since the first patch adjusting NAPI_SKB_CACHE_SIZE to 128, the number
-of packets to be freed in the softirq was increased from 32 to 64.
-Considering a subsequent net_rx_action() calling napi_poll() a few
-times can easily consume the 64 available slots and we can afford
-keeping a higher value of sk_buffs in per-cpu storage, decrease
-NAPI_SKB_CACHE_FREE to 32 like before. So now the logic is 1) keeping
-96 skbs, 2) freeing 32 skbs at one time.
+After getting the current skb in napi_skb_cache_get(), the next skb in
+cache is highly likely to be used soon, so prefetch would be helpful.
 
 Suggested-by: Eric Dumazet <edumazet@google.com>
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- net/core/skbuff.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ net/core/skbuff.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index b6fe7ab85c4a..d81ac78c32ff 100644
+index d81ac78c32ff..5a1d123e7ef7 100644
 --- a/net/core/skbuff.c
 +++ b/net/core/skbuff.c
-@@ -225,7 +225,7 @@ static void skb_under_panic(struct sk_buff *skb, unsigned int sz, void *addr)
- 
- #define NAPI_SKB_CACHE_SIZE	128
- #define NAPI_SKB_CACHE_BULK	32
--#define NAPI_SKB_CACHE_HALF	(NAPI_SKB_CACHE_SIZE / 2)
-+#define NAPI_SKB_CACHE_FREE	32
- 
- struct napi_alloc_cache {
- 	local_lock_t bh_lock;
-@@ -1445,7 +1445,6 @@ void __consume_stateless_skb(struct sk_buff *skb)
- static void napi_skb_cache_put(struct sk_buff *skb)
- {
- 	struct napi_alloc_cache *nc = this_cpu_ptr(&napi_alloc_cache);
--	u32 i;
- 
- 	if (!kasan_mempool_poison_object(skb))
- 		return;
-@@ -1454,13 +1453,16 @@ static void napi_skb_cache_put(struct sk_buff *skb)
- 	nc->skb_cache[nc->skb_count++] = skb;
- 
- 	if (unlikely(nc->skb_count == NAPI_SKB_CACHE_SIZE)) {
--		for (i = NAPI_SKB_CACHE_HALF; i < NAPI_SKB_CACHE_SIZE; i++)
-+		u32 i, remaining = NAPI_SKB_CACHE_SIZE - NAPI_SKB_CACHE_FREE;
-+
-+		for (i = remaining; i < NAPI_SKB_CACHE_SIZE; i++)
- 			kasan_mempool_unpoison_object(nc->skb_cache[i],
- 						skbuff_cache_size);
- 
--		kmem_cache_free_bulk(net_hotdata.skbuff_cache, NAPI_SKB_CACHE_HALF,
--				     nc->skb_cache + NAPI_SKB_CACHE_HALF);
--		nc->skb_count = NAPI_SKB_CACHE_HALF;
-+		kmem_cache_free_bulk(net_hotdata.skbuff_cache,
-+				     NAPI_SKB_CACHE_FREE,
-+				     nc->skb_cache + remaining);
-+		nc->skb_count = remaining;
+@@ -299,6 +299,8 @@ static struct sk_buff *napi_skb_cache_get(bool alloc)
  	}
+ 
+ 	skb = nc->skb_cache[--nc->skb_count];
++	if (nc->skb_count)
++		prefetch(nc->skb_cache[nc->skb_count - 1]);
  	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- }
+ 	kasan_mempool_unpoison_object(skb, skbuff_cache_size);
+ 
 -- 
 2.41.3
 
