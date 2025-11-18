@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-239699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AD20C6B7D6
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 20:49:57 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36AECC6B845
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 21:03:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 7855129D51
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 19:49:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3FAA74EB39A
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 20:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C162DC780;
-	Tue, 18 Nov 2025 19:49:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7662BE7DD;
+	Tue, 18 Nov 2025 20:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kVjtr8J3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z1znWSqv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544752D77E2
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 19:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363A12E8B98
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 20:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763495390; cv=none; b=E7Z6rW5kdPzNS9SJojAoLT0aLkfTfx9GKIHn+g4l2PyF4+elv69NRmubynusB931l8vAK/lKNpd4MJVjpyc3u4cKoCJtYf2MB14I22LiVj1VqLhHQSWt1qgc76DwcEdXJUiX0TDbmjKALUeH1OPgSUp9IkwHQOY4JZHXyU9rp3g=
+	t=1763496144; cv=none; b=lz3F5rhLVFkfYdxmJc5Zi6cbiZJnfJMe9kPNeu2wE22zwgnTtspwzX65a1MEDjVJDD3kdJO2TjKc/RlZUfz64lTwZ/W5Erq57XwNbStTpA97Dv/iwOHgydiMlXfpveZLzotqM+Iygs+oxElNsZ0IE9acFGBjw5LUt6vBa4B9Brk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763495390; c=relaxed/simple;
-	bh=YXVbZ/G3o1cijroYiYeiYfEdMJm4koHra21dxqxfjfo=;
+	s=arc-20240116; t=1763496144; c=relaxed/simple;
+	bh=CKn6PKW2vuSE0Z5h+0ILh/4ECVDG71EHVEwN6mcRvNg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VwOgR/ah2C4yIdvpHKJYxRQldjcuZnmVF/+nW9tqKTCcV/TCA9gzhUEr+w3jlJseqOGnjIsH5xZZt8qcLcJNxcUoxyCYioe7GXKH+trHM7l18JUDvu/4JWUqxP8nqznSH/UQSQoYG1cKc+OhxPaSZIHMgy+J7NcLS8xa4osNvW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kVjtr8J3; arc=none smtp.client-ip=209.85.128.50
+	 In-Reply-To:Content-Type; b=U2S3eeRlsfFsIjzDFDsglsIp0bD/+ag3/gmo6ZDfukpDwBd1dvbZWqz/f5fNMDW1h9NPDxWHpqDh7cIGajlPF2YW6xggKVWRXjaOWnBeedcyNBBQq+JlUJwCCDkrm6RL/5iabJqI7ZW5TlmnGQOu9Uk5K5LHJ70HUlhBCZmfd6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z1znWSqv; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47778b23f64so40251315e9.0
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 11:49:49 -0800 (PST)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-42b3c965cc4so104786f8f.0
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 12:02:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763495388; x=1764100188; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763496140; x=1764100940; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=bAPnBDlR63cqO9sTYisaUI8jjHrzFG7MKIEFc9ORWmQ=;
-        b=kVjtr8J3JtvEkqhBTIRf8vso3zpGICQjvNTrJTepQzdrFynjRU9wgQlsY3weDJjzu7
-         AfOc9m9DFCTY4x337dOMFaZwUFJlt5wLeqrW0r0K6HN36u8X6SmPsp/tlPfLibEmafyY
-         IbujlHqF5o6cHasyH0QPv72ShKbfk27E7h0OPBNMBYuCPMt3qtRPktGdXCQ9KoA2s91x
-         X1uDi0uZApo1Lzmqw3NeqKNEXwwNFPYKHY500rS9zuGgnyuHaUsK7YnojTNlp4xf558n
-         WmDTgHT298dK0vR04o08CUAnZuNnNPHlEpWuVpnXYKlaISyqbNT5gec8tXal9vttt+KA
-         OMOQ==
+        bh=E9eTMEVkW1xNiE9PqQ5snGtAxfd66QMGM9GqQRGyhUc=;
+        b=Z1znWSqv3QN2UWIcaILUsbbFmbYOsC3nX83b5hsEgHGLge9BuPAr/NBkkem921YPkT
+         BywJoYRJa3LwAgNvRx93sv43O1pcCrGommZDMdjrYOSam/aP8LzV2peidqxgJUCzjRd8
+         MVhw/WT9H7AbMxlJojyrRpXNUbO6u7jhYd2AmUJx3If7Pml6qbxjqxNkZoFoxD5dvib+
+         DOgfk0lGTK+IDf9liEe9wykgfEQBWubU3Y95LkQegPbspLHsZCRP/BkmHrixC3dYIUqe
+         SbyFg5DxOsU8rCtkT6IMIlW3luprKFUjcFkq2QKYkElsuQzzg++foScltpyx0wnVe+Bp
+         Skrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763495388; x=1764100188;
+        d=1e100.net; s=20230601; t=1763496140; x=1764100940;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bAPnBDlR63cqO9sTYisaUI8jjHrzFG7MKIEFc9ORWmQ=;
-        b=gI/+dXKBH3MFLm7NY5d/K8yO59uRN8H/Cnahwb+cBRiRZXbIlrgM5DTWTMYoPVfiIh
-         gmzgGzGxv0PtLcxTezDp66/9zqNF7J4ZhrDyXalQzL4gOIKRaSnLozh2UP8y1+n/WZ21
-         y6cJiQEZ8x9CcxE8siQ0w2vrpgH/E91MWNJyYpCtkrLBAOs2v9fE3OabcyPv9YyzPhT1
-         0gNtlw9lPWpI8w3DeqBaYrqwaq8KAMXsOhbUEvn8iIvu8unWEgGUMsLZhDFfABJkgwmN
-         ocUB08HSAc0M2bldglsRj0SMOx3PXOMi6m7fS7DfwHobo9TliABWuqyApsuT8pU4NCQM
-         5GRw==
-X-Gm-Message-State: AOJu0YylCzkXTTROYvTp/yXqqlXeB3opAuK8QusSHnOl0lZRla5i151o
-	cBvizicuLoW2YjZtAHbfMDpKCTqPhq4UXgc+SefXF7lA05Ql0Ee71bJxJuOrkw==
-X-Gm-Gg: ASbGncvM8N+lCpEO9euOXaWV05IT/Dhln5+b3RMPLJ3Sw+l0DOZydkAeYTzQUSF1APg
-	lIyTrEVNJpY74ar17CD3hrofq6FikqGlK7CuWE/Nfu5oxi74jYHMbmPgNqUeQI793+er+D0cEO2
-	e4lSBI4wOOcjESLyQL7uQxZooPHvhn4/uJ4BFKzLp8ye7hw63HITGs081WH8CZY79hnkbu3gGlg
-	W7i1hMRkI4KdLtvOFuL7GAhLUr00UVB13dL5mOO+1LlFYSTyPVjvzcSYOK7elstXVZ9REZHGCO/
-	ZRYGjwGr+fo5G2OmymnvuBC+bi0a3bgh5KGUwjCL6OiWeHHubHcSgkdgerBNUR1IkR5+1Ld64gm
-	9uGxWkSmyoHS+9Obyh+XQmDwgpoJMyjVjOiHNRimpzBku/X3RB8iwOWMIJF9h2GJUm9P+XLUQYa
-	Om+B+Tiien/EM7UPfIjNO+cABhaCDYDCIb/lu7ftyQOUgNpvgMqusLX+dsvgNlbpcMzqK/XiVLj
-	oTaOkztvSJqSfEvWbKy3heG69KyCgBcfJvUurMgxDFdAGfABVJJ+bD/WEyRtQ==
-X-Google-Smtp-Source: AGHT+IEDPi2F8wic3ro4PplHeDssdUxjnPfGxlNEnFL0oouSXhp4b8emTYX8c6CAWwg+WX9vS3wmVA==
-X-Received: by 2002:a05:600c:4744:b0:46e:48fd:a1a9 with SMTP id 5b1f17b1804b1-4778fea8ab2mr179464195e9.33.1763495387365;
-        Tue, 18 Nov 2025 11:49:47 -0800 (PST)
+        bh=E9eTMEVkW1xNiE9PqQ5snGtAxfd66QMGM9GqQRGyhUc=;
+        b=Y4Ega98AN6qzDDAnwxfB0xd0YXbjheysdtl2nRblzJa2woToX9H7Dxpc8HvYRD8tME
+         aspFa8l4jSLB4LaQHB+wNzXEa0vbuUWN82Dq33p3Ktszl5lFHUabbo0xoxEBF/Vw5k3l
+         t7O6oRXHRlr91OtZKQEB6ajO8XIvr69oO7n7I5bKAfc1UhHya0n6cov/C96E3ospAj+v
+         IZk1NBovbe3LOPlrkfz++3dh6B7ztVidiOIAy6P71utw8gSXxUbBud3J9b/26v+ucP4h
+         AVUB6siEyn4fct9FenJBP9NOtSbfp81Aloi2EWL2hSidfQVgckUXHwcBuUTxr4aeJ6DZ
+         IieA==
+X-Forwarded-Encrypted: i=1; AJvYcCUFDDLI0WEI8sZosfu+HGSdLBiS6NnD9LNsZnjHb1ASeNw0nSmPLRkXwvgUv3qrrf5+BKLqnd0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQe9lW8QvArKl2FeRhsXQ4RgPwMaMPWw7GESx6jNAqCCVR8jpe
+	Tb+9uvbP5HdQrG9w8qoV8YdY8alSgFaxIBHcEwrBq/CTRl3+ksqZo9/T
+X-Gm-Gg: ASbGncuPmJ6io/er/bk5IuctcUBPCj7i27742uehcr6F/6x9z+OmdDZsjOteuEOuH/b
+	cyHrk1WZXlHq4o0HkhOUeULhFxhYk/jYBf8CXFcPcNzX1ZaGogFE2kbvimI5qExBX1Ihtyb38h+
+	SlWg8Ch0QKU1klHNyh9bNJv/Kgh7C8bgz5g/lOGSRqz3k2hSYYG3p8zWTlVOPVyqqGe/Ez7HoRq
+	Gea8+BTvi4FNHyn9qj/WFFSQ0UDgqgRo5k0KtSGd4H4sFHO8dN552LFLpsUZvg2esfVm9/68i2t
+	SXkjygm6y1t9zL/ZVNSlGLax557PxEqJSeQAi2GJFqk7Fw8B40GR8rCCa40EoZin44RILVl0LjH
+	t8L2V/PtI6qroxOOm31BU+jKhHT7dEQ7l2n3TWcEkuR+OYAifXCuDZe3EbI3BtMAyt8XI1kgKlD
+	HjhvsxmTmNZnppJpDGgzFnEIX+ijxWgrnYbMQs7Q/DmF1y9ihiZIhjLSp2oOCPP/rpYjDExqmyc
+	pfsFLSyXLf6Lplbje7KX97k8CC7uF1MRs9ecx5TdRQuV8N1W/VZCTI/Xn1b0Q==
+X-Google-Smtp-Source: AGHT+IFWNROA0fNsC2tzebVqd3TzfeuL5sV6EbCxaKS+MVRaVwCbyPFgBHZ6NVRfVSaxuj8FFFbS7Q==
+X-Received: by 2002:a5d:5f92:0:b0:429:d253:8619 with SMTP id ffacd0b85a97d-42cb1920a61mr142300f8f.5.1763496140340;
+        Tue, 18 Nov 2025 12:02:20 -0800 (PST)
 Received: from ?IPV6:2003:ea:8f37:1a00:5d3:6147:37fb:5feb? (p200300ea8f371a0005d3614737fb5feb.dip0.t-ipconnect.de. [2003:ea:8f37:1a00:5d3:6147:37fb:5feb])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b0ffc90fsm7723805e9.2.2025.11.18.11.49.46
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53dea1c9sm34070297f8f.0.2025.11.18.12.02.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Nov 2025 11:49:46 -0800 (PST)
-Message-ID: <3a8e5e57-6a64-4245-ab92-87cb748926b5@gmail.com>
-Date: Tue, 18 Nov 2025 20:49:49 +0100
+        Tue, 18 Nov 2025 12:02:19 -0800 (PST)
+Message-ID: <ff55848b-5543-4a8d-b8c2-88837db16c29@gmail.com>
+Date: Tue, 18 Nov 2025 21:02:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,51 +85,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Bug: Realtek 8127 disappears from PCI bus after shutdown
-To: Jason Lethbridge <lethbridgejason@gmail.com>, nic_swsd@realtek.com
-Cc: netdev@vger.kernel.org
-References: <6411b990f83316909a2b250bb3372596d7523ebb.camel@gmail.com>
+Subject: Re: [PATCH] r8169: add support for RTL8127ATF
+To: Andrew Lunn <andrew@lunn.ch>, Fabio Baltieri <fabio.baltieri@gmail.com>
+Cc: nic_swsd@realtek.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251117191657.4106-1-fabio.baltieri@gmail.com>
+ <c6beb0d4-f65e-4181-80e6-212b0a938a15@lunn.ch> <aRxTk9wuRiH-9X6l@google.com>
+ <89298d49-d85f-4dfd-954c-f8ca9b47f386@lunn.ch>
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <6411b990f83316909a2b250bb3372596d7523ebb.camel@gmail.com>
+In-Reply-To: <89298d49-d85f-4dfd-954c-f8ca9b47f386@lunn.ch>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 11/18/2025 6:07 PM, Jason Lethbridge wrote:
-> Hi all,
+On 11/18/2025 8:31 PM, Andrew Lunn wrote:
+>> I see, unfortunately all I have for this NIC is the out of tree Realtek
+>> driver and it does not seem to implement the API for reading the module
+>> EEPROM data, and there's no datasheet available, so I'm afraid that
+>> either the Realtek folks pick this up or it's not going to happen.
 > 
-> I’m reporting a reproducible issue with the r8169 driver on kernel
-> 6.17.8.
+> Heiner is of the opinion it is not going to happen.
 > 
-> I recently got a Minisform MS-S1 which has two RTL8127 NICs built in.
-> The r8169 driver works perfectly well with these on kernel 6.17.8 until
-> the device is powered off.
-> 
-> If the device has not been disconnected from wall power then the next
-> time it's turned on both NICs appear to stay powered down. There's no
-> LED illuminated on the NIC or the switch they're connected to nor are
-> they listed by lspci. The only way to recover the NICs from this state
-> is to disconnect the power then plug it back in.
-> 
-- How is it after a suspend-to-ram / resume cycle?
-- Does enabling Wake-on-LAN work around the issue?
-- Issue also occurs with r8127 vendor driver?
+Realtek seems to do all SFP handling in firmware, w/o providing info about
+to which extent this firmware can be controlled via chip registers.
 
-> - The bug occurs after graceful shutdown
-> - The bug occurs after holding the power button to force off
-> - The bug occurs even if `modprobe -r r8169` is run before shutdown
-> - The bug does NOT occur when Linux is rebooting the machine
-> - The bug does NOT occur when the r8169 module is blacklisted
-> - The bug is indifferent to either NIC being connected or not
-> - The bug is indifferent to CONFIG_R8169 being in-built or a module
-> - The bug is indifferent to CONFIG_R8169_LEDS being set on or off
-> 
-> Attachments include `dmesg`, `lspci -vvv`, and `/proc/config.gz` from
-> the system exhibiting the bug.
-> 
-> I'll be happy to try any patches if that helps.
-> 
-> Thanks
-> -Jason
+A contact in Realtek confirmed that only 1G and 10G speeds are supported.
+He wasn't sure whether copper SFP modules are supported, and will check
+internally.
+
+I'll try to strip down the patch as far as possible, likely supporting 10G
+only in the beginning (as 1G requires some more vendor magic to configure).
+I assume the typical user won't spend money on a 10G card to use it with a
+1G fiber module.
+Reducing complexity of the patch should make the decision easier to accept it.
+
+I don't have hw with RTL8127ATF, so I would give the patch to Fabio for testing.
+
+> 	Andrew
+
+Heiner
 
 
