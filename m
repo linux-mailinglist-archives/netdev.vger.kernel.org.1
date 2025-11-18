@@ -1,170 +1,124 @@
-Return-Path: <netdev+bounces-239649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D770C6AF0F
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 18:25:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8292C6AE98
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 18:21:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E7F334F89D6
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:18:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id EA3192CDB6
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D94A31ED6A;
-	Tue, 18 Nov 2025 17:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2420369237;
+	Tue, 18 Nov 2025 17:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oo3H7YWA"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="KI5buitu"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C141331ED69;
-	Tue, 18 Nov 2025 17:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C022369201;
+	Tue, 18 Nov 2025 17:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763486086; cv=none; b=UUgimhcvpGrvf8jF4oCAz/NkCfjdmIC0/L7isoeobjFTGz7/MuKII6eMp3hzswJfXgJFq49ValGIgBtLBgs+L0AhclVTpmSPUSwuXMypgAZV3+eDvMn3B5GGZppqjOKpepv+PMFFmyr5vHSZ/ivcAC5h3+aAA4F+SsdTc2ECD+g=
+	t=1763486212; cv=none; b=hnt4EueDCTRO6i8yDyZFWWPDhKXi4mS8Ic1ZFY91ddJeS6BeedJK7RowuyDYbOgWTTD+n41hDRcAylH5Y9ZcIAgx1odZ/G6gvPvVF2kN+92w+m5A9LkGHPByNKPFwC1+r6NINdaLiuDa9DNJtUIOOYT09TEhg9HNA019GYkryPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763486086; c=relaxed/simple;
-	bh=xfsD+LlKqTaJfHcxKw6CkYmBVdQSbkrAih+rqEc2mUc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n/qflhQ/riiUn0OScp3hAExqDjZg31VdQFHOazdVSnrj8UN9Hc/Go65lkUG9F26nwk2Xp8GhkjjhLmljAvyNFV9ApzPcLsh1szqiJva3pdneQQBWJ9Vogzfzktg3JkI+lTmOzJASh/7FXME374RLgbBE6s4Ka4CZtK/MR9KrZUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=oo3H7YWA; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ix3qrQo4JTxUkNTnS7E6e3XShNCoCiRudEoAtypBRpU=; b=oo3H7YWA+QMQ7erolFEZGTdwDM
-	3czWcf7ljYhymkaI7QbzlkQjYtD9nXQj/d/6sv8b0ZLU/FOGMFxgPOxAs4Uypl6K3T+1GEdQ6YuOl
-	npYlXMn2ZKTyKb8C4IAJvJgr7s6QRMrdlX7kZXFrmyd2jG7YRt1fJ8gq02FOEduEIPDgfEAgjzz4u
-	QxlxVc/KRGsIN5HGNBpzgo2iUAXqvwCu69IGzdZjC9iAUzGdq0VbRqA9ehqmDNFLwYUWpFs0oyldW
-	AlnXKjG4GNJHMX4xp9fXiZZ0zhVfcxGDVqdXXAV9mpoV8tJG0czgIcO6/UO9IYT4nZoHpzzIfbe5e
-	MEpV4xcw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54398)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vLPHY-000000003Vz-1zpn;
-	Tue, 18 Nov 2025 17:14:20 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vLPHS-000000002cb-0W9K;
-	Tue, 18 Nov 2025 17:14:14 +0000
-Date: Tue, 18 Nov 2025 17:14:13 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Inochi Amaoto <inochiama@gmail.com>,
-	Quentin Schulz <quentin.schulz@cherry.de>,
-	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
-	Rayagond Kokatanur <rayagond@vayavyalabs.com>,
-	Giuseppe CAVALLARO <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH net v2] net: stmmac: add clk_prepare_enable() error
- handling
-Message-ID: <aRypZZ88K8tnh9Ha@shell.armlinux.org.uk>
-References: <20251114142351.2189106-1-Pavel.Zhigulin@kaspersky.com>
- <4a3a8ba2-2535-461d-a0a5-e29873f538a4@redhat.com>
+	s=arc-20240116; t=1763486212; c=relaxed/simple;
+	bh=HhJcusgK4gBGdJeJoNSwYRT1qkaAQlNrgbmsRu5oSFs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q4zwj1zubW7hOiAqBY/H8JRB3vqpXLsSzV0hCXiYor8rg+V21Q3xHy9TMNwrbflxzIjJsbT2p9JDbYMZQSZhuqgCkmNK27lxAaak9eR8YZH9cysKTOB8p4n/IDBCQ9TvW3t7pAf3L9ToNVbhdKxZyEl4Q4jnawNXntd/RvM6UFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=KI5buitu; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1763486205;
+	bh=HhJcusgK4gBGdJeJoNSwYRT1qkaAQlNrgbmsRu5oSFs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=KI5buituNFxmPC1Ezzluw4+/nkc/uuapbnCZVH3CP3sYH0GDSpuiUUDDagz1lr3s3
+	 4tA7yx2+KtPXaVRtJmup/psjBjRI3wlAFp11m+dldHlfJYLpU9YQVSTDWZruJEuLQ+
+	 AcWrSI7+tb3VRte7/WSuJ01dC5EQGbc7M3Byzdmpq5Ejz1IxSpNPhPQvxyPhh+sCH5
+	 CP8HphNNflhH62kP7i7jd+8JhiyPgBEsgUqD22/wA6owtOHUgHaIvcZnp9ggdylxXE
+	 h9KLd3LeaCs3cyRaCsry3miMNMaGIlqUnWb0qtJdDu/+ethufv+uesjBCkQMLr6ycH
+	 v2wEOP6kBs8zw==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id BD11A600FC;
+	Tue, 18 Nov 2025 17:16:44 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 591372017A4;
+	Tue, 18 Nov 2025 17:16:12 +0000 (UTC)
+Message-ID: <29155dac-97c4-4213-8db5-194d9109050e@fiberby.net>
+Date: Tue, 18 Nov 2025 17:16:12 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4a3a8ba2-2535-461d-a0a5-e29873f538a4@redhat.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 08/11] tools: ynl: add sample for wireguard
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Jordan Rife <jordan@jrife.io>
+References: <20251105183223.89913-1-ast@fiberby.net>
+ <20251105183223.89913-9-ast@fiberby.net> <aRyO2mvToYf4yuwY@zx2c4.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <aRyO2mvToYf4yuwY@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 18, 2025 at 03:30:09PM +0100, Paolo Abeni wrote:
-> On 11/14/25 3:23 PM, Pavel Zhigulin wrote:
-> > The driver previously ignored the return value of 'clk_prepare_enable()'
-> > for both the CSR clock and the PCLK in 'stmmac_probe_config_dt()' function.
-> > 
-> > Add 'clk_prepare_enable()' return value checks.
-> > 
-> > Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> > 
-> > Fixes: bfab27a146ed ("stmmac: add the experimental PCI support")
-> > Signed-off-by: Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>
-> > ---
-> > v2: Fix 'ret' value initialization after build bot notification.
-> > v1: https://lore.kernel.org/all/20251113134009.79440-1-Pavel.Zhigulin@kaspersky.com/
-> > 
-> >  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 11 +++++++++--
-> >  1 file changed, 9 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > index 27bcaae07a7f..8f9eb9683d2b 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > @@ -632,7 +632,9 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
-> >  			dev_warn(&pdev->dev, "Cannot get CSR clock\n");
-> >  			plat->stmmac_clk = NULL;
-> >  		}
-> > -		clk_prepare_enable(plat->stmmac_clk);
-> > +		rc = clk_prepare_enable(plat->stmmac_clk);
-> > +		if (rc < 0)
-> > +			dev_warn(&pdev->dev, "Cannot enable CSR clock: %d\n", rc);
-> >  	}
-> > 
-> >  	plat->pclk = devm_clk_get_optional(&pdev->dev, "pclk");
-> > @@ -640,7 +642,12 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
-> >  		ret = plat->pclk;
-> >  		goto error_pclk_get;
-> >  	}
-> > -	clk_prepare_enable(plat->pclk);
-> > +	rc = clk_prepare_enable(plat->pclk);
-> > +	if (rc < 0) {
-> > +		ret = ERR_PTR(rc);
-> > +		dev_err(&pdev->dev, "Cannot enable pclk: %d\n", rc);
-> > +		goto error_pclk_get;
-> > +	}
+On 11/18/25 3:20 PM, Jason A. Donenfeld wrote:
+> On Wed, Nov 05, 2025 at 06:32:17PM +0000, Asbjørn Sloth Tønnesen wrote:
+>> +CFLAGS_wireguard:=$(call get_hdr_inc,_LINUX_WIREGUARD_H,wireguard.h) \
+>> +	-D _WG_UAPI_WIREGUARD_H # alternate pre-YNL guard
 > 
-> It looks like the driver is supposed to handle the
-> IS_ERR_OR_NULL(plat->pclk) condition. This check could cause regression
-> on existing setup currently failing to initialize the (optional) clock
-> and still being functional.
-> 
-> I *think* we are better off without the added checks.
+> I don't totally grok what's going on here. As I understand it, this
+> makefile creates `wireguard-user.h` in the generated/ include path,
+> which has all the various netlink wrapper declarations. And then this
+> also references, somehow, include/uapi/linux/wireguard.h, for the constants.
+> For some reason, you're then defining _WG_UAPI_WIREGUARD_H here, so that
+> wireguard.h from /usr/include doesn't clash. But also, why would it?
+> Isn't this just a matter of placing $(src)/include/uapi earlier in the
+> include file path?
 
-Note that the clk API permits NULL as valid. CCF checks for this
-in clk_prepare() and avoids returning an error:
+The aim is to use the generated in-tree header, while avoiding making a
+copy, and avoiding the system header.
 
-        if (!clk)
-                return 0;
+As an example then in tools/net/ynl/generated/Makefile:
 
-Same check in clk_enable(). So if plat->pclk is NULL, then no error
-will be returned.
+%-user.o: %-user.c %-user.h
+         @echo -e "\tCC $@"
+         @$(COMPILE.c) $(CFLAGS_$*) -o $@ $<
 
-Places that set plat->pclk:
+Where for the "wireguard-user.o" target, then "$(CFLAGS_$*)" expands to
+"$CFLAGS_wireguard".
 
-stmmac_probe_config_dt() - checks for error-pointers and fails. This
-will cause driver probe failure.
+CFLAGS_wireguard has two parts the normal one similar to the other families,
+and a transitional extra guard.
 
-dwc_qos_probe() - uses stmmac_pltfr_find_clk() which returns the
-clk from the bulk-get or NULL. These clocks will have been obtained
-using devm_clk_bulk_get_all_enabled(), which I think will return an
-error if any fail, which fails the driver probe.
+The header guard in the old UAPI header is "_WG_UAPI_WIREGUARD_H".
+The header guard in the new UAPI header in-tree is "_UAPI_LINUX_WIREGUARD_H".
+The header guard in the new UAPI header in-system is "_LINUX_WIREGUARD_H".
 
-So, I don't think plat->pclk can be an error-pointer here.
+Linux uapi headers are installed using scripts/headers_install.sh, which
+transforms the headers slightly, one of these transformations is to alter
+the header guard, stripping the _UAPI in the beginning of the guard.
 
-Therefore, I don't think there's any concern with error pointers
-or NULL in plat->pclk.
+So "get_hdr_inc=-D$(1) -include $(UAPI_PATH)/linux/$(2)" does:
+1) Defines the in-system guard
+2) Includes the in-tree header
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+The purpose of defining the in-system guard is disable the include in
+the code, as it's header guard is already defined.
+
+I added the extra transitional define of the old UAPI guard, so that
+it also works on systems with the old header installed in /usr.
+This extra line can be removed in a few releases, when we don't care
+about compiling these tools on a system with the old header installed.
 
