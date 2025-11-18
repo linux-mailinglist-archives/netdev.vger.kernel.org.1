@@ -1,128 +1,99 @@
-Return-Path: <netdev+bounces-239702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9DCCC6B9E4
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 21:29:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A70FC6B9F3
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 21:30:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2B0D34F6281
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 20:25:20 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3697C382D78
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 20:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 804443702F7;
-	Tue, 18 Nov 2025 20:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7509333C1AF;
+	Tue, 18 Nov 2025 20:24:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SODY/Dwp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NbiDW1IC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA483702EE
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 20:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E100A2F617B;
+	Tue, 18 Nov 2025 20:24:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763497225; cv=none; b=XjA9ZNtkKDW2xNBYLBZEMA5oaBlrA7xqeX6hECwWhqAKZS8VSY+/FCi3FK1q1eDN4+0K0DJvBWx2WFwQ5cNYey0bxW32nSSiQhn/YMR569uacWoMHC/xUrMncbywPqcVlUSbxkTOrGDw9aIuuf+Qq/OnnfRGTXwlZ/TUcd762AE=
+	t=1763497475; cv=none; b=bFvz8F/lo7d2wnOl5V/sQfBpHYBfG4cQ3BX1kxDAFKS2LsjJofoZlWFTR3qZUOXgoOz38WiBJoc4UK40nMPGHRJfakXy8Rfk11OMKqTPVjz7ZoTKdcUMmniXVnyy++v938Ly67+XYdGxHcUtDcOZ77Q3Ta9s4+XikyU1szJZZJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763497225; c=relaxed/simple;
-	bh=IbrP+RAFFs5uSyKH8DEgaYosOA3a4YB08+rNm2PfJmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QM1p0EDyHOaR1WO9NGsXEJ82BHPgSTrXFSaxkEYTfTGfiory3/bL6DJo6UGhhRENnVGjoRg0xBq95cpinF/RKF9vLs7gDKuEC76/Ih2Uqp9oU6xl4Oql6No6kOGOzmQ8QJtcbaOLJarM0XVlL2YflQmFSEp2ZGUTO6hvb3nIFsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SODY/Dwp; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42b427cda88so4265126f8f.0
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 12:20:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763497221; x=1764102021; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=l0pKkIaEqkTeFfMBeLi6StcxmGY0QC1qizzrKLLRaeo=;
-        b=SODY/DwptoES347ziIflWCk4w8S7ebnTasQFqlfGU6FywPE0LsAyXaUwno+JtNfmXi
-         geU0lyU+gmxa5UlrlF20DVhmk7f9foLN3BIEeqsyIjKKgN5xhOsl60IGjztce9lVM+sB
-         QqrHObsMRve8QyLemh1wkn/oymnTNrAaMQN4Ds1zSqP/poeeuWcx9XOWpfZ96v3GT0ua
-         byhYU5L4aJDyTF3l4ibLfzNbNubAf3Pl3bn7vCgnDUNb92VByfAygJvJRdC04PRPDvrM
-         RGYHa6Nm5f269SRZdh4HS/CfdbKJ46PAYM8NmuVGe4h6w4WCSYPjhVcZwyFU0dKFOB4R
-         FOSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763497221; x=1764102021;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l0pKkIaEqkTeFfMBeLi6StcxmGY0QC1qizzrKLLRaeo=;
-        b=Ow8kP8+A4cZmQnE2M3D6dyuWc4J0IZDBL3uaAI2vylcZXvQUL6pBQipW2ZoDllIOt4
-         cAkQ9uPPfpt/MEyt+mRbhW4vgsIKKDIqFyEm6whL4XY+bQ502iBM9WbsRDI17L5ulDjL
-         IfOeH0z3W3L3VittPT4jyV1O3/cwdzeQJORNMJj5p1m8d9mLXBhaZjDWulzE3tQ/qC8m
-         6xaMg/SyIaApV9zsjYRqKNqOjask9x9Z3W5xXz6EwMqraXvPqxHpc+9gr9QyVGMQ5olV
-         nsLpBnTS3whqyPvnDArGZt0xU+psahEcRdIsemd0B3Wvjq+N/FC4Vfnw+PEwvmEZOHrq
-         CYIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUaL7gOnhb0i4UAlVtR6CR0YCInVSnJjZat1zdep/LnYJz7aHczJkjtGwm44G0EjkPjhTW+Ohs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywf8RqisZ7Hcf+FcxQceqf1oxL1kFCGbEPcF9uRKxCmkesG4+ky
-	39MifSBr1d/C3UeyAiyjO2I8AKu8JwSjgpe+xky4rgIfvSfg5TRFuBCX
-X-Gm-Gg: ASbGncuE/2UUgV/nwuP4Yfdjt83afSbPEKab9X4AT3TKg4jOpUWtGvPuvmCcUY0q0am
-	PYfHoEi1QV2SrmUkCStqcwjFNocDWL1sWw88RRPDmZtYn6ee9UMxDLPyt5jo2Zt++oBkuOoMd/a
-	heLCxAP80qPOP3bwoO99Z/3ndPXOOdvWxPCt71eO2pshulJfE70BAlxuTyPkMsxAwMspa//L+0o
-	NrXqtOzp26X0cyeQMesKFiwBEQz2JLLM2b+QZxIorcG0itSJqvwHcqw32H7rA5FEiDet9n23okk
-	T+WcGgmMpIWv2maxLIJzxXuitZQVEvO9dcuYnRBJoYg6HIJEipG0yBrXYTUySYzyP0GfqXMZI8/
-	rZGqEwWyhxuYm9c/rg2ImJ2X/rhDxgYXRb6o6oglOUAFm6zCETR34F3o231PpXAs1Kv/yt1vTJb
-	iwRcbZhnJBnJARpX4dKO8cx82QAGqDh/T19SSw
-X-Google-Smtp-Source: AGHT+IFewRuIeONGEHUMg5h6XpjXzlc8IyfzgPHPxe8zn2VsF2GBYuWpckKVA66DE8AtS4uUJlK76Q==
-X-Received: by 2002:a05:6000:2010:b0:42b:2e39:6d66 with SMTP id ffacd0b85a97d-42b59339192mr17414878f8f.15.1763497220979;
-        Tue, 18 Nov 2025 12:20:20 -0800 (PST)
-Received: from google.com ([37.228.206.31])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f206aasm34279654f8f.40.2025.11.18.12.20.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 12:20:20 -0800 (PST)
-Date: Tue, 18 Nov 2025 20:20:18 +0000
-From: Fabio Baltieri <fabio.baltieri@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, nic_swsd@realtek.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Michael Zimmermann <sigmaepsilon92@gmail.com>
-Subject: Re: [PATCH] r8169: add support for RTL8127ATF
-Message-ID: <aRzVApYF_8loj8Uo@google.com>
-References: <20251117191657.4106-1-fabio.baltieri@gmail.com>
- <c6beb0d4-f65e-4181-80e6-212b0a938a15@lunn.ch>
- <aRxTk9wuRiH-9X6l@google.com>
- <89298d49-d85f-4dfd-954c-f8ca9b47f386@lunn.ch>
- <ff55848b-5543-4a8d-b8c2-88837db16c29@gmail.com>
+	s=arc-20240116; t=1763497475; c=relaxed/simple;
+	bh=Q8olBVnZEAzUcW+zVw/ny0i3wL3dDPF5Wf+3Nc1j/+U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JkmBbinN8OECyqUJB/vi3rhC4+EGAotJNcUIYr6xmsm+2ajBj89vKBttU0AEooYyQJEkQvyPaJ6Aahfl02DzvA71f+LRL7tnDowGQq+chYR10f7TRmvbmMVLwaJmxM80+yPGWwicw/IdGFMEm3A4jGTl6hRcCTinOb/X3lMJasQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NbiDW1IC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6021C2BC87;
+	Tue, 18 Nov 2025 20:24:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763497472;
+	bh=Q8olBVnZEAzUcW+zVw/ny0i3wL3dDPF5Wf+3Nc1j/+U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NbiDW1ICA+TF6h7y/gbxuxxRkVUlxzkQwpVlPKwtBT/CHb8EgfHiUY5o7ogzAdaeG
+	 9e1GwIVLdxaZmB7Y+Hf0VY8bnYfJBdBZiLb54TUni16nLAJR9oCA1d6Ey6m/NiRzAq
+	 4y9UodQj+fAFzxwKgwU3NnJFiLkJT88HSPadDOyYTDl+YJNQmCnK272BN+eGPS/4H/
+	 zKtgZs8oVGtiN4HP4ju/wyC7m9ufDGDxw5GOKfjZ03H9h6+Tm2oN+7+Npm8P4DPTtH
+	 ZCJ9ALSDr3WME8L32CHNCf4t+DajyDAMee3EgfmjYcb0XI51XfpJv8GfY+nF10y1oC
+	 MmtivsLQH6ymw==
+Date: Tue, 18 Nov 2025 12:24:30 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: jiefeng.z.zhang@gmail.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, edumazet@google.com, linux-kernel@vger.kernel.org,
+ irusskikh@marvell.com
+Subject: Re: [PATCH net] net: atlantic: fix fragment overflow handling in RX
+ path
+Message-ID: <20251118122430.65cc5738@kernel.org>
+In-Reply-To: <20251118070402.56150-1-jiefeng.z.zhang@gmail.com>
+References: <20251118070402.56150-1-jiefeng.z.zhang@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ff55848b-5543-4a8d-b8c2-88837db16c29@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 18, 2025 at 09:02:22PM +0100, Heiner Kallweit wrote:
-> A contact in Realtek confirmed that only 1G and 10G speeds are supported.
-> He wasn't sure whether copper SFP modules are supported, and will check
-> internally.
+On Tue, 18 Nov 2025 15:04:02 +0800 jiefeng.z.zhang@gmail.com wrote:
+> From: Jiefeng Zhang <jiefeng.z.zhang@gmail.com>
 > 
-> I'll try to strip down the patch as far as possible, likely supporting 10G
-> only in the beginning (as 1G requires some more vendor magic to configure).
-> I assume the typical user won't spend money on a 10G card to use it with a
-> 1G fiber module.
-> Reducing complexity of the patch should make the decision easier to accept it.
+> The atlantic driver can receive packets with more than MAX_SKB_FRAGS (17)
+> fragments when handling large multi-descriptor packets. This causes an
+> out-of-bounds write in skb_add_rx_frag_netmem() leading to kernel panic.
 > 
-> I don't have hw with RTL8127ATF, so I would give the patch to Fabio for testing.
+> The issue occurs because the driver doesn't check the total number of
+> fragments before calling skb_add_rx_frag(). When a packet requires more
+> than MAX_SKB_FRAGS fragments, the fragment index exceeds the array bounds.
+> 
+> Add a check in __aq_ring_rx_clean() to ensure the total number of fragments
+> (including the initial header fragment and subsequent descriptor fragments)
+> does not exceed MAX_SKB_FRAGS. If it does, drop the packet gracefully
+> and increment the error counter.
 
-Hey thanks for following up on this, cc'ing Michael as well, as it turns
-out he was also working on upstream support for this at the same time as
-me, maybe he can help testing in more scenarios.
+First off, some basic Linux mailing list savoir vivre:
+ - please don't top post
+ - please don't resubmit your code within 24h of previous posting
+ - please wait for a discussion to close before you send another version
 
-I did test 1G support between two RTL8127ATF cards and it works fine,
-have not tried between that a 1G fiber only card (don't own any), happy
-to drop it if you think it may not work but hopefully it can be tested
-and kept, it was in the out of tree driver after all, I'd hope the
-vendor did some interoperability test with that code.
+Quoting your response:
 
-Cheers,
-Fabio
+https://lore.kernel.org/all/CADEc0q6iLdpwYsyGAwH4qzST8G7asjdqgR6+ymXMy1k0wRwhNQ@mail.gmail.com/
+
+> I have used git send-email to send my code.
+> 
+> As for the patch --The aquantia/atlantic driver supports a maximum of
+> AQ_CFG_SKB_FRAGS_MAX (32U) fragments, while the kernel limits the
+> maximum number of fragments to MAX_SKB_FRAGS (17).
+
+Frag count limits in drivers are usually for Tx not Rx.
+Again, why do you think this driver can generate more frags than 17?
+-- 
+pw-bot: cr
 
