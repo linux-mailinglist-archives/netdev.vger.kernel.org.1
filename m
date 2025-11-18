@@ -1,99 +1,85 @@
-Return-Path: <netdev+bounces-239308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6520C66C5D
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 02:02:19 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFBDAC66C81
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 02:07:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E820F4E9437
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:01:04 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DADB9352A15
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9FA92FDC35;
-	Tue, 18 Nov 2025 01:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A50213DBA0;
+	Tue, 18 Nov 2025 01:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rvl2Ukq0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="th3Aa8oY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26502FD67C;
-	Tue, 18 Nov 2025 01:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7016FEEB3;
+	Tue, 18 Nov 2025 01:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763427648; cv=none; b=jjwPN4iJYFzJS+c3coiGBR5PWKnn3qkPNt2NMYEsoquPdDs8SGUpzhKTpK+CuRxlhcFgHPXSDl6x9vwxJZHIUuXWOz5LBtQKBvOjHICRqi4U2k6PAvKmWCdyRTz/mCcM4Bqr65VvGz1YAoBuLNVN+B7vpsubo9EmWFgN3KrynJE=
+	t=1763427913; cv=none; b=HCzSckMOTYs1nzzCofmi86RI5rwH2X4S1Kf+16Y6Q9nXZDIfpK+fXDZneRcHtDSVk9c9DQlnWnJatS9/U6P6Go5Klvij6UJVtTG3cCWnwnoJWYKTcmveQVISmIrg4+4c1gfpAsuLlfFo7a2zp7nDZyd8JRrgsQ6HNmZxA+dqPUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763427648; c=relaxed/simple;
-	bh=Y+ss9/v3fhfi7iOJtQ3BHjk2Cuo3Dg3jbtkAASl3fnU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cUOgEV1k3as9Lil+HcFcLsTEw6JY2RT972BVY+5RhoCkO3rg7tsPIhRLUkBUzAaJDBoJhKzZv/ajlfW3+BxH1d/uEwgl3h0wx0zvn1t0NHbykiaWM2xv1oOSGE1cd7ImfUZXYHzqwO1P0iMej3ZjNPOKMivHy9ijs9Il0iKTxdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rvl2Ukq0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35B7DC2BCB3;
-	Tue, 18 Nov 2025 01:00:48 +0000 (UTC)
+	s=arc-20240116; t=1763427913; c=relaxed/simple;
+	bh=3vRuS3jhAbIJ4aR5KD9+0crFujpy8R3Ml2SGNf0hWQg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ulLhDfqYbhObmSwk5xGBOHibEoD11Hq66oj0ejc5M+ghKeabPvfRyKJAX8qiIkRlTnJrKziVmC6N4kwAqfLaZOb+yNojYdYRzsNB9ifO50NMegBJVQU3ruEh3d6Ndiw7rozIibrR5zDrSOo33MdDElfYRztSBdxCBD6jHaV0s6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=th3Aa8oY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D195BC4CEF1;
+	Tue, 18 Nov 2025 01:05:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763427648;
-	bh=Y+ss9/v3fhfi7iOJtQ3BHjk2Cuo3Dg3jbtkAASl3fnU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rvl2Ukq0pcDzAnvVOGRYuO/ntDmToXhd35xjQHDBMO7T3NANaU5IR9Smy+DcrJ1WT
-	 ypbWDBH6mzhjK9sTS242PuOQKh2zxr73oJN29/xtdVOa2uANIa53iLcGWVxDOCwtyh
-	 L+qB5eTr0TsxcsqAP9m/BryKewP77dXXwVx03+4e3TpMDi+q3SJnLZW5iJG1Zp6Ilw
-	 5/kN9vLFxLNnhq2VM/3bUUpJJiBj79JuaRz3eozjxERg7MqpAA2zZNwuv5+QwWZ3yK
-	 Rw8+sNo2XE1pErQtoDsssmHZTuuB16+d4a9DkCD8BcMT6wI5VHcaVv0VAJadtU7nkK
-	 0du8GY0koyY0A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE11A3809A18;
-	Tue, 18 Nov 2025 01:00:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1763427911;
+	bh=3vRuS3jhAbIJ4aR5KD9+0crFujpy8R3Ml2SGNf0hWQg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=th3Aa8oY2cXQ3JWEy4XJSXlFX10rgFvafqnnSXmZo9kDCKUjuHXF9Iay0nbQURsiQ
+	 sd0PkY6u6uT7AoVJql4BvJWGY5aQP5PGnOfkCe9dMiIqpfKJ9GSYhlN646/StMkJ0l
+	 1gWfUAICr0RsvSKnONMEjQ+SPdSAncWQi8yq1KlkMoXeIptfw5PTSxsAkdhFfKmus2
+	 70THQqjA9YFvaUEEoXsSHajPt8tcoAS+FkzgcM7fhX+EVd3DFKml6nFF/NiMqCYCqS
+	 dwCqt0UG8CIlkPs29FiCFwWvsMuVxGqdvdSA1R3i94PTnDFHZInbmBu06PMc1NWRnh
+	 w1AdKfv8WNsuA==
+Date: Mon, 17 Nov 2025 17:05:08 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Mat Martineau
+ <martineau@kernel.org>, Geliang Tang <geliang.tang@linux.dev>, Florian
+ Westphal <fw@strlen.de>, netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+2a6fbf0f0530375968df@syzkaller.appspotmail.com, Geliang Tang
+ <geliang@kernel.org>, MPTCP Linux <mptcp@lists.linux.dev>, "David S .
+ Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH v2 net] mptcp: fix a race in mptcp_pm_del_add_timer()
+Message-ID: <20251117170508.4ffe043f@kernel.org>
+In-Reply-To: <a155bf8b-08cd-4cd9-91d9-f49180f19f6c@kernel.org>
+References: <20251117100745.1913963-1-edumazet@google.com>
+	<c378da30-4916-4fd6-8981-4ab2ffa17482@kernel.org>
+	<CANn89iLxt+F+SrpgXGvYh9CZ8GNmbbowv5Ce80P1gsWjaXf+CA@mail.gmail.com>
+	<a155bf8b-08cd-4cd9-91d9-f49180f19f6c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V2] eth: fbnic: Configure RDE settings for pause
- frame
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176342761424.3532963.7569003490275374200.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Nov 2025 01:00:14 +0000
-References: <20251113232610.1151712-1-mohsin.bashr@gmail.com>
-In-Reply-To: <20251113232610.1151712-1-mohsin.bashr@gmail.com>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, almasrymina@google.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- horms@kernel.org, kernel-team@meta.com, kuba@kernel.org,
- linux-kernel@vger.kernel.org, linux@armlinux.org.uk, pabeni@redhat.com,
- rmk+kernel@armlinux.org.uk
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 13 Nov 2025 15:26:10 -0800 you wrote:
-> fbnic supports pause frames. When pause frames are enabled presumably
-> user expects lossless operation from the NIC. Make sure we configure
-> RDE (Rx DMA Engine) to DROP_NEVER mode to avoid discards due to delays
-> in fetching Rx descriptors from the host.
+On Mon, 17 Nov 2025 11:42:31 +0100 Matthieu Baerts wrote:
+> >> Out of curiosity, is it not OK to reply to the patch with the new
+> >> Reported-by & Closes tags to have them automatically added when applying
+> >> the patch? (I was going to do that on the v1, then I saw the v2 just
+> >> when I was going to press 'Send' :) )  
+> > 
+> > I am not sure patchwork has been finally changed to understand these two tags.  
 > 
-> While at it enable DROP_NEVER when NIC only has a single queue
-> configured. In this case the NIC acts as a FIFO so there's no risk
-> of head-of-line blocking other queues by making RDE wait. If pause
-> is disabled this just moves the packet loss from the DMA engine to
-> the Rx buffer.
+> Ah yes, thank you! If there is a dependence on Patchwork, I think
+> indeed, it doesn't recognise the 'Closes' tag (but I think 'Reported-by'
+> is OK).
 > 
-> [...]
+> While at it, I forgot to add: this patch can be applied in net directly.
 
-Here is the summary with links:
-  - [net-next,V2] eth: fbnic: Configure RDE settings for pause frame
-    https://git.kernel.org/netdev/net-next/c/0135333914d6
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+FWIW I have a local script which extracts them from patchwork comments
+and applies them (same for Fixes tags). But it's always safer to resend.
 
