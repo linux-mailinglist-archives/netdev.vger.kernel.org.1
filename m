@@ -1,69 +1,59 @@
-Return-Path: <netdev+bounces-239417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E3EC68131
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 08:53:14 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DC64C68207
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:08:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 9ECB02A00F
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 07:53:11 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8893F3438EC
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 08:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55AA2F49F4;
-	Tue, 18 Nov 2025 07:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="vLcBVoVx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2376D2FE06D;
+	Tue, 18 Nov 2025 08:05:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962921E2614;
-	Tue, 18 Nov 2025 07:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA202D5416
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 08:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763452386; cv=none; b=nDyMMvhUGgeOemuGtvn/jj8NxKddgkoF0wrLjHJLFfjuBM84EiI2cjhe/WlXtuVzgUFr4Mj6bW38PKsxH+ZMHbccx2yjxL6SEwnMXY+v8T13GMimepMPV1R9I889GnQK1wh/n1ugZaYxVEvmKHvHEi9Vy1tymXUZa7WInWMsbi4=
+	t=1763453126; cv=none; b=Thj1r2w74wtjFScsqrHmNNMcU08kUs7c97JETkYvMuEr39Ae0e0tZLpDaQ5IBchK0LdkzvS5L/xlHtNRKYlxpyc7jNXnPWP+5c1aF6abxy11odHgPHNy721rrbEUZ5xB4Ou9xo6gg3/lDWDaptgBc02eKIbsoWhpaxYHJRVtAJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763452386; c=relaxed/simple;
-	bh=CrCOz/n7EhDzopuM4Jj8UKmOJnk248V2J/pBSXsf5/0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UCNJvJ6R+aYT9AGacGwtvCvvT6Y1G66MgkPuIaCuqYyUGJNhUJlCFUwJRn1h6KQlUEp966tpEH68l6ztHafminHMWGeTk4dDMVIMz/24nDNJAfPvqmN3cTSbmMlv6gnLML8vjBb89xSLSpAXC+zkoTLY3oqfEg7w9N4CN31wEN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=vLcBVoVx; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 5AI7qLvX51082773, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1763452342;
-	bh=wb0CBWIL5vk9uqWAFeMWV+aHh1MSnhIRcxnohUMADvk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=vLcBVoVxmlEw3B+mM21qWI5zsS8iCfqwcmK81h71VZTxsF90Jq4g+nSP5FalQoa4u
-	 dWoFm2uy8AWxfpVlkcRVqk9o5I4lVyuZDV0u4bHye9RmmzoDN3s5ArYi1XKjyYGE2V
-	 +5g1LbhtP9xQRJRaAFCbXSAKLnddN4YuN6vz0rQWn/xT4b+a6vtWBLbunt3jEttxIX
-	 0lI3l6o9mGg6svPCpxnKMoX6Am6vPMx6ug29+55fgzDp1abAFCbOAiLb5tZTR7xn0V
-	 KsN1fb2LGo0BoTJZAX2Ch1x3XlpjVGFcG+j6DZjijWwEYbUdol45E1QpYU32VrXxeo
-	 qjcYvDgULqvuA==
-Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 5AI7qLvX51082773
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 18 Nov 2025 15:52:22 +0800
-Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
- RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Tue, 18 Nov 2025 15:52:21 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS2.realsil.com.cn
- (172.29.17.102) with Microsoft SMTP Server id 15.2.1544.36 via Frontend
- Transport; Tue, 18 Nov 2025 15:52:21 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        javen
-	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v1] r8169: add support for RTL9151A
-Date: Tue, 18 Nov 2025 15:52:17 +0800
-Message-ID: <20251118075217.3444-1-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
+	s=arc-20240116; t=1763453126; c=relaxed/simple;
+	bh=BHzPaYI30ZIGSfNHCykhCxTnSuMt9TFad1RWsd/INDo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d+Lt0Dir4A+EY7czTDoho/mfbbgFP0UNFNBrxtCgEPWZH2bGvXgnO+9DqeN1Bqh+5ke6m154mG68BRyws+iJnBfLlrhmBRioZVeu/DRB3zKBo73NIvaQ7seIkfpdGKj++SW/1OnONqJiEbumVR6bm48jDExccrlUt6hCIhCqY7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.16.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: zesmtpgz8t1763452995t49bfdc56
+X-QQ-Originating-IP: WhEhDLSr9FOo7BHZcbbeoSb1ESzMrf8Qwfi4tNrtkn8=
+Received: from lap-jiawenwu.trustnetic.com ( [125.120.152.51])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 18 Nov 2025 16:03:12 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 9165256098943442868
+EX-QQ-RecipientCnt: 12
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v2 0/5] TXGBE support more modules
+Date: Tue, 18 Nov 2025 16:02:54 +0800
+Message-Id: <20251118080259.24676-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,45 +61,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: NNwhR4tXr/lTWtVw45JKuumUSeBT/Typdr48v2IS7ZcBZe8PgLXxnKqM
+	8B4myj84U3lxkwx59TSZ1ofkc7yHHk73Eh4e1nP5hNFLXupvrKF0mgwu3Byse9r6m0culIL
+	H71yV8j9Jx5kxXPV5SkNQTgB3jFsKsU3VaaANraAQ3Kb9uk906onAb4BAoZ6RVi+qyMny3P
+	cnqtxP5pq+78qY1B9pHZeUQuYW9vZCrtQaILu6mPCOkGUX7GMjM3dJNiYdnc0l6FhsoklZw
+	+ZN4ljhuE1pWNBogfzTenHzghhYM+KgPRoBxfD1rNeHTIxZ7FubfTubi16NsQ2FAChuQIzG
+	60a3h7H4W2bjrHFgIUMznqGRZb6rc8U2AcSrMivlFDTHuQm3dIHzLPm0MkvafdzFoiEJrCm
+	MGZJCSigYLX5GbwhjpqzvuhNODwqBoEiZt6EULRotsiFgO0zTOklsNP5J3tWLWIqVxDdNKJ
+	tAwwulU6rU+TVdZwBj/PDtJWKgkZtnGvm5tyNxYy1rjyiF87TXERDQdhr0Rsw1y+Sz6/8tb
+	aVr2+poo2GFnGT32wZcOeht+T8z/z79Z4NQekgzaVmolVMYgS1sr/Fj5V125NXR+DYLsYCh
+	wPzEuS+wLu5G9QBXb3YU1kYAlV2BH44zRJcxMguC1CObEoOYpiEy8zlZ+YJXxWnSevGNrx6
+	xHL3x2K0pvLIDW6+47gQ0lMywUKM+JfuYv3ExEk1aDioFBFkyT/QdNqrW7pJ/gIAdlJ8LmC
+	lK0ZDhChEX8/sGhIYKGc3AbOaCDzOJ+mZVTBABOUvaT1M+EY/28rY7DXQq9Ws4mp+muhvVw
+	2vFSSN7vgh7cVxNEOWF/6h3y6Bp6mT20Yg5fcq2IiZv0j70TUPREYTztqMaR+8s7C49kRRu
+	3Sku3Lzz/37mVsE7q00TXKLWncBmz0iRVpDi/Sx8rkmrJJ+Xce2OSc7LV2Np/8JkliKMk9i
+	Awq9AebqLpv8aSKU761T3bKndy16ggsMbydAsZm02Z2lR29IyPVOFheJgJpurMQ9L+3KJOy
+	ekta3c3vUqTxqfUX6llGLV5y74aNcqu/6kk7aaCVpfAmszx3/E
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-RECHKSPAM: 0
 
-This add support for chip RTL9151A. Its XID is 0x68b. It is bascially
-based on the one with XID 0x688, but with different firmware file.
+Support CR modules for 25G devices and QSFP modules for 40G devices. And
+implement .get_module_eeprom_by_page() to get module info.
 
-Signed-off-by: javen <javen_xu@realsil.com.cn>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 3 +++
- 1 file changed, 3 insertions(+)
+v2:
+- adjust data offset for reading I2C
+- use round_up() for DWORD align
+- declare __be32 member
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index d18734fe12e4..dfc824326b16 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -58,6 +58,7 @@
- #define FIRMWARE_8125D_1	"rtl_nic/rtl8125d-1.fw"
- #define FIRMWARE_8125D_2	"rtl_nic/rtl8125d-2.fw"
- #define FIRMWARE_8125BP_2	"rtl_nic/rtl8125bp-2.fw"
-+#define FIRMWARE_9151A_1	"rtl_nic/rtl9151a-1.fw"
- #define FIRMWARE_8126A_2	"rtl_nic/rtl8126a-2.fw"
- #define FIRMWARE_8126A_3	"rtl_nic/rtl8126a-3.fw"
- #define FIRMWARE_8127A_1	"rtl_nic/rtl8127a-1.fw"
-@@ -110,6 +111,7 @@ static const struct rtl_chip_info {
- 	{ 0x7cf, 0x681,	RTL_GIGA_MAC_VER_66, "RTL8125BP", FIRMWARE_8125BP_2 },
- 
- 	/* 8125D family. */
-+	{ 0x7cf, 0x68b, RTL_GIGA_MAC_VER_64, "RTL9151A", FIRMWARE_9151A_1 },
- 	{ 0x7cf, 0x689,	RTL_GIGA_MAC_VER_64, "RTL8125D", FIRMWARE_8125D_2 },
- 	{ 0x7cf, 0x688,	RTL_GIGA_MAC_VER_64, "RTL8125D", FIRMWARE_8125D_1 },
- 
-@@ -771,6 +773,7 @@ MODULE_FIRMWARE(FIRMWARE_8125B_2);
- MODULE_FIRMWARE(FIRMWARE_8125D_1);
- MODULE_FIRMWARE(FIRMWARE_8125D_2);
- MODULE_FIRMWARE(FIRMWARE_8125BP_2);
-+MODULE_FIRMWARE(FIRMWARE_9151A_1);
- MODULE_FIRMWARE(FIRMWARE_8126A_2);
- MODULE_FIRMWARE(FIRMWARE_8126A_3);
- MODULE_FIRMWARE(FIRMWARE_8127A_1);
+v1: https://lore.kernel.org/all/20251112055841.22984-1-jiawenwu@trustnetic.com/
+---
+
+Jiawen Wu (5):
+  net: txgbe: support CR modules for AML devices
+  net: txgbe: rename the SFP related
+  net: txgbe: improve functions of AML 40G devices
+  net: txgbe: delay to identify modules in .ndo_open
+  net: txgbe: support getting module EEPROM by page
+
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |  12 -
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |   2 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_aml.c    | 260 ++++++++++++++----
+ .../net/ethernet/wangxun/txgbe/txgbe_aml.h    |   5 +-
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |  38 ++-
+ .../net/ethernet/wangxun/txgbe/txgbe_irq.c    |  10 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  23 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |   2 -
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  34 ++-
+ 9 files changed, 290 insertions(+), 96 deletions(-)
+
 -- 
-2.43.0
+2.48.1
 
 
