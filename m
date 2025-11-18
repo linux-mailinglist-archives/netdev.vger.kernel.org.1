@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-239291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 493D3C66A72
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:25:31 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 151A2C66A6C
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:25:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D3A7B4EAB5D
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7391135EFF2
 	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC82283683;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2696726E6FD;
 	Tue, 18 Nov 2025 00:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CRUibDaQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jCSypgpE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF802609EE
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8963F26E709
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763425499; cv=none; b=iEgH6n2vPnoAIRgsqvwQctpPGEo1mr1p6rhWLAuOO4H0udzU0GZlMBQ/Vk3d4y9pqsTEMVp8krz4CijRi1TJmPjOm7s19cLe/cc2yGM/nnjmM9w2xj4JRC9PGfD47dsm6lzp7ZPM1VsJkHAiPtTdLslq1zBDxWpjMmqIqZksrRs=
+	t=1763425498; cv=none; b=FKEtRcSsrxLzaRWmwLzM5FMy1XhbZtTfvnl11PjDVe8pwyEw9tV/u99bfYn8wia8uOtvRYU+hPlgZEi8n+gDZBocH/scfh3ukITVICKrZJixk+kEvJs9KDPA/zvzPeJuB3g8DChB8GAnDPxR6pmlDYCj37xK2yncTbfB5yI90ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763425499; c=relaxed/simple;
-	bh=GU2W4Env3pVySzouvOpft34vMD3lKZ1I3nej/UOh/y4=;
+	s=arc-20240116; t=1763425498; c=relaxed/simple;
+	bh=VBV4wTTE4imuwCtDr+8mVLpoDQnQGoRXrQDIn/8Nmdk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FC+pj/FyH3Pd26jtk3wO0nVoCeMjLTKNZJYSLsDSHGp0yCVBPcR2OzD8GPr5zsoKo+Z/hpGNMQoNFOxv/RgPViOg9OcU6btPsb9HKYL7bQN+uM/yy7qYav1R64VsQLvuQp/sd9wsSdDw6hGieGeXKEoSDwIbYmMOYrgY9vcM/+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CRUibDaQ; arc=none smtp.client-ip=209.85.128.180
+	 MIME-Version; b=aEFCD6rZn91Kz2UGCtH1qqrNs1Ugg0Mdne5FNa3fErA/vNcI43K3XQzqVZlNefkXe3Wbf+XJhCtVVl/L/d7E2BypBxNVEAE5yET5zh2PNS+PNu31fwD0DGMLX/2p8XD6yujYiJ0dESpHaNPPhEzb6Y0FXHPy0f6Zxu+OSOvGzbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jCSypgpE; arc=none smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-7881b67da53so43747777b3.1
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:24:53 -0800 (PST)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-71d71bcab6fso43583487b3.0
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:24:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763425492; x=1764030292; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763425495; x=1764030295; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Lpm61WVMpXaTS4gWKedINtFRMcV4KgYOfoTCHp0JnK8=;
-        b=CRUibDaQhsp+gAFQgFCmRFnf8lP/m/6XOnfCBXDxhpA1lE5ni/dhiJjAQyMS3K5wQZ
-         fCNH76cMG0JBGzsGLvGDbjzZo60ukpRrvyLZCDQ9/KHxd3U1S3Sn7gUkXvqTHNKIJHOa
-         fOXF8wCEKHY9TBv8e3qhcmC2dRtdgC5NzSmNjjQD5/ceZBly6rZWWraiKFYL/+8+ZeZq
-         216AvoAimu0/XhbE97qa17cOHJDcfFnWDqCXuIRUHXugSkjZ0F/pmdw84Xl7GYMYD7sO
-         bgdW18rYKF7+Tnjo52cJF9TD7Twy/OU3I6o6vUhRNouRMKbfo7PDAGaRCeY57+Mi61dN
-         6qIA==
+        bh=GenjXWqNInuYwre7qbdm1o4nfBEHIUP7s9yd4imsMSU=;
+        b=jCSypgpEWAMyarruHDWV+nByd0bFtRniVhw6oe47Rmz70CMBiY7UWd2YKjrwE3ucRC
+         SEc35fprsPwLQ1d0B3Wi1xZEErwrWVjlLl9yBgcDc7IlgIWJS40EcS9HoZ/yIN7cOxbk
+         4sOt1I8hx5RMbtAYVdH27S20zuTdh7CDgwC2MpHnWQuHnT4fjDNTl/wu7l2L/VcxmCtM
+         xzUQX6CdplIKyw4AWqgJIKS8APJKiTr0B7Rb3xiCDLrSIyHOoVmNxgt62mCDXwoM2M7A
+         Tn4z0AURtChYhEGlDJdZ7KItk5RAQ+yQQ9KctFZLYNohtZDdIgPZt+0J6qgvlYEyzCAM
+         rpiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763425492; x=1764030292;
+        d=1e100.net; s=20230601; t=1763425495; x=1764030295;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Lpm61WVMpXaTS4gWKedINtFRMcV4KgYOfoTCHp0JnK8=;
-        b=pnWH9+plZCel860XWeHMP/+df/NxlSJWSerevYeXewGp9nwiyFj8fO7nHw9hOMTjgA
-         YAqFl2kZCYstnKz8Qzh+fu/PMkVmvR/xSoESVrIeyFr8QkkQqAAzScHWZAmSMWYeQBCi
-         Q8iSXli4MkFvMkGYNs9ohziKhbvVXK6w3xERM+jPSLmdGh3JX19B+5fujX0dRNSBJous
-         HCEamcWDbFaCaJ8f/5CS6jn9vbe5jqbzT+27Qdm1f80g3Nb3/dqTj57YW5/VjBWurlwO
-         GrQEMFoIMZv1CyhZkt5UelrlH4Ch4qMdSRk38jLL0tR7ir8oz6yvWpSeAiWSi8NrshT9
-         kz4Q==
-X-Gm-Message-State: AOJu0YwtIw6bbccbzwDEALiOhelv/TdWWoSQXAD+H26gx2i3Pg/gQp4H
-	nzMa3BVdoctSDnXJNEEX2+niCL2eX/SINSO/zIFGKl+k2ET2AtCA2Gbn
-X-Gm-Gg: ASbGncsY8JDPZPBvhiMOU3dMFsWCJqAxvT1wdIYm2YezHbbZ3x75PtC0Fo/YvzTcxyY
-	xHDHGOWaPyqjDUeToZRfA+wqARTius5+GxHgHIhMcouojwacgwnWF+kX9nY/KL1SPguisuFY/XM
-	HH9TAnZkIbOWnaSztU7xthLCrDTerdytWXCKX+dMEdQw5k2GkFIg5CFui87ISLhz54FgDubytVz
-	TDugX5QBMIYewa7Q4zBrPAQ8QFM90KqzdmT6Rfp9KrfyaxVf37s2d43XrycSMSRWZDPQbkLwryB
-	T15QylninZ5TbIwIeUqQRrc/srMgcAktqoigokeSX9tf0nyykRzN+wORAskpnsu1o+0iy+sLJFm
-	/YZ6rPe6Zez1QNhP6HKjBkT74UChlsrg28zu6IQ9TTuqo/pPtRxhCT8YWeCTuvytYD1v8iyZSrn
-	NgCilVNQ3Rct1hd+moMR1Z
-X-Google-Smtp-Source: AGHT+IG+Fh1oMqCwOWhdJCefG39eiTd3KH357Rm2dtFkemtoWRfvUtMRNQYxOyrW7sTnzPCc3JOpvw==
-X-Received: by 2002:a05:690c:c3f1:b0:786:660b:82b5 with SMTP id 00721157ae682-78929e46780mr104068197b3.27.1763425492499;
-        Mon, 17 Nov 2025 16:24:52 -0800 (PST)
-Received: from localhost ([2a03:2880:25ff:47::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7882214ea47sm46813667b3.45.2025.11.17.16.24.48
+        bh=GenjXWqNInuYwre7qbdm1o4nfBEHIUP7s9yd4imsMSU=;
+        b=Dd1ci246Qysoh3TVcP6mMs6rZ/POEzkVgIYj2DlX4hSztp6P8U/tIhg5U5IJbS1F+O
+         2iR7ZsBLiAybS+IC9GLvFkfzj59UZnjznyFnOPwtl7IfS4/D4PBPOEBT4ajC07hxVCDe
+         d34l0gwwmeh5XJ7F3pYDtM8T8OH2xfwNbNbp1MHUEGhTBcrqiVB3nWSyB0LZxQupOS9R
+         n43mG1IYyJ1grsRrT/Ls3wHynKCkzsv8LYner8daAI9RQFhG8VIr6kd+2AKYEcWx3XbG
+         ubogb+BXbWnIPEisvOGjDyZBFhO7dGqjpY0/Waqo4ZYexkDD0GvVpS3Eaqgv76ktykMk
+         495g==
+X-Gm-Message-State: AOJu0Ywr6MvyUrMc3KSJraytveexPZxkLQQMJPvEPVNyMDj/yGXC6kca
+	ZtOy1QImOikiJNq2yvkwUn7NeASbUq/JAy6nODut8twbOoeHTRNKBsvK
+X-Gm-Gg: ASbGncsZXVFqrUGRhbqf9RAhcRcDMy2aO//6ffGqJFLTEKbeusrG1ZozMtbWsNFUpH2
+	6vhOnwfFJwFtyPjXB5ZPpCUmAAmvbWk4yrfysEsk/5a5Xmyr+5SQ8AdtK4e/PfZwTDXbz/vyhd/
+	5q/g+S0ppBY8bXIhfprqgR0g06691spM182Sgfp94NC8yXkiltj6sbUj4WxWExgMqWm5psRZX5R
+	unE0FPdFG757xCIophaTgUVYKHhAcOFdcXLYD6sHOxxpiZCWrsH/nLwDDSEM01NXWmMfuRfgMZw
+	Un2yvVJEgzJD68hhHJ4Fdgvl6ZQyeoDUEBX9eV5BnnteZd/s3pNZlYsYoeqPDuUFbHG49DUz3Dg
+	18iV8h9LAmxI0Xi/4ydTUsjSMWsaeRkMoBI/hHe5HdHZ8flmG6iFyZx0Ali2bcJwPBnsOkV95kw
+	bjVMbVNJo3Pf3rN+0k1edg
+X-Google-Smtp-Source: AGHT+IG3sVHIKUgzGse+OqII+TDOwybzXE1KBDn6uL/BlWk2Z3KoPdn+jhe/F8558MWvBkxr5uFXQg==
+X-Received: by 2002:a05:690e:2598:b0:63f:a2a7:8f1f with SMTP id 956f58d0204a3-641e75bf86bmr8550441d50.27.1763425495455;
+        Mon, 17 Nov 2025 16:24:55 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:41::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-788221224d8sm47135867b3.38.2025.11.17.16.24.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 16:24:49 -0800 (PST)
+        Mon, 17 Nov 2025 16:24:53 -0800 (PST)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: Jiri Pirko <jiri@resnulli.us>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -121,9 +121,9 @@ To: Jiri Pirko <jiri@resnulli.us>,
 Cc: netdev@vger.kernel.org,
 	linux-doc@vger.kernel.org,
 	linux-rdma@vger.kernel.org
-Subject: [PATCH net-next v4 5/6] netdevsim: register a new devlink param with default value interface
-Date: Mon, 17 Nov 2025 16:24:31 -0800
-Message-ID: <20251118002433.332272-6-daniel.zahka@gmail.com>
+Subject: [PATCH net-next v4 6/6] selftest: netdevsim: test devlink default params
+Date: Mon, 17 Nov 2025 16:24:32 -0800
+Message-ID: <20251118002433.332272-7-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251118002433.332272-1-daniel.zahka@gmail.com>
 References: <20251118002433.332272-1-daniel.zahka@gmail.com>
@@ -135,124 +135,177 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Create a new devlink param, test2, that supports default param actions
-via the devlink_param::get_default() and
-devlink_param::reset_default() functions.
+Test querying default values and resetting to default values for
+netdevsim devlink params.
+
+This should cover the basic paths of interest: driverinit and
+non-driverinit cmodes, as well as bool and non-bool value
+type. Default param values of type bool are encoded with u8 netlink
+type as opposed to flag type, so that userspace can distinguish
+"not-present" from false.
 
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
- drivers/net/netdevsim/dev.c       | 55 +++++++++++++++++++++++++++++++
- drivers/net/netdevsim/netdevsim.h |  1 +
- 2 files changed, 56 insertions(+)
+ .../drivers/net/netdevsim/devlink.sh          | 113 +++++++++++++++++-
+ 1 file changed, 107 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
-index 95f66c1f59db..3aeb3abfec83 100644
---- a/drivers/net/netdevsim/dev.c
-+++ b/drivers/net/netdevsim/dev.c
-@@ -320,6 +320,8 @@ static int nsim_dev_debugfs_init(struct nsim_dev *nsim_dev)
- 			   &nsim_dev->max_macs);
- 	debugfs_create_bool("test1", 0600, nsim_dev->ddir,
- 			    &nsim_dev->test1);
-+	debugfs_create_u32("test2", 0600, nsim_dev->ddir,
-+			   &nsim_dev->test2);
- 	nsim_dev->take_snapshot = debugfs_create_file("take_snapshot",
- 						      0200,
- 						      nsim_dev->ddir,
-@@ -521,8 +523,51 @@ static int nsim_dev_resources_register(struct devlink *devlink)
- enum nsim_devlink_param_id {
- 	NSIM_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
- 	NSIM_DEVLINK_PARAM_ID_TEST1,
-+	NSIM_DEVLINK_PARAM_ID_TEST2,
- };
+diff --git a/tools/testing/selftests/drivers/net/netdevsim/devlink.sh b/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
+index 030762b203d7..e642da9dd0c1 100755
+--- a/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
++++ b/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
+@@ -3,7 +3,8 @@
  
-+static int
-+nsim_devlink_param_test2_get(struct devlink *devlink, u32 id,
-+			     struct devlink_param_gset_ctx *ctx,
-+			     struct netlink_ext_ack *extack)
-+{
-+	struct nsim_dev *nsim_dev = devlink_priv(devlink);
-+
-+	ctx->val.vu32 = nsim_dev->test2;
-+	return 0;
+ lib_dir=$(dirname $0)/../../../net/forwarding
+ 
+-ALL_TESTS="fw_flash_test params_test regions_test reload_test \
++ALL_TESTS="fw_flash_test params_test  \
++	   params_default_test regions_test reload_test \
+ 	   netns_reload_test resource_test dev_info_test \
+ 	   empty_reporter_test dummy_reporter_test rate_test"
+ NUM_NETIFS=0
+@@ -78,17 +79,28 @@ fw_flash_test()
+ param_get()
+ {
+ 	local name=$1
++	local attr=${2:-value}
++	local cmode=${3:-driverinit}
+ 
+ 	cmd_jq "devlink dev param show $DL_HANDLE name $name -j" \
+-	       '.[][][].values[] | select(.cmode == "driverinit").value'
++	       '.[][][].values[] | select(.cmode == "'"$cmode"'").'"$attr"
+ }
+ 
+ param_set()
+ {
+ 	local name=$1
+ 	local value=$2
++	local cmode=${3:-driverinit}
+ 
+-	devlink dev param set $DL_HANDLE name $name cmode driverinit value $value
++	devlink dev param set $DL_HANDLE name $name cmode $cmode value $value
 +}
 +
-+static int
-+nsim_devlink_param_test2_set(struct devlink *devlink, u32 id,
-+			     struct devlink_param_gset_ctx *ctx,
-+			     struct netlink_ext_ack *extack)
++param_set_default()
 +{
-+	struct nsim_dev *nsim_dev = devlink_priv(devlink);
++	local name=$1
++	local cmode=${2:-driverinit}
 +
-+	nsim_dev->test2 = ctx->val.vu32;
-+	return 0;
++	devlink dev param set $DL_HANDLE name $name default cmode $cmode
+ }
+ 
+ check_value()
+@@ -97,12 +109,18 @@ check_value()
+ 	local phase_name=$2
+ 	local expected_param_value=$3
+ 	local expected_debugfs_value=$4
++	local cmode=${5:-driverinit}
+ 	local value
++	local attr="value"
+ 
+-	value=$(param_get $name)
+-	check_err $? "Failed to get $name param value"
++	if [[ "$phase_name" == *"default"* ]]; then
++		attr="default"
++	fi
++
++	value=$(param_get $name $attr $cmode)
++	check_err $? "Failed to get $name param $attr"
+ 	[ "$value" == "$expected_param_value" ]
+-	check_err $? "Unexpected $phase_name $name param value"
++	check_err $? "Unexpected $phase_name $name param $attr"
+ 	value=$(<$DEBUGFS_DIR/$name)
+ 	check_err $? "Failed to get $name debugfs value"
+ 	[ "$value" == "$expected_debugfs_value" ]
+@@ -135,6 +153,89 @@ params_test()
+ 	log_test "params test"
+ }
+ 
++value_to_debugfs()
++{
++	local value=$1
++
++	case "$value" in
++		true)
++			echo "Y"
++			;;
++		false)
++			echo "N"
++			;;
++		*)
++			echo "$value"
++			;;
++	esac
 +}
 +
-+static int
-+nsim_devlink_param_test2_get_default(struct devlink *devlink, u32 id,
-+				     struct devlink_param_gset_ctx *ctx,
-+				     struct netlink_ext_ack *extack)
++test_default()
 +{
-+	ctx->val.vu32 = 1234;
-+	return 0;
++	local param_name=$1
++	local new_value=$2
++	local expected_default=$3
++	local cmode=${4:-driverinit}
++	local default_debugfs=$(value_to_debugfs $expected_default)
++	local new_debugfs=$(value_to_debugfs $new_value)
++	local expected_debugfs
++
++	expected_debugfs=$default_debugfs
++	check_value $param_name initial-default $expected_default $expected_debugfs $cmode
++
++	param_set $param_name $new_value $cmode
++	check_err $? "Failed to set $param_name to $new_value"
++
++	expected_debugfs=$([ "$cmode" == "runtime" ] && echo "$new_debugfs" || echo "$default_debugfs")
++	check_value $param_name post-set $new_value $expected_debugfs $cmode
++
++	devlink dev reload $DL_HANDLE
++	check_err $? "Failed to reload device"
++
++	expected_debugfs=$new_debugfs
++	check_value $param_name post-reload-new-value $new_value $expected_debugfs $cmode
++
++	param_set_default $param_name $cmode
++	check_err $? "Failed to set $param_name to default"
++
++	expected_debugfs=$([ "$cmode" == "runtime" ] && echo "$default_debugfs" || echo "$new_debugfs")
++	check_value $param_name post-set-default $expected_default $expected_debugfs $cmode
++
++	devlink dev reload $DL_HANDLE
++	check_err $? "Failed to reload device"
++
++	expected_debugfs=$default_debugfs
++	check_value $param_name post-reload-default $expected_default $expected_debugfs $cmode
 +}
 +
-+static int
-+nsim_devlink_param_test2_reset_default(struct devlink *devlink, u32 id,
-+				       enum devlink_param_cmode cmode,
-+				       struct netlink_ext_ack *extack)
++params_default_test()
 +{
-+	struct nsim_dev *nsim_dev = devlink_priv(devlink);
++	RET=0
 +
-+	nsim_dev->test2 = 1234;
-+	return 0;
++	if ! devlink dev param help 2>&1 | grep -q "value VALUE | default"; then
++		echo "SKIP: devlink cli missing default feature"
++		return
++	fi
++
++	# Remove side effects of previous tests. Use plain param_set, because
++	# param_set_default is a feature under test here.
++	param_set max_macs 32 driverinit
++	check_err $? "Failed to reset max_macs to default value"
++	param_set test1 true driverinit
++	check_err $? "Failed to reset test1 to default value"
++	param_set test2 1234 runtime
++	check_err $? "Failed to reset test2 to default value"
++
++	devlink dev reload $DL_HANDLE
++	check_err $? "Failed to reload device for clean state"
++
++	test_default max_macs 16 32 driverinit
++	test_default test1 false true driverinit
++	test_default test2 100 1234 runtime
++
++	log_test "params default test"
 +}
 +
- static const struct devlink_param nsim_devlink_params[] = {
- 	DEVLINK_PARAM_GENERIC(MAX_MACS,
- 			      BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
-@@ -531,6 +576,14 @@ static const struct devlink_param nsim_devlink_params[] = {
- 			     "test1", DEVLINK_PARAM_TYPE_BOOL,
- 			     BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
- 			     NULL, NULL, NULL),
-+	DEVLINK_PARAM_DRIVER_WITH_DEFAULTS(NSIM_DEVLINK_PARAM_ID_TEST2,
-+					   "test2", DEVLINK_PARAM_TYPE_U32,
-+					   BIT(DEVLINK_PARAM_CMODE_RUNTIME),
-+					   nsim_devlink_param_test2_get,
-+					   nsim_devlink_param_test2_set,
-+					   NULL,
-+					   nsim_devlink_param_test2_get_default,
-+					   nsim_devlink_param_test2_reset_default),
- };
- 
- static void nsim_devlink_set_params_init_values(struct nsim_dev *nsim_dev,
-@@ -1396,6 +1449,7 @@ static const struct devlink_ops nsim_dev_devlink_ops = {
- 
- #define NSIM_DEV_MAX_MACS_DEFAULT 32
- #define NSIM_DEV_TEST1_DEFAULT true
-+#define NSIM_DEV_TEST2_DEFAULT 1234
- 
- static int __nsim_dev_port_add(struct nsim_dev *nsim_dev, enum nsim_dev_port_type type,
- 			       unsigned int port_index, u8 perm_addr[ETH_ALEN])
-@@ -1590,6 +1644,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
- 	nsim_dev->fw_update_flash_chunk_time_ms = NSIM_DEV_FLASH_CHUNK_TIME_MS_DEFAULT;
- 	nsim_dev->max_macs = NSIM_DEV_MAX_MACS_DEFAULT;
- 	nsim_dev->test1 = NSIM_DEV_TEST1_DEFAULT;
-+	nsim_dev->test2 = NSIM_DEV_TEST2_DEFAULT;
- 	spin_lock_init(&nsim_dev->fa_cookie_lock);
- 
- 	dev_set_drvdata(&nsim_bus_dev->dev, nsim_dev);
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index af6fcfcda8ba..d1a941e2b18f 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -331,6 +331,7 @@ struct nsim_dev {
- 	u32 fw_update_flash_chunk_time_ms;
- 	u32 max_macs;
- 	bool test1;
-+	u32 test2;
- 	bool dont_allow_reload;
- 	bool fail_reload;
- 	struct devlink_region *dummy_region;
+ check_region_size()
+ {
+ 	local name=$1
 -- 
 2.47.3
 
