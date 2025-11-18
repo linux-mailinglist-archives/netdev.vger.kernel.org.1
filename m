@@ -1,125 +1,288 @@
-Return-Path: <netdev+bounces-239395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94DD9C67D66
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 08:10:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4942C68176
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 08:59:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5B34D354616
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 07:07:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 9B62C291E6
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 07:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B392FB97D;
-	Tue, 18 Nov 2025 07:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA81C30597B;
+	Tue, 18 Nov 2025 07:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c5lGP3Td"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eJhko107"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75AD2F531A
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 07:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763449634; cv=none; b=Z7XmwKytT6jaYdY/g8VkcSII9ANwNoTOPM5LY9DCd4Hjgyu+JNW0vi7TrzhVDnxE2GDPGl0E2iW5DvdMaeHVHC/JbQCRHiUgqgBXjVgoC6nStO4C+z0G1iLBRsDU1HgJskwb+xa982fVY7MGFckLWmCtlrqdPvG7w/sIp4K10iA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763449634; c=relaxed/simple;
-	bh=3RED3YqVVZqWfs4npKZKtaBwJGrtnDirzNNEGnJpL7Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ik555bShIpf2XgbVswNdT77sqf3zoPGXJEZyhy7OLdzsdBoC3TKnPdBW+Cu8sozb7XkDwPki/O7A79kxM7iOY0NwMP3io0CtHd3Y6Xf201D09xFW/LfORDLgVgQwhZdOlnfvq+xK2gfIreLjxx7ZIIvtMgY1OJfJf5QqRaI4A6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c5lGP3Td; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3410c86070dso3887772a91.1
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 23:07:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763449632; x=1764054432; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cox+QGAKOZb0FZ+q6lv8UkSqGpKkoFZtrVzvrKo4ouQ=;
-        b=c5lGP3TdXVH4Q5uoi8TZreYVNjMBniSbaKJYzlqQ2kyoGlQhitO4Jbda2LmXMxk5qV
-         /y4ZKOhhnurSxGKvDXUN3OGr4h6HS/3eB16YI82zAuq58MuW5Ddr9UbZqTJoKUAlKN+p
-         dDK6quGQ/kvr7ha2dzIXH9ziY7518vdmT4iwzxzaKa1yDJVn3YrGnUiqvk4es++2mRq3
-         i3wqWhyoc+Cr0GNeJwdTlcDOd+4shjTzF3xUkBcU2YY7UPJbLmdQOWuAk022TrJSb0A/
-         rgDMNIXXAMvxJU7A989Zgi7Pj0lHcWZ12kv79GryYMESdUKSUZErcy7YNwAPMfydes+b
-         Vxwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763449632; x=1764054432;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Cox+QGAKOZb0FZ+q6lv8UkSqGpKkoFZtrVzvrKo4ouQ=;
-        b=iZy2cPbH8BP190Pc5+tA9vxOSEB2X4ed1ON83L20Q1dKPd36Wqf5pbYt+CVg12vldf
-         iVv2sDAai7AA0dIIEPt73GvYX8gaSzPtBu4RUjlTfoxoBwFrVWSJRpQsGaqxItXqiUDv
-         Wm1EP3mnLOblrfV80n/8KzFKnUk9KToz4RwZXKjWir2xBqMdFNi4q4m7weGmdQkln3Ey
-         78VtgkmEES7ASqDeL3cfRHRr+rgfdsaBfGLqCTHOUyvpt3U9H6zlffOmWqJDeeOcxuog
-         dbOG+jcXY5DqZexDOr9mJdkU8jUV06CPEZTUjUlTdN3R9om3wmLEV0+YRfGJsP+CR0o8
-         /xfQ==
-X-Gm-Message-State: AOJu0YwnvUCvs8ZNWr1JxZ+Z5KN/OC6TR0Y/VAgfSeIqN+JGFmj1i+x+
-	7n5h+hoKcRc7BEDR4kV/uWwHnvJvbZfT6XMqj1TrqVrYrxlgYH3XlMGd
-X-Gm-Gg: ASbGncuvFUOTfzVsJQBrdwoR37RmD1yHoFvF+8YeJ3BWQJrv5aUTgO0ROz4DDwL6qb4
-	Co9yG4E8dHWEydY4OSBbbGx7AavDl/+inBTMkYIGNxGdm7uHQm4Ks0vOTXc4P/qdw2DLV7xNMhc
-	kaia0iUt3jS6X/1dcWRMi1vcr33t9dIt97xyfGCkaa2qm6v3/ipXJJ/3oqBIl4mHCU5WRAawLLo
-	tGk1nqM/mUqg23IlQAyNngvjHoT/stCq0o4KM6jSL6siW+mE6AB7z7IQEJqfOnGv2cllNrptQEE
-	kTkEPvzO9urqg9sXjaKy+51MLlr8JcBHbxd0o+7c6k/sgyh4fuH8z32tOFTpXZJdLs8ycis58Ln
-	5tqno+2LoWEYF1jtDKW+vEEnHfPPRHDx0EmaL1J1Y3CGT4VyK7QRDPORpPmTUSrlGpeRGj8dE95
-	VQ76x/ciXLlXIPenjnhMMe5lk4DDJ2+mSdDEd3S9MhO6MNrdY=
-X-Google-Smtp-Source: AGHT+IGhN6YS+jHampvyhEZt253P0eaNhUc1BOQA57xlR/xLHJdePDApMnfuel430mxolKjANOr7DQ==
-X-Received: by 2002:a17:90b:1a8a:b0:341:69e3:785a with SMTP id 98e67ed59e1d1-343f9fdf8efmr20032430a91.16.1763449632102;
-        Mon, 17 Nov 2025 23:07:12 -0800 (PST)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-345651183b2sm11868494a91.2.2025.11.17.23.07.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 23:07:11 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 4/4] net: prefetch the next skb in napi_skb_cache_get()
-Date: Tue, 18 Nov 2025 15:06:46 +0800
-Message-Id: <20251118070646.61344-5-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20251118070646.61344-1-kerneljasonxing@gmail.com>
-References: <20251118070646.61344-1-kerneljasonxing@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59980302153;
+	Tue, 18 Nov 2025 07:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763452732; cv=fail; b=aWFyCv7pI9TgXyfpWu+OXUmzcg9FkNCIZ0tQJYaXIEaY9XY7YGzkffkY6JM1F4Am+UZvst5jTOiAlbIp+dcz0L2mOyA0gRKZjpFJdSV5hJGbSu//6oiswwEHs+qBBl68w0c/wErgM2YQ3gHb45tpAVkgWTAAxaJTY+aC4aFVJ5E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763452732; c=relaxed/simple;
+	bh=sf/Tpoac8/QDWalRFFNLOuhSQUtLuZv9R82FnK7Iqr8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Gvp2vUiV8bDUeLdhGeGHNWzDqLQsZyE+vjlNOFUafXnUm5RiJczJPRFl28DDhZRuJES4hHJzDmUvVIYXEQIX3TYAsuGX37rwj4N6dmSPN/RVEAgOXz215mIljjpHiC5vby1xiGDfk1yRbPptIIe704yNNiikH6IhJH+V1iPs6oY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eJhko107; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763452730; x=1794988730;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=sf/Tpoac8/QDWalRFFNLOuhSQUtLuZv9R82FnK7Iqr8=;
+  b=eJhko107PPGp/Nsbl/AgofgrT71tQco3DYX7+CrBE/GXtRdvMfCcKEsA
+   odsMp2Ojnr8KzOaUnwDXNGDCR749opJ8MX9Vsczq2KR7lqFdXgmEscFOX
+   HoTee0WoqqkD8CXD+l6nlntaDJJsHiol6x6CyDC71hR/0wFvUR6kNGeNE
+   D7v20OP0SDSuSwxrpM9QwA9yR4MzXwP/NhJFV+Wwz06WhNzjXlCTQovAQ
+   a5yyZ0MRhVnjrZ8FrGrpIy3kWDXIbw75WbKqEwhpj5Co0uG1n7oBO3pcc
+   q1XkwKz4BKdDXS5DDh7/ByIzad73THdoQU9xlo/ZgmdWx3NOazxEBs+Zb
+   Q==;
+X-CSE-ConnectionGUID: Qxzmza7HT2iymmFqYoBd0A==
+X-CSE-MsgGUID: 9UFDKBvNRsyLa5l6ZLfzNw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="75785501"
+X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
+   d="scan'208";a="75785501"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 23:17:46 -0800
+X-CSE-ConnectionGUID: BbUrWAKTRsSlQnqXhwVbZg==
+X-CSE-MsgGUID: piAZ0evDRrWB60gtUGFG8g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
+   d="scan'208";a="190843170"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 23:17:46 -0800
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 17 Nov 2025 23:17:45 -0800
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Mon, 17 Nov 2025 23:17:45 -0800
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.56) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 17 Nov 2025 23:17:45 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NPpMl6DHSP0ZPImiJm5iSebQZDPdT0N/nUWOn3ABQoqc+qvw1A6AhvnxWKw7af4508ne6EKRoSBhbkptFc9dCN8YyLMbtnzj/YT4VmZvR2CzeyA85Vew1bP9ofs2mIIRAP2NcZkw0LPQ8MyHl3ThqjxzIqLJ06oouhmxotUzO3dh5I+eDaRHZciZBiYF4gVC9OwyAE3fD5rlDSPsLtii4jfz5x7KSN/StKl0mmIWtNod+18gjCJ/2bo7aeLgI0sliGlAY2EeplNUfd/20jGycNdybfxNJpjW+LTrtetRJ7ZH2506Myu5ScdGm2z83FwggVWlai9QFXGfdN96pONJTQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6w8fsPqF+ZqJLMn0hJKIZv2uYvgG5juKeqU8xystr6c=;
+ b=RKAcA2bxw2Ax+sJNfhEOTO7Y6RTON7pvFcDETnSaD5JU4QQqNSdNM1ZO/1sV7CctS+kWz/cVM0a9kOlG95kGCU5sVAQM+7iSIxcNX60wFtETGUJa3ArN3vN0j0jycyeHw30vA4Nc7qsOWrAZAo0RXInlh70X7qHk2wjOjGC9KE27M7qhUQP9vua7D8QoZ6vatD1Uik2qVtjBnOgrQGBrCS8NYKYCEzqMTGKRlTJCCW+92RTovi+JrntiZ7oZTHzU1DkBG4TTLZ7hZKCpyHMZRbVKgXwpQoXYpprGAXPTzdz/xbHDpZPGiahEfst5KfKJsMxMcxz8eaxLrbo+2qb5zA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by IA1PR11MB8246.namprd11.prod.outlook.com (2603:10b6:208:445::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.18; Tue, 18 Nov
+ 2025 07:17:42 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9320.021; Tue, 18 Nov 2025
+ 07:17:42 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Daniel Zahka <daniel.zahka@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Simon
+ Horman" <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Srujana Challa
+	<schalla@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, Brett Creeley <brett.creeley@amd.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Goutham, Sunil Kovvuri"
+	<sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>, Geetha sowjanya
+	<gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>, hariprasad
+	<hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, Tariq Toukan
+	<tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+	<leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, Ido Schimmel
+	<idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, Manish Chopra
+	<manishc@marvell.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Siddharth Vadapalli
+	<s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, Loic Poulain
+	<loic.poulain@oss.qualcomm.com>, Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>, Vladimir Oltean
+	<olteanv@gmail.com>, Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	"Ertman, David M" <david.m.ertman@intel.com>, Vlad Dumitrescu
+	<vdumitrescu@nvidia.com>, "Russell King (Oracle)"
+	<rmk+kernel@armlinux.org.uk>, Alexander Sverdlin
+	<alexander.sverdlin@gmail.com>, Lorenzo Bianconi <lorenzo@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Subject: RE: [PATCH net-next v4 1/6] devlink: pass extack through to
+ devlink_param::get()
+Thread-Topic: [PATCH net-next v4 1/6] devlink: pass extack through to
+ devlink_param::get()
+Thread-Index: AQHcWCHFkPPKsRsPUUeR/1TMj5i2d7T4BnHQ
+Date: Tue, 18 Nov 2025 07:17:41 +0000
+Message-ID: <IA3PR11MB8986A51FD457CD040F2D73FDE5D6A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20251118002433.332272-1-daniel.zahka@gmail.com>
+ <20251118002433.332272-2-daniel.zahka@gmail.com>
+In-Reply-To: <20251118002433.332272-2-daniel.zahka@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|IA1PR11MB8246:EE_
+x-ms-office365-filtering-correlation-id: 080d348d-7c2e-4044-89e2-08de26729026
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700021|921020;
+x-microsoft-antispam-message-info: =?us-ascii?Q?987oVIUUgIy7ZeQ5GX6DbyW0lfyG490NrtNMbhXUW17An4Lm2sCHvMPSGI7z?=
+ =?us-ascii?Q?pKl3PRQgRbfOVS9Wle7h0dBnaieWphDqVoA2aisXjr1RWRqMq+emIpJRcZUM?=
+ =?us-ascii?Q?lUdRdwBUEiBCUGpU1/Gf/TS9jq3HNO+IRPI51DoP3a3X1bFK5vPNSH6gw9N0?=
+ =?us-ascii?Q?a6RbM+75dj6pAp5NoF9uKo9Ha/lwHH1fbKN9OIt5nKbyO/EqcqCTY+hIKKGq?=
+ =?us-ascii?Q?y47vaaCgjGJj4de9JvB+TV6mx2EEzl3T1TvgoLPOH+rRXhxuBo0XO0+1Yerk?=
+ =?us-ascii?Q?VTLY6aE8ZBpM+MLPuIF+csXzgtObADwTdm4G0l+ztPOZ9u2p39GRVbTriJmU?=
+ =?us-ascii?Q?C5eM8seNrn7qbvnDMmWQCzKGjzzFlh3wnP9R09ii+fSefy0B7a5LpY+u/1MM?=
+ =?us-ascii?Q?ERfrUkk6m/YAhJdVJEg/+DrHarXZZ1a/NtzGcpupvRV6BF3Ik3H+CYUu1NPi?=
+ =?us-ascii?Q?hyb/GB5yGJtdCRh/w19w8KGiboJ3/JPXGtehYQbl97+qjiF3rRTgbqUQvWRa?=
+ =?us-ascii?Q?epOMcNhRRTKgewm5odIpB5QoFj3T/pz5IdnOdLbz+Y2WbqhRHhGA7EP+dDah?=
+ =?us-ascii?Q?XvMqChyyRvDFwvvVTaq+sqI5SnlCes0R5ikMDVwN5ZQ4FyRjZM3ZZxV3ter3?=
+ =?us-ascii?Q?ZldtLGoSmMfJ60/zk4ZQpAZuRt5mbdz3jQ/74eKfFJH/IbX0AHkaBFhDPrDw?=
+ =?us-ascii?Q?BYcUUNbWFA1e40e6YYH2RjZ8CR84v/l94yz7Gu6mDmrphrRU1Gayn4RBBhyF?=
+ =?us-ascii?Q?yoBbd/kr14phMQtrCqOsT77OxKmp2TZvHI0P4mZpcc1NslEgb6MhTLy/YOwB?=
+ =?us-ascii?Q?cFCKI9Z0RX+qTiTKSbV84Sj5FYDXcB0JPhFOUZRnZkZ67R58nMeKRkFMc287?=
+ =?us-ascii?Q?d3kDYZD8tmM+B/m/9yFmcNOBoXy+QQSlFScoHZFPEBpPzSEbO0PaM3GsmlcW?=
+ =?us-ascii?Q?bnTus2QGPwGA/ku7c3kQZzEwagg4fwScpD2POEPzYck7oRSFYRW6FKefW6zB?=
+ =?us-ascii?Q?cUJSHf263Fs30Kx2hhL8hRiN62pcNo0IgnzwOP/XofRPSThDUOgXkH5lji5u?=
+ =?us-ascii?Q?vSwUJoZ7gWhBXcPACXmYD0m6VKXS8ZrUfUOYI9D6WxyW5swX6tRhn1dSFV+L?=
+ =?us-ascii?Q?PodMOFp89nOy7PIPIkgJ4vF1jSsUa7R9MzEfIEyLHmwkIwIpqh+GgrEtvLT6?=
+ =?us-ascii?Q?pwbpEO5IxkC2QkLDFcgZmV/lhy3GgMK86mbZlKlY1YhZESmerKTx2HQ08hPd?=
+ =?us-ascii?Q?tmpg9qBQnH91TlXxOPT8dH5tZ69H4geIVstmr86/6L0j6JQ9mJUpgTPhU2KD?=
+ =?us-ascii?Q?0Cx/eCs+eZx822rgYd8X566zw+9vPrF8tcuczxKa5+MfuskXWpY5IHeKBWSD?=
+ =?us-ascii?Q?ptT3hiItz44ecb4iBp6/AxuVp1qeQX8Z3JMQXuNvUCdmhlmvrDYZOOVb43tT?=
+ =?us-ascii?Q?atEtg7BM/H/m46U8pVjv2ugVvVm/8DitFxetO9JTQdtYghzUXXUmxV3c+utD?=
+ =?us-ascii?Q?rUD/yPaWBwnrJ4WpPChirbUSmNvT2u2JYxlAxv6sMp6eWqo5pfdx5Avaow?=
+ =?us-ascii?Q?=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700021)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?xoFZOFV3RCvLQc2VM2I5KMcM/9WLgLypaYybn6bb12gv2hAJzWKQ8GFP2GTH?=
+ =?us-ascii?Q?Tmdf7qCI52UpNP8I19maElr06bsb2lDdjpeLUQhp1ktoCtsnHSYYJ8UwGlZi?=
+ =?us-ascii?Q?2gA+Rr5HV8u8mok1YeVrAa9NsYsOo0eOa2x9wZquv/U6I1Wxqz9PagTDPtbk?=
+ =?us-ascii?Q?skvBMTUWWL0wh2EJgfx8aH14o1BBUSHW5TGwbYpcw0LxG6qbcImPK9F5FtAN?=
+ =?us-ascii?Q?a9rXwvTuX1RDZyX2XLi2gIf3gh6y53+gvbqh3BfOAiD3r8m+/W2zTbEmh9l3?=
+ =?us-ascii?Q?uMPA1FgwOPTcK/7kELQRK/XzFqJNFPXl3/LzF/YwcUE5lUtv4belyix3Sazn?=
+ =?us-ascii?Q?JLdwl3JNdmyNPvBd/cdDTAk+rShJ49h0ABotPxDOdNZO+lJ1/lmNgk8+Q2hl?=
+ =?us-ascii?Q?AoqD8JhsJ6GFMITOjJvVzEgXsEWcndHOEhgOq1IPAlgqqJrNEAgc5RZwwF8c?=
+ =?us-ascii?Q?AIf+6Y8+aUZy6eINgXtE/0xFHwkzAH3tqZEkvusKnLGx4/gYWTSKkplVGhQu?=
+ =?us-ascii?Q?Tx+6BYEh9VjNQI52xhNtDgV1zY941gO2qGAZv+TDf6EL/S7gg4D24YVo80T8?=
+ =?us-ascii?Q?Rqlm/58UpFegyPM9lIo+0632JQHWAWBLap5ZXQTpUh3H17KY3p7v7lIaH2Gv?=
+ =?us-ascii?Q?rOCeIHeFdcmOq1GpwlKw+3PMT5OrnmfrD5sOs87lPN4qBIeYxK1FVhbEM62B?=
+ =?us-ascii?Q?VqJL7nkUOPpRuSC47UHXtJXAmeU+3PrQRJCYdWAXye3ldLwfZoTmViYZLDP/?=
+ =?us-ascii?Q?by8KGp3nA2E4tBOYMof46zq7zFvcTz/6BHI7KpQzlGr/0qr3D94SctVwydgk?=
+ =?us-ascii?Q?u+mWsh7a4llBaKnDywsjS4Y6br2ol/0bkOWRraywlNnexTbl8vMi9AdM1jwc?=
+ =?us-ascii?Q?WzXPTBJhsdChNW2UE5Psc3sbiqcZiUbq7DgNXTfHe57N8XPO+miFL/0iaB2S?=
+ =?us-ascii?Q?rAwObmvaCRPEPDby52QEPGJWeqjHvRAkcaHOdLhgXPJxl6Ly5kdRpl+zZ03h?=
+ =?us-ascii?Q?6K2OjH8kxy2vINcKpFaY2HMX3wDY48CKoZ+AQb1vw9br3w3vGUitE2TaV3vY?=
+ =?us-ascii?Q?7ykoGRCvX1dr9JHLSZ2rSjlYX2MRgAXOuZV5STdVMzscep122MSEWyy+Nb6A?=
+ =?us-ascii?Q?PXRa2EDSWRis30aG/gAHnJkeK9FFzHB4xG5AggxV5a/1Zp0MX/YrVYL7y4kl?=
+ =?us-ascii?Q?N+VofKOo4GRmOFm3w0LhQNX8hQdJ1iBvzFfCg7sjmUWOtkZYnn5kSW3htMzb?=
+ =?us-ascii?Q?iAZw0rx1JqI7R+Q2EG4fHrB63hqFJo8sZNysPVyC669ydSozwKAAwNR22Ky4?=
+ =?us-ascii?Q?ehaGkEGKLF3d+vBeCDXSlPe36Dn1ICKKgfaJ45ZWjdwMiYsmGwi55aFXDslD?=
+ =?us-ascii?Q?GLOySZM/Ao8cv0blq/JBW1FMzWbxfkudV0Y9A4ZmqDv/JkuxJhMHDx3kt7oV?=
+ =?us-ascii?Q?fa6lXHNOQs8tWNsHeNmQCV6Po0BjWpqqqIDJKFZN7g8mxvz2Q2zxyLaMV0Yv?=
+ =?us-ascii?Q?tI24pPgHqnqI8SfVyAMQnvOU6cM8wNK2A3zbwjtyFQl9VUU6WEeG/nXF5oZH?=
+ =?us-ascii?Q?6kxGOcEgW2J2oUO4im/aw+WQtH787vCTI6IRulOA3l/jCyMwLVoNgjKANh62?=
+ =?us-ascii?Q?yQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 080d348d-7c2e-4044-89e2-08de26729026
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Nov 2025 07:17:41.9160
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Ct1pmnO3YGCbmYOr0jtXniHT6+DPJgMpTIKfdVeMr8C0jrunnRRBYOLDlq0OsjIdChKu/fd10AveDAjldwesryRPnEoD1niyLs/HzOPSra8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB8246
+X-OriginatorOrg: intel.com
 
-From: Jason Xing <kernelxing@tencent.com>
 
-After getting the current skb in napi_skb_cache_get(), the next skb in
-cache is highly likely to be used soon, so prefetch would be helpful.
 
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- net/core/skbuff.c | 2 ++
- 1 file changed, 2 insertions(+)
+> -----Original Message-----
+> From: Daniel Zahka <daniel.zahka@gmail.com>
+> Sent: Tuesday, November 18, 2025 1:24 AM
+> To: Jiri Pirko <jiri@resnulli.us>; David S. Miller
+> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Simon
+> Horman <horms@kernel.org>; Jonathan Corbet <corbet@lwn.net>; Srujana
+> Challa <schalla@marvell.com>; Bharat Bhushan <bbhushan2@marvell.com>;
+> Herbert Xu <herbert@gondor.apana.org.au>; Brett Creeley
+> <brett.creeley@amd.com>; Andrew Lunn <andrew+netdev@lunn.ch>; Michael
+> Chan <michael.chan@broadcom.com>; Pavan Chebbi
+> <pavan.chebbi@broadcom.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Goutham, Sunil Kovvuri
+> <sgoutham@marvell.com>; Linu Cherian <lcherian@marvell.com>; Geetha
+> sowjanya <gakula@marvell.com>; Jerin Jacob <jerinj@marvell.com>;
+> hariprasad <hkelam@marvell.com>; Subbaraya Sundeep
+> <sbhatta@marvell.com>; Tariq Toukan <tariqt@nvidia.com>; Saeed
+> Mahameed <saeedm@nvidia.com>; Leon Romanovsky <leon@kernel.org>; Mark
+> Bloch <mbloch@nvidia.com>; Ido Schimmel <idosch@nvidia.com>; Petr
+> Machata <petrm@nvidia.com>; Manish Chopra <manishc@marvell.com>;
+> Maxime Coquelin <mcoquelin.stm32@gmail.com>; Alexandre Torgue
+> <alexandre.torgue@foss.st.com>; Siddharth Vadapalli <s-
+> vadapalli@ti.com>; Roger Quadros <rogerq@kernel.org>; Loic Poulain
+> <loic.poulain@oss.qualcomm.com>; Sergey Ryazanov
+> <ryazanov.s.a@gmail.com>; Johannes Berg <johannes@sipsolutions.net>;
+> Vladimir Oltean <olteanv@gmail.com>; Michal Swiatkowski
+> <michal.swiatkowski@linux.intel.com>; Loktionov, Aleksandr
+> <aleksandr.loktionov@intel.com>; Ertman, David M
+> <david.m.ertman@intel.com>; Vlad Dumitrescu <vdumitrescu@nvidia.com>;
+> Russell King (Oracle) <rmk+kernel@armlinux.org.uk>; Alexander Sverdlin
+> <alexander.sverdlin@gmail.com>; Lorenzo Bianconi <lorenzo@kernel.org>
+> Cc: netdev@vger.kernel.org; linux-doc@vger.kernel.org; linux-
+> rdma@vger.kernel.org
+> Subject: [PATCH net-next v4 1/6] devlink: pass extack through to
+> devlink_param::get()
+>=20
+> Allow devlink_param::get() handlers to report error messages via
+> extack. This function is called in a few different contexts, but not
+> all of them will have an valid extack to use.
+>=20
+> When devlink_param::get() is called from param_get_doit or
+> param_get_dumpit contexts, pass the extack through so that drivers can
+> report errors when retrieving param values. devlink_param::get() is
+> called from the context of devlink_param_notify(), pass NULL in for
+> the extack.
+>=20
+> Reviewed-by: Saeed Mahameed <saeedm@nvidia.com>
+> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+> ---
+>=20
+> Notes:
+>     v3:
+>     - fix warnings about undocumented param in intel ice driver
+>=20
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index d81ac78c32ff..5a1d123e7ef7 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -299,6 +299,8 @@ static struct sk_buff *napi_skb_cache_get(bool alloc)
- 	}
- 
- 	skb = nc->skb_cache[--nc->skb_count];
-+	if (nc->skb_count)
-+		prefetch(nc->skb_cache[nc->skb_count - 1]);
- 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 	kasan_mempool_unpoison_object(skb, skbuff_cache_size);
- 
--- 
-2.41.3
+...
+
+>=20
+> --
+> 2.47.3
+
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
 
