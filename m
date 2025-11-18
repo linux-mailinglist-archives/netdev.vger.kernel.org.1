@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-239633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E289FC6AA8F
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:35:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E17EC6AAF2
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:40:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id D238F2CB59
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 16:35:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 3CFDB2C058
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 16:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0AB3A5E77;
-	Tue, 18 Nov 2025 16:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43A026F2B6;
+	Tue, 18 Nov 2025 16:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="f9vwQNyQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2Eeb2cJy"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF84F393DD1;
-	Tue, 18 Nov 2025 16:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5081C1D63EF
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 16:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763483556; cv=none; b=I1socQx1eBUj2C6SVh5psSsPQTZNQH1e6mqbIZr81i7UM9TOz9KqbOhIaOPNW5amPlHQkTInfBSzJygPMovhBNVOaQ6KUfprzQDnIx1zg2LkMB+Gh1/sSUCk6jh1A1CS8mG92Dbt+6ycRF8SPmastsPNLhGTuXrcR7wGAr67MDI=
+	t=1763484023; cv=none; b=Ht68b00anj4bs9vTw1vQYQRbhTEFdP13uih3HwaowOxpthyY+U7sC8L+KiJ6dCVj2z9GTC6t+Xs1tNQVKQbcyKTjaH8S7HLT1Li+X9RO8d5vSqXTQ8u9voQM5dD66sFMEaXWo4zh8i17/ojYVyLE/tKz9aDIFocbMTR3vJiiiko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763483556; c=relaxed/simple;
-	bh=vFo7r0XdnaRLl/OJtbQ6R9qQ2Bv/a+jVHUjiqFqRBqY=;
+	s=arc-20240116; t=1763484023; c=relaxed/simple;
+	bh=TxK41wWPYCmyIIobQi7otEbIKKUdXKELAPlLBaM2HjQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GA+4e2obWOJEZiGZ8qfHKmmfe4Dp9rWNmqTY5pNbBO0L9SJ5w+29jsha9ygiUDDRYCk3q4U0m2a2GDkjUVI+mSgu7Rl30pdbI7pHajo8+naGHZh2FZXP34CfUTeU07tYRDipQ+J05vRG3CF0MQZITGPboWK0CY/6KOb+lAkaIxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=f9vwQNyQ; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZQlZCzfjOLN9pz0hqJpSfkK4GDwX6GM+tK8rM2j85AAzcxCt3ZCxnZSTzOf+O7qrNjN5ya1vUiXG20p2kimQ7BQK4QWtx43b+VSRECXIvIZN+WZ5TOzqg7k0s6a33idPVlkIE7P9nH4RN3wiCdVQ99lWs/D73hGdoAzO7Ioq3vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2Eeb2cJy; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,32 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nyu4wcuTtWYOJHnjMQ7lXCj5/noswXstfWWmMH5QKEc=; b=f9vwQNyQfdoMJNE4azz4WFej8L
-	RvgrgB13p9zf4FQQqqHsORjKjsTc9oE+Og77RCz2uwiMfdFlWma43ODCDQ7Q9OCPBQb7q56QHYZgP
-	TFESffn6pZpMmp2tDOJF9Ag4q8HeU6wwa47l4vCJYeYrkC4Rg1AH4yBMQjwQyx1AoGgY=;
+	bh=oZ3/8tV3+I0CFki1qG4ilo5z4AmC2klo1ULGZnE/XsA=; b=2Eeb2cJyf5DmS3infjDtjH3JNW
+	THrFHhkPbEE9RPT9WWJVtjWrFaaPN46ARnq8ZivCxEjqWuHeYsnhN/G5ILlAWl238Tst6s1slFr87
+	FlIUSrqIsm1N7F0Au0OKLKBbRSBYy+EEHXYuENfMRCtEA366M4TxpkuXlXwScG/3RLEY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vLOcr-00ENEA-RC; Tue, 18 Nov 2025 17:32:17 +0100
-Date: Tue, 18 Nov 2025 17:32:17 +0100
+	id 1vLOkd-00ENFi-7X; Tue, 18 Nov 2025 17:40:19 +0100
+Date: Tue, 18 Nov 2025 17:40:19 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Pascal Eberhard <pascal.eberhard@se.com>,
-	=?iso-8859-1?Q?Miqu=E8l?= Raynal <miquel.raynal@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v5 5/5] net: dsa: microchip: Fix symetry in
- ksz_ptp_msg_irq_{setup/free}()
-Message-ID: <d87f3e67-fc99-4076-8e9e-0a20ce387f1b@lunn.ch>
-References: <20251118-ksz-fix-v5-0-8e9c7f56618d@bootlin.com>
- <20251118-ksz-fix-v5-5-8e9c7f56618d@bootlin.com>
+To: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Cc: Netdev <netdev@vger.kernel.org>,
+	"inus.walleij@linaro.org" <inus.walleij@linaro.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>,
+	"olteanv@gmail.com" <olteanv@gmail.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>
+Subject: Re: [PATCH] net: dsa: realtek: rtl8365mb: Do not subtract
+ ifOutDiscards from rx_packets
+Message-ID: <a31ffe45-5457-42a2-aac5-2f2da9368408@lunn.ch>
+References: <878777925.105015.1763423928520.ref@mail.yahoo.com>
+ <878777925.105015.1763423928520@mail.yahoo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,26 +66,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251118-ksz-fix-v5-5-8e9c7f56618d@bootlin.com>
+In-Reply-To: <878777925.105015.1763423928520@mail.yahoo.com>
 
-On Tue, Nov 18, 2025 at 05:13:26PM +0100, Bastien Curutchet (Schneider Electric) wrote:
-> The IRQ numbers created through irq_create_mapping() are only assigned
-> to ptpmsg_irq[n].num at the end of the IRQ setup. So if an error occurs
-> between their creation and their assignment (for instance during the
-> request_threaded_irq() step), we enter the error path and fail to
-> release the newly created virtual IRQs because they aren't yet assigned
-> to ptpmsg_irq[n].num.
+On Mon, Nov 17, 2025 at 11:58:48PM +0000, Mieczyslaw Nalewaj wrote:
+> rx_packets should report the number of frames successfully received:
+> unicast + multicast + broadcast. Subtracting ifOutDiscards (a TX
+> counter) is incorrect and can undercount RX packets. RX drops are
+> already reported via rx_dropped (e.g. etherStatsDropEvents), so
+> there is no need to adjust rx_packets.
 > 
-> Move the mapping creation to ksz_ptp_msg_irq_setup() to ensure symetry
-> with what's released by ksz_ptp_msg_irq_free().
-> In the error path, move the irq_dispose_mapping to the out_ptp_msg label
-> so it will be called only on created IRQs.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: cc13ab18b201 ("net: dsa: microchip: ptp: enable interrupt for timestamping")
-> Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+> This patch removes the subtraction of ifOutDiscards from rx_packets
+> in rtl8365mb_stats_update().
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+It does look like a cut/paste error of some sort.
+
+Please could you figure out a Fixes: tag, and submit this to net.
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
     Andrew
+
+---
+pw-bot: cr
 
