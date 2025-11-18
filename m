@@ -1,132 +1,270 @@
-Return-Path: <netdev+bounces-239496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11825C68BE4
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:14:42 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8961C68D89
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:32:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4CFA94E9F6E
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:14:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id AFF1E2B086
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FA0338939;
-	Tue, 18 Nov 2025 10:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402BD352922;
+	Tue, 18 Nov 2025 10:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Br/migN1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NbXbVUvM";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZN8PruE3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6360E337B86;
-	Tue, 18 Nov 2025 10:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B9134C9AE
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 10:22:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763460737; cv=none; b=tgU+QsZjG9CUTlCLS+DtghUfm7gtzkbCv6yCBpSvc/qwbY/d+doHcYOSOwUWxFWilbSuPxpa2gAfIsxR04RJIAQoneI//eh2YuoAaX9khQp4DeS9yy08oNQ9epMvcT8JXLcnRaSut70PDI0a9SAFcmFtmmJWUjVe2mssDvhaGU8=
+	t=1763461361; cv=none; b=PNP6CLJ10RmnSod7DkiZcCKjiW2HPcxTdFKQVq9f4s9woGnALAM4Qg8i++QM8nCl+rQWl2Vyql5A/WLAFuQYVwoGv7ul/PXZOAcx7QWew++1pnt+RQRCd7KANDpr4yoBfrzRCMC1hHW10wIlK0hGc4RfnEHSlC2Grxhh2SxnbrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763460737; c=relaxed/simple;
-	bh=nl7pmGt8CjVlZAWWmPXGrOGwVFNg8prR1eUshaeTMmo=;
+	s=arc-20240116; t=1763461361; c=relaxed/simple;
+	bh=DP2UqYoAhUQhjzVLwVf1Qc3K1rq3/0/jImzuikX3f1E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lEpc5rdgMBVdL3Dn8SkFIFCg3qV/khhtVq8F6+Zy9zLeob/C2xXBz+Em5ncV42dwag2Whj85R22V//NTCVneTTEH56GjcCJlbzckOQpDXCIl4eaETCInKJI07m18cuF2ELTndUSTv8vwMhuJvVrITt95OCbPHi7Gz/HWYlUIhLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Br/migN1; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763460735; x=1794996735;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nl7pmGt8CjVlZAWWmPXGrOGwVFNg8prR1eUshaeTMmo=;
-  b=Br/migN1+AwyfqfcfSiYp2ljSktBS16oeNFM9DF1/+tD6SYZxdoM/ll6
-   61okvpsjjoZ0qLmPbFO9LNzEiuB/bRogEgBwYwDtkAC3/EGL3Bvk9lgb2
-   rAoQVhVU5U/OQSM/QRBXmjphpAOCvBhjX1pCpnvnJrpgJ0LkXdUz9nKcH
-   ZjEjxVHFkGuTKFkRiwdQE0WMVYYU6lAmkJrPSGelJKxSXrrez+5alVoAs
-   fZgSvbexOs55DFu6gA324UedzBS1WHD7lj823W+6TucVORDvkaxmfJCqW
-   hJQD+FHcV2sh3+c7EhvgkgH+zhXPsweWhKkDgq7vZdZ0pju6tYNhnKbCw
-   w==;
-X-CSE-ConnectionGUID: 6HBwi8EYSKOb+vqUXINZCA==
-X-CSE-MsgGUID: HoovTqNJS/eULFeuYD6+xA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="65358560"
-X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
-   d="scan'208";a="65358560"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 02:12:14 -0800
-X-CSE-ConnectionGUID: xPGIwTZrQQqn+TtBb2ocTw==
-X-CSE-MsgGUID: aDzpKKoYR7uBPxdb2THN0A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
-   d="scan'208";a="191157958"
-Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 18 Nov 2025 02:12:12 -0800
-Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vLIgz-0001bI-2b;
-	Tue, 18 Nov 2025 10:12:09 +0000
-Date: Tue, 18 Nov 2025 18:12:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
-	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com,
-	ameryhung@gmail.com, kernel-team@meta.com
-Subject: Re: [PATCH bpf-next v1 1/1] bpf: Annotate rqspinlock lock acquiring
- functions with __must_check
-Message-ID: <202511181716.vzqU1M8A-lkp@intel.com>
-References: <20251117191515.2934026-1-ameryhung@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lDeNtSkRwaoVa0kvvXqK5HwIEiOGyH1V2zbpsBVqzeX3eP1ohk35G29UHeFU7fGD9k0d+tjZNNKFmhX2X9a0vpethqA4AC6NIm6Los/SuuVQplNPjsShyqCK9hqQ2GGmR4QpWOqwfhnyfZ1f00KE9w26pJgD1QoHuzwofDolGrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NbXbVUvM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZN8PruE3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763461356;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WhrxnuIQ+DWK1cNZVwgN/Tu9b3I3RG0xWTJTU2uF+lc=;
+	b=NbXbVUvM1qQDjY1haandtAfbRcAzW3zhCwNPZDqd8elx5wiJRwVNu0j7bsVh2CYSBLq7J2
+	XpLsJQr7Lr0I6M0eABNKO3ZHS4ChtPKpncMDcTw73wS8OaorqL2pX9oHFlDWDzc4vjdBeT
+	bQLeUX2PrAmyjuEOXEjpLo5ZmtfwG5c=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-495-w_AWfXHDMzmkI2TLmkyA9g-1; Tue, 18 Nov 2025 05:22:34 -0500
+X-MC-Unique: w_AWfXHDMzmkI2TLmkyA9g-1
+X-Mimecast-MFC-AGG-ID: w_AWfXHDMzmkI2TLmkyA9g_1763461353
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b739a4cf54fso448782366b.3
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 02:22:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763461353; x=1764066153; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WhrxnuIQ+DWK1cNZVwgN/Tu9b3I3RG0xWTJTU2uF+lc=;
+        b=ZN8PruE3rdHFqElf9iN0OL/et5yxTHljvbCSfqNEVePsZ6kevuUWMraFEx78tr7E33
+         t/8VxIssI/23+QchxiXVm3jGGiHwTqbG/MyvinBAhV2kYhGMDPcei4mV48RhUdQveegx
+         e7aXr9W/RPI3UNRJPpnveTKuhpG33daW6/mUwDdMKVuzPPJ7N/BUuHNsFMQBM3uvMsEi
+         qSP0bOY/ZO2hnfA+pglXj4ArNMXbCyg72TH43HMyMGM+xC7Fj3FZCPPuOhDseFmbh+MC
+         MWa4RBuo/manUFGbvAjNWmT5aa3mFBNUjdSZr8g58DA+lmzppAGtvpuT/5g5Bes1Tnda
+         aQLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763461353; x=1764066153;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WhrxnuIQ+DWK1cNZVwgN/Tu9b3I3RG0xWTJTU2uF+lc=;
+        b=I3ux43CcEJcT83FXOugqgj6y8r765wWiEnAHpQkL/3j68ekBOjc4kOin6i8FrvBDFu
+         Zo9Weud3/xXvc+wWFyeekyFcTls9WoOleH385xcKjbfn9O57C+IYhz2aweLq3w8wvSO+
+         jzTRturQ7CUtBzOF44yAxGIM5B2siCOlCG5/de5ID9olew4UufHjQmc7zcFod0Z6T8FI
+         lT8myf/YAkdey9xHXtsFSkQh0+KT9IKwp+nUzJMDPd0P8F325JMdK2oDaZfQtZ3599lx
+         HTjNcDmwRqJXSOyF/17gO0exG7eGB19LgJjiTTGaF42vS7HNJ5XFdfdee/JoeCvEfzcm
+         MNTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWNLo1GXoIm6HWp5l4d9Ab7HOfwL5j+pRzSs/jXdgCGRdT9xSCD9l/iq/JWHja0fuck57t7H/c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwH4pRzbOfLnL3VsDbLjD621U/7WLv40BJ4uw3iwf0BayxtakSb
+	CyLn/QJvW5wlUsh56DGh0T5IBs0auNtWhtun3/2yTby8NjIAujlljg2YbDog//jogyXa7jALMRp
+	kyFJpfAnsHnEDCTKA4oKrGDGkoXJCModNtVnUn/ynbiUDEtoJoepdFcAQ+Q==
+X-Gm-Gg: ASbGncueLr0dH2ArUhf9OGtLmxFSA9d1pwoz8ogN0fKQwQu3Z64AsrOsKqtrDv4KWcm
+	TJH9eR0x5fdGIGssTs2jQeK4+pgNFr6ST3D6wSxGoVS6fumKjclGVme79Dfbc56NfvslO3B9jVF
+	TDwna37kUWnjj3x+pYjP5eEcTrO98YhRvvQfGotOaOLtbBwGxng6l74O2KZn+wCR3tpgCtOs4zV
+	5XVXxotvunX9VABXoGBSptTwwmfmqM+wf4LP2cjUrKCt7jkijIvGRgeN+HVwq7KigKcrEIiH9nP
+	B6SFvnaFSDGKt3jsOX0DtfVyYIVLfzgTXhfIqUiu/5y9NIi6EAkCxDk+3qqik1V7Siqtc2YaQDT
+	Xo2LZGnA79SVGdTsuF9evQxgxCVHKRgO8ajULFKE2O1clkrcd
+X-Received: by 2002:a17:907:9446:b0:b71:29f7:47ef with SMTP id a640c23a62f3a-b7367bd9eddmr1553213666b.61.1763461353305;
+        Tue, 18 Nov 2025 02:22:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH5wXBLs/IvjmY2IFBzvdXJdfIARJZCTsl5s37hgphmEAYMJcnafh7q0nxw3c1pVEGtYDAXPQ==
+X-Received: by 2002:a17:907:9446:b0:b71:29f7:47ef with SMTP id a640c23a62f3a-b7367bd9eddmr1553210066b.61.1763461352763;
+        Tue, 18 Nov 2025 02:22:32 -0800 (PST)
+Received: from sgarzare-redhat (host-82-57-51-250.retail.telecomitalia.it. [82.57.51.250])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fa812a3sm1314518866b.8.2025.11.18.02.22.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Nov 2025 02:22:32 -0800 (PST)
+Date: Tue, 18 Nov 2025 11:14:12 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Subject: Re: vsock broken after connect() returns EINTR (was Re: [PATCH net
+ 2/2] vsock/test: Add test for SO_LINGER null ptr deref)
+Message-ID: <cosqkkilcmorj5kmivfn3qhd2ixmjnrx7b2gv6ueadvh344yrh@ppqrpwfaql7d>
+References: <xafz4xrgpi5m3wedkbhfx6qoqbbpogryxycrvawwzerge3l4t3@d6r6jbnpiyhs>
+ <f201fcb6-9db9-4751-b778-50c44c957ef2@rbox.co>
+ <hkhwrfz4dzhaco4mb25st5zyfybimchac3zcqsgzmtim53sq5o@o4u6privahp3>
+ <aa00af3b-2bb1-4c09-8222-edeec0520ae1@rbox.co>
+ <cd7chdxitqx7pvusgt45p7s4s4cddyloqog2koases4ocvpayg@ryndsxdgm5ul>
+ <7566fe52-23b7-46cc-95ef-63cbbd3071a1@rbox.co>
+ <kiz4tjwsvauyupixpccqug5wt7tq7g3mld5yy5drpg5zxkmiap@3z625aedysx7>
+ <d3a0a4e3-57bd-43f2-8907-af60c18d53ec@rbox.co>
+ <js3gdbpaupbglmtowcycniidowz46fp23camtvsohac44eybzd@w5w5mfpyjawd>
+ <70371863-fa71-48e0-a1e5-fee83e7ca37c@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20251117191515.2934026-1-ameryhung@gmail.com>
+In-Reply-To: <70371863-fa71-48e0-a1e5-fee83e7ca37c@rbox.co>
 
-Hi Amery,
+On Fri, Jul 25, 2025 at 11:06:52AM +0200, Michal Luczaj wrote:
+>On 4/15/25 15:07, Stefano Garzarella wrote:
+>> On Fri, Apr 11, 2025 at 04:43:35PM +0200, Michal Luczaj wrote:
+>...
+>>> Once connect() fails with EINTR (e.g. due to a signal delivery), retrying
+>>> connect() (to the same listener) fails. That is what the code below was
+>>> trying to show.
+>>
+>> mmm, something is going wrong in the vsock_connect().
+>>
+>> IIUC if we fails with EINTR, we are kind of resetting the socket.
+>> Should we do the same we do in vsock_assign_transport() when we found
+>> that we are changing transport?
+>>
+>> I mean calling release(), vsock_deassign_transport(). etc.
+>> I'm worried about having pending packets in flight.
+>>
+>> BTW we need to investigate more, I agree.
+>
+>I took a look. Once I've added a condition to break the connect() loop
+>(right after schedule_timeout(), on `sk_state == TCP_ESTABLISHED`), things
+>got a bit clearer for me.
 
-kernel test robot noticed the following build warnings:
+Great! and sorry for the delay!
 
-[auto build test WARNING on bpf-next/master]
+>
+>Because listener keeps child socket in the accept_queue _and_
+>connected_table, every time we try to re-connect() our
+>VIRTIO_VSOCK_OP_REQUEST is answered with VIRTIO_VSOCK_OP_RST, which kills
+>the re-connect(). IOW:
+>
+>L = socket()
+>listen(L)
+>				S = socket()
+>				connect(S, L)
+>					S.sk_state = TCP_SYN_SENT
+>					send VIRTIO_VSOCK_OP_REQUEST
+>
+>				connect() is interrupted
+>					S.sk_state = TCP_CLOSE
+>
+>L receives REQUEST
+>	C = socket()
+>	C.sk_state = TCP_ESTABLISHED
+>	add C to L.accept_queue
+>	add C to connected_table
+>	send VIRTIO_VSOCK_OP_RESPONSE
+>
+>				S receives RESPONSE
+>					unexpected state:
+>					S.sk_state != TCP_SYN_SENT
+>					send VIRTIO_VSOCK_OP_RST
+>
+>C receives RST
+>	virtio_transport_do_close()
+>		C.sk_state = TCP_CLOSING
+>
+>				retry connect(S, L)
+>					S.sk_state = TCP_SYN_SENT
+>					send VIRTIO_VSOCK_OP_REQUEST
+>
+>C (not L!) receives REQUEST
+>	send VIRTIO_VSOCK_OP_RST
+>
+>				S receives RST, connect() fails
+>					S.sk_state = TCP_CLOSE
+>					S.sk_err = ECONNRESET
+>
+>I was mistaken that flushing the accept queue, i.e. close(accept()), would
+>be enough to drop C from connected_table and let the re-connect() succeed.
+>In fact, for the removal to actually take place you need to wait a bit
+>after the flushing close(). What's more, child's vsock_release() might
+>throw a poorly timed OP_RST at a client -- affecting the re-connect().
+>
+>Now, one thing we can do about this is: nothing. Let the user space handle
+>the client- and server-side consequences of client-side's signal delivery
+>(or timeout).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Amery-Hung/bpf-Annotate-rqspinlock-lock-acquiring-functions-with-__must_check/20251118-031838
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20251117191515.2934026-1-ameryhung%40gmail.com
-patch subject: [PATCH bpf-next v1 1/1] bpf: Annotate rqspinlock lock acquiring functions with __must_check
-config: i386-randconfig-002-20251118 (https://download.01.org/0day-ci/archive/20251118/202511181716.vzqU1M8A-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251118/202511181716.vzqU1M8A-lkp@intel.com/reproduce)
+Perhaps until we receive a specific request from a user, we could leave 
+things as they are, because it really seems like a rare corner case to 
+me.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511181716.vzqU1M8A-lkp@intel.com/
+>
+>Another thing we can do is switch to a 3-way handshake. I think that would
+>also eliminate the need for vsock_transport_cancel_pkt(), which was
+>introduced in commit 380feae0def7 ("vsock: cancel packets when failing to
+>connect").
 
-All warnings (new ones prefixed by >>):
+Unfortunately, I think this is a problem. For now, each transport 
+implements whatever it wants.
 
->> kernel/locking/locktorture.c:372:2: warning: ignoring return value of function declared with 'warn_unused_result' attribute [-Wunused-result]
-     372 |         raw_res_spin_lock(&rqspinlock);
-         |         ^~~~~~~~~~~~~~~~~ ~~~~~~~~~~~
-   kernel/locking/locktorture.c:396:2: warning: ignoring return value of function declared with 'warn_unused_result' attribute [-Wunused-result]
-     396 |         raw_res_spin_lock_irqsave(&rqspinlock, flags);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/asm-generic/rqspinlock.h:255:48: note: expanded from macro 'raw_res_spin_lock_irqsave'
-     255 | #define raw_res_spin_lock_irqsave(lock, flags) __raw_res_spin_lock_irqsave(lock, &flags)
-         |                                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
-   2 warnings generated.
+In the case of virtio-vsock, we have a specification, and making this 
+change will require a change in the specification. In addition, we would 
+still have to continue to support the old versions in some way, so I 
+don't know if it just adds complexity.
 
+>
+>All the other options I was considering (based on the idea to send client
+>-> server OP_SHUTDOWN on connect() interrupt) are racy. Even if we make
+>server-side drop the half-open-broken child from accept_queue, user might
+>race us with accept().
+>
+>L = socket()
+>listen(L)
+>				S = socket()
+>				connect(S, L)
+>					S.sk_state = TCP_SYN_SENT
+>					send VIRTIO_VSOCK_OP_REQUEST
+>
+>				connect() is interrupted
+>					S.sk_state = TCP_CLOSE
+>					send VIRTIO_VSOCK_OP_SHUTDOWN|CHILD
+>
+>L receives REQUEST
+>	C = socket()
+>	C.sk_state = TCP_ESTABLISHED
+>	add C to L.accept_queue
+>	add C to connected_table
+>	send VIRTIO_VSOCK_OP_RESPONSE
+>
+>				S receives RESPONSE
+>					unexpected state:
+>					S.sk_state != TCP_SYN_SENT
+>					send VIRTIO_VSOCK_OP_RST
+>
+>C receives SHUTDOWN
+>	if !flags.CHILD
+>		send VIRTIO_VSOCK_OP_RST
+>	virtio_transport_do_close()
+>		C.sk_state = TCP_CLOSING
+>	del C from connected_table
+>	// if flags.CHILD
+>	//	(schedule?) del C from L.accept_queue?
+>	//	racy anyway
+>
+>L receives RST
+>	nothing (as RST reply to client's RST won't be send)
+>
+>So that's all I could come up with. Please let me know what you think.
 
-vim +/warn_unused_result +372 kernel/locking/locktorture.c
+Thanks again for everything you're doing, much appreciated!
 
-a6884f6f1dd565 Kumar Kartikeya Dwivedi 2025-03-15  369  
-a6884f6f1dd565 Kumar Kartikeya Dwivedi 2025-03-15  370  static int torture_raw_res_spin_write_lock(int tid __maybe_unused)
-a6884f6f1dd565 Kumar Kartikeya Dwivedi 2025-03-15  371  {
-a6884f6f1dd565 Kumar Kartikeya Dwivedi 2025-03-15 @372  	raw_res_spin_lock(&rqspinlock);
-a6884f6f1dd565 Kumar Kartikeya Dwivedi 2025-03-15  373  	return 0;
-a6884f6f1dd565 Kumar Kartikeya Dwivedi 2025-03-15  374  }
-a6884f6f1dd565 Kumar Kartikeya Dwivedi 2025-03-15  375  
+If you agree, I'd say let's leave things as they are for now.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Stefano
+
 
