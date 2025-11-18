@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-239457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 736BDC6885A
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:27:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8282C68893
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:30:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 26BDF2A71D
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:27:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C6FE94F2B25
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:27:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA7ED317711;
-	Tue, 18 Nov 2025 09:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B32287243;
+	Tue, 18 Nov 2025 09:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="F+mgHQXa"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="v2U5djF8"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2C83101C0
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 09:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189E53090E2
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 09:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763457985; cv=none; b=gzmhAnfP87JSsKiWSiJqj9SaY14Q3eh+jbFd9bAftE8Qe1MAvgB14bqSpivseXWZ48rux4ZBF1EAA5pgw5zvAlLTxXQHjk60n/0w8QaMxtzNCWFa3YGtg67SoFl8X2R4HtzcMblO137IJJua20LVKpYwlAPRgNM6MYvYlHu46ds=
+	t=1763458049; cv=none; b=OjfOQQnMnyJtz34BEclXNBavI2DksWIGPRvzzmSqdg4U4IoetDiIShdZeX90zDnX1ceFQgdWKj4OXvh0RH0QWpnir3Q7/iACob833mLl7hRtohRP7bLqSHAo4w2pIx/QwyH2UcOtlR+vuxyBUGzYCPCv3PFq6x7vNRtk3+Timpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763457985; c=relaxed/simple;
-	bh=tG0OD5/iwv0NbvoqF9T3b85ZCSL5u5uAI5eM+XIexCc=;
+	s=arc-20240116; t=1763458049; c=relaxed/simple;
+	bh=rX/HkTEGcNFcuQ6ytuLATfzESVUWE90qZ94FaNmyAuE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QmIcER+HaeTuMVg+XzZN4Kb9dN9m+vox8Qd0j4CA9DO37KLo/iR3JFUp1uLo759Z7y2xSMy1zPRUI2hs1Jder8vnBRF8/majDV1Sgi6dy94z0nhK9QjlpCQepB+LvRccBj17TvgWiQldQ/Qp+OrD5a4xtjusHbO9T+N86tLGUWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=F+mgHQXa; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=cA6XHd7Q16xkaYwZW8JvV9X0QBh1Eh5b4aU11SOGsewy54gJ5IHr/NK3Xxh7GctDKs1b+4KXNy2xL3RsgJN6/HkwysGYQMSV9Iiq+0J1ilxQgmvCjMy1QAxqtt54Y0q7eNkYyc2x6DEIYNaFDMtx74sEZVfsq5TIlWdhiPVhzQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=v2U5djF8; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 7F03520841;
-	Tue, 18 Nov 2025 10:26:19 +0100 (CET)
+	by mx1.secunet.com (Postfix) with ESMTP id BF29A2074B;
+	Tue, 18 Nov 2025 10:27:24 +0100 (CET)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p-QLBeKf1BCB; Tue, 18 Nov 2025 10:26:18 +0100 (CET)
+ with ESMTP id E-ktOX2IZeE8; Tue, 18 Nov 2025 10:27:24 +0100 (CET)
 Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id D20D4207FC;
-	Tue, 18 Nov 2025 10:26:18 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com D20D4207FC
+	by mx1.secunet.com (Postfix) with ESMTPS id 2CC97200AC;
+	Tue, 18 Nov 2025 10:27:24 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 2CC97200AC
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1763457978;
-	bh=CT5/2dm2GZCsgSZ05/cqD/oJB1WlmoxMhNvMfPACDcE=;
+	s=202301; t=1763458044;
+	bh=DrEo9ylUF6RmCtCq6AQmNg3V2Ory65uQFVsPN+AgfzY=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=F+mgHQXaRp5pLet/zQrxjRPZwVUeg/F318smtKOLsXQZgKRG0nZM1n7z4gfp6NicE
-	 2XU0brHJ+h35gycv3qDoAvBJSMcr/xrE0hdHQm+2AIEixGnHb8Gdp5mT9rSB4/IKlZ
-	 vLuUJsNQPlj8sNsdHi897IVaYCk0CewDhZef3tBzu52fLegTs27c3t8WYvLobPnQmS
-	 9gpMNDUFG5twpHoDBZw+0qQ8p7UmGow47939B2zFjazwFgLywY+fkRu62xvFpxHkmb
-	 mICJD+y/4WeX1ni2ab2HgZlV1zRqSMj0CSGsYUvNMDb4A3Z+xuQxBrqXQ9SaOff05o
-	 z5nCxng+Uhl+Q==
+	b=v2U5djF8V1rxsjwcyGUnQLQSswl2ipW4sf6TIstFg4fMX4/prvV8PRSHioMTR8EHu
+	 NrUMphtngn+IWFV/hrr4PBJKmzWZE6uP7Xf69NyF5zO8hxke3Coqs8uWS3UQRPFvC9
+	 YLtLI32JtB8tSBDWSVKol6rphZ7nqrqnJMnA5qGGq7x4har1pTToXjF28hJuZvGH8u
+	 6gs5lWCr/grgVryS78fC/6TXxgIhCm4LEODSDjVzJhgDZG9I3rzS3vm/nGT0t7fYKU
+	 +ajU1B84RpryyJHb2Z8vFsv6ScxY2CBQHAbIjcHWKIhKVKVCLm7KOo4jcD72vdmwME
+	 iccSEUyGN8r6Q==
 Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Tue, 18 Nov
- 2025 10:26:18 +0100
-Received: (nullmailer pid 2223962 invoked by uid 1000);
+ 2025 10:27:23 +0100
+Received: (nullmailer pid 2223965 invoked by uid 1000);
 	Tue, 18 Nov 2025 09:26:12 -0000
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 03/12] pfkey: Deprecate pfkey
-Date: Tue, 18 Nov 2025 10:25:40 +0100
-Message-ID: <20251118092610.2223552-4-steffen.klassert@secunet.com>
+Subject: [PATCH 04/12] Documentation: xfrm_device: Wrap iproute2 snippets in literal code block
+Date: Tue, 18 Nov 2025 10:25:41 +0100
+Message-ID: <20251118092610.2223552-5-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251118092610.2223552-1-steffen.klassert@secunet.com>
 References: <20251118092610.2223552-1-steffen.klassert@secunet.com>
@@ -78,66 +78,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
  EXCH-01.secunet.de (10.32.0.171)
 
-The pfkey user configuration interface was replaced by the netlink
-user configuration interface more than a decade ago. In between
-all maintained IKE implementations moved to the netlink interface.
-So let config NET_KEY default to no in Kconfig. The pfkey code
-will be removed in a second step.
+From: Bagas Sanjaya <bagasdotme@gmail.com>
 
+iproute2 snippets (ip x) are shown in long-running definition lists
+instead. Format them as literal code blocks that do the semantic job
+better.
+
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-Acked-by: Antony Antony <antony.antony@secunet.com>
-Acked-by: Tobias Brunner <tobias@strongswan.org>
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-Acked-by: Tuomo Soini <tis@foobar.fi>
-Acked-by: Paul Wouters <paul@nohats.ca>
 ---
- net/key/af_key.c |  2 ++
- net/xfrm/Kconfig | 11 +++++++----
- 2 files changed, 9 insertions(+), 4 deletions(-)
+ Documentation/networking/xfrm_device.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/key/af_key.c b/net/key/af_key.c
-index 2ebde0352245..571200433aa9 100644
---- a/net/key/af_key.c
-+++ b/net/key/af_key.c
-@@ -3903,6 +3903,8 @@ static int __init ipsec_pfkey_init(void)
- {
- 	int err = proto_register(&key_proto, 0);
+diff --git a/Documentation/networking/xfrm_device.rst b/Documentation/networking/xfrm_device.rst
+index 122204da0fff..7a13075b5bf0 100644
+--- a/Documentation/networking/xfrm_device.rst
++++ b/Documentation/networking/xfrm_device.rst
+@@ -34,7 +34,7 @@ Right now, there are two types of hardware offload that kernel supports.
+ Userland access to the offload is typically through a system such as
+ libreswan or KAME/raccoon, but the iproute2 'ip xfrm' command set can
+ be handy when experimenting.  An example command might look something
+-like this for crypto offload:
++like this for crypto offload::
  
-+	pr_warn_once("PFKEY is deprecated and scheduled to be removed in 2027, "
-+	             "please contact the netdev mailing list\n");
- 	if (err != 0)
- 		goto out;
+   ip x s add proto esp dst 14.0.0.70 src 14.0.0.52 spi 0x07 mode transport \
+      reqid 0x07 replay-window 32 \
+@@ -42,7 +42,7 @@ like this for crypto offload:
+      sel src 14.0.0.52/24 dst 14.0.0.70/24 proto tcp \
+      offload dev eth4 dir in
  
-diff --git a/net/xfrm/Kconfig b/net/xfrm/Kconfig
-index f0157702718f..4a62817a88f8 100644
---- a/net/xfrm/Kconfig
-+++ b/net/xfrm/Kconfig
-@@ -110,14 +110,17 @@ config XFRM_IPCOMP
- 	select CRYPTO_DEFLATE
+-and for packet offload
++and for packet offload::
  
- config NET_KEY
--	tristate "PF_KEY sockets"
-+	tristate "PF_KEY sockets (deprecated)"
- 	select XFRM_ALGO
- 	help
- 	  PF_KEYv2 socket family, compatible to KAME ones.
--	  They are required if you are going to use IPsec tools ported
--	  from KAME.
- 
--	  Say Y unless you know what you are doing.
-+	  The PF_KEYv2 socket interface is deprecated and
-+	  scheduled for removal. All maintained IKE daemons
-+	  no longer need PF_KEY sockets. Please use the netlink
-+	  interface (XFRM_USER) to configure IPsec.
-+
-+	  If unsure, say N.
- 
- config NET_KEY_MIGRATE
- 	bool "PF_KEY MIGRATE"
+   ip x s add proto esp dst 14.0.0.70 src 14.0.0.52 spi 0x07 mode transport \
+      reqid 0x07 replay-window 32 \
 -- 
 2.43.0
 
