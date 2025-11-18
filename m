@@ -1,290 +1,761 @@
-Return-Path: <netdev+bounces-239676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C92A8C6B4E0
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 19:54:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B711C6B562
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 20:03:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5D61534A92F
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 18:54:51 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9640B4E18B4
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 19:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF2B2DF131;
-	Tue, 18 Nov 2025 18:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B959F2139C9;
+	Tue, 18 Nov 2025 19:01:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b="hcXO2muo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3fUnV2u";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KTUu6SB3"
 X-Original-To: netdev@vger.kernel.org
-Received: from alln-iport-4.cisco.com (alln-iport-4.cisco.com [173.37.142.91])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343DD2773EC;
-	Tue, 18 Nov 2025 18:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=173.37.142.91
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763492083; cv=fail; b=DPQEwASgSvdyNIUaYPuTHDv8tbqySi4ETgCHe709V8s0WvPyOUCrCOy8aj33djBssBlDxaKCex3IfbA8MiCY1CpDkEmDQWUe+Hnj84K9QuyddRJYjxjw/oRGbsMBtsbmYpCbbwM4cb2MJ+xFysVh7Sc1QDoOGHC3jRrtu2Ob6ZY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763492083; c=relaxed/simple;
-	bh=aF5vkLEAIHqJ9xH6JosqW7Y9Sf3asLlHWrOCvgpE7GY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=r/PPdTny+cfFZW9SLjVcjSbogH4H7S86hblAxhaRKuRhTzVezRSUcIDfM/JH/cDl16k+Jo9PURA10C3EmddAprz/L5KSFLlxx3ECq6fK7iRJ0q89Cw2oPNf9XWzcJeZS84r+BsArYDPq6cN5UP7VT8xqRHu2IJkBenrPfMPAScY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b=hcXO2muo; arc=fail smtp.client-ip=173.37.142.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60ADD126C03
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 19:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763492495; cv=none; b=pZ4pSVH81iq9yRzIlJvCYXIYdmzSu6n4mXo0FuZZPuSNmfnbk2/JzvCgXNCaP2nz8Wx9bod7Vd2nBHKLASU60P0S/9rijoBuHQegnt39tCDU7GFCeofj/HdqzKKtt07wltYtINtIhAf8EnutDAcbGCBKJt4TSO3xStWNmH09Mis=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763492495; c=relaxed/simple;
+	bh=+I/yNks0Eb2isVt7MdvzYyqTDcPDCygIbXkb81uNlyk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lvQrm+QQJLucAB3ASDHs7keOXN7gIboy1Pk6RFPkoZxJM8MjTb6pN+pEViSY4bzSWV+doXmdM5ufecv9t0mqYvQQT1CPIHFKlT0Nno4OwMUFAT6o+H3w9Lfy5ZFkH9OKMJqDhaS1yQ6xyqlMPIidFzMSqxHFW7CrT6RbM3lOOO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H3fUnV2u; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KTUu6SB3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763492492;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VCBuSytF2h41nKIX7/kpFcsvmz0MDH6koR8dubfe87I=;
+	b=H3fUnV2uWkQhLifLW3i33XLNtSvdIlcXmWmXB+L+UuB8t7+wTlMjSBcK79GnRXpnCCq23V
+	zOFL4pjShYmI00gtRp0LebLctk++Ngv0gSk2/OvBfNMoUovZztwagurvvZtufEMRq1Jjxf
+	oIDCRWAqIEBNWj0gp2JZx+AGPIVc+34=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-140-9rkm1-TUOJeQuEGFFD5Skw-1; Tue, 18 Nov 2025 14:01:29 -0500
+X-MC-Unique: 9rkm1-TUOJeQuEGFFD5Skw-1
+X-Mimecast-MFC-AGG-ID: 9rkm1-TUOJeQuEGFFD5Skw_1763492488
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4775fcf67d8so39752045e9.0
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 11:01:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=818; q=dns/txt;
-  s=iport01; t=1763492081; x=1764701681;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=aF5vkLEAIHqJ9xH6JosqW7Y9Sf3asLlHWrOCvgpE7GY=;
-  b=hcXO2muov2U8hmXqUknnRxyIn42oSuBUUSianRJhWlRDO1iC48o+4kjk
-   P9tTUxT2diN2PQI13bjm2BhyPW+NGwda0gQMHeuf8yu9+QCB7nFRED6h8
-   CNMeOY9w5DksJbb2vm3s0mtqnmMEZEqesQ7/ndHNZyY98Xp9xaP9FL/e1
-   Sfx98UdKmC97wvTWrh5lIXGG4aD+GPh6+goQ2pDIVUNNwDbU19dYxTGi2
-   uAZpkNT90rl0q0JbNyznloJm0ikWgv7WsgEP/1yVVuGiW1nchjcCZ5MU2
-   zvKhd4Rrkoa8/x/abffewPTHYd+iaJeVWvFsojnsyPdDlryDrrI82scyK
-   w==;
-X-CSE-ConnectionGUID: KxHH3LMVR3WEDhNf9ltICg==
-X-CSE-MsgGUID: SpBODioJSTK1GKGnO8uacg==
-X-IPAS-Result: =?us-ascii?q?A0AuAAAdwBxp/5MQJK1aHAEBAQEBAQcBARIBAQQEAQFAJ?=
- =?us-ascii?q?YEXBwEBCwGBbVIHghtJiCADhE1fhliCJJ4agX8PAQEBDQJRBAEBhQcCjFoCJ?=
- =?us-ascii?q?jQJDgECBAEBAQEDAgMBAQEBAQEBAQEBAQsBAQUBAQECAQcFgQ4ThlyGWgEBA?=
- =?us-ascii?q?QEDEig/EAIBCA4KHhAxJQIEDgUIGoVUAwECo2UBgUACiit4gTSBAeAmgUoBi?=
- =?us-ascii?q?FIBhW6EeCcbgg2BV4JoPoRFhBOCLwSBDoEUgQ6GJ4wmTIY8UngcA1ksAVUTF?=
- =?us-ascii?q?wsHBYEgQwOBCyNLBS0dgSQiHxgRYFRAg0kQDAZoDwaBEhlJAgICBQJAOoFoB?=
- =?us-ascii?q?hwGHBICAwECAjpVDYF3AgIEghx+ggoPiGGBCQVHAwttPTcUGwUEgTUFlAxRg?=
- =?us-ascii?q?UNpmkqbCJUXCoQcog0XhASNE5lUmQapFgIEAgQFAhABAQaBaDyBWXAVgyJSG?=
- =?us-ascii?q?Q/VEHgCOgIHCwEBAwmGSI0fAQE?=
-IronPort-PHdr: A9a23:OdrNgx8R5Wma2f9uWBDoyV9kXcBvk7zwOghQ7YIolPcUNK+i5J/le
- kfY4KYlgFzIWNDD4ulfw6rNsq/mUHAd+5vJrn0YcZJNWhNEwcUblgAtGoiEXGXwLeXhaGoxG
- 8EqaQ==
-IronPort-Data: A9a23:nhP2Mq73IXZAO6B45lRIFQxRtFPHchMFZxGqfqrLsTDasY5as4F+v
- jEdC2iAMq7cNmHwKtt3bYm2/RwOvZDTy9VjHgNt/y5gZn8b8sCt6fZ1gavT04J+CuWZESqLO
- u1HMoGowPgcFyGa/lH2dOC98RGQ7InQLpLkEunIJyttcgFtTSYlmHpLlvUw6mJSqYDR7zil5
- 5Wr8qUzBHf/g2QpaztNu/rawP9SlK2aVA0w7wRWic9j5Dcyp1FNZLoDKKe4KWfPQ4U8NoaSW
- +bZwbilyXjS9hErB8nNuu6TnpoiG+O60aCm0xK6aoD66vRwjnVaPpUTaJLwXXxqZwChxLid/
- jniWauYEm/FNoWU8AgUvoIx/ytWZcWq85efSZSzXFD6I0DuKxPRL/tS4E4eHp042r1TJF90r
- sM1BDArYEGHm8Odz+fuIgVsrpxLwMjDNYcbvDRkiDreF/tjGMiFSKTR7tge1zA17ixMNa+BP
- IxCN3w2MlKZP0In1lQ/UPrSmM+rj2PjcjlRq3qepLE85C7YywkZPL3FboOFJofRG50O9qqej
- lne1UPVAxY4D+C8kBWm3XSL1vLGliyuDer+E5X9rJaGmma7zWELCFgaWEW2pdGnhUOkHdFSM
- UoZ/mwpt6da3EiqSMTtGhSipTuBpRs0RdVdCas55RuLx66S5ByWbkAATzhceJkqs8QeWzMnz
- BmKksnvCDgpt6eaIVqZ97GJvXaxNDITIGsqeyAJV00G7sPlrYV1iQjAJv5nEaionpjwFD3xy
- hiUoyUkwbYel8gG0+O851+vqzatoIXZCwsw7S3JUW+/qAB0foioY8qv81ezxfJBKpuJC0GKv
- VAalMWEquMDF5eAkGqKWuplNLWo4euVdSaH0AZHAZYs7XKu9mSlcIQW5ytxTG9tM8AZaXrya
- 1TSkR1e6YUVP3awa6JzJYWrBKwCyanmCMSgSurdZdcLYZVrcgKD1D9haFTW3G33lkUo16YlN
- v+zd8uwAXsEIbpowSDwROoH17IvgCckygvuqYvTxhCj1/+aIXWSU7pAaQPIZeEi56TCqwLQm
- zpCC/a3J9xkeLSWSgHc8JUYKhYBKn1TOHw8g5Y/mjKrSua+JFwcNg==
-IronPort-HdrOrdr: A9a23:isJ0B6o7mBVQdo2rPMerNN4aV5tkLNV00zEX/kB9WHVpm5Oj5q
- OTdaUgtSMc1gxxZJh5o6H/BEDhex/hHZ4c2/h2AV7QZniWhILOFvAs0WKC+UytJ8SQzJ8m6U
- 4NSdkbNDS0NykEsS+Y2nj3Lz9D+qj7zEnAv463pBkdL3AOV0gj1XYENu/xKDwOeOAyP+tDKH
- Pq3Ls+m9PPQwVxUu2LQlM+c6zoodrNmJj6YRgAKSIGxWC15w+A2frRKTTd+g0RfQ9u7N4ZnF
- QtlTaX2oyT99WAjjPM3W7a6Jpb3PH7zMFYOcCKgs8Jbh3xlweBfu1aKv2/lQFwhNvqxEchkd
- HKrRtlFd908Wntcma8pgao8xX80Qwp92TpxTaj8DjeSI3CNXAH4vh69MZkmyjimg0dVRZHoe
- R2Nleixt9q5NX77X3ADpbzJklXfwGP0AofeKYo/g9iuM0lGf5sRUh1xjIOLH/GdxiKs7wPAa
- 1gCtrR6+1Rdk7fZ3fFvnN3yNjpRXgrGAyaK3Jy8fB9/gIm1UyR9XFojPA3jzMF7tYwWpNE7+
- PLPuBhk6xPVNYfaeZ4CP0aScW6B2TRSVaUWVjibGjPBeUCITbAupT36LI66KWjf4EJ1oI7nN
- DEXElDvWA/dkryAYmF3YFN8BrKXGKhNA6dgP129tx8oPnxVbDrOSqMRBQnlNahuewWBonBV/
- O6KPttconexKvVaPF0NiHFKu1vwCMlIb8oU/4AKieznv4=
-X-Talos-CUID: 9a23:Xb7igWzONU6qJkUUejISBgU3CuAFKVn48k2LHGKUCUBnGbmJaHSfrfY=
-X-Talos-MUID: =?us-ascii?q?9a23=3AMtKaBA7a8N5qzYJLE2fjAS/wxoxT+46JJEEKs64?=
- =?us-ascii?q?6mJCrFgN2HGeAhT+4F9o=3D?=
-X-IronPort-Anti-Spam-Filtered: true
-Received: from alln-l-core-10.cisco.com ([173.36.16.147])
-  by alln-iport-4.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 18 Nov 2025 18:53:31 +0000
-Received: from alln-opgw-2.cisco.com (alln-opgw-2.cisco.com [173.37.147.250])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by alln-l-core-10.cisco.com (Postfix) with ESMTPS id 9ED3918000162;
-	Tue, 18 Nov 2025 18:53:31 +0000 (GMT)
-X-CSE-ConnectionGUID: M9leBRaDSNerl8581u8RUQ==
-X-CSE-MsgGUID: VHYB3SmNQcuTRetKu2wrtA==
-Authentication-Results: alln-opgw-2.cisco.com; dkim=pass (signature verified) header.i=@cisco.com
-X-IronPort-AV: E=Sophos;i="6.19,314,1754956800"; 
-   d="scan'208";a="32832790"
-Received: from mail-bl0pr07cu00105.outbound.protection.outlook.com (HELO BL0PR07CU001.outbound.protection.outlook.com) ([40.93.4.5])
-  by alln-opgw-2.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 18 Nov 2025 18:53:28 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=N40gpzt9wav64InpGlstHYx4ivYccTosBkbwgti54vj+iexpoJpuGz3KqG/iO9zdzJ+6kspKCYQPduBL8vuNXCORzM4H2Ti/IgA31BaJ9NiiZMJFdeLsH98ZaUn/q7VsgQMMkaxqbWMp9Nmxh9rmFcXf7Lr5BgKf8r0Uvh+7ZPmYflXjXurRQ2792H04mbJFinCfxvvPETPsCwwM7HdVmVW4ZPp4hKYG1D+G7NMoteRveacSABqY46tITcBp3melPTqW+0klxQsyBdejq1ihC1O6UlcMaY4b4oTP7E86usqU37UTbpC2e1EDpZCriRnVG83nTl34ACwraklChwqaKQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aF5vkLEAIHqJ9xH6JosqW7Y9Sf3asLlHWrOCvgpE7GY=;
- b=nexeg8FPBe5uAeHVOB656ZkueAwdhfLbP79zqx/eEyLCppj5MQPbXN2dr2UbzOjDwMTOVeL8PlZlhORBzgOIF8gMuvE/M9SSH2hnEgaTGWuhmeVbJrrdMZI4GOV1TQQ7dwNgdAIdYDgJe52OLlkOoCTawD4zc6AFVF/KK95bFS/w4EySAi+osDhAsX/8aq1++UeQQWGPR+1nX+ZXFFgBGw1imKimLevn853AF1DgFRdR50uABFU7r0GDHN3/EWhed+KXcW+rujXA1YicGKcdLfVybQ3UkOnG683WtqbpN4obEVnUrRlkfm2EbltfXDoGMWFUR26k5Vm3nDHembVN/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=cisco.com; dmarc=pass action=none header.from=cisco.com;
- dkim=pass header.d=cisco.com; arc=none
-Received: from SJ0PR11MB5896.namprd11.prod.outlook.com (2603:10b6:a03:42c::19)
- by SJ0PR11MB7701.namprd11.prod.outlook.com (2603:10b6:a03:4e4::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.16; Tue, 18 Nov
- 2025 18:53:26 +0000
-Received: from SJ0PR11MB5896.namprd11.prod.outlook.com
- ([fe80::2081:bcd4:cb3e:e2dd]) by SJ0PR11MB5896.namprd11.prod.outlook.com
- ([fe80::2081:bcd4:cb3e:e2dd%4]) with mapi id 15.20.9343.009; Tue, 18 Nov 2025
- 18:53:26 +0000
-From: "Karan Tilak Kumar (kartilak)" <kartilak@cisco.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-CC: Steven Rostedt <rostedt@goodmis.org>, Petr Mladek <pmladek@suse.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"openipmi-developer@lists.sourceforge.net"
-	<openipmi-developer@lists.sourceforge.net>, "linux-media@vger.kernel.org"
-	<linux-media@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
-	<dri-devel@lists.freedesktop.org>, "linaro-mm-sig@lists.linaro.org"
-	<linaro-mm-sig@lists.linaro.org>, "amd-gfx@lists.freedesktop.org"
-	<amd-gfx@lists.freedesktop.org>, "linux-arm-msm@vger.kernel.org"
-	<linux-arm-msm@vger.kernel.org>, "freedreno@lists.freedesktop.org"
-	<freedreno@lists.freedesktop.org>, "intel-xe@lists.freedesktop.org"
-	<intel-xe@lists.freedesktop.org>, "linux-mmc@vger.kernel.org"
-	<linux-mmc@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, "linux-s390@vger.kernel.org"
-	<linux-s390@vger.kernel.org>, "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>, "linux-staging@lists.linux.dev"
-	<linux-staging@lists.linux.dev>, "ceph-devel@vger.kernel.org"
-	<ceph-devel@vger.kernel.org>, "linux-trace-kernel@vger.kernel.org"
-	<linux-trace-kernel@vger.kernel.org>, Rasmus Villemoes
-	<linux@rasmusvillemoes.dk>, Sergey Senozhatsky <senozhatsky@chromium.org>,
-	"Satish Kharat (satishkh)" <satishkh@cisco.com>, "Sesidhar Baddela
- (sebaddel)" <sebaddel@cisco.com>, "James E.J. Bottomley"
-	<James.Bottomley@hansenpartnership.com>, Andrew Morton
-	<akpm@linux-foundation.org>
-Subject: RE: [PATCH v3 19/21] scsi: fnic: Switch to use %ptSp
-Thread-Topic: [PATCH v3 19/21] scsi: fnic: Switch to use %ptSp
-Thread-Index: AQHcVK6ozanKNwbcFU2LSi/oClNkW7TxMIPggACrXQCABvPI0A==
-Date: Tue, 18 Nov 2025 18:53:25 +0000
-Message-ID:
- <SJ0PR11MB58966843A2F7413517F25822C3D6A@SJ0PR11MB5896.namprd11.prod.outlook.com>
-References: <20251113150217.3030010-1-andriy.shevchenko@linux.intel.com>
- <20251113150217.3030010-20-andriy.shevchenko@linux.intel.com>
- <SJ0PR11MB5896D2F9DAC35FF8ADB29087C3CDA@SJ0PR11MB5896.namprd11.prod.outlook.com>
- <aRbreoKzashQcEne@smile.fi.intel.com>
-In-Reply-To: <aRbreoKzashQcEne@smile.fi.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR11MB5896:EE_|SJ0PR11MB7701:EE_
-x-ms-office365-filtering-correlation-id: a5ad9d9c-fec6-41c1-2267-08de26d3c18f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?GUMa+XOyswf2U2DZtEJX5ixyVbnqEMu6+P/cmDXtAOmacozf9sTeRAPDoRo9?=
- =?us-ascii?Q?qR2z8k5QXeT9mLfPAY+A7GPyEoVeX+C/hxWS5l60LIcfeKC7KCCFM3NsyfDu?=
- =?us-ascii?Q?XRvf+ZUAdMp7LpE3/t/oqHvY0sSKto68drpWLCKm3UfWXjQJxaVeY5YFZD10?=
- =?us-ascii?Q?Ykeozb0BKyaUWqBo+5ksmQMisXGfg4Y0eflj/ooM5RboHswkIVYLwnZY9nzm?=
- =?us-ascii?Q?yI0AmWRzPPGjM1mN3VLxZP50NYARrg1x1B0A4XPj7wOb82OIiKC8xPAQEyIa?=
- =?us-ascii?Q?c/cMVe4R6/889JUofDr0fyOHxTWaBZy7L1HDcsIXPhUpi2m/VtEs+y7zVO3X?=
- =?us-ascii?Q?JN4o3/Jc/pMfyXvJdmVtr+VjdhJrfU+dtXNo7OKXNd0BTatCgyP+6W4Wh0ig?=
- =?us-ascii?Q?wE48OBu/s+ENCm0eryKnHyDrKjVG0hhzzSIJ7yMznnSWsQ8torqxOQdmtAiS?=
- =?us-ascii?Q?fQxvttI8k/8Vtlh+sDaVfD59s2NtqVm1aBvTPrvK99ej6qavEOdKi103mbOl?=
- =?us-ascii?Q?A9btywOofvoBFJGRZKsNPI82gpFJFIFZol9Tk86ZVIIDt8tBazyY6sxN1LCr?=
- =?us-ascii?Q?TZ+OiJedxLf9m3q1P9LUkgISHunZNE1vRLxo7kV186DvpkZqfSDp5/F5dtqR?=
- =?us-ascii?Q?VLb8a0n79/C/CHR6cE5cZvwFIuQbfCuvy8ZghQWoVB4qjHh2ShC7tWY/Yhp0?=
- =?us-ascii?Q?YoembG3qsq92We+EyMzJpbPLH02jv7s3Xgq89R8z1YWsoaEj0u9/QBqS98CG?=
- =?us-ascii?Q?E+ujhRMWMHrYsb56TbAvnQnShBvwyqxOc5ejXyez0+yjE13lCqHqoJ3AjUh6?=
- =?us-ascii?Q?rPb1yxWqoMrKhLwgsMbEy6sEOhPM9qYivqFoAyD1awquylfskD+XiYLIJeDY?=
- =?us-ascii?Q?HRXqJxEFN5p96UvZxUduu0XWeyXRyW+TU/7uvtaGRwu2klGjVeaW9bUevAOA?=
- =?us-ascii?Q?Yq+rJvNg0wxJafGNurhlHFv5inOJlSyc7pR9xB5mqB4bAQ/nXfRqQ3Cr8wyG?=
- =?us-ascii?Q?drPti2nq/5O7BOlcQ/ckPyVu2pd4LB9kJIHDzfwF/If2xOOJFX5tdUf9P4y5?=
- =?us-ascii?Q?A+PgQqwCFcHkg+lDCYDUiEDWWrFWmSHfLPR7/wISbMhOapBcxsWrDaDH8bAX?=
- =?us-ascii?Q?YCDa7DvxdkppsKJMNfFxu0+TXi+CL+zFNhawd8FLlnoBiuruj/H6vUoGpYu4?=
- =?us-ascii?Q?p8mT5Oc51Wmq7vxhrgmtoP9DUW9cym7+HBrw+at7j085OVrcgc/6wd/LVwv+?=
- =?us-ascii?Q?YaYSx8u/FZFXoxUEMjy9CbjkdDmo4qgTxANijYef5ngmO7BFGFnZ+4jiiJpD?=
- =?us-ascii?Q?u1xPwquutK5Ir7jU1DEu35zR6Gask+iBEVpVzffqMpw1+MD2XueXMc0eU4BW?=
- =?us-ascii?Q?r6CALNEr0gwe83nf2B2xYZYit1lxnDV434Qfh/nOHtaX9QbpQGDI/C/mr5xs?=
- =?us-ascii?Q?cS5/dgufeEKq2mR+lQXEGXOrjmjHzg4wAOr7EMWRbTtdPg8w26/rkrgKf0S/?=
- =?us-ascii?Q?Kk26pg5OvuuJQYdxheC0ZPQTOIupS0HpgvbC?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5896.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?4g49PWLq4LnszL+DPUrVw0Z7BDQjRmBANGMTzIKXkbkHa7COXiVWygzlSygC?=
- =?us-ascii?Q?+nb6PB2Xd4khvp858iobsixHJecUd/4YHN/PZUQy+/1WSXD27l+43WfYMgCC?=
- =?us-ascii?Q?LR7eaPRDh7FRFGZ5D0/btclpOpIYReYqEBUnktcVzjozDgYqWm4UnejrFfXc?=
- =?us-ascii?Q?Rb6Sc4Ih87OjMK9ZuVGuCGvBtUttKkbZQSEpHLH8FA/+3c5QGFf4u02PT2ez?=
- =?us-ascii?Q?a78QzpaImmCxx4QoCcqaq9t4ocVv+T5fWLZ5iBeb1H5o4ZlWAsn/rec9R5Wq?=
- =?us-ascii?Q?JTALIiE/h1gJ3hvajhsqKzCvZhASmfDRuUE8Ll96efoMG/9Mv49/rCDqx38l?=
- =?us-ascii?Q?AsiZzX2Ng3wSUPs3pARBgf7enrJbwaF6tvf7w3nRGbgYe7CzDZ3Ho+yrkQ47?=
- =?us-ascii?Q?AASTZE4+Jk61cy9X8wrrElvkA4BQ+pQqfvc26pL32X3DzATMdD+n71h4tRyG?=
- =?us-ascii?Q?5M/Ilfs93s9BJi9aa+WvCEnPjdYWPzWhs4WfLaIG9W2eaDeYvwIR6317wS8i?=
- =?us-ascii?Q?nloa7xlzahUJ3qKEuOLIR/OvCr6DnHyvZNvuNAp9YWwz6WHLwfDHGoGoc6Mc?=
- =?us-ascii?Q?YLp9BXp1twFg/eogDMzsWgTerYBtPbM7Y/WfWaQHY42OOxPQYZkgRT4Ewc7r?=
- =?us-ascii?Q?QCj/EFu90lrEi7t2XWUu1O0p7z9x/vG6cE0MLfMhTXG2YsjPuDpkI3KeFLpr?=
- =?us-ascii?Q?9ro/SW+ywENYsS0fadcxk+SY7d1ctb7QfmuNWqZN9gyNvFsVBeSBc2FGO0a8?=
- =?us-ascii?Q?j8p4aeKWdR0iT1J3dOk+rPgEUCdfIeZJ1vsfZCnjUEf10c6Z6SWPC2GaPIHc?=
- =?us-ascii?Q?sPZP8UT18E8zUee4/il3Ry9+NHTw6gmBPmEftL1kns4ZvuoSmTdTpOKIpj5q?=
- =?us-ascii?Q?FOamVJ7c4XwL0umzSZFTFADpStj/Mnjt3D6CjxSyqj48Y38stZcnOaXtXo4Z?=
- =?us-ascii?Q?2iKJ7vTMhyezmZV6Ogsio5S2Png+Hr25OGunbheGFvwg4+3d8C7hLD0Uxfa8?=
- =?us-ascii?Q?VvGic6BhVdlzMp7vhjkH4bw/Vl5Y9kkneS27wo59pOXam7oASDueEHJcaYD3?=
- =?us-ascii?Q?6FvfdhFTOOvYnAadbvQBHx3BFNTBpMbtImw/wOzdlSXdpG0dIKFTeUaeMc4S?=
- =?us-ascii?Q?hRsQ7eC1mX4ytKtQllHlWiHwHnUkDGcwtwqCoC2+OADdM6838YpHV9rkn88d?=
- =?us-ascii?Q?5XV+7ncpQjUc7SrP7po1ytI2jQ9QBCK2ZW/e76Cb2OW1yrwJjh4cc2RB13Dx?=
- =?us-ascii?Q?eLHSMowtXBHzcRQQBXK9FQRcut0VwkJ2w/BSoIG4MnkXJvXfJ8wr5cfCggB4?=
- =?us-ascii?Q?Su3cBFP/Fyvg6GVQXmIc/8i9a0EdvhtjarM7zNQ+aue6pIhdDtkSQKvI6ZCp?=
- =?us-ascii?Q?sujh9K82JUkylQ/12yzeNXqk5nWy2Q5kavriDPhOPfTQ9RZClXpyJOiRglsH?=
- =?us-ascii?Q?OTHbQ2HoJ+ojQjfb2zGtJSldHACjTWb3Nu3oaNkObAw0XsPVVKb8WQil8yY3?=
- =?us-ascii?Q?UIL8SrClUK7KzbmOWYZqJe76kOo7z554Hk7NFBl75kDq7q2UPM0ngQ5JYgTF?=
- =?us-ascii?Q?af7AZBJ7ceEnDM2oWAdVNhBi2cFlDJaNrrFzcJyE?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=redhat.com; s=google; t=1763492488; x=1764097288; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VCBuSytF2h41nKIX7/kpFcsvmz0MDH6koR8dubfe87I=;
+        b=KTUu6SB3wgc5qf0kBwjxNRAO9AoBUZo6P6f/oyZEhbQeaeDyvyk3lzDBwII11RqTgh
+         itrVSbJLp1XEyCdSmjjH7PYBa5BRrs/uDV94XrYyG9yCbnfZfHIK7Jv0zI2MQHUXN9ey
+         Scg1zMRQ8+RtMDyj2ex5gNnazPg/DwMB62HaiTSifuLNu3tuYgaNl2/z2adYHDsfPnnL
+         GaCvMLXVxtEmSUwi0e+kt92cwxWNYmcO2fm6PlVdg1oKG5wbUOEjKQzZ/dFjA9fHbv/c
+         IraUFyFUmfaGAcQzB5XLdH6+16fLq4xzxO2C3juBuTDKm/H1XspPr694YoPb9i5/43dQ
+         soOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763492488; x=1764097288;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VCBuSytF2h41nKIX7/kpFcsvmz0MDH6koR8dubfe87I=;
+        b=YhWZO4FHWakBuZgWDbPVQwcqeR81RP2QOYuWFmuhx1Pms/pzBSSs9qOv6t2JN9cRuI
+         4z+op4ITTnF/asOtinKZvdw9sKPiQ0g0Y88lXyMCPZdKPLOF6DOVwa9hPZHrHpyB/s/O
+         1KV64+K9xkSLI61mjbmjJGyBN8go1S+LGtauE7CiJDKe9VVsPdEFbUJ1EfFUMqyV963L
+         QY0rmz++r6n64y0kXKTeSZIytuOUSOwN9GldMiiUtB9hZjPjCkcBXGCx9PM3O9o+2Ibj
+         FrHm2O+CjBpsUlMcusA3xjL112tyvk1USkeg/ntxoPMdOgaekgKzxBIWh1kr+Eas//mc
+         4dJg==
+X-Gm-Message-State: AOJu0Yziiiap2Psk8x2PFmIpEVJjVvXwUoNgsWDWtEZAh7k0Bn3Qflqt
+	QYJrtTwm3AcreYJ0Ho5/hr/1FPxtI4qPo586FF5n088lgjcYVFtwcHe1zkVywy63Ge2cMCjA+VK
+	1POZBJBSKdpP/9eSn7RTXgo7ea2vDEitWyqtlSEsS4QbHWCEZ7w2MUr0Wew==
+X-Gm-Gg: ASbGncvWfi+S3UdSJnlFdLy3qJMHG2ve2dPgZqLfPBXuVqjXWlLrpGRhIoJ+vMQIWvy
+	qw1oNlK5Ej6xpWNNXomaemPPgrQt2MQswfkrgnvbhx1sFJOXeD4CIC6WXjgRpTKHVWwubE+ceLp
+	k+SAtHG4HJGW6XsB8Jq9kooOtwXU6Ph+82A63w78usaRdedetF6U8EgCllxuLvKlUCJygxjaRll
+	0iyP5SjVfpWSSQeRKI8n1uVMfWmuuc7Zd9dbArCcSXcJW/kwm0HLx3aO8nzSfGeHX0eFkPjVEk/
+	uVTsI3QV2UPyXyTDRKNpfcrcGoZo2eh4UGTRUkhEk4HQMlN96L6pCAQezvomZP2DB8o4YWhRwQJ
+	ZOCFegJapbgJPh2p3/Sg7aeu3uuJ0cg==
+X-Received: by 2002:a05:600c:1f83:b0:477:54cd:2030 with SMTP id 5b1f17b1804b1-4778fe797afmr166514105e9.21.1763492487514;
+        Tue, 18 Nov 2025 11:01:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGhUCNBpNzTcPcE2bLsBsGlcir1j5psRrpIdmQJUKwecEAhDbQONWB7A1XZKTihhB2Kbo9CPA==
+X-Received: by 2002:a05:600c:1f83:b0:477:54cd:2030 with SMTP id 5b1f17b1804b1-4778fe797afmr166513575e9.21.1763492486937;
+        Tue, 18 Nov 2025 11:01:26 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a9e1b657sm22104535e9.17.2025.11.18.11.01.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Nov 2025 11:01:26 -0800 (PST)
+Date: Tue, 18 Nov 2025 14:01:23 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
+	virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
+	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v11 07/12] virtio_net: Implement layer 2 ethtool
+ flow rules
+Message-ID: <20251118135634-mutt-send-email-mst@kernel.org>
+References: <20251118143903.958844-1-danielj@nvidia.com>
+ <20251118143903.958844-8-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: cisco.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5896.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5ad9d9c-fec6-41c1-2267-08de26d3c18f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Nov 2025 18:53:26.0249
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 5ae1af62-9505-4097-a69a-c1553ef7840e
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4oM0CPuVrjk8BArkEZqVmX25kgwilVgpoUtzL7jXnPF5Wqo8A12k/Bv+wSykoN9Ag42nrO1qlkYSH02XL2axqg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB7701
-X-Outbound-SMTP-Client: 173.37.147.250, alln-opgw-2.cisco.com
-X-Outbound-Node: alln-l-core-10.cisco.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251118143903.958844-8-danielj@nvidia.com>
 
-On Friday, November 14, 2025 12:43 AM, Andy Shevchenko <andriy.shevchenko@l=
-inux.intel.com> wrote:
->
-> On Thu, Nov 13, 2025 at 10:34:36PM +0000, Karan Tilak Kumar (kartilak) wr=
-ote:
-> > On Thursday, November 13, 2025 6:33 AM, Andy Shevchenko <andriy.shevche=
-nko@linux.intel.com> wrote:
->
-> ...
->
-> > Can you please advise how I can compile test this change?
->
-> I have added the following to my x86_64_defconfig
->
-> CONFIG_SCSI_FC_ATTRS=3Dm
-> CONFIG_LIBFC=3Dm
-> CONFIG_LIBFCOE=3Dm
-> CONFIG_FCOE_FNIC=3Dm
->
-> You can always add the just a one (last) line to a configuration stanza t=
-hat
-> can be merged to the .config with help of merge_config tool. It will take=
- care
-> of all needed dependencies.
->
-> --
-> With Best Regards,
-> Andy Shevchenko
->
+On Tue, Nov 18, 2025 at 08:38:57AM -0600, Daniel Jurgens wrote:
+> Filtering a flow requires a classifier to match the packets, and a rule
+> to filter on the matches.
+> 
+> A classifier consists of one or more selectors. There is one selector
+> per header type. A selector must only use fields set in the selector
+> capability. If partial matching is supported, the classifier mask for a
+> particular field can be a subset of the mask for that field in the
+> capability.
+> 
+> The rule consists of a priority, an action and a key. The key is a byte
+> array containing headers corresponding to the selectors in the
+> classifier.
+> 
+> This patch implements ethtool rules for ethernet headers.
+> 
+> Example:
+> $ ethtool -U ens9 flow-type ether dst 08:11:22:33:44:54 action 30
+> Added rule with ID 1
+> 
+> The rule in the example directs received packets with the specified
+> destination MAC address to rq 30.
+> 
+> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+> v4:
+>     - Fixed double free bug in error flows
+>     - Build bug on for classifier struct ordering.
+>     - (u8 *) to (void *) casting.
+>     - Documentation in UAPI
+>     - Answered questions about overflow with no changes.
+> v6:
+>     - Fix sparse warning "array of flexible structures" Jakub K/Simon H
+> v7:
+>     - Move for (int i -> for (i hunk from next patch. Paolo Abeni
+> ---
+>  drivers/net/virtio_net.c           | 462 +++++++++++++++++++++++++++++
+>  include/uapi/linux/virtio_net_ff.h |  50 ++++
+>  2 files changed, 512 insertions(+)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 900d597726f7..de1a23c71449 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -284,6 +284,11 @@ static const struct virtnet_stat_desc virtnet_stats_tx_speed_desc_qstat[] = {
+>  	VIRTNET_STATS_DESC_TX_QSTAT(speed, ratelimit_packets, hw_drop_ratelimits),
+>  };
+>  
+> +struct virtnet_ethtool_ff {
+> +	struct xarray rules;
+> +	int    num_rules;
+> +};
+> +
+>  #define VIRTNET_FF_ETHTOOL_GROUP_PRIORITY 1
+>  #define VIRTNET_FF_MAX_GROUPS 1
+>  
+> @@ -293,8 +298,16 @@ struct virtnet_ff {
+>  	struct virtio_net_ff_cap_data *ff_caps;
+>  	struct virtio_net_ff_cap_mask_data *ff_mask;
+>  	struct virtio_net_ff_actions *ff_actions;
+> +	struct xarray classifiers;
+> +	int num_classifiers;
+> +	struct virtnet_ethtool_ff ethtool;
+>  };
+>  
+> +static int virtnet_ethtool_flow_insert(struct virtnet_ff *ff,
+> +				       struct ethtool_rx_flow_spec *fs,
+> +				       u16 curr_queue_pairs);
+> +static int virtnet_ethtool_flow_remove(struct virtnet_ff *ff, int location);
+> +
+>  #define VIRTNET_Q_TYPE_RX 0
+>  #define VIRTNET_Q_TYPE_TX 1
+>  #define VIRTNET_Q_TYPE_CQ 2
+> @@ -5653,6 +5666,21 @@ static u32 virtnet_get_rx_ring_count(struct net_device *dev)
+>  	return vi->curr_queue_pairs;
+>  }
+>  
+> +static int virtnet_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info)
+> +{
+> +	struct virtnet_info *vi = netdev_priv(dev);
+> +
+> +	switch (info->cmd) {
+> +	case ETHTOOL_SRXCLSRLINS:
+> +		return virtnet_ethtool_flow_insert(&vi->ff, &info->fs,
+> +						   vi->curr_queue_pairs);
+> +	case ETHTOOL_SRXCLSRLDEL:
+> +		return virtnet_ethtool_flow_remove(&vi->ff, info->fs.location);
+> +	}
+> +
+> +	return -EOPNOTSUPP;
+> +}
+> +
+>  static const struct ethtool_ops virtnet_ethtool_ops = {
+>  	.supported_coalesce_params = ETHTOOL_COALESCE_MAX_FRAMES |
+>  		ETHTOOL_COALESCE_USECS | ETHTOOL_COALESCE_USE_ADAPTIVE_RX,
+> @@ -5679,6 +5707,7 @@ static const struct ethtool_ops virtnet_ethtool_ops = {
+>  	.get_rxfh_fields = virtnet_get_hashflow,
+>  	.set_rxfh_fields = virtnet_set_hashflow,
+>  	.get_rx_ring_count = virtnet_get_rx_ring_count,
+> +	.set_rxnfc = virtnet_set_rxnfc,
+>  };
+>  
+>  static void virtnet_get_queue_stats_rx(struct net_device *dev, int i,
+> @@ -6790,6 +6819,428 @@ static const struct xdp_metadata_ops virtnet_xdp_metadata_ops = {
+>  	.xmo_rx_hash			= virtnet_xdp_rx_hash,
+>  };
+>  
+> +struct virtnet_ethtool_rule {
+> +	struct ethtool_rx_flow_spec flow_spec;
+> +	u32 classifier_id;
+> +};
+> +
+> +/* The classifier struct must be the last field in this struct */
+> +struct virtnet_classifier {
+> +	size_t size;
+> +	u32 id;
+> +	struct virtio_net_resource_obj_ff_classifier classifier;
+> +};
+> +
+> +static_assert(sizeof(struct virtnet_classifier) ==
+> +	      ALIGN(offsetofend(struct virtnet_classifier, classifier),
+> +		    __alignof__(struct virtnet_classifier)),
+> +	      "virtnet_classifier: classifier must be the last member");
+> +
+> +static bool check_mask_vs_cap(const void *m, const void *c,
+> +			      u16 len, bool partial)
+> +{
+> +	const u8 *mask = m;
+> +	const u8 *cap = c;
+> +	int i;
+> +
+> +	for (i = 0; i < len; i++) {
+> +		if (partial && ((mask[i] & cap[i]) != mask[i]))
+> +			return false;
+> +		if (!partial && mask[i] != cap[i])
+> +			return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +static
+> +struct virtio_net_ff_selector *get_selector_cap(const struct virtnet_ff *ff,
+> +						u8 selector_type)
+> +{
+> +	struct virtio_net_ff_selector *sel;
+> +	void *buf;
+> +	int i;
+> +
+> +	buf = &ff->ff_mask->selectors;
+> +	sel = buf;
+> +
+> +	for (i = 0; i < ff->ff_mask->count; i++) {
+> +		if (sel->type == selector_type)
+> +			return sel;
+> +
+> +		buf += sizeof(struct virtio_net_ff_selector) + sel->length;
+> +		sel = buf;
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +static bool validate_eth_mask(const struct virtnet_ff *ff,
+> +			      const struct virtio_net_ff_selector *sel,
+> +			      const struct virtio_net_ff_selector *sel_cap)
+> +{
+> +	bool partial_mask = !!(sel_cap->flags & VIRTIO_NET_FF_MASK_F_PARTIAL_MASK);
+> +	struct ethhdr *cap, *mask;
+> +	struct ethhdr zeros = {};
+> +
+> +	cap = (struct ethhdr *)&sel_cap->mask;
+> +	mask = (struct ethhdr *)&sel->mask;
+> +
+> +	if (memcmp(&zeros.h_dest, mask->h_dest, sizeof(zeros.h_dest)) &&
+> +	    !check_mask_vs_cap(mask->h_dest, cap->h_dest,
+> +			       sizeof(mask->h_dest), partial_mask))
+> +		return false;
+> +
+> +	if (memcmp(&zeros.h_source, mask->h_source, sizeof(zeros.h_source)) &&
+> +	    !check_mask_vs_cap(mask->h_source, cap->h_source,
+> +			       sizeof(mask->h_source), partial_mask))
+> +		return false;
+> +
+> +	if (mask->h_proto &&
+> +	    !check_mask_vs_cap(&mask->h_proto, &cap->h_proto,
+> +			       sizeof(__be16), partial_mask))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> +static bool validate_mask(const struct virtnet_ff *ff,
+> +			  const struct virtio_net_ff_selector *sel)
+> +{
+> +	struct virtio_net_ff_selector *sel_cap = get_selector_cap(ff, sel->type);
+> +
+> +	if (!sel_cap)
+> +		return false;
+> +
+> +	switch (sel->type) {
+> +	case VIRTIO_NET_FF_MASK_TYPE_ETH:
+> +		return validate_eth_mask(ff, sel, sel_cap);
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static int setup_classifier(struct virtnet_ff *ff, struct virtnet_classifier *c)
+> +{
+> +	int err;
+> +
+> +	err = xa_alloc(&ff->classifiers, &c->id, c,
+> +		       XA_LIMIT(0, le32_to_cpu(ff->ff_caps->classifiers_limit) - 1),
+> +		       GFP_KERNEL);
+> +	if (err)
+> +		return err;
+> +
+> +	err = virtio_admin_obj_create(ff->vdev,
+> +				      VIRTIO_NET_RESOURCE_OBJ_FF_CLASSIFIER,
+> +				      c->id,
+> +				      VIRTIO_ADMIN_GROUP_TYPE_SELF,
+> +				      0,
+> +				      &c->classifier,
+> +				      c->size);
+> +	if (err)
+> +		goto err_xarray;
+> +
+> +	return 0;
+> +
+> +err_xarray:
+> +	xa_erase(&ff->classifiers, c->id);
+> +
+> +	return err;
+> +}
+> +
+> +static void destroy_classifier(struct virtnet_ff *ff,
+> +			       u32 classifier_id)
+> +{
+> +	struct virtnet_classifier *c;
+> +
+> +	c = xa_load(&ff->classifiers, classifier_id);
+> +	if (c) {
+> +		virtio_admin_obj_destroy(ff->vdev,
+> +					 VIRTIO_NET_RESOURCE_OBJ_FF_CLASSIFIER,
+> +					 c->id,
+> +					 VIRTIO_ADMIN_GROUP_TYPE_SELF,
+> +					 0);
+> +
+> +		xa_erase(&ff->classifiers, c->id);
+> +		kfree(c);
+> +	}
+> +}
+> +
+> +static void destroy_ethtool_rule(struct virtnet_ff *ff,
+> +				 struct virtnet_ethtool_rule *eth_rule)
+> +{
+> +	ff->ethtool.num_rules--;
+> +
+> +	virtio_admin_obj_destroy(ff->vdev,
+> +				 VIRTIO_NET_RESOURCE_OBJ_FF_RULE,
+> +				 eth_rule->flow_spec.location,
+> +				 VIRTIO_ADMIN_GROUP_TYPE_SELF,
+> +				 0);
+> +
+> +	xa_erase(&ff->ethtool.rules, eth_rule->flow_spec.location);
+> +	destroy_classifier(ff, eth_rule->classifier_id);
+> +	kfree(eth_rule);
+> +}
+> +
+> +static int insert_rule(struct virtnet_ff *ff,
+> +		       struct virtnet_ethtool_rule *eth_rule,
+> +		       u32 classifier_id,
+> +		       const u8 *key,
+> +		       size_t key_size)
+> +{
+> +	struct ethtool_rx_flow_spec *fs = &eth_rule->flow_spec;
+> +	struct virtio_net_resource_obj_ff_rule *ff_rule;
+> +	int err;
+> +
+> +	ff_rule = kzalloc(sizeof(*ff_rule) + key_size, GFP_KERNEL);
+> +	if (!ff_rule)
+> +		return -ENOMEM;
+> +
+> +	/* Intentionally leave the priority as 0. All rules have the same
+> +	 * priority.
+> +	 */
+> +	ff_rule->group_id = cpu_to_le32(VIRTNET_FF_ETHTOOL_GROUP_PRIORITY);
+> +	ff_rule->classifier_id = cpu_to_le32(classifier_id);
+> +	ff_rule->key_length = (u8)key_size;
 
-Thank you Andy.
+I don't think you need this cast. 
 
-Regards,
-Karan
+BTW why do you insist on making all this math in size_t variables?
+
+Just u8 should do, and in calculate_flow_sizes you can do a BUG_ON to check
+it does not overflow.
+
+
+
+
+
+
+> +	ff_rule->action = fs->ring_cookie == RX_CLS_FLOW_DISC ?
+> +					     VIRTIO_NET_FF_ACTION_DROP :
+> +					     VIRTIO_NET_FF_ACTION_RX_VQ;
+> +	ff_rule->vq_index = fs->ring_cookie != RX_CLS_FLOW_DISC ?
+> +					       cpu_to_le16(fs->ring_cookie) : 0;
+> +	memcpy(&ff_rule->keys, key, key_size);
+> +
+> +	err = virtio_admin_obj_create(ff->vdev,
+> +				      VIRTIO_NET_RESOURCE_OBJ_FF_RULE,
+> +				      fs->location,
+> +				      VIRTIO_ADMIN_GROUP_TYPE_SELF,
+> +				      0,
+> +				      ff_rule,
+> +				      sizeof(*ff_rule) + key_size);
+> +	if (err)
+> +		goto err_ff_rule;
+> +
+> +	eth_rule->classifier_id = classifier_id;
+> +	ff->ethtool.num_rules++;
+> +	kfree(ff_rule);
+> +
+> +	return 0;
+> +
+> +err_ff_rule:
+> +	kfree(ff_rule);
+> +
+> +	return err;
+> +}
+> +
+> +static u32 flow_type_mask(u32 flow_type)
+> +{
+> +	return flow_type & ~(FLOW_EXT | FLOW_MAC_EXT | FLOW_RSS);
+> +}
+> +
+> +static bool supported_flow_type(const struct ethtool_rx_flow_spec *fs)
+> +{
+> +	switch (fs->flow_type) {
+> +	case ETHER_FLOW:
+> +		return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static int validate_flow_input(struct virtnet_ff *ff,
+> +			       const struct ethtool_rx_flow_spec *fs,
+> +			       u16 curr_queue_pairs)
+> +{
+> +	/* Force users to use RX_CLS_LOC_ANY - don't allow specific locations */
+> +	if (fs->location != RX_CLS_LOC_ANY)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (fs->ring_cookie != RX_CLS_FLOW_DISC &&
+> +	    fs->ring_cookie >= curr_queue_pairs)
+> +		return -EINVAL;
+> +
+> +	if (fs->flow_type != flow_type_mask(fs->flow_type))
+> +		return -EOPNOTSUPP;
+> +
+> +	if (!supported_flow_type(fs))
+> +		return -EOPNOTSUPP;
+> +
+> +	return 0;
+> +}
+> +
+> +static void calculate_flow_sizes(struct ethtool_rx_flow_spec *fs,
+> +				 size_t *key_size, size_t *classifier_size,
+> +				 int *num_hdrs)
+> +{
+> +	*num_hdrs = 1;
+> +	*key_size = sizeof(struct ethhdr);
+> +	/*
+> +	 * The classifier size is the size of the classifier header, a selector
+> +	 * header for each type of header in the match criteria, and each header
+> +	 * providing the mask for matching against.
+> +	 */
+> +	*classifier_size = *key_size +
+> +			   sizeof(struct virtio_net_resource_obj_ff_classifier) +
+> +			   sizeof(struct virtio_net_ff_selector) * (*num_hdrs);
+> +}
+> +
+> +static void setup_eth_hdr_key_mask(struct virtio_net_ff_selector *selector,
+> +				   u8 *key,
+> +				   const struct ethtool_rx_flow_spec *fs)
+> +{
+> +	struct ethhdr *eth_m = (struct ethhdr *)&selector->mask;
+> +	struct ethhdr *eth_k = (struct ethhdr *)key;
+> +
+> +	selector->type = VIRTIO_NET_FF_MASK_TYPE_ETH;
+> +	selector->length = sizeof(struct ethhdr);
+> +
+> +	memcpy(eth_m, &fs->m_u.ether_spec, sizeof(*eth_m));
+> +	memcpy(eth_k, &fs->h_u.ether_spec, sizeof(*eth_k));
+> +}
+> +
+> +static int
+> +validate_classifier_selectors(struct virtnet_ff *ff,
+> +			      struct virtio_net_resource_obj_ff_classifier *classifier,
+> +			      int num_hdrs)
+> +{
+> +	struct virtio_net_ff_selector *selector = (void *)classifier->selectors;
+> +	int i;
+> +
+> +	for (i = 0; i < num_hdrs; i++) {
+> +		if (!validate_mask(ff, selector))
+> +			return -EINVAL;
+> +
+> +		selector = (((void *)selector) + sizeof(*selector) +
+> +					selector->length);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int build_and_insert(struct virtnet_ff *ff,
+> +			    struct virtnet_ethtool_rule *eth_rule)
+> +{
+> +	struct virtio_net_resource_obj_ff_classifier *classifier;
+> +	struct ethtool_rx_flow_spec *fs = &eth_rule->flow_spec;
+> +	struct virtio_net_ff_selector *selector;
+> +	struct virtnet_classifier *c;
+> +	size_t classifier_size;
+> +	size_t key_size;
+> +	int num_hdrs;
+> +	u8 *key;
+> +	int err;
+> +
+> +	calculate_flow_sizes(fs, &key_size, &classifier_size, &num_hdrs);
+> +
+> +	key = kzalloc(key_size, GFP_KERNEL);
+> +	if (!key)
+> +		return -ENOMEM;
+> +
+> +	/*
+> +	 * virtio_net_ff_obj_ff_classifier is already included in the
+> +	 * classifier_size.
+> +	 */
+> +	c = kzalloc(classifier_size +
+> +		    sizeof(struct virtnet_classifier) -
+> +		    sizeof(struct virtio_net_resource_obj_ff_classifier),
+> +		    GFP_KERNEL);
+> +	if (!c) {
+> +		kfree(key);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	c->size = classifier_size;
+> +	classifier = &c->classifier;
+> +	classifier->count = num_hdrs;
+> +	selector = (void *)&classifier->selectors[0];
+> +
+> +	setup_eth_hdr_key_mask(selector, key, fs);
+> +
+> +	err = validate_classifier_selectors(ff, classifier, num_hdrs);
+> +	if (err)
+> +		goto err_key;
+> +
+> +	err = setup_classifier(ff, c);
+> +	if (err)
+> +		goto err_classifier;
+> +
+> +	err = insert_rule(ff, eth_rule, c->id, key, key_size);
+> +	if (err) {
+> +		/* destroy_classifier will free the classifier */
+> +		destroy_classifier(ff, c->id);
+> +		goto err_key;
+> +	}
+> +
+> +	return 0;
+> +
+> +err_classifier:
+> +	kfree(c);
+> +err_key:
+> +	kfree(key);
+> +
+> +	return err;
+> +}
+> +
+> +static int virtnet_ethtool_flow_insert(struct virtnet_ff *ff,
+> +				       struct ethtool_rx_flow_spec *fs,
+> +				       u16 curr_queue_pairs)
+> +{
+> +	struct virtnet_ethtool_rule *eth_rule;
+> +	int err;
+> +
+> +	if (!ff->ff_supported)
+> +		return -EOPNOTSUPP;
+> +
+> +	err = validate_flow_input(ff, fs, curr_queue_pairs);
+> +	if (err)
+> +		return err;
+> +
+> +	eth_rule = kzalloc(sizeof(*eth_rule), GFP_KERNEL);
+> +	if (!eth_rule)
+> +		return -ENOMEM;
+> +
+> +	err = xa_alloc(&ff->ethtool.rules, &fs->location, eth_rule,
+> +		       XA_LIMIT(0, le32_to_cpu(ff->ff_caps->rules_limit) - 1),
+> +		       GFP_KERNEL);
+> +	if (err)
+> +		goto err_rule;
+> +
+> +	eth_rule->flow_spec = *fs;
+> +
+> +	err = build_and_insert(ff, eth_rule);
+> +	if (err)
+> +		goto err_xa;
+> +
+> +	return err;
+> +
+> +err_xa:
+> +	xa_erase(&ff->ethtool.rules, eth_rule->flow_spec.location);
+> +
+> +err_rule:
+> +	fs->location = RX_CLS_LOC_ANY;
+> +	kfree(eth_rule);
+> +
+> +	return err;
+> +}
+> +
+> +static int virtnet_ethtool_flow_remove(struct virtnet_ff *ff, int location)
+> +{
+> +	struct virtnet_ethtool_rule *eth_rule;
+> +	int err = 0;
+> +
+> +	if (!ff->ff_supported)
+> +		return -EOPNOTSUPP;
+> +
+> +	eth_rule = xa_load(&ff->ethtool.rules, location);
+> +	if (!eth_rule) {
+> +		err = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	destroy_ethtool_rule(ff, eth_rule);
+> +out:
+> +	return err;
+> +}
+> +
+>  static size_t get_mask_size(u16 type)
+>  {
+>  	switch (type) {
+> @@ -6955,6 +7406,8 @@ static int virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev)
+>  	if (err)
+>  		goto err_ff_action;
+>  
+> +	xa_init_flags(&ff->classifiers, XA_FLAGS_ALLOC);
+> +	xa_init_flags(&ff->ethtool.rules, XA_FLAGS_ALLOC);
+>  	ff->vdev = vdev;
+>  	ff->ff_supported = true;
+>  
+> @@ -6979,9 +7432,18 @@ static int virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev)
+>  
+>  static void virtnet_ff_cleanup(struct virtnet_ff *ff)
+>  {
+> +	struct virtnet_ethtool_rule *eth_rule;
+> +	unsigned long i;
+> +
+>  	if (!ff->ff_supported)
+>  		return;
+>  
+> +	xa_for_each(&ff->ethtool.rules, i, eth_rule)
+> +		destroy_ethtool_rule(ff, eth_rule);
+> +
+> +	xa_destroy(&ff->ethtool.rules);
+> +	xa_destroy(&ff->classifiers);
+> +
+>  	virtio_admin_obj_destroy(ff->vdev,
+>  				 VIRTIO_NET_RESOURCE_OBJ_FF_GROUP,
+>  				 VIRTNET_FF_ETHTOOL_GROUP_PRIORITY,
+> diff --git a/include/uapi/linux/virtio_net_ff.h b/include/uapi/linux/virtio_net_ff.h
+> index 6d1f953c2b46..c98aa4942bee 100644
+> --- a/include/uapi/linux/virtio_net_ff.h
+> +++ b/include/uapi/linux/virtio_net_ff.h
+> @@ -13,6 +13,8 @@
+>  #define VIRTIO_NET_FF_ACTION_CAP 0x802
+>  
+>  #define VIRTIO_NET_RESOURCE_OBJ_FF_GROUP 0x0200
+> +#define VIRTIO_NET_RESOURCE_OBJ_FF_CLASSIFIER 0x0201
+> +#define VIRTIO_NET_RESOURCE_OBJ_FF_RULE 0x0202
+>  
+>  /**
+>   * struct virtio_net_ff_cap_data - Flow filter resource capability limits
+> @@ -103,4 +105,52 @@ struct virtio_net_resource_obj_ff_group {
+>  	__le16 group_priority;
+>  };
+>  
+> +/**
+> + * struct virtio_net_resource_obj_ff_classifier - Flow filter classifier object
+> + * @count: number of selector entries in @selectors
+> + * @reserved: must be set to 0 by the driver and ignored by the device
+> + * @selectors: array of selector descriptors that define match masks
+> + *
+> + * Payload for the VIRTIO_NET_RESOURCE_OBJ_FF_CLASSIFIER administrative object.
+> + * Each selector describes a header mask used to match packets
+> + * (see struct virtio_net_ff_selector). Selectors appear in the order they are
+> + * to be applied.
+> + */
+> +struct virtio_net_resource_obj_ff_classifier {
+> +	__u8 count;
+> +	__u8 reserved[7];
+> +	__u8 selectors[];
+> +};
+> +
+> +/**
+> + * struct virtio_net_resource_obj_ff_rule - Flow filter rule object
+> + * @group_id: identifier of the target flow filter group
+> + * @classifier_id: identifier of the classifier referenced by this rule
+> + * @rule_priority: relative priority of this rule within the group
+> + * @key_length: number of bytes in @keys
+> + * @action: action to perform, one of VIRTIO_NET_FF_ACTION_*
+> + * @reserved: must be set to 0 by the driver and ignored by the device
+> + * @vq_index: RX virtqueue index for VIRTIO_NET_FF_ACTION_RX_VQ, 0 otherwise
+> + * @reserved1: must be set to 0 by the driver and ignored by the device
+> + * @keys: concatenated key bytes matching the classifier's selectors order
+> + *
+> + * Payload for the VIRTIO_NET_RESOURCE_OBJ_FF_RULE administrative object.
+> + * @group_id and @classifier_id refer to previously created objects of types
+> + * VIRTIO_NET_RESOURCE_OBJ_FF_GROUP and VIRTIO_NET_RESOURCE_OBJ_FF_CLASSIFIER
+> + * respectively. The key bytes are compared against packet headers using the
+> + * masks provided by the classifier's selectors. Multi-byte fields are
+> + * little-endian.
+> + */
+> +struct virtio_net_resource_obj_ff_rule {
+> +	__le32 group_id;
+> +	__le32 classifier_id;
+> +	__u8 rule_priority;
+> +	__u8 key_length; /* length of key in bytes */
+> +	__u8 action;
+> +	__u8 reserved;
+> +	__le16 vq_index;
+> +	__u8 reserved1[2];
+> +	__u8 keys[];
+> +};
+> +
+>  #endif
+> -- 
+> 2.50.1
+
 
