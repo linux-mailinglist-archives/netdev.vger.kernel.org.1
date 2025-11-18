@@ -1,95 +1,105 @@
-Return-Path: <netdev+bounces-239623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AADAC6A879
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:11:57 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 642BEC6A864
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:11:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0428D4E024B
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 16:04:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1844F34BA3D
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 16:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F75636A022;
-	Tue, 18 Nov 2025 16:04:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25BD36A028;
+	Tue, 18 Nov 2025 16:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uVU4HZq3"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="vS+EwqQi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B67368283;
-	Tue, 18 Nov 2025 16:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20AA530E0E3
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 16:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763481883; cv=none; b=GofPiAeGaY5dTqfOuRWyZlDJ3G9dnw8ejPiclz2sVUlLWKHKx+ayeXJDTOzNjje8TILn25N8M5mDzm3JujgluTfZmNUB+ZYAnty1ttmXoZ21Fc70qoN6QOcivfsUd9T2/kMG/rayebuKRTf+KwuXDNjbjcpQQM87Y0AuIyY/ZU4=
+	t=1763481977; cv=none; b=J26Owm8UiRLSWvdzDS977/fnNZZIDxIqf6l+iiPT6apUxe5NMCcIHq8Z6HiVUQ9osrgsKXFyooRvxF0naPIyuIiM3anUVTPs+q1UD74HM5ArF+xBN5FkTKhklFbT2O8FaH2l8nBaoqFRpns6vuTZc0ETzlFe5PW35z7rDUb14ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763481883; c=relaxed/simple;
-	bh=i0LbVI+QNFWoYKWn/EVjpgtC/3PUyI8ix5LquE4m9wo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I4Uj+rSBMBvLnfeiFQ1OnWxlmUSx63/8fHRb+N55wUQXPPA/UBHBiCj0iR8zvVu/9Nd03bw+EgDACn4kbUEti8UXtNb2aaR8W+BWAFgF/k4ocptN6onV/YVXU7kB/Z2v5MOOZ6kEwWr16vRNK4szHIdSkRc99OxZUTLl80w5zFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uVU4HZq3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80574C2BCB3;
-	Tue, 18 Nov 2025 16:04:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763481881;
-	bh=i0LbVI+QNFWoYKWn/EVjpgtC/3PUyI8ix5LquE4m9wo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uVU4HZq3cLW1JlSW+0iPXXroPICFFq6Ai37vB7ZBB3pZzgUcFLtCdCeNKWc2fOnfL
-	 XDliMUIydYTqXD8rOCXjcRseAFX39NixnNUoTDXWx59i+m5PiZhcZTAbma3HGxowFs
-	 EClp880TWyqAfWo92j9abu7CkeFJMZAcIB/cG76UnjOi8lCGgojIfL6wb3+ilxPuTY
-	 eWduF9BlnpoKHbbiHTMUlVPhHT+PCLaLhLL33F1MFP2ob5ceei9TQmqrzkzbqLtzhy
-	 TJ817GAms/Aa7owT9iINOmNwxzuIA1gTc4q3rsEjca4MjSguxB9tMAXGBdS2RVmVXW
-	 an2UGN1/YhrLQ==
-Message-ID: <e5e7b1cd-b733-40d5-9e78-b27a1a352cec@kernel.org>
-Date: Tue, 18 Nov 2025 09:04:38 -0700
+	s=arc-20240116; t=1763481977; c=relaxed/simple;
+	bh=YjVD6DRq5MWkVF+x7gkwrFTaWIUQiwpICXuAEgT4BwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JO5JPgYMpaF+freDfz2z6S/dNWq3C/FDFbxCRQ2kfy9gM/Nkv3/3EUMV7KTNm3lrNf6lBOx0oWalFGFpSpb2ikIpIeg5IoLBtUd813bKyE5DSBNhVpvN3t5r4+KRq/emVvc/RT+4iNRGK9e6K8ZaUVzuBBXmax1oz9H5iFW/f3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=vS+EwqQi; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-297d4a56f97so62978335ad.1
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 08:06:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1763481975; x=1764086775; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YjVD6DRq5MWkVF+x7gkwrFTaWIUQiwpICXuAEgT4BwQ=;
+        b=vS+EwqQiN9IPEZNUo54CKwlv55msFpGNjE9nMQ43vPtDvALcG2CMXDFOAVgdo587eY
+         60PM5VMxWeHvk0qZznTBftCgGcRKHc44R8jK4yu//ZhKNzrr6yHTpi4tf/YhavRJTjPS
+         hogm7HKhA5XVCsxmL2lH3XOU6STTmSAOqcz48KDVq1MUfGfr7Eh6upJCPfZ3oRqXsHev
+         LBcVjPciJj5DAaR90QIqb6vHWfjZIKjdx1eJ/PQ4evqsWddaKLnlFapY/nwLXt5vGiyC
+         kH3AXaYhCiDtzaCfwtZVlbjmpqAGOmNh0Vk5jwlE2he4nAdS70zudA+TATeRP4aXVeKd
+         ZhSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763481975; x=1764086775;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YjVD6DRq5MWkVF+x7gkwrFTaWIUQiwpICXuAEgT4BwQ=;
+        b=HpHHp7iPF9oIv6eLuuP6l72Gp6TpY2YQ3RQnVWyeHijUBKYG1efijLKLE8aQFKfE5S
+         AYfzAu1xxrCEZrEAk5pnKA3dlmQAtqUFQ0Hx6BkCK6a02wHEe1lN/1/FsOvafvoM4sa8
+         viY0hSwDxfrrmqLKB8KlBuGDABpcEfSJEaexr1N89X+vEzhAU/u7vKMItQRJGH+DVW9G
+         7eEUFCXVp7jIbGFosMDP5vvaPOLtq/hafL530C4kf5ZF0VX9KDdZSzABsr6pHixHJq1y
+         xBnZHvUujTl7YjQd7LS3tfIovhtny6lQLn9zjuoK1UwgE9WHVBwPaZDMNw+327x/ttTn
+         jtNA==
+X-Gm-Message-State: AOJu0YwSEUw0EyQyG/vNa9TpoUK4Kg1NRlIEB0hCws61jggQ+aYo+PEo
+	iDRQvfh02UXJmJrV9V9nkrwEWTAX4RHCSuKNvPob4jNKz0fYdB3iYa/tNK81Ftf03ANwck2uG62
+	iuz2d
+X-Gm-Gg: ASbGncvQSdnUKbpvpSowSdyMGAIdH1l/DUfxu61cKOHnyCowQJswbAR50h58hAQMHV2
+	o/LAJ2koURZheJOGkbjojvKHOI/rRr0G4X04E1svrAqtqZNRNWc/2E+pNF0P4cQpMCQP0MYyYXK
+	6eYJ2jtpsLRm8ofMjEL9ObLRhcMP4jnTbypXAqlyFw1ZdY+FOGADxy+z1BAf7we43wvn/iDFaJh
+	9b6z2i1f8mT4qnTSkhI2kGFB4hD6zCJQXCAsCcqMOMk1ldPj4PRwtMgyIKDGQCJSzrGMoowAYEK
+	MGBZvMtQ6qUL9RxMTpnX5qo0F+1mNUB3PjV/abBf7wX15vfkTnVPsOLp1hMCrS8NiQArkWm6Pgi
+	x2yUUvbyIlnpiqWUKUFOwLKjgBZI9i/+fAi1PWIHtsl7etWQEzqowlBZCZB5RuLHrLxRM1hVTBc
+	o2Wm3oIg87x38JquRS2OAgp0ziP26scU/ClOUpgYtaF9p6aKSM3cQc
+X-Google-Smtp-Source: AGHT+IE3UJvEuiPrp4atDcWihCRYjOncxoqE8Tout+yHcvqekJ+luaRFDPNrAp9vKYb9soc2oHw+AQ==
+X-Received: by 2002:a05:7022:6621:b0:119:e569:f27d with SMTP id a92af1059eb24-11b8f160a01mr5988669c88.38.1763481975232;
+        Tue, 18 Nov 2025 08:06:15 -0800 (PST)
+Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11b060885eesm62535012c88.1.2025.11.18.08.06.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Nov 2025 08:06:15 -0800 (PST)
+Date: Tue, 18 Nov 2025 08:06:11 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+Cc: <netdev@vger.kernel.org>, <andrey.bokhanko@huawei.com>,
+ <edumazet@google.com>
+Subject: Re: [PATCH v2 iproute2-next 1/1] Support l2macnat in ip util
+Message-ID: <20251118080611.2e5bdec7@phoenix.local>
+In-Reply-To: <20251118112347.2967577-1-skorodumov.dmitry@huawei.com>
+References: <20251118112347.2967577-1-skorodumov.dmitry@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/ipv6: allow device-only routes via the multipath API
-Content-Language: en-US
-To: azey <me@azey.net>, nicolasdichtel <nicolas.dichtel@6wind.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev <netdev@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
-References: <a6vmtv3ylu224fnj5awi6xrgnjoib5r2jm3kny672hemsk5ifi@ychcxqnmy5us>
- <7a4ebf5d-1815-44b6-bf77-bc7b32f39984@kernel.org>
- <a4be64fb-d30e-43e3-b326-71efa7817683@6wind.com>
- <19a969f919b.facf84276222.4894043454892645830@azey.net>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <19a969f919b.facf84276222.4894043454892645830@azey.net>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 11/18/25 4:00 AM, azey wrote:
-> On 2025-11-18 10:05:55, +0100 Nicolas Dichtel wrote:
->> If I remember well, it was to avoid merging connected routes to ECMP routes.
->> For example, fe80:: but also if two interfaces have an address in the same
->> prefix. With the current code, the last route will always be used. With this
->> patch, packets will be distributed across the two interfaces, right?
->> If yes, it may cause regression on some setups.
-> 
-> Thanks! Yes, with this patch routes with the same destination and metric automatically
-> become multipath. From my testing, for link-locals this shouldn't make a difference
-> as the interface must always be specified with % anyway.
-> 
-> For non-LL addresses, this could indeed cause a regression in obscure setups. In my
-> opinion though, I feel that it is very unlikely anyone who has two routes with the
-> same prefix and metric (which AFAIK, isn't really a supported configuration without
-> ECMP anyway) relies on this quirk. The most plausible setup relying on this I can
-> think of would be a server with two interfaces on the same L2 segment, and a
-> firewall somewhere that only allows the source address of one interface through.
-> 
-> IMO, setups like that are more of a misconfiguration than a "practical use case"
-> that'd make this a real regression, but I'd completely understand if it'd be enough
-> to block this.
+On Tue, 18 Nov 2025 14:23:47 +0300
+Dmitry Skorodumov <skorodumov.dmitry@huawei.com> wrote:
 
-There is really no reason to take a risk of a regression. If someone
-wants ecmp with device only nexthops, then use the new nexthop infra to
-do it.
+> Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+
+
+Good start, but you need update ipvlan_print_opt as well.
+The trigraph is getting long enough that it is time for a helper function.
+
+Also need to update man page.
 
