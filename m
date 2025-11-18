@@ -1,176 +1,155 @@
-Return-Path: <netdev+bounces-239446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59451C68729
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:13:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 491E5C68735
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:14:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 791482A810
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:13:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 098482A59B
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94673081D0;
-	Tue, 18 Nov 2025 09:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF18311C14;
+	Tue, 18 Nov 2025 09:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X9Q+GWs2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5D730F80A
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 09:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42016304BDA
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 09:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763457148; cv=none; b=uQGODKtdkQfAQj0URkcaibb4HYdpUkjMdOOLfrKzOLE96sXl10wsStNNo3epHMikJaNjpN9LFCRRFWZI/N2O3np4Kq67ORKHszpD3UU3EAmleGib4IseFghgyX95veTdBtJOXmzhDRLqkjp9GuADN1sPuuMKHHOPZOMiqAUf/WQ=
+	t=1763457190; cv=none; b=oSxXvK8Zy0VYPMfn8tfGa6TUyYp3G40Lqfd8q2hfgWkolpVyk4L+r2HsFVeWmWhjsMhyGwcjMB2Z2o923OEupLau41irvVrwioZ5Dc1nMBBD52CGV80hKDIqcwW+7xqR9M1MJ411e9wDlTTsKIZo6JSF/T4LqvdNvOX+fNhl8bA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763457148; c=relaxed/simple;
-	bh=RMHiKfDDZRF4XKtK3FvegO8GyEZ0WcrzD9nGISsyTbI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QgklhtOuKEb/b0MiFwGJazKPUnAtvWdp6jiJIOrhnUOra+bFKJH4497O/GUcrB857xIEZ1/Pb2a2BpEUmgOf8Z2g9/9jRqx3oD0YI/j2qMcKMhGO1IfJ58gyALF3Q8aQ4pX/4h/BA9fzdLPHZMkCy7DDZSPVkDrgLQVBvl+oMdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-433795a17c1so135375415ab.2
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 01:12:25 -0800 (PST)
+	s=arc-20240116; t=1763457190; c=relaxed/simple;
+	bh=SdqlTpbJJyHy0CnqZckFC0G6Xe2xBCQUl7hLQuseWzw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vFKFwqRVMpNOZZ6GCwVrea9HSwOicHuzft2N7QfCxWIIix04KorNmL4jyzeRkiWACpu1hW/gnxlw7c1PMcm8D51/fhSrMVs1MbWu8EiVRV4VA5XB2YqkOS7G/i+Q7j12QJSai/Hxkl1kfyPNotFsl6NwZoPqS7cG2Hj4w3xVR5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X9Q+GWs2; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7b852bb31d9so5900007b3a.0
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 01:13:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763457183; x=1764061983; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JFkOpeDn2jRMncnbRni6Etd02PIBihHP7ylWcxC9j6Q=;
+        b=X9Q+GWs2L009mwZPy6IOjfaRQycjcX9fjfXcwbrJ4DbWPjN15DiP3EY9uktdfC2IDt
+         PIr4Dng+xI6hK6gnhFyAUS0m4cg07q7Plmxjm8ku9/7nrEolsQN8KOGdKJIlNEKIjMzq
+         T7Y1sxnhuB0b+kaM4q/I6VV6CieuK32pKiGKl+5R8lc4ERDG8iAGOqXBlhSFv7vGKBkC
+         aWJBu1LO0Inv2SYz9tpWbLvyvq3I93/I46GIai2jNKRvuHbUpjPLWSAU+DkNtZ689B+h
+         K7TZ9RUsTdkuFRjhAwiO36SekdhCEUXt98eEkY/u+dq3c4/3LLFFas4/otX6mtQYUf7a
+         w7YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763457144; x=1764061944;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZCPCBiDseJTYHAymJetqpym/2ftXtJI5iOpKOSwwOu8=;
-        b=t4ocrxPlTY3h+AkfjqF4IJAYn+ljjD9ec62uAfuqIWMrnJXUOpQ7hCemfcIn33JNzX
-         SaoPLMAG7xR2LMM1/p4G6ctQ4Hl2hg4dcclPjZTJeYRvU50STu4oUAQqL2l609yoQpz2
-         S+cNtO6VmgELjEN0+ORLMlMaID8al+LNeDZM+FnXHc5M37vyVJ2FsxIXnMI7gUI/77kb
-         uwIV5OHq6tnF7cG82qttFdClI2H7sSF1QtkKpf5nbO4B9xyqc56EL5kF2sTViULV4m6G
-         QrQprB2g7jTjl5WVQwU2N4VHfb+ROKZGuCpNcKGjwWzH1GzGC0/rSPYHtnRzE3DP05nt
-         XEPw==
-X-Forwarded-Encrypted: i=1; AJvYcCUytgUDeg7+mXgX0ubJJrA06ign2m84EgfOoKPocsN9LwKacQqzZ4ZrWzSctQDLJWwZl7VWF+Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxfqBjPmhJ13SpAR+SA1kTiZ7/jCxpWUkl4gNKx6mr7DiSsoiU
-	Zl+LVFsp1Fl9pcyB38+y5QmumzyEuMqIAKJc6fxtjpTzdsBsemN29P8Ofc451nF2a1brSmDI2ZC
-	nquxKr7g4VXTWMT0+Rk+AaQiTSaoSPFRAl2uPp00I+sJYYccfDcnteYuQ4p4=
-X-Google-Smtp-Source: AGHT+IHbXwBOmPJLm6wPLuoglDX5/xd6oe773wnP4kFD6s8nnbvi1P7vk4tk6PUBU6UeysoSGSqlg9jn7cKoVjP7wvVISevaja92
+        d=1e100.net; s=20230601; t=1763457183; x=1764061983;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JFkOpeDn2jRMncnbRni6Etd02PIBihHP7ylWcxC9j6Q=;
+        b=L2oSmUj4P7EmijbqOT1rEOWo8CApqrYi+u138COUY6UWyrOftfrKATgNGZ2pT+mQ/7
+         hBiSQnjw6uEqMckG4nJeua9TXTmV6M0E3bQ1hwPc4KHVRHpjSqw0EDcJ2nW65tHJqGc/
+         YA9Cblq26TY5xg1GnqtjPXXDP+V9I4UE8etZxyTDjVioTAvujojW/gN9owUsXG3OAtRk
+         UkQYPUMrvMfCZzg+oz0ujkiTG+CHrTL3u/MkTKbeEoCjBY3iZwJ6gorVfX8+pmnHAz6F
+         aUkj6+EH06rz3l3tloOIL9xW7/taYm9yXrsH/S+rTgMoRZVOwI97i1A/Y4pPZezgzaMF
+         rxiw==
+X-Gm-Message-State: AOJu0YyyYuQDMWZ78Kc8SOzdb8EpJiOUvapdd9vWcfWEZF/Bw7ZoCIN5
+	v0PkT/1NZPmCno1Gqx+j7Wj8jaTcg4fnCoDSVzgQW9MlOmGY0j13fC7WjywyczF2
+X-Gm-Gg: ASbGncvj3DEUtQ8ZmqRw1C44+RD/chkkpbSe2nUUMZaVkQCmHrqmhcw+UWmwgmGUQFN
+	g69r/0BKIsbPRkr3bU0UTPLO8FQZryDsWJOxka+83phg4CzHCURz5mKahFjOIfFw9iE3PGZoLdJ
+	G7eDsiWULJRPpS0X0O6zORzn4ZX08sxCPDenBgOZm5vRRSJ5TUsd+w/5X1bmvaVr418m8DspuMP
+	8YZLIbBeAPKaMfjN7PoPueyLff7WzTC995FGnPhnFgEL3V3EzIwD+fWj6031AvlSZQojV4KSnmS
+	XEzRMIoL9/0jFb4+46d+ZZ9BBo7jmbwx6MgUMXIZSbIqnUF5UEeb5z7p8tTn6NVtjYerWpMbJkg
+	YIV7eRQfN+O9LAhPq7rkuSLonrdj4W8yGnX7iS77gbiaww3tLOLwUB6PvVFISeioCs/N1DO3dZM
+	DB0atTVts=
+X-Google-Smtp-Source: AGHT+IELD+mUOOmyAzNfNMxNVLo7AvHaGl4tLct5UR4tcQdGQzNqWRjSuqIa9bQ6MpfLRzKhYDaiyA==
+X-Received: by 2002:a05:6a20:6a03:b0:334:a180:b7ac with SMTP id adf61e73a8af0-35ba1c93579mr19863554637.39.1763457183358;
+        Tue, 18 Nov 2025 01:13:03 -0800 (PST)
+Received: from d.home.mmyangfl.tk ([45.32.227.231])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b9251ca3e9sm15913459b3a.29.2025.11.18.01.13.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Nov 2025 01:13:02 -0800 (PST)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: dsa: yt921x: Fix MIB attribute table
+Date: Tue, 18 Nov 2025 17:12:33 +0800
+Message-ID: <20251118091237.2208994-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b44:b0:433:79a7:8158 with SMTP id
- e9e14a558f8ab-4348c9334c1mr166286595ab.27.1763457144310; Tue, 18 Nov 2025
- 01:12:24 -0800 (PST)
-Date: Tue, 18 Nov 2025 01:12:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <691c3878.a70a0220.3124cb.00b9.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING: suspicious RCU usage in
- ieee80211_mesh_csa_beacon (2)
-From: syzbot <syzbot+b59873f5699e941717ca@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+There are holes in the MIB field I didn't notice, leading to wrong
+statistics after stress tests.
 
-syzbot found the following issue on:
-
-HEAD commit:    7a0892d2836e Merge tag 'pci-v6.18-fixes-5' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1100a212580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=929790bc044e87d7
-dashboard link: https://syzkaller.appspot.com/bug?extid=b59873f5699e941717ca
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12656884580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15519212580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-7a0892d2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a78c5c2efd8d/vmlinux-7a0892d2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/5a51cc5df960/bzImage-7a0892d2.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b59873f5699e941717ca@syzkaller.appspotmail.com
-
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
-R13: 00007f4e229e5fa0 R14: 00007f4e229e5fa0 R15: 0000000000000003
- </TASK>
-=============================
-WARNING: suspicious RCU usage
-syzkaller #0 Not tainted
------------------------------
-net/mac80211/mesh.c:1571 suspicious rcu_dereference_check() usage!
-
-other info that might help us debug this:
-
-
-rcu_scheduler_active = 2, debug_locks = 1
-2 locks held by syz.0.17/5477:
- #0: ffffffff8f333750 (cb_lock){++++}-{4:4}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1218
- #1: ffff888059ba0788 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: wiphy_lock include/net/cfg80211.h:6343 [inline]
- #1: ffff888059ba0788 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: nl80211_pre_doit+0x281/0x930 net/wireless/nl80211.c:17999
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5477 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- lockdep_rcu_suspicious+0x140/0x1d0 kernel/locking/lockdep.c:6876
- ieee80211_mesh_csa_beacon+0x280/0x2c0 net/mac80211/mesh.c:1571
- ieee80211_set_csa_beacon+0x3cc/0x9a0 net/mac80211/cfg.c:4288
- __ieee80211_channel_switch net/mac80211/cfg.c:4406 [inline]
- ieee80211_channel_switch+0x8ef/0xcb0 net/mac80211/cfg.c:4442
- rdev_channel_switch+0x108/0x290 net/wireless/rdev-ops.h:1116
- nl80211_channel_switch+0xac9/0xd70 net/wireless/nl80211.c:11475
- genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:742
- ____sys_sendmsg+0x505/0x830 net/socket.c:2630
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
- __sys_sendmsg net/socket.c:2716 [inline]
- __do_sys_sendmsg net/socket.c:2721 [inline]
- __se_sys_sendmsg net/socket.c:2719 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f4e2278f6c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe9e0535c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f4e229e5fa0 RCX: 00007f4e2278f6c9
-RDX: 0000000000000000 RSI: 0000200000004180 RDI: 0000000000000003
-RBP: 00007ffe9e053620 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
-R13: 00007f4e229e5fa0 R14: 00007f4e229e5fa0 R15: 0000000000000003
- </TASK>
-
-
+Signed-off-by: David Yang <mmyangfl@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/dsa/yt921x.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
+index 944988e29127..97fc6085f4d0 100644
+--- a/drivers/net/dsa/yt921x.c
++++ b/drivers/net/dsa/yt921x.c
+@@ -56,13 +56,13 @@ static const struct yt921x_mib_desc yt921x_mib_descs[] = {
+ 
+ 	MIB_DESC(1, 0x30, NULL),	/* RxPktSz1024To1518 */
+ 	MIB_DESC(1, 0x34, NULL),	/* RxPktSz1519ToMax */
+-	MIB_DESC(2, 0x38, NULL),	/* RxGoodBytes */
+-	/* 0x3c */
++	/* 0x38 unused */
++	MIB_DESC(2, 0x3c, NULL),	/* RxGoodBytes */
+ 
+-	MIB_DESC(2, 0x40, "RxBadBytes"),
+-	/* 0x44 */
+-	MIB_DESC(2, 0x48, NULL),	/* RxOverSzErr */
+-	/* 0x4c */
++	/* 0x40 */
++	MIB_DESC(2, 0x44, "RxBadBytes"),
++	/* 0x48 */
++	MIB_DESC(1, 0x4c, NULL),	/* RxOverSzErr */
+ 
+ 	MIB_DESC(1, 0x50, NULL),	/* RxDropped */
+ 	MIB_DESC(1, 0x54, NULL),	/* TxBroadcast */
+@@ -79,10 +79,10 @@ static const struct yt921x_mib_desc yt921x_mib_descs[] = {
+ 	MIB_DESC(1, 0x78, NULL),	/* TxPktSz1024To1518 */
+ 	MIB_DESC(1, 0x7c, NULL),	/* TxPktSz1519ToMax */
+ 
+-	MIB_DESC(2, 0x80, NULL),	/* TxGoodBytes */
+-	/* 0x84 */
+-	MIB_DESC(2, 0x88, NULL),	/* TxCollision */
+-	/* 0x8c */
++	/* 0x80 unused */
++	MIB_DESC(2, 0x84, NULL),	/* TxGoodBytes */
++	/* 0x88 */
++	MIB_DESC(1, 0x8c, NULL),	/* TxCollision */
+ 
+ 	MIB_DESC(1, 0x90, NULL),	/* TxExcessiveCollistion */
+ 	MIB_DESC(1, 0x94, NULL),	/* TxMultipleCollision */
+@@ -705,7 +705,7 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
+ 			res = yt921x_reg_read(priv, reg + 4, &val1);
+ 			if (res)
+ 				break;
+-			val = ((u64)val0 << 32) | val1;
++			val = ((u64)val1 << 32) | val0;
+ 		}
+ 
+ 		WRITE_ONCE(*valp, val);
+-- 
+2.51.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
