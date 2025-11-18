@@ -1,192 +1,214 @@
-Return-Path: <netdev+bounces-239464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE364C688C3
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:32:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0265C68927
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:36:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4CBF736644E
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:29:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id F20292A6B8
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063E7314D0B;
-	Tue, 18 Nov 2025 09:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06121319852;
+	Tue, 18 Nov 2025 09:36:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lloDqHDE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="j9XJWv5G"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013052.outbound.protection.outlook.com [40.93.196.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B34313523;
-	Tue, 18 Nov 2025 09:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763458161; cv=none; b=Ws2Ae3gwsgJy54Yk7mlm4lR6ZpXAxHIHuciFM3TF0RfC4xbgO2Uvf2Nq9iXO4Tp+q9JrXoB8/UnQTYvww4LOJW+fx1DauB3WMTZAd0aCUfFSxBZyQE/O2H5xSD7diRIz0NBVIiaiUUPHWQZOWELN+wTXSUOEuv693w/FeQN3RRY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763458161; c=relaxed/simple;
-	bh=XtXjD5/us05FBBs2aNvNSAmALfBDhakcT0etFgo4DWg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Bqt+ZKFhzZH4IbmZ2yYyPVWdLP7LT3MiRcnyjg3f5q6hwZ+zFmi6AJcJY5qX4FCI2pV8OCGIJaONjKDEThCbWm1C4g0s0TXRiBys1l+266mp3+j9JDa7ujq/Lw8Pai10CoTVyTrkO8E0shpEUJ1g0cWY2aK+MwCyKJuQ37lz/dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lloDqHDE; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=po
-	5utToS7tZbEM3s51Es5F5AGq5I+najj73o2GX8Ib8=; b=lloDqHDEE8iWilaZwQ
-	qdJhaVyRG1z9GgiVz1O1DDcYN2kb4W9yJgW+n5ZByQbylNMrQBHRwP+PU+CmSist
-	KRFJUjJWn3rbW1eX2FSh6YW+D0z8rZHeHvDa+K/YRk5xn9P/UrGG2MQP3I0s4PyZ
-	YDwKwWIyiu+4xWC2LhvqWX7ck=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wD3H+JNPBxpth0NBA--.1772S3;
-	Tue, 18 Nov 2025 17:28:48 +0800 (CST)
-From: Gongwei Li <13875017792@163.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Gongwei Li <ligongwei@kylinos.cn>,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH v3 2/2] Bluetooth: Process Read Remote Version evt
-Date: Tue, 18 Nov 2025 17:28:44 +0800
-Message-Id: <20251118092844.210978-2-13875017792@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251118092844.210978-1-13875017792@163.com>
-References: <20251118092844.210978-1-13875017792@163.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46DED3164A0;
+	Tue, 18 Nov 2025 09:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763458564; cv=fail; b=cQTLdNtMWDgrHWRVFYo4ZFvANmH0lmduH2WHoyqEASmOdAeMmyERg7sWBC4LJhRFexXkjdwaXL/yr0/KwKG+pEAeaVzydvcoD3u9z6azIvLMVaOpPCGRu4AZCLYR9MIzugkbRyd0PeSF+CEigeg4OlOJi2kN+oIF9yAfq/WdidA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763458564; c=relaxed/simple;
+	bh=dDA8OVVUmsQSqxtCq0uAvgP6l3AbZ+7WuaN1BZMF8pU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=I0m/igm+ymPE3henoT06KJYKSyB4mQx4x5ittDIHSzDd2oM5SRLTFK2sroNyWYOUrfZ690VRvfdOqfiZ0xkOW1p00V1VLi7d1QXWpucQiZfcH4+QCJvWQVV0/yGKf7W5alBWHJQzlFKqRdWG9uZKvrb1mgvCeXoOAx2+YHFqdEU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=j9XJWv5G; arc=fail smtp.client-ip=40.93.196.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=e/ATdemcZ70Q5pCcOeH2/1B0c9KTWHrBDlneSRbAJkbBFkjPfuPW/rX21K5zh385BKx98i2IGW8Z456JX98f49djrBZOEJlBao/qDsb8cYDic+3sAQm88YrudyB/OOkNDvmIsA82qy+i3gCxowOP7vWCiihcmsNGDDlb9BXjuZM42ubSIzzFy+/445UnKvy4OWRoThoN91W953RSehTJciEmJGlPRy+fUpdv0fbNuFl5f0WYwCcH9METCVvFy9FePubzGfnQSAy3eS6rRdmWhQDRLxAMw9OW4l9I4q3sRTD34h/Eb8R5b50WwFYdVhUxEdcBOPjsTc7bhJN6k8j6pg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hUpiTQfvsDZbzIHdNAsrhIrRg5LtS1Nl9EuJff2jzCU=;
+ b=FvNlTXqrnDxJq6QlHQSdu0KE1xVIeamTOiW9OcSxgf7HUacMpz2Um4SVrzxxUXnsYok5erAQpW8bNaRbswa9g0fOk0yTLNbek2HeV4GrJ7lZLfMxyGsGLVG79ZfdI58WiNc+VLEeszzG92hfuwOvEcRnWbivx72oZv7n7N7IDuU/r5FDrJZAEXVClWCmQhVURFx4/SLTZQii5u026xI0A7S1X5ZNDwBb35+x21AtHZ077AcdTrtNl42m57iQJY49onWTO3pqf4nAMBeuefzmYynhGpSPnXDvAjdM37tS88ieSdcLZFgbCUIe111FiW/1FbzfHANs+RSZgcTO41UuIw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hUpiTQfvsDZbzIHdNAsrhIrRg5LtS1Nl9EuJff2jzCU=;
+ b=j9XJWv5GBQRYXlg4M6j0vQS+3IiC2rb4e9vRXN/Ab609Muka3tdPtUMSkYAUZ3JILp4u/r2FGXdqsh2kYqC17jg3bRZHpeDP+BvLUKxxn+IqfFHrchGh5aYn3K74AefRNiFc0vIXeloErZcEeWaNya1f71iotiiW0J/0twSz5vxYA27b7GywntWh4HREb7ORXfjEzbxcejP5+/+uc6/jEHgktie4IZedA0I8BinO57RfHZJXQSNJMoPvxA28KLxB9rXHmoAqs55dZbpA9BMDD6NcaVlXS/jbI0UG5+5aBt7KN50vKmcZVxq0XbdXRbb95fl5MTAO89I05sqBwdfeeg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
+ by IA0PR12MB8326.namprd12.prod.outlook.com (2603:10b6:208:40d::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Tue, 18 Nov
+ 2025 09:35:58 +0000
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2%4]) with mapi id 15.20.9343.009; Tue, 18 Nov 2025
+ 09:35:58 +0000
+Message-ID: <b646c522-d4ac-4cb3-ba10-9c456a3ab5c5@nvidia.com>
+Date: Tue, 18 Nov 2025 11:35:52 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] tools: ynl: cli: Display enum values in
+ --list-attrs output
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, bpf@vger.kernel.org,
+ Nimrod Oren <noren@nvidia.com>
+References: <20251116192845.1693119-1-gal@nvidia.com>
+ <20251116192845.1693119-4-gal@nvidia.com> <m2jyzomypp.fsf@gmail.com>
+From: Gal Pressman <gal@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <m2jyzomypp.fsf@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL2P290CA0022.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:3::6)
+ To CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3H+JNPBxpth0NBA--.1772S3
-X-Coremail-Antispam: 1Uf129KBjvJXoWxGF4UGr4rCw1DCr17tw4rAFb_yoWrCrWxpF
-	Z8u3WfArW8Jr4fXFyxAa18ZFn5Jrn7WFW7KrZ2v34rJws0vrWkJr4kCryjyFy5CrWqqFyx
-	ZF1jqr1fuFyUtr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jAcTPUUUUU=
-X-CM-SenderInfo: rprtmlyvqrllizs6il2tof0z/1tbiXAEKumkcONVibQABs7
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|IA0PR12MB8326:EE_
+X-MS-Office365-Filtering-Correlation-Id: 64b0c0cd-c2d3-41e7-ef01-08de2685e0d8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bm5Zd3AvNVB4bkN2S29uTmYweWJxL2c1Kzl4UStVSDFicnFsMkxvTlVNWng0?=
+ =?utf-8?B?TTJrendqYWF1akxndDh5U2c0K2JPS0w0bnNIV0p3RURMeUdlaFJQY3g0VlQw?=
+ =?utf-8?B?MVB1U3N2R1JHUXN2OU9nYkJBOEZ1bXNYYmwzUGRnWFdScmxyY2VNeDVOMUgx?=
+ =?utf-8?B?QUpsWDl3TWFia0RUQU9mK2hOckNpaFA0YzM3dk1qcE9Uc0FQMkV5aGZjL2pT?=
+ =?utf-8?B?dHEwM1djUUdoRW1BQVREdkpTNERDaFlmMWs0SGVlZVE2dFlxYTRBSVhCMzJL?=
+ =?utf-8?B?RW9GK0c3S09BZHJqcXFxU0xTbDlMUzhLTDBzdWtjcHhQNE9EcjRhMUtCaGhr?=
+ =?utf-8?B?TGMxNlBNcEp5aHV1M253YVJyS1RJNmUwRmFDR1hVTkZnRXp5WHpPMVUrOFZW?=
+ =?utf-8?B?c3hDeS9nN3J4d3FqZ2tITVFVZGVyZmRvcXJTTlRoODcyVWhxdmdHS0NydXVR?=
+ =?utf-8?B?YmVkMk9BSmMyRE1tVHkwOTlUY2ZxOFc5UDl1WE1KZURMZWtHMFMvT1h6YUtK?=
+ =?utf-8?B?NUszczFCY2psMnMvaVo4NytZazNOaHMvUmMzSC9JK09CbXRrTnF4V0IwdzZE?=
+ =?utf-8?B?MVgrYnl5TEg4V3NMbkFOVHhMY3QySjFocTRjbFUxK3MzbFFrdXVXaEpOT1Zh?=
+ =?utf-8?B?TVZCVzdzYU0wMVIxa2VDdGYzNmRlYUEyQU9qenJvd2JkYjJodjd0R2ZTTDB3?=
+ =?utf-8?B?Zi9OQlhOTXVGbGFCNDhqZGx3STlocXJ4dnpITXhDUEswUVhiTU1kUzR0R05S?=
+ =?utf-8?B?WkczWHNiclVwNXVMMlcyQmRwMzFrM3J0Y0d6SDlhcW85T20yeXNPRDZSbnB0?=
+ =?utf-8?B?eStLVFBaSzM1TU9zbGE1ZnV5TFZQRHYzM3BKUHV4bkdRU3ZuS3VhLzJVOXpM?=
+ =?utf-8?B?Yk5ybVY4S1M1UEw0TGNyd0k2c1pxOC9yemJJN243YWQ5Nks2RWN1bnU0NVkx?=
+ =?utf-8?B?USswZGNVMWswbElxalVtanpVVkRjYVNzVXBvU1AydUVJMXBmT2FzcjJmSkpm?=
+ =?utf-8?B?Q2lZR3o5b0ZBL1dtU1dCZUtWLzM1R3lyVENNMW1MZDRsbFNDT08xdE9rdmZ5?=
+ =?utf-8?B?SnBvR2dWNHBHTXBNUzdMamdqME9mZnd6bDNkMHY2aDdWdUZsQ2Zqd04wRUh4?=
+ =?utf-8?B?aTYzV1pPRWE1V0ZCQzM5UnYweEVCeHJVRHQ1U1M2dngySVA4amIrR2xtcUdm?=
+ =?utf-8?B?aWllRnN3SDdzcFRSZGVDVzZqRVJHNmVHYWhaRGdla2pwSDRPcW9GS0JkZGM0?=
+ =?utf-8?B?Rm5NWGtDMlBpeHFwdHJwTlZydzlXd2VFZ09tSTczWkp4MTJEQlQ4S2JHUkZZ?=
+ =?utf-8?B?Z1BESFdJTXNjOEk4YW5SSWYyZ3NGVzc3cjhSRVBscGE4eTFVUVpiWm9HVnVY?=
+ =?utf-8?B?ZjgrSVMyRFdnckpZdUFsTHU4SFVIVmx3Uk5zSWJtRE9XbXoxMFhsSllzQi9o?=
+ =?utf-8?B?dVA5Y0RockdPelFkekx0NjVNUm9udFpIMzc5Sko4ekovMFRWNkRFNjJwcHhy?=
+ =?utf-8?B?eVRKUHFRdndROG1YR21wSnpxaGlCNWh5Mys2aTlJTmhTaUR0WThmSnJLT0sz?=
+ =?utf-8?B?ZlRHS09iZDVIWC9xYWdtV1VwcWNlamorKzJxZXU0akdPMGp3WjUzdHpxbHBH?=
+ =?utf-8?B?SjE3OFcrVis5QUNMcmFBUDNleXNUVmE0bGhrUjJISExCRzh3enJBUnRNcUxI?=
+ =?utf-8?B?M1gwdjJUMVY5NlIvd0FweUYwTDVxR054cnhKbkhnbnhGRE1lT3VuTlJUWGJU?=
+ =?utf-8?B?SEdRcExyYjNTNGNqa2REQk1kTXlSakczbHlDNGk2dllDeFF2YWpXRWVwVDJm?=
+ =?utf-8?B?WkNaUktLTXdIZHBaWWFXOEhUYmNlZ0xjSDNqMSs0WjZISkwyY1ZSWVpZU3ox?=
+ =?utf-8?B?WTZ0ckpjbHZyZ0tYbUNzMTYxcElsdDBNck5aS1JPdGFlRDdIYlNzenBhWGJn?=
+ =?utf-8?Q?YzpBgWoMwibHWfmO1D5LCaADG1wdp8IO?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YmZSQlZYNW1GaitzejdKYjRRdi9DUTlJVi9lNUFoREFUMlg1NlVGdDVlRHUx?=
+ =?utf-8?B?d1J3d1RVK1VRVm04aFQ1eHMzamRSQXVUeG9ycSt2aG9OTHpDbExKM3ZRUGxn?=
+ =?utf-8?B?Y01uU2VTS0FZRzBzbmtTcW1mcXpYWmpZb1ZhcGhUV0NUa0hwSjlCaTVzS0Q4?=
+ =?utf-8?B?V0lZeFNhVjBwV2MxWFVTT1FtS0tsMkFKMEdqcVprOHFrUS82TCs4OGtrNGZI?=
+ =?utf-8?B?ODFEZ1V1QmVYR2ZWNXRUNTU3UjB2aHhnak8zY2MxVm11Vk02UnpzZzVybTB2?=
+ =?utf-8?B?N2xxUEtRbTYvbzE5UjZKVHByTnNqZGhsdjVsVFhHeFpac0xqT0c1SEVYS3dQ?=
+ =?utf-8?B?OGw2VE5jNDdGZUI5S0I5ZFZwbVUvdjFSQldYeDJTSnQrTkV0NG5tWFlTdG5a?=
+ =?utf-8?B?SnVCNUpTaXUrSTV1dmwvM05EdDl6ME8yNTZ0TTRaekNKMm5NMjI5Wjh2NW0y?=
+ =?utf-8?B?UXd3OWFkOUNFRUYxNkdxMTJYQ0tLLy93TEYyQ2pSK2dKU0N0QW43Zy84Z1Q2?=
+ =?utf-8?B?WXF0TFVEVUs0d1FnMXp6bkhKRm1iaXVmUGpnZlhDNHFBcHl2RFJBbVBMNFNx?=
+ =?utf-8?B?Z09QRE0vTXVOc0w0cnZBeW5lNC94cm5GWDRmMkRjZ2RLN01EZ21lY0hrdkxV?=
+ =?utf-8?B?c3dTTFY5K1p5NWJsUXZBOEVmMHdhWlBIbnJrV0hrTGhlZ0xNdWFZMFVnc1pO?=
+ =?utf-8?B?b2xKL0dET3N5ZWlRWUVrTVgzLzhlc0xpeDJBOHcvZ0Y0M2RjR3FSVG8reEV0?=
+ =?utf-8?B?V1dlcUJNTkEvMTFOczQ2VEpNMjdzQUw5V3FQdzNBZDE4OVB5MFYwRkRhUy9V?=
+ =?utf-8?B?bTVGU0VlRmdjN0xUZmtEOWs0VWxBc09tUzI1TWZZREs5VytqRjdxTEhZaDZZ?=
+ =?utf-8?B?aE85WElWZ1ZnUEU2Z2lCOURYY0hHREtabzZvZCtETTVNZm5waldHdjhLS3hC?=
+ =?utf-8?B?RkZnNjNENlN4djY2RHRKMUQ2SjlYSG1QMVhuUXlJTzhhNk11RERyT1k3TzhE?=
+ =?utf-8?B?K280V1dKME94bnhQR1Y3RWx0T0xadU0wbU9aVkVZMFQzRXJVYXNtc1llVkVG?=
+ =?utf-8?B?RkhHQmpBTjUyRnJ4SUNXbWcxZzNNanUyLzNzeEhGNkFoaVBOUEE3Vm1RMHU5?=
+ =?utf-8?B?RWorZUNpUkRRcGFqVG9WUEczWk5OYmxRV1M5LzBKd2VudnlsSi9jODlNN29J?=
+ =?utf-8?B?Y2t0a3NlZXRtUVhDQkdmSGxiTkgyY2lLcFh5NzhKTC9NTnlJZE5WM0xmU3l5?=
+ =?utf-8?B?NW5FcGZoZnFnc25FdjR5a25Pakx6Z0NSMURGYnZEa3pkSmROUm4raWg2cWFW?=
+ =?utf-8?B?bFc2U25UWGRiSUx6RGY3ZUgyQjI4Zm9CRnNrc1F2UW5IcTJGZ29hREhldUkw?=
+ =?utf-8?B?NGdjYXBGaDg5dWVMRy80ZUlwK2JIRVpEa0JvSDZINjdQWGhROWEvc2tVaVpH?=
+ =?utf-8?B?VDFkZHFCcFV1QUY4dHMwQmt4MkNyc1JxUy9vQVNscTZYSnRxSWhsRWNDZkVR?=
+ =?utf-8?B?S2o4emRtVys1Y1lsY3g2amVTYkM4aCs3TjFVTEFLdUc5am9sYTBid2NLUWIz?=
+ =?utf-8?B?bmd5U09waXBJNFhxenlkMFQ5UysvVjFyTVNGM2tqeW5DSXBDVnBjVVRZeU9J?=
+ =?utf-8?B?bUlQejk1d3Y1bk9xVkJvVm5pZmN4cGZUWE5tR0ZhQ3FZNXNvMzNyT2pVajZH?=
+ =?utf-8?B?cSs5YzVWSUZpaWVWRUU1VTJzMDF1a0dCWlllVmZnY0VPQ1hrVk1JdkhEWFhB?=
+ =?utf-8?B?L083dG05TDRsNWlLOXArR1Q2TEsvUW5ranNsbm9MSEhQeHNQRGo4Qk9JYjVC?=
+ =?utf-8?B?NU8rN3JyYmJqMytyeXhjM2taMVUzRVNoRFNqQ2Y1SjhrZlh1c2ZxbzN4OWJa?=
+ =?utf-8?B?aTNHSTFGRS9RN1ZjNDhTVmNNSmNMN0dzdkVObGRuNEJNQ2tlTHpIZDVBbjRz?=
+ =?utf-8?B?SmdBYmo3SDI1dnRMUm1jYVFLZ2FpUHFrWC9PMUh4M1IxWUdYcExiNU5XSWpC?=
+ =?utf-8?B?VkI2eE1SeUl2VHZoTE1tU0hFSmhoT1lBWlNXUkwxaTRIN2UzMDgwMWhqVEY2?=
+ =?utf-8?B?cy9FV3ZnWGtITWFNSkFrZGJvdmhXQ3dzV21MalNrZURTWWVPajlzaXJGT3Jq?=
+ =?utf-8?Q?fKhdk3BWEX1rYvA+j723PRy+x?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64b0c0cd-c2d3-41e7-ef01-08de2685e0d8
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2025 09:35:58.1075
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: A9fUQHBH2sKW6xJ21s9zhImCQz9V6uKEkqgQUj3kW97CJsVded+F84z6ZxMPV/Oc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8326
 
-From: Gongwei Li <ligongwei@kylinos.cn>
+On 17/11/2025 18:05, Donald Hunter wrote:
+>> diff --git a/tools/net/ynl/pyynl/cli.py b/tools/net/ynl/pyynl/cli.py
+>> index 3389e552ec4e..d305add514cd 100755
+>> --- a/tools/net/ynl/pyynl/cli.py
+>> +++ b/tools/net/ynl/pyynl/cli.py
+>> @@ -139,7 +139,12 @@ def main():
+>>                  attr = attr_set.attrs[attr_name]
+>>                  attr_info = f'{prefix}- {attr_name}: {attr.type}'
+>>                  if 'enum' in attr.yaml:
+>> -                    attr_info += f" (enum: {attr.yaml['enum']})"
+>> +                    enum_name = attr.yaml['enum']
+>> +                    attr_info += f" (enum: {enum_name})"
+> 
+> Would be good to say enum | flags so that people know what semantics are valid.
 
-Add processing for HCI Process Read Remote Version event.
-Used to query the lmp version of remote devices.
+I changed "Values: " to "enum:"/"flags:".
 
-Signed-off-by: Gongwei Li <ligongwei@kylinos.cn>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
----
-v1->v2: Add bt_dev_dbg to print remote_ver
-v2->v3: Read ver in get_conn_info_Sync() instead of during the connection process
- include/net/bluetooth/hci_core.h |  1 +
- include/net/bluetooth/hci_sync.h |  2 ++
- net/bluetooth/hci_event.c        | 25 +++++++++++++++++++++++++
- net/bluetooth/hci_sync.c         | 11 +++++++++++
- net/bluetooth/mgmt.c             |  2 ++
- 5 files changed, 41 insertions(+)
+> 
+>> +                    # Print enum values if available
+>> +                    if enum_name in ynl.consts:
+>> +                        enum_values = list(ynl.consts[enum_name].entries.keys())
+>> +                        attr_info += f"\n{prefix}  Values: {', '.join(enum_values)}"
+> 
+> This produces quite noisy output for e.g.
+> 
+> ./tools/net/ynl/pyynl/cli.py --family ethtool --list-attrs rss-get
+> 
+> Not sure what to suggest to improve readability but maybe it doesn't
+> need 'Values:' or commas, or perhaps only output each enum once?
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 9efdefed3..424349b74 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -750,6 +750,7 @@ struct hci_conn {
- 
- 	__u8		remote_cap;
- 	__u8		remote_auth;
-+	__u8		remote_ver;
- 
- 	unsigned int	sent;
- 
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 3133f40fa..52078c58a 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -189,3 +189,5 @@ int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
- int hci_connect_pa_sync(struct hci_dev *hdev, struct hci_conn *conn);
- int hci_connect_big_sync(struct hci_dev *hdev, struct hci_conn *conn);
- int hci_past_sync(struct hci_conn *conn, struct hci_conn *le);
-+
-+int hci_get_remote_ver_sync(struct hci_dev *hdev, __le16 handle);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7c4ca14f1..12ed1fd36 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3738,6 +3738,28 @@ static void hci_remote_features_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_remote_version_evt(struct hci_dev *hdev, void *data,
-+				   struct sk_buff *skb)
-+{
-+	struct hci_ev_remote_version *ev = (void *)skb->data;
-+	struct hci_conn *conn;
-+
-+	bt_dev_dbg(hdev, "");
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-+	if (!conn)
-+		goto unlock;
-+
-+	conn->remote_ver = ev->lmp_ver;
-+
-+	bt_dev_dbg(hdev, "remote_ver 0x%2x2", conn->remote_ver);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
- static inline void handle_cmd_cnt_and_timer(struct hci_dev *hdev, u8 ncmd)
- {
- 	cancel_delayed_work(&hdev->cmd_timer);
-@@ -7523,6 +7545,9 @@ static const struct hci_ev {
- 	/* [0x0b = HCI_EV_REMOTE_FEATURES] */
- 	HCI_EV(HCI_EV_REMOTE_FEATURES, hci_remote_features_evt,
- 	       sizeof(struct hci_ev_remote_features)),
-+	/* [0x0c = HCI_EV_REMOTE_VERSION] */
-+	HCI_EV(HCI_EV_REMOTE_VERSION, hci_remote_version_evt,
-+	       sizeof(struct hci_ev_remote_version)),
- 	/* [0x0e = HCI_EV_CMD_COMPLETE] */
- 	HCI_EV_REQ_VL(HCI_EV_CMD_COMPLETE, hci_cmd_complete_evt,
- 		      sizeof(struct hci_ev_cmd_complete), HCI_MAX_EVENT_SIZE),
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index a36d2414a..1bca97564 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -419,6 +419,17 @@ static void le_scan_disable(struct work_struct *work)
- static int hci_le_set_scan_enable_sync(struct hci_dev *hdev, u8 val,
- 				       u8 filter_dup);
- 
-+int hci_get_remote_ver_sync(struct hci_dev *hdev, __le16 handle)
-+{
-+	struct hci_cp_read_remote_version cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.handle = handle;
-+
-+	return __hci_cmd_sync_status(hdev, HCI_OP_READ_REMOTE_VERSION,
-+				     sizeof(cp), &cp, HCI_NCMD_TIMEOUT);
-+}
-+
- static int reenable_adv_sync(struct hci_dev *hdev, void *data)
- {
- 	bt_dev_dbg(hdev, "");
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c11cdef42..36f713d9e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7402,6 +7402,8 @@ static int get_conn_info_sync(struct hci_dev *hdev, void *data)
- 	/* Refresh RSSI each time */
- 	err = hci_read_rssi_sync(hdev, handle);
- 
-+	err = hci_get_remote_ver_sync(hdev, handle);
-+
- 	/* For LE links TX power does not change thus we don't need to
- 	 * query for it once value is known.
- 	 */
--- 
-2.25.1
-
+Values was replaced, I don't see how removing the commas improves the
+situation.
 
