@@ -1,123 +1,161 @@
-Return-Path: <netdev+bounces-239737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 298C5C6BDB5
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 23:25:44 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E406FC6BDE8
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 23:31:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 195F54E52BC
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 22:25:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2848034A41E
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 22:31:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B270F311588;
-	Tue, 18 Nov 2025 22:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2430F1E7C19;
+	Tue, 18 Nov 2025 22:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="ZCgSaFVx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LdIqwixy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD09311C22;
-	Tue, 18 Nov 2025 22:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9EF3702FA
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 22:31:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763504667; cv=none; b=iOFPE4QQakEzD0LL+zpcS3S33vF7Y0VtlR9VrptwS4GPYr8tu5ZcU1hVwPCe0Hb8ZfVyOfSJw41ximw1+Hn1VYD0Ygt5y4LIgWekN9j/eL4RPKx+kCCB/oqG2AqR9b1zCiZowJSFvdD+WkhslyDzAB1AR/h2hXYV9l84BVs57JQ=
+	t=1763505115; cv=none; b=oR2f/2hhmZarcueSUexGHqxtOZEtWLPSZH5ity+GDZZyedeCM/okflKTDvLSuXadb39UDfRtOy/zmJuTTo56gxGIc727HzDhXuTFQ/gTU3lU38FPJKAt4/ZgEqx8Issa76fnSyOOfvQXUOhBRGjitWBboseE4Sqh1jVa/sm8brY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763504667; c=relaxed/simple;
-	bh=d1hsAgUp0S7O3xktC/JjGyw+tK5U6MXAFsvdNg7H1Fw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BmX/y2XXoTY6jolucXTPywAvW1CyBuQjk3IWw2C+NFEthVsPPLOhlSnvm5ECmPfDgzAz9SJrqnONIADSJM/v75pNiAqe5AgAsfrJOBdgr7ODZ//tTnq8W9hIKc/KR5dj7llqAbNm+8XEkK/MuWE8RE1TtmC+M4XSUFfX4AGQJ7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=ZCgSaFVx; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1763504661;
-	bh=d1hsAgUp0S7O3xktC/JjGyw+tK5U6MXAFsvdNg7H1Fw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZCgSaFVxD9ry+FnSAey6z6hm1/tnZHSDSLHMcRa4lA8s4xygB5rCB6eomM8Lo1+qP
-	 duleYI5sfJopH8+Ajy+n4DMCpv9cFPyxX/qpQgp6kbEQkZd2x0z3Ddf9PV/G1N2lom
-	 fJbqAbABR7pskYTMacqq9XKLjAn5hTU58EzI6orDYdIiTcmDLOqPF+mOVp5mzVjuWI
-	 qCtB/r/slfjDc59fiFbBxi15j3x4ga67P33LQq6UqVTH2/cpoP8906ttYBCVC707+C
-	 jSYYmfX4DDkRGz5kTKFEwf6TxqVhaHKZ2OFLcaR1LOl7zJXTdyp0Ri6iQln6IZY+/D
-	 6FKhOZvKFYK2w==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 9437B600FC;
-	Tue, 18 Nov 2025 22:24:20 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 5F27620187F;
-	Tue, 18 Nov 2025 22:23:13 +0000 (UTC)
-Message-ID: <d2e84a2b-74cd-44a1-97a6-a10ece7b4c5f@fiberby.net>
-Date: Tue, 18 Nov 2025 22:23:12 +0000
+	s=arc-20240116; t=1763505115; c=relaxed/simple;
+	bh=7u5rSjHo75NoOI+UxqrKNBpVfXmfdqSPOBdIH6YXSBk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=sq8c9fFbeI3n6LBwX/vt+Tv3PwH2mAOjethMMPr8KdMnrYY9W7wY7V2pHYeSWbHx8Te9+R3eWx7pQ1H17upltdaqJKPEenYaJimHDhiRQIlVAaoUAUusVcLD59ESB3ygbuRxangq9bps0zykC0W6Q+RRT0WD8bO4FkGFFYRaXJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LdIqwixy; arc=none smtp.client-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-63f97ab5cfcso5126842d50.0
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 14:31:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763505112; x=1764109912; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=swHg83nqxZF6Fleu7P846/7OxC4U2kUKOxQR3ccIoBE=;
+        b=LdIqwixye5YkcofuTgJd2r4IO9MYZ1y37konROme9sjXgCn/mO55uXD1b+ffVuqHp+
+         1gDUeedfELGEidPmXLchk2ns1K4B9NBUi7CJSpgTBr7dAuoH2GLcCZyp33nUcqH1bt4w
+         pCdZV6PrcXdmXit/kld8D9Q8pmSmS5W+YAmqo1tf2IrrIOQTGI9ZHAzsvv+Tz6A7y13R
+         k7XhaeL+zPCHZ910L4BAtP49+134SiMy3Ax9OcCxD9DKSFLl5UrkRTQoDt5yTN/HIvvn
+         7uFPqC7U99rjZ1mcMnaUhyDxKF7epxUko+ex0mUI3iexPknmuwNzJ0Dutpr7ndcbHsEP
+         kOkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763505112; x=1764109912;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=swHg83nqxZF6Fleu7P846/7OxC4U2kUKOxQR3ccIoBE=;
+        b=h7vQDAITkHtDZEnySRhjMLEn+AJcKwVXvpa+3T3LyT/DC/fEBU3frs750amVZWpZNk
+         BogPsLpl88ZpQ1DZd858GNj8B897T/kyC7FkdfG34oMqOENPXrLAs21vya3vLunL2Cfv
+         BU1IyV2N73OWHKCompSNkND2dQpjjusPvT6H25Au74c/Urz3MahPZJUyBpsRzBbvl8Ye
+         NjpPdcWRUA8Mv+duM7o8jgwo6kIMSoYadAdGN5bJmOZp3S75mQb0luJLYWb/zj/8VSiZ
+         yWq2vesOgtMKPJiVtV+CSlnaNIDGKf9/42NHOogeNG/fwiNYywL/hoFtrVwsRKEvq6GH
+         Z9hw==
+X-Gm-Message-State: AOJu0YxiTZZOHMGcbC7HL93/gttyHbpBBnrtSVmhbLFprSj+TgTzxvV1
+	pbgW6y7UDt+3tuvYDweBnHjHhYnEtFDCjx6Bi9tpepbEHR7npvYOompH
+X-Gm-Gg: ASbGncs2RdkFpkO+/DlHcLM3o+3/lnvKQ4E9/ubr+cHBuqXkFCWs7MDQqnVgiKuNcYD
+	ScVMyPoq9K7D9ZQBQoloJtJXCH26NgmovFgBW/Q8PBKjo9u1dlgtkyAH5sqTTgbwVd8TC2cV8pc
+	gYBYtVya+6dX9KZypMFzm2HiGvmq3GEd28PV5TmEry+9e9Q2M7ypneIqALFgKpuQNKydUwibPol
+	P4TVynVy9pFPUWVsHp/BPxw93jvrQS0iEWAOUFdy40OZk6Ok6pb8PPoKlXPmuun2CofCXoA4yw6
+	7ZtQsxKdjDmqqFvPSgWRWsK5PiDRMFKdWlCVYnOYchCeHfuvSBLnXCrVwTkYOLgUYUMtDCPGth3
+	aktDZFuBbiS4BeocMW6iPz0+BhKIYJKl/bkFIr08Z4ItsloWbNz61IER0DYK7t0rpfVF9Ssa3Rc
+	yq4hmQG5QuwurM6ObKpqE3WIlWOaT7BjzcUeCnxaDQYexXVjwrvWymZ8Uf8G6zzgdrF5I=
+X-Google-Smtp-Source: AGHT+IG9T83KTfCCjwEaqLX0kM2I3yUkPGht8w5fKsyEevMjwg4abeuC0L5IwFmtt2cabCDX6MSt4g==
+X-Received: by 2002:a53:c059:0:10b0:640:b8ef:b777 with SMTP id 956f58d0204a3-641e76dd131mr11699937d50.69.1763505112433;
+        Tue, 18 Nov 2025 14:31:52 -0800 (PST)
+Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6410ead559dsm6273060d50.24.2025.11.18.14.31.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Nov 2025 14:31:51 -0800 (PST)
+Date: Tue, 18 Nov 2025 17:31:50 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ willemdebruijn.kernel@gmail.com, 
+ shuah@kernel.org, 
+ sdf@fomichev.me, 
+ krakauer@google.com, 
+ linux-kselftest@vger.kernel.org, 
+ petrm@nvidia.com, 
+ matttbe@kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>
+Message-ID: <willemdebruijn.kernel.27c628e67e858@gmail.com>
+In-Reply-To: <20251118215126.2225826-1-kuba@kernel.org>
+References: <20251118215126.2225826-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 00/12] selftests: drv-net: convert GRO and
+ Toeplitz tests to work for drivers in NIPA
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 11/11] wireguard: netlink: generate netlink
- code
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Jakub Kicinski <kuba@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Jordan Rife <jordan@jrife.io>
-References: <20251105183223.89913-1-ast@fiberby.net>
- <20251105183223.89913-12-ast@fiberby.net> <aRyNiLGTbUfjNWCa@zx2c4.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <aRyNiLGTbUfjNWCa@zx2c4.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On 11/18/25 3:15 PM, Jason A. Donenfeld wrote:
-> On Wed, Nov 05, 2025 at 06:32:20PM +0000, Asbjørn Sloth Tønnesen wrote:
->>   drivers/net/wireguard/netlink_gen.c | 77 +++++++++++++++++++++++++++++
->>   drivers/net/wireguard/netlink_gen.h | 29 +++++++++++
->>   create mode 100644 drivers/net/wireguard/netlink_gen.c
->>   create mode 100644 drivers/net/wireguard/netlink_gen.h
->> +#include "netlink_gen.h"
->> +// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
->> +/* Do not edit directly, auto-generated from: */
->> +/*	Documentation/netlink/specs/wireguard.yaml */
->> +/* YNL-GEN kernel source */
+Jakub Kicinski wrote:
+> Main objective of this series is to convert the gro.sh and toeplitz.sh
+> tests to be "NIPA-compatible" - meaning make use of the Python env,
+> which lets us run the tests against either netdevsim or a real device.
 > 
-> Similar to what's happening in the tools/ynl/samples build system,
-> instead of statically generating this, can you have this be generated at
-> build time, and placed into a generated/ folder that doesn't get checked
-> into git? I don't see the purpose of having to manually keep this in
-> check?
+> The tests seem to have been written with a different flow in mind.
+> Namely they source different bash "setup" scripts depending on arguments
+> passed to the test. While I have nothing against the use of bash and
+> the overall architecture - the existing code needs quite a bit of work
+> (don't assume MAC/IP addresses, support remote endpoint over SSH).
+> If I'm the one fixing it, I'd rather convert them to our "simplistic"
+> Python.
 > 
-> (And if for some reason, you refuse to do that, it'd be very nice if the
->   DO NOT EDIT header of the file also had the command that generated it,
->   in case I need to regenerate it later and can't remember how it was
->   done, because I didn't do it the first time, etc. Go's generated files
->   usually follow this pattern.
+> This series rewrites the tests in Python while addressing their
+> shortcomings. The functionality of running the test over loopback
+> on a real device is retained but with a different method of invocation
+> (see the last patch).
 > 
->   But anyway, I think I'd prefer, if it's possible, to just have this
->   generated at compile time.)
+> Once again we are dealing with a script which run over a variety of
+> protocols (combination of [ipv4, ipv6, ipip] x [tcp, udp]). The first
+> 4 patches add support for test variants to our scripts. We use the
+> term "variant" in the same sense as the C kselftest_harness.h -
+> variant is just a set of static input arguments.
+> 
+> Note that neither GRO nor the Toeplitz test fully passes for me on
+> any HW I have access to. But this is unrelated to the conversion.
+> This series is not making any real functional changes to the tests,
+> it is limited to improving the "test harness" scripts.
+> 
+> v2:
+>  [patch  5] fix accidental modification of gitignore
+>  [patch  8] fix typo in "compared"
+>  [patch  9] fix typo I -> It
+>  [patch 10] fix typoe configure -> configured
+> v1: https://lore.kernel.org/20251117205810.1617533-1-kuba@kernel.org
+> 
+> Jakub Kicinski (12):
+>   selftests: net: py: coding style improvements
+>   selftests: net: py: extract the case generation logic
+>   selftests: net: py: add test variants
+>   selftests: drv-net: xdp: use variants for qstat tests
+>   selftests: net: relocate gro and toeplitz tests to drivers/net
+>   selftests: net: py: support ksft ready without wait
+>   selftests: net: py: read ip link info about remote dev
+>   netdevsim: pass packets thru GRO on Rx
+>   selftests: drv-net: add a Python version of the GRO test
+>   selftests: drv-net: hw: convert the Toeplitz test to Python
+>   netdevsim: add loopback support
+>   selftests: net: remove old setup_* scripts
 
-The main value in having the generated kernel code in git, is that it can't
-change accidentally, which makes it easy for patchwork to catch if output
-changes without being a part of the commit.
+For the series:
 
-I will leave it up to Donald and Jakub, if they want to allow these files to
-be generated on-the-fly.
-
-Alternatively, the generated files could be put under YNL in MAINTAINERS, so you
-only maintain the spec, but not the generated output files.
-
-I agree that there could be a note in the header about how to re-generate
-the files, or just a link to the doc:
-
-https://docs.kernel.org/userspace-api/netlink/intro-specs.html#generating-kernel-code
-
-The easy to use regeneration tool is ynl-regen:
-./tools/net/ynl/ynl-regen.sh                           # skip if output is newer than yaml
-./tools/net/ynl/ynl-regen.sh -f                        # force, when working on ynl
-./tools/net/ynl/ynl-regen.sh -p drivers/net/wireguard  # run on a subdir
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
