@@ -1,121 +1,103 @@
-Return-Path: <netdev+bounces-239584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4F1C69DF1
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:16:49 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D383C6A10B
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:43:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 00FBC2B9DD
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:16:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 14D984F7C49
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4DF35A14E;
-	Tue, 18 Nov 2025 14:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29EF824A066;
+	Tue, 18 Nov 2025 14:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="rZSevX56"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UEKPZFD8";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="h/sRwr7x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5254B29D29C
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 14:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257322BEC28;
+	Tue, 18 Nov 2025 14:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763475389; cv=none; b=dfwOgeObQrIYPQb5v9b3Kn+ituFAk35/opNf+vsoisyd04jaaeFawsDhTO5itn+DzgqeXdFyKGeEnRXf7FhIak6BWf3qv0r6YnCv3OUfifE1NcybpnjyYY8B+NLCOALQ+wvGg0A2HhpayekQ0qZG0l7c9dU2BoQWZH9LIFuxcRs=
+	t=1763476174; cv=none; b=L8OrEyRXAXw/N5cHkOnL+LBkqSNBYoKyL/dsPOkxZgICXzqxDgJzd/UWNzg7enibXyFU7Xbq8dCvETNfjRdAoqie4jiS3lkiz26HgvO5fArqd7NBaXakJgezfsn2Qp62vnOjQ2twPByi7UalwRoRv8Z6JJqv0CLRlXcaAc2IVk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763475389; c=relaxed/simple;
-	bh=aKCh9z64HInFJ4FpiEKmHPF4xCGLRzCqTWSvJCeZsYE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PmLDnG/8HZIF3oxBTvomWb29SBIY/q1mPfgAAIzT1aSWnkju3UWtlZUUyS85gRUM7Ufb3S17MnzDhZ0mzdzHt2wWigWAIllZTxpMMIt8q+CQHXGEYPq/sJMBG5HjoW1u5bGozB6IIVKzVHgf06woaD/IyVwUL0LAM73x60hCYN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=rZSevX56; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id AB68F1A1B8E;
-	Tue, 18 Nov 2025 14:16:24 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 7B29C606FE;
-	Tue, 18 Nov 2025 14:16:24 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5643D10371867;
-	Tue, 18 Nov 2025 15:16:19 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763475383; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=Y7S1oWvyJulQPsg6AFtZsd2ot0WojieRgVnRZ3VWiIo=;
-	b=rZSevX56KQ94GD1E4LqTOWK4HAJcBR+vvc3VkWQDNuFvhKrroWYTXKNEVXsdJO7P8Eo49z
-	GWJTzkUsH2ABGaA5k5dl1Jb/oEGKd02489rB/kVbzjnC9p5j1Sv6cAN6Kte/gAh0f1cjhm
-	IEPKqEFWnXJCtvOE3Qq9sYwh9aAnFKsVoMTTc11mgUwPB+q0mkObE2Jht6pTeZ2wb5fux/
-	DM8aWmUTkS4199dS04Qe6SxFQ5bzzlpXJXPIFwLnG+qmuEz5PE5TlcOi4nEoZPvdTZss4D
-	pS2Q3DVBrD/UsT8FJctUT8ybc8KF9F1pTOoa+R4dBWJFaE1BIffeJf3yf1Zmdw==
-Message-ID: <7ad06091-dd5d-4084-81da-e148bd4aea63@bootlin.com>
-Date: Tue, 18 Nov 2025 15:16:18 +0100
+	s=arc-20240116; t=1763476174; c=relaxed/simple;
+	bh=bsTGiYCeUGyKymNT/zymuRlkd9lPzEB0+jj26ocRViM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Nn7LEjuUpkZTK+P5ch77gWpWvUC/094llUhjvllCE2VhsrzdlNID8KC6qq76YZrZA3TsbOHTvVp1ipkGiX/Otkhyl0WA7IzCbPozbVGBWr/eqDn9P7Hl8/gUtNtNhQvhCs/IJN9lKEUjeJXkWPDK9SzBp86DEFW5Ze7cqWjnJ+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UEKPZFD8; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=h/sRwr7x; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1763476171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0n9UnbJWA0qi+JmKy/6pHK84BHEidvZ9wIicmRWTn88=;
+	b=UEKPZFD8IIH9dBvKhwzK+fXlmTby97FDKBDH31b76QtLz4uD0gbhWa+W7SG6f2imgKHsWF
+	nu7N2cXnD+OCXTKolN3SzKUxx0O8+YMYrf0DJRqkmvAsYU7YQt4xMRIRn31eSNTDdyUdTG
+	IT2upU2s7XedV+LOJih1/IaYmQwaNjbWORnGZX5SwX7NuvSC4KD3ikvjJIvhOM46GhQd01
+	52oJbqmp9xU9wMBK5pfo+VUj795hv5/+DoNV18rIIGuY7Np5J8ffKQgUsoL/5nUfJg3+NS
+	VL74Yn4la+CYnL9s6qvPYaEX2wHWgAZZrqm1x678CcgHB2dDbTcn5wYaPqQxpw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1763476171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0n9UnbJWA0qi+JmKy/6pHK84BHEidvZ9wIicmRWTn88=;
+	b=h/sRwr7xzeJWCEHSEV2dmP1lyM8HmabFe+SrA74S6/B5KUksS4LoIrxmGid+rFGCLsbVgL
+	qsdlJxY2x7xXHyBw==
+To: Christophe Leroy <christophe.leroy@csgroup.eu>, Peter Zijlstra
+ <peterz@infradead.org>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan
+ Kara <jack@suse.cz>, Ingo Molnar <mingo@redhat.com>, Darren Hart
+ <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>, Andre Almeida
+ <andrealmeid@igalia.com>, Andrew Morton <akpm@linux-foundation.org>, Eric
+ Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Madhavan Srinivasan
+ <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, Nichlas
+ Piggin <npiggin@gmail.com>, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v5 0/4] uaccess: Prepare for masked user access on powerpc
+In-Reply-To: <cover.1763396724.git.christophe.leroy@csgroup.eu>
+References: <cover.1763396724.git.christophe.leroy@csgroup.eu>
+Date: Tue, 18 Nov 2025 15:29:29 +0100
+Message-ID: <87y0o35s8m.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] net: ethtool: Add support for 1600Gbps speed
-To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Saeed Mahameed <saeedm@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
- Shahar Shitrit <shshitrit@nvidia.com>, Yael Chemla <ychemla@nvidia.com>,
- Dragos Tatulea <dtatulea@nvidia.com>
-References: <1763414340-1236872-1-git-send-email-tariqt@nvidia.com>
- <1763414340-1236872-2-git-send-email-tariqt@nvidia.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <1763414340-1236872-2-git-send-email-tariqt@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain
 
-Hi,
+On Mon, Nov 17 2025 at 17:43, Christophe Leroy wrote:
+> This is v5 of the series "powerpc: Implement masked user access". This
+> version only includes the preparatory patches to enable merging of
+> powerpc architecture patches that depend on them on next cycle.
+>
+> It applies on top of commit 6ec821f050e2 (tag: core-scoped-uaccess)
+> from tip tree.
+>
+> Thomas, Peter, could you please take those preparatory patches
+> in tip tree for v6.19, then Maddy will take powerpc patches
+> into powerpc-next for v6.20.
 
-On 17/11/2025 22:18, Tariq Toukan wrote:
-> From: Yael Chemla <ychemla@nvidia.com>
-> 
-> Add support for 1600Gbps link modes based on 200Gbps per lane [1].
-> This includes the adopted IEEE 802.3dj copper and optical PMDs that use
-> 200G/lane signaling [2].
-> 
-> Add the following PMD types:
-> - KR8 (backplane)
-> - CR8 (copper cable)
-> - DR8 (SMF 500m)
-> - DR8-2 (SMF 2km)
-> 
-> These modes are defined in the 802.3dj specifications.
-> References:
-> [1] https://www.ieee802.org/3/dj/public/23_03/opsasnick_3dj_01a_2303.pdf
-> [2] https://www.ieee802.org/3/dj/projdoc/objectives_P802d3dj_240314.pdf
-> 
-> Signed-off-by: Yael Chemla <ychemla@nvidia.com>
-> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  drivers/net/phy/phy-core.c   | 4 +++-
->  include/uapi/linux/ethtool.h | 5 +++++
->  net/ethtool/common.c         | 8 ++++++++
-
-Can you please also update drivers/net/phy/phy_caps.c :
-
- -> the link_capabilities array
- -> the speed_duplex_to_capa function
-
-Without this update, phylib will fail to load entirely (by design), cf 
-phy_caps_init(). A check was added specifically to catch when new speeds
-are added without updating phylib alongside :)
+I've applied them to tip core/uaccess, which contains only the uaccess
+related bits. That branch is immutable and could be consumed by PPC if
+required.
 
 Thanks,
 
-Maxime
-
+        tglx
 
