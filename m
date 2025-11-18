@@ -1,90 +1,78 @@
-Return-Path: <netdev+bounces-239683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4489DC6B592
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 20:06:48 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BE3BC6B6BC
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 20:25:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 89741296BD
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 19:06:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B3088342FB4
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 19:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE042EA171;
-	Tue, 18 Nov 2025 19:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A13029D282;
+	Tue, 18 Nov 2025 19:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Kia8R9X8"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0qSvQaHo"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F1CA2E8B7A
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 19:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94BA1DC1AB;
+	Tue, 18 Nov 2025 19:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763492761; cv=none; b=eFzlBPZd2yrXBn8syYCGBXcqP6HLTIa/hHT0Z/rY+bkliWLkI56HS+dgh47GDnL0BXJlaZ5ZSMV8p1gmowOSOiflPcmC0m6+8baR9cgBlxohWXH2F902x05Q/1F2P78fLFor7KhBuZUnQ5xcVrxIPCERgTZMkbqywqCwaFmTRXQ=
+	t=1763493620; cv=none; b=duxD5PTeIt+guZyBrlQ8jd45VKzCTRs2Upf6MKxOARA6UwRmKHrgaxcfkWJbnObmYsn5oM3+mcAhvWHz4Fsgk6FURR4QP+zO/ksXdh+BXZx4q4yBqdD8JUKPw8B1h6DaIOsSLKkMqSociFZt7mVxkTTIKXyBhDNhTWLV2PJaCZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763492761; c=relaxed/simple;
-	bh=pju7ofIaCfEqOBR/57I3eU7P3+hZCgl1oJwiJhFZduY=;
+	s=arc-20240116; t=1763493620; c=relaxed/simple;
+	bh=rmhsiRCPaKlEi8Mvc83hZZfvMm6fTD1gnF0RIpd9gQc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M+JqIFQd11qod6d2xaRF9bDT1mENxpK2v4iSkYJs/Ibnqkc4kyIVum8eQ7MTTQ+oQlLxMyfBscT6ST/3d9+QkAd60YtJlEk8PPc6azQZDtww6qMLQPApmJCN+9xQqxH4nIfYsNuvNq6sSkItb+2J01KB757xOprLty+koIOSr7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Kia8R9X8; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=n3nIQvBOH5mGQz2rD1DAyfNSuf25h5uUYOByjCC6c5SIdSW8mvIRk6+wjHzx1UKUm9tT6wnieLM8m0CZ4MbwvH5+62JKDN+pIGCmqmwdP6PSGQEErq96qRLNVSXDsmkyETzJTrjcPqRJDrttPgNc3zpuor+vYIGOWabKyA3qXtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0qSvQaHo; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=xrJC8QIJplMqK0vd9ECzTMFETLn3A1uAp2fyDz2bmuY=; b=Ki
-	a8R9X8s+EdYRPpFVkjK29m0Wp7GAfvEirU7kB8fHvsSnQLatJJC5ttTa0e+X1js75ixh6wxj+Kk53
-	LH83+VLjYN1El5ICBMkqky9ePyeCIJvxBh7pODYKQwHp9Iu0z7M0xn8C9pTuShvJEZ9KhxCvkHYYX
-	AVuKwucWZuzhnp0=;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=R4A7+q1wlSBY6LjIjrcOMg/t1pNb/aK98l81XwQHln8=; b=0qSvQaHovu8f25uOSeEH1motjG
+	pOjC2V3VbhrWW7qaHdI53Hget0U1nvC5yyunvOmtFnNPbHJnUH5yatNwftVVIG7J0JnwZypOEKO18
+	TW1wMn3rNgAsmvVUVZFL1pQED/8RdOpp+a2oTVYHXak3vPc3eYlGcDOqIj6V//0YS/ew=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vLR1W-00EO1c-2p; Tue, 18 Nov 2025 20:05:54 +0100
-Date: Tue, 18 Nov 2025 20:05:54 +0100
+	id 1vLRFH-00EO9s-QZ; Tue, 18 Nov 2025 20:20:07 +0100
+Date: Tue, 18 Nov 2025 20:20:07 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-Cc: Netdev <netdev@vger.kernel.org>,
-	"inus.walleij@linaro.org" <inus.walleij@linaro.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>,
-	"olteanv@gmail.com" <olteanv@gmail.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: [PATCH] net: dsa: realtek: rtl8365mb: Do not subtract
- ifOutDiscards from rx_packets
-Message-ID: <59fd46df-8eef-4c56-a528-92729ad548aa@lunn.ch>
-References: <878777925.105015.1763423928520.ref@mail.yahoo.com>
- <878777925.105015.1763423928520@mail.yahoo.com>
- <a31ffe45-5457-42a2-aac5-2f2da9368408@lunn.ch>
- <527355522.9591320.1763491519924@mail.yahoo.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: lan966x: Fix the initialization of taprio
+Message-ID: <11ca041a-3f5b-4342-8d50-a5798827bfa7@lunn.ch>
+References: <20251117144309.114489-1-horatiu.vultur@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <527355522.9591320.1763491519924@mail.yahoo.com>
+In-Reply-To: <20251117144309.114489-1-horatiu.vultur@microchip.com>
 
-On Tue, Nov 18, 2025 at 06:45:19PM +0000, Mieczyslaw Nalewaj wrote:
-> I can't pinpoint the commit that caused this error. The file's history on GitHub starts on October 18, 2021, and this error is already occurring.
+On Mon, Nov 17, 2025 at 03:43:09PM +0100, Horatiu Vultur wrote:
+> To initialize the taprio block in lan966x, it is required to configure
+> the register REVISIT_DLY. The purpose of this register is to set the
+> delay before revisit the next gate and the value of this register depends
+> on the system clock. The problem is that the we calculated wrong the value
+> of the system clock period in picoseconds. The actual system clock is
+> ~165.617754MHZ and this correspond to a period of 6038 pico seconds and
+> not 15125 as currently set.
 
-Please don't top post.
-
-commit 4af2950c50c8634ed2865cf81e607034f78b84aa
-Author: Alvin Šipraga <alsi@bang-olufsen.dk>
-Date:   Mon Oct 18 11:38:01 2021 +0200
-
-    net: dsa: realtek-smi: add rtl8365mb subdriver for RTL8365MB-VC
-
-Does appear to suggest it was always broken. So use that for the
-Fixes: tag.
+Is the system clock available as a linux clock? Can you do a
+clk_get_rate() on it?
 
 	Andrew
 
