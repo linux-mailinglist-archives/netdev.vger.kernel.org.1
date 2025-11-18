@@ -1,206 +1,143 @@
-Return-Path: <netdev+bounces-239554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71D7BC69B37
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:50:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6808AC69B55
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:50:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 119942B067
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 13:50:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 79BA62BAA9
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 13:50:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9489E35A145;
-	Tue, 18 Nov 2025 13:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE523563DE;
+	Tue, 18 Nov 2025 13:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MiBKtNPN"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC50358D11;
-	Tue, 18 Nov 2025 13:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1D129B783
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 13:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763473637; cv=none; b=ZPCoLfYPnKNfyXvMKIgS6cS3TMuRWqxFyRzzAEPNbivWP7UObhKPhIdiPNgHwjDPRcUAqmyNjKBV7HSKqbLzy3wgGwKdOvHEG3ONq+fYYiP6mFEEy2a+6L2RqArzssW9zGCWV7HagwnNEnIkZ+hxgmUZ2DN1FpXW55rQ9X/fIH8=
+	t=1763473745; cv=none; b=AcD0THco7A26VZmuMMowXtHtg4IkRAToowOTj9+oNAq7Gq+Z7MHCv+ysfZpuF38PhuPJkVtlxRyxWkxKmnag9ZGVFfVh7i1NDZ7XZ7G9g9iaMQe36bI93CdnMZiuqowtry8GpT5DFO/0m2GFrRuYepojiKeLQPexjhYurAYG/WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763473637; c=relaxed/simple;
-	bh=9LsR1sVmTcxFSzMrb0BVLV7ghy87Yimdmp8ZgQOctjQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mhPL3WXwGJUIJKS86ZvG2M0jrmhpMFD0YyRDMO8J7hgBHjYNuGOYtF9f/1bHWkY+eKUkpBoSlXcDNi+plRgVQ1A4GaMqY6KzGnYgY9Nn/q7JbZa2wLSgxsUHDCO1srxwwnTDUWR5ywceh3FdR0YOELIdwlE1OZbujYTLneCLTnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d9m9m28d4zHnH7f;
-	Tue, 18 Nov 2025 21:46:36 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id 35B661402F3;
-	Tue, 18 Nov 2025 21:47:07 +0800 (CST)
-Received: from mscphis02103.huawei.com (10.123.65.215) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 18 Nov 2025 16:47:06 +0300
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-To: <mic@digikod.net>, <gnoack@google.com>
-CC: <willemdebruijn.kernel@gmail.com>, <matthieu@buffet.re>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-Subject: [RFC PATCH v4 19/19] landlock: Document socket rule type support
-Date: Tue, 18 Nov 2025 21:46:39 +0800
-Message-ID: <20251118134639.3314803-20-ivanov.mikhail1@huawei-partners.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251118134639.3314803-1-ivanov.mikhail1@huawei-partners.com>
-References: <20251118134639.3314803-1-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1763473745; c=relaxed/simple;
+	bh=FrPOOsZVyi/511d2OKLIe+2mKiI7Kq97FOMzoLiW24M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EKw8vWWHEf0gzhdYHjOc+BEyKGAP6Tfsu0v9Kj9fUVPYp5Hr6+uQoSeF/L2vzzqCK0KG91rWOQ4Zx5O3nHT75yPfwL9NzXXstq6v09v+6+tv33Byjls5HIqvFmjJZ+Lq8T7K5cXNCVtW9AFTSGhP2e5j/ojQqcgsewxKGmkrX5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MiBKtNPN; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 35E871A1B86;
+	Tue, 18 Nov 2025 13:48:55 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id EED54606FE;
+	Tue, 18 Nov 2025 13:48:54 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9846810371D09;
+	Tue, 18 Nov 2025 14:48:47 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1763473734; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=GlBhdagIv79JVcL9in1O72ju+fMc1vc59Oegn0NObR8=;
+	b=MiBKtNPN5r33In7hMNTY3A/YcFYzQQpH/KpcDU5sLR3FBaW4H00KnunhPUHpW4ANBNQfUI
+	f3rzckotNXn+7FsPmMGoz+TU7uYakDV5l8MsZMe6yad58UecyXZnsjtCUNNcLUhxesg7P7
+	iaYjoTdDlDK8TFLO73hdKhVzpxV0ajGcC57emAvuhZPgFf8yA7NrlthI2hcBeEk3UaMc10
+	1j6094cRbYuzUzewCLngiy9EgVPtKXfkgxyZf+4h/pJYXMCXHf7h5AQvl6GUx46J3l/Kbp
+	SRo3/bOR3pJH1rI5l0tGlDRhWGpv5MXdkkd+mXod+t1HI0dTUa0YvUkzr0MHEg==
+Message-ID: <7f81c9f1-a061-4269-96cd-ecdaa6137c72@bootlin.com>
+Date: Tue, 18 Nov 2025 14:48:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: mscpeml500004.china.huawei.com (7.188.26.250) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: stmmac: dwc-qos-eth: simplify switch() in
+ dwc_eth_dwmac_config_dt()
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <E1vLJij-0000000ExKZ-3C9s@rmk-PC.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <E1vLJij-0000000ExKZ-3C9s@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Extend documentation with socket rule type description.
 
-Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
----
-Changes since v3:
-* Fixes identantion.
----
- Documentation/userspace-api/landlock.rst | 48 ++++++++++++++++++++----
- 1 file changed, 41 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/userspace-api/landlock.rst b/Documentation/userspace-api/landlock.rst
-index 1d0c2c15c22e..49fdc897db24 100644
---- a/Documentation/userspace-api/landlock.rst
-+++ b/Documentation/userspace-api/landlock.rst
-@@ -8,7 +8,7 @@ Landlock: unprivileged access control
- =====================================
- 
- :Author: Mickaël Salaün
--:Date: March 2025
-+:Date: November 2025
- 
- The goal of Landlock is to enable restriction of ambient rights (e.g. global
- filesystem or network access) for a set of processes.  Because Landlock
-@@ -33,7 +33,7 @@ A Landlock rule describes an action on an object which the process intends to
- perform.  A set of rules is aggregated in a ruleset, which can then restrict
- the thread enforcing it, and its future children.
- 
--The two existing types of rules are:
-+The three existing types of rules are:
- 
- Filesystem rules
-     For these rules, the object is a file hierarchy,
-@@ -44,14 +44,18 @@ Network rules (since ABI v4)
-     For these rules, the object is a TCP port,
-     and the related actions are defined with `network access rights`.
- 
-+Socket rules (since ABI v8)
-+    For these rules, the object is a pair of an address family and a socket type,
-+    and the related actions are defined with `socket access rights`.
-+
- Defining and enforcing a security policy
- ----------------------------------------
- 
- We first need to define the ruleset that will contain our rules.
- 
- For this example, the ruleset will contain rules that only allow filesystem
--read actions and establish a specific TCP connection. Filesystem write
--actions and other TCP actions will be denied.
-+read actions, create TCP sockets and establish a specific TCP connection.
-+Filesystem write actions, non-TCP sockets creation other TCP actions will be denied.
- 
- The ruleset then needs to handle both these kinds of actions.  This is
- required for backward and forward compatibility (i.e. the kernel and user
-@@ -81,6 +85,8 @@ to be explicit about the denied-by-default access rights.
-         .handled_access_net =
-             LANDLOCK_ACCESS_NET_BIND_TCP |
-             LANDLOCK_ACCESS_NET_CONNECT_TCP,
-+        .handled_access_socket =
-+            LANDLOCK_ACCESS_SOCKET_CREATE,
-         .scoped =
-             LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET |
-             LANDLOCK_SCOPE_SIGNAL,
-@@ -127,6 +133,11 @@ version, and only use the available subset of access rights:
-         /* Removes LANDLOCK_SCOPE_* for ABI < 6 */
-         ruleset_attr.scoped &= ~(LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET |
-                                  LANDLOCK_SCOPE_SIGNAL);
-+    case 6:
-+    case 7:
-+         /* Removes LANDLOCK_ACCESS_SOCKET for ABI < 8 */
-+         ruleset_attr.handled_access_socket &=
-+             ~LANDLOCK_ACCESS_SOCKET_CREATE;
-     }
- 
- This enables the creation of an inclusive ruleset that will contain our rules.
-@@ -178,6 +189,21 @@ for the ruleset creation, by filtering access rights according to the Landlock
- ABI version.  In this example, this is not required because all of the requested
- ``allowed_access`` rights are already available in ABI 1.
- 
-+For socket access-control, we can add a rule to allow TCP sockets creation. UNIX,
-+UDP/IP and other protocols will be denied by the ruleset.
-+
-+.. code-block:: c
-+
-+    struct landlock_net_port_attr tcp_socket = {
-+        .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
-+        .family = AF_INET,
-+        .type = SOCK_STREAM,
-+        .protocol = 0,
-+    };
-+
-+    err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
-+                            &tcp_socket, 0);
-+
- For network access-control, we can add a set of rules that allow to use a port
- number for a specific action: HTTPS connections.
- 
-@@ -194,7 +220,8 @@ number for a specific action: HTTPS connections.
- The next step is to restrict the current thread from gaining more privileges
- (e.g. through a SUID binary).  We now have a ruleset with the first rule
- allowing read access to ``/usr`` while denying all other handled accesses for
--the filesystem, and a second rule allowing HTTPS connections.
-+the filesystem, a second rule allowing TCP sockets and a third rule allowing
-+HTTPS connections.
- 
- .. code-block:: c
- 
-@@ -442,7 +469,7 @@ Access rights
- -------------
- 
- .. kernel-doc:: include/uapi/linux/landlock.h
--    :identifiers: fs_access net_access scope
-+    :identifiers: fs_access net_access socket_access scope
- 
- Creating a new ruleset
- ----------------------
-@@ -461,7 +488,7 @@ Extending a ruleset
- 
- .. kernel-doc:: include/uapi/linux/landlock.h
-     :identifiers: landlock_rule_type landlock_path_beneath_attr
--                  landlock_net_port_attr
-+                  landlock_net_port_attr landlock_socket_attr
- 
- Enforcing a ruleset
- -------------------
-@@ -604,6 +631,13 @@ Landlock audit events with the ``LANDLOCK_RESTRICT_SELF_LOG_SAME_EXEC_OFF``,
- sys_landlock_restrict_self().  See Documentation/admin-guide/LSM/landlock.rst
- for more details on audit.
- 
-+Socket support (ABI < 8)
-+-------------------------
-+
-+Starting with the Landlock ABI version 8, it is now possible to restrict
-+creation of user space sockets to only a set of allowed protocols thanks
-+to the new ``LANDLOCK_ACCESS_SOCKET_CREATE`` access right.
-+
- .. _kernel_support:
- 
- Kernel support
--- 
-2.34.1
+On 18/11/2025 12:18, Russell King (Oracle) wrote:
+> Simplify the the switch() statement in dwc_eth_dwmac_config_dt().
+> Although this is not speed-critical, simplifying it can make it more
+> readable. This also drastically improves the code emitted by the
+> compiler.
+> 
+> On aarch64, with the original code, the compiler loads registers with
+> every possible value, and then has a tree of test-and-branch statements
+> to work out which register to store. With the simplified code, the
+> compiler can load a register with '4' and shift it appropriately.
+> 
+> This shrinks the text size on aarch64 from 4289 bytes to 4153 bytes,
+> a reduction of 3%.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
+
+> ---
+>  .../stmicro/stmmac/dwmac-dwc-qos-eth.c        | 26 +++----------------
+>  1 file changed, 3 insertions(+), 23 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> index c7cd6497d42d..e6d5893c5905 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> @@ -84,29 +84,9 @@ static int dwc_eth_dwmac_config_dt(struct platform_device *pdev,
+>  	device_property_read_u32(dev, "snps,burst-map", &burst_map);
+>  
+>  	/* converts burst-map bitmask to burst array */
+> -	for (bit_index = 0; bit_index < 7; bit_index++) {
+> -		if (burst_map & (1 << bit_index)) {
+> -			switch (bit_index) {
+> -			case 0:
+> -			plat_dat->axi->axi_blen[a_index] = 4; break;
+> -			case 1:
+> -			plat_dat->axi->axi_blen[a_index] = 8; break;
+> -			case 2:
+> -			plat_dat->axi->axi_blen[a_index] = 16; break;
+> -			case 3:
+> -			plat_dat->axi->axi_blen[a_index] = 32; break;
+> -			case 4:
+> -			plat_dat->axi->axi_blen[a_index] = 64; break;
+> -			case 5:
+> -			plat_dat->axi->axi_blen[a_index] = 128; break;
+> -			case 6:
+> -			plat_dat->axi->axi_blen[a_index] = 256; break;
+> -			default:
+> -			break;
+> -			}
+> -			a_index++;
+> -		}
+> -	}
+> +	for (bit_index = 0; bit_index < 7; bit_index++)
+> +		if (burst_map & (1 << bit_index))
+> +			plat_dat->axi->axi_blen[a_index++] = 4 << bit_index;
+>  
+>  	/* dwc-qos needs GMAC4, AAL, TSO and PMT */
+>  	plat_dat->core_type = DWMAC_CORE_GMAC4;
 
 
