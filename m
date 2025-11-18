@@ -1,171 +1,293 @@
-Return-Path: <netdev+bounces-239712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22F4EC6BBCD
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 22:43:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB6E7C6BC07
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 22:45:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 256A329DE7
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 21:43:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 75B392B314
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 21:45:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599EB305067;
-	Tue, 18 Nov 2025 21:43:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B7AA37031B;
+	Tue, 18 Nov 2025 21:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NBgtOmBs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TzPX3M90";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CsSvSiOU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847F63702EE
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 21:43:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6D924C676
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 21:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763502191; cv=none; b=lkXQNcPoed/ptg83JLCqqKAORVmgPUN45GyvZySYF1a5VOSHbaSIFqgRsEOAPO7ES7t+vsrxiKfmsNFkvc3ZKWBZZr2ygHbPiHFT1l2wYpfOe9pZpxdWxjNMr0GcK5MryEyddtwGmy/aA00DA2IfZIlwT0JjpLnsc/iuQ8lN9ME=
+	t=1763502328; cv=none; b=oEXIxuJKiUfJZgCbwtpm8LoiibJZYhL0keZGGlIEq05MZQkQ4AU82l5C1fxQSXj3onLUPFw560VqRqEzQJ/lZcHjX4QWnAShGlDUvowq9lax490vsCeWQe9jM8VebZJZj8waIp+6oJ5N3jb1gyz8227CZycxT0eYpUx2l8PYNg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763502191; c=relaxed/simple;
-	bh=7XN+8w3NWv5CIgxr9frrAmMEY4zZ2Ww+CNE+UHCbaSE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rRYjIEBQmVeGC8tVK8QOA0JF1egg3sy0T5R768cCfzyfQAwn2FRFXBq8JU5itRojjCo8S5UOttEe4fEeHJA8NqLIW1Ue1Pqvl5Zs/KXzYvqCr8C/nnBydT52fhHQPUcF3rT1cw5oy/jSxoKzde3eLEhOqa8hl8/1JlENyIBqsIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NBgtOmBs; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47775fb6c56so60725355e9.1
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 13:43:09 -0800 (PST)
+	s=arc-20240116; t=1763502328; c=relaxed/simple;
+	bh=EWVoiStL8xxc8fjRAlKEGJa+L4prc8/ogGMYl/n3jNY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vF4q2Qgtc9xRF8q37WtXfzVW+ntq8MVsqagEj7N4mRKxxkibaDU3gynRrKno98wsMtlnWWd0r21u2D5dPuUDYfUIVMCtktCWi12wYCx9PEBMIoSR7l+0hsGu9xmUopEAomSrn2wvDv/iLEMsHYT1Gjw+uHKXGzMvN4bhF4QKRZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TzPX3M90; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CsSvSiOU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763502325;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xmcD+jsjC8wZ84+RswPoQFo8c1DNHek5aHXjd3P3kGk=;
+	b=TzPX3M90fdG7GZOXl/WZsYay2G6OZtHJIFyX5r7c64Q0dR5u8gzNf5cbEzVAhMRNSWr7dV
+	+9XHgn52puWbqX2U951kSRFJMRXcKGHi3gEzvreIfL02OdGriaI8A0DljztocefNEv/GE/
+	hrF/ALCqSmlDrk0i7hqL2JZpMJrZN8k=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-494-QMIDcjCSNLWlEzj_tKMDnA-1; Tue, 18 Nov 2025 16:45:19 -0500
+X-MC-Unique: QMIDcjCSNLWlEzj_tKMDnA-1
+X-Mimecast-MFC-AGG-ID: QMIDcjCSNLWlEzj_tKMDnA_1763502318
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42b366a76ffso3180718f8f.1
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 13:45:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763502188; x=1764106988; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OUkVwdGzVQ7q0OYPtHv5zvws/AG+rq7G9PwmbeyAvwQ=;
-        b=NBgtOmBskChMSzJW4Jtkz7lowF2AKUXDbYRFxJEl0Iwu8DGHzO/PcaD0MUBy7yApNR
-         gLwtej4kfo6MvhWg6ua0vOvunu2czyBV27H47JEfr5lXtODSFbIfXWm2cxmrpWNIsIl4
-         vCncSVF2Yoqu8EGCQXMEhh9bcwX9ygmZwnkwVoN1jP+VgZ1ey+VRG7m4W7TXNwL5x4SN
-         t4W3SCWSwPxcoxGvUzVFp9NTC2EaHOOr3oOj1zLToO5dnnumpH8oL8MJ+22MjC6RUNdx
-         wtwd6uOFexAsEQndXdr4rKnc/WbsCjYhhpRgvWxAdT6w+1GClrdHjpKJmkvfLe4sAwMf
-         1kBQ==
+        d=redhat.com; s=google; t=1763502318; x=1764107118; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xmcD+jsjC8wZ84+RswPoQFo8c1DNHek5aHXjd3P3kGk=;
+        b=CsSvSiOUslfrnu6eju6JJCDc9sEAVN8jgTzv+8eENnbX8640khnggiXj86Lb2hrM22
+         fmXuBM/+L5EB62rTifGH3Q727EkT/k+Kfc1oweqK2w0B+Bu289Tw40VBc0V7JzN1JcUx
+         u6Wom7uebbFMC6GKwL/KGCHRnMhjcKbqnvikLIAZTIccksSSrG95WIFbhMVR6UigeEDq
+         dinzJJ/W3MMa36JbhtFsKkAsOTMmKiYYe0jikDWpqBb7lJRnGrkPj+H5vdoQyCDiCGGj
+         odDdWgEpn8H1pTiVuUmjdzu4kRx9IZFvfYRZDFMwaR05qo7Tc200VgYWgcI4uaD0sH1i
+         l8Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763502188; x=1764106988;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OUkVwdGzVQ7q0OYPtHv5zvws/AG+rq7G9PwmbeyAvwQ=;
-        b=oPNYPeVwAQj9NVdUhbdWhmnoAmsN0RftZ2TBZat6SqmGh3Sj697vlww0VUSW98GdtB
-         4DQv2hb9xVAUJPfeoz+1cGc63u1qC7CGhS5onfDhhTyW9g6S3FPCXc4MrFu4us/3gQL8
-         pPQb6c7f4YpoDjUdOUI1OCh2mR/vKIAjG97tpfxg1nuesrh1tZJxU1LkJAcMxCz1CH2y
-         cO6+Iy45ZXZuKIK0zr+QYC4BVb7cxQue/8vKAEvOsYz+hIyN+HQe27GhYMlqWwQeja8j
-         Yo84lNSj4nuiQeE7Vf+IIBKqGuQH6Y3tyV/RlzOchG9umqQ1d7grlPWKOOc3JNOg9AHD
-         WnlA==
-X-Gm-Message-State: AOJu0Ywe7mDOJMxLX5H1iB8oGHVGXaBAQZXCIoecq9mi9zolJaszERK7
-	GBZQ64VoqC426yawYw4ydAmIvdQ1Scu2lRFDXc7zJ1tmeB0aGgVwRq+g
-X-Gm-Gg: ASbGncvdhssxsL+8NwZXJ6tkNVLkP1SdsqP5xAcbYYLXyDMoAJllZkFO4dp8mHPt/ef
-	dSU0VhZJohbIEiAp5Nh3o77ECJMYVD7I4FdKobvFXSXmozhtMwcMvXabmpLEB0hhbAcXEBcc276
-	bkW67Owmx7T7FcE2ULCqp7p4hnmNw9psNI2z/BdWg703ufWTTvIkMl2W7UV/U/jvBcXLVOouwVT
-	P3oP2XMCtXdcLOcEGBhL02xcPqvocpBhIpgOydOGbUrUkzvnYRdrG8vATJslKZUobqn2504SCNR
-	j+zeK3r6ZDiWCBLiU83bpIGw3WjCCS29ww8sIZfeKpZ+eGh7wb+N3ircKF+mjwDwfBJfefyq0Wt
-	/CsfOLzQbcF/KUdB+80QcGO6ASdzrtgRNXQQVX8uwtgvy0N9CXLeC/Ovgd5F7kHiPtgQnNNI5I3
-	fa09KZNWQsV7ivCV4kiasrjPG9EcGyLdzb9KcNWGlf8v3j+gYqGdqsrv92gG0lXwH2lVsnF2cSG
-	uzNBr9nXsigjWAqx21abDSYTRL/r+DucWCVApUF3z1mqm6tUuE=
-X-Google-Smtp-Source: AGHT+IHg3V+RqTj21DBPLKCHvRfQnSaDtMWAXbMel11BLrYXN8CyGyQPU+OHp+0S1f8SYH8QcVsLdQ==
-X-Received: by 2002:a05:600c:1f86:b0:477:7c7d:d9b2 with SMTP id 5b1f17b1804b1-4778fea17bemr150756395e9.32.1763502187690;
-        Tue, 18 Nov 2025 13:43:07 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f37:1a00:5d3:6147:37fb:5feb? (p200300ea8f371a0005d3614737fb5feb.dip0.t-ipconnect.de. [2003:ea:8f37:1a00:5d3:6147:37fb:5feb])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b0ffd37bsm11673145e9.3.2025.11.18.13.43.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Nov 2025 13:43:07 -0800 (PST)
-Message-ID: <cc1c8d30-fda0-4d3d-ad61-3ff932ef0222@gmail.com>
-Date: Tue, 18 Nov 2025 22:43:10 +0100
+        d=1e100.net; s=20230601; t=1763502318; x=1764107118;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xmcD+jsjC8wZ84+RswPoQFo8c1DNHek5aHXjd3P3kGk=;
+        b=s9WCeJGHX2KkOGvVRcL4JH8kWn2vlH0uk0Yku0zRFobPcD44guiW4S30NDeSHs82et
+         Acm29AxQHAjkFhu2WOBmAnCDogy9U7gz9aaHAfnTj/MhZbdkS0MQ4dNiG+HKU3i4G81l
+         BYG+Dj0XjxaqwmMQ3N/Wfmn+DQyV/pLhAuQ/O54UBPg+S6Gx5M/TNo5dXKS0rc+7UzL4
+         iR1zD3akzepHL9ETFtdCoTVgmu8DggYv0y/AyHzr6uC6oH+Updczrj503uSm23s9bTZh
+         gTKToLNthRsKlDRiNnAj4e6WLbLoeSusH0ouDnCLkCDJDY9cMocFK8/rLJeFVuGhU/4u
+         lUZQ==
+X-Gm-Message-State: AOJu0Yz/hs07HDUoBfNYVD3yw5usF2q3Pepyg5Bq0UU3ilvA653MGred
+	AZqYhVXpOxtdo1hKIXAtQaKnvdbWCu/ctYpPSQfXQ/KsXdhfBTEMnEQGI9iCClDpHbV4rXjRuu8
+	bqISMbJ8CP+bqZeiG1OOghS/S0I4ctPH3BqD/IQnJV8ELmQ4syi4TYEGOj4Za4d3Mfg==
+X-Gm-Gg: ASbGncuqGAznsP6gfRC9KQJQ3ro6bE48bcntEn9rzNDVHSs6iTFzk9B4A16bZqPjpcc
+	xPawRkvsNcUNfpy64gvnmnqayMGefxbD/p9XocCQVY/ZQouXoy3kwynkfiGWHjTIBbZ5BoST2iW
+	1ynfBXXPy+Hy1BD0soasj2vYcn8Kxwj79gpPN04WglThKbCjt1AVGZLRt/AsQqSWycxMYhctcNX
+	Y49GleN5cdJmDVU0P3VF3qdRloMTNkckVuoFH0aaMgHYCDoaIJ6VCv47fUw8djmAxv2p41n9xUk
+	aMQAGQ3+L1MfzzV6tEF5Vv6MBVtzmIDw8D5RYVlHnIlphHRBHcN5nc08Az0DLp0+iRgzF4Ea952
+	6NMWW4hGD/RORtD4Uluf5FvVtsMIZgg==
+X-Received: by 2002:a05:6000:615:b0:425:75c6:7125 with SMTP id ffacd0b85a97d-42b5934f2famr15507762f8f.16.1763502318142;
+        Tue, 18 Nov 2025 13:45:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE6pbEaOuD4MXi0DZA4VBiHWLk/LNDtUUFYZniNj6WmjWygzYmgIegGsNOm3BN26F6K9mlM8g==
+X-Received: by 2002:a05:6000:615:b0:425:75c6:7125 with SMTP id ffacd0b85a97d-42b5934f2famr15507746f8f.16.1763502317590;
+        Tue, 18 Nov 2025 13:45:17 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f174afsm33416600f8f.33.2025.11.18.13.45.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Nov 2025 13:45:17 -0800 (PST)
+Date: Tue, 18 Nov 2025 16:45:14 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
+	virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
+	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v11 10/12] virtio_net: Add support for IPv6
+ ethtool steering
+Message-ID: <20251118164400-mutt-send-email-mst@kernel.org>
+References: <20251118143903.958844-1-danielj@nvidia.com>
+ <20251118143903.958844-11-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Bug: Realtek 8127 disappears from PCI bus after shutdown
-To: Jason Lethbridge <lethbridgejason@gmail.com>, nic_swsd@realtek.com
-Cc: netdev@vger.kernel.org
-References: <6411b990f83316909a2b250bb3372596d7523ebb.camel@gmail.com>
- <3a8e5e57-6a64-4245-ab92-87cb748926b5@gmail.com>
- <de12662baa7219b4c8e376a9d571869675a9a631.camel@gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <de12662baa7219b4c8e376a9d571869675a9a631.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251118143903.958844-11-danielj@nvidia.com>
 
-On 11/18/2025 10:09 PM, Jason Lethbridge wrote:
+On Tue, Nov 18, 2025 at 08:39:00AM -0600, Daniel Jurgens wrote:
+> Implement support for IPV6_USER_FLOW type rules.
 > 
->> - How is it after a suspend-to-ram / resume cycle?
-> This machine is having trouble resuming from suspend-to-ram. I doubt
-> that it's a problem relating to r8169 however since suspend-to-ram
-> doesn't work properly even with r8169 blacklisted.
+> Example:
+> $ ethtool -U ens9 flow-type ip6 src-ip fe80::2 dst-ip fe80::4 action 3
+> Added rule with ID 0
 > 
->> - Does enabling Wake-on-LAN work around the issue?
-> r8169 behaves the same regardless of if Wake-on-LAN is enable or
-> disabled in UEFI.
+> The example rule will forward packets with the specified source and
+> destination IP addresses to RX ring 3.
 > 
-Thanks for the feedback. Enabling WoL in UEFI isn't sufficient.
-It has to be enabled also on the chip:
-
-ethtool -s <if-name> wol g
+> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
 
->> - Issue also occurs with r8127 vendor driver?
-> The "10G Ethernet LINUX driver r8127 for kernel up to 6.15 11.015.00"
-> from 'https://www.realtek.com/Download/List?cate_id=584' builds and
-> runs flawlessly on 6.17.8. The issue is not occurring when the NICs are
-> driven by the r8127 module.
+I find it weird that this does not modify setup_eth_hdr_key_mask
+
+So it still hardcodes ETH_P_IP for all IP flows?
+For IPv6, should it not use ETH_P_IPV6 instead?
+
+how does it work?
+
+> ---
+> v4: commit message typo
+> ---
+>  drivers/net/virtio_net.c | 89 ++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 81 insertions(+), 8 deletions(-)
 > 
-> Drivers SHA-256:
-> ab21bf69368fb9de7f591b2e81cf1a815988bbf086ecbf41af7de9787b10594b 
-> r8127-11.015.00.tar.bz2
-> 
-> On Tue, 2025-11-18 at 20:49 +0100, Heiner Kallweit wrote:
->> On 11/18/2025 6:07 PM, Jason Lethbridge wrote:
->>> Hi all,
->>>
->>> I’m reporting a reproducible issue with the r8169 driver on kernel
->>> 6.17.8.
->>>
->>> I recently got a Minisform MS-S1 which has two RTL8127 NICs built
->>> in.
->>> The r8169 driver works perfectly well with these on kernel 6.17.8
->>> until
->>> the device is powered off.
->>>
->>> If the device has not been disconnected from wall power then the
->>> next
->>> time it's turned on both NICs appear to stay powered down. There's
->>> no
->>> LED illuminated on the NIC or the switch they're connected to nor
->>> are
->>> they listed by lspci. The only way to recover the NICs from this
->>> state
->>> is to disconnect the power then plug it back in.
->>>
->> - How is it after a suspend-to-ram / resume cycle?
->> - Does enabling Wake-on-LAN work around the issue?
->> - Issue also occurs with r8127 vendor driver?
->>
->>> - The bug occurs after graceful shutdown
->>> - The bug occurs after holding the power button to force off
->>> - The bug occurs even if `modprobe -r r8169` is run before shutdown
->>> - The bug does NOT occur when Linux is rebooting the machine
->>> - The bug does NOT occur when the r8169 module is blacklisted
->>> - The bug is indifferent to either NIC being connected or not
->>> - The bug is indifferent to CONFIG_R8169 being in-built or a module
->>> - The bug is indifferent to CONFIG_R8169_LEDS being set on or off
->>>
->>> Attachments include `dmesg`, `lspci -vvv`, and `/proc/config.gz`
->>> from
->>> the system exhibiting the bug.
->>>
->>> I'll be happy to try any patches if that helps.
->>>
->>> Thanks
->>> -Jason
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index c1adba60b6a8..78fc8f01b6c4 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -6932,6 +6932,34 @@ static bool validate_ip4_mask(const struct virtnet_ff *ff,
+>  	return true;
+>  }
+>  
+> +static bool validate_ip6_mask(const struct virtnet_ff *ff,
+> +			      const struct virtio_net_ff_selector *sel,
+> +			      const struct virtio_net_ff_selector *sel_cap)
+> +{
+> +	bool partial_mask = !!(sel_cap->flags & VIRTIO_NET_FF_MASK_F_PARTIAL_MASK);
+> +	struct ipv6hdr *cap, *mask;
+> +
+> +	cap = (struct ipv6hdr *)&sel_cap->mask;
+> +	mask = (struct ipv6hdr *)&sel->mask;
+> +
+> +	if (!ipv6_addr_any(&mask->saddr) &&
+> +	    !check_mask_vs_cap(&mask->saddr, &cap->saddr,
+> +			       sizeof(cap->saddr), partial_mask))
+> +		return false;
+> +
+> +	if (!ipv6_addr_any(&mask->daddr) &&
+> +	    !check_mask_vs_cap(&mask->daddr, &cap->daddr,
+> +			       sizeof(cap->daddr), partial_mask))
+> +		return false;
+> +
+> +	if (mask->nexthdr &&
+> +	    !check_mask_vs_cap(&mask->nexthdr, &cap->nexthdr,
+> +	    sizeof(cap->nexthdr), partial_mask))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+>  static bool validate_mask(const struct virtnet_ff *ff,
+>  			  const struct virtio_net_ff_selector *sel)
+>  {
+> @@ -6946,6 +6974,9 @@ static bool validate_mask(const struct virtnet_ff *ff,
+>  
+>  	case VIRTIO_NET_FF_MASK_TYPE_IPV4:
+>  		return validate_ip4_mask(ff, sel, sel_cap);
+> +
+> +	case VIRTIO_NET_FF_MASK_TYPE_IPV6:
+> +		return validate_ip6_mask(ff, sel, sel_cap);
+>  	}
+>  
+>  	return false;
+> @@ -6968,11 +6999,38 @@ static void parse_ip4(struct iphdr *mask, struct iphdr *key,
+>  	}
+>  }
+>  
+> +static void parse_ip6(struct ipv6hdr *mask, struct ipv6hdr *key,
+> +		      const struct ethtool_rx_flow_spec *fs)
+> +{
+> +	const struct ethtool_usrip6_spec *l3_mask = &fs->m_u.usr_ip6_spec;
+> +	const struct ethtool_usrip6_spec *l3_val  = &fs->h_u.usr_ip6_spec;
+> +
+> +	if (!ipv6_addr_any((struct in6_addr *)l3_mask->ip6src)) {
+> +		memcpy(&mask->saddr, l3_mask->ip6src, sizeof(mask->saddr));
+> +		memcpy(&key->saddr, l3_val->ip6src, sizeof(key->saddr));
+> +	}
+> +
+> +	if (!ipv6_addr_any((struct in6_addr *)l3_mask->ip6dst)) {
+> +		memcpy(&mask->daddr, l3_mask->ip6dst, sizeof(mask->daddr));
+> +		memcpy(&key->daddr, l3_val->ip6dst, sizeof(key->daddr));
+> +	}
+> +
+> +	if (l3_mask->l4_proto) {
+> +		mask->nexthdr = l3_mask->l4_proto;
+> +		key->nexthdr = l3_val->l4_proto;
+> +	}
+> +}
+> +
+>  static bool has_ipv4(u32 flow_type)
+>  {
+>  	return flow_type == IP_USER_FLOW;
+>  }
+>  
+> +static bool has_ipv6(u32 flow_type)
+> +{
+> +	return flow_type == IPV6_USER_FLOW;
+> +}
+> +
+>  static int setup_classifier(struct virtnet_ff *ff,
+>  			    struct virtnet_classifier **c)
+>  {
+> @@ -7108,6 +7166,7 @@ static bool supported_flow_type(const struct ethtool_rx_flow_spec *fs)
+>  	switch (fs->flow_type) {
+>  	case ETHER_FLOW:
+>  	case IP_USER_FLOW:
+> +	case IPV6_USER_FLOW:
+>  		return true;
+>  	}
+>  
+> @@ -7150,7 +7209,8 @@ static void calculate_flow_sizes(struct ethtool_rx_flow_spec *fs,
+>  	++(*num_hdrs);
+>  	if (has_ipv4(fs->flow_type))
+>  		size += sizeof(struct iphdr);
+> -
+> +	else if (has_ipv6(fs->flow_type))
+> +		size += sizeof(struct ipv6hdr);
+>  done:
+>  	*key_size = size;
+>  	/*
+> @@ -7187,18 +7247,31 @@ static int setup_ip_key_mask(struct virtio_net_ff_selector *selector,
+>  			     u8 *key,
+>  			     const struct ethtool_rx_flow_spec *fs)
+>  {
+> +	struct ipv6hdr *v6_m = (struct ipv6hdr *)&selector->mask;
+>  	struct iphdr *v4_m = (struct iphdr *)&selector->mask;
+> +	struct ipv6hdr *v6_k = (struct ipv6hdr *)key;
+>  	struct iphdr *v4_k = (struct iphdr *)key;
+>  
+> -	selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
+> -	selector->length = sizeof(struct iphdr);
+> +	if (has_ipv6(fs->flow_type)) {
+> +		selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV6;
+> +		selector->length = sizeof(struct ipv6hdr);
+>  
+> -	if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
+> -	    fs->h_u.usr_ip4_spec.tos ||
+> -	    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4)
+> -		return -EOPNOTSUPP;
+> +		if (fs->h_u.usr_ip6_spec.l4_4_bytes ||
+> +		    fs->h_u.usr_ip6_spec.tclass)
+> +			return -EOPNOTSUPP;
+>  
+> -	parse_ip4(v4_m, v4_k, fs);
+> +		parse_ip6(v6_m, v6_k, fs);
+> +	} else {
+> +		selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
+> +		selector->length = sizeof(struct iphdr);
+> +
+> +		if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
+> +		    fs->h_u.usr_ip4_spec.tos ||
+> +		    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4)
+> +			return -EOPNOTSUPP;
+> +
+> +		parse_ip4(v4_m, v4_k, fs);
+> +	}
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.50.1
 
 
