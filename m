@@ -1,127 +1,189 @@
-Return-Path: <netdev+bounces-239568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED09C69D23
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:07:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20B5EC69C9F
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:02:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E31E04F6C84
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:01:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id ED2B8349865
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4CB35F8C6;
-	Tue, 18 Nov 2025 13:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D52535E556;
+	Tue, 18 Nov 2025 13:59:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="KLGlu8be"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XK4Td46z";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aC6M3Cjc"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACE43570C9;
-	Tue, 18 Nov 2025 13:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB413563CB
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 13:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763474353; cv=none; b=Lg0V5/b6wDKG1NELieDeUyq+ZN6+yr+gddjK4e1+MBhP8YbwWU2XTPOQVjDA91gXkr0KTIDiHG9eLjr7iSS6lXbpcqW6/YOB4wBbTvKz+TFw6iBquOnD11j6lyB99jjhB+Ty9WuvpoZFUYFXgWjX0ezLTc5DufmJhiTx/vlw7wM=
+	t=1763474347; cv=none; b=lv3WQDb5WcgroDfWlArxVQDsvW6m8hMfMGcI9rTPXLl83CSRdpISU14GUIpqpeIIWvCDwflzXzgyaMmt+/zZWeZaSiEGOCIeVOiVBSO4B2/4BlMNZsXV5B7MNwu5TAcjlXblYyoNKmXHj5DHqKOJUV2abtbhsyaigF9IEcdYEkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763474353; c=relaxed/simple;
-	bh=vuCMu8Zyr0++D4LokQ/BIJwvJfctwQ7pVDmzVTNH3mk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lGuOZCJFqog7UtnEpCNFb2+PuXbm9ujFo5aJ/53aH0mB6uRRCkmW0D7T0Znz9jYxLYKBqklj7QcpzpISj0jOjEic6zWlpLQ0o+i3mrKKJiCqabMTxi7KMMr8IaD/IbCSh/gQL+TMG45B0l27H7Dp1+WvHMJm9NG/ZxsIaUMsCXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=KLGlu8be; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 47A74A0A9C;
-	Tue, 18 Nov 2025 14:58:58 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=mail; bh=BH8nS9fyL+TA/Jht3rNm
-	U3h3KU5XVc/dfK0gPokSnho=; b=KLGlu8bePrDaDoExgYUMfAq2aoCoIidrPId3
-	mye2DjTnnpzgTMzaBLizI3rZIh5ZbmanB3Ojco+A+iJ4ngHaZtyTCHgwmI2BeQJp
-	+ki8n0/TMZJdBm16C9EshdZXRC/i3+EeXwIpNw06WGNoYZEal3gaDorxrmYoLAsd
-	3elzcyJx1e5Y1zi25drGSHdlsRe/ClOoH1U3vXy0WzeWZP0dk5kVjN314Rnx/8ZT
-	eGU64LHidNz5RX225uu/+Ba08621qr43FkFihx9RcRgvi+s90y/hGaEvk4ZDt9ur
-	AfQ7AHMAnAvpfJbgX4T3MbDvi1ntusZw6jczyGSa/vUJq3GjhLCS8oPqE3K1EikO
-	8vEUgf9GGKiWggjEBm4dQrHN8ngAPZatVsZxO78WSBgKsXwoUp4dSprjmPvdkFOH
-	lXvOLEvXIfAUlseB3zNm1oZFsX12aGvNIjqLbgWzcMyV/sb+GZhvEpAgpGwrWQTI
-	nKPfz6JmbmP6MOEXIjpRgsfxr/JKOzpYfWmc8i/CffE/aCBIf9Z8ckBQIT1HrQtP
-	2HEhYWZFC7ww8jeJga0JWqQuytHOeBFRgYlMLQqtEA7Vp49SwUqcAMSq9BJE7hvW
-	I2vgu2sIZ33i5i37GhA9m21VrMcda1Ph3lhMMiq+vI3c2vf9rIMGmKLYlz8JPdiB
-	kJF2Gx4=
-From: Buday Csaba <buday.csaba@prolan.hu>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Philipp Zabel
-	<p.zabel@pengutronix.de>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-CC: Buday Csaba <buday.csaba@prolan.hu>
-Subject: [PATCH net-next v3 3/3] net: mdio: improve reset handling in mdio_device.c
-Date: Tue, 18 Nov 2025 14:58:54 +0100
-Message-ID: <641df1488517ae71ba10158ec1e38424211d8651.1763473655.git.buday.csaba@prolan.hu>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <cover.1763473655.git.buday.csaba@prolan.hu>
-References: <cover.1763473655.git.buday.csaba@prolan.hu>
+	s=arc-20240116; t=1763474347; c=relaxed/simple;
+	bh=aDOXQIB2n+pg4b/q/S49BAM6icV8tjHMUu6SgbSHF3M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=a896giZRH7yK/NtN/y7+QnBsV9ZjeCScNzPGzysWMDGmDFm4c1bgw7+D5OfaQAe2XzjczOWssYo6vFBzLm/Wo97f0JTHchTU0RCcTsu39MS+teyG8tfEhVnY8tnAelGqYW9m4mULTTtIDgntbJR8SpKAZ4VkSbUXD7TExTdQWpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XK4Td46z; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aC6M3Cjc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763474343;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/sMrzWdyDZvwFZkmGhcBLLXh+fImVyjMBGC8vdg9gsc=;
+	b=XK4Td46zKk99R21Rlga4CfC+43zsFYx2JIzS4w5rbzAVeVCIF4dldZZXfArjVVNEERT5Q7
+	RH7TlgzI+6rfMEqWfHCWfsp8TAQhMDopaH284OT77WN0N6mG9krPdEo5PMz0QHsHuigOYb
+	9IBaxvKOLwIHUnyI/XhOqxEvvpobVsA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-30-nB8RJIgoNUSKa4PBbuN7sA-1; Tue, 18 Nov 2025 08:59:02 -0500
+X-MC-Unique: nB8RJIgoNUSKa4PBbuN7sA-1
+X-Mimecast-MFC-AGG-ID: nB8RJIgoNUSKa4PBbuN7sA_1763474341
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4775d110fabso43249615e9.1
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 05:59:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763474341; x=1764079141; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/sMrzWdyDZvwFZkmGhcBLLXh+fImVyjMBGC8vdg9gsc=;
+        b=aC6M3CjcSJ3JHIvhVPo6nuzb9LRIbQY7YGexjD9QcSAzfyiL8M/bJXaEy4f0VSi6Kf
+         JfHWaXFSQ/Qr7dOFkq+uXGHmg/Zg6VNf0xIn2WLWKDCVT0O+NKsi9JNGX+y8mPDWBw/3
+         prPFcyeaaGc2YvCoSFjH/jrOsn2RHVdzAEBseKOX5Grv0NZ4r4FLSb0daLHHG5eOi1oK
+         mAF+h2ext16wAdV1uLc/+A98iSBMiYUDKEl+1WQv0oqLpwppwhjnxKmYaIenNUVyy/lV
+         XLn5SmJedRevW+eL0O1d/Ek8h1NrKHjBaBPX/TmyByD7cAIZ1hckHhrJA06rcEE3y6OV
+         xnFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763474341; x=1764079141;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/sMrzWdyDZvwFZkmGhcBLLXh+fImVyjMBGC8vdg9gsc=;
+        b=OV5RrIOULsPB2afbK6/NNjM4oZiHrM25xv0Dsrww7RtnXM6Vsb9IV45YbDOXlWNhR/
+         JkWRCnx4faJAO3OmIIwFnRvzxJGlczqufX1iRMsBH453uQB26UfLBvc8ohrQ3ydj63Vh
+         MgNM6SsgiC3hohdeLF8fn0jK3lvStjQmcCLpU0kzLg8Q8Gop77CfAM2lUbpW4PrEFoAU
+         6WQnculgmNCvb4QPtOWiL5VEcuNSyEerzhaa2oXEg1Nurfd2vNTkJzbPJTMnLrRZCG4C
+         qYfVgYB2KrPzbt/kr+m1U+BfcaIq68zxvvODSZkPmrc+8UdDU4d/1XWCTAOKGutSQkIb
+         DGiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUO7vuxd8mxazjHL44WsXCsfL+1hFrfywUf++aCiNO1iS/UXAGk8ZMnjz0zzoTRgFNDhL3ueDE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHbTf9ZhL/Y+XFkPCL/5t7qKcoOyP42IZKoDLQoyKWZ3sWsJuq
+	2h5fuVm/6eHiRV9ciFtHsyHs+NnYiUi1W18nsjXoppD7lTXolV6iC3myyEmcHn9mUm9ok+Qg6qc
+	rKbmF4KeUebkUc4EmiiYoWrvfYIcuEkOlHU+C+gpDUnCW/avvXzRJQohjzQ==
+X-Gm-Gg: ASbGnctN5Vt1yVIh5xwlYMCK74I4cpobthOs6VKswyXxzoVa3khg3MPbGQydST0DTi/
+	YLKpiv1Wwk1wwYB3LBl84k2EgnHyfhsh03Y2+KMJuRatYN9MWWDc3nDzzVrQe6awm5dKUc64Zhi
+	R7Y1fFdkjhgiH3ApOPXa21gFq57xwr21wJ9ooYMcrEOlGILUhfciBnUvx/mOOUvzBSGXSeMRk5J
+	3z5V1DDH5pwCTcFz0R9Pcom10QWA0lCcI2LFCQIgWrf3TS7LQu+7hHn32oV3BBdAEDqgA87uw+l
+	ygSDMtwCxnIfEttsPO8plcJh7adBmcGeUq+1gGn7eXGFs4PZVSvrK9wzIS9xzdWh/X1ebgN+2KU
+	rg2tkvvEyuDTa
+X-Received: by 2002:a05:600c:4595:b0:45d:d8d6:7fcc with SMTP id 5b1f17b1804b1-4778fe88265mr151064045e9.27.1763474340688;
+        Tue, 18 Nov 2025 05:59:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE9Am1Diu+ximSUOXMP3A5a0o3OiqTxBDb1D8Ajqh2TFqWWMm87brTKlLuvl3dgDrOlhHHa3A==
+X-Received: by 2002:a05:600c:4595:b0:45d:d8d6:7fcc with SMTP id 5b1f17b1804b1-4778fe88265mr151063795e9.27.1763474340210;
+        Tue, 18 Nov 2025 05:59:00 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.41])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a9deb126sm16925725e9.9.2025.11.18.05.58.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Nov 2025 05:58:59 -0800 (PST)
+Message-ID: <769c1ba6-b622-402e-a615-dffa6f3d640c@redhat.com>
+Date: Tue, 18 Nov 2025 14:58:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1763474337;VERSION=8002;MC=3304440463;ID=69551;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2998FD515F617266
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 net-next 10/14] tcp: accecn: retransmit SYN/ACK without
+ AccECN option or non-AccECN SYN/ACK
+To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com, parav@nvidia.com,
+ linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+References: <20251114071345.10769-1-chia-yu.chang@nokia-bell-labs.com>
+ <20251114071345.10769-11-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251114071345.10769-11-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Change fwnode_property_read_u32() in mdio_device_register_reset()
-to device_property_read_u32(), which is more appropriate here.
+On 11/14/25 8:13 AM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> 
+> For Accurate ECN, the first SYN/ACK sent by the TCP server shall set the
+> ACE flag (see Table 1 of RFC9768) and the AccECN option to complete the
+> capability negotiation. However, if the TCP server needs to retransmit such
+> a SYN/ACK (for example, because it did not receive an ACK acknowledging its
+> SYN/ACK, or received a second SYN requesting AccECN support), the TCP server
+> retransmits the SYN/ACK without the AccECN option. This is because the
+> SYN/ACK may be lost due to congestion, or a middlebox may block the AccECN
+> option. Furthermore, if this retransmission also times out, to expedite
+> connection establishment, the TCP server should retransmit the SYN/ACK with
+> (AE,CWR,ECE) = (0,0,0) and without the AccECN option, while maintaining
+> AccECN feedback mode.
+> 
+> This complies with Section 3.2.3.2.2 of the AccECN specification (RFC9768).
+> 
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> 
+> ---
+> v6:
+> - Use new synack_type TCP_SYNACK_RETRANS and num_retrans.
+> ---
+>  include/net/tcp_ecn.h | 20 ++++++++++++++------
+>  net/ipv4/tcp_output.c |  4 ++--
+>  2 files changed, 16 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/net/tcp_ecn.h b/include/net/tcp_ecn.h
+> index a709fb1756eb..57841dfa6705 100644
+> --- a/include/net/tcp_ecn.h
+> +++ b/include/net/tcp_ecn.h
+> @@ -649,12 +649,20 @@ static inline void tcp_ecn_clear_syn(struct sock *sk, struct sk_buff *skb)
+>  }
+>  
+>  static inline void
+> -tcp_ecn_make_synack(const struct request_sock *req, struct tcphdr *th)
+> -{
+> -	if (tcp_rsk(req)->accecn_ok)
+> -		tcp_accecn_echo_syn_ect(th, tcp_rsk(req)->syn_ect_rcv);
+> -	else if (inet_rsk(req)->ecn_ok)
+> -		th->ece = 1;
+> +tcp_ecn_make_synack(const struct request_sock *req, struct tcphdr *th,
+> +		    enum tcp_synack_type synack_type)
+> +{
+> +	// num_retrans will be incresaed after tcp_ecn_make_synack()
 
-Make mdio_device_unregister_reset() truly reverse
-mdio_device_register_reset() by setting the internal fields to
-their default values.
+Please use /* */ for comments
 
-Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
----
-V2 -> V3: no changes
-V1 -> V2: rebase, leak fix removed, since it is already in base
----
- drivers/net/phy/mdio_device.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+> +	if (!req->num_retrans) {
 
-diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
-index a4d9c6ccf..fd0e16dbc 100644
---- a/drivers/net/phy/mdio_device.c
-+++ b/drivers/net/phy/mdio_device.c
-@@ -149,9 +149,9 @@ int mdio_device_register_reset(struct mdio_device *mdiodev)
- 	mdiodev->reset_ctrl = reset;
- 
- 	/* Read optional firmware properties */
--	fwnode_property_read_u32(dev_fwnode(&mdiodev->dev), "reset-assert-us",
-+	device_property_read_u32(&mdiodev->dev, "reset-assert-us",
- 				 &mdiodev->reset_assert_delay);
--	fwnode_property_read_u32(dev_fwnode(&mdiodev->dev), "reset-deassert-us",
-+	device_property_read_u32(&mdiodev->dev, "reset-deassert-us",
- 				 &mdiodev->reset_deassert_delay);
- 
- 	return 0;
-@@ -165,7 +165,11 @@ int mdio_device_register_reset(struct mdio_device *mdiodev)
- void mdio_device_unregister_reset(struct mdio_device *mdiodev)
- {
- 	gpiod_put(mdiodev->reset_gpio);
-+	mdiodev->reset_gpio = NULL;
- 	reset_control_put(mdiodev->reset_ctrl);
-+	mdiodev->reset_ctrl = NULL;
-+	mdiodev->reset_assert_delay = 0;
-+	mdiodev->reset_deassert_delay = 0;
- }
- 
- void mdio_device_reset(struct mdio_device *mdiodev, int value)
--- 
-2.39.5
+It's unclear you this function receives a `synack_type` argument and
+don't use it. Should the above be
 
+	if (synack_type != TCP_SYNACK_RETRANS) {
+
+?
+
+Or just remove such argument.
+
+/P
 
 
