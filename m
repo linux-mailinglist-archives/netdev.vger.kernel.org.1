@@ -1,82 +1,107 @@
-Return-Path: <netdev+bounces-239281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70892C669FC
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:10:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39899C66A05
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:12:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2620C34FC19
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:10:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id E86B424269
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A1754652;
-	Tue, 18 Nov 2025 00:10:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6994F13C8E8;
+	Tue, 18 Nov 2025 00:12:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q7zj6KuA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mzh/VTBk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0037114A8B
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA7915278E
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763424650; cv=none; b=RjF6InqWRvJXhENchGA7teJw3yTLwHDKtfUI1TDQbafVaZOxHw4iaKHWb0myhGmHFtgE31VdkcWBpAIPNx8t3zHBFPl5YIqPzaD8wpTJgYONjWPePB/OjRQukprEpDlQeLmGSV8rMcr0FvXeNDzHOoVLbB04Gz/C6udvNO0Nkgc=
+	t=1763424757; cv=none; b=hoWy5biiiweEDkG6wKEAJOSFYNegW0l0JZp5u2HIe1mwK9SifUGQYr5mFBo0AGfenoHq9NeivtdreaPKOfGSg4v7YVDKRBgB1ATG+oON9chyCmzzIoMj+MyNMku4w/mqilRZlMzXxkeu7onHPOzhakZVQ5di9enNqI88sJgmCnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763424650; c=relaxed/simple;
-	bh=k/iOsbzQZyYAaHy0DymPB3JsA1vUj+SNK6O3heZQETo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s8H3zzK5yTu6x4pcM3CZK+ckbYsTacD20t1pVzAJBIMd/D9+g27YtuF+6FvrtlR/P9gmHa7H3aiC29oJ8Qvjas25sGPF0ItVI1dTfXfHLc6GoDYclMA75gBWsxKhvXdC8wNrFbj2pZYeDxCz/3I1D2cMTuImiaVKS/mT6CrHNZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q7zj6KuA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B202FC4AF0B;
-	Tue, 18 Nov 2025 00:10:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763424648;
-	bh=k/iOsbzQZyYAaHy0DymPB3JsA1vUj+SNK6O3heZQETo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q7zj6KuAfTnkf+RUZ/EbC4WsRNakmzG2pRiIFcqt74N6i+d1MCEl/0Y1GxQ1MSchm
-	 GwiyZVgrVKZ1ratyIKLFMrBVdFK0ohJM41yoO8kBkkzqHxL4Kfi5IB0XLP9wlz99zR
-	 5WdISp1ebfBBb6iK1VaNAPyOwUmb4uEJAboekA0H0e2gmQjBy+VMO/aXfzpddlLiO1
-	 G8XqyeIFexOPllBFcwJG6YkTOGvjabDFfBeu/pQ2Lb7ZQb5o8nOpnFMRFKe275TKEr
-	 xyAU8xPQUtyKEhvtdGdLex18sbFNZD21uTx4SjgFi/eWl8qaHmkvf7MRsd9n8SASM5
-	 gSF8KLEanjANA==
-Date: Mon, 17 Nov 2025 16:10:45 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Marek Mietus <mmietus97@yahoo.com>
-Cc: Sabrina Dubroca <sd@queasysnail.net>, Eric Dumazet
- <edumazet@google.com>, netdev@vger.kernel.org, pabeni@redhat.com,
- davem@davemloft.net
-Subject: Re: [PATCH net-next v4 02/14] net: skb: use dstref for storing dst
- entry
-Message-ID: <20251117161045.10c9c7bd@kernel.org>
-In-Reply-To: <39fbfcb8-20a4-4693-af24-ea59a726bbec@yahoo.com>
-References: <20251112072720.5076-1-mmietus97@yahoo.com>
-	<20251112072720.5076-3-mmietus97@yahoo.com>
-	<aRS_SEUbglrR_MeX@krikkit>
-	<5af3e1bd-6b20-432b-8223-9302a8f9fe44@yahoo.com>
-	<CANn89i+qce6WJYUpjH93SMRKA8cQ6Wt-b81O6gu9V5GGnDeo_A@mail.gmail.com>
-	<aRYgtN-nToS4MQ3r@krikkit>
-	<39fbfcb8-20a4-4693-af24-ea59a726bbec@yahoo.com>
+	s=arc-20240116; t=1763424757; c=relaxed/simple;
+	bh=62k18Es4eUtWC2jPgswY+O0FImJuDuN/Mnh3422V7OA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sABXFHD2d8QpPByxHzsEq4VsQuBRll6DIm2iFZc4PIkC0w6D6OY89dcJnZIKvWSjbOkZaMpvHANO2iFl7PkEhFuvL4ML8sVhQYfe7eurn3Xy3tJtEUoATn7XioqWzo4HJmwO/d+8iUaiDrnH7Qcely92ZiRXr/5e7Ex1WcXm0pQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mzh/VTBk; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-4336f492d75so25482565ab.1
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:12:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763424755; x=1764029555; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=62k18Es4eUtWC2jPgswY+O0FImJuDuN/Mnh3422V7OA=;
+        b=mzh/VTBkxMDCB51v6GJ2Ua2z/LfAftSRVpHxqBZIwTJbkqFv+iH56/vqRvAJ9lNbFj
+         40YpxEn6MgwfuDj2YtTK3i1W/yAE/S54u/MoN0ZIoaR0AFnDTBk7/ptIUWV9YPLuUmfl
+         SD99fv0WyeJXM9DrjpEADKuBX6b+M8cFA5QCpJoDCozS6LFgQSOqYJ+CvJJpdz9e036N
+         D/SkO6BTWhzQnxHEDyowz/C9Ldtq/IhAV1m7TRxtsaY3uKS7c60ixik+98g1zUceUDnv
+         1c/JK2a/kH4XipuhOv3CxR5H1OYvZ+v9BLSqaNJJNRW0qD1OMZueuq8PO4qGT4IyZE/j
+         z4FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763424755; x=1764029555;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=62k18Es4eUtWC2jPgswY+O0FImJuDuN/Mnh3422V7OA=;
+        b=LuwNLtnamdbrL5KZDy9cp2uYMUI18h5Wi1z+RgIv4VHYn9XPOkgwmyXO1FKfvuP04b
+         qqfYcRqKRJdwE/H8dmDaIOIVbagjOrZcNlK0+6tVNdLZoSzydwAKGt79DSmynu8g+dH8
+         KTLsU8i526Tvkr89ENzhk7GZf1VN7vCf58yRLHpih0Rr6nBYlRHzENcxan+rC7rLjSoO
+         pcEGRd8LkT3Uh2sZCPfSrI+54gKA2mPQ7LMay94JkSJorSHVXdI6cpLmZ3NdJ9oNJhwn
+         Gk6lmvG7RAdf7zD/M61sOyegcN9916Mu3dKdCe5/z5cj7LftjAzF9f6MgmylLEDtgeyi
+         bAKA==
+X-Forwarded-Encrypted: i=1; AJvYcCWEENOG/1qJBJ8fwosREUFR4R8Pbb7pAYUgobQmMMgk92ExBc3bjFm1BxlJRJYafFGAk2HhiHo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygRLSgGb/rbvy5+HY5zVL2uLmQMDOh/aUIWAMFT4xzZcbzGAlB
+	4v7TPa8HraRorwRtJDbsDdPbxWSpZ2HJWdNlzPeyRHHvnIHbovzP/G+EToAb8VVFQEaVFxt1Ddw
+	BWg5ai25cD/1NGNz6uK75Uk9YuThK5EhhCudvpNE=
+X-Gm-Gg: ASbGncujsW/4j4uimpE2R5tCs9NWbVq9+B6n3V8UbwSAZS1Cv0PJEJWqe7IyTOSNHhj
+	f9vrg9mni+PIcxFDs3tFCrNpcRl3A6TW+RmDtwmoER3es/262wLkXlUm4Sad1eP0wZgEa99b2HF
+	kdMIVZjT9i5kl+liLmoEjM4H4lCAJY7J9AyYcEFhvQCaQurxqBXJhAPD466lPg+AAYdwZvN8V2j
+	203saF9gSXXwXb7vwTvtB6ULLV5vwhOIN7t7nVkJF3AkajprQicwdyek7ix7JkDmfUWQw==
+X-Google-Smtp-Source: AGHT+IG8R79z1aVtTPL/xdv+U9Ez2QUoCUWG7nFqFgNKdsihKR2A1m6Fv7sVh+OvXRRkFuSkg89jBOTjaj1NOOcu6Ns=
+X-Received: by 2002:a05:6e02:3113:b0:42e:7273:a370 with SMTP id
+ e9e14a558f8ab-4348c87af71mr165061275ab.5.1763424755027; Mon, 17 Nov 2025
+ 16:12:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20251118000445.4091280-1-kuniyu@google.com>
+In-Reply-To: <20251118000445.4091280-1-kuniyu@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 18 Nov 2025 08:11:58 +0800
+X-Gm-Features: AWmQ_blQLPwAElnfDqqy9sxVQZARmhFgn9sc_xrWwkaDAC3nQb2LvBGdakma_I4
+Message-ID: <CAL+tcoBcKtiD5Q8sx5jB+h14KdYcEntjznEoh7+OpMbdpDsX+w@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next] tcp: Don't reinitialise tw->tw_transparent in tcp_time_wait().
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Neal Cardwell <ncardwell@google.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 17 Nov 2025 12:31:00 +0100 Marek Mietus wrote:
-> > But IMO Jakub's comment about technical debt is not addressed by
-> > pushing dstref all over the tunnel code.
-> 
-> I understood it differently. I thought the aforementioned debt referred
-> to maintaining two different APIs that accomplish the same result, which
-> is why I took the time to replace all callers in all of the tunnels to use
-> the new API, and removed the old API. Maybe Jakub can clarify.
+On Tue, Nov 18, 2025 at 8:05=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+>
+> tw->tw_transparent is initialised twice in inet_twsk_alloc()
+> and tcp_time_wait().
+>
+> Let's remove the latter.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 
-True, my direct complaint was about only converting a subset of tunnels.
-But as Eric said you seem to have gone too far in the opposite direction
-now :(
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+
+Thanks,
+Jason
 
