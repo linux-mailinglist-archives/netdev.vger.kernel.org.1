@@ -1,187 +1,111 @@
-Return-Path: <netdev+bounces-239571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69EB5C69D49
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:09:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59621C69CD2
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:04:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 77B2C4F41B9
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:03:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id D2C332BA91
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:04:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100DD36403A;
-	Tue, 18 Nov 2025 14:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87681309F0F;
+	Tue, 18 Nov 2025 14:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GwVHwhM0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Uv0XmdqB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB9936403E
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 14:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED8F3043D1;
+	Tue, 18 Nov 2025 14:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763474423; cv=none; b=rR1OuKoRRZGOxtEmFNS9xH/51pt9/R+tqZbnoMaNjwG8JnX79Z0aw2sS+U64S5vaHdCyIVz+A2RaGkjW2Kcm+ilDTeJQodNSqnEMxBuiPQlfi7Dlx4E5iwokudheH28pfMW8u7h+DOwth0jI+GusKkv4LZHhYUjmY8ntNppEDTM=
+	t=1763474548; cv=none; b=CSGdk6TZ/qOTg5bMW2Nvl5GYP94XxaU3mdDl5NOygEUB2oef8YP6LEixmmEsKGOZNhf+RpjD/KdQLaDKRZqN1lzB1F6o9wOVX5SZ7aRG6bnP0xMmJSRzZaUIoZexmofpksygYFVYT2ZejLKrq6Q92NIpdJCyVLRvMg6Hc2x3Tyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763474423; c=relaxed/simple;
-	bh=3wnO420+7TX5tlRb0vMPDu/XZOnWU0TUBTEtAyLbSnA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gA/p/yegZM6aBcUliJuFk3lRh9WhMt4Uc6oMYUiNwn17vsAMFxuLGw0Veix8YKVRTVUmum4hyTxXuRn9udzgpwhcV6BOfkNjuvyL/X6AdNbYwpsGRtQ0G1nfLxL3qQ1SIbvckeIu5QD38Tq1y1Ll9okCRvO2AmURKjIlycVwW3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GwVHwhM0; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 8FAA54E4175B;
-	Tue, 18 Nov 2025 14:00:13 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5EF33606FE;
-	Tue, 18 Nov 2025 14:00:13 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E891010371DD3;
-	Tue, 18 Nov 2025 15:00:10 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763474412; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=1T9L6GNFxVeySHO4fK7pztQOaxOzwYo2ILkJ3QC3pyY=;
-	b=GwVHwhM0ZXmBzkSyBjZN/AiXpiutG2xbKiY+F25x3Vc8hAaL8BUxv9fCOApJM+edWzt8mH
-	MUqOlKjs4IAh/IpCxP/Kg8k+aE8TYWAtuyVjtQTVdLs3+E5WlvAgAAf5thKL5fJdUGhfnt
-	xPJJtNJzsX2PR/Jln0+oRXIpRrrjftSacS558PssKLG2Z7FC4ILyvoOA5KThBv72YTxDl6
-	0sLDe6Nafd6FapcU6BfDYV0R0IpOSSaF7pgkcciW6PsJHAhvuUuqAFC8fMgflGpnq4e7fe
-	Ud0r7ycdege9sLBCX6q+LsFUIMKYoKeYkWU1Yl0x3HoWdkDIy7J1V5vAMdhoog==
-Message-ID: <ec621eb4-8a4f-47fd-a544-44d8130fcbb8@bootlin.com>
-Date: Tue, 18 Nov 2025 15:00:10 +0100
+	s=arc-20240116; t=1763474548; c=relaxed/simple;
+	bh=+KhqY3oB1wgkGc6jzN+UfYOvpqqc60Dgp6JPVcxBT1Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GXE7y0tEWyqbND+vzGYrwYzfMgezSst+Agr1xP6Ip0pBryZUNsdov9nBnvatIRdipMBKNlAMHy5B8N14W3rSYSwYxYXiFBVFoDJt82kHURFGCW1yJ2LtVBDzRdBMv2RZ5iVX2d8XT4FLFe5iEA+gT+7fPZ5c4FCfQ/YfjvFyLog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Uv0XmdqB; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Dg01KqUntpaFpjCXJtHlRufZ34s60nzPkse3Ae90upo=; b=Uv0XmdqBapCHl4/1aM3xKwbpby
+	m739xINTZZujr9WHqEVYit0n8ne2KlWegg8Q1/AiVm07rmj+MUplkUH7Vs0QHzhekb91pQ4jV9iAa
+	oMsfnrWvz206steIJdpH/Ek2LQz6TkQva7Okdu9D8pYbAkKDHxsd8Eda9skbMCkhD44iTnQabge1/
+	hYMUTL1LSRZQ26f9uEFFW7pWrwGjHzj7a5tnxZWUAFNNeT3FONqRrpGDjJjJGJbd/C3xbn9ObVBv6
+	iIT7koyhZp4BH9U4q22aIx2IlYJq/1h8denLX9mNx0DubtV9LT5eTxSmn5vvEeSB5IS6He67Yq46f
+	aWp5Havg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50934)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vLMHg-000000003Hs-3XN4;
+	Tue, 18 Nov 2025 14:02:16 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vLMHe-000000002VP-0rEX;
+	Tue, 18 Nov 2025 14:02:14 +0000
+Date: Tue, 18 Nov 2025 14:02:14 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Wei Fang <wei.fang@nxp.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"eric@nelint.com" <eric@nelint.com>,
+	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 net] net: phylink: add missing supported link modes
+ for the fixed-link
+Message-ID: <aRx8Zh-7MWeY0iJd@shell.armlinux.org.uk>
+References: <20251117102943.1862680-1-wei.fang@nxp.com>
+ <aRwtEVvzuchzBHAu@shell.armlinux.org.uk>
+ <PAXPR04MB8510A92D5185F67DDC8CC32F88D6A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <e7222c87-3e4c-4170-993b-dbf5ba26c462@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: stmmac: stmmac_is_jumbo_frm() returns
- boolean
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <aRxDqJSWxOdOaRt4@shell.armlinux.org.uk>
- <E1vLIWW-0000000Ewkl-21Ia@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <E1vLIWW-0000000Ewkl-21Ia@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e7222c87-3e4c-4170-993b-dbf5ba26c462@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-
-
-On 18/11/2025 11:01, Russell King (Oracle) wrote:
-> stmmac_is_jumbo_frm() returns whether the driver considers the frame
-> size to be a jumbo frame, and thus returns 0/1 values. This is boolean,
-> so convert it to return a boolean and use false/true instead. Also
-> convert stmmac_xmit()'s is_jumbo to be bool, which causes several
-> variables to be repositioned to keep it in reverse Christmas-tree
-> order.
+On Tue, Nov 18, 2025 at 03:00:00PM +0100, Andrew Lunn wrote:
+> > > > Fixes: de7d3f87be3c ("net: phylink: Use phy_caps_lookup for fixed-link
+> > > > configuration")
+> > > > Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> > > > Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > > 
+> > > NAK. I give up.
+> > > 
+> > 
+> > Sorry, could you please tell me what the reason is?
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> I think Russell is referring to the commit message, and how you only
+> quoted a little section of his explanation. There is no limit to
+> commit messages, they don't need to be short. It is actually better if
+> they are long. So you could use his whole explanation. And then you
+> don't need the link.
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Worse than that. I gave my reviewed-by, which seems to have been a waste
+of time.
 
-Maxime
-
-> ---
->  drivers/net/ethernet/stmicro/stmmac/chain_mode.c  | 9 ++++-----
->  drivers/net/ethernet/stmicro/stmmac/hwif.h        | 2 +-
->  drivers/net/ethernet/stmicro/stmmac/ring_mode.c   | 9 ++-------
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 6 +++---
->  4 files changed, 10 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/chain_mode.c b/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
-> index d14b56e5ed40..120a009c9992 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
-> @@ -83,14 +83,13 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
->  	return entry;
->  }
->  
-> -static unsigned int is_jumbo_frm(unsigned int len, int enh_desc)
-> +static bool is_jumbo_frm(unsigned int len, bool enh_desc)
->  {
-> -	unsigned int ret = 0;
-> +	bool ret = false;
->  
->  	if ((enh_desc && (len > BUF_SIZE_8KiB)) ||
-> -	    (!enh_desc && (len > BUF_SIZE_2KiB))) {
-> -		ret = 1;
-> -	}
-> +	    (!enh_desc && (len > BUF_SIZE_2KiB)))
-> +		ret = true;
->  
->  	return ret;
->  }
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> index 4953e0fab547..f257ce4b6c66 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> @@ -541,7 +541,7 @@ struct stmmac_rx_queue;
->  struct stmmac_mode_ops {
->  	void (*init) (void *des, dma_addr_t phy_addr, unsigned int size,
->  		      unsigned int extend_desc);
-> -	unsigned int (*is_jumbo_frm)(unsigned int len, int ehn_desc);
-> +	bool (*is_jumbo_frm)(unsigned int len, bool enh_desc);
->  	int (*jumbo_frm)(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
->  			 int csum);
->  	int (*set_16kib_bfsize)(int mtu);
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/ring_mode.c b/drivers/net/ethernet/stmicro/stmmac/ring_mode.c
-> index 039903c424df..382d94a3b972 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/ring_mode.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/ring_mode.c
-> @@ -91,14 +91,9 @@ static int jumbo_frm(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
->  	return entry;
->  }
->  
-> -static unsigned int is_jumbo_frm(unsigned int len, int enh_desc)
-> +static bool is_jumbo_frm(unsigned int len, bool enh_desc)
->  {
-> -	unsigned int ret = 0;
-> -
-> -	if (len >= BUF_SIZE_4KiB)
-> -		ret = 1;
-> -
-> -	return ret;
-> +	return len >= BUF_SIZE_4KiB;
->  }
->  
->  static void refill_desc3(struct stmmac_rx_queue *rx_q, struct dma_desc *p)
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index db68c89316ec..12fc31c909c4 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -4579,18 +4579,18 @@ static bool stmmac_has_ip_ethertype(struct sk_buff *skb)
->   */
->  static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
->  {
-> -	unsigned int first_entry, tx_packets, enh_desc;
-> +	bool enh_desc, has_vlan, set_ic, is_jumbo = false;
->  	struct stmmac_priv *priv = netdev_priv(dev);
->  	unsigned int nopaged_len = skb_headlen(skb);
-> -	int i, csum_insertion = 0, is_jumbo = 0;
->  	u32 queue = skb_get_queue_mapping(skb);
->  	int nfrags = skb_shinfo(skb)->nr_frags;
-> +	unsigned int first_entry, tx_packets;
->  	int gso = skb_shinfo(skb)->gso_type;
->  	struct stmmac_txq_stats *txq_stats;
->  	struct dma_edesc *tbs_desc = NULL;
->  	struct dma_desc *desc, *first;
->  	struct stmmac_tx_queue *tx_q;
-> -	bool has_vlan, set_ic;
-> +	int i, csum_insertion = 0;
->  	int entry, first_tx;
->  	dma_addr_t des;
->  	u32 sdu_len;
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
