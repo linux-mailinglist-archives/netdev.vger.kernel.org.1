@@ -1,113 +1,86 @@
-Return-Path: <netdev+bounces-239665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7148DC6B2BF
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 19:17:18 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 120A2C6B2E3
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 19:20:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 739E92A532
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 18:16:44 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 41182366D97
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 18:18:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EABFF262815;
-	Tue, 18 Nov 2025 18:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 868DA33C190;
+	Tue, 18 Nov 2025 18:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CJg7LSBD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OpC2E5RT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A2C927B4E1
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 18:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8FE27B4E1;
+	Tue, 18 Nov 2025 18:18:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763489796; cv=none; b=Yn6KvddOLyMvXY9pH+1Lltr6f0ulKc53cyNNX+x0joOZlNK2kJ8hz2hP2foJ9cQ4XI4moMeIRVxn6eDv3yTgtC9LfLRFi2h/LgLcZn0RJ+jX5gq8Hn4iRPAMsdT4DVZmzUsUq0Ie2pz3dxcni41FYjcDOgKlIRH6RBgMeWYuY4s=
+	t=1763489918; cv=none; b=QYDfsAi/OHjd3auI14ejD/3gOfFs08qIoTJJ8hht8WwQlr/paDTGELvlXr6SDsBuJphm/2zs5D4OZplOGaOho4RtvnlkUHERuMGAvEE1rnLOzPu7dfRHOzqjNsYCMBFznGvzjA+jkub0QjVTEM9udAFc7WkeH+8vGwFdaj1ylx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763489796; c=relaxed/simple;
-	bh=ZXkQ3kPe7AT5UT2l2UWSViuerymT1NythTEpwa8wHAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sVnTOONw4OuWXd+c5JJmLlvjXPbcjPyokFeumkACcV9FtCde59tUYs9sXAFJeFYyEPv+yJMadYfKyHKhzUYFiFHcoYYvOS1BruuQy1y+lkHaxhPXOlJGPauCxZX33kuHIlVU/nzR6Fhc75yTv2d2HKwbfx1NdZVwwCB5wCJIu+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CJg7LSBD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763489794;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iNv0pqSHRfXuYShbyhGgq8zNuj162daZJfAUfy98etc=;
-	b=CJg7LSBDNq2ItNOJU0sDd0bdziKt2SUparhnqtzJ95y8j6DOLCeDueAJwpDO/2aEGdfJgN
-	msdcyDgXAm/KCvlJdtY+Uep2DPCf4htHghMJe6b1Bz8mLvKSQtcmykuDaXDMItYu1qrDBl
-	8yMZjia8+x4b7ytH0Pj4lJ1n7RLmtb8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-499-KnqTUGjFOuaMYKkdq5qUGA-1; Tue,
- 18 Nov 2025 13:16:29 -0500
-X-MC-Unique: KnqTUGjFOuaMYKkdq5qUGA-1
-X-Mimecast-MFC-AGG-ID: KnqTUGjFOuaMYKkdq5qUGA_1763489787
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A1431800250;
-	Tue, 18 Nov 2025 18:16:26 +0000 (UTC)
-Received: from localhost (unknown [10.44.32.14])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BAB87195419F;
-	Tue, 18 Nov 2025 18:16:24 +0000 (UTC)
-Date: Tue, 18 Nov 2025 18:16:23 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-To: Pavel Machek <pavel@ucw.cz>
-Cc: Eric Dumazet <edumazet@google.com>, Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
-	Eric Dumazet <eric.dumazet@gmail.com>,
-	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com,
-	Mike Christie <mchristi@redhat.com>,
-	Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
-	nbd@other.debian.org
-Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
-Message-ID: <20251118181623.GK1427@redhat.com>
-References: <20250909132243.1327024-1-edumazet@google.com>
- <aRyzUc/WndKJBAz0@duo.ucw.cz>
+	s=arc-20240116; t=1763489918; c=relaxed/simple;
+	bh=MTOZH+w8AIufbNBuaeJ47Bc4EfM9FZ2OsV28593CwRU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f5uI9wDY/OTflCEin6blT2w8TtOtY647LOiDzWeNALUpj9vOjW2GQixn1RLzP5oN/3LcWkHBVJkAeJ2J01tatC1TYah3tjWbpWxhALscBLIloy1TQuNYx9kaFqFdJfnloqvOlAymApIe33l3/61ZpPM98FOLcOcTXzvUsQRT47s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OpC2E5RT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2D2CC116B1;
+	Tue, 18 Nov 2025 18:18:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763489917;
+	bh=MTOZH+w8AIufbNBuaeJ47Bc4EfM9FZ2OsV28593CwRU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OpC2E5RTOZL8WPOqdLS7+R8fEKSktWzoc5Dd+UZ/gCKZ/HQFPqkVnHF0d9fexDIRN
+	 PmZTS/qZeRUlndmLbpMRtG3KeanzZ1zaFKqmrYsmYcGhQz4uUuWOlBXWaJ4qsqRsEA
+	 iq8C7BpsUwLVqGHM3LM7InjNjgeYcDa5MeTRv4KZ9ESfZ9TWW7P7VyKoh9jfI1mNCt
+	 61Si+ayzZxq0KM+0qIuBspBXlsOLSTxuG1lW8MFjGMTklKPxe0sEGuzhW28iXnZAu2
+	 pFpUmOX8gVWlQM8ILFbohdtClyrjOE2Y8hSdTAcdNlZEqE1836MWVhu+5TGO3OO+hG
+	 p6be1YU9uHeSQ==
+Message-ID: <07f075bd-46a7-4298-953f-d0540759d694@kernel.org>
+Date: Tue, 18 Nov 2025 11:18:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRyzUc/WndKJBAz0@duo.ucw.cz>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/ipv6: allow device-only routes via the multipath API
+Content-Language: en-US
+To: azey <me@azey.net>
+Cc: nicolasdichtel <nicolas.dichtel@6wind.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev <netdev@vger.kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>
+References: <a6vmtv3ylu224fnj5awi6xrgnjoib5r2jm3kny672hemsk5ifi@ychcxqnmy5us>
+ <7a4ebf5d-1815-44b6-bf77-bc7b32f39984@kernel.org>
+ <a4be64fb-d30e-43e3-b326-71efa7817683@6wind.com>
+ <19a969f919b.facf84276222.4894043454892645830@azey.net>
+ <e5e7b1cd-b733-40d5-9e78-b27a1a352cec@kernel.org>
+ <19a97dce5fc.10e4ece0319525.6646442146487396729@azey.net>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <19a97dce5fc.10e4ece0319525.6646442146487396729@azey.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 18, 2025 at 06:56:33PM +0100, Pavel Machek wrote:
-> Hi!
+On 11/18/25 9:47 AM, azey wrote:
+> On 2025-11-18 17:04:38 +0100,  David Ahern <dsahern@kernel.org> wrote:
+>> There is really no reason to take a risk of a regression. If someone
+>> wants ecmp with device only nexthops, then use the new nexthop infra to
+>> do it.
 > 
-> > Recently, syzbot started to abuse NBD with all kinds of sockets.
-> > 
-> > Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
-> > made sure the socket supported a shutdown() method.
-> > 
-> > Explicitely accept TCP and UNIX stream sockets.
+> My initial reason was that device-only ECMP via `ip route` works with IPv4
+> but not IPv6, so I thought it'd make sense to unify functionality - but if
+> this is final I won't argue any further.
 > 
-> Note that running nbd server and client on same machine is not safe in
-> read-write mode. It may deadlock under low memory conditions.
-> 
-> Thus I'm not sure if we should accept UNIX sockets.
 
-Both nbd-client and nbdkit have modes where they can mlock themselves
-into RAM.
-
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
-
+There was a push many years ago to align v4 and v6 as much as possible.
+Certain areas - like ipv6 multipath - proved to be too difficult and
+ended up causing regressions.
 
