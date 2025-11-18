@@ -1,132 +1,237 @@
-Return-Path: <netdev+bounces-239535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76614C6980A
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 13:58:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 758D9C69AAA
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:47:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1CBD53495ED
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 12:58:20 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 79FF2354562
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 13:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564F32580EE;
-	Tue, 18 Nov 2025 12:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lm6ph70A"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003943559F2;
+	Tue, 18 Nov 2025 13:47:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC9E257AEC
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 12:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF80A30F52A;
+	Tue, 18 Nov 2025 13:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763470695; cv=none; b=ARwqysrYMlUtX/cBGSgYnDXk8Gcb2hIJAi13jIyDQUUwgenJ1j+PaiiSVhFkHYYUtAbXi17k2rsCn7qOt4uE6PIu2WEGhXdOUCFc7ic4Mk6xI1BbLFdByVBEj4wGuMAnADPt4gzSn87HZkwicr/mH9CLmMoV9H7HwR+n43MsAbo=
+	t=1763473631; cv=none; b=kXc+hGj6zAaIyn4VtronvsAgVO0ixGRsDH4hQSyAelc2u5p8bNRY2UHszeD8bFekk5uXzN9UelscwzsGw9XXGCD1TNm++KkKU1O11orwbRWKsc611wvVlCBmrIIzj6WLPZg976G2wQGdG8+rnpR2dNe3rniUdDqY9ErPeI0fQco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763470695; c=relaxed/simple;
-	bh=WSYY1GCy65Dn9yCQkFLxBnLEHOuwaMSGnWKnMHR8fD8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l0pyRYuj+EcqIrtv4xSne4nQHwGDPfsCgPV2DOTEg1o/F807nxIyGRl1tCfQRRvUq5HC6XG2S1LmhezTdUDmkRlTiAcjlu2s6/zj4hwryOLAQ3Z+0hYdW9lHxsKYJBeHs4mk5tUXhyaz7I4qBpL0kjHt6Oa5H8z9dERZsaB6AtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lm6ph70A; arc=none smtp.client-ip=74.125.224.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-641e4744e59so4155136d50.2
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 04:58:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763470692; x=1764075492; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WSYY1GCy65Dn9yCQkFLxBnLEHOuwaMSGnWKnMHR8fD8=;
-        b=lm6ph70APVTlPzk6Ia0wqBjN1FNHr1HKL7Ug5iTmzl5UobRTQTVNCjivaNIz+0OarZ
-         CUTFJoHLXy32dkL3XSh0Q+sNJajcT0wN7M0BaI4f58uGW/DGuMZgZ0QenfwkbzTQCaFk
-         eFmKiOSEPlBmGUMt0TLYCBt0yv7Psl1Xh82hU0y/YQRUNaKNxUG0erlkISNNmNNISusW
-         uxl/2ZOzrIfgtK+xBfH0T4hUY+g+e8u9j/HORdDRdzO4jjgXHPn+uvkkE7iwmO7Rrn/m
-         vYE2FyCIEmR8m8yJ48bX/hQHQJFTw+D/IJYg5ta2tY0YJVUnfjMTK/zW3xKfsZ/XRhgy
-         7PJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763470692; x=1764075492;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WSYY1GCy65Dn9yCQkFLxBnLEHOuwaMSGnWKnMHR8fD8=;
-        b=gM7W9oqndy5xnQw+qo/sifpuI5jqd71fJmP6dzamXPerdRlogrif5YOHP7iP+Le0SQ
-         T8Bcj0FLnG8M6a3xgWNtXuqHwrE5CRWAtAGaEinBuZJNbOJr5ZAAC5NDQOZUIbMl6b5g
-         MS08ZOFhMoBdlfsyQ0ZD0BF/LP8sG5PjbuXMG1hrx4cVMsTs2VWO2wWf9CnR90scP59k
-         vIYYMQDZZHZ9V8WZ66mOO4WVSa4T0QoW4Mkm33bflfyv9WtyEzeqXk0nB+bR9qkp83kC
-         UpiuK7bsHYoFo07yVjNKgvCuBXCB3aSSbCCfE30rVZbAxK3yyr+MEngH9b2LPi+lZyfr
-         GhFw==
-X-Gm-Message-State: AOJu0YywioTfU+qLfPQTQJlllBv7mSyKhj2BRmHcIwSeGxN4ELMsmDBp
-	AdCiOBa9/40fu4psMoSQVnFg27ShXmC+HEhNfSQRg7h5lztKgU09NUN4yKT/v+IzVZ0VSi7P6bk
-	uzU4UqFZmDm3Loj4R9+aggHAzskJCp7M=
-X-Gm-Gg: ASbGnctjENV9Ega8SXwcK2eVwYQBLcqoPnUE0sWOwfAMKezYvqGIzoziqsTz27H/Cwn
-	R7//TgkI48/vEdH62gM6QocEdEaQ/gC9PhbxZLnOPxMMr2YyFosx8GTsmS4LgzQ00QRTEuWGgnG
-	anYRgcpFMNofjr2LIE9jPW5XgOpHetzTpTL3/iVl7EJKafrJA0pm9uan69ULbIjBzsde0hW9FTV
-	c7PrnFy0elg8X+dUxANLoLVAS/8RAPeMU5XT4D7NfydMrluBybCHBvhahwSFpPWrRbIV7reelVI
-	0x+GbZ4=
-X-Google-Smtp-Source: AGHT+IH/bZDBsrXsXAUAApwF6gssHfnH7eugf+ppBCQvvbWbg+nM//chdWve7ti2vCZ7FoMXtZajUu4P37i484lEKww=
-X-Received: by 2002:a53:d057:0:10b0:63e:2d17:6a67 with SMTP id
- 956f58d0204a3-641e75bbe5cmr12100922d50.28.1763470692533; Tue, 18 Nov 2025
- 04:58:12 -0800 (PST)
+	s=arc-20240116; t=1763473631; c=relaxed/simple;
+	bh=K5UvAeQaJDLQEt6TxazsrdmbD4UuqZX9vXnPKc2XZP8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CyoEKV721XAXn6ecqTLRyssHchnCtOIcJIlCOtBBl7Mo2FfBrKM0GDazVoMeZ4V5l+gNW26Jq5F8p6uOHvRDCuoT1uc+gfx4jHmLm6A/e/P42t33yxQ1WqwrvOokwPXhFFvd1ZTaD4jxIcAKTuSFqHRSBNHHEuKRhTpGmYcq9dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d9m9j5jtszHnH5g;
+	Tue, 18 Nov 2025 21:46:33 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id AED4D14033F;
+	Tue, 18 Nov 2025 21:47:04 +0800 (CST)
+Received: from mscphis02103.huawei.com (10.123.65.215) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 18 Nov 2025 16:47:04 +0300
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+To: <mic@digikod.net>, <gnoack@google.com>
+CC: <willemdebruijn.kernel@gmail.com>, <matthieu@buffet.re>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+Subject: [RFC PATCH v4 00/19] Support socket access-control
+Date: Tue, 18 Nov 2025 21:46:20 +0800
+Message-ID: <20251118134639.3314803-1-ivanov.mikhail1@huawei-partners.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CADEc0q5uRhf164cur2SL3YG+fqzbiderZrSqnH2nY0CkhGHKTw@mail.gmail.com>
- <20251117164201.4eab5834@kernel.org>
-In-Reply-To: <20251117164201.4eab5834@kernel.org>
-From: Jiefeng <jiefeng.z.zhang@gmail.com>
-Date: Tue, 18 Nov 2025 20:57:59 +0800
-X-Gm-Features: AWmQ_blepoLafxReiBIAa1hzJwPYnKoCLHh1NmMbo8JO-oq4DtUKvsAdjp4y_iQ
-Message-ID: <CADEc0q6iLdpwYsyGAwH4qzST8G7asjdqgR6+ymXMy1k0wRwhNQ@mail.gmail.com>
-Subject: Re: [PATCH] net: atlantic: fix fragment overflow handling in RX path
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com, 
-	andrew+netdev@lunn.ch, edumazet@google.com, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: mscpeml500004.china.huawei.com (7.188.26.250) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
-I have used git send-email to send my code.
+Hello! This is v4 RFC patch dedicated to socket protocols restriction.
 
-As for the patch --The aquantia/atlantic driver supports a maximum of
-AQ_CFG_SKB_FRAGS_MAX (32U) fragments, while the kernel limits the
-maximum number of fragments to MAX_SKB_FRAGS (17).
+It is based on the landlock's mic-next branch on top of Linux 6.16-rc2
+kernel version.
 
-Jakub Kicinski <kuba@kernel.org> =E4=BA=8E2025=E5=B9=B411=E6=9C=8818=E6=97=
-=A5=E5=91=A8=E4=BA=8C 08:42=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, 17 Nov 2025 19:38:54 +0800 Jiefeng wrote:
-> > From f78a25e62b4a0155beee0449536ba419feeddb75 Mon Sep 17 00:00:00 2001
-> > From: Jiefeng Zhang <jiefeng.z.zhang@gmail.com>
-> > Date: Mon, 17 Nov 2025 16:17:37 +0800
-> > Subject: [PATCH] net: atlantic: fix fragment overflow handling in RX pa=
-th
-> >
-> > The atlantic driver can receive packets with more than MAX_SKB_FRAGS (1=
-7)
-> > fragments when handling large multi-descriptor packets. This causes an
-> > out-of-bounds write in skb_add_rx_frag_netmem() leading to kernel panic=
-.
-> >
-> > The issue occurs because the driver doesn't check the total number of
-> > fragments before calling skb_add_rx_frag(). When a packet requires more
-> > than MAX_SKB_FRAGS fragments, the fragment index exceeds the array boun=
-ds.
-> >
-> > Add a check in __aq_ring_rx_clean() to ensure the total number of fragm=
-ents
-> > (including the initial header fragment and subsequent descriptor fragme=
-nts)
-> > does not exceed MAX_SKB_FRAGS. If it does, drop the packet gracefully
-> > and increment the error counter.
->
-> This submissions is not formatted correctly. Use git or b4 to send your
-> code. Please also make sure you read:
-> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
->
-> As for the patch -- what's the frag size the driver uses? If it's
-> larger than max_mtu / 16 the overflow is impossible.
+Objective
+=========
+Extend Landlock with a mechanism to restrict any set of protocols in
+a sandboxed process.
+
+Closes: https://github.com/landlock-lsm/linux/issues/6
+
+Motivation
+==========
+Landlock implements the `LANDLOCK_RULE_NET_PORT` rule type, which provides
+fine-grained control of actions for a specific protocol. Any action or
+protocol that is not supported by this rule can not be controlled. As a
+result, protocols for which fine-grained control is not supported can be
+used in a sandboxed system and lead to vulnerabilities or unexpected
+behavior.
+
+Controlling the protocols used will allow to use only those that are
+necessary for the system and/or which have fine-grained Landlock control
+through others types of rules (e.g. TCP bind/connect control with
+`LANDLOCK_RULE_NET_PORT`, UNIX bind control with
+`LANDLOCK_RULE_PATH_BENEATH`).
+
+Consider following examples:
+* Server may want to use only TCP sockets for which there is fine-grained
+  control of bind(2) and connect(2) actions [1].
+* System that does not need a network or that may want to disable network
+  for security reasons (e.g. [2]) can achieve this by restricting the use
+  of all possible protocols.
+
+[1] https://lore.kernel.org/all/ZJvy2SViorgc+cZI@google.com/
+[2] https://cr.yp.to/unix/disablenetwork.html
+
+Implementation
+==============
+This patchset adds control over the protocols used by implementing a
+restriction of socket creation. This is possible thanks to the new type
+of rule - `LANDLOCK_RULE_SOCKET`, that allows to restrict actions on
+sockets, and a new access right - `LANDLOCK_ACCESS_SOCKET_CREATE`, that
+corresponds to user space sockets creation. The key in this rule
+corresponds to communication protocol signature from socket(2) syscall.
+
+The right to create a socket is checked in the LSM hook which is called
+in the __sock_create method. The following user space operations are
+subject to this check: socket(2), socketpair(2), io_uring(7).
+
+`LANDLOCK_ACCESS_SOCKET_CREATE` does not restrict socket creation
+performed by accept(2), because created socket is used for messaging
+between already existing endpoints.
+
+Design discussion
+===================
+1. Should `SCTP_SOCKOPT_PEELOFF` and socketpair(2) be restricted?
+
+SCTP socket can be connected to a multiple endpoints (one-to-many
+relation). Calling setsockopt(2) on such socket with option
+`SCTP_SOCKOPT_PEELOFF` detaches one of existing connections to a separate
+UDP socket. This detach is currently restrictable.
+
+Same applies for the socketpair(2) syscall. It was noted that denying
+usage of socketpair(2) in sandboxed environment may be not meaninful [1].
+
+Currently both operations use general socket interface to create sockets.
+Therefore it's not possible to distinguish between socket(2) and those
+operations inside security_socket_create LSM hook which is currently
+used for protocols restriction. Providing such separation may require
+changes in socket layer (eg. in __sock_create) interface which may not be
+acceptable.
+
+[1] https://lore.kernel.org/all/ZurZ7nuRRl0Zf2iM@google.com/
+
+Code coverage
+=============
+Code coverage(gcov) report with the launch of all the landlock selftests:
+* security/landlock:
+lines......: 94.0% (1200 of 1276 lines)
+functions..: 95.0% (134 of 141 functions)
+
+* security/landlock/socket.c:
+lines......: 100.0% (56 of 56 lines)
+functions..: 100.0% (5 of 5 functions)
+
+Currently landlock-test-tools fails on mini.kernel_socket test due to lack
+of SMC protocol support.
+
+General changes v3->v4
+======================
+* Implementation
+  * Adds protocol field to landlock_socket_attr.
+  * Adds protocol masks support via wildcards values in
+    landlock_socket_attr.
+  * Changes LSM hook used from socket_post_create to socket_create.
+  * Changes protocol ranges acceptable by socket rules.
+  * Adds audit support.
+  * Changes ABI version to 8.
+* Tests
+  * Adds 5 new tests:
+    * mini.rule_with_wildcard, protocol_wildcard.access,
+      mini.ruleset_with_wildcards_overlap:
+      verify rulesets containing rules with wildcard values.
+    * tcp_protocol.alias_restriction: verify that Landlock doesn't
+      perform protocol mappings.
+    * audit.socket_create: tests audit denial logging.
+  * Squashes tests corresponding to Landlock rule adding to a single commit.
+* Documentation
+  * Refactors Documentation/userspace-api/landlock.rst.
+* Commits
+  * Rebases on mic-next.
+  * Refactors commits.
+
+Previous versions
+=================
+v3: https://lore.kernel.org/all/20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com/
+v2: https://lore.kernel.org/all/20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com/
+v1: https://lore.kernel.org/all/20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com/
+
+Mikhail Ivanov (19):
+  landlock: Support socket access-control
+  selftests/landlock: Test creating a ruleset with unknown access
+  selftests/landlock: Test adding a socket rule
+  selftests/landlock: Testing adding rule with wildcard value
+  selftests/landlock: Test acceptable ranges of socket rule key
+  landlock: Add hook on socket creation
+  selftests/landlock: Test basic socket restriction
+  selftests/landlock: Test network stack error code consistency
+  selftests/landlock: Test overlapped rulesets with rules of protocol
+    ranges
+  selftests/landlock: Test that kernel space sockets are not restricted
+  selftests/landlock: Test protocol mappings
+  selftests/landlock: Test socketpair(2) restriction
+  selftests/landlock: Test SCTP peeloff restriction
+  selftests/landlock: Test that accept(2) is not restricted
+  lsm: Support logging socket common data
+  landlock: Log socket creation denials
+  selftests/landlock: Test socket creation denial log for audit
+  samples/landlock: Support socket protocol restrictions
+  landlock: Document socket rule type support
+
+ Documentation/userspace-api/landlock.rst      |   48 +-
+ include/linux/lsm_audit.h                     |    8 +
+ include/uapi/linux/landlock.h                 |   60 +-
+ samples/landlock/sandboxer.c                  |  118 +-
+ security/landlock/Makefile                    |    2 +-
+ security/landlock/access.h                    |    3 +
+ security/landlock/audit.c                     |   12 +
+ security/landlock/audit.h                     |    1 +
+ security/landlock/limits.h                    |    4 +
+ security/landlock/ruleset.c                   |   37 +-
+ security/landlock/ruleset.h                   |   46 +-
+ security/landlock/setup.c                     |    2 +
+ security/landlock/socket.c                    |  198 +++
+ security/landlock/socket.h                    |   20 +
+ security/landlock/syscalls.c                  |   61 +-
+ security/lsm_audit.c                          |    4 +
+ tools/testing/selftests/landlock/base_test.c  |    2 +-
+ tools/testing/selftests/landlock/common.h     |   14 +
+ tools/testing/selftests/landlock/config       |   47 +
+ tools/testing/selftests/landlock/net_test.c   |   11 -
+ .../selftests/landlock/protocols_define.h     |  169 +++
+ .../testing/selftests/landlock/socket_test.c  | 1169 +++++++++++++++++
+ 22 files changed, 1990 insertions(+), 46 deletions(-)
+ create mode 100644 security/landlock/socket.c
+ create mode 100644 security/landlock/socket.h
+ create mode 100644 tools/testing/selftests/landlock/protocols_define.h
+ create mode 100644 tools/testing/selftests/landlock/socket_test.c
+
+
+base-commit: 6dde339a3df80a57ac3d780d8cfc14d9262e2acd
+-- 
+2.34.1
+
 
