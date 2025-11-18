@@ -1,142 +1,111 @@
-Return-Path: <netdev+bounces-239514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF5CBC69082
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 12:18:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8652CC690D7
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 12:24:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id B6F9F2AD51
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:18:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 8BCD92AEA4
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:24:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB38A3254AB;
-	Tue, 18 Nov 2025 11:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jhYjBCC+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC79D34FF5B;
+	Tue, 18 Nov 2025 11:24:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33E934B410
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 11:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA81C1EB9FA
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 11:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763464691; cv=none; b=lY2hpA/yvHUbK0clSWrG87eWw90bC5d8c8F2nvdDz7mOVM7YZB26NW4zYchMTJmnPwvn4NqbKw5bee+ZcSq1PcQecv9oE/U/3zBt+QhJwyUM0ZxZcquMfE0Sq/YcMIaVvOAfhLnjb7J3bagC2GlpJgP4V6vnsy1EGlthD7UvwBU=
+	t=1763465058; cv=none; b=l7JWVUcBDNoVy7D2oX67g24cvm03rrUM5DfakVMg25p5/t8HzOyvwYX87wU86Ciev4ecoSMmVevgs7/C5nCukdOQfpl5chxRkYfHsHJcda0ZnwA6FBxBdq7td/e4tkO6u0X/GOuXmxOpxRYkq09SpKbsaNvf+jNltmFMEGGqOPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763464691; c=relaxed/simple;
-	bh=QRHp+DsGTm8b5PvkICjRrpHlNWDxvoVOz4LnUfqhxVU=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=Y45blLjc53ZOEMm+1lsT8/DwfrY7wsyOWAVEJQfO1kNty9kw9iTX7TeVY8xuG6IgOy6vlYB90M62KHu5YSHQOmZ8B+qM3KQPVlotW9aZbGzbPkimvHy+kC7OFCbE9fKVRKEcnLWIGVuEyqsFyiGVJz3zzNUaNlHsYp0ou+hPGlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jhYjBCC+; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Gw2RAS9z2/AKPOpj9C3KeuA6m32UimKQaTe/G+VHdaE=; b=jhYjBCC+RZJsFwpImZv35aSNd7
-	7DgFCeD6yzUJOdWGMUH+2zB3A1lOU7gmkGVDf0PLk/Fn5vUunP7N/SRT4cjW9yixxIc/YHxAQpqhX
-	zr1XCrRxmhT+2dQZspqPSWGGt5hC6OHdBdyJRS7swVA8zBSXT1KpMFgi4pOAjrTxumlQTcWWZTAh1
-	JJnWfV3ujDvz4SMtsmO1C2Whk9wRc6TxhmWT13xGDDn7p2Ah1h88fMTughel8iUPB+fkv8Dr2OAzX
-	CombRCgVYXTyWhvpsLVVlyw/DfKBYdxgdn3yq5dv7houpuLPfe05MUii9U2woqG34NzAwzaU7iyn1
-	Yib9ydsQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:57464 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vLJik-0000000039I-2tXE;
-	Tue, 18 Nov 2025 11:18:02 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vLJij-0000000ExKZ-3C9s;
-	Tue, 18 Nov 2025 11:18:01 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: stmmac: dwc-qos-eth: simplify switch() in
- dwc_eth_dwmac_config_dt()
+	s=arc-20240116; t=1763465058; c=relaxed/simple;
+	bh=999gxEadfInHHFzeuTbM4HIE2zWKbMryG1bMU6PnHPI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RfI+hfE+rotLnOmYCuvWEODAz+4R7Wkna1+27cur2m/EjaCmQpY172Sg3y9MH3+viRyloTi65sGT+jcuiHRK+r3svsxuAYUg8kVHJSVFcJ7aJ4NHDT/w5qU/cZxW6pp31wjz2ln3AR+H2JI1O+jAweLUj7AOcEYQmsgN9KQU49M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d9j0X6PDgzJ46mw
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 19:23:24 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0F3DA1402F3
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 19:24:07 +0800 (CST)
+Received: from huawei-ThinkCentre-M920t.huawei.com (10.123.122.223) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 18 Nov 2025 14:24:06 +0300
+From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+To: <netdev@vger.kernel.org>
+CC: <andrey.bokhanko@huawei.com>, <edumazet@google.com>, Dmitry Skorodumov
+	<skorodumov.dmitry@huawei.com>
+Subject: [PATCH v2 iproute2-next 1/1] Support l2macnat in ip util
+Date: Tue, 18 Nov 2025 14:23:47 +0300
+Message-ID: <20251118112347.2967577-1-skorodumov.dmitry@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vLJij-0000000ExKZ-3C9s@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 18 Nov 2025 11:18:01 +0000
+Content-Type: text/plain
+X-ClientProxiedBy: mscpeml500003.china.huawei.com (7.188.49.51) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
-Simplify the the switch() statement in dwc_eth_dwmac_config_dt().
-Although this is not speed-critical, simplifying it can make it more
-readable. This also drastically improves the code emitted by the
-compiler.
-
-On aarch64, with the original code, the compiler loads registers with
-every possible value, and then has a tree of test-and-branch statements
-to work out which register to store. With the simplified code, the
-compiler can load a register with '4' and shift it appropriately.
-
-This shrinks the text size on aarch64 from 4289 bytes to 4153 bytes,
-a reduction of 3%.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
 ---
- .../stmicro/stmmac/dwmac-dwc-qos-eth.c        | 26 +++----------------
- 1 file changed, 3 insertions(+), 23 deletions(-)
+ include/uapi/linux/if_link.h | 1 +
+ ip/iplink_ipvlan.c           | 7 +++++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-index c7cd6497d42d..e6d5893c5905 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-@@ -84,29 +84,9 @@ static int dwc_eth_dwmac_config_dt(struct platform_device *pdev,
- 	device_property_read_u32(dev, "snps,burst-map", &burst_map);
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index d05f5cc7..ec79f246 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -1267,6 +1267,7 @@ enum ipvlan_mode {
+ 	IPVLAN_MODE_L2 = 0,
+ 	IPVLAN_MODE_L3,
+ 	IPVLAN_MODE_L3S,
++	IPVLAN_MODE_L2_MACNAT,
+ 	IPVLAN_MODE_MAX
+ };
  
- 	/* converts burst-map bitmask to burst array */
--	for (bit_index = 0; bit_index < 7; bit_index++) {
--		if (burst_map & (1 << bit_index)) {
--			switch (bit_index) {
--			case 0:
--			plat_dat->axi->axi_blen[a_index] = 4; break;
--			case 1:
--			plat_dat->axi->axi_blen[a_index] = 8; break;
--			case 2:
--			plat_dat->axi->axi_blen[a_index] = 16; break;
--			case 3:
--			plat_dat->axi->axi_blen[a_index] = 32; break;
--			case 4:
--			plat_dat->axi->axi_blen[a_index] = 64; break;
--			case 5:
--			plat_dat->axi->axi_blen[a_index] = 128; break;
--			case 6:
--			plat_dat->axi->axi_blen[a_index] = 256; break;
--			default:
--			break;
--			}
--			a_index++;
--		}
--	}
-+	for (bit_index = 0; bit_index < 7; bit_index++)
-+		if (burst_map & (1 << bit_index))
-+			plat_dat->axi->axi_blen[a_index++] = 4 << bit_index;
+diff --git a/ip/iplink_ipvlan.c b/ip/iplink_ipvlan.c
+index f29fa4f9..df2c1aa4 100644
+--- a/ip/iplink_ipvlan.c
++++ b/ip/iplink_ipvlan.c
+@@ -19,7 +19,7 @@ static void print_explain(struct link_util *lu, FILE *f)
+ 	fprintf(f,
+ 		"Usage: ... %s [ mode MODE ] [ FLAGS ]\n"
+ 		"\n"
+-		"MODE: l3 | l3s | l2\n"
++		"MODE: l3 | l3s | l2 | l2macnat\n"
+ 		"FLAGS: bridge | private | vepa\n"
+ 		"(first values are the defaults if nothing is specified).\n",
+ 		lu->id);
+@@ -39,12 +39,15 @@ static int ipvlan_parse_opt(struct link_util *lu, int argc, char **argv,
  
- 	/* dwc-qos needs GMAC4, AAL, TSO and PMT */
- 	plat_dat->core_type = DWMAC_CORE_GMAC4;
+ 			if (strcmp(*argv, "l2") == 0)
+ 				mode = IPVLAN_MODE_L2;
++			else if (strcmp(*argv, "l2macnat") == 0)
++				mode = IPVLAN_MODE_L2_MACNAT;
+ 			else if (strcmp(*argv, "l3") == 0)
+ 				mode = IPVLAN_MODE_L3;
+ 			else if (strcmp(*argv, "l3s") == 0)
+ 				mode = IPVLAN_MODE_L3S;
+ 			else {
+-				fprintf(stderr, "Error: argument of \"mode\" must be either \"l2\", \"l3\" or \"l3s\"\n");
++				fprintf(stderr, "Error: argument of \"mode\" must be either "
++					"\"l2\", \"l2macnat\", \"l3\" or \"l3s\"\n");
+ 				return -1;
+ 			}
+ 			addattr16(n, 1024, IFLA_IPVLAN_MODE, mode);
 -- 
-2.47.3
+2.25.1
 
 
