@@ -1,98 +1,98 @@
-Return-Path: <netdev+bounces-239642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9D80C6ACBB
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 18:04:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 791A4C6AC51
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:57:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 02A334E9CF6
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 16:57:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 3083E2C158
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 16:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66FA368289;
-	Tue, 18 Nov 2025 16:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE48C35F8A6;
+	Tue, 18 Nov 2025 16:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VCZDGjzI"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hTMa+WRI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C8133C50B
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 16:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609EE33C50B;
+	Tue, 18 Nov 2025 16:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763485017; cv=none; b=kbC5CSvI8tUjlPCSM27SquAA0gwGjoQO8C5QQZxvPyS1HSwnEDhVrKaQn/iqdy+hwy6GiDllrXurGCT7XWPjmXpu0uWzG59S+t2s3N0OIqaYIZsZdCSsHwWVvFKTBXxvzIe2XzAlorHvMFauPpP+Z8awtimPeH18gCLeYcI/k4o=
+	t=1763485071; cv=none; b=QisAcwO1ttHJ05Y6d+gJP26XZhJEVTQ6SZo5jH+iNSeozEggUPL2qvehduU7GawHOms7vM2K4msiBW5H0g3t3XU2I0qN2rHNXd7H1K1jMP/pC3XQGi11E/mFDsLlyoLXjecW28A4p3qxXaI8iIm1McyE0sBlCwh6Z3Tj2fVvn4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763485017; c=relaxed/simple;
-	bh=5V7GiE6xtZks7l89G9tTxWFWQSrdthsihabtJ0mENe4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b5OyHUAlpalFhhe/V2wvIO8MSzlx7F2a7STPgSdzzf7cCuiOL9dUr3EePjkr/GWlHWnBk/bSjPKj4l0S62I+HFWe5yBRxuJLkTZG2JwKetA1HGDBYPUpNQNtMFQAlFNXr8jsEcu2Yc9DF7ber3ikCAIdPSe09/VxqBd8IjlTRoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VCZDGjzI; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-640b0639dabso10065070a12.3
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 08:56:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763485015; x=1764089815; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5V7GiE6xtZks7l89G9tTxWFWQSrdthsihabtJ0mENe4=;
-        b=VCZDGjzI6OOU24B1aEZXcWyEOZ8AbwrSJXAQaiCrSfMv1IdYDwcA+v+7sVzaEzWf0g
-         7EXNWhSQ9tQO4FxnBy6e/L6i7flybanqTadvEVxLwSGi/F3IBFSHK/FaFsPU2iyLwkXq
-         Kdob2qyE9gShed3svdb7bjHz9obAH9okCZYIj5/GaQEHLkbqPT+HFE4uaGy+U+dSEwJ3
-         gFbvyoTRUoTnUiDLWoIeasEeMGMZ+K5QacQSS7JjQ0LFnXyCw7eRAOroFp1evd3+3ET1
-         UbcoGV3k4JX0hlklKAL0UpWDo/ESM4DNFMbxgPMl2Cb4g0JZegMlaeEsuQwABJIRjmtg
-         wJHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763485015; x=1764089815;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5V7GiE6xtZks7l89G9tTxWFWQSrdthsihabtJ0mENe4=;
-        b=d+9g6ddp58+ekloaYNJaefh7XNprSEC4TOol+0vWZD9+hpb8zRQlRnMzBo2T1S41Tf
-         yllCZvu9pvuBg3pjN2k2u04ywRyTOS/R1gx0GA6+wA5YtfEVpCh0Za0fGS653ArC9qqt
-         gqYQlpNSzbyFkTScWMDsyVMjlz2kWHUb19VW+K2h1SzrYr6QX3QFyQjKHVtJvytRkdMj
-         1xNbsAphh3N2tiZfeotQ5ud5qQ0k4UmosB1WjlXx0358epIgo7djupK80aN9ehfrmMfX
-         +W9hzM+qYTNavposCXnkZteHMEH3Q9L2gduLPcKPXKxzq1p9MfWzVFI69OhcPnZHHYQg
-         nWeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURWfYt4tokA8jeXrVoZ5EYKKj5QkjXt20ekrkKTeeJoUHI7aEY/mVnvlZ1QVlM5kwdxNphk1U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpaBDJXl5gcnETe8+wkZYa2sC0o8DmLc8fH5ZwCAnU61gkHZKm
-	DG/OKR6386BTtb5YyBJ+SN6bP5QZOwUKCM2MDPPWiYCINLL87Dkc+I1tSMG12TLDokJmG/fhCtt
-	VticQErDSPUFPcGwbX3jxHfuZdnXgYkA=
-X-Gm-Gg: ASbGnctK/Z+4aEh/1dsqbj+ztJtEUFVT8Hp2rG/FrTqNTY0XqbzExvbnixBsyFaNIDN
-	fGBKTFd9u6yk7F/q/FPzE0C/QXTNcq2lLkKFGwMCpK2gIxnzp1v7laGqs6jIaEmdBWQIOFzacPq
-	bicu8i7HKNIPr1V8XXgawuq7GKROGH1PhaGOW9NBl4hQXaNpoQUaxNgWrd42Cujvz6qqkYk7lwx
-	Dhmbn6EAapdYf30Je8hOrB2RpQuT/5haLyPd23A8sD1jbt/4UOE66vFFObgaoyNrC9faKLI35ug
-	F+h1i80=
-X-Google-Smtp-Source: AGHT+IFs1ML/yGQuC8YS4/Iv0wOMlGo1jVem3rfZFTTCm2g0aNVw9IUXkatjMzTKAnormtovEcs5dn1ta7eT+xhuG8Q=
-X-Received: by 2002:a05:6402:2111:b0:641:3d64:b120 with SMTP id
- 4fb4d7f45d1cf-64350e89f50mr14361293a12.18.1763485014376; Tue, 18 Nov 2025
- 08:56:54 -0800 (PST)
+	s=arc-20240116; t=1763485071; c=relaxed/simple;
+	bh=UDriwsuBnjOEywQCrQ4A0kzuvLtrMAbcXfVnxRTqH1I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CmqMZIOAG3s0vbLgry1kb9oVAMz1FetsFTXo5hT+9+NTBAvJ9IgvK50xCM61AeOjkPB8rhCJxAtaToo4TUAExPQBkOqDkD+rlb6qddHnNS5ShuRv28RsKrKmwpdcR2goP4JaRZVHec9iXl8dywI4N2uG6lB9c36AK2ICn2Pb/iQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=hTMa+WRI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F664C4AF0D;
+	Tue, 18 Nov 2025 16:57:49 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hTMa+WRI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1763485066;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iCqeKRErpiskaDWQgypPBD6vSuFTsdUlVUEfCgLg8Mo=;
+	b=hTMa+WRIqJn+KqsV9hq0rMuRNCkEFOC6MeFEj4ufcRXPcrDrMrQG+QmYLDiNcAr/duaSKl
+	7PxmvcngaHQ7gESt59AdM04add+IRDxafgsfu0vDYrP5rwTREkgRvpjaPT9P2oo/LW5OU2
+	k7dBtaphmHtiVcA8mfvWd+ssMZOCAgE=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 81180c79 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 18 Nov 2025 16:57:46 +0000 (UTC)
+Date: Tue, 18 Nov 2025 17:57:41 +0100
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: =?utf-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jordan Rife <jordan@jrife.io>
+Subject: Re: [PATCH net-next v3 11/11] wireguard: netlink: generate netlink
+ code
+Message-ID: <aRylhXuvGb2s5KHi@zx2c4.com>
+References: <20251105183223.89913-1-ast@fiberby.net>
+ <20251105183223.89913-12-ast@fiberby.net>
+ <aRyNiLGTbUfjNWCa@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251118164333.24842-1-viswanathiyyappan@gmail.com>
-In-Reply-To: <20251118164333.24842-1-viswanathiyyappan@gmail.com>
-From: I Viswanath <viswanathiyyappan@gmail.com>
-Date: Tue, 18 Nov 2025 22:26:42 +0530
-X-Gm-Features: AWmQ_bl01hvmKDelrUqTiwPIOlLTUnTAKXqeUslzZwhDZ8PPWJwRB4NxkgNyhqM
-Message-ID: <CAPrAcgNSqdo_d2WWG25YBDjFzsE6RR63CBLs9aMwXd8DGiKRew@mail.gmail.com>
-Subject: Re: [RFT net-next v4 0/2] net: Split ndo_set_rx_mode into snapshot
- and deferred write
-To: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, mst@redhat.com, 
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
-	sdf@fomichev.me, kuniyu@google.com, skhawaja@google.com, 
-	aleksander.lobakin@intel.com
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kernel-mentees@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aRyNiLGTbUfjNWCa@zx2c4.com>
 
-Hi,
+On Tue, Nov 18, 2025 at 04:15:20PM +0100, Jason A. Donenfeld wrote:
+> On Wed, Nov 05, 2025 at 06:32:20PM +0000, Asbjørn Sloth Tønnesen wrote:
+> >  drivers/net/wireguard/netlink_gen.c | 77 +++++++++++++++++++++++++++++
+> >  drivers/net/wireguard/netlink_gen.h | 29 +++++++++++
+> >  create mode 100644 drivers/net/wireguard/netlink_gen.c
+> >  create mode 100644 drivers/net/wireguard/netlink_gen.h
+> > +#include "netlink_gen.h"
+> > +// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
+> > +/* Do not edit directly, auto-generated from: */
+> > +/*	Documentation/netlink/specs/wireguard.yaml */
+> > +/* YNL-GEN kernel source */
+> 
+> Similar to what's happening in the tools/ynl/samples build system,
+> instead of statically generating this, can you have this be generated at
+> build time, and placed into a generated/ folder that doesn't get checked
+> into git? I don't see the purpose of having to manually keep this in
+> check?
 
-I am sorry that it is broken. I will submit a v5 as soon as possible
+Grep, for example, for PERLASM in the lib/crypto code. There's certainly
+precedent for doing this.
 
