@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-239296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB9FC66ACF
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:40:18 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ECD4C66AD2
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:40:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id B2F4728EA1
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:40:17 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0426335F0FE
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011082EC081;
-	Tue, 18 Nov 2025 00:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0174F2F28E3;
+	Tue, 18 Nov 2025 00:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KlYR5kMG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U3mDrtMy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520EA1A3164
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343322E3360
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763426409; cv=none; b=KyoLA3FUlwGoZ38XrN8iNgvOs1QjxckoOSedhH1bh8LsIPhkAclP3E+iMd1ZH4CkSXuF+faI5IyM6duQ2HXF8OYXHwIKUFAWndjn2qzAwc706g6ne7rsq/hTM+71KqoyLl4tIe+3tuRCboEPL0b5estvyuOdQk9ay0kVFJcg6gI=
+	t=1763426410; cv=none; b=kSyj4YY/Qlmw8CiqCoFO1dTntqYIkEKVVj06iXTnsu/Fk6XgEaGxON3fdjxOnP8cgQJEYyX8gP9USmW2h+a3Srck+CtlcU+6SF0q2267lnt/ajqzVFTkZFUNVkZqxl6EmFRBaKrNWXn8M2hfd5LFbDk1l/QcIt4xnaxQCItJ2BI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763426409; c=relaxed/simple;
-	bh=rbvKxkilGhW4hC5ITJRR1qWxAH0KtfJOgfRVxhMbNTs=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=akyHJG6Kx5LckFFKADgE5YEIrvOq9n+U71nyyMGcMwQM/zzhfvu50/w5oArHOSAtHH/FNoeyLTGa/SrVoNCfTGP+mHN627b4UR4H0xNIhXajm6zb1wulgyQ7pfdfnePnUkT/9/DnCc8wwKHceaS7Iyq9OwUfjVw8oEjVLLJ/FFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KlYR5kMG; arc=none smtp.client-ip=209.85.128.176
+	s=arc-20240116; t=1763426410; c=relaxed/simple;
+	bh=y+Fg+3L9RF2YR/K2UiohBXziJJEMw+aPd6361OSWSY0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=aTpM0OIJVttJjUnNX/WQLEJh/dYIZQyTWBzFZBJ5PePTY6K5ksPcnl0HoOUaFc5lyQLZxyglamOlvHH9zVve7VAJztSCPcFGN09jzx0Tq9eeufWFT34fG1LYJwuy9PPwWtBK8IeP+V5di2Y+TigEQ6pGA4AT3Y/NCoOtYDOC4Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U3mDrtMy; arc=none smtp.client-ip=74.125.224.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-78665368a5cso47919917b3.3
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:40:06 -0800 (PST)
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-64107188baeso4459252d50.3
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:40:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763426405; x=1764031205; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QovSHzxOHHSJ1JTS/nieXeRhebq2+8AYH6v3fDX79E8=;
-        b=KlYR5kMGFQ5UdgBnTFGRUhPZP2Bn8x5HK8JmSnVFln3rqITOwJk13TwCsKfJpj9P+q
-         6kjtBtwn10Di9eYiMm8jTmy3+yFf9NzfAW580G32WIFAlmS/PlE4eJqh5ZG5ohjpNRTM
-         npTitob1i4CrNcA/9yHtRLJM0h/dDY57YRPZ6mNiJjXP8o2A2877TOzjedyIn8vGa6aE
-         jZmD07xQdzKyfdt4l6SNIN51ntGUdtJ01lWahD4BpY+7ozI9zjg28i56zT2Sr4btWAcP
-         cONiUmfDmANu6g3h2wrxNMkLn0pSUDHXAk9huubQjDXHAcm75xzzidazXebAm/TMwDWO
-         RwFg==
+        d=gmail.com; s=20230601; t=1763426408; x=1764031208; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uY4jikFbGmNLRBwiaiD17hVuPoDKsjOE0QxnYNS9vGw=;
+        b=U3mDrtMyK2Trb+F5WBWFHUhllT0AFAklJJVnOLSvWDoT/m66LRvH7s3mKwatrEq6h3
+         a+VH5NN2eDiHMOjWvRv6yvNCTgNtENujGm8+06B4SWCUkRrjfn6S5BsMkDu9/UA6W6pk
+         Pii7kukiXOOngqPPjbZkzyn+N1zDwQnVluQNATdCxBjKgnRA5Cb/QiXziFar/gCXeYPd
+         p6KDhOyM3BAX9ymcUzaVgckCx9h/CmWPbXnNPMuCTsYGo53GrSxfG+Iy/c6nzO9JGm7Q
+         LXliO1PV8tXPBiKNLMKPPYJkwr/hV1rZRrr/zC3N24Ou0Bvm92nuaqGqcyoF6CZU22Ev
+         syrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763426405; x=1764031205;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QovSHzxOHHSJ1JTS/nieXeRhebq2+8AYH6v3fDX79E8=;
-        b=LkwIGAQzGyXZXXrPrmTB5WgFZrfbX89ZZgajP2RFKoGkrWvVyrb5xe7JTjKEvPFq6a
-         REi2Bpr3si0gDnTeImIOBLJWa8Uly18qoRfCYcLuJx4pn6ixCH6k27X8saTwf9pQeBuq
-         eT4s4IjuLfT3uKL1DgPO6+mjBkm70BU0PYq0Xg0SQdo18jXhrDO4I2xCoQBWTueJB98a
-         /76p2Fip1LnjgMEqfQYXw1JudDw5NOQP0ZwowBRTFV4219qAkpejjVrWBjs0H5ANk1vz
-         B219N1JyJFqp5MfabyNlAJI2uA0hquDB5eSGjMEJCe2sR5K7poZ/lYg180enBe6FXQY4
-         pBEg==
-X-Gm-Message-State: AOJu0Yx61dMLnbcTO5fCDhVC2Un76j2wDxdgAHDp70tQY8/Me6I2jgPY
-	Jt63tA1y7uc2R3s5pNT+x8LN1eA2cu8TDZeXB7Dtgi5fqLcYjQWybs1NHcygpQ==
-X-Gm-Gg: ASbGncv9d5R+bm5mAlok3XFO5JACB3Be3ibyiXIyXd9jAXgdhDBmX2XACK6f0cvqw6G
-	br1DadhnOKVnXc2nf45wrhJAdUFcLExA7rCffo6j3A2rK0NUBKxRQ72WL+6Qx9ZgXY0kICtn0Aj
-	l+ydtTQ7e34IwrVo8XtJR98LhxPfN1swdK/itRZYGTMPGfIGQdX4PkbjjH1rZYfmnH3dssfdpEC
-	IkTaMFxD+oRp4Uibz3kM+/ewj+J4DhRqp+ZZnYG9nL+WZf7lh1ci0SXAcgA5pvJ0PwDfEu/Y0UP
-	HI/bmXf5AqJ+l7XtXoUd2SvrHMc+9+jofyBsfdbCYfDZJA5m4Q42chvIplzeJRA5/CZDeLjDzT4
-	hy3zFZyoqaYXUfv5VoQK0cFXFccIOB1xl514Fvvngwu7noxnwBwmLDLEcHBLS6233sG09lX548R
-	cYpiR5My5GS+jBO/juopo=
-X-Google-Smtp-Source: AGHT+IGBzqQKTrsf8NsBEcYrKccimGPtuqkmtrDGofYMFyDNH4JXRIC+Ur/MfZ8VDrQbXd0a58/Guw==
-X-Received: by 2002:a05:690c:a657:b0:787:e9f8:1869 with SMTP id 00721157ae682-78929e25fa7mr88947687b3.10.1763426404896;
-        Mon, 17 Nov 2025 16:40:04 -0800 (PST)
-Received: from localhost ([2a03:2880:25ff:1::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-788221781e9sm47537627b3.52.2025.11.17.16.40.02
+        d=1e100.net; s=20230601; t=1763426408; x=1764031208;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uY4jikFbGmNLRBwiaiD17hVuPoDKsjOE0QxnYNS9vGw=;
+        b=pcZZuaB0fC3oQUwRbSyWxr30YdQuiakwRYapVAEuA34wvhUiZ7S96jM/Pih8H5nOW9
+         WjRd6CnXhu45MDITy4LS27KgcOefA0F48BVSS3Vq02dBDDHJzsl4hoomWCPv/pxbAhqm
+         cIWK7xFC4Q+DU6/sZcC4v9oTw+zMjVUe3Rb2w9M98NhfQW2tvAfbp8NonkUUem/uiV59
+         LcO2sBtbyIcai8Mr7FDCxrAS3DvVWy0FDjbbX6BUlS+8C+5di65bsB9lxBG2rD9bvx8H
+         hsfvRhUFN1W8ST1ccIaXV9YEvCdUCI6XDCuAHnXKAZVaRq4QjJEG3RmzZq/BW2mkHdA+
+         MSLA==
+X-Gm-Message-State: AOJu0YzofUTy/pNKFyUpHv/yehOIbDle2TDVrwAbu/elbohpNpLipvNM
+	GJIev/o25rmdlrEBLVDDJxcL8dSKY8bxMYoilGtsPMagHuLxHJQZrJV3R4cuBw==
+X-Gm-Gg: ASbGncvDtNinTJqxf4Z2R0vkK0JY6bnkFNyagak3r/+N9Id5gJ1emaUwDLF70uopXo2
+	F/++80jjaS2Pl11P0ZNRwi9d/NnQiKlLwcm1Ddz6fuwdvpppTc+DhNqpVBg9o3iC6nmfuGGdf0q
+	suWSOlAiJTE/YywYM5h/Bl/4ynyAy2sl4v12YfJrOhko9s4S4jgpwy6AU21z8ur50646VmCqlg3
+	W3akMHTV8GpUyqpkylTICcILXdbhj9MxDm0ZHkL8UK9X+Qop9b180HgMn1isOb/kKamys7d1Dz7
+	Qn+4wCWjtQyHXF3kSLYKeisPcdwi7FsAzgVmsFpxbmt94uVVu/hlee90Y4TRrRo5SVMe2Q8pzom
+	Qr+FB3vHQKFBP9Ms2Q/CfZgVpKi750Lvx8ckVJ96IhVSaMt+nK36Y0i9tYlR64ndfrx13Z4Df+2
+	DVcExVQpXVcNLz/ObvwGQI
+X-Google-Smtp-Source: AGHT+IGZ0/dLzweo8Pfr0VK+bb19fRxT+wan9dWkMGpcRAVGw0ETLPlIBSCHDMu95LgYEngrhg+Zew==
+X-Received: by 2002:a05:690e:428a:20b0:63f:bd67:7c5a with SMTP id 956f58d0204a3-641e7605cfcmr9418029d50.41.1763426407727;
+        Mon, 17 Nov 2025 16:40:07 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:59::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-788221222c1sm47366427b3.28.2025.11.17.16.40.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 16:40:03 -0800 (PST)
+        Mon, 17 Nov 2025 16:40:05 -0800 (PST)
 From: Daniel Zahka <daniel.zahka@gmail.com>
-Subject: [PATCH iproute2-next 0/2] devlink: support default flag attr for
- param-get and param-set commands
-Date: Mon, 17 Nov 2025 16:40:01 -0800
-Message-Id: <20251117-param-defaults-v1-0-c99604175d09@gmail.com>
+Date: Mon, 17 Nov 2025 16:40:02 -0800
+Subject: [PATCH iproute2-next 1/2] devlink: Pull the value printing logic
+ out of pr_out_param_value()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,9 +85,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAGHAG2kC/x3MQQqEMAxA0atI1gamAZXxKuKi2nQmoLWkVQTx7
- haXb/H/BYlVOEFfXaB8SJItFJi6gvlvw49RXDHQhxpjDGG0ald07O2+5ISu+7beu6npaIISRWU
- v5zscQKJue2bCwGeG8b4fCi1hkm8AAAA=
+Message-Id: <20251117-param-defaults-v1-1-c99604175d09@gmail.com>
+References: <20251117-param-defaults-v1-0-c99604175d09@gmail.com>
+In-Reply-To: <20251117-param-defaults-v1-0-c99604175d09@gmail.com>
 To: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
  Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
@@ -95,55 +96,154 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Daniel Zahka <daniel.zahka@gmail.com>
 X-Mailer: b4 0.13.0
 
-Add cli support for default param values introduced in the
-accompanying kerenl series [1]. Here is some sample usage:
-
-[1]: https://lore.kernel.org/netdev/20251118002433.332272-1-daniel.zahka@gmail.com/
-
- # dump params with defaults
-./devlink dev param show pci/0000:01:00.0
-pci/0000:01:00.0:
-  name max_macs type generic
-    values:
-      cmode driverinit value 128 default 128
-...
-  name swp_l4_csum_mode type driver-specific
-    values:
-      cmode permanent value default default default
-
-  # set to l4_only
-./devlink dev param set pci/0000:01:00.0 name swp_l4_csum_mode value l4_only cmode permanent
-./devlink dev param show pci/0000:01:00.0 name swp_l4_csum_mode
-pci/0000:01:00.0:
-  name swp_l4_csum_mode type driver-specific
-    values:
-      cmode permanent value l4_only default default
-
-  # reset to default
-./devlink dev param set pci/0000:01:00.0 name swp_l4_csum_mode default cmode permanent
-./devlink dev param show pci/0000:01:00.0 name swp_l4_csum_mode
-pci/0000:01:00.0:
-  name swp_l4_csum_mode type driver-specific
-    values:
-      cmode permanent value default default default
+Split the type demux and value print out of pr_out_param_value() into
+a new function pr_out_param_value_print(). This new function can be
+re-used for printing additional kinds of values e.g., a default value
+reported by the kernel.
 
 Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
-Daniel Zahka (2):
-      devlink: Pull the value printing logic out of pr_out_param_value()
-      devlink: support displaying and resetting to default params
+ devlink/devlink.c | 88 ++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 54 insertions(+), 34 deletions(-)
 
- devlink/devlink.c            | 165 ++++++++++++++++++++++++++++++++-----------
- include/uapi/linux/devlink.h |   3 +
- man/man8/devlink-dev.8       |  22 +++++-
- man/man8/devlink-port.8      |  20 +++++-
- 4 files changed, 167 insertions(+), 43 deletions(-)
----
-base-commit: da3525408f9607f1e7e41984c034d7e349317a3b
-change-id: 20251112-param-defaults-d796ffdb572b
+diff --git a/devlink/devlink.c b/devlink/devlink.c
+index fd9fac21..e1612b77 100644
+--- a/devlink/devlink.c
++++ b/devlink/devlink.c
+@@ -3518,33 +3518,14 @@ static const struct param_val_conv param_val_conv[] = {
+ 
+ #define PARAM_VAL_CONV_LEN ARRAY_SIZE(param_val_conv)
+ 
+-static void pr_out_param_value(struct dl *dl, const char *nla_name,
+-			       int nla_type, struct nlattr *nl)
++static int pr_out_param_value_print(const char *nla_name, int nla_type,
++				     struct nlattr *val_attr, bool conv_exists,
++				     const char *label)
+ {
+-	struct nlattr *nla_value[DEVLINK_ATTR_MAX + 1] = {};
+-	struct nlattr *val_attr;
++	char format_str[32];
+ 	const char *vstr;
+-	bool conv_exists;
+ 	int err;
+ 
+-	err = mnl_attr_parse_nested(nl, attr_cb, nla_value);
+-	if (err != MNL_CB_OK)
+-		return;
+-
+-	if (!nla_value[DEVLINK_ATTR_PARAM_VALUE_CMODE] ||
+-	    (nla_type != MNL_TYPE_FLAG &&
+-	     !nla_value[DEVLINK_ATTR_PARAM_VALUE_DATA]))
+-		return;
+-
+-	check_indent_newline(dl);
+-	print_string(PRINT_ANY, "cmode", "cmode %s",
+-		     param_cmode_name(mnl_attr_get_u8(nla_value[DEVLINK_ATTR_PARAM_VALUE_CMODE])));
+-
+-	val_attr = nla_value[DEVLINK_ATTR_PARAM_VALUE_DATA];
+-
+-	conv_exists = param_val_conv_exists(param_val_conv, PARAM_VAL_CONV_LEN,
+-					    nla_name);
+-
+ 	switch (nla_type) {
+ 	case MNL_TYPE_U8:
+ 		if (conv_exists) {
+@@ -3554,10 +3535,12 @@ static void pr_out_param_value(struct dl *dl, const char *nla_name,
+ 						     mnl_attr_get_u8(val_attr),
+ 						     &vstr);
+ 			if (err)
+-				return;
+-			print_string(PRINT_ANY, "value", " value %s", vstr);
++				return err;
++			snprintf(format_str, sizeof(format_str), " %s %%s", label);
++			print_string(PRINT_ANY, label, format_str, vstr);
+ 		} else {
+-			print_uint(PRINT_ANY, "value", " value %u",
++			snprintf(format_str, sizeof(format_str), " %s %%u", label);
++			print_uint(PRINT_ANY, label, format_str,
+ 				   mnl_attr_get_u8(val_attr));
+ 		}
+ 		break;
+@@ -3569,10 +3552,12 @@ static void pr_out_param_value(struct dl *dl, const char *nla_name,
+ 						     mnl_attr_get_u16(val_attr),
+ 						     &vstr);
+ 			if (err)
+-				return;
+-			print_string(PRINT_ANY, "value", " value %s", vstr);
++				return err;
++			snprintf(format_str, sizeof(format_str), " %s %%s", label);
++			print_string(PRINT_ANY, label, format_str, vstr);
+ 		} else {
+-			print_uint(PRINT_ANY, "value", " value %u",
++			snprintf(format_str, sizeof(format_str), " %s %%u", label);
++			print_uint(PRINT_ANY, label, format_str,
+ 				   mnl_attr_get_u16(val_attr));
+ 		}
+ 		break;
+@@ -3584,21 +3569,56 @@ static void pr_out_param_value(struct dl *dl, const char *nla_name,
+ 						     mnl_attr_get_u32(val_attr),
+ 						     &vstr);
+ 			if (err)
+-				return;
+-			print_string(PRINT_ANY, "value", " value %s", vstr);
++				return err;
++			snprintf(format_str, sizeof(format_str), " %s %%s", label);
++			print_string(PRINT_ANY, label, format_str, vstr);
+ 		} else {
+-			print_uint(PRINT_ANY, "value", " value %u",
++			snprintf(format_str, sizeof(format_str), " %s %%u", label);
++			print_uint(PRINT_ANY, label, format_str,
+ 				   mnl_attr_get_u32(val_attr));
+ 		}
+ 		break;
+ 	case MNL_TYPE_STRING:
+-		print_string(PRINT_ANY, "value", " value %s",
++		snprintf(format_str, sizeof(format_str), " %s %%s", label);
++		print_string(PRINT_ANY, label, format_str,
+ 			     mnl_attr_get_str(val_attr));
+ 		break;
+ 	case MNL_TYPE_FLAG:
+-		print_bool(PRINT_ANY, "value", " value %s", val_attr);
++		snprintf(format_str, sizeof(format_str), " %s %%s", label);
++		print_bool(PRINT_ANY, label, format_str, val_attr);
+ 		break;
+ 	}
++
++	return 0;
++}
++
++static void pr_out_param_value(struct dl *dl, const char *nla_name,
++			       int nla_type, struct nlattr *nl)
++{
++	struct nlattr *nla_value[DEVLINK_ATTR_MAX + 1] = {};
++	struct nlattr *val_attr;
++	bool conv_exists;
++	int err;
++
++	err = mnl_attr_parse_nested(nl, attr_cb, nla_value);
++	if (err != MNL_CB_OK)
++		return;
++
++	if (!nla_value[DEVLINK_ATTR_PARAM_VALUE_CMODE] ||
++	    (nla_type != MNL_TYPE_FLAG &&
++	     !nla_value[DEVLINK_ATTR_PARAM_VALUE_DATA]))
++		return;
++
++	check_indent_newline(dl);
++	print_string(PRINT_ANY, "cmode", "cmode %s",
++		     param_cmode_name(mnl_attr_get_u8(nla_value[DEVLINK_ATTR_PARAM_VALUE_CMODE])));
++
++	val_attr = nla_value[DEVLINK_ATTR_PARAM_VALUE_DATA];
++
++	conv_exists = param_val_conv_exists(param_val_conv, PARAM_VAL_CONV_LEN,
++					    nla_name);
++
++	pr_out_param_value_print(nla_name, nla_type, val_attr, conv_exists, "value");
+ }
+ 
+ static void pr_out_param(struct dl *dl, struct nlattr **tb, bool array,
 
-Best regards,
 -- 
-Daniel Zahka <daniel.zahka@gmail.com>
+2.47.3
 
 
