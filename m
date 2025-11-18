@@ -1,122 +1,95 @@
-Return-Path: <netdev+bounces-239344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA680C67011
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 03:22:43 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EF66C6708C
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 03:35:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 512064ECEF1
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 02:21:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D3D28354164
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 02:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B9E3254BE;
-	Tue, 18 Nov 2025 02:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1461231A32;
+	Tue, 18 Nov 2025 02:34:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ln1TixMs"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ykNXXiDJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30CC3254A2
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 02:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05081A4F3C;
+	Tue, 18 Nov 2025 02:34:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763432505; cv=none; b=i6Zo9YK+FVeANaup7OjfI9HNrMJbMW6WjRVeQruOdV99PQIE2I8pRP7TTzfquBu/fFne6RqsEtzj4v5+UL4x4zHIWYvMrRucpN+5QR+aU9H60wGOGSlRFLozkgHTrQWLMMVEomWPJ11AxhP1+H6IcbmnGjLTaVgMFOqRhM42pHg=
+	t=1763433252; cv=none; b=sD3a2KX63W7dMjocui+MVMM0Hjb0xCN+TREQURR2h8nL5v28gfzyqLGjSGBW7k/x7r6xF7ANletDEh80NZEhcQDfzIWhzWrzppEtPTHbbWe5QFE7TEo+AoY+9MqpQ4wdjll/i/eVLWbzfQSSPLOearWR8+TNx9nUqQCdPXsFS1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763432505; c=relaxed/simple;
-	bh=Dxo6argfOd4gg/MKHqkObtOc3KDfRSBa9IFUE06if1k=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=UqmzBt1IaPg8kN3kerXyZCVZT4qoAb8gQJdfCD6W/6wvyMSp6Qmn0t5ThsAeDw04n9UjWBCa+A1gJi6Df+2TIX5GqR4OUxgpZYjcOzhB/HfgNqUy9I6z/SWLhCre+RK7EBWjMwfvjwOLIMSamuiWR8CmWpVdapSxvDipWwkrkzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ln1TixMs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B62E0C116B1;
-	Tue, 18 Nov 2025 02:21:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763432504;
-	bh=Dxo6argfOd4gg/MKHqkObtOc3KDfRSBa9IFUE06if1k=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=ln1TixMs1IM1Mvse9jG5LEtAfDAHdpx9z7R9e/+6NO5mTKRN0V5j2PsMik1TxXhqz
-	 Gy1dR7SmJd2iuoM2eoIGSV11afSnalPTKaDDOGTiaJ68ED+LGAgRdhrUijFkWDjgcH
-	 LsOfP9Q4+26zX/WoG66cwqAgrw7VWImWjUhpbgXQ6VrM9NYtn7Qi1x5sCGWJhdaLCN
-	 xuy8Mrc0qOzYkWYHq4M7CO0hz8VOAMxn8npU82Upor+ILu5MGuiM0d3UyCPDSNTb6f
-	 J1ZRSIaV8SNiAw4soLM8G5G71BISifP8qZL7lPaEqA+vJ+TSl1xIl67PfzNdJAgrwH
-	 1EC9uFt0wWPig==
-Date: Tue, 18 Nov 2025 03:21:35 +0100 (GMT+01:00)
-From: Matthieu Baerts <matttbe@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jan Stancek <jstancek@redhat.com>,
-	=?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Petr Machata <petrm@nvidia.com>
-Message-ID: <e7aba5b3-d402-4a09-9656-1b96be6efa84@kernel.org>
-In-Reply-To: <aRvIh-Hs6WjPiwdV@fedora>
-References: <20251117024457.3034-1-liuhangbin@gmail.com> <20251117024457.3034-4-liuhangbin@gmail.com> <b3041d17-8191-4039-a307-d7b5fb3ea864@kernel.org> <aRvIh-Hs6WjPiwdV@fedora>
-Subject: Re: [PATCHv5 net-next 3/3] tools: ynl: add YNL test framework
+	s=arc-20240116; t=1763433252; c=relaxed/simple;
+	bh=pBfMKeKI4nK96dld4bpTkIaDfA+Idfe37tvvE+pshSA=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=OHODY99LPANiK2yaxjEkZJ3ztxYS8Q0hhH8Yylgj7/qVTSN9czu4YGEamTiSzllYY4SxSoLRfVd3PvFcq8OXFshp+/RhQsma6Ph0QsbP4KmxUdj/jwmNG+Gd9VQ9BpjQsA00GJKWjpVKFafcwjFELo3T2n2Zo5lS77L1aS0htTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ykNXXiDJ; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=pBfMKeKI4nK96dld4bpTkIaDfA+Idfe37tvvE+pshSA=;
+	b=ykNXXiDJ95tMEXWe26mkupixNihyPKyLKfmKpyxP/ECZ/QxT6iiW0W7jPdb/rNRv7FWwoPmbx
+	9s0HtOC1v8v3FWdDiZDSJsWrFrRZKHK5n/6ydtA3bTzRGzNp1LI1a6rrLYvufBqwS4fux0JxXcL
+	LeoM2MDv1y8HpXiUVACDTXc=
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4d9TD54v9lz12Ldp;
+	Tue, 18 Nov 2025 10:32:37 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 046FD18048A;
+	Tue, 18 Nov 2025 10:34:06 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 18 Nov 2025 10:34:05 +0800
+Message-ID: <327ac0a2-35a7-4bde-aa7b-941bef2a5996@huawei.com>
+Date: Tue, 18 Nov 2025 10:34:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Correlation-ID: <e7aba5b3-d402-4a09-9656-1b96be6efa84@kernel.org>
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<lantao5@huawei.com>, <huangdonghua3@h-partners.com>,
+	<yangshuaisong@h-partners.com>, <jonathan.cameron@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 3/3] net: hibmcge: support pagepool for rx
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20251114092222.2071583-1-shaojijie@huawei.com>
+ <20251114092222.2071583-4-shaojijie@huawei.com>
+ <20251117174957.631e7b40@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20251117174957.631e7b40@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-18 Nov 2025 02:15:08 Hangbin Liu <liuhangbin@gmail.com>:
 
-> On Mon, Nov 17, 2025 at 11:59:32AM +0100, Matthieu Baerts wrote:
->> I just have one question below, but that's not blocking.
->>
->> (...)
->>
->>> diff --git a/tools/net/ynl/tests/test_ynl_cli.sh b/tools/net/ynl/tests/=
-test_ynl_cli.sh
->>> new file mode 100755
->>> index 000000000000..cccab336e9a6
->>> --- /dev/null
->>> +++ b/tools/net/ynl/tests/test_ynl_cli.sh
->>> @@ -0,0 +1,327 @@
->>> +#!/bin/bash
->>> +# SPDX-License-Identifier: GPL-2.0
->>> +# Test YNL CLI functionality
->>> +
->>> +# Load KTAP test helpers
->>> +KSELFTEST_KTAP_HELPERS=3D"$(dirname "$(realpath "$0")")/../../../testi=
-ng/selftests/kselftest/ktap_helpers.sh"
->>> +# shellcheck source=3D/dev/null
->>
->> Out of curiosity, why did you put source=3D/dev/null? It is equivalent t=
-o
->> "disable=3DSC1090" and there is no comment explaining why: was it not OK
->> to use this?
->>
->> =C2=A0 shellcheck source=3D../../../testing/selftests/kselftest/ktap_hel=
-pers.sh
->>
->
-> I got the following warning with it
->
-> In test_ynl_cli.sh line 8:
-> source "$KSELFTEST_KTAP_HELPERS"
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^-----------------------^ SC1091 (in=
-fo): Not following: ../../../testing/selftests/kselftest/ktap_helpers.sh wa=
-s not specified as input (see shellcheck -x).
+on 2025/11/18 9:49, Jakub Kicinski wrote:
+> On Fri, 14 Nov 2025 17:22:22 +0800 Jijie Shao wrote:
+>> Support pagepool for rx, retaining the original
+>> packet receiving process.
+> Why retain the legacy path? Page pool is 7 years old, all major NIC
+> vendors had dropped the support for non-page pool Rx path at this point.
+> If there are bugs or performance regressions we will fix them and send
+> the fixes to stable.
 
-How did you execute shellcheck?
+I have seen some drivers that retain the legacy packet receiving path.
+The community does not recommend this practice now, and I will remove the legacy path in v2.
 
-If I'm not mistaken, you are supposed to execute it from the same directory=
-, and with -x:
+Thanks,
+Jijie Shao
 
-=C2=A0 cd "$(dirname "${script}")"
-=C2=A0 shellcheck -x "$(basename "${script}")"
-
-Cheers,
-Matt
 
