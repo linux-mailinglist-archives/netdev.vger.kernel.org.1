@@ -1,113 +1,124 @@
-Return-Path: <netdev+bounces-239426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD798C682F1
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:24:10 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DA61C6838A
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 943A028A56
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 08:24:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AEED24E1FC5
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 08:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E6F307AC7;
-	Tue, 18 Nov 2025 08:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDE730B509;
+	Tue, 18 Nov 2025 08:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XzsDB1G9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eyvR0XUC"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288B426B75C;
-	Tue, 18 Nov 2025 08:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC2A2877D7
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 08:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763454245; cv=none; b=dVNJJ/otx854sTVdyj/PGSzIjN+A6opQWxw7dGNMHhO6FMNnjEZuG16NAWuFHmiSkpcfOPLu5nuGsxzVG8N/ti7TfLVv0FJk3R7BQc6obnyqwVXN8xCSXCaXZAb9AAwKhl5FefCel7oJA1fpbzubfDFAB1MZZZIJdWlE/Z+NP0M=
+	t=1763454764; cv=none; b=c2fkLqRrL6p5LjPJhP5afjztGJCsAATAZbA1EpKCGUwJiRtQSNR3vrvpJL+6QAPdtRs1atLCNidD3g1U7afIDr3aDBkvUkH7HjrPeZqr44U48NjLGp9ACqu4ipMW6dLM2ORBptvaNE5Po6GuvvT86vftImg8cuE9IednRykjwL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763454245; c=relaxed/simple;
-	bh=GWBWi6n/09s4UFkCZrc4hn3vheoXtmdjxbEXTYUz66I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tzhdQj4sB6UDMEBmSQvfsiLDBvKsg/QWy2BBobkX+ytKeOYoBB90r8KQ+P+pzr3VpYHGnwlS+5LsbMhOqsvjvWY5tlYdXO1DT3yRByiRvoT8rMtmx3IdBtZHXTUiJU4k3KKC9uv3yId42p000xSp7A6TwK40ZJSXTq0kbnhD1BA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XzsDB1G9; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8SLu1N6OkiZOCKYpKcgBHYGaJlgn3HankT7fWKAAW+g=; b=XzsDB1G9tH6y6Am4sthjbvOngF
-	F84JB9kQMPJ/3gUMA8ErN74tm83ExxYGIC5MQhG0I9pMt9u4VIfAO+tO5vInKyPiu4CbNeIUVg1i/
-	NsWjhcBW2hhaz7Cf5fbeufgQFsaM8OlplZ1hjTnTRlwEaKUVhw3shh6OOslzqx7XUcmW/wxMKmswL
-	BczBrSBZRRs2j3ghXL+RHYXJ/V/sNbaCD59TVansTjdcoGrPrY/SFK9ZdJqmtbSepTP4kshJjI4Ij
-	MX17udDSBe9XcHZpmj3Vvd5KQ9viTYzHryqBBOxk5rLdZ1J2NeurXaHwsFihy5aO8byOTL03V/0uU
-	WiF4jyTw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57590)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vLH0A-000000002uO-1cZE;
-	Tue, 18 Nov 2025 08:23:50 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vLH05-000000002Jb-2EVx;
-	Tue, 18 Nov 2025 08:23:45 +0000
-Date: Tue, 18 Nov 2025 08:23:45 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	eric@nelint.com, maxime.chevallier@bootlin.com, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 net] net: phylink: add missing supported link modes
- for the fixed-link
-Message-ID: <aRwtEVvzuchzBHAu@shell.armlinux.org.uk>
-References: <20251117102943.1862680-1-wei.fang@nxp.com>
+	s=arc-20240116; t=1763454764; c=relaxed/simple;
+	bh=1mHnmcWp6rRYR3G3tcyAvpSy0GNVWG/OY1byeJrOIpc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NaYgDDsO1Nn0ODkFZ4q8VoPBUNKWE8Tlx1XjP7GNgFKAlxVYs41l3No+ylaT4TsxdVJad9tUAmF76r39sCXD1KE5ygKst17ufpq7zmo9pk/EH9t4wKd/YbUc7EGVYIaKOVBSLA7D/F4B4SSCd/U+LjADla+O4EsZyo45DCSM26A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eyvR0XUC; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ee0084fd98so26719161cf.3
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:32:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763454762; x=1764059562; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1mHnmcWp6rRYR3G3tcyAvpSy0GNVWG/OY1byeJrOIpc=;
+        b=eyvR0XUCgOCX4VZdWZ2fZDRKNLeJpyJ8UIo3+saaOqHVt5U+bTlBeBBNTeA6UaMEve
+         d462+RQYFvuUcAMv46m1LYEiHAXqTuZVWeiwqE/czZzjw0/GMlT0cNsmlCUixJGg937X
+         cpDV+ImOeGzvb5XhWeaS0dlKGTf8q9qjfkSzSAYXjx0TSiyb6NgMNKSUSzez3TsjXmMZ
+         Bmt3WkuMvjE1le+jqzbocufsrR+WTHwUW0obZ/f8evvZ9y2BWGBku3aKwYNIy0MoDNCa
+         20/LJ3aGd+KhB4XwdzKGsBxAXP/+HaRh1apiALOxSNCRronNkxQxPLE600l7rDXEfvWX
+         Q+QA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763454762; x=1764059562;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1mHnmcWp6rRYR3G3tcyAvpSy0GNVWG/OY1byeJrOIpc=;
+        b=Q2ZUdSN566r7ng3JXRIYeCk26r+eSxBkQXvrz4mISRI9N28xm6BuOjgPemTc5aJp2U
+         B0JCxv8do4OlN+2ERf+OBOeM/psHmE4I3iId0ctGg13Z/34nJkmofZKLGpXDKd6j/E5t
+         urgOb96Q9F3XbTwuDKzR98Rz1FsE266JbFnpL++rNFLo7sxeM8nWtAmkx2eHoydiDr63
+         uNCHyJU+U4lvDgkM9/a85viOgxgbZxm0Myph7yfbqChVzvtS5SuIpw8Ha+XIij4Q7ffy
+         Uj1OHX5J8RHi34WnUfOK2dF/Kp21SpojU5s5itLNZxNT5JEZEkGuL4CFM3eiAxbohco2
+         ajjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0i7/yyLFh/AF7G8CXOUkrbBDyHuCtLeTkOf+wW3H0AnXU/pGqkSC0cBtSMJ2izTpgiZPTBfQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5iIAsjE20tKE9vYgz1ziNjdCQipF8x14s7E+cPAYc7ztW9A6R
+	lMGzo+qCLKup0ti77hsSu/aJu40bupYFuyDxYCyAjp76SO7pytO+CrriUKVL+t0/kwmouZMNqQ2
+	tkBG5BNx9B1RK3ttNxux699qqPkifdj1RhI9MIVLl
+X-Gm-Gg: ASbGncvWRGwkHJ9+Kz2zegxMhJ/i/WbGlNAl//SbNu7YUpWQeQx5m3R/Hc6nd1CF0ZW
+	NaFB+lF4mZL+IjZcY1tlRhSdrfNBabJcgYQOAUz0dNDK0R4wbt7uu8xxdp1YatScUzglOQobDFr
+	57tJ4QMux0m/yq/Xaiqg/oe+LDSOPfDziG5/SaYLsa5g+uATESJWUBmYyZEnDXuforcbc1wTYkF
+	kVFo9PO7m2CAc2VDDxTsR0ZW/L6XGWGep3J5UzctBgYXdIlPTVm/ksPa0GJnW0Uyyz7ytCD
+X-Google-Smtp-Source: AGHT+IH3YNDL98ZyOMCnH0umCySpaC1iKuhIFz4H8v4cGiIqTxSXm7i2+3kC3iyVZkOdsa6a6+pyR8W4aPBbhxb4DEg=
+X-Received: by 2002:a05:622a:1805:b0:4ee:1b53:ca70 with SMTP id
+ d75a77b69052e-4ee1b53ceddmr93808481cf.23.1763454761198; Tue, 18 Nov 2025
+ 00:32:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251117102943.1862680-1-wei.fang@nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20251116202717.1542829-1-edumazet@google.com> <20251116202717.1542829-4-edumazet@google.com>
+ <CAL+tcoD3-qtq4Kcmo9eb4mw6bdSYCCjxzNB3qov5LDYoe_gtkw@mail.gmail.com>
+ <CAL+tcoBpUg=ggf6nQpYeZyAcMbXobuJtyUdN98G1HpcuUqFZ+w@mail.gmail.com>
+ <CANn89iJb8hLw7Mx1+Td_BK7gGm5guRaUe6zdhqRqtfdw_0gLzA@mail.gmail.com>
+ <CAL+tcoBeEXmyugUrqxct9VuYrSErVDA61nZ1Y62w8-NSwgdxjw@mail.gmail.com>
+ <CANn89iJec+7ssKpAp0Um5pNecfzxohRJBKQybSYS=e-9pQjqag@mail.gmail.com>
+ <CAL+tcoAJR3Du1ZsJC5KU=pNB7G9FP+qYVe8314GXu8xv7-PC3g@mail.gmail.com> <CAL+tcoC8v9QpTxRJWA17ciu=sB-RAZJ_eWNZZTVFYwUXEQHtbA@mail.gmail.com>
+In-Reply-To: <CAL+tcoC8v9QpTxRJWA17ciu=sB-RAZJ_eWNZZTVFYwUXEQHtbA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 18 Nov 2025 00:32:29 -0800
+X-Gm-Features: AWmQ_bm_95_kJKbrIoqmjbeOBf355zw3JuGb821BLcMYZE4A8YYl8T5Qc0aUKaE
+Message-ID: <CANn89iLhd2Y0Htwx_kO7RixXPrPviBngZxngeMgN5n2zBTNG-w@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 3/3] net: use napi_skb_cache even in process context
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 17, 2025 at 06:29:43PM +0800, Wei Fang wrote:
-> Pause, Asym_Pause and Autoneg bits are not set when pl->supported is
-> initialized, so these link modes will not work for the fixed-link. This
-> leads to a TCP performance degradation issue observed on the i.MX943
-> platform.
-> 
-> The switch CPU port of i.MX943 is connected to an ENETC MAC, this link
-> is a fixed link and the link speed is 2.5Gbps. And one of the switch
-> user ports is the RGMII interface, and its link speed is 1Gbps. If the
-> flow-control of the fixed link is not enabled, we can easily observe
-> the iperf performance of TCP packets is very low. Because the inbound
-> rate on the CPU port is greater than the outbound rate on the user port,
-> the switch is prone to congestion, leading to the loss of some TCP
-> packets and requiring multiple retransmissions.
-> 
-> Solving this problem should be as simple as setting the Asym_Pause and
-> Pause bits. The reason why the Autoneg bit needs to be set, Russell
-> has gave a very good explanation in the thread [1], see below.
-> 
-> "As the advertising and lp_advertising bitmasks have to be non-empty,
-> and the swphy reports aneg capable, aneg complete, and AN enabled, then
-> for consistency with that state, Autoneg should be set. This is how it
-> was prior to the blamed commit."
-> 
-> [1] https://lore.kernel.org/all/aRjqLN8eQDIQfBjS@shell.armlinux.org.uk/
-> 
-> Fixes: de7d3f87be3c ("net: phylink: Use phy_caps_lookup for fixed-link configuration")
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+On Mon, Nov 17, 2025 at 6:07=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Mon, Nov 17, 2025 at 10:31=E2=80=AFPM Jason Xing <kerneljasonxing@gmai=
+l.com> wrote:
+> >
+> > On Mon, Nov 17, 2025 at 5:48=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
 
-NAK. I give up.
+> >
+> > >
+> > > We can add a static key to enable/disable the behaviors that are most
+> > > suited to a particular workload.
+> >
+> > Are we going to introduce a new knob to control this snippet in
+> > napi_consume_skb()?
+>
+> That's it. For single flow in xsk scenarios, adding something like a
+> static key to avoid 1) using napi_skb_cache_get() in this patch, 2)
+> deferring free in commit [3] can contribute to a higher performance
+> back to more than 1,900,000 pps. I have no clue if adding a new sysctl
+> is acceptable.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I will add one as soon as this series is merged.
 
