@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-239392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F577C67D63
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 08:09:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5845C67D69
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 08:10:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ADA894EE44E
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 07:07:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C34A54EFAB0
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 07:07:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE312F9985;
-	Tue, 18 Nov 2025 07:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039DB2FABEE;
+	Tue, 18 Nov 2025 07:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Plh8AkNW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BzyK5ogh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE572F8BC8
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 07:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785452F9DAD
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 07:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763449626; cv=none; b=Lc2OcqDt17q8hH6XWGi8RPP0kGfrP43D80+wUz9+OcmH7LeYQsgHPExqeqiQJEMEJmyo8RDNnVjivbwtrQPSxDOfccMI1KWTQustu7qOqnv0b9Ciy8OA3uXn/ShrWDSidrdUxbNKSj1hbCYMS0PR4S/GvqbWMskmderpddCjKmE=
+	t=1763449628; cv=none; b=ZfDCQgSmD0UII9moeop6v3OQHC07b0V1k7ZFgVBjlqiJNNc0ehsanOPbXViFLXAN3mn4qwGd7jQeWPoO4Z1py6a6LjJhYl1KYVfxl06wg1SKkqi3IQsOqbMQX/cj4OW5uF0zDYzdEkKhzBxacPxf8xPadaQYXTmZxEmPFg62NmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763449626; c=relaxed/simple;
-	bh=5g6k5BzwpuBqUFfvHmjlJC+7YxAPf4rt1rdJRr/37S4=;
+	s=arc-20240116; t=1763449628; c=relaxed/simple;
+	bh=6MY5RszjN79jITllGzV3tPixdoGd66YhqGBbeAdrlkU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tC6RngLZ+IEkZpJ3u8oqi3JNsPJrDHX5K6dPMa7twt6PSUQDosTBAprRLTJTCgQ7cAKFhk9WJvmM5pZfz5+VHwhihzoztDbgtvHJYxFYuoOaV8YJFczpE9dcM7iesG4ldpzhplUiOseUWRiVJFusT+l16FyUIIOuqU0bXR/AFmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Plh8AkNW; arc=none smtp.client-ip=209.85.216.54
+	 MIME-Version; b=td+5qZ41YOHM89Rvhqw7n19lR/Z+4+OhTiqLzc2JLZsPDSeuPWOCSxhc57irN9ojEWwPalJK3Jggfngrb61tKlYkX7Hf1SDTou04GwWq/rTgJTXQ+MxtLjh1kc+VVjUgryzi6KzqbvWLNkTfaSHixL0ZZAJEg5wC54PNF7qGgYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BzyK5ogh; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-341988c720aso4368836a91.3
-        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 23:07:04 -0800 (PST)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-340a5c58bf1so3693755a91.2
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 23:07:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763449624; x=1764054424; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763449627; x=1764054427; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HkB4RgDB5Bcj/2n23/sQis7qO/bn9myIhi8+KuQ4Huc=;
-        b=Plh8AkNWw/wCooB/xSbv6PkYUy5nWViFJxUiG+vBCDX+9Pd+a4i5O262HszJsFpTKX
-         IuuRyjVQREahmbrUnDL0DKIOjXoUSFKsLE6QWuF3HUp3FiL4YjY3mzwLZWQcWQzQ6ArC
-         +Es4DqkQPpQXbmyH/V0eVKqz0ImRLO8fGNx9ZmtsUSrX0CIH3DaTMXI3ZnQRiwm6ShNQ
-         Zr28+QcVCIYEnln/T/slCNeaNu/fCbn32+oiJCDHWmT/O8cATbVK7X1PvfPV68Fqgyi+
-         DnrRvVJVxrRc67IMu0ryQdc7oWtZaECaQfRrKGrYI+nGMslmFYgjW9L1rgszGsalF23+
-         48pQ==
+        bh=NDNsUPlP3wC5vEK480EogEefxtuqHFjjo9dpXikS25E=;
+        b=BzyK5oghUbYvY6Ox0CKd2lnNr5GwfAVEv/88C60v3XWdP6D5fGOsYOwQYeev2vCSat
+         F32ygKkCuFT0vdrqs35pR6Mqj8IS9b5CDeFs1UYnJEDtbvoVMl79S8C0Kd1XvgrUvaWd
+         D18tWXSQti4P6cf/RI+TUBqPHftsgESy6vh3W+/R85bqlwC/dlwbDB/UxoU6F7TpJDZq
+         G6S1t8K5Yq3FGboSakzYZsf4Z6V2EBnZ61Ag+v3aax3XwQcHw3usVzt0l6AVuXeXsrR3
+         sUwGOPt1532XEwIDYN8ZwItwlFTSnz2hC/CI4vddzTf6Oh+Nl70im24mHBgbMqMAV3RM
+         VeQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763449624; x=1764054424;
+        d=1e100.net; s=20230601; t=1763449627; x=1764054427;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=HkB4RgDB5Bcj/2n23/sQis7qO/bn9myIhi8+KuQ4Huc=;
-        b=g42M8d4l/9NcQ7NiDjsp3c2rf4Fwf79X1Ha5m59aObiaGin17bczzLMb52QnVtpci0
-         44I9c7lGFfoDIQfleUxa/VpjqzBGAfLP7egAoocY/1SGfDd3ooxEN5hjZYsYHOKmdunD
-         /2NsalQbq1Z1Snt+8bSJMuWxb/+y7CqOkOXWhsZBdI5Zm1OTDhUpKIR/MXIc84Uti8Er
-         EO4iqABl2v7XSKB/+nPcY90TehcOWYbvZyTfgzGDRHgCwHnIJaEA02IAPXv1kOpJOmB3
-         FDtC1GjKS7bjxwm68EyRsWhAbp73cFCwomlCLjn6ks6w7w4Yxc+OVs2tfnVc43WIj8sU
-         WE/Q==
-X-Gm-Message-State: AOJu0YzPyAK9Lrbn4ZFRRWGqfGifJDvGpe4RFXfRqimY3uEwY+5bAjR4
-	rz7QJOynHSbF/sfaGyCJ4DdOoi6PfN+gmYOwUFddJj3IbnBvg/cT0Pf28gUOEq30
-X-Gm-Gg: ASbGncvMj1BEevPnL9pPYGeiP2pvOx7fBnSrjWRvf5Krc7J6O+gdj4P2rV/E5R05w3O
-	eCC5Lyy4lmy0+7gAaWhlQKTivQZOOsCNut+X31R0I8KTfVw4Cd469tWZKQ8YQ5oCo6IGaxCs4ps
-	xMZtQhE90Eb4WQwQrEsMHv6FIKBwnwSHi6B0PDIDdFogwTkQ/0qt8+7h5GVQkbur5B58hkqD4tV
-	nNw9mFbW4ljs7XE987gXMExyEC1BOw2515wbiIv2xUxs9Jnafn3MgBjhAbZ1RxbNtiPWgasUaJP
-	y2Nx8wQi3+pJ1eP/USZ3pDUay37j7qMrFkjr3enhfJsU85Fw5g4W2z4zaemD2UpyLNoho5S4KpC
-	NmB1Fs00e+RqCDPF+LEyXl+9OYn508Efn2pMPKp064NDX4IMGz+PP9G4rylCrKrIr7vevleKhe+
-	1R84EUfwmzInrKcWuhx7kVuYwsaBdAALaP/CWkVCe8E5gpHiM=
-X-Google-Smtp-Source: AGHT+IHJZ7lrQC24tar6rsiEV3MrjGZcHHBX7Lf2LxG9AxE9+VxeJKZ12Ba+ZKWK3bjEpfpT0wiGcA==
-X-Received: by 2002:a17:90b:2f8c:b0:343:6c71:6d31 with SMTP id 98e67ed59e1d1-343f9ec8d2bmr17812450a91.11.1763449624109;
-        Mon, 17 Nov 2025 23:07:04 -0800 (PST)
+        bh=NDNsUPlP3wC5vEK480EogEefxtuqHFjjo9dpXikS25E=;
+        b=Am4CDnS1bJvOaH13zmyTkkmNYqHNlZ85qnMm3a/qRKoGt+Azi5URtG3OYj0oSoM15H
+         BSwd5yPjFhF7qdTMI7usP0XsxD6BG/Fi9NRdrYfiioTtzqEnpsRcVmjfpEF9QFPbcOWY
+         kB3Q7ThNVQucNuzvIlv5V0uyT5YiSbr15A+af9R8lOtQ7N1aPCxqmfLkj/qSZ2z8OeM2
+         FVtv9Qe+rx5UjucRxJZVVUaYlE5r14ZTPPcysxaNOsnFBdlB2VyLaoQ+99DqwV8wVcfC
+         CIuKHEyaaOsk2oZKEWzipbaBPLoGlQM010uROeT99pf4Na4xRvJJrT9eZmCJ1H5wQKcf
+         nImg==
+X-Gm-Message-State: AOJu0YyJVGJz4abCVeqQkdFmlvumZgO6mkw1zItt5Tz8qyzFR+bfuBj0
+	nAjuVYtK8NkJ/LJkpB5szgruIcMpF/i36EAp6gGHk3P3HX15uGLjMB1TsD9W4Nje
+X-Gm-Gg: ASbGnct2jZOdfKbeOF1A05fDVV7EUr2IUuIUzWaFbR39EAntXbQdl4e+DuJkQdPRVmM
+	RRQTGUyHCDePnNuVivWRHDl9OkJtiTE0KXTjDUmM/FnbaQJG0S4/YyaZVYU+iRhfpbXPbP7hsoC
+	VlWbLUsxxvTGsYjB4bBtunh79i/rMCwyO/IgadaQqg+kHDrVD5frtCxlJlhdUMSwHFsbx735N6h
+	ELE3XPjpgcy1dAdWVP0SNUVLdUA3jJrnQ3mkQ5zDC5CJgoB5skLI1y3BhWr857ULTDUpEgp8re4
+	/bSy6/MzVZo54N+N9S72MUyBCo8iReVNOFTuaRW0IRw8obT3GkoHbFT3iIn31+KbP+GSRlYZ5Lv
+	/CZE352ZHQCMuh9K9+YAQJrTBicAImUNlEcr0I/q6Jce/8arhkva4W3ih/m/S4XrEsx2T3v34pC
+	+n2UQfrIxScHEJMvXme5ll9qS4fWcngbU5qgDXifo9OcZWaJU=
+X-Google-Smtp-Source: AGHT+IHbnc3xo77IPrBTlmh9XlaSx7FK3/shQp3vMCdGFExNgzOSbDBmZah+s/QCAltNrrUwp9v3DQ==
+X-Received: by 2002:a17:90b:51c4:b0:32e:9da9:3e60 with SMTP id 98e67ed59e1d1-343fa74fd8cmr16071858a91.36.1763449626710;
+        Mon, 17 Nov 2025 23:07:06 -0800 (PST)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-345651183b2sm11868494a91.2.2025.11.17.23.07.01
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-345651183b2sm11868494a91.2.2025.11.17.23.07.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 23:07:03 -0800 (PST)
+        Mon, 17 Nov 2025 23:07:06 -0800 (PST)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -81,9 +81,9 @@ To: davem@davemloft.net,
 	horms@kernel.org
 Cc: netdev@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 1/4] net: increase default NAPI_SKB_CACHE_SIZE to 128
-Date: Tue, 18 Nov 2025 15:06:43 +0800
-Message-Id: <20251118070646.61344-2-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next 2/4] net: increase default NAPI_SKB_CACHE_BULK to 32
+Date: Tue, 18 Nov 2025 15:06:44 +0800
+Message-Id: <20251118070646.61344-3-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20251118070646.61344-1-kerneljasonxing@gmail.com>
 References: <20251118070646.61344-1-kerneljasonxing@gmail.com>
@@ -97,15 +97,9 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-After commit b61785852ed0 ("net: increase skb_defer_max default to 128")
-changed the value sysctl_skb_defer_max to avoid many calls to
-kick_defer_list_purge(), the same situation can be applied to
-NAPI_SKB_CACHE_SIZE that was proposed in 2016. It's a trade-off between
-using pre-allocated memory in skb_cache and saving more a bit heavy
-function calls in the softirq context.
-
-With this patch applied, we can have more skbs per-cpu to accelerate the
-sending path that needs to acquire new skbs.
+The previous value 16 is a bit conservative, so adjust it along with
+NAPI_SKB_CACHE_SIZE, which can minimize triggering memory allocation
+in napi_skb_cache_get*().
 
 Suggested-by: Eric Dumazet <edumazet@google.com>
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
@@ -114,18 +108,18 @@ Signed-off-by: Jason Xing <kernelxing@tencent.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 9feea830a4db..e4abf0e56776 100644
+index e4abf0e56776..b6fe7ab85c4a 100644
 --- a/net/core/skbuff.c
 +++ b/net/core/skbuff.c
-@@ -223,7 +223,7 @@ static void skb_under_panic(struct sk_buff *skb, unsigned int sz, void *addr)
- 	skb_panic(skb, sz, addr, __func__);
+@@ -224,7 +224,7 @@ static void skb_under_panic(struct sk_buff *skb, unsigned int sz, void *addr)
  }
  
--#define NAPI_SKB_CACHE_SIZE	64
-+#define NAPI_SKB_CACHE_SIZE	128
- #define NAPI_SKB_CACHE_BULK	16
+ #define NAPI_SKB_CACHE_SIZE	128
+-#define NAPI_SKB_CACHE_BULK	16
++#define NAPI_SKB_CACHE_BULK	32
  #define NAPI_SKB_CACHE_HALF	(NAPI_SKB_CACHE_SIZE / 2)
  
+ struct napi_alloc_cache {
 -- 
 2.41.3
 
