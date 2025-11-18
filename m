@@ -1,174 +1,246 @@
-Return-Path: <netdev+bounces-239303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F03DAC66B38
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:50:28 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D1FC66BCB
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 01:55:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA2434E06CD
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:50:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 584DA4E8B6F
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 00:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485012F3636;
-	Tue, 18 Nov 2025 00:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F1420DD75;
+	Tue, 18 Nov 2025 00:52:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="OlKqWkhC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dmiOkBLn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FAB2F0C79
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6507A2F49EF
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 00:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763427022; cv=none; b=X7WTfckhbqBp2qLChJ/SJv/GyugwSqh6DuuscdaLzgowGkhcUV+G8q24/0B5ufS42BH9o9KeGX7wDQ8MMZnPFw9JY6x+CHEbj6hOzT552/guSR3KX8MPNh0xWlvTHGAII+X9QpqSrlzmKtw0g7YwaplZnbPRzZwBRtS953PrL8Q=
+	t=1763427160; cv=none; b=JL4G5C2bbnHhMCEGAOEqddn7ieeJPxLiTIHYWNk3ZmrTf3Y3Z56FKw9LWzJ8SpboZZnJDSYNJOXzHBDssEkLgE9qkm6BF6jRR59qKZfCyCrt939WEd0aAVRLv7v0f2SOSCfMlafPD8pDgBEMgDR4S5cs/bAq8LePHqwOVYyQozc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763427022; c=relaxed/simple;
-	bh=gHS/Eg1xPCcRUqB7YMbxuhHmVgSNi2IWCXXJ0dykZng=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eX+RH4CrNwBM3P0AupVcci1YI7dfug8owLnsDISjU+mHwGgG717FKTEex6K4P+k45erb/ggLPriXfW++/0QYIlRjXVupzbp7CK3E1ML6XSrTt04R5C9I0TUZ6wwiM1cpmsBMPqDSHcYjPOa8FZZoYNp9qxNyWJ/COc3nuAq8KsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=OlKqWkhC; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AHLm0Wg3852206
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:50:19 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=K984MT1BI8AsKR90UtDQZfW+zUX5Q/Uf71qK2FmsDdo=; b=OlKqWkhC7au8
-	rsRERnOWkZ1JBrcgPX6tXoR1ZjiZhpDjUL/GGlCRoo1CEn+penMwj6x96Pvi5TXE
-	rONHC3ISgwbXtX2D/twGG/bS9Eu4S97cZCte4Mfcdls2+HW4tRvz7nLIRaWau0sv
-	PUrJKWk0JHKbuHJm0yokoD+S/hyC7GmRkKGQhMynm2xQw+zzMLBfB120/2gZ7Wh4
-	sJEBvbmNtYXbKjazhh66EUJIOVDkHALsoAnmem10EGeTZV/nw3ulaFVAbKwiFMBk
-	1G4Qc41ZWlOmRbiaebPhsRwjwuJB6U9ZegtwM8R/gOC/OmU9ffFr7ZdJnFSf7kNx
-	NeGZcwlV8g==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ag7w3ut8h-6
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:50:19 -0800 (PST)
-Received: from twshared12874.03.snb2.facebook.com (2620:10d:c0a8:1c::1b) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Tue, 18 Nov 2025 00:50:15 +0000
-Received: by devbig259.ftw1.facebook.com (Postfix, from userid 664516)
-	id E597DC3DF760; Mon, 17 Nov 2025 16:50:05 -0800 (PST)
-From: <zhipingz@meta.com>
-To: Jonathan Cameron <jonathan.cameron@huawei.com>
-CC: <jgg@ziepe.ca>, <leon@kernel.org>, <bhelgaas@google.com>,
-        <linux-rdma@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kbusch@kernel.org>, <yochai@nvidia.com>,
-        <yishaih@nvidia.com>
-Subject: Re: [RFC 1/2] Set steering-tag directly for PCIe P2P memory access
-Date: Mon, 17 Nov 2025 16:50:01 -0800
-Message-ID: <20251118005005.1473648-1-zhipingz@meta.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251114131232.00006e9e@huawei.com>
-References: <20251114131232.00006e9e@huawei.com>
+	s=arc-20240116; t=1763427160; c=relaxed/simple;
+	bh=YhK01yEm8Or5m4iJRKQEVOBZx+xr+W3uS2qAVqJnMsI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=U+XZM1sRGD8uKMS4f2F5cgt2yfQumu9fXLHJM+fWnTL4gr3VV72ETXeSyKuRWi7XPrrVl0P+ZpA2gb//6OZ+qH5/rRdyZu5WquNrj4d9FTZI8QsfK002HAdcgxmbCxw23DgMPOOf3fyD/6qtShSH/pZgUY/KghdpmOAcEi5Z1Cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dmiOkBLn; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7a9c64dfa8aso3946293b3a.3
+        for <netdev@vger.kernel.org>; Mon, 17 Nov 2025 16:52:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763427157; x=1764031957; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7xkfyBzlpHLk6cYkYqCdyQYs7/2JZrSvHXCymLJB1fk=;
+        b=dmiOkBLn8dmTM+kwMGnjMq084atxuu0jGV0GHza1jye3QcS26DmgrN7qVspkY1deB1
+         +QEat55anVHVhL/5kWvDHynPnSnr1oa8mBhbvFUFY0T8IPWvH/Hl0QKOi1hluVOpu8Gr
+         wyWBUVfdUM3hdQ+CMO9tTYqZXhG4FdmMvrL1MB0tuJ6z3aNB62m4yr08Rg7VcdIEM9Cx
+         a/0q6FvXVKH5mJuTSCVZgUI2C2gUgunzsbPfVW6/c7VDMcZbO+IwtOhKap7TrgZvudet
+         dmJum9PiaXtGGx1rmPwhhqLiy5mbcIPpvC3BWbqHVUP7+clAW8WcYytcz8TYZQBLPl76
+         v7IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763427157; x=1764031957;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7xkfyBzlpHLk6cYkYqCdyQYs7/2JZrSvHXCymLJB1fk=;
+        b=wYEFBpVl+yeW99dqBFmRiMgKocoVLDrlDeLQQlI2H8wzxQdCuO56pDyDU3SHedpMTV
+         IaCY39Bv35GQuhQQaaQV1X8U7/MarSFjEqkhoWpz1Ej4dnpWA+KXbxBLLYhSr7Cvez95
+         6O7oMURJr22fASomHt1Tel5qh7fcVOkGxCvaFGA2lgylvpKHZVwfh5tPxw5r59arEB1r
+         G2p0A+cQvl0HxGqfQEZsqJPkwUsKFO7ErXM8e2dk3+lIlIStwcCKVwaaHvxgaT7DaF6B
+         vnhYaFVpEsDAIRi0HSVCbO7t5Fj1J9xNfyFAZHxNRsL6xrzTI8nPmAbw98qosvYPyHaH
+         PdBA==
+X-Forwarded-Encrypted: i=1; AJvYcCUeyqctO8bRXKDPfi81jKuePuxtSwyxWwzdbtcBhp4CZj9jdN4q1exvi3Z89VTJeyTmHCXL05g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwO43mPqDROVH59ADAN+6YcleiMIsB1MZydeWeiCf4jR/9MnUkj
+	oybW5JXAXmbRhNfCqz5NkX60TkVZbZt79aueAOHyi94yEhg/OtXv5avg
+X-Gm-Gg: ASbGncs7xuhUJARzd7QheeUEidk8Lvn5UMBa5z9PlxlQFBxiio1Xw5y29brJSnQXEdV
+	TEFUGLBSaO27etxqc0+WyqQnecXa1OzRzHaaUswJrXgWH/yXpksDVW/yA6DhEqNdKZW+kTLVGmj
+	bnLZf9QoMHCKH5dnGJGU1RPF4YUU5QnYI/jB8t/PxkitcSTxtW82J1eoy1Qql0xB82hP4WdsbBn
+	cCyH0sjYZJY712V9v/vQp+uYhy/vjWUHLB4xftUr9e5Wv7nIOtOp0Oc0LMYJ4PqOXweM0ZnJFbT
+	DVbLAFtZgLTAIc2a6juh+OhiJxYgQ9shm6YGr/Q5qbgtUpWRcOf05YkRCW3ZJe2aCp2LZ9UWvOS
+	4H6tLlKgv7jBU1udZMrVjuM3K/hSdfXaKtJz4Olj8R68jQcY1LuYripw7RlYteN8+9jq9w6RdSl
+	pZa8lselmV/AViHgJGyJlOYE5+w8NfZIEg7X2kQOwNgboGo1dKgPrlwbUuLZmqnlP/1A==
+X-Google-Smtp-Source: AGHT+IHI6r30fmHCfJda6Wio1aA9zaaV2vJoyHVqRCkPlOwNOBPcbPMld3Tka8Rft1T7PFly+o22OQ==
+X-Received: by 2002:a05:6a00:1306:b0:7a9:d1ca:8a44 with SMTP id d2e1a72fcca58-7ba3c66777amr16998865b3a.24.1763427157372;
+        Mon, 17 Nov 2025 16:52:37 -0800 (PST)
+Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7b927c24254sm14528058b3a.64.2025.11.17.16.52.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 16:52:36 -0800 (PST)
+Message-ID: <4b7f0ce90f17bd0168cbf3192a18b48cdabfa14b.camel@gmail.com>
+Subject: Re: Ethtool: advance phy debug support
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>, Lee Trager <lee@trager.us>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, Susheela Doddagoudar	
+ <susheelavin@gmail.com>, netdev@vger.kernel.org, mkubecek@suse.cz,
+ Hariprasad Kelam <hkelam@marvell.com>, Alexander Duyck
+ <alexanderduyck@fb.com>
+Date: Mon, 17 Nov 2025 16:52:35 -0800
+In-Reply-To: <2fcc7d12-b1cf-4a24-ac39-a3257e407ef7@lunn.ch>
+References: 
+	<CAOdo=cNAy4kTrJ7KxEf2CQ_kiuR5sMD6jG3mJSFeSwqD6RdUtw@mail.gmail.com>
+	 <843c25c6-dd49-4710-b449-b03303c7cf45@bootlin.com>
+	 <eca707a6-7161-4efc-9831-69fbfa56eb93@lunn.ch>
+	 <52e1917a-2030-4019-bb9f-a836dc47bda9@trager.us>
+	 <401e9d39-2c28-480e-b1c4-d3601131c1fb@lunn.ch>
+	 <399ca61a-abf0-4b37-af32-018a9ef08312@trager.us>
+	 <2fcc7d12-b1cf-4a24-ac39-a3257e407ef7@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE4MDAwNCBTYWx0ZWRfX7sf/jBG3t5u5
- Cci/7G5VUxKZyebyDjsMPpR8yu7KdBInvQZR56qP8S/0D2gTfRXsIkTfua94zQayY64n1GkF1hB
- ooeYn6Rq/zfRTAAl5LHN1ZXG5IMzMpyl0x8F6/7aqdEDFK2SOIEH++ANE29GftbhPP7iU66zwXL
- 7EYb8bzpCepWk6LF61DkL/kjOjxA6toG7Z5r/Rg0NOR4hcs38G8q7uw3q5okobdx71lvq6UOevC
- 7bWdGBdrhhx9vze63Qs02RGbYvU/bJf9xaSGLS7gVy69xOW1gUY2HuvCLWhODTJ416slAiuLX2a
- XTF6KNHI25J2mNe3uH98EOrVJMwXpE2DE++ERoKB3uIDUtq7MXX6eE/wCYOWuj7BFr6hJS7eAP1
- GwlagpnQs4OaNZ8m7/QxyrZOzR/5AA==
-X-Proofpoint-ORIG-GUID: 9IZ6hZOpRkcHyfcO5dumRSfz0_i0tdWv
-X-Authority-Analysis: v=2.4 cv=Zsfg6t7G c=1 sm=1 tr=0 ts=691bc2cb cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=S7gPgYD2AAAA:8 a=VabnemYjAAAA:8 a=tBecTD8rVLH8ZP6GYt4A:9 a=QEXdDO2ut3YA:10
- a=1f8SinR9Uz0LDa1zYla5:22 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-GUID: 9IZ6hZOpRkcHyfcO5dumRSfz0_i0tdWv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-17_04,2025-11-13_02,2025-10-01_01
 
-> From: Jonathan Cameron @ 2025-11-14 13:12 UTC (permalink / raw)
->  To: Zhiping Zhang
->  Cc: Jason Gunthorpe, Leon Romanovsky, Bjorn Helgaas, linux-rdma,
->	linux-pci, netdev, Keith Busch, Yochai Cohen, Yishai Hadas
->
-> On Thu, 13 Nov 2025 13:37:11 -0800
-> Zhiping Zhang <zhipingz@meta.com> wrote:
->
-> > PCIe: Add a memory type for P2P memory access
+On Sun, 2025-11-16 at 00:27 +0100, Andrew Lunn wrote:
+> > PRBS testing can be used as a signal integrity test between any two end
+> > points, not just networking. For example we have CSRs to allow PRBS tes=
+ting
+> > on PCIE with fbnic. My thought was always to limit the scope to network=
+ use
+> > case. The feedback I received at Netdev was we need to handle this
+> > generically for any phy, thus the suggestion to do this on phy. That ad=
+ds a
+> > ton of complexity so I'd be supportive to narrow this down to just
+> > networking and leverage ethtool.
+>=20
+> We need to be careful with terms here. We have PHYs driven by phylib,
+> bitstreams to signals on twisted pairs, drivers/net/phy
+>=20
+> And we have generic PHYs, which might contain a SERDES, for PCIE,
+> SATA, USB, /drivers/phy.
+>=20
+> Maxime reference to comphy for Marvell is a generic PHY, and they do
+> implement SATA, USB and networking.
+>=20
+> Having said that, i don't see why you should not narrow it down to
+> networking, and ethtool. It might well be Marvell MAC drivers could
+> call into the generic PHY, and the API needed for that should be
+> reusable for anybody wanting to do testing of PCIE via a PRBS within a
+> generic PHY.
+>=20
+> As i said before, what is important is we have an architecture that
+> allows for PRBS in different locations. You don't need to implement
+> all those locations, just the plumbing you need for your use case. So
+> MAC calling phylink, calling into the PCS driver. We might also need
+> some enumeration of where the PRBSes are, and being able to select
+> which one you want to use, e.g. you could have a PCS with PRBS, doing
+> SGMII connecting to a Marvell PHY which also has PRBS.
+
+It seems to me like we would likely end up with two different setups.
+For the SerDes PHYs they would likely end up with support for many more
+test patterns than a standard Ethernet PHY would.
+
+I know I had been looking at section 45.2.1.168 - 45.2.1.174 of the
+IEEE 802.3 spec as that would be the standard for a PMA/PMD interface,
+or section 45.2.3.17 - 45.2.3.20 for the PCS interface, as to how to do
+this sort of testing on Ethernet using a c45 PHY. I wonder if we
+couldn't use those registers as a general guide for putting together
+the interface to enable the PHY testing with the general idea being
+that the APIs should translate to similar functionality as what is
+exposed in the IEEE spec.
+
+> > > That actually seems odd to me. I assume you need to set the link mode
+> > > you want. Having it default to 10/Half is probably not what you
+> > > want. You want to use ethtool_ksettings_set to force the MAC and PCS
+> > > into a specific link mode. Most MAC drivers don't do anything if that
+> > > call is made when the interface is admin down. And if you look at how
+> > > most MAC drivers are structured, they don't bind to phylink/phylib
+> > > until open() is called. So when admin down, you don't even have a
+> > > PCS/PHY. And some designs have multiple PCSes, and you select the one
+> > > you need based on the link mode, set by ethtool_ksettings_set or
+> > > autoneg. And if admin down, the phylink will turn the SFP laser off.
 > >=20
-> > The current tph memory type definition applies for CPU use cases. For=
- device
-> > memory accessed in the peer-to-peer (P2P) manner, we need another mem=
-ory
-> > type.
-> >=20
-> > Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
-> > ---
-> >  drivers/pci/tph.c       | 4 ++++
-> >  include/linux/pci-tph.h | 4 +++-
-> >  2 files changed, 7 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/drivers/pci/tph.c b/drivers/pci/tph.c
-> > index cc64f93709a4..d983c9778c72 100644
-> > --- a/drivers/pci/tph.c
-> > +++ b/drivers/pci/tph.c
-> > @@ -67,6 +67,8 @@ static u16 tph_extract_tag(enum tph_mem_type mem_ty=
-pe, u8 req_type,
-> > 			if (info->pm_st_valid)
-> > 				return info->pm_st;
-> > 			break;
-> > +		default:
-> > +			return 0;
-> > 		}
-> > 		break;
-> > 	case PCI_TPH_REQ_EXT_TPH: /* 16-bit tag */
-> > @@ -79,6 +81,8 @@ static u16 tph_extract_tag(enum tph_mem_type mem_ty=
-pe, u8 req_type,
-> > 			if (info->pm_xst_valid)
-> > 				return info->pm_xst;
-> > 			break;
-> > +		default:
-> > +			return 0;
-> > 		}
-> > 		break;
-> > 	default:
-> > diff --git a/include/linux/pci-tph.h b/include/linux/pci-tph.h
-> > index 9e4e331b1603..b989302b6755 100644
-> > --- a/include/linux/pci-tph.h
-> > +++ b/include/linux/pci-tph.h
-> > @@ -14,10 +14,12 @@
-> >   * depending on the memory type: Volatile Memory or Persistent Memor=
-y. When a
-> >   * caller query about a target's Steering Tag, it must provide the t=
-arget's
-> >   * tph_mem_type. ECN link: https://members.pcisig.com/wg/PCI-SIG/doc=
-ument/15470.
-> > + * Add a new tph type for PCI peer-to-peer access use case.
-> >   */
-> >  enum tph_mem_type {
-> >  	TPH_MEM_TYPE_VM,	/* volatile memory */
-> > -	TPH_MEM_TYPE_PM		/* persistent memory */
-> > +	TPH_MEM_TYPE_PM,	/* persistent memory */
-> > +	TPH_MEM_TYPE_P2P	/* peer-to-peer accessable memory */
->
-> Trivial but this time definitely add the trailing comma!  Maybe there w=
-ill never
-> be any more in here but maybe there will and we can avoid a line of
-> churn next time.
->
+> > fbnic does not currently support autoneg
+>=20
+> autoneg does not really come into this. Yes, ksettings_set can be used
+> to configure what autoneg offers to the link partner. But if you call
+> ksettings_set with the autoneg parameter set to off, it is used to
+> directly set the link mode. So this is going to be the generic way you
+> set the link to the correct mode before starting the test.
+>=20
+> fbnic is actually very odd in that the link mode is hard wired at
+> production time. I don't know of any other device that does
+> that. Because fbnic is odd, while designing this, you probably want to
+> ignore it, consider 'normal' devices making use of the normal
+> APIs. Maybe go buy a board using stmmac and the XPCS_PCS driver, so
+> you have a normal system to work on? And then make sure the oddball
+> fbnic can be somehow coerced to do the right thing like normal
+> devices.
 
-Thanks for catching that! I=E2=80=99ll add the trailing comma to the enum=
- in the patch.
+It isn't so much hard wired as limited based on the cable connected to
+it. In addition the other end doesn't do any sort of autoneg. In theory
+we should be able to resolve much of that once we get the SFP framework
+updated so that it can actually handle QSFP and reading the CMIS and
+SFF-8636 EEPROMs. Doing that we can at least determine what the media
+supports and just run with that. Arguably much of the weirdness is due
+to the 50R2 implementation as that seems to be where everything
+diverges from the norm and becomes a parallel 25G setup without much
+support for autoneg.
 
-> >  };
-> > =20
-> >  #ifdef CONFIG_PCIE_TPH
+As far as the testing itself, we aren't going to be linking anyway. So
+the configured speed/duplex won't matter. When we are testing either
+the PCS or the PMA/PMD is essentially running the show and everything
+above it is pretty much cut off. So the MAC isn't going to see a link
+anyway. In the grand scheme of things it is basically just a matter of
+setting up the lanes and frequency/modulation for those lanes.
 
+The way I see it we need to be able to determine the number of lanes,
+frequency, and then the test pattern we need to operate at. One of the
+things is that the PMA/PMD interface provides tuning variables for
+equalization based on if we are running with NRZ/PAM2 (4.2.1.112) or
+PAM4 (4.2.1.135).
+
+> > > > When I spoke with test engineers internally in Meta I could not com=
+e up with
+> > > > a time period and over night testing came up as a requirement. I de=
+cided to
+> > > > just let the user start and stop testing with no time requirement. =
+If
+> > > > firmware loses the host heartbeat it automatically disables PRBS te=
+sting.
+> > > O.K. So i would probably go for a blocking netlink call, and when ^C
+> > > is used, to exits PRBS and allows normal traffic. You then need to
+> > > think about RTNL, which you cannot hold for hours.
+> > RTNL() is only held when starting testing, its released once testing ha=
+s
+> > begun. We could set a flag on the netdev to say PRBS testing is running=
+,
+> > don't do anything else with this device until the flag is reset.
+>=20
+> Its the ^C bit which makes it interesting. The idea is used other
+> places in the stack. mrouted(1) and the kernel side for multicast
+> routing does something similar. So long at the user space daemon holds
+> the socket open, the kernel maintains the multicast routing
+> cache. Once the socket is closed, because the daemon as died/exited,
+> the kernel flushes the cache. But this is an old BSD sockets
+> behaviour, not netlink sockets. I've no idea if you can do the same
+> with netlink, get a notification when a process closes such a socket.
+>=20
+> 	Andrew
+
+This is one of the reasons why I was thinking of something like a
+phydev being provided by the driver. Specifically it provides an
+interface that can be inspected by a netdev via standard calls to
+determine things like if the link is allowed to come up. In the case of
+the phydev code it already had all the bits in place for PHY_CABLETEST
+as a state.
+
+Assuming we have something like that buried somewhere in the PHY,
+either as a part of the PMAPMD or the PCS drivers we could then look at
+having a state there that essentially communicates that "this device is
+testing so brining the link up is blocked". Then it would just be a
+matter of making sure you can pop the device into and out of that state
+while holding the RTNL lock without having to hold it for the full
+duration.
 
