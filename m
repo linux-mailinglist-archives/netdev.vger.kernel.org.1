@@ -1,106 +1,98 @@
-Return-Path: <netdev+bounces-239641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB080C6ABBB
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:50:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9D80C6ACBB
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 18:04:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 2C7052C129
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 16:50:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 02A334E9CF6
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 16:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A97D36B047;
-	Tue, 18 Nov 2025 16:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66FA368289;
+	Tue, 18 Nov 2025 16:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lh/WXSW3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VCZDGjzI"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9383368275;
-	Tue, 18 Nov 2025 16:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C8133C50B
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 16:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763484608; cv=none; b=Gdap1eC4SaH5+6nYsHYgzE6s6MFAwMu0i0ecpoyPs4I4Psu7gvG6h0lQMLENM0i1UEkjwUyvcAMBS9GRsJdPqdp050D5g1/UvCNXTuldMTFowGeCRIbLMNt2Nf08ljO8v5+jZ5OS+VLyLXvgO0kk99kVieQu+mn0X23fRqmDZOQ=
+	t=1763485017; cv=none; b=kbC5CSvI8tUjlPCSM27SquAA0gwGjoQO8C5QQZxvPyS1HSwnEDhVrKaQn/iqdy+hwy6GiDllrXurGCT7XWPjmXpu0uWzG59S+t2s3N0OIqaYIZsZdCSsHwWVvFKTBXxvzIe2XzAlorHvMFauPpP+Z8awtimPeH18gCLeYcI/k4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763484608; c=relaxed/simple;
-	bh=Gz7C0zxUsuhxrC3g7BpdaXUBXOAX3bQB2zZJVmH2GzA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NTvJYpKS+JZMvid/ptEnGSR4p45w1RsTlbdbf9LuThUGlY/Q7bBgeYChweG9O1ZyfA6yzG5a8DL1G4Pe7+C3vG9/QoxrMB9g0RZ7NDyNmq08ivoUBX4tVuLUoHYxVT56tu3CJvylknTwYMbxAWsMjMLtQalvmlzobgl1qf14sIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lh/WXSW3; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lGt66pGi8dt8iogorYeJbKaQNvOXL5mgOjSYNAZEHq8=; b=lh/WXSW3qZAsc4V5+gvZWY4g8Q
-	sZtFG9V0gg+vsr2BGFXdM2CfYy0CQp3Xpc+WZHF3EepGQmPKV2SgCmsQhDD+J8UGwHMlDK0KDF6Is
-	9YTJ5T7LzXGrhA3RtndhPpxQziLQF6z+dPVtjIExbGdm5PYSQlfYLkxPSV84PRZwkqXg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vLOtv-00ENKw-DZ; Tue, 18 Nov 2025 17:49:55 +0100
-Date: Tue, 18 Nov 2025 17:49:55 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: yt921x: Fix MIB attribute table
-Message-ID: <89a401dd-b6a9-4b1b-b323-10d713646e5d@lunn.ch>
-References: <20251118091237.2208994-1-mmyangfl@gmail.com>
+	s=arc-20240116; t=1763485017; c=relaxed/simple;
+	bh=5V7GiE6xtZks7l89G9tTxWFWQSrdthsihabtJ0mENe4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b5OyHUAlpalFhhe/V2wvIO8MSzlx7F2a7STPgSdzzf7cCuiOL9dUr3EePjkr/GWlHWnBk/bSjPKj4l0S62I+HFWe5yBRxuJLkTZG2JwKetA1HGDBYPUpNQNtMFQAlFNXr8jsEcu2Yc9DF7ber3ikCAIdPSe09/VxqBd8IjlTRoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VCZDGjzI; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-640b0639dabso10065070a12.3
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 08:56:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763485015; x=1764089815; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5V7GiE6xtZks7l89G9tTxWFWQSrdthsihabtJ0mENe4=;
+        b=VCZDGjzI6OOU24B1aEZXcWyEOZ8AbwrSJXAQaiCrSfMv1IdYDwcA+v+7sVzaEzWf0g
+         7EXNWhSQ9tQO4FxnBy6e/L6i7flybanqTadvEVxLwSGi/F3IBFSHK/FaFsPU2iyLwkXq
+         Kdob2qyE9gShed3svdb7bjHz9obAH9okCZYIj5/GaQEHLkbqPT+HFE4uaGy+U+dSEwJ3
+         gFbvyoTRUoTnUiDLWoIeasEeMGMZ+K5QacQSS7JjQ0LFnXyCw7eRAOroFp1evd3+3ET1
+         UbcoGV3k4JX0hlklKAL0UpWDo/ESM4DNFMbxgPMl2Cb4g0JZegMlaeEsuQwABJIRjmtg
+         wJHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763485015; x=1764089815;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5V7GiE6xtZks7l89G9tTxWFWQSrdthsihabtJ0mENe4=;
+        b=d+9g6ddp58+ekloaYNJaefh7XNprSEC4TOol+0vWZD9+hpb8zRQlRnMzBo2T1S41Tf
+         yllCZvu9pvuBg3pjN2k2u04ywRyTOS/R1gx0GA6+wA5YtfEVpCh0Za0fGS653ArC9qqt
+         gqYQlpNSzbyFkTScWMDsyVMjlz2kWHUb19VW+K2h1SzrYr6QX3QFyQjKHVtJvytRkdMj
+         1xNbsAphh3N2tiZfeotQ5ud5qQ0k4UmosB1WjlXx0358epIgo7djupK80aN9ehfrmMfX
+         +W9hzM+qYTNavposCXnkZteHMEH3Q9L2gduLPcKPXKxzq1p9MfWzVFI69OhcPnZHHYQg
+         nWeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURWfYt4tokA8jeXrVoZ5EYKKj5QkjXt20ekrkKTeeJoUHI7aEY/mVnvlZ1QVlM5kwdxNphk1U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpaBDJXl5gcnETe8+wkZYa2sC0o8DmLc8fH5ZwCAnU61gkHZKm
+	DG/OKR6386BTtb5YyBJ+SN6bP5QZOwUKCM2MDPPWiYCINLL87Dkc+I1tSMG12TLDokJmG/fhCtt
+	VticQErDSPUFPcGwbX3jxHfuZdnXgYkA=
+X-Gm-Gg: ASbGnctK/Z+4aEh/1dsqbj+ztJtEUFVT8Hp2rG/FrTqNTY0XqbzExvbnixBsyFaNIDN
+	fGBKTFd9u6yk7F/q/FPzE0C/QXTNcq2lLkKFGwMCpK2gIxnzp1v7laGqs6jIaEmdBWQIOFzacPq
+	bicu8i7HKNIPr1V8XXgawuq7GKROGH1PhaGOW9NBl4hQXaNpoQUaxNgWrd42Cujvz6qqkYk7lwx
+	Dhmbn6EAapdYf30Je8hOrB2RpQuT/5haLyPd23A8sD1jbt/4UOE66vFFObgaoyNrC9faKLI35ug
+	F+h1i80=
+X-Google-Smtp-Source: AGHT+IFs1ML/yGQuC8YS4/Iv0wOMlGo1jVem3rfZFTTCm2g0aNVw9IUXkatjMzTKAnormtovEcs5dn1ta7eT+xhuG8Q=
+X-Received: by 2002:a05:6402:2111:b0:641:3d64:b120 with SMTP id
+ 4fb4d7f45d1cf-64350e89f50mr14361293a12.18.1763485014376; Tue, 18 Nov 2025
+ 08:56:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251118091237.2208994-1-mmyangfl@gmail.com>
+References: <20251118164333.24842-1-viswanathiyyappan@gmail.com>
+In-Reply-To: <20251118164333.24842-1-viswanathiyyappan@gmail.com>
+From: I Viswanath <viswanathiyyappan@gmail.com>
+Date: Tue, 18 Nov 2025 22:26:42 +0530
+X-Gm-Features: AWmQ_bl01hvmKDelrUqTiwPIOlLTUnTAKXqeUslzZwhDZ8PPWJwRB4NxkgNyhqM
+Message-ID: <CAPrAcgNSqdo_d2WWG25YBDjFzsE6RR63CBLs9aMwXd8DGiKRew@mail.gmail.com>
+Subject: Re: [RFT net-next v4 0/2] net: Split ndo_set_rx_mode into snapshot
+ and deferred write
+To: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, mst@redhat.com, 
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
+	sdf@fomichev.me, kuniyu@google.com, skhawaja@google.com, 
+	aleksander.lobakin@intel.com
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kernel-mentees@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Nov 18, 2025 at 05:12:33PM +0800, David Yang wrote:
-> There are holes in the MIB field I didn't notice, leading to wrong
-> statistics after stress tests.
-> 
-> Signed-off-by: David Yang <mmyangfl@gmail.com>
-> ---
->  drivers/net/dsa/yt921x.c | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-> index 944988e29127..97fc6085f4d0 100644
-> --- a/drivers/net/dsa/yt921x.c
-> +++ b/drivers/net/dsa/yt921x.c
-> @@ -56,13 +56,13 @@ static const struct yt921x_mib_desc yt921x_mib_descs[] = {
->  
->  	MIB_DESC(1, 0x30, NULL),	/* RxPktSz1024To1518 */
->  	MIB_DESC(1, 0x34, NULL),	/* RxPktSz1519ToMax */
-> -	MIB_DESC(2, 0x38, NULL),	/* RxGoodBytes */
-> -	/* 0x3c */
-> +	/* 0x38 unused */
-> +	MIB_DESC(2, 0x3c, NULL),	/* RxGoodBytes */
+Hi,
 
-How is this described in the datasheet? Maybe add #defines for each
-location? At could mean you don't need the comment, since the #define
-documents what it is.
-
-> @@ -705,7 +705,7 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
->  			res = yt921x_reg_read(priv, reg + 4, &val1);
->  			if (res)
->  				break;
-> -			val = ((u64)val0 << 32) | val1;
-> +			val = ((u64)val1 << 32) | val0;
-
-And that is a different thing, has nothing to do with holes. This
-should be mentioned in the commit message.
-
-    Andrew
-
----
-pw-bot: cr
+I am sorry that it is broken. I will submit a v5 as soon as possible
 
