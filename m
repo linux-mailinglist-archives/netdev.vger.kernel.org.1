@@ -1,107 +1,86 @@
-Return-Path: <netdev+bounces-239647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FCF0C6ADE1
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 18:14:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F804C6AE34
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 18:18:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id BCB1E2D098
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:12:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 905832CD15
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22D143A1D18;
-	Tue, 18 Nov 2025 17:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780AF3A5E93;
+	Tue, 18 Nov 2025 17:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="cu9urYDH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r409iXWd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17F2355038
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 17:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB453A5E86;
+	Tue, 18 Nov 2025 17:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763485861; cv=none; b=lSMw3g7sC+frL1n2kQK8hwuB8Oi+1biCCy+BEb+bgJUBscfqzQPsycWFLtiLFtkXCZk/PKmmblx+GDT3sgPXAxuM7II74kw3KDlQfmDh0yVnb/RvU7vFtMwP76ldF040GIGTstkRrzhbE3HJuou0AqAxwcYK5xFyiOph0h4Kdh0=
+	t=1763486012; cv=none; b=NkS/JtZOnK6hF7bawM4LLaUI/WSCjet6dppenY5Row++HtlHJEjjp4acvEGhUjyFE7gEhyvJuRCO1R2VGGIGrJ68y/7387il8p1vtpVwVAXhEx6ljLzD3OIpoVfq4GOKPHhT0GCv2kjzB+/+6F6ywsQwmoO0iiKfNGruflfaaVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763485861; c=relaxed/simple;
-	bh=h+J7u3/CpPatdeQYr/tmIncQdjRefuqRNa5ojln1lvs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y1ViHMlCTSSdTl5ucAWTiXpRV5oJSfzUsTDnhcL3SF3O6JYdl9EFmG5mnUHe+258zKpPmqWyyXpNE1sZ1wPE0EtPXj7kpUdQOekE5KbIKUkNIjSt+cLGmey5t7IP3AlNFv3waKO/YjztFYeTBSniFW0cBgsiyYTMMIdFTNaw/Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=cu9urYDH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76A5CC2BCB1
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 17:10:59 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="cu9urYDH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1763485855;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vplNO5csMyvgI0N+D58HkHbAeNRmIHcdSs3oPvlRhjY=;
-	b=cu9urYDHTq35ESp8/5LBlH+0dt3QdLsjnnK3GfcvJ24psLpnaLjR08u066RSbTP90HwWJM
-	pWwrB8+RTwA7dUfjXmQhT8QTOWhHJSjzqzrWwVHFIoFkaqkNtfPYYQupE7mv58V29nk8Cy
-	gzr5KOuelRlQ/K+A6buaMBly6+CSiDU=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b6cadc28 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
-	for <netdev@vger.kernel.org>;
-	Tue, 18 Nov 2025 17:10:54 +0000 (UTC)
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7c6d13986f8so15885a34.0
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 09:10:54 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCW2eWtVqx7NUWj+kY5hKAqUgv/umssX+v3KNgdQgM+OLh5y284ArXMospB+jv9GjHs6bLBhNrk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZXK59CF6DTpKIPj93NFUKkYnF6HIqmLg8zOZ34zWmrsXD3IwL
-	R3153XNqVZ6sC7yDh3SPIW90QfvxBB9mlOVjJoUAvzH00bV0ClYMdUyuCfv9WLgLdfw/UcpfMK8
-	QNEj+L4n8Tq2Q16YaRffSNpxMtxw+3Do=
-X-Google-Smtp-Source: AGHT+IHyJUxom0hIRKScdEIXcqhrOcYQvTp4xIGZtuKdvJzwmINJbL3H3L94nnkBnG5pxXMRsYlyY/8rIR7RH87Fvjc=
-X-Received: by 2002:a05:6808:13c4:b0:450:c6af:7c10 with SMTP id
- 5614622812f47-450ee21dcf2mr107881b6e.22.1763485853009; Tue, 18 Nov 2025
- 09:10:53 -0800 (PST)
+	s=arc-20240116; t=1763486012; c=relaxed/simple;
+	bh=ggNhrLVSuJqH6QwhZSmvni68NhR4jn+ys9UmYoZ2dS0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KI5zJmsqk1wXEGXd3dmqSdbsGxK5lg1Hpf4RQpZX8J0KZtbPevq4xdU9KTrctMyHmUDYeXHJv9tJzb+6p5VHohBapOEy9ErJ+d2fFw9il0qRMDaCRTBuf5mUIT7RQVlaVv9Hsg0BPwxzVRRusZ6YIRTFq8k8lm5XjOpUVg1c9jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r409iXWd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80EB1C4CEF5;
+	Tue, 18 Nov 2025 17:13:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763486011;
+	bh=ggNhrLVSuJqH6QwhZSmvni68NhR4jn+ys9UmYoZ2dS0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=r409iXWdNYBga6hQ7E3WWFb7ae2KNM0nZsNpiuC7qlBvrll0LfrENOCdRBrnGQe24
+	 O+JM46sKT4thoYF5rSaN4lJespIamyHTIGNyhTFYATdaffmwH58ImmpCBfrOHbKGCz
+	 PKMtGB/+zIgRFH0qANQcCJNmIu/wLRGv81lUs5dfYmmGROvI5ws8LJgQnRGY75tYE7
+	 3naGu8OSlgAR8kaLPfRs2j/3q5joJ3mjpuS1SujjWwFVMsMZQtZ+x4JAWJn0RUXKzn
+	 wflRTOgActJedaD/u8wMYpOWa3GEBa3bWZ5caEbZOqTSRQNQi3F+bl0aupmZLwqmCn
+	 4ZJFfaPRcYskQ==
+Date: Tue, 18 Nov 2025 09:13:28 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, Donald Hunter
+ <donald.hunter@gmail.com>, Simon Horman <horms@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ bpf@vger.kernel.org, Nimrod Oren <noren@nvidia.com>
+Subject: Re: [PATCH net-next 1/3] tools: ynl: cli: Add --list-attrs option
+ to show operation attributes
+Message-ID: <20251118091328.052c88d6@kernel.org>
+In-Reply-To: <e634a466-a968-4422-a30a-49f6261d8703@nvidia.com>
+References: <20251116192845.1693119-1-gal@nvidia.com>
+	<20251116192845.1693119-2-gal@nvidia.com>
+	<20251117173503.3774c532@kernel.org>
+	<e634a466-a968-4422-a30a-49f6261d8703@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251105183223.89913-1-ast@fiberby.net> <20251105183223.89913-4-ast@fiberby.net>
-In-Reply-To: <20251105183223.89913-4-ast@fiberby.net>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Tue, 18 Nov 2025 18:10:41 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pYvUZ8b9dzWi-XBk9N6A04MzSLELgnBezHUF7FHz-maA@mail.gmail.com>
-X-Gm-Features: AWmQ_bnuBzEBp57HuRaFihbm9Rt0pgcJuXMd6cUvTwLP-PJHaf_yRwTXcyrtcqM
-Message-ID: <CAHmME9pYvUZ8b9dzWi-XBk9N6A04MzSLELgnBezHUF7FHz-maA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 03/11] wireguard: netlink: enable strict
- genetlink validation
-To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Simon Horman <horms@kernel.org>, 
-	Jacob Keller <jacob.e.keller@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	wireguard@lists.zx2c4.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jordan Rife <jordan@jrife.io>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Asbj=C3=B8rn,
+On Tue, 18 Nov 2025 11:38:04 +0200 Gal Pressman wrote:
+> > Could you try to detect that do and dump replies are identical 
+> > and combine them? They are the same more often than not so 
+> > I think it'd be nice to avoid printing the same info twice.  
+> 
+> We need to take care of both cases where the whole operation is
+> identical (e.g., ethtool debug-get), and cases where only the replies
+> are identical (e.g., netdev dev-get). This kind of complicates the code.
 
-On Wed, Nov 5, 2025 at 7:32=E2=80=AFPM Asbj=C3=B8rn Sloth T=C3=B8nnesen <as=
-t@fiberby.net> wrote:
->  static struct genl_family genl_family __ro_after_init =3D {
->         .ops =3D genl_ops,
->         .n_ops =3D ARRAY_SIZE(genl_ops),
-> -       .resv_start_op =3D WG_CMD_SET_DEVICE + 1,
->         .name =3D WG_GENL_NAME,
->         .version =3D WG_GENL_VERSION,
->         .maxattr =3D WGDEVICE_A_MAX,
+I was thinking just the reply. This is mostly for GET type operations.
+Request doesn't exist for DUMP, but for DO it carries ID.
 
-This patch is fine and standalone enough, that I merged it into my
-wireguard.git devel branch:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/wireguard-linux.git/c=
-ommit/?h=3Ddevel&id=3Dfbd8c752a8e3d00341fa7754d6e45e60d6b45490
-
-If you wind up rerolling the rest of these, you can do it against that bran=
-ch.
-
-Jason
+> I'll give it a few more attempts, but maybe this should come as a
+> followup to this series.
 
