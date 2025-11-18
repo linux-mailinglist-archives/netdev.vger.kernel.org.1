@@ -1,164 +1,207 @@
-Return-Path: <netdev+bounces-239557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59BF2C69BA2
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:54:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 025B8C69BC6
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:56:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D8B9038741C
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 13:52:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 042392B3C3
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 13:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2B43590A3;
-	Tue, 18 Nov 2025 13:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60AA35A940;
+	Tue, 18 Nov 2025 13:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gOU0Moux"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="mjRiTdqP"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012044.outbound.protection.outlook.com [40.93.195.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F7135A948
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 13:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763473855; cv=none; b=oJpjq8PFa/a9XOdXg5rWVaEqRmHmR4KIJd0HnXQDQwpkc28MLeCU6cZGqTGBqNTn8ptNSASWlN+8KdrHcD57raypEe3UzELas+Et5rNobShZ+Eo5E3pu2thtvNRI24TXUeiu9EUw+O3YhNPrbLiJF2CwiwospTLCobU+cRAIUHM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763473855; c=relaxed/simple;
-	bh=y7/K4goWitQnjGt6rQWX5T3/zWKYEM/eQanLE9dJWO8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P0gdXQ4fTJ+UFx2bJlzMNbQqtPaFZM0hIek12TeVoIDPT414O9NgiG+BpqHGTngOwy15oFiwHI3/+ZJIgrmSoI7mywQQqzJdQnIbR9tBOFjT9qyw/8ttJqMxbdpj20UyI0sfT2a3B6KuruGPFqoJ5W8XzoNLHYdbCtFX8N8NQMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gOU0Moux; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=//SwCgfiIZvNj0Mg0En9h4YXKpn27wFP8YJOCeIrWgM=; b=gOU0Mouxd1HBEoYGjIpj+IJIkY
-	ITlm0+2/lvGHdqt/UORn4gVxb3lOWROPPQulMfJZB9JC2OFU7KsEP9d5L5XnkBUS6T9U7Xr00MX8N
-	ydqvnKTmZqlvzc1qsu0g6F/uJo2aEtyNGNcrC5r3m5exYb9WHqOmwdfI4PbwsgdAd0ak=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vLM6L-00ELue-U0; Tue, 18 Nov 2025 14:50:33 +0100
-Date: Tue, 18 Nov 2025 14:50:33 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander H Duyck <alexander.duyck@gmail.com>
-Cc: Lee Trager <lee@trager.us>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Susheela Doddagoudar <susheelavin@gmail.com>,
-	netdev@vger.kernel.org, mkubecek@suse.cz,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Alexander Duyck <alexanderduyck@fb.com>
-Subject: Re: Ethtool: advance phy debug support
-Message-ID: <e38b51f0-b403-42b0-a8e5-8069755683f6@lunn.ch>
-References: <CAOdo=cNAy4kTrJ7KxEf2CQ_kiuR5sMD6jG3mJSFeSwqD6RdUtw@mail.gmail.com>
- <843c25c6-dd49-4710-b449-b03303c7cf45@bootlin.com>
- <eca707a6-7161-4efc-9831-69fbfa56eb93@lunn.ch>
- <52e1917a-2030-4019-bb9f-a836dc47bda9@trager.us>
- <401e9d39-2c28-480e-b1c4-d3601131c1fb@lunn.ch>
- <399ca61a-abf0-4b37-af32-018a9ef08312@trager.us>
- <2fcc7d12-b1cf-4a24-ac39-a3257e407ef7@lunn.ch>
- <4b7f0ce90f17bd0168cbf3192a18b48cdabfa14b.camel@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B11358D0F;
+	Tue, 18 Nov 2025 13:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763474162; cv=fail; b=JLmWeJKZZqcp7GAuY9c24YNhF3BohpVC4bSQixkOPa1vkQRAwECEKVjAcjqP6N4MgU3stg8nAhUE66zygJFsxdh//OQcrHKt2fVOp4QC8pozk5Ew4JGdLpIB8BMOgv36RIfKdlHiaV3jPO+ISMPokTCMV1mbnq/VgL+pkT5yigU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763474162; c=relaxed/simple;
+	bh=MIbE4ykbcND322Y9YGdzXu1wv5pCC8f0e2MopCW0UFU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JUR/mi1yTGvLAXPC+I1ilxVRQ4mDQYqwdJqitYJ7yiM2e1cVxBneaZ6VAV6+BM1qc0VFAyta1nG6ch55jFTAqukt7F/O2dTP9jlF3YxIggnHfuPb8yEFGLwbmQkou4jCPBS42k5cdNGLM2T7DPV8pu+3nf8xtEoQqq2YLD3yK1M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=mjRiTdqP; arc=fail smtp.client-ip=40.93.195.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=H1/DNRSddPht56LFSA3Gr2j2sRBb/qmfDFw8Vv+wpjYQcZmuy3U9dFLbkJjaYJ1/LAfbZI9hMH5zflQ681dnuCcK7aNMlQNNFnfIKtaTBAKpwJKoYGNgaAT5JyglmzoCT7ORk5UdYVG8XPb1tk3Pi9UI18li571wa7GrynobrFG9zP9jwxjz3EVNtdTTBcMyyb4DcoOdLtld4O/HAePMJUdwY2TA+HSVhqOFfr2IBp6PbEeSPlHw21sUzjlwbUJv/EPoZ3W0+kUa9xGKrnFON3jFXQjX0mIE2Q5LV8uFOReWna0V+GM/MScHwOSXZNj7WfB8ChZmy4LFwZtsJh2TLw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Dbi/SDEbhwv9x9qUnIJcSmxMwVDSSZlgVZJIO9G4GsI=;
+ b=fDDSyWdEjOlF9btt9N9T2QGv/VsP5/jnbNZWkFBNV1OdAudiPY5p/F4aW/sC8QHafa/tW7Jb7gTzHj6PpXQkeU53LqUqWpOZM8QFkAspx2T6UF7vHzm+PHHxEW502psFE3FQzUCehsiBWpp604qP5OvSqBt6VNM+w7UJEawG0GkW9eEaZAS56Kf387lgZ4hlekIMFNwx6bfNSO1xUUU5ALC1qlwkrySmc1XBeBA7KzvW9bvm+3k+0xm7qZWQHfPigX4xfzdVzWSw+HKeSlsI7vfzHi2cUhjfFa/MUBXwYL68WWiC6tdzZffs01XVQzJftigbabI+j7hqoa+ADIbuUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.21.194) smtp.rcpttodomain=kernel.org smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Dbi/SDEbhwv9x9qUnIJcSmxMwVDSSZlgVZJIO9G4GsI=;
+ b=mjRiTdqPuk932D1Ca6yNkiqh1zF1Siakx5llwvZVGYTJTwDtJlZn8TYgi+dIqb1nsqxDi55OojdXkizl+/xS08KBY7m7384YS7nx5tMwazQd0bdF4Qos0i2GkQyRIv+0Nev9WYN/Q35PedCJmrMwaQvNJqGW2DHRWPxVx78hXMs=
+Received: from PH7P223CA0026.NAMP223.PROD.OUTLOOK.COM (2603:10b6:510:338::31)
+ by DS0PR10MB7245.namprd10.prod.outlook.com (2603:10b6:8:fd::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9320.22; Tue, 18 Nov 2025 13:55:53 +0000
+Received: from CY4PEPF0000EE34.namprd05.prod.outlook.com
+ (2603:10b6:510:338:cafe::a1) by PH7P223CA0026.outlook.office365.com
+ (2603:10b6:510:338::31) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Tue,
+ 18 Nov 2025 13:55:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
+Received: from flwvzet200.ext.ti.com (198.47.21.194) by
+ CY4PEPF0000EE34.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.9 via Frontend Transport; Tue, 18 Nov 2025 13:55:51 +0000
+Received: from DFLE214.ent.ti.com (10.64.6.72) by flwvzet200.ext.ti.com
+ (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 18 Nov
+ 2025 07:55:48 -0600
+Received: from DFLE211.ent.ti.com (10.64.6.69) by DFLE214.ent.ti.com
+ (10.64.6.72) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 18 Nov
+ 2025 07:55:47 -0600
+Received: from fllvem-mr07.itg.ti.com (10.64.41.89) by DFLE211.ent.ti.com
+ (10.64.6.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Tue, 18 Nov 2025 07:55:47 -0600
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllvem-mr07.itg.ti.com (8.18.1/8.18.1) with ESMTP id 5AIDtl3f605856;
+	Tue, 18 Nov 2025 07:55:47 -0600
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 5AIDtkwo004165;
+	Tue, 18 Nov 2025 07:55:47 -0600
+From: Meghana Malladi <m-malladi@ti.com>
+To: <horms@kernel.org>, <namcao@linutronix.de>, <vadim.fedorenko@linux.dev>,
+	<jacob.e.keller@intel.com>, <m-malladi@ti.com>, <christian.koenig@amd.com>,
+	<sumit.semwal@linaro.org>, <sdf@fomichev.me>, <john.fastabend@gmail.com>,
+	<hawk@kernel.org>, <daniel@iogearbox.net>, <ast@kernel.org>,
+	<pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+	<davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
+	<linux-media@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
+	<vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net-next v6 0/6] Add AF_XDP zero copy support
+Date: Tue, 18 Nov 2025 19:25:36 +0530
+Message-ID: <20251118135542.380574-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4b7f0ce90f17bd0168cbf3192a18b48cdabfa14b.camel@gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE34:EE_|DS0PR10MB7245:EE_
+X-MS-Office365-Filtering-Correlation-Id: bcfc0923-3683-47d9-bd34-08de26aa2f43
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|7416014|1800799024|36860700013|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?kjgwSamNIf2UpUJG5mE+YJtocnY7AJEoOCK+ZHmOxVJd1DylsqMAfYVhcKcz?=
+ =?us-ascii?Q?ergCyl+sEOLz+coNcN55MVJBJzlIHoNRsRff/dJETCCmz3dyHwln7PldQ1Xi?=
+ =?us-ascii?Q?CIQrLJeY6pViSx2LkYSluqbOjCtL+FUwWJW6uSCrLBvwswO11TwIYRrZGUK2?=
+ =?us-ascii?Q?nCBIO0PRTRH5pFmR+GF2a49TWltOfCIbhBBWxaSUiSDLnYGXiFzuPsjhXpx6?=
+ =?us-ascii?Q?EPFoI9h+K9N8u0wa0QErYdaP9ER6mCIG5JuvgLQ0XDsPVr68aW9HtZsqbL1R?=
+ =?us-ascii?Q?rhbAs9qrLEvERMnMcX/+3dHTcoZB5QyF4wn2i/BUCL8Cobq8xDD6OyWvXvXG?=
+ =?us-ascii?Q?EHUf4jV+ItWiTiqCqBtM5cdDC0v7blv4wg2HaU7sRhtpwP2iNeUMCpbX+kRK?=
+ =?us-ascii?Q?EKIDSlv84/q/zm6KOzmqsP/KowusVNBLsJd/97Fl/EtcUqcjsYoqPsi1ux9Q?=
+ =?us-ascii?Q?aLN495BUPNl0T7E9GXuAGk/petjGCHREtOIKAcsKqlQ4GGGuASfYtHD3oUK5?=
+ =?us-ascii?Q?/43Z+CGGnQQqh1mM/VRD+um/1DzWVWBZASEeEMjnMboVY5rhCbG+VHd11R0W?=
+ =?us-ascii?Q?+FwRJ8iPFi/Reit8IhsEEQY9W/qWXu/VzXUwN29lx1yJevLBSy5S8TKU4KtI?=
+ =?us-ascii?Q?hsya97+ms/VHI+UdbsdyyQzuOrbZq+B2QQlUdiSTIFAuexCa5lmS3Hqmu95O?=
+ =?us-ascii?Q?nf9QEDuMxW9vhL94YRBx28QUJi0+BwfbjmCIjPF/eRoUp6SIgXmbriTQbyvj?=
+ =?us-ascii?Q?Mou/8aFlvSlgUj8ob3QHm/Itv66JuDEFofdVYbcRCqge3xlb2Ojs8drgRzm/?=
+ =?us-ascii?Q?UcRsaEHiZfx3RhqPkX5cc0Lbgbf0OGPjVsaGDrLcx6bdkWyn+ig8s/ws0UPE?=
+ =?us-ascii?Q?NPpAFWoMPIxhVVw7rZ+BViSBGn5k12FR66UqOI+eHPH8WrqL8iM3m33lzJbz?=
+ =?us-ascii?Q?rwqeEv3NBbChCgUP8eqZRAHk956MPLeaN5wHAc1fg76aXuMRbJJkWfOE3ar8?=
+ =?us-ascii?Q?dgyGQmqtR2EhQYBTRi9UFb8AY6q7u0gWwNg92tRzxtKp7zhbN7Uj7HRp+s23?=
+ =?us-ascii?Q?MC9X26blPg131ZHFr0nUKRh4MzpYE7cQW93GfzCMdUtFyLpdKzajtnKp6+yf?=
+ =?us-ascii?Q?fIP8YnxAKcCpHBW5H8ods3zUH1cKD5D2/SaDDvef+OAdln0cSkziFSahhL12?=
+ =?us-ascii?Q?iTwLa/roYzuVZxOo+V0Axk5Ia6SiTyihe5fr1G5YT6reYhn8RaG+g5SyxqYB?=
+ =?us-ascii?Q?C+wzgz3uaFLD2XHW+ycgElzTByszrBI/BqJIN+uRDTEhTarOGdWemgfXvPgF?=
+ =?us-ascii?Q?yRXdweqW7eEteCKuj/O94Y+Zg2/Kx3UoyDBi0Um9v/sXEfW8zc6aZf0bqe7C?=
+ =?us-ascii?Q?a7CM3MXN7pwqQ5qcEPWuwfN0ERpAKaDnfMfNEe4WDW3AXFvQ2wiGOQAxSoMT?=
+ =?us-ascii?Q?3K0DtoyHrHTq7fQUbXDSGoaXTjTCt4gmjj2UUZ8gPlXZv74DWmhZtREerKJA?=
+ =?us-ascii?Q?7ovC69xp8HES4o3VfaLLEVRs5US8/ev5fYtXt98QwP1cm5/npCjVOrjGqXkh?=
+ =?us-ascii?Q?EbTViv9IffvieMeC2Q5CbIEzwYiLNxN1tN9Oup2j?=
+X-Forefront-Antispam-Report:
+	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(376014)(82310400026)(7416014)(1800799024)(36860700013)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2025 13:55:51.1520
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: bcfc0923-3683-47d9-bd34-08de26aa2f43
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE34.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB7245
 
-> > As i said before, what is important is we have an architecture that
-> > allows for PRBS in different locations. You don't need to implement
-> > all those locations, just the plumbing you need for your use case. So
-> > MAC calling phylink, calling into the PCS driver. We might also need
-> > some enumeration of where the PRBSes are, and being able to select
-> > which one you want to use, e.g. you could have a PCS with PRBS, doing
-> > SGMII connecting to a Marvell PHY which also has PRBS.
-> 
-> It seems to me like we would likely end up with two different setups.
-> For the SerDes PHYs they would likely end up with support for many more
-> test patterns than a standard Ethernet PHY would.
-> 
-> I know I had been looking at section 45.2.1.168 - 45.2.1.174 of the
-> IEEE 802.3 spec as that would be the standard for a PMA/PMD interface,
-> or section 45.2.3.17 - 45.2.3.20 for the PCS interface, as to how to do
-> this sort of testing on Ethernet using a c45 PHY. I wonder if we
-> couldn't use those registers as a general guide for putting together
-> the interface to enable the PHY testing with the general idea being
-> that the APIs should translate to similar functionality as what is
-> exposed in the IEEE spec.
+This series adds AF_XDP zero coppy support to icssg driver.
 
-It probably needs somebody to look at the different PRBS and see what
-is common and what is different. 802.3 is a good starting point.
-If you look around you can find some Marvell documents:
+Tests were performed on AM64x-EVM with xdpsock application [1].
 
-https://www.mouser.com/pdfDocs/marvell-phys-transceivers-alaska-c-88x5113-datasheet-2018-07.pdf
-https://www.marvell.com/content/dam/marvell/en/public-collateral/phys-transceivers/marvell-phys-transceivers-alaska-m-88e21x0-datasheet.pdf
-https://www.marvell.com/content/dam/marvell/en/public-collateral/phys-transceivers/marvell-phys-transceivers-alaska-x-88x2222-datasheet.pdf
+A clear improvement is seen Transmit (txonly) and receive (rxdrop)
+for 64 byte packets. 1500 byte test seems to be limited by line
+rate (1G link) so no improvement seen there in packet rate
 
-And there are other vendors:
+Having some issue with l2fwd as the benchmarking numbers show 0
+for 64 byte packets after forwading first batch packets and I am
+currently looking into it.
 
-https://www.ti.com/lit/ds/symlink/dp83tc811r-q1.pdf
+AF_XDP performance using 64 byte packets in Kpps.
+AF_XDP performance using 64 byte packets in Kpps.
+Benchmark:	XDP-SKB		XDP-Native	XDP-Native(ZeroCopy)
+rxdrop		253		473		656
+txonly		350		354		855
+l2fwd 		178		240		0
 
-But we should also make use of the flexibility of netlink. We can
-probably get a core set of attributes, but maybe also allow each PRBS
-to make use of additional attributes?
+AF_XDP performance using 1500 byte packets in Kpps.
+Benchmark:	XDP-SKB		XDP-Native	XDP-Native(ZeroCopy)
+rxdrop		82		82		82
+txonly		81		82		82
+l2fwd 		81		82		82
 
-> It isn't so much hard wired as limited based on the cable connected to
-> it. In addition the other end doesn't do any sort of autoneg.
+[1]: https://github.com/xdp-project/bpf-examples/tree/master/AF_XDP-example
+v5: https://lore.kernel.org/all/20251111101523.3160680-1-m-malladi@ti.com/
 
-For PRBS, i doubt you want negotiation. Do you actually have a link
-partner? Or it is some test equipment? If you are tuning SERDES
-windows/eyes, you have to assume you are going to make the link worse,
-before it gets better, and so autoneg will fail. So i expect the
-general case of anybody using PRBS is going to want to use 'ethtool -s
-autoneg off' to force the system into a specific mode.
+Meghana Malladi (6):
+  net: ti: icssg-prueth: Add functions to create and destroy Rx/Tx
+    queues
+  net: ti: icssg-prueth: Add XSK pool helpers
+  net: ti: icssg-prueth: Add AF_XDP zero copy for TX
+  net: ti: icssg-prueth: Make emac_run_xdp function independent of page
+  net: ti: icssg-prueth: Add AF_XDP zero copy for RX
+  net: ti: icssg-prueth: Enable zero copy in XDP features
 
-> As far as the testing itself, we aren't going to be linking anyway. So
-> the configured speed/duplex won't matter.
+ drivers/net/ethernet/ti/icssg/icssg_common.c | 469 ++++++++++++++++---
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 394 +++++++++++++---
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h |  25 +-
+ 3 files changed, 739 insertions(+), 149 deletions(-)
 
-I'm surprised about that. Again, general case, would a 1G 1000baseX
-allow/require different tuning to a 2500BaseX link? It is clocked at a
-different frequency? Duplex however is probably not an issue, does an
-SGMII SERDES running at 100Half even look different to a 100Full? The
-SERDES always runs at the same speed, 10/100 just require symbol
-duplication to full the stream up to 1G. And link modes > 1G don't
-have a duplex setting.
 
-> When we are testing either
-> the PCS or the PMA/PMD is essentially running the show and everything
-> above it is pretty much cut off. So the MAC isn't going to see a link
-> anyway. In the grand scheme of things it is basically just a matter of
-> setting up the lanes and frequency/modulation for those lanes.
+base-commit: c9dfb92de0738eb7fe6a591ad1642333793e8b6e
+-- 
+2.43.0
 
-And the kernel API for that, at the top level is ksettings_set(). I
-agree the MAC is not sending packets etc, but it is the one
-configuring everything below it, via phylink/phylib or firmware. Is
-there really any difference between a real configuration and a PRBS
-configuration for testing a link mode?
-
-And then we need a second API to access whatever you want to tune,
-which i guess is vendor specific. As far as i remember, Lee's basic
-design did separate this into a different API after looking around at
-what different vendors provided.
-
-> This is one of the reasons why I was thinking of something like a
-> phydev being provided by the driver. Specifically it provides an
-> interface that can be inspected by a netdev via standard calls to
-> determine things like if the link is allowed to come up. In the case of
-> the phydev code it already had all the bits in place for PHY_CABLETEST
-> as a state.
-
-And this is why i talked about infrastructure, or core for PRBS,
-something which can deal with a netdev state transitions. A don't see
-a phydev as a good representation of a PRBS. We probably want a PRBS
-'device' which can be embedded in a phydev, or a PCS, or a generic
-PHY, which registers itself to the PRBS core, and it is associated to
-a netdev.
-
-	Andrew
 
