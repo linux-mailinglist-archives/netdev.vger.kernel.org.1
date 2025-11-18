@@ -1,109 +1,95 @@
-Return-Path: <netdev+bounces-239622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B12BCC6A828
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:09:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AADAC6A879
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 17:11:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 08AC24F3728
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 16:03:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0428D4E024B
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 16:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DC536A002;
-	Tue, 18 Nov 2025 16:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F75636A022;
+	Tue, 18 Nov 2025 16:04:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="0q6a7PMk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uVU4HZq3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01853148B7
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 16:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B67368283;
+	Tue, 18 Nov 2025 16:04:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763481766; cv=none; b=PDjaLkEecoByqiSygzKDRkU2WJrvIcxf9aniFGujMdggjdzDOkP1U8RfFCGKpR8YDbOei0w6F/m9HQ7HUKbiizGeQT+3l0pPlM6jHnGiM+W3/goRSIpvwoP0lzaJdyHORlNxmFfmbPGjbYeMOu4hYU/54mGy1kgmVy6BqDHqqLk=
+	t=1763481883; cv=none; b=GofPiAeGaY5dTqfOuRWyZlDJ3G9dnw8ejPiclz2sVUlLWKHKx+ayeXJDTOzNjje8TILn25N8M5mDzm3JujgluTfZmNUB+ZYAnty1ttmXoZ21Fc70qoN6QOcivfsUd9T2/kMG/rayebuKRTf+KwuXDNjbjcpQQM87Y0AuIyY/ZU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763481766; c=relaxed/simple;
-	bh=GfqTXkXVrEJpb5atUqf8HNxbs/hLvVCpb7QwD8IwGVE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XpBcV8UzyBiRVVyGa9WEhKuo/UrS7d7eR4Hq7bAJHJL5Nu9jiVY+DtU3PM+mk3gh6P1P4L9dBMs1rBPw5nfXOiLbt+elAelppk6nrj8TQe8ptMdk9rm3QJTVA9Mw3xUYFG2wKZDnk2mkWmifLNYqc1hMUhbq54fanhEdrnBjEwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=0q6a7PMk; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-bc17d39ccd2so2928349a12.3
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 08:02:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1763481764; x=1764086564; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ScVXv43JwkQ2uSjub0/NPG71+GfionxesRG+Ys4Pw6s=;
-        b=0q6a7PMkXHrqRHhWMGxESP8cRK4F95AsW9LEeaI5g15NY7UV+d4oYJcwOR2wLPVBTy
-         jYNdU6VW0xUagisL4kDsfmLQryyAB5FYn4zdridgBFeVQOWnWntW1zA6yd8peogg3RPa
-         bPERdrgF7g2dnU1Ff4hZqxmoo/DLwZzwakNV1OqhI1j6hcmQi1Qd2UVZHNS4p0BGJtG8
-         qgPMdX2umV+qVRQ8tpowOl8O8AXwlrqJyFr4ezn6BE/d5trzi5lmaAOzZ2e7EOjwQ6UA
-         UMxYVWpea+viU7yDw5f8AXPfFb5liN5HObF14sOnqWnBGmtXWq6RJrMfuQFlLhg0pZc4
-         vZyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763481764; x=1764086564;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ScVXv43JwkQ2uSjub0/NPG71+GfionxesRG+Ys4Pw6s=;
-        b=MYGv2pdZnwGcjTpUrHnI3vzPgAfT/1VFJlrMpWjmelSc8GsOJLnfPQSA8YiyyvOCzw
-         DuCvRxygDO3lQPXi11JdfOH4U3vglqEorQAd5UE/u4NgO69wOQzeD05dc70wQFraSuWw
-         aEYeuQPcJN1hw8lbP5Ki6thDNVxcraMD9AxlWvdUg6i6KGlT5Hi78tti2IhoCqscmf+6
-         aUqJRcP+aTH6AGIvCrEHSE9SOCnN2bhbrb8XHyVlJbGKYtb3+DIWqZLSP9FBGzUZALL4
-         PiIfW6Ipq51113NKH+oPWAgEYHaKZbDVjOCe8x+1/BpOobbMujuEzYqkZazflgtsRQYu
-         KnSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUhRoR0Os7rlJjda0NiJk1i3c6Bq6YA5MK6xA/BL6f0b9XO8Ww7RXMCG4kb7ZpnK5xyv121vI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQLmoFBiXwW4oJtIHo3f3m+xpz7d31Asrz3YGTf6njTu4FBhXI
-	vKeBO2KgbBCkgSmscktObrY1IIO24RT4LB8t6cznMt7ic+zRYdgl8eJo1Ytm8VdhmeI=
-X-Gm-Gg: ASbGncs+KjCraWRgoo0brUSBRYdOPuAdjGv2C1vTzgAAbu3Fw/w34e6E5AuRk0I8ODm
-	tuRrhmO//WjVD+Avtdk3oEqaiLyAzos4Btzx/DFz+W9T1D5PuSVkYxu4alEmkTc3qqHIX40/3+H
-	ncZnFvjQ2ZwQzLcdSaM9U79WbveYeo3BMlln9sOMnaJYzUgsuJGSWoF2AonqeFYu4rKLlEqpmNu
-	EeJ6isYyHV5F4stO+5rP+V+wJEgt/ERHiOn3yTkHKhZ8LSUpYFWZWvkTJrN+yYVpVeA0vQzdAIO
-	qfYLrn2hDLV4cuwyLoXSMqqaPpxiTF/idsGRHcXVd05H5B+60FM6ErcjiWIf1U9pFmpWKcdtuUd
-	YaLSPlUmJyEMRsfymTKZgSkye5eeqDLcnkwepzQqtipfVn8P+GCciCXVF7YXBgyTCqPxfuzckoF
-	YjHBBe9STUAXRY+fjEp8u3JovJMcZpI2/9q3LekmpdI9kWtqU+NASi
-X-Google-Smtp-Source: AGHT+IFTRD+pIPszE9N/Ony6HB6DPT/ovJwMRVqsvZ8dzqg8FLfSj/2s630xXVH64J45zJA2cOLe+A==
-X-Received: by 2002:a05:693c:6090:b0:2a4:3593:467a with SMTP id 5a478bee46e88-2a4abd973bamr8027943eec.22.1763481763720;
-        Tue, 18 Nov 2025 08:02:43 -0800 (PST)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a49dad0aefsm45188960eec.3.2025.11.18.08.02.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 08:02:43 -0800 (PST)
-Date: Tue, 18 Nov 2025 08:02:39 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, David
- Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iproute2-next 1/2] devlink: Pull the value printing
- logic out of pr_out_param_value()
-Message-ID: <20251118080239.405507d6@phoenix.local>
-In-Reply-To: <20251117-param-defaults-v1-1-c99604175d09@gmail.com>
-References: <20251117-param-defaults-v1-0-c99604175d09@gmail.com>
-	<20251117-param-defaults-v1-1-c99604175d09@gmail.com>
+	s=arc-20240116; t=1763481883; c=relaxed/simple;
+	bh=i0LbVI+QNFWoYKWn/EVjpgtC/3PUyI8ix5LquE4m9wo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I4Uj+rSBMBvLnfeiFQ1OnWxlmUSx63/8fHRb+N55wUQXPPA/UBHBiCj0iR8zvVu/9Nd03bw+EgDACn4kbUEti8UXtNb2aaR8W+BWAFgF/k4ocptN6onV/YVXU7kB/Z2v5MOOZ6kEwWr16vRNK4szHIdSkRc99OxZUTLl80w5zFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uVU4HZq3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80574C2BCB3;
+	Tue, 18 Nov 2025 16:04:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763481881;
+	bh=i0LbVI+QNFWoYKWn/EVjpgtC/3PUyI8ix5LquE4m9wo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=uVU4HZq3cLW1JlSW+0iPXXroPICFFq6Ai37vB7ZBB3pZzgUcFLtCdCeNKWc2fOnfL
+	 XDliMUIydYTqXD8rOCXjcRseAFX39NixnNUoTDXWx59i+m5PiZhcZTAbma3HGxowFs
+	 EClp880TWyqAfWo92j9abu7CkeFJMZAcIB/cG76UnjOi8lCGgojIfL6wb3+ilxPuTY
+	 eWduF9BlnpoKHbbiHTMUlVPhHT+PCLaLhLL33F1MFP2ob5ceei9TQmqrzkzbqLtzhy
+	 TJ817GAms/Aa7owT9iINOmNwxzuIA1gTc4q3rsEjca4MjSguxB9tMAXGBdS2RVmVXW
+	 an2UGN1/YhrLQ==
+Message-ID: <e5e7b1cd-b733-40d5-9e78-b27a1a352cec@kernel.org>
+Date: Tue, 18 Nov 2025 09:04:38 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/ipv6: allow device-only routes via the multipath API
+Content-Language: en-US
+To: azey <me@azey.net>, nicolasdichtel <nicolas.dichtel@6wind.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev <netdev@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
+References: <a6vmtv3ylu224fnj5awi6xrgnjoib5r2jm3kny672hemsk5ifi@ychcxqnmy5us>
+ <7a4ebf5d-1815-44b6-bf77-bc7b32f39984@kernel.org>
+ <a4be64fb-d30e-43e3-b326-71efa7817683@6wind.com>
+ <19a969f919b.facf84276222.4894043454892645830@azey.net>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <19a969f919b.facf84276222.4894043454892645830@azey.net>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Mon, 17 Nov 2025 16:40:02 -0800
-Daniel Zahka <daniel.zahka@gmail.com> wrote:
+On 11/18/25 4:00 AM, azey wrote:
+> On 2025-11-18 10:05:55, +0100 Nicolas Dichtel wrote:
+>> If I remember well, it was to avoid merging connected routes to ECMP routes.
+>> For example, fe80:: but also if two interfaces have an address in the same
+>> prefix. With the current code, the last route will always be used. With this
+>> patch, packets will be distributed across the two interfaces, right?
+>> If yes, it may cause regression on some setups.
+> 
+> Thanks! Yes, with this patch routes with the same destination and metric automatically
+> become multipath. From my testing, for link-locals this shouldn't make a difference
+> as the interface must always be specified with % anyway.
+> 
+> For non-LL addresses, this could indeed cause a regression in obscure setups. In my
+> opinion though, I feel that it is very unlikely anyone who has two routes with the
+> same prefix and metric (which AFAIK, isn't really a supported configuration without
+> ECMP anyway) relies on this quirk. The most plausible setup relying on this I can
+> think of would be a server with two interfaces on the same L2 segment, and a
+> firewall somewhere that only allows the source address of one interface through.
+> 
+> IMO, setups like that are more of a misconfiguration than a "practical use case"
+> that'd make this a real regression, but I'd completely understand if it'd be enough
+> to block this.
 
-> -			print_uint(PRINT_ANY, "value", " value %u",
-> +			snprintf(format_str, sizeof(format_str), " %s %%u", label);
-> +			print_uint(PRINT_ANY, label, format_str,
-
-The problem with generating format strings is that it makes it difficult to
-impossible to use any of the compiler format validation flags.
+There is really no reason to take a risk of a regression. If someone
+wants ecmp with device only nexthops, then use the new nexthop infra to
+do it.
 
