@@ -1,166 +1,106 @@
-Return-Path: <netdev+bounces-239609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 982B0C6A255
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:57:36 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AAAAC6A38F
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 16:08:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 129A8362D81
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 14:57:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0C4F14F93AE
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 15:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0667F361DCD;
-	Tue, 18 Nov 2025 14:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE3D357A5D;
+	Tue, 18 Nov 2025 15:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4doJTDC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F8A35F8D5
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 14:57:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326B72367DC;
+	Tue, 18 Nov 2025 15:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763477849; cv=none; b=n0zld0hkKqzNCw2bPFuCEWXG1+SY/5PMdBn5kr5CypEYdVS3v87S5Oo4eb3ZS/MTuK2Yi/f2yy+EtMNhn3iltWaR+8wOnVZlPUbYwX3K5yzmzXu8rnOp7jLwYPbIvmyN4kJDgQUgjAyxLeK71GjG1hk/2XbVOD87BBp2mesfidg=
+	t=1763478046; cv=none; b=Z7lSbM/4R2nVIIhNJDb8n/ExYoiVIm2DEdxf5fbDBHDfuqQpYDN+ejryW0ZkMkRvY5JodBXcAGX4RTZNXrfpklLsAHCuivpoVAIqVr2a2dcSy2l3FTLn6DrxCkoTbbPWgEFlEqCzYU8gnKYo5iMZfzyqKZEn5Ibh8vHjWMbM0j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763477849; c=relaxed/simple;
-	bh=ruYCHusFkEH9KG2jSmGmY93iY/CEiGTZkjjn416cp2I=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=Fafipu6HNGzNHczyCdjareBtFqzcdwDxC500Mmhp3t4UmkeIHZqOkzG/Wifxbh/1NXfxlCwXrY0NXqcOFe3KY+QdWEEj9TIYjev6AlV1BEuYPb6VwxXsb9a4AlK/5wtS6OHa4YdUDpetEYB3MZq0wek5t/JPhcR0JrIJGe2AmAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-9487df8723aso1131982639f.3
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 06:57:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763477847; x=1764082647;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u763Shby4GQU/5OqcoMKzhO+KKK/dvga9Fa7xrTqfVg=;
-        b=MSK9Es9yYedqzdOJvMNx5ZUuKtIWS+FK8NYlGWooIv8WxFED2MLG9Hjk5yazQ0sD5L
-         O5pKvRTV2qT6t5Kjy8WcLOhE9eP0MBPLeW2s5d1u+uQxoPW5hU4eaOHs7Qq7JeZ6JymP
-         VYnkp4y2TcKAqKcsPd4yRL70shliyIXfCDnuVZW+WOaqNv6H/1DJ3PRQqqCa4fF0UCUP
-         05KpjVVdPOnxZ63m4Uq+fjB2oYFLTBOtpYEdDJxcE6Cd0cLC10KuLCPfV3l1EcZEpdoh
-         tRT5c/WJl06bd/IEA2AUv/bz8sLZ7YhBXBDsgmH4dILcn+AfrBcyWwm/aqagKczxnpBl
-         IwzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX09rf9gYdv6e9TpTTrsncfKOswXz6R20sFiTpeAYeem8fkBS9ztnmYaKBjT0BogPNbbANGGNc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1zV+g056AIyrP9x+bLgy4nRokvIaRyV0y2eSzn/59a1c/KVl0
-	9JWxvVYfv6H1H6xHnJOofc1SoD/IWOcvs17gUv65CRQmhpjCellHOiL0CmIeLHUOVMjHKK1+b8x
-	U+8EnGeLUkBthPmVT6Bww3e0rqF++fKzXsRucDXDbEK2fv2/5f/OF7Wcm3rI=
-X-Google-Smtp-Source: AGHT+IHa4N09KYI8/WNwIltWNhmJKlXVmJu3DeOqrGZ0vlm1Y96bjs9AjcmNtJPRcyC9kLIx3VFX6ZXPa2RYWqnjo0rNI9BKaFSd
+	s=arc-20240116; t=1763478046; c=relaxed/simple;
+	bh=dQzpbT2F2qJaoBjb2XPpXsQz/3pWhfQOSIcwv25p/BU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FGA0ov0E9D4IHecYZ6o8Ka1ATrt8Le4XGsOtY6MCtaWpDFVw9j3CNHLIy3uh0QIijcLR8UWCo7Phkqxp3k6P56KE7tCgwBMX0gyRAyqOFtkQKE8h4LpKH6J8KSCiKU9roHv8VHWA3V3ifRpNaCiGt25Hh5Ajli/cwYlgraNwwU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4doJTDC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2860C116B1;
+	Tue, 18 Nov 2025 15:00:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763478045;
+	bh=dQzpbT2F2qJaoBjb2XPpXsQz/3pWhfQOSIcwv25p/BU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=e4doJTDCZlA1GNWXbFlJoa+OLXjbMfkt3pOpy1hH4mX6QPpdNycp2E/cf8R+g3Srk
+	 ACK8lehT2XVnMYG1wisubMiOHMBbLixYjNMVz+XC4RGEhsazH2hVqbygb9yh3FRxP9
+	 RtnekfKL+6TxCFOW7Fz9Rhnf7EadTKVVy//XOSD/zUcWUG6uvk85s+XIrKeBGYU4sH
+	 F4UBqEIktOHQieKIRW6tJ4R7Weyp3iMO6DWqKVywiDgXmVeXUREQ3q95Q8p9lc9xtv
+	 e8Qi9t/V6DACl9ppGSUy3VI9De+cznM5lFgaOnCtk5TvhgmfubpeSuzwOMAFwFZmXC
+	 DzjdAoZYbNBFA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7105C3809A8F;
+	Tue, 18 Nov 2025 15:00:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:174b:b0:433:2240:a516 with SMTP id
- e9e14a558f8ab-4348c93d24amr231835385ab.30.1763477847195; Tue, 18 Nov 2025
- 06:57:27 -0800 (PST)
-Date: Tue, 18 Nov 2025 06:57:27 -0800
-In-Reply-To: <20251118100046.2944392-1-skorodumov.dmitry@huawei.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <691c8957.a70a0220.3124cb.00cd.GAE@google.com>
-Subject: [syzbot ci] Re: ipvlan: support mac-nat mode
-From: syzbot ci <syzbot+ci8641603e6d3479de@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, andrey.bokhanko@huawei.com, corbet@lwn.net, 
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	shuah@kernel.org, skorodumov.dmitry@huawei.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/4] gve: Implement XDP HW RX Timestamping
+ support
+ for DQ
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176347801225.4178761.8286232845240261074.git-patchwork-notify@kernel.org>
+Date: Tue, 18 Nov 2025 15:00:12 +0000
+References: <20251114211146.292068-1-joshwash@google.com>
+In-Reply-To: <20251114211146.292068-1-joshwash@google.com>
+To: Joshua Washington <joshwash@google.com>
+Cc: netdev@vger.kernel.org, hramamurthy@google.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
+ willemb@google.com, pkaligineedi@google.com, thostet@google.com,
+ yyd@google.com, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 
-syzbot ci has tested the following series
+Hello:
 
-[v4] ipvlan: support mac-nat mode
-https://lore.kernel.org/all/20251118100046.2944392-1-skorodumov.dmitry@huawei.com
-* [PATCH net-next 01/13] ipvlan: Support MACNAT mode
-* [PATCH net-next 02/13] ipvlan: macnat: Handle rx mcast-ip and unicast eth
-* [PATCH net-next 03/13] ipvlan: Forget all IP when device goes down
-* [PATCH net-next 04/13] ipvlan: Support IPv6 in macnat mode.
-* [PATCH net-next 05/13] ipvlan: Fix compilation warning about __be32 -> u32
-* [PATCH net-next 06/13] ipvlan: Make the addrs_lock be per port
-* [PATCH net-next 07/13] ipvlan: Take addr_lock in ipvlan_open()
-* [PATCH net-next 08/13] ipvlan: Don't allow children to use IPs of main
-* [PATCH net-next 09/13] ipvlan: const-specifier for functions that use iaddr
-* [PATCH net-next 10/13] ipvlan: Common code from v6/v4 validator_event
-* [PATCH net-next 11/13] ipvlan: common code to handle ipv6/ipv4 address events
-* [PATCH net-next 12/13] ipvlan: Ignore PACKET_LOOPBACK in handle_mode_l2()
-* [PATCH net-next 13/13] selftests: drv-net: selftest for ipvlan-macnat mode
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-and found the following issue:
-WARNING: suspicious RCU usage in ipvlan_addr_event
+On Fri, 14 Nov 2025 13:11:42 -0800 you wrote:
+> From: Tim Hostetler <thostet@google.com>
+> 
+> This patch series adds support for bpf_xdp_metadata_rx_timestamp from an
+> XDP program loaded into the driver on its own or bound to an XSK. This
+> is only supported for DQ.
+> 
+> Tim Hostetler (4):
+>   gve: Move ptp_schedule_worker to gve_init_clock
+>   gve: Wrap struct xdp_buff
+>   gve: Prepare bpf_xdp_metadata_rx_timestamp support
+>   gve: Add Rx HWTS metadata to AF_XDP ZC mode
 
-Full report is available here:
-https://ci.syzbot.org/series/e483b93a-1063-4c8a-b0e2-89530e79768b
+Here is the summary with links:
+  - [net-next,1/4] gve: Move ptp_schedule_worker to gve_init_clock
+    https://git.kernel.org/netdev/net-next/c/46e7860ef941
+  - [net-next,2/4] gve: Wrap struct xdp_buff
+    https://git.kernel.org/netdev/net-next/c/f356a66b87bb
+  - [net-next,3/4] gve: Prepare bpf_xdp_metadata_rx_timestamp support
+    https://git.kernel.org/netdev/net-next/c/66adaf102128
+  - [net-next,4/4] gve: Add Rx HWTS metadata to AF_XDP ZC mode
+    https://git.kernel.org/netdev/net-next/c/1b42e07af1ee
 
-***
-
-WARNING: suspicious RCU usage in ipvlan_addr_event
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      c99ebb6132595b4b288a413981197eb076547c5a
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/ac5af6f3-6b14-4e35-9d81-ee1522de3952/config
-
-8021q: adding VLAN 0 to HW filter on device batadv0
-=============================
-WARNING: suspicious RCU usage
-syzkaller #0 Not tainted
------------------------------
-drivers/net/ipvlan/ipvlan.h:128 suspicious rcu_dereference_check() usage!
-
-other info that might help us debug this:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-rcu_scheduler_active = 2, debug_locks = 1
-2 locks held by syz-executor/5984:
- #0: ffffffff8f2cc248 (rtnl_mutex){+.+.}-{4:4}, at: inet_rtm_newaddr+0x3b0/0x18b0
- #1: ffffffff8f39d9b0 ((inetaddr_chain).rwsem){++++}-{4:4}, at: blocking_notifier_call_chain+0x54/0x90
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 5984 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250
- lockdep_rcu_suspicious+0x140/0x1d0
- ipvlan_addr_event+0x60b/0x950
- notifier_call_chain+0x1b6/0x3e0
- blocking_notifier_call_chain+0x6a/0x90
- __inet_insert_ifa+0xa13/0xbf0
- inet_rtm_newaddr+0xf3a/0x18b0
- rtnetlink_rcv_msg+0x7cf/0xb70
- netlink_rcv_skb+0x208/0x470
- netlink_unicast+0x82f/0x9e0
- netlink_sendmsg+0x805/0xb30
- __sock_sendmsg+0x21c/0x270
- __sys_sendto+0x3bd/0x520
- __x64_sys_sendto+0xde/0x100
- do_syscall_64+0xfa/0xfa0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f711f191503
-Code: 64 89 02 48 c7 c0 ff ff ff ff eb b7 66 2e 0f 1f 84 00 00 00 00 00 90 80 3d 61 70 22 00 00 41 89 ca 74 14 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 75 c3 0f 1f 40 00 55 48 83 ec 30 44 89 4c 24
-RSP: 002b:00007ffc44b05f28 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f711ff14620 RCX: 00007f711f191503
-RDX: 0000000000000028 RSI: 00007f711ff14670 RDI: 0000000000000003
-RBP: 0000000000000001 R08: 00007ffc44b05f44 R09: 000000000000000c
-R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000003
-R13: 0000000000000000 R14: 00007f711ff14670 R15: 0000000000000000
- </TASK>
-syz-executor (5984) used greatest stack depth: 19864 bytes left
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
