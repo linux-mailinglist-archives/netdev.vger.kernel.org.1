@@ -1,133 +1,103 @@
-Return-Path: <netdev+bounces-239506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56BD7C68F25
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 12:00:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8697CC68F46
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 12:01:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 400654E1E65
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:00:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 972572ACC2
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4023B31A07B;
-	Tue, 18 Nov 2025 11:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 990C42D978D;
+	Tue, 18 Nov 2025 11:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LY7VainY"
+	dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b="aEVpzY/S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from sender-of-o58.zoho.eu (sender-of-o58.zoho.eu [136.143.169.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE96224D6
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 11:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763463618; cv=none; b=TDTzQUhuBChdK6+6/85oJAlJCxDjOYoTtMbo+fZ+DRMEJesPj3JpojzmAk2k9RoSyOCYpxtKJPSHIp+fanWf/ZQf2kBbM5x9O2z0cA72PntIn03urTSpG5SGOWcLLGut4Qj3G873Hy8qD6x/90qG7Nsif9DfWAkuwlEj5e5m+Rk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763463618; c=relaxed/simple;
-	bh=tFDRCVUVudJMkiJJKdSIYdfw6Iuy22ys7NE28doThrE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lL4kmWnOlshCeLxf/w+4cAPM0YgeHtJlfjGJ8pPVdKfockqsNKlU9t06CyXK4lvBSQDqej2lez1IDuk9Y7qqQpFUW3U7FhxZZdPXtcgmM6A6gV/kIoYa+oSiszzYUJ38afnX5u0Dd6AyEADFBB9Dm5AzPLJv4BZNUsKurmgy3Zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=LY7VainY; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AI9CdSR024855;
-	Tue, 18 Nov 2025 10:59:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=vtzw7cutTccMEE7WY+vb8GRnS9OkT
-	CSwzPJit9gHtrI=; b=LY7VainYnp/sR2aAI/KBNWsVdJe82zP//qHu44d0qnzFp
-	CENHDPFapXm7wwOczSkdKaqWEIRO238SpQgXzQ5GSks06xh2p0lpvIf/mI1b4tIS
-	iZCpr79PDUZw7isB9TB5YXVI4UG4tNq15G/EdNLmk+RbU+RMzg5dqN2+zB6kmD+L
-	lxRzBmxT9eOOd9lEGUTk40uHm4Z5DofU2UgZAUk+K4P0xKhMovYF4OYvSV9EffW2
-	yKpa6S/t8A11CJ2R1KzC+JUtCNRvSbWbCeUBNO8Oi7v+EhKO4NkkAGWxwZKzCWj/
-	QtjT0H1tNnLjEuo1rzk2RlTUYOerI8HuH++enyAJQ==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4aejbpvmav-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 18 Nov 2025 10:59:52 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AI8UToc004250;
-	Tue, 18 Nov 2025 10:59:46 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4aefy8qw90-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 18 Nov 2025 10:59:46 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AIAt1It020499;
-	Tue, 18 Nov 2025 10:59:46 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4aefy8qw8a-1;
-	Tue, 18 Nov 2025 10:59:46 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: przemyslaw.kitszel@intel.com, aleksander.lobakin@intel.com,
-        anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch, kuba@kernel.org,
-        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
-Subject: [PATCH v2 net-next] idpf: use desc_ring when checking completion queue DMA allocation
-Date: Tue, 18 Nov 2025 02:55:21 -0800
-Message-ID: <20251118105942.3163598-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3779DEEB3
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 11:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763463673; cv=pass; b=Lj9hkhbFThLopTfni/uoMT5/bH3wVhKPYPRnOak30pBlvDxViSmEp6ezNTFg9YXjX4yuHZ9f/oxi/qRkXdyYTSXCwHctrvxf2LjGtYqDFld+ecpQRhoyhozBMzbbamf92Fio8lMXogHSTAeCjiv7K8qrJdxeDYRhuQDxjBO1T1g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763463673; c=relaxed/simple;
+	bh=IUNUMAVe+omibHWRcimXmSoMKQtlhtj9ipHTjfgpzzQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=pVuA7Hh7OhNtwOCQy1QYizdt1h2yZWoxAlgYZT0brmtND8Lbkqtn89haw9oKY6YXi0QMP8F7279Os/AKSuRmaUdpHOA4jfVo30SQSJPAqNT8fLJJe7ZIR5rOmag00huIUZjwJsPFlJXVykZriFhffM+lY6c1wU41JG44JgTwdP4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net; spf=pass smtp.mailfrom=azey.net; dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b=aEVpzY/S; arc=pass smtp.client-ip=136.143.169.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=azey.net
+ARC-Seal: i=1; a=rsa-sha256; t=1763463633; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=IPFBaiuxgZp7VhDm/2Yv9CoOKHQDfL+b7loQh96oJRBx+HNkm45vKHHSVGH1a+agYr8Eu0T8raGaXbjSjEFcVyaT4Ko/NBkjBOihnQNIr/J6mTFLEqxrGVVA2cvCOPFstVyqLZKJysPDJugkO25T0JYJqLet/gsr5nbXq9Ftxxg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1763463633; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=IUNUMAVe+omibHWRcimXmSoMKQtlhtj9ipHTjfgpzzQ=; 
+	b=F6CJMTar3pRty0Dkgfh9TcfDXibVogdhOHNUoB+6tCBC9plUjOqkkl8QfCipZ7FMiAxaxcdTtNefhyTWQfPNr21xdY6OFERf0POdJqfmdF0m+u5yVvMZ5kxginCMheoxTMqOXFmpI3uLd4AZkQHO4hqdNL8c5rAY+nno8YMrcR8=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=azey.net;
+	spf=pass  smtp.mailfrom=me@azey.net;
+	dmarc=pass header.from=<me@azey.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1763463633;
+	s=zmail; d=azey.net; i=me@azey.net;
+	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=IUNUMAVe+omibHWRcimXmSoMKQtlhtj9ipHTjfgpzzQ=;
+	b=aEVpzY/Si5iehy7j9pXeiOt+iRa3K+hFe/DY1RDaSbbiXcBzvNoSWHrSMzVUkJZy
+	FSDdRd9+J57nJ2xo1pTmYUpQ3yQjYFBSg2Jqa0iIa5fgreUX4rhHM0D8C+wr1VGmEQ9
+	Sh1HtkX/y+i/HEv5jZqHyZTIMJQEzf0rqQ2TB+X0=
+Received: from mail.zoho.eu by mx.zoho.eu
+	with SMTP id 1763463631338149.69069901999615; Tue, 18 Nov 2025 12:00:31 +0100 (CET)
+Date: Tue, 18 Nov 2025 12:00:31 +0100
+From: azey <me@azey.net>
+To: "nicolasdichtel" <nicolas.dichtel@6wind.com>
+Cc: "David Ahern" <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Eric Dumazet" <edumazet@google.com>,
+	"Jakub Kicinski" <kuba@kernel.org>,
+	"Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
+	"netdev" <netdev@vger.kernel.org>,
+	"linux-kernel" <linux-kernel@vger.kernel.org>
+Message-ID: <19a969f919b.facf84276222.4894043454892645830@azey.net>
+In-Reply-To: <a4be64fb-d30e-43e3-b326-71efa7817683@6wind.com>
+References: <a6vmtv3ylu224fnj5awi6xrgnjoib5r2jm3kny672hemsk5ifi@ychcxqnmy5us>
+ <7a4ebf5d-1815-44b6-bf77-bc7b32f39984@kernel.org> <a4be64fb-d30e-43e3-b326-71efa7817683@6wind.com>
+Subject: Re: [PATCH] net/ipv6: allow device-only routes via the multipath
+ API
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-17_04,2025-11-13_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
- suspectscore=0 malwarescore=0 mlxscore=0 bulkscore=0 phishscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2510240000 definitions=main-2511180087
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMSBTYWx0ZWRfX4p2J4CPo7ZbA
- DksgnPE0eDIHJ6RCw8yK8dNpvRYgFRk/sGJKOz/uDH6QOioLitxcx0gKwtmanCAhVqoVck/gSoz
- wiFUbqU0lbUy32EIh79V6BI3I8CrewJtmFqu1AyHMPp3u8YEeLBtBqofetPwIMq66aZVE3XA2BI
- O3onSsSmyZa71q+upoDBovP8cJylLeu6fDBha4WxGpCjwcHLE+vR/rnYrjWO9wnaTbzOkCxAlVe
- 7xwlRbht3CcjnSVkkQvIR9CiCsj15wbMdzUfr1QwCeujCe0bSeBMAxYBc+pFtL2VhMzvAGRCi7d
- snL+X3xBsGTSnC4slbHKbaAHEbNEmKr9NOwV729pDrQIYp1Iy5MpWvqw9fI/CtkCsxXqmvhIiG/
- Ttf52IA4ZCzwAgw5PP4sp9tHo4396g==
-X-Proofpoint-ORIG-GUID: P2G8VG4CIHh-YEj45eT3-iXoMDBz0Fs5
-X-Proofpoint-GUID: P2G8VG4CIHh-YEj45eT3-iXoMDBz0Fs5
-X-Authority-Analysis: v=2.4 cv=a+o9NESF c=1 sm=1 tr=0 ts=691c51a8 cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
- a=MPXrcZT4uZQNy45QjfwA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
 
-idpf_compl_queue uses a union for comp, comp_4b, and desc_ring. The
-release path should check complq->desc_ring to determine whether the DMA
-descriptor ring is allocated. The current check against comp is not
-incorrect, but it appears to be leftover code from a previous commit.
+On 2025-11-18 10:05:55, +0100 Nicolas Dichtel wrote:
+> If I remember well, it was to avoid merging connected routes to ECMP routes.
+> For example, fe80:: but also if two interfaces have an address in the same
+> prefix. With the current code, the last route will always be used. With this
+> patch, packets will be distributed across the two interfaces, right?
+> If yes, it may cause regression on some setups.
 
-Switching the check to desc_ring improves readability and more directly
-reflects the intended meaning, since desc_ring is the field representing
-the allocated DMA-backed descriptor ring.
+Thanks! Yes, with this patch routes with the same destination and metric automatically
+become multipath. From my testing, for link-locals this shouldn't make a difference
+as the interface must always be specified with % anyway.
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
-v1 -> v2
-modify commit message and target to net-next
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+For non-LL addresses, this could indeed cause a regression in obscure setups. In my
+opinion though, I feel that it is very unlikely anyone who has two routes with the
+same prefix and metric (which AFAIK, isn't really a supported configuration without
+ECMP anyway) relies on this quirk. The most plausible setup relying on this I can
+think of would be a server with two interfaces on the same L2 segment, and a
+firewall somewhere that only allows the source address of one interface through.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 828f7c444d30..1e7ae6f969ac 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -134,7 +134,7 @@ static void idpf_compl_desc_rel(struct idpf_compl_queue *complq)
- {
- 	idpf_xsk_clear_queue(complq, VIRTCHNL2_QUEUE_TYPE_TX_COMPLETION);
- 
--	if (!complq->comp)
-+	if (!complq->desc_ring)
- 		return;
- 
- 	dma_free_coherent(complq->netdev->dev.parent, complq->size,
--- 
-2.50.1
-
+IMO, setups like that are more of a misconfiguration than a "practical use case"
+that'd make this a real regression, but I'd completely understand if it'd be enough
+to block this.
 
