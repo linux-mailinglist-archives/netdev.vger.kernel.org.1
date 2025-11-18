@@ -1,120 +1,133 @@
-Return-Path: <netdev+bounces-239505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91EA1C68E10
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:42:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 56BD7C68F25
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 12:00:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2E57B4E1DF9
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:42:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 400654E1E65
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02230346E59;
-	Tue, 18 Nov 2025 10:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4023B31A07B;
+	Tue, 18 Nov 2025 11:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WixSIKAR"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LY7VainY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA8C32ED2E
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 10:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE96224D6
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 11:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763462572; cv=none; b=bQ2wZiVYXrAquMhJchDzwTxoB7gibGvHatCe6UE1BiBW1JVZkICgl70fw/wWFE5nY1akYaTYpVWF3teZSXs33jRN9RTVCfz7RkVqyHcbvesAPvynQWIvFpnRA23UeWVw4PPv9ny1swmAatBeSsd7Y3MiKJiPCtpMmhNyBOY8GY0=
+	t=1763463618; cv=none; b=TDTzQUhuBChdK6+6/85oJAlJCxDjOYoTtMbo+fZ+DRMEJesPj3JpojzmAk2k9RoSyOCYpxtKJPSHIp+fanWf/ZQf2kBbM5x9O2z0cA72PntIn03urTSpG5SGOWcLLGut4Qj3G873Hy8qD6x/90qG7Nsif9DfWAkuwlEj5e5m+Rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763462572; c=relaxed/simple;
-	bh=vpkBfMqQ3K5js2CMNGkRdtr+acWamucEKHJA/OdeC2U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YAffI5WYMf+SWHA5dAmSYmkbPOhBfHFpg0i7zhE+obV9I010Ptxq/LFHH+2EZHAgpfiQ+UrnPnXV6fi6Th+SPFSL6/KTcxnLrgQCDBNpR6mHfd7dd+bn/fynySO4dgPNjvforaRO2KX777FatzXyTL2h8aTWcc55bV5GAxuo3YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WixSIKAR; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47774d3536dso43970185e9.0
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 02:42:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763462570; x=1764067370; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3LNZ7kLM8T15IVuj4fqsK7U08DBmLHPEhW/eCbNKEog=;
-        b=WixSIKAReuRriWrHH/O0afMEFN/LnVUKfBhDwBttKdP2tbgUOjBwzNJ/Kt6x16YPWZ
-         RquHE7uWc7x5pDkMn6ZZq3twVbVFWoEXtlRDA0eWEJAUpI7jlgzZ/k8xwMulr+D6YRbS
-         fTEjYdfKlV6mP/yz+gLkqiGrHuyd/u8pIjLw+Q+qqmdz7q4HtGJ/7eTZB5OcKigRNFHo
-         v5B8UwXkPuNUMpZQvUjLKvIxoETTrtwl1+95Mn1FSIPaPWKzreLeouCSDUGKIRihP7WK
-         N+vePZQQCTseZi1Kww1diZpZCMHpnnLJpM0i5DKldiQl1DmYA9ZICJi5VX0KULOhIabd
-         xmtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763462570; x=1764067370;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3LNZ7kLM8T15IVuj4fqsK7U08DBmLHPEhW/eCbNKEog=;
-        b=kT3jMTbLftNZizkPG2agV1oLTetVfdP9GayIvDA8HvIsT6TtU1Qn1Ty/Wcdnn40iAN
-         42aSTLsnkIodcAJmPG56bW3cz1pouwgmvrcaycq6cCLiSia1kE+26dt+8XNQFs8II26t
-         ss+eQkuvRF+Y5R+RJYzfJNrGhnosFqOCxku0yeNNH4lxe6a8Z8+AJtP+e434kK5USUF+
-         tLO4ldIAayp0RgLmTbQTEA/1aphIMDeLZaEpX1In6Hx5FdvvbK6U6v0Qg1sg5Ov9CzKO
-         vuA+ejszJp2lPp3gFeKzFyRevF6S6pd+aNVsmermNrikYRrSBeIvU4fZV8DB5L9u1mMc
-         teeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWdccrx+EaIHOv1Vca5y5Yjkh5S7wf+lp3U7C+GPBhYIwCILGjtBbTZRyHEQuJaMyq8i0Kw4NU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+ilZ2I55TF+R/cECKaMDWzotcjhuta2gfZQm/g/imxkZxcJXH
-	f49kjCo8779VZdGf50Fk5TQDA5NEBaym3k5M8dGbHJAaD9tzKxgTUc0u
-X-Gm-Gg: ASbGncstQZSaG7tWolMG7ZhtlsfM0WZiAN1yuEEYyyRZDSu8/tdm1ocjSRXJ0Txd4MU
-	615GtUbY/cscXLN6tOOuvUHnvqDy6nOD4EMbXQoYVxOcyRK8qo0nPKc1MjSQn3OK+G3ef8ovw/a
-	orV7eUlR1pRU78JSKkXHmaCLV2C23oj9+QN7AJCU4IOJRP63GasojeWrCyP6GhKnjl7GdP3r/zm
-	eFgmhjuz/R7TqhROHVplaw9rmQU5C7JIfAMSuIPGMZAe7GwmDczsD9ecAzteHP8OdpCKxyXJaGB
-	bMJ5MUwM/IYnVY8AxKZnueITQbtDj8RSzUDZFM2mv3VkiA5z7rVSEZTDql/DBOpsFxJsVuHKya7
-	JqmKq1632ZJlPJSDhPN2+OLtWNFac2fBHflHCFrTzBQQHcZbSO6Sd3UsmgRH1DuLaDqG4xPXRXv
-	0w6xB7zdsgAgSbynwYPGars6PYF61MLXZiaAvjT5OpePg6iEjApw9qULxfCWzNsA4Oal5OT9mvQ
-	w==
-X-Google-Smtp-Source: AGHT+IEBUYaX4Bp2LkqHG3fEIEVxQRNem8L5c5rq2F9Th3HxY/EOPdLBnO8LsPHmltiaFAAMNb258A==
-X-Received: by 2002:a05:600c:3b13:b0:477:9890:9ab8 with SMTP id 5b1f17b1804b1-477a94acd85mr27682085e9.3.1763462569245;
-        Tue, 18 Nov 2025 02:42:49 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4779a2892c8sm182555035e9.1.2025.11.18.02.42.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 02:42:49 -0800 (PST)
-Date: Tue, 18 Nov 2025 10:42:47 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Cc: Amery Hung <ameryhung@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- daniel@iogearbox.net, kernel-team@meta.com
-Subject: Re: [PATCH bpf-next v1 1/1] bpf: Annotate rqspinlock lock acquiring
- functions with __must_check
-Message-ID: <20251118104247.0bf0b17d@pumpkin>
-In-Reply-To: <CAP01T74CcZqt9W8Y5T3NYheU8HyGataKXFw99cnLC46ZV9oFPQ@mail.gmail.com>
-References: <20251117191515.2934026-1-ameryhung@gmail.com>
-	<CAP01T74CcZqt9W8Y5T3NYheU8HyGataKXFw99cnLC46ZV9oFPQ@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1763463618; c=relaxed/simple;
+	bh=tFDRCVUVudJMkiJJKdSIYdfw6Iuy22ys7NE28doThrE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lL4kmWnOlshCeLxf/w+4cAPM0YgeHtJlfjGJ8pPVdKfockqsNKlU9t06CyXK4lvBSQDqej2lez1IDuk9Y7qqQpFUW3U7FhxZZdPXtcgmM6A6gV/kIoYa+oSiszzYUJ38afnX5u0Dd6AyEADFBB9Dm5AzPLJv4BZNUsKurmgy3Zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=LY7VainY; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AI9CdSR024855;
+	Tue, 18 Nov 2025 10:59:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=vtzw7cutTccMEE7WY+vb8GRnS9OkT
+	CSwzPJit9gHtrI=; b=LY7VainYnp/sR2aAI/KBNWsVdJe82zP//qHu44d0qnzFp
+	CENHDPFapXm7wwOczSkdKaqWEIRO238SpQgXzQ5GSks06xh2p0lpvIf/mI1b4tIS
+	iZCpr79PDUZw7isB9TB5YXVI4UG4tNq15G/EdNLmk+RbU+RMzg5dqN2+zB6kmD+L
+	lxRzBmxT9eOOd9lEGUTk40uHm4Z5DofU2UgZAUk+K4P0xKhMovYF4OYvSV9EffW2
+	yKpa6S/t8A11CJ2R1KzC+JUtCNRvSbWbCeUBNO8Oi7v+EhKO4NkkAGWxwZKzCWj/
+	QtjT0H1tNnLjEuo1rzk2RlTUYOerI8HuH++enyAJQ==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4aejbpvmav-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 18 Nov 2025 10:59:52 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AI8UToc004250;
+	Tue, 18 Nov 2025 10:59:46 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4aefy8qw90-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 18 Nov 2025 10:59:46 +0000
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AIAt1It020499;
+	Tue, 18 Nov 2025 10:59:46 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4aefy8qw8a-1;
+	Tue, 18 Nov 2025 10:59:46 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: przemyslaw.kitszel@intel.com, aleksander.lobakin@intel.com,
+        anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch, kuba@kernel.org,
+        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
+Subject: [PATCH v2 net-next] idpf: use desc_ring when checking completion queue DMA allocation
+Date: Tue, 18 Nov 2025 02:55:21 -0800
+Message-ID: <20251118105942.3163598-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-17_04,2025-11-13_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
+ suspectscore=0 malwarescore=0 mlxscore=0 bulkscore=0 phishscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2510240000 definitions=main-2511180087
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMSBTYWx0ZWRfX4p2J4CPo7ZbA
+ DksgnPE0eDIHJ6RCw8yK8dNpvRYgFRk/sGJKOz/uDH6QOioLitxcx0gKwtmanCAhVqoVck/gSoz
+ wiFUbqU0lbUy32EIh79V6BI3I8CrewJtmFqu1AyHMPp3u8YEeLBtBqofetPwIMq66aZVE3XA2BI
+ O3onSsSmyZa71q+upoDBovP8cJylLeu6fDBha4WxGpCjwcHLE+vR/rnYrjWO9wnaTbzOkCxAlVe
+ 7xwlRbht3CcjnSVkkQvIR9CiCsj15wbMdzUfr1QwCeujCe0bSeBMAxYBc+pFtL2VhMzvAGRCi7d
+ snL+X3xBsGTSnC4slbHKbaAHEbNEmKr9NOwV729pDrQIYp1Iy5MpWvqw9fI/CtkCsxXqmvhIiG/
+ Ttf52IA4ZCzwAgw5PP4sp9tHo4396g==
+X-Proofpoint-ORIG-GUID: P2G8VG4CIHh-YEj45eT3-iXoMDBz0Fs5
+X-Proofpoint-GUID: P2G8VG4CIHh-YEj45eT3-iXoMDBz0Fs5
+X-Authority-Analysis: v=2.4 cv=a+o9NESF c=1 sm=1 tr=0 ts=691c51a8 cx=c_pps
+ a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
+ a=MPXrcZT4uZQNy45QjfwA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
 
-On Tue, 18 Nov 2025 05:16:50 -0500
-Kumar Kartikeya Dwivedi <memxor@gmail.com> wrote:
+idpf_compl_queue uses a union for comp, comp_4b, and desc_ring. The
+release path should check complq->desc_ring to determine whether the DMA
+descriptor ring is allocated. The current check against comp is not
+incorrect, but it appears to be leftover code from a previous commit.
 
-> On Mon, 17 Nov 2025 at 14:15, Amery Hung <ameryhung@gmail.com> wrote:
-> >
-> > Locking a resilient queued spinlock can fail when deadlock or timeout
-> > happen. Mark the lock acquring functions with __must_check to make sure
-> > callers always handle the returned error.
-> >
-> > Suggested-by: Andrii Nakryiko <andrii@kernel.org>
-> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > ---  
-> 
-> Looks like it's working :)
-> I would just explicitly ignore with (void) cast the locktorture case.
+Switching the check to desc_ring improves readability and more directly
+reflects the intended meaning, since desc_ring is the field representing
+the allocated DMA-backed descriptor ring.
 
-I'm not sure that works - I usually have to try a lot harder to ignore
-a '__must_check' result.
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+v1 -> v2
+modify commit message and target to net-next
+---
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-	David
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 828f7c444d30..1e7ae6f969ac 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -134,7 +134,7 @@ static void idpf_compl_desc_rel(struct idpf_compl_queue *complq)
+ {
+ 	idpf_xsk_clear_queue(complq, VIRTCHNL2_QUEUE_TYPE_TX_COMPLETION);
+ 
+-	if (!complq->comp)
++	if (!complq->desc_ring)
+ 		return;
+ 
+ 	dma_free_coherent(complq->netdev->dev.parent, complq->size,
+-- 
+2.50.1
+
 
