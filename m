@@ -1,95 +1,132 @@
-Return-Path: <netdev+bounces-239475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF705C68ACE
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:00:24 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C02A2C68AE6
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:01:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BA4E94E2C0D
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:00:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 397FC354A84
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25D5632D0ED;
-	Tue, 18 Nov 2025 10:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wXCPvy19"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C112032D0CD;
+	Tue, 18 Nov 2025 10:01:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2276232C948
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 10:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3296C32D435
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 10:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763460023; cv=none; b=JtIta/P8nfJpy9BTXrqEpfDTX28PXRVsWYXe2oQ9HQBEMAfsSpURVk4sCbNAkt2UMntpBgC+2l8QVA5QuFegetShm7YiIb2Q8tSVCogGkjjG9mrRU4AcuC+c8HK3r2Nnn4+yAw1ko7DOwO4kzl3slrW+h8BMqomXCIeawHqu6Ig=
+	t=1763460060; cv=none; b=tLRS/ipSIE8Fb18ZXpJ5eI7O/O67RfLRLLMe6O4HV2R9PtX4s3Xdj1fsOqLaF9JEU5eCF1hH62spAvah6JvylDUcs03FMcfbHooqx5LRtYkSbjzkf2G95MsiC7LEEjboQI5zs7VE584A/qZhanuuwFQIxQQGcpoxWtosbG1V8NM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763460023; c=relaxed/simple;
-	bh=F5eld1SwlnW+fDQKB6EHEtFsROTcF1ZCGkSoBmicXQ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=poZJ9NjQmTbLbQNkIeymfPOOk+kmQy7HQ4cjtzVB+x2PBAeRBkNkEP5j1GKJf7Z1cgtD1TCgH+ELTzszkk3v13k8kSg/8/FUDNi4Gt3f/0pMwuBYo83/9oodkZPbvup2gygB4q7gG3GI2oXXvQNK1pqKc4DqQ8le4Arto2T7lqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wXCPvy19; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZHtYuYxvWqbVVfivkjXN2yF2dYFsIpwehTqtsa5taOc=; b=wXCPvy19LVshAa4rOzm6Eu7c1v
-	qKbcCfAZparxO4aSBWG29gShzC+P/5T4Q5+lretIYqoY/yxPCvZkOJHEsYSLlK222UF32OuBywoGh
-	5Vn7vci+LECxTe2mBJUez4eJCCGeWO2kUQncKX3r5B4af0Nq/PZ6mEuJPZxJv/h1gyJH/dvocVZ2g
-	rc6saTB8D36f9EGU6z6pMRXoUd+xDdPoEw7LIleLcq7elOknljK/NanH3DNY8kwLP08jUNq24vbyP
-	rL1qTRuY6F5LpDaT50ZqDiXgciGGtVI+HWzx6qrrClJrBLlAl6pMFXbc7miGBgEbClkYAAHlrapjQ
-	nQiKBsVQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39436)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vLIVQ-0000000031R-44Py;
-	Tue, 18 Nov 2025 10:00:13 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vLIVN-000000002Mv-0OUs;
-	Tue, 18 Nov 2025 10:00:09 +0000
-Date: Tue, 18 Nov 2025 10:00:08 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 0/2] net: stmmac: sanitise stmmac_is_jumbo_frm()
-Message-ID: <aRxDqJSWxOdOaRt4@shell.armlinux.org.uk>
+	s=arc-20240116; t=1763460060; c=relaxed/simple;
+	bh=U33qyF00O3e8KmBYVJcJ7XWe2SkBsSxVU+kiCOmwK9o=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=g3al/GK9PbS4XgnvPTqjFBFPd5qz7vPx29cRGPqLOxv3QgLVkd7Z0jn3qoeEw2zbqYrwniUgKyu3P3HZFOhHrAmMadxK+tzP9DOLb8xx+gw8GgUnRh5IW/D5kL9hHCol7NJMhk/fOILovdAVv/hJQaPBbTUo0fRPqTmqHvujsX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d9g8X42mXzJ46hD
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 18:00:12 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9A6C51404FE
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 18:00:54 +0800 (CST)
+Received: from huawei-ThinkCentre-M920t.huawei.com (10.123.122.223) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 18 Nov 2025 13:00:54 +0300
+From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+To: <netdev@vger.kernel.org>
+CC: <andrey.bokhanko@huawei.com>, <edumazet@google.com>, Dmitry Skorodumov
+	<skorodumov.dmitry@huawei.com>
+Subject: [PATCH v4 net-next 00/13] ipvlan: support mac-nat mode
+Date: Tue, 18 Nov 2025 13:00:32 +0300
+Message-ID: <20251118100046.2944392-1-skorodumov.dmitry@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: mscpeml500003.china.huawei.com (7.188.49.51) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
-stmmac_is_jumbo_frm() takes skb->len, which is unsigned int, but the
-parameter is passed as an "int" and then tested using signed
-comparisons. This can cause bugs. Change the parameter to be unsigned.
+pvlan: support mac-nat mode
 
-Also arrange for it to return a bool.
+ipvlan: Add support of MAC-NAT translation in L2-bridge
 
- drivers/net/ethernet/stmicro/stmmac/chain_mode.c  | 9 ++++-----
- drivers/net/ethernet/stmicro/stmmac/hwif.h        | 2 +-
- drivers/net/ethernet/stmicro/stmmac/ring_mode.c   | 9 ++-------
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 6 +++---
- 4 files changed, 10 insertions(+), 16 deletions(-)
+Make it is possible to create link in L2_MACNAT mode: learnable
+bridge with MAC Address Translation. The IPs and MAC addresses will be learned
+from TX-packets of child interfaces.
+
+Also, dev_add_pack() protocol is attached to the main port
+to support communication from main to child interfaces.
+
+This mode is intended for the desktop virtual machines, for
+bridging to Wireless interfaces.
+
+The mode should be specified while creating first child interface.
+It is not possible to change it after this.
+
+This functionality is quite often requested by users.
+
+diff from v3:
+- Restructured code, to place all new functionality under
+if (ipvlan_is_macnat(port) condition and minimize refactoring
+of existing code.
+- Added kselftest for the new functionality
+- Removed patch with unnecessary gso_segment() call
+- Patches 1-3 were merged into 1
+- Fixed compilation warnings about __be16/__be32 conversions
+
+diff from v2:
+- forgotten patches (10..14) added
+
+diff from v1:
+
+- changed name of the mode to be L2_MACNAT
+- Fixed use of uninitialized variable, found by Intel CI/CD
+- Fixed style problems with lines more then 80 chars
+- Try to use xmastree style of vars declarations
+- Fixed broken intermediate compilation
+- Added check, that child-ip doesn't use IP of the main port
+- Added patch to ignore PACKET_LOOPBACK in handle_mode_l2()
+- Some patches with style-refactoring of addr-event notifications
+
+Dmitry Skorodumov (13):
+  ipvlan: Support MACNAT mode
+  ipvlan: macnat: Handle rx mcast-ip and unicast eth
+  ipvlan: Forget all IP when device goes down
+  ipvlan: Support IPv6 in macnat mode.
+  ipvlan: Fix compilation warning about __be32 -> u32
+  ipvlan: Make the addrs_lock be per port
+  ipvlan: Take addr_lock in ipvlan_open()
+  ipvlan: Don't allow children to use IPs of main
+  ipvlan: const-specifier for functions that use iaddr
+  ipvlan: Common code from v6/v4 validator_event
+  ipvlan: common code to handle ipv6/ipv4 address events
+  ipvlan: Ignore PACKET_LOOPBACK in handle_mode_l2()
+  selftests: drv-net: selftest for ipvlan-macnat mode
+
+ Documentation/networking/ipvlan.rst           |  20 +
+ drivers/net/ipvlan/ipvlan.h                   |  45 +-
+ drivers/net/ipvlan/ipvlan_core.c              | 486 ++++++++++++++++-
+ drivers/net/ipvlan/ipvlan_main.c              | 506 ++++++++++++++----
+ include/uapi/linux/if_link.h                  |   1 +
+ tools/testing/selftests/net/Makefile          |   3 +
+ .../selftests/net/ipvtap_macnat_bridge.py     | 174 ++++++
+ .../selftests/net/ipvtap_macnat_test.sh       | 332 ++++++++++++
+ 8 files changed, 1426 insertions(+), 141 deletions(-)
+ create mode 100755 tools/testing/selftests/net/ipvtap_macnat_bridge.py
+ create mode 100755 tools/testing/selftests/net/ipvtap_macnat_test.sh
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.25.1
+
 
