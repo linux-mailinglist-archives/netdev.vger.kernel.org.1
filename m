@@ -1,285 +1,176 @@
-Return-Path: <netdev+bounces-239445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD6EC686F5
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:10:31 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59451C68729
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:13:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AD7004E418D
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:10:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 791482A810
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835442F9DBD;
-	Tue, 18 Nov 2025 09:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jaguarmicro.com header.i=@jaguarmicro.com header.b="qOgfQ9+p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94673081D0;
+	Tue, 18 Nov 2025 09:12:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11023124.outbound.protection.outlook.com [40.107.44.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27ECF2571BD;
-	Tue, 18 Nov 2025 09:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763457011; cv=fail; b=fuQiKmmztk5se9MIVl8rCGQUyzTP7bi7EOzMpYnlflD7djbbz5EEIoSnwuizv50xWdUst7bwd+WMqO0sgWFWqUo2FObBJjKRNb/YQYv12zlcGJMo0MQpDCAVykO9i/hf/heqTVbvCOjYMeeuUmMXFJDz7mJN8xY5EkvmAm/bbMo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763457011; c=relaxed/simple;
-	bh=XxkEVvZj1DwAdW0jek5MKiALkGnKzeoeoUVHKy2k0Cc=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=XfGRge96lE+nCopaIv6H6gylXPPKEcpmSLqd/0GjbGlHDnp96yLVqYce+HtVAU9YSRFyJE/nYXf/k+GcdxFDmxOP4AKqELvY6RlCqBtWpk3Dh+scGxwVN0sc/iWvmE+EVxVgF28pBD/a4zc/Bfw/KVYY+m0T/BJvfY2KKPscuQ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jaguarmicro.com; spf=pass smtp.mailfrom=jaguarmicro.com; dkim=pass (2048-bit key) header.d=jaguarmicro.com header.i=@jaguarmicro.com header.b=qOgfQ9+p; arc=fail smtp.client-ip=40.107.44.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jaguarmicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jaguarmicro.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NBDh/UQzWGEWrp56FDntFj9Gqhm6s4k/6RJg9iHfsST+5wZUBMihTW9zNDDA+l5gMGzE8oic1zstLSk9T/RnfhfjTV5pxlsCBZN6lq+bBd5ebBLbO8lniVikmnfIL3EYedExkv2c4pnqixsqsDjbmgW0stL7ExkS/VXPbNgYwdr98NU4aVXlbDwrX2LgVGzBDM2PdsWdTMXVxgNGfsLqdZ7VYqTCkr1LO90aunwHfajj0X5fXjIwcKGBLQeI5AlrViMhd8PJcVB2uBjCB9+T/H2nWT9kFS0HZV5XVj3E9un7/9HcpwrlMQ1eUJtI6b0omre0oApjKn1GAQiwKAl6aA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J3JbsAmV5B+NeJFmwJdE0LYXLLtQ+bT1fMQhjvhrKTo=;
- b=QNVbMvkgkkM2LVw6R/C/BmRj8Io3e4U68+90pKj1RgQA3lUEZV9QsyEQMJ9l39tPOWcCoB79nEghLiDzgKErpOYu/Ax1KSCcb7s6nPiWhMtcunWLBWVQtegd0NlgWI33h7DEWW4nfAcimK76YFg1pmqBQ1GNUpCgPhAYaUpi3fbBrEb3NHyKCpLs4rswfWiLvAbfcnmx6jVY1ANSWCGLRfmIMc7H4UtJOVx8ah/XS1gt+gagUtfyacbz3y+cQyDWEmMmg5DgJzgWdWL4XlzKTnx69HAi52FY4esrwm9zmKidqnfYj0daRgS/S+zC5bcFfW30OyaFbMZy1QdUrn7UlA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=jaguarmicro.com; dmarc=pass action=none
- header.from=jaguarmicro.com; dkim=pass header.d=jaguarmicro.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaguarmicro.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J3JbsAmV5B+NeJFmwJdE0LYXLLtQ+bT1fMQhjvhrKTo=;
- b=qOgfQ9+pOHY7ZfsVK/03Iqgl+pRLXXy4wYkhqJI0OZm+znw5Z8XG1d1X4jdfJkoNEvQQIYUdt2rXKDR2LdHq66LGUG9x7o5HLdfTDipVaGcMZj+S+kOpp6/aEXqb/q8gvi8jKQSzLpaHjhRvhiogTquOJS6aXtnwgRqx17EL8UT/q8nJyxtdzND8rxLV8O3wUDR0O4SDjiKJfVqDw6eNpOBbC6ZUAKwbz+edbTCwmwoP5p2m+nzD9NbVPrxQ8R5bk/3ZAs6BtveIkKLh12hR8zFEs8zeSCuAVYUnRwrszM0SaFEYNZmgtgvcJ5cN8crTIrnXJJV7tqmK7bt7oNf+pw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=jaguarmicro.com;
-Received: from PSAPR06MB3942.apcprd06.prod.outlook.com (2603:1096:301:2b::5)
- by PUZPR06MB5902.apcprd06.prod.outlook.com (2603:1096:301:119::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.22; Tue, 18 Nov
- 2025 09:10:00 +0000
-Received: from PSAPR06MB3942.apcprd06.prod.outlook.com
- ([fe80::9b95:32e5:8e63:7881]) by PSAPR06MB3942.apcprd06.prod.outlook.com
- ([fe80::9b95:32e5:8e63:7881%5]) with mapi id 15.20.9320.013; Tue, 18 Nov 2025
- 09:10:00 +0000
-From: liming.wu@jaguarmicro.com
-To: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-Cc: kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	angus.chen@jaguarmicro.com,
-	Liming Wu <liming.wu@jaguarmicro.com>
-Subject: [PATCH] virtio_net: enhance wake/stop tx queue statistics accounting
-Date: Tue, 18 Nov 2025 17:09:42 +0800
-Message-ID: <20251118090942.1369-1-liming.wu@jaguarmicro.com>
-X-Mailer: git-send-email 2.49.0.windows.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: KUZPR01CA0005.apcprd01.prod.exchangelabs.com
- (2603:1096:d10:34::18) To PSAPR06MB3942.apcprd06.prod.outlook.com
- (2603:1096:301:2b::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5D730F80A
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 09:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763457148; cv=none; b=uQGODKtdkQfAQj0URkcaibb4HYdpUkjMdOOLfrKzOLE96sXl10wsStNNo3epHMikJaNjpN9LFCRRFWZI/N2O3np4Kq67ORKHszpD3UU3EAmleGib4IseFghgyX95veTdBtJOXmzhDRLqkjp9GuADN1sPuuMKHHOPZOMiqAUf/WQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763457148; c=relaxed/simple;
+	bh=RMHiKfDDZRF4XKtK3FvegO8GyEZ0WcrzD9nGISsyTbI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QgklhtOuKEb/b0MiFwGJazKPUnAtvWdp6jiJIOrhnUOra+bFKJH4497O/GUcrB857xIEZ1/Pb2a2BpEUmgOf8Z2g9/9jRqx3oD0YI/j2qMcKMhGO1IfJ58gyALF3Q8aQ4pX/4h/BA9fzdLPHZMkCy7DDZSPVkDrgLQVBvl+oMdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-433795a17c1so135375415ab.2
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 01:12:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763457144; x=1764061944;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZCPCBiDseJTYHAymJetqpym/2ftXtJI5iOpKOSwwOu8=;
+        b=t4ocrxPlTY3h+AkfjqF4IJAYn+ljjD9ec62uAfuqIWMrnJXUOpQ7hCemfcIn33JNzX
+         SaoPLMAG7xR2LMM1/p4G6ctQ4Hl2hg4dcclPjZTJeYRvU50STu4oUAQqL2l609yoQpz2
+         S+cNtO6VmgELjEN0+ORLMlMaID8al+LNeDZM+FnXHc5M37vyVJ2FsxIXnMI7gUI/77kb
+         uwIV5OHq6tnF7cG82qttFdClI2H7sSF1QtkKpf5nbO4B9xyqc56EL5kF2sTViULV4m6G
+         QrQprB2g7jTjl5WVQwU2N4VHfb+ROKZGuCpNcKGjwWzH1GzGC0/rSPYHtnRzE3DP05nt
+         XEPw==
+X-Forwarded-Encrypted: i=1; AJvYcCUytgUDeg7+mXgX0ubJJrA06ign2m84EgfOoKPocsN9LwKacQqzZ4ZrWzSctQDLJWwZl7VWF+Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxfqBjPmhJ13SpAR+SA1kTiZ7/jCxpWUkl4gNKx6mr7DiSsoiU
+	Zl+LVFsp1Fl9pcyB38+y5QmumzyEuMqIAKJc6fxtjpTzdsBsemN29P8Ofc451nF2a1brSmDI2ZC
+	nquxKr7g4VXTWMT0+Rk+AaQiTSaoSPFRAl2uPp00I+sJYYccfDcnteYuQ4p4=
+X-Google-Smtp-Source: AGHT+IHbXwBOmPJLm6wPLuoglDX5/xd6oe773wnP4kFD6s8nnbvi1P7vk4tk6PUBU6UeysoSGSqlg9jn7cKoVjP7wvVISevaja92
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PSAPR06MB3942:EE_|PUZPR06MB5902:EE_
-X-MS-Office365-Filtering-Correlation-Id: 66c5b884-76d7-46e4-aa59-08de26823fb5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|52116014|376014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?9A8+7xEIuhspZTUq9sfaf2R0AqLE3O0cpbHiJuj3uW91zXhTwd7HsCdxNOdO?=
- =?us-ascii?Q?o3F91L6YMs9TvQ4eEb2zEKEJo8LR1/69U2bW5kFP8rwgzahXUJAWg1Adde+0?=
- =?us-ascii?Q?X2NsfP/jEiq7UWDUmu56BehoA6Om7MnDeNWBdSJigdcfKPLGoxN1Vd8xEvam?=
- =?us-ascii?Q?QgvU1S6bWtJjpBlOpwga5FIC+vZXNq4ANOToggtu5NpOCYaWjm7fU+Zmkduf?=
- =?us-ascii?Q?6AlQbv4iwmS9OcB0x0nUc2cq45rDddyO+MD6xzFr0zFRWLU0pPSqbyvZyeKb?=
- =?us-ascii?Q?N6AClRC3rOmckvr/h4RvD3CC9NJQGQ1Auxh/HeepljPQiV6096eNpKx56e3M?=
- =?us-ascii?Q?SXdyTY6svNGzI2/shxdu7gvbdqREeGm2zcmlCxWa/8S1Ak0kMXMsxrM59ecr?=
- =?us-ascii?Q?06eWlSGH9pE6+tS09kVTf8u1T1ejIpUDZ8sKP5fux8z/TZb8tqEzig9lCctS?=
- =?us-ascii?Q?AB/9xrkKL+W6Km+17VWjo+PkcXps2lttNh2EoF6gL3+uil9dGXIqusi8Q1ov?=
- =?us-ascii?Q?fxmOh8JgEvLS9xqzXoskdfgbWxNmOaQYV68ypRMdmuIxwSMkSwWBEg/VsUkT?=
- =?us-ascii?Q?JPEWe3Med4pRv0+QSdglASKpsb15t1VK1y77d0KJYSGy7XaFViJaL9A1YDel?=
- =?us-ascii?Q?WbhJvBSGWZXAUDzISfb0ZkELnOiiMVETURdSE/ErxVlVG/pQitBfBgeE0hCv?=
- =?us-ascii?Q?EYJSoazmzo3poBKcHKvQiCc95DsDC7Lfm4j8McteoGb+dPQegU+R0onLtYsL?=
- =?us-ascii?Q?+5Xc9l0dE9pQqjMdet7ly6r+UtGGEZ/8m1G6QhyCELXchRP4+1qvMZKwamKq?=
- =?us-ascii?Q?/5mEvs4ClzD1RRe3FWWLb8CNVhiIqDYY5Al/yaifZbv9I6ancxNUt/QnWMJm?=
- =?us-ascii?Q?ibvIJ7A4qgumaS7GhiY6E9Uc3/oTM3JxUvDRDisr60PRT2HJDUvE8O8NOpNi?=
- =?us-ascii?Q?T89m9ojV6q1QNXU6BpE46RWBXdhd0wCp+AauGDxxEQ9/cDhsaZ+L2P5q56wY?=
- =?us-ascii?Q?HYJcfluRC5ePjyt+hgP6bvWMcGRcfwVarWGzfNCKc20nLCRdBApB2PS0r1n+?=
- =?us-ascii?Q?jHq1MeYi8CLDJ4R2TVrABIYCKt88L3GjzZfit0IIQpG6c3o82LV7bXvjBcv/?=
- =?us-ascii?Q?C5Ncm6q/2C4ZpWL2YDaPlC8AAz9wsPzBccMo84xoFwJpSceznGqC0sN55nUc?=
- =?us-ascii?Q?lvFYQzt+udUrKsxsfZKY8GGmbTiAoYC8m9jmzDtrkuQtso6R7R8FxIbLqY+T?=
- =?us-ascii?Q?6byuJY+b4zs1dp4eKT31x55o3jSqfGnj+iBJMjcCOgp2vXn/AVHJ+fGgmwrn?=
- =?us-ascii?Q?pMdJWPr2SLkwcPNzHfSqGMyan+/1eXEGIFGqmlrR0LwEpvJewDDwAcqB9VV1?=
- =?us-ascii?Q?SEtg9yZIGeqArt2pO/OQkAqsYfnZ3nrZgCz3L6+IdjNrIU0agKMrZTBAqnvD?=
- =?us-ascii?Q?4RbU0TIyzniAF/G9cdd0FwqsUiTJJ77cgOWjXkxJz2pKWCFtfI6KdLzeNwwZ?=
- =?us-ascii?Q?FjBtJ/nepSw4j58VZZWncM9ahKrTfKqzud0F?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PSAPR06MB3942.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(52116014)(376014)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?kWaiVluYrVtpkUxnJX9Xn7a2cfayvXOUZ2ETcdOneayRxmC/qQCrJBPn2a8s?=
- =?us-ascii?Q?OUJrIUPpyHU0g6NQxM2/0B3DN/rQc9Th2FJLTAAuosy1OQYGiJ9u/+zxrj9Q?=
- =?us-ascii?Q?8Hvh6tGsIiLhlo1me0UUhvN/sNkvV0KY6SFf7BRmTHQNjEd/NJufulP6GTqN?=
- =?us-ascii?Q?JGgJb3DC4HwDV77pgVSKQd4xdfoIbJStZSwr13IV67EyEoGaICltXFuah0DJ?=
- =?us-ascii?Q?OVhnXdL3H+B1NDdSxUKHnt/ApUtl0fapRQBDGZgkwC5aAw8pQAihHjaSfYUe?=
- =?us-ascii?Q?HxcVyl9UjuInwZFiv/dKE2dyFicrxwQ7Qv972mTE+GtP2wgKNN70dBzbLJZM?=
- =?us-ascii?Q?97YmY44V3I8FsvExgv0rV51Hn9k4gEKS6zbudc7KK0WQUIbfLtvPWYXd2FXw?=
- =?us-ascii?Q?WT7V9cZiiEdTCUbSggpHJ1n7FujXiDj+whjUwucCXPXp2F3ln5k8RwScb1IP?=
- =?us-ascii?Q?8NSjOAoYVEfa2Vo8YJVQ+4JKH3ThkYK63v2tbRtk9HzHHyGX/zmnnPXPBGgx?=
- =?us-ascii?Q?hn6X/abC95S8coHtF6JqfTKplH1kEzJeJ0XXDfT2+pLswDt/ZJl61AaHeX7J?=
- =?us-ascii?Q?0XJlFYqsoDv7yDdYwa1eBfbCRKzPPq/PRgJ9lcTD20CCcz9awH+snZE9SVbu?=
- =?us-ascii?Q?nAowrVK4ySMe3VKQssp07uF1NABu1Zx5SoGX27Vj2bJnq9cfV81YcBDTf4XI?=
- =?us-ascii?Q?C9FpUxaAFdVMHXbDnJTziKR+fjz46ciw3JMKVeHsP3fiseqwdVEPH+1by83Z?=
- =?us-ascii?Q?DBLXhGNgk3GQ7FwxaOih4+R94TnKN46ucdWd7kk92DlvNanVA8Yu5tRJjF/q?=
- =?us-ascii?Q?Iwby/ZgEQMdHDxYva2OyrkIE7/6tZp2KDFB/OkerW2RQWW3JN37+9x19waVW?=
- =?us-ascii?Q?LTGZqAANplkbkANXCBk6NT7taKTRjqQn1SGsQAQ8apj4LVcpsCY/NgmrgMqd?=
- =?us-ascii?Q?RysL/nPsymW+0Ns5fdkxfmKVqEitAMpY6dsuL7TCGVZ8MOit+X3lxfeObrJ0?=
- =?us-ascii?Q?nvr0Nxip3g+0l3c/2GALmALpgTzgHT/Cv4vvhBHin7GYt9Uh9F+GU09Elspz?=
- =?us-ascii?Q?rFE2KJcjOC0M9gWWvE4IeRAsYw7ShzbyhFPvWwqqt9Zb2KDFir/ngdFmTb5s?=
- =?us-ascii?Q?OMk6N4vko6/y91+1DhlRaAweR6l5JuUvH16uctJxHeIf+Dg9J4NC+94JXkyA?=
- =?us-ascii?Q?xptgfDd78mR4lefcadovxruYJXl4sHjQSLFWHJPpoqy5kPfNz6Idi2mhzTyD?=
- =?us-ascii?Q?pXVe39TT71gK5KhgRgS5xMZisyHE42rXlYN8/f05mu9K/aPzs7HzWbusur9q?=
- =?us-ascii?Q?qUQaXsW1tgxBmoKhLRdzD4R8QomKIzvhFJW5Nu4UXI6rNT4vto3fatCUQis7?=
- =?us-ascii?Q?1ogekf1nQGE6JgWrG7wn5vmF+bEbrJLjBs403yZFzybZ+7lzpWJj5LCBhOKr?=
- =?us-ascii?Q?dWZ/Uzi+5SGo8xGUzTcjSPodY7dobxqRxY5o8XsU1LZeo2mnEXXTEnoTUXW2?=
- =?us-ascii?Q?lZ8ugiAYWBr0D7z03cfjYNUrJ6cbAeTn9x9rroQo3mGHrKDwTVMgtesMBAq9?=
- =?us-ascii?Q?gv1ArmHPFp3DSj3mwOk8gQWvaVa4Z5bh37NyvDJFokns0K9bVaT/J1TdL7jb?=
- =?us-ascii?Q?cQ=3D=3D?=
-X-OriginatorOrg: jaguarmicro.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66c5b884-76d7-46e4-aa59-08de26823fb5
-X-MS-Exchange-CrossTenant-AuthSource: PSAPR06MB3942.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2025 09:09:59.8641
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 1e45a5c2-d3e1-46b3-a0e6-c5ebf6d8ba7b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uWRMa2oAeoETjSGKVTTl/icQJTLTnc2Z0BHpmStNX5NcmgF9igOC2X/oPJ0t2c84yZoaQahfIhpLJvdQdbXTmO1BH8DaQuptxEuBxJxYqmY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZPR06MB5902
+X-Received: by 2002:a05:6e02:b44:b0:433:79a7:8158 with SMTP id
+ e9e14a558f8ab-4348c9334c1mr166286595ab.27.1763457144310; Tue, 18 Nov 2025
+ 01:12:24 -0800 (PST)
+Date: Tue, 18 Nov 2025 01:12:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <691c3878.a70a0220.3124cb.00b9.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING: suspicious RCU usage in
+ ieee80211_mesh_csa_beacon (2)
+From: syzbot <syzbot+b59873f5699e941717ca@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Liming Wu <liming.wu@jaguarmicro.com>
+Hello,
 
-This patch refines and strengthens the statistics collection of TX queue
-wake/stop events introduced by a previous patch.
+syzbot found the following issue on:
 
-Previously, the driver only recorded partial wake/stop statistics
-for TX queues. Some wake events triggered by 'skb_xmit_done()' or resume
-operations were not counted, which made the per-queue metrics incomplete.
+HEAD commit:    7a0892d2836e Merge tag 'pci-v6.18-fixes-5' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1100a212580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=929790bc044e87d7
+dashboard link: https://syzkaller.appspot.com/bug?extid=b59873f5699e941717ca
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12656884580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15519212580000
 
-Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-7a0892d2.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a78c5c2efd8d/vmlinux-7a0892d2.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5a51cc5df960/bzImage-7a0892d2.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b59873f5699e941717ca@syzkaller.appspotmail.com
+
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
+R13: 00007f4e229e5fa0 R14: 00007f4e229e5fa0 R15: 0000000000000003
+ </TASK>
+=============================
+WARNING: suspicious RCU usage
+syzkaller #0 Not tainted
+-----------------------------
+net/mac80211/mesh.c:1571 suspicious rcu_dereference_check() usage!
+
+other info that might help us debug this:
+
+
+rcu_scheduler_active = 2, debug_locks = 1
+2 locks held by syz.0.17/5477:
+ #0: ffffffff8f333750 (cb_lock){++++}-{4:4}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1218
+ #1: ffff888059ba0788 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: wiphy_lock include/net/cfg80211.h:6343 [inline]
+ #1: ffff888059ba0788 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: nl80211_pre_doit+0x281/0x930 net/wireless/nl80211.c:17999
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 5477 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ lockdep_rcu_suspicious+0x140/0x1d0 kernel/locking/lockdep.c:6876
+ ieee80211_mesh_csa_beacon+0x280/0x2c0 net/mac80211/mesh.c:1571
+ ieee80211_set_csa_beacon+0x3cc/0x9a0 net/mac80211/cfg.c:4288
+ __ieee80211_channel_switch net/mac80211/cfg.c:4406 [inline]
+ ieee80211_channel_switch+0x8ef/0xcb0 net/mac80211/cfg.c:4442
+ rdev_channel_switch+0x108/0x290 net/wireless/rdev-ops.h:1116
+ nl80211_channel_switch+0xac9/0xd70 net/wireless/nl80211.c:11475
+ genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:742
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2630
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
+ __sys_sendmsg net/socket.c:2716 [inline]
+ __do_sys_sendmsg net/socket.c:2721 [inline]
+ __se_sys_sendmsg net/socket.c:2719 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f4e2278f6c9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe9e0535c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f4e229e5fa0 RCX: 00007f4e2278f6c9
+RDX: 0000000000000000 RSI: 0000200000004180 RDI: 0000000000000003
+RBP: 00007ffe9e053620 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
+R13: 00007f4e229e5fa0 R14: 00007f4e229e5fa0 R15: 0000000000000003
+ </TASK>
+
+
 ---
- drivers/net/virtio_net.c | 49 ++++++++++++++++++++++------------------
- 1 file changed, 27 insertions(+), 22 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 8e8a179aaa49..f92a90dde2b3 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -775,10 +775,26 @@ static bool virtqueue_napi_complete(struct napi_struct *napi,
- 	return false;
- }
- 
-+static void virtnet_tx_wake_queue(struct virtnet_info *vi,
-+				struct send_queue *sq)
-+{
-+	unsigned int index = vq2txq(sq->vq);
-+	struct netdev_queue *txq = netdev_get_tx_queue(vi->dev, index);
-+
-+	if (netif_tx_queue_stopped(txq)) {
-+		u64_stats_update_begin(&sq->stats.syncp);
-+		u64_stats_inc(&sq->stats.wake);
-+		u64_stats_update_end(&sq->stats.syncp);
-+		netif_tx_wake_queue(txq);
-+	}
-+}
-+
- static void skb_xmit_done(struct virtqueue *vq)
- {
- 	struct virtnet_info *vi = vq->vdev->priv;
--	struct napi_struct *napi = &vi->sq[vq2txq(vq)].napi;
-+	unsigned int index = vq2txq(vq);
-+	struct send_queue *sq = &vi->sq[index];
-+	struct napi_struct *napi = &sq->napi;
- 
- 	/* Suppress further interrupts. */
- 	virtqueue_disable_cb(vq);
-@@ -786,8 +802,7 @@ static void skb_xmit_done(struct virtqueue *vq)
- 	if (napi->weight)
- 		virtqueue_napi_schedule(napi, vq);
- 	else
--		/* We were probably waiting for more output buffers. */
--		netif_wake_subqueue(vi->dev, vq2txq(vq));
-+		virtnet_tx_wake_queue(vi, sq);
- }
- 
- #define MRG_CTX_HEADER_SHIFT 22
-@@ -1166,10 +1181,7 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
- 			/* More just got used, free them then recheck. */
- 			free_old_xmit(sq, txq, false);
- 			if (sq->vq->num_free >= MAX_SKB_FRAGS + 2) {
--				netif_start_subqueue(dev, qnum);
--				u64_stats_update_begin(&sq->stats.syncp);
--				u64_stats_inc(&sq->stats.wake);
--				u64_stats_update_end(&sq->stats.syncp);
-+				virtnet_tx_wake_queue(vi, sq);
- 				virtqueue_disable_cb(sq->vq);
- 			}
- 		}
-@@ -3068,13 +3080,8 @@ static void virtnet_poll_cleantx(struct receive_queue *rq, int budget)
- 			free_old_xmit(sq, txq, !!budget);
- 		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
- 
--		if (sq->vq->num_free >= MAX_SKB_FRAGS + 2 &&
--		    netif_tx_queue_stopped(txq)) {
--			u64_stats_update_begin(&sq->stats.syncp);
--			u64_stats_inc(&sq->stats.wake);
--			u64_stats_update_end(&sq->stats.syncp);
--			netif_tx_wake_queue(txq);
--		}
-+		if (sq->vq->num_free >= MAX_SKB_FRAGS + 2)
-+			virtnet_tx_wake_queue(vi, sq);
- 
- 		__netif_tx_unlock(txq);
- 	}
-@@ -3264,13 +3271,8 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
- 	else
- 		free_old_xmit(sq, txq, !!budget);
- 
--	if (sq->vq->num_free >= MAX_SKB_FRAGS + 2 &&
--	    netif_tx_queue_stopped(txq)) {
--		u64_stats_update_begin(&sq->stats.syncp);
--		u64_stats_inc(&sq->stats.wake);
--		u64_stats_update_end(&sq->stats.syncp);
--		netif_tx_wake_queue(txq);
--	}
-+	if (sq->vq->num_free >= MAX_SKB_FRAGS + 2)
-+		virtnet_tx_wake_queue(vi, sq);
- 
- 	if (xsk_done >= budget) {
- 		__netif_tx_unlock(txq);
-@@ -3521,6 +3523,9 @@ static void virtnet_tx_pause(struct virtnet_info *vi, struct send_queue *sq)
- 
- 	/* Prevent the upper layer from trying to send packets. */
- 	netif_stop_subqueue(vi->dev, qindex);
-+	u64_stats_update_begin(&sq->stats.syncp);
-+	u64_stats_inc(&sq->stats.stop);
-+	u64_stats_update_end(&sq->stats.syncp);
- 
- 	__netif_tx_unlock_bh(txq);
- }
-@@ -3537,7 +3542,7 @@ static void virtnet_tx_resume(struct virtnet_info *vi, struct send_queue *sq)
- 
- 	__netif_tx_lock_bh(txq);
- 	sq->reset = false;
--	netif_tx_wake_queue(txq);
-+	virtnet_tx_wake_queue(vi, sq);
- 	__netif_tx_unlock_bh(txq);
- 
- 	if (running)
--- 
-2.34.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
