@@ -1,211 +1,126 @@
-Return-Path: <netdev+bounces-239443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6CA7C686AF
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:05:14 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3EB6C686D3
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:07:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AF34C4E2389
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:04:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 763C43420AB
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE33287243;
-	Tue, 18 Nov 2025 09:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4043A2FB0B1;
+	Tue, 18 Nov 2025 09:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="HbPg9acu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C535E23F429
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 09:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B781207A3A
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 09:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763456689; cv=none; b=Lt2tY9xnJCNO+KHckYX3b9XL2wxXoH8cAZhQHjA5ojC59h7W1fcJalNb4COlFM8AIjDVZsq6rr5YnM5GzJib7cBmt5JPVtJ7O6hpQVht7NfEmCG+ETZLjUuoRyz+FWPVDm20rpvvP4ZByRaXH1SSSZVPAky2GnsaQoDsvjzMCRw=
+	t=1763456760; cv=none; b=pXAjWyzFXc4jqr+j2u4KPtRC1JLPi4M6mEPrFUy/f0yJlrJrnvxUO9WJgkyKzv1tj9Yh1gluDyUrs43CmfQiFznESg9VK6+AaNKFDX/GDgSY5b8MuYY6WeSFBskGWNDVy5J2PtsABk5q/eE1iIYnzhtAZX26Va2CxF6M58EmfBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763456689; c=relaxed/simple;
-	bh=jWVnSsJjEVBomPepEWJzEivM0/r/KsnMYqZ3/85tUBE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E/7j3SlaJkp9Z8QR0+04RNJ69uqqWU9R4V5cerQezaD3H1pgFPH/GYX8BUxelse7p6bXD074L6m0bC8NG2RRtRJoJUqUSFt+fk9ExTcQsw08QDFXExabMYoVaBQMUIuHhRjJyUSRD3R5XnwHxDisBKuanLaW+DamLMTnCCe+gk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=15.184.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpgz7t1763456675tdbc3a96a
-X-QQ-Originating-IP: FT8O7Ez7u86708GH/IhNXVeCRB1lUr9SUxHNKFDAnlI=
-Received: from localhost.localdomain ( [111.204.182.99])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 18 Nov 2025 17:04:33 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 8494190856986743115
-EX-QQ-RecipientCnt: 12
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-To: netdev@vger.kernel.org
-Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next v1] net: bonding: move bond_should_notify_peers, e.g. into rtnl lock block
-Date: Tue, 18 Nov 2025 17:04:31 +0800
-Message-Id: <20251118090431.35654-1-tonghao@bamaicloud.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1763456760; c=relaxed/simple;
+	bh=l5hU9L5Yj7VZJj97kMh6UZz+7GJNWFi2weoykB0U5Ic=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=dCnkHa9JVM52AgQFmxIUPkd25eKtLJJTMrva6oFo5BylnCCaqr+ckgJsRl5CyWffUtGNwXWhKFD7oIT0ut67K742y94XHSlQGrQN9cu50MmobD+2iITDHae7hNisgAxUvleXWBXITrVjzSGaGXqW46IyFxCPO0f1HSjgBwNSq2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=HbPg9acu; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4779fd615a3so1624595e9.0
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 01:05:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1763456757; x=1764061557; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Vv8b30UPdNYBhUDR5IJHjoXKKpsIjJNO+tgtc+hFsc=;
+        b=HbPg9acuGWFCf6hatvVN0fq8aR/3tMekJ8vSeK+n2YzTB0NneGOiAyRYwKifSpFBjN
+         VD0K3rwfBp6I9wOypDhiKaVcu3RoWxAq+NroIBD45zsoOoZSWMVpC3Um9lxRlbLuMVvR
+         go1gaStJrgHCe/b55OpVSZKya6+BQR6CMNwGvSGeIinJgW5084tBi4ZNZfRSqaPBn/8l
+         FFfWsrN4suEvSZnAghR7otQcOkVRc2MIKomWgl09zmeO9+DrrJAITprh4XECo87c5Lfn
+         KAMw0MeUpaxkv5X0N8cDEgcRrw6BEnxVf60G3UbitVUpFQO4sk82Ul3GyMFneq5jboFH
+         meCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763456757; x=1764061557;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4Vv8b30UPdNYBhUDR5IJHjoXKKpsIjJNO+tgtc+hFsc=;
+        b=VEHHdtZuBvXHwnzj2S96hikCWHpRDIfMyyCB49ft4dDkltDcVxpH8rPVIupiAL7nbD
+         SrVsckXJ64dBMJ5Z4tCEv5bv9Um7wyK/WXaAoVCM4Cvq4YTCTRx0ptVEKWoq5NH/dKfK
+         RDiaYtVNtOIiNKAFhrkuLJy18gCgmT3to0IhAa9XZj1YFED2HO/VdhrjgHeZymp/jMGK
+         1mw+C07nx3kG4aOnarp+eLdFhEiu6lJUOLXMY87mEeOiS00m/9TQ4kXgsOYXuq0T99cZ
+         aM7kjhr/0/nmMx5W1YX8iYJOKVvN1bJUQ7qh9yCbUg4P8GFXM3Ot1zciwPD7ywnA34TZ
+         JNBA==
+X-Forwarded-Encrypted: i=1; AJvYcCVorb5i91ePGa/16rPC3guWX6WQ7utdXwHu//Lr++0W8tv4gWuOQVWec6wOhZmRk0u88S5yqjo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrBKhVrE+UsnKseas3FnmXJXY6YZD8pPPByADKoLCHAIdBh24E
+	nhJagpZHRmP37HWx5DU5aBLvlX90B9sG8WdDu1xQAod9nED3QmQ9b1HsTRd0Pd1bOEQ=
+X-Gm-Gg: ASbGnctTcpeYffCtIwJIf5to9GqWl8UmMCsVyuYe/NiXvlasaTHMRIXvAcLYzDyVQKe
+	vwSf5FWcZIPC0lp/fLldOAkxs3RDV9jPYNEMAXiMVSzWMY7bJPvga9JS6HvPViQvf6byeTQXKTb
+	B6hzdjdOPIAi+bs2j2EWzSuRrXtJ4+HX+WHIfsxDwWvjDQncUhkkMw3Z8HPxUQa1EAC93FqoMuD
+	y/asqg3Dkq5rxTqWCCHA1qRrYuPOjcjpHCdfKTC+7mT+zIyryOHeYXiGy/bOZK3VEkkwMrkZXm3
+	WAHT9aaEP71BZ/vNoZPe/PGH7mqXGRajBwrjxbWzjcN3/5sYZnGPT0am3ZNw2s4Tf+0rRwDp0q9
+	Umm2OG0wH9HLS93KW61BbbivIX6K+cHzP3qLPISHDpe481fkJjwVKDfQtniE5vvvE+6vkxGFBL3
+	PnwNyn9YE88+cGjOAX164BXbj8QEhKx4AtdvMlCo0OodGW3Do4t+/kRKK/PO8Rdz8=
+X-Google-Smtp-Source: AGHT+IE+bZDiXeOa0QOmpZlV9zGUl0nc6P6rVY9AZ9mOcMwPfj9WJ7rj7K8GQtY6HIyEMxOUWFMBcQ==
+X-Received: by 2002:a05:600c:19cd:b0:46e:43f0:6181 with SMTP id 5b1f17b1804b1-4778feb5ae7mr80092035e9.7.1763456756632;
+        Tue, 18 Nov 2025 01:05:56 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a97412e3sm12877915e9.5.2025.11.18.01.05.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Nov 2025 01:05:56 -0800 (PST)
+Message-ID: <a4be64fb-d30e-43e3-b326-71efa7817683@6wind.com>
+Date: Tue, 18 Nov 2025 10:05:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH] net/ipv6: allow device-only routes via the multipath API
+To: David Ahern <dsahern@kernel.org>, azey <me@azey.net>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <a6vmtv3ylu224fnj5awi6xrgnjoib5r2jm3kny672hemsk5ifi@ychcxqnmy5us>
+ <7a4ebf5d-1815-44b6-bf77-bc7b32f39984@kernel.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <7a4ebf5d-1815-44b6-bf77-bc7b32f39984@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: OT1af/FwY+++wA/SU5RYmc0kGWTS+8Vlgkdv2VZZ1i7mrY7yTy5amoaN
-	Cw/uh+KjSeIfWfK0sChF3Y7dQs92IDrGbtRrfqjiF39ZlPdAvJ8CuAG7kH9N166cBd/yPyx
-	YZpcWomgzHGcRglLJmu7CDZqNwpqkc/S2c2/vOsJowve72k6/VXJHHcV6FJdobirTxqDQiy
-	n1bLbaoqA79MVeQHN52gAkaNjyq1T23xroon2OVaKu6CwS+n7pGi6I6o9VoEC3ZHWAINdgF
-	jnp19URXgO1NfFh3EFhPN6I5r7FkXAJF8vMB5E3G4hiuOY1Z/eocZVtdzRV+q+UgHrZGk65
-	eKo3+zhZZzSqZ1PhycrnY7njq92yZVT+GPzqejfWyuC8snMkZEATh/PHGX9Lfg48sKs3JZh
-	KGHitsmFZIeAyJx5jYvIhtBge3O0KdJi5HocMDsqV/c4oSiSzuNFBsHV0c3/G+0XMx/1Vjz
-	4mroxGBBUHfBizieokneKXMFCV7MsqT3zPGHSztfwb79p4b31hYzD1emC2+P/OlOXF6FDyr
-	2trfR4yowMk16t69cT5GiKCYaYarwWQ8mI9y/IpG4SqwkW6ml5mXnNGIva/ZMZCIjEJrnf6
-	41YC099/NVOvERhElwc7LWQAknN1NRuwSGTM5doKw0+fnMSMMD2W/ZeWHqMv+9ZJevoe21C
-	LgGOuidSHBYxd0Tbnh/NCr8aIAQpv93b4PbQOvfYMp0rDv0G0yapN0IV4kVnrqo9lcrE/cG
-	q/QFJ7RKc3DyDEAdnFpSG1tndB+lhPEplgvL66wSr19zxfPNl9Jw/jyfjGmbrgsKhYMRkui
-	HjpFIUgDBgk+sOOUfPCS4Nao7X0C8HCDuG9WdP4ww3OGgiyl0TdAG4UCkIICcuX3VyIvbfG
-	nYjMHWA0t2DMBUKqCZK3/DbzhDS3Qt85j9HyXz+1ENXHDLKFV8N0LDq8xei4ZU3mIztYLNJ
-	EbQDqVGtytYW8sr/S7n3voAYucp8Zl3jaWgBkquzHE9PcPzKh6zEnXTeHcNFKowBC5Mhmsa
-	PkNVDVAXr3iiDnyP43PtcUV6fKT9C4VUXOs4TL6dzVG5eZ9YvpMWzZ2qjgCyE=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
 
-In bond_mii_monitor()/bond_activebackup_arp_mon(), when we hold the rtnl lock:
+Le 17/11/2025 à 02:57, David Ahern a écrit :
+> On 11/16/25 11:31 AM, azey wrote:
+>> At some point after b5d2d75e079a ("net/ipv6: Do not allow device only
+>> routes via the multipath API"), the IPv6 stack was updated such that
+>> device-only multipath routes can be installed and work correctly, but
+>> still weren't allowed in the code.
+>>
+>> This change removes the has_gateway check from rtm_to_fib6_multipath_config()
+>> and the fib_nh_gw_family check from rt6_qualify_for_ecmp(), allowing
+>> device-only multipath routes to be installed again.
+>>
+> 
+> My recollection is that device only legs of an ECMP route is only valid
+> with the separate nexthop code. Added Nicholas (author of the original
+> IPv4 multipath code) to keep me honest.
+If I remember well, it was to avoid merging connected routes to ECMP routes.
+For example, fe80:: but also if two interfaces have an address in the same
+prefix. With the current code, the last route will always be used. With this
+patch, packets will be distributed across the two interfaces, right?
+If yes, it may cause regression on some setups.
 
-- check send_peer_notif again to avoid unconditionally reducing this value.
-- send_peer_notif may have been reset. Therefore, it is necessary to check
-  whether to send peer notify via bond_should_notify_peers() to avoid the
-  loss of notification events.
-
-Cc: Jay Vosburgh <jv@jvosburgh.net>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Hangbin Liu <liuhangbin@gmail.com>
-Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
----
- drivers/net/bonding/bond_main.c | 35 ++++++++++++++-------------------
- 1 file changed, 15 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index b7370c918978..6f0fa78fa3f3 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -2810,11 +2810,10 @@ static void bond_mii_monitor(struct work_struct *work)
- {
- 	struct bonding *bond = container_of(work, struct bonding,
- 					    mii_work.work);
--	bool should_notify_peers;
--	bool commit;
--	unsigned long delay;
--	struct slave *slave;
- 	struct list_head *iter;
-+	struct slave *slave;
-+	unsigned long delay;
-+	bool commit;
- 
- 	delay = msecs_to_jiffies(bond->params.miimon);
- 
-@@ -2823,7 +2822,6 @@ static void bond_mii_monitor(struct work_struct *work)
- 
- 	rcu_read_lock();
- 
--	should_notify_peers = bond_should_notify_peers(bond);
- 	commit = !!bond_miimon_inspect(bond);
- 
- 	rcu_read_unlock();
-@@ -2844,10 +2842,10 @@ static void bond_mii_monitor(struct work_struct *work)
- 		}
- 
- 		if (bond->send_peer_notif) {
--			bond->send_peer_notif--;
--			if (should_notify_peers)
-+			if (bond_should_notify_peers(bond))
- 				call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
- 							 bond->dev);
-+			bond->send_peer_notif--;
- 		}
- 
- 		rtnl_unlock();	/* might sleep, hold no other locks */
-@@ -3759,8 +3757,7 @@ static bool bond_ab_arp_probe(struct bonding *bond)
- 
- static void bond_activebackup_arp_mon(struct bonding *bond)
- {
--	bool should_notify_peers = false;
--	bool should_notify_rtnl = false;
-+	bool should_notify_rtnl;
- 	int delta_in_ticks;
- 
- 	delta_in_ticks = msecs_to_jiffies(bond->params.arp_interval);
-@@ -3770,15 +3767,12 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
- 
- 	rcu_read_lock();
- 
--	should_notify_peers = bond_should_notify_peers(bond);
--
- 	if (bond_ab_arp_inspect(bond)) {
- 		rcu_read_unlock();
- 
- 		/* Race avoidance with bond_close flush of workqueue */
- 		if (!rtnl_trylock()) {
- 			delta_in_ticks = 1;
--			should_notify_peers = false;
- 			goto re_arm;
- 		}
- 
-@@ -3791,18 +3785,15 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
- 	should_notify_rtnl = bond_ab_arp_probe(bond);
- 	rcu_read_unlock();
- 
--re_arm:
--	if (bond->params.arp_interval)
--		queue_delayed_work(bond->wq, &bond->arp_work, delta_in_ticks);
--
--	if (should_notify_peers || should_notify_rtnl) {
-+	if (bond->send_peer_notif || should_notify_rtnl) {
- 		if (!rtnl_trylock())
- 			return;
- 
--		if (should_notify_peers) {
-+		if (bond->send_peer_notif) {
-+			if (bond_should_notify_peers(bond))
-+				call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
-+							 bond->dev);
- 			bond->send_peer_notif--;
--			call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
--						 bond->dev);
- 		}
- 		if (should_notify_rtnl) {
- 			bond_slave_state_notify(bond);
-@@ -3811,6 +3802,10 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
- 
- 		rtnl_unlock();
- 	}
-+
-+re_arm:
-+	if (bond->params.arp_interval)
-+		queue_delayed_work(bond->wq, &bond->arp_work, delta_in_ticks);
- }
- 
- static void bond_arp_monitor(struct work_struct *work)
--- 
-2.34.1
-
+Regards,
+Nicolas
 
