@@ -1,211 +1,171 @@
-Return-Path: <netdev+bounces-239500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4140BC68D74
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:31:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84EA6C68D9B
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 11:33:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id D6FD22C987
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:25:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 6590C2AA4C
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CDEF2BD030;
-	Tue, 18 Nov 2025 10:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A7F33F8C7;
+	Tue, 18 Nov 2025 10:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PdxTz88O";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MDhKhUcf"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="NahMNgS3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0730E3491CD
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 10:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF0A30BBA0
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 10:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763461270; cv=none; b=fcrHIY/j2gTReAKwKWMVi9kYEqJVaJkPYCl4wOKdxT6R6fyUbjr/8AuDNe0MPBWK0tNbShKBrr7lNjAJlxYVFDBKeAicamQfdUh1EVp4jx8Sh9sKwPXlDhjkEL7TN5FH60hd9BwmEpfZVM7HRBskDGBQr05ZJ4C6/1zt85FfEHk=
+	t=1763461589; cv=none; b=j7Eyd6DN6HAHhdqDMJW4We3U2/oVqLrX5tisRulZtTgnFCb0jwmLce12uHCLMpdDpK4x6C7WO2KyJiEfgVQd1qePBSis1WgBBzUkTYt8Ip/RihGHxEbewdqitc6KQq+OTQ9MfsimIkLlUR3ULdqKp0XJCJp8v3I/vERU/4fJYoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763461270; c=relaxed/simple;
-	bh=QKHrTMU8AS2rDV5NflMgKvQqapBxTNGK+ptCn0J05jU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=GVHoojQPsUcOOZfIfINY03yM8p07EDhI25aRhqaMlypt+CjzXuaPkn/oL2JcjFShcOTAudstv8CCbTELaTE3wuj066AnMsfyfj/dyl6LfucD2XviWmd12Lhxg7SuHFR7Nj7TCYKp6RtiDWDTO8ASYRRfDgkAM9w2ZiU/13NH3KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PdxTz88O; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MDhKhUcf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763461263;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qqdb8OtTIWPqMLICOLkFlFxhk9j2szKMv7aCnVG8Juk=;
-	b=PdxTz88OC4/lasTp7dwTTut/l1b/YFsJ5sexpyoIS3C16vfCfv5nAwuGUTe/Z8ZS2fl5Nl
-	OccWshrjZskhlxDIebDiJ8rxfkeP+DzSvMR+WVgJQiDCorzCXyoy/FKKQJm0HvQl/7a7cN
-	7xBDbeUq0A1MM1SSTPkuF5FrtWuVm5c=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-280-tGEAf4ohOAu2jz-s3VMh6g-1; Tue, 18 Nov 2025 05:20:50 -0500
-X-MC-Unique: tGEAf4ohOAu2jz-s3VMh6g-1
-X-Mimecast-MFC-AGG-ID: tGEAf4ohOAu2jz-s3VMh6g_1763461249
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-6450e804cd9so208419a12.3
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 02:20:50 -0800 (PST)
+	s=arc-20240116; t=1763461589; c=relaxed/simple;
+	bh=oay2Y0RYtBNA35kUgmNA70K3Qe/H7tL7ZlQWPWImoU8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k7bTlmVIu38ykinc3MzC9bTGNS8jYlE+/GO8lI5J2z8HeDgTgP89goBhZmHHxxfA1wbxjKjGywymWyha752Q1JeLxtUQ1kucGaaQA4heOOT8uuRrKVRgSG8vR1F/SSa58z1HIT9uoElGyD7BwqEWoosgzZqjnNuv/Y8CZDYdwsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=NahMNgS3; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b739ef3f739so322076166b.1
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 02:26:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763461249; x=1764066049; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qqdb8OtTIWPqMLICOLkFlFxhk9j2szKMv7aCnVG8Juk=;
-        b=MDhKhUcfSMNQhXr5EW7cLe6FIXiYHeg9ntXyCankqnmKUbn4Hc/LT8W0J7m4RRb+p8
-         DLbybrFOukGkWA44v0MK/JjUTTwAqwOwnvpQKr/gJDFUHPrRkmp+UPo+kgB8Hvq7Wgzq
-         BENj9+iYZOPyhMFKfjoxoHpOtq4pgeY70u1LH1FQw5/zgbO/wZ6QvjaErixIgjIyEodW
-         9CQ42RwbAj4zqrnyQNFOECwmkyjIwTIv9rzPDRuXFBBjmGJ2zAdtki2HXUzIgEpyWuvt
-         kIqYmvRluMZY6X8oSpBz/285YDMjplkcqPUWSzeWVBye19A8tG6A7NJglOW9g68JyZzw
-         1t+w==
+        d=openvpn.net; s=google; t=1763461581; x=1764066381; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/OTTsu0LjJ22YPCAfK50R8FQVgllWZ9069adGRfH0gk=;
+        b=NahMNgS32eTtYm08Az70NZQVJL1HpOhmWhBMO9qrC5de/9p3HEPb8ebScqLRIINdZU
+         SnhKmqgDyj/0sJQFAf++6cw0G+0N4OP+D+MqD7SSYEVJLxO+3ce5v/HFlwYY37XBgLCe
+         AgOkXkjssyT+ZNBxdyhktEQFGUGCjGtrDTHndvGIQzse8cktJQEUQEZMF59aav542T1D
+         fJnYm5pRvUZtcvEbLYeLtqLCvmlOcpFU1K8W0nyFYM1QbB0dNp7wMghEou6eX5B7mmyZ
+         yCx9L6UrN6zPSuzOceYCQRv997VzLCeejCgYvlnr7uk0URFUHp7Cb8RReDY6ncLJ3Gj4
+         J4DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763461249; x=1764066049;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Qqdb8OtTIWPqMLICOLkFlFxhk9j2szKMv7aCnVG8Juk=;
-        b=jsexOoovjWeujPvO8qRnKqvBa6UvYLdwtGPJAIXA1+iRg+dSlkxLKqS5RqQTLl90GA
-         GO0r1ubeXi0810e+gUsiS39rGshBLRt10CY7zk8bYgUrzORb3TtyJsoMIcaLQjmvKnPf
-         hFQiku1/vxyQDDRs9ndV9c0vCL6sT/04g45JfNKNhpNKVOIkfk5v9TqQYH8fvvTFYBWe
-         iwh95oeBZyW9zYUK08lHoWK993KrXpP6ErYmdqBZS0sdY2MiaFs8UBWoLwZovjjrMZuq
-         s0nCpc3jIkjA7xeZ0PYTip2XKnJ1xYVx5Nifxb4E/GMVl1LvGRXJRagmMrPEfIMU5XA/
-         AlMA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIIya/8ytUTScxr0yGTP5/PlaItULisaKuetwydu2wCSUtRHw03s63dKMPuvVAMx+CnCUOVLM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGc1MDVrS1BOeilCRZuI7Qpg2D2j3RmQMMFfnCrv399YhLPGI+
-	pWxXJFaVgF6BQqJDlCgzLsuz21u3e9eJTbB4YEhOB1hWh08TGMhefkrbxiKn3a3FtedN3vrWM3l
-	Tq5eYYGuqGKn24K7hgjs/5Vh9Gr42mXtUZjNlWMz/LHdLLQvuKL8Shph5Hg==
-X-Gm-Gg: ASbGncvn1HgFFBho4nMMVMltu9eOTRFtQlrgplD/JO4oM2SgU9MOhcoMss5BXdogfe5
-	tUiHB4tNjttxq0DVEZeyeTQM92lE9e8AGc3VaTaB4yvXyR+UzuqKayLbAxbOR2sQezIc4I9pLo5
-	dQGvRuqfv/6fD/xbZVvGoJllv6/FNKas1ShzudQGbMtmoWAk0uKMFALMWnTMM+EcVmr+Bhof6Ia
-	mVN/0J/56nFMr4ODOHkG9QdFfcJoMIwEcof4uo8K7Xcab3lb0iLdXb8rgEOlMiHrTzy+VYl+6/k
-	8dL0MI9SuIIWz1D+h29p5Z9MxncRVZ02Lv7Y/FFEUINatUjrLvrogUOdPlo/wlTQt8UmUahEl4S
-	6HwikzJlYRcv/G3lLMB5bwqkdVw==
-X-Received: by 2002:a05:6402:2813:b0:640:9eb3:3686 with SMTP id 4fb4d7f45d1cf-64350e8e398mr14659680a12.19.1763461249110;
-        Tue, 18 Nov 2025 02:20:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGMmLVmalw0Ch5oVUFByxi23ViTAeHA9jZ/CP/GaJCrMyZNeJXWNQJXBphzVUwZfa0E+XKE2w==
-X-Received: by 2002:a05:6402:2813:b0:640:9eb3:3686 with SMTP id 4fb4d7f45d1cf-64350e8e398mr14659656a12.19.1763461248670;
-        Tue, 18 Nov 2025 02:20:48 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6433a4cbd18sm12247224a12.35.2025.11.18.02.20.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 02:20:47 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id ABC7F329BD0; Tue, 18 Nov 2025 11:20:46 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>, Byungchul Park
- <byungchul@sk.com>, "David Hildenbrand (Red Hat)" <david@kernel.org>
-Cc: linux-mm@kvack.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, kuba@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
- pabeni@redhat.com, akpm@linux-foundation.org, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
- surenb@google.com, mhocko@suse.com, horms@kernel.org, jackmanb@google.com,
- hannes@cmpxchg.org, ziy@nvidia.com, ilias.apalodimas@linaro.org,
- willy@infradead.org, brauner@kernel.org, kas@kernel.org,
- yuzhao@google.com, usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
- almasrymina@google.com, asml.silence@gmail.com, bpf@vger.kernel.org,
- linux-rdma@vger.kernel.org, sfr@canb.auug.org.au, dw@davidwei.uk,
- ap420073@gmail.com, dtatulea@nvidia.com
-Subject: Re: [RFC mm v6] mm: introduce a new page type for page pool in page
- type
-In-Reply-To: <ea294b1d-7698-4f67-abd5-a7b9b67db6bb@kernel.org>
-References: <20251117052041.52143-1-byungchul@sk.com>
- <f25a95a4-5371-40bd-8cc8-d5f7ede9a6ac@kernel.org>
- <e470c73a-9867-4387-9a9a-a63cd3b2654f@kernel.org>
- <20251118010735.GA73807@system.software.com>
- <20251118011831.GA7184@system.software.com>
- <ea294b1d-7698-4f67-abd5-a7b9b67db6bb@kernel.org>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 18 Nov 2025 11:20:46 +0100
-Message-ID: <874iqrod4x.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1763461581; x=1764066381;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/OTTsu0LjJ22YPCAfK50R8FQVgllWZ9069adGRfH0gk=;
+        b=SUAVRgfivbW3T0CRCWcJB1zQ/HRnVeQljQVJbj2QRZtn3RgPrfBDmEoija6mPCU27s
+         8t5xj7p9sLd4KbR4ho1AlyMfiYE62DakLZAzXwhA1NYVIzqKHKQh8nSAvsoiII4AV+hi
+         zQqbYVxzQOinIMQSnRIJAYxklh5fbMMPLZZOBkvg6uUvQBybRgM/JLqrIXjQO5G+UYUY
+         bv5zCRl6C9OZPl2NsoxePM1qoeYHAciMoNtm40UeuIlYgFdo+JOOGJ/ndgFG2+9/ORug
+         88Q86fKrt2rmt6JahkT3HqAwgmXyRZf+UVD3TsLZvdMbqJSUF1pkn1alrb2WNAjZ1NCu
+         P22Q==
+X-Gm-Message-State: AOJu0YyJQaZZK7PAvAlZfSadrlO0wfQZzdrPL3/qEPrRdjnaMv8w93WP
+	ChUfhc/kFJeK+7w7BgTOAy7/gGtHRAXoq5uiEJt7fn4y/P6DsBwbxV/zi8gvW2rXPvkh//VBghW
+	haEZn+/pUM3eljjuImJisIX6OVm77GUFmLW74IdC4qZHDcQKAwD4=
+X-Gm-Gg: ASbGncs1pw8kF5Sxwgogsfj3UXQwGiZS1137Jc35M2Owx+YpsGXv2040H3SmrrdZKQz
+	YZ9X/EjtX70Aj1ZVrly5kTQE7eBbqCaxF/hGESszEb92nJJ4VYBL8eJK4jzbrCFt6OTIy7Zg/K4
+	pzpORxgYtSk9UlFl4C5f3iYOIRqqEqvReRFHgX8wZOuEP9+rfcGn2+X5lsXGahfvtsZcnl/kJ6b
+	nWd578Y9+rHJoIKjmdawrdE7EFYYwxery73DMw9EWQK+KqLXU1QP89jZY2wPdHYb0vVTJJDxgA+
+	tez0iPe845WvaWFmWGcyLDsn9f0O2J5tMyILEu+ukGjGLLEseU+6lEK8IMq17b0gXWGDZ3okMqD
+	w4IBaZb0leeUjAeZjD7m64lH/iC87wcT3fhJyjN9Q1hQV7iTvQqUY3kHxjWZauS4o1AGQB3D5iS
+	VaRe/Bae75AXe9IZLiUaykio9KIV98BWNl+kg5POj0QN8iv8qnaw==
+X-Google-Smtp-Source: AGHT+IFNYEFrAG7pmSV+LK/IVfb35+vI+/316e49HgB5Fw83Rsc8L3++7RCFm60Ztr1YEaF80OkYEg==
+X-Received: by 2002:a17:907:989:b0:b73:5936:77fc with SMTP id a640c23a62f3a-b7367829d26mr1634736566b.13.1763461581446;
+        Tue, 18 Nov 2025 02:26:21 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:63aa:7ccd:fa6e:231b? ([2001:67c:2fbc:1:63aa:7ccd:fa6e:231b])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7359bfb238sm1235848566b.14.2025.11.18.02.26.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Nov 2025 02:26:20 -0800 (PST)
+Message-ID: <819ccede-6edf-49d4-b07f-a973552e02a9@openvpn.net>
+Date: Tue, 18 Nov 2025 11:26:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 4/8] ovpn: Allow IPv6 link-local addresses
+ through RPF check
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ralf Lici <ralf@mandelbit.com>
+References: <20251111214744.12479-1-antonio@openvpn.net>
+ <20251111214744.12479-5-antonio@openvpn.net> <aRdTkDHlRi0WbsVS@krikkit>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <aRdTkDHlRi0WbsVS@krikkit>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Jesper Dangaard Brouer <hawk@kernel.org> writes:
+On 14/11/2025 17:06, Sabrina Dubroca wrote:
+> 2025-11-11, 22:47:37 +0100, Antonio Quartulli wrote:
+>> From: Ralf Lici <ralf@mandelbit.com>
+>>
+>> IPv6 link-local addresses are not globally routable and are therefore
+>> absent in the unicast routing table. This causes legitimate packets with
+>> link-local source addresses to fail standard RPF checks within ovpn.
+>>
+>> Introduce an exception to explicitly allow such packets as link-local
+>> addresses are essential for core IPv6 link-level operations like NDP,
+>> which must function correctly within the virtual tunnel interface.
+> 
+> Does this fix an existing bug, or does it only become a problem for
+> some of the new features in that series (multipeer-to-multipeer?)? If
+> this is a problem for existing use-cases, there should be a Fixes tag.
+> 
 
-> On 18/11/2025 02.18, Byungchul Park wrote:
->> On Tue, Nov 18, 2025 at 10:07:35AM +0900, Byungchul Park wrote:
->>> On Mon, Nov 17, 2025 at 05:47:05PM +0100, David Hildenbrand (Red Hat) wrote:
->>>> On 17.11.25 17:02, Jesper Dangaard Brouer wrote:
->>>>>
->>>>> On 17/11/2025 06.20, Byungchul Park wrote:
->>>>>> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
->>>>>> index 600d9e981c23..01dd14123065 100644
->>>>>> --- a/mm/page_alloc.c
->>>>>> +++ b/mm/page_alloc.c
->>>>>> @@ -1041,7 +1041,6 @@ static inline bool page_expected_state(struct page *page,
->>>>>>     #ifdef CONFIG_MEMCG
->>>>>>                       page->memcg_data |
->>>>>>     #endif
->>>>>> -                    page_pool_page_is_pp(page) |
->>>>>>                       (page->flags.f & check_flags)))
->>>>>>               return false;
->>>>>>
->>>>>> @@ -1068,8 +1067,6 @@ static const char *page_bad_reason(struct page *page, unsigned long flags)
->>>>>>       if (unlikely(page->memcg_data))
->>>>>>               bad_reason = "page still charged to cgroup";
->>>>>>     #endif
->>>>>> -    if (unlikely(page_pool_page_is_pp(page)))
->>>>>> -            bad_reason = "page_pool leak";
->>>>>>       return bad_reason;
->>>>>>     }
->>>>>
->>>>> This code have helped us catch leaks in the past.
->>>>> When this happens the result is that the page is marked as a bad page.
->>>>>
->>>>>>
->>>>>> @@ -1378,9 +1375,12 @@ __always_inline bool free_pages_prepare(struct page *page,
->>>>>>               mod_mthp_stat(order, MTHP_STAT_NR_ANON, -1);
->>>>>>               folio->mapping = NULL;
->>>>>>       }
->>>>>> -    if (unlikely(page_has_type(page)))
->>>>>> +    if (unlikely(page_has_type(page))) {
->>>>>> +            /* networking expects to clear its page type before releasing */
->>>>>> +            WARN_ON_ONCE(PageNetpp(page));
->>>>>>               /* Reset the page_type (which overlays _mapcount) */
->>>>>>               page->page_type = UINT_MAX;
->>>>>> +    }
->>>>>>
->>>>>>       if (is_check_pages_enabled()) {
->>>>>>               if (free_page_is_bad(page))
->>>>>
->>>>> What happens to the page? ... when it gets marked with:
->>>>>      page->page_type = UINT_MAX
->>>>>
->>>>> Will it get freed and allowed to be used by others?
->>>>> - if so it can result in other hard-to-catch bugs
->>>>
->>>> Yes, just like most other use-after-free from any other subsystem in the
->>>> kernel :)
->>>>
->>>> The expectation is that such BUGs are found early during testing
->>>> (triggering a WARN) such that they can be fixed early.
->>>>
->>>> But we could also report a bad page here and just stop (return false).
->
-> I agree, that we want to catch these bugs early by triggering a WARN.
-> The bad_page() call also triggers dump_stack() and have a burst limiter,
-> which I like.  We are running with CONFIG_DEBUG_VM=y in production (as
-> the measured overhead was minimal) to monitor these kind of leaks.
->
-> For the case with page_pool, we *could* recover more gracefully, by
-> returning the page to the page_pool (page->pp) instance.  But I'm
-> reluctant to taking this path, as that puts less pressure on fixing the
-> leak as we "recovered", as this becomes are warning and not a bug.
-> Opinions are welcomed, should we recover or do bad_page() ?
+Actually, after having spent more time on this patch, we realized that 
+this patch is not really needed, because we can't truly route packets to 
+addresses that are not known to ovpn (we wouldn't know which peer to 
+send them to).
 
-I think we should do bad_page() to get the bugs fixed :)
+Hence this is a change that we originally thought to be needed, but 
+further tests proved what I said above.
 
--Toke
+I'll drop this patch from the next PR.
+
+Regards,
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
 
