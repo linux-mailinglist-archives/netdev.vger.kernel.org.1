@@ -1,56 +1,65 @@
-Return-Path: <netdev+bounces-239356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C079DC672CD
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 04:41:11 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20687C672E2
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 04:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 5FDD329AEC
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 03:41:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 6CAB429C66
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 03:46:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4BA25D546;
-	Tue, 18 Nov 2025 03:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2CB1F5437;
+	Tue, 18 Nov 2025 03:46:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WIhwV6yU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BpseHyje"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB36A21CC79
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 03:41:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B55149C7B;
+	Tue, 18 Nov 2025 03:46:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763437266; cv=none; b=RjrP1NMzPfA9TaIhtpdLlQyLvuKIejWWORe1gM9XaRcboq5f4/n0WsourtBBZn52fYJkyGSzrRLhXdV0W0Y80lh75nCpP6iox5+3mDjS6SRhw7QRKUstJJUdzQn6YGiMStRrIr7keWv36hbXW7QRvISWC5DXAAJybC5W8EmlDhY=
+	t=1763437585; cv=none; b=Pmy+iB5M+oVjFI28FNUz4NrBYhR91OMvnfyjar9lUdMfs+J2k1aKy9irRt72s3qfOqRMc/0QIn4ac3mDrtyj0zw0Oh5TWtZ0YXUHnaajuNyu/rpx2+jIJdA3uAJKS/Ne+IghsSYD9v7UfKJtdGYrXdjSQHdhOKB2PiHk5piY6c4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763437266; c=relaxed/simple;
-	bh=OQaOYpr8vPQPVWhnq6HI6/VB8djnyrGp032SrgQHzZM=;
+	s=arc-20240116; t=1763437585; c=relaxed/simple;
+	bh=NHRSkMrm5VFbMsl0bkTL+ScNduSSSzLnJ9QB5TdsNPc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bjGelNj6kv6Th+93u4xzkltwq4YTwUk12pFEW/wtqonu0rrMw1i/fue/Wvtr7hGcO7VJeX8AlGpahW/z4eNeBFKxiC6HDSeZ7VAmgvRAtJmnN9kOo17IIZ2CArFeu0pFjLsx0OSjdh0RCokoipX8T5oKfLmqOXRkB6tzwoptE/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WIhwV6yU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FCCCC2BCAF;
-	Tue, 18 Nov 2025 03:41:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Di01MfONep71AjCMeN+nkdhAasvqfLbT26nFCU/aJGPashHThEr7s8UZO/5RaiHWmSyrpbCp43Cw5ma0PQ+HgBNUwy4GkgqT1+E/BmHyX1Z0S7pPDG3cZ+PbL5XM35KSDXOC0B5USPf4/BVfs7LLL2aF+G2nxfeOmkZT8gHICxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BpseHyje; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA2BCC19421;
+	Tue, 18 Nov 2025 03:46:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763437264;
-	bh=OQaOYpr8vPQPVWhnq6HI6/VB8djnyrGp032SrgQHzZM=;
+	s=k20201202; t=1763437583;
+	bh=NHRSkMrm5VFbMsl0bkTL+ScNduSSSzLnJ9QB5TdsNPc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WIhwV6yUYPZ3FJYv0eim/aGzCzbh50Y/rBZt77FWyDqNW6NWa4Yggs196eJ8al2bu
-	 PA4mCVFBXOfhitU8cnw4DeKD4SARrMLZih6xCOx3HePk9cb5ao55h3w6tiUYKprIuu
-	 cJWLMZjpTanlUN3CGvH8B7cd+Ue+23GvOrkF5PAaUHDxb4slj0cNYrWnwRZ6TVFlTJ
-	 1Eb1q2b93Lrv7uq5OOqPDfTWdDejE5gEMUVsMDNDxu1x+M0kstCjYZsGSV7htTuUZv
-	 9xSkzRcYZt/xSydO5YEospP259abyaQhYX1LGU/gtIuiJgZJZ6wAHgXOe5DqimLp28
-	 4qo2rzO+o2vxg==
-Date: Mon, 17 Nov 2025 19:41:01 -0800
+	b=BpseHyjekH5vSE9flw1mzQvP746Mk/APq+6hu7nBut8ov+sV78qvwawpqfT3uExgQ
+	 /3QGYV1Xvp4ChvQwuWXehHCkejVrxTFp5/t6tsEKvTZQb5ImyvkxXVAo10zA/WFWdv
+	 im5nUZDjtUYpOVzX0Hohq9Q5CZfaPVXnbrlKOeGyS3yLa4EMCEmwicwH7duRwExYe0
+	 TXyQxVjmzkyVbx26I7otc/RGCbZXVouRmmRAN709hqBYg3whiN1eX6yU7YWI7VgDkf
+	 9Q+AmrYbyP78jaxr3vHgyzKx3fUeLXdwrwV13pfsHAN0ekCpDwqetHU9s/u+6pI80A
+	 v4aOlvSF4RxFA==
+Date: Mon, 17 Nov 2025 19:46:18 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Parav Pandit <parav@nvidia.com>
-Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <horms@kernel.org>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next] devlink: Notify eswitch mode changes to
- devlink monitor
-Message-ID: <20251117194101.3b86a936@kernel.org>
-In-Reply-To: <20251115025125.13485-1-parav@nvidia.com>
-References: <20251115025125.13485-1-parav@nvidia.com>
+To: Aditya Garg <gargaditya@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+ kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
+ shirazsaleem@microsoft.com, leon@kernel.org, mlevitsk@redhat.com,
+ yury.norov@gmail.com, sbhatta@marvell.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, gargaditya@microsoft.com
+Subject: Re: [PATCH net-next v5 1/2] net: mana: Handle SKB if TX SGEs exceed
+ hardware limit
+Message-ID: <20251117194618.33af8e98@kernel.org>
+In-Reply-To: <1763155003-21503-2-git-send-email-gargaditya@linux.microsoft.com>
+References: <1763155003-21503-1-git-send-email-gargaditya@linux.microsoft.com>
+	<1763155003-21503-2-git-send-email-gargaditya@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,12 +69,44 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 15 Nov 2025 04:51:25 +0200 Parav Pandit wrote:
-> +	err = devlink_nl_eswitch_fill(msg, devlink, DEVLINK_CMD_ESWITCH_SET,
+On Fri, 14 Nov 2025 13:16:42 -0800 Aditya Garg wrote:
+> The MANA hardware supports a maximum of 30 scatter-gather entries (SGEs)
+> per TX WQE. Exceeding this limit can cause TX failures.
+> Add ndo_features_check() callback to validate SKB layout before
+> transmission. For GSO SKBs that would exceed the hardware SGE limit, clear
+> NETIF_F_GSO_MASK to enforce software segmentation in the stack.
+> Add a fallback in mana_start_xmit() to linearize non-GSO SKBs that still
+> exceed the SGE limit.
 
-I've never seen action command ID being used for a notification.
-Either use an existing type which has the same message format,
-or if no message which naturally fits exists allocate a new ID.
+> +	BUILD_BUG_ON(MAX_TX_WQE_SGL_ENTRIES != MANA_MAX_TX_WQE_SGL_ENTRIES);
+> +#if (MAX_SKB_FRAGS + 2 > MANA_MAX_TX_WQE_SGL_ENTRIES)
+> +	if (skb_shinfo(skb)->nr_frags + 2 > MAX_TX_WQE_SGL_ENTRIES) {
+
+nit: please try to avoid the use of ifdef if you can. This helps to
+avoid build breakage sneaking in as this code will be compiled out
+on default config on all platforms.
+
+Instead you should be able to simply add the static condition to the
+if statement:
+
+	if (MAX_SKB_FRAGS + 2 > MANA_MAX_TX_WQE_SGL_ENTRIES &&
+	    skb_shinfo(skb)->nr_frags + 2 > MAX_TX_WQE_SGL_ENTRIES) {
+
+and let the compiler (rather than preprocessor) eliminate this if ()
+block.
+
+> +		/* GSO skb with Hardware SGE limit exceeded is not expected here
+> +		 * as they are handled in mana_features_check() callback
+> +		 */
+> +		if (skb_linearize(skb)) {
+> +			netdev_warn_once(ndev, "Failed to linearize skb with nr_frags=%d and is_gso=%d\n",
+> +					 skb_shinfo(skb)->nr_frags,
+> +					 skb_is_gso(skb));
+> +			goto tx_drop_count;
+> +		}
+> +		apc->eth_stats.linear_pkt_tx_cnt++;
+> +	}
+> +#endif
 -- 
 pw-bot: cr
 
