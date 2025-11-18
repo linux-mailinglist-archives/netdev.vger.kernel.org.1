@@ -1,155 +1,135 @@
-Return-Path: <netdev+bounces-239447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 491E5C68735
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:14:02 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80B5CC68808
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 10:24:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 098482A59B
-	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:14:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 93E972A78F
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 09:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF18311C14;
-	Tue, 18 Nov 2025 09:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F693148D6;
+	Tue, 18 Nov 2025 09:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X9Q+GWs2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YL22y+dI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42016304BDA
-	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 09:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041272EA743
+	for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 09:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763457190; cv=none; b=oSxXvK8Zy0VYPMfn8tfGa6TUyYp3G40Lqfd8q2hfgWkolpVyk4L+r2HsFVeWmWhjsMhyGwcjMB2Z2o923OEupLau41irvVrwioZ5Dc1nMBBD52CGV80hKDIqcwW+7xqR9M1MJ411e9wDlTTsKIZo6JSF/T4LqvdNvOX+fNhl8bA=
+	t=1763457729; cv=none; b=ux/m6axAJF7YgX+7rHW5irdH0D8r+nX9UrQz0kKRHuVrCURZV6+C+w6QRiL35vzGoI/LmH+vIU9Zf/xbJvykR/yjG5dxdY6xwExObPH/dL4uxvvYJXdPK00RVw4nBoqvgdlmC272czPpaTzfDQUOkZPG/0VksaGH+e7dCD3EnVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763457190; c=relaxed/simple;
-	bh=SdqlTpbJJyHy0CnqZckFC0G6Xe2xBCQUl7hLQuseWzw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vFKFwqRVMpNOZZ6GCwVrea9HSwOicHuzft2N7QfCxWIIix04KorNmL4jyzeRkiWACpu1hW/gnxlw7c1PMcm8D51/fhSrMVs1MbWu8EiVRV4VA5XB2YqkOS7G/i+Q7j12QJSai/Hxkl1kfyPNotFsl6NwZoPqS7cG2Hj4w3xVR5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X9Q+GWs2; arc=none smtp.client-ip=209.85.210.180
+	s=arc-20240116; t=1763457729; c=relaxed/simple;
+	bh=BvOFQAdy9zjJKDHz1JA0HgglsdARQQ0adRPw9YpAmhM=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=EtPM/PLOcESQFGU36lRTjlL5aKeFSD9+ni7K6/T7iqSSHPF9p5GoQeF0SLrR40h5PTX0PHWggTyl7AyeffPWuF5ClWf3EfQ21eZVJ4PVdWfTUP/k8HZHNuRXvJmFuyp2nje+CU7yZmM0QCalFdUtLTnlb15yLxzmkZmEENvkyjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YL22y+dI; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7b852bb31d9so5900007b3a.0
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 01:13:05 -0800 (PST)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4775ae77516so57817205e9.1
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 01:22:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763457183; x=1764061983; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JFkOpeDn2jRMncnbRni6Etd02PIBihHP7ylWcxC9j6Q=;
-        b=X9Q+GWs2L009mwZPy6IOjfaRQycjcX9fjfXcwbrJ4DbWPjN15DiP3EY9uktdfC2IDt
-         PIr4Dng+xI6hK6gnhFyAUS0m4cg07q7Plmxjm8ku9/7nrEolsQN8KOGdKJIlNEKIjMzq
-         T7Y1sxnhuB0b+kaM4q/I6VV6CieuK32pKiGKl+5R8lc4ERDG8iAGOqXBlhSFv7vGKBkC
-         aWJBu1LO0Inv2SYz9tpWbLvyvq3I93/I46GIai2jNKRvuHbUpjPLWSAU+DkNtZ689B+h
-         K7TZ9RUsTdkuFRjhAwiO36SekdhCEUXt98eEkY/u+dq3c4/3LLFFas4/otX6mtQYUf7a
-         w7YQ==
+        d=gmail.com; s=20230601; t=1763457725; x=1764062525; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=n9PnZqYfIzULXWhxWLD9KbztWyXV9i31fSKXw0TFJSM=;
+        b=YL22y+dInl7eOtPzbxUXKZe7AD0/7yMfLv1enhSandlAu9DS+52Rcf0I+gph3X3969
+         btDi23gZR7eaVscZXv5GX1BVQjR7qRlXJZ2scK6R5J1cod85upGSlLsUBJEnQ5SZ5QMk
+         vqG960LUly0N/wapCcRxmmZAHUr+bqi5oC/vS6mP6XmQUrqmzfZv+UT3OzBSdC9kN2Y3
+         YV0orcGlE+8+RffYrGayetvqgn6wGvi6ft1OwJsnr6nrxPEx19S3m5OhTVqVBbdMLBwI
+         Blt450VZpRYUKOozoP3/ASNaA+zi/7TjPuhG3F13HBH2k47NrVKxsBZnz8ecAZtzeQJN
+         Y1ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763457183; x=1764061983;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JFkOpeDn2jRMncnbRni6Etd02PIBihHP7ylWcxC9j6Q=;
-        b=L2oSmUj4P7EmijbqOT1rEOWo8CApqrYi+u138COUY6UWyrOftfrKATgNGZ2pT+mQ/7
-         hBiSQnjw6uEqMckG4nJeua9TXTmV6M0E3bQ1hwPc4KHVRHpjSqw0EDcJ2nW65tHJqGc/
-         YA9Cblq26TY5xg1GnqtjPXXDP+V9I4UE8etZxyTDjVioTAvujojW/gN9owUsXG3OAtRk
-         UkQYPUMrvMfCZzg+oz0ujkiTG+CHrTL3u/MkTKbeEoCjBY3iZwJ6gorVfX8+pmnHAz6F
-         aUkj6+EH06rz3l3tloOIL9xW7/taYm9yXrsH/S+rTgMoRZVOwI97i1A/Y4pPZezgzaMF
-         rxiw==
-X-Gm-Message-State: AOJu0YyyYuQDMWZ78Kc8SOzdb8EpJiOUvapdd9vWcfWEZF/Bw7ZoCIN5
-	v0PkT/1NZPmCno1Gqx+j7Wj8jaTcg4fnCoDSVzgQW9MlOmGY0j13fC7WjywyczF2
-X-Gm-Gg: ASbGncvj3DEUtQ8ZmqRw1C44+RD/chkkpbSe2nUUMZaVkQCmHrqmhcw+UWmwgmGUQFN
-	g69r/0BKIsbPRkr3bU0UTPLO8FQZryDsWJOxka+83phg4CzHCURz5mKahFjOIfFw9iE3PGZoLdJ
-	G7eDsiWULJRPpS0X0O6zORzn4ZX08sxCPDenBgOZm5vRRSJ5TUsd+w/5X1bmvaVr418m8DspuMP
-	8YZLIbBeAPKaMfjN7PoPueyLff7WzTC995FGnPhnFgEL3V3EzIwD+fWj6031AvlSZQojV4KSnmS
-	XEzRMIoL9/0jFb4+46d+ZZ9BBo7jmbwx6MgUMXIZSbIqnUF5UEeb5z7p8tTn6NVtjYerWpMbJkg
-	YIV7eRQfN+O9LAhPq7rkuSLonrdj4W8yGnX7iS77gbiaww3tLOLwUB6PvVFISeioCs/N1DO3dZM
-	DB0atTVts=
-X-Google-Smtp-Source: AGHT+IELD+mUOOmyAzNfNMxNVLo7AvHaGl4tLct5UR4tcQdGQzNqWRjSuqIa9bQ6MpfLRzKhYDaiyA==
-X-Received: by 2002:a05:6a20:6a03:b0:334:a180:b7ac with SMTP id adf61e73a8af0-35ba1c93579mr19863554637.39.1763457183358;
-        Tue, 18 Nov 2025 01:13:03 -0800 (PST)
-Received: from d.home.mmyangfl.tk ([45.32.227.231])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b9251ca3e9sm15913459b3a.29.2025.11.18.01.13.00
+        d=1e100.net; s=20230601; t=1763457725; x=1764062525;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=n9PnZqYfIzULXWhxWLD9KbztWyXV9i31fSKXw0TFJSM=;
+        b=lqc01RUkEeikNjrWqralHzRomvOTalK2TJwyikPI8dR0B6M5qa3ocLhmJqLy96E+rc
+         Rkm4xFpsZ5bziFH54GlVOyx/4jAFFsTsyCyNTVr8up732xVi0XkBq1nIDCH4YCxu52vi
+         PJdu7K7em2M1nzhTHfyYGs2GP1jIRKI4gIxBNyZ+hDDKFEjlZ74KS/WLmfNLrSH80Rx4
+         Dvri/2Q6+Uos09OCe7gegS4L/nI+dAijx7lMNSfS+0WZXAjwBKUd3XpNiN0oq7VpgK7b
+         xrRIsSIeuHFFkIu2HEjTXLvdIesasinqvypexjcExhqZIPfUKHZQz56W+TLv+qfkm71f
+         3TLw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXtwQ0m6/I/ZQDY/zXxq7oTeMcU9rggUcSDwDMJG2SntkMuyMdCClv16nOxcQODmX5kzH65Zk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKriWhihVyNzsZ1coCKcR8n1nS1YygsNKiLPWMXZ8dgFDBRw3h
+	eNSNwm/MiCb7yKi/GbOJkEiuE67JByPONN8gdL3CtnK0ugfg6qKAgNEz
+X-Gm-Gg: ASbGncuLulSowuDkRnkiAVlqNW5q5bWnoVSZQU14F+8LezVabXqbTNkqXgduI9GY3g9
+	JZzN9e/U1mJ9EP4HaaHFVWTgeVpINzgslGkIYBU29vbciNZ3KgzttYxMrS9ZnaMf1L+0lX+Ylhs
+	rcCWy5jUechgXRVZr/Ocjnk9Le4PCS2MCK2G2JfI0AOhlxpJTQpgZIwXrK5oBpLlPogcgO5ZMi0
+	Tqnky9ATxTW82geQ/GjFeputyzKo9ULn9cRhfojbtQS4E+LsNqlJaoKeYHw5FlFCNzJPalr6OkY
+	tGyipCox6EtWvpssB92ALZ99vv4TKds25zvQmBk9BGLFDwjBC/WHFOqFsdzWZEqskmn7oFFsH6w
+	vuqPvl27D9RjhWsrz420hI/TRdK61bh/zzLqGB5Pw6ILsEgBo7jjXaTQ6DD/EDBXTF36TpB42XE
+	0PLm4TxQk2H2Yvhawxx+6m2m3kfMa4szLSwHyaoROfn3hr
+X-Google-Smtp-Source: AGHT+IGSr/3N2cWhsJqtnk0wg9x/yA/uNhYB0j+Mk1qBcmIOENJcOu7NXZJlQH8vYKujOTqblYlcPw==
+X-Received: by 2002:a05:600c:45d4:b0:477:7c45:87b2 with SMTP id 5b1f17b1804b1-4778fe5dde3mr190114145e9.16.1763457724945;
+        Tue, 18 Nov 2025 01:22:04 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:295b:6b4b:e3b5:a967])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47787e953e3sm346458935e9.14.2025.11.18.01.22.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 01:13:02 -0800 (PST)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: dsa: yt921x: Fix MIB attribute table
-Date: Tue, 18 Nov 2025 17:12:33 +0800
-Message-ID: <20251118091237.2208994-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.51.0
+        Tue, 18 Nov 2025 01:22:04 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Gal Pressman <gal@nvidia.com>,  "David S. Miller" <davem@davemloft.net>,
+  Eric Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,
+  Andrew Lunn <andrew+netdev@lunn.ch>,  <netdev@vger.kernel.org>,  Simon
+ Horman <horms@kernel.org>,  Alexei Starovoitov <ast@kernel.org>,  Daniel
+ Borkmann <daniel@iogearbox.net>,  Jesper Dangaard Brouer
+ <hawk@kernel.org>,  John Fastabend <john.fastabend@gmail.com>,  Stanislav
+ Fomichev <sdf@fomichev.me>,  <bpf@vger.kernel.org>,  Nimrod Oren
+ <noren@nvidia.com>
+Subject: Re: [PATCH net-next 1/3] tools: ynl: cli: Add --list-attrs option
+ to show operation attributes
+In-Reply-To: <20251117173503.3774c532@kernel.org>
+Date: Tue, 18 Nov 2025 09:20:50 +0000
+Message-ID: <m2y0o3lmrx.fsf@gmail.com>
+References: <20251116192845.1693119-1-gal@nvidia.com>
+	<20251116192845.1693119-2-gal@nvidia.com>
+	<20251117173503.3774c532@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-There are holes in the MIB field I didn't notice, leading to wrong
-statistics after stress tests.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- drivers/net/dsa/yt921x.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+> On Sun, 16 Nov 2025 21:28:43 +0200 Gal Pressman wrote:
+>>
+>> +    def print_attr_list(attr_names, attr_set):
+>
+> It nesting functions inside main() a common pattern for Python?
+> Having a function declared in the middle of another function,
+> does not seem optimal to me, but for some reason Claude loves
+> to do that.
 
-diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index 944988e29127..97fc6085f4d0 100644
---- a/drivers/net/dsa/yt921x.c
-+++ b/drivers/net/dsa/yt921x.c
-@@ -56,13 +56,13 @@ static const struct yt921x_mib_desc yt921x_mib_descs[] = {
- 
- 	MIB_DESC(1, 0x30, NULL),	/* RxPktSz1024To1518 */
- 	MIB_DESC(1, 0x34, NULL),	/* RxPktSz1519ToMax */
--	MIB_DESC(2, 0x38, NULL),	/* RxGoodBytes */
--	/* 0x3c */
-+	/* 0x38 unused */
-+	MIB_DESC(2, 0x3c, NULL),	/* RxGoodBytes */
- 
--	MIB_DESC(2, 0x40, "RxBadBytes"),
--	/* 0x44 */
--	MIB_DESC(2, 0x48, NULL),	/* RxOverSzErr */
--	/* 0x4c */
-+	/* 0x40 */
-+	MIB_DESC(2, 0x44, "RxBadBytes"),
-+	/* 0x48 */
-+	MIB_DESC(1, 0x4c, NULL),	/* RxOverSzErr */
- 
- 	MIB_DESC(1, 0x50, NULL),	/* RxDropped */
- 	MIB_DESC(1, 0x54, NULL),	/* TxBroadcast */
-@@ -79,10 +79,10 @@ static const struct yt921x_mib_desc yt921x_mib_descs[] = {
- 	MIB_DESC(1, 0x78, NULL),	/* TxPktSz1024To1518 */
- 	MIB_DESC(1, 0x7c, NULL),	/* TxPktSz1519ToMax */
- 
--	MIB_DESC(2, 0x80, NULL),	/* TxGoodBytes */
--	/* 0x84 */
--	MIB_DESC(2, 0x88, NULL),	/* TxCollision */
--	/* 0x8c */
-+	/* 0x80 unused */
-+	MIB_DESC(2, 0x84, NULL),	/* TxGoodBytes */
-+	/* 0x88 */
-+	MIB_DESC(1, 0x8c, NULL),	/* TxCollision */
- 
- 	MIB_DESC(1, 0x90, NULL),	/* TxExcessiveCollistion */
- 	MIB_DESC(1, 0x94, NULL),	/* TxMultipleCollision */
-@@ -705,7 +705,7 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- 			res = yt921x_reg_read(priv, reg + 4, &val1);
- 			if (res)
- 				break;
--			val = ((u64)val0 << 32) | val1;
-+			val = ((u64)val1 << 32) | val0;
- 		}
- 
- 		WRITE_ONCE(*valp, val);
--- 
-2.51.0
+It's common for closure-like things and for scoping. Reviewing this
+again, these add a lot of noise to main() and would be better separated
+out.
 
+To be fair, I started it with `def output(msg)` but I'd argue it is a
+closure-like scoped helper thing :-)
+
+>> +        """Print a list of attributes with their types and documentation."""
+>> +        for attr_name in attr_names:
+>> +            if attr_name in attr_set.attrs:
+>> +                attr = attr_set.attrs[attr_name]
+>> +                attr_info = f'  - {attr_name}: {attr.type}'
+>> +                if 'enum' in attr.yaml:
+>> +                    attr_info += f" (enum: {attr.yaml['enum']})"
+>> +                if attr.yaml.get('doc'):
+>> +                    doc_text = textwrap.indent(attr.yaml['doc'], '    ')
+>> +                    attr_info += f"\n{doc_text}"
+>> +                print(attr_info)
+>> +            else:
+>> +                print(f'  - {attr_name}')
+>> +
 
