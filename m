@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-239778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0599C6C586
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 03:11:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80862C6C589
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 03:11:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 98728350368
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 02:11:01 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4F84F352097
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 02:11:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC0226F28C;
-	Wed, 19 Nov 2025 02:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BCAB27055D;
+	Wed, 19 Nov 2025 02:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ehKcFD87"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T7TCOVL0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0BE184E
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 02:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3597B2376E0
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 02:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763518256; cv=none; b=W3kirMdCL1ltgtz/uFIFPheUD/HPVscs3OoqmhJ/m/BwN5XX1d62dKiciiQp93BTzoUwu6yQxXfu3o9Pp2AH+wg/7pI8OsQXAmqB8I1bskEihPFLe0A/3Fl6+rW31D4VU26W6CK3jJnnUQTvuymVA/ga2wQPJxXlv74mlN5P97w=
+	t=1763518261; cv=none; b=LHSbG7B8A5QkeWn8AWX9JtdZGZsnrjLSSvvr6tVd9IfFFm6ZtRpyyKr8CdQTV4V9Wk3EW15bibumIuAN4uXAPjeT9MLL2vNJpBgpTxzmDJwSlNe9VGmOYrTW64F381wZm8zenHzXuusv7bp7PnANacDYuENrw3c6ycMon6BhEhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763518256; c=relaxed/simple;
-	bh=00MYvXiHG/bjNu6C6elPmWmcpRZ1zXafnH3WcMeDKcg=;
+	s=arc-20240116; t=1763518261; c=relaxed/simple;
+	bh=IY4pIDzwBvApBk5L+qnIM5FpGtKDNWHXMzMROPS3ZqU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bJLoR8S/Gea9FswOgAv1ZjEdta5VCHRBNppLLuY8j6ccJAB/TceWLMoKMcwySGXAr8TuiIkrDtyh+Pa3xsQDTW3HaRszmNzbFn4WZZ8mgmgFJQBDX59QTirrwYCMoqu0JzjweL+5IV867yNQqNmT8FevPqeKVUxqH2yybnBBHJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ehKcFD87; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E492C4AF0B;
-	Wed, 19 Nov 2025 02:10:56 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=CTMtOnpa1VegiHvgpFhXh6AePCODzRkAIP7+nXAQAL7xNNgdKdd4At5yupBDFjmsMQgBao7U5/Xbal807clrWwHIeT/Ew3GjOURA0uZzdhhndcVfaCvyl85Rh0/mAYqsRws/SPFItVx1hQSosPjB9eE2dwaCGZLutCRp24ZSoJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T7TCOVL0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE18C4CEF5;
+	Wed, 19 Nov 2025 02:11:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763518256;
-	bh=00MYvXiHG/bjNu6C6elPmWmcpRZ1zXafnH3WcMeDKcg=;
+	s=k20201202; t=1763518260;
+	bh=IY4pIDzwBvApBk5L+qnIM5FpGtKDNWHXMzMROPS3ZqU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ehKcFD8735sPu97d5L55qYwxiD927MVZGyQfxlQbyFZv/mVJBW5xowMO4nqNs4nUD
-	 IEqipUsaY18fKiiEtRkMQnvZF3j76+ZlLtmbO8S4pww3ajEdHjJpkFMFhjCz9leEAF
-	 8o5Wv1HWDLYI17Ss+Wc/qZK2XvQNZNTy+P4XbrEuv8wgUJUdhuhIQzPPRDhkGHuIEA
-	 xWX+e61N+sGjNT5qY/R0cMOwM3Ye8u5dU0MUMTkdQXDWLJJmgpLSP3uLr8mAQA8ZWZ
-	 ooVxgylaMxJKKuVfOHqzog6HkmO+Psin/aovFtnOPiZv3Ld7N46EQNsAJeEsl5bkt2
-	 82YQ2fgNdeBrg==
+	b=T7TCOVL0a4LVRRszB4tLj8GmdWYMVHt6INIjLIb+9oyBpO/j55y+F4lCauOG8+27X
+	 Xu7Uv2sQK9bAvCS/hXe/Ay95HFw5pUPxiyKHxTepetogptnDLl5MAJzDLMyv/g/xa3
+	 GzGTQesWyCAop9C59Qfief4XUONpZSPbeRqCt+UkvM+buFFuclHPioleVfvJ5GWuDQ
+	 SsFJmaNIaqxDkvc0J4XvNpyd7/9cYU6UL1WVq5zS0dVq1C/rRZU14fXOGVuBsp0hsN
+	 XUdxXIvHHmba6noGiZyL8l0iMDNU/b8YkFrfG8OzbP9Qr94Y+ihArK8L7y0ZB8trO3
+	 FZlUuxHNEYq3w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD61380A94B;
-	Wed, 19 Nov 2025 02:10:22 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1A6380A94B;
+	Wed, 19 Nov 2025 02:10:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,55 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 01/10] xfrm: drop SA reference in xfrm_state_update if dir
- doesn't match
+Subject: Re: [PATCH v1 net-next] tcp: Don't reinitialise tw->tw_transparent in
+ tcp_time_wait().
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176351822157.182718.3296790077935029617.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Nov 2025 02:10:21 +0000
-References: <20251118085344.2199815-2-steffen.klassert@secunet.com>
-In-Reply-To: <20251118085344.2199815-2-steffen.klassert@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: davem@davemloft.net, kuba@kernel.org, herbert@gondor.apana.org.au,
- netdev@vger.kernel.org
+ <176351822549.182718.113533008094323243.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Nov 2025 02:10:25 +0000
+References: <20251118000445.4091280-1-kuniyu@google.com>
+In-Reply-To: <20251118000445.4091280-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ncardwell@google.com, horms@kernel.org,
+ kuni1840@gmail.com, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Steffen Klassert <steffen.klassert@secunet.com>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 18 Nov 2025 09:52:34 +0100 you wrote:
-> From: Sabrina Dubroca <sd@queasysnail.net>
+On Tue, 18 Nov 2025 00:04:40 +0000 you wrote:
+> tw->tw_transparent is initialised twice in inet_twsk_alloc()
+> and tcp_time_wait().
 > 
-> We're not updating x1, but we still need to put() it.
+> Let's remove the latter.
 > 
-> Fixes: a4a87fa4e96c ("xfrm: Add Direction to the SA in or out")
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [01/10] xfrm: drop SA reference in xfrm_state_update if dir doesn't match
-    https://git.kernel.org/netdev/net/c/8d2a2a49c30f
-  - [02/10] xfrm: also call xfrm_state_delete_tunnel at destroy time for states that were never added
-    https://git.kernel.org/netdev/net/c/10deb6986484
-  - [03/10] xfrm: make state as DEAD before final put when migrate fails
-    https://git.kernel.org/netdev/net/c/5502bc4746e8
-  - [04/10] xfrm: call xfrm_dev_state_delete when xfrm_state_migrate fails to add the state
-    https://git.kernel.org/netdev/net/c/7f0228576479
-  - [05/10] xfrm: set err and extack on failure to create pcpu SA
-    https://git.kernel.org/netdev/net/c/1dcf617bec5c
-  - [06/10] xfrm: check all hash buckets for leftover states during netns deletion
-    https://git.kernel.org/netdev/net/c/f2bc8231fd43
-  - [07/10] xfrm: Check inner packet family directly from skb_dst
-    https://git.kernel.org/netdev/net/c/082ef944e55d
-  - [08/10] xfrm: Determine inner GSO type from packet inner protocol
-    https://git.kernel.org/netdev/net/c/61fafbee6cfe
-  - [09/10] xfrm: Prevent locally generated packets from direct output in tunnel mode
-    https://git.kernel.org/netdev/net/c/59630e2ccd72
-  - [10/10] xfrm: fix memory leak in xfrm_add_acquire()
-    https://git.kernel.org/netdev/net/c/a55ef3bff84f
+  - [v1,net-next] tcp: Don't reinitialise tw->tw_transparent in tcp_time_wait().
+    https://git.kernel.org/netdev/net-next/c/932478bf9f6d
 
 You are awesome, thank you!
 -- 
