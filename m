@@ -1,252 +1,786 @@
-Return-Path: <netdev+bounces-239804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21F07C6C7BB
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 03:57:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74820C6C7CA
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 03:58:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 0A5E42CC7B
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 02:57:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 77E622CD7C
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 02:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220532D641D;
-	Wed, 19 Nov 2025 02:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B0021D3CC;
+	Wed, 19 Nov 2025 02:57:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dsz7qVHw";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZXBYrMFC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="exZE97+o"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FA321D3CC
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 02:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14316288C24
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 02:57:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763520995; cv=none; b=KQPj58uuNHP4E4dQ2/AlgLlVXB2tZLc0VbvkhUnx224lLGAp1VldnpcG9HKA7q7PlZrtzw8iCMoW0P1SmHr1UmJvVCeUI0crF8gPVx22rl9rQQ3sEeigCrCRxx4uVu1YK8UXZMeuhTUXOs3IxfKI28tuM5R4hY7Tk6q9F8laC8o=
+	t=1763521078; cv=none; b=Ik2hB/F+MFLrh59KJSheOvvGLUGrTKPU6aSZElMENXTKAy+bzgpx81ZYaJgX1YK1F0ZEtT3EjaMcA5JHDfT+RskWw/dGz2NPnU6lEQJKM8NHalKx/bE9y9bxHb39NnMapJ04ZFZiUFq7KOO+RN/H0Z7+R3vn7xP82WMB8iwSPoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763520995; c=relaxed/simple;
-	bh=G12hxObS9vVdQSHOVQsEwJdya84pJfSeHUQ2pXezb/M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qbbqOS8BGVMntwQJnMRQDlZnbHkuHzQxc3qxEhgdUHRYJXuqcsNfct1sLgTtS9lhoU6mMwEHp0nBVJJowmmtDOCt3NM1regmJ1UPH8llY9i0WaJBtm+mog/I8ZZIqN4FJf4vgRc2YBnuUtcVQVi36tmCKzxb/vH+nX75Za/i3L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dsz7qVHw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZXBYrMFC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763520992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jDvPTx8od/LRicGRV59Ci5CqBppmh/yq9CH+cOE9Xiw=;
-	b=dsz7qVHw9C3W8GO2xcE9wkLwabbmpZ9EAmM9paEYPbRJGY3y0JwEks/PAkp8pz4ECp+k/P
-	o96fGsYaICUgkDQqXcU7H5DM+8WUII/aCA7OV+CWcAOeK4GIh+bVHFOErXOP+pUTlldWg0
-	Y2DHuqjR4CfS6/cqWyPmXhZ+q0z7BZc=
-Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
- [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-333-hFDNNWWbM0-BonHUINV9qA-1; Tue, 18 Nov 2025 21:56:30 -0500
-X-MC-Unique: hFDNNWWbM0-BonHUINV9qA-1
-X-Mimecast-MFC-AGG-ID: hFDNNWWbM0-BonHUINV9qA_1763520990
-Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-5dfb4950a48so15363554137.0
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 18:56:30 -0800 (PST)
+	s=arc-20240116; t=1763521078; c=relaxed/simple;
+	bh=R66wqwPToI0jl4HoRviYfQqu2zgI1SYRsSTbf+IIU1k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dXOMqO+Q3b5wk1ZsrDpAssGFO2wp1hV6IdQxOtXNOcQbC8GuPksqVOQmAVmWfdki0+g59OM/2/Ad2ZCtroAERCGdgPU1zcC6RcCFO17k7cGQEejMvLHEKkQtMGdp+9XWWJMw8exwiypFTUzfuAc26bS1p8qYyoVesPtm9SoTYFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=exZE97+o; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2955623e6faso57276635ad.1
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 18:57:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763520990; x=1764125790; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jDvPTx8od/LRicGRV59Ci5CqBppmh/yq9CH+cOE9Xiw=;
-        b=ZXBYrMFC4R3upu86JqxrnKc8pUwc541fOUIcr2lW83OWb7MyiGlakRT3DQh/NNaklx
-         DuI0W82eWlyIfqQgWwvw3aZX99ngVnxCH4UEU4Om8/bCaIEO0sZhrL2fsSRXOMXvVRBO
-         X3Z4uIZXaKSeiduiMyfySKcmUQILVfqnXW0vePUqWdvjUv9JDXuRM1iZJKRPUEXGif8E
-         1dGc16Bs3uXdqAsvoaJdlFquFjQdEQVB/zz+QvWFbS/Obb4vmUotnaF24u/v9fqxQa0J
-         7ma96TyOM2OnZynw7Trsld6H4EpG/uZWGcGkaWVMK2PcFdXm2X2O4knA933oiINc05nV
-         qoVQ==
+        d=gmail.com; s=20230601; t=1763521075; x=1764125875; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=azMN/zG6EQFEJExTeSNW6ZCmGjVR1DXUOK19mT6eJ2c=;
+        b=exZE97+o1IBZU+6l5YQc1cqicsZO1Xkbb9T79hHn+vIIwHUzPghgbdVe/hO+iZU17D
+         1V63z/AdzH53LbG4YjZTy3RYnKUDZCcBkZ7jcNagzcanpQEi62m/WEAbkYCzw1nQ6fQR
+         dKdyEj6/c5g92yx6P3OGm8jAISBdibg/zZ0CrPZm+Gfwb0U3RY+n65j5g31kRqJyk/lQ
+         1soOZ5Lp2l34zpI1fRPpJFyGrgX7T9q2+XVW9MZjBvhA+H7V7BbLy5+ljuHMHM1ByIXb
+         4v/l33n4PZGvNFWEpZd6pNPUo8/oV3zTlhloikJeq9RFCUbrxxCBzImnYyzTvKzZFxsn
+         SDMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763520990; x=1764125790;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=jDvPTx8od/LRicGRV59Ci5CqBppmh/yq9CH+cOE9Xiw=;
-        b=V6rq+nOuLpK0K7hdbM/BmZbTBDmr0jCv7xeyLWgcTkONLkA2LJgwyBBI0AFQWwjK3u
-         BcO/gdsst4m95OrWXe9qjzVZa7b0CmN1/4Z92LmSmsbm1M7KNGwVvE9G1xZw7Jesv9Dy
-         xh5IU8ydhVWk4ehKi2UosBk2xFAmWA+L1idB++N2wEWjDfBB5KLdMRYunf9ihl8rH5hz
-         /buy2ChOUzb7HYRKLGqdgC+abAwYYoghhAYltwOeO1rvh2NAo1713I6dUUz+xVu+xkC3
-         IhaJtXfq6kslwR9kTBk057ITy1h/46AeUGGrjqRSzUVoLNnXvOXVaWAMiMlx2M+F+eZa
-         /Hxw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4IvhePM4BgN7tQR+VPvVMk7Kgl8njgg+fQs7QckoCmhk2RY7CUin4n0vZzpy0JDFyY9rQ2Hw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMLav/vD3U3z9l0GJksQLSyQvFxm8gnEqLiqpKGQ5z4b+lWhXW
-	GjbSweg4al6un7n+9S/3vD3Ah62bcJztTpV0XYux9aqgE4OeDFMZN91KsfY7eYIyq3IrpwsSHey
-	e5DwA1zzpHnE5SApgpFRZ8VOnQTlpl/6rxKY7uTKldRuOhDcuo6GuT8C8E2D+13v60pxrwxFKYA
-	LlFLu4EzglPJDhRGurFyt7GhXZIT9GMYPj
-X-Gm-Gg: ASbGnct7MrpeVSm0B4x5wXC2pLz6XUPivXGVkRl4mS/jQVBRiWL38MghPyhHMyBcdlS
-	S0PLUNDRCM2qKH9HT2Xf7ngNoRW5ckxJ1UyZwEpYFzyRkkKfGEWTcTzZFnMcCpMQvb7VCQggtes
-	9wMC8Ld/tjTRbdLwTmpw0SGuLE5As443iM7YGHV/9bbQC+zuFmkCadVFr/TdP2FP4=
-X-Received: by 2002:a05:6102:e0a:b0:5db:ef3f:6c7d with SMTP id ada2fe7eead31-5dfc5556bf8mr6112206137.14.1763520990174;
-        Tue, 18 Nov 2025 18:56:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEMHvc8TbnsY8T2F+eiw7C0cSgj9lMpJACXTR8AzjwZ2GrCglhiRk/Pmo0QAEu0HhMJS9z+SDjksvQGpkSmyfk=
-X-Received: by 2002:a05:6102:e0a:b0:5db:ef3f:6c7d with SMTP id
- ada2fe7eead31-5dfc5556bf8mr6112195137.14.1763520989781; Tue, 18 Nov 2025
- 18:56:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763521075; x=1764125875;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=azMN/zG6EQFEJExTeSNW6ZCmGjVR1DXUOK19mT6eJ2c=;
+        b=NhuA/pwGtyjOyjRpbADeOiUG7OfMXWNpurjblYE4yL7JEfpNMQG/i4P5KlD8thMnLP
+         Dwwn6gbNr7lRuXwz/aMoUmUuLz6l7HcRleE6V4QBtdB5xO/XzSmXAiQl7lMKck1P040l
+         hsIs71ruNEba54KitPJJ/Mvh4RVyM+4wrannBR9azzMqTWNw6iUyE5ovxq8ks3kiQotl
+         p1rpGWwRzBOKGDJPg3teqkd8W0JfWzA9/+J78cSBDGsdExummRrC1rCGFHeYyNC+b311
+         nwpTxumck6lv6PGZZ0DVbLjc1KRcR2pKuOy1svXE1UQTPdrJwK1jTs4+FpTBByVSioNO
+         a3LA==
+X-Gm-Message-State: AOJu0YxP8nkVeg86f5ovDly8pyvYdzoEoLWW3BZFwhlDup2TASAHix4j
+	HTWzMM6cviAyrxx6H0PHfyJRcZ3V0RO2V64vrm5XEpbMVhgAbcMQD2WUDjucU2BL
+X-Gm-Gg: ASbGnct1xKE+UUJMtUVs1oXxeLDwVS/rQpgCsAKJyS2ZtCNLenL5SkFpAlZvsBZX6Eh
+	2E4tcVy7hWyk4rw2G+I5ncS1okbTv54rvzxrV7W6MVEHreTZb/BFBwA7vTRe5U+jBHma3mUk/d2
+	zQuht1Qc2h3PilckbN7Wigkp1W9eeH2pGQo4uO+kenvKGmqbQBHL8gV8BtdLSZhX+2yfToTlXwW
+	KwtqJmFpsqZrF7gVeyPkeVYkjagpuDJ4yIrnt1ONISad23NNTBeuG3w/8ame2jUer1nQamXcwLw
+	aha+wd6mOh8jrPX9FvqmjGFLyDiOjOyw5TTP/ErXMtQvV6VMAJgHZyBsCtw+Xf8NEp8vmnEfJjK
+	8tcwZ2DPWoTgd+yr+qON2V+R2oP+8TXtGnnwlyZ7334EQ2RL5butSJIgoz0PbbZY1eUidH9cMSJ
+	MDTCjot66MyzuYQLA=
+X-Google-Smtp-Source: AGHT+IFO//MOpSwafbf+h7eZH12LAIJ5phVMVuXzDfPtJXqcyI9mIJp+lFgm0xqilBpj1SX3wCs2FA==
+X-Received: by 2002:a17:903:1a2f:b0:27c:56af:88ea with SMTP id d9443c01a7336-2986a76bce4mr191769535ad.60.1763521074968;
+        Tue, 18 Nov 2025 18:57:54 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2376f6sm185374175ad.21.2025.11.18.18.57.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Nov 2025 18:57:54 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jan Stancek <jstancek@redhat.com>,
+	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	=?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Petr Machata <petrm@nvidia.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv6 net-next] tools: ynl: add YNL test framework
+Date: Wed, 19 Nov 2025 02:57:42 +0000
+Message-ID: <20251119025742.11611-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251118090942.1369-1-liming.wu@jaguarmicro.com>
-In-Reply-To: <20251118090942.1369-1-liming.wu@jaguarmicro.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 19 Nov 2025 10:56:17 +0800
-X-Gm-Features: AWmQ_bmKFv4JLlor4jL7WLrkrIdgod9abx7FeAA8sB4t9HbQcF1R97xzgCvVagE
-Message-ID: <CACGkMEvwedzRrMd9hYm7PbDezBu1GM3q-YcUhsvfYJVv=bNSdw@mail.gmail.com>
-Subject: Re: [PATCH] virtio_net: enhance wake/stop tx queue statistics accounting
-To: liming.wu@jaguarmicro.com
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, angus.chen@jaguarmicro.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 18, 2025 at 5:10=E2=80=AFPM <liming.wu@jaguarmicro.com> wrote:
->
-> From: Liming Wu <liming.wu@jaguarmicro.com>
->
-> This patch refines and strengthens the statistics collection of TX queue
-> wake/stop events introduced by a previous patch.
+Add a test framework for YAML Netlink (YNL) tools, covering both CLI and
+ethtool functionality. The framework includes:
 
-It would be better to add commit id here.
+1) cli: family listing, netdev, ethtool, rt-* families, and nlctrl
+   operations
+2) ethtool: device info, statistics, ring/coalesce/pause parameters, and
+   feature gettings
 
->
-> Previously, the driver only recorded partial wake/stop statistics
-> for TX queues. Some wake events triggered by 'skb_xmit_done()' or resume
-> operations were not counted, which made the per-queue metrics incomplete.
->
-> Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
-> ---
->  drivers/net/virtio_net.c | 49 ++++++++++++++++++++++------------------
->  1 file changed, 27 insertions(+), 22 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 8e8a179aaa49..f92a90dde2b3 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -775,10 +775,26 @@ static bool virtqueue_napi_complete(struct napi_str=
-uct *napi,
->         return false;
->  }
->
-> +static void virtnet_tx_wake_queue(struct virtnet_info *vi,
-> +                               struct send_queue *sq)
-> +{
-> +       unsigned int index =3D vq2txq(sq->vq);
-> +       struct netdev_queue *txq =3D netdev_get_tx_queue(vi->dev, index);
-> +
-> +       if (netif_tx_queue_stopped(txq)) {
-> +               u64_stats_update_begin(&sq->stats.syncp);
-> +               u64_stats_inc(&sq->stats.wake);
-> +               u64_stats_update_end(&sq->stats.syncp);
-> +               netif_tx_wake_queue(txq);
-> +       }
-> +}
-> +
->  static void skb_xmit_done(struct virtqueue *vq)
->  {
->         struct virtnet_info *vi =3D vq->vdev->priv;
-> -       struct napi_struct *napi =3D &vi->sq[vq2txq(vq)].napi;
-> +       unsigned int index =3D vq2txq(vq);
-> +       struct send_queue *sq =3D &vi->sq[index];
-> +       struct napi_struct *napi =3D &sq->napi;
->
->         /* Suppress further interrupts. */
->         virtqueue_disable_cb(vq);
-> @@ -786,8 +802,7 @@ static void skb_xmit_done(struct virtqueue *vq)
->         if (napi->weight)
->                 virtqueue_napi_schedule(napi, vq);
->         else
-> -               /* We were probably waiting for more output buffers. */
-> -               netif_wake_subqueue(vi->dev, vq2txq(vq));
-> +               virtnet_tx_wake_queue(vi, sq);
->  }
->
->  #define MRG_CTX_HEADER_SHIFT 22
-> @@ -1166,10 +1181,7 @@ static void check_sq_full_and_disable(struct virtn=
-et_info *vi,
->                         /* More just got used, free them then recheck. */
->                         free_old_xmit(sq, txq, false);
->                         if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2) {
-> -                               netif_start_subqueue(dev, qnum);
-> -                               u64_stats_update_begin(&sq->stats.syncp);
-> -                               u64_stats_inc(&sq->stats.wake);
-> -                               u64_stats_update_end(&sq->stats.syncp);
-> +                               virtnet_tx_wake_queue(vi, sq);
+The current YNL syntax is a bit obscure, and end users may not always know
+how to use it. This test framework provides usage examples and also serves
+as a regression test to catch potential breakages caused by future changes.
 
-This is suspicious, netif_tx_wake_queue() will schedule qdisc, or is
-this intended?
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
 
->                                 virtqueue_disable_cb(sq->vq);
->                         }
->                 }
-> @@ -3068,13 +3080,8 @@ static void virtnet_poll_cleantx(struct receive_qu=
-eue *rq, int budget)
->                         free_old_xmit(sq, txq, !!budget);
->                 } while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
->
-> -               if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2 &&
-> -                   netif_tx_queue_stopped(txq)) {
-> -                       u64_stats_update_begin(&sq->stats.syncp);
-> -                       u64_stats_inc(&sq->stats.wake);
-> -                       u64_stats_update_end(&sq->stats.syncp);
-> -                       netif_tx_wake_queue(txq);
-> -               }
-> +               if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2)
-> +                       virtnet_tx_wake_queue(vi, sq);
->
->                 __netif_tx_unlock(txq);
->         }
-> @@ -3264,13 +3271,8 @@ static int virtnet_poll_tx(struct napi_struct *nap=
-i, int budget)
->         else
->                 free_old_xmit(sq, txq, !!budget);
->
-> -       if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2 &&
-> -           netif_tx_queue_stopped(txq)) {
-> -               u64_stats_update_begin(&sq->stats.syncp);
-> -               u64_stats_inc(&sq->stats.wake);
-> -               u64_stats_update_end(&sq->stats.syncp);
-> -               netif_tx_wake_queue(txq);
-> -       }
-> +       if (sq->vq->num_free >=3D MAX_SKB_FRAGS + 2)
-> +               virtnet_tx_wake_queue(vi, sq);
->
->         if (xsk_done >=3D budget) {
->                 __netif_tx_unlock(txq);
-> @@ -3521,6 +3523,9 @@ static void virtnet_tx_pause(struct virtnet_info *v=
-i, struct send_queue *sq)
->
->         /* Prevent the upper layer from trying to send packets. */
->         netif_stop_subqueue(vi->dev, qindex);
-> +       u64_stats_update_begin(&sq->stats.syncp);
-> +       u64_stats_inc(&sq->stats.stop);
-> +       u64_stats_update_end(&sq->stats.syncp);
->
->         __netif_tx_unlock_bh(txq);
->  }
-> @@ -3537,7 +3542,7 @@ static void virtnet_tx_resume(struct virtnet_info *=
-vi, struct send_queue *sq)
->
->         __netif_tx_lock_bh(txq);
->         sq->reset =3D false;
-> -       netif_tx_wake_queue(txq);
-> +       virtnet_tx_wake_queue(vi, sq);
->         __netif_tx_unlock_bh(txq);
->
->         if (running)
-> --
-> 2.34.1
->
+v6: rebase to latest net-next. update the shellcheck comment.
+v5: add a comment about why disable shellcheck (Matthieu Baerts)
+    move ktap_set_plan after setup (Matthieu Baerts)
+    Use TESTS_NO to track the test number (Matthieu Baerts)
+    Link: https://lore.kernel.org/netdev/20251117024457.3034-1-liuhangbin@gmail.com
+v4: Use KTAP helper to report the test result (Matthieu Baerts)
+    iterate through $(TESTS) instead of being hard coded (Donald Hunter)
+    Link: https://lore.kernel.org/netdev/20251114034651.22741-1-liuhangbin@gmail.com
+v3: add `make run_tests` to run all the tests at a time (Jakub Kicinski)
+    use ipv4-or-v6 display hint for dual-stack fields (Jakub Kicinski)
+    check sysfs in case of netdevsim buildin (Sabrina Dubroca)
+    Link: https://lore.kernel.org/netdev/20251110100000.3837-1-liuhangbin@gmail.com
+v2: move test from selftest to ynl folder (Jakub Kicinski)
+    Link: https://lore.kernel.org/netdev/20251105082841.165212-1-liuhangbin@gmail.com
+v1: Link: https://lore.kernel.org/netdev/20251029082245.128675-1-liuhangbin@gmail.com
 
-Thanks
+---
+ tools/net/ynl/Makefile                  |   8 +-
+ tools/net/ynl/tests/Makefile            |  32 +++
+ tools/net/ynl/tests/config              |   6 +
+ tools/net/ynl/tests/test_ynl_cli.sh     | 327 ++++++++++++++++++++++++
+ tools/net/ynl/tests/test_ynl_ethtool.sh | 222 ++++++++++++++++
+ 5 files changed, 593 insertions(+), 2 deletions(-)
+ create mode 100644 tools/net/ynl/tests/Makefile
+ create mode 100644 tools/net/ynl/tests/config
+ create mode 100755 tools/net/ynl/tests/test_ynl_cli.sh
+ create mode 100755 tools/net/ynl/tests/test_ynl_ethtool.sh
+
+diff --git a/tools/net/ynl/Makefile b/tools/net/ynl/Makefile
+index 31ed20c0f3f8..a40591e513b7 100644
+--- a/tools/net/ynl/Makefile
++++ b/tools/net/ynl/Makefile
+@@ -12,7 +12,7 @@ endif
+ libdir  ?= $(prefix)/$(libdir_relative)
+ includedir ?= $(prefix)/include
+ 
+-SUBDIRS = lib generated samples ynltool
++SUBDIRS = lib generated samples ynltool tests
+ 
+ all: $(SUBDIRS) libynl.a
+ 
+@@ -49,5 +49,9 @@ install: libynl.a lib/*.h
+ 	@echo -e "\tINSTALL pyynl"
+ 	@pip install --prefix=$(DESTDIR)$(prefix) .
+ 	@make -C generated install
++	@make -C tests install
+ 
+-.PHONY: all clean distclean install $(SUBDIRS)
++run_tests:
++	@$(MAKE) -C tests run_tests
++
++.PHONY: all clean distclean install run_tests $(SUBDIRS)
+diff --git a/tools/net/ynl/tests/Makefile b/tools/net/ynl/tests/Makefile
+new file mode 100644
+index 000000000000..38161217e249
+--- /dev/null
++++ b/tools/net/ynl/tests/Makefile
+@@ -0,0 +1,32 @@
++# SPDX-License-Identifier: GPL-2.0
++# Makefile for YNL tests
++
++TESTS := \
++	test_ynl_cli.sh \
++	test_ynl_ethtool.sh \
++# end of TESTS
++
++all: $(TESTS)
++
++run_tests:
++	@for test in $(TESTS); do \
++		./$$test; \
++	done
++
++install: $(TESTS)
++	@mkdir -p $(DESTDIR)/usr/bin
++	@mkdir -p $(DESTDIR)/usr/share/kselftest
++	@cp ../../../testing/selftests/kselftest/ktap_helpers.sh $(DESTDIR)/usr/share/kselftest/
++	@for test in $(TESTS); do \
++		name=$$(basename $$test .sh); \
++		sed -e 's|^ynl=.*|ynl="ynl"|' \
++		    -e 's|^ynl_ethtool=.*|ynl_ethtool="ynl-ethtool"|' \
++		    -e 's|KSELFTEST_KTAP_HELPERS=.*|KSELFTEST_KTAP_HELPERS="/usr/share/kselftest/ktap_helpers.sh"|' \
++		    $$test > $(DESTDIR)/usr/bin/$$name; \
++		chmod +x $(DESTDIR)/usr/bin/$$name; \
++	done
++
++clean:
++	@# Nothing to clean
++
++.PHONY: all install clean run_tests
+diff --git a/tools/net/ynl/tests/config b/tools/net/ynl/tests/config
+new file mode 100644
+index 000000000000..339f1309c03f
+--- /dev/null
++++ b/tools/net/ynl/tests/config
+@@ -0,0 +1,6 @@
++CONFIG_DUMMY=m
++CONFIG_INET_DIAG=y
++CONFIG_IPV6=y
++CONFIG_NET_NS=y
++CONFIG_NETDEVSIM=m
++CONFIG_VETH=m
+diff --git a/tools/net/ynl/tests/test_ynl_cli.sh b/tools/net/ynl/tests/test_ynl_cli.sh
+new file mode 100755
+index 000000000000..7c0722a08117
+--- /dev/null
++++ b/tools/net/ynl/tests/test_ynl_cli.sh
+@@ -0,0 +1,327 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Test YNL CLI functionality
++
++# Load KTAP test helpers
++KSELFTEST_KTAP_HELPERS="$(dirname "$(realpath "$0")")/../../../testing/selftests/kselftest/ktap_helpers.sh"
++# shellcheck source=../../../testing/selftests/kselftest/ktap_helpers.sh
++source "$KSELFTEST_KTAP_HELPERS"
++
++# Default ynl path for direct execution, can be overridden by make install
++ynl="../pyynl/cli.py"
++
++readonly NSIM_ID="1338"
++readonly NSIM_DEV_NAME="nsim${NSIM_ID}"
++readonly VETH_A="veth_a"
++readonly VETH_B="veth_b"
++
++testns="ynl-$(mktemp -u XXXXXX)"
++TESTS_NO=0
++
++# Test listing available families
++cli_list_families()
++{
++	if $ynl --list-families &>/dev/null; then
++		ktap_test_pass "YNL CLI list families"
++	else
++		ktap_test_fail "YNL CLI list families"
++	fi
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++# Test netdev family operations (dev-get, queue-get)
++cli_netdev_ops()
++{
++	local dev_output
++	local ifindex
++
++	ifindex=$(ip netns exec "$testns" cat /sys/class/net/"$NSIM_DEV_NAME"/ifindex 2>/dev/null)
++
++	dev_output=$(ip netns exec "$testns" $ynl --family netdev \
++		--do dev-get --json "{\"ifindex\": $ifindex}" 2>/dev/null)
++
++	if ! echo "$dev_output" | grep -q "ifindex"; then
++		ktap_test_fail "YNL CLI netdev operations (netdev dev-get output missing ifindex)"
++		return
++	fi
++
++	if ! ip netns exec "$testns" $ynl --family netdev \
++		--dump queue-get --json "{\"ifindex\": $ifindex}" &>/dev/null; then
++		ktap_test_fail "YNL CLI netdev operations (failed to get netdev queue info)"
++		return
++	fi
++
++	ktap_test_pass "YNL CLI netdev operations"
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++# Test ethtool family operations (rings-get, linkinfo-get)
++cli_ethtool_ops()
++{
++	local rings_output
++	local linkinfo_output
++
++	rings_output=$(ip netns exec "$testns" $ynl --family ethtool \
++		--do rings-get --json "{\"header\": {\"dev-name\": \"$NSIM_DEV_NAME\"}}" 2>/dev/null)
++
++	if ! echo "$rings_output" | grep -q "header"; then
++		ktap_test_fail "YNL CLI ethtool operations (ethtool rings-get output missing header)"
++		return
++	fi
++
++	linkinfo_output=$(ip netns exec "$testns" $ynl --family ethtool \
++		--do linkinfo-get --json "{\"header\": {\"dev-name\": \"$VETH_A\"}}" 2>/dev/null)
++
++	if ! echo "$linkinfo_output" | grep -q "header"; then
++		ktap_test_fail "YNL CLI ethtool operations (ethtool linkinfo-get output missing header)"
++		return
++	fi
++
++	ktap_test_pass "YNL CLI ethtool operations"
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++# Test rt-route family operations
++cli_rt_route_ops()
++{
++	local ifindex
++
++	if ! $ynl --list-families 2>/dev/null | grep -q "rt-route"; then
++		ktap_test_skip "YNL CLI rt-route operations (rt-route family not available)"
++		return
++	fi
++
++	ifindex=$(ip netns exec "$testns" cat /sys/class/net/"$NSIM_DEV_NAME"/ifindex 2>/dev/null)
++
++	# Add route: 192.0.2.0/24 dev $dev scope link
++	if ! ip netns exec "$testns" $ynl --family rt-route --do newroute --create \
++		--json "{\"dst\": \"192.0.2.0\", \"oif\": $ifindex, \"rtm-dst-len\": 24, \"rtm-family\": 2, \"rtm-scope\": 253, \"rtm-type\": 1, \"rtm-protocol\": 3, \"rtm-table\": 254}" &>/dev/null; then
++		ktap_test_fail "YNL CLI rt-route operations (failed to add route)"
++		return
++	fi
++
++	local route_output
++	route_output=$(ip netns exec "$testns" $ynl --family rt-route --dump getroute 2>/dev/null)
++	if echo "$route_output" | grep -q "192.0.2.0"; then
++		ktap_test_pass "YNL CLI rt-route operations"
++	else
++		ktap_test_fail "YNL CLI rt-route operations (failed to verify route)"
++	fi
++
++	ip netns exec "$testns" $ynl --family rt-route --do delroute \
++		--json "{\"dst\": \"192.0.2.0\", \"oif\": $ifindex, \"rtm-dst-len\": 24, \"rtm-family\": 2, \"rtm-scope\": 253, \"rtm-type\": 1, \"rtm-protocol\": 3, \"rtm-table\": 254}" &>/dev/null
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++# Test rt-addr family operations
++cli_rt_addr_ops()
++{
++	local ifindex
++
++	if ! $ynl --list-families 2>/dev/null | grep -q "rt-addr"; then
++		ktap_test_skip "YNL CLI rt-addr operations (rt-addr family not available)"
++		return
++	fi
++
++	ifindex=$(ip netns exec "$testns" cat /sys/class/net/"$NSIM_DEV_NAME"/ifindex 2>/dev/null)
++
++	if ! ip netns exec "$testns" $ynl --family rt-addr --do newaddr \
++		--json "{\"ifa-index\": $ifindex, \"local\": \"192.0.2.100\", \"ifa-prefixlen\": 24, \"ifa-family\": 2}" &>/dev/null; then
++		ktap_test_fail "YNL CLI rt-addr operations (failed to add address)"
++		return
++	fi
++
++	local addr_output
++	addr_output=$(ip netns exec "$testns" $ynl --family rt-addr --dump getaddr 2>/dev/null)
++	if echo "$addr_output" | grep -q "192.0.2.100"; then
++		ktap_test_pass "YNL CLI rt-addr operations"
++	else
++		ktap_test_fail "YNL CLI rt-addr operations (failed to verify address)"
++	fi
++
++	ip netns exec "$testns" $ynl --family rt-addr --do deladdr \
++		--json "{\"ifa-index\": $ifindex, \"local\": \"192.0.2.100\", \"ifa-prefixlen\": 24, \"ifa-family\": 2}" &>/dev/null
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++# Test rt-link family operations
++cli_rt_link_ops()
++{
++	if ! $ynl --list-families 2>/dev/null | grep -q "rt-link"; then
++		ktap_test_skip "YNL CLI rt-link operations (rt-link family not available)"
++		return
++	fi
++
++	if ! ip netns exec "$testns" $ynl --family rt-link --do newlink --create \
++		--json "{\"ifname\": \"dummy0\", \"linkinfo\": {\"kind\": \"dummy\"}}" &>/dev/null; then
++		ktap_test_fail "YNL CLI rt-link operations (failed to add link)"
++		return
++	fi
++
++	local link_output
++	link_output=$(ip netns exec "$testns" $ynl --family rt-link --dump getlink 2>/dev/null)
++	if echo "$link_output" | grep -q "$NSIM_DEV_NAME" && echo "$link_output" | grep -q "dummy0"; then
++		ktap_test_pass "YNL CLI rt-link operations"
++	else
++		ktap_test_fail "YNL CLI rt-link operations (failed to verify link)"
++	fi
++
++	ip netns exec "$testns" $ynl --family rt-link --do dellink \
++		--json "{\"ifname\": \"dummy0\"}" &>/dev/null
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++# Test rt-neigh family operations
++cli_rt_neigh_ops()
++{
++	local ifindex
++
++	if ! $ynl --list-families 2>/dev/null | grep -q "rt-neigh"; then
++		ktap_test_skip "YNL CLI rt-neigh operations (rt-neigh family not available)"
++		return
++	fi
++
++	ifindex=$(ip netns exec "$testns" cat /sys/class/net/"$NSIM_DEV_NAME"/ifindex 2>/dev/null)
++
++	# Add neighbor: 192.0.2.1 dev nsim1338 lladdr 11:22:33:44:55:66 PERMANENT
++	if ! ip netns exec "$testns" $ynl --family rt-neigh --do newneigh --create \
++		--json "{\"ndm-ifindex\": $ifindex, \"dst\": \"192.0.2.1\", \"lladdr\": \"11:22:33:44:55:66\", \"ndm-family\": 2, \"ndm-state\": 128}" &>/dev/null; then
++		ktap_test_fail "YNL CLI rt-neigh operations (failed to add neighbor)"
++	fi
++
++	local neigh_output
++	neigh_output=$(ip netns exec "$testns" $ynl --family rt-neigh --dump getneigh 2>/dev/null)
++	if echo "$neigh_output" | grep -q "192.0.2.1"; then
++		ktap_test_pass "YNL CLI rt-neigh operations"
++	else
++		ktap_test_fail "YNL CLI rt-neigh operations (failed to verify neighbor)"
++	fi
++
++	ip netns exec "$testns" $ynl --family rt-neigh --do delneigh \
++		--json "{\"ndm-ifindex\": $ifindex, \"dst\": \"192.0.2.1\", \"lladdr\": \"11:22:33:44:55:66\", \"ndm-family\": 2}" &>/dev/null
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++# Test rt-rule family operations
++cli_rt_rule_ops()
++{
++	if ! $ynl --list-families 2>/dev/null | grep -q "rt-rule"; then
++		ktap_test_skip "YNL CLI rt-rule operations (rt-rule family not available)"
++		return
++	fi
++
++	# Add rule: from 192.0.2.0/24 lookup 100 none
++	if ! ip netns exec "$testns" $ynl --family rt-rule --do newrule \
++		--json "{\"family\": 2, \"src-len\": 24, \"src\": \"192.0.2.0\", \"table\": 100}" &>/dev/null; then
++		ktap_test_fail "YNL CLI rt-rule operations (failed to add rule)"
++		return
++	fi
++
++	local rule_output
++	rule_output=$(ip netns exec "$testns" $ynl --family rt-rule --dump getrule 2>/dev/null)
++	if echo "$rule_output" | grep -q "192.0.2.0"; then
++		ktap_test_pass "YNL CLI rt-rule operations"
++	else
++		ktap_test_fail "YNL CLI rt-rule operations (failed to verify rule)"
++	fi
++
++	ip netns exec "$testns" $ynl --family rt-rule --do delrule \
++		--json "{\"family\": 2, \"src-len\": 24, \"src\": \"192.0.2.0\", \"table\": 100}" &>/dev/null
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++# Test nlctrl family operations
++cli_nlctrl_ops()
++{
++	local family_output
++
++	if ! family_output=$($ynl --family nlctrl \
++		--do getfamily --json "{\"family-name\": \"netdev\"}" 2>/dev/null); then
++		ktap_test_fail "YNL CLI nlctrl getfamily (failed to get nlctrl family info)"
++		return
++	fi
++
++	if ! echo "$family_output" | grep -q "family-name"; then
++		ktap_test_fail "YNL CLI nlctrl getfamily (nlctrl getfamily output missing family-name)"
++		return
++	fi
++
++	if ! echo "$family_output" | grep -q "family-id"; then
++		ktap_test_fail "YNL CLI nlctrl getfamily (nlctrl getfamily output missing family-id)"
++		return
++	fi
++
++	ktap_test_pass "YNL CLI nlctrl getfamily"
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++setup()
++{
++	modprobe netdevsim &> /dev/null
++	if ! [ -f /sys/bus/netdevsim/new_device ]; then
++		ktap_skip_all "netdevsim module not available"
++		exit "$KSFT_SKIP"
++	fi
++
++	if ! ip netns add "$testns" 2>/dev/null; then
++		ktap_skip_all "failed to create test namespace"
++		exit "$KSFT_SKIP"
++	fi
++
++	echo "$NSIM_ID 1" | ip netns exec "$testns" tee /sys/bus/netdevsim/new_device >/dev/null 2>&1 || {
++		ktap_skip_all "failed to create netdevsim device"
++		exit "$KSFT_SKIP"
++	}
++
++	local dev
++	dev=$(ip netns exec "$testns" ls /sys/bus/netdevsim/devices/netdevsim$NSIM_ID/net 2>/dev/null | head -1)
++	if [[ -z "$dev" ]]; then
++		ktap_skip_all "failed to find netdevsim device"
++		exit "$KSFT_SKIP"
++	fi
++
++	ip -netns "$testns" link set dev "$dev" name "$NSIM_DEV_NAME" 2>/dev/null || {
++		ktap_skip_all "failed to rename netdevsim device"
++		exit "$KSFT_SKIP"
++	}
++
++	ip -netns "$testns" link set dev "$NSIM_DEV_NAME" up 2>/dev/null
++
++	if ! ip -n "$testns" link add "$VETH_A" type veth peer name "$VETH_B" 2>/dev/null; then
++		ktap_skip_all "failed to create veth pair"
++		exit "$KSFT_SKIP"
++	fi
++
++	ip -n "$testns" link set "$VETH_A" up 2>/dev/null
++	ip -n "$testns" link set "$VETH_B" up 2>/dev/null
++}
++
++cleanup()
++{
++	ip netns exec "$testns" bash -c "echo $NSIM_ID > /sys/bus/netdevsim/del_device" 2>/dev/null || true
++	ip netns del "$testns" 2>/dev/null || true
++}
++
++# Check if ynl command is available
++if ! command -v $ynl &>/dev/null && [[ ! -x $ynl ]]; then
++	ktap_skip_all "ynl command not found: $ynl"
++	exit "$KSFT_SKIP"
++fi
++
++trap cleanup EXIT
++
++ktap_print_header
++setup
++ktap_set_plan "${TESTS_NO}"
++
++cli_list_families
++cli_netdev_ops
++cli_ethtool_ops
++cli_rt_route_ops
++cli_rt_addr_ops
++cli_rt_link_ops
++cli_rt_neigh_ops
++cli_rt_rule_ops
++cli_nlctrl_ops
++
++ktap_finished
+diff --git a/tools/net/ynl/tests/test_ynl_ethtool.sh b/tools/net/ynl/tests/test_ynl_ethtool.sh
+new file mode 100755
+index 000000000000..b826269017f4
+--- /dev/null
++++ b/tools/net/ynl/tests/test_ynl_ethtool.sh
+@@ -0,0 +1,222 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Test YNL ethtool functionality
++
++# Load KTAP test helpers
++KSELFTEST_KTAP_HELPERS="$(dirname "$(realpath "$0")")/../../../testing/selftests/kselftest/ktap_helpers.sh"
++# shellcheck source=../../../testing/selftests/kselftest/ktap_helpers.sh
++source "$KSELFTEST_KTAP_HELPERS"
++
++# Default ynl-ethtool path for direct execution, can be overridden by make install
++ynl_ethtool="../pyynl/ethtool.py"
++
++readonly NSIM_ID="1337"
++readonly NSIM_DEV_NAME="nsim${NSIM_ID}"
++readonly VETH_A="veth_a"
++readonly VETH_B="veth_b"
++
++testns="ynl-ethtool-$(mktemp -u XXXXXX)"
++TESTS_NO=0
++
++# Uses veth device as netdevsim doesn't support basic ethtool device info
++ethtool_device_info()
++{
++	local info_output
++
++	info_output=$(ip netns exec "$testns" $ynl_ethtool "$VETH_A" 2>/dev/null)
++
++	if ! echo "$info_output" | grep -q "Settings for"; then
++		ktap_test_fail "YNL ethtool device info (device info output missing expected content)"
++		return
++	fi
++
++	ktap_test_pass "YNL ethtool device info"
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++ethtool_statistics()
++{
++	local stats_output
++
++	stats_output=$(ip netns exec "$testns" $ynl_ethtool --statistics "$NSIM_DEV_NAME" 2>/dev/null)
++
++	if ! echo "$stats_output" | grep -q -E "(NIC statistics|packets|bytes)"; then
++		ktap_test_fail "YNL ethtool statistics (statistics output missing expected content)"
++		return
++	fi
++
++	ktap_test_pass "YNL ethtool statistics"
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++ethtool_ring_params()
++{
++	local ring_output
++
++	ring_output=$(ip netns exec "$testns" $ynl_ethtool --show-ring "$NSIM_DEV_NAME" 2>/dev/null)
++
++	if ! echo "$ring_output" | grep -q -E "(Ring parameters|RX|TX)"; then
++		ktap_test_fail "YNL ethtool ring parameters (ring parameters output missing expected content)"
++		return
++	fi
++
++	if ! ip netns exec "$testns" $ynl_ethtool --set-ring "$NSIM_DEV_NAME" rx 64 2>/dev/null; then
++		ktap_test_fail "YNL ethtool ring parameters (set-ring command failed unexpectedly)"
++		return
++	fi
++
++	ktap_test_pass "YNL ethtool ring parameters (show/set)"
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++ethtool_coalesce_params()
++{
++	if ! ip netns exec "$testns" $ynl_ethtool --show-coalesce "$NSIM_DEV_NAME" &>/dev/null; then
++		ktap_test_fail "YNL ethtool coalesce parameters (failed to get coalesce parameters)"
++		return
++	fi
++
++	if ! ip netns exec "$testns" $ynl_ethtool --set-coalesce "$NSIM_DEV_NAME" rx-usecs 50 2>/dev/null; then
++		ktap_test_fail "YNL ethtool coalesce parameters (set-coalesce command failed unexpectedly)"
++		return
++	fi
++
++	ktap_test_pass "YNL ethtool coalesce parameters (show/set)"
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++ethtool_pause_params()
++{
++	if ! ip netns exec "$testns" $ynl_ethtool --show-pause "$NSIM_DEV_NAME" &>/dev/null; then
++		ktap_test_fail "YNL ethtool pause parameters (failed to get pause parameters)"
++		return
++	fi
++
++	if ! ip netns exec "$testns" $ynl_ethtool --set-pause "$NSIM_DEV_NAME" tx 1 rx 1 2>/dev/null; then
++		ktap_test_fail "YNL ethtool pause parameters (set-pause command failed unexpectedly)"
++		return
++	fi
++
++	ktap_test_pass "YNL ethtool pause parameters (show/set)"
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++ethtool_features_info()
++{
++	local features_output
++
++	features_output=$(ip netns exec "$testns" $ynl_ethtool --show-features "$NSIM_DEV_NAME" 2>/dev/null)
++
++	if ! echo "$features_output" | grep -q -E "(Features|offload)"; then
++		ktap_test_fail "YNL ethtool features info (features output missing expected content)"
++		return
++	fi
++
++	ktap_test_pass "YNL ethtool features info (show/set)"
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++ethtool_channels_info()
++{
++	local channels_output
++
++	channels_output=$(ip netns exec "$testns" $ynl_ethtool --show-channels "$NSIM_DEV_NAME" 2>/dev/null)
++
++	if ! echo "$channels_output" | grep -q -E "(Channel|Combined|RX|TX)"; then
++		ktap_test_fail "YNL ethtool channels info (channels output missing expected content)"
++		return
++	fi
++
++	if ! ip netns exec "$testns" $ynl_ethtool --set-channels "$NSIM_DEV_NAME" combined-count 1 2>/dev/null; then
++		ktap_test_fail "YNL ethtool channels info (set-channels command failed unexpectedly)"
++		return
++	fi
++
++	ktap_test_pass "YNL ethtool channels info (show/set)"
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++ethtool_time_stamping()
++{
++	local ts_output
++
++	ts_output=$(ip netns exec "$testns" $ynl_ethtool --show-time-stamping "$NSIM_DEV_NAME" 2>/dev/null)
++
++	if ! echo "$ts_output" | grep -q -E "(Time stamping|timestamping|SOF_TIMESTAMPING)"; then
++		ktap_test_fail "YNL ethtool time stamping (time stamping output missing expected content)"
++		return
++	fi
++
++	ktap_test_pass "YNL ethtool time stamping"
++}
++TESTS_NO=$((TESTS_NO + 1))
++
++setup()
++{
++	modprobe netdevsim &> /dev/null
++	if ! [ -f /sys/bus/netdevsim/new_device ]; then
++		ktap_skip_all "netdevsim module not available"
++		exit "$KSFT_SKIP"
++	fi
++
++	if ! ip netns add "$testns" 2>/dev/null; then
++		ktap_skip_all "failed to create test namespace"
++		exit "$KSFT_SKIP"
++	fi
++
++	echo "$NSIM_ID 1" | ip netns exec "$testns" tee /sys/bus/netdevsim/new_device >/dev/null 2>&1 || {
++		ktap_skip_all "failed to create netdevsim device"
++		exit "$KSFT_SKIP"
++	}
++
++	local dev
++	dev=$(ip netns exec "$testns" ls /sys/bus/netdevsim/devices/netdevsim$NSIM_ID/net 2>/dev/null | head -1)
++	if [[ -z "$dev" ]]; then
++		ktap_skip_all "failed to find netdevsim device"
++		exit "$KSFT_SKIP"
++	fi
++
++	ip -netns "$testns" link set dev "$dev" name "$NSIM_DEV_NAME" 2>/dev/null || {
++		ktap_skip_all "failed to rename netdevsim device"
++		exit "$KSFT_SKIP"
++	}
++
++	ip -netns "$testns" link set dev "$NSIM_DEV_NAME" up 2>/dev/null
++
++	if ! ip -n "$testns" link add "$VETH_A" type veth peer name "$VETH_B" 2>/dev/null; then
++		ktap_skip_all "failed to create veth pair"
++		exit "$KSFT_SKIP"
++	fi
++
++	ip -n "$testns" link set "$VETH_A" up 2>/dev/null
++	ip -n "$testns" link set "$VETH_B" up 2>/dev/null
++}
++
++cleanup()
++{
++	ip netns exec "$testns" bash -c "echo $NSIM_ID > /sys/bus/netdevsim/del_device" 2>/dev/null || true
++	ip netns del "$testns" 2>/dev/null || true
++}
++
++# Check if ynl-ethtool command is available
++if ! command -v $ynl_ethtool &>/dev/null && [[ ! -x $ynl_ethtool ]]; then
++	ktap_skip_all "ynl-ethtool command not found: $ynl_ethtool"
++	exit "$KSFT_SKIP"
++fi
++
++trap cleanup EXIT
++
++ktap_print_header
++setup
++ktap_set_plan "${TESTS_NO}"
++
++ethtool_device_info
++ethtool_statistics
++ethtool_ring_params
++ethtool_coalesce_params
++ethtool_pause_params
++ethtool_features_info
++ethtool_channels_info
++ethtool_time_stamping
++
++ktap_finished
+-- 
+2.50.1
 
 
