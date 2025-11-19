@@ -1,64 +1,78 @@
-Return-Path: <netdev+bounces-240114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D84C9C70AE6
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:44:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D79FEC70AD4
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:42:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D1EDC353495
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 18:41:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 9400B29D9E
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 18:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B37242D69;
-	Wed, 19 Nov 2025 18:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D7031770F;
+	Wed, 19 Nov 2025 18:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KOgLihFq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EdRjYlhh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D9B3191C4;
-	Wed, 19 Nov 2025 18:41:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A094730E84B;
+	Wed, 19 Nov 2025 18:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763577672; cv=none; b=afcQRVqVaErkXOlJsH8Wwn3bXnSK6yvgErszE7aYWtTuxt+/6u5B7D4oM/ys/oWINeZmW0Dx+POtP8lYU36xw+Txz9ty3bXkb+wHnAWdWm58mvKWyKpW0RcNhLjqgfa0DVlCD5sl/TYxbqXegccYr/GlljUd5AP+3cvcKIZZ+aM=
+	t=1763577767; cv=none; b=a5lSBn+YE8zT90baTw4X/7bcfReywYOt2UCNLKELiKpMWX00cWEpf56jPnODmYRQWtITuPlTE0gKwcvOqVn9zuG6I5lQ+EZ5TCWlpVSz6G8ruzqJzE3/eDkpiVjblbA77s97T2riNTcOuAY17HYjCG5qVB/DOeGQZdS/goWpQWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763577672; c=relaxed/simple;
-	bh=jPiEf9D0enUbIPbwxeeiH63YOLo0c0B5JvI5bNTryrk=;
+	s=arc-20240116; t=1763577767; c=relaxed/simple;
+	bh=d+20Uj7V/wB53t3E3ACYXIU/QyzVL9+KYCOlwfL2P6s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cXa1wmWTci4AdcHWRNq5cZab8Zi7tsCavF5iTmAbWX1U2yYI7bpxyPVzO1F9pWFxu2x+GjX4pixl+Iujbuz+82uMzHECdSnEbOifMoJxqfAbzgkAlZ1b12ji6URq82xTkAcRvbMacLIesEqI0Q2XeH8LCmMRygbaW0tGVFvZaPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KOgLihFq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B83CDC4CEF5;
-	Wed, 19 Nov 2025 18:41:07 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=oF6xehNMKnVDSbI7EdebYMczcdJ/UE0vuGENrVdYWxsqM18z8u9pUaxbTs/jwXT9IHehyLsoXwUo396dmDeffQrt0ne2Y6QC5pMowaB0vLJdLQLXp6EYpd6MfHdpIwPw0lw2I8oRCwp8PclpwpPfZuhv/9Hcs11qU9Ymgz3nY6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EdRjYlhh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23360C4CEF5;
+	Wed, 19 Nov 2025 18:42:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763577670;
-	bh=jPiEf9D0enUbIPbwxeeiH63YOLo0c0B5JvI5bNTryrk=;
+	s=k20201202; t=1763577764;
+	bh=d+20Uj7V/wB53t3E3ACYXIU/QyzVL9+KYCOlwfL2P6s=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KOgLihFq4e/zbXry3OmMxJlk6/wjfu+Jr63VKL/cUMy8nfY0GxXWpBkKYZ1QGc0pk
-	 Um07NKpisn+tyRjh2S/CXmXsUP+rEuir7t5OsaER3oyjiogna/0vI5rFEoiE1KF0yt
-	 qdfubygGYscPwGZWQX58N7otP6RQ8wxvOwoHBFY7pE8B7jbUxwJl0WIfleN6HIOruG
-	 UrN0npsdRbxaD41STo+S2rD1KA8Pv7d+0JAutXnz/HUO7YYgSoyP84CD07pW8NFWW3
-	 FYAR3znkbbNwNFk7Etp1O1A4Ekbi2Uj3RWiWDvGyHx8tfdkad/o2xcSnTRDZ9akjzu
-	 pVDIKc8TNSA5g==
-Date: Wed, 19 Nov 2025 18:41:05 +0000
+	b=EdRjYlhhDT9zjqscZl9dlk/VT2v65GFWB3iqHMzaQ4z8NdllYI0b1kSjnUUz5X5As
+	 UgF/WhAJt0vsYmMaV6bLjCxpKGQwamYcp2JNPSeQSbN2UxLWnLS6JJqLX2faMrUGzf
+	 oYwOaEAMmod6faMCkejLzbEJ2C75HCLHat1HLOPlRK3zKoxUEfNwB/rTVIEkgKBF/c
+	 +4Jyd7+usTtI1J7mKfFdwJu9l8vG3vosYdvG2btZbhB3rL5twxTFCkDnirM71iUsP4
+	 NOFrrtdQbgWHEnu3hJpo/LU7j1I+c0+3ylyPLfB3tF1pNfrH5xcRU4RgwtxWMHVVPt
+	 BRNWVIKBrXAvQ==
+Date: Wed, 19 Nov 2025 18:42:37 +0000
 From: Conor Dooley <conor@kernel.org>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Sjoerd Simons <sjoerd@collabora.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Jianjun Wang <jianjun.wang@mediatek.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Andrew Jeffery <andrew@aj.id.au>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] dt-bindings: net: aspeed: add AST2700 MDIO
- compatible
-Message-ID: <20251119-gooey-wifi-413598a8a1d7@spud>
-References: <20251117-aspeed_mdio_ast2700-v1-1-8ecb0032f554@aspeedtech.com>
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	kernel@collabora.com, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
+	linux-phy@lists.infradead.org, netdev@vger.kernel.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	Bryan Hinton <bryan@bryanhinton.com>
+Subject: Re: [PATCH v4 06/11] dt-bindings: net: mediatek,net: Correct
+ bindings for MT7981
+Message-ID: <20251119-snowless-thrower-0c4743a2820c@spud>
+References: <20251115-openwrt-one-network-v4-0-48cbda2969ac@collabora.com>
+ <20251115-openwrt-one-network-v4-6-48cbda2969ac@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,91 +80,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2bWqpCW/1YghVWvY"
+	protocol="application/pgp-signature"; boundary="OWZxw9N+U4ItickZ"
 Content-Disposition: inline
-In-Reply-To: <20251117-aspeed_mdio_ast2700-v1-1-8ecb0032f554@aspeedtech.com>
+In-Reply-To: <20251115-openwrt-one-network-v4-6-48cbda2969ac@collabora.com>
 
 
---2bWqpCW/1YghVWvY
+--OWZxw9N+U4ItickZ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 17, 2025 at 03:30:18PM +0800, Jacky Chou wrote:
-> Add "aspeed,ast2700-mdio" compatible to the binding schema with a fallback
-> to "aspeed,ast2600-mdio".
+On Sat, Nov 15, 2025 at 09:58:09PM +0100, Sjoerd Simons wrote:
+> Different SoCs have different numbers of Wireless Ethernet
+> Dispatch (WED) units:
+> - MT7981: Has 1 WED unit
+> - MT7986: Has 2 WED units
+> - MT7988: Has 2 WED units
 >=20
-> Although the MDIO controller on AST2700 is functionally the same as the
-> one on AST2600, it's good practice to add a SoC-specific compatible for
-> new silicon. This allows future driver updates to handle any 2700-specific
-> integration issues without requiring devicetree changes or complex
-> runtime detection logic.
+> Update the binding to reflect these hardware differences. The MT7981
+> also uses infracfg for PHY switching, so allow that property.
 >=20
-> For now, the driver continues to bind via the existing
-> "aspeed,ast2600-mdio" compatible, so no driver changes are needed.
->=20
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> ---
->  Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml | 8 +++++=
-++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.ya=
-ml b/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml
-> index d6ef468495c5..1c90e7c15a44 100644
-> --- a/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml
-> +++ b/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml
-> @@ -13,13 +13,19 @@ description: |+
->    The ASPEED AST2600 MDIO controller is the third iteration of ASPEED's =
-MDIO
->    bus register interface, this time also separating out the controller f=
-rom the
->    MAC.
-> +  The ASPEED AST2700 MDIO controller is similar to the AST2600's.
+> Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
 
-This statement disagrees with your commit message that claims
-functionally identical, and implies that the 2700 supports some extra
-features or whatever.
-I think I'd drop this entirely from the patch, rather than try to reword
-it. Remove it and then:
 Acked-by: Conor Dooley <conor.dooley@microchip.com>
-pw-bot: changes-requested
 
->  allOf:
->    - $ref: mdio.yaml#
-> =20
->  properties:
->    compatible:
-> -    const: aspeed,ast2600-mdio
-> +    oneOf:
-> +      - const: aspeed,ast2600-mdio
-> +      - items:
-> +          - enum:
-> +              - aspeed,ast2700-mdio
-> +          - const: aspeed,ast2600-mdio
-> =20
->    reg:
->      maxItems: 1
->=20
-> ---
-> base-commit: c9dfb92de0738eb7fe6a591ad1642333793e8b6e
-> change-id: 20251117-aspeed_mdio_ast2700-aa089c4f0474
->=20
-> Best regards,
-> --=20
-> Jacky Chou <jacky_chou@aspeedtech.com>
->=20
-
---2bWqpCW/1YghVWvY
+--OWZxw9N+U4ItickZ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaR4PQQAKCRB4tDGHoIJi
-0sqUAP9r+wKYrCdpXMLj+cK8mnW1jeDSeXieLhR1kXkxcYrCUgEAvz3f7zkatpMU
-AoB7sxn/YdlOC4WEHCby7J2J47TRzAo=
-=rJkd
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaR4PnAAKCRB4tDGHoIJi
+0qysAP4slbkJvvcDz+LiScI3HC4oFNoFUawshCKoNhDhEg0RZQD+JPTtXG5xiV2r
+lqSBXMrX7H73koX9k2vleiv2AUW+EAI=
+=X2CE
 -----END PGP SIGNATURE-----
 
---2bWqpCW/1YghVWvY--
+--OWZxw9N+U4ItickZ--
 
