@@ -1,120 +1,105 @@
-Return-Path: <netdev+bounces-239877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34968C6D821
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:48:08 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BCCBC6D878
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:55:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 494632C02A
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:48:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2DFD74EE4A6
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD5972FE583;
-	Wed, 19 Nov 2025 08:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4C830101A;
+	Wed, 19 Nov 2025 08:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="SdWaPX4c"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vroafa2Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594CC2FD69B;
-	Wed, 19 Nov 2025 08:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB952FF140
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763542082; cv=none; b=vAI86f+zMDa/qqArxV4MqjPWv4lSUXxZxkJRcEZLYeZgvU/ioqFU8TBCPSTScFFxrc7aW9aodVtxHIxPpun8x9/VRpCZRnJCM1D2ubRoxuyS3IHDid1pripuU1qQg7lNwC418zzkYIR3JGewn2iTG6AspxlvKFG5+YiHpmLOQGk=
+	t=1763542097; cv=none; b=My6GoYjVypvn9R2DhisPmOS9PEFGUiE+ccNPEL5lKZXMiqJvF8Wby56o3W1c7IrylqE6GLh+KyF2+6vOBFfkgZ6pO0UBKCDeRGyaOZg5DqZFjH8mHokWcWd4sTxsjI3+lFaNRI5Nm+gorQFKO+ctt80wawtRQY7gSOOjKUlqtYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763542082; c=relaxed/simple;
-	bh=O49iELD3kyWCfrVpGVJs1lLgucO8zwXquiJoldaJSL0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hkVLU2mHhmfg7ISAvxiCzVadprxVGHaigXbOqarYBi9rpUmtPGxnSton7WwEq6kkgJ766v1ZwWAqnt2GR2wV+4WOabLo5llh9bAIcFFyYMV34TurQmupWstpQSMT4tnowfJtkk5UYgWL0u8fHtJVOTL7tPa66KsrgwgzemgZMys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=SdWaPX4c; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Yk
-	wwP38JHvCo882DSvkKjOiqTTOePIZx3hF9olcucO4=; b=SdWaPX4cYP7XxWw8l3
-	KfkmF/59458iQsIX9p/ktixD2w8XrRv4AxbKPKY2WfuIEYnhIuswTmpsNnbHOiVe
-	8LOdlpe3bVViNf4ZrwueCfBAAhbQp5YWrGcK8jvOdmdY7nvS0R1H/L5VPW3TvEkn
-	XV1UXWLWnT677lmRGnLfC3ajM=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wD3X0r0gx1pAgHiBA--.132S2;
-	Wed, 19 Nov 2025 16:46:47 +0800 (CST)
-From: Slark Xiao <slark_xiao@163.com>
-To: mani@kernel.org
-Cc: loic.poulain@oss.qualcomm.com,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	mhi@lists.linux.dev,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Slark Xiao <slark_xiao@163.com>
-Subject: [PATCH v2 1/2] bus: mhi: host: pci_generic: Add Foxconn T99W760 modem
-Date: Wed, 19 Nov 2025 16:45:37 +0800
-Message-Id: <20251119084537.34303-1-slark_xiao@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1763542097; c=relaxed/simple;
+	bh=clxegaGK9GFURBRD/eSo3Fjncz2KuVsq+bGv/DuUE0Y=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HE2nEkTOZMOcBvdxgPab+reMoSp4oYAPnJSt0Cf4dDdeIkjjdkza61lnDIxnaFyGoWSCTZma2j3LPUwZ7SIHYUWPp1gjifYHrtD+zU5Xo7YgcL8TJu6ujad6r1AG5AH/Nq5Am7Q3IdJp+8fmi+FKyOrE13CBevubBNae2WEhi5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Vroafa2Q; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8b29b4864b7so1942702185a.0
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 00:48:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763542095; x=1764146895; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MRFEpRxjDirkXHdVXeO95at4r1WDry31ItejlJ7qW1E=;
+        b=Vroafa2QE1bLgZ4jW6/w8ckKe81Q4+YscWbBgKmQDhZwu2+pBBiVDVsJP3KynlXdxb
+         pwjrv18v41CTh4CGp40LqWUzVD3JX5HnBtoYyc1V2sbxEoHN9lR/TYsVUw1J0wm5SUEp
+         AWy5oOxFe/BGJbjzJMN77Hsiktn12EfVX2Yc0LbaKzY0WPptl1cgpcxxFXpr0ENB5Tda
+         ab+1pNsl1u63ZmvPkETs4mHkVHf0aojUfHr6IkMNiG9N6aRB6xhwi+pLp8HpKxEInr2O
+         /ViITBVQa1197s6smfasQHb7NYW357cMi98rgRKMRBEAUUua9XS2Z2LernOvsysTFzvP
+         kJCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763542095; x=1764146895;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MRFEpRxjDirkXHdVXeO95at4r1WDry31ItejlJ7qW1E=;
+        b=FCrObY7qpBA3rw57MyjRf1UwUX3xEa5E1SzUniZnc5WE7rdd/ZUle+aOglEz5qei++
+         Pdrc8Jf1wg3EeCP9TPgizclQ7tie2CHx7JyORw4/38B8rfFlTwRXe/gS3iuXC/XHCQG/
+         HsOyn7S4FqMKCh9T7olJQsMthBa3bJauqP1sv2U3tcLLTnHuk4kb5cMK54kOkPCC8oXH
+         ICniB7nE8xwR3eZ7LkHIn9XyMsqx03mwqtHumADrZvxqrIsPa15DcPlrOF8xnWpNiKSP
+         mftArtqfijjnTLYWkXGqQKdjiyE4OLfo600gjRy7qtR10gianA7/I0hx3X2eGqGM+5wA
+         oUmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVBRnoZ9QL4KY5yF+ObU1IyyFLdm7PWGMf1rqt8pYpeewlZZkiHsfuaHodssAVKdOv9Y0OAuFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA9zKpwjLZ8D3DL5OUdYY1j2t1d51s4rCZp9R9MUP1f8wgXAHm
+	Vyb7yqHRTOS4/jF9e583sapesqSeSF2uj7jWok2cmfaKyPIblRs/Y9x88HWIet0di68b7Fw4DD6
+	CrY2F+Mi+CkcKyg==
+X-Google-Smtp-Source: AGHT+IHoAH1ordXt+dP7dhmnW1YzWKovYN35IWGNShOmAlaWcpbpbhCCHEkkpyMOwSUeI2r2UUpKfUY3enEX5w==
+X-Received: from qknqj6.prod.google.com ([2002:a05:620a:8806:b0:8b2:f2ce:8209])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:f04:b0:88f:c0e1:ec2 with SMTP id af79cd13be357-8b2c31c4166mr2257702885a.60.1763542095286;
+ Wed, 19 Nov 2025 00:48:15 -0800 (PST)
+Date: Wed, 19 Nov 2025 08:48:11 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3X0r0gx1pAgHiBA--.132S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7ZFWxWF1ftr4fAFy8Wr4kZwb_yoW8Ar43pF
-	4F9rWjyF4vqr45ta1vyryDuF95GwsxC347KFnrKw12gw4qyrZ0qrs7Kw12gF1Yva95XF4S
-	vFyUWF9Fg3WDtF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRuT5PUUUUU=
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbibgULZGkdgCFb5gAAss
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
+Message-ID: <20251119084813.3684576-1-edumazet@google.com>
+Subject: [PATCH v2 net-next 0/2] tcp: tcp_rcvbuf_grow() changes
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Rick Jones <jonesrick@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-T99W760 modem is based on Qualcomm SDX35 chipset.
-It use the same channel settings with Foxconn SDX61.
-edl file has been committed to linux-firmware.
+First pach is minor and moves tcp_moderate_rcvbuf in appropriate group.
 
-Signed-off-by: Slark Xiao <slark_xiao@163.com>
----
-v2: Add net and MHI maintainer together
----
- drivers/bus/mhi/host/pci_generic.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Second patch is another attempt to keep small sk->sk_rcvbuf for DC
+(small RT) TCP flows for optimal performance.
 
-diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
-index 3d8c9729fcfc..e3bc737313a2 100644
---- a/drivers/bus/mhi/host/pci_generic.c
-+++ b/drivers/bus/mhi/host/pci_generic.c
-@@ -663,6 +663,17 @@ static const struct mhi_pci_dev_info mhi_foxconn_t99w696_info = {
- 	.sideband_wake = false,
- };
- 
-+static const struct mhi_pci_dev_info mhi_foxconn_t99w760_info = {
-+	.name = "foxconn-t99w760",
-+	.edl = "qcom/sdx35/foxconn/xbl_s_devprg_ns.melf",
-+	.edl_trigger = true,
-+	.config = &modem_foxconn_sdx61_config,
-+	.bar_num = MHI_PCI_DEFAULT_BAR_NUM,
-+	.dma_data_width = 32,
-+	.mru_default = 32768,
-+	.sideband_wake = false,
-+};
-+
- static const struct mhi_channel_config mhi_mv3x_channels[] = {
- 	MHI_CHANNEL_CONFIG_UL(0, "LOOPBACK", 64, 0),
- 	MHI_CHANNEL_CONFIG_DL(1, "LOOPBACK", 64, 0),
-@@ -1010,6 +1021,8 @@ static const struct pci_device_id mhi_pci_id_table[] = {
- 	/* DW5934e(sdx72), Non-eSIM */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_FOXCONN, 0xe11e),
- 		.driver_data = (kernel_ulong_t) &mhi_foxconn_dw5934e_info },
-+	{ PCI_DEVICE(PCI_VENDOR_ID_FOXCONN, 0xe123),
-+		.driver_data = (kernel_ulong_t) &mhi_foxconn_t99w760_info },
- 	/* MV31-W (Cinterion) */
- 	{ PCI_DEVICE(PCI_VENDOR_ID_THALES, 0x00b3),
- 		.driver_data = (kernel_ulong_t) &mhi_mv31_info },
+Eric Dumazet (2):
+  tcp: tcp_moderate_rcvbuf is only used in rx path
+  tcp: add net.ipv4.tcp_rcvbuf_low_rtt sysctl
+
+ Documentation/networking/ip-sysctl.rst         | 10 ++++++++++
+ .../net_cachelines/netns_ipv4_sysctl.rst       |  3 ++-
+ include/net/netns/ipv4.h                       |  3 ++-
+ net/core/net_namespace.c                       | 11 ++++-------
+ net/ipv4/sysctl_net_ipv4.c                     |  9 +++++++++
+ net/ipv4/tcp_input.c                           | 18 ++++++++++++++----
+ net/ipv4/tcp_ipv4.c                            |  1 +
+ 7 files changed, 42 insertions(+), 13 deletions(-)
+
 -- 
-2.25.1
+2.52.0.rc1.455.g30608eb744-goog
 
 
