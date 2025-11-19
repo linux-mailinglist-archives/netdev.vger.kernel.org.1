@@ -1,90 +1,111 @@
-Return-Path: <netdev+bounces-240085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A98C2C70684
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 18:18:53 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F0C6C704D7
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 18:04:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5B9F14FED40
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:54:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9D16638799C
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:56:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD72D349B1E;
-	Wed, 19 Nov 2025 16:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B529F36921A;
+	Wed, 19 Nov 2025 16:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Nd+1lxY8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iMMUe6L7";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="setWmwgR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15325341068
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 16:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A914B368271
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 16:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763571108; cv=none; b=hwKNDlPXqch2IxB7vGBiSrne9bZcnYfJk3Y5q520oq3dJnCzA8XUgctetcZBgD2z72gC2H2g1y+XZtcxydDYqQVyuYCXrCtDQKwmHCxe7fm0PT08xJL29PQYhdPk6rQVfiwfZSe1lFSk8Ayo29aQM13fMXae8W9GASA+++05zv0=
+	t=1763571126; cv=none; b=Q0lhRHzQuTdWSSFQw9xujWzXkcaDTBRGpxcxkF6tVck1dHiL9PMCWKYnRwYgvJ2PAl5ySvH2qVf8udVBwYW65O9oT/WId70qZYtUI1AIf/OgmQCnJ+sBQ9MZYqSdFY18SVruEvHqtuQwytLRuJgIrdaaC7mKUkddB/iiS7oGXow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763571108; c=relaxed/simple;
-	bh=9N1sUiO5CeMoefLRcd5UKkK7JgP2YFmRoYgJ+RGvCRE=;
+	s=arc-20240116; t=1763571126; c=relaxed/simple;
+	bh=4ioazr+rErlQAmgFmhcgugwx4ST9WMu2Co1jE6pk2p8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MIZointjzsDrvI0lcrES/Q5nsz7ASYpZ48Etuw70L1paknbTSw+WMfNidPohUXOGj3Pqn9q4aDMr0IWHzw4gRlmu9hxbDp9xpnckbq4xCJ+B6kVsOe3WjYq0XCLaKWRVZV2buKN1LBXRIBtlZkJ0ns8TuzcA6G6S2O5YACP5ouw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Nd+1lxY8; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b73669bdcd2so983899266b.2
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:51:45 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=K4Yop+VOD9lgKf8X0lgI5naaJFNZY9ytwqlDu6eRoHnQidqAu1E3MuIE++YeY+KcVJTrqW1Sr0P6GHabTzxocnAsQuAPOhZwIK3Muug8iWdwUtrdiJMeyYLBbfsO4RAI1crmYhnmM1pLfL5om8hybVVoIX8aUeRp+9LUjPncLMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iMMUe6L7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=setWmwgR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763571123;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uGDdV1wZzMygZPXUS+BFjZbrrq0xn6nPN5Vu0ZlXeto=;
+	b=iMMUe6L7Z8Gt9BQpUqlpF01jO/5Ys3vXbcXJUHd8/cW1svteDkyFDOvycbEoVCf6PXQ2yL
+	Aqdg2eYuemOREjUn6HSugHkE/CRMzuLBXiwVhJIMxYif/dAE2TBFiUztOCdqrN4XEdk4RM
+	mzoL5p1+r/3epNgpqvMZXMv0GOgGPS0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-677-IV32xKBWOBuB2xqiVPqBhw-1; Wed, 19 Nov 2025 11:52:02 -0500
+X-MC-Unique: IV32xKBWOBuB2xqiVPqBhw-1
+X-Mimecast-MFC-AGG-ID: IV32xKBWOBuB2xqiVPqBhw_1763571121
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477212937eeso45484515e9.2
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:52:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1763571104; x=1764175904; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1763571121; x=1764175921; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ReEEmWGIWZkShqG3AnUB9jXISOu1RTm6ECnZ2pbpzpw=;
-        b=Nd+1lxY8OgTExDhvN+oo/YPRvsPSam8CMhGwDCKENbvifRlEm4ARLXvWtKSWsuPj4Q
-         Cpl4WPypDK6+1nYSE2jLbwU/0kFJ7HpevVSMcJbCl53eM/KqWtRi2J0TFSMEcC+oL4OT
-         FJoHLkkMYQpopIwZzR0mtOMQzTz7XE/NWvW9buimMPJybmJj7pQeyzF4Xx4Mlf3bz0uC
-         xtxnajPQ1RlYgM/jANt7KvhjIKPCdvd08z8m40KbcYnC4AYUuACYBNlo1LbxQZjLz4nY
-         DCDnmHX1g9WG8f/wPhn8nAiawQblm0aoNhCJ2G8523orPB2ixcBqS5r1rSDPGH2f8uny
-         HQaQ==
+        bh=uGDdV1wZzMygZPXUS+BFjZbrrq0xn6nPN5Vu0ZlXeto=;
+        b=setWmwgRfLbd6EtMxx9cb3ls6vYpvAFQrlJmpJLiSVdclzUzCMKvduu/BTz0bzquJ3
+         jTbPtan8ocd1y514TnC16Ibj8bYhZnXNI0wPiMY6/ZRbXYQ4eM8XmWgM3d3qHn7MYB4d
+         Mq9q+dFxzVf/BOlrIO8YMe4zVKm4aRv4Z09Tpc0uRhiklfapa/ucCJa6/Lzg+ZMRN/zz
+         KHxUCkqXdVNFrf+VG5B0zRt/gNEBIe1ux27JUv6iQe4y2bSmeLPCSK8vkND1UNSA1Jiv
+         Pgcx0ONLivDyEmWCIy1V4oPd91t20lrME8qA1gRn1tXbnGtEC2O4p1sGPNnEikqNJETw
+         chSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763571104; x=1764175904;
+        d=1e100.net; s=20230601; t=1763571121; x=1764175921;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ReEEmWGIWZkShqG3AnUB9jXISOu1RTm6ECnZ2pbpzpw=;
-        b=SGByxbQwhG6WNp0IesizT+Wkhcnawr/JL1kEC55T4BoFVHQuUdEtLQ6up2FQaltr4l
-         EcYLTJ6GwiU0Yxo1LKn8ubuI0V+DZbrALGC/ZDzjm8ZyaCNI7snR+XwmTPWxR1YLD5BS
-         w+8ofSSk2fFQufGXuaXHRF1Cz5wjR3EoSsH5EOIo3JBgaNtxQOYAEF4RvK/ZbewIE125
-         6SHhvjRYwthCV5NEvt2H1OzSE0qJwKwCmP2JB26c42QNM5606jC2tgUWZBjS29TV/3/i
-         +OdGpgOJW8aLSb05y4xiISNQHKL5NdQ/58S3ThH8raT4Gj8SbVAabhgO25nze0qXRL+u
-         nhkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV5pth/3pvsN+tpdNfWx2k9pK1TSFO1sodxCHN/ASR/XQlhTS0/shEh1YWOrRQr1+Cyt6vVopo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWBcSnzIwK1YwkcAfDZrlMyqOseIYpD29VVJVvbczT15bswa7d
-	3ULZvMs5S2enmzr7aY1NwS4xgdKOznIl7uWqSmtbOCtpbQnHHjPqzPhlOesNPq+UAEc=
-X-Gm-Gg: ASbGncuizsQ/RyfJdIOwLDhWtkbz3TcNpWXlzsrfFgmGNIl49eh7TpCkn+F3WRz+0Zp
-	21Kty9JI20a0TnUn2AWkcg2jj8xYSoICMDL9vOFKjcW+lRQFPusJVPb+/FsYdYmHRCWY1iFAkAf
-	8y6jl2Qwknpko2dg5D9D1sv3ZWiUTIWnSHOUOB7IQzcouiZ24i15MvFWM93ikp/QYIMNoQ9D4Sy
-	Z12G0GCPeHNMbNC/vO0cuF9TwWTwG2FGgv17Zqd/xzP62Oa504r97TQSbpA+ttj1n0bdWU3eW+3
-	aIFroiXOw7Idg1qYJeLvNM/UTFVLG95XNKp573NCmcn+XFDMaXGNoJunMWyhT11uu99vBHmTp3+
-	D0uK44sTbiQ2vpUAnnkRPO47qAUOJzSwiQTbxMVR1aDlma+rKJkTOnK2E5xZSQPD3gTtwX9DERA
-	RTXU4NJ5tVGG8K3e1BkH3u5kMCfvy+qekQ5A==
-X-Google-Smtp-Source: AGHT+IEzLMBCDRHwKO55KVT8oJ8QExhciJCThHZS9S9CuM3yQ83u3ZpN76rvKWx3vuw9CcSdP1Sv/g==
-X-Received: by 2002:a17:907:3c90:b0:b73:4006:1883 with SMTP id a640c23a62f3a-b7367b8d6d5mr2014953066b.30.1763571104042;
-        Wed, 19 Nov 2025 08:51:44 -0800 (PST)
-Received: from FV6GYCPJ69 ([213.195.231.108])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fb12c87sm1643091266b.31.2025.11.19.08.51.43
+        bh=uGDdV1wZzMygZPXUS+BFjZbrrq0xn6nPN5Vu0ZlXeto=;
+        b=LqK2DFCVpUOUQCCEJywq1vGRT6ZaOn2+MwfAgLW8O3HmDZBCHFQ6EjFJDE49ounY9w
+         XNB5OENsyqi/DealoAxD6jumJaenB+dC/05vm6JkiNSiLYkGMHXLctK8zxTqmPW13Ba+
+         5zD3Qg8J3bMODvtwck3rpnvUWURZKQry9U8KdpwICQk+fLP8gvkGPy4zpmoZQIuI2m7/
+         fIHsbqy0MlA1g2q+cEw/WN6YbHICunGorXvIwCmHCYzXMA0X8kxu+TG0KYU+09RURr12
+         kTzJMRoPdWPAGBS9OkhQwdu5Wfz75MUEY8gw710BIWHHc8RnZeAV8/54HxYlzOFYWfFc
+         KWsg==
+X-Gm-Message-State: AOJu0Yy1KC02uhtktEDTM+zWMM4nwsJOw5/gLz3fpZXGYufoCOOnkHsX
+	JCMjX/w8qderGv/Dpsvus8eAI5ePX98T+dRrLEakzBsV9+ZvWQZ+zhvtfWTHtu30Wg3EBJgwPAZ
+	rqVkzlot36MY+L99HAOF2Cv1qFoTPlq59gvX7TL48Aorx/9eggIgFFcBZaA==
+X-Gm-Gg: ASbGncu6heaaSeBT5q6/FSYPZD7nbq8CO7MMliHcWJFrTm4CnhbKdhNb8U1c3QMBglY
+	H0HaDkI9KVe7d6sEZqZexdmgAZizNK0DXpKXfaHV3KLL14nNfHCknqQ/oPoaZuxwi1OL5JHPSWB
+	SyLk7IOWpX4JlxqmpIOFm4o+DkUm54qHe7iwhU67FkZuqnVvPXBh45Ya48ZWZU6FHhIoGN9sDH+
+	c4gx+0zh/EmL8bbzV1XgkSc7PPa7BDxM6BFROvEnaVXP6xXul6aFxOqZ2BkKJbNBGnYeLncqK+K
+	2vGZIocJ1Z9zNinvzn15hHO3yclE4eyWhcPd8Bj6/j9UC2mpI/m6aRIh9es3UhLg7CGFJLJ4VsH
+	JesQt+CFzVcNMiSIFBDQsx6fIXXUMVA==
+X-Received: by 2002:a05:600c:1f88:b0:475:dd8d:2f52 with SMTP id 5b1f17b1804b1-4778fea7579mr172318385e9.32.1763571120716;
+        Wed, 19 Nov 2025 08:52:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFkCnAWqylPnRvfnAU1+MUgF93xF234J4nNqKzo6llZD/6bIaoJV/mwKhcnyL5kC1Q0Nvad2w==
+X-Received: by 2002:a05:600c:1f88:b0:475:dd8d:2f52 with SMTP id 5b1f17b1804b1-4778fea7579mr172318205e9.32.1763571120251;
+        Wed, 19 Nov 2025 08:52:00 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b0ffef34sm57829355e9.2.2025.11.19.08.51.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 08:51:43 -0800 (PST)
-Date: Wed, 19 Nov 2025 17:51:42 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, david.hunter.linux@gmail.com, 
-	khalid@kernel.org, linux-kernel-mentees@lists.linuxfoundation.org, 
-	syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2] team: Move team device type change at the end of
- team_port_add
-Message-ID: <gbashnabbmnsqwwno5rc4piiwkluriytfcnvfdejn4abwovfkl@furcaobquk5t>
-References: <20251113211142.245216-1-zlatistiv@gmail.com>
+        Wed, 19 Nov 2025 08:51:59 -0800 (PST)
+Date: Wed, 19 Nov 2025 11:51:56 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Dan Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
+	virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
+	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v11 09/12] virtio_net: Implement IPv4 ethtool
+ flow rules
+Message-ID: <20251119115113-mutt-send-email-mst@kernel.org>
+References: <20251118143903.958844-1-danielj@nvidia.com>
+ <20251118143903.958844-10-danielj@nvidia.com>
+ <20251118161734-mutt-send-email-mst@kernel.org>
+ <20251119041745-mutt-send-email-mst@kernel.org>
+ <103955ba-baa7-4b0b-8b9b-f3824ad54b4d@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,113 +114,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251113211142.245216-1-zlatistiv@gmail.com>
+In-Reply-To: <103955ba-baa7-4b0b-8b9b-f3824ad54b4d@nvidia.com>
 
-Thu, Nov 13, 2025 at 10:11:42PM +0100, zlatistiv@gmail.com wrote:
->Attempting to add a port device that is already up will expectedly fail,
->but not before modifying the team device header_ops.
->
->In the case of the syzbot reproducer the gre0 device is
->already in state UP when it attempts to add it as a
->port device of team0, this fails but before that
->header_ops->create of team0 is changed from eth_header to ipgre_header
->in the call to team_dev_type_check_change.
->
->Later when we end up in ipgre_header() struct *ip_tunnel points to nonsense
->as the private data of the device still holds a struct team.
->
->Example sequence of iproute commands to reproduce the hang/BUG():
->ip link add dev team0 type team
->ip link add dev gre0 type gre
->ip link set dev gre0 up
->ip link set dev gre0 master team0
->ip link set dev team0 up
->ping -I team0 1.1.1.1
->
->Move team_dev_type_check_change down where all other checks have passed
->as it changes the dev type with no way to restore it in case
->one of the checks that follow it fail.
->
->Also make sure to preserve the origial mtu assignment:
->  - If port_dev is not the same type as dev, dev takes mtu from port_dev
->  - If port_dev is the same type as dev, port_dev takes mtu from dev
->
->Testing:
->  - team device driver in-tree selftests
->  - Add/remove various devices as slaves of team device
->  - syzbot
->
->Reported-by: syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
->Closes: https://syzkaller.appspot.com/bug?extid=a2a3b519de727b0f7903
->Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
->Signed-off-by: Nikola Z. Ivanov <zlatistiv@gmail.com>
->---
->Changes since v1:
->  - Add a "Fixes" tag
->  - Add a simple reproducer in the commit log
->  https://lore.kernel.org/netdev/20251111171341.4c6d69be@kernel.org/T/#u
->
-> drivers/net/team/team_core.c | 19 +++++++++++--------
-> 1 file changed, 11 insertions(+), 8 deletions(-)
->
->diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
->index 29dc04c299a3..94c149e89231 100644
->--- a/drivers/net/team/team_core.c
->+++ b/drivers/net/team/team_core.c
->@@ -1134,10 +1134,6 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
-> 		return -EPERM;
-> 	}
+On Wed, Nov 19, 2025 at 10:33:31AM -0600, Dan Jurgens wrote:
+> On 11/19/25 3:18 AM, Michael S. Tsirkin wrote:
+> > On Tue, Nov 18, 2025 at 04:31:09PM -0500, Michael S. Tsirkin wrote:
+> >>> +static int setup_ip_key_mask(struct virtio_net_ff_selector *selector,
+> >>> +			     u8 *key,
+> >>> +			     const struct ethtool_rx_flow_spec *fs)
+> >>> +{
+> >>> +	struct iphdr *v4_m = (struct iphdr *)&selector->mask;
+> >>> +	struct iphdr *v4_k = (struct iphdr *)key;
+> >>> +
+> >>> +	selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
+> >>> +	selector->length = sizeof(struct iphdr);
+> >>> +
+> >>> +	if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
+> >>> +	    fs->h_u.usr_ip4_spec.tos ||
+> >>> +	    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4)
+> >>> +		return -EOPNOTSUPP;
+> >>
+> >> So include/uapi/linux/ethtool.h says:
+> >>
+> >>  * struct ethtool_usrip4_spec - general flow specification for IPv4
+> >>  * @ip4src: Source host
+> >>  * @ip4dst: Destination host
+> >>  * @l4_4_bytes: First 4 bytes of transport (layer 4) header
+> >>  * @tos: Type-of-service
+> >>  * @ip_ver: Value must be %ETH_RX_NFC_IP4; mask must be 0
+> >>  * @proto: Transport protocol number; mask must be 0
+> >>
+> >> I guess this ETH_RX_NFC_IP4 check validates that userspace follows this
+> >> documentation? But then shouldn't you check the mask
+> >> as well? and mask for proto?
+> >>
+> >>
+> >>
+> > 
+> > in fact, what if e.g. tos is 0 but mask is non-zero? should not
+> > this be rejected, too?
+> > 
 > 
->-	err = team_dev_type_check_change(dev, port_dev);
->-	if (err)
->-		return err;
->-
-> 	if (port_dev->flags & IFF_UP) {
-> 		NL_SET_ERR_MSG(extack, "Device is up. Set it down before adding it as a team port");
-> 		netdev_err(dev, "Device %s is up. Set it down before adding it as a team port\n",
->@@ -1155,10 +1151,12 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
-> 	INIT_LIST_HEAD(&port->qom_list);
-> 
-> 	port->orig.mtu = port_dev->mtu;
->-	err = dev_set_mtu(port_dev, dev->mtu);
->-	if (err) {
->-		netdev_dbg(dev, "Error %d calling dev_set_mtu\n", err);
->-		goto err_set_mtu;
->+	if (dev->type == port_dev->type) {
->+		err = dev_set_mtu(port_dev, dev->mtu);
+> Actually the tos check should be removed, there's no guidance it should
+> be 0, like the other fields. Our hardware doesn't support it, but this
+> will be caught in validate_classifier_selectors.
 
-I'm probably missing something. Why you made this conditional? Didn't
-find mentioning that in patch description.
+same question for l4_4_bytes then.
 
+-- 
+MST
 
-
->+		if (err) {
->+			netdev_dbg(dev, "Error %d calling dev_set_mtu\n", err);
->+			goto err_set_mtu;
->+		}
-> 	}
-> 
-> 	memcpy(port->orig.dev_addr, port_dev->dev_addr, port_dev->addr_len);
->@@ -1233,6 +1231,10 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
-> 		}
-> 	}
-> 
->+	err = team_dev_type_check_change(dev, port_dev);
->+	if (err)
->+		goto err_set_dev_type;
->+
-> 	if (dev->flags & IFF_UP) {
-> 		netif_addr_lock_bh(dev);
-> 		dev_uc_sync_multiple(port_dev, dev);
->@@ -1251,6 +1253,7 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
-> 
-> 	return 0;
-> 
->+err_set_dev_type:
-> err_set_slave_promisc:
-> 	__team_option_inst_del_port(team, port);
-> 
->-- 
->2.51.0
->
 
