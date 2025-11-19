@@ -1,90 +1,63 @@
-Return-Path: <netdev+bounces-240156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A74BC70D6A
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 20:37:48 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81968C70E12
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 20:47:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 4B0332BB54
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:36:10 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BFD09347806
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95DDA35BDDB;
-	Wed, 19 Nov 2025 19:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D46936C0B1;
+	Wed, 19 Nov 2025 19:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VhAJoSW2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JUx+vO6M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F110B1DE3DC;
-	Wed, 19 Nov 2025 19:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19182D9487;
+	Wed, 19 Nov 2025 19:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763580964; cv=none; b=MQ0oxHjna8845FwKGnlwFX6wDjftt99tPKCoJU4R493EgNJEdiD9c20pSBjyEpLLMDuHfXjYzPIaoMBzVcxNrSmcMLNhN1VeSYdZuRq1jd/Il+a4oOQ3Zef6IngwfjDy15LI0zIxZhAFCBcCg5lFVsTg+6jpO3gM67EYX8KNk+I=
+	t=1763581497; cv=none; b=aBSu9pdZQr+WfuzqhDlQE9Evcc6P+l9xPAVAEOePeOdodTtyp8vFN/qJGZTNuRMzVbMnhurRgu8lpsvm4db467LxbOCIR5LssV1NhmGdwieGv2+1cx1Wj98p7nC7OttMw0nxFJmRN6Ghy6wz8o7341SSOHCxM04S/FY8NDPM2dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763580964; c=relaxed/simple;
-	bh=bez+CQkfaww081dvqDXAVsriAvoJSfA+OSquu+Hh7Sw=;
+	s=arc-20240116; t=1763581497; c=relaxed/simple;
+	bh=Lvzw5kWPZOa+UVHkjliY8GRM2NlfagfPs9hfidPFsfk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pX/E2hEjqwX5xaWkQbRaXOcK7CdlQ6zZHmtvgsdXMPxIUPzYAr5PBHyemrJmnYOcRVWxz+RJtjTnuujdudSItNP/JG3VtgZ/x3PNNSjnDmrrwC/DzLFRB42L+ludzuEOKVULQweahvh8b48Ie55YGl5Aef06yQj0pDmMv2ViTVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VhAJoSW2; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763580962; x=1795116962;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bez+CQkfaww081dvqDXAVsriAvoJSfA+OSquu+Hh7Sw=;
-  b=VhAJoSW2Vqfcl/fhJGN4qZL3ORhnVYbmCDa/N5dxD4UsmTezRoOcROFU
-   MGICjX1shpPIUimjMREdyPRjihf5UcWbAvB3kk1sVcRXGGNL7jWV7G6Wr
-   8xpi7NQqJvUk163veM6RaLT3arrJJEqefoW0PPVVL4ih2403mKfA/cRQE
-   7ij5ha7vyVm2SmrvCPwJ5+xIvKRZDfFi6ve1/zGNqLJIhQ3lZNa3ZnVaj
-   WnDWOR/fGUIeCAZMefoik8I+OvS1P17FhzKBGDTmZc4W7UD+C7om56ur4
-   GO3UqIlQviJ2s/rqE6/OXd8FbAUMUUEiIcX7j5rJAywF17iC8HrjAfInf
-   A==;
-X-CSE-ConnectionGUID: quAJagxyTfC8XZzG1futsw==
-X-CSE-MsgGUID: yB0UyPTxRVmYSg8FfQif4g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="75963434"
-X-IronPort-AV: E=Sophos;i="6.19,316,1754982000"; 
-   d="scan'208";a="75963434"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 11:34:01 -0800
-X-CSE-ConnectionGUID: kVqpp2tRQVC4cQ8KvhjPjQ==
-X-CSE-MsgGUID: BDavac7vSIi1Oji14uiDqw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,316,1754982000"; 
-   d="scan'208";a="195640151"
-Received: from rvuia-mobl.ger.corp.intel.com (HELO localhost) ([10.245.245.245])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 11:33:58 -0800
-Date: Wed, 19 Nov 2025 21:33:55 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, Serge Semin <fancer.lancer@gmail.com>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 14/15] net: dsa: sja1105: replace mdiobus-pcs
- with xpcs-plat driver
-Message-ID: <aR4bo4cPwWdapr7j@smile.fi.intel.com>
-References: <20251118164130.4e107c93@kernel.org>
- <20251118164130.4e107c93@kernel.org>
- <20251119095942.bu64kg6whi4gtnwe@skbuf>
- <aR2cf91qdcKMy5PB@smile.fi.intel.com>
- <20251119112522.dcfrh6x6msnw4cmi@skbuf>
- <20251119081112.3bcaf923@kernel.org>
- <aR3trBo3xqZ0sDyr@smile.fi.intel.com>
- <aR39JBrqn5PC911s@shell.armlinux.org.uk>
- <aR4A1MaCn9fStNdm@smile.fi.intel.com>
- <20251119103545.53c13aac@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jD7aZDaKg0GZVI9JO7hpvXoxh6pTa6FD74TMw8fV1BczalWV/rpfNehNyla/jeK570XLNKAhyF1FtOCg/NmzjuC9SQId+2tqllMsf6kBYOTJ/ZHFutlKIdHCgZfCRkucYsxJmB6jKUukywkSsxP9I0hep8ZzQb5hwDnn+QDTrJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JUx+vO6M; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3+MzljTu9sSQD9At6Ks7daYDnEuV5FX1vj590BIioUI=; b=JUx+vO6MqJ7R+n5Se9X4Jzl5wO
+	cDKHBdrTjmoMKLb3G+atFqUElMjKybaSqOPfUpTYi9oNS7u4AZjEv/8I72LEIH/J1qzu596xXp2Uc
+	9uSzS+D3c07AHZTdWDAxqUxb4IJYvSGNpIeOBBGCW8g4ugydEo0Xj9L4hb1otC+7ezI0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vLo6g-00EXkE-0M; Wed, 19 Nov 2025 20:44:46 +0100
+Date: Wed, 19 Nov 2025 20:44:45 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+	vsrama-krishna.nemani@broadcom.com, vikas.gupta@broadcom.com,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+Subject: Re: [v2, net-next 09/12] bng_en: Add ethtool link settings and
+ capabilities support
+Message-ID: <b45636cd-48be-4db7-bf2d-a9eb611c14c6@lunn.ch>
+References: <20251114195312.22863-1-bhargava.marreddy@broadcom.com>
+ <20251114195312.22863-10-bhargava.marreddy@broadcom.com>
+ <49930724-74b8-41fe-8f5c-482afc976b82@lunn.ch>
+ <CANXQDtb5XuLKOOorCMYDUpVz6aFuQgvmQZ4pS6RJGkAgeM8n1A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,48 +66,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251119103545.53c13aac@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+In-Reply-To: <CANXQDtb5XuLKOOorCMYDUpVz6aFuQgvmQZ4pS6RJGkAgeM8n1A@mail.gmail.com>
 
-On Wed, Nov 19, 2025 at 10:35:45AM -0800, Jakub Kicinski wrote:
-> On Wed, 19 Nov 2025 19:39:32 +0200 Andy Shevchenko wrote:
-> > On Wed, Nov 19, 2025 at 05:23:48PM +0000, Russell King (Oracle) wrote:
-> > > On Wed, Nov 19, 2025 at 06:17:48PM +0200, Andy Shevchenko wrote:  
-> > > > On Wed, Nov 19, 2025 at 08:11:12AM -0800, Jakub Kicinski wrote:  
-> > > I can say that stuff such as unused const variables gets found by
-> > > nipa, via -Wunused-const-variable, which as I understand it is a
-> > > W=1 thing.
-> > > 
-> > > I suspect CONFIG_WERROR=y isn't used (I don't know) as that would
-> > > stop the build on warnings, whereas what is done instead is that
-> > > the output of the build is analysed, and the number of warnings
-> > > counted and reported in patchwork. Note that the "build" stuff
-> > > reports number of errors/warnings before and after the patch.
-> > > 
-> > > Hope this answers your question.  
-> > 
-> > Pretty much, thanks!
+> > > +     if (link_info->support_auto_speeds || link_info->support_auto_speeds2 ||
+> > > +         link_info->support_pam4_auto_speeds)
+> > > +             linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+> > > +                              lk_ksettings->link_modes.supported);
+> >
+> > autoneg is more than speed. In fact, 1000BaseX only works are 1G, no
+> > link speed negotiation, but you can negotiate pause. Do any of the
+> > link modes you support work like this?
 > 
-> We do:
+> All the speeds we support can be auto-negotiated.
 
-A-ha, thanks!
+If all the speeds you support can do autoneg, why do you need the if ()
 
-> prep_config() {
->   make LLVM=1 O=$output_dir allmodconfig
->   ./scripts/config --file $output_dir/.config -d werror
->   ./scripts/config --file $output_dir/.config -d drm_werror
->   ./scripts/config --file $output_dir/.config -d kvm_werror
-> }
-> 
-> I have strong feelings about people who think Werror is an acceptable
-> practice in 2025, but let me not violate the CoC here..
-
-WERROR=y by default was introduced you-know-by-whom :-)
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+	Andrew
 
