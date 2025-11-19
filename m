@@ -1,256 +1,178 @@
-Return-Path: <netdev+bounces-239901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD6D1C6DB92
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 10:30:12 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CCA2C6DBFE
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 10:35:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 90EBF3872D2
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:26:33 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 45F633876E5
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3252F33DEFF;
-	Wed, 19 Nov 2025 09:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE69026E703;
+	Wed, 19 Nov 2025 09:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gDYZmjeP";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="q34LyBg5"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="4hrZdawV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013039.outbound.protection.outlook.com [40.93.201.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5146309DAB
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 09:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763544375; cv=none; b=AjgTNbVe6npquEDrhUOkDNmynQBtcjksqXQcui7wIYPyyJahZhjsi3wJH4njC4+PkU3QBkxfM9VvHa8InsY+XJpciutkW5j4oBujPzEiNTaTOE8ObCoVraxiRIyL6UkrbZP8Zgt1/QJa5yIOepD4RXZWVN69GAzt0PPoj2Xyfgs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763544375; c=relaxed/simple;
-	bh=JJcwz0bx1oxIm6FGLUg4rtPr6fl26Ggcd1mLYOQFhcs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kT5lkRryfC7IyxiPiEDl9izeS4yfzuro2eGyoU+DOTD+kPA+/5KtAt8slRYffvRqxNW9nsFBOquenIo02yJUqA3SXg8f5M11C6umgq3qbnWllzFqfGK5UbHm6xLyjJoPDyqbKyYxtKFxemgwZH0AmqHLE/XJylfC1xErCfP7Ia0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gDYZmjeP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=q34LyBg5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763544371;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kg6w3iuKZwh3LTVuqvZ2tolattLonAtduv2bEj/k2Dk=;
-	b=gDYZmjeP5cxxkkcv6BTKC8IB0yqefAjS3klyPPwxXZhtQ9awQkGMrIdtGIgrOYSgW+p9Ka
-	zKX+eY71heFf0SiUxeeQrgERFdmdmdOrQvFURUaGjUp7rt4zF3DhyRXno97yUjW9dfCdlX
-	XquXgKz8fWQKn48RCt1+2UFCQ3uIbug=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-595-E-RpQPPvMX-n5Oh6nkZ_tw-1; Wed, 19 Nov 2025 04:26:10 -0500
-X-MC-Unique: E-RpQPPvMX-n5Oh6nkZ_tw-1
-X-Mimecast-MFC-AGG-ID: E-RpQPPvMX-n5Oh6nkZ_tw_1763544369
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-477563e531cso59667225e9.1
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 01:26:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763544368; x=1764149168; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kg6w3iuKZwh3LTVuqvZ2tolattLonAtduv2bEj/k2Dk=;
-        b=q34LyBg5dNx+2ulyZUnYW7CIRcX2glMdyarG1lzC/wknvnWz2UTTWDb+o7E4UKlehC
-         7h6jRN88CyEstZVteYIIHo2CwpOaQM5KYbtLmOafWVMo+QgqKhFndZITQMZmatzb9tQe
-         kSTZWsKBfe9DN0UKX2Kx3kSxy3ngN3qPGecnWOKZxUQei0IoT/BX/QMiK7RpssSfoCXU
-         rAd1rmZsXqkCP59azChozAnNdkMi0jDCMOpa1gXG67fK73oE7i1JLy46P+p9V3oyR/ZE
-         Y/uy+66NOFa8/+Ck6NEcp7R+Un8rjlND5diW6961BLLPX1/kAUDBDZcQZ6LtLzhSHHuz
-         nCVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763544368; x=1764149168;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kg6w3iuKZwh3LTVuqvZ2tolattLonAtduv2bEj/k2Dk=;
-        b=fsKngt4WJBlqSSIYiJ00xqb0tQ8Sqm9OwyalHqBzwtn1NnQErJSogPiJJJ1xWfEJrq
-         rV1xefLbLYT3hxgf85s6KJT7d8hIJ1ckyTX23Q9uwuzNqaP59HwW70vlPxcNU9w1j1PN
-         COLhYbi8G/vVYiaeONCG4lC0+sQFti4/Gs5iIvm3AbXEGL1nBzqduV7MD71JIw0I9ZoU
-         SszCOd1xrKMUuaSEag0W6FnY/eIncBv8f5iBOMcB5I7yf9iJwGF1BHHO0wLKyE+o6v4b
-         2SzSACFnzAJQXPLqZ6FTCDkDNViav4RGihWdZQSNxUb//kLj/Nf1d2ajM/8P45yOp+vK
-         +siA==
-X-Gm-Message-State: AOJu0YyNqieqcQzl1i8IfqDr0r5lgsu5k8Ph7iINa757QttPhsIZPc4R
-	w0KR/najF+Ex0yfsdVssotkdFrW6/h2ahSsFHzhExIXkery0I9d1+JMJQfFeBsZVodixG/bw+Jg
-	u1PCNr7jiKB9mm+GJRPzAAye63Bou374I8RSwm+ealwUREFC3XN7+2V2ZTOTJ1elvGg==
-X-Gm-Gg: ASbGnctWNb5URk0Jy00l8Cy1BB/uGHslBUvnkMZKzFzEvmu/WMg1K8HRTJddMXfxOnr
-	2u71njVf/VDGvw7eyOm2SdsyZVxIKG2c5N6/88Ldu08Nj1J1Gyr4BwVqbD7vjnhIdtxbPUOTk+M
-	f2NxXP/x+sgSxDXTvRlFX3nL4ACzqankSevsi9p0tpE5WwzEQjnJCvBUqpaeN71sJLEg1NTVS8k
-	0M/+yw88W2TbTPS66aeUL+q+eBlYBYdG2m5JjlEfsV4CVhRHM6nO31bhDCF/11heeRF7m/vxBy6
-	Ss2Uui6V6CtyxoiNXgxkoLc//3cpVyD1M6WGZBj4/dRAT0Ir9Q9/dDk7v01hcGcsNT+tTZDLDld
-	kY/tVh10x7JHClPjuBeTF+1NPeX5vjQ==
-X-Received: by 2002:a05:6000:1ace:b0:3eb:d906:e553 with SMTP id ffacd0b85a97d-42b595bb7f6mr19172433f8f.55.1763544368505;
-        Wed, 19 Nov 2025 01:26:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEVomqmKlWReLQMuWyS3MbD3ynvl2oZ2FTnd3twDk8bXDcAPeBlrnIcm3c30fp1inxoAhVROQ==
-X-Received: by 2002:a05:6000:1ace:b0:3eb:d906:e553 with SMTP id ffacd0b85a97d-42b595bb7f6mr19172400f8f.55.1763544368034;
-        Wed, 19 Nov 2025 01:26:08 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e7b12asm36639012f8f.10.2025.11.19.01.26.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 01:26:07 -0800 (PST)
-Date: Wed, 19 Nov 2025 04:26:04 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
-	virtualization@lists.linux.dev, parav@nvidia.com,
-	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
-	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
-Subject: Re: [PATCH net-next v11 07/12] virtio_net: Implement layer 2 ethtool
- flow rules
-Message-ID: <20251119042245-mutt-send-email-mst@kernel.org>
-References: <20251118143903.958844-1-danielj@nvidia.com>
- <20251118143903.958844-8-danielj@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368AA38DF9
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 09:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.39
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763544711; cv=fail; b=Lk2A6cTqRCEnvrrYEQ9mhiTAgp47dW/OYaSP0MlH2uFCbd74AR3od4tYSknYR3XMxY2H/mwgjYk0nlMIkOQQov3MjWRmy+7Vr0wzSTERIlyYwTJUbCNlLL49mXAch+u4d9IHU2429Qi3byNxnoMNrfY6vurVMlqs0jIwrnI1RDM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763544711; c=relaxed/simple;
+	bh=16C8/tRDFuWa+547PyY3wELJWJ+GLPk6cmg8IUs7kI0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jk5xIBNc0d6dUuWIOdQF2ri7wcpSYKKMTu7nxQa8p+Q8CBI1movCfouwHJVIgnfVt9f6aKbDhBC7bkeejk8WLAyXkGfjj89eKMP+wCmtT+v7LJGCiPaImkgCkBcllxio8Dhv/izFfKwtxO5CGazW8dYUdnDplRadk40loJ9KiF4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=4hrZdawV; arc=fail smtp.client-ip=40.93.201.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RlziIx4JXKKGghSlPZb1c9IpWfo2w0MZEBgInfOZ7GM/EHTRCXVMrX4hmpNu+0kXy+Ud89GdvA5MwAvIPSqbaxiN+9hthOp8WkvKQHPnLkHHdBAlZRvI+6WUlLarrMBNki/msw+OKrVQNEN1VFrdG3Om4s1cnlpnjiBjAXO5BZhfFeERj7ObyqzSG2OlbtmwGu+AwEuUzHxKVwV3VhGPrgU6xaB6LJseGDj/9fGkzZvL5MZUqpf3eN1EEIOTWyfs8rjn1HLPAtj+7peL9d3y2YVyGjsm4c7ix+dLwcx4ow+Yz72ze3WD6orakGTYJSoSdnvvZiwJpUQ8CHIreK1QXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0vkbQLp8qQ7phI5wloyjRYddARdNqgJesIxxwMWo0EM=;
+ b=nr0V9PhXmCnjjyJmzvVW19OGuhWGsdR/3xOfyNL69Aue5xU3QA3RCJFIEzgpigDut3EyI8OhzbKmbFAZbJjM8FfNIsVaXtkiKM3aZMKISC3wQ1c4/ghWnzYLO03jVpwdiWhFJ5MZXZlSP0zGbUKvekxYAWj6rWsphsiBYwItd0AqS8B9Ui8hU4IwafqxWeL+zMi5bJNnZPTIlfboiy5V3my4kw3fvxZC/yn0zREjJ07afkxDI+OV+y3spvM39bx07vk2g5g2lu9QbbD2oX4IKnBRaCXd2ylAjugYbzw1pAHA1+eC0V0hFIIDdwPd8MsrXzTwPFNVnEwzUzIGO89h6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0vkbQLp8qQ7phI5wloyjRYddARdNqgJesIxxwMWo0EM=;
+ b=4hrZdawVOF7ubDfOHsm4cZn0jZqwUwC9O8Kujl8otp+OQCr2//VQxs7wGte0Y6xo+wZRwd5mRxVPyQqcH/oHLB3zOdIt1nNGsAYRDMX2qWuK8pmpZopxiJ68KLN33GdrviitE6zGNwmvmsOFOgXLCSH3NXhhJKsf3/m29bH9qqc=
+Received: from SA0PR11CA0112.namprd11.prod.outlook.com (2603:10b6:806:d1::27)
+ by DS7PR12MB6120.namprd12.prod.outlook.com (2603:10b6:8:98::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.10; Wed, 19 Nov 2025 09:31:46 +0000
+Received: from SN1PEPF0002BA50.namprd03.prod.outlook.com
+ (2603:10b6:806:d1:cafe::f6) by SA0PR11CA0112.outlook.office365.com
+ (2603:10b6:806:d1::27) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Wed,
+ 19 Nov 2025 09:31:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SN1PEPF0002BA50.mail.protection.outlook.com (10.167.242.73) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.9 via Frontend Transport; Wed, 19 Nov 2025 09:31:46 +0000
+Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 19 Nov
+ 2025 01:31:44 -0800
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+To: <netdev@vger.kernel.org>
+CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+	<davem@davemloft.net>, <andrew+netdev@lunn.ch>, <Shyam-sundar.S-k@amd.com>,
+	Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: [PATCH net-next] amd-xgbe: let the MAC manage PHY PM
+Date: Wed, 19 Nov 2025 15:01:24 +0530
+Message-ID: <20251119093124.548566-1-Raju.Rangoju@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251118143903.958844-8-danielj@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA50:EE_|DS7PR12MB6120:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8b06df53-51bf-49f4-8f5a-08de274e7590
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?6hRav21u/l6qxFwriVL3YT37pCuhUhzZnFl0/urqf0ErTLcoAq52Kt4iI8Fc?=
+ =?us-ascii?Q?poa8AhRcQ5eo+EHbq3jEuIp3XHeHY1+Stq5dUacrxZ9fTRuTDna/OVMdbHy/?=
+ =?us-ascii?Q?Mugp3TUKQTD7lnLgpsKmt8J/FzOtF+4U0rWTKx0OFinExS0iEDKBGXM4Fa23?=
+ =?us-ascii?Q?Z34Zrt1QaF08JcLzfb9dhl9G+Gsgy8hbc5dXXcP35RAmAV17Z7iW7ZIDDznA?=
+ =?us-ascii?Q?uCS1bbMk4mkSEu7+Ea3Q64RwkkRrxgVSgLHP3xbJLghPSSs2KsNir05y2LVW?=
+ =?us-ascii?Q?qtdYKd7PO94jIa5p18vc0vJoAEZK7toB+nSt1LFM+KLxNe64VTmj/G8Ecy1L?=
+ =?us-ascii?Q?3gT2twZf8MW2w/Z2ZC9bW1Zj1K1+bLFP5gPpRn7PtQnzu6EgW/B7nAnGg3j3?=
+ =?us-ascii?Q?3H1IWqo/+xRZoMyiuTPupXxqEzRV+j50bMCCvud+kNqgo9DQQLZpBLKivJfb?=
+ =?us-ascii?Q?UQM5f3D+LWc55zJKyC7dxBdZyaLsn5WiO5qNbh8Z440NHbRzI/1OAhiVtqnF?=
+ =?us-ascii?Q?rA2yFSNVvxZiLaH2kLxvFY9gWyo1YkmWlDo8coQraxOrChBYVjprbkAr3k9b?=
+ =?us-ascii?Q?rucy0X2bBR/bN04TkBIk3qOvLn4pXHzIMKhqppMDTfx0/6sYkVsnMUmzA8p7?=
+ =?us-ascii?Q?nqU66MIszLEKBKLEstv9h7Aem6ON6kW+YVw3HfCuiHn9XCkLWkWn/Y6U4WR7?=
+ =?us-ascii?Q?2NGkisYCRCeFD4S5XmuDBkM9W3Q2k5qWMLZ9E3GUJl/w3KwUD88PCG2gpV02?=
+ =?us-ascii?Q?uG+aAysgMWJ0qnYkCueUEfXxwNpFfMH0ezauqLJ8kN4oJozVA2lH266rZb3X?=
+ =?us-ascii?Q?9fNF+h59AAlpeU29yN2RwwQP1ZXsvre1w8HjJy8GF6v3OKhxc2yakoblBiw+?=
+ =?us-ascii?Q?bkOK6UFSCg7AIsMJVDbO8SMKhCNDIXkbiI8lTQb9NHQBREH4UmT87mxwjKMT?=
+ =?us-ascii?Q?fVTgSXK2KicbN4P9oi5AtfO3iv3x+EWbSPw9zPagxzzjg+a+ugm3+qFGyzL1?=
+ =?us-ascii?Q?IsnZx76z2bbqiHI9vAkFYkLl9VyJTfzdD/pMej/OrQRhlNFtTjeU96sa5d87?=
+ =?us-ascii?Q?eWDfe9qIRTDa0RrZvUo8fZhxISW23CL9ViUasazewT/THm9OBV7OUavhxK8r?=
+ =?us-ascii?Q?2k9hWyT2f6Crl1ByIpQIJIqhEKz5uZGKOf1JIs45//0V+Z2WnbShQdQP013l?=
+ =?us-ascii?Q?u8/t8KUU2/SPb9JWjp8C6vgJx5WmsLPLJickVUGmyoNOgI0kSgPzOoy4GV8l?=
+ =?us-ascii?Q?g4rm31Nji6pYcXRmHZ8gawOzowlSVf8GQrOSsLlLGuCiwe3g9dW7jwWJQGWz?=
+ =?us-ascii?Q?eo7s4XUdSXUS0TO7BzXfwtYouHwhdep7F2uSnQ61li70ZIYFOC5mqAA4SjiK?=
+ =?us-ascii?Q?ekkvGCRq7aYwVZNKzAs12HC+sfCnmneJb/f5TV90fPVyLF05uwaFOq403gCF?=
+ =?us-ascii?Q?Kyb2rNEfndxa4nCLSYLeMf+gPUA+69HhsUDAosPAb8ms3IJjkfVB4k3zY01n?=
+ =?us-ascii?Q?oc445qFkQmjCjFklAE7c+t1IapnuUGyUtyJhqGqZwPfVKJa/vwlQaTunfhkw?=
+ =?us-ascii?Q?fF0/Iyqjnpjvpx487wk=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 09:31:46.6142
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b06df53-51bf-49f4-8f5a-08de274e7590
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002BA50.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6120
 
-On Tue, Nov 18, 2025 at 08:38:57AM -0600, Daniel Jurgens wrote:
+Use the MAC managed PM flag to indicate that MAC driver takes care of
+suspending/resuming the PHY, and reset it when the device is brought up.
 
-...
+Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+---
+ drivers/net/ethernet/amd/xgbe/xgbe-drv.c    | 3 +++
+ drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c | 1 +
+ 2 files changed, 4 insertions(+)
 
-> +static int insert_rule(struct virtnet_ff *ff,
-> +		       struct virtnet_ethtool_rule *eth_rule,
-> +		       u32 classifier_id,
-> +		       const u8 *key,
-> +		       size_t key_size)
-> +{
-> +	struct ethtool_rx_flow_spec *fs = &eth_rule->flow_spec;
-> +	struct virtio_net_resource_obj_ff_rule *ff_rule;
-> +	int err;
-> +
-> +	ff_rule = kzalloc(sizeof(*ff_rule) + key_size, GFP_KERNEL);
-> +	if (!ff_rule)
-> +		return -ENOMEM;
-> +
-> +	/* Intentionally leave the priority as 0. All rules have the same
-> +	 * priority.
-> +	 */
-> +	ff_rule->group_id = cpu_to_le32(VIRTNET_FF_ETHTOOL_GROUP_PRIORITY);
-> +	ff_rule->classifier_id = cpu_to_le32(classifier_id);
-> +	ff_rule->key_length = (u8)key_size;
-> +	ff_rule->action = fs->ring_cookie == RX_CLS_FLOW_DISC ?
-> +					     VIRTIO_NET_FF_ACTION_DROP :
-> +					     VIRTIO_NET_FF_ACTION_RX_VQ;
-> +	ff_rule->vq_index = fs->ring_cookie != RX_CLS_FLOW_DISC ?
-> +					       cpu_to_le16(fs->ring_cookie) : 0;
-> +	memcpy(&ff_rule->keys, key, key_size);
-> +
-> +	err = virtio_admin_obj_create(ff->vdev,
-> +				      VIRTIO_NET_RESOURCE_OBJ_FF_RULE,
-> +				      fs->location,
-> +				      VIRTIO_ADMIN_GROUP_TYPE_SELF,
-> +				      0,
-> +				      ff_rule,
-> +				      sizeof(*ff_rule) + key_size);
-> +	if (err)
-> +		goto err_ff_rule;
-> +
-> +	eth_rule->classifier_id = classifier_id;
-> +	ff->ethtool.num_rules++;
-> +	kfree(ff_rule);
-> +
-> +	return 0;
-> +
-> +err_ff_rule:
-> +	kfree(ff_rule);
-> +
-> +	return err;
-> +}
-
-
-...
-
-> +static int build_and_insert(struct virtnet_ff *ff,
-> +			    struct virtnet_ethtool_rule *eth_rule)
-> +{
-> +	struct virtio_net_resource_obj_ff_classifier *classifier;
-> +	struct ethtool_rx_flow_spec *fs = &eth_rule->flow_spec;
-> +	struct virtio_net_ff_selector *selector;
-> +	struct virtnet_classifier *c;
-> +	size_t classifier_size;
-> +	size_t key_size;
-> +	int num_hdrs;
-> +	u8 *key;
-> +	int err;
-> +
-> +	calculate_flow_sizes(fs, &key_size, &classifier_size, &num_hdrs);
-> +
-> +	key = kzalloc(key_size, GFP_KERNEL);
-> +	if (!key)
-> +		return -ENOMEM;
-
-So key is allocated here ...
-
-
-> +
-> +	/*
-> +	 * virtio_net_ff_obj_ff_classifier is already included in the
-> +	 * classifier_size.
-> +	 */
-> +	c = kzalloc(classifier_size +
-> +		    sizeof(struct virtnet_classifier) -
-> +		    sizeof(struct virtio_net_resource_obj_ff_classifier),
-> +		    GFP_KERNEL);
-> +	if (!c) {
-> +		kfree(key);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	c->size = classifier_size;
-> +	classifier = &c->classifier;
-> +	classifier->count = num_hdrs;
-> +	selector = (void *)&classifier->selectors[0];
-> +
-> +	setup_eth_hdr_key_mask(selector, key, fs);
-> +
-> +	err = validate_classifier_selectors(ff, classifier, num_hdrs);
-> +	if (err)
-> +		goto err_key;
-> +
-> +	err = setup_classifier(ff, c);
-> +	if (err)
-> +		goto err_classifier;
-> +
-> +	err = insert_rule(ff, eth_rule, c->id, key, key_size);
-
-
-... copied by insert_rule
-
-
-> +	if (err) {
-> +		/* destroy_classifier will free the classifier */
-> +		destroy_classifier(ff, c->id);
-> +		goto err_key;
-> +	}
-> +
-
-
-... and apparently never freed?
-
-
-I think it's because the API of insert_rule is confusing...
-
-> +	return 0;
-> +
-> +err_classifier:
-> +	kfree(c);
-> +err_key:
-> +	kfree(key);
-> +
-> +	return err;
-> +}
-> +
-
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+index f3adf29b222b..1c03fb138ce6 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+@@ -1266,6 +1266,9 @@ static int xgbe_start(struct xgbe_prv_data *pdata)
+ 
+ 	clear_bit(XGBE_STOPPED, &pdata->dev_state);
+ 
++	/* Reset the phy settings */
++	xgbe_phy_reset(pdata);
++
+ 	return 0;
+ 
+ err_irqs:
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+index 35a381a83647..a68757e8fd22 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+@@ -989,6 +989,7 @@ static int xgbe_phy_find_phy_device(struct xgbe_prv_data *pdata)
+ 		return ret;
+ 	}
+ 	phy_data->phydev = phydev;
++	phy_data->phydev->mac_managed_pm = true;
+ 
+ 	xgbe_phy_external_phy_quirks(pdata);
+ 
 -- 
-MST
+2.34.1
 
 
