@@ -1,265 +1,372 @@
-Return-Path: <netdev+bounces-239833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FAB2C6CDE8
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 07:09:37 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACF5C6CEFC
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 07:32:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4F4414ECE0D
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 06:08:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 89FEE34D7CF
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 06:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8742EC569;
-	Wed, 19 Nov 2025 06:08:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEFD7328242;
+	Wed, 19 Nov 2025 06:26:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aO92Udtk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TQDkUn1V";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="g7yEL0VI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f228.google.com (mail-pf1-f228.google.com [209.85.210.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF781ACEDE
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 06:08:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322E931A04F
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 06:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763532526; cv=none; b=QJX9bP2kUrUzsNPnXCmBpAGqwqEvxQZleKFF4D/fcIvhJmrrkK6ap5rJP4KXMtTmJjyNY6b+knu60lU9paIIsW2QFxJF7CBIi/xn/T/vFOsmwolfxFO++cbRGJ0ybLhgiwouQ13/komH1bxm4tM/y1YjiaTuI9OG/hU5YYplUEc=
+	t=1763533588; cv=none; b=OvGXhlPWlTAsQYuRmhPPnNRd3VXSpsAxzz68+MrOSjNkzwYSE0c6PLpsDJhaUE5N9/PTT6OD1CYlK7XPVHS5dU8caJutp6DqrIxm457ALarzYVUr98V/3BT9aD6T5odRvqBWwvV9rbTtMOjQmsGjJU8Y5PxwMjpDeH0YLy1G7ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763532526; c=relaxed/simple;
-	bh=L2aL+dg6WNwBJSAe5YQ3A7tgCg+2JwA1Vhuruj4wEUk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q0Jgzpy+kTtu+LSw7nz2XHhHnjVX6U2f76G4f1S0kVhBgavhMvvoLucJEECgi+NzP6pRNG3upDhnQJa4ks6MTXeFlQfO8I2Bbm6UDTzW0uylgQYMZhVUg/04n3Mv4g1jovYzeSfyp3Oa1fpF4oddwAu1e2J0OuVZIJ5+BjTsST0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=aO92Udtk; arc=none smtp.client-ip=209.85.210.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f228.google.com with SMTP id d2e1a72fcca58-7acd9a03ba9so6303587b3a.1
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 22:08:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763532525; x=1764137325;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HgcVscQv5elPLhKxKeG6h3ww2ShFuRXN9ySPCFPoezI=;
-        b=KrsgEELZqbcdSVbZuXlPTCxMY0zT+WBAZ2Hn81c0pGLC+fsW6Nr4Il2EkUqSyfI9t0
-         qIjQZikFXPSWN7BP+MkC8coBWebuqfDPjkwfZimcseLZ2euGMkGc68XR/dFEtaVrwUWI
-         sKWGfhfaL8UFGjCSh57wXtjYkjNAx3UWxJtvt7MO3ocSbpyTmU+TM2+AQi5pmTj4KsJp
-         Qg1N04gYLr5qJpD6V2s9ZGky2UsXgZkYtbvNuNpj+YXjnDQFnevQze4YGNODiSWw8ha4
-         gRmfPRXTw5xhfWwZuknAdPY0kGt+Yd/G7iTI724svFsSVQVndV5YZpRHE06nBVwKK5n5
-         9ePg==
-X-Forwarded-Encrypted: i=1; AJvYcCXiOjbGp8rXm9JJlaiG8GQrQl+45KeX9+euFjnbAazSsM8x0HEPCHAgmQT9AwZ8g9HOaeTjTUM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNI3dChxwCJreUYOkU3gWWJ6GI05JrS5AYktfKrrsIZ7oA9V1B
-	YDwI3r/lMpRySxDGjsHMs/z7j6F7JKx5uitF+aMleWEVCuZy8+ADOo8/Vk1pLIuETD1l5WTH03T
-	P33HXe/dHynlIMxEhCcAz5F4LYjZQdErzJmIxQNe7CkNfTuMo9CNZW4nxV3EnUWoemTbxXoDNR6
-	kp5USnIAghFbhAiZMXc1P5JJbbuNFp3lc/bSG6A+fz6EWLMdWR0JddNQLD9idwWCTWwZVM7VsUT
-	/NxIcJEYve6SvZwAg==
-X-Gm-Gg: ASbGncvFVfxeszctq/kkA5p8pwkl7NF1Pk5Fis/4T1aXarMaxUh79RTySR4NyzURaCo
-	rwr10D7Tl7WKpTNJENDHVxP1cSxpee0H53GynEy2zqLB4zuw+0dGcUtzYc50CVDTxQ0Ljmc1NDh
-	mtg3aJvMEvEeiYGO2aLhFl1WfnLYPj0a/s3hNyDAbIj/mtUYpi8iYE/9MdoX7dWFctQgIwJXgzf
-	qb607DAQginq+/wxGI33ulKM+3VRnfddse4YVBOcfIJcv7JHFuwFWiB9AV2tWp8DhHZIrnYQC7P
-	fFJhQ1GW5/AEIm7Glu3BvGaSIx0D3CZ5Pe8ir5sw73Z4/sxgzReoBnFw6iYyZuD6DYAhegs565M
-	gKt2taD5j39aQkIvjPd+6uCMZxECpuJCX4hw6sA1iC6CnKvanVjVo6UvvEb/Ld7haah8+88nDhz
-	y0/eHsgNunkaFhXEdzs4paDF12Xuw4rteQSr8sV8GYTM197FkPLqxfHA==
-X-Google-Smtp-Source: AGHT+IGT2QSsMOeXQKxEr9T2bnjQcDFNtMwfjVAJ0nrXvhOtWDF+iMKRxFj23Ojt/0Ku03JolxAKU9SeC8q6
-X-Received: by 2002:a05:7022:b90d:b0:11b:8fc9:9f5d with SMTP id a92af1059eb24-11b8fc9ae93mr3739131c88.30.1763532524358;
-        Tue, 18 Nov 2025 22:08:44 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-103.dlp.protect.broadcom.com. [144.49.247.103])
-        by smtp-relay.gmail.com with ESMTPS id a92af1059eb24-11bb154e6e2sm1240985c88.7.2025.11.18.22.08.43
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 18 Nov 2025 22:08:44 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-bc4e9808b69so6687135a12.2
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 22:08:43 -0800 (PST)
+	s=arc-20240116; t=1763533588; c=relaxed/simple;
+	bh=5EDc/f+VmsHhTS8Xoex2CMoDeMz7q9mQHhQgB7L90Ng=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UhA06uts4dhj5Kf31ibjUgvMB2707nHHwSCtSjlDcFA+TdPIbYcPElqRbt5sWw5e1iBxysYlnS+YiElWH2dPIXa48WO4JlQd8aOI2W51BXquRuxmQzBZ/YN3m3cF/8aj0wCWjiaCjMsSSihJKHvxoDrW/BblrUul4bGBSHzR41g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TQDkUn1V; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=g7yEL0VI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763533585;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y1HKVzAgxx7i6yZ83N1XooYE8usn83cITm9aQzQHukg=;
+	b=TQDkUn1VKSwF9yJmeweZA4zpBTOsPsKYd12OzkXuunT3HwJeAGeemzYJy4EyE1K7hmjAoF
+	ZXoAGz+gqwaT2FQjP73qiIWLWwZvTMHIHtgoElu4kEr/SGnGlk5lIbU4fbdtJGOnHbhjYL
+	CFdn92vV9tAnaHqJFdQnJY3qOwadr48=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-12-Lx5ub-UwP7qp5dqkJeBiuA-1; Wed, 19 Nov 2025 01:26:23 -0500
+X-MC-Unique: Lx5ub-UwP7qp5dqkJeBiuA-1
+X-Mimecast-MFC-AGG-ID: Lx5ub-UwP7qp5dqkJeBiuA_1763533582
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-477a027877eso33902715e9.2
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 22:26:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1763532522; x=1764137322; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HgcVscQv5elPLhKxKeG6h3ww2ShFuRXN9ySPCFPoezI=;
-        b=aO92Udtk1W7y/rAeST05wXOfuW09bdEqUVdZ9LGb5QkzswxdSZjpD0i0TtOhNobqp6
-         45pusCw/J+6tFnCCac78MB7jCvMoT1HjOjkTM14Q+1XaTbyXv9VkCIV3kd7ko0q+Q76l
-         ZD9uHRjxMtxeUz7w8sI7KG41naS63FkCV0Yls=
-X-Forwarded-Encrypted: i=1; AJvYcCVwGtFhHa+NURp0vs5sJeXK39C+KG6NsawdVutBqT3PvvY1inpZX+K6f2PdyeomyVTJ+/8vfLw=@vger.kernel.org
-X-Received: by 2002:a05:7300:a54c:b0:2a4:3593:6463 with SMTP id 5a478bee46e88-2a4abb1cf85mr9399082eec.19.1763532522486;
-        Tue, 18 Nov 2025 22:08:42 -0800 (PST)
-X-Received: by 2002:a05:7300:a54c:b0:2a4:3593:6463 with SMTP id
- 5a478bee46e88-2a4abb1cf85mr9399062eec.19.1763532521889; Tue, 18 Nov 2025
- 22:08:41 -0800 (PST)
+        d=redhat.com; s=google; t=1763533582; x=1764138382; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=y1HKVzAgxx7i6yZ83N1XooYE8usn83cITm9aQzQHukg=;
+        b=g7yEL0VI2JbRyVQg5jLA7SxM2YqkQc+8obmmUwZX9fPJQ/QirrvAKksAPU3j8kGmIJ
+         kycnioDgDr4GreC5j/r7+1zP4evqyk3yZVlKv1iqDjkVRMIdLHizCkZLRUp8GUyJrJSh
+         C8GXJkVOrYz6ECiuh7/qwF6mAAnrmw2Lw1PAaNdv58HtGkyMOLS0MbsRZlZx3IypbDIC
+         Jxw3UcUz39p52HbH/T3Wag3qwPoUAckcdsgyRa0U7KW5Pp2YvIOxOMoCTbHzmBJhipNh
+         RZUXsiUfdsIo/y1k8Nfpw+7GaNo4AADQI9N6VupDwU9Ytm7/BOacX1KPvIKDmLnTTbRM
+         aczA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763533582; x=1764138382;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y1HKVzAgxx7i6yZ83N1XooYE8usn83cITm9aQzQHukg=;
+        b=j/l+fw4dP+m4ki4+1vFReTp3q+VhGnk+tILb+duv1m10807fBcszhfd0OtSYPf1g/R
+         al3dXzkjD6YxW5jPEZIzd25dRVJ7uR3ggYYknxzCjU8V2WilvT8f+EncnCO4ZlbEHRHH
+         uvc21xEqSSo7+DnrQscqHhlSlUYb33UZsNcKjC3cIzfDB3reLw10aRAtfQnR1JYX/LhY
+         uXOZkOpF57hRzRlOa2GhCQD6887Xw1SBdR0OrdM4v8JRfz10TRxNYUEpSRXO13ijI/1y
+         Fuq1Z81bhGpWBQSKB10PXYKmSlG00fPzobkkYhYgDRb+BhL1GSazX4gCnEOBTk9LjBzR
+         zWMA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKW0NkAEitnLT0kN8v/h6J1+C0zZ0tup536PpiQoVlaZSqz1LcERQjC6++pGQMtLs9Xu24Mxc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3m/El0y037RT1Vd0K548NDSwOc/bSEt0aPYCWyiUv77gAH/ev
+	oubIvfeo+b8zGbp7CwHPpQI5+GaDgnsi2UY9dK5keQd612E9IsJmV04GZo5C8fiTrm5n+6+onRW
+	ChIF4vH2U81sW8587fg2NGjPM8sSklcyukAxPLYQDJYwdZInfPf0h1mG0oA==
+X-Gm-Gg: ASbGncuMAp0oMsnTjnywMdQacpweMzp3rMgmH6S7wO1iY/nwGYLjL0NRQkrvNbwEwpO
+	GExCNqqE3XJVvGGU4l2qp6mGzqnvmjg4cmngbEXo+sYWwzAht4DQ/lKsXWMrfUlRo1nc5EItBnk
+	xAyeFkVxhFfq2vvmzzQ5/QueDUYSXtWg/L7EnFk56OV89bBXnhDL24c1p/FIspAwcXYtr63CkbH
+	cswkHxbKYjuxW0qF9Xi+yvk9qYG9yCFz1qmhxMV95SGgOd/3kFz8yiSZXIohw12zUxHdm+sW8Az
+	KKzgtRuNSjv8+SZ7J921QMM/Cb3U8njdlU0ONMgltttiH0gDBLA4OMhhNtxWBWTDajasKdAoTB5
+	3nSivler9OMRJepskllOIIeTzVZzUeg==
+X-Received: by 2002:a5d:64e7:0:b0:429:cd3f:f45f with SMTP id ffacd0b85a97d-42b5933dc54mr17627890f8f.7.1763533581545;
+        Tue, 18 Nov 2025 22:26:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGHbEIgDvwzU/PwaPvTTi3zQKc9nOXwTgJs02XEdEtPndPNL32NuK0ZEl+WnP3eYo21GNBnmw==
+X-Received: by 2002:a5d:64e7:0:b0:429:cd3f:f45f with SMTP id ffacd0b85a97d-42b5933dc54mr17627860f8f.7.1763533581006;
+        Tue, 18 Nov 2025 22:26:21 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f206e2sm36522931f8f.41.2025.11.18.22.26.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Nov 2025 22:26:20 -0800 (PST)
+Date: Wed, 19 Nov 2025 01:26:17 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Mike Christie <michael.christie@oracle.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: [PATCH v4 2/2] vhost: switch to arrays of feature bits
+Message-ID: <20251119012322-mutt-send-email-mst@kernel.org>
+References: <cover.1763278904.git.mst@redhat.com>
+ <17c98c7304b6d78d2d59893ba7295c2f64ab1224.1763278904.git.mst@redhat.com>
+ <CACGkMEu28fHr7Bo5Zm4chwOj-xBmTYcHM3TfXRx8OZ3OhO8q8Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251114195312.22863-1-bhargava.marreddy@broadcom.com>
- <20251114195312.22863-10-bhargava.marreddy@broadcom.com> <49930724-74b8-41fe-8f5c-482afc976b82@lunn.ch>
-In-Reply-To: <49930724-74b8-41fe-8f5c-482afc976b82@lunn.ch>
-From: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
-Date: Wed, 19 Nov 2025 11:38:27 +0530
-X-Gm-Features: AWmQ_bmhTL-ugdLACWQ9Lvw4UTqJgbfKE_qXobJyefLOoxRjjq-dfQzAhBNDMEI
-Message-ID: <CANXQDtb5XuLKOOorCMYDUpVz6aFuQgvmQZ4pS6RJGkAgeM8n1A@mail.gmail.com>
-Subject: Re: [v2, net-next 09/12] bng_en: Add ethtool link settings and
- capabilities support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, 
-	vsrama-krishna.nemani@broadcom.com, vikas.gupta@broadcom.com, 
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000941c4e0643ec69ef"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEu28fHr7Bo5Zm4chwOj-xBmTYcHM3TfXRx8OZ3OhO8q8Q@mail.gmail.com>
 
---000000000000941c4e0643ec69ef
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Sun, Nov 16, 2025 at 2:38=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
+On Wed, Nov 19, 2025 at 10:03:58AM +0800, Jason Wang wrote:
+> On Sun, Nov 16, 2025 at 3:45 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > The current interface where caller has to know in which 64 bit chunk
+> > each bit is, is inelegant and fragile.
+> > Let's simply use arrays of bits.
+> > By using unroll macros text size grows only slightly.
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  drivers/vhost/net.c   | 34 +++++++++++++++++++---------------
+> >  drivers/vhost/scsi.c  |  9 ++++++---
+> >  drivers/vhost/test.c  | 10 ++++++++--
+> >  drivers/vhost/vhost.h | 42 ++++++++++++++++++++++++++++++++++--------
+> >  drivers/vhost/vsock.c | 10 ++++++----
+> >  5 files changed, 73 insertions(+), 32 deletions(-)
+> >
+> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> > index d057ea55f5ad..00d00034a97e 100644
+> > --- a/drivers/vhost/net.c
+> > +++ b/drivers/vhost/net.c
+> > @@ -69,15 +69,15 @@ MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero Copy TX;"
+> >
+> >  #define VHOST_DMA_IS_DONE(len) ((__force u32)(len) >= (__force u32)VHOST_DMA_DONE_LEN)
+> >
+> > -static const u64 vhost_net_features[VIRTIO_FEATURES_U64S] = {
+> > -       VHOST_FEATURES |
+> > -       (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
+> > -       (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
+> > -       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+> > -       (1ULL << VIRTIO_F_RING_RESET) |
+> > -       (1ULL << VIRTIO_F_IN_ORDER),
+> > -       VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
+> > -       VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
+> > +static const int vhost_net_features[] = {
+> > +       VHOST_FEATURES,
+> > +       VHOST_NET_F_VIRTIO_NET_HDR,
+> > +       VIRTIO_NET_F_MRG_RXBUF,
+> > +       VIRTIO_F_ACCESS_PLATFORM,
+> > +       VIRTIO_F_RING_RESET,
+> > +       VIRTIO_F_IN_ORDER,
+> > +       VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO,
+> > +       VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO
+> >  };
+> >
+> >  enum {
+> > @@ -1734,14 +1734,14 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+> >                         return -EFAULT;
+> >                 return vhost_net_set_backend(n, backend.index, backend.fd);
+> >         case VHOST_GET_FEATURES:
+> > -               features = vhost_net_features[0];
+> > +               features = VHOST_FEATURES_U64(vhost_net_features, 0);
+> >                 if (copy_to_user(featurep, &features, sizeof features))
+> >                         return -EFAULT;
+> >                 return 0;
+> >         case VHOST_SET_FEATURES:
+> >                 if (copy_from_user(&features, featurep, sizeof features))
+> >                         return -EFAULT;
+> > -               if (features & ~vhost_net_features[0])
+> > +               if (features & ~VHOST_FEATURES_U64(vhost_net_features, 0))
+> >                         return -EOPNOTSUPP;
+> >
+> >                 virtio_features_from_u64(all_features, features);
+> > @@ -1753,9 +1753,13 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+> >                 /* Copy the net features, up to the user-provided buffer size */
+> >                 argp += sizeof(u64);
+> >                 copied = min(count, (u64)VIRTIO_FEATURES_U64S);
+> > -               if (copy_to_user(argp, vhost_net_features,
+> > -                                copied * sizeof(u64)))
+> > -                       return -EFAULT;
 > > +
-> > +     if (!(bd->phy_flags & BNGE_PHY_FL_NO_PAUSE)) {
-> > +             linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT,
-> > +                              lk_ksettings->link_modes.supported);
-> > +             linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-> > +                              lk_ksettings->link_modes.supported);
-> > +     }
+> > +               {
+> > +                       const DEFINE_VHOST_FEATURES_ARRAY(features, vhost_net_features);
 > > +
-> > +     if (link_info->support_auto_speeds || link_info->support_auto_spe=
-eds2 ||
-> > +         link_info->support_pam4_auto_speeds)
-> > +             linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-> > +                              lk_ksettings->link_modes.supported);
->
-> autoneg is more than speed. In fact, 1000BaseX only works are 1G, no
-> link speed negotiation, but you can negotiate pause. Do any of the
-> link modes you support work like this?
+> > +                       if (copy_to_user(argp, features, copied * sizeof(u64)))
+> > +                               return -EFAULT;
+> > +               }
+> 
+> Any reason to use a standalone block here?
 
-All the speeds we support can be auto-negotiated. We don't see any
-cases like 1000Base-X.
-Do you see any issue with the above setting autoneg?
+Just so we can name the variable "features", as well as
+having the declaration stand out a bit more.
 
->
-> > +     /* Note ETHTOOL_LINK_MODE_10baseT_Half_BIT =3D=3D 0 is a legal Li=
-nux
-> > +      * link mode, but since no such devices exist
->
-> 10BaseT Half devices definitely do exist, and there are actually more
-> appearing in the automotive field.
 
-Our devices don't support 10baseT_Half, will fix the comment.
+> >
+> >                 /* Zero the trailing space provided by user-space, if any */
+> >                 if (clear_user(argp, size_mul(count - copied, sizeof(u64))))
+> > @@ -1784,7 +1788,7 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+> >                 }
+> >
+> >                 for (i = 0; i < VIRTIO_FEATURES_U64S; i++)
+> > -                       if (all_features[i] & ~vhost_net_features[i])
+> > +                       if (all_features[i] & ~VHOST_FEATURES_U64(vhost_net_features, i))
+> >                                 return -EOPNOTSUPP;
+> >
+> >                 return vhost_net_set_features(n, all_features);
+> > diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+> > index 98e4f68f4e3c..04fcbe7efd77 100644
+> > --- a/drivers/vhost/scsi.c
+> > +++ b/drivers/vhost/scsi.c
+> > @@ -197,11 +197,14 @@ enum {
+> >  };
+> >
+> >  /* Note: can't set VIRTIO_F_VERSION_1 yet, since that implies ANY_LAYOUT. */
+> > -enum {
+> > -       VHOST_SCSI_FEATURES = VHOST_FEATURES | (1ULL << VIRTIO_SCSI_F_HOTPLUG) |
+> > -                                              (1ULL << VIRTIO_SCSI_F_T10_PI)
+> > +static const int vhost_scsi_features[] = {
+> > +       VHOST_FEATURES,
+> > +       VIRTIO_SCSI_F_HOTPLUG,
+> > +       VIRTIO_SCSI_F_T10_PI
+> >  };
+> >
+> > +#define VHOST_SCSI_FEATURES VHOST_FEATURES_U64(vhost_scsi_features, 0)
+> > +
+> >  #define VHOST_SCSI_MAX_TARGET  256
+> >  #define VHOST_SCSI_MAX_IO_VQ   1024
+> >  #define VHOST_SCSI_MAX_EVENT   128
+> > diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> > index 42c955a5b211..af727fccfe40 100644
+> > --- a/drivers/vhost/test.c
+> > +++ b/drivers/vhost/test.c
+> > @@ -308,6 +308,12 @@ static long vhost_test_set_backend(struct vhost_test *n, unsigned index, int fd)
+> >         return r;
+> >  }
+> >
+> > +static const int vhost_test_features[] = {
+> > +       VHOST_FEATURES
+> > +};
+> > +
+> > +#define VHOST_TEST_FEATURES VHOST_FEATURES_U64(vhost_test_features, 0)
+> > +
+> >  static long vhost_test_ioctl(struct file *f, unsigned int ioctl,
+> >                              unsigned long arg)
+> >  {
+> > @@ -328,14 +334,14 @@ static long vhost_test_ioctl(struct file *f, unsigned int ioctl,
+> >                         return -EFAULT;
+> >                 return vhost_test_set_backend(n, backend.index, backend.fd);
+> >         case VHOST_GET_FEATURES:
+> > -               features = VHOST_FEATURES;
+> > +               features = VHOST_TEST_FEATURES;
+> >                 if (copy_to_user(featurep, &features, sizeof features))
+> >                         return -EFAULT;
+> >                 return 0;
+> >         case VHOST_SET_FEATURES:
+> >                 if (copy_from_user(&features, featurep, sizeof features))
+> >                         return -EFAULT;
+> > -               if (features & ~VHOST_FEATURES)
+> > +               if (features & ~VHOST_TEST_FEATURES)
+> >                         return -EOPNOTSUPP;
+> >                 return vhost_test_set_features(n, features);
+> >         case VHOST_RESET_OWNER:
+> > diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> > index 621a6d9a8791..d8f1af9a0ff1 100644
+> > --- a/drivers/vhost/vhost.h
+> > +++ b/drivers/vhost/vhost.h
+> > @@ -14,6 +14,7 @@
+> >  #include <linux/atomic.h>
+> >  #include <linux/vhost_iotlb.h>
+> >  #include <linux/irqbypass.h>
+> > +#include <linux/unroll.h>
+> >
+> >  struct vhost_work;
+> >  struct vhost_task;
+> > @@ -279,14 +280,39 @@ void vhost_iotlb_map_free(struct vhost_iotlb *iotlb,
+> >                                 eventfd_signal((vq)->error_ctx);\
+> >         } while (0)
+> >
+> > -enum {
+> > -       VHOST_FEATURES = (1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) |
+> > -                        (1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
+> > -                        (1ULL << VIRTIO_RING_F_EVENT_IDX) |
+> > -                        (1ULL << VHOST_F_LOG_ALL) |
+> > -                        (1ULL << VIRTIO_F_ANY_LAYOUT) |
+> > -                        (1ULL << VIRTIO_F_VERSION_1)
+> > -};
+> > +#define VHOST_FEATURES \
+> > +       VIRTIO_F_NOTIFY_ON_EMPTY, \
+> > +       VIRTIO_RING_F_INDIRECT_DESC, \
+> > +       VIRTIO_RING_F_EVENT_IDX, \
+> > +       VHOST_F_LOG_ALL, \
+> > +       VIRTIO_F_ANY_LAYOUT, \
+> > +       VIRTIO_F_VERSION_1
+> > +
+> > +static inline u64 vhost_features_u64(const int *features, int size, int idx)
+> > +{
+> > +       unsigned long res = 0;
+> 
+> Should this be u64?
 
-Thanks,
-Bhargava Marreddy
+Ugh. Yes.
 
->
->
->     Andrew
->
-> ---
-> pw-bot: cr
+> > +
+> > +       unrolled_count(VIRTIO_FEATURES_BITS)
+> > +       for (int i = 0; i < size; ++i) {
+> > +               int bit = features[i];
+> > +
+> > +               if (virtio_features_chk_bit(bit) && VIRTIO_U64(bit) == idx)
+> > +                       res |= VIRTIO_BIT(bit);
+> > +       }
+> > +       return res;
+> > +}
+> > +
+> > +#define VHOST_FEATURES_U64(features, idx) \
+> > +       vhost_features_u64(features, ARRAY_SIZE(features), idx)
+> > +
+> > +#define DEFINE_VHOST_FEATURES_ARRAY_ENTRY(idx, features) \
+> > +       [idx] = VHOST_FEATURES_U64(features, idx),
+> > +
+> > +#define DEFINE_VHOST_FEATURES_ARRAY(array, features) \
+> > +       u64 array[VIRTIO_FEATURES_U64S] = { \
+> > +               UNROLL(VIRTIO_FEATURES_U64S, \
+> > +                      DEFINE_VHOST_FEATURES_ARRAY_ENTRY, features) \
+> > +       }
+> >
+> >  /**
+> >   * vhost_vq_set_backend - Set backend.
+> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > index ae01457ea2cd..16662f2b87c1 100644
+> > --- a/drivers/vhost/vsock.c
+> > +++ b/drivers/vhost/vsock.c
+> > @@ -29,12 +29,14 @@
+> >   */
+> >  #define VHOST_VSOCK_PKT_WEIGHT 256
+> >
+> > -enum {
+> > -       VHOST_VSOCK_FEATURES = VHOST_FEATURES |
+> > -                              (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+> > -                              (1ULL << VIRTIO_VSOCK_F_SEQPACKET)
+> > +static const int vhost_vsock_features[] = {
+> > +       VHOST_FEATURES,
+> > +       VIRTIO_F_ACCESS_PLATFORM,
+> > +       VIRTIO_VSOCK_F_SEQPACKET
+> >  };
+> >
+> > +#define VHOST_VSOCK_FEATURES VHOST_FEATURES_U64(vhost_vsock_features, 0)
+> > +
+> >  enum {
+> >         VHOST_VSOCK_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
+> >  };
+> > --
+> > MST
+> >
+> 
+> Thanks
 
---000000000000941c4e0643ec69ef
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-tJVewHuOmXgWQxNWV7Oiszu1d9xAcqyj65s1PrEIIaHnxEM3eTK+teecLEy8QymZjjDTrCHg4x36
-2AczdlQAIiq5TSAucGja5VP8g1zTnfL/RAxEZvLS471GABptArolXY2hMVHdVEYcTduZlu8aHARc
-phXveOB5/l3bPqpMVf2aFalv4ab733Aw6cPuQkbtwpMFifp9Y3s/0HGBfADomK4OeDTDJfuvCp8g
-a907E48SjOJBGkh6c6B3ace2XH+CyB7+WBsoK6hsrV5twAXSe7frgP4lN/4Cm2isQl3D7vXM3PBQ
-ddI2aZzmewTfbgZptt4KCUhZh+t7FGB6ZKppQ++Rx0zsGN1s71MtjJnhXvJyPs9UyL1n7KQPTEX/
-07kwIwdMjxC/hpbZmVq0mVccpMy7FYlTuiwFD+TEnhmxGDTVTJ267fcfrySVBHioA7vugeXaX3yL
-SqGQdCWnsz5LyCxWvcfI7zjiXJLwefechLp0LWEBIH5+0fJPB1lfiy1DUutGDJTh9WZHeXfVVFsf
-rSQ3y0VaTqBESMjYsJnFFYQJ9tZJScBluOYacW6gqPGC6EU+bNYC1wpngwVayaQQMIIGqjCCBJKg
-AwIBAgIMFJTEEB7G+bRSFHogMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
-ExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBDQSAy
-MDIzMB4XDTI1MDYyMDEzNTI1NVoXDTI3MDYyMTEzNTI1NVowge0xCzAJBgNVBAYTAlVTMRMwEQYD
-VQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTYW4gSm9zZTEZMBcGA1UEYRMQTlRSVVMrREUtNjYx
-MDExNzERMA8GA1UEBBMITWFycmVkZHkxGDAWBgNVBCoTD0JoYXJnYXZhIENoZW5uYTEWMBQGA1UE
-ChMNQlJPQURDT00gSU5DLjEnMCUGA1UEAwweYmhhcmdhdmEubWFycmVkZHlAYnJvYWRjb20uY29t
-MS0wKwYJKoZIhvcNAQkBFh5iaGFyZ2F2YS5tYXJyZWRkeUBicm9hZGNvbS5jb20wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQCq1sbXItt9Z31lzjb1WqEEegmLi72l7kDsxOJCWBCSkART
-C/LTHOEoELrltkLJnRJiEujzwxS1/cV0LQse38GKog0UmiG5Jsq4YbNxmC7s3BhuuZYSoyCQ7Jg+
-BzqQDU+k9ESjiD/R/11eODWJOxHipYabn/b+qYM+7CTSlVAy7vlJ+z1E/LnygVYHkWFN+IJSuY26
-OWgSyvM8/+TPOrECYbo+kLcjqZfLS9/8EDThXQgg9oCeQOD8pwExycHc9w6ohJLoK7mVWrDol6cl
-vW0XPONZARkdcZ69nJIHt/aMhihlyTUEqD0R8yRHfBp9nQwoSs8z+8xZ+cczX/XvtCVJAgMBAAGj
-ggHiMIIB3jAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADCBkwYIKwYBBQUHAQEEgYYwgYMw
-RgYIKwYBBQUHMAKGOmh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjZz
-bWltZWNhMjAyMy5jcnQwOQYIKwYBBQUHMAGGLWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dz
-Z2NjcjZzbWltZWNhMjAyMzBlBgNVHSAEXjBcMAkGB2eBDAEFAwMwCwYJKwYBBAGgMgEoMEIGCisG
-AQQBoDIKAwIwNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3Np
-dG9yeS8wQQYDVR0fBDowODA2oDSgMoYwaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3I2
-c21pbWVjYTIwMjMuY3JsMCkGA1UdEQQiMCCBHmJoYXJnYXZhLm1hcnJlZGR5QGJyb2FkY29tLmNv
-bTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAd
-BgNVHQ4EFgQUkiPQZ5IKnCUHj3xJyO85n4OdVl4wDQYJKoZIhvcNAQELBQADggIBALtu8uco00Hh
-dGp+c7lMOYHnFquYd6CXMYL1sBTi51PmiOKDO2xgfVvR7XI/kkqK5Iut0PYzv7kvUJUpG7zmL+XW
-ABC2V9jvp5rUPlGSfP9Ugwx7yoGYEO+x42LeSKypUNV0UbBO8p32C1C/OkqikHlrQGuy8oUMNvOl
-rrSoYMXdlZEravXgTAGO1PLgwVHEpXKy+D523j8B7GfDKHG7M7FjuqqyuxiDvFSoo3iEjYVzKZO9
-NkcawmbO73W8o/5QE6GiIIvXyc+YUfVSNmX5/XpZFqbJ/uFhmiMmBhsT7xJA+L0NHTR7m09xCfZd
-+XauyU42jyqUrgRWA36o20SMf1IURZYWgH4V7gWF2f95BiJs0uV1ddjo5ND4pejlKGkCGBfXSAWP
-Ye5wAfgaC3LLKUnpYc3o6q5rUrhp9JlPey7HcnY9yJzQsw++DgKprh9TM/9jwlek8Kw1SIIiaFry
-iriecfkPEiR9HVip63lbWsOrBFyroVEsNmmWQYKaDM4DLIDItDZNDw0FgM1b6R/E2M0ME1Dibn8P
-alTJmpepLqlS2uwywOFZMLeiiVfTYSHwV/Gikq70KjVLNF59BWZMtRvyD5EoPHQavcOQTr7I/5Gc
-GboBOYvJvkYzugiHmztSchEvGtPA10eDOxR1voXJlPH95MB73ZQwqQNpRPq04ElwMYICVzCCAlMC
-AQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMf
-R2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0EgMjAyMwIMFJTEEB7G+bRSFHogMA0GCWCGSAFlAwQC
-AQUAoIHHMC8GCSqGSIb3DQEJBDEiBCBbSJ7/ObU8h+rlqgU15/zfBKI4TYE42n8z46YyJ/hJrTAY
-BgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yNTExMTkwNjA4NDJaMFwG
-CSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYI
-KoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBv+WHC
-040ypLJB2BXE7KIXicLdAnUzHFwsDpz2uVP4CSDH9ztNjuJJ5aMdwm2lVcqIk1OdzVdfA8k4953m
-pNOUf7kotL6YOfJfwuT0z1D7bET3CbB2fFWkf0pLd+75Ah7bv8aAvrkmkdW4Ljt7CHJNAGg53+rU
-SAfpdGaZEOz//g6j6aY8PEObU1js7f5m3sHEyS3AKIk8xw5BlqmwOVeczWvtJCYwCEfLqRaFcgtP
-v729VWSepk1AaherJKnog3jm0CJ1wgH6oH9qgYHNQ4CymIPbltdhk/6aBpO/1uYe5mozUfuKt7aU
-r/69ltw14pxwNjpaQBB+r6xn/PBjZEq5
---000000000000941c4e0643ec69ef--
 
