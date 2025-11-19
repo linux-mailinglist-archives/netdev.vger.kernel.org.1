@@ -1,122 +1,248 @@
-Return-Path: <netdev+bounces-240029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47C09C6F807
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:03:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A78A5C6F855
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:05:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B85464EFA3A
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:49:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 0FE8D31B68
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:55:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A707C2FE045;
-	Wed, 19 Nov 2025 14:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1939D27702E;
+	Wed, 19 Nov 2025 14:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KgyrHhUU"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="djcYSUtE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013062.outbound.protection.outlook.com [40.107.201.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DCA2848BE
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 14:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763563599; cv=none; b=QBFtVcaVQUVhgj/6jsV9AVSx1IjDN6SDxoCTsJEKoC+7gzTE6j3+1KSgciMgoSisPQNHtlvwLyodhZTJxTo9xmYrlRsCCjQd+5LeqkvK1IN5PYxbXIoYIlBLhOxdVvPNRWQWDnzj+/wmL51s1o8nbF3dygqv/3jaWnRQlA/s6kM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763563599; c=relaxed/simple;
-	bh=dVUb+h86+CetBpU7sUv/ON54rwF6tzp0gCaIYMl6X9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SlfyYrBKN9jRbww+VkKA+xwULW/Zt0NAtn+/e7AsVhzOWb8h4tv7k+93IFr2h3OxjsD2oN2aHQKzErrq2yhOareknT3dP/zWLvQGdG5hjiodHz0Fd5RAEoVctOBgjDO4a9pzSpWtAvhoMc15xaQyLgZlsTxoGVreNI8vE47lTpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KgyrHhUU; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-297d4ac44fbso6872685ad.0
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 06:46:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763563597; x=1764168397; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rQA352dXJcZAKR6yJ6U8qnfyj40QR0CCGB8Vb/aE0V8=;
-        b=KgyrHhUUWsGidI7t0Cbx5tMim7p0fKS5NhpubieGc0j7rpiDgl3IdmuC8ndgWFRiqK
-         QSVas3Oky0bC8hTdagQhSkhrbcHijtPSj77OtmI3C1mGricfClpUdPVD3cpJhLjZRNAz
-         wEGjJy1gBuf0Wg/+JeuxjGlknUqBiHOoYuanssuvDmmZt8Tk+bqRUM3HoKZTzmO7i/8I
-         IvoasshX5cWAiBMIHLXl979o0Zhhw2jTU0hT6g3yi4x7YhgJbTgc7hRUOBRDGQTPOpG4
-         ytGd/PJkMwcsWhsbs5mQuiA0Yxd6RVx0BimRM803P622gfXpvajaiIuDz2nZEGuV+QQG
-         2UYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763563597; x=1764168397;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rQA352dXJcZAKR6yJ6U8qnfyj40QR0CCGB8Vb/aE0V8=;
-        b=GIFQ2FzwvnbsuJTlKTjNw3hT44qVORGfkDROvvEFyqqhuSwJRM/ElJ8GwHRSVGEuKn
-         Dz5HRZ67IZP+dJJRhBNzGRLwEEYncQ/ajpyEJg7IS/grQo/fCbQ2Buy6JHIduKxDopsk
-         9KLYo1h18PIXphxSjmKxb4KpcbYQcBjp29OEHIW8SitZ5zxLCvLjcSbYW8YtMScdIanS
-         FsBDtp1+DB32CkMNqqwQ2dQKP0NuKB27iXsLl4zRFCYjo3Y0SKyOGEhDMhKa8ZfmQJ/Q
-         cK4dRbJh087vT4uRgzS/1d2knG3TqMAgVYp6a3AYol1jZr6fgxcFehYHzDt3sYPUEbkE
-         QBIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKiiNjv8IgXghRIGqzTHIYqF1p1FVv820n2CqUAt4IRTtqrqmjyZaSQ0wpDO0j1+IAauX/+nk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylIB8wCm0ZlAgFaG+XfGO6pyM9euzrqTYsyaFq34vh4cTXT1tp
-	i13BCOuEfmEMOTycTp0bqvAJ/+b4VrY1l1M5V7HmpeXeiQd7My18hiAI
-X-Gm-Gg: ASbGncvkbIbOGQXiHBmOJ7lrXfWL2snxVdyQeiKTuN/gpfO1d/nqnMbHMQXZhm+Q1um
-	c77cna1P9D1ajWTgIa+oWHrtXSQbAneJfRBQ0ZkpC1OxzCoefbdh1RKjKX84+QgxoXcWjpzfVOs
-	R8w7fZLUQpprb/poHQhzC1eEN5Vqr2Ki6HhFiNDPZTdyuK/oaPtc4+kNlsHbkPrqpVEnk8uwXWn
-	SuS6UCJHwJQvEQmPO1zLtymhGxJxQa2irvmLs2j3cCX88iIoJRaQ4238/dEHXH0D5iP1aZupzi4
-	DWwisLP3GacSWA4qgHEsHBXSUQwSWxbzTk/8aQoHof6DyfFDjbmjPBYswcTuSdTe7/4xDIuYu2g
-	CMQh2PlPTFZAS2SeRcAClG7ARzImJqoBd6BksrhPoQDCYdzbKgbfXka+Oy8D+s1a+WzFF4Yj8RM
-	1MvkLxGi8=
-X-Google-Smtp-Source: AGHT+IGpcGVpZRl1c35GOlHBj+kG5Sp++Bpj1FwdXDfVRMbITTp+GnbP5BkK0sgWjprikSCI+cKM4A==
-X-Received: by 2002:a17:903:b0b:b0:295:82d0:9baa with SMTP id d9443c01a7336-29a0624f595mr32999145ad.17.1763563597199;
-        Wed, 19 Nov 2025 06:46:37 -0800 (PST)
-Received: from fedora ([122.173.30.56])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c1800ebsm208577035ad.0.2025.11.19.06.46.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 06:46:36 -0800 (PST)
-From: Shi Hao <i.shihao.999@gmail.com>
-To: davem@davemloft.net
-Cc: pabeni@redhat.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	dsahern@kernel.org,
-	kuniyu@google.com,
-	ncardwell@google.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	i.shihao.999@gmail.com
-Subject: [PATCH] net: ipv4: fix spelling typo in comment
-Date: Wed, 19 Nov 2025 20:07:37 +0530
-Message-ID: <20251119143737.22477-1-i.shihao.999@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61624C133;
+	Wed, 19 Nov 2025 14:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763564126; cv=fail; b=cbPTTXta6n4GY+xTByHRGz+G6z6QKP1taVZY4/IpOJBgQwQOHXGMSZScAZyxEfLF1yrNlfKgspREv+rXCl3btvaK03Dz5LtcGRv05wlAxGRE3jbtmq3t9EFCqP1NW8iX1elX4y98LTsXmAibMQeDi6OEZxMsgEYwb1ECZh60yfY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763564126; c=relaxed/simple;
+	bh=pihqpKIY6b9vFD/Tsfho/JszANUmp4BWZFq/SBhi7t4=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=Mpiq6gl2pp4KLvbH9FNJg4FNHvltK9eZKvRJsnxJuJfNOgZxr4FlQGDXV0JapNkb+T3xJBH0ey+aeUYCOHPs/1NenEoMMQWfCgzvkJQqNAMVziyL8DWQCMyMFlbK8EikUECAnZj6ECkCJMSNRCH1bftRM5kQFSJh0psZU0MM+dk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=djcYSUtE; arc=fail smtp.client-ip=40.107.201.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wclMEuTJmZ2yy8aFkJ4ihgCJuUyL8jnIgsKNj485iVKefer9EU6tc1LU2+AoWOtUNlP2ti21fjVpzAf5Z9VubYRJ2bstd7NvnSgqPsPTCNEf2AY5wM4DLtfvEmvVJ+GEHLkdqc/1riSU7u8ZexTIZHQ3V/Wt4k0wdXCdCdPDKVEoqzVRFXFCwj9HYZmgsxO27bRg/RpnG1pHRDs6nXgCyNTQsbdMV9tyfIFylSK3mZZwuFf8qeiix3WgUe9yqqFVFtdkv8qUoUMYwa6b9l5VrFL64D2xTd3yXiTPxqX2evcyTvEAocwdtax91k7R53Y2lx5P69LK4gox3COh1PzVOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+tT70b5AfeRzKX/vo5NhxFKbaZRejQ8p7yVbqWLy0OI=;
+ b=XbtosCZU0HRBltX6h3MPIFojowsTnMBK9U7Ek15NqwuzR0+P6GiV0b3UFXIugfJGjVCHxRY1fgsdyxZvQwBd66zZ+CEPK+SEZbqH7Veqhxclf0dJXGWW54mixBEXmYVQjgoUOgLR1whzdTqxnLs4zLdkPR0HXH8IRz5wbYhyYhzd4xQcdj/Hl17fbzk7+wfI1k2TPSF9hVCSivZBgTy75Vfckf9YufSBIYNJrjdandfK8H8ai6dnw/ANbVwjO+V/KF/keuLb7lc/+NrkhOpqMHhkhXjUNDSgbszt/fdkx5eMIbORgs0hTl4/5QgsYDk56kXQYQ2sfHwfTnhn6Tdk2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+tT70b5AfeRzKX/vo5NhxFKbaZRejQ8p7yVbqWLy0OI=;
+ b=djcYSUtEWBRNEOA8QzJMM4LAHFG5QFjP89q+1SCSPueIli/3iE4YNGDhcJ0GG7gvuQjaE6MREXJmkMRR5gPOnrUf3bquEJHVw4xOwJJQ/k1ZAcU4LSNCNS/NMWzgiaXLY4qaNGG9mg9CL04LtrfdEuqSMDMsvT9R/eO77ZDm+xN2yrllTo1xuOslzVbqvr1wGQEjX6tllQWxB9wAByiqNDiYXwStGmFGA3O9HUZ9pCliGYN3/CJ8HlDbrfc80XwTy3qVVjEXnkounLCDCapdAEAKm2OGIGGCKnADW5fN9XrSiSGUvRa4epzQXJeOJ0/wFkmsmddTzZNBfvxSYveYDA==
+Received: from MN2PR08CA0017.namprd08.prod.outlook.com (2603:10b6:208:239::22)
+ by DM6PR12MB4140.namprd12.prod.outlook.com (2603:10b6:5:221::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Wed, 19 Nov
+ 2025 14:55:17 +0000
+Received: from MN1PEPF0000ECDA.namprd02.prod.outlook.com
+ (2603:10b6:208:239:cafe::c5) by MN2PR08CA0017.outlook.office365.com
+ (2603:10b6:208:239::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Wed,
+ 19 Nov 2025 14:55:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MN1PEPF0000ECDA.mail.protection.outlook.com (10.167.242.134) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9320.13 via Frontend Transport; Wed, 19 Nov 2025 14:55:17 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 06:54:59 -0800
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 06:54:53 -0800
+References: <20251118215126.2225826-1-kuba@kernel.org>
+ <20251118215126.2225826-4-kuba@kernel.org>
+User-agent: mu4e 1.8.14; emacs 30.2
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<willemdebruijn.kernel@gmail.com>, <shuah@kernel.org>, <sdf@fomichev.me>,
+	<krakauer@google.com>, <linux-kselftest@vger.kernel.org>, <petrm@nvidia.com>,
+	<matttbe@kernel.org>
+Subject: Re: [PATCH net-next v2 03/12] selftests: net: py: add test variants
+Date: Wed, 19 Nov 2025 15:42:39 +0100
+In-Reply-To: <20251118215126.2225826-4-kuba@kernel.org>
+Message-ID: <87ecpucbt7.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECDA:EE_|DM6PR12MB4140:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6bb7fd3e-8e98-4ccf-dc6c-08de277ba786
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|7416014|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Edso0fMe9qn0tA3VxL6YUhAk6FghKYYdCUgr6IacK+Xx+GbYFXu6/jO9yhxE?=
+ =?us-ascii?Q?kRemynqKXSt6XOhEroRE4s7NfhSpZUTkPePB/e/s3KLkxFia8kG1m42of3Fz?=
+ =?us-ascii?Q?ZJ8iG5im4fNxP3RXMsCw/YJsSjcWZ7R3/sAe1GX3KPGjaWtZWOWLXKWRujei?=
+ =?us-ascii?Q?MiZr7usEOTs7mKRB0qFHUTriR+lRtym5KoDvTXx5oJXQMnLS2pHJf+IgJdgw?=
+ =?us-ascii?Q?Qw4GFyB9sAXTG8Ih2KSb+GtA2Oqomy8+JIG18sZf7FPTc7OxF91QOTRi6uU3?=
+ =?us-ascii?Q?fqy88SvmCRAGu1YwZaJBFlycYXBrwDhnRJrS31uc7orrkYFUu5rPCR+hUf/I?=
+ =?us-ascii?Q?u70KtxFbQJt4DF2pQWAmpH1hDRbKItD8SCaG95JHBYYJBk2/6FOJvVCoQFOy?=
+ =?us-ascii?Q?ThwBO1rNGJOydMiyPU7im3Wdt46IP+7beDE7y5rji+EeafiE9w/f55FHZciM?=
+ =?us-ascii?Q?evmus1qZmlbdnZLp+cNeX6c/HFyqRr0fdsTqp+Ae+TfT8p8u44tyozokE1Rn?=
+ =?us-ascii?Q?JWtF0UaFXboNxXj6FU4LFOdZbIAAI/llfOt8fZswuVI84/Du//UMwxaJBsNC?=
+ =?us-ascii?Q?uceyY9Pahz1NwVUPi0gDOU3cb5nxkx6vdFNG0IEkDK65Ks3SpeTUw67WPdZU?=
+ =?us-ascii?Q?jrrTgcVTgaTcwBpzyGWOvlNqofgWsm3fHsxdh4VmoEdXUWDomKWh7pgkTTMT?=
+ =?us-ascii?Q?FFCvqRSUNp+hKYUEVy+btK/7yryGawJuP/5e2se7WTIqn0LPWxd2q7myZ/Hy?=
+ =?us-ascii?Q?SYsCBa6azXi/B566vLbkBBQB1dlchHWuoh2FyYuIRiXC8kec0GbruTWloJ/Z?=
+ =?us-ascii?Q?tpSnBfn0qFIipta3V3CuKLeut+3UoWm29JBFtZNf5Q24rr0Khfztg2pXgBAY?=
+ =?us-ascii?Q?CrQGMWuXgvtthJUHtFS59Oda3AdQPlV5PthOCz/KHhs4zoI+d69q0nIE7iPH?=
+ =?us-ascii?Q?/2Ja2OXaLABK8NKGBNBYC+/ID4dGt8MDaaF16edUBoacGiwMfbwSD4vO/XGm?=
+ =?us-ascii?Q?VrCZWwpXvs+flE8gdIXGUCQq4xM7P1EuPZpnnJC91aIsPASdd5wxHCzQvKV+?=
+ =?us-ascii?Q?cE6PmawxrKYW/5B87FYIKWzNHqnVQRqOLHVWDwk7WgCHzuWyH+YM557WbRGU?=
+ =?us-ascii?Q?wp7xkObE2UME3sWChnyFwola/hunEsagpIVDm0NL7qbsWDydA9ZbGEign9Rh?=
+ =?us-ascii?Q?C/hu6jGEVkzkHuR9vq//rIza/FKsG/PylUo5v0nlpq59pIiAnbRjwDWhiiv7?=
+ =?us-ascii?Q?t6iKJOS+185elV0jDPOMJ+mfnduGC4RuvTFMSroBdZOfOfk83p7QX7glLdZa?=
+ =?us-ascii?Q?cshWoLYCEbZT+JBuoUAffqWBiT7VN4lVFKKytRXDuOcNeIN+EOft7r9Liuv0?=
+ =?us-ascii?Q?r7JZkCcq+fmfuo7X1u6v6VwlgrYNPebc1FAC/40TN7x2OXfjWGY8t8rJ3auH?=
+ =?us-ascii?Q?J2ngaNsS+aqGrS3OI3EUxeXoDwq8MjgFVI3TIUMCY1GrdBZ2F8pyTqCrw+Fb?=
+ =?us-ascii?Q?+jK+XEHz1f3+1kkm16wvcYBrhvSf0GnVnzkFOKyi9ukzQsP6S+LGmqDa1aRc?=
+ =?us-ascii?Q?NoBNnd0AnAvg/7r0cKs=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(7416014)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 14:55:17.6448
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6bb7fd3e-8e98-4ccf-dc6c-08de277ba786
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECDA.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4140
 
-Convert "Segement" to "Segment" in the code comment.
 
-Signed-off-by: Shi Hao <i.shihao.999@gmail.com>
----
- net/ipv4/syncookies.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Jakub Kicinski <kuba@kernel.org> writes:
 
-diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-index 569befcf021b..7d0d34329259 100644
---- a/net/ipv4/syncookies.c
-+++ b/net/ipv4/syncookies.c
-@@ -131,7 +131,7 @@ static __u32 check_tcp_syn_cookie(__u32 cookie, __be32 saddr, __be32 daddr,
+> diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
+> index 52c42c313cf2..47e0af210bee 100644
+> --- a/tools/testing/selftests/net/lib/py/ksft.py
+> +++ b/tools/testing/selftests/net/lib/py/ksft.py
+> @@ -185,6 +185,49 @@ KSFT_DISRUPTIVE = True
+>      return wrapper
+>  
+>  
+> +class KsftNamedVariant:
+> +    """ Named string name + argument list tuple for @ksft_variants """
+> +
+> +    def __init__(self, name, *params):
+> +        self.params = params
+> +        self.name = name or "_".join([str(x) for x in self.params])
+> +
+> +
+> +def ksft_variants(params):
+> +    """
+> +    Decorator defining the sets of inputs for a test.
+> +    The parameters will be included in the name of the resulting sub-case.
+> +    Parameters can be either single object, tuple or a KsftNamedVariant.
+> +    The argument can be a list or a generator.
+> +
+> +    Example:
+> +
+> +    @ksft_variants([
+> +        (1, "a"),
+> +        (2, "b"),
+> +        KsftNamedVariant("three", 3, "c"),
+> +    ])
+> +    def my_case(cfg, a, b):
+> +        pass # ...
+> +
+> +    ksft_run(cases=[my_case], args=(cfg, ))
+> +
+> +    Will generate cases:
+> +        my_case.1_a
+> +        my_case.2_b
+> +        my_case.three
+> +    """
+> +
+> +    def decorator(func):
+> +        @functools.wraps(func)
+> +        def wrapper():
+> +            return func
+> +        wrapper.ksft_variants = params
+> +        wrapper.original_func = func
+> +        return wrapper
+> +    return decorator
 
- /*
-  * MSS Values are chosen based on the 2011 paper
-- * 'An Analysis of TCP Maximum Segement Sizes' by S. Alcock and R. Nelson.
-+ * 'An Analysis of TCP Maximum Segment Sizes' by S. Alcock and R. Nelson.
-  * Values ..
-  *  .. lower than 536 are rare (< 0.2%)
-  *  .. between 537 and 1299 account for less than < 1.5% of observed values
---
-2.51.0
+This uses the wrapper() merely as a vessel to carry the three
+attributes. I think the idea would be better expressed as a namedtupple
+
+    from collections import namedtuple
+
+    KsftCaseFunction = namedtuple("KsftCaseFunction",
+                                  ['name', 'original_func', 'variants'])
+
+    def ksft_variants(params):
+        return lambda func: KsftCaseFunction(func.__name__, func, params)
+
+> +
+> +
+>  def ksft_setup(env):
+>      """
+>      Setup test framework global state from the environment.
+> @@ -236,7 +279,19 @@ KSFT_DISRUPTIVE = True
+>                      break
+>  
+>      for func in cases:
+> -        test_cases.append((func, args, func.__name__))
+> +        if hasattr(func, 'ksft_variants'):
+
+Then this could just be if callable(func) just call it, else the complex
+processing.
+
+I'm not married to the namedtuple idea, but I consider using a function
+as essentially a struct wrong. It should be a general object.
+
+> +            # Parametrized test - create case for each param
+> +            for param in func.ksft_variants:
+> +                if not isinstance(param, KsftNamedVariant):
+> +                    if not isinstance(param, tuple):
+> +                        param = (param, )
+> +                    param = KsftNamedVariant(None, *param)
+> +
+> +                test_cases.append((func.original_func,
+> +                                   (*args, *param.params),
+> +                                   func.__name__ + "." + param.name))
+> +        else:
+> +            test_cases.append((func, args, func.__name__))
+>  
+>      return test_cases
 
 
