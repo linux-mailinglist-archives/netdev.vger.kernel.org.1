@@ -1,178 +1,241 @@
-Return-Path: <netdev+bounces-239902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CCA2C6DBFE
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 10:35:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CFDC6DC22
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 10:37:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 45F633876E5
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:31:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 247EF2DB9E
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:37:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE69026E703;
-	Wed, 19 Nov 2025 09:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC43733F37E;
+	Wed, 19 Nov 2025 09:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="4hrZdawV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qjhe9rZ7";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Amaqy0qK"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013039.outbound.protection.outlook.com [40.93.201.39])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368AA38DF9
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 09:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.39
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763544711; cv=fail; b=Lk2A6cTqRCEnvrrYEQ9mhiTAgp47dW/OYaSP0MlH2uFCbd74AR3od4tYSknYR3XMxY2H/mwgjYk0nlMIkOQQov3MjWRmy+7Vr0wzSTERIlyYwTJUbCNlLL49mXAch+u4d9IHU2429Qi3byNxnoMNrfY6vurVMlqs0jIwrnI1RDM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763544711; c=relaxed/simple;
-	bh=16C8/tRDFuWa+547PyY3wELJWJ+GLPk6cmg8IUs7kI0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jk5xIBNc0d6dUuWIOdQF2ri7wcpSYKKMTu7nxQa8p+Q8CBI1movCfouwHJVIgnfVt9f6aKbDhBC7bkeejk8WLAyXkGfjj89eKMP+wCmtT+v7LJGCiPaImkgCkBcllxio8Dhv/izFfKwtxO5CGazW8dYUdnDplRadk40loJ9KiF4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=4hrZdawV; arc=fail smtp.client-ip=40.93.201.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RlziIx4JXKKGghSlPZb1c9IpWfo2w0MZEBgInfOZ7GM/EHTRCXVMrX4hmpNu+0kXy+Ud89GdvA5MwAvIPSqbaxiN+9hthOp8WkvKQHPnLkHHdBAlZRvI+6WUlLarrMBNki/msw+OKrVQNEN1VFrdG3Om4s1cnlpnjiBjAXO5BZhfFeERj7ObyqzSG2OlbtmwGu+AwEuUzHxKVwV3VhGPrgU6xaB6LJseGDj/9fGkzZvL5MZUqpf3eN1EEIOTWyfs8rjn1HLPAtj+7peL9d3y2YVyGjsm4c7ix+dLwcx4ow+Yz72ze3WD6orakGTYJSoSdnvvZiwJpUQ8CHIreK1QXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0vkbQLp8qQ7phI5wloyjRYddARdNqgJesIxxwMWo0EM=;
- b=nr0V9PhXmCnjjyJmzvVW19OGuhWGsdR/3xOfyNL69Aue5xU3QA3RCJFIEzgpigDut3EyI8OhzbKmbFAZbJjM8FfNIsVaXtkiKM3aZMKISC3wQ1c4/ghWnzYLO03jVpwdiWhFJ5MZXZlSP0zGbUKvekxYAWj6rWsphsiBYwItd0AqS8B9Ui8hU4IwafqxWeL+zMi5bJNnZPTIlfboiy5V3my4kw3fvxZC/yn0zREjJ07afkxDI+OV+y3spvM39bx07vk2g5g2lu9QbbD2oX4IKnBRaCXd2ylAjugYbzw1pAHA1+eC0V0hFIIDdwPd8MsrXzTwPFNVnEwzUzIGO89h6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0vkbQLp8qQ7phI5wloyjRYddARdNqgJesIxxwMWo0EM=;
- b=4hrZdawVOF7ubDfOHsm4cZn0jZqwUwC9O8Kujl8otp+OQCr2//VQxs7wGte0Y6xo+wZRwd5mRxVPyQqcH/oHLB3zOdIt1nNGsAYRDMX2qWuK8pmpZopxiJ68KLN33GdrviitE6zGNwmvmsOFOgXLCSH3NXhhJKsf3/m29bH9qqc=
-Received: from SA0PR11CA0112.namprd11.prod.outlook.com (2603:10b6:806:d1::27)
- by DS7PR12MB6120.namprd12.prod.outlook.com (2603:10b6:8:98::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9343.10; Wed, 19 Nov 2025 09:31:46 +0000
-Received: from SN1PEPF0002BA50.namprd03.prod.outlook.com
- (2603:10b6:806:d1:cafe::f6) by SA0PR11CA0112.outlook.office365.com
- (2603:10b6:806:d1::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Wed,
- 19 Nov 2025 09:31:46 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SN1PEPF0002BA50.mail.protection.outlook.com (10.167.242.73) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9343.9 via Frontend Transport; Wed, 19 Nov 2025 09:31:46 +0000
-Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 19 Nov
- 2025 01:31:44 -0800
-From: Raju Rangoju <Raju.Rangoju@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-	<davem@davemloft.net>, <andrew+netdev@lunn.ch>, <Shyam-sundar.S-k@amd.com>,
-	Raju Rangoju <Raju.Rangoju@amd.com>
-Subject: [PATCH net-next] amd-xgbe: let the MAC manage PHY PM
-Date: Wed, 19 Nov 2025 15:01:24 +0530
-Message-ID: <20251119093124.548566-1-Raju.Rangoju@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8649341AB8
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 09:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763545007; cv=none; b=ISZ/7iBJs/bnVPGtme9XOAKB6NM3JY4ze5QgFm7TuVDIdYRsoIi0YzxvdsMst+TsEBOfHIh0Zam8C4cy9vJF53uHBsm55COqNAckzGZAEXqm/lBxHY+OPnOPFq8GfZpCnKXc+3HJnpOnDQX+xRE04VThv3qb7J8lxvF3uHNmrvo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763545007; c=relaxed/simple;
+	bh=ddbxYFNYyxO0crczqbpFFeeu60pejIjeVYJrf2gzAO0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IJx1DoWZho9YRpV5ARqK6afp2kIki1SnPg3PAHXFDlcZKEHdC3b/8bb9Eaf+cEX0k1y8ITV+2pE8xx76WK5xmXNr8xfrHcbMC14bf0vbnq31UyCLqAp5CNNKip/b2a7UTjmXzL7LSACXI2tgvUKT2H1IH7iEpXhiX7eKqkRvfos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qjhe9rZ7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Amaqy0qK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763545004;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bKG1jT74K/MRXdmPINAtGMWDRUANM+Qsoq8JeULmVME=;
+	b=Qjhe9rZ7mRo28prql2ATC6jRFQvOi1kmhO2fs2s/PKJtUjW4+4aLvix4KtgOnJU7N/AZWz
+	L60+JEJM9ItKFr2rItKOCHkw3Rx8Is/NVN/fUjmDAyEolBUUCeFfzCTnmXmTSTSqDZjz/N
+	caKCjZWXQQtREFcrBFICkYwmphuR45Y=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-634-imLb7GuYMxS3ybiq4fL61Q-1; Wed, 19 Nov 2025 04:36:42 -0500
+X-MC-Unique: imLb7GuYMxS3ybiq4fL61Q-1
+X-Mimecast-MFC-AGG-ID: imLb7GuYMxS3ybiq4fL61Q_1763545002
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-429cbd8299cso3016392f8f.1
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 01:36:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763545001; x=1764149801; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bKG1jT74K/MRXdmPINAtGMWDRUANM+Qsoq8JeULmVME=;
+        b=Amaqy0qK7z8WN6n30wT0ewFN9Pi2NE0wvoUDv8ac38PYg05rsoZq70U76wll7CTndh
+         fD7vkz39YZoB6A1Tk0CQaLMVBeT89JMzA9g+bM0iU2nRoDo+QTKSeKGY7yosXO6Sk+Wp
+         15Kohp7XYmTlR9kHQujIWHHbx7KVz9kHyKfQJbr92Lycft3Zg0lB2gfYgFa561hra39Z
+         QHr/Vq33AnlfkdiFTG0aItE+8blNgjy8XGWl2uK2E/G4BarG5iIsmHrSQ4Rz9P8w6/Rf
+         3JoVKixlxGfnPSX+fGgtSl4bhAAkXANhOIgPo1ntKrsUrqcLSNUnv944KtYehUR6RXRT
+         aNRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763545001; x=1764149801;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bKG1jT74K/MRXdmPINAtGMWDRUANM+Qsoq8JeULmVME=;
+        b=f9XYbWV+mutsRI+b73rMYjHqTgDlLvyHsAWYxkdniVn1UuhGaph8iKgPRH+nYfmCfT
+         oa4IKa3SR4bB4sgJDus+kx+A0qMeZeDCtHmQ7XZaE9mYrTIcGesyb2Z6niA9wPdyDxiq
+         yH3nWcF+H7hYDkqtO7LH2795bqScQaRS4EQ34hUWeCCNcFVVTNmhq0ZLWRxonSVVF6jC
+         NIo89LXV2JWEIr6msoBO4tgcsk/hBwiVdDNAKk33okKMlt3hsNb0409mWDM0NAk2McDy
+         owpwcw+tV8792r1wBnizLW2TwNkkb4SXGwBRdW8Of/OqjD17BTBfwKd/Fx0TPwJ98jCZ
+         aH+A==
+X-Gm-Message-State: AOJu0YwYyQAtZBzzRw3N6WO2c2T6MMjwnDn0IVIrqn9aAlCKzfV2TVYR
+	w3xFqSIGWhF2EuUfsj9oURdMHjXInbBkM3QiH5rL2FLVTI4WoFqMgc1Kf8y+eS0s3WSK4iCStYO
+	LLKswEN/SzZQ+nIZOW/zI2epVJQSedpoD//Mi+TVhf8aWkn6Fx+9lNN+Z1Q==
+X-Gm-Gg: ASbGncsTXyh74PKUeqCXlR/8ushedTIkJVJNwmLReBmyr34E0MPIrs6Rip8h7W/eVl9
+	cVrKP/Zy4WS8jSW8e91j1SDd9sAqfQbWudoRI17NeDDbXi5vphCvuq/h+cx8yIZhGiTIFqBOfHg
+	zFfKqvu9tKO2IbbEDL0jWtdpIixMVV4Ji9+4HBObWgzUIB0pqR1eNqQ6STqDYPGv1Dec5W0ZkHq
+	zI/rA8VQCYzWr5Cqz+KevRe02X6ciXFS6SfuUKUx12J46o4YuYX+DmFJZaRKbxMoEy1IA3kfBct
+	rYaahzkxd1hvpk29aEgmZ/HIjpOldZp/GEc/7AvZVtbR7NGLudcCEJ4B5b4dot4qerI5NZpMlOH
+	SYrmAQ+zjg8vDUqo5cJOM9bLenPtuxA==
+X-Received: by 2002:a05:6000:1786:b0:42b:3dbe:3a54 with SMTP id ffacd0b85a97d-42b59367325mr20283203f8f.17.1763545001392;
+        Wed, 19 Nov 2025 01:36:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHusiVJhfbm3D902mT/wCPD/6mngLbvmdkL4QEKPOFz754t3oVY53OB2o+PC3ldDQcTxltm/A==
+X-Received: by 2002:a05:6000:1786:b0:42b:3dbe:3a54 with SMTP id ffacd0b85a97d-42b59367325mr20283166f8f.17.1763545000872;
+        Wed, 19 Nov 2025 01:36:40 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f206aasm37291606f8f.40.2025.11.19.01.36.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Nov 2025 01:36:40 -0800 (PST)
+Date: Wed, 19 Nov 2025 04:36:37 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
+	virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
+	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v11 06/12] virtio_net: Create a FF group for
+ ethtool steering
+Message-ID: <20251119043412-mutt-send-email-mst@kernel.org>
+References: <20251118143903.958844-1-danielj@nvidia.com>
+ <20251118143903.958844-7-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA50:EE_|DS7PR12MB6120:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8b06df53-51bf-49f4-8f5a-08de274e7590
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?6hRav21u/l6qxFwriVL3YT37pCuhUhzZnFl0/urqf0ErTLcoAq52Kt4iI8Fc?=
- =?us-ascii?Q?poa8AhRcQ5eo+EHbq3jEuIp3XHeHY1+Stq5dUacrxZ9fTRuTDna/OVMdbHy/?=
- =?us-ascii?Q?Mugp3TUKQTD7lnLgpsKmt8J/FzOtF+4U0rWTKx0OFinExS0iEDKBGXM4Fa23?=
- =?us-ascii?Q?Z34Zrt1QaF08JcLzfb9dhl9G+Gsgy8hbc5dXXcP35RAmAV17Z7iW7ZIDDznA?=
- =?us-ascii?Q?uCS1bbMk4mkSEu7+Ea3Q64RwkkRrxgVSgLHP3xbJLghPSSs2KsNir05y2LVW?=
- =?us-ascii?Q?qtdYKd7PO94jIa5p18vc0vJoAEZK7toB+nSt1LFM+KLxNe64VTmj/G8Ecy1L?=
- =?us-ascii?Q?3gT2twZf8MW2w/Z2ZC9bW1Zj1K1+bLFP5gPpRn7PtQnzu6EgW/B7nAnGg3j3?=
- =?us-ascii?Q?3H1IWqo/+xRZoMyiuTPupXxqEzRV+j50bMCCvud+kNqgo9DQQLZpBLKivJfb?=
- =?us-ascii?Q?UQM5f3D+LWc55zJKyC7dxBdZyaLsn5WiO5qNbh8Z440NHbRzI/1OAhiVtqnF?=
- =?us-ascii?Q?rA2yFSNVvxZiLaH2kLxvFY9gWyo1YkmWlDo8coQraxOrChBYVjprbkAr3k9b?=
- =?us-ascii?Q?rucy0X2bBR/bN04TkBIk3qOvLn4pXHzIMKhqppMDTfx0/6sYkVsnMUmzA8p7?=
- =?us-ascii?Q?nqU66MIszLEKBKLEstv9h7Aem6ON6kW+YVw3HfCuiHn9XCkLWkWn/Y6U4WR7?=
- =?us-ascii?Q?2NGkisYCRCeFD4S5XmuDBkM9W3Q2k5qWMLZ9E3GUJl/w3KwUD88PCG2gpV02?=
- =?us-ascii?Q?uG+aAysgMWJ0qnYkCueUEfXxwNpFfMH0ezauqLJ8kN4oJozVA2lH266rZb3X?=
- =?us-ascii?Q?9fNF+h59AAlpeU29yN2RwwQP1ZXsvre1w8HjJy8GF6v3OKhxc2yakoblBiw+?=
- =?us-ascii?Q?bkOK6UFSCg7AIsMJVDbO8SMKhCNDIXkbiI8lTQb9NHQBREH4UmT87mxwjKMT?=
- =?us-ascii?Q?fVTgSXK2KicbN4P9oi5AtfO3iv3x+EWbSPw9zPagxzzjg+a+ugm3+qFGyzL1?=
- =?us-ascii?Q?IsnZx76z2bbqiHI9vAkFYkLl9VyJTfzdD/pMej/OrQRhlNFtTjeU96sa5d87?=
- =?us-ascii?Q?eWDfe9qIRTDa0RrZvUo8fZhxISW23CL9ViUasazewT/THm9OBV7OUavhxK8r?=
- =?us-ascii?Q?2k9hWyT2f6Crl1ByIpQIJIqhEKz5uZGKOf1JIs45//0V+Z2WnbShQdQP013l?=
- =?us-ascii?Q?u8/t8KUU2/SPb9JWjp8C6vgJx5WmsLPLJickVUGmyoNOgI0kSgPzOoy4GV8l?=
- =?us-ascii?Q?g4rm31Nji6pYcXRmHZ8gawOzowlSVf8GQrOSsLlLGuCiwe3g9dW7jwWJQGWz?=
- =?us-ascii?Q?eo7s4XUdSXUS0TO7BzXfwtYouHwhdep7F2uSnQ61li70ZIYFOC5mqAA4SjiK?=
- =?us-ascii?Q?ekkvGCRq7aYwVZNKzAs12HC+sfCnmneJb/f5TV90fPVyLF05uwaFOq403gCF?=
- =?us-ascii?Q?Kyb2rNEfndxa4nCLSYLeMf+gPUA+69HhsUDAosPAb8ms3IJjkfVB4k3zY01n?=
- =?us-ascii?Q?oc445qFkQmjCjFklAE7c+t1IapnuUGyUtyJhqGqZwPfVKJa/vwlQaTunfhkw?=
- =?us-ascii?Q?fF0/Iyqjnpjvpx487wk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 09:31:46.6142
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8b06df53-51bf-49f4-8f5a-08de274e7590
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002BA50.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251118143903.958844-7-danielj@nvidia.com>
 
-Use the MAC managed PM flag to indicate that MAC driver takes care of
-suspending/resuming the PHY, and reset it when the device is brought up.
+On Tue, Nov 18, 2025 at 08:38:56AM -0600, Daniel Jurgens wrote:
+> All ethtool steering rules will go in one group, create it during
+> initialization.
+> 
+> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+> v4: Documented UAPI
+> ---
+>  drivers/net/virtio_net.c           | 29 +++++++++++++++++++++++++++++
+>  include/uapi/linux/virtio_net_ff.h | 15 +++++++++++++++
+>  2 files changed, 44 insertions(+)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 3615f45ac358..900d597726f7 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -284,6 +284,9 @@ static const struct virtnet_stat_desc virtnet_stats_tx_speed_desc_qstat[] = {
+>  	VIRTNET_STATS_DESC_TX_QSTAT(speed, ratelimit_packets, hw_drop_ratelimits),
+>  };
+>  
+> +#define VIRTNET_FF_ETHTOOL_GROUP_PRIORITY 1
+> +#define VIRTNET_FF_MAX_GROUPS 1
+> +
+>  struct virtnet_ff {
+>  	struct virtio_device *vdev;
+>  	bool ff_supported;
+> @@ -6812,6 +6815,7 @@ static int virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev)
+>  	size_t ff_mask_size = sizeof(struct virtio_net_ff_cap_mask_data) +
+>  			      sizeof(struct virtio_net_ff_selector) *
+>  			      VIRTIO_NET_FF_MASK_TYPE_MAX;
+> +	struct virtio_net_resource_obj_ff_group ethtool_group = {};
+>  	struct virtio_admin_cmd_query_cap_id_result *cap_id_list;
+>  	struct virtio_net_ff_selector *sel;
+>  	size_t real_ff_mask_size;
+> @@ -6895,6 +6899,12 @@ static int virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev)
+>  	if (err)
+>  		goto err_ff_action;
+>  
+> +	if (le32_to_cpu(ff->ff_caps->groups_limit) < VIRTNET_FF_MAX_GROUPS) {
+> +		err = -ENOSPC;
+> +		goto err_ff_action;
+> +	}
+> +	ff->ff_caps->groups_limit = cpu_to_le32(VIRTNET_FF_MAX_GROUPS);
+> +
+>  	err = virtio_admin_cap_set(vdev,
+>  				   VIRTIO_NET_FF_RESOURCE_CAP,
+>  				   ff->ff_caps,
+> @@ -6932,6 +6942,19 @@ static int virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev)
+>  	if (err)
+>  		goto err_ff_action;
+>  
+> +	ethtool_group.group_priority = cpu_to_le16(VIRTNET_FF_ETHTOOL_GROUP_PRIORITY);
+> +
+> +	/* Use priority for the object ID. */
+> +	err = virtio_admin_obj_create(vdev,
+> +				      VIRTIO_NET_RESOURCE_OBJ_FF_GROUP,
+> +				      VIRTNET_FF_ETHTOOL_GROUP_PRIORITY,
+> +				      VIRTIO_ADMIN_GROUP_TYPE_SELF,
+> +				      0,
+> +				      &ethtool_group,
+> +				      sizeof(ethtool_group));
+> +	if (err)
+> +		goto err_ff_action;
+> +
+>  	ff->vdev = vdev;
+>  	ff->ff_supported = true;
+>  
 
-Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
----
- drivers/net/ethernet/amd/xgbe/xgbe-drv.c    | 3 +++
- drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c | 1 +
- 2 files changed, 4 insertions(+)
+So this is set here and never cleared.
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-index f3adf29b222b..1c03fb138ce6 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-@@ -1266,6 +1266,9 @@ static int xgbe_start(struct xgbe_prv_data *pdata)
- 
- 	clear_bit(XGBE_STOPPED, &pdata->dev_state);
- 
-+	/* Reset the phy settings */
-+	xgbe_phy_reset(pdata);
-+
- 	return 0;
- 
- err_irqs:
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
-index 35a381a83647..a68757e8fd22 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
-@@ -989,6 +989,7 @@ static int xgbe_phy_find_phy_device(struct xgbe_prv_data *pdata)
- 		return ret;
- 	}
- 	phy_data->phydev = phydev;
-+	phy_data->phydev->mac_managed_pm = true;
- 
- 	xgbe_phy_external_phy_quirks(pdata);
- 
--- 
-2.34.1
+But we never recreate the group on restore (after suspend).
+
+sounds like we need virtnet_ff_cleanup/virtnet_ff_init on the
+suspend/restore path?
+
+> @@ -6959,6 +6982,12 @@ static void virtnet_ff_cleanup(struct virtnet_ff *ff)
+>  	if (!ff->ff_supported)
+>  		return;
+>  
+> +	virtio_admin_obj_destroy(ff->vdev,
+> +				 VIRTIO_NET_RESOURCE_OBJ_FF_GROUP,
+> +				 VIRTNET_FF_ETHTOOL_GROUP_PRIORITY,
+> +				 VIRTIO_ADMIN_GROUP_TYPE_SELF,
+> +				 0);
+> +
+>  	kfree(ff->ff_actions);
+>  	kfree(ff->ff_mask);
+>  	kfree(ff->ff_caps);
+> diff --git a/include/uapi/linux/virtio_net_ff.h b/include/uapi/linux/virtio_net_ff.h
+> index bd7a194a9959..6d1f953c2b46 100644
+> --- a/include/uapi/linux/virtio_net_ff.h
+> +++ b/include/uapi/linux/virtio_net_ff.h
+> @@ -12,6 +12,8 @@
+>  #define VIRTIO_NET_FF_SELECTOR_CAP 0x801
+>  #define VIRTIO_NET_FF_ACTION_CAP 0x802
+>  
+> +#define VIRTIO_NET_RESOURCE_OBJ_FF_GROUP 0x0200
+> +
+>  /**
+>   * struct virtio_net_ff_cap_data - Flow filter resource capability limits
+>   * @groups_limit: maximum number of flow filter groups supported by the device
+> @@ -88,4 +90,17 @@ struct virtio_net_ff_actions {
+>  	__u8 reserved[7];
+>  	__u8 actions[];
+>  };
+> +
+> +/**
+> + * struct virtio_net_resource_obj_ff_group - Flow filter group object
+> + * @group_priority: priority of the group used to order evaluation
+> + *
+> + * This structure is the payload for the VIRTIO_NET_RESOURCE_OBJ_FF_GROUP
+> + * administrative object. Devices use @group_priority to order flow filter
+> + * groups. Multi-byte fields are little-endian.
+> + */
+> +struct virtio_net_resource_obj_ff_group {
+> +	__le16 group_priority;
+> +};
+> +
+>  #endif
+> -- 
+> 2.50.1
 
 
