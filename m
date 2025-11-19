@@ -1,212 +1,158 @@
-Return-Path: <netdev+bounces-239888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCCE4C6DA11
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 10:15:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3E06C6D93F
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 10:05:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E754F4E367C
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:05:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 3C27E2BDCA
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:05:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A2D633436F;
-	Wed, 19 Nov 2025 09:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2823334695;
+	Wed, 19 Nov 2025 09:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZVZ6x1C";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AS/i2tkl"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="A9bwyRrI";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="TyLuLXFN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E4633375E
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 09:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625EF334686
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 09:05:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763543121; cv=none; b=pVV+THZEjUQ3mS0xpww1VBShExgO+yVMVW8TsotPSb0PmRb7aJ/qpNLKIRS2HyQYjHsVBDaZxYq46WRU0E9M7Qu2Rt4n4QzGYNz02PRUu5Q0q8T0q0LVA0tB0ASYLFfG7ihHOz+mst1SNjBOpkjiSjV9/jonLhjkYcHSGwE9fQE=
+	t=1763543124; cv=none; b=f8ugyG65hblNbloyowFU3T0CBVouEbxZnQQOWqr6GJGpwVuyW8+J0Q3Mh4roBiwX27J+P6eaX1XP72+fwf3cpkG6LApC7JU9fIfJjK1uN332n7amxmQ6ZKgZLZHBnEFhjKe/ZvBJV2ctuJjVaKVwf8UFEP1ul/ZwmNdQI3g7tX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763543121; c=relaxed/simple;
-	bh=vUdRmeRkR1Sic0vFERO+c65P4WSSzlgLf+kR0Zto560=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=poulPRUosojISqNLvWlZQeC8tXfZDi85TnO26Qu9qFe68TQqPTEHfqyaCd0Q21uzw5AphM5Rkc012dappIjayk1g/FW+EnaIr0JhCXe/0Qky3vP7zsD9yR8pKJ/8SQGKFu6J3IFsgEFuYLtiTQrtnMdnMqD3jf5U7tExRzRblXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XZVZ6x1C; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AS/i2tkl; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763543117;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=st/lacsc6niuYoE7DSoWjNBoFYdmnwECFBXbRm0DT6k=;
-	b=XZVZ6x1CR8ebcwu8TzXplh8aEm1AHErmPQIR/1rUVAJny+gBmGwWUwG9HyQ06IMWD6BYMW
-	ZOZGgOxAayh2fT3pZD/8yuyBUsgw1j4YGxGX2mDNwI3hIVl510sw3dVz/6VI3OJWs7Xgx3
-	8NElY8uL/6ihr7SHPFw2tDDCZNTD2mU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-223-o70UreYpO3GuqzIK2JA5OQ-1; Wed, 19 Nov 2025 04:05:16 -0500
-X-MC-Unique: o70UreYpO3GuqzIK2JA5OQ-1
-X-Mimecast-MFC-AGG-ID: o70UreYpO3GuqzIK2JA5OQ_1763543115
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42b2b9c7ab6so2956926f8f.2
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 01:05:16 -0800 (PST)
+	s=arc-20240116; t=1763543124; c=relaxed/simple;
+	bh=ezXtnxmmy4nKLRLUirnPsKAzx/wRLwitVXJfmH83Lpg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=epejNNPjpVPoeOYt8+L+DM+1riOpPJOi1nD2haN3B9ru0ahALmzdPCylHlNt3gQggeK7QgTKwZzjMGeaXxpx0TbEFVK39cCgRbSb0FpVvpf3dGIYAvVKpEqIUTHeLIraXBWRPDEbyzr/ISvcvyJRpam2dm6ERsYFMFf2v5mCk5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=A9bwyRrI; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=TyLuLXFN; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AJ4pCbH2926869
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 09:05:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=oBAgJBWC5PELt9dF08F2H0pq
+	iR9jG9unSRTCNbWqiMQ=; b=A9bwyRrIZe3RrEjd8qyp+x1YZQWMnIYRRv8haD/p
+	laQQTqRN7yWDRWLLpw05m5f0N3B6is1xlVs7ivtt/sdpXDHNE9G/eHH4OSwiZ3BL
+	ID8Xz/hMfJjSjbxBJwMZS+8tagDEgp/AhrIpz9y+93eSGqGIGuSGiUhwt0/78c6e
+	Udor9GbxW9j6l8D9pY2JymUNyHLVVDll1JLL59tcHTaVnkBEZu+h7EYMd+zYzCz3
+	I6cHXf4e/VFTLEYDRc3YSST8JpCC84Wlvs0VsB3brC4+HhEEBjVjsfqgPjtYdPJx
+	/x/NXKgPAvgt3jaRNjQmdGurXxSmQ7HJJ0zCuLzFlmbUfQ==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4agq293kqr-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 09:05:22 +0000 (GMT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-89ee646359cso2068693785a.1
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 01:05:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763543115; x=1764147915; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=st/lacsc6niuYoE7DSoWjNBoFYdmnwECFBXbRm0DT6k=;
-        b=AS/i2tklNFANFpI5oB0uVzX+Ygx6SJQNEKFszTRVf9IdgCXV9o6tjVUw47XTZKkTRz
-         zAEb9wUPpdJ8XF5Zjh8np0nHeWZByUlaSM2CvHICo2C9pwumIlLDUHmxJfa6BnzPStcy
-         sqnq/1oW+uBLSwD0/+kFHb/hlLrPWti7UwbfofiMVOuGxXvO7xPug5frU7v2QF8Ju0+R
-         WaRmCQxqU7pWXuhBW7/ZpheCQ7pHvODO6V1mRdoPQNAtUSBOLSDN1PTgQ0d4LNmTWncL
-         Yf6oiYBW6VXL/Qz0vItMA0TBV/2PBBcD+ZfgY1Xbpj55wa1lAm70L6wV9TZFx+Iqgjx4
-         dpJg==
+        d=oss.qualcomm.com; s=google; t=1763543122; x=1764147922; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oBAgJBWC5PELt9dF08F2H0pqiR9jG9unSRTCNbWqiMQ=;
+        b=TyLuLXFNuriy/6zQR1EskTHJ9Hy/oRQPE16jTYRkzHg7GDFZGwFFTUwqCqRlKBNpNH
+         dUS4+d3YCUujw6tHr7QiUz8RK3a5KqHyCLHOLyKFy/FiLR+s94nEMpwXD+Iiz0RQroe6
+         fsIJrFGHz7d6wD08yBLED9owUlgu4O+RxI4IbrDx431MWeJnWiZEfCEnjYgQ2bKIbywJ
+         OQjg3axV4RwgDh9PrvedDe5pDVKzrJhyUtrYu/ESRITHpyLgQ0+An+ACCLL0tqZQ3ypI
+         lVoI3lTy422moIDiF9qJ1ltkGs8xzYtYMwsNguzDmhq8rLLRKEWMdUvpUA2vCYTPW/uo
+         pV3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763543115; x=1764147915;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=st/lacsc6niuYoE7DSoWjNBoFYdmnwECFBXbRm0DT6k=;
-        b=TONcR1F4Rei/dvOApUWmyJRxfYyCoQZQOARxAFxhhvT+whefwEloUlPRBHV0Aq4QQI
-         V7tE17xjoVgrueUP3yrXfWr6tOoIjow4i6sBea5Eb7yWXTv/TnxO6iNnoJvfDgohqDpB
-         VJxtQ5JGqzdFUlYclma1rmEOUDpS0CDmn0F5B3spR/bj0ImDeeFgQAtoVUsd9Zm1/gUt
-         VnRhe8rdHXIiBmKT9M6yDQqDrF3l05eflbRkd1WJ6O5EvaR2qkPqzg5GJ+2IaDZyHNmG
-         m6UsBdbdzS7RtqDRP7WPCANg5m0HZkknK7G61a18aXsSAiXavmSjFoJKuKEK9u2JPjgA
-         yqzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX/3Mv+kD42V2GubLvnrAocmW1+yRhnqvTGB9lzeB1oV4FVj7jnuyc14qt3lcvAorkwLShncZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAkUuViU/yE5bwxpizFA+7fx9z0DRq+CBxKKvrp3wRKMk0yXb2
-	e3kMTHDJiub18fuHYk+lCTHn4q1+wWkF4uhYVwZg8RBbso+p0qSw8oyTdXV+MuW2zDdvh2OfQP6
-	vTXpcsZL9K+XNV5JO9nidbcxuCMGw0T8F7llzcQqmWPtM7w6fTRFgA04i/A==
-X-Gm-Gg: ASbGncvUXXtgm/JnF8VzUxt7JQRZgos4j+K7S6aVOyMyY9j2OtkZFUtUuJDBwSR1qUT
-	zfPx0v2F8n4LgejbpVhwwj+LtUiNFj1Htp4gkRVmwMSwlLhyhPy9B/uS03B8gCCZAbXn4yzttlt
-	I2TOSVGMf4EwqMq1yWF2rgc3UmrPh3t/uBig+hNBVBWSVrhMk5fOD+jDWjd6+eqBfkKXPKMuWla
-	fMpIUYHSYtBfVisiabZWRNR7WqLBa2BuKG6wI0FKTigrYwIFf+8w6sjtn5VsmPRX9rw+OIOzqio
-	kNuuPEBeJYu9++BDP5F/xDueR1P4nZ6oLiqKXj6bHRW6HJd9kugtfIwfUFRsxxfvh/cb+AH6h/L
-	6qRj4CY8bGqRN
-X-Received: by 2002:a05:6000:26d3:b0:429:d3c9:b889 with SMTP id ffacd0b85a97d-42b5935df5fmr19818670f8f.1.1763543114970;
-        Wed, 19 Nov 2025 01:05:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGo7beDDn9H8iHhYeh4PJ0bWu4CG/GA7G+HhTHawitTKldTiJcNqPdi7LYaI5n8LXHKtwGC8A==
-X-Received: by 2002:a05:6000:26d3:b0:429:d3c9:b889 with SMTP id ffacd0b85a97d-42b5935df5fmr19818625f8f.1.1763543114508;
-        Wed, 19 Nov 2025 01:05:14 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.41])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f17cbfsm36875660f8f.35.2025.11.19.01.05.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Nov 2025 01:05:14 -0800 (PST)
-Message-ID: <46dee7e9-121d-42c5-9658-c6b1a5fe4363@redhat.com>
-Date: Wed, 19 Nov 2025 10:05:12 +0100
+        d=1e100.net; s=20230601; t=1763543122; x=1764147922;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oBAgJBWC5PELt9dF08F2H0pqiR9jG9unSRTCNbWqiMQ=;
+        b=K0SaMDnmoWFqMmjukjGcsxlexXZhFDki8BzZf0Z522cm+ZC2GKDdR+Q+zoS45zdX9s
+         pSkchMo/Hj9Sje8fWIbAjuqZjNjJN5O03EnneXG6VGsL/5bclIjpzprGePFhhAmeOFMq
+         yeo75KCjlneTGiRbrXR/A6wsnBnce8XtGECSQr5FlNPF0GBvXzZ/4hBwbE5igS2QjWLj
+         EN5iKYjEo74v3Ve7X2erEioACSf1L0wyYPHaqIwqqhK8Vbw8/DQfF/sMHtPnSqJ3rWU7
+         qs/NA/3CgFbpPPNwJQ1VPglnXQxx2vCZqyEVSkSka1ADUQhm0B6ASqTBcVax0eVzebr2
+         mTAw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJhJllPGqAsbSN4zKDgG09zygSDYHI6zLvooa2FRyd27zeZZkRYHaF0pyxPJSTI8UowXFBbkA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPFAmiOpbKlqP4XDfjiqhEOkgt5PXbm1Kuu1SU4HpF/Q2JEe6u
+	/o6XaAwCMuM/lo3mXGhEXJtNOIi+LQoIFGSINg6o3xCefkiJ6+hm9To1hcXTGpfPRFiMAwH50zt
+	4plY0OKUzgl7GBJaheD3/2ZmITvwdd7F1eP9l6ewH4T3KXQOsPHyCN/iQo04=
+X-Gm-Gg: ASbGncv4XVmYIsKwvVG+WGSB3axisXzB96XvTzFL0Ih5Sl355poX0FgBX3dhKNMFO4f
+	3VaxnJUlTgRq+JEcAe5yOKUbAlyJayRarV3813/XYcJh4MJ2aiJfavALkhbdyiFIMA76Jmf3+th
+	oRyuCk0wq0ZcI46Y/4EdIEl/Fw7CfoUvrGhHfGZz0czYOqVXMQ5q/RNTbaRRwbftfY+G9bZN1c8
+	ycBnaV5FAyRbKx2UWejGLadmkGG4ZiVdAA5+wc6YZOdstYlDOnlNhkV0s+q/DC8420T6VW2dotk
+	mIHFvAfpWy3sDzneHomXDD0Mh4SbQYKlHm1BHkEH5afUk74ZFVKaSCCAJj04P8CDEtOJc0V/kFL
+	JK+pPtoZ8uFez4ssDR59Llv+3tby3FwDUdj6QTTBvgjyvbMOUQPyTb/b3OkZ/Sa98240qkVViii
+	2LnkESeygefHFDZXCGsxPKg8w=
+X-Received: by 2002:a05:620a:5ec6:b0:8b2:d26f:14a8 with SMTP id af79cd13be357-8b2d26f15fcmr1482717585a.9.1763543121631;
+        Wed, 19 Nov 2025 01:05:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGl0tVP0nruUET6azg14pcDZMW+9RwVCKQSB0MA+hirvaAaTc5VWCKGXZJPH/eYVd8nYtboXQ==
+X-Received: by 2002:a05:620a:5ec6:b0:8b2:d26f:14a8 with SMTP id af79cd13be357-8b2d26f15fcmr1482715585a.9.1763543121100;
+        Wed, 19 Nov 2025 01:05:21 -0800 (PST)
+Received: from umbar.lan (2001-14ba-a0c3-3a00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a0c3:3a00:264b:feff:fe8b:be8a])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-37b9ce25408sm39192991fa.20.2025.11.19.01.05.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Nov 2025 01:05:20 -0800 (PST)
+Date: Wed, 19 Nov 2025 11:05:17 +0200
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+To: Slark Xiao <slark_xiao@163.com>
+Cc: mani@kernel.org, loic.poulain@oss.qualcomm.com, ryazanov.s.a@gmail.com,
+        johannes@sipsolutions.net, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        netdev@vger.kernel.org, mhi@lists.linux.dev,
+        linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] bus: mhi: host: pci_generic: Add Foxconn T99W760
+ modem
+Message-ID: <aqhkk6sbsuvx5yoy564sd53blbb3fqcrlidrg3zuk3gsw64w24@hsxi4nj4t7vy>
+References: <20251119084537.34303-1-slark_xiao@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 2/2] tcp: add net.ipv4.tcp_rcvbuf_low_rtt
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Rick Jones <jonesrick@google.com>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20251119084813.3684576-1-edumazet@google.com>
- <20251119084813.3684576-3-edumazet@google.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251119084813.3684576-3-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119084537.34303-1-slark_xiao@163.com>
+X-Authority-Analysis: v=2.4 cv=FJgWBuos c=1 sm=1 tr=0 ts=691d8852 cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Byx-y9mGAAAA:8 a=Zbds-apdPVEvrNjdMCwA:9 a=CjuIK1q_8ugA:10
+ a=PEH46H7Ffwr30OY-TuGO:22
+X-Proofpoint-ORIG-GUID: bu3uv8QBt5oFZEBjmDZNygLjNZZ2Bvsz
+X-Proofpoint-GUID: bu3uv8QBt5oFZEBjmDZNygLjNZZ2Bvsz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE5MDA3MSBTYWx0ZWRfX1zRg/egc1KMi
+ SrBY56M7ID2unNRYuMbtKqkBk/iRVR8z2DAzmydtdSvn37dYNIY05KAzpuZTSS05/cWQgO9nal+
+ ghQXnYYhWVSOwGiveP/mMRHYz9FCGZotXoMbOAzwv9v+MSYjvyPVTpgPigFYnY/qI4C8ofd/nkO
+ m7iaoehK7TLlJWHr4pYpYXsRtux/MjghhtcHodfzI1ZsDbBjK+JGLUJMkGpY+J+fAwIz5IU9Bkm
+ HgecNndjSNWU4dpUIhv9TVq3ac7FXRS9qDjGzr2baJ6I/SiTIm+79MvjYiyaiyxB0vdGK09ZogW
+ 4+OMSAreGkGR44gYxZQe9G9qpFyL4vnr80peX7TypHJ7E1cOzy9uAkIk7dUj0JXvyC5UJvFJsZF
+ cpFtLWO+INJoWyodcQHmvarMVF3P4g==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-19_02,2025-11-18_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 malwarescore=0 suspectscore=0 impostorscore=0 lowpriorityscore=0
+ clxscore=1015 spamscore=0 phishscore=0 priorityscore=1501 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511190071
 
-On 11/19/25 9:48 AM, Eric Dumazet wrote:
-> This is a follow up of commit aa251c84636c ("tcp: fix too slow
-> tcp_rcvbuf_grow() action") which brought again the issue that I tried
-> to fix in commit 65c5287892e9 ("tcp: fix sk_rcvbuf overshoot")
+On Wed, Nov 19, 2025 at 04:45:37PM +0800, Slark Xiao wrote:
+> T99W760 modem is based on Qualcomm SDX35 chipset.
+> It use the same channel settings with Foxconn SDX61.
+> edl file has been committed to linux-firmware.
 > 
-> We also recently increased tcp_rmem[2] to 32 MB in commit 572be9bf9d0d
-> ("tcp: increase tcp_rmem[2] to 32 MB")
-> 
-> Idea of this patch is to not let tcp_rcvbuf_grow() grow sk->sk_rcvbuf
-> too fast for small RTT flows. If sk->sk_rcvbuf is too big, this can
-> force NIC driver to not recycle pages from their page pool, and also
-> can cause cache evictions for DDIO enabled cpus/NIC, as receivers
-> are usually slower than senders.
-> 
-> Add net.ipv4.tcp_rcvbuf_low_rtt sysctl, set by default to 1000 usec (1 ms)
-> 
-> If RTT if smaller than the sysctl value, use the RTT/tcp_rcvbuf_low_rtt
-> ratio to control sk_rcvbuf inflation.
-> 
-> Tested:
-> 
-> Pair of hosts with a 200Gbit IDPF NIC. Using netperf/netserver
-> 
-> Client initiates 8 TCP bulk flows, asking netserver to use CPU #10 only.
-> 
-> super_netperf 8 -H server -T,10 -l 30
-> 
-> On server, use perf -e tcp:tcp_rcvbuf_grow while test is running.
-> 
-> Before:
-> 
-> sysctl -w net.ipv4.tcp_rcvbuf_low_rtt=1
-> perf record -a -e tcp:tcp_rcvbuf_grow sleep 30 ; perf script|tail -20|cut -c30-230
->  1153.051201: tcp:tcp_rcvbuf_grow: time=398 rtt_us=382 copied=6905856 inq=180224 space=6115328 ooo=0 scaling_ratio=240 rcvbuf=27666235 rcv_ssthresh=25878235 window_clamp=25937095 rcv_wnd=25600000 famil
->  1153.138752: tcp:tcp_rcvbuf_grow: time=446 rtt_us=413 copied=5529600 inq=180224 space=4505600 ooo=0 scaling_ratio=240 rcvbuf=23068672 rcv_ssthresh=21571860 window_clamp=21626880 rcv_wnd=21286912 famil
->  1153.361484: tcp:tcp_rcvbuf_grow: time=415 rtt_us=380 copied=7061504 inq=204800 space=6725632 ooo=0 scaling_ratio=240 rcvbuf=27666235 rcv_ssthresh=25878235 window_clamp=25937095 rcv_wnd=25600000 famil
->  1153.457642: tcp:tcp_rcvbuf_grow: time=483 rtt_us=421 copied=5885952 inq=720896 space=4407296 ooo=0 scaling_ratio=240 rcvbuf=23763511 rcv_ssthresh=22223271 window_clamp=22278291 rcv_wnd=21430272 famil
->  1153.466002: tcp:tcp_rcvbuf_grow: time=308 rtt_us=281 copied=3244032 inq=180224 space=2883584 ooo=0 scaling_ratio=240 rcvbuf=44854314 rcv_ssthresh=41992059 window_clamp=42050919 rcv_wnd=41713664 famil
->  1153.747792: tcp:tcp_rcvbuf_grow: time=394 rtt_us=332 copied=4460544 inq=585728 space=3063808 ooo=0 scaling_ratio=240 rcvbuf=44854314 rcv_ssthresh=41992059 window_clamp=42050919 rcv_wnd=41373696 famil
->  1154.260747: tcp:tcp_rcvbuf_grow: time=652 rtt_us=226 copied=10977280 inq=737280 space=9486336 ooo=0 scaling_ratio=240 rcvbuf=31165538 rcv_ssthresh=29197743 window_clamp=29217691 rcv_wnd=28368896 fami
->  1154.375019: tcp:tcp_rcvbuf_grow: time=461 rtt_us=443 copied=7573504 inq=507904 space=6856704 ooo=0 scaling_ratio=240 rcvbuf=27666235 rcv_ssthresh=25878235 window_clamp=25937095 rcv_wnd=25288704 famil
->  1154.463072: tcp:tcp_rcvbuf_grow: time=494 rtt_us=408 copied=7983104 inq=200704 space=7065600 ooo=0 scaling_ratio=240 rcvbuf=27666235 rcv_ssthresh=25878235 window_clamp=25937095 rcv_wnd=25579520 famil
->  1154.474658: tcp:tcp_rcvbuf_grow: time=507 rtt_us=459 copied=5586944 inq=540672 space=4718592 ooo=0 scaling_ratio=240 rcvbuf=17852266 rcv_ssthresh=16692999 window_clamp=16736499 rcv_wnd=16056320 famil
->  1154.584657: tcp:tcp_rcvbuf_grow: time=494 rtt_us=427 copied=8126464 inq=204800 space=7782400 ooo=0 scaling_ratio=240 rcvbuf=27666235 rcv_ssthresh=25878235 window_clamp=25937095 rcv_wnd=25600000 famil
->  1154.702117: tcp:tcp_rcvbuf_grow: time=480 rtt_us=406 copied=5734400 inq=180224 space=5349376 ooo=0 scaling_ratio=240 rcvbuf=23068672 rcv_ssthresh=21571860 window_clamp=21626880 rcv_wnd=21286912 famil
->  1155.941595: tcp:tcp_rcvbuf_grow: time=717 rtt_us=670 copied=11042816 inq=3784704 space=7159808 ooo=0 scaling_ratio=240 rcvbuf=19581357 rcv_ssthresh=18333222 window_clamp=18357522 rcv_wnd=14614528 fam
->  1156.384735: tcp:tcp_rcvbuf_grow: time=529 rtt_us=473 copied=9011200 inq=180224 space=7258112 ooo=0 scaling_ratio=240 rcvbuf=19581357 rcv_ssthresh=18333222 window_clamp=18357522 rcv_wnd=18018304 famil
->  1157.821676: tcp:tcp_rcvbuf_grow: time=529 rtt_us=272 copied=8224768 inq=602112 space=6545408 ooo=0 scaling_ratio=240 rcvbuf=67000000 rcv_ssthresh=62793576 window_clamp=62812500 rcv_wnd=62115840 famil
->  1158.906379: tcp:tcp_rcvbuf_grow: time=710 rtt_us=445 copied=11845632 inq=540672 space=10240000 ooo=0 scaling_ratio=240 rcvbuf=31165538 rcv_ssthresh=29205935 window_clamp=29217691 rcv_wnd=28536832 fam
->  1164.600160: tcp:tcp_rcvbuf_grow: time=841 rtt_us=430 copied=12976128 inq=1290240 space=11304960 ooo=0 scaling_ratio=240 rcvbuf=31165538 rcv_ssthresh=29212591 window_clamp=29217691 rcv_wnd=27856896 fa
->  1165.163572: tcp:tcp_rcvbuf_grow: time=845 rtt_us=800 copied=12632064 inq=540672 space=7921664 ooo=0 scaling_ratio=240 rcvbuf=27666235 rcv_ssthresh=25912795 window_clamp=25937095 rcv_wnd=25260032 fami
->  1165.653464: tcp:tcp_rcvbuf_grow: time=388 rtt_us=309 copied=4493312 inq=180224 space=3874816 ooo=0 scaling_ratio=240 rcvbuf=44854314 rcv_ssthresh=41995899 window_clamp=42050919 rcv_wnd=41713664 famil
->  1166.651211: tcp:tcp_rcvbuf_grow: time=556 rtt_us=553 copied=6328320 inq=540672 space=5554176 ooo=0 scaling_ratio=240 rcvbuf=23068672 rcv_ssthresh=21571860 window_clamp=21626880 rcv_wnd=20946944 famil
-> 
-> After:
-> 
-> sysctl -w net.ipv4.tcp_rcvbuf_low_rtt=1000
-> perf record -a -e tcp:tcp_rcvbuf_grow sleep 30 ; perf script|tail -20|cut -c30-230
->  1457.053149: tcp:tcp_rcvbuf_grow: time=128 rtt_us=24 copied=1441792 inq=40960 space=1269760 ooo=0 scaling_ratio=240 rcvbuf=2960741 rcv_ssthresh=2605474 window_clamp=2775694 rcv_wnd=2568192 family=AF_I
->  1458.000778: tcp:tcp_rcvbuf_grow: time=128 rtt_us=31 copied=1441792 inq=24576 space=1400832 ooo=0 scaling_ratio=240 rcvbuf=3060163 rcv_ssthresh=2810042 window_clamp=2868902 rcv_wnd=2674688 family=AF_I
->  1458.088059: tcp:tcp_rcvbuf_grow: time=190 rtt_us=110 copied=3227648 inq=385024 space=2781184 ooo=0 scaling_ratio=240 rcvbuf=6728240 rcv_ssthresh=6252705 window_clamp=6307725 rcv_wnd=5799936 family=AF
->  1458.148549: tcp:tcp_rcvbuf_grow: time=232 rtt_us=129 copied=3956736 inq=237568 space=2842624 ooo=0 scaling_ratio=240 rcvbuf=6731333 rcv_ssthresh=6252705 window_clamp=6310624 rcv_wnd=5918720 family=AF
->  1458.466861: tcp:tcp_rcvbuf_grow: time=193 rtt_us=83 copied=2949120 inq=180224 space=2457600 ooo=0 scaling_ratio=240 rcvbuf=5751438 rcv_ssthresh=5357689 window_clamp=5391973 rcv_wnd=5054464 family=AF_
->  1458.775476: tcp:tcp_rcvbuf_grow: time=257 rtt_us=127 copied=4304896 inq=352256 space=3346432 ooo=0 scaling_ratio=240 rcvbuf=8067131 rcv_ssthresh=7523275 window_clamp=7562935 rcv_wnd=7061504 family=AF
->  1458.776631: tcp:tcp_rcvbuf_grow: time=200 rtt_us=96 copied=3260416 inq=143360 space=2768896 ooo=0 scaling_ratio=240 rcvbuf=6397256 rcv_ssthresh=5938567 window_clamp=5997427 rcv_wnd=5828608 family=AF_
->  1459.707973: tcp:tcp_rcvbuf_grow: time=215 rtt_us=96 copied=2506752 inq=163840 space=1388544 ooo=0 scaling_ratio=240 rcvbuf=3068867 rcv_ssthresh=2768282 window_clamp=2877062 rcv_wnd=2555904 family=AF_
->  1460.246494: tcp:tcp_rcvbuf_grow: time=231 rtt_us=80 copied=3756032 inq=204800 space=3117056 ooo=0 scaling_ratio=240 rcvbuf=7288091 rcv_ssthresh=6773725 window_clamp=6832585 rcv_wnd=6471680 family=AF_
->  1460.714596: tcp:tcp_rcvbuf_grow: time=270 rtt_us=110 copied=4714496 inq=311296 space=3719168 ooo=0 scaling_ratio=240 rcvbuf=8957739 rcv_ssthresh=8339020 window_clamp=8397880 rcv_wnd=7933952 family=AF
->  1462.029977: tcp:tcp_rcvbuf_grow: time=101 rtt_us=19 copied=1105920 inq=40960 space=1036288 ooo=0 scaling_ratio=240 rcvbuf=2338970 rcv_ssthresh=2091684 window_clamp=2192784 rcv_wnd=1986560 family=AF_I
->  1462.802385: tcp:tcp_rcvbuf_grow: time=89 rtt_us=45 copied=1069056 inq=0 space=1064960 ooo=0 scaling_ratio=240 rcvbuf=2338970 rcv_ssthresh=2091684 window_clamp=2192784 rcv_wnd=2035712 family=AF_INET6
->  1462.918648: tcp:tcp_rcvbuf_grow: time=105 rtt_us=33 copied=1441792 inq=180224 space=1069056 ooo=0 scaling_ratio=240 rcvbuf=2383282 rcv_ssthresh=2091684 window_clamp=2234326 rcv_wnd=1896448 family=AF_
->  1463.222533: tcp:tcp_rcvbuf_grow: time=273 rtt_us=144 copied=4603904 inq=385024 space=3469312 ooo=0 scaling_ratio=240 rcvbuf=8422564 rcv_ssthresh=7891053 window_clamp=7896153 rcv_wnd=7409664 family=AF
->  1466.519312: tcp:tcp_rcvbuf_grow: time=130 rtt_us=23 copied=1343488 inq=0 space=1261568 ooo=0 scaling_ratio=240 rcvbuf=2780158 rcv_ssthresh=2493778 window_clamp=2606398 rcv_wnd=2494464 family=AF_INET6
->  1466.681003: tcp:tcp_rcvbuf_grow: time=128 rtt_us=21 copied=1441792 inq=12288 space=1343488 ooo=0 scaling_ratio=240 rcvbuf=2932027 rcv_ssthresh=2578555 window_clamp=2748775 rcv_wnd=2568192 family=AF_I
->  1470.689959: tcp:tcp_rcvbuf_grow: time=255 rtt_us=122 copied=3932160 inq=204800 space=3551232 ooo=0 scaling_ratio=240 rcvbuf=8182038 rcv_ssthresh=7647384 window_clamp=7670660 rcv_wnd=7442432 family=AF
->  1471.754154: tcp:tcp_rcvbuf_grow: time=188 rtt_us=95 copied=2138112 inq=577536 space=1429504 ooo=0 scaling_ratio=240 rcvbuf=3113650 rcv_ssthresh=2806426 window_clamp=2919046 rcv_wnd=2248704 family=AF_
->  1476.813542: tcp:tcp_rcvbuf_grow: time=269 rtt_us=99 copied=3088384 inq=180224 space=2564096 ooo=0 scaling_ratio=240 rcvbuf=6219470 rcv_ssthresh=5771893 window_clamp=5830753 rcv_wnd=5509120 family=AF_
->  1477.738309: tcp:tcp_rcvbuf_grow: time=166 rtt_us=54 copied=1777664 inq=180224 space=1417216 ooo=0 scaling_ratio=240 rcvbuf=3117118 rcv_ssthresh=2874958 window_clamp=2922298 rcv_wnd=2613248 family=AF_
-> 
-> We can see sk_rcvbuf values are much smaller, and that rtt_us (estimation of rtt
-> from a receiver point of view) is kept small, instead of being bloated.
-> 
-> No difference in throughput.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Signed-off-by: Slark Xiao <slark_xiao@163.com>
+> ---
+> v2: Add net and MHI maintainer together
+> ---
+>  drivers/bus/mhi/host/pci_generic.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 
-Whoops, I replied in the old thread too late. I also see good numbers in
-the scenario above.
+Note: only 1/2 made it to linux-arm-msm. Is it intentional or was there
+any kind of an error while sending the patches?
 
-Tested-by: Paolo Abeni <pabeni@redhat.com>
-
+-- 
+With best wishes
+Dmitry
 
