@@ -1,96 +1,96 @@
-Return-Path: <netdev+bounces-239895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07491C6DAC6
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 10:22:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6EAEC6DBF8
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 10:35:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1DC4F3A2627
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:15:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AFD374FE344
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC77F336EF6;
-	Wed, 19 Nov 2025 09:15:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E9133B6F4;
+	Wed, 19 Nov 2025 09:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cIZmBk3C";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="LR0IiBsg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MxjfQvnP";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="o9dymNem"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE631336EDD
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 09:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFCF30648A
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 09:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763543707; cv=none; b=aB0msTqZjsgB9UR7pxD6Yel12vod4kP+jR+Ktp8bt6WwoMVEWAJpwIfFcXvara1/npqnfNUYL3Hsl2JDOsRqp9+cRUui2nEH/cE+1JYMq7cw4YMS1xPJWQOag1jIPbUitJ1qff5D/8cE6lOwjQ40rwws4Q7TalVqqfoVLVqDADY=
+	t=1763543932; cv=none; b=me230yZkQiQP8qjZt6sUvbXQhqKgn/FcRnyqLPawKrddxUeKzxTTCbZ/zpHIhfILYI8q0CZqf38edAegZuNOaJyxLAWCpI5ADQI0mTwIL2GwkjB8nuIxdNAVzzCabzUVSEwYWUsHLZSyxuLGbojXs3UmjWX4s/9j3c2f2CASvaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763543707; c=relaxed/simple;
-	bh=vCiayDyXQMeSWQnZ0u5xg0l7ULoxebZX0NUwkzYWlSw=;
+	s=arc-20240116; t=1763543932; c=relaxed/simple;
+	bh=eD8SrHrMaadYG50GIhGP1OcsE+eBdPe4buzRGFAm4Zs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CaAExdD49iVapV+KR+6Iv+UXzzK9wmrJoiicMt2w/0K9zv5kBI7aLEYY1AJr/yFuUTrIUI3PVvKqhw4R5BiYuce4ue7lyWzqOSKNT0lT2hv4ns9BVcOlcK+3YxY9vo+cfjB8PlzELRjxbkF4HZmTC5Ry8hlUYDFKGDnRHnhlGm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cIZmBk3C; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=LR0IiBsg; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=nGpJ+YYRwYnihBkWmzNvx58SM0QlY+Md8ZdkGxFKPduKezQnpoVDCTA3c9gC3vHwlKjoGrSMRx2Oo2xSfa8swA59BXbBxVfYTSWGxF/Zhz7rP2vXjSSa9m2MEHCeTOPlaN3eyKF8um5gjVoXVseTbIRmR6L2HxrGbj1+JUZm/JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MxjfQvnP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=o9dymNem; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763543704;
+	s=mimecast20190719; t=1763543929;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=U+iRB2oBivDIJuDbosHNcX/b7vuh1IFrDOEjoVs0d5Q=;
-	b=cIZmBk3ChN1My7WoHTQD5b/BMVCCpaJyKeqEbB+lnCd9xl21ndx34GabsXvQxbYbA4yzwi
-	1R0PeF/a5de+1p++q1njWVPWmrBjrthZWM8V6OQuIpudNkKdVwNqjBonPNGZVcinlFdlXr
-	g7xVPi3ZAwGrllbQQaOiPB3cbo8qKt8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ykiTizCFtTIndhsPVLB6d9JwBV5HvA0v8sThcwbCDCw=;
+	b=MxjfQvnPXxgNE57CwPZdPElKNPOUlxRfynN2/WE1opOTLUKP/UOukVxSg+9g5LSwBL0L+L
+	WaLQZwZgdCQXS2N2xEvqp9GzhopRwsen6XctsW5ETjl2OSF8qZjovw8Cw0eLywHrF2ZfEJ
+	8VAmapTHfwASCXt1q/svkqdjTrWitjE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-379-OgFc9_fiPTWsKN_enB3v6w-1; Wed, 19 Nov 2025 04:15:03 -0500
-X-MC-Unique: OgFc9_fiPTWsKN_enB3v6w-1
-X-Mimecast-MFC-AGG-ID: OgFc9_fiPTWsKN_enB3v6w_1763543702
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42b366a76ffso3386258f8f.1
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 01:15:03 -0800 (PST)
+ us-mta-272-ACiNhPqFP5e6Vs_Qa5r7qQ-1; Wed, 19 Nov 2025 04:18:48 -0500
+X-MC-Unique: ACiNhPqFP5e6Vs_Qa5r7qQ-1
+X-Mimecast-MFC-AGG-ID: ACiNhPqFP5e6Vs_Qa5r7qQ_1763543927
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4779c35a66bso26444065e9.2
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 01:18:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763543702; x=1764148502; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1763543927; x=1764148727; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U+iRB2oBivDIJuDbosHNcX/b7vuh1IFrDOEjoVs0d5Q=;
-        b=LR0IiBsgYw4G3MyZRViI8f+0JYsuF81lxFwbBpWaPlVh7wYUOgChbp42hfQG1BuYAS
-         BUC4Sey76znhhew7b1Jp5WZXgoB8dcZ3H9pKBtbD8FRvGtIgJrl5EANaSza0aP5mjHJj
-         wUu122P7gQe/u/vM3omgqLDi+OHI4on3uOubJWcQtvRZg9hd6LhenKqwbk50Yuw26X/x
-         FFhustCcZYApTPxPfEC4TjZsmKxnFwdWHb46gr6Gv8tfqT6ueu2FG8syUCC8rcsrcQXk
-         iqM93L5JZoCUwFHvoa3LRUdLIOYNYlVXp+UdWHYpXNHohQrMqJEBCGY59co9c43nzXy0
-         j8Og==
+        bh=ykiTizCFtTIndhsPVLB6d9JwBV5HvA0v8sThcwbCDCw=;
+        b=o9dymNemXkUAy8qAt/QbRSTGJ56reFTc46qUL1xwY6uVDSGsFveNRFAKuEIlSFeie+
+         adC2i0vsOoMAYOrK/9jcuGRGHBHO6LYiM+D+XIW16rYaDZC9JgBgm+cpEGhaA1E3KcCZ
+         lUiKwjqUl5ePxhbL3qq3uPyJ96k6/RqfRzuDLBXTA4qp5grrriOsSANxv9lTnFom8INj
+         Vrl8gbVswSch7G7nya8EntTfxgDximqb3G5ykAG5yFkyRuNxCWbcl+FCpbbS0e5IUdUA
+         O6gLcxXcX+9+XVZArAzwhTo+wjQmCF9Ny2NAfG6YgVTWXPHPMwZEYoOhd/gWfkycnfdn
+         LmZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763543702; x=1764148502;
+        d=1e100.net; s=20230601; t=1763543927; x=1764148727;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U+iRB2oBivDIJuDbosHNcX/b7vuh1IFrDOEjoVs0d5Q=;
-        b=pWc70jypN9V0SWygmvoyIStztlwq0LeMImoROBsfQ61VuRN0DszSDcYlZebhqm5FN8
-         9aYhIdbalEGGYNSLR64VjB+IwaiOUmFHsWHyd1FCuTmd4eRk0G8PvDvSPLxQb8h67LNg
-         lVMoQCcodaoTWHCT7JiD4sInbSdJhLw0Fm5vq4s/xaTqLT+37x6FBsDmti10M4s6eFQb
-         r0mI7rVQgRvCFx7EY2654I6Pw/JiS/O9I2sOno0DXy0CXvxgHVVyH+INg2dBLtFsGeLh
-         1oAW3JvciUFw4RNPYCOBHCqGHM2KnCkEOPhoEsycYMyK+c91p6WBjOVat2bJON4Z3bUe
-         rQow==
-X-Gm-Message-State: AOJu0YzFoSgxKg8x8gf2iGQqkLJsGOZQO8CK/3KDJHC8CVqjPu2t1lGM
-	vwlRijxbsspIaqjrW9LXW9puAAr/3EUaU3FA6TVW4Oe2vZGVYRpqKLKfzsEBPtwLklwuTGqUoRx
-	T0WeKdcGV3bPAYQACakfX5681g/Keu0Q6dMAU1+058uqK+y4m09ZyMjYNsg==
-X-Gm-Gg: ASbGncsIOcaMC8nBRo4TbvkmOflqMlxWtyrWbABH011jqu0WFPkjzLdCkMzT1dQu85m
-	T9OVyR7gKPL05koRn4OarOvNjSDAGxTVQjgmM2VMp7iu4btjg5RYK3swO6NXrdLtmpfgTlRwXhR
-	uX7pz+BnwWVKxkyTNI39XQSqpP/oTZrby3D++Qm6YXmB8m8E7BwrXC+mu2INJlGfYqZWJNZZm1V
-	GaaAINb71NX0PHDOo/QWX8NcLY3QI4ZGDp/IaQm+dNrDPXI5bVJRQF2mvTH61vG7bhkZzyWcq3k
-	NgF7OO+qoikckl7Uu0TouZBHx8gn+7U+oxbOdfDTJk4ytJZkO7XiatRwemQxhrmrHVxycNjvQZB
-	yUBVZQy8xwVMLRZBFij8IT4omd3+n2Q==
-X-Received: by 2002:a05:6000:1849:b0:429:f14a:9807 with SMTP id ffacd0b85a97d-42b5938aac0mr18791026f8f.40.1763543701701;
-        Wed, 19 Nov 2025 01:15:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHpSphKmrAY6KUvFodAB5O56XHMrPtkTG1jHwTLKCUo+5xF8M9q56JIE1Dwzj482I2IEdQ3tQ==
-X-Received: by 2002:a05:6000:1849:b0:429:f14a:9807 with SMTP id ffacd0b85a97d-42b5938aac0mr18790983f8f.40.1763543701242;
-        Wed, 19 Nov 2025 01:15:01 -0800 (PST)
+        bh=ykiTizCFtTIndhsPVLB6d9JwBV5HvA0v8sThcwbCDCw=;
+        b=H49/nUeSpHfgL63jpDIDqFU5+7YURWgfMHMCm7MGBE3rxy2no0fGtFvCVy2CHAULYB
+         MnzGBamu3RMKKS+uqPRiwb8N8pUn8RQgc3TAai9Vhudh1kHVeeKZzPok9DXoDjrK5Ecs
+         K/EgHRSfy20MEfE88LV1wEAyFaZBD/imBARlVGl7sI7zW9fk+98I8C0brxl0htsV2Cel
+         j2hIm7h+fGsw9KF3InSApk4klTiNgRBUJe2GOiNLt90ZlySlnWXhnUPn2OuBmu0++KPb
+         mfWhQzc7AKqZbaWVnIYWQWGh+x+aaErs8hbAuo54kDBMngM9OzZlwBoBdHr6yONJFhmv
+         xmxQ==
+X-Gm-Message-State: AOJu0YyAnrHYcA811TdsFDrqpSQ9g9+PVOCXTV3gaANB5cYu/ZHrdtCD
+	oiwGWZNNDcAUdzhrh8KmTF5AhJHYA7doAGYQGkTLxUDj6ydU4ZKR7v5Kv/8pxXpwoLGU2X77vKw
+	YGzZK1ATzWjDaBmydnYMwXMPF+7WNMp8zNx5Y3lWvHLOYDIMfVyZxPx7S/w==
+X-Gm-Gg: ASbGncv/w0zI6w+f63ymbmOLxdAJrba/kTzbD7cw/1fhfWFqxNm/HqC0dijdAA/Ej/h
+	4JSzSIP30GYpJsdqVtHGNUw0L8y6pRfYtAdQ2PlWIpU+hO8ydNAshAF6uHan14zUwnd9FjSG0Rc
+	t9VEhUPkVDwwVRbgL0hm5QwhQ0E9lMKzO0zlZmtwFeXdIkgHffLEnKbzU01qVP2taH8P/4H7dcx
+	iDz+HaURe8VmEY6efnOEIqYPU7Ic9XWjXIx8b+NrT3PQZzddrTbYPb8CrLPOVDRSMMEaI53tQ34
+	B628nzir3ANnp6vXlQr9qBo/+K8UlYehjv2cc0udLOYOwbpQF6iu9c/QipcPfJU20W+bgHnfelz
+	6pdshuyP8HlGV1xKkqUk8+BRrWVVheQ==
+X-Received: by 2002:a05:600c:c48f:b0:477:7b16:5f80 with SMTP id 5b1f17b1804b1-4778fe49c0bmr188982535e9.10.1763543926582;
+        Wed, 19 Nov 2025 01:18:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFJ0kf7jlIDNUdvm7TX8LR8Op1tEhe9CwD+MgXbg7FzSdj44TfR1SeRP2n+wUWlmPpEYHNLLQ==
+X-Received: by 2002:a05:600c:c48f:b0:477:7b16:5f80 with SMTP id 5b1f17b1804b1-4778fe49c0bmr188982255e9.10.1763543926189;
+        Wed, 19 Nov 2025 01:18:46 -0800 (PST)
 Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e7ae88sm36177558f8f.6.2025.11.19.01.14.59
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e91f2dsm37899071f8f.19.2025.11.19.01.18.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 01:15:00 -0800 (PST)
-Date: Wed, 19 Nov 2025 04:14:57 -0500
+        Wed, 19 Nov 2025 01:18:45 -0800 (PST)
+Date: Wed, 19 Nov 2025 04:18:42 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Daniel Jurgens <danielj@nvidia.com>
 Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
@@ -98,11 +98,12 @@ Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
 	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
 	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
 	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
-Subject: Re: [PATCH net-next v11 11/12] virtio_net: Add support for TCP and
- UDP ethtool rules
-Message-ID: <20251119040931-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH net-next v11 09/12] virtio_net: Implement IPv4 ethtool
+ flow rules
+Message-ID: <20251119041745-mutt-send-email-mst@kernel.org>
 References: <20251118143903.958844-1-danielj@nvidia.com>
- <20251118143903.958844-12-danielj@nvidia.com>
+ <20251118143903.958844-10-danielj@nvidia.com>
+ <20251118161734-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -111,33 +112,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251118143903.958844-12-danielj@nvidia.com>
+In-Reply-To: <20251118161734-mutt-send-email-mst@kernel.org>
 
-On Tue, Nov 18, 2025 at 08:39:01AM -0600, Daniel Jurgens wrote:
-> @@ -7167,6 +7261,10 @@ static bool supported_flow_type(const struct ethtool_rx_flow_spec *fs)
->  	case ETHER_FLOW:
->  	case IP_USER_FLOW:
->  	case IPV6_USER_FLOW:
-> +	case TCP_V4_FLOW:
-> +	case TCP_V6_FLOW:
-> +	case UDP_V4_FLOW:
-> +	case UDP_V6_FLOW:
->  		return true;
->  	}
->  
+On Tue, Nov 18, 2025 at 04:31:09PM -0500, Michael S. Tsirkin wrote:
+> > +static int setup_ip_key_mask(struct virtio_net_ff_selector *selector,
+> > +			     u8 *key,
+> > +			     const struct ethtool_rx_flow_spec *fs)
+> > +{
+> > +	struct iphdr *v4_m = (struct iphdr *)&selector->mask;
+> > +	struct iphdr *v4_k = (struct iphdr *)key;
+> > +
+> > +	selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
+> > +	selector->length = sizeof(struct iphdr);
+> > +
+> > +	if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
+> > +	    fs->h_u.usr_ip4_spec.tos ||
+> > +	    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4)
+> > +		return -EOPNOTSUPP;
+> 
+> So include/uapi/linux/ethtool.h says:
+> 
+>  * struct ethtool_usrip4_spec - general flow specification for IPv4
+>  * @ip4src: Source host
+>  * @ip4dst: Destination host
+>  * @l4_4_bytes: First 4 bytes of transport (layer 4) header
+>  * @tos: Type-of-service
+>  * @ip_ver: Value must be %ETH_RX_NFC_IP4; mask must be 0
+>  * @proto: Transport protocol number; mask must be 0
+> 
+> I guess this ETH_RX_NFC_IP4 check validates that userspace follows this
+> documentation? But then shouldn't you check the mask
+> as well? and mask for proto?
+> 
+> 
+> 
 
-it kinda looks like you are sending flow control rules to
-the device ignoring what it reported as supported through
-VIRTIO_NET_FF_SELECTOR_CAP
-
-Is that right?
-
-The spec does not say what happens in such a case.
-
-Parav what is your take? is the implication that driver
-must only send supported rules?
-
--- 
-MST
+in fact, what if e.g. tos is 0 but mask is non-zero? should not
+this be rejected, too?
 
 
