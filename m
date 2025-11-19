@@ -1,226 +1,176 @@
-Return-Path: <netdev+bounces-239984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2123C6EA26
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:59:08 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B88EC6ECC0
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:19:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 9671C2A3B1
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 12:59:07 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8FD4C3A6309
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:12:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F0D311968;
-	Wed, 19 Nov 2025 12:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825753612FC;
+	Wed, 19 Nov 2025 13:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="C8lYSGtM";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="O+PdprZc"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="aufVFN8K";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="QG1bur70"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E02D2DCF5D
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 12:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D253612E9
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 13:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763557145; cv=none; b=ru/Cdi0N7WmkaiOdcuq47yKtdiItZ17WTJ+TMdW2FJYuTkMGcw1wRvR2Z4qI+o1m3llB59UmZxWXou6ceePz+nLgHbZA52RUxLGtI4zAMm8Z5zXrFNyHjUIw2GNlwSgXRwfQ83x2phZSbJcTCOt4ON+xieA9i3JOuXxn3TMULmY=
+	t=1763557731; cv=none; b=Z8auz3SpDLyTDYtr3bhaJJy/s+Y+pQ+affOBcXEInarA6XSgD9MrHIo57SE1CCUM9leoTp9I+7JGponpklWYQG0raBzcIj/DXw6u+OCl+pEB48VBgx1R3VE5g1EWa233F3dHAYcMekwoTAE7GCtjc0OgZytDpgf94RC9hz20MJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763557145; c=relaxed/simple;
-	bh=R4entDCq94AuEGtP5w7qfitkVN7YwG/0+GrBuf7vwis=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RRmzqJur2ufaaMTCE66VIKIhlkS7X6kZIsI41WHqz4TSb22PWUkw7nymnDFUJMJhBh+h0cHRzO4nItY6d1HbAcG5TBRJXAWQU6mkJujpKe5s23SPgjKUV9IsaH3jY25y5SkM+ST5ZD1wvr/usGkWSPYhlbdLK6xPqeSujgiNdIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=C8lYSGtM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=O+PdprZc; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.stl.internal (Postfix) with ESMTP id 19EB11D0016A;
-	Wed, 19 Nov 2025 07:58:59 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Wed, 19 Nov 2025 07:58:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1763557138; x=
-	1763643538; bh=13eP7Wbg+SvzNZ0BgOogCk4y6i5sHlypruTU0fAPebQ=; b=C
-	8lYSGtMA32M9C73LDJFoN0A48Dwph8UMj5IjGZriq7MabRKnJvUYhIp7qQgBWzsT
-	13Ba3tyUYCQ6YibXb+jdnBU4Zb0++EJz7BgginFcXt9mCRQbj3CYRF9bTiz3jNZz
-	KoCZ3eghxTZfAB641PjVwEQXuW1PpmK0E8siq2UG0E/KtihHyTjryeP6tZzVqO88
-	+cqSZf0U3pfX6D9DiUdAg2XrAfX549bIorWmgBjTcuY0i7AlBgHUgdkeLwFhzGgZ
-	uuFWHqWZ50q8WJtzlpk2R/AOFsPVlEQgjivei/8c8E3e/UpTWhtAcsiEKNeCjRLq
-	IBqkL4m7dfzJ2NqbFe9Uw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1763557138; x=1763643538; bh=13eP7Wbg+SvzNZ0BgOogCk4y6i5sHlypruT
-	U0fAPebQ=; b=O+PdprZc0Px07+8JMnuWi99kZ3fIGjq+nDRf/1Byf/lKYCl+v5u
-	C63TSvNGuC9vySZBNm2TwgAF2RPOysqtAkqwWxeUzZ9hyb5lNOLNKirzHzGsuBpD
-	FaMNovie73DpVVPaULTQPv7M9mp0iQ5+IXO/YbtlEtVD8OmyZsalTVe0Ga19/6uM
-	4NQhoL76ZqnR008laS1vWzpL+SVbQ2kz8KHKVx0CLrIlMqkz2+PXxDyoo9cPBJ/M
-	YHqnopJyUyb5G58HilVFxtPrfx1QcKqxXSKMqz/sovDuB3znf4EackU/Y9lU6l83
-	kUuTXJuwl0HPohuzxJoMAaO6W/UR3syCEHA==
-X-ME-Sender: <xms:Eb8daSvxx_TOKoX8al1SLDJlTMa8doPEljsHWTMPlAiDktvjgR00jA>
-    <xme:Eb8daTUkV3C5AjoO7T09KIt_SZaatPFEgdxVoEbOvksEJ8c5JPjA1pYKF4eYguc9i
-    JcQuB53UnmPDpWMLIppQ1OFx3ZvVyOWCadAThUP1STD04dLJ7Cf9hs>
-X-ME-Received: <xmr:Eb8daawjSUaOl0o6YCaMbRkCkmd5s5KnO2VeJ8YGm1NrVESd5rkpaarYlvs3>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvdegvdeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduuddpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepjhhirghnsgholhesnhhvihguihgrrdgtoh
-    hmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsrg
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhht
-    sehsvggtuhhnvghtrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrd
-    grphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpth
-    htohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-ME-Proxy: <xmx:Eb8daSEj8mrm8JF20pYBCdqGHOf1nsJjvJX6rWb5-EooygL9RUf2YA>
-    <xmx:Eb8daXvUZd3yJCg-nWg38rhCQmZr-PBkRukZH00jOaZ8lvpXbxl-XQ>
-    <xmx:Eb8daaA3VH9lKEVETJ8U9D9GLEaz_ao0m5_DpZgt6QBNENlzdYDmVQ>
-    <xmx:Eb8daaAF4C51BZtZl6pmIAGSPko0N7eIxL3YKGVSXfQqUc3rkmzGMQ>
-    <xmx:Er8dab7U0LzsrYClOgGrh-YqiV6z_BB5lQBEZ0FoTXgNwGkNfflBsJNU>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 19 Nov 2025 07:58:57 -0500 (EST)
-Date: Wed, 19 Nov 2025 13:58:55 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jianbo Liu <jianbol@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	steffen.klassert@secunet.com,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH ipsec] xfrm: Fix inner mode lookup in tunnel mode GSO
- segmentation
-Message-ID: <aR2_D3iEQvAklDEW@krikkit>
-References: <20251114035824.22293-1-jianbol@nvidia.com>
- <aRpaNMxGlyV_eAHe@krikkit>
- <d18ab53f-b91b-4c64-926f-4a1466d2d31e@nvidia.com>
+	s=arc-20240116; t=1763557731; c=relaxed/simple;
+	bh=zfEQUt4DhWAUXc5x6ce3fvEtypuCBnBXH7OVSLBJQLc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YuYjja7zAFuYXbfZOubaV0Ew1m4ZJSG6s2P2yXXdgto72cg3rri49aZGwuIiZHFJGaaWg432jsVFWadczp3NIIcNybIgGKPBjEUhwSbQ2f2SpZgZ5gddg0GcWnhyE7fCIGZHao6iIWdWSPYnfqMCtFyZrSy7Gv44P5hIq5dCK4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=aufVFN8K; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=QG1bur70; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AJB6Gwe1982214
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 13:08:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	l9lECUAFdYVI6sCIVSOz3LRlNh/O8By86XnvozCDqms=; b=aufVFN8KDVdSv69a
+	hRT8GTNwJnTqUhoUVN0GUd1eHfFPuDuEXpteVMBRqQmbkLV+9JhrVq/4f3PPqsQK
+	spfIbRLn0RBJyWlFxIOKhGcaoRy3quZ/Ixko412pkSEOsaZmMOa2gY9hxHKyNwLd
+	NnQO77kYkz+sasGlbwDvbIZ6hiHAfv0Drj/6dVhTDG89cO21LJ8N8lACunR8cW02
+	RUlJvAwTWm9LW8xqVGt4tq0fZGsAN3FJsptioNFnfTmpfKS1belXodN/SSvBorDJ
+	9NI/1SpAeY0Hc8QAegSbTv+eqUsyDUa4jZZjV0nxiXmVEY+ObCpM6Mk6y7tJESgn
+	ZWXUfQ==
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ahcqng9yh-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 13:08:47 +0000 (GMT)
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-949056882beso368510139f.2
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 05:08:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1763557726; x=1764162526; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l9lECUAFdYVI6sCIVSOz3LRlNh/O8By86XnvozCDqms=;
+        b=QG1bur70EJbE8Miaf653J0h0J66izu+6gpxuJV+KQKYIJnXjp0PW6Bopd2BO/oSQWt
+         lUUB/HIE0QbUbusWw+XL6KxaB4d/4kvtBKFJJu4Em3yWc+SPf9q5PXkqOXXTuqvicuZp
+         gi9Zm2Q1NR7RzlVmD0s+jqKBKZtpGo0phWk9f06lJKQYP5B406ShdxTtDbbKSOCLJlhl
+         tzxObncoVPt1TmDUEkp7KvtldftPVSdO1Sb/BbWx0ifhzKalvZVxhYTD6McWq0K2Gzy+
+         4UxJVvPYndIcVYOu3UjqsABLUDkKXRRmw2u/32c9mYW7p2oppeTn/XMi4fxanot2fO9J
+         pmag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763557726; x=1764162526;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=l9lECUAFdYVI6sCIVSOz3LRlNh/O8By86XnvozCDqms=;
+        b=BOVwkDpIJde9hDtvxzT00Q9obcHBdTj78w8iJ6kT02gszFuLm9TCCzPNbKbJQCawaN
+         KmR8X6n+GXYTupH39alrdpBSBmpCE7tB64hcbRNNDdU3Rp0OiFUTknnBA4/SIWorBdu1
+         ZQqd6ZIQOVs+hLWG8UTMjOYjoXRqOxE2n1FrolYaBpdjLgyK1lDd1fG8DN7P9gPptqnw
+         H/YeQm3/AtK9ZHy3XMnw3Jjvi7Seu4P62jduMZ3DuAauuT8oYd32r8TUCJeUppaUdV5Z
+         o3wNddH8Ma6RJ3zYlC+WsZPq3H71E/SYHEIysVTFnjNyFA9Trmq0Xplvhlf62ptQku67
+         jAaA==
+X-Forwarded-Encrypted: i=1; AJvYcCUMYCtU5C0ZE+VgULsUuoIFiQ5Rc1w3/jP6QX9g6U1zyMWUj1vmVFQ/4EEDFtBRfQSEg51gomc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxlJBTmJhM8u78vcd4kBX/nS+FH9CrVR7366zdNaHYVjD4cjAL
+	mbxuFTavgcwW36mfO6x9eWGdbpyF4Nf3Enb2BM2ED+fyuS6KttSM3KJjr4yrwWpv+bnA+INosSf
+	9oM0hzdVUIGCLnLWe1l32NPuHwJ+NlLzUuUH3u5mweOuqaqnRPrULnGen4sUro7+KwebOfU54nT
+	mxJIq5LlYRK0uZtIQnKDw31vqb7eAciz5+Qw==
+X-Gm-Gg: ASbGncvsnOlQX7GwUte1bQTbTTZV8UI5mMPrZ9dfCze2XxE/lT9YhgtfLULOUhmvzie
+	r1NydeHsfhUAN312ufLzi6YqajNlBMdpgUyH81IYmzEX4ZJV9XvLz08r39OIkiSd/DNRM1sEX97
+	YugUYOFdm1YjQNIT2LaDrMs9CbsJD7dLzN/KLiqmVZgmytu0cFcgZJ/DcgJFl1RvONSMa1Kzs87
+	stIHoqpQ/TRkK+ULeVOGCgzXFZe
+X-Received: by 2002:a02:ac16:0:b0:57b:66fe:15ef with SMTP id 8926c6da1cb9f-5b7c9e0370cmr14450842173.19.1763557726430;
+        Wed, 19 Nov 2025 05:08:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEY+j1dfzf8Batt7FHNQwSvu4wncs/IYd0ddz7VrhrJ0xKu+nxGk0DEyzi1ENK6CVZeNWF9cPj4TuK3qu0VzgI=
+X-Received: by 2002:a02:ac16:0:b0:57b:66fe:15ef with SMTP id
+ 8926c6da1cb9f-5b7c9e0370cmr14450812173.19.1763557725952; Wed, 19 Nov 2025
+ 05:08:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d18ab53f-b91b-4c64-926f-4a1466d2d31e@nvidia.com>
+References: <20251119105615.48295-1-slark_xiao@163.com> <20251119105615.48295-3-slark_xiao@163.com>
+ <rrqgur5quuejtny576fzr65rtjhvhnprr746kuhgyn6a46jhct@dqstglnjwevx>
+In-Reply-To: <rrqgur5quuejtny576fzr65rtjhvhnprr746kuhgyn6a46jhct@dqstglnjwevx>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Wed, 19 Nov 2025 14:08:33 +0100
+X-Gm-Features: AWmQ_bkdfqVA1rkVLtELKfbA7SfWdvWWr7jj-_NBBRnuiF2JhyyUFR7jNOrf7ls
+Message-ID: <CAFEp6-18EWK7WWhn4nA=j516pBo397qAWphX5Zt7xq1Hg1nVmw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] net: wwan: mhi: Add network support for Foxconn T99W760
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+        Slark Xiao <slark_xiao@163.com>
+Cc: mani@kernel.org, ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, mhi@lists.linux.dev,
+        linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE5MDEwNCBTYWx0ZWRfX5bBVXE/ju94L
+ eZ5vIibeAYUypeibTMoLo6PF3BohXKpSIBl3Qo8kgm4haASdhLQXhl8dWH2zN0qm+LRC+fUBsMl
+ /x4rVYMsKqAz/NkrMwnOvbJwrMkMG78FoOgx11jZGT+HEGiAHPjEQXaaGFDs20rDCkzQwVuMKGx
+ S8ncFUIveFDcNTiV/2gNEdaRi+ZGmqmhKEhOPZjRK3BdEHzTPaVTIqb5CDXvIZQ8VydxLJIoQ6s
+ WpKxrvyXlMS23vEvjoQj8zW63eR80A2nfHcEkRpixz0q9ZEtz53W/iq2G41Aq3oQZaWaMaA+BET
+ PUJ3i4rU8JynayGwRbBjDBk79fKKVKjirmY+VAhG3GHz0CAAoqAVENHSsGFDG5EivfPcEt+2USK
+ fJj+vHDKK7X/zcPl15bPdQ/212Szxw==
+X-Authority-Analysis: v=2.4 cv=ApfjHe9P c=1 sm=1 tr=0 ts=691dc15f cx=c_pps
+ a=7F85Ct0dzgNClt63SJIU8Q==:117 a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=Byx-y9mGAAAA:8
+ a=8dE3Wk8t88_o15qU7OwA:9 a=QEXdDO2ut3YA:10 a=LKR0efx6xuerLj5D82wC:22
+X-Proofpoint-GUID: OnM933UgHbbyA4oyyKa2ztMFrg2GE2Pc
+X-Proofpoint-ORIG-GUID: OnM933UgHbbyA4oyyKa2ztMFrg2GE2Pc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-19_04,2025-11-18_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 lowpriorityscore=0 spamscore=0 priorityscore=1501
+ suspectscore=0 impostorscore=0 phishscore=0 adultscore=0 malwarescore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2511190104
 
-2025-11-17, 10:12:32 +0800, Jianbo Liu wrote:
-> 
-> 
-> On 11/17/2025 7:11 AM, Sabrina Dubroca wrote:
-> > 2025-11-14, 05:56:17 +0200, Jianbo Liu wrote:
-> > > Commit 61fafbee6cfe ("xfrm: Determine inner GSO type from packet
-> > > inner protocol") attempted to fix GSO segmentation by reading the
-> > > inner protocol from XFRM_MODE_SKB_CB(skb)->protocol. This was
-> > > incorrect as the XFRM_MODE_SKB_CB(skb)->protocol field is not assigned
-> > > a value in this code path and led to selecting the wrong inner mode.
-> > 
-> > Your testing didn't catch it before the patch was submitted? :(
-> > 
-> 
-> I admit I didn't test all the cases for the previous submission, but I have
-> tested all the cases now with this fix.
-> 
-> > 
-> > > The correct value is in xfrm_offload(skb)->proto, which is set from
-> > > the outer tunnel header's protocol field by esp[4|6]_gso_encap(). It
-> > > is initialized by xfrm[4|6]_tunnel_encap_add() to either IPPROTO_IPIP
-> > > or IPPROTO_IPV6, using xfrm_af2proto() and correctly reflects the
-> > > inner packet's address family.
-> > 
-> > What's the call sequence that leads to calling
-> > xfrm4_tunnel_gso_segment without setting
-> > XFRM_MODE_SKB_CB(skb)->protocol? I'm seeing
-> > 
-> > xfrm_output -> xfrm_output2 -> xfrm_output_one
-> >   -> xfrm_outer_mode_output -> xfrm4_prepare_output
-> >   -> xfrm_inner_extract_output -> xfrm4_extract_output
-> > 
-> > (almost same as what ends up calling xfrm[4|6]_tunnel_encap_add)
-> > so XFRM_MODE_SKB_CB(skb)->protocol should be set?
-> > 
-> 
-> I think we both made mistaken.
-> a. XFRM_MODE_SKB_CB(skb)->protocol is assigned in that path, but it is
-> assigned the value from ip_hdr(skb)->protocol. This means it holds the L4
-> protocol (e.g., IPPROTO_TCP or IPPROTO_UDP). However, to correctly determine
-> the inner mode family, we need the tunnel protocols (IPPROTO_IPIP or
-> IPPROTO_IPV6), which xfrm_af2proto() expects.
+On Wed, Nov 19, 2025 at 12:27=E2=80=AFPM Dmitry Baryshkov
+<dmitry.baryshkov@oss.qualcomm.com> wrote:
+>
+> On Wed, Nov 19, 2025 at 06:56:15PM +0800, Slark Xiao wrote:
+> > T99W760 is designed based on Qualcomm SDX35 chip. It use similar
+> > architechture with SDX72/SDX75 chip. So we need to assign initial
+> > link id for this device to make sure network available.
+> >
+> > Signed-off-by: Slark Xiao <slark_xiao@163.com>
+> > ---
+> >  drivers/net/wwan/mhi_wwan_mbim.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_ww=
+an_mbim.c
+> > index c814fbd756a1..a142af59a91f 100644
+> > --- a/drivers/net/wwan/mhi_wwan_mbim.c
+> > +++ b/drivers/net/wwan/mhi_wwan_mbim.c
+> > @@ -98,7 +98,8 @@ static struct mhi_mbim_link *mhi_mbim_get_link_rcu(st=
+ruct mhi_mbim_context *mbim
+> >  static int mhi_mbim_get_link_mux_id(struct mhi_controller *cntrl)
+> >  {
+> >       if (strcmp(cntrl->name, "foxconn-dw5934e") =3D=3D 0 ||
+> > -         strcmp(cntrl->name, "foxconn-t99w515") =3D=3D 0)
+> > +         strcmp(cntrl->name, "foxconn-t99w515") =3D=3D 0 ||
+> > +         strcmp(cntrl->name, "foxconn-t99w760") =3D=3D 0)
+>
+> Can we replace this list of strinc comparisons with some kind of device
+> data, being set in the mhi-pci-generic driver?
 
-(not "expects" but "returns"? or did you mean
-s/xfrm_af2proto/xfrm_ip2inner_mode/?)
+If we move this MBIM-specific information into mhi-pci-generic, we
+should consider using a software node (e.g. via
+device_add_software_node) so that these properties can be accessed
+through the generic device-property API.
 
-Ah, right. Thanks. Then please update the commit message to explain
-that XFRM_MODE_SKB_CB(skb)->protocol is not the right value, rather
-than being unset.
-
-> b. Furthermore, XFRM_MODE_SKB_CB(skb) shares the same memory layout as
-> XFRM_SKB_CB(skb). This area can be overwritten during the transformation
-> process (for example, in xfrm_replay_overflow and others), making the value
-> in XFRM_MODE_SKB_CB unreliable by the time we reach GSO segmentation.
-
-Ok, that could also happen.
-
-> > Also, after thinking about it more, I'm not so sure that
-> > xfrm_ip2inner_mode is wanted/needed in this context. Since we already
-> > have the inner protocol (whether it's via xo->proto or
-> > XFRM_MODE_SKB_CB(skb)->protocol), and all we care about is the inner
-> > family (to get the corresponding ethertype), we can just get it
-> > directly from the inner protocol without looking at
-> > x->inner_mode{,_iaf}? (pretty much just the reverse of xfrm_af2proto)
-> > 
-> 
-> I still prefer to reuse the logic in xfrm_af2proto()/xfrm_ip2inner_mode for
-> two main reasons: a. It keeps the code easier to understand by using
-> standard helpers rather than open-coding the reverse mapping. 
-
-We don't have to open-code it, we can add something like
-
-static inline int xfrm_proto2af(unsigned int ipproto)
-{
-	switch(ipproto) {
-	case IPPROTO_IPIP:
-		return AF_INET;
-	case IPPROTO_IPV6:
-		return AF_INET6;
-	default:
-		return 0;
-	}
-}
-
-
-I don't think xfrm_ip2inner_mode, which does "if [some ipproto value]
-and [some x->* property] match then use inner_mode, otherwise use
-_iaf", is easier to understand. To me it seems clearer to add
-xfrm_proto2af.
-
-
-And looking for all uses of inner_mode_iaf, I'm not sure we need this
-at all anymore. We only use inner_mode_iaf->family nowadays, and
-->family is always "not x->props.family" (one of AF_INET/AF_INET6), or
-0 with unspec selector on transport mode (makes sense, there's no
-"inner" AF there). (but that's a separate issue)
-
-
-I'd be ok with using xfrm_ip2inner_mode for this fix and trying to
-clean this up later in -next.
-
-> b. It keeps
-> the logic directly related to the xfrm configuration and state properties.
-> 
-> Thanks!
-> Jianbo
-> 
-
--- 
-Sabrina
+Regards,
+Loic
 
