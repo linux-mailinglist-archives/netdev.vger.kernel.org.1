@@ -1,248 +1,133 @@
-Return-Path: <netdev+bounces-240034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78A5C6F855
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:05:42 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A70C6F7D4
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:01:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 0FE8D31B68
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:55:36 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 33E803839CE
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1939D27702E;
-	Wed, 19 Nov 2025 14:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="djcYSUtE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3898B34C141;
+	Wed, 19 Nov 2025 14:43:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013062.outbound.protection.outlook.com [40.107.201.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61624C133;
-	Wed, 19 Nov 2025 14:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763564126; cv=fail; b=cbPTTXta6n4GY+xTByHRGz+G6z6QKP1taVZY4/IpOJBgQwQOHXGMSZScAZyxEfLF1yrNlfKgspREv+rXCl3btvaK03Dz5LtcGRv05wlAxGRE3jbtmq3t9EFCqP1NW8iX1elX4y98LTsXmAibMQeDi6OEZxMsgEYwb1ECZh60yfY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763564126; c=relaxed/simple;
-	bh=pihqpKIY6b9vFD/Tsfho/JszANUmp4BWZFq/SBhi7t4=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=Mpiq6gl2pp4KLvbH9FNJg4FNHvltK9eZKvRJsnxJuJfNOgZxr4FlQGDXV0JapNkb+T3xJBH0ey+aeUYCOHPs/1NenEoMMQWfCgzvkJQqNAMVziyL8DWQCMyMFlbK8EikUECAnZj6ECkCJMSNRCH1bftRM5kQFSJh0psZU0MM+dk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=djcYSUtE; arc=fail smtp.client-ip=40.107.201.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wclMEuTJmZ2yy8aFkJ4ihgCJuUyL8jnIgsKNj485iVKefer9EU6tc1LU2+AoWOtUNlP2ti21fjVpzAf5Z9VubYRJ2bstd7NvnSgqPsPTCNEf2AY5wM4DLtfvEmvVJ+GEHLkdqc/1riSU7u8ZexTIZHQ3V/Wt4k0wdXCdCdPDKVEoqzVRFXFCwj9HYZmgsxO27bRg/RpnG1pHRDs6nXgCyNTQsbdMV9tyfIFylSK3mZZwuFf8qeiix3WgUe9yqqFVFtdkv8qUoUMYwa6b9l5VrFL64D2xTd3yXiTPxqX2evcyTvEAocwdtax91k7R53Y2lx5P69LK4gox3COh1PzVOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+tT70b5AfeRzKX/vo5NhxFKbaZRejQ8p7yVbqWLy0OI=;
- b=XbtosCZU0HRBltX6h3MPIFojowsTnMBK9U7Ek15NqwuzR0+P6GiV0b3UFXIugfJGjVCHxRY1fgsdyxZvQwBd66zZ+CEPK+SEZbqH7Veqhxclf0dJXGWW54mixBEXmYVQjgoUOgLR1whzdTqxnLs4zLdkPR0HXH8IRz5wbYhyYhzd4xQcdj/Hl17fbzk7+wfI1k2TPSF9hVCSivZBgTy75Vfckf9YufSBIYNJrjdandfK8H8ai6dnw/ANbVwjO+V/KF/keuLb7lc/+NrkhOpqMHhkhXjUNDSgbszt/fdkx5eMIbORgs0hTl4/5QgsYDk56kXQYQ2sfHwfTnhn6Tdk2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+tT70b5AfeRzKX/vo5NhxFKbaZRejQ8p7yVbqWLy0OI=;
- b=djcYSUtEWBRNEOA8QzJMM4LAHFG5QFjP89q+1SCSPueIli/3iE4YNGDhcJ0GG7gvuQjaE6MREXJmkMRR5gPOnrUf3bquEJHVw4xOwJJQ/k1ZAcU4LSNCNS/NMWzgiaXLY4qaNGG9mg9CL04LtrfdEuqSMDMsvT9R/eO77ZDm+xN2yrllTo1xuOslzVbqvr1wGQEjX6tllQWxB9wAByiqNDiYXwStGmFGA3O9HUZ9pCliGYN3/CJ8HlDbrfc80XwTy3qVVjEXnkounLCDCapdAEAKm2OGIGGCKnADW5fN9XrSiSGUvRa4epzQXJeOJ0/wFkmsmddTzZNBfvxSYveYDA==
-Received: from MN2PR08CA0017.namprd08.prod.outlook.com (2603:10b6:208:239::22)
- by DM6PR12MB4140.namprd12.prod.outlook.com (2603:10b6:5:221::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Wed, 19 Nov
- 2025 14:55:17 +0000
-Received: from MN1PEPF0000ECDA.namprd02.prod.outlook.com
- (2603:10b6:208:239:cafe::c5) by MN2PR08CA0017.outlook.office365.com
- (2603:10b6:208:239::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Wed,
- 19 Nov 2025 14:55:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MN1PEPF0000ECDA.mail.protection.outlook.com (10.167.242.134) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9320.13 via Frontend Transport; Wed, 19 Nov 2025 14:55:17 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
- 2025 06:54:59 -0800
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
- 2025 06:54:53 -0800
-References: <20251118215126.2225826-1-kuba@kernel.org>
- <20251118215126.2225826-4-kuba@kernel.org>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<willemdebruijn.kernel@gmail.com>, <shuah@kernel.org>, <sdf@fomichev.me>,
-	<krakauer@google.com>, <linux-kselftest@vger.kernel.org>, <petrm@nvidia.com>,
-	<matttbe@kernel.org>
-Subject: Re: [PATCH net-next v2 03/12] selftests: net: py: add test variants
-Date: Wed, 19 Nov 2025 15:42:39 +0100
-In-Reply-To: <20251118215126.2225826-4-kuba@kernel.org>
-Message-ID: <87ecpucbt7.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE49232D0ED
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 14:43:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763563423; cv=none; b=i33wIOKaRHP1frhj26HwvsDeixyOk4jGvudYZW/cOMkq8Uie182oOB3Sift5SCfQyjjy25Doiy4RwTMSBxzHpYOADOe6JGALyl085Xd3+AgNEJ/UaUMuXK8mEXTC9k+tDXOaQGLnfoATK5YAcc1vGbOflh12O5MNBBdMJSrWpq0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763563423; c=relaxed/simple;
+	bh=tN4N7vuK4JJ0rterP05amy6D7j/6Qj9sv/6YKc8hKYg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LJAMgMWxujmXKW/AyO9QvV0UcjFXbouGehvYFf8iJ1lBlcZtxtT84R7mLmuUHRChCNgJy6v5E9lCul67Nos7bZOBJuk+NA2TP+bNpcTnZlTX2QF9KT1a0NmEhktwoTkhwUX6wd+ghAAXiEw5bwz2QNe9RqMs4NTshyfejYF/Ig0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=csie.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=csie.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-37ba5af5951so61919301fa.1
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 06:43:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763563416; x=1764168216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :reply-to:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U4rPsaXkkkPPqP8F89aStRjGcZr5tE7ulQ3b9FN2Uak=;
+        b=Mz7PPbspKp+ujT0mepw90gTWKME3b7Mcus9iCF5bFpTWKrg5bYcAPX5MiTx7fH7lh0
+         kMF6Dn1q5BrrAz4ZYQQANdajddR1SckZ1SgO+M37Z3jOlkN9fFlQShlrq+ckMuf7fsIc
+         3JyALRfggoSmGt7iTeeRtVB4XtOrKTwIAvXfeRZEgZy+glHbGgClJCoEXiueShzf/YVc
+         3U7rzkdYmOz71yNOOjH88pioW0IrlVQl2An061+nWxex24GpElo26w8RKUPVf7o8S/aB
+         Mu7nMtY2U0nCIITG0esueq9TWsvn7lk91MbkGsaXP88owCU0RKewRKRs2zJce9q2oCTu
+         Nafw==
+X-Forwarded-Encrypted: i=1; AJvYcCVvqX7HCPNux4EBg0zIu12Vj2t3xz8KXGn0wL4smGEUIDZxatMeYi52DY3cO/FZ6OSnxqK2gn8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBbqPjXk2KHKV18WHGQjmcgxAtH7mDykwrOORU7RfoP1N/8Rzf
+	vbkuL27ahcPXkdyIPdKAkI+uG8UmWh+NKQFY7YVPRsQ6NTOxqCO33KFVIzde5SWB
+X-Gm-Gg: ASbGncuuz03DV0C01O6q3DEprpXesTYuY+Nkl7j37kbheLu/uF/UDdx+3zZRHgAb66A
+	KJnc2n4iTXr86LH2M0ki7yHpgokdODPqsGOmqoMcvKnix7+vVvTDZO44gn7B/tI8KEPETOL271n
+	VsMS2p5FJxJTb0Bsv6G1NFFBx/x3EDUccmeTQ8amApxp1IakmVfK9G2ltOsEy38K3BRgd7Q3h7U
+	IHoJ+5/RQJNtcfuH0bmWCac61yIEVPng0tJgaMPJ2/BKse7gEPp4dqXMH26nVmhGA2AN3R75iP0
+	+/tJ3Tn+enyz3TThwqGdNaPdvIAPX2RnvIRNiClypbr97MpEAD42iG4UXbNUE9HiPnDyTuOlZL6
+	sKMvIbjz49JfCP8vk9c6zO8egJ02vm1iRDUy+3uRLW2/+HrOFbO+vr6z7Uyt5xGXPBmZBpU6IM3
+	O/Bax69tD/C2C5JMX2EPkYmX5cnGcKAoZzvfCsd0+mbvy5Xv2DZkDlkA==
+X-Google-Smtp-Source: AGHT+IHnxVBRnkWu6mRZSyUTXxFbVnhLpzzz1f2NKcF7+hWUUAHLvK/nV4REGK6Q3UChVMYlPqWy8w==
+X-Received: by 2002:a05:651c:23c2:20b0:37a:5c06:6eb1 with SMTP id 38308e7fff4ca-37babbacecdmr50467501fa.17.1763563415965;
+        Wed, 19 Nov 2025 06:43:35 -0800 (PST)
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com. [209.85.208.172])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-37b9cee0cabsm40924281fa.40.2025.11.19.06.43.34
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Nov 2025 06:43:34 -0800 (PST)
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-37ba5af5951so61916991fa.1
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 06:43:34 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWIDM7fVLC0+U6hdCRIeEqX73gSIq3/lxeqN+NncpHW5RrGXR+S6xuGk/qrrm/F8zt6MD2pRr0=@vger.kernel.org
+X-Received: by 2002:a2e:9ace:0:b0:372:904d:add4 with SMTP id
+ 38308e7fff4ca-37babd35f8amr45635351fa.28.1763563413779; Wed, 19 Nov 2025
+ 06:43:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECDA:EE_|DM6PR12MB4140:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6bb7fd3e-8e98-4ccf-dc6c-08de277ba786
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|7416014|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Edso0fMe9qn0tA3VxL6YUhAk6FghKYYdCUgr6IacK+Xx+GbYFXu6/jO9yhxE?=
- =?us-ascii?Q?kRemynqKXSt6XOhEroRE4s7NfhSpZUTkPePB/e/s3KLkxFia8kG1m42of3Fz?=
- =?us-ascii?Q?ZJ8iG5im4fNxP3RXMsCw/YJsSjcWZ7R3/sAe1GX3KPGjaWtZWOWLXKWRujei?=
- =?us-ascii?Q?MiZr7usEOTs7mKRB0qFHUTriR+lRtym5KoDvTXx5oJXQMnLS2pHJf+IgJdgw?=
- =?us-ascii?Q?Qw4GFyB9sAXTG8Ih2KSb+GtA2Oqomy8+JIG18sZf7FPTc7OxF91QOTRi6uU3?=
- =?us-ascii?Q?fqy88SvmCRAGu1YwZaJBFlycYXBrwDhnRJrS31uc7orrkYFUu5rPCR+hUf/I?=
- =?us-ascii?Q?u70KtxFbQJt4DF2pQWAmpH1hDRbKItD8SCaG95JHBYYJBk2/6FOJvVCoQFOy?=
- =?us-ascii?Q?ThwBO1rNGJOydMiyPU7im3Wdt46IP+7beDE7y5rji+EeafiE9w/f55FHZciM?=
- =?us-ascii?Q?evmus1qZmlbdnZLp+cNeX6c/HFyqRr0fdsTqp+Ae+TfT8p8u44tyozokE1Rn?=
- =?us-ascii?Q?JWtF0UaFXboNxXj6FU4LFOdZbIAAI/llfOt8fZswuVI84/Du//UMwxaJBsNC?=
- =?us-ascii?Q?uceyY9Pahz1NwVUPi0gDOU3cb5nxkx6vdFNG0IEkDK65Ks3SpeTUw67WPdZU?=
- =?us-ascii?Q?jrrTgcVTgaTcwBpzyGWOvlNqofgWsm3fHsxdh4VmoEdXUWDomKWh7pgkTTMT?=
- =?us-ascii?Q?FFCvqRSUNp+hKYUEVy+btK/7yryGawJuP/5e2se7WTIqn0LPWxd2q7myZ/Hy?=
- =?us-ascii?Q?SYsCBa6azXi/B566vLbkBBQB1dlchHWuoh2FyYuIRiXC8kec0GbruTWloJ/Z?=
- =?us-ascii?Q?tpSnBfn0qFIipta3V3CuKLeut+3UoWm29JBFtZNf5Q24rr0Khfztg2pXgBAY?=
- =?us-ascii?Q?CrQGMWuXgvtthJUHtFS59Oda3AdQPlV5PthOCz/KHhs4zoI+d69q0nIE7iPH?=
- =?us-ascii?Q?/2Ja2OXaLABK8NKGBNBYC+/ID4dGt8MDaaF16edUBoacGiwMfbwSD4vO/XGm?=
- =?us-ascii?Q?VrCZWwpXvs+flE8gdIXGUCQq4xM7P1EuPZpnnJC91aIsPASdd5wxHCzQvKV+?=
- =?us-ascii?Q?cE6PmawxrKYW/5B87FYIKWzNHqnVQRqOLHVWDwk7WgCHzuWyH+YM557WbRGU?=
- =?us-ascii?Q?wp7xkObE2UME3sWChnyFwola/hunEsagpIVDm0NL7qbsWDydA9ZbGEign9Rh?=
- =?us-ascii?Q?C/hu6jGEVkzkHuR9vq//rIza/FKsG/PylUo5v0nlpq59pIiAnbRjwDWhiiv7?=
- =?us-ascii?Q?t6iKJOS+185elV0jDPOMJ+mfnduGC4RuvTFMSroBdZOfOfk83p7QX7glLdZa?=
- =?us-ascii?Q?cshWoLYCEbZT+JBuoUAffqWBiT7VN4lVFKKytRXDuOcNeIN+EOft7r9Liuv0?=
- =?us-ascii?Q?r7JZkCcq+fmfuo7X1u6v6VwlgrYNPebc1FAC/40TN7x2OXfjWGY8t8rJ3auH?=
- =?us-ascii?Q?J2ngaNsS+aqGrS3OI3EUxeXoDwq8MjgFVI3TIUMCY1GrdBZ2F8pyTqCrw+Fb?=
- =?us-ascii?Q?+jK+XEHz1f3+1kkm16wvcYBrhvSf0GnVnzkFOKyi9ukzQsP6S+LGmqDa1aRc?=
- =?us-ascii?Q?NoBNnd0AnAvg/7r0cKs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(7416014)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 14:55:17.6448
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6bb7fd3e-8e98-4ccf-dc6c-08de277ba786
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECDA.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4140
+References: <aR2V0Kib7j0L4FNN@shell.armlinux.org.uk> <E1vLf2U-0000000FMN2-0SLg@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1vLf2U-0000000FMN2-0SLg@rmk-PC.armlinux.org.uk>
+Reply-To: wens@csie.org
+From: Chen-Yu Tsai <wens@csie.org>
+Date: Wed, 19 Nov 2025 22:43:18 +0800
+X-Gmail-Original-Message-ID: <CAGb2v65syu47YAy8-24LDXt1MC2K7r+weOyCWn5fZzRgSFhnDA@mail.gmail.com>
+X-Gm-Features: AWmQ_bnEwqpydG-ZRtqWc8I4l30DitJuwNrACYzTdhyRCjLGsAnpeFb-cKD8BLA
+Message-ID: <CAGb2v65syu47YAy8-24LDXt1MC2K7r+weOyCWn5fZzRgSFhnDA@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] net: stmmac: pass struct device to
+ init()/exit() methods
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Drew Fustini <fustini@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Fu Wei <wefu@redhat.com>, Guo Ren <guoren@kernel.org>, 
+	Heiko Stuebner <heiko@sntech.de>, Jakub Kicinski <kuba@kernel.org>, Jan Petrous <jan.petrous@oss.nxp.com>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Keguang Zhang <keguang.zhang@gmail.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-rockchip@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-sunxi@lists.linux.dev, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, s32@nxp.com, 
+	Samuel Holland <samuel@sholland.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Nov 19, 2025 at 6:04=E2=80=AFPM Russell King (Oracle)
+<rmk+kernel@armlinux.org.uk> wrote:
+>
+> As struct plat_stmmacenet_data is not platform_device specific, pass
+> a struct device into the init() and exit() methods to allow them to
+> become independent of the underlying device.
+>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac-anarion.c   |  4 +--
+>  .../ethernet/stmicro/stmmac/dwmac-eic7700.c   |  4 +--
+>  .../ethernet/stmicro/stmmac/dwmac-loongson1.c | 12 ++++----
+>  .../stmicro/stmmac/dwmac-renesas-gbeth.c      |  4 +--
+>  .../net/ethernet/stmicro/stmmac/dwmac-s32.c   | 14 +++++-----
+>  .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |  2 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac-sti.c   |  4 +--
 
 
-Jakub Kicinski <kuba@kernel.org> writes:
+>  .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 10 +++----
+>  .../net/ethernet/stmicro/stmmac/dwmac-sunxi.c |  4 +--
 
-> diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-> index 52c42c313cf2..47e0af210bee 100644
-> --- a/tools/testing/selftests/net/lib/py/ksft.py
-> +++ b/tools/testing/selftests/net/lib/py/ksft.py
-> @@ -185,6 +185,49 @@ KSFT_DISRUPTIVE = True
->      return wrapper
->  
->  
-> +class KsftNamedVariant:
-> +    """ Named string name + argument list tuple for @ksft_variants """
-> +
-> +    def __init__(self, name, *params):
-> +        self.params = params
-> +        self.name = name or "_".join([str(x) for x in self.params])
-> +
-> +
-> +def ksft_variants(params):
-> +    """
-> +    Decorator defining the sets of inputs for a test.
-> +    The parameters will be included in the name of the resulting sub-case.
-> +    Parameters can be either single object, tuple or a KsftNamedVariant.
-> +    The argument can be a list or a generator.
-> +
-> +    Example:
-> +
-> +    @ksft_variants([
-> +        (1, "a"),
-> +        (2, "b"),
-> +        KsftNamedVariant("three", 3, "c"),
-> +    ])
-> +    def my_case(cfg, a, b):
-> +        pass # ...
-> +
-> +    ksft_run(cases=[my_case], args=(cfg, ))
-> +
-> +    Will generate cases:
-> +        my_case.1_a
-> +        my_case.2_b
-> +        my_case.three
-> +    """
-> +
-> +    def decorator(func):
-> +        @functools.wraps(func)
-> +        def wrapper():
-> +            return func
-> +        wrapper.ksft_variants = params
-> +        wrapper.original_func = func
-> +        return wrapper
-> +    return decorator
+For sun8i / sunxi,
 
-This uses the wrapper() merely as a vessel to carry the three
-attributes. I think the idea would be better expressed as a namedtupple
+Acked-by: Chen-Yu Tsai <wens@kernel.org>
 
-    from collections import namedtuple
-
-    KsftCaseFunction = namedtuple("KsftCaseFunction",
-                                  ['name', 'original_func', 'variants'])
-
-    def ksft_variants(params):
-        return lambda func: KsftCaseFunction(func.__name__, func, params)
-
-> +
-> +
->  def ksft_setup(env):
->      """
->      Setup test framework global state from the environment.
-> @@ -236,7 +279,19 @@ KSFT_DISRUPTIVE = True
->                      break
->  
->      for func in cases:
-> -        test_cases.append((func, args, func.__name__))
-> +        if hasattr(func, 'ksft_variants'):
-
-Then this could just be if callable(func) just call it, else the complex
-processing.
-
-I'm not married to the namedtuple idea, but I consider using a function
-as essentially a struct wrong. It should be a general object.
-
-> +            # Parametrized test - create case for each param
-> +            for param in func.ksft_variants:
-> +                if not isinstance(param, KsftNamedVariant):
-> +                    if not isinstance(param, tuple):
-> +                        param = (param, )
-> +                    param = KsftNamedVariant(None, *param)
-> +
-> +                test_cases.append((func.original_func,
-> +                                   (*args, *param.params),
-> +                                   func.__name__ + "." + param.name))
-> +        else:
-> +            test_cases.append((func, args, func.__name__))
->  
->      return test_cases
-
+>  .../net/ethernet/stmicro/stmmac/dwmac-thead.c |  2 +-
+>  .../ethernet/stmicro/stmmac/stmmac_platform.c | 28 ++++++++++---------
+>  include/linux/stmmac.h                        |  4 +--
+>  12 files changed, 47 insertions(+), 45 deletions(-)
 
