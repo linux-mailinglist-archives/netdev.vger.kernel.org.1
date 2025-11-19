@@ -1,199 +1,182 @@
-Return-Path: <netdev+bounces-240064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AFC7C700C1
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:23:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7AF6C707C5
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 18:36:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E915A4E7593
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:09:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 6CB152F58F
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B40031ED78;
-	Wed, 19 Nov 2025 16:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE20302745;
+	Wed, 19 Nov 2025 17:34:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AsZsQf2+"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="yEd2xxua"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1D526FDBF
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 16:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCD41FAC42;
+	Wed, 19 Nov 2025 17:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763568539; cv=none; b=ZwWh/uvFAykBmvDIdJE62Bt6w3G1pE6GmssUa5HS9HU5AhvIasNTtmrwBtpSy1y+myeoRd6RBqELcg2S2aV3z4/DdPdzgUWzm0qIPV8E10tU1hZCSz5qLI/TpWl4fldb8jD2L4uXXuzBBawR9Z93xINLLGlfVsFLSYw7u0y1Ymc=
+	t=1763573697; cv=none; b=uR1Y8loITu/DB6xt8TBDIjUkjpR4ZPoToMqam8O2Mw/Xw1w9Rq5K7j9mRDzV8wQOhz/J6IoMt7FI1pK4b6mu8CMUBGXgyO0svOZu0CKEt9HUgyIFPalCr5sau2kycl0BMLmh2G6uH76ve4h0PaF5w66aUNWlvAbxwqHPHMbeP9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763568539; c=relaxed/simple;
-	bh=Z3cJOQ2ccJsQ0oWrL1rpG5fsyyBggDRUQgteyGwCcbM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i3HO5402FK+/70/GAPx1rQbn3wc+Btvds0WP2CQPL/bAQO5hNQCV2Znrpbt9sZPlW3/e+uTAU+PXpdxWIZK5t+NHPL2q80ICfV/HkO24bf5pHSec2/k4TVtZ6KFDQLUdYmSglV+MUfypDAJU8B8xVqLV2J+EhBy5ttt8DEsZz8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AsZsQf2+; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b736cd741c1so873519766b.0
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:08:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763568534; x=1764173334; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SizZzBPjLKOoZAzPRbyBM42MsY16LLyvAwLNC6fcHOw=;
-        b=AsZsQf2+kfGPGV3q17h1dhrrTg+T73pYWlEPIqm8v7yJ8Q7C+eGA7uVmk669W0YeIV
-         ih6M+AYqUB3Vlu/DtW75lpdvs22ezYXQVRM4RebP/UtWkakTtudunTVKXVugICJTlnK0
-         BVzixu3i+DAde99cYSmFErdH/Gg90j8cVxYuxnXP1zkJG6ydij1/ctuTVCuUbc2+ZbWD
-         VCfK0aoUYMjyKOPiIiz1ENH8+lDOHwaWGfyVh5k0CLEyHXUC9KpJfs/sI6J8CMN9c/Ja
-         vRsJRZ5YqoyFVpl3AcTlgGGqzbeSOxsfUZZLGgLihtJqUzpQY3hxU3jvwD/1fAy4vfZS
-         QIRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763568534; x=1764173334;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SizZzBPjLKOoZAzPRbyBM42MsY16LLyvAwLNC6fcHOw=;
-        b=lqBaPNXd5AWkK/swC7tGZDsDnlS5kxis5wDMUifMV1RMmLfhYXvkVuQjl/UQs1TIlO
-         ugHYBPGzvzFFU6/syxRtD5kUe9J6tykF+ieaIvgz7v0eJ+//xpS6ml5iJCAY23tf8PoA
-         Wtd/paCGy8QrrH8jy2VUvU4Ua8vmE51ggiEgy/jjsRC8x5a92PyuNe6qtjuMd5nzfv+G
-         wu/6Np1H/U73NtpVDUeacMwa6tBtBdXIt5NxaDCQc9C/PmB1zHXtCA6UupY5E81GTBRO
-         UPsZR5TYTkKsnmR/j8hfH13K7s3yjKaFsJfE2vR6CiaY6Bcg4KNNqDGgjrza2dIM326v
-         DjCg==
-X-Gm-Message-State: AOJu0YwhBFFWYdmZGqRywJIGszayGPW8XTLywbYYOqriPrqadtoV0n1Z
-	VQogjc158oIDviX4ut8BAk3td4nSXId5GW8N8J25tRLRz+GZRsPWPxms
-X-Gm-Gg: ASbGncvv6tAhs02JxL8DkJ2T1uD3vz6IOcspINtbgmeMALMsHMgszghfjx/+5dOJeXb
-	MaYi6QUg48Zf3sJUApkaEWJoa30NMRLyQRB52vo1WgWOYGgyA5BuGOCRSb2NrTNi+tisCtXY4k2
-	D8fu/QmNAiy0b31lPbSxGyhXGCzSXjpvPOKeSV1mr+9GVyn5Bl/C5hPRn87YjUadaC/ToVnWRb2
-	bTkfEWYZKft0fxBaJ60dG0wdisw3Oi60mzZv9RZoI63O5lEeoqJT8EX99Ofa80Uqx0TZhcU7WC8
-	yWTy+XuBx06hsZbMWBpACi1cEBHTxmuV0zPHTOQpcZw9gqXSbJcDyQmKjhh1bELqmC+gQHZRi64
-	0QAHE6kZYK4ozIaIbNFSjkimiXatOqR4S+AslTN3XsD8Iuj6cfmbqeQSGcKk6gp7bJ2GWZRAv+g
-	XQ2kfyKofnEM7ZxOszaMZzbA==
-X-Google-Smtp-Source: AGHT+IH2cx6mffoyjgk5HxK/FEYr6BIhhOy7D3Vvb4brj04ZDUMSv4/MBmhJNb8U2haI1icmHHq8Iw==
-X-Received: by 2002:a17:906:794d:b0:b73:1905:bba0 with SMTP id a640c23a62f3a-b7637869c14mr374006666b.17.1763568533551;
-        Wed, 19 Nov 2025 08:08:53 -0800 (PST)
-Received: from localhost.localdomain ([46.10.223.24])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fad45afsm1657863166b.24.2025.11.19.08.08.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 08:08:53 -0800 (PST)
-From: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
-To: jiri@resnulli.us,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	david.hunter.linux@gmail.com,
-	khalid@kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	"Nikola Z. Ivanov" <zlatistiv@gmail.com>,
-	syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
-Subject: [PATCH net v3] team: Move team device type change at the end of team_port_add
-Date: Wed, 19 Nov 2025 18:08:50 +0200
-Message-ID: <20251119160850.378824-1-zlatistiv@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1763573697; c=relaxed/simple;
+	bh=CP1RHwnLKRxiLODuRu9d3QUcRfYZy94bnfo/gKve3d8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=umqo6DKNqn1FfDaHGfhaaign2CgosCxNtWE1IROx7VtWkOIyVPPcuD8lRea0f8TAApP8uu0lZPdweo4ADnJvjM0BNNRYZYh2Viy+yQmrrU5P+x3+71XpCONL+9ZmMHkHa0yDrswJrHQEZTkn0duQJvYvv+3yZiPFlO8lSiUOmr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=yEd2xxua; arc=none smtp.client-ip=80.241.56.161
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4dBTBW16zVz9tl0;
+	Wed, 19 Nov 2025 18:34:43 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1763573683;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e8QG+N4/1kcdXJQ/ndyF1FfjMK6+46fe00n91fXl4zg=;
+	b=yEd2xxualOZVytUgw3Cm0xIpSSC+7i0hA/sy4Jpc/iTSCJvNNzs1XQ0HU5b74/FHvDgBb5
+	X6QCpYcnMXyMVeqbdnCjfWM9ZHsbz95+R8P5Ai/2+V9PS0a33sJsxAa4dDebvAqdic28Av
+	obTly/Pir2GjLVbNv/RvwHWdFWAMGgTjrNtwVYuO4LcNRiHgIxDhq/GKupAlfvIkaat3Ad
+	ZvrX+B+wVyf3eErqKyxWbTdt6/oTWudG1hcfgjwQZ3W7cK7yaSGVoO1IGVXreyah4PpCvC
+	9CuOUsy9k9wCuOuGQ98BEHBzpVFOzZ/Ye1MT8O8XtNXvDRi0ciTzMbnOvUaf9Q==
+Message-ID: <d520f61e-1c51-48dd-aa49-6bf4618d6b54@mailbox.org>
+Date: Wed, 19 Nov 2025 17:09:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH] leds: trigger: netdev: Check offload ability on interface
+ up
+From: Marek Vasut <marek.vasut@mailbox.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-leds@vger.kernel.org,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Christian Marangi <ansuelsmth@gmail.com>,
+ Christophe Roullier <christophe.roullier@foss.st.com>,
+ Daniel Golle <daniel@makrotopia.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Lee Jones <lee@kernel.org>,
+ Pavel Machek <pavel@ucw.cz>, kernel@dh-electronics.com,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+References: <20241001024731.140069-1-marex@denx.de>
+ <1d72f370-3409-4b0f-b971-8f194cf1644b@lunn.ch>
+ <d0411d89-5c83-47b4-bef9-904b63cbc2c0@denx.de>
+ <b4ba27e5-a1cc-4477-a254-a318e586ef2a@mailbox.org>
+Content-Language: en-US
+In-Reply-To: <b4ba27e5-a1cc-4477-a254-a318e586ef2a@mailbox.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-MBO-RS-ID: 846c09ea91c3b08f769
+X-MBO-RS-META: sx15x14jwms1as3f6qs156fxnrhnbrkr
 
-Attempting to add a port device that is already up will expectedly fail,
-but not before modifying the team device header_ops.
+On 11/17/25 12:18 PM, Marek Vasut wrote:
 
-In the case of the syzbot reproducer the gre0 device is
-already in state UP when it attempts to add it as a
-port device of team0, this fails but before that
-header_ops->create of team0 is changed from eth_header to ipgre_header
-in the call to team_dev_type_check_change.
+Hello one more time,
 
-Later when we end up in ipgre_header() struct ip_tunnel* points to nonsense
-as the private data of the device still holds a struct team.
+>>>> On STM32MP13xx with RTL8211F, it is enough to have the following 
+>>>> udev rule
+>>>> in place, boot the machine with cable plugged in, and the LEDs won't 
+>>>> work
+>>>> without this patch once the interface is brought up, even if they 
+>>>> should:
+>>>> "
+>>>> ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:green:wan", 
+>>>> ATTR{trigger}="netdev", ATTR{link_10}="1", ATTR{link_100}="1", 
+>>>> ATTR{link_1000}="1", ATTR{device_name}="end0"
+>>>> ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:yellow:wan", 
+>>>> ATTR{trigger}="netdev", ATTR{rx}="1", ATTR{tx}="1", 
+>>>> ATTR{device_name} ="end0"
+>>>> "
+>>>
+>>> Nice use of udev. I had not thought about using it for this.
+> 
+> I might have been a bit too hasty with this. The following is only a 
+> quick preliminary FYI, I am still investigating the details.
+> 
+> I observe on 6.18-rc6 (ST STM32MP13xx , so STM32 DWMAC ethernet, and 
+> RTL8211F PHY), that if I use the these udev rules (SoC has two MACs, 
+> there are two rules for each MAC, and 2 rules for each of two LEDs on 
+> each MAC PHY , therefore four rules in total ; the rules for both MACs 
+> are identical):
+> 
+> "
+> ACTION=="add|change", SUBSYSTEM=="leds", 
+> KERNEL=="stmmac-0:01:green:wan", ATTR{trigger}="netdev", ATTR{link_10} 
+> ="1", ATTR{link_100}="1", ATTR{link_1000}="1", ATTR{device_name}="ethsom0"
+> ACTION=="add|change", SUBSYSTEM=="leds", 
+> KERNEL=="stmmac-0:01:yellow:wan", ATTR{trigger}="netdev", ATTR{rx}="1", 
+> ATTR{tx}="1", ATTR{device_name}="ethsom0"
+> 
+> ACTION=="add|change", SUBSYSTEM=="leds", 
+> KERNEL=="stmmac-1:01:green:lan", ATTR{trigger}="netdev", ATTR{link_10} 
+> ="1", ATTR{link_100}="1", ATTR{link_1000}="1", ATTR{device_name}="ethsom1"
+> ACTION=="add|change", SUBSYSTEM=="leds", 
+> KERNEL=="stmmac-1:01:yellow:lan", ATTR{trigger}="netdev", ATTR{rx}="1", 
+> ATTR{tx}="1", ATTR{device_name}="ethsom1"
+> "
+> 
+> I get this backtrace. Notice the "sysfs: cannot create duplicate 
+> filename ..." part , I suspect there is some subtle race condition ?
+> 
+> "
+> sysfs: cannot create duplicate filename '/devices/platform/ 
+> soc/5c007000.bus/5800e000.ethernet/mdio_bus/stmmac-1/stmmac-1:01/leds/ 
+> stmmac-1:01:green:lan/link_10'
+> CPU: 0 UID: 0 PID: 153 Comm: (udev-worker) Not tainted 6.18.0-rc6 #1 
+> PREEMPT
+> Hardware name: STM32 (Device Tree Support)
+> Call trace:
+>   unwind_backtrace from show_stack+0x18/0x1c
+>   show_stack from dump_stack_lvl+0x54/0x68
+>   dump_stack_lvl from sysfs_warn_dup+0x58/0x6c
+>   sysfs_warn_dup from sysfs_add_file_mode_ns+0xf0/0x130
+>   sysfs_add_file_mode_ns from internal_create_group+0x344/0x480
+>   internal_create_group from internal_create_groups+0x48/0x6c
+>   internal_create_groups from led_trigger_set+0x1e4/0x278
+>   led_trigger_set from led_trigger_write+0xe0/0x118
+>   led_trigger_write from sysfs_kf_bin_write+0x98/0xa0
+>   sysfs_kf_bin_write from kernfs_fop_write_iter+0x14c/0x198
+>   kernfs_fop_write_iter from vfs_write+0x170/0x1d4
+>   vfs_write from ksys_write+0x7c/0xd0
+>   ksys_write from ret_fast_syscall+0x0/0x54
+> Exception stack(0xedbf1fa8 to 0xedbf1ff0)
+> 1fa0:                   00000006 bec4476c 00000015 bec4476c 00000006 
+> 00000001
+> 1fc0: 00000006 bec4476c 000e7698 00000004 00000006 fffffff7 00000000 
+> 000d1710
+> 1fe0: 00000004 bec44578 b6c34397 b6bb15e6
+> leds stmmac-1:01:green:lan: Failed to add trigger attributes
+> "
+> 
+> If I find out more, I will get back to this thread.
 
-Example sequence of iproute2 commands to reproduce the hang/BUG():
-ip link add dev team0 type team
-ip link add dev gre0 type gre
-ip link set dev gre0 up
-ip link set dev gre0 master team0
-ip link set dev team0 up
-ping -I team0 1.1.1.1
+I've been tracking it all the way to kernfs, but so far without much 
+success.
 
-Move team_dev_type_check_change down where all other checks have passed
-as it changes the dev type with no way to restore it in case
-one of the checks that follow it fail.
+I found commit 52c47742f79d ("leds: triggers: send uevent when changing 
+triggers") which indicates the udev rules above are likely wrong, but 
+they still shouldn't corrupt sysfs the way they do, right ?
 
-Also make sure to preserve the origial mtu assignment:
-  - If port_dev is not the same type as dev, dev takes mtu from port_dev
-  - If port_dev is the same type as dev, port_dev takes mtu from dev
+If you have any hint how to find out what is actually going on, I would 
+be much grateful. I already tried KASAN on this and LOCKDEP, but neither 
+triggers. I was also adding a lot of trace_printk() into netdev LED 
+trigger, but all I could find is the link_* attributes are removed, then 
+added again, and the kernel complains the link_10 attribute already exists.
 
-Testing:
-  - team device driver in-tree selftests
-  - Add/remove various devices as slaves of team device
-  - syzbot
-
-Reported-by: syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=a2a3b519de727b0f7903
-Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
-Signed-off-by: Nikola Z. Ivanov <zlatistiv@gmail.com>
----
-Changes since v1:
-  - Add a "Fixes" tag
-  - Add a simple reproducer in the commit log
-  https://lore.kernel.org/netdev/20251111171341.4c6d69be@kernel.org/T/#u
-
-Changes since v2:
-  - Use already present exit label "err_set_slave_promisc"
-    for returning on failure of team_dev_type_check_change.
-    This was suggested in the initial patch thread (v1).
-  https://lore.kernel.org/netdev/20251113211142.245216-1-zlatistiv@gmail.com/
-
- drivers/net/team/team_core.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index 17f07eb0ee52..d7625a390e94 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -1191,10 +1191,6 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 		return -EPERM;
- 	}
- 
--	err = team_dev_type_check_change(dev, port_dev);
--	if (err)
--		return err;
--
- 	if (port_dev->flags & IFF_UP) {
- 		NL_SET_ERR_MSG(extack, "Device is up. Set it down before adding it as a team port");
- 		netdev_err(dev, "Device %s is up. Set it down before adding it as a team port\n",
-@@ -1212,10 +1208,12 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 	INIT_LIST_HEAD(&port->qom_list);
- 
- 	port->orig.mtu = port_dev->mtu;
--	err = dev_set_mtu(port_dev, dev->mtu);
--	if (err) {
--		netdev_dbg(dev, "Error %d calling dev_set_mtu\n", err);
--		goto err_set_mtu;
-+	if (dev->type == port_dev->type) {
-+		err = dev_set_mtu(port_dev, dev->mtu);
-+		if (err) {
-+			netdev_dbg(dev, "Error %d calling dev_set_mtu\n", err);
-+			goto err_set_mtu;
-+		}
- 	}
- 
- 	memcpy(port->orig.dev_addr, port_dev->dev_addr, port_dev->addr_len);
-@@ -1290,6 +1288,10 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 		}
- 	}
- 
-+	err = team_dev_type_check_change(dev, port_dev);
-+	if (err)
-+		goto err_set_slave_promisc;
-+
- 	if (dev->flags & IFF_UP) {
- 		netif_addr_lock_bh(dev);
- 		dev_uc_sync_multiple(port_dev, dev);
--- 
-2.51.0
-
+I also noticed that if I try to list /sys/...stmmac-1:01:green:lan/ 
+directory after the splat with netdev trigger set, the result of the 
+listing is not always the same, sometimes there are the netdev trigger 
+attributes, sometimes not, and sometimes they are corrupted.
 
