@@ -1,224 +1,208 @@
-Return-Path: <netdev+bounces-239939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB1CC6E365
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 12:24:43 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAA36C6E395
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 12:29:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F20724E1C69
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 11:19:16 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3FCF23524FD
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 11:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1961C351FB4;
-	Wed, 19 Nov 2025 11:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B33035389E;
+	Wed, 19 Nov 2025 11:20:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aF+9Tk3I"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="laf8a0QP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21A8350A0B;
-	Wed, 19 Nov 2025 11:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A54352FA2;
+	Wed, 19 Nov 2025 11:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763551152; cv=none; b=Xj3/4xdrLYuaslHvtiyvxIy/Bt5z7xpVF581+QBt0vdgd/mjLZmBMkreXR+Cc8TFPjKs4WYHCfuO/zFT/UK2WqTzJ0WbV9wrtSmg6lHgyC7Tjxg46gnPBG9KQUOe/mQdY2cm/HN18s4lcsUq2mzNkfhZ77xzn8Ewg1jCHo5y3L8=
+	t=1763551243; cv=none; b=on75ICgcBZnEIoZd8b2qzPS9ksnAGlT2IblP3+BN7iRNOi9NTep+crFOcAvN5g9+2mo/5k3dm8+PbFqEcxG+c4GEmyB/OE1KGD6tMDhDT5AXmHC0V5w7BziQF9GjNQl4zmhdrSEwjMWKLKpG+0zGJKvb064r7n/BsB+7XQrzBus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763551152; c=relaxed/simple;
-	bh=e5luU8H79ds78sItRWsonUxVPkWeHh+yAutPaKVJGLk=;
+	s=arc-20240116; t=1763551243; c=relaxed/simple;
+	bh=8GYEEcFXxf1XWxFmK+/08Fz7rh+Zh6iwPK82Hcyn60A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QIHnQF53NXsr1T6YeWU7IvqsCJTeedSE91HcYc9JeCx1z8/njWwdHyqs59Kt5gOpMWxHVwLK4eKDkCtr+pR/ZFnrRjxLbFKKgo6nu4WhCo+5Xs73p4S2/ehtMKbsa+YApVwCKtzN0max1jDxeW8aykrEDTucT+205AB787AIAlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aF+9Tk3I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BF2AC19422;
-	Wed, 19 Nov 2025 11:19:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763551151;
-	bh=e5luU8H79ds78sItRWsonUxVPkWeHh+yAutPaKVJGLk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aF+9Tk3IRXUKewbiFGFbnkhZdXblI7LOHDgr7982DO40NcRvuObB+En+tYDt1A1J7
-	 m5BpJm2XewurnYwAJlYKo5z5PEM6CnRhOurUWGtfjHyNEmzZPnYMtJpBsxSQSfVzvg
-	 G8XCzzs3sGbJV2WBoXGqM/e5RAv8YvCpCqhDcFGpXpZCu/0pMZsWOEOaMTnu4M/SLP
-	 epmOfKP2cbCEYHeJPcd1UKswbx89b4R1xWdZq0QLIECwONtvDLTZpShaUGwOJJuY3K
-	 gbg24oTHnEDm19e21UVyr6s2p08xnk/t4KPVaRPft9Y4AGGtrqFupwGb2xXno9jnjF
-	 gUIXiLDqoRCNQ==
-Date: Wed, 19 Nov 2025 12:19:07 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=TPkOAVSR0WPYbt7vkq4YJeDZfk5qaD8m5q9QaL1OyB2iwbbuvXq6tZtof3oZId9PTovpLGuKWwMgHVu2d3ppw4PiX4zW8+dtwJLGFF5dffqLexLfTQKzr/wlKBMiLMEWbzmwct1ev2TqRd+d/osnVHUU+Nk4ausftoEbonVFhcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=laf8a0QP; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763551242; x=1795087242;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8GYEEcFXxf1XWxFmK+/08Fz7rh+Zh6iwPK82Hcyn60A=;
+  b=laf8a0QPIJPZw2cQkq0W+cYbo9YDF1OxxkTszUv6VG57M/dB/aPRRasg
+   eb9fXpux2OeXCoIMivTvticT4a/WufD6A1X9vbxsLM78+udsOUv/VmZTf
+   b8iLF8Q/ePCLihdbN5uY8ATw3e8yKgtDkezvqOMFtEfNFsWqON1eJSLft
+   ag+3JaBURFysH7ntRSea680liq7TnllW6bzFdTGeV8hOUzZa9DzLVEQO5
+   TuXYWXNza3tCDfkJ5GCceYm83JBh8jdeCgYS0WWGkYTlHx+VpUX4LHjYy
+   kjKmbMQNSzAj+Ykr2t8/jgvfTcXXdLJxu4vUx07iI+mzI9gbV8rXNcpJ3
+   Q==;
+X-CSE-ConnectionGUID: derv1FmtTYmpnHHmAtkJaQ==
+X-CSE-MsgGUID: OqZY9ruzRkmjbbJG6sgXYQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11617"; a="75913615"
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="75913615"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 03:20:42 -0800
+X-CSE-ConnectionGUID: K+iQptuBRX2UI2ytmN5h9A==
+X-CSE-MsgGUID: 2P7RqcVvTK+TZCsDKz012Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="221658079"
+Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 19 Nov 2025 03:20:38 -0800
+Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vLgEl-0002oD-1S;
+	Wed, 19 Nov 2025 11:20:35 +0000
+Date: Wed, 19 Nov 2025 19:19:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Phil Sutter <phil@nwl.cc>, Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH nf-next v9 2/3] net: netfilter: Add IPIP flowtable tx sw
- acceleration
-Message-ID: <aR2nq_UIz9oF5Xt_@lore-desk>
-References: <20251107-nf-flowtable-ipip-v9-0-7cbc4090dfcb@kernel.org>
- <20251107-nf-flowtable-ipip-v9-2-7cbc4090dfcb@kernel.org>
- <aRSDjkzMx4Ba7IW8@calendula>
- <aRSvnfdhO2G1DXJI@lore-desk>
- <aRUT-tFXYbwfZYUk@calendula>
- <aRWLhLobB4Rz0dA_@lore-desk>
- <aRunjT-HYQ-UeR_-@calendula>
- <aRu1aFVwT_FPDeZ1@lore-desk>
- <aR0Lj3ph0RYtpleX@calendula>
+	linux-kernel@vger.kernel.org, Serge Semin <fancer.lancer@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 14/15] net: dsa: sja1105: replace mdiobus-pcs
+ with xpcs-plat driver
+Message-ID: <202511191835.rwfD48SW-lkp@intel.com>
+References: <20251118190530.580267-15-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kcIDJeLuCmIpT6qE"
-Content-Disposition: inline
-In-Reply-To: <aR0Lj3ph0RYtpleX@calendula>
-
-
---kcIDJeLuCmIpT6qE
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20251118190530.580267-15-vladimir.oltean@nxp.com>
 
-> Hi Lorenzo,
->=20
-> I found one more issue: caching the ip6 daddr does not work because
-> skb_cow_head() can reallocate the skb header, invalidating all
-> pointers.
->=20
-> I went back to use the other_tuple, it is safer, new branch:
->=20
->         flowtable-consolidate-xmit+ipip3
+Hi Vladimir,
 
-Hi Pablo,
+kernel test robot noticed the following build warnings:
 
-thx for fixing it. I tested the branch above and it works fine with IPIP tu=
-nnel
-flowtable offloading.
+[auto build test WARNING on net-next/main]
 
->=20
-> Hopefully, this is the last iteration for this series.
->=20
-> I am attaching a diff that compares flowtable-consolidate-xmit+ipip2
-> vs. flowtable-consolidate-xmit+ipip3 branches.
->=20
-> I also made a few cosmetic edits.
+url:    https://github.com/intel-lab-lkp/linux/commits/Vladimir-Oltean/net-dsa-sja1105-let-phylink-help-with-the-replay-of-link-callbacks/20251119-031300
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251118190530.580267-15-vladimir.oltean%40nxp.com
+patch subject: [PATCH net-next 14/15] net: dsa: sja1105: replace mdiobus-pcs with xpcs-plat driver
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20251119/202511191835.rwfD48SW-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251119/202511191835.rwfD48SW-lkp@intel.com/reproduce)
 
-> diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_tab=
-le_ip.c
-> index ee81ee3a5110..e128b0fe9a7b 100644
-> --- a/net/netfilter/nf_flow_table_ip.c
-> +++ b/net/netfilter/nf_flow_table_ip.c
-> @@ -512,13 +512,14 @@ static int nf_flow_pppoe_push(struct sk_buff *skb, =
-u16 id)
->  }
-> =20
->  static int nf_flow_tunnel_ipip_push(struct net *net, struct sk_buff *skb,
-> -				    struct flow_offload_tuple *tuple)
-> +				    struct flow_offload_tuple *tuple,
-> +				    __be32 *ip_daddr)
->  {
->  	struct iphdr *iph =3D (struct iphdr *)skb_network_header(skb);
->  	struct rtable *rt =3D dst_rtable(tuple->dst_cache);
-> -	__be16	frag_off =3D iph->frag_off;
-> -	u32 headroom =3D sizeof(*iph);
->  	u8 tos =3D iph->tos, ttl =3D iph->ttl;
-> +	__be16 frag_off =3D iph->frag_off;
-> +	u32 headroom =3D sizeof(*iph);
->  	int err;
-> =20
->  	err =3D iptunnel_handle_offloads(skb, SKB_GSO_IPXIP4);
-> @@ -551,14 +552,17 @@ static int nf_flow_tunnel_ipip_push(struct net *net=
-, struct sk_buff *skb,
->  	__ip_select_ident(net, iph, skb_shinfo(skb)->gso_segs ?: 1);
->  	ip_send_check(iph);
-> =20
-> +	*ip_daddr =3D tuple->tun.src_v4.s_addr;
-> +
->  	return 0;
->  }
-> =20
->  static int nf_flow_tunnel_v4_push(struct net *net, struct sk_buff *skb,
-> -				  struct flow_offload_tuple *tuple)
-> +				  struct flow_offload_tuple *tuple,
-> +				  __be32 *ip_daddr)
->  {
->  	if (tuple->tun_num)
-> -		return nf_flow_tunnel_ipip_push(net, skb, tuple);
-> +		return nf_flow_tunnel_ipip_push(net, skb, tuple, ip_daddr);
-> =20
->  	return 0;
->  }
-> @@ -572,7 +576,8 @@ static int nf_flow_encap_push(struct sk_buff *skb,
->  		switch (tuple->encap[i].proto) {
->  		case htons(ETH_P_8021Q):
->  		case htons(ETH_P_8021AD):
-> -			if (skb_vlan_push(skb, tuple->encap[i].proto, tuple->encap[i].id) < 0)
-> +			if (skb_vlan_push(skb, tuple->encap[i].proto,
-> +					  tuple->encap[i].id) < 0)
->  				return -1;
->  			break;
->  		case htons(ETH_P_PPP_SES):
-> @@ -624,12 +629,11 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff =
-*skb,
->  	dir =3D tuplehash->tuple.dir;
->  	flow =3D container_of(tuplehash, struct flow_offload, tuplehash[dir]);
->  	other_tuple =3D &flow->tuplehash[!dir].tuple;
-> +	ip_daddr =3D other_tuple->src_v4.s_addr;
-> =20
-> -	if (nf_flow_tunnel_v4_push(state->net, skb, other_tuple) < 0)
-> +	if (nf_flow_tunnel_v4_push(state->net, skb, other_tuple, &ip_daddr) < 0)
->  		return NF_DROP;
-> =20
-> -	ip_daddr =3D ip_hdr(skb)->daddr;
-> -
->  	if (nf_flow_encap_push(skb, other_tuple) < 0)
->  		return NF_DROP;
-> =20
-> @@ -906,6 +910,7 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff =
-*skb,
->  {
->  	struct flow_offload_tuple_rhash *tuplehash;
->  	struct nf_flowtable *flow_table =3D priv;
-> +	struct flow_offload_tuple *other_tuple;
->  	enum flow_offload_tuple_dir dir;
->  	struct nf_flowtable_ctx ctx =3D {
->  		.in	=3D state->in,
-> @@ -937,9 +942,10 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff=
- *skb,
-> =20
->  	dir =3D tuplehash->tuple.dir;
->  	flow =3D container_of(tuplehash, struct flow_offload, tuplehash[dir]);
-> -	ip6_daddr =3D &ipv6_hdr(skb)->daddr;
-> +	other_tuple =3D &flow->tuplehash[!dir].tuple;
-> +	ip6_daddr =3D &other_tuple->src_v6;
-> =20
-> -	if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
-> +	if (nf_flow_encap_push(skb, other_tuple) < 0)
->  		return NF_DROP;
-> =20
->  	switch (tuplehash->tuple.xmit_type) {
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511191835.rwfD48SW-lkp@intel.com/
 
-ack, the above changes are fine to me.
+All warnings (new ones prefixed by >>):
 
-Regards,
-Lorenzo
+   drivers/net/dsa/sja1105/sja1105_mfd.c: In function 'sja1105_create_pcs_nodes':
+>> drivers/net/dsa/sja1105/sja1105_mfd.c:145:73: warning: format '%llx' expects argument of type 'long long unsigned int', but argument 4 has type 'resource_size_t' {aka 'unsigned int'} [-Wformat=]
+     145 |                 snprintf(node_name, sizeof(node_name), "ethernet-pcs@%llx",
+         |                                                                      ~~~^
+         |                                                                         |
+         |                                                                         long long unsigned int
+         |                                                                      %x
+     146 |                          pcs_res->res.start);
+         |                          ~~~~~~~~~~~~~~~~~~                              
+         |                                      |
+         |                                      resource_size_t {aka unsigned int}
 
 
+vim +145 drivers/net/dsa/sja1105/sja1105_mfd.c
 
---kcIDJeLuCmIpT6qE
-Content-Type: application/pgp-signature; name=signature.asc
+   124	
+   125	static int sja1105_create_pcs_nodes(struct sja1105_private *priv,
+   126					    struct device_node *regs_node)
+   127	{
+   128		struct dsa_switch *ds = priv->ds;
+   129		struct device *dev = ds->dev;
+   130		struct device_node *pcs_node;
+   131		const u32 reg_io_width = 4;
+   132		char node_name[32];
+   133		u32 reg_props[2];
+   134		int rc;
+   135	
+   136		for (int i = 0; i < priv->info->num_pcs_resources; i++) {
+   137			const struct sja1105_pcs_resource *pcs_res;
+   138	
+   139			pcs_res = &priv->info->pcs_resources[i];
+   140	
+   141			if (sja1105_child_node_exists(regs_node, "ethernet-pcs",
+   142						      &pcs_res->res))
+   143				continue;
+   144	
+ > 145			snprintf(node_name, sizeof(node_name), "ethernet-pcs@%llx",
+   146				 pcs_res->res.start);
+   147	
+   148			pcs_node = of_changeset_create_node(&priv->of_cs, regs_node,
+   149							    node_name);
+   150			if (!pcs_node) {
+   151				dev_err(dev, "Failed to create PCS node %s\n", node_name);
+   152				return -ENOMEM;
+   153			}
+   154	
+   155			rc = of_changeset_add_prop_string(&priv->of_cs, pcs_node,
+   156							  "compatible",
+   157							  pcs_res->compatible);
+   158			if (rc) {
+   159				dev_err(dev, "Failed to add compatible property to %s: %pe\n",
+   160					node_name, ERR_PTR(rc));
+   161				return rc;
+   162			}
+   163	
+   164			reg_props[0] = pcs_res->res.start;
+   165			reg_props[1] = resource_size(&pcs_res->res);
+   166			rc = of_changeset_add_prop_u32_array(&priv->of_cs, pcs_node,
+   167							     "reg", reg_props, 2);
+   168			if (rc) {
+   169				dev_err(dev, "Failed to add reg property to %s: %pe\n",
+   170					node_name, ERR_PTR(rc));
+   171				return rc;
+   172			}
+   173	
+   174			rc = of_changeset_add_prop_string(&priv->of_cs, pcs_node,
+   175							  "reg-names",
+   176							  pcs_res->res.name);
+   177			if (rc) {
+   178				dev_err(dev, "Failed to add reg-names property to %s: %pe\n",
+   179					node_name, ERR_PTR(rc));
+   180				return rc;
+   181			}
+   182	
+   183			rc = of_changeset_add_prop_u32_array(&priv->of_cs, pcs_node,
+   184							     "reg-io-width",
+   185							     &reg_io_width, 1);
+   186			if (rc) {
+   187				dev_err(dev, "Failed to add reg-io-width property to %s: %pe\n",
+   188					node_name, ERR_PTR(rc));
+   189				return rc;
+   190			}
+   191	
+   192			dev_dbg(dev, "Created OF node %pOF\n", pcs_node);
+   193			priv->pcs_fwnode[pcs_res->port] = of_fwnode_handle(pcs_node);
+   194		}
+   195	
+   196		return 0;
+   197	}
+   198	
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaR2nqwAKCRA6cBh0uS2t
-rCguAP94Y7RHnUASHiziYeFrJJxBnS4STiAJgV9S0aQo5/aivwD/eSWO+ndi+yzN
-7+k7tS3aaTPJVKMehmyBmfl9xGWd+QE=
-=4wc/
------END PGP SIGNATURE-----
-
---kcIDJeLuCmIpT6qE--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
