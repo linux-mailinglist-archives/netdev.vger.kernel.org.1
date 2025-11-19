@@ -1,112 +1,140 @@
-Return-Path: <netdev+bounces-240139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 144CFC70CC6
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 20:26:28 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A74BC70D6A
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 20:37:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 862D13477BC
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:23:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 4B0332BB54
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8E336C5AA;
-	Wed, 19 Nov 2025 19:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95DDA35BDDB;
+	Wed, 19 Nov 2025 19:36:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="I+iiF84r"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VhAJoSW2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE45A366DD7
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F110B1DE3DC;
+	Wed, 19 Nov 2025 19:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763580196; cv=none; b=MoIg7x4pc0jtb3tKsLtD1V8BdoUfLqFp7UQZUO8H1obywhr0x0+GzPHeEbXJtRyWRxHyv2ifDshnkSUbwVpeLC1hGts1ylHQpfvTfjUUUxQUdivRNsgopSTQrTny4AM8mbR0V+LyuxJt9oWUDQ7rY0wlD/tEWBCjtIdXOfkUbUI=
+	t=1763580964; cv=none; b=MQ0oxHjna8845FwKGnlwFX6wDjftt99tPKCoJU4R493EgNJEdiD9c20pSBjyEpLLMDuHfXjYzPIaoMBzVcxNrSmcMLNhN1VeSYdZuRq1jd/Il+a4oOQ3Zef6IngwfjDy15LI0zIxZhAFCBcCg5lFVsTg+6jpO3gM67EYX8KNk+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763580196; c=relaxed/simple;
-	bh=SNe4Mdqg6NAIPK1SK1Ms+lEEPh9CF2D5MUTmnt6p03E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BlwWZg1j0jQiXkPIbyMbzuE8igk9slTd/49dKaFR8Hrj+B7qesP5dR2Mw+Q/ayjvjFBBMquezt69VyQOW3gVxG6QcjmOPEmXuXHGiCs5gOilALWeavYiP+G+xUPar2OMWxQO8MeFd4If89NqWU64jUVxNTNzFTALybEoEmfeuAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=I+iiF84r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C752C4CEF5
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:23:13 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="I+iiF84r"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1763580192;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vBS1R+KWQuyQS4ikMq/m97ZN3SpSoGN8I0V3RuwXubs=;
-	b=I+iiF84rbqTdp86zcKG7OWQO05xfM1C3zQx6pkgytcAHKBfVLgBnOGRJdJn1uRndhDSWHR
-	3oQq/aDHNr1GYeVVUq0//19q1CoZryJgr4PfeeUPdnPGFN6oSMGgqzRTSbhwPgm8XogD6N
-	BCQhIYnpGkcv0S9yPwPzH/QbknAGBCc=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 53acf135 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
-	for <netdev@vger.kernel.org>;
-	Wed, 19 Nov 2025 19:23:11 +0000 (UTC)
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-450f7f91845so18001b6e.1
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 11:23:10 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVn9J22pfRzslae91djHkW5HzTJdfrTvCng/vo9onmR/P9qcns4dyFoTiN/824UoQpfd1k9BIc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaZONTPILn9CgptjT1+rgq9evU2fu6Md4dMuvemMjhzjhmE9hb
-	1zV7md/vsLnQdRRKxutJcp+j0Xi3lHcF44QrSrc/rMqNvdNtLxvznX3RGS1VdFZWV27MXxRaJPW
-	M5r6O63oDDqgT4x7Begjb/tDIKUgwOKk=
-X-Google-Smtp-Source: AGHT+IFWThcQphzmtMR1ZuP2+pYZXYtjvWAaMc/MPtL0eQ+UOwpEqO8TkAKOgEc0jUYpcex3oAJFRMG7Wc/2bTyrr7U=
-X-Received: by 2002:a05:6808:1796:b0:450:c6a0:3f39 with SMTP id
- 5614622812f47-450ff3e8b6amr241128b6e.58.1763580190101; Wed, 19 Nov 2025
- 11:23:10 -0800 (PST)
+	s=arc-20240116; t=1763580964; c=relaxed/simple;
+	bh=bez+CQkfaww081dvqDXAVsriAvoJSfA+OSquu+Hh7Sw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pX/E2hEjqwX5xaWkQbRaXOcK7CdlQ6zZHmtvgsdXMPxIUPzYAr5PBHyemrJmnYOcRVWxz+RJtjTnuujdudSItNP/JG3VtgZ/x3PNNSjnDmrrwC/DzLFRB42L+ludzuEOKVULQweahvh8b48Ie55YGl5Aef06yQj0pDmMv2ViTVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VhAJoSW2; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763580962; x=1795116962;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=bez+CQkfaww081dvqDXAVsriAvoJSfA+OSquu+Hh7Sw=;
+  b=VhAJoSW2Vqfcl/fhJGN4qZL3ORhnVYbmCDa/N5dxD4UsmTezRoOcROFU
+   MGICjX1shpPIUimjMREdyPRjihf5UcWbAvB3kk1sVcRXGGNL7jWV7G6Wr
+   8xpi7NQqJvUk163veM6RaLT3arrJJEqefoW0PPVVL4ih2403mKfA/cRQE
+   7ij5ha7vyVm2SmrvCPwJ5+xIvKRZDfFi6ve1/zGNqLJIhQ3lZNa3ZnVaj
+   WnDWOR/fGUIeCAZMefoik8I+OvS1P17FhzKBGDTmZc4W7UD+C7om56ur4
+   GO3UqIlQviJ2s/rqE6/OXd8FbAUMUUEiIcX7j5rJAywF17iC8HrjAfInf
+   A==;
+X-CSE-ConnectionGUID: quAJagxyTfC8XZzG1futsw==
+X-CSE-MsgGUID: yB0UyPTxRVmYSg8FfQif4g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="75963434"
+X-IronPort-AV: E=Sophos;i="6.19,316,1754982000"; 
+   d="scan'208";a="75963434"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 11:34:01 -0800
+X-CSE-ConnectionGUID: kVqpp2tRQVC4cQ8KvhjPjQ==
+X-CSE-MsgGUID: BDavac7vSIi1Oji14uiDqw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,316,1754982000"; 
+   d="scan'208";a="195640151"
+Received: from rvuia-mobl.ger.corp.intel.com (HELO localhost) ([10.245.245.245])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 11:33:58 -0800
+Date: Wed, 19 Nov 2025 21:33:55 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, Serge Semin <fancer.lancer@gmail.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 14/15] net: dsa: sja1105: replace mdiobus-pcs
+ with xpcs-plat driver
+Message-ID: <aR4bo4cPwWdapr7j@smile.fi.intel.com>
+References: <20251118164130.4e107c93@kernel.org>
+ <20251118164130.4e107c93@kernel.org>
+ <20251119095942.bu64kg6whi4gtnwe@skbuf>
+ <aR2cf91qdcKMy5PB@smile.fi.intel.com>
+ <20251119112522.dcfrh6x6msnw4cmi@skbuf>
+ <20251119081112.3bcaf923@kernel.org>
+ <aR3trBo3xqZ0sDyr@smile.fi.intel.com>
+ <aR39JBrqn5PC911s@shell.armlinux.org.uk>
+ <aR4A1MaCn9fStNdm@smile.fi.intel.com>
+ <20251119103545.53c13aac@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251105183223.89913-1-ast@fiberby.net> <20251105183223.89913-5-ast@fiberby.net>
- <aRvWzC8qz3iXDAb3@zx2c4.com> <f21458b6-f169-4cd3-bd1b-16255c78d6cd@fiberby.net>
- <aRyLoy2iqbkUipZW@zx2c4.com> <9871bdc7-774d-4e35-be5f-02d45063d317@fiberby.net>
- <aRz4rs1IpohQpgWf@zx2c4.com> <20251118165028.4e43ee01@kernel.org> <f4d147da-3299-4ae7-b11e-b4309625e2c9@fiberby.net>
-In-Reply-To: <f4d147da-3299-4ae7-b11e-b4309625e2c9@fiberby.net>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Wed, 19 Nov 2025 20:22:57 +0100
-X-Gmail-Original-Message-ID: <CAHmME9rzr8EGkTy3TduTXK45-w1CwEYnRLX=SjkAqo1CTTgVHA@mail.gmail.com>
-X-Gm-Features: AWmQ_bkA-F3ilICecskNIJAu7S_B6vXW8UH-CCPXrJPWb6WBZhcwX_rzqk5QfHg
-Message-ID: <CAHmME9rzr8EGkTy3TduTXK45-w1CwEYnRLX=SjkAqo1CTTgVHA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 04/11] netlink: specs: add specification for wireguard
-To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jacob Keller <jacob.e.keller@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	wireguard@lists.zx2c4.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jordan Rife <jordan@jrife.io>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119103545.53c13aac@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Wed, Nov 19, 2025 at 8:20=E2=80=AFPM Asbj=C3=B8rn Sloth T=C3=B8nnesen <a=
-st@fiberby.net> wrote:
-> B) Add a "operations"->"function-prefix" in YAML, only one funtion gets r=
-enamed.
->
->     wg_get_device_start(), wg_get_device_dump() and wg_get_device_done() =
-keep
->     their names, while wg_set_device() gets renamed to wg_set_device_doit=
-().
->
->     This compliments the existing "name-prefix" (which is used for the UA=
-PI enum names).
->
->     Documentation/netlink/genetlink-legacy.yaml |  6 ++++++
->     tools/net/ynl/pyynl/ynl_gen_c.py            | 13 +++++++++----
->     2 files changed, 15 insertions(+), 4 deletions(-)
->
-> Jason, would option B work for you?
+On Wed, Nov 19, 2025 at 10:35:45AM -0800, Jakub Kicinski wrote:
+> On Wed, 19 Nov 2025 19:39:32 +0200 Andy Shevchenko wrote:
+> > On Wed, Nov 19, 2025 at 05:23:48PM +0000, Russell King (Oracle) wrote:
+> > > On Wed, Nov 19, 2025 at 06:17:48PM +0200, Andy Shevchenko wrote:  
+> > > > On Wed, Nov 19, 2025 at 08:11:12AM -0800, Jakub Kicinski wrote:  
+> > > I can say that stuff such as unused const variables gets found by
+> > > nipa, via -Wunused-const-variable, which as I understand it is a
+> > > W=1 thing.
+> > > 
+> > > I suspect CONFIG_WERROR=y isn't used (I don't know) as that would
+> > > stop the build on warnings, whereas what is done instead is that
+> > > the output of the build is analysed, and the number of warnings
+> > > counted and reported in patchwork. Note that the "build" stuff
+> > > reports number of errors/warnings before and after the patch.
+> > > 
+> > > Hope this answers your question.  
+> > 
+> > Pretty much, thanks!
+> 
+> We do:
 
-So just wg_set_device() -> wg_set_device_doit()? That seems quite fine
-to me. And it's probably a better name, too, given that it corresponds
-with device_dump. It makes both of those follow the form "wg_{genl
-verb}_{nl verb}". I like it.
+A-ha, thanks!
 
-Jason
+> prep_config() {
+>   make LLVM=1 O=$output_dir allmodconfig
+>   ./scripts/config --file $output_dir/.config -d werror
+>   ./scripts/config --file $output_dir/.config -d drm_werror
+>   ./scripts/config --file $output_dir/.config -d kvm_werror
+> }
+> 
+> I have strong feelings about people who think Werror is an acceptable
+> practice in 2025, but let me not violate the CoC here..
+
+WERROR=y by default was introduced you-know-by-whom :-)
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
