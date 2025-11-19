@@ -1,120 +1,94 @@
-Return-Path: <netdev+bounces-240032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0467AC6F909
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:11:51 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21233C6F86D
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:06:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5A6A3347C61
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:52:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B80A84FDFFD
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:54:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C623366570;
-	Wed, 19 Nov 2025 14:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 504652773CB;
+	Wed, 19 Nov 2025 14:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="WR0vdcVr"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Gn61vTvE"
 X-Original-To: netdev@vger.kernel.org
-Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4CB31DDC28;
-	Wed, 19 Nov 2025 14:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC8D27CB0A
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 14:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763563805; cv=none; b=cHnGDj7kR4BvxYkapNaK6NS6ISnO9kz/c1zj7GMAW/pd1KKP6pxaRGDtoxMCF93f5mg62QTqbBXtM5IQB78qNG1CefytNQrr/83gAmo0+cdIALfD2meSyK2xOo9TdO7zGfN/fVQtcBAhpuXsprysPKKbRfIfjcwhPB7i3zobdys=
+	t=1763563847; cv=none; b=e1uFSgq9Z15LUT3skSx9YO07O8DISoCztkFcdmQnavNrWD7V7NL3RJZFBKlCzDmsA4v1LOkMXss33RJmPL9CnC5M1R/y83+KcF9DBVBRGFI6yjLjvLhmdn+6jo3xhFIslNyhE8ymdFSTW4DsZ3dUXYo+0SqdwEChkHyyHNWjnyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763563805; c=relaxed/simple;
-	bh=nlGsuxDbBUvtko/C6ulfDV3R9btGGY1QhicP8kVQGxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e7/Ei5dLSqSnZ+4LQWESo/8pf7U7grdewx+uvd/ec25isRft199XHG/EW93Z4lhOREaCQGrfPaj2iLhXx1tKrEHdRQnvH6sroF2qG8B8V1sfwacnwlVx18Glfk5neop1e+X166GSdcpyBlP59WMBKfR5Kykc1/4e59txj5F8/Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=WR0vdcVr; arc=none smtp.client-ip=151.80.46.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
-	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=nlGsuxDbBUvtko/C6ulfDV3R9btGGY1QhicP8kVQGxo=; b=WR0vdcVrYrWfM5M0KdsFKkPSow
-	brvU4uzFheM6ABGTeHczHHGB9bLUtCnnqAVIRG0JcTq3yk2XBIRzs8idbiCds3HHwDVPBT7qJr9/C
-	JY6JFaeQlejEw6DXqcq8AoiSG1Te+WPsgygmybxClENx3YdFMyC+eVCPtoCsnzigfRl9N+ZYo1GAf
-	BSnhUG4mDTPPMJP8Ev9PdCnBf3A9bfq44QxHf/j7nXJtHiYBGEtVOTV2rU9CtxdVNqhOwkzFTyTZB
-	P6BVtP7BAzt+wAudrpcEyEnO9mKLg7DSknAe8yPR7jvo6tISwn6cxYPbrEBD2Z12j3S9DQTa86ssu
-	OD++FMvQ==;
-Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
-	(envelope-from <phil@nwl.cc>)
-	id 1vLjVN-000000003pC-2ClU;
-	Wed, 19 Nov 2025 15:49:57 +0100
-Date: Wed, 19 Nov 2025 15:49:57 +0100
-From: Phil Sutter <phil@nwl.cc>
-To: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
-Cc: netdev@vger.kernel.org, Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kernel@vger.kernel.org
-Subject: Re: Soft lock-ups caused by iptables
-Message-ID: <aR3ZFSOawH-y_A3q@orbyte.nwl.cc>
-Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
-	Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>,
-	netdev@vger.kernel.org, Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kernel@vger.kernel.org
-References: <20251118221735.GA5477@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1763563847; c=relaxed/simple;
+	bh=qmidgmVmoOpLWFerYaSqb9o6YIpAU5KTbzeAOR6nOZk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W+ewER15GUMLzoDvfYxNG+S7nIlYr/Lb6Ni8Pg3dUrwqkI40muGAsCVhBm4TXKOd0bDXxAe/E8Ld3rcf5aLK8QpX+RWJn+2j8vT3+BChzpGqLgWE3MmKhnHpzse/44zaYryI3i/DrYJ237/ND+73W4PucIrNMUvLIZillE73w2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Gn61vTvE; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 20DF64E417A6;
+	Wed, 19 Nov 2025 14:50:43 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id EB90560699;
+	Wed, 19 Nov 2025 14:50:42 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5FD9410371A78;
+	Wed, 19 Nov 2025 15:50:39 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1763563842; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=qmidgmVmoOpLWFerYaSqb9o6YIpAU5KTbzeAOR6nOZk=;
+	b=Gn61vTvEaqpqZlaHlEuSsiZ5ry+cSlvEWYFAbAn9iXo5MmhRPCaIaUNpZtZrqDeurAh8+7
+	SVwaghLpNWUlOcV9NoXeZbhmgIdVU0uJxznDEv5AxFnYcjvicNpkNz5akxMgkmV61AM5Kv
+	GeihNIAAlUYTii/44tmR8wGRUUvpBwrUiXqiFR23DNzRilinkzCC/bZ9kExVW63obbw1Zv
+	iN0iih0UMEzJLNLrnsSjLR/52PIpBdI3iNnKairlzB9BlhTo0/yroVPc3LwLbRBshm1acy
+	tzFULQHrnhCo42ifd3iTRWCGjG70I2iAnqzFGiGJ2unskN0J43A7VTPRrNic0Q==
+Date: Wed, 19 Nov 2025 15:50:38 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Russell King <linux@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrei Botila
+ <andrei.botila@oss.nxp.com>, Richard Cochran <richardcochran@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Jacob Keller <jacob.e.keller@intel.com>,
+ bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 8/9] net: phy: nxp-c45-tja11xx: add HW
+ timestamp configuration reporting
+Message-ID: <20251119155038.03ded922@kmaincent-XPS-13-7390>
+In-Reply-To: <20251119124725.3935509-9-vadim.fedorenko@linux.dev>
+References: <20251119124725.3935509-1-vadim.fedorenko@linux.dev>
+	<20251119124725.3935509-9-vadim.fedorenko@linux.dev>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251118221735.GA5477@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi,
+On Wed, 19 Nov 2025 12:47:24 +0000
+Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
 
-On Tue, Nov 18, 2025 at 02:17:35PM -0800, Hamza Mahfooz wrote:
-> I am able to consistly repro several cpu soft lock-ups that seem to all
-> end up in either in nft_chain_validate(), nft_match_validate(), or
-> nft_match_validate(), see below for examples. Also, this doesn't seem
-> to be a recent regression since I am able to repro it as far back as
-> v5.15.184. The repro steps are rather convoluted (involving a config
-> with a ~40k iptables rules and 2 vCPUs) so I am happy to test any
-> patches. You can find the config I used to build the 6.18 kernel at [1].
+> The driver stores HW timestamping configuration and can technically
+> report it. Add callback to do it.
 
-Nftables ruleset validation code was refactored in v6.10 with commit
-cff3bd012a95 ("netfilter: nf_tables: prefer nft_chain_validate"). This
-is also present in v5.15.184, so in order to estimate whether a bug is
-"new" or "old", better really use old kernels not recent minor releases
-of old major ones. :)
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Anyway, basically what happens is that nft_chain_validate() iterates
-over each rule's expressions calling their 'validate' callback if
-present. With nft_immediate, this leads to a recursive call to
-nft_chain_validate() if the verdict is a jump/goto call. There is a
-recursion limit involved, but chains are potentially revalidated
-multiple times to cover all possible flow paths (e.g. with consecutive
-rules jumping to the same chain).
-
-So, how many --jump/--goto calls does your 40k iptables dump contain? Is
-this a (penetration) test or an actual ruleset in use? While it might be
-possible to reduce the overhead involved with this chain validation,
-maybe you want to consider using ipset (or better, nftables and its
-verdict maps) to improve the ruleset in general?
-
-On nftables side, maybe we could annotate chains with a depth value once
-validated to skip digging into them again when revisiting from another
-jump?
-
-Cheers, Phil
+Thank you!
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
