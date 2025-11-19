@@ -1,233 +1,173 @@
-Return-Path: <netdev+bounces-240078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78C2AC703B2
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:53:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45EA0C70486
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 18:01:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 583773C550C
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:34:51 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 579D14F7843
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F00F35B15E;
-	Wed, 19 Nov 2025 16:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B6EC335063;
+	Wed, 19 Nov 2025 16:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ro9h3cFd";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="l/+cfj+t"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="t8xLRByW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013030.outbound.protection.outlook.com [40.93.196.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5943590DB
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 16:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763569884; cv=none; b=Xrq9oTAdaKee5E2JVahbHsn8TkDY+vKrSSaT2VUbqy94IoMXMzbEFHyoekMz96gSXEQHjvXBG7v/hdrasVqxDADmJadhmKXO8bKW14mSVrQSgXUqT27fGZ3RnVeQEp5+9mChcACxHL4Y08BB/hFZDiJI5WUYBer3dKOoK0Gs0tM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763569884; c=relaxed/simple;
-	bh=FqqvmkUPgSq7OZp9nrgzHtuk68f2+rkXNRL8blqM5Gw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nbUFmg6NcjUIX4ombFUYdLRCeGzooguCqxJxnRUYP+zg/Vs/Mr+7G90Q5BPmtEC+DJ8YTOIrC5z6L0cfGzcduxrDSDMnMCO7qsaIlHfXsfqbhZPFfQ5tebRUaWjGbI4ZVL1/GsdW0q028qhdkXKORQtYIrVOQfK5BPC8150sot8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ro9h3cFd; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=l/+cfj+t; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763569881;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O3kVindzkKJ+KF8jM/3D9z51CP303MCzFh5WHNehWDM=;
-	b=Ro9h3cFdnteI3rhSoL5Ws/nivj/ndNLcsVakvDcPQShDWaOSJF+C5eKJXokrDioauLnpKP
-	Udk7QSv/0nZSzTR4TLodXaOeKiDPqw2Qi9E3sbltPqbYSTug4axcgGfvUTKe3C5xjLutfV
-	+YdF0eCrILUup1f1gy5+2H/SOdpGOO0=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-489-3iIw0qiCPjacl8w07gF0eA-1; Wed, 19 Nov 2025 11:31:20 -0500
-X-MC-Unique: 3iIw0qiCPjacl8w07gF0eA-1
-X-Mimecast-MFC-AGG-ID: 3iIw0qiCPjacl8w07gF0eA_1763569879
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-8804b991976so194861126d6.2
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:31:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763569877; x=1764174677; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O3kVindzkKJ+KF8jM/3D9z51CP303MCzFh5WHNehWDM=;
-        b=l/+cfj+tJXasJue0f8SeL2ebb7dhOO8XLamvf7AP5repUaUMkrl1aW6m5yiE3USAfj
-         7LPlnUPhjQZZkehjo70qkRHDmc+9iLiybzfHRpzbViDK2Mto05xdhrufadkvU2KS/giO
-         uFnwtrLnrVGcTh2a0itXYXabeq4b4cvELFvPdDlKi7lFCh9MZ0P53h2U+X6xT6iQd/6h
-         L9QxJPueZpg5QeqXY0E1GQ1iOxXCT9xKebDEXqcF0mbtTOGVFX7/e4DjMecWbBYCoglB
-         u9baXq4/j2a7L1gmFaZiI5DMb0DWstEsDNMKRm8cLiMJwCCM49Q6b31o9KbeWDxBmslN
-         9vWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763569877; x=1764174677;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O3kVindzkKJ+KF8jM/3D9z51CP303MCzFh5WHNehWDM=;
-        b=W1cpbQZlWjucnOYErw7MeQ0JIwIcexDYIXQ53tMbjOTGF/TuWyiphtUfVYxOamNuGA
-         K0CPI5FpXUkUIKZBk0JvZ79UuEBROXo1SRc8LqnY1bc9/ZemD1J7bW6iDjlZ5Pdg3mVq
-         Jz61TDBYf4XfhLW2f5F8CBHN4tpD9uH3g8IRKrA4qZlKNddX3lNoS25DqNn1eL/qp+Un
-         IBN4eGW9jnqFMINSGDgfbK4IPIUVCz9yc0PKgBqc2kleEEtspps8dmWG9fmFapLNkFa+
-         wn6EwpVEnfU2AXgmpyTUTXzjG0PCGCCbFWBFqVPTSfYH1res39IjNqHqfs7U+mZ+Vz3c
-         U2eg==
-X-Forwarded-Encrypted: i=1; AJvYcCWnbERDjv2VxyZ4vbDDVtz7nleQhCSbMR9wt1vV8ARvtdKRZFZCCiG+9Q/7UhEvW4rll4RJqqY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywar6wb/g02+LHazOymqrris/XgQhRqFsqFNBnpqjtBI1QmHuxN
-	UPCoqvbwQZMkIkyRFmumauLYkClCudkibrT1truqi68oqBIw01UXBlZ2Sih0uBdk7LFoPuor3Mh
-	yrZtd9oi2UmES0aZ32gsvv4o+b4keZ8NG0KHauyaO9Acf72OoUE/68HmrmA==
-X-Gm-Gg: ASbGncuGBWmlnYEOC+1QaMgEaK0TUQefT7G1hADHbpVMHTO8sCcraGVp0RW40/P/h6n
-	NTJSAKVVjPT2me5fSRDJg2q/ZLqw2Ucikd1oH1bO4WG7EKMHc0I3llBTEFGVTRW8VNFp71XALKg
-	qglsWjLXZWongmadvwYE7gQ1vYyabMBWx/jN9BhVyCHAuOCiMDg0MYca0a7zbocvs3FG+Srn+da
-	mEjqwRYfgN5Y0QKEsyN/z2GReM02PaLlqvIjDmmPdApcrUQbDD82c7FWHjq8z+pbFAYfWKDL4TU
-	giuDk0PT48UPTmatfY3ErYsSvGRMfgkPiowEtnMsriilfMSXaBYPAyaJjgLQlCg6XOjbmVLTKZJ
-	QDM9DVH6b0Rf844y7hsz7B38eAKaNnMAQkv7VX3z/dNFz2NQ=
-X-Received: by 2002:a05:6214:2246:b0:882:398d:3cf5 with SMTP id 6a1803df08f44-88292703764mr336989756d6.52.1763569876555;
-        Wed, 19 Nov 2025 08:31:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFlMoSDGo8RCC4ukLN3fwxkuNRsD7z+J9Dhyfp0NsIu40eZGeuMWPAwGp70A3xvg/lU9rghuw==
-X-Received: by 2002:a05:6214:2246:b0:882:398d:3cf5 with SMTP id 6a1803df08f44-88292703764mr336988236d6.52.1763569875387;
-        Wed, 19 Nov 2025 08:31:15 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88286314656sm136478176d6.21.2025.11.19.08.31.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 08:31:14 -0800 (PST)
-Date: Wed, 19 Nov 2025 17:31:01 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] vsock: Ignore signal/timeout on connect() if already
- established
-Message-ID: <663yvkk2sh5lesfvdeerlca567xb64qbwih52bxjftob3umsah@eamuykmarrfr>
-References: <20251117-vsock-interrupted-connect-v1-1-bc021e907c3f@rbox.co>
- <dh6gl6xzufrxk23dwei3dcyljjlspjx3gwdhi6o3umtltpypkw@ef4n6llndg5p>
- <98e2ac89-34e9-42d9-bfcf-e81e7a04504d@rbox.co>
- <rptu2o7jpqw5u5g4xt76ntyupsak3dcs7rzfhzeidn6vcwf6ku@dcd47yt6ebhu>
- <09c6de68-06aa-404d-9753-907eab61b9ab@rbox.co>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2AB3327C0C;
+	Wed, 19 Nov 2025 16:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.30
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763569975; cv=fail; b=sZQ5rCSxHiwPoaH02ZiVd5k7QkSOVSdHddYZpYWdRD64WMbVdNYsT3nGjtFTXVyjfalX53/GlDO/AsLoKmeNWtoaP9QFCO7EG0N3KS6owj1TuoIo+w2QogOy88Z6S1yBAsCBkGYQHoIYOzb6W85xylPqGFTQZ4kj+hNrQhSd21Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763569975; c=relaxed/simple;
+	bh=tPbW9Qm1JFJxkheYagrb1gm1JpphiLR0ExEh6p4BXps=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=J5SOhnbtQ3dO6ivqHH/FNGNxHgdPecgf/dQ1CfNMJlr35OHGWsKl2JKoS8CwpHRTChb7jwvJivD4VKpTqbtrp8mfV/DrVV61HcbX8nm3lujMOkznDiF57E3u+U9QqIlEA24aKSU/S//y9rmfvx5DTNowBcGtTMcbEpHnZYXKGhg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=t8xLRByW; arc=fail smtp.client-ip=40.93.196.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AylL4qymTbAv4SWoCGxTtcH/aKwt6I5gRmMsXf/RtUcnaNzzB3oK98WMKmpnMeijMe27RzjlHz1A696rxs5rsTbr5CrPybckVba6NUuWFlezZpGuqys5maTkSbeX+1hlhnx3JaHrt5TUMsD/W1LyEyrQ8jOxcw4wPKfYsP7Pq0ObhwfR/KgirZIbLAgvpyPWgn0jnmYX651LsU0oL+KG08/5SuVTowKRrXJRhQBe509eis0+k6oVNMwVhT5brEEPdBAxSO4f6g5zRUMeaGNzUxOpY39oqMlgB8cLJOHIHJjHkpnw8pIZ9tthFKBI6d2vWu9zLeF3Zzuts8J2JPZfBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tPbW9Qm1JFJxkheYagrb1gm1JpphiLR0ExEh6p4BXps=;
+ b=EMcu+H5xi01+fLU/XOwBoI8v+bbwrBqtsgbOyyQNUTsg/qo9BdaGrBU765BASLT4KczPybF2cWktfqYt+RptgY+G63BYd2cY7hxFYNOPqB7x54aT6eWnEUcQDfzbG9W48n2PDJL/ThVZoiz1b5oacYqZLzhS2ZYvAz59TxjmsZGT0sLZkd9Kcu3dUacPttynA1Sfof419wr3JMbGut71aKf4IGfbvuPGcrcwu/EOG/U0wCL/oe8OJa9RO7w/1OZ39oHu4Mb6DRP+tEgxKmX+jjlD/1Q/uvs8svsesTW6PtEaWVxylU47eB/no8BA2gAPFHx88zFQ67N1zlt5z0paXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tPbW9Qm1JFJxkheYagrb1gm1JpphiLR0ExEh6p4BXps=;
+ b=t8xLRByW+XF7ZGDaNVOfbFlAN98U3myNm6u95LH3hZVQo1B/3QvlHA9Fk6NV+oi2qh/YEcdL1WXLS8HAaaiQLNjLb6VO6mLZ0xVAP8eVVGoe5HLqa7M60wiVScCWgSJFqWlNd3gg2EK+/F6P2XAsoVoW0M8ropGP1a5ESusYxDLfGVb5+79M1Fu0TFbavwn9GY2w5SRSqW5fFCXDPDRkscJiAp8gLdlrvnjHqvv4DADacoaPlmF/6n8fuAgo8FLsLWXy9QkcYueQwETGYhhNUl6kuSP4DWje8ADJG+0YUyi4Q6l6p0t4xtscKcyGzMbewgFkFS/1ILgvJBUTZHK/iQ==
+Received: from SJ0PR13CA0135.namprd13.prod.outlook.com (2603:10b6:a03:2c6::20)
+ by DS0PR12MB9039.namprd12.prod.outlook.com (2603:10b6:8:de::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Wed, 19 Nov
+ 2025 16:32:50 +0000
+Received: from SJ5PEPF00000207.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c6:cafe::c) by SJ0PR13CA0135.outlook.office365.com
+ (2603:10b6:a03:2c6::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Wed,
+ 19 Nov 2025 16:32:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ5PEPF00000207.mail.protection.outlook.com (10.167.244.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.9 via Frontend Transport; Wed, 19 Nov 2025 16:32:50 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 08:32:28 -0800
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 08:32:22 -0800
+References: <20251118215126.2225826-1-kuba@kernel.org>
+ <20251118215126.2225826-7-kuba@kernel.org>
+User-agent: mu4e 1.8.14; emacs 30.2
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<willemdebruijn.kernel@gmail.com>, <shuah@kernel.org>, <sdf@fomichev.me>,
+	<krakauer@google.com>, <linux-kselftest@vger.kernel.org>, <petrm@nvidia.com>,
+	<matttbe@kernel.org>
+Subject: Re: [PATCH net-next v2 06/12] selftests: net: py: support ksft
+ ready without wait
+Date: Wed, 19 Nov 2025 17:31:58 +0100
+In-Reply-To: <20251118215126.2225826-7-kuba@kernel.org>
+Message-ID: <87jyzmasqa.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <09c6de68-06aa-404d-9753-907eab61b9ab@rbox.co>
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF00000207:EE_|DS0PR12MB9039:EE_
+X-MS-Office365-Filtering-Correlation-Id: d0d530fc-ea41-4378-bdca-08de27894835
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?qmAIwH3HrzQ6FN9D9cRcfuEv2gUZm9xA49cu5YYtRE4Puf8GU/PZNAhmcmmZ?=
+ =?us-ascii?Q?/WPZFux7GV3JjunzBiCQrgBI+Q/PL9Vi5KMk3+YieNqOpxBr0MTFLmidGsye?=
+ =?us-ascii?Q?c+VhEYuMWBfWVWk34s8XkltBmxq8pEV+EsG95ORsowaYEqKBR4bFh25tmFpM?=
+ =?us-ascii?Q?EymE/wYX0MZVqrXYWYAXg5H69s4LnS/4Co6h4hlUgbQ7aZDcfXeWcMxE1xmb?=
+ =?us-ascii?Q?+62tmsDCJo97szgH6snVsX1k08bOoSVeNSu6S4SIaHgK/43NgX23ZB2zKS/G?=
+ =?us-ascii?Q?QB90Pwlb7PwUf0T7cu0gh9gq0y5EunabXye63GUBeMMBPb5/84tUjHe61fhs?=
+ =?us-ascii?Q?sRAE5ZyLOphFporzw9WgnocyqQkZwXJyGZdPIcF90gnJCTUziasESY238F6i?=
+ =?us-ascii?Q?/+W//4TGXhWcJuH3sJDiGm987VYA91as4FmGXAUH7L/VpDf7yROYpjBPln98?=
+ =?us-ascii?Q?xVoOIm9Nqw6K7YwOwiOSaTqzqH0y1AQytGuU8kinbiBJiR5tlVWju/jsAmGD?=
+ =?us-ascii?Q?st3VZDy93ZbrUzu0bz9lVmqvyi9+tG5+0TUbsncBWaNNnNB0ZLMdw523+0Mc?=
+ =?us-ascii?Q?wb46Evowgvx3ysDe54AJS3aceegtUnMw59nqZUukifG7vlfJ3xdbiwTOTlkb?=
+ =?us-ascii?Q?IZC302br+4WHQbICFx+irlRLcAi5Ku4OL1kz+0o91LmQ9lxNdJ8InpaT1blZ?=
+ =?us-ascii?Q?hJ2Rs9Pby5yjXvK9hqWhy2xU9kUfoeBRDOmoDP6Z7ovWS74H2UxMCYhLSIWI?=
+ =?us-ascii?Q?BI2mPwK9TB8F5f4FCs5sXlFZ+f/CFXh//of8+IIvfWTDcze4eW1rArUvLuXI?=
+ =?us-ascii?Q?HjpX9S25Lef9VT7ECGbBLD+0MFZspmjcTAYofTxt1kLGpZp7OKfc6afsG5Xn?=
+ =?us-ascii?Q?Y66LRWulSAElHpoNI/EfWOJnfRbgTIr8QLtPMy8kbKqPg2+19Ry1H2dISJhP?=
+ =?us-ascii?Q?IC0cSI4M3pzK94TQu80PyCx4+EtYIjwG8K3/Wvyz8wXWFu6VNLpJGCmVFLhJ?=
+ =?us-ascii?Q?wPT0AW1Q4u1HnX8qNSkNZ+g+Q3hUAuimo6W2g30foloFjKgu6lqy3otrr+f5?=
+ =?us-ascii?Q?+9adN96dJJAdVbPksI80mtAz+1CdgBOrYZYDUp+RZuQTYsN9hCKijrvXaljL?=
+ =?us-ascii?Q?5jcvfs2nBWJDhIlOmbgMqvTGf9aW2+2fe45kOpKmztuk3ojRQwyBynzXmSz5?=
+ =?us-ascii?Q?jcNNdD8NT1XmLOyGsUCG5Hr1MjTvE5Cmn87iYl9t92yNICPQqX2VbiRyq2Jp?=
+ =?us-ascii?Q?OaVmqiaB45U5JAMeuUZClPOSjyC9pgxL5dxhyOd3e8xpTRCwimy84gZi9BBG?=
+ =?us-ascii?Q?S9vC847e+RVVgqWUDb8yigk6wlyS2mJLl5+dqFHGT6iTqaoxqCGlEKjUZiVR?=
+ =?us-ascii?Q?5l8MvAEwDzqX6aXIw8wCKDKB5XcoorJ/17hsbTmRPprVlJ6BKpf97mDmsMrH?=
+ =?us-ascii?Q?qd4DysFcIOSKYSldyXL0i0zQJOsnoR7lQue7l1Vv8mTH290odQKnujwwFFEO?=
+ =?us-ascii?Q?IBfgXUkSfyyFg6W6lU8W4E4pquQh0Esi5te44n3NUAg0wQXjfMd+JLzyHylp?=
+ =?us-ascii?Q?2vy58jAy3fiARy0D580=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 16:32:50.7376
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d0d530fc-ea41-4378-bdca-08de27894835
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF00000207.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9039
 
-On Wed, Nov 19, 2025 at 03:09:25PM +0100, Michal Luczaj wrote:
->On 11/19/25 11:36, Stefano Garzarella wrote:
->> On Tue, Nov 18, 2025 at 11:02:17PM +0100, Michal Luczaj wrote:
->>> On 11/18/25 10:51, Stefano Garzarella wrote:
->>>> On Mon, Nov 17, 2025 at 09:57:25PM +0100, Michal Luczaj wrote:
->>>>> ...
->>>>> +static void vsock_reset_interrupted(struct sock *sk)
->>>>> +{
->>>>> +	struct vsock_sock *vsk = vsock_sk(sk);
->>>>> +
->>>>> +	/* Try to cancel VIRTIO_VSOCK_OP_REQUEST skb sent out by
->>>>> +	 * transport->connect().
->>>>> +	 */
->>>>> +	vsock_transport_cancel_pkt(vsk);
->>>>> +
->>>>> +	/* Listener might have already responded with VIRTIO_VSOCK_OP_RESPONSE.
->>>>> +	 * Its handling expects our sk_state == TCP_SYN_SENT, which hereby we
->>>>> +	 * break. In such case VIRTIO_VSOCK_OP_RST will follow.
->>>>> +	 */
->>>>> +	sk->sk_state = TCP_CLOSE;
->>>>> +	sk->sk_socket->state = SS_UNCONNECTED;
->>>>> +}
->>>>> +
->>>>> static int vsock_connect(struct socket *sock, struct sockaddr *addr,
->>>>> 			 int addr_len, int flags)
->>>>> {
->>>>> @@ -1661,18 +1678,33 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
->>>>> 		timeout = schedule_timeout(timeout);
->>>>> 		lock_sock(sk);
->>>>>
->>>>> +		/* Connection established. Whatever happens to socket once we
->>>>> +		 * release it, that's not connect()'s concern. No need to go
->>>>> +		 * into signal and timeout handling. Call it a day.
->>>>> +		 *
->>>>> +		 * Note that allowing to "reset" an already established socket
->>>>> +		 * here is racy and insecure.
->>>>> +		 */
->>>>> +		if (sk->sk_state == TCP_ESTABLISHED)
->>>>> +			break;
->>>>> +
->>>>> +		/* If connection was _not_ established and a signal/timeout came
->>>>> +		 * to be, we want the socket's state reset. User space may want
->>>>> +		 * to retry.
->>>>> +		 *
->>>>> +		 * sk_state != TCP_ESTABLISHED implies that socket is not on
->>>>> +		 * vsock_connected_table. We keep the binding and the transport
->>>>> +		 * assigned.
->>>>> +		 */
->>>>> 		if (signal_pending(current)) {
->>>>> 			err = sock_intr_errno(timeout);
->>>>> -			sk->sk_state = sk->sk_state == TCP_ESTABLISHED ? TCP_CLOSING : TCP_CLOSE;
->>>>> -			sock->state = SS_UNCONNECTED;
->>>>> -			vsock_transport_cancel_pkt(vsk);
->>>>> -			vsock_remove_connected(vsk);
->>>>> +			vsock_reset_interrupted(sk);
->>>>> 			goto out_wait;
->>>>> -		} else if ((sk->sk_state != TCP_ESTABLISHED) && (timeout == 0)) {
->>>>> +		}
->>>>> +
->>>>> +		if (timeout == 0) {
->>>>> 			err = -ETIMEDOUT;
->>>>> -			sk->sk_state = TCP_CLOSE;
->>>>> -			sock->state = SS_UNCONNECTED;
->>>>> -			vsock_transport_cancel_pkt(vsk);
->>>>> +			vsock_reset_interrupted(sk);
->>>>> 			goto out_wait;
->>>>
->>>> I'm fine with the change, but now both code blocks are the same, so
->>>> can we unify them?
->>>> I mean something like this:
->>>> 		if (signal_pending(current) || timeout == 0 {
->>>> 			err = timeout == 0 ? -ETIMEDOUT : sock_intr_errno(timeout);
->>>> 			...
->>>> 		}
->>>>
->>>> Maybe at that point we can also remove the vsock_reset_interrupted()
->>>> function and put the code right there.
->>>>
->>>> BTW I don't have a strong opinion, what do you prefer?
->>>
->>> Sure, no problem.
->>>
->>> But I've realized invoking `sock_intr_errno(timeout)` is unnecessary.
->>> `timeout` can't be MAX_SCHEDULE_TIMEOUT, so the call always evaluates to
->>> -EINTR, right?
->>
->> IIUC currently schedule_timeout() can return MAX_SCHEDULE_TIMEOUT only
->> if it was called with that parameter, and I think we never call it in
->> that way, so I'd agree with you.
->>
->> My only concern is if it's true for all the stable branches we will
->> backport this patch.
->>
->> I would probably touch it as little as possible and continue using
->> sock_intr_errno() for now, but if you verify that it has always been
->> that way, then it's fine to change it.
+
+Jakub Kicinski <kuba@kernel.org> writes:
+
+> There's a common synchronization problem when a script (Python test)
+> uses a C program to set up some state (usually start a receiving
+> process for traffic). The script needs to know when the process
+> has fully initialized. The inverse of the problem exists for shutting
+> the process down - we need a reliable way to tell the process to exit.
 >
->All right then, here's a v2 with minimum changes:
->https://lore.kernel.org/netdev/20251119-vsock-interrupted-connect-v2-1-70734cf1233f@rbox.co/
+> We added helpers to do this safely in
+> commit 71477137994f ("selftests: drv-net: add a way to wait for a local process")
+> unfortunately the two operations (wait for init, and shutdown) are
+> controlled by a single parameter (ksft_wait). Add support for using
+> ksft_ready without using the second fd for exit.
 >
-
-Thanks!
-
->Note a detail though: should signal and timeout happen at the same time,
->now it's the timeout errno returned.
+> This is useful for programs which wait for a specific number of packets
+> to rx so exit_wait is a good match, but we still need to wait for init.
 >
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Yeah, I thought about that, but I don't see any problems with that.
-I mean, it's something that if it happens, it's still not deterministic,
-so we're not really changing anything.
-
-Thanks,
-Stefano
-
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
