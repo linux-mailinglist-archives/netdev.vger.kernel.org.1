@@ -1,103 +1,203 @@
-Return-Path: <netdev+bounces-240159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC298C70E6D
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 20:53:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F57C70E70
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 20:53:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0570B4E018B
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:52:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C77BC4E1415
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CACB62E62C6;
-	Wed, 19 Nov 2025 19:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C395E371DF4;
+	Wed, 19 Nov 2025 19:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="F6pln4dJ"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="cWj/bIdf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA7934DB60;
-	Wed, 19 Nov 2025 19:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7D3220698;
+	Wed, 19 Nov 2025 19:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763581919; cv=none; b=jkVVZXxD4w3dEqkTQb4H08yuJudYzSqc2I/984wiiKVKFRMgbLKaEbwqVVaGRMsvbgbLagfgESJe+SUy/WUC+ZSU262UmI2Lw6dGjnhzVXb81AQVC+d5uQ5RaRmGhZH+wU0iqXXa5yfy3V5ve/6k0FYJAXMbjmhI7ja7RPztNgk=
+	t=1763581980; cv=none; b=e/NXEaaoOW33aJA5Os2sXCmBc+CSrpnEAUk65JpPoyVHAZuTjPEiA1QdN8+gD+aoydMXskEx//DcpsYQO6PBKmIAq3nYCH52Y6FTtvrkSspYm6E7TXGx5xrl8PsV0qnlhc3ljJc1NuEnBu+W8XHt3V0qyqSOhq8v3ru38V1XGTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763581919; c=relaxed/simple;
-	bh=xk95UURiSzEbIEbTh795kb7YWO/yWBYiVU0rKCqfYyk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yn2cAJkCvRs9qgVlqqsM7zkdSyxpWCyXlL90CdnyLQSO68YqQQc0qYd8gP5qBBZukbrFZJrc+35pscENMbXdOM5esq0iDkOvOoDkcbX37q1oM8LKuEf7rhUt7+J+OmApS6wmCcQMEvkdTt9oodkNe7534343BzNP39kmV7b2vbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=F6pln4dJ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Dg+ZfMlkkva2YqCScrw1/cbaetvEkaxgzLwIQZgnGh4=; b=F6pln4dJ+YqiJig6hY3QPemhNm
-	tATG9SMWl+R1km6OTNq4RfvHlZtEwuQT9ulsgU0GvI49LLfrH3XtwI2O4tXKZ6HsT4/apTp3Hic6L
-	HTEmW2NCTyFaoZHUley8+ZUMgcsLyTtHwyInPy532n1gMnU3NWGz9UldZ3vU8g91c3bI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vLoDP-00EXnU-35; Wed, 19 Nov 2025 20:51:43 +0100
-Date: Wed, 19 Nov 2025 20:51:43 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jisheng Zhang <jszhang@kernel.org>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 resend] net: stmmac: add support for dwmac 5.20
-Message-ID: <c73c4683-6bc4-42e9-9f5b-9b5bcd2f0aa6@lunn.ch>
-References: <20251119153526.13780-1-jszhang@kernel.org>
- <aR3snSb1YUFh9Dwp@shell.armlinux.org.uk>
- <aR3p4NBK-AnCGK6a@xhacker>
+	s=arc-20240116; t=1763581980; c=relaxed/simple;
+	bh=jF6kVo6Hjs7U3p0jUm2wQrED5+i0c1aTSJj3C1XKJPo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H2ZiVNO1zzwUYbIlqEhoJPgb4rNh6qGaAgzZ553pt1lJbtqPlFMtKN9gR6qcUcNQr+xHOEmOKPPWWhzwKzL8i3ZBJ0l2UoZid4PlbLEYBRWDT+QzB8Ea8XwZ61ShSAfGdrwt7PkniFIOF2fSE23YRJRG6AcKrIADVCV29rxQ0BI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=cWj/bIdf; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1vLoEQ-006OPH-30; Wed, 19 Nov 2025 20:52:46 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=M1tjLezg7BNgs3HfhRtLwjVoRH1sIIdmfgc0Pkts8CE=; b=cWj/bIdfxRAjFQ9tTxzlg1lBeR
+	gEKX3Xhb+7jXiBgjl8JotTnysxyTfr0ZgXTDyqKPHBLOKL8GnfltMbGte4W6hXC2HelDEuSZ67gIO
+	uxdNe+eIyZNwkva/l1r24rzKzkyYijXZq1KgzknjR9+dL9NV63TT3Sie9RxUudNA7CCa044zSm1j7
+	2R82WD8+BcX/M8GY2vCwpam4rHLIZCJSsYkjpklANgR2uWXnNXhTIeaPpT2XYynnh1SMuwdzCo+TQ
+	oOLJdsAn/yGsa4JODlT5O2zqAR+Ln2lJ5o8nr5COfERTjeD18hsxwLgl8h1eIW/VsPi9tFgRI70dx
+	VL7PNjZw==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1vLoEO-0003y3-Jc; Wed, 19 Nov 2025 20:52:44 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vLoED-00GIgn-Sk; Wed, 19 Nov 2025 20:52:33 +0100
+Message-ID: <1b2255c7-0e97-4b37-b7ab-e13e90b7b0b9@rbox.co>
+Date: Wed, 19 Nov 2025 20:52:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aR3p4NBK-AnCGK6a@xhacker>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] vsock: Ignore signal/timeout on connect() if already
+ established
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251117-vsock-interrupted-connect-v1-1-bc021e907c3f@rbox.co>
+ <dh6gl6xzufrxk23dwei3dcyljjlspjx3gwdhi6o3umtltpypkw@ef4n6llndg5p>
+ <98e2ac89-34e9-42d9-bfcf-e81e7a04504d@rbox.co>
+ <rptu2o7jpqw5u5g4xt76ntyupsak3dcs7rzfhzeidn6vcwf6ku@dcd47yt6ebhu>
+ <09c6de68-06aa-404d-9753-907eab61b9ab@rbox.co>
+ <663yvkk2sh5lesfvdeerlca567xb64qbwih52bxjftob3umsah@eamuykmarrfr>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <663yvkk2sh5lesfvdeerlca567xb64qbwih52bxjftob3umsah@eamuykmarrfr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 20, 2025 at 12:01:36AM +0800, Jisheng Zhang wrote:
-> On Wed, Nov 19, 2025 at 04:13:17PM +0000, Russell King (Oracle) wrote:
-> > On Wed, Nov 19, 2025 at 11:35:26PM +0800, Jisheng Zhang wrote:
-> > > The dwmac 5.20 IP can be found on some synaptics SoCs. 
-> > > 
-> > > The binding doc has been already upstreamed by
-> > > commit 13f9351180aa ("dt-bindings: net: snps,dwmac: Add dwmac-5.20
-> > > version")
-> > > 
-> > > So we just need to add a compatibility flag in dwmac generic driver.
-> > 
-> > Do we _need_ to add it to the generic driver? Do the platforms that are
-> > using this really not need any additional code to support them?
-> > 
-> > Looking at all the DT that mention dwmac-5.20 in their compatible
-> > strings, that is always after other compatibles that point to other
-> > platform specific drivers.
-> > 
-> > So, can you point to a platform that doesn't have its own platform
-> > glue, and would be functional when using the dwmac-generic driver?
+On 11/19/25 17:31, Stefano Garzarella wrote:
+> On Wed, Nov 19, 2025 at 03:09:25PM +0100, Michal Luczaj wrote:
+>> On 11/19/25 11:36, Stefano Garzarella wrote:
+>>> On Tue, Nov 18, 2025 at 11:02:17PM +0100, Michal Luczaj wrote:
+>>>> On 11/18/25 10:51, Stefano Garzarella wrote:
+>>>>> On Mon, Nov 17, 2025 at 09:57:25PM +0100, Michal Luczaj wrote:
+>>>>>> ...
+>>>>>> +static void vsock_reset_interrupted(struct sock *sk)
+>>>>>> +{
+>>>>>> +	struct vsock_sock *vsk = vsock_sk(sk);
+>>>>>> +
+>>>>>> +	/* Try to cancel VIRTIO_VSOCK_OP_REQUEST skb sent out by
+>>>>>> +	 * transport->connect().
+>>>>>> +	 */
+>>>>>> +	vsock_transport_cancel_pkt(vsk);
+>>>>>> +
+>>>>>> +	/* Listener might have already responded with VIRTIO_VSOCK_OP_RESPONSE.
+>>>>>> +	 * Its handling expects our sk_state == TCP_SYN_SENT, which hereby we
+>>>>>> +	 * break. In such case VIRTIO_VSOCK_OP_RST will follow.
+>>>>>> +	 */
+>>>>>> +	sk->sk_state = TCP_CLOSE;
+>>>>>> +	sk->sk_socket->state = SS_UNCONNECTED;
+>>>>>> +}
+>>>>>> +
+>>>>>> static int vsock_connect(struct socket *sock, struct sockaddr *addr,
+>>>>>> 			 int addr_len, int flags)
+>>>>>> {
+>>>>>> @@ -1661,18 +1678,33 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
+>>>>>> 		timeout = schedule_timeout(timeout);
+>>>>>> 		lock_sock(sk);
+>>>>>>
+>>>>>> +		/* Connection established. Whatever happens to socket once we
+>>>>>> +		 * release it, that's not connect()'s concern. No need to go
+>>>>>> +		 * into signal and timeout handling. Call it a day.
+>>>>>> +		 *
+>>>>>> +		 * Note that allowing to "reset" an already established socket
+>>>>>> +		 * here is racy and insecure.
+>>>>>> +		 */
+>>>>>> +		if (sk->sk_state == TCP_ESTABLISHED)
+>>>>>> +			break;
+>>>>>> +
+>>>>>> +		/* If connection was _not_ established and a signal/timeout came
+>>>>>> +		 * to be, we want the socket's state reset. User space may want
+>>>>>> +		 * to retry.
+>>>>>> +		 *
+>>>>>> +		 * sk_state != TCP_ESTABLISHED implies that socket is not on
+>>>>>> +		 * vsock_connected_table. We keep the binding and the transport
+>>>>>> +		 * assigned.
+>>>>>> +		 */
+>>>>>> 		if (signal_pending(current)) {
+>>>>>> 			err = sock_intr_errno(timeout);
+>>>>>> -			sk->sk_state = sk->sk_state == TCP_ESTABLISHED ? TCP_CLOSING : TCP_CLOSE;
+>>>>>> -			sock->state = SS_UNCONNECTED;
+>>>>>> -			vsock_transport_cancel_pkt(vsk);
+>>>>>> -			vsock_remove_connected(vsk);
+>>>>>> +			vsock_reset_interrupted(sk);
+>>>>>> 			goto out_wait;
+>>>>>> -		} else if ((sk->sk_state != TCP_ESTABLISHED) && (timeout == 0)) {
+>>>>>> +		}
+>>>>>> +
+>>>>>> +		if (timeout == 0) {
+>>>>>> 			err = -ETIMEDOUT;
+>>>>>> -			sk->sk_state = TCP_CLOSE;
+>>>>>> -			sock->state = SS_UNCONNECTED;
+>>>>>> -			vsock_transport_cancel_pkt(vsk);
+>>>>>> +			vsock_reset_interrupted(sk);
+>>>>>> 			goto out_wait;
+>>>>>
+>>>>> I'm fine with the change, but now both code blocks are the same, so
+>>>>> can we unify them?
+>>>>> I mean something like this:
+>>>>> 		if (signal_pending(current) || timeout == 0 {
+>>>>> 			err = timeout == 0 ? -ETIMEDOUT : sock_intr_errno(timeout);
+>>>>> 			...
+>>>>> 		}
+>>>>>
+>>>>> Maybe at that point we can also remove the vsock_reset_interrupted()
+>>>>> function and put the code right there.
+>>>>>
+>>>>> BTW I don't have a strong opinion, what do you prefer?
+>>>>
+>>>> Sure, no problem.
+>>>>
+>>>> But I've realized invoking `sock_intr_errno(timeout)` is unnecessary.
+>>>> `timeout` can't be MAX_SCHEDULE_TIMEOUT, so the call always evaluates to
+>>>> -EINTR, right?
+>>>
+>>> IIUC currently schedule_timeout() can return MAX_SCHEDULE_TIMEOUT only
+>>> if it was called with that parameter, and I think we never call it in
+>>> that way, so I'd agree with you.
+>>>
+>>> My only concern is if it's true for all the stable branches we will
+>>> backport this patch.
+>>>
+>>> I would probably touch it as little as possible and continue using
+>>> sock_intr_errno() for now, but if you verify that it has always been
+>>> that way, then it's fine to change it.
+>>
+>> All right then, here's a v2 with minimum changes:
+>> https://lore.kernel.org/netdev/20251119-vsock-interrupted-connect-v2-1-70734cf1233f@rbox.co/
+>>
 > 
-> Synatpics platforms use the dwmac-generic driver, it's enough now.
-> But we haven't upstreamed related platforms, but will do soon.
+> Thanks!
+> 
+>> Note a detail though: should signal and timeout happen at the same time,
+>> now it's the timeout errno returned.
+>>
+> 
+> Yeah, I thought about that, but I don't see any problems with that.
+> I mean, it's something that if it happens, it's still not deterministic,
+> so we're not really changing anything.
 
-Please make this patch part of the patchset when you upstream the
-platforms. We prefer to only add things which have users.
+Mhm, I suppose.
 
-    Andrew
+To follow up, should I add a version of syzkaller's lockdep warning repro
+to vsock test suite? In theory it could test this fix here as well, but in
+practice the race window is small and hitting it (the brute way) takes
+prohibitively long.
 
----
-pw-bot: cr
 
