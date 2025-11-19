@@ -1,72 +1,90 @@
-Return-Path: <netdev+bounces-240068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C81C703D3
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:54:11 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11E39C70142
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:27:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 610184FA3A9
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:13:40 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0DAE84FBF12
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CFAD33A709;
-	Wed, 19 Nov 2025 16:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1F235BDAB;
+	Wed, 19 Nov 2025 16:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BRLKTIep"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LgblkGQo"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A6D33A713;
-	Wed, 19 Nov 2025 16:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EA430F938;
+	Wed, 19 Nov 2025 16:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763568810; cv=none; b=ITjryjt7cSTHIc76/aCEeNxJ7xxk5JdgAGW98d+WgCXpVfbpGhBOw5SmXK37ZMxR8nhcpEFKUkR2N3HudbPX88tr4bAL1HvYy1crQervclSp+5EnfQ5XWkwtaY8FooqUIfqMUvsPdyd0n3C0JEyBh77OH9IWVWjYMhpoN9EHxXw=
+	t=1763569076; cv=none; b=iShCXZIyWUJ+jtiOSh+S/uyO/NCdztY8AcQLrNNIX5gKanZN206WEHxVdjtsZgKiqba/YwL85qrQcsnvweOkeYDJgCUVqhVaNHrwlwPqBbbG18VgLmoTqArqCEyJMO0hoZ6IfX3HZppLFG2uoQ/niDEJXyy3/BFazphx+cu0rzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763568810; c=relaxed/simple;
-	bh=VrqQU9LTD/17OAmHEq8JGfmrEPMEeQQqPOvWT7IcTKo=;
+	s=arc-20240116; t=1763569076; c=relaxed/simple;
+	bh=KZojjTAuT7Jo/IAEhOuOTd7OhdZ6sgudnBZtwsb7/Po=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z4ZtX7RrC5U08JgOt9CT5NH9r7pn4LjDN6sCgG4zvWH2qfMQ/WEIn7ex+v9+SopJ9vBWmJy7EmhNyBmBuM7Fs1h4NqXX+nhuYr6UsH4WXQuL9DsRNSVsF0T9PoNg6gdvFxO8WpYG7Wb11ME23sL8sJ1mmQKcgXfuiSjO0jTVvVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BRLKTIep; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=I2Z8/xcjTHwwelfJUI+eSlYaVGFYtTXFWiaz6vN1dqc=; b=BRLKTIepSCsk2GgXJg5XJJxzcW
-	Q01F6+TnlEaz2bHGlKhI12kgEN1NM7BDaQppp5zAAEQgLiaRYg1O8m3hrzul7eWn3PeUTAEyNQOpa
-	Rgx0+25rJnZ+ulN9XZymfV0agn8derlOjokbo4zNIdphtx5TCR/mRxSrDnlp8i+i0nKmehDwFPUh5
-	wCiOZr9B+8svl8RWRnQAv4a7S5L+t4Ywut5foMAGHWsPDrty6gcPagQvHCDtrhcOxfMou91DOitEY
-	et5g38666G9rqA8DRHBDFSgfKlGwdg5LklhRdBbShOvASvSTou/TSBZ6hhPE1dz82M9F44q8Kr8CQ
-	VvsZowzA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33292)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vLko3-0000000058C-3sRn;
-	Wed, 19 Nov 2025 16:13:19 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vLko1-000000003Yg-3fGV;
-	Wed, 19 Nov 2025 16:13:17 +0000
-Date: Wed, 19 Nov 2025 16:13:17 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jisheng Zhang <jszhang@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 resend] net: stmmac: add support for dwmac 5.20
-Message-ID: <aR3snSb1YUFh9Dwp@shell.armlinux.org.uk>
-References: <20251119153526.13780-1-jszhang@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gzhIFu2WyxZSHa4ogdpQxzXhdsEUffAe6HARERarGtoTFrwr1ITGpFAcYHBuVm/BiR5of121WViwjGILfJ6awzFnMN1RlIkbbWJOoMByvdxlreCbNq6JhgyWWa3WRVocp1rS7AI4lRtm1aW4s6VTON68bxf625yqOoWKIRbAqlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LgblkGQo; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763569074; x=1795105074;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=KZojjTAuT7Jo/IAEhOuOTd7OhdZ6sgudnBZtwsb7/Po=;
+  b=LgblkGQo1CDnRg2hL9shlL9wy2ZNQB+L7yet5DEaOS7fduS8fTndSdVz
+   pXz7fpMPLPvvhtpP7dG7Q4Ecbz3XYrnREG7NlYvlvQAGEEuDFsqiyTTTE
+   sdutX8X812XHDdYOB5iy6/LhO+uU+7Tm20ykEYZy5WZt3gM9Te/ssE6po
+   ZZ56TTYt9ukS00h08AuhN82oQSMtp1bP0eopJAdLNVbRC4ADohyovcoNp
+   r96Sk9v3ACrALBDspLGjiAttimMByxC/veBdk6z2XCl93k9jhFmgev3GD
+   cXXBVi/F1Klh+QWTAOIsWCYUhKtBhV5sZqWYC7v1yAqeCFjKxwFeZdDEx
+   A==;
+X-CSE-ConnectionGUID: kGTKlBSmR8a+MuWPkwervQ==
+X-CSE-MsgGUID: /9BSKdIgS9+sCcDqsm1/vQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="64812777"
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="64812777"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 08:17:53 -0800
+X-CSE-ConnectionGUID: yad8mbXFQV+zDTAHMNdg0Q==
+X-CSE-MsgGUID: /+VV7mzjSI6pL4Pac6nzlw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="222025487"
+Received: from rvuia-mobl.ger.corp.intel.com (HELO localhost) ([10.245.245.245])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 08:17:50 -0800
+Date: Wed, 19 Nov 2025 18:17:48 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, Serge Semin <fancer.lancer@gmail.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 14/15] net: dsa: sja1105: replace mdiobus-pcs
+ with xpcs-plat driver
+Message-ID: <aR3trBo3xqZ0sDyr@smile.fi.intel.com>
+References: <20251118190530.580267-1-vladimir.oltean@nxp.com>
+ <20251118190530.580267-15-vladimir.oltean@nxp.com>
+ <20251118190530.580267-1-vladimir.oltean@nxp.com>
+ <20251118190530.580267-15-vladimir.oltean@nxp.com>
+ <20251118164130.4e107c93@kernel.org>
+ <20251118164130.4e107c93@kernel.org>
+ <20251119095942.bu64kg6whi4gtnwe@skbuf>
+ <aR2cf91qdcKMy5PB@smile.fi.intel.com>
+ <20251119112522.dcfrh6x6msnw4cmi@skbuf>
+ <20251119081112.3bcaf923@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,42 +93,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251119153526.13780-1-jszhang@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20251119081112.3bcaf923@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Wed, Nov 19, 2025 at 11:35:26PM +0800, Jisheng Zhang wrote:
-> The dwmac 5.20 IP can be found on some synaptics SoCs. 
+On Wed, Nov 19, 2025 at 08:11:12AM -0800, Jakub Kicinski wrote:
+> On Wed, 19 Nov 2025 13:25:22 +0200 Vladimir Oltean wrote:
+> > I think it's due to the fact that the "contest" checks are fundamentally
+> > so slow, that they can't be run on individual patch sets, and are run on
+> > batches of patch sets merged into a single branch (of which there seem
+> > to be 8 per day).
 > 
-> The binding doc has been already upstreamed by
-> commit 13f9351180aa ("dt-bindings: net: snps,dwmac: Add dwmac-5.20
-> version")
+> Correct, looking at the logs AFAICT coccicheck takes 25min on a
+> relatively beefy machine, and we only run it on path that were actually
+> modified by pending changes. We get 100+ patches a day, and 40+ series,
+> and coccicheck fails relatively rarely. So on the NIPA side it's not
+> worth it.
 > 
-> So we just need to add a compatibility flag in dwmac generic driver.
+> But, we can certainly integrate it into ingest_mdir.
+> 
+> FTR make htmldocs and of course selftests are also not executed by
+> ingest_mdir.
 
-Do we _need_ to add it to the generic driver? Do the platforms that are
-using this really not need any additional code to support them?
+Btw, do you do `make W=1` while having CONFIG_WERROR=y?
+And if so, do you also compile with clang?
 
-Looking at all the DT that mention dwmac-5.20 in their compatible
-strings, that is always after other compatibles that point to other
-platform specific drivers.
-
-So, can you point to a platform that doesn't have its own platform
-glue, and would be functional when using the dwmac-generic driver?
-
-For reference, the dts that refer to dwmac-5.20 are:
-
-arch/arm64/boot/dts/renesas/r9a09g047.dtsi
-arch/arm64/boot/dts/renesas/r9a09g056.dtsi
-arch/arm64/boot/dts/renesas/r9a09g057.dtsi
-arch/arm64/boot/dts/st/stm32mp251.dtsi
-arch/arm64/boot/dts/st/stm32mp253.dtsi
-arch/arm64/boot/dts/st/stm32mp233.dtsi
-arch/arm64/boot/dts/st/stm32mp231.dtsi
-arch/riscv/boot/dts/starfive/jh7110.dtsi
-
-Thanks.
+Sorry if it's documented / answered already, please point me to that discussion
+/ documentation.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+With Best Regards,
+Andy Shevchenko
+
+
 
