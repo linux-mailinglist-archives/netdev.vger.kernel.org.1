@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-239973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29A46C6E9B7
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:54:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FD46C6E9BD
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:54:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id E89792E525
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 12:52:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 255CB2F366
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 12:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8763F359F98;
-	Wed, 19 Nov 2025 12:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2BA1352926;
+	Wed, 19 Nov 2025 12:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JuwPmvD+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fC88zSju"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015C72F6933
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 12:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351323590A4
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 12:48:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763556497; cv=none; b=YIXkxTCJ8P8ZiW2kaiplCoumTVxcC1LiEAJDgvaI0luSo2IlN+HaRZx0YoVfQGqdqwQvp/9VYlJCj2yQryJ3AlQ4S3hOPrO7U26Erp/gZpDVUHn4SX4nGWDqH6Ncdvik1/8v87W6fqGIP6JvbOaJuj2ppT80f/ui+R/JKjLHQ58=
+	t=1763556499; cv=none; b=szwniEa4fLD4V4ptiKHJS8vbJ8LQK8LiyhVlQCMsYCw0PSKHmViymlD/maBUChffVU9Mbee2K/9UrbkVAZGpj/2JaHlwWyC1JNjpmuDR6jM45JcU83bQ5Uj2VbLRFK77OLDfWE91bA3OKb7FfKqyygEgqIJs0eGRm6Q+ELFwRik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763556497; c=relaxed/simple;
-	bh=9kqR75Rm7xAyXMp2bU67Frn84D/xTapSOkmmETyenAk=;
+	s=arc-20240116; t=1763556499; c=relaxed/simple;
+	bh=FSDDPMiS8rO56jPusgBoh+RHhMuF7LmYdUrSgUMVh98=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sI+dft7oa4tP2H0Tp2Igh/ftH0AtoQYr5zxjswUWvQuv8CRbZKu0SVHIG4ClIuSiHzCoAS3oI42uiSoqq+bEno18n0kAdinkd8poazH5BjbsL0/xRG4l5gd5+AWCoDe1vMY3FTyo820/ptjGDkezT62n1SqujaAwQTn5orHI+Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JuwPmvD+; arc=none smtp.client-ip=95.215.58.181
+	 MIME-Version; b=YyD9HYBC80LNJNWcr6a7S4TVVn+mBd1W4DLeV8xZ8IxWDnhvy6zZOZIRCdWf7AhGKKT+YI5e15XZeRSqdGlvnF3g0/gNd/5JqQ7+PVcy5kIQpKEEsUKACA2Yl24qo3CwEr9Jv1BzyT3FzCtuiN7kAdism0f3lMJARa9u6X+6ySI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fC88zSju; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763556492;
+	t=1763556494;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=t7DmaBU3wFK5HLBIMy94QrsJfR5bcX/8ZOoykoqqi/Y=;
-	b=JuwPmvD+wWbmLcn7M7lKUl5s2jfRM9dDpSsZpqsl2IfBdaJp7k3yLp4/3kl3SEbcJgcThG
-	FO7qJ1gzslU9XLmoBYZoOHlU7odSEGilRgSfqL60K2IX/I1upuDtCE8l9+kflc90LPbq7C
-	9lQgcjXd6cvQzCHWVLlH0xyvKnBiWuQ=
+	bh=FPgyYFzPzsZVkh75m60RrdwmoponMr51azBYvaHVoBM=;
+	b=fC88zSjuwXKbKxTnTzZnn5vmPAWrFI4OsHiyx6V/yewkWktdwoJNC1+gCcQf7pKCHuQsx1
+	O1K0hmREV45O3F19gjZtA/JMwCbyiKylSwm+rXj+tq7czHX7T48S1Cv6AcYen73cm5VjSz
+	+k908l2iPsE05T7eKT8AnCMnzV3vnBw=
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Florian Fainelli <florian.fainelli@broadcom.com>,
@@ -61,9 +61,9 @@ Cc: Simon Horman <horms@kernel.org>,
 	bcm-kernel-feedback-list@broadcom.com,
 	netdev@vger.kernel.org,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next v3 3/9] net: phy: broadcom: add HW timestamp configuration reporting
-Date: Wed, 19 Nov 2025 12:47:19 +0000
-Message-ID: <20251119124725.3935509-4-vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next v3 4/9] net: phy: dp83640: add HW timestamp configuration reporting
+Date: Wed, 19 Nov 2025 12:47:20 +0000
+Message-ID: <20251119124725.3935509-5-vadim.fedorenko@linux.dev>
 In-Reply-To: <20251119124725.3935509-1-vadim.fedorenko@linux.dev>
 References: <20251119124725.3935509-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
@@ -75,45 +75,82 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The driver stores configuration information and can technically report
-it. Implement hwtstamp_get callback to report the configuration.
+The driver stores configuration of TX timestamping and can technically
+report it. Patch RX timestamp configuration storage to be more precise
+on reporting and add callback to actually report it.
 
 Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- drivers/net/phy/bcm-phy-ptp.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/net/phy/dp83640.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/phy/bcm-phy-ptp.c b/drivers/net/phy/bcm-phy-ptp.c
-index 6815e844a62e..65d609ed69fb 100644
---- a/drivers/net/phy/bcm-phy-ptp.c
-+++ b/drivers/net/phy/bcm-phy-ptp.c
-@@ -780,6 +780,18 @@ static void bcm_ptp_txtstamp(struct mii_timestamper *mii_ts,
- 	kfree_skb(skb);
+diff --git a/drivers/net/phy/dp83640.c b/drivers/net/phy/dp83640.c
+index f733a8b72d40..b950acc9c49b 100644
+--- a/drivers/net/phy/dp83640.c
++++ b/drivers/net/phy/dp83640.c
+@@ -1176,6 +1176,18 @@ static irqreturn_t dp83640_handle_interrupt(struct phy_device *phydev)
+ 	return IRQ_HANDLED;
  }
  
-+static int bcm_ptp_hwtstamp_get(struct mii_timestamper *mii_ts,
++static int dp83640_hwtstamp_get(struct mii_timestamper *mii_ts,
 +				struct kernel_hwtstamp_config *cfg)
 +{
-+	struct bcm_ptp_private *priv = mii2priv(mii_ts);
++	struct dp83640_private *dp83640 =
++		container_of(mii_ts, struct dp83640_private, mii_ts);
 +
-+	cfg->rx_filter = priv->hwts_rx ? HWTSTAMP_FILTER_PTP_V2_EVENT
-+				       : HWTSTAMP_FILTER_NONE;
-+	cfg->tx_type = priv->tx_type;
++	cfg->rx_filter = dp83640->hwts_rx_en;
++	cfg->tx_type = dp83640->hwts_tx_en;
 +
 +	return 0;
 +}
 +
- static int bcm_ptp_hwtstamp_set(struct mii_timestamper *mii_ts,
+ static int dp83640_hwtstamp_set(struct mii_timestamper *mii_ts,
  				struct kernel_hwtstamp_config *cfg,
  				struct netlink_ext_ack *extack)
-@@ -899,6 +911,7 @@ static void bcm_ptp_init(struct bcm_ptp_private *priv)
- 	priv->mii_ts.rxtstamp = bcm_ptp_rxtstamp;
- 	priv->mii_ts.txtstamp = bcm_ptp_txtstamp;
- 	priv->mii_ts.hwtstamp_set = bcm_ptp_hwtstamp_set;
-+	priv->mii_ts.hwtstamp_get = bcm_ptp_hwtstamp_get;
- 	priv->mii_ts.ts_info = bcm_ptp_ts_info;
+@@ -1198,7 +1210,7 @@ static int dp83640_hwtstamp_set(struct mii_timestamper *mii_ts,
+ 	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
+ 	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
+ 	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
+-		dp83640->hwts_rx_en = 1;
++		dp83640->hwts_rx_en = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+ 		dp83640->layer = PTP_CLASS_L4;
+ 		dp83640->version = PTP_CLASS_V1;
+ 		cfg->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+@@ -1206,7 +1218,7 @@ static int dp83640_hwtstamp_set(struct mii_timestamper *mii_ts,
+ 	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
+ 	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+ 	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
+-		dp83640->hwts_rx_en = 1;
++		dp83640->hwts_rx_en = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
+ 		dp83640->layer = PTP_CLASS_L4;
+ 		dp83640->version = PTP_CLASS_V2;
+ 		cfg->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
+@@ -1214,7 +1226,7 @@ static int dp83640_hwtstamp_set(struct mii_timestamper *mii_ts,
+ 	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
+ 	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
+ 	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
+-		dp83640->hwts_rx_en = 1;
++		dp83640->hwts_rx_en = HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
+ 		dp83640->layer = PTP_CLASS_L2;
+ 		dp83640->version = PTP_CLASS_V2;
+ 		cfg->rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
+@@ -1222,7 +1234,7 @@ static int dp83640_hwtstamp_set(struct mii_timestamper *mii_ts,
+ 	case HWTSTAMP_FILTER_PTP_V2_EVENT:
+ 	case HWTSTAMP_FILTER_PTP_V2_SYNC:
+ 	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
+-		dp83640->hwts_rx_en = 1;
++		dp83640->hwts_rx_en = HWTSTAMP_FILTER_PTP_V2_EVENT;
+ 		dp83640->layer = PTP_CLASS_L4 | PTP_CLASS_L2;
+ 		dp83640->version = PTP_CLASS_V2;
+ 		cfg->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
+@@ -1408,6 +1420,7 @@ static int dp83640_probe(struct phy_device *phydev)
+ 	dp83640->mii_ts.rxtstamp = dp83640_rxtstamp;
+ 	dp83640->mii_ts.txtstamp = dp83640_txtstamp;
+ 	dp83640->mii_ts.hwtstamp_set = dp83640_hwtstamp_set;
++	dp83640->mii_ts.hwtstamp_get = dp83640_hwtstamp_get;
+ 	dp83640->mii_ts.ts_info  = dp83640_ts_info;
  
- 	priv->phydev->mii_ts = &priv->mii_ts;
+ 	INIT_DELAYED_WORK(&dp83640->ts_work, rx_timestamp_work);
 -- 
 2.47.3
 
