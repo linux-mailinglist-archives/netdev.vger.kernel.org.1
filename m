@@ -1,100 +1,86 @@
-Return-Path: <netdev+bounces-239757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18564C6C2DB
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 01:55:23 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E75BDC6C356
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 02:02:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 1CF3C2C62B
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 00:55:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AD7A04EBCD8
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 01:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9590A221FCA;
-	Wed, 19 Nov 2025 00:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D138B1EB1AA;
+	Wed, 19 Nov 2025 01:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h1I0qSAl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ByKHzKNV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C47F214812;
-	Wed, 19 Nov 2025 00:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82F71A9F84;
+	Wed, 19 Nov 2025 01:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763513599; cv=none; b=GP8sB1FLs7Bd+hNTvdpy/d9Evzolo0sgQy668AI3Ryum0b+3y2IyKmB3ginCPhNJOnTOa14WmTBlcIuiE5y58zCtTcKxXlB6dmYkChD7496bXNfGLa5zVchOiqpJm3KQjzTRxgTrdZNUP06juj5fES0UJtw+B5/fJlZCeHAfsJg=
+	t=1763514049; cv=none; b=IvPr+DBNyF7MLv449Zk1ypgI3gE8XpvlQrvFaKPc8j1rgoGPIjiRztWMNbcWU9aK3o0VPY0SLx4u34Gwto/7LQ4hmyeGRLGl9Sd6p3AIuWiVDLNfEIIvBh954gqxumLKK5rIsROMEayFMea/dGsWCz8tXZMI1ee8IJJnGc/ULkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763513599; c=relaxed/simple;
-	bh=kdl2WMZWDlCFrdcyuc2+LdLt928k5GOWuRvxrCpd7Qs=;
+	s=arc-20240116; t=1763514049; c=relaxed/simple;
+	bh=CQjZ0N89SVdwQBbPJ9aCn3Gqm4WwXY0obje6FxdqVi4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dkFdVgpU52VRFtfImuC8qCqVH3CaIBue+xN8fnMWsOnuCdDgnCs0z8FoZKmLKfca1b2YlUiSN+DSCx4/myfit2XV5C1ju4GCrCBK3DUPfbDvqq1InRquj9ZwYrvXUDKIWvo/0BZ96thgyIbcaRc+DGMyXf0xFphRmc9FETh5tOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h1I0qSAl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63956C4AF12;
-	Wed, 19 Nov 2025 00:53:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=smMPWgaGdS7s0qHhwI7P6CZnmTj1nsRTR6GOzDGyctZbWBoBcAdd9JJprXA/+6JuzhX9ogrMIqbXHFr0BgraCOvJEWdJ9jrrU4iODB6D+T18sVCj6KNFUJd5dm2jzA5MrS85aaMd1NAvhjJlamsbeqP+5ASRkhhJITxCeF4ZqIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ByKHzKNV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DBA8C16AAE;
+	Wed, 19 Nov 2025 01:00:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763513598;
-	bh=kdl2WMZWDlCFrdcyuc2+LdLt928k5GOWuRvxrCpd7Qs=;
+	s=k20201202; t=1763514048;
+	bh=CQjZ0N89SVdwQBbPJ9aCn3Gqm4WwXY0obje6FxdqVi4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h1I0qSAlaTPipkby0PxQ0loeTlahBMxd7/rnsKdgRuk+VHiS7HXvaEHVhyHVca+6Q
-	 gK5ocBk5/HjBSAgycwE4HoCUGQPe1YMU/43LPrHdUXMiNwPwq9hNf0pqtm39yLF995
-	 yVEzh/l86WZSDGC3gBQw35bu6inN4T+tdlqQze6fWKPybXDtZm6rxaULRDoGBvBEid
-	 mCw5b+tNJXGe9809w+o1jSCjEmuouudo0woEH0t+d370DTjKikeu9g/ESD0WT6VLm1
-	 //RSrJ2fcJXROmBje6cuMVZQ85/y+uAjr9RyFO6foluu8DJ2OnWhA3/suepo7yDaoy
-	 wQIsKgSmTVMzQ==
-Date: Tue, 18 Nov 2025 16:53:15 -0800
+	b=ByKHzKNVLOSLn5LEw/fWzSjuif5JJLGakx1Tgrd8qkQe2MPOT3tQ6mow1lI+10WE0
+	 8bGknq3Y1JL6fh17+RlVvn6pak65A9gpgOW4nTaCB/thLahgGL98lucmYQR9PPwFf4
+	 pPhsme4RVZhMDlnc9I6Jh7IdZkCrIkgzl0TQFyY7nZBXIrIDtw5A3SFUV4BBDcNCUl
+	 E27Bi3x7+HfH0GSgOFvSUyrNAOu7nku315vyMQ0oaoAa5dEpG1FfeQSg0ObytjWJjD
+	 KCfoE6AqWjoLj4DVY6KuoAUvTxO8i1dkNyLBlexQiolgPPSimIreBiyS6pL378bPRh
+	 XdZGFKOHdEGiA==
+Date: Tue, 18 Nov 2025 17:00:45 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc: =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?=
- <ast@fiberby.net>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald Hunter
- <donald.hunter@gmail.com>, Simon Horman <horms@kernel.org>, Jacob Keller
+ <ast@fiberby.net>, Donald Hunter <donald.hunter@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jacob Keller
  <jacob.e.keller@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
  wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, Jordan Rife <jordan@jrife.io>
-Subject: Re: [PATCH net-next v3 07/11] uapi: wireguard: generate header with
- ynl-gen
-Message-ID: <20251118165315.281a21ca@kernel.org>
-In-Reply-To: <aRyOAYuWZE440WQ4@zx2c4.com>
+Subject: Re: [PATCH net-next v3 11/11] wireguard: netlink: generate netlink
+ code
+Message-ID: <20251118170045.0c2e24f7@kernel.org>
+In-Reply-To: <aRz4eVCjw_JUXki6@zx2c4.com>
 References: <20251105183223.89913-1-ast@fiberby.net>
-	<20251105183223.89913-8-ast@fiberby.net>
-	<aRyOAYuWZE440WQ4@zx2c4.com>
+	<20251105183223.89913-12-ast@fiberby.net>
+	<aRyNiLGTbUfjNWCa@zx2c4.com>
+	<d2e84a2b-74cd-44a1-97a6-a10ece7b4c5f@fiberby.net>
+	<aRz4eVCjw_JUXki6@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 18 Nov 2025 16:17:21 +0100 Jason A. Donenfeld wrote:
-> On Wed, Nov 05, 2025 at 06:32:16PM +0000, Asbj=C3=B8rn Sloth T=C3=B8nnese=
-n wrote:
-> > Use ynl-gen to generate the UAPI header for wireguard.
-> > diff --git a/include/uapi/linux/wireguard.h b/include/uapi/linux/wiregu=
-ard.h
-> > index a2815f4f2910..dc3924d0c552 100644
-> > --- a/include/uapi/linux/wireguard.h
-> > +++ b/include/uapi/linux/wireguard.h
-> > @@ -1,32 +1,28 @@
-> > -/* SPDX-License-Identifier: (GPL-2.0 WITH Linux-syscall-note) OR MIT */
-> > -/*
-> > - * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All R=
-ights Reserved.
-> > - */
-> > +/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-=
-3-Clause) */
-> > +/* Do not edit directly, auto-generated from: */
-> > +/*	Documentation/netlink/specs/wireguard.yaml */
-> > +/* YNL-GEN uapi header */ =20
->=20
-> Same desire here -- can this get auto generated at compile time (or in
-> headers_install time).
+On Tue, 18 Nov 2025 23:51:37 +0100 Jason A. Donenfeld wrote:
+> I mean, there is *tons* of generated code in the kernel. This is how it
+> works. And you *want the output to change when the tool changes*. That's
+> literally the point. It would be like if you wanted to check in all the
+> .o files, in case the compiler started generating different output, or
+> if you wanted the objtool output or anything else to be checked in. And
+> sheerly from a git perspective, it seems outrageous to touch a zillion
+> files every time the ynl code changes. Rather, the fact that it's
+> generated on the fly ensures that the ynl generator stays correctly
+> implemented. It's the best way to keep that code from rotting.
 
-IMHO generating uAPI on the fly has more downsides than benefits.
-For one thing people grepping the code and looking and lxr will
-never find the definition. All the user space code in tools/ is
-generated at build time, but the amount of kernel code we generate
-is not significant at this stage. Not significant enough to complicate
-everyone's life..
+CI checks validate that the files are up to date.
+There has been no churn to the kernel side of the generated code.
+Let's be practical.
 
