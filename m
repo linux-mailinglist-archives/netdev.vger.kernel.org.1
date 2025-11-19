@@ -1,226 +1,162 @@
-Return-Path: <netdev+bounces-239870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57541C6D547
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:12:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0426CC6D567
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:13:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B992D3A00D6
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:04:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 281304FD1C4
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BEE32ABCF;
-	Wed, 19 Nov 2025 07:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C879E32BF46;
+	Wed, 19 Nov 2025 08:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+AatFsl";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qI76pcys"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s9X7kMoX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3E531B133
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 07:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FC92EF673
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763539131; cv=none; b=Ert6dqW03dTPz3cRuZLHDDQWkLp/jx8JJlwokj+mnOtim2xJGovxp4RJRgeCFcz/tgvCvOS8b3qKAdmMIdBR42aQg8K217KSkgUf9qFeNQZ2GKbttlz0ELYFcrpkPCE10BLnQ5Q5y1fgclZJjJXNZ/tay5/Ii/dhmx7shHdKPZk=
+	t=1763539307; cv=none; b=PLnldH+7RipDq3lwg9J0VcwQ8cF3MeC12gD+VMGbs9OcDYa9L3kLJcjW3pP2wtO83d3yM2Epp/24NeEzYjlAUuUNUqbJxjNb8DoGgjY3QfSCu/JuTvmRwZeI2av3weJSYwJDmNZTa+yvZKkljZ8ahyYrcakI3WlxOC5MEoK6vFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763539131; c=relaxed/simple;
-	bh=ztPb0Oi9ktxAOJLg1T9PzO/fl6i4U/jNw5A/87EltNw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D7exypBnhmGH64ySDyY3abPDV5LV55Lb8NUKWfimQmfpa/i7BsLxt4TZUpCxAwGmPP0GnAEzzOHtwcrQVzzr5j0gHk4/l1BMjsuH5Xbko02sS+ToJdxUb+RWUQrWH1U+KIDHNMuLei18pVoKXdZlsifPY4aTcwl349D4iKiLZw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T+AatFsl; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qI76pcys; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763539126;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h1kdukhMv0e5PS6jWRdXt6KYB0O1bYUGO99kB+sjRgQ=;
-	b=T+AatFslTlib88SmRl9MpbV+XLPIMbdfeh4ONUfKzXby9e+T40Sxtp9p5JYBufOnsgR0Jf
-	oJmnTl+DiGkQji+AF2V3mmqZs1ZHV9C2zBF6qHAUU7sUNfu/kYLZTN62Yhr9b3C4Psz452
-	lKVx2b4zFh86n/D7D9zSbgXPHJb7PUw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-138-oOXXArj_OeqyckhkJZTboQ-1; Wed, 19 Nov 2025 02:58:44 -0500
-X-MC-Unique: oOXXArj_OeqyckhkJZTboQ-1
-X-Mimecast-MFC-AGG-ID: oOXXArj_OeqyckhkJZTboQ_1763539123
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-429cbd8299cso2958458f8f.1
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 23:58:44 -0800 (PST)
+	s=arc-20240116; t=1763539307; c=relaxed/simple;
+	bh=0TBmqklw31qv0EXQ3EZ3FDM8CQDT/8C2HPHLN9YEjTs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QK2poO4b539LnsVtVDDuoxIRnqOYneJ0N4TaI98hVTBS9vUvYIh200iGHdeF0wlsBjd2wuONmTyzQvysyOwDUvnt3xRgzuxPN3P4XX8o+UsMCBXsYcpQjcAH57YfRxTXxRzrUumYKdSV2Bqpyi3zuvkv5uh/LYSM1+4jwQ162Cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s9X7kMoX; arc=none smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64107188baeso5866491d50.3
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 00:01:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763539123; x=1764143923; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=h1kdukhMv0e5PS6jWRdXt6KYB0O1bYUGO99kB+sjRgQ=;
-        b=qI76pcysZic5E21w8D+rsBZdukfMfleNARdiaqrV7bXJeASL/5AZxngwBgC/e66nji
-         JeApmZ+jz2XB9/9gvyx0oD7S40LyN3Z4dN2B2HgB99MB279FtfYZ5AC3iUq3RN3BIUeO
-         0aDHeU7Pep7NeSuFldlb/owhuy2kRFXt0C/iUXenZl5Yz3lFmlGPYg5QHPCDOQDzIkyR
-         CuKrnOzBBUlvbS6hY1okFTrBbEuttTXtisV82bCwJAS3yBRjYsAq6SrEP9pbVE2wqwHz
-         FWw+jskkHGKEyHLmdOC0i3CrWFfTAP+hwE8b8c/B6n3lEpbx3yDcnBa337amA7I/GW/B
-         t2ZQ==
+        d=google.com; s=20230601; t=1763539305; x=1764144105; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tJSI3tSrrDT6dXrt+GLht/ivtiT+nZxBQRKJRVnXP9Y=;
+        b=s9X7kMoXEJG03SbHYxpygI56QwcI5VSbQ8AQqs82A929fiq450IldR3qQGqjXIIp0B
+         ljn1GGDqpHoUdZNoXo33xtT6mvcKOag/rbnBHWlgAzfUIU9fNlGbimjmbn7ItUWS/WQR
+         lvN+tXJSov63CdJbWrBvV3Ee8lQOzBJAQFi6zp1O3TLVEYKgVGp50Z0vMKc8wfYj2bfB
+         HrYicaYKQ00pmWSKCpuvcbZoXE+21yGMQHDMIkcuMPksbEpTrbLuSH6oglI8mJxmaZYC
+         tqy2B/e5Qxd49k8Xhr3XlR/vvsov/VD4h/nvfJdsWhHOVOWKCxQDSY5rs4PDW0iJgfYd
+         412Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763539123; x=1764143923;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h1kdukhMv0e5PS6jWRdXt6KYB0O1bYUGO99kB+sjRgQ=;
-        b=Rs+sQ4eygO16rArcq8TyCwORDPXTVDFmGClSnE0WpxO7YLHFGc2daXrPYNj3HCZHrN
-         jHPyTMyztDwKHbT7wwgZNxgg6D+OUHxcqC6L4rYPUGL944qN03riJXBy59BjmQhcyzFk
-         O4+DYJ0m1DTMvubks9/uTazaawuqd118Uwa/BBn8FWx88Sb1itiqT2ro2yKPLAXAwJ2h
-         PwrJMxLn/bA27WxrdF6IKH/7Gif1egpQeskI5sRFAVjUsxwTugUhNOBHgV6lzjNR00B6
-         W/yZK8C8AL6dXcPq0x8GjxQvv6qHKoKrodBuYSudp00lBhqthbaxN1aD60N7cJJtvrYO
-         EvtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVeiul4xsNvCbmftU3pWkfRlL9JCnPsd8AZjrVZ0w2I9tGRlXS6sFyIvEMUCrQdNOtcVHzF7No=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy85q+KF1m5AzgnHtGt/NGFT5s4WoU/IqJKJ5zwqmoomukkqw4g
-	QJg6jV0CUa9wcVKV1nwSir4A3IP26YzqcknfbWOvob0aTZACz98xPWEIWOUzElJugmvhJsdDb06
-	sAHUjY8XUBo58YR4QrO4RrXUuSKdr/sfqKThenLVMMYdfIONgZFvB3hTFng==
-X-Gm-Gg: ASbGncurMLFE5andUCtDDngWA1aQy0sQmEuuwcF4jEIhRoFf1DPt3YBvwcYc87Pzh9v
-	/yqUcrwSgvjGQWn7tCw1NqjyTKmlQwUy/mZU/xD0Lu7Fr+l0ubk9Gm+12m7GmCjKZi7JqDIbIri
-	2vIkzqBTlp1M87FnThIzRooSMJWSTi7fe83zwGOyUFQ5ZyAIZBdSFJAnP8IWa4YfWONmusimxQI
-	ktGkgA4w7weJXJfHsauFuU3q42pmzqtVczM92PpLq/qUMXsbGnjV0H5wyryzc9rOozEmg1oUEUm
-	sHAhuXJpPIccG6HBx7S+EcfEQao8LkCDFJFGH4kKR/THDILQ1AKf/p/Jm9vjEDxjpeBPfp2sWmf
-	styDWW+uYCs57jZsg2joXxnOZs8Hl6g==
-X-Received: by 2002:a5d:5d01:0:b0:42b:4177:7131 with SMTP id ffacd0b85a97d-42b595add99mr19386655f8f.44.1763539123178;
-        Tue, 18 Nov 2025 23:58:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF/d9kIia5C1Rk173uB/q7uMGiJORCrpd/szircj7eTupOsjnjxbBmEFPJg4z/3AWkkns9YXA==
-X-Received: by 2002:a5d:5d01:0:b0:42b:4177:7131 with SMTP id ffacd0b85a97d-42b595add99mr19386634f8f.44.1763539122739;
-        Tue, 18 Nov 2025 23:58:42 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f174afsm35614093f8f.33.2025.11.18.23.58.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 23:58:42 -0800 (PST)
-Date: Wed, 19 Nov 2025 02:58:39 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Liming Wu <liming.wu@jaguarmicro.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Angus Chen <angus.chen@jaguarmicro.com>
-Subject: Re: [PATCH] virtio_net: enhance wake/stop tx queue statistics
- accounting
-Message-ID: <20251119025546-mutt-send-email-mst@kernel.org>
-References: <20251118090942.1369-1-liming.wu@jaguarmicro.com>
- <CACGkMEvwedzRrMd9hYm7PbDezBu1GM3q-YcUhsvfYJVv=bNSdw@mail.gmail.com>
- <PSAPR06MB39429783A41F42FDD82477A2E1D7A@PSAPR06MB3942.apcprd06.prod.outlook.com>
+        d=1e100.net; s=20230601; t=1763539305; x=1764144105;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=tJSI3tSrrDT6dXrt+GLht/ivtiT+nZxBQRKJRVnXP9Y=;
+        b=Y3nS0huKdYQAtJGhCZ5K5uvvA4r3upJZ6NrGZWAQ/Yep/fIFG9MMG1HNndvjC/53MN
+         VXyFP8eo42poMNgthB5BowwYaM1sS7YU9wJs+GgKMmYh7wYpHfPfbjTIGYXTj4uxf33V
+         LczNnLgPCUWcYk02SJBeLlYGBM5MSevs1k1CzU94HGc8Av961uUQPHqYpc9G33jrHWcS
+         9GZIHhADz8YROKdp9n7QNyqjBfg+H1aeUsFeIwzn0sj5sF9JsF30rW9v5UB/ojGRJkb1
+         94UK2XCIdRIwb/oanJtsq39K0yB9E+LeQdDujsqClbT3MGBbxGUsAIoM1E9+JHMB+oep
+         Kh9w==
+X-Forwarded-Encrypted: i=1; AJvYcCUYLyKn2jpmOkVATCOFvq4qPcuQ7sdGVQnYebFH/hBH3yLkvXyBg3NJtEnNa4SJMhHwbfp9QpU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjTO0D7gQR0E9c1hMX2R40+xXnOwQI2syYU6UAouekXk11No64
+	kvzrLvQOw9c2WEHQF8yecBmdmgglWlc8qGlPASbSoPUyrMD0i+gmZuGZKSKKhOqp6QSoB0YVL95
+	30VT7445GvHkSv5GiaZbA4jgawLWs2wFKEcm/dcHa
+X-Gm-Gg: ASbGncuc2VZ4KjehnDUOOX3ywjMXOMez2RNSvuY8Iq0Xu90MQOKD4YhI/4NZKTfWg5K
+	Dq6yn0jeixydMyXgwPCZzW+3OZ/68/FZfjnzsVjp2nTiuQBhU6bFDz0M9ex9cjEeXTphBcIFVE9
+	vnJf6TACKEuj0i7zGbxY2zlouUXz9QsMOJiJbVON5Tk2B7+73qvQ4M+y83F5Q3sDdZuG+syHUFR
+	Qc9FxcPES6o9Ao4FnDWhVSnoZFy65QtVW9LMvHT44mjowZUMJGfcGNYUUf7D7e9yRnU
+X-Google-Smtp-Source: AGHT+IFEIHqm8JhwXf+uwrqNBH0++IUaL+fUnAxcHl+f+UoA+rgPimpPmEfG/0j4dY6YqgSwTSCZh3raJtqz/3rCLj8=
+X-Received: by 2002:a53:c055:0:20b0:63f:a856:5f5a with SMTP id
+ 956f58d0204a3-641e74a366bmr13781155d50.1.1763539304787; Wed, 19 Nov 2025
+ 00:01:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <PSAPR06MB39429783A41F42FDD82477A2E1D7A@PSAPR06MB3942.apcprd06.prod.outlook.com>
+References: <20251117132802.2083206-1-edumazet@google.com> <20251117132802.2083206-3-edumazet@google.com>
+ <c1a44dde-376c-4140-8f51-aeac0a49c0da@redhat.com> <CANn89iLGXY0qhvNNZWVppq+u0kccD5QCVAEqZ_0GyZGGeWL=Yg@mail.gmail.com>
+In-Reply-To: <CANn89iLGXY0qhvNNZWVppq+u0kccD5QCVAEqZ_0GyZGGeWL=Yg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 19 Nov 2025 00:01:33 -0800
+X-Gm-Features: AWmQ_bnP9Rz2OMxO7JHyhjafzjXsjJ-iaAqsbfsLTZSt57wF95O4OSRa99sVCPA
+Message-ID: <CANn89iJfnWSn-1hghtJEaZ5u8_+9B7eCTZ07U9GnGh6UxS8rJw@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] tcp: add net.ipv4.tcp_rtt_threshold sysctl
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 19, 2025 at 07:54:07AM +0000, Liming Wu wrote:
-> > queue wake/stop events introduced by a previous patch.
-> > 
-> > It would be better to add commit id here.
-> OK, thx.
-> 
-> > 
-> eck. */
-> > >                         free_old_xmit(sq, txq, false);
-> > >                         if (sq->vq->num_free >= MAX_SKB_FRAGS + 2) {
-> > > -                               netif_start_subqueue(dev, qnum);
-> > > -
-> > u64_stats_update_begin(&sq->stats.syncp);
-> > > -                               u64_stats_inc(&sq->stats.wake);
-> > > -
-> > u64_stats_update_end(&sq->stats.syncp);
-> > > +                               virtnet_tx_wake_queue(vi, sq);
-> > 
-> > This is suspicious, netif_tx_wake_queue() will schedule qdisc, or is this intended?
-> Thanks for pointing this out.
-> You're right — using netif_tx_wake_queue() here would indeed trigger qdisc scheduling, which is not intended in this specific path.
-> My change tried to unify the wake/stop accounting paths, but replacing netif_start_subqueue() was not the right choice semantically.
-> 
-> I will restore netif_start_subqueue() at this site and keep only the statistic increment, so the behavior stays consistent with the original code while still improving the per-queue metrics.
-
-
-Please do not send fluff comments like this to the list.
-
-And with em-dashes too, for added flair.
-
-If you can not bother writing email yourself why should
-anyone bother reading it?
-
-
-
-
-> > 
-> > >                                 virtqueue_disable_cb(sq->vq);
-> > >                         }
-> > >                 }
-> > > @@ -3068,13 +3080,8 @@ static void virtnet_poll_cleantx(struct
-> > receive_queue *rq, int budget)
-> > >                         free_old_xmit(sq, txq, !!budget);
-> > >                 } while
-> > > (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+On Tue, Nov 18, 2025 at 1:22=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Nov 18, 2025 at 1:15=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
+rote:
+> >
+> > Hi,
+> >
+> > On 11/17/25 2:28 PM, Eric Dumazet wrote:
+> > > This is a follow up of commit aa251c84636c ("tcp: fix too slow
+> > > tcp_rcvbuf_grow() action") which brought again the issue that I tried
+> > > to fix in commit 65c5287892e9 ("tcp: fix sk_rcvbuf overshoot")
 > > >
-> > > -               if (sq->vq->num_free >= MAX_SKB_FRAGS + 2 &&
-> > > -                   netif_tx_queue_stopped(txq)) {
-> > > -                       u64_stats_update_begin(&sq->stats.syncp);
-> > > -                       u64_stats_inc(&sq->stats.wake);
-> > > -                       u64_stats_update_end(&sq->stats.syncp);
-> > > -                       netif_tx_wake_queue(txq);
-> > > -               }
-> > > +               if (sq->vq->num_free >= MAX_SKB_FRAGS + 2)
-> > > +                       virtnet_tx_wake_queue(vi, sq);
+> > > We also recently increased tcp_rmem[2] to 32 MB in commit 572be9bf9d0=
+d
+> > > ("tcp: increase tcp_rmem[2] to 32 MB")
 > > >
-> > >                 __netif_tx_unlock(txq);
-> > >         }
-> > > @@ -3264,13 +3271,8 @@ static int virtnet_poll_tx(struct napi_struct *napi,
-> > int budget)
-> > >         else
-> > >                 free_old_xmit(sq, txq, !!budget);
+> > > Idea of this patch is to not let tcp_rcvbuf_grow() grow sk->sk_rcvbuf
+> > > too fast for small RTT flows. If sk->sk_rcvbuf is too big, this can
+> > > force NIC driver to not recycle pages from the page pool, and also
+> > > can cause cache evictions for DDIO enabled cpus/NIC, as receivers
+> > > are usually slower than senders.
 > > >
-> > > -       if (sq->vq->num_free >= MAX_SKB_FRAGS + 2 &&
-> > > -           netif_tx_queue_stopped(txq)) {
-> > > -               u64_stats_update_begin(&sq->stats.syncp);
-> > > -               u64_stats_inc(&sq->stats.wake);
-> > > -               u64_stats_update_end(&sq->stats.syncp);
-> > > -               netif_tx_wake_queue(txq);
-> > > -       }
-> > > +       if (sq->vq->num_free >= MAX_SKB_FRAGS + 2)
-> > > +               virtnet_tx_wake_queue(vi, sq);
+> > > Add net.ipv4.tcp_rtt_threshold sysctl, set by default to 1000 usec (1=
+ ms)
+> > > If RTT if smaller than the sysctl value, use the RTT/tcp_rtt_threshol=
+d
+> > > ratio to control sk_rcvbuf inflation.
 > > >
-> > >         if (xsk_done >= budget) {
-> > >                 __netif_tx_unlock(txq); @@ -3521,6 +3523,9 @@ static
-> > > void virtnet_tx_pause(struct virtnet_info *vi, struct send_queue *sq)
-> > >
-> > >         /* Prevent the upper layer from trying to send packets. */
-> > >         netif_stop_subqueue(vi->dev, qindex);
-> > > +       u64_stats_update_begin(&sq->stats.syncp);
-> > > +       u64_stats_inc(&sq->stats.stop);
-> > > +       u64_stats_update_end(&sq->stats.syncp);
-> > >
-> > >         __netif_tx_unlock_bh(txq);
-> > >  }
-> > > @@ -3537,7 +3542,7 @@ static void virtnet_tx_resume(struct
-> > > virtnet_info *vi, struct send_queue *sq)
-> > >
-> > >         __netif_tx_lock_bh(txq);
-> > >         sq->reset = false;
-> > > -       netif_tx_wake_queue(txq);
-> > > +       virtnet_tx_wake_queue(vi, sq);
-> > >         __netif_tx_unlock_bh(txq);
-> > >
-> > >         if (running)
-> > > --
-> > > 2.34.1
-> > >
-> > 
-> > Thanks
-> 
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> >
+> > I gave this series a spin in my test-bed: 2 quite old hosts b2b
+> > connected via 100Gbps links. RTT is < 100us. Doing bulk/iperf3 tcp
+> > transfers, with irq and user-space processes pinned.
+> >
+> > The average tput for 30s connections does not change measurably: ~23Gbp=
+s
+> > per connection. WRT the receiver buffer, in 30 runs prior to this patch
+> > I see:
+> >
+> > min 1901769, max 4322922 avg 2900036
+> >
+> > On top of this series:
+> >
+> > min 1078047 max 3967327 avg 2465665.
+> >
+> > So I do see smaller buffers on average, but I'm not sure I'm hitting th=
+e
+> >  reference scenario (notably the lowest value here is considerably
+> > higher than the theoretical minimum rcvwin required to handle the given
+> > B/W).
+> >
+> > Should I go for longer (or shorter) connections?
+>
+> 23 Gbps seems small ?
+>
+> I would perhaps use 8 senders, and force all receivers on one cpu (cpu
+> 4 in the following run)
+>
+> for i in {1..8}
+> do
+>  netperf -H host -T,4 -l 100 &
+> done
+>
+> This would I think show what can happen when receivers can not keep up.
 
+I will add a Tested: section with some numbers in V2.
+
+And switch to tcp_rcvbuf_low_rtt name as Neal suggested.
 
