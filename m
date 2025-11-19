@@ -1,157 +1,224 @@
-Return-Path: <netdev+bounces-240062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E6CCC6FF4D
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:10:05 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32705C7046A
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:59:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 5FB122FCF5
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:07:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2AF944FBCC1
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D36329C60;
-	Wed, 19 Nov 2025 16:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44062369231;
+	Wed, 19 Nov 2025 16:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rOsF1021"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dt5B0i/l"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011015.outbound.protection.outlook.com [40.93.194.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D05D636E565;
-	Wed, 19 Nov 2025 16:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763568378; cv=none; b=sClw2024i908fmOKoB8Ef6v05FOrCMu8lX127qvONgL8YvHi6e4RhFvwPsmPfHgqwv+adko+QXyIaQDylMZZW2ip+zKPAGpgRuOIhBUvezuE7HYWPpuzjwBm2uxCz+GZfuo9lepTiGcjMQfZvipDs7XJ0QaXOlfZ5Lh8jl6mEyo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763568378; c=relaxed/simple;
-	bh=24Dcce1UVUAVpMKj+dP4kjzWvZwevmROYUFbHq7zowM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pGLX+DLwAh/g4FEC1OaG6IWrRZ9GKrD8sGupuwMNtcRsphl0YB9XkBjMRW+UvbvFagd8W0J6FUS9a1bbLtBP/bvER516E5W71nGXx81xJP8coBwPuqoNKgZCUtoRGhLMJWMPOlwVFES9d8J+k1dvyQC26d5vegfA/iYo9Wv9czo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rOsF1021; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Px0Xg38eGUHqwzUBVJdLah8PpQsrq4TfC5LY5cFQMlM=; b=rOsF1021SaoG7Nw1Hgy8oXc1bK
-	ZvXQO2cj7ivTOvaZkvjBlpZeDympoUzyVOa1Lg++4CTA5KXY4+BuwpdoME3FqaUR8B+o0z6Ml5RkZ
-	GozOU+jdgOPttzz7PQjbUBVoaVF8HPoGixr/NvPvTv+alVfX8jurIXLdrxYXwV4K3Iw//tpn1Ozz8
-	DjT5C+wZ4wpuZyCLfBHIQd/ljwbsPk3i1k5HZ7NPrep/G5UJb5kYHIM2FMdh7vffHP+WXRZS1EoOm
-	lDuBXp352I5BKD+AEtfXgYm0nhK4LRkci53YrnMtmA6X2Wf+NvdFo735uJ7Xww0V4LZVnSZvwYsCb
-	poVz+FXA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51792)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vLkh4-0000000057K-1HbR;
-	Wed, 19 Nov 2025 16:06:06 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vLkh1-000000003Xc-1Uc7;
-	Wed, 19 Nov 2025 16:06:03 +0000
-Date: Wed, 19 Nov 2025 16:06:03 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"eric@nelint.com" <eric@nelint.com>,
-	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 net] net: phylink: add missing supported link modes
- for the fixed-link
-Message-ID: <aR3q6_CS2A1VH236@shell.armlinux.org.uk>
-References: <20251117102943.1862680-1-wei.fang@nxp.com>
- <aRwtEVvzuchzBHAu@shell.armlinux.org.uk>
- <PAXPR04MB8510A92D5185F67DDC8CC32F88D6A@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <e7222c87-3e4c-4170-993b-dbf5ba26c462@lunn.ch>
- <aRx8Zh-7MWeY0iJd@shell.armlinux.org.uk>
- <PAXPR04MB8510BA569EB34E26E1A499BB88D7A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8F2366566;
+	Wed, 19 Nov 2025 16:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763569753; cv=fail; b=jA0ZxW1LorcQjAqFhgSTVGxh9CRUgL/X3w7CkmQURdW4vRvD9JywFSJTgihlW9MSW3XbxqbiYTJOKbt8G/uLcDt7oYME3gHDZQDK+Ux481j7vZCWnkdxktUZrsGJOrwrZUDOJQSLWWhWP55FUj9b0LsmG1SLZvIYdla5/ihfAag=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763569753; c=relaxed/simple;
+	bh=c4XkOst5u8djnWgv0wZCH3HLDy24/6XtebgE++5OZLM=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=UgX5/q6f4Q6bHbZ5xcSfCHWygHDOaZjHljPSyg2f5dFNN/og4QsInQi5CjRqF+ZKAlYjrkUmYaa2SVetvDHCxZCVohoa6efUhu3XvscaLkR+Kqkocxcsf9w2DF+cA0k2TcEh7cSD7OOlG+tUV1PxG3C58GYorVktJNBGYOHw+gI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dt5B0i/l; arc=fail smtp.client-ip=40.93.194.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=R1OIonc9uYTJXUrHvJxArx1sp6MFOkXQKnlEI1hRN36gCASqxmm9m+KCs9PvpUgaTWp5DLnOsh0riOlYqnlm0JtN8HCG2uKtbp9Y0TE1xJtp9QNj+lRNu35N8L8OqqCFORHMuvgD5+mdo6r6M+4SK6furKVRMrLDBWogFri8s2HwGuD4w2tQlfQ95Dp4e/TKiRWBuC7S7nAfh1TQLCbLwQtZj5vFzjCgUH6o9YG4qTOaoC+i/Zs6sGqC07uCqoc8nLKRAzgZ3XgCL5HCZRIVB3F7q4+DErNMH7jdrIUSHKrD+zx0TK9NCaHaRxXuiScVoUtP0NX0AwrkWidJa1budw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IELE2Nw0W7Kpv7xID9qug/QA+i17s8/Len5qXQI/3ao=;
+ b=BY9YEJsDJS7J9FaRgRzbYk7DFiaUmwjcWiBcS13KwlFeI+S4ZoN6tLH2mGBeNQ3OCg2Zv1yEPYhvjcMJtmT8BVS7WjQ7Ab5bKojya3m6Paskat+7swiSc+x3k37TtiDpNA78D5lNkW86mzReRkCS+zqj5zgKStNQLqhMrtvNbueVA7Z6vhbBiu4b0C/P0KI3D6lj2HfG6eYo0PuyVLOdCJeUNzhJKNKsQT06qaMZNOExmjWVVaV2vHocvdllLlZh698GEyPi1HGgm0wSVrc/5x7nJOIh242J9jN8i+IaNM4oBnVFSeVvpoFI5AXrB/m3XzKyzgpPThJuelE64jAAOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IELE2Nw0W7Kpv7xID9qug/QA+i17s8/Len5qXQI/3ao=;
+ b=dt5B0i/l6ynnqUqr8lLCn4sMaXT3i7zkTsiHF5AwJazvEK6dz/5Ci8lx1Pnts5ztY6jOGLG9fZxgFbltb58CqIFxmoKvpsSi7sqtU8hnVDjkHe+ZHCXdj/omdskKAYqw4spft23N/Mg/2o3iFMHt4YGQuzwG7XwDcOfN+mvRsqdF+XnoJTqgAZFODAYdQIaSzwtnAvIuUZ/zjP6PrssZuhxid9HLvf39fl5qwz0kv8phfXZUZg9Mx+hJ7hAIGAISXLLuc6cL0sOjE7HnDqZmSL7KCQkmocdBFP2hgCwaxdLQwuFjztMtjsHMScNmc3JyN4qiJhvnKwRbV2ddlf5ynQ==
+Received: from MW4PR02CA0003.namprd02.prod.outlook.com (2603:10b6:303:16d::30)
+ by DS7PR12MB5910.namprd12.prod.outlook.com (2603:10b6:8:7b::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.10; Wed, 19 Nov 2025 16:29:01 +0000
+Received: from CO1PEPF000044F4.namprd05.prod.outlook.com
+ (2603:10b6:303:16d:cafe::52) by MW4PR02CA0003.outlook.office365.com
+ (2603:10b6:303:16d::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Wed,
+ 19 Nov 2025 16:29:00 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000044F4.mail.protection.outlook.com (10.167.241.74) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.9 via Frontend Transport; Wed, 19 Nov 2025 16:29:00 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 08:28:39 -0800
+Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 08:28:34 -0800
+References: <20251118215126.2225826-1-kuba@kernel.org>
+ <20251118215126.2225826-2-kuba@kernel.org> <87ms4icely.fsf@nvidia.com>
+ <20251119063228.3adfd743@kernel.org>
+User-agent: mu4e 1.8.14; emacs 30.2
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Petr Machata <petrm@nvidia.com>, <davem@davemloft.net>,
+	<netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<willemdebruijn.kernel@gmail.com>, <shuah@kernel.org>, <sdf@fomichev.me>,
+	<krakauer@google.com>, <linux-kselftest@vger.kernel.org>,
+	<matttbe@kernel.org>
+Subject: Re: [PATCH net-next v2 01/12] selftests: net: py: coding style
+ improvements
+Date: Wed, 19 Nov 2025 17:06:28 +0100
+In-Reply-To: <20251119063228.3adfd743@kernel.org>
+Message-ID: <87o6oyaswg.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PAXPR04MB8510BA569EB34E26E1A499BB88D7A@PAXPR04MB8510.eurprd04.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F4:EE_|DS7PR12MB5910:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5295226d-038c-4f65-38d5-08de2788bf2f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|36860700013|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?dy9VVFBnRlhFVWxVOG9BZmk0dkRKL1docmJmWC9QdlV3MENsb0E3YVM5SFIz?=
+ =?utf-8?B?MktyRGtKT0xPNmxXeW51SUExMDlQazFhdmFxU1h5NktVNjhqTjUvMExNK2xm?=
+ =?utf-8?B?enp2VjgwODd6T3U1bTdSenFJZmFjSjdmODRPTHJYWno0YkpKcmp3a2ROd3hq?=
+ =?utf-8?B?d3cyYXJOSTFpamx0VGRvNm5HOWFMZVZVcVg5Q2FHSzRjUFR2V0FPZDROekp4?=
+ =?utf-8?B?ZStJekpIOC94b0duVkNzR1poZlhiYWZQbUpzblF5bkRiWmhjWWVXQkViaDZS?=
+ =?utf-8?B?d29nRWc5SUk2NjNOeG1POTBzbkhESkFTcWkzejU0NmRXeUZsVktqdjdpWld5?=
+ =?utf-8?B?VkF3Q0JrQngrd0ZteEYxUFpyWWVST25pbU95SlJQRVkwNTM4SGVpVUo0UklL?=
+ =?utf-8?B?WHNZR3lBdWtoakdVWE5yOVBZS2pQaTRXVHZFRVRJT3R0VURqSmNzOEk0d3Fr?=
+ =?utf-8?B?NnRhUEU5ajQvMHNCSEg2a3I4Q05mN2M5Y1F4YU1KR1UyTWtLcjhMM1h6ZmxO?=
+ =?utf-8?B?anJyeWx4d1lFcm12TFo0c3FQS0JzVXc4ZXd1c1dRVStpTzh4bjgvVVNWNmtm?=
+ =?utf-8?B?TzFTb3MyZ3hZS3lwVmpDczR3SS95NXl1THBtRDI0YnA4V3lwdEJxWmdhYjhQ?=
+ =?utf-8?B?cXZMTzJzRHNkNlNuUzZ4TU1OenJ1bVgxUG1kOGhwZGRHT0gyN0ZLQ2xUS2NG?=
+ =?utf-8?B?a1NYSVdWc2ZHWnVoeWpPckRGQUVpME01TzlXa24rV0FWWDg5ZFc1TkxQcUVs?=
+ =?utf-8?B?NG1mNXVNdG54SzBJYkk5QnpHLzJGYkQ3NCsranpaVWsxcTJ6MEpjTDVQVDlC?=
+ =?utf-8?B?a2lZaE5odEpyekRuUDdrb3dKczRENytWd2w2OHZ4Y2xrTjBPeFZKNGdEelhE?=
+ =?utf-8?B?akc4N2JGSFpXWXh4RlR3SDNMRy9tTnJIejlydHNlMEl5WiswUS9XVGc5WllZ?=
+ =?utf-8?B?bUEzV0syZTdnM25ITmpBdXdQRWg3L3hoekw2N25XUXExR1FvNzI4RFNSMmMr?=
+ =?utf-8?B?Q2xjUDVlQktYVnpaL0lkbW1ORFI4SU9NNWIwNzRCc2cyaTBBMEJaMTVmTXo3?=
+ =?utf-8?B?dVZGMkcvMWFaV0oyYldKU0EwUXl3MklqZmFSQ2l3QlVKMHJRRnVDdnZicVpK?=
+ =?utf-8?B?ZnJLYWM4bWxqcjZBbk05bDlzbEczaVNGR2FBTyt5V3ZSdzFwNjVUODlKTjBU?=
+ =?utf-8?B?R1dBYkpHRXFHaEtwTFZVVGhIaHJENzJjREZ4L3pqeUlVa2tKRW5GNkRpTSsw?=
+ =?utf-8?B?S28wcTBpRStJWFZQK0QzSkhQTTdkc3dvLzd6bGZ4dnNkMzI2Qnp6SCtlR0w1?=
+ =?utf-8?B?aEFSVXhiMEhFcDJqbWpFYXduRldmdHBZeExBNkxkamFmYmI5V1hOY3ZzQnB4?=
+ =?utf-8?B?Mm9tZEdtVzFnN3NUaDJUOGVGRWJNQVlIWnFXdmV1YmtHdy8wdUp4T3RNTkhk?=
+ =?utf-8?B?OHA0TysrZWFSaTQxQjBGQkx3V3pqVElrWHR3dW9IejlNYWg5ODh1d1hYVmhq?=
+ =?utf-8?B?Y2pBMzIyb01SSVVSRnM5UWdidUJITzVFV0pkc3ltODk2SnE4dUhUMUZqTHNE?=
+ =?utf-8?B?RjBIMWRyRXUyUlFHT2xVRkZkc0lpODBvcVRWMDh1djVuZ1hNcWFrcis4OG1V?=
+ =?utf-8?B?ZUpZbFIzcENCa2Q3UXh3M3o3UWdoZlYyRjJ5Y1hiYlREZE9rSVN1ejkwVGRP?=
+ =?utf-8?B?S0lsZzE3bm5vQlJ5MXNaMXhPb2NCZC9YSHJXTXhkOFBFUStGUFJTcUMwbmQ0?=
+ =?utf-8?B?ZFNTV1JGZFM1eEw5V2JRalY5c0ZWUE9jTHRzOE9OaDl4ZUkwOTJtZEJKYXJj?=
+ =?utf-8?B?aUdnNXVGaXNHUXgyYUYxMm84U2VsZGxpbVNSQnlpN284N3FON0NoMFNnMGxD?=
+ =?utf-8?B?alNhYldlNDIrRWkxSEFaQ28zQ0d2bDBPWkJGWDF6TnN5QWg5YnYvcE5RTGxa?=
+ =?utf-8?B?MWorVjl5RllyeUhrWS9lYi8rL0lrajBZaGtsejd3STZNK0I0Nlg5TjNuam4r?=
+ =?utf-8?B?cEhSa3ZyUnJjZitZQ2NCY2duRDlzdkVPT3ZtUG1mM3VBVEozaHNRUUtCVUJI?=
+ =?utf-8?B?ZU5GZFNSWlc4eW1YTm02R2ZEalZuVWU5d041V3hFbUFOZ3ZnSXpUQ0ZXRzZv?=
+ =?utf-8?Q?tlcM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 16:29:00.8769
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5295226d-038c-4f65-38d5-08de2788bf2f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044F4.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5910
 
-On Wed, Nov 19, 2025 at 01:22:17AM +0000, Wei Fang wrote:
-> > On Tue, Nov 18, 2025 at 03:00:00PM +0100, Andrew Lunn wrote:
-> > > > > > Fixes: de7d3f87be3c ("net: phylink: Use phy_caps_lookup for fixed-link
-> > > > > > configuration")
-> > > > > > Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> > > > > > Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > > > >
-> > > > > NAK. I give up.
-> > > > >
-> > > >
-> > > > Sorry, could you please tell me what the reason is?
-> > >
-> > > I think Russell is referring to the commit message, and how you only
-> > > quoted a little section of his explanation. There is no limit to
-> > > commit messages, they don't need to be short. It is actually better if
-> > > they are long. So you could use his whole explanation. And then you
-> > > don't need the link.
-> > 
-> > Worse than that. I gave my reviewed-by, which seems to have been a waste
-> > of time.
-> > 
-> 
-> I'm sorry, I was in a rush to send out the v3 patch, and I hadn't received
-> your Reviewed-by tag at that time, so the tag was not added. When I saw
-> that you gave the Review-by in v2, I realized that I could no longer add it
-> to v3, so I replied that I had sent v3, hoping that you could resend your
-> Reviewed-by tag.
-> 
-> If you don't mind, I will refine the commit message as Andrew suggested
-> and add your Revived-by tag from v2 to v4. I apologize again.
 
-I also question the need to refine the commit message this much. One
-of the points of lore.kernel.org is that it provides a stable source
-for mailing list archives. We use URLs to that site extensively in
-the kernel development process - e.g. it's recommended to use it in
-Closes: tags, and to reference discussion from commit messages. If
-I look at the number of times lore.kernel.org has been mentioned in
-commit messages since 6.17, it comes out at around 5700 to date.
-Looking back to 6.16, it's about 13000.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-So, lore.kernel.org is already an insanely valuable resource to the
-kernel community, and the loss of it would result in a lot of
-context being lost.
+> On Wed, 19 Nov 2025 14:40:41 +0100 Petr Machata wrote:
+>> > @@ -163,7 +162,7 @@ KSFT_DISRUPTIVE =3D True
+>> >          entry =3D global_defer_queue.pop()
+>> >          try:
+>> >              entry.exec_only()
+>> > -        except:
+>> > +        except Exception:=20=20
+>>=20
+>> This used to catch KsftTerminate, which we use for SIGTERM handling, now
+>> it doesn't anymore. I think it could legitimately appear in that context
+>> if SIGTERM si delivered while exec_only() is running.
+>>=20
+>> IMHO it should catch BaseException, like ksft_run() already does.
+>
+> TBH I haven't thought of this. Are you thinking that we shouldn't
+> interrupt the execution of deferred cleanups when SIGTERM arrives?
+> Fair point, but I think we'd need more code to handle that properly =F0=
+=9F=A4=94=EF=B8=8F
+> Right now we ignore SIGTERM which isn't great. After this patch we'll
+> no longer ignore it and have the whole test exit. Neither actually
+> catches the exception and sets stop=3DTrue in ksft_run()..
 
-We have had problems with other sites - lkml.org used to be the
-popular site, but that became unreliable and stuff broke. However,
-the difference is that lore.kernel.org is maintained by the same
-people who look after the rest of the kernel.org infrastructure.
+Well, previously at least the rest of the defer queue would be run, now
+it's skipped. Which -- OK, likely if you SIGTERM in the middle of a
+cleanup, chances are the cleanup is stuck and the sigterm then skips it,
+which is what you want.
 
-Moreover, using lore.kernel.org is encouraged when one wishes to
-link to discussion. See "Linking to list discussions from commits"
-at the bottom of https://www.kernel.org/lore.html
+It's a pick your poison. Ignore C-c or ignore deferred cleanups :)
 
-So, I think there was no need to go through v3, inflating the commit
-message, and end up in this situation.
+Given this is supposed to be a cleanup patch, it would make sense to
+just s/bare except/except BaseException/ and leave the behavior broken.
+The commit message indicates it's a NOP make-linter-happy patch, but
+then it's not really.
 
-Every time a patch gets reposted, the netdev cycle (as far as the
-netdev maintainers are concerned) restarts, and it means a multi-day
-delay before the change gets committed. As things stand, this is
-likely to miss tomorrow's linux-net tree submission, which is
-highly likely to be the last one before 6.18 is released. So we're
-not going to get this fixed before the final 6.18 now. And for
-what value? None as far as I can see. The patch was ready at v2.
+> WDYT about leaving this patch as is and doing this on top:
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+It's a good stop-gap.
+
+> diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/s=
+elftests/net/lib/py/ksft.py
+> index 83b1574f7719..5a667ad22ef4 100644
+> --- a/tools/testing/selftests/net/lib/py/ksft.py
+> +++ b/tools/testing/selftests/net/lib/py/ksft.py
+> @@ -268,7 +268,12 @@ KSFT_DISRUPTIVE =3D True
+>              KSFT_RESULT =3D False
+>              cnt_key =3D 'fail'
+>=20=20
+> -        ksft_flush_defer()
+> +        try:
+> +            ksft_flush_defer()
+> +        except BaseException as e:
+> +            stop |=3D isinstance(e, KeyboardInterrupt)
+> +            # Flush was interrupted, try to finish the job best we can
+> +            ksft_flush_defer()
+>=20=20
+>          if not cnt_key:
+>              cnt_key =3D 'pass' if KSFT_RESULT else 'fail'
+
 
