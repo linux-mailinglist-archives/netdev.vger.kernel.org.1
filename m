@@ -1,201 +1,100 @@
-Return-Path: <netdev+bounces-240090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67665C704A1
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 18:02:35 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3B66C70274
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:42:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sto.lore.kernel.org (Postfix) with ESMTPS id D43272A0F5
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:02:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 2A1E52E5B8
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0E4301463;
-	Wed, 19 Nov 2025 17:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F552359F9D;
+	Wed, 19 Nov 2025 16:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="E02hMbT5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gKpEtYw8"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011040.outbound.protection.outlook.com [40.93.194.40])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2912D2E8B66;
-	Wed, 19 Nov 2025 17:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763571655; cv=fail; b=es9RzG/M1H1Df7j2cApZxkJe2M/oftL2T3PCDX4mLTmefxlq9Y4ZmQFtcVWVwTuAz46xcR8xuSw/xxPogpbTut92KlFQhsE4Yr/IpmJsPBTIPuJpvp4pL1p12Zim1sQJwXmiMeZTYqBHMsdf/E5zbRjcioXTBX7XBpfLeixh77A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763571655; c=relaxed/simple;
-	bh=JIlfRoxp+4omHCblGeNkOtq8XzM1Wg05EIcWXrokc1M=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=Nrgx6FnJ+Cbp0q+0JW76aJc8+2R0thaA5G4fZafHYztUXcqpeEbqCbrEnSqQFIkFLtVUdWf+xKAbw8NOlnn0/vEiiFfVy6oY+vBZ/oU1vo7OOj2moMLJgKKxurcYPUUugnXOLw1whu5g792UF1WhfxxRfrZ52jKQ6Yuffsgy+CA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=E02hMbT5; arc=fail smtp.client-ip=40.93.194.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=V+PWjpaTt/bpYNkfuvhVQhJWMHRm9nTYFUooYuJ3rv4MoMVWvrihdQm5OfWL4gtUQukeCNu+pJz241BB94KL0R166PBNr08vX9uvMImXApYBcW5Ay4BiUlcGp8E75L8qUc+0aPGtLP7+3mnK/1iwwRpooBi6WuNs15xkcrEW3X+ojKHPU8YIgE6Oz9wGyTNsUxavd9Onf1u55+1KCD3jGgIVdpUPiko8MvoeM6ob7BI+h2/Yr/vgvCGHaf8z8GH3XgUHEz9NWKYep9/P8uiR+bM9+SgzQgeH4O7yIHOOXapo2yXzFUQybXNCkxJsA3Jsds7XypySs+u0CywZi6EOAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3igZpjbMBS1YbunztfnHZGPh7i1TN/8cprvfMNWnMBI=;
- b=p+BGEInvqWo5UaF/Y5Cki9Tu1vtWwk9JaTalaEKjjjnVDRWXaX3OpSvy89Bv+ExTYeRnWkoIDAJzOPyEjmHDDZotJ771aeWbSbREgapRZqL3PKKhLVyg7yeJ3q+0uaGT4XvGiiGyq+S/66oC3UYNfhX2ZCD2L77SQK9yQGCnsqa3zy4eMRoAi9heRhFLxeFWdpUbLdPId6LDl5AWebcELUZ+SY/YCPGR4yzJBf8HrzOungLYVb+mtyIn4M/kBwsfQ/W3L/5jVh0FrHleEVsZGvGxDuYrJPu02B6TWoufnAmnucrOCrgzviXfYTfsNj2o7ftawiNOiTLYG7n8RmoXTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3igZpjbMBS1YbunztfnHZGPh7i1TN/8cprvfMNWnMBI=;
- b=E02hMbT50FmlUxn4oMLdtnmhc6ybixOQVEPGwAl7zbD3Jk68qhTfMHPo4WHL1QcPm3ZVUykE5+ok56OEK3FK2Nem2KJlNZ7ewz3uD5ykKnodeoyYKXfPvSFcEeqmFGd1E6IPxstdOro/HTHa0Yq4px0JcBYQgqkMr3r1XtlHp+xYhOTRy7YTASjK9e0Hv48L+Adoy2LFC9gwwsmMAXe6lMSktgmoewvPoiNov4sZo3cZ2XIwFJZ4LqO1yX6BZxc6C0e2IaZ5Dg8bjMCE3ZXXTzJ5Lu0RQyLRVEEAzlV7LFbNrTyRSZ976bKDPsaPgBMxUAKh9wVW8pDQ4Lc/MjJUQw==
-Received: from BYAPR08CA0022.namprd08.prod.outlook.com (2603:10b6:a03:100::35)
- by CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Wed, 19 Nov
- 2025 17:00:41 +0000
-Received: from SJ5PEPF0000020A.namprd05.prod.outlook.com
- (2603:10b6:a03:100:cafe::68) by BYAPR08CA0022.outlook.office365.com
- (2603:10b6:a03:100::35) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Wed,
- 19 Nov 2025 17:00:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ5PEPF0000020A.mail.protection.outlook.com (10.167.244.43) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9343.9 via Frontend Transport; Wed, 19 Nov 2025 17:00:41 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
- 2025 09:00:15 -0800
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
- 2025 09:00:09 -0800
-References: <20251118215126.2225826-1-kuba@kernel.org>
- <20251118215126.2225826-11-kuba@kernel.org>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<willemdebruijn.kernel@gmail.com>, <shuah@kernel.org>, <sdf@fomichev.me>,
-	<krakauer@google.com>, <linux-kselftest@vger.kernel.org>, <petrm@nvidia.com>,
-	<matttbe@kernel.org>
-Subject: Re: [PATCH net-next v2 10/12] selftests: drv-net: hw: convert the
- Toeplitz test to Python
-Date: Wed, 19 Nov 2025 17:39:46 +0100
-In-Reply-To: <20251118215126.2225826-11-kuba@kernel.org>
-Message-ID: <87fraaarfv.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D00350288;
+	Wed, 19 Nov 2025 16:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763570446; cv=none; b=G7i2y5iRsfLeB60iV5QaudXThflcz3H1SlyhN8czaxFAhLu9s1enKR/f17BQf1/NlmY/d6/biLP+/COVDD9dll4eJhXzwQl8JhSx1SYu3KC5EBGf4F/YGu3VO0cnMU4Fzgeg28jSSpBEHO70qf41a6gK4c0M/HJiFRDuitE5g4g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763570446; c=relaxed/simple;
+	bh=fdxXRZqA2QPN/W/iwYUC/9zToFGBrYm7yidpHfVZkhQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=aVLFwTXduCcrf3VnPvS2G6iQ7DL/4RBMKQysYzZbfBnnflXsOTzGIwT/DPkBrGASqBehYy/SVku1yh0yfXixbQZTZ4g47fpC2dqj70FlW5T5uy/mNJ0X2oC6mDPQrBpRRSmXw+iKmQRHJ/iUDpjIURO4XzWRje8ymTvKcUM6kJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gKpEtYw8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EC62C4CEF5;
+	Wed, 19 Nov 2025 16:40:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763570445;
+	bh=fdxXRZqA2QPN/W/iwYUC/9zToFGBrYm7yidpHfVZkhQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gKpEtYw8KOkIvyuu0VFrr8xOb4ZPSc2WhNnq1CuLIiBfYmHq5Y1gbjFZwO+5n3r3X
+	 g57XiBKwLzYdNVA+U8+1eiEfnl6ETyJz/JZ6SqLIl6MvlcHWu8gBd68YEZA8FV/fiL
+	 CHgDHWyB9V1NCSCee90Lxb2zXD8Ttoj21KFZRpRFhs/cB9D81nbfxw/ZTKGsUoCh3P
+	 xELKAE38HteAneQhsTqaCusJomZTgYK1JyoKLMCEVg/2STnjdoHd2zaP8vIeExMr79
+	 D8gvAPZNtoi+RDrghNa590rhFIF2CdVfOTyRuXCGyd3NXUupfS8cpLw2a+h3oQmRSI
+	 ZHYcBt9Y0NRdQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710B839D0C22;
+	Wed, 19 Nov 2025 16:40:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF0000020A:EE_|CH3PR12MB7763:EE_
-X-MS-Office365-Filtering-Correlation-Id: dbc9638e-7a4c-4319-6cf5-08de278d2c0c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|7416014|376014|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?UtuS+nb6SVPT8at8vCoDIgZcfUp/T6jSjEImAuFyGaRwmWl1zHkgMWFoeOgq?=
- =?us-ascii?Q?IfCee5Mit4QKXnqXG5ejBOsvERMJWAx2qKmtwd7WJkZOikKBU2sH2ghWXJ5V?=
- =?us-ascii?Q?9l72xorkE+Uua6G/vAY3PPO0XwgqDQyPSaSkn4bUXcO+vsvol8MrXONWEnZw?=
- =?us-ascii?Q?CBR2G2sAs/p1byz/NRreDG69cVd8tawe2wOWjtCWyNg1EzYcUO3PXbIkc9DT?=
- =?us-ascii?Q?0g0xw82o93V4szy6FvfAvm/+0vjP1LnYIxHK/lWA2ODc5Yncx5Js4YEylO+o?=
- =?us-ascii?Q?dIZvVJwTEezJ+9FKiecrDskzcXan0aE/F5zlQpqCTB623TLhQXaddD82IdL9?=
- =?us-ascii?Q?7zLPxs72wYTXsH9N2uOdLeAakJ7kflkenJIHW5Bk1ndV66APb0y7p4eqR13k?=
- =?us-ascii?Q?FRg+eBqF5c0KDImhp+oeMBMLq7OeqFk4ySjmZve1PTpJOWpYPdn63Scl4kLh?=
- =?us-ascii?Q?InEcsBddqf3TJfU32ahAyCULxHhEMwr8foF5O4BYPJ/yJMsKXd6GEnc3pn7D?=
- =?us-ascii?Q?xtXZGYILzEN2DcCe8gqN1RyZakSJ5umpMrAgQcv9Tgva1A61jcX4UjGbBU3U?=
- =?us-ascii?Q?zfBw8YegEyCKI+FJB2KkgpsKUCBAfAp3KsW2BZyDPvHZ0N7EQEglkhtt8b76?=
- =?us-ascii?Q?22xR2tNhAJ1Ny/0e4wv7Hz7GLG4AF91wJa/dgsM1KaZp7vamiy88M/zacaMo?=
- =?us-ascii?Q?9dZy1Ra9KPK1OJryHPnJdb8lZ/hO/DGDNqe0sTmt0wBEfbxGl8BNaXVzRTpi?=
- =?us-ascii?Q?xv7znORkGnLVylE0c1og4j7j3IqvHCkJuaYAmoCQIrDyaZ8W397LWnLAu5TT?=
- =?us-ascii?Q?SLMGINxrbeXfrcaw0PfYeH3r2XJHqHyhbfEmudaJIQBsvfSQVb6COwCypD2s?=
- =?us-ascii?Q?35FTKagq6nfJys/Qsy02LxZDMTuU51U4uLXFoJtuOV6Vqbjbm7F+pJd5PZ8n?=
- =?us-ascii?Q?E2gTRTyaJaIC66VI8L1Anww4wryY1jbbfC9A1u80AMNcZqf/rJ3mJIT56kyz?=
- =?us-ascii?Q?lv1mFPGTWe2vVtuApRF2TmQT58mPj+XTJeckxFZsBWtyaBC0Kz97RIOt8lQk?=
- =?us-ascii?Q?DyIDaptT2nsdP/0zJBpQRwpP8z7vTGc8TOvvuER47/um/xOmq9UgPbnLLY/I?=
- =?us-ascii?Q?rFfgO4Pz3sVbvb/jvXDvbnvjP5xgwn4ageCENZsQTzTNPjUFQucSXV44h/0m?=
- =?us-ascii?Q?NiIRtyNHqP/QPooCDkbwVXaigEbpXof4a6+WAEzNIYuqW+R1u2rNBhF3zNXc?=
- =?us-ascii?Q?qfdN+jjO7qBBzaZi8vDXUAPCoNvT0MTSMADBUWhjldeCiMm5uHdo+FM9JqPV?=
- =?us-ascii?Q?jnJ24iowfcozbFBbzboa+/5rCqFl+19jzhGCt2OLVMKy0miS5HtzimCswfoj?=
- =?us-ascii?Q?XPTXT89SsAsmeBcXEA0NgOjHhfWKv+hJqY7K955HRRCzU2QAGyns3v5dg6Ym?=
- =?us-ascii?Q?xBjaXHZ+SxqNaqH6erF4gSRe/QLhvCC8OQfmvTQYQZ1rE11oQECN1UOgNQbW?=
- =?us-ascii?Q?bCN1OekwFRzTf9MDUaBvkMA7VzapaSbiVnRa0mRbG3UtcOupSixGT6zMUGci?=
- =?us-ascii?Q?bdPz66M/i+AlVDq3ZCk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 17:00:41.4828
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: dbc9638e-7a4c-4319-6cf5-08de278d2c0c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF0000020A.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7763
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: stmmac: convert priv->sph* to boolean and
+ rename
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176357041126.873046.11074623716236864582.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Nov 2025 16:40:11 +0000
+References: <E1vLIDN-0000000Evur-2NLU@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1vLIDN-0000000Evur-2NLU@rmk-PC.armlinux.org.uk>
+To: Russell King <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ ast@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, hawk@kernel.org, john.fastabend@gmail.com,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me
+
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 18 Nov 2025 09:41:33 +0000 you wrote:
+> priv->sph* only have 'true' and 'false' used with them, yet they are an
+> int. Change their type to a bool, and rename to make their usage more
+> clear.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  4 +--
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 26 +++++++++----------
+>  .../stmicro/stmmac/stmmac_selftests.c         |  2 +-
+>  .../net/ethernet/stmicro/stmmac/stmmac_xdp.c  |  2 +-
+>  4 files changed, 17 insertions(+), 17 deletions(-)
+
+Here is the summary with links:
+  - [net-next] net: stmmac: convert priv->sph* to boolean and rename
+    https://git.kernel.org/netdev/net-next/c/7ac60a14d3fc
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Jakub Kicinski <kuba@kernel.org> writes:
-
-> Rewrite the existing toeplitz.sh test in Python. The conversion
-> is a lot less exact than the GRO one. We use Netlink APIs to
-> get the device RSS and IRQ information. We expect that the device
-> has neither RPS nor RFS configured, and set RPS up as part of
-> the test.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-Reviewed-by: Petr Machata <petrm@nvidia.com>
-
-> +    # Set RPS bitmap for all rx queues
-> +    for rps_file in glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*/rps_cpus"):
-> +        cmd(f"echo {mask} > {rps_file}", shell=True)
-
-A bit odd to use echo like this, the other test does this through open /
-write. Unless I'm missing something and this actually runs remotely...?
-
-Anyway, not important. Just that maybe eventually some helpers that
-support this sysfs-based configuration might be handy.
-
-> +    return mask
-> +
-> +
-> +def _send_traffic(cfg, proto_flag, ipver, port):
-> +    """Send 20 packets of requested type."""
-> +
-> +    # Determine protocol and IP version for socat
-> +    if proto_flag == "-u":
-> +        proto = "UDP"
-> +    else:
-> +        proto = "TCP"
-> +
-> +    baddr = f"[{cfg.addr_v['6']}]" if ipver == "6" else cfg.addr_v["4"]
-> +
-> +    # Run socat in a loop to send traffic periodically
-> +    # Use sh -c with a loop similar to toeplitz_client.sh
-> +    socat_cmd = f"""
-> +    for i in `seq 20`; do
-> +        echo "msg $i" | socat -{ipver} -t 0.1 - {proto}:{baddr}:{port};
-> +        sleep 0.001;
-> +    done
-> +    """
-
-Yeah, what with the remote execution, this probably makes sense.
-
-> +    cmd(socat_cmd, shell=True, host=cfg.remote)
 
