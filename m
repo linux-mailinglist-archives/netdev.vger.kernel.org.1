@@ -1,85 +1,103 @@
-Return-Path: <netdev+bounces-240157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81968C70E12
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 20:47:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA453C70E31
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 20:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BFD09347806
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:45:01 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5D540347F0D
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D46936C0B1;
-	Wed, 19 Nov 2025 19:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57105371DCA;
+	Wed, 19 Nov 2025 19:47:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JUx+vO6M"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="EGQtZOMM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19182D9487;
-	Wed, 19 Nov 2025 19:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC25836C0B8;
+	Wed, 19 Nov 2025 19:47:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763581497; cv=none; b=aBSu9pdZQr+WfuzqhDlQE9Evcc6P+l9xPAVAEOePeOdodTtyp8vFN/qJGZTNuRMzVbMnhurRgu8lpsvm4db467LxbOCIR5LssV1NhmGdwieGv2+1cx1Wj98p7nC7OttMw0nxFJmRN6Ghy6wz8o7341SSOHCxM04S/FY8NDPM2dw=
+	t=1763581645; cv=none; b=AEsGE1lMDaBW5ZDgteh1941Yd47lkPQHbOol25hY13bkyK38puBj+WwvAR2xbfgnDZIqi3xscuxVqyzR74WzoHof4m5hDCKyC+tF6oZd3S0TaI0P5iYl1IsgP+nfhf15/VFkTW2A4iyWUSRbGKNSfya3g6Q0KGy1B2JM+fiesqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763581497; c=relaxed/simple;
-	bh=Lvzw5kWPZOa+UVHkjliY8GRM2NlfagfPs9hfidPFsfk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jD7aZDaKg0GZVI9JO7hpvXoxh6pTa6FD74TMw8fV1BczalWV/rpfNehNyla/jeK570XLNKAhyF1FtOCg/NmzjuC9SQId+2tqllMsf6kBYOTJ/ZHFutlKIdHCgZfCRkucYsxJmB6jKUukywkSsxP9I0hep8ZzQb5hwDnn+QDTrJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JUx+vO6M; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3+MzljTu9sSQD9At6Ks7daYDnEuV5FX1vj590BIioUI=; b=JUx+vO6MqJ7R+n5Se9X4Jzl5wO
-	cDKHBdrTjmoMKLb3G+atFqUElMjKybaSqOPfUpTYi9oNS7u4AZjEv/8I72LEIH/J1qzu596xXp2Uc
-	9uSzS+D3c07AHZTdWDAxqUxb4IJYvSGNpIeOBBGCW8g4ugydEo0Xj9L4hb1otC+7ezI0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vLo6g-00EXkE-0M; Wed, 19 Nov 2025 20:44:46 +0100
-Date: Wed, 19 Nov 2025 20:44:45 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com, vikas.gupta@broadcom.com,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: Re: [v2, net-next 09/12] bng_en: Add ethtool link settings and
- capabilities support
-Message-ID: <b45636cd-48be-4db7-bf2d-a9eb611c14c6@lunn.ch>
-References: <20251114195312.22863-1-bhargava.marreddy@broadcom.com>
- <20251114195312.22863-10-bhargava.marreddy@broadcom.com>
- <49930724-74b8-41fe-8f5c-482afc976b82@lunn.ch>
- <CANXQDtb5XuLKOOorCMYDUpVz6aFuQgvmQZ4pS6RJGkAgeM8n1A@mail.gmail.com>
+	s=arc-20240116; t=1763581645; c=relaxed/simple;
+	bh=KsI8Umf4mFSB6UvvlEIpBMW3/4PuQgsM3Xm+he9VpiQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d+dSzvmHNp/HA3VAhnut+55zVFoXJ8l8WM/8XtuimciotM5TH5so1EFL8aoCjRFNA6P78IlDe8KasgWVHGeMb9sQpeODGW0gc+VnE3ojc4SAkQXAGVk9NcKbJlraMldcL2J5lG9B6s/bdpT0BZEwlTETqFxQD5Nk/PEUE+qxZhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=EGQtZOMM; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1763581638;
+	bh=KsI8Umf4mFSB6UvvlEIpBMW3/4PuQgsM3Xm+he9VpiQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EGQtZOMMqC3N7PPrM+5Z4snmrD4mUcpaa6R20RoV9h/fzNab8WQjxtImodyGzpkXe
+	 /xfleVAzRCQePC1WUCMNoi2WF7uJqUrKDGRfj5iYHZgzmelN0b2piwnwkWSlwBeeVd
+	 c24s66iVrPvXn67i4ZpQ2WOgOxVBC5Etp1Q2DcB+ZEQXAvWZfTPCChT7LuM93u/XKW
+	 gszRsfBfJYnhla6b7Pz5AJfvpxuKFhJzHoQJYpZtYhsLBYoZt7MwPEYDotcCaVxuTy
+	 yxn+9jeThY1hrsb+bkbIDugRhm1o0NC3yIG9HYLHqbX01Dm0GdtBwVJkqTb8guVyFV
+	 pvqmLNlIDAwAg==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id D623D600FC;
+	Wed, 19 Nov 2025 19:47:17 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id D9FEC2017A4;
+	Wed, 19 Nov 2025 19:47:13 +0000 (UTC)
+Message-ID: <36bdb7f1-fb64-44b5-8848-6c3a8d37b88d@fiberby.net>
+Date: Wed, 19 Nov 2025 19:47:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANXQDtb5XuLKOOorCMYDUpVz6aFuQgvmQZ4pS6RJGkAgeM8n1A@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 04/11] netlink: specs: add specification for
+ wireguard
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Donald Hunter
+ <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Jordan Rife <jordan@jrife.io>
+References: <20251105183223.89913-1-ast@fiberby.net>
+ <20251105183223.89913-5-ast@fiberby.net> <aRvWzC8qz3iXDAb3@zx2c4.com>
+ <f21458b6-f169-4cd3-bd1b-16255c78d6cd@fiberby.net>
+ <aRyLoy2iqbkUipZW@zx2c4.com>
+ <9871bdc7-774d-4e35-be5f-02d45063d317@fiberby.net>
+ <aRz4rs1IpohQpgWf@zx2c4.com> <20251118165028.4e43ee01@kernel.org>
+ <f4d147da-3299-4ae7-b11e-b4309625e2c9@fiberby.net>
+ <CAHmME9rzr8EGkTy3TduTXK45-w1CwEYnRLX=SjkAqo1CTTgVHA@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <CAHmME9rzr8EGkTy3TduTXK45-w1CwEYnRLX=SjkAqo1CTTgVHA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-> > > +     if (link_info->support_auto_speeds || link_info->support_auto_speeds2 ||
-> > > +         link_info->support_pam4_auto_speeds)
-> > > +             linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-> > > +                              lk_ksettings->link_modes.supported);
-> >
-> > autoneg is more than speed. In fact, 1000BaseX only works are 1G, no
-> > link speed negotiation, but you can negotiate pause. Do any of the
-> > link modes you support work like this?
+On 11/19/25 7:22 PM, Jason A. Donenfeld wrote:
+> On Wed, Nov 19, 2025 at 8:20 PM Asbjørn Sloth Tønnesen <ast@fiberby.net> wrote:
+>> B) Add a "operations"->"function-prefix" in YAML, only one funtion gets renamed.
+>>
+>>      wg_get_device_start(), wg_get_device_dump() and wg_get_device_done() keep
+>>      their names, while wg_set_device() gets renamed to wg_set_device_doit().
+>>
+>>      This compliments the existing "name-prefix" (which is used for the UAPI enum names).
+>>
+>>      Documentation/netlink/genetlink-legacy.yaml |  6 ++++++
+>>      tools/net/ynl/pyynl/ynl_gen_c.py            | 13 +++++++++----
+>>      2 files changed, 15 insertions(+), 4 deletions(-)
+>>
+>> Jason, would option B work for you?
 > 
-> All the speeds we support can be auto-negotiated.
+> So just wg_set_device() -> wg_set_device_doit()? 
 
-If all the speeds you support can do autoneg, why do you need the if ()
+Sorry, no, wg_get_device_dump{,it} too.
 
-	Andrew
+Did my test on top of my branch were they are still renamed, so overlooked that rename.
 
