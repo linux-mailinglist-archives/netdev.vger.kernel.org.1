@@ -1,136 +1,146 @@
-Return-Path: <netdev+bounces-239883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 926C2C6D8AB
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:59:17 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 587E4C6D884
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:56:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4A87F4F1215
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:51:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 176C928B17
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56A2E3090C6;
-	Wed, 19 Nov 2025 08:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 109A5314B93;
+	Wed, 19 Nov 2025 08:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TccGqokl"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kURYeSdG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24732307AE0
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D4E30AADC
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763542293; cv=none; b=Nsph/kTCScYJWk4kM1IkUICwWgsEI8TVxTix8D19QjCUNGeiW244adj8HpIqyUYvUftXglA89G9h/vs8u7QLUnJWSoHo2P7Et2ISxNxm3RUsLrVb6ym9zsmc73sjUcQslJD75x6pNH5T4IXRo+gqcqPa+p5H3DS1LFz6fX1iMwQ=
+	t=1763542568; cv=none; b=lJ399INRbVqcDwtTIk/5aKE5q8ApXho5RHYk0ps51M36MWd5GRI5CXVnEcr6cjkfPDGj3UAfkmIcHru/f8QuMND/8NDfGRvKFlXTxKEdjBj1uITAtiphmvG7+84ja/BL0OcvilUH0n9vPU6qDHRraiNVb4IeNT0+eculjWpf8P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763542293; c=relaxed/simple;
-	bh=ee7eIKYLxltvb9luhLPfWOa0bbdGd3NypbFBXy7NrLM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Sk38uUDaySLo5SqChyIb4coWp8r9qsURpgr2EHEpTV14dysLIxN7R6I7Mfd9JTPl44emPnRld2uaLscaUXypBa1/UiCGyWYauoOknw/LWqZHrc4H7QsCiRVQujBhdVcpGY5gNzFYWKvpiRtGNXaF6D1IrhwjhXKZDAytcPnZmTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TccGqokl; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ee13dc0c52so29629621cf.2
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 00:51:30 -0800 (PST)
+	s=arc-20240116; t=1763542568; c=relaxed/simple;
+	bh=aygYqcN6DbPL+9YOMaKjW2uVedrCGUGI/puL8gk1w7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=DNf4A06OaB+JmIOaXJXH4uOaVnKH/qREM+OAWuAD9oN56LJvWI60cr5/1BVuH1w9C6eAiE8kbaa5vlAo6o4R95aGae+9DibGM70pIE5hxeCQPbug2ikBxLdf7aIogXRpvIQtfg9e8ENOrI0nUReN8WrEm3aasRyPAcZ0xvVHfAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kURYeSdG; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-47789cd2083so43839565e9.2
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 00:56:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763542290; x=1764147090; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9PzdkOYousQrSY2rOnG5T82fyKw0YgPsDtubwnKB1Bc=;
-        b=TccGqoklVTlmdWWsvUgK7A6YdymKUz2uVY5HJZbtUFQ+JSzE7TlE91757DSSwHcFx/
-         abLGpnxDeRjkQVw+lZG6J+7RS8IoH0MGPjG9DUWFlL3QN6E+k0KcwqqnIIwDfnCtcMnT
-         NVHsTO3aV0RyDnqMy5erjc0zuC3kRrlmSF60iJikaPHrvhK0R/lHQkd29Hd4xGYyq5Kw
-         7SlAFFNXhdJPJ03+flkwNrXmypsYa3Jx2pLVvh3O3rRq+uidmxnfnE3778pPsuUv7arZ
-         w1MEUc6JrS+1HCYEeK1yjsRUPjBcuvsVm5OFwJ+W+l0ppilpHwHfInPtLFJb39hwsuZt
-         y6jw==
+        d=linaro.org; s=google; t=1763542564; x=1764147364; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ub8VA87UVhC998u/Q5U1WNuABffKD2IBy+bs92msj4c=;
+        b=kURYeSdGu7Hgfg+WrZZh75sbLFlRg76W1hgaipFKAYmwfwhDAojiQXcwGa4nbPj8BZ
+         Pfz5sjTuuT6tS+oZqw3C0FPg3wBm68NC36F5cplkHlRdxV64icOklZA5IKMcrkM/1KSH
+         6vd97EHq8cH1k7Xn6f2QusvHvKbqDv+Xj3NbZd3urFJ5jg/T6M90OVJQ2amP/kvvlHO8
+         0gMbRBcCLQqxeSGHqWcbps84v2HoGu2OU6XsomMJw5DxAGJPbGOfKeCrwZHSGZrQ6jlm
+         ydw3MLXAeY+Zs6tp6A9YBIsRhMg/QLZymU9Oe8IBEs/Z7o5BcSL2FFKICsDyUSlTnybZ
+         W0yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763542290; x=1764147090;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9PzdkOYousQrSY2rOnG5T82fyKw0YgPsDtubwnKB1Bc=;
-        b=SWan60CFaAx4ON3IJUz8RoUA9n45Kpbd3uThfn/fqYBd20HJrw/hpoQ51F2uUeVnMu
-         PZi3JIcyLDzAMCUCrTAa8XUkN+CCZ50brHc1sSNmSpwxJoNg7rffYV0Fa1AEMYplmt7j
-         3wFxuHVi3adin9h5P86bxR8JufMPC+tWEOPrs3HrIetENxxgYEe5LAcVEuKQrxdnocSG
-         Gux0G/0QfcO3NwvQ6VfSLYOI9g1j8U1qMeJx4+53qcFQm7mIcpqaDOHt+lryDffBDuac
-         WLvDr/0sNJeNVza31JzzSiOYWBJ6hBHlMfKubh97XweL0JEB3nnRhbKmAC9P7HFYIA2C
-         pPBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUrQtUm3irGKRw7lC3xZbI5pia4dH3IF+qeeZgp9w7tX8mPXKbaCdLp88bKV5DXKwL5sstpv3E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjxC1zLU99VcbZoc5RN3tQoub8cOqOwv0ehT6R9Rmv/A6tDKd+
-	rRf7mvyIVzOiAKgVAikaHoF4/RQcDR315a5aLiIw2IZbM3NJ1K78GsNa393tzE5JvUfLHxhHlvd
-	h1bcP5owT7S/U14OGFRybWU6D0jrN0r/wyFnppbcf
-X-Gm-Gg: ASbGncupkkXpD34S6evPWi5EG8ZhQm8JDJU2MyfhJ/iB03NeAe2fsM0DE/yq/xqiq5S
-	ys1Cz4iQLHvdLoKWLsY5ieZEHxBj8tJZVaMC+qsueKhnz16DAWm2pWSkTPDy14xsA8ej9nwBTAJ
-	/IO7Uz3DQqLlkDlH8sv23JAmKJqI+Fh1ClBBXBmdGYSBqiZq9b30pKgk8M8pewUPQDkzuKfb8/9
-	HPUAahtIYogGRLuAvz/EVFKdTr/BY2Hwqwu4hcNL8QoO/VP6W4EtLsGccZGYUmLhEA8
-X-Google-Smtp-Source: AGHT+IHqnaq1dnuT0/YFHHGEZtmwTLGpCIC27a5rS5AmgK2FX1w+IoEXNvJINEKEKYUZnzpuDOyxD7L3UrQ6druGve0=
-X-Received: by 2002:ac8:5f93:0:b0:4ee:1b37:c9da with SMTP id
- d75a77b69052e-4ee1b37cc71mr119997681cf.17.1763542289535; Wed, 19 Nov 2025
- 00:51:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763542564; x=1764147364;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ub8VA87UVhC998u/Q5U1WNuABffKD2IBy+bs92msj4c=;
+        b=XVscVJ9MqmPpQVlkxjZTvWe5SAw744kt7d4JfErvkCO3y61FfJZvhXvkNyvmawnhop
+         ISsPNlvuefv5Xn0jD9cfyk4LOmVw75wQJjfS6fkMGB2fMufghxEA9PCaYjJpAz0fE7bk
+         vmBCzozOyjQHr1rLOMuva9xVxqQ/eLrrSsLYTS6D5WQzY9hgXJeHbB+WScWC7C0yjAk0
+         VnhOGa+pOul+WZOtS8RyUCbBy1H4873CqP24pRsXELErrAsRvR6GNJHrx1uVI/1aQa86
+         BRlhP3UXKBdYxq0/soCYM+e6x0uVzKpfDNKHAcz2EjX6ut3tUuSfEZHnTo4bbjCxHqDj
+         P0ag==
+X-Gm-Message-State: AOJu0YzzbOp3a4GW0Nzi/f1IKzIo5VjbNHeJnGmEw5+ClZ6JeXEaG/zH
+	xtXDrg39hAVKqfvaFIZihlUg0FciXyaSRVAyX1IsuqZnGMqFsRB3KLshMrbINRpvU+k=
+X-Gm-Gg: ASbGncuqfavExueXBilYVPRIjLIG4dMt/OJY+E03p1lYWq/ley9cV/5RF6oxQyyitIz
+	PMIzVY2wJnB86BhsFBxUxv23mTWB6Yb2FJ+DGLV3TZrvZMqhDuqzKZtjqv81nwygMV2DMCCuqvp
+	XFyxX9reKKaHJXZbBgsI0VKVY6XHt5lZKjdridbF4dlnEjNGWMoto8wT6LO5IL+QYjcqd0Lys9f
+	JYWvkHUIWa7X9Mqudqhwcwuu3TZcxCRQdPPjxDFKCCeNxOcPJVxzG+BZnQVs+FRP4MdDmg45udO
+	/vDr4/dCWNuhJihfs9cI53TxEAm+OfHXEm4O5vFpZPYzPCFbIuaFiDeDRlCrPAuuPkfUxg8wBEM
+	eB5rW75p1w8zKOrmtmFkDt78RXVU5EzhY2NPnu3FPdQgA+KQ2zNWk0LYodmORxQgcTExoSRU87P
+	+af8NAzBqjB9xORz/9q7eaRRURCfY=
+X-Google-Smtp-Source: AGHT+IE1LyNOXB27xzO2V909q4sd8b9P1658pihIg+a1peM8WFSDvphctbUhcaLLXqLuuLLBrg7u0g==
+X-Received: by 2002:a05:600c:3b12:b0:475:dcbb:7903 with SMTP id 5b1f17b1804b1-4778fe5c87amr177672355e9.9.1763542563914;
+        Wed, 19 Nov 2025 00:56:03 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-477b0faf295sm38299435e9.0.2025.11.19.00.56.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Nov 2025 00:56:03 -0800 (PST)
+Date: Wed, 19 Nov 2025 11:55:58 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Moshe Shemesh <moshe@nvidia.com>
+Cc: netdev@vger.kernel.org
+Subject: [bug report] devlink: Move devlink dev reload code to dev
+Message-ID: <aR2GHqHTWg0-fblr@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251117144309.114489-1-horatiu.vultur@microchip.com>
- <11ca041a-3f5b-4342-8d50-a5798827bfa7@lunn.ch> <20251119082646.y3afgrypbknp2t2g@DEN-DL-M31836.microchip.com>
-In-Reply-To: <20251119082646.y3afgrypbknp2t2g@DEN-DL-M31836.microchip.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 19 Nov 2025 00:51:18 -0800
-X-Gm-Features: AWmQ_bk2GqEX4bm8Ggh-VH2AOGTcGYpyk3Q1NxUXfE0QpMeaNtJLm5SaeqgtGRE
-Message-ID: <CANn89iKzVa+FNuWF7PZ-Cbq81Fj0pxeP74rD2gsjbg7NHEcOjA@mail.gmail.com>
-Subject: Re: [PATCH net] net: lan966x: Fix the initialization of taprio
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	richardcochran@gmail.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Wed, Nov 19, 2025 at 12:26=E2=80=AFAM Horatiu Vultur
-<horatiu.vultur@microchip.com> wrote:
->
-> The 11/18/2025 20:20, Andrew Lunn wrote:
->
-> Hi Andrew,
->
-> >
-> > On Mon, Nov 17, 2025 at 03:43:09PM +0100, Horatiu Vultur wrote:
-> > > To initialize the taprio block in lan966x, it is required to configur=
-e
-> > > the register REVISIT_DLY. The purpose of this register is to set the
-> > > delay before revisit the next gate and the value of this register dep=
-ends
-> > > on the system clock. The problem is that the we calculated wrong the =
-value
-> > > of the system clock period in picoseconds. The actual system clock is
-> > > ~165.617754MHZ and this correspond to a period of 6038 pico seconds a=
-nd
-> > > not 15125 as currently set.
-> >
-> > Is the system clock available as a linux clock? Can you do a
-> > clk_get_rate() on it?
->
-> Unfortunetly, I can not do clk_get_rate because in the device tree for th=
-e
-> switch node I don't have any clocks property. And maybe that is the
-> problem because I have the system clock (sys_clk) in the lan966x.dtsi
-> file. But if I go this way then I need add a bigger changeset and add
-> it to multiple kernel trees which complicate the things.
-> So maybe I should not change this patch and then create another one
-> targeting net-next where I can start using clk_get_rate()
+Hello Moshe Shemesh,
 
-Or define a clock rate
+Commit c6ed7d6ef929 ("devlink: Move devlink dev reload code to dev")
+from Feb 2, 2023 (linux-next), leads to the following Smatch static
+checker warning:
 
-#define LAN9X66_CLOCK_RATE 165617754
+	net/devlink/dev.c:408 devlink_netns_get()
+	error: potential NULL/IS_ERR bug 'net'
 
-then use
+net/devlink/dev.c
+    378 static struct net *devlink_netns_get(struct sk_buff *skb,
+    379                                      struct genl_info *info)
+    380 {
+    381         struct nlattr *netns_pid_attr = info->attrs[DEVLINK_ATTR_NETNS_PID];
+    382         struct nlattr *netns_fd_attr = info->attrs[DEVLINK_ATTR_NETNS_FD];
+    383         struct nlattr *netns_id_attr = info->attrs[DEVLINK_ATTR_NETNS_ID];
+    384         struct net *net;
+    385 
+    386         if (!!netns_pid_attr + !!netns_fd_attr + !!netns_id_attr > 1) {
+    387                 NL_SET_ERR_MSG(info->extack, "multiple netns identifying attributes specified");
+    388                 return ERR_PTR(-EINVAL);
+    389         }
+    390 
+    391         if (netns_pid_attr) {
+    392                 net = get_net_ns_by_pid(nla_get_u32(netns_pid_attr));
 
-return PICO /  LAN9X66_CLOCK_RATE;
+Smatch thinks that the "net = get_net(nsproxy->net_ns);" could mean that
+get_net_ns_by_pid() returns NULL.  I don't know if that's correct or not.
+If someone could tell me, then it's easy for me to add a line
+"get_net_ns_by_pid 0" to the smatch_data/db/kernel.delete.return_states
+file but I'd prefer to be sure before I do that...
 
-This would look less random....
+    393         } else if (netns_fd_attr) {
+    394                 net = get_net_ns_by_fd(nla_get_u32(netns_fd_attr));
+    395         } else if (netns_id_attr) {
+    396                 net = get_net_ns_by_id(sock_net(skb->sk),
+    397                                        nla_get_u32(netns_id_attr));
+    398                 if (!net)
+    399                         net = ERR_PTR(-EINVAL);
+    400         } else {
+    401                 WARN_ON(1);
+    402                 net = ERR_PTR(-EINVAL);
+    403         }
+    404         if (IS_ERR(net)) {
+    405                 NL_SET_ERR_MSG(info->extack, "Unknown network namespace");
+    406                 return ERR_PTR(-EINVAL);
+    407         }
+--> 408         if (!netlink_ns_capable(skb, net->user_ns, CAP_NET_ADMIN)) {
+    409                 put_net(net);
+    410                 return ERR_PTR(-EPERM);
+    411         }
+    412         return net;
+    413 }
+
+regards,
+dan carpenter
 
