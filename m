@@ -1,118 +1,226 @@
-Return-Path: <netdev+bounces-239869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63A78C6D532
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:12:01 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57541C6D547
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:12:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1F746385B6F
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:03:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B992D3A00D6
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304862E54AA;
-	Wed, 19 Nov 2025 07:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BEE32ABCF;
+	Wed, 19 Nov 2025 07:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jFM1j/Xq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+AatFsl";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qI76pcys"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7277332779D
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 07:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3E531B133
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 07:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763539004; cv=none; b=ZUCW3fNnvTQohlHKqr0U6svuKyZUq/uXMtjxEzXr9/ki8xIf/7ztpWrjMNrf156NU8ZbnVPFZ7clVxnqPcv3UXF8gYbApD/UkiDl99Rw6Bp4Sk+sbciEKlWmeGbkN4qhuc5HO8AZt29UCpmrWTgSXCcm52dWE51mL9y5//i+LEI=
+	t=1763539131; cv=none; b=Ert6dqW03dTPz3cRuZLHDDQWkLp/jx8JJlwokj+mnOtim2xJGovxp4RJRgeCFcz/tgvCvOS8b3qKAdmMIdBR42aQg8K217KSkgUf9qFeNQZ2GKbttlz0ELYFcrpkPCE10BLnQ5Q5y1fgclZJjJXNZ/tay5/Ii/dhmx7shHdKPZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763539004; c=relaxed/simple;
-	bh=rEXvudxkQhACY29ZQzHhhu73feIKH7DIWejsnTjRwDQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q3B/TJ1Uud6DC8Egne39O0E/88eTKGU26QlWK6QNk34vKDq06X2og2+tfZ8Vc8jiCW1B773flSQR9bs87sz2BZFMP/QrNidbsQrasvA54lDJgHxAynL5l5uPIlW8L2UZCBdUlbgvGGep5fROxXY75ObxFPSIjTe2bo8igKC+X0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jFM1j/Xq; arc=none smtp.client-ip=74.125.224.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-640c9c85255so6833784d50.3
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 23:56:42 -0800 (PST)
+	s=arc-20240116; t=1763539131; c=relaxed/simple;
+	bh=ztPb0Oi9ktxAOJLg1T9PzO/fl6i4U/jNw5A/87EltNw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D7exypBnhmGH64ySDyY3abPDV5LV55Lb8NUKWfimQmfpa/i7BsLxt4TZUpCxAwGmPP0GnAEzzOHtwcrQVzzr5j0gHk4/l1BMjsuH5Xbko02sS+ToJdxUb+RWUQrWH1U+KIDHNMuLei18pVoKXdZlsifPY4aTcwl349D4iKiLZw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T+AatFsl; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qI76pcys; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763539126;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h1kdukhMv0e5PS6jWRdXt6KYB0O1bYUGO99kB+sjRgQ=;
+	b=T+AatFslTlib88SmRl9MpbV+XLPIMbdfeh4ONUfKzXby9e+T40Sxtp9p5JYBufOnsgR0Jf
+	oJmnTl+DiGkQji+AF2V3mmqZs1ZHV9C2zBF6qHAUU7sUNfu/kYLZTN62Yhr9b3C4Psz452
+	lKVx2b4zFh86n/D7D9zSbgXPHJb7PUw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-138-oOXXArj_OeqyckhkJZTboQ-1; Wed, 19 Nov 2025 02:58:44 -0500
+X-MC-Unique: oOXXArj_OeqyckhkJZTboQ-1
+X-Mimecast-MFC-AGG-ID: oOXXArj_OeqyckhkJZTboQ_1763539123
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-429cbd8299cso2958458f8f.1
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 23:58:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763539001; x=1764143801; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vnLuhq+bNdf77j9DiWOZnNN0ok/zvj+B4h8aoL60/Eo=;
-        b=jFM1j/XqKnt6qB0L3lxQiepudSb+NyvezZWMf+3y9g5mykDaJTCnON8t1/qeoc6/Ke
-         HbYMMsKxXfigk64PNSEC35hF74AC4ArorKVQ8S+rCEAmE2k+40nHBEIaye4FExW+0GID
-         9z2DkF43Q1YKEFxwhQo++bV8us7Rpz0K5AcM8Yq+roBtD1qrMlEwL23ar9913NMQ7zpZ
-         wjCnpLBzzWbhExKMaGhUhUbZCX8hW6OuhHoz+otNTnpH/iFBgfJpjZ9PE+J7vib4Y92k
-         PapfIjeW7j/2fZt0ljK9xr27Y/SP7S8gDrHg0b2nYGmDcGh0XYYqzRigT9TCJac7dzzf
-         kmpw==
+        d=redhat.com; s=google; t=1763539123; x=1764143923; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=h1kdukhMv0e5PS6jWRdXt6KYB0O1bYUGO99kB+sjRgQ=;
+        b=qI76pcysZic5E21w8D+rsBZdukfMfleNARdiaqrV7bXJeASL/5AZxngwBgC/e66nji
+         JeApmZ+jz2XB9/9gvyx0oD7S40LyN3Z4dN2B2HgB99MB279FtfYZ5AC3iUq3RN3BIUeO
+         0aDHeU7Pep7NeSuFldlb/owhuy2kRFXt0C/iUXenZl5Yz3lFmlGPYg5QHPCDOQDzIkyR
+         CuKrnOzBBUlvbS6hY1okFTrBbEuttTXtisV82bCwJAS3yBRjYsAq6SrEP9pbVE2wqwHz
+         FWw+jskkHGKEyHLmdOC0i3CrWFfTAP+hwE8b8c/B6n3lEpbx3yDcnBa337amA7I/GW/B
+         t2ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763539001; x=1764143801;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vnLuhq+bNdf77j9DiWOZnNN0ok/zvj+B4h8aoL60/Eo=;
-        b=p9G0hoN1Rylyn8bc3Ac1Vm6rV0PvupFSlpped7iHM8HQ/ufVEpmm2wWoqqwcx3Fcx/
-         KxbapAMHSFfY+iUfya2dPRwE7qTLadjziQhdcZPBac1O0MM4iQkPGuEkEI3+JpgAjvN6
-         dSInaks5eRxmB8yoSEVpXtlrQgpcf5hRygSxeODo97WKRcgSNG6PiXJW0fnRx2X1cKJE
-         QzXTiRR/5uJs+7WFY4XKZDAV8ddu/eX9ThLGlpxhHGwRmH5RUrcMCcaC5Yh/ptZ/1+7U
-         weR7qeddcKH0uqdKxLI7VsSzFGNMcIIWXuqvvRGmKFJ97URPooGG0J6dmVCrtyCf4NTS
-         6iMw==
-X-Forwarded-Encrypted: i=1; AJvYcCXMV97oZ7I174PpZvHXgyILANTdv6w+lVv15IABDoYrw0cbSmUAcWem3WTR6RiuKZZY5nbgOSw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5SCKF1mHm8FGlkWIlgDWjjwzpFAMjQMN62+XXSISc51RvBCC5
-	oce/ZtpcTaN8zly/yNBBYLhaSdrnuGg6M6DKTz6img57Ah1cF2zTLKYTxZGWxzRE/JrLmWgT1So
-	Sy2ryVtQ2VK8Vb7IoYD7aUKe9b7/bweJdOV8ndL0OX/J3m99v03En3d/+
-X-Gm-Gg: ASbGncvCLPzl32sg2R4bfms9Bv/52wS9EFAZz7ezeC2mYIDFqgN+DqRtWMutiGOfr8p
-	o0LxKdryDJTJIGvOhtddQgYAW/X/97RLo5gCg6reqfEu20zeiAdIu/SpslP7hEMa1J67UU1m6oN
-	w9bdV3PqExC7GOHaGZteAjF1ZU+A1sFlcHZ6NlKwFRNLAXfnq39BmrEn9dyWInOv2gI5sJLeDlp
-	6397cZdWf96kLcYQRIRizUiMdHvZ1WPKs8iyclrjYjtaUYMysoT8PdxJYv8BhUiIJuR
-X-Google-Smtp-Source: AGHT+IGyny9/IswQOI0uO0AQgkDhk9qjgq2p3rVcyFnTKlrhJBeddq01b40dTexZNZVTh7omHihMViSJ1pBA6YAe92g=
-X-Received: by 2002:a05:690e:1581:10b0:640:e021:ff79 with SMTP id
- 956f58d0204a3-641e763f310mr13353732d50.39.1763539001181; Tue, 18 Nov 2025
- 23:56:41 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763539123; x=1764143923;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h1kdukhMv0e5PS6jWRdXt6KYB0O1bYUGO99kB+sjRgQ=;
+        b=Rs+sQ4eygO16rArcq8TyCwORDPXTVDFmGClSnE0WpxO7YLHFGc2daXrPYNj3HCZHrN
+         jHPyTMyztDwKHbT7wwgZNxgg6D+OUHxcqC6L4rYPUGL944qN03riJXBy59BjmQhcyzFk
+         O4+DYJ0m1DTMvubks9/uTazaawuqd118Uwa/BBn8FWx88Sb1itiqT2ro2yKPLAXAwJ2h
+         PwrJMxLn/bA27WxrdF6IKH/7Gif1egpQeskI5sRFAVjUsxwTugUhNOBHgV6lzjNR00B6
+         W/yZK8C8AL6dXcPq0x8GjxQvv6qHKoKrodBuYSudp00lBhqthbaxN1aD60N7cJJtvrYO
+         EvtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVeiul4xsNvCbmftU3pWkfRlL9JCnPsd8AZjrVZ0w2I9tGRlXS6sFyIvEMUCrQdNOtcVHzF7No=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy85q+KF1m5AzgnHtGt/NGFT5s4WoU/IqJKJ5zwqmoomukkqw4g
+	QJg6jV0CUa9wcVKV1nwSir4A3IP26YzqcknfbWOvob0aTZACz98xPWEIWOUzElJugmvhJsdDb06
+	sAHUjY8XUBo58YR4QrO4RrXUuSKdr/sfqKThenLVMMYdfIONgZFvB3hTFng==
+X-Gm-Gg: ASbGncurMLFE5andUCtDDngWA1aQy0sQmEuuwcF4jEIhRoFf1DPt3YBvwcYc87Pzh9v
+	/yqUcrwSgvjGQWn7tCw1NqjyTKmlQwUy/mZU/xD0Lu7Fr+l0ubk9Gm+12m7GmCjKZi7JqDIbIri
+	2vIkzqBTlp1M87FnThIzRooSMJWSTi7fe83zwGOyUFQ5ZyAIZBdSFJAnP8IWa4YfWONmusimxQI
+	ktGkgA4w7weJXJfHsauFuU3q42pmzqtVczM92PpLq/qUMXsbGnjV0H5wyryzc9rOozEmg1oUEUm
+	sHAhuXJpPIccG6HBx7S+EcfEQao8LkCDFJFGH4kKR/THDILQ1AKf/p/Jm9vjEDxjpeBPfp2sWmf
+	styDWW+uYCs57jZsg2joXxnOZs8Hl6g==
+X-Received: by 2002:a5d:5d01:0:b0:42b:4177:7131 with SMTP id ffacd0b85a97d-42b595add99mr19386655f8f.44.1763539123178;
+        Tue, 18 Nov 2025 23:58:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF/d9kIia5C1Rk173uB/q7uMGiJORCrpd/szircj7eTupOsjnjxbBmEFPJg4z/3AWkkns9YXA==
+X-Received: by 2002:a5d:5d01:0:b0:42b:4177:7131 with SMTP id ffacd0b85a97d-42b595add99mr19386634f8f.44.1763539122739;
+        Tue, 18 Nov 2025 23:58:42 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f174afsm35614093f8f.33.2025.11.18.23.58.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Nov 2025 23:58:42 -0800 (PST)
+Date: Wed, 19 Nov 2025 02:58:39 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Liming Wu <liming.wu@jaguarmicro.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Angus Chen <angus.chen@jaguarmicro.com>
+Subject: Re: [PATCH] virtio_net: enhance wake/stop tx queue statistics
+ accounting
+Message-ID: <20251119025546-mutt-send-email-mst@kernel.org>
+References: <20251118090942.1369-1-liming.wu@jaguarmicro.com>
+ <CACGkMEvwedzRrMd9hYm7PbDezBu1GM3q-YcUhsvfYJVv=bNSdw@mail.gmail.com>
+ <PSAPR06MB39429783A41F42FDD82477A2E1D7A@PSAPR06MB3942.apcprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251118070646.61344-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20251118070646.61344-1-kerneljasonxing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 18 Nov 2025 23:56:29 -0800
-X-Gm-Features: AWmQ_bnahoEUrf47hvK3QwrYdF29OolGylbOZYrpVIrgYq2lLe-vkIyRPIGo9qM
-Message-ID: <CANn89iKYj-N6fm7LYX7V63EZU5fnMCfnOTbpixhDEQ7h=h3hhg@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/4] net: adjust conservative values around napi
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PSAPR06MB39429783A41F42FDD82477A2E1D7A@PSAPR06MB3942.apcprd06.prod.outlook.com>
 
-On Mon, Nov 17, 2025 at 11:07=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> This series keeps at least 96 skbs per cpu and frees 32 skbs at one
-> time in conclusion. More initial discussions with Eric can be seen at
-> the link [1].
->
-> [1]: https://lore.kernel.org/all/CAL+tcoBEEjO=3D-yvE7ZJ4sB2smVBzUht1gJN85=
-CenJhOKV2nD7Q@mail.gmail.com/
->
-> ---
-> Please note that the series is made on top of the recent series:
-> https://lore.kernel.org/all/20251116202717.1542829-1-edumazet@google.com/
->
-> Jason Xing (4):
->   net: increase default NAPI_SKB_CACHE_SIZE to 128
->   net: increase default NAPI_SKB_CACHE_BULK to 32
->   net: use NAPI_SKB_CACHE_FREE to keep 32 as default to do bulk free
->   net: prefetch the next skb in napi_skb_cache_get()
+On Wed, Nov 19, 2025 at 07:54:07AM +0000, Liming Wu wrote:
+> > queue wake/stop events introduced by a previous patch.
+> > 
+> > It would be better to add commit id here.
+> OK, thx.
+> 
+> > 
+> eck. */
+> > >                         free_old_xmit(sq, txq, false);
+> > >                         if (sq->vq->num_free >= MAX_SKB_FRAGS + 2) {
+> > > -                               netif_start_subqueue(dev, qnum);
+> > > -
+> > u64_stats_update_begin(&sq->stats.syncp);
+> > > -                               u64_stats_inc(&sq->stats.wake);
+> > > -
+> > u64_stats_update_end(&sq->stats.syncp);
+> > > +                               virtnet_tx_wake_queue(vi, sq);
+> > 
+> > This is suspicious, netif_tx_wake_queue() will schedule qdisc, or is this intended?
+> Thanks for pointing this out.
+> You're right — using netif_tx_wake_queue() here would indeed trigger qdisc scheduling, which is not intended in this specific path.
+> My change tried to unify the wake/stop accounting paths, but replacing netif_start_subqueue() was not the right choice semantically.
+> 
+> I will restore netif_start_subqueue() at this site and keep only the statistic increment, so the behavior stays consistent with the original code while still improving the per-queue metrics.
 
-For the series :
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Please do not send fluff comments like this to the list.
 
-Thanks !
+And with em-dashes too, for added flair.
+
+If you can not bother writing email yourself why should
+anyone bother reading it?
+
+
+
+
+> > 
+> > >                                 virtqueue_disable_cb(sq->vq);
+> > >                         }
+> > >                 }
+> > > @@ -3068,13 +3080,8 @@ static void virtnet_poll_cleantx(struct
+> > receive_queue *rq, int budget)
+> > >                         free_old_xmit(sq, txq, !!budget);
+> > >                 } while
+> > > (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+> > >
+> > > -               if (sq->vq->num_free >= MAX_SKB_FRAGS + 2 &&
+> > > -                   netif_tx_queue_stopped(txq)) {
+> > > -                       u64_stats_update_begin(&sq->stats.syncp);
+> > > -                       u64_stats_inc(&sq->stats.wake);
+> > > -                       u64_stats_update_end(&sq->stats.syncp);
+> > > -                       netif_tx_wake_queue(txq);
+> > > -               }
+> > > +               if (sq->vq->num_free >= MAX_SKB_FRAGS + 2)
+> > > +                       virtnet_tx_wake_queue(vi, sq);
+> > >
+> > >                 __netif_tx_unlock(txq);
+> > >         }
+> > > @@ -3264,13 +3271,8 @@ static int virtnet_poll_tx(struct napi_struct *napi,
+> > int budget)
+> > >         else
+> > >                 free_old_xmit(sq, txq, !!budget);
+> > >
+> > > -       if (sq->vq->num_free >= MAX_SKB_FRAGS + 2 &&
+> > > -           netif_tx_queue_stopped(txq)) {
+> > > -               u64_stats_update_begin(&sq->stats.syncp);
+> > > -               u64_stats_inc(&sq->stats.wake);
+> > > -               u64_stats_update_end(&sq->stats.syncp);
+> > > -               netif_tx_wake_queue(txq);
+> > > -       }
+> > > +       if (sq->vq->num_free >= MAX_SKB_FRAGS + 2)
+> > > +               virtnet_tx_wake_queue(vi, sq);
+> > >
+> > >         if (xsk_done >= budget) {
+> > >                 __netif_tx_unlock(txq); @@ -3521,6 +3523,9 @@ static
+> > > void virtnet_tx_pause(struct virtnet_info *vi, struct send_queue *sq)
+> > >
+> > >         /* Prevent the upper layer from trying to send packets. */
+> > >         netif_stop_subqueue(vi->dev, qindex);
+> > > +       u64_stats_update_begin(&sq->stats.syncp);
+> > > +       u64_stats_inc(&sq->stats.stop);
+> > > +       u64_stats_update_end(&sq->stats.syncp);
+> > >
+> > >         __netif_tx_unlock_bh(txq);
+> > >  }
+> > > @@ -3537,7 +3542,7 @@ static void virtnet_tx_resume(struct
+> > > virtnet_info *vi, struct send_queue *sq)
+> > >
+> > >         __netif_tx_lock_bh(txq);
+> > >         sq->reset = false;
+> > > -       netif_tx_wake_queue(txq);
+> > > +       virtnet_tx_wake_queue(vi, sq);
+> > >         __netif_tx_unlock_bh(txq);
+> > >
+> > >         if (running)
+> > > --
+> > > 2.34.1
+> > >
+> > 
+> > Thanks
+> 
+
 
