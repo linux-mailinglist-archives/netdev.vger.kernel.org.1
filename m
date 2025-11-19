@@ -1,118 +1,151 @@
-Return-Path: <netdev+bounces-239806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4448C6C82B
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 04:03:05 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3CEFC6C8BB
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 04:16:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 915662CADD
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 03:01:51 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0B3034EE221
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 03:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20FC82D8DC2;
-	Wed, 19 Nov 2025 03:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065822E62D0;
+	Wed, 19 Nov 2025 03:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IKueXAfw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABDA2D8DB9;
-	Wed, 19 Nov 2025 03:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F8729898B;
+	Wed, 19 Nov 2025 03:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763521299; cv=none; b=qwlJ3HlcYHWT6UO279Yi3bIfCOJQYCUWK2VJPrnTT7K7L5oZQM8wOU+E9T/znRM5tirEjqhlgX/S0EIrqJcZ92CQ6bt+jEm/qOIicIcb03CDv3Bd3OhwGaU5esdYQqY6mkOxlO/VHDcGzZCv/8yWgsSlVP2fIR2knd4JU9iRTk4=
+	t=1763522122; cv=none; b=cYeJY05ZiDs1AnshCqUlMFAjYKXHCAP19qhsUn5lyqOQuEZ936mW5zq3aqb917mIBBE0qRmmRVXW0ex28AMcCkV8qfk1vvrrPkZVAuICrFLJpqrMXIDTNzAlZTS1yLQfCB3D/qSxXkapxT/NaEE3CGaf7edzoBnpjrhVLOfLbpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763521299; c=relaxed/simple;
-	bh=2YDp8cfB+hfCFecaBj//V3DLS0FGXrkI5Xw5CVMRDpo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o9UY1bLVQ2ksVTDFuAW6dD3/WFozpFHO0EYRphNJO4xJ/XxWiCbfo1vw1RK+91br+RyUBtDcTWf8eBjWRejOj9joLUXhGYOByUZerEdYFtaS9UJ1zdIbtrZQjKdhqX3XsCYszGAmoRhJ7RjRqX/KFx8VWU7WQYMB6fiJtvlyjhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 097ba05cc4f411f0a38c85956e01ac42-20251119
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
-	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
-	DMARC_NOPASS, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
-	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:738446a6-b2c9-4f89-958d-13a1b121e253,IP:10,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:5
-X-CID-INFO: VERSION:1.3.6,REQID:738446a6-b2c9-4f89-958d-13a1b121e253,IP:10,URL
-	:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:5
-X-CID-META: VersionHash:a9d874c,CLOUDID:ef4c4b91d06e56043c16bf6ff82b2e7e,BulkI
-	D:251119110128SWWI5032,BulkQuantity:0,Recheck:0,SF:17|19|38|66|78|102|850,
-	TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,
-	BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 097ba05cc4f411f0a38c85956e01ac42-20251119
-X-User: zhaochenguang@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <zhaochenguang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1201661605; Wed, 19 Nov 2025 11:01:25 +0800
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH nf-next v2] netfilter: conntrack: Add missing modification about data-race around ct->timeout
-Date: Wed, 19 Nov 2025 11:01:19 +0800
-Message-Id: <20251119030119.124117-1-zhaochenguang@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1763522122; c=relaxed/simple;
+	bh=jppTVEZ7+b57BpzoBkGxDxEcHrfhod9Sylcsl4PBp2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nBQ7nb6dCpykUbucBRjakFDcB8dyU4CdDtHWIdEydDWODOrQkVW8m2t8WZAEIKmi0pMnV/cnLuwOaPuCYP/x7olgMk2kPDP0e+lOaiCfF2+tVwMU6PZGtY1eWwf5faX10GEEdPp81HngaEtSCSJprAgcPvpwTAV3rFIJyUCLbKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IKueXAfw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61698C2BCB0;
+	Wed, 19 Nov 2025 03:15:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763522122;
+	bh=jppTVEZ7+b57BpzoBkGxDxEcHrfhod9Sylcsl4PBp2M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IKueXAfwGpXxKjDN3my/fqv1yoK/JMu5VDNsDHVUadXWHn43VKfMAFfmOOdA4DaEi
+	 m7Y7CwbXMRzf4w5qI/T3hEb6leiiu3VpBQHc6VHDVVwFpgyIYOxGmyki3Eme5QzECC
+	 yBP7JdcF10UywPvnd/Y7v6jSYdUkRluJBdETGQ2LhGi62vUDClbhEM7PlV7COFI1HS
+	 i2ywsp4XCzKV/Li7NHGOrgTfSO2s62Wi7AOqERyBrsVEVe8LP6L3sRr5waJa+tEZCI
+	 J/FRiC07J4mSiFpOsylBEkBqubUaqi8JkIDdKg8DkRMW/8bqEPLCGcHin2mfnRpSYC
+	 Pcb85/4PMtSwA==
+Date: Tue, 18 Nov 2025 19:15:17 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
+ devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
+ Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v16 02/15] net: ethtool: Introduce
+ ETHTOOL_LINK_MEDIUM_* values
+Message-ID: <20251118191517.1a369dad@kernel.org>
+In-Reply-To: <20251113081418.180557-3-maxime.chevallier@bootlin.com>
+References: <20251113081418.180557-1-maxime.chevallier@bootlin.com>
+	<20251113081418.180557-3-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-struct nf_conn)->timeout can be read/written locklessly,
-add READ_ONCE()/WRITE_ONCE() to prevent load/store tearing.
+On Thu, 13 Nov 2025 09:14:04 +0100 Maxime Chevallier wrote:
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index c2d8b4ec62eb..ad2b5ed9522b 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -216,13 +216,26 @@ static inline u8 *ethtool_rxfh_context_key(struct ethtool_rxfh_context *ctx)
+>  void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id);
+>  
+>  struct link_mode_info {
+> -	int                             speed;
+> -	u8                              lanes;
+> -	u8                              duplex;
+> +	int	speed;
+> +	u8	lanes;
+> +	u8	min_pairs;
+> +	u8	pairs;
+> +	u8	duplex;
+> +	u16	mediums;
+>  };
+>  
+>  extern const struct link_mode_info link_mode_params[];
+>  
+> +extern const char ethtool_link_medium_names[][ETH_GSTRING_LEN];
+> +
+> +static inline const char *phy_mediums(enum ethtool_link_medium medium)
+> +{
+> +	if (medium >= __ETHTOOL_LINK_MEDIUM_LAST)
+> +		return "unknown";
+> +
+> +	return ethtool_link_medium_names[medium];
+> +}
 
-The patch 'commit 802a7dc5cf1b ("netfilter: conntrack: annotate
-data-races around ct->timeout")'fixed it, but there was a
-missing part that this patch completes it.
+Will this function be called by a lot of drivers? Would be great to
+find a more suitable place for it, ethtool.h is included by thousands
+of objects :(
 
-Fixes: 802a7dc5cf1b ("netfilter: conntrack: annotate data-races around ct->timeout")
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
----
- net/netfilter/nf_conntrack_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>  /* declare a link mode bitmap */
+>  #define __ETHTOOL_DECLARE_LINK_MODE_MASK(name)		\
+>  	DECLARE_BITMAP(name, __ETHTOOL_LINK_MODE_MASK_NBITS)
+> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+> index 8bd5ea5469d9..6ed235053aed 100644
+> --- a/include/uapi/linux/ethtool.h
+> +++ b/include/uapi/linux/ethtool.h
+> @@ -2587,4 +2587,24 @@ enum phy_upstream {
+>  	PHY_UPSTREAM_PHY,
+>  };
+>  
+> +enum ethtool_link_medium {
+> +	ETHTOOL_LINK_MEDIUM_BASET = 0,
+> +	ETHTOOL_LINK_MEDIUM_BASEK,
+> +	ETHTOOL_LINK_MEDIUM_BASES,
+> +	ETHTOOL_LINK_MEDIUM_BASEC,
+> +	ETHTOOL_LINK_MEDIUM_BASEL,
+> +	ETHTOOL_LINK_MEDIUM_BASED,
+> +	ETHTOOL_LINK_MEDIUM_BASEE,
+> +	ETHTOOL_LINK_MEDIUM_BASEF,
+> +	ETHTOOL_LINK_MEDIUM_BASEV,
+> +	ETHTOOL_LINK_MEDIUM_BASEMLD,
+> +	ETHTOOL_LINK_MEDIUM_NONE,
+> +
+> +	__ETHTOOL_LINK_MEDIUM_LAST,
+> +};
 
-diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
-index 344f88295976..df4426adc9c8 100644
---- a/net/netfilter/nf_conntrack_core.c
-+++ b/net/netfilter/nf_conntrack_core.c
-@@ -1297,7 +1297,7 @@ __nf_conntrack_confirm(struct sk_buff *skb)
- 	/* Timeout is relative to confirmation time, not original
- 	   setting time, otherwise we'd get timer wrap in
- 	   weird delay cases. */
--	ct->timeout += nfct_time_stamp;
-+	WRITE_ONCE(ct->timeout, READ_ONCE(ct->timeout) + nfct_time_stamp);
- 
- 	__nf_conntrack_insert_prepare(ct);
- 
--- 
-2.25.1
+Why is this in uAPI? I'd have expected it to either exist in the YAML
+spec if there's a new uAPI that needs it, or in kernel headers.
+Let's move it out for now to be safe, we can always move it in.
 
+> +#define ETHTOOL_MEDIUM_FIBER_BITS (BIT(ETHTOOL_LINK_MEDIUM_BASES) | \
+> +				   BIT(ETHTOOL_LINK_MEDIUM_BASEL) | \
+> +				   BIT(ETHTOOL_LINK_MEDIUM_BASEF))
+
+Ditto.
 
