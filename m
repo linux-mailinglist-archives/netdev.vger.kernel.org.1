@@ -1,143 +1,187 @@
-Return-Path: <netdev+bounces-240053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE946C6FE7A
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:02:02 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE376C7004C
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:19:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BE42C4EF705
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 15:55:07 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C09573A8EC4
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45DE8377E9B;
-	Wed, 19 Nov 2025 15:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 343B7261B9A;
+	Wed, 19 Nov 2025 16:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Laj4zYxh"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JeOXAv92"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010057.outbound.protection.outlook.com [52.101.85.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4F717D2;
-	Wed, 19 Nov 2025 15:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763567408; cv=none; b=N99xdWoVmgJVUllSYTTA7BGdMb2DR4/hVsLE0SKsEwhmYiWcbmnTg2FBaw4oSH0Wpz9OmnwETME6TrgkIcQDJa2xzp6Kk8Ornk/ym2EYpn6QW5UZODFO2iLFpqIMrjSymDGgSWYmHp7hZffjJv4NLnrzklNM34hTPgNzchkRzTA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763567408; c=relaxed/simple;
-	bh=mtl+IHM/JXtrCO8ISnitiGZcya/g9fsTYHXlgtCEzjQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uyO14AnYKT/4hutPCI9e4BRS+TXDQ5aKcVakc2mhYGXqSyAUBVNeeuM0auo2DpH9ITtkvwBLVHb4hHoAUd6rL2Y3xNaR16hjxAYkHbBcDiqmM9CTK3C7vD7l06DJ8/BcIZG3b2UFYJxzk4VM31opoIc6bVw57CWSnRZ1RKwfwgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Laj4zYxh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3A51C2BCB0;
-	Wed, 19 Nov 2025 15:49:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763567407;
-	bh=mtl+IHM/JXtrCO8ISnitiGZcya/g9fsTYHXlgtCEzjQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Laj4zYxhFW+Cyz8oEoGr4IEUQkfwUMdLv7HRG6pEmMXhq+vvRB62wNZAYyCBhwMgW
-	 ydZ26okaryoinvEE8tIJbLlJoY1/cMOVAl5gZWnUjbENpW2a9mfRw+vAlvoqjU3euP
-	 pbkZQ00ScKclvx/Fc7+VWCtde1BoO4ZllGxuhaaQ6oHWiJx30xfmdUGu2l8xqahHsp
-	 T+hG+IPeCO3xnQsYkJ7VatBdtqrEHMzKKg55/4DdSBYnYup2E2b5/XfowD8zPoAvGV
-	 SUjpmYocHoRKpWNGz1Ow4h6dPUUWYAJv0jrXiCMFF0CA6h8rz5TtzNJHhRm6MSXZFU
-	 PqBSfmBBhtEiA==
-Date: Wed, 19 Nov 2025 21:19:25 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Corey Minyard <corey@minyard.net>, 
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>, "Dr. David Alan Gilbert" <linux@treblig.org>, 
-	Alex Deucher <alexander.deucher@amd.com>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, Rob Clark <robin.clark@oss.qualcomm.com>, 
-	Matthew Brost <matthew.brost@intel.com>, Ulf Hansson <ulf.hansson@linaro.org>, 
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Vitaly Lifshits <vitaly.lifshits@intel.com>, 
-	Niklas Cassel <cassel@kernel.org>, Calvin Owens <calvin@wbinvd.org>, 
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Sagi Maimon <maimon.sagi@gmail.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Karan Tilak Kumar <kartilak@cisco.com>, 
-	Hans Verkuil <hverkuil+cisco@kernel.org>, Casey Schaufler <casey@schaufler-ca.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Petr Mladek <pmladek@suse.com>, 
-	Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>, Max Kellermann <max.kellermann@ionos.com>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	openipmi-developer@lists.sourceforge.net, linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linaro-mm-sig@lists.linaro.org, amd-gfx@lists.freedesktop.org, linux-arm-msm@vger.kernel.org, 
-	freedreno@lists.freedesktop.org, intel-xe@lists.freedesktop.org, linux-mmc@vger.kernel.org, 
-	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org, linux-pci@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev, 
-	ceph-devel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	Gustavo Padovan <gustavo@padovan.org>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Dmitry Baryshkov <lumag@kernel.org>, 
-	Abhinav Kumar <abhinav.kumar@linux.dev>, Jessica Zhang <jesszhan0024@gmail.com>, 
-	Sean Paul <sean@poorly.run>, Marijn Suijten <marijn.suijten@somainline.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Lucas De Marchi <lucas.demarchi@intel.com>, 
-	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Rodolfo Giometti <giometti@enneenne.com>, 
-	Jonathan Lemon <jonathan.lemon@gmail.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Stefan Haberland <sth@linux.ibm.com>, Jan Hoeppner <hoeppner@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Satish Kharat <satishkh@cisco.com>, 
-	Sesidhar Baddela <sebaddel@cisco.com>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v3 15/21] PCI: epf-test: Switch to use %ptSp
-Message-ID: <wuyn4v625xw4n2jm4eiullfrprmjiw4aiwo4zudcp4ppd2yeva@s7vzfoinnavt>
-References: <20251113150217.3030010-1-andriy.shevchenko@linux.intel.com>
- <20251113150217.3030010-16-andriy.shevchenko@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E4415A85A;
+	Wed, 19 Nov 2025 16:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763568090; cv=fail; b=SWzfbHn9xfKiX43/I7ZkuF2jKzgy9EYu6MyRwj2r3aFHHh0ceJafVAlyJljHEuMUtsSt1AJON1bXbJdKjB6B+NTqypEGAXpRY7nFeeDNZKbOCifgarljK4gb4RQCzEHg4XBZlEzBdu//1lsA6MSZeDENCT6l7TQAxEEDoOZp2xk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763568090; c=relaxed/simple;
+	bh=bZbjckn7h+Xul6UMA2mDwImYveB+SGaECo9daFpqD3M=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=eKq7sLLM2Zl7doxzkSNipcvekq2nvT9J+Butb7CWZhBDBj10YO3tspbL3FOmb3iks5qE3IUaQ1VC/vI9EW+IVVc6eEDQqJZeTXaLMb+G3SXGIDlPsiaQccdvzSAxfS/6PvS3saesBdI867i/zXwReRLHGgUedE0P1MfP9HZ7OcU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JeOXAv92; arc=fail smtp.client-ip=52.101.85.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xGmd1Yl75+dxEDIFD3XROxgREcFKSldLRAsDAf9cRxFGKYNBApIi7HP6JyaoBJdEYKAzJsh2j94EkrwjXUeI+LpaTezVNUyMlEiZGoEJff5JN9gUITt7CYQ2U52A8UMp/Sb1Q1f3Cofg9BNUCtrWI3w8yBzHuf4K9QelIZ9QdxUDpeCd6bkVvd2AlhHgd7DUka43BQjlGMySRXJ+1nLfkz5H4hTatqC0JJMAtNuGl0v4U1bkOLjBwtXdqpkBvpPenO0TazLLr13kKrwcTC5Ga6h4H0saGWeNC3iQxIsQylJNhsn4iXwZAMXxfwzEj/TMEOiFF4iluxDOERI6b5srOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=f04FIWNoOcQldSJtq1npKbzjo89weJ5/FL8koobBaUo=;
+ b=zUf/nbsV5I8PvGP8pnDHG0qeXNGjcNljr64plg9g8MiQp1+yhI1sn4arZ7TwVicSPt0bxfiags+NfQlvkv+gzU5ccJj91YAqZ0Pn97g8IhjbMbFxbJI4/Xu3i6OAtf1BeUiaVj4yv/k5KlWtqRwS5YjmjHOWKDIrGUj7v6qNvTADTNF3JRTgBu9ahFweOdeZ07XgaamGiyyVguoYnG8CjbnwuiVZpJTKBIrffZAETkuCJy3GIhmIyRAI/epUFro+NboNl4PuHb98XS0KTwwYL3IgCIzePJ2mq8U8/9nY3+wuWHiM8kROWGrU8+h8RYm4v2cqSYtKJyZAiCdOcLpwAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f04FIWNoOcQldSJtq1npKbzjo89weJ5/FL8koobBaUo=;
+ b=JeOXAv92fTyVk59JkdMhOeUFChfZRz5HOXrR2zCQXc3KoKkSQKwJfw1iDSElm8V98IjZZdhZ4IeGi53fucvzhjK6AnJZHKjp9gcupQM1Kuu0uhddFGEIGUpFLPFLepWs9z+qYTjDzrXNfCdLkJnNvFGTcicIq9fwaaysgKZR/V8GbpbVIfhwqmsHPswne/s77u77N52kTRC11Ys3kaucK13I+KnSFr7tQez8xmL3UHa9ek2X1e6pK+utefWergboTFox3xuuuGqgnJzd+cEMbmRu9rvXGBtlLVWhV/2gDc8BxlesnwfL2seaSCTfTiiMqDnMDMBaazqumZ5o0m8UZA==
+Received: from BN9PR03CA0684.namprd03.prod.outlook.com (2603:10b6:408:10e::29)
+ by MN2PR12MB4421.namprd12.prod.outlook.com (2603:10b6:208:26c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Wed, 19 Nov
+ 2025 16:01:19 +0000
+Received: from BN1PEPF0000467F.namprd03.prod.outlook.com
+ (2603:10b6:408:10e:cafe::51) by BN9PR03CA0684.outlook.office365.com
+ (2603:10b6:408:10e::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Wed,
+ 19 Nov 2025 16:01:19 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN1PEPF0000467F.mail.protection.outlook.com (10.167.243.84) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.9 via Frontend Transport; Wed, 19 Nov 2025 16:01:19 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 08:00:42 -0800
+Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 08:00:36 -0800
+References: <20251118215126.2225826-1-kuba@kernel.org>
+ <20251118215126.2225826-10-kuba@kernel.org>
+User-agent: mu4e 1.8.14; emacs 30.2
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<willemdebruijn.kernel@gmail.com>, <shuah@kernel.org>, <sdf@fomichev.me>,
+	<krakauer@google.com>, <linux-kselftest@vger.kernel.org>, <petrm@nvidia.com>,
+	<matttbe@kernel.org>
+Subject: Re: [PATCH net-next v2 09/12] selftests: drv-net: add a Python
+ version of the GRO test
+Date: Wed, 19 Nov 2025 16:54:45 +0100
+In-Reply-To: <20251118215126.2225826-10-kuba@kernel.org>
+Message-ID: <871pluc8ro.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251113150217.3030010-16-andriy.shevchenko@linux.intel.com>
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF0000467F:EE_|MN2PR12MB4421:EE_
+X-MS-Office365-Filtering-Correlation-Id: 74588090-5daf-477f-07de-08de2784e0ae
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?5XZ2uJNs/HtPs37V1cnMOZxEULppkKkHLSKIBMzFkvw4rEUCLdZHo66DXnJJ?=
+ =?us-ascii?Q?wM0e4TzWMkEePADjB9LNUFDGw8DFVcp6HTMp3AiOjTE/XitNBGfkKK9McbmI?=
+ =?us-ascii?Q?R1f09wEzlo+bf4iuPNEKGf6uwoAXCU2NeiZcrAswbRenYEzT5JkXtZ3Pu5qy?=
+ =?us-ascii?Q?HGkEyR9xASgJ19w2LRtXqmG3YZDkHOJ3DDS5CEBY11fo/kSqMKU/sc/es2ra?=
+ =?us-ascii?Q?p21tLazCN1WBwbUS7y7RtePqs5Kv7gltqHtsSliutMBG5g/08QkyViEozlBe?=
+ =?us-ascii?Q?/d+JdcTjZqb+4kSLDOJv9Wewu0LQsEWQReZaZHVP/L0K/KG3uv4hld7iuIWi?=
+ =?us-ascii?Q?2p8V40UI2FAzXdvW1q1tPAshkzPtNlSLI99UaVFK62Ic5kTVbAWNG8XXOV4C?=
+ =?us-ascii?Q?9K+uomjliPxSwKwpChC1EX8Zwoj2OaNs+865FHYGbcedTv4EbWSHR5k4iutb?=
+ =?us-ascii?Q?b+I7rKAW21/MkdfzFljBc4q29Mmz38l068ynR5gNcqdmXDZRN1W+H6Ug0EQY?=
+ =?us-ascii?Q?DbQJ8STVraWf66JA+tuGweO7cUH4VjrBzJODDfRSA6b3yrK7b6KD+gFxzH1h?=
+ =?us-ascii?Q?aDzHTwutytO8PtWvJteSud3AdBaTjWD5+BqsAZC2RADGv4VomYZa5MEnWGwV?=
+ =?us-ascii?Q?SVFBuWZmzTrrI3aqqzK2HKNU0p+Hxt6tDYnH2VmrUO7g7x/f7E5C2eGHk8yM?=
+ =?us-ascii?Q?nEV9p6nP5+kPwLh7Jm1+bbSzXpWt93X+jV+NeO55rD47z4MZPssgYLUu6Ae+?=
+ =?us-ascii?Q?Q8ITQgWy6NBjGlLJp1g47pz4WWX8sfhoRCFGGVkcQm1VApwkkrfDdBmz9XeW?=
+ =?us-ascii?Q?Ogr2YcuChOYgvp7IsMzIHlcXtKvT0jRv7Q7vx4FCRSli27kJd1STih0vvSxJ?=
+ =?us-ascii?Q?v/06Vv4KzEjEKrQdMO8pvupyXeDqe+jSRKJw3knaqrkdN9sIGdMODyfGVymd?=
+ =?us-ascii?Q?wz0QDmiull7YifME4dXeX2pW7ap2y1vUAEyTf6Y0BETI92RRb0B+LvCTFnlB?=
+ =?us-ascii?Q?+fKKemiZKrkllnTH+EY9qsR8A7ebmiV4AborpVtgqjiaUJ5CVWvXNVyjmJtl?=
+ =?us-ascii?Q?iB/rsjFY+VG4YNKJbfZLiC2aH+l89rbWfjQ0PfMqsuW8Swv9RgHfsfMbEl0b?=
+ =?us-ascii?Q?OldP7Y8SN071g60y23U+5YiHKkv99jDwM8VG3y0UyYTifhOWlHVE7pAaAA5f?=
+ =?us-ascii?Q?UWz0U/gnaKOHHxx1/HS73ybGjXvqIc7vJnSqbqd/92izV3PzYDfw5CC9rjJE?=
+ =?us-ascii?Q?ORh1Vdj/1XrI7dQ9u14I/vhFLhx9fm6W+3x/8YzcaLVtQ2HsMj2U1kLskLV6?=
+ =?us-ascii?Q?DPspAB/Ol/O75OF8YSgdWQbVhtjr7iJ29BSV6W9T+nsyknH3+ScN56z2l3Bp?=
+ =?us-ascii?Q?CaBtKwyFNvWkqUuQ2CMOokickysjYXHRtx+5zKWyWx7RC9ikaIAdZhkPSoqd?=
+ =?us-ascii?Q?lpJCk9TqqtAP4OvkqenO5a5GgxpLj6XSOxI+ccV1BmMQ4s2R+Gf6tm2CInHy?=
+ =?us-ascii?Q?/Q5rFQ9gjON03AZc+T2J3sTVlHWvgdSGlwDrf+zPqCwNVU5E5pOBdLqxPiik?=
+ =?us-ascii?Q?7Ne6FPRP9l55RhHUFro=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 16:01:19.0023
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74588090-5daf-477f-07de-08de2784e0ae
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF0000467F.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4421
 
-On Thu, Nov 13, 2025 at 03:32:29PM +0100, Andy Shevchenko wrote:
-> Use %ptSp instead of open coded variants to print content of
-> struct timespec64 in human readable format.
-> 
-> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-Acked-by: Manivannan Sadhasivam <mani@kernel.org>
+Jakub Kicinski <kuba@kernel.org> writes:
 
-- Mani
+> Rewrite the existing gro.sh test in Python. The conversion
+> not exact, the changes are related to integrating the test
+> with our "remote endpoint" paradigm. The test now reads
+> the IP addresses from the user config. It resolves the MAC
+> address (including running over Layer 3 networks).
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-> ---
->  drivers/pci/endpoint/functions/pci-epf-test.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/pci/endpoint/functions/pci-epf-test.c b/drivers/pci/endpoint/functions/pci-epf-test.c
-> index b05e8db575c3..debd235253c5 100644
-> --- a/drivers/pci/endpoint/functions/pci-epf-test.c
-> +++ b/drivers/pci/endpoint/functions/pci-epf-test.c
-> @@ -331,9 +331,8 @@ static void pci_epf_test_print_rate(struct pci_epf_test *epf_test,
->  		rate = div64_u64(size * NSEC_PER_SEC, ns * 1000);
->  
->  	dev_info(&epf_test->epf->dev,
-> -		 "%s => Size: %llu B, DMA: %s, Time: %llu.%09u s, Rate: %llu KB/s\n",
-> -		 op, size, dma ? "YES" : "NO",
-> -		 (u64)ts.tv_sec, (u32)ts.tv_nsec, rate);
-> +		 "%s => Size: %llu B, DMA: %s, Time: %ptSp s, Rate: %llu KB/s\n",
-> +		 op, size, dma ? "YES" : "NO", &ts, rate);
->  }
->  
->  static void pci_epf_test_copy(struct pci_epf_test *epf_test,
-> -- 
-> 2.50.1
-> 
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
--- 
-மணிவண்ணன் சதாசிவம்
+However:
+
+> +    base_cmd_args = [
+> +        f"--{protocol}",
+> +        f"--dmac {_resolve_dmac(cfg, ipver)}",
+> +        f"--smac {cfg.remote_dev['address']}",
+> +        f"--daddr {cfg.addr_v[ipver]}",
+> +        f"--saddr {cfg.remote_addr_v[ipver]}",
+> +        f"--test {test_name}",
+> +        "--verbose"
+> +    ]
+> +    base_args = " ".join(base_cmd_args)
+> +
+
+> +    max_retries = 6
+> +    for attempt in range(max_retries):
+
+The original had a comment about flakiness which was IMHO useful. The
+"retry failures" paradigm on its own is transparent enough, but the
+comment explained why the flakiness comes up.
+
+2c
 
