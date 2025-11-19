@@ -1,176 +1,197 @@
-Return-Path: <netdev+bounces-239985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B88EC6ECC0
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:19:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8770AC6ECA5
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:18:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8FD4C3A6309
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:12:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 3FDFB2E3E2
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825753612FC;
-	Wed, 19 Nov 2025 13:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFFF435FF45;
+	Wed, 19 Nov 2025 13:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="aufVFN8K";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="QG1bur70"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="DQJFkS9T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D253612E9
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 13:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF012357A5B
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 13:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763557731; cv=none; b=Z8auz3SpDLyTDYtr3bhaJJy/s+Y+pQ+affOBcXEInarA6XSgD9MrHIo57SE1CCUM9leoTp9I+7JGponpklWYQG0raBzcIj/DXw6u+OCl+pEB48VBgx1R3VE5g1EWa233F3dHAYcMekwoTAE7GCtjc0OgZytDpgf94RC9hz20MJg=
+	t=1763557883; cv=none; b=ZfgODarhEE63T6frPYJTUuG8uLp0yn+jy+ya0ioumMzldJinxhOZCLyAYsQtZYllWphyp3vjSL3wFaGzratr60nmUAGl6SVN+C/R4s/g4MLe/AKgxNkkHJrD20yfHcrX7xQgPQDRC4iZ7H4QGcjq7ALoO0+BLzk4wma15XE93/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763557731; c=relaxed/simple;
-	bh=zfEQUt4DhWAUXc5x6ce3fvEtypuCBnBXH7OVSLBJQLc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YuYjja7zAFuYXbfZOubaV0Ew1m4ZJSG6s2P2yXXdgto72cg3rri49aZGwuIiZHFJGaaWg432jsVFWadczp3NIIcNybIgGKPBjEUhwSbQ2f2SpZgZ5gddg0GcWnhyE7fCIGZHao6iIWdWSPYnfqMCtFyZrSy7Gv44P5hIq5dCK4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=aufVFN8K; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=QG1bur70; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AJB6Gwe1982214
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 13:08:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	l9lECUAFdYVI6sCIVSOz3LRlNh/O8By86XnvozCDqms=; b=aufVFN8KDVdSv69a
-	hRT8GTNwJnTqUhoUVN0GUd1eHfFPuDuEXpteVMBRqQmbkLV+9JhrVq/4f3PPqsQK
-	spfIbRLn0RBJyWlFxIOKhGcaoRy3quZ/Ixko412pkSEOsaZmMOa2gY9hxHKyNwLd
-	NnQO77kYkz+sasGlbwDvbIZ6hiHAfv0Drj/6dVhTDG89cO21LJ8N8lACunR8cW02
-	RUlJvAwTWm9LW8xqVGt4tq0fZGsAN3FJsptioNFnfTmpfKS1belXodN/SSvBorDJ
-	9NI/1SpAeY0Hc8QAegSbTv+eqUsyDUa4jZZjV0nxiXmVEY+ObCpM6Mk6y7tJESgn
-	ZWXUfQ==
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ahcqng9yh-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 13:08:47 +0000 (GMT)
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-949056882beso368510139f.2
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 05:08:47 -0800 (PST)
+	s=arc-20240116; t=1763557883; c=relaxed/simple;
+	bh=sJLZgI9vl/ePXAMiM1HFoKkY761fjwT9P7fNtQPrjMI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AbNEZaBWHAa1hVqjmQFBpd02JHXSqx7NWMldFMwpqg1l4ZUK4gyKrvmB3rWMVrNX4r+KEdKVKpCG9K9viOmFUCjjsoJyO+X7+tWpS8D4ZGfxhBl1bhlYDrqwIISa36hySYOe06kn8Sf1+8EdPQ5rgtsrZS/6nf+skPyMNtd/6lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=DQJFkS9T; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-640ca678745so10992570a12.2
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 05:11:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1763557726; x=1764162526; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l9lECUAFdYVI6sCIVSOz3LRlNh/O8By86XnvozCDqms=;
-        b=QG1bur70EJbE8Miaf653J0h0J66izu+6gpxuJV+KQKYIJnXjp0PW6Bopd2BO/oSQWt
-         lUUB/HIE0QbUbusWw+XL6KxaB4d/4kvtBKFJJu4Em3yWc+SPf9q5PXkqOXXTuqvicuZp
-         gi9Zm2Q1NR7RzlVmD0s+jqKBKZtpGo0phWk9f06lJKQYP5B406ShdxTtDbbKSOCLJlhl
-         tzxObncoVPt1TmDUEkp7KvtldftPVSdO1Sb/BbWx0ifhzKalvZVxhYTD6McWq0K2Gzy+
-         4UxJVvPYndIcVYOu3UjqsABLUDkKXRRmw2u/32c9mYW7p2oppeTn/XMi4fxanot2fO9J
-         pmag==
+        d=suse.com; s=google; t=1763557878; x=1764162678; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2hIjgqXWXn3Sbfto+9OWapsp1QwhUBtS+kZIjBq+Tlw=;
+        b=DQJFkS9TfIkIw04m01xXMLNrkosYb3FSrkUd1Mfnq3DmFPVYW5BQAF/kJ7qBH/fiSm
+         pVnVkcfKZlPcHTsyEwqHQR67eAr7CHq57OGD53huuAi4hSCw/ct6edPOGR+fsY5nGz/N
+         Yw1ooyFk/+rMnBQZngJcf6t2sX9N66HB8FZQS71x9KKl/6xkzHkV8uFKm2Iy/9fAm8Ag
+         I22CiD+iqPZDy+W/I0Ox3Jki6uwZV0vfVWc6IvJTegJWTzKaS6FEi0EnBDDhgSnIfI+y
+         k4OP4x8AdsPKrFrvmXhICnjEUtirKTXsrSbTk6Wz8fF+OXFqP7Hrg3yvNq2+bPjQ4kUM
+         Gqaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763557726; x=1764162526;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=l9lECUAFdYVI6sCIVSOz3LRlNh/O8By86XnvozCDqms=;
-        b=BOVwkDpIJde9hDtvxzT00Q9obcHBdTj78w8iJ6kT02gszFuLm9TCCzPNbKbJQCawaN
-         KmR8X6n+GXYTupH39alrdpBSBmpCE7tB64hcbRNNDdU3Rp0OiFUTknnBA4/SIWorBdu1
-         ZQqd6ZIQOVs+hLWG8UTMjOYjoXRqOxE2n1FrolYaBpdjLgyK1lDd1fG8DN7P9gPptqnw
-         H/YeQm3/AtK9ZHy3XMnw3Jjvi7Seu4P62jduMZ3DuAauuT8oYd32r8TUCJeUppaUdV5Z
-         o3wNddH8Ma6RJ3zYlC+WsZPq3H71E/SYHEIysVTFnjNyFA9Trmq0Xplvhlf62ptQku67
-         jAaA==
-X-Forwarded-Encrypted: i=1; AJvYcCUMYCtU5C0ZE+VgULsUuoIFiQ5Rc1w3/jP6QX9g6U1zyMWUj1vmVFQ/4EEDFtBRfQSEg51gomc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxlJBTmJhM8u78vcd4kBX/nS+FH9CrVR7366zdNaHYVjD4cjAL
-	mbxuFTavgcwW36mfO6x9eWGdbpyF4Nf3Enb2BM2ED+fyuS6KttSM3KJjr4yrwWpv+bnA+INosSf
-	9oM0hzdVUIGCLnLWe1l32NPuHwJ+NlLzUuUH3u5mweOuqaqnRPrULnGen4sUro7+KwebOfU54nT
-	mxJIq5LlYRK0uZtIQnKDw31vqb7eAciz5+Qw==
-X-Gm-Gg: ASbGncvsnOlQX7GwUte1bQTbTTZV8UI5mMPrZ9dfCze2XxE/lT9YhgtfLULOUhmvzie
-	r1NydeHsfhUAN312ufLzi6YqajNlBMdpgUyH81IYmzEX4ZJV9XvLz08r39OIkiSd/DNRM1sEX97
-	YugUYOFdm1YjQNIT2LaDrMs9CbsJD7dLzN/KLiqmVZgmytu0cFcgZJ/DcgJFl1RvONSMa1Kzs87
-	stIHoqpQ/TRkK+ULeVOGCgzXFZe
-X-Received: by 2002:a02:ac16:0:b0:57b:66fe:15ef with SMTP id 8926c6da1cb9f-5b7c9e0370cmr14450842173.19.1763557726430;
-        Wed, 19 Nov 2025 05:08:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEY+j1dfzf8Batt7FHNQwSvu4wncs/IYd0ddz7VrhrJ0xKu+nxGk0DEyzi1ENK6CVZeNWF9cPj4TuK3qu0VzgI=
-X-Received: by 2002:a02:ac16:0:b0:57b:66fe:15ef with SMTP id
- 8926c6da1cb9f-5b7c9e0370cmr14450812173.19.1763557725952; Wed, 19 Nov 2025
- 05:08:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763557878; x=1764162678;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2hIjgqXWXn3Sbfto+9OWapsp1QwhUBtS+kZIjBq+Tlw=;
+        b=g/6qkZglcGDwyXvrIFp/vHhvTezbrUUJfhQ+HJ+ZquP6poK680rX/wRGZqqHyX2Ssj
+         J+G9JME5doiiVdIgBV/xg+JlTSnL3gjmiWU+jHZ74N+WMhG62mwi0a764xqg0taz4LlC
+         9nqK70PCfzHKjsN588ymAaWkHkRv8ojU2JFL/60oVpjI/vbpGX5XlDPDSXd3HK42ymf+
+         BdlVqmatm9XuvzOEzZ7AIMAss+WdgcPGutOuD7SsGRjS8R0nycJzJYGOApJ40/tCk0uY
+         39IsgjbSlBJaGhm7FdN1JnA2r4hcn0c0FfU5Av1Dybk9N6YIRyUo9PQRsZvoeIhtM5gL
+         CL+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXZKnWsrmt+urxiUowU3OU4Ga/Ld50m50Ooxrc2SK5Dbup4BZAsPntnfufQwwYnhzQIONW24rU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1Mylwn3jNd1U+Z6AMsBJyCUJRzrK65AQ4KXiOgVtSVhwf2w6I
+	VGqW3cLNNVvV2CcUW66zLTwrtEH9Z1PnNpjmjBQrV0+vWZtGR0QOCMrFrl5C80e1YCg=
+X-Gm-Gg: ASbGnct4INxOGSeksJzfJoJJzTWBqi3uuH/9GejrhJzWuXrMgTUIAAFrB0wDnmt6U5Q
+	UaWDWsvugdIv9CnVY3GnvUWhUTW00T1aZesTatByx05u+hozQmhwWkvcX8hsYTdGv5u3Ib/TVrT
+	JCryPYtun0vrWGT7cSbnMqBwEx68f1gCp23eukc/wBoHkL8tchisSYdzeq5q2fKgNUw/lYw4gZW
+	VcMZjLdQdAMbjyaC05/u0OY70UbIMmZsL13Ay8a/qF4LtMYU4dXyF0piWJNf0dSjDKvYa+YJC3Z
+	hpQPWufA0NUC4HRT98ofsE3dWXAAJeRy7Lekbuj5DcIv8ODqsHIPrXvwYMcGJNjCOE0mD99bm1w
+	prZDD85rPJPDQNhDSvUdBQSCnNJRAve/AQn6jOhA6EY5YDbNjCQnZw/IaHnefZdroaxO7yM5ZF5
+	XvoIlvlkKjHjVmfA==
+X-Google-Smtp-Source: AGHT+IHh/9HSY9QxYY7JWRlsHkQE77dEey/TQadLHho4kIFH9l0Cnuj5X98H1aD+vZkw9c2t87Tcgg==
+X-Received: by 2002:a17:907:96a7:b0:b6d:50f7:a805 with SMTP id a640c23a62f3a-b7367c02586mr2099815666b.59.1763557878059;
+        Wed, 19 Nov 2025 05:11:18 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6433a3d8775sm15093392a12.5.2025.11.19.05.11.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Nov 2025 05:11:17 -0800 (PST)
+Date: Wed, 19 Nov 2025 14:11:12 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Corey Minyard <corey@minyard.net>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Rob Clark <robin.clark@oss.qualcomm.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Vitaly Lifshits <vitaly.lifshits@intel.com>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>, Calvin Owens <calvin@wbinvd.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Sagi Maimon <maimon.sagi@gmail.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Karan Tilak Kumar <kartilak@cisco.com>,
+	Hans Verkuil <hverkuil+cisco@kernel.org>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>,
+	Max Kellermann <max.kellermann@ionos.com>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	openipmi-developer@lists.sourceforge.net,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, amd-gfx@lists.freedesktop.org,
+	linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org, linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-pci@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+	ceph-devel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Dmitry Baryshkov <lumag@kernel.org>,
+	Abhinav Kumar <abhinav.kumar@linux.dev>,
+	Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
+	Marijn Suijten <marijn.suijten@somainline.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Rodolfo Giometti <giometti@enneenne.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Stefan Haberland <sth@linux.ibm.com>,
+	Jan Hoeppner <hoeppner@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Satish Kharat <satishkh@cisco.com>,
+	Sesidhar Baddela <sebaddel@cisco.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v3 00/21] treewide: Introduce %ptS for struct timespec64
+ and convert users
+Message-ID: <aR3B8ECx9W6F0BV_@pathway.suse.cz>
+References: <20251113150217.3030010-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251119105615.48295-1-slark_xiao@163.com> <20251119105615.48295-3-slark_xiao@163.com>
- <rrqgur5quuejtny576fzr65rtjhvhnprr746kuhgyn6a46jhct@dqstglnjwevx>
-In-Reply-To: <rrqgur5quuejtny576fzr65rtjhvhnprr746kuhgyn6a46jhct@dqstglnjwevx>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Wed, 19 Nov 2025 14:08:33 +0100
-X-Gm-Features: AWmQ_bkdfqVA1rkVLtELKfbA7SfWdvWWr7jj-_NBBRnuiF2JhyyUFR7jNOrf7ls
-Message-ID: <CAFEp6-18EWK7WWhn4nA=j516pBo397qAWphX5Zt7xq1Hg1nVmw@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] net: wwan: mhi: Add network support for Foxconn T99W760
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-        Slark Xiao <slark_xiao@163.com>
-Cc: mani@kernel.org, ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, mhi@lists.linux.dev,
-        linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE5MDEwNCBTYWx0ZWRfX5bBVXE/ju94L
- eZ5vIibeAYUypeibTMoLo6PF3BohXKpSIBl3Qo8kgm4haASdhLQXhl8dWH2zN0qm+LRC+fUBsMl
- /x4rVYMsKqAz/NkrMwnOvbJwrMkMG78FoOgx11jZGT+HEGiAHPjEQXaaGFDs20rDCkzQwVuMKGx
- S8ncFUIveFDcNTiV/2gNEdaRi+ZGmqmhKEhOPZjRK3BdEHzTPaVTIqb5CDXvIZQ8VydxLJIoQ6s
- WpKxrvyXlMS23vEvjoQj8zW63eR80A2nfHcEkRpixz0q9ZEtz53W/iq2G41Aq3oQZaWaMaA+BET
- PUJ3i4rU8JynayGwRbBjDBk79fKKVKjirmY+VAhG3GHz0CAAoqAVENHSsGFDG5EivfPcEt+2USK
- fJj+vHDKK7X/zcPl15bPdQ/212Szxw==
-X-Authority-Analysis: v=2.4 cv=ApfjHe9P c=1 sm=1 tr=0 ts=691dc15f cx=c_pps
- a=7F85Ct0dzgNClt63SJIU8Q==:117 a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=Byx-y9mGAAAA:8
- a=8dE3Wk8t88_o15qU7OwA:9 a=QEXdDO2ut3YA:10 a=LKR0efx6xuerLj5D82wC:22
-X-Proofpoint-GUID: OnM933UgHbbyA4oyyKa2ztMFrg2GE2Pc
-X-Proofpoint-ORIG-GUID: OnM933UgHbbyA4oyyKa2ztMFrg2GE2Pc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-19_04,2025-11-18_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 lowpriorityscore=0 spamscore=0 priorityscore=1501
- suspectscore=0 impostorscore=0 phishscore=0 adultscore=0 malwarescore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
- definitions=main-2511190104
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251113150217.3030010-1-andriy.shevchenko@linux.intel.com>
 
-On Wed, Nov 19, 2025 at 12:27=E2=80=AFPM Dmitry Baryshkov
-<dmitry.baryshkov@oss.qualcomm.com> wrote:
->
-> On Wed, Nov 19, 2025 at 06:56:15PM +0800, Slark Xiao wrote:
-> > T99W760 is designed based on Qualcomm SDX35 chip. It use similar
-> > architechture with SDX72/SDX75 chip. So we need to assign initial
-> > link id for this device to make sure network available.
-> >
-> > Signed-off-by: Slark Xiao <slark_xiao@163.com>
-> > ---
-> >  drivers/net/wwan/mhi_wwan_mbim.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_ww=
-an_mbim.c
-> > index c814fbd756a1..a142af59a91f 100644
-> > --- a/drivers/net/wwan/mhi_wwan_mbim.c
-> > +++ b/drivers/net/wwan/mhi_wwan_mbim.c
-> > @@ -98,7 +98,8 @@ static struct mhi_mbim_link *mhi_mbim_get_link_rcu(st=
-ruct mhi_mbim_context *mbim
-> >  static int mhi_mbim_get_link_mux_id(struct mhi_controller *cntrl)
-> >  {
-> >       if (strcmp(cntrl->name, "foxconn-dw5934e") =3D=3D 0 ||
-> > -         strcmp(cntrl->name, "foxconn-t99w515") =3D=3D 0)
-> > +         strcmp(cntrl->name, "foxconn-t99w515") =3D=3D 0 ||
-> > +         strcmp(cntrl->name, "foxconn-t99w760") =3D=3D 0)
->
-> Can we replace this list of strinc comparisons with some kind of device
-> data, being set in the mhi-pci-generic driver?
+On Thu 2025-11-13 15:32:14, Andy Shevchenko wrote:
+> Here is the third part of the unification time printing in the kernel.
+> This time for struct timespec64. The first patch brings a support
+> into printf() implementation (test cases and documentation update
+> included) followed by the treewide conversion of the current users.
+> 
+> Petr, we got like more than a half being Acked, I think if you are okay
+> with this, the patches that have been tagged can be applied.
+> 
+> Note, not everything was compile-tested. Kunit test has been passed, though.
 
-If we move this MBIM-specific information into mhi-pci-generic, we
-should consider using a software node (e.g. via
-device_add_software_node) so that these properties can be accessed
-through the generic device-property API.
+JFYI, the patchset has been committed into printk/linux.git,
+branch for-6.19-vsprintf-timespec64.
 
-Regards,
-Loic
+Note, that I have:
+
+   + fixed the 19th patch as proposed, see
+     https://lore.kernel.org/all/aR2XAYWTEgMZu_Mx@pathway.suse.cz/
+
+   + reviewed all patches but I triple checked 7th patch which
+     did not have any ack yet. And I added my Reviewed-by tag
+     there. ;-)
+
+   + I tried build with allyesconfig. It succeeded. I am not 100%
+     sure that it built all modified sources but...
+
+Best Regards,
+Petr
 
