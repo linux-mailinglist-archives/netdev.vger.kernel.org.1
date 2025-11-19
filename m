@@ -1,99 +1,95 @@
-Return-Path: <netdev+bounces-240020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FFFBC6F554
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 15:38:24 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D246C6F58A
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 15:40:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5754B3A5E29
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:29:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CED8F4F77B6
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9EB62F260E;
-	Wed, 19 Nov 2025 14:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D706F2356A4;
+	Wed, 19 Nov 2025 14:30:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="c1kV0AOG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VK68FZ10"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0F9275B16;
-	Wed, 19 Nov 2025 14:26:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBAC278E53;
+	Wed, 19 Nov 2025 14:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763562415; cv=none; b=XR9zMdCyh9MdYlNxrhsG07pwBDbePRdGNz8Qd7E+8VPf2i8bw3Bsyz181nyj9jd0UJcriI76SopEqIczH72+N01TCZ+0lEYprlQjeYsxOXOM61QUh2B8QJLPKz4kZYeLJ8sBZm37eYsgypBLP/reFvu+Dz3d1E37SidIiuWw/f4=
+	t=1763562642; cv=none; b=GavT6SPyHgxNYQMArlnIPpuyjvrF+eDXf3O5RgYZ0Ac9FWy3ohlYzu1uU20ASq+IoJi5ibKIRKid1feZtMswm7t+Gky+Mb41mHRCdh3rvf5a84KPYHZfZiAKjiOirVgwO895CeRvbOqYLktGZGfH/r3bZ2ZPymm4f+l6eq5dH6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763562415; c=relaxed/simple;
-	bh=bhcI06CIbQU0+aoz15+EQstZSQQXogZM7y1ufCmJ4ak=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h1TZ58cf4ACGvrSc+/+cK+kf8p5h2VLeVwIHNSY4Hhfvu01MdIbPnxnZVFOO1gpY2agEBxR4eRuvdxKZudwfsW1yeBb23s95KGvaaiFlv37fl7QRtjNpitV/HTKQWXu4w60kI5qLOrMvn41aKhJoZNJvMJJ34mM4HgxnAPQ1G9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=c1kV0AOG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KGT/XOcVu7Pb6bU5dSoi4/F4rfNvcMt5cvbYh0kgDx8=; b=c1kV0AOGKO9IPEzlVPukttntTb
-	rXN3oWyPys+RKgAeTDeQFqKHK4zzkKffxesdEpCo/rK+vfLLd6xHNpsLRG1KqMU9c0X5OYAGOAQNs
-	6oJIeab3eRRfM1T7Ar8H+cEGcQ7/1G6pt7tbG0SSP3zQn+akG4ob5WYqzqN+R2HEEhXQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vLj8r-00EVLg-7C; Wed, 19 Nov 2025 15:26:41 +0100
-Date: Wed, 19 Nov 2025 15:26:41 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: lan966x: Fix the initialization of taprio
-Message-ID: <4f8b0e67-1cc4-4387-bad3-0c5ae2092f52@lunn.ch>
-References: <20251117144309.114489-1-horatiu.vultur@microchip.com>
- <11ca041a-3f5b-4342-8d50-a5798827bfa7@lunn.ch>
- <20251119082646.y3afgrypbknp2t2g@DEN-DL-M31836.microchip.com>
+	s=arc-20240116; t=1763562642; c=relaxed/simple;
+	bh=BwZ69VMzFOzMAhCNfuEn1G4/kYJvBPDd2luYOFErFS0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Kdsl/+YJPmUbhla80ZiDX8b9OZAP4j3ucT/91q7Z6J0PdFRUsL+4Cw68o6YvWXwR4j6amVrTtAv+VbADW0DrEO96SLNy1wLGkvxvUQkn46lc3NQ1cLVpq7vgF/EaRB/ORGjhZa6RGRSM4WKaraa6n54/E4NVBux5a4DE4OvmndM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VK68FZ10; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E925C19422;
+	Wed, 19 Nov 2025 14:30:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763562642;
+	bh=BwZ69VMzFOzMAhCNfuEn1G4/kYJvBPDd2luYOFErFS0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VK68FZ10itKRR5w4jeeL4PkRMlb2C392aYpZVOeRWp6Foduv8XyvKJT2wMpGrYyIF
+	 0ffI4mkrbMosK5w04H9zpcKIO/0hJTQY++AtEumgHxAzogPtmeLuFO4Ecns9Zzntca
+	 ioWc9t0l0kIzPkUe3ldsvJFAl3IgsAiWVQCNCWNc4BbqgJSf8Kqz+WA2OD0hm8kvWa
+	 SKGyRmb3/B4Gwrxy4pq/8Tdz/I1pfO+GLmfQwN5CRdPn7Pc3JjqsoMe+ucGl67Qjl0
+	 5LQZfRZWTQt3rNrfeg/9D6LmHpkvrOKPCDDy8FXVTwg9dpoT5priWEmPnY9bRmjT/n
+	 VDAqNuqzd0JCQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E2C380AA44;
+	Wed, 19 Nov 2025 14:30:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251119082646.y3afgrypbknp2t2g@DEN-DL-M31836.microchip.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: hci_sock: Prevent race in socket write iter
+ and
+ sock bind
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176356260726.811862.764219010634757763.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Nov 2025 14:30:07 +0000
+References: <tencent_279508EB2AECDECC2C79466F582D896E980A@qq.com>
+In-Reply-To: <tencent_279508EB2AECDECC2C79466F582D896E980A@qq.com>
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: syzbot+9aa47cd4633a3cf92a80@syzkaller.appspotmail.com,
+ johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org,
+ netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 
-On Wed, Nov 19, 2025 at 09:26:46AM +0100, Horatiu Vultur wrote:
-> The 11/18/2025 20:20, Andrew Lunn wrote:
-> 
-> Hi Andrew,
-> 
-> > 
-> > On Mon, Nov 17, 2025 at 03:43:09PM +0100, Horatiu Vultur wrote:
-> > > To initialize the taprio block in lan966x, it is required to configure
-> > > the register REVISIT_DLY. The purpose of this register is to set the
-> > > delay before revisit the next gate and the value of this register depends
-> > > on the system clock. The problem is that the we calculated wrong the value
-> > > of the system clock period in picoseconds. The actual system clock is
-> > > ~165.617754MHZ and this correspond to a period of 6038 pico seconds and
-> > > not 15125 as currently set.
-> > 
-> > Is the system clock available as a linux clock? Can you do a
-> > clk_get_rate() on it?
-> 
-> Unfortunetly, I can not do clk_get_rate because in the device tree for the
-> switch node I don't have any clocks property. And maybe that is the
-> problem because I have the system clock (sys_clk) in the lan966x.dtsi
-> file. But if I go this way then I need add a bigger changeset and add
-> it to multiple kernel trees which complicate the things.
-> So maybe I should not change this patch and then create another one
-> targeting net-next where I can start using clk_get_rate()
+Hello:
 
-This is fine as is. But maybe rather than use the magic number, add a
-#defines for the system clock rate, and convert to pico seconds in the
-code, and let the compiler do it at compile time. The code then
-documents what is going on.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-	Andrew
+On Sun, 16 Nov 2025 17:04:43 +0800 you wrote:
+> There is a potential race condition between sock bind and socket write
+> iter. bind may free the same cmd via mgmt_pending before write iter sends
+> the cmd, just as syzbot reported in UAF[1].
+> 
+> Here we use hci_dev_lock to synchronize the two, thereby avoiding the
+> UAF mentioned in [1].
+> 
+> [...]
+
+Here is the summary with links:
+  - Bluetooth: hci_sock: Prevent race in socket write iter and sock bind
+    https://git.kernel.org/bluetooth/bluetooth-next/c/1f738d68430c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
