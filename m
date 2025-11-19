@@ -1,94 +1,150 @@
-Return-Path: <netdev+bounces-239999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 518F8C6F173
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:58:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 175A6C6F0F8
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:54:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6A4B0349C05
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:50:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 1AD7F2EC50
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:54:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A94135FF6C;
-	Wed, 19 Nov 2025 13:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61431364045;
+	Wed, 19 Nov 2025 13:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="a8a4xmrQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VAutWhz3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="RQAH5RXp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D988C3557FE
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 13:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5965A3559C8
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 13:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763560233; cv=none; b=IRiaAgo9iNgFP5bH3/Z0MoRmNecPgulAwjZBf8DQQzrKVoYsHD3p0Qnde188oJo3KU/tsn92bye0zHcb+/D2sWYW41o/5ETR2flvc7tEOdzshlooBq+uhNHTSEos6SicSCFruW0JlEt1Al8Rua9jFXJwYqDUBcDkyS50dUMh0Vs=
+	t=1763560455; cv=none; b=VNb6R8zGRqQ4BbW0IlG7OSINkwged7jrMoic9brFrTS1J59u+9znfXm6gwhM3Gmoz2vR3sCh+cLI6ENdu42kel+cKIlC3GrdiOXWA1ee+gIwr1sA/vSoggbB2cWdmF5bwMezDqTkh1QmQ8e9j4jirVk/HE1E1wtV11Itr3b49+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763560233; c=relaxed/simple;
-	bh=rC4b9BwnLMbuU6/Bt66vkcwMTBq+TjDi1dDyp3cEDWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oKZILHnkD/Jto452C5VSi9kNAcJLsx1wlwtHQZkTpPD8g8e7wC6QBuHNDHt99tWL1WjM9DU+FrKxUgTei/OAwTgVyz2A1k0vpvV3nPw9Ry8xVNc9H9C2n6q0czsA+XlGKk0kw9b1TUCQ8nxez7jxlWmELXos4xkKtBdT5oWetnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=a8a4xmrQ; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id D470EC11188;
-	Wed, 19 Nov 2025 13:50:05 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 1009560699;
-	Wed, 19 Nov 2025 13:50:28 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 17D011037165D;
-	Wed, 19 Nov 2025 14:50:22 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763560227; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=rC4b9BwnLMbuU6/Bt66vkcwMTBq+TjDi1dDyp3cEDWo=;
-	b=a8a4xmrQ/O74uqrDByWv9onj9aRteHrV2naKEWLR3MgGiR46WZ9YiTRYKYxk3zDEHwKw1u
-	fSoTPh0M+ToNGU0zVdT9UHWSChhda/5EFv4tFb8OY/xwYIOv7o3zkTi5hrdVVTSZTvQvYk
-	vj4lcBpqm0DOIyFJrwHMEAZ5JW/MS4KCYApU7e9SjCJcyLIdprGZDBzQ1MfEXiSqfvZhSU
-	JBwBVUD/7T5DaiBT0hyPbTnmfn8PInIc/T2zAk/D+aFHSA2tgBGGJVuv9SbnmHWHLn2Hek
-	1sKr5qqV9CtVW8j5jMU4Z6ZdZCKd/HuX4oMs2bCdOQ2cqGH20EXzQPb4uqyk1Q==
-Date: Wed, 19 Nov 2025 14:50:21 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Russell King <linux@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrei Botila
- <andrei.botila@oss.nxp.com>, Richard Cochran <richardcochran@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Jacob Keller <jacob.e.keller@intel.com>,
- bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/9] phy: rename hwtstamp callback to
- hwtstamp_set
-Message-ID: <20251119145021.762b57df@kmaincent-XPS-13-7390>
-In-Reply-To: <20251119124725.3935509-2-vadim.fedorenko@linux.dev>
-References: <20251119124725.3935509-1-vadim.fedorenko@linux.dev>
-	<20251119124725.3935509-2-vadim.fedorenko@linux.dev>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1763560455; c=relaxed/simple;
+	bh=vdD/z1H/NGSD2CgcxQDbI9+TnzdvYKd67NdxZFVWUJ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X39BCiWpM9tSlvGDurxgz9s/oYUNR7DtwnDzXW+oZ7n1Sdi59i+G6bnWloXBFAfJfBN0KMSaMaxrie8JP5IPlfwMxQA/wlLRkIWhqsS5CCZWLt5JF6Kn3eMvIHl1fHMCrvMtqBTPHVLBG4NTose8FWqRPeeNW5Dn0G11RRIsCGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VAutWhz3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=RQAH5RXp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763560450;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LMQhc2GyWc9uyu5idju6PCesOmACkvvX3yAV0Jzw2sk=;
+	b=VAutWhz3x3IMA+tJjmGW3XnOrm6HKGAYLUFJmOUs4aNwziT1b5+Jbbwcb8uAhw7rpqEgnX
+	fYLTxRTphtl2XDu0tXjI3nDyutRnlpmQlM6bY/nOgD/GF+lDExGDwakmLtuKQm69HtMYPA
+	io5PMHclOlFQqyPyygSm7Wf95VILBBw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-107-dbW5tuMkNSKuP_g0fmsTig-1; Wed, 19 Nov 2025 08:54:09 -0500
+X-MC-Unique: dbW5tuMkNSKuP_g0fmsTig-1
+X-Mimecast-MFC-AGG-ID: dbW5tuMkNSKuP_g0fmsTig_1763560448
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477a1e2b372so33313855e9.2
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 05:54:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763560447; x=1764165247; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LMQhc2GyWc9uyu5idju6PCesOmACkvvX3yAV0Jzw2sk=;
+        b=RQAH5RXpbSJ1rT3ZV536B+ptOLv3KkEMQE9+8k+MPevWf3aeRpPlpe7Hqet9FdBycb
+         keW6hGWHwfIFJRoXQsoouNZNVgbYprveOOzxngc8msPqMbeME5EV5JSuTj2TZIP+Zunx
+         n6TdxtE1hRk7tBnx4M6RqLnAG3LuEtqYQu5YGpv3oBM0mYiZVt8j2CPzo7EIelDMhoED
+         Sc64JCQQMTiaaQ24iwE3qV+bu5zrJdShQ8+AJyGSd8tPZgtKpp3J1fmc+zyY4zxVY2S0
+         0NJrs8BZ3Sddv4dE4AzJ0Gc/V13XJtuO/rgl6fSwDrvQazokkHdS6VT5nfRHVA5ipqDI
+         82oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763560447; x=1764165247;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LMQhc2GyWc9uyu5idju6PCesOmACkvvX3yAV0Jzw2sk=;
+        b=herXF/xkuBqfYE6Z9KKaLrVPC2ZhkqHxFTRMp7cjYPU5OPJAYkalrW6SRkHP7AmezY
+         ceHyRZ23hap9xBxJ4vUwMbdKgYXOJrrn81M//EmgDXAXqiDO0FCu0cOjxVSG4VsWnMAb
+         7IS2jITtbc+37HkAjD97JAMxXXTMbgnzcuajftdSH6wScthn4hoiyHMrNwA25Xc5seSI
+         N5mOdWz509zCDewPUCzT+QLUXcDa8RrdmEMa5DXDx6ZKC8h6ofpk/Ho1ccL4DuuFuNpk
+         U31H8x9sV05uFvlWtKNsUBuAPlkR7BqiKaJbvCgmwvLvjBZHk8k/Xq+o0ev26+OrDn95
+         MN4g==
+X-Gm-Message-State: AOJu0YwIiLm4mQMSqoKR3BuxVKvORsfEWjj3iFDo7mk2DI53XK4kfAiU
+	3zl174mK6R1/FXepUE2IUrnscwPr2/s8bdRrVKR89NqrXIDYhm8rmWRZlAR6A/zuALcTwovPDpg
+	Wr9y0S+fEZKmKsRW7U9ZD0OZqcGCu41PMinpweLh6IkSp8WzgV97TR62ho/I30h6eBxGWbLwxWv
+	TlHN0kEQg3uPuyLHiQhGpt+nSaPtgsfp+6ln0DZYab5Zjg
+X-Gm-Gg: ASbGnctd5sRJmDKYiJ0907px7zWVvRjG9FWsfnVPWQJhcsQZ2WJxwXNGQfF4TCtZsLI
+	d6UXZGPFC4ihXDW/OqnbsMI1798h0DEgsR2lJ2j1XTJo0A5DILgicO7ZVbtiitIUwxjw63fHLqh
+	pQuNPvwX0eV62aGTYVQGPpJkt6VZw06gMBzs0eRvzxgKtRP7aRtw3EQXR3YQVBsNvWElfh+/ILe
+	//FAFdiSJ5abzFcQICvNiByGdAFs4Be1A6Y6MGIQRUSVX8AMfuj5NCboK6gS9fQNippzHbDB0FM
+	nCauFGQBSpxQ9CJ6tVyjNmQAqWKZJlxF4heRe+06ok7P1pIZT9HlpvLlANgBb2KTehp93ruWERq
+	4b53dhIgNLjZBDXVS/A4k7YUAhBZkuNcYXAC0PgvLmRFEXt/VKQ==
+X-Received: by 2002:a05:600c:a05:b0:475:da1a:5418 with SMTP id 5b1f17b1804b1-4778fe55465mr177259505e9.1.1763560446951;
+        Wed, 19 Nov 2025 05:54:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHpKwklYtjYG58EPBtrSyHrM5/GRdUfxe+KtacxJxPjhTsatzjqf5qMBg22UqZ+NYappiYBLA==
+X-Received: by 2002:a05:600c:a05:b0:475:da1a:5418 with SMTP id 5b1f17b1804b1-4778fe55465mr177259125e9.1.1763560446508;
+        Wed, 19 Nov 2025 05:54:06 -0800 (PST)
+Received: from localhost (net-130-25-194-234.cust.vodafonedsl.it. [130.25.194.234])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a9deb126sm40145975e9.9.2025.11.19.05.54.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Nov 2025 05:54:05 -0800 (PST)
+From: Paolo Valerio <pvalerio@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH RFC net-next 0/6] net: macb: Add XDP support and page pool integration
+Date: Wed, 19 Nov 2025 14:53:24 +0100
+Message-ID: <20251119135330.551835-1-pvalerio@redhat.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 
-On Wed, 19 Nov 2025 12:47:17 +0000
-Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
+Testing were performed on Raspberry Pi 5 with upstream kernel
+and all the changes are intended for gem only.
 
-> PHY devices has hwtstamp callback which actually performs set operation.
-> Rename it to better reflect the action.
+The series consists of two main changes:
 
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+- Migration from netdev_alloc_skb() to page pool allocation,
+  enabling skb recycling.
+  This also adds support for multi-descriptor frame reception,
+  removing the previous single-descriptor approach and avoiding
+  potentially large contiguous allocations for e.g. jumbo frames
+  with CONFIG_PAGE_SIZE_4KB.
 
-Thank you!=20
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+- XDP support: Complete XDP implementation supporting all major
+  verdicts (XDP_PASS, XDP_DROP, XDP_REDIRECT, XDP_TX) along with
+  the ndo_xdp_xmit function for packet redirection.
+
+The driver now advertises NETDEV_XDP_ACT_BASIC, NETDEV_XDP_ACT_REDIRECT,
+NETDEV_XDP_ACT_NDO_XMIT capabilities.
+
+Paolo Valerio (6):
+  cadence: macb/gem: Add page pool support
+  cadence: macb/gem: handle multi-descriptor frame reception
+  cadence: macb/gem: use the current queue number for stats
+  cadence: macb/gem: add XDP support for gem
+  cadence: macb/gem: make tx path skb agnostic
+  cadence: macb/gem: introduce xmit support
+
+ drivers/net/ethernet/cadence/Kconfig     |   1 +
+ drivers/net/ethernet/cadence/macb.h      |  42 +-
+ drivers/net/ethernet/cadence/macb_main.c | 680 ++++++++++++++++++-----
+ 3 files changed, 567 insertions(+), 156 deletions(-)
+
+-- 
+2.51.1
+
 
