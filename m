@@ -1,303 +1,164 @@
-Return-Path: <netdev+bounces-239865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E24FC6D3F5
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:54:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8E3CC6D4C6
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:07:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6B6F835C081
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 07:51:18 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 11B333A2B44
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D53329E7B;
-	Wed, 19 Nov 2025 07:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E30533291F;
+	Wed, 19 Nov 2025 07:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MsqSWJYs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gcKA2ACW";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="X6Uz85P8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4738932863B
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 07:49:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206623321D2
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 07:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763538578; cv=none; b=gKwC48YPiMLXELQYD6uwUAOr9aA1jzedQ5mk5Eoq8GL4f9TqMGjQZQkM3ZHpzNqMckuRAPgDZl4QCkdnPBns/MSVmp1+mgfqsuS8v4Xgch4CJs8ajcTRd2p7tmDBAODOu6RPByDn3YhOfWc2AUKNdM3mNohEbaC4fOEmiOHY6DE=
+	t=1763538826; cv=none; b=jK1NLMhP5JUUBj7qn/q9FPh1gMjkG6hKvHf6SBuYlLNdUN1ss4jcFszKn2SITYhfa+18hwZ3oLfW/QjiQkhDC6QDevpUlFKH/jqrgfsaNIvxQOj5uHEVtidFF9YZXxgWXlRRcGqloneDaUPqYuO+qsjaAzbycnKlFtxdDnlU3oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763538578; c=relaxed/simple;
-	bh=PJbVIE+FjlqZXAqh81T+nKN+VWQTjy5oRGltePRw6wo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WxtRNJ9n/5ODve67sqe5Y4LeJwcEqDxLbWhaBf/5SaDIJeE6fzUzmGmARTzuv18Asu9RKbdiJZesvESVaHualInmEiiYxRo8Pi8EiCK72i4GkWLEHuWY8S6yTmfPsw9tBbKNwPAPGPLGW4mSnlxuvME4+NCYnO30DIHYYxvggqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MsqSWJYs; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-42b3c965df5so3708500f8f.1
-        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 23:49:36 -0800 (PST)
+	s=arc-20240116; t=1763538826; c=relaxed/simple;
+	bh=FjYWz+kqKXceeDdZL6A5QBOjG9PhOHQiTLvMhRcd9fo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mhrRVRX8Z33PrN879DikRzq4ojifzUK0zGSwraqvqOeoE+5S3MT8JsqQ2caDbj1kt+8FAWMb3U8ZgHmNXFH0kojz2KN+qNfx92hyt4NYK63wjv9w7Dcs8EzuId+mtxUOYqVKfQ6jhubcdxRhAV6ECs+sqaUk/S6aXzn7TjCcKMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gcKA2ACW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=X6Uz85P8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763538823;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Vucbh5rS/iiazlez28RYwrKcwogXle3E0ZGtqJKXZmQ=;
+	b=gcKA2ACW8C0seUkkSTB+vIbfMCblFkkTq4eQSYlU40nGlNcfbIIQDKHY7/QLXYPTyAkTaw
+	o8PPQ7XgR06vmnVtoX9HQwA13lJu4iOAu+2Ec442SKZXsgZPrK3VVG/M5ZsYwbFYVWljsA
+	7O5mHMZ0IfhG2hcNkwYZ07BbubzUv94=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-277-ylZVxUbdPwCq0UrP1oAQSw-1; Wed, 19 Nov 2025 02:53:41 -0500
+X-MC-Unique: ylZVxUbdPwCq0UrP1oAQSw-1
+X-Mimecast-MFC-AGG-ID: ylZVxUbdPwCq0UrP1oAQSw_1763538821
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477632ef599so2470325e9.1
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 23:53:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763538574; x=1764143374; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3YO8hwlO2C7MvqjPC6EcWcIdUphHn/vVfWOEg+rLhE4=;
-        b=MsqSWJYskP0psn59XxmZ7fbHIW18kVKs1jBUIh+Wglqztw0m9QzkjtBpd8N93QsYgx
-         BCXkaoLOhjF9juCJIxnd515DCycvvSBitnDk6Ns2jhk5MwxjGDxQjmhQ4xWRHB82iNvf
-         DdFtcfIOSfch8bTCNigj314SR/XuUXV4i7HA3cT25uiFWa92f/nqG7mpyXRtrBRQKlhO
-         3tA7QQRee04pfm38e4LseCuEZL7Dl24HR0b9yMZ05g6caqOEUnSBjySdlvaKUUhsf+C9
-         Ob6R1PZNK3eS+k5TptdZ+x5djKteG6tPnJVg/F+Gwq4lH7z+OUlheo6KCmW/1eOAa0d4
-         DtOQ==
+        d=redhat.com; s=google; t=1763538820; x=1764143620; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vucbh5rS/iiazlez28RYwrKcwogXle3E0ZGtqJKXZmQ=;
+        b=X6Uz85P88A4jlXxaR8nmE4rB/eNcUChW1EjpVTd5q4pamdOVI9n8WJdZxge0RY/iyE
+         G2PCajkVD4+pW2H1+SZgXX7QZIqK/FcOUbknKmz4sPTVBrYK1Y62oGWlS0GqBzpwGX9u
+         3A6fT0lyhtLDmG8YFllLXL2RM3PaQZ7xzhHq+PFYtp2QNNj3ncbyg97Kp7ykm3NdENbe
+         HsSYVUa5P8O2le+tljdD1BGRvU0gzxw/53kCu7JebTf/xeoPRdFaCYPVSJSFoHXhrls6
+         zBDC/7KRLcLN/cwk2lMQ8GYnVN5RyDQCWHvoChH08nSe+5PNJFMUY5fzpFNOjRa+wC/7
+         ww0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763538574; x=1764143374;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3YO8hwlO2C7MvqjPC6EcWcIdUphHn/vVfWOEg+rLhE4=;
-        b=r8gAg9ty7CUK+rw8Mcz8al0nH4hF2ynoFkRUBSzgWcwzTmId/4RXA7lpdqrej2J6Zf
-         e6LOFrVn9Ew5xVmHX1VKhDkBGlfmgD/QxFN5TDd6Yq5ss+ftnwatgHkHGn2Kv44CEKZi
-         w/6dcFWmA0KsLqaHtd0geBCm3rEJGM1Lk5L27nFmmN636+MusYwbcF6TRNqMB1mno9yG
-         HOONG7TwQfPart9V7Q0wYqPOni+FYlqPl9KRiB94Bfz1G1xChHnrI5x1mu0VoXE2ZKcn
-         IXCURzAqrEl9tuU2NkSvZUfxUjJFm1ctP+LE+ERcwP1etZi1RfS/shH74fkaIMlhVrfy
-         LcYA==
-X-Gm-Message-State: AOJu0YzKp8DkceVykjCzOmayL9HLjTW8RFn4qIDuwOp4+HfGPitRioso
-	8jD1c5BmBhexoVOfC08kvtY35xrOYv6jrrCtyRewiDOHu8Z6HEwkT9MX
-X-Gm-Gg: ASbGncvhbCbwvCLp55d0SVG4EUyj0/X5QP3TnEg37OMDLK3tTsK622L3a+3l5MEUjNN
-	v9qBQJ+9loYj4tsXhfTRghIAVKYSl4bCW4e3KEPBVS8eaErh/f53sao4/ydqY93BDVE1PwJaevm
-	sM92EqV6+zRY/wSuv8FybGs9G+ehP44Z2Xs/MzEfCOKVvdGs1+fIlBlmiPTLjl4i0DydWLD7D7i
-	Uix1PrDLHMk+QQ1xX3Po/L1itoNu+TdMP7yDnxKzjGdYrBuTiZR+O3HAgInItqRamUDIirJdsxD
-	zSmHL5A+ozRYf+2FmHDevrCjOCl6MevagifIFRnBfXjUaWI7g55SL4B/QWqAC8VSdDiihu+P+KM
-	ZSs4r7Kr0SEOLSAQ0rzRqinwXeW6UcCrHDpKxHgf1BSeJk17QMbjT92pZjc4rHPsivQC/FT2p4V
-	Z36W//cmv8aWe54XtgGQXDld9Z/J6EFAAfJlb/
-X-Google-Smtp-Source: AGHT+IGPDf3n7yw9tmvx3mRMsXmrPnlbEY7oesz8TUWhArbu2lVE770zOvsQLkEdWQLuDspCZ91xzQ==
-X-Received: by 2002:a5d:64e3:0:b0:42b:3592:1b92 with SMTP id ffacd0b85a97d-42b59398992mr19426502f8f.47.1763538574344;
-        Tue, 18 Nov 2025 23:49:34 -0800 (PST)
-Received: from [192.168.1.243] ([143.58.192.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53e91f2dsm37461146f8f.19.2025.11.18.23.49.33
+        d=1e100.net; s=20230601; t=1763538820; x=1764143620;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vucbh5rS/iiazlez28RYwrKcwogXle3E0ZGtqJKXZmQ=;
+        b=Bwrmg52ARa5YJZPmqk1Pg2DIq0MabjmJKNCdPF4GRawzgGEsA89Qk/NG8aWR41i4Tn
+         lKOjyKwLY6lQ8J+igy0A/Ph9AI+t9cmbc+mO6uNxoAu4I4OULV9NtiV45qMeBKJVyrZo
+         k6jQPN+N32ma38J5K8Vyf494G7K30ZCgns3gQoMgnsDHVQA5p77kZ1LK/f/NVROJVzQ5
+         pchXfMuEo99JheczWq/DmLElFfbjXWHwG9CNGAPxYR6rmxFQkLIp/SakDzR4fAxmeSjp
+         bxKh8WX11HRQTObZq7/4ajzIEJWUaITrpzsPJKB2XEQwuu2UPlvsoGpCIourmgeslx5/
+         9UJg==
+X-Gm-Message-State: AOJu0Yxznde4KUFtVLaNCCiXybOhPwtM/mf/DXv+jySZCXctANNXpyDE
+	rVTXJG2JgmHHhhbWj5aTJjEbPa9eH29XAEvYcfrZ5rPLcRY+WeMEZJ18M2LhK67d8b4j2NBqr7S
+	3qXywVrUmJ+Zc7qzFwrer3CnCCSTkaqsZeeI0jhJYUneIMeki0jhiA3TKBw==
+X-Gm-Gg: ASbGncvSt/GLoFQypWX0CEnOowrKxAYCY2WAFuU/u13EtoVr4M/XZXAIwd/y+FfE6Bp
+	n29BVXfTlNKcLwMZjpsqAiFGugs6G+87dYPJz8+hwJ14XQzalocdvDJSM18LVrlI+w9ot6OBS7c
+	oK0B/bI5YvpuEvZJW3y90lrEJpyt84lOMgx9ey21nPy63vBeuquMowpTdAMxSq6s9mPATJbmPmm
+	S1IF/wiiH98Orq/U7wOJN9hRL88P3hFsCCREzEPPMep9hnScD9z/cG1Y+ZsThApSvUN8Ogb2cqT
+	WklRza2W4jXNf0UuVG7kxy7I74Bv+C7W4foXsiGDEhhQdyNOiZpuY/zo0L2ZzYKAC5fm1p2PdHo
+	VoF4n7LsBClZHgKVJmslwpxuOaLx4vw==
+X-Received: by 2002:a05:600c:840f:b0:477:9890:9ab8 with SMTP id 5b1f17b1804b1-477b18b3858mr13385025e9.3.1763538820478;
+        Tue, 18 Nov 2025 23:53:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH6WJ8GNo5TuaYkMGmc4zQd9ybPu8J8JY7frBr6ZZhJdaxc0puxXCryzwZ9nWzJqD3dgyJT/Q==
+X-Received: by 2002:a05:600c:840f:b0:477:9890:9ab8 with SMTP id 5b1f17b1804b1-477b18b3858mr13384625e9.3.1763538819988;
+        Tue, 18 Nov 2025 23:53:39 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b1037d32sm31884905e9.12.2025.11.18.23.53.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 23:49:33 -0800 (PST)
-From: Andre Carvalho <asantostc@gmail.com>
-Date: Wed, 19 Nov 2025 07:49:23 +0000
-Subject: [PATCH net-next v5 5/5] selftests: netconsole: validate target
- resume
+        Tue, 18 Nov 2025 23:53:39 -0800 (PST)
+Date: Wed, 19 Nov 2025 02:53:36 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
+	virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
+	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v11 05/12] virtio_net: Query and set flow filter
+ caps
+Message-ID: <20251119024647-mutt-send-email-mst@kernel.org>
+References: <20251118143903.958844-1-danielj@nvidia.com>
+ <20251118143903.958844-6-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251119-netcons-retrigger-v5-5-2c7dda6055d6@gmail.com>
-References: <20251119-netcons-retrigger-v5-0-2c7dda6055d6@gmail.com>
-In-Reply-To: <20251119-netcons-retrigger-v5-0-2c7dda6055d6@gmail.com>
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Andre Carvalho <asantostc@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1763538567; l=6488;
- i=asantostc@gmail.com; s=20250807; h=from:subject:message-id;
- bh=PJbVIE+FjlqZXAqh81T+nKN+VWQTjy5oRGltePRw6wo=;
- b=3e3WCZ8bN9e7l+IkkBwVS0veQgRbSFvgvYDsAXZseHDhoWoDryCb6ea8Xq+nxulgDN1iEOtph
- 8lttF8bxPr8AEN3OkDmGiY36oKaAFTA97/R4KcvPMGszKou6zzbKryw
-X-Developer-Key: i=asantostc@gmail.com; a=ed25519;
- pk=eWre+RwFHCxkiaQrZLsjC67mZ/pZnzSM/f7/+yFXY4Q=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251118143903.958844-6-danielj@nvidia.com>
 
-Introduce a new netconsole selftest to validate that netconsole is able
-to resume a deactivated target when the low level interface comes back.
+On Tue, Nov 18, 2025 at 08:38:55AM -0600, Daniel Jurgens wrote:
+> +/**
+> + * struct virtio_net_ff_cap_data - Flow filter resource capability limits
+> + * @groups_limit: maximum number of flow filter groups supported by the device
+> + * @classifiers_limit: maximum number of classifiers supported by the device
+> + * @rules_limit: maximum number of rules supported device-wide across all groups
+> + * @rules_per_group_limit: maximum number of rules allowed in a single group
+> + * @last_rule_priority: priority value associated with the lowest-priority rule
+> + * @selectors_per_classifier_limit: maximum selectors allowed in one classifier
+> + *
+> + * The limits are reported by the device and describe resource capacities for
+> + * flow filters.
 
-The test setups the network using netdevsim, creates a netconsole target
-and then remove/add netdevsim in order to bring the same interfaces
-back. Afterwards, the test validates that the target works as expected.
+This sentence adds nothing of substance.
+Pls don't add fluff like this in comments.
 
-Targets are created via cmdline parameters to the module to ensure that
-we are able to resume targets that were bound by mac and interface name.
+> Multi-byte fields are little-endian.
 
-Signed-off-by: Andre Carvalho <asantostc@gmail.com>
----
- tools/testing/selftests/drivers/net/Makefile       |  1 +
- .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 35 ++++++--
- .../selftests/drivers/net/netcons_resume.sh        | 97 ++++++++++++++++++++++
- 3 files changed, 128 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 33f4816216ec..7dc9e5b23d5b 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -17,6 +17,7 @@ TEST_PROGS := \
- 	netcons_cmdline.sh \
- 	netcons_fragmented_msg.sh \
- 	netcons_overflow.sh \
-+	netcons_resume.sh \
- 	netcons_sysdata.sh \
- 	netcons_torture.sh \
- 	netpoll_basic.py \
-diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-index 87f89fd92f8c..239f44d4a45d 100644
---- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-+++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-@@ -203,19 +203,21 @@ function do_cleanup() {
- function cleanup_netcons() {
- 	# delete netconsole dynamic reconfiguration
- 	# do not fail if the target is already disabled
--	if [[ ! -d "${NETCONS_PATH}" ]]
-+	local TARGET_PATH=${1:-${NETCONS_PATH}}
-+
-+	if [[ ! -d "${TARGET_PATH}" ]]
- 	then
- 		# in some cases this is called before netcons path is created
- 		return
- 	fi
--	if [[ $(cat "${NETCONS_PATH}"/enabled) != 0 ]]
-+	if [[ $(cat "${TARGET_PATH}"/enabled) != 0 ]]
- 	then
--		echo 0 > "${NETCONS_PATH}"/enabled || true
-+		echo 0 > "${TARGET_PATH}"/enabled || true
- 	fi
- 	# Remove all the keys that got created during the selftest
--	find "${NETCONS_PATH}/userdata/" -mindepth 1 -type d -delete
-+	find "${TARGET_PATH}/userdata/" -mindepth 1 -type d -delete
- 	# Remove the configfs entry
--	rmdir "${NETCONS_PATH}"
-+	rmdir "${TARGET_PATH}"
- }
- 
- function cleanup() {
-@@ -377,6 +379,29 @@ function check_netconsole_module() {
- 	fi
- }
- 
-+function wait_target_state() {
-+	local TARGET=${1}
-+	local STATE=${2}
-+	local TARGET_PATH="${NETCONS_CONFIGFS}"/"${TARGET}"
-+	local ENABLED=0
-+
-+	if [ "${STATE}" == "enabled" ]
-+	then
-+		ENABLED=1
-+	fi
-+
-+	if [ ! -d "$TARGET_PATH" ]; then
-+		echo "FAIL: Target does not exist." >&2
-+		exit "${ksft_fail}"
-+	fi
-+
-+	local CHECK_CMD="grep \"$ENABLED\" \"$TARGET_PATH/enabled\""
-+	slowwait 2 sh -c "test -n \"\$($CHECK_CMD)\"" || {
-+		echo "FAIL: ${TARGET} is not ${STATE}." >&2
-+		exit "${ksft_fail}"
-+	}
-+}
-+
- # A wrapper to translate protocol version to udp version
- function wait_for_port() {
- 	local NAMESPACE=${1}
-diff --git a/tools/testing/selftests/drivers/net/netcons_resume.sh b/tools/testing/selftests/drivers/net/netcons_resume.sh
-new file mode 100755
-index 000000000000..b9f2d5a7dc59
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netcons_resume.sh
-@@ -0,0 +1,97 @@
-+#!/usr/bin/env bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This test validates that netconsole is able to resume a target that was
-+# deactivated when its interface was removed when the interface is brought
-+# back up.
-+#
-+# The test configures a netconsole target and then removes netdevsim module to
-+# cause the interface to disappear. Targets are configured via cmdline to ensure
-+# targets bound by interface name and mac address can be resumed.
-+# The test verifies that the target moved to disabled state before adding
-+# netdevsim and the interface back.
-+#
-+# Finally, the test verifies that the target is re-enabled automatically and
-+# the message is received on the destination interface.
-+#
-+# Author: Andre Carvalho <asantostc@gmail.com>
-+
-+set -euo pipefail
-+
-+SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
-+
-+source "${SCRIPTDIR}"/lib/sh/lib_netcons.sh
-+
-+modprobe netdevsim 2> /dev/null || true
-+rmmod netconsole 2> /dev/null || true
-+
-+check_netconsole_module
-+
-+function cleanup() {
-+	cleanup_netcons "${NETCONS_CONFIGFS}/cmdline0"
-+	do_cleanup
-+	rmmod netconsole
-+}
-+
-+trap cleanup EXIT
-+
-+# Run the test twice, with different cmdline parameters
-+for BINDMODE in "ifname" "mac"
-+do
-+	echo "Running with bind mode: ${BINDMODE}" >&2
-+	# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
-+	echo "6 5" > /proc/sys/kernel/printk
-+
-+	# Create one namespace and two interfaces
-+	set_network
-+
-+	# Create the command line for netconsole, with the configuration from
-+	# the function above
-+	CMDLINE=$(create_cmdline_str "${BINDMODE}")
-+
-+	# The content of kmsg will be save to the following file
-+	OUTPUT_FILE="/tmp/${TARGET}-${BINDMODE}"
-+
-+	# Load the module, with the cmdline set
-+	modprobe netconsole "${CMDLINE}"
-+	# Expose cmdline target in configfs
-+	mkdir "${NETCONS_CONFIGFS}/cmdline0"
-+
-+	# Target should be enabled
-+	wait_target_state "cmdline0" "enabled"
-+
-+	# Remove low level module
-+	rmmod netdevsim
-+	# Target should be disabled
-+	wait_target_state "cmdline0" "disabled"
-+
-+	# Add back low level module
-+	modprobe netdevsim
-+	# Recreate namespace and two interfaces
-+	set_network
-+	# Target should be enabled again
-+	wait_target_state "cmdline0" "enabled"
-+
-+	# Listen for netconsole port inside the namespace and destination
-+	# interface
-+	listen_port_and_save_to "${OUTPUT_FILE}" &
-+	# Wait for socat to start and listen to the port.
-+	wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
-+	# Send the message
-+	echo "${MSG}: ${TARGET}" > /dev/kmsg
-+	# Wait until socat saves the file to disk
-+	busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+	# Make sure the message was received in the dst part
-+	# and exit
-+	validate_msg "${OUTPUT_FILE}"
-+
-+	# kill socat in case it is still running
-+	pkill_socat
-+	# Cleanup & unload the module
-+	cleanup
-+
-+	echo "${BINDMODE} : Test passed" >&2
-+done
-+
-+trap - EXIT
-+exit "${ksft_pass}"
+You do not really need to say "Multi-byte fields are little-endian."
+do you? It says __le explicitly. Same applies to all structures.
+
+> + */
+> +struct virtio_net_ff_cap_data {
+> +	__le32 groups_limit;
+> +	__le32 classifiers_limit;
+> +	__le32 rules_limit;
+> +	__le32 rules_per_group_limit;
+> +	__u8 last_rule_priority;
+> +	__u8 selectors_per_classifier_limit;
+> +};
+
+so the compiler adds 2 bytes of padding here. The bug is
+in the spec.
+
+I think this happens to work for people because controllers
+either also added 2 bytes of padding here at the end,
+or they report a shorter structure and
+the spec says commands can be truncated.
+So I think we can just add 2 bytes of padding at the end
+and it will be harmless.
+
+It is a spec extension, but a minor one.
+
 
 -- 
-2.52.0
+MST
 
 
