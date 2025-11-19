@@ -1,186 +1,226 @@
-Return-Path: <netdev+bounces-239980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E532C6E990
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:53:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2123C6EA26
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:59:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id E24F92E95C
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 12:53:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 9671C2A3B1
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 12:59:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A953F35C185;
-	Wed, 19 Nov 2025 12:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F0D311968;
+	Wed, 19 Nov 2025 12:59:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XyBNZwEk";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="C7C/e5Ox"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="C8lYSGtM";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="O+PdprZc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE8C354AF1
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 12:49:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E02D2DCF5D
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 12:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763556543; cv=none; b=bK0ba6L25QfbUa8TLD9q8lDBMululp//apE8WDZtetqC0+BqW1JhGpFIrllPMQaiA3Js0QxwzWVe9vkrrJLbXQ5sbh3VD5ujiBL9o30QbMIye1QiJ+mqkK3LEfw5/44UesFJ9tlZgH2XZsjpA2gUegJflXoRfnCn2cMFbUbNafU=
+	t=1763557145; cv=none; b=ru/Cdi0N7WmkaiOdcuq47yKtdiItZ17WTJ+TMdW2FJYuTkMGcw1wRvR2Z4qI+o1m3llB59UmZxWXou6ceePz+nLgHbZA52RUxLGtI4zAMm8Z5zXrFNyHjUIw2GNlwSgXRwfQ83x2phZSbJcTCOt4ON+xieA9i3JOuXxn3TMULmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763556543; c=relaxed/simple;
-	bh=UZNBewuvwkPWj+bu4O3n8vX8SbsHsZYXgD064ZW+wME=;
+	s=arc-20240116; t=1763557145; c=relaxed/simple;
+	bh=R4entDCq94AuEGtP5w7qfitkVN7YwG/0+GrBuf7vwis=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AWj9lf9qcXSt0cE1xfvh+wN+hC4r1bTLp+o0imjCg/LsKFgBkW9q/AaaGTPSxfnridlpmaF7E4MiJxQa1InEiwsQpEydOF5FkUZ2OBASQ0DkEJDSZpuXVvxyUUokwkvGBK84unH/ubdpHG6nRRyfpBZSLjqQAzxd83drZ8azqD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XyBNZwEk; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=C7C/e5Ox; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763556540;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=efzFAXa6AqvKlr68xmTUgqr7OrHhr6l1HfrVAauk7zk=;
-	b=XyBNZwEk4nm5xu8Yv7jWIJ/bNwmTNI3iLJ5GtfGLmr3CQ1uu36W5hfNm/vUytmf2Rj/3RQ
-	/F8MMMGYrS6Tr4PtgsIqo8fc1QpsNBJSNeEt8Mu+TZ/6nAyxarHPA7tY+KK8e489BYw+by
-	vEvuO8js/hzEO7r8ZtWVWo3kNUEwheU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-346-ZMhEo3FQMUuC8guTeysVCQ-1; Wed, 19 Nov 2025 07:48:59 -0500
-X-MC-Unique: ZMhEo3FQMUuC8guTeysVCQ-1
-X-Mimecast-MFC-AGG-ID: ZMhEo3FQMUuC8guTeysVCQ_1763556538
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4775e00b16fso40958505e9.2
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 04:48:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763556538; x=1764161338; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=efzFAXa6AqvKlr68xmTUgqr7OrHhr6l1HfrVAauk7zk=;
-        b=C7C/e5OxFboNzS8m1t5dKea5dZs0Nqemx5VNAyS4V2udOfYctUTj2De0vzprMRklfA
-         n3w1Mgd3TzD+NnHKap47yfCXshuADswNZhBjdS5qSODybS5FAOpg6k9f31+v9Mog2g9A
-         YHqc3dmZuEZ0SSZocHliCffdTUluxvJ+/3rHUi6olkh/k4BhILq29ruCCEphYB4ChMtz
-         ftlIA1IXwMgRJoIWAWH8U6pK8wcgkcZGxdr2uZfmWFIs/zfWGAWckGcvF5U1dYqmLryG
-         UQoarNVJZbwkOtckDW5yHCMhPJXb9OCo1yUfjTj3TvrtncLybSNM9tNlI4NdGpBUnSjD
-         +OpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763556538; x=1764161338;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=efzFAXa6AqvKlr68xmTUgqr7OrHhr6l1HfrVAauk7zk=;
-        b=oua3u8rKvXP+SUT3U0hz2r7yvyoo4bz7CIkTE2hC2AwYeFahHujz8UN6pOkoGA8nIL
-         KwFtk4/zqS8AAWr5Xp5yx0S8pm+D6uuZQlUHYaVjbgZOmzD0lbMS+rH3AhNET03miY9E
-         cQ+UFJHogpzZbG5+Hqy8fUNlaVYItJ1iQbeNkoLeeCnqFOTH+XP9Utv2elij/D8N+TBk
-         Kkw/c+bkEK8l9bT9Klk/e2OOYrcemJ5lsYFRP+DafK49SCiRazB/CoZJ9Sz9YJECBEqY
-         mkW5X4vQmi2G0iXIaLmgNkAEzvYJm2NAQaJ17h5SWOGVSWWf+YZNu+odphS75YZKq1PE
-         y9OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUVMd7hB5zMtMKMALu0C7TGYeO+37nvd0wIHfvapgLA8Vzj5/jgmA1zU4AcXc0gcudfthOFuc4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkkXFyu5cIJDxw4KWy20u7oBgg3GLQhSo0BnjwtW091SuDekJn
-	dgE4lxA+SXqsbr5awVUyGKuXCrtOZJmLt5xplC9dzJpu7RHsT/CSIHDHNqBrFk2vMiqOCZNaqdU
-	sOCsfauOq1Kn0jtk/RpLRc0SZ6AXmIU+eKCyDqrQcyQucnPnxEU8H0ztLvQ==
-X-Gm-Gg: ASbGncsBj0JRXhvgdhdGZb0EtQhbGUwg2CFV8f62ZDbi11UKISDSC9K2D+umGJuOqq9
-	xi6PUUBPOhXtVtaWvv0Dts5eUZYvM6RcFsPmd32U6/wAInYSf2+Ua/cSYaWmBSVfxeeHimac6oP
-	EwkNFz8UMMebAuu00fzcNSDECRhSzJFAu8NMJAbuYMp0f1hNHMFGgYzX/RL3egttRSMUGcz5xdc
-	jnxZr1UQCkrJwvgys/WjDmV1hIkHEhSISmTTz28VOZaQCaKYbJGmuEWloUHczM3Vmg9ZJ+VBgNJ
-	7VkyODuyv2OF4rU3c4AJr87NIcAwZyp873tOucsqEHBvbHvVoxwCC+TW0Gx1Ynlwz2M4PC+P3Ap
-	UEu21Lpg3qHOUAK4EY/cxaAOkTEvEuw==
-X-Received: by 2002:a05:600c:45c4:b0:477:7658:572a with SMTP id 5b1f17b1804b1-4778fea84d9mr173008215e9.20.1763556537874;
-        Wed, 19 Nov 2025 04:48:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF3vS0uApFcgFVlL2gt/R9GTQH3kJDQoD3RSC3xgY4lk5mLnK8+RM+7y+ofmIidRok8jpEiHw==
-X-Received: by 2002:a05:600c:45c4:b0:477:7658:572a with SMTP id 5b1f17b1804b1-4778fea84d9mr173007825e9.20.1763556537409;
-        Wed, 19 Nov 2025 04:48:57 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a9e19875sm38753245e9.16.2025.11.19.04.48.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 04:48:56 -0800 (PST)
-Date: Wed, 19 Nov 2025 07:48:53 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Mike Christie <michael.christie@oracle.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: [PATCH v5 2/2] vhost: switch to arrays of feature bits
-Message-ID: <20251119074746-mutt-send-email-mst@kernel.org>
-References: <cover.1763535083.git.mst@redhat.com>
- <fbf51913a243558ddfee96d129d37d570fa23946.1763535083.git.mst@redhat.com>
- <4204ed4b-0da1-407f-84e0-e23e2ce65fc7@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RRmzqJur2ufaaMTCE66VIKIhlkS7X6kZIsI41WHqz4TSb22PWUkw7nymnDFUJMJhBh+h0cHRzO4nItY6d1HbAcG5TBRJXAWQU6mkJujpKe5s23SPgjKUV9IsaH3jY25y5SkM+ST5ZD1wvr/usGkWSPYhlbdLK6xPqeSujgiNdIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=C8lYSGtM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=O+PdprZc; arc=none smtp.client-ip=202.12.124.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id 19EB11D0016A;
+	Wed, 19 Nov 2025 07:58:59 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Wed, 19 Nov 2025 07:58:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1763557138; x=
+	1763643538; bh=13eP7Wbg+SvzNZ0BgOogCk4y6i5sHlypruTU0fAPebQ=; b=C
+	8lYSGtMA32M9C73LDJFoN0A48Dwph8UMj5IjGZriq7MabRKnJvUYhIp7qQgBWzsT
+	13Ba3tyUYCQ6YibXb+jdnBU4Zb0++EJz7BgginFcXt9mCRQbj3CYRF9bTiz3jNZz
+	KoCZ3eghxTZfAB641PjVwEQXuW1PpmK0E8siq2UG0E/KtihHyTjryeP6tZzVqO88
+	+cqSZf0U3pfX6D9DiUdAg2XrAfX549bIorWmgBjTcuY0i7AlBgHUgdkeLwFhzGgZ
+	uuFWHqWZ50q8WJtzlpk2R/AOFsPVlEQgjivei/8c8E3e/UpTWhtAcsiEKNeCjRLq
+	IBqkL4m7dfzJ2NqbFe9Uw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1763557138; x=1763643538; bh=13eP7Wbg+SvzNZ0BgOogCk4y6i5sHlypruT
+	U0fAPebQ=; b=O+PdprZc0Px07+8JMnuWi99kZ3fIGjq+nDRf/1Byf/lKYCl+v5u
+	C63TSvNGuC9vySZBNm2TwgAF2RPOysqtAkqwWxeUzZ9hyb5lNOLNKirzHzGsuBpD
+	FaMNovie73DpVVPaULTQPv7M9mp0iQ5+IXO/YbtlEtVD8OmyZsalTVe0Ga19/6uM
+	4NQhoL76ZqnR008laS1vWzpL+SVbQ2kz8KHKVx0CLrIlMqkz2+PXxDyoo9cPBJ/M
+	YHqnopJyUyb5G58HilVFxtPrfx1QcKqxXSKMqz/sovDuB3znf4EackU/Y9lU6l83
+	kUuTXJuwl0HPohuzxJoMAaO6W/UR3syCEHA==
+X-ME-Sender: <xms:Eb8daSvxx_TOKoX8al1SLDJlTMa8doPEljsHWTMPlAiDktvjgR00jA>
+    <xme:Eb8daTUkV3C5AjoO7T09KIt_SZaatPFEgdxVoEbOvksEJ8c5JPjA1pYKF4eYguc9i
+    JcQuB53UnmPDpWMLIppQ1OFx3ZvVyOWCadAThUP1STD04dLJ7Cf9hs>
+X-ME-Received: <xmr:Eb8daawjSUaOl0o6YCaMbRkCkmd5s5KnO2VeJ8YGm1NrVESd5rkpaarYlvs3>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvdegvdeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduuddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepjhhirghnsgholhesnhhvihguihgrrdgtoh
+    hmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsrg
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhht
+    sehsvggtuhhnvghtrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrd
+    grphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpth
+    htohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-ME-Proxy: <xmx:Eb8daSEj8mrm8JF20pYBCdqGHOf1nsJjvJX6rWb5-EooygL9RUf2YA>
+    <xmx:Eb8daXvUZd3yJCg-nWg38rhCQmZr-PBkRukZH00jOaZ8lvpXbxl-XQ>
+    <xmx:Eb8daaA3VH9lKEVETJ8U9D9GLEaz_ao0m5_DpZgt6QBNENlzdYDmVQ>
+    <xmx:Eb8daaAF4C51BZtZl6pmIAGSPko0N7eIxL3YKGVSXfQqUc3rkmzGMQ>
+    <xmx:Er8dab7U0LzsrYClOgGrh-YqiV6z_BB5lQBEZ0FoTXgNwGkNfflBsJNU>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 19 Nov 2025 07:58:57 -0500 (EST)
+Date: Wed, 19 Nov 2025 13:58:55 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jianbo Liu <jianbol@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	steffen.klassert@secunet.com,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH ipsec] xfrm: Fix inner mode lookup in tunnel mode GSO
+ segmentation
+Message-ID: <aR2_D3iEQvAklDEW@krikkit>
+References: <20251114035824.22293-1-jianbol@nvidia.com>
+ <aRpaNMxGlyV_eAHe@krikkit>
+ <d18ab53f-b91b-4c64-926f-4a1466d2d31e@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <4204ed4b-0da1-407f-84e0-e23e2ce65fc7@redhat.com>
+In-Reply-To: <d18ab53f-b91b-4c64-926f-4a1466d2d31e@nvidia.com>
 
-On Wed, Nov 19, 2025 at 12:04:12PM +0100, Paolo Abeni wrote:
-> On 11/19/25 7:55 AM, Michael S. Tsirkin wrote:
-> > @@ -1720,6 +1720,7 @@ static long vhost_net_set_owner(struct vhost_net *n)
-> >  static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
-> >  			    unsigned long arg)
-> >  {
-> > +	const DEFINE_VHOST_FEATURES_ARRAY(features_array, vhost_net_features);
+2025-11-17, 10:12:32 +0800, Jianbo Liu wrote:
 > 
-> I'm sorry for the late feedback, I was drowning in other stuff.
 > 
-> I have just a couple of non blocking suggestions, feel free to ignore.
+> On 11/17/2025 7:11 AM, Sabrina Dubroca wrote:
+> > 2025-11-14, 05:56:17 +0200, Jianbo Liu wrote:
+> > > Commit 61fafbee6cfe ("xfrm: Determine inner GSO type from packet
+> > > inner protocol") attempted to fix GSO segmentation by reading the
+> > > inner protocol from XFRM_MODE_SKB_CB(skb)->protocol. This was
+> > > incorrect as the XFRM_MODE_SKB_CB(skb)->protocol field is not assigned
+> > > a value in this code path and led to selecting the wrong inner mode.
+> > 
+> > Your testing didn't catch it before the patch was submitted? :(
+> > 
+> 
+> I admit I didn't test all the cases for the previous submission, but I have
+> tested all the cases now with this fix.
+> 
+> > 
+> > > The correct value is in xfrm_offload(skb)->proto, which is set from
+> > > the outer tunnel header's protocol field by esp[4|6]_gso_encap(). It
+> > > is initialized by xfrm[4|6]_tunnel_encap_add() to either IPPROTO_IPIP
+> > > or IPPROTO_IPV6, using xfrm_af2proto() and correctly reflects the
+> > > inner packet's address family.
+> > 
+> > What's the call sequence that leads to calling
+> > xfrm4_tunnel_gso_segment without setting
+> > XFRM_MODE_SKB_CB(skb)->protocol? I'm seeing
+> > 
+> > xfrm_output -> xfrm_output2 -> xfrm_output_one
+> >   -> xfrm_outer_mode_output -> xfrm4_prepare_output
+> >   -> xfrm_inner_extract_output -> xfrm4_extract_output
+> > 
+> > (almost same as what ends up calling xfrm[4|6]_tunnel_encap_add)
+> > so XFRM_MODE_SKB_CB(skb)->protocol should be set?
+> > 
+> 
+> I think we both made mistaken.
+> a. XFRM_MODE_SKB_CB(skb)->protocol is assigned in that path, but it is
+> assigned the value from ip_hdr(skb)->protocol. This means it holds the L4
+> protocol (e.g., IPPROTO_TCP or IPPROTO_UDP). However, to correctly determine
+> the inner mode family, we need the tunnel protocols (IPPROTO_IPIP or
+> IPPROTO_IPV6), which xfrm_af2proto() expects.
+
+(not "expects" but "returns"? or did you mean
+s/xfrm_af2proto/xfrm_ip2inner_mode/?)
+
+Ah, right. Thanks. Then please update the commit message to explain
+that XFRM_MODE_SKB_CB(skb)->protocol is not the right value, rather
+than being unset.
+
+> b. Furthermore, XFRM_MODE_SKB_CB(skb) shares the same memory layout as
+> XFRM_SKB_CB(skb). This area can be overwritten during the transformation
+> process (for example, in xfrm_replay_overflow and others), making the value
+> in XFRM_MODE_SKB_CB unreliable by the time we reach GSO segmentation.
+
+Ok, that could also happen.
+
+> > Also, after thinking about it more, I'm not so sure that
+> > xfrm_ip2inner_mode is wanted/needed in this context. Since we already
+> > have the inner protocol (whether it's via xo->proto or
+> > XFRM_MODE_SKB_CB(skb)->protocol), and all we care about is the inner
+> > family (to get the corresponding ethertype), we can just get it
+> > directly from the inner protocol without looking at
+> > x->inner_mode{,_iaf}? (pretty much just the reverse of xfrm_af2proto)
+> > 
+> 
+> I still prefer to reuse the logic in xfrm_af2proto()/xfrm_ip2inner_mode for
+> two main reasons: a. It keeps the code easier to understand by using
+> standard helpers rather than open-coding the reverse mapping. 
+
+We don't have to open-code it, we can add something like
+
+static inline int xfrm_proto2af(unsigned int ipproto)
+{
+	switch(ipproto) {
+	case IPPROTO_IPIP:
+		return AF_INET;
+	case IPPROTO_IPV6:
+		return AF_INET6;
+	default:
+		return 0;
+	}
+}
 
 
-Oh this is really nice.
-I did exactly this and the diff is smaller while the compiler
-was smart enough to figure it out and the generated code is the same.
+I don't think xfrm_ip2inner_mode, which does "if [some ipproto value]
+and [some x->* property] match then use inner_mode, otherwise use
+_iaf", is easier to understand. To me it seems clearer to add
+xfrm_proto2af.
 
-Thanks!
+
+And looking for all uses of inner_mode_iaf, I'm not sure we need this
+at all anymore. We only use inner_mode_iaf->family nowadays, and
+->family is always "not x->props.family" (one of AF_INET/AF_INET6), or
+0 with unspec selector on transport mode (makes sense, there's no
+"inner" AF there). (but that's a separate issue)
 
 
-> I think that if you rename `vhost_net_features` as
-> `vhost_net_features_bits` and `features_array` as `vhost_net_features`
-> the diffstat could be smaller and possibly clearer.
-> 
-> >  	u64 all_features[VIRTIO_FEATURES_U64S];
-> >  	struct vhost_net *n = f->private_data;
-> >  	void __user *argp = (void __user *)arg;
-> > @@ -1734,14 +1735,14 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
-> >  			return -EFAULT;
-> >  		return vhost_net_set_backend(n, backend.index, backend.fd);
-> >  	case VHOST_GET_FEATURES:
-> > -		features = vhost_net_features[0];
-> > +		features = VHOST_FEATURES_U64(vhost_net_features, 0);
-> 
-> Here and below you could use directly:
-> 
-> 		features = features_array[0];
-> 
-> if you apply the rename mentioned above, this chunk and the following 3
-> should not be needed.
-> 
-> [...]> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-> > index 42c955a5b211..af727fccfe40 100644
-> > --- a/drivers/vhost/test.c
-> > +++ b/drivers/vhost/test.c
-> > @@ -308,6 +308,12 @@ static long vhost_test_set_backend(struct vhost_test *n, unsigned index, int fd)
-> >  	return r;
-> >  }
-> >  
-> > +static const int vhost_test_features[] = {
-> > +	VHOST_FEATURES
-> > +};
-> > +
-> > +#define VHOST_TEST_FEATURES VHOST_FEATURES_U64(vhost_test_features, 0)
-> 
-> If you rename `VHOST_FEATURES` to `VHOST_FEATURES_BITS` and
-> `VHOST_TEST_FEATURES` to `VHOST_FEATURES`, the following two chunks
-> should not be needed.
-> 
-> Thanks,
-> 
-> Paolo
+I'd be ok with using xfrm_ip2inner_mode for this fix and trying to
+clean this up later in -next.
 
+> b. It keeps
+> the logic directly related to the xfrm configuration and state properties.
+> 
+> Thanks!
+> Jianbo
+> 
+
+-- 
+Sabrina
 
