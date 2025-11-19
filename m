@@ -1,166 +1,148 @@
-Return-Path: <netdev+bounces-239843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 678B1C6CFFD
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 07:58:16 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 290FFC6D04A
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:03:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 37BA82CD33
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 06:58:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9C0C84E9F5F
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 07:00:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E6F31197B;
-	Wed, 19 Nov 2025 06:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C93D3203A1;
+	Wed, 19 Nov 2025 07:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XXVFxZ8n"
 X-Original-To: netdev@vger.kernel.org
-Received: from trager.us (trager.us [52.5.81.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFCD131064B
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 06:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.5.81.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0147431ED94
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 07:00:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763535474; cv=none; b=hfMApW9YnDfz+/O+9ycRatkg0GZEEZUzyuGRFs6quUV3aUinu0GpEjpY4xczp5U0bf6wc7DfLJI1IHqN31AkaMXBUFXvlvZAyk3600NhOKlEnqniBUyluFPbXX96mQuvQv2n+rWXv8Nr31Ze3OumL4DaqixEGE+dLxkS82OwtgE=
+	t=1763535614; cv=none; b=SJsofBcBgr+us1Qnw0yKxMz5AwWwycB8H8PWxpBzMmU/leCtm5b+bakq19uapkZoBcsVcjZL+8VapWM31llaSHmTDeVyZj6+wFKcZ645KDlIQ866JELlIOZxtYk2x1eN4OXUBrlD0v18/W1liAIEO3zya9PWA2cSipGKaODW6M8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763535474; c=relaxed/simple;
-	bh=MTOcW0nrr12Em1mQ9ac2k8VtVYqOC7OCYUJEDT/tbUM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V0wNeYyX6or1hWTu8Feq+sHOgR1QnprKK0EsbzaTJyPgo/tqBrjWu0+ktOGWK7XVvA+8dVEE3OW6qdAbY37+XdCq8b6iBkTETNHcvgunNNvPhzA9ddMeyiE86ubYzdXd4D9F3P/ENZIDSYu4i7xLpXuXdRTiwhOSfcm6LIxGqsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=trager.us
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trager.us
-Received: from c-76-104-255-50.hsd1.wa.comcast.net ([76.104.255.50] helo=[192.168.1.226])
-	by trager.us with esmtpsa (TLSv1.3:TLS_AES_128_GCM_SHA256:128)
-	(Exim 4.92.3)
-	(envelope-from <lee@trager.us>)
-	id 1vLc8N-0000xD-H9; Wed, 19 Nov 2025 06:57:43 +0000
-Message-ID: <83128442-9e77-482a-ba8f-08883c3f3269@trager.us>
-Date: Tue, 18 Nov 2025 22:57:36 -0800
+	s=arc-20240116; t=1763535614; c=relaxed/simple;
+	bh=C//nuYD3sxHkRsF0MUS3JcPxXHu6tsvLTGpo1KWoX8A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RjBDuFZQFf7+OL1S0Y7FBZumy0lhWX5HArUbnBVOw4XbJP4cI1zY0fbGJckZu22ALbMwqzrPgpD9rtyiTX4zneZDKG5s0hnQSqgvz0Pc2S9TMbTXxQBti1qj01bTAEKTgvxV2cYNz2iRUc1c5IuYMjlC2A1WhSDisftDHEf7XEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XXVFxZ8n; arc=none smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-63fbed0f71aso5377827d50.0
+        for <netdev@vger.kernel.org>; Tue, 18 Nov 2025 23:00:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763535612; x=1764140412; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CKXeN3lXoFJirsuBqwPBgziYWBaDW/ia3ZuQKR5DhYI=;
+        b=XXVFxZ8n/0Mxoes6NTrD6J6HE2ApckRM59j+uJJoVdlNsNilMn7tcpDgGyRBPyYEZc
+         c7xI66Z+FHdPtfqFDIAzDCmVbU7JgGnthd27Ha5VDrCQiSymiwJkyI62TuWy0Xcrza7c
+         zQwx3sm/OSPbE0BaIKwUhNONibMHIjRErZW98w4gw5/JFeLfr1rIv4oaFaMar5bP5mlT
+         J9gxnI7UHd8sRN4AjyBzIU+QSrJTxBFP6x+qAlm0PL7V6GPLwYsGR1N6yNA28sU/KATi
+         cvoVnB+bqWHxKPtE2K6caCR/LY45053YZFAA1etY1EEaIdQ37+ZiesrrZkAoaHp3UaYv
+         t42A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763535612; x=1764140412;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=CKXeN3lXoFJirsuBqwPBgziYWBaDW/ia3ZuQKR5DhYI=;
+        b=q7ZX8Ss9OwOnMtiowHHQB1IGrlV3OQZE9u/vXDsOhRggvy+ltIyKqClyiTPpBT5lNM
+         ZlvHFMgrEYh+FkLLAouk2vo848CWBIG0YPVNcg6IgX0wEBf0l1nOyM3n5vd7s6CBnOtZ
+         GA5YCcJJqRkveh4tknXXz8q5bb3lTWUzORA1yeaHCidAI6LMLNvSQWupGmQdWkdX7yIy
+         t3LhhczNqTYYfEqXVI6+rUC52lVHfsjJBUkwSxbUNRE3oaMtxoGisyUTQ/Xm39KoWT+f
+         wXxUxhNpDh3Nz3Ug1pKlDC42sBU6cIQmfQlxJy3eTWUlp3+y8z8J7zVDoiGG1RjbGlej
+         E0eg==
+X-Forwarded-Encrypted: i=1; AJvYcCXWUXAcAV67b9qQcWQWJuZl3dN5H9HbLjNtTQfRAzyfrCBG3CeaNZfm2Q0YT+ilAHHmrJOEddA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFBFqKOJZS5F84MIS/dKc03Wod8vkUAOV/PDGHoAdLLMWCr0b7
+	rJBbYLS8Z52VTEl+Po2QRBkzEqL5cTT8eMpGnTXg6eLvcAf5fnUxGDZyE5+RzxZn/pKHgw3RbcL
+	UI0QGk31a66n2mDuqn4IDdTwgeJGKOHg=
+X-Gm-Gg: ASbGnctxUZAkaUcpotCULsdAiXPBzfxhOcKEcqwYWAhbhUVjJHbrsfkuLOOIgjfUc+h
+	9X0Moy+SjOp77QNNep/c/ODU+BMmcWkG/PwmJ0qwsVNeAHL/qgUl64rsqoX/vk8Vjim5iAZrAcW
+	DG2VVVv1PHNJC1kSXe3JS1rsP3xPE+yPuzgVbipwbh3RXMNfPL8uUx4SZjcCm4dS6qT6IogcQTQ
+	JBWyfNIFKNP7BWnhMfbevAbH+SsiAjVZYmNCLvvXiyxpY73PQWb1ScPB1XNyy2lGtQavBMwlT6V
+	rG48AiZhK1BFJDRBCBg/46S9i4M=
+X-Google-Smtp-Source: AGHT+IEKoWpPlSpd7U4NDw/b6BWiTAb0dv3Nfymh2sNbb71XM40guLSJjJed5KV8LAKmRs+9ZZwvdWafkh9Z5A2lWi4=
+X-Received: by 2002:a05:690e:424b:b0:63f:b446:7019 with SMTP id
+ 956f58d0204a3-642ed19f069mr885869d50.64.1763535611915; Tue, 18 Nov 2025
+ 23:00:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Ethtool: advance phy debug support
-To: Andrew Lunn <andrew@lunn.ch>, Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Susheela Doddagoudar <susheelavin@gmail.com>, netdev@vger.kernel.org,
- mkubecek@suse.cz, Hariprasad Kelam <hkelam@marvell.com>,
- Alexander Duyck <alexanderduyck@fb.com>
-References: <CAOdo=cNAy4kTrJ7KxEf2CQ_kiuR5sMD6jG3mJSFeSwqD6RdUtw@mail.gmail.com>
- <843c25c6-dd49-4710-b449-b03303c7cf45@bootlin.com>
- <eca707a6-7161-4efc-9831-69fbfa56eb93@lunn.ch>
- <52e1917a-2030-4019-bb9f-a836dc47bda9@trager.us>
- <401e9d39-2c28-480e-b1c4-d3601131c1fb@lunn.ch>
- <399ca61a-abf0-4b37-af32-018a9ef08312@trager.us>
- <2fcc7d12-b1cf-4a24-ac39-a3257e407ef7@lunn.ch>
- <4b7f0ce90f17bd0168cbf3192a18b48cdabfa14b.camel@gmail.com>
- <e38b51f0-b403-42b0-a8e5-8069755683f6@lunn.ch>
- <CAKgT0UcVs9SwiGjmXQcLVX7pSRwoQ2ZaWorXOc7Tm_FFi80pJA@mail.gmail.com>
- <174e07b4-68cc-4fbc-8350-a429f3f4e40f@lunn.ch>
-Content-Language: en-US
-From: Lee Trager <lee@trager.us>
-In-Reply-To: <174e07b4-68cc-4fbc-8350-a429f3f4e40f@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20251117191657.4106-1-fabio.baltieri@gmail.com>
+ <c6beb0d4-f65e-4181-80e6-212b0a938a15@lunn.ch> <aRxTk9wuRiH-9X6l@google.com>
+ <89298d49-d85f-4dfd-954c-f8ca9b47f386@lunn.ch> <ff55848b-5543-4a8d-b8c2-88837db16c29@gmail.com>
+ <aRzVApYF_8loj8Uo@google.com> <CAN9vWDK4LggAGZ-to41yHq4xoduMQdKpj-B6qTpoXiy2fnB=5Q@mail.gmail.com>
+ <aRzsxg_MEnGgu2lB@google.com>
+In-Reply-To: <aRzsxg_MEnGgu2lB@google.com>
+From: Michael Zimmermann <sigmaepsilon92@gmail.com>
+Date: Wed, 19 Nov 2025 08:00:01 +0100
+X-Gm-Features: AWmQ_bmfL2RVzkRfFQkrMvx2GF_t6pB3lLmshM-uCOdJh4qG2uKH8Dz_mCBhx6w
+Message-ID: <CAN9vWDKEDFmDiTuPB6ZQF02NYy0QiW2Oo7v4Zcu6tSiMH5Kj9Q@mail.gmail.com>
+Subject: Re: [PATCH] r8169: add support for RTL8127ATF
+To: Fabio Baltieri <fabio.baltieri@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>, nic_swsd@realtek.com, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/18/25 9:29 AM, Andrew Lunn wrote:
-
->> Right. With PRBS you already should know what the link partner is
->> configured for. It is usually a manual process on both sides. That is
->> why I mentioned the cable/module EEPROM. The cable will indicate the
->> number of lanes present and the recommended/maximum frequency and
->> modulation it is supposed to be used at.
-> But i also expect that is standard ksetting_set behaviour. If user
-> space asks you do a specific link mode, you are going to check if it
-> is supported and return -EINVAL if it is not. So in the general case,
-> all this already exists. I call
+On Tue, Nov 18, 2025 at 11:01=E2=80=AFPM Fabio Baltieri
+<fabio.baltieri@gmail.com> wrote:
 >
-> ethtool -s eth42 autoneg off 20000baseCR2
+> On Tue, Nov 18, 2025 at 10:31:54PM +0100, Michael Zimmermann wrote:
+> > One thing the out-of-tree driver does, which your patch doesn't do, is
+> > disabling eee when in fiber mode. I'd suggest something like this:
+> > @@ -845,7 +860,8 @@ static bool rtl_supports_eee(struct rtl8169_private=
+ *tp)
+> >  {
+> >         return tp->mac_version >=3D RTL_GIGA_MAC_VER_34 &&
+> >                tp->mac_version !=3D RTL_GIGA_MAC_VER_37 &&
+> > -              tp->mac_version !=3D RTL_GIGA_MAC_VER_39;
+> > +              tp->mac_version !=3D RTL_GIGA_MAC_VER_39 &&
+> > +              !tp->fiber_enabled;
+> >  }
 >
-> and it should check if it is supported, and then configure the MAC,
-> PCS and anything else in the path for that link mode. Or return
-> -EINVAL if it is not supported.
+> Heya, don't I have exactly that diff in the patch? The second chunk
 >
-> [I forget the exact ethtool syntax, its not something i use very
-> often, to set a specific link mode]
+> @@ -842,7 +843,8 @@ static bool rtl_supports_eee(struct rtl8169_private *=
+tp)
+>  {
+>         return tp->mac_version >=3D RTL_GIGA_MAC_VER_34 &&
+>                tp->mac_version !=3D RTL_GIGA_MAC_VER_37 &&
+> -              tp->mac_version !=3D RTL_GIGA_MAC_VER_39;
+> +              tp->mac_version !=3D RTL_GIGA_MAC_VER_39 &&
+> +              !tp->fiber_mode;
+>  }
 
-Yes and no. PRBS is a signal integrity test primary used to verify TX 
-coefficients with a link partner. There is no way to know what the link 
-partner supports when testing. Setup is a manual process and it is 
-expected the user will configure both ends correctly. Setup is typically 
-mapped to various ethernet settings as that is our goal.
+You're right, no idea how I missed that, sorry.
 
-Strictly speaking settings don't have to be mapped to ethernet 
-configurations, at least not in our IP. I could use a 3 lane setup 
-alternating between NRZ and PAM4 each with different TX coefficients 
-despite this not making any sense. This is where the argument comes in 
-that PRBS testing and TX coefficients don't belong in ethtool. The 
-argument for putting everything in phy is to create a generic interface 
-that works for all phys, not just ethernet. That would give us something 
-like
+I've also done some testing with the out-of-tree driver:
+- (my normal setup) a DAC between the rt8127 and a 10G switch works just fi=
+ne.
+- RJ45 10G modules on both sides works fine, but HwFiberModeVer stays
+at 1 even after reloading the driver.
+- RJ45 1G modules on both sides works after "ethtool -s enp1s0 speed
+1000 duplex full autoneg on", but you have to do that while connected
+via 10G because that driver is buggy and returns EINVAL otherwise.
+HwFiberModeVer was 1 as well after reloading the driver.
 
-phy 00:01.0 lane 0 nrz-tx-coefficent 0 1 8 55 0
+What this means is that the fiber mode is always enabled on these
+cards, which makes sense given that the out-of-tree driver only reads
+it once when loading the driver. I guess it's either a hardware
+variant, configured in the factory or detected using a pin of the
+chip.
+It also means that it doesn't matter to the linux driver what's
+actually connected beyond the speed you want to use since - as others
+have said before - this seems to be fully handled on the NIC.
 
-phy 00:01.0 lane 1 pam4-tx-cofficent 0 1 9 54 0
-
-phy 00:01.0 lane 2 nrz-tx-officent 0 1 7 45 0
-
-phy 00:01.0 lane 0 start-prbs prbs31
-
-phy 00:01.0 lane 1 start-prbs prbs7
-
-phy 00:01.0 lane 2 start-prbs prbs8
-
-phy 00:01.0 lane 0 get-prbs-stats
-
-...
-
-I don't think there is much value in that which is why I like creating 
-an ethernet specific version. It makes a cleaner user interface which 
-require less technical details from the user. I like piggy backing off 
-of ethtool -s since users are custom to NIC speed, not lanes and mode. 
-That would give us something like
-
-ethtool -s eth42 100000baseCR2  - Test fbnic in PAM4 with 2 lanes
-
-ethtool --set-phy-tunable eth42 tx-coefficent 0 1 8 55 0 - Sets the 
-tx-coefficent for PAM4, this way users doesn't have to know the mapping 
-between mode and speed
-
-ethtool --start-prbs eth42 prbs31 - Start the PRBS31 test
-
-ethtool --get-prbs-stats eth42 - Dump stats collected while testing
-
-ethtool --stop-prbs eth42 - Stop testing
-
-I think that is pretty straight forward for users and allows developers 
-to map to whatever backend API they need. I get the argument for a phy 
-specific interface but it really complicates things for the user.
-
->
->> With that you can essentially
->> determine what the correct setup would be to test it as this is mostly
->> just a long duration cable test. The only imitation is if there is
->> something in between such as a PMA/PMD that is configured for 2 lanes
->> instead of 4.
-> And the CR2 indicates you want to use 2 lanes. And you would then run
-> RPBS on both of them. We could consider additional properties on the
-> netlink API to run PRBS on a subset. But would you not actually want
-> them all active to see if there is cross talk noise to deal with?
->
->> Yes. Again most of these settings appear to be per-lane in both the IP
->> we have and the IEEE specification. For example it occurs to me that a
->> device could be running a 25G or 50G link over a single QSFP cable,
->> and still have testing enabled for the unused 2 or 3 lanes on the
->> cable potentially assuming the PMA/PMD is a 4 lane link and is only
->> using one or two lanes for the link.
-> So that would be 25000baseCR and 50000baseCR2, for the 25G and 50G,
-> using 1 lane and 2 lanes, leaving the other 3/2 lanes unused?
-In our setup 2500baseCR and 50000baseCR use 1 lane, during testing the 
-other lane is unused.
->
-> 	Andrew
+Michael
 
