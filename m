@@ -1,119 +1,141 @@
-Return-Path: <netdev+bounces-240100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505E4C70768
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 18:30:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F4098C7074D
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 18:29:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9EDC2352EE0
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:25:08 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9899D3423DE
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B771C3612E8;
-	Wed, 19 Nov 2025 17:24:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C1AF359FBE;
+	Wed, 19 Nov 2025 17:24:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cEwsqXJ/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="v5CvUAkT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900C6304BAB
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 17:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9743612E8;
+	Wed, 19 Nov 2025 17:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763573096; cv=none; b=C8vGzBTulrsqdHGUZuklUX9Mit2u8IzQ/fQBcXkrkCZwUxQgqJzAKNo7sB4wEMtce7HY12DPCwXjXWEWu4jQSzyEECA7vRBYhOeKXuBuACBwyOCmvtAtN2BFBq8RUhVMSgdpcGh7aXp6lJQs+s9t2tLETXiCq7I6mtrbgSbfGxE=
+	t=1763573052; cv=none; b=Xo9zGxN+kG26bX8qD4VaYuJkBr/Ehba1jWGEftheegz7d9Du4iLV+sKvGMmLj31JtABUt8167OMvw91LvX9L5xvTPwLcHrF7uEfuieQA6J5FS6S19zEJ8Wl+Tu+ROO21rUPf77GSQyrqrnyLSC1/6CeTW9jDB5+cVLqLcKSsTqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763573096; c=relaxed/simple;
-	bh=LXO4rDdTBgbuM/YA0kPF6N03fGhHLBgeEcVQW1wfkcM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YqiLpLX2IfiQ6dQzEMlrNSpYKUYqW2tGdScUNp3wktntbfDaYEbv3Lhso91Cn8DEA8jV8J6xP1EX+eFPKDAuSUE86zYSmapm3a4eTj7/Z/CMNyYe5bKWBagbpbesNLOoLjMEWa6oMz5DAwmNRlj1UFYZwiQ2dRIVh6W/rqI8hHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cEwsqXJ/; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7b8e49d8b35so7898912b3a.3
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 09:24:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763573094; x=1764177894; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OX/n7B61DXx8TflUhCVSCBsbf+p06lqRcS2ORfg3AuQ=;
-        b=cEwsqXJ/47LCMMREoFm1rVxzygbiH1bSZKup26kSq/unsPBk7o6u7BmNe+CiDJmpv7
-         hfR1r3CMszvF7xCsoWpPoDNxFOX4LvJbIBMIUihrT0ixnLe7mca5HeHUDaGhL9Pw1Ru/
-         Ake4J6neRyzRsf+aAPtq/V7AaX0b4Ox348CyppouDrmaQZdriChCVIfzUtdcZTO3p1bo
-         f1RfDuWoU/bVTtGAHWe0dHM0erSlsvPTasGAOnhZbqMrn30jTsMyG2+73756pSRgOwO0
-         5XjQ4rQVu8YrK5Yyhe4OQJ1GP1R9rnodNWqiDlWGElG6pJfiLHySeGAM8IUojGDfJ4DW
-         JG9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763573094; x=1764177894;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OX/n7B61DXx8TflUhCVSCBsbf+p06lqRcS2ORfg3AuQ=;
-        b=avQhLBzybaDQpuBRNu+3HV04okzqek8M1/pywh3SUDhRIC4hy4/AYYyTlAWKshqTMa
-         kCh2C81W3Kv93Wk87uX5ddbefMxkPq9WclvuufswoN2Jt+AfJSWnnUx+htH7Ts5ck5vt
-         C89mAMJj8HJbnm3MWWWtaE2PJ+RamVRMbyOou5HIgbdU056ppwhhbkwriW95jZGhpxVu
-         i58ugPPUZRcERBPF2EbwA3XqmDFEVChqRXV/IXniqDklP8ctUx2l9qYmVLC28UBPpJgA
-         TODbGI/zy7exFL+6AvFHsHp1Cdc0WE57cwjpGq87hfL9LlY6rPicWAgeKD/CqtxWraAx
-         kYig==
-X-Forwarded-Encrypted: i=1; AJvYcCUbSPP/LawWcWGfo3rcg9/VKV5jdyFK1zkb5V7kBAqf2moKIZrTVJ+2QVHYBV1bFLMHu6Tjx3M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZOKcWfaplukFBkaHmXAYzGySHL6Pd5YA/Ul06NNOEJRpp1xub
-	08h8Ax3xtnINU2i2FeIyxZ03Whpp+C3I9Pm9d0OfBqTC7yMw68yLFHZe
-X-Gm-Gg: ASbGncuT612qKi6MwnFaDo8GOHJkEjpaGih0WWdHpMuoHNiwMp6uWy2sEGe93C6/Kff
-	8Y1kjpr934i5bzg/7mK8POMxNUfOPbgFbEcer+ADBqgr8EiWPBIpnX9PEW0583KgFM3r9eHYMWL
-	vZENzftaFxR2bGW6P8mCXxbuROu03k20SKAeIA8XYFHgnAjVtWQujcoywyUOOOCmRlwvMcP6RVD
-	zOddmYm7vt7Z6jJ+9fAA2EZfwa9fPnQECCYRbEhV1BBA72s1mBXVa5THdRnGwsS/rshpSnWWBnU
-	tT2UmDE401Ju6J+1nPkIl6y+sjC6XE8NIPwvYPhNCVEN0h+X9biyTY105JFWwqcE+qCes2J9Tq3
-	8oC6kcumrim9YgX9UUSE+PzS/dgx41TABHpRRmGfl289IlAW6zQ+O36QuBtovcExtol7oa/Yy7i
-	8qf0Jo8bI=
-X-Google-Smtp-Source: AGHT+IEC/HLrLINt0xXoa7ewEDUcprZ6BTZq3/IZpchioggBzCVMw9Hf3alVFdah+AZzS8uQB60heg==
-X-Received: by 2002:a05:6300:218e:b0:350:31b3:218a with SMTP id adf61e73a8af0-3613b535290mr355474637.27.1763573093780;
-        Wed, 19 Nov 2025 09:24:53 -0800 (PST)
-Received: from fedora ([122.173.30.56])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b9250d24b9sm20209696b3a.17.2025.11.19.09.24.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 09:24:53 -0800 (PST)
-From: Shi Hao <i.shihao.999@gmail.com>
-To: ncardwell@google.com
-Cc: pabeni@redhat.com,
-	davem@davemloft.net,
-	kuniyu@google.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	i.shihao.999@gmail.com
-Subject: [PATCH] net: ipv4: fix spelling typo in comment
-Date: Wed, 19 Nov 2025 22:52:39 +0530
-Message-ID: <20251119172239.41963-1-i.shihao.999@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1763573052; c=relaxed/simple;
+	bh=c+CxTfJFAihZfmb8pM44lVO6CKJsjHPohT3hdCYU5yo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JfV1EaAu+P3ZAxa/YaC5r2ZRh7OR5a+rxjNPXl9pwOGDEjL97veKX0aF1C3xthNtg+OTkHDCj5YteGa/DzorgHOdDfu1fgi0tqIvVrseiu81QEf6fXjqgGmRUYQpOY5XeiavD16Qm2B13OIR5DirxmwdUPaj4DzeurT3mTnHFSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=v5CvUAkT; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Wn6ONkRCeRKKhGAlDyEAqfV/PcLRTJSDP9TT9+pdRJM=; b=v5CvUAkTlRoZdxsyNwJJf37vPy
+	Rlew48/9J/wyYHxHK8KiD95VOftwrpxjPuRYPAgtv9iBmIyK+5z3jPQ38K+++DWJBzWLrq53/lT0T
+	7BY68SDPNNiYS06hNCQ7YhjUVw0J0XOCC/Gk4kkJNtpalgRW1mt2xILpAVyHKjOHz6A3cG6rhExiQ
+	hZgs1kxiZKdb5moHEdM7nIWlHwZTgalIwiNzygHZnIr2D5b+2JpVDK31jN0/eBHkK7PIsSBrnuH1D
+	+gR1A9f+Lvvz+3WyLtHIipFnpFZ8N1Hwe7Qzhj0DygS/799lRY/87gD3v95wZaVs3CHB5LAWEHQ2u
+	INBhESjQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46206)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vLluK-000000005Gr-3FgI;
+	Wed, 19 Nov 2025 17:23:52 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vLluH-000000003ay-0KzU;
+	Wed, 19 Nov 2025 17:23:49 +0000
+Date: Wed, 19 Nov 2025 17:23:48 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, Serge Semin <fancer.lancer@gmail.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 14/15] net: dsa: sja1105: replace mdiobus-pcs
+ with xpcs-plat driver
+Message-ID: <aR39JBrqn5PC911s@shell.armlinux.org.uk>
+References: <20251118190530.580267-15-vladimir.oltean@nxp.com>
+ <20251118190530.580267-1-vladimir.oltean@nxp.com>
+ <20251118190530.580267-15-vladimir.oltean@nxp.com>
+ <20251118164130.4e107c93@kernel.org>
+ <20251118164130.4e107c93@kernel.org>
+ <20251119095942.bu64kg6whi4gtnwe@skbuf>
+ <aR2cf91qdcKMy5PB@smile.fi.intel.com>
+ <20251119112522.dcfrh6x6msnw4cmi@skbuf>
+ <20251119081112.3bcaf923@kernel.org>
+ <aR3trBo3xqZ0sDyr@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aR3trBo3xqZ0sDyr@smile.fi.intel.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Replace "splitted" with "split" in comment.
+On Wed, Nov 19, 2025 at 06:17:48PM +0200, Andy Shevchenko wrote:
+> On Wed, Nov 19, 2025 at 08:11:12AM -0800, Jakub Kicinski wrote:
+> > On Wed, 19 Nov 2025 13:25:22 +0200 Vladimir Oltean wrote:
+> > > I think it's due to the fact that the "contest" checks are fundamentally
+> > > so slow, that they can't be run on individual patch sets, and are run on
+> > > batches of patch sets merged into a single branch (of which there seem
+> > > to be 8 per day).
+> > 
+> > Correct, looking at the logs AFAICT coccicheck takes 25min on a
+> > relatively beefy machine, and we only run it on path that were actually
+> > modified by pending changes. We get 100+ patches a day, and 40+ series,
+> > and coccicheck fails relatively rarely. So on the NIPA side it's not
+> > worth it.
+> > 
+> > But, we can certainly integrate it into ingest_mdir.
+> > 
+> > FTR make htmldocs and of course selftests are also not executed by
+> > ingest_mdir.
+> 
+> Btw, do you do `make W=1` while having CONFIG_WERROR=y?
+> And if so, do you also compile with clang?
 
-Signed-off-by: Shi Hao <i.shihao.999@gmail.com>
----
- net/ipv4/tcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If you look at any patch in patchwork, e.g.
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 8a18aeca7ab0..0d1c8e805d24 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1600,7 +1600,7 @@ struct sk_buff *tcp_recv_skb(struct sock *sk, u32 seq, u32 *off)
- 			return skb;
- 		}
- 		/* This looks weird, but this can happen if TCP collapsing
--		 * splitted a fat GRO packet, while we released socket lock
-+		 * split a fat GRO packet, while we released socket lock
- 		 * in skb_splice_bits()
- 		 */
- 		tcp_eat_recv_skb(sk, skb);
---
-2.51.0
+https://patchwork.kernel.org/project/netdevbpf/patch/E1vLgSZ-0000000FMrW-0cEu@rmk-PC.armlinux.org.uk/
 
+it gives a list of the tests performed. In answer to your questions:
+
+netdev/build_clang 	success 	Errors and warnings before: 1 this patch: 1
+
+So yes, building with clang is tested.
+
+I can say that stuff such as unused const variables gets found by
+nipa, via -Wunused-const-variable, which as I understand it is a
+W=1 thing.
+
+I suspect CONFIG_WERROR=y isn't used (I don't know) as that would
+stop the build on warnings, whereas what is done instead is that
+the output of the build is analysed, and the number of warnings
+counted and reported in patchwork. Note that the "build" stuff
+reports number of errors/warnings before and after the patch.
+
+Hope this answers your question.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
