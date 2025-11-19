@@ -1,162 +1,176 @@
-Return-Path: <netdev+bounces-239871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0426CC6D567
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:13:14 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19F95C6D634
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 09:23:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 281304FD1C4
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:06:04 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7A8F2352958
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 08:18:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C879E32BF46;
-	Wed, 19 Nov 2025 08:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E778032570E;
+	Wed, 19 Nov 2025 08:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s9X7kMoX"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="niMfbMW+";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="dIsmg/84"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FC92EF673
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9ADA2EBBB7
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763539307; cv=none; b=PLnldH+7RipDq3lwg9J0VcwQ8cF3MeC12gD+VMGbs9OcDYa9L3kLJcjW3pP2wtO83d3yM2Epp/24NeEzYjlAUuUNUqbJxjNb8DoGgjY3QfSCu/JuTvmRwZeI2av3weJSYwJDmNZTa+yvZKkljZ8ahyYrcakI3WlxOC5MEoK6vFc=
+	t=1763540321; cv=none; b=bq/08Jmy/1PjQJaZuca51J7EhiAOI33372RRFryiWt3swWletpvF9DJ9De0i5p6MvpUa9dLoBOm+W8bVw4c9vckZW7XzdrfPtOmg9wvMWKRr1+pL27tr3WvyPDR1LH8Nn6rf/aJr+pwbN9UrMLLCK/dqC3BNXeybt1nqepzzhlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763539307; c=relaxed/simple;
-	bh=0TBmqklw31qv0EXQ3EZ3FDM8CQDT/8C2HPHLN9YEjTs=;
+	s=arc-20240116; t=1763540321; c=relaxed/simple;
+	bh=zh5VcahD+EvJkMkKldozFL8zmqblGb5A2OjPNjQzt7c=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QK2poO4b539LnsVtVDDuoxIRnqOYneJ0N4TaI98hVTBS9vUvYIh200iGHdeF0wlsBjd2wuONmTyzQvysyOwDUvnt3xRgzuxPN3P4XX8o+UsMCBXsYcpQjcAH57YfRxTXxRzrUumYKdSV2Bqpyi3zuvkv5uh/LYSM1+4jwQ162Cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s9X7kMoX; arc=none smtp.client-ip=74.125.224.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64107188baeso5866491d50.3
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 00:01:45 -0800 (PST)
+	 To:Cc:Content-Type; b=m+GAJcuOO0EZ/XSIpNm5XNP2XcTHNljyNXLvJT7cRP1s/q9wRuox9N/NZ5EPzPQIvVmWYtJPF/FykTkCRbP8yydZpbQPEf/DmntPYLQWdxsB2iVgIXSvsh6aZl6s4A4RbO/u6Fk4rc81dZG+UTjIVQwZfhKOsJHjeZfvJvbgLVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=niMfbMW+; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=dIsmg/84; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AJ4XgOS885024
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:18:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	5hJNda7PPbyFFAigZjxkd+5Q6vs5av51VdJVvooGekU=; b=niMfbMW+8B68ok5W
+	fuhGcUtwrG7Wf2cGKaTiF5wWY67/TD8Hamq4bAOdHX/rac+eu3p0jnCB0nCojH9+
+	FpgIfA45XSObDUS2rtUqcaRZMqA4NSB8Kcm+V0k7dUJGF6r6YMmP21Vi8De5UQ7S
+	3pD23U7F0kqHZhN5tnO0g+C8g3m/uJsN+6qYGWtoGr7SrJsmJI6dpy7bHeGZN15l
+	p+aGdYOIrd649IsEpNFGGLhNeUvqTtEXGoWOcsQXxy4Yqob81SP3P/rUllYZwlfp
+	BX30M3wbRRX0/Q6z3AEG6gU0AGXko4eqXjDjO88slAJ9WN9tLa5/eNpsU2mmhRAb
+	r64+eg==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ah6yq8kgh-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:18:38 +0000 (GMT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8b2e41884a0so1272651885a.1
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 00:18:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763539305; x=1764144105; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1763540318; x=1764145118; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tJSI3tSrrDT6dXrt+GLht/ivtiT+nZxBQRKJRVnXP9Y=;
-        b=s9X7kMoXEJG03SbHYxpygI56QwcI5VSbQ8AQqs82A929fiq450IldR3qQGqjXIIp0B
-         ljn1GGDqpHoUdZNoXo33xtT6mvcKOag/rbnBHWlgAzfUIU9fNlGbimjmbn7ItUWS/WQR
-         lvN+tXJSov63CdJbWrBvV3Ee8lQOzBJAQFi6zp1O3TLVEYKgVGp50Z0vMKc8wfYj2bfB
-         HrYicaYKQ00pmWSKCpuvcbZoXE+21yGMQHDMIkcuMPksbEpTrbLuSH6oglI8mJxmaZYC
-         tqy2B/e5Qxd49k8Xhr3XlR/vvsov/VD4h/nvfJdsWhHOVOWKCxQDSY5rs4PDW0iJgfYd
-         412Q==
+        bh=5hJNda7PPbyFFAigZjxkd+5Q6vs5av51VdJVvooGekU=;
+        b=dIsmg/84hD9azZbTOQqkZx09sGqQJ9mNtAIFWqIvetA4LD8P5Vex5gXplGhpj2koKv
+         WwyGhzYAyCQM/VXEA6Z5NPAGGUcAInOJSxpwmT2IjJTFMMzWHuuYzOZbH1Hej0I2uCKA
+         SHbOmIzvqbvUs0mVjzFMP0LmLkHfydmZIpVBMlX29FakkIXs+AKO7H7kIiVuGgXz/0Gf
+         JIARfqtS3lIDKTQpdad9/qoqQ+Ox+GD6uSe26SchiNw5c7EqsNQN9xV+XmzGntcGLWWn
+         eOZIfycWEdcJKxCjKwfrWBkrGLCvwaQyShdx4OaXw6Y+IjnwrjV/OCaeSgY1N5GGga+9
+         Kw2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763539305; x=1764144105;
+        d=1e100.net; s=20230601; t=1763540318; x=1764145118;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=tJSI3tSrrDT6dXrt+GLht/ivtiT+nZxBQRKJRVnXP9Y=;
-        b=Y3nS0huKdYQAtJGhCZ5K5uvvA4r3upJZ6NrGZWAQ/Yep/fIFG9MMG1HNndvjC/53MN
-         VXyFP8eo42poMNgthB5BowwYaM1sS7YU9wJs+GgKMmYh7wYpHfPfbjTIGYXTj4uxf33V
-         LczNnLgPCUWcYk02SJBeLlYGBM5MSevs1k1CzU94HGc8Av961uUQPHqYpc9G33jrHWcS
-         9GZIHhADz8YROKdp9n7QNyqjBfg+H1aeUsFeIwzn0sj5sF9JsF30rW9v5UB/ojGRJkb1
-         94UK2XCIdRIwb/oanJtsq39K0yB9E+LeQdDujsqClbT3MGBbxGUsAIoM1E9+JHMB+oep
-         Kh9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUYLyKn2jpmOkVATCOFvq4qPcuQ7sdGVQnYebFH/hBH3yLkvXyBg3NJtEnNa4SJMhHwbfp9QpU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjTO0D7gQR0E9c1hMX2R40+xXnOwQI2syYU6UAouekXk11No64
-	kvzrLvQOw9c2WEHQF8yecBmdmgglWlc8qGlPASbSoPUyrMD0i+gmZuGZKSKKhOqp6QSoB0YVL95
-	30VT7445GvHkSv5GiaZbA4jgawLWs2wFKEcm/dcHa
-X-Gm-Gg: ASbGncuc2VZ4KjehnDUOOX3ywjMXOMez2RNSvuY8Iq0Xu90MQOKD4YhI/4NZKTfWg5K
-	Dq6yn0jeixydMyXgwPCZzW+3OZ/68/FZfjnzsVjp2nTiuQBhU6bFDz0M9ex9cjEeXTphBcIFVE9
-	vnJf6TACKEuj0i7zGbxY2zlouUXz9QsMOJiJbVON5Tk2B7+73qvQ4M+y83F5Q3sDdZuG+syHUFR
-	Qc9FxcPES6o9Ao4FnDWhVSnoZFy65QtVW9LMvHT44mjowZUMJGfcGNYUUf7D7e9yRnU
-X-Google-Smtp-Source: AGHT+IFEIHqm8JhwXf+uwrqNBH0++IUaL+fUnAxcHl+f+UoA+rgPimpPmEfG/0j4dY6YqgSwTSCZh3raJtqz/3rCLj8=
-X-Received: by 2002:a53:c055:0:20b0:63f:a856:5f5a with SMTP id
- 956f58d0204a3-641e74a366bmr13781155d50.1.1763539304787; Wed, 19 Nov 2025
- 00:01:44 -0800 (PST)
+        bh=5hJNda7PPbyFFAigZjxkd+5Q6vs5av51VdJVvooGekU=;
+        b=cvVxidqOZOCRrQjSG0ExzL5460YNcm62BjvntX+YUXHRcDSr6/62nf2QQP6I+wKB8E
+         ShW+e7lwr/Y41V3em7+nz88d77muUW4NWHTEtGrISKcIFmzrGgs+xFglDuiyJ0FcqmGB
+         aElEqBZvtSzNFoKlN1f+KPYUYBNSVavmEROaBLT7ew12GTkb4C/cLGU28Dye16K3aXOs
+         htIHvohioLc8LurQVDmUTdxrLKO6KT5d3wIVWKGM2j1WARwweIyRTUO7PdZv60+ndpFK
+         AI0MFZr9PxdpeCIrMP8Us8Bc4053rO8OMpssjWMvSzbvZJkTnFeHCWrIgT7jO44XVCAa
+         NVDA==
+X-Forwarded-Encrypted: i=1; AJvYcCU3YRdBhSK57gweasOW6CmA8lxh/jghljKNI7jbVfwjbCJxGrtNi92qi2DJRBrNPkb1czuw/ok=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZBSsFvELaA2qQ3yrsNGTNLY2voj8E4+a3woAonEYneXt7fnia
+	yto4BPMe9wTuDKAD3nSsZgq20dzpQgRxq8R8mGTf42YLxvobdWLGWunZp92F4XBxkzVCedcI857
+	XHY2yC0UZYjRyqGLhFbXiEx4qMKteeHKXi5nAKntYfD5whKa8KfzceCNGUcddcXOEb+0YMqseQq
+	MdwNcBDIfEQjA5X2mAdZkk3CxkB7WKb68e2zleca36yDwlB60=
+X-Gm-Gg: ASbGnctYC+QNldG+v6/N5QIHlYsAX7VOx18bkf4QBbnovQ1sdfXFi3RUwFSMSECp7gn
+	JBfRNUnyYeyqWOFWHhQLZKje0fITw7CkduR8GVHpvn45Yx+62PwSzqlCRNgaupx7DGVoVesQqCr
+	VZw3QJSFw871y+qsElaJJo8JygmHr7fDdtTBxJCvesSd4N2Fvv5Fzw4xitSH8H1LW242Q+Aeqw2
+	FFoCiOG57kg66x6GMmbL0BAiF77
+X-Received: by 2002:a05:620a:4113:b0:89f:7109:185f with SMTP id af79cd13be357-8b2c315f239mr2451077185a.31.1763540318167;
+        Wed, 19 Nov 2025 00:18:38 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFJOvBJ2k2WkiN0ddCAdza60PA1z3V6Q3GboHhLXVhVW3gvLVseQdpDrJIPWFCUbtXqUHnQfEPKF8iL3YVNGAM=
+X-Received: by 2002:a05:620a:4113:b0:89f:7109:185f with SMTP id
+ af79cd13be357-8b2c315f239mr2451075285a.31.1763540317855; Wed, 19 Nov 2025
+ 00:18:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251117132802.2083206-1-edumazet@google.com> <20251117132802.2083206-3-edumazet@google.com>
- <c1a44dde-376c-4140-8f51-aeac0a49c0da@redhat.com> <CANn89iLGXY0qhvNNZWVppq+u0kccD5QCVAEqZ_0GyZGGeWL=Yg@mail.gmail.com>
-In-Reply-To: <CANn89iLGXY0qhvNNZWVppq+u0kccD5QCVAEqZ_0GyZGGeWL=Yg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 19 Nov 2025 00:01:33 -0800
-X-Gm-Features: AWmQ_bnP9Rz2OMxO7JHyhjafzjXsjJ-iaAqsbfsLTZSt57wF95O4OSRa99sVCPA
-Message-ID: <CANn89iJfnWSn-1hghtJEaZ5u8_+9B7eCTZ07U9GnGh6UxS8rJw@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] tcp: add net.ipv4.tcp_rtt_threshold sysctl
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20251119033917.7526-1-slark_xiao@163.com>
+In-Reply-To: <20251119033917.7526-1-slark_xiao@163.com>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Wed, 19 Nov 2025 09:18:26 +0100
+X-Gm-Features: AWmQ_bm5vJfHA2LeTDtgXpEwR43aKTczmYbaYmzkeFja82B4SBLuomcTnJBfmk4
+Message-ID: <CAFEp6-0EQwmh2JfAwEdBM0514h+UF9q_eec5WNLCax9kdxFHhA@mail.gmail.com>
+Subject: Re: [PATCH] net: wwan: mhi: Add network support for Foxconn T99W760
+To: Slark Xiao <slark_xiao@163.com>
+Cc: ryazanov.s.a@gmail.com, johannes@sipsolutions.net, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mani@kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-ORIG-GUID: Rse6YmHIZdVu0C4P5mrwXDyPODLd1Uwz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE5MDA2NCBTYWx0ZWRfX4mgw/vj9q5xE
+ aa6dPqdGJFWzYa+MMenFBaWHZgxTTVNvhcynbwRr4Wlt8vjS2a87Yi0f/WKES8uGNfOFhuJJdvk
+ AubL6cQx6eZnJcQ0HuEjQajNbg0neSvEh2ew8HHtZTOY90tyf9/hluPlzOt6qUtmjrPMEkJkdaB
+ LEu36HYCQeUQLYsplRr5qAI58WPoYoLKwNvAOiuitAFOI33Q1nWX5d8Uub3bNB6DfSI6nHx8wec
+ MLg0XRZWFPeXBT69DWvRYnLiCTfifi/s6RbHz/GSlcZMLa7cVQb1n6JCuVW3DMHosQr+MRJ8mak
+ vhdxp7DKMR6hJpxoLS5P56qgwwMg4KUbR+NRkoA4WMxzACAwWFSuILIOX8r+awN4rYvQs+bRA25
+ kILI1aeMLXdoi4F0Kq7drAE08QZhhQ==
+X-Authority-Analysis: v=2.4 cv=Ut1u9uwB c=1 sm=1 tr=0 ts=691d7d5e cx=c_pps
+ a=qKBjSQ1v91RyAK45QCPf5w==:117 a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Byx-y9mGAAAA:8
+ a=jTkqkXBVwd2mT_Iii2oA:9 a=QEXdDO2ut3YA:10 a=NFOGd7dJGGMPyQGDc5-O:22
+X-Proofpoint-GUID: Rse6YmHIZdVu0C4P5mrwXDyPODLd1Uwz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-19_02,2025-11-18_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 phishscore=0 suspectscore=0 malwarescore=0 adultscore=0
+ bulkscore=0 lowpriorityscore=0 impostorscore=0 spamscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511190064
 
-On Tue, Nov 18, 2025 at 1:22=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, Nov 18, 2025 at 1:15=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > Hi,
-> >
-> > On 11/17/25 2:28 PM, Eric Dumazet wrote:
-> > > This is a follow up of commit aa251c84636c ("tcp: fix too slow
-> > > tcp_rcvbuf_grow() action") which brought again the issue that I tried
-> > > to fix in commit 65c5287892e9 ("tcp: fix sk_rcvbuf overshoot")
-> > >
-> > > We also recently increased tcp_rmem[2] to 32 MB in commit 572be9bf9d0=
-d
-> > > ("tcp: increase tcp_rmem[2] to 32 MB")
-> > >
-> > > Idea of this patch is to not let tcp_rcvbuf_grow() grow sk->sk_rcvbuf
-> > > too fast for small RTT flows. If sk->sk_rcvbuf is too big, this can
-> > > force NIC driver to not recycle pages from the page pool, and also
-> > > can cause cache evictions for DDIO enabled cpus/NIC, as receivers
-> > > are usually slower than senders.
-> > >
-> > > Add net.ipv4.tcp_rtt_threshold sysctl, set by default to 1000 usec (1=
- ms)
-> > > If RTT if smaller than the sysctl value, use the RTT/tcp_rtt_threshol=
-d
-> > > ratio to control sk_rcvbuf inflation.
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> >
-> > I gave this series a spin in my test-bed: 2 quite old hosts b2b
-> > connected via 100Gbps links. RTT is < 100us. Doing bulk/iperf3 tcp
-> > transfers, with irq and user-space processes pinned.
-> >
-> > The average tput for 30s connections does not change measurably: ~23Gbp=
-s
-> > per connection. WRT the receiver buffer, in 30 runs prior to this patch
-> > I see:
-> >
-> > min 1901769, max 4322922 avg 2900036
-> >
-> > On top of this series:
-> >
-> > min 1078047 max 3967327 avg 2465665.
-> >
-> > So I do see smaller buffers on average, but I'm not sure I'm hitting th=
-e
-> >  reference scenario (notably the lowest value here is considerably
-> > higher than the theoretical minimum rcvwin required to handle the given
-> > B/W).
-> >
-> > Should I go for longer (or shorter) connections?
->
-> 23 Gbps seems small ?
->
-> I would perhaps use 8 senders, and force all receivers on one cpu (cpu
-> 4 in the following run)
->
-> for i in {1..8}
-> do
->  netperf -H host -T,4 -l 100 &
-> done
->
-> This would I think show what can happen when receivers can not keep up.
+Hi Slark,
 
-I will add a Tested: section with some numbers in V2.
+On Wed, Nov 19, 2025 at 4:41=E2=80=AFAM Slark Xiao <slark_xiao@163.com> wro=
+te:
+>
+> T99W760 is designed based on Qualcomm SDX35 chip. It use similar
+> architecture with SDX72/SDX75 chip. So we need to assign initial
+> link id for this device to make sure network available.
+>
+> Signed-off-by: Slark Xiao <slark_xiao@163.com>
 
-And switch to tcp_rcvbuf_low_rtt name as Neal suggested.
+It should be in the same series as the patch introducing Foxconn
+T99W760 into MHI/PCI driver.
+
+Regards,
+Loic
+
+
+> ---
+>  drivers/net/wwan/mhi_wwan_mbim.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan=
+_mbim.c
+> index c814fbd756a1..a142af59a91f 100644
+> --- a/drivers/net/wwan/mhi_wwan_mbim.c
+> +++ b/drivers/net/wwan/mhi_wwan_mbim.c
+> @@ -98,7 +98,8 @@ static struct mhi_mbim_link *mhi_mbim_get_link_rcu(stru=
+ct mhi_mbim_context *mbim
+>  static int mhi_mbim_get_link_mux_id(struct mhi_controller *cntrl)
+>  {
+>         if (strcmp(cntrl->name, "foxconn-dw5934e") =3D=3D 0 ||
+> -           strcmp(cntrl->name, "foxconn-t99w515") =3D=3D 0)
+> +           strcmp(cntrl->name, "foxconn-t99w515") =3D=3D 0 ||
+> +           strcmp(cntrl->name, "foxconn-t99w760") =3D=3D 0)
+>                 return WDS_BIND_MUX_DATA_PORT_MUX_ID;
+>
+>         return 0;
+> --
+> 2.25.1
+>
 
