@@ -1,83 +1,304 @@
-Return-Path: <netdev+bounces-240161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0306EC70EB6
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 20:57:46 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C29DAC70E92
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 20:55:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7351C343A81
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:53:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 1D7702908C
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 19:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD501366DCB;
-	Wed, 19 Nov 2025 19:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84951373758;
+	Wed, 19 Nov 2025 19:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="x7aTNYss"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="eyetexJU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D7E371DC5;
-	Wed, 19 Nov 2025 19:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65B52F5B
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763582005; cv=none; b=GtAwuvYBIXs3abgw8TOSdywdVDoUXK9VHzNdnCr+LMCfnsVLQaDyJv37fRsIMHb1Kf9czr3M9EtxjNo5WevaTc21AC2uNf6Jh6vZu8o6x/NPqxpAbE6iDyMxnpvsOjhiSyP9EkuaZqwf0Y4lxsMvVY7YuEM5BusKC0NGj/BKwBU=
+	t=1763582024; cv=none; b=D37ufEXFI8Zlti1CiZA/g7DfywSUIwonTTU9c/eKIwgZuyvgNUIpXJXZS/rt2XJ/UFZBjzKU/U6EB6bjLgxRDR4roHR68kk0HDf9V9+VOShs3Dj1cWKLB0sdYEQwnAYEuF4WGmLbFr4waE5YM9hTsKTCg846gAhs6d10B1/RTyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763582005; c=relaxed/simple;
-	bh=HL48sP4Xb6zrvLbsLGKA44KV6tQWp6ekwH4IaDpvlBU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UGaizhOxbAzaZRL9FKus5KX2x1QaHE9u9ihQXoRsRTX3TGquxZc8wkvtQDFuTnlmgUL6i6qLmS4GrF358lKrpEv31odYkEKYlaHGYgUMxm9kWVhpMCg97WEx0S1hDV8btZ6pSrJi2Y0Mh+yY19c0FDPOY4ODejhnSQeM4DxnL2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=x7aTNYss; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=aWO5KrFQkBjGbqWq3opM1WzP8ZAtbN7r9Kz3p3ON6nA=; b=x7aTNYssYFyN4yBC3IRuHII8y8
-	6qaX3WQA77mUmw58FnanspgKC9RnduoXABfiCHicmRz+SiJydCt7aw1jth2Z/KJtTHsIT3z6gcYr+
-	Q+sB7gEFI78ee5jCWuJrZm5/N+zz794pfwcgLdZTvHPJ2wrMgt/tjyXJccaT8aOHLU5g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vLoEn-00EXoe-2A; Wed, 19 Nov 2025 20:53:09 +0100
-Date: Wed, 19 Nov 2025 20:53:09 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: lan966x: Fix the initialization of taprio
-Message-ID: <ffa6ba0a-750e-4281-826d-f56c4f5ea433@lunn.ch>
-References: <20251119172845.430730-1-horatiu.vultur@microchip.com>
+	s=arc-20240116; t=1763582024; c=relaxed/simple;
+	bh=0Akz0+lNh1xHfq2Nl+iVgGPrSVUHVmkhlu32PmBwXjo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VMFz70x6AjREfiKeDPd6zzGOCfKxcov6WG160KGvHBd5lPAz8kRZl71Vr0r+UP4XcMrI2PYyov9glF+Psvb3MnQAY4pceYdfLTcs5FhLyHLx1tw9D7Uc3Ru4r7SGsV5MEvtOQbWeCTqXkPi9rrMj0QKWs+z0Bwgvxz01Wcwj08g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=eyetexJU; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b75c7cb722aso24656166b.1
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 11:53:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1763582016; x=1764186816; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Aem5xOVJvhgpFL5eZXcfB54MezIBm+m/g090fjqNIPQ=;
+        b=eyetexJU3g7mzl5x8JXkQuaQjuNUJ8y/X25XiRUh1aPv+am+NM5c9fFSidaihuD4Rs
+         owOVN1HPqyroI770CSKz+YQEYz4E6AstmfWvgpXb8WVhtH8XFcmoZd8KoiL/HGk5/rbH
+         9Uimo906Z2sbYO3riSx4KyLLvwwmYQ1R9QkLl/fybEAG2aHiNeOYBDmAzzYNhbxbJ31Z
+         QsroQCrX9ZWu29rrHH+4WUklItbTTb/LbVmw6BgEjW1HNphCT23U/5Bin5qFm6dI+TpH
+         ITe2kEzRBHkMZ3XVwQ08wZZZK3d7gGcu9MBX9AbbWxlkq5bwHxa8rrg6SLyK4Iy0Bgwn
+         WVNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763582016; x=1764186816;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Aem5xOVJvhgpFL5eZXcfB54MezIBm+m/g090fjqNIPQ=;
+        b=cj9+8foqf+wJEPPVwuhEm5CddeU+nkQVn9AKDJX7PazZVRyIrVsg00zSTy+DeJ9gIQ
+         q6A6c/h79ljmSf2e4/nrB4wjEnVvAWivw64J3dwsbFhY7UbdAUNX+emkGjc2YgAxEFxo
+         aLto5OejJ4Q/+64NEMS1oQMPcgjBl2Vwsm16y3voMudvdFPR2aJnWYGtA61kd5ClXL7W
+         ushCQXvwtCZkc8XQacjdF+Z+l7wZfCzZnRz10LG73mE1i6c1USjHnCpOiadTic4zs2IJ
+         eDD0DQUp5MfmG2/mi7kVh2+OxZ+QxGsZnW+vorWmdSRfV7XFOr1TQBjuROo3HmYuAFE6
+         td/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWDFh/60jEaBToRKYvAhP3zU2kCrV4fvS9Nhd9cREnQPbQvpt8p5m22j6ua/haLj3ebiGtgHl0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYCZtCnhglkZgqq8PSfrQrpSwxWxQPFCLWsbF1uT/gesDL7iFT
+	+fWCuIQdSs7yRni55AtHBeZeVXoQEaVIWf0lB+ifp3Ofux+GeJ6tyaSUlQFBD98cUGg=
+X-Gm-Gg: ASbGncv7DBDgC5aCaz3IqKlqHLtiIxAwouTRN7RwwaKiLGzCzxNjN/JNjAegIAuvzMN
+	RkW9bEINEQGnWPYTx3gimh8UiZo1HVy3X3qjUBwDLhL/ZeCWWpt27MLWcEMOCmaxUOTiaErZ9kv
+	yhYVxdzvi3yxcTa6LYb94Ot8YbaO+/SaOJWxVRsN/3ixwtjqH/N+s7GB2zTN92aZiXWjAnBr+YZ
+	394Yn9jilt0j9naVSEeOkC4FCpKnTuiYilWyA80CT8NoeBFRpH1mFvMpPhHCYQhBjzNsWJlbZnS
+	uEZ8g3SefEpYGWqi63s94Nvu9hpaMrR6R/8ngWaWgdBNKHiOFPpLPB1DuEmDGq9w2eozsQNPiq2
+	Mcxs6cWmnb6XrUFppM8BHcKqPmkOTXcy4q1Tn5tWVi4Rwxsz9u4mFrY6gZDAQxQg4Re7nnTm8lN
+	gf1EsPcxkasW2WO57Cz7NRebG+
+X-Google-Smtp-Source: AGHT+IGzw2bAN/LjeUPdPS5iyXmbC02OEZ1xM5G58Srnj8lbxl9efxcDcTwBXx3YJ4DcTxSJ62ipqw==
+X-Received: by 2002:a17:907:c04:b0:b73:7710:fe03 with SMTP id a640c23a62f3a-b76554a52bbmr24911466b.58.1763582016246;
+        Wed, 19 Nov 2025 11:53:36 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:5063:2969::420:5c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654fd4f4esm18582566b.45.2025.11.19.11.53.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Nov 2025 11:53:35 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: bpf@vger.kernel.org,  John Fastabend <john.fastabend@gmail.com>,  "David
+ S. Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,
+  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  Simon Horman <horms@kernel.org>,  Neal Cardwell <ncardwell@google.com>,
+  Kuniyuki Iwashima <kuniyu@google.com>,  David Ahern <dsahern@kernel.org>,
+  Alexei Starovoitov <ast@kernel.org>,  Daniel Borkmann
+ <daniel@iogearbox.net>,  Andrii Nakryiko <andrii@kernel.org>,  Martin
+ KaFai Lau <martin.lau@linux.dev>,  Eduard Zingerman <eddyz87@gmail.com>,
+  Song Liu <song@kernel.org>,  Yonghong Song <yonghong.song@linux.dev>,  KP
+ Singh <kpsingh@kernel.org>,  Stanislav Fomichev <sdf@fomichev.me>,  Hao
+ Luo <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Shuah Khan
+ <shuah@kernel.org>,  Michal Luczaj <mhal@rbox.co>,  Stefano Garzarella
+ <sgarzare@redhat.com>,  Cong Wang <cong.wang@bytedance.com>,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v1 1/3] bpf, sockmap: Fix incorrect copied_seq
+ calculation
+In-Reply-To: <20251117110736.293040-2-jiayuan.chen@linux.dev> (Jiayuan Chen's
+	message of "Mon, 17 Nov 2025 19:07:05 +0800")
+References: <20251117110736.293040-1-jiayuan.chen@linux.dev>
+	<20251117110736.293040-2-jiayuan.chen@linux.dev>
+Date: Wed, 19 Nov 2025 20:53:34 +0100
+Message-ID: <87zf8h6bpd.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251119172845.430730-1-horatiu.vultur@microchip.com>
+Content-Type: text/plain
 
-> +#define LAN9X66_CLOCK_RATE	165617754
-
-You add a #define
-
-> +
->  #define LAN966X_MAX_PTP_ID	512
+On Mon, Nov 17, 2025 at 07:07 PM +08, Jiayuan Chen wrote:
+> A socket using sockmap has its own independent receive queue: ingress_msg.
+> This queue may contain data from its own protocol stack or from other
+> sockets.
+>
+> The issue is that when reading from ingress_msg, we update tp->copied_seq
+> by default. However, if the data is not from its own protocol stack,
+> tcp->rcv_nxt is not increased. Later, if we convert this socket to a
+> native socket, reading from this socket may fail because copied_seq might
+> be significantly larger than rcv_nxt.
+>
+> This fix also addresses the syzkaller-reported bug referenced in the
+> Closes tag.
+>
+> This patch marks the skmsg objects in ingress_msg. When reading, we update
+> copied_seq only if the data is from its own protocol stack.
+>
+>                                                      FD1:read()
+>                                                      --  FD1->copied_seq++
+>                                                          |  [read data]
+>                                                          |
+>                                 [enqueue data]           v
+>                   [sockmap]     -> ingress to self ->  ingress_msg queue
+> FD1 native stack  ------>                                 ^
+> -- FD1->rcv_nxt++               -> redirect to other      | [enqueue data]
+>                                        |                  |
+>                                        |             ingress to FD1
+>                                        v                  ^
+>                                       ...                 |  [sockmap]
+>                                                      FD2 native stack
+>
+> Closes: https://syzkaller.appspot.com/bug?extid=06dbd397158ec0ea4983
+> Fixes: 04919bed948dc ("tcp: Introduce tcp_read_skb()")
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> ---
+>  include/linux/skmsg.h | 25 ++++++++++++++++++++++++-
+>  net/core/skmsg.c      | 19 ++++++++++++++++---
+>  net/ipv4/tcp_bpf.c    |  5 +++--
+>  3 files changed, 43 insertions(+), 6 deletions(-)
+>
+> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> index 49847888c287..b7826cb2a388 100644
+> --- a/include/linux/skmsg.h
+> +++ b/include/linux/skmsg.h
+> @@ -23,6 +23,17 @@ enum __sk_action {
+>  	__SK_NONE,
+>  };
 >  
->  /* Represents 1ppm adjustment in 2^59 format with 6.037735849ns as reference
-> @@ -1126,5 +1129,5 @@ void lan966x_ptp_rxtstamp(struct lan966x *lan966x, struct sk_buff *skb,
->  u32 lan966x_ptp_get_period_ps(void)
+> +/* The BPF program sets BPF_F_INGRESS on sk_msg to indicate data needs to be
+> + * redirected to the ingress queue of a specified socket. Since BPF_F_INGRESS is
+> + * defined in UAPI so that we can't extend this enum for our internal flags. We
+> + * define some internal flags here while inheriting BPF_F_INGRESS.
+> + */
+> +enum {
+> +	SK_MSG_F_INGRESS	= BPF_F_INGRESS, /* (1ULL << 0) */
+> +	/* internal flag */
+> +	SK_MSG_F_INGRESS_SELF	= (1ULL << 1)
+> +};
+> +
+
+
+I'm wondering if we need additional state to track this.
+Can we track sk_msg's construted from skb's that were not redirected by
+setting `sk_msg.sk = sk` to indicate that the source socket is us in
+sk_psock_skb_ingress_self()?
+
+If not, then I'd just offset the internal flags like we do in
+net/core/filter.c, BPF_F_REDIRECT_INTERNAL.
+
+>  struct sk_msg_sg {
+>  	u32				start;
+>  	u32				curr;
+> @@ -141,8 +152,20 @@ int sk_msg_memcopy_from_iter(struct sock *sk, struct iov_iter *from,
+>  			     struct sk_msg *msg, u32 bytes);
+>  int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+>  		   int len, int flags);
+> +int __sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+> +		     int len, int flags, int *from_self_copied);
+>  bool sk_msg_is_readable(struct sock *sk);
+>  
+> +static inline bool sk_msg_is_to_self(struct sk_msg *msg)
+> +{
+> +	return msg->flags & SK_MSG_F_INGRESS_SELF;
+> +}
+> +
+> +static inline void sk_msg_set_to_self(struct sk_msg *msg)
+> +{
+> +	msg->flags |= SK_MSG_F_INGRESS_SELF;
+> +}
+> +
+>  static inline void sk_msg_check_to_free(struct sk_msg *msg, u32 i, u32 bytes)
 >  {
->  	/* This represents the system clock period in picoseconds */
-> -	return 15125;
-> +	return PICO / 165617754;
-
-and then don't use it?
-
-	Andrew
+>  	WARN_ON(i == msg->sg.end && bytes);
+> @@ -235,7 +258,7 @@ static inline struct page *sk_msg_page(struct sk_msg *msg, int which)
+>  
+>  static inline bool sk_msg_to_ingress(const struct sk_msg *msg)
+>  {
+> -	return msg->flags & BPF_F_INGRESS;
+> +	return msg->flags & SK_MSG_F_INGRESS;
+>  }
+>  
+>  static inline void sk_msg_compute_data_pointers(struct sk_msg *msg)
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index 2ac7731e1e0a..25d88c2082e9 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
+> @@ -409,14 +409,14 @@ int sk_msg_memcopy_from_iter(struct sock *sk, struct iov_iter *from,
+>  }
+>  EXPORT_SYMBOL_GPL(sk_msg_memcopy_from_iter);
+>  
+> -/* Receive sk_msg from psock->ingress_msg to @msg. */
+> -int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+> -		   int len, int flags)
+> +int __sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+> +		     int len, int flags, int *from_self_copied)
+>  {
+>  	struct iov_iter *iter = &msg->msg_iter;
+>  	int peek = flags & MSG_PEEK;
+>  	struct sk_msg *msg_rx;
+>  	int i, copied = 0;
+> +	bool to_self;
+>  
+>  	msg_rx = sk_psock_peek_msg(psock);
+>  	while (copied != len) {
+> @@ -425,6 +425,7 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+>  		if (unlikely(!msg_rx))
+>  			break;
+>  
+> +		to_self = sk_msg_is_to_self(msg_rx);
+>  		i = msg_rx->sg.start;
+>  		do {
+>  			struct page *page;
+> @@ -443,6 +444,9 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+>  			}
+>  
+>  			copied += copy;
+> +			if (to_self && from_self_copied)
+> +				*from_self_copied += copy;
+> +
+>  			if (likely(!peek)) {
+>  				sge->offset += copy;
+>  				sge->length -= copy;
+> @@ -487,6 +491,14 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+>  out:
+>  	return copied;
+>  }
+> +EXPORT_SYMBOL_GPL(__sk_msg_recvmsg);
+> +
+> +/* Receive sk_msg from psock->ingress_msg to @msg. */
+> +int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+> +		   int len, int flags)
+> +{
+> +	return __sk_msg_recvmsg(sk, psock, msg, len, flags, NULL);
+> +}
+>  EXPORT_SYMBOL_GPL(sk_msg_recvmsg);
+>  
+>  bool sk_msg_is_readable(struct sock *sk)
+> @@ -616,6 +628,7 @@ static int sk_psock_skb_ingress_self(struct sk_psock *psock, struct sk_buff *skb
+>  	if (unlikely(!msg))
+>  		return -EAGAIN;
+>  	skb_set_owner_r(skb, sk);
+> +	sk_msg_set_to_self(msg);
+>  	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, take_ref);
+>  	if (err < 0)
+>  		kfree(msg);
+> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+> index a268e1595b22..6332fc36ffe6 100644
+> --- a/net/ipv4/tcp_bpf.c
+> +++ b/net/ipv4/tcp_bpf.c
+> @@ -226,6 +226,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
+>  	int peek = flags & MSG_PEEK;
+>  	struct sk_psock *psock;
+>  	struct tcp_sock *tcp;
+> +	int from_self_copied = 0;
+>  	int copied = 0;
+>  	u32 seq;
+>  
+> @@ -262,7 +263,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
+>  	}
+>  
+>  msg_bytes_ready:
+> -	copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
+> +	copied = __sk_msg_recvmsg(sk, psock, msg, len, flags, &from_self_copied);
+>  	/* The typical case for EFAULT is the socket was gracefully
+>  	 * shutdown with a FIN pkt. So check here the other case is
+>  	 * some error on copy_page_to_iter which would be unexpected.
+> @@ -277,7 +278,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
+>  			goto out;
+>  		}
+>  	}
+> -	seq += copied;
+> +	seq += from_self_copied;
+>  	if (!copied) {
+>  		long timeo;
+>  		int data;
 
