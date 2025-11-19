@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-240197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18EA1C715B5
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 23:49:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66A4AC71513
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 23:44:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9EE3A353102
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 22:48:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 2FA1D2E3C6
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 22:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4109F33BBC3;
-	Wed, 19 Nov 2025 22:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F0C32E6A7;
+	Wed, 19 Nov 2025 22:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="mH3mu7CU"
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="ECG1ya7r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B831A322547;
-	Wed, 19 Nov 2025 22:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906D92C178E
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 22:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763592180; cv=none; b=dAIyxEwxcL87Tb78++Pmi/tMN6NsqzQQFUE755EdpszLCb7BjgYjNiwkt7WNyVYTyvP9B6myTkCtKIb+4o0YUhYkGj8GsRwoXzvarawobmkTdkyCO5Lp0/Df5FLlPLB6mdxjBhjNI5b2Hs2Z5JjCQPFh2pvjdvMCEB2zG1T+q6s=
+	t=1763592166; cv=none; b=cTHeUviMbji9+KxUreFxQVXCg+IFy7Nlmd4cut16+bMoy1u8/tAvxeeAZ7iHb8tCs7vsZC9AVB06m6oG6jgq7537/fX53Ob/5qeIjJFnHlcJ9zskzsTkQj2F2YisXj1uZ9O/gkiETzH6zTKOA90OprPnMfx+WIqkcfAnaHLESxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763592180; c=relaxed/simple;
-	bh=XFrfwVCvPCtb0hiydszl3RIWBMsxeFfaRQl+89Butuk=;
+	s=arc-20240116; t=1763592166; c=relaxed/simple;
+	bh=GGIYofSpJetz0G/DijcVeZfshF99ebnoJhj3c2n6FnA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qxala0pxsZ+ljQUql0P//lxy0e+3u8GA+fxnFMiWiXhDpcuTQcYk2eoETcdO67NxObJyqb1AxhjYipxWLNcpYlo4rh083o03UTABIvCZ449140YFSt5QjZjjbkxn3/QVm8RcSgGIGH3EXkknIGTR+TkPoETslvoNk4Pl4kw3VpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=mH3mu7CU; arc=none smtp.client-ip=185.226.149.38
+	 MIME-Version; b=msl8610WMaUOizYJNVKnQ1h+w1xioJOHBSlqsjTAcIyA1+2kjLAYR6cqD7ABvbqmWFaUANlMSyv25Zm6YPdpB20u94PE+cw4Eo27+OiFQ98X0yOU+Bki5Y3+f1pK07Jkuka1mEBymyqRp+QzxNfRKVDTBzxUBWFyrKBjxqxNm1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=ECG1ya7r; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1vLqt4-006kya-5z; Wed, 19 Nov 2025 23:42:54 +0100
+	id 1vLqsr-006ypp-Fv; Wed, 19 Nov 2025 23:42:41 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To
 	:Message-Id:Date:Subject:Cc:To:From;
-	bh=gcWmtAAfsAw9kpNlGTgaWUDkrcywIVK3kKVtDQyu4MQ=; b=mH3mu7CUOLOgvZQQz4iSHYl8md
-	bDHLoV5jQJ8+4QdanQY9jEszDaCJGnYBPdN/4BkP6xA9uFDgkIQlZ7zgNuiie8/ZY6pBzFla7+hXS
-	9r8objOy4Ex6It0D6XXEOl/Ymqhq8c9jrgoXsT3A2gKVHlNDl/K8WSP+dYsluD8oldGHLBid67cdC
-	5wh75wheE42DC29E923kuHXpZ2xLnaVZZzR380BbZO6/MLyooYHxkfo0oix0AeASsGKtT2Tm6ErWp
-	Cz7stmPzBciBUC+4KoVhXmQ+C9WaxPETYMv1feWdSi4IHH4NcmDS5XzkRdZQCyyyJ7+x7csJw6sfP
-	L3rM3iwg==;
+	bh=KQSx02HfqdXV3FVS/PIgGpzRzBe8PakhMgRiOJybjb4=; b=ECG1ya7rAkE2AU1b7MJ4tGMs0d
+	NzA58Xj6Jm3TdE6A4Sy2Oz6zxBe1gEz7bEmIA1WSi/lP1+aVI0cQm392zRWGk17k1cWQqP03s+v6H
+	RBIecCOZYZMgNuNoXXx8d/6txCveyFoNuUIAB+QVaytdgZLVV9RW1MK6AXcv7FQPGyEZBvocLbG//
+	pzh+19ln/rv7FgqLLH9V2vSt1tMEMPnWT59LGf99Yw9E2+JYU+c+l+OIVwEY5BegdODJWTvlSnqU6
+	qT0EI91c3XpbK5PwUiB4D5QELSK3AdWcrD5RPqf8w/hREC7lec0BSDs0yGKhTsueIe2jRHN+Ig1Yb
+	zB0IuVFw==;
 Received: from [10.9.9.74] (helo=submission03.runbox)
 	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1vLqt3-0000E8-Mq; Wed, 19 Nov 2025 23:42:53 +0100
+	id 1vLqsq-0000Az-LE; Wed, 19 Nov 2025 23:42:40 +0100
 Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1vLqso-00Fos6-ED; Wed, 19 Nov 2025 23:42:38 +0100
+	id 1vLqsp-00Fos6-45; Wed, 19 Nov 2025 23:42:39 +0100
 From: david.laight.linux@gmail.com
 To: linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
 	netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+Cc: David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	John Fastabend <john.fastabend@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 	David Laight <david.laight.linux@gmail.com>
-Subject: [PATCH 41/44] net/core: Change loop conditions so min() can be used
-Date: Wed, 19 Nov 2025 22:41:37 +0000
-Message-Id: <20251119224140.8616-42-david.laight.linux@gmail.com>
+Subject: [PATCH 42/44] net: use min() instead of min_t()
+Date: Wed, 19 Nov 2025 22:41:38 +0000
+Message-Id: <20251119224140.8616-43-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20251119224140.8616-1-david.laight.linux@gmail.com>
 References: <20251119224140.8616-1-david.laight.linux@gmail.com>
@@ -79,65 +80,193 @@ Content-Transfer-Encoding: 8bit
 
 From: David Laight <david.laight.linux@gmail.com>
 
-Loops like:
-	int copied = ...;
-	...
-	while (copied) {
-		use = min_t(type, copied, PAGE_SIZE - offset);
-		...
-		copied -= 0;
-	}
-can be converted to a plain min() if the comparison is changed to:
-	while (copied > 0) {
-This removes any chance of high bits being discded by min_t().
-(In the case above PAGE_SIZE is 64bits so the 'int' cast is safe,
-but there are plenty of cases where the check shows up bugs.)
+min_t(unsigned int, a, b) casts an 'unsigned long' to 'unsigned int'.
+Use min(a, b) instead as it promotes any 'unsigned int' to 'unsigned long'
+and so cannot discard significant bits.
+
+In this case the 'unsigned long' value is small enough that the result
+is ok.
+
+Detected by an extra check added to min_t().
 
 Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
- net/core/datagram.c | 6 +++---
- net/core/skmsg.c    | 4 ++--
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ net/core/net-sysfs.c   | 3 +--
+ net/ipv4/fib_trie.c    | 2 +-
+ net/ipv4/tcp_input.c   | 4 ++--
+ net/ipv4/tcp_output.c  | 5 ++---
+ net/ipv4/tcp_timer.c   | 4 ++--
+ net/ipv6/addrconf.c    | 8 ++++----
+ net/ipv6/ndisc.c       | 5 ++---
+ net/packet/af_packet.c | 2 +-
+ net/unix/af_unix.c     | 4 ++--
+ 9 files changed, 17 insertions(+), 20 deletions(-)
 
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index c285c6465923..555f38b89729 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -664,8 +664,8 @@ int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
- 		head = compound_head(pages[n]);
- 		order = compound_order(head);
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index ca878525ad7c..8aaeed38be0b 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -985,8 +985,7 @@ static int netdev_rx_queue_set_rps_mask(struct netdev_rx_queue *queue,
+ 	struct rps_map *old_map, *map;
+ 	int cpu, i;
  
--		for (refs = 0; copied != 0; start = 0) {
--			int size = min_t(int, copied, PAGE_SIZE - start);
-+		for (refs = 0; copied > 0; start = 0) {
-+			int size = min(copied, PAGE_SIZE - start);
+-	map = kzalloc(max_t(unsigned int,
+-			    RPS_MAP_SIZE(cpumask_weight(mask)), L1_CACHE_BYTES),
++	map = kzalloc(max(RPS_MAP_SIZE(cpumask_weight(mask)), L1_CACHE_BYTES),
+ 		      GFP_KERNEL);
+ 	if (!map)
+ 		return -ENOMEM;
+diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
+index 59a6f0a9638f..e85441717222 100644
+--- a/net/ipv4/fib_trie.c
++++ b/net/ipv4/fib_trie.c
+@@ -710,7 +710,7 @@ static unsigned char update_suffix(struct key_vector *tn)
+ 	 * tn->pos + tn->bits, the second highest node will have a suffix
+ 	 * length at most of tn->pos + tn->bits - 1
+ 	 */
+-	slen_max = min_t(unsigned char, tn->pos + tn->bits - 1, tn->slen);
++	slen_max = min(tn->pos + tn->bits - 1, tn->slen);
  
- 			if (pages[n] - head > (1UL << order) - 1) {
- 				head = compound_head(pages[n]);
-@@ -783,7 +783,7 @@ EXPORT_SYMBOL(__zerocopy_sg_from_iter);
-  */
- int zerocopy_sg_from_iter(struct sk_buff *skb, struct iov_iter *from)
- {
--	int copy = min_t(int, skb_headlen(skb), iov_iter_count(from));
-+	int copy = min(skb_headlen(skb), iov_iter_count(from));
+ 	/* search though the list of children looking for nodes that might
+ 	 * have a suffix greater than the one we currently have.  This is
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index e4a979b75cc6..8c9eb91190ae 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -2870,7 +2870,7 @@ static void tcp_mtup_probe_success(struct sock *sk)
+ 	val = (u64)tcp_snd_cwnd(tp) * tcp_mss_to_mtu(sk, tp->mss_cache);
+ 	do_div(val, icsk->icsk_mtup.probe_size);
+ 	DEBUG_NET_WARN_ON_ONCE((u32)val != val);
+-	tcp_snd_cwnd_set(tp, max_t(u32, 1U, val));
++	tcp_snd_cwnd_set(tp, max(1, val));
  
- 	/* copy up to skb headlen */
- 	if (skb_copy_datagram_from_iter(skb, 0, from, copy))
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 2ac7731e1e0a..b58e319f4e2e 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -335,8 +335,8 @@ int sk_msg_zerocopy_from_iter(struct sock *sk, struct iov_iter *from,
- 		bytes -= copied;
- 		msg->sg.size += copied;
+ 	tp->snd_cwnd_cnt = 0;
+ 	tp->snd_cwnd_stamp = tcp_jiffies32;
+@@ -3323,7 +3323,7 @@ void tcp_rearm_rto(struct sock *sk)
+ 			/* delta_us may not be positive if the socket is locked
+ 			 * when the retrans timer fires and is rescheduled.
+ 			 */
+-			rto = usecs_to_jiffies(max_t(int, delta_us, 1));
++			rto = usecs_to_jiffies(max(delta_us, 1));
+ 		}
+ 		tcp_reset_xmit_timer(sk, ICSK_TIME_RETRANS, rto, true);
+ 	}
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index b94efb3050d2..516ea138993d 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -3076,7 +3076,7 @@ bool tcp_schedule_loss_probe(struct sock *sk, bool advancing_rto)
+ 			jiffies_to_usecs(inet_csk(sk)->icsk_rto) :
+ 			tcp_rto_delta_us(sk);  /* How far in future is RTO? */
+ 	if (rto_delta_us > 0)
+-		timeout = min_t(u32, timeout, usecs_to_jiffies(rto_delta_us));
++		timeout = min(timeout, usecs_to_jiffies(rto_delta_us));
  
--		while (copied) {
--			use = min_t(int, copied, PAGE_SIZE - offset);
-+		while (copied > 0) {
-+			use = min(copied, PAGE_SIZE - offset);
- 			sg_set_page(&msg->sg.data[msg->sg.end],
- 				    pages[i], use, offset);
- 			sg_unmark_end(&msg->sg.data[msg->sg.end]);
+ 	tcp_reset_xmit_timer(sk, ICSK_TIME_LOSS_PROBE, timeout, true);
+ 	return true;
+@@ -4382,8 +4382,7 @@ void tcp_send_delayed_ack(struct sock *sk)
+ 		 * directly.
+ 		 */
+ 		if (tp->srtt_us) {
+-			int rtt = max_t(int, usecs_to_jiffies(tp->srtt_us >> 3),
+-					TCP_DELACK_MIN);
++			int rtt = max(usecs_to_jiffies(tp->srtt_us >> 3), TCP_DELACK_MIN);
+ 
+ 			if (rtt < max_ato)
+ 				max_ato = rtt;
+diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+index 2dd73a4e8e51..9d5fc405e76a 100644
+--- a/net/ipv4/tcp_timer.c
++++ b/net/ipv4/tcp_timer.c
+@@ -43,7 +43,7 @@ static u32 tcp_clamp_rto_to_user_timeout(const struct sock *sk)
+ 	if (remaining <= 0)
+ 		return 1; /* user timeout has passed; fire ASAP */
+ 
+-	return min_t(u32, icsk->icsk_rto, msecs_to_jiffies(remaining));
++	return min(icsk->icsk_rto, msecs_to_jiffies(remaining));
+ }
+ 
+ u32 tcp_clamp_probe0_to_user_timeout(const struct sock *sk, u32 when)
+@@ -504,7 +504,7 @@ static bool tcp_rtx_probe0_timed_out(const struct sock *sk,
+ 		 */
+ 		if (rtx_delta > user_timeout)
+ 			return true;
+-		timeout = min_t(u32, timeout, msecs_to_jiffies(user_timeout));
++		timeout = umin(timeout, msecs_to_jiffies(user_timeout));
+ 	}
+ 	/* Note: timer interrupt might have been delayed by at least one jiffy,
+ 	 * and tp->rcv_tstamp might very well have been written recently.
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 40e9c336f6c5..930e34af4331 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -1422,11 +1422,11 @@ static int ipv6_create_tempaddr(struct inet6_ifaddr *ifp, bool block)
+ 	if_public_preferred_lft = ifp->prefered_lft;
+ 
+ 	memset(&cfg, 0, sizeof(cfg));
+-	cfg.valid_lft = min_t(__u32, ifp->valid_lft,
+-			      READ_ONCE(idev->cnf.temp_valid_lft) + age);
++	cfg.valid_lft = min(ifp->valid_lft,
++			    READ_ONCE(idev->cnf.temp_valid_lft) + age);
+ 	cfg.preferred_lft = cnf_temp_preferred_lft + age - idev->desync_factor;
+-	cfg.preferred_lft = min_t(__u32, if_public_preferred_lft, cfg.preferred_lft);
+-	cfg.preferred_lft = min_t(__u32, cfg.valid_lft, cfg.preferred_lft);
++	cfg.preferred_lft = min(if_public_preferred_lft, cfg.preferred_lft);
++	cfg.preferred_lft = min(cfg.valid_lft, cfg.preferred_lft);
+ 
+ 	cfg.plen = ifp->prefix_len;
+ 	tmp_tstamp = ifp->tstamp;
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index f427e41e9c49..b3bcbf0d864b 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -1731,9 +1731,8 @@ void ndisc_send_redirect(struct sk_buff *skb, const struct in6_addr *target)
+ 		neigh_release(neigh);
+ 	}
+ 
+-	rd_len = min_t(unsigned int,
+-		       IPV6_MIN_MTU - sizeof(struct ipv6hdr) - sizeof(*msg) - optlen,
+-		       skb->len + 8);
++	rd_len = min(IPV6_MIN_MTU - sizeof(struct ipv6hdr) - sizeof(*msg) - optlen,
++		     skb->len + 8);
+ 	rd_len &= ~0x7;
+ 	optlen += rd_len;
+ 
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index 173e6edda08f..af0c74f7b4d4 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -3015,7 +3015,7 @@ static int packet_snd(struct socket *sock, struct msghdr *msg, size_t len)
+ 	hlen = LL_RESERVED_SPACE(dev);
+ 	tlen = dev->needed_tailroom;
+ 	linear = __virtio16_to_cpu(vio_le(), vnet_hdr.hdr_len);
+-	linear = max(linear, min_t(int, len, dev->hard_header_len));
++	linear = max(linear, min(len, dev->hard_header_len));
+ 	skb = packet_alloc_skb(sk, hlen + tlen, hlen, len, linear,
+ 			       msg->msg_flags & MSG_DONTWAIT, &err);
+ 	if (skb == NULL)
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 768098dec231..e573fcb21a01 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2448,7 +2448,7 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+ 			/* allow fallback to order-0 allocations */
+ 			size = min_t(int, size, SKB_MAX_HEAD(0) + UNIX_SKB_FRAGS_SZ);
+ 
+-			data_len = max_t(int, 0, size - SKB_MAX_HEAD(0));
++			data_len = max(0, size - (int)SKB_MAX_HEAD(0));
+ 
+ 			data_len = min_t(size_t, size, PAGE_ALIGN(data_len));
+ 
+@@ -3054,7 +3054,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 			sunaddr = NULL;
+ 		}
+ 
+-		chunk = min_t(unsigned int, unix_skb_len(skb) - skip, size);
++		chunk = min(unix_skb_len(skb) - skip, size);
+ 		chunk = state->recv_actor(skb, skip, chunk, state);
+ 		if (chunk < 0) {
+ 			if (copied == 0)
 -- 
 2.39.5
 
