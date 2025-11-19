@@ -1,99 +1,224 @@
-Return-Path: <netdev+bounces-239938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31B8EC6E2C2
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 12:15:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FB1CC6E365
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 12:24:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8CFC34EF73A
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 11:08:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F20724E1C69
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 11:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4440C351FA9;
-	Wed, 19 Nov 2025 11:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1961C351FB4;
+	Wed, 19 Nov 2025 11:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="Kkh9r5c5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aF+9Tk3I"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D3B24886E;
-	Wed, 19 Nov 2025 11:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21A8350A0B;
+	Wed, 19 Nov 2025 11:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763550419; cv=none; b=XH2SNAoK5zOrIE1YH1+QBGmVn1+C4CYG27RiRD/z5Td7fOIGSxOU7enNSU+tm0ysCodrhEip32cT69A/LMlR54i1owpnIn3dtUU7tTklvvNBeFP+686NEXKhzcog+fq949+ZE046UwIRt/UoTPTiDAA1JMzsA1v/ECY38GGoZ9Y=
+	t=1763551152; cv=none; b=Xj3/4xdrLYuaslHvtiyvxIy/Bt5z7xpVF581+QBt0vdgd/mjLZmBMkreXR+Cc8TFPjKs4WYHCfuO/zFT/UK2WqTzJ0WbV9wrtSmg6lHgyC7Tjxg46gnPBG9KQUOe/mQdY2cm/HN18s4lcsUq2mzNkfhZ77xzn8Ewg1jCHo5y3L8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763550419; c=relaxed/simple;
-	bh=vxeKL9n8sesvnbmXcAPsqsCVyIM733KeN+FhouEaeic=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=G+HYQ0x+1RGHj7ocPEqSoIj5Yg1Mj39ekZP3gRMLUZTUrdjjPPpOazTi65u4fYwIBleuRALVKOk4dIhkSn0BAAg/NJB8KUMADJgexBJYFRSfudnw5gG1hz2yGvX5KRi2d7k+MFR9V9ch5TqNQMs9msP6iKZTSROg8mkML9/UsqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=Kkh9r5c5 reason="signature verification failed"; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=4LTf8U1ZnZvkLJFXeL+wl/+iB8gycPhi64DhPGHK4dM=; b=K
-	kh9r5c5MpFH741jS/ua0haRopQMcT+zAj/HS/7xlc0yr8H96iV5t+eu7lmRdXt9p
-	NwejTKkDd3BBct7KKphr70Ihp4Mdr9eVobUstjOJ2DwL+AkkjzKxQOmBMa8gj7PR
-	gOiih3OE+5sOGYGFHVIH4/0QngBmYEpdptZGj6p3n0=
-Received: from slark_xiao$163.com ( [2408:8459:3860:2d7a:924e:a1a:3ee9:828d]
- ) by ajax-webmail-wmsvr-40-132 (Coremail) ; Wed, 19 Nov 2025 19:05:27 +0800
- (CST)
-Date: Wed, 19 Nov 2025 19:05:27 +0800 (CST)
-From: "Slark Xiao" <slark_xiao@163.com>
-To: "Konrad Dybcio" <konrad.dybcio@oss.qualcomm.com>
-Cc: "Dmitry Baryshkov" <dmitry.baryshkov@oss.qualcomm.com>, mani@kernel.org,
-	loic.poulain@oss.qualcomm.com, ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org, mhi@lists.linux.dev,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re:Re: [PATCH v2 1/2] bus: mhi: host: pci_generic: Add Foxconn
- T99W760 modem
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
-In-Reply-To: <8adcb880-a2d3-4987-88c8-c3441963fc53@oss.qualcomm.com>
-References: <20251119084537.34303-1-slark_xiao@163.com>
- <aqhkk6sbsuvx5yoy564sd53blbb3fqcrlidrg3zuk3gsw64w24@hsxi4nj4t7vy>
- <7373f6c5.8783.19a9b62ad62.Coremail.slark_xiao@163.com>
- <8adcb880-a2d3-4987-88c8-c3441963fc53@oss.qualcomm.com>
-X-NTES-SC: AL_Qu2dAfmev0sp4SSZZOkfmk8Sg+84W8K3v/0v1YVQOpF8jAPo8yMnU0Z6BF76zeyeFiCHvwOXfzlsx/10ebdUWrsh9SC3/ElWd/pccoOCxVBObA==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1763551152; c=relaxed/simple;
+	bh=e5luU8H79ds78sItRWsonUxVPkWeHh+yAutPaKVJGLk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QIHnQF53NXsr1T6YeWU7IvqsCJTeedSE91HcYc9JeCx1z8/njWwdHyqs59Kt5gOpMWxHVwLK4eKDkCtr+pR/ZFnrRjxLbFKKgo6nu4WhCo+5Xs73p4S2/ehtMKbsa+YApVwCKtzN0max1jDxeW8aykrEDTucT+205AB787AIAlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aF+9Tk3I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BF2AC19422;
+	Wed, 19 Nov 2025 11:19:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763551151;
+	bh=e5luU8H79ds78sItRWsonUxVPkWeHh+yAutPaKVJGLk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aF+9Tk3IRXUKewbiFGFbnkhZdXblI7LOHDgr7982DO40NcRvuObB+En+tYDt1A1J7
+	 m5BpJm2XewurnYwAJlYKo5z5PEM6CnRhOurUWGtfjHyNEmzZPnYMtJpBsxSQSfVzvg
+	 G8XCzzs3sGbJV2WBoXGqM/e5RAv8YvCpCqhDcFGpXpZCu/0pMZsWOEOaMTnu4M/SLP
+	 epmOfKP2cbCEYHeJPcd1UKswbx89b4R1xWdZq0QLIECwONtvDLTZpShaUGwOJJuY3K
+	 gbg24oTHnEDm19e21UVyr6s2p08xnk/t4KPVaRPft9Y4AGGtrqFupwGb2xXno9jnjF
+	 gUIXiLDqoRCNQ==
+Date: Wed, 19 Nov 2025 12:19:07 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Phil Sutter <phil@nwl.cc>, Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH nf-next v9 2/3] net: netfilter: Add IPIP flowtable tx sw
+ acceleration
+Message-ID: <aR2nq_UIz9oF5Xt_@lore-desk>
+References: <20251107-nf-flowtable-ipip-v9-0-7cbc4090dfcb@kernel.org>
+ <20251107-nf-flowtable-ipip-v9-2-7cbc4090dfcb@kernel.org>
+ <aRSDjkzMx4Ba7IW8@calendula>
+ <aRSvnfdhO2G1DXJI@lore-desk>
+ <aRUT-tFXYbwfZYUk@calendula>
+ <aRWLhLobB4Rz0dA_@lore-desk>
+ <aRunjT-HYQ-UeR_-@calendula>
+ <aRu1aFVwT_FPDeZ1@lore-desk>
+ <aR0Lj3ph0RYtpleX@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <4c801771.9d89.19a9bca727f.Coremail.slark_xiao@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:hCgvCgAnXMR3pB1pSdMlAA--.30W
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbCwBfnTGkdpHfDWAAA3A
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="kcIDJeLuCmIpT6qE"
+Content-Disposition: inline
+In-Reply-To: <aR0Lj3ph0RYtpleX@calendula>
 
-CkF0IDIwMjUtMTEtMTkgMTc6MjE6MzMsICJLb25yYWQgRHliY2lvIiA8a29ucmFkLmR5YmNpb0Bv
-c3MucXVhbGNvbW0uY29tPiB3cm90ZToKPk9uIDExLzE5LzI1IDEwOjEyIEFNLCBTbGFyayBYaWFv
-IHdyb3RlOgo+PiAKPj4gQXQgMjAyNS0xMS0xOSAxNzowNToxNywgIkRtaXRyeSBCYXJ5c2hrb3Yi
-IDxkbWl0cnkuYmFyeXNoa292QG9zcy5xdWFsY29tbS5jb20+IHdyb3RlOgo+Pj4gT24gV2VkLCBO
-b3YgMTksIDIwMjUgYXQgMDQ6NDU6MzdQTSArMDgwMCwgU2xhcmsgWGlhbyB3cm90ZToKPj4+PiBU
-OTlXNzYwIG1vZGVtIGlzIGJhc2VkIG9uIFF1YWxjb21tIFNEWDM1IGNoaXBzZXQuCj4+Pj4gSXQg
-dXNlIHRoZSBzYW1lIGNoYW5uZWwgc2V0dGluZ3Mgd2l0aCBGb3hjb25uIFNEWDYxLgo+Pj4+IGVk
-bCBmaWxlIGhhcyBiZWVuIGNvbW1pdHRlZCB0byBsaW51eC1maXJtd2FyZS4KPj4+Pgo+Pj4+IFNp
-Z25lZC1vZmYtYnk6IFNsYXJrIFhpYW8gPHNsYXJrX3hpYW9AMTYzLmNvbT4KPj4+PiAtLS0KPj4+
-PiB2MjogQWRkIG5ldCBhbmQgTUhJIG1haW50YWluZXIgdG9nZXRoZXIKPj4+PiAtLS0KPj4+PiAg
-ZHJpdmVycy9idXMvbWhpL2hvc3QvcGNpX2dlbmVyaWMuYyB8IDEzICsrKysrKysrKysrKysKPj4+
-PiAgMSBmaWxlIGNoYW5nZWQsIDEzIGluc2VydGlvbnMoKykKPj4+Cj4+PiBOb3RlOiBvbmx5IDEv
-MiBtYWRlIGl0IHRvIGxpbnV4LWFybS1tc20uIElzIGl0IGludGVudGlvbmFsIG9yIHdhcyB0aGVy
-ZQo+Pj4gYW55IGtpbmQgb2YgYW4gZXJyb3Igd2hpbGUgc2VuZGluZyB0aGUgcGF0Y2hlcz8KPj4+
-Cj4+PiAtLSAKPj4+IFdpdGggYmVzdCB3aXNoZXMKPj4+IERtaXRyeQo+PiBCb3RoIHBhdGNoZXMg
-aGF2ZSBjYyBsaW51eC1hcm0tbXNtQHZnZXIua2VybmVsLm9yZy4KPj4gQW5kIG5vdyBJIGNhbiBm
-aW5kIGJvdGggcGF0Y2hlcyBpbjoKPj4gcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcHJvamVjdC9saW51
-eC1hcm0tbXNtL2xpc3QvCj4KPkl0IHNlZW1zIGxpa2UgdGhleSdyZSB0aGVyZSwgYnV0IG5vdCBw
-YXJ0IG9mIHRoZSBzYW1lIHRocmVhZAo+Cj5QbGVhc2UgdHJ5IHVzaW5nIHRoZSBiNCB0b29sOgo+
-Cj5odHRwczovL2I0LmRvY3Mua2VybmVsLm9yZy8KPgo+d2hpY2ggd2lsbCBoZWxwIGF2b2lkIHN1
-Y2ggaXNzdWVzCj4KPktvbnJhZApJIHNlbmQgYSB2ZXJzaW9uIDMgYWdhaW4uIEl0IHNlZW1zIE9L
-IG5vdy4KUGxlYXNlIGhlbHAgdGFrZSBhIGxvb2sgb24gdGhhdC4KClRoYW5rcy4K
+
+--kcIDJeLuCmIpT6qE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+> Hi Lorenzo,
+>=20
+> I found one more issue: caching the ip6 daddr does not work because
+> skb_cow_head() can reallocate the skb header, invalidating all
+> pointers.
+>=20
+> I went back to use the other_tuple, it is safer, new branch:
+>=20
+>         flowtable-consolidate-xmit+ipip3
+
+Hi Pablo,
+
+thx for fixing it. I tested the branch above and it works fine with IPIP tu=
+nnel
+flowtable offloading.
+
+>=20
+> Hopefully, this is the last iteration for this series.
+>=20
+> I am attaching a diff that compares flowtable-consolidate-xmit+ipip2
+> vs. flowtable-consolidate-xmit+ipip3 branches.
+>=20
+> I also made a few cosmetic edits.
+
+> diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_tab=
+le_ip.c
+> index ee81ee3a5110..e128b0fe9a7b 100644
+> --- a/net/netfilter/nf_flow_table_ip.c
+> +++ b/net/netfilter/nf_flow_table_ip.c
+> @@ -512,13 +512,14 @@ static int nf_flow_pppoe_push(struct sk_buff *skb, =
+u16 id)
+>  }
+> =20
+>  static int nf_flow_tunnel_ipip_push(struct net *net, struct sk_buff *skb,
+> -				    struct flow_offload_tuple *tuple)
+> +				    struct flow_offload_tuple *tuple,
+> +				    __be32 *ip_daddr)
+>  {
+>  	struct iphdr *iph =3D (struct iphdr *)skb_network_header(skb);
+>  	struct rtable *rt =3D dst_rtable(tuple->dst_cache);
+> -	__be16	frag_off =3D iph->frag_off;
+> -	u32 headroom =3D sizeof(*iph);
+>  	u8 tos =3D iph->tos, ttl =3D iph->ttl;
+> +	__be16 frag_off =3D iph->frag_off;
+> +	u32 headroom =3D sizeof(*iph);
+>  	int err;
+> =20
+>  	err =3D iptunnel_handle_offloads(skb, SKB_GSO_IPXIP4);
+> @@ -551,14 +552,17 @@ static int nf_flow_tunnel_ipip_push(struct net *net=
+, struct sk_buff *skb,
+>  	__ip_select_ident(net, iph, skb_shinfo(skb)->gso_segs ?: 1);
+>  	ip_send_check(iph);
+> =20
+> +	*ip_daddr =3D tuple->tun.src_v4.s_addr;
+> +
+>  	return 0;
+>  }
+> =20
+>  static int nf_flow_tunnel_v4_push(struct net *net, struct sk_buff *skb,
+> -				  struct flow_offload_tuple *tuple)
+> +				  struct flow_offload_tuple *tuple,
+> +				  __be32 *ip_daddr)
+>  {
+>  	if (tuple->tun_num)
+> -		return nf_flow_tunnel_ipip_push(net, skb, tuple);
+> +		return nf_flow_tunnel_ipip_push(net, skb, tuple, ip_daddr);
+> =20
+>  	return 0;
+>  }
+> @@ -572,7 +576,8 @@ static int nf_flow_encap_push(struct sk_buff *skb,
+>  		switch (tuple->encap[i].proto) {
+>  		case htons(ETH_P_8021Q):
+>  		case htons(ETH_P_8021AD):
+> -			if (skb_vlan_push(skb, tuple->encap[i].proto, tuple->encap[i].id) < 0)
+> +			if (skb_vlan_push(skb, tuple->encap[i].proto,
+> +					  tuple->encap[i].id) < 0)
+>  				return -1;
+>  			break;
+>  		case htons(ETH_P_PPP_SES):
+> @@ -624,12 +629,11 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff =
+*skb,
+>  	dir =3D tuplehash->tuple.dir;
+>  	flow =3D container_of(tuplehash, struct flow_offload, tuplehash[dir]);
+>  	other_tuple =3D &flow->tuplehash[!dir].tuple;
+> +	ip_daddr =3D other_tuple->src_v4.s_addr;
+> =20
+> -	if (nf_flow_tunnel_v4_push(state->net, skb, other_tuple) < 0)
+> +	if (nf_flow_tunnel_v4_push(state->net, skb, other_tuple, &ip_daddr) < 0)
+>  		return NF_DROP;
+> =20
+> -	ip_daddr =3D ip_hdr(skb)->daddr;
+> -
+>  	if (nf_flow_encap_push(skb, other_tuple) < 0)
+>  		return NF_DROP;
+> =20
+> @@ -906,6 +910,7 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff =
+*skb,
+>  {
+>  	struct flow_offload_tuple_rhash *tuplehash;
+>  	struct nf_flowtable *flow_table =3D priv;
+> +	struct flow_offload_tuple *other_tuple;
+>  	enum flow_offload_tuple_dir dir;
+>  	struct nf_flowtable_ctx ctx =3D {
+>  		.in	=3D state->in,
+> @@ -937,9 +942,10 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff=
+ *skb,
+> =20
+>  	dir =3D tuplehash->tuple.dir;
+>  	flow =3D container_of(tuplehash, struct flow_offload, tuplehash[dir]);
+> -	ip6_daddr =3D &ipv6_hdr(skb)->daddr;
+> +	other_tuple =3D &flow->tuplehash[!dir].tuple;
+> +	ip6_daddr =3D &other_tuple->src_v6;
+> =20
+> -	if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
+> +	if (nf_flow_encap_push(skb, other_tuple) < 0)
+>  		return NF_DROP;
+> =20
+>  	switch (tuplehash->tuple.xmit_type) {
+
+ack, the above changes are fine to me.
+
+Regards,
+Lorenzo
+
+
+
+--kcIDJeLuCmIpT6qE
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaR2nqwAKCRA6cBh0uS2t
+rCguAP94Y7RHnUASHiziYeFrJJxBnS4STiAJgV9S0aQo5/aivwD/eSWO+ndi+yzN
+7+k7tS3aaTPJVKMehmyBmfl9xGWd+QE=
+=4wc/
+-----END PGP SIGNATURE-----
+
+--kcIDJeLuCmIpT6qE--
 
