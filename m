@@ -1,130 +1,85 @@
-Return-Path: <netdev+bounces-240203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE1D6C716C1
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 00:11:53 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D963C716D9
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 00:15:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 09F4028A4C
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 23:11:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 043B0354A06
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 23:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD51327204;
-	Wed, 19 Nov 2025 23:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7C532C933;
+	Wed, 19 Nov 2025 23:14:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Lt1gjpav"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="EbDyxSJG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB98F2D9491
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 23:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C6F32C92B;
+	Wed, 19 Nov 2025 23:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763593909; cv=none; b=p9daOsKUHlOyR1F51+wvfKGcC52PCEZV7Pk0oLmwo3KxFRZXPqqDpUgT1YctwUFgxAJ8/Dtlv9V2B7cjsRcPdhPB7Tw84DWOU0gwaWPHlYTAzTiTOvWrjyNmRst3OLJOmeSxZEJyZGJugPfS4qtoITngPTLz/Cp6LWx/ShAFfDk=
+	t=1763594093; cv=none; b=G7+cs31rYtRVg4vLCMr35T8QMx7Z3HKnoKy0AWDGK02hcYTcaFZtX4z5d9LgkI8s6MQPmBYuu5l0M1OKp53Waabjy6YkuHaR0vMVd43remTTjiRJtZGLWFMSre3XfihfK105PuG2S1AULNoY8gccCWF2OL5d/GSOI7DjEGolm4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763593909; c=relaxed/simple;
-	bh=B4ogaSzeCTEfO2fyf8QMTYxTmdo61Vz7PJm9iZmEd3Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XFtQVLwapByuVZm4TY2Tn+a59yKPS49dB8wMHRLCrNtNgZyMgB9PzujYBOI+5GdiU+YYqsJWs2aERQLe/p3ddduWiJxVCv4IpJau3AA5rbDRG9+u7fwdRikPIngtRvyXbdQM3aFVrPElgQ7H3aWVdVBEkhQkC2ac/7up7cscfnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Lt1gjpav; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b713c7096f9so43717966b.3
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 15:11:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1763593906; x=1764198706; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZZaTR1bnryMwBTD6jnnFcRa6YP7RbWnYcC+dF48Y8gs=;
-        b=Lt1gjpavpSK9inte/G57cwm4PSwPwttll4e+ymij3cyrakoFzX5zF+cp+l0Duw2unE
-         Cj9YFP9FCAa6UL+1/iZCK4/U1HfDG8KMkkQFEWfA7LD1ZF0CHRoMFoX+wf2W2gkqNOSr
-         baq3Jr8PZC6S8u47xPkFKIYIJlCGbhJHPK6xTeqzSx8ojhjE3YGndy+mljtrna6ezvl5
-         wOMrQah3zr0jrP7SlN2OC39R9K0P9FW7TU6F+rAXBFrBzC05zC/ASF+OjJmh1qoahNX8
-         XdhULDXE5nKDPxTooC340LvRvgbXlf5s/rs+yKg3nTTjdpM0HrZQHLUpF54qRCekB4Vp
-         qFmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763593906; x=1764198706;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZZaTR1bnryMwBTD6jnnFcRa6YP7RbWnYcC+dF48Y8gs=;
-        b=iq/qxVqoDkAPXKhp8WkZXasz87hszcBsAxQ+6s5njdP++P++Fukwr4FqtY4gC6KrP0
-         ceknCgpx09MSgYPsZD6chBHXGoLPA6f0DJtmfYNYAFb6270pzfgtT/MzDSqCG2FqYJpc
-         aBemqd8cAOVsQBo95OWbmuUee9t9DvF5CvzEcCLIHKIgW1ff3TBj3bju/gvxU02qSqVV
-         R4ocLmbL3ppQyKIFhn6SR1MuB+vebv1prrQbvOf2UV3bka9DKwxZI6CkdGDfQQqcqqIP
-         a8JyCmilUBZ0rR9bR2EmvwnaqYDjIhNIfbB1qiSmzh1Y3DKplfW4VZOQ/IxnI22+dZZ4
-         saYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWoa4mabZigOHNef+j9LYhSTA5d5Q5U2RR/GPmqpDKb73s0H6dRBlTih94/fXdw7gypNqmshTo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgnfoE9iT8tftKSw1RwCbMWiDGx//QnB1zqMdZd2uE9CdeGwTS
-	5W4j3XzO/rZkCvW4YeyAGbGjie3rLdzSkBOQB88kSIMwYihSOFvAUIP/FWcK6F25gYw=
-X-Gm-Gg: ASbGncv0Mt1JgMYR7SINtue1NntwEu8ZFupZ2x5j9GqCUo1TdgLCb+qveU7ThARDs8w
-	Bgb9FImAsysipeXDGKFK/8cIImLrANoI3538vv75PwLjlOpDiyBBrb/YE2XzAYmIZiIYPzCh0ln
-	BvfVGHwh/xpVNvBseo38XFNuNRry4rPZrTfaDUsizUXR8v7JUl9Of/Wtp8quWyN0BUgqDpwhJmZ
-	0GCLh/cIDO/B4urf4NYR7gQJsHDt7rq3YZo6bQxm0Bes6ar2iEYUhIznvsflmXS1flfxt8hKhh5
-	EjVhd4h7ExFeIp8/IZP678x57M9Gat3Fu1k1Zfo2vDYhVUWQEqxhxQ1+6eLZTD0TRhY0mQ4MqOo
-	DTxkAnC7461asGgy8gI5B3BWd4QX/ECZn/lkKJ/vpnqAQepxXe+IkpvlMii8OnqH4ui1F9vaUSu
-	BvQP6GjHAwlPQ+spzPD8jQM3tj+iRnfY+0U6kW
-X-Google-Smtp-Source: AGHT+IGsbJFAHX8SXEuf70GC/fdHzn+3vcHUS7IST+d0xdlWSQsiYTr0gIPPSua8jakHdIJ/TGNUrA==
-X-Received: by 2002:a17:907:2d20:b0:b73:572d:3aff with SMTP id a640c23a62f3a-b7654eaf8c8mr99610366b.35.1763593906003;
-        Wed, 19 Nov 2025 15:11:46 -0800 (PST)
-Received: from dev-mattc2.dev.purestorage.com ([208.88.159.129])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b7654d80665sm54469166b.31.2025.11.19.15.11.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 15:11:45 -0800 (PST)
-From: Matthew W Carlis <mattc@purestorage.com>
-To: tariqt@nvidia.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	dtatulea@nvidia.com,
-	edumazet@google.com,
-	gal@nvidia.com,
-	kuba@kernel.org,
-	leon@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	mattc@purestorage.com,
-	mbloch@nvidia.com,
-	moshe@nvidia.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	saeedm@nvidia.com
-Subject: Re: [PATCH net-next 1/5] net/mlx5: Refactor EEPROM query error handling to return status separately
-Date: Wed, 19 Nov 2025 16:11:15 -0700
-Message-ID: <20251119231115.8722-1-mattc@purestorage.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <1763415729-1238421-2-git-send-email-tariqt@nvidia.com>
-References: <1763415729-1238421-2-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1763594093; c=relaxed/simple;
+	bh=GHAt7j3+39V1Ggijq6zlZisj89G5F7F6alC2XGpNv1Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lc1hw9o2yTysah0vImUVaI8yHmhsNMNEb4H+8ngsqVAGbPd+0/JfnvfZ84xTFgfgXcay0QHx4pQa5VilTHl5JSQqhm6ca3B7ry/+Cm4895tSShb6V2T0V8/tuGIep1q6NjYKoMM2siOVOAGnOCBIdCcYVrnPLoyttuiN3mXTIWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=EbDyxSJG; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 0DB246026B;
+	Thu, 20 Nov 2025 00:14:49 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1763594089;
+	bh=Y45S3lR4iKjKGcl+z8yZ+7WFG4SmwPeg2GBJ/4/cvoM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EbDyxSJG9lQVzmgH6OUTpxyIdFUtop9slDxeQk8uXSC47jEBeIB6Zj8DC2XhglDsm
+	 56jM8HlwsZnP8WoVsT6+048w6bf0QWEICp3xIv6u5cB8lwWm2VhRDx2CiFRICmufDQ
+	 aIIBiSfrDqjG1gCAYBXLQL4a92bmzG9uNBTNdjXjIcQ8SkE8GSV0vw+zmzwm4KFdWE
+	 EymDrt1d/5l+1gk6HfJJVc5o6HNxTSkNe6WVONp0RwkxZSZrW1mUz57mRqs/+O5FvT
+	 0/xZL0yRSSHb+5IVhlfTQUxGD61V8Rb6pMU1P8dac/Z3eyO6MgDJzCVv1rxXw7SMcz
+	 CWxrR0L4nAwdQ==
+Date: Thu, 20 Nov 2025 00:14:46 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
+Cc: Phil Sutter <phil@nwl.cc>, Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: Soft lock-ups caused by iptables
+Message-ID: <aR5PZvdjpvGD2mIS@calendula>
+References: <20251118221735.GA5477@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <aR3ZFSOawH-y_A3q@orbyte.nwl.cc>
+ <20251119222940.GA5070@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251119222940.GA5070@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 
-On Mon, 17 Nov 2025 23:42:05 +0200, Gal Pressman said
+On Wed, Nov 19, 2025 at 02:29:40PM -0800, Hamza Mahfooz wrote:
+> On Wed, Nov 19, 2025 at 03:49:57PM +0100, Phil Sutter wrote:
+> > Nftables ruleset validation code was refactored in v6.10 with commit
+> > cff3bd012a95 ("netfilter: nf_tables: prefer nft_chain_validate"). This
+> > is also present in v5.15.184, so in order to estimate whether a bug is
+> > "new" or "old", better really use old kernels not recent minor releases
+> > of old major ones. :)
+> 
+> FWIW I tried to repro this on v6.6.45 as well and it also suffers from
+> this issue.
 
-> Matthew and Jakub reported [1] issues where inventory automation tools
-> are calling EEPROM query repeatedly on a port that doesn't have an SFP
-> connected, resulting in millions of error prints.
-
-I'm not very familiar with the networking stack in general, but I poked around a
-little trying to be able to come up with a meaningful review. I noticed that in
-ethtool there are two methods registered for "ethtool -m".. Looks like it first
-prefers a netlink method, but also may fall back on an ioctl implementation.
-
-Will users who end up in the ioctl path expect to see the kernel message? In the
-case of users who run "ethtool -m" on a device without a transceiver installed I
-think we should expect to see something as follows?  (Is this correct?)
-
-$ ethtool -m ethx
-"netlink error: mlx5: Query module eeprom by page failed, read xxx bytes, err xxx, status xxx"
-
-
-Thank you for helping on this issue.
--Matt
+This example ruleset does not restore, it is missing ipsets.
 
