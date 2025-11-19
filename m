@@ -1,197 +1,176 @@
-Return-Path: <netdev+bounces-239986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8770AC6ECA5
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:18:22 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 633DEC6EDDF
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:27:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 3FDFB2E3E2
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:18:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 92C644FAE06
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 13:19:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFFF435FF45;
-	Wed, 19 Nov 2025 13:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="DQJFkS9T"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D549E363C65;
+	Wed, 19 Nov 2025 13:14:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF012357A5B
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 13:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E093612F9
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 13:14:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763557883; cv=none; b=ZfgODarhEE63T6frPYJTUuG8uLp0yn+jy+ya0ioumMzldJinxhOZCLyAYsQtZYllWphyp3vjSL3wFaGzratr60nmUAGl6SVN+C/R4s/g4MLe/AKgxNkkHJrD20yfHcrX7xQgPQDRC4iZ7H4QGcjq7ALoO0+BLzk4wma15XE93/w=
+	t=1763558067; cv=none; b=NXdXudLwrToGx76qmEvaMyCjZ6hJUTYO0hOSJvuzM8OCN3rjM22+t52aSOIY9mh6I+OhG6Gugx9zINhalxhH1Vnnbvd5kUYkNBVThE15uEVy2CCBYPWLux3WHsTNxnwDJeMdGNAVLMffJB4JHEwx6+QLNcULTXaSukvHCnZysoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763557883; c=relaxed/simple;
-	bh=sJLZgI9vl/ePXAMiM1HFoKkY761fjwT9P7fNtQPrjMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AbNEZaBWHAa1hVqjmQFBpd02JHXSqx7NWMldFMwpqg1l4ZUK4gyKrvmB3rWMVrNX4r+KEdKVKpCG9K9viOmFUCjjsoJyO+X7+tWpS8D4ZGfxhBl1bhlYDrqwIISa36hySYOe06kn8Sf1+8EdPQ5rgtsrZS/6nf+skPyMNtd/6lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=DQJFkS9T; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-640ca678745so10992570a12.2
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 05:11:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1763557878; x=1764162678; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2hIjgqXWXn3Sbfto+9OWapsp1QwhUBtS+kZIjBq+Tlw=;
-        b=DQJFkS9TfIkIw04m01xXMLNrkosYb3FSrkUd1Mfnq3DmFPVYW5BQAF/kJ7qBH/fiSm
-         pVnVkcfKZlPcHTsyEwqHQR67eAr7CHq57OGD53huuAi4hSCw/ct6edPOGR+fsY5nGz/N
-         Yw1ooyFk/+rMnBQZngJcf6t2sX9N66HB8FZQS71x9KKl/6xkzHkV8uFKm2Iy/9fAm8Ag
-         I22CiD+iqPZDy+W/I0Ox3Jki6uwZV0vfVWc6IvJTegJWTzKaS6FEi0EnBDDhgSnIfI+y
-         k4OP4x8AdsPKrFrvmXhICnjEUtirKTXsrSbTk6Wz8fF+OXFqP7Hrg3yvNq2+bPjQ4kUM
-         Gqaw==
+	s=arc-20240116; t=1763558067; c=relaxed/simple;
+	bh=42RmOKiDA6GeexOCOMcU/ivBYtVakVLPOtwUodTLUOk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZbCBfVm74ODbV797CQvni33UI1dXlbYCtu4yub312oXI83elTHwTNACpfbSm6ESzNyzzcQsa/EThW8h9deNATQ+4IhUmif8zsMKOH9wHIHB5lEW9pJVUZ1CTXWhzYvAoEUOvwGL2+D0fkI2L7XRZX5lTpkt3n99EUE7aHKw77Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-43321627eabso141090605ab.3
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 05:14:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763557878; x=1764162678;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2hIjgqXWXn3Sbfto+9OWapsp1QwhUBtS+kZIjBq+Tlw=;
-        b=g/6qkZglcGDwyXvrIFp/vHhvTezbrUUJfhQ+HJ+ZquP6poK680rX/wRGZqqHyX2Ssj
-         J+G9JME5doiiVdIgBV/xg+JlTSnL3gjmiWU+jHZ74N+WMhG62mwi0a764xqg0taz4LlC
-         9nqK70PCfzHKjsN588ymAaWkHkRv8ojU2JFL/60oVpjI/vbpGX5XlDPDSXd3HK42ymf+
-         BdlVqmatm9XuvzOEzZ7AIMAss+WdgcPGutOuD7SsGRjS8R0nycJzJYGOApJ40/tCk0uY
-         39IsgjbSlBJaGhm7FdN1JnA2r4hcn0c0FfU5Av1Dybk9N6YIRyUo9PQRsZvoeIhtM5gL
-         CL+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXZKnWsrmt+urxiUowU3OU4Ga/Ld50m50Ooxrc2SK5Dbup4BZAsPntnfufQwwYnhzQIONW24rU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1Mylwn3jNd1U+Z6AMsBJyCUJRzrK65AQ4KXiOgVtSVhwf2w6I
-	VGqW3cLNNVvV2CcUW66zLTwrtEH9Z1PnNpjmjBQrV0+vWZtGR0QOCMrFrl5C80e1YCg=
-X-Gm-Gg: ASbGnct4INxOGSeksJzfJoJJzTWBqi3uuH/9GejrhJzWuXrMgTUIAAFrB0wDnmt6U5Q
-	UaWDWsvugdIv9CnVY3GnvUWhUTW00T1aZesTatByx05u+hozQmhwWkvcX8hsYTdGv5u3Ib/TVrT
-	JCryPYtun0vrWGT7cSbnMqBwEx68f1gCp23eukc/wBoHkL8tchisSYdzeq5q2fKgNUw/lYw4gZW
-	VcMZjLdQdAMbjyaC05/u0OY70UbIMmZsL13Ay8a/qF4LtMYU4dXyF0piWJNf0dSjDKvYa+YJC3Z
-	hpQPWufA0NUC4HRT98ofsE3dWXAAJeRy7Lekbuj5DcIv8ODqsHIPrXvwYMcGJNjCOE0mD99bm1w
-	prZDD85rPJPDQNhDSvUdBQSCnNJRAve/AQn6jOhA6EY5YDbNjCQnZw/IaHnefZdroaxO7yM5ZF5
-	XvoIlvlkKjHjVmfA==
-X-Google-Smtp-Source: AGHT+IHh/9HSY9QxYY7JWRlsHkQE77dEey/TQadLHho4kIFH9l0Cnuj5X98H1aD+vZkw9c2t87Tcgg==
-X-Received: by 2002:a17:907:96a7:b0:b6d:50f7:a805 with SMTP id a640c23a62f3a-b7367c02586mr2099815666b.59.1763557878059;
-        Wed, 19 Nov 2025 05:11:18 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6433a3d8775sm15093392a12.5.2025.11.19.05.11.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 05:11:17 -0800 (PST)
-Date: Wed, 19 Nov 2025 14:11:12 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Corey Minyard <corey@minyard.net>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	Rob Clark <robin.clark@oss.qualcomm.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>, Calvin Owens <calvin@wbinvd.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Sagi Maimon <maimon.sagi@gmail.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Karan Tilak Kumar <kartilak@cisco.com>,
-	Hans Verkuil <hverkuil+cisco@kernel.org>,
-	Casey Schaufler <casey@schaufler-ca.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>,
-	Max Kellermann <max.kellermann@ionos.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	openipmi-developer@lists.sourceforge.net,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, amd-gfx@lists.freedesktop.org,
-	linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org, linux-mmc@vger.kernel.org,
-	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	linux-pci@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-	ceph-devel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Dmitry Baryshkov <lumag@kernel.org>,
-	Abhinav Kumar <abhinav.kumar@linux.dev>,
-	Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
-	Marijn Suijten <marijn.suijten@somainline.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Rodolfo Giometti <giometti@enneenne.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Stefan Haberland <sth@linux.ibm.com>,
-	Jan Hoeppner <hoeppner@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Satish Kharat <satishkh@cisco.com>,
-	Sesidhar Baddela <sebaddel@cisco.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v3 00/21] treewide: Introduce %ptS for struct timespec64
- and convert users
-Message-ID: <aR3B8ECx9W6F0BV_@pathway.suse.cz>
-References: <20251113150217.3030010-1-andriy.shevchenko@linux.intel.com>
+        d=1e100.net; s=20230601; t=1763558060; x=1764162860;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cWeS540O/DtVZO2hs++H8AN2oyKVmTS0zqyLwiaCVtg=;
+        b=HQUZfeesMl0FQ7udC4fYVx3S1oueYBvjWkgNDvWOkBimSmeCyigh7XouWrUt7JlNZs
+         v8bEBSp1yZ7cAOM+LnzWsGSqRdqSdtKIbo5QiuI+lYaF5E+GpDp2O4YAJ9IBRxwHOIQ0
+         erPp0FO1s6hBXiw7udfnM9XcXmSzQU9v5HYSxJ6hs8u9sRohs2ahCDdT+JbiCCLOPTON
+         WIZ/+7ekXytA8vEc/TNP2jgKcuM6/oTHWK164drv1IwczbEiRoEdYeHlsHnUWrbC/j8N
+         oiVxMoWuDQNekbftu9m/uIc8YhCzPMrBF9oGfsX0VFyd470SIZleXqGTZIZPgLYNHWfu
+         uMnw==
+X-Forwarded-Encrypted: i=1; AJvYcCWnsTNDQk4di2nlbgEQ/A3BZ6XqdFo5xyTRHC/EsjGJBk91W3zOCODeLxgGf0Eaa0OVMczkQeA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOLMiVVRbMFEtdQQODlMpXdEeEHWEUYBfPx9iPWbpNx09MHJDV
+	0VcwcHkKUWEtMwR8dqfN20SEiLABqKM61zekP2kLCf9Cr50Ny0HsDKJGJRf6swhbA+R/iKn1g9F
+	HeB5IYiz5BJjfsykBQJTZeK9wj4VEB7K5pPiVN+gZZFziaaxgH6s5qXvUv3M=
+X-Google-Smtp-Source: AGHT+IE0wN29h+b//Oy4kflZwkutKByXWn7e4G2F17+fGh7LzriH+pLrQE9E/GQMsNJDpkneW5Y33SPtXhIrBOd2RULh8XNfzAHd
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251113150217.3030010-1-andriy.shevchenko@linux.intel.com>
+X-Received: by 2002:a05:6e02:3810:b0:434:96ea:ff8b with SMTP id
+ e9e14a558f8ab-43496eb0395mr195448995ab.35.1763558060468; Wed, 19 Nov 2025
+ 05:14:20 -0800 (PST)
+Date: Wed, 19 Nov 2025 05:14:20 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <691dc2ac.050a0220.2ffa18.0005.GAE@google.com>
+Subject: [syzbot] [bridge?] [netfilter?] WARNING in nf_ct_bridge_post
+From: syzbot <syzbot+a8ba738fe2db6b4bb27f@syzkaller.appspotmail.com>
+To: bridge@lists.linux.dev, coreteam@netfilter.org, davem@davemloft.net, 
+	edumazet@google.com, fw@strlen.de, horms@kernel.org, idosch@nvidia.com, 
+	kadlec@netfilter.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, phil@nwl.cc, razor@blackwall.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu 2025-11-13 15:32:14, Andy Shevchenko wrote:
-> Here is the third part of the unification time printing in the kernel.
-> This time for struct timespec64. The first patch brings a support
-> into printf() implementation (test cases and documentation update
-> included) followed by the treewide conversion of the current users.
-> 
-> Petr, we got like more than a half being Acked, I think if you are okay
-> with this, the patches that have been tagged can be applied.
-> 
-> Note, not everything was compile-tested. Kunit test has been passed, though.
+Hello,
 
-JFYI, the patchset has been committed into printk/linux.git,
-branch for-6.19-vsprintf-timespec64.
+syzbot found the following issue on:
 
-Note, that I have:
+HEAD commit:    5bebe8de1926 mm/huge_memory: Fix initialization of huge ze..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1526e97c580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a1db0fea040c2a9f
+dashboard link: https://syzkaller.appspot.com/bug?extid=a8ba738fe2db6b4bb27f
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13fca8b4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=121b7332580000
 
-   + fixed the 19th patch as proposed, see
-     https://lore.kernel.org/all/aR2XAYWTEgMZu_Mx@pathway.suse.cz/
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-5bebe8de.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/45a180eaa13d/vmlinux-5bebe8de.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9ba2dcafae20/bzImage-5bebe8de.xz
 
-   + reviewed all patches but I triple checked 7th patch which
-     did not have any ack yet. And I added my Reviewed-by tag
-     there. ;-)
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a8ba738fe2db6b4bb27f@syzkaller.appspotmail.com
 
-   + I tried build with allyesconfig. It succeeded. I am not 100%
-     sure that it built all modified sources but...
+bridge0: received packet on syz_tun with own address as source address (addr:aa:aa:aa:aa:aa:aa, vlan:1)
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5876 at net/bridge/netfilter/nf_conntrack_bridge.c:357 nf_ct_bridge_refrag net/bridge/netfilter/nf_conntrack_bridge.c:357 [inline]
+WARNING: CPU: 0 PID: 5876 at net/bridge/netfilter/nf_conntrack_bridge.c:357 nf_ct_bridge_post+0x3ff/0x1060 net/bridge/netfilter/nf_conntrack_bridge.c:408
+Modules linked in:
+CPU: 0 UID: 0 PID: 5876 Comm: syz.3.94 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:nf_ct_bridge_refrag net/bridge/netfilter/nf_conntrack_bridge.c:357 [inline]
+RIP: 0010:nf_ct_bridge_post+0x3ff/0x1060 net/bridge/netfilter/nf_conntrack_bridge.c:408
+Code: 89 ff 48 89 da 48 8d 8c 24 40 01 00 00 49 c7 c0 40 0c 2a 8a e8 12 d6 e1 ff 41 bf 02 00 00 00 e9 9c 07 00 00 e8 d2 1a 96 f7 90 <0f> 0b 90 45 31 ff e9 8b 07 00 00 e8 c1 1a 96 f7 eb 05 e8 ba 1a 96
+RSP: 0018:ffffc9000d996ae0 EFLAGS: 00010293
+RAX: ffffffff8a29f88e RBX: ffff888050bc0140 RCX: ffff88803b2b0000
+RDX: 0000000000000000 RSI: ffffffff8f40f220 RDI: 0000000000000081
+RBP: ffffc9000d996cc0 R08: ffff88803b2b0000 R09: 0000000000000002
+R10: 000000000000dd86 R11: 0000000000000000 R12: 1ffff1100a17802e
+R13: dffffc0000000000 R14: ffffc9000d996d80 R15: 0000000000000081
+FS:  00007f027c05e6c0(0000) GS:ffff88808d730000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00002000000000c0 CR3: 0000000059f5b000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
+ nf_hook_slow+0xc5/0x220 net/netfilter/core.c:623
+ nf_hook include/linux/netfilter.h:273 [inline]
+ NF_HOOK+0x215/0x3c0 include/linux/netfilter.h:316
+ br_forward_finish+0xd3/0x130 net/bridge/br_forward.c:66
+ NF_HOOK+0x320/0x3c0 include/linux/netfilter.h:318
+ __br_forward+0x41e/0x600 net/bridge/br_forward.c:115
+ deliver_clone net/bridge/br_forward.c:131 [inline]
+ maybe_deliver+0xb5/0x160 net/bridge/br_forward.c:191
+ br_flood+0x31a/0x6a0 net/bridge/br_forward.c:238
+ br_handle_frame_finish+0x15a3/0x1c90 net/bridge/br_input.c:229
+ nf_hook_bridge_pre net/bridge/br_input.c:313 [inline]
+ br_handle_frame+0xb75/0x14f0 net/bridge/br_input.c:442
+ __netif_receive_skb_core+0x10b9/0x4380 net/core/dev.c:5966
+ __netif_receive_skb_one_core net/core/dev.c:6077 [inline]
+ __netif_receive_skb+0x72/0x380 net/core/dev.c:6192
+ netif_receive_skb_internal net/core/dev.c:6278 [inline]
+ netif_receive_skb+0x1cb/0x790 net/core/dev.c:6337
+ tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
+ tun_get_user+0x2b65/0x3e90 drivers/net/tun.c:1953
+ tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
+ new_sync_write fs/read_write.c:593 [inline]
+ vfs_write+0x5c9/0xb30 fs/read_write.c:686
+ ksys_write+0x145/0x250 fs/read_write.c:738
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f027b18e17f
+Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 92 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 93 02 00 48
+RSP: 002b:00007f027c05e000 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007f027b3e6090 RCX: 00007f027b18e17f
+RDX: 000000000000004e RSI: 0000200000000500 RDI: 00000000000000c8
+RBP: 00007f027b211f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 000000000000004e R11: 0000000000000293 R12: 0000000000000000
+R13: 00007f027b3e6128 R14: 00007f027b3e6090 R15: 00007ffc84bca4a8
+ </TASK>
 
-Best Regards,
-Petr
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
