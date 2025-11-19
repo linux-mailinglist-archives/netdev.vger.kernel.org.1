@@ -1,257 +1,114 @@
-Return-Path: <netdev+bounces-240069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F828C6FFF7
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:16:17 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1793C700A0
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:22:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id F282828F97
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:16:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8A5533524B1
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CA3346780;
-	Wed, 19 Nov 2025 16:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCC82D59F7;
+	Wed, 19 Nov 2025 16:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="aVLrGC4k"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.blochl.de (mail.blochl.de [151.80.40.192])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B88534104E;
-	Wed, 19 Nov 2025 16:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.40.192
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F8236E56B
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 16:10:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763568930; cv=none; b=FXbwlY34h4hqJ48gpURUdgT09al67ogzdocZuvdTWyR+vpCU2R6lzf9dFStGmUPuB44RJagPIvYIsjjCtB8dkTJ/OZ40ZwurVHJuUsEbnkfTPIbRHQzMEdiDuEIbA0H3boC053/kclm8YWfJc+2Rupv7Hsx28Cm5p4G25Vixi5s=
+	t=1763568622; cv=none; b=RMrqBBC4hBB1doRWooQ5NC53puDTCoOrYtamv0ERXjRKAbQgvzsyylnLkFetwFa5xN+6aSOSRIgyLlQQ03vDdR90h0gQ7+B4Dlb8oABZ1XB5FOfYvzdV1yEbDEaysr4jO3aYvchb4Fn7L5VqxE0AZFUGE2jRHEEcqDkhalmEKkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763568930; c=relaxed/simple;
-	bh=LdnLu++HLZnRwZZrapuQ9JqYkYCX+rox/PeY/x+F7VM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=dQ6FmcYBR1TVMnrK0AvU+kvlDEdpaFGZhS7aOA2BnxeTeKM88kDwEoM8LrmLNJGl88T7wpL/So2i+mZa6WRVuJOe3GZQ4chf0/32HROxRcAn2siPCns9kAsMlHtWOkF+PnpYK8QTMj3OxQKif0/Jh7wlcCdzUQoEgl6MAhApRuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blochl.de; spf=pass smtp.mailfrom=blochl.de; arc=none smtp.client-ip=151.80.40.192
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blochl.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blochl.de
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.blochl.de 101F94641E88
-Authentication-Results: mail.blochl.de; dmarc=none (p=none dis=none) header.from=blochl.de
-Authentication-Results: mail.blochl.de; spf=fail smtp.mailfrom=blochl.de
-Received: from WorkKnecht (ppp-93-104-13-154.dynamic.mnet-online.de [93.104.13.154])
-	by smtp.blochl.de (Postfix) with ESMTPSA id 101F94641E88;
-	Wed, 19 Nov 2025 16:09:49 +0000 (UTC)
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 1.4.3 at 449b6f9d6baf
-Date: Wed, 19 Nov 2025 17:09:43 +0100
-From: Markus =?utf-8?Q?Bl=C3=B6chl?= <markus@blochl.de>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Richard Cochran <richardcochran@gmail.com>, 
-	Markus =?utf-8?Q?Bl=C3=B6chl?= <markus.bloechl@ipetronik.com>, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] i40e: fix ptp time increment while link is down
-Message-ID: <20251119-i40e_ptp_link_down-v1-1-b351fed254b3@blochl.de>
-X-B4-Tracking: v=1; b=H4sIAJjpHWkC/x3MQQqAIBBA0avErBOaUsKuEiGRUw2FiUYF4d2Tl
- m/x/wuRAlOErngh0MWRD5eBZQHTOrqFBNtsqKtaIaIWLCsy/vRmZ7cZe9xOyFY3ctaESlnIoQ8
- 08/NP+yGlD7UPWh5kAAAA
-X-Change-ID: 20251119-i40e_ptp_link_down-47934f9e155d
-X-Mailer: b4 0.14.3
+	s=arc-20240116; t=1763568622; c=relaxed/simple;
+	bh=mHmSBdBUMsM98MKMQ16j1/Bj/dx65pntHMGDTY2scS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OCR4/beQ9Hka8ilPYIfL1f6cU4fPqrwIK8RKrFz+YYKsZ/Yh6JleCyaTDe1CxZjwik1yp3kMhe8ggRKBT1OZDMFOCtK4DL14dwouBVeY4V49mRFvqVvZ3LRBAlqL+qy8gaQeLoavJcEvsHVGi1zfsh4jiqy8RODpdXQnUBvVcUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=aVLrGC4k; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b737cd03d46so645915066b.0
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 08:10:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1763568619; x=1764173419; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=obMO0wYPRukfGEWb9Ik5Mm0Kc6J6YzvOIw86E9DCTVA=;
+        b=aVLrGC4kb0XZg19NyUJPeVGLsGEKG0Dj615KQB28MDqlKDLP1JaoiTTEg8c5Arpqj3
+         h3gAUA62dbsd+p68q2KxkLJK4oxlDzRIVC/8LLXKGXDAPVgAbsA0IlVy+zqvIXKIGTFm
+         cqspXGvRdUIdW6Fn+xTpNLmvT/9UHIILeApJGoyfaPU4zjSMcGV0ulCm0NrjL79RI7qr
+         YyCinEpjKeHCtsHUoDFuNy56uh9WdTOR6I3ACHYhP+ZGGNHr6agcOSprCFR/jUv1rqir
+         Os3TkrqEdJAUnX43a/+3rxckYSk3fiwyXnFLbUY3xc2P9XxmEoFMz4peJdzUQBwpnkCp
+         mvtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763568619; x=1764173419;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=obMO0wYPRukfGEWb9Ik5Mm0Kc6J6YzvOIw86E9DCTVA=;
+        b=LlLapad84or3bypsJ/n0DSI+ClYKg+BxuTHFeiSXEg1vv3iXd3AE9i5XWsrWiFUiRS
+         gjU7rb1KV68Oz95ZDeA54Wt5yoZj8Qy108gtDYERsk9fybYo+vcYgDqHpIGz8rgmsrmv
+         nT3fGFFS/mn4n9gk6t2fg28y6iAvWIDh4tJWkUPj2ZH3cfjV3NDJ6SkLZtL87HolGbsk
+         kwu22jwc0K5ADLnpL78FJnsA9uX9OQAhZ+Wg1R2G3Z6YziKpP6uDwwmTbj4ShmfmuCH+
+         6z9FKM3enyWMYv8VMhl59cTUMJ4ZQKIcu3ohXQKgA3RMkN4LYC04PEKW/D2Le1eFCcau
+         v8Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCW1rlQlPOGDXTpUXUrDRPyM6gf4CnshAMClROvmoI7wiCMldAOPs7CCvoKR6K60eb7U/K2LnC4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYz7IBoZWP7iMuqRSB1ZW9KstSfD/ZCUP/a01REF5CbGoU+ZkD
+	h5u1Y84ylg1eIJNUT5WVUZsu48nRdnnaxTyUWcdJn3u3Zc+in2EYEJaEgfqnVU7oSqc=
+X-Gm-Gg: ASbGncv+ku561iepfsE0qtnCY3qID3jW0Sh/430nJK5OmCuFM3vLL6kxrUYCXFDnvuW
+	qRdVSRGOa/Qo8zlSdAVvcofcRuaniWIymHWg3FZTz5NyD99qKtfCJDrmlwoFilVyjQXPOww1ELd
+	4DpiFVcmXBUtNCvzM+Rt0b3oZgA8DpbpNZPinLCXIfkNdTk7xQg9uNGk6UkupFZM+Rtg/1Ex0y7
+	Lb31SzqJb53t4qdNXOsjs80Q5CFLQc77plbEUj7Mu5ZIX4k+T9QCcnC3nj/OUOUqtE0+TCWkGpI
+	RuO/xK5IBBMZWwSTfVLGrkRLvonkdhmryh9gKghjpNJo9+mHnLIs6zZJvPXG7XuX1Kz1CmgPxNa
+	l//fPlRkv3Fqidk8JC4l9YpRRUgmBaKuAnBPpIrIYurdwZioukO3vBkQU2QCcLGYsQzoShGmuAt
+	5UxlhH7Fgt82TUlUWJjjc8KrI=
+X-Google-Smtp-Source: AGHT+IEXAArin/coa0GZgSrEav6MLboqNEKcMPid0tRL7uyYDaIetyaKZwreOBItTdMx+ON6Mg2+iw==
+X-Received: by 2002:a17:906:7d0:b0:b73:74d6:d360 with SMTP id a640c23a62f3a-b7374d6d4e3mr1534730966b.40.1763568618474;
+        Wed, 19 Nov 2025 08:10:18 -0800 (PST)
+Received: from FV6GYCPJ69 ([213.195.231.108])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fad800dsm1664562866b.29.2025.11.19.08.10.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Nov 2025 08:10:17 -0800 (PST)
+Date: Wed, 19 Nov 2025 17:10:15 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "Nikola Z. Ivanov" <zlatistiv@gmail.com>, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, david.hunter.linux@gmail.com, 
+	khalid@kernel.org, linux-kernel-mentees@lists.linuxfoundation.org, 
+	syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] team: Move team device type change at the end of
+ team_port_add
+Message-ID: <mekjl7qqrb6nkk6ru4fztqxzemldzbsplf5tzuu7amc7yaa5j3@rulh6ijsppaq>
+References: <20251112003444.2465-1-zlatistiv@gmail.com>
+ <c6fa0160-aac6-4fc4-b252-7151a0cb91d3@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.6.4 (smtp.blochl.de [0.0.0.0]); Wed, 19 Nov 2025 16:09:49 +0000 (UTC)
+In-Reply-To: <c6fa0160-aac6-4fc4-b252-7151a0cb91d3@redhat.com>
 
-When an X710 ethernet port with an active ptp daemon (like the ptp4l and phc2sys combo)
-suddenly loses its link and regains it after a while, the ptp daemon has a hard time
-to recover synchronization and sometimes entirely fails to do so.
+Tue, Nov 18, 2025 at 12:46:36PM +0100, pabeni@redhat.com wrote:
+>On 11/12/25 1:34 AM, Nikola Z. Ivanov wrote:
+>> @@ -1233,6 +1231,10 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+>>  		}
+>>  	}
+>>  
+>> +	err = team_dev_type_check_change(dev, port_dev);
+>> +	if (err)
+>> +		goto err_set_dev_type;
+>
+>Please don't add unneeded new labels, instead reuse the exiting
+>`err_set_slave_promisc`.
 
-The issue seems to be related to a wrongly configured increment while the link is down.
-This could not be observed with the Intel reference driver. We identified the fix to appear in
-Intels official ethernet-linux-i40e release version 2.17.4.
-
-Include the relevant changes in the kernel version of this driver.
-
-Fixes: beb0dff1251d ("i40e: enable PTP")
-Cc: stable@vger.kernel.org
-Signed-off-by: Markus Blöchl <markus@blochl.de>
----
-Tested with an X710 at 10G link speed and kernel version 6.12.42.
----
- drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h |  9 +++
- drivers/net/ethernet/intel/i40e/i40e_ptp.c        | 68 +++++++++++++++++++++--
- drivers/net/ethernet/intel/i40e/i40e_register.h   |  9 +++
- drivers/net/ethernet/intel/i40e/i40e_type.h       |  8 +++
- 4 files changed, 89 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-index cc02a85ad42b..ec176e9569ad 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-@@ -1488,6 +1488,15 @@ enum i40e_aq_link_speed {
- 	I40E_LINK_SPEED_25GB	= BIT(I40E_LINK_SPEED_25GB_SHIFT),
- };
- 
-+enum i40e_prt_mac_pcs_link_speed {
-+	I40E_PRT_MAC_PCS_LINK_SPEED_UNKNOWN = 0,
-+	I40E_PRT_MAC_PCS_LINK_SPEED_100MB,
-+	I40E_PRT_MAC_PCS_LINK_SPEED_1GB,
-+	I40E_PRT_MAC_PCS_LINK_SPEED_10GB,
-+	I40E_PRT_MAC_PCS_LINK_SPEED_40GB,
-+	I40E_PRT_MAC_PCS_LINK_SPEED_20GB
-+};
-+
- struct i40e_aqc_module_desc {
- 	u8 oui[3];
- 	u8 reserved1;
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-index 33535418178b..ee6927e2c6f8 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-@@ -847,6 +847,65 @@ void i40e_ptp_rx_hwtstamp(struct i40e_pf *pf, struct sk_buff *skb, u8 index)
- 	i40e_ptp_convert_to_hwtstamp(skb_hwtstamps(skb), ns);
- }
- 
-+/**
-+ * i40e_ptp_get_link_speed_hw - get the link speed
-+ * @pf: Board private structure
-+ *
-+ * Calculate link speed depending on the link status.
-+ * Return the link speed.
-+ **/
-+static enum i40e_aq_link_speed i40e_ptp_get_link_speed_hw(struct i40e_pf *pf)
-+{
-+	bool link_up = pf->hw.phy.link_info.link_info & I40E_AQ_LINK_UP;
-+	enum i40e_aq_link_speed link_speed = I40E_LINK_SPEED_UNKNOWN;
-+	struct i40e_hw *hw = &pf->hw;
-+
-+	if (link_up) {
-+		struct i40e_link_status *hw_link_info = &hw->phy.link_info;
-+
-+		i40e_aq_get_link_info(hw, true, NULL, NULL);
-+		link_speed = hw_link_info->link_speed;
-+	} else {
-+		enum i40e_prt_mac_link_speed prtmac_linksta;
-+		u64 prtmac_pcs_linksta;
-+
-+		prtmac_linksta = (rd32(hw, I40E_PRTMAC_LINKSTA(0))
-+			& I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_MASK)
-+			>> I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT;
-+		if (prtmac_linksta == I40E_PRT_MAC_LINK_SPEED_40GB) {
-+			link_speed = I40E_LINK_SPEED_40GB;
-+		} else {
-+			i40e_aq_debug_read_register(hw,
-+						    I40E_PRTMAC_PCS_LINK_STATUS1(0),
-+						    &prtmac_pcs_linksta,
-+						    NULL);
-+
-+			prtmac_pcs_linksta = (prtmac_pcs_linksta
-+			& I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_MASK)
-+			>> I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT;
-+
-+			switch (prtmac_pcs_linksta) {
-+			case I40E_PRT_MAC_PCS_LINK_SPEED_100MB:
-+				link_speed = I40E_LINK_SPEED_100MB;
-+				break;
-+			case I40E_PRT_MAC_PCS_LINK_SPEED_1GB:
-+				link_speed = I40E_LINK_SPEED_1GB;
-+				break;
-+			case I40E_PRT_MAC_PCS_LINK_SPEED_10GB:
-+				link_speed = I40E_LINK_SPEED_10GB;
-+				break;
-+			case I40E_PRT_MAC_PCS_LINK_SPEED_20GB:
-+				link_speed = I40E_LINK_SPEED_20GB;
-+				break;
-+			default:
-+				link_speed = I40E_LINK_SPEED_UNKNOWN;
-+			}
-+		}
-+	}
-+
-+	return link_speed;
-+}
-+
- /**
-  * i40e_ptp_set_increment - Utility function to update clock increment rate
-  * @pf: Board private structure
-@@ -857,16 +916,14 @@ void i40e_ptp_rx_hwtstamp(struct i40e_pf *pf, struct sk_buff *skb, u8 index)
-  **/
- void i40e_ptp_set_increment(struct i40e_pf *pf)
- {
--	struct i40e_link_status *hw_link_info;
-+	enum i40e_aq_link_speed link_speed;
- 	struct i40e_hw *hw = &pf->hw;
- 	u64 incval;
- 	u32 mult;
- 
--	hw_link_info = &hw->phy.link_info;
-+	link_speed = i40e_ptp_get_link_speed_hw(pf);
- 
--	i40e_aq_get_link_info(&pf->hw, true, NULL, NULL);
--
--	switch (hw_link_info->link_speed) {
-+	switch (link_speed) {
- 	case I40E_LINK_SPEED_10GB:
- 		mult = I40E_PTP_10GB_INCVAL_MULT;
- 		break;
-@@ -909,6 +966,7 @@ void i40e_ptp_set_increment(struct i40e_pf *pf)
- 	/* Update the base adjustement value. */
- 	WRITE_ONCE(pf->ptp_adj_mult, mult);
- 	smp_mb(); /* Force the above update. */
-+	i40e_ptp_set_1pps_signal_hw(pf);
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/net/ethernet/intel/i40e/i40e_register.h
-index 432afbb64201..c4051dbcc297 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_register.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
-@@ -530,6 +530,15 @@
- #define I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_SHIFT 0
- #define I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_MASK I40E_MASK(0xFFFF, \
- 	I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_SHIFT)
-+/* _i=0...3 */ /* Reset: GLOBR */
-+#define I40E_PRTMAC_PCS_LINK_STATUS1(_i) (0x0008C200 + ((_i) * 4))
-+#define I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT 24
-+#define I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_MASK I40E_MASK(0x7, I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT)
-+#define I40E_PRTMAC_PCS_LINK_STATUS2 0x0008C220
-+/* _i=0...3 */ /* Reset: GLOBR */
-+#define I40E_PRTMAC_LINKSTA(_i) (0x001E2420 + ((_i) * 4))
-+#define I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT 27
-+#define I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_MASK I40E_MASK(0x7, I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT)
- #define I40E_GLNVM_FLA 0x000B6108 /* Reset: POR */
- #define I40E_GLNVM_FLA_LOCKED_SHIFT 6
- #define I40E_GLNVM_FLA_LOCKED_MASK I40E_MASK(0x1, I40E_GLNVM_FLA_LOCKED_SHIFT)
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
-index ed8bbdb586da..98c8c5709e5f 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_type.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
-@@ -115,6 +115,14 @@ enum i40e_queue_type {
- 	I40E_QUEUE_TYPE_UNKNOWN
- };
- 
-+enum i40e_prt_mac_link_speed {
-+	I40E_PRT_MAC_LINK_SPEED_100MB = 0,
-+	I40E_PRT_MAC_LINK_SPEED_1GB,
-+	I40E_PRT_MAC_LINK_SPEED_10GB,
-+	I40E_PRT_MAC_LINK_SPEED_40GB,
-+	I40E_PRT_MAC_LINK_SPEED_20GB
-+};
-+
- struct i40e_link_status {
- 	enum i40e_aq_phy_type phy_type;
- 	enum i40e_aq_link_speed link_speed;
-
----
-base-commit: 8b690556d8fe074b4f9835075050fba3fb180e93
-change-id: 20251119-i40e_ptp_link_down-47934f9e155d
-
-Best regards,
--- 
-Markus Blöchl <markus@blochl.de>
-
-
--- 
+Well, that is how error labels are done in team. "action" and
+"err_action" is always paired. Why to break this consistent pattern?
 
