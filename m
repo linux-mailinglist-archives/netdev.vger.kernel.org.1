@@ -1,207 +1,161 @@
-Return-Path: <netdev+bounces-240051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6424AC6FB83
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:43:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75C90C6FEE0
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 17:06:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5E404387023
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 15:36:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id B6292300B4
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC582DE718;
-	Wed, 19 Nov 2025 15:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 725A22E8B66;
+	Wed, 19 Nov 2025 16:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="emjC9/al";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PknmgSOO"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bQJ7X/pC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010001.outbound.protection.outlook.com [52.101.193.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D012D9EF3
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 15:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763566557; cv=none; b=DmRnNIVysGNZeXiM/ixHkl1RyRunaP4lEo3KrHtuduprEe66TmBKc+3ovX24X1SJlFkUR7X2zp8Fu70yGlfmTS3y5s+tkCXy4A0+hiRH14fn5Te/tdSf/gBxAOeyFg86IxURD0KX1xkhySzW2FikHIzdk1y0UbQ3QxFHdMm1jCg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763566557; c=relaxed/simple;
-	bh=8xQWC2OGmtfjHYhYxSYa01NZETYq9M+SyMw53U93t6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ADBuzuizFbYIOMnlAR56KcAa0Z1rdq7vx3x1qBpRqtmzGy8hEcifgyWAR3VHp6PVOYJVMxTCGFvlDSnF6lDK4j6bPFWItkU1pgRNTsCc60wF4WmhMM75ltsFKIf5A6iAXV7JYljWMLVn+HGleOkN+hDTZk5lGhhOdvBcTVmMl2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=emjC9/al; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PknmgSOO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763566554;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B5rXBayezD4fGmnwc7W8pDkjBIEGyWaeCx/RLJ47OIA=;
-	b=emjC9/alu/wdC4o49rLdIoeVBBPriZRJR2cEMMJPiljjpm9+ip9TdQpiy5286E52b7hrDY
-	8Jq+L+LBdtlyNqz5eC1CQR/LBfd9GB4DHJaqyGkvK2jIZtc7XwjydLADejaxzp6+Vp9ZmZ
-	9HCYrF33DBK7WYjs9Zf7/zHIjJlkFiI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-444-IM2unokkOkq6CLy8cAb77A-1; Wed, 19 Nov 2025 10:35:53 -0500
-X-MC-Unique: IM2unokkOkq6CLy8cAb77A-1
-X-Mimecast-MFC-AGG-ID: IM2unokkOkq6CLy8cAb77A_1763566552
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42b366a76ffso3585545f8f.1
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 07:35:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763566551; x=1764171351; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=B5rXBayezD4fGmnwc7W8pDkjBIEGyWaeCx/RLJ47OIA=;
-        b=PknmgSOOK1OgAnnLggb8yEpD1m/+g6YD/DofUSurnLQv9VpuEdvfnwHprwkptYskSj
-         18vD7A8qGOiZDvFX6kWHjk3M53mpPlq8m2JhP6AOCDt62qU1pgdbUzQP+tRfD9H/HgjZ
-         n1QVhFCIjKvI0RSd7/pUKzyGGFGes0x3ma+M2Fd2U8P110W6ltSt+wOKbAfnvaPXG4Rl
-         lzCvq15jqq7DdwzpxRNpDIZwlI/WQQ3JiJTiCyovzxvXaiY/DJbRnVmrPuqn8J9x7Hye
-         2STh9WLkU4xWkmam0XPrArlxsibteeygeI4/UIzLoEljCmgQeEdO2UoBzoJaKAywIKO2
-         jHTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763566551; x=1764171351;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B5rXBayezD4fGmnwc7W8pDkjBIEGyWaeCx/RLJ47OIA=;
-        b=GolBYqW7xiHu3c/5O2clWCj4FxX2k7qyEIIcC2EqEAqD16lZOKdfujmQXXl8xvI/Vg
-         lPhTjdAlMGhssAdvfEe6/zRjCexhfKNCEAMav3OnDtCt/R0SPWU0Rdl6RgKHoncO/qvt
-         jQjWvvNBIyNQmav+MhqtpSoosNN8+kXCxcSA/FVx2Dy1TIsXR7BVlIKPrURiIVxPHTTJ
-         SUFr9yYGWhAAyDbwTooHWhjdMkRfpNYbDD/9ndSX6QMKWhdRbToWvSEQvGRtXXPbijXp
-         pPr6A2iDYeqvJXyAjx9f/YXOplXp8QQlEbg64X03WsvedeSPl1WuVPTqrfkdePg+o5/K
-         iIng==
-X-Gm-Message-State: AOJu0Yw2P3LAIUf0rbqMirTxsZsJWdEHLlE/+W7E3CWW7ox5DuznVd8r
-	iMNELXaWim8C6H4fRJFB84m/3ELPdI1+xfpJtaI/DZvtn+cZY30ZPDyxosMr7rSDrLr6pix8woV
-	I503mg2xyBaT2Kjsx+nfIhv52rQN8m9q4IDVjLFynSX+nMxoUGbbg0wW8Xg==
-X-Gm-Gg: ASbGncuUfR5lNmWWltBDU9W1X4knzJ48kP0KLJikTtvZEnxMOeuvFBJo9oSLtt6hVkZ
-	SWmQc/k7pDVT4kmlTpkC37jKhtEdIkRF+V6dpcCZlSfne9Dws4MHyUn9eoQjLIN2wBsdwxO0ySw
-	in5KJvT7kagGiqLvtgMi7bxlLWaN2baMe/ZMZXKKpNkvB+OagPBQi2GGonz63CsEL4WmiF91HVn
-	UBtJowKNL96E6YNj9cuO5ea5CXAa7wwp/COKec3gXkbDHA0gi0j9h/GHB8s1wKZxK9hbRCYuGCo
-	OzzesFwlyCg5vYmZlgpeb0VtRr4scML+Km9YWWpnbMUN/dC0/Hg1x8wgivubkUgHao7My/kCS6L
-	bO9EYExhgxvWQMX1Ro7H/LrkDFtWw3g==
-X-Received: by 2002:a05:6000:1a8e:b0:42b:3e0a:64b8 with SMTP id ffacd0b85a97d-42b593505bamr19333066f8f.24.1763566551402;
-        Wed, 19 Nov 2025 07:35:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFsu6XSFNDBciSWl2Js2B1sAVjUG1swL73vKYbAUIAe5E9Q/RDA00H3GxNi9yzFc+Jd1MBR4w==
-X-Received: by 2002:a05:6000:1a8e:b0:42b:3e0a:64b8 with SMTP id ffacd0b85a97d-42b593505bamr19333019f8f.24.1763566550923;
-        Wed, 19 Nov 2025 07:35:50 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53dea1c9sm38718586f8f.0.2025.11.19.07.35.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 07:35:50 -0800 (PST)
-Date: Wed, 19 Nov 2025 10:35:47 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net v6 2/2] virtio-net: correct hdr_len handling for
- tunnel gso
-Message-ID: <20251119102753-mutt-send-email-mst@kernel.org>
-References: <20251119055522.617-1-xuanzhuo@linux.alibaba.com>
- <20251119055522.617-3-xuanzhuo@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2017288C08;
+	Wed, 19 Nov 2025 16:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763568094; cv=fail; b=JMepRPhjgCIcZ9OXl4ioSKYVQaMX0bKxI6Hgzz9YUDT3dI6bRR9T5rjyWOBlD7dNCuYLcivLFRGRZRdl7W+f14TljdQ9wGvRbCQ/SD+07TAKL2gs+d8e1j+8JOQ1Tm8LE+dd6KWIp52QVbZFRmUgf0OK2dZJEQAhzERC4dv2wqQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763568094; c=relaxed/simple;
+	bh=j107q189kTGNl/WPgtiVEXszO1j87aPKg38HrYcaThk=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=TKXgrj3rdTRkPi1gNIJQ9K/RTb2fh1yuV6/Mbcqe+occ0nnUuIYIZML9mGaM6y/GMTrZdfZikvuNORmAFgNZHiJmRnVP/SmzsI7odJQD6+EemKNa5DCh602XyFPWnSjlsc6tTDD4sLSN+EzD2i+SRUlG6dONeOKcOWrM5PFk78A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bQJ7X/pC; arc=fail smtp.client-ip=52.101.193.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UnA4E4RhmPuLa8zkXz75ja48g1akyaj+/ToyoMXd5NBUfou5zEDfo26i+PYkakPFR+hKvHyRILeREqU3RRE37SNfmi/CAcfeNmviqnxcCTA/ENScg6+t8WBNKz8P0qX8Or71cDiR0DVZqQJL+mT9DjxuiLbcH9ooFb8xs6EumfL2pMxtAGd7R3fZeRCBxzS5biMm+TTatd48q+HFL1qXT84d0RcbaI9S5GoHI2p/pJVQ8p4kLAhcdTGFKOrrQ6vBar2PmK9FTnQ/OBQs8JJGNe+8qzj1b9qXFNfMQ68Ny3JyGqQaVm3+vyOP351zUJvEAbSfAqwi7QmysGj6CJT+lQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j107q189kTGNl/WPgtiVEXszO1j87aPKg38HrYcaThk=;
+ b=U6/7sUpDrIL39bA3NJ2r0CfAfAX2/t0uT7sr/wzLcjazMxwFjqNaPDOs7HxOiRPOg004LN5iz0krVP15LQgHHx5pKujpUDmMljHvvWEO6+2W62oj6xuX07r1sbXlaJSQLh2MTFwrdpGhAHBOTAYZpLk6n7RzGndQ23QFv6xdpF4EI+RV+PL0XbonzVOamD51k8XeSqL5+pG0Dmwdr9Lxwbt/1pHfrPWBhuRlqOHGptHH4v3HpqasBX6I5NPWwInOwXcMonEboOfZqUnP19+tgaAxCVF9Us5WqRle+i87GenfbEXqugxan2Zbkop9K+oIVl2Npzv9AQ86OUpIa464XA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j107q189kTGNl/WPgtiVEXszO1j87aPKg38HrYcaThk=;
+ b=bQJ7X/pCnwywz67L4kTsLBxTLbgjE7UhUxlTv+vAOEXQBzaWRj6guIXBYw2nrT6J6W4xKIGF7VakD/pUDxxEBBRIirDziTrIqTieEYx72lrR+01O9/CM8GThl/yUz/A1+k6MW7qQCILSfOBiOB+ZUIC3ge7f32hVJsTMBQSd9vQYwvzlfX+KiJjwI6xhEFk52Q2KyNOIq31MZgmkN36gjtyU8h15FyfxCIUFkbwZfU+SYxA+gXuds+wnccTPEZXpW9/ggCfO6vIr30b+RVnDf/N+2koqPmLz04Mb0UOZ6sUwf2InClUnjENzuhtDuou6XC1imI4vX+Pj9wWUX5siMQ==
+Received: from BN9PR03CA0185.namprd03.prod.outlook.com (2603:10b6:408:f9::10)
+ by MN0PR12MB5737.namprd12.prod.outlook.com (2603:10b6:208:370::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Wed, 19 Nov
+ 2025 16:01:29 +0000
+Received: from BN1PEPF00004685.namprd03.prod.outlook.com
+ (2603:10b6:408:f9:cafe::fd) by BN9PR03CA0185.outlook.office365.com
+ (2603:10b6:408:f9::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Wed,
+ 19 Nov 2025 16:01:27 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN1PEPF00004685.mail.protection.outlook.com (10.167.243.86) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.9 via Frontend Transport; Wed, 19 Nov 2025 16:01:27 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 08:00:52 -0800
+Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 08:00:47 -0800
+References: <20251118215126.2225826-1-kuba@kernel.org>
+ <20251118215126.2225826-9-kuba@kernel.org>
+User-agent: mu4e 1.8.14; emacs 30.2
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<willemdebruijn.kernel@gmail.com>, <shuah@kernel.org>, <sdf@fomichev.me>,
+	<krakauer@google.com>, <linux-kselftest@vger.kernel.org>, <petrm@nvidia.com>,
+	<matttbe@kernel.org>
+Subject: Re: [PATCH net-next v2 08/12] netdevsim: pass packets thru GRO on Rx
+Date: Wed, 19 Nov 2025 16:43:01 +0100
+In-Reply-To: <20251118215126.2225826-9-kuba@kernel.org>
+Message-ID: <87wm3mau6r.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251119055522.617-3-xuanzhuo@linux.alibaba.com>
-
-On Wed, Nov 19, 2025 at 01:55:22PM +0800, Xuan Zhuo wrote:
-> The commit a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP
-> GSO tunneling.") introduces support for the UDP GSO tunnel feature in
-> virtio-net.
-> 
-> The virtio spec says:
-> 
->     If the \field{gso_type} has the VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 bit or
->     VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6 bit set, \field{hdr_len} accounts for
->     all the headers up to and including the inner transport.
-> 
-> The commit did not update the hdr_len to include the inner transport.
-> 
-> I observed that the "hdr_len" is 116 for this packet:
->     17:36:18.241105 52:55:00:d1:27:0a > 2e:2c:df:46:a9:e1, ethertype IPv4 (0x0800), length 2912: (tos 0x0, ttl 64, id 45197, offset 0, flags [none], proto UDP (17), length 2898)
->         192.168.122.100.50613 > 192.168.122.1.4789: [bad udp cksum 0x8106 -> 0x26a0!] VXLAN, flags [I] (0x08), vni 1
->     fa:c3:ba:82:05:ee > ce:85:0c:31:77:e5, ethertype IPv4 (0x0800), length 2862: (tos 0x0, ttl 64, id 14678, offset 0, flags [DF], proto TCP (6), length 2848)
->         192.168.3.1.49880 > 192.168.3.2.9898: Flags [P.], cksum 0x9266 (incorrect -> 0xaa20), seq 515667:518463, ack 1, win 64, options [nop,nop,TS val 2990048824 ecr 2798801412], length 2796
-> 
-> 116 = 14(mac) + 20(ip) + 8(udp) + 8(vxlan) + 14(inner mac) + 20(inner ip) + 32(innner tcp)
-> 
-> Fixes: a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP GSO tunneling.")
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->  include/linux/virtio_net.h | 25 ++++++++++++++++---------
->  1 file changed, 16 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-> index ee960ec9a35e..ee8231eb759b 100644
-> --- a/include/linux/virtio_net.h
-> +++ b/include/linux/virtio_net.h
-> @@ -215,12 +215,22 @@ static inline void virtio_net_set_hdrlen(const struct sk_buff *skb,
->  	u16 hdr_len;
->  
->  	if (guest_hdrlen) {
-> -		hdr_len = skb_transport_offset(skb);
-> -
-> -		if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
-> -			hdr_len += sizeof(struct udphdr);
-> -		else
-> -			hdr_len += tcp_hdrlen(skb);
-> +		if (sinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
-> +				       SKB_GSO_UDP_TUNNEL_CSUM)) {
-> +			hdr_len = skb_inner_transport_offset(skb);
-> +
-> +			if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
-> +				hdr_len += sizeof(struct udphdr);
-> +			else
-> +				hdr_len += inner_tcp_hdrlen(skb);
-> +		} else {
-> +			hdr_len = skb_transport_offset(skb);
-> +
-> +			if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
-> +				hdr_len += sizeof(struct udphdr);
-> +			else
-> +				hdr_len += tcp_hdrlen(skb);
-> +		}
->  	} else {
->  		/* This is a hint as to how much should be linear. */
->  		hdr_len = skb_headlen(skb);
-
-BTW  I noticed that include/linux/virtio_net.h really should include
-linux/tcp.h for tcp_hdrlen and uapi/linux/udp.h for struct udphdr
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004685:EE_|MN0PR12MB5737:EE_
+X-MS-Office365-Filtering-Correlation-Id: 63a60cc1-3578-4d8c-2be3-08de2784e599
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|7416014|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?e4AnHUOhfO+W3qN20SRlReVUFDkPxhlsCSsqSpJCF0ytkZaZAqGyTmWGIu3E?=
+ =?us-ascii?Q?iiCBcNoU0gldOULNP6uvnfBxM3hxswvI9Wlimp/UBqFjHj0CpaVrnO+pIjrt?=
+ =?us-ascii?Q?/A92IAUXaE9FU4OzLCtXKoc7Ds97oliYin0rVGEchIGW6YRX7bFdPGy6OyYT?=
+ =?us-ascii?Q?tECV8RIXBgnwqoIhxwOjm7RcT5/pXiiwbTWD7Cm8aSVd1IIYDcEOOtV+x8I+?=
+ =?us-ascii?Q?XchPbmSU8N8yRvirAqSbeAK/4DeI244bJUT0Iy2UqWgboA2gheLSvVwNPYBu?=
+ =?us-ascii?Q?p4vUkKDnzv04JEe0AG6UBFdoG5RNoH2Yypmaz5VmKOymH4Eu5fd1dLd/3Mra?=
+ =?us-ascii?Q?zkBEafzMRAtYR0x+n6OP/GAOqPqfXnahh/17lJiqKHTYhkt4fGQu30Re+U8g?=
+ =?us-ascii?Q?vlwzh3Jup5uMStgayuaGsmakFbjqa4AJ9mhz3QKh/20o2ZMjLvHcOGdBJBUI?=
+ =?us-ascii?Q?NUEEOGy2G9iMt7bP9U5PNRzbTNFszI5t03AdAIQY3Zl9nQM/0C+MU3CU5ixD?=
+ =?us-ascii?Q?xU+m3GQgR54Nhniktfyu09LjaDa52I89q2a3w7wqrVNbX/Fn4im8yzBH4zV/?=
+ =?us-ascii?Q?INsLEZFMOQqpBNRCSm7wspEoplSpBWqur+ELtf5hgjoCQS8P0bSeKj3uwT7e?=
+ =?us-ascii?Q?nEdfydqV+iz3Zmi8EiChFpfylhLKm+JCJ91QN6c8RzMI4+NvKYogrBM9MtVU?=
+ =?us-ascii?Q?I3gzxCAKmn6au7k/RiQrWnkyMAPzM9H+E2pWq6pT8PRCoMQVBywfVWU9nXs4?=
+ =?us-ascii?Q?RD/d3A41BzW73MtKpfeln3i+xIGuMMqqL6rMK9A6Tv7L5rxrA6Duv88ZIknA?=
+ =?us-ascii?Q?D+YwEdfqPTFH5PYoehyNSiMj7ThBojgtmlqeX2PrceTf8ChtIP2azZphU+g0?=
+ =?us-ascii?Q?pcIyD8sUvs0s/FmRxixLFwcFRqR9bTzIh55NwfSo3pp6JA1QWYlDKLcPktO1?=
+ =?us-ascii?Q?DTGeDnNQlP0PhEhU79UnuSWYYKjB8P0b+tS7m/e5GZylIzm4zZzwe5YAW5iQ?=
+ =?us-ascii?Q?RtJUgE2QPs9c29Vjyli5PZnk6Bfe0oIy8xnRN/jj/48rLpF2BXHEQOIS/5sw?=
+ =?us-ascii?Q?L0Lru8KtbKRjXjhgdz/fGOj6+8YWYTjM9/oDCemdAEiDb+R16uqqBYMUUoZV?=
+ =?us-ascii?Q?KKOry0BfJPfYblifTHIHG7Hg2BGNvRuhSB4E7KjNPYP/QXy1AHTr1wsS41d7?=
+ =?us-ascii?Q?0a/U6XpMoq17jfuwaPv85cRSnfbF/cI8mGGe7losqDObd0LoRboheYzrdwBN?=
+ =?us-ascii?Q?u5sZztvNqrN83YsAJ0f1ohA1q5Otr9g7q6rn1u3MSBY6ZOlAN122fiQsNEc6?=
+ =?us-ascii?Q?ZSOzV1aBSjjxltgXA5IbyQTQf381sgTtNDF5Jh7xuK8xszvEoRGrBcgzqFIT?=
+ =?us-ascii?Q?GFgoVf6q8AM3/icOS9QMIiH8ELS9cKx+a2QLV51t/Dad3VqWltXzQXBCTI07?=
+ =?us-ascii?Q?gBq3/wFEVAHo/Y9TZpjveLjMZT9Mjf6y4k6ij2KhfVA9blnmJMu1WhCQci5w?=
+ =?us-ascii?Q?X5zZJlM7UZS0+/fgSoKBGOEO3f/RXuI3T+A8RAMWFCJ//bkEyseRKLqgyMZM?=
+ =?us-ascii?Q?8gwiITYmXPNV+n1/8cM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(7416014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 16:01:27.2499
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 63a60cc1-3578-4d8c-2be3-08de2784e599
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004685.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5737
 
 
-Not a new issue so you do not have to resolve it in this patchset,
-though.
+Jakub Kicinski <kuba@kernel.org> writes:
 
+> To replace veth in software GRO testing with netdevsim we need
+> GRO support in netdevsim. Luckily we already have NAPI support
+> so this change is trivial (compared to veth).
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-
-> @@ -441,11 +451,8 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
->          vhdr->hash_hdr.hash_report = 0;
->          vhdr->hash_hdr.padding = 0;
->  
-> -	/* Let the basic parsing deal with plain GSO features. */
-> -	skb_shinfo(skb)->gso_type &= ~tnl_gso_type;
->  	ret = __virtio_net_hdr_from_skb(skb, hdr, true, false,
->  					guest_hdrlen, vlan_hlen);
-> -	skb_shinfo(skb)->gso_type |= tnl_gso_type;
->  	if (ret)
->  		return ret;
->  
-> -- 
-> 2.32.0.3.g01195cf9f
-
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
