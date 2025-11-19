@@ -1,90 +1,81 @@
-Return-Path: <netdev+bounces-239787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDA1FC6C6D7
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 03:46:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10060C6C6F8
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 03:49:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id C82832082B
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 02:46:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D9D564E9CB4
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 02:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9C32C1590;
-	Wed, 19 Nov 2025 02:46:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A772C21E1;
+	Wed, 19 Nov 2025 02:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Le/mxjPp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uPtzsA3b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7918629D267
-	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 02:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315F628C2DD;
+	Wed, 19 Nov 2025 02:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763520363; cv=none; b=TbshVehhdBbi5zedn3rzHmQfabzuC4J3b1ZEsTFwNPD3D8hwPoJbeJ6xVV5rRxDFFmRs5A8SRD/nW65J2Dcjfvge2rIEvdevA4wdSlG3RSUCZn7g7LmfADVvKeuHTPUAq/NsIeJCpiokLQCSEJoxFv75mWkpSlce0DCcF6BnTbA=
+	t=1763520535; cv=none; b=twQNbo9FEP8w3x50xIaLjdPrXXI/aHvRjSrYXYb6G5qXVMYVgoVGZFhpdA3daUYBp8/nT4+FYePXgb0mUby6rTexb+rrxW55oPHur3dBckDAeGhSSMCE2hQRUw/uKWitqCxvWWCLsqG5Ro2UIVDhA231a/lvxNEja2qmX4pB+wI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763520363; c=relaxed/simple;
-	bh=kivB3IDwUgyvC6c7m0lspcXwZWGwaoluuW90NTyK4W0=;
+	s=arc-20240116; t=1763520535; c=relaxed/simple;
+	bh=UzR+D2r5Tf/NMJV7Pdd89HkiknvyfNwrgoZJRhBYlTs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EpGOYE73oM/BEW0nPsCzHTP0pwXrapQoT2R1qUJmgMcO8ZEt/+PT1B21kgO6Xe6ZfKRv+byOw/JORqwDJx3Hshby30HIOqX38kxnCWqfS0B5JKew6mGbPTq2z24q+UBl5b6Y/qFb2XZObUCRBe4J3Al5eGq+bunpG0ZL+WbKlC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Le/mxjPp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F449C4CEF5;
-	Wed, 19 Nov 2025 02:46:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=I5MIntJiQC+SUczqqGMd1BeSXpY6Rl5MO2OdJ8auvhfLk0aQMm3wpgp+Ic3rFukCg7JDOToGKPcn5eaw7I/+hXc3n1NnMIKoeJbTblIlRTN84vT54mXpa1jDq580B7lHyKqHBETbRbL/RktnMIIgOYC1dMss0oIxvFSddp87GZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uPtzsA3b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB412C2BCB0;
+	Wed, 19 Nov 2025 02:48:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763520361;
-	bh=kivB3IDwUgyvC6c7m0lspcXwZWGwaoluuW90NTyK4W0=;
+	s=k20201202; t=1763520534;
+	bh=UzR+D2r5Tf/NMJV7Pdd89HkiknvyfNwrgoZJRhBYlTs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Le/mxjPpgstZQ15NjuVkkJLEkshbd7nsoIBk0ZtzX6fJg1RU/53+hnz+FH3zX24fR
-	 NtLs0RvJJmjZNgDJHRy0JGWKuTGOL3DlbvwiS/44z2oQ8PwuoIb8wMRBDbvGHo7mnV
-	 uudtIC5XP+6/pEM0MrKHP3bFsz+oYuGAVCEu7c4ruwXHT+/qwCoOAAOWWq3HI69b3f
-	 MIkBu9pdlMQGSWXz2xGVkePZ3nwUKYJh/S1kXO1kXxWXwU22ZmMBOVC1r8RX79wMt1
-	 rDTvDmMLmXTSsFz5f9c09gELOpUZoz1hYtlZcTyMD8z1kQMZjtqgyFHnGBmVi395GI
-	 iZRzkX0gvopcg==
-Date: Tue, 18 Nov 2025 18:45:58 -0800
+	b=uPtzsA3bj+RJ4iXsXgs/v75RYb8MDA6CzPXlfd/l2gyeM3HcfpU2UeYokip/jYhdb
+	 KV3oHoY/IFnUw/wTiTiVUm4gPBMKK6He5iuiNh/o9yf15FCDd/84vRpYMn/D0eBZbJ
+	 ihdiKzc6NBcNRkyBWb/itOwqN660VLn35+5/JHkoz174Wya+5QTRMUtFWnySK1nqNd
+	 0wrE/0bx6OzUEOjpOny7ToS7s3HrZUd8oUrLEL1IW0qa6Q6X9BiP3mTMsIjo0QbtJS
+	 OQsS3HZrJK0cPxkWL95kdkhB9TqGBX9/MQajYjfJ0sE4gJycEjcNC+hyU7tVlqVoNg
+	 g10TxtYFnhFPQ==
+Date: Tue, 18 Nov 2025 18:48:50 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, netdev@vger.kernel.org, Donald
- Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Jan Stancek <jstancek@redhat.com>,
- =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?= <ast@fiberby.net>,
- Stanislav Fomichev <sdf@fomichev.me>, Ido Schimmel <idosch@nvidia.com>,
- Guillaume Nault <gnault@redhat.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Petr Machata <petrm@nvidia.com>
-Subject: Re: [PATCHv5 net-next 3/3] tools: ynl: add YNL test framework
-Message-ID: <20251118184558.4d28aae2@kernel.org>
-In-Reply-To: <aRvdb65MyVc39nm6@fedora>
-References: <20251117024457.3034-1-liuhangbin@gmail.com>
-	<20251117024457.3034-4-liuhangbin@gmail.com>
-	<b3041d17-8191-4039-a307-d7b5fb3ea864@kernel.org>
-	<aRvIh-Hs6WjPiwdV@fedora>
-	<e7aba5b3-d402-4a09-9656-1b96be6efa84@kernel.org>
-	<aRvdb65MyVc39nm6@fedora>
+To: Byungchul Park <byungchul@sk.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, kernel_team@skhynix.com, harry.yoo@oracle.com,
+ hawk@kernel.org, andrew+netdev@lunn.ch, david@redhat.com,
+ lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+ ziy@nvidia.com, willy@infradead.org, toke@redhat.com,
+ asml.silence@gmail.com, alexanderduyck@fb.com, kernel-team@meta.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ mohsin.bashr@gmail.com, almasrymina@google.com, jdamato@fastly.com
+Subject: Re: [RFC net-next] eth: fbnic: use ring->page_pool instead of
+ page->pp in fbnic_clean_twq1()
+Message-ID: <20251118184850.068273c5@kernel.org>
+In-Reply-To: <20251119024546.GA18344@system.software.com>
+References: <20251119011146.27493-1-byungchul@sk.com>
+	<20251118173216.6b584dcb@kernel.org>
+	<20251119024546.GA18344@system.software.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 18 Nov 2025 02:43:59 +0000 Hangbin Liu wrote:
-> > How did you execute shellcheck?
-> >=20
-> > If I'm not mistaken, you are supposed to execute it from the same direc=
-tory, and with -x:
-> >=20
-> > =C2=A0 cd "$(dirname "${script}")"
-> > =C2=A0 shellcheck -x "$(basename "${script}")" =20
->=20
-> Ah, I forgot to add the "-x" option... I will fix the comment in future t=
-est
-> case update.
+On Wed, 19 Nov 2025 11:45:46 +0900 Byungchul Park wrote:
+> > @ring in this context is the Tx ring, but it's the Rx ring that has the
+> > page_pool pointer. Each Rx+Tx queue pair has 6 rings in total. You need
+> > the sub0/sub1 ring of the Rx queue from which the page came here.  
+> 
+> Thank you for the explanation.  I'd better make it in the following way
+> rather than modifying the unfamiliar code.  Looks fine?
 
-I applied the first two patches of the series, please respin this one.
-TBH I'd like to check if this all works in NIPA but probably won't have
-time to set up a new worker until the weekend. I suspect I'll need
-to touch up the vng wrappers since this is not true ksft TARGET.
+Yes, I think that's fine. Just please wrap the long lines at 80 chars
+in networking.
 
