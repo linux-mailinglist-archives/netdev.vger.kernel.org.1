@@ -1,245 +1,148 @@
-Return-Path: <netdev+bounces-239930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4C15C6E16C
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 11:56:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18B84C6DF8D
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 11:27:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9AFB84EE6F0
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 10:49:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 072DD2E02E
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 10:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222CF34E764;
-	Wed, 19 Nov 2025 10:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE042F6180;
+	Wed, 19 Nov 2025 10:26:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="jozRnVoP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VXOzQNez"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010035.outbound.protection.outlook.com [52.101.84.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C6E34DCC8;
-	Wed, 19 Nov 2025 10:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.35
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763549346; cv=fail; b=r+lRWKsIJG0QaYN13/4Tr+xX/voFYsh+kfNvt5PFtmYMkt1VDRDXETbgoLrkcwFw7hr+OALOmyqj7v2D1df05uCjVBZekG9e9q7BZO7pIxgZpjP+Qf3WUDhi7ySvkd5e4g0e2Rs6SzlK9opJI1XNmiFeBc4UvCI31BeoIJq3JFk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763549346; c=relaxed/simple;
-	bh=PMs/xmtapr29yv31vvLAIgTlIQytmQEWyHpOXFfCLNg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=MZAR9iFqyp05VCqjtzmBcxAolwOsShu098/UTboPrApwIIAy+fbPYuAEZ4iNsbSNi6nBA9XdOzYhjwcLtJh+6ubiY96emSD30v0ISk0++6i5TueFQHbY90b02Ikd7bkVrX1U2vKPgTYYNAMaQBzag3bNqVuFbFfmWZ84LHQrdyE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=jozRnVoP; arc=fail smtp.client-ip=52.101.84.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nb/H7enPX3gs5zObj2VFDPyKWOOKSMSY6AGbfT2kvWZiaWYEIdsDFNGx/gjoOKp/Fs98ghJCYIyUHBjL/15MnipZDoNuNqYwdRFVwBlwnJHEmSMSwR123oSlllua2r8OkpMiJGN7huDf3ZKIqpagcc927TI5PCYerO96dQ9xjjv4Zk9CX4phqj0eS639QSZ4l43zaOVXzHOk0iLCG5xFtSwljaGWmr0LakZjZR2SXRf9bd61HYD0i/fxJQFj6CwuRnWI2wIpJTSdNOfHkjtT8ovv/BmUAchwe4zcVNqUK3vDMywi3jOXYD5vK7Knvx6rtrHIeg8cNptBssyU5KiVnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Wh1ugBt8Nkt4TSeliMD6m/ioEoY2ZTis6gDExb45f7k=;
- b=xobf1uQC7WaSbNZcnpJ9zVLsEEbsnb80fDX5B80St3Ubp/jY5nDxjgTdS98a25lQf1DwSKfJVUfs8P/7A/ytxiIBwVMdDXb8vILtfpPnWZqReP7iiGlkyF3YWwelw3Ff8VOyVIFRgJjNQ10k1+RZQw4BSXQNEfSR/iAeEhols0G9x0aVLx2EAiwHoGg0fx/qWCypgEeP5AKNMg1d4Yxz8Op88YD/bmlWHEHitCwNd+Q2uvauYHMKuG2TEJQjBetRG1rmdxB9arG7+B01G/qNeYQ/KwCf+FjLdWpXnAUJFvlbvwJfT6RP3fcr+BUFWz6EnpbdGtScLUS16v2DThokcw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Wh1ugBt8Nkt4TSeliMD6m/ioEoY2ZTis6gDExb45f7k=;
- b=jozRnVoPYu9CWbBAi04QbsGhX89GuzPw8vSe4HWuFK+l3FrJYuqrV6BIy9uhl5V4IE2r0nat2O7LBowyTAG8vtKkZ3JTnfz1zQ+JUdg2w/jWL6hFadoenfPm6gMJKjuH5kdWXXn5bFkColHL9b6eu8tLxVpnX1uMDiO2GLv2Xzdrw7/9HB8gLd6CElPnsl+J3am0rYxOrcSbMIBb40gnVbisBA/eGXOBTq/ybeO2JMyV/VI8OWS80eeshIfCV2Shk+R+TCUu3SlcT5hv7+1iTJhTQW9dCSezXcGvvo5K8Txu0r/Xu81Z/AcE/25CcZdIfIwwiH8zYA3+kvdqfN2WUA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by PA1PR04MB10628.eurprd04.prod.outlook.com (2603:10a6:102:490::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Wed, 19 Nov
- 2025 10:49:02 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9343.009; Wed, 19 Nov 2025
- 10:49:02 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: aziz.sellami@nxp.com,
-	imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 net-next 3/3] net: enetc: update the base address of port MDIO registers for ENETC v4
-Date: Wed, 19 Nov 2025 18:25:57 +0800
-Message-Id: <20251119102557.1041881-4-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251119102557.1041881-1-wei.fang@nxp.com>
-References: <20251119102557.1041881-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR06CA0210.apcprd06.prod.outlook.com
- (2603:1096:4:68::18) To PAXPR04MB8510.eurprd04.prod.outlook.com
- (2603:10a6:102:211::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8933F346FB8
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 10:26:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763548015; cv=none; b=H6b3VAM73js8er/mqjlsTS0tihbpOGav6x7+WyEYg739GqCxVpsnzIDyxIBximJfYnz+QkVrBD2OslqqgXDLSYBZNX2sZ4fK7smpPNB87PRQ4PSlR+LIfCOCjDvdaYFAT1wOxuc86PNP51LkTJgSNdsS0oZrtFzEMTzDwYzcKB4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763548015; c=relaxed/simple;
+	bh=oxmzroMvZ5AU/n1HFTCRga/pJwfJ1i0eGYNtmLdrilM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ikG5r/3AqCCNE10qUzBW3lnuW4fdal8vEGrm4l1InKFA2s2yxKZjUOrlOQK6gLXYpeY3YYrqizTdq94HJTRfiVn5oAPvBHQax3igJXBP+qw97sP+WF6A6eEGJ84RJC0tbiIF/JEq8OBgZ7T/5FBXfrzrkT0v8BZeJZwV6LbBSjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VXOzQNez; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47790b080e4so27958575e9.3
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 02:26:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763548012; x=1764152812; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oxmzroMvZ5AU/n1HFTCRga/pJwfJ1i0eGYNtmLdrilM=;
+        b=VXOzQNezhUDgs6XVo7bO+RblyoW6omBfAA0ike+5QQFUva+Q7lk5WNvBcHU11hJBpn
+         hHBdi/6vmQvPyFpuMOE4YGggPv8hkHMzk7K5O9bDpzGn7cUAWodNZRuCZ4xxCYD+lbp3
+         GqGAz9uU9StTERsBAEtF5BlTqPY9HaHuqHcw41m8V8TpqpXenyMh1W1cBMrT5nomszFM
+         nkE76Kg2pUmWIAuairfLNbKW/QyQurckqkN9kKdopthPPcLlMbdSghhI3C7c0C7XTcO0
+         7KCTsegCXQDiL+/fpPNedeWJr9rpb85L+CrD6uzmx2Yfcl+KaMOdTpv2BmHSNfUpk5pb
+         8v0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763548012; x=1764152812;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oxmzroMvZ5AU/n1HFTCRga/pJwfJ1i0eGYNtmLdrilM=;
+        b=gmM9zS4lgh1X5XzOta0wpv40tYEFnfGgRABztBLdzIQ7JTSuSHiuCdSyCadDFrISOb
+         O/wspWlg1MOXqy2ZARkN3qfUffMVjrnlQiGtNA2i86v8+fbpAMGkAF6yYLy5kbBFBUQu
+         b3flduzvhEfTUQS1s/a9zj6va53MrPj+5JqTtba5z/MJhURQhOQrPYIUxnq+oRoWuJ+d
+         pFs1Jci5uVizT5ImzhUfTmRGtG5Dic6duye0Y/x7vYnOQnzykIqKpgol66LW5iTqx9ze
+         RiCvtLZ0jeCCWK6mDMPqa7dksllxqSH+8D281arcXgn2syoDsBGV+NUzzNBaOTzY7r7H
+         Ia9g==
+X-Forwarded-Encrypted: i=1; AJvYcCVlxZCiuLLcrNATX+MmV6A/VwE8UabjopwjAH7xX5Z/5BxfSeVcrhZ1il4MjC050jMIe8V4oIg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYFQOij3wUQrPJynUM3YP2+7mJMo2gdouos+KCatp0CTkICv84
+	lqLSLgG2/NUuBTw4C1Yses4VAZY6Fveww1I4STcJ9j6xOlav8Y5a17ZG
+X-Gm-Gg: ASbGncuN8VhnJyMB6rUf64puT03YyKS8D9A7QU53gKrqq5bmfO4/SmSALy8OEKqt758
+	hNW9OykQcpQXWYvRO/GxFR/lUqD7u6+SCdX6OEffaOMmzO0A38TX7KK7Y5BUA0Q8Wa7QTBdk3Ii
+	nX6XRo0TSJ5fTok0NppXvBU/bkNOp2QfcSVaJWRXU4H4HVKZm5xzl7C44DCPxw6BQ20vUwvEgDr
+	i7M9Ijam/VFTbbOHCc391/R5sSbEKZlprzjGkAdZ5nCEgp00CNQ0fWgE2xQRhDCSDwoWAcbImWk
+	JXJsc6+Gi58guFHFJ2eflE/b2YwPZO/QdYClqLFEWhvKAT3Evr643ca/qrmq4OlAqkZMKt1Bgtk
+	spUnogPM+Yrh41w0ZKjFBIDansB61xNtQYYHwrcivW0NSxiCHcIyCxym+Tu5cgxcz3zm3H7mL45
+	KGCOnXZnOl5+vkcBs=
+X-Google-Smtp-Source: AGHT+IFHDqYGurpdt2uHH5VOa/35juS3aBQUK8rSpUMtqfxD574D5IoNwDyfAoYeqEKbMytDMuEJSQ==
+X-Received: by 2002:a05:600c:4f07:b0:477:63b5:6f3a with SMTP id 5b1f17b1804b1-4778fead9a4mr182793745e9.27.1763548011469;
+        Wed, 19 Nov 2025 02:26:51 -0800 (PST)
+Received: from google.com ([37.228.206.31])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b102bc9csm42675715e9.8.2025.11.19.02.26.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Nov 2025 02:26:50 -0800 (PST)
+Date: Wed, 19 Nov 2025 10:26:49 +0000
+From: Fabio Baltieri <fabio.baltieri@gmail.com>
+To: Michael Zimmermann <sigmaepsilon92@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, nic_swsd@realtek.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] r8169: add support for RTL8127ATF
+Message-ID: <aR2baZuFBuA7Mx_x@google.com>
+References: <20251117191657.4106-1-fabio.baltieri@gmail.com>
+ <c6beb0d4-f65e-4181-80e6-212b0a938a15@lunn.ch>
+ <aRxTk9wuRiH-9X6l@google.com>
+ <89298d49-d85f-4dfd-954c-f8ca9b47f386@lunn.ch>
+ <ff55848b-5543-4a8d-b8c2-88837db16c29@gmail.com>
+ <aRzVApYF_8loj8Uo@google.com>
+ <CAN9vWDK4LggAGZ-to41yHq4xoduMQdKpj-B6qTpoXiy2fnB=5Q@mail.gmail.com>
+ <aRzsxg_MEnGgu2lB@google.com>
+ <CAN9vWDKEDFmDiTuPB6ZQF02NYy0QiW2Oo7v4Zcu6tSiMH5Kj9Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|PA1PR04MB10628:EE_
-X-MS-Office365-Filtering-Correlation-Id: 899f69b9-9934-4a0d-9cd2-08de275940b4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|52116014|366016|19092799006|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?h4v/j2t6zrG4roYNnW7mV54kVNcPqIjBN7oSkWJuNFxzW7/x1+jWuHeKowCs?=
- =?us-ascii?Q?WKMzrl4Bu7O+SiBbRbww25RFiSA2p/ejvsFtsuyKbNO1NEwyY4EhD3HN9LrQ?=
- =?us-ascii?Q?YTsgptgq8veMY4mtX29I99WV61QYufl3VL/2q6VECEoQA3dWx9E+HC6PPl7B?=
- =?us-ascii?Q?h0pDbrD95KdmzOrB5/LbPb8wXD7Vw8bEa3JxAsf3o9UEM29EadC446CkM3yA?=
- =?us-ascii?Q?kDmStcf65rUIC2fOfHacTjmX6Eg+YLeIj6Qnw8oyGVsALDQ/7qtXy77Y1prM?=
- =?us-ascii?Q?r1KKq0gzeq39M1hoTUFpN67xzg3iXotO+x4bSl2iuAUYONnnO+GTiEiNoNv2?=
- =?us-ascii?Q?IRiNPY0jKwoVpXQJsclFSzLk4/dV/cG2xmxwvEeMnfi0uMAJGAAbNLlmcSo4?=
- =?us-ascii?Q?TZQwbMQqlE1GaVVcBswJR7WvcnJ2h5FGO7c++BinA4WbL52+pjWWt65He1i0?=
- =?us-ascii?Q?wYTpn2N2+IEm33Kbz+330lvjxSWvXNRALpA61mEBnwfyxR22Ooo/htjLtfFE?=
- =?us-ascii?Q?WB8IGdtWHZiw8W5TjToe2RIH7Jz+Q3LfXZ5TUb+o/71Pzq0z+fKR1+brPw4P?=
- =?us-ascii?Q?r6t3EhsmkhpGEsHKhS3lwZ327JNgmP709qCLRb/6r4+9DXzBvCNXVdNSGC3A?=
- =?us-ascii?Q?MdcXWgvzI5uQslTVInkBPMAV+nISoukKpShll25HZVlhdzTm5EuaxNOlRJcm?=
- =?us-ascii?Q?bBbbTNPVNAkmB/nZA6jbP9XflpcYLjdfzXAyxpIZp3RDFFFHo1NP/XlZppxJ?=
- =?us-ascii?Q?LeEpW0vCaTJgpZBEiGvk6SQP+rJg5MtDsI5rBVURb9SFlE4Jt2TJQCtl0U/x?=
- =?us-ascii?Q?nk8LLDd8g/FjEQQA6YIbCSyMxuHO/q90mih+u89Rtg8ID+bff4GYWNhF4/Wy?=
- =?us-ascii?Q?/Ay5l1kl2EZY+NbNGoAZKGAjo/L+cd8pEaGcJNQOoWgwDPVquyMwV6Fbz4Mn?=
- =?us-ascii?Q?kVsgEyY4kM7hwIrsy4J2okO0F4StGCeD3/7CUg+E0pZPwQx3Bw+E0s8XxKpM?=
- =?us-ascii?Q?73EUp8HkX6wvViOc+pqgbidRGVeyQUDzzJzsKbw5599VE+mrKqaujJYoRY6v?=
- =?us-ascii?Q?ZkDcW70qTSGq7CKdiyg7qoV8LRgZ58dyDR0CpCVAX3hqOoPGVVYjOnVgdtD2?=
- =?us-ascii?Q?0MzAb68bg5pb7YvH51tbGivUld1zkTTI3/hTByqI++bAkY4xMBkqCfPDduWm?=
- =?us-ascii?Q?YWORQxnpKPKrWxDNcFY7IRr6V7nmusz5initKXn1lOELZXN0a9ZJvjn5j4Ax?=
- =?us-ascii?Q?4CTACtVDXsAl00IEbuQaRrJSkUcmcn1w3cQW83yEb+HLEJHcnGCF2RUi7cce?=
- =?us-ascii?Q?V7033ERWsberoS/CC8PITg1f2QPbLlCmE8TNwkapfuwUoO42fbvEgJfrhOaK?=
- =?us-ascii?Q?Sjk8wAjd1ajtmJzqUyvTU+vpsaxBwnB4YWLPjMONQh9Q1UpaKb2ix1DmcBBG?=
- =?us-ascii?Q?xbO8s39DZ0P4QJQuwEAEUE2EZ3BhkKkOQUqBjLztHY39pDbiEe7xHng2HZVY?=
- =?us-ascii?Q?08yJ7tP78/opNAs4wpmoyWsL00RL5px9gk1H?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(52116014)(366016)(19092799006)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?euV1HwdykL9pNQwqueKLLA73edKM1xNdhl2I0k4d95aXC02bLmzzQS/Ve5Wd?=
- =?us-ascii?Q?hH13Xif/Q7GoICdgzzIk+8Kzy0d48OSJtF/2xuG+ErCPwX/pMN8UAbvhpm2f?=
- =?us-ascii?Q?O2E8l0/5q1vCOZ4MnMlo2zOECXL+qIHxPSA53l0JFzOqpiACTt3L+eJn9jLN?=
- =?us-ascii?Q?QXPoEDiqGiWnrvLOzrlnksfspzT1wPRYL1PzK49i/hIu7QML9hAuiw526KuY?=
- =?us-ascii?Q?snMJpZawGP6lLb+LbM43SwXyOQYRd1cGEQuAJAfkBroBhk8U/W2s+YkBfbCQ?=
- =?us-ascii?Q?7OuO9c79tbkXKhC4am0tCab9LNmpjSARui8yq1/aT59mKm72KZJoofDhUVc6?=
- =?us-ascii?Q?Yeh2uTvlg7T124mR/RUIg1dQ/QwHdodIMty60Zn2sQi2yV6vdKJEVZQfjwt7?=
- =?us-ascii?Q?YFgR3QohCvjAmOHgzA4UNT7516euI+pVGQbcQNOM2xlqSnPrD+csPUzla3k5?=
- =?us-ascii?Q?Wmw4zwpZXrYOr9ifdkV6iN3/rrJ81p+u11z0Qg642Pm8ZvEa20q13YCGkJc8?=
- =?us-ascii?Q?HqqtjhVU9Ioxa9hGGWr08jk38kPk4gfUl6h80GlZEdbIGSX4f8Z/jdTPP/zL?=
- =?us-ascii?Q?69IeydUBZE7+WakWkTui7GoTXH6r4ZBhhlb9Jh4dTkd5EfUwESHes8Q388VX?=
- =?us-ascii?Q?mAnpiJyqWttae048XMljbynakDri3vuMchFJf2IjTOucgxwy7YuB8tdKJ56M?=
- =?us-ascii?Q?n1RmJ1NzCOtuCgfjhcew11P+Xsaym/eeJO2z66u52OoCJ0WVsYY4N61fvdbS?=
- =?us-ascii?Q?c351CDHM7i4TYjreu20NwQF/Wi9ACvqmthwi4UmcGdSCaplWEtBGg/vrvWPd?=
- =?us-ascii?Q?3Of4ztJ4nQL/1W3IT7R44l1+4Ic4aI69v5g1WhHMfg0PWqsd8N/XKvX8wqnf?=
- =?us-ascii?Q?FaKMbh+yClZIYwWX3d0cAWaveT6t8+bbl7jFQOGrkaUCKtrzsghCKrw8ogxD?=
- =?us-ascii?Q?jJeF7ZFBJJtkM5utx36n8hLyGcWWG6bDyAn1d2qOUnTAN/V3by1MHWv/f0hc?=
- =?us-ascii?Q?GxWQAm7VzmqfCUNqch2NGAQ20rGL7ygSlBbnY73xgf2EdD3202JADAOieQiG?=
- =?us-ascii?Q?tUDSwJcVBYO+E9BSiozn8RsomSl6oisrhgB8zmb3v2TEsVqxzAcf1mV/4Q/1?=
- =?us-ascii?Q?0wDlFiYLMgrfxLuh92po2FTNjPbVmm+4fq0GxMpSXQJ/YKVodVkLK9lwk/SX?=
- =?us-ascii?Q?24tFvoU6U9aIHKxu3cDRruOembkYb0ArLK4ZLmYJugL0Z69zVkqKoVKgdK+I?=
- =?us-ascii?Q?0IavH8AYVIoOadpNIzOqCLF+CE2JJFxQzT3qYd0V9NZ0pnEO/X7FJXrCWV8A?=
- =?us-ascii?Q?lrJXyItvN3YKiP73hnjRdoTI8Ibldoi+j3d6yAoAr0Zr0szJuDKuTWxz6+NI?=
- =?us-ascii?Q?aOlW9xB1TFlfAGov0Ux11q4pfryI5jpSm53WNUZYvByHW4RdrCd0r3cCvNZL?=
- =?us-ascii?Q?W+NoJRhaSp8Wffijz5IPlU+Z+/cM29zevDfaz4L3O4HV19ouER9L9lv5nX04?=
- =?us-ascii?Q?gDUgaHqj4RcCcIfmlan2ks/roU8kLUDbh9j5XWhVPT1UyZEbgJq3XwynYLMD?=
- =?us-ascii?Q?pg/7GN+DDScU9X36J3o8iKjqniCElZ7pRqyA9dAZ?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 899f69b9-9934-4a0d-9cd2-08de275940b4
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 10:49:02.7080
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Mf62QpKNeNXvzl4R+Ux+7ak0IJLZ47e3tGLn8LnOLPfChjARlUSpRQy91vDe/5+V5uERtXtP+f663lP3SduTVg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10628
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAN9vWDKEDFmDiTuPB6ZQF02NYy0QiW2Oo7v4Zcu6tSiMH5Kj9Q@mail.gmail.com>
 
-Each ENETC has a set of external MDIO registers to access its external
-PHY based on its port EMDIO bus, these registers are used for MDIO bus
-access, such as setting the PHY address, PHY register address and value,
-read or write operations, C22 or C45 format, etc. The base address of
-this set of registers has been modified in ENETC v4 and is different
-from that in ENETC v1. So the base address needs to be updated so that
-ENETC v4 can use port MDIO to manage its own external PHY.
+On Wed, Nov 19, 2025 at 08:00:01AM +0100, Michael Zimmermann wrote:
+> I've also done some testing with the out-of-tree driver:
+> - (my normal setup) a DAC between the rt8127 and a 10G switch works just fine.
+> - RJ45 10G modules on both sides works fine, but HwFiberModeVer stays
+> at 1 even after reloading the driver.
+> - RJ45 1G modules on both sides works after "ethtool -s enp1s0 speed
+> 1000 duplex full autoneg on", but you have to do that while connected
+> via 10G because that driver is buggy and returns EINVAL otherwise.
+> HwFiberModeVer was 1 as well after reloading the driver.
 
-Additionally, if ENETC has the PCS layer, it also has a set of internal
-MDIO registers for managing its on-die PHY (PCS/Serdes). The base address
-of this set of registers is also different from that of ENETC v1, so the
-base address also needs to be updated so that ENETC v4 can support the
-management of on-die PHY through the internal MDIO bus.
+You are right, did some more extensive testing and it seems like
+switching speed is somewhat unreliable.
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/ethernet/freescale/enetc/enetc4_hw.h   |  6 ++++++
- .../net/ethernet/freescale/enetc/enetc_pf_common.c | 14 ++++++++++++--
- 2 files changed, 18 insertions(+), 2 deletions(-)
+I've also bumped into
+https://lore.kernel.org/netdev/cc1c8d30-fda0-4d3d-ad61-3ff932ef0222@gmail.com/
+and sure enough this is affected too, it also does not survive suspend
+without the wol flag, but more importantly I've found that the serdes
+has to be reconfigured on resume, so I need to send a v2 moving some
+code around.
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
-index ebea4298791c..3ed0f7a02767 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
-@@ -170,6 +170,9 @@
- /* Port MAC 0/1 Maximum Frame Length Register */
- #define ENETC4_PM_MAXFRM(mac)		(0x5014 + (mac) * 0x400)
- 
-+/* Port internal MDIO base address, use to access PCS */
-+#define ENETC4_PM_IMDIO_BASE		0x5030
-+
- /* Port MAC 0/1 Pause Quanta Register */
- #define ENETC4_PM_PAUSE_QUANTA(mac)	(0x5054 + (mac) * 0x400)
- 
-@@ -198,6 +201,9 @@
- #define   SSP_1G			2
- #define  PM_IF_MODE_ENA			BIT(15)
- 
-+/* Port external MDIO Base address, use to access off-chip PHY */
-+#define ENETC4_EMDIO_BASE		0x5c00
-+
- /**********************ENETC Pseudo MAC port registers************************/
- /* Port pseudo MAC receive octets counter (64-bit) */
- #define ENETC4_PPMROCR			0x5080
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-index 9c634205e2a7..76263b8566bb 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-@@ -176,7 +176,12 @@ static int enetc_mdio_probe(struct enetc_pf *pf, struct device_node *np)
- 	bus->parent = dev;
- 	mdio_priv = bus->priv;
- 	mdio_priv->hw = &pf->si->hw;
--	mdio_priv->mdio_base = ENETC_EMDIO_BASE;
-+
-+	if (is_enetc_rev1(pf->si))
-+		mdio_priv->mdio_base = ENETC_EMDIO_BASE;
-+	else
-+		mdio_priv->mdio_base = ENETC4_EMDIO_BASE;
-+
- 	snprintf(bus->id, MII_BUS_ID_SIZE, "%s", dev_name(dev));
- 
- 	err = of_mdiobus_register(bus, np);
-@@ -221,7 +226,12 @@ static int enetc_imdio_create(struct enetc_pf *pf)
- 	bus->phy_mask = ~0;
- 	mdio_priv = bus->priv;
- 	mdio_priv->hw = &pf->si->hw;
--	mdio_priv->mdio_base = ENETC_PM_IMDIO_BASE;
-+
-+	if (is_enetc_rev1(pf->si))
-+		mdio_priv->mdio_base = ENETC_PM_IMDIO_BASE;
-+	else
-+		mdio_priv->mdio_base = ENETC4_PM_IMDIO_BASE;
-+
- 	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-imdio", dev_name(dev));
- 
- 	err = mdiobus_register(bus);
--- 
-2.34.1
+> What this means is that the fiber mode is always enabled on these
+> cards, which makes sense given that the out-of-tree driver only reads
+> it once when loading the driver. I guess it's either a hardware
+> variant, configured in the factory or detected using a pin of the
+> chip.
+> It also means that it doesn't matter to the linux driver what's
+> actually connected beyond the speed you want to use since - as others
+> have said before - this seems to be fully handled on the NIC.
 
+Yeah but that make sense, it does not really mean *fiber* mode, it
+controls the serdes configuration which is used both by fiber
+transceiver and DACs or anything else you plug in the SFP port. It's a
+good point though I think it may be a good idea to rename it to
+something like "sfp_mode" so it's not ambiguous.
+
+Heiner: if I'm reading the room right you are more keen to have a more
+minimal initial support patch: I'm sending a v2 anyway to fix up the
+standby support, would you like me to rip off the 1g code and keep it
+10g only while at it? Then we can have at least that hopefully working
+reliably, as you pointed out that's probably what the vast majority of
+users of this nic needs anyway.
 
