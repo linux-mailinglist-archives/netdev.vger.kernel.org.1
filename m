@@ -1,184 +1,99 @@
-Return-Path: <netdev+bounces-240012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F051C6F26F
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 15:09:55 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A36C6F31F
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 15:17:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id DA20229511
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:09:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E33C95002B7
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 14:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9295421B195;
-	Wed, 19 Nov 2025 14:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9CF364EB3;
+	Wed, 19 Nov 2025 14:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="oYA2RMry"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="J5FZ0Oz3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F47B31ED96;
-	Wed, 19 Nov 2025 14:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615823538A1
+	for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 14:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763561390; cv=none; b=CyU/qfbv2hMl6dTsrI+JvlEXY3G+WefpkOTNmfmE7F0E2XaTorNJsdAkD27ID5Qum6ZZaEFPssKRjMJSWvvSMhP+rLsE9IM4u24B0rqvifqU2AntWSPSDX5Pqr5XB0BNR6GkY+DynZu+Sc7FMzUtv3nfqvJNm73teHAbVXqNSfk=
+	t=1763561406; cv=none; b=JZFe1ybFNBLtleNpLkJ/I5EKUP/GUV7OaBJq3JPP3InRX8cPFfzQMqQxJaJ/5OFdkMAzDgA1rEiIt++NIK5GAqQLznc5CIoBcnRapSlPBcz1fth1mGsOl7SLAfP2G1B7rc5AeAYBImKwqVwjEuJgw6ZdrTnlol1f3z94hgzjAUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763561390; c=relaxed/simple;
-	bh=JRZOtH3n73C7KjpFe3uoi9EJEfKK69QvStpnFTVU+Gw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NptXefg10cTHJ8R0GUUqujtKMShQQz3RqqL30Cwm981sflZuPqYaOLtbxTQsZ97Ta5tBE8FklxZuisgcOOVqBfKHpn0wTXbO6JNW0qrrLFDsZM5gkTcPuFE+s66EQqYoh23B8Xkiaprg5wJgw5o86kW5YLtK9di37qi8KQ35WPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=oYA2RMry; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1vLisR-005nht-Ia; Wed, 19 Nov 2025 15:09:43 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=53wAJwNOjqb4ntnBnczBa2f4AuXPtxn18LUg6Hu+6g4=; b=oYA2RMryWQgAB6DV8HS49llBEx
-	4x+Wo1M5zM1u2NNfb14q3uQuTd6//4JzY2aSRyhdvztY16DzzfyUts8RDhrnx+6xahdBHXBo9nJv1
-	KVmFmY82T0RA0VfsB4D0o3R/5S8O3E1ptAsUs8e12FPLQrMltyJXI4vzZPVc6Zpsq6uGRUaUEJiqK
-	28AoY7VVxNIeuhkMx2Cfc4WuaoplQylM/zgXqVTuQu2A7zaKJl5RL8cB5TPFSk1oQik3rWazhqF56
-	WBc2c+p6jZ85KKeBR6BqMr2eeqHbY5AfhXYHD30qV7xNHTUu/4VbJvJmgkMh7sYazSkS+zzpe0Oam
-	2QuI97VA==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1vLisQ-00017s-HP; Wed, 19 Nov 2025 15:09:42 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vLisA-00Epah-Fr; Wed, 19 Nov 2025 15:09:26 +0100
-Message-ID: <09c6de68-06aa-404d-9753-907eab61b9ab@rbox.co>
-Date: Wed, 19 Nov 2025 15:09:25 +0100
+	s=arc-20240116; t=1763561406; c=relaxed/simple;
+	bh=+wg7P+9JQZcHTzO9iSDPSNZTaRZE0A3xtiJBTQ0TiA0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DP2iHA+eXvDu8qpnnz/eP421Pw5OCTHt3B+9EtsXDLX7m+7HWOm66JkxQA4LO+2JBM8ZZlGjKiSDiK2XPRD3YQquk427uGd/V3j0RH2yC+YdIDpgfFqqzv4CV+jo9hUQIm0ZQMe8gAGkl9tiaVzAHl+Q1X9sPxaQPgkJ3/BB9JU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=J5FZ0Oz3; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 3AF964E417A1;
+	Wed, 19 Nov 2025 14:09:55 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0755A60699;
+	Wed, 19 Nov 2025 14:09:55 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C4D5E10371A63;
+	Wed, 19 Nov 2025 15:09:49 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1763561393; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=+wg7P+9JQZcHTzO9iSDPSNZTaRZE0A3xtiJBTQ0TiA0=;
+	b=J5FZ0Oz3c5uM2WeJU+S/S6aW0vzCzTtcjORp0FgibIhqOdWex6tmngIhma1gFq4i/bIzYB
+	X9tC6Kf2J7rnT6vneyDTeZDqt9EIABvIxnR3rq9ZIaV34hsTPn2y5wEsRsEBOi2RJQLMqw
+	yvjCQGgLoWav/C/hJjciYAIVcpEX0mh+nEVxGW0Dku751l3b3cznAKiQ69T19pxl1Ow0jN
+	ToxPF8PQa0e/rIn1vlHatopL38BNFz6S2MusVHh6853rXmGBdXi1Wa3LZizChJDb958E7m
+	pUb6+WOin/9h9mqziscevc5eLei2sRITzEag8Tt32H5PV8RtkhCN5/bfC9Kycg==
+Date: Wed, 19 Nov 2025 15:09:48 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Russell King <linux@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrei Botila
+ <andrei.botila@oss.nxp.com>, Richard Cochran <richardcochran@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Jacob Keller <jacob.e.keller@intel.com>,
+ bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/9] phy: add hwtstamp_get callback to phy
+ drivers
+Message-ID: <20251119150948.0ba5f479@kmaincent-XPS-13-7390>
+In-Reply-To: <20251119124725.3935509-3-vadim.fedorenko@linux.dev>
+References: <20251119124725.3935509-1-vadim.fedorenko@linux.dev>
+	<20251119124725.3935509-3-vadim.fedorenko@linux.dev>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] vsock: Ignore signal/timeout on connect() if already
- established
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251117-vsock-interrupted-connect-v1-1-bc021e907c3f@rbox.co>
- <dh6gl6xzufrxk23dwei3dcyljjlspjx3gwdhi6o3umtltpypkw@ef4n6llndg5p>
- <98e2ac89-34e9-42d9-bfcf-e81e7a04504d@rbox.co>
- <rptu2o7jpqw5u5g4xt76ntyupsak3dcs7rzfhzeidn6vcwf6ku@dcd47yt6ebhu>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <rptu2o7jpqw5u5g4xt76ntyupsak3dcs7rzfhzeidn6vcwf6ku@dcd47yt6ebhu>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 11/19/25 11:36, Stefano Garzarella wrote:
-> On Tue, Nov 18, 2025 at 11:02:17PM +0100, Michal Luczaj wrote:
->> On 11/18/25 10:51, Stefano Garzarella wrote:
->>> On Mon, Nov 17, 2025 at 09:57:25PM +0100, Michal Luczaj wrote:
->>>> ...
->>>> +static void vsock_reset_interrupted(struct sock *sk)
->>>> +{
->>>> +	struct vsock_sock *vsk = vsock_sk(sk);
->>>> +
->>>> +	/* Try to cancel VIRTIO_VSOCK_OP_REQUEST skb sent out by
->>>> +	 * transport->connect().
->>>> +	 */
->>>> +	vsock_transport_cancel_pkt(vsk);
->>>> +
->>>> +	/* Listener might have already responded with VIRTIO_VSOCK_OP_RESPONSE.
->>>> +	 * Its handling expects our sk_state == TCP_SYN_SENT, which hereby we
->>>> +	 * break. In such case VIRTIO_VSOCK_OP_RST will follow.
->>>> +	 */
->>>> +	sk->sk_state = TCP_CLOSE;
->>>> +	sk->sk_socket->state = SS_UNCONNECTED;
->>>> +}
->>>> +
->>>> static int vsock_connect(struct socket *sock, struct sockaddr *addr,
->>>> 			 int addr_len, int flags)
->>>> {
->>>> @@ -1661,18 +1678,33 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
->>>> 		timeout = schedule_timeout(timeout);
->>>> 		lock_sock(sk);
->>>>
->>>> +		/* Connection established. Whatever happens to socket once we
->>>> +		 * release it, that's not connect()'s concern. No need to go
->>>> +		 * into signal and timeout handling. Call it a day.
->>>> +		 *
->>>> +		 * Note that allowing to "reset" an already established socket
->>>> +		 * here is racy and insecure.
->>>> +		 */
->>>> +		if (sk->sk_state == TCP_ESTABLISHED)
->>>> +			break;
->>>> +
->>>> +		/* If connection was _not_ established and a signal/timeout came
->>>> +		 * to be, we want the socket's state reset. User space may want
->>>> +		 * to retry.
->>>> +		 *
->>>> +		 * sk_state != TCP_ESTABLISHED implies that socket is not on
->>>> +		 * vsock_connected_table. We keep the binding and the transport
->>>> +		 * assigned.
->>>> +		 */
->>>> 		if (signal_pending(current)) {
->>>> 			err = sock_intr_errno(timeout);
->>>> -			sk->sk_state = sk->sk_state == TCP_ESTABLISHED ? TCP_CLOSING : TCP_CLOSE;
->>>> -			sock->state = SS_UNCONNECTED;
->>>> -			vsock_transport_cancel_pkt(vsk);
->>>> -			vsock_remove_connected(vsk);
->>>> +			vsock_reset_interrupted(sk);
->>>> 			goto out_wait;
->>>> -		} else if ((sk->sk_state != TCP_ESTABLISHED) && (timeout == 0)) {
->>>> +		}
->>>> +
->>>> +		if (timeout == 0) {
->>>> 			err = -ETIMEDOUT;
->>>> -			sk->sk_state = TCP_CLOSE;
->>>> -			sock->state = SS_UNCONNECTED;
->>>> -			vsock_transport_cancel_pkt(vsk);
->>>> +			vsock_reset_interrupted(sk);
->>>> 			goto out_wait;
->>>
->>> I'm fine with the change, but now both code blocks are the same, so
->>> can we unify them?
->>> I mean something like this:
->>> 		if (signal_pending(current) || timeout == 0 {
->>> 			err = timeout == 0 ? -ETIMEDOUT : sock_intr_errno(timeout);
->>> 			...
->>> 		}
->>>
->>> Maybe at that point we can also remove the vsock_reset_interrupted()
->>> function and put the code right there.
->>>
->>> BTW I don't have a strong opinion, what do you prefer?
->>
->> Sure, no problem.
->>
->> But I've realized invoking `sock_intr_errno(timeout)` is unnecessary.
->> `timeout` can't be MAX_SCHEDULE_TIMEOUT, so the call always evaluates to
->> -EINTR, right?
-> 
-> IIUC currently schedule_timeout() can return MAX_SCHEDULE_TIMEOUT only 
-> if it was called with that parameter, and I think we never call it in 
-> that way, so I'd agree with you.
-> 
-> My only concern is if it's true for all the stable branches we will 
-> backport this patch.
-> 
-> I would probably touch it as little as possible and continue using 
-> sock_intr_errno() for now, but if you verify that it has always been 
-> that way, then it's fine to change it.
+On Wed, 19 Nov 2025 12:47:18 +0000
+Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
 
-All right then, here's a v2 with minimum changes:
-https://lore.kernel.org/netdev/20251119-vsock-interrupted-connect-v2-1-70734cf1233f@rbox.co/
+> PHY devices had lack of hwtstamp_get callback even though most of them
+> are tracking configuration info. Introduce new call back to
+> mii_timestamper.
 
-Note a detail though: should signal and timeout happen at the same time,
-now it's the timeout errno returned.
+It would be nice to update this kdoc note:
+https://elixir.bootlin.com/linux/v6.18-rc6/source/net/core/dev_ioctl.c#L252
 
+Else:
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+
+Thank you!
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
