@@ -1,226 +1,170 @@
-Return-Path: <netdev+bounces-240039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D85C6F903
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:11:21 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD8D3C6F9C1
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 16:18:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 165DD2F85D
-	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 15:07:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AE2EE4FAC67
+	for <lists+netdev@lfdr.de>; Wed, 19 Nov 2025 15:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DE2363C54;
-	Wed, 19 Nov 2025 15:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB122C11E7;
+	Wed, 19 Nov 2025 15:10:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="pydQ9Cm/"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WGJRWTmM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011053.outbound.protection.outlook.com [40.107.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBD52C11C6;
-	Wed, 19 Nov 2025 15:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763564673; cv=none; b=cmWT2V/LxbCW8h4uqVl2tJlNJLkUdJhHIiChHMhdavhES2dhktDpmdwNaf34N0RfAbyomsTttjn0h0e7b7mGQrfR9zjA6/Z1oIFp4O9SEIb4I+E5DKj+tQLJ8sgPpkh3iIb8UwYqK9ej9ltSS4h/fqCJIewbg4ecLHnG+y7Sc3M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763564673; c=relaxed/simple;
-	bh=JWsvclXfQAhpF+gm46D5gt1oWK9nQX08T4sCNZQEqHY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s2zxQ8I7AzpynJ820l6Wzmf4hvymHHiazE+Bjm9k8HxH6BWAGjBNPKUfFibgyDJ/8rIrNgF0YFRn4T+f/dRvqDJYcmL33wJusQnItDHcpH3m23jVUqt0/POP7RQt4fqtZxuZny+F5z3spBuppHykPyhvxM2X2uPe2BvtiWoXreI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=pydQ9Cm/; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id CE093C1118B;
-	Wed, 19 Nov 2025 15:04:07 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 12AD160699;
-	Wed, 19 Nov 2025 15:04:30 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4AF2610371A6A;
-	Wed, 19 Nov 2025 16:04:24 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763564668; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=iOlkPCGpg/MS+MVjysj2yGEdNDC307nbqdpz8sSAuv0=;
-	b=pydQ9Cm/qN+VYxsz9ea5stWmObgr9qhSdrASCCjEPUvYmak8eHP47YpqmmAg/tkKCk/Jl3
-	XjUzyN0fKdeUd4GLVr9+vjbRQYRB1JS0RPpxGjzl1gzELMJNBdieiCGAF4Xccko61ckjiL
-	bhqntexyJ9bG6Mm8ZuZmEmSioCgnGbLtDUDV1jAw8fqR4FFR7sgyZfvMKPaQFd05aK2+7K
-	VrVAw/L1VhoIC8Qbj1PND/v39ak718JA6YKAtbiQAqGzNsaERPvGuKMkc3+QiRziw/GXFP
-	sXOdLDFBk6nZjRZoyPGjNuubGQ2MUqWjnMvMHhDE0bZM4TYIETvG8n/8HYV7FA==
-Message-ID: <b04b1abe-c75b-4f59-b9a9-183df0c56d08@bootlin.com>
-Date: Wed, 19 Nov 2025 16:04:23 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3512D1F40;
+	Wed, 19 Nov 2025 15:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763565009; cv=fail; b=Bt2aCWGG1jsfhVnlCXVn2UdCaOaCekxyrmKmqwh6+5qVlOrMidBKIGE3gH2/pWwzCS9RSQ1hnxi4nYEnUT6iXIdO5ljbB4q6T25TYqf0rVGHhYInPhhIpV/PFoK2lELP+bYAGDMm2hwdLPZKgZqhh4suLDV3RNz5578rTrh9zWE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763565009; c=relaxed/simple;
+	bh=AoV6nC9v2qWbCD25m9K8U/Xn5JUzYf5zoe6BQYC/R4s=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=sO6yYzk/YtdVdadbdzrufmAy1iT0gfx0bPJRFgscPfAwFBJYVYyC5xigezVTDLnJ/h+QxUcziL4YMJWRifnJwuhljK7AOYnKQbXjHOdtOBL1Hpbmu5A0zu8uuNiGYDpkjbv2GaImnFnQ+f80mgei+kfElpUpE3301UdpYWFSTUQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WGJRWTmM; arc=fail smtp.client-ip=40.107.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=J1EcWOYd2ubNVguMd9olGwgjYwrWtuVnzY9m3i6QIbK5rM8w7rcQUpcLmfy7REBVF8aHSmtC0/GiWo79RwioX6CKdbejvUxFHuV8Xu8x5S+wMH0n7sm5vyUBIjj9ImQeDxs+h++Wb55Cl5AUSftz/z58YNZdWI6NDMu1H/f02pccO44LRgIk3I7jfDCDjNNTZj5KPm9qPiRfIVIeUmREOHBPobRboxABgMaNAqG6br4BAEXjEZyR1OzJfBu8/5dPuuephx2S8D6oHycgRo62NUsVBqzo7EuUwgqPQ/qkRQR1u3kIk7zrBM3UffTK76cHEqM9i2JnGNhhlef4hwCFhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AoV6nC9v2qWbCD25m9K8U/Xn5JUzYf5zoe6BQYC/R4s=;
+ b=lCUHI5Bp1EwLBup+QxLRYGTXn5bztPsOX2tD98xIQLwpVclMKroMDH0+9B9ZmuFuWkL90Xs9nxW2AEoVAMMUDjWYz8Od+1/AKKmSnrUmAE7em7YD4Uz3OKdRnqqNNcKTGycL7HZbGE6Xnekm0cvTkKRqzfJ1y0bhPcmJFi52xJyNMcE49MSBxxDA6s8vuzI9aPilg/7Q4arHt//JQAgTvrCl77t4y9EJ3N3cGzk3WtHOh6Qihp7GDyQqUnLRwKV/wDc+2O+z/qrroTqQEykr5ybEE9ZLBjBCurKeErReQw0CHeJiUKOfu3aG4oP+zNn6VoYel0WoL9EUAg495msYjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AoV6nC9v2qWbCD25m9K8U/Xn5JUzYf5zoe6BQYC/R4s=;
+ b=WGJRWTmMsua00cFvOJqNPI+4dR5Eg0OTnZ7K+UmqqNcUfYoIW9AXK1VPfzeRdTv/uYdUHIUwglwrGrQ+YWtA3AVkU8kUrXPzKwKxTzN4VUG0Sy62uIk7XzkuyFjatEmlUMR7nQI+kpdZdALUAujk1xSJ8MizPY+U+hfuMCt0mwHtgnAE0jSNbNui2XiWMTdbnz3/5zQSFxTARm+J+8wuFehoh2/t9S3pShqQq7P5G74VwlGlHwyUte7ns/VD9CdarG98HsnOSwikHApAbykjgqvbrb1+0GQlX1yPx5U2qdDOcHlTu5pMGg2u0MscM7pvMuPmjbnxhnglaBGF5YtWhg==
+Received: from BL6PEPF00013E13.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:22e:400:0:1001:0:14) by BN7PPF0D942FA9A.namprd12.prod.outlook.com
+ (2603:10b6:40f:fc02::6c7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Wed, 19 Nov
+ 2025 15:09:56 +0000
+Received: from BL6PEPF0001AB73.namprd02.prod.outlook.com
+ (2a01:111:f403:f901::3) by BL6PEPF00013E13.outlook.office365.com
+ (2603:1036:903:4::4) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Wed,
+ 19 Nov 2025 15:09:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL6PEPF0001AB73.mail.protection.outlook.com (10.167.242.166) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.9 via Frontend Transport; Wed, 19 Nov 2025 15:09:55 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 07:09:31 -0800
+Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 19 Nov
+ 2025 07:09:25 -0800
+References: <20251118215126.2225826-1-kuba@kernel.org>
+ <20251118215126.2225826-6-kuba@kernel.org>
+User-agent: mu4e 1.8.14; emacs 30.2
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<willemdebruijn.kernel@gmail.com>, <shuah@kernel.org>, <sdf@fomichev.me>,
+	<krakauer@google.com>, <linux-kselftest@vger.kernel.org>, <petrm@nvidia.com>,
+	<matttbe@kernel.org>
+Subject: Re: [PATCH net-next v2 05/12] selftests: net: relocate gro and
+ toeplitz tests to drivers/net
+Date: Wed, 19 Nov 2025 16:09:13 +0100
+In-Reply-To: <20251118215126.2225826-6-kuba@kernel.org>
+Message-ID: <875xb6cb4u.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] net: stmmac: move probe/remove calling of
- init/exit
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Chen-Yu Tsai <wens@csie.org>,
- "David S. Miller" <davem@davemloft.net>, Drew Fustini <fustini@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Fu Wei <wefu@redhat.com>,
- Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
- Jakub Kicinski <kuba@kernel.org>, Jan Petrous <jan.petrous@oss.nxp.com>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Keguang Zhang <keguang.zhang@gmail.com>,
- Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-rockchip@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, s32@nxp.com,
- Samuel Holland <samuel@sholland.org>
-References: <aR2V0Kib7j0L4FNN@shell.armlinux.org.uk>
- <E1vLf2Z-0000000FMNH-0xPV@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <E1vLf2Z-0000000FMNH-0xPV@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB73:EE_|BN7PPF0D942FA9A:EE_
+X-MS-Office365-Filtering-Correlation-Id: 79e1fe15-3ed3-4eea-a783-08de277db2c9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?voME8cT8gsN6ITcetblwc9Dr+oPfVKixTT0T/43w9nmeheCRfJJlLwC/4G3i?=
+ =?us-ascii?Q?JdfzAQM4SqvDx0zSW+KIcHzuVhpmXcBYclBixxjVfyyA11oQHseI4jMxzP2d?=
+ =?us-ascii?Q?iN/3EufEbggXc+uSBvYgBL+Bow5rRpOb2xIWlCCs0v1T0k0b4laqTiTpOUYb?=
+ =?us-ascii?Q?aeULFiKW3z3ThlOSc7xDsubHUmZODn8RNRUdTrqVS44lb4iN8Hl3oRyHx5PK?=
+ =?us-ascii?Q?dxwjGbqDNHt+E4nFeGqxFIY+Td9v99mZONqxcvog8kuQJZluyzETUYFPLpBT?=
+ =?us-ascii?Q?qwmJY1MRI+BKEvWup4elX2s+Ret9btGUgGGwXxueslc4gv+cyy0MhNEF8m7H?=
+ =?us-ascii?Q?/qWilKE77VS+ipOf058V3mQ7VV+hSG5PM8QqEQs9Uffvh2b2+LvYIBAJBeck?=
+ =?us-ascii?Q?U3Vcc/5b1Ym7fjtm4+DCBsqtzeLKWZwS72iQ0DryFdcZEx1fUr2VTD14FcI6?=
+ =?us-ascii?Q?wWMT7zskISyvovrj1FWhemae/ZTthcbxgNkZo9W0M6R5Eh135KOH8pm+nJQV?=
+ =?us-ascii?Q?CCYbCtgVOQ9wHgVryhnTViGZwqjW8EPMFxOkYpOHr71UKXBKr7asT2lxGqBx?=
+ =?us-ascii?Q?cngCX2blmv4AAR+u6SRFbh0jcYXN81UMTklYFlW8j0eSadJN7BvTzg/zz1HS?=
+ =?us-ascii?Q?QL4d66h7kCwqDdQ30DLSuxxDS5ZkOWmy57AqUcuUIdCuIXGd16e/5wc9kaMr?=
+ =?us-ascii?Q?lMHVHn8HR3XEYDLWKhHVnq1pNaIpxeipuUR7Sv93JDubhPBGges9re5q7nnn?=
+ =?us-ascii?Q?uiN5HMF3M1RghjToxmZP7EUSawyYKDMycOC6a34bdx6rBQSpAAbGP6mZmaxO?=
+ =?us-ascii?Q?Dyef0Gpt0rjMUJ69aEXTkaTjNZ2L/wPkyv48pIbJ7eYBZy5PPWX9khCtf+aX?=
+ =?us-ascii?Q?UcRme1W5GfLYBrWrPUaEg0O2JffDcDwRlbttWREGZpXQKUaauNJuJCGUJlYy?=
+ =?us-ascii?Q?zpe3HxBFIqD3Qqzgwe8CZZItoDj6YXbL85OKRxEYlqo3uecz6A7iW6dJPxXH?=
+ =?us-ascii?Q?GKlfsj4wQUg1OgWZky0AypSOoPSGeReAspffNr+LbA03RD2sNVs9Yivs3H/q?=
+ =?us-ascii?Q?uVnwAfXrPay/JRKWyW/ACYSb6MYfIltR7WvQRjJdinsYlKhK/3QiX8/nwi9c?=
+ =?us-ascii?Q?EoI1iooOneA7XSL/kVd7Uw12500dJfa31BKYjQsXbU+58nPGUcvPyVY6sOTa?=
+ =?us-ascii?Q?JThOfIoSVp0oQlX0bWgafTAH2jTu9dsZKgaB9k7VOdbnXiy27WKTrYpFuwUl?=
+ =?us-ascii?Q?npu8QZ4UAST9fA++e1UIBlB2f/SzhUVp+NyNfTnhewEkdf1OW3dMkI0DIcPi?=
+ =?us-ascii?Q?2HOEmfvVKLHQ1/34dvjPD+mF3F60jwXRYsH/CGi7a0eJak5pNFQNakLBd2VW?=
+ =?us-ascii?Q?zceXhx1HWMBeZN1P3loNdgJ+ccB9+lFt4C3vLVrhf9hHDq0XInhoPbO5BMXu?=
+ =?us-ascii?Q?QQx3TjMVW8w4R22nFW0hLNykotAYolxE0cwWXkaBFQakkMJNFsUwg2WbUcxv?=
+ =?us-ascii?Q?kVOhcPNmrrvVathjgm7/IK0RHRp3g9tuqfwv1wJcG5gJ+5dQGZ/7YxxRRhfD?=
+ =?us-ascii?Q?giOONV/QG9+w0DjEObQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014)(7416014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 15:09:55.5084
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79e1fe15-3ed3-4eea-a783-08de277db2c9
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB73.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PPF0D942FA9A
 
 
+Jakub Kicinski <kuba@kernel.org> writes:
 
-On 19/11/2025 11:03, Russell King (Oracle) wrote:
-> Move the probe/remove time calling of the init()/exit() methods in
-> the platform data to the main driver probe/remove functions. This
-> allows them to be used by non-platform_device based drivers.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> The GRO test can run on a real device or a veth.
+> The Toeplitz hash test can only run on a real device.
+> Move them from net/ to drivers/net/ and drivers/net/hw/ respectively.
+>
+> There are two scripts which set up the environment for these tests
+> setup_loopback.sh and setup_veth.sh. Move those scripts to net/lib.
+> The paths to the setup files are a little ugly but they will be
+> deleted shortly.
+>
+> toeplitz_client.sh is not a test in itself, but rather a helper
+> to send traffic, so add it to TEST_FILES rather than TEST_PROGS.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
-
-> ---
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 47 ++++++++++++++-----
->  .../ethernet/stmicro/stmmac/stmmac_platform.c | 23 +--------
->  2 files changed, 36 insertions(+), 34 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 644dccb29f75..aac8188248ff 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -7593,19 +7593,9 @@ struct plat_stmmacenet_data *stmmac_plat_dat_alloc(struct device *dev)
->  }
->  EXPORT_SYMBOL_GPL(stmmac_plat_dat_alloc);
->  
-> -/**
-> - * stmmac_dvr_probe
-> - * @device: device pointer
-> - * @plat_dat: platform data pointer
-> - * @res: stmmac resource pointer
-> - * Description: this is the main probe function used to
-> - * call the alloc_etherdev, allocate the priv structure.
-> - * Return:
-> - * returns 0 on success, otherwise errno.
-> - */
-> -int stmmac_dvr_probe(struct device *device,
-> -		     struct plat_stmmacenet_data *plat_dat,
-> -		     struct stmmac_resources *res)
-> +static int __stmmac_dvr_probe(struct device *device,
-> +			      struct plat_stmmacenet_data *plat_dat,
-> +			      struct stmmac_resources *res)
->  {
->  	struct net_device *ndev = NULL;
->  	struct stmmac_priv *priv;
-> @@ -7912,6 +7902,34 @@ int stmmac_dvr_probe(struct device *device,
->  
->  	return ret;
->  }
-> +
-> +/**
-> + * stmmac_dvr_probe
-> + * @dev: device pointer
-> + * @plat_dat: platform data pointer
-> + * @res: stmmac resource pointer
-> + * Description: this is the main probe function used to
-> + * call the alloc_etherdev, allocate the priv structure.
-> + * Return:
-> + * returns 0 on success, otherwise errno.
-> + */
-> +int stmmac_dvr_probe(struct device *dev, struct plat_stmmacenet_data *plat_dat,
-> +		     struct stmmac_resources *res)
-> +{
-> +	int ret;
-> +
-> +	if (plat_dat->init) {
-> +		ret = plat_dat->init(dev, plat_dat->bsp_priv);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	ret = __stmmac_dvr_probe(dev, plat_dat, res);
-> +	if (ret && plat_dat->exit)
-> +		plat_dat->exit(dev, plat_dat->bsp_priv);
-> +
-> +	return ret;
-> +}
->  EXPORT_SYMBOL_GPL(stmmac_dvr_probe);
->  
->  /**
-> @@ -7950,6 +7968,9 @@ void stmmac_dvr_remove(struct device *dev)
->  
->  	pm_runtime_disable(dev);
->  	pm_runtime_put_noidle(dev);
-> +
-> +	if (priv->plat->exit)
-> +		priv->plat->exit(dev, priv->plat->bsp_priv);
->  }
->  EXPORT_SYMBOL_GPL(stmmac_dvr_remove);
->  
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> index feccb8a3e7e8..9015b7f80d1b 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -804,25 +804,12 @@ int stmmac_pltfr_probe(struct platform_device *pdev,
->  		       struct plat_stmmacenet_data *plat,
->  		       struct stmmac_resources *res)
->  {
-> -	struct device *dev = &pdev->dev;
-> -	int ret;
-> -
->  	if (!plat->suspend && plat->exit)
->  		plat->suspend = stmmac_plat_suspend;
->  	if (!plat->resume && plat->init)
->  		plat->resume = stmmac_plat_resume;
->  
-> -	ret = stmmac_pltfr_init(dev, plat);
-> -	if (ret)
-> -		return ret;
-> -
-> -	ret = stmmac_dvr_probe(dev, plat, res);
-> -	if (ret) {
-> -		stmmac_pltfr_exit(dev, plat);
-> -		return ret;
-> -	}
-> -
-> -	return ret;
-> +	return stmmac_dvr_probe(&pdev->dev, plat, res);
->  }
->  EXPORT_SYMBOL_GPL(stmmac_pltfr_probe);
->  
-> @@ -864,13 +851,7 @@ EXPORT_SYMBOL_GPL(devm_stmmac_pltfr_probe);
->   */
->  void stmmac_pltfr_remove(struct platform_device *pdev)
->  {
-> -	struct net_device *ndev = platform_get_drvdata(pdev);
-> -	struct stmmac_priv *priv = netdev_priv(ndev);
-> -	struct plat_stmmacenet_data *plat = priv->plat;
-> -	struct device *dev = &pdev->dev;
-> -
-> -	stmmac_dvr_remove(dev);
-> -	stmmac_pltfr_exit(dev, plat);
-> +	stmmac_dvr_remove(&pdev->dev);
->  }
->  EXPORT_SYMBOL_GPL(stmmac_pltfr_remove);
->  
-
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
