@@ -1,171 +1,155 @@
-Return-Path: <netdev+bounces-240578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1882AC76677
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 22:43:47 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C007CC76701
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 22:57:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BA0254E184E
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 21:43:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id B1EC02A423
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 21:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D9C311C39;
-	Thu, 20 Nov 2025 21:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082872EAB6E;
+	Thu, 20 Nov 2025 21:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Thg0PgGj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PexajmDq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09CE22259F;
-	Thu, 20 Nov 2025 21:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5C42F25E5
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 21:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763674976; cv=none; b=IqqqFj5yIRQDfbPX9SvEKCX2dH6rAChvZ/7IisaiBfCYX1B1uaAqkkiBZ04GC+RPxAWLQIwHEOiD7Pc45B3LWeOvCmAHywyygd3wPWClz1CCAtWv+wvObhz4pxOFJr+CmeZnb8npCLn+rrwOjMeNPIOAVhzUxzWre7M1zwjVdQI=
+	t=1763675849; cv=none; b=gK39gUnw4G0Y7qYsEu3ZVjec2IZJdRgGTxo6p9+mHDSNkGDeVm/BcC1B+ER8AJqM4lc9EDrFn5SwmlTqXFyHCHPtxZ+vuZLvk7y4cedBtH4KMP5hAykuDjrxqQRENioRp/exo1F+F2Cew5pEaEMm3NtQQcClvwwoUnaudJV3Roo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763674976; c=relaxed/simple;
-	bh=v2QU8nHLBZc7DdgFbNM+X9roRdeuesPeUX/gK+xZUkM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ISd4vuYRxuh9Z5Y545a3TdakY7hBwH+ewQWKDxiqPqKYQaeWR7zWkbwunwWWNXqmwPJ9Aft84ImHHAQz6e0x7Dm5IcYp22dJpSuG9WBn/ZcG9mcuxk9heI0KbdvbHZRY+aubrj0fV+w5pD7mCyEUlkwQBZXcHqcI/tgcZRyFGAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Thg0PgGj; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AKJNbPM2821819;
-	Thu, 20 Nov 2025 13:42:49 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=u2dHfkev4wkIM8Ip2xKtpkKrJScBQYOcd4BvsyKhRgI=; b=Thg0PgGjNBFu
-	ZNc0f8SLVd5xd9CwjydMqpjTnJbkuBrM/U0ESHogpM1Xid9k+IDmVhmTEW/58reR
-	XKGI8drczGstYdV+IPZwqzaW9PNSf7tAp+RGqgYi/zF484Ia31kCcidYj7Zauq0d
-	JZUihRMibA4omDO+pKMPM3LxCFwNjh1czw55Am83gBUduuApxZ7311pFHsa6l6xL
-	ErxWErchAIGQncEQdK2z9ieufJfZax9RE+NPTxtpeft58HwGdoO82C7/oRwuSf+1
-	Rm3k4ibzStq32U4+3wb/y0XjJMLIH5ymi6GcJ1Uum+aoSRQxKbDsMEgypnKSxAJi
-	sL+iTZADqw==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4aj93wh8ew-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 20 Nov 2025 13:42:49 -0800 (PST)
-Received: from devvm16459.vll0.facebook.com (2620:10d:c0a8:1c::1b) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Thu, 20 Nov 2025 21:42:47 +0000
-From: Danielle Costantino <dcostantino@meta.com>
-To: Gal Pressman <gal@nvidia.com>, Paolo Abeni <pabeni@redhat.com>
-CC: Tariq Toukan <tariqt@nvidia.com>, Nimrod Oren <noren@nvidia.com>,
-        Saeed
- Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky <leonro@nvidia.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 4/5] net/mlx5e: Fix wraparound in rate limiting for values above 255 Gbps
-Date: Thu, 20 Nov 2025 13:42:28 -0800
-Message-ID: <20251120214228.1594282-1-dcostantino@meta.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <1762681073-1084058-5-git-send-email-tariqt@nvidia.com>
-References: <1762681073-1084058-5-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1763675849; c=relaxed/simple;
+	bh=VIKRq0aH9aABuWVIGVcfN5YqIU2XFRDRNS0bP4bbPUs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F9ijI6BIHi+RT9qaC9DK26ZAcpcidfhn+nM/oW7lx74kVyzWVITzZ4gc3spm9DhwJqUiaQK+v3hIC6zgBuDTCxCMX+C4he2Z7Zuebuckmhsy1hNIrleQAiObfpMqsMm+hnee0taA6XwOuzsGsrPpBsgglMtZRSINUVd4zpFmpwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PexajmDq; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-780fd0da0e9so1234407b3.0
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 13:57:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763675847; x=1764280647; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=acngTfTdYoPKs7QTbd+kw/zmLQ6CCjPa+Hcp6y5W2SQ=;
+        b=PexajmDqUzVATi9xZpZ4FjEIB3wTrFbxfR9xUAi1YtWHB+EpXmGjdxuvPLqoYBSPIl
+         JIEPWBMKGggnNYj90TMvaYwWfz7rOvYgWf6x5PNbRgJeCOR7fJEvgTiS4n0J+BcnAw1p
+         jKYThpYXQ6Jj1RiDKajAFfxxOrp+Ce5wg5t2sn2teZ/GL/zHh3EIg4853r1VfKHsyVr8
+         qF38u0Q1IHhUGyiGR/XVSfgKxxx+ZMjqfea/4KP7bVMm7G6KJPcQ1MAXwq9Q7uM2s4MF
+         KKBSSd4evBt82HEx/t8yGdtWAGA7f76H2o2q/L4qDvHkjJXY/YuhcFDtXOTM2ZyQMSvG
+         HQGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763675847; x=1764280647;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=acngTfTdYoPKs7QTbd+kw/zmLQ6CCjPa+Hcp6y5W2SQ=;
+        b=jTXyYuXJ2h6MzAZBXex8qHlLYApvB94oW3gqgnOXsqdoy3xFMoP9gpHzatMfHxz2Pp
+         PWnV8BmQgmGd0pekic0pKBUvsbESa36j7cWK+rY4oHNUVsvkOYaQKVz3LO1ufCyngykm
+         jiBfnKVdiOXI46z4jXwflHdQ2FvYeog9D+iXulMZK008kiKo5i7Ezy6j+0lLoGLWUww2
+         OWomPWkncLN+Z8NPoj5je4qgw4+xTkMjorqlS+iX7A6mz61CBEtq4TfbwpuvO3PqO+9X
+         AL8Y3+hI0ZrhYQtNXJL3dPBaQBxDLL408Omda9WRo6rloyNXJXudbrFsKMO+NG/v3CF2
+         D+fQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXjFKWzUi9n4QD7Dr30sxvR0BXfXQHfVWJ1vEpZ6TcSQf6poMTYTJdHJUSYQwh6ODyvPdjVBEE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiYbONIM8VVzuKWH9nlrNwUgwBn2mnSKwILtG5YGdG55GO2NO0
+	wKgR1QHRK+z/ZMghiMwgsyTCSK/zaTJynsTSkWwJfOQPO2lrBBPDjE7/S7QNODS2NAysMmHrKZc
+	XapIGYo/BKYe7JYEyuV5/CPOrw47hrwA=
+X-Gm-Gg: ASbGnctcs5BXL5PrlIXxgF+gyofJg4EopPP8MXe+4hH1g8EKsZdhSvs/bdp/nSbWFVA
+	SpYCfWUcIaUWiwRFnDBqu+r0VtKS5UJzvEuNT1rZ2r0xNWtu2wA7Dx/aXsTbuNaDd1IA0VP+6ZJ
+	GytMgZ7gT+04DYulRJis6Y1Ch4Jc6mrQD23tgSGWgLN8ZiAwtjksMsYbpTwqjkjcHAoJ7kGan0w
+	/Tl8NSR15hRcHDzCsbPMc+B0ChCKTfojPFtCH/sRz3+9oK5WjBnQEsGAex7uyPIbTEcSuUuUUh0
+	hjVKUpDR5CQXFzeApQBuByx2XkGe3tto2Yv6hFo=
+X-Google-Smtp-Source: AGHT+IFH278gd7LaywHnjKGV7yj58tOA/DWTSt1RwuOIc/Q06gl3Klfp6Ih7scebqFhpQ8DaqwGihTulQXH48vN/uNw=
+X-Received: by 2002:a05:690c:95:b0:788:16d7:6ebb with SMTP id
+ 00721157ae682-78a795ed423mr35045787b3.5.1763675847167; Thu, 20 Nov 2025
+ 13:57:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=aKT9aL9m c=1 sm=1 tr=0 ts=691f8b59 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=NEAV23lmAAAA:8
- a=RTeLCBTnN0hYe8qsFzMA:9
-X-Proofpoint-ORIG-GUID: PmZ_-FDrydLKj9suP5VIA-UPXnmBuafr
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIwMDE1MiBTYWx0ZWRfXzTh53Jr8WW2U
- d/AcNfTL9nzNB8Kk6JkI2zJ/M9oxHcDKLMlHMWcDkS+Rhy+BGBzu9FS7AFke6zoZAepTa1OnjXv
- WQoQ8DVSlvNg7LSwLfxAuMso60lscq2HTidcFPe1y4Dqx3RBEOgPjZUBTVtr7EV6njaPR6nkpyM
- yBG3iyiMp23K5E+DNj2qz70JjPvkwct2GvqxWr5JltmsuH8/sKpxKEmqaQZ2QL8+8X03JDWD0F0
- 8wTnP/FDOqTrf6xLPCx5r074EM/hKUDEymxsrL2ylGma0Njn+hFyb6zRGkMTdCOS7hnB8r6h2/I
- 7DzxuhpcvDC8GiXu0mTwNLpy0Eno+lST9XuU02J7lcjVCUigXOOcgBO2Xg2ovrEbi20yT/TDbSV
- NVAdGWqZ2O1yNVorNM0SZjel4B8Uew==
-X-Proofpoint-GUID: PmZ_-FDrydLKj9suP5VIA-UPXnmBuafr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-20_09,2025-11-20_01,2025-10-01_01
+References: <20251120213805.4135-1-ptpt52@gmail.com> <20251120213805.4135-2-ptpt52@gmail.com>
+In-Reply-To: <20251120213805.4135-2-ptpt52@gmail.com>
+From: Vladimir Oltean <olteanv@gmail.com>
+Date: Thu, 20 Nov 2025 23:57:15 +0200
+X-Gm-Features: AWmQ_bnv4TbUctX3C0M8ZCciFb5_1SLblT9d2oxVI4WCyhhk5TijuqMkKDB1Ffg
+Message-ID: <CA+h21hoW3v_hL+woeQRwpxVCQ00ywWhJ0H+DfhaRqpMWB2ZSng@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] net: dsa: mt7530: fix active-low reset sequence
+To: Chen Minqiang <ptpt52@gmail.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	"Chester A. Unal" <chester.a.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>, 
+	DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Nov 9, 2025 at 11:37:52AM +0200, Gal Pressman wrote:
-> Add validation to reject rates exceeding 255 Gbps that would overflow
-> the 8 bits max bandwidth field.
+Hi Chen,
 
-Hi Gal, Tariq, Paolo,
+On Thu, 20 Nov 2025 at 23:40, Chen Minqiang <ptpt52@gmail.com> wrote:
+>
+> With GPIO_ACTIVE_LOW configured in DTS, gpiod_set_value(1) asserts reset
+> (drives the line low), and gpiod_set_value(0) deasserts reset (drives high).
+>
+> Update the reset sequence so that the driver:
+>  - asserts reset by driving the GPIO low first
+>  - waits for the required reset interval
+>  - deasserts reset by driving it high
+>
+> This ensures MT7531 receives a correct low-to-high reset pulse.
+>
+> Compatibility notes:
+>
+> The previous implementation contained a polarity mismatch: the DTS
+> described the reset line as active-high, while the driver asserted reset
+> by driving the GPIO low. The two mistakes matched each other, so the
+> reset sequence accidentally worked.
+>
+> This patch fixes both sides: the DTS is corrected to use
+> GPIO_ACTIVE_LOW, and the driver now asserts reset by driving the line
+> low (value = 1 for active-low) and then deasserts it by driving it high
+> (value = 0).
+>
+> Because the old behaviour relied on a matched pair of bugs, this change
+> is not compatible with mixed combinations of old DTS and new kernel, or
+> new DTS and old kernel. Both sides must be updated together.
+>
+> Upstream DTS and upstream kernels will remain fully compatible after
+> this patch. Out-of-tree DT blobs must update their reset-gpios flags to
+> match the correct hardware polarity, or the switch may remain stuck in
+> reset or fail to reset properly.
+>
+> There is no practical way to maintain compatibility with the previous
+> incorrect behaviour without adding non-detectable heuristics, so fixing
+> the binding and the driver together is the correct approach.
+>
+> Signed-off-by: Chen Minqiang <ptpt52@gmail.com>
+> ---
 
-While reviewing this commit (43b27d1bd88a) for backporting, I believe
-I've found a logic error in the validation condition.
+If the switch reset is active low and that is a known invariant fact about this
+hardware IP, why not use gpiod_is_active_low() in the driver to decide whether
+to call the old reset sequence of the new one?
 
-The issue is on line 617:
+Then you can fix device trees without regressing the kernel. You'll still
+regress old kernels which boot on updated (fixed) device trees, but for the
+latter, you can request a backport of the DSA driver patch to stable kernels.
 
-    } else if (max_bw_value[i] <= upper_limit_gbps) {
-        max_bw_value[i] = div_u64(maxrate->tc_maxrate[i], MLX5E_1GB);
-        max_bw_unit[i]  = MLX5_GBPS_UNIT;
+In networking process terms (be sure to read
+Documentation/process/maintainer-netdev.rst)
+it means you'll send one patch to the 'net' tree with a Fixes: tag like this:
+Fixes: c288575f7810 ("net: dsa: mt7530: Add the support of MT7531 switch")
+(when unsure, use "git log" and watch https://lore.kernel.org/netdev/ to see
+how others do things), and separate patch sets to the respective SoC maintainers
+for updating device trees.
 
-Here, max_bw_value[i] is used in the condition before it's assigned in
-this branch. This appears to be a copy-paste error from the previous
-commit a7bf4d5063c7 ("net/mlx5e: Fix maxrate wraparound in threshold
-between units").
-
-The condition should check the input value maxrate->tc_maxrate[i], not
-the output variable max_bw_value[i]:
-
-    } else if (maxrate->tc_maxrate[i] <= upper_limit_gbps) {
-
-This matches the pattern used in the first branch:
-
-    if (maxrate->tc_maxrate[i] <= upper_limit_mbps) {
-        max_bw_value[i] = div_u64(maxrate->tc_maxrate[i], MLX5E_100MB);
-        ...
-    }
-
-Impact:
--------
-The current code will compare an uninitialized (or stale from previous
-iteration) max_bw_value[i] against upper_limit_gbps, rather than
-comparing the actual requested rate. This means:
-
-1. For rates between 25.5 Gbps and 255 Gbps:
-   - If max_bw_value[i] happens to be 0 (from memset), the condition
-     (0 <= 255000000000) is true, incorrectly allowing the GBPS path
-   - The rate gets converted to Gbps units, which may be correct by
-     accident
-
-2. The validation in the else clause that rejects rates > 255 Gbps may
-   never trigger correctly if max_bw_value[i] from a previous iteration
-   is small enough
-
-3. For i > 0, max_bw_value[i] contains the computed value from the
-   previous TC, leading to incorrect branching logic
-
-This makes the overflow validation unreliable and could allow rates that
-should be rejected, or reject rates that should be accepted.
-
-Suggested fix:
---------------
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_dcbnl.c b/drivers/net/ethernet/mellanox/mlx5/core/en_dcbnl.c
-index d88a48210fdc..XXXXXXXX 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_dcbnl.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_dcbnl.c
-@@ -614,7 +614,7 @@ static int mlx5e_dcbnl_ieee_setmaxrate(struct net_device *netdev,
- 						  MLX5E_100MB);
- 			max_bw_value[i] = max_bw_value[i] ? max_bw_value[i] : 1;
- 			max_bw_unit[i]  = MLX5_100_MBPS_UNIT;
--		} else if (max_bw_value[i] <= upper_limit_gbps) {
-+		} else if (maxrate->tc_maxrate[i] <= upper_limit_gbps) {
- 			max_bw_value[i] = div_u64(maxrate->tc_maxrate[i],
- 						  MLX5E_1GB);
- 			max_bw_unit[i]  = MLX5_GBPS_UNIT;
-
-Let me know if you'd like me to send a formal patch for this.
-
-Thanks,
---
-Danielle Costantino
-Meta Platforms, Inc.
-Flagged by Claude Code with https://github.com/masoncl/review-prompts/
-
+BTW, didn't ./scripts/get_maintainer.pl also suggest my name in the CC
+list for this email?
 
