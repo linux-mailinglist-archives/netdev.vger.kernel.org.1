@@ -1,86 +1,104 @@
-Return-Path: <netdev+bounces-240292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id D85F9C722DD
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 05:23:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0814FC72322
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 05:31:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0DBCF352E9C
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:22:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A97CD347400
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4F0267B02;
-	Thu, 20 Nov 2025 04:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4839227B34D;
+	Thu, 20 Nov 2025 04:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nOD8j1Pk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kw38CNHB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D582135CE;
-	Thu, 20 Nov 2025 04:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1331C23BF9C;
+	Thu, 20 Nov 2025 04:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763612531; cv=none; b=JsDuyjCqU5AedNv1WQAAmttfmgsV71mFEB/u3ESrVRHGnL/JvyZ//GV9SUo79lQw2Ee0Fdu8o8JV9xFkkZCpAjKebpk1oWQ8uH/Ho/8CSmJ6RFutwiAW8GjRe8lJJRCEIQUTsGQxO0yuPyve3OBskRk3UZpjsALG0KkyIvEpa34=
+	t=1763613045; cv=none; b=m33/8Id6SFMRpIjPLxzD20j3CANE8gV6wjlb5AYOmPwN1So6GMoT0NaiJLpKrFMQNpQSyB08WAdrQsvzMIzLHjh2kEqueETQz0onVOXqh+UPAO5d4MmKVWSL0xEP99BIjpMThEFl7j3SYDeIsUEH55d737PkEdgrsR2b8RdMVhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763612531; c=relaxed/simple;
-	bh=bHoA5YIj8f9goOT8x55+QH3KcEvt0Aw7nd4f8ohSWh0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oOiXrFbUyKtdrDcwSkQfy1IRUnBZDB9wGw9PnVUy5xbj/WLoQSelb/G2tF4pj9SZHf9zcCGauil84cX7qTIyZGzfQx+EpM2QiqBFTgmDpiCc4w5w44CFv5vjS2AhpuOfncM5U5/pAx75E2XAfWLSOiZ+E4u5psXXzhYXhCztjqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nOD8j1Pk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C89AAC4CEF1;
-	Thu, 20 Nov 2025 04:22:09 +0000 (UTC)
+	s=arc-20240116; t=1763613045; c=relaxed/simple;
+	bh=XDBowCbVb6T1WoqzF+S0IyPnF3QQ1o/ZS55y3qujj7U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nhAO6b5IXENdoSJaekBIF4YnH/pyeBeiLAOJV7zcQ+MGsC8htGGaHTBNLHXOggL/hv1bJkPtTg+kaVSFOpDhm2WRmmD+RfiQ+0CTOpD2k6z3XTjEnM2Okcqxd7g9mpY5+2RzR0Ra6TCxMj5xfStcyRE1kiAr/7wXzNFCFsU4C9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kw38CNHB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABE24C4CEF1;
+	Thu, 20 Nov 2025 04:30:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763612530;
-	bh=bHoA5YIj8f9goOT8x55+QH3KcEvt0Aw7nd4f8ohSWh0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nOD8j1PkS8DZ1TBDONiAouELH6FJYLNOciUm0jBbEz9FAlv0lDup/VMPszLHfvpnm
-	 KKczo6ZDlen8eEFkwdCbgg5PN/VUYG2l1hnKB9BukJfhbmYJJiMy0UiFA6Mvd1PZKK
-	 5CUryRCbAumEhUBGH7ZRDtATyExuVAWSfmQ+ivOuOwwTOOqbKgcvAfaDbG9cJSomUC
-	 LdRQ75SPMBvnOepV2C2MVJE2smWWozW9FA5obWV25utUzK/4UuNazEWmLg93B/89WZ
-	 HripqdmXbJXfwSfBN+T8xqxJrjoaqzmVIYispRr1uHAM8ZATtQdQmdITHNmf4Ngiv2
-	 MZPu3datVgTjA==
-Date: Wed, 19 Nov 2025 20:22:08 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Arun
- Ramadoss <arun.ramadoss@microchip.com>, Pascal Eberhard
- <pascal.eberhard@se.com>, =?UTF-8?B?TWlxdcOobA==?= Raynal
- <miquel.raynal@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v5 4/5] net: dsa: microchip: Free previously
- initialized ports on init failures
-Message-ID: <20251119202208.1b0f5a3a@kernel.org>
-In-Reply-To: <20251118-ksz-fix-v5-4-8e9c7f56618d@bootlin.com>
-References: <20251118-ksz-fix-v5-0-8e9c7f56618d@bootlin.com>
-	<20251118-ksz-fix-v5-4-8e9c7f56618d@bootlin.com>
+	s=k20201202; t=1763613044;
+	bh=XDBowCbVb6T1WoqzF+S0IyPnF3QQ1o/ZS55y3qujj7U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Kw38CNHBKMBgMjOj/zQI3NGqSusDzDEAbchk5HWvEfJH3IkIGAQvNRNfMqMq56eEq
+	 Y8VBQnIcq2/q7DhuQfKM3nXgzMphhxYdalGESMgSH610vJOqmSlcNeSvj1rIXD0IVk
+	 jrGUOKHMpUlUoxLCfCQSEmmUJKYyrO6uLBG9WolGlk7YiLXCG+H+jMuCdWDJKHLL71
+	 WX0OYM0gNAn0TzMhUoiXBNNeVrzKY0BnP1KNZtYo4rMgmkmbDOLBmG4FI08IoSoIQH
+	 Fg8+ON+LoQyyMSmAk2K8Vwap5xUdn7dAPQYJryFkic2TBZHoc364OlVZYgulgwe+xt
+	 a+Zbr1ZrymfWg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E3C39EF974;
+	Thu, 20 Nov 2025 04:30:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v6 0/2] net: mana: Enforce TX SGE limit and fix
+ error
+ cleanup
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176361301025.1077848.8735410574086807354.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Nov 2025 04:30:10 +0000
+References: <1763464269-10431-1-git-send-email-gargaditya@linux.microsoft.com>
+In-Reply-To: 
+ <1763464269-10431-1-git-send-email-gargaditya@linux.microsoft.com>
+To: Aditya Garg <gargaditya@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
+ shirazsaleem@microsoft.com, leon@kernel.org, mlevitsk@redhat.com,
+ yury.norov@gmail.com, sbhatta@marvell.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, gargaditya@microsoft.com
 
-On Tue, 18 Nov 2025 17:13:25 +0100 Bastien Curutchet (Schneider
-Electric) wrote:
->  			if (dev->info->ptp_capable) {
->  				ret = ksz_ptp_irq_setup(ds, dp->index);
-> -				if (ret)
-> -					goto out_pirq;
-> +				if (ret) {
-> +					ksz_irq_free(&dev->ports[dp->index].pirq);
-> +					goto port_release;
+Hello:
 
-please jump to the correct location in the unwind loop
-it's perfectly normal for kernel code
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +				}
->  			}
+On Tue, 18 Nov 2025 03:11:07 -0800 you wrote:
+> Add pre-transmission checks to block SKBs that exceed the hardware's SGE
+> limit. Force software segmentation for GSO traffic and linearize non-GSO
+> packets as needed.
+> 
+> Update TX error handling to drop failed SKBs and unmap resources
+> immediately.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v6,1/2] net: mana: Handle SKB if TX SGEs exceed hardware limit
+    https://git.kernel.org/netdev/net-next/c/934fa943b537
+  - [net-next,v6,2/2] net: mana: Drop TX skb on post_work_request failure and unmap resources
+    https://git.kernel.org/netdev/net-next/c/45120304e841
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
