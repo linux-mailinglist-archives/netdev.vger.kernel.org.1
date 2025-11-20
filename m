@@ -1,110 +1,149 @@
-Return-Path: <netdev+bounces-240414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F906C74981
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:36:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 387D0C74969
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:35:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 785A131E2B
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 14:30:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id F085B30940
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 14:35:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4B81ACED7;
-	Thu, 20 Nov 2025 14:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49F8227FB34;
+	Thu, 20 Nov 2025 14:35:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BY9YcLo9"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="c9/+Xw7P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2173B2BA;
-	Thu, 20 Nov 2025 14:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDF8279DA2;
+	Thu, 20 Nov 2025 14:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763649051; cv=none; b=nNXDVivVsXi88h90MOmQFKNGeAUQLFhBG71cADi4byCuF/k3NZS4eiDl8yJrC8e5zJd276BWBUdrTbSkbOPbZdCed0XUqDDJ7EiIyNCjP9wzhJaaPUv7lMopsnvi1HpjPSAcBASnPeb0iyXm4UKXAcgphE/8SoIBxhY7AY25NGA=
+	t=1763649316; cv=none; b=OEWmQdPKWMZrF7aFadskbKPlcAEnndulRrnScPUQ8Ej7g0mxID2//hEZpCiURXxBkFPuTLsD+q+49rPQrQRxk66A3ZdWmDSWlgz2Tr7HA4jDKsx4VvpEI9yIMLkQuXbQ7FhNwRKiGnlQjC4SwaUGoKopYmKP6/G+GB+Jbhqf6so=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763649051; c=relaxed/simple;
-	bh=G0UVsRqQ7j8J9S16cmfX+j6Xm8Cx7ey9TFc+hgOvBdc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UPrUiiB+uDDAL+KKYT4j0tTQ0O8H289ou2Yt2BqfOQlZsTIPFG1zO2AqVtnsGIyGmYChFniSOJuyx+3f2/LjP6gylJAbfqvpWJE6iQo/88UFpCkOMTCqtameJ5ytoI4U9T10UvOvlrLYyjSo4Oldk/NRXXEoNmUsPJprCLToCz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BY9YcLo9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D225C4CEF1;
-	Thu, 20 Nov 2025 14:30:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763649050;
-	bh=G0UVsRqQ7j8J9S16cmfX+j6Xm8Cx7ey9TFc+hgOvBdc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BY9YcLo9PfgLCtt2rd0kgNyiwsySVweY8KcCyA6BZwyH6QSGzWolRG59qQBleVOdV
-	 2YPw73f5oaRWHYMp8PsWt758sIPRvImjds+2QvxjNT3pk8FpD2uAENbsyJmyTcmAko
-	 K4Wc5H8igZzgX7q8zgD+GXWCcXiKU69+OnaDj0cUCcVtMqR6Ln8u+cpMdxpjs1DkLs
-	 Vz0b8JopsN8zGBq7Ln7dQ2vhkJy4GWNtl0fKvy+i5uXY5FB8T7eu3rMobUPWuwSwx0
-	 kSia1/X5hInvUYSppwsSJLpqago3Xi67ZiQLZarj/c/x/AGqDoRprp63jB4vlrxvEJ
-	 7Rim3ehM+vlsg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF1739FEB77;
-	Thu, 20 Nov 2025 14:30:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1763649316; c=relaxed/simple;
+	bh=XUGGSkAVuPvR8VjCEXTxpMVeDoQkboBdTdML0twAlog=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S7pUFQYVJvIrtUgxVulnRJ8wTxx27KpS0k5L+lc+F2Om8730g52yiE40yFzSRUpJ2EaBFHpoSZbldcgaaCNXXgoeCjWvpV9YVVO5tTO+aOSAGu5FVREWNJiNvQnlPCC0lb5RySQxerDxwevTtdhObiQycaVBD9U3gD2QjJMDdgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=c9/+Xw7P; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 9E73A4E417E5;
+	Thu, 20 Nov 2025 14:35:10 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 64C5E6068C;
+	Thu, 20 Nov 2025 14:35:10 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E690410371BC7;
+	Thu, 20 Nov 2025 15:35:07 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1763649309; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=myJX+EbqUMHfePZ6NP3v+A2rBdvfOFs876oKDs9+xKA=;
+	b=c9/+Xw7PsWUSWNgII4CSs8oPhideO6dOFA3eVU+8Q7L95PPTUYNKKIRWC/DlN9meOhZZTd
+	OodbVaGzEIaxo9RZam1kOSLCeQbhDNXNLOFJWI3koi69mtZhFIkTEqVnHGm5jw95JALobn
+	sodQJn3XrOzhWLUXn5BfnneqhUtPTtJksY3h1zHaXN4Tlexj+1zmd8B/FMCnxMYldbAMKv
+	GAn8YHhyt9nywkWLAna7L37wlOnwO+iayqq3p2d8gSkvzxYAWcENMZbSJaIzAAVIUmXGZd
+	9DePqPuVIcSN00B+TXQpyTN7AuKLtBbIR2Ms7lZGYK6FUrJWiywLSUya0f4f4A==
+Message-ID: <942f62f9-4c79-4c35-ad03-40bf7c6111b4@bootlin.com>
+Date: Thu, 20 Nov 2025 15:35:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 0/6] Add AF_XDP zero copy support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176364901575.1647241.5550367394642830810.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Nov 2025 14:30:15 +0000
-References: <20251118135542.380574-1-m-malladi@ti.com>
-In-Reply-To: <20251118135542.380574-1-m-malladi@ti.com>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: horms@kernel.org, namcao@linutronix.de, vadim.fedorenko@linux.dev,
- jacob.e.keller@intel.com, christian.koenig@amd.com, sumit.semwal@linaro.org,
- sdf@fomichev.me, john.fastabend@gmail.com, hawk@kernel.org,
- daniel@iogearbox.net, ast@kernel.org, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
- linaro-mm-sig@lists.linaro.org, dri-devel@lists.freedesktop.org,
- linux-media@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com, vigneshr@ti.com,
- rogerq@kernel.org, danishanwar@ti.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 02/15] net: mdio-regmap: permit working with
+ non-MMIO regmaps
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+References: <20251118190530.580267-1-vladimir.oltean@nxp.com>
+ <20251118190530.580267-3-vladimir.oltean@nxp.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251118190530.580267-3-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hello:
+Hi Vladimir,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 18 Nov 2025 19:25:36 +0530 you wrote:
-> This series adds AF_XDP zero coppy support to icssg driver.
+On 18/11/2025 20:05, Vladimir Oltean wrote:
+> The regmap world is seemingly split into two groups which attempt to
+> solve different problems. Effectively, this means that not all regmap
+> providers are compatible with all regmap consumers.
 > 
-> Tests were performed on AM64x-EVM with xdpsock application [1].
+> First, we have the group where the current mdio-regmap users fit:
+> altera_tse_main.c and dwmac-socfpga.c use devm_regmap_init_mmio() to
+> ioremap their pcs_base and obtain a regmap where address zero is the
+> first PCS register.
 > 
-> A clear improvement is seen Transmit (txonly) and receive (rxdrop)
-> for 64 byte packets. 1500 byte test seems to be limited by line
-> rate (1G link) so no improvement seen there in packet rate
+> Second, we have the group where MFD parent drivers call
+> mfd_add_devices(), having previously initialized a non-MMIO (SPI, I2C)
+> regmap and added it to their devres list, and MFD child drivers use
+> dev_get_regmap(dev->parent, NULL) in their probe function, to find the
+> first (and single) regmap of the MFD parent. The address zero of this
+> regmap is global to the entire parent, so the children need to be
+> parent-aware and add their own offsets for the registers that they
+> should manage.
 > 
-> [...]
+> This is essentially because MFD is seemingly coming from a world where
+> peripheral registers are all entangled with each other, but what I'm
+> trying to support via MFD are potentially multiple instances of the same
+> kind of device, at well separated address space regions.
+> 
+> To use MFD but provide isolated regmaps for each child device would
+> essentially mean to fight against the system. The problem that needs to
+> be now solved is that each child device needs to find the correct
+> regmap, which means that "dev_get_regmap(dev->parent, NULL)" transforms
+> either in:
+> - dev_get_regmap(dev, NULL): search in the child device's devres list,
+>   not in the parent's. But MFD does not give us a hook in between
+>   platform_device_alloc() and platform_device_add() where we could make
+>   the devm_regmap_init_spi() call for the child device. We have to make
+>   it for the parent.
+> - dev_get_regmap(dev->parent, "unique-regmap-name"): now the child
+>   device needs to know, in case there are multiple instances of it,
+>   which one is it, to ask for the right one. I've seen
+>   drivers/mfd/ocelot-core.c work around this rather elegantly, providing
+>   a resource to the child, and then the child uses resource->name to
+>   find the regmap of the same name in the parent. But then I also
+>   stumbled upon drivers/net/pcs/pcs-xpcs-plat.c which I need to support
+>   as an MFD child, and that superimposes its own naming scheme for the
+>   resources: "direct" or "indirect" - scheme which is obviously
+>   incompatible with namespacing per instance.
+> 
+> So a MFD parent needs to decide whether it is in the boat that provides
+> one isolated regmap for each child, or one big regmap for all. The "one
+> big regmap" is the lowest common denominator when considering children
+> like pcs-xpcs-plat.c.
+> 
+> This means that from mdio-regmap's perspective, it needs to deal with
+> regmaps coming from both kinds of providers, as neither of them is going
+> away.
+> 
+> Users who provide a big regmap but want to access only a window into it
+> should provide as a struct mdio_regmap_config field a resource that
+> describes the start and end of that window. Currently we only use the
+> start as an offset into the regmap, and hope that MDIO reads and writes
+> won't go past the end.
+> 
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Here is the summary with links:
-  - [net-next,v6,1/6] net: ti: icssg-prueth: Add functions to create and destroy Rx/Tx queues
-    https://git.kernel.org/netdev/net-next/c/41dde7f1d013
-  - [net-next,v6,2/6] net: ti: icssg-prueth: Add XSK pool helpers
-    https://git.kernel.org/netdev/net-next/c/7dfd7597911f
-  - [net-next,v6,3/6] net: ti: icssg-prueth: Add AF_XDP zero copy for TX
-    https://git.kernel.org/netdev/net-next/c/8756ef2eb078
-  - [net-next,v6,4/6] net: ti: icssg-prueth: Make emac_run_xdp function independent of page
-    https://git.kernel.org/netdev/net-next/c/121133163c9f
-  - [net-next,v6,5/6] net: ti: icssg-prueth: Add AF_XDP zero copy for RX
-    https://git.kernel.org/netdev/net-next/c/7a64bb388df3
-  - [net-next,v6,6/6] net: ti: icssg-prueth: Enable zero copy in XDP features
-    https://git.kernel.org/netdev/net-next/c/c6a1ec1870e6
+That sounds good to me ! Thanks for expanding this driver :) I agree
+with keeping the entire resource instead of just 'start'.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-
+Maxime
 
