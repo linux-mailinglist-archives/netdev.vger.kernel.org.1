@@ -1,275 +1,194 @@
-Return-Path: <netdev+bounces-240490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDEA7C757C6
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:57:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E442BC75766
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:48:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BB17B4E19CB
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:47:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id AD5CF2BFED
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC2D36BCF5;
-	Thu, 20 Nov 2025 16:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB86369992;
+	Thu, 20 Nov 2025 16:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kJhcQAmq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ih0BDNKS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1DA36BCD2;
-	Thu, 20 Nov 2025 16:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAEC35E52C
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 16:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763657239; cv=none; b=cdt06CcFuku2lN9iG27ENYQCsYI5fCZG1QKXooASu5T5+N/JKyYtwARjijPSqaTqkDNXZu5P92JW7WmzKUl5wjAsv/+p6E9l/hmSTTpMWIdM7/eXyShUB+SbZRX6yHSOMvsdtd0ymHozl6D2aPew3lxalPiy2vx0B6Y/Tk6RTDo=
+	t=1763657308; cv=none; b=T4f5kaLLU7p657swvWSnOfxlGynXNganqOLYKarI98khWkG/PepgSIAMTZWeE1ze/Gm6szwFiV9GposZ5SPRQQKilGw3HRLvjOH+MUPi0t1G0CfOY+veEKu+OMUNOFo1/DpHlJtPNxAvk0oQyFbNP/yfBsBwn6M6Qc97N1dia2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763657239; c=relaxed/simple;
-	bh=LjuhgqD9n1j5hJRaIAx2AOc3Lan7soWPzgEKsEeP9xo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Cd2/hFIrkmKdPHAPneCQrw+wgPC7A0fInOEyEalG/DP0GFe3MBBKUzCEmkEevWRrg3UgvcGWLbY5XoXkW73joAjXzsFjR21nAKjFyMgULtL8KLf3VMYSY9OuacQLvdaydkRVijEKD9dSmLCjcXu3VXRtLdH9zDZLrvRbunR4ctM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kJhcQAmq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36BFFC116D0;
-	Thu, 20 Nov 2025 16:47:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763657238;
-	bh=LjuhgqD9n1j5hJRaIAx2AOc3Lan7soWPzgEKsEeP9xo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=kJhcQAmqK5cpcyO9O+UmHns33ot68M04DtL1LIo0r3ARCVCQYEZEIfhv+cGenbzYx
-	 b/cassYzBqOFeRCh5YewXdIZi2IM9ialMvKu0iR2VZTOYua9dstBDjl3BH30CKYJyn
-	 9mAhEN72tvyA9SMLV6F4n0h9Qqfz1NxByp/E47cOID79cp+AH3hn0f4on4FKGIAHCI
-	 YBF+Aubx/IuBWksJz0qA0+Rwp1k5oIGq66S4kKd7xPMOI1qWS3kw7QZtUyC/B2Qohm
-	 YHI0QffkvLY7YwE+L0o0mI1lc0Tf+h7CrWUPHAWzCtEXO1euAT6uKeARLwUGBQwKas
-	 6mIWZ4JGXdQuA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com
-Subject: [GIT PULL] Networking for v6.18-rc7
-Date: Thu, 20 Nov 2025 08:47:17 -0800
-Message-ID: <20251120164717.3974032-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.1
+	s=arc-20240116; t=1763657308; c=relaxed/simple;
+	bh=N+av1V9z9y7TptkRFnUJpYIorgVfCv8xrM7rU+y2IP4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EjRFwc3pfzu0kq4bA6WIz8xx9ra6ezjiZpIgB7/JuU93qgeQCl51y2/Y6FuT3y4v3qZskqv0os538Htv9mSWqnZNvEGOyz/FMdxahJ2mPguq30rcoEtlHtKGBIuzf138nh6poHy6USUNKMFOSbEboM4mS9WH6EUryIl6DC1Y3Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ih0BDNKS; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ee243b98caso292161cf.1
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 08:48:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763657306; x=1764262106; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LxGjazSHqn9sM/he04tGkXIBH0z5/kApvL+Oqyzo8W8=;
+        b=Ih0BDNKSqbZudF0GKH9vCQLp8a7TSFC93QW4oKev46bvuYg1yV80ziiaYXaj5WL07V
+         DT8Bt1hUznPvAGi79IUcT7GRTRCxNodDq5SJXR4f8XYNVUJltQSjAs8B0txmT8gRUtbr
+         D69BJf/K7ZYQPraQr3Yv9FDpSK5r0JPDsrLcjjEKMy6rXN+svi1pv/Ee2RK37ABhPfyj
+         /i9b0+2itL7m9EXkNpg28lHGGCfXR0zIz2GkabMhUz9QyKQKHqP0tlBf/q/Jwg0+wqCp
+         Ib899suoxrZ7wUE4yZWTIGbVtPBQxHzZYXkKh9gSc87rUHKxegXHO0hA3rZvzmCCOdPN
+         9UPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763657306; x=1764262106;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LxGjazSHqn9sM/he04tGkXIBH0z5/kApvL+Oqyzo8W8=;
+        b=MjuVRiUK20Y65ZghFUzfTRWT/iWCVmxPFQRzELsA1iQ713LE/kw7FzyKnsTDBzhSTN
+         CdnrPvQafI3VxT9qX7L9Er7VatiPS9RGn1ajDo3krBhhGa7EWWvCPAcFKMHFHets4NPe
+         A9Em/KvsuMkv7T73OLjcom46ri8jZPTv7UYfKUfvSQq4f5kDi8bnSfJUYcr0F8XIsKtR
+         Q7PYJS/VRWPFwARpaKMJQB/sFBW9KeiIdrLrARnK02AhbaZPpMvG8PeZICkX3phvYLht
+         91pKnfvsHdOiv/rbGAuP6XgrM14aTqaZILs+EvuE2+wjnZm0XG3AOHKpDaxvsRdOwiLA
+         +Veg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPojtvtqG9cptk9ioBlx83NgRh6SD8LbEIXGT3xyB2PmgLYj402dbepo+3FcU9VOtcZ/BgYq0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztUtO/iS5Sk/mTnZb9Ij68v2noeeWbJad/KC37eB4ImCu/6Y+v
+	44KGDzvWonf6YhETHBpUk6kNUPm36ystIGoegDKubu/MYtPeAZAxmSz7gPHLjmCkW+0opoo9L6K
+	yG7uZUrO9/B50GGfDS2L9yXp+gKFrjV087szuc46R
+X-Gm-Gg: ASbGncv8fAd6yjp6XxPaGnJDbQA9bdodN7XrqQX6OE/PFeUfjeNRdNKyeRnFBFT2bbS
+	xcBXwbBDPaJfsswL690dy1bzJE3XHmnD08p0uCPWjf0jRHNe5u3bMKdCPbKyFIDMzKSVW+696ZA
+	7DbZoJnCxIc5gaxmQ+t9xCiI2PSxkhdmyvMlpoZbzFy6GBm25trOSv5s5JDfyS2ini/6TIGfgK4
+	+Irgd9e9L5fGjsHCBzU2YZaHmeEDJsYm8MsxQqkt2BQYZ8JkaESAXHeRYZE4jG6HJBzftSaVUGn
+	cr9bmwky3jFpPHxMDeJ1L7l9IKGZ9VCBiaqI2eiaLlLHSHOFNTEUYvWHlfxBIb2q0uRTlw==
+X-Google-Smtp-Source: AGHT+IGTAh/1TkE04XJgeZYaG8lKCNKCk6OAgW2sS1qehNlP8IA0/2tKgcJW5Oya3vDRMJpBYq0x9BK3/tmK6tTd0G4=
+X-Received: by 2002:ac8:5792:0:b0:4e6:eaea:af3f with SMTP id
+ d75a77b69052e-4ee4ae9fe3cmr4987121cf.3.1763657305485; Thu, 20 Nov 2025
+ 08:48:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <OS7PR01MB13832468BD527C1623093DDDA95D7A@OS7PR01MB13832.jpnprd01.prod.outlook.com>
+ <CADVnQy=4BRX-z97s2qnNjLDSOr5hce4x6xknaySy6=Wrpjhn1A@mail.gmail.com> <OS7PR01MB13832DD044176D127AEE48B2995D4A@OS7PR01MB13832.jpnprd01.prod.outlook.com>
+In-Reply-To: <OS7PR01MB13832DD044176D127AEE48B2995D4A@OS7PR01MB13832.jpnprd01.prod.outlook.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 20 Nov 2025 11:48:05 -0500
+X-Gm-Features: AWmQ_bmQiP2Dis9rTUQjYuez6mruv-YAlfA8yi8NnGmKgixOQ-5WNm3HL3ektKk
+Message-ID: <CADVnQykxV+E6VqsZTSi9pnQNgZ5xFFbdtJTafU_yUShghmjnMA@mail.gmail.com>
+Subject: Re: [PATCH] tcp:provide 2 options for MSS/TSO window size: half the
+ window or full window.
+To: "He.kai Zhang.zihan" <hk517j@hotmail.com>
+Cc: edumazet@google.com, kuniyu@google.com, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Linus!
+On Thu, Nov 20, 2025 at 11:13=E2=80=AFAM He.kai Zhang.zihan <hk517j@hotmail=
+.com> wrote:
+>
+>
+> On 2025/11/20 00:43, Neal Cardwell wrote:
+> > On Wed, Nov 19, 2025 at 11:30=E2=80=AFAM He.kai Zhang.zihan <hk517j@hot=
+mail.com> wrote:
+> >
+> > Please read the following before sending your next patch:
+> >
+> > https://docs.kernel.org/process/maintainer-netdev.html
+> > https://docs.kernel.org/process/submitting-patches.html
+> >
+> > Rather than attaching patches, please use "git send-email" when
+> > sending patches, with something like the following for networking
+> > patches:
+> >
+> > # first check:
+> > ./scripts/checkpatch.pl *.patch
+> > # fix any issues
+> >
+> > # then send:
+> > git send-email \
+> >    --to 'David Miller <davem@davemloft.net>' \
+> >    --to 'Jakub Kicinski <kuba@kernel.org>' \
+> >    --to 'Eric Dumazet <edumazet@google.com>' \
+> >    --cc 'netdev@vger.kernel.org'  *.patch
+> >
+> > On the specifics of your patch:
+> >
+> > (1) Can you please send a tcpdump packet trace showing the problem you
+> > are trying to solve, and then another trace showing the behavior after
+> > your patch is applied?
+> >
+> > (2) Can you please provide your analysis of why the existing code in
+> > tcp_bound_to_half_wnd() does not achieve what you are looking for? It
+> > already tries to use the full receive window when the receive window
+> > is small. So perhaps all we need is to change the
+> > tcp_bound_to_half_wnd() logic to not use half the receive window if
+> > the receive window is less than 1 MSS or so, rather than using a
+> > threshold of TCP_MSS_DEFAULT?
+> >
+> > thanks,
+> > neal
+>
+>
+> Thank you for your reply! I will submit the patch according to your
+> suggestions next time.
+>
+> soon
+> (1) This issue actually occurs on Linux 4.x.x, caused by the function
+> tcp_bound_to_half_wnd().
+> This function first appeared in 2009 and has never been modified since
+> then. Moreover, Linux
+> 4.x.x is no longer available on the homepage of www.kernel.org, so I
+> assume you probably
+> won't accept patches for Linux 4.x.x. Therefore, this patch is based on
+> Linux 6.x.x. I will prove
+>   based on my analysis that this issue has existed for a long time.
+> Regarding the tcpdump you
+> requested, I will send it to you later for reference.
+>
+>
+> (2) In the current era, when dealing with embedded devices which often
+> use the lwIP or uIP
+> protocol stacks,MSS is generally around 1460 bytes. However, in the
+> tcp_bound_to_half_wnd()
+> function, the value of TCP_MSS_DEFAULTis 536U/* IPv4 (RFC1122, RFC2581)
+> */. When the peer
+> has only 1 MSS (i.e., 1460 bytes), and we want to send 1200 bytes, Linux
+> judges that this exceeds
+>   the 536 threshold and thus segments the data, sending it in two parts
+> (the first 730 bytes, and
+> the remaining in the second). But Windows 10 sends it in one go. What I
+> want is to send it in
+> one go. Previously, I considered changing the threshold of
+> TCP_MSS_DEFAULT to 1460, which
+> seemed convenient and safe, but it doesn=E2=80=99t seem appropriate=E2=80=
+=94this
+> threshold originates
+> from the RFC 1122 and RFC 2581 standards. What do you think? Is it
+> feasible?When the peer's
+> receive window is less than or equal to 1 MSS, we can avoid using half
+> the window. The
+> tcp_bound_to_half_wnd() function introduces a variable parameter mss_now
+> and then
+> performs a comparison. I'll modify and test this approach later.
 
-No known regressions or ongoing investigations.
+Yes, something like that. I agree that when the peer's receive window
+is less than or equal to 1 MSS, it seems to make sense to avoid using
+half the receive window.
 
-The following changes since commit d0309c054362a235077327b46f727bc48878a3bc:
+Please keep in mind the tcp_bound_to_half_wnd() comment:
 
-  Merge tag 'net-6.18-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-11-13 11:20:25 -0800)
+* On the other hand, for extremely large MSS devices, handling
+* smaller than MSS windows in this way does make sense.
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.18-rc7
-
-for you to fetch changes up to 002541ef650b742a198e4be363881439bb9d86b4:
-
-  vsock: Ignore signal/timeout on connect() if already established (2025-11-20 07:40:06 -0800)
-
-----------------------------------------------------------------
-Including fixes from IPsec and wireless.
-
-Previous releases - regressions:
-
- - prevent NULL deref in generic_hwtstamp_ioctl_lower(),
-   newer APIs don't populate all the pointers in the request
-
- - phylink: add missing supported link modes for the fixed-link
-
- - mptcp: fix false positive warning in mptcp_pm_nl_rm_addr
-
-Previous releases - always broken:
-
- - openvswitch: remove never-working support for setting NSH fields
-
- - xfrm: number of fixes for error paths of xfrm_state creation/
-   modification/deletion
-
- - xfrm: fixes for offload
-   - fix the determination of the protocol of the inner packet
-   - don't push locally generated packets directly to L2 tunnel
-     mode offloading, they still need processing from the standard
-     xfrm path
-
- - mptcp: fix a couple of corner cases in fallback and fastclose
-   handling
-
- - wifi: rtw89: hw_scan: prevent connections from getting stuck,
-   work around apparent bug in FW by tweaking messages we send
-
- - af_unix: fix duplicate data if PEEK w/ peek_offset needs to wait
-
- - veth: more robust handing of race to avoid txq getting stuck
-
- - eth: ps3_gelic_net: handle skb allocation failures
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-----------------------------------------------------------------
-Aleksei Nikiforov (1):
-      s390/ctcm: Fix double-kfree
-
-Andrey Vatoropin (1):
-      be2net: pass wrb_params in case of OS2BMC
-
-Baruch Siach (1):
-      MAINTAINERS: Remove eth bridge website
-
-Bitterblue Smith (1):
-      wifi: rtw89: hw_scan: Don't let the operating channel be last
-
-David Bauer (1):
-      l2tp: reset skb control buffer on xmit
-
-Emil Tantilov (1):
-      idpf: fix possible vport_config NULL pointer deref in remove
-
-Eric Dumazet (2):
-      mptcp: fix race condition in mptcp_schedule_work()
-      mptcp: fix a race in mptcp_pm_del_add_timer()
-
-Florian Fuchs (1):
-      net: ps3_gelic_net: handle skb allocation failures
-
-Gang Yan (2):
-      mptcp: fix address removal logic in mptcp_pm_nl_rm_addr
-      selftests: mptcp: add a check for 'add_addr_accepted'
-
-Grzegorz Nitka (1):
-      ice: fix PTP cleanup on driver removal in error path
-
-Ido Schimmel (1):
-      selftests: net: lib: Do not overwrite error messages
-
-Ilya Maximets (1):
-      net: openvswitch: remove never-working support for setting nsh fields
-
-Jakub Kicinski (4):
-      Merge tag 'ipsec-2025-11-18' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec
-      Merge branch 'af_unix-fix-so_peek_off-bug-in-unix_stream_read_generic'
-      Merge branch 'mptcp-misc-fixes-for-v6-18-rc7'
-      Merge branch '200GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-
-Jesper Dangaard Brouer (1):
-      veth: more robust handing of race to avoid txq getting stuck
-
-Jiaming Zhang (1):
-      net: core: prevent NULL deref in generic_hwtstamp_ioctl_lower()
-
-Jianbo Liu (3):
-      xfrm: Check inner packet family directly from skb_dst
-      xfrm: Determine inner GSO type from packet inner protocol
-      xfrm: Prevent locally generated packets from direct output in tunnel mode
-
-Johannes Berg (1):
-      Merge tag 'rtw-2025-11-20' of https://github.com/pkshih/rtw
-
-Kuniyuki Iwashima (2):
-      af_unix: Read sk_peek_offset() again after sleeping in unix_stream_read_generic().
-      selftest: af_unix: Add test for SO_PEEK_OFF.
-
-Lorenzo Bianconi (1):
-      net: airoha: Do not loopback traffic to GDM2 if it is available on the device
-
-Matthieu Baerts (NGI0) (3):
-      selftests: mptcp: join: fastclose: remove flaky marks
-      selftests: mptcp: join: endpoints: longer timeout
-      selftests: mptcp: join: userspace: longer timeout
-
-Michal Luczaj (1):
-      vsock: Ignore signal/timeout on connect() if already established
-
-Oleksij Rempel (1):
-      net: dsa: microchip: lan937x: Fix RGMII delay tuning
-
-Paolo Abeni (7):
-      mptcp: fix ack generation for fallback msk
-      mptcp: avoid unneeded subflow-level drops
-      mptcp: fix premature close in case of fallback
-      mptcp: do not fallback when OoO is present
-      mptcp: decouple mptcp fastclose from tcp close
-      mptcp: fix duplicate reset on fastclose
-      Merge tag 'wireless-2025-11-20' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-
-Pavel Zhigulin (3):
-      net: dsa: hellcreek: fix missing error handling in LED registration
-      net: mlxsw: linecards: fix missing error check in mlxsw_linecard_devlink_info_get()
-      net: qlogic/qede: fix potential out-of-bounds read in qede_tpa_cont() and qede_tpa_end()
-
-Pradyumn Rahar (1):
-      net/mlx5: Clean up only new IRQ glue on request_irq() failure
-
-Sabrina Dubroca (6):
-      xfrm: drop SA reference in xfrm_state_update if dir doesn't match
-      xfrm: also call xfrm_state_delete_tunnel at destroy time for states that were never added
-      xfrm: make state as DEAD before final put when migrate fails
-      xfrm: call xfrm_dev_state_delete when xfrm_state_migrate fails to add the state
-      xfrm: set err and extack on failure to create pcpu SA
-      xfrm: check all hash buckets for leftover states during netns deletion
-
-Shay Drory (1):
-      devlink: rate: Unset parent pointer in devl_rate_nodes_destroy
-
-Wei Fang (1):
-      net: phylink: add missing supported link modes for the fixed-link
-
-Zilin Guan (2):
-      mlxsw: spectrum: Fix memory leak in mlxsw_sp_flower_stats()
-      xfrm: fix memory leak in xfrm_add_acquire()
-
- MAINTAINERS                                        |   1 -
- drivers/net/dsa/hirschmann/hellcreek_ptp.c         |  14 +-
- drivers/net/dsa/microchip/lan937x_main.c           |   1 +
- drivers/net/ethernet/airoha/airoha_ppe.c           |   2 +-
- drivers/net/ethernet/emulex/benet/be_main.c        |   7 +-
- drivers/net/ethernet/intel/ice/ice_ptp.c           |  22 ++-
- drivers/net/ethernet/intel/idpf/idpf_main.c        |   2 +
- drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c  |   6 +-
- .../net/ethernet/mellanox/mlxsw/core_linecards.c   |   2 +
- .../net/ethernet/mellanox/mlxsw/spectrum_flower.c  |   6 +-
- drivers/net/ethernet/qlogic/qede/qede_fp.c         |   5 +-
- drivers/net/ethernet/toshiba/ps3_gelic_net.c       |  45 ++++--
- drivers/net/ethernet/toshiba/ps3_gelic_net.h       |   1 +
- drivers/net/phy/phylink.c                          |   3 +
- drivers/net/veth.c                                 |  38 ++---
- drivers/net/wireless/realtek/rtw89/fw.c            |   7 +
- drivers/s390/net/ctcm_mpc.c                        |   1 -
- include/net/xfrm.h                                 |   3 +-
- net/core/dev_ioctl.c                               |   3 +
- net/devlink/rate.c                                 |   4 +-
- net/ipv4/esp4_offload.c                            |   6 +-
- net/ipv6/esp6_offload.c                            |   6 +-
- net/l2tp/l2tp_core.c                               |   6 +-
- net/mptcp/options.c                                |  54 ++++++-
- net/mptcp/pm.c                                     |  20 ++-
- net/mptcp/pm_kernel.c                              |   2 +-
- net/mptcp/protocol.c                               |  78 ++++++----
- net/mptcp/protocol.h                               |   3 +-
- net/openvswitch/actions.c                          |  68 +--------
- net/openvswitch/flow_netlink.c                     |  64 +-------
- net/openvswitch/flow_netlink.h                     |   2 -
- net/unix/af_unix.c                                 |   3 +-
- net/vmw_vsock/af_vsock.c                           |  40 +++--
- net/xfrm/xfrm_device.c                             |   2 +-
- net/xfrm/xfrm_output.c                             |   8 +-
- net/xfrm/xfrm_state.c                              |  30 +++-
- net/xfrm/xfrm_user.c                               |   8 +-
- tools/testing/selftests/net/.gitignore             |   1 +
- tools/testing/selftests/net/af_unix/Makefile       |   1 +
- tools/testing/selftests/net/af_unix/so_peek_off.c  | 162 +++++++++++++++++++++
- .../selftests/net/forwarding/lib_sh_test.sh        |   7 +
- tools/testing/selftests/net/lib.sh                 |   2 +-
- tools/testing/selftests/net/mptcp/mptcp_join.sh    |  27 ++--
- 43 files changed, 521 insertions(+), 252 deletions(-)
- create mode 100644 tools/testing/selftests/net/af_unix/so_peek_off.c
+thanks,
+neal
 
