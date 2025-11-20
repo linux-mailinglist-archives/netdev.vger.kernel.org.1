@@ -1,99 +1,97 @@
-Return-Path: <netdev+bounces-240419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23C3EC74ACB
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:54:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15333C74A8C
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:52:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EC4F33545A2
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 14:50:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id D328C2ACD0
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 14:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88BF02F7AB0;
-	Thu, 20 Nov 2025 14:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981352F1FCB;
+	Thu, 20 Nov 2025 14:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uLuz7Hmi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uT1Z529N"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBDE2F619D;
-	Thu, 20 Nov 2025 14:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736772E542C
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 14:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763650245; cv=none; b=kn/AePOfMnkFCQOHKoZHtu9egh+0BLKo8y+WtC7cJ9jE3E41SlC0mlmMyvGJR0QucGTbqvY2nBjJTG7d8J3ua96OOBXVZPMTyS3DITGIFG5vyGnOqakx7jKzhBIrtixmKDFXCmO3QlYsrNGQMMyyE6hpatjzOUjwADq9IDtGBU4=
+	t=1763650345; cv=none; b=AQbE2kVwI9yNB2kETNtRoVWznJsP6yi4c9JjA/6zs25fgzUI456bmQ5NrtwDK9J9TXoVEIebeqLGpukSLzJJL9se0dbRzr0p+87ED2JiuCgOJgSBXTk0dqxXzDxyXfTb2lD6h5kRoTvdtgIXsAJPArTukjztZivajFEXfJ0DaX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763650245; c=relaxed/simple;
-	bh=WfYdhiV/Pe6fKmjDC/PPLOZ1XVBwj9BgyydH6NExDPc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eiXWay03cVp6eYldtdjxhcopLHs1XjcJkL9pgD30RvDC1tcz68OSaMEDxMDd0kwau4FzyIrh+pTDfNtBesnA3X42XeuZPkq7RfNvEhUs9Whz9n9EsrnhMcJs5TvgdGSfI7tJscUZscWCzymrlxRjP9xaEF8coZYJT3tRbh87btQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uLuz7Hmi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC36BC113D0;
-	Thu, 20 Nov 2025 14:50:44 +0000 (UTC)
+	s=arc-20240116; t=1763650345; c=relaxed/simple;
+	bh=YMmvji9k0l5z1bLwT7W4OFry7JGlInMOVfzy+fHrUQw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ipSzF0T3oSolRw7VvGF0MmuLAMBNLv7uMxWceTtQIXfgZ7AScHLGs9I9auU5TOI/L893UNWg6E09g0iIwXAgIIG9wz37kSLxj3D/q0x/SVhOETvxd9hPZ/l9zrfmZXVJV+nOeLtmr4cNI/GoWujcR2cWpI8QTXsMLeE9Dx06NH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uT1Z529N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 876F0C4CEF1;
+	Thu, 20 Nov 2025 14:52:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763650245;
-	bh=WfYdhiV/Pe6fKmjDC/PPLOZ1XVBwj9BgyydH6NExDPc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uLuz7HmisFSvKUfPjRnjUH2BO2TI/R4njwjGlmetfjSxeVjq5xabhQZCOwGDEZzGo
-	 uwYNzxrAjraIfwUgSc4OG7b//lSjiQw21fgUuGTseSi0PR9idm0Jpyj5wIjwiwa7/+
-	 u7r+Xl3EQgVAxK3RqRVSqN9E0GsuXaetUEawXqPM9bbJqj4SENqxU1BdRoBv8ln9yw
-	 of3jHF9QyJn21SkFsjUMkjDUmoTDNGYsvlIzwoFQ5oa6+2tbDXeljv8zwJj+n/qTkY
-	 Gy+4xkYQyLt/39hpIPySCTXOinp3bQ8q81bqAaw4hSDFfS6Q1EFWRFnwdAZOmOeure
-	 08Ye8ZSuW6rFQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F2D39FEB75;
-	Thu, 20 Nov 2025 14:50:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1763650344;
+	bh=YMmvji9k0l5z1bLwT7W4OFry7JGlInMOVfzy+fHrUQw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uT1Z529NPpffZXWmB4mgxYWgXkZTgJrKrv6aNGKyuqgLSp+gvBOiHaulp16AYd7/s
+	 i/X6V+Xxbx9lsZFqF7lA0KxxZrcltY8wTOAJjO5gcOm62cFfUtdqJ4kwShg/DL3hL7
+	 skmk2ee+mxkY8RFBmuvnNp8RLJFsLWdAjk1KrXQDdhbzEBY0cnTOhht788NLNQUZ8Y
+	 Lu3uLEpU3C4gyo0U40QTlb0hUZMbwyUFyPm/t/QG+VbO4xRMf8GbFHK6+TbtUMbhvm
+	 HpvTIXCwUTOibKiHDysaQ78CDW8ERGT9/qjbhtj6SAHAPyNEKFOoLg9fcuKDUy1ZkO
+	 cCW5uej27Y05g==
+Date: Thu, 20 Nov 2025 06:52:23 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Parav Pandit <parav@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org
+Subject: Re: [PATCH net-next v1] devlink: Notify eswitch mode changes to
+ devlink monitor
+Message-ID: <20251120065223.7c9d4462@kernel.org>
+In-Reply-To: <32hbfvtxcn3okpylfcgfeuq7uvrufpij4y7w6au6vxrernwthb@pdxvc6r6jl5z>
+References: <20251119165936.9061-1-parav@nvidia.com>
+	<20251119175628.4fe6cd4d@kernel.org>
+	<32hbfvtxcn3okpylfcgfeuq7uvrufpij4y7w6au6vxrernwthb@pdxvc6r6jl5z>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/3] YNL CLI --list-attrs argument
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176365021029.1654378.15223154509378467974.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Nov 2025 14:50:10 +0000
-References: <20251118143208.2380814-1-gal@nvidia.com>
-In-Reply-To: <20251118143208.2380814-1-gal@nvidia.com>
-To: Gal Pressman <gal@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- donald.hunter@gmail.com, horms@kernel.org, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, bpf@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 18 Nov 2025 16:32:05 +0200 you wrote:
-> While experimenting with the YNL CLI, I found the process of going back
-> and forth to examine the YAML spec files in order to figure out how to
-> use each command quite tiring.
+On Thu, 20 Nov 2025 13:09:35 +0100 Jiri Pirko wrote:
+> Thu, Nov 20, 2025 at 02:56:28AM +0100, kuba@kernel.org wrote:
+> >On Wed, 19 Nov 2025 18:59:36 +0200 Parav Pandit wrote:  
+> >> When eswitch mode changes, notify such change to the
+> >> devlink monitoring process.
+> >> 
+> >> After this notification, a devlink monitoring process
+> >> can see following output:
+> >> 
+> >> $ devlink mon
+> >> [eswitch,get] pci/0000:06:00.0: mode switchdev inline-mode none encap-mode basic
+> >> [eswitch,get] pci/0000:06:00.0: mode legacy inline-mode none encap-mode basic
+> >> 
+> >> Reviewed-by: Jiri Pirko <jiri@nvidia.com>  
+> >
+> >Jiri, did you have a chance to re-review this or the tag is stale?  
 > 
-> The addition of --list-attrs helps by providing all information needed
-> directly in the tool. I figured others would likely find it useful as
-> well.
+> Nope, I reviewed internally, that's why the tag was taken.
 > 
-> [...]
+> >I have a slight preference for a new command ID here but if you
+> >think GET is fine then so be it.  
+> 
+> Well, For the rest of the notifications, we have NEW/DEL commands.
+> However in this case, as "eswitch" is somehow a subobject, there is no
+> NEW/DEL value defined. I'm fine with using GET for notifications for it.
+> I'm also okay with adding new ID, up to you.
 
-Here is the summary with links:
-  - [net-next,v2,1/3] tools: ynl: cli: Add --list-attrs option to show operation attributes
-    https://git.kernel.org/netdev/net-next/c/2a2d5a3392b6
-  - [net-next,v2,2/3] tools: ynl: cli: Parse nested attributes in --list-attrs output
-    https://git.kernel.org/netdev/net-next/c/bc1bc1b357cd
-  - [net-next,v2,3/3] tools: ynl: cli: Display enum values in --list-attrs output
-    https://git.kernel.org/netdev/net-next/c/6c10f1a1c08a
-
-You are awesome, thank you!
+Let's add a DEVLINK_CMD_ESWITCH_NTF. Having a separate ID makes it
+easier / possible to use the same socket for requests and notifications.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
