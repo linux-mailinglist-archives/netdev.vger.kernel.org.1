@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-240473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E883C75635
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:35:25 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C739BC75624
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:34:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0A1F33596F1
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:28:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6047B4E9914
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC6E36C0A4;
-	Thu, 20 Nov 2025 16:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B3136C0D5;
+	Thu, 20 Nov 2025 16:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OuBwFOIQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1U8Lsrs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FBB366DC7;
-	Thu, 20 Nov 2025 16:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DDE3644D9;
+	Thu, 20 Nov 2025 16:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763656012; cv=none; b=EJY5YRfIuoCsu0zg2nMH82HUU/JsEGFcSk/G9Idds7cb4IpS49zWYHVWyAqy7LT6Trput6kUcN2KjQxewePlr8Oa5DXVWhB+VHFOjRY8aYYy9snAwTHwRsymi5yRznlaBGdXbM0WQ/1fsd+LfmI5ouYL8BayCWvMfqvPozhP8S0=
+	t=1763656018; cv=none; b=h1PbA/tF7sLasudcYtQRq1uPzWuFf6i7q0DsXcdCSM/HgTgBD3qZfoyladhcooc4/yZSkfzh7lAR0ffqiCh7e2d9kFyRHGN29v6WnshIjsOCDylOuqKMNwfbWBoeDqoPO505yBTwKwdc/eIcKjnHFYTxmqBWpkW+bLtF5vwo4/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763656012; c=relaxed/simple;
-	bh=rkNBjbwLoFq9BqcRqqIp3a/rpQWG6VvjMT67WwIxYzY=;
+	s=arc-20240116; t=1763656018; c=relaxed/simple;
+	bh=vyKf7oAe73jG7REVIeUhuNZDGGytb/NVXkzSMRKd0IY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qtZP4voUcdRMu/W2qbSS8qW4451Vp+BgTEx/97FE8xbAm4Wej2bqs/ZS2mlrb28lOAqm95xsH1/qTASYnEstb3m7Ta34ggeN91MY26/uDSDB6XBAxPSQ1L+XnSiJ8PE0Efn6UyFFapTDkH0+XOYP8H9I5mmyb/bMLfsnAxGCz6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OuBwFOIQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62E8AC4CEF1;
-	Thu, 20 Nov 2025 16:26:47 +0000 (UTC)
+	 MIME-Version; b=JATx9W9GBrzzg9wlk//syyEUNRpvg7LDtPxEZjoSmM3d1Q4XSMML7iJzl8rTsBK5PtysO5EexRcYceJLlDewnMlRsWHQSwtuFDAYp1BJ6U4Ig8UclrQsjDQwu5jZ9km31noEp1BQcq9K2RwAjTGNXBrsZ8GCSu6+r2CpTzO4qAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1U8Lsrs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E521C4CEF1;
+	Thu, 20 Nov 2025 16:26:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763656012;
-	bh=rkNBjbwLoFq9BqcRqqIp3a/rpQWG6VvjMT67WwIxYzY=;
+	s=k20201202; t=1763656018;
+	bh=vyKf7oAe73jG7REVIeUhuNZDGGytb/NVXkzSMRKd0IY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OuBwFOIQtvJZo4UvFhnNNYeKkLD2w5SzhLhRQTWxfYBdQ965AZrT+gm8T05WDE6/c
-	 roNe31hpHWTh7xmbB+ZM4LrItzMwgO6mshm5Eq67KB31QjgKSGkW627WPO2DdGpYym
-	 NvRXeKY9WyO8f6wTfOdew+02CiXs3iHjshf8h8V/SWdJW4JJX1tU7v293SR7p6h4kE
-	 POfCwD7TGZkWoD1z8xHKlW59FVmuGGzIrO1ZpOXNGhGU1CGraNkrci4gqW7vdkzrIl
-	 M/3lWIYLbAM+OTEYK+R1mTfT6f88RBRXKT+n+/7tsSWfQMn37wHz34XSPGIS3IkwZJ
-	 C9VsCmHpMx3wg==
+	b=S1U8Lsrs/SxWVweihN4p0v2fQXX5uuo5KT1E0ATmGO7U44Cg1lZoRLt2akgeKu5Eu
+	 PhVO5/ACbGAAMWNLo37apEbqD/B6pt5iXzcQylc8Fuo+KwWMVAxs9vKh9KtKHRsp3I
+	 BF5MyxkA8z+Z2FakraOKNu8wzeBjd7VQYsEIMEin7CXevE6XJnzIziNcuzcLF7/ooQ
+	 eGum4pIH22+TM8VL8dzK5EgnpvgL5JEavG3gjOb13fdaJenmDJpMu5GUCa9u8rTIzq
+	 xeZSeTNSzZ0LdFZveCpuaO/nQXKN/TKwcEVRD8upoH5VE0V/ScIylChZgSZIKbOeP7
+	 234s5P0on+iKQ==
 From: Conor Dooley <conor@kernel.org>
 To: netdev@vger.kernel.org
 Cc: conor@kernel.org,
@@ -71,9 +71,9 @@ Cc: conor@kernel.org,
 	Sean Anderson <sean.anderson@linux.dev>,
 	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
 	Abin Joseph <abin.joseph@amd.com>
-Subject: [RFC net-next v1 5/7] dt-bindings: net: macb: add property indicating timer adjust mode
-Date: Thu, 20 Nov 2025 16:26:07 +0000
-Message-ID: <20251120-drudge-disloyal-9b8a88079905@spud>
+Subject: [RFC net-next v1 6/7] net: macb: afaict, the driver doesn't support tsu timer adjust mode
+Date: Thu, 20 Nov 2025 16:26:08 +0000
+Message-ID: <20251120-grudging-gargle-690dad0a5c5f@spud>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251120-jubilant-purposely-67ec45ce4e2f@spud>
 References: <20251120-jubilant-purposely-67ec45ce4e2f@spud>
@@ -83,50 +83,39 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1146; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=NDamtq5JNE/kXNNE44aa9YujEMn703V/vjt2FaQ3+K8=; b=kA0DAAoWeLQxh6CCYtIByyZiAGkfQRuhTkDIGxVQJ8t/SMCYg4kOkb8JzlWdyFTz6FOW5pgU9 Yh1BAAWCgAdFiEEYduOhBqv/ES4Q4zteLQxh6CCYtIFAmkfQRsACgkQeLQxh6CCYtKeZAD/W+QW 1evt7Irt7dIdI65P4eITbL18e/FN8tPb5HbKQyQBANeQMpJgIgUt6nCK2WOnnI0Hu3iQkOkY8mH UTLhpneMM
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1079; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=QT0eIvEE2MWf5tzLxJfFcb6I4liyojXQm/8lvAoxpqw=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJnyjtKnJH/Lxxx509ptxp515eBnJpeuOYL35+0MqxUql ki+Fzito5SFQYyLQVZMkSXxdl+L1Po/Ljuce97CzGFlAhnCwMUpABNpqmX4X3H0yh7VtcUdBfyq VSytl5j+zt/+vuHQnrgJbv8E8wXX2jEytFx9vHXprXMbp3Nyhx7ercrvwSgSGSN/LqVpzmqBPZ0 nmAE=
 X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
 Content-Transfer-Encoding: 8bit
 
 From: Conor Dooley <conor.dooley@microchip.com>
 
+The ptp portion of this driver controls the tsu's timer, which is not
+compatible with the hardware trying to control it via the
+gem_tsu_inc_ctrl and gem_tsu_ms inputs afaict. Abort probe if someone
+tries to use it.
+
 Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- .../devicetree/bindings/net/cdns,macb.yaml        | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ drivers/net/ethernet/cadence/macb_main.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-index 1029786a855c..4cea288412b5 100644
---- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
-+++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-@@ -116,6 +116,12 @@ properties:
-   power-domains:
-     maxItems: 1
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 21045575f19c..4ad1409dab63 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -5531,6 +5531,12 @@ static int macb_probe(struct platform_device *pdev)
  
-+  cdns,timer-adjust:
-+    type: boolean
-+    description:
-+      Set when the hardware is operating in timer-adjust mode, where the timer
-+      is controlled by the gem_tsu_inc_ctrl and gem_tsu_ms inputs.
+ 	bp->usrio = macb_config->usrio;
+ 
++	if (of_property_read_bool(bp->pdev->dev.of_node, "cdns,timer-adjust") &&
++			IS_ENABLED(CONFIG_MACB_USE_HWSTAMP)) {
++		dev_err(&pdev->dev, "Timer adjust mode is not supported\n");
++		goto err_out_free_netdev;
++	}
 +
-   cdns,refclk-ext:
-     type: boolean
-     description:
-@@ -182,6 +188,15 @@ allOf:
-       properties:
-         reg:
-           maxItems: 1
-+  - if:
-+      not:
-+        properties:
-+          compatible:
-+            contains:
-+              const: microchip,mpfs-macb
-+    then:
-+      properties:
-+        cdns,timer-adjust: false
- 
- unevaluatedProperties: false
- 
+ 	/* By default we set to partial store and forward mode for zynqmp.
+ 	 * Disable if not set in devicetree.
+ 	 */
 -- 
 2.51.0
 
