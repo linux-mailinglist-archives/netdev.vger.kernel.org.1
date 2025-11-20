@@ -1,123 +1,97 @@
-Return-Path: <netdev+bounces-240494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F361C75905
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 18:11:39 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id F346BC75C02
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 18:40:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 709C828F7E
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:11:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 540754E7AB9
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F0732471D;
-	Thu, 20 Nov 2025 17:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqLfR4iU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABE11258EFC;
+	Thu, 20 Nov 2025 17:26:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15D02F1FF3;
-	Thu, 20 Nov 2025 17:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B99236C0D6;
+	Thu, 20 Nov 2025 17:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763658676; cv=none; b=jw1rjqC3XTNVwat/7jxXF/ls187TCJYgCtDGX6kOAT7o+5EJut8MYaGxngzw2DfBqQuTqt5nrS7dMm5XpFdzuzDyO650TT+/X8I8fLj9MBZ9ssLd//OY6Vpn930+F3HZXaFE3GqI+fdpUWGPKdtf6mlST2TJpubgFo/0QSf4i8s=
+	t=1763659608; cv=none; b=bjXIot494OYdCePDmyj+PqgShGa4s0WQ8YNV021cnegle/eLIm+vOcQH3tYYOic7x2cXtgTn/3yPTSPwuyXERDeRS5VJPf2CFJquFnVw3edtPit7EnJTHf48zRj0p1ob/cPKI9JRVAaqOzIz5N1MXDoP8+gmb6TXNsW3A7IBO4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763658676; c=relaxed/simple;
-	bh=TMLntoU8iUOS/qsRpXy6ReTJ0gjhyOEPYkzAMR3tBsI=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=HS8KKNst0vZ1JTzoXTYXGbjn8aB8dF6D+RXImhcUEvuxCevbg1zM4DbcsWA/wNRItsy8ILXy9gfqow10XJBQ4PrrwZN+G/Ecabp2AVB0Rt7vBFD4rxVExc9gUXrKL43aMBLVJhAkfRsLeatt9OFVlLSqr+/JwvXR/blILh8AXyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqLfR4iU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56A38C4CEF1;
-	Thu, 20 Nov 2025 17:11:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763658675;
-	bh=TMLntoU8iUOS/qsRpXy6ReTJ0gjhyOEPYkzAMR3tBsI=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=aqLfR4iUeq0dB4adf+THdyDTXEYLPmrUzBfkTi+siE4FErR83JFGTcLfKnZPwMODP
-	 zj2cUYj3WBLrInuLNgbziXnA7+G9xs8XtvV8dheiKGDn0HgJZReHIrRT/oWGXTphBw
-	 jav2dXGGvpcDBBZpIT1RCdSYwVNydmY44mIGqMAlNo1AsrYfgc5+mcS8i3aaEEr2ud
-	 4TUiRefxrRVy12nbdxe98sT9eFv8FdR5zFScbGQQFtJSC3KnpPv1GWm214oV8dZjgT
-	 NBl/XpNE1EKX2BLhLbdvZITRXTf7HBvkVza3ncDhy4jxeipTFt+dX7P+f3c6f1D9CH
-	 5vSYkUHWrDl8w==
-From: Vinod Koul <vkoul@kernel.org>
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Ryder Lee <ryder.lee@mediatek.com>, 
- Jianjun Wang <jianjun.wang@mediatek.com>, 
- Bjorn Helgaas <bhelgaas@google.com>, 
- Lorenzo Pieralisi <lpieralisi@kernel.org>, 
- =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
- Manivannan Sadhasivam <mani@kernel.org>, 
- Chunfeng Yun <chunfeng.yun@mediatek.com>, 
- Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones <lee@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
- Sjoerd Simons <sjoerd@collabora.com>
-Cc: kernel@collabora.com, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org, 
- linux-phy@lists.infradead.org, netdev@vger.kernel.org, 
- Daniel Golle <daniel@makrotopia.org>, Bryan Hinton <bryan@bryanhinton.com>, 
- Conor Dooley <conor.dooley@microchip.com>
-In-Reply-To: <20251115-openwrt-one-network-v4-0-48cbda2969ac@collabora.com>
-References: <20251115-openwrt-one-network-v4-0-48cbda2969ac@collabora.com>
-Subject: Re: (subset) [PATCH v4 00/11] arm64: dts: mediatek: Add Openwrt
- One AP functionality
-Message-Id: <176365866697.207696.9870186215211079064.b4-ty@kernel.org>
-Date: Thu, 20 Nov 2025 22:41:06 +0530
+	s=arc-20240116; t=1763659608; c=relaxed/simple;
+	bh=b00G+EOecpV8fBd+0/uaZ2E3Shcz9iiVeFOn6ObGL7Y=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ho7o8dKIa3OEvkdpy+vDUogsia/5LZmda+vJ97Y30nMDRFatVEBzung1luNhMbpuk6FCIwUEt62QnQfRGqFUAtzDYGRlu9u5OEqR29EgOJ6lX5kifwtoHFXQ1gyJI/fUxLvILVpqpgttQdgmEcZH+31ZZ3v5Cf1DVmJ0dGpgldI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dC4y747LvzHnGh8;
+	Fri, 21 Nov 2025 01:26:07 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id A8EAB1402EF;
+	Fri, 21 Nov 2025 01:26:42 +0800 (CST)
+Received: from huawei-ThinkCentre-M920t.huawei.com (10.123.122.223) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 20 Nov 2025 20:26:42 +0300
+From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+To: <netdev@vger.kernel.org>, Dmitry Skorodumov
+	<skorodumov.dmitry@huawei.com>, Jakub Kicinski <kuba@kernel.org>, Julian
+ Vetter <julian@outer-limits.org>, Ido Schimmel <idosch@nvidia.com>, Eric
+ Dumazet <edumazet@google.com>, Guillaume Nault <gnault@redhat.com>, Mahesh
+ Bandewar <maheshb@google.com>, "David S. Miller" <davem@davemloft.net>,
+	<linux-kernel@vger.kernel.org>
+CC: <andrey.bokhanko@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Paolo
+ Abeni <pabeni@redhat.com>
+Subject: [PATCH v2 net-next] ipvlan: Fix sparse warning about __be32 -> u32
+Date: Thu, 20 Nov 2025 20:26:32 +0300
+Message-ID: <20251120172636.3818116-1-skorodumov.dmitry@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: mscpeml100003.china.huawei.com (10.199.174.67) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
+Fixed a sparse warning:
 
-On Sat, 15 Nov 2025 21:58:03 +0100, Sjoerd Simons wrote:
-> Significant changes in V4:
->   * Drop patches that were picked up
->   * Improve mediatek,net dt bindings:
->     - Move back to V2 version (widening global constraint, constraining
->       per compatible)
->     - Ensure all compatibles are constraint in the amount of WEDs (2 for
->       everything apart from mt7981). Specifically adding constraints for
->       mediatek,mt7622-eth and ralink,rt5350-eth
-> Significant changes in V3:
->   * Drop patches that were picked up
->   * Re-order patches so changes that don't require dt binding changes
->     come first (Requested by Angelo)
->   * Specify drive power directly rather then using MTK_DRIVE_...
->   * Simply mediatek,net binding changes to avoid accidental changes to
->     other compatibles then mediatek,mt7981-eth
-> Significant changes in V2:
->   * https://lore.kernel.org/lkml/20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com/
->   * Only introduce labels in mt7981b.dtsi when required
->   * Switch Airoha EN8811H phy irq to level rather then edge triggered
->   * Move uart0 pinctrl from board dts to soc dtsi
->   * Only overwrite constraints with non-default values in MT7981 bindings
->   * Make SPI NOR nvmem cell labels more meaningfull
->   * Seperate fixing and disable-by-default for the mt7981 in seperate
->     patches
-> 
-> [...]
+ipvlan_core.c:56: warning: incorrect type in argument 1
+(different base types) expected unsigned int [usertype] a
+got restricted __be32 const [usertype] s_addr
 
-Applied, thanks!
+Force cast the s_addr to u32
 
-[03/11] dt-bindings: phy: mediatek,tphy: Add support for MT7981
-        commit: 80ac0fba0f1a72be2c7b532b8e2ad61300a165c3
+Fixes: 2ad7bf363841 ("ipvlan: Initial check-in of the IPVLAN driver.")
+Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+---
+ drivers/net/ipvlan/ipvlan_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Best regards,
+diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
+index d7e3ddbcab6f..dea411e132db 100644
+--- a/drivers/net/ipvlan/ipvlan_core.c
++++ b/drivers/net/ipvlan/ipvlan_core.c
+@@ -52,8 +52,8 @@ static u8 ipvlan_get_v4_hash(const void *iaddr)
+ {
+ 	const struct in_addr *ip4_addr = iaddr;
+ 
+-	return jhash_1word(ip4_addr->s_addr, ipvlan_jhash_secret) &
+-	       IPVLAN_HASH_MASK;
++	return jhash_1word((__force u32)ip4_addr->s_addr, ipvlan_jhash_secret) &
++			   IPVLAN_HASH_MASK;
+ }
+ 
+ static bool addr_equal(bool is_v6, struct ipvl_addr *addr, const void *iaddr)
 -- 
-~Vinod
-
+2.25.1
 
 
