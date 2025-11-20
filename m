@@ -1,156 +1,110 @@
-Return-Path: <netdev+bounces-240360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6595DC73BCC
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:31:38 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D9AC73C3E
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:37:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 392054EB41F
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:27:34 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DE95A357F86
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95E92FCC1D;
-	Thu, 20 Nov 2025 11:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A732DF701;
+	Thu, 20 Nov 2025 11:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QzMtpowC";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aUTtYlrS"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VxgBKxUq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6E9137923
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 11:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6A14A3C;
+	Thu, 20 Nov 2025 11:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763638016; cv=none; b=SMVEe6X2NS1Cq9EbC4lhaF56u5rDHgN0P50xXQ1glegKah1V9NrbsgUlS1a+j6wOefR01/M6EILIcoRQ+QtKCCG4z2TZXEkCjsFIzYhSRpX8aO3SGLoI8o4LtjZffCh3bw7ZXLDVluJzSWDZRCjZpI5IVQvRywVHCtjFzLQStKk=
+	t=1763638270; cv=none; b=VnbiU6c89zs3ZxsGJegoE9sU55txjrdwiPOVxfCWxqoVBzmi6HwdJ5n9YiaDFGi4TGHy8MHBVtO+n1zIApYrsm+zUDt5nAvU7fuvcWjUZpQGfQJ3ITgVtBi4OWb8kt6dJo3Zm8E8fyyIAe7bjl2J7wY9T6U58OthPIzEseewgco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763638016; c=relaxed/simple;
-	bh=YJqucc6y3evWF4wSv56D5Hg6FOQn5YFJUMPL4VlHK4c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kv2Z9pO+NuyB4uftI94cXpsu2W7vwPmKF14NR2aIaWuMvxgxvx42IzpVh2sVuobvD+JbnTl/LbI9KlPQutaH+2QThpsQ1aX0OCkuekJ0uYikQBfr7axjH6bzH/IM3m7Rw7JOfcjhBSjZyfttYtNbTgbr6b/W7v+WixiAkirTFZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QzMtpowC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aUTtYlrS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763638014;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sqS+S451NRmIYeRi6IUton5nKAKTYp9P1BRktE8Qx5E=;
-	b=QzMtpowC2WDUvJF0CYyHepezKPapYWfVcKk1JHa/Rg/a6AhpJ8Z/QXrFNHGOmw0gl+Cfak
-	939IWwzJMh27O5mUA7XrzN9/d5yMgrI9RdPb73TPY6EFCsyZrE1E+Alt5Fdwxls95xl4BK
-	ZQLYFv5Go/o8nJGgb7YDOijuJdO6xAE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-tiH1v2hWNrWv6Fh98r_9GA-1; Thu, 20 Nov 2025 06:26:52 -0500
-X-MC-Unique: tiH1v2hWNrWv6Fh98r_9GA-1
-X-Mimecast-MFC-AGG-ID: tiH1v2hWNrWv6Fh98r_9GA_1763638012
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4779393221aso4506395e9.2
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:26:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763638011; x=1764242811; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sqS+S451NRmIYeRi6IUton5nKAKTYp9P1BRktE8Qx5E=;
-        b=aUTtYlrSM+SSWKPDdL8phWLZ8WsAnPeIaSSnIOvATgS1R+Q2is1K+lIvdk+CaCk8Mn
-         xAwWsTXk9qZI1fP/qrXvmGybknlPpQZVNvCO6j7NRHJL4OFkm1/L0ct1f/9oBn81WpXC
-         2s7NZ1i2mjI4CU4UDJwQJWzjvwQ9PhyP4h4pNWAd7OowLtFnEw/qWJphl61jmxR6B1Vd
-         ubxPgcigmHuZjzLrPYifONHXDMzvoftwwML5tj1eCzgPE9ruwJFK3aN8sO/K4lgsa4dY
-         ZystGxk16GSOOhLIDAQtqthlODDNXavifUMBYiQduO5N0y+G4rkWOVvP7EHFzmlEa47T
-         0e8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763638011; x=1764242811;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sqS+S451NRmIYeRi6IUton5nKAKTYp9P1BRktE8Qx5E=;
-        b=wWue//Z3XTjN3owo9mxstLc4wqRSa3RhinLMqhj+dJsV2fVzH6jjjzWcjWXhEqvBDp
-         8WyX7B4QqWX4bUGsLqcNO5e1SwDfwNlzd/X/QFGIgTgcSCK/PAFjue0EvI4G3ydZUK2M
-         Y9FOg8/6gPX4grTYg4TnIcC6dvGoO3eAaWBgN8WfSsSNU5bndamITQVt2/fgXFKtTLwP
-         AMfwtDpYrKViw54WiEcVnmcGTUmCJUYHUA0mqM67jI8+6znDrezN9N2RmTSfoS9hchd+
-         Ea8ZeTqDUbqUSs95OUJK4qf2JmTla+gF6kfbFC1sjJ9gbeSNGnVQS6fe37kEUy03Gy1h
-         12lg==
-X-Forwarded-Encrypted: i=1; AJvYcCUnyuy/ix3IuF3VnxfgAojJ7UrD/JT/mCcXeJIVYMB0t1w6HniG+NbL9u0WV9VyqEVBYgGG0Ao=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdX/N8IvUnc7Sqtp6vGThZ5H6pMfA9fny3QXaw6iCFmiBtOgBf
-	ikbSQCQc+8FCFG3CAVMv2Vc7S33UdC+E/crUTrSCUbtPy/L8hAkkHGmn2NW1HusIywxayaf/TJ+
-	cEUr/ml85TEycwJ5TJ1fAuHqTryx7IoXsPII2SHTxKYYlwLWCWwrHc0xOWQ==
-X-Gm-Gg: ASbGnctPnldF63m3oVPKLsp+4kBYvhKeQnViFBw8Bl2KbXntB8kxSDK6m1X7NRh2I7c
-	owI1qLRnW5BqBIEpG6+MesBomh/lf4DBkXc4VXB15Wjs2G7EY6vuQt/2VpQ1vdh1+kdQ+aeA0Y5
-	++FBAYeigWT8msD0cOkwd7SZfA0DlLmndxN99oA3rKVAy9bde3hJybNRagyAOmWKFasf1twOg/J
-	iyh4rVuy5LdrHRrdi8qTMUGZtOb/yUvwc7Qzx2VLXWZQAazrnGI+v/Uael7XJSesLMd/0PmH2eO
-	MnZ9c1MEXW6GKXhcLq4U85mCeW7bk3C2Vood5WZKF43h2oI3xJMR02h7NTokhdv9iV04eHtta1V
-	vFqeGBIF5bamu
-X-Received: by 2002:a05:600c:4f51:b0:471:9da:524c with SMTP id 5b1f17b1804b1-477babcf75emr19620885e9.12.1763638011508;
-        Thu, 20 Nov 2025 03:26:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFeKEOaazfM9KhQXI1DdCaf+McPmoAWzMH7ECavD7fZB8Di1CGCkdsdqX4WGC/qULZnN/Krbw==
-X-Received: by 2002:a05:600c:4f51:b0:471:9da:524c with SMTP id 5b1f17b1804b1-477babcf75emr19620605e9.12.1763638011115;
-        Thu, 20 Nov 2025 03:26:51 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.41])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a9dea7fcsm62835665e9.8.2025.11.20.03.26.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 03:26:50 -0800 (PST)
-Message-ID: <038697aa-a11c-45ce-a270-258403cc1457@redhat.com>
-Date: Thu, 20 Nov 2025 12:26:49 +0100
+	s=arc-20240116; t=1763638270; c=relaxed/simple;
+	bh=QJGUiA83Zy67wUbf2pESMCDtasYTZsnvSogijE02TjY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iec8t78BZ25GfCrUZ7UlNtnpeRP/jPpir9ZEMQsvr8Jh7my9I2w1zc9IphlQ/H+UXyqNNx6ZwZKKjjI90yFosf/EsV1+5LBmzaR6efaQwcKwJvQw43MC5Mowq/VorTCEr9h/7oAc9531Vp69Qdnp3cJlJwm0VloX1rKkD1BDg6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VxgBKxUq; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=kiWH0/YZBx9aFxNDPIFdolJuvMUpl0yJwssz6YI10nY=; b=VxgBKxUq2Aq7FKSBV1RbjVUfju
+	+zReZgekJzT9LDjDfe4qebH7lqQNCk7+WUnAV/ZO+7Qxnh5EBuxb8ZX6Z1jVpkGi4x/bc++LYkMVQ
+	F35otdxM3SNxdjDcBH+5J6gAgmjqlNRsV4zD9R9QS9KsoWOA/VdMggGSKQfchF0R0y6QrN61nq2vQ
+	LHH3nuW1mbDsOF9PT2srPRfQhpFUiVCvuep1RQnrQ/3Tk8vWY74m9wdgIA7/xP8CoqguR/mhEffIS
+	Is28Cbajewd52w6d9Ky14ayNlSVvKFowAjsP2q07eCDZh11rPRLA8JCNmRefn87+4LlOWXhmTPzWP
+	qqOt9epQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54204)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vM2sQ-000000006A3-0xfZ;
+	Thu, 20 Nov 2025 11:31:02 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vM2sO-000000004LM-0FuK;
+	Thu, 20 Nov 2025 11:31:00 +0000
+Date: Thu, 20 Nov 2025 11:30:59 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next v2 1/3] net: stmmac: qcom-ethqos: use u32 for
+ rgmii read/write/update
+Message-ID: <aR778ygQp-SZO19n@shell.armlinux.org.uk>
+References: <aR76i0HjXitfl7xk@shell.armlinux.org.uk>
+ <E1vM2mq-0000000FRTi-3y5F@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH REPOST net v2] atm/fore200e: Fix possible data race in
- fore200e_open()
-To: Gui-Dong Han <hanguidong02@gmail.com>, 3chas3@gmail.com,
- horms@kernel.org, kuba@kernel.org
-Cc: linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, baijiaju1990@gmail.com, stable@vger.kernel.org
-References: <20251118033330.1844136-1-hanguidong02@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251118033330.1844136-1-hanguidong02@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1vM2mq-0000000FRTi-3y5F@rmk-PC.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 11/18/25 4:33 AM, Gui-Dong Han wrote:
-> Protect access to fore200e->available_cell_rate with rate_mtx lock to
-> prevent potential data race.
+On Thu, Nov 20, 2025 at 11:25:16AM +0000, Russell King (Oracle) wrote:
+> readl() returns a u32, and writel() takes a "u32" for the value. These
+> are used in rgmii_readl()() and rgmii_writel(), but the value and
+> return are "int". As these are 32-bit register values which are not
+> signed, use "u32".
 > 
-> In this case, since the update depends on a prior read, a data race
-> could lead to a wrong fore200e.available_cell_rate value.
+> These changes do not cause generated code changes.
 > 
-> The field fore200e.available_cell_rate is generally protected by the lock
-> fore200e.rate_mtx when accessed. In all other read and write cases, this
-> field is consistently protected by the lock, except for this case and
-> during initialization.
+> Update rgmii_updatel() to use u32 for mask and val. Changing "mask"
+> to "u32" also does not cause generated code changes. However, changing
+> "val" causes the generated assembly to be re-ordered for aarch64.
 > 
-> This potential bug was detected by our experimental static analysis tool,
-> which analyzes locking APIs and paired functions to identify data races
-> and atomicity violations.
+> Update the temporary variables used with the rgmii functions to use
+> u32.
 > 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Gui-Dong Han <hanguidong02@gmail.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> ---
-> v2:
-> * Added a description of the data race hazard in fore200e_open(), as
-> suggested by Jakub Kicinski and Simon Horman.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-It looks like you missed Jakub's reply on v2:
+Konrad provided his reviewed-by in
+https://lore.kernel.org/r/76d153cf-8048-4c6f-8765-51741de78298@oss.qualcomm.com
+but for some reason I forgot to add it, so:
 
-https://lore.kernel.org/netdev/20250123071201.3d38d8f6@kernel.org/
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-The above comment is still not sufficient: you should describe
-accurately how 2 (or more) CPUs could actually race causing the
-corruption, reporting the relevant call paths leading to the race.
-
-Thanks,
-
-Paolo
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
