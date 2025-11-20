@@ -1,143 +1,132 @@
-Return-Path: <netdev+bounces-240430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C9D5C75006
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:35:58 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 853D5C74FBB
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:32:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D5E504ED8E7
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:25:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9F91235ED0B
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ACE6362144;
-	Thu, 20 Nov 2025 15:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6BB366DC5;
+	Thu, 20 Nov 2025 15:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mlJcpGKB"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="l9S42diO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6929C3612ED;
-	Thu, 20 Nov 2025 15:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D9E361DB6;
+	Thu, 20 Nov 2025 15:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763651837; cv=none; b=hbrWk91Puxj59laMcwAW5GEaRaE8u1tO/CBIr4gfPZqZPolT3Y61J2KBEJAHRHXihf2vHaLW+gQURJzULUyT3wxYTutntAEVIHQl47QTXgTgM2R3g0cY5/1F9hz9/5geFsQpiNaIktWXx27qkqiztAPIluWoVIufhwkRzA5+PYU=
+	t=1763651914; cv=none; b=QwIQ78HIBSzPtbGqovOC1JrfNvZoYWUuRhYVEYj0aL1BaZnKLKUin5IKsoNxW+4wEtQ7XYux2RrD0vwMeQlw/M98C5ntmtd+3uDoZvtSKOYB4yMpFtjTp36U/e7Tn/0e5SriHcMLB6GVUcOgQ32y+/nYMValV5xIbGmSVXuRqLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763651837; c=relaxed/simple;
-	bh=0XkeEI6EtugL+gxBeZZYjRHFjTbVod/dVJdkyoFZesQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=juMMuDdAJ6ryrDQl3782Lb8yav8YGTxVnqpJfeCmR2exvWpj+Ij5naiG0NhFJeVMipiohtOwUx06+AhsElwmjQ2r6a9vM/17pAnVNp1Aro+GO+grpRDePii/p2inBUxnqnffrIeCnj789ZDjKubmyisC5a3b8ZckNxTaC8+Wlcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mlJcpGKB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C63BC4CEF1;
-	Thu, 20 Nov 2025 15:17:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763651836;
-	bh=0XkeEI6EtugL+gxBeZZYjRHFjTbVod/dVJdkyoFZesQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mlJcpGKBUdMDhbcuoqlJJC6B5wxHmWnnowVJH2Rv+4L5WnJfAJiX7cui/1Ntah8Ce
-	 0Rbg5Zt6fz1w3nlvF6y19tBFIRmMhgiJzfAgm76baqoG3itGImarKzpT8S8Zqt6+7o
-	 M0tVvLEhCkK8QxuL1ny4BJu1a1t80y0YMMR4CueBZc4T6i2PiRkN+ElEutfkqVw2QE
-	 NZhgeEGPvkvGvI3DlEuK1MeqfLUNktCxCTsq0y1Kvxbcw4NIBv4FYFiuwWrChHHYfs
-	 LigZ0A1MDqMUwzBSc6VoTCw3PnqZqQMeSrpLhl5Ohxc4f++LltQS9r2EBd7K9JpWmn
-	 OBJ1UDnkU4fMQ==
-Date: Thu, 20 Nov 2025 07:17:15 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: I Viswanath <viswanathiyyappan@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me, kuniyu@google.com,
- skhawaja@google.com, aleksander.lobakin@intel.com, mst@redhat.com,
- jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kernel-mentees@lists.linux.dev
-Subject: Re: [PATCH net-next v5 0/2] net: Split ndo_set_rx_mode into
- snapshot
-Message-ID: <20251120071715.28a47b21@kernel.org>
-In-Reply-To: <20251120141354.355059-1-viswanathiyyappan@gmail.com>
-References: <20251120141354.355059-1-viswanathiyyappan@gmail.com>
+	s=arc-20240116; t=1763651914; c=relaxed/simple;
+	bh=KiKmLPo0LId2AqBx7SKloWwEHaffPU4qyU54oEDKIa8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nm7cGJb/4TaEJT8QBRfgLe46/MmJihkeiE/Set+5wEzMcU5k8qnBL3P23rS6oxN/XI+zZ8YxuWorge0HmC3ROLTGjYjOqkrvYGJmd8nNRaA2hUmKOT1riSy4GZgkfI6Wgnqq1byrE9Rb171u4I0UID1/+6d2Z6hfg6kJf4ien5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=l9S42diO; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 5E0DF1A1C4A;
+	Thu, 20 Nov 2025 15:18:24 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2C8EC6068C;
+	Thu, 20 Nov 2025 15:18:24 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1371810371C4F;
+	Thu, 20 Nov 2025 16:18:14 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1763651902; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=W+w9uzAPuUadr/2vcu3RjzEbTIq1CSq9medNjoIyd0c=;
+	b=l9S42diO51gPGUNuhEnHQSnWSxeL7UtQyzWf+pSUkD1kHEiJLJ2pxLkp7FW9teyxIjXeM7
+	GjWKcU9mPtqPUARnLTB3ODK0eZk1VkcUWYggdmpPLYWEwWavemElCdfRIimMfNBGkrc44R
+	GfJd21OqCv3vIdx3ElchM3qWyG5kH3MY8B17grroqx8eE6LefdKu7NWY2NY9qgsXmOufzK
+	SPI/OvH7FwMVdEIafwEKK2MLS+gq44ozi4hBBVG84S8XT/UIoO2PlY0dPj4Mx0IwzrYzDc
+	aCTBmsdZC7uM6gAaoQzZlnJlVWbMcQ7lEVSNmdFhnJRosCsGAmk0OA+xXUyoPw==
+Message-ID: <2fbd40ed-40e6-4ba2-b914-1f6d2d26dc85@bootlin.com>
+Date: Thu, 20 Nov 2025 16:18:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v17 03/15] net: phy: Introduce PHY ports
+ representation
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+References: <20251119195920.442860-1-maxime.chevallier@bootlin.com>
+ <20251119195920.442860-4-maxime.chevallier@bootlin.com>
+ <20251119195400.1bf0cc68@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251119195400.1bf0cc68@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, 20 Nov 2025 19:43:52 +0530 I Viswanath wrote:
-> Teardown path:
+
+
+On 20/11/2025 04:54, Jakub Kicinski wrote:
+> On Wed, 19 Nov 2025 20:59:04 +0100 Maxime Chevallier wrote:
+>> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+>> index 2f4b70f104e8..8216e4ada58e 100644
+>> --- a/net/ethtool/common.c
+>> +++ b/net/ethtool/common.c
+>> @@ -460,6 +460,21 @@ const struct link_mode_info link_mode_params[] = {
+>>  static_assert(ARRAY_SIZE(link_mode_params) == __ETHTOOL_LINK_MODE_MASK_NBITS);
+>>  EXPORT_SYMBOL_GPL(link_mode_params);
+>>  
+>> +const char ethtool_link_medium_names[][ETH_GSTRING_LEN] = {
+>> +	[ETHTOOL_LINK_MEDIUM_BASET] = "BaseT",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEK] = "BaseK",
+>> +	[ETHTOOL_LINK_MEDIUM_BASES] = "BaseS",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEC] = "BaseC",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEL] = "BaseL",
+>> +	[ETHTOOL_LINK_MEDIUM_BASED] = "BaseD",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEE] = "BaseE",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEF] = "BaseF",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEV] = "BaseV",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEMLD] = "BaseMLD",
+>> +	[ETHTOOL_LINK_MEDIUM_NONE] = "None",
+>> +};
+>> +static_assert(ARRAY_SIZE(ethtool_link_medium_names) == __ETHTOOL_LINK_MEDIUM_LAST);
 > 
-> Relevant as they flush the work item. ens4 is the virtio-net interface.
+> Thanks for reshuffling things, this one needs a static tho:
 > 
-> virtnet_remove:
-> ip maddr add 01:00:5e:00:03:02 dev ens4; echo 1 > /sys/bus/pci/devices/0000:00:04.0/remove
-> 
-> virtnet_freeze_down:
-> ip maddr add 01:00:5e:00:03:02 dev ens4; echo mem > /sys/power/state
+> net/ethtool/common.c:463:12: warning: symbol 'ethtool_link_medium_names' was not declared. Should it be static?
 
-Running 
+Ok I figured that I didn't have sparse installed locally, so the
+local NIPA build "build_allmodconfig_warn" didn't go through.
 
-make -C tools/testing/selftests TARGETS="drivers/net/virtio_net" run_tests
+That's fixed now, hopefully even less bugs next time !
 
-[    1.967073] BUG: kernel NULL pointer dereference, address: 0000000000000018
-[    1.967179] #PF: supervisor read access in kernel mode
-[    1.967237] #PF: error_code(0x0000) - not-present page
-[    1.967296] PGD 0 P4D 0 
-[    1.967327] Oops: Oops: 0000 [#1] SMP
-[    1.967372] CPU: 2 UID: 0 PID: 220 Comm: basic_features. Not tainted 6.18.0-rc5-virtme #1 PREEMPT(voluntary) 
-[    1.967500] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-[    1.967576] RIP: 0010:__flush_work+0x33/0x3a0
-[    1.967651] Code: 41 55 41 54 55 53 48 83 ec 60 44 0f b6 25 0d ab 91 01 65 48 8b 05 2d ff 8d 01 48 89 44 24 58 31 c0 45 84 e4 0f 84 35 03 00 00 <48> 83 7f 18 00 48 89 fd 0f 84 30 03 00 00 41 89 f5 e8 07 24 07 00
-[    1.967861] RSP: 0018:ffffab9bc0597cf0 EFLAGS: 00010202
-[    1.967920] RAX: 0000000000000000 RBX: ffff9d08c2c549c0 RCX: ffffab9bc0597d28
-[    1.968010] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-[    1.968100] RBP: ffff9d08c1cd5000 R08: ffff9d08c1db7b70 R09: 0000000000000000
-[    1.968189] R10: ffff9d08c1db7f80 R11: ffff9d08c152e480 R12: 0000000000000001
-[    1.968281] R13: ffffffffbd9ffe00 R14: ffff9d08c193e140 R15: 0000000000000008
-[    1.968371] FS:  00007fb66173b000(0000) GS:ffff9d0940ce9000(0000) knlGS:0000000000000000
-[    1.968472] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.968546] CR2: 0000000000000018 CR3: 00000000045e5006 CR4: 0000000000772ef0
-[    1.968640] PKRU: 55555554
-[    1.968669] Call Trace:
-[    1.968700]  <TASK>
-[    1.968729]  ? kernfs_should_drain_open_files+0x2e/0x40
-[    1.968796]  ? __rtnl_unlock+0x37/0x60
-[    1.968849]  ? netdev_run_todo+0x63/0x550
-[    1.968894]  ? kernfs_name_hash+0x12/0x80
-[    1.968938]  virtnet_remove+0x65/0xb0
-[    1.968984]  virtio_dev_remove+0x3c/0x80
-[    1.969029]  device_release_driver_internal+0x193/0x200
-[    1.969090]  unbind_store+0x9d/0xb0
-[    1.969136]  kernfs_fop_write_iter+0x12b/0x1c0
-[    1.969197]  vfs_write+0x33a/0x470
-[    1.969242]  ksys_write+0x65/0xe0
-[    1.969287]  do_syscall_64+0xa4/0xfd0
-[    1.969333]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[    1.969393] RIP: 0033:0x7fb66183b257
-[    1.969434] Code: 0f 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
-[    1.969640] RSP: 002b:00007fffca552fe8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-[    1.969729] RAX: ffffffffffffffda RBX: 00007fb661937780 RCX: 00007fb66183b257
-[    1.969820] RDX: 0000000000000008 RSI: 0000558903e5a280 RDI: 0000000000000001
-[    1.969911] RBP: 0000000000000008 R08: 0000000000000003 R09: 0000000000000077
-[    1.970004] R10: 0000000000000063 R11: 0000000000000246 R12: 0000000000000008
-[    1.970096] R13: 0000558903e5a280 R14: 0000000000000008 R15: 00007fb6619329c0
-[    1.970189]  </TASK>
-[    1.970218] Modules linked in:
-[    1.970266] CR2: 0000000000000018
-[    1.970311] ---[ end trace 0000000000000000 ]---
-[    1.970372] RIP: 0010:__flush_work+0x33/0x3a0
-[    1.970441] Code: 41 55 41 54 55 53 48 83 ec 60 44 0f b6 25 0d ab 91 01 65 48 8b 05 2d ff 8d 01 48 89 44 24 58 31 c0 45 84 e4 0f 84 35 03 00 00 <48> 83 7f 18 00 48 89 fd 0f 84 30 03 00 00 41 89 f5 e8 07 24 07 00
-[    1.970656] RSP: 0018:ffffab9bc0597cf0 EFLAGS: 00010202
-[    1.970717] RAX: 0000000000000000 RBX: ffff9d08c2c549c0 RCX: ffffab9bc0597d28
-[    1.970806] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-[    1.970897] RBP: ffff9d08c1cd5000 R08: ffff9d08c1db7b70 R09: 0000000000000000
-[    1.970988] R10: ffff9d08c1db7f80 R11: ffff9d08c152e480 R12: 0000000000000001
-[    1.971081] R13: ffffffffbd9ffe00 R14: ffff9d08c193e140 R15: 0000000000000008
-[    1.971174] FS:  00007fb66173b000(0000) GS:ffff9d0940ce9000(0000) knlGS:0000000000000000
-[    1.971264] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.971337] CR2: 0000000000000018 CR3: 00000000045e5006 CR4: 0000000000772ef0
-[    1.971431] PKRU: 55555554
-[    1.971460] note: basic_features.[220] exited with irqs disabled
--- 
-pw-bot: cr
+Maxime
+
 
