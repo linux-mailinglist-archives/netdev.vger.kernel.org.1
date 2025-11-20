@@ -1,68 +1,169 @@
-Return-Path: <netdev+bounces-240498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 768CCC75C98
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 18:48:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A49C75C95
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 18:48:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 273B6347E61
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:42:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 0ADCE2C1CF
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684F32E0939;
-	Thu, 20 Nov 2025 17:42:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED37D2FD670;
+	Thu, 20 Nov 2025 17:48:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gU04EDir"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="BbIS2P69"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423E7248896;
-	Thu, 20 Nov 2025 17:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC95F2F8BF0;
+	Thu, 20 Nov 2025 17:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763660556; cv=none; b=U8KyAARfM+MfjI0gqOOIeg6RcV6RkBHl1mzJQ4frGpKCETkCGwwAyjmMHrk82hEct4mOLr1BQMCnUFYHPcUKsTcw9MZF0R2DLRgplPugKVitUHtYPU+MGQ28ADKIn2tMQMa64e3VX1pzqp9FyQAmjGF6zGMOhdU4KUGAS9DufCo=
+	t=1763660880; cv=none; b=BjJ0sYdWyibbLEkX/3MCfOXsvvIKIuimAg2hG8f7fG2ON88h1yAjx6Mea4NMdUHmIxq6UxjAqBgv4ADR50sEpFRVlD1cSLTS5dm+HJ9GLn+HXjhLTnAQX4M/aWD7sUoWBrpMqeTNhp8n6//rCZWnvsv2DwBkI96fYd4IKJXGk6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763660556; c=relaxed/simple;
-	bh=HoNpCchVl9FxkOpbMf4OI4oPnzMOw4ZHwppz7KRzYvo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GyxdOFlah+qDdiZ5uTz2HdQBi24Ur8yLVvT4koMhhOoR1vHz268svPwJ6ydbruC3oxmM1PJd1Lt590h75lf0WJIWlLuG/mGxKLd0usuVzEYqPWZtEE/oKaVt5Pi/yO7uCiYzad3IRQunerwHqWD0ou8e9VBIVXMuJbFD5h4Is2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gU04EDir; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3AFAC4CEF1;
-	Thu, 20 Nov 2025 17:42:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763660555;
-	bh=HoNpCchVl9FxkOpbMf4OI4oPnzMOw4ZHwppz7KRzYvo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gU04EDir8AH2awWzciaF0PDluhnQ/vedijpl9lIAM7C28YGyxdpA40LV+orJspaPi
-	 i5e103pKc6+VLhXQZ2fcj8+TfhgjL0Pj4SlcBtrdGPehPXi0Dg7nE009/GOIJWEwMn
-	 Q/HH3dR+/V+eoPMYafNDEXM8XM+7ar80aDsFLZmkDvOlvaV30wajij1G6RMxzCEDfC
-	 VokQOpBBQSrVuSD9N5BkF14qDB9eDmm11r7Eoqh8rdTqQah1+WGcOjk16rspctMqa3
-	 tyudgoq8NFKiDiu1TMz8kF214NgovA7fYFE+5/9ewBD94WdnjDe/J/oR7kYuyqywv5
-	 409uR/mzNwuVg==
-Date: Thu, 20 Nov 2025 09:42:34 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [GIT PULL] wireless-2025-11-20
-Message-ID: <20251120094234.26285f93@kernel.org>
-In-Reply-To: <20251120085433.8601-3-johannes@sipsolutions.net>
-References: <20251120085433.8601-3-johannes@sipsolutions.net>
+	s=arc-20240116; t=1763660880; c=relaxed/simple;
+	bh=Q5CBm+m4hE1qg8WOGkB/pV5OGeigy1uz+XMPBiUMLs4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ISvSmLlAXUZ/YzDBQd7z+bWydDPlQ1pNKTh2t0nV446aGp3GKKVH0a3q6qn+V7j30cljJvwJZiiT/+isRlzgwqh9nY8EJKhmNxxHejdjeR5h5HI0f52iT5c3kCzOQo7k/pj82t2Amsd0pCy1X4b1dnKSEgnY+bXfNZ2SMvNUu/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=BbIS2P69; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1763660872;
+	bh=Q5CBm+m4hE1qg8WOGkB/pV5OGeigy1uz+XMPBiUMLs4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BbIS2P699erwigCOeT99ysNM4IJhezBiGzW7LYadfR/wj6LRswafPUHr4MNHxLd2O
+	 24AnF584X/l0KaODT0TqjF6W0+lfQHpVb3q/cKIW74ccM5hIGlMpv4DZo9lBTL9QR6
+	 txRg3Qln2pTsxvPPKC/voIvHPHkvutlCHrKrMRUtoB0Fz6JXa9/A2GLWbcP1FHv0Jf
+	 nmLAD9AKA7NwQBmObe3ZReidxPgsiGCUGuDXMMF5SYWsUdzrBM3ImK0sxIwWCJMeoa
+	 ENTtefW6/tUcozdPXzmKbnePt6KpJl8vWCvJWFURJBPZO8CMs+4lnsx722Gpkp9Vrf
+	 DpZD/rpXOeWag==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 9842760104;
+	Thu, 20 Nov 2025 17:46:25 +0000 (UTC)
+Received: by x201s (Postfix, from userid 1000)
+	id 1B1442002DF; Thu, 20 Nov 2025 17:45:07 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Anna Schumaker <anna@kernel.org>,
+	Antonio Quartulli <antonio@openvpn.net>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	=?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
+	Carlos Llamas <cmllamas@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Daniel Zahka <daniel.zahka@gmail.com>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Wei <dw@davidwei.uk>,
+	Eric Dumazet <edumazet@google.com>,
+	Geliang Tang <geliang@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Hannes Reinecke <hare@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Joe Damato <jdamato@fastly.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Li Li <dualli@google.com>,
+	linux-kernel@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	Martijn Coenen <maco@android.com>,
+	Mat Martineau <martineau@kernel.org>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	mptcp@lists.linux.dev,
+	NeilBrown <neil@brown.name>,
+	netdev@vger.kernel.org,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Todd Kjos <tkjos@android.com>,
+	Tom Talpey <tom@talpey.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next 0/2] tools: ynl-gen: regeneration comment + function prefix
+Date: Thu, 20 Nov 2025 17:44:25 +0000
+Message-ID: <20251120174429.390574-1-ast@fiberby.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, 20 Nov 2025 09:53:10 +0100 Johannes Berg wrote:
-> Hi,
-> 
-> Looks like things are quieting down, I fear maybe _too_ quiet
-> since we only have a single fix for rtw89 scanning.
+It looks like these two patches are the last ones needed
+for YNL, before the WireGuard patches can go in.
 
-Pulled, thanks!
+These patches was both requested by Jason, during review
+of the WireGuard YNL conversion patchset[1].
+
+[1] https://lore.kernel.org/r/20251105183223.89913-1-ast@fiberby.net/T/#u
+
+Asbjørn Sloth Tønnesen (2):
+  tools: ynl-gen: add function prefix argument
+  tools: ynl-gen: add regeneration comment
+
+ drivers/android/binder_netlink.c              |  1 +
+ drivers/android/binder_netlink.h              |  1 +
+ drivers/dpll/dpll_nl.c                        |  1 +
+ drivers/dpll/dpll_nl.h                        |  1 +
+ drivers/net/ovpn/netlink-gen.c                |  1 +
+ drivers/net/ovpn/netlink-gen.h                |  1 +
+ drivers/net/team/team_nl.c                    |  1 +
+ drivers/net/team/team_nl.h                    |  1 +
+ fs/lockd/netlink.c                            |  1 +
+ fs/lockd/netlink.h                            |  1 +
+ fs/nfsd/netlink.c                             |  1 +
+ fs/nfsd/netlink.h                             |  1 +
+ include/uapi/linux/android/binder_netlink.h   |  1 +
+ include/uapi/linux/dpll.h                     |  1 +
+ .../uapi/linux/ethtool_netlink_generated.h    |  1 +
+ include/uapi/linux/fou.h                      |  1 +
+ include/uapi/linux/handshake.h                |  1 +
+ include/uapi/linux/if_team.h                  |  1 +
+ include/uapi/linux/lockd_netlink.h            |  1 +
+ include/uapi/linux/mptcp_pm.h                 |  1 +
+ include/uapi/linux/net_shaper.h               |  1 +
+ include/uapi/linux/netdev.h                   |  1 +
+ include/uapi/linux/nfsd_netlink.h             |  1 +
+ include/uapi/linux/ovpn.h                     |  1 +
+ include/uapi/linux/psp.h                      |  1 +
+ net/core/netdev-genl-gen.c                    |  1 +
+ net/core/netdev-genl-gen.h                    |  1 +
+ net/devlink/netlink_gen.c                     |  1 +
+ net/devlink/netlink_gen.h                     |  1 +
+ net/handshake/genl.c                          |  1 +
+ net/handshake/genl.h                          |  1 +
+ net/ipv4/fou_nl.c                             |  1 +
+ net/ipv4/fou_nl.h                             |  1 +
+ net/mptcp/mptcp_pm_gen.c                      |  1 +
+ net/mptcp/mptcp_pm_gen.h                      |  1 +
+ net/psp/psp-nl-gen.c                          |  1 +
+ net/psp/psp-nl-gen.h                          |  1 +
+ net/shaper/shaper_nl_gen.c                    |  1 +
+ net/shaper/shaper_nl_gen.h                    |  1 +
+ tools/include/uapi/linux/netdev.h             |  1 +
+ tools/net/ynl/pyynl/ynl_gen_c.py              | 26 ++++++++++++-------
+ 41 files changed, 57 insertions(+), 9 deletions(-)
+
+-- 
+2.51.0
+
 
