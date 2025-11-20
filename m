@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-240472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74591C75582
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:27:55 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E883C75635
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:35:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 0C7582A06F
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:27:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0A1F33596F1
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:28:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1F536A03E;
-	Thu, 20 Nov 2025 16:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC6E36C0A4;
+	Thu, 20 Nov 2025 16:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wis8FnzW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OuBwFOIQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E732366573;
-	Thu, 20 Nov 2025 16:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FBB366DC7;
+	Thu, 20 Nov 2025 16:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763656007; cv=none; b=CQPMNhd+ow5sC6XKm31PZ+0Gjw2lhEZS0krgPnunDGfRGakilzZiVB9CE5hI2yMd0W9tV+aSDS1Hn+Sq8IUIJ1y7u8iKtkvhnfMmP+U4gJ4aKMOYMrwCEQkDbYG6FDhoFp3SDgxvlf/TTY5571HNH5iCIcD6+sAD5SJecTsxDUM=
+	t=1763656012; cv=none; b=EJY5YRfIuoCsu0zg2nMH82HUU/JsEGFcSk/G9Idds7cb4IpS49zWYHVWyAqy7LT6Trput6kUcN2KjQxewePlr8Oa5DXVWhB+VHFOjRY8aYYy9snAwTHwRsymi5yRznlaBGdXbM0WQ/1fsd+LfmI5ouYL8BayCWvMfqvPozhP8S0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763656007; c=relaxed/simple;
-	bh=0AGNlvqqr0qu4bwYr8AQBoa4jNlfvu8ZN5pTq4ez5ZE=;
+	s=arc-20240116; t=1763656012; c=relaxed/simple;
+	bh=rkNBjbwLoFq9BqcRqqIp3a/rpQWG6VvjMT67WwIxYzY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CncLPEFHT11877HiXv0mowLE9GgQLu9m1yVuLaf/CR7P1sT57dZ4Zp1h7fIAS6ndJHKAMVAwld8cKKbkucDHDK1UxeB7heeQm/4cptYB11h6M6EsovxvBE2iowTmmK+8p687jtbHnr8INHI/eyZWzxAvU0asf+LDwrwz9GPHeN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wis8FnzW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B897AC116C6;
-	Thu, 20 Nov 2025 16:26:41 +0000 (UTC)
+	 MIME-Version; b=qtZP4voUcdRMu/W2qbSS8qW4451Vp+BgTEx/97FE8xbAm4Wej2bqs/ZS2mlrb28lOAqm95xsH1/qTASYnEstb3m7Ta34ggeN91MY26/uDSDB6XBAxPSQ1L+XnSiJ8PE0Efn6UyFFapTDkH0+XOYP8H9I5mmyb/bMLfsnAxGCz6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OuBwFOIQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62E8AC4CEF1;
+	Thu, 20 Nov 2025 16:26:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763656007;
-	bh=0AGNlvqqr0qu4bwYr8AQBoa4jNlfvu8ZN5pTq4ez5ZE=;
+	s=k20201202; t=1763656012;
+	bh=rkNBjbwLoFq9BqcRqqIp3a/rpQWG6VvjMT67WwIxYzY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Wis8FnzWPhKLKU+uK1W0nWROE0rAfq+mPjJk2YhoLyjqhObcBYjrDRf33s6Bq7Fnx
-	 Sy1KyRr3Q93U59KEH4r9K2fpnCh4EpuhDgBGJhtXmw67UciyXZa3aM9zpZJCE37L4k
-	 +BMQTePTqHmRqdy92goxx5+Hh4BmmR2FG/zB/ixK9vL0yYf2Vy8vexwYbI8DMhrAzF
-	 tDhEHIuS19Y57Z1j6HEmllx9zoK2QSfgSXv4IjAbkUWMI4m8U7DMUcjHaO3TS0Agsk
-	 xgfD2Bel5PM6UCXlTRl3kdn+ZwcxWsbnE3DC9vGCfdn2mhZ+3FTs8rwcBda7tv2wWb
-	 Iexs3zgkdcTJg==
+	b=OuBwFOIQtvJZo4UvFhnNNYeKkLD2w5SzhLhRQTWxfYBdQ965AZrT+gm8T05WDE6/c
+	 roNe31hpHWTh7xmbB+ZM4LrItzMwgO6mshm5Eq67KB31QjgKSGkW627WPO2DdGpYym
+	 NvRXeKY9WyO8f6wTfOdew+02CiXs3iHjshf8h8V/SWdJW4JJX1tU7v293SR7p6h4kE
+	 POfCwD7TGZkWoD1z8xHKlW59FVmuGGzIrO1ZpOXNGhGU1CGraNkrci4gqW7vdkzrIl
+	 M/3lWIYLbAM+OTEYK+R1mTfT6f88RBRXKT+n+/7tsSWfQMn37wHz34XSPGIS3IkwZJ
+	 C9VsCmHpMx3wg==
 From: Conor Dooley <conor@kernel.org>
 To: netdev@vger.kernel.org
 Cc: conor@kernel.org,
@@ -71,9 +71,9 @@ Cc: conor@kernel.org,
 	Sean Anderson <sean.anderson@linux.dev>,
 	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
 	Abin Joseph <abin.joseph@amd.com>
-Subject: [RFC net-next v1 4/7] net: macb: np4 doesn't need a usrio pointer
-Date: Thu, 20 Nov 2025 16:26:06 +0000
-Message-ID: <20251120-native-steadier-481bc9453d04@spud>
+Subject: [RFC net-next v1 5/7] dt-bindings: net: macb: add property indicating timer adjust mode
+Date: Thu, 20 Nov 2025 16:26:07 +0000
+Message-ID: <20251120-drudge-disloyal-9b8a88079905@spud>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251120-jubilant-purposely-67ec45ce4e2f@spud>
 References: <20251120-jubilant-purposely-67ec45ce4e2f@spud>
@@ -83,33 +83,50 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=818; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=tC+n+f2MenYJnWXWr5SyA85ikQiWhM9zmnDvVhPzymI=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJnyjlIXF6/531VxvHi70bQzkc9PevhM38O2ZXMzK0voS pb0yjWvO0pZGMS4GGTFFFkSb/e1SK3/47LDuectzBxWJpAhDFycAjARiZeMDKdUWNfKiSdvijvi +jVo7kReqbBelX1rH/0X/yA2v/WMOwfDX/HTjBxqL+Z3i2qY3Dl/beKV3TrP2W15fr+65/AqdsG DM0wA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1146; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=NDamtq5JNE/kXNNE44aa9YujEMn703V/vjt2FaQ3+K8=; b=kA0DAAoWeLQxh6CCYtIByyZiAGkfQRuhTkDIGxVQJ8t/SMCYg4kOkb8JzlWdyFTz6FOW5pgU9 Yh1BAAWCgAdFiEEYduOhBqv/ES4Q4zteLQxh6CCYtIFAmkfQRsACgkQeLQxh6CCYtKeZAD/W+QW 1evt7Irt7dIdI65P4eITbL18e/FN8tPb5HbKQyQBANeQMpJgIgUt6nCK2WOnnI0Hu3iQkOkY8mH UTLhpneMM
 X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
 Content-Transfer-Encoding: 8bit
 
 From: Conor Dooley <conor.dooley@microchip.com>
 
-USRIO is disabled on this platform, having a pointer to a usrio config
-structure doesn't actually do anything other than look weird.
-
 Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../devicetree/bindings/net/cdns,macb.yaml        | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 888a72c40f26..21045575f19c 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5314,7 +5314,7 @@ static const struct macb_config np4_config = {
- 	.caps = MACB_CAPS_USRIO_DISABLED,
- 	.clk_init = macb_clk_init,
- 	.init = macb_init,
--	.usrio = &at91_default_usrio,
-+	.usrio = NULL,
- };
+diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+index 1029786a855c..4cea288412b5 100644
+--- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
++++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+@@ -116,6 +116,12 @@ properties:
+   power-domains:
+     maxItems: 1
  
- static const struct macb_config zynqmp_config = {
++  cdns,timer-adjust:
++    type: boolean
++    description:
++      Set when the hardware is operating in timer-adjust mode, where the timer
++      is controlled by the gem_tsu_inc_ctrl and gem_tsu_ms inputs.
++
+   cdns,refclk-ext:
+     type: boolean
+     description:
+@@ -182,6 +188,15 @@ allOf:
+       properties:
+         reg:
+           maxItems: 1
++  - if:
++      not:
++        properties:
++          compatible:
++            contains:
++              const: microchip,mpfs-macb
++    then:
++      properties:
++        cdns,timer-adjust: false
+ 
+ unevaluatedProperties: false
+ 
 -- 
 2.51.0
 
