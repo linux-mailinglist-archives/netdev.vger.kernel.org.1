@@ -1,136 +1,221 @@
-Return-Path: <netdev+bounces-240313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CD89C72DF9
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 09:31:22 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id E617BC72D98
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 09:28:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8C3A74EDFAB
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 08:27:13 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 10F9C35842B
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 08:26:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911A6314D24;
-	Thu, 20 Nov 2025 08:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE003112B2;
+	Thu, 20 Nov 2025 08:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="kRmrKjJD"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PUagXUfX"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8E831354F;
-	Thu, 20 Nov 2025 08:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B1830AD15;
+	Thu, 20 Nov 2025 08:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763627029; cv=none; b=T4GeqIb59ErTVEC1Mt52wYqLhc3AigH9FyQtFoy7nboZk48iPq1/xBgtiV3Mk075wtbWI7W3UaCOPdhx1GuYNznHXNLBtyIEmfJTGLKTPa0ZdexNBGOcEnTXwzIw+RexfeK1N1hzn95Qki87vSwZ3Lc6CKqaBLItbMLJ6m4uGlQ=
+	t=1763627010; cv=none; b=tjd+gyGQ7lk5YAwpU0ueU131fnX0iTdnPTKocOFsYf8I7tLjI4qOBSzTWwmESOnZq6d+5pzRf7bXJZqq+q3xoSnb850liHgtxrHFYGOz5qC04aI1zD9X3E7f3p7RnDaKyMdydfAPicQHoUauFIuy0awFaLjXUb9SrqfTOS+EFp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763627029; c=relaxed/simple;
-	bh=I4OuTk4KWd136mUPhGduSNpZZqcUHVslyKUCJNl5tlo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=jIVn2AubHA+90ZgzndlxNlOrfjK2bcjNYSz/AQETK7N61m6cPdfGyTk1qHJTCsBu/+cF+cmOcyJdLKIeHA8E0w3Qqb4k6oUeOLbEDlS0ceMv0szq2zE2EBbKutPTHtEq+JkNoljn67sLU6813MNh9Sf6+scR0rJ9QtaCTn371Oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=kRmrKjJD reason="signature verification failed"; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=NYAcTM7nDsHLuFDi8ivh7DNKiDUeX1ma+C6wZPtbPFU=; b=k
-	RmrKjJD0uhpAg+sUGWLvIFAdBOAi801bra0cS5RM5q4Zu9DdnBMPZMbY8/39gc18
-	wd3pJyne38iMnSJr/a/g1PNycPIEalRJSHyb6cXe+4ELZwJnXX5ODnmvY2rQvBht
-	jERQMU8pLCFy5wo63A5jJ6+Ntb2AxN7vnnlNNqugmw=
-Received: from slark_xiao$163.com ( [112.97.80.230] ) by
- ajax-webmail-wmsvr-40-137 (Coremail) ; Thu, 20 Nov 2025 16:22:57 +0800
- (CST)
-Date: Thu, 20 Nov 2025 16:22:57 +0800 (CST)
-From: "Slark Xiao" <slark_xiao@163.com>
-To: "Loic Poulain" <loic.poulain@oss.qualcomm.com>
-Cc: "Manivannan Sadhasivam" <mani@kernel.org>,
-	"Dmitry Baryshkov" <dmitry.baryshkov@oss.qualcomm.com>,
-	ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mhi@lists.linux.dev,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re:Re: [PATCH v3 2/2] net: wwan: mhi: Add network support for
- Foxconn T99W760
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
-In-Reply-To: <CAFEp6-1kSMGY0ydJjTvZqB4okXQgcwkvhMni8r-tOMzXyY7P_g@mail.gmail.com>
-References: <20251119105615.48295-1-slark_xiao@163.com>
- <20251119105615.48295-3-slark_xiao@163.com>
- <rrqgur5quuejtny576fzr65rtjhvhnprr746kuhgyn6a46jhct@dqstglnjwevx>
- <CAFEp6-18EWK7WWhn4nA=j516pBo397qAWphX5Zt7xq1Hg1nVmw@mail.gmail.com>
- <moob5m5ek4jialx4vbxdkuagrkvvv7ioaqm2yhvei5flrdrzxi@c45te734h3yf>
- <CAFEp6-1kSMGY0ydJjTvZqB4okXQgcwkvhMni8r-tOMzXyY7P_g@mail.gmail.com>
-X-NTES-SC: AL_Qu2dAfqZuUEs4SSeY+kfmk8Sg+84W8K3v/0v1YVQOpF8jBLo8zg9YXRILWfX3/qKFg6yij6FVRVc+85mdrtmcoA73P/dSqEOUofPo65KGg8sCQ==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1763627010; c=relaxed/simple;
+	bh=lz3C1BijMM/g4Dp1N7kwcUbZURUQDWRihRMwyfRAp7Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u3bT6Yp5Np6OPa4R/0xzFMs4RKjS9TtCoUKxkVqRA0QE0PsR3aHBKzop5OarzyUS4VK6aqmFt1vF0rHxiFL1HSQO4dWuD1onwPK1bvgr2z9mcXl6D7Wsj5mPCNcKUE2SpROOJNDzRRfs6tOw1d9gOqht6CB37EwTWMZaP6o/pyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PUagXUfX; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 6E8A34E417D1;
+	Thu, 20 Nov 2025 08:23:26 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 279926068C;
+	Thu, 20 Nov 2025 08:23:26 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6F32D103713E4;
+	Thu, 20 Nov 2025 09:23:21 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1763627005; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=rBaqG1h8z9S+3XpuGkfDmFNGqfXLXYWP7uVYMOf3F90=;
+	b=PUagXUfXM9tyJNSXOBVjjJcPpyZQy4GtFge/T/V1pSIUmT8SPuowJtOX3WrTfxBMaKuX4F
+	JiIvdAaKXcMYRamukpU789W7490Ucl9xvQIEgkmrre81qZgU0tMx3ro58FwzoCjkfjVeR9
+	lHKz34BONXelHHVI8gf0/sElMBqXomzINk/7wk22axNqPYVTTFdjFrLg9sQZ12A2ByInFH
+	09fm6Uz1gfA67Y3hS63WLypgXdUFV8r3JAlAb/01fLPfSGGNvttBDQ2aEjq4ZXsnbxmLqw
+	tjCTHmAmWvveGDYLCJNdbAyvAmg+5RLNQZzguLNlzYUygXUjgEFh64+/AF/kRw==
+Message-ID: <06661540-a1d5-496c-a807-1aa4577b4361@bootlin.com>
+Date: Thu, 20 Nov 2025 09:23:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <20c33ad2.791f.19aa05c08c3.Coremail.slark_xiao@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:iSgvCgD3H+bhzx5ptWMmAA--.4020W
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbibgYMZGkexYwmAwACsZ
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V2 1/3] net: ethtool: Add support for 1600Gbps
+ speed
+To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Saeed Mahameed <saeedm@nvidia.com>,
+ Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+ Shahar Shitrit <shshitrit@nvidia.com>, Yael Chemla <ychemla@nvidia.com>,
+ Dragos Tatulea <dtatulea@nvidia.com>
+References: <1763585297-1243980-1-git-send-email-tariqt@nvidia.com>
+ <1763585297-1243980-2-git-send-email-tariqt@nvidia.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <1763585297-1243980-2-git-send-email-tariqt@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-QXQgMjAyNS0xMS0yMCAxNTo0NDoxNCwgIkxvaWMgUG91bGFpbiIgPGxvaWMucG91bGFpbkBvc3Mu
-cXVhbGNvbW0uY29tPiB3cm90ZToKPk9uIFRodSwgTm92IDIwLCAyMDI1IGF0IDY6NDHigK9BTSBN
-YW5pdmFubmFuIFNhZGhhc2l2YW0gPG1hbmlAa2VybmVsLm9yZz4gd3JvdGU6Cj4+Cj4+IE9uIFdl
-ZCwgTm92IDE5LCAyMDI1IGF0IDAyOjA4OjMzUE0gKzAxMDAsIExvaWMgUG91bGFpbiB3cm90ZToK
-Pj4gPiBPbiBXZWQsIE5vdiAxOSwgMjAyNSBhdCAxMjoyN+KAr1BNIERtaXRyeSBCYXJ5c2hrb3YK
-Pj4gPiA8ZG1pdHJ5LmJhcnlzaGtvdkBvc3MucXVhbGNvbW0uY29tPiB3cm90ZToKPj4gPiA+Cj4+
-ID4gPiBPbiBXZWQsIE5vdiAxOSwgMjAyNSBhdCAwNjo1NjoxNVBNICswODAwLCBTbGFyayBYaWFv
-IHdyb3RlOgo+PiA+ID4gPiBUOTlXNzYwIGlzIGRlc2lnbmVkIGJhc2VkIG9uIFF1YWxjb21tIFNE
-WDM1IGNoaXAuIEl0IHVzZSBzaW1pbGFyCj4+ID4gPiA+IGFyY2hpdGVjaHR1cmUgd2l0aCBTRFg3
-Mi9TRFg3NSBjaGlwLiBTbyB3ZSBuZWVkIHRvIGFzc2lnbiBpbml0aWFsCj4+ID4gPiA+IGxpbmsg
-aWQgZm9yIHRoaXMgZGV2aWNlIHRvIG1ha2Ugc3VyZSBuZXR3b3JrIGF2YWlsYWJsZS4KPj4gPiA+
-ID4KPj4gPiA+ID4gU2lnbmVkLW9mZi1ieTogU2xhcmsgWGlhbyA8c2xhcmtfeGlhb0AxNjMuY29t
-Pgo+PiA+ID4gPiAtLS0KPj4gPiA+ID4gIGRyaXZlcnMvbmV0L3d3YW4vbWhpX3d3YW5fbWJpbS5j
-IHwgMyArKy0KPj4gPiA+ID4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDEgZGVs
-ZXRpb24oLSkKPj4gPiA+ID4KPj4gPiA+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L3d3YW4v
-bWhpX3d3YW5fbWJpbS5jIGIvZHJpdmVycy9uZXQvd3dhbi9taGlfd3dhbl9tYmltLmMKPj4gPiA+
-ID4gaW5kZXggYzgxNGZiZDc1NmExLi5hMTQyYWY1OWE5MWYgMTAwNjQ0Cj4+ID4gPiA+IC0tLSBh
-L2RyaXZlcnMvbmV0L3d3YW4vbWhpX3d3YW5fbWJpbS5jCj4+ID4gPiA+ICsrKyBiL2RyaXZlcnMv
-bmV0L3d3YW4vbWhpX3d3YW5fbWJpbS5jCj4+ID4gPiA+IEBAIC05OCw3ICs5OCw4IEBAIHN0YXRp
-YyBzdHJ1Y3QgbWhpX21iaW1fbGluayAqbWhpX21iaW1fZ2V0X2xpbmtfcmN1KHN0cnVjdCBtaGlf
-bWJpbV9jb250ZXh0ICptYmltCj4+ID4gPiA+ICBzdGF0aWMgaW50IG1oaV9tYmltX2dldF9saW5r
-X211eF9pZChzdHJ1Y3QgbWhpX2NvbnRyb2xsZXIgKmNudHJsKQo+PiA+ID4gPiAgewo+PiA+ID4g
-PiAgICAgICBpZiAoc3RyY21wKGNudHJsLT5uYW1lLCAiZm94Y29ubi1kdzU5MzRlIikgPT0gMCB8
-fAo+PiA+ID4gPiAtICAgICAgICAgc3RyY21wKGNudHJsLT5uYW1lLCAiZm94Y29ubi10OTl3NTE1
-IikgPT0gMCkKPj4gPiA+ID4gKyAgICAgICAgIHN0cmNtcChjbnRybC0+bmFtZSwgImZveGNvbm4t
-dDk5dzUxNSIpID09IDAgfHwKPj4gPiA+ID4gKyAgICAgICAgIHN0cmNtcChjbnRybC0+bmFtZSwg
-ImZveGNvbm4tdDk5dzc2MCIpID09IDApCj4+ID4gPgo+PiA+ID4gQ2FuIHdlIHJlcGxhY2UgdGhp
-cyBsaXN0IG9mIHN0cmluYyBjb21wYXJpc29ucyB3aXRoIHNvbWUga2luZCBvZiBkZXZpY2UKPj4g
-PiA+IGRhdGEsIGJlaW5nIHNldCBpbiB0aGUgbWhpLXBjaS1nZW5lcmljIGRyaXZlcj8KPj4gPgo+
-PiA+IElmIHdlIG1vdmUgdGhpcyBNQklNLXNwZWNpZmljIGluZm9ybWF0aW9uIGludG8gbWhpLXBj
-aS1nZW5lcmljLCB3ZQo+PiA+IHNob3VsZCBjb25zaWRlciB1c2luZyBhIHNvZnR3YXJlIG5vZGUg
-KGUuZy4gdmlhCj4+ID4gZGV2aWNlX2FkZF9zb2Z0d2FyZV9ub2RlKSBzbyB0aGF0IHRoZXNlIHBy
-b3BlcnRpZXMgY2FuIGJlIGFjY2Vzc2VkCj4+ID4gdGhyb3VnaCB0aGUgZ2VuZXJpYyBkZXZpY2Ut
-cHJvcGVydHkgQVBJLgo+PiA+Cj4+Cj4+IE1ISSBoYXMgdG8gYnVzaW5lc3MgaW4gZGVhbGluZyB3
-aXRoIE1CSU0gc3BlY2lmaWMgaW5mb3JtYXRpb24gYXMgd2UgYWxyZWFkeQo+PiBjb25jbHVkZWQu
-IFNvIGl0IHNob3VsZCBiZSBoYW5kbGVkIHdpdGhpbiB0aGUgV1dBTiBzdWJzeXN0ZW0uCj4KPml0
-IGRvZXNu4oCZdCBtYWtlIHNlbnNlIHRvIGluY2x1ZGUgTUJJTS1zcGVjaWZpYyBmaWVsZHMgaW4g
-YSBnZW5lcmljIE1ISQo+c3RydWN0dXJlLiBIb3dldmVyLCBhdHRhY2hpbmcgZndub2RlIHByb3Bl
-cnRpZXMgY291bGQgYmUgcmVhc29uYWJsZQo+c2luY2UgdGhlIE1ISSBQQ0kgZHJpdmVyIGlzIHJl
-c3BvbnNpYmxlIGZvciBkZXZpY2UgZW51bWVyYXRpb24sIGFuZAo+dGhhdCB3b3VsZCBrZWVwIGRl
-dmljZSBtb2RlbCBzcGVjaWZpYyBoYW5kbGluZyBmdWxseSBjb3ZlcmVkIGluIHRoYXQKPmRyaXZl
-ci4KPgo+SXTigJlzIGZpbmUgdG8ga2VlcCBkZXZpY2Utc3BlY2lmaWMgaGFuZGxpbmcgd2l0aGlu
-IFdXQU4vTUJJTS4gSG93ZXZlciwKPm5leHQgdGltZSwgcGxlYXNlIGludHJvZHVjZSBhIGRlZGlj
-YXRlZCBkZXZpY2UgZGF0YSBzdHJ1Y3R1cmUgZm9yIHRoZQo+bXV4LWlkIGluc3RlYWQgb2YgYWRk
-aW5nIGFub3RoZXIgc3RyY21wLgo+CkhpIExvaWMsClNvIHlvdSBhbnN3ZXIgaXMgeWVzIGZvciB0
-aGlzIHRpbWUuIEkgYXBwcmVjaWF0ZSBpdCB2ZXJ5IG11Y2guCkFuZCBJIHdpbGwgY29tbWl0IGFu
-b3RoZXIgcGF0Y2ggZm9yIGZpeGluZyB0aGUgbmFtZSAidDk5dzUxNSIgdG8gCiJ0OTl3NjQwIi4g
-SSBoYXZlIHVwZGF0ZWQgaXQgaW4gbWhpIHNpZGUgaW4gMjAyNS82LkJ1dCBJIGZvcmdvdCB0byAK
-c3luYyBpbiBNQklNIHNpZGUuIFBsZWFzZSByZWZlciB0bzogCmh0dHBzOi8vbG9yZS5rZXJuZWwu
-b3JnL2FsbC8yMDI1MDYwNjA5NTAxOS4zODM5OTItMS1zbGFya194aWFvQDE2My5jb20vCkhvcGUg
-dGhhdCBjb21taXQgd29uJ3QgYnJlYWsgeW91ciBkZWNpc2lvbi4KClRvIGF2b2lkIHN1Y2ggbWlz
-bWF0Y2ggaXNzdWUsIEkgYWdyZWUgdG8gdXNlIGEgbmV3IG1lY2hhbmlzbSB0bwptYWtlIGl0IG1v
-cmUgY29udmVuaWVudC4KQ3VycmVudGx5LCBpdCBzZWVtcyBvbmx5IFNEWDc1L1NEWDM1IE1CSU0g
-c29sdXRpb24gaGF2ZSB0aGlzIGlzc3VlLgpGb3Igd2hvbGUgTUhJIHN1cHBvcnQgcHJvZHVjdHMs
-IG9ubHkgRm94Y29ubiBmZWxsIGludG8gdGhpcyB0cmFwLgpTbyBJIGhvcGUgY29tbXVuaXR5IGNv
-dWxkIGhlbHAgdGhpcyBmb3IgdGhlIG5ldyBkZXNpZ24uCgpUaGFua3MK
+
+
+On 19/11/2025 21:48, Tariq Toukan wrote:
+> From: Yael Chemla <ychemla@nvidia.com>
+> 
+> Add support for 1600Gbps link modes based on 200Gbps per lane [1].
+> This includes the adopted IEEE 802.3dj copper and optical PMDs that use
+> 200G/lane signaling [2].
+> 
+> Add the following PMD types:
+> - KR8 (backplane)
+> - CR8 (copper cable)
+> - DR8 (SMF 500m)
+> - DR8-2 (SMF 2km)
+> 
+> These modes are defined in the 802.3dj specifications.
+> References:
+> [1] https://www.ieee802.org/3/dj/public/23_03/opsasnick_3dj_01a_2303.pdf
+> [2] https://www.ieee802.org/3/dj/projdoc/objectives_P802d3dj_240314.pdf
+> 
+> Signed-off-by: Yael Chemla <ychemla@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
+
+> ---
+>  drivers/net/phy/phy-caps.h   | 1 +
+>  drivers/net/phy/phy-core.c   | 4 +++-
+>  drivers/net/phy/phy_caps.c   | 2 ++
+>  include/uapi/linux/ethtool.h | 5 +++++
+>  net/ethtool/common.c         | 8 ++++++++
+>  5 files changed, 19 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/phy/phy-caps.h b/drivers/net/phy/phy-caps.h
+> index b7f0c6a3037a..4951a39f3828 100644
+> --- a/drivers/net/phy/phy-caps.h
+> +++ b/drivers/net/phy/phy-caps.h
+> @@ -29,6 +29,7 @@ enum {
+>  	LINK_CAPA_200000FD,
+>  	LINK_CAPA_400000FD,
+>  	LINK_CAPA_800000FD,
+> +	LINK_CAPA_1600000FD,
+>  
+>  	__LINK_CAPA_MAX,
+>  };
+> diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
+> index 0c63e6ba2cb0..277c034bc32f 100644
+> --- a/drivers/net/phy/phy-core.c
+> +++ b/drivers/net/phy/phy-core.c
+> @@ -17,7 +17,7 @@
+>   */
+>  const char *phy_speed_to_str(int speed)
+>  {
+> -	BUILD_BUG_ON_MSG(__ETHTOOL_LINK_MODE_MASK_NBITS != 121,
+> +	BUILD_BUG_ON_MSG(__ETHTOOL_LINK_MODE_MASK_NBITS != 125,
+>  		"Enum ethtool_link_mode_bit_indices and phylib are out of sync. "
+>  		"If a speed or mode has been added please update phy_speed_to_str "
+>  		"and the PHY settings array.\n");
+> @@ -55,6 +55,8 @@ const char *phy_speed_to_str(int speed)
+>  		return "400Gbps";
+>  	case SPEED_800000:
+>  		return "800Gbps";
+> +	case SPEED_1600000:
+> +		return "1600Gbps";
+>  	case SPEED_UNKNOWN:
+>  		return "Unknown";
+>  	default:
+> diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
+> index 23c808b59b6f..3a05982b39bf 100644
+> --- a/drivers/net/phy/phy_caps.c
+> +++ b/drivers/net/phy/phy_caps.c
+> @@ -25,6 +25,7 @@ static struct link_capabilities link_caps[__LINK_CAPA_MAX] __ro_after_init = {
+>  	{ SPEED_200000, DUPLEX_FULL, {0} }, /* LINK_CAPA_200000FD */
+>  	{ SPEED_400000, DUPLEX_FULL, {0} }, /* LINK_CAPA_400000FD */
+>  	{ SPEED_800000, DUPLEX_FULL, {0} }, /* LINK_CAPA_800000FD */
+> +	{ SPEED_1600000, DUPLEX_FULL, {0} }, /* LINK_CAPA_1600000FD */
+>  };
+>  
+>  static int speed_duplex_to_capa(int speed, unsigned int duplex)
+> @@ -52,6 +53,7 @@ static int speed_duplex_to_capa(int speed, unsigned int duplex)
+>  	case SPEED_200000: return LINK_CAPA_200000FD;
+>  	case SPEED_400000: return LINK_CAPA_400000FD;
+>  	case SPEED_800000: return LINK_CAPA_800000FD;
+> +	case SPEED_1600000: return LINK_CAPA_1600000FD;
+>  	}
+>  
+>  	return -EINVAL;
+> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+> index 8bd5ea5469d9..eb7ff2602fbb 100644
+> --- a/include/uapi/linux/ethtool.h
+> +++ b/include/uapi/linux/ethtool.h
+> @@ -2077,6 +2077,10 @@ enum ethtool_link_mode_bit_indices {
+>  	ETHTOOL_LINK_MODE_800000baseDR4_2_Full_BIT	 = 118,
+>  	ETHTOOL_LINK_MODE_800000baseSR4_Full_BIT	 = 119,
+>  	ETHTOOL_LINK_MODE_800000baseVR4_Full_BIT	 = 120,
+> +	ETHTOOL_LINK_MODE_1600000baseCR8_Full_BIT	 = 121,
+> +	ETHTOOL_LINK_MODE_1600000baseKR8_Full_BIT	 = 122,
+> +	ETHTOOL_LINK_MODE_1600000baseDR8_Full_BIT	 = 123,
+> +	ETHTOOL_LINK_MODE_1600000baseDR8_2_Full_BIT	 = 124,
+>  
+>  	/* must be last entry */
+>  	__ETHTOOL_LINK_MODE_MASK_NBITS
+> @@ -2190,6 +2194,7 @@ enum ethtool_link_mode_bit_indices {
+>  #define SPEED_200000		200000
+>  #define SPEED_400000		400000
+>  #define SPEED_800000		800000
+> +#define SPEED_1600000		1600000
+>  
+>  #define SPEED_UNKNOWN		-1
+>  
+> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+> index 55223ebc2a7e..369c05cf8163 100644
+> --- a/net/ethtool/common.c
+> +++ b/net/ethtool/common.c
+> @@ -233,6 +233,10 @@ const char link_mode_names[][ETH_GSTRING_LEN] = {
+>  	__DEFINE_LINK_MODE_NAME(800000, DR4_2, Full),
+>  	__DEFINE_LINK_MODE_NAME(800000, SR4, Full),
+>  	__DEFINE_LINK_MODE_NAME(800000, VR4, Full),
+> +	__DEFINE_LINK_MODE_NAME(1600000, CR8, Full),
+> +	__DEFINE_LINK_MODE_NAME(1600000, KR8, Full),
+> +	__DEFINE_LINK_MODE_NAME(1600000, DR8, Full),
+> +	__DEFINE_LINK_MODE_NAME(1600000, DR8_2, Full),
+>  };
+>  static_assert(ARRAY_SIZE(link_mode_names) == __ETHTOOL_LINK_MODE_MASK_NBITS);
+>  
+> @@ -422,6 +426,10 @@ const struct link_mode_info link_mode_params[] = {
+>  	__DEFINE_LINK_MODE_PARAMS(800000, DR4_2, Full),
+>  	__DEFINE_LINK_MODE_PARAMS(800000, SR4, Full),
+>  	__DEFINE_LINK_MODE_PARAMS(800000, VR4, Full),
+> +	__DEFINE_LINK_MODE_PARAMS(1600000, CR8, Full),
+> +	__DEFINE_LINK_MODE_PARAMS(1600000, KR8, Full),
+> +	__DEFINE_LINK_MODE_PARAMS(1600000, DR8, Full),
+> +	__DEFINE_LINK_MODE_PARAMS(1600000, DR8_2, Full),
+>  };
+>  static_assert(ARRAY_SIZE(link_mode_params) == __ETHTOOL_LINK_MODE_MASK_NBITS);
+>  EXPORT_SYMBOL_GPL(link_mode_params);
+
 
