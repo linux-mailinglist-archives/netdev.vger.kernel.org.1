@@ -1,226 +1,99 @@
-Return-Path: <netdev+bounces-240340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E38BBC73693
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:14:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E9A0C73752
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:30:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B09A04EEF29
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 10:12:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 21EF04E1D81
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 10:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3FD3176E1;
-	Thu, 20 Nov 2025 10:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C1F32C316;
+	Thu, 20 Nov 2025 10:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u8FH/qXN"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A02314A6F;
-	Thu, 20 Nov 2025 10:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA8732BF52;
+	Thu, 20 Nov 2025 10:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763633495; cv=none; b=I7X6kBN+5NLsLckhbpcEW9q7618t5bqhdMyISvr77LATvHa9OdL1o/jNYqNJPMaHRSZIk709EGzsEIhytKicgZkEUFSFS/TJ/FU5ehUObHClBfIaYvAv4F3TlieBjCJWFRCpo8TNG80IEAvGy2glqO34P2s+pffdR0eb15dbs1k=
+	t=1763634641; cv=none; b=gJgizgXHQNmqM8re+oG2b48TYt5+3tK3lsCJulK9JG3k1M4ezrGspEJoH9a43hy2EEZr2q5GWOcOIS/EHM+9PqD5gcfpO0eoEpVZh8SWnYyteBPolXi6PcMAdfOSiP0KXNm7XWWGjhj4ltHB5sKEo4SwdkJ1k9D2jsQSqeR0et8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763633495; c=relaxed/simple;
-	bh=eWAadXHslEuh/Azwc+8IxNUGy6ZwhEzMJ9HpDHY0sZU=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=JzfNC/7FZceAW7vChCBW/szyTQxJEzD7BtNcjr/WSxKWkTrxfU3NqMrKYNSlGSEnURzzHxviXE5MzNCsVr8a1DZdE4zxYuAeI2PrxG3orUvEWVqlF1zh0JDlgM0DEhUxmDgSnyAD6PVqArrAIOGuk3lKcyocvHpZOBmr7jibohE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 5AKABMMX062143;
-	Thu, 20 Nov 2025 19:11:22 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 5AKABM97062137
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 20 Nov 2025 19:11:22 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <d2be2d6a-6cbb-4b13-9f86-a6b7fe94983a@I-love.SAKURA.ne.jp>
-Date: Thu, 20 Nov 2025 19:11:22 +0900
+	s=arc-20240116; t=1763634641; c=relaxed/simple;
+	bh=J+fGTIM35yM1pnJJE2Bn40ap6PS1L5bDXilEDqX2pZY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=imBLvCqYlnxNVjEIhejtSNgO3zJdd63eaMr5sEcjljVElqJlFU5PvQ9kBtMmC/Z5Ci/4XJsw6YB3yhc9Q3n0c7HxyzNbVs2C56+EnhSVsH1zF7nDmMSAZQY3aTHd1V80PFrY8em3Y54trKD8/yKlmB9ax7H9Pqomg9vQM58Uo4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u8FH/qXN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D82C9C4CEF1;
+	Thu, 20 Nov 2025 10:30:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763634640;
+	bh=J+fGTIM35yM1pnJJE2Bn40ap6PS1L5bDXilEDqX2pZY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=u8FH/qXN4RaQBDL3SD7Sx9njyJAkEW1gA4TAswKbQKeSibImAJG54KdF0+WKpp8RL
+	 f7vAvBakilALRfPQ29GH2j50dhlCB/A00um8Fynx+oUh7sNOQHMaVXZh7s87Fb+hMd
+	 8RoYHsEBMm7kuD+csWJaPNaeDop2JT4xuxlYQFipL42lXnLmmlFTzrwvRLokUoa9Ae
+	 oQVTFbcw7tJcGfTeGd1PmaWNSpdoJKBOt5wxaahzYp1X3+DL2kQskWhfvc3Slx1HH0
+	 4xNmnbDQ7EDXuOMJxfc3X/TWPex9xb/weSGUaMt6fU1IeovusfFRGIlL0aBxe2PrqD
+	 r3cePBUOyvuNw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7119339EFA6E;
+	Thu, 20 Nov 2025 10:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: linux-can@vger.kernel.org, Network Development <netdev@vger.kernel.org>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Oleksij Rempel <o.rempel@pengutronix.de>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: [can/j1939] unregister_netdevice: waiting for vcan0 to become free.
- Usage count = 2
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav103.rs.sakura.ne.jp
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 1/1] net: dsa: microchip: lan937x: Fix RGMII delay
+ tuning
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176363460626.1565276.14971544367038790990.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Nov 2025 10:30:06 +0000
+References: <20251114090951.4057261-1-o.rempel@pengutronix.de>
+In-Reply-To: <20251114090951.4057261-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
+ f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com,
+ woojung.huh@microchip.com, arun.ramadoss@microchip.com,
+ stable@vger.kernel.org, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, UNGLinuxDriver@microchip.com
 
-Hello.
+Hello:
 
-I am using a debug printk() patch for j1939_priv which records/counts where
-refcount for j1939_priv has changed, and syzbot succeeded to record/count a
-j1939_priv leak in next-20251119
-( https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84 ).
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-The output from the debug printk() patch is shown below. I think that
-understanding what actions have been taken on this j1939_priv object will
-help you finding the cause of j1939_priv leak bug.
+On Fri, 14 Nov 2025 10:09:51 +0100 you wrote:
+> Correct RGMII delay application logic in lan937x_set_tune_adj().
+> 
+> The function was missing `data16 &= ~PORT_TUNE_ADJ` before setting the
+> new delay value. This caused the new value to be bitwise-OR'd with the
+> existing PORT_TUNE_ADJ field instead of replacing it.
+> 
+> For example, when setting the RGMII 2 TX delay on port 4, the
+> intended TUNE_ADJUST value of 0 (RGMII_2_TX_DELAY_2NS) was
+> incorrectly OR'd with the default 0x1B (from register value 0xDA3),
+> leaving the delay at the wrong setting.
+> 
+> [...]
 
-Regards.
+Here is the summary with links:
+  - [net,v2,1/1] net: dsa: microchip: lan937x: Fix RGMII delay tuning
+    https://git.kernel.org/netdev/net/c/3ceb6ac2116e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-unregister_netdevice: waiting for vcan0 to become free. Usage count = 2
-Call trace for vcan0@ffff888031c9c000 +1 at
-     j1939_priv_create net/can/j1939/main.c:150 [inline]
-     j1939_netdev_start+0x1de/0xa30 net/can/j1939/main.c:282
-     j1939_sk_bind+0x926/0xca0 net/can/j1939/socket.c:498
-     __sys_bind_socket net/socket.c:1878 [inline]
-     __sys_bind+0x2c6/0x3e0 net/socket.c:1909
-Call trace for vcan0@ffff888031c9c000 +1 at
-     j1939_priv_get net/can/j1939/main.c:191 [inline]
-     j1939_can_rx_register net/can/j1939/main.c:199 [inline]
-     j1939_netdev_start+0x615/0xa30 net/can/j1939/main.c:305
-     j1939_sk_bind+0x926/0xca0 net/can/j1939/socket.c:498
-     __sys_bind_socket net/socket.c:1878 [inline]
-     __sys_bind+0x2c6/0x3e0 net/socket.c:1909
-Call trace for vcan0@ffff888031c9c000 +1 at
-     j1939_sk_bind+0xa02/0xca0 net/can/j1939/socket.c:510
-     __sys_bind_socket net/socket.c:1878 [inline]
-     __sys_bind+0x2c6/0x3e0 net/socket.c:1909
-Call trace for vcan0@ffff888031c9c000 +1 at
-     j1939_jsk_add net/can/j1939/socket.c:81 [inline]
-     j1939_sk_bind+0x769/0xca0 net/can/j1939/socket.c:530
-     __sys_bind_socket net/socket.c:1878 [inline]
-     __sys_bind+0x2c6/0x3e0 net/socket.c:1909
-Call trace for vcan0@ffff888031c9c000 +2 at
-     j1939_session_new+0x127/0x450 net/can/j1939/transport.c:1503
-     j1939_tp_send+0x338/0x8c0 net/can/j1939/transport.c:2018
-     j1939_sk_send_loop net/can/j1939/socket.c:1159 [inline]
-     j1939_sk_sendmsg+0xaf8/0x1350 net/can/j1939/socket.c:1282
-     sock_sendmsg_nosec net/socket.c:727 [inline]
-     __sock_sendmsg+0x21c/0x270 net/socket.c:746
-Call trace for vcan0@ffff888031c9c000 +2 at
-     j1939_priv_get net/can/j1939/main.c:191 [inline]
-     j1939_can_recv+0x17f/0xa30 net/can/j1939/main.c:54
-     deliver net/can/af_can.c:575 [inline]
-     can_rcv_filter+0x357/0x7d0 net/can/af_can.c:609
-     can_receive+0x312/0x450 net/can/af_can.c:666
-     can_rcv+0x145/0x270 net/can/af_can.c:690
-     __netif_receive_skb_one_core net/core/dev.c:6130 [inline]
-     __netif_receive_skb+0x164/0x380 net/core/dev.c:6243
-     process_backlog+0x622/0x1530 net/core/dev.c:6595
-     __napi_poll+0xae/0x320 net/core/dev.c:7659
-     napi_poll net/core/dev.c:7722 [inline]
-     net_rx_action+0x672/0xe50 net/core/dev.c:7874
-     handle_softirqs+0x27d/0x880 kernel/softirq.c:626
-Call trace for vcan0@ffff888031c9c000 +1 at
-     j1939_session_new+0x127/0x450 net/can/j1939/transport.c:1503
-     j1939_session_fresh_new net/can/j1939/transport.c:1543 [inline]
-     j1939_xtp_rx_rts_session_new net/can/j1939/transport.c:1628 [inline]
-     j1939_xtp_rx_rts+0xd16/0x18b0 net/can/j1939/transport.c:1749
-     j1939_tp_cmd_recv net/can/j1939/transport.c:2071 [inline]
-     j1939_tp_recv+0xb24/0x1040 net/can/j1939/transport.c:2158
-     j1939_can_recv+0x6a0/0xa30 net/can/j1939/main.c:108
-     deliver net/can/af_can.c:575 [inline]
-     can_rcv_filter+0x357/0x7d0 net/can/af_can.c:609
-     can_receive+0x312/0x450 net/can/af_can.c:666
-     can_rcv+0x145/0x270 net/can/af_can.c:690
-     __netif_receive_skb_one_core net/core/dev.c:6130 [inline]
-     __netif_receive_skb+0x164/0x380 net/core/dev.c:6243
-     process_backlog+0x622/0x1530 net/core/dev.c:6595
-     __napi_poll+0xae/0x320 net/core/dev.c:7659
-     napi_poll net/core/dev.c:7722 [inline]
-     net_rx_action+0x672/0xe50 net/core/dev.c:7874
-     handle_softirqs+0x27d/0x880 kernel/softirq.c:626
-Call trace for vcan0@ffff888031c9c000 -2 at
-     j1939_priv_put+0x23/0x370 net/can/j1939/main.c:184
-     j1939_can_recv+0x6e0/0xa30 net/can/j1939/main.c:115
-     deliver net/can/af_can.c:575 [inline]
-     can_rcv_filter+0x357/0x7d0 net/can/af_can.c:609
-     can_receive+0x312/0x450 net/can/af_can.c:666
-     can_rcv+0x145/0x270 net/can/af_can.c:690
-     __netif_receive_skb_one_core net/core/dev.c:6130 [inline]
-     __netif_receive_skb+0x164/0x380 net/core/dev.c:6243
-     process_backlog+0x622/0x1530 net/core/dev.c:6595
-     __napi_poll+0xae/0x320 net/core/dev.c:7659
-     napi_poll net/core/dev.c:7722 [inline]
-     net_rx_action+0x672/0xe50 net/core/dev.c:7874
-     handle_softirqs+0x27d/0x880 kernel/softirq.c:626
-Call trace for vcan0@ffff888031c9c000 -2 at
-     j1939_priv_put+0x23/0x370 net/can/j1939/main.c:184
-     j1939_session_destroy net/can/j1939/transport.c:285 [inline]
-     __j1939_session_release net/can/j1939/transport.c:294 [inline]
-     kref_put include/linux/kref.h:65 [inline]
-     j1939_session_put+0x2f0/0x460 net/can/j1939/transport.c:299
-     j1939_tp_rxtimer+0x177/0x3d0 net/can/j1939/transport.c:1266
-     __run_hrtimer kernel/time/hrtimer.c:1777 [inline]
-     __hrtimer_run_queues+0x51c/0xc70 kernel/time/hrtimer.c:1841
-     hrtimer_run_softirq+0x187/0x2b0 kernel/time/hrtimer.c:1858
-     handle_softirqs+0x27d/0x880 kernel/softirq.c:626
-Call trace for vcan0@ffff888031c9c000 -1 at
-     j1939_priv_put+0x23/0x370 net/can/j1939/main.c:184
-     j1939_jsk_del net/can/j1939/socket.c:94 [inline]
-     j1939_sk_release+0x408/0x7c0 net/can/j1939/socket.c:649
-     __sock_release net/socket.c:662 [inline]
-     sock_close+0xc3/0x240 net/socket.c:1459
-     __fput+0x44c/0xa70 fs/file_table.c:468
-     task_work_run+0x1d4/0x260 kernel/task_work.c:233
-     resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-     __exit_to_user_mode_loop kernel/entry/common.c:44 [inline]
-     exit_to_user_mode_loop+0xff/0x4f0 kernel/entry/common.c:75
-     __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
-     syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
-     syscall_exit_to_user_mode_work include/linux/entry-common.h:159 [inline]
-     syscall_exit_to_user_mode include/linux/entry-common.h:194 [inline]
-     do_syscall_64+0x2e9/0xfa0 arch/x86/entry/syscall_64.c:100
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-Call trace for vcan0@ffff888031c9c000 -1 at
-     j1939_priv_put+0x23/0x370 net/can/j1939/main.c:184
-     j1939_can_rx_unregister net/can/j1939/main.c:221 [inline]
-     __j1939_rx_release net/can/j1939/main.c:230 [inline]
-     kref_put_mutex include/linux/kref.h:86 [inline]
-     j1939_netdev_stop+0xa6/0x190 net/can/j1939/main.c:325
-     j1939_sk_release+0x471/0x7c0 net/can/j1939/socket.c:654
-     __sock_release net/socket.c:662 [inline]
-     sock_close+0xc3/0x240 net/socket.c:1459
-     __fput+0x44c/0xa70 fs/file_table.c:468
-     task_work_run+0x1d4/0x260 kernel/task_work.c:233
-     resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-     __exit_to_user_mode_loop kernel/entry/common.c:44 [inline]
-     exit_to_user_mode_loop+0xff/0x4f0 kernel/entry/common.c:75
-     __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
-     syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
-     syscall_exit_to_user_mode_work include/linux/entry-common.h:159 [inline]
-     syscall_exit_to_user_mode include/linux/entry-common.h:194 [inline]
-     do_syscall_64+0x2e9/0xfa0 arch/x86/entry/syscall_64.c:100
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-Call trace for vcan0@ffff888031c9c000 -1 at
-     j1939_priv_put+0x23/0x370 net/can/j1939/main.c:184
-     j1939_sk_release+0x471/0x7c0 net/can/j1939/socket.c:654
-     __sock_release net/socket.c:662 [inline]
-     sock_close+0xc3/0x240 net/socket.c:1459
-     __fput+0x44c/0xa70 fs/file_table.c:468
-     task_work_run+0x1d4/0x260 kernel/task_work.c:233
-     resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-     __exit_to_user_mode_loop kernel/entry/common.c:44 [inline]
-     exit_to_user_mode_loop+0xff/0x4f0 kernel/entry/common.c:75
-     __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
-     syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
-     syscall_exit_to_user_mode_work include/linux/entry-common.h:159 [inline]
-     syscall_exit_to_user_mode include/linux/entry-common.h:194 [inline]
-     do_syscall_64+0x2e9/0xfa0 arch/x86/entry/syscall_64.c:100
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-Call trace for vcan0@ffff888031c9c000 -1 at
-     j1939_priv_put+0x23/0x370 net/can/j1939/main.c:184
-     j1939_sk_sock_destruct+0x52/0x90 net/can/j1939/socket.c:386
-     __sk_destruct+0x85/0x880 net/core/sock.c:2350
-     rcu_do_batch kernel/rcu/tree.c:2605 [inline]
-     rcu_core+0xcab/0x1770 kernel/rcu/tree.c:2861
-     handle_softirqs+0x27d/0x880 kernel/softirq.c:626
-balance for vcan0@j1939_priv is 1
 
