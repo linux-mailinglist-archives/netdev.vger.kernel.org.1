@@ -1,265 +1,333 @@
-Return-Path: <netdev+bounces-240568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33789C76494
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 22:00:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16020C76409
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 21:55:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 357272A07E
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 21:00:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 44B5628E95
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 20:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967C93A5E78;
-	Thu, 20 Nov 2025 20:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFD23502A6;
+	Thu, 20 Nov 2025 20:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PyGvrDcT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DF/qQ4HO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696FC3A1D03;
-	Thu, 20 Nov 2025 20:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7043128C4
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 20:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763672180; cv=none; b=t++27rw4F1gRLNIXhgrAZ6po9QWEXGoJOKy+5SkdWwpjqJAqOz3hb1liNhx2+2gX3QCjndT3K94tH13/jC0p+Buh+6eg4KspgqD80HVqZPBmokOZmE/2On2tK/u1lLY1g1laK4/p4cEGoGqfWkuHaXbltfgO9ZfzDAEoaDhg43k=
+	t=1763672132; cv=none; b=MbMcpEuiP1MPbJccMJ/t9I2h3sZfu59VFM7ISisZ03XiBxXybD1NirQUM4h+zvY800u06xs9WCyBozxOmq/zcSj2Cz4jO6t6OUciT6+pQRa/z1XUBNdNuT3AEMkni0wu2QeDReBqujvCWCL4P1ZbVWIi7e3f2GGaAOxjQtFnR3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763672180; c=relaxed/simple;
-	bh=ygnMB0zO5n7LNWTLaftTf7mOpO0kT3kaJ+Cqfp3KG9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rfzfj6wG9pvQDapB+q53+uHA+/UBM6MyMznGdrANTBm5nUHjTSJsTyb3IN99xq6PDYTbq/Ak06r/p3CS/9109WiF/hQo1/2nh+ChsSmySAiEgVzvRc4VfV4U95zpLlv6w5tUpEnfL7H11U62zvNA4GC50RtaUaB2SIpzeCo6GwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PyGvrDcT; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 33EA41A1C5E;
-	Thu, 20 Nov 2025 20:56:17 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 021AD606F6;
-	Thu, 20 Nov 2025 20:56:17 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DAEF710371BCD;
-	Thu, 20 Nov 2025 21:56:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763672175; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=q5cHSdBiFQndzU4nTFiD7tW7FCwQQjMLgxuIBfRu/1k=;
-	b=PyGvrDcT7ypsyJNjzh+XF97vqWLiE8UgFZwD7LM7RTXeyL/4Df4ybgKbJIgSfHMiszYoBL
-	RfnisJjNgq3dKPJCUn7XNHa3V1ufBk7zvdiGLs4jfrCS6TfteYrpdnbZqXIldeMej/LavL
-	T7NtNIm7wrzUnuluFWffTovgBZQrO5kdnQ+W05WXlw52dR909gOg58d8+g+zu5kBwtVHEH
-	OwWlRLHVmeD40/q91gRspHwa+bDPPrQaf/OZLfPru6WG84weJYyQafqnPhtfzR1ZKsbla6
-	8cVAo7zOrWuBoUomfUFq/LGqUJyXQ/KiNqnCl5WgLjV9gJTkXCUkN4jgCFT+Yw==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>,
-	devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH net-next v18 15/15] Documentation: networking: Document the phy_port infrastructure
-Date: Thu, 20 Nov 2025 21:55:05 +0100
-Message-ID: <20251120205508.553909-16-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20251120205508.553909-1-maxime.chevallier@bootlin.com>
-References: <20251120205508.553909-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1763672132; c=relaxed/simple;
+	bh=Tw6PzwmFUH3yzaToVragN2xPLBkERaK2J51NDxu9Hfg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CGu2A3JTbNR9uyb/Zub7tq5vM/1GTGxpV6wna2p29Zo2AhzC2Io8lHOFHNI3cYxxYvvXsbQGWzM4zv1v2QUdJeQqGgYgeytFseSULd+JS4F1Cmr8vzXEUlOSyOw+VNJfJdF8UetW/Rd34oZfisC88dvczkm7LULwD0p6O+lnXrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DF/qQ4HO; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-42b3ac40ae4so782830f8f.0
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:55:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763672128; x=1764276928; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AZ0TiYuUwtM/It7RYy4vPWkMc0+ElnY6WAKQWRtqUCo=;
+        b=DF/qQ4HOp3KcqgrqStk0NkyNYM+SW4WOMvU/oeEVHq2SDhc2ZLwyCb0w9G6KbVvtoP
+         aCWSkck1LCOFVdcdzpXcqraSu/DZ9W+PQ1KiRRJ3oGbq/eDOgcz0hUfPoHhNyl2hTEwC
+         RHMh2lNyMhz80IVgoSr4QNXBmFf30Gh5g8RKUB6OHOUNWwxQnQWmUJSNgm/nHy0rjEfq
+         uk89p28N3IZdT1eL1HDzOG16dKIyvnFU6L2JidA5ThTcriOBueHsfWZyBUVNQ1GbRWLe
+         ugEssAuSCZL+bkYg7l5i1JwxOHPC0pByKpBBH4o7Cfgsb5/pyAF7OZatOjnygGR5kvpr
+         guKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763672128; x=1764276928;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AZ0TiYuUwtM/It7RYy4vPWkMc0+ElnY6WAKQWRtqUCo=;
+        b=jYmBYpsSvlt4/72QhJYA1SiI+oBV1uYqVpy82oT9V5Ne/uHZfYFKMgHI4eA3vOuaVU
+         FYmp4oVEDsCVbt+iRuErFT2ws5pVDyLnIFtexYgZ/vpo5XX9NCwtyHzgwgWAQNX/y3Dz
+         T3uYLLqIrIAWHY4oW7S0GuBlTNi7xGUJHFFAil9pQsf458J4AS1wFnGstEW5y6Wz3mqY
+         P0Gd8zPnYd94Jcu9ds1aS9PKM0zWTR+Rz1a8CgcbCjCbejRaBjP7SC9vQ3Hg/0ZO2o8z
+         TwcrtdeRNYUctTHzRE0UWMwh7xrirSkxz5eqkcGe2mPlrRDQqSmoclMkfNJdxaeI5s/U
+         5tHA==
+X-Gm-Message-State: AOJu0Yxc6UN5hYRCa7nHmmfWltuBFfwY3QelDnWclMJKIpwr+DqJRKVl
+	bw11vhdrxvzTFUsa4pfIPQX01Ro4OLjK+nHUIOsWqfD9JcLUbHGzfSjG
+X-Gm-Gg: ASbGncvBdfVnAIj4EZvPYLvEY6h8ddWdX6B1qlsYBYFkuhTvZdBwyBApTKd8vsgSPU0
+	9slBPMHzJeSrIhpWmxPgV6khFyoxSXdjBbettYH92uRfsxH8jbM2cfLCpT4BmTmYlDWcp3RzxJR
+	iunGpI67qiw7bRdKcXVn8kjbSd2GRj5ozvpk8C6fWuiLVmibCFtyr99dm3IkRz238BsgRJCoNBT
+	3IMu/Qq+GDawqI/n19GoaTl5ytl0DoSxfXSCYKd+TtT8y4MaNw5ZzLMTYGAI64IK0hC/KY0YER8
+	pOdOs9BJYg+k32KYnWeE7S3219BjIiV3XYljMmfUoU9TWX6iHE/38zq5AIz8mTG7KJJPZ0HZLJV
+	I3+Xja3ADdw6aN3je23ruKSqhFvBFliplwFRF/mySjmTx3cdWyq8hwaeLzxo8NSyKVRW+P/MMz2
+	Oyc1/eBT0zEGcO4zy/29a/DM+nh7ZMV5E1vnw8zCb35nT7JxMi+952EM8ceqeDiyz02yqI0Tt6M
+	SDcherbn9hOoHZnvb8TpCkVPY37xcbn0GAXLqSeS9lcfaBRE2iPFA==
+X-Google-Smtp-Source: AGHT+IG3rjXFlUC2x656rCC2Pxt5Kfvcgeo+c3M2JQoDuHBQrq/vXa4AmsyR7jlMTliyV9bcCy5tbg==
+X-Received: by 2002:a05:6000:1863:b0:42b:3c8d:1932 with SMTP id ffacd0b85a97d-42cb99f595dmr4082151f8f.23.1763672128221;
+        Thu, 20 Nov 2025 12:55:28 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f3a:7100:6cbf:5f75:6c2d:3ca3? (p200300ea8f3a71006cbf5f756c2d3ca3.dip0.t-ipconnect.de. [2003:ea:8f3a:7100:6cbf:5f75:6c2d:3ca3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fb9190sm7538676f8f.33.2025.11.20.12.55.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Nov 2025 12:55:27 -0800 (PST)
+Message-ID: <f263daf0-70c2-46c2-af25-653ff3179cb0@gmail.com>
+Date: Thu, 20 Nov 2025 21:55:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] r8169: add support for RTL8127ATF
+To: Fabio Baltieri <fabio.baltieri@gmail.com>, nic_swsd@realtek.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Michael Zimmermann <sigmaepsilon92@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251120195055.3127-1-fabio.baltieri@gmail.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <20251120195055.3127-1-fabio.baltieri@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-This documentation aims at describing the main goal of the phy_port
-infrastructure.
+On 11/20/2025 8:50 PM, Fabio Baltieri wrote:
+> Add support for ATF variant of the RTL8127, this uses an SFP transceiver
+> instead of the twisted pair one and only runs at 1Gbps or 10Gbps, only
+> 10Gbps is supported with this patch.
+> 
+> The change is based on the r8127 driver package version 11.015.00
+> available on the Realtek website and also on
+> https://github.com/openwrt/rtl8127.
+> 
+> There's no public datasheet for the chip so this is just porting over
+> the original vendor code to the API and style of the upstream one.
+> 
+> Signed-off-by: Fabio Baltieri <fabio.baltieri@gmail.com>
+> ---
+> 
+> Hi, did more tests with 1g mode on the v1 of this patch, the setting
+> itself works but triggering it from ethtool reliably seems problematic
+> due to some weird behavior of the phy code which end up reporting a
+> specific link speed when the link is down, making it impossible to set
+> it with ethool as it thinks it's already set.
+> 
+> Since it seems like supporting 1g properly needs expanding the scope of
+> the patch, I'm taking the suggestion from Heiner in v1 review and
+> stripped this down so it only supports 10g, which is likely what the
+> vast majority of the users need anyway.
+> 
+> Also tested this on suspend/resume, this is also affected by the wol
+> issue but with that bit set it now works correctly.
+> 
+> v1 -> v2
+> - stripped out 1g support
+> - moved the sds settings in rtl8169_init_phy() so it get called on
+>   resume
+> - renamed fiber_mode to sfp_mode to avoid confusion
+> 
+> Cheers,
+> Fabio
+> 
+>  drivers/net/ethernet/realtek/r8169_main.c | 128 +++++++++++++++++++++-
+>  1 file changed, 126 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index d18734fe12e..e19518c7b98 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -729,6 +729,7 @@ struct rtl8169_private {
+>  	unsigned supports_gmii:1;
+>  	unsigned aspm_manageable:1;
+>  	unsigned dash_enabled:1;
+> +	unsigned sfp_mode:1;
+>  	dma_addr_t counters_phys_addr;
+>  	struct rtl8169_counters *counters;
+>  	struct rtl8169_tc_offsets tc_offset;
+> @@ -842,7 +843,8 @@ static bool rtl_supports_eee(struct rtl8169_private *tp)
+>  {
+>  	return tp->mac_version >= RTL_GIGA_MAC_VER_34 &&
+>  	       tp->mac_version != RTL_GIGA_MAC_VER_37 &&
+> -	       tp->mac_version != RTL_GIGA_MAC_VER_39;
+> +	       tp->mac_version != RTL_GIGA_MAC_VER_39 &&
+> +	       !tp->sfp_mode;
+>  }
+>  
+>  static void rtl_read_mac_from_reg(struct rtl8169_private *tp, u8 *mac, int reg)
+> @@ -1399,6 +1401,95 @@ DECLARE_RTL_COND(rtl_ocp_tx_cond)
+>  	return RTL_R8(tp, IBISR0) & 0x20;
+>  }
+>  
+> +#define R8127_SDS_CMD 0x2348
+> +#define R8127_SDS_ADDR 0x234a
+> +#define R8127_SDS_DATA_IN 0x234c
+> +#define R8127_SDS_DATA_OUT 0x234e
+> +
+> +#define R8127_MAKE_SDS_ADDR(_index, _page, _reg) \
+> +	(((_index) << 11) | ((_page) << 5) | (_reg))
+> +
+> +#define R8127_SDS_CMD_IN BIT(0)
+> +#define R8127_SDS_WE_IN BIT(1)
+> +
+> +DECLARE_RTL_COND(rtl_sds_cmd_done)
+> +{
+> +	return RTL_R16(tp, R8127_SDS_CMD) & R8127_SDS_CMD_IN;
+> +}
+> +
+> +static u16 rtl8127_sds_phy_read(struct rtl8169_private *tp,
+> +				u16 index, u16 page, u16 reg)
+> +{
+> +	RTL_W16(tp, R8127_SDS_ADDR, R8127_MAKE_SDS_ADDR(index, page, reg));
+> +	RTL_W16(tp, R8127_SDS_CMD, R8127_SDS_CMD_IN);
+> +
+> +	if (rtl_loop_wait_low(tp, &rtl_sds_cmd_done, 1, 100))
+> +		return RTL_R16(tp, R8127_SDS_DATA_OUT);
+> +	else
+> +		return 0xffff;
+> +}
+> +
+> +static void rtl8127_sds_phy_write(struct rtl8169_private *tp,
+> +				  u16 index, u16 page, u16 reg, u16 val)
+> +{
+> +	RTL_W16(tp, R8127_SDS_DATA_IN, val);
+> +	RTL_W16(tp, R8127_SDS_ADDR, R8127_MAKE_SDS_ADDR(index, page, reg));
+> +	RTL_W16(tp, R8127_SDS_CMD, R8127_SDS_CMD_IN | R8127_SDS_WE_IN);
+> +
+> +	rtl_loop_wait_low(tp, &rtl_sds_cmd_done, 1, 100);
+> +}
+> +
+> +static void rtl8127_sds_phy_modify(struct rtl8169_private *tp,
+> +				   u16 index, u16 page, u16 addr,
+> +				   u16 mask, u16 set)
+> +{
+> +	u16 val;
+> +
+> +	val = rtl8127_sds_phy_read(tp, index, page, addr);
+> +	val = (val & ~mask) | set;
+> +	rtl8127_sds_phy_write(tp, index, page, addr, val);
+> +}
+> +
+> +static void rtl8127_sds_phy_reset(struct rtl8169_private *tp)
+> +{
+> +	RTL_W8(tp, 0x2350, RTL_R8(tp, 0x2350) & ~BIT(0));
+> +	udelay(1);
+> +
+> +	RTL_W16(tp, 0x233a, 0x801f);
+> +	RTL_W8(tp, 0x2350, RTL_R8(tp, 0x2350) | BIT(0));
+> +	udelay(10);
+> +}
+> +
+> +static void rtl8127_sds_phy_exit_1g(struct rtl8169_private *tp)
+> +{
+> +	rtl8127_sds_phy_modify(tp, 0, 1, 31, BIT(3), 0);
+> +	rtl8127_sds_phy_modify(tp, 0, 2, 0,
+> +			       BIT(13) | BIT(12) | BIT(6),
+> +			       BIT(6));
+> +
+> +	rtl8127_sds_phy_reset(tp);
+> +}
+> +
+> +static void rtl8127_set_sds_phy_caps_10g(struct rtl8169_private *tp)
+> +{
+> +	u16 val;
+> +
+> +	RTL_W16(tp, 0x233a, 0x801a);
+> +
+> +	val = RTL_R16(tp, 0x233e);
+> +	val &= BIT(13) | BIT(12) | BIT(1) | BIT(0);
+> +	val |= BIT(12);
+> +	RTL_W16(tp, 0x233e, val);
+> +
+> +	r8169_mdio_write(tp, 0xc40a, 0x0);
+> +	r8169_mdio_write(tp, 0xc466, 0x3);
+> +	r8169_mdio_write(tp, 0xc808, 0x0);
+> +	r8169_mdio_write(tp, 0xc80a, 0x0);
+> +
+This function isn't usable on RTL8127.
 
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Tested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- Documentation/networking/index.rst    |   1 +
- Documentation/networking/phy-port.rst | 111 ++++++++++++++++++++++++++
- MAINTAINERS                           |   2 +
- 3 files changed, 114 insertions(+)
- create mode 100644 Documentation/networking/phy-port.rst
+> +	val = r8168_phy_ocp_read(tp, 0xc804);
+> +	r8168_phy_ocp_write(tp, 0xc804, (val & ~0x000f) | 0x000c);
+> +}
+> +
+>  static void rtl8168ep_stop_cmac(struct rtl8169_private *tp)
+>  {
+>  	RTL_W8(tp, IBCR2, RTL_R8(tp, IBCR2) & ~0x01);
+> @@ -1512,6 +1603,15 @@ static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
+>  	}
+>  }
+>  
+> +static bool rtl_sfp_mode(struct rtl8169_private *tp)
+> +{
+> +	if (tp->mac_version == RTL_GIGA_MAC_VER_80 &&
+> +	    (r8168_mac_ocp_read(tp, 0xd006) & 0xff) == 0x07)
+> +		return true;
+> +
+> +	return false;
+> +}
+> +
+>  static void rtl_set_d3_pll_down(struct rtl8169_private *tp, bool enable)
+>  {
+>  	if (tp->mac_version >= RTL_GIGA_MAC_VER_25 &&
+> @@ -2390,7 +2490,10 @@ static void rtl8125a_config_eee_mac(struct rtl8169_private *tp)
+>  
+>  static void rtl8125b_config_eee_mac(struct rtl8169_private *tp)
+>  {
+> -	r8168_mac_ocp_modify(tp, 0xe040, 0, BIT(1) | BIT(0));
+> +	if (tp->sfp_mode)
+> +		r8168_mac_ocp_modify(tp, 0xe040, BIT(1) | BIT(0), 0);
+> +	else
+> +		r8168_mac_ocp_modify(tp, 0xe040, 0, BIT(1) | BIT(0));
+>  }
+>  
+>  static void rtl_rar_exgmac_set(struct rtl8169_private *tp, const u8 *addr)
+> @@ -2440,6 +2543,25 @@ static void rtl8169_init_phy(struct rtl8169_private *tp)
+>  	    tp->pci_dev->subsystem_device == 0xe000)
+>  		phy_write_paged(tp->phydev, 0x0001, 0x10, 0xf01b);
+>  
+> +	if (tp->sfp_mode) {
+> +		rtl8127_sds_phy_exit_1g(tp);
+> +		rtl8127_set_sds_phy_caps_10g(tp);
+> +
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_100baseT_Full_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_1000baseT_Full_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_2500baseT_Full_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_5000baseT_Full_BIT);
+> +
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_Autoneg_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
+> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
+> +
+> +		tp->phydev->autoneg = 0;
+> +	}
+> +
+>  	/* We may have called phy_speed_down before */
+>  	phy_speed_up(tp->phydev);
+>  
+> @@ -5453,6 +5575,8 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	tp->dash_type = rtl_get_dash_type(tp);
+>  	tp->dash_enabled = rtl_dash_is_enabled(tp);
+>  
+> +	tp->sfp_mode = rtl_sfp_mode(tp);
+> +
+>  	tp->cp_cmd = RTL_R16(tp, CPlusCmd) & CPCMD_MASK;
+>  
+>  	if (sizeof(dma_addr_t) > 4 && tp->mac_version >= RTL_GIGA_MAC_VER_18 &&
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 75db2251649b..49fcfa577711 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -96,6 +96,7 @@ Contents:
-    packet_mmap
-    phonet
-    phy-link-topology
-+   phy-port
-    pktgen
-    plip
-    ppp_generic
-diff --git a/Documentation/networking/phy-port.rst b/Documentation/networking/phy-port.rst
-new file mode 100644
-index 000000000000..6e28d9094bce
---- /dev/null
-+++ b/Documentation/networking/phy-port.rst
-@@ -0,0 +1,111 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+.. _phy_port:
-+
-+=================
-+Ethernet ports
-+=================
-+
-+This document is a basic description of the phy_port infrastructure,
-+introduced to represent physical interfaces of Ethernet devices.
-+
-+Without phy_port, we already have quite a lot of information about what the
-+media-facing interface of a NIC can do and looks like, through the
-+:c:type:`struct ethtool_link_ksettings <ethtool_link_ksettings>` attributes,
-+which includes :
-+
-+ - What the NIC can do through the :c:member:`supported` field
-+ - What the Link Partner advertises through :c:member:`lp_advertising`
-+ - Which features we're advertising through :c:member:`advertising`
-+
-+We also have info about the number of pairs and the PORT type. These settings
-+are built by aggregating together information reported by various devices that
-+are sitting on the link :
-+
-+  - The NIC itself, through the :c:member:`get_link_ksettings` callback
-+  - Precise information from the MAC and PCS by using phylink in the MAC driver
-+  - Information reported by the PHY device
-+  - Information reported by an SFP module (which can itself include a PHY)
-+
-+This model however starts showing its limitations when we consider devices that
-+have more than one media interface. In such a case, only information about the
-+actively used interface is reported, and it's not possible to know what the
-+other interfaces can do. In fact, we have very little information about whether
-+or not there are any other media interfaces.
-+
-+The goal of the phy_port representation is to provide a way of representing a
-+physical interface of a NIC, regardless of what is driving the port (NIC through
-+a firmware, SFP module, Ethernet PHY).
-+
-+Multi-port interfaces examples
-+==============================
-+
-+Several cases of multi-interface NICs have been observed so far :
-+
-+Internal MII Mux::
-+
-+  +------------------+
-+  | SoC              |
-+  |          +-----+ |           +-----+
-+  | +-----+  |     |-------------| PHY |
-+  | | MAC |--| Mux | |   +-----+ +-----+
-+  | +-----+  |     |-----| SFP |
-+  |          +-----+ |   +-----+
-+  +------------------+
-+
-+Internal Mux with internal PHY::
-+
-+  +------------------------+
-+  | SoC                    |
-+  |          +-----+ +-----+
-+  | +-----+  |     |-| PHY |
-+  | | MAC |--| Mux | +-----+   +-----+
-+  | +-----+  |     |-----------| SFP |
-+  |          +-----+       |   +-----+
-+  +------------------------+
-+
-+External Mux::
-+
-+  +---------+
-+  | SoC     |  +-----+  +-----+
-+  |         |  |     |--| PHY |
-+  | +-----+ |  |     |  +-----+
-+  | | MAC |----| Mux |  +-----+
-+  | +-----+ |  |     |--| PHY |
-+  |         |  +-----+  +-----+
-+  |         |     |
-+  |    GPIO-------+
-+  +---------+
-+
-+Double-port PHY::
-+
-+  +---------+
-+  | SoC     | +-----+
-+  |         | |     |--- RJ45
-+  | +-----+ | |     |
-+  | | MAC |---| PHY |   +-----+
-+  | +-----+ | |     |---| SFP |
-+  +---------+ +-----+   +-----+
-+
-+phy_port aims at providing a path to support all the above topologies, by
-+representing the media interfaces in a way that's agnostic to what's driving
-+the interface. the struct phy_port object has its own set of callback ops, and
-+will eventually be able to report its own ksettings::
-+
-+             _____      +------+
-+            (     )-----| Port |
-+ +-----+   (       )    +------+
-+ | MAC |--(   ???   )
-+ +-----+   (       )    +------+
-+            (_____)-----| Port |
-+                        +------+
-+
-+Next steps
-+==========
-+
-+As of writing this documentation, only ports controlled by PHY devices are
-+supported. The next steps will be to add the Netlink API to expose these
-+to userspace and add support for raw ports (controlled by some firmware, and directly
-+managed by the NIC driver).
-+
-+Another parallel task is the introduction of a MII muxing framework to allow the
-+control of non-PHY driver multi-port setups.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e0dc230df90e..219c04aab4a6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9283,6 +9283,7 @@ F:	Documentation/devicetree/bindings/net/ethernet-connector.yaml
- F:	Documentation/devicetree/bindings/net/ethernet-phy.yaml
- F:	Documentation/devicetree/bindings/net/mdio*
- F:	Documentation/devicetree/bindings/net/qca,ar803x.yaml
-+F:	Documentation/networking/phy-port.rst
- F:	Documentation/networking/phy.rst
- F:	drivers/net/mdio/
- F:	drivers/net/mdio/acpi_mdio.c
-@@ -17981,6 +17982,7 @@ F:	net/ethtool/phy.c
- NETWORKING [ETHTOOL PHY PORT]
- M:	Maxime Chevallier <maxime.chevallier@bootlin.com>
- F:	Documentation/devicetree/bindings/net/ethernet-connector.yaml
-+F:	Documentation/networking/phy-port.rst
- F:	drivers/net/phy/phy_port.c
- F:	include/linux/phy_port.h
- K:	struct\s+phy_port|phy_port_
--- 
-2.49.0
-
+Your patch is a good starting point, however it needs more thoughts / work how to somewhat cleanly
+integrate Realtek's design with phylib. E.g. you would want to set 10G and aneg off via ethtool,
+but that's not supported by phy_ethtool_ksettings_set().
+I'll prepare patches and, if you don't mind, would provide them to you for testing, as I don't
+own this hw.
+At least you have a working solution for the time being. Thanks!
 
