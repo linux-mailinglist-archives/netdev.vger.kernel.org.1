@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-240464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35336C75490
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:17:29 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8D6FC7556D
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:27:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 66C84345480
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:10:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6BA184E59D9
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9012A34BA22;
-	Thu, 20 Nov 2025 16:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7B1362133;
+	Thu, 20 Nov 2025 16:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M74yrSbi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Il+Gzbxh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3F035E553;
-	Thu, 20 Nov 2025 16:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2EA335BDD3;
+	Thu, 20 Nov 2025 16:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763655043; cv=none; b=IYj1nSbk0mQHdbyDolWnWJQtFQ7vXDCWkFkn7HlIgr4ZkTpZ8e4Zy+ht4X12AOC7aq0UDIWYo/T/tOEZxz85O1FFKAXvQXi9LXit8eZBGV1pz1C5AsiQetF7VITmLmwBSnyLPzRQGP569LcAiUZV5UAe7/jcbmyqQMgVs0+mauc=
+	t=1763655045; cv=none; b=i98QGSbIqfyKx2u+cGBTLzDqVZ2KMgtp7ZM3MP/adMx6qLsMGVlxVVR+0dZBZ3SjFwqMx/+9jOmNvCIatmbIXKxVnok38xNM5cW8SflVT5tjpg/j4HuIdILKMcitFCmC39cwlWJ193CmyAP81RPsrYKwFWgLA+2leYi46FjOZls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763655043; c=relaxed/simple;
-	bh=Eb6ynyOtXG61Ezk7YCZHzjM2XgYPekLwM/FoJGDK3oo=;
+	s=arc-20240116; t=1763655045; c=relaxed/simple;
+	bh=E46jylNdUioNWuXLjbDHm9/yoo2nBmjmtxAxyKtp1Nw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PYO00tYKh3NTrAUVcLezaYldmkt+UDaHdEPUrLKWd7O9nMK1t6vHAHYYXU+PpoRttryDtN6sooZjrLMDzEQe3RafESDJWP5v7g6H2VfSJzbU6vDCMvHjUWrC643FZQPhwHvkeTYpZ/wN0Y6Fx/Ai7VlyH+wlphdwWLBUo05qBR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M74yrSbi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F13C9C116C6;
-	Thu, 20 Nov 2025 16:10:42 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cNihxmKJU5q7WExTtwxX/xTmE9kK4Vi2D5ADXWY1ttRa9uh6H+erpXGACe1diNMUksNg/HNxBHS14PcdaBKGFLn2ycyPa9Tn8AuMoBVVSPi+mplNyr3qQxtGUk0Ks6sS2aMkKGJ6LtLBCghDpZvPfjH8M6kDjp1IosFZA0/2+Qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Il+Gzbxh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 722F9C4CEF1;
+	Thu, 20 Nov 2025 16:10:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763655043;
-	bh=Eb6ynyOtXG61Ezk7YCZHzjM2XgYPekLwM/FoJGDK3oo=;
+	s=k20201202; t=1763655044;
+	bh=E46jylNdUioNWuXLjbDHm9/yoo2nBmjmtxAxyKtp1Nw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=M74yrSbiwOPk8R8LlIfXhct7HD622KPMESzjR5/kvO3QCoAHQ7YRHowHWhUcYvuzu
-	 2WraB+ZKGgiaoqVN+yog0Tzki9zg/F03pVqAGAtw7PUXBc57xeD5U2XZ/6MjtidlZG
-	 QZwSU6DdxEtR+EPBRAkkdqn9D0gPswUQO8e93HLkSiqfHNRrX1nOblGFvSmmFhHm8f
-	 0Df1uia/4ukLeh/WeTanYj8B87ZUCnFG7XnyCNi9EboRaGXQo/i6FrhTIvvA7TkzyS
-	 avBfB+qw4x8hUmyvsjWBJBPlPR+GAizOJH8kCGZtGC143uimYYt6PV2rlIeeQe/xJw
-	 EpwlzUb5RMGAA==
+	b=Il+GzbxhWh+GUek1EU2CnZUm6IrGs7kZFuoNpnX9EnYP9AqIUe7FwyNNO1uWvQxZG
+	 Tkfsu0kM3PAYTBjXWYdurbIgoWPc7c39Gejlx7X+3nfyBIRnHWmYrshUAdSmr6ZdWg
+	 38XIHjUHcLVw/xlIxiliMGnKyopZ6LRgBBwqgSbm4clsJX8kdiFuQEFa3RpnXxT0/F
+	 9o0opOsKf2aJikaVbMpsvg7sSINze2WeOOx7edHizbehoEtM71ksDodDH5eMBjU3Zo
+	 GJls8p+zPk9qnpVLl8MkYd9nduDY7KKJ0rmgdnFDTh5C9Ahcs1C1wxWWwWFZUXJR8f
+	 IFes+sisRKrdw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F6D3A40FC2;
-	Thu, 20 Nov 2025 16:10:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD923A40FC2;
+	Thu, 20 Nov 2025 16:10:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] be2net: pass wrb_params in case of OS2BMC
+Subject: Re: [PATCH net v2] vsock: Ignore signal/timeout on connect() if
+ already established
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176365500794.1690915.6904445190938491859.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Nov 2025 16:10:07 +0000
-References: <20251119105015.194501-1-a.vatoropin@crpt.ru>
-In-Reply-To: <20251119105015.194501-1-a.vatoropin@crpt.ru>
-To: =?utf-8?b?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuSA8YS52YXRvcm9waW5AY3Jw?=@codeaurora.org,
-	=?utf-8?b?dC5ydT4=?=@codeaurora.org
-Cc: ajit.khaparde@broadcom.com, sriharsha.basavapatna@broadcom.com,
- somnath.kotur@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- VenkatKumar.Duvvuru@Emulex.Com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
- stable@vger.kernel.org
+ <176365500951.1690915.18295352732751335055.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Nov 2025 16:10:09 +0000
+References: <20251119-vsock-interrupted-connect-v2-1-70734cf1233f@rbox.co>
+In-Reply-To: <20251119-vsock-interrupted-connect-v2-1-70734cf1233f@rbox.co>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, georgezhang@vmware.com,
+ acking@vmware.com, dtor@vmware.com, virtualization@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 19 Nov 2025 10:51:12 +0000 you wrote:
-> From: Andrey Vatoropin <a.vatoropin@crpt.ru>
+On Wed, 19 Nov 2025 15:02:59 +0100 you wrote:
+> During connect(), acting on a signal/timeout by disconnecting an already
+> established socket leads to several issues:
 > 
-> be_insert_vlan_in_pkt() is called with the wrb_params argument being NULL
-> at be_send_pkt_to_bmc() call site.  This may lead to dereferencing a NULL
-> pointer when processing a workaround for specific packet, as commit
-> bc0c3405abbb ("be2net: fix a Tx stall bug caused by a specific ipv6
-> packet") states.
+> 1. connect() invoking vsock_transport_cancel_pkt() ->
+>    virtio_transport_purge_skbs() may race with sendmsg() invoking
+>    virtio_transport_get_credit(). This results in a permanently elevated
+>    `vvs->bytes_unsent`. Which, in turn, confuses the SOCK_LINGER handling.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] be2net: pass wrb_params in case of OS2BMC
-    https://git.kernel.org/netdev/net/c/7d277a7a5857
+  - [net,v2] vsock: Ignore signal/timeout on connect() if already established
+    https://git.kernel.org/netdev/net/c/002541ef650b
 
 You are awesome, thank you!
 -- 
