@@ -1,322 +1,189 @@
-Return-Path: <netdev+bounces-240538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E88BEC76204
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 20:51:07 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A2DEC7622E
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 20:59:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 9EE2F28CA4
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 19:51:06 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 96A45355770
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 19:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 322053019A3;
-	Thu, 20 Nov 2025 19:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C78303A2A;
+	Thu, 20 Nov 2025 19:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ko6uKONu"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Mk+OV9af"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013059.outbound.protection.outlook.com [40.107.159.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB082D6E6B
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 19:51:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763668264; cv=none; b=LkbF+/X82+Afy0o8R9vnL937ESUgDn+JXyOcHBd+Fj2ekaPxVMkQSNsk1w5mXN8eyrzSCKbiX/3Dbyyrrvtzwq7og4iB2yCKDIKnKBwf1oAK/wvUHBleUUmz5pm5opdbJscP6EqFXlYd0AG6UWzIjMKUbcMX9GiIQrc4z9Mqp58=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763668264; c=relaxed/simple;
-	bh=AC3XIuUJXRJWedH3cQ7AriKmum/CB3i3Hw86x/suSDo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j2AcJIdlQX/7FuinV2BtWWnEeHK6fISMJZhmlcJgvoKMunCyRMhSCVqiC7OoF7OjB1i191NiWajz1jiXgvfI1rpQyYFdq/VoIxHtibiPMYHiU5yiB6lCQpFkSBd3ra+hj7funSE2AZxeUVNhGiKlv0OvrrbtVh/r/Zu3zgL7Adk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ko6uKONu; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-47796a837c7so8569975e9.0
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 11:51:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763668261; x=1764273061; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kppobf+HfqrnKfgCmTsw8ifBKt7BpqlOrevM3P0J6K8=;
-        b=ko6uKONub60tYodmmkaH0Wb/cxYILfufXUXeBacK7QCrM2Wi9HsVSX476i9GVsWW/L
-         XgnpE8jjvWAN2MYPxhsi0/7RXla85GbOmNn9UkoP7EA+IpALyrKRsFWpN8mWuZR9mYaV
-         4bElan2WGUrbFgZYtWNV9Qu+yyjNSjyACD0L3HT6p4Z1Myyd/BxZRBzDKJe3fdazw1+8
-         0B+uAq6KA6wxFz5XkY6lmp2ASSmqY7K9lKpyrgKEE4nlM55+K1VxGNOaKbwkQe/PPb8K
-         9DsVioQUBF1VtulcLKUskDyAytucFNpUnpBvSpcrgdo47Qp/RVxwX8KShrRKwupWasJU
-         qS3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763668261; x=1764273061;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kppobf+HfqrnKfgCmTsw8ifBKt7BpqlOrevM3P0J6K8=;
-        b=JbxA/9Hmh5SuN6uwKRU65IngCSgo42HgrRtqnuxomriJdbFMvz8N4iGye8A+ScqGq2
-         VUTLr+1OYRc+O2wZIQqj8nstjJSfWWFPmjxWHklI+ptT3mPHxKcOErjtWihAZbXOD/Ms
-         i7DKosQZoC4D68EOUpAvtJJv7XhWyxGRUemTiKuwF3C7hapmMkPl/ANlmA3xwtQOKbPN
-         DjVN8OK8n1I1wPeebfZqLwg4FZZOVAjJOUcyYoLTHacXWa9xirjsSqxdzSiAMJBXz911
-         BL9skNjAplsGvGMzbG7M4zSQ8F3DUtAVTS0zUwHdlydkVw5SAr4h1UOTF6irgZ2ypdEn
-         N2UQ==
-X-Gm-Message-State: AOJu0YxH6wFz/jdkJjkKo4SmashfhDcZUWhT6Pah1CEHxBk08szCzonE
-	SJ/ke9aquAKwsh62o6rJXurnBYWlX/3Q1RHhP0cz65mptWOGOsC9U9P7
-X-Gm-Gg: ASbGnctMs7RuYme+HzA1SxmWTaBgPTzY1fyam/r5t3ZSqnxU9z4gVjr494wuJs2yOs/
-	vmnNDE1MpaVl8/3CRNBbdmwMVTyFr7PrQIVZ7ChFsuLn+51jQw0J/eR63eqsSi+3J+bArmfbN6W
-	LEkbTYX1CSaGYTafdlV85R/EnAyAgS/W/N4nYjKVd7BGeRwCva63BJtC4duGazue1aY6UynmVB5
-	/CdorAwI8vslHi8MOWa1NCP8KCpoAbBSyeNqMNY0Q+q2O10NnXHUgANlvYYbmrGRQWnUGjuEu5H
-	kuNVGMwNNoy3teQqLXWOr7penbn2wT/+TQWNVzYOq02NmyZdncZQ7k5BjHthRK7sTs0ebSAHU/J
-	bOFeaey+O8cODVVx9Q/T3HhAewvWG0ovS9H8ysYCJcnSJlfFV2XxUM/aPOWyGFhhky5fro9Lji9
-	790uMZnxgS9pqtVI5ygilrwIzxMG6SnQ==
-X-Google-Smtp-Source: AGHT+IENBLk0dQNZRsMkCQ2uReAjBiprjlbsAn/Xo5XqqTbFie50c0omTcUmw7Kww3d4abSbhugR4Q==
-X-Received: by 2002:a05:600c:458e:b0:46e:396b:f5ae with SMTP id 5b1f17b1804b1-477bac0cfb5mr40650755e9.16.1763668260113;
-        Thu, 20 Nov 2025 11:51:00 -0800 (PST)
-Received: from localhost.localdomain ([37.228.206.31])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a9739964sm73324225e9.1.2025.11.20.11.50.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 11:50:59 -0800 (PST)
-From: Fabio Baltieri <fabio.baltieri@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>,
-	nic_swsd@realtek.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2872FE578;
+	Thu, 20 Nov 2025 19:59:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763668791; cv=fail; b=mDL0aSopgKeuFRjCGYNLBbG7Io457YvXyth730AczoK+NJCP1gbeL+BOiWSX50YLqK/lRiBDSVRfUq/xCGqhrNGnNKo9LlxDG2D+fg6lWRpL+dGzJBX2Ew0n8gJ06hrc4+zmwiiSKwKefyVW02aQpW0fC8c5Z2L7oT0yJJIMSrY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763668791; c=relaxed/simple;
+	bh=txX2/Qm3+4NWCO+StyR01UpAZi2ENAGLVb7kD36oauk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=S8GQIwlZSuZWb2szr70CjXh/njyCBt88B02IUn6wSfvcz6lthfucCJuRuK2FgRXm9rrxkU/JOIiXoccmbtCa9nYV07Xx2jWp4sejbTAeyO4Tr/gLdc29zlUPZg5rK4+tuFU0xrw9BPddlHi9Ckk4jVrkpsUQs9AcK/YMbj01rFc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Mk+OV9af; arc=fail smtp.client-ip=40.107.159.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lKFIYLYczkTdQE9nXk6FDneCftLKG+VHmMcDrl/9qVKve5Z0aV5i8qy0fLwhCeCcdRtSMsgbVGuvOQXjKc211sZcutrmGSpzAMujJSPsBRO1mL7XfrydwqtTe+LvTYF5dZnoV0Ju0GK0N4L8yzhrd1/CfAcPy40jdjx/RKZalap4Oj2j5Sj7cV2ouz/VrvkYvRDwo2unWFnA+CpSEcRN5azkVAFopUsCKnIdR2Ixrl2fo/JkBW1+C9AZbDKc9EJN7gAyw4wfRXEHitsU3AkLQUGYA/EL605PEpo4Lv5FBPl7SZAAvGPxjUNSQQp4RsUGVDWLSierTFkaySI3OtgwRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=txX2/Qm3+4NWCO+StyR01UpAZi2ENAGLVb7kD36oauk=;
+ b=jJvrPYX6iyKO4qZEz05GdzLxDK4QFYl8qU2EDB+dtNppJetgTuPeJD01wIppp2C+OTZtW+M7AieGE8h27ga0CBOXYRP8CGdRlwbEZ8nnCGm0YBU0zwx2II8K+TusCsCEPIPoJyWyfAwMcG65f3TeuBPvcz7kmp5K1hDr8zwkJo+IUXKDtu0plFpCiLtBVDNCNW4mutd7GXaXEuS5R9kZcALYfNEJoiq1WIt8gQ0YXchUGlS+VwDJWYxIy4Z/pjhpgaNWKB0KnrF8U6EsuFRYyqYYWHY2/KR23rbvW71+9yH1oQ42rLtbRAB9VZPQubINkII1fDvdhaksoT8ajxafHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=txX2/Qm3+4NWCO+StyR01UpAZi2ENAGLVb7kD36oauk=;
+ b=Mk+OV9afFq/atIweOywWfJ8is8jG25aC0nGdTrsSN08d2B9KEPd8d4cwJ+O+3COn8EmJEQ/1XXbg0q6YIeUFDMJHAfLYM+GHczWpHP2/OokgzWmnvvqjRGj93a3RZUo1gl4IXG6XsLDNZLHSS7750OGP61OhhRZEgpBKj16CeCGz1TNR+DZ9lCb7SNsg1GhJlYUTOMVSI+YEgC+oy+Q5a5/mpTox7igjcX++7WHwLn8a7y2awrj4FsRtrJci5xBZti85QeRUkhMdhEqANZVZrMUbqsHTOuSHPwvFDDg+lJjMuJT8ED4u9FhAteFBNbO73H0fvkDjHXiPUv0ZZQUmoQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DBBPR04MB7497.eurprd04.prod.outlook.com (2603:10a6:10:204::9)
+ by VI0PR04MB11865.eurprd04.prod.outlook.com (2603:10a6:800:2f8::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Thu, 20 Nov
+ 2025 19:59:45 +0000
+Received: from DBBPR04MB7497.eurprd04.prod.outlook.com
+ ([fe80::503f:b388:6d07:adff]) by DBBPR04MB7497.eurprd04.prod.outlook.com
+ ([fe80::503f:b388:6d07:adff%4]) with mapi id 15.20.9343.011; Thu, 20 Nov 2025
+ 19:59:44 +0000
+Date: Thu, 20 Nov 2025 21:59:41 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Lee Jones <lee@kernel.org>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Michael Zimmermann <sigmaepsilon92@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fabio Baltieri <fabio.baltieri@gmail.com>
-Subject: [PATCH v2] r8169: add support for RTL8127ATF
-Date: Thu, 20 Nov 2025 19:50:55 +0000
-Message-ID: <20251120195055.3127-1-fabio.baltieri@gmail.com>
-X-Mailer: git-send-email 2.47.3
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 08/15] net: dsa: sja1105: transition OF-based
+ MDIO drivers to standalone
+Message-ID: <20251120195941.qumgpiwvkxvfjkug@skbuf>
+References: <20251118190530.580267-1-vladimir.oltean@nxp.com>
+ <20251118190530.580267-9-vladimir.oltean@nxp.com>
+ <20251120144046.GE661940@google.com>
+ <20251120151458.e5syoeay45fuajlt@skbuf>
+ <20251120163603.GK661940@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251120163603.GK661940@google.com>
+X-ClientProxiedBy: VI1PR08CA0221.eurprd08.prod.outlook.com
+ (2603:10a6:802:15::30) To DBBPR04MB7497.eurprd04.prod.outlook.com
+ (2603:10a6:10:204::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DBBPR04MB7497:EE_|VI0PR04MB11865:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8dea2cd4-07f6-4ee9-f7eb-08de286f59ad
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|10070799003|19092799006|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?B04zynKT7gcg3ytNEnz0M+1Lu+mEpsYAY6qyt0gGFRHXQMPf/sFUpenfxqY7?=
+ =?us-ascii?Q?UxiY+T3DO2CbJuOmc48kf6jp+xfn/7QMC0iJGk+7Z1mBSdkvnCBUPX2VTV4G?=
+ =?us-ascii?Q?uOlSMD9NfoTautUU9NhbQCbDLFKPzo1sgzh1T2CwqaGkdLZyf2TaAxHsshs3?=
+ =?us-ascii?Q?wI66xriSwiLocXMLpOZDG4jpWeaTB7yTvcpk/JQthkVN3TZwx1L7rBv26i6u?=
+ =?us-ascii?Q?iOVEoAsVA8RHLArUyREd1TgEJrGmPMmFEGNI3y1kbcHE4hVxY98j/43ek/tq?=
+ =?us-ascii?Q?KauhnLGOXd0I36jwnJkD7u6H9UWNN6S6m9VuniyXHceLkTLUbYEwm9oAxvkD?=
+ =?us-ascii?Q?1R92nB3JKl2u0gZD+GHPEBZi1ysrJgCt8oWs4r5B5tm923Cf9eceE9KIDQJH?=
+ =?us-ascii?Q?j8mMZIHWaXo30KsVS5vdtKd+EX01NdxIbO8UNM+YHundmyOEy0tZHS42P4Kx?=
+ =?us-ascii?Q?nHEARzdjefGOx9jZTOboam9LrFe4G2vbxkCr/ZUKO2pqLmAPdDDSygAFooXo?=
+ =?us-ascii?Q?6OCxzobcFJCHwD8WrBxnvIT+gTnkLCcbTcw63sjZqshuOQfhMKrQsDyydKoX?=
+ =?us-ascii?Q?8i6JZUvwydCP88OOIfXjGcgbExcaGidAy8SPcorwhD7wZyrvMdiN5/0NZFE2?=
+ =?us-ascii?Q?Sx0/9w6atogGol8V6aFnSgD4FgCSGRkgdDa/nlxvVlYZwlpqPcmNJZxFnLD1?=
+ =?us-ascii?Q?TC6pkrKr2tPNVewtw6UmxvDstkwPBJfTGY5i68cUFechv0Z4OXtRX+ZPsKAe?=
+ =?us-ascii?Q?fHd7jJzrsOuzuqWfQ5xUlIyyjmYdZqWJNQq3S0x1E2ahDWYTd/80hyHLb0tt?=
+ =?us-ascii?Q?oVJYNHOE0rMU8qalehDTd+MOybLuSx/M9HAn+FweWUs+YnWEbUYSwzy4zPE2?=
+ =?us-ascii?Q?W8K3aGmJgJLZFtofY8RZl5Or6OY79afGuqXU2hXbEMI6GGGreWOIftNSaK8/?=
+ =?us-ascii?Q?ATbYHm7/35td08srCmOLm0O825CEDujJ2m8OpJ4opeISQAeRn5uMdMUYo0sL?=
+ =?us-ascii?Q?HoO4wfA+PDXZwIIR1G34SBlKYynDUApPoU4wtqyt6lCzS1WwA/z2hnUFItkk?=
+ =?us-ascii?Q?z9X9G5v2/vIdN5GXYAg1CG5iks9vcyDOrbgFQyRlLkBVbq3+gI/hViEj/itw?=
+ =?us-ascii?Q?QKuOAwjxn+KfyGn7kklU+VXTPAffnfVxSV66mvxIXEnMTAkjHkj6O3rOtMd6?=
+ =?us-ascii?Q?IonlBA9T30MxnmNdgehEIHLdHAln4mGRn0he5vdmCDlISphiSiDd+GqAWZFo?=
+ =?us-ascii?Q?O/YfGMIoZHWFIP/lVPlGXRoO2UWUvC2ChLut6DjrlniQLEdc91fBGNK82t/m?=
+ =?us-ascii?Q?0voHC+QAxyp694YXoSVm5nhhRLy6Cz8HHpzLZmbi6SsfIqiSudGNFKB8j1Sl?=
+ =?us-ascii?Q?daXkPQsHzbMYaqElU5Sg6uOvkvioC+WYC63/SbB6WOJkA+gdyfvJmRnXGeQ9?=
+ =?us-ascii?Q?akzw3uEBUddr2AS4ql7L9savRApZMHTN?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7497.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(19092799006)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?rGHyL+8COcxQQ6hLGaWZTJx4bziY+EnUWwGqrKj0uw+83jWehyoujg+xZYPJ?=
+ =?us-ascii?Q?JR223ht3Fobw8XxUJoFHlg6kbPCEIlyKa3RYHIGGK9cbWv/TgdlMxZQ1pW2U?=
+ =?us-ascii?Q?KlopnQsFvurSOeaMcfX8sYH8uIzNCamAROaSmzx/G5HqrDiQDRXyymL6+mkX?=
+ =?us-ascii?Q?Ld608LMGx1o8xXSvaRF/PrB5f6rx6kgyDOL/y80OdIphvSld1z2vQPFacWfT?=
+ =?us-ascii?Q?U71o/W4npxxPbBoKHCEt1RdFIULyRaR+jHIS5bUXnU9G3RS2Wfk7g3jcMrqo?=
+ =?us-ascii?Q?9sAOfGz9q7WXGX72CAr2st4WhHvT2YINmZqESlDqq/y030lF+f2wZHz+5SKJ?=
+ =?us-ascii?Q?7x8U0YEv43xZwqk2EdgNQFE18HCjWJYY34BLgvn0jjPC6QV5REHO/xHwrBdb?=
+ =?us-ascii?Q?cMXL9suOl7cpaYU1ALIFCDLywFiaGFChFl4G6KIVaXFhZe4GjN+EgrsVnBiE?=
+ =?us-ascii?Q?z4dtjUxhyMFEjCe6X1nyMknvgEm3DjPuqzOs0f1mr9Q8dsFddyLBlD98OQPV?=
+ =?us-ascii?Q?D6RPNGQxUFG9dv7J0peQttGPMdAr5c21PoRxq5EMZaRsi280Xk03oG6g8rR7?=
+ =?us-ascii?Q?QBOheTikr5YsYzCle9mmEUi/Q5k/+f9ybFJAa6D2U4rLnzKCH4fTnqtJVjoF?=
+ =?us-ascii?Q?7Dcj4TgfK9fiT3cMNM641WA7rNjlQ3fXNPddkNxpjE4k2qSP3UTEtQri0g7j?=
+ =?us-ascii?Q?HpVLIM5jCqS+08qK38a9KO/PjOAM04E9BxnscfAWGKaRL0d1QYw7Q+16AuGY?=
+ =?us-ascii?Q?jUoO4yLZCqxyP5o4CSiSILtq8xh/XDTjeVr2hB6QkVfF1l6ZGj03kmyM2Jby?=
+ =?us-ascii?Q?ocziGaHQNo1uKlYNE/hclAR4QBuQMMpvdy/KgdnLFC8mWzQXghpbWfGl+0jG?=
+ =?us-ascii?Q?DLYud+9ylGUa+44qIzcM36ApXv/emj7upvtI+jhQ0h1nou+HBvVCBUxvRLBE?=
+ =?us-ascii?Q?lR9nlvHYr+yJv1qqDkxeBO499iU9biLti2RMwCPqpRytaQO43LFR3JcdTn/G?=
+ =?us-ascii?Q?ho9KMHXjhAGFeE6NVwgM/1Me4qxfKLFyN8HfydOaNmev1LCmmWNN07xy+rVF?=
+ =?us-ascii?Q?XL2+I3gq8gSjrEIZO8LaXxF6fK+oY67KZhrVeWrA1kbo8f6R4J270abc2hNO?=
+ =?us-ascii?Q?kN66TL/KfJxDolsO8tq4NAlu5Pkos5X8G5yMFTS90w8ZkqZQd5h/AChr7YTq?=
+ =?us-ascii?Q?+tSmE9zgF1vg7fmfagbTS54oL12uGT+k75UmjP0e/Cn6xFhrLZI1Qlsmy0N2?=
+ =?us-ascii?Q?UrXvRtBlSPGFOU6dTEKXXjoqqOLbr3XI1D72vQT/HcJZhyhulz6cQuQ/dof5?=
+ =?us-ascii?Q?rCTJcv0leZTjBId4J4+gQLheeQglCdnTIQYV5sMOlP9hQVYW1H9EfPudFfKl?=
+ =?us-ascii?Q?1riK6VbLDpa19JE78MbPkMnMzy17SiKJucveP1MYe/9CHKt8viG55YdhZtq/?=
+ =?us-ascii?Q?L/km41QuFbaVJXDgyr4V4qyTpdwrFLSLeOXVcdaX+69LquIrhwmqW8/YGtY5?=
+ =?us-ascii?Q?nlBwii5iqZmAGMmVVF8Ijat2Eqa0c7ujwa/qhxQwWMUwHbdnuQASVYGQpfDu?=
+ =?us-ascii?Q?Q93wACyRyCpMf+GuMpTfOagozcm8F8Ljxajtb7FUckcQw1PsWrVtMNRnoD2l?=
+ =?us-ascii?Q?A4u+8LBJzIsYxIWCExca6oKcvusDQcoLN3Eqp7uT8K1bn2p1bqf14d/5hfhO?=
+ =?us-ascii?Q?QsEWNw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8dea2cd4-07f6-4ee9-f7eb-08de286f59ad
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7497.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2025 19:59:44.8248
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OoB5X5QjZ626ZIFPemrmPhTNm5itcBThe1t9CyRsEMhNrPwSPa6An6VFB5q3+1HJPe95GBAw/GuT3JF6heyX6g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB11865
 
-Add support for ATF variant of the RTL8127, this uses an SFP transceiver
-instead of the twisted pair one and only runs at 1Gbps or 10Gbps, only
-10Gbps is supported with this patch.
+On Thu, Nov 20, 2025 at 04:36:03PM +0000, Lee Jones wrote:
+> The canonical answer goes 3 ways: If you want to use the MFD API, move
+> the handling to drivers/mfd.
 
-The change is based on the r8127 driver package version 11.015.00
-available on the Realtek website and also on
-https://github.com/openwrt/rtl8127.
+Wait, so now it's negotiable? What about "this device is not an MFD"
+from the other patch? Move it to another folder and suddenly it's an MFD?
+https://lore.kernel.org/netdev/20251120153622.p6sy77coa3de6srw@skbuf/
 
-There's no public datasheet for the chip so this is just porting over
-the original vendor code to the API and style of the upstream one.
+> If it's possible, use one of the predetermined helpers like
+> of_platform_populate() (and I think we authored another one that
+> worked around some of its issues, but I forget where we put it!).
 
-Signed-off-by: Fabio Baltieri <fabio.baltieri@gmail.com>
----
+yay...
 
-Hi, did more tests with 1g mode on the v1 of this patch, the setting
-itself works but triggering it from ethtool reliably seems problematic
-due to some weird behavior of the phy code which end up reporting a
-specific link speed when the link is down, making it impossible to set
-it with ethool as it thinks it's already set.
+I don't need the code necessarily, just the overall idea if you remember it.
 
-Since it seems like supporting 1g properly needs expanding the scope of
-the patch, I'm taking the suggestion from Heiner in v1 review and
-stripped this down so it only supports 10g, which is likely what the
-vast majority of the users need anyway.
+> Or if all else fails, you have to register the device the old
+> fashioned way with the platform_device_*() API.
 
-Also tested this on suspend/resume, this is also affected by the wol
-issue but with that bit set it now works correctly.
-
-v1 -> v2
-- stripped out 1g support
-- moved the sds settings in rtl8169_init_phy() so it get called on
-  resume
-- renamed fiber_mode to sfp_mode to avoid confusion
-
-Cheers,
-Fabio
-
- drivers/net/ethernet/realtek/r8169_main.c | 128 +++++++++++++++++++++-
- 1 file changed, 126 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index d18734fe12e..e19518c7b98 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -729,6 +729,7 @@ struct rtl8169_private {
- 	unsigned supports_gmii:1;
- 	unsigned aspm_manageable:1;
- 	unsigned dash_enabled:1;
-+	unsigned sfp_mode:1;
- 	dma_addr_t counters_phys_addr;
- 	struct rtl8169_counters *counters;
- 	struct rtl8169_tc_offsets tc_offset;
-@@ -842,7 +843,8 @@ static bool rtl_supports_eee(struct rtl8169_private *tp)
- {
- 	return tp->mac_version >= RTL_GIGA_MAC_VER_34 &&
- 	       tp->mac_version != RTL_GIGA_MAC_VER_37 &&
--	       tp->mac_version != RTL_GIGA_MAC_VER_39;
-+	       tp->mac_version != RTL_GIGA_MAC_VER_39 &&
-+	       !tp->sfp_mode;
- }
- 
- static void rtl_read_mac_from_reg(struct rtl8169_private *tp, u8 *mac, int reg)
-@@ -1399,6 +1401,95 @@ DECLARE_RTL_COND(rtl_ocp_tx_cond)
- 	return RTL_R8(tp, IBISR0) & 0x20;
- }
- 
-+#define R8127_SDS_CMD 0x2348
-+#define R8127_SDS_ADDR 0x234a
-+#define R8127_SDS_DATA_IN 0x234c
-+#define R8127_SDS_DATA_OUT 0x234e
-+
-+#define R8127_MAKE_SDS_ADDR(_index, _page, _reg) \
-+	(((_index) << 11) | ((_page) << 5) | (_reg))
-+
-+#define R8127_SDS_CMD_IN BIT(0)
-+#define R8127_SDS_WE_IN BIT(1)
-+
-+DECLARE_RTL_COND(rtl_sds_cmd_done)
-+{
-+	return RTL_R16(tp, R8127_SDS_CMD) & R8127_SDS_CMD_IN;
-+}
-+
-+static u16 rtl8127_sds_phy_read(struct rtl8169_private *tp,
-+				u16 index, u16 page, u16 reg)
-+{
-+	RTL_W16(tp, R8127_SDS_ADDR, R8127_MAKE_SDS_ADDR(index, page, reg));
-+	RTL_W16(tp, R8127_SDS_CMD, R8127_SDS_CMD_IN);
-+
-+	if (rtl_loop_wait_low(tp, &rtl_sds_cmd_done, 1, 100))
-+		return RTL_R16(tp, R8127_SDS_DATA_OUT);
-+	else
-+		return 0xffff;
-+}
-+
-+static void rtl8127_sds_phy_write(struct rtl8169_private *tp,
-+				  u16 index, u16 page, u16 reg, u16 val)
-+{
-+	RTL_W16(tp, R8127_SDS_DATA_IN, val);
-+	RTL_W16(tp, R8127_SDS_ADDR, R8127_MAKE_SDS_ADDR(index, page, reg));
-+	RTL_W16(tp, R8127_SDS_CMD, R8127_SDS_CMD_IN | R8127_SDS_WE_IN);
-+
-+	rtl_loop_wait_low(tp, &rtl_sds_cmd_done, 1, 100);
-+}
-+
-+static void rtl8127_sds_phy_modify(struct rtl8169_private *tp,
-+				   u16 index, u16 page, u16 addr,
-+				   u16 mask, u16 set)
-+{
-+	u16 val;
-+
-+	val = rtl8127_sds_phy_read(tp, index, page, addr);
-+	val = (val & ~mask) | set;
-+	rtl8127_sds_phy_write(tp, index, page, addr, val);
-+}
-+
-+static void rtl8127_sds_phy_reset(struct rtl8169_private *tp)
-+{
-+	RTL_W8(tp, 0x2350, RTL_R8(tp, 0x2350) & ~BIT(0));
-+	udelay(1);
-+
-+	RTL_W16(tp, 0x233a, 0x801f);
-+	RTL_W8(tp, 0x2350, RTL_R8(tp, 0x2350) | BIT(0));
-+	udelay(10);
-+}
-+
-+static void rtl8127_sds_phy_exit_1g(struct rtl8169_private *tp)
-+{
-+	rtl8127_sds_phy_modify(tp, 0, 1, 31, BIT(3), 0);
-+	rtl8127_sds_phy_modify(tp, 0, 2, 0,
-+			       BIT(13) | BIT(12) | BIT(6),
-+			       BIT(6));
-+
-+	rtl8127_sds_phy_reset(tp);
-+}
-+
-+static void rtl8127_set_sds_phy_caps_10g(struct rtl8169_private *tp)
-+{
-+	u16 val;
-+
-+	RTL_W16(tp, 0x233a, 0x801a);
-+
-+	val = RTL_R16(tp, 0x233e);
-+	val &= BIT(13) | BIT(12) | BIT(1) | BIT(0);
-+	val |= BIT(12);
-+	RTL_W16(tp, 0x233e, val);
-+
-+	r8169_mdio_write(tp, 0xc40a, 0x0);
-+	r8169_mdio_write(tp, 0xc466, 0x3);
-+	r8169_mdio_write(tp, 0xc808, 0x0);
-+	r8169_mdio_write(tp, 0xc80a, 0x0);
-+
-+	val = r8168_phy_ocp_read(tp, 0xc804);
-+	r8168_phy_ocp_write(tp, 0xc804, (val & ~0x000f) | 0x000c);
-+}
-+
- static void rtl8168ep_stop_cmac(struct rtl8169_private *tp)
- {
- 	RTL_W8(tp, IBCR2, RTL_R8(tp, IBCR2) & ~0x01);
-@@ -1512,6 +1603,15 @@ static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
- 	}
- }
- 
-+static bool rtl_sfp_mode(struct rtl8169_private *tp)
-+{
-+	if (tp->mac_version == RTL_GIGA_MAC_VER_80 &&
-+	    (r8168_mac_ocp_read(tp, 0xd006) & 0xff) == 0x07)
-+		return true;
-+
-+	return false;
-+}
-+
- static void rtl_set_d3_pll_down(struct rtl8169_private *tp, bool enable)
- {
- 	if (tp->mac_version >= RTL_GIGA_MAC_VER_25 &&
-@@ -2390,7 +2490,10 @@ static void rtl8125a_config_eee_mac(struct rtl8169_private *tp)
- 
- static void rtl8125b_config_eee_mac(struct rtl8169_private *tp)
- {
--	r8168_mac_ocp_modify(tp, 0xe040, 0, BIT(1) | BIT(0));
-+	if (tp->sfp_mode)
-+		r8168_mac_ocp_modify(tp, 0xe040, BIT(1) | BIT(0), 0);
-+	else
-+		r8168_mac_ocp_modify(tp, 0xe040, 0, BIT(1) | BIT(0));
- }
- 
- static void rtl_rar_exgmac_set(struct rtl8169_private *tp, const u8 *addr)
-@@ -2440,6 +2543,25 @@ static void rtl8169_init_phy(struct rtl8169_private *tp)
- 	    tp->pci_dev->subsystem_device == 0xe000)
- 		phy_write_paged(tp->phydev, 0x0001, 0x10, 0xf01b);
- 
-+	if (tp->sfp_mode) {
-+		rtl8127_sds_phy_exit_1g(tp);
-+		rtl8127_set_sds_phy_caps_10g(tp);
-+
-+		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
-+		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
-+		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
-+		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_100baseT_Full_BIT);
-+		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_1000baseT_Full_BIT);
-+		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_2500baseT_Full_BIT);
-+		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_5000baseT_Full_BIT);
-+
-+		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_Autoneg_BIT);
-+		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
-+		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
-+
-+		tp->phydev->autoneg = 0;
-+	}
-+
- 	/* We may have called phy_speed_down before */
- 	phy_speed_up(tp->phydev);
- 
-@@ -5453,6 +5575,8 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	tp->dash_type = rtl_get_dash_type(tp);
- 	tp->dash_enabled = rtl_dash_is_enabled(tp);
- 
-+	tp->sfp_mode = rtl_sfp_mode(tp);
-+
- 	tp->cp_cmd = RTL_R16(tp, CPlusCmd) & CPCMD_MASK;
- 
- 	if (sizeof(dma_addr_t) > 4 && tp->mac_version >= RTL_GIGA_MAC_VER_18 &&
--- 
-2.47.3
-
+Do you realize that by this, you are inviting me to waste time until the
+next reviewer rightfully asks, why didn't you use MFD, then I'll point
+them towards this discussion, but you didn't really answer?
 
