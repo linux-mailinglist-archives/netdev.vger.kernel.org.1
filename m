@@ -1,82 +1,119 @@
-Return-Path: <netdev+bounces-240251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3793AC71E32
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:48:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BBDB0C71E3B
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:50:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 2F7542989E
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 02:48:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id BADC928BFF
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 02:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6156229D270;
-	Thu, 20 Nov 2025 02:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232B82F5465;
+	Thu, 20 Nov 2025 02:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="Qx0VAVFg"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r6p8/rba"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E971E23C4F3;
-	Thu, 20 Nov 2025 02:48:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198622F39A2
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 02:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763606924; cv=none; b=Er/G+5ClR4YbHERTKghRtVm/V6a+GhmPc/uT9LrzmyFWugqX/94jhLQ1mxAuCA7hrc0qJi1ZpAqHqJoBft4sW5wdeWaSPlzf55M81sfL5aRLDwUB8daXZsXuKAfb7eIqycWc3dBdWkPAEH1HjTlIPI4LAOaHKrc3fdWXpvngr+M=
+	t=1763606998; cv=none; b=T/kOAVwx9/r8OyOx3jTTlq9mPoKS24UMI93qXsFC/BSv6sWtiDLv9wvkiTLixqXn0w6Ht1MbDvKpETdKwiMYnF2L15CX98pOyejRs/L4I1hg2mVHONGjDrkOtb7XpviGT3lXwk+KsAziq+t+YhbY6cnOr4cZrNeHhHBEhcGtg+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763606924; c=relaxed/simple;
-	bh=nf9VTDivm/in8YbqaK9ezXTizbY/IXqU2F9LZDFm9CQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=JVUF9BHPqtn0y07f/6FbIOoRGxwoev1GYbjMM+0Zfoo+6a126RFrHfji5mYnFsPjLsyEuxO/LjkT+JLnYxRdxY8Fq9FHmFeh/TrW/07R+aaKplftRm56FqfOL6uyHn+tp5iixv+Uq8J47s01rfF2xSDHFaMG2TpWmc2UfQm6/xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=Qx0VAVFg reason="signature verification failed"; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=aVhFvntcAiHl1cUfGa7ZdVn7XulScDHz6YAjay861B8=; b=Q
-	x0VAVFgpJHw32eis5hycEVn3qgnMp6fTmfMtxaYImGf2KUEsRsnwioQtH5JT8aqI
-	T4rQ236VA/DkGSfOWDY/jY4u8V6gnzPldPdsAYN/axi6Rfbt6rBiGcdLAnrdVVjY
-	SfbvOpgrMNmsJkuJeCkcUe2Ez5EZEfl/+D35dhOxLw=
-Received: from slark_xiao$163.com ( [2409:895a:3841:c8e7:efe9:818f:26:6687]
- ) by ajax-webmail-wmsvr-40-121 (Coremail) ; Thu, 20 Nov 2025 10:47:44 +0800
- (CST)
-Date: Thu, 20 Nov 2025 10:47:44 +0800 (CST)
-From: "Slark Xiao" <slark_xiao@163.com>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: mani@kernel.org, loic.poulain@oss.qualcomm.com, ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re:Re: [PATCH v3 0/2] *** Add support for Foxconn T99W760 ***
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
-In-Reply-To: <20251119180735.1baeaa8b@kernel.org>
-References: <20251119105615.48295-1-slark_xiao@163.com>
- <20251119180735.1baeaa8b@kernel.org>
-X-NTES-SC: AL_Qu2dAfqbuUAt4iSbYukfmk8Sg+84W8K3v/0v1YVQOpF8jArpwSECY0B8BUfdzf6lCgOMiBSzdglMzf5CZrRIeK4rFIuMn+hCzQiN9/GlcT0saA==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1763606998; c=relaxed/simple;
+	bh=lcrVwZLgR5ItAg4hTqw5DCPtnAFmviQlQW6jyyCm6AQ=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=qej16ZVO6s9CnYVQ6/3Y/OHllS3m/ARnteOaeoDpqyKl3XwMxr2jOLr4P/qimbaOzjlSYTIwX2CAMdk+gIWbrOjDHyBZDdMSrK89BbkVnCbPW3mmr0vfeYgMa9RPFQc2kq/XhcVOjV7YazdGdCLUF/3O5PJRH1KNMvTIHOiIVJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r6p8/rba; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <16b8499d.29cd.19a9f29223c.Coremail.slark_xiao@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:eSgvCgC31GpQgR5pym8mAA--.5547W
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbibh4MZGkec8WEzgABsS
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1763606993;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rAmlZ19Q2ySJYciDDAnJfVxjnGiyaxmJEvZmZ5AC8SI=;
+	b=r6p8/rbaNJADRrVWiyUBHjV59EDhYdGHQ8MwKzVPpuSpMjcXvSmkRJ4hdHg56OEzMq5dc3
+	Do6Sp1UXC91GFdgK+4vDbM0WonDRKHr1YWnC57sSxMh2USyoD69HX5fih5kOabSc/w3rla
+	o/vnqs2uFFH5whbmB7SP1GxXLOLzk0Q=
+Date: Thu, 20 Nov 2025 02:49:43 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <5a66955891ef8db94b7288bbb296efcc0ac357cf@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH bpf-next v1 1/3] bpf, sockmap: Fix incorrect copied_seq
+ calculation
+To: "Jakub Sitnicki" <jakub@cloudflare.com>
+Cc: bpf@vger.kernel.org, "John Fastabend" <john.fastabend@gmail.com>, "David 
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Simon Horman" <horms@kernel.org>, "Neal Cardwell"
+ <ncardwell@google.com>, "Kuniyuki Iwashima" <kuniyu@google.com>, "David
+ Ahern" <dsahern@kernel.org>, "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>, "Andrii Nakryiko"
+ <andrii@kernel.org>, "Martin  KaFai Lau" <martin.lau@linux.dev>, "Eduard
+ Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong
+ Song" <yonghong.song@linux.dev>, "KP  Singh" <kpsingh@kernel.org>,
+ "Stanislav Fomichev" <sdf@fomichev.me>, "Hao  Luo" <haoluo@google.com>,
+ "Jiri Olsa" <jolsa@kernel.org>, "Shuah Khan" <shuah@kernel.org>, "Michal
+ Luczaj" <mhal@rbox.co>, "Stefano Garzarella" <sgarzare@redhat.com>, "Cong
+ Wang" <cong.wang@bytedance.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+In-Reply-To: <87zf8h6bpd.fsf@cloudflare.com>
+References: <20251117110736.293040-1-jiayuan.chen@linux.dev>
+ <20251117110736.293040-2-jiayuan.chen@linux.dev>
+ <87zf8h6bpd.fsf@cloudflare.com>
+X-Migadu-Flow: FLOW_OUT
 
-CgpBdCAyMDI1LTExLTIwIDEwOjA3OjM1LCAiSmFrdWIgS2ljaW5za2kiIDxrdWJhQGtlcm5lbC5v
-cmc+IHdyb3RlOgo+T24gV2VkLCAxOSBOb3YgMjAyNSAxODo1NjoxMyArMDgwMCBTbGFyayBYaWFv
-IHdyb3RlOgo+PiBTdWJqZWN0OiBbUEFUQ0ggdjMgMC8yXSAqKiogQWRkIHN1cHBvcnQgZm9yIEZv
-eGNvbm4gVDk5Vzc2MCAqKioKPgo+PiAqKiogVGhpcyBzZXJpZXMgYWRkIHN1cHBvcnQgZm9yIEZv
-eGNvbm4gNUcgbW9kZW0gVDk5Vzc2MCAqKioKPgo+UGxlYXNlIGRvbid0IHdpdGggdGhlICoqKi4K
-TXkgYmFkLiBJdCdzIG15IGZpcnN0IHRpbWUgdG8gdXNlIHRoZSBjb3ZlciBsZXR0ZXIuCkFuZCBJ
-IHJlcGxhY2UgdGhlIGNvbnRlbnRzIGFuZCBzdWJqZWN0IGFjY29yZGluZyB0byB0aGUgZ3VpZGUg
-YnV0Cm1pc3NpbmcgdGhvc2UgKioqLiBXaWxsIHJlbW92ZSBpdCBpZiBuZXh0IHZlcnNpb24gaXMg
-cmVxdWlyZWQuCgpUaGFua3M=
+November 20, 2025 at 03:53, "Jakub Sitnicki" <jakub@cloudflare.com mailto=
+:jakub@cloudflare.com?to=3D%22Jakub%20Sitnicki%22%20%3Cjakub%40cloudflare=
+.com%3E > wrote:
+
+[...]
+> >  +/* The BPF program sets BPF_F_INGRESS on sk_msg to indicate data ne=
+eds to be
+> >  + * redirected to the ingress queue of a specified socket. Since BPF=
+_F_INGRESS is
+> >  + * defined in UAPI so that we can't extend this enum for our intern=
+al flags. We
+> >  + * define some internal flags here while inheriting BPF_F_INGRESS.
+> >  + */
+> >  +enum {
+> >  + SK_MSG_F_INGRESS =3D BPF_F_INGRESS, /* (1ULL << 0) */
+> >  + /* internal flag */
+> >  + SK_MSG_F_INGRESS_SELF =3D (1ULL << 1)
+> >  +};
+> >  +
+> >=20
+>=20I'm wondering if we need additional state to track this.
+> Can we track sk_msg's construted from skb's that were not redirected by
+> setting `sk_msg.sk =3D sk` to indicate that the source socket is us in
+> sk_psock_skb_ingress_self()?
+
+Functionally, that would work. However, in that case, we would have to ho=
+ld
+a reference to sk until the sk_msg is read, which would delay the release=
+ of
+sk. One concern is that if there is a bug in the read-side application, s=
+k
+might never be released.
+
+
+> If not, then I'd just offset the internal flags like we do in
+> net/core/filter.c, BPF_F_REDIRECT_INTERNAL.
+
+I think we can try offsetting the internal flags.
 
