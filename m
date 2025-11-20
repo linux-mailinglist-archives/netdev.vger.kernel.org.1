@@ -1,110 +1,289 @@
-Return-Path: <netdev+bounces-240361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41D9AC73C3E
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:37:08 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18BFC73C6B
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:41:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DE95A357F86
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:31:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 003914E68EF
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A732DF701;
-	Thu, 20 Nov 2025 11:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A39932BF21;
+	Thu, 20 Nov 2025 11:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VxgBKxUq"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="TnpMXkKR";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LPGF8y4Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6A14A3C;
-	Thu, 20 Nov 2025 11:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564F13002A8
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 11:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763638270; cv=none; b=VnbiU6c89zs3ZxsGJegoE9sU55txjrdwiPOVxfCWxqoVBzmi6HwdJ5n9YiaDFGi4TGHy8MHBVtO+n1zIApYrsm+zUDt5nAvU7fuvcWjUZpQGfQJ3ITgVtBi4OWb8kt6dJo3Zm8E8fyyIAe7bjl2J7wY9T6U58OthPIzEseewgco=
+	t=1763638585; cv=none; b=Q7chUSIgigCkkbfXmbo3d01bCNbcTHrqEWjCJj5AGE5IS4tBfquQW9f+f+f9xjJes4wmNPFAPiLTaWw0CvK/EEYBZuhOSnTIw7Q7lJSvmdAA/oW7R0JpN4Me9BuE9flGacn3Dbi0lO8zB0pdV3rhZpImaUgpGtAfQc1g8jlK9oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763638270; c=relaxed/simple;
-	bh=QJGUiA83Zy67wUbf2pESMCDtasYTZsnvSogijE02TjY=;
+	s=arc-20240116; t=1763638585; c=relaxed/simple;
+	bh=kgXlwnzmYFsXTZ8lHcA5mi62tkQY8RwrDdQ1rYh+2g4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iec8t78BZ25GfCrUZ7UlNtnpeRP/jPpir9ZEMQsvr8Jh7my9I2w1zc9IphlQ/H+UXyqNNx6ZwZKKjjI90yFosf/EsV1+5LBmzaR6efaQwcKwJvQw43MC5Mowq/VorTCEr9h/7oAc9531Vp69Qdnp3cJlJwm0VloX1rKkD1BDg6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VxgBKxUq; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=kiWH0/YZBx9aFxNDPIFdolJuvMUpl0yJwssz6YI10nY=; b=VxgBKxUq2Aq7FKSBV1RbjVUfju
-	+zReZgekJzT9LDjDfe4qebH7lqQNCk7+WUnAV/ZO+7Qxnh5EBuxb8ZX6Z1jVpkGi4x/bc++LYkMVQ
-	F35otdxM3SNxdjDcBH+5J6gAgmjqlNRsV4zD9R9QS9KsoWOA/VdMggGSKQfchF0R0y6QrN61nq2vQ
-	LHH3nuW1mbDsOF9PT2srPRfQhpFUiVCvuep1RQnrQ/3Tk8vWY74m9wdgIA7/xP8CoqguR/mhEffIS
-	Is28Cbajewd52w6d9Ky14ayNlSVvKFowAjsP2q07eCDZh11rPRLA8JCNmRefn87+4LlOWXhmTPzWP
-	qqOt9epQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54204)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vM2sQ-000000006A3-0xfZ;
-	Thu, 20 Nov 2025 11:31:02 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vM2sO-000000004LM-0FuK;
-	Thu, 20 Nov 2025 11:31:00 +0000
-Date: Thu, 20 Nov 2025 11:30:59 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next v2 1/3] net: stmmac: qcom-ethqos: use u32 for
- rgmii read/write/update
-Message-ID: <aR778ygQp-SZO19n@shell.armlinux.org.uk>
-References: <aR76i0HjXitfl7xk@shell.armlinux.org.uk>
- <E1vM2mq-0000000FRTi-3y5F@rmk-PC.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=guGOgXcqlJ7qcgwM1C95onu0a+nIdY7UgRfW5vMs3s157U01bqpDeG645nDT4l1UC+JwQjvRa019YxNOPXDONiZHE5Qc5f3MUsWLm50SiqibRoXCwQ9aQFr2XIEKMYW6JrKjY0ZCIsuKPoB8iVYNCmqOlOdV/oLk7euGIQThDgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=TnpMXkKR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LPGF8y4Q; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 37C14EC0370;
+	Thu, 20 Nov 2025 06:36:21 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Thu, 20 Nov 2025 06:36:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1763638581; x=1763724981; bh=duJmX5HHOziadQf5q4kEyZjSRR1LrD50
+	zaH8pVR/GKo=; b=TnpMXkKRYM2qwcsuVgkhBt00zkAurS4vLdp3QkC4fmCXIT8p
+	VIYY8ffTUffInnEBvWvX6FQAfLFtPQMSgdSIl+ggAU9W43Zrixhvo47P656funMP
+	cFfAA/ZY/AIN3gQDKyskJkNAh4XSYrYrHD4u/ToYnYo8yvLEofDwkM2YUUGfK9al
+	Tb/OjpwEl0Gd1dlMX/uyf0/xOYomWmBo7cRk/Xa9yP9mQH2pNG6Sxk0ldIhymoaK
+	OTg2ADNujbDpeGMQifcmiRHCCjkQtwPeuVSTtySc10YbrtLmj7/KLWPF11eaMTew
+	9FEU0uMHB5Rt1NRPK21NMtfinUHPhnKb/Yn7xw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763638581; x=
+	1763724981; bh=duJmX5HHOziadQf5q4kEyZjSRR1LrD50zaH8pVR/GKo=; b=L
+	PGF8y4QMGXARiehHOCHCVjnxv/MqLtLMFTdvUjJ1snuciB3Mf2F0Xfpdlybnx0TH
+	KQ9UZQsxu6dfdb9TC6Zm86QwS7m7WXb2NkjRSElJ6bJVOXsvU1U6Crjrr04ZuuyQ
+	/tTgXiLHhXC0ImcUiWs1WSlgOAyvqYjZULajfhfFboDh5+s4OTDXduCGlgnDGT3x
+	lJC0jN3Ao2uT5lXQqSvJb7fTmqqMYpuvu0zsNz+xOjj24AgrqCBeAO5XV5dDr2pS
+	6T3f7q6i8ltr1SmxwXra9br1KOg1vaBWCMeJSkOWnpBRcHyIFbCXschNeAlwIrA+
+	vK2Ig6kC/+Ol3TT3R37Pw==
+X-ME-Sender: <xms:M_0eaTAPy6Ibub7ljrF2YpHCkMX3nK23QZll07BEYCt02dLgvUYTpA>
+    <xme:M_0eaeEq1kLbcdvRDq5zcG1UW6rsV8hCxzBnx0C1D1tLCEY4DqS5TA5jPKjyE212x
+    GKxXYwBZS1_6IQsmwk3tJiBo-IoKTjoL_6nbxvR4qaYJN1PrreXLyc>
+X-ME-Received: <xmr:M_0eabvnAsZe6yfwXdMUcCNMNDcbjAmvhFjWWzE2Pwq2tYmtobO3_44sHIBC>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvdeileejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
+    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
+    frrghtthgvrhhnpefgvdegieetffefvdfguddtleegiefhgeeuheetveevgeevjeduleef
+    ffeiheelvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudegpdhm
+    ohguvgepshhmthhpohhuthdprhgtphhtthhopegtrhgrthhiuhesnhhvihguihgrrdgtoh
+    hmpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhhtsehsvggtuhhnvghtrdgt
+    ohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtph
+    htthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghpgedv
+    tddtjeefsehgmhgrihhlrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguoh
+    hrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehlvghonhhrohesnhhvihguihgr
+    rdgtohhmpdhrtghpthhtohepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhrtghpthhtoh
+    epkhhusggrsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:M_0eack9jvi8s4dHgeyq0efMSJExsmKPNOebbdeuO8t8b9NdNqEs2A>
+    <xmx:M_0eaWP5k2ooxb-jlZe5Vw1svEVfWdQxlw7WQbtYWlPT5GaU_oLF1A>
+    <xmx:M_0eaQzBGsHNolWjO98G4GUi8ArMX_qAa-J0_p23Rz1hnp8u-rpv0A>
+    <xmx:M_0eaTseTLwensuJCbCT6KDYLBUnKLhXQv4VRR89DmSHj2KdrzD4zA>
+    <xmx:Nf0eaWkgsYby_ZfrB-0WCISvgSFwCC2dAdXqdRN4a1svqsAzx8pfcmA4>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 20 Nov 2025 06:36:18 -0500 (EST)
+Date: Thu, 20 Nov 2025 12:36:16 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Cosmin Ratiu <cratiu@nvidia.com>, steffen.klassert@secunet.com
+Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"ap420073@gmail.com" <ap420073@gmail.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	"jv@jvosburgh.net" <jv@jvosburgh.net>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [PATCH ipsec v2 1/2] bond: Use xfrm_state_migrate to migrate SAs
+Message-ID: <aR79MCBdyx2oTcp2@krikkit>
+References: <20251113104310.1243150-1-cratiu@nvidia.com>
+ <aRcnDwyMn11TfRUG@krikkit>
+ <88f2bf5ef1977fcdd4c87051cd54a4545db993da.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <E1vM2mq-0000000FRTi-3y5F@rmk-PC.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <88f2bf5ef1977fcdd4c87051cd54a4545db993da.camel@nvidia.com>
 
-On Thu, Nov 20, 2025 at 11:25:16AM +0000, Russell King (Oracle) wrote:
-> readl() returns a u32, and writel() takes a "u32" for the value. These
-> are used in rgmii_readl()() and rgmii_writel(), but the value and
-> return are "int". As these are 32-bit register values which are not
-> signed, use "u32".
+2025-11-17, 12:48:20 +0000, Cosmin Ratiu wrote:
+> On Fri, 2025-11-14 at 13:56 +0100, Sabrina Dubroca wrote:
+> > 2025-11-13, 12:43:09 +0200, Cosmin Ratiu wrote:
+> > > The bonding driver manages offloaded SAs using the following
+> > > strategy:
+> > > 
+> > > An xfrm_state offloaded on the bond device with bond_ipsec_add_sa()
+> > > uses
+> > > 'real_dev' on the xfrm_state xs to redirect the offload to the
+> > > current
+> > > active slave. The corresponding bond_ipsec_del_sa() (called with
+> > > the xs
+> > > spinlock held) redirects the unoffload call to real_dev.
+> > 
+> > 
+> > > Finally,
+> > > cleanup happens in bond_ipsec_free_sa(), which removes the offload
+> > > from
+> > > the device. Since the last call happens without the xs spinlock
+> > > held,
+> > > that is where the real work to unoffload actually happens.
+> > 
+> > Not on all devices (some don't even implement xdo_dev_state_free).
 > 
-> These changes do not cause generated code changes.
-> 
-> Update rgmii_updatel() to use u32 for mask and val. Changing "mask"
-> to "u32" also does not cause generated code changes. However, changing
-> "val" causes the generated assembly to be re-ordered for aarch64.
-> 
-> Update the temporary variables used with the rgmii functions to use
-> u32.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> You're right. Looking at what the stack does:
+> xfrm_state_delete() immediately calls xdo_dev_state_delete(), but
+> leaves xdo_dev_state_free() for when there are no more refs (in-flight
+> tx packets are done).
+> xfrm_dev_state_flush() forces an xfrm_dev_state_free() immediately
+> after deleting xs. I guess the goal is to clean up *now* everything
+> from 'dev'.
 
-Konrad provided his reviewed-by in
-https://lore.kernel.org/r/76d153cf-8048-4c6f-8765-51741de78298@oss.qualcomm.com
-but for some reason I forgot to add it, so:
+Yes, see 07b87f9eea0c ("xfrm: Fix unregister netdevice hang on hardware offload.")
+(though I'm not sure it's still needed, now that TCP drops the secpath
+early: 9b6412e6979f)
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+> All other callers of xfrm_state_delete() don't care about free, it will
+> be done when there are no more refs.
+> 
+> So right now for devices that implement xdo_dev_state_free(), there's
+> distinct behavior of what happens when xfrm_state_delete gets called
+> 
+> So right now, there's a difference in behavior for what happens with
+> in-flight packets when xfrm_state_delete() is called:
+> 1. On devs which delete the dev state in xdo_dev_state_free(), in-
+> flight packets are not affected.
+> 2. On devs which delete the dev state in xdo_dev_state_delete(), in-
+> flight packets will see the xs yanked from underneath them.
+> 
+> This makes me ask the question: Is there a point to the
+> xdo_dev_state_delete() callback any more? Couldn't we consolidate on
+> having a single callback to free the offloaded xfrm_state when there
+> are no more references to it? This would simplify the delete+free dance
+> and would leave proper cleanup for the xs reference counting.
+> 
+> What am I missing?
+
+I don't know. Maybe it's a leftover of the initial offload
+implementation/drivers that we don't need anymore? Steffen?
+
+
+[...]
+> > > With the new approach, in-use states on old_dev will not be deleted
+> > > until in-flight packets are transmitted.
+> > 
+> > How does this guarantee it? It would be good to describe how the new
+> > approach closes the race with a bit more info than "use
+> > xfrm_state_migrate".
+> > 
+> > And I don't think we currently guarantee that packets using offload
+> > will be fully transmitted before xdo_dev_state_delete was called in
+> > case of deletion. 
+> 
+> Apologies for leaving this part out, yeah, it's pretty important.
+> I changed the descriptions for the next versions, here's what happens:
+> In-flight offloaded tx packets hold a reference to the used xfrm_state
+> via xfrm_output -> xfrm_state_hold which gets released when the
+> completion arrives via napi_consume_skb -...-> skb_ext_put ->
+> skb_ext_put_sp -> xfrm_state_put.
+> 
+> But this doesn't work on devices which do the dev state deletion in
+> xdo_dev_state_delete(), because those might get their SAs yanked from
+> the device during the xfrm_state_delete() added in this patch. I guess
+> this ties to the previous point: Shouldn't there be only
+> xdo_dev_state_delete which touches the device when refcount is 0?
+> 
+> 
+> > But ok, the bond case is worse due to the add/delete
+> > dance when we change the active slave (and there's still the possible
+> > issue Steffen mentioned a while ago, that this delete/add dance may
+> > not be valid at all depending on how the HW behaves wrt IVs).
+> 
+> I am aware of that issue, I am not trying to change any of that. Just
+> trying to improve bond from a security perspective.
+
+Sure. But I'm not sure we can make it really trustworthy...
+
+> I don't think it's
+> ok for it to send out unencrypted IPSec packets.
+
+Agree.
+
+
+> > > It also makes for cleaner
+> > > bonding code, which no longer needs to care about xfrm_state
+> > > management
+> > > so much.
+> > 
+> > But using the migrate code for that feels kind of hacky, and the 2nd
+> > patch in this set also looks quite hacky.
+> 
+> It's less hacky than the manual xfrm state management done so far. At
+> least bonding no longer needs to care so much about the semantics of
+> the xfrm dev state operations. And it no longer needs to acquire the
+> xs->lock (what does bonding have to do with an internal xfrm_state lock
+> anyway?)
+
+To me, it's hacky in the sense that we're hijacking the migrate code
+that isn't intended for that, and triggering core xfrm operations from
+inside a driver (and without proper locking). But true, the current
+code is also hacky.
+
+I think a better solution might be to find a way to use the
+"per-resource" SA code for bonding (currently implemented for
+"per-CPU" SAs, but a resource could be a lower device). Then we don't
+have to worry about moving states from one link to another, but it
+requires userspace cooperation.
+
+
+> > And doing all that without protection against admin operations on the
+> > xfrm state objects doesn't seem safe.
+> > 
+> > Thinking about the migrate behavior, if we fail to create/offload the
+> > new state:
+> >  - old state will be deleted
+> >  - new state won't be created
+> > 
+> > So any packet we send afterwards that would need to use this SA will
+> > just get dropped? (while the old behavior was "no more offload until
+> > we change the active slave again"?)
+> 
+> This is not ideal, I agree. Perhaps instead of giving up on the failed
+> xs there could be an alternate migration path where we call
+> xdo_dev_state_free+xdo_dev_state_add like before? Ick, I don't really
+> like that.
+> 
+> Alternatively, I have implemented another fix to these races, which is
+> to change xs.xso to be able to be offloaded on multiple devices at the
+> same time (nothing fancy, just parameter changes to xdo ops) and
+> changing the bonding driver to maintain a single offloaded xfrm_state
+> on *all* slaves (using bonding data structs). Changing the active slave
+> then becomes as simple as updating the esn on the new device (to get
+> that device state up to speed).
+> Leon and I discussed about that and he suggested it would be better to
+> use xfrm_state_migrate, since that is an existing well-understood
+> workflow.
+> Do you think that approach is worth pursuing instead? I could send them
+> patches as RFC for discussion.
+
+You can go ahead and share them if you want, but the short description
+above kind of puzzles/scares me.
+
+This whole feature is really a mess :/
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sabrina
 
