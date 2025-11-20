@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-240482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41E31C7568E
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:39:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3EADC7566D
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:38:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 88DE4360E5A
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:31:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7A31E4E3726
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:31:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB163702F9;
-	Thu, 20 Nov 2025 16:28:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7F1377E9C;
+	Thu, 20 Nov 2025 16:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eeHWdSgE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FKevzLuF"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29616376BC0;
-	Thu, 20 Nov 2025 16:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF51F36E9AF;
+	Thu, 20 Nov 2025 16:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763656110; cv=none; b=d+OzFMOCS5/1CuMqbNYAWd2I9jOsbZ1du3ubX6Oulz0pGv5oJNbAAXiMi1KuBtTwGEyTQHFYILmLoE3N5Gz/aBJ5V3en3jCX9X7AIkqA9L4v4jvADUxlQhaly+ph8uOJsigfnryK1/RUf8YUsFmDZYQR6ASBuiPywf96Q+H1x+g=
+	t=1763656113; cv=none; b=SdGvEuoc/O5y4SxZxPg7kxmpa4y3ioGpns3qLbeud2VmfzWBd0qDLd8cMQsfLUBC+3bUGtze8/Ectu/cHlRWCDe69wgXi6OWhtVISUcGDfmyC9v7Kqaes8xgyYmLjxidpDhqc4X5rxxPmDaBokkCsSyaOidt0jyJhVQ+i8Z1LP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763656110; c=relaxed/simple;
-	bh=Lh+5jACMhiO/2Y5m+VvRKadn77MvcK31xvDS10Hga1g=;
+	s=arc-20240116; t=1763656113; c=relaxed/simple;
+	bh=7mr82eL2NhNrBA6h6yqN1TZWLz9fgZvkV9spAxbZY5U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fjEXW1U1BfJ/1MtfuxcGkyiQu7siz3ESTzfARszFKtadxeDY3hRtkySpKZf+iRTR+AB4SmsdE0E7W1g3VXEJk23IikDE80ZsfLxYIDNXv3uub2KishuNwvpxY0/KqQMXu1r/ubxA/3tDBKOYmiXdoIlWHjnB3oKYCCY+Q+g+0mA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eeHWdSgE; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=EkOY65j8fP8bnriUeXuh9d+ztjHBMIZQ0maF7aTddevqRySrQekJ2nAKg5I2U1Awm2VCgs2IrbGTpeSrb9Lgz0DXaVVIe4xtxldEyzN35/QqsKL72gh1s34QHhKHP6W0SuL8tSh8/E3fwnjCQrMvfqt37uSdyrxhMO8YqhDxU6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FKevzLuF; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763656109; x=1795192109;
+  t=1763656112; x=1795192112;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Lh+5jACMhiO/2Y5m+VvRKadn77MvcK31xvDS10Hga1g=;
-  b=eeHWdSgEYXxCHpnkeGmCAHTQySUBZfcMCLDb+wfNbYhV/t9d8PGnkc3o
-   Mm5txqosZmcc9ijLyWt7Lk7Xex6GcNUq04vjIGZgDIZDswnY3Sm863Ti+
-   LpwfpjadkvzBkg7Wmbnxijhbl+15Dvt4D2m08/7j7xWGkflWQHDRppI9K
-   YFOlOIhIGzeKPU/Lm6prDgVTBzYKx1gpaGJNX/OYAWCQ0VGpEzkfmvUxN
-   iRlZsRU1yAz8frIWnb2U2Vq5wHRzJybhkPxQWZDAthORI14yiBczONRbW
-   In2nrkbDoStR3g+T6w81HY17DsO1PeoJ5pc9B53D0mIJcksJFyVXOvc81
-   g==;
-X-CSE-ConnectionGUID: jFAf6G+JQNCZt672X9YSRw==
-X-CSE-MsgGUID: SnrSC7q9RuWXtUU8XUYwsQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="69599308"
+  bh=7mr82eL2NhNrBA6h6yqN1TZWLz9fgZvkV9spAxbZY5U=;
+  b=FKevzLuF5Y7KEd1x3ZD67GuJyUabIUMebonii2oyFAqYtyKj8e7t8/FD
+   3OfaU5idqEIoJ6uo2fAm/0XRjdgjl0t0wvI3Kx7TEVwD1I5P0U+L8td89
+   GquP8NA5ZidT2KHhe6lPNqv2xXpCDctT19IJRjmDIglP5XOynW6A2NWhT
+   4mdNko3TsSmPKsbpuxSMbOfctHj5iUXiwBl+X5Uvaf0tcYXfc0fm7pEdu
+   M+DncOX8UTr0Bw93nNa5q7JZgKML5HHbzYBebUko419uImEvGrFUoML1F
+   ZUHVa/Mw65pUl8G0rfjN+R9tVDyI29AIL2oqgiVJVp6CZzjZ9rWQj2Cjc
+   w==;
+X-CSE-ConnectionGUID: 7EmPWkohQQydotw3C3NR5A==
+X-CSE-MsgGUID: WfuCvzsSSvmzFkwXzAxQyA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="69599313"
 X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="69599308"
+   d="scan'208";a="69599313"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 08:28:29 -0800
-X-CSE-ConnectionGUID: CQw5iJrYTVe8N6t16ut0pw==
-X-CSE-MsgGUID: be4QnUz6S4GKgwOXDdNJ+w==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 08:28:31 -0800
+X-CSE-ConnectionGUID: hx1B/rSOQdG1wDYDhYEXiA==
+X-CSE-MsgGUID: 5nZDR4qRSCWfqbYicYwY1Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="191531300"
+   d="scan'208";a="191531308"
 Received: from hpe-dl385gen10.igk.intel.com ([10.91.240.117])
-  by orviesa008.jf.intel.com with ESMTP; 20 Nov 2025 08:28:27 -0800
+  by orviesa008.jf.intel.com with ESMTP; 20 Nov 2025 08:28:29 -0800
 From: Jakub Slepecki <jakub.slepecki@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: linux-kernel@vger.kernel.org,
@@ -66,9 +66,9 @@ Cc: linux-kernel@vger.kernel.org,
 	anthony.l.nguyen@intel.com,
 	michal.swiatkowski@linux.intel.com,
 	jakub.slepecki@intel.com
-Subject: [PATCH iwl-next 6/8] ice: add functions to query for vsi's pvids
-Date: Thu, 20 Nov 2025 17:28:11 +0100
-Message-ID: <20251120162813.37942-7-jakub.slepecki@intel.com>
+Subject: [PATCH iwl-next 7/8] ice: add mac vlan to filter API
+Date: Thu, 20 Nov 2025 17:28:12 +0100
+Message-ID: <20251120162813.37942-8-jakub.slepecki@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251120162813.37942-1-jakub.slepecki@intel.com>
 References: <20251120162813.37942-1-jakub.slepecki@intel.com>
@@ -81,95 +81,79 @@ MIME-Version: 1.0
 Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
 
-PVID information is set across two structs and several members depending
-primarily on DVM support and VSI type.  This commit adds function that
-guess whether PVID is set and where and allow to access raw VLAN ID set.
-This is intended to be used later on to decide what MAC{,VLAN} filters
-to set for a VSI.
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Allow mac vlan filters to be managed by filters API in ice driver.
+Together with mac-only filters they will be used to forward traffic
+intended for loopback in VEB mode.
+
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Jakub Slepecki <jakub.slepecki@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_lib.c | 56 ++++++++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_lib.h |  2 +
- 2 files changed, 58 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_fltr.c | 33 +++++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_fltr.h |  4 +++
+ 2 files changed, 37 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 44f3c2bab308..55ba043f8f5e 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -4059,3 +4059,59 @@ void ice_vsi_update_l2tsel(struct ice_vsi *vsi, enum ice_l2tsel l2tsel)
- 		wr32(hw, qrx_context_offset, regval);
- 	}
+diff --git a/drivers/net/ethernet/intel/ice/ice_fltr.c b/drivers/net/ethernet/intel/ice/ice_fltr.c
+index aff7a141c30d..96a4e4b1b3fc 100644
+--- a/drivers/net/ethernet/intel/ice/ice_fltr.c
++++ b/drivers/net/ethernet/intel/ice/ice_fltr.c
+@@ -240,6 +240,39 @@ ice_fltr_add_mac_to_list(struct ice_vsi *vsi, struct list_head *list,
+ 					  list);
  }
-+
+ 
 +/**
-+ * ice_vsi_has_outer_pvid - check if VSI has outer Port VLAN ID assigned
-+ * @info: props of VSI in question
++ * ice_fltr_add_mac_vlan_to_list - add MAC VLAN filter info to
++ * existing list
++ * @vsi: pointer to VSI struct
++ * @list: list to add filter info to
++ * @mac: MAC address to add
++ * @vlan_id: VLAN id to add
++ * @action: filter action
 + *
-+ * Return: true if VSI has outer PVID, false otherwise.
++ * Return:
++ * * 0 if entry for filter was added, or
++ * * %-ENOMEM if entry could not be allocated.
 + */
-+static bool
-+ice_vsi_has_outer_pvid(const struct ice_aqc_vsi_props *info)
++int
++ice_fltr_add_mac_vlan_to_list(struct ice_vsi *vsi, struct list_head *list,
++			      const u8 *mac, u16 vlan_id,
++			      enum ice_sw_fwd_act_type action)
 +{
-+	return info->outer_vlan_flags & ICE_AQ_VSI_OUTER_VLAN_PORT_BASED_INSERT;
++	struct ice_fltr_info info = {};
++
++	info.flag = ICE_FLTR_TX;
++	info.src_id = ICE_SRC_ID_VSI;
++	info.lkup_type = ICE_SW_LKUP_MAC_VLAN;
++	info.fltr_act = action;
++	info.vsi_handle = vsi->idx;
++
++	info.l_data.mac_vlan.vlan_id = vlan_id;
++	ether_addr_copy(info.l_data.mac_vlan.mac_addr, mac);
++
++	return ice_fltr_add_entry_to_list(ice_pf_to_dev(vsi->back), &info,
++					  list);
 +}
 +
-+/**
-+ * ice_vsi_has_inner_pvid - check if VSI has inner Port VLAN ID assigned
-+ * @info: props of VSI in question
-+ *
-+ * Return: true if VSI has inner PVID, false otherwise.
-+ */
-+static bool
-+ice_vsi_has_inner_pvid(const struct ice_aqc_vsi_props *info)
-+{
-+	return info->inner_vlan_flags & ICE_AQ_VSI_INNER_VLAN_INSERT_PVID;
-+}
-+
-+/**
-+ * ice_vsi_has_pvid - check if VSI has Port VLAN ID assigned
-+ * @vsi: VSI in question
-+ *
-+ * Return: true if VSI has either outer or inner PVID, false otherwise.
-+ */
-+bool
-+ice_vsi_has_pvid(struct ice_vsi *vsi)
-+{
-+	return ice_vsi_has_outer_pvid(&vsi->info) ||
-+	       ice_vsi_has_inner_pvid(&vsi->info);
-+}
-+
-+/**
-+ * ice_vsi_pvid - retrieve VSI's Port VLAN ID
-+ * @vsi: VSI in question
-+ *
-+ * Return: VSI's PVID; it is valid only if ice_vsi_has_pvid is true.
-+ */
-+u16
-+ice_vsi_pvid(struct ice_vsi *vsi)
-+{
-+	__le16 vlan_info = 0;
-+
-+	if (ice_vsi_has_outer_pvid(&vsi->info))
-+		vlan_info = vsi->info.port_based_outer_vlan;
-+	else if (ice_vsi_has_inner_pvid(&vsi->info))
-+		vlan_info = vsi->info.port_based_inner_vlan;
-+
-+	return le16_to_cpu(vlan_info) & VLAN_VID_MASK;
-+}
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
-index 2cb1eb98b9da..c28c69963946 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.h
-@@ -124,4 +124,6 @@ void ice_clear_feature_support(struct ice_pf *pf, enum ice_feature f);
- void ice_init_feature_support(struct ice_pf *pf);
- bool ice_vsi_is_rx_queue_active(struct ice_vsi *vsi);
- void ice_vsi_update_l2tsel(struct ice_vsi *vsi, enum ice_l2tsel l2tsel);
-+bool ice_vsi_has_pvid(struct ice_vsi *vsi);
-+u16 ice_vsi_pvid(struct ice_vsi *vsi);
- #endif /* !_ICE_LIB_H_ */
+ /**
+  * ice_fltr_add_vlan_to_list - add VLAN filter info to exsisting list
+  * @vsi: pointer to VSI struct
+diff --git a/drivers/net/ethernet/intel/ice/ice_fltr.h b/drivers/net/ethernet/intel/ice/ice_fltr.h
+index 0f3dbc308eec..fb9ffb39be50 100644
+--- a/drivers/net/ethernet/intel/ice/ice_fltr.h
++++ b/drivers/net/ethernet/intel/ice/ice_fltr.h
+@@ -23,6 +23,10 @@ int
+ ice_fltr_add_mac_to_list(struct ice_vsi *vsi, struct list_head *list,
+ 			 const u8 *mac, enum ice_sw_fwd_act_type action);
+ int
++ice_fltr_add_mac_vlan_to_list(struct ice_vsi *vsi, struct list_head *list,
++			      const u8 *mac, u16 vlan_id,
++			      enum ice_sw_fwd_act_type action);
++int
+ ice_fltr_add_mac(struct ice_vsi *vsi, const u8 *mac,
+ 		 enum ice_sw_fwd_act_type action);
+ int
 -- 
 2.43.0
 
