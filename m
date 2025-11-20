@@ -1,96 +1,82 @@
-Return-Path: <netdev+bounces-240528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C1FC75DDC
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 19:08:25 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18D7DC75DE8
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 19:13:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 72D60343B36
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 18:08:25 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 75A1734C59A
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 18:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554662E03F3;
-	Thu, 20 Nov 2025 18:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5F8351FDB;
+	Thu, 20 Nov 2025 18:13:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF1234DB40;
-	Thu, 20 Nov 2025 18:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE95334385
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 18:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763662100; cv=none; b=A5aM/oIDg9XSO7tlVboVReiDsRz9fA5IP4LSrkDRRnfxYu4qX6LEGoFMY8bAoWiA9Sf5d0iCK6kU5Gdoam/zsRkLT5Pgw6haUjQfLA8GNC5/Hi6Giab//6RmIhyVsyuEV0i5bpU9dOkz5lip/uksJetqUbybT6AmtLpdd+9yBsM=
+	t=1763662381; cv=none; b=jisxNUmBqsGjIpRMgB2/YVyIT7FEWEqlaylIOknvCR4EpnYPX1m/LyX7AICkwC3jPcPf1uk1nhWnDNnyRPfUL6SK9bGVEAXKOTd6hN0SOvfCp1n6TYhfsYCTyBUFwTKWvnCANlWDkIGA8gHqIQtlNtgIOKgCKrgbotrCr8C9WKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763662100; c=relaxed/simple;
-	bh=UnnFl3rY9FqVL9vjmZgHXUaZ5u4R4nXBPU2E7u6esTk=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DLX0ZKNk/1pW3kh/X8wOhJMZKpC/bC0pVX5XrApRyJrX/asj1j5Jbafk1ZCitY2sGaOGJ68y5DRfqWYU+5it7ECbEyEQSimoVb5R03nrMKjy63RLjzZ+sIASDfSYvtiodV7dE9tvygEPI+rA3J4u5VEpjs+SRheZCARZpFa/T5g=
+	s=arc-20240116; t=1763662381; c=relaxed/simple;
+	bh=Bpb91mLMg9VxI+05UZC/8AXORGa0NShWS5w+jSVLnQg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=O5hkJjy3ZXVJyLo7OCxZtqhMegRf2Z9Qs0kuFm4Vf5n+7vB5nXlrp1NoJKwZqKZp4utWc92k6LedpraaQNuazVFyrCUC4VrkAVUmZ4haHkzm3aM3zM+ljNoIV/7gp2ESZZ4DohcqEZ+/emeewMHTDkMANHpckCLFwH6chFi9CeA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dC5sm4mL0zJ469G;
-	Fri, 21 Nov 2025 02:07:24 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7F2B714038F;
-	Fri, 21 Nov 2025 02:08:10 +0800 (CST)
-Received: from localhost (10.48.159.58) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Thu, 20 Nov
- 2025 18:08:09 +0000
-Date: Thu, 20 Nov 2025 18:08:05 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v21 01/23] cxl/mem: refactor memdev allocation
-Message-ID: <20251120180805.00001699@huawei.com>
-In-Reply-To: <20251119192236.2527305-2-alejandro.lucero-palau@amd.com>
-References: <20251119192236.2527305-1-alejandro.lucero-palau@amd.com>
-	<20251119192236.2527305-2-alejandro.lucero-palau@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dC5zT5fmxzHnGdT;
+	Fri, 21 Nov 2025 02:12:21 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id F38941402EF;
+	Fri, 21 Nov 2025 02:12:56 +0800 (CST)
+Received: from huawei-ThinkCentre-M920t.huawei.com (10.123.122.223) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 20 Nov 2025 21:12:56 +0300
+From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+To: <netdev@vger.kernel.org>
+CC: <stephen@networkplumber.org>, Dmitry Skorodumov
+	<skorodumov.dmitry@huawei.com>
+Subject: [PATCH v2 net-next 0/3] support for l2macnat in ip-util
+Date: Thu, 20 Nov 2025 21:12:45 +0300
+Message-ID: <20251120181248.3834304-1-skorodumov.dmitry@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: mscpeml500003.china.huawei.com (7.188.49.51) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
-On Wed, 19 Nov 2025 19:22:14 +0000
-alejandro.lucero-palau@amd.com wrote:
+Support mode l2macnat in ip-util for link type
+ipvlan/ipvtap
 
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> In preparation for always-synchronous memdev attach, refactor memdev
-> allocation and fix release bug in devm_cxl_add_memdev() when error after
-> a successful allocation.
-> 
-> The diff is busy as this moves cxl_memdev_alloc() down below the definition
-> of cxl_memdev_fops and introduces devm_cxl_memdev_add_or_reset() to
-> preclude needing to export more symbols from the cxl_core.
-> 
-> Fixes: 1c3333a28d45 ("cxl/mem: Do not rely on device_add() side effects for dev_set_name() failures")
-> 
+Diff from v1:
+- Implemented helper functions for ipvlan_mode <-> string
+conversions
+- Wrote a section in man-page about ipvlan/ipvtap and
+extended it with l2macnat mode
 
-No line break here. Fixes is part of the tag block and some tools
-get grumpy if that isn't contiguous.  That includes a bot that runs
-on linux-next.
+Dmitry Skorodumov (3):
+  helper funcs for ipvlan_mode <-> string conversion
+  Provide man section for IPVLAN and IPVTAP Type Support
+  Support l2macnat in ip util
 
-> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+ include/uapi/linux/if_link.h |  1 +
+ ip/iplink_ipvlan.c           | 51 ++++++++++++++++++++--------
+ man/man8/ip-link.8.in        | 65 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 103 insertions(+), 14 deletions(-)
 
-This SOB chain is wrong.  What was Dan's role in this?  As first SOB with no
-Co-developed tag he would normally also be the author (From above)
-
-I'm out of time for today so will leave review for another time. Just flagging
-that without these tag chains being correct Dave can't pick this up even
-if everything else is good.
+-- 
+2.25.1
 
 
