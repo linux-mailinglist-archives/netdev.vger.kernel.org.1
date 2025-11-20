@@ -1,226 +1,187 @@
-Return-Path: <netdev+bounces-240380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69608C740A2
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 13:53:16 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01469C740E4
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 13:57:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 1A5352A53D
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:53:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 017D62BEC6
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA183321B7;
-	Thu, 20 Nov 2025 12:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26CF337BAC;
+	Thu, 20 Nov 2025 12:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VXj9IF9a";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="SZhJ2maE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j3i59l/r"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880BD372AB6
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEE0337B96
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763643190; cv=none; b=elq2b6A/HQJshBkYaesuzXsR63WXGrO2uI/kgmVjOrtQRNUVdcjME3eH5fLPHTJ6q6fGm7fZ2Qcbo2scHdtsinPeZbYuPjsrKT8XPjKIidJRxdEmtwsrcPT/E4DwO7MF7wSvfzIjjZxVud8OVEM/r7nEjIOyQJnE/BE/3lGaoaw=
+	t=1763643387; cv=none; b=p7U4KL1AMASH/vcSJHgagpuouEkYll3DoCPMG6TQzXJAh8fP72mL02Ued5j5a5PqCYjOF6r/aYBb+zcdnj92xHdKMXPXnz/Voc/Whay/XBF3FY9EagrZCowkijL+FY4edjOO0hYBQLDwKV5qdFae/YnzrgQuMQa9I2+wIZPwowY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763643190; c=relaxed/simple;
-	bh=LR8ULDq7xaDD5klVm5YD6xiApfZRxnj7/tNcY9vHvYg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CWsEJB+OK64CKisb2PvBDMudWPHy2zVepsRCPfFAspxzhlo2YYRalx7DoWmSBzbdvauJn3Yi8zR/cUTWxz0K3t6YuTmaSGkCD/b9ZAa+c2frfEHT1GaHzvFAt118cmzvnxkSJpn+tU6S8XScM/GhJ/oWnMnbbustlocNIYROfqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VXj9IF9a; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SZhJ2maE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763643185;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E3UU0E8vPbSvan1H9YT1uOvt6lacoFR29MXg1ip0mwM=;
-	b=VXj9IF9a0+feoJhaRzkpokRlYluilaP//x0qbSlCGwX2Xc8aU5RfnMm/Ea4NpBww2aqR/k
-	tNLTNOYWqzP2eGNU7KZaSbo0O5z7HZjdo5mj5C1AhXbgPhoS3ET662z5hg2cfseHQ2e6KS
-	q4oQQKpUtq6PWE31SKtEsBIM+ersjpQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-MwqoCNzPMyGBGdCAR9M-kw-1; Thu, 20 Nov 2025 07:53:04 -0500
-X-MC-Unique: MwqoCNzPMyGBGdCAR9M-kw-1
-X-Mimecast-MFC-AGG-ID: MwqoCNzPMyGBGdCAR9M-kw_1763643183
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477964c22e0so5839585e9.0
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 04:53:03 -0800 (PST)
+	s=arc-20240116; t=1763643387; c=relaxed/simple;
+	bh=pGZrNRY0M4sDQsxJo1THaYnZteKnSAPL17HRBh+c/RE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ULfa1ij2uQ6KtrKRpNyME6nKCJMGPVlvwzBeJ2jmPokkBRnLQNje7gntGdBttsYzkgLxuC9qwTYVlSXP9l4yv73Jul+PCo489pkIt9uW90LQeTqkj0FVy5J4aghPDLoGPt1uBszvXRBxz3y6ecaVpI6kCvBuBf6trT6c8w2xknY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j3i59l/r; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7aa2170adf9so713238b3a.0
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 04:56:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763643183; x=1764247983; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=E3UU0E8vPbSvan1H9YT1uOvt6lacoFR29MXg1ip0mwM=;
-        b=SZhJ2maEkF3EKeWI5vUyczz93m21p1n+0DvAhHY6lHk/3kxwFign+noqz3jjV7vouz
-         SAyrpYvfdn48w1JxZJPrVYKTXFj3J10gRI01VjFqYjri0VIVFbpSUbS1R51pKEYrN73/
-         7W3IW36i9C51/OmG/gsVksVNvd6l2x3j1ROSZ+tm80Gf3T1Y3yCUqnJpmx7myDJlGFgv
-         0R9yt+3AmZmo2tYekfDmJHKzWk4m66YgGVKrBEXNoumHj7rMG5LjZnVE17EAvfPDH14L
-         cWJ5whYsiTY3wpr924iE/ztobGWA82WNXJ4TDZ09h2apdrSQdbs/T5S72RdnG2wUvtew
-         Kppw==
+        d=gmail.com; s=20230601; t=1763643385; x=1764248185; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FlgtCRNk8JjCTXwMmpQaIRJDDDuMEDSfzE9Xaxa/a9c=;
+        b=j3i59l/r5193PjV+bZKwdeOdKa1ty67yukWBwbAk9uFnjtNBhqbNepip2p6GADlbko
+         fg8Bi0pSfNIJ7uteCZlFVMV8IPYI3npvSglL+gdbJGDRrK3CBZj4ZWTU8CebVdlu6c1I
+         dFoAqkGxur7Eu8RIVTRUjclfK+vryJPLN8sS8STbiPtBNs9ObE6+r9TaDo0U2nu7sVxE
+         Tk1tPepvBUjDD2JMqUPbOZp3JRrpPNiNxFJ0L4fHmJR/rtpBEizk08rVJAc8+HD08fH5
+         yghrDY4XFhyWb/QDd8StA6uojKnGmEadtrBuWXhtG3i3gIlIjnNVlPERM/b7JtjL9zKR
+         BOcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763643183; x=1764247983;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E3UU0E8vPbSvan1H9YT1uOvt6lacoFR29MXg1ip0mwM=;
-        b=lxxXJYhFc3zNLEeooOg0InQcHzU9v6cybPYPXhxGYKS0zasFoQiMxp2mSLTLwrX+M/
-         5Uwz3chyVzySC+tErN1FavJ+lID8IkLp7Asrr+Fhl1Ls4YP+KLPKFq/2Z9DPxa0mUtVn
-         CsT38BRsdjoeu2dfoiAFxv/GsmZkCleeEsbOs1PlRb4sKhs6Nn0NR7ggjMfWbUwQPNQu
-         Gn7aJmK9DrmDgOym4vm1QkGwKBaO5kV5muAOrCN3xFG8+cZbToxtUhh/iJzma8KQeprm
-         5DuqM3l9bf/f4lny5AUa4f5DJTPeF1sOkozuprQeVANyjSf03RVzNqybGEqsxtLxy9ye
-         /FQg==
-X-Forwarded-Encrypted: i=1; AJvYcCWkk6kfAsD4VqYtE1z/J4/KJpC0uk+WzhnJbEOHugo2lL4cP8zUPvUXtejS0B8YLtYSoI9MAiQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQdXAIMagP2iyh2dHei7vwtF/e+FxDAXBCYYZDZlZNg65AIYHV
-	zNTdtgSoJcF/hWdOaGV2Q/Q8+luUnxKp8ofy13iE2WRy9yzx8TgjSmFNibMh1vtQZKWw4mobXJR
-	J4S7t7JSR2te4C9pycn3TZZHS5jYsloJUyjBY6ZvUDIrDGg4YqIzPOKva8Q==
-X-Gm-Gg: ASbGnctIJxqGV6Hv1X/LlLBB0Wxyo/nMOYyeQKUuUzu3lbOScLmVv74xrW5hPU04Y44
-	cSWU3Gyjal/2bdhGNUETID2nJCLkiJ7sQ8Mpnja35axwcj5gHfbnKTagbchYaIQIEiq5Ih+oncm
-	H8gPc3XJjEmceQrZDU3JdqwZU0A2vAe4mee6BYBqJjLqLwGS3gBEttF6vt2O9UI8iMUEc7CZo6j
-	hZQQ+GSeJ+qugMnVXNZAmgiiVP0I09OjZjJtG8Fo4ePd+AmsgVytGNQqx/KbAwD8tbpztYWz1SX
-	ijcfhL0YUd5vxV8vZv5yHYPH56ghQvXVY5loN3SRcWHwMq3swBAXW5lqHRicGsVcbxH6dy5xUq1
-	nvvlr4+iEjT63
-X-Received: by 2002:a05:600c:4704:b0:477:a1bb:c58e with SMTP id 5b1f17b1804b1-477b9eb25ebmr29390885e9.7.1763643182665;
-        Thu, 20 Nov 2025 04:53:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFIuNKtkfJBpkGKvjHCtPWs99RSneT8gAHjsulFGLOqaPV/sy4mVEzOiqlz6HiAmI6D5mqQsA==
-X-Received: by 2002:a05:600c:4704:b0:477:a1bb:c58e with SMTP id 5b1f17b1804b1-477b9eb25ebmr29390545e9.7.1763643182271;
-        Thu, 20 Nov 2025 04:53:02 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.41])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fd8c47sm5519216f8f.38.2025.11.20.04.53.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 04:53:01 -0800 (PST)
-Message-ID: <4dcae50b-42f8-4adb-b154-5974f5aec19d@redhat.com>
-Date: Thu, 20 Nov 2025 13:53:00 +0100
+        d=1e100.net; s=20230601; t=1763643385; x=1764248185;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FlgtCRNk8JjCTXwMmpQaIRJDDDuMEDSfzE9Xaxa/a9c=;
+        b=W/Z2qPbenNlBZcMkYZ/OUaZoeyS5mZ1gAAl7J+l1RrIXEl//vGhDBACZMqLHGoS6LZ
+         o9DZf4lAafpQ19i/txg9KFBMN2GxXcb5SLoMpxwEkwozz0tZADfYFQN5+K+5M58yGsym
+         8nFPIT4FWhhPogsGfvhtXxmqu6KkLWU6VaWTdUo4EWBUQXyfUseHAksBiKn7eXkZ6f4d
+         fl1EBMclKfN+oFZIH7CaBMzy1JGeLoo/lHOjOLUhsBFMLj/sdaXMFd1RDXu9RdJNA8c0
+         8WvaTTkx33Ad18QC2JkMNWfjE27I7SyrTG9aKsDESpIFQbGjIrLbr4Ud3BwuPB3IPy9x
+         JJFQ==
+X-Gm-Message-State: AOJu0YxdfzBtXFl9agmDVAGdOimMyVNgfU+NmuSApT1YNSuVEWhZB0ri
+	uypu+OKTYBTEnm2tpvGzAYmvYPypurPTXpK8tydXgn3XBRFXNJcuitXV8rIUtt7KkGpG3A==
+X-Gm-Gg: ASbGncuKkfYizawIwJZnNioNxQFiGXYrYTO+jK16ERbZqz3dPI1u0hEZ4LbUzkE0ojr
+	8iBqyI9WzdFzFkyMxsOOfIcEidkji5uuyl+2AHxCtwdmm7efo94mgEJkC2WU5arODiQuK1ChWnf
+	V/h6UrYxS/WqlgSdD6IQvPU0xM7P51k0BhIrpDTE4jk7JMpj9luoiCQedxD+hBD/aHTYqEEg51n
+	FV4sk3x+/YD/IDh/O2iO/qw8fW1ZdjQC1WqB2YEdL1rpzLzDGY/T9SFCvHoWX7bYZEz75A+LqPI
+	Xq1jhSZpKMzqrVVjqJh9/t5npQbku1OMpqsBd0OswGVdczViw7NhpyMzFeh6m+LCOrwgoe/8Cw6
+	grYO8i2UiQZ9AbOAgAOJC21f2UVfxu4SXKO9BxWTx7WcyVbtPRgFVeSSpXQi9+HBXuHziHjCg2Q
+	ZonaHzA2tbmrhakzvfofivtHnOx0NlBcdRbSM=
+X-Google-Smtp-Source: AGHT+IH6Cxx9ekQROMt6D3RdsjVLzu9EK7/tuG1Oc7Wl7EP8mwN1jNlypi4fx566Z3g1GdSw5Sbymw==
+X-Received: by 2002:a05:6a00:3ccc:b0:7ac:acc:1da with SMTP id d2e1a72fcca58-7c3f0d55b66mr3684237b3a.25.1763643385042;
+        Thu, 20 Nov 2025 04:56:25 -0800 (PST)
+Received: from gmail.com ([183.56.183.11])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f174e5b0sm2745771b3a.67.2025.11.20.04.56.19
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 20 Nov 2025 04:56:24 -0800 (PST)
+From: jiefeng.z.zhang@gmail.com
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	linux-kernel@vger.kernel.org,
+	irusskikh@marvell.com,
+	Jiefeng Zhang <jiefeng.z.zhang@gmail.com>
+Subject: [PATCH net v2] net: atlantic: fix fragment overflow handling in RX path
+Date: Thu, 20 Nov 2025 20:56:13 +0800
+Message-Id: <20251120125613.35776-1-jiefeng.z.zhang@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] net: bonding: move bond_should_notify_peers,
- e.g. into rtnl lock block
-To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Nikolay Aleksandrov <razor@blackwall.org>, Hangbin Liu <liuhangbin@gmail.com>
-References: <20251118090431.35654-1-tonghao@bamaicloud.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251118090431.35654-1-tonghao@bamaicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/18/25 10:04 AM, Tonghao Zhang wrote:
-> In bond_mii_monitor()/bond_activebackup_arp_mon(), when we hold the rtnl lock:
-> 
-> - check send_peer_notif again to avoid unconditionally reducing this value.
-> - send_peer_notif may have been reset. Therefore, it is necessary to check
->   whether to send peer notify via bond_should_notify_peers() to avoid the
->   loss of notification events.
+From: Jiefeng Zhang <jiefeng.z.zhang@gmail.com>
 
-This looks strictly related to:
+The atlantic driver can receive packets with more than MAX_SKB_FRAGS (17)
+fragments when handling large multi-descriptor packets. This causes an
+out-of-bounds write in skb_add_rx_frag_netmem() leading to kernel panic.
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20251118090305.35558-1-tonghao@bamaicloud.com/
+The issue occurs because the driver doesn't check the total number of
+fragments before calling skb_add_rx_frag(). When a packet requires more
+than MAX_SKB_FRAGS fragments, the fragment index exceeds the array bounds.
 
-you probably should bundle both in a series.
+Fix by adding a check in __aq_ring_rx_clean() to skip extracting
+the zeroth fragment when frag_cnt reaches MAX_SKB_FRAGS.
 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index b7370c918978..6f0fa78fa3f3 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -2810,11 +2810,10 @@ static void bond_mii_monitor(struct work_struct *work)
->  {
->  	struct bonding *bond = container_of(work, struct bonding,
->  					    mii_work.work);
-> -	bool should_notify_peers;
-> -	bool commit;
-> -	unsigned long delay;
-> -	struct slave *slave;
->  	struct list_head *iter;
-> +	struct slave *slave;
-> +	unsigned long delay;
-> +	bool commit;
->  
->  	delay = msecs_to_jiffies(bond->params.miimon);
->  
-> @@ -2823,7 +2822,6 @@ static void bond_mii_monitor(struct work_struct *work)
->  
->  	rcu_read_lock();
->  
-> -	should_notify_peers = bond_should_notify_peers(bond);
->  	commit = !!bond_miimon_inspect(bond);
->  
->  	rcu_read_unlock();
-> @@ -2844,10 +2842,10 @@ static void bond_mii_monitor(struct work_struct *work)
->  		}
->  
->  		if (bond->send_peer_notif) {
+This crash occurred in production with an Aquantia AQC113 10G NIC.
 
-The first `bond->send_peer_notif` access is outside the lock. I think
-the compiler could do funny things and read the field only outside the
-lock: I guess you need additional ONCE annotation, and that could be a
-separate patch.
+Stack trace from production environment:
+```
+RIP: 0010:skb_add_rx_frag_netmem+0x29/0xd0
+Code: 90 f3 0f 1e fa 0f 1f 44 00 00 48 89 f8 41 89
+ca 48 89 d7 48 63 ce 8b 90 c0 00 00 00 48 c1 e1 04 48 01 ca 48 03 90
+c8 00 00 00 <48> 89 7a 30 44 89 52 3c 44 89 42 38 40 f6 c7 01 75 74 48
+89 fa 83
+RSP: 0018:ffffa9bec02a8d50 EFLAGS: 00010287
+RAX: ffff925b22e80a00 RBX: ffff925ad38d2700 RCX:
+fffffffe0a0c8000
+RDX: ffff9258ea95bac0 RSI: ffff925ae0a0c800 RDI:
+0000000000037a40
+RBP: 0000000000000024 R08: 0000000000000000 R09:
+0000000000000021
+R10: 0000000000000848 R11: 0000000000000000 R12:
+ffffa9bec02a8e24
+R13: ffff925ad8615570 R14: 0000000000000000 R15:
+ffff925b22e80a00
+FS: 0000000000000000(0000)
+GS:ffff925e47880000(0000) knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffff9258ea95baf0 CR3: 0000000166022004 CR4:
+0000000000f72ef0
+PKRU: 55555554
+Call Trace:
+<IRQ>
+aq_ring_rx_clean+0x175/0xe60 [atlantic]
+? aq_ring_rx_clean+0x14d/0xe60 [atlantic]
+? aq_ring_tx_clean+0xdf/0x190 [atlantic]
+? kmem_cache_free+0x348/0x450
+? aq_vec_poll+0x81/0x1d0 [atlantic]
+? __napi_poll+0x28/0x1c0
+? net_rx_action+0x337/0x420
+```
 
-> -			bond->send_peer_notif--;
-> -			if (should_notify_peers)
-> +			if (bond_should_notify_peers(bond))
->  				call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
->  							 bond->dev);
-> +			bond->send_peer_notif--;
->  		}
->  
->  		rtnl_unlock();	/* might sleep, hold no other locks */
-> @@ -3759,8 +3757,7 @@ static bool bond_ab_arp_probe(struct bonding *bond)
->  
->  static void bond_activebackup_arp_mon(struct bonding *bond)
->  {
-> -	bool should_notify_peers = false;
-> -	bool should_notify_rtnl = false;
-> +	bool should_notify_rtnl;
->  	int delta_in_ticks;
->  
->  	delta_in_ticks = msecs_to_jiffies(bond->params.arp_interval);
-> @@ -3770,15 +3767,12 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
->  
->  	rcu_read_lock();
->  
-> -	should_notify_peers = bond_should_notify_peers(bond);
-> -
->  	if (bond_ab_arp_inspect(bond)) {
->  		rcu_read_unlock();
->  
->  		/* Race avoidance with bond_close flush of workqueue */
->  		if (!rtnl_trylock()) {
->  			delta_in_ticks = 1;
-> -			should_notify_peers = false;
->  			goto re_arm;
->  		}
->  
-> @@ -3791,18 +3785,15 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
->  	should_notify_rtnl = bond_ab_arp_probe(bond);
->  	rcu_read_unlock();
->  
-> -re_arm:
-> -	if (bond->params.arp_interval)
-> -		queue_delayed_work(bond->wq, &bond->arp_work, delta_in_ticks);
-> -
-> -	if (should_notify_peers || should_notify_rtnl) {
-> +	if (bond->send_peer_notif || should_notify_rtnl) {
->  		if (!rtnl_trylock())
->  			return;
+Changes in v2:
+- Fix fragment overflow by skipping zeroth fragment extraction when
+  frag_cnt reaches MAX_SKB_FRAGS.
 
-The above skips the 2nd trylock attempt when the first one fail, which
-IMHO makes sense, but its unrelated from the rest of the change here. I
-think this specific bits should go in a separate patch.
+Signed-off-by: Jiefeng Zhang <jiefeng.z.zhang@gmail.com>
+---
+ drivers/net/ethernet/aquantia/atlantic/aq_ring.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-/P
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
+index f21de0c21e52..2c3cfceefd28 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
+@@ -538,6 +538,7 @@ static int __aq_ring_rx_clean(struct aq_ring_s *self, struct napi_struct *napi,
+ 		bool is_ptp_ring = aq_ptp_ring(self->aq_nic, self);
+ 		struct aq_ring_buff_s *buff_ = NULL;
+ 		struct sk_buff *skb = NULL;
++		unsigned int frag_cnt = 0U;
+ 		unsigned int next_ = 0U;
+ 		unsigned int i = 0U;
+ 		u16 hdr_len;
+@@ -546,7 +547,6 @@ static int __aq_ring_rx_clean(struct aq_ring_s *self, struct napi_struct *napi,
+ 			continue;
+ 
+ 		if (!buff->is_eop) {
+-			unsigned int frag_cnt = 0U;
+ 			buff_ = buff;
+ 			do {
+ 				bool is_rsc_completed = true;
+@@ -631,7 +631,7 @@ static int __aq_ring_rx_clean(struct aq_ring_s *self, struct napi_struct *napi,
+ 		memcpy(__skb_put(skb, hdr_len), aq_buf_vaddr(&buff->rxdata),
+ 		       ALIGN(hdr_len, sizeof(long)));
+ 
+-		if (buff->len - hdr_len > 0) {
++		if (buff->len - hdr_len > 0 && frag_cnt < MAX_SKB_FRAGS) {
+ 			skb_add_rx_frag(skb, i++, buff->rxdata.page,
+ 					buff->rxdata.pg_off + hdr_len,
+ 					buff->len - hdr_len,
+-- 
+2.39.5
 
 
