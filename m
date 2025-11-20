@@ -1,150 +1,92 @@
-Return-Path: <netdev+bounces-240350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A55BC73A91
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:17:35 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9DCFC73B79
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:27:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C146D347E7D
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:16:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3DCE64E82AD
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6242D192B;
-	Thu, 20 Nov 2025 11:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5692337BB2;
+	Thu, 20 Nov 2025 11:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cstr9LDO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k914ASyh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C95B1EA7EC
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 11:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335BB337B90;
+	Thu, 20 Nov 2025 11:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763637388; cv=none; b=P/FpoCkdtEoIpsmqRyxegfLNTOjsCVjP2JA3I4p4MJyx+X8qLKXo+LpuTCDX8KkNIeHemZfiAPO8BYIlE06K/ASGHT9p4LnuOBJlmM1nB93ZUbhc9xKqWxS2AGrbjpoRv/ES3s3CHLERKdVH9GYyeJFr5slgkJgnX8Dxe4eHVAI=
+	t=1763637641; cv=none; b=U9+dHyzrgfXg6YtsvwlQkoJisF/Y0FndU3yYI6SORhxhTw4leGZlPVQVDZj0A7zjiioawDclA659nOHLbszW75On1hMwf7eOrCq8ggJrdqY46LniC0ozH1cUaQzh/m2l0mjyspk7R+4YPTn7TY3J+hLjjgjdDFxkjp+1L/dwuEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763637388; c=relaxed/simple;
-	bh=aaujChFq0aBNtPDtJwu9E+yl31n3maw8a+IjMcDvdgc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hPr/i4ewcubec9HwEwcd2CKSsoEFiyOg4i/HDFbS22QrBrPmMPozXlqpEJe9K+fYqJeZZ28UFQhku1NxV0LbKH12teKp4ruXxDLNZ6ctHSacjbLRrsDkgM0J0khvHl0czQ90pAHkGW9oBSQBtf4m2x1NWHFuVuW3I6uGQAGzH4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cstr9LDO; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-477a1c28778so8965165e9.3
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:16:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763637386; x=1764242186; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0OPXfZoq32hCbqwxNyncsVbKNdLZ3Sub0ZLhzzXMtjo=;
-        b=Cstr9LDOZEyibDNHmrlgwZv/kUodflHgjupKdZT7AaNpOXRIyksbd2jGikvCUWiQlq
-         h92nMuj1rxfWVQQgqVo1bqRRjhC3MQrRDH2y7sCjd4TfcHMj8JFZw/uBwDleJp9wsFz4
-         Uz3k4tuff8DBGsNa3g1mC/RUXZbzUCkCw5VmOz4/qJJQPO8N9X4FKkqnB+HNGNtdVb9F
-         Z9CXDD8W5II8xaTmbK5YlHeE2zoussuM2+FfHBpHcruCKM4hhgjNVQm1zcFEYJTTj/QL
-         nIQN43rtdum/Qv9HAxvaL79rvlBTpJAVoyFcBh36gM8jKEJRiV74Y373mzYamsWYGOQh
-         L/Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763637386; x=1764242186;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0OPXfZoq32hCbqwxNyncsVbKNdLZ3Sub0ZLhzzXMtjo=;
-        b=PqfdED7Np7k3zSK8tHdGPLl8a68RxurNuOdxAc23I9IPwCDCmM9CviajzOcbT2k3N6
-         Z4kO52Cnn0G27C+ys6Jq5jkI4tmUI+FQ6Dx8ABl4gVNKYZhn+sEF8xzT03NsJ5J9Arv+
-         VuY+Yor1mWAGd1/AxyaD8eeDeCHBZPz2c6ccoc4BwNWzYUKk1YJDOd6qKEZOI1BYHFjc
-         ZHd+yR86HEeWybtD2I7RxYHS3S7vbHpdfHb4rNFZ/zvU+v5063d3mjY2z/tcBwveEhI+
-         Mrxy7oqxv50z7hJHkjiAwM2RetLC4t+4pAK5sO64MEojE0mn45IPcXWHos3mb0daRsrX
-         zwPg==
-X-Forwarded-Encrypted: i=1; AJvYcCW5oNuZ6hQVQ2LXQdcPTCR9UGA2Jav9J3+IoEaez6JZNBFRqIePSF6ti1yWswHf22lEetcecIo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGQopXZX5jP0xCoDR+WUTOKU6Fdx0kj9DGyTdoWCFPZVGStXR1
-	x+x6zRofconfvO1TJ+MXcTttil0rtes2bnelEgg318fFMqXl/aupKq00
-X-Gm-Gg: ASbGncuP+ZsqIqrAAJgEmu7HaaJG0Bzq+RJRkGvJermS5gGB1iV3VPzxCgmjc0leYkM
-	luLhzDjbK3QRvwYSiSQhcvpMcZ7TyCmSTlEnX71hXjLsphwhAI/03fngMjRp4Bbl9R12Wk9vXXk
-	e7PbDhgjKWfKlPHt5SXFza/r6BZ7OvwFZRW8WRFZXJacpQDHU+p41HVF7YvY39E9kRibJFgwSAH
-	E+lMGBmeROYwv8rXZxUE78giUXVf812qEiBnuonongf60QM9IIxtCBQVIeuvLBXhH6J/jn/41br
-	aqQ2r8aToGNQOnYJ+X+zRHSiRntplubuyaVz6tJwi9huuxs+NWSa0n2eVrhzS69/2nds6+nLMPR
-	lGN6nrifVoEO8iuCi7ML125BQSeqTFevfLRKSYHeAAw1nCmSmSQKPU7g1di2iLSxrZUQyY4z+3G
-	cdY0/mI7rLU/e4JRhewneUiGynVmqJTd7ReujYIO+amHpPW06x+kFT
-X-Google-Smtp-Source: AGHT+IFZB29IrybraSPGQhV7roEItbkZW/1Rvxj8aVil7QNoLoeVbtGz5PzkfltFhZGqHiCqn2Q5ow==
-X-Received: by 2002:a05:600c:3115:b0:477:89d5:fdac with SMTP id 5b1f17b1804b1-477b8a9f9camr28349905e9.31.1763637385245;
-        Thu, 20 Nov 2025 03:16:25 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a973dbabsm64908285e9.3.2025.11.20.03.16.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 03:16:24 -0800 (PST)
-Date: Thu, 20 Nov 2025 11:16:23 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: bot+bpf-ci@kernel.org
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- dsahern@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, andrii@kernel.org,
- daniel@iogearbox.net, martin.lau@kernel.org, eddyz87@gmail.com,
- yonghong.song@linux.dev, clm@meta.com, ihor.solodrai@linux.dev
-Subject: Re: [PATCH 09/44] ipv6: __ip6_append_data() don't abuse max_t()
- casts
-Message-ID: <20251120111623.44ebfae7@pumpkin>
-In-Reply-To: <ddcd920ff99e0f97ed2c92cf650872d76a4b7404ea87a104e6ab061ee3005cf9@mail.kernel.org>
-References: <20251119224140.8616-10-david.laight.linux@gmail.com>
-	<ddcd920ff99e0f97ed2c92cf650872d76a4b7404ea87a104e6ab061ee3005cf9@mail.kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1763637641; c=relaxed/simple;
+	bh=NPis4lGIzRENwNC8RL+waJhQBAh3ydR+JSiZg+5KEmQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KfATtevQVwxdIPHAUSTcvk1M+jr8St4YnKRUZ38qupQney1tkR7Jn4rtO4N4Dyuf22qWTitj5GSZlupcGOjYEPLsMZNW5bmZJcT4Tu2atZ2Q2Xs/aHPhUdjBm8F/SrB2rzRcIVk6Qr1wZXWvwQ8gJXt1RYfSyPnM1orfZVONRfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k914ASyh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D605DC4CEF1;
+	Thu, 20 Nov 2025 11:20:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763637640;
+	bh=NPis4lGIzRENwNC8RL+waJhQBAh3ydR+JSiZg+5KEmQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=k914ASyhSFRSziz3mXQUxMBbObOSp4Gn4fZjLPNy2Sh91HYEDRmZMbeDpebR0JYnF
+	 Ooar61W0RXVXrMRPS3phcO+tZJzbGWK/bMKIwaF36G3kgqFh1pHD/kECWANX+I7o4Y
+	 I04pV34lpEBzxWllaVv+cMTRIv+gXXjT8wwcvo7Md9s/4oTU7iNTeNM+FScibo2RAb
+	 ImJbmQxaZoBHWsmRgyg/E3VYkqmQ5JzhcZYvX1Ip76fWcbErsswQO0wMcluzxIbg0B
+	 VMnulOLWXRuHJ4XlUK+5f49XSdqxisygq6VOYQrd04vD2/gLXKJf0MrlX0G6UF8r1Q
+	 b81jZEVZ3p0hw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B2E39EFA6F;
+	Thu, 20 Nov 2025 11:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] l2tp: reset skb control buffer on xmit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176363760630.1581289.683888947957322970.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Nov 2025 11:20:06 +0000
+References: <20251118001619.242107-1-mail@david-bauer.net>
+In-Reply-To: <20251118001619.242107-1-mail@david-bauer.net>
+To: David Bauer <mail@david-bauer.net>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, kaber@trash.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Thu, 20 Nov 2025 00:32:34 +0000 (UTC)
-bot+bpf-ci@kernel.org wrote:
+Hello:
 
-> > diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-> > index f904739e9..6fecf2f2c 100644
-> > --- a/net/ipv6/ip6_output.c
-> > +++ b/net/ipv6/ip6_output.c
-> > @@ -1440,7 +1440,7 @@ static int __ip6_append_data(struct sock *sk,
-> >  	struct sk_buff *skb, *skb_prev = NULL;
-> >  	struct inet_cork *cork = &cork_full->base;
-> >  	struct flowi6 *fl6 = &cork_full->fl.u.ip6;
-> > -	unsigned int maxfraglen, fragheaderlen, mtu, orig_mtu, pmtu;
-> > +	unsigned int maxfraglen, fragheaderlen, mtu, orig_mtu;  
-> 
-> [ ... ]
-> 
-> > @@ -1504,9 +1504,10 @@ static int __ip6_append_data(struct sock *sk,
-> >  		maxnonfragsize = mtu;
-> >
-> >  	if (cork->length + length > maxnonfragsize - headersize) {
-> > +		int pmtu;
-> >  emsgsize:
-> > -		pmtu = max_t(int, mtu - headersize + sizeof(struct ipv6hdr), 0);
-> > -		ipv6_local_error(sk, EMSGSIZE, fl6, pmtu);
-> > +		pmtu = mtu - headersize + (int)sizeof(struct ipv6hdr);
-> > +		ipv6_local_error(sk, EMSGSIZE, fl6, max(pmtu, 0));
-> >  		return -EMSGSIZE;
-> >  	}  
-> 
-> Can the variable pmtu be used uninitialized here?
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-If your AI bot doesn't understand code don't run it.
+On Tue, 18 Nov 2025 01:16:18 +0100 you wrote:
+> The L2TP stack did not reset the skb control buffer before sending the
+> encapsulated package.
+> 
+> In a setup with an ath10k radio and batman-adv over an L2TP tunnel
+> massive fragmentations happen sporadically if the L2TP tunnel is
+> established over IPv4.
+> 
+> [...]
 
-	David
+Here is the summary with links:
+  - [net] l2tp: reset skb control buffer on xmit
+    https://git.kernel.org/netdev/net/c/d70b592551ff
 
-> 
-> When reaching the emsgsize label via goto statements from earlier in
-> __ip6_append_data() (the checks at lines around mtu <= fragheaderlen,
-> headersize + transhdrlen > mtu, and the dontfrag check), the int pmtu
-> declaration is skipped. This leaves pmtu uninitialized when it's used
-> in the calculation that's passed to ipv6_local_error().
-> 
-> 
-> ---
-> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-> 
-> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19519124312
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
