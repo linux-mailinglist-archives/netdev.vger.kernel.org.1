@@ -1,159 +1,188 @@
-Return-Path: <netdev+bounces-240324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EF22C73114
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 10:15:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C5ABC73350
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 10:35:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1FE0E348A0C
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 09:13:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 483EF2FE21
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 09:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E13B31B82B;
-	Thu, 20 Nov 2025 09:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DV3Hw/Vd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2D624DCEB;
+	Thu, 20 Nov 2025 09:34:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015393191C3;
-	Thu, 20 Nov 2025 09:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7BD01991D2;
+	Thu, 20 Nov 2025 09:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763629944; cv=none; b=PAkpynbN6FE/AnSpaNZ8xqlkZEP1yL+zPgeBQ01PFeBtWOcPSz91Hl/dhIcMUa2bS/MHUqrzKkNmb1SYinld6JES0NTyarQvuQA5m2QAh+lht7bwrvSGMjlSnuazIUpbs4TMwAp4UIwYRd/iQi8na3/X5xdjrbLANhSVJIpNHOE=
+	t=1763631292; cv=none; b=Dg81+G1AGWqeAokwk56Pvn4FXBINol2uH1aGzZ8SINxoVokQ9g5jv6S0pTAIz9o4VKsiFajAutO/ogWu5WNkul6htrgOI9VFZI80cUXPEbu79biJjc8pGXVX38kkXBWFl55jY1fGPnMaVl/8ar00K3zy6TqYP1E6zU0qzADV448=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763629944; c=relaxed/simple;
-	bh=Fr95gr2MS+4E19O9tKTmnf7ACBsyrmSMrq1dJf/vZk8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NS6SRlk4Jke34PHLtuHzolvojUHJdWPduLbCxF+FXNNaRWRoDZg59npH3eyBIGNf+tPWNktQwoQ+RsUYVSZo4bFjxFYqV4Kvl0BPZPR3COH+49s3qqUflowPyja/OWp1KOBtexpo+zRLiM3l3aYEHI8foXYeAf3zIZOdt2dufyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DV3Hw/Vd; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 500531A1C28;
-	Thu, 20 Nov 2025 09:12:20 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 244286068C;
-	Thu, 20 Nov 2025 09:12:20 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CA66910371C08;
-	Thu, 20 Nov 2025 10:12:17 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763629939; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=6PmstxobF6Y4mA2z1PMwswOGcY6Z1dVMYzIEo3cJgeM=;
-	b=DV3Hw/VdLCIYqVARSkaBflhiYbE1MhDD7RoQswQDkztPcjY8ml0iDrzh54PQ/n5M8Ccii1
-	tkgTF5pPsZxbX/hvF8k/S8gCPtstIvfAxw9L+aRxksKvIMBR3t7jyTL6okx4rljViEMyOZ
-	Xblox8LGo6MkL58eoPD0gRO3PPUc6T3lNupq0qBB6w6gCWPbxqJP9QZ3q/M5OIFgP7ORmU
-	GqcpQ6bPrDpcj2qk3qyoxRXu/1bY68Xn/p45mx1HUkzOdEC434CD6zFYfyFvDzREtMB1tT
-	bSxS+A3Rl86KL1X2RvAZFYqIahhmk2XTD5nPfoLe3IjC9PRjGUL7fvt3ojhPnA==
-From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Thu, 20 Nov 2025 10:12:04 +0100
-Subject: [PATCH net v6 5/5] net: dsa: microchip: Fix symetry in
- ksz_ptp_msg_irq_{setup/free}()
+	s=arc-20240116; t=1763631292; c=relaxed/simple;
+	bh=tegRMgEqPhKRlMFtVCga4Fuxxm747O0bQgsRdJ858xE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lOftH1CILEplNAeAnzDijThNULy1jMwQUrPq8un4fnI+lVhS2rwv+RooZwepddY+FBj0OyfOVtqf7HBuHpalL8XcQWT48qGTH/sE63nlmQ0cgxKW8cB/jjKu6YPd9/36Q5DOkl2TVZkOo9lw8eXpwQeubctRpFCZx+T5fm+Jl5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 72B14604C4; Thu, 20 Nov 2025 10:34:46 +0100 (CET)
+Date: Thu, 20 Nov 2025 10:34:46 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Phil Sutter <phil@nwl.cc>,
+	Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>,
+	netdev@vger.kernel.org, Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kernel@vger.kernel.org
+Subject: Re: Soft lock-ups caused by iptables
+Message-ID: <aR7grVC-kLg76kvE@strlen.de>
+References: <20251118221735.GA5477@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <aR3ZFSOawH-y_A3q@orbyte.nwl.cc>
+ <aR3pNvwbvqj_mDu4@strlen.de>
+ <aR4Ildw_PYHPAkPo@orbyte.nwl.cc>
+ <aR5ObjGO4SaD3GkX@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251120-ksz-fix-v6-5-891f80ae7f8f@bootlin.com>
-References: <20251120-ksz-fix-v6-0-891f80ae7f8f@bootlin.com>
-In-Reply-To: <20251120-ksz-fix-v6-0-891f80ae7f8f@bootlin.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
- =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>, 
- stable@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aR5ObjGO4SaD3GkX@calendula>
 
-The IRQ numbers created through irq_create_mapping() are only assigned
-to ptpmsg_irq[n].num at the end of the IRQ setup. So if an error occurs
-between their creation and their assignment (for instance during the
-request_threaded_irq() step), we enter the error path and fail to
-release the newly created virtual IRQs because they aren't yet assigned
-to ptpmsg_irq[n].num.
+Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> > > Yes, but you also need to annotate the type of the last base chain origin,
+> > > else you might skip validation of 'chain foo' because its depth value says its
+> > > fine but new caller is coming from filter, not nat, and chain foo had
+> > > masquerade expression.
+> 
+> You could also have chains being called from different levels.
 
-Move the mapping creation to ksz_ptp_msg_irq_setup() to ensure symetry
-with what's released by ksz_ptp_msg_irq_free().
-In the error path, move the irq_dispose_mapping to the out_ptp_msg label
-so it will be called only on created IRQs.
+But thats not an issue.  If you see a jump from c1 to c2, and c2
+has been validated for a level of 5, then you need to revalidate
+only if c1->depth >= 5.
 
-Cc: stable@vger.kernel.org
-Fixes: cc13ab18b201 ("net: dsa: microchip: ptp: enable interrupt for timestamping")
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
----
- drivers/net/dsa/microchip/ksz_ptp.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
+Do you see any issue with this? (it still lacks annotation for
+the calling basechains type, so this cannot be applied as-is):
 
-diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
-index c8bfbe5e2157323ecf29149d1907b77e689aa221..997e4a76d0a68448b0ebc76169150687bbc79673 100644
---- a/drivers/net/dsa/microchip/ksz_ptp.c
-+++ b/drivers/net/dsa/microchip/ksz_ptp.c
-@@ -1093,19 +1093,19 @@ static int ksz_ptp_msg_irq_setup(struct ksz_port *port, u8 n)
- 	static const char * const name[] = {"pdresp-msg", "xdreq-msg",
- 					    "sync-msg"};
- 	const struct ksz_dev_ops *ops = port->ksz_dev->dev_ops;
-+	struct ksz_irq *ptpirq = &port->ptpirq;
- 	struct ksz_ptp_irq *ptpmsg_irq;
- 
- 	ptpmsg_irq = &port->ptpmsg_irq[n];
-+	ptpmsg_irq->num = irq_create_mapping(ptpirq->domain, n);
-+	if (!ptpmsg_irq->num)
-+		return -EINVAL;
- 
- 	ptpmsg_irq->port = port;
- 	ptpmsg_irq->ts_reg = ops->get_port_addr(port->num, ts_reg[n]);
- 
- 	strscpy(ptpmsg_irq->name, name[n]);
- 
--	ptpmsg_irq->num = irq_find_mapping(port->ptpirq.domain, n);
--	if (ptpmsg_irq->num < 0)
--		return ptpmsg_irq->num;
--
- 	return request_threaded_irq(ptpmsg_irq->num, NULL,
- 				    ksz_ptp_msg_thread_fn, IRQF_ONESHOT,
- 				    ptpmsg_irq->name, ptpmsg_irq);
-@@ -1135,9 +1135,6 @@ int ksz_ptp_irq_setup(struct dsa_switch *ds, u8 p)
- 	if (!ptpirq->domain)
- 		return -ENOMEM;
- 
--	for (irq = 0; irq < ptpirq->nirqs; irq++)
--		irq_create_mapping(ptpirq->domain, irq);
--
- 	ptpirq->irq_num = irq_find_mapping(port->pirq.domain, PORT_SRC_PTP_INT);
- 	if (!ptpirq->irq_num) {
- 		ret = -EINVAL;
-@@ -1159,12 +1156,11 @@ int ksz_ptp_irq_setup(struct dsa_switch *ds, u8 p)
- 
- out_ptp_msg:
- 	free_irq(ptpirq->irq_num, ptpirq);
--	while (irq--)
-+	while (irq--) {
- 		free_irq(port->ptpmsg_irq[irq].num, &port->ptpmsg_irq[irq]);
--out:
--	for (irq = 0; irq < ptpirq->nirqs; irq++)
- 		irq_dispose_mapping(port->ptpmsg_irq[irq].num);
--
-+	}
-+out:
- 	irq_domain_remove(ptpirq->domain);
- 
- 	return ret;
+netfilter: nf_tables: avoid chain re-validation if possible
 
--- 
-2.51.1
+Consider:
+
+      input -> j2 -> j3
+      input -> j2 -> j3
+      input -> j1 -> j2 -> j3
+
+Then the second rule does not need to revalidate j2, and, by extension j3.
+
+We need to validate it only for rule 3.
+
+This is needed because chain loop detection also ensures we do not
+exceed the jump stack: Just because we know that j2 is cycle free, its
+last jump might now exceed the allowed stack.  We also need to update
+the new largest call depth for all the reachable nodes.
+
+diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
+--- a/include/net/netfilter/nf_tables.h
++++ b/include/net/netfilter/nf_tables.h
+@@ -1109,6 +1109,7 @@ struct nft_rule_blob {
+  *	@udlen: user data length
+  *	@udata: user data in the chain
+  *	@blob_next: rule blob pointer to the next in the chain
++ *	@depth: chain was validated for call level <= depth
+  */
+ struct nft_chain {
+ 	struct nft_rule_blob		__rcu *blob_gen_0;
+@@ -1128,9 +1129,10 @@ struct nft_chain {
+ 
+ 	/* Only used during control plane commit phase: */
+ 	struct nft_rule_blob		*blob_next;
++	u8				depth;
+ };
+ 
+-int nft_chain_validate(const struct nft_ctx *ctx, const struct nft_chain *chain);
++int nft_chain_validate(const struct nft_ctx *ctx, struct nft_chain *chain);
+ int nft_setelem_validate(const struct nft_ctx *ctx, struct nft_set *set,
+ 			 const struct nft_set_iter *iter,
+ 			 struct nft_elem_priv *elem_priv);
+diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+--- a/net/netfilter/nf_tables_api.c
++++ b/net/netfilter/nf_tables_api.c
+@@ -4088,15 +4088,26 @@ static void nf_tables_rule_release(const struct nft_ctx *ctx, struct nft_rule *r
+  * and set lookups until either the jump limit is hit or all reachable
+  * chains have been validated.
+  */
+-int nft_chain_validate(const struct nft_ctx *ctx, const struct nft_chain *chain)
++int nft_chain_validate(const struct nft_ctx *ctx, struct nft_chain *chain)
+ {
+ 	struct nft_expr *expr, *last;
+ 	struct nft_rule *rule;
+ 	int err;
+ 
++	BUILD_BUG_ON(NFT_JUMP_STACK_SIZE > 255);
+ 	if (ctx->level == NFT_JUMP_STACK_SIZE)
+ 		return -EMLINK;
+ 
++	/* jumps to base chains are not allowed, this is already
++	 * validated by nft_verdict_init().
++	 *
++	 * Chain must be re-validated if we are entering for first
++	 * time or if the current jumpstack usage is higher than on
++	 * previous check.
++	 */
++	if (ctx->level && chain->depth >= ctx->level)
++		return 0;
++
+ 	list_for_each_entry(rule, &chain->rules, list) {
+ 		if (fatal_signal_pending(current))
+ 			return -EINTR;
+@@ -4117,6 +4128,10 @@ int nft_chain_validate(const struct nft_ctx *ctx, const struct nft_chain *chain)
+ 		}
+ 	}
+ 
++	/* Chain needs no re-validation if called again
++	 * from a path that doesn't exceed level.
++	 */
++	chain->depth = ctx->level;
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(nft_chain_validate);
+@@ -4128,7 +4143,7 @@ static int nft_table_validate(struct net *net, const struct nft_table *table)
+ 		.net	= net,
+ 		.family	= table->family,
+ 	};
+-	int err;
++	int err = 0;
+ 
+ 	list_for_each_entry(chain, &table->chains, list) {
+ 		if (!nft_is_base_chain(chain))
+@@ -4137,12 +4152,16 @@ static int nft_table_validate(struct net *net, const struct nft_table *table)
+ 		ctx.chain = chain;
+ 		err = nft_chain_validate(&ctx, chain);
+ 		if (err < 0)
+-			return err;
++			goto err;
+ 
+ 		cond_resched();
+ 	}
+ 
+-	return 0;
++err:
++	list_for_each_entry(chain, &table->chains, list)
++		chain->depth = 0;
++
++	return err;
+ }
+ 
+ int nft_setelem_validate(const struct nft_ctx *ctx, struct nft_set *set,
 
 
