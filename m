@@ -1,132 +1,112 @@
-Return-Path: <netdev+bounces-240431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 853D5C74FBB
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:32:22 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B001C74FDC
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:34:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9F91235ED0B
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:26:32 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 739FC365A09
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:26:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6BB366DC5;
-	Thu, 20 Nov 2025 15:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73DD364032;
+	Thu, 20 Nov 2025 15:18:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="l9S42diO"
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="ED0zFn4U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D9E361DB6;
-	Thu, 20 Nov 2025 15:18:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB9E36403C
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 15:18:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763651914; cv=none; b=QwIQ78HIBSzPtbGqovOC1JrfNvZoYWUuRhYVEYj0aL1BaZnKLKUin5IKsoNxW+4wEtQ7XYux2RrD0vwMeQlw/M98C5ntmtd+3uDoZvtSKOYB4yMpFtjTp36U/e7Tn/0e5SriHcMLB6GVUcOgQ32y+/nYMValV5xIbGmSVXuRqLE=
+	t=1763651937; cv=none; b=uxHme5Yc0BQtFYV6vElqwgpvg3JkYd3UMyjJbTy8100Cx67pbeAujECHQnUseJ/6YVTaXR533Ye+Be/cCioyph37z3nUyjHBCyj7DhcSnf86P/e+UuuuISFD/vjUDb5RCpH+3WsD5C9q3HbhOhHCyW2+t0WB0cQpo6IT9+lmKc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763651914; c=relaxed/simple;
-	bh=KiKmLPo0LId2AqBx7SKloWwEHaffPU4qyU54oEDKIa8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nm7cGJb/4TaEJT8QBRfgLe46/MmJihkeiE/Set+5wEzMcU5k8qnBL3P23rS6oxN/XI+zZ8YxuWorge0HmC3ROLTGjYjOqkrvYGJmd8nNRaA2hUmKOT1riSy4GZgkfI6Wgnqq1byrE9Rb171u4I0UID1/+6d2Z6hfg6kJf4ien5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=l9S42diO; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 5E0DF1A1C4A;
-	Thu, 20 Nov 2025 15:18:24 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 2C8EC6068C;
-	Thu, 20 Nov 2025 15:18:24 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1371810371C4F;
-	Thu, 20 Nov 2025 16:18:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763651902; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=W+w9uzAPuUadr/2vcu3RjzEbTIq1CSq9medNjoIyd0c=;
-	b=l9S42diO51gPGUNuhEnHQSnWSxeL7UtQyzWf+pSUkD1kHEiJLJ2pxLkp7FW9teyxIjXeM7
-	GjWKcU9mPtqPUARnLTB3ODK0eZk1VkcUWYggdmpPLYWEwWavemElCdfRIimMfNBGkrc44R
-	GfJd21OqCv3vIdx3ElchM3qWyG5kH3MY8B17grroqx8eE6LefdKu7NWY2NY9qgsXmOufzK
-	SPI/OvH7FwMVdEIafwEKK2MLS+gq44ozi4hBBVG84S8XT/UIoO2PlY0dPj4Mx0IwzrYzDc
-	aCTBmsdZC7uM6gAaoQzZlnJlVWbMcQ7lEVSNmdFhnJRosCsGAmk0OA+xXUyoPw==
-Message-ID: <2fbd40ed-40e6-4ba2-b914-1f6d2d26dc85@bootlin.com>
-Date: Thu, 20 Nov 2025 16:18:14 +0100
+	s=arc-20240116; t=1763651937; c=relaxed/simple;
+	bh=ga/ylwTfIbOxh/mMnl6r96V6WEmjetu1+5m97/n3UPA=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=WtlDmHUQA+LgolL3+UauqNWhKuqqhBJh1GrThxHwOM7qZSshtcX2WVSwo27a+l9qQlFnNvJV2o7Xa4FwZ48fcx/fLmcZx/S9ZOvkUm3GdQSMVURIFsbsdAF6cqge1YDE5MAPvRORoEU/nASg9DAVXpEb2JWyfuv2Moy4o8VME4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=ED0zFn4U; arc=none smtp.client-ip=185.70.43.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1763651927; x=1763911127;
+	bh=EJwU/BjWhyfPG7QmP4FViJ7bQSf3HiQXggFyBGL0WIQ=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=ED0zFn4ULVAZWhxbYZLXSBiD+BWGLyh4/L5B7/eYLEqfRSyiXdbkHRrtjcs6skuaO
+	 Yag97AoPS060Rx6iHCSJs0wiI2QBhH8LkmdVt1VwrnFHh4U/rtJG/4nKG/Yu8MLaMb
+	 og6sJeKpKEyPaELLeMrHEUcrG7UzkVzbw3krlE8oH0QNd/K7qoANVfhf1Xe4Tk1egu
+	 9MK/jrQs3sRHp5SRKmaSiNZr+8fxB0x9qKTFjpic/hdsNKPXao4F2RDhEyz4aTi/Mc
+	 aPgGP2LR3K9bL8IBDeVtgxcSqW2p4Snr9+bZXuNJli1xuPeKGCulVffmZdu+kmAQQo
+	 T7DyL3JKRqUmA==
+Date: Thu, 20 Nov 2025 15:18:40 +0000
+To: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+From: "Remy D. Farley" <one-d-wide@protonmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, "Remy D. Farley" <one-d-wide@protonmail.com>
+Subject: [PATCH v5 0/6] doc/netlink: Expand nftables specification
+Message-ID: <20251120151754.1111675-1-one-d-wide@protonmail.com>
+Feedback-ID: 59017272:user:proton
+X-Pm-Message-ID: 6bb83a766f93632f4dce9c79fa87077729812c2a
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v17 03/15] net: phy: Introduce PHY ports
- representation
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
- Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-References: <20251119195920.442860-1-maxime.chevallier@bootlin.com>
- <20251119195920.442860-4-maxime.chevallier@bootlin.com>
- <20251119195400.1bf0cc68@kernel.org>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251119195400.1bf0cc68@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+Getting out some changes I've accumulated while making nftables work
+with Rust netlink-bindings. Hopefully, this will be useful upstream.
 
+v5:
 
-On 20/11/2025 04:54, Jakub Kicinski wrote:
-> On Wed, 19 Nov 2025 20:59:04 +0100 Maxime Chevallier wrote:
->> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
->> index 2f4b70f104e8..8216e4ada58e 100644
->> --- a/net/ethtool/common.c
->> +++ b/net/ethtool/common.c
->> @@ -460,6 +460,21 @@ const struct link_mode_info link_mode_params[] = {
->>  static_assert(ARRAY_SIZE(link_mode_params) == __ETHTOOL_LINK_MODE_MASK_NBITS);
->>  EXPORT_SYMBOL_GPL(link_mode_params);
->>  
->> +const char ethtool_link_medium_names[][ETH_GSTRING_LEN] = {
->> +	[ETHTOOL_LINK_MEDIUM_BASET] = "BaseT",
->> +	[ETHTOOL_LINK_MEDIUM_BASEK] = "BaseK",
->> +	[ETHTOOL_LINK_MEDIUM_BASES] = "BaseS",
->> +	[ETHTOOL_LINK_MEDIUM_BASEC] = "BaseC",
->> +	[ETHTOOL_LINK_MEDIUM_BASEL] = "BaseL",
->> +	[ETHTOOL_LINK_MEDIUM_BASED] = "BaseD",
->> +	[ETHTOOL_LINK_MEDIUM_BASEE] = "BaseE",
->> +	[ETHTOOL_LINK_MEDIUM_BASEF] = "BaseF",
->> +	[ETHTOOL_LINK_MEDIUM_BASEV] = "BaseV",
->> +	[ETHTOOL_LINK_MEDIUM_BASEMLD] = "BaseMLD",
->> +	[ETHTOOL_LINK_MEDIUM_NONE] = "None",
->> +};
->> +static_assert(ARRAY_SIZE(ethtool_link_medium_names) == __ETHTOOL_LINK_MEDIUM_LAST);
-> 
-> Thanks for reshuffling things, this one needs a static tho:
-> 
-> net/ethtool/common.c:463:12: warning: symbol 'ethtool_link_medium_names' was not declared. Should it be static?
+- Fix docgen warnings in enums (avoid interleaving strings and attrsets in =
+a list).
+- Remove "# defined in ..." comments in favor of explicit "header" tag.
+- Split into smaller commits.
 
-Ok I figured that I didn't have sparse installed locally, so the
-local NIPA build "build_allmodconfig_warn" didn't go through.
+v4: https://lore.kernel.org/netdev/cover.1763574466.git.one-d-wide@protonma=
+il.com/
+- Move changes to netlink-raw.yaml into a separate commit.
 
-That's fixed now, hopefully even less bugs next time !
+v3: https://lore.kernel.org/netdev/20251009203324.1444367-1-one-d-wide@prot=
+onmail.com/
+- Fill out missing attributes in each operation (removing todo comments fro=
+m v1).
+- Add missing annotations: dump ops, byte-order, checks.
+- Add max check to netlink-raw specification (suggested by Donald Hunter).
+- Revert changes to ynl_gen_rst.py.
 
-Maxime
+v2: https://lore.kernel.org/netdev/20251003175510.1074239-1-one-d-wide@prot=
+onmail.com/
+- Handle empty request/reply attributes in ynl_gen_rst.py script.
+
+v1: https://lore.kernel.org/netdev/20251002184950.1033210-1-one-d-wide@prot=
+onmail.com/
+- Add missing byte order annotations.
+- Fill out attributes in some operations.
+- Replace non-existent "name" attribute with todo comment.
+- Add some missing sub-messages (and associated attributes).
+- Add (copy over) documentation for some attributes / enum entries.
+- Add "getcompat" operation.
+
+Remy D. Farley (6):
+  doc/netlink: netlink-raw: Add max check
+  doc/netlink: nftables: Add definitions
+  doc/netlink: nftables: Update attribute sets
+  doc/netlink: nftables: Add sub-messages
+  doc/netlink: nftables: Add getcompat operation
+  doc/netlink: nftables: Fill out operation attributes
+
+ Documentation/netlink/netlink-raw.yaml    |  11 +-
+ Documentation/netlink/specs/nftables.yaml | 687 ++++++++++++++++++++--
+ 2 files changed, 647 insertions(+), 51 deletions(-)
+
+--=20
+2.50.1
+
 
 
