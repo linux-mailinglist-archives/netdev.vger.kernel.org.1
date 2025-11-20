@@ -1,63 +1,50 @@
-Return-Path: <netdev+bounces-240366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F658C73D52
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:53:25 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B06FBC73DAF
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 13:01:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 182F4304F4
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:53:24 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2C6233529E9
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:01:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1229D2727EE;
-	Thu, 20 Nov 2025 11:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69629331222;
+	Thu, 20 Nov 2025 12:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="N5DlF3fz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k8OTfZGn"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF9B2FD1B9;
-	Thu, 20 Nov 2025 11:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B78331212
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763639602; cv=none; b=NO1o2sCxRPrJVjw7YTQGQ3gqwvHSaqAgp0uNxUj8nIW/v+NszvWBrBpL7F7tLoSs0borgzripqHTpREP5+exfKJhuz/4MkhahZZ5zir1CXbL79qupuAM323e34dILEr2NZ+OYSZ3IRMThJBrSQyvJoYf0OCMpDQQuql/kPxoAf4=
+	t=1763640049; cv=none; b=uj2tBAoETuplWuMb5IZMY2uNyJxu18waVfULxAq4fc23pXcTs6Yvs8QrjfLNR51yfutftf+wSMpR13FAt2KPBxrPyPCnfrSD3Dbwa9taQkmXNtrFpGE1mAJOTQAN5cyhjM5VifqQchPA/h9FFadam5qs1f17f/sx+fEFdzVBZK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763639602; c=relaxed/simple;
-	bh=2aEtqVtnhhNYp29lCAJcQY1w52LRSC5n/qmKVhVyk7M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aN83dQZADx08Ne9T1rMx/zLor98RTzl7SIIq2rhrXcBK28Get5YhBwYvyobHFEOZE3bWydphvvB7r5JcMuSnq4Htwe8HNkSjGeGa3S08mgymASV+jFo8XrdwM5qTe2ER9sq9V3z1PifLL8F1X21fK3UCGZpodqXRTkuefvYpiLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=N5DlF3fz; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=jo
-	bMWD91by5uhDYoqh/KCiL5hqPFwNPSpc8S2TG7LwE=; b=N5DlF3fzBh1aInjDoH
-	CXeDjKwJowSJRDUJ2zugc2ImDzWaBYTMz+49beAqR1lmjmWBzxLiJ3SAO/JFHATo
-	hRY1X+4CX9MML8s9s8SsLGR9db81/3g83PweQig0yfKy3z+UiFNC8U3xpQFzyi6/
-	ZdlFMFxAVGTvKgX1Pe6+W5lCg=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wDnaqbxAB9px6_ZBQ--.2298S2;
-	Thu, 20 Nov 2025 19:52:20 +0800 (CST)
-From: Slark Xiao <slark_xiao@163.com>
-To: chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	haijun.liu@mediatek.com,
-	loic.poulain@oss.qualcomm.com,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Slark Xiao <slark_xiao@163.com>
-Subject: [PATCH] net: wwan: t7xx: Make local function static
-Date: Thu, 20 Nov 2025 19:52:08 +0800
-Message-Id: <20251120115208.345578-1-slark_xiao@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1763640049; c=relaxed/simple;
+	bh=hrpfl3+6RTyo6PK63HjV3JOoV42ZU4Lb9vAW+nPIy4I=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=i2e60g9+8gbLz5fouiPLFc0mnGPUNJA9MpuiXKEy1u8b54oH2dJGjQ9jwGvBcJz5u8CtYjZFB+rilmmWU8cG29W4wk09mvHvMPa4sPewp60R7XOc48uvDdXxlhoZHkxJ62TEAHXWJTBTDMSCBLHFycVUgkJ/0SeinfVoHlFLfTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k8OTfZGn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D635DC116D0;
+	Thu, 20 Nov 2025 12:00:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763640048;
+	bh=hrpfl3+6RTyo6PK63HjV3JOoV42ZU4Lb9vAW+nPIy4I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=k8OTfZGn55V3CgjATnT8AafijJPpe2QKSQETsXmGXQN9PinvUQ0w1sp9IF+MoB2LG
+	 bTWYbp/4bu6Javy88RM9vTCvl1jYQAC/5x6Uf9dygmjTtGpA3V+KwtNWw581vJfYFc
+	 Qw0AF4wUEQAVS1OxfZeJXK9yxC6SItcvgcP4hgx7I9eLcxtrAQyXGZON82Lcp9kmmY
+	 1O9iBPHq0WXkX7unS537liEop7+ndeN1+QomI+wkcpYrJ9lsn7Zl+/Al4+9gqvtjpR
+	 xBh8tRwhpaX0T1JRiKWN7Kxtkg09fYlcijd6IQ5z34H2NWkzRf9dLqWVjWrzINcetM
+	 EykyLlAcEer0g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C0E39EFBBF;
+	Thu, 20 Nov 2025 12:00:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,49 +52,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnaqbxAB9px6_ZBQ--.2298S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7WF4UGrWkuw4DJw17CryrCrg_yoW8CF4kpa
-	1UAF12k39Yyw4Duw4UJrWIyFnxJw1Iv3y09ryftw1rWF93ArW5AF1q9FW3Ar43A3srWF1f
-	ArWUt39xCF18CrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pisa93UUUUU=
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiGRsMZGke-YpS-QAAsF
+Subject: Re: [PATCH net-next v2 0/5] TXGBE support more modules
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176364001400.1592828.13106374979415290182.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Nov 2025 12:00:14 +0000
+References: <20251118080259.24676-1-jiawenwu@trustnetic.com>
+In-Reply-To: <20251118080259.24676-1-jiawenwu@trustnetic.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux@armlinux.org.uk, jacob.e.keller@intel.com, vadim.fedorenko@linux.dev,
+ mengyuanlou@net-swift.com
 
-This function was used in t7xx_hif_cldma.c only. Make it static
-as it should be.
+Hello:
 
-Signed-off-by: Slark Xiao <slark_xiao@163.com>
----
- drivers/net/wwan/t7xx/t7xx_hif_cldma.c | 2 +-
- drivers/net/wwan/t7xx/t7xx_hif_cldma.h | 2 --
- 2 files changed, 1 insertion(+), 3 deletions(-)
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c b/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
-index 97163e1e5783..bd16788882f0 100644
---- a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
-+++ b/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
-@@ -899,7 +899,7 @@ static void t7xx_cldma_hw_start_send(struct cldma_ctrl *md_ctrl, int qno,
-  * @queue: CLDMA queue.
-  * @recv_skb: Receiving skb callback.
-  */
--void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
-+static void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
- 			     int (*recv_skb)(struct cldma_queue *queue, struct sk_buff *skb))
- {
- 	queue->recv_skb = recv_skb;
-diff --git a/drivers/net/wwan/t7xx/t7xx_hif_cldma.h b/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
-index f2d9941be9c8..9d0107e18a7b 100644
---- a/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
-+++ b/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
-@@ -126,8 +126,6 @@ void t7xx_cldma_switch_cfg(struct cldma_ctrl *md_ctrl, enum cldma_cfg cfg_id);
- void t7xx_cldma_start(struct cldma_ctrl *md_ctrl);
- int t7xx_cldma_stop(struct cldma_ctrl *md_ctrl);
- void t7xx_cldma_reset(struct cldma_ctrl *md_ctrl);
--void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
--			     int (*recv_skb)(struct cldma_queue *queue, struct sk_buff *skb));
- int t7xx_cldma_send_skb(struct cldma_ctrl *md_ctrl, int qno, struct sk_buff *skb);
- void t7xx_cldma_stop_all_qs(struct cldma_ctrl *md_ctrl, enum mtk_txrx tx_rx);
- void t7xx_cldma_clear_all_qs(struct cldma_ctrl *md_ctrl, enum mtk_txrx tx_rx);
+On Tue, 18 Nov 2025 16:02:54 +0800 you wrote:
+> Support CR modules for 25G devices and QSFP modules for 40G devices. And
+> implement .get_module_eeprom_by_page() to get module info.
+> 
+> ---
+> v2:
+> - adjust data offset for reading I2C
+> - use round_up() for DWORD align
+> - declare __be32 member
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,1/5] net: txgbe: support CR modules for AML devices
+    https://git.kernel.org/netdev/net-next/c/354d128aa721
+  - [net-next,v2,2/5] net: txgbe: rename the SFP related
+    https://git.kernel.org/netdev/net-next/c/dbba6b7a47cb
+  - [net-next,v2,3/5] net: txgbe: improve functions of AML 40G devices
+    https://git.kernel.org/netdev/net-next/c/57d39faed4c9
+  - [net-next,v2,4/5] net: txgbe: delay to identify modules in .ndo_open
+    https://git.kernel.org/netdev/net-next/c/c6e97daec549
+  - [net-next,v2,5/5] net: txgbe: support getting module EEPROM by page
+    https://git.kernel.org/netdev/net-next/c/9b97b6b5635b
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
