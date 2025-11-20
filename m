@@ -1,97 +1,114 @@
-Return-Path: <netdev+bounces-240420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15333C74A8C
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:52:29 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 276FBC74ADA
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:55:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id D328C2ACD0
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 14:52:27 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0BC6134BA63
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 14:52:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981352F1FCB;
-	Thu, 20 Nov 2025 14:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866A332C92D;
+	Thu, 20 Nov 2025 14:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uT1Z529N"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="1KgjbmiQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736772E542C
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 14:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAE02BF000
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 14:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763650345; cv=none; b=AQbE2kVwI9yNB2kETNtRoVWznJsP6yi4c9JjA/6zs25fgzUI456bmQ5NrtwDK9J9TXoVEIebeqLGpukSLzJJL9se0dbRzr0p+87ED2JiuCgOJgSBXTk0dqxXzDxyXfTb2lD6h5kRoTvdtgIXsAJPArTukjztZivajFEXfJ0DaX0=
+	t=1763650361; cv=none; b=M2WSGhNSvGRjxC1IuJUQpjDvxoGSZZHfxO4CtQHTyFmPzTxv4fbSJ2ohagqyEMcW6fdB+IrIlCkD6WWzUhsg/3q/d6EscxNstlTxddZNEvxsxMKRlPWz1sSulcWNMIktDxv+83op+DOTaAjwAj4kgLEieOkg1ZYR9KdyewRuwDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763650345; c=relaxed/simple;
-	bh=YMmvji9k0l5z1bLwT7W4OFry7JGlInMOVfzy+fHrUQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ipSzF0T3oSolRw7VvGF0MmuLAMBNLv7uMxWceTtQIXfgZ7AScHLGs9I9auU5TOI/L893UNWg6E09g0iIwXAgIIG9wz37kSLxj3D/q0x/SVhOETvxd9hPZ/l9zrfmZXVJV+nOeLtmr4cNI/GoWujcR2cWpI8QTXsMLeE9Dx06NH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uT1Z529N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 876F0C4CEF1;
-	Thu, 20 Nov 2025 14:52:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763650344;
-	bh=YMmvji9k0l5z1bLwT7W4OFry7JGlInMOVfzy+fHrUQw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uT1Z529NPpffZXWmB4mgxYWgXkZTgJrKrv6aNGKyuqgLSp+gvBOiHaulp16AYd7/s
-	 i/X6V+Xxbx9lsZFqF7lA0KxxZrcltY8wTOAJjO5gcOm62cFfUtdqJ4kwShg/DL3hL7
-	 skmk2ee+mxkY8RFBmuvnNp8RLJFsLWdAjk1KrXQDdhbzEBY0cnTOhht788NLNQUZ8Y
-	 Lu3uLEpU3C4gyo0U40QTlb0hUZMbwyUFyPm/t/QG+VbO4xRMf8GbFHK6+TbtUMbhvm
-	 HpvTIXCwUTOibKiHDysaQ78CDW8ERGT9/qjbhtj6SAHAPyNEKFOoLg9fcuKDUy1ZkO
-	 cCW5uej27Y05g==
-Date: Thu, 20 Nov 2025 06:52:23 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Parav Pandit <parav@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
- netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org
-Subject: Re: [PATCH net-next v1] devlink: Notify eswitch mode changes to
- devlink monitor
-Message-ID: <20251120065223.7c9d4462@kernel.org>
-In-Reply-To: <32hbfvtxcn3okpylfcgfeuq7uvrufpij4y7w6au6vxrernwthb@pdxvc6r6jl5z>
-References: <20251119165936.9061-1-parav@nvidia.com>
-	<20251119175628.4fe6cd4d@kernel.org>
-	<32hbfvtxcn3okpylfcgfeuq7uvrufpij4y7w6au6vxrernwthb@pdxvc6r6jl5z>
+	s=arc-20240116; t=1763650361; c=relaxed/simple;
+	bh=qlVoOV1b0m1EsqTqevKebTa5adC2s2q0Xm1TYQIEY5c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OXFdBvsLadDgc8e0KqlARcwpTj7dcRV2emPewBvppTCK7rWJY8NZ+QsdXWaoFoGni7ASRFAT3uUqpbcEAhExJ2yxgcaw5Ot5PwvqPYi2kL8oCQv40cTBLVYTiWhGRsdq8A2yTmP4gPgJ2kHgyLz5CWeGnAYlNEaSNq1NEVmRLto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=1KgjbmiQ; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b73875aa527so158295166b.3
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 06:52:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1763650358; x=1764255158; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qlVoOV1b0m1EsqTqevKebTa5adC2s2q0Xm1TYQIEY5c=;
+        b=1KgjbmiQcA2RVz54IvXXlSdGGsuG++U7UX4hfHSFB4tLAKJpux6kPxygEldzuHAZkq
+         wdoXebLApjfbrZ+2yY2brZByqzAdbURTMN5OaBc6uVa9cnhwXNHvXB/6mvg4585jXWdo
+         68uGnDjlfRdY2UK8IguwYer+G2pbFtwRfye2PlZ1YIAqq6xWLlt16XlrSBvRrnLMZpNR
+         x9tHhhmEBnj8LPysGf/Ct+Hxxl3JThedC7OTgE2wLqEnKL2vLxLEMUi1aOtGqRoNqVS8
+         gU8ZAR33ebFCTMg+LTGgZTi1D1aV+l7Knc4MDkGddR8GQ3RuRiPAoRbBd2R1CVEAFBx0
+         yNLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763650358; x=1764255158;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qlVoOV1b0m1EsqTqevKebTa5adC2s2q0Xm1TYQIEY5c=;
+        b=sSE6v8E/+hX1suCyYR/1BZ3qNPxENp6vbx1XxPc1FgmiDGu9dggm+FIu3r+aT5VkEr
+         NlEOPliRlSO+sXK7f4JOa5VqrHhRhKrfu1dJyzbUEPodRxKGW2aGctxVE7jvZqIg8Ehd
+         8j0VaGgbQvi5FuKOkMFh3FyVWzkKhK5VWR40/5O12AEbCh3VdvKaulQbrE1hD1ZCi0i2
+         6NshoNJ+ox2h7ZT5lwHpqz9Bx4XxbodJV1K/beamJ5a4IaEpVLtco5TPVE/nbCLDrPbA
+         wpYQQm8cs3lhRxSBiL/9pl05uqEJ6cqYk68BkNmuB55V0s4MfdR8Fng5qaX+nOIMXmQI
+         ppLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWXC5pPKD9/TeUitVYWy3j0nuzAjsQirvLwN8G4XaOyzCoSme6JRPGCOjn/pQeflbrupJl7sG8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdwwHeTkaPQBDtUYRCzAnPKD9Y2zErpOIjJIWB15YHP4nZDcyW
+	lr6kMLpWjZ/NZ8w4elQkBPfEr77tyxrnqB1y0FbvsbIPrP5Ne8GHSz/5yaGrBRMea0I=
+X-Gm-Gg: ASbGncswDa1oBIo96k9NuAFIaEcCc6psUS0lR2SFqoEPSAhiCyZBkN2iUTiL1RJK8rb
+	VybwQsxV5oPuaCgYrfhSYw2Mcve98qT9m0Q2pZdY+Es12bvPiWSejy4c28cFihsTjebUIXzq6uP
+	bQpqi+Vuo5vd7NugEExe2YTGt4Tb+8Il+fKlGIcVasWXizacFv6hacPqu9HsneyRon9c8mYXat8
+	/xDYUhzZkCChlyTgemEEMqdGly9P0vso/NvTHqicV8oqDXOZdHUdZWZy0fmQPl2HW/Pvf9t370f
+	CQjw36bIhkHyTS33eaaPynY3aqEAdeJKRt9ISt/wSrxETMPs/CcnIXlBOXNE4frOJy+MHKUHMOE
+	m+Fybb+pma2d7hpIG2QG1/tAc1jyfYHWs0h3MPWiDfZfh6OWJCpm1XRstE768QqJJHer1gC1dnC
+	UinPGiSoHjEH7/GzWK970=
+X-Google-Smtp-Source: AGHT+IHij78wIttXL5qrzeJ5Fr4uMDiSvsvUdH/MMYd2AuxlJUx0L+zs8iuv/NdnITfidNIJsVOY8Q==
+X-Received: by 2002:a17:906:478b:b0:b6c:38d9:6935 with SMTP id a640c23a62f3a-b76552b9f32mr307984766b.24.1763650357685;
+        Thu, 20 Nov 2025 06:52:37 -0800 (PST)
+Received: from FV6GYCPJ69 ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-645363c56a4sm2255897a12.15.2025.11.20.06.52.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Nov 2025 06:52:37 -0800 (PST)
+Date: Thu, 20 Nov 2025 15:52:33 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, 
+	Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next 03/14] devlink: Add helpers to lock nested-in
+ instances
+Message-ID: <hj37vfeodmmjpfrfa6vnwm3rwp7an4fzt7bvi4fwyusjzgbtrm@fc6j4szuodq6>
+References: <1763644166-1250608-1-git-send-email-tariqt@nvidia.com>
+ <1763644166-1250608-4-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1763644166-1250608-4-git-send-email-tariqt@nvidia.com>
 
-On Thu, 20 Nov 2025 13:09:35 +0100 Jiri Pirko wrote:
-> Thu, Nov 20, 2025 at 02:56:28AM +0100, kuba@kernel.org wrote:
-> >On Wed, 19 Nov 2025 18:59:36 +0200 Parav Pandit wrote:  
-> >> When eswitch mode changes, notify such change to the
-> >> devlink monitoring process.
-> >> 
-> >> After this notification, a devlink monitoring process
-> >> can see following output:
-> >> 
-> >> $ devlink mon
-> >> [eswitch,get] pci/0000:06:00.0: mode switchdev inline-mode none encap-mode basic
-> >> [eswitch,get] pci/0000:06:00.0: mode legacy inline-mode none encap-mode basic
-> >> 
-> >> Reviewed-by: Jiri Pirko <jiri@nvidia.com>  
-> >
-> >Jiri, did you have a chance to re-review this or the tag is stale?  
-> 
-> Nope, I reviewed internally, that's why the tag was taken.
-> 
-> >I have a slight preference for a new command ID here but if you
-> >think GET is fine then so be it.  
-> 
-> Well, For the rest of the notifications, we have NEW/DEL commands.
-> However in this case, as "eswitch" is somehow a subobject, there is no
-> NEW/DEL value defined. I'm fine with using GET for notifications for it.
-> I'm also okay with adding new ID, up to you.
+Thu, Nov 20, 2025 at 02:09:15PM +0100, tariqt@nvidia.com wrote:
+>From: Cosmin Ratiu <cratiu@nvidia.com>
+>
+>Upcoming code will need to obtain a reference to locked nested-in
+>devlink instances. Add helpers to lock, obtain an already locked
+>reference and unlock/unref the nested-in instance.
+>
+>Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+>Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+>Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-Let's add a DEVLINK_CMD_ESWITCH_NTF. Having a separate ID makes it
-easier / possible to use the same socket for requests and notifications.
--- 
-pw-bot: cr
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
