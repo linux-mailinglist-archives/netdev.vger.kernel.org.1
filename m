@@ -1,82 +1,57 @@
-Return-Path: <netdev+bounces-240273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC32C7205A
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:38:53 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0135C72087
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:41:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1F36A4E4D78
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:38:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 066FE4E40CD
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBAFE309EF6;
-	Thu, 20 Nov 2025 03:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BCD2F6920;
+	Thu, 20 Nov 2025 03:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c50ijRWD"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=w_armin@gmx.de header.b="aoqKxpIt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4BC3019D8
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:37:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7B51DED40;
+	Thu, 20 Nov 2025 03:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763609839; cv=none; b=ez1Laocy6360sbSeHDD9SNxa54qQBSRuYaQ3BBwthzaIj5cFC7GqzXxW/FoLV01jcICIzpCMboIkj850zMS9o7RnQJDIaT8UUUTJXQYpS2aA6baFuy4/dc8ty6uZZOZOsTzqLLLerfDYwAnjy4IIvXcWW50j4i28pytt1hFsf5U=
+	t=1763610084; cv=none; b=nt8+qWYindMNyVrk46yNJMEwjzoREapP6VK4hgmjUnzRvp8NoCaJ2knaLT7eF+AJs44nNbTQmGlHYU4qrrh0BW1QVpUs3Thy2AKGtWmCGmqi4MefZs6EBH8c0LnsbnqN1mloghZwnUS8hXC5idMyMNI1VWMiAMultXqd83cs6ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763609839; c=relaxed/simple;
-	bh=o+TnvX8H67E39YgV1VzM4yPneveTtrGVWnzs7PTFEyI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ns4D/AAmyxJ5NJm865gKVLDtHM4a6jnm1HZU7CNhjBR/jAcVogfnB3VOrLTBHTBNKF2aWBL5sORstUCLi6a7Cv/RNELunlRbx0OG6DFa/v8ZBnyO5zMpIdz3iVV9Ohgaa2s7ZXbcjpDDMqhYzcVG8xZGTDXbsrSJwH36itmtVgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c50ijRWD; arc=none smtp.client-ip=74.125.224.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-63fca769163so339617d50.2
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:37:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763609835; x=1764214635; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dB9vGRQKOzD+0FIDq610kWqp5roY5Ews5Rp+LunXhtg=;
-        b=c50ijRWDv6C4+bgjDgEntLElA/090B2lBIWQ/umM7rjkKgvMUfVLaWczs2DEj2Rbyx
-         I2Mgxaiors/DmJAgoAkki5Yp8iYo6qaNIfe18qbZFMlNXnyel4IyEggprq4KIhCUYFh9
-         Bm+3PjfIENhOZTyXldLtte3+qD4dvFuMMCUGwm1rMUeiij76QlSqlEiCCnnZF7kJ5BZe
-         4iUe9LHarqM1jVzlwwYg4D8J61TCwd26KZejYV0GYmvc1qplkVnBMWVAlC/3VQ6aEcqF
-         gyMUwQxdOyvxUG+CcLNJhg297RkK9mcREkxV+nLAF8yQJDS0JslUe6HU4TOWOl27kwIR
-         uJlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763609835; x=1764214635;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dB9vGRQKOzD+0FIDq610kWqp5roY5Ews5Rp+LunXhtg=;
-        b=BCCE73iOKjXTnUMtW2JK59XdNn4RE9p4Po7uRchApVIxs82ITadxbCCURAWIE8v4Hg
-         4A98Y9WBI4Lv6HcJEm9fcToKMHsC4711G4cGd+feDG8K/9TseyiRszsUYHNH8raLkB0Z
-         LUCPAcNxTKbfAfAV7ZLdte0yhX1BmNCaPf5Y8aj65M17nmkRysJIJ3A9KJexr1q0TQ+5
-         X1nSzWUzad/TuzUA860W/G8sBwMVG/PcDzfX/4dhixHfy8NMeOqqhWn0bQbDkIZpCNiT
-         oRlqm+VaJdjjIetXAkZYsFT3r9asMd4oejqwT2j7TA34yIy1+vY8D/f3Ikb74ors3eY+
-         pvaQ==
-X-Gm-Message-State: AOJu0YzKFXpe4i7To/eYkuXNSH5u2P4FTGflPrj1u1toahYrv6Hdd2Qk
-	eS7CBaQ5XVwdnTx9kUv2AECzHKCL9T2a220A4TiQWyVsjWOPG46sRcu8
-X-Gm-Gg: ASbGncvbUgeu75cLofV9Ki/HZqMLJIGM344zc96w0phr5mdngZboTx8if2//1UTuzoL
-	5SmFrC6jSMKMU3TFkQDyfph/cU42/efHfXOUH1pKrx7a9Xb9X/tjrSO5NXjNqH0UB5D6SguJGle
-	6qb444N6fQCD5zMwGScSU5NeWLJjR54QlXR9rFiYMntjjJkC6v9ClyUQy5YrbbrPDsF6w6+RvLi
-	4kEmctEyRtI31iO9Vbz79GtpwIC1wEKIJhopV8oOeQ0rNjbDbLIB5zDrFcf/U5O2VkxxfBPRnBh
-	S3aOKGJScLRAiHfUi9d+VhyEGlyl63sEuOMlX7SNSZofsJ0Qyw9vFf79iHn1XN8syZ3fhhCM9VL
-	38CQWFDfMfBuSSibrI9/oVcOv75+mO6cTVZixm63PrDH0Hzu1U+smi87DinTKGUqREMMG/5Nyqt
-	u/UCXbA87m7Ij/x58NUyXEeQ==
-X-Google-Smtp-Source: AGHT+IH+ZvCrkl3kFqXJlHEtVfU0bYPG0c0dzdNLXfeCYjxXFUTZZPthcByghfwOu6Wk5tCc8cKAKg==
-X-Received: by 2002:a05:690e:12cb:b0:63f:a324:bbf3 with SMTP id 956f58d0204a3-642f79d694dmr1177865d50.42.1763609835427;
-        Wed, 19 Nov 2025 19:37:15 -0800 (PST)
-Received: from localhost ([2a03:2880:25ff:52::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-642f718bbbesm456461d50.21.2025.11.19.19.37.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 19:37:15 -0800 (PST)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Wed, 19 Nov 2025 19:37:12 -0800
-Subject: [PATCH net-next v7 5/5] selftests: drv-net: devmem: add
- autorelease tests
+	s=arc-20240116; t=1763610084; c=relaxed/simple;
+	bh=RYHc3943PwzhU1jz4QdSnoWTWJAgaHfCdYi5o4VvDyY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=vCDnMOfGGE/AaplACWUCW8hw40xr2KTyzuAke8uLNWejMyXkpsdn/DQgmfXKOGG7ChZqJ73qZBuciR27Cce50pvDO2ZDf6pDmBW1GtG71RSSR27f9QZ+2fG3pDitamAsYhQwOkQPyF0zVOdM7kjVB7lsj70yFi7JcpMk6Zifs2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=w_armin@gmx.de header.b=aoqKxpIt; arc=none smtp.client-ip=212.227.17.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1763610078; x=1764214878; i=w_armin@gmx.de;
+	bh=EfKyHSgu72E5XtbQRP8q+S271PUWmhxdP5i176j621o=;
+	h=X-UI-Sender-Class:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:To:Cc:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=aoqKxpItMFG/cGUVVkfB1NhzTpFMPOwqiKqBkxUSdglyjuleis0Y4HhyHY0LUHTP
+	 wRzVvH7IxSr6a2GcsddK3MvmeVjt3jEnGdwZp4OR7PTI5HxZ5421SPvgzEpDawqwu
+	 0f7W3SM+Dd6YN6b29vbbaCI29NanKxtyYlM4pe4fxcToFiRu1H6Q7Y/jW4mQt6sZw
+	 lNMoAGaNhFDgHzG078dSISrf5mH4jVfTkQbVg1sYvP5KlRiCpSJN7rz1oRqdp6gkN
+	 H23cOPc2JXbFFSX+Mw+IAyRdoZV1KbBfhJ4bbD0lGUbIlMSQ2Nf/m/ZkN0rLg5fhp
+	 sP1EsXjlcFU6jXzdaQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [127.0.0.1] ([93.202.247.91]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MLi8m-1vdav82PvU-00KALa; Thu, 20
+ Nov 2025 04:41:18 +0100
+From: Armin Wolf <W_Armin@gmx.de>
+Subject: [PATCH RFC RESEND 0/8] thermal: core: Allow setting the parent
+ device of thermal zone/cooling devices
+Date: Thu, 20 Nov 2025 04:41:10 +0100
+Message-Id: <20251120-thermal-device-v1-0-bbdad594d57a@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,176 +59,201 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-5-1abc8467354c@meta.com>
-References: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-0-1abc8467354c@meta.com>
-In-Reply-To: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-0-1abc8467354c@meta.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Willem de Bruijn <willemb@google.com>, Neal Cardwell <ncardwell@google.com>, 
- David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- Shuah Khan <shuah@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
- Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arch@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>, 
- Bobby Eshleman <bobbyeshleman@meta.com>
+Content-Transfer-Encoding: quoted-printable
+X-B4-Tracking: v=1; b=H4sIANaNHmkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1NDQ0MT3ZKM1KLcxBzdFKDi5FRdM1PTFENjCwsjk2QzJaCmgqLUtMwKsIH
+ RSkFuziCxINdgVz8XpdjaWgB7+urfbwAAAA==
+X-Change-ID: 20251114-thermal-device-655d138824c6
+To: "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Daniel Lezcano <daniel.lezcano@linaro.org>, Zhang Rui <rui.zhang@intel.com>, 
+ Lukasz Luba <lukasz.luba@arm.com>, Len Brown <lenb@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>, Ido Schimmel <idosch@nvidia.com>, 
+ Petr Machata <petrm@nvidia.com>
+Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ etnaviv@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+ linux-tegra@vger.kernel.org, linux-acpi@vger.kernel.org, 
+ linux-doc@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
+ ath11k@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, platform-driver-x86@vger.kernel.org, 
+ linux-pci@vger.kernel.org, imx@lists.linux.dev, 
+ linux-renesas-soc@vger.kernel.org
 X-Mailer: b4 0.14.3
+X-Provags-ID: V03:K1:UzHmwioHZKfjFpYTePSeoB+nEB5pgRKUwAckErW8vPODyOjizzx
+ /feBzdus+6v6o3v+eb2dnxcueQu6ShHFe1TT6Xi/kk8kv5nVS0Y9m+JMn8+ZkS1ADmANUys
+ KJE6GDq7jWYTptIpEMYFhITEe/619/61fPiKltwdUQWuLX/fH71JR7y/I3G+rWcTL/yjCgw
+ 31BGItEd8tKh5IQVLSerA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:7gAiZgF03ew=;ZONVuGAOGDYqPBH8Je3dmeYjmp6
+ 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
+ Q0O7hFL4=
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
+Drivers registering thermal zone/cooling devices are currently unable
+to tell the thermal core what parent device the new thermal zone/
+cooling device should have, potentially causing issues with suspend
+ordering and making it impossible for user space appications to
+associate a given thermal zone device with its parent device.
 
-Add tests cases that check the autorelease modes (on and off).  The new
-tests are the same as the old ones, but just pass a flag to ncdevmem to
-select the autorelease mode.
+This patch series aims to fix this issue by extending the functions
+used to register thermal zone/cooling devices to also accept a parent
+device pointer. The first six patches convert all functions used for
+registering cooling devices, while the functions used for registering
+thermal zone devices are converted by the remaining two patches.
 
-Only for RX tests is autorelease checked, as the autorelease ncdevmem
-flag is unused in the TX case and doesn't apply to TX bind operations.
+I tested this series on various devices containing (among others):
+- ACPI thermal zones
+- ACPI processor devices
+- PCIe cooling devices
+- Intel Wifi card
+- Intel powerclamp
+- Intel TCC cooling
 
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
----
-Note: I tested successfully with kperf, but I'm troubleshooting
-some mlx5 issues with ncdevmem so this patch, though simple, is not
-fully validated. Will respond to this thread when solve the issue.
+I also compile-tested the remaining affected drivers, however i would
+still be happy if the relevant maintainers (especially those of the
+mellanox ethernet switch driver) could take a quick glance at the
+code and verify that i am using the correct device as the parent
+device.
 
-Changes in v7:
-- use autorelease netlink
-- remove sockopt tests
----
- tools/testing/selftests/drivers/net/hw/devmem.py  | 22 ++++++++++++++++++++--
- tools/testing/selftests/drivers/net/hw/ncdevmem.c | 19 +++++++++++++------
- 2 files changed, 33 insertions(+), 8 deletions(-)
+This work is also necessary for extending the ACPI thermal zone driver
+to support the _TZD ACPI object in the future.
 
-diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
-index 45c2d49d55b6..dddb9d77cb28 100755
---- a/tools/testing/selftests/drivers/net/hw/devmem.py
-+++ b/tools/testing/selftests/drivers/net/hw/devmem.py
-@@ -25,7 +25,23 @@ def check_rx(cfg) -> None:
- 
-     port = rand_port()
-     socat = f"socat -u - TCP{cfg.addr_ipver}:{cfg.baddr}:{port},bind={cfg.remote_baddr}:{port}"
--    listen_cmd = f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.addr} -p {port} -c {cfg.remote_addr} -v 7"
-+    listen_cmd = f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.addr} -p {port} -c {cfg.remote_addr} -v 7 -a 0"
-+
-+    with bkg(listen_cmd, exit_wait=True) as ncdevmem:
-+        wait_port_listen(port)
-+        cmd(f"yes $(echo -e \x01\x02\x03\x04\x05\x06) | \
-+            head -c 1K | {socat}", host=cfg.remote, shell=True)
-+
-+    ksft_eq(ncdevmem.ret, 0)
-+
-+
-+@ksft_disruptive
-+def check_rx_autorelease(cfg) -> None:
-+    require_devmem(cfg)
-+
-+    port = rand_port()
-+    socat = f"socat -u - TCP{cfg.addr_ipver}:{cfg.baddr}:{port},bind={cfg.remote_baddr}:{port}"
-+    listen_cmd = f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.addr} -p {port} -c {cfg.remote_addr} -v 7 -a 1"
- 
-     with bkg(listen_cmd, exit_wait=True) as ncdevmem:
-         wait_port_listen(port)
-@@ -68,7 +84,9 @@ def main() -> None:
-         cfg.bin_local = path.abspath(path.dirname(__file__) + "/ncdevmem")
-         cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
- 
--        ksft_run([check_rx, check_tx, check_tx_chunks],
-+        ksft_run([check_rx, check_rx_autorelease,
-+                  check_tx, check_tx_autorelease,
-+                  check_tx_chunks, check_tx_chunks_autorelease],
-                  args=(cfg, ))
-     ksft_exit()
- 
-diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-index 3288ed04ce08..406f1771d9ec 100644
---- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-+++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-@@ -92,6 +92,7 @@ static char *port;
- static size_t do_validation;
- static int start_queue = -1;
- static int num_queues = -1;
-+static int devmem_autorelease;
- static char *ifname;
- static unsigned int ifindex;
- static unsigned int dmabuf_id;
-@@ -679,7 +680,8 @@ static int configure_flow_steering(struct sockaddr_in6 *server_sin)
- 
- static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
- 			 struct netdev_queue_id *queues,
--			 unsigned int n_queue_index, struct ynl_sock **ys)
-+			 unsigned int n_queue_index, struct ynl_sock **ys,
-+			 int autorelease)
- {
- 	struct netdev_bind_rx_req *req = NULL;
- 	struct netdev_bind_rx_rsp *rsp = NULL;
-@@ -695,6 +697,7 @@ static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
- 	req = netdev_bind_rx_req_alloc();
- 	netdev_bind_rx_req_set_ifindex(req, ifindex);
- 	netdev_bind_rx_req_set_fd(req, dmabuf_fd);
-+	netdev_bind_rx_req_set_autorelease(req, autorelease);
- 	__netdev_bind_rx_req_set_queues(req, queues, n_queue_index);
- 
- 	rsp = netdev_bind_rx(*ys, req);
-@@ -872,7 +875,8 @@ static int do_server(struct memory_buffer *mem)
- 		goto err_reset_rss;
- 	}
- 
--	if (bind_rx_queue(ifindex, mem->fd, create_queues(), num_queues, &ys)) {
-+	if (bind_rx_queue(ifindex, mem->fd, create_queues(), num_queues, &ys,
-+			  devmem_autorelease)) {
- 		pr_err("Failed to bind");
- 		goto err_reset_flow_steering;
- 	}
-@@ -1092,7 +1096,7 @@ int run_devmem_tests(void)
- 		goto err_reset_headersplit;
- 	}
- 
--	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys)) {
-+	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys, 0)) {
- 		pr_err("Binding empty queues array should have failed");
- 		goto err_unbind;
- 	}
-@@ -1108,7 +1112,7 @@ int run_devmem_tests(void)
- 		goto err_reset_headersplit;
- 	}
- 
--	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys)) {
-+	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys, 0)) {
- 		pr_err("Configure dmabuf with header split off should have failed");
- 		goto err_unbind;
- 	}
-@@ -1124,7 +1128,7 @@ int run_devmem_tests(void)
- 		goto err_reset_headersplit;
- 	}
- 
--	if (bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys)) {
-+	if (bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys, 0)) {
- 		pr_err("Failed to bind");
- 		goto err_reset_headersplit;
- 	}
-@@ -1397,7 +1401,7 @@ int main(int argc, char *argv[])
- 	int is_server = 0, opt;
- 	int ret, err = 1;
- 
--	while ((opt = getopt(argc, argv, "ls:c:p:v:q:t:f:z:")) != -1) {
-+	while ((opt = getopt(argc, argv, "ls:c:p:v:q:t:f:z:a:")) != -1) {
- 		switch (opt) {
- 		case 'l':
- 			is_server = 1;
-@@ -1426,6 +1430,9 @@ int main(int argc, char *argv[])
- 		case 'z':
- 			max_chunk = atoi(optarg);
- 			break;
-+		case 'a':
-+			devmem_autorelease = atoi(optarg);
-+			break;
- 		case '?':
- 			fprintf(stderr, "unknown option: %c\n", optopt);
- 			break;
+Signed-off-by: Armin Wolf <W_Armin@gmx.de>
+=2D--
+Armin Wolf (8):
+      thermal: core: Allow setting the parent device of cooling devices
+      thermal: core: Set parent device in thermal_of_cooling_device_regist=
+er()
+      ACPI: processor: Stop creating "device" sysfs link
+      ACPI: fan: Stop creating "device" sysfs link
+      ACPI: video: Stop creating "device" sysfs link
+      thermal: core: Set parent device in thermal_cooling_device_register(=
+)
+      ACPI: thermal: Stop creating "device" sysfs link
+      thermal: core: Allow setting the parent device of thermal zone devic=
+es
 
--- 
-2.47.3
+ Documentation/driver-api/thermal/sysfs-api.rst     | 10 ++++-
+ drivers/acpi/acpi_video.c                          |  9 +----
+ drivers/acpi/fan_core.c                            | 16 ++------
+ drivers/acpi/processor_thermal.c                   | 15 +------
+ drivers/acpi/thermal.c                             | 33 ++++++---------
+ drivers/gpu/drm/etnaviv/etnaviv_gpu.c              |  4 +-
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.c |  4 +-
+ drivers/net/ethernet/mellanox/mlxsw/core_thermal.c | 47 +++++++++++------=
+=2D----
+ drivers/net/wireless/ath/ath10k/thermal.c          |  2 +-
+ drivers/net/wireless/ath/ath11k/thermal.c          |  2 +-
+ drivers/net/wireless/intel/iwlwifi/mld/thermal.c   |  6 +--
+ drivers/net/wireless/intel/iwlwifi/mvm/tt.c        | 12 +++---
+ drivers/net/wireless/mediatek/mt76/mt7915/init.c   |  2 +-
+ drivers/net/wireless/mediatek/mt76/mt7996/init.c   |  2 +-
+ drivers/platform/x86/acerhdf.c                     |  4 +-
+ drivers/power/supply/power_supply_core.c           |  4 +-
+ drivers/thermal/armada_thermal.c                   |  2 +-
+ drivers/thermal/cpufreq_cooling.c                  |  2 +-
+ drivers/thermal/cpuidle_cooling.c                  |  2 +-
+ drivers/thermal/da9062-thermal.c                   |  2 +-
+ drivers/thermal/devfreq_cooling.c                  |  2 +-
+ drivers/thermal/dove_thermal.c                     |  2 +-
+ drivers/thermal/imx_thermal.c                      |  2 +-
+ .../intel/int340x_thermal/int3400_thermal.c        |  2 +-
+ .../intel/int340x_thermal/int3403_thermal.c        |  4 +-
+ .../intel/int340x_thermal/int3406_thermal.c        |  2 +-
+ .../intel/int340x_thermal/int340x_thermal_zone.c   | 13 +++---
+ .../int340x_thermal/processor_thermal_device_pci.c |  7 ++--
+ drivers/thermal/intel/intel_pch_thermal.c          |  2 +-
+ drivers/thermal/intel/intel_powerclamp.c           |  2 +-
+ drivers/thermal/intel/intel_quark_dts_thermal.c    |  2 +-
+ drivers/thermal/intel/intel_soc_dts_iosf.c         |  2 +-
+ drivers/thermal/intel/intel_tcc_cooling.c          |  2 +-
+ drivers/thermal/intel/x86_pkg_temp_thermal.c       |  6 +--
+ drivers/thermal/kirkwood_thermal.c                 |  2 +-
+ drivers/thermal/pcie_cooling.c                     |  2 +-
+ drivers/thermal/renesas/rcar_thermal.c             | 10 +++--
+ drivers/thermal/spear_thermal.c                    |  2 +-
+ drivers/thermal/tegra/soctherm.c                   |  5 +--
+ drivers/thermal/testing/zone.c                     |  2 +-
+ drivers/thermal/thermal_core.c                     | 23 +++++++----
+ drivers/thermal/thermal_of.c                       |  9 +++--
+ include/linux/thermal.h                            | 22 +++++-----
+ 43 files changed, 145 insertions(+), 162 deletions(-)
+=2D--
+base-commit: 653ef66b2c04bcdecaf3d13ea5069c4b1f27d5da
+change-id: 20251114-thermal-device-655d138824c6
+
+Best regards,
+=2D-=20
+Armin Wolf <W_Armin@gmx.de>
 
 
