@@ -1,97 +1,178 @@
-Return-Path: <netdev+bounces-240495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F346BC75C02
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 18:40:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F338AC75C32
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 18:43:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 540754E7AB9
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:33:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id ECB593252F
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 17:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABE11258EFC;
-	Thu, 20 Nov 2025 17:26:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A9852E9EAD;
+	Thu, 20 Nov 2025 17:30:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C0Xd3qxc"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B99236C0D6;
-	Thu, 20 Nov 2025 17:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59FF2E03F3;
+	Thu, 20 Nov 2025 17:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763659608; cv=none; b=bjXIot494OYdCePDmyj+PqgShGa4s0WQ8YNV021cnegle/eLIm+vOcQH3tYYOic7x2cXtgTn/3yPTSPwuyXERDeRS5VJPf2CFJquFnVw3edtPit7EnJTHf48zRj0p1ob/cPKI9JRVAaqOzIz5N1MXDoP8+gmb6TXNsW3A7IBO4M=
+	t=1763659816; cv=none; b=ccqbCZ2UL7epEyOUHapF1Iagrx1oadKrrWIacIWJxMoDm/03ZGtg2vtAUEEVUWGMlUKnbQ3XSBjcrnSzzfvoWUqQgrJU+CtwYxGpdvRUivIVI+19E7sAx8E5yfXKSfRqwNGdSZbIX0JjlqGftOjXmuDuL3PNj6gyT6w2Uj9QjPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763659608; c=relaxed/simple;
-	bh=b00G+EOecpV8fBd+0/uaZ2E3Shcz9iiVeFOn6ObGL7Y=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ho7o8dKIa3OEvkdpy+vDUogsia/5LZmda+vJ97Y30nMDRFatVEBzung1luNhMbpuk6FCIwUEt62QnQfRGqFUAtzDYGRlu9u5OEqR29EgOJ6lX5kifwtoHFXQ1gyJI/fUxLvILVpqpgttQdgmEcZH+31ZZ3v5Cf1DVmJ0dGpgldI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dC4y747LvzHnGh8;
-	Fri, 21 Nov 2025 01:26:07 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id A8EAB1402EF;
-	Fri, 21 Nov 2025 01:26:42 +0800 (CST)
-Received: from huawei-ThinkCentre-M920t.huawei.com (10.123.122.223) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 20 Nov 2025 20:26:42 +0300
-From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-To: <netdev@vger.kernel.org>, Dmitry Skorodumov
-	<skorodumov.dmitry@huawei.com>, Jakub Kicinski <kuba@kernel.org>, Julian
- Vetter <julian@outer-limits.org>, Ido Schimmel <idosch@nvidia.com>, Eric
- Dumazet <edumazet@google.com>, Guillaume Nault <gnault@redhat.com>, Mahesh
- Bandewar <maheshb@google.com>, "David S. Miller" <davem@davemloft.net>,
-	<linux-kernel@vger.kernel.org>
-CC: <andrey.bokhanko@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Paolo
- Abeni <pabeni@redhat.com>
-Subject: [PATCH v2 net-next] ipvlan: Fix sparse warning about __be32 -> u32
-Date: Thu, 20 Nov 2025 20:26:32 +0300
-Message-ID: <20251120172636.3818116-1-skorodumov.dmitry@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1763659816; c=relaxed/simple;
+	bh=pIZqPi/mXGe/GNfKv8c4XGgpFEpKm6p5bQCRorVwhsE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GuAylFBU2TdwHuxjzMpOe78mUHlu+7OaPA2fXL537bBEMRqgjqFUXTCYbBnIg98b5kzvBJqrazKRfsOSjAiDoDePforw7ditxkpFpTQqJFymDR5a7ZekBZDQZiHCLtTJ4Jovif+eOJRjhB9Tql10Wexx69BXxNPIvgW1Jsm7xjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C0Xd3qxc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52F13C4CEF1;
+	Thu, 20 Nov 2025 17:30:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763659814;
+	bh=pIZqPi/mXGe/GNfKv8c4XGgpFEpKm6p5bQCRorVwhsE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C0Xd3qxcEOro3m2faDUanniB5vub6VASfuaAD38GMVZjvrAop5JSehVcv5wLs/lB7
+	 6EVEyyAboRD+rfGyv0cFxwaxlGKMhUIr1LSHaRidO1wsS4Y0bT2X+7u0z8Ts0X/awU
+	 tE+ya3+kswujHlhW/yokKfY+vTEXppX1wpFX4WG199/3UuAk7LIxfIBuAvXfXRth6/
+	 qKedynzxUulcVVFKwZh7gIXmEU2pQqTOi7OeFVfFvObG6Xqers4eEto3XCtX4G7Jkz
+	 wyLz6BS/lKHR8eQXlPFM244eSQMxRSYdHWvll4rbwNXWoz42ogUHL1X7eSQX7YZi6S
+	 PcXadKpoxFMFg==
+Date: Thu, 20 Nov 2025 11:30:12 -0600
+From: Rob Herring <robh@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 12/15] dt-bindings: net: dsa: sja1105: document
+ the PCS nodes
+Message-ID: <20251120173012.GA1563834-robh@kernel.org>
+References: <20251118190530.580267-1-vladimir.oltean@nxp.com>
+ <20251118190530.580267-13-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mscpeml100003.china.huawei.com (10.199.174.67) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251118190530.580267-13-vladimir.oltean@nxp.com>
 
-Fixed a sparse warning:
+On Tue, Nov 18, 2025 at 09:05:27PM +0200, Vladimir Oltean wrote:
+> The XPCS blocks in NXP SJA1105 and SJA1110 may be described in the
+> device tree, and they follow the same bindings as the other instances
+> which are memory-mapped using an APB3 or MCI interface.
+> 
+> Document their compatible string, positioning in the switch's "regs"
+> subnode, and the pcs-handle to them.
+> 
+> The "type: object" addition in the ethernet-port node is to suppress
+> a dt_binding_check warning that states "node schemas must have a type
+> or $ref". This is fine, but I don't completely understand why it started
+> being required just now (apparently, the presence of "properties" under
+> the port node affects this).
 
-ipvlan_core.c:56: warning: incorrect type in argument 1
-(different base types) expected unsigned int [usertype] a
-got restricted __be32 const [usertype] s_addr
+Yes. It's related to quirks in how json-schema works. You would think 
+'properties' would require the instance to be an object, but no, such a 
+schema defining properties would pass even for a boolean property. So 
+requiring 'type: object' is necessary. In this case, we already do that 
+elsewhere so it's not strictly needed here, but figuring that out is 
+complicated.
 
-Force cast the s_addr to u32
+> Cc: Rob Herring <robh@kernel.org>
+> Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+> Cc: Conor Dooley <conor+dt@kernel.org>
+> Cc: devicetree@vger.kernel.org
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>  .../bindings/net/dsa/nxp,sja1105.yaml         | 28 +++++++++++++++++++
+>  .../bindings/net/pcs/snps,dw-xpcs.yaml        |  8 ++++++
+>  2 files changed, 36 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml b/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
+> index 607b7fe8d28e..ee1a95d6b032 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
+> @@ -85,11 +85,31 @@ properties:
+>            - compatible
+>            - reg
+>  
+> +  regs:
+> +    type: object
+> +    description:
+> +      Optional container node for peripherals in the switch address space other
+> +      than the switching IP itself. This node and its children only need to be
+> +      described if board-specific properties need to be specified, like SerDes
+> +      lane polarity inversion. If absent, default descriptions are used.
+> +    additionalProperties: false
+> +
+> +    properties:
+> +      '#address-cells':
+> +        const: 1
+> +      '#size-cells':
+> +        const: 1
+> +
+> +    patternProperties:
+> +      "^ethernet-pcs@[0-9a-f]+$":
+> +        $ref: /schemas/net/pcs/snps,dw-xpcs.yaml#
+> +
+>  patternProperties:
+>    "^(ethernet-)?ports$":
+>      additionalProperties: true
+>      patternProperties:
+>        "^(ethernet-)?port@[0-9]$":
+> +        type: object
+>          allOf:
+>            - if:
+>                properties:
+> @@ -107,6 +127,14 @@ patternProperties:
+>                  tx-internal-delay-ps:
+>                    $ref: "#/$defs/internal-delay-ps"
+>  
+> +        properties:
+> +          pcs-handle:
+> +            $ref: /schemas/types.yaml#/definitions/phandle
 
-Fixes: 2ad7bf363841 ("ipvlan: Initial check-in of the IPVLAN driver.")
-Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
----
- drivers/net/ipvlan/ipvlan_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This already has a type, so drop the $ref.
 
-diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
-index d7e3ddbcab6f..dea411e132db 100644
---- a/drivers/net/ipvlan/ipvlan_core.c
-+++ b/drivers/net/ipvlan/ipvlan_core.c
-@@ -52,8 +52,8 @@ static u8 ipvlan_get_v4_hash(const void *iaddr)
- {
- 	const struct in_addr *ip4_addr = iaddr;
- 
--	return jhash_1word(ip4_addr->s_addr, ipvlan_jhash_secret) &
--	       IPVLAN_HASH_MASK;
-+	return jhash_1word((__force u32)ip4_addr->s_addr, ipvlan_jhash_secret) &
-+			   IPVLAN_HASH_MASK;
- }
- 
- static bool addr_equal(bool is_v6, struct ipvl_addr *addr, const void *iaddr)
--- 
-2.25.1
-
+> +            description:
+> +              Phandle to a PCS device node from the "regs" container.
+> +              Can be skipped if the PCS description is missing - in that case,
+> +              the connection is implicit.
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/net/pcs/snps,dw-xpcs.yaml b/Documentation/devicetree/bindings/net/pcs/snps,dw-xpcs.yaml
+> index e77eec9ac9ee..46e4f611f714 100644
+> --- a/Documentation/devicetree/bindings/net/pcs/snps,dw-xpcs.yaml
+> +++ b/Documentation/devicetree/bindings/net/pcs/snps,dw-xpcs.yaml
+> @@ -25,6 +25,14 @@ description:
+>  properties:
+>    compatible:
+>      oneOf:
+> +      - description:
+> +          Synopsys DesignWare XPCS in NXP SJA1105 switch (direct APB3 access
+> +          via SPI) with custom PMA
+> +        const: nxp,sja1105-pcs
+> +      - description:
+> +          Synopsys DesignWare XPCS in NXP SJA1110 switch (indirect APB3 access
+> +          via SPI) with custom PMA
+> +        const: nxp,sja1110-pcs
+>        - description: Synopsys DesignWare XPCS with none or unknown PMA
+>          const: snps,dw-xpcs
+>        - description: Synopsys DesignWare XPCS with Consumer Gen1 3G PMA
+> -- 
+> 2.34.1
+> 
 
