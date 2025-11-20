@@ -1,333 +1,144 @@
-Return-Path: <netdev+bounces-240554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16020C76409
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 21:55:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA68EC764B5
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 22:01:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 44B5628E95
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 20:55:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 3878B2C7E8
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 21:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFD23502A6;
-	Thu, 20 Nov 2025 20:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DF/qQ4HO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733513570A6;
+	Thu, 20 Nov 2025 20:58:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7043128C4
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 20:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1FF2D062F
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 20:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763672132; cv=none; b=MbMcpEuiP1MPbJccMJ/t9I2h3sZfu59VFM7ISisZ03XiBxXybD1NirQUM4h+zvY800u06xs9WCyBozxOmq/zcSj2Cz4jO6t6OUciT6+pQRa/z1XUBNdNuT3AEMkni0wu2QeDReBqujvCWCL4P1ZbVWIi7e3f2GGaAOxjQtFnR3w=
+	t=1763672314; cv=none; b=f0phDVzfFoRbl8y8AZPhXDtJ9ZGoTGS/dUnBlGbJ+k6+EoRVzsSfms4FS67fYWl7Mn25jFJbLH6y861hCkBiLjClcK3cJILSuGRoIPZvungr8+ViBOcAEOzVVHtq3WXzu5vYv2/agIhQA/bus67Tn/jl/ymFUuafKTjxzpoOXdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763672132; c=relaxed/simple;
-	bh=Tw6PzwmFUH3yzaToVragN2xPLBkERaK2J51NDxu9Hfg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CGu2A3JTbNR9uyb/Zub7tq5vM/1GTGxpV6wna2p29Zo2AhzC2Io8lHOFHNI3cYxxYvvXsbQGWzM4zv1v2QUdJeQqGgYgeytFseSULd+JS4F1Cmr8vzXEUlOSyOw+VNJfJdF8UetW/Rd34oZfisC88dvczkm7LULwD0p6O+lnXrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DF/qQ4HO; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-42b3ac40ae4so782830f8f.0
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:55:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763672128; x=1764276928; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AZ0TiYuUwtM/It7RYy4vPWkMc0+ElnY6WAKQWRtqUCo=;
-        b=DF/qQ4HOp3KcqgrqStk0NkyNYM+SW4WOMvU/oeEVHq2SDhc2ZLwyCb0w9G6KbVvtoP
-         aCWSkck1LCOFVdcdzpXcqraSu/DZ9W+PQ1KiRRJ3oGbq/eDOgcz0hUfPoHhNyl2hTEwC
-         RHMh2lNyMhz80IVgoSr4QNXBmFf30Gh5g8RKUB6OHOUNWwxQnQWmUJSNgm/nHy0rjEfq
-         uk89p28N3IZdT1eL1HDzOG16dKIyvnFU6L2JidA5ThTcriOBueHsfWZyBUVNQ1GbRWLe
-         ugEssAuSCZL+bkYg7l5i1JwxOHPC0pByKpBBH4o7Cfgsb5/pyAF7OZatOjnygGR5kvpr
-         guKg==
+	s=arc-20240116; t=1763672314; c=relaxed/simple;
+	bh=U1JaPEvAFIFM5GBCerQtXTCxm6A+HV551Vy1xWavn0k=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=n5fX0vwyBLoHsd1yPuSH2/aqKTn6NqVjAtf8hLRQrIA2etW8c/2iB4UhaDyYV/LPQCrDv8DUiGifTyfUM4jU3Rc3mwVtAyU7wSRPpvFHOuwuWs+EL4CP81nsFWzKNnvQ42oTWwC7MfHK8NCBBxN7D03bwG7nWWxjbTTvExpy4ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-43470d72247so15319875ab.3
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:58:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763672128; x=1764276928;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AZ0TiYuUwtM/It7RYy4vPWkMc0+ElnY6WAKQWRtqUCo=;
-        b=jYmBYpsSvlt4/72QhJYA1SiI+oBV1uYqVpy82oT9V5Ne/uHZfYFKMgHI4eA3vOuaVU
-         FYmp4oVEDsCVbt+iRuErFT2ws5pVDyLnIFtexYgZ/vpo5XX9NCwtyHzgwgWAQNX/y3Dz
-         T3uYLLqIrIAWHY4oW7S0GuBlTNi7xGUJHFFAil9pQsf458J4AS1wFnGstEW5y6Wz3mqY
-         P0Gd8zPnYd94Jcu9ds1aS9PKM0zWTR+Rz1a8CgcbCjCbejRaBjP7SC9vQ3Hg/0ZO2o8z
-         TwcrtdeRNYUctTHzRE0UWMwh7xrirSkxz5eqkcGe2mPlrRDQqSmoclMkfNJdxaeI5s/U
-         5tHA==
-X-Gm-Message-State: AOJu0Yxc6UN5hYRCa7nHmmfWltuBFfwY3QelDnWclMJKIpwr+DqJRKVl
-	bw11vhdrxvzTFUsa4pfIPQX01Ro4OLjK+nHUIOsWqfD9JcLUbHGzfSjG
-X-Gm-Gg: ASbGncvBdfVnAIj4EZvPYLvEY6h8ddWdX6B1qlsYBYFkuhTvZdBwyBApTKd8vsgSPU0
-	9slBPMHzJeSrIhpWmxPgV6khFyoxSXdjBbettYH92uRfsxH8jbM2cfLCpT4BmTmYlDWcp3RzxJR
-	iunGpI67qiw7bRdKcXVn8kjbSd2GRj5ozvpk8C6fWuiLVmibCFtyr99dm3IkRz238BsgRJCoNBT
-	3IMu/Qq+GDawqI/n19GoaTl5ytl0DoSxfXSCYKd+TtT8y4MaNw5ZzLMTYGAI64IK0hC/KY0YER8
-	pOdOs9BJYg+k32KYnWeE7S3219BjIiV3XYljMmfUoU9TWX6iHE/38zq5AIz8mTG7KJJPZ0HZLJV
-	I3+Xja3ADdw6aN3je23ruKSqhFvBFliplwFRF/mySjmTx3cdWyq8hwaeLzxo8NSyKVRW+P/MMz2
-	Oyc1/eBT0zEGcO4zy/29a/DM+nh7ZMV5E1vnw8zCb35nT7JxMi+952EM8ceqeDiyz02yqI0Tt6M
-	SDcherbn9hOoHZnvb8TpCkVPY37xcbn0GAXLqSeS9lcfaBRE2iPFA==
-X-Google-Smtp-Source: AGHT+IG3rjXFlUC2x656rCC2Pxt5Kfvcgeo+c3M2JQoDuHBQrq/vXa4AmsyR7jlMTliyV9bcCy5tbg==
-X-Received: by 2002:a05:6000:1863:b0:42b:3c8d:1932 with SMTP id ffacd0b85a97d-42cb99f595dmr4082151f8f.23.1763672128221;
-        Thu, 20 Nov 2025 12:55:28 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f3a:7100:6cbf:5f75:6c2d:3ca3? (p200300ea8f3a71006cbf5f756c2d3ca3.dip0.t-ipconnect.de. [2003:ea:8f3a:7100:6cbf:5f75:6c2d:3ca3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fb9190sm7538676f8f.33.2025.11.20.12.55.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 12:55:27 -0800 (PST)
-Message-ID: <f263daf0-70c2-46c2-af25-653ff3179cb0@gmail.com>
-Date: Thu, 20 Nov 2025 21:55:26 +0100
+        d=1e100.net; s=20230601; t=1763672309; x=1764277109;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JatGuBdz8ZGZO1wKcI2oQG5Aywx+T8e7anUEr9P78xU=;
+        b=iZvW36+6oBptTc8+D5YYGIqdueCTw9JpvIpjVTb84XgnmGdQd2Ahdql9zsuM8F0RzN
+         WMiNXKeTNDpeiqkZUj9K3Kw3Eo55SREpQfKn2plGaNW3VDqHXLCtiGuwX+o3m7qfbJVT
+         NMwum5KX71lW0ASYsp+qoVE1vcYgWr2orEnUL3+zfTHAcFzMotvJJNW9lrRMtz52nPM1
+         zIBy19UtQmds1RBGHD/znt0Hxc6X7+juH17bHn5pJNPYFU+PUZTudhJiEyzTpMFGnNMY
+         k9RZppSuo86bHLuVKje4y0j4WRyKQQYQu1w2aqvEdbGH4lP+/kl2HkHwaf3OgQUwMvoT
+         T3sA==
+X-Forwarded-Encrypted: i=1; AJvYcCUcn8z6ZslSJbnBdoR2lH+nqcrZEjDh9AzJo5dExCOxypMeR9eiRL5YjURG//XiRjJdqQs387Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4IlZOrHzGPAehDOqzn424qfRO55wHYfVrtsgDxvQBZjky1iu/
+	tV56GlREGm7llOsS/7SNSbBuRfF5S4L8coDXxlN71iTqrP7EtpE+LVKlwHhIHHQFKaDxhYnXTFr
+	HBW29+ZTsppn0JueDvBQZt8akHAqe/FS5+Gq8rk9ocybuKuADaG2RmMvJcmk=
+X-Google-Smtp-Source: AGHT+IGYAvS2Z0gKNmabp2o3OeNbFYDd3Y5OgjHJ1mJxa32vG5Vaj/kFbBiY2n//s2+U8qQQLrQDSK3tsD2UqMZlARM9XD73lXM4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] r8169: add support for RTL8127ATF
-To: Fabio Baltieri <fabio.baltieri@gmail.com>, nic_swsd@realtek.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Michael Zimmermann <sigmaepsilon92@gmail.com>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251120195055.3127-1-fabio.baltieri@gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <20251120195055.3127-1-fabio.baltieri@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:18ce:b0:435:a148:cbe with SMTP id
+ e9e14a558f8ab-435b8e9da74mr783315ab.41.1763672308949; Thu, 20 Nov 2025
+ 12:58:28 -0800 (PST)
+Date: Thu, 20 Nov 2025 12:58:28 -0800
+In-Reply-To: <68a5c278.050a0220.3d78fd.0000.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <691f80f4.a70a0220.2ea503.003a.GAE@google.com>
+Subject: Re: [syzbot] [mptcp?] WARNING in subflow_data_ready (4)
+From: syzbot <syzbot+0ff6b771b4f7a5bce83b@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/20/2025 8:50 PM, Fabio Baltieri wrote:
-> Add support for ATF variant of the RTL8127, this uses an SFP transceiver
-> instead of the twisted pair one and only runs at 1Gbps or 10Gbps, only
-> 10Gbps is supported with this patch.
-> 
-> The change is based on the r8127 driver package version 11.015.00
-> available on the Realtek website and also on
-> https://github.com/openwrt/rtl8127.
-> 
-> There's no public datasheet for the chip so this is just porting over
-> the original vendor code to the API and style of the upstream one.
-> 
-> Signed-off-by: Fabio Baltieri <fabio.baltieri@gmail.com>
-> ---
-> 
-> Hi, did more tests with 1g mode on the v1 of this patch, the setting
-> itself works but triggering it from ethtool reliably seems problematic
-> due to some weird behavior of the phy code which end up reporting a
-> specific link speed when the link is down, making it impossible to set
-> it with ethool as it thinks it's already set.
-> 
-> Since it seems like supporting 1g properly needs expanding the scope of
-> the patch, I'm taking the suggestion from Heiner in v1 review and
-> stripped this down so it only supports 10g, which is likely what the
-> vast majority of the users need anyway.
-> 
-> Also tested this on suspend/resume, this is also affected by the wol
-> issue but with that bit set it now works correctly.
-> 
-> v1 -> v2
-> - stripped out 1g support
-> - moved the sds settings in rtl8169_init_phy() so it get called on
->   resume
-> - renamed fiber_mode to sfp_mode to avoid confusion
-> 
-> Cheers,
-> Fabio
-> 
->  drivers/net/ethernet/realtek/r8169_main.c | 128 +++++++++++++++++++++-
->  1 file changed, 126 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index d18734fe12e..e19518c7b98 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -729,6 +729,7 @@ struct rtl8169_private {
->  	unsigned supports_gmii:1;
->  	unsigned aspm_manageable:1;
->  	unsigned dash_enabled:1;
-> +	unsigned sfp_mode:1;
->  	dma_addr_t counters_phys_addr;
->  	struct rtl8169_counters *counters;
->  	struct rtl8169_tc_offsets tc_offset;
-> @@ -842,7 +843,8 @@ static bool rtl_supports_eee(struct rtl8169_private *tp)
->  {
->  	return tp->mac_version >= RTL_GIGA_MAC_VER_34 &&
->  	       tp->mac_version != RTL_GIGA_MAC_VER_37 &&
-> -	       tp->mac_version != RTL_GIGA_MAC_VER_39;
-> +	       tp->mac_version != RTL_GIGA_MAC_VER_39 &&
-> +	       !tp->sfp_mode;
->  }
->  
->  static void rtl_read_mac_from_reg(struct rtl8169_private *tp, u8 *mac, int reg)
-> @@ -1399,6 +1401,95 @@ DECLARE_RTL_COND(rtl_ocp_tx_cond)
->  	return RTL_R8(tp, IBISR0) & 0x20;
->  }
->  
-> +#define R8127_SDS_CMD 0x2348
-> +#define R8127_SDS_ADDR 0x234a
-> +#define R8127_SDS_DATA_IN 0x234c
-> +#define R8127_SDS_DATA_OUT 0x234e
-> +
-> +#define R8127_MAKE_SDS_ADDR(_index, _page, _reg) \
-> +	(((_index) << 11) | ((_page) << 5) | (_reg))
-> +
-> +#define R8127_SDS_CMD_IN BIT(0)
-> +#define R8127_SDS_WE_IN BIT(1)
-> +
-> +DECLARE_RTL_COND(rtl_sds_cmd_done)
-> +{
-> +	return RTL_R16(tp, R8127_SDS_CMD) & R8127_SDS_CMD_IN;
-> +}
-> +
-> +static u16 rtl8127_sds_phy_read(struct rtl8169_private *tp,
-> +				u16 index, u16 page, u16 reg)
-> +{
-> +	RTL_W16(tp, R8127_SDS_ADDR, R8127_MAKE_SDS_ADDR(index, page, reg));
-> +	RTL_W16(tp, R8127_SDS_CMD, R8127_SDS_CMD_IN);
-> +
-> +	if (rtl_loop_wait_low(tp, &rtl_sds_cmd_done, 1, 100))
-> +		return RTL_R16(tp, R8127_SDS_DATA_OUT);
-> +	else
-> +		return 0xffff;
-> +}
-> +
-> +static void rtl8127_sds_phy_write(struct rtl8169_private *tp,
-> +				  u16 index, u16 page, u16 reg, u16 val)
-> +{
-> +	RTL_W16(tp, R8127_SDS_DATA_IN, val);
-> +	RTL_W16(tp, R8127_SDS_ADDR, R8127_MAKE_SDS_ADDR(index, page, reg));
-> +	RTL_W16(tp, R8127_SDS_CMD, R8127_SDS_CMD_IN | R8127_SDS_WE_IN);
-> +
-> +	rtl_loop_wait_low(tp, &rtl_sds_cmd_done, 1, 100);
-> +}
-> +
-> +static void rtl8127_sds_phy_modify(struct rtl8169_private *tp,
-> +				   u16 index, u16 page, u16 addr,
-> +				   u16 mask, u16 set)
-> +{
-> +	u16 val;
-> +
-> +	val = rtl8127_sds_phy_read(tp, index, page, addr);
-> +	val = (val & ~mask) | set;
-> +	rtl8127_sds_phy_write(tp, index, page, addr, val);
-> +}
-> +
-> +static void rtl8127_sds_phy_reset(struct rtl8169_private *tp)
-> +{
-> +	RTL_W8(tp, 0x2350, RTL_R8(tp, 0x2350) & ~BIT(0));
-> +	udelay(1);
-> +
-> +	RTL_W16(tp, 0x233a, 0x801f);
-> +	RTL_W8(tp, 0x2350, RTL_R8(tp, 0x2350) | BIT(0));
-> +	udelay(10);
-> +}
-> +
-> +static void rtl8127_sds_phy_exit_1g(struct rtl8169_private *tp)
-> +{
-> +	rtl8127_sds_phy_modify(tp, 0, 1, 31, BIT(3), 0);
-> +	rtl8127_sds_phy_modify(tp, 0, 2, 0,
-> +			       BIT(13) | BIT(12) | BIT(6),
-> +			       BIT(6));
-> +
-> +	rtl8127_sds_phy_reset(tp);
-> +}
-> +
-> +static void rtl8127_set_sds_phy_caps_10g(struct rtl8169_private *tp)
-> +{
-> +	u16 val;
-> +
-> +	RTL_W16(tp, 0x233a, 0x801a);
-> +
-> +	val = RTL_R16(tp, 0x233e);
-> +	val &= BIT(13) | BIT(12) | BIT(1) | BIT(0);
-> +	val |= BIT(12);
-> +	RTL_W16(tp, 0x233e, val);
-> +
-> +	r8169_mdio_write(tp, 0xc40a, 0x0);
-> +	r8169_mdio_write(tp, 0xc466, 0x3);
-> +	r8169_mdio_write(tp, 0xc808, 0x0);
-> +	r8169_mdio_write(tp, 0xc80a, 0x0);
-> +
-This function isn't usable on RTL8127.
+syzbot has found a reproducer for the following issue on:
 
-> +	val = r8168_phy_ocp_read(tp, 0xc804);
-> +	r8168_phy_ocp_write(tp, 0xc804, (val & ~0x000f) | 0x000c);
-> +}
-> +
->  static void rtl8168ep_stop_cmac(struct rtl8169_private *tp)
->  {
->  	RTL_W8(tp, IBCR2, RTL_R8(tp, IBCR2) & ~0x01);
-> @@ -1512,6 +1603,15 @@ static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
->  	}
->  }
->  
-> +static bool rtl_sfp_mode(struct rtl8169_private *tp)
-> +{
-> +	if (tp->mac_version == RTL_GIGA_MAC_VER_80 &&
-> +	    (r8168_mac_ocp_read(tp, 0xd006) & 0xff) == 0x07)
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
->  static void rtl_set_d3_pll_down(struct rtl8169_private *tp, bool enable)
->  {
->  	if (tp->mac_version >= RTL_GIGA_MAC_VER_25 &&
-> @@ -2390,7 +2490,10 @@ static void rtl8125a_config_eee_mac(struct rtl8169_private *tp)
->  
->  static void rtl8125b_config_eee_mac(struct rtl8169_private *tp)
->  {
-> -	r8168_mac_ocp_modify(tp, 0xe040, 0, BIT(1) | BIT(0));
-> +	if (tp->sfp_mode)
-> +		r8168_mac_ocp_modify(tp, 0xe040, BIT(1) | BIT(0), 0);
-> +	else
-> +		r8168_mac_ocp_modify(tp, 0xe040, 0, BIT(1) | BIT(0));
->  }
->  
->  static void rtl_rar_exgmac_set(struct rtl8169_private *tp, const u8 *addr)
-> @@ -2440,6 +2543,25 @@ static void rtl8169_init_phy(struct rtl8169_private *tp)
->  	    tp->pci_dev->subsystem_device == 0xe000)
->  		phy_write_paged(tp->phydev, 0x0001, 0x10, 0xf01b);
->  
-> +	if (tp->sfp_mode) {
-> +		rtl8127_sds_phy_exit_1g(tp);
-> +		rtl8127_set_sds_phy_caps_10g(tp);
-> +
-> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
-> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
-> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
-> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_100baseT_Full_BIT);
-> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_1000baseT_Full_BIT);
-> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_2500baseT_Full_BIT);
-> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_5000baseT_Full_BIT);
-> +
-> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_Autoneg_BIT);
-> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
-> +		phy_remove_link_mode(tp->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
-> +
-> +		tp->phydev->autoneg = 0;
-> +	}
-> +
->  	/* We may have called phy_speed_down before */
->  	phy_speed_up(tp->phydev);
->  
-> @@ -5453,6 +5575,8 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	tp->dash_type = rtl_get_dash_type(tp);
->  	tp->dash_enabled = rtl_dash_is_enabled(tp);
->  
-> +	tp->sfp_mode = rtl_sfp_mode(tp);
-> +
->  	tp->cp_cmd = RTL_R16(tp, CPlusCmd) & CPCMD_MASK;
->  
->  	if (sizeof(dma_addr_t) > 4 && tp->mac_version >= RTL_GIGA_MAC_VER_18 &&
+HEAD commit:    8e621c9a3375 Merge tag 'net-6.18-rc7' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12887a12580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1cd7f786c0f5182f
+dashboard link: https://syzkaller.appspot.com/bug?extid=0ff6b771b4f7a5bce83b
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=133c9a12580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=117a2a12580000
 
-Your patch is a good starting point, however it needs more thoughts / work how to somewhat cleanly
-integrate Realtek's design with phylib. E.g. you would want to set 10G and aneg off via ethtool,
-but that's not supported by phy_ethtool_ksettings_set().
-I'll prepare patches and, if you don't mind, would provide them to you for testing, as I don't
-own this hw.
-At least you have a working solution for the time being. Thanks!
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6be75789d60e/disk-8e621c9a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/62e7a40cfe48/vmlinux-8e621c9a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3e523caa536d/bzImage-8e621c9a.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+0ff6b771b4f7a5bce83b@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 15 at net/mptcp/subflow.c:1519 subflow_data_ready+0x40b/0x7c0 net/mptcp/subflow.c:1519
+Modules linked in:
+CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+RIP: 0010:subflow_data_ready+0x40b/0x7c0 net/mptcp/subflow.c:1519
+Code: 89 ee e8 88 f8 72 f6 40 84 ed 75 21 e8 9e fd 72 f6 44 89 fe bf 07 00 00 00 e8 d1 f8 72 f6 41 83 ff 07 74 09 e8 86 fd 72 f6 90 <0f> 0b 90 e8 7d fd 72 f6 48 89 df e8 e5 ad ff ff 31 ff 89 c5 89 c6
+RSP: 0018:ffffc90000147380 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff888030aa72c0 RCX: ffffffff8b4959ef
+RDX: ffff88801d2cbc80 RSI: ffffffff8b4959fa RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000007
+R10: 0000000000000004 R11: 00000d230000000c R12: ffff888033463c00
+R13: 1ffff92000028e70 R14: ffff88802f9bbc00 R15: 0000000000000004
+FS:  0000000000000000(0000) GS:ffff888124a0d000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f841c04df98 CR3: 0000000078b7e000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ tcp_data_ready+0x110/0x550 net/ipv4/tcp_input.c:5355
+ tcp_data_queue+0x1aa6/0x5000 net/ipv4/tcp_input.c:5445
+ tcp_rcv_state_process+0xfb6/0x6490 net/ipv4/tcp_input.c:7159
+ tcp_v4_do_rcv+0x68e/0x10a0 net/ipv4/tcp_ipv4.c:1954
+ tcp_v4_rcv+0x3077/0x4db0 net/ipv4/tcp_ipv4.c:2374
+ ip_protocol_deliver_rcu+0xba/0x4c0 net/ipv4/ip_input.c:205
+ ip_local_deliver_finish+0x3f2/0x720 net/ipv4/ip_input.c:239
+ NF_HOOK include/linux/netfilter.h:318 [inline]
+ NF_HOOK include/linux/netfilter.h:312 [inline]
+ ip_local_deliver+0x18e/0x1f0 net/ipv4/ip_input.c:260
+ dst_input include/net/dst.h:474 [inline]
+ ip_rcv_finish net/ipv4/ip_input.c:453 [inline]
+ NF_HOOK include/linux/netfilter.h:318 [inline]
+ NF_HOOK include/linux/netfilter.h:312 [inline]
+ ip_rcv+0x2e0/0x600 net/ipv4/ip_input.c:573
+ __netif_receive_skb_one_core+0x197/0x1e0 net/core/dev.c:6079
+ __netif_receive_skb+0x1d/0x160 net/core/dev.c:6192
+ process_backlog+0x439/0x15e0 net/core/dev.c:6544
+ __napi_poll.constprop.0+0xba/0x550 net/core/dev.c:7594
+ napi_poll net/core/dev.c:7657 [inline]
+ net_rx_action+0x97f/0xef0 net/core/dev.c:7784
+ handle_softirqs+0x219/0x8e0 kernel/softirq.c:622
+ run_ksoftirqd kernel/softirq.c:1063 [inline]
+ run_ksoftirqd+0x3a/0x60 kernel/softirq.c:1055
+ smpboot_thread_fn+0x3f7/0xae0 kernel/smpboot.c:160
+ kthread+0x3c5/0x780 kernel/kthread.c:463
+ ret_from_fork+0x675/0x7d0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
