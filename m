@@ -1,56 +1,105 @@
-Return-Path: <netdev+bounces-240220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FC74C71AF1
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 02:29:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCE05C71B5D
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 02:47:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id BB5FD299A0
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 01:29:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5570534B94A
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 01:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB14171CD;
-	Thu, 20 Nov 2025 01:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D68AA266B6F;
+	Thu, 20 Nov 2025 01:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qZuXaKDP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uF2z7xSs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E945E10957;
-	Thu, 20 Nov 2025 01:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F05816EB42;
+	Thu, 20 Nov 2025 01:47:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763602158; cv=none; b=qXBAYP0KUSYHuEvwXvQemUWtg3FunNcYELoW+hdkTiu0X3UNOcWyb84pYCbSh05JP+feucQREWAxUKKUx2m1sWt4CTzQgp4S/kISLjribhxRqy8mLqShvSKsY/V1MwMcjTJwbH9KqBRqXfDOSQOYmqLGFRgIlaR5mxCMpIhMCkw=
+	t=1763603259; cv=none; b=LehxLUdygbahBDgmM6n5WKLwmWaaFf9RQCIqQl/qgs2FG5m4isINVZgc+kLIMe0fLrbzyB7ytxDo9p+6iljFwa9nzhm8E8sTPonJt7PR5SgkmRLxv8aL1eiKt4NuVQYW+Yr6g3fvw6SDUo3r+ctpDePa5hzfAdvYg0zmpUaut44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763602158; c=relaxed/simple;
-	bh=/gsuOrSwXMU6ajTuh8Pi9FCSoC2761pArh9tUcwpPfs=;
+	s=arc-20240116; t=1763603259; c=relaxed/simple;
+	bh=Qz0Kt9BVZotF+W8b8C03wV9uEpjzU2IZVkSaOcZVd50=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CnQHH03Wm5tgKcA+TlFUwhdmqa20NWk/Ak5dY0ZPFkLkE6RZgQcbqps4RyyTZMYcghviKtAf0nNQR2MRqpcW2OreOm4RUxrMIpb6gUnl8q7j+eneW2OGB6fq1rGrI0b6YM86j3lV3VLffPW9qpFY5vQokBtFcmVuSDz02c6/ig4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qZuXaKDP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42AE7C4CEF5;
-	Thu, 20 Nov 2025 01:29:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=AvH6jxCmb00Tu1pC9E68hK/IG2HkCQ2rUi3fteRS7RVCxd98MBVlgnbfgacz7Bq+11mxmr99AHS127RFH9nx6yI1texBxvKKBN1LoiUA+0YwLVTYlGXrBHoll7rtuLyDG5WYzWYIYohdSn8tVnM9wZ6SCws3KeZBQ74dXRwQNSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uF2z7xSs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFC38C113D0;
+	Thu, 20 Nov 2025 01:47:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763602157;
-	bh=/gsuOrSwXMU6ajTuh8Pi9FCSoC2761pArh9tUcwpPfs=;
+	s=k20201202; t=1763603258;
+	bh=Qz0Kt9BVZotF+W8b8C03wV9uEpjzU2IZVkSaOcZVd50=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qZuXaKDP8UOjVOTT3DCza1zvEsEcJLKKICWX5CdeZhmws+kyVkmDYx2C9KC0R7jBX
-	 O6W0JewJNAuRY518vpJkHgaEbuulG7ZoTVGAhubYAzrKbeBM2e7Y8q29uXsLgN8tCG
-	 zxEzuWJgzPdTutVRrZ6qRw8bAa/WQ++i/jQNGflkMuwX7LOPlqjoCm4Whcn6Weia8Q
-	 Z4iyFqJdDvuLowOSRlR8JYlh1UBU+JQd0RxHjmHupEUP4hfbBK6iGrph6w87LTZ3ma
-	 eYjmTb+lv9LqIbs3NnBEgnH5Duij925XmPaOtivVPn3eHbk+u0XmKXqFYmonwdHVB6
-	 xFArSzxeXWNYA==
-Date: Wed, 19 Nov 2025 17:29:16 -0800
+	b=uF2z7xSsJBEF2o7jOCGEA8BICVnf2Ll7GN/YdEoLbs8PaQeAHioKS/o3SZ7QSxsKt
+	 vFnjbh6TICH8PLye1zHlHKdpzDE5Fm345e4L/w0hg/fEJ7Itp2slYgup6C6JZwwIym
+	 LLCi+QyeEmLY48F4L7ZzcbTStdyHeEENY8Hfnp0DqQrXSF5r2MrZk7t4OMHkvbN7PR
+	 8Qcsuc8hp1q4+vdSlLZQjWoYyrPh5U9WhuFsg9TNqdi8dNwuUtBQRxPyNJujXI9VwL
+	 mc5s7M6miwKRs2zV2Elwkq7lUfoGg+X1KHfkkxDDXD+SynQUk6oIGjhckD0gmUEmi4
+	 nBJOVjtHwyLhA==
+Date: Wed, 19 Nov 2025 17:47:34 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>, Gabriel Krisman Bertazi <krisman@suse.de>
-Cc: netdev@vger.kernel.org, io-uring@vger.kernel.org, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH 0/3] Introduce getsockname io_uring_cmd
-Message-ID: <20251119172916.7fd4a8f1@kernel.org>
-In-Reply-To: <8ab727b0-e377-457b-9b3e-2499ea38abc0@kernel.dk>
-References: <20251024154901.797262-1-krisman@suse.de>
-	<8ab727b0-e377-457b-9b3e-2499ea38abc0@kernel.dk>
+To: david.laight.linux@gmail.com
+Cc: linux-kernel@vger.kernel.org, Alan Stern <stern@rowland.harvard.edu>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Alexei Starovoitov
+ <ast@kernel.org>, Andi Shyti <andi.shyti@kernel.org>, Andreas Dilger
+ <adilger.kernel@dilger.ca>, Andrew Lunn <andrew@lunn.ch>, Andrew Morton
+ <akpm@linux-foundation.org>, Andrii Nakryiko <andrii@kernel.org>, Andy
+ Shevchenko <andriy.shevchenko@linux.intel.com>, Ard Biesheuvel
+ <ardb@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, Bjorn
+ Helgaas <bhelgaas@google.com>, Borislav Petkov <bp@alien8.de>, Christian
+ Brauner <brauner@kernel.org>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, Christoph Hellwig <hch@lst.de>, Daniel Borkmann
+ <daniel@iogearbox.net>, Dan Williams <dan.j.williams@intel.com>, Dave
+ Hansen <dave.hansen@linux.intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ David Ahern <dsahern@kernel.org>, David Hildenbrand <david@redhat.com>,
+ Davidlohr Bueso <dave@stgolabs.net>, "David S. Miller"
+ <davem@davemloft.net>, Dennis Zhou <dennis@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Jarkko Sakkinen
+ <jarkko@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Jens Axboe
+ <axboe@kernel.dk>, Jiri Slaby <jirislaby@kernel.org>, Johannes Weiner
+ <hannes@cmpxchg.org>, John Allen <john.allen@amd.com>, Jonathan Cameron
+ <jonathan.cameron@huawei.com>, Juergen Gross <jgross@suse.com>, Kees Cook
+ <kees@kernel.org>, KP Singh <kpsingh@kernel.org>, Linus Walleij
+ <linus.walleij@linaro.org>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, "Matthew Wilcox (Oracle)"
+ <willy@infradead.org>, Mika Westerberg <westeri@kernel.org>, Mike Rapoport
+ <rppt@kernel.org>, Miklos Szeredi <miklos@szeredi.hu>, Namhyung Kim
+ <namhyung@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ nic_swsd@realtek.com, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, Olivia
+ Mackall <olivia@selenic.com>, Paolo Abeni <pabeni@redhat.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Peter Huewe <peterhuewe@gmx.de>, Peter
+ Zijlstra <peterz@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Sean Christopherson <seanjc@google.com>, Srinivas Kandagatla
+ <srini@kernel.org>, Stefano Stabellini <sstabellini@kernel.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Tejun Heo <tj@kernel.org>, "Theodore Ts'o"
+ <tytso@mit.edu>, Thomas Gleixner <tglx@linutronix.de>, Tom Lendacky
+ <thomas.lendacky@amd.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, x86@kernel.org, Yury Norov
+ <yury.norov@gmail.com>, amd-gfx@lists.freedesktop.org, bpf@vger.kernel.org,
+ cgroups@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ io-uring@vger.kernel.org, kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-cxl@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
+ linux-integrity@vger.kernel.org, linux-mm@kvack.org,
+ linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-serial@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ usb-storage@lists.one-eyed-alien.net
+Subject: Re: [PATCH 00/44] Change a lot of min_t() that might mask high bits
+Message-ID: <20251119174734.5cba3f95@kernel.org>
+In-Reply-To: <20251119224140.8616-1-david.laight.linux@gmail.com>
+References: <20251119224140.8616-1-david.laight.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,51 +109,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 19 Nov 2025 16:30:38 -0700 Jens Axboe wrote:
-> On 10/24/25 9:48 AM, Gabriel Krisman Bertazi wrote:
-> > 
-> > This feature has been requested a few times in the liburing repository
-> > and Discord channels, such as in [1,2].  If anything, it also helps
-> > solve a long standing issue in the bind-listen test that results in
-> > occasional test failures.
-> > 
-> > The patchset is divided in three parts: Patch 1 merges the getpeername
-> > and getsockname implementation in the network layer, making further
-> > patches easier; Patch 2 splits out a helper used by io_uring, like done
-> > for other network commands; Finally, patch 3 plumbs the new command in
-> > io_uring.
-> > 
-> > The syscall path was tested by booting a Linux distro, which does all
-> > sorts of getsockname/getpeername syscalls.  The io_uring side was tested
-> > with a couple of new liburing subtests available at:
-> > 
-> >    https://github.com/krisman/liburing.git -b socket
-> > 
-> > Based on top of Jens' for-next.  
-> 
-> Ping netdev / networking folks on patches 1+2...
+On Wed, 19 Nov 2025 22:40:56 +0000 david.laight.linux@gmail.com wrote:
+> I've had to trim the 124 maintainers/lists that get_maintainer.pl finds
+> from 124 to under 100 to be able to send the cover letter.
+> The individual patches only go to the addresses found for the associated files.
+> That reduces the number of emails to a less unsane number.
 
-Hm, I think I was hoping to exercise the moderately recent MAINTAINERS
-entry here:
-
-NETWORKING [SOCKETS]
-M:	Eric Dumazet <edumazet@google.com>
-M:	Kuniyuki Iwashima <kuniyu@google.com>
-M:	Paolo Abeni <pabeni@redhat.com>
-M:	Willem de Bruijn <willemb@google.com>
-S:	Maintained
-F:	include/linux/sock_diag.h
-F:	include/linux/socket.h
-F:	include/linux/sockptr.h
-F:	include/net/sock.h
-F:	include/net/sock_reuseport.h
-F:	include/uapi/linux/socket.h
-F:	net/core/*sock*
-F:	net/core/scm.c
-F:	net/socket.c
-
-but now I realize that the submitter hasn't actually CCed the
-maintainers :S
-
-Gabriel, please repost this with a more comprehensive CC list...
+Please split the networking (9?) patches out to a separate series.
+It will help you with the CC list, and help us to get this applied..
 
