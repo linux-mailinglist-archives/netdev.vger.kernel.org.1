@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-240263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6608DC71FE4
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:31:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6E01C71FD8
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:30:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 083F434B61A
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:30:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 872642C556
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2646A2FB0BD;
-	Thu, 20 Nov 2025 03:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1088B2FD1CA;
+	Thu, 20 Nov 2025 03:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="r9FxiQ6L"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="u07xJD/4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F33F2F12C0
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D2E29B20D
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763609425; cv=none; b=NaQBaq+/Qn6VjRSTlYAJD34N7PU4AGp9RE04Ewm12c/QkV08fT4gIPHIxKKf7AT9wIor8iwLSO0FOavc1j/OPftuElOS/4NXiUz55YxiPn4rGfvKc6Jx/Lt/YBt3Lq0e67AdJVhj4geuX1lJLaqG4yByg+Zv8MmLS45I8456HOY=
+	t=1763609426; cv=none; b=Y0O2TxgoEe5aqT2Nh1baeyPM5zQ6rY83SLh9uaZkK6gOlc845ZSpCIz3XrTs+AFTIJt27WHLlfXzYgdPAgnE7tduhEnSPxMSf+4becAHp+t+KwKMozjioCIo4AZFdcYjKfbcgUxO6+8byN2y77uj7ufPoKyVxkSuEuJqG6+Zovc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763609425; c=relaxed/simple;
-	bh=tODjvHtLEOFd4l/9hUUDDLNzE/aKJg3yfj0LXelvcOM=;
+	s=arc-20240116; t=1763609426; c=relaxed/simple;
+	bh=gse6CQrZR5o+dCWzVSEOPuKdxSb9RPCLCV9xcx881Bk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=vClJyL6k7y2c0DsW1ovvJNpI2LraX2gGD2xuQDi0CHA1gi37nktNRs9Xy3QAby9+9Aj8bfGUbI0gRmbQk40Da8iObGPP41YA5MywAEnayx3bqoTn5yxvJIDNEYdmXKih4zPZJKqg8EZktZWoQdtx+ZpEQs3MjhrTs/g6Gjs4/gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=r9FxiQ6L; arc=none smtp.client-ip=209.85.210.49
+	 MIME-Version; b=dMN9mvrBJEHDb2J8Ih7FRZTNy+8iVVOiXmVosVqgKJkmESb8K+azYm90Pd/VLoKvu506UmxnHoMPJO5j3ZJiSkfNWc8UFAZtfYqpS/R2DsOdmb2c6jVIB4mqYaVjIQGC3KSmRcG+N5nSQTIvgLLPlnH7oaeaYz82e2P1t2E715s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=u07xJD/4; arc=none smtp.client-ip=209.85.161.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7c6d699610cso129010a34.0
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:30:22 -0800 (PST)
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-6574ace76dbso157976eaf.3
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:30:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1763609422; x=1764214222; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1763609423; x=1764214223; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XE/kEV8Iv/KPEflTGU8vOfxmufGP4K7iSm172nlOA+c=;
-        b=r9FxiQ6LmjnNWdDBhu6AZoP/KGyyHGx78FMxeKS0a6UONXanSPIh4/Vq72/0qmkgot
-         FzWJOsYs6GnjBIouCk67TgNlZg0dsBPkCqBpzgwMeURUsKRWLYP5tCIQ7OJlT+t2wYAY
-         Oolddh2766EiRaNG++MaFr2fytPYwSUlzOrNB4fnat8kGTcqtKZIFkx/IWo3p6Q9YRKJ
-         guJlcIU/LkXAHVugzJI+qugqlYC6pbz6GRpmdD9Dd52CROcevuZ3d9fNTCcHlg6F3Yvw
-         pL2V9WYJ3kgyGyJ7YRxGIssknMHDHRPY8lc58yAjRPWAJ61wfDqdzrqtA91nFnbdPmQm
-         g//Q==
+        bh=6yGkDY9Gz3qxcQO9P+o+Qi8S0NeuXxWQoJidPzE3fuQ=;
+        b=u07xJD/4C/tGYpUer23q10wgJAGNQrn21xZ33+rX+zMh2hwcq/R1m4O+OdhOG0/Pzr
+         B/zJE86vC0eBrNI7SVsQU55AQmVcgGdEYBfJeKAN8W3APljPgoRY4edwZ1k/1FxSEYYq
+         Se3/Y97hywpn3Ov2TgRUISZHVauwb8jUo6FemobcckfBNgKEwkdNQRVdeCBcAEuanzGS
+         XW2yzLI8L613Yw5uE3tTycp8f/a1lpWqoAi2q4nJjVwCEGqewJROcyGUBWrvIts38VTA
+         cRicFt4fM257uDRJsNr2pQnFmJ14Tm4i8HIhVmsfxwvE+hTofCQrgGPjc7fWN/AxQaZc
+         EnbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763609422; x=1764214222;
+        d=1e100.net; s=20230601; t=1763609423; x=1764214223;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=XE/kEV8Iv/KPEflTGU8vOfxmufGP4K7iSm172nlOA+c=;
-        b=eaHEtXo8iyk/11flfTiQVCCgQlHPyizSXgfCDoLy9pNVq0Ll9tqmsNh9XKJNN0AGUd
-         X2S6g14aCKsqcri2Hob0+bOZatZ53ncrZddeDoqJDU0FQKdJLnzijI2slYBSG2JpDq+W
-         nDU11Zg7K/9XoPwSpUwOW3YqnBXARxNj1HoWpxaHTAClxVfnicg/VR7i+IJaDhLZ3otM
-         A/0aEScTdj56huEu3dXrvUP/XJE7v46XwtlDWXC3nO7Ze6cQY+9ZEN1HqaUoiz4q3Pt8
-         QfyxODG+6TApcRGV0sfOSV4I4QZIALynCT3I2JArrUhjTb0Zd3p7ImE0UHfKehtolPLw
-         rBCQ==
-X-Gm-Message-State: AOJu0YyuPgEwbJ8DLnVv467RKPfLgZRsTGOmmKqfgVDkQDcdwZNvliLw
-	k/bxqCaQ5335lq0/OS5GTiZVceKMmNQ4R1qe/QXACtKOyhuT91DeN4rvP4GoYphcGYVXs1HCq03
-	UCUJt
-X-Gm-Gg: ASbGncuHWYotKrcEatjeirIRDPsAxr8F5eROMnwy0fih2CbIeLNxpSEbYqABH+40SQk
-	jTKp8g6T5XIw4TF7JGDxq1mbBHZz9Td7KNgYgJKhmyBkbX+i2o471Uug716VUZNp/NHWKdE7bMn
-	W2fDTdLcrUXYdhv4QC9Ds8a6DDpUtYbE1p3o+kXR6m5vm3GARL1upI42VvQupALV6hoO9KBPyaG
-	h7iXAd3rTsDdnfzA9xVBSiY2piPR2wG6oe8Ebtd7CoVJiY/sHwBT6dv/1h0WX/LEQ8tYWvqS4Kq
-	gtG3jHUO4nOMP1mA0f9twq0PJysToC7BRXuxy1BlsBmwWb1oM4OVR7fcZ/68Q9GOITS4Dx9NCpt
-	2gLQk5Bc9UdYrGtn43b5hAA+5IVgsYY8hkx6uit2C6SSplvychHZ2xXGQdLVcDcsyRC7Sjo5c/R
-	bFNHKNz7ZGuhpii3qcAPP2EMQiOd4JL36o5quZFBeJACxg7MCk6Mf7
-X-Google-Smtp-Source: AGHT+IFrTUWGU8N/btyZeQTNeKLoG3ysZmBYTj9a7YWKAkzIWLQvlY/95l/9/q5XDFQ3FMwzwb1ORw==
-X-Received: by 2002:a05:6830:700c:b0:799:c0c8:e9d1 with SMTP id 46e09a7af769-7c78d2dada0mr1562918a34.24.1763609422027;
-        Wed, 19 Nov 2025 19:30:22 -0800 (PST)
-Received: from localhost ([2a03:2880:12ff:70::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c78d4282bdsm569799a34.28.2025.11.19.19.30.21
+        bh=6yGkDY9Gz3qxcQO9P+o+Qi8S0NeuXxWQoJidPzE3fuQ=;
+        b=eUHFY5Mpx3ZzEltC0Gp+DXHg3ApIpr21jNitOWNAFcbh9h/XD/ThBDeBz6AOk5SzcN
+         A6b8EzEt7xNQ3M32GTEbmps/MPUMsiB5CTKa8tEzRou+DfZWk7u0oZhOAbI+QCDS3on+
+         OFTRyeagGug+PTzOgsmvw8sYAfdPTf7kTtgS+mHObD+v22M+IiqHawuz8LEuKbBPzQvQ
+         riEP/JSaCMPyC1WUmDGMNWdn0SnCYLqQ7Ew1tZoQ9K4usnfjtD/pgNBul+xkUxDEeIn8
+         RzvP2EmhQXRJZOazoeINJEcfui1N6yF2C2bOyuMl6nMJTcAa1fvv4vMWARIFNsz12+My
+         IpkA==
+X-Gm-Message-State: AOJu0YxzpPVVELfw0IFOv+CAODj6dQi5qCCYFm723LjdXWfXjhU9awom
+	IfDpgkHZJ0XuAZBVNyhw1A5BgAmsUpsbCvDE9Nyb7qqUgZvuZgaMj1gCmAS57kFQpGz2X3i5H4a
+	W/lIb
+X-Gm-Gg: ASbGncscfsU/DGYMIeE6vPXBfPWgoSs17h2zBk7gLjRRb6ua0IAeCoT1RFB2wPJL8be
+	d53JHmK5bzm6sK632SyZI3OJlMByK7GDfnzNxSU17wHpNvD/PqdndYbkdG1eaXKRJ4jag6GgMEs
+	tqGfXBvXGtxmHtu8MbwrpK/V3Vt9CZrHN6AuR5e2y9tAEO7kXCa1ZjyueY/XMlMEJD2m2SQQBpJ
+	dAeg9ysyp+Ln6c1/18NKKRwCmlaJytYuhdmfk0jDUi73jD0gxslvEp7JoBJx0CsPLj+M7W9ffMy
+	otUh2PouooiFK6Ah9/74idcG3VWkfbYafBqWgTO6S6dB4s0v2KS3Nn+6b6Ulwz8bxO7+/DGgnRf
+	PzhUCfLSuxR98uK+Q71akII/mPBwzc0KCSPCQ6ik6IuCj4lt9RhVZ310cdp6/siNagLHykua6gZ
+	NZnc1VzFei/1aAv4/vTdA2NFCTY41aKXX/phjy6dCV
+X-Google-Smtp-Source: AGHT+IEh9gli6kvwQTPKyMD3Hy+KjVuyJPp9BNW508cVB4E2O7nWlaFKN0k2vs2g7zPnwSM4SOgoeg==
+X-Received: by 2002:a05:6820:1c91:b0:654:faee:1077 with SMTP id 006d021491bc7-657849f10bbmr589509eaf.6.1763609423425;
+        Wed, 19 Nov 2025 19:30:23 -0800 (PST)
+Received: from localhost ([2a03:2880:12ff:9::])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65782b4c9f1sm455529eaf.11.2025.11.19.19.30.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 19:30:21 -0800 (PST)
+        Wed, 19 Nov 2025 19:30:22 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -82,9 +82,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH net-next v1 3/7] selftests/net: modify iou-zcrx.py to use MemPrvEnv
-Date: Wed, 19 Nov 2025 19:30:12 -0800
-Message-ID: <20251120033016.3809474-4-dw@davidwei.uk>
+Subject: [PATCH net-next v1 4/7] selftests/net: add rand_ifname() helper
+Date: Wed, 19 Nov 2025 19:30:13 -0800
+Message-ID: <20251120033016.3809474-5-dw@davidwei.uk>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251120033016.3809474-1-dw@davidwei.uk>
 References: <20251120033016.3809474-1-dw@davidwei.uk>
@@ -96,181 +96,113 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Modify iou-zcrx.py to use MemPrvEnv which shortens the test
-significantly.
-
-In addition, there's no need to duplicate the test with and without RSS.
-Set up two envs to do this. This makes it easier to repeat each test,
-with and without RSS.
+For upcoming netkit container datapath selftests I want to generate
+randomised ifnames. Add a helper rand_ifname() to do this.
 
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- .../selftests/drivers/net/hw/iou-zcrx.py      | 131 +++---------------
- 1 file changed, 16 insertions(+), 115 deletions(-)
+ tools/testing/selftests/drivers/net/hw/lib/py/__init__.py | 5 +++--
+ tools/testing/selftests/drivers/net/lib/py/__init__.py    | 5 +++--
+ tools/testing/selftests/net/lib/py/__init__.py            | 5 +++--
+ tools/testing/selftests/net/lib/py/utils.py               | 7 +++++++
+ 4 files changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-index 712c806508b5..4b99ab090b7c 100755
---- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-+++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-@@ -1,143 +1,44 @@
- #!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
+diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+index 09f120be9075..f2f6d3eccc86 100644
+--- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
++++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+@@ -22,7 +22,8 @@ try:
+         NlError, RtnlFamily, DevlinkFamily, PSPFamily
+     from net.lib.py import CmdExitFailure
+     from net.lib.py import bkg, cmd, bpftool, bpftrace, defer, ethtool, \
+-        fd_read_timeout, ip, rand_port, wait_port_listen, wait_file
++        fd_read_timeout, ip, rand_port, wait_port_listen, wait_file, \
++        rand_ifname
+     from net.lib.py import KsftSkipEx, KsftFailEx, KsftXfailEx
+     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
+         ksft_setup
+@@ -37,7 +38,7 @@ try:
+                "CmdExitFailure",
+                "bkg", "cmd", "bpftool", "bpftrace", "defer", "ethtool",
+                "fd_read_timeout", "ip", "rand_port",
+-               "wait_port_listen", "wait_file",
++               "wait_port_listen", "wait_file", "rand_ifname",
+                "KsftSkipEx", "KsftFailEx", "KsftXfailEx",
+                "ksft_disruptive", "ksft_exit", "ksft_pr", "ksft_run",
+                "ksft_setup",
+diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+index dde4e80811c7..8fb75725f558 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
++++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
+@@ -22,7 +22,8 @@ try:
+         NlError, RtnlFamily, DevlinkFamily, PSPFamily
+     from net.lib.py import CmdExitFailure
+     from net.lib.py import bkg, cmd, bpftool, bpftrace, defer, ethtool, \
+-        fd_read_timeout, ip, rand_port, wait_port_listen, wait_file
++        fd_read_timeout, ip, rand_port, wait_port_listen, wait_file, \
++        rand_ifname
+     from net.lib.py import KsftSkipEx, KsftFailEx, KsftXfailEx
+     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
+         ksft_setup
+@@ -35,7 +36,7 @@ try:
+                "CmdExitFailure",
+                "bkg", "cmd", "bpftool", "bpftrace", "defer", "ethtool",
+                "fd_read_timeout", "ip", "rand_port",
+-               "wait_port_listen", "wait_file",
++               "wait_port_listen", "wait_file", "rand_ifname",
+                "KsftSkipEx", "KsftFailEx", "KsftXfailEx",
+                "ksft_disruptive", "ksft_exit", "ksft_pr", "ksft_run",
+                "ksft_setup",
+diff --git a/tools/testing/selftests/net/lib/py/__init__.py b/tools/testing/selftests/net/lib/py/__init__.py
+index 97b7cf2b20eb..f16cbc025bf2 100644
+--- a/tools/testing/selftests/net/lib/py/__init__.py
++++ b/tools/testing/selftests/net/lib/py/__init__.py
+@@ -12,7 +12,8 @@ from .ksft import KsftFailEx, KsftSkipEx, KsftXfailEx, ksft_pr, ksft_eq, \
+ from .netns import NetNS, NetNSEnter
+ from .nsim import NetdevSim, NetdevSimDev
+ from .utils import CmdExitFailure, fd_read_timeout, cmd, bkg, defer, \
+-    bpftool, ip, ethtool, bpftrace, rand_port, wait_port_listen, wait_file
++    bpftool, ip, ethtool, bpftrace, rand_port, wait_port_listen, wait_file, \
++    rand_ifname
+ from .ynl import NlError, YnlFamily, EthtoolFamily, NetdevFamily, RtnlFamily, RtnlAddrFamily
+ from .ynl import NetshaperFamily, DevlinkFamily, PSPFamily
  
--import re
- from os import path
--from lib.py import ksft_run, ksft_exit, KsftSkipEx
--from lib.py import NetDrvEpEnv
--from lib.py import bkg, cmd, defer, ethtool, rand_port, wait_port_listen
--
--
--def _get_current_settings(cfg):
--    output = ethtool(f"-g {cfg.ifname}", json=True)[0]
--    return (output['rx'], output['hds-thresh'])
--
--
--def _get_combined_channels(cfg):
--    output = ethtool(f"-l {cfg.ifname}").stdout
--    values = re.findall(r'Combined:\s+(\d+)', output)
--    return int(values[1])
--
--
--def _create_rss_ctx(cfg, chan):
--    output = ethtool(f"-X {cfg.ifname} context new start {chan} equal 1").stdout
--    values = re.search(r'New RSS context is (\d+)', output).group(1)
--    ctx_id = int(values)
--    return (ctx_id, defer(ethtool, f"-X {cfg.ifname} delete context {ctx_id}"))
--
--
--def _set_flow_rule(cfg, port, chan):
--    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} action {chan}").stdout
--    values = re.search(r'ID (\d+)', output).group(1)
--    return int(values)
--
--
--def _set_flow_rule_rss(cfg, port, ctx_id):
--    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} context {ctx_id}").stdout
--    values = re.search(r'ID (\d+)', output).group(1)
--    return int(values)
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import MemPrvEnv
-+from lib.py import bkg, cmd, wait_port_listen
+@@ -25,7 +26,7 @@ __all__ = ["KSRC",
+            "NetNS", "NetNSEnter",
+            "CmdExitFailure", "fd_read_timeout", "cmd", "bkg", "defer",
+            "bpftool", "ip", "ethtool", "bpftrace", "rand_port",
+-           "wait_port_listen", "wait_file",
++           "wait_port_listen", "wait_file", "rand_ifname",
+            "NetdevSim", "NetdevSimDev",
+            "NetshaperFamily", "DevlinkFamily", "PSPFamily", "NlError",
+            "YnlFamily", "EthtoolFamily", "NetdevFamily", "RtnlFamily",
+diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
+index cb40ecef9456..56546d796f6c 100644
+--- a/tools/testing/selftests/net/lib/py/utils.py
++++ b/tools/testing/selftests/net/lib/py/utils.py
+@@ -2,9 +2,11 @@
  
+ import json as _json
+ import os
++import random
+ import re
+ import select
+ import socket
++import string
+ import subprocess
+ import time
  
- def test_zcrx(cfg) -> None:
-     cfg.require_ipver('6')
- 
--    combined_chans = _get_combined_channels(cfg)
--    if combined_chans < 2:
--        raise KsftSkipEx('at least 2 combined channels required')
--    (rx_ring, hds_thresh) = _get_current_settings(cfg)
--    port = rand_port()
--
--    ethtool(f"-G {cfg.ifname} tcp-data-split on")
--    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
--
--    ethtool(f"-G {cfg.ifname} hds-thresh 0")
--    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
--
--    ethtool(f"-G {cfg.ifname} rx 64")
--    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
--
--    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
--    defer(ethtool, f"-X {cfg.ifname} default")
--
--    flow_rule_id = _set_flow_rule(cfg, port, combined_chans - 1)
--    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
--
--    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
--    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 12840"
-+    rx_cmd = f"{cfg.bin_local} -s -p {cfg.port} -i {cfg.ifname} -q {cfg.target_queue}"
-+    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {cfg.port} -l 12840"
-     with bkg(rx_cmd, exit_wait=True):
--        wait_port_listen(port, proto="tcp")
-+        wait_port_listen(cfg.port, proto="tcp")
-         cmd(tx_cmd, host=cfg.remote)
- 
- 
- def test_zcrx_oneshot(cfg) -> None:
-     cfg.require_ipver('6')
- 
--    combined_chans = _get_combined_channels(cfg)
--    if combined_chans < 2:
--        raise KsftSkipEx('at least 2 combined channels required')
--    (rx_ring, hds_thresh) = _get_current_settings(cfg)
--    port = rand_port()
--
--    ethtool(f"-G {cfg.ifname} tcp-data-split on")
--    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
--
--    ethtool(f"-G {cfg.ifname} hds-thresh 0")
--    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
--
--    ethtool(f"-G {cfg.ifname} rx 64")
--    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
--
--    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
--    defer(ethtool, f"-X {cfg.ifname} default")
--
--    flow_rule_id = _set_flow_rule(cfg, port, combined_chans - 1)
--    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
--
--    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1} -o 4"
--    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 4096 -z 16384"
-+    rx_cmd = f"{cfg.bin_local} -s -p {cfg.port} -i {cfg.ifname} -q {cfg.target_queue} -o 4"
-+    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {cfg.port} -l 4096 -z 16384"
-     with bkg(rx_cmd, exit_wait=True):
--        wait_port_listen(port, proto="tcp")
-+        wait_port_listen(cfg.port, proto="tcp")
-         cmd(tx_cmd, host=cfg.remote)
+@@ -238,6 +240,11 @@ def rand_port(stype=socket.SOCK_STREAM):
+         return s.getsockname()[1]
  
  
--def test_zcrx_rss(cfg) -> None:
--    cfg.require_ipver('6')
--
--    combined_chans = _get_combined_channels(cfg)
--    if combined_chans < 2:
--        raise KsftSkipEx('at least 2 combined channels required')
--    (rx_ring, hds_thresh) = _get_current_settings(cfg)
--    port = rand_port()
--
--    ethtool(f"-G {cfg.ifname} tcp-data-split on")
--    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
--
--    ethtool(f"-G {cfg.ifname} hds-thresh 0")
--    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
--
--    ethtool(f"-G {cfg.ifname} rx 64")
--    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
--
--    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
--    defer(ethtool, f"-X {cfg.ifname} default")
--
--    (ctx_id, delete_ctx) = _create_rss_ctx(cfg, combined_chans - 1)
--    flow_rule_id = _set_flow_rule_rss(cfg, port, ctx_id)
--    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
--
--    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
--    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 12840"
--    with bkg(rx_cmd, exit_wait=True):
--        wait_port_listen(port, proto="tcp")
--        cmd(tx_cmd, host=cfg.remote)
-+def main() -> None:
-+    with MemPrvEnv(__file__) as cfg:
-+        cfg.bin_local = path.abspath(path.dirname(__file__) + "/../../../drivers/net/hw/iou-zcrx")
-+        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
- 
-+        ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg,))
- 
--def main() -> None:
--    with NetDrvEpEnv(__file__) as cfg:
-+    with MemPrvEnv(__file__, rss=True) as cfg:
-         cfg.bin_local = path.abspath(path.dirname(__file__) + "/../../../drivers/net/hw/iou-zcrx")
-         cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
- 
--        ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg, ))
-+        ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg,), case_sfx="_rss")
-     ksft_exit()
- 
++def rand_ifname():
++    dev = ''.join(random.choice(string.ascii_lowercase) for _ in range(6))
++    return dev + ''.join(random.choice(string.digits) for _ in range(2))
++
++
+ def wait_port_listen(port, proto="tcp", ns=None, host=None, sleep=0.005, deadline=5):
+     end = time.monotonic() + deadline
  
 -- 
 2.47.3
