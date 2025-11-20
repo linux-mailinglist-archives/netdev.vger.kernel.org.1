@@ -1,142 +1,198 @@
-Return-Path: <netdev+bounces-240374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 589A3C73EC0
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 13:15:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34D1DC73F2A
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 13:21:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 4C82C2A541
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:14:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4C4EB4E61B7
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541FE331A7B;
-	Thu, 20 Nov 2025 12:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E16B3191C9;
+	Thu, 20 Nov 2025 12:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DNT/qRJa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fHgr2EF/";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tUnV/aKw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C548B326D75
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:14:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48F612B143
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763640854; cv=none; b=RqeLKA2/ocQPcAR/rsg5ZYjsi1CKN698mDt8phk1HngBCT9zDqB7U0wSdZmpkgUCTO8X34xgskCETKJhT3N2GdEhNPPTZZELNa+cGv2HYb2/tzQotnk6nABLRJX7h9qIwqU1Jtbaa+tTRB+tlekbwBgxayi0hRAUyBHk1f44Dyw=
+	t=1763641202; cv=none; b=jwS+Qsjhj78oxob5jzjHl/9Aqopc9wkGqFAlrEdxpS1vRYc8VMY6wYywSG1hnaXNXJy0LQldUaqvF/cP28gD94l65PDjSrsYXI7vx93ztj1ax5ieMy2DbZf/cpkK61dhkdyIXV2gp8x25L8dh3Dp2BOptwzV0o/FINFg1sjwmg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763640854; c=relaxed/simple;
-	bh=afPc1NBubibhkYAj3B9LVVpPs3rRw+YuXpTnHu87Ey8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b/VIZKr/bQfBHDhcWI+a4y+c1GhvuVmgeC+yEoP+uEDuvIOppB2dueR6iKObOgmo9JyP0yQOEI76PbzlN+KZKz+M6YL7L3MIFcPK8ih8IPAfTiSj4aSdCVsnWcnmNywv5n7WtvsblMZgKCC8jbMxbNiaG0dn+NeB6QTUP33BRh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DNT/qRJa; arc=none smtp.client-ip=209.85.161.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-65745a436f7so299197eaf.3
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 04:14:12 -0800 (PST)
+	s=arc-20240116; t=1763641202; c=relaxed/simple;
+	bh=at1e75hOWpRKvRRLbvhWM9/uctq5gzPahra6Oo6jHMc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S9yv+6hJsIWVuaQaEmbZFkEGkUQi50x6sDWEQeaYeNA15K79rnroxBmvA/s1MfWdDpvpMJ3FU77ViBuENNyU+ofWD8Bi5ynwz6Lwakruvyn2QRRM8F3mSWd7s/wh5XlFqiSp70H1FAGnWUgx+PDd8WGkZnNKriLsrP9KPNnLY5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fHgr2EF/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tUnV/aKw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763641199;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Pw7frUWnVBP5/bK04W/QcbdTjEKCzyz1vTHmtbnF5zE=;
+	b=fHgr2EF/Cm6noYo/Hg5zUcrhIRMQe0l9R1l7HfZVYICjgm8OGeeFRD54CvwzpoQEPTneu5
+	xk/M9E94TRK7vT6SDJg6PUDpUUTpgFaYG3t7Gmnj82Q0QLjgbIES39zdV8yEKPFSqNs9ue
+	G/KkWZt86yjzbHudlM/j56REtGCVnxY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-483-RWIqgT5pOe2b5zFB6N0LJA-1; Thu, 20 Nov 2025 07:19:58 -0500
+X-MC-Unique: RWIqgT5pOe2b5zFB6N0LJA-1
+X-Mimecast-MFC-AGG-ID: RWIqgT5pOe2b5zFB6N0LJA_1763641197
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42b30184be7so403034f8f.2
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 04:19:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763640852; x=1764245652; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from:sender
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=afPc1NBubibhkYAj3B9LVVpPs3rRw+YuXpTnHu87Ey8=;
-        b=DNT/qRJaZq445LS7tOTjGSSsmQAmpv7S/qwgqiqKNt4NC+5nuqs2jSZ8wryNrHOPvY
-         iYnGl2YWdqKkWXa6OPuxxgkms3acKRXJ/Ju9pQcAWEmFeAtPlAZoyyNhIboXrk4QsnJP
-         3JjxNXL1uMp3iwp0J67flZtOzDN8UxI8huK3zFDSYRon6YdR3PSicxk2lcBuoObHNgvi
-         8pzZSGy/Hox3U9G6XFQ0WfGyblGakfs4tpA6QEo7qto6SFYS3+AFExHKepNKsSZQd+Bc
-         o1hywQBjLpvtXv9FIyNEGHB/amv2ZFSH3TIO7RmD0ZgGFhK91+47BC5fkPVXffj3Tq4p
-         YIkA==
+        d=redhat.com; s=google; t=1763641197; x=1764245997; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Pw7frUWnVBP5/bK04W/QcbdTjEKCzyz1vTHmtbnF5zE=;
+        b=tUnV/aKwNPveV58Vpl1u4WXidLL0tPUXnGzIG9fac8c3t01U4/KSsOBgS2ratf4qGv
+         n5FUQc+VOON5CgkFl7wexHNru6RdTKly02m7n8JWcM7HUyGxfnwzKc3bziDtEqsRheEs
+         hgCa1WSWPX49Vc+3IzUx9wNcn8gq8s1+0XD4D87S5xZAiYDIsvhNtYOcPNnRj20SaHus
+         mqeGGsHiN5CgcSOwpjJ7kMWeW2dAkBCIdZF73wM0L+0aWqapFG25roJIix+yYKrcMzpo
+         xGfvkaYG4i461Z4KKnzicBwn9u4UNO4tI2vst/4Kc6kHGBwSzara3F5kzML/8lx9t7TV
+         54Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763640852; x=1764245652;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :x-google-sender-delegation:sender:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=afPc1NBubibhkYAj3B9LVVpPs3rRw+YuXpTnHu87Ey8=;
-        b=ERHRqQI3auhELaAn/WTsl4BWVKIGMfkz5DxrZBwPXwV1rDB/+f2bwsBZHjdTbrMCV8
-         oasmvQpk+M81nToiwcY7CnqrcfiR+BwOPe/RVepz6efeyW84qINszQuV+bJneVdLTZXv
-         gSel7gnS/TYIP7elWet2f7ZKyKUH7SKHXIvnFkd4U4GvnlaRQYZ1QLubtLga0vajOnHA
-         QJYf2a+b4cXxjvtrtpajGaK8D/NU9avhgubWIyoirmX8hq0Bs3ajLUNtv69DcqYKUS5J
-         XjWvL2Mrko2TLPsQITfdSBtzQ0PiFJL8v5XRhslA1Imkfk+HSHXuMwizve+g3P75v7C6
-         txdA==
-X-Forwarded-Encrypted: i=1; AJvYcCWAe7f7RERtsyKmpG+JpeCPsn9U5Klh2ssjfLbJUiG1v+aDw5yJprfcIyW4+0hYA0H/gvHhqa4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXQ8yQXpJh6oVgyByNbQoVNO5OEXwoHMNVFRcI9NDzaiSChgM6
-	hTRaKFJtSlhF+IuRx+0sc2u40xZ52D+bRTrq5yNFbpS2EfN9AWIjI9PMkZYBp+NkH5tNKivDJlR
-	ioGmZxFrWWIEJvNhSE9moSoc4FBE8ZUQ=
-X-Gm-Gg: ASbGncuXVdHlkW53eOSCqYlDjN6FWjGr22Gg1eG/jCzfG+eeWK4LW7XElnAUbASyUxV
-	ga0tjoQ4p+Q8PePwHo99T/D3Ouk3j3ouMhGeKvb/bT/S3ghdgl4OGmyqi/JH3GypEmQNaMmNbVv
-	1n73v2TRhOws6oPYQbYVXSCVHYGJavQapaD94ID4G9o+ZVDEAFD7hNvx9gvGXi0Mk/cc2A23H7M
-	0GvvN+Ff60cgBvLV3umD3xSbr9McYj5is7TxsXZF2tCpQOdic8r21SvnC/wcWRuuWE+j1LJK0Gh
-	upIv
-X-Google-Smtp-Source: AGHT+IH/eb3Dv0UCJrH1SZTf8BRjK9wJlIx5viCddf8iUS/Adh5/Wq0DDGKJebipoqWAx6FTViIp4L8FHEEuuUe+tRQ=
-X-Received: by 2002:a05:6820:2d8b:10b0:654:f9a7:76dc with SMTP id
- 006d021491bc7-65787f3daefmr493288eaf.4.1763640851785; Thu, 20 Nov 2025
- 04:14:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763641197; x=1764245997;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Pw7frUWnVBP5/bK04W/QcbdTjEKCzyz1vTHmtbnF5zE=;
+        b=cav8e03Sysb2LNgn773HCTG9giOyn/sSXIX8bllefNQwqkuXsDGxM7lOoWz/TOOlau
+         ooLdTgSv0yJVyFpAqVNBllqIaoDfo2RznenSuDAwVf/Um+FNydzHgcATVP7nhVxdUw9q
+         408rvXuteAtgw4LuQU4XJPON0bRbmNFsK8eSeNm67gB5lXS/25sNxmQF/s62QLK1jd9F
+         rndD3sniUXNIExr9ydfGlDjurI8TjhPSsvoyV4dvu+TnDLeUzhqXPICsTrnfa9ypx78D
+         FDD2pRPxRq4zGIkHYbUzYYYFRn+No+PMZ5b6GMxYZMaAo3nj4hQWDItXJiyJstPH2Yj6
+         mjgw==
+X-Gm-Message-State: AOJu0YwBAzDHCzF9aiFi+dfRH1yEVHEid3nbNxkK4j4vQmX8yHSyEe/W
+	4ed4eTo9aQRQo3ejL/equsQNYHKFSnOaqNh/bA3RZzemWBNYv0A/WJWFBtgK8dSK3uo5eOpE2AV
+	u4IUThFqpiZ9LpykthIw11OZrR5X5TXcEJQ+LVuZUQzEkxsvlzesPmqEQQg==
+X-Gm-Gg: ASbGnculF+VOkJc80JmM0+2JcD4HUElIUbS5nASB+U7UC2C+SJBFUMtoyYorG8QjUYz
+	IlZqNgRfCfNMoNlThwLFXnfJKuF9HmrovCbs8B2RTj9wuHtk+o2NSoYvDmf1LV6mOIjE4HcjJ1n
+	LQrHMgfx+klA5Hugsoxpx5k6m3k5vp/GhENVQd/XCfqX7MgK18p/RGgIsiI0aVKKKK+VXPUvup1
+	zx9BKgtjtR5iiwtfpYRAf5TmZ2kdUuQtvbblsAkgp4OkcpZMn8oUHsVzeawh+gl1K11WcSMyLab
+	yiXL5a7ymuwKEYQ83zDUNtO7IjU0h8SrOy0e/CwmOjykIDxOwQHwbvfeDKqU3sp5i291rzHfOr3
+	sn1H0NHSMhWqG
+X-Received: by 2002:a5d:64c4:0:b0:42b:3ee9:4772 with SMTP id ffacd0b85a97d-42cbb2b1a79mr2179240f8f.52.1763641197265;
+        Thu, 20 Nov 2025 04:19:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGDT5eOsby5onmtLuvobHZk2SYkA/y2Wh5xP/wocdvM4KSJix9fhaPkAeUQspjHNj61Efl/0A==
+X-Received: by 2002:a5d:64c4:0:b0:42b:3ee9:4772 with SMTP id ffacd0b85a97d-42cbb2b1a79mr2179197f8f.52.1763641196791;
+        Thu, 20 Nov 2025 04:19:56 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.41])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fba201sm5107021f8f.32.2025.11.20.04.19.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Nov 2025 04:19:56 -0800 (PST)
+Message-ID: <a0543467-df01-4486-9bac-d1a3446f44cc@redhat.com>
+Date: Thu, 20 Nov 2025 13:19:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251118033330.1844136-1-hanguidong02@gmail.com> <038697aa-a11c-45ce-a270-258403cc1457@redhat.com>
-In-Reply-To: <038697aa-a11c-45ce-a270-258403cc1457@redhat.com>
-Sender: 2045gemini@gmail.com
-X-Google-Sender-Delegation: 2045gemini@gmail.com
-From: Gui-Dong Han <hanguidong02@gmail.com>
-Date: Thu, 20 Nov 2025 20:14:01 +0800
-X-Google-Sender-Auth: yD23ODSIyzTE7MrBut6Z8fEMW0I
-X-Gm-Features: AWmQ_bluxQrCtKwmX5vZq88lt2K-omHHzjSpi9caWAxfKnV3WK2fZc43sm6lac4
-Message-ID: <CALbr=LYBs9P92oHpF3-w1k6a+W8u3eTqBpgZv5WncfTm+zCHUA@mail.gmail.com>
-Subject: Re: [PATCH REPOST net v2] atm/fore200e: Fix possible data race in fore200e_open()
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: 3chas3@gmail.com, horms@kernel.org, kuba@kernel.org, 
-	linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, baijiaju1990@gmail.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 3/5] net: devmem: implement autorelease token
+ management
+To: Bobby Eshleman <bobbyeshleman@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, Neal Cardwell <ncardwell@google.com>,
+ David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Shuah Khan <shuah@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>,
+ Bobby Eshleman <bobbyeshleman@meta.com>
+References: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-0-1abc8467354c@meta.com>
+ <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-3-1abc8467354c@meta.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-3-1abc8467354c@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 20, 2025 at 7:26=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 11/18/25 4:33 AM, Gui-Dong Han wrote:
-> > Protect access to fore200e->available_cell_rate with rate_mtx lock to
-> > prevent potential data race.
-> >
-> > In this case, since the update depends on a prior read, a data race
-> > could lead to a wrong fore200e.available_cell_rate value.
-> >
-> > The field fore200e.available_cell_rate is generally protected by the lo=
-ck
-> > fore200e.rate_mtx when accessed. In all other read and write cases, thi=
-s
-> > field is consistently protected by the lock, except for this case and
-> > during initialization.
-> >
-> > This potential bug was detected by our experimental static analysis too=
-l,
-> > which analyzes locking APIs and paired functions to identify data races
-> > and atomicity violations.
-> >
-> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Gui-Dong Han <hanguidong02@gmail.com>
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> > ---
-> > v2:
-> > * Added a description of the data race hazard in fore200e_open(), as
-> > suggested by Jakub Kicinski and Simon Horman.
->
-> It looks like you missed Jakub's reply on v2:
->
-> https://lore.kernel.org/netdev/20250123071201.3d38d8f6@kernel.org/
->
-> The above comment is still not sufficient: you should describe
-> accurately how 2 (or more) CPUs could actually race causing the
-> corruption, reporting the relevant call paths leading to the race.
+On 11/20/25 4:37 AM, Bobby Eshleman wrote:
+> @@ -2479,10 +2504,12 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+>  			      unsigned int offset, struct msghdr *msg,
+>  			      int remaining_len)
+>  {
+> +	struct net_devmem_dmabuf_binding *binding = NULL;
+>  	struct dmabuf_cmsg dmabuf_cmsg = { 0 };
+>  	struct tcp_xa_pool tcp_xa_pool;
+>  	unsigned int start;
+>  	int i, copy, n;
+> +	int refs = 0;
+>  	int sent = 0;
+>  	int err = 0;
+>  
+> @@ -2536,6 +2563,7 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+>  			skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
+>  			struct net_iov *niov;
+>  			u64 frag_offset;
+> +			u32 token;
+>  			int end;
+>  
+>  			/* !skb_frags_readable() should indicate that ALL the
+> @@ -2568,13 +2596,32 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+>  					      start;
+>  				dmabuf_cmsg.frag_offset = frag_offset;
+>  				dmabuf_cmsg.frag_size = copy;
+> -				err = tcp_xa_pool_refill(sk, &tcp_xa_pool,
+> -							 skb_shinfo(skb)->nr_frags - i);
+> -				if (err)
+> +
+> +				binding = net_devmem_iov_binding(niov);
+> +
+> +				if (!sk->sk_devmem_info.binding)
+> +					sk->sk_devmem_info.binding = binding;
+> +
+> +				if (sk->sk_devmem_info.binding != binding) {
+> +					err = -EFAULT;
+>  					goto out;
+> +				}
+> +
+> +				if (static_branch_unlikely(&tcp_devmem_ar_key)) {
 
-Hi Paolo,
+Not a real/full review but the above is apparently causing kunit build
+failures:
 
-Added the detailed description in v3.
+ERROR:root:ld: vmlinux.o: in function `tcp_recvmsg_dmabuf':
+tcp.c:(.text+0x669b21): undefined reference to `tcp_devmem_ar_key'
+ld: tcp.c:(.text+0x669b68): undefined reference to `tcp_devmem_ar_key'
+ld: tcp.c:(.text+0x669c54): undefined reference to `tcp_devmem_ar_key'
+make[3]: *** [../scripts/Makefile.vmlinux:72: vmlinux.unstripped] Error 1
+make[2]: *** [/home/kunit/testing/Makefile:1242: vmlinux] Error 2
+make[1]: *** [/home/kunit/testing/Makefile:248: __sub-make] Error 2
+make: *** [Makefile:248: __sub-make] Error 2
 
-Thank you,
-Gui-Dong Han
+see:
+
+https://netdev-3.bots.linux.dev/kunit/results/393664/
+
+> @@ -2617,6 +2664,7 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+>  
+>  out:
+>  	tcp_xa_pool_commit(sk, &tcp_xa_pool);
+> +
+
+[just because I stumbled upon the above while looking for the build
+issue]: please do not mix unrelated whitespace-change only with
+functional change.
+
+/P
+
 
