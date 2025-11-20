@@ -1,219 +1,230 @@
-Return-Path: <netdev+bounces-240267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65434C71FE1
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:31:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7EFDC7200F
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:37:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 1C2A12B560
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:31:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 3C27929AF2
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC47301027;
-	Thu, 20 Nov 2025 03:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19AA22F60D1;
+	Thu, 20 Nov 2025 03:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="AINODSv1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qsxa+VKd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689AC2FFDF5
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F66279DB6
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763609429; cv=none; b=AcedVSlG9dCF1Mrs6eAClvQhU0FiIYai+7CIY6oEouKtbVK7t07ycqC4UI/2vinsxX2Nwst+PWLBcAD6iaKEYadJkXs7fJYohcdI0XNaPgeuqOc/RJNVksAjihr3EVYcG0dwNoDNkk4jngTlK8VDNYNoY63APffUJf6C2xqYtHw=
+	t=1763609833; cv=none; b=LGEtDw0uIJ/oI/pKV+v3AsSK5oD/A/N6ZYfWNFNWTJed3RXnJfUyz0it2QgkJislTEkktjjU9wBJZ/gIBBcYd7GRksOfhgoUO/DT5Wf2NV5mofy/0g+VGzgsrEixAJ6rL9igh6Kjub1gkHbNBxFyznmcjUAGp105e1oUud4ztEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763609429; c=relaxed/simple;
-	bh=skzqejGjT8GBIo6sRj1raxwLJbrJktcjew8Fj9AgyHo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a0pAlo4KLyZxDw9hjv2SrVXBca6JoonbduZmp9ReQdALdGxMidY6SRq+yzG20DR459lY/kTis8G06Duj4JdPiqiiMrzJH2ITylekuxL0eIa1MFzYO+zE2Ez/SUKN8npGI9LWsqc9q73/wz0hcS6EmA17iAEBEOL16eWbcW+3MB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=AINODSv1; arc=none smtp.client-ip=209.85.160.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-3e37ad3d95aso213324fac.3
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:30:28 -0800 (PST)
+	s=arc-20240116; t=1763609833; c=relaxed/simple;
+	bh=ECDBbREziOCBdmljpaOyZYKnPyj7Q88QKnhf5KEHVVM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=itgA9srPgYVk5FWDiyd5F1oajJCnNURROrl9lzIoxVvkZrolextKhJxKFqMD8ZoO7+qjaoWrUEg7OptPzUnOkl+bNQRYIPs6vL/sDKarnP0VLAS+FYBWXwL3nkr8WxaDvrKOOG4KUDHcAaK9WZUjXs6zuJGDPGPkwHlZ40NYgwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qsxa+VKd; arc=none smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-640d0895d7cso519231d50.1
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:37:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1763609427; x=1764214227; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WkJsGkbmG5wukxAxoFHneooDiZqTCaYDKjLXMjnX+CY=;
-        b=AINODSv1Rhu2i6FH3PcLKXCnqquQhbwfv8mbx5ORTBd/hQ/BEu5IKFafjJgbx0Y+vo
-         59/ZmtAveID/J49D8zGSmNdIeREbigN9cKGrwZ9qJatdrtPy/wnbEH8CUj7qrdIkzIEH
-         PN+KSnjZuwHKh7Qx7QQam9cWOAigQeSCrmw0kz7SQV51DrhOd8OWI0abfHmum5U8pTBL
-         G20IFyc2G0+1R1d374HY2tZOEmvZwBEOeeB3pV8wCTcp+uBsZ/pywK6/1bwarLpyR2Ow
-         QsWKEXWdunv0UNhlz6HQixRPJXKnqadzc04IeQBhyLm4Rkir+IZbrTEJmG7VeMXcz/Qc
-         JvvA==
+        d=gmail.com; s=20230601; t=1763609831; x=1764214631; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LIkiaMiVquFyiirALpYhy26Yx4mEN1PZCumzzoxIfHM=;
+        b=Qsxa+VKd1mpF7UMBzUypqSeI2fpL9oercFH36BLY0JFDDSV1v6mzYlAvlrroyjRbw7
+         I/gd8y4I1aOQuqt89THFWvvobEQt6MjyL2cSH67gw6shL07YZaHBehY8b1UAcxooTtah
+         kHGDLiRh3BGI1WbaiJaq8yrqgu3aQ4gSRH5B35xbheyVT6GvSdVZT/T2opISaSr04BhS
+         s2SXG+j9E6ksMjKkWQz+Xwo2WeKSbaQRDmO+Sn4ajetlbrnhuv5qaB7Lr7mnvwFqFw6O
+         UftCsGlJ8Uj45P34gk0OkTjJEaEIhbw0OvMnLxiu1/0j3qSSH3LTD03EhQf4PSCqICTW
+         fYtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763609427; x=1764214227;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WkJsGkbmG5wukxAxoFHneooDiZqTCaYDKjLXMjnX+CY=;
-        b=sduxZ1qZBP0wfLtO9OQ9jRUcpKXimLlt3hP07HnnVqVJV18Vk0v637wAnxEKY9dyg2
-         Hx+s74U5WpQs2rCQbA/p8lEOcLiZRn7Ij4i+tN7P7Xn+/Dp0V+rb7Z7l5mkfd2NAqE9v
-         /yl3xEE/pedb7JQfy5xGCP+MNxjX/1xhb1gFJz9TDAsx4nee/Y8n0oCcd1NM79m4NxQ9
-         KMsFvV1r3Eoj4AfVg9UdeHCdZFtXi87R1V1/sJjAWZ/8m3VDnukoCifO5my2dtid5vCA
-         VCHKI/4SBp324sqcQTCyu4JeWwIN8JoSkTDpPZbr1T/SDenj4rk+Wn/WjhAaRuTEZCcZ
-         tvEA==
-X-Gm-Message-State: AOJu0Yz1QdefKW1JfH5/adOyNWZPkgoLTxPRdpFCkwptDiYpM8kJt57j
-	D/zRMZogt7CTogqyuzJbswsF0iSGGyyb+hZ9H8kVDx1b3O7crEOgBBnNNQottWGTgj2zjW9oBWk
-	7DFxn
-X-Gm-Gg: ASbGncsygN0Kqf8tvxMfY0DpqT3INxZQhHRh6UgBQx3cywhMBPfYJh8NQuf+Piwm2tJ
-	StLvKJvz27Uy88POpgseVW3C6DNKiWP2eHxjdMlHG+PaSsLLfmsoTdrz54ziMSZra7Ni90bDas6
-	7zEVfHlPhs4IviqSxqYpWjeVHHubDRzUYThoW3Ds4ixIeKN3UlrIXoz78VvDi9KVcf9nIbUQDwA
-	TKBSP4Ch8Axe41/j9kJ1Ij1LOnAL1sSWkmcqcwZzrVIFj/bsJx/MQaaqIW0c+Xq1C5AEvtWIMpB
-	nq4hYV0LIMl61HI3FoVoVt9bq9T/zbINsuYmtADREmByztYn+hyRUP244ugEo8x/m0UpHU3qhpZ
-	+KqgJbr2vBZR4U4DhZRtmX0JbVtMuN7zBmvA7gmkWbgsX0m22hQxp74V+bmnpvS9tru1g25/yA2
-	YMAIUXNn0vBrp8udOf2NjD07PLc7WIyOqm4lPmrQsTov5C0XUI1TQ=
-X-Google-Smtp-Source: AGHT+IEFKc5KqrWMbYiYxIaQplHGnhA5gcT4BXb0naKVnfTKEX0emPYsfqaOej56U3gD4Sys6WoswQ==
-X-Received: by 2002:a05:6808:14d6:b0:44f:7562:1a73 with SMTP id 5614622812f47-450ff387ad4mr1001735b6e.35.1763609427432;
-        Wed, 19 Nov 2025 19:30:27 -0800 (PST)
-Received: from localhost ([2a03:2880:12ff:5::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-450fff8d592sm379745b6e.12.2025.11.19.19.30.26
+        d=1e100.net; s=20230601; t=1763609831; x=1764214631;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LIkiaMiVquFyiirALpYhy26Yx4mEN1PZCumzzoxIfHM=;
+        b=pZF8BS13Msf5MdCTsBlL+IAG3ZEHr7To8gLdDI4a4bxlqMqg+hRdO9cwaeCmG4QFYu
+         5vlaJjnNYZxDT10aup3aWnYvbxLDZoApoljKBxcyt2jag3WIqgHJZIdqHocUXsGQjnP0
+         CqAD/lZrv17IsasjZ+IbzgYA/XCwScYM/frnUNeGyOfVqniYwRgyLZ8DlRyq/ztLElr5
+         lB6d4sCytlT+J8Hvq7skvAvST+3rueS+0skYkHwnNex+CuSumG/PZtS4UIHPrSkM+Rn1
+         aRWUC/J/RUou/ywGI9lWZpaTn3d3LpYUlfHFzns+71aPSBGWWtGJNzjIIcOcvk8/7uMG
+         eOiA==
+X-Gm-Message-State: AOJu0YxJkLq2G4rlvPId7rhSpKypHV51cmRvcdU7ItTPTo87sdOy1/UL
+	m3bG2OHzSPtrcw5lvgth8jipdGHfSv7osrOfSL35iuEBWS9CQp9N8Cxm
+X-Gm-Gg: ASbGnct85hCikodtY54l70mmWmEyLHdZOrxs0JBYLBjQ7HgzYCse8v5LMOX4tJSWEzY
+	3v4Vr0/Q7IgQc4B7GzRRaJ+3UWN6UzPSjTOxH7TX8RPoHJSXoZq8Bi/M2lGvr8JZhZw0h++JIsn
+	pQDx7+zmrrLrINkYWzVrIyVid/hH2lqWBEjjn/uLNioML2o9KQzM5fo6CnQUcIFcjqQDyMVQfxD
+	1gvS2lhNbXUajNTRlXWXLpAqsmE1X7CJQeujATEla+6enOTJkUQKrqde2btQteUl0K4nu+Q+U/6
+	LPQNbfK+mHfjDPyRcatVR9Nhqp8kPrDLf3lJ0U23LZ2NxjxlXxN9RrgtmF6PAB00tz9fGRjn2jy
+	r1y0rx2F3J9XFAp9T3qlVTY3OtrsHN0J4fp4AbcHS9F+WG33splgzrKUN1j68afzO2Bx7ORLVA4
+	F/HKg6CPE0wGWeAvyDa0sinw==
+X-Google-Smtp-Source: AGHT+IFKpR/FkxuF8iJIp+zHB2TEb80Y93lcc8kYP3bFlmrPbGL1JL+3IZD61Ppr98fvNX1s6GOhrQ==
+X-Received: by 2002:a05:690e:4009:b0:63f:b1fd:3850 with SMTP id 956f58d0204a3-642f8e16330mr648848d50.33.1763609830900;
+        Wed, 19 Nov 2025 19:37:10 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:50::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78a798bd22fsm4151977b3.25.2025.11.19.19.37.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 19:30:27 -0800 (PST)
-From: David Wei <dw@davidwei.uk>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH net-next v1 7/7] selftests/net: add a netkit netns ping test
-Date: Wed, 19 Nov 2025 19:30:16 -0800
-Message-ID: <20251120033016.3809474-8-dw@davidwei.uk>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251120033016.3809474-1-dw@davidwei.uk>
-References: <20251120033016.3809474-1-dw@davidwei.uk>
+        Wed, 19 Nov 2025 19:37:10 -0800 (PST)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: [PATCH net-next v7 0/5] net: devmem: improve cpu cost of RX token
+ management
+Date: Wed, 19 Nov 2025 19:37:07 -0800
+Message-Id: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-0-1abc8467354c@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOOMHmkC/5XQu26EMBCF4VexXO9EY2ODTbXvEaXwZQhWwkXYQ
+ bta8e6RKBJERz3S9x/Ni2daEmXeshdfaE05TSNvWXNjPPRu/CRIkbeMS5QajbSQw+JK6MFP3j8
+ p9980uBEirQMNUMIMZfqiEX7mXBZyA0grPYlGRY0VvzE+L9Slx1585yMVGOlR+MeN8T7lMi3Pf
+ coq9vtetSgvV1cBCNGqWtTWa63xPlBxb2Ea9tQqD7wQ13kJCMFgbCrto9LVia8OvKyv8xUgoFF
+ e1T46Y7oTr/94gbK6zmtAUE3wRndaaksnvv7nBarrfA0I5KwJnYoK/fE527b9Ahk4QLRzAgAA
+X-Change-ID: 20250829-scratch-bobbyeshleman-devmem-tcp-token-upstream-292be174d503
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Willem de Bruijn <willemb@google.com>, Neal Cardwell <ncardwell@google.com>, 
+ David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Shuah Khan <shuah@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+ Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arch@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>, 
+ Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.14.3
 
-Set up a netkit pair, with one end in a netns. Use LOCAL_PREFIX_V6 and
-nk_forward bpf prog to ping from a remote host to the netkit in netns.
+This series improves the CPU cost of RX token management by adding an
+attribute to NETDEV_CMD_BIND_RX that configures sockets using the
+binding to avoid the xarray allocator and instead use a per-binding niov
+array and a uref field in niov.
 
-Signed-off-by: David Wei <dw@davidwei.uk>
+Improvement is ~13% cpu util per RX user thread.
+    
+Using kperf, the following results were observed:
+
+Before:
+	Average RX worker idle %: 13.13, flows 4, test runs 11
+After:
+	Average RX worker idle %: 26.32, flows 4, test runs 11
+
+Two other approaches were tested, but with no improvement. Namely, 1)
+using a hashmap for tokens and 2) keeping an xarray of atomic counters
+but using RCU so that the hotpath could be mostly lockless. Neither of
+these approaches proved better than the simple array in terms of CPU.
+
+The attribute NETDEV_A_DMABUF_AUTORELEASE is added to toggle the
+optimization. It is an optional attribute and defaults to 0 (i.e.,
+optimization on).
+
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Simon Horman <horms@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+To: Willem de Bruijn <willemb@google.com>
+To: Neal Cardwell <ncardwell@google.com>
+To: David Ahern <dsahern@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+To: Arnd Bergmann <arnd@arndb.de>
+To: Jonathan Corbet <corbet@lwn.net>
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: Shuah Khan <shuah@kernel.org>
+Cc: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-arch@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+
+Changes in v7:
+- use netlink instead of sockopt (Stan)
+- restrict system to only one mode, dmabuf bindings can not co-exist
+  with different modes (Stan)
+- use static branching to enforce single system-wide mode (Stan)
+- Link to v6: https://lore.kernel.org/r/20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-0-ea98cf4d40b3@meta.com
+
+Changes in v6:
+- renamed 'net: devmem: use niov array for token management' to refer to
+  optionality of new config
+- added documentation and tests
+- make autorelease flag per-socket sockopt instead of binding
+  field / sysctl
+- many per-patch changes (see Changes sections per-patch)
+- Link to v5: https://lore.kernel.org/r/20251023-scratch-bobbyeshleman-devmem-tcp-token-upstream-v5-0-47cb85f5259e@meta.com
+
+Changes in v5:
+- add sysctl to opt-out of performance benefit, back to old token release
+- Link to v4: https://lore.kernel.org/all/20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v4-0-39156563c3ea@meta.com
+
+Changes in v4:
+- rebase to net-next
+- Link to v3: https://lore.kernel.org/r/20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v3-0-084b46bda88f@meta.com
+
+Changes in v3:
+- make urefs per-binding instead of per-socket, reducing memory
+  footprint
+- fallback to cleaning up references in dmabuf unbind if socket
+  leaked tokens
+- drop ethtool patch
+- Link to v2: https://lore.kernel.org/r/20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-0-c80d735bd453@meta.com
+
+Changes in v2:
+- net: ethtool: prevent user from breaking devmem single-binding rule
+  (Mina)
+- pre-assign niovs in binding->vec for RX case (Mina)
+- remove WARNs on invalid user input (Mina)
+- remove extraneous binding ref get (Mina)
+- remove WARN for changed binding (Mina)
+- always use GFP_ZERO for binding->vec (Mina)
+- fix length of alloc for urefs
+- use atomic_set(, 0) to initialize sk_user_frags.urefs
+- Link to v1: https://lore.kernel.org/r/20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com
+
 ---
- .../testing/selftests/drivers/net/hw/Makefile |  1 +
- .../selftests/drivers/net/hw/nk_netns.py      | 89 +++++++++++++++++++
- 2 files changed, 90 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
+Bobby Eshleman (5):
+      net: devmem: rename tx_vec to vec in dmabuf binding
+      net: devmem: refactor sock_devmem_dontneed for autorelease split
+      net: devmem: implement autorelease token management
+      net: devmem: document NETDEV_A_DMABUF_AUTORELEASE netlink attribute
+      selftests: drv-net: devmem: add autorelease tests
 
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 855363bc8d48..dfca39d1b99f 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -16,6 +16,7 @@ TEST_PROGS = \
- 	irq.py \
- 	loopback.sh \
- 	nic_timestamp.py \
-+	nk_netns.py \
- 	pp_alloc_fail.py \
- 	rss_api.py \
- 	rss_ctx.py \
-diff --git a/tools/testing/selftests/drivers/net/hw/nk_netns.py b/tools/testing/selftests/drivers/net/hw/nk_netns.py
-new file mode 100755
-index 000000000000..43b520ac5757
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/nk_netns.py
-@@ -0,0 +1,89 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+import subprocess
-+import time
-+from os import path
-+from lib.py import ksft_run, ksft_exit, KsftSkipEx, KsftFailEx
-+from lib.py import NetNS, MemPrvEnv
-+from lib.py import cmd, defer, ip, rand_ifname
-+
-+
-+def attach(bin, netif_ifindex, nk_host_ifindex, ipv6_prefix):
-+    cmd = [
-+        bin,
-+        "-n", str(nk_host_ifindex),
-+        "-e", str(netif_ifindex),
-+        "-i", ipv6_prefix
-+    ]
-+    try:
-+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-+        time.sleep(0.5)
-+        if proc.poll() is not None:
-+            _, stderr = proc.communicate()
-+            raise KsftFailEx(f"Failed to attach nk_forward BPF program: {stderr}")
-+        return proc
-+    except Exception as e:
-+        raise KsftFailEx(f"Failed to attach nk_forward BPF program: {e}")
-+
-+
-+def detach(proc):
-+    if proc and proc.poll() is None:
-+        try:
-+            proc.terminate()
-+            proc.wait(timeout=5)
-+        except subprocess.TimeoutExpired:
-+            proc.kill()
-+            proc.wait()
-+
-+
-+def test_netkit_ping(cfg) -> None:
-+    cfg.require_ipver("6")
-+
-+    local_prefix = cfg.env.get("LOCAL_PREFIX_V6")
-+    if not local_prefix:
-+        raise KsftSkipEx("LOCAL_PREFIX_V6 required")
-+
-+    local_prefix = local_prefix.rstrip("/64").rstrip("::").rstrip(":")
-+    ipv6_prefix = f"{local_prefix}::"
-+
-+    nk_host_ifname = rand_ifname()
-+    nk_guest_ifname = rand_ifname()
-+
-+    ip(f"link add {nk_host_ifname} type netkit mode l2 forward peer forward {nk_guest_ifname}")
-+    nk_host_info = ip(f"-d link show dev {nk_host_ifname}", json=True)[0]
-+    nk_host_ifindex = nk_host_info["ifindex"]
-+    nk_guest_info = ip(f"-d link show dev {nk_guest_ifname}", json=True)[0]
-+    nk_guest_ifindex = nk_guest_info["ifindex"]
-+
-+    bpf_proc = attach(cfg.nk_forward_bin, cfg.ifindex, nk_host_ifindex, ipv6_prefix)
-+    defer(detach, bpf_proc)
-+
-+    guest_ipv6 = f"{local_prefix}::2:1"
-+    ip(f"link set dev {nk_host_ifname} up")
-+    ip(f"-6 addr add fe80::1/64 dev {nk_host_ifname} nodad")
-+    ip(f"-6 route add {guest_ipv6}/128 via fe80::2 dev {nk_host_ifname}")
-+
-+    with NetNS() as netns:
-+        ip(f"link set dev {nk_guest_ifname} netns {netns.name}")
-+
-+        ip("link set lo up", ns=netns)
-+        ip(f"link set dev {nk_guest_ifname} up", ns=netns)
-+        ip(f"-6 addr add fe80::2 dev {nk_guest_ifname}", ns=netns)
-+        ip(f"-6 addr add {guest_ipv6} dev {nk_guest_ifname} nodad", ns=netns)
-+
-+        ip(f"-6 route add default via fe80::1 dev {nk_guest_ifname}", ns=netns)
-+
-+        cmd(f"ping -c 1 -W5 {guest_ipv6}")
-+        cmd(f"ping -c 1 -W5 {cfg.remote_addr_v['6']}", ns=netns)
-+
-+
-+def main() -> None:
-+    with MemPrvEnv(__file__) as cfg:
-+        cfg.nk_forward_bin = path.abspath(path.dirname(__file__) + "/nk_forward")
-+        ksft_run([test_netkit_ping], args=(cfg,))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
+ Documentation/netlink/specs/netdev.yaml           |  12 +++
+ Documentation/networking/devmem.rst               |  70 +++++++++++++
+ include/net/netmem.h                              |   1 +
+ include/net/sock.h                                |   7 +-
+ include/uapi/linux/netdev.h                       |   1 +
+ net/core/devmem.c                                 | 121 ++++++++++++++++++----
+ net/core/devmem.h                                 |  13 ++-
+ net/core/netdev-genl-gen.c                        |   5 +-
+ net/core/netdev-genl.c                            |  13 ++-
+ net/core/sock.c                                   | 103 ++++++++++++++----
+ net/ipv4/tcp.c                                    |  78 +++++++++++---
+ net/ipv4/tcp_ipv4.c                               |  13 ++-
+ net/ipv4/tcp_minisocks.c                          |   3 +-
+ tools/include/uapi/linux/netdev.h                 |   1 +
+ tools/testing/selftests/drivers/net/hw/devmem.py  |  22 +++-
+ tools/testing/selftests/drivers/net/hw/ncdevmem.c |  19 ++--
+ 16 files changed, 401 insertions(+), 81 deletions(-)
+---
+base-commit: 4c52142904b33b41c3ff7ee58670b4e3b3bf1120
+change-id: 20250829-scratch-bobbyeshleman-devmem-tcp-token-upstream-292be174d503
+
+Best regards,
 -- 
-2.47.3
+Bobby Eshleman <bobbyeshleman@meta.com>
 
 
