@@ -1,109 +1,133 @@
-Return-Path: <netdev+bounces-240309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AE3FC72A79
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 08:51:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B669C72BD6
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 09:14:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1777F3459EC
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 07:51:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C68614E3931
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 08:14:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4B1280CC1;
-	Thu, 20 Nov 2025 07:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D42E73093DB;
+	Thu, 20 Nov 2025 08:14:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="mLA/kMFO"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="zO53s/w0"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025B729B8E5;
-	Thu, 20 Nov 2025 07:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FF42E54BB;
+	Thu, 20 Nov 2025 08:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763625098; cv=none; b=Gx/L9NjLS09nzrHR7oypOSY9N3ot3JIzF67yB+vOH68Ap6Emme+pF/u2OWgNUbuQ521YPbH+vsWgqBGzEZ3QY7OXQA7RrXsIZhLru4BzRPhhmVUDvgSdj87yl8meG/M7fCQIlXSgo+vEjIcfVdiVWDryztCDl5bBbg51saEnzOg=
+	t=1763626489; cv=none; b=QipPkInbfVRNOYEoTPJO1IVqakX9V/4r71BG8K5notKl+HufvHCHOKav75iKgWdOTcn3QeFzm8Rw/r56adEhFcfUcIRTqB2puneq3ONXLn1b19DU5QLUVhbg5TOxA8Qj5G34zut5fh0jwDWibpVhaBxeOmrep+EpYB7d6F6w0/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763625098; c=relaxed/simple;
-	bh=6WeLNPzmOcXHftooSQWNIuFAJUMvdPcbNnVe5XBUAKo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ffnIh76Ka0wx7bPvmurcYX28Hlfz6DoTr5lsotKKlW2m22uXj5sx96xwvxXnyIfDTz3NZcuYv9QLhRxlcW6vUVH6eItAiSljgaOvG9dlX0PMzKPDRNs4RwoLbNPNQMDzp4lCG8hK0zY9MLKA7+XZ7vDzAEsgdmQke/8WeaFIBCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=mLA/kMFO; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1763625096; x=1795161096;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6WeLNPzmOcXHftooSQWNIuFAJUMvdPcbNnVe5XBUAKo=;
-  b=mLA/kMFOoIe5WkNCLb98AriTgvA+cPa+tkmZis3P2fmOU6y1c+1GohYq
-   z9A2ty7f2uyvs0f+WCDGJIkgBib1tKfEMRN+JtNTdq20UIsUoSjz4JM5F
-   IUM3tDDAojbBBGCIYG9MR1LAcNGFq/151ODmWLQ53EBa0ty1qgikn3dmP
-   UuO0g2q22OrcLcwTTI0LGTtQ+XgHi0Y9CRm316TBcLRKEK2r7lVFYgJJs
-   qnX+ugUZiX1JpCjiCUNrZ2EAHfaUAg03xrcLP6Y1oeIrqZ2eGcPQmvWvV
-   skaQhlQp6Y6dLzEeiY2yxjXTGfqdc3SidIcLM0pGs89c5ef5BxTdneQbI
-   g==;
-X-CSE-ConnectionGUID: PcM37C81QYmn/42u/XMkmw==
-X-CSE-MsgGUID: vSkbAs8FQbC6DUcE72NZ9g==
-X-IronPort-AV: E=Sophos;i="6.19,317,1754982000"; 
-   d="scan'208";a="48779748"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 00:51:35 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Thu, 20 Nov 2025 00:50:55 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Thu, 20 Nov 2025 00:50:54 -0700
-Date: Thu, 20 Nov 2025 08:50:57 +0100
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <UNGLinuxDriver@microchip.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v2] net: lan966x: Fix the initialization of taprio
-Message-ID: <20251120075057.dsjr4wgnunecgom6@DEN-DL-M31836.microchip.com>
-References: <20251119172845.430730-1-horatiu.vultur@microchip.com>
- <ffa6ba0a-750e-4281-826d-f56c4f5ea433@lunn.ch>
+	s=arc-20240116; t=1763626489; c=relaxed/simple;
+	bh=4M3rIlDgfGY2KP0GGEpH34NIuXvhKUUboZiFUNvEWSA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ifZxBD6y61vvYrrYShSss9V16OtC49WX3e3KcRr6Z6QacWqOp3+UogQcp1NnB7wigtRury/qQ2ioLqzdKjhpe3Hq7I/qGDnbJEjZFOjVXZv1O9he7uDeBJOhCvfbg4GsrnqlcPU5P9rQghKcOAfns5u/4pb+NBqeHEU7y1lztak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=zO53s/w0; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id EDE36C111A9;
+	Thu, 20 Nov 2025 08:14:21 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2888D6068C;
+	Thu, 20 Nov 2025 08:14:44 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2463810371BE5;
+	Thu, 20 Nov 2025 09:14:33 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1763626483; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=04pEPH5W1KZzvKj2XXuseVAsQtkSJz6OArHi5Tto5KU=;
+	b=zO53s/w0VCdf+TA3nqmIBY3AO6g2hAcIA8DYJg+Ur8lzFILy38/OMfKYSQ+ZWW4du3nKeG
+	TaIzz/Lc8SeReN6qrxdnf52ZQqv8Styxa8pscrO72QV9f0PKjdMWJsxF8dHVlTD+0AMOnX
+	vs1Bdl3BLh5uSif2yxUad37+pzs0McyAq9JMmw6audHClyPHRmRJkFDnD3EYimer8auZhK
+	pme+Y01qHFkt3vlfXUqplZ2pvegrCpRugViRQTqsIVXvmORw8N1mWZsglY+BAaozClZoKG
+	d5DoLtYlP73V22dpwdFeNsQ07vPVl4hhxer5xnFxmeFSlwzUHiE9ZbIVxpWCbQ==
+Message-ID: <61f73cda-b3d8-44da-a210-34ea15888d24@bootlin.com>
+Date: Thu, 20 Nov 2025 09:14:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <ffa6ba0a-750e-4281-826d-f56c4f5ea433@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v17 03/15] net: phy: Introduce PHY ports
+ representation
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+References: <20251119195920.442860-1-maxime.chevallier@bootlin.com>
+ <20251119195920.442860-4-maxime.chevallier@bootlin.com>
+ <20251119195400.1bf0cc68@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251119195400.1bf0cc68@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-The 11/19/2025 20:53, Andrew Lunn wrote:
-> 
-> > +#define LAN9X66_CLOCK_RATE   165617754
-> 
-> You add a #define
-> 
-> > +
-> >  #define LAN966X_MAX_PTP_ID   512
-> >
-> >  /* Represents 1ppm adjustment in 2^59 format with 6.037735849ns as reference
-> > @@ -1126,5 +1129,5 @@ void lan966x_ptp_rxtstamp(struct lan966x *lan966x, struct sk_buff *skb,
-> >  u32 lan966x_ptp_get_period_ps(void)
-> >  {
-> >       /* This represents the system clock period in picoseconds */
-> > -     return 15125;
-> > +     return PICO / 165617754;
-> 
-> and then don't use it?
 
-Argh... that is just a stupid mistake.
-I will update in the next version.
 
+On 20/11/2025 04:54, Jakub Kicinski wrote:
+> On Wed, 19 Nov 2025 20:59:04 +0100 Maxime Chevallier wrote:
+>> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+>> index 2f4b70f104e8..8216e4ada58e 100644
+>> --- a/net/ethtool/common.c
+>> +++ b/net/ethtool/common.c
+>> @@ -460,6 +460,21 @@ const struct link_mode_info link_mode_params[] = {
+>>  static_assert(ARRAY_SIZE(link_mode_params) == __ETHTOOL_LINK_MODE_MASK_NBITS);
+>>  EXPORT_SYMBOL_GPL(link_mode_params);
+>>  
+>> +const char ethtool_link_medium_names[][ETH_GSTRING_LEN] = {
+>> +	[ETHTOOL_LINK_MEDIUM_BASET] = "BaseT",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEK] = "BaseK",
+>> +	[ETHTOOL_LINK_MEDIUM_BASES] = "BaseS",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEC] = "BaseC",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEL] = "BaseL",
+>> +	[ETHTOOL_LINK_MEDIUM_BASED] = "BaseD",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEE] = "BaseE",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEF] = "BaseF",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEV] = "BaseV",
+>> +	[ETHTOOL_LINK_MEDIUM_BASEMLD] = "BaseMLD",
+>> +	[ETHTOOL_LINK_MEDIUM_NONE] = "None",
+>> +};
+>> +static_assert(ARRAY_SIZE(ethtool_link_medium_names) == __ETHTOOL_LINK_MEDIUM_LAST);
 > 
->         Andrew
+> Thanks for reshuffling things, this one needs a static tho:
+> 
+> net/ethtool/common.c:463:12: warning: symbol 'ethtool_link_medium_names' was not declared. Should it be static?
 
--- 
-/Horatiu
+hmpf I hesistated for some dumb reason... I'll respin after the usual
+cooldown.
+
+I'll keep Christophe's review tag though, as this is just adding the
+static keyword :)
+
+Maxime
+
 
