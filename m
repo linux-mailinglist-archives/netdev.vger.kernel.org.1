@@ -1,152 +1,255 @@
-Return-Path: <netdev+bounces-240408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD3DDC747DE
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:16:10 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5312C74860
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:21:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 702524F1649
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 14:04:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 100424ED96B
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 14:15:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999553469FA;
-	Thu, 20 Nov 2025 14:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 862DF348466;
+	Thu, 20 Nov 2025 14:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o+xUpKA0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b/Rugs2d"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DE2346A06;
-	Thu, 20 Nov 2025 14:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBB333B6CF
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 14:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763647445; cv=none; b=HFF+bjubhJid76yru7wKLqT8wRWJLLwzhRhyw6Q3D2ZFCfNni8SLieW5sWtoBgMU5xfbOhVuH8pUD9VLESObH9C+VSi1LCsBT1+wEQDer8jujTZD38ItCwIMV4ufLveQ/cxUlQxFOKwA1uhAWH1ujwjCCqfzJ7TzzUgxWfBaXvI=
+	t=1763648142; cv=none; b=KTtBQNDAN2iPVScQjhvSAKelSB2fNznw1r09Y63dVefNbDlShWzti4a/2qCTMwpVW3jcKjTBfh994jpj5CI2rrIlYfH/9quZxoSbrNadNf3+lAXh8/QPROmXWPIGYClM7siLjySL7yGBAGGEyWQmhAzBx+vZifljhGpHUfxd6LE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763647445; c=relaxed/simple;
-	bh=CI3aKvMENBD6Wx/BMX3Dm6s28G/RCoH+gf+fXWi+F9U=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=PxbBrbKrAaosM7IyDmCeVWlduMz9qdw1WN5CWpLtUvpN0ghQ5t4GoVnBOkDd9CxO8UsGM5H4lPCkDtoB9L18Lc/86fy+C9of80b2iG9qVVXimh77jUROOTkurot7u2nzKkaEnv2jWt/8HBiqgiXLb0kWkr4o+p18KtCA3q7ZrEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o+xUpKA0; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1763648142; c=relaxed/simple;
+	bh=URcRCRZc27ATehNsnD5wCfBb0enqn8YbmGPfjxgsNAM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=NlitLRKmBWGufY0mRHNslHKJNZ7ySX6lfBiOJ4ZA7zoRmP0nTox3VTX7f8OwEV39d8Xua64VTg9JIf04NanulqI6YS7U0DynisfW0O4azagTH8D3y2hYGJFv1ve9C4PCeIhpLC9MxMzkCJbxabEdzHWSZa8YZUeXdYOjH5h/hog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b/Rugs2d; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-297ef378069so8979035ad.3
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 06:15:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763648140; x=1764252940; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1w0vRPTrSQYB1FNs5Alcq6MmQhD4iwCtva78BRmz+fY=;
+        b=b/Rugs2dmreXmWWA/nrhZkSDi2gSJzQRxYkcNsMH8NNXyx/5afZaJwYKYg8zYvsp8d
+         83rCzTcpwFNmxEKMSoMATdYc8eAnOxfctaox1wpYj7H4b05qeiyClV3T70C2yBEp0an+
+         9ddbOx3vuYhfi3onPsZC8FJGfgqzoL6puRzWML2np7ZJb4DQE5cRjADPVyu0CI0p8waa
+         vUjcGz4EIVgPpd0aeQuqj+OunjyTXrTvF4m6JektgPppchzkzQ2N3QIvCXMh/UZF7ZxT
+         wBX/YV+S5B7m8Zlvb2vAVhSOfAWcM6cWOculid20zYL2vY1NX0nWctrijKVX5zFuVwaW
+         aH2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763648140; x=1764252940;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1w0vRPTrSQYB1FNs5Alcq6MmQhD4iwCtva78BRmz+fY=;
+        b=wADagNO3NCfe0loxx27Cha8mz+Ysq8K+Tw8e0YGiMuKLFhw8Zje7xOA7ywyEiXzHFe
+         za0UQVOfcbCcirL85Eo7wDSONeYBhNhsRH284kYunc3SegZ9GNycitKDUSQS7++q+650
+         mn52KB1BAd3JUd1OxjN/4w+vkVTkieKsmozfoan6KB61LzJHNdmkJ4qlEvL7dmojCVDx
+         F5E4ctWl3txCNNxNNPk4EJv7pPSb+qbdXwZqqRmswKWrZo92Q5CNSyW8bu6DWA8KMypH
+         tSrvh1Yqx5GvvpNl7FitfnaL4tDWLeTMMXpUEWWi+Qvbwxp2leDVd1bKTlBkXOdO4wZ3
+         hYYw==
+X-Forwarded-Encrypted: i=1; AJvYcCXmXBw4Qg97i6xhINGeMltIbqRYO1PLDLCbl1MZkOach0xrIOik4vHJRjrqRznCtFWSgmUphnY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPzdVwKLPRv/HzFfLTU0xH4jLjBpTV7RAru0Jybe8pch54+y/Q
+	aeBlwBhTBtkP/cCruXstOnx0tgwwwBdxdqSbCYcNCHqNe34DN4dkHGNe
+X-Gm-Gg: ASbGncsG6nTzdCel3rA0Rf8aTUGllWpIT/viXrQIt0BFjjt4DqSKbkgBqWkDdyriIR5
+	TmEHTUTfZlZLtRwV6w8U9LjjYuvE/4Hq6AzrXh633PXTbdS5xA33HXbkdq5323rhIBzKr7k38ga
+	NCqOZb/wxvibsvfFNX3c/Hyf+E5zQu3n+r7PlVaLZR6NI3Z7p2p+qZ/dYXbz02KlEIXZfBcjfRW
+	wMUkDcTJueyG9FpzNtYOWDFiW8WDB8ss1St24Z/PQ5raSTLy7v4IjJkkHigfzvgAQ+N3TLNgkPH
+	RLWYux78ZoAq0wpLvNsdTaOJIKVDH+xnbQb80TLdO4fpF2DMjEZm91Dh7ZVME3UvPH9zVAa3+u0
+	0gHEuWhyP3hSAZYTfx+l0K2uo7EO3oCjybDDw2/XZzWQ5hFJNQPc95GXynrfSyCBdigS526ZEt0
+	NbaHue1WrWNm3hW4TPQdR43jPB84W/AC0=
+X-Google-Smtp-Source: AGHT+IHNdc6f9RQwfAmaKFzQBgZ1LixjzxJRn7eguePAU93WE2AGCr17VZU7UMlryHgGAufaRcg0Eg==
+X-Received: by 2002:a17:903:1b03:b0:295:9627:8cbd with SMTP id d9443c01a7336-29b5b0f760cmr43206965ad.33.1763648140012;
+        Thu, 20 Nov 2025 06:15:40 -0800 (PST)
+Received: from COB-LTR7HP24-497.. ([223.185.131.209])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b138bcbsm28442915ad.29.2025.11.20.06.15.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Nov 2025 06:15:39 -0800 (PST)
+From: I Viswanath <viswanathiyyappan@gmail.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	kuniyu@google.com,
+	skhawaja@google.com,
+	aleksander.lobakin@intel.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com
+Cc: virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev,
+	I Viswanath <viswanathiyyappan@gmail.com>
+Subject: [PATCH net-next v5 0/2] net: Split ndo_set_rx_mode into snapshot
+Date: Thu, 20 Nov 2025 19:43:52 +0530
+Message-Id: <20251120141354.355059-1-viswanathiyyappan@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1763647429;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t2tROtgsicTEps6RWKZs8tKAeJGs/9o7AxPBq2elSzg=;
-	b=o+xUpKA0GTss5Hqr4AOnKIRD0++/yyfuuMREnltWDz/NJroRTWSqaxV9qW8YLNRbTjboLf
-	0ZjKKmP/IQWPRCKVZ7l3LweYSzsrygSlUyM1MRKmqcRIXhvZTNOwPHkkgEA/h+UWA+GtmA
-	Dg5jZq1PklmquRRuCwEQa3Ouw8++Kzg=
-Date: Thu, 20 Nov 2025 14:03:46 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <b6c033deb75243e285fa6b028ee666f874b75eb8@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH bpf-next v1 1/3] bpf, sockmap: Fix incorrect copied_seq
- calculation
-To: "Jakub Sitnicki" <jakub@cloudflare.com>
-Cc: bpf@vger.kernel.org, "John Fastabend" <john.fastabend@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Simon Horman" <horms@kernel.org>, "Neal Cardwell"
- <ncardwell@google.com>, "Kuniyuki Iwashima" <kuniyu@google.com>, "David 
- Ahern" <dsahern@kernel.org>, "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>, "Andrii Nakryiko"
- <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Eduard 
- Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong 
- Song" <yonghong.song@linux.dev>, "KP Singh" <kpsingh@kernel.org>,
- "Stanislav Fomichev" <sdf@fomichev.me>, "Hao Luo" <haoluo@google.com>,
- "Jiri Olsa" <jolsa@kernel.org>, "Shuah Khan" <shuah@kernel.org>, "Michal
- Luczaj" <mhal@rbox.co>, "Stefano Garzarella" <sgarzare@redhat.com>, "Cong
- Wang" <cong.wang@bytedance.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-In-Reply-To: <87tsyo6ets.fsf@cloudflare.com>
-References: <20251117110736.293040-1-jiayuan.chen@linux.dev>
- <20251117110736.293040-2-jiayuan.chen@linux.dev>
- <87zf8h6bpd.fsf@cloudflare.com>
- <5a66955891ef8db94b7288bbb296efcc0ac357cf@linux.dev>
- <87tsyo6ets.fsf@cloudflare.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-November 20, 2025 at 20:58, "Jakub Sitnicki" <jakub@cloudflare.com mailto=
-:jakub@cloudflare.com?to=3D%22Jakub%20Sitnicki%22%20%3Cjakub%40cloudflare=
-.com%3E > wrote:
+This is an implementation of the idea provided by Jakub here
 
+https://lore.kernel.org/netdev/20250923163727.5e97abdb@kernel.org/
 
->=20
->=20On Thu, Nov 20, 2025 at 02:49 AM GMT, Jiayuan Chen wrote:
->=20
->=20>=20
->=20> November 20, 2025 at 03:53, "Jakub Sitnicki" <jakub@cloudflare.com =
-mailto:jakub@cloudflare.com?to=3D%22Jakub%20Sitnicki%22%20%3Cjakub%40clou=
-dflare.com%3E > wrote:
-> >=20
->=20>  [...]
-> >=20
->=20> >=20
->=20> > > +/* The BPF program sets BPF_F_INGRESS on sk_msg to indicate da=
-ta needs to be
-> > >  > + * redirected to the ingress queue of a specified socket. Since=
- BPF_F_INGRESS is
-> > >  > + * defined in UAPI so that we can't extend this enum for our in=
-ternal flags. We
-> > >  > + * define some internal flags here while inheriting BPF_F_INGRE=
-SS.
-> > >  > + */
-> > >  > +enum {
-> > >  > + SK_MSG_F_INGRESS =3D BPF_F_INGRESS, /* (1ULL << 0) */
-> > >  > + /* internal flag */
-> > >  > + SK_MSG_F_INGRESS_SELF =3D (1ULL << 1)
-> > >  > +};
-> > >  > +
-> > >  >=20
->=20> >  I'm wondering if we need additional state to track this.
-> > >  Can we track sk_msg's construted from skb's that were not redirect=
-ed by
-> > >  setting `sk_msg.sk =3D sk` to indicate that the source socket is u=
-s in
-> > >  sk_psock_skb_ingress_self()?
-> > >=20
->=20>  Functionally, that would work. However, in that case, we would hav=
-e to hold
-> >  a reference to sk until the sk_msg is read, which would delay the re=
-lease of
-> >  sk. One concern is that if there is a bug in the read-side applicati=
-on, sk
-> >  might never be released.
-> >=20
->=20We don't need to grab a reference to sk if we're talking about settin=
-g
-> it only in sk_psock_skb_ingress_self(). psock already holds a ref for
-> psock->sk, and we purge psock->ingress_msg queue when destroying the
-> psock before releasing the sock ref in sk_psock_destroy().
+ndo_set_rx_mode is problematic because it cannot sleep. 
 
-I see. When it's an ingress to self redirection, the msg.sk would point t=
-o
-the same socket as psock->sk (the socket itself), not to another socket, =
-so
-indeed no additional reference grab is needed.
+To address this, this series proposes dividing the concept of setting
+rx_mode into 2 stages: snapshot and deferred I/O. To achieve this, we
+reinterpret set_rx_mode and add create a new ndo write_rx_mode as
+explained below:
 
-> While there's nothing wrong with an internal flaag, I'm trying to see i=
-f
-> we make things somewhat consistent so as a result sk_msg state is easie=
-r
-> to reason about.
->=20
->=20My thinking here is that we already set sk_msg.sk to source socket in
-> sk_psock_msg_verdict() on sendmsg() path, so we know that this is the
-> purpose of that field. We could mimic this on recvmsg() path.
->
+The new set_rx_mode will be responsible for customizing the rx_mode
+snapshot which will be used by write_rx_mode to update the hardware
+
+In brief, the new flow looks something like:
+
+prepare_rx_mode():
+    ndo_set_rx_mode();
+    ready_snapshot();
+
+write_rx_mode():
+    commit_and_use_snapshot();
+    ndo_write_rx_mode();
+
+write_rx_mode() is called from a work item and doesn't hold the 
+netif_addr_lock lock during ndo_write_rx_mode() making it sleepable
+in that section.
+
+This model should work correctly if the following conditions hold:
+
+1. write_rx_mode should use the rx_mode set by the most recent
+    call to prepare_rx_mode before its execution.
+
+2. If a prepare_rx_mode call happens during execution of write_rx_mode,
+    write_rx_mode should be rescheduled.
+
+3. All calls to modify rx_mode should pass through the prepare_rx_mode +
+    schedule write_rx_mode execution flow. netif_rx_mode_schedule_work 
+    has been implemented in core for this.
+
+1 and 2 are guaranteed because of the properties of work queues
+
+Drivers need to ensure 3
+
+To use this model, a driver needs to implement the
+ndo_write_rx_mode callback, change the set_rx_mode callback
+appropriately and replace all calls to modify rx mode with
+netif_rx_mode_schedule_work
+
+Signed-off-by: I Viswanath <viswanathiyyappan@gmail.com>
+---
+Questions I have:
+
+1) Would there ever be a situation in which you will have to wait for I/O 
+to complete in a call to set_rx_mode before proceeding further? That is, 
+Does netif_rx_mode_schedule_work need the flush argument?
+
+2) Does priv_ptr in netif_rx_mode_config make sense? For virtio_net, I 
+can get the vi pointer by doing netdev_priv(dev) and am wondering 
+if this would be a common thing
+
+3) From a previous discussion: 
+https://lore.kernel.org/netdev/417c677f-268a-4163-b07e-deea8f9b9b40@intel.com/
+
+On Thu, 23 Oct 2025 at 05:16, Jacob Keller  wrote:
+> Is there any mechanism to make this guarantee either implemented or at
+> least verified by the core? If not that, what about some sort of way to
+> lint driver code and make sure its correct?
+
+I am not sure how to automate this but basically we need warnings to be 
+generated when the the set_rx_mode implementations are called statically in 
+code (From my understanding, usually in the open callback or the timeout function) 
+but not when they are called through ops->set_rx_mode. 
+Can Coccinelle do something like this?
+
+v1:
+Link: https://lore.kernel.org/netdev/20251020134857.5820-1-viswanathiyyappan@gmail.com/
+
+v2:
+- Exported set_and_schedule_rx_config as a symbol for use in modules
+- Fixed incorrect cleanup for the case of rx_work alloc failing in alloc_netdev_mqs
+- Removed the locked version (cp_set_rx_mode) and renamed __cp_set_rx_mode to cp_set_rx_mode
+Link: https://lore.kernel.org/netdev/20251026175445.1519537-1-viswanathiyyappan@gmail.com/
+
+v3:
+- Added RFT tag
+- Corrected mangled patch
+Link: https://lore.kernel.org/netdev/20251028174222.1739954-1-viswanathiyyappan@gmail.com/
+
+v4:
+- Completely reworked the snapshot mechanism as per v3 comments
+- Implemented the callback for virtio-net instead of 8139cp driver
+- Removed RFC tag
+Link: https://lore.kernel.org/netdev/20251118164333.24842-1-viswanathiyyappan@gmail.com/
+
+v5:
+- Fix broken code and titles
+- Remove RFT tag
+
+Here’s an enumeration of all the cases I have tested that should be exhaustive:
+
+RX behaviour verification:
+
+1) Dest is UC/MC addr X in UC/MC list:
+	no mode: Recv
+	allmulti: Recv
+	promisc: Recv	
+
+2) Dest is UC addr X not in UC list:
+	no_mode: Drop
+	allmulti: Drop
+	promisc: Recv
+
+3) Dest is MC addr X not in MC list:
+	no_mode: Drop
+	allmulti: Recv
+	promisc: Recv
+
+Packets injected from host using scapy on a TAP device as follows:
+sendp(Ether(src=tap0_mac, dst=X) / IP() / UDP() / "test", iface="tap0")
+
+And on the VM side, rx was checked via cat /proc/net/dev
+
+Teardown path:
+
+Relevant as they flush the work item. ens4 is the virtio-net interface.
+
+virtnet_remove:
+ip maddr add 01:00:5e:00:03:02 dev ens4; echo 1 > /sys/bus/pci/devices/0000:00:04.0/remove
+
+virtnet_freeze_down:
+ip maddr add 01:00:5e:00:03:02 dev ens4; echo mem > /sys/power/state
+
+---
+
+I Viswanath (2):
+  net: refactor set_rx_mode into snapshot and deferred I/O
+  virtio-net: Implement ndo_write_rx_mode callback
+
+ drivers/net/virtio_net.c  |  58 +++++------
+ include/linux/netdevice.h | 104 ++++++++++++++++++-
+ net/core/dev.c            | 208 +++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 330 insertions(+), 40 deletions(-)
+
+-- 
+2.34.1
+
 
