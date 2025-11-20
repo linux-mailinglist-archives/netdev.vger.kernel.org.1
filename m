@@ -1,110 +1,120 @@
-Return-Path: <netdev+bounces-240217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FA09C719F2
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 01:56:00 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D287C71AA7
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 02:12:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id C0EC22978E
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 00:55:58 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0443B349E02
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 01:12:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B351DA60D;
-	Thu, 20 Nov 2025 00:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="isUTSwDq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2435F25A626;
+	Thu, 20 Nov 2025 01:11:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC8519B5A7;
-	Thu, 20 Nov 2025 00:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B171C254B18;
+	Thu, 20 Nov 2025 01:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763600154; cv=none; b=UpKMDdSitIpD4ncxuosWkqvyQGO6boiLShvZGhBRd4OXhBnrGYEYOTVb3PJstnVH79Lq0bwdpZ4FC99Vl/zra84NNl/rfXRyDA0WhegKol8x87i9E96MFuzqzBpBxKrvBAsWXdATdZcLzqG1mBm8mrR0jO7i5GkemdHEXv9c210=
+	t=1763601097; cv=none; b=uAmc8TZa8wf76XoM7rzHtvjYqFO8R+uxoXaqe0d6IAZaL0/K+jqf30dN8dTOlHnbSp842TCyPVxxHNxEGeRWeEPZRH6ad9RtMP8v+80rw43cvdPHFL0llhkgAvOMN+ngvf9wGcHx00wtBLvCns6THJ6YT+B6npJ1uRKpvinJRqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763600154; c=relaxed/simple;
-	bh=Q0DZZ/JxiekuSF1qvW3fJNjEeUh+Mh6kSzNDRLBQhZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=spNfDn0okd6hFF+l9a1dgJuz7RO6oEpyqmDrpskYQLNx7ZhWuHt8XlnutSTA3LmIGtkclPa4GwONlwa/yP5VGP3dNr3Mt+I8Ss1fueZoSwIoD0Ml41NL8jkLREzJtQ1MVfyYs5CRK9JzuOgJZU1ie1XQ4A0hJKiBgrOuucWAvLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=isUTSwDq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A554EC4CEF5;
-	Thu, 20 Nov 2025 00:55:52 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="isUTSwDq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1763600151;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3WInqmEFbDY/RNTxo/ojAG1xVSL8xc4rSolc9zgV/Ec=;
-	b=isUTSwDqz/O9aQIVXmq8x3m8Q17M+ZNH3Boeq+6dsokl2bXo1wXUizy8q9SUvf26ogkeS2
-	vG6I9VH+DYdi9Cpg1Bba1VglO3Eqc71p6ffGMtgdmda3nh1pYVQgErf0vfKsymgh/N7Wz7
-	+R9bONq8+sgufWODyOZxyWhUEa9Eozc=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 3c48548b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 20 Nov 2025 00:55:50 +0000 (UTC)
-Date: Thu, 20 Nov 2025 01:55:46 +0100
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?utf-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jordan Rife <jordan@jrife.io>
-Subject: Re: [PATCH net-next v3 07/11] uapi: wireguard: generate header with
- ynl-gen
-Message-ID: <aR5nEnP2PWJ7G7yp@zx2c4.com>
-References: <20251105183223.89913-1-ast@fiberby.net>
- <20251105183223.89913-8-ast@fiberby.net>
- <aRyOAYuWZE440WQ4@zx2c4.com>
- <20251118165315.281a21ca@kernel.org>
+	s=arc-20240116; t=1763601097; c=relaxed/simple;
+	bh=tvJu9MYFspPxUcYcup8DqmUw+hO8Akr3THQmq0yUIo8=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=a3xEptVMKbTBUbcrSce0XC50L5w6o/0Rxz6QmXEuL3UbZ0riMDHZjiamzTqXUwrDiv8ws0HQzTRQg3gFFs35kYUEowwNtO1d2PEtyTdseY/diARyL2hzSVAWxvwN9GLOSnO/DhNMKmP3Du0s5q5LkxtF87ELni+ctseuhtg8NEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c2dff70000001609-09-691e6ac0bb8f
+From: Byungchul Park <byungchul@sk.com>
+To: kuba@kernel.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	kernel_team@skhynix.com,
+	harry.yoo@oracle.com,
+	hawk@kernel.org,
+	andrew+netdev@lunn.ch,
+	david@redhat.com,
+	lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com,
+	vbabka@suse.cz,
+	ziy@nvidia.com,
+	willy@infradead.org,
+	toke@redhat.com,
+	asml.silence@gmail.com,
+	alexanderduyck@fb.com,
+	kernel-team@meta.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	mohsin.bashr@gmail.com,
+	almasrymina@google.com
+Subject: [PATCH net-next] eth: fbnic: access @pp through netmem_desc instead of page
+Date: Thu, 20 Nov 2025 10:11:18 +0900
+Message-Id: <20251120011118.73253-1-byungchul@sk.com>
+X-Mailer: git-send-email 2.17.1
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNLMWRmVeSWpSXmKPExsXC9ZZnoe7BLLlMg+/HuS32NS1jtlj9o8Ji
+	+YMdrBZzVm1jtJhzvoXF4uv6X8wWT489Yre4v+wZi8We9u3MFvsurmGzuLCtj9Vie8MDdovL
+	u+awWdxb85/V4uSslSwWH0+cYLQ4tkDM4tvpN4wWlw4/YrGY3djHaPH7B1DZ7KP32B3EPLas
+	vMnkMbH5HbvHzll32T0WbCr12LxCy2PTqk42j02fJgGFd3xm8jh3scKjt/kdm8fHp7dYPN7v
+	u8rmcWbBEXaPz5vkAviiuGxSUnMyy1KL9O0SuDLu9WxjK3jNUbHqSwtrA+Me9i5GTg4JAROJ
+	vg/tzF2MHGD2nquKIGE2AXWJGzd+MoPYIgK6Egc6JwPZXBzMAp+YJSYvus4EkhAWCJH4v3oD
+	mM0ioCrRsPEHC4jNK2Aq8fL8LlaI+fISqzccAGuWEGhnl1i+5Q5UQlLi4IobLBMYuRcwMqxi
+	FMrMK8tNzMwx0cuozMus0EvOz93ECIyCZbV/oncwfroQfIhRgINRiYc34phsphBrYllxZe4h
+	RgkOZiURXlVHmUwh3pTEyqrUovz4otKc1OJDjNIcLErivEbfylOEBNITS1KzU1MLUotgskwc
+	nFINjN6h16cvWWSzsTIiT1u/nJtRbsV2GS7V67dip3zc/it7T2zRm4O7rdf2fpcTvW4q86Cj
+	rH+HiP/MGqadX1U4oo4Ya/hWOLleWxyo57/rh1X36nYZj4LQwgsp+y//szCVOB6cMLsyxiZc
+	1Dful23rUja9lnmlyh3RL+4e2R399X5FwbKOlvIfSizFGYmGWsxFxYkAVscVQX4CAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAwFlApr9CAMS0gMaCGludGVybmFsIgYKBApOO4MtwGoeaTCcrzA4voKmAzir
+	+Hg4p+C4BTicqrYBOJzPhAQ49a/6AzjlxuIHON+m5gQ4vIe3Azi+0awGOMOdyQU40LaOBTi3
+	gOAHONO6nAY43qz/BTjJmqkEOPHIyAE4xqAWOPbL7AE40sPiBDibgY4BOPv4nAY4m8XeB0AX
+	SLSp2QJIkYPuB0i5mt0HSKCydUizqCpIsqqJBkiy8pIHSLm48wJIztF4SI2D7gZI8eXaBEjv
+	vtUGSKPo8AJIzKDEB0jzsh5QD1oKPGRlbGl2ZXIvPmAKaN6MtgZw6wh4qvSEBYABvAeKAQgI
+	GBA0GLzVIYoBCQgGECcY2Nj5A4oBCQgUEC0YwImTA4oBCggDEPIDGJOi1wKKAQkIExBUGP+r
+	sAKKAQkIBBAlGICx+ASKAQkIDRA1GOnPugWKAQkIGBAfGKuwwAOQAQigAQCqARRpbnZtYWls
+	NS5za2h5bml4LmNvbbIBBgoEpn38kbgB9NNHwgEQCAEiDA1Yxh1pEgVhdnN5bcIBGAgDIhQN
+	JUEcaRINZGF5emVyb19ydWxlc8IBGwgEIhcNSldlYBIQZ2F0ZWtlZXBlcl9ydWxlc8IBAggJ
+	GoABoJHbR2sVUCzxuoDwxyMmkqBXF4al3Xu+/KeWDFycuLHThKC1KVAB4UhuTInEILi7Yc9F
+	LSPhohFt3YrI6sYdAyb4t6hro/hiVt9dUMepBuE0D0Iykco+5aIwqZWeTTBz+t7PiBCCGmPc
+	hiTD6LBvqu4JFXow8q8jzbRTUA5WRDgiBHNoYTEqA3JzYZmxZ6JlAgAA
+X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251118165315.281a21ca@kernel.org>
 
-On Tue, Nov 18, 2025 at 04:53:15PM -0800, Jakub Kicinski wrote:
-> On Tue, 18 Nov 2025 16:17:21 +0100 Jason A. Donenfeld wrote:
-> > On Wed, Nov 05, 2025 at 06:32:16PM +0000, Asbjørn Sloth Tønnesen wrote:
-> > > Use ynl-gen to generate the UAPI header for wireguard.
-> > > diff --git a/include/uapi/linux/wireguard.h b/include/uapi/linux/wireguard.h
-> > > index a2815f4f2910..dc3924d0c552 100644
-> > > --- a/include/uapi/linux/wireguard.h
-> > > +++ b/include/uapi/linux/wireguard.h
-> > > @@ -1,32 +1,28 @@
-> > > -/* SPDX-License-Identifier: (GPL-2.0 WITH Linux-syscall-note) OR MIT */
-> > > -/*
-> > > - * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-> > > - */
-> > > +/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
-> > > +/* Do not edit directly, auto-generated from: */
-> > > +/*	Documentation/netlink/specs/wireguard.yaml */
-> > > +/* YNL-GEN uapi header */  
-> > 
-> > Same desire here -- can this get auto generated at compile time (or in
-> > headers_install time).
-> 
-> IMHO generating uAPI on the fly has more downsides than benefits.
-> For one thing people grepping the code and looking and lxr will
-> never find the definition. All the user space code in tools/ is
-> generated at build time, but the amount of kernel code we generate
-> is not significant at this stage. Not significant enough to complicate
-> everyone's life..
+To eliminate the use of struct page in page pool, the page pool users
+should use netmem descriptor and APIs instead.
 
-I was thinking that doing this automatically at compile-time or
-install-time would be _less_ complicated, not more, since everything
-would be kept in sync automatically and such. But alright, so be it.
+Make fbnic access @pp through netmem_desc instead of page.
+
+Signed-off-by: Byungchul Park <byungchul@sk.com>
+---
+Changes from rfc:
+	1. Use pp_page_to_nmdesc(page)->pp instead a wrong approach,
+	   ring->page_pool. (feedbacked by Jakub)
+---
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index c2d7b67fec28..56744e3a14ec 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -653,7 +653,8 @@ static void fbnic_clean_twq1(struct fbnic_napi_vector *nv, bool pp_allow_direct,
+ 				 FBNIC_TWD_TYPE_AL;
+ 		total_bytes += FIELD_GET(FBNIC_TWD_LEN_MASK, twd);
+ 
+-		page_pool_put_page(page->pp, page, -1, pp_allow_direct);
++		page_pool_put_page(pp_page_to_nmdesc(page)->pp, page, -1,
++				   pp_allow_direct);
+ next_desc:
+ 		head++;
+ 		head &= ring->size_mask;
+-- 
+2.17.1
+
 
