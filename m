@@ -1,87 +1,110 @@
-Return-Path: <netdev+bounces-240459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32459C7523A
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:52:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B856C751A4
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 16:47:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 67410363C99
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:45:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id B26233190D
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 592CA340A63;
-	Thu, 20 Nov 2025 15:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5FC93624B3;
+	Thu, 20 Nov 2025 15:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="QR9HcoWh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKY+ap4N"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256EB35CBA6;
-	Thu, 20 Nov 2025 15:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD44362148;
+	Thu, 20 Nov 2025 15:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763653379; cv=none; b=Iy9jbm+PBQ1h2wnrmjMO9g/eJ4XAeS4kj3739bbkrE2g0UqY0q/0hX9Y6OSylHh+5Ujmwq62qjrs+3lJRYj3nL7adYfCqiTZJ4ygi8Wp7GGN1yKtMPr9X719LPVnUBXxwnSGg5/+I1jHzXVJcSoa7IwPIAtvSfbwH0PS77yGa6w=
+	t=1763653500; cv=none; b=GnmSdlndKslllJ51NPMukaUR+lyyAxLNuDu3vCLkAQ0bwZqliScowQVr0+RNCKJykD3tx8XcGRd1CC+ghG5RPJcsE1WX96UDwZrSDRyMIVWZhXG/nWR8YR0GCQmIeAUwCsArcsXwnEkgKF8kUPkxdK1NICjZfxa1SyNKXMWKgCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763653379; c=relaxed/simple;
-	bh=ygk1zHv6iDbGjm+GZZypyjLpCQV5gripf5JFKbjoQlA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NdKSjv+q0Ho/4BYqT3QCz+KmpI78+uHObpcN1gd5GxaWo1sRn9kHeK1IimnaIYv1OPXzeG8z2Q2dco/tYLNmK1Gt4MbSQ7AuTzsi9hu1J5O7MUVpD8g5DDcFURVxW6r2qUYaFBY3cO3B9Kpa2f3tJbjY52s0jF2vRYcTbZK8sgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=QR9HcoWh; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=1DejjWV5IE6Y627zgKuh4/6XZNhaCgxWanFFF8GFYD8=; b=QR9HcoWh7whqz+6106X2hPh4jm
-	ZZvHSans8aqobvo/Nn/BsVoEEdrtmOIpVfyiV3ljEPP5q7uwbcPDMzU7TYi0eRd2D+1dSY4KONXHi
-	dRDh0nIIZpRWyrrTCn5BYDMzKcsOmaXiTVA8ishDa+koErUE/1YzkptHJ4lhWPQX/WNk9cHKfL8Ws
-	cG9ere8oan89QlM2GC/70F648tzMP5IrvrUVJ/bYb0Nx7vCE0eKEAAbA3sEcWrmqbERsPYEAwVm2z
-	p3hHvzkPzMLaSPWFa2Ty1SwNwH0jKGFZcCelodIOzmq36erUKRZKpqM3iG7yKg72LsYqvCZc9DwMG
-	M5Kwluig==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vM6o0-00H0jz-TT; Thu, 20 Nov 2025 15:42:45 +0000
-Date: Thu, 20 Nov 2025 07:42:40 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Andre Carvalho <asantostc@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v5 5/5] selftests: netconsole: validate target
- resume
-Message-ID: <nmmxynre57tcwicbfgigh7arzmbugwshy7utp7laembwtnoqhb@ra3tdcapc5lt>
-References: <20251119-netcons-retrigger-v5-0-2c7dda6055d6@gmail.com>
- <20251119-netcons-retrigger-v5-5-2c7dda6055d6@gmail.com>
+	s=arc-20240116; t=1763653500; c=relaxed/simple;
+	bh=3LqOxODjnWoAP85raLtIKnv5cNa5InqYMD4HtPn0Jyk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h0BKLKCSF/JIAqFotLk1w86W6r+m+u5avFpQNRjcp3MOHVO6O8XI9/7TO0+axqRrIEVGW/3m59LLVDhNg2DdGR/wZINi8Xd+t/Hm8goAoFhz4Ii7POfa7GY3OTGzQtQlholQpn2KAUt6oM00OY+9MV/mLyswAf0/QvU8lrS/ojc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKY+ap4N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D90FC4CEF1;
+	Thu, 20 Nov 2025 15:44:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763653500;
+	bh=3LqOxODjnWoAP85raLtIKnv5cNa5InqYMD4HtPn0Jyk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LKY+ap4NYFE5J1G3Sy7gfSDDID+FtmQ7psQdU05gg25PHaQWWaA+KmwaNu0UUCqk3
+	 RWQVdK/BTkOv7omtykdjw8g1kjb2FnXcqvBzi84P13BLVL/Dz/2CGJ8X/yGvPDCAJr
+	 g2sIZslOqXkQ0ix0413DAJWjG3ZXo4P5uSCajXUmzI/SHLKgnC+ivm11nZ70iPv6Fi
+	 uuBM6FpnqCmPeGxYRjn9TtvQCw1kCylery5WZeV2WpyqeyrQmUCBReJjZIeH98X/TP
+	 sw2EvTHsIEquigEPX91TxuLN2Sy9ncO3wZXs7QQp+nbA9JnAwKlZ/1OOdVjiY6BqrE
+	 jmS7kRCJS5ZFw==
+Date: Thu, 20 Nov 2025 07:44:57 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lee Jones <lee@kernel.org>, Konstantin Ryabitsev
+ <konstantin@linuxfoundation.org>
+Cc: patchwork-bot+netdevbpf@kernel.org, Sjoerd Simons
+ <sjoerd@collabora.com>, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, ryder.lee@mediatek.com,
+ jianjun.wang@mediatek.com, bhelgaas@google.com, lpieralisi@kernel.org,
+ kwilczynski@kernel.org, mani@kernel.org, chunfeng.yun@mediatek.com,
+ vkoul@kernel.org, kishon@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ lorenzo@kernel.org, nbd@nbd.name, kernel@collabora.com,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-pci@vger.kernel.org, linux-phy@lists.infradead.org,
+ netdev@vger.kernel.org, daniel@makrotopia.org, bryan@bryanhinton.com,
+ conor.dooley@microchip.com
+Subject: Re: [PATCH v4 00/11] arm64: dts: mediatek: Add Openwrt One AP
+ functionality
+Message-ID: <20251120074457.5aa06d89@kernel.org>
+In-Reply-To: <20251120154012.GJ661940@google.com>
+References: <20251115-openwrt-one-network-v4-0-48cbda2969ac@collabora.com>
+	<176360700676.1051457.11874224265724256534.git-patchwork-notify@kernel.org>
+	<20251120152829.GH661940@google.com>
+	<20251120073639.3fd7cc7c@kernel.org>
+	<20251120154012.GJ661940@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251119-netcons-retrigger-v5-5-2c7dda6055d6@gmail.com>
-X-Debian-User: leitao
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 19, 2025 at 07:49:23AM +0000, Andre Carvalho wrote:
-> Introduce a new netconsole selftest to validate that netconsole is able
-> to resume a deactivated target when the low level interface comes back.
+On Thu, 20 Nov 2025 15:40:12 +0000 Lee Jones wrote:
+> > > >   - [v4,02/11] dt-bindings: PCI: mediatek-gen3: Add MT7981 PCIe compatible
+> > > >     (no matching commit)
+> > > >   - [v4,03/11] dt-bindings: phy: mediatek,tphy: Add support for MT7981
+> > > >     (no matching commit)
+> > > >   - [v4,04/11] arm64: dts: mediatek: mt7981b: Add PCIe and USB support
+> > > >     (no matching commit)
+> > > >   - [v4,05/11] arm64: dts: mediatek: mt7981b-openwrt-one: Enable PCIe and USB
+> > > >     (no matching commit)
+> > > >   - [v4,06/11] dt-bindings: net: mediatek,net: Correct bindings for MT7981
+> > > >     https://git.kernel.org/netdev/net-next/c/bc41fbbf6faa
+> > > >   - [v4,07/11] arm64: dts: mediatek: mt7981b: Add Ethernet and WiFi offload support
+> > > >     (no matching commit)
+> > > >   - [v4,08/11] arm64: dts: mediatek: mt7981b-openwrt-one: Enable Ethernet
+> > > >     (no matching commit)
+> > > >   - [v4,09/11] arm64: dts: mediatek: mt7981b: Disable wifi by default
+> > > >     (no matching commit)
+> > > >   - [v4,10/11] arm64: dts: mediatek: mt7981b: Add wifi memory region
+> > > >     (no matching commit)
+> > > >   - [v4,11/11] arm64: dts: mediatek: mt7981b-openwrt-one: Enable wifi
+> > > >     (no matching commit)  
 > 
-> The test setups the network using netdevsim, creates a netconsole target
-> and then remove/add netdevsim in order to bring the same interfaces
-> back. Afterwards, the test validates that the target works as expected.
+> This is a very odd way of presenting that one patch from the set was merged.
 > 
-> Targets are created via cmdline parameters to the module to ensure that
-> we are able to resume targets that were bound by mac and interface name.
+> Not sure I've seen this before.  Is it new?
 > 
-> Signed-off-by: Andre Carvalho <asantostc@gmail.com>
+> It's very confusing.  Is it a core PW thing and / or can it be configured?
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+It's k.org infra bot. Konstantin, would it be possible to highlight
+more that a series is partially applied?
 
