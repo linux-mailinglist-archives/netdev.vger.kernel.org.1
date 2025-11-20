@@ -1,92 +1,75 @@
-Return-Path: <netdev+bounces-240368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA252C73DFD
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 13:07:16 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C6FC73E5D
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 13:10:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 96014354B2F
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:07:16 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BB15F356AAD
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:09:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD94233120B;
-	Thu, 20 Nov 2025 12:07:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476CF33122F;
+	Thu, 20 Nov 2025 12:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mRK3WJ/S"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G9O3Ie07"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B22A372ADC
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8540420459A
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763640430; cv=none; b=Y12xWJkjK1Nl9inLagdNVNRPHVEQbsjd5ucyVIe3X3bWo/WFqqGww9ctrboTX1CWF4u8lPtIAu13lIjykJsk0+vamUfX4au44alNH/bz4NKwCCX9Dc5EOfC+d4pz2vH22s8vZFcbmG9HC1mz4RUhiwG6BUlfkvov1x5p/1v6tXg=
+	t=1763640543; cv=none; b=NDxW1EoJIWZrgJ8phV0rm7HOnUZ6PKH9i1fjyRszFoPtNypLeZ0ec/XNcYch8Dtc3bAWvxmRlJ2SXg73pDSKkunbXVeIcOU74MQxDDcJ/fqDCYNPEU1kGs5dtRSro5Vn/RSzJv9gK8iZpQcxhopbVzNsrnz0KHtga8tzCsLxNlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763640430; c=relaxed/simple;
-	bh=kHIRw9JtarZwa773c9rrA7Sh/ynBxdlTXwbJEgMPosU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sBG3uAYG3sX+mFB4a83KwdjjHImFK6KLQHXnjQmNWX1zO6B4ub8dpCdIXtZtmIZU82taYGQDYuHhVeos4I/MbsMbYFuhecoohJ994HKqwRAvrxv2M0DCfPspM+Ns64tqBQYG3LX+sfr3GqkxFBeJAPqX/QkG4HdGv3bedNS34ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mRK3WJ/S; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-29845b06dd2so10228175ad.2
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 04:07:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763640428; x=1764245228; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X5oFycNEQQvwxiwtacy6vIh6YX/aGmQRlWzpW1R7bkA=;
-        b=mRK3WJ/S1MRudwFG8AUgCShC7G+2EkFT6tkbhy8rYSMggoLpq6lAJGKpIKH/V7ya2v
-         BHZlDwqcJyjMpTE4LVkQJd/Yq/uYXLRoo/h27kTWvhZDnnRUu6X6+f4LbllkzobmNCtm
-         0lB8VUhuWMCuWl4YAL79sJhJ2FObxY37YiEgnQ5GP5doYDoaCF063/9ugRnqUsN9ivxo
-         L5//TnIWZ4iZ19OF6HTq/vCiK4d4yem3V0EVAf/qk8XSiFR7nXwVdg71Be54ISKuecl2
-         iHZFSE36jTIXvm8zGnlpK6TRuKT1MjDLLRYdzekNJsOKEukxFe4CVK81ntBmjqADcxVV
-         yF9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763640428; x=1764245228;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X5oFycNEQQvwxiwtacy6vIh6YX/aGmQRlWzpW1R7bkA=;
-        b=lD8sITWpscmLVIXir/k8WGe8YOlHp4wQOm1+ksEIP8Fi5KHXhcbHgOG+hvAywlpM/p
-         z0bxb+RZshtCFYAwI/7GNB8Dqz7g7ndYP/cLIdQX/MDh/GjCtfi9UukzMSlpqWq37SSq
-         Mtad1heusbBtaQvH3P8NWmAMofqCnWDk566HapVK051BUOTFTCVOLMhN8Bbf7dgmNdrh
-         SEV0DhJgomuKnAHPqVcM0i2sIaiZDb9w/FlD4PHYnXGXqfyT8paNItyViv4YwvDR/jYh
-         yyq02FMhvQGytfQJ5cDlFS3MY/b5uY48lq5zeupDGhCaoWosyzQ/TyUzM/N4cBd/Xz35
-         MfcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUjiLyNtgqBHcYboE0zds1qQk6kEo3EW6XS0A705E/SlU4gpQitqBevSvdRULNUdHM7IJusPRE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgULuMNq8i14hKRzFz6wI0o1aFe+Df82hNcwuO9GhM9Pnq3U0F
-	yaav5QMwYMXjXkPwq6nXsii+if6Ioap0yQjdAfrGYKhgSdMiwnGukxLt
-X-Gm-Gg: ASbGncswuK7oDjBE5n3AEPes/DEBeVZvkLw8xJQvLFnhTedBhN443LUtklySjd+xHLb
-	eVBgjPor+qcKjFz8g0JeUOS07MwFdWXrnW+dd+jIM1lsusN3oZPHZR3R4jLNagOEsPnSIwf9O8n
-	FcEBW8uNCPpLTIONbJZlMsVn3jB0+7kIwKhaIkEqu2CL5LVlDiYaxwIR2HgRTy2zQaghFup9oOR
-	96mLHuI2ULnhOYm5L+yP4wgKj1HwpreaPudfytKjyRs1NXLzqoxvEbAhuY8r0wa/HQUfzmIbJoG
-	E9/UdBkB4LhAV6lhpA81M+vyV9FyHX+UkfpmVXMSFVsAZS8d+ETaTFOEErqJmUSM9QQkWvvDGJu
-	h9Ee8CbD/J/GktqLEUBcJCJzXhqK/+yGyDb83hgfi7j5vupG3HT5PQahUvo0zbnV2jYForw8wne
-	HD1ZrA9zAQOqX1rlUfVfVULSsj2PND0Uri8Mjw
-X-Google-Smtp-Source: AGHT+IHFRDK28WOgfhLwyxo9fNDEJUyqOd57Tzt8s5kHu8siVkpXQv00/V1u5HV+EbRwk50S2r5gnA==
-X-Received: by 2002:a17:903:183:b0:298:45b1:6c30 with SMTP id d9443c01a7336-29b5b163032mr35372985ad.57.1763640428097;
-        Thu, 20 Nov 2025 04:07:08 -0800 (PST)
-Received: from localhost.localdomain ([1.203.169.140])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b111650sm24894815ad.8.2025.11.20.04.07.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 04:07:07 -0800 (PST)
-From: Gui-Dong Han <hanguidong02@gmail.com>
-To: 3chas3@gmail.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	kuba@kernel.org
-Cc: linux-atm-general@lists.sourceforge.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	Gui-Dong Han <hanguidong02@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v3] atm/fore200e: Fix possible data race in fore200e_open()
-Date: Thu, 20 Nov 2025 20:06:57 +0800
-Message-Id: <20251120120657.2462194-1-hanguidong02@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1763640543; c=relaxed/simple;
+	bh=ngJsEfYjg8B/DGcvuWFHXohdm36j18EsWZbz8HmumaY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qN9Ab5U4rn3kgL+wg1h5igUCFI/HXh8Vf6vWEovmClF6OmrKTSa4v7qbg+XfXsEPEeWY9nIdqy6jsnL2C75PLR7Yh0JJCuiPL+Gdvxc2LvqCjPRdWUK2tYwCHQBO5nUIje72+PJeQxP3sNECkPqVTYwzYkogVHPkLR+ipKDWZSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G9O3Ie07; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763640541; x=1795176541;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ngJsEfYjg8B/DGcvuWFHXohdm36j18EsWZbz8HmumaY=;
+  b=G9O3Ie07bTaeuGodo8AKBDnmbpRC331kDW8X46yBgaYEk0ZMfb9JOaG1
+   eEV3tq5uown/1MeaWH+MoqWnkY0NXDkQsR4CrQeXBNA7ET9aoHb8g1Zo1
+   4mEAnbftCoPtNP0wvy3Jq1D9WVD/IVWpouqTcj37YBfNhAMNCjyADEq4a
+   lFpOmahhSyL0/rbe4n19nuM1Sl2TJ4noYHDs0dUM2ETjMp+8CBgd6E8mq
+   39pFh3vmeniiZYI85nD29yk7BtG3Iz8ocfX+ln1lBiJc4shLKUggFx9d/
+   IQvX8bWg2ci85ncUIE/+geWmrkn4W59WCsQIPgv5fojXlg/P0R39r5VxC
+   g==;
+X-CSE-ConnectionGUID: sOsGZUi6TpmMHd4E2i6m9g==
+X-CSE-MsgGUID: T5cmG3IMQAKr3j5i0W/vjQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="65599812"
+X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
+   d="scan'208";a="65599812"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 04:08:58 -0800
+X-CSE-ConnectionGUID: GgQhKsAqQJyAfeJ8AKhLMQ==
+X-CSE-MsgGUID: FP8kXtrLQdW+Eo5llxQphg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
+   d="scan'208";a="195485157"
+Received: from pae-d-dell-r7525-263.igk.intel.com ([172.28.191.240])
+  by orviesa003.jf.intel.com with ESMTP; 20 Nov 2025 04:08:55 -0800
+From: "Korba, Przemyslaw" <przemyslaw.korba@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	"Korba, Przemyslaw" <przemyslaw.korba@intel.com>,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH iwl-net] i40e: fix scheduling in set_rx_mode
+Date: Thu, 20 Nov 2025 13:07:28 +0100
+Message-ID: <20251120120750.400715-2-przemyslaw.korba@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,61 +78,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Protect access to fore200e->available_cell_rate with rate_mtx lock in the
-error handling path of fore200e_open() to prevent a data race.
+Add service task schedule to set_rx_mode.
+In some cases there are error messages printed out in PTP application
+(ptp4l):
 
-The field fore200e->available_cell_rate is a shared resource used to track
-available bandwidth. It is concurrently accessed by fore200e_open(),
-fore200e_close(), and fore200e_change_qos().
+ptp4l[13848.762]: port 1 (ens2f3np3): received SYNC without timestamp
+ptp4l[13848.825]: port 1 (ens2f3np3): received SYNC without timestamp
+ptp4l[13848.887]: port 1 (ens2f3np3): received SYNC without timestamp
 
-In fore200e_open(), the lock rate_mtx is correctly held when subtracting
-vcc->qos.txtp.max_pcr from available_cell_rate to reserve bandwidth.
-However, if the subsequent call to fore200e_activate_vcin() fails, the
-function restores the reserved bandwidth by adding back to
-available_cell_rate without holding the lock.
+This happens when service task would not run immediately after
+set_rx_mode, and we need it for setup tasks. This service task checks, if
+PTP RX packets are hung in firmware, and propagate correct settings such
+as multicast address for IEEE 1588 Precision Time Protocol.
+RX timestamping depends on some of these filters set. Bug happens only
+with high PTP packets frequency incoming, and not every run since
+sometimes service task is being ran from a different place immediately
+after starting ptp4l.
 
-This introduces a race condition because available_cell_rate is a global
-device resource shared across all VCCs. If the error path in
-fore200e_open() executes concurrently with operations like
-fore200e_close() or fore200e_change_qos() on other VCCs, a
-read-modify-write race occurs.
-
-Specifically, the error path reads the rate without the lock. If another
-CPU acquires the lock and modifies the rate (e.g., releasing bandwidth in
-fore200e_close()) between this read and the subsequent write, the error
-path will overwrite the concurrent update with a stale value. This results
-in incorrect bandwidth accounting.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Gui-Dong Han <hanguidong02@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fixes: 0e4425ed641f ("i40e: fix: do not sleep in netdev_ops")
+Reviewed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
 ---
-v3:
-* Expanded the commit message to describe the specific call paths causing
-the race, as suggested by Jakub Kicinski and Paolo Abeni.
-v2:
-* Added a description of the data race hazard in fore200e_open(), as
-suggested by Jakub Kicinski and Simon Horman.
----
- drivers/atm/fore200e.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/atm/fore200e.c b/drivers/atm/fore200e.c
-index 4fea1149e003..f62e38571440 100644
---- a/drivers/atm/fore200e.c
-+++ b/drivers/atm/fore200e.c
-@@ -1374,7 +1374,9 @@ fore200e_open(struct atm_vcc *vcc)
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index f3b1b70d824f..a1b600ab0397 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -2234,6 +2234,7 @@ static void i40e_set_rx_mode(struct net_device *netdev)
+ 		vsi->flags |= I40E_VSI_FLAG_FILTER_CHANGED;
+ 		set_bit(__I40E_MACVLAN_SYNC_PENDING, vsi->back->state);
+ 	}
++	i40e_service_event_schedule(vsi->back);
+ }
  
- 	vcc->dev_data = NULL;
- 
-+	mutex_lock(&fore200e->rate_mtx);
- 	fore200e->available_cell_rate += vcc->qos.txtp.max_pcr;
-+	mutex_unlock(&fore200e->rate_mtx);
- 
- 	kfree(fore200e_vcc);
- 	return -EINVAL;
+ /**
+
+base-commit: be983dcd591c53cb76f92448afc61f91fd7c5fe7
 -- 
-2.34.1
+2.43.0
 
 
