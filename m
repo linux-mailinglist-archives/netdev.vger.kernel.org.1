@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-240266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB50C71FE7
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:31:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65434C71FE1
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:31:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id F2B7D2AFAB
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:30:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 1C2A12B560
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25F13009CB;
-	Thu, 20 Nov 2025 03:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC47301027;
+	Thu, 20 Nov 2025 03:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="s87R4Ft+"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="AINODSv1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455E92FF65B
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689AC2FFDF5
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763609428; cv=none; b=IrkGggpybvTww/NGrmXfft6EOqP7ABhCm9KMH407vNTGV1ay3Wd7Q3f3elcNaWjYl02j7nUGEJtxRaZMl9mUskmLh7zcetnrTKrXW2vT9XPuCJtwbZ34Pw7LHb6UUObVyxHw1pYxPFt/5ZD6Dj95X0Z2JEQ0iNGLlm5XcFPQKpQ=
+	t=1763609429; cv=none; b=AcedVSlG9dCF1Mrs6eAClvQhU0FiIYai+7CIY6oEouKtbVK7t07ycqC4UI/2vinsxX2Nwst+PWLBcAD6iaKEYadJkXs7fJYohcdI0XNaPgeuqOc/RJNVksAjihr3EVYcG0dwNoDNkk4jngTlK8VDNYNoY63APffUJf6C2xqYtHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763609428; c=relaxed/simple;
-	bh=3dzdDFVdiEPNKym0yCmxUNh+RQXrvtRHEez2LG8Zr5Y=;
+	s=arc-20240116; t=1763609429; c=relaxed/simple;
+	bh=skzqejGjT8GBIo6sRj1raxwLJbrJktcjew8Fj9AgyHo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nooB1XS9yyG3NTKh8FXf2bCuf2lfYwXhSCU2Z/aWGdcDLEfHmRrP7xDjESoEFsV4ZoofrJL9vM/aSNEiunBKY+cspCt8F7MTpaNbkU6PsFWtTTj9Kufrnjd218ypmCLvaaTB622DM0nJjgp1aRIa0gkdCXHBDyYYY1iY2N4p4EI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=s87R4Ft+; arc=none smtp.client-ip=209.85.167.174
+	 MIME-Version; b=a0pAlo4KLyZxDw9hjv2SrVXBca6JoonbduZmp9ReQdALdGxMidY6SRq+yzG20DR459lY/kTis8G06Duj4JdPiqiiMrzJH2ITylekuxL0eIa1MFzYO+zE2Ez/SUKN8npGI9LWsqc9q73/wz0hcS6EmA17iAEBEOL16eWbcW+3MB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=AINODSv1; arc=none smtp.client-ip=209.85.160.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-450252e3bceso95200b6e.3
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:30:27 -0800 (PST)
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-3e37ad3d95aso213324fac.3
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:30:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1763609426; x=1764214226; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1763609427; x=1764214227; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sYqZQ2VZMehhev6ct3exQUNNpN1H7iK+QE3fcckx+c0=;
-        b=s87R4Ft+PY1k3qVuKRPcS60lELQyJwXti4HwAp+DepNdxEur6529iNfAvJ4YFQddMF
-         Ap+TP6ZvQrBa03x9JUrHdthMHoAqxE9w/lVdaTQkYt7JL7JUN24zn49mzSz66Ecnn12G
-         Rr3s0Igxh24zIGWBR1ZS+O9prn1GDFjx7uDxbQ/EzUe16G9pjXwb2EsFFW46n+v83soB
-         6oEP+PQIqhk9sROh8bD23+rMDWZFL46FkkOBbu956YYtabWXNBkaLt3XwmI2p52GAzhl
-         y18vkKL86PZz0rnOBJAFmSQ4Hjx11H2bhsLJPTwaz8+2EdDizJ0iHn+YC8RX6RT3BMmV
-         QwJg==
+        bh=WkJsGkbmG5wukxAxoFHneooDiZqTCaYDKjLXMjnX+CY=;
+        b=AINODSv1Rhu2i6FH3PcLKXCnqquQhbwfv8mbx5ORTBd/hQ/BEu5IKFafjJgbx0Y+vo
+         59/ZmtAveID/J49D8zGSmNdIeREbigN9cKGrwZ9qJatdrtPy/wnbEH8CUj7qrdIkzIEH
+         PN+KSnjZuwHKh7Qx7QQam9cWOAigQeSCrmw0kz7SQV51DrhOd8OWI0abfHmum5U8pTBL
+         G20IFyc2G0+1R1d374HY2tZOEmvZwBEOeeB3pV8wCTcp+uBsZ/pywK6/1bwarLpyR2Ow
+         QsWKEXWdunv0UNhlz6HQixRPJXKnqadzc04IeQBhyLm4Rkir+IZbrTEJmG7VeMXcz/Qc
+         JvvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763609426; x=1764214226;
+        d=1e100.net; s=20230601; t=1763609427; x=1764214227;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=sYqZQ2VZMehhev6ct3exQUNNpN1H7iK+QE3fcckx+c0=;
-        b=MPoQjtKEDlTaUC4nnnAy81qH93D34VkHwLlOeNRHh3xhFUysUf1/NaMb0d0faOoVyR
-         tkqXz1ErPP7TRC5eyfS58CVodpKPiyr4cfhWQ26bULzVO5ArHa3FF2htZEkKm5k9FWOI
-         BvXDGbyy9VgHpfA3eJGY8ubwBWlsQLZhC+nrfJU7ubsYTeu+wX6bkJaczTZ60gpyUjDT
-         1zYLzLTiM2v28ozLiAe2+CTxieod6G3t9uUUtOrv1bYN0KXL3cFZe3MqX5Ld8xdnkbw/
-         e8w9utzynrizWYOsC6cjp8bBc1E86QeEABsMNXXaZga/rq9aYqBBPotuT+iGmRHiscHh
-         g+7A==
-X-Gm-Message-State: AOJu0Ywb6X0aiWwmgrlQXOf5a0omJQR06hA+QOUB88Ns8EWX/OrneRzR
-	YQCf47lgjsDbJV6QSrCxXlB0Qj1gND2NCXvBzhY2GrhO/OGWYP2mYnhZ7YcEqq7ER15JbQ4T2Bk
-	LrrNq
-X-Gm-Gg: ASbGncs3EaCjr4R8VyxDeH4UEiKyvygB2efxhtXiR8xA0AvHoCzYn7k3Uk0bPoxI/oO
-	gbs39uUkoGM0Y6JvoAaXL3d/vuTnCUzW/t35wz2npWSN3Pn5krPD+KmNHVs5z8k5Ha3s6Dcs/PB
-	lHIwGHJrA0sOq39aMqieDgXbJpb5Q5J2qx9vQD3HO7St2f2872uaC+xnpwVe4as8ZqeXBQIg+k5
-	JTOz6Ya0gzwoUuGgHg8+an/NzZyhkLcLA2p1KFgLflEp6lwfVmDFwe35ma3xkt0+J9pqz2MVD4X
-	9xQfzGe98Y6/sHmdRi439vzX7Y6drx1DMCU0vPl4unpnheOTCI+1W2Sbpf0G/dv9LOek5jcYkLa
-	BvJhklbGiTgLzRL6ZmUcW95fuHc13kpi7MxA8yM2UuAMHfc5+i2Rg/vT98jtpvSMH51UgdNOqcK
-	CqhihVJtMCaAf9FPecWREoMIeAGow8KXKi5r1s214a
-X-Google-Smtp-Source: AGHT+IFdfpRNDFBzBEcvwWcoGNeeh4V4hwW/XAMT1eRe0tCitk0Ruma3CBkuKXmQRN1esm2tlSikig==
-X-Received: by 2002:a05:6808:c14a:b0:450:6eb0:349c with SMTP id 5614622812f47-451002479a7mr714746b6e.40.1763609426330;
-        Wed, 19 Nov 2025 19:30:26 -0800 (PST)
-Received: from localhost ([2a03:2880:12ff:4::])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65782badb38sm451515eaf.16.2025.11.19.19.30.25
+        bh=WkJsGkbmG5wukxAxoFHneooDiZqTCaYDKjLXMjnX+CY=;
+        b=sduxZ1qZBP0wfLtO9OQ9jRUcpKXimLlt3hP07HnnVqVJV18Vk0v637wAnxEKY9dyg2
+         Hx+s74U5WpQs2rCQbA/p8lEOcLiZRn7Ij4i+tN7P7Xn+/Dp0V+rb7Z7l5mkfd2NAqE9v
+         /yl3xEE/pedb7JQfy5xGCP+MNxjX/1xhb1gFJz9TDAsx4nee/Y8n0oCcd1NM79m4NxQ9
+         KMsFvV1r3Eoj4AfVg9UdeHCdZFtXi87R1V1/sJjAWZ/8m3VDnukoCifO5my2dtid5vCA
+         VCHKI/4SBp324sqcQTCyu4JeWwIN8JoSkTDpPZbr1T/SDenj4rk+Wn/WjhAaRuTEZCcZ
+         tvEA==
+X-Gm-Message-State: AOJu0Yz1QdefKW1JfH5/adOyNWZPkgoLTxPRdpFCkwptDiYpM8kJt57j
+	D/zRMZogt7CTogqyuzJbswsF0iSGGyyb+hZ9H8kVDx1b3O7crEOgBBnNNQottWGTgj2zjW9oBWk
+	7DFxn
+X-Gm-Gg: ASbGncsygN0Kqf8tvxMfY0DpqT3INxZQhHRh6UgBQx3cywhMBPfYJh8NQuf+Piwm2tJ
+	StLvKJvz27Uy88POpgseVW3C6DNKiWP2eHxjdMlHG+PaSsLLfmsoTdrz54ziMSZra7Ni90bDas6
+	7zEVfHlPhs4IviqSxqYpWjeVHHubDRzUYThoW3Ds4ixIeKN3UlrIXoz78VvDi9KVcf9nIbUQDwA
+	TKBSP4Ch8Axe41/j9kJ1Ij1LOnAL1sSWkmcqcwZzrVIFj/bsJx/MQaaqIW0c+Xq1C5AEvtWIMpB
+	nq4hYV0LIMl61HI3FoVoVt9bq9T/zbINsuYmtADREmByztYn+hyRUP244ugEo8x/m0UpHU3qhpZ
+	+KqgJbr2vBZR4U4DhZRtmX0JbVtMuN7zBmvA7gmkWbgsX0m22hQxp74V+bmnpvS9tru1g25/yA2
+	YMAIUXNn0vBrp8udOf2NjD07PLc7WIyOqm4lPmrQsTov5C0XUI1TQ=
+X-Google-Smtp-Source: AGHT+IEFKc5KqrWMbYiYxIaQplHGnhA5gcT4BXb0naKVnfTKEX0emPYsfqaOej56U3gD4Sys6WoswQ==
+X-Received: by 2002:a05:6808:14d6:b0:44f:7562:1a73 with SMTP id 5614622812f47-450ff387ad4mr1001735b6e.35.1763609427432;
+        Wed, 19 Nov 2025 19:30:27 -0800 (PST)
+Received: from localhost ([2a03:2880:12ff:5::])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-450fff8d592sm379745b6e.12.2025.11.19.19.30.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 19:30:25 -0800 (PST)
+        Wed, 19 Nov 2025 19:30:27 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -82,9 +82,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH net-next v1 6/7] selftests/net: add LOCAL_PREFIX_V{4,6} env to HW selftests
-Date: Wed, 19 Nov 2025 19:30:15 -0800
-Message-ID: <20251120033016.3809474-7-dw@davidwei.uk>
+Subject: [PATCH net-next v1 7/7] selftests/net: add a netkit netns ping test
+Date: Wed, 19 Nov 2025 19:30:16 -0800
+Message-ID: <20251120033016.3809474-8-dw@davidwei.uk>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251120033016.3809474-1-dw@davidwei.uk>
 References: <20251120033016.3809474-1-dw@davidwei.uk>
@@ -96,46 +96,123 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Expect netkit container datapath selftests to have a publicly routable
-IP prefix to assign to netkit in a container, such that packets will
-land on eth0. The bpf skb forward program will then forward such packets
-from the host netns to the container netns.
+Set up a netkit pair, with one end in a netns. Use LOCAL_PREFIX_V6 and
+nk_forward bpf prog to ping from a remote host to the netkit in netns.
 
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- tools/testing/selftests/drivers/net/README.rst    | 6 ++++++
- tools/testing/selftests/drivers/net/lib/py/env.py | 1 +
- 2 files changed, 7 insertions(+)
+ .../testing/selftests/drivers/net/hw/Makefile |  1 +
+ .../selftests/drivers/net/hw/nk_netns.py      | 89 +++++++++++++++++++
+ 2 files changed, 90 insertions(+)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
 
-diff --git a/tools/testing/selftests/drivers/net/README.rst b/tools/testing/selftests/drivers/net/README.rst
-index eb838ae94844..ea2d3538e228 100644
---- a/tools/testing/selftests/drivers/net/README.rst
-+++ b/tools/testing/selftests/drivers/net/README.rst
-@@ -62,6 +62,12 @@ LOCAL_V4, LOCAL_V6, REMOTE_V4, REMOTE_V6
- 
- Local and remote endpoint IP addresses.
- 
-+LOCAL_PREFIX_V6, LOCAL_PREFIX_V6
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+index 855363bc8d48..dfca39d1b99f 100644
+--- a/tools/testing/selftests/drivers/net/hw/Makefile
++++ b/tools/testing/selftests/drivers/net/hw/Makefile
+@@ -16,6 +16,7 @@ TEST_PROGS = \
+ 	irq.py \
+ 	loopback.sh \
+ 	nic_timestamp.py \
++	nk_netns.py \
+ 	pp_alloc_fail.py \
+ 	rss_api.py \
+ 	rss_ctx.py \
+diff --git a/tools/testing/selftests/drivers/net/hw/nk_netns.py b/tools/testing/selftests/drivers/net/hw/nk_netns.py
+new file mode 100755
+index 000000000000..43b520ac5757
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/hw/nk_netns.py
+@@ -0,0 +1,89 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
 +
-+Local IP prefix that is publicly routable. Devices assigned with an address
-+using this prefix can directly receive packets from a remote.
++import subprocess
++import time
++from os import path
++from lib.py import ksft_run, ksft_exit, KsftSkipEx, KsftFailEx
++from lib.py import NetNS, MemPrvEnv
++from lib.py import cmd, defer, ip, rand_ifname
 +
- REMOTE_TYPE
- ~~~~~~~~~~~
- 
-diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-index 3e19b57ef5e0..ee427c2b2647 100644
---- a/tools/testing/selftests/drivers/net/lib/py/env.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-@@ -196,6 +196,7 @@ class NetDrvEpEnv(NetDrvEnvBase):
-     def _check_env(self):
-         vars_needed = [
-             ["LOCAL_V4", "LOCAL_V6"],
-+            ["LOCAL_PREFIX_V4", "LOCAL_PREFIX_V6"],
-             ["REMOTE_V4", "REMOTE_V6"],
-             ["REMOTE_TYPE"],
-             ["REMOTE_ARGS"]
++
++def attach(bin, netif_ifindex, nk_host_ifindex, ipv6_prefix):
++    cmd = [
++        bin,
++        "-n", str(nk_host_ifindex),
++        "-e", str(netif_ifindex),
++        "-i", ipv6_prefix
++    ]
++    try:
++        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
++        time.sleep(0.5)
++        if proc.poll() is not None:
++            _, stderr = proc.communicate()
++            raise KsftFailEx(f"Failed to attach nk_forward BPF program: {stderr}")
++        return proc
++    except Exception as e:
++        raise KsftFailEx(f"Failed to attach nk_forward BPF program: {e}")
++
++
++def detach(proc):
++    if proc and proc.poll() is None:
++        try:
++            proc.terminate()
++            proc.wait(timeout=5)
++        except subprocess.TimeoutExpired:
++            proc.kill()
++            proc.wait()
++
++
++def test_netkit_ping(cfg) -> None:
++    cfg.require_ipver("6")
++
++    local_prefix = cfg.env.get("LOCAL_PREFIX_V6")
++    if not local_prefix:
++        raise KsftSkipEx("LOCAL_PREFIX_V6 required")
++
++    local_prefix = local_prefix.rstrip("/64").rstrip("::").rstrip(":")
++    ipv6_prefix = f"{local_prefix}::"
++
++    nk_host_ifname = rand_ifname()
++    nk_guest_ifname = rand_ifname()
++
++    ip(f"link add {nk_host_ifname} type netkit mode l2 forward peer forward {nk_guest_ifname}")
++    nk_host_info = ip(f"-d link show dev {nk_host_ifname}", json=True)[0]
++    nk_host_ifindex = nk_host_info["ifindex"]
++    nk_guest_info = ip(f"-d link show dev {nk_guest_ifname}", json=True)[0]
++    nk_guest_ifindex = nk_guest_info["ifindex"]
++
++    bpf_proc = attach(cfg.nk_forward_bin, cfg.ifindex, nk_host_ifindex, ipv6_prefix)
++    defer(detach, bpf_proc)
++
++    guest_ipv6 = f"{local_prefix}::2:1"
++    ip(f"link set dev {nk_host_ifname} up")
++    ip(f"-6 addr add fe80::1/64 dev {nk_host_ifname} nodad")
++    ip(f"-6 route add {guest_ipv6}/128 via fe80::2 dev {nk_host_ifname}")
++
++    with NetNS() as netns:
++        ip(f"link set dev {nk_guest_ifname} netns {netns.name}")
++
++        ip("link set lo up", ns=netns)
++        ip(f"link set dev {nk_guest_ifname} up", ns=netns)
++        ip(f"-6 addr add fe80::2 dev {nk_guest_ifname}", ns=netns)
++        ip(f"-6 addr add {guest_ipv6} dev {nk_guest_ifname} nodad", ns=netns)
++
++        ip(f"-6 route add default via fe80::1 dev {nk_guest_ifname}", ns=netns)
++
++        cmd(f"ping -c 1 -W5 {guest_ipv6}")
++        cmd(f"ping -c 1 -W5 {cfg.remote_addr_v['6']}", ns=netns)
++
++
++def main() -> None:
++    with MemPrvEnv(__file__) as cfg:
++        cfg.nk_forward_bin = path.abspath(path.dirname(__file__) + "/nk_forward")
++        ksft_run([test_netkit_ping], args=(cfg,))
++    ksft_exit()
++
++
++if __name__ == "__main__":
++    main()
 -- 
 2.47.3
 
