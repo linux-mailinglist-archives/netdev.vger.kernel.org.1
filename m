@@ -1,176 +1,134 @@
-Return-Path: <netdev+bounces-240369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B697BC73E0D
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 13:07:45 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C6DEC73E81
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 13:11:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 85025354B83
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:07:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1DADA4E871F
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B020B331231;
-	Thu, 20 Nov 2025 12:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D093321AD;
+	Thu, 20 Nov 2025 12:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="bSNFcJjz";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="UtzWR+dl"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="QXlUGNMO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941A732FA0C
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284B73314B8
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763640461; cv=none; b=NxjQrAwcd+VywnonOgUdT1zorqZ3Qu0EKguZEMCKrGLfDB0maUqOMXVoy86bDb1fXWKEBXNp/Ve4nHY2REb3+vIfpGGBB1rholk+oTgnPAGTF0Y8aqBM1rF9aRFe27i6n560icFG6MJpP02rqSFEjj5iDQa6NjUy0hAg7yH8H6M=
+	t=1763640581; cv=none; b=es1BSVPlKAQqrHnj/PLceW+jgNSL+XPfnWIlrwds1JaEog4jwOhm3ZR8ZM5hx43BhO/4GriWl7FEgRR+ENJY2sSuCzfl9m4n07S3YnODmZJ5RIw5CeU4cFDTwr8xjf89hrxPP2+HdIV7+bQdKOHKD4ECGZ4BeAsuyYlrudn6oOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763640461; c=relaxed/simple;
-	bh=a/FYQGu4Dtd48mV2r2frvBl1FdBxmOYRbxt5tSGaUPs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g1PQktI687LUaeRAA4RcswuiS9CaiN1StJXQ3WdGEbFKZWMcYYZZS+tvCxRvFVDUkJ9dRkTSIguQ/Ox4cEPoWO6pSAn8xteRLWdI9xeQJNPK3/+f2q9tz6F2BuBw1OY3eLoK8CKGRXZLNHCgB+e3/qXHYrPYRHUAlm4yiYMNxps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=bSNFcJjz; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=UtzWR+dl; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AK9hLrZ473372
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:07:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	rocURVTpRm6dtP5iHBbr10ILRzx3pCec9r06uq4Mrmw=; b=bSNFcJjzfM2eSZVf
-	ap7LPSWqzx0iOfNw2FHgJl2e1XDcCHL5jQ095fGr6BUpn4yQtsw74Zz1t/eJrkUg
-	rxm35bhzhwyulCh2F3rGzLU5Sp0dV1nNgh3fC2bBs8miPZZtHjAN5BE3i1QmfJhJ
-	6TOD02J2KMYAqobOhBxlDtJSUa9xTflsIAUoVqNA2WOOzqWpWGf2EJY9nSCBEuRD
-	8c6AD/Mw2K7VSe3zGHvexXf7smHw6Mn7KqfcSJekKr3LHFbMVuD3xi8SMhRG1A3C
-	v4YSkkoXSjAXHqc2JAo2Xp3j++EYALsSDHZAWnJkfkbPpKSsYDRfqItZvw3/MhjJ
-	5c+f/Q==
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4aj0kw0d7k-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:07:38 +0000 (GMT)
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4ed767bf637so1101311cf.1
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 04:07:38 -0800 (PST)
+	s=arc-20240116; t=1763640581; c=relaxed/simple;
+	bh=gcVcD1n4ee+H1YDiuDfkt7Tr7JvAH4O988KQFKf1NXQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ya6hRAv+B50a5uAhZ5BiSuoWu++WXbGqX20XJCOcw+ST41eFm0imrVI1rUv+gVfWENKkTdGNr0Mxl2Cp6BiEW22ROX7KwBrHB3dbAO4szF47ZPKAEKh7Eh+c7dFuPqHPlvU8/xESyCnOcQHrQNAXjcWPzBdbPSEDsnOfV1/4uj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=QXlUGNMO; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-640b0639dabso1338042a12.3
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 04:09:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1763640458; x=1764245258; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rocURVTpRm6dtP5iHBbr10ILRzx3pCec9r06uq4Mrmw=;
-        b=UtzWR+dlJ4gebtcr7AIQ9yb/RS2kEbrQRICKCkXZUrQP/6QB9p9HF3jAOHBjU+I15t
-         S1ccYamPyW6dWQGdNbkq9JpQSjPqYapGMzp13X6wbsfM322+wwcBx/GTFSVxGRMFCyua
-         v7xpIaplMklF6WYZ6WQTw6Pq4JesJJCKjpYouPMEONEw0FrEZxVSB/MqRzIo4Hhs5Pwx
-         9o6rDD+pRO0+cuvynerRdmE/RUsg8OMmm27Zk3+0Q8UlBx1p3jQ0+JELn8g+BhyKpOXo
-         evR5VebfhDfeTaO9mvobVhg/n1ziZqTOvKvtwarpGhqGgYVUoYBxnTwHxJAjhSgEGhLe
-         Wb0Q==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1763640577; x=1764245377; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FWSnudDR8tHHtjamIlJX7lyfwtx5ChaAS1c4cXdDUyk=;
+        b=QXlUGNMOAZa4DDK7sT7DIvtM2gFl3zuEU51lnz9Qg7Xl9Gbbl7m97JC7/vQuXbwtHT
+         072pnzfDolVDKeloxN/YYM9/IpDOKMGoBQun8sltfZXdbLvZZrcZXmUw4rhI7ysGsPpc
+         k2XMzUZGFB8roZImDyYt3ILdOtVpsxmXXnUvpFltDAAoTlDxzSyeEz3vdjhCjBvi4T2q
+         JmIztNYwf15zPC8diHDTqrlIR9A7knnVA4rbVDR0p4dh+sxlrRk7LoOIlI22TmkFCNye
+         /IU0P0lqa0VTAfUh7J+pDoMk27ppO4jiD6ohIAJeF81iX3wbcjFkeP2yY3JM7/XYm528
+         S9Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763640458; x=1764245258;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rocURVTpRm6dtP5iHBbr10ILRzx3pCec9r06uq4Mrmw=;
-        b=MfcwFXFl0Se8kIlwg3ybkM9WqNLypCppRxd9OiZJvD8JNvKhHRDhMkp3+f/y8NUccO
-         BaVAjnrbY50nlYSALqY8YeGW3ZlOTSDlZ3KQfhsVQYSthEQFR1/mFxRR0Svl2a6h6xGO
-         EtqOvCgn+3Gepu5YC+sQPfgyfE+cecyXoRuiu64bBEXTyfQX2OXx0dkqWm+mDe/GOJjH
-         4mIhgONemynwrbiYSwOeXQjQXpoAoiVzW03RGCpV+zl1XWmAQkxGGOi6cDHEt4CcXimj
-         VRbfkyAvQM/sL6oP4g96pAU+D+q+x8F4mmrnWSEivWgsnJc6Geqe0yqz6+6DhScb4MZG
-         jNhA==
-X-Forwarded-Encrypted: i=1; AJvYcCXiYQcUocl6ghQ+DowO3detPjP540+xTbnuZrNR733w/AjqOLRCUelpzAXMwZ4zRlBIpPSqfe8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzK1AtqpX2cDRxSshORViyn4VOVU3n8XdcLsGHzyw35CjAo+Vzz
-	CZ92AvLDBPngy6hgQzU4Pj2weQ/dS0OGQrCrmLopYS1slNJoxC9BXZ7ZLZjIsm2Bi40QFdh90bX
-	ym3SyB7wakHjbmq5mhu/g07PfX8TNpz6ARKBdIhiCIoRMiZEipfhATZz1uJE=
-X-Gm-Gg: ASbGncun9YbDY5HWg1CvYoWlWPGcpl/noDfzjZH3pAYGgfMX1soxi2cxIJJRH2NCd06
-	24Z3BAxP5pn8o/W/Fcdyi4Y1ImhkI6/U2v9eaeCmKDSlHw7FO7kOU8ZFBakbEnGZCK4IgY4hILm
-	SIcw2He4Wux4OjhqAWV/5XQPQeJXj5FPWAQJxcWIx15Ek00ANrT0Ctaiz+/qYifdCYpdF+VQy7i
-	b1/INwb+mpugjhi1lWKZUQIyv+Fo6SfhvNp/F/BVgMAI58jAP+aZlDLmXkcZsbNGXmwrnkeDDWK
-	LZp2XErj3nQ9g2ZyJfavWDO3dusHbmp/nz5uy3h+YhEmcK3FeeogVOOiyFZ3SL+GkiFuoa6KDxc
-	KlBH4UAAsKzoAjzjhzleRX8T8ZewSGpArd1oAvuXovjkjI1GHqaoY9CQ09FYBBnboTf8=
-X-Received: by 2002:ac8:7f49:0:b0:4ee:1063:d0f3 with SMTP id d75a77b69052e-4ee4979d58amr22346571cf.11.1763640457821;
-        Thu, 20 Nov 2025 04:07:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH7C0G7oIjRGR0HYITo/8aJIWfL6aczcG7wVEVYDZP+JyR4xosC6Jsi56JuaGBd1eQMFrosxw==
-X-Received: by 2002:ac8:7f49:0:b0:4ee:1063:d0f3 with SMTP id d75a77b69052e-4ee4979d58amr22346301cf.11.1763640457383;
-        Thu, 20 Nov 2025 04:07:37 -0800 (PST)
-Received: from [192.168.119.202] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654cdac18sm189684666b.11.2025.11.20.04.07.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 04:07:36 -0800 (PST)
-Message-ID: <02b73243-f7a0-404d-913a-f95c0ce80632@oss.qualcomm.com>
-Date: Thu, 20 Nov 2025 13:07:34 +0100
+        d=1e100.net; s=20230601; t=1763640577; x=1764245377;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FWSnudDR8tHHtjamIlJX7lyfwtx5ChaAS1c4cXdDUyk=;
+        b=nS4n9wyJrhYnzI8C4e8+ALBDtqH7cSu49Mqkx6CQ51Q6UMm0XzlbFp1dX44l8oX6BG
+         trFRzBqx8R0OEUrWL6E7Rt3g0cq6hdqtr/4RGKyiU7RqOlvYOAb/m4xvgqpHmPQlPPRI
+         gVf0oACxEzaT+yRGlart/fFwIPOCzqg6RjLZJCBQIaLqYsnbqpFa9bqtXRLeiYqWNwt1
+         dMa+/yVo+pTouCMaChJxf/ynv0UnG4byE3TnK55wpX6LcGm/RBM0Ph70Wx+wxzymDkYH
+         MV+SRStehNPIJEoPeg1hGECOHOjytfVmbQU4NMNPRZ80Gnj9y/qKr63maekRa8fX0wW4
+         7qeA==
+X-Forwarded-Encrypted: i=1; AJvYcCXuC5UE1qMxNQBpPRFuxY9zlenkoJ6wgYmd5QbQj/BZo1wpQeHAn8FCDVxnvceGEgcJ373KKWU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZIKKM3YId4U1uP+5r9rrhZI/QIjb4DmI/ide63Objd6O3VBPz
+	0TBzf/o5XmVaR4czuAcPbng/nC64drOxKBtz8rPgKjJHhtL6G7NyGNFIFK/AJlvb2uo=
+X-Gm-Gg: ASbGncsCnDAS21E3ftFGu3tP+CYaaI3FGQTQT0DFTqRo/TGCzvxufTHNyuF37RPTYsP
+	3I7CgpK0laRovMvgj4FPVmKGqq0XFsciA9prcZAP9jogAdgp/34YXP9Pzg22klaU7qCr8zhm0PW
+	lBW+KpI6jx3I0xap62Odwse0U9dTiEbjK3QxGEsI8WxcvAkL3PAhBFcne8JxeOARklZEZBVYWeQ
+	D6IbPo/iZ4FKaQp+HQMyNOUA6QfM9SRXOYZr2nAhyp9YZzJcZGG69vWOtRf2V1l49uoYrvw7vkd
+	JVTHIGfYgZa1/0jFtW84sZ6fXKRLxeSqklHY05vQEMQDCIn1QnaDMjkKmOwTsq7cI0/LklPJcev
+	VOIRkoJ3hj7r3Tbhc8dVewFG5NpAjshrekLAkJpqJfMe/kElTwoVqk7gk6OK2cGdJd0GPwgCC7s
+	VcdSi+enbqztyilNFDhNs=
+X-Google-Smtp-Source: AGHT+IHRDa6hk0aFCtsUQ00gc8HrkYKh8UMcKyJEbSS2aB1Hb6FdEjVNNaMmagQCJNwQfw+q4sMHmg==
+X-Received: by 2002:a17:907:7f19:b0:b73:4e86:88ac with SMTP id a640c23a62f3a-b76554862d5mr292723466b.12.1763640577191;
+        Thu, 20 Nov 2025 04:09:37 -0800 (PST)
+Received: from FV6GYCPJ69 ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b765504828esm188350466b.64.2025.11.20.04.09.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Nov 2025 04:09:36 -0800 (PST)
+Date: Thu, 20 Nov 2025 13:09:35 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Parav Pandit <parav@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
+	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	horms@kernel.org
+Subject: Re: [PATCH net-next v1] devlink: Notify eswitch mode changes to
+ devlink monitor
+Message-ID: <32hbfvtxcn3okpylfcgfeuq7uvrufpij4y7w6au6vxrernwthb@pdxvc6r6jl5z>
+References: <20251119165936.9061-1-parav@nvidia.com>
+ <20251119175628.4fe6cd4d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/3] net: stmmac: qcom-ethqos: add rgmii
- set/clear functions
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-        Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-References: <aR76i0HjXitfl7xk@shell.armlinux.org.uk>
- <E1vM2mw-0000000FRTo-0End@rmk-PC.armlinux.org.uk>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <E1vM2mw-0000000FRTo-0End@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=WeUBqkhX c=1 sm=1 tr=0 ts=691f048a cx=c_pps
- a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=PHq6YzTAAAAA:8 a=EUspDBNiAAAA:8
- a=-t6nT1al7WGe8XWH3MkA:9 a=QEXdDO2ut3YA:10 a=a_PwQJl-kcHnX1M80qC6:22
- a=ZKzU8r6zoKMcqsNulkmm:22
-X-Proofpoint-GUID: kY-gFAg5NbPaYtaL-KtOctjNUy2EJy1Y
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIwMDA3NiBTYWx0ZWRfX9A89V+1ORohR
- TPGVL9qlEq6sJp+du2Lxsjw1+hp+cCGilxqpRSQi6C6sjsN9gb3DTTR85Mn3uTUSRh650MgBiq/
- 1k5LOo9ZlbFrSioH+siNfanrcdETiEgBD9FW0kFph6bqPptgbFSse7i3Q03D+tJFCO271zTd0EK
- /078LOAJgRveA/oupa6Cl4JS//+EWx/xF6QJMcpdiABz22QM+mS60MqdAlNfzXYNEZCq6YIU5iP
- nN/tcpkpnJ/T061L2+koZTMT/JYzNt3tv4dDyX8yofgsMXsJbYlYXbpO/fu06JZWHkbmPQuJvBe
- dTYlRCQuFTcNghscr/2QwhG8acmvB6QChIr7F8mgdYbYOb2+yna61OBm4r1ZB/CDa1kfctWckgX
- VYUu5ZmYDlyfP9ggV2Y/9Ke/KQ/BCw==
-X-Proofpoint-ORIG-GUID: kY-gFAg5NbPaYtaL-KtOctjNUy2EJy1Y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-20_04,2025-11-20_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 bulkscore=0 clxscore=1015 suspectscore=0 spamscore=0
- lowpriorityscore=0 adultscore=0 malwarescore=0 phishscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511200076
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119175628.4fe6cd4d@kernel.org>
 
-On 11/20/25 12:25 PM, Russell King (Oracle) wrote:
-> The driver has a lot of bit manipulation of the RGMII registers. Add
-> a pair of helpers to set bits and clear bits, converting the various
-> calls to rgmii_updatel() as appropriate.
-> 
-> Most of the change was done via this sed script:
-> 
-> /rgmii_updatel/ {
-> 	N
-> 	/,$/N
-> 	/mask, / ! {
-> 		s|rgmii_updatel\(([^,]*,\s+([^,]*),\s+)\2,\s+|rgmii_setmask(\1|
-> 		s|rgmii_updatel\(([^,]*,\s+([^,]*),\s+)0,\s+|rgmii_clrmask(\1|
-> 		s|^\s+$||
-> 	}
-> }
-> 
-> and then formatting tweaked where necessary.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
+Thu, Nov 20, 2025 at 02:56:28AM +0100, kuba@kernel.org wrote:
+>On Wed, 19 Nov 2025 18:59:36 +0200 Parav Pandit wrote:
+>> When eswitch mode changes, notify such change to the
+>> devlink monitoring process.
+>> 
+>> After this notification, a devlink monitoring process
+>> can see following output:
+>> 
+>> $ devlink mon
+>> [eswitch,get] pci/0000:06:00.0: mode switchdev inline-mode none encap-mode basic
+>> [eswitch,get] pci/0000:06:00.0: mode legacy inline-mode none encap-mode basic
+>> 
+>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>
+>Jiri, did you have a chance to re-review this or the tag is stale?
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Nope, I reviewed internally, that's why the tag was taken.
 
-Konrad
+
+>I have a slight preference for a new command ID here but if you
+>think GET is fine then so be it.
+
+Well, For the rest of the notifications, we have NEW/DEL commands.
+However in this case, as "eswitch" is somehow a subobject, there is no
+NEW/DEL value defined. I'm fine with using GET for notifications for it.
+I'm also okay with adding new ID, up to you.
+
+
+>
+>Is it possible to add this to the Netlink YAML spec? off the top of 
+>my head I think it's a "notification":
+>
+>    -
+>      name: $name
+>      doc: $doc
+>      notify: eswitch-get
+>
 
