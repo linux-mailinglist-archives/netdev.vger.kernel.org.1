@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-240543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297A4C762E9
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 21:21:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F6FAC762F5
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 21:22:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AB0A135BFE5
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 20:21:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4C9D135C37D
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 20:21:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 984F033B6FF;
-	Thu, 20 Nov 2025 20:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AA6435E53D;
+	Thu, 20 Nov 2025 20:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l/hEsLYS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ALRe65HY"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012E13101DB
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 20:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9A8173
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 20:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763670081; cv=none; b=josTrPDKVKvsvsQwbvhy5t4yxlETUoo2Y5WVA/AzIn68hSqHtnNszPaRtqaNfb9YHUSEq3NtReR9oA3W3E53qGWkUWyA4ku7my4UEG+EhKVYbrXnFLAWWxI/If4yUSm43oQVsp5JCCkA8R7oIwum1toCFhcbNoUx20YD/p0nU1A=
+	t=1763670089; cv=none; b=jEDANR6998kK+DFG8jZtPYf7Qm47ninJF1zwhuKDWCV2bLoy4g42S4t44/y4tWUpE6lczyhOUc9tThO4oF1wqu1u2cttLNmT6RniVlKWDlaXEBLqiHPe5e3R4P3DEufBTdst9VtlOaQ/sOPc4Qz7swuj69Lqc7Cax/rMqfrx0t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763670081; c=relaxed/simple;
-	bh=DfYxaVDADmFTAmicAnjEt8LtB3MiHxWc16GEl1QPrZs=;
+	s=arc-20240116; t=1763670089; c=relaxed/simple;
+	bh=RnK5Yn3GmGp9RzAKxdtNG3jz84uIi/0mPOzdiEFHcpg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LQuILRup6JmmSLSYXj9UtQ8QcVkLU2vEx9xiiIMi8otLwrIycoJh4zOfIMj2rnGaYClt+180gtoRLanSmkvjWgU3l5YeHQb8C8TBKyb24qwLxAqqcq1LNH+JYweBJlzx0Ga9mAkmlLKCkVhJcIvmHtHwy4rApVjZuVtOdSNXsJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l/hEsLYS; arc=none smtp.client-ip=198.175.65.21
+	 In-Reply-To:To:Cc; b=s5uQxKOkqa20GuRd1IViCdpSWdakOdrGDZtW+i9o5QLW/1619cCZuT6cu83ZdsPJlFjwwzAn3KO6Fwc3OQsgygvIpGGMlgh0FuoodrtPh5988bUSTHCRovL5Mk3xhBf5te5gfMRFkTrcVl7Lc02GWikkopR2XplLq9qtnD9YgSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ALRe65HY; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763670080; x=1795206080;
+  t=1763670088; x=1795206088;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=DfYxaVDADmFTAmicAnjEt8LtB3MiHxWc16GEl1QPrZs=;
-  b=l/hEsLYS7ilWhXzGPTkMvUInDENXonmJEpiKWg4nAFh/+FuwDtCzgzPw
-   7JRipCQqJSEWESK96oNSaxKv6eyQoYJmrFlw2zYwVrKE0UjTry4oDhiw2
-   wuaPNJijrVPVBNafviRR3Mj9OdyVEbDz6eEU0BIVrDVWtlUKc9UZc+stA
-   r3U5jXQNFJRrK7k2sxvKGPhk/W4Iwoj+Kw6ynBs+GAxb5+zuDilmFXJyd
-   8av7L2u5aYHk99jXv+fF0ce0oNMkJzXoXa+vJLnZcBW1aKKUGchXR1GY5
-   5zG58gn2ZimR32NxqkvR+HSOV2d3u5rD9YaiHaWv3ayd4PDigIdM6ziTN
-   w==;
-X-CSE-ConnectionGUID: t7F34KGfTP6PEcrKDiz/bQ==
-X-CSE-MsgGUID: YaPWid51Q1OcnYY4vpyg1Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="65688939"
+  bh=RnK5Yn3GmGp9RzAKxdtNG3jz84uIi/0mPOzdiEFHcpg=;
+  b=ALRe65HY4ABER5NLbQXmCiU/sM/Q8ec8QAGb9qihotGYfcD1yhdqs3yR
+   BPt3nfA9Y18Ks7mLbS/jDsktT8eithUMxY0VAY2W42VuTyN3Tf1SyP3JX
+   gCmpLXggAsE7YEqLVjson7hoPBaSrCl9KusvkeYCKvTxkOMY3rzDM1T0K
+   tELRCujkn68mrhrlRcpn8R2+DbcL4OqjnsPkn3nNk6M/rzWHffF8JsJWc
+   6Y21IgWCmWYVD5jLu8cfpdTgjrmveIBirRWDdfSY+zyjvzhsLG0TVy5lM
+   WpbJRXgONEVHQ6K0zacBxe2SXCTzem2UBhfv34cN2DzGfiVyVDcnlvA6b
+   g==;
+X-CSE-ConnectionGUID: /xGhDclARB6tdBVeYGkwQw==
+X-CSE-MsgGUID: C0CplRKbRuaPYAfPVyJKpQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="65688947"
 X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="65688939"
+   d="scan'208";a="65688947"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 12:21:16 -0800
-X-CSE-ConnectionGUID: apEEvgd7RTq9rhGLDJFWsw==
-X-CSE-MsgGUID: y4UqaO2BTdS2C101lTAt4w==
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 12:21:17 -0800
+X-CSE-ConnectionGUID: ddAGYSHmS0i/1HwSFewC3w==
+X-CSE-MsgGUID: xVAm074wSaaQ8oH1dF9IJw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="222419699"
+   d="scan'208";a="222419702"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.90]) ([10.166.28.90])
   by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 12:21:12 -0800
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Thu, 20 Nov 2025 12:20:43 -0800
-Subject: [PATCH iwl-next v4 3/6] ice: remove ice_q_stats struct and use
- struct_group
+Date: Thu, 20 Nov 2025 12:20:44 -0800
+Subject: [PATCH iwl-next v4 4/6] ice: use u64_stats API to access
+ pkts/bytes in dim sample
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251120-jk-refactor-queue-stats-v4-3-6e8b0cea75cc@intel.com>
+Message-Id: <20251120-jk-refactor-queue-stats-v4-4-6e8b0cea75cc@intel.com>
 References: <20251120-jk-refactor-queue-stats-v4-0-6e8b0cea75cc@intel.com>
 In-Reply-To: <20251120-jk-refactor-queue-stats-v4-0-6e8b0cea75cc@intel.com>
 To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
@@ -81,143 +81,203 @@ Cc: Simon Horman <horms@kernel.org>, intel-wired-lan@lists.osuosl.org,
  netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
  Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 X-Mailer: b4 0.15-dev-f4b34
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5248;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6434;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=DfYxaVDADmFTAmicAnjEt8LtB3MiHxWc16GEl1QPrZs=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhkz5CtOJ1y662H4/5P7q1qMZBvPO3/kV93H6zcbrMqG3H
- Us/7VE41lHKwiDGxSArpsii4BCy8rrxhDCtN85yMHNYmUCGMHBxCsBExOYx/E9cplwz7azmWoeq
- U8fa10e0BHUsfPSyLuTO5QsW6/RY0+Yx/OFx+6j3+0nZSd0PKwRkplaKlLPfma33X+bakvMsE08
- s38QPAA==
+ bh=RnK5Yn3GmGp9RzAKxdtNG3jz84uIi/0mPOzdiEFHcpg=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhkz5ClP7pjwNA8EjMRv5+oMXr+8N/zz/V9YXxYo3c9dcE
+ Vp9hdmso5SFQYyLQVZMkUXBIWTldeMJYVpvnOVg5rAygQxh4OIUgIl0rmH4w+n5Z6bhn23nGIq+
+ 5ZziYO1NeyybdXD38nmT/6mYbHjpPJeRocsuzZ915ma+RcFN0y5rJamf3HO2UWiJTPbyot/PfSt
+ 3sAEA
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-The ice_qp_reset_stats function resets the stats for all rings on a VSI. It
-currently behaves differently for Tx and Rx rings. For Rx rings, it only
-clears the rx_stats which do not include the pkt and byte counts. For Tx
-rings and XDP rings, it clears only the pkt and byte counts.
+The __ice_update_sample and __ice_get_ethtool_stats functions directly
+accesses the pkts and bytes counters from the ring stats. A following
+change is going to update the fields to be u64_stats_t type, and will need
+to be accessed appropriately. This will ensure that the accesses do not
+cause load/store tearing.
 
-We could add extra memset calls to cover both the stats and relevant
-tx/rx stats fields. Instead, lets convert stats into a struct_group which
-contains both the pkts and bytes fields as well as the Tx or Rx stats, and
-remove the ice_q_stats structure entirely.
-
-The only remaining user of ice_q_stats is the ice_q_stats_len function in
-ice_ethtool.c, which just counts the number of fields. Replace this with a
-simple multiplication by 2. I find this to be simpler to reason about than
-relying on knowing the layout of the ice_q_stats structure.
-
-Now that the stats field of the ice_ring_stats covers all of the statistic
-values, the ice_qp_reset_stats function will properly zero out all of the
-fields.
+Add helper functions similar to the ones used for updating the stats
+values, and use them. This ensures use of the syncp pointer on 32-bit
+architectures. Once the fields are updated to u64_stats_t, it will then
+properly avoid tears on all architectures.
 
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_txrx.h    | 18 ++++++++----------
- drivers/net/ethernet/intel/ice/ice_base.c    |  4 ++--
- drivers/net/ethernet/intel/ice/ice_ethtool.c |  4 ++--
- drivers/net/ethernet/intel/ice/ice_lib.c     |  7 ++++---
- 4 files changed, 16 insertions(+), 17 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_lib.h     |  6 +++++
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 26 +++++++++++++-------
+ drivers/net/ethernet/intel/ice/ice_lib.c     | 36 ++++++++++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_txrx.c    | 29 +++++++++++-----------
+ 4 files changed, 75 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
-index e440c55d9e9f..d5ad76b25f16 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.h
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
-@@ -129,11 +129,6 @@ struct ice_tx_offload_params {
- 	u8 header_len;
- };
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
+index 2cb1eb98b9da..49454d98dcfe 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_lib.h
+@@ -92,6 +92,12 @@ void ice_update_tx_ring_stats(struct ice_tx_ring *ring, u64 pkts, u64 bytes);
  
--struct ice_q_stats {
--	u64 pkts;
--	u64 bytes;
--};
--
- struct ice_txq_stats {
- 	u64 restart_q;
- 	u64 tx_busy;
-@@ -149,12 +144,15 @@ struct ice_rxq_stats {
+ void ice_update_rx_ring_stats(struct ice_rx_ring *ring, u64 pkts, u64 bytes);
  
- struct ice_ring_stats {
- 	struct rcu_head rcu;	/* to avoid race on free */
--	struct ice_q_stats stats;
- 	struct u64_stats_sync syncp;
--	union {
--		struct ice_txq_stats tx_stats;
--		struct ice_rxq_stats rx_stats;
--	};
-+	struct_group(stats,
-+		u64 pkts;
-+		u64 bytes;
-+		union {
-+			struct ice_txq_stats tx_stats;
-+			struct ice_rxq_stats rx_stats;
-+		};
-+	);
- };
- 
- enum ice_ring_state_t {
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index eadb1e3d12b3..afbff8aa9ceb 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -1414,8 +1414,8 @@ static void ice_qp_reset_stats(struct ice_vsi *vsi, u16 q_idx)
- 	if (!vsi_stat)
- 		return;
- 
--	memset(&vsi_stat->rx_ring_stats[q_idx]->rx_stats, 0,
--	       sizeof(vsi_stat->rx_ring_stats[q_idx]->rx_stats));
-+	memset(&vsi_stat->rx_ring_stats[q_idx]->stats, 0,
-+	       sizeof(vsi_stat->rx_ring_stats[q_idx]->stats));
- 	memset(&vsi_stat->tx_ring_stats[q_idx]->stats, 0,
- 	       sizeof(vsi_stat->tx_ring_stats[q_idx]->stats));
- 	if (vsi->xdp_rings)
++void ice_fetch_tx_ring_stats(const struct ice_tx_ring *ring,
++			     u64 *pkts, u64 *bytes);
++
++void ice_fetch_rx_ring_stats(const struct ice_rx_ring *ring,
++			     u64 *pkts, u64 *bytes);
++
+ void ice_write_intrl(struct ice_q_vector *q_vector, u8 intrl);
+ void ice_write_itr(struct ice_ring_container *rc, u16 itr);
+ void ice_set_q_vector_intrl(struct ice_q_vector *q_vector);
 diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index a1d9abee97e5..0bc6f31a2b06 100644
+index 0bc6f31a2b06..6c93e0e91ef5 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -33,8 +33,8 @@ static int ice_q_stats_len(struct net_device *netdev)
- {
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
+@@ -1942,25 +1942,35 @@ __ice_get_ethtool_stats(struct net_device *netdev,
+ 	rcu_read_lock();
  
--	return ((np->vsi->alloc_txq + np->vsi->alloc_rxq) *
--		(sizeof(struct ice_q_stats) / sizeof(u64)));
-+	/* One packets and one bytes count per queue */
-+	return ((np->vsi->alloc_txq + np->vsi->alloc_rxq) * 2);
- }
+ 	ice_for_each_alloc_txq(vsi, j) {
++		u64 pkts, bytes;
++
+ 		tx_ring = READ_ONCE(vsi->tx_rings[j]);
+-		if (tx_ring && tx_ring->ring_stats) {
+-			data[i++] = tx_ring->ring_stats->stats.pkts;
+-			data[i++] = tx_ring->ring_stats->stats.bytes;
+-		} else {
++		if (!tx_ring || !tx_ring->ring_stats) {
+ 			data[i++] = 0;
+ 			data[i++] = 0;
++			continue;
+ 		}
++
++		ice_fetch_tx_ring_stats(tx_ring, &pkts, &bytes);
++
++		data[i++] = pkts;
++		data[i++] = bytes;
+ 	}
  
- #define ICE_PF_STATS_LEN	ARRAY_SIZE(ice_gstrings_pf_stats)
+ 	ice_for_each_alloc_rxq(vsi, j) {
++		u64 pkts, bytes;
++
+ 		rx_ring = READ_ONCE(vsi->rx_rings[j]);
+-		if (rx_ring && rx_ring->ring_stats) {
+-			data[i++] = rx_ring->ring_stats->stats.pkts;
+-			data[i++] = rx_ring->ring_stats->stats.bytes;
+-		} else {
++		if (!rx_ring || !rx_ring->ring_stats) {
+ 			data[i++] = 0;
+ 			data[i++] = 0;
++			continue;
+ 		}
++
++		ice_fetch_rx_ring_stats(rx_ring, &pkts, &bytes);
++
++		data[i++] = pkts;
++		data[i++] = bytes;
+ 	}
+ 
+ 	rcu_read_unlock();
 diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 116a4f4ef91d..85bc18600c17 100644
+index 85bc18600c17..1e3946a1dd36 100644
 --- a/drivers/net/ethernet/intel/ice/ice_lib.c
 +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -3441,7 +3441,8 @@ int ice_vsi_cfg_tc(struct ice_vsi *vsi, u8 ena_tc)
-  *
-  * This function assumes that caller has acquired a u64_stats_sync lock.
-  */
--static void ice_update_ring_stats(struct ice_q_stats *stats, u64 pkts, u64 bytes)
-+static void ice_update_ring_stats(struct ice_ring_stats *stats,
-+				  u64 pkts, u64 bytes)
- {
- 	stats->bytes += bytes;
- 	stats->pkts += pkts;
-@@ -3456,7 +3457,7 @@ static void ice_update_ring_stats(struct ice_q_stats *stats, u64 pkts, u64 bytes
- void ice_update_tx_ring_stats(struct ice_tx_ring *tx_ring, u64 pkts, u64 bytes)
- {
- 	u64_stats_update_begin(&tx_ring->ring_stats->syncp);
--	ice_update_ring_stats(&tx_ring->ring_stats->stats, pkts, bytes);
-+	ice_update_ring_stats(tx_ring->ring_stats, pkts, bytes);
- 	u64_stats_update_end(&tx_ring->ring_stats->syncp);
- }
- 
-@@ -3469,7 +3470,7 @@ void ice_update_tx_ring_stats(struct ice_tx_ring *tx_ring, u64 pkts, u64 bytes)
- void ice_update_rx_ring_stats(struct ice_rx_ring *rx_ring, u64 pkts, u64 bytes)
- {
- 	u64_stats_update_begin(&rx_ring->ring_stats->syncp);
--	ice_update_ring_stats(&rx_ring->ring_stats->stats, pkts, bytes);
-+	ice_update_ring_stats(rx_ring->ring_stats, pkts, bytes);
+@@ -3474,6 +3474,42 @@ void ice_update_rx_ring_stats(struct ice_rx_ring *rx_ring, u64 pkts, u64 bytes)
  	u64_stats_update_end(&rx_ring->ring_stats->syncp);
  }
  
++/**
++ * ice_fetch_tx_ring_stats - Fetch Tx ring packet and byte counters
++ * @ring: ring to update
++ * @pkts: number of processed packets
++ * @bytes: number of processed bytes
++ */
++void ice_fetch_tx_ring_stats(const struct ice_tx_ring *ring,
++			     u64 *pkts, u64 *bytes)
++{
++	unsigned int start;
++
++	do  {
++		start = u64_stats_fetch_begin(&ring->ring_stats->syncp);
++		*pkts = ring->ring_stats->pkts;
++		*bytes = ring->ring_stats->bytes;
++	} while (u64_stats_fetch_retry(&ring->ring_stats->syncp, start));
++}
++
++/**
++ * ice_fetch_rx_ring_stats - Fetch Rx ring packet and byte counters
++ * @ring: ring to read
++ * @pkts: number of processed packets
++ * @bytes: number of processed bytes
++ */
++void ice_fetch_rx_ring_stats(const struct ice_rx_ring *ring,
++			     u64 *pkts, u64 *bytes)
++{
++	unsigned int start;
++
++	do  {
++		start = u64_stats_fetch_begin(&ring->ring_stats->syncp);
++		*pkts = ring->ring_stats->pkts;
++		*bytes = ring->ring_stats->bytes;
++	} while (u64_stats_fetch_retry(&ring->ring_stats->syncp, start));
++}
++
+ /**
+  * ice_is_dflt_vsi_in_use - check if the default forwarding VSI is being used
+  * @pi: port info of the switch with default VSI
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index ad76768a4232..f4196347b23a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -1087,35 +1087,36 @@ static void __ice_update_sample(struct ice_q_vector *q_vector,
+ 				struct dim_sample *sample,
+ 				bool is_tx)
+ {
+-	u64 packets = 0, bytes = 0;
++	u64 total_packets = 0, total_bytes = 0, pkts, bytes;
+ 
+ 	if (is_tx) {
+ 		struct ice_tx_ring *tx_ring;
+ 
+ 		ice_for_each_tx_ring(tx_ring, *rc) {
+-			struct ice_ring_stats *ring_stats;
+-
+-			ring_stats = tx_ring->ring_stats;
+-			if (!ring_stats)
++			if (!tx_ring->ring_stats)
+ 				continue;
+-			packets += ring_stats->stats.pkts;
+-			bytes += ring_stats->stats.bytes;
++
++			ice_fetch_tx_ring_stats(tx_ring, &pkts, &bytes);
++
++			total_packets += pkts;
++			total_bytes += bytes;
+ 		}
+ 	} else {
+ 		struct ice_rx_ring *rx_ring;
+ 
+ 		ice_for_each_rx_ring(rx_ring, *rc) {
+-			struct ice_ring_stats *ring_stats;
+-
+-			ring_stats = rx_ring->ring_stats;
+-			if (!ring_stats)
++			if (!rx_ring->ring_stats)
+ 				continue;
+-			packets += ring_stats->stats.pkts;
+-			bytes += ring_stats->stats.bytes;
++
++			ice_fetch_rx_ring_stats(rx_ring, &pkts, &bytes);
++
++			total_packets += pkts;
++			total_bytes += bytes;
+ 		}
+ 	}
+ 
+-	dim_update_sample(q_vector->total_events, packets, bytes, sample);
++	dim_update_sample(q_vector->total_events,
++			  total_packets, total_bytes, sample);
+ 	sample->comp_ctr = 0;
+ 
+ 	/* if dim settings get stale, like when not updated for 1
 
 -- 
 2.51.0.rc1.197.g6d975e95c9d7
