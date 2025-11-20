@@ -1,107 +1,161 @@
-Return-Path: <netdev+bounces-240213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9166CC718E4
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 01:32:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA034C71959
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 01:44:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 406894E1EC2
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 00:32:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DCBEF4E2076
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 00:44:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 501CD1A294;
-	Thu, 20 Nov 2025 00:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74FB31DF72C;
+	Thu, 20 Nov 2025 00:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d3UPRbBN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aGb6Etb7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D121862;
-	Thu, 20 Nov 2025 00:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFF419E97B
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 00:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763598755; cv=none; b=AVlo+zqj/idxksHQ+IJQpymKcA/YiBxI59it4DpaiBWYbp4J6FcoDVAftloRwfSjvU7pox2LkLOnai73fTbvNWxhBzk4b65gUj9+InrMHLDl4b7QcM5UpRO1i556FvIJ/6UbxRgMX/DZcjZhCQRvcO/q7XoMDfILdBuTOxNhJKk=
+	t=1763599445; cv=none; b=dCGkEnaMtEqvGkbhq1ZSw529PAajPxWPJ3hUe/yjct7mjHiyWDEDFCGqBcQ6BDUtNghvOW4AZJ4w8o4K50i/LJILJHJETYYkTeMDZQ8jbZ5kyhnAR1NgZChaFMGr/9okAzJrHhybkLOfsgWz8qdsq9Oiu2jJPy6L/7RtTsfOmAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763598755; c=relaxed/simple;
-	bh=1VFUXTf1H+UnGLtwStE54hDmLh6dZbbREG4rbaAFuV8=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=Ag6h8tNp3zD4nlvByyUIIWZVNEr0VsH/e626ZAz4l6xT2GXTnM2mU6Wv5jfN97iIgIUY/cnkqYLs7Wz9eGTUY9+HvkSflDQe44dG9ghh1cYklT9SFKaoMm4Sq/aWv3WgbltFjp7TEMfoQHTIM7fcukZqbdPAKQD+9YzHKuyKKHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d3UPRbBN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BCB7C4CEF5;
-	Thu, 20 Nov 2025 00:32:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763598754;
-	bh=1VFUXTf1H+UnGLtwStE54hDmLh6dZbbREG4rbaAFuV8=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=d3UPRbBN1KJSKGjiY55r8AtUta/Gk3YdTkVx1v4CxDAR8iNCeOnxgpFtOXABgfzcp
-	 X5xSCMmA18ItvrRdgbClqhUIFtG8XS1o31aiLFhuWBQVqzCHZiV9Th8IuT2XgycnD6
-	 aEAW4Mtm3pOVDeEcFLgkcDDpmSns9gaMB/hfhfgEAP3iaoCS9u9cxiz1WGUzWjFDT1
-	 Kq8smtmhvyF4UK2GSCINu1KKfGW7GB6h5qcylnP9B+t3bvNr8E5oyfYE7k3rttc8FB
-	 Z9yVGM4IvnYyB/8hOSVLfGjdEKa5JJhz3ZcIfvVzphlWFdnXugBNj+VHlEdrA3w0fk
-	 Ra/3AbwIdWffw==
-Content-Type: multipart/mixed; boundary="===============0628261362762456075=="
+	s=arc-20240116; t=1763599445; c=relaxed/simple;
+	bh=j9rg6e2eAbuasOML5wHDFy3gDEnDj0LDk6jSRAhyyzk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DktJeMDli4uXsPjnCku6zN1bzDFjhtgiSZ0Og5GWHvD5W0OVtOkPtixoIU0Ty5UIjEEl6oXcWhaUvnGskh/y4zVPytRDouJvVrGU1P860ubPEiap1spdPcCy1TuzTK9dal0MKKvUv+Eos6Y0guarwyu0IvYkFKW7jHLDGvMWyPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aGb6Etb7; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763599444; x=1795135444;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=j9rg6e2eAbuasOML5wHDFy3gDEnDj0LDk6jSRAhyyzk=;
+  b=aGb6Etb7yIML+/+aZUB/t8G2wueGkq3SzkIFm6vltjazdF6wi0FCvLDw
+   IrH28GbR6a+shDUFbXMRVa91cMQrXyHYOArma55Pf5b9e1+VNppGNIYdK
+   TuU1ZqiNxf+Fv3wceUumZptPCeJUneO4Y75l4RVH5PoDh9KchN4dzDHPn
+   ysUHzkHexvdRjw7b/KxYq+AGfc5PdVSBGIE3M4phgwjD9spoczK+Y2r4I
+   Y/BJnoeurUEIUHYXYMjpxDbmnacInP2NGbBdIQ0Q8/20TuV+PRKELWTVw
+   mdEfqEJJy0biegK1Xdr89bJjoPPkqwY2yIKl6pFkTxWlP4MJZ0Qt13Yiy
+   Q==;
+X-CSE-ConnectionGUID: fcrvQkufSM68nczXvBlc5Q==
+X-CSE-MsgGUID: +LPGW9HNQPKFUKnAmUwnSQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="77015638"
+X-IronPort-AV: E=Sophos;i="6.19,316,1754982000"; 
+   d="scan'208";a="77015638"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 16:44:03 -0800
+X-CSE-ConnectionGUID: RTxhISTHS62iKj2P88PN0w==
+X-CSE-MsgGUID: ALeGpSJnQvy4irHKfiKXHQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,316,1754982000"; 
+   d="scan'208";a="228527379"
+Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 19 Nov 2025 16:43:58 -0800
+Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vLsmC-0003SB-0J;
+	Thu, 20 Nov 2025 00:43:56 +0000
+Date: Thu, 20 Nov 2025 08:43:44 +0800
+From: kernel test robot <lkp@intel.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Alvaro Karsz <alvaro.karsz@solid-run.com>,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net v6 2/2] virtio-net: correct hdr_len handling for
+ tunnel gso
+Message-ID: <202511200846.lqEgKwk3-lkp@intel.com>
+References: <20251119055522.617-3-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <ddcd920ff99e0f97ed2c92cf650872d76a4b7404ea87a104e6ab061ee3005cf9@mail.kernel.org>
-In-Reply-To: <20251119224140.8616-10-david.laight.linux@gmail.com>
-References: <20251119224140.8616-10-david.laight.linux@gmail.com>
-Subject: Re: [PATCH 09/44] ipv6: __ip6_append_data() don't abuse max_t() casts
-From: bot+bpf-ci@kernel.org
-To: david.laight.linux@gmail.com,linux-kernel@vger.kernel.org,netdev@vger.kernel.org
-Cc: dsahern@kernel.org,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,david.laight.linux@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Thu, 20 Nov 2025 00:32:34 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119055522.617-3-xuanzhuo@linux.alibaba.com>
 
---===============0628261362762456075==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Xuan,
 
-> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-> index f904739e9..6fecf2f2c 100644
-> --- a/net/ipv6/ip6_output.c
-> +++ b/net/ipv6/ip6_output.c
-> @@ -1440,7 +1440,7 @@ static int __ip6_append_data(struct sock *sk,
->  	struct sk_buff *skb, *skb_prev = NULL;
->  	struct inet_cork *cork = &cork_full->base;
->  	struct flowi6 *fl6 = &cork_full->fl.u.ip6;
-> -	unsigned int maxfraglen, fragheaderlen, mtu, orig_mtu, pmtu;
-> +	unsigned int maxfraglen, fragheaderlen, mtu, orig_mtu;
+kernel test robot noticed the following build errors:
 
-[ ... ]
+[auto build test ERROR on net/main]
 
-> @@ -1504,9 +1504,10 @@ static int __ip6_append_data(struct sock *sk,
->  		maxnonfragsize = mtu;
->
->  	if (cork->length + length > maxnonfragsize - headersize) {
-> +		int pmtu;
->  emsgsize:
-> -		pmtu = max_t(int, mtu - headersize + sizeof(struct ipv6hdr), 0);
-> -		ipv6_local_error(sk, EMSGSIZE, fl6, pmtu);
-> +		pmtu = mtu - headersize + (int)sizeof(struct ipv6hdr);
-> +		ipv6_local_error(sk, EMSGSIZE, fl6, max(pmtu, 0));
->  		return -EMSGSIZE;
->  	}
+url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio-net-correct-hdr_len-handling-for-VIRTIO_NET_F_GUEST_HDRLEN/20251119-135650
+base:   net/main
+patch link:    https://lore.kernel.org/r/20251119055522.617-3-xuanzhuo%40linux.alibaba.com
+patch subject: [PATCH net v6 2/2] virtio-net: correct hdr_len handling for tunnel gso
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20251120/202511200846.lqEgKwk3-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251120/202511200846.lqEgKwk3-lkp@intel.com/reproduce)
 
-Can the variable pmtu be used uninitialized here?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511200846.lqEgKwk3-lkp@intel.com/
 
-When reaching the emsgsize label via goto statements from earlier in
-__ip6_append_data() (the checks at lines around mtu <= fragheaderlen,
-headersize + transhdrlen > mtu, and the dontfrag check), the int pmtu
-declaration is skipped. This leaves pmtu uninitialized when it's used
-in the calculation that's passed to ipv6_local_error().
+All errors (new ones prefixed by >>):
+
+   In file included from drivers/net/tun.c:59:
+>> include/linux/virtio_net.h:218:7: error: use of undeclared identifier 'sinfo'
+     218 |                 if (sinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
+         |                     ^
+   1 error generated.
 
 
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+vim +/sinfo +218 include/linux/virtio_net.h
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19519124312
+   209	
+   210	static inline void virtio_net_set_hdrlen(const struct sk_buff *skb,
+   211						 struct virtio_net_hdr *hdr,
+   212						 bool little_endian,
+   213						 bool guest_hdrlen)
+   214	{
+   215		u16 hdr_len;
+   216	
+   217		if (guest_hdrlen) {
+ > 218			if (sinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
+   219					       SKB_GSO_UDP_TUNNEL_CSUM)) {
+   220				hdr_len = skb_inner_transport_offset(skb);
+   221	
+   222				if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
+   223					hdr_len += sizeof(struct udphdr);
+   224				else
+   225					hdr_len += inner_tcp_hdrlen(skb);
+   226			} else {
+   227				hdr_len = skb_transport_offset(skb);
+   228	
+   229				if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
+   230					hdr_len += sizeof(struct udphdr);
+   231				else
+   232					hdr_len += tcp_hdrlen(skb);
+   233			}
+   234		} else {
+   235			/* This is a hint as to how much should be linear. */
+   236			hdr_len = skb_headlen(skb);
+   237		}
+   238	
+   239		hdr->hdr_len = __cpu_to_virtio16(little_endian, hdr_len);
+   240	}
+   241	
 
---===============0628261362762456075==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
