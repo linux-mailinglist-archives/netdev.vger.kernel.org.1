@@ -1,220 +1,146 @@
-Return-Path: <netdev+bounces-240318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B461C73040
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 10:06:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5E29C73128
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 10:15:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DD6534E253E
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 09:06:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9E9E14EA316
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 09:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D752EBB86;
-	Thu, 20 Nov 2025 09:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC3D311979;
+	Thu, 20 Nov 2025 09:12:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="y5h8XcZe";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="uQ2Eblao";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="y5h8XcZe";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="uQ2Eblao"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SYFq8EBP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12301E230E
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 09:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21120286400;
+	Thu, 20 Nov 2025 09:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763629580; cv=none; b=IVSWGalVpblBI493Y324OBKnMBDKq4lKQmPqStSyfFhDFDMa+wkw4YpC6QTyhVrsmH5nECBpvsznQiyPCWKSWV9YsA/Ugxz7+WSg4pwYZYeNkVresNxI7doEeZzD2dmy2sQUiYgGg4EzoVV1Eur6bKMBBvgMhR02SPzGLphPc6Q=
+	t=1763629936; cv=none; b=O7BoIofUdJKg7+F5ubZnyWPk4ZnedsIalRnsBxBS15zXAD0J2Vr3ikzVkKJCJsn7pID8aWfumT8RStXWs8253bbQLjFbu2XLjF4nKoy1k+1gdqUBfnYJ/U8bNMHlMWEE4wTOWIbrgb1e4gm+EIPpdwa425gGZXVZGe1IAg/+nbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763629580; c=relaxed/simple;
-	bh=nm6n88nu7OQYVsavht02juxlJNgRwSin/OowD8jsfho=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cQGnQEkvA9T0My2vxcTA4UnLx4w7uEZaSkWKY8wWjxH+7++t4J4UW0G+e0ddFo6OI9Pfn0XT1xXDISfxG76XxInNfcVaSHNbEVSqI1BTJJqjgiwO8cQtIuX9Wk2kErmjd0PZC6W9sBQyNlweXVYnLOda3WpunZVANdJLPQAsYYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=y5h8XcZe; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=uQ2Eblao; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=y5h8XcZe; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=uQ2Eblao; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id A56F420948;
-	Thu, 20 Nov 2025 09:06:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1763629576; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HnMACFI+lNtydjer9xn7VvtdapGzf7zyfntGkIc5Wd8=;
-	b=y5h8XcZejthatntG3rr82Ggs4jiPogJJQ+gxQceaQG/FZjYN5h/8FCeQvoI7cqgykbMYLA
-	qaw+CjpZ9e8P9HmNE/4+zDFeryM1xbpZwlzblguz1FAMYT/4rtG1AzVLkGcNi8o5BGt36i
-	GskLs/JaTXC1rPfIWJi9ipDg7sL0ZLM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1763629576;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HnMACFI+lNtydjer9xn7VvtdapGzf7zyfntGkIc5Wd8=;
-	b=uQ2Eblao7KJkQ7rE1nQXCo0XycYpufA/tDAB+Q2kUQe4S6datsXuV3a2SkOthdy+dcERmC
-	atrDMEmuJ4gtG8CA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=y5h8XcZe;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=uQ2Eblao
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1763629576; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HnMACFI+lNtydjer9xn7VvtdapGzf7zyfntGkIc5Wd8=;
-	b=y5h8XcZejthatntG3rr82Ggs4jiPogJJQ+gxQceaQG/FZjYN5h/8FCeQvoI7cqgykbMYLA
-	qaw+CjpZ9e8P9HmNE/4+zDFeryM1xbpZwlzblguz1FAMYT/4rtG1AzVLkGcNi8o5BGt36i
-	GskLs/JaTXC1rPfIWJi9ipDg7sL0ZLM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1763629576;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HnMACFI+lNtydjer9xn7VvtdapGzf7zyfntGkIc5Wd8=;
-	b=uQ2Eblao7KJkQ7rE1nQXCo0XycYpufA/tDAB+Q2kUQe4S6datsXuV3a2SkOthdy+dcERmC
-	atrDMEmuJ4gtG8CA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1E2433EA61;
-	Thu, 20 Nov 2025 09:06:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 2oO3AwjaHmkZCwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 20 Nov 2025 09:06:16 +0000
-Message-ID: <c7fb0c73-12e9-4a6d-94d9-65f7fc9514ce@suse.de>
-Date: Thu, 20 Nov 2025 10:06:01 +0100
+	s=arc-20240116; t=1763629936; c=relaxed/simple;
+	bh=CVl5hfHmm+btB3Wjc6ttnNrRk4deutzmxd5URUscRCA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=IoNds7NbZyhN8QPhTNmwPkrhU5UeE60vn8NqIhCB/5X0kk7lUJSGnEtC6KFLjV4nEiXLhjLGFWsVYzQmZs3Fmn8YTKU35ZyhMX4FpQHyVa1Og25arHHlID0rg2KiuuqeuTPnonX2AElJf/9L7pPdxHMEdeJpxVoCll7UHpoTwhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SYFq8EBP; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 7899C4E417EA;
+	Thu, 20 Nov 2025 09:12:11 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 3731B6068C;
+	Thu, 20 Nov 2025 09:12:11 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5975510371C08;
+	Thu, 20 Nov 2025 10:12:04 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1763629929; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=s5kQlOxmcfPkYVGoAeCB+9DTT9baZsDkjUnBb6JjBt4=;
+	b=SYFq8EBPeJVbn1cpMJtAJ0Aeg11Zkx2UKjs2SQprNp2jU7+9wh+g1SmZ1jgBwlrEUHLGNd
+	m9R1suUQ9bQ8esbFemZr3z1vYMraDeV0NY2oCcewDSPp+920b6SkyYea3SgYb85T7HtJL2
+	s8ksz49AAeCoyG2ObWNcjkcnzpj2t530B3MRCw/b4ntaVQJzXiqLmlwvrQKsWCaAktw4Oe
+	ms5kbX4Jk0aLCwSSwoyPQD0sioIgSr2BY4fw+iFu63mVrkvEPehtHnCpqaSljwJ2bKLtLV
+	N9T8pEekq/NDSK/XPe0tz2DJxkpIgCzhHn/LTK1MOlU7KTIhzrQHGtVmPmFRZg==
+From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
+Subject: [PATCH net v6 0/5] net: dsa: microchip: Fix resource releases in
+ error path
+Date: Thu, 20 Nov 2025 10:11:59 +0100
+Message-Id: <20251120-ksz-fix-v6-0-891f80ae7f8f@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] xsk: avoid data corruption on cq descriptor number
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: netdev@vger.kernel.org, csmate@nop.hu, maciej.fijalkowski@intel.com,
- bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-References: <20251118124807.3229-1-fmancera@suse.de>
- <CAL+tcoCthXqJS=z3-HhMSn3nfGzrqt8co3jKru-=YX0iJ2Yd6w@mail.gmail.com>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <CAL+tcoCthXqJS=z3-HhMSn3nfGzrqt8co3jKru-=YX0iJ2Yd6w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: A56F420948
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:url,suse.de:email,suse.de:mid,suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAF/bHmkC/2XMTW7DIBAF4KtErEvE8E9XvUeVhYEhQW1NZSwrb
+ eS7B3mDIy/fm/neg1ScMlbyfnqQCZdccxlb0G8nEm7DeEWaY8uEM66ACaBf9Z+mfKfRC6liMlq
+ oRNr374St3pY+yYgzubTylutcpr9tfYHtdBhagDJqUOqIzjmM8OFLmb/zeA7lZ1tZeJfAdJe8S
+ WbA2qSZtUYcpdhJkF2KJofgvfAuBMHTUcq9NF3KJkEgxEHZQTp+lGovbZeqSYsumKS0Bhtf5bq
+ uT0j+yHWNAQAA
+X-Change-ID: 20251031-ksz-fix-db345df7635f
+To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Arun Ramadoss <arun.ramadoss@microchip.com>
+Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
+ =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>, 
+ stable@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-Last-TLS-Session-Version: TLSv1.3
 
+Hi all,
 
+I worked on adding PTP support for the KSZ8463. While doing so, I ran
+into a few bugs in the resource release process that occur when things go
+wrong arount IRQ initialization.
 
-On 11/20/25 4:07 AM, Jason Xing wrote:
-> On Tue, Nov 18, 2025 at 8:48 PM Fernando Fernandez Mancera
-> <fmancera@suse.de> wrote:
-[...]>> @@ -828,11 +840,20 @@ static struct sk_buff 
-*xsk_build_skb(struct xdp_sock *xs,
->>                                  goto free_err;
->>                          }
->>
->> -                       xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
->> -                       if (!xsk_addr) {
->> -                               __free_page(page);
->> -                               err = -ENOMEM;
->> -                               goto free_err;
->> +                       if (xsk_skb_destructor_is_addr(skb)) {
->> +                               xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache,
->> +                                                            GFP_KERNEL);
->> +                               if (!xsk_addr) {
->> +                                       __free_page(page);
->> +                                       err = -ENOMEM;
->> +                                       goto free_err;
->> +                               }
->> +
->> +                               xsk_addr->num_descs = 1;
->> +                               xsk_addr->addrs[0] = xsk_skb_destructor_get_addr(skb);
->> +                               skb_shinfo(skb)->destructor_arg = (void *)xsk_addr;
->> +                       } else {
->> +                               xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
->>                          }
->>
->>                          vaddr = kmap_local_page(page);
->> @@ -842,13 +863,11 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
->>                          skb_add_rx_frag(skb, nr_frags, page, 0, len, PAGE_SIZE);
->>                          refcount_add(PAGE_SIZE, &xs->sk.sk_wmem_alloc);
->>
->> -                       xsk_addr->addr = desc->addr;
->> -                       list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
->> +                       xsk_addr->addrs[xsk_addr->num_descs] = desc->addr;
->> +                       xsk_addr->num_descs++;
-> 
-> Wait, it's too late to increment it... Please find below.
-> 
->>                  }
->>          }
->>
->> -       xsk_inc_num_desc(skb);
->> -
+This small series fixes those bugs.
 
+The next series, which will add the PTP support, depend on this one.
 
+Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+---
+Changes in v6:
+- PATCH 4: Jump in the middle of the release loop instead of partially
+  freeing resource before jumping at the beginning of the release loop.
+- PATCH 5: Add Andrew's Reviewed-By.
+- Link to v5: https://lore.kernel.org/r/20251118-ksz-fix-v5-0-8e9c7f56618d@bootlin.com
 
->>          return skb;
->>
->>   free_err:
->> @@ -857,7 +876,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
->>
->>          if (err == -EOVERFLOW) {
->>                  /* Drop the packet */
->> -               xsk_inc_num_desc(xs->skb);
-> 
-> Why did you remove this line? The error can occur in the above hidden
-> snippet[1] without IFF_TX_SKB_NO_LINEAR setting and then we will fail
-> to increment it by one.
-> 
->
-That is a good catch. Let me fix this logic.. I missed that the 
--EOVERFLOW is returned in different moments for xsk_build_skb_zerocopy() 
-and xsk_build_skb(). Keeping the increment logic as it was it is better.
+Changes in v5:
+- All: Add Cc Tag.
+- PATCH 3: Use dsa_switch_for_each_user_port_continue_reverse() to only
+  iterate over initialized ports.
+- PATCH 4: Also clean PTP IRQs on port initialization failures
+- Link to v4: https://lore.kernel.org/r/20251117-ksz-fix-v4-0-13e1da58a492@bootlin.com
 
-> [1]: https://elixir.bootlin.com/linux/v6.18-rc6/source/net/xdp/xsk.c#L821
-> 
-> Thanks,
-> Jason
+Changes in v4:
+- PATCH 1 & 2: Add Andrew's Reviewed-By.
+- PATCH 3: Ensure ksz_irq is initialized outside of ksz_irq_free()
+- Add PATCH 4
+- PATCH 5: Fix symetry issues in ksz_ptp_msg_irq_{setup/free}()
+- Link to v3: https://lore.kernel.org/r/20251114-ksz-fix-v3-0-acbb3b9cc32f@bootlin.com
+
+Changes in v3:
+- PATCH 1 and 3: Fix Fixes tags
+- PATCH 3: Move the irq_dispose_mapping() behind the check that verifies that
+  the domain is initialized
+- Link to v2: https://lore.kernel.org/r/20251106-ksz-fix-v2-0-07188f608873@bootlin.com
+
+Changes in v2:
+- Add Fixes tag.
+- Split PATCH 1 in two patches as it needed two different Fixes tags
+- Add details in commit logs
+- Link to v1: https://lore.kernel.org/r/20251031-ksz-fix-v1-0-7e46de999ed1@bootlin.com
+
+---
+Bastien Curutchet (Schneider Electric) (5):
+      net: dsa: microchip: common: Fix checks on irq_find_mapping()
+      net: dsa: microchip: ptp: Fix checks on irq_find_mapping()
+      net: dsa: microchip: Don't free uninitialized ksz_irq
+      net: dsa: microchip: Free previously initialized ports on init failures
+      net: dsa: microchip: Fix symetry in ksz_ptp_msg_irq_{setup/free}()
+
+ drivers/net/dsa/microchip/ksz_common.c | 31 +++++++++++++++----------------
+ drivers/net/dsa/microchip/ksz_ptp.c    | 22 +++++++++-------------
+ 2 files changed, 24 insertions(+), 29 deletions(-)
+---
+base-commit: 09652e543e809c2369dca142fee5d9b05be9bdc7
+change-id: 20251031-ksz-fix-db345df7635f
+
+Best regards,
+-- 
+Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 
 
