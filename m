@@ -1,114 +1,177 @@
-Return-Path: <netdev+bounces-240421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 276FBC74ADA
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:55:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B60C74AA4
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 15:53:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0BC6134BA63
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 14:52:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 277332B595
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 14:53:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866A332C92D;
-	Thu, 20 Nov 2025 14:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE50345CDA;
+	Thu, 20 Nov 2025 14:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="1KgjbmiQ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Nlop4bDN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAE02BF000
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 14:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E249340DBC
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 14:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763650361; cv=none; b=M2WSGhNSvGRjxC1IuJUQpjDvxoGSZZHfxO4CtQHTyFmPzTxv4fbSJ2ohagqyEMcW6fdB+IrIlCkD6WWzUhsg/3q/d6EscxNstlTxddZNEvxsxMKRlPWz1sSulcWNMIktDxv+83op+DOTaAjwAj4kgLEieOkg1ZYR9KdyewRuwDk=
+	t=1763650372; cv=none; b=JX1Qn/6sM77yNquFiFb1DgyfnOj6+ML1DU5XV6neYbBQPmiWFrDdb/GwW9APZqi8vwRucAKPXqoSYT2aSwLEqllnatl1g87lcdV25+zPXW36L8yRaORxhN3JfKpPo0fgUqYLQ0XmaSqZDg/xCNUKj0nzpuLFWLct7R1VDKCh/DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763650361; c=relaxed/simple;
-	bh=qlVoOV1b0m1EsqTqevKebTa5adC2s2q0Xm1TYQIEY5c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OXFdBvsLadDgc8e0KqlARcwpTj7dcRV2emPewBvppTCK7rWJY8NZ+QsdXWaoFoGni7ASRFAT3uUqpbcEAhExJ2yxgcaw5Ot5PwvqPYi2kL8oCQv40cTBLVYTiWhGRsdq8A2yTmP4gPgJ2kHgyLz5CWeGnAYlNEaSNq1NEVmRLto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=1KgjbmiQ; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b73875aa527so158295166b.3
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 06:52:39 -0800 (PST)
+	s=arc-20240116; t=1763650372; c=relaxed/simple;
+	bh=fJNbQYu7PoiJLsEPpjUYNqAPI6k2geFEJacIKnsv5a4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=lmm/Xl/GeVIS65na+3S7v5wbNoEzki7QgvvprSuHTwSQySE8cWKyvbckT1zga8fIj44R84WDTNbgvM6NoNBioJ3qSs6mq3+mUYDKwXk7aIye310czNI5cjux+vLIYV7qbv9NdIXUuQ/Y7NBusLQyL3VkEq01QmZLhmrXbc+nBMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Nlop4bDN; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-43346da8817so5269455ab.0
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 06:52:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1763650358; x=1764255158; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qlVoOV1b0m1EsqTqevKebTa5adC2s2q0Xm1TYQIEY5c=;
-        b=1KgjbmiQcA2RVz54IvXXlSdGGsuG++U7UX4hfHSFB4tLAKJpux6kPxygEldzuHAZkq
-         wdoXebLApjfbrZ+2yY2brZByqzAdbURTMN5OaBc6uVa9cnhwXNHvXB/6mvg4585jXWdo
-         68uGnDjlfRdY2UK8IguwYer+G2pbFtwRfye2PlZ1YIAqq6xWLlt16XlrSBvRrnLMZpNR
-         x9tHhhmEBnj8LPysGf/Ct+Hxxl3JThedC7OTgE2wLqEnKL2vLxLEMUi1aOtGqRoNqVS8
-         gU8ZAR33ebFCTMg+LTGgZTi1D1aV+l7Knc4MDkGddR8GQ3RuRiPAoRbBd2R1CVEAFBx0
-         yNLg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763650367; x=1764255167; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mIp1emodWmrQX+c6TjoXmEBGWcecINECr9nK+dGHBUw=;
+        b=Nlop4bDNIOkjuo0pMhzaqc0ODrEsmRo7XtLqwhp00uyFASxw+sbIvvfDKg63/0WNIr
+         Irgw7i1L5c7f3KspyZuRfY76O51HffIuodvQy5ZIcDN4No7WwIxUOGZ9dpes/M6K+nsd
+         SNLzENdMcdkRpJUmuFjuM9BMlGaR61DPmsUMatu7aVJzbpi7Z/RO6GbliOgOscpBha8S
+         DnzFtV5phPRpPEJgf98WlMFKyzL6CdLykV3ZnkTgBAq3ZRb9M24771+6fglXYKmcEHuj
+         JwzMwrRMP1iOEu/PZF6XSo/nxjqLzdvmfaif9TGvKGR4YXIy2m1LIpokuAZvSHGS7C+s
+         olCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763650358; x=1764255158;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qlVoOV1b0m1EsqTqevKebTa5adC2s2q0Xm1TYQIEY5c=;
-        b=sSE6v8E/+hX1suCyYR/1BZ3qNPxENp6vbx1XxPc1FgmiDGu9dggm+FIu3r+aT5VkEr
-         NlEOPliRlSO+sXK7f4JOa5VqrHhRhKrfu1dJyzbUEPodRxKGW2aGctxVE7jvZqIg8Ehd
-         8j0VaGgbQvi5FuKOkMFh3FyVWzkKhK5VWR40/5O12AEbCh3VdvKaulQbrE1hD1ZCi0i2
-         6NshoNJ+ox2h7ZT5lwHpqz9Bx4XxbodJV1K/beamJ5a4IaEpVLtco5TPVE/nbCLDrPbA
-         wpYQQm8cs3lhRxSBiL/9pl05uqEJ6cqYk68BkNmuB55V0s4MfdR8Fng5qaX+nOIMXmQI
-         ppLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWXC5pPKD9/TeUitVYWy3j0nuzAjsQirvLwN8G4XaOyzCoSme6JRPGCOjn/pQeflbrupJl7sG8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdwwHeTkaPQBDtUYRCzAnPKD9Y2zErpOIjJIWB15YHP4nZDcyW
-	lr6kMLpWjZ/NZ8w4elQkBPfEr77tyxrnqB1y0FbvsbIPrP5Ne8GHSz/5yaGrBRMea0I=
-X-Gm-Gg: ASbGncswDa1oBIo96k9NuAFIaEcCc6psUS0lR2SFqoEPSAhiCyZBkN2iUTiL1RJK8rb
-	VybwQsxV5oPuaCgYrfhSYw2Mcve98qT9m0Q2pZdY+Es12bvPiWSejy4c28cFihsTjebUIXzq6uP
-	bQpqi+Vuo5vd7NugEExe2YTGt4Tb+8Il+fKlGIcVasWXizacFv6hacPqu9HsneyRon9c8mYXat8
-	/xDYUhzZkCChlyTgemEEMqdGly9P0vso/NvTHqicV8oqDXOZdHUdZWZy0fmQPl2HW/Pvf9t370f
-	CQjw36bIhkHyTS33eaaPynY3aqEAdeJKRt9ISt/wSrxETMPs/CcnIXlBOXNE4frOJy+MHKUHMOE
-	m+Fybb+pma2d7hpIG2QG1/tAc1jyfYHWs0h3MPWiDfZfh6OWJCpm1XRstE768QqJJHer1gC1dnC
-	UinPGiSoHjEH7/GzWK970=
-X-Google-Smtp-Source: AGHT+IHij78wIttXL5qrzeJ5Fr4uMDiSvsvUdH/MMYd2AuxlJUx0L+zs8iuv/NdnITfidNIJsVOY8Q==
-X-Received: by 2002:a17:906:478b:b0:b6c:38d9:6935 with SMTP id a640c23a62f3a-b76552b9f32mr307984766b.24.1763650357685;
-        Thu, 20 Nov 2025 06:52:37 -0800 (PST)
-Received: from FV6GYCPJ69 ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-645363c56a4sm2255897a12.15.2025.11.20.06.52.36
+        d=1e100.net; s=20230601; t=1763650367; x=1764255167;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mIp1emodWmrQX+c6TjoXmEBGWcecINECr9nK+dGHBUw=;
+        b=oNqI7zwUsciVjBq2g2IhUcZ0/ANeNWhVCcUgEVMviX+0UxkwByN9HguUB81fg4eh3W
+         h2h5KJNR57apwls+DW3s+1wtKJUaqul8pfGm9Lmwf5JZI29zwDJujRzJfYntPqky4oL2
+         9X36Sckpp8YKmQi88JBnbY/MPifoN+ZEsVpGKmBeXwAG2WSq0HF5n/GLlSiNQ4eZ0g5Q
+         m4Ru1qOmrve2PjVbgv1zgEKtSRRFBeJUfy4kqEUmGM+vEtNAfL551DKV0+XR3GG3iGpJ
+         VkMDRwhfLDMFtsAZfZ5ALV5HC/DrmCJBm5zw/NbLfmiJlVllKBwsxWYyh/jT1+kvyZFT
+         NxHw==
+X-Forwarded-Encrypted: i=1; AJvYcCXX5WsVTNyNaq7M25g26BX//BmML8fWTExPzUjATTEy6yILK7zVgINFg2+h2tPP7RYZAo2z5AQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+TugzpADDxCtshvs3cgVblrAKLg/rEhQNRECxEFddOTl22Fq1
+	HvRWq/uLsh4EnPO+lBoptNW4bJqptPdgvGAUJBMijuK9oz0aSzB4DhBQfYRozn3MLds=
+X-Gm-Gg: ASbGncue4HoRxWhi8kXRrrDCh+i/+QNNJa1jRgdGO9k304kX72MzyZjT8hX/D8FxKeC
+	DfxscnA5IVQH1U172VxX0EcuTYkt+lyte46RVvKX89VJnbB5JCdLrABgvfPuYqtUq29MFVQ4hD2
+	S83uK/DZOsGrjMJxLhcvzd2qzDzijz2n3KX2jiY7s0R5jz8/pa09oGQqhrlom6/TLI4125UWfPj
+	Opi4hK6ak+PMxz3gmYIug+6U0xweLiKqhf3JME9LgNmIJF3e0fYHLDLWE3lrCz28yX8ApCK/v4C
+	P55ckh2DOQ8h2LkYfBDctSMguzw+94apQsxacb7ar6mBsyFphie48Y2LoxNKGjE0VP259cIcc7q
+	/vMA9j7ARbwxY3R11z2bTPom9drxENKAw4dJS5Cnv19FBB87V7TxcLCkC0Q7YlAEsfra9697R1H
+	FL5Q==
+X-Google-Smtp-Source: AGHT+IEmRlVKCe07qbgo1t2w3uFpBKsqx62crTftDC+8sZ0oUBIrcGL53VTRakva//fmnWvcfQrQww==
+X-Received: by 2002:a05:6e02:1c01:b0:433:1d5a:5157 with SMTP id e9e14a558f8ab-435aa88e822mr21434775ab.6.1763650367018;
+        Thu, 20 Nov 2025 06:52:47 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b954b207d7sm1008611173.33.2025.11.20.06.52.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 06:52:37 -0800 (PST)
-Date: Thu, 20 Nov 2025 15:52:33 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, 
-	Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next 03/14] devlink: Add helpers to lock nested-in
- instances
-Message-ID: <hj37vfeodmmjpfrfa6vnwm3rwp7an4fzt7bvi4fwyusjzgbtrm@fc6j4szuodq6>
-References: <1763644166-1250608-1-git-send-email-tariqt@nvidia.com>
- <1763644166-1250608-4-git-send-email-tariqt@nvidia.com>
+        Thu, 20 Nov 2025 06:52:46 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-kernel@vger.kernel.org, david.laight.linux@gmail.com
+Cc: Alan Stern <stern@rowland.harvard.edu>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Alexei Starovoitov <ast@kernel.org>, Andi Shyti <andi.shyti@kernel.org>, 
+ Andreas Dilger <adilger.kernel@dilger.ca>, Andrew Lunn <andrew@lunn.ch>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Ard Biesheuvel <ardb@kernel.org>, 
+ Arnaldo Carvalho de Melo <acme@kernel.org>, 
+ Bjorn Helgaas <bhelgaas@google.com>, Borislav Petkov <bp@alien8.de>, 
+ Christian Brauner <brauner@kernel.org>, 
+ =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ Christoph Hellwig <hch@lst.de>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Dan Williams <dan.j.williams@intel.com>, 
+ Dave Hansen <dave.hansen@linux.intel.com>, 
+ Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>, 
+ Davidlohr Bueso <dave@stgolabs.net>, 
+ "David S. Miller" <davem@davemloft.net>, Dennis Zhou <dennis@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Jakub Sitnicki <jakub@cloudflare.com>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+ Jarkko Sakkinen <jarkko@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
+ Jiri Slaby <jirislaby@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+ John Allen <john.allen@amd.com>, 
+ Jonathan Cameron <jonathan.cameron@huawei.com>, 
+ Juergen Gross <jgross@suse.com>, Kees Cook <kees@kernel.org>, 
+ KP Singh <kpsingh@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+ Mika Westerberg <westeri@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+ Miklos Szeredi <miklos@szeredi.hu>, Namhyung Kim <namhyung@kernel.org>, 
+ Neal Cardwell <ncardwell@google.com>, nic_swsd@realtek.com, 
+ OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+ Olivia Mackall <olivia@selenic.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Peter Huewe <peterhuewe@gmx.de>, 
+ Peter Zijlstra <peterz@infradead.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Sean Christopherson <seanjc@google.com>, 
+ Srinivas Kandagatla <srini@kernel.org>, 
+ Stefano Stabellini <sstabellini@kernel.org>, 
+ Steven Rostedt <rostedt@goodmis.org>, Tejun Heo <tj@kernel.org>, 
+ Theodore Ts'o <tytso@mit.edu>, Thomas Gleixner <tglx@linutronix.de>, 
+ Tom Lendacky <thomas.lendacky@amd.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, x86@kernel.org, 
+ Yury Norov <yury.norov@gmail.com>, amd-gfx@lists.freedesktop.org, 
+ bpf@vger.kernel.org, cgroups@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, io-uring@vger.kernel.org, 
+ kvm@vger.kernel.org, linux-acpi@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ linux-cxl@vger.kernel.org, linux-efi@vger.kernel.org, 
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+ linux-integrity@vger.kernel.org, linux-mm@kvack.org, 
+ linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, 
+ linux-perf-users@vger.kernel.org, linux-scsi@vger.kernel.org, 
+ linux-serial@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+ linux-usb@vger.kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
+ usb-storage@lists.one-eyed-alien.net, David Hildenbrand <david@kernel.org>
+In-Reply-To: <20251119224140.8616-1-david.laight.linux@gmail.com>
+References: <20251119224140.8616-1-david.laight.linux@gmail.com>
+Subject: Re: (subset) [PATCH 00/44] Change a lot of min_t() that might mask
+ high bits
+Message-Id: <176365036384.566630.2992984118137417732.b4-ty@kernel.dk>
+Date: Thu, 20 Nov 2025 07:52:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1763644166-1250608-4-git-send-email-tariqt@nvidia.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-Thu, Nov 20, 2025 at 02:09:15PM +0100, tariqt@nvidia.com wrote:
->From: Cosmin Ratiu <cratiu@nvidia.com>
->
->Upcoming code will need to obtain a reference to locked nested-in
->devlink instances. Add helpers to lock, obtain an already locked
->reference and unlock/unref the nested-in instance.
->
->Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
->Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
->Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+On Wed, 19 Nov 2025 22:40:56 +0000, david.laight.linux@gmail.com wrote:
+> It in not uncommon for code to use min_t(uint, a, b) when one of a or b
+> is 64bit and can have a value that is larger than 2^32;
+> This is particularly prevelant with:
+> 	uint_var = min_t(uint, uint_var, uint64_expression);
+> 
+> Casts to u8 and u16 are very likely to discard significant bits.
+> 
+> [...]
+
+Applied, thanks!
+
+[12/44] block: use min() instead of min_t()
+        commit: 9420e720ad192c53c8d2803c5a2313b2d586adbd
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
 
