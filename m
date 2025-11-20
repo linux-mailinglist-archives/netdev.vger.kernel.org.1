@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-240272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56F13C7203F
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:38:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDC32C7205A
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:38:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 1160D2E233
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:38:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1F36A4E4D78
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 03:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32EE730504D;
-	Thu, 20 Nov 2025 03:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBAFE309EF6;
+	Thu, 20 Nov 2025 03:37:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G13At/e0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c50ijRWD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB862FF155
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4BC3019D8
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763609838; cv=none; b=UmJJKlL44Lejfzmc/Ygdc/IxqesYZa95MExQd7aecdgsvKNz/uDvCbA4sa2w7aKKgn02kAgh8GdEudDpJSTonTVnDRi9R/qjTIHXAQo6lNH/q2LMMQXuN5irQ+Azu1Hl5t00ZsNAb5aEAUJAGs8qYWQOwyehqrbaJiofPEeK508=
+	t=1763609839; cv=none; b=ez1Laocy6360sbSeHDD9SNxa54qQBSRuYaQ3BBwthzaIj5cFC7GqzXxW/FoLV01jcICIzpCMboIkj850zMS9o7RnQJDIaT8UUUTJXQYpS2aA6baFuy4/dc8ty6uZZOZOsTzqLLLerfDYwAnjy4IIvXcWW50j4i28pytt1hFsf5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763609838; c=relaxed/simple;
-	bh=6tucM9ZQ59G0xrDfMuItsfF1GTt7N8xzYil/t1gA1PQ=;
+	s=arc-20240116; t=1763609839; c=relaxed/simple;
+	bh=o+TnvX8H67E39YgV1VzM4yPneveTtrGVWnzs7PTFEyI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CCnD3+gxY/LhhTZ2YxEY+s76T/mFunAvLhq9SbXpv5W/qrbWlYmyUq/I0COXu+2Ue3ryJ6mG+sa0XHANq4OURbKyzGML4lmDeIrYzwbN1X2oPDPvGRgjpRMYXxq1d9+EVrzZk0JzJbZGcCl+3N+3/cNMGtP7DJ98yN32FX4j/iM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G13At/e0; arc=none smtp.client-ip=209.85.128.175
+	 In-Reply-To:To:Cc; b=ns4D/AAmyxJ5NJm865gKVLDtHM4a6jnm1HZU7CNhjBR/jAcVogfnB3VOrLTBHTBNKF2aWBL5sORstUCLi6a7Cv/RNELunlRbx0OG6DFa/v8ZBnyO5zMpIdz3iVV9Ohgaa2s7ZXbcjpDDMqhYzcVG8xZGTDXbsrSJwH36itmtVgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c50ijRWD; arc=none smtp.client-ip=74.125.224.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-78802ac22abso4502777b3.3
-        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:37:15 -0800 (PST)
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-63fca769163so339617d50.2
+        for <netdev@vger.kernel.org>; Wed, 19 Nov 2025 19:37:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763609834; x=1764214634; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763609835; x=1764214635; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DXRdbOnUYiudn9GxHVVfvuR3By+3aRth8g9ruHEmquY=;
-        b=G13At/e0ioienxBeW6SQ4+fRmP63PmF11G7gK+KurFlMBg7OkigrTjnVBpsGYN0J0n
-         fiCfJ0RsAjB63GZ8//xxoaWEM3ODPdoTvl2NQIr8NVIe1E1Ie2W7lPBWPI8MiJ4v85FL
-         VtYKdGz7ogahpf+jJiKYhB3WrjgfPWDKMTyKyU+Gjtvf5MhW+Dsn5060AkHv+MZGwgaQ
-         01yL6IYIYcswfHXCVr1uekDjLEwklN5yyOTP/zueoyfuFIi17EYqJBlqpyGTAGJR/bBu
-         ueZqnAtGdpdisotGE5eYJKzF6iYTn9pYYZRNS0eQmkUtqlqs79HfOFucgTufrWGJonUH
-         5XJQ==
+        bh=dB9vGRQKOzD+0FIDq610kWqp5roY5Ews5Rp+LunXhtg=;
+        b=c50ijRWDv6C4+bgjDgEntLElA/090B2lBIWQ/umM7rjkKgvMUfVLaWczs2DEj2Rbyx
+         I2Mgxaiors/DmJAgoAkki5Yp8iYo6qaNIfe18qbZFMlNXnyel4IyEggprq4KIhCUYFh9
+         Bm+3PjfIENhOZTyXldLtte3+qD4dvFuMMCUGwm1rMUeiij76QlSqlEiCCnnZF7kJ5BZe
+         4iUe9LHarqM1jVzlwwYg4D8J61TCwd26KZejYV0GYmvc1qplkVnBMWVAlC/3VQ6aEcqF
+         gyMUwQxdOyvxUG+CcLNJhg297RkK9mcREkxV+nLAF8yQJDS0JslUe6HU4TOWOl27kwIR
+         uJlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763609834; x=1764214634;
+        d=1e100.net; s=20230601; t=1763609835; x=1764214635;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=DXRdbOnUYiudn9GxHVVfvuR3By+3aRth8g9ruHEmquY=;
-        b=t5avAUa8WlVSKNKo8rmMO/ioaurYR4sqcOsUrXaRYVnqKIHFhsnmM2Z5Gshlk9Uib8
-         IGl81bZgu0hbCtNwegaLgymBnJjmVXZ2c/l+opA0BkNeRqq0LaH8ZEragJunZyLXrMp8
-         zXgiaKuhkDa0RZLS0XsjbwdMXqdl3lodHAm4UwE4wDcD1Bx/J8BAaHmLnyUy1j5EdqwD
-         7QPMFliKwU95emuVvSb3XQb9IjcbwsfdcwjbN9Me82nudynPz++zeHkfyiLKqNuLvJmW
-         jrV+2TIKWim/DR/bb8Hfqa8uQyp6bXjrM5S/LvIY1EbESyGyhbTCjEsWmZq47KA7iIbX
-         a2aA==
-X-Gm-Message-State: AOJu0YxgkwB9fVqupIWXdwqU4/C/NF2PQZTm+8pCMQDXlSy3TorV9mLK
-	q6T5XGn1nwZvri1ul9cTUg+xFlqELEwWEB9v+1bIhpLnANgPkEIDf9eM
-X-Gm-Gg: ASbGnctI7yaO/RB+P4w0AdxdgjkS0rUlxBDUcC8Kok8eHzSwxTV+nYzsVIoaoemgBMm
-	KDJUkgklH4B5XdiOu+HLSBThtzg4hRBjHvWn0JjQB1L10YpsnxmWSiV/oJPy08FcbCpuE6SDQB3
-	uZIhPT8VyNhomSrYOPLFQA9fhE4u4q6ONXn0pVVNqeRFCRO0BYMS80bH49phGTvA3aTnCuzEzO9
-	uQ8sBil3oPrN+uBJ/hLBjrSbqt+mXFF1xBLNkbH32jqLNLaU7DPfD0NDaX6vMU9U5h8uoIdldX5
-	bo0kizKxMplU8gvedJrKHnWziJtUyYG0T4UzczmeboosdTsp1JoMkKN29KpsvKgUjIGdulN3Ren
-	vjKXNiwZkNQ57wcjQ8d3KWFblPPZ4rkHFGl/3CM4sCbiS9kDfm0Zrocn9tujrEsh9N4GqXNvYlQ
-	L2z5ZkvHb09rHEAKUi7/nStQ==
-X-Google-Smtp-Source: AGHT+IHc8CUnhbCI562x0BXPS/DRgsQMraAy3qtBr5+up+1mfxjEqc0SEDv6gbxTVE+GeQ4ZI1qCqg==
-X-Received: by 2002:a05:690c:b13:b0:787:de81:35c2 with SMTP id 00721157ae682-78a795f89b8mr13892267b3.42.1763609834525;
-        Wed, 19 Nov 2025 19:37:14 -0800 (PST)
-Received: from localhost ([2a03:2880:25ff:70::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78a7993c4e5sm4116457b3.40.2025.11.19.19.37.13
+        bh=dB9vGRQKOzD+0FIDq610kWqp5roY5Ews5Rp+LunXhtg=;
+        b=BCCE73iOKjXTnUMtW2JK59XdNn4RE9p4Po7uRchApVIxs82ITadxbCCURAWIE8v4Hg
+         4A98Y9WBI4Lv6HcJEm9fcToKMHsC4711G4cGd+feDG8K/9TseyiRszsUYHNH8raLkB0Z
+         LUCPAcNxTKbfAfAV7ZLdte0yhX1BmNCaPf5Y8aj65M17nmkRysJIJ3A9KJexr1q0TQ+5
+         X1nSzWUzad/TuzUA860W/G8sBwMVG/PcDzfX/4dhixHfy8NMeOqqhWn0bQbDkIZpCNiT
+         oRlqm+VaJdjjIetXAkZYsFT3r9asMd4oejqwT2j7TA34yIy1+vY8D/f3Ikb74ors3eY+
+         pvaQ==
+X-Gm-Message-State: AOJu0YzKFXpe4i7To/eYkuXNSH5u2P4FTGflPrj1u1toahYrv6Hdd2Qk
+	eS7CBaQ5XVwdnTx9kUv2AECzHKCL9T2a220A4TiQWyVsjWOPG46sRcu8
+X-Gm-Gg: ASbGncvbUgeu75cLofV9Ki/HZqMLJIGM344zc96w0phr5mdngZboTx8if2//1UTuzoL
+	5SmFrC6jSMKMU3TFkQDyfph/cU42/efHfXOUH1pKrx7a9Xb9X/tjrSO5NXjNqH0UB5D6SguJGle
+	6qb444N6fQCD5zMwGScSU5NeWLJjR54QlXR9rFiYMntjjJkC6v9ClyUQy5YrbbrPDsF6w6+RvLi
+	4kEmctEyRtI31iO9Vbz79GtpwIC1wEKIJhopV8oOeQ0rNjbDbLIB5zDrFcf/U5O2VkxxfBPRnBh
+	S3aOKGJScLRAiHfUi9d+VhyEGlyl63sEuOMlX7SNSZofsJ0Qyw9vFf79iHn1XN8syZ3fhhCM9VL
+	38CQWFDfMfBuSSibrI9/oVcOv75+mO6cTVZixm63PrDH0Hzu1U+smi87DinTKGUqREMMG/5Nyqt
+	u/UCXbA87m7Ij/x58NUyXEeQ==
+X-Google-Smtp-Source: AGHT+IH+ZvCrkl3kFqXJlHEtVfU0bYPG0c0dzdNLXfeCYjxXFUTZZPthcByghfwOu6Wk5tCc8cKAKg==
+X-Received: by 2002:a05:690e:12cb:b0:63f:a324:bbf3 with SMTP id 956f58d0204a3-642f79d694dmr1177865d50.42.1763609835427;
+        Wed, 19 Nov 2025 19:37:15 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:52::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-642f718bbbesm456461d50.21.2025.11.19.19.37.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 19:37:14 -0800 (PST)
+        Wed, 19 Nov 2025 19:37:15 -0800 (PST)
 From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Wed, 19 Nov 2025 19:37:11 -0800
-Subject: [PATCH net-next v7 4/5] net: devmem: document
- NETDEV_A_DMABUF_AUTORELEASE netlink attribute
+Date: Wed, 19 Nov 2025 19:37:12 -0800
+Subject: [PATCH net-next v7 5/5] selftests: drv-net: devmem: add
+ autorelease tests
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +85,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-4-1abc8467354c@meta.com>
+Message-Id: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-5-1abc8467354c@meta.com>
 References: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-0-1abc8467354c@meta.com>
 In-Reply-To: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-0-1abc8467354c@meta.com>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -105,107 +105,153 @@ X-Mailer: b4 0.14.3
 
 From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-Update devmem.rst documentation to describe the autorelease netlink
-attribute used during RX dmabuf binding.
+Add tests cases that check the autorelease modes (on and off).  The new
+tests are the same as the old ones, but just pass a flag to ncdevmem to
+select the autorelease mode.
 
-The autorelease attribute is specified at bind-time via the netlink API
-(NETDEV_CMD_BIND_RX) and controls what happens to outstanding tokens
-when the socket closes.
-
-Document the two token release modes (automatic vs manual), how to
-configure the binding for autorelease, the perf benefits, new caveats
-and restrictions, and the way the mode is enforced system-wide.
+Only for RX tests is autorelease checked, as the autorelease ncdevmem
+flag is unused in the TX case and doesn't apply to TX bind operations.
 
 Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 ---
-Changes in v7:
-- Document netlink instead of sockopt
-- Mention system-wide locked to one mode
----
- Documentation/networking/devmem.rst | 70 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 70 insertions(+)
+Note: I tested successfully with kperf, but I'm troubleshooting
+some mlx5 issues with ncdevmem so this patch, though simple, is not
+fully validated. Will respond to this thread when solve the issue.
 
-diff --git a/Documentation/networking/devmem.rst b/Documentation/networking/devmem.rst
-index a6cd7236bfbd..67c63bc5a7ae 100644
---- a/Documentation/networking/devmem.rst
-+++ b/Documentation/networking/devmem.rst
-@@ -235,6 +235,76 @@ can be less than the tokens provided by the user in case of:
- (a) an internal kernel leak bug.
- (b) the user passed more than 1024 frags.
+Changes in v7:
+- use autorelease netlink
+- remove sockopt tests
+---
+ tools/testing/selftests/drivers/net/hw/devmem.py  | 22 ++++++++++++++++++++--
+ tools/testing/selftests/drivers/net/hw/ncdevmem.c | 19 +++++++++++++------
+ 2 files changed, 33 insertions(+), 8 deletions(-)
+
+diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
+index 45c2d49d55b6..dddb9d77cb28 100755
+--- a/tools/testing/selftests/drivers/net/hw/devmem.py
++++ b/tools/testing/selftests/drivers/net/hw/devmem.py
+@@ -25,7 +25,23 @@ def check_rx(cfg) -> None:
  
+     port = rand_port()
+     socat = f"socat -u - TCP{cfg.addr_ipver}:{cfg.baddr}:{port},bind={cfg.remote_baddr}:{port}"
+-    listen_cmd = f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.addr} -p {port} -c {cfg.remote_addr} -v 7"
++    listen_cmd = f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.addr} -p {port} -c {cfg.remote_addr} -v 7 -a 0"
 +
-+Autorelease Control
-+~~~~~~~~~~~~~~~~~~~
++    with bkg(listen_cmd, exit_wait=True) as ncdevmem:
++        wait_port_listen(port)
++        cmd(f"yes $(echo -e \x01\x02\x03\x04\x05\x06) | \
++            head -c 1K | {socat}", host=cfg.remote, shell=True)
 +
-+The autorelease mode controls what happens to outstanding tokens (tokens not
-+released via SO_DEVMEM_DONTNEED) when the socket closes. Autorelease is
-+configured per-binding at binding creation time via the netlink API::
-+
-+	struct netdev_bind_rx_req *req;
-+	struct netdev_bind_rx_rsp *rsp;
-+	struct ynl_sock *ys;
-+	struct ynl_error yerr;
-+
-+	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
-+
-+	req = netdev_bind_rx_req_alloc();
-+	netdev_bind_rx_req_set_ifindex(req, ifindex);
-+	netdev_bind_rx_req_set_fd(req, dmabuf_fd);
-+	netdev_bind_rx_req_set_autorelease(req, 0); /* 0 = manual, 1 = auto */
-+	__netdev_bind_rx_req_set_queues(req, queues, n_queues);
-+
-+	rsp = netdev_bind_rx(ys, req);
-+
-+	dmabuf_id = rsp->id;
-+
-+When autorelease is disabled (0):
-+
-+- Outstanding tokens are NOT released when the socket closes
-+- Outstanding tokens are only released when the dmabuf is unbound
-+- Provides better performance by eliminating xarray overhead (~13% CPU reduction)
-+- Kernel tracks tokens via atomic reference counters in net_iov structures
-+
-+When autorelease is enabled (1):
-+
-+- Outstanding tokens are automatically released when the socket closes
-+- Backwards compatible behavior
-+- Kernel tracks tokens in an xarray per socket
-+
-+The default is autorelease disabled.
-+
-+Important: In both modes, applications should call SO_DEVMEM_DONTNEED to
-+return tokens as soon as they are done processing. The autorelease setting only
-+affects what happens to tokens that are still outstanding when close() is called.
-+
-+The mode is enforced system-wide. Once a binding is created with a specific
-+autorelease mode, all subsequent bindings system-wide must use the same mode.
++    ksft_eq(ncdevmem.ret, 0)
 +
 +
-+Performance Considerations
-+~~~~~~~~~~~~~~~~~~~~~~~~~~
++@ksft_disruptive
++def check_rx_autorelease(cfg) -> None:
++    require_devmem(cfg)
 +
-+Disabling autorelease provides approximately ~13% CPU utilization improvement
-+in RX workloads. That said, applications must ensure all tokens are released
-+via SO_DEVMEM_DONTNEED before closing the socket, otherwise the backing pages
-+will remain pinned until the dmabuf is unbound.
-+
-+
-+Caveats
-+~~~~~~~
-+
-+- Once a system-wide autorelease mode is selected (via the first binding),
-+  all subsequent bindings must use the same mode. Attempts to create bindings
-+  with a different mode will be rejected with -EINVAL.
-+
-+- Applications using manual release mode (autorelease=0) must ensure all tokens
-+  are returned via SO_DEVMEM_DONTNEED before socket close to avoid resource
-+  leaks during the lifetime of the dmabuf binding. Tokens not released before
-+  close() will only be freed when the dmabuf is unbound.
-+
-+
- TX Interface
- ============
++    port = rand_port()
++    socat = f"socat -u - TCP{cfg.addr_ipver}:{cfg.baddr}:{port},bind={cfg.remote_baddr}:{port}"
++    listen_cmd = f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.addr} -p {port} -c {cfg.remote_addr} -v 7 -a 1"
  
+     with bkg(listen_cmd, exit_wait=True) as ncdevmem:
+         wait_port_listen(port)
+@@ -68,7 +84,9 @@ def main() -> None:
+         cfg.bin_local = path.abspath(path.dirname(__file__) + "/ncdevmem")
+         cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
+ 
+-        ksft_run([check_rx, check_tx, check_tx_chunks],
++        ksft_run([check_rx, check_rx_autorelease,
++                  check_tx, check_tx_autorelease,
++                  check_tx_chunks, check_tx_chunks_autorelease],
+                  args=(cfg, ))
+     ksft_exit()
+ 
+diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+index 3288ed04ce08..406f1771d9ec 100644
+--- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
++++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+@@ -92,6 +92,7 @@ static char *port;
+ static size_t do_validation;
+ static int start_queue = -1;
+ static int num_queues = -1;
++static int devmem_autorelease;
+ static char *ifname;
+ static unsigned int ifindex;
+ static unsigned int dmabuf_id;
+@@ -679,7 +680,8 @@ static int configure_flow_steering(struct sockaddr_in6 *server_sin)
+ 
+ static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
+ 			 struct netdev_queue_id *queues,
+-			 unsigned int n_queue_index, struct ynl_sock **ys)
++			 unsigned int n_queue_index, struct ynl_sock **ys,
++			 int autorelease)
+ {
+ 	struct netdev_bind_rx_req *req = NULL;
+ 	struct netdev_bind_rx_rsp *rsp = NULL;
+@@ -695,6 +697,7 @@ static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
+ 	req = netdev_bind_rx_req_alloc();
+ 	netdev_bind_rx_req_set_ifindex(req, ifindex);
+ 	netdev_bind_rx_req_set_fd(req, dmabuf_fd);
++	netdev_bind_rx_req_set_autorelease(req, autorelease);
+ 	__netdev_bind_rx_req_set_queues(req, queues, n_queue_index);
+ 
+ 	rsp = netdev_bind_rx(*ys, req);
+@@ -872,7 +875,8 @@ static int do_server(struct memory_buffer *mem)
+ 		goto err_reset_rss;
+ 	}
+ 
+-	if (bind_rx_queue(ifindex, mem->fd, create_queues(), num_queues, &ys)) {
++	if (bind_rx_queue(ifindex, mem->fd, create_queues(), num_queues, &ys,
++			  devmem_autorelease)) {
+ 		pr_err("Failed to bind");
+ 		goto err_reset_flow_steering;
+ 	}
+@@ -1092,7 +1096,7 @@ int run_devmem_tests(void)
+ 		goto err_reset_headersplit;
+ 	}
+ 
+-	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys)) {
++	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys, 0)) {
+ 		pr_err("Binding empty queues array should have failed");
+ 		goto err_unbind;
+ 	}
+@@ -1108,7 +1112,7 @@ int run_devmem_tests(void)
+ 		goto err_reset_headersplit;
+ 	}
+ 
+-	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys)) {
++	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys, 0)) {
+ 		pr_err("Configure dmabuf with header split off should have failed");
+ 		goto err_unbind;
+ 	}
+@@ -1124,7 +1128,7 @@ int run_devmem_tests(void)
+ 		goto err_reset_headersplit;
+ 	}
+ 
+-	if (bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys)) {
++	if (bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys, 0)) {
+ 		pr_err("Failed to bind");
+ 		goto err_reset_headersplit;
+ 	}
+@@ -1397,7 +1401,7 @@ int main(int argc, char *argv[])
+ 	int is_server = 0, opt;
+ 	int ret, err = 1;
+ 
+-	while ((opt = getopt(argc, argv, "ls:c:p:v:q:t:f:z:")) != -1) {
++	while ((opt = getopt(argc, argv, "ls:c:p:v:q:t:f:z:a:")) != -1) {
+ 		switch (opt) {
+ 		case 'l':
+ 			is_server = 1;
+@@ -1426,6 +1430,9 @@ int main(int argc, char *argv[])
+ 		case 'z':
+ 			max_chunk = atoi(optarg);
+ 			break;
++		case 'a':
++			devmem_autorelease = atoi(optarg);
++			break;
+ 		case '?':
+ 			fprintf(stderr, "unknown option: %c\n", optopt);
+ 			break;
 
 -- 
 2.47.3
