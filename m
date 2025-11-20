@@ -1,143 +1,211 @@
-Return-Path: <netdev+bounces-240570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE399C764E2
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 22:03:14 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA604C764E8
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 22:03:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CA7BE345A49
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 21:01:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4540B4E49A4
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 21:02:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41D333F38A;
-	Thu, 20 Nov 2025 20:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313CF2F5A13;
+	Thu, 20 Nov 2025 21:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netstatz.com header.i=@netstatz.com header.b="qidKq8Rh"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="H2CDCR95"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6552FE07F
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 20:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7F921D58B;
+	Thu, 20 Nov 2025 21:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763672371; cv=none; b=a1f0LGXsxbCR0+j9Etc215g1GrkHkzDgUnDWCit0P4W9nfxOaDKNfFitFTqtF/v9+Hg6o0ivu9LE+H1MVbcQuD6XDnL8sjau55fym9hXC2jlDuI1jiX2nCvj898SSGv/ycpJ5tbMpRYMQBL6xHMhwXWbRh9EFIjn31ukobqmuf8=
+	t=1763672524; cv=none; b=eAO4GUYLUpXNZ2zl2A08Ev/E8edrGMKqEWJ4e8CIaRjoM3qeAObs1r/wbfdhYbMQ2y7zvGWN3eUMxbxw/G/9QfuPT+8Z0SqGcSGApZ2uXPkEndiVbEdsNdRTrn5RsvykGyZcp4nwvC4rZQFpNN9j5kDOe03J+9PskYqVfkSd5jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763672371; c=relaxed/simple;
-	bh=YkE40NrQmfi63kJXdNVKvBaWnocpyaH15TRbWMGI6AI=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=WXi6lEkaBX6Un0x8s9C/pflmO3QkPfkTzmTgrhKINkr3245MJYF9lzyaoISjFtMEwSt2EaN5hLHgWGn7ZKyQkXDUj04TVqKkq391xZIEWdrw5CHw8l2bLUP8rUouAsBxgz6vWcla3AIMa8Ceq3EjWscj+9ON63x8yax7xZLbhMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netstatz.com; spf=pass smtp.mailfrom=netstatz.com; dkim=pass (2048-bit key) header.d=netstatz.com header.i=@netstatz.com header.b=qidKq8Rh; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netstatz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netstatz.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-37b99da107cso11599151fa.1
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:59:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=netstatz.com; s=google; t=1763672367; x=1764277167; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Hq1DcJKchbBZtQFYqlFaOkUYwbHumvFG+4vA65lH/uk=;
-        b=qidKq8RhJLoTBakiBi4qDHES8UJXwOvBxyPqOAqNw3dJqKtrfk/6CnC5IS5EMqk2+q
-         H75wJ8IEoAcYvyMGg98yVLHGF5Ek38rFtzRRLlqguMcPoU4bLcpVbnSJcE4hBsOKGFMb
-         +NjPz6KkjQOIMIDrQO2DKXFxPvrrS3simkjXMgjHS6PjZmugaLVpjdZkEz+fWybPyy8j
-         rYzREK1zKHyWD5zEIQpTYzIDkhq0CC2IewFZXz/srH259R2pd8gvrPmPcMM56ubQQLgB
-         hMW+sFwRUohiMreqoz8vQEWQ1pQKNnMEnvt4YirECH69v4qxVpumtNiMXLs4xiLykH1e
-         /2cQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763672367; x=1764277167;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hq1DcJKchbBZtQFYqlFaOkUYwbHumvFG+4vA65lH/uk=;
-        b=arGNw+qm6ulWYCtSSnxIoxUfB/G6ys1EpS3tpGVq0nw6E+ztc5Urdk+1PJ6AOh/KYW
-         IWQq4qYOCBnBy6PU9BPCXgDOWgz/+gsgbP7/PXzabvHw381yWisN6bAM4PwU9yCvDCGe
-         2PmBNi/Fk4izFHEVZ1SPEQQomhHnJoZgAS0olqhVgI6m2bje1mvq2GvfQfry4SYmhd2w
-         IgR0ta2J47Dio44ZX/cuYPKlSLT3Yjo3ebeL4pudpU1/Td1uvF2qk9f0LRYbeqcfcjv8
-         KVooMo/xNjT7nkbi/WZuzpI5JZeyzDysrAoSi5bInQfRZSwiNEwQHLwxI846UuAGCDkH
-         I5pQ==
-X-Gm-Message-State: AOJu0YyoZ1vECEPPdfKpYLKlOdhyk2mm6YLWiINt5XIZB4EqlwN8FD3d
-	sU7Eg6BiiPnkfjwQ/viySSSFVYgiyAMmIQ2zoqLTvKnU2EjofZvAe9eFZJ4Bg1eL6gBr2//HgA4
-	T3gyY/sKLGzLq+28CyGcbCvJdLT2HkBTWAbORDKfSyQ==
-X-Gm-Gg: ASbGncvkbYnylEBZZH5CtM35ZCmXG5qr0f8uktEbCW7RCbBBDccFUfUA/HWUvRmFw5g
-	Q4JSR0ehbYJgIA5yp5DH3mfS7IiXP+bb+7nPbb3wMW1LaiumbgGphTalkieeVALm1K0ldb2zL+l
-	6l01V4P7GW8j3xfDW6Z9LOuLVCRShzFv3y91mOl6R1ev/xx0SzSK6xpkCWz34n/P6pkidSZCS1I
-	OQ9prE7wMTX91bUyIv2z6AFdGiOHTbaZ+AYBHsqFRyfp5cKMu2xcdATtwo1gt9kysfaf4iSFw==
-X-Google-Smtp-Source: AGHT+IGNTlT8GDqO74PAWRTP2dgCzNXPkGP9m5Kt+gXbl5z4XRQU9ws0C5K29ccAiDZc+7Q+R9O67CD3BO5hC0p/5zw=
-X-Received: by 2002:a05:651c:31cb:b0:373:a93d:5b42 with SMTP id
- 38308e7fff4ca-37cc679738bmr14192701fa.27.1763672367103; Thu, 20 Nov 2025
- 12:59:27 -0800 (PST)
+	s=arc-20240116; t=1763672524; c=relaxed/simple;
+	bh=8nCRgP3IDyFbatx5ZBBjWe99LzXT0QWPbh9rG8JZF40=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tW8C3bpZ2sKAFED9BwFjeWF0+ey4X8eGAprJOSt+T54/3GWwe36+lXk2IbXsQmDTcuRJA2ESOVCz1OQj6O2Z+kQ/cFDP/E8HQ2A457H6nps2poBL4MubORZK/zKuJwc92kVyDxDDDZ5gtWtwYCUGSA+QYWVdHVu27tY6cm+kWBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=H2CDCR95; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 8AF7160251;
+	Thu, 20 Nov 2025 22:01:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1763672516;
+	bh=waSi7BZBCixzxalPdVPvkoFvDFq7L+eJerfbL4uTgGs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=H2CDCR95IVbDAY4ZSoAwtjFD/ekO1HdXqka5BVMu1bvRdBmC57Zpnrff4bRR45u38
+	 BLzt/8oN8faRqO2LWpZfqZ0ZVQO9enlPJ2dmgfZtmB3vN4vtKT9VvoLUju8CQoj87V
+	 RLWb2bDuxtXR65wMGbsKQF96jn+JudEDY+Xf0n23sz/tse8LH92fzTHUDSRDLbNczv
+	 6/LacFTUIXWcZtKSIHRI3V4Fnp7zFJ8f08TA0EW5q0zQxXTi4H1qOnw//0SvWECRnc
+	 JPQSTxpwCtPI+T89ADNb5BrpXVLhJXQhZxVb5tLK3amVp0jBA18C0LBR8ki/RK8ghj
+	 0gCN2tOGmArRg==
+Date: Thu, 20 Nov 2025 22:01:54 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Phil Sutter <phil@nwl.cc>,
+	Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>,
+	netdev@vger.kernel.org, Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kernel@vger.kernel.org
+Subject: Re: Soft lock-ups caused by iptables
+Message-ID: <aR-BwjLjeEyq3Hfd@calendula>
+References: <20251118221735.GA5477@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <aR3ZFSOawH-y_A3q@orbyte.nwl.cc>
+ <aR3pNvwbvqj_mDu4@strlen.de>
+ <aR4Ildw_PYHPAkPo@orbyte.nwl.cc>
+ <aR5ObjGO4SaD3GkX@calendula>
+ <aR7grVC-kLg76kvE@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Ian MacDonald <ian@netstatz.com>
-Date: Thu, 20 Nov 2025 15:59:15 -0500
-X-Gm-Features: AWmQ_blxoprMob1y6pjCwbA7YyWG1SJd3AAeSFjXF_kSv3lK86ZnzRg81aiOcfc
-Message-ID: <CAFJzfF9N4Hak23sc-zh0jMobbkjK7rg4odhic1DQ1cC+=MoQoA@mail.gmail.com>
-Subject: net: thunderbolt: missing ndo_set_mac_address breaks 802.3ad bonding
-To: Mika Westerberg <westeri@kernel.org>, Yehezkel Bernat <YehezkelShB@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	1121032@bugs.debian.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aR7grVC-kLg76kvE@strlen.de>
 
-Hi,
+On Thu, Nov 20, 2025 at 10:34:46AM +0100, Florian Westphal wrote:
+> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> > > > Yes, but you also need to annotate the type of the last base chain origin,
+> > > > else you might skip validation of 'chain foo' because its depth value says its
+> > > > fine but new caller is coming from filter, not nat, and chain foo had
+> > > > masquerade expression.
+> > 
+> > You could also have chains being called from different levels.
+> 
+> But thats not an issue.  If you see a jump from c1 to c2, and c2
+> has been validated for a level of 5, then you need to revalidate
+> only if c1->depth >= 5.
 
-Using two Thunderbolt network interfaces as slaves in a bonding device
-in mode 802.3ad (LACP) fails because the bonding driver cannot set the
-MAC address on the thunderbolt_net interfaces. The same setup works in
-mode active-backup.
+OK, you could also have a jump to chain from filter and nat basechain
+chains, does this optimization below works in that case too?
 
-Hardware: AMD Strix Halo (Framework connect to Sixunited AXB35 USB4 ports)
-Kernel:  6.12.57 (also reproduced on 6.16.12 and 6.18~rc6)
+Validation is two-folded:
 
-Steps to reproduce:
-1. Create a bond with mode 802.3ad and add thunderbolt0 and thunderbolt1
-   as slaves.
-2. Bring up the bond and slaves.
-3. Observe that bonding fails to set the slave MAC addresses and logs:
+- Search for cycles.
+- Ensure expression can be called from basechains that can reach it.
 
-   [   25.922317] bond0: (slave thunderbolt0): The slave device
-   specified does not support setting the MAC address
-   [   25.922328] bond0: (slave thunderbolt0): Error -95 calling
-   set_mac_address
-   [   25.980235] bond0: (slave thunderbolt1): The slave device specified
-   does not support setting the MAC address
-   [   25.980242] bond0: (slave thunderbolt1): Error -95 calling
-   set_mac_address
-
-Expected result:
-- bond0 and both Thunderbolt interfaces share bond0's MAC address.
-- 802.3ad operates normally and the link comes up.
-
-Actual result:
-- dev_set_mac_address(thunderboltX, bond0_mac) fails with -EOPNOTSUPP.
-- bonding reports that the slave does not support setting the MAC address
-  and cannot use the interfaces in 802.3ad mode.
-
-From reading drivers/net/thunderbolt/main.c:
-
-- thunderbolt_net generates a locally administered MAC from the
-  Thunderbolt UUID and sets it with eth_hw_addr_set().
-- The net_device_ops for thunderbolt_net currently define:
-    .ndo_open
-    .ndo_stop
-    .ndo_start_xmit
-    .ndo_get_stats64
-  but do not implement .ndo_set_mac_address.
-
-As a result, dev_set_mac_address() returns -EOPNOTSUPP and bonding treats
-the device as not supporting MAC address changes.
-
-A bit of research suggests it should be possible to implement
-ndo_set_mac_address using
-eth_mac_addr(), and, if appropriate, mark the device with
-IFF_LIVE_ADDR_CHANGE so MAC changes while the interface is up are
-allowed.   I have a feeling there is a lot more to it;
-
-There is a corresponding downstream Debian bug with additional
-hardware details https://bugs.debian.org/1121032
-
-Thanks,
-Ian
+> Do you see any issue with this? (it still lacks annotation for
+> the calling basechains type, so this cannot be applied as-is):
+> 
+> netfilter: nf_tables: avoid chain re-validation if possible
+> 
+> Consider:
+> 
+>       input -> j2 -> j3
+>       input -> j2 -> j3
+>       input -> j1 -> j2 -> j3
+> 
+> Then the second rule does not need to revalidate j2, and, by extension j3.
+> 
+> We need to validate it only for rule 3.
+> 
+> This is needed because chain loop detection also ensures we do not
+> exceed the jump stack: Just because we know that j2 is cycle free, its
+> last jump might now exceed the allowed stack.  We also need to update
+> the new largest call depth for all the reachable nodes.
+> 
+> diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
+> --- a/include/net/netfilter/nf_tables.h
+> +++ b/include/net/netfilter/nf_tables.h
+> @@ -1109,6 +1109,7 @@ struct nft_rule_blob {
+>   *	@udlen: user data length
+>   *	@udata: user data in the chain
+>   *	@blob_next: rule blob pointer to the next in the chain
+> + *	@depth: chain was validated for call level <= depth
+>   */
+>  struct nft_chain {
+>  	struct nft_rule_blob		__rcu *blob_gen_0;
+> @@ -1128,9 +1129,10 @@ struct nft_chain {
+>  
+>  	/* Only used during control plane commit phase: */
+>  	struct nft_rule_blob		*blob_next;
+> +	u8				depth;
+>  };
+>  
+> -int nft_chain_validate(const struct nft_ctx *ctx, const struct nft_chain *chain);
+> +int nft_chain_validate(const struct nft_ctx *ctx, struct nft_chain *chain);
+>  int nft_setelem_validate(const struct nft_ctx *ctx, struct nft_set *set,
+>  			 const struct nft_set_iter *iter,
+>  			 struct nft_elem_priv *elem_priv);
+> diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+> --- a/net/netfilter/nf_tables_api.c
+> +++ b/net/netfilter/nf_tables_api.c
+> @@ -4088,15 +4088,26 @@ static void nf_tables_rule_release(const struct nft_ctx *ctx, struct nft_rule *r
+>   * and set lookups until either the jump limit is hit or all reachable
+>   * chains have been validated.
+>   */
+> -int nft_chain_validate(const struct nft_ctx *ctx, const struct nft_chain *chain)
+> +int nft_chain_validate(const struct nft_ctx *ctx, struct nft_chain *chain)
+>  {
+>  	struct nft_expr *expr, *last;
+>  	struct nft_rule *rule;
+>  	int err;
+>  
+> +	BUILD_BUG_ON(NFT_JUMP_STACK_SIZE > 255);
+>  	if (ctx->level == NFT_JUMP_STACK_SIZE)
+>  		return -EMLINK;
+>  
+> +	/* jumps to base chains are not allowed, this is already
+> +	 * validated by nft_verdict_init().
+> +	 *
+> +	 * Chain must be re-validated if we are entering for first
+> +	 * time or if the current jumpstack usage is higher than on
+> +	 * previous check.
+> +	 */
+> +	if (ctx->level && chain->depth >= ctx->level)
+> +		return 0;
+> +
+>  	list_for_each_entry(rule, &chain->rules, list) {
+>  		if (fatal_signal_pending(current))
+>  			return -EINTR;
+> @@ -4117,6 +4128,10 @@ int nft_chain_validate(const struct nft_ctx *ctx, const struct nft_chain *chain)
+>  		}
+>  	}
+>  
+> +	/* Chain needs no re-validation if called again
+> +	 * from a path that doesn't exceed level.
+> +	 */
+> +	chain->depth = ctx->level;
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(nft_chain_validate);
+> @@ -4128,7 +4143,7 @@ static int nft_table_validate(struct net *net, const struct nft_table *table)
+>  		.net	= net,
+>  		.family	= table->family,
+>  	};
+> -	int err;
+> +	int err = 0;
+>  
+>  	list_for_each_entry(chain, &table->chains, list) {
+>  		if (!nft_is_base_chain(chain))
+> @@ -4137,12 +4152,16 @@ static int nft_table_validate(struct net *net, const struct nft_table *table)
+>  		ctx.chain = chain;
+>  		err = nft_chain_validate(&ctx, chain);
+>  		if (err < 0)
+> -			return err;
+> +			goto err;
+>  
+>  		cond_resched();
+>  	}
+>  
+> -	return 0;
+> +err:
+> +	list_for_each_entry(chain, &table->chains, list)
+> +		chain->depth = 0;
+> +
+> +	return err;
+>  }
+>  
+>  int nft_setelem_validate(const struct nft_ctx *ctx, struct nft_set *set,
+> 
 
