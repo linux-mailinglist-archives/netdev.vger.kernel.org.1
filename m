@@ -1,183 +1,156 @@
-Return-Path: <netdev+bounces-240359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44E6EC73B70
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:27:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6595DC73BCC
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:31:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 55FBB2AA0B
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:27:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 392054EB41F
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107FE32D0F5;
-	Thu, 20 Nov 2025 11:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95E92FCC1D;
+	Thu, 20 Nov 2025 11:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="V1Qg33MX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QzMtpowC";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aUTtYlrS"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4430733120B;
-	Thu, 20 Nov 2025 11:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6E9137923
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 11:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763637937; cv=none; b=LQpZokDjKgU17u2nTro49iKwn9U24d1vKKMa+YDoIT5jP9dhy1pznTkgA0CIBNVDZEX2tmXcUOKAJNk1aIjThmN1Ph7cS8x1xJlXeEPC3rSat7uFdJKcBQI7fWfmb11GG/inqyPKeWMtI7Hs7FUgY+NU4TQyHIk/wFfEIM386Xc=
+	t=1763638016; cv=none; b=SMVEe6X2NS1Cq9EbC4lhaF56u5rDHgN0P50xXQ1glegKah1V9NrbsgUlS1a+j6wOefR01/M6EILIcoRQ+QtKCCG4z2TZXEkCjsFIzYhSRpX8aO3SGLoI8o4LtjZffCh3bw7ZXLDVluJzSWDZRCjZpI5IVQvRywVHCtjFzLQStKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763637937; c=relaxed/simple;
-	bh=UdYLZQ434/sW+ppwfVUxxPDfBNTZClC/i0GYLfj1TzM=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=BI6WXFLzdaKOHZnd1iNbiLRGaG9FbhIrXK5jmEcxocnG0UQp58qCnJOS19xUZNlZ8K+STUw1l2lZn/Zx3ZI0kOmUNzB0KOxhcRgXImuMY13Cnh2j0zc/j1yWBlPysxrdLspXXjB+dvJAt0q+8EIQuhqZn4HpSHr7MhkITVZtvJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=V1Qg33MX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CUQy2hOqXXIR84E1BC+cMB3jx+mhZuD2NvtfYPa21vM=; b=V1Qg33MXF+j1p6vBTjqK/gquwP
-	5DSdqAkUbrrWdSH83Z2akdEDXH203/eVsorJiziJCnnxmJshfTViBrvxjDQhoBtyCnCcPfq5Sl9Ei
-	WmiGUIi8k/gtbTmb8LZzVsmO9nn5NU3OjwwIFLTnDXm/OvdHsgHYZNqFLgxl8qhgl6C9bk95TTst6
-	LwfL750B6cudq/zCqmZ1smaSmcYJ+6hL1kP8j96NKYx3FL+7Pa17tBiNZtnCApX7igIhiGEw+f1GY
-	h+budSTOQkbKoLHWv4tNBwEex9yzH7XyYOLP9XDzeATkFgoYsywQV0uI5z/V/eU87AAFoXa922qid
-	ien1Pdig==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:46748 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vM2n2-0000000068e-0Ro8;
-	Thu, 20 Nov 2025 11:25:28 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vM2n1-0000000FRTu-0js9;
-	Thu, 20 Nov 2025 11:25:27 +0000
-In-Reply-To: <aR76i0HjXitfl7xk@shell.armlinux.org.uk>
-References: <aR76i0HjXitfl7xk@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH net-next v2 3/3] net: stmmac: qcom-ethqos: use
- read_poll_timeout_atomic()
+	s=arc-20240116; t=1763638016; c=relaxed/simple;
+	bh=YJqucc6y3evWF4wSv56D5Hg6FOQn5YFJUMPL4VlHK4c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kv2Z9pO+NuyB4uftI94cXpsu2W7vwPmKF14NR2aIaWuMvxgxvx42IzpVh2sVuobvD+JbnTl/LbI9KlPQutaH+2QThpsQ1aX0OCkuekJ0uYikQBfr7axjH6bzH/IM3m7Rw7JOfcjhBSjZyfttYtNbTgbr6b/W7v+WixiAkirTFZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QzMtpowC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aUTtYlrS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763638014;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sqS+S451NRmIYeRi6IUton5nKAKTYp9P1BRktE8Qx5E=;
+	b=QzMtpowC2WDUvJF0CYyHepezKPapYWfVcKk1JHa/Rg/a6AhpJ8Z/QXrFNHGOmw0gl+Cfak
+	939IWwzJMh27O5mUA7XrzN9/d5yMgrI9RdPb73TPY6EFCsyZrE1E+Alt5Fdwxls95xl4BK
+	ZQLYFv5Go/o8nJGgb7YDOijuJdO6xAE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-627-tiH1v2hWNrWv6Fh98r_9GA-1; Thu, 20 Nov 2025 06:26:52 -0500
+X-MC-Unique: tiH1v2hWNrWv6Fh98r_9GA-1
+X-Mimecast-MFC-AGG-ID: tiH1v2hWNrWv6Fh98r_9GA_1763638012
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4779393221aso4506395e9.2
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 03:26:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763638011; x=1764242811; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sqS+S451NRmIYeRi6IUton5nKAKTYp9P1BRktE8Qx5E=;
+        b=aUTtYlrSM+SSWKPDdL8phWLZ8WsAnPeIaSSnIOvATgS1R+Q2is1K+lIvdk+CaCk8Mn
+         xAwWsTXk9qZI1fP/qrXvmGybknlPpQZVNvCO6j7NRHJL4OFkm1/L0ct1f/9oBn81WpXC
+         2s7NZ1i2mjI4CU4UDJwQJWzjvwQ9PhyP4h4pNWAd7OowLtFnEw/qWJphl61jmxR6B1Vd
+         ubxPgcigmHuZjzLrPYifONHXDMzvoftwwML5tj1eCzgPE9ruwJFK3aN8sO/K4lgsa4dY
+         ZystGxk16GSOOhLIDAQtqthlODDNXavifUMBYiQduO5N0y+G4rkWOVvP7EHFzmlEa47T
+         0e8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763638011; x=1764242811;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sqS+S451NRmIYeRi6IUton5nKAKTYp9P1BRktE8Qx5E=;
+        b=wWue//Z3XTjN3owo9mxstLc4wqRSa3RhinLMqhj+dJsV2fVzH6jjjzWcjWXhEqvBDp
+         8WyX7B4QqWX4bUGsLqcNO5e1SwDfwNlzd/X/QFGIgTgcSCK/PAFjue0EvI4G3ydZUK2M
+         Y9FOg8/6gPX4grTYg4TnIcC6dvGoO3eAaWBgN8WfSsSNU5bndamITQVt2/fgXFKtTLwP
+         AMfwtDpYrKViw54WiEcVnmcGTUmCJUYHUA0mqM67jI8+6znDrezN9N2RmTSfoS9hchd+
+         Ea8ZeTqDUbqUSs95OUJK4qf2JmTla+gF6kfbFC1sjJ9gbeSNGnVQS6fe37kEUy03Gy1h
+         12lg==
+X-Forwarded-Encrypted: i=1; AJvYcCUnyuy/ix3IuF3VnxfgAojJ7UrD/JT/mCcXeJIVYMB0t1w6HniG+NbL9u0WV9VyqEVBYgGG0Ao=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdX/N8IvUnc7Sqtp6vGThZ5H6pMfA9fny3QXaw6iCFmiBtOgBf
+	ikbSQCQc+8FCFG3CAVMv2Vc7S33UdC+E/crUTrSCUbtPy/L8hAkkHGmn2NW1HusIywxayaf/TJ+
+	cEUr/ml85TEycwJ5TJ1fAuHqTryx7IoXsPII2SHTxKYYlwLWCWwrHc0xOWQ==
+X-Gm-Gg: ASbGnctPnldF63m3oVPKLsp+4kBYvhKeQnViFBw8Bl2KbXntB8kxSDK6m1X7NRh2I7c
+	owI1qLRnW5BqBIEpG6+MesBomh/lf4DBkXc4VXB15Wjs2G7EY6vuQt/2VpQ1vdh1+kdQ+aeA0Y5
+	++FBAYeigWT8msD0cOkwd7SZfA0DlLmndxN99oA3rKVAy9bde3hJybNRagyAOmWKFasf1twOg/J
+	iyh4rVuy5LdrHRrdi8qTMUGZtOb/yUvwc7Qzx2VLXWZQAazrnGI+v/Uael7XJSesLMd/0PmH2eO
+	MnZ9c1MEXW6GKXhcLq4U85mCeW7bk3C2Vood5WZKF43h2oI3xJMR02h7NTokhdv9iV04eHtta1V
+	vFqeGBIF5bamu
+X-Received: by 2002:a05:600c:4f51:b0:471:9da:524c with SMTP id 5b1f17b1804b1-477babcf75emr19620885e9.12.1763638011508;
+        Thu, 20 Nov 2025 03:26:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFeKEOaazfM9KhQXI1DdCaf+McPmoAWzMH7ECavD7fZB8Di1CGCkdsdqX4WGC/qULZnN/Krbw==
+X-Received: by 2002:a05:600c:4f51:b0:471:9da:524c with SMTP id 5b1f17b1804b1-477babcf75emr19620605e9.12.1763638011115;
+        Thu, 20 Nov 2025 03:26:51 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.41])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a9dea7fcsm62835665e9.8.2025.11.20.03.26.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Nov 2025 03:26:50 -0800 (PST)
+Message-ID: <038697aa-a11c-45ce-a270-258403cc1457@redhat.com>
+Date: Thu, 20 Nov 2025 12:26:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vM2n1-0000000FRTu-0js9@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 20 Nov 2025 11:25:27 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH REPOST net v2] atm/fore200e: Fix possible data race in
+ fore200e_open()
+To: Gui-Dong Han <hanguidong02@gmail.com>, 3chas3@gmail.com,
+ horms@kernel.org, kuba@kernel.org
+Cc: linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, baijiaju1990@gmail.com, stable@vger.kernel.org
+References: <20251118033330.1844136-1-hanguidong02@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251118033330.1844136-1-hanguidong02@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Use read_poll_timeout_atomic() to poll the rgmii registers rather than
-open-coding the polling.
+On 11/18/25 4:33 AM, Gui-Dong Han wrote:
+> Protect access to fore200e->available_cell_rate with rate_mtx lock to
+> prevent potential data race.
+> 
+> In this case, since the update depends on a prior read, a data race
+> could lead to a wrong fore200e.available_cell_rate value.
+> 
+> The field fore200e.available_cell_rate is generally protected by the lock
+> fore200e.rate_mtx when accessed. In all other read and write cases, this
+> field is consistently protected by the lock, except for this case and
+> during initialization.
+> 
+> This potential bug was detected by our experimental static analysis tool,
+> which analyzes locking APIs and paired functions to identify data races
+> and atomicity violations.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Gui-Dong Han <hanguidong02@gmail.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> ---
+> v2:
+> * Added a description of the data race hazard in fore200e_open(), as
+> suggested by Jakub Kicinski and Simon Horman.
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 44 ++++++-------------
- 1 file changed, 14 insertions(+), 30 deletions(-)
+It looks like you missed Jakub's reply on v2:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 1f84bd821c4e..0826a7bd32ff 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -311,7 +311,6 @@ static const struct ethqos_emac_driver_data emac_v4_0_0_data = {
- static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
- {
- 	struct device *dev = &ethqos->pdev->dev;
--	int retry = 1000;
- 	u32 val;
- 
- 	/* Set CDR_EN */
-@@ -337,15 +336,10 @@ static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
- 	}
- 
- 	/* Wait for CK_OUT_EN clear */
--	do {
--		val = rgmii_readl(ethqos, SDCC_HC_REG_DLL_CONFIG);
--		val &= SDCC_DLL_CONFIG_CK_OUT_EN;
--		if (!val)
--			break;
--		mdelay(1);
--		retry--;
--	} while (retry > 0);
--	if (!retry)
-+	if (read_poll_timeout_atomic(rgmii_readl, val,
-+				     !(val & SDCC_DLL_CONFIG_CK_OUT_EN),
-+				     1000, 1000000, false,
-+				     ethqos, SDCC_HC_REG_DLL_CONFIG))
- 		dev_err(dev, "Clear CK_OUT_EN timedout\n");
- 
- 	/* Set CK_OUT_EN */
-@@ -353,16 +347,10 @@ static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
- 		      SDCC_HC_REG_DLL_CONFIG);
- 
- 	/* Wait for CK_OUT_EN set */
--	retry = 1000;
--	do {
--		val = rgmii_readl(ethqos, SDCC_HC_REG_DLL_CONFIG);
--		val &= SDCC_DLL_CONFIG_CK_OUT_EN;
--		if (val)
--			break;
--		mdelay(1);
--		retry--;
--	} while (retry > 0);
--	if (!retry)
-+	if (read_poll_timeout_atomic(rgmii_readl, val,
-+				     val & SDCC_DLL_CONFIG_CK_OUT_EN,
-+				     1000, 1000000, false,
-+				     ethqos, SDCC_HC_REG_DLL_CONFIG))
- 		dev_err(dev, "Set CK_OUT_EN timedout\n");
- 
- 	/* Set DDR_CAL_EN */
-@@ -531,8 +519,8 @@ static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos, int speed)
- static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos, int speed)
- {
- 	struct device *dev = &ethqos->pdev->dev;
--	volatile u32 dll_lock;
--	unsigned int i, retry = 1000;
-+	unsigned int i;
-+	u32 val;
- 
- 	/* Reset to POR values and enable clk */
- 	for (i = 0; i < ethqos->num_por; i++)
-@@ -582,14 +570,10 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos, int speed)
- 				      SDCC_USR_CTL);
- 
- 		/* wait for DLL LOCK */
--		do {
--			mdelay(1);
--			dll_lock = rgmii_readl(ethqos, SDC4_STATUS);
--			if (dll_lock & SDC4_STATUS_DLL_LOCK)
--				break;
--			retry--;
--		} while (retry > 0);
--		if (!retry)
-+		if (read_poll_timeout_atomic(rgmii_readl, val,
-+					     val & SDC4_STATUS_DLL_LOCK,
-+					     1000, 1000000, true,
-+					     ethqos, SDC4_STATUS))
- 			dev_err(dev, "Timeout while waiting for DLL lock\n");
- 	}
- 
--- 
-2.47.3
+https://lore.kernel.org/netdev/20250123071201.3d38d8f6@kernel.org/
+
+The above comment is still not sufficient: you should describe
+accurately how 2 (or more) CPUs could actually race causing the
+corruption, reporting the relevant call paths leading to the race.
+
+Thanks,
+
+Paolo
 
 
