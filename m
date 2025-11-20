@@ -1,99 +1,183 @@
-Return-Path: <netdev+bounces-240341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E9A0C73752
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:30:44 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F2A4C73827
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:44:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 21EF04E1D81
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 10:30:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 988BB354AB2
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 10:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C1F32C316;
-	Thu, 20 Nov 2025 10:30:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A797B307499;
+	Thu, 20 Nov 2025 10:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u8FH/qXN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Af2Z4mrj";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MDpUylQz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA8732BF52;
-	Thu, 20 Nov 2025 10:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F0D26E6F7
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 10:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763634641; cv=none; b=gJgizgXHQNmqM8re+oG2b48TYt5+3tK3lsCJulK9JG3k1M4ezrGspEJoH9a43hy2EEZr2q5GWOcOIS/EHM+9PqD5gcfpO0eoEpVZh8SWnYyteBPolXi6PcMAdfOSiP0KXNm7XWWGjhj4ltHB5sKEo4SwdkJ1k9D2jsQSqeR0et8=
+	t=1763635442; cv=none; b=sW/j6ef0JFC6SnOY77Od03f7MN7XcQWnRGjka2RJ44n6gyUBIqBCEutPSKAKoo+oVeYwQlWvgW9cfvkGndQ+RxWyEYtdar5GJ0nIZaup06zGmP8Ijtmb714ovvGloRlwnx5D4eUK3bE0vKJEFjBajwx2AG406mOqxH6Yl0AEUhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763634641; c=relaxed/simple;
-	bh=J+fGTIM35yM1pnJJE2Bn40ap6PS1L5bDXilEDqX2pZY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=imBLvCqYlnxNVjEIhejtSNgO3zJdd63eaMr5sEcjljVElqJlFU5PvQ9kBtMmC/Z5Ci/4XJsw6YB3yhc9Q3n0c7HxyzNbVs2C56+EnhSVsH1zF7nDmMSAZQY3aTHd1V80PFrY8em3Y54trKD8/yKlmB9ax7H9Pqomg9vQM58Uo4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u8FH/qXN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D82C9C4CEF1;
-	Thu, 20 Nov 2025 10:30:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763634640;
-	bh=J+fGTIM35yM1pnJJE2Bn40ap6PS1L5bDXilEDqX2pZY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=u8FH/qXN4RaQBDL3SD7Sx9njyJAkEW1gA4TAswKbQKeSibImAJG54KdF0+WKpp8RL
-	 f7vAvBakilALRfPQ29GH2j50dhlCB/A00um8Fynx+oUh7sNOQHMaVXZh7s87Fb+hMd
-	 8RoYHsEBMm7kuD+csWJaPNaeDop2JT4xuxlYQFipL42lXnLmmlFTzrwvRLokUoa9Ae
-	 oQVTFbcw7tJcGfTeGd1PmaWNSpdoJKBOt5wxaahzYp1X3+DL2kQskWhfvc3Slx1HH0
-	 4xNmnbDQ7EDXuOMJxfc3X/TWPex9xb/weSGUaMt6fU1IeovusfFRGIlL0aBxe2PrqD
-	 r3cePBUOyvuNw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7119339EFA6E;
-	Thu, 20 Nov 2025 10:30:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1763635442; c=relaxed/simple;
+	bh=0CiiO9j0xkb0mo5fLo8ag9H5ivXz95o7qymjM9S+1jo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dbWS+iQT7BgX9cmt+nrrL3C+1fqFNly3TDfzmWffp4RmFLgHZrvPPW9AgUhDW2vbIbKrvVm4uqzO8Kc+ZVTX8+qHkXNIp2MAGylEn3EpmToyG245jDdcI1YQmWQQ8EtKy2iMXVZCq14JyBLsAzdf5HObPge+kVIDk4WFlcdOy/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Af2Z4mrj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MDpUylQz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763635435;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8y1jPHiAwVo3dkS7PWUJ32CmlpzzI2xRMMetRTLKqec=;
+	b=Af2Z4mrjgLiecTLOJG7G+smTb6E70Rb/kL39tX8iUVGRLMO9JLvtFL2gGyg/su5X3lAIso
+	iBAyJXiPm6AIONtFQlH3KUXoNL05G/ANR2jhHT20LUKra9t8e4JesOPEU7wuoZOW6ifDIA
+	ZIrIVqAwWiIgTdgXZ3EtPtWFKmwptlc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-611-xto0pqeXO-uSNFTkhSOFdw-1; Thu, 20 Nov 2025 05:43:53 -0500
+X-MC-Unique: xto0pqeXO-uSNFTkhSOFdw-1
+X-Mimecast-MFC-AGG-ID: xto0pqeXO-uSNFTkhSOFdw_1763635432
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4779981523fso8892675e9.2
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 02:43:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763635432; x=1764240232; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8y1jPHiAwVo3dkS7PWUJ32CmlpzzI2xRMMetRTLKqec=;
+        b=MDpUylQzcUQLl5LJ15FssQue3sv+OWkcdzZngyrvSkPAVgr/i5PkgsCKjTI/kr+BvA
+         3prBObj17KkdQRTSoHs/pW3N87WQunaADAB6W+p+Y2c6jTbshj05N8FopJre0s5KJ6Zh
+         fBeUak1yNQNOrMaJOAteYAFn/u9qSYVG3KLFRIZSd/IoQIy3+mC9yynmZFd5oWvTG6KY
+         nEavtO0bkBTLwP9c6Zo3Gnzyt/ftVmmz8hdw+b4V2dh1TNjGS2OhRnblQC0UZIpxbMbC
+         0CsqAImZSXeHoQFoUFd9n8qsJuNQMmD1iTue+0wWZ8pUcFp3XMEdBBS108Nu4rQLuF/Y
+         AghQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763635432; x=1764240232;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8y1jPHiAwVo3dkS7PWUJ32CmlpzzI2xRMMetRTLKqec=;
+        b=mfH1QSBPifYoVKRWzPDl22Sg7+RKgjOVrKeO6O/ykDsqjustoJ+NiaDdoSBH7RVEtx
+         SeNI1GsAAD4OgtlIOcu8IgMy3psHDjq+y4t1x1PDvhuPO3aDFafYnv9xIDZiBb9eLKIh
+         1+PQsAc0ps305+SdIj/IVhrbed6QyK1SRgO/oqrBNKCH5KWdkag6el84ecUs31p38B25
+         837ssLESkUmsIVHL4HMNrc5bVPUYoeq5MKY8oM3qm37nQ0/mrFdxoLYVAkL5JOIFIdyd
+         Wc4aOuTj6zuHvpxbRDP6ep61zqVI5O78mvg9IuYer8cZerxEwQb35uw3X43zQZIT+K8H
+         CL5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX+fyEJToSAKGc7abRLi1++3xH8HjHmODUxpfi6+szY2lo9/028RLQRQFigBtUidUUHPSw3XKU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywe2Zo6Opg0NrbVKh40Yi5/B2yWdCE+hXa7ViMEmtQEy+/dNBo/
+	4d9O9+ogsR2pXpshHc8Ka2FHf2o6lvWeSJfo+5Ib6QXT9/YPkU5NTXO9gApsr/MHl9tslb/6vPC
+	MLFZU9CrzR1ESaHbGjYn88iN0p3p4wfsOAIQjpNs6adI6lIP9D4G34XbTDQ==
+X-Gm-Gg: ASbGncuUUdHxzgpEVY/Sd829LeBiWff0/EbvmZX4Z66jFyXsgN/2nVP5ytlWUjLmu3t
+	KB1SoRXPj86t8lpV7Z3t2gMHst1kK9vG68orHlpCloFweaaM+b2nlMeLYSU+z/Voxp6q7idxvSV
+	Kdaz9df36TsJOP+TmEnCmIcd1KSj+3oyzOLtQZTIexGpZYjA7GE57jULbeTbsuQxreyLXmOxzoH
+	UQAENxqMFdz+/UXYXg7EXbJ3n6uRVP1U2YQajl5NCvQdfKX/PFi9B8/pMwN73GtYt1rtNqxUIk6
+	EsfrVJCQoHaPyWFJHMLVulsOgHNl0qaCxvDfpPn2ogv30b5SFItT1HxREWLapMM9HpDLFtjk279
+	QstGoxhzothPK
+X-Received: by 2002:a05:600c:4449:b0:477:abea:9023 with SMTP id 5b1f17b1804b1-477b8953f82mr21394935e9.9.1763635432117;
+        Thu, 20 Nov 2025 02:43:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGR1Ruk2Gj51suzzS5y4BcXGGtt9pWyX/QRlRypsMh/5NKSs6sTrfUKJWhyNZl7GGOZM7Fmcg==
+X-Received: by 2002:a05:600c:4449:b0:477:abea:9023 with SMTP id 5b1f17b1804b1-477b8953f82mr21394645e9.9.1763635431713;
+        Thu, 20 Nov 2025 02:43:51 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.41])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b8314279sm41801585e9.11.2025.11.20.02.43.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Nov 2025 02:43:51 -0800 (PST)
+Message-ID: <98bbac96-99df-46de-9066-2f8315c17eb7@redhat.com>
+Date: Thu, 20 Nov 2025 11:43:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 1/1] net: dsa: microchip: lan937x: Fix RGMII delay
- tuning
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176363460626.1565276.14971544367038790990.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Nov 2025 10:30:06 +0000
-References: <20251114090951.4057261-1-o.rempel@pengutronix.de>
-In-Reply-To: <20251114090951.4057261-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
- f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com,
- woojung.huh@microchip.com, arun.ramadoss@microchip.com,
- stable@vger.kernel.org, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, UNGLinuxDriver@microchip.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/2] net/rds: Give each connection its own
+ workqueue
+To: Allison Henderson <achender@kernel.org>, netdev@vger.kernel.org
+Cc: edumazet@google.com, rds-devel@oss.oracle.com, kuba@kernel.org,
+ horms@kernel.org, linux-rdma@vger.kernel.org
+References: <20251117202338.324838-1-achender@kernel.org>
+ <20251117202338.324838-3-achender@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251117202338.324838-3-achender@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 14 Nov 2025 10:09:51 +0100 you wrote:
-> Correct RGMII delay application logic in lan937x_set_tune_adj().
+On 11/17/25 9:23 PM, Allison Henderson wrote:
+> From: Allison Henderson <allison.henderson@oracle.com>
 > 
-> The function was missing `data16 &= ~PORT_TUNE_ADJ` before setting the
-> new delay value. This caused the new value to be bitwise-OR'd with the
-> existing PORT_TUNE_ADJ field instead of replacing it.
+> RDS was written to require ordered workqueues for "cp->cp_wq":
+> Work is executed in the order scheduled, one item at a time.
 > 
-> For example, when setting the RGMII 2 TX delay on port 4, the
-> intended TUNE_ADJUST value of 0 (RGMII_2_TX_DELAY_2NS) was
-> incorrectly OR'd with the default 0x1B (from register value 0xDA3),
-> leaving the delay at the wrong setting.
+> If these workqueues are shared across connections,
+> then work executed on behalf of one connection blocks work
+> scheduled for a different and unrelated connection.
 > 
-> [...]
+> Luckily we don't need to share these workqueues.
+> While it obviously makes sense to limit the number of
+> workers (processes) that ought to be allocated on a system,
+> a workqueue that doesn't have a rescue worker attached,
+> has a tiny footprint compared to the connection as a whole:
+> A workqueue costs ~900 bytes, including the workqueue_struct,
+> pool_workqueue, workqueue_attrs, wq_node_nr_active and the
+> node_nr_active flex array.  While an RDS/IB connection
+> totals only ~5 MBytes.
 
-Here is the summary with links:
-  - [net,v2,1/1] net: dsa: microchip: lan937x: Fix RGMII delay tuning
-    https://git.kernel.org/netdev/net/c/3ceb6ac2116e
+The above accounting still looks incorrect to me. AFAICS
+pool_workqueue/cpu_pwq is a per CPU data. On recent hosts it will
+require 64K or more.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Also it looks like it would a WQ per path, up to 8 WQs per connection.
+> So we're getting a signficant performance gain
+> (90% of connections fail over under 3 seconds vs. 40%)
+> for a less than 0.02% overhead.
+> 
+> RDS doesn't even benefit from the additional rescue workers:
+> of all the reasons that RDS blocks workers, allocation under
+> memory pressue is the least of our concerns. And even if RDS
+> was stalling due to the memory-reclaim process, the work
+> executed by the rescue workers are highly unlikely to free up
+> any memory. If anything, they might try to allocate even more.
+> 
+> By giving each connection its own workqueues, we allow RDS
+> to better utilize the unbound workers that the system
+> has available.
+> 
+> Signed-off-by: Somasundaram Krishnasamy <somasundaram.krishnasamy@oracle.com>
+> Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
+> ---
+>  net/rds/connection.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/rds/connection.c b/net/rds/connection.c
+> index dc7323707f450..dcb554e10531f 100644
+> --- a/net/rds/connection.c
+> +++ b/net/rds/connection.c
+> @@ -269,7 +269,15 @@ static struct rds_connection *__rds_conn_create(struct net *net,
+>  		__rds_conn_path_init(conn, &conn->c_path[i],
+>  				     is_outgoing);
+>  		conn->c_path[i].cp_index = i;
+> -		conn->c_path[i].cp_wq = rds_wq;
+> +		conn->c_path[i].cp_wq = alloc_ordered_workqueue(
+> +						"krds_cp_wq#%lu/%d", 0,
+> +						rds_conn_count, i);
+This has a reasonable chance of failure under memory pressure, what
+about falling back to rds_wq usage instead of shutting down the
+connection entirely?
 
+/P
 
 
