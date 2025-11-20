@@ -1,180 +1,113 @@
-Return-Path: <netdev+bounces-240365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2863C73D01
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:48:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F658C73D52
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:53:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A81CA4E8939
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:47:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 182F4304F4
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:53:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83598313E19;
-	Thu, 20 Nov 2025 11:46:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1229D2727EE;
+	Thu, 20 Nov 2025 11:53:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ioVz8R0b"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="N5DlF3fz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5791A2D7DEB;
-	Thu, 20 Nov 2025 11:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF9B2FD1B9;
+	Thu, 20 Nov 2025 11:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763639194; cv=none; b=rEqEgYwIGDd1Dqz/Xjpkmt+/oGXfFE+xGf7MaFr5MbujRlZtXu1YiNvb/M7uxCOpZvPF9hs/TLW5jFUh4Mcq2nPzpQW+/bcsoYSFWRcqijAgcCCENbkVxk8VkLdpogXp/5b+rZZ0jU5y7CEqVetGqaMboV7C3cbVHX5TeRLjH1Q=
+	t=1763639602; cv=none; b=NO1o2sCxRPrJVjw7YTQGQ3gqwvHSaqAgp0uNxUj8nIW/v+NszvWBrBpL7F7tLoSs0borgzripqHTpREP5+exfKJhuz/4MkhahZZ5zir1CXbL79qupuAM323e34dILEr2NZ+OYSZ3IRMThJBrSQyvJoYf0OCMpDQQuql/kPxoAf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763639194; c=relaxed/simple;
-	bh=Hjvk/TbZrxYtx11cm6+WsGhzGqGOEZoJxdE6pKvyKFg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:Cc:
-	 In-Reply-To:Content-Type; b=h+/zyJuQpPQIpocmI+wJfOc8WgwYdKW5t8co7HPsFcpFZRuFOBHBrVMyI4Gijd02y7xCEllIz7kBS3xHAJJyeY7sFsqwoY/Tpm9CxJif8BWYszTghPFUBPYvrPe0baTplFk1H8OBr+0LtNjkpMF/wg+46I/DsVYzfeYYKjbTP/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ioVz8R0b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36546C4CEF1;
-	Thu, 20 Nov 2025 11:46:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763639192;
-	bh=Hjvk/TbZrxYtx11cm6+WsGhzGqGOEZoJxdE6pKvyKFg=;
-	h=Date:Subject:From:To:References:Cc:In-Reply-To:From;
-	b=ioVz8R0bNOGlOaaifyAzGByIOEDvrh7xeaL2AO0SbdtNukNeoql72uzFyDW3yYqCX
-	 Vh6AwXNLHmzaAIVrfxDdEajEqFPQbxQ80jhLtdnWi2GQPJd2IE+7XR1dgtThA72fmI
-	 MgMiHZlA2vH9QeQIdOR2C168kFqaG+6nR6QrQc3CqQh5l3CCPYj2Wz4dU9Y2GAOISz
-	 /I7XSuhu+x8Mxa3UHJvyWCEZqvvZo5UwWR6uHc9mMPrulYrVe5uF9VHbid1q7A9KNs
-	 IphK/s0t0ADpbMrlkwGUnCOVg4hKisECVZF63MH4yEjMkK4T7uExu7GlT+j6jEDaoh
-	 T2Y1pWFwCot/w==
-Message-ID: <74a4f889-33fa-4218-8eee-1980c6981dd6@kernel.org>
-Date: Thu, 20 Nov 2025 11:46:30 +0000
+	s=arc-20240116; t=1763639602; c=relaxed/simple;
+	bh=2aEtqVtnhhNYp29lCAJcQY1w52LRSC5n/qmKVhVyk7M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aN83dQZADx08Ne9T1rMx/zLor98RTzl7SIIq2rhrXcBK28Get5YhBwYvyobHFEOZE3bWydphvvB7r5JcMuSnq4Htwe8HNkSjGeGa3S08mgymASV+jFo8XrdwM5qTe2ER9sq9V3z1PifLL8F1X21fK3UCGZpodqXRTkuefvYpiLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=N5DlF3fz; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=jo
+	bMWD91by5uhDYoqh/KCiL5hqPFwNPSpc8S2TG7LwE=; b=N5DlF3fzBh1aInjDoH
+	CXeDjKwJowSJRDUJ2zugc2ImDzWaBYTMz+49beAqR1lmjmWBzxLiJ3SAO/JFHATo
+	hRY1X+4CX9MML8s9s8SsLGR9db81/3g83PweQig0yfKy3z+UiFNC8U3xpQFzyi6/
+	ZdlFMFxAVGTvKgX1Pe6+W5lCg=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wDnaqbxAB9px6_ZBQ--.2298S2;
+	Thu, 20 Nov 2025 19:52:20 +0800 (CST)
+From: Slark Xiao <slark_xiao@163.com>
+To: chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	loic.poulain@oss.qualcomm.com,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	kuba@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Slark Xiao <slark_xiao@163.com>
+Subject: [PATCH] net: wwan: t7xx: Make local function static
+Date: Thu, 20 Nov 2025 19:52:08 +0800
+Message-Id: <20251120115208.345578-1-slark_xiao@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: FOSDEM 2026 eBPF Devroom Call for Participation
-From: Quentin Monnet <qmo@kernel.org>
-To: bpf <bpf@vger.kernel.org>, xdp-newbies <xdp-newbies@vger.kernel.org>,
- netdev@vger.kernel.org
-References: <571ea41f-a6e9-4574-b5c5-737f0a0a9965@kernel.org>
-Content-Language: en-GB
-Cc: bpf@ietf.org
-In-Reply-To: <571ea41f-a6e9-4574-b5c5-737f0a0a9965@kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDnaqbxAB9px6_ZBQ--.2298S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7WF4UGrWkuw4DJw17CryrCrg_yoW8CF4kpa
+	1UAF12k39Yyw4Duw4UJrWIyFnxJw1Iv3y09ryftw1rWF93ArW5AF1q9FW3Ar43A3srWF1f
+	ArWUt39xCF18CrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pisa93UUUUU=
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiGRsMZGke-YpS-QAAsF
 
-Hi all,
+This function was used in t7xx_hif_cldma.c only. Make it static
+as it should be.
 
-The call for participation for the BPF devroom at FOSDEM'26 is currently
-open, until December 1st (details below).
+Signed-off-by: Slark Xiao <slark_xiao@163.com>
+---
+ drivers/net/wwan/t7xx/t7xx_hif_cldma.c | 2 +-
+ drivers/net/wwan/t7xx/t7xx_hif_cldma.h | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
-If you have things to say on the topic, please consider sending a
-proposal. If you know people who might be interested in attending or
-presenting, please let them know.
-
-Thanks,
-Quentin
-
-
-2025-10-30 12:41 UTC+0100 ~ Quentin Monnet <qmo@kernel.org>
-> We are delighted to announce the Call for Participation for the second
-> eBPF Devroom at FOSDEM!
-> 
-> Mark the Dates
-> --------------
-> 
-> * December 1st, 2025: Submission deadline
-> * December 15th, 2025: Announcement of accepted talks and schedule
-> * January 31st, 2026: eBPF Devroom at FOSDEM
-> 
-> eBPF at FOSDEM
-> --------------
-> 
-> FOSDEM is a free, community-organized event focusing on open source, and
-> aiming at gathering open source software developers and communities to
-> meet, learn, and share. It takes place annually in Brussels, Belgium.
-> After hosting a number of eBPF-related talks in various devrooms over
-> the years, FOSDEM 2026 welcomes a devroom dedicated to eBPF for the
-> second time! This devroom aims at gathering talks about various aspects
-> of eBPF, ideally on multiple platforms.
-> 
-> Topics of Interest
-> ------------------
-> 
-> If you have something to present about eBPF, we would love for you to
-> consider submitting a proposal to the Devroom.
-> 
-> The projects or technologies discussed in the talks MUST be open-source.
-> 
-> Topics of interest for the Devroom include (but are not limited to):
-> 
-> * eBPF development: recent or proposed features (on Linux, on other
->   platforms, or even cross-platform), such as:
->     * eBPF program signing and supply chain security
->     * Profiling eBPF with eBPF
->     * eBPF-based process schedulers
->     * eBPF in storage devices
->     * eBPF verifier improvements or alternative implementations
->     * eBPF for profiling AI workloads
-> * Deep-dives on existing eBPF features
-> * Working with eBPF: best practices, common mistakes, debugging, etc.
-> * eBPF toolchain, for compiling, managing, debugging, packaging, and
->   deploying eBPF programs and related objects
-> * eBPF libraries, in C/C++, Go, Rust, or other languages
-> * eBPF in the real world, production use cases and their impact
-> * eBPF community efforts (documentation, standardization, cross-platform
->   initiatives)
-> 
-> The list is not exhaustive, don’t hesitate to submit your proposal!
-> 
-> Format
-> ------
-> 
-> FOSDEM 2026 will be an in-person event in Brussels, Belgium.
-> We do not accept remote presentations.
-> 
-> We’re looking for 20- to 30-minute presentations. The duration should
-> include time for questions: allow at least 5 to 10 minutes to answer
-> questions from the public.
-> 
-> Note that due to time constraints, we may end up offering a slot
-> duration different than the one requested when submitting. If you have
-> specific duration requirements, we encourage you to mention them in your
-> proposal.
-> 
-> You can look at last year's schedule for inspiration, at
-> https://archive.fosdem.org/2025/schedule/track/ebpf/
-> 
-> How to Submit
-> -------------
-> 
-> Please submit your proposals on Pretalx, FOSDEM’s submissions tool, at
-> https://pretalx.fosdem.org/fosdem-2026/cfp
-> 
-> Make sure to select “eBPF” as the track.
-> 
-> Code of Conduct
-> ---------------
-> 
-> All participants at FOSDEM are expected to abide by the FOSDEM’s Code of
-> Conduct. If your proposal is accepted, you will be required to confirm
-> that you accept this Code of Conduct. You can find this code at
-> https://fosdem.org/2026/practical/conduct/
-> 
-> Devroom Organisers
-> ------------------
-> 
-> * Alexei Starovoitov
-> * Andrii Nakryiko
-> * Bill Mulligan
-> * Daniel Borkmann
-> * Dimitar Kanaliev
-> * Quentin Monnet
-> * Yusheng Zheng
-> 
-> If you have questions about any aspects of this Call for Participation,
-> please email us at ebpf-devroom-manager@fosdem.org, and we will do our
-> best to assist you.
-> 
-> We keep an up-to-date version of this Call for Participation at
-> https://ebpf.io/fosdem-2026.html
+diff --git a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c b/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
+index 97163e1e5783..bd16788882f0 100644
+--- a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
++++ b/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
+@@ -899,7 +899,7 @@ static void t7xx_cldma_hw_start_send(struct cldma_ctrl *md_ctrl, int qno,
+  * @queue: CLDMA queue.
+  * @recv_skb: Receiving skb callback.
+  */
+-void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
++static void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
+ 			     int (*recv_skb)(struct cldma_queue *queue, struct sk_buff *skb))
+ {
+ 	queue->recv_skb = recv_skb;
+diff --git a/drivers/net/wwan/t7xx/t7xx_hif_cldma.h b/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
+index f2d9941be9c8..9d0107e18a7b 100644
+--- a/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
++++ b/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
+@@ -126,8 +126,6 @@ void t7xx_cldma_switch_cfg(struct cldma_ctrl *md_ctrl, enum cldma_cfg cfg_id);
+ void t7xx_cldma_start(struct cldma_ctrl *md_ctrl);
+ int t7xx_cldma_stop(struct cldma_ctrl *md_ctrl);
+ void t7xx_cldma_reset(struct cldma_ctrl *md_ctrl);
+-void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
+-			     int (*recv_skb)(struct cldma_queue *queue, struct sk_buff *skb));
+ int t7xx_cldma_send_skb(struct cldma_ctrl *md_ctrl, int qno, struct sk_buff *skb);
+ void t7xx_cldma_stop_all_qs(struct cldma_ctrl *md_ctrl, enum mtk_txrx tx_rx);
+ void t7xx_cldma_clear_all_qs(struct cldma_ctrl *md_ctrl, enum mtk_txrx tx_rx);
+-- 
+2.25.1
 
 
