@@ -1,96 +1,117 @@
-Return-Path: <netdev+bounces-240287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D8CC72213
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 05:03:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 883A9C72243
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 05:11:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6C3003518F7
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:03:11 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D5BFA34D310
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 04:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D78226541;
-	Thu, 20 Nov 2025 04:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B892C11E7;
+	Thu, 20 Nov 2025 04:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3lxHcSL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2Imk8F6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCA619D071
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 04:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388BE2264A9;
+	Thu, 20 Nov 2025 04:10:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763611387; cv=none; b=LHj8uDrU365Zkkz+6ABqTXt6bPJVf/DDSHHR3kvAlPxNgrhSfxqnXPjMsliWzyJp2yYeYYV2y4/K/R0uhvPIHQVhWS54xGLSYVOXcv3RxF0g1v+nm8NOPlnLV99MQOMCKG3j8Gq7ibiFU6Be0f9jWHljXzBmN0dETeSt6nnzUIw=
+	t=1763611855; cv=none; b=QdPvDor/KSN+y/qvucwHLLLbDh4vPy5+mw1kFhLUAlv0UM8kmYuNhxvpWgaWpcYbmAjHA/MyKPJQd+6zJZwxpTtqKKlIrgNRudeBxjj7hVrV4+yUDijiHVppVjz0C+xZd3hpr6K7XTKleCPA7rVpftkep9DS7SAGeGJXkArElB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763611387; c=relaxed/simple;
-	bh=OBn51iG5c42DqEv43G7gT9DDS0iRcln91HT4C0dz+E0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F+OD/voBUI/beAYarIhp6sZ1MIx/6+HIyiohsv2A/btoVwfYxw7UVVFLRbEAZQzf9ZP3poh/NKUviQeRR0y2jlSn+JwG13TE37DJWXA+YydDI+kRMB4wzSGtOmZrg74qOK61KA8IggzxNKMZ1HB7jbj09xvwI3adn4sd5ceU9N8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3lxHcSL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC247C4CEF1;
-	Thu, 20 Nov 2025 04:03:05 +0000 (UTC)
+	s=arc-20240116; t=1763611855; c=relaxed/simple;
+	bh=nNkw/HHMttissex3RT39Yy/FGFO9F7e8C5EUg9Ax/Uo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UGYSkAux4H+6jWplV59kmC2YAH8cvvoHFbjvrgpqb+nZcAvlPHJRUVQWrQpYHYM6XRXidNcyzKox0HK1z/i8S9WIiu4Q1n7p4Qpf3dgKqEp9vqDDrIesZQ/LR8a97KF1WbkeVXgmHMMw8WklEjI6wGM4ApaZyPfJ1o9m3/unE+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2Imk8F6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1C5AC4CEF1;
+	Thu, 20 Nov 2025 04:10:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763611385;
-	bh=OBn51iG5c42DqEv43G7gT9DDS0iRcln91HT4C0dz+E0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h3lxHcSLs4O90GTlIWxLxhZ6eCm0FGgT3h/KXG00dVZYb2+vIcbNYdIpViGjumrjT
-	 kuJftdXKF+ZqXxnO63FpZjnW1ru8BczUk8mbDIa0r5TG4lUWmUzq9Ca5Rm6H42QkWu
-	 +TyGZS5pAhcIwwrvHRQ50XO++h77XE3ay0NF30eZ0mCekvqIo8lk7jSablLLEb1sPz
-	 /V/X/9+hNWEzQf0kI5TgbUx5ErfNaARKAbkiF3LFhMQJdQNUdmhU39paSymWfdGxgw
-	 4gWnFxTt7fQJRAIT38SGVgKXxlCSuXw8QDydsIydekiUDs5AkobqvH7NtTxoBoTHfh
-	 tuC+GvMYwpDug==
-Date: Wed, 19 Nov 2025 20:03:04 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Remy D. Farley" <one-d-wide@protonmail.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 2/2] doc/netlink: Expand nftables specification
-Message-ID: <20251119200304.7a0a7905@kernel.org>
-In-Reply-To: <2a8b6847cbb9c4c09a2ddd6663294b8238b044ad.1763574466.git.one-d-wide@protonmail.com>
-References: <2a8b6847cbb9c4c09a2ddd6663294b8238b044ad.1763574466.git.one-d-wide@protonmail.com>
+	s=k20201202; t=1763611854;
+	bh=nNkw/HHMttissex3RT39Yy/FGFO9F7e8C5EUg9Ax/Uo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=F2Imk8F6z3CsyoKSW+n4YscqlO9KPxGSFxWk/ATxEXCOzepoCp2P3nhDdJZLG7hRh
+	 kX8JFXweXwbmiweAJL6YC6HJBezQt5V6A+U6bS4JRLzSO38sUHnuDkZUyqPkm1Vbxc
+	 IxDZ6/gZSXdovY8mUITzvVEz7stNDZLuauXFPhRmfL6GYMEUyE2x2SvACYTFvA/lik
+	 BMl9IXqNtSuMcWZL6fjMwpntSTU0bfIArxoVhJefwlfMf2o4Fw98xR7Iz7cv5z7vB9
+	 uN9hg7mAlWPNcek1zzGhsbcNzOUMf8BiCRdEeZsPP4SbEsS9zAiblh7Lzur0OoKB72
+	 c0p/djP4gL/Ww==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7145439EF974;
+	Thu, 20 Nov 2025 04:10:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 00/11] mptcp: misc fixes for v6.18-rc7
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176361182026.1072863.12495916598448618920.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Nov 2025 04:10:20 +0000
+References: 
+ <20251118-net-mptcp-misc-fixes-6-18-rc6-v1-0-806d3781c95f@kernel.org>
+In-Reply-To: 
+ <20251118-net-mptcp-misc-fixes-6-18-rc6-v1-0-806d3781c95f@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ shuah@kernel.org, fw@strlen.de, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, stable@vger.kernel.org, yangang@kylinos.cn
 
-On Wed, 19 Nov 2025 18:16:00 +0000 Remy D. Farley wrote:
-> Getting out some changes I've accumulated while making nftables work
-> with Rust netlink-bindings. Hopefully, this will be useful upstream.
+Hello:
 
-In the future it's better to keep things in smaller patches.
-Easier to review.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The docs have to be in ReST-compatible format I see:
+On Tue, 18 Nov 2025 08:20:18 +0100 you wrote:
+> Here are various unrelated fixes:
+> 
+> - Patch 1: Fix window space computation for fallback connections which
+>   can affect ACK generation. A fix for v5.11.
+> 
+> - Patch 2: Avoid unneeded subflow-level drops due to unsynced received
+>   window. A fix for v5.11.
+> 
+> [...]
 
-Documentation/netlink/specs/nftables.yaml:66: WARNING: Field list ends without a blank line; unexpected unindent.
-Documentation/netlink/specs/nftables.yaml:261: WARNING: Bullet list ends without a blank line; unexpected unindent.
-Documentation/netlink/specs/nftables.yaml:261: WARNING: Field list ends without a blank line; unexpected unindent.
+Here is the summary with links:
+  - [net,01/11] mptcp: fix ack generation for fallback msk
+    https://git.kernel.org/netdev/net/c/5e15395f6d9e
+  - [net,02/11] mptcp: avoid unneeded subflow-level drops
+    https://git.kernel.org/netdev/net/c/4f102d747cad
+  - [net,03/11] mptcp: fix premature close in case of fallback
+    https://git.kernel.org/netdev/net/c/17393fa7b708
+  - [net,04/11] mptcp: do not fallback when OoO is present
+    https://git.kernel.org/netdev/net/c/1bba3f219c5e
+  - [net,05/11] mptcp: decouple mptcp fastclose from tcp close
+    https://git.kernel.org/netdev/net/c/fff0c8799667
+  - [net,06/11] mptcp: fix duplicate reset on fastclose
+    https://git.kernel.org/netdev/net/c/ae155060247b
+  - [net,07/11] selftests: mptcp: join: fastclose: remove flaky marks
+    https://git.kernel.org/netdev/net/c/efff6cd53ac5
+  - [net,08/11] selftests: mptcp: join: endpoints: longer timeout
+    https://git.kernel.org/netdev/net/c/fb13c6bb810c
+  - [net,09/11] selftests: mptcp: join: userspace: longer timeout
+    https://git.kernel.org/netdev/net/c/0e4ec14dc1ee
+  - [net,10/11] mptcp: fix address removal logic in mptcp_pm_nl_rm_addr
+    https://git.kernel.org/netdev/net/c/92e239e36d60
+  - [net,11/11] selftests: mptcp: add a check for 'add_addr_accepted'
+    https://git.kernel.org/netdev/net/c/0eee0fdf9b7b
 
-`make htmldocs` to repro
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> +    # Defined in include/linux/netfilter/nf_tables.h
 
-Isn't this the main header for nf_tables?
-If yes then no need to comment, should be the obvious place.
-If no - can we use 
-	
-	header: linux/netfilter/nf_tables.h
-
-?
-
-Last but not least when you post v2 please CC folks from netfilter:
-
-NETFILTER
-M:	Pablo Neira Ayuso <pablo@netfilter.org>
-M:	Jozsef Kadlecsik <kadlec@netfilter.org>
-M:	Florian Westphal <fw@strlen.de>
-R:	Phil Sutter <phil@nwl.cc>
-L:	netfilter-devel@vger.kernel.org
-L:	coreteam@netfilter.org
-S:	Maintained
 
