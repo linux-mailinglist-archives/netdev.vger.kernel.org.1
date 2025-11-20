@@ -1,124 +1,176 @@
-Return-Path: <netdev+bounces-240370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C6FC73E5D
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 13:10:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B697BC73E0D
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 13:07:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BB15F356AAD
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:09:13 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 85025354B83
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476CF33122F;
-	Thu, 20 Nov 2025 12:09:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B020B331231;
+	Thu, 20 Nov 2025 12:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G9O3Ie07"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="bSNFcJjz";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="UtzWR+dl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8540420459A
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941A732FA0C
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763640543; cv=none; b=NDxW1EoJIWZrgJ8phV0rm7HOnUZ6PKH9i1fjyRszFoPtNypLeZ0ec/XNcYch8Dtc3bAWvxmRlJ2SXg73pDSKkunbXVeIcOU74MQxDDcJ/fqDCYNPEU1kGs5dtRSro5Vn/RSzJv9gK8iZpQcxhopbVzNsrnz0KHtga8tzCsLxNlk=
+	t=1763640461; cv=none; b=NxjQrAwcd+VywnonOgUdT1zorqZ3Qu0EKguZEMCKrGLfDB0maUqOMXVoy86bDb1fXWKEBXNp/Ve4nHY2REb3+vIfpGGBB1rholk+oTgnPAGTF0Y8aqBM1rF9aRFe27i6n560icFG6MJpP02rqSFEjj5iDQa6NjUy0hAg7yH8H6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763640543; c=relaxed/simple;
-	bh=ngJsEfYjg8B/DGcvuWFHXohdm36j18EsWZbz8HmumaY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qN9Ab5U4rn3kgL+wg1h5igUCFI/HXh8Vf6vWEovmClF6OmrKTSa4v7qbg+XfXsEPEeWY9nIdqy6jsnL2C75PLR7Yh0JJCuiPL+Gdvxc2LvqCjPRdWUK2tYwCHQBO5nUIje72+PJeQxP3sNECkPqVTYwzYkogVHPkLR+ipKDWZSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G9O3Ie07; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763640541; x=1795176541;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ngJsEfYjg8B/DGcvuWFHXohdm36j18EsWZbz8HmumaY=;
-  b=G9O3Ie07bTaeuGodo8AKBDnmbpRC331kDW8X46yBgaYEk0ZMfb9JOaG1
-   eEV3tq5uown/1MeaWH+MoqWnkY0NXDkQsR4CrQeXBNA7ET9aoHb8g1Zo1
-   4mEAnbftCoPtNP0wvy3Jq1D9WVD/IVWpouqTcj37YBfNhAMNCjyADEq4a
-   lFpOmahhSyL0/rbe4n19nuM1Sl2TJ4noYHDs0dUM2ETjMp+8CBgd6E8mq
-   39pFh3vmeniiZYI85nD29yk7BtG3Iz8ocfX+ln1lBiJc4shLKUggFx9d/
-   IQvX8bWg2ci85ncUIE/+geWmrkn4W59WCsQIPgv5fojXlg/P0R39r5VxC
-   g==;
-X-CSE-ConnectionGUID: sOsGZUi6TpmMHd4E2i6m9g==
-X-CSE-MsgGUID: T5cmG3IMQAKr3j5i0W/vjQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11618"; a="65599812"
-X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="65599812"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 04:08:58 -0800
-X-CSE-ConnectionGUID: GgQhKsAqQJyAfeJ8AKhLMQ==
-X-CSE-MsgGUID: FP8kXtrLQdW+Eo5llxQphg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,213,1758610800"; 
-   d="scan'208";a="195485157"
-Received: from pae-d-dell-r7525-263.igk.intel.com ([172.28.191.240])
-  by orviesa003.jf.intel.com with ESMTP; 20 Nov 2025 04:08:55 -0800
-From: "Korba, Przemyslaw" <przemyslaw.korba@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	"Korba, Przemyslaw" <przemyslaw.korba@intel.com>,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH iwl-net] i40e: fix scheduling in set_rx_mode
-Date: Thu, 20 Nov 2025 13:07:28 +0100
-Message-ID: <20251120120750.400715-2-przemyslaw.korba@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1763640461; c=relaxed/simple;
+	bh=a/FYQGu4Dtd48mV2r2frvBl1FdBxmOYRbxt5tSGaUPs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g1PQktI687LUaeRAA4RcswuiS9CaiN1StJXQ3WdGEbFKZWMcYYZZS+tvCxRvFVDUkJ9dRkTSIguQ/Ox4cEPoWO6pSAn8xteRLWdI9xeQJNPK3/+f2q9tz6F2BuBw1OY3eLoK8CKGRXZLNHCgB+e3/qXHYrPYRHUAlm4yiYMNxps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=bSNFcJjz; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=UtzWR+dl; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AK9hLrZ473372
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:07:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	rocURVTpRm6dtP5iHBbr10ILRzx3pCec9r06uq4Mrmw=; b=bSNFcJjzfM2eSZVf
+	ap7LPSWqzx0iOfNw2FHgJl2e1XDcCHL5jQ095fGr6BUpn4yQtsw74Zz1t/eJrkUg
+	rxm35bhzhwyulCh2F3rGzLU5Sp0dV1nNgh3fC2bBs8miPZZtHjAN5BE3i1QmfJhJ
+	6TOD02J2KMYAqobOhBxlDtJSUa9xTflsIAUoVqNA2WOOzqWpWGf2EJY9nSCBEuRD
+	8c6AD/Mw2K7VSe3zGHvexXf7smHw6Mn7KqfcSJekKr3LHFbMVuD3xi8SMhRG1A3C
+	v4YSkkoXSjAXHqc2JAo2Xp3j++EYALsSDHZAWnJkfkbPpKSsYDRfqItZvw3/MhjJ
+	5c+f/Q==
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4aj0kw0d7k-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 12:07:38 +0000 (GMT)
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4ed767bf637so1101311cf.1
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 04:07:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1763640458; x=1764245258; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rocURVTpRm6dtP5iHBbr10ILRzx3pCec9r06uq4Mrmw=;
+        b=UtzWR+dlJ4gebtcr7AIQ9yb/RS2kEbrQRICKCkXZUrQP/6QB9p9HF3jAOHBjU+I15t
+         S1ccYamPyW6dWQGdNbkq9JpQSjPqYapGMzp13X6wbsfM322+wwcBx/GTFSVxGRMFCyua
+         v7xpIaplMklF6WYZ6WQTw6Pq4JesJJCKjpYouPMEONEw0FrEZxVSB/MqRzIo4Hhs5Pwx
+         9o6rDD+pRO0+cuvynerRdmE/RUsg8OMmm27Zk3+0Q8UlBx1p3jQ0+JELn8g+BhyKpOXo
+         evR5VebfhDfeTaO9mvobVhg/n1ziZqTOvKvtwarpGhqGgYVUoYBxnTwHxJAjhSgEGhLe
+         Wb0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763640458; x=1764245258;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rocURVTpRm6dtP5iHBbr10ILRzx3pCec9r06uq4Mrmw=;
+        b=MfcwFXFl0Se8kIlwg3ybkM9WqNLypCppRxd9OiZJvD8JNvKhHRDhMkp3+f/y8NUccO
+         BaVAjnrbY50nlYSALqY8YeGW3ZlOTSDlZ3KQfhsVQYSthEQFR1/mFxRR0Svl2a6h6xGO
+         EtqOvCgn+3Gepu5YC+sQPfgyfE+cecyXoRuiu64bBEXTyfQX2OXx0dkqWm+mDe/GOJjH
+         4mIhgONemynwrbiYSwOeXQjQXpoAoiVzW03RGCpV+zl1XWmAQkxGGOi6cDHEt4CcXimj
+         VRbfkyAvQM/sL6oP4g96pAU+D+q+x8F4mmrnWSEivWgsnJc6Geqe0yqz6+6DhScb4MZG
+         jNhA==
+X-Forwarded-Encrypted: i=1; AJvYcCXiYQcUocl6ghQ+DowO3detPjP540+xTbnuZrNR733w/AjqOLRCUelpzAXMwZ4zRlBIpPSqfe8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK1AtqpX2cDRxSshORViyn4VOVU3n8XdcLsGHzyw35CjAo+Vzz
+	CZ92AvLDBPngy6hgQzU4Pj2weQ/dS0OGQrCrmLopYS1slNJoxC9BXZ7ZLZjIsm2Bi40QFdh90bX
+	ym3SyB7wakHjbmq5mhu/g07PfX8TNpz6ARKBdIhiCIoRMiZEipfhATZz1uJE=
+X-Gm-Gg: ASbGncun9YbDY5HWg1CvYoWlWPGcpl/noDfzjZH3pAYGgfMX1soxi2cxIJJRH2NCd06
+	24Z3BAxP5pn8o/W/Fcdyi4Y1ImhkI6/U2v9eaeCmKDSlHw7FO7kOU8ZFBakbEnGZCK4IgY4hILm
+	SIcw2He4Wux4OjhqAWV/5XQPQeJXj5FPWAQJxcWIx15Ek00ANrT0Ctaiz+/qYifdCYpdF+VQy7i
+	b1/INwb+mpugjhi1lWKZUQIyv+Fo6SfhvNp/F/BVgMAI58jAP+aZlDLmXkcZsbNGXmwrnkeDDWK
+	LZp2XErj3nQ9g2ZyJfavWDO3dusHbmp/nz5uy3h+YhEmcK3FeeogVOOiyFZ3SL+GkiFuoa6KDxc
+	KlBH4UAAsKzoAjzjhzleRX8T8ZewSGpArd1oAvuXovjkjI1GHqaoY9CQ09FYBBnboTf8=
+X-Received: by 2002:ac8:7f49:0:b0:4ee:1063:d0f3 with SMTP id d75a77b69052e-4ee4979d58amr22346571cf.11.1763640457821;
+        Thu, 20 Nov 2025 04:07:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH7C0G7oIjRGR0HYITo/8aJIWfL6aczcG7wVEVYDZP+JyR4xosC6Jsi56JuaGBd1eQMFrosxw==
+X-Received: by 2002:ac8:7f49:0:b0:4ee:1063:d0f3 with SMTP id d75a77b69052e-4ee4979d58amr22346301cf.11.1763640457383;
+        Thu, 20 Nov 2025 04:07:37 -0800 (PST)
+Received: from [192.168.119.202] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654cdac18sm189684666b.11.2025.11.20.04.07.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Nov 2025 04:07:36 -0800 (PST)
+Message-ID: <02b73243-f7a0-404d-913a-f95c0ce80632@oss.qualcomm.com>
+Date: Thu, 20 Nov 2025 13:07:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/3] net: stmmac: qcom-ethqos: add rgmii
+ set/clear functions
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+References: <aR76i0HjXitfl7xk@shell.armlinux.org.uk>
+ <E1vM2mw-0000000FRTo-0End@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <E1vM2mw-0000000FRTo-0End@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=WeUBqkhX c=1 sm=1 tr=0 ts=691f048a cx=c_pps
+ a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=PHq6YzTAAAAA:8 a=EUspDBNiAAAA:8
+ a=-t6nT1al7WGe8XWH3MkA:9 a=QEXdDO2ut3YA:10 a=a_PwQJl-kcHnX1M80qC6:22
+ a=ZKzU8r6zoKMcqsNulkmm:22
+X-Proofpoint-GUID: kY-gFAg5NbPaYtaL-KtOctjNUy2EJy1Y
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIwMDA3NiBTYWx0ZWRfX9A89V+1ORohR
+ TPGVL9qlEq6sJp+du2Lxsjw1+hp+cCGilxqpRSQi6C6sjsN9gb3DTTR85Mn3uTUSRh650MgBiq/
+ 1k5LOo9ZlbFrSioH+siNfanrcdETiEgBD9FW0kFph6bqPptgbFSse7i3Q03D+tJFCO271zTd0EK
+ /078LOAJgRveA/oupa6Cl4JS//+EWx/xF6QJMcpdiABz22QM+mS60MqdAlNfzXYNEZCq6YIU5iP
+ nN/tcpkpnJ/T061L2+koZTMT/JYzNt3tv4dDyX8yofgsMXsJbYlYXbpO/fu06JZWHkbmPQuJvBe
+ dTYlRCQuFTcNghscr/2QwhG8acmvB6QChIr7F8mgdYbYOb2+yna61OBm4r1ZB/CDa1kfctWckgX
+ VYUu5ZmYDlyfP9ggV2Y/9Ke/KQ/BCw==
+X-Proofpoint-ORIG-GUID: kY-gFAg5NbPaYtaL-KtOctjNUy2EJy1Y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-20_04,2025-11-20_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 bulkscore=0 clxscore=1015 suspectscore=0 spamscore=0
+ lowpriorityscore=0 adultscore=0 malwarescore=0 phishscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511200076
 
-Add service task schedule to set_rx_mode.
-In some cases there are error messages printed out in PTP application
-(ptp4l):
+On 11/20/25 12:25 PM, Russell King (Oracle) wrote:
+> The driver has a lot of bit manipulation of the RGMII registers. Add
+> a pair of helpers to set bits and clear bits, converting the various
+> calls to rgmii_updatel() as appropriate.
+> 
+> Most of the change was done via this sed script:
+> 
+> /rgmii_updatel/ {
+> 	N
+> 	/,$/N
+> 	/mask, / ! {
+> 		s|rgmii_updatel\(([^,]*,\s+([^,]*),\s+)\2,\s+|rgmii_setmask(\1|
+> 		s|rgmii_updatel\(([^,]*,\s+([^,]*),\s+)0,\s+|rgmii_clrmask(\1|
+> 		s|^\s+$||
+> 	}
+> }
+> 
+> and then formatting tweaked where necessary.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
 
-ptp4l[13848.762]: port 1 (ens2f3np3): received SYNC without timestamp
-ptp4l[13848.825]: port 1 (ens2f3np3): received SYNC without timestamp
-ptp4l[13848.887]: port 1 (ens2f3np3): received SYNC without timestamp
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-This happens when service task would not run immediately after
-set_rx_mode, and we need it for setup tasks. This service task checks, if
-PTP RX packets are hung in firmware, and propagate correct settings such
-as multicast address for IEEE 1588 Precision Time Protocol.
-RX timestamping depends on some of these filters set. Bug happens only
-with high PTP packets frequency incoming, and not every run since
-sometimes service task is being ran from a different place immediately
-after starting ptp4l.
-
-Fixes: 0e4425ed641f ("i40e: fix: do not sleep in netdev_ops")
-Reviewed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index f3b1b70d824f..a1b600ab0397 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -2234,6 +2234,7 @@ static void i40e_set_rx_mode(struct net_device *netdev)
- 		vsi->flags |= I40E_VSI_FLAG_FILTER_CHANGED;
- 		set_bit(__I40E_MACVLAN_SYNC_PENDING, vsi->back->state);
- 	}
-+	i40e_service_event_schedule(vsi->back);
- }
- 
- /**
-
-base-commit: be983dcd591c53cb76f92448afc61f91fd7c5fe7
--- 
-2.43.0
-
+Konrad
 
