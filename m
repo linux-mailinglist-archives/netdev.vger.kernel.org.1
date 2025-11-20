@@ -1,114 +1,110 @@
-Return-Path: <netdev+bounces-240362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F18BFC73C6B
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:41:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2175EC73CAA
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 12:45:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 003914E68EF
-	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:36:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E8B564E8D53
+	for <lists+netdev@lfdr.de>; Thu, 20 Nov 2025 11:41:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A39932BF21;
-	Thu, 20 Nov 2025 11:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189CD302150;
+	Thu, 20 Nov 2025 11:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="TnpMXkKR";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LPGF8y4Q"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="xVW8G8M9";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="uNTOc6Ww"
 X-Original-To: netdev@vger.kernel.org
 Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564F13002A8
-	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 11:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006AC32D455
+	for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 11:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763638585; cv=none; b=Q7chUSIgigCkkbfXmbo3d01bCNbcTHrqEWjCJj5AGE5IS4tBfquQW9f+f+f9xjJes4wmNPFAPiLTaWw0CvK/EEYBZuhOSnTIw7Q7lJSvmdAA/oW7R0JpN4Me9BuE9flGacn3Dbi0lO8zB0pdV3rhZpImaUgpGtAfQc1g8jlK9oc=
+	t=1763638877; cv=none; b=CZ+s6jIJAZqVrgcjtOeAdzFUeTAcrRYtC3t85EVyonqhIHkHx+zQ0knmCZrPcH0lTHcT6G2HXZvbZMHOPF8arNM36BUk13GmIDrK/avLmBJJosrBWMJmi3uiJy+XxdAdNsKGjwpRpZc6DN135uR72iY/wGP+4RYrSxTrzubkOLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763638585; c=relaxed/simple;
-	bh=kgXlwnzmYFsXTZ8lHcA5mi62tkQY8RwrDdQ1rYh+2g4=;
+	s=arc-20240116; t=1763638877; c=relaxed/simple;
+	bh=QRiWu8IMKuFEZ0Zb1YqIko45RVAugpaDPrxC8+KbOm0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=guGOgXcqlJ7qcgwM1C95onu0a+nIdY7UgRfW5vMs3s157U01bqpDeG645nDT4l1UC+JwQjvRa019YxNOPXDONiZHE5Qc5f3MUsWLm50SiqibRoXCwQ9aQFr2XIEKMYW6JrKjY0ZCIsuKPoB8iVYNCmqOlOdV/oLk7euGIQThDgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=TnpMXkKR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LPGF8y4Q; arc=none smtp.client-ip=103.168.172.148
+	 Content-Type:Content-Disposition:In-Reply-To; b=hX/psK9hpaS7HZJiCXzDM5agj9XMxtCFotSij9FEe/ESkgSUaDuTJUG+4TwQ6yP7Mko6Nlxf25cbzxDkcJuzIkWHTFrf+55P2uY4gc59SiwGaZjgRDfgVtWWxfoNHiDJai7hCsyO4G7Qzn0n5QcAj9UyxTfz4VJ+mPi7ACoV8DM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=xVW8G8M9; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=uNTOc6Ww; arc=none smtp.client-ip=103.168.172.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id 37C14EC0370;
-	Thu, 20 Nov 2025 06:36:21 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Thu, 20 Nov 2025 06:36:21 -0500
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.phl.internal (Postfix) with ESMTP id 26FCAEC00A1;
+	Thu, 20 Nov 2025 06:41:14 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Thu, 20 Nov 2025 06:41:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1763638581; x=1763724981; bh=duJmX5HHOziadQf5q4kEyZjSRR1LrD50
-	zaH8pVR/GKo=; b=TnpMXkKRYM2qwcsuVgkhBt00zkAurS4vLdp3QkC4fmCXIT8p
-	VIYY8ffTUffInnEBvWvX6FQAfLFtPQMSgdSIl+ggAU9W43Zrixhvo47P656funMP
-	cFfAA/ZY/AIN3gQDKyskJkNAh4XSYrYrHD4u/ToYnYo8yvLEofDwkM2YUUGfK9al
-	Tb/OjpwEl0Gd1dlMX/uyf0/xOYomWmBo7cRk/Xa9yP9mQH2pNG6Sxk0ldIhymoaK
-	OTg2ADNujbDpeGMQifcmiRHCCjkQtwPeuVSTtySc10YbrtLmj7/KLWPF11eaMTew
-	9FEU0uMHB5Rt1NRPK21NMtfinUHPhnKb/Yn7xw==
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1763638874; x=
+	1763725274; bh=2MN86O1mfC8UsJREomoDMj1T6vuicrR1s3SYMTvRUJU=; b=x
+	VW8G8M96pJMBz9sTmIl2hTMaz2B2q6iVioz5DAqH7CSJ4dT5lTd9R/VR9Yapa/1F
+	zRMxr+xayfxOicnMsxqMEOuJh8GBIi3ig64x99Kj/0CwBONxl3u1FHzqmmXIgbnV
+	9yVuDkfUFV+FbLKjODczRffAn1MnerVZYiFgEgcdRoQS22boQocC3uYV7zKIRLIX
+	zHUBLv/bscdOTqxJO99kNJz9XXMPgNXeW7wgamBdD/vs9k+/0wLfA7hEN/ys/Lad
+	QQJxUpbQIxKup/L+n6vP3ZJgsIimmotOvkGSCD1fjxwK6k0CLXdis/gmYspGcrar
+	FVH4ClM6r/jqol08gU2pQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763638581; x=
-	1763724981; bh=duJmX5HHOziadQf5q4kEyZjSRR1LrD50zaH8pVR/GKo=; b=L
-	PGF8y4QMGXARiehHOCHCVjnxv/MqLtLMFTdvUjJ1snuciB3Mf2F0Xfpdlybnx0TH
-	KQ9UZQsxu6dfdb9TC6Zm86QwS7m7WXb2NkjRSElJ6bJVOXsvU1U6Crjrr04ZuuyQ
-	/tTgXiLHhXC0ImcUiWs1WSlgOAyvqYjZULajfhfFboDh5+s4OTDXduCGlgnDGT3x
-	lJC0jN3Ao2uT5lXQqSvJb7fTmqqMYpuvu0zsNz+xOjj24AgrqCBeAO5XV5dDr2pS
-	6T3f7q6i8ltr1SmxwXra9br1KOg1vaBWCMeJSkOWnpBRcHyIFbCXschNeAlwIrA+
-	vK2Ig6kC/+Ol3TT3R37Pw==
-X-ME-Sender: <xms:M_0eaTAPy6Ibub7ljrF2YpHCkMX3nK23QZll07BEYCt02dLgvUYTpA>
-    <xme:M_0eaeEq1kLbcdvRDq5zcG1UW6rsV8hCxzBnx0C1D1tLCEY4DqS5TA5jPKjyE212x
-    GKxXYwBZS1_6IQsmwk3tJiBo-IoKTjoL_6nbxvR4qaYJN1PrreXLyc>
-X-ME-Received: <xmr:M_0eabvnAsZe6yfwXdMUcCNMNDcbjAmvhFjWWzE2Pwq2tYmtobO3_44sHIBC>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvdeileejucetufdoteggodetrf
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1763638874; x=1763725274; bh=2MN86O1mfC8UsJREomoDMj1T6vuicrR1s3S
+	YMTvRUJU=; b=uNTOc6WwtQPLlpL1fCUJDkO4EsU20mb5ZfAoEgbGx16DH9VWzqZ
+	KVFsvW4jdeTtSwftPxVYUZfKPOuFZaaXFIfu/RlqnVQAwAZQuUBfoHC8Vw7wVJ/i
+	MSxhdoFJba9hAkm5qlMVm8MeURDVqsGwdd36irorg8iIr+4UvM9mUXSqINPOoYZi
+	g9d3um3PXckH6rUuECbMO9+tLFYC8bIZGYb1ZkiWzGdCAJ58SDZGmyDRWyJ+ltZL
+	zl//XUfDL7Ym/ucDFnybXyzAt7njfuU4rLCL4jyoLZepYZy1bTSeXl4cFsw2dkZi
+	C2K4OLqpXDMBQk4N/YyMk1fZXGLoII0v2zQ==
+X-ME-Sender: <xms:Wf4eaUmLGy9CVFKrC9yswgTkJgcEbYA6GWbVtEvohY6-8_iIQWVsHw>
+    <xme:Wf4eafu2Dnp9cthUCbzow_n_aqRxaN_Ok9NM0OO8PZ5ztI6EL4lejKsXiudh1IIDe
+    jjDrnh8Q8sw67uc2oeIdlW94pQR55LQF3HBcs_s-vlgJu64dxxJ1v8>
+X-ME-Received: <xmr:Wf4eafqF2FnPxl5BWWl41CZ9K_RH2FzYnTqdVkTD-cEmUVUkM5myeDo6Q7Ur>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvdeileekucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
-    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
-    frrghtthgvrhhnpefgvdegieetffefvdfguddtleegiefhgeeuheetveevgeevjeduleef
-    ffeiheelvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudegpdhm
-    ohguvgepshhmthhpohhuthdprhgtphhtthhopegtrhgrthhiuhesnhhvihguihgrrdgtoh
-    hmpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhhtsehsvggtuhhnvghtrdgt
-    ohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtph
-    htthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghpgedv
-    tddtjeefsehgmhgrihhlrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguoh
-    hrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehlvghonhhrohesnhhvihguihgr
-    rdgtohhmpdhrtghpthhtohepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhrtghpthhtoh
-    epkhhusggrsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:M_0eack9jvi8s4dHgeyq0efMSJExsmKPNOebbdeuO8t8b9NdNqEs2A>
-    <xmx:M_0eaWP5k2ooxb-jlZe5Vw1svEVfWdQxlw7WQbtYWlPT5GaU_oLF1A>
-    <xmx:M_0eaQzBGsHNolWjO98G4GUi8ArMX_qAa-J0_p23Rz1hnp8u-rpv0A>
-    <xmx:M_0eaTseTLwensuJCbCT6KDYLBUnKLhXQv4VRR89DmSHj2KdrzD4zA>
-    <xmx:Nf0eaWkgsYby_ZfrB-0WCISvgSFwCC2dAdXqdRN4a1svqsAzx8pfcmA4>
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduuddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepjhhirghnsgholhesnhhvihguihgrrdgtoh
+    hmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsrg
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhht
+    sehsvggtuhhnvghtrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrd
+    grphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpth
+    htohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-ME-Proxy: <xmx:Wf4eaVcSOdVaCEcpBvRwwTgRyVL7Hgw0Jr-ifCx_e3pcIkg3V3T1SQ>
+    <xmx:Wf4eaXkyTDIpbvtXvMhwVPKapzQDehNob8X4BoDj9ytbUu9nT8WPOw>
+    <xmx:Wf4eacZwBIhH3Xreq8sWThPcLFcyarWv3GxhIT3GwE6e5WpRkNHL_A>
+    <xmx:Wf4eac5-SNjNMzXs6CIsSFSxyvRwGi5w7KpE5DcCbFIbFEhsTNygvA>
+    <xmx:Wv4eaRQnoShaC9JtpmQsgkEzEVGbYGhfmJxtOHlyK1jmR9Qa2JgazXKx>
 Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 20 Nov 2025 06:36:18 -0500 (EST)
-Date: Thu, 20 Nov 2025 12:36:16 +0100
+ 20 Nov 2025 06:41:12 -0500 (EST)
+Date: Thu, 20 Nov 2025 12:41:11 +0100
 From: Sabrina Dubroca <sd@queasysnail.net>
-To: Cosmin Ratiu <cratiu@nvidia.com>, steffen.klassert@secunet.com
-Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"ap420073@gmail.com" <ap420073@gmail.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	"jv@jvosburgh.net" <jv@jvosburgh.net>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [PATCH ipsec v2 1/2] bond: Use xfrm_state_migrate to migrate SAs
-Message-ID: <aR79MCBdyx2oTcp2@krikkit>
-References: <20251113104310.1243150-1-cratiu@nvidia.com>
- <aRcnDwyMn11TfRUG@krikkit>
- <88f2bf5ef1977fcdd4c87051cd54a4545db993da.camel@nvidia.com>
+To: Jianbo Liu <jianbol@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	steffen.klassert@secunet.com,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH ipsec] xfrm: Fix inner mode lookup in tunnel mode GSO
+ segmentation
+Message-ID: <aR7-Vx4du2M6HGl2@krikkit>
+References: <20251114035824.22293-1-jianbol@nvidia.com>
+ <aRpaNMxGlyV_eAHe@krikkit>
+ <d18ab53f-b91b-4c64-926f-4a1466d2d31e@nvidia.com>
+ <aR2_D3iEQvAklDEW@krikkit>
+ <86801357-7262-40e5-b2bc-8429ac80ec7e@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -117,172 +113,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <88f2bf5ef1977fcdd4c87051cd54a4545db993da.camel@nvidia.com>
+In-Reply-To: <86801357-7262-40e5-b2bc-8429ac80ec7e@nvidia.com>
 
-2025-11-17, 12:48:20 +0000, Cosmin Ratiu wrote:
-> On Fri, 2025-11-14 at 13:56 +0100, Sabrina Dubroca wrote:
-> > 2025-11-13, 12:43:09 +0200, Cosmin Ratiu wrote:
-> > > The bonding driver manages offloaded SAs using the following
-> > > strategy:
+2025-11-20, 09:20:11 +0800, Jianbo Liu wrote:
+> On 11/19/2025 8:58 PM, Sabrina Dubroca wrote:
+> > 2025-11-17, 10:12:32 +0800, Jianbo Liu wrote:
+> > > On 11/17/2025 7:11 AM, Sabrina Dubroca wrote:
+> > > > 2025-11-14, 05:56:17 +0200, Jianbo Liu wrote:
+> > > > > The correct value is in xfrm_offload(skb)->proto, which is set from
+> > > > > the outer tunnel header's protocol field by esp[4|6]_gso_encap(). It
+> > > > > is initialized by xfrm[4|6]_tunnel_encap_add() to either IPPROTO_IPIP
+> > > > > or IPPROTO_IPV6, using xfrm_af2proto() and correctly reflects the
+> > > > > inner packet's address family.
+> > > > 
+> > > > What's the call sequence that leads to calling
+> > > > xfrm4_tunnel_gso_segment without setting
+> > > > XFRM_MODE_SKB_CB(skb)->protocol? I'm seeing
+> > > > 
+> > > > xfrm_output -> xfrm_output2 -> xfrm_output_one
+> > > >    -> xfrm_outer_mode_output -> xfrm4_prepare_output
+> > > >    -> xfrm_inner_extract_output -> xfrm4_extract_output
+> > > > 
+> > > > (almost same as what ends up calling xfrm[4|6]_tunnel_encap_add)
+> > > > so XFRM_MODE_SKB_CB(skb)->protocol should be set?
+> > > > 
 > > > 
-> > > An xfrm_state offloaded on the bond device with bond_ipsec_add_sa()
-> > > uses
-> > > 'real_dev' on the xfrm_state xs to redirect the offload to the
-> > > current
-> > > active slave. The corresponding bond_ipsec_del_sa() (called with
-> > > the xs
-> > > spinlock held) redirects the unoffload call to real_dev.
+> > > I think we both made mistaken.
+> > > a. XFRM_MODE_SKB_CB(skb)->protocol is assigned in that path, but it is
+> > > assigned the value from ip_hdr(skb)->protocol. This means it holds the L4
+> > > protocol (e.g., IPPROTO_TCP or IPPROTO_UDP). However, to correctly determine
+> > > the inner mode family, we need the tunnel protocols (IPPROTO_IPIP or
+> > > IPPROTO_IPV6), which xfrm_af2proto() expects.
 > > 
+> > (not "expects" but "returns"? or did you mean
+> > s/xfrm_af2proto/xfrm_ip2inner_mode/?)
 > > 
-> > > Finally,
-> > > cleanup happens in bond_ipsec_free_sa(), which removes the offload
-> > > from
-> > > the device. Since the last call happens without the xs spinlock
-> > > held,
-> > > that is where the real work to unoffload actually happens.
-> > 
-> > Not on all devices (some don't even implement xdo_dev_state_free).
 > 
-> You're right. Looking at what the stack does:
-> xfrm_state_delete() immediately calls xdo_dev_state_delete(), but
-> leaves xdo_dev_state_free() for when there are no more refs (in-flight
-> tx packets are done).
-> xfrm_dev_state_flush() forces an xfrm_dev_state_free() immediately
-> after deleting xs. I guess the goal is to clean up *now* everything
-> from 'dev'.
+> Yes, I meant xfrm_ip2inner_mode. I apologize for the confusing mix-up in
+> helper function names.
 
-Yes, see 07b87f9eea0c ("xfrm: Fix unregister netdevice hang on hardware offload.")
-(though I'm not sure it's still needed, now that TCP drops the secpath
-early: 9b6412e6979f)
-
-> All other callers of xfrm_state_delete() don't care about free, it will
-> be done when there are no more refs.
-> 
-> So right now for devices that implement xdo_dev_state_free(), there's
-> distinct behavior of what happens when xfrm_state_delete gets called
-> 
-> So right now, there's a difference in behavior for what happens with
-> in-flight packets when xfrm_state_delete() is called:
-> 1. On devs which delete the dev state in xdo_dev_state_free(), in-
-> flight packets are not affected.
-> 2. On devs which delete the dev state in xdo_dev_state_delete(), in-
-> flight packets will see the xs yanked from underneath them.
-> 
-> This makes me ask the question: Is there a point to the
-> xdo_dev_state_delete() callback any more? Couldn't we consolidate on
-> having a single callback to free the offloaded xfrm_state when there
-> are no more references to it? This would simplify the delete+free dance
-> and would leave proper cleanup for the xs reference counting.
-> 
-> What am I missing?
-
-I don't know. Maybe it's a leftover of the initial offload
-implementation/drivers that we don't need anymore? Steffen?
-
+No worries. Thanks for clarifying.
 
 [...]
-> > > With the new approach, in-use states on old_dev will not be deleted
-> > > until in-flight packets are transmitted.
+> > And looking for all uses of inner_mode_iaf, I'm not sure we need this
+> > at all anymore. We only use inner_mode_iaf->family nowadays, and
+> > ->family is always "not x->props.family" (one of AF_INET/AF_INET6), or
+> > 0 with unspec selector on transport mode (makes sense, there's no
+> > "inner" AF there). (but that's a separate issue)
 > > 
-> > How does this guarantee it? It would be good to describe how the new
-> > approach closes the race with a bit more info than "use
-> > xfrm_state_migrate".
-> > 
-> > And I don't think we currently guarantee that packets using offload
-> > will be fully transmitted before xdo_dev_state_delete was called in
-> > case of deletion. 
 > 
-> Apologies for leaving this part out, yeah, it's pretty important.
-> I changed the descriptions for the next versions, here's what happens:
-> In-flight offloaded tx packets hold a reference to the used xfrm_state
-> via xfrm_output -> xfrm_state_hold which gets released when the
-> completion arrives via napi_consume_skb -...-> skb_ext_put ->
-> skb_ext_put_sp -> xfrm_state_put.
-> 
-> But this doesn't work on devices which do the dev state deletion in
-> xdo_dev_state_delete(), because those might get their SAs yanked from
-> the device during the xfrm_state_delete() added in this patch. I guess
-> this ties to the previous point: Shouldn't there be only
-> xdo_dev_state_delete which touches the device when refcount is 0?
-> 
-> 
-> > But ok, the bond case is worse due to the add/delete
-> > dance when we change the active slave (and there's still the possible
-> > issue Steffen mentioned a while ago, that this delete/add dance may
-> > not be valid at all depending on how the HW behaves wrt IVs).
-> 
-> I am aware of that issue, I am not trying to change any of that. Just
-> trying to improve bond from a security perspective.
+> The inner_mode_iaf is required because it holds several fields (maybe more
+> if extended in the future) for the inner mode, not just the address family.
 
-Sure. But I'm not sure we can make it really trustworthy...
-
-> I don't think it's
-> ok for it to send out unencrypted IPSec packets.
-
-Agree.
-
-
-> > > It also makes for cleaner
-> > > bonding code, which no longer needs to care about xfrm_state
-> > > management
-> > > so much.
-> > 
-> > But using the migrate code for that feels kind of hacky, and the 2nd
-> > patch in this set also looks quite hacky.
-> 
-> It's less hacky than the manual xfrm state management done so far. At
-> least bonding no longer needs to care so much about the semantics of
-> the xfrm dev state operations. And it no longer needs to acquire the
-> xs->lock (what does bonding have to do with an internal xfrm_state lock
-> anyway?)
-
-To me, it's hacky in the sense that we're hijacking the migrate code
-that isn't intended for that, and triggering core xfrm operations from
-inside a driver (and without proper locking). But true, the current
-code is also hacky.
-
-I think a better solution might be to find a way to use the
-"per-resource" SA code for bonding (currently implemented for
-"per-CPU" SAs, but a resource could be a lower device). Then we don't
-have to worry about moving states from one link to another, but it
-requires userspace cooperation.
-
-
-> > And doing all that without protection against admin operations on the
-> > xfrm state objects doesn't seem safe.
-> > 
-> > Thinking about the migrate behavior, if we fail to create/offload the
-> > new state:
-> >  - old state will be deleted
-> >  - new state won't be created
-> > 
-> > So any packet we send afterwards that would need to use this SA will
-> > just get dropped? (while the old behavior was "no more offload until
-> > we change the active slave again"?)
-> 
-> This is not ideal, I agree. Perhaps instead of giving up on the failed
-> xs there could be an alternate migration path where we call
-> xdo_dev_state_free+xdo_dev_state_add like before? Ick, I don't really
-> like that.
-> 
-> Alternatively, I have implemented another fix to these races, which is
-> to change xs.xso to be able to be offloaded on multiple devices at the
-> same time (nothing fancy, just parameter changes to xdo ops) and
-> changing the bonding driver to maintain a single offloaded xfrm_state
-> on *all* slaves (using bonding data structs). Changing the active slave
-> then becomes as simple as updating the esn on the new device (to get
-> that device state up to speed).
-> Leon and I discussed about that and he suggested it would be better to
-> use xfrm_state_migrate, since that is an existing well-understood
-> workflow.
-> Do you think that approach is worth pursuing instead? I could send them
-> patches as RFC for discussion.
-
-You can go ahead and share them if you want, but the short description
-above kind of puzzles/scares me.
-
-This whole feature is really a mess :/
+But the other fields are never used (and have the same value as those
+from x->inner_mode, no need to check _iaf). Anyway, I'll propose a
+cleanup later.
 
 -- 
 Sabrina
