@@ -1,177 +1,207 @@
-Return-Path: <netdev+bounces-240594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6723BC76BB1
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 01:19:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 259B0C76BD2
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 01:21:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2D6F73583B7
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 00:19:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E8B3A357AC2
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 00:20:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1BD4223DD6;
-	Fri, 21 Nov 2025 00:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67262248AE;
+	Fri, 21 Nov 2025 00:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YCro1LeL"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="eDBh1/5j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46CCB218AAB
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 00:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB4A1F09A3
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 00:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763684360; cv=none; b=ushWyNJ4LP8DgUm3mxsmePb0q9khI/upes2L/MF1LIHrcb1MiaBQDjoHg8G6dNE0Wsbi1VhUy54HGhtCcQxqFRZkk9GUB46mPccLJowfOMfwMg7NCXmeu67NQMzD4xGxryWVyUTHYdveTofJmL/5onbW0DBCRRR0dbfr7oU14eg=
+	t=1763684454; cv=none; b=Fax5jOhJSkVkkls81CP38bX6+SmnMW2HzeUQYN+Js+SYLiDyuwP9sZjQX5ZAt7+f4zms8p1G4+LCX7Osz6IKvfyV7EW+zKyO0g9ChFZXYBKhxM3zxKpfSlS045TS1JK2ZIjXDE5E14D2ftngrYsN9+aL6oQrZ8Vx9/ISGCsZgYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763684360; c=relaxed/simple;
-	bh=WBReMd/4kyyzfFC4PN4BcAjrw+uONVzAFH3InTSJ9D8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=krZkWhyaPSgdSWBeI/8BxA84uOrNm6kj+4xYrkHSIgE6yfi5wux/vZtb6NVy0s/if5oX+z/Luzo458stqM7UpoeSz5pkN5AF5zkqerG7Rk2k/GO2NkRGhkc0HBsFdaAp6/o1Df/O35vh7mTKWAtLiKdn+nucQVPancOpqMeRKek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YCro1LeL; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763684360; x=1795220360;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=WBReMd/4kyyzfFC4PN4BcAjrw+uONVzAFH3InTSJ9D8=;
-  b=YCro1LeLS0K+A3jC/VFnbN1QkGlvXtlggfYB4w8L8M6Vlb3GXMD06wm7
-   C4udj1v3ZLQ8FQvREfjyjV0tlJxmpqbYRcBVco2k2cT3C7J0//mDvVt0m
-   Miuw5ExIwS6RLOIHLq62GJOsMN5Jd+8mHrVZjil8/KXnpGr3Vw3RXNp3o
-   fNoaiOHgrsOVUsFvq4v+jgCxdOP+2i8PENYfLmEr3KGLVRK+B/Z9hl1ND
-   pKjNUQ974p+7s6L0XIDWyuCoLKfyjNLaijhT2mlpUIySjJcjE1GOPWwth
-   VPiWpxbdEdTYld4BcSY8lm9V8L92bmFTLWHdrytvFaOoA1EPxCpdGZu2A
-   Q==;
-X-CSE-ConnectionGUID: QgqciuONRbW+B7ONOQ1HgQ==
-X-CSE-MsgGUID: 9EQY6kNYTxGvjl634281Kw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="65704083"
-X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
-   d="scan'208";a="65704083"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 16:19:16 -0800
-X-CSE-ConnectionGUID: A3hmL438R/uJjuxBMSU4HA==
-X-CSE-MsgGUID: jMKo8rHLSjWvOg33LpUgqQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
-   d="scan'208";a="190815185"
-Received: from estantil-desk.jf.intel.com ([10.166.241.24])
-  by orviesa010.jf.intel.com with ESMTP; 20 Nov 2025 16:19:15 -0800
-From: Emil Tantilov <emil.s.tantilov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Aleksandr.Loktionov@intel.com,
-	przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	decot@google.com,
-	willemb@google.com,
-	joshua.a.hay@intel.com,
-	madhu.chittim@intel.com,
-	aleksander.lobakin@intel.com,
-	larysa.zaremba@intel.com,
-	iamvivekkumar@google.com
-Subject: [PATCH iwl-net v2 5/5] idpf: fix error handling in the init_task on load
-Date: Thu, 20 Nov 2025 16:12:18 -0800
-Message-Id: <20251121001218.4565-6-emil.s.tantilov@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20251121001218.4565-1-emil.s.tantilov@intel.com>
-References: <20251121001218.4565-1-emil.s.tantilov@intel.com>
+	s=arc-20240116; t=1763684454; c=relaxed/simple;
+	bh=gkVr8IobuC68eHv3Z7VDv3KtRdI5x5m7j6A4Cq1f+Xk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YDxELL7OEKBGW7yLXQHCcbtNWJcr7LKhPHHHuZMXSKR3UhwESAQ9aTEO8vkbxHmw2VLm/CYJXgazWyd4xUolxxHwd9uaCsxxeg01Lnd0X4WWxp8oPotf6NyqRLDu0PPPokHpbF6u2RLMIaEVMHEof06LQu0jNoaxog+MSlJOYKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=eDBh1/5j; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4779cb0a33fso14256815e9.0
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 16:20:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1763684450; x=1764289250; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PZEcjIjXTcoCtcoHMKS6yM6dPDyzVSynlkUTK2L1Eyc=;
+        b=eDBh1/5jVornOlC3bGDMlIKrSIzcThlN/n9FqHGMJ5nq9IQo7/b0VP2iqVWQuOiZzb
+         zQQK64BXXrQDbMTkuIGzzU9mCs/mHYr49+kmPJB6MgMPxs+kGVw1jUG+tzAleMnB+Xjj
+         YhMLkFwmdTV9WrVcv3TtIDpJAPweHU/vnMfVdLChr1f++jxjc3q8w8b5tURZl6kXTQRD
+         RMCRll8P4urM7vwZzw7q/z6tGlosAgV6NokDfXGZO2lZm9QI4nkNaIH87WyMoG0K/pV0
+         Y6Rg8qdsafQ8qHYfaRZ0BZl5/NzY+QPVwk5xSBuOOvs0551eLmApCoEnZlOfyiREJ6/T
+         PiiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763684450; x=1764289250;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PZEcjIjXTcoCtcoHMKS6yM6dPDyzVSynlkUTK2L1Eyc=;
+        b=R8csnalLr8hq7xqmiiQVMig6+7Gsqjr+IIBM8ihb83pnDXbB7eu89qqNSsv0Av8iXL
+         0a9nCErPaViEcQyAwR9QT0kyhKmvsG3pdeSuDoJMN6/Ws2lnUozzf5CuF3m305kMWSqp
+         qjEYluZ9uQwIYawEQOksTV8qEwMoOeC7bagRs/8qe8zXzDMCTFYf09F217sz7wLZS8p2
+         u6OxRy6zTguOQG2gTUWMVv2VlokxX6iXfV9Y8fNNOlT/VNy7Dm5knT9ICf5J51IZs58n
+         9LKgnOfKF5b+ABkKTALFEHxRVCgkok1J5sKMf6y8Uw+Yj+wxTtrYY14yj1eQr9TGmiTd
+         2W3g==
+X-Gm-Message-State: AOJu0YzQAcOXPgg/jNIBwEltSU7PoRS/tKMAqZHBzbb3aXvuoL9N2Rp0
+	sDMYjYExaz8sipR1Cpr0pjU73+R0y2XGLWpbW+owxoMVYJxKFzcSsy3cg1cDAHvXzjqtorYK3EA
+	55QpoDwbu5o9A8rc2BcmTNb25wcBnQf1rA6TZYtMXvhsx/fwTt6vdNQF/HaQiFqaKNQk=
+X-Gm-Gg: ASbGnctuCpg+c/9bb1DiE8MMMfTgGiym5L4S4Wq0YoYQf2mG9bkTl2Emk1TARJHD4dT
+	NolCvDpRIdlMHrTHfrsHOA8G0UGDOLIoIQ0NxZ02E2rZEQnOOSWFT7L7zMUacdzNtWwxB/E4uvg
+	mag5A+pG2UJj3Srj4aeyjfBIrkJiSRZNPppnpIof18MwYLBvq/Pvsxerdo4/JYLDh2ATOyfWOpp
+	xiM+BPtFZODVvoxZfhv4/g/B2Wt9gT11UJ0vT3LHv1xYBwjBdi93fNFq4gT+HjqOQzduPSfm7q2
+	qgnRwcplU7gJ4mXjkOoeFPWyM5jzCk3r/qBHLGLPMx9w+KPA3JHw7CosN0Qslf1rU1Ur1an0H/E
+	yvaEFC00BMijkiNzYXng8kC2GR96LA8ZjUCEa3EVa7G6lxZpysE//6v6I/f2k2EFH0iakAa1jIq
+	DzMevhShUBrhwGJ7FpILiE0p8gdnAnsyQ3dFw=
+X-Google-Smtp-Source: AGHT+IFUsYW7hYLEsGViwAV+3gSRUjYStxH02gAJMXNSlf/oVnRvsCZ+DsOFchdok41u9ZKOmJE2Wg==
+X-Received: by 2002:a05:600c:5494:b0:477:93f7:bbc5 with SMTP id 5b1f17b1804b1-477c0184c3amr4926295e9.10.1763684450102;
+        Thu, 20 Nov 2025 16:20:50 -0800 (PST)
+Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:85ee:9871:b95c:24cf])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf226bf7sm15287345e9.11.2025.11.20.16.20.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Nov 2025 16:20:49 -0800 (PST)
+From: Antonio Quartulli <antonio@openvpn.net>
+To: netdev@vger.kernel.org
+Cc: Antonio Quartulli <antonio@openvpn.net>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Ralf Lici <ralf@mandelbit.com>,
+	linux-kselftest@vger.kernel.org,
+	Shuah Khan <shuah@kernel.org>
+Subject: [RFC net-next 00/13] ovpn: new features + kselftests
+Date: Fri, 21 Nov 2025 01:20:31 +0100
+Message-ID: <20251121002044.16071-1-antonio@openvpn.net>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-If the init_task fails during a driver load, we end up without vports and
-netdevs, effectively failing the entire process. In that state a
-subsequent reset will result in a crash as the service task attempts to
-access uninitialized resources. Following trace is from an error in the
-init_task where the CREATE_VPORT (op 501) is rejected by the FW:
+Dear all,
 
-[40922.763136] idpf 0000:83:00.0: Device HW Reset initiated
-[40924.449797] idpf 0000:83:00.0: Transaction failed (op 501)
-[40958.148190] idpf 0000:83:00.0: HW reset detected
-[40958.161202] BUG: kernel NULL pointer dereference, address: 00000000000000a8
-...
-[40958.168094] Workqueue: idpf-0000:83:00.0-vc_event idpf_vc_event_task [idpf]
-[40958.168865] RIP: 0010:idpf_vc_event_task+0x9b/0x350 [idpf]
-...
-[40958.177932] Call Trace:
-[40958.178491]  <TASK>
-[40958.179040]  process_one_work+0x226/0x6d0
-[40958.179609]  worker_thread+0x19e/0x340
-[40958.180158]  ? __pfx_worker_thread+0x10/0x10
-[40958.180702]  kthread+0x10f/0x250
-[40958.181238]  ? __pfx_kthread+0x10/0x10
-[40958.181774]  ret_from_fork+0x251/0x2b0
-[40958.182307]  ? __pfx_kthread+0x10/0x10
-[40958.182834]  ret_from_fork_asm+0x1a/0x30
-[40958.183370]  </TASK>
+This patchset is just a respin of my latest PR to net-next, including all
+modifications requested by Jakub and Sabrina.
 
-Fix the error handling in the init_task to make sure the service and
-mailbox tasks are disabled if the error happens during load. These are
-started in idpf_vc_core_init(), which spawns the init_task and has no way
-of knowing if it failed. If the error happens on reset, following
-successful driver load, the tasks can still run, as that will allow the
-netdevs to attempt recovery through another reset. Stop the PTP callbacks
-either way as those will be restarted by the call to idpf_vc_core_init()
-during a successful reset.
+However, this time I am also adding patches targeting selftest/net/ovpn, as
+they come in handy for testing the new features (originally I wanted
+them to be a separate PR, but it doesn't indeed make a lot of sense).
 
-Fixes: 0fe45467a104 ("idpf: add create vport and netdev configuration")
-Reported-by: Vivek Kumar <iamvivekkumar@google.com>
-Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_lib.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+This said, since these kselftest patches are quite invasive, I didn't
+feel confident with sending them in a PR right away, but I rather wanted
+some feedback from Sabrina and Shuah first, if possible.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 5193968c9bb1..89f3b46378c4 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -1716,10 +1716,9 @@ void idpf_init_task(struct work_struct *work)
- 		set_bit(IDPF_VPORT_REG_NETDEV, vport_config->flags);
- 	}
- 
--	/* As all the required vports are created, clear the reset flag
--	 * unconditionally here in case we were in reset and the link was down.
--	 */
-+	/* Clear the reset and load bits as all vports are created */
- 	clear_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
-+	clear_bit(IDPF_HR_DRV_LOAD, adapter->flags);
- 	/* Start the statistics task now */
- 	queue_delayed_work(adapter->stats_wq, &adapter->stats_task,
- 			   msecs_to_jiffies(10 * (pdev->devfn & 0x07)));
-@@ -1733,6 +1732,15 @@ void idpf_init_task(struct work_struct *work)
- 				idpf_vport_dealloc(adapter->vports[index]);
- 		}
- 	}
-+	/* Cleanup after vc_core_init, which has no way of knowing the
-+	 * init task failed on driver load.
-+	 */
-+	if (test_and_clear_bit(IDPF_HR_DRV_LOAD, adapter->flags)) {
-+		cancel_delayed_work_sync(&adapter->serv_task);
-+		cancel_delayed_work_sync(&adapter->mbx_task);
-+	}
-+	idpf_ptp_release(adapter);
-+
- 	clear_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
- }
- 
-@@ -1882,7 +1890,7 @@ static void idpf_init_hard_reset(struct idpf_adapter *adapter)
- 	dev_info(dev, "Device HW Reset initiated\n");
- 
- 	/* Prepare for reset */
--	if (test_and_clear_bit(IDPF_HR_DRV_LOAD, adapter->flags)) {
-+	if (test_bit(IDPF_HR_DRV_LOAD, adapter->flags)) {
- 		reg_ops->trigger_reset(adapter, IDPF_HR_DRV_LOAD);
- 	} else if (test_and_clear_bit(IDPF_HR_FUNC_RESET, adapter->flags)) {
- 		bool is_reset = idpf_is_reset_detected(adapter);
+So here we go.
+
+Once I get some approval on this batch, I'll send then send them all
+to net-next again as PRv2.
+
+
+Thanks a lot!
+
+Regards,
+
+
+Antonio Quartulli (1):
+  selftests: ovpn: allow compiling ovpn-cli.c with mbedtls3
+
+Qingfang Deng (1):
+  ovpn: pktid: use bitops.h API
+
+Ralf Lici (10):
+  selftests: ovpn: add notification parsing and matching
+  ovpn: notify userspace on client float event
+  ovpn: add support for asymmetric peer IDs
+  selftests: ovpn: check asymmetric peer-id
+  selftests: ovpn: add test for the FW mark feature
+  ovpn: consolidate crypto allocations in one chunk
+  ovpn: use bound device in UDP when available
+  selftests: ovpn: add test for bound device
+  ovpn: use bound address in UDP when available
+  selftests: ovpn: add test for bound address
+
+Sabrina Dubroca (1):
+  ovpn: use correct array size to parse nested attributes in
+    ovpn_nl_key_swap_doit
+
+ Documentation/netlink/specs/ovpn.yaml         |  23 +-
+ drivers/net/ovpn/crypto_aead.c                | 162 +++++++---
+ drivers/net/ovpn/io.c                         |   8 +-
+ drivers/net/ovpn/netlink-gen.c                |  13 +-
+ drivers/net/ovpn/netlink-gen.h                |   6 +-
+ drivers/net/ovpn/netlink.c                    |  98 +++++-
+ drivers/net/ovpn/netlink.h                    |   2 +
+ drivers/net/ovpn/peer.c                       |   6 +
+ drivers/net/ovpn/peer.h                       |   4 +-
+ drivers/net/ovpn/pktid.c                      |  11 +-
+ drivers/net/ovpn/pktid.h                      |   2 +-
+ drivers/net/ovpn/skb.h                        |  13 +-
+ drivers/net/ovpn/udp.c                        |  10 +-
+ include/uapi/linux/ovpn.h                     |   2 +
+ tools/testing/selftests/net/ovpn/Makefile     |  17 +-
+ .../selftests/net/ovpn/check_requirements.py  |  37 +++
+ tools/testing/selftests/net/ovpn/common.sh    |  60 +++-
+ tools/testing/selftests/net/ovpn/data64.key   |   6 +-
+ .../selftests/net/ovpn/json/peer0-float.json  |   9 +
+ .../selftests/net/ovpn/json/peer0.json        |   6 +
+ .../selftests/net/ovpn/json/peer1-float.json  |   1 +
+ .../selftests/net/ovpn/json/peer1.json        |   1 +
+ .../selftests/net/ovpn/json/peer2-float.json  |   1 +
+ .../selftests/net/ovpn/json/peer2.json        |   1 +
+ .../selftests/net/ovpn/json/peer3-float.json  |   1 +
+ .../selftests/net/ovpn/json/peer3.json        |   1 +
+ .../selftests/net/ovpn/json/peer4-float.json  |   1 +
+ .../selftests/net/ovpn/json/peer4.json        |   1 +
+ .../selftests/net/ovpn/json/peer5-float.json  |   1 +
+ .../selftests/net/ovpn/json/peer5.json        |   1 +
+ .../selftests/net/ovpn/json/peer6-float.json  |   1 +
+ .../selftests/net/ovpn/json/peer6.json        |   1 +
+ tools/testing/selftests/net/ovpn/ovpn-cli.c   | 281 +++++++++++-------
+ .../selftests/net/ovpn/requirements.txt       |   1 +
+ .../testing/selftests/net/ovpn/tcp_peers.txt  |  11 +-
+ .../selftests/net/ovpn/test-bind-addr.sh      |  10 +
+ tools/testing/selftests/net/ovpn/test-bind.sh | 117 ++++++++
+ .../selftests/net/ovpn/test-close-socket.sh   |   2 +-
+ tools/testing/selftests/net/ovpn/test-mark.sh |  81 +++++
+ tools/testing/selftests/net/ovpn/test.sh      |  57 +++-
+ .../testing/selftests/net/ovpn/udp_peers.txt  |  12 +-
+ 41 files changed, 855 insertions(+), 224 deletions(-)
+ create mode 100755 tools/testing/selftests/net/ovpn/check_requirements.py
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer0-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer0.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer1-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer1.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer2-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer2.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer3-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer3.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer4-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer4.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer5-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer5.json
+ create mode 120000 tools/testing/selftests/net/ovpn/json/peer6-float.json
+ create mode 100644 tools/testing/selftests/net/ovpn/json/peer6.json
+ create mode 120000 tools/testing/selftests/net/ovpn/requirements.txt
+ create mode 100755 tools/testing/selftests/net/ovpn/test-bind-addr.sh
+ create mode 100755 tools/testing/selftests/net/ovpn/test-bind.sh
+ create mode 100755 tools/testing/selftests/net/ovpn/test-mark.sh
+
 -- 
-2.37.3
+2.51.2
 
 
