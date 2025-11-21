@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-240689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9495AC77F0C
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:36:57 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC85EC77EEB
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:35:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id EBCCC30CA3
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 08:33:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BE8534E9979
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 08:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2960033C1B6;
-	Fri, 21 Nov 2025 08:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531DC33C50D;
+	Fri, 21 Nov 2025 08:33:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UzDmJbMV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cmc7duB6"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0AE33BBDB
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 08:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A870933C1A5
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 08:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763713988; cv=none; b=RZ+ErQgphO2VSSdVRJ+6XU+RHzEruvlgK+kgXv+biuX2TMjjfWpqEEEjga+GA1ncLTEW6jJ1T1IOX2j+nvA5grDYJsND5B3xBYpiHZ37xQZU5F8vaSFOrDjy+f9XY0ihJ2ANQGM3XvHRmA8gmTuYsTk92Iro4kbcet9/ek34uoc=
+	t=1763713989; cv=none; b=ajd5qSwYUG/tkXMRJ2H2/1I3V61hfA3U+pYkIYO+4AO9CHYlI9pmNBxfuAjqQ0Q8BDpka+C5iod0RTNcEZ1n8yCg3x4RYl7kgL1GH8169y82St744XelvLSicceVR3xr+MeLNGBZeptMkauvsBWehxSMd65e8HmUTC0oune7wfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763713988; c=relaxed/simple;
-	bh=PzfuYvqUQIE4fXbX+TsPHPm55oUbZnO16LGusAr2Dg0=;
+	s=arc-20240116; t=1763713989; c=relaxed/simple;
+	bh=XFqUHjvSLue/QWMCGsMmcrVc0elHs4WFzSTYSTFkjC8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=M7M/Ut7M8IlVfTfXx1r8WI9Um7bIL1WvCQsZRSqgfstcvFftAE2uDtnm8UvFueAsjxUh6eAJ++P78SLLv26P2Z65HPlUeOlBY9ZT6Jb7r3oUi55Xq3aCfQbNMGehhk+wdVu0gu9nl2Ct+sTKPIAeF5m8y/xNkcHXVXVK4cmAeoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UzDmJbMV; arc=none smtp.client-ip=209.85.219.74
+	 To:Cc:Content-Type; b=BofIu4uT2xUv++LH9pp/auQ/i7HfqyugtKY1FEqdGRRONiANHv0OBwk0bKjtsHNnAd5GAghqys24q+Bt3fsaiwFCeHpKMGxFX9tAU2Dxbef5NsEJ5ulFP63Qz8fM1c61b+fUJIuHheXjmCyzf5uR7JMCeATatCZ5u7QVYd/dJu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cmc7duB6; arc=none smtp.client-ip=209.85.219.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-880444afa2cso23986556d6.1
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 00:33:06 -0800 (PST)
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-880501dcc67so82393966d6.3
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 00:33:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763713985; x=1764318785; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763713986; x=1764318786; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5EL3KEUgZGnbwXQCvtf+xiUF/kGzinngnuVYQ1V0yOY=;
-        b=UzDmJbMVFFt9iB7We4ynQZQL99XZWXiS6ahB2jQ/P8JonNpuvG+AqodEsIEdKPX0bd
-         GGROG7pzVdp+JnMFDtLY4QezlPvP20U/RZDhaaRmQwTsEY4DR1tlfabqXCrWWvBwGPIG
-         ndBvjTkZbeV/DdMXf6EgkVLKVteOYtheEjNzBpETcltkkSZ2KzSKJpUzdW6H3cPP8nGf
-         ioXH8oHbFcnUuUKDU6WkOKR5sF2ctqMzUaLKOCpDIRYTdsL9vdjEvad9phC68JEBJqRn
-         9gSGSm21LQBE7/Cfo2cbU25gLxTNObIpePVuG/1J0q11VaX8Hc7mAIM+WJZKqELZn/pJ
-         qQPg==
+        bh=uNdhzEsBsFO6H5IIdiKTSR/LaiuSK2adJi0pugGVspc=;
+        b=Cmc7duB6qTQssvCfamA17YtxLEOx3QPXDRiZ79UMb1mIZ8cbOf0sQ9U7KjIb2WiZlT
+         JBdqU4jziN7JtcLHAINcx7hdWjft6p0MaTskP7v6fSokkk+lUqaYy6hR+ZVwJh1IPGSk
+         FGVdEPZ6wMVZdftlClVIl4olq1MQKtf/WHxpmGvpVHSRk26aZrxaWBSSdbei2v/K93Bl
+         5fI4J0OxAiO0t7GSx6qjpwK2I6t6W83HYKjOZ/HmmlYU/nioj3e6gzP6Sor0MS3GM5v/
+         6iK5Js1Lmh1eKagB3pvWfYGu1aWpmgGSBawH30gRWUxLQ3VN7eQ+K+h1kaW0XSZ1M+ex
+         fYCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763713985; x=1764318785;
+        d=1e100.net; s=20230601; t=1763713986; x=1764318786;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5EL3KEUgZGnbwXQCvtf+xiUF/kGzinngnuVYQ1V0yOY=;
-        b=G8vqdjOGr0pYyh1CD/fjentBszEPYyWuKw/7rGnnFr+ZkF0Va8C5Efe/39ywBaDkQy
-         t025z1kS0OWBSFj0imK40K9AqCpxRzHmEJIQu/xRKaLr7KPqu4vWvk/8JgD0qQehGiAa
-         Idgd4plcOLtIU+/UtK8tc9yF0LnSPieqvScIpXpVnQNlD5Jzfpjc3Fq9KY2Dr+/HOXvw
-         DlQ4xkyvhbckEnS0aC0O4PQhqkBO2ZyTt+ZSdsvcCXyqXc0p6qlqyR3M9RINTakBCqXG
-         q4YUkYbEjv7/XOowVreqfn1v0fB+RAPZAv46X8vOxi6JTPq8PNCKyXMb6sMAE6pRYlCw
-         6KZA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/gxZcorhaLojg37q4evfNu5t2PHwfHlkFznYrq+YcPfBYpQdzLKCqYKdnD7VjakUE3h02MkA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOKQIxU0hR6yEMXOZnUBXXugF3qSddUeW9RLPjOBx1Zf3FUcDA
-	EugHxvfCbfpp8vmc8Ch0yuubcBZJje5wo+Ia+hWQ60Zyai/DA43/Tii4xXrVJ80U/PI/CRbXwKZ
-	EZknJhWJETlJpOg==
-X-Google-Smtp-Source: AGHT+IFguIPd3StUj46x9acWoXRaT+fUS6wbthLDOSEi08QGalT0HyeJkO6HtQlEaZa5fxpu4xM/pUx/ZwgOEw==
-X-Received: from qvbkr28.prod.google.com ([2002:a05:6214:2b9c:b0:882:4668:dfc9])
+        bh=uNdhzEsBsFO6H5IIdiKTSR/LaiuSK2adJi0pugGVspc=;
+        b=gg8NfcEkxB2h2gW3wZrxL/AvYBxZ9i/pXlvgwLR0qFu8iO0/HAydFCfhrOdXVMsiFz
+         pNFp52GOU9ivK1Nm2WqUuYeBUdiXH29UqM9fXY3Zpp9b7RQ9OEGmX/1p4nClVCSmvg8o
+         8Z7OzV5HQrk/0qSGyC+YiSbqAAJdeLmBKHsdIdrD9evQcJXi1YMXW0lVe3Ehtej1POie
+         JDVtwRWYhVrC5BltwwWUhmfGkqPvEjNXb93JLW9yY+Td2W+CjkqXBBHZqktwyu2cUNTf
+         5ttMUqWm2sxssdN4GcApfr48oVp9COWDnp9zX6FI9ksgnrh77+RgCzl9/mr0iCQ9JhkA
+         9T9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUV7gqaOIIXQ1gZvCCLXP9yRgs09cUxlku8bvAXbrfK/d/eUtXr3IcTmlm0pncA4qWP+RizOYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYC5L76JHouTG5WJwmEKwyjPrl2ZbfQJY3PZzOHMjUp7H3q+n6
+	ttxEW9mdCeJ2waSlssNOv9Khmxk0e2IBDyJhzvPaUCnNdG7iqoXYG9Dtp3+gWSF6iEskvV7k6Uy
+	luxpTRwROGuTEQQ==
+X-Google-Smtp-Source: AGHT+IFd+jVeSYSUIaQcqjXim1UU93MqmtBL+PcI9ynj+OUtPkfMjQQ5sPtfwMStIOIyaHNOg0SITG7NitAadw==
+X-Received: from qvbmw1.prod.google.com ([2002:a05:6214:33c1:b0:882:5544:5991])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:21e2:b0:880:52d3:9bfc with SMTP id 6a1803df08f44-8847c4e007amr17576396d6.22.1763713985195;
- Fri, 21 Nov 2025 00:33:05 -0800 (PST)
-Date: Fri, 21 Nov 2025 08:32:47 +0000
+ 2002:a05:622a:15c4:b0:4ee:1727:10bb with SMTP id d75a77b69052e-4ee58b047fbmr15999171cf.73.1763713986494;
+ Fri, 21 Nov 2025 00:33:06 -0800 (PST)
+Date: Fri, 21 Nov 2025 08:32:48 +0000
 In-Reply-To: <20251121083256.674562-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251121083256.674562-1-edumazet@google.com>
 X-Mailer: git-send-email 2.52.0.460.gd25c4c69ec-goog
-Message-ID: <20251121083256.674562-6-edumazet@google.com>
-Subject: [PATCH v3 net-next 05/14] net_sched: use qdisc_skb_cb(skb)->pkt_segs
- in bstats_update()
+Message-ID: <20251121083256.674562-7-edumazet@google.com>
+Subject: [PATCH v3 net-next 06/14] net_sched: cake: use qdisc_pkt_segs()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -87,126 +86,57 @@ Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Avoid up to two cache line misses in qdisc dequeue() to fetch
-skb_shinfo(skb)->gso_segs/gso_size while qdisc spinlock is held.
+Use new qdisc_pkt_segs() to avoid a cache line miss in cake_enqueue()
+for non GSO packets.
 
-This gives a 5 % improvement in a TX intensive workload.
+cake_overhead() does not have to recompute it.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/sch_generic.h | 13 ++++++++++---
- net/sched/sch_cake.c      |  1 +
- net/sched/sch_dualpi2.c   |  1 +
- net/sched/sch_netem.c     |  1 +
- net/sched/sch_qfq.c       |  2 +-
- net/sched/sch_taprio.c    |  1 +
- net/sched/sch_tbf.c       |  1 +
- 7 files changed, 16 insertions(+), 4 deletions(-)
+ net/sched/sch_cake.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 9cd8b5d4b23698fd8959ef40c303468e31c1d4af..cdf7a58ebcf5ef2b5f8b76eb6fbe92d5f0e07899 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -829,6 +829,15 @@ static inline unsigned int qdisc_pkt_len(const struct sk_buff *skb)
- 	return qdisc_skb_cb(skb)->pkt_len;
- }
- 
-+static inline unsigned int qdisc_pkt_segs(const struct sk_buff *skb)
-+{
-+	u32 pkt_segs = qdisc_skb_cb(skb)->pkt_segs;
-+
-+	DEBUG_NET_WARN_ON_ONCE(pkt_segs !=
-+			(skb_is_gso(skb) ? skb_shinfo(skb)->gso_segs : 1));
-+	return pkt_segs;
-+}
-+
- /* additional qdisc xmit flags (NET_XMIT_MASK in linux/netdevice.h) */
- enum net_xmit_qdisc_t {
- 	__NET_XMIT_STOLEN = 0x00010000,
-@@ -870,9 +879,7 @@ static inline void _bstats_update(struct gnet_stats_basic_sync *bstats,
- static inline void bstats_update(struct gnet_stats_basic_sync *bstats,
- 				 const struct sk_buff *skb)
- {
--	_bstats_update(bstats,
--		       qdisc_pkt_len(skb),
--		       skb_is_gso(skb) ? skb_shinfo(skb)->gso_segs : 1);
-+	_bstats_update(bstats, qdisc_pkt_len(skb), qdisc_pkt_segs(skb));
- }
- 
- static inline void qdisc_bstats_cpu_update(struct Qdisc *sch,
 diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index 9213129f0de10bc67ce418f77c36fed2581f3781..a20880034aa5eacec0c25977406104448b336397 100644
+index a20880034aa5eacec0c25977406104448b336397..5948a149129c6de041ba949e2e2b5b6b4eb54166 100644
 --- a/net/sched/sch_cake.c
 +++ b/net/sched/sch_cake.c
-@@ -1800,6 +1800,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		skb_list_walk_safe(segs, segs, nskb) {
- 			skb_mark_not_on_list(segs);
- 			qdisc_skb_cb(segs)->pkt_len = segs->len;
-+			qdisc_skb_cb(segs)->pkt_segs = 1;
- 			cobalt_set_enqueue_time(segs, now);
- 			get_cobalt_cb(segs)->adjusted_len = cake_overhead(q,
- 									  segs);
-diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
-index 4b975feb52b1f3d3b37b31713d1477de5f5806d9..6d7e6389758dc8e645b1116efe4e11fb7290ac86 100644
---- a/net/sched/sch_dualpi2.c
-+++ b/net/sched/sch_dualpi2.c
-@@ -475,6 +475,7 @@ static int dualpi2_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 			 * (3) Enqueue fragment & set ts in dualpi2_enqueue_skb
- 			 */
- 			qdisc_skb_cb(nskb)->pkt_len = nskb->len;
-+			qdisc_skb_cb(nskb)->pkt_segs = 1;
- 			dualpi2_skb_cb(nskb)->classified =
- 				dualpi2_skb_cb(skb)->classified;
- 			dualpi2_skb_cb(nskb)->ect = dualpi2_skb_cb(skb)->ect;
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index eafc316ae319e3f8c23b0cb0c58fdf54be102213..32a5f33040461f3be952055c097b5f2fe760a858 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -429,6 +429,7 @@ static struct sk_buff *netem_segment(struct sk_buff *skb, struct Qdisc *sch,
- 	struct sk_buff *segs;
- 	netdev_features_t features = netif_skb_features(skb);
+@@ -1398,12 +1398,12 @@ static u32 cake_overhead(struct cake_sched_data *q, const struct sk_buff *skb)
+ 	const struct skb_shared_info *shinfo = skb_shinfo(skb);
+ 	unsigned int hdr_len, last_len = 0;
+ 	u32 off = skb_network_offset(skb);
++	u16 segs = qdisc_pkt_segs(skb);
+ 	u32 len = qdisc_pkt_len(skb);
+-	u16 segs = 1;
  
-+	qdisc_skb_cb(skb)->pkt_segs = 1;
- 	segs = skb_gso_segment(skb, features & ~NETIF_F_GSO_MASK);
+ 	q->avg_netoff = cake_ewma(q->avg_netoff, off << 16, 8);
  
- 	if (IS_ERR_OR_NULL(segs)) {
-diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-index 2255355e51d350eded4549c1584b60d4d9b00fff..d920f57dc6d7659c510a98956c6dd2ed9e5ee5b8 100644
---- a/net/sched/sch_qfq.c
-+++ b/net/sched/sch_qfq.c
-@@ -1250,7 +1250,7 @@ static int qfq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		}
+-	if (!shinfo->gso_size)
++	if (segs == 1)
+ 		return cake_calc_overhead(q, len, off);
+ 
+ 	/* borrowed from qdisc_pkt_len_segs_init() */
+@@ -1430,12 +1430,6 @@ static u32 cake_overhead(struct cake_sched_data *q, const struct sk_buff *skb)
+ 			hdr_len += sizeof(struct udphdr);
  	}
  
--	gso_segs = skb_is_gso(skb) ? skb_shinfo(skb)->gso_segs : 1;
-+	gso_segs = qdisc_pkt_segs(skb);
- 	err = qdisc_enqueue(skb, cl->qdisc, to_free);
- 	if (unlikely(err != NET_XMIT_SUCCESS)) {
- 		pr_debug("qfq_enqueue: enqueue failed %d\n", err);
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index 39b735386996eb59712a1fc28f7bb903ec1b2220..300d577b328699eb42d2b829ecfc76464fd7b186 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -595,6 +595,7 @@ static int taprio_enqueue_segmented(struct sk_buff *skb, struct Qdisc *sch,
- 	skb_list_walk_safe(segs, segs, nskb) {
- 		skb_mark_not_on_list(segs);
- 		qdisc_skb_cb(segs)->pkt_len = segs->len;
-+		qdisc_skb_cb(segs)->pkt_segs = 1;
- 		slen += segs->len;
+-	if (unlikely(shinfo->gso_type & SKB_GSO_DODGY))
+-		segs = DIV_ROUND_UP(skb->len - hdr_len,
+-				    shinfo->gso_size);
+-	else
+-		segs = shinfo->gso_segs;
+-
+ 	len = shinfo->gso_size + hdr_len;
+ 	last_len = skb->len - shinfo->gso_size * (segs - 1);
  
- 		/* FIXME: we should be segmenting to a smaller size
-diff --git a/net/sched/sch_tbf.c b/net/sched/sch_tbf.c
-index 4c977f049670a600eafd219c898e5f29597be2c1..f2340164f579a25431979e12ec3d23ab828edd16 100644
---- a/net/sched/sch_tbf.c
-+++ b/net/sched/sch_tbf.c
-@@ -221,6 +221,7 @@ static int tbf_segment(struct sk_buff *skb, struct Qdisc *sch,
- 		skb_mark_not_on_list(segs);
- 		seg_len = segs->len;
- 		qdisc_skb_cb(segs)->pkt_len = seg_len;
-+		qdisc_skb_cb(segs)->pkt_segs = 1;
- 		ret = qdisc_enqueue(segs, q->qdisc, to_free);
- 		if (ret != NET_XMIT_SUCCESS) {
- 			if (net_xmit_drop_count(ret))
+@@ -1788,7 +1782,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	if (unlikely(len > b->max_skblen))
+ 		b->max_skblen = len;
+ 
+-	if (skb_is_gso(skb) && q->rate_flags & CAKE_FLAG_SPLIT_GSO) {
++	if (qdisc_pkt_segs(skb) > 1 && q->rate_flags & CAKE_FLAG_SPLIT_GSO) {
+ 		struct sk_buff *segs, *nskb;
+ 		netdev_features_t features = netif_skb_features(skb);
+ 		unsigned int slen = 0, numsegs = 0;
 -- 
 2.52.0.460.gd25c4c69ec-goog
 
