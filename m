@@ -1,58 +1,64 @@
-Return-Path: <netdev+bounces-240641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1367C77291
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 04:25:52 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F50DC772C2
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 04:39:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BF80C4E66C0
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:24:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 269422AEEE
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D792E54BB;
-	Fri, 21 Nov 2025 03:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6738026A1B9;
+	Fri, 21 Nov 2025 03:39:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RzhFCHiK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ty/EFn9x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737A62248AE
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 03:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7C818A956;
+	Fri, 21 Nov 2025 03:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763695485; cv=none; b=G53Pa8rMacHovENE/dg/svPiC0jFlujxSHZAqFYVcnBA0fjQL+mVKpYuRiladiihIp74G5N44OyRbUh6DJ4ktZNRpUjT6WSTwTy+QaNVmLC2MHtfZL8N7NHp/F3fbGJPfccNqUZp+vzN3QNj3QRz4GnnvDVncS4w/UajQ8xQYoA=
+	t=1763696384; cv=none; b=lVD/0uukjhuA2BTp0mdn9uV/IqDTZdhYVhhM0ebSzDPCcXvowhFwmFb+lRae+QvUxCeLUojGtgV+km/MUTnvMoy9Ybv42unuZLvhBcTHNfbylXm9Eyxfr3Bzq41qIU/PkkvI06eRdJfROPId6cdRUkHhk76+3BDEme6F2+7i3Hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763695485; c=relaxed/simple;
-	bh=2QfvV8bh3wMkQrI99FiERJOgsEbkSpA7LMfOjXIizH4=;
+	s=arc-20240116; t=1763696384; c=relaxed/simple;
+	bh=gsyvr6N3w0w8TUaKcqtHGPW+xZFPpFRf3IaY0bUKitQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BxYdjb6/cHMypPagrDaIi4QnCz44LV52RHiM9xM3OcdG7rDsjpBTFnx9gAxF3LKv5AZlGG6fpN7wZ7zYzLqF3uJwo2zll8mpZ3YIdXa6lEFonD4gwHvvO6cjnfUa3oLDYfiFvVisGCW/HDIVY3VF4R+/k6WKdAfkmdqrlnPZw8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RzhFCHiK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5EBC4CEF1;
-	Fri, 21 Nov 2025 03:24:44 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rLRZZtQv9qlJOXg/unQMx7n45O4wO5k10f4ni+53dLFwDBYfuT9oa8hoCBeJGYhshohTgEWztc6/sFKiJ8VqfiJ4QFLNPp0Z88KPGZUea4j7QyVuJhkkUQ9NYeRo/qqImj3fvV5a24BNNnulejBShPnGFWdjuRsPGok7AIeZaeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ty/EFn9x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0585DC4CEF1;
+	Fri, 21 Nov 2025 03:39:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763695485;
-	bh=2QfvV8bh3wMkQrI99FiERJOgsEbkSpA7LMfOjXIizH4=;
+	s=k20201202; t=1763696383;
+	bh=gsyvr6N3w0w8TUaKcqtHGPW+xZFPpFRf3IaY0bUKitQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RzhFCHiKpH7YI/093TMX9V1UyzAGj+U/dDdRw1sRybZr7v9pKIWqA8Lr2BWxgHMAH
-	 ikFPXAjobkgQ+gXfIOT9hsGHkTRMMkBQ7irjcdACnrfnd1QjOfEqIK4lDEdzo9dmrX
-	 0ruLin7xPz/KwR9xzOAADl+WED9TceQg10SW+tOlJzIBEwASY9qp4vY/1BjlZ9e+Le
-	 K0dPlcg3B3AfP6hsVB5kyguEVoXKDfIfK3KDIoae2s7yZBbwTzDsZvWYvwXY1jzIpF
-	 nEo1oN4FZHl/FKFNbSgO/TQhe2n9155RrmTYQ/LSvTs4aCVinHfk4kJiNlfJpSlJxQ
-	 0+zcVV8Oqcvng==
-Date: Thu, 20 Nov 2025 19:24:43 -0800
+	b=Ty/EFn9xV5fGi4rA6Mo7gWH1xwwVYl1XgK3dT1nLx3GZ5TsfXqybwvgw74/IewClS
+	 U2uIoIwPQld+z6ILQ7SBjRaW6DAmj0GNGT0B7FpjTRdykMP7KiEVUcpxlcbcGDA+kn
+	 6Zb/hvKfG2hWqpyn4m6jBsbFELvSHe/Lv9j6TS3K/8Sd9ixm6s1zxAC1wTaSdZFGeI
+	 k3YR7T0GJc+gpSVPxmTpCOmOviR7d5XrzEs0tuHDeWdPamxq/GCArn5P0j0cRF3pjQ
+	 aXYIDF7a8deHP+njNufod0tnLXaBOk62v7/Vk8hsmFPQPeWmlB03FhOzko8OqxNrhn
+	 HgWbamji+jNZw==
+Date: Thu, 20 Nov 2025 19:39:42 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>
-Subject: Re: [PATCH net-next v1 6/7] selftests/net: add LOCAL_PREFIX_V{4,6}
- env to HW selftests
-Message-ID: <20251120192443.21bd30d1@kernel.org>
-In-Reply-To: <20251120033016.3809474-7-dw@davidwei.uk>
-References: <20251120033016.3809474-1-dw@davidwei.uk>
-	<20251120033016.3809474-7-dw@davidwei.uk>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed
+ <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Mark Bloch
+ <mbloch@nvidia.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+ <linux-rdma@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe Shemesh
+ <moshe@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu
+ <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next 00/14] devlink and mlx5: Support cross-function
+ rate scheduling
+Message-ID: <20251120193942.51832b96@kernel.org>
+In-Reply-To: <1763644166-1250608-1-git-send-email-tariqt@nvidia.com>
+References: <1763644166-1250608-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,18 +68,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 19 Nov 2025 19:30:15 -0800 David Wei wrote:
-> +LOCAL_PREFIX_V6, LOCAL_PREFIX_V6
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+On Thu, 20 Nov 2025 15:09:12 +0200 Tariq Toukan wrote:
+> Code dependency:
+> This series should apply cleanly after the pulling of
+> 'net-2025_11_19_05_03', specifically commit f94c1a114ac2 ("devlink:
+> rate: Unset parent pointer in devl_rate_nodes_destroy").
 
-I suppose one of these was supposed to say 4?
-
-> +Local IP prefix that is publicly routable. Devices assigned with an address
-> +using this prefix can directly receive packets from a remote.
-
-How about this:
-
-Local IP prefix/subnet which can be used to allocate extra IP addresses
-(for network name spaces behind macvlan, veth, netkit devices).
-DUT must be reachable using these addresses from the endpoint.
+repost please, we don't do dependencies
 
