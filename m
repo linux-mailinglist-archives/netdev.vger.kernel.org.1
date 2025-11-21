@@ -1,249 +1,322 @@
-Return-Path: <netdev+bounces-240889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 018AAC7BC4C
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 22:38:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF4DEC7BC69
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 22:41:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB4183A2886
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 21:38:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DFA63A59F9
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 21:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C782258CE2;
-	Fri, 21 Nov 2025 21:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6D64303CBD;
+	Fri, 21 Nov 2025 21:41:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZAhLr72U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0gtV3Gf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65FB1EEA49
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 21:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763761094; cv=fail; b=R6CRA9XIFyulOzfah4OnhmKDsd+bcL0ObnL+SgcNqejLy6ov8/cW7tBIZdT2+Y646icgtEHDgWrab7g6haR7iITJdhuaGVsNQ0hzzmUJQXiIlxxpX97+d2P5y4JguNqR/dADyyg1Xj4aMxAsqmuOtj8IfeR9yTnNBRay2HMe/Kg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763761094; c=relaxed/simple;
-	bh=lLUdKt8EithfZjd72gz9dMFtJASw2VhLEI6zKq4kRHE=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=NAYGYksRq20G5wFgysm/v8gIA+ZiPGemtUI75/VNqSxo/OQJFX47n8HtsKEWlb4V0a/qiu7Higj001bjQpYl7vxpmwK7v4ITWCMOH7PZ5JInZFucftDT5rX+l3wSRVYypRlaA/p3voqEWqWIo+bwejUfx7sMrX7L16SgYUcdbLs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZAhLr72U; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763761093; x=1795297093;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=lLUdKt8EithfZjd72gz9dMFtJASw2VhLEI6zKq4kRHE=;
-  b=ZAhLr72UX/ljrtmcBvTb+tGMBTFgoR3UvzLdaqOIaFjLXW1k1acfk89u
-   zvk+Z9bwAWyhcgUyKoSWlNvgh9Q2FKHjIQBG2Lpz34AVBzFtfyLyZcWgJ
-   HTGmVOOddRgj42Pm4C4Qotw71DE/ul1mMLhMHVHDXF5gskK9iAY0kwS5Z
-   rqidEviM0nkfXZ1+xFn6JFnF7qGIrueuCv/6xjGqMzMmhWMVEk/JMO/Xd
-   2wmJgPS2SNKLfo1C2B4sD6rQjNaIpWSnr8Ei+7tZIsRMH/10kGZ8ENpxM
-   WNmIwELCZpcrSlwZiU/pIs8ygvekeEyXSAA0TqUUguuWJaaEapYFCLST3
-   A==;
-X-CSE-ConnectionGUID: OK73F0coTdKMzorMwjGHVg==
-X-CSE-MsgGUID: Q34AWALhQqq2fbawy4ENRA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11620"; a="65798892"
-X-IronPort-AV: E=Sophos;i="6.20,216,1758610800"; 
-   d="scan'208";a="65798892"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 13:38:13 -0800
-X-CSE-ConnectionGUID: Gop5G0QKQeeI0TV3KhU/uw==
-X-CSE-MsgGUID: M1q8gICzRgaFxMwda3ZDhA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,216,1758610800"; 
-   d="scan'208";a="222744823"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 13:38:12 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 21 Nov 2025 13:38:11 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Fri, 21 Nov 2025 13:38:11 -0800
-Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.40) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 21 Nov 2025 13:38:11 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XHS1Zuue3cThTQC2Y79vZpQL78KXVILwkURE8xeIvp120BfUeEb/PaEeXiaIHTOibo2qXsWD3ez9ULxsZem1nDgaXbi4vVeDR3UQJmo9/s3atk5zMBrcmGtLhARyquL3v7lrI24J+hWexYjBUN+48F+s4Zus6C1nrXL3bKFyu3ar2029lqLr4vmjdvxc0IgTXePJ4jTNrfrpThZH/vZwov9YZsyji5LMpbJUFjTUX9AKjn3pWszV3qHRobMtZu3wXz10Ciu9jjVi1xKzPu/X4K2hleRA+lfBTgcfeguZ/m65DIEU66O7HJ2xK04gb54BGnmWzvn25w284y7EBdEQDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f9BJdIW4Df8vaOxpxrlT82q6tUpH3OCqX1+X5OafzBA=;
- b=JerT6AEcO/KkshfCp0NGr7Lvp7d6EpuObCzsEhs97f0GclS7v+HrZTK5wjjhGIBzvDgvlkmv/LEE6/4CfpHhxOqmMNROCk/OaghsyAMPS5Ovktpd7EUpw8tlm78yRNe5sITdG4KDoJQLVfaGwF/wS1K9DnrUKZYaim1uq4hJ3Yek2keSLDVHdSW4ot+3Gt3dr17Yqdz9AYtGmApnRtCtTMZDBkYZlg5lA6gZpZG7UbbaeIqrmk2dCAdjK9RnoEYuC/GIbeJKv6HcCv7JRj/OFqzfyblsDWwNK0CtzIAg/yrB/9sK/0QLjYb1JCFBBXw94d3TtMOFUrebBT+fS9joHg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by CY5PR11MB6186.namprd11.prod.outlook.com (2603:10b6:930:26::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.11; Fri, 21 Nov
- 2025 21:38:08 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::24ab:bc69:995b:e21]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::24ab:bc69:995b:e21%6]) with mapi id 15.20.9343.009; Fri, 21 Nov 2025
- 21:38:08 +0000
-Message-ID: <84d7bbbd-5902-4b9d-9bc2-eb1704b81d57@intel.com>
-Date: Fri, 21 Nov 2025 13:38:04 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH linux-firmware] ice: update DDP LAG package to 1.3.2.0
-To: Marcin Szycik <marcin.szycik@linux.intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>, Aleksandr Loktionov
-	<aleksandr.loktionov@intel.com>
-References: <20251118121709.122512-1-marcin.szycik@linux.intel.com>
-Content-Language: en-US
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <20251118121709.122512-1-marcin.szycik@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0285.namprd04.prod.outlook.com
- (2603:10b6:303:89::20) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196122F1FD1
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 21:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763761308; cv=none; b=QlI69YY//C8sCxDLDha7nlWVyX5zK0b+ycTL2RAm2pe7agpizL92JisgLl65R1+kFF2oVrdd5oiDKDI3x8YRHKItLG/52toz4KZsx09XegndresisysQkiriKTkNZexYwP0d/LnwezwiLXeAGrctSJg1PlG5SbXddQmFLEmnfMA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763761308; c=relaxed/simple;
+	bh=tWpGutvthbl0vmJC71Cjs0NJn9cl86bS2pwKW7GWMxA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hdA/iEvERSMCisLsSDlSW8nZGHrckiY71NZaU249qataoqniL8XD+mVS5LrGGM9YhfUBUqpFz9LA0vXLrNUYvgRBPafNAlpqIFwpOdJ+YyUWiLUCW6InzTRDdpn3uTO7SL+ExEgzXS58jRKT6eMBrF6jAIym3Pe/VOM5sxcTdT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J0gtV3Gf; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-477632d9326so15666105e9.1
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 13:41:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763761304; x=1764366104; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CEotC2Jer+OQWcHMmR588K4B9r/jwYBL3ATyOeVj44I=;
+        b=J0gtV3GfPNnv9aKKJgGbIuwZfzzZRGcizYfvjZAE0eDsxoMBhGP3TCeNxBpMbnV6qs
+         xR2PDBSo+K6yVTjoN/eAXxPvVownYOjrG1QLGoNLHtVKt8ePvgBUrg0J49ir72rnM0z2
+         tNP8YSOpMHlvK0R9ASt9/ITaNY/0jR/E1zULD+af05VNRo4DuQZyfjjR2AWhTpNkNams
+         KNwpVmWOJlbwlWNNVh9/wJU8j4REA/DYmW405l1e4Ekw8wIwhG4wbdMRZIZwlzwBYfY+
+         E1cu/JZO8Pl7sc0LPxMhLhEpyp3WGuWR4cAMwGvcPwpcZFI98MTQel4//p/ot1jbklIW
+         RfHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763761304; x=1764366104;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=CEotC2Jer+OQWcHMmR588K4B9r/jwYBL3ATyOeVj44I=;
+        b=YQ986A3x2/MjNZYiXoxsPpVQCefoHzpq1jAtJWV8aRLwnMowJtKoWLwqu33rFsQiSd
+         wSxAw94cJLrEhHn03EWA4Y50vV36+eoKhX+Pn4vUrpYRQs5qW8MZuioAk0jJg//i1xII
+         gLsPYNZbYb0OQet3x9R2i3HrLUyJTTYFkHjQyG8KvgFCrg+zTNzpqjW+e6taQGhb5Cx0
+         YNp7msg9z2Xog+tTve5LCgUCJh6WfI3+hrms8p1fhH25OcRkOF39wOlRJMc3E8vOiSZS
+         GGV/MtRDiBZRyvi0pWSKSDRVWb3e9UPaYURNnAVa3HzMlRAf8tR1WZ+KuOH29Gfoc/W4
+         /L3A==
+X-Forwarded-Encrypted: i=1; AJvYcCWm71YThM5Pz6c9tPe9ab2foeCyN1YZ8dgFnjzo8HwEdjVQNM+tUcpmJi50VUIgk7nbhIDKhK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9vuIWwuocwcwmDZDzNMdv1i8D2uNjcpj1qiHKKV2b0mkic5yE
+	Z24mq3A/pO9FlwaDPuioNjwi4JmPadeFYQ/MnZ6tNTK2yqW3c1n+Q5oVAC+x8O0JGuIogM81j9k
+	23ueaU1S05x4pfgfKp3nqawgBVPvZy0Y=
+X-Gm-Gg: ASbGncuW4DUBzqeQaLEFpLf47Buf1hpQTbC/GtGZPuKRRDzKsFHiIj50yE83IV+uzoh
+	4fye2Fowevy6x3/uXef6vcG+L6Otlaw/5VJS/PRYlUZujT7v7M5DshceiYYZ9xb6VTChs7TwW2D
+	mK02aqCSeBGesT0rrG24Fcc+qcw2HhdoihUumE08vrVGDuIRKn1P68S4LrRfMRTVa6ZxtohtnU0
+	SZTyH1wEoHgWNMuw3gKAi/AzS1C0qR4FrAS+M7fxJYSaDdWUwLDDTdXVrmSuvKHWwrGDbzsg/Wh
+	7C4t1Nmgio/IJRT6paJTbVM9ogAm
+X-Google-Smtp-Source: AGHT+IHeREyNsO6TawnTkYCrf9XGp32KZCYN1xfZZ5gkS4XCMZGcna8r1J1jHYakREKCoqjzMWX7Imhr8FoVJ4OHPdI=
+X-Received: by 2002:a05:600c:1f85:b0:477:9c73:267f with SMTP id
+ 5b1f17b1804b1-477c01ff629mr32731045e9.33.1763761304086; Fri, 21 Nov 2025
+ 13:41:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|CY5PR11MB6186:EE_
-X-MS-Office365-Filtering-Correlation-Id: bdd0f167-6802-45fc-16a4-08de29464307
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?MVljN05tVFl3UzFKaTVXcUwrQlB4MFBwMU5QcDRucUFwcVBtQlFoSGF1WkI4?=
- =?utf-8?B?UktVL1h0NFQzdmxpMkhmZWNHZWxlQkk3Y09qT1IxSlNpZHNLNW96V0ovOGl4?=
- =?utf-8?B?ZHBGQXdVekxEak1jdmR6N01BNE5jWVJUNUR0OWVGZWV2c2pLdDdZR0FnZCtM?=
- =?utf-8?B?SzJTWkF1dWlHdWZBUDJBd3FISUxXejJaaFI2bmJjQkU2L3Q0cEc3N0MxV3FR?=
- =?utf-8?B?OFRJb2gxU1VVWlZacUQxNmJvelU3bkVnOXdObHdLTEtweVpaQncrNUhGT2xm?=
- =?utf-8?B?Z0YzMmxrVUY1UTdRbHdTeHRxUFdZanhUaThDUmpLL2QvMWRJY052dmJBMG9s?=
- =?utf-8?B?Q0IySTh3OFRrS3YxSzFhUHptdHcxMDU1aTRNOWZFQzh2TEk2MnZ3Y2k0aGtW?=
- =?utf-8?B?UXd2clIxMWd3MEZqTHdxS0pMM1MyRDlSdnpIUTM5UWZMZk1nZ2NKVmZNcXUz?=
- =?utf-8?B?YVFFVTFVMWZEa0IrR3VmU3lKZXJVQ0NoUnJqaG9XSVY1WTNDUUM2UDdFT3Bj?=
- =?utf-8?B?NEFsOE5yVGQ3N0JxMU1pUU1aSGJEUVhvVjQrd2hjQ1MzeXkyZWtadkZQdkp3?=
- =?utf-8?B?NjJkR3RRYnZGODFnOHBZMnFpUnRuSmkwUDI1V3dXTmFFemlOb1BodkljTE90?=
- =?utf-8?B?b1dueGlQcnROMStkV29udGpBMWQ1TFBEYmRqOTV0VUU2a1Foc0N6VnlOTzVG?=
- =?utf-8?B?R0ppRitjSktkMVZzRDJDTjZkS2pxYVNWTVcwVytWSTJrdDZOcU4xaEVPMFZ6?=
- =?utf-8?B?bmhpQ2QzSUQ2RGFQTlhjYUdHTG1NajRDcDZtWW9URHNZTXBYaExySmdnTmM4?=
- =?utf-8?B?Y0V6ZThzZjlTSW1hTUFqTHA2Y25xVTR6Nng2N1RwTmhBVkorQzJteEhwTEJL?=
- =?utf-8?B?aWpCd0lqNGlJN3VJTlhEenM2cCtGMHJTMVJpNmVEYTN1N0VRUGV3QkV1TnQw?=
- =?utf-8?B?NS9oY3puNi9qZ2gvSjcvZWZJUXZneC90RC9ZSndWVTF5TUtpeHZ2MGdoOFRC?=
- =?utf-8?B?SnhiMzhZZXJGWUpSSXZESmRiM3RMSUN0NENnSjc0dTdCdDZVZGgwUmtLVC9U?=
- =?utf-8?B?YldmZ1FvVU96UG5xK0h1ckpVYkVLR2QveUNDRzk1bk84QjdPQUt6SlpidUFn?=
- =?utf-8?B?RXA0SW5OdThwcW9qUTlvQjIxR1IxRE45cldOc3R6bGxJTXBBeU53VjBkd0hN?=
- =?utf-8?B?NTlOejlvRlZBU2I3WWJ4OFUzOGQrMWNTb2FyNVRTUkxkaXlXMGEzN2hYMVMv?=
- =?utf-8?B?eS81UW5DNkpVTU9tS2EvdWc4RjkxSTdzUi9KYkVLa2JQRFNNMDhFOTAwMEtJ?=
- =?utf-8?B?SUxSUVVvREl3WlhNVUJrbGRVbWw4ZlVqdi9LZDBFaG8vYXZjZXIybi9QeUwr?=
- =?utf-8?B?MU45NGI1a3Q3RDJNZVZvcEhIRVNsZERnRzl3dVdEMkkyc3JQUDBmUmt3RVBL?=
- =?utf-8?B?NWpNakZsMG5nOS9rRGRRTE9NVkt3MThFUXV5dDR1WXRqWlRBY1VaWVJxT2Er?=
- =?utf-8?B?V25rWHpITXoyY1pBWDc3YWM0SXpkMm82aytLS0RKSmttUTFmekVXMllMTWhm?=
- =?utf-8?B?QlhKN2J3QUZVbXo3ZkZxOUxYTFlFaDErRGovSW5uNG5MdlRvaDJhNUhreFlK?=
- =?utf-8?B?bnVwRzBLWUN6djRnQjY5bDJpMlF2a1pTZkQvdWxya04vSGdYUjRWM2NOSW9Q?=
- =?utf-8?B?U0pzTjVVUWlHdldhbHF1MTRqajVuNDhJVk9INUIyT043cnZ4TDBoTmlvRGxY?=
- =?utf-8?B?VG8wQTloL2ZkRnhNS0k2eENZYXl0RTdFZmY1V2srR0V6bnQ3QURibjVjL3M3?=
- =?utf-8?B?RHFXY1BWN1Qwakc5Um45UFhBMm0xWGowYWZuUG5sSWdKZVdUS3h5dG9JMTJh?=
- =?utf-8?B?VHdhclRwWmIxQlRLbHRGZ0JubEZ5SzEwcGk3c0paaWFQaERhekZ1K3lMSjlC?=
- =?utf-8?Q?p4ySa8mPph56juTgmR4EDZYkL2pkLYXz?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bHY4Y08zU3NYeW8vaFRuSXJQODJmV1dmWENBc0kxNmwybE1nUHRtb3p5MEFL?=
- =?utf-8?B?Wm5SNXVXUXVsNTZZUzN5ZHVSQTd4MHFxcURPcldTTXZ3YkUyTzV3Zm1Sc1pn?=
- =?utf-8?B?MDNVREhjQlpmZGdOK1A0TzAyR2VLekZqQmJpQkpsU1BFYWpveUthSDhTWmVm?=
- =?utf-8?B?czk1WXdRVEphS0g5NUlBYjRHdFR0TCtha2VPdld0SGoxNllicEpRRVlFdXlF?=
- =?utf-8?B?SlFRVG5yN3A3UW9xNHVZS1ByUktZZloxTVlkeW1OeE8zRjVXK2JDOExMVlc5?=
- =?utf-8?B?M0lVQmdDUUFQQ0puejU5YW4zZ0lDY21nYVZWK1VTQUdvUlZqQXBJOUNBN3Jk?=
- =?utf-8?B?MGJXS2p2Y3JadTQ2cVhhRjJUaVhsK0VqNlZNSTFBeWlubGpnbWg1YkNlOG1W?=
- =?utf-8?B?Y0lnN1JhN2YyTHBkaG8vOFNKVlJJL3lidVZhY1dvTjJPWEtsNnNIMzJ3VFlM?=
- =?utf-8?B?WWpOUUx1a0JmUDVYWXNpaUkxdjkybVlBTFRud2xBa3Mrdk8wZVd6UUdENFA1?=
- =?utf-8?B?YmF2ektRbXY5SjVKWlpGT2tIZDJqSU0vMEs3Q0RIbFNLZzJJaERLMlU5RVBW?=
- =?utf-8?B?K0NhQVV3S1ZLdU9PVi85ZzZSMmhZOExUeXhBUEppL0hydHFJL2c3citocHM0?=
- =?utf-8?B?SnFpVUdYdFBsdyt4WVh4RWEwcTE2TFo2SEFJQitBdE5PcHRKTUFmLzFud3Jm?=
- =?utf-8?B?R3BhVkNFMS80Uk03d1gvdWwrazBEQ09qZ1JuZXdkQ1U3ZlJKQml3TmViaDJR?=
- =?utf-8?B?dTNuZGpIOEtFZ2VoWWh6M1VuYytSMGpiZVMzdVFEQ0ZDSjlvODlwbUVjTE1F?=
- =?utf-8?B?VzY0Z0FQaENNTHRHUVdqc0pkdWhWZUYrMjQ5ODRpOHpNZFp1UmNwandDeHNl?=
- =?utf-8?B?bURLblhXR0VNRmxIZkUyTU1TTG81WDB0emIrWG9rZ2tkNDFCcEJYVUtTcTEr?=
- =?utf-8?B?YlpBSlpEMnJkSFhHOXUwWVlMUkRvc0d5a1QxZDVVekFJR1huYTEwNE14ZDhx?=
- =?utf-8?B?a2VQWWhGUkVMZ0VydUxhRCs5WTMrN2VWWnpDWjZuQmw3bGM0VllNcDNFQ1Zj?=
- =?utf-8?B?YUh5TXJhNm9Ka2lPWTNFUDRONzd3OUZUMGpkMUZwQWlNYTlqN1R3cEtpYUgw?=
- =?utf-8?B?VUV4bnVJMEppNzdMcWppamcrMldGQVNKMkdlT1YyRHFYK0NmejRaclU1MUph?=
- =?utf-8?B?YjFJVnVlNnBCNnJUSERJN25hWkZ4UFA2aUFDOGhsL1lXMmd1cmlqTEdoRXRN?=
- =?utf-8?B?bHVoSG5XYXgwWUlURG51T1c5TWtuSnhvWjdrUGVqUjBCbVF2SFZ0MDNDdS9G?=
- =?utf-8?B?ZXI2eHNFck9tQW8wczdkQmZCY3g0UGJSMXlSYzBlelhPUENROXg3UTVZd1Zn?=
- =?utf-8?B?U1N1RHh3TGMwYnpNWm9waXJBcFhUOVpYOWhpd2JvVUQvOVVKNkkrUVRlSTZ2?=
- =?utf-8?B?MHN3REF3czRLb2E4V25lMjQ4bDRPeXpkNkdLN1pwVVN6Mzh3WVIzc1pOK0t4?=
- =?utf-8?B?aDVzdzBtblBuSDdiN1QzTC9VWGREUm5ZT1RVNDVDRE9ab0lNU2hCOXc2b3NU?=
- =?utf-8?B?cURyRmlMaWJlaTlkd2hsOGkycjJJUm9EZW5zV3VjZ05TcFRWQWs4a3lMV0V4?=
- =?utf-8?B?emZ5THFxUFpHNVg1ZUxoRnpkVFZ3N1JYRnNtaURUMmVjTDR6N2UwNHRpLzBn?=
- =?utf-8?B?Tk5VY0V3WmlCbktJUFBZYW9Xc2tBd2tRUnV6TUNOeGt5bmNmNSszeWhpQWFt?=
- =?utf-8?B?N3FrdEFvbEJuNUw2eGpxUzhzcHZVYk4yWHNuM2hQV0t0MkNKbGQ2Nk1MN2RI?=
- =?utf-8?B?c1dndUF5Wm5zSUNyK0hML3REOTZOc2tieHNjb1J1R1pCZnpPblcvUTV6TTdC?=
- =?utf-8?B?T1BWNWE5MEc3UjR5MEY0eDhpOEQ1ZThhNVFmU1VlTVpmbjREYmJuVEozb0Zk?=
- =?utf-8?B?akt5c0hCaEhXQkZXWnEyRFRDc21tMFljUUhPWG9GTnFSRTFNdHh0OWEvd2tl?=
- =?utf-8?B?ZXFsZ0VEZjJ6amx5V0tqcFowdkVJcVgvVjZzSjlTQWY1Ymo0bDlQb3NIeUpu?=
- =?utf-8?B?cmhWRGpyWm9xcVhCbWFCN3NtTGVGL3I5Nkc3aUwwNjRXWDhBbFZycE9MbkZF?=
- =?utf-8?B?NHQwcUVDZmk2cUxJVzZYYi9NalJ5Y003em9iS2FZQW5YcG93eHhlWGthNldX?=
- =?utf-8?B?R2c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdd0f167-6802-45fc-16a4-08de29464307
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2025 21:38:08.4991
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KAn9/W9yoC4fq18K2FZkoHo3OmkgSbd4Mf1eSmjnZClJ4GlpbX13Io98SXbh6RafANKnY0fGPdHzbr92D7CaKPKJncMEFqtlnwQhK+8Bxl4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6186
-X-OriginatorOrg: intel.com
+References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251121113553.2955854-8-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251121203453.y6s46k4ttdtq5mgh@skbuf>
+In-Reply-To: <20251121203453.y6s46k4ttdtq5mgh@skbuf>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Fri, 21 Nov 2025 21:41:18 +0000
+X-Gm-Features: AWmQ_bnkkDC-5qzFEr6hKU9cjN4WecnAvwwlnGTCtwbWhs045dHTVDk3pOihUVk
+Message-ID: <CA+V-a8sRr9FzR8pCXJbeuyidv+zVLykhPnj_71zuEGf8U4xS7A@mail.gmail.com>
+Subject: Re: [PATCH net-next 07/11] net: dsa: rzn1-a5psw: Make switch topology
+ configurable via OF data
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Russell King <linux@armlinux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Vladimir,
 
+Thank you for the review.
 
-On 11/18/2025 4:17 AM, Marcin Szycik wrote:
-> Highlights of changes since 1.3.1.0:
-> 
-> - Add support for Intel E830 series SR-IOV Link Aggregation (LAG) in
->    active-active mode. This uses a dual-segment package with one segment
->    for E810 and one for E830, which increases package size.
-> 
-> Testing hints:
-> - Install ice_lag package
-> - Load ice driver
-> - devlink dev eswitch set $PF1_PCI mode switchdev
-> - ip link add $BR type bridge
-> - echo 1 > /sys/class/net/$PF1/device/sriov_numvfs
-> - ip link add $BOND type bond miimon 100 mode 802.3ad
-> - ip link set $PF1 down
-> - ip link set $PF1 master $BOND
-> - ip link set $PF2 down
-> - ip link set $PF2 master $BOND
-> - ip link set $BOND master $BR
-> - ip link set $VF1_PR master $BR
-> - Configure link partner in 802.3ad bond mode
-> - Verify both links in bond are transmitting/receiving VF traffic
-> - Verify bond still works after pulling one of the cables
-> 
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> ---
->   ...ce_lag-1.3.1.0.pkg => ice_lag-1.3.2.0.pkg} | Bin 692776 -> 1360772 bytes
->   1 file changed, 0 insertions(+), 0 deletions(-)
->   rename intel/ice/ddp-lag/{ice_lag-1.3.1.0.pkg => ice_lag-1.3.2.0.pkg} (49%)
+On Fri, Nov 21, 2025 at 8:34=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
+ wrote:
+>
+> On Fri, Nov 21, 2025 at 11:35:33AM +0000, Prabhakar wrote:
+> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> >
+> > Move the switch topology description-the number of ports and the CPU-po=
+rt
+> > index-out of hard-coded constants and into SoC-specific OF match data. =
+The
+> > driver previously assumed a fixed 5-port layout with the last port acti=
+ng
+> > as the CPU port. That assumption does not hold for newer Renesas varian=
+ts,
+> > and embedding it in the code made the driver inflexible and error-prone=
+.
+>
+> That assumption has 2 parts: that the port has 5 ports, and that the
+> last port is the CPU port. It's unclear from your statement which part
+> does not hold. I see that for the new switches, the CPU port is still
+> the last port (not that there's a problem with still parameterizing it).
+>
+> >
+> > Introduce a small a5psw_of_data structure carrying both the total numbe=
+r
+> > of ports and the CPU-port identifier, and rely on this data everywhere =
+the
+> > driver previously used fixed values. This ensures that port loops, PCS
+> > allocation, management-port setup, and bridge bookkeeping all reflect t=
+he
+> > actual hardware configuration.
+> >
+> > Making these attributes runtime-selectable allows the driver to support
+> > RZ/T2H and RZ/N2H SoCs which use different port counts and CPU-port
+> > assignments-without rewriting common logic or forking the driver, while
+> > preserving correct behaviour on existing RZN1 systems.
+>
+> The code is mostly fine, but reading the commit message had me jumping
+> or twitching any time I would see the words "configure" or "make attribut=
+es
+> runtime-selectable". These expressions have their own meanings having to
+> do with adding kernel APIs through which these parameters can be changed
+> (by the user), so I wasn't really sure what I was going to review. None
+> of that is the case, according to the code. Please choose other wording.
+> You're not making the driver attributes configurable, you're just
+> replacing constants hardcoded in the .text section with constants
+> hardcoded in structured data in the .rodata section, selected at probe
+> time based on compatible string.
+>
+> I'm sorry for saying this, but the commit message is too long for the
+> amount of information that it transmits. You repeated 3 times the
+> properties that need to be parameterized (port count and CPU port index),
+> and there's more bla bla about irrelevant things like forking the driver.
+>
+> The commit message has to serve as an aid in understanding the change
+> itself, not detract from it. In this case, giving the motivation and
+> context in one paragraph or two is fine, but then you can use the space
+> to focus on listing the transformations that need to be followed when
+> reviewing the patch, and if not obvious, explain what led to those
+> choices. What you want is obviously correct changes.
+>
+Thanks for the detailed feedback.
 
-The WHENCE file needs to be updated to reflect the new version.
+I understand your point regarding the terminology using phrases like
+=E2=80=9Cconfigure=E2=80=9D and =E2=80=9Cruntime-selectable=E2=80=9D was mi=
+sleading, and that wasn=E2=80=99t
+my intention. I=E2=80=99ll revise the commit message to avoid implying
+user-accessible configuration and instead describe the change more
+accurately.
 
-> 
-> diff --git a/intel/ice/ddp-lag/ice_lag-1.3.1.0.pkg b/intel/ice/ddp-lag/ice_lag-1.3.2.0.pkg
-> similarity index 49%
-> rename from intel/ice/ddp-lag/ice_lag-1.3.1.0.pkg
-> rename to intel/ice/ddp-lag/ice_lag-1.3.2.0.pkg
+> For example, why ARRAY_SIZE(a5psw->pcs) transforms into
+> a5psw->of_data->nports - 1. Is this the best choice? The code looks
+> worse, and it's not obvious that the last port would not have a PCS as a
+> matter of architecture. You had several other options: introduce an
+> "npcs" extra parameter, or even compare with "cpu_port" and place
+> comments explaining the lack of a PCS for the CPU port (since "cpu_port"
+> is "nports - 1").
+>
+Agreed, I'll rework on it.
 
+> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> > ---
+> >  drivers/net/dsa/rzn1_a5psw.c | 26 +++++++++++++++++---------
+> >  drivers/net/dsa/rzn1_a5psw.h | 17 ++++++++++++++---
+> >  2 files changed, 31 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/drivers/net/dsa/rzn1_a5psw.c b/drivers/net/dsa/rzn1_a5psw.=
+c
+> > index 99098bc06efe..d957b6d40f05 100644
+> > --- a/drivers/net/dsa/rzn1_a5psw.c
+> > +++ b/drivers/net/dsa/rzn1_a5psw.c
+> > @@ -382,13 +382,14 @@ static void a5psw_port_bridge_leave(struct dsa_sw=
+itch *ds, int port,
+> >                                   struct dsa_bridge bridge)
+> >  {
+> >       struct a5psw *a5psw =3D ds->priv;
+> > +     unsigned int cpu_port =3D a5psw->of_data->cpu_port;
+> >
+> >       a5psw->bridged_ports &=3D ~BIT(port);
+> >
+> >       a5psw_port_set_standalone(a5psw, port, true);
+> >
+> >       /* No more ports bridged */
+> > -     if (a5psw->bridged_ports =3D=3D BIT(A5PSW_CPU_PORT))
+> > +     if (a5psw->bridged_ports =3D=3D BIT(cpu_port))
+> >               a5psw->br_dev =3D NULL;
+> >  }
+> >
+> > @@ -924,20 +925,21 @@ static void a5psw_vlan_setup(struct a5psw *a5psw,=
+ int port)
+> >  static int a5psw_setup(struct dsa_switch *ds)
+> >  {
+> >       struct a5psw *a5psw =3D ds->priv;
+> > +     unsigned int cpu_port =3D a5psw->of_data->cpu_port;
+> >       int port, vlan, ret;
+> >       struct dsa_port *dp;
+> >       u32 reg;
+> >
+> > -     /* Validate that there is only 1 CPU port with index A5PSW_CPU_PO=
+RT */
+> > +     /* Validate that there is only 1 CPU port with index matching cpu=
+_port */
+> >       dsa_switch_for_each_cpu_port(dp, ds) {
+> > -             if (dp->index !=3D A5PSW_CPU_PORT) {
+> > +             if (dp->index !=3D cpu_port) {
+> >                       dev_err(a5psw->dev, "Invalid CPU port\n");
+> >                       return -EINVAL;
+> >               }
+> >       }
+> >
+> >       /* Configure management port */
+> > -     reg =3D A5PSW_CPU_PORT | A5PSW_MGMT_CFG_ENABLE;
+> > +     reg =3D cpu_port | A5PSW_MGMT_CFG_ENABLE;
+> >       a5psw_reg_writel(a5psw, A5PSW_MGMT_CFG, reg);
+> >
+> >       /* Set pattern 0 to forward all frame to mgmt port */
+> > @@ -1147,7 +1149,7 @@ static void a5psw_pcs_free(struct a5psw *a5psw)
+> >  {
+> >       int i;
+> >
+> > -     for (i =3D 0; i < ARRAY_SIZE(a5psw->pcs); i++) {
+> > +     for (i =3D 0; i < a5psw->of_data->nports - 1; i++) {
+> >               if (a5psw->pcs[i])
+> >                       miic_destroy(a5psw->pcs[i]);
+> >       }
+> > @@ -1174,7 +1176,7 @@ static int a5psw_pcs_get(struct a5psw *a5psw)
+> >                       goto free_pcs;
+> >               }
+> >
+> > -             if (reg >=3D ARRAY_SIZE(a5psw->pcs)) {
+> > +             if (reg >=3D a5psw->of_data->nports - 1) {
+> >                       ret =3D -ENODEV;
+> >                       goto free_pcs;
+> >               }
+> > @@ -1223,7 +1225,8 @@ static int a5psw_probe(struct platform_device *pd=
+ev)
+> >       if (IS_ERR(a5psw->base))
+> >               return PTR_ERR(a5psw->base);
+> >
+> > -     a5psw->bridged_ports =3D BIT(A5PSW_CPU_PORT);
+> > +     a5psw->of_data =3D of_device_get_match_data(dev);
+> > +     a5psw->bridged_ports =3D BIT(a5psw->of_data->cpu_port);
+> >
+> >       ret =3D a5psw_pcs_get(a5psw);
+> >       if (ret)
+> > @@ -1268,7 +1271,7 @@ static int a5psw_probe(struct platform_device *pd=
+ev)
+> >
+> >       ds =3D &a5psw->ds;
+> >       ds->dev =3D dev;
+> > -     ds->num_ports =3D A5PSW_PORTS_NUM;
+> > +     ds->num_ports =3D a5psw->of_data->nports;
+> >       ds->ops =3D &a5psw_switch_ops;
+> >       ds->phylink_mac_ops =3D &a5psw_phylink_mac_ops;
+> >       ds->priv =3D a5psw;
+> > @@ -1310,8 +1313,13 @@ static void a5psw_shutdown(struct platform_devic=
+e *pdev)
+> >       platform_set_drvdata(pdev, NULL);
+> >  }
+> >
+> > +static const struct a5psw_of_data rzn1_of_data =3D {
+> > +     .nports =3D 5,
+> > +     .cpu_port =3D 4,
+> > +};
+> > +
+> >  static const struct of_device_id a5psw_of_mtable[] =3D {
+> > -     { .compatible =3D "renesas,rzn1-a5psw", },
+> > +     { .compatible =3D "renesas,rzn1-a5psw", .data =3D &rzn1_of_data }=
+,
+> >       { /* sentinel */ },
+> >  };
+> >  MODULE_DEVICE_TABLE(of, a5psw_of_mtable);
+> > diff --git a/drivers/net/dsa/rzn1_a5psw.h b/drivers/net/dsa/rzn1_a5psw.=
+h
+> > index 81be30d6c55f..d1b2cc5b43e6 100644
+> > --- a/drivers/net/dsa/rzn1_a5psw.h
+> > +++ b/drivers/net/dsa/rzn1_a5psw.h
+> > @@ -195,8 +195,7 @@
+> >  #define A5PSW_aCarrierSenseErrors            0x924
+> >
+> >  #define A5PSW_VLAN_TAG(prio, id)     (((prio) << 12) | (id))
+> > -#define A5PSW_PORTS_NUM                      5
+> > -#define A5PSW_CPU_PORT                       (A5PSW_PORTS_NUM - 1)
+> > +#define A5PSW_MAX_PORTS                      4
+>
+> Poor naming choice - it makes nports larger than A5PSW_MAX_PORTS, which
+> according to their name should be directly comparable.
+>
+> Perhaps A5PSW_MAX_NUM_PCS (a comment explaining the relationship with
+> the CPU port would be good).
+>
+Agreed, I will rename it.
 
+Cheers,
+Prabhakar
 
