@@ -1,154 +1,82 @@
-Return-Path: <netdev+bounces-240878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC48FC7BB38
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 21:59:41 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BD83C7BB42
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 22:00:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2A803353F43
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 20:59:34 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2AF31357B7D
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 20:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6923302748;
-	Fri, 21 Nov 2025 20:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F033A2EE617;
+	Fri, 21 Nov 2025 20:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fFJ8GWOk"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="dogAOetS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C441241CB7
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 20:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865992D77EA;
+	Fri, 21 Nov 2025 20:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763758766; cv=none; b=gHi3cdCMLyBVQaZkGdktbi24dg/767CebozTL/sJpTNkRY98L5f8p8UVhhC3UidrmOSgAxlCrRBm50pqqHmNP/y4R+nENyrsooySpqfI4SIVcUEq5e6siSObtM2h0oBG/iTsSbITHGJCRzfvEBTGbbjYvnoJOu3TD+aIIXzyxCs=
+	t=1763758776; cv=none; b=oGU3BeFdXeZo7ahQzfyFsMrdcdmw+uIALt3c45Fk0Bkww2PellFDNSzATDxl7qb3QMW2oV/lbA37y5k0egu4w4NTefSN/VhBC3xv+Bgxq4qecMkv6eCFZAZfSqCIwpMjUjy6mwACGTPeSNInuP6P6zgznDl5oSp7X8I9RcpQZUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763758766; c=relaxed/simple;
-	bh=bBtrX5EFPZEAZC522dfsiRzfYQSbHJajcuBGnynMbnA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t2x3LvScKeW4Rl66YtypBFjNMUX6qPwJMvFoF6h7iovrFvDKgF6oDdvTPzD4FB8iYn+hQwOPytvI1v6/KpZLwSX32FX5waA8a2Yjz2FkQmRazPNc0noc/eOO3Vj0rqAIW4l8oU7ulOuoyzsVQbWqCFLoPPa9EAzLCJ+o6/Xlvvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fFJ8GWOk; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42b2a0c18caso1598099f8f.1
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:59:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763758762; x=1764363562; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ompreuHERq3FUSzaEPD4bpaAyYj0ejhMujXL9v1zCZw=;
-        b=fFJ8GWOkqO76wiHeLrfhi1R4l+ekOuSLspy9BonAi1ZLEf1F6cvleCrXa6MM1oC9vD
-         qVu1uCWcFUnI0y+ehgxpf6DzkgPAjklBcmD4BdDOkxWmvqcTZeJwXTbnF9WdCH5y5MIn
-         EH+sI4G0iDH4q36c41RmLpCN5cNbMFQdIv4wlUfuUmndm3ICLCJp3p+FpfVXrQV8A+Lb
-         A+zgrJPMuHBgq5NmAmB0TQPBwVdtDeJo59j/1O/8Iuq+Mx6203/QE0thPBwI0nShwrsG
-         Iof61ZQRulBH1GDiyANFiuxoycymqBbuUis3AmxoLRvRwKV0b8ItAMeLfOQfYc3dyPzA
-         oHHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763758762; x=1764363562;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ompreuHERq3FUSzaEPD4bpaAyYj0ejhMujXL9v1zCZw=;
-        b=morrmgTT9jaygP2RrI7n4ZmkKqjyshkhI7o+n+qlax8Pu5XGPTzNsQ24fyVkh6Obi/
-         hUaUXYQwRCG43kibvFDu+C0AoxjMSNp1tapgtyhYyHw6+IwKgNp/3iHdSRpujr7AMAE5
-         dOm6ytyrDQCRlzxMxFKtmcNR9kd2Rw5ktvps6Gkk/N8eHtKUjijvXgASU48cGP6DeEWn
-         kvSUhjdMey5Nm+Q7ruTPqa77mbKaFin9O/MYRlPQotWVUJXslP+zYGF9qDNFx4UyFLD6
-         7NKsfs0LZVKJh+XwKGyI9VuoRgQzvICPbomOT/z6DKbyKc9f67lTE0bPBEW9V20x1EyW
-         8Gag==
-X-Forwarded-Encrypted: i=1; AJvYcCVOxNKDkISRJzxEqmw1ASGm5VJoXmoIZ42EUqdz9rpbwUWSBrpnlYc+ONHk62bLNLhM+5eFV7U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQWtEYgnskgeURAFkad+Kzrpq1GRxYTX1Ur4ae2x5lCZPTKF3P
-	7HQTgwu/bwQIy87KEGDWLo+UCOwRPqzQPS/k3AGQPSUGAo5D+CDapf91VfA97b7uHiXsZPyLLKR
-	H8CzWuG1XIlIwd/rZm/q9xo/M8pq436Y=
-X-Gm-Gg: ASbGncsvy1h6So+2+ztH8iJQnSL8qBx/iNlQHc6fFzAtSpCg6doBHppfTKJ5ewKwzMf
-	DorUllTElZGLzafJjI9EKIpAhPbW6AbiRQim+gLNnMS4XFtc0ux0CVnKXkajktTD1Cf6KNtb6G6
-	Chi5NW2gsTSZsgMMarXoTW85uWK6yI4vq0nVb+m4I9Ah1D2egpjbvC5YCGfc8ZU5fgWEHN4cLeX
-	tOJ1dfRPnX5O/Zu1UWRmU8ezSJ2YQNCf2CxnzRiq9ljCpSKcJFbkAvqwcm9PZVvorjUHVGjcYqe
-	xl7NSfOqbN8wMLyOLFBAX8EFZw1ltuNsH39m3bU=
-X-Google-Smtp-Source: AGHT+IEJnYj9tzPgEsH3/YX9J7g70T3nquwHQesZI2rg877VbuY1O9Me5EFeMIoOkC9QXWw8tDigW182DhTgyFQOpFc=
-X-Received: by 2002:a5d:5e01:0:b0:42b:3e20:f1b0 with SMTP id
- ffacd0b85a97d-42cc1ac9b39mr4097573f8f.7.1763758762231; Fri, 21 Nov 2025
- 12:59:22 -0800 (PST)
+	s=arc-20240116; t=1763758776; c=relaxed/simple;
+	bh=0nonkJxFsZX+AnPKp8fkGyGFPFrLIomP6rhf8mOLMPM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q0hTCxEJMoNjwRR72WF+tAmL4FmENrGhwNvGGmuB1cBX0Y3BufnMK1IhYxru5z162V1OmiIOWPDjwURbaK1qIYXR7LDjm99QWLXYPxXYvI6bpWi/j6Nhu+w6shP/AKK8qBkIlry+/OZLeURDuTN8at6LRga29VT6qtd/LhB1/A0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=dogAOetS; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1216)
+	id 1982B2120704; Fri, 21 Nov 2025 12:59:35 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1982B2120704
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1763758775;
+	bh=UJQ1JkgN/Q2PMt20vZ0iqGog9QKdheDUj+FPtHedvx0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dogAOetShnB/8CkWe484WcB4dJAkTxj9Lz9tAoiIG445F20h/WR0eQaBY/X4zQDtP
+	 W920SDHnIYWtVIHw29auNf2PQ/lIG/8UDstPF/FGr6X+3X76i/j1UKyUuo5YrCMhJ2
+	 pMSuCEcXr4nI8dqUa52x0O1OmX2TsicxTj1PGZt8=
+Date: Fri, 21 Nov 2025 12:59:35 -0800
+From: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	netdev@vger.kernel.org, Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kernel@vger.kernel.org
+Subject: Re: Soft lock-ups caused by iptables
+Message-ID: <20251121205935.GA31175@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20251118221735.GA5477@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <aR3ZFSOawH-y_A3q@orbyte.nwl.cc>
+ <aR3pNvwbvqj_mDu4@strlen.de>
+ <aR4Ildw_PYHPAkPo@orbyte.nwl.cc>
+ <aR5ObjGO4SaD3GkX@calendula>
+ <aR7grVC-kLg76kvE@strlen.de>
+ <20251120203836.GA31922@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <aR-DEpU5rSz_VWy5@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251121113553.2955854-4-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251121193002.hzjuijrs6gtoibuv@skbuf>
-In-Reply-To: <20251121193002.hzjuijrs6gtoibuv@skbuf>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Fri, 21 Nov 2025 20:58:56 +0000
-X-Gm-Features: AWmQ_bmUNeZEWkWbeRP4C_Eo6_UYOxEcRWlNLuxLNTPKm97Sw-9WbzKrfrrXu9I
-Message-ID: <CA+V-a8sWzBsnO6vNFirPJCT=S=jMDO1uw5HhvN0kQ2PpvumJ-Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 03/11] net: dsa: Kconfig: Expand config
- description to cover RZ/T2H and RZ/N2H ETHSW
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Russell King <linux@armlinux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aR-DEpU5rSz_VWy5@calendula>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Hi Vladimir,
+On Thu, Nov 20, 2025 at 10:07:30PM +0100, Pablo Neira Ayuso wrote:
+> Could you also give a try to this small patch:
+> 
+> https://lore.kernel.org/netfilter-devel/aR27zHy5Mp4x-rrL@strlen.de/T/#mc6b8e6b02a4a46a62f443912d8122c8529df0c88
+> https://patchwork.ozlabs.org/project/netfilter-devel/patch/20251119124205.124376-1-pablo@netfilter.org/
+> (patchwork.ozlabs.org is a bit slow today)
 
-Thank you for the review.
-
-On Fri, Nov 21, 2025 at 7:30=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
->
-> On Fri, Nov 21, 2025 at 11:35:29AM +0000, Prabhakar wrote:
-> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> >
-> > Update the Kconfig entry for the RZN1 A5PSW tag driver to reflect that
-> > the same tagging format is also used by the ETHSW blocks found in Renes=
-as
-> > RZ/T2H and RZ/N2H SoCs.
-> >
-> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > ---
-> >  net/dsa/Kconfig | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
-> > index f86b30742122..a00eb3bdcd0f 100644
-> > --- a/net/dsa/Kconfig
-> > +++ b/net/dsa/Kconfig
-> > @@ -159,11 +159,11 @@ config NET_DSA_TAG_RTL8_4
-> >         switches with 8 byte protocol 4 tags, such as the Realtek RTL83=
-65MB-VC.
-> >
-> >  config NET_DSA_TAG_RZN1_A5PSW
-> > -     tristate "Tag driver for Renesas RZ/N1 A5PSW switch"
-> > +     tristate "Tag driver for Renesas RZ/N1 A5PSW and RZ/{T2H,N2H} ETH=
-SW switches"
-> >       help
-> >         Say Y or M if you want to enable support for tagging frames for
-> > -       Renesas RZ/N1 embedded switch that uses an 8 byte tag located a=
-fter
-> > -       destination MAC address.
-> > +       Renesas RZ/N1 A5PSW and RZ/{T2H,N2H} ETHSW embedded switches th=
-at use
-> > +       an 8-byte tag located after the destination MAC address.
->
-> I think the device names are sufficiently strange with that forward
-> slash in them, that you shouldn't make them worse with the {}, at least
-> not in the full help text, and spell them out instead. It's hard for an
-> unfamiliar reader to know which punctuation marks to take literally and
-> which not to... (plus it makes it more difficult to find through grep)
->
-Agreed, I will add the full device names.
-
-Cheers,
-Prabhakar
+The issue is still reproducible with that patch applied (the stack trace
+doesn't seem to be any different as well).
 
