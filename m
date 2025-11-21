@@ -1,214 +1,172 @@
-Return-Path: <netdev+bounces-240700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68A69C77FEA
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:51:52 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 088F9C78011
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:54:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 566074E55CE
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 08:51:51 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E17D035FA96
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 08:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AEB02F363E;
-	Fri, 21 Nov 2025 08:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B89A33CE84;
+	Fri, 21 Nov 2025 08:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SDBj18+G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zbx1jdKw"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013064.outbound.protection.outlook.com [40.93.201.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E11B22A1D5
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 08:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763715107; cv=fail; b=qCQ3CJcRWVzHph0fdx40i/I9niWDYvtjEJC/i8hpMhgAqjYZIT792/bLrBEvYmzh+CGDbFEFx6VMPoVt9GyAtr75ylRp4YKQJcJKP16tUeIEvgOw38zUQYW9fucB51dWHQ4E4McXacef4Vnt6HXAJIKNe7/eN0wRlz9Ye9IQg3g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763715107; c=relaxed/simple;
-	bh=kURbqG287N9KrxfAWygkFqdE2g0oWbijO+WStuF/wNE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=pESlL2YGd+WtFCqNnLfVb7T3c6aUEz4sznXSdSOqVsvu4l/8UsqoyBfbJl+7t4P6t3lGr4cBJpz7zZWmCOzyzA4TZtSSfL+UEAGxjMEF+aXWHLW71Dr8kNFdbcvg5MdPvD0si0Iz9RGwvPVF3iEE+5eqKCwf/058aCzUzaal4sA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SDBj18+G; arc=fail smtp.client-ip=40.93.201.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hht6cWNQhMq1r/qeG2m1zVudQQnOCneVXFvDZY4cGScDAryVJwuvSM9GZiBiz0bTR1zlFRu1enw8zSFSCsqLfAYlEe3O+Oi25nXoU3kBuzwv0S0iE/y2y1Ju67bFbyzohYPskr+pqN99wrUedDXYnWenX+4JE4cFCWgd3xnyYQrvkv0gJXg+zbI21TYrjEQhdt3+5zqnf5a5YIIrCpzoGeEG13WJ5GnAjhhVPrtr8Us12x9vs0lbwVxkFN7qIUcJxAvxoUKp9lwsWKYQNBotUOQJt/SIQkZH0JaTEqW0PbEcmDlTAtKKlwIGUAzbe/YJ15yyrFYM7AvpGKmv5Owxvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kURbqG287N9KrxfAWygkFqdE2g0oWbijO+WStuF/wNE=;
- b=jeR51q6nDWhLMVZMqiRIoOWf7xXW9VhC1jITHwtnVuiR5iVcmnlX1Z7qFcFONAOFb6/nlfzSQNtCJujjv6SaKS7qElQb0cpbWAZtSK1qbyf46119J+mvyCKW7/s5wuwtbsCo4Jt17WYP68YY/gAVBtpGKWwXgI1FTUM2mA2K+7xkUJ8SGuUowE2g38dQLeTVAJv53EuAscaubg2CPRORkEmDAPignBYo1nniVjpgPiBY+mPk4ZdKfHK+SaxRoMIDTBpLQifYeaYY98qp4jqlodFaRAPnsacPU3FbY6aW8B/7zter3VDiQN24oWCmV3I5cjcvzUONpk6UabEY/H89rw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kURbqG287N9KrxfAWygkFqdE2g0oWbijO+WStuF/wNE=;
- b=SDBj18+Ghumulb2rqESvB+yzTZPhuiQDJbpkqeO7iJbRB4/AW/UtvBLE4BPIMfOXy0/n7laAyFlBC/DpiMgBO4hab6hYgs0cy02oU7F9dZOvtjJmmhJ25Eo+hqFNC3GBnrRtYqVXd9iSozfGXOtGKWyK2UEUC+4df2oMSG1XpIl6rc9t34T3phKxyFduqIvJttqp3rkN8qoVd920Xi/NOXGZpbDSc+WYcI9KSsCS8iPYOL7/jcHuSugUwmOwW39V9WCAqXroKqN9fcl9Jbz6XCts4r9zOdXLjcYMnvzhqTDsRko5DK20Z7q+crJJ7K8vgNuwx23P/bPOiJryAOMnPQ==
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com (2603:10b6:930:59::11)
- by DM4PR12MB5794.namprd12.prod.outlook.com (2603:10b6:8:61::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.11; Fri, 21 Nov
- 2025 08:51:43 +0000
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::e571:5f76:2b46:e0f8]) by CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::e571:5f76:2b46:e0f8%5]) with mapi id 15.20.9343.009; Fri, 21 Nov 2025
- 08:51:43 +0000
-From: Parav Pandit <parav@nvidia.com>
-To: Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>
-CC: Jiri Pirko <jiri@nvidia.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>
-Subject: RE: [PATCH net-next v1] devlink: Notify eswitch mode changes to
- devlink monitor
-Thread-Topic: [PATCH net-next v1] devlink: Notify eswitch mode changes to
- devlink monitor
-Thread-Index: AQHcWXX7teMkj3OyeUyWgPTZckbpj7T6ztgAgACrToCAAC18gIABKQEAgAADUvA=
-Date: Fri, 21 Nov 2025 08:51:42 +0000
-Message-ID:
- <CY8PR12MB719597CF0D93BE6091CBFC09DCD5A@CY8PR12MB7195.namprd12.prod.outlook.com>
-References: <20251119165936.9061-1-parav@nvidia.com>
- <20251119175628.4fe6cd4d@kernel.org>
- <32hbfvtxcn3okpylfcgfeuq7uvrufpij4y7w6au6vxrernwthb@pdxvc6r6jl5z>
- <20251120065223.7c9d4462@kernel.org>
- <q5n6ata2nhrtbkcnemyuiuhsf43365uqpdrbhm2qvpckxkyyuj@u3ugwpyqab6a>
-In-Reply-To: <q5n6ata2nhrtbkcnemyuiuhsf43365uqpdrbhm2qvpckxkyyuj@u3ugwpyqab6a>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR12MB7195:EE_|DM4PR12MB5794:EE_
-x-ms-office365-filtering-correlation-id: 61e4899a-5795-406e-1e54-08de28db31b8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?9SHJgXmj6oiON1VJOXeoZwd4eA2QnJfQ34gUqpYkwsotB7LfEdlid5YUZnLh?=
- =?us-ascii?Q?1UP8NMDzVfI8OQ9wFQx9ptrRnvvInUglLKiUsRw0TDoKWYZLS5g7vsk70csn?=
- =?us-ascii?Q?NsVbraAnCIiDLmCn1+kE48H/oINm/CDOyRcIYIAslr5sZ0HH96CdrHNYvTX6?=
- =?us-ascii?Q?GEYt2Cvshs0nNiKXhdi7qpb/P5L2u9pLA66NvtkfOtNqdZpdTEMNHCKrEsY4?=
- =?us-ascii?Q?QG1UzciCeEC/6E4vf/nBQ81ZpF3XGcBVegCmzJzBM2bYKUPayx6v5MXTyYw8?=
- =?us-ascii?Q?tHHrDdvivGkgsKItg2XgQehFe3w5qrS2zxEsikF6XsmBX92VeKVGRah5Js0R?=
- =?us-ascii?Q?U5rdRYwk7dpAmRahfYuO5jORaI/G6RSj6IkJjaw8/PXdpMarae3ZE0PeIlu2?=
- =?us-ascii?Q?71GgqcdRTnc2gwSymoYDcah4uus9ezTAPgIg9aWc6R9ABWXQhc6JWQ5qcTl3?=
- =?us-ascii?Q?yZXkLwNwnCLxjLD0bDlYcf+R7AExu7prMOwT7luISywPlLEx6iFTIlKsjlI+?=
- =?us-ascii?Q?SrxH1/FvEDDqu/pwO4lYoh46gf7Jn/8UTGx8eD8N4M1/9LwfLB6ORtRmft3p?=
- =?us-ascii?Q?XMWlRdiQE9dlXLqC75wS5GaRW0SBA4zxBKQw82zkAAFfLhPnVBzq1t86ARZF?=
- =?us-ascii?Q?T/C+UPOm54EwhWY8ReDtwwr90z7HDuT5/jDCi3uTiHCv+sCdJJ3g8ImYbuQ/?=
- =?us-ascii?Q?hFw1I0T9tQ1814YzN5BAt6bre35FGKgh+EMKMfjzyTCIFFeFsWKn1vSO6LHR?=
- =?us-ascii?Q?jUxtgGctvcF+lQYfBkK3NpEw1hW5AS9ex3VJsv9KaZVxAJalydoGGcDf/tbk?=
- =?us-ascii?Q?NaCEQ6qG23mPZyEQYAY23nsINHCYyQBnBR3aMmN8XTfplp9Ig+Ki8YI2OBdf?=
- =?us-ascii?Q?hbYYkTr3TdLex1EzMAhhXK3opBZiYfpOkc5vy3bynBGy0vWO1klWHLImhrZb?=
- =?us-ascii?Q?B5UZtgauIeEGZhXszTnxWTlYBeF6dnFDj0r25vOGAX8mtsaIh5E4nJcogKDU?=
- =?us-ascii?Q?7eeLfAViMKVg2+UVgYfcv/GdICIotO3ar88n4P2urrx+UodbdUmjhSQijZ6k?=
- =?us-ascii?Q?GinteJtKMNaOrJKUIsezJBqJXzSkIkVceo20q5e5ABzN5/+ouq5MfiVyWLZ3?=
- =?us-ascii?Q?sCYKpTIDOvsUOkFsOmAuOLwIwAjMOBmzhXeS+T/WZ2fUf18TpSxEiHs7iCRN?=
- =?us-ascii?Q?IzcbqcC4ZyQHhrlyyob2kpbzzi+WdVCnzP6XSfNSJOtOgzsdUVztEMT9clJ3?=
- =?us-ascii?Q?hssyVm+PxkhOkGUWc+3gBUSM8x2WprkDqUuvKtTDX3irfxf8EzB6SkzGGvD2?=
- =?us-ascii?Q?a0QtMKcstKjWcWZFhbe4kKQKpuVswTqLDB5nwSw9R5MIfEw8X5S1Zn/AG19Y?=
- =?us-ascii?Q?y22LtcNV1GTcjeyYtz9j/f5TZ8ug/Byseb+RLHaU/WDkNjmdQmtBaNlUOTlz?=
- =?us-ascii?Q?hqchVNstnfYaOO2J7MEUw2gSDFubdZzt83xC0aI0leKp0aTtOt5osYfDjBxV?=
- =?us-ascii?Q?dcJJ4T+i1QLd9C89Bzq+mzzIR6P1fag0nnVD?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB7195.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?5U5YsU69y8Jag25PRpY0t9Hnfdw/lIc4ED4pSxirsZrC4IEjtyICUvu9hFCd?=
- =?us-ascii?Q?jfBp0+IbdL1iPkHRFUAfQ4wJAvdt7/cmKZ7HjS9ilR9bX/DBpOvSB1sGY3O+?=
- =?us-ascii?Q?Eh2jqqZ339iYkeVvEgIZ/PCEyyKBxQysTZ8vnhYcfaaMEOjjsBsJFxMHOkES?=
- =?us-ascii?Q?nu0swRejtyNtYK1LoFXMTmTZ10Xi3KfcSUprnuxWzMfEZ/FbS9mgvjUKtsf2?=
- =?us-ascii?Q?v2D1kaaag5l26DxdEA/7cY5rhkLjRt7ydzg5cIXRQX0Wzq4xKIo6GB8vbb1D?=
- =?us-ascii?Q?ynhFFX2s5i74SM+S/FFjtUJKdq6mpQt7ctNGE6Dsi2ilMhZIE0M/O0Qn3xZm?=
- =?us-ascii?Q?prNv102cSHUH0hYC9dbAVLQL6dXbg+zhbe9/QqhdkIQvkQX6T30BpzFnfNBH?=
- =?us-ascii?Q?dNLEUYIeZ+nwFKD8c3xFgUcZ/1C/X2DUotHcIGM/qa1vXVsdmXi+xBKBjJVW?=
- =?us-ascii?Q?kpMCndItXz0PyTfPt8a0FSbX0uS9gklUnnI8iIcTavzqmR61JN/ElKvCpruc?=
- =?us-ascii?Q?/8+OcQ+P7TvXIpn8NpiK3kz/fvRtoJHgUpWkRh9ePFP1HbiI4vkkopMRxoHf?=
- =?us-ascii?Q?cYp9Nje5+R/3u4ZV7Newdp0gM2OPywC0dHDk7C+JX6rhWSlKCbv95UbSwYKy?=
- =?us-ascii?Q?rHk/NPqTzJMSg2v7wKQHL+Qc1zjMJ6lDD+zE09eZsisieed7izDDKX/OT5fN?=
- =?us-ascii?Q?d+XauSQjtSV0SumCt0ZjK2JlcNe4nhA8PYrCahyb4Z9p7VesyMckHJ+Xvu/k?=
- =?us-ascii?Q?H+tcXVsA2TUqQ00Up3L49xheIoY3q2W2och1GVMLOUomhcq7bL3evYPqfwjL?=
- =?us-ascii?Q?XnbXQapwzhLueKdKgea7pH0UV2SAFJi8zCXZXaN4W8MT/QVOIhqUMNlCulzG?=
- =?us-ascii?Q?7Jt3Jw2IYIrteGht9PRDsgzGJ0UnIVX4/RhSCXttqjCuKot13NKLifEaVFWc?=
- =?us-ascii?Q?vCdOiLZJmGc3dCuxIl+Q1Temv1ht+0a9Nq4HBZ88NVLy+eAGYSsrvxm/LPyE?=
- =?us-ascii?Q?mZ/CXOJZy4efajjNA8WZkXbAna1MCnlkHlamzflSgibQqPnpsgeFZbXo9twR?=
- =?us-ascii?Q?r+gtve76M/05I6KpJaD6up/anBr5mgDUDiY9z14SuwZZrEsXSQ94yVi3566M?=
- =?us-ascii?Q?QXlICWEk8z4VlZCStjYG5kI2Z/JwYC4WQ2x173BuZQTJDh9pzpYJck2hOC4H?=
- =?us-ascii?Q?czltFzIV0mf8KYVeCReeQ9qZ5p6ToJhRCzVNI31poL3iGXLk6BS7MZkx1LR4?=
- =?us-ascii?Q?N6FgwuZWW7L2O4LI5EpPkalfYxtZaiD+7speF4VazRYGK6zy/H3fJxyQY/as?=
- =?us-ascii?Q?zRGPDskJvl2dCct6/PbG05wwXom4jiaekG0tzAkX6hCiIl0afDJiyvptM9hQ?=
- =?us-ascii?Q?87BKsQjA1N01n5qxGY0+MaTNKJmWmMTd2LP2ny+S04PH8y9c2cQJfyC779/Z?=
- =?us-ascii?Q?C1a1ty2hh/Q72HeZ5+t+2B6Nv+sugEWmN01+6r30/PPm0psLeJEmK2Xg0gvf?=
- =?us-ascii?Q?PtqQ600NQFWEk2JFgGprCPhwwb95IBTCF8ZJu+HY8coo3l380PLI4CzgypM1?=
- =?us-ascii?Q?qqLz0B/3060YoQF7DOc=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BFA4305E27
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 08:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763715245; cv=none; b=PeX0gGzjMUgODAUDFrUwOJutU4VxWtQTjnPsOvwyoLfWkwlqdufrUjPuP6eznTFrVPxY/6iJOPBxnXRxYlz2IQNrDWYNKuROCTuwyD2P+spYZ4AdVHQeR9Kv5mIor4wsDMkTDfPVPr3R0jNDeFOuZZ4cb8I9VZoK1Wp0UoQFQVE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763715245; c=relaxed/simple;
+	bh=5ONFbsYgwaxvG2oaqCIQcvL9nC4rsYPLT1nLoZ6TTT4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KG7bNjQk++PlIU1nuFmqomjjrfma83AfnQdKj/13Z7QDQjU09GSJc6aBvYAmBmRs1ERFX+2paip1UAq7LdstCeuji1Jj587XigRyM/5ZrfscglkM4IqmFbNqVIx8rJnXYqqr0GzuJ6YDVC4ZQEau7cUq1qlKS2GgpYDzqz0bCnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zbx1jdKw; arc=none smtp.client-ip=209.85.214.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2953ad5517dso23068325ad.0
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 00:54:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763715242; x=1764320042; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/YTlngMcqbvauGZMeP16vkAvJ48G9EBdsHd/OECzaso=;
+        b=Zbx1jdKwIcRoCdE0lCiPAlzIxMwtVnqGA1uuPrjedx2+/x7ndIQu86pRiosD9kOvxE
+         +dq6VGNfahgvlJy9im/oeQnO04JQaJQA22nSfqlBW3EM8N4MBqlhtqv4LueaqR4aeazO
+         MtxUqbUqNY6bVsWHBeDK1k6uVC4ptlvxt6kn7PDGKfOYpoonec7kvN3+6SRaJ8t9uJFQ
+         S+vm3y5DnqoJHijA1osQrl0/KI5oVY/o2XR6rDiIZ1E3eRWyyhy0PIlderEbD4JuEuod
+         uoBV9i30RJDhmxc7+5hu/Dj6kXQqHO9G3Fpni6G1Bv3V0Vr2v5KvYUETlC9bG22LRBD5
+         ghfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763715242; x=1764320042;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/YTlngMcqbvauGZMeP16vkAvJ48G9EBdsHd/OECzaso=;
+        b=TyitUa+oBep+WP/xpuob4LVAVGoLSn3P9gUt7rOtzwJnCG26TeZBNwIrTpe0s++rgO
+         eXOnZUS+au3+73r/29/6sK+hzmDgVReAyJ5D0mN6xAYiIvDLkhxjJTGUjoVRsEuLo3La
+         GBKNb9zY6sb9sWezSB23QtlO/e5BZSO7YxzErHgsV29BxTcK/LJ7FOo8Xc9FAMPEarDV
+         RyR5fX5JOuphN6lr+s6SgB3XBYeaU535hOhu3RE8bbsdTOsUjPywp2CM6mJgErojciBa
+         lyfgiDyVPJrB/Eq/OjxVonWN3TrOj2lO6d50/p8yEb/l97n6FWrCNfoTOXmVXx2wk0F/
+         vy3w==
+X-Forwarded-Encrypted: i=1; AJvYcCU5oos30kAWEclETqHtL9qqVoWZW4ZirTJgjQboTQGpxLf+p+bAeYERO2kfYgw0Qm9bo9XVFA8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6QxTBupARr2NEHJkGYXFuGtmSzAuAe1II9HfHDOEgnAEiOLKI
+	uNq8tG6YkrU+NxwwjeVQH8woNYi/BvdncBl9WrhJk2B0RD2w5WQ997Zk
+X-Gm-Gg: ASbGncvujZHeDaHIwsDDn7DS3F8bAp+AJJsswB1PUUmvPtjQqSO2t9gEEpO+LsLBhE4
+	PMRCybTeJGsDxr2N02WGh0dJ3fQEK07Pp2s4OwSbhVvz8xqSmUI5eh6BV693l2rIVywf5enjs2b
+	6gXobCebKI7joBywV0P3Cr69QBZskw9proxvQDxzhLVN6gK2Qce+KzHlDH5pGRL2yyb2R/C8Mh5
+	Rx58H3N2heT73bh3JmpPTGJNbBzpSRsfcPi2OYVE+Kw7lcDAUFsIHmb7zg72/sMTTd1aoi9aJC2
+	r4fg86WczCiKEuTAigdnS6C9LxQCzpo7IRTWRoPHBJSQMa0w0sithjHiy/dZCpskAJAFgsVDkpn
+	GdgY8aKQc2z/KlmyJ97Md3hxQlbb9UltmrToplas6cPkQTZzKY7tnaTbk5g9X9Q3c2MXPAcAuLn
+	QeoVNazaIn7NfdL1e7Ozu+5kYAtQHp53s3LVOr/gfiwQ==
+X-Google-Smtp-Source: AGHT+IHuu7fePZOfFm1BwV5Mds9oUo/keOxc859jpBRxZdakp53XXkD9VJ9ewpv9IfRTXvYaNE2Pnw==
+X-Received: by 2002:a17:903:98f:b0:298:b4f1:37eb with SMTP id d9443c01a7336-29b6be9364fmr21213895ad.10.1763715242052;
+        Fri, 21 Nov 2025 00:54:02 -0800 (PST)
+Received: from LAPTOP-PN4ROLEJ.localdomain ([221.228.238.82])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b274d39sm49938125ad.77.2025.11.21.00.53.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Nov 2025 00:54:01 -0800 (PST)
+From: Slavin Liu <slavin452@gmail.com>
+To: horms@verge.net.au,
+	ja@ssi.bg
+Cc: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	fw@strlen.de,
+	phil@nwl.cc,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: [PATCH net v2] ipvs: fix ipv4 null-ptr-deref in route error path
+Date: Fri, 21 Nov 2025 16:52:13 +0800
+Message-Id: <20251121085213.1660-1-slavin452@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251120190313.1051-1-slavin452@gmail.com>
+References: <20251120190313.1051-1-slavin452@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB7195.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 61e4899a-5795-406e-1e54-08de28db31b8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2025 08:51:42.9968
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: EP7KKf51JWt/Ucl/Ca1NRxIiSRCHx9EnYj381D7LCz18GNMwhlmzMwL6TL4KNEOYKu+6PrqHvLgigQCx4PyDew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5794
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+The IPv4 code path in __ip_vs_get_out_rt() calls dst_link_failure()
+without ensuring skb->dev is set, leading to a NULL pointer dereference
+in fib_compute_spec_dst() when ipv4_link_failure() attempts to send
+ICMP destination unreachable messages.
 
-> From: Jiri Pirko <jiri@resnulli.us>
-> Sent: 21 November 2025 02:05 PM
->=20
-> Thu, Nov 20, 2025 at 03:52:23PM +0100, kuba@kernel.org wrote:
-> >On Thu, 20 Nov 2025 13:09:35 +0100 Jiri Pirko wrote:
-> >> Thu, Nov 20, 2025 at 02:56:28AM +0100, kuba@kernel.org wrote:
-> >> >On Wed, 19 Nov 2025 18:59:36 +0200 Parav Pandit wrote:
-> >> >> When eswitch mode changes, notify such change to the devlink
-> >> >> monitoring process.
-> >> >>
-> >> >> After this notification, a devlink monitoring process can see
-> >> >> following output:
-> >> >>
-> >> >> $ devlink mon
-> >> >> [eswitch,get] pci/0000:06:00.0: mode switchdev inline-mode none
-> >> >> encap-mode basic [eswitch,get] pci/0000:06:00.0: mode legacy
-> >> >> inline-mode none encap-mode basic
-> >> >>
-> >> >> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> >> >
-> >> >Jiri, did you have a chance to re-review this or the tag is stale?
-> >>
-> >> Nope, I reviewed internally, that's why the tag was taken.
-> >>
-> >> >I have a slight preference for a new command ID here but if you
-> >> >think GET is fine then so be it.
-> >>
-> >> Well, For the rest of the notifications, we have NEW/DEL commands.
-> >> However in this case, as "eswitch" is somehow a subobject, there is
-> >> no NEW/DEL value defined. I'm fine with using GET for notifications fo=
-r it.
-> >> I'm also okay with adding new ID, up to you.
-> >
-> >Let's add a DEVLINK_CMD_ESWITCH_NTF. Having a separate ID makes it
-> >easier / possible to use the same socket for requests and notifications.
->=20
-> Well, you still can use the same socket with just ESWITCH_GET. Request
-> messages are going from userspace, notifications from kernel, there is no
-> mixup.
->=20
-> For the sake of consistency, shouldn't the name be ESWITCH_NEW?
+The issue emerged after commit ed0de45a1008 ("ipv4: recompile ip options
+in ipv4_link_failure") started calling __ip_options_compile() from
+ipv4_link_failure(). This code path eventually calls fib_compute_spec_dst()
+which dereferences skb->dev. An attempt was made to fix the NULL skb->dev
+dereference in commit 0113d9c9d1cc ("ipv4: fix null-deref in
+ipv4_link_failure"), but it only addressed the immediate dev_net(skb->dev)
+dereference by using a fallback device. The fix was incomplete because
+fib_compute_spec_dst() later in the call chain still accesses skb->dev
+directly, which remains NULL when IPVS calls dst_link_failure().
 
-It's the change happening in the eswitch: mode or attribute or something el=
-se tomorrow.
-So it looks more like DPLL_CMD_DEVICE_CHANGE_NTF to me.
+The crash occurs when:
+1. IPVS processes a packet in NAT mode with a misconfigured destination
+2. Route lookup fails in __ip_vs_get_out_rt() before establishing a route
+3. The error path calls dst_link_failure(skb) with skb->dev == NULL
+4. ipv4_link_failure() → ipv4_send_dest_unreach() →
+   __ip_options_compile() → fib_compute_spec_dst()
+5. fib_compute_spec_dst() dereferences NULL skb->dev
+
+Apply the same fix used for IPv6 in commit 326bf17ea5d4 ("ipvs: fix
+ipv6 route unreach panic"): set skb->dev from skb_dst(skb)->dev before
+calling dst_link_failure().
+
+KASAN: null-ptr-deref in range [0x0000000000000328-0x000000000000032f]
+CPU: 1 PID: 12732 Comm: syz.1.3469 Not tainted 6.6.114 #2
+RIP: 0010:__in_dev_get_rcu include/linux/inetdevice.h:233
+RIP: 0010:fib_compute_spec_dst+0x17a/0x9f0 net/ipv4/fib_frontend.c:285
+Call Trace:
+  <TASK>
+  spec_dst_fill net/ipv4/ip_options.c:232
+  spec_dst_fill net/ipv4/ip_options.c:229
+  __ip_options_compile+0x13a1/0x17d0 net/ipv4/ip_options.c:330
+  ipv4_send_dest_unreach net/ipv4/route.c:1252
+  ipv4_link_failure+0x702/0xb80 net/ipv4/route.c:1265
+  dst_link_failure include/net/dst.h:437
+  __ip_vs_get_out_rt+0x15fd/0x19e0 net/netfilter/ipvs/ip_vs_xmit.c:412
+  ip_vs_nat_xmit+0x1d8/0xc80 net/netfilter/ipvs/ip_vs_xmit.c:764
+
+Fixes: ed0de45a1008 ("ipv4: recompile ip options in ipv4_link_failure")
+Signed-off-by: Slavin Liu <slavin452@gmail.com>
+---
+ net/netfilter/ipvs/ip_vs_xmit.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
+index 95af252b2939..618fbe1240b5 100644
+--- a/net/netfilter/ipvs/ip_vs_xmit.c
++++ b/net/netfilter/ipvs/ip_vs_xmit.c
+@@ -409,6 +409,9 @@ __ip_vs_get_out_rt(struct netns_ipvs *ipvs, int skb_af, struct sk_buff *skb,
+ 	return -1;
+ 
+ err_unreach:
++	if (!skb->dev)
++		skb->dev = skb_dst(skb)->dev;
++
+ 	dst_link_failure(skb);
+ 	return -1;
+ }
+-- 
+2.43.0
+
 
