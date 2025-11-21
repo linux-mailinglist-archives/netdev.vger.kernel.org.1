@@ -1,50 +1,70 @@
-Return-Path: <netdev+bounces-240628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D2D2C77115
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:52:16 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842ECC77184
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 04:01:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BCB6535C648
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 02:51:06 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C5D27356DFB
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB182DC357;
-	Fri, 21 Nov 2025 02:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lT4bOfga"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7A82848A7;
+	Fri, 21 Nov 2025 03:00:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from localhost.localdomain (unknown [147.136.157.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BED2DC322;
-	Fri, 21 Nov 2025 02:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8953F2D77EA;
+	Fri, 21 Nov 2025 03:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.136.157.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763693455; cv=none; b=WK4T8eTkJk6F5oFOsW5vg/RJc7b9unGO5Y/WQs96xbi6mCSu30L45Mj0DqAjc6BoxyK37qGayWqiKiimHGjm9tNnUYRzgB+fkM7eOg5PuAuUkNapKuPj7GJ2oq8vW1zYl/Fu50M080Uqgbx7TNbv1BeEPR0GNNGkcCPMdhafoSY=
+	t=1763694025; cv=none; b=NZI0kTdro8kci0wHKSmMsFj/RA86bqNHVFH3+J8NxkQkZxlc65xBJjAr3/UniVzF9K2Ofvx0K3CdI3aSUhX7ejU/BBmeCorzWnxZ0sGrTmbZthRqZkk8jp+ciFoc++mHe5ad1zzJoo5loXfuhROtO11WcT3tXL+HqcP/qp3zO8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763693455; c=relaxed/simple;
-	bh=tSa30zLKOXEBzsBQsVHHF/No4SIK2WbE9wnFY3vZY0E=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QR7pvT5YgKgC769EzG80JLWvNOVe/IX4SJIa4PKIeX+tYpoQMEv5/K2VYynXrVVObaTAe01BrRN2vzCXiHDGqegd7VHE/yvBin4FEEEOcs8rqfsbT8GsIh8GjN7vXJrEX/hqIGQWQNjYB/H27wkIubkRPtV0WAICq/309cw2hAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lT4bOfga; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 309D0C4CEF1;
-	Fri, 21 Nov 2025 02:50:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763693455;
-	bh=tSa30zLKOXEBzsBQsVHHF/No4SIK2WbE9wnFY3vZY0E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lT4bOfgaSFlI9rv3K8nWf0UmPb8/NshjF3F8VBCMYi5ll7PajDk7el5QKHth8HARk
-	 OVGIJWegnlHwxZT1j39ebHaqKkI0+32ZFg8lcqb4DEnh3ew1KYnq0pgUviedutYJL2
-	 mA/U1S/WLhc03i026GPNhgGu01kGY8jrHoPi28EVg2jIgs0UXP6xD7kV3r6EbaUZCf
-	 jiY/qNBkGmQHQ+CbcLnb0YVQJuj+NPeV5c8IdNNF/DZJQtKVvLq7xceKiOwSrTJaeE
-	 2W4ozazVoHpTaxYSmljMHJ39KTqoCsHiF+SonNbD6wwWYK0dTCQtrjpXiHV3HfsGse
-	 aDwOILtsrJ6yQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7111C3A41003;
-	Fri, 21 Nov 2025 02:50:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1763694025; c=relaxed/simple;
+	bh=BpR73GKKSJHvTtGxGpzHqvLjY1kP0t8z1tlrwz2cO7g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iy0lhQQY63NMevqRMX/fLtId48DPHlD72GoYZJ+I0pHf6hG0NzNHBCkWMumR757ZjrA6EiICxKbuxuFpRT0Lnap2MSo5+yXEgZ8OIdZOJpNBgPmuWvSMoG0xtEpeGdH8uO4gxuyuMQS2IE2CljKVcfCbcnnlI82IPJsx2EX0c1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=none smtp.mailfrom=localhost.localdomain; arc=none smtp.client-ip=147.136.157.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=localhost.localdomain
+Received: by localhost.localdomain (Postfix, from userid 1007)
+	id AACEB8B2A11; Fri, 21 Nov 2025 11:00:15 +0800 (+08)
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Michal Luczaj <mhal@rbox.co>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Cong Wang <cong.wang@bytedance.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next v2 0/3] bpf: Fix FIONREAD and copied_seq issues
+Date: Fri, 21 Nov 2025 10:59:41 +0800
+Message-ID: <20251121030013.60133-1-jiayuan.chen@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,61 +72,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net-next 0/5] net: fec: do some cleanup for the driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176369342000.1872917.9969026361331291521.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Nov 2025 02:50:20 +0000
-References: <20251119025148.2817602-1-wei.fang@nxp.com>
-In-Reply-To: <20251119025148.2817602-1-wei.fang@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: shenwei.wang@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- eric@nelint.com, Frank.Li@nxp.com, imx@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+syzkaller reported a bug [1] where a socket using sockmap, after being
+unloaded, exposed incorrect copied_seq calculation. The selftest I
+provided can be used to reproduce the issue reported by syzkaller.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+TCP recvmsg seq # bug 2: copied E92C873, seq E68D125, rcvnxt E7CEB7C, fl 40
+WARNING: CPU: 1 PID: 5997 at net/ipv4/tcp.c:2724 tcp_recvmsg_locked+0xb2f/0x2910 net/ipv4/tcp.c:2724
+Call Trace:
+ <TASK>
+ receive_fallback_to_copy net/ipv4/tcp.c:1968 [inline]
+ tcp_zerocopy_receive+0x131a/0x2120 net/ipv4/tcp.c:2200
+ do_tcp_getsockopt+0xe28/0x26c0 net/ipv4/tcp.c:4713
+ tcp_getsockopt+0xdf/0x100 net/ipv4/tcp.c:4812
+ do_sock_getsockopt+0x34d/0x440 net/socket.c:2421
+ __sys_getsockopt+0x12f/0x260 net/socket.c:2450
+ __do_sys_getsockopt net/socket.c:2457 [inline]
+ __se_sys_getsockopt net/socket.c:2454 [inline]
+ __x64_sys_getsockopt+0xbd/0x160 net/socket.c:2454
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-On Wed, 19 Nov 2025 10:51:43 +0800 you wrote:
-> This patch set removes some unnecessary or invalid code from the FEC
-> driver. See each patch for details.
-> 
-> ---
-> v3 changes:
-> 1. Revert patch 2 to v1, fec_enet_register_offset_6ul still needs the
-> "#ifdef" guard, otherwise, there are some build errors
-> 2. Fix a typo in the commit message of patch 3
-> 3. Collect Reviewed-by tag
-> v2: https://lore.kernel.org/imx/20251117101921.1862427-1-wei.fang@nxp.com/
-> v2 changes:
-> 1. Improve the commit message
-> 2. Remove the "#ifdef" guard for fec_enet_register_offset_6ul
-> 3. Add a BUILD_BUG_ON() test to ensure that FEC_ENET_XDP_HEADROOM
-> provides the required alignment.
-> 4. Collect Reviewed-by tag
-> v1: https://lore.kernel.org/imx/20251111100057.2660101-1-wei.fang@nxp.com/
-> 
-> [...]
+A sockmap socket maintains its own receive queue (ingress_msg) which may
+contain data from either its own protocol stack or forwarded from other
+sockets.
 
-Here is the summary with links:
-  - [v3,net-next,1/5] net: fec: remove useless conditional preprocessor directives
-    https://git.kernel.org/netdev/net-next/c/3eea593b5597
-  - [v3,net-next,2/5] net: fec: simplify the conditional preprocessor directives
-    https://git.kernel.org/netdev/net-next/c/eef7b786bdab
-  - [v3,net-next,3/5] net: fec: remove struct fec_enet_priv_txrx_info
-    https://git.kernel.org/netdev/net-next/c/63083d597ada
-  - [v3,net-next,4/5] net: fec: remove rx_align from fec_enet_private
-    https://git.kernel.org/netdev/net-next/c/3bb06c8a461b
-  - [v3,net-next,5/5] net: fec: remove duplicate macros of the BD status
-    https://git.kernel.org/netdev/net-next/c/bd31490718b4
+                                                     FD1:read()
+                                                     --  FD1->copied_seq++
+                                                         |  [read data]
+                                                         |
+                                [enqueue data]           v
+                  [sockmap]     -> ingress to self ->  ingress_msg queue
+FD1 native stack  ------>                                 ^
+-- FD1->rcv_nxt++               -> redirect to other      | [enqueue data]
+                                       |                  |
+                                       |             ingress to FD1
+                                       v                  ^
+                                      ...                 |  [sockmap]
+                                                     FD2 native stack
 
-You are awesome, thank you!
+The issue occurs when reading from ingress_msg: we update tp->copied_seq
+by default, but if the data comes from other sockets (not the socket's
+own protocol stack), tcp->rcv_nxt remains unchanged. Later, when
+converting back to a native socket, reads may fail as copied_seq could
+be significantly larger than rcv_nxt.
+
+Additionally, FIONREAD calculation based on copied_seq and rcv_nxt is
+insufficient for sockmap sockets, requiring separate field tracking.
+
+[1] https://syzkaller.appspot.com/bug?extid=06dbd397158ec0ea4983
+
+---
+
+v1 -> v2: Use skmsg.sk instead of extending BPF_F_XXX macro
+v1: https://lore.kernel.org/bpf/20251117110736.293040-1-jiayuan.chen@linux.dev/
+
+Jiayuan Chen (3):
+  bpf, sockmap: Fix incorrect copied_seq calculation
+  bpf, sockmap: Fix FIONREAD for sockmap
+  bpf, selftest: Add tests for FIONREAD and copied_seq
+
+ include/linux/skmsg.h                         |  48 ++++-
+ net/core/skmsg.c                              |  29 ++-
+ net/ipv4/tcp_bpf.c                            |  26 ++-
+ net/ipv4/udp_bpf.c                            |  25 ++-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  | 203 +++++++++++++++++-
+ .../bpf/progs/test_sockmap_pass_prog.c        |   8 +
+ 6 files changed, 323 insertions(+), 16 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
