@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-240592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 722E5C76BD5
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 01:21:19 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B728C76BCC
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 01:21:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 2BF962DBB2
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 00:19:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2C41B4E6A5E
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 00:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B6B221DAD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6052236E8;
 	Fri, 21 Nov 2025 00:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lShi4Jk2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bFeNfKBz"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA1E20E702
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25ED521579F
 	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 00:19:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763684360; cv=none; b=fZrGrKHnnRQYwuntPh/ADssmv7pLbX3oyJjLqxawLuhywCHMpEgPdWDMQLpcz2CcYuWXDHPvWg6ap6mHt1/7TdUcVDF+qbSSSX7DDbYJUQEEP5aZ6TJZiFK2d+f/oCYOj59dpyvB/f4oyRwqmyfOeJR2d7jsnCsM/CNWJy4tols=
+	t=1763684360; cv=none; b=oYeUPiaJJrpnHgROcDRDYGC1DFBHdoltr6tcntekC/H2WSMJKqN9Isiat2+Y5UsQUy3I05IKpOGbxjCVLUUJXkwtfZVUvvfVtW4FEv8rDqr0eN+aPJgOYYH1+CKLhvfkzDy3Y67BcbTGgaT+ioh5z24qaWeKWL4Y4E6sALd6yGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763684360; c=relaxed/simple;
-	bh=ac+SqF+nclpj0220XqgkFGA2lonSr+pAqOAfRRXyCyk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=qJaUZzf7GRT9NmR1Ao3bzHySpd+Dpsp42khc9HiApI8FVclDM7xWyu8SnJ+EHZvBQev9nzyu58El1ujELVZaBEO39C7ylNKPJHWzcL1JdM6ZUxttaQHyq+SQP+NO3ZijuRDX/nU0tfSHbf/prtV3yMBYV59Is5O5eMn2tgPlZrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lShi4Jk2; arc=none smtp.client-ip=198.175.65.21
+	bh=Sh6c7b6Hi90RoX/bOeWbivnnXi5ySOfBIpzuddrreJs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=VucTiwXP4ieUFFMtSSUyXzfqawz6yoCfahyxRMxXX00mvRI6mNSNCGwzBiHpx7pW5LfBo3w2hggt7IpsukBdNJv+2j/yf504Ex3K8vLwipvF2JkDL92AAXZrC74pPzaRPsBO+U3rN4hqDyvt1I8i/pW5Zhu3em40EaYJcDwJgec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bFeNfKBz; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -35,26 +35,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1763684359; x=1795220359;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=ac+SqF+nclpj0220XqgkFGA2lonSr+pAqOAfRRXyCyk=;
-  b=lShi4Jk2wm5/j7SJZphzso+4gPB0ZcxzgiXp7FKFKnQukgrU38NVTiDm
-   r6npbycSVzHSLlnOnx6HBYio3nOdw6CZBfI9Vwsrar8XdqkdWxlN67tuA
-   kK4aZdm/3X7uL/Rcl7oaTriY37MgCPfcX2dvUUugyPGovX2bCIjrtFBV7
-   s8HMQ7eGUoJQwzcNghN69kJuWaCcxsVgf2xdogMF1GmbYGUTT2EMeIO5F
-   qevN5iHZFtBMaX+LpUq0XTRyErjRX3IHwTo7IZ9uYuKvpypcQrhxqgBwY
-   Au8LceTOXdvV0uzvA9jut6Y0u4ZtYgrekaCIxezIKoeBfA2cR1VOPiQht
-   A==;
-X-CSE-ConnectionGUID: hrIcsV2LQkyZ77auph8+tg==
-X-CSE-MsgGUID: JcWX69z6Rmec5BmWjCetnw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="65704068"
+  bh=Sh6c7b6Hi90RoX/bOeWbivnnXi5ySOfBIpzuddrreJs=;
+  b=bFeNfKBzJmiMR1Cqd3VHvyTEuU8J1DoItrjo227nCFT6c4T4Jeo3p2tI
+   I0Q4t7eIpkZH8Zj9rPzTxvvtmCXAkG+L3AjVN7oJ2hZd0T0lhdp1lfsHX
+   jrJ91CVeDy2F2zpt7Rnd1tmQCxSgiB/yXhXbTg+n60IJW/yxeR7CUImxQ
+   qvyWzneIo+XTzytul9DqYa/gwPQxPHT473UqXpPNh/wppoPEKJF5Oj7eh
+   Wn9qxE0/FPmVoGwmtwN9aQpsNW7KmmfjlZ3igFV2791CD4r39taKC4ljI
+   jNyddFk8k6ExHyL2d7Yp41CG+/7T1wvg9UE4DCuLu1z1eIgETZg4FUI50
+   Q==;
+X-CSE-ConnectionGUID: qgQ1/pKeT7GjDuPJm9vyFg==
+X-CSE-MsgGUID: 3y53edCASSmFh1GFYs2YXQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="65704075"
 X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
-   d="scan'208";a="65704068"
+   d="scan'208";a="65704075"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
   by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 16:19:15 -0800
-X-CSE-ConnectionGUID: 9patfTSeSl+wYjuBlrU3vQ==
-X-CSE-MsgGUID: F4qIXi24T2evqRHr5rP5dw==
+X-CSE-ConnectionGUID: /CmWmNz9QuCSvdbjCtO1qA==
+X-CSE-MsgGUID: sSB9nbthTMSxOdfdOtvxiA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,214,1758610800"; 
-   d="scan'208";a="190815179"
+   d="scan'208";a="190815182"
 Received: from estantil-desk.jf.intel.com ([10.166.241.24])
   by orviesa010.jf.intel.com with ESMTP; 20 Nov 2025 16:19:15 -0800
 From: Emil Tantilov <emil.s.tantilov@intel.com>
@@ -75,9 +75,9 @@ Cc: netdev@vger.kernel.org,
 	aleksander.lobakin@intel.com,
 	larysa.zaremba@intel.com,
 	iamvivekkumar@google.com
-Subject: [PATCH iwl-net v2 3/5] idpf: fix memory leak in idpf_vport_rel()
-Date: Thu, 20 Nov 2025 16:12:16 -0800
-Message-Id: <20251121001218.4565-4-emil.s.tantilov@intel.com>
+Subject: [PATCH iwl-net v2 4/5] idpf: fix memory leak in idpf_vc_core_deinit()
+Date: Thu, 20 Nov 2025 16:12:17 -0800
+Message-Id: <20251121001218.4565-5-emil.s.tantilov@intel.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20251121001218.4565-1-emil.s.tantilov@intel.com>
 References: <20251121001218.4565-1-emil.s.tantilov@intel.com>
@@ -87,45 +87,53 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-Free vport->rx_ptype_lkup in idpf_vport_rel() to avoid leaking memory
-during a reset. Reported by kmemleak:
+Make sure to free hw->lan_regs. Reported by kmemleak during reset:
 
-unreferenced object 0xff450acac838a000 (size 4096):
-  comm "kworker/u258:5", pid 7732, jiffies 4296830044
+unreferenced object 0xff1b913d02a936c0 (size 96):
+  comm "kworker/u258:14", pid 2174, jiffies 4294958305
   hex dump (first 32 bytes):
-    00 00 00 00 00 10 00 00 00 10 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 10 00 00 00 00 00 00  ................
-  backtrace (crc 3da81902):
-    __kmalloc_cache_noprof+0x469/0x7a0
-    idpf_send_get_rx_ptype_msg+0x90/0x570 [idpf]
-    idpf_init_task+0x1ec/0x8d0 [idpf]
+    00 00 00 c0 a8 ba 2d ff 00 00 00 00 00 00 00 00  ......-.........
+    00 00 40 08 00 00 00 00 00 00 25 b3 a8 ba 2d ff  ..@.......%...-.
+  backtrace (crc 36063c4f):
+    __kmalloc_noprof+0x48f/0x890
+    idpf_vc_core_init+0x6ce/0x9b0 [idpf]
+    idpf_vc_event_task+0x1fb/0x350 [idpf]
     process_one_work+0x226/0x6d0
     worker_thread+0x19e/0x340
     kthread+0x10f/0x250
     ret_from_fork+0x251/0x2b0
     ret_from_fork_asm+0x1a/0x30
 
-Fixes: 0fe45467a104 ("idpf: add create vport and netdev configuration")
+Fixes: 6aa53e861c1a ("idpf: implement get LAN MMIO memory regions")
 Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+Reviewed-by: Joshua Hay <joshua.a.hay@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_lib.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 5c81f52db266..5193968c9bb1 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -1105,6 +1105,8 @@ static void idpf_vport_rel(struct idpf_vport *vport)
- 		kfree(adapter->vport_config[idx]->req_qs_chunks);
- 		adapter->vport_config[idx]->req_qs_chunks = NULL;
- 	}
-+	kfree(vport->rx_ptype_lkup);
-+	vport->rx_ptype_lkup = NULL;
- 	kfree(vport);
- 	adapter->num_alloc_vports--;
- }
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+index fc03d55bc9b9..ca302df9ff40 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+@@ -3570,6 +3570,7 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
+  */
+ void idpf_vc_core_deinit(struct idpf_adapter *adapter)
+ {
++	struct idpf_hw *hw = &adapter->hw;
+ 	bool remove_in_prog;
+ 
+ 	if (!test_bit(IDPF_VC_CORE_INIT, adapter->flags))
+@@ -3593,6 +3594,9 @@ void idpf_vc_core_deinit(struct idpf_adapter *adapter)
+ 
+ 	idpf_vport_params_buf_rel(adapter);
+ 
++	kfree(hw->lan_regs);
++	hw->lan_regs = NULL;
++
+ 	kfree(adapter->vports);
+ 	adapter->vports = NULL;
+ 
 -- 
 2.37.3
 
