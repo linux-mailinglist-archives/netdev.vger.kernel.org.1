@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-240838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC51AC7B037
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 18:13:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AF2EC7AFD1
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 18:08:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7B9A14F382D
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:06:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C39153A3F14
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E31E735773B;
-	Fri, 21 Nov 2025 17:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7983C357A40;
+	Fri, 21 Nov 2025 17:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tvH5CwQw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SADS0S9j"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF2635770E;
-	Fri, 21 Nov 2025 17:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F863357A37;
+	Fri, 21 Nov 2025 17:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763744589; cv=none; b=MVR+2Bv/oLzyx7lPnwe+m1sdPpQfpLyMax6fJFhyHXk/byIdr5Qh2lrQfxBTVehZIH923IODMEc8f9QC7CRDjvunDE7R5TrhJCNVVc13tNEs2osCvUs4hpIXsAIxdjphNEI0yDgCCScF4FOYSXSVeDU/R5aON2rDxfl6mWOQg44=
+	t=1763744593; cv=none; b=YRJIxrDXQ9v4xmVu6AywqiV0WScMYfV947fVW19C9P1ENEP3Vgd9NktQ8ek4bqf0f62UF43kSlDfN6kp/9xrJHja5Qct0Stl7owKHY9qq37WkiNHNefaeKebnGEIIUcnXb1Uu18FUhZxv9OiLVxFy/aCbWBo194aC5gMC4C4E5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763744589; c=relaxed/simple;
-	bh=exipAAAG44c1ya/2FIftGqLb+lrF8/NOW6yQn4gOd8g=;
+	s=arc-20240116; t=1763744593; c=relaxed/simple;
+	bh=4lc9o5hypIw06c+bc58A+FpLlk7rv5SCZaysugtGJHg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NQBcIae+wRVXbs0zMjrxAa1MDYpSfU+bHLb6xGYf5k+BsLrrH0nui0mMjkKcUgGKFbwGENuu9SgerqmTwr1HcxgBTYtgcVUFRwCTTE8DARwOxjFPNUDzM+olT0Ff8Mowz7+FyzIMIhgSTG/KrbpGBx9Hz9ejl77/0arnCqfOiQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tvH5CwQw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75B47C4CEF1;
-	Fri, 21 Nov 2025 17:03:06 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=GE9eNF7IsDNf/OQCdjpySdUXykafGjqN7tzokEVGoK55oFjt5+KVMldROMs8qItLCfYpLKqPfPXvl8COJsZ4skuyMHkbot4+4RR1SggnzqsLX97CSt3XbF4qdfnSgcTjhhaPG1UPuXzvKunY23L5xahp1McnHrvbQlP2rNftjnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SADS0S9j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF4D1C116D0;
+	Fri, 21 Nov 2025 17:03:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763744589;
-	bh=exipAAAG44c1ya/2FIftGqLb+lrF8/NOW6yQn4gOd8g=;
+	s=k20201202; t=1763744592;
+	bh=4lc9o5hypIw06c+bc58A+FpLlk7rv5SCZaysugtGJHg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=tvH5CwQwNHgt31gWGOdn8L7LEbE2/j7HMBgaRyLtIXqHCltYLIMiDFAOPGDGaYP2T
-	 aSHM43cz+5wCme1FJLgxn6MnmiNcSKROR4lC4UjGAdzzbv7QQj3cYQh7FAde6RFhIx
-	 T7uBoD2dcPEDFJiH+K9pAgOiH7WE2aRFGenbk9c1XkYCoM0rYLaCJmOh9TavTP4D+P
-	 m1O0seT5504F/xFzj1BWR+b05YSoUi8x/EqBOaf1u8XSyBaVOfwk8cQ22b4O21us9P
-	 pBaCE+yAUQNMDPvbVmK0d3K1DVn9mMYgT+ugJPQyDBINSqBtVXEPgw2XH21fx2aJNd
-	 8i5BedE4dyqBQ==
+	b=SADS0S9jwOeC0CaeONHZeZbmPg9Qy1MbHSZi+z9l0zW6JKKQuRPOotkJNu1X5YoWE
+	 dAEhT8I7JmV6VJjrf1eyovXD3x9Jx8Qwj0dbF9c+AuftSoIQePFnTBkJ8hqRVydXbr
+	 KgTHpfECWYDXd7qGostOX99zhAvrbArP8NyuKUz4BMRI6VzS5JUFLkR3FliFiaqrWr
+	 zKSlu3klvvGwLxYWze34ZhAEfXn4jh6U6a053lNfmCGiUTh/ErF0cPY4eqD0bBesOZ
+	 AJ8I18TrO0WRN7B9bJY0M3Yrg9pYdfhm5UxYJvpO9c89xgsLUF/Oy7OK16lfTKWotF
+	 pHyZ7MhP2qjwQ==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 21 Nov 2025 18:02:11 +0100
-Subject: [PATCH net-next 12/14] mptcp: borrow forward memory from subflow
+Date: Fri, 21 Nov 2025 18:02:12 +0100
+Subject: [PATCH net-next 13/14] mptcp: introduce mptcp-level backlog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251121-net-next-mptcp-memcg-backlog-imp-v1-12-1f34b6c1e0b1@kernel.org>
+Message-Id: <20251121-net-next-mptcp-memcg-backlog-imp-v1-13-1f34b6c1e0b1@kernel.org>
 References: <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
 In-Reply-To: <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
 To: Eric Dumazet <edumazet@google.com>, 
@@ -67,210 +67,262 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  mptcp@lists.linux.dev, Davide Caratti <dcaratti@redhat.com>, 
  "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7831; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=hY44Oq6q0TXEmmxU5JFPD8A8RXoTf8Ee1IhPcJGt60c=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDIVZssdYv+yYuKcTN3UxWfPnlrLwWc693Zlx3wBFdFcw
- 9zWtTzCHaUsDGJcDLJiiizSbZH5M59X8ZZ4+VnAzGFlAhnCwMUpABOx6mBk2Lclbnvue0FzrqS2
- 0LNHHE/8f3Xi6JZm5WtrbuTdnHnC/TjDPyWZPsvLniXTJfSblB/FTqn/KMYfYaBm8PY9z+cHl2o
- kOAA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8346; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=Ms4xwAkncS62P20+iLp6vtlwxgVmggWBcGXR1o8kOlY=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDIVZsu7c7QedZ0WGL0r2CuY46+W+dW/k0u/7r91L4nhZ
+ aom48fajlIWBjEuBlkxRRbptsj8mc+reEu8/Cxg5rAygQxh4OIUgInYKjP8jxG+vNPzkdWGZQ8Z
+ 9Z4rrVUX4koWZVrKcvz9B9MPLbU6Rxn+KZ5bl3sj0bT69qsga68pfyIPt3+6HD3t1YwKvxWzZ88
+ 6zA0A
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
 From: Paolo Abeni <pabeni@redhat.com>
 
-In the MPTCP receive path, we release the subflow allocated fwd
-memory just to allocate it again shortly after for the msk.
+We are soon using it for incoming data processing.
+MPTCP can't leverage the sk_backlog, as the latter is processed
+before the release callback, and such callback for MPTCP releases
+and re-acquire the socket spinlock, breaking the sk_backlog processing
+assumption.
 
-That could increases the failures chances, especially when we will
-add backlog processing, with other actions could consume the just
-released memory before the msk socket has a chance to do the
-rcv allocation.
+Add a skb backlog list inside the mptcp sock struct, and implement
+basic helper to transfer packet to and purge such list.
 
-Replace the skb_orphan() call with an open-coded variant that
-explicitly borrows, the fwd memory from the subflow socket instead
-of releasing it.
+Packets in the backlog are memory accounted and still use the incoming
+subflow receive memory, to allow back-pressure. The backlog size is
+implicitly bounded to the sum of subflows rcvbuf.
 
-The borrowed memory does not have PAGE_SIZE granularity; rounding to
-the page size will make the fwd allocated memory higher than what is
-strictly required and could make the incoming subflow fwd mem
-consistently negative. Instead, keep track of the accumulated frag and
-borrow the full page at subflow close time.
+When a subflow is closed, references from the backlog to such sock
+are removed.
 
-This allow removing the last drop in the TCP to MPTCP transition and
-the associated, now unused, MIB.
+No packet is currently added to the backlog, so no functional changes
+intended here.
 
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Reviewed-by: Mat Martineau <martineau@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/mptcp/fastopen.c |  4 +++-
- net/mptcp/mib.c      |  1 -
- net/mptcp/mib.h      |  1 -
- net/mptcp/protocol.c | 23 +++++++++++++++--------
- net/mptcp/protocol.h | 28 ++++++++++++++++++++++++++++
- 5 files changed, 46 insertions(+), 11 deletions(-)
+ net/mptcp/mptcp_diag.c |  3 +-
+ net/mptcp/protocol.c   | 78 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ net/mptcp/protocol.h   | 25 ++++++++++++----
+ 3 files changed, 97 insertions(+), 9 deletions(-)
 
-diff --git a/net/mptcp/fastopen.c b/net/mptcp/fastopen.c
-index b9e451197902..82ec15bcfd7f 100644
---- a/net/mptcp/fastopen.c
-+++ b/net/mptcp/fastopen.c
-@@ -32,7 +32,8 @@ void mptcp_fastopen_subflow_synack_set_params(struct mptcp_subflow_context *subf
- 	/* dequeue the skb from sk receive queue */
- 	__skb_unlink(skb, &ssk->sk_receive_queue);
- 	skb_ext_reset(skb);
--	skb_orphan(skb);
-+
-+	mptcp_subflow_lend_fwdmem(subflow, skb);
+diff --git a/net/mptcp/mptcp_diag.c b/net/mptcp/mptcp_diag.c
+index ac974299de71..136c2d05c0ee 100644
+--- a/net/mptcp/mptcp_diag.c
++++ b/net/mptcp/mptcp_diag.c
+@@ -195,7 +195,8 @@ static void mptcp_diag_get_info(struct sock *sk, struct inet_diag_msg *r,
+ 	struct mptcp_sock *msk = mptcp_sk(sk);
+ 	struct mptcp_info *info = _info;
  
- 	/* We copy the fastopen data, but that don't belong to the mptcp sequence
- 	 * space, need to offset it in the subflow sequence, see mptcp_subflow_get_map_offset()
-@@ -50,6 +51,7 @@ void mptcp_fastopen_subflow_synack_set_params(struct mptcp_subflow_context *subf
- 	mptcp_data_lock(sk);
- 	DEBUG_NET_WARN_ON_ONCE(sock_owned_by_user_nocheck(sk));
+-	r->idiag_rqueue = sk_rmem_alloc_get(sk);
++	r->idiag_rqueue = sk_rmem_alloc_get(sk) +
++			  READ_ONCE(mptcp_sk(sk)->backlog_len);
+ 	r->idiag_wqueue = sk_wmem_alloc_get(sk);
  
-+	mptcp_borrow_fwdmem(sk, skb);
- 	skb_set_owner_r(skb, sk);
- 	__skb_queue_tail(&sk->sk_receive_queue, skb);
- 	mptcp_sk(sk)->bytes_received += skb->len;
-diff --git a/net/mptcp/mib.c b/net/mptcp/mib.c
-index 171643815076..f23fda0c55a7 100644
---- a/net/mptcp/mib.c
-+++ b/net/mptcp/mib.c
-@@ -71,7 +71,6 @@ static const struct snmp_mib mptcp_snmp_list[] = {
- 	SNMP_MIB_ITEM("MPFastcloseRx", MPTCP_MIB_MPFASTCLOSERX),
- 	SNMP_MIB_ITEM("MPRstTx", MPTCP_MIB_MPRSTTX),
- 	SNMP_MIB_ITEM("MPRstRx", MPTCP_MIB_MPRSTRX),
--	SNMP_MIB_ITEM("RcvPruned", MPTCP_MIB_RCVPRUNED),
- 	SNMP_MIB_ITEM("SubflowStale", MPTCP_MIB_SUBFLOWSTALE),
- 	SNMP_MIB_ITEM("SubflowRecover", MPTCP_MIB_SUBFLOWRECOVER),
- 	SNMP_MIB_ITEM("SndWndShared", MPTCP_MIB_SNDWNDSHARED),
-diff --git a/net/mptcp/mib.h b/net/mptcp/mib.h
-index a1d3e9369fbb..812218b5ed2b 100644
---- a/net/mptcp/mib.h
-+++ b/net/mptcp/mib.h
-@@ -70,7 +70,6 @@ enum linux_mptcp_mib_field {
- 	MPTCP_MIB_MPFASTCLOSERX,	/* Received a MP_FASTCLOSE */
- 	MPTCP_MIB_MPRSTTX,		/* Transmit a MP_RST */
- 	MPTCP_MIB_MPRSTRX,		/* Received a MP_RST */
--	MPTCP_MIB_RCVPRUNED,		/* Incoming packet dropped due to memory limit */
- 	MPTCP_MIB_SUBFLOWSTALE,		/* Subflows entered 'stale' status */
- 	MPTCP_MIB_SUBFLOWRECOVER,	/* Subflows returned to active status after being stale */
- 	MPTCP_MIB_SNDWNDSHARED,		/* Subflow snd wnd is overridden by msk's one */
+ 	if (inet_sk_state_load(sk) == TCP_LISTEN) {
 diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index d22f792f4760..f5526855a2e5 100644
+index f5526855a2e5..dfed036e0591 100644
 --- a/net/mptcp/protocol.c
 +++ b/net/mptcp/protocol.c
-@@ -358,7 +358,7 @@ static void mptcp_data_queue_ofo(struct mptcp_sock *msk, struct sk_buff *skb)
- static void mptcp_init_skb(struct sock *ssk, struct sk_buff *skb, int offset,
- 			   int copy_len)
- {
--	const struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(ssk);
-+	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(ssk);
- 	bool has_rxtstamp = TCP_SKB_CB(skb)->has_rxtstamp;
- 
- 	/* the skb map_seq accounts for the skb offset:
-@@ -383,11 +383,7 @@ static bool __mptcp_move_skb(struct sock *sk, struct sk_buff *skb)
- 	struct mptcp_sock *msk = mptcp_sk(sk);
- 	struct sk_buff *tail;
- 
--	/* try to fetch required memory from subflow */
--	if (!sk_rmem_schedule(sk, skb, skb->truesize)) {
--		MPTCP_INC_STATS(sock_net(sk), MPTCP_MIB_RCVPRUNED);
--		goto drop;
--	}
-+	mptcp_borrow_fwdmem(sk, skb);
- 
- 	if (MPTCP_SKB_CB(skb)->map_seq == msk->ack_seq) {
- 		/* in sequence */
-@@ -409,7 +405,6 @@ static bool __mptcp_move_skb(struct sock *sk, struct sk_buff *skb)
- 	 * will retransmit as needed, if needed.
- 	 */
- 	MPTCP_INC_STATS(sock_net(sk), MPTCP_MIB_DUPDATA);
--drop:
- 	mptcp_drop(sk, skb);
- 	return false;
+@@ -659,6 +659,39 @@ static void mptcp_dss_corruption(struct mptcp_sock *msk, struct sock *ssk)
+ 	}
  }
-@@ -710,7 +705,7 @@ static bool __mptcp_move_skbs_from_subflow(struct mptcp_sock *msk,
+ 
++static void __mptcp_add_backlog(struct sock *sk,
++				struct mptcp_subflow_context *subflow,
++				struct sk_buff *skb)
++{
++	struct mptcp_sock *msk = mptcp_sk(sk);
++	struct sk_buff *tail = NULL;
++	bool fragstolen;
++	int delta;
++
++	if (unlikely(sk->sk_state == TCP_CLOSE)) {
++		kfree_skb_reason(skb, SKB_DROP_REASON_SOCKET_CLOSE);
++		return;
++	}
++
++	/* Try to coalesce with the last skb in our backlog */
++	if (!list_empty(&msk->backlog_list))
++		tail = list_last_entry(&msk->backlog_list, struct sk_buff, list);
++
++	if (tail && MPTCP_SKB_CB(skb)->map_seq == MPTCP_SKB_CB(tail)->end_seq &&
++	    skb->sk == tail->sk &&
++	    __mptcp_try_coalesce(sk, tail, skb, &fragstolen, &delta)) {
++		skb->truesize -= delta;
++		kfree_skb_partial(skb, fragstolen);
++		__mptcp_subflow_lend_fwdmem(subflow, delta);
++		WRITE_ONCE(msk->backlog_len, msk->backlog_len + delta);
++		return;
++	}
++
++	list_add_tail(&skb->list, &msk->backlog_list);
++	mptcp_subflow_lend_fwdmem(subflow, skb);
++	WRITE_ONCE(msk->backlog_len, msk->backlog_len + skb->truesize);
++}
++
+ static bool __mptcp_move_skbs_from_subflow(struct mptcp_sock *msk,
+ 					   struct sock *ssk)
+ {
+@@ -705,8 +738,13 @@ static bool __mptcp_move_skbs_from_subflow(struct mptcp_sock *msk,
  			size_t len = skb->len - offset;
  
  			mptcp_init_skb(ssk, skb, offset, len);
--			skb_orphan(skb);
-+			mptcp_subflow_lend_fwdmem(subflow, skb);
- 			ret = __mptcp_move_skb(sk, skb) || ret;
+-			mptcp_subflow_lend_fwdmem(subflow, skb);
+-			ret = __mptcp_move_skb(sk, skb) || ret;
++
++			if (true) {
++				mptcp_subflow_lend_fwdmem(subflow, skb);
++				ret |= __mptcp_move_skb(sk, skb);
++			} else {
++				__mptcp_add_backlog(sk, subflow, skb);
++			}
  			seq += len;
  
-@@ -2436,6 +2431,7 @@ static void __mptcp_close_ssk(struct sock *sk, struct sock *ssk,
+ 			if (unlikely(map_remaining < len)) {
+@@ -2531,6 +2569,9 @@ static void __mptcp_close_ssk(struct sock *sk, struct sock *ssk,
+ void mptcp_close_ssk(struct sock *sk, struct sock *ssk,
+ 		     struct mptcp_subflow_context *subflow)
  {
- 	struct mptcp_sock *msk = mptcp_sk(sk);
- 	bool dispose_it, need_push = false;
-+	int fwd_remaining;
++	struct mptcp_sock *msk = mptcp_sk(sk);
++	struct sk_buff *skb;
++
+ 	/* The first subflow can already be closed and still in the list */
+ 	if (subflow->close_event_done)
+ 		return;
+@@ -2540,6 +2581,17 @@ void mptcp_close_ssk(struct sock *sk, struct sock *ssk,
+ 	if (sk->sk_state == TCP_ESTABLISHED)
+ 		mptcp_event(MPTCP_EVENT_SUB_CLOSED, mptcp_sk(sk), ssk, GFP_KERNEL);
  
- 	/* Do not pass RX data to the msk, even if the subflow socket is not
- 	 * going to be freed (i.e. even for the first subflow on graceful
-@@ -2444,6 +2440,17 @@ static void __mptcp_close_ssk(struct sock *sk, struct sock *ssk,
- 	lock_sock_nested(ssk, SINGLE_DEPTH_NESTING);
- 	subflow->closing = 1;
- 
-+	/* Borrow the fwd allocated page left-over; fwd memory for the subflow
-+	 * could be negative at this point, but will be reach zero soon - when
-+	 * the data allocated using such fragment will be freed.
++	/* Remove any reference from the backlog to this ssk; backlog skbs consume
++	 * space in the msk receive queue, no need to touch sk->sk_rmem_alloc
 +	 */
-+	if (subflow->lent_mem_frag) {
-+		fwd_remaining = PAGE_SIZE - subflow->lent_mem_frag;
-+		sk_forward_alloc_add(sk, fwd_remaining);
-+		sk_forward_alloc_add(ssk, -fwd_remaining);
-+		subflow->lent_mem_frag = 0;
++	list_for_each_entry(skb, &msk->backlog_list, list) {
++		if (skb->sk != ssk)
++			continue;
++
++		atomic_sub(skb->truesize, &skb->sk->sk_rmem_alloc);
++		skb->sk = NULL;
 +	}
 +
- 	/* If the first subflow moved to a close state before accept, e.g. due
- 	 * to an incoming reset or listener shutdown, the subflow socket is
- 	 * already deleted by inet_child_forget() and the mptcp socket can't
-diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-index d30806b287d2..5e2749d92a49 100644
---- a/net/mptcp/protocol.h
-+++ b/net/mptcp/protocol.h
-@@ -547,6 +547,7 @@ struct mptcp_subflow_context {
- 	bool	scheduled;
- 	bool	pm_listener;	    /* a listener managed by the kernel PM? */
- 	bool	fully_established;  /* path validated */
-+	u32	lent_mem_frag;
- 	u32	remote_nonce;
- 	u64	thmac;
- 	u32	local_nonce;
-@@ -646,6 +647,33 @@ mptcp_send_active_reset_reason(struct sock *sk)
- 	tcp_send_active_reset(sk, GFP_ATOMIC, reason);
+ 	/* subflow aborted before reaching the fully_established status
+ 	 * attempt the creation of the next subflow
+ 	 */
+@@ -2769,12 +2821,31 @@ static void mptcp_mp_fail_no_response(struct mptcp_sock *msk)
+ 	unlock_sock_fast(ssk, slow);
  }
  
-+/* Made the fwd mem carried by the given skb available to the msk,
-+ * To be paired with a previous mptcp_subflow_lend_fwdmem() before freeing
-+ * the skb or setting the skb ownership.
-+ */
-+static inline void mptcp_borrow_fwdmem(struct sock *sk, struct sk_buff *skb)
++static void mptcp_backlog_purge(struct sock *sk)
 +{
-+	struct sock *ssk = skb->sk;
++	struct mptcp_sock *msk = mptcp_sk(sk);
++	struct sk_buff *tmp, *skb;
++	LIST_HEAD(backlog);
 +
-+	/* The subflow just lend the skb fwd memory, and we know that the skb
-+	 * is only accounted on the incoming subflow rcvbuf.
-+	 */
-+	DEBUG_NET_WARN_ON_ONCE(skb->destructor);
++	mptcp_data_lock(sk);
++	list_splice_init(&msk->backlog_list, &backlog);
++	msk->backlog_len = 0;
++	mptcp_data_unlock(sk);
++
++	list_for_each_entry_safe(skb, tmp, &backlog, list) {
++		mptcp_borrow_fwdmem(sk, skb);
++		kfree_skb_reason(skb, SKB_DROP_REASON_SOCKET_CLOSE);
++	}
++	sk_mem_reclaim(sk);
++}
++
+ static void mptcp_do_fastclose(struct sock *sk)
+ {
+ 	struct mptcp_subflow_context *subflow, *tmp;
+ 	struct mptcp_sock *msk = mptcp_sk(sk);
+ 
+ 	mptcp_set_state(sk, TCP_CLOSE);
++	mptcp_backlog_purge(sk);
+ 
+ 	/* Explicitly send the fastclose reset as need */
+ 	if (__mptcp_check_fallback(msk))
+@@ -2853,11 +2924,13 @@ static void __mptcp_init_sock(struct sock *sk)
+ 	INIT_LIST_HEAD(&msk->conn_list);
+ 	INIT_LIST_HEAD(&msk->join_list);
+ 	INIT_LIST_HEAD(&msk->rtx_queue);
++	INIT_LIST_HEAD(&msk->backlog_list);
+ 	INIT_WORK(&msk->work, mptcp_worker);
+ 	msk->out_of_order_queue = RB_ROOT;
+ 	msk->first_pending = NULL;
+ 	msk->timer_ival = TCP_RTO_MIN;
+ 	msk->scaling_ratio = TCP_DEFAULT_SCALING_RATIO;
++	msk->backlog_len = 0;
+ 
+ 	WRITE_ONCE(msk->first, NULL);
+ 	inet_csk(sk)->icsk_sync_mss = mptcp_sync_mss;
+@@ -3234,6 +3307,7 @@ static void mptcp_destroy_common(struct mptcp_sock *msk)
+ 	struct sock *sk = (struct sock *)msk;
+ 
+ 	__mptcp_clear_xmit(sk);
++	mptcp_backlog_purge(sk);
+ 
+ 	/* join list will be eventually flushed (with rst) at sock lock release time */
+ 	mptcp_for_each_subflow_safe(msk, subflow, tmp)
+diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+index 5e2749d92a49..fe0dca4122f2 100644
+--- a/net/mptcp/protocol.h
++++ b/net/mptcp/protocol.h
+@@ -357,6 +357,9 @@ struct mptcp_sock {
+ 					 * allow_infinite_fallback and
+ 					 * allow_join
+ 					 */
++
++	struct list_head backlog_list;	/* protected by the data lock */
++	u32		backlog_len;
+ };
+ 
+ #define mptcp_data_lock(sk) spin_lock_bh(&(sk)->sk_lock.slock)
+@@ -407,6 +410,7 @@ static inline int mptcp_space_from_win(const struct sock *sk, int win)
+ static inline int __mptcp_space(const struct sock *sk)
+ {
+ 	return mptcp_win_from_space(sk, READ_ONCE(sk->sk_rcvbuf) -
++				    READ_ONCE(mptcp_sk(sk)->backlog_len) -
+ 				    sk_rmem_alloc_get(sk));
+ }
+ 
+@@ -655,23 +659,32 @@ static inline void mptcp_borrow_fwdmem(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct sock *ssk = skb->sk;
+ 
+-	/* The subflow just lend the skb fwd memory, and we know that the skb
+-	 * is only accounted on the incoming subflow rcvbuf.
++	/* The subflow just lend the skb fwd memory; if the subflow meanwhile
++	 * closed, mptcp_close_ssk() already released the ssk rcv memory.
+ 	 */
+ 	DEBUG_NET_WARN_ON_ONCE(skb->destructor);
+-	skb->sk = NULL;
+ 	sk_forward_alloc_add(sk, skb->truesize);
++	if (!ssk)
++		return;
++
+ 	atomic_sub(skb->truesize, &ssk->sk_rmem_alloc);
 +	skb->sk = NULL;
-+	sk_forward_alloc_add(sk, skb->truesize);
-+	atomic_sub(skb->truesize, &ssk->sk_rmem_alloc);
 +}
 +
 +static inline void
-+mptcp_subflow_lend_fwdmem(struct mptcp_subflow_context *subflow,
-+			  struct sk_buff *skb)
++__mptcp_subflow_lend_fwdmem(struct mptcp_subflow_context *subflow, int size)
 +{
-+	int frag = (subflow->lent_mem_frag + skb->truesize) & (PAGE_SIZE - 1);
++	int frag = (subflow->lent_mem_frag + size) & (PAGE_SIZE - 1);
 +
-+	skb->destructor = NULL;
 +	subflow->lent_mem_frag = frag;
-+}
-+
- static inline u64
- mptcp_subflow_get_map_offset(const struct mptcp_subflow_context *subflow)
+ }
+ 
+ static inline void
+ mptcp_subflow_lend_fwdmem(struct mptcp_subflow_context *subflow,
+ 			  struct sk_buff *skb)
  {
+-	int frag = (subflow->lent_mem_frag + skb->truesize) & (PAGE_SIZE - 1);
+-
++	__mptcp_subflow_lend_fwdmem(subflow, skb->truesize);
+ 	skb->destructor = NULL;
+-	subflow->lent_mem_frag = frag;
+ }
+ 
+ static inline u64
 
 -- 
 2.51.0
