@@ -1,172 +1,372 @@
-Return-Path: <netdev+bounces-240701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 088F9C78011
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:54:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBB72C7801D
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:54:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E17D035FA96
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 08:54:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id BF8932A639
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 08:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B89A33CE84;
-	Fri, 21 Nov 2025 08:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33BD322D7B6;
+	Fri, 21 Nov 2025 08:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zbx1jdKw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TF8K05Pp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BFA4305E27
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 08:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763715245; cv=none; b=PeX0gGzjMUgODAUDFrUwOJutU4VxWtQTjnPsOvwyoLfWkwlqdufrUjPuP6eznTFrVPxY/6iJOPBxnXRxYlz2IQNrDWYNKuROCTuwyD2P+spYZ4AdVHQeR9Kv5mIor4wsDMkTDfPVPr3R0jNDeFOuZZ4cb8I9VZoK1Wp0UoQFQVE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763715245; c=relaxed/simple;
-	bh=5ONFbsYgwaxvG2oaqCIQcvL9nC4rsYPLT1nLoZ6TTT4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KG7bNjQk++PlIU1nuFmqomjjrfma83AfnQdKj/13Z7QDQjU09GSJc6aBvYAmBmRs1ERFX+2paip1UAq7LdstCeuji1Jj587XigRyM/5ZrfscglkM4IqmFbNqVIx8rJnXYqqr0GzuJ6YDVC4ZQEau7cUq1qlKS2GgpYDzqz0bCnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zbx1jdKw; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2953ad5517dso23068325ad.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 00:54:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763715242; x=1764320042; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/YTlngMcqbvauGZMeP16vkAvJ48G9EBdsHd/OECzaso=;
-        b=Zbx1jdKwIcRoCdE0lCiPAlzIxMwtVnqGA1uuPrjedx2+/x7ndIQu86pRiosD9kOvxE
-         +dq6VGNfahgvlJy9im/oeQnO04JQaJQA22nSfqlBW3EM8N4MBqlhtqv4LueaqR4aeazO
-         MtxUqbUqNY6bVsWHBeDK1k6uVC4ptlvxt6kn7PDGKfOYpoonec7kvN3+6SRaJ8t9uJFQ
-         S+vm3y5DnqoJHijA1osQrl0/KI5oVY/o2XR6rDiIZ1E3eRWyyhy0PIlderEbD4JuEuod
-         uoBV9i30RJDhmxc7+5hu/Dj6kXQqHO9G3Fpni6G1Bv3V0Vr2v5KvYUETlC9bG22LRBD5
-         ghfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763715242; x=1764320042;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/YTlngMcqbvauGZMeP16vkAvJ48G9EBdsHd/OECzaso=;
-        b=TyitUa+oBep+WP/xpuob4LVAVGoLSn3P9gUt7rOtzwJnCG26TeZBNwIrTpe0s++rgO
-         eXOnZUS+au3+73r/29/6sK+hzmDgVReAyJ5D0mN6xAYiIvDLkhxjJTGUjoVRsEuLo3La
-         GBKNb9zY6sb9sWezSB23QtlO/e5BZSO7YxzErHgsV29BxTcK/LJ7FOo8Xc9FAMPEarDV
-         RyR5fX5JOuphN6lr+s6SgB3XBYeaU535hOhu3RE8bbsdTOsUjPywp2CM6mJgErojciBa
-         lyfgiDyVPJrB/Eq/OjxVonWN3TrOj2lO6d50/p8yEb/l97n6FWrCNfoTOXmVXx2wk0F/
-         vy3w==
-X-Forwarded-Encrypted: i=1; AJvYcCU5oos30kAWEclETqHtL9qqVoWZW4ZirTJgjQboTQGpxLf+p+bAeYERO2kfYgw0Qm9bo9XVFA8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6QxTBupARr2NEHJkGYXFuGtmSzAuAe1II9HfHDOEgnAEiOLKI
-	uNq8tG6YkrU+NxwwjeVQH8woNYi/BvdncBl9WrhJk2B0RD2w5WQ997Zk
-X-Gm-Gg: ASbGncvujZHeDaHIwsDDn7DS3F8bAp+AJJsswB1PUUmvPtjQqSO2t9gEEpO+LsLBhE4
-	PMRCybTeJGsDxr2N02WGh0dJ3fQEK07Pp2s4OwSbhVvz8xqSmUI5eh6BV693l2rIVywf5enjs2b
-	6gXobCebKI7joBywV0P3Cr69QBZskw9proxvQDxzhLVN6gK2Qce+KzHlDH5pGRL2yyb2R/C8Mh5
-	Rx58H3N2heT73bh3JmpPTGJNbBzpSRsfcPi2OYVE+Kw7lcDAUFsIHmb7zg72/sMTTd1aoi9aJC2
-	r4fg86WczCiKEuTAigdnS6C9LxQCzpo7IRTWRoPHBJSQMa0w0sithjHiy/dZCpskAJAFgsVDkpn
-	GdgY8aKQc2z/KlmyJ97Md3hxQlbb9UltmrToplas6cPkQTZzKY7tnaTbk5g9X9Q3c2MXPAcAuLn
-	QeoVNazaIn7NfdL1e7Ozu+5kYAtQHp53s3LVOr/gfiwQ==
-X-Google-Smtp-Source: AGHT+IHuu7fePZOfFm1BwV5Mds9oUo/keOxc859jpBRxZdakp53XXkD9VJ9ewpv9IfRTXvYaNE2Pnw==
-X-Received: by 2002:a17:903:98f:b0:298:b4f1:37eb with SMTP id d9443c01a7336-29b6be9364fmr21213895ad.10.1763715242052;
-        Fri, 21 Nov 2025 00:54:02 -0800 (PST)
-Received: from LAPTOP-PN4ROLEJ.localdomain ([221.228.238.82])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b274d39sm49938125ad.77.2025.11.21.00.53.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 00:54:01 -0800 (PST)
-From: Slavin Liu <slavin452@gmail.com>
-To: horms@verge.net.au,
-	ja@ssi.bg
-Cc: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	phil@nwl.cc,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org
-Subject: [PATCH net v2] ipvs: fix ipv4 null-ptr-deref in route error path
-Date: Fri, 21 Nov 2025 16:52:13 +0800
-Message-Id: <20251121085213.1660-1-slavin452@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251120190313.1051-1-slavin452@gmail.com>
-References: <20251120190313.1051-1-slavin452@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB7D1917FB;
+	Fri, 21 Nov 2025 08:54:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763715279; cv=fail; b=fhSSiOWgJOPmNXb57vQvqCNMJX6noEPDmQS7N9O8twqkVJ8qUO0LJ9YuJnRJ4bmnc8QfsAIIX1qUUgHezEAaiO9cXoZDiciS3CEscks8CW5tdwesIxhf+GvwEeJv/gAbhUDOEApxgt5z2Hr356RaZ0yfZk70GkIQMRpXOTRAYgc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763715279; c=relaxed/simple;
+	bh=o25XVQbq71cRnws5d5OVPeEzPhQOf61cJSE+NP6eydo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SnE7IE6XEzNZZtu2Ojq4TTa39/3msileX9Ncubl8+cmdMQ0TgMjSLv0i0johcoOr+3xJuwv/+oejUAZvGrFaMk98TmzUTUcyXxResgE50zBoz4vluq/kOircLVv5yR9oG2w3WG3YhcW85yyStkvui7qxWesezRA0pGEMda1pcn0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TF8K05Pp; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763715277; x=1795251277;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=o25XVQbq71cRnws5d5OVPeEzPhQOf61cJSE+NP6eydo=;
+  b=TF8K05PpDLCXrA9ETeYJvWKy7XOmd8L6os8m6wBYAm2xiZVwMtEzDx46
+   spk7nzYEsVGRGbNyoocvN7P13CmGN7iUd/jwOwBzWhn3YWgHeHZH9Zn/z
+   XGppn6pF9abdco8O7EQf5y9eeFe6WQcaRi2bL0qDI2QNdJVME5SvWxcfS
+   DbL4vcjPWh31LPo5PB79xSY/9kYERp5G7DO9SNOJdZkvcaAzrIaXhhD5N
+   DeFOeczMZWc+uby4+NcJOOZf4LQ3Tlk28iuuwhVTzhslKF98NssQLe4mq
+   pNKCLlRZUt7/3J/jLAMc/ZeoOxZMr858C3qf0xoLmo+wbfjZtl4II/MXh
+   Q==;
+X-CSE-ConnectionGUID: 4bbNisNZSvmUQMqcR/kJzQ==
+X-CSE-MsgGUID: DOl0NqmxTuuxWuQ76IRskg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="91285608"
+X-IronPort-AV: E=Sophos;i="6.20,215,1758610800"; 
+   d="scan'208";a="91285608"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 00:54:36 -0800
+X-CSE-ConnectionGUID: +OQkV4pGR7uyg318aprBAA==
+X-CSE-MsgGUID: e6oY+WVlTmuYWMXQBqIzqg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,215,1758610800"; 
+   d="scan'208";a="195805959"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 00:54:36 -0800
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 21 Nov 2025 00:54:34 -0800
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Fri, 21 Nov 2025 00:54:34 -0800
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.57)
+ by edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 21 Nov 2025 00:54:34 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ydWivyGuvKu42bMhf3Dn6rXEjUKEeaOPoGed8XCzjSHx5X+d5QV9HKophL817FhCGlEHHEV0mASh86Bm9n+5l+o79OQDRiUCG608SvKHzWkOsLqyT4JJqc860TOAiJb/qTKOVg25tw9CU+E4y+ZxTROVUoduE8WoVmhtxXYgy0UNRcTmO6zZKT7r4rami5yH7eZqhCQ6Plqm1PAql40qC9xhnXy+QzippWTjBzZmGiVly8338saL5dStPLdwXHBt4OBf/Heo64VYdNDn1b/fRe5FGtpdArf/FOBoxzTjCTPlJHmK+apBh6WrGW5Hz37igvE0YjtG6IHrZ3KRHwHkHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iOBu0Pg1mhTZN77+krbDXN4OBgw1IT1G2ceKIoKt9vk=;
+ b=zQE9dVATbgZnB7j+sZbpBND+gx4K8KZ0u0bZRTikleNt2r8H2uNq8TLAWXPCaP0Qdo9+IkHsUKsgRUvcr0dtnTzDeA/6i5cgCB8ASYnZ93t4838/9P2DulTFIsh2AaFarQjkSIwSOidHdcM/nGzdCFLIimlOVkKYK+XjqRl0C2gdhMbL7lZ9S5DprZM0/c2RaEAzG9xJSrebzO6c3+F9UZ31QQHGspH/imdqcCHjE0wDyykK/DQcrENZNiehlmnPaw01UHEzq4/jIuinI7qvmeqABJmqWFgNggm7Nvsjc0VWA/QXOg1q+KZj5tt3BV362tvbTmUOFwI6LiWxO3xRMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by SN7PR11MB7974.namprd11.prod.outlook.com (2603:10b6:806:2e7::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Fri, 21 Nov
+ 2025 08:54:32 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9343.009; Fri, 21 Nov 2025
+ 08:54:32 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Slepecki, Jakub" <jakub.slepecki@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "michal.swiatkowski@linux.intel.com"
+	<michal.swiatkowski@linux.intel.com>, "Slepecki, Jakub"
+	<jakub.slepecki@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next 5/8] ice: update mac, vlan
+ rules when toggling between VEB and VEPA
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next 5/8] ice: update mac, vlan
+ rules when toggling between VEB and VEPA
+Thread-Index: AQHcWj7dphYaYDcl2UGv6A55cG1gbLT80U2A
+Date: Fri, 21 Nov 2025 08:54:32 +0000
+Message-ID: <IA3PR11MB89862D16B3E71FCB8DF2113EE5D5A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20251120162813.37942-1-jakub.slepecki@intel.com>
+ <20251120162813.37942-6-jakub.slepecki@intel.com>
+In-Reply-To: <20251120162813.37942-6-jakub.slepecki@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|SN7PR11MB7974:EE_
+x-ms-office365-filtering-correlation-id: 79a63dd9-d94c-48cc-be3e-08de28db96c0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700021|7053199007;
+x-microsoft-antispam-message-info: =?us-ascii?Q?x2GLQHdMeWU8rgFSGE60zz3nstfgM8qzDBWENN6qoR1EYb4PwDGWB4P+l9fy?=
+ =?us-ascii?Q?8S/fZ8KuY7nd2xDnJqGkWpgDmbHhSqElY4z24iXq8EgidsU6sOD9J/M2Gdyg?=
+ =?us-ascii?Q?MyDmD0embY6LFmA13+TWK674Chizw87TBoJE5RHsZbCLKLT7pFoOSwbHvKuj?=
+ =?us-ascii?Q?ctpUGFukZUKi/SZJoY5M51i6N2IMeoIED0ul5kwS8J50gYupySI7Miht0S5h?=
+ =?us-ascii?Q?0E0IwsAmVZPXzPEI0Lj46Huo7P83iPLu0TmoQ1ns9EnCCD98fUrLbLoQv+Pd?=
+ =?us-ascii?Q?2rs2WQMJAz+IYYZLyTqNyHEA7ZCGgxXiHlHFuFoSnkEBakvP18VozlitzAC1?=
+ =?us-ascii?Q?sA3XptZxWS+njwGYdo75rKdQ1eMVpbyRNWEFvXAW53Xg5bWj1XIWekHJZmWO?=
+ =?us-ascii?Q?XMdl/5D/etj2KkFigrKl24DUklfLFgirRbjzPtGoHztCUj0baai/4+KMrpsB?=
+ =?us-ascii?Q?nv+4+daJ/sdWouPHWLDSd1wwGcCp7b+09nnV8/Q9OxfMLdeox3RYvsN3iC4z?=
+ =?us-ascii?Q?DWDQ1kcHTe3Fnn+Qy0S5libZ2OtnTl/BgMSlwLK+U7iTwGmGPZoUWZnl2Y0W?=
+ =?us-ascii?Q?w3Vi0o/hq0HZCCCjVmy9nRKY2rOIbdgJ+K0xhoEq5xbwRk3Pt77LWXqvUvY5?=
+ =?us-ascii?Q?p4cVyW5iBmHJr40rwCo6Oji/aUZvrnH85TOhoUiFMRkLwxk8Hlw0KGt9RqHF?=
+ =?us-ascii?Q?PBGGSkJTXxjalahS0kDeNxvZ8UnTG6za5Fd2GI/c8FiBMnjGCt6M6SgFr6EG?=
+ =?us-ascii?Q?/SjWAiHjWbXJr6LbLVYJf95iEkXSKkMoNimPDfO61/v6Q43xwxqh0cpzCpNF?=
+ =?us-ascii?Q?brM1j2Fpu2tEXDFE2LvZT/dTjD3dPmV+kbqlv3cNx6SXG4ZvrIqnK+yDPSOe?=
+ =?us-ascii?Q?XxfnGOs8BzXPMFzIOCs7FkJliXAbf7pybBz+R7c9I1R4uU6X8IAb7hdUmsL/?=
+ =?us-ascii?Q?U0vw6vEvOgJua4LP2PsqQAN67XLJdr+sgryNKFXDY8rRb7elziTksC2Xie5D?=
+ =?us-ascii?Q?b/Xqbsi+kscGtjdTEqX/3F/yFgUJtFo3yRlFZISiCnR4fEmSo58KHnvcKT/G?=
+ =?us-ascii?Q?5FZZurORtTLYDbZl1+rAFbZUOyMqDSWyqiFl/ZQcTasQWsoUrKBVl9TigSKv?=
+ =?us-ascii?Q?MOgmpXaL2LnHA/EZYPX/ii2vRyH13CGqvwQU108+QqSF3QQrcs+Jw4bu1jh9?=
+ =?us-ascii?Q?YVp4RFbjCk3b5lShJ60eSh+HHdPWkuRvNbdsJBnI+GKGUMlto/xJ35QpLC2t?=
+ =?us-ascii?Q?vQW3WCaTFb24iXvUDofaX3tQkGFH/8lbm2+U4h836n3au6d9HYV7V2vvWZMn?=
+ =?us-ascii?Q?4eZ0sQ4rX/7rAAk78GwwnCLb+Fs8yeLuM0u/bv+D1afFmc1G/m1UcwIl4GxL?=
+ =?us-ascii?Q?ZVLDXfTJQsKdmuJ3eZPEG0r+R6vgBszCCw4JQEiHZcfr7QpcW4/WC5gUzAVH?=
+ =?us-ascii?Q?ZpGfuG7t15dmPWgp+jBQLP5coQbnv+WiSFoWtoSgZt44msFrDmqKoUbbdgij?=
+ =?us-ascii?Q?AGPG0xGkbqQmJfHnkXLyKmdWCkOz7vrrwYyj?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?gKJmQ22k5NQ80CbfAkdo+T/uQBFl5jD5uwfjVCtYPlglP6niVSuR5wjjLIkd?=
+ =?us-ascii?Q?6n1mb2fOi3j333Japzn1THbDLmF1l46MOT6oQporDo7R1/sr0CmgrUax51LI?=
+ =?us-ascii?Q?MSR7Su9b2h4V0a1iVshVD8fz1iL3LwSztaVoO/uhdjMAxl93fo2zXNhZ9B1a?=
+ =?us-ascii?Q?EWe9LM9gVZIAhMOqR/Ii+Jb+H/vvVzrUkg1NhAqtnYDOHkIwBH+MF61fTWOh?=
+ =?us-ascii?Q?H4y2RZhHGaPjVZiN02cd1zdUivGJfCQpl1S1UU4nEek2x8vAuxZ64Ex/Lxzi?=
+ =?us-ascii?Q?6VvMoJlU+u6p/yAPC895cNCK02VRsOfef9hHH1N0I4RnksBY4OSkgnE5UpNb?=
+ =?us-ascii?Q?Nn9LmcQ6YUMY4P4vtNKZOrf5S6AP1u6tZ9pk4/kA9fZrNvLKcgAhzgPAkwSn?=
+ =?us-ascii?Q?HDeqC2+8LpP7GzhIi9VoeQ+qDyVf5Pbc9qr1E8OUN2vtknH0ZaZdxHfRz5wm?=
+ =?us-ascii?Q?TPhhjjfWvV1dijYNndy3K21ndXPTakptFMS/gpT4o0TbKII2sdJqsymmU1Tj?=
+ =?us-ascii?Q?dOw8AsZwa4kEZz/k9YzejS9LAsid8D8FFr4+sU1t1ttCAB+kVXbk5+Y8xnh8?=
+ =?us-ascii?Q?IvY6JZV///7nD4YUwk1IrXXsI0ESNzIVzMpzqsDOZiE8wHPuW70oXoLE1Nvs?=
+ =?us-ascii?Q?guZnTh5UBsIHklLV/xSoaGf+Y+LNnQfaLf31rKlAKwCNO7NmcL+T3EwgvC9Y?=
+ =?us-ascii?Q?f4zS7YMGkf4HSCDenjghskl+UtUcDKxAcxnsHhUYrH1Dfy7jomeAaJ5YwF/J?=
+ =?us-ascii?Q?y/MfJmeYXbyXdY0XRhF8+fOVN0xuxYyx0MLM/9aFP5HfwSIbmns0NW+Tg9U5?=
+ =?us-ascii?Q?WpuKHmqpiaO4nTV6efPpH8MnHAL6FvnMT7ssNXY1bR0eWPhRNrghK+BtCfNm?=
+ =?us-ascii?Q?lfSmsM/84gmrutEAOXvr+vV0Y2Fj4k9lG9vbYCd9xH5nnzrE+5sRVgurKmVH?=
+ =?us-ascii?Q?yFivxXiR93nYDk4HypuP2tr2Yvu6x2btp7osdKaz/sOquAXfJ5TfLJ9BRrYC?=
+ =?us-ascii?Q?3dk3j3nJjiEOs5kkRkhyfx3M0RTXiCHmdgbYtLs9ogC6BYJZN5uDGQZEIfxj?=
+ =?us-ascii?Q?FFjOkwB6Vh7h+xm593580/C2yjNdDM2PZhJxTraa61EpGOwJtHHlReY6c7Nf?=
+ =?us-ascii?Q?3VEMLnn7HUSyNWMxzKfsqO7Ng4qej5p+DwGgkV/YsV09u2KDGUTSOMdnV4YL?=
+ =?us-ascii?Q?SUHHlzeahoZXKDr6t3BikqB4ExUkciV2mgHNd76PAyaUG7VnH89kwOcb/okJ?=
+ =?us-ascii?Q?lqBCI3MK3GRedgjMj7zfB2spMY947hFF3F6xRlKBTYql2t3TrXG19jcVwk8d?=
+ =?us-ascii?Q?fMRl55K9jq/FDNcN7E6XqXxhU41OTZEWv+ZaezlljxpV3c1PkRVG+eWGCH/a?=
+ =?us-ascii?Q?5EYwHxH5KL3LAJPJe0s3d5yRWD1Ta1jM3h+cY1YlMx+S7oIE7Qlwtm/8I/Zv?=
+ =?us-ascii?Q?YxHaZmTgLZPHfiRcXBfcQPtfSr4o4zFbVrWSIf/sqtXlky6HJL5ljZpqzk2x?=
+ =?us-ascii?Q?SmtY+XcbJwCa4RoVEO8MyTLyxg8QPBeLKP7UmZFhlEZ1L7XW06o9yMBefe2U?=
+ =?us-ascii?Q?JfUdptw2n6NdJJ3fdSvuFPAoMXK5lZF7AnvDp/4f8xiW9P1x06QBI22oJY6j?=
+ =?us-ascii?Q?hg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79a63dd9-d94c-48cc-be3e-08de28db96c0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2025 08:54:32.5102
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: R/hp/X8YhkbHNlqOCKTtEpsitmzQZgPXGolVYjZHREXWSr6SKajfI0fn7l8Ywvx4wpNQWwm8gLfT6Nfta0GHQNeHfHenlTBUPxxBA/xMIiU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7974
+X-OriginatorOrg: intel.com
 
-The IPv4 code path in __ip_vs_get_out_rt() calls dst_link_failure()
-without ensuring skb->dev is set, leading to a NULL pointer dereference
-in fib_compute_spec_dst() when ipv4_link_failure() attempts to send
-ICMP destination unreachable messages.
 
-The issue emerged after commit ed0de45a1008 ("ipv4: recompile ip options
-in ipv4_link_failure") started calling __ip_options_compile() from
-ipv4_link_failure(). This code path eventually calls fib_compute_spec_dst()
-which dereferences skb->dev. An attempt was made to fix the NULL skb->dev
-dereference in commit 0113d9c9d1cc ("ipv4: fix null-deref in
-ipv4_link_failure"), but it only addressed the immediate dev_net(skb->dev)
-dereference by using a fallback device. The fix was incomplete because
-fib_compute_spec_dst() later in the call chain still accesses skb->dev
-directly, which remains NULL when IPVS calls dst_link_failure().
 
-The crash occurs when:
-1. IPVS processes a packet in NAT mode with a misconfigured destination
-2. Route lookup fails in __ip_vs_get_out_rt() before establishing a route
-3. The error path calls dst_link_failure(skb) with skb->dev == NULL
-4. ipv4_link_failure() → ipv4_send_dest_unreach() →
-   __ip_options_compile() → fib_compute_spec_dst()
-5. fib_compute_spec_dst() dereferences NULL skb->dev
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Jakub Slepecki
+> Sent: Thursday, November 20, 2025 5:28 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: linux-kernel@vger.kernel.org; netdev@vger.kernel.org; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; michal.swiatkowski@linux.intel.com;
+> Slepecki, Jakub <jakub.slepecki@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next 5/8] ice: update mac, vlan
+> rules when toggling between VEB and VEPA
+>=20
+> When changing into VEPA mode MAC rules are modified to forward all
+> traffic to the wire instead of allowing some packets to go into the
+> loopback.
+> MAC,VLAN rules may and will also be used to forward loopback traffic
+> in VEB, so when we switch to VEPA, we want them to behave similarly to
+> MAC-only rules.
+Is it possible to verify from shell? Could be nice to add exact steps to re=
+produce/verify.=20
 
-Apply the same fix used for IPv6 in commit 326bf17ea5d4 ("ipvs: fix
-ipv6 route unreach panic"): set skb->dev from skb_dst(skb)->dev before
-calling dst_link_failure().
 
-KASAN: null-ptr-deref in range [0x0000000000000328-0x000000000000032f]
-CPU: 1 PID: 12732 Comm: syz.1.3469 Not tainted 6.6.114 #2
-RIP: 0010:__in_dev_get_rcu include/linux/inetdevice.h:233
-RIP: 0010:fib_compute_spec_dst+0x17a/0x9f0 net/ipv4/fib_frontend.c:285
-Call Trace:
-  <TASK>
-  spec_dst_fill net/ipv4/ip_options.c:232
-  spec_dst_fill net/ipv4/ip_options.c:229
-  __ip_options_compile+0x13a1/0x17d0 net/ipv4/ip_options.c:330
-  ipv4_send_dest_unreach net/ipv4/route.c:1252
-  ipv4_link_failure+0x702/0xb80 net/ipv4/route.c:1265
-  dst_link_failure include/net/dst.h:437
-  __ip_vs_get_out_rt+0x15fd/0x19e0 net/netfilter/ipvs/ip_vs_xmit.c:412
-  ip_vs_nat_xmit+0x1d8/0xc80 net/netfilter/ipvs/ip_vs_xmit.c:764
+>=20
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Jakub Slepecki <jakub.slepecki@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_main.c   | 38 ++++++++++++++++----
+> -
+>  drivers/net/ethernet/intel/ice/ice_switch.c |  8 +++--
+> drivers/net/ethernet/intel/ice/ice_switch.h |  3 +-
+>  3 files changed, 37 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c
+> b/drivers/net/ethernet/intel/ice/ice_main.c
+> index 0b6175ade40d..661af039bf4f 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -8115,8 +8115,8 @@ ice_bridge_setlink(struct net_device *dev,
+> struct nlmsghdr *nlh,
+>  	struct ice_pf *pf =3D ice_netdev_to_pf(dev);
+>  	struct nlattr *attr, *br_spec;
+>  	struct ice_hw *hw =3D &pf->hw;
+> +	int rem, v, rb_err, err =3D 0;
+>  	struct ice_sw *pf_sw;
+> -	int rem, v, err =3D 0;
+>=20
+>  	pf_sw =3D pf->first_sw;
+>  	/* find the attribute in the netlink message */ @@ -8126,6
+> +8126,7 @@ ice_bridge_setlink(struct net_device *dev, struct nlmsghdr
+> *nlh,
+>=20
+>  	nla_for_each_nested_type(attr, IFLA_BRIDGE_MODE, br_spec, rem)
+> {
+>  		__u16 mode =3D nla_get_u16(attr);
+> +		u8 old_evb_veb =3D hw->evb_veb;
+>=20
+>  		if (mode !=3D BRIDGE_MODE_VEPA && mode !=3D BRIDGE_MODE_VEB)
+>  			return -EINVAL;
+> @@ -8147,17 +8148,38 @@ ice_bridge_setlink(struct net_device *dev,
+> struct nlmsghdr *nlh,
+>  		/* Update the unicast switch filter rules for the
+> corresponding
+>  		 * switch of the netdev
+>  		 */
+> -		err =3D ice_update_sw_rule_bridge_mode(hw);
+> +		err =3D ice_update_sw_rule_bridge_mode(hw,
+> ICE_SW_LKUP_MAC);
+>  		if (err) {
+> -			netdev_err(dev, "switch rule update failed, mode
+> =3D %d err %d aq_err %s\n",
+> -				   mode, err,
+> +			/* evb_veb is expected to be already reverted in
+> error
+> +			 * path because of the potential rollback.
+> +			 */
+> +			hw->evb_veb =3D old_evb_veb;
+> +			goto err_without_rollback;
+> +		}
+> +		err =3D ice_update_sw_rule_bridge_mode(hw,
+> ICE_SW_LKUP_MAC_VLAN);
+> +		if (err) {
+> +			/* ice_update_sw_rule_bridge_mode looks this up,
+> so we
+> +			 * must revert it before attempting a rollback.
+> +			 */
+> +			hw->evb_veb =3D old_evb_veb;
+> +			goto err_rollback_mac;
+> +		}
+> +		pf_sw->bridge_mode =3D mode;
+> +		continue;
+> +
+> +err_rollback_mac:
+> +		rb_err =3D ice_update_sw_rule_bridge_mode(hw,
+> ICE_SW_LKUP_MAC);
+> +		if (rb_err) {
+> +			netdev_err(dev, "switch rule update failed, mode
+> =3D %d err %d; rollback failed, err %d aq_err %s\n",
+> +				   mode, err, rb_err,
+>  				   libie_aq_str(hw-
+> >adminq.sq_last_status));
+> -			/* revert hw->evb_veb */
+> -			hw->evb_veb =3D (pf_sw->bridge_mode =3D=3D
+> BRIDGE_MODE_VEB);
+> -			return err;
+> +			return rb_err;
+On rollback failure you now return `rb_err` instead of the original `err`.
+This is a visible semantic change.
+Please justify it in the commit message (and confirm callers expect rollbac=
+k status rather than the original failure).
 
-Fixes: ed0de45a1008 ("ipv4: recompile ip options in ipv4_link_failure")
-Signed-off-by: Slavin Liu <slavin452@gmail.com>
----
- net/netfilter/ipvs/ip_vs_xmit.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
-index 95af252b2939..618fbe1240b5 100644
---- a/net/netfilter/ipvs/ip_vs_xmit.c
-+++ b/net/netfilter/ipvs/ip_vs_xmit.c
-@@ -409,6 +409,9 @@ __ip_vs_get_out_rt(struct netns_ipvs *ipvs, int skb_af, struct sk_buff *skb,
- 	return -1;
- 
- err_unreach:
-+	if (!skb->dev)
-+		skb->dev = skb_dst(skb)->dev;
-+
- 	dst_link_failure(skb);
- 	return -1;
- }
--- 
-2.43.0
+>  		}
+>=20
+> -		pf_sw->bridge_mode =3D mode;
+> +err_without_rollback:
+> +		netdev_err(dev, "switch rule update failed, mode =3D %d
+> err %d aq_err %s\n",
+> +			   mode, err, libie_aq_str(hw-
+> >adminq.sq_last_status));
+> +		return err;
+>  	}
+>=20
+>  	return 0;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c
+> b/drivers/net/ethernet/intel/ice/ice_switch.c
+> index 7b63588948fd..b1445dfb1b64 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_switch.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+> @@ -3065,10 +3065,12 @@ ice_update_pkt_fwd_rule(struct ice_hw *hw,
+> struct ice_fltr_info *f_info)
+>  /**
+>   * ice_update_sw_rule_bridge_mode
+>   * @hw: pointer to the HW struct
+> + * @lkup: recipe/lookup type to update
+>   *
+>   * Updates unicast switch filter rules based on VEB/VEPA mode
+>   */
+> -int ice_update_sw_rule_bridge_mode(struct ice_hw *hw)
+> +int ice_update_sw_rule_bridge_mode(struct ice_hw *hw,
+> +				   enum ice_sw_lkup_type lkup)
+>  {
+>  	struct ice_switch_info *sw =3D hw->switch_info;
+>  	struct ice_fltr_mgmt_list_entry *fm_entry; @@ -3076,8 +3078,8
+> @@ int ice_update_sw_rule_bridge_mode(struct ice_hw *hw)
+>  	struct mutex *rule_lock; /* Lock to protect filter rule list */
+>  	int status =3D 0;
+>=20
+> -	rule_lock =3D &sw->recp_list[ICE_SW_LKUP_MAC].filt_rule_lock;
+> -	rule_head =3D &sw->recp_list[ICE_SW_LKUP_MAC].filt_rules;
+> +	rule_lock =3D &sw->recp_list[lkup].filt_rule_lock;
+> +	rule_head =3D &sw->recp_list[lkup].filt_rules;
+>=20
+>  	mutex_lock(rule_lock);
+>  	list_for_each_entry(fm_entry, rule_head, list_entry) { diff --
+> git a/drivers/net/ethernet/intel/ice/ice_switch.h
+> b/drivers/net/ethernet/intel/ice/ice_switch.h
+> index a7dc4bfec3a0..60527475959b 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_switch.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_switch.h
+> @@ -360,7 +360,8 @@ int
+>  ice_add_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
+>  		 u16 lkups_cnt, struct ice_adv_rule_info *rinfo,
+>  		 struct ice_rule_query_data *added_entry); -int
+> ice_update_sw_rule_bridge_mode(struct ice_hw *hw);
+> +int ice_update_sw_rule_bridge_mode(struct ice_hw *hw,
+> +				   enum ice_sw_lkup_type lkup);
+>  int ice_add_vlan(struct ice_hw *hw, struct list_head *m_list);  int
+> ice_remove_vlan(struct ice_hw *hw, struct list_head *v_list);  int
+> ice_add_mac(struct ice_hw *hw, struct list_head *m_lst);
+> --
+> 2.43.0
 
 
