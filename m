@@ -1,78 +1,127 @@
-Return-Path: <netdev+bounces-240642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F50DC772C2
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 04:39:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4607BC77316
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 04:52:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 269422AEEE
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:39:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id AB16F299C8
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6738026A1B9;
-	Fri, 21 Nov 2025 03:39:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ty/EFn9x"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC52E2773D4;
+	Fri, 21 Nov 2025 03:52:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7C818A956;
-	Fri, 21 Nov 2025 03:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E266F1A2630;
+	Fri, 21 Nov 2025 03:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763696384; cv=none; b=lVD/0uukjhuA2BTp0mdn9uV/IqDTZdhYVhhM0ebSzDPCcXvowhFwmFb+lRae+QvUxCeLUojGtgV+km/MUTnvMoy9Ybv42unuZLvhBcTHNfbylXm9Eyxfr3Bzq41qIU/PkkvI06eRdJfROPId6cdRUkHhk76+3BDEme6F2+7i3Hk=
+	t=1763697153; cv=none; b=WoBbHNPq5PS5rdpyn7rNQu80XWLcuCbODQHat2lUkRNdaJorJdaswUHCJ9Cy4+gm4/L4xOlC5rnObO+puNeE8cEdmXwmbFgm3N9+QTIRjVTgiv/BoyCVUh0hSRmONj6JD/S6ua17gAft//RDavGQ6z5j+U8hTFqrvz46ttm+lz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763696384; c=relaxed/simple;
-	bh=gsyvr6N3w0w8TUaKcqtHGPW+xZFPpFRf3IaY0bUKitQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rLRZZtQv9qlJOXg/unQMx7n45O4wO5k10f4ni+53dLFwDBYfuT9oa8hoCBeJGYhshohTgEWztc6/sFKiJ8VqfiJ4QFLNPp0Z88KPGZUea4j7QyVuJhkkUQ9NYeRo/qqImj3fvV5a24BNNnulejBShPnGFWdjuRsPGok7AIeZaeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ty/EFn9x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0585DC4CEF1;
-	Fri, 21 Nov 2025 03:39:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763696383;
-	bh=gsyvr6N3w0w8TUaKcqtHGPW+xZFPpFRf3IaY0bUKitQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ty/EFn9xV5fGi4rA6Mo7gWH1xwwVYl1XgK3dT1nLx3GZ5TsfXqybwvgw74/IewClS
-	 U2uIoIwPQld+z6ILQ7SBjRaW6DAmj0GNGT0B7FpjTRdykMP7KiEVUcpxlcbcGDA+kn
-	 6Zb/hvKfG2hWqpyn4m6jBsbFELvSHe/Lv9j6TS3K/8Sd9ixm6s1zxAC1wTaSdZFGeI
-	 k3YR7T0GJc+gpSVPxmTpCOmOviR7d5XrzEs0tuHDeWdPamxq/GCArn5P0j0cRF3pjQ
-	 aXYIDF7a8deHP+njNufod0tnLXaBOk62v7/Vk8hsmFPQPeWmlB03FhOzko8OqxNrhn
-	 HgWbamji+jNZw==
-Date: Thu, 20 Nov 2025 19:39:42 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed
- <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Mark Bloch
- <mbloch@nvidia.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <linux-rdma@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe Shemesh
- <moshe@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu
- <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next 00/14] devlink and mlx5: Support cross-function
- rate scheduling
-Message-ID: <20251120193942.51832b96@kernel.org>
-In-Reply-To: <1763644166-1250608-1-git-send-email-tariqt@nvidia.com>
-References: <1763644166-1250608-1-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1763697153; c=relaxed/simple;
+	bh=M6Ctx6m102bBxdU8/i2dOzPqVv+ZyA9HUSq23fFJuik=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=UQQpmaiEzM/OZ50RI1sOxA7pxkNAES9WxJhtTO7ZM8GAOC9riFt37vigLVtkGi8ZRuC4GDKxLDpKGmGfizmauX5kuPofZrBEtfG3pM8zdUS665ta/y8axQmdWJDEM6OvztsOQ4x37QD97zS4T6fzRrRAbrsQqCQrbY9TQQDLico=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [202.112.113.212])
+	by APP-03 (Coremail) with SMTP id rQCowACnONvD4R9pEEJ_AQ--.40522S2;
+	Fri, 21 Nov 2025 11:51:37 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: andrew@lunn.ch,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	florian.fainelli@broadcom.com,
+	stephen@networkplumber.org,
+	robh@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	akpm@linux-foundation.org,
+	Ma Ke <make24@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: dsa: Fix error handling in dsa_port_parse_of
+Date: Fri, 21 Nov 2025 11:51:30 +0800
+Message-Id: <20251121035130.16020-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:rQCowACnONvD4R9pEEJ_AQ--.40522S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tFy7uFWkAryrGr4UCrWDXFb_yoW8XFy3pa
+	13Cay5KrWDG392kr4vvw18C3y2kw40k3ySk34xC34Sqrn3Jr15JrWj9F1Y9w15ArWxC348
+	JFZFqF95CFWUZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14
+	v_Gr4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
+	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
+	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUnYFADUUU
+	U
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Thu, 20 Nov 2025 15:09:12 +0200 Tariq Toukan wrote:
-> Code dependency:
-> This series should apply cleanly after the pulling of
-> 'net-2025_11_19_05_03', specifically commit f94c1a114ac2 ("devlink:
-> rate: Unset parent pointer in devl_rate_nodes_destroy").
+When of_find_net_device_by_node() successfully acquires a reference to
+a network device but the subsequent call to dsa_port_parse_cpu()
+fails, dsa_port_parse_of() returns without releasing the reference
+count on the network device.
 
-repost please, we don't do dependencies
+of_find_net_device_by_node() increments the reference count of the
+returned structure, which should be balanced with a corresponding
+put_device() when the reference is no longer needed.
+
+Found by code review.
+
+Cc: stable@vger.kernel.org
+Fixes: 6ca80638b90c ("net: dsa: Use conduit and user terms")
+Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+---
+ net/dsa/dsa.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
+index 5b01a0e43ebe..632e0d716d62 100644
+--- a/net/dsa/dsa.c
++++ b/net/dsa/dsa.c
+@@ -1246,6 +1246,7 @@ static int dsa_port_parse_of(struct dsa_port *dp, struct device_node *dn)
+ 	struct device_node *ethernet = of_parse_phandle(dn, "ethernet", 0);
+ 	const char *name = of_get_property(dn, "label", NULL);
+ 	bool link = of_property_read_bool(dn, "link");
++	int err;
+ 
+ 	dp->dn = dn;
+ 
+@@ -1259,7 +1260,13 @@ static int dsa_port_parse_of(struct dsa_port *dp, struct device_node *dn)
+ 			return -EPROBE_DEFER;
+ 
+ 		user_protocol = of_get_property(dn, "dsa-tag-protocol", NULL);
+-		return dsa_port_parse_cpu(dp, conduit, user_protocol);
++		err = dsa_port_parse_cpu(dp, conduit, user_protocol);
++		if (err) {
++			put_device(conduit);
++			return err;
++		}
++
++		return 0;
+ 	}
+ 
+ 	if (link)
+-- 
+2.17.1
+
 
