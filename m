@@ -1,147 +1,122 @@
-Return-Path: <netdev+bounces-240677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C308DC77985
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 07:41:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C48BC779D7
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 07:53:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8F23F4E3A12
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 06:41:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id B8C2C2CBF1
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 06:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D0A32FA2F;
-	Fri, 21 Nov 2025 06:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43E3334C2A;
+	Fri, 21 Nov 2025 06:53:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gyfAeaz2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kg3E31GY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B300F2F5487;
-	Fri, 21 Nov 2025 06:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B2E332907
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 06:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763707278; cv=none; b=PYFwC8wWFfNr+0K1NMX+Vawwxvx/IjWfISD/vccNRkRkw2UNlhlP4A8u+wYj2bb5IzXcsm/7OmXrIwaPX0NDJEtDFuOp36jJ88jfb0x5QFpQzXr4H3nfdRDW3thJnBHnmlOyTXL57CldZerrRES2Q2o3YS09j5LUkqCJlPhIwKE=
+	t=1763708006; cv=none; b=s4ABGqCPKcOGzX1f8vIi6296zsRpkurTcSrVUVjLfEjB3OvG1/iGwekEAwzs8izMVSFhdRBOhyPauGXYWqXO5f98LGegdThQEdPJ7aIuNHne5+XfWbWlOStNYqUE2uI1PY5ocdlwWasTCxqMbMBYKIOyTGKHvMTJwAeDuc37Ero=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763707278; c=relaxed/simple;
-	bh=uYFvjqEc51Mdt5o+/a/tTRDyKKIcuwZGwngRMwPgH44=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gENaVoPrNf5+HywkMyKnv/6XQLLDML1J0hKyBTv1gc+ur7ZTjSzVka6Z9B+labfavCg/Ih84rM4RnRt+ufaDo3D1BUoOfso+Vl6Va5J0XcSLV47A6tLwK8YoZkmlYg5MiO3ev98SvKDPTPTRLiZxPEeRGc8yaO2y52v5BLpzIl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gyfAeaz2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 088A7C4CEF1;
-	Fri, 21 Nov 2025 06:41:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763707278;
-	bh=uYFvjqEc51Mdt5o+/a/tTRDyKKIcuwZGwngRMwPgH44=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=gyfAeaz258kV8f9IQSLueORrn2WaBhy+kOxZ7BTgdJaFN1iUPuEUoy10gXY1U8Sh9
-	 7Bg8SqVE2DAyIVCPnOxgCgAQbubRJsKvb7vBdfgmKtLCEmEZqmqVOhwd484glRu9d+
-	 4cDyxSMgZa4p7duJccGM7Ut/5leZHNZHPHSFbRRoJb9ImbLzRYH63sRNH3W1r8kC1B
-	 h0vhdnoJ8O5b9gUVmIpD719srxJvOiZHJV2VyZ585hNTimZs4GQcvxkDRxgcvLACG9
-	 SxCSM3wLqw7G8796FoFKC9UlE7EhwAriikgcceTSt3TojAJsIE8qxAcY0DF81DjFDI
-	 KBpK5nyPoktFg==
-Message-ID: <e3d376c8a1ac1ee9b75d02f78bdc25f7c556bb20.camel@kernel.org>
-Subject: Re: [PATCH v21 00/23] Type2 device basic support
-From: PJ Waskiewicz <ppwaskie@kernel.org>
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org, 
-	netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, 	dave.jiang@intel.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-Date: Thu, 20 Nov 2025 22:41:17 -0800
-In-Reply-To: <20251119192236.2527305-1-alejandro.lucero-palau@amd.com>
-References: <20251119192236.2527305-1-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
+	s=arc-20240116; t=1763708006; c=relaxed/simple;
+	bh=YoE6DX9QPrZ8nJtKpQk0wObbgEu8hWylBm+gY9w6WKo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=eMDhgVbhX3G2opGCmJNpnSSiiRNyzoRziIA469K5pdOFQH14X70tzAJohZyRt/0fjYKMCiaPNeuID6i9R8wGKxe4/sFy9DObEHUwoxRjKdT2nxJDmBzaa2vlon9iGYWgw/uUeIqQJQb+86BUGkrbOTtUQUrA5hnDgHhv5TSniKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kg3E31GY; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-477a219dbcaso15916855e9.3
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 22:53:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763708003; x=1764312803; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=34q6eh1LVMr1p8gZ6yDK5bs90rev74r8o+EQAEX0tF0=;
+        b=Kg3E31GYQWJ1esr5+xhv4eYxV0Xfa1Xc2Z12+8tUeari0lUC37qXR84K7cKUDUQ7xo
+         ivFk5tBkfch9pz0ZD4dBp3XlD6DxD65mbDQ5adj55ckgAz1wk0u2TbUYrOwQPrVlFNX3
+         8zfW4hvhsWy6oU6p4aKnPJCKIpsG/B8EsjrBI/YoGIBXCXpjy2f1WmX2H0R8fp8NQndd
+         FOq7DMyG8Gk3FMc254Mz9Vl566eYkWWzLh1alu7kOIZVdLR8pdNBeu91Ba3/f0x50gMs
+         whsRzASwrv98qQz8m7BRvbhCiF6X7+GHThkhWUArDOEMXC5q9TffDXBPDSOnVXhxUQDh
+         atEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763708003; x=1764312803;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=34q6eh1LVMr1p8gZ6yDK5bs90rev74r8o+EQAEX0tF0=;
+        b=SdRFgrBBDCIZwkh1FZ1Rew9hmaTJb+qse6jjNTg5MnTjLl+xddrCl82W9kqLRS+X6l
+         GXH2H81kdJsXuTAaqfMX4uez6Js9H9YnZSkvuwOABPu01ej0djcYPxpO5nDCL5Lqro5D
+         IiLgrC0U2C9A6j5vi3uS+NDOMd9njOh3wFKDlOlUUtDDf6kHRjA6oLlgY4lwVg+ZDq/I
+         aRDgAG6aEleKaFJxjx5/iSQHHANiVMwSeoT/x7mTIin/UsfQExYKr5hZX+5DSLmq5iC/
+         pzYjX9Cc4sYYvo15MA2ZNNIvorPdZmHyh1w7ygHelhBAKAUhBFEmaXUNGSXQH9tOZ+qG
+         kukA==
+X-Forwarded-Encrypted: i=1; AJvYcCUM5kSNe+Zx05tfEZrSiHdjcw0sDqg2ralsc3y8p6/FgPdlyLKE/4hUJRZJBRCj2rkf7rJU2Pw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjvCqef10/Tq2W+d/owQcz+xsLWV8z0yWVW1OuOWrt3k6HKxMt
+	HH7o1wyPSwEmt0867X5zQQpSBmtFY+g4CtlSQOLc55JBgliwwgE1edOz8b4pRA==
+X-Gm-Gg: ASbGncsIfgKou/wxIz0Il/SqrkDZ+n5Uyc9Yx2MvVwRASOY+42P17yJPTvIKxwT0UFF
+	MBqWaIGGFCL6gT6aBCrBCdwPDBDnJwdpCxyBwMnzyjxVz4K8feJ5+OeHmJWBzN3rW168kG9zdrS
+	ZMs+MHMmnnUPBILBkFlCatwlVUQrccLSBUb6mWL0iJ/YPSkoM668qkIXYccWmSed704B3GjbWCc
+	+gHVcU7GdNkKIs6bp4mLelXBw5skCBN5GmtVsvzw0W8YzJso7rgahxCK+PPjtkciZQKjCeOHcCS
+	6HmcPBG7zYXXm4OjMQ8A7TWuUERqkQkRvhDHgYkGzDfgq3+CCVRngvxXvKJQzjNKrtDLtD+R3x4
+	26MyVy71JsfkvTduiTFiI2ZEcAHE9bkvtEoL+mdxkyYvqb/pAnmDpBO2VvAnfZnaePnA4qjDD/p
+	4N7JbODMCvOa8aGSQKHFzDZXvYEWHW9N6E3HQO/5Pb4SxwyixWFI+yIgWLGv4fma8MBehVoanIB
+	+SQ/HtGAzJM99Sj+QTRhGGGGdIiV63vn9KpYJ5JLkNfVh3rAjyQeQ==
+X-Google-Smtp-Source: AGHT+IF/bCF6j+QcYZhz3/GjrRtGdXGXhke+GG+32dX287Zxkm+fmXd+FgvxVzsloEl3viC1coDIww==
+X-Received: by 2002:a05:600c:1c82:b0:477:73cc:82c3 with SMTP id 5b1f17b1804b1-477c01ee405mr10875795e9.26.1763708003257;
+        Thu, 20 Nov 2025 22:53:23 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f20:6900:9d47:8de1:7320:72f5? (p200300ea8f2069009d478de1732072f5.dip0.t-ipconnect.de. [2003:ea:8f20:6900:9d47:8de1:7320:72f5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf3af0e1sm26049155e9.10.2025.11.20.22.53.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Nov 2025 22:53:22 -0800 (PST)
+Message-ID: <8cbd4650-aeed-4d1c-8173-957776dfec51@gmail.com>
+Date: Fri, 21 Nov 2025 07:53:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Question] Return value of mii_bus->write()
+To: Buday Csaba <buday.csaba@prolan.hu>, netdev@vger.kernel.org
+References: <aSAHVPsxrM60lRIj@debianbuilder>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <aSAHVPsxrM60lRIj@debianbuilder>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2025-11-19 at 19:22 +0000, alejandro.lucero-palau@amd.com
-wrote:
+On 11/21/2025 7:31 AM, Buday Csaba wrote:
+> I am preparing a patch to eliminate kernel-doc warnings in mdio_device.c
+> and mdio_bus.c
+> 
+> I have ran into an ambiguity: what is mii_bus->write() supposed to
+> return on success? Documentation/networking/phy.txt does not give any
+> information about it, neither does the kdoc in include/linux/phy.h.
+> 
+> It is clear that 0 is treated as success, and a negative indicates
+> failure. The reference implementation also follows this convention.
+> But the code in mdio_bus.c, for example: __mdiobus_modify_changed(),
+> seems to also expect positive return values from write().
+> 
+I think you misread the code. __mdiobus_modify_changed() returns
+a positive value in case new and old value differ, but __mdiobus_write()
+never returns a positive value.
 
-Hi Alejandro,
+> Is there any other implementation that allows positive return
+> values for success? Should it be mentioned in kernel-doc?
+> 
+> Thanks,
+> Csaba
+> 
+> 
 
-Sorry it's been a bit since I've been able to comment.  I've been
-trying to test these patchsets with varying degrees of success.  Still
-haven't gotten things up and running fully.  One comment below.
-
-> From: Alejandro Lucero <alucerop@amd.com>
->=20
-> The patchset should be applied on the described base commit then
-> applying
-> Terry's v13 about CXL error handling. The first 4 patches come from
-> Dan's
-> for-6.18/cxl-probe-order branch with minor modifications.
->=20
-> v21 changes;
->=20
-> =C2=A0 patch1-2: v20 patch1 splitted up doing the code move in the second
-> 	=C2=A0=C2=A0=C2=A0 patch in v21. (Jonathan)
-> =C2=A0
-> =C2=A0 patch1-4: adding my Signed-off tag along with Dan's
->=20
-> =C2=A0 patch5: fix duplication of CXL_NR_PARTITION definition
->=20
-> =C2=A0 patch7: dropped the cxl test fixes removing unused function. It wa=
-s
-> 	=C2=A0 sent independently ahead of this version.
->=20
-> =C2=A0 patch12: optimization for max free space calculation (Jonathan)
->=20
-> =C2=A0 patch19: optimization for returning on error (Jonathan)
-
-I cannot test these v21 patches or the v20 patches for the same reason.
-I suspect v19 is also affected, but I was stuck on v17 for awhile (b4
-was really not likely the prereq patches you required to get the tree
-into a usable state to apply your patchset).
-
-When I build and go to install the kernel mods, depmod fails:
-
-DEPMOD  /lib/modules/6.18.0-rc6+
-depmod: ERROR: Cycle detected: cxl_core -> cxl_mem -> cxl_port ->
-cxl_core
-depmod: ERROR: Cycle detected: cxl_core -> cxl_mem -> cxl_core
-depmod: ERROR: Found 3 modules in dependency cycles!
-
-I repro'd this on a few different systems, and just finally repro'd
-this on a box outside of my work network.
-
-This is unusable unfortunately, so I can't test this if I wanted to.
-
-My .config for CXL:
-
-
-CONFIG_PCIEAER_CXL=3Dy
-CONFIG_CXL_BUS=3Dm
-CONFIG_CXL_PCI=3Dy
-# CONFIG_CXL_MEM_RAW_COMMANDS is not set
-CONFIG_CXL_ACPI=3Dm
-CONFIG_CXL_PMEM=3Dm
-CONFIG_CXL_MEM=3Dm
-CONFIG_CXL_FEATURES=3Dy
-# CONFIG_CXL_EDAC_MEM_FEATURES is not set
-CONFIG_CXL_PORT=3Dm
-CONFIG_CXL_SUSPEND=3Dy
-CONFIG_CXL_REGION=3Dy
-# CONFIG_CXL_REGION_INVALIDATION_TEST is not set
-CONFIG_CXL_RAS=3Dy
-CONFIG_CXL_RCH_RAS=3Dy
-CONFIG_CXL_PMU=3Dm
-CONFIG_DEV_DAX_CXL=3Dm
-
-Pretty simple to repro.
-
-$ make -j<N> && make modules && make modules_install
-
-Hopefully there's a solution here that doesn't involve building the
-whole mess into the kernel directly.
-
-Cheers,
--PJ
 
