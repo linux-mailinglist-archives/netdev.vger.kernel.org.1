@@ -1,126 +1,148 @@
-Return-Path: <netdev+bounces-240643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4607BC77316
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 04:52:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9E39C77342
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 05:01:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id AB16F299C8
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:52:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A4BF14E46A9
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 04:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC52E2773D4;
-	Fri, 21 Nov 2025 03:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C1226C39F;
+	Fri, 21 Nov 2025 04:01:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E266F1A2630;
-	Fri, 21 Nov 2025 03:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347DB248F68;
+	Fri, 21 Nov 2025 04:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763697153; cv=none; b=WoBbHNPq5PS5rdpyn7rNQu80XWLcuCbODQHat2lUkRNdaJorJdaswUHCJ9Cy4+gm4/L4xOlC5rnObO+puNeE8cEdmXwmbFgm3N9+QTIRjVTgiv/BoyCVUh0hSRmONj6JD/S6ua17gAft//RDavGQ6z5j+U8hTFqrvz46ttm+lz8=
+	t=1763697670; cv=none; b=ID0xututA0Htz29S3H+JgHjl1gMKESg+LGcF6SV/e9azbu1BiG6GPBmwjIWArvo43szrXObWFub+PPunjwGrjjbSsQb+5uE28HXlvS+F3o9Ffa6zFKd5IVF47638n/dKrEbt/8omKA+pnVs5Ig9QKdKqvhqYR+hsUz0RYmgti/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763697153; c=relaxed/simple;
-	bh=M6Ctx6m102bBxdU8/i2dOzPqVv+ZyA9HUSq23fFJuik=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=UQQpmaiEzM/OZ50RI1sOxA7pxkNAES9WxJhtTO7ZM8GAOC9riFt37vigLVtkGi8ZRuC4GDKxLDpKGmGfizmauX5kuPofZrBEtfG3pM8zdUS665ta/y8axQmdWJDEM6OvztsOQ4x37QD97zS4T6fzRrRAbrsQqCQrbY9TQQDLico=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [202.112.113.212])
-	by APP-03 (Coremail) with SMTP id rQCowACnONvD4R9pEEJ_AQ--.40522S2;
-	Fri, 21 Nov 2025 11:51:37 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: andrew@lunn.ch,
-	olteanv@gmail.com,
+	s=arc-20240116; t=1763697670; c=relaxed/simple;
+	bh=6qIHlhM+MCUdvVq4j3wN5PWzi4h0LIZ0znmf+vGPkR8=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=kFi6bs7+MXtdtMFiv1IZWacQmEv//fp8INYbXSnGhyD0TCMMvfZsCit1+6F1ICXZoMoxnyTGInRtvCQQGyf+x+oxl782BFrumoPxtmD8Al3sz9ee7Tpn/1ExZSiwu4kMYBynK+ATpF5BkKuAkJBkl5gcUYxjpz525PT94zyyMn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c2dff70000001609-6d-691fe3faf41f
+From: Byungchul Park <byungchul@sk.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	kernel_team@skhynix.com,
+	harry.yoo@oracle.com,
+	hawk@kernel.org,
+	andrew+netdev@lunn.ch,
+	david@redhat.com,
+	lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com,
+	vbabka@suse.cz,
+	ziy@nvidia.com,
+	willy@infradead.org,
+	toke@redhat.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	horms@kernel.org,
-	florian.fainelli@broadcom.com,
-	stephen@networkplumber.org,
-	robh@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	akpm@linux-foundation.org,
-	Ma Ke <make24@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: dsa: Fix error handling in dsa_port_parse_of
-Date: Fri, 21 Nov 2025 11:51:30 +0800
-Message-Id: <20251121035130.16020-1-make24@iscas.ac.cn>
+	asml.silence@gmail.com,
+	axboe@kernel.dk,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	dsahern@kernel.org,
+	almasrymina@google.com,
+	sdf@fomichev.me,
+	dw@davidwei.uk,
+	ap420073@gmail.com,
+	dtatulea@nvidia.com,
+	shivajikant@google.com,
+	io-uring@vger.kernel.org
+Subject: [PATCH net-next 1/3] netmem, io_uring/zcrx: access pp fields through @desc in net_iov
+Date: Fri, 21 Nov 2025 13:00:45 +0900
+Message-Id: <20251121040047.71921-1-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:rQCowACnONvD4R9pEEJ_AQ--.40522S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tFy7uFWkAryrGr4UCrWDXFb_yoW8XFy3pa
-	13Cay5KrWDG392kr4vvw18C3y2kw40k3ySk34xC34Sqrn3Jr15JrWj9F1Y9w15ArWxC348
-	JFZFqF95CFWUZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
-	rcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14
-	v_Gr4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
-	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
-	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
-	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
-	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUnYFADUUU
-	U
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBIsWRmVeSWpSXmKPExsXC9ZZnke6vx/KZBku28lus/lFhsfzBDlaL
+	n2ueM1nMWbWN0WL13X42iznnW1gsvq7/xWyxblcrk8XOXc8ZLV7NWMtm8fTYI3aL+8uesVjs
+	ad/ObPGo/wSbxbvWcywWF7b1sVqcO7ySzWJ7wwN2i8u75rBZ3Fvzn9Xi5KyVLBYdd/ayWBxb
+	IGbx7fQbRourM3cxWSy8E29x6fAjFovZjX2MFr9/ANXPPnqP3UHOY8vKm0we12ZMZPG4se8U
+	k8fOWXfZPRZsKvXYvELL4/LZUo9NqzrZPDZ9msTusXPHZyaP3uZ3bB4fn95i8Xi/7yqbx5kF
+	R9g9Pm+SC+CP4rJJSc3JLEst0rdL4MpoXvKDreALT0XP7ZNMDYynuboYOTkkBEwkVi5/wAhj
+	f2tsZAex2QTUJW7c+MkMYosISEl83LEdKM7FwSywhlVi+YytYA3CAnESD38sAGtgEVCVWL92
+	MRuIzStgKtGxZznUUHmJ1RsOMIM0SwgcY5d4+vMPG0RCUuLgihssExi5FzAyrGIUyswry03M
+	zDHRy6jMy6zQS87P3cQIjK9ltX+idzB+uhB8iFGAg1GJh/cEp3ymEGtiWXFl7iFGCQ5mJRFe
+	VUeZTCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8Rt/KU4QE0hNLUrNTUwtSi2CyTBycUg2MVpsu
+	mxzp2FScyusT47rj7h/Jt9XWX17XSL5c+7j15fLtK1IiLjDMl6gXf+/YtTnnwISotbOcnslx
+	bjywIe38p6+714bZn92puMN8S+K+Az17XwufMLLdpxGvspnPqaYrceVTBc3uzQGXeLt/qKTp
+	XjSX13BcLrd/yxb2ks7y5eVdH8R/aq+3U2Ipzkg01GIuKk4EAKkE5lqrAgAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAwGRAm79CAMS/gMaCGludGVybmFsIgYKBApOO4Mt+uMfaTCOOjir+Hg4p+C4
+	BTj5rOcCOJyqtgE4q92PBjicz4QEOPWv+gM4rrqFAji5uucBOOqYrQY45cbiBzjfpuYEOLyH
+	twM44o/IBjjuhc4EOMOdyQU40LaOBTjOw6kGOLeA4Ac407qcBjjerP8FOMmaqQQ4iNy9BDjG
+	oBY49svsATjVmboCOKHcXzjSw+IEOJuBjgE4+/icBjibxd4HQB9ItKnZAkjWmJEESNi+ygJI
+	uZrdB0igsnVIs6gqSNPNdUiyqokGSLLykgdIubjzAkiNg+4GSPHl2gRI777VBkij6PACSMyg
+	xAdI87IeUBBaCjxkZWxpdmVyLz5gCmiDpPgGcPQMeIzbyQKAAcsKigEJCBgQNBj2gYEHigEJ
+	CAYQJxjY2PkDigEJCBQQGhjxuLcHigEKCAMQrAUYp5i1AYoBCQgTEF4Y4figB4oBCQgEECUY
+	r62jBooBCQgNEDUYiLynAYoBCQgYEB8Yq7DAA5ABCKABAKoBFGludm1haWw1LnNraHluaXgu
+	Y29tsgEGCgSmffyRuAH000fCARAIASIMDcgJH2kSBWF2c3ltwgEYCAMiFA0lQRxpEg1kYXl6
+	ZXJvX3J1bGVzwgEbCAQiFw1KV2VgEhBnYXRla2VlcGVyX3J1bGVzwgECCAkagAEAuSxiYklG
+	aIusnnStzTc8+QxM5e5ncem5ZVHeb2HzY8QvfOiwsiQCnYkGWFDtu8S2Ar5WHICr0h8eVG2M
+	n0ylQba81grQiQi1FX7kvPun43q8VverMW7mqYosZAjnp9DMwqkK7//qyr366Oew1XhNs8kw
+	HOSkVpsXN2KzXzeuHyIEc2hhMSoDcnNhp4l8S5ECAAA=
+X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-When of_find_net_device_by_node() successfully acquires a reference to
-a network device but the subsequent call to dsa_port_parse_cpu()
-fails, dsa_port_parse_of() returns without releasing the reference
-count on the network device.
+Convert all the legacy code directly accessing the pp fields in net_iov
+to access them through @desc in net_iov.
 
-of_find_net_device_by_node() increments the reference count of the
-returned structure, which should be balanced with a corresponding
-put_device() when the reference is no longer needed.
-
-Found by code review.
-
-Cc: stable@vger.kernel.org
-Fixes: 6ca80638b90c ("net: dsa: Use conduit and user terms")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- net/dsa/dsa.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ io_uring/zcrx.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-index 5b01a0e43ebe..632e0d716d62 100644
---- a/net/dsa/dsa.c
-+++ b/net/dsa/dsa.c
-@@ -1246,6 +1246,7 @@ static int dsa_port_parse_of(struct dsa_port *dp, struct device_node *dn)
- 	struct device_node *ethernet = of_parse_phandle(dn, "ethernet", 0);
- 	const char *name = of_get_property(dn, "label", NULL);
- 	bool link = of_property_read_bool(dn, "link");
-+	int err;
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index b1b723222cdb..f3ba04ce97ab 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -693,12 +693,12 @@ static void io_zcrx_return_niov(struct net_iov *niov)
+ {
+ 	netmem_ref netmem = net_iov_to_netmem(niov);
  
- 	dp->dn = dn;
- 
-@@ -1259,7 +1260,13 @@ static int dsa_port_parse_of(struct dsa_port *dp, struct device_node *dn)
- 			return -EPROBE_DEFER;
- 
- 		user_protocol = of_get_property(dn, "dsa-tag-protocol", NULL);
--		return dsa_port_parse_cpu(dp, conduit, user_protocol);
-+		err = dsa_port_parse_cpu(dp, conduit, user_protocol);
-+		if (err) {
-+			put_device(conduit);
-+			return err;
-+		}
-+
-+		return 0;
+-	if (!niov->pp) {
++	if (!niov->desc.pp) {
+ 		/* copy fallback allocated niovs */
+ 		io_zcrx_return_niov_freelist(niov);
+ 		return;
  	}
+-	page_pool_put_unrefed_netmem(niov->pp, netmem, -1, false);
++	page_pool_put_unrefed_netmem(niov->desc.pp, netmem, -1, false);
+ }
  
- 	if (link)
+ static void io_zcrx_scrub(struct io_zcrx_ifq *ifq)
+@@ -800,7 +800,7 @@ static void io_zcrx_ring_refill(struct page_pool *pp,
+ 		if (!page_pool_unref_and_test(netmem))
+ 			continue;
+ 
+-		if (unlikely(niov->pp != pp)) {
++		if (unlikely(niov->desc.pp != pp)) {
+ 			io_zcrx_return_niov(niov);
+ 			continue;
+ 		}
+@@ -1074,8 +1074,8 @@ static int io_zcrx_recv_frag(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
+ 		return io_zcrx_copy_frag(req, ifq, frag, off, len);
+ 
+ 	niov = netmem_to_net_iov(frag->netmem);
+-	if (!niov->pp || niov->pp->mp_ops != &io_uring_pp_zc_ops ||
+-	    io_pp_to_ifq(niov->pp) != ifq)
++	if (!niov->desc.pp || niov->desc.pp->mp_ops != &io_uring_pp_zc_ops ||
++	    io_pp_to_ifq(niov->desc.pp) != ifq)
+ 		return -EFAULT;
+ 
+ 	if (!io_zcrx_queue_cqe(req, niov, ifq, off + skb_frag_off(frag), len))
 -- 
 2.17.1
 
