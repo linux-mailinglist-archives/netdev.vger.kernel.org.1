@@ -1,344 +1,194 @@
-Return-Path: <netdev+bounces-240709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08485C7824C
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 10:26:48 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 016CDC7821F
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 10:24:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 10D5C3526E8
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:24:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 066832D5DA
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C0D341AC7;
-	Fri, 21 Nov 2025 09:21:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0FE32FD67A;
+	Fri, 21 Nov 2025 09:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EUmhfJxy"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="IuvGVpB0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3B03081C6;
-	Fri, 21 Nov 2025 09:21:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763716886; cv=fail; b=EVcKDQ6+Gy0NBtq91bVgp52ysEbyFM3rYUaYodL5oU6p5OD9ugvYjK2TojCcY0QUu3lzJ+fFgx/g7HGgr4oxPijNU2P6ZvbP0Gi1sxJJtsSIcci+jmRiWEN7cwyUCwlb0/XCp6REvEZz8Hvoe8QKh/kSX1D7+dSTKEcYCVz1FNk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763716886; c=relaxed/simple;
-	bh=Cg3bChY5rIND71AFMggpWWqQEmSsL4wArv9CBjrZ9ZU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=FsUzsWEhGJkCO7axRg+Vlm/97e/pdMw86/0Gjf2pCVot1UgGkiIAwLxpVOWX4feoDvBGVRxK8OkKqIvNrqyRiCrkGUlEqvvovAQOP18JfbH6SHtdEdgeQQSuf445QKSMe7KB2x4tZkO0eG13cEheX9m3i4sWJa1gWFJggN2jLiY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EUmhfJxy; arc=fail smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763716885; x=1795252885;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Cg3bChY5rIND71AFMggpWWqQEmSsL4wArv9CBjrZ9ZU=;
-  b=EUmhfJxyBtKs1APX70axLQTOgr4pxOku6lq0RcrEbBK0i59ebNl7Xa9Y
-   3e4phYIX+cdJ2rHUSCekeaOUSEvKNL7LGztVeAPR0mtRJZsbPs7M9ghdV
-   SPkZGRfkgp2fN4LzDwp0IVcMsd2x18P62eiQS1U+x39HaPso9mhmPL/It
-   XfZTpbQPVuv89Jd9vVX1DjrkzMke68eqXa0gYwqJYSAsHq0Kh8Hl7eTgs
-   KdnDx1qUxIs1y89sQ+iq8jlssvodgXzWUfxIHWuqgKPn9Y4FnjS1awAua
-   UCkDYNFrcHqHq66vclgnTUmGEKhB5S8DZTsWAyDAivBH4hoDGd4ZbUnF6
-   Q==;
-X-CSE-ConnectionGUID: KuXB9tCjSsKA8DxGzYHUPA==
-X-CSE-MsgGUID: urXqhT4vTGG7j09ZyhsrWQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="88456909"
-X-IronPort-AV: E=Sophos;i="6.20,215,1758610800"; 
-   d="scan'208";a="88456909"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 01:21:20 -0800
-X-CSE-ConnectionGUID: ZjDqRMAvRsaHj7ms6/z11A==
-X-CSE-MsgGUID: 4E1o23oATWmpXWe956NEMw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,215,1758610800"; 
-   d="scan'208";a="196595849"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 01:21:19 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 21 Nov 2025 01:21:19 -0800
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Fri, 21 Nov 2025 01:21:19 -0800
-Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.14) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 21 Nov 2025 01:21:19 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZC1WgiSWsFmGvAVN94SXn68aWFnQFiZ7rSPYVA6VL6Mv+BzWLdAnxqPAjiF7aCEvOdZBa6p4kXxlArOYFyLW3vXjCaPDmYZvx9cx2p6eWqzMUl1emPf6m9h1DkL4neI0aCmQOupAJVQt2iH0RV8GcgHF3CwgEY0b2F3EI3xtqVb4OJs5QUkp5iJjAc0WqUQSqUlFatVRq4LzuwcK4KnNDI+bpGtqABlHRIzoONvppWVMWPs7STDrHuaGg/JP/EFZbNPzK+swbLTaR4xbj8TnzX7w3FH/PpqAqzE4g7HkvpU471X7VRZ7YcJnpMaoDM0rjFk5CmHzH12ybgG9Bn3Azg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K4C3I7TNIUS54Ure2uBwz5aGuGVysB8rQnsLsCWxgGM=;
- b=W/CqFAt9hiyj/vy0vGKnhU6MXLkJ902qlgMTbBX95rCXNEf8BXOYi/1ztCSv12ORy9moahP0G4yV5TQalkJVX1/VGnkge3Y9Pg713OyBXEMooClDWm17FlNCXwXSRxTxrtETlvKhM9VzylvnEakG0dc57kU9xWmKaU/n16iaYLw0kaW7T71EFUrFeippaBhlKxvW9nEiHGpv8opIGLiMS3R4ycrwWOLC+g/jptJSQbXYWPCir3jARKBR3eOqXLmW1qyxirdChbREcf6S/E5QDHNnL09KSW8sk2dk8tcz4RrFwB0K2IeztlnDKY0OcIiJAI9ZYWLQy44S1wLMhHbQUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by PH8PR11MB6856.namprd11.prod.outlook.com (2603:10b6:510:22b::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.11; Fri, 21 Nov
- 2025 09:21:11 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9343.009; Fri, 21 Nov 2025
- 09:21:11 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Slepecki, Jakub" <jakub.slepecki@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "michal.swiatkowski@linux.intel.com"
-	<michal.swiatkowski@linux.intel.com>, "Slepecki, Jakub"
-	<jakub.slepecki@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next 4/8] ice: allow overriding
- lan_en, lb_en in switch
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next 4/8] ice: allow overriding
- lan_en, lb_en in switch
-Thread-Index: AQHcWj7Yly0Q2RHZ2UWt8T72RdAc9bT81jWA
-Date: Fri, 21 Nov 2025 09:21:11 +0000
-Message-ID: <IA3PR11MB89860CA2EBCCEDDF0C9E05D9E5D5A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20251120162813.37942-1-jakub.slepecki@intel.com>
- <20251120162813.37942-5-jakub.slepecki@intel.com>
-In-Reply-To: <20251120162813.37942-5-jakub.slepecki@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|PH8PR11MB6856:EE_
-x-ms-office365-filtering-correlation-id: 9d88aa44-cf5b-4e33-7f48-08de28df4fe9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?63ox/uexBLu2f4gJ4yD5qLsghtCYpixlgVdBE+6wSLYsTSODaXl3RPOujtpZ?=
- =?us-ascii?Q?900tL9nlyLPxkmiXrP8bEDN0rEVKyMfd/MR2Hko/S2nUHVV63e9jTTBE4xfH?=
- =?us-ascii?Q?aD1N2siwXHZA881E95rKcvdBb/2EMkzNDBsv7KzOlpyClPA/z62BZ/2O+FaL?=
- =?us-ascii?Q?qRIYQkDyttWKeWQQqnVnVNLKg/Yt/n4Aig4O2ODeMNU35LKEz9/2tycyF+I5?=
- =?us-ascii?Q?eN9q5As8WPeongXYeRQzD1k/vIWgLcKACbaJ8TYZkTh6nX8KOvpDgFiV6JTl?=
- =?us-ascii?Q?NIHfBXTdHhSWny5f4Z5GtPGZWDVGIc7n7slxEA/fL6bV0KYDGrfbogmtnAeF?=
- =?us-ascii?Q?Umdxm88Z4xXLSe9OgkC/7hDYb6jcr3UqToAaW8xnjlnCt6XCHQBQLuM8U7PJ?=
- =?us-ascii?Q?Oa0f7KP7C/Ww2uVSRSml3yptxEgvT50yXloSvc9cLr+kwOYRwSb72a33xccL?=
- =?us-ascii?Q?GgQgSav4ePDHxHTsLPJ7tAxRse7aHtP9Y24y7lf8EAIO9HR+Z4C7gXkicPnd?=
- =?us-ascii?Q?W6nMspS6Mhx0R6S3UpY3sbGEoeSUkCIyb2AXMtopopZgcMJ841JXJR8YRj/z?=
- =?us-ascii?Q?OfTlFHvXhBI1+VZXp+iVyB4OnY4gXQz0Vf7c3rCNnPerjMt7OCqV2TzCCqeg?=
- =?us-ascii?Q?4acXjWSGxrPdDDlX9PhoHpE8vKw1f0yJwb1QIiKHTw2/7yydbtxgJ22OqHh4?=
- =?us-ascii?Q?Fw15Zam1qBYaJ0/RQRzysDH4p/qG/QlU3bsCGu6Cj4aUT7A/79A+dvUYfcIO?=
- =?us-ascii?Q?D7TQooXMaUDEpHEJJYgUpHLFWHGQge8E6dSwXfcc240fUFrsIUXM8tgzUvUC?=
- =?us-ascii?Q?IW1NYUpbpWpdFBsOHx+dyVenn0fjwiom4wJdeJHlSqyriZW2vZp4axU/3i+M?=
- =?us-ascii?Q?eWpIoaObY27X9DDcxNbe7cwxWu6x+nLABE64MLw9bjyoqmXQZjQxj6RufSVK?=
- =?us-ascii?Q?4dL9To7aC2c0+uTxvX0+jLlVLpbuttom9+WmXCxxnEJBrlSRN08X2ILlU6oP?=
- =?us-ascii?Q?i7+Vd6Y4c9YDpAl7wficzygSyusmYUMuGwS8ESvySOSry9OUQ42SkzG8IG04?=
- =?us-ascii?Q?d4kQ3vrZBn/vCWxZa49yqYKubnIsM756/xbCXR0PZvMTXLHp0dLfg2YHclaS?=
- =?us-ascii?Q?WUzhG8TmNkwsIBai39e3pFeSCrUN0WIT1NfXaAuoJuxAhA2kr+YxMMaHtBMg?=
- =?us-ascii?Q?iQl9Ev6n6msvRX+K76SwPfNfbz2MCGqKBNzJXPMDU7E0Dk8EIRICA5jHHEc0?=
- =?us-ascii?Q?Ut/qjpLnymftxEN28uxxo7tGgCKjA4nI5EhxppIU5S/qwv0d8Njg773Lgo7P?=
- =?us-ascii?Q?b30G2y596HYHWj9zlyxzjjE0XmSrgq/F1x3VXQVFMxlkYlZ7wB0AZWq/f5YC?=
- =?us-ascii?Q?RI2Lt94gwawRvSDrqYsqJK6yQ5kJq2U6fEqrtOC4hP0iaD/Pb3aG1Hoe1MwB?=
- =?us-ascii?Q?/BJPZyvI46sUCP1DQOpXYHbid4QTe3cYU5xlKlMnPXg8K+5LWxB4EZnYPvFS?=
- =?us-ascii?Q?DIU65GlTSLlddK0Mabl8fHbIv8xh3tzRg3z3?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?y6jg0FxUli3QmQRxz4K/5O3cjTDMPdOowx53N09DYKiQhtvA2AtaMvN2YYD4?=
- =?us-ascii?Q?FGKKK3Wt5T6fWjS6+B7hn36nRYtKEki1Q4sl8G3qwmivBObANherSh1ksv0+?=
- =?us-ascii?Q?Ne+uCPo6w1EIXR5OxrpP6ZqoLcQenlZmsQkJtYNZZsfeBID5k1ahz3a7HAYt?=
- =?us-ascii?Q?sqmoY4CI8RDfdMl6KDETec+SXDRqmQ7OdFHKP3NduAKv4jxKITrs0wrkNPwZ?=
- =?us-ascii?Q?H1NFRCDYGpqOZSdos584eP9w3DK2kSyfQLzZOSFmh4JE20Eka21/MvtVIEmp?=
- =?us-ascii?Q?MT1L+nHFymNZNeUs39y+oTKVP3PcbxJiv6i87Bz1Jj0uvas784QLptHUyG3y?=
- =?us-ascii?Q?qAR9/d84lQB+PexK06j8In/gyCtiAjte/xTjH7Mt8KU03YzikEHQISm6rm9b?=
- =?us-ascii?Q?58/z64IGsaI/pmtg7oQ7uR71kuuWocyPaLoyaQm8H1l0n0ona9sKiZwgYIQu?=
- =?us-ascii?Q?IueqQM3yl5gvFjcQ9lMorm4X7lVBVKVmYTDoVFjyfk9AsZMqvH1hsIKURits?=
- =?us-ascii?Q?+4+x3fjKt3CQPkzjsmo7TrFWQjB88oJxu+F3rIVcbSTetPD1Wpl24Oq2l+3t?=
- =?us-ascii?Q?RBH64Z3sc9gRBCrbM3nkAEKteb33SwMW6BEpyJexiu28mXsEccAvM1SuR1NB?=
- =?us-ascii?Q?A/pQc6RoxJ1RKtcIrM/YDdUZswRZf5aY6lrr/RNyIZxabpu7tCdo1+T2e3Pp?=
- =?us-ascii?Q?xJvx4wlv9E9zawvWVuHrqRg9Ed2BHumFwdBsDZWizgr1AaxJUN+vd7QccnqZ?=
- =?us-ascii?Q?IfOzCm21KdCrtUibwjH/JwmdnrKVWatQRyWVIyh1KAahM846PpOWQVerq+jN?=
- =?us-ascii?Q?9JUtTzzwv3k0dugxlsw061IaELXhF5cACJeMAONcvhT1+Fo5kEvvBMiYuyOb?=
- =?us-ascii?Q?3P+w7YVmpAsx0Ml88tjP0cvMEkdosG+s7R0pQnez6PDwBL31imrNvexlbWg0?=
- =?us-ascii?Q?sB+ayv6VZm5jT4KgFZ7clmpKzEiFheYur4MFGmsb98R+duo5V3y36a28sLfG?=
- =?us-ascii?Q?swGg9oVQkgsTppheywJUWR93mKf8gdf6LKom27wRl6RVpMzsq12Cb+Z39TEX?=
- =?us-ascii?Q?k6uol7F0xFh1EExqVPU4avkWN58CVWVHPX/+km179AQdFtpOxMGI0mbAysgF?=
- =?us-ascii?Q?cLXAdDOKs/MMtrQBEoI2T2IqjIUT5sxWHN29BO1TdVDT64WHMASQRakvq3dC?=
- =?us-ascii?Q?PdXyXLqL1likTc4yGKmp3p4EQwrluPSumcKoja+ryB0eDvFfqcjBYmCjxEdV?=
- =?us-ascii?Q?z7Ki412trsFdSnys3BvabnfNjR1ceypNi7mBWIm38ZCSl7DfZ2n05qFhC+TC?=
- =?us-ascii?Q?rchR6jIgHDg9vTAuGcpHKsbHKU5QkJ/iEFkHeC8Y8EhkagD59HnEElf3lTm4?=
- =?us-ascii?Q?FJbhjIuJRnhPCQkMb6TmV650AmFcmCwcCSDqmVZQD6nHUio2ncV5BjpOg2/A?=
- =?us-ascii?Q?LcJoHlKPQN41upOLa5HcY4MltKkNAadFldWW16LWUq4kbF6xrkmIJhBbBxmE?=
- =?us-ascii?Q?CiD/fwJ6/2rY3AVY8O9HFhtT0qpleiuH52VIIzYaQfa4VC8ANMzTaaBkDTjn?=
- =?us-ascii?Q?jzKcfnq1+Bkz/3uCWhdOaZstHMM6giKhrHWWGNxLKcBt+Ee6+AnoTsBxRFZK?=
- =?us-ascii?Q?Gw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571E533C519;
+	Fri, 21 Nov 2025 09:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763717012; cv=none; b=Y5qtItLOa47Ygq8y4TvfayHM61im1ijlfyq4gLPSC/cu0uFZNoyM+u5T2NgVqVpvfGgf8LTX7coUOHUNUZbNp/UzCl2nXGJb+LrdGDYuD+aS+/wc6UK5ETdef+EENipyM4mFul8oX50FOBna68bzacAScnr0aqtaDT/7gsYNoiA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763717012; c=relaxed/simple;
+	bh=+5r5M+XjdNfDZF30/xVMNjtVt/AXHifID6EEEYPo0vo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EbraUMHeGy8wQGuF+9pIARlPaAhKSOMfamQetOvdeZ4Gsyq7Z9VVrGrjrbqHv+T3yXsrHiNdOUxb9U1jZJcNvRG+SVqWUGXknbElAFW1VBId2ITEHOr/YQiMUE1hAqz3Z/7/hBET8zTb9Cxx5JSPB6bVm2lgScbhZW56lQra7ME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=IuvGVpB0; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.248] ([129.217.186.248])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5AL9MsJG001806
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 21 Nov 2025 10:22:55 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1763716975;
+	bh=+5r5M+XjdNfDZF30/xVMNjtVt/AXHifID6EEEYPo0vo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=IuvGVpB07VG27ZINKrgDMTA4P73PHOzA7V25P23FKBnR1i0KwG7h4v4TSjlXncbtI
+	 cloKvi/kJwGyEFemOy1PI9PuLbuPhzYEKQJRm73haUYW/qO9NHu/I/n4GSIIAcvO9H
+	 4rusZGlWB2wfvEDid7EQo4nTgG6UEex29KfcDhZ4=
+Message-ID: <b9fff8e1-fb96-4b1f-9767-9d89adf31060@tu-dortmund.de>
+Date: Fri, 21 Nov 2025 10:22:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d88aa44-cf5b-4e33-7f48-08de28df4fe9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2025 09:21:11.6067
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tlDoLPRXuRboWSM8vhiuS/gluq/mj3c15j+7A04uB4xXAKmGHAw2T7GEuFPv4VM71DHWv/a4Xsvh5qQ0X5LSq2m17IDFeGjeURSgfDhWrBI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6856
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v6 0/8] tun/tap & vhost-net: netdev queue flow
+ control to avoid ptr_ring tail drop
+To: Jason Wang <jasowang@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
+        jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
+ <CACGkMEuboys8sCJFUTGxHUeouPFnVqVLGQBefvmxYDe4ooLfLg@mail.gmail.com>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <CACGkMEuboys8sCJFUTGxHUeouPFnVqVLGQBefvmxYDe4ooLfLg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+On 11/21/25 07:19, Jason Wang wrote:
+> On Thu, Nov 20, 2025 at 11:30 PM Simon Schippers
+> <simon.schippers@tu-dortmund.de> wrote:
+>>
+>> This patch series deals with tun/tap and vhost-net which drop incoming
+>> SKBs whenever their internal ptr_ring buffer is full. Instead, with this
+>> patch series, the associated netdev queue is stopped before this happens.
+>> This allows the connected qdisc to function correctly as reported by [1]
+>> and improves application-layer performance, see our paper [2]. Meanwhile
+>> the theoretical performance differs only slightly:
+>>
+>> +--------------------------------+-----------+----------+
+>> | pktgen benchmarks to Debian VM | Stock     | Patched  |
+>> | i5 6300HQ, 20M packets         |           |          |
+>> +-----------------+--------------+-----------+----------+
+>> | TAP             | Transmitted  | 195 Kpps  | 183 Kpps |
+>> |                 +--------------+-----------+----------+
+>> |                 | Lost         | 1615 Kpps | 0 pps    |
+>> +-----------------+--------------+-----------+----------+
+>> | TAP+vhost_net   | Transmitted  | 589 Kpps  | 588 Kpps |
+>> |                 +--------------+-----------+----------+
+>> |                 | Lost         | 1164 Kpps | 0 pps    |
+>> +-----------------+--------------+-----------+----------+
+> 
 
+Hi Jason,
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Jakub Slepecki
-> Sent: Thursday, November 20, 2025 5:28 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: linux-kernel@vger.kernel.org; netdev@vger.kernel.org; Kitszel,
-> Przemyslaw <przemyslaw.kitszel@intel.com>; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; michal.swiatkowski@linux.intel.com;
-> Slepecki, Jakub <jakub.slepecki@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next 4/8] ice: allow overriding
-> lan_en, lb_en in switch
->=20
-> Currently, lan_en and lb_en are determined based on switching mode,
-> destination MAC, and the lookup type, action type and flags of the
-> rule in question.  This gives little to no options for the user (such
-> as
-> ice_fltr.c) to enforce rules to behave in a specific way.
->=20
-> Such functionality is needed to work with pairs of rules, for example,
-> when handling MAC forward to LAN together with MAC,VLAN forward to
-> loopback rules pair.  This case could not be easily deduced in a
-> context of a single filter without adding a specialized flag.
->=20
-> Instead of adding a specialized flag to mark special scenario rules,
-> we add a slightly more generic flag to the lan_en and lb_en themselves
-> for the ice_fltr.c to request specific destination flags later on, for
-> example, to override value:
->=20
->     struct ice_fltr_info fi;
->     fi.lb_en =3D ICE_FLTR_INFO_LB_LAN_FORCE_ENABLED;
->     fi.lan_en =3D ICE_FLTR_INFO_LB_LAN_FORCE_DISABLED;
->=20
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Signed-off-by: Jakub Slepecki <jakub.slepecki@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_switch.c | 21 +++++++++++++-------
-> -  drivers/net/ethernet/intel/ice/ice_switch.h |  7 +++++++
->  2 files changed, 20 insertions(+), 8 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c
-> b/drivers/net/ethernet/intel/ice/ice_switch.c
-> index 04e5d653efce..7b63588948fd 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_switch.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-> @@ -2538,8 +2538,9 @@ int ice_get_initial_sw_cfg(struct ice_hw *hw)
->   */
->  static void ice_fill_sw_info(struct ice_hw *hw, struct ice_fltr_info
-> *fi)  {
-> -	fi->lb_en =3D false;
-> -	fi->lan_en =3D false;
-> +	bool lan_en =3D false;
-> +	bool lb_en =3D false;
-> +
->  	if ((fi->flag & ICE_FLTR_TX) &&
->  	    (fi->fltr_act =3D=3D ICE_FWD_TO_VSI ||
->  	     fi->fltr_act =3D=3D ICE_FWD_TO_VSI_LIST || @@ -2549,7 +2550,7
-> @@ static void ice_fill_sw_info(struct ice_hw *hw, struct
-> ice_fltr_info *fi)
->  		 * packets to the internal switch that will be dropped.
->  		 */
->  		if (fi->lkup_type !=3D ICE_SW_LKUP_VLAN)
-> -			fi->lb_en =3D true;
-> +			lb_en =3D true;
->=20
->  		/* Set lan_en to TRUE if
->  		 * 1. The switch is a VEB AND
-> @@ -2578,14 +2579,18 @@ static void ice_fill_sw_info(struct ice_hw
-> *hw, struct ice_fltr_info *fi)
->  			     !is_unicast_ether_addr(fi-
-> >l_data.mac.mac_addr)) ||
->  			    (fi->lkup_type =3D=3D ICE_SW_LKUP_MAC_VLAN &&
->  			     !is_unicast_ether_addr(fi-
-> >l_data.mac.mac_addr)))
-> -				fi->lan_en =3D true;
-> +				lan_en =3D true;
->  		} else {
-> -			fi->lan_en =3D true;
-> +			lan_en =3D true;
->  		}
->  	}
->=20
->  	if (fi->flag & ICE_FLTR_TX_ONLY)
-> -		fi->lan_en =3D false;
-> +		lan_en =3D false;
-> +	if (!(fi->lb_en & ICE_FLTR_INFO_LB_LAN_FORCE_MASK))
-> +		fi->lb_en =3D lb_en;
-> +	if (!(fi->lan_en & ICE_FLTR_INFO_LB_LAN_FORCE_MASK))
-> +		fi->lan_en =3D lan_en;
-For me it looks strange.
-What type the fi->lb_en has?=20
-fi->lb_en declared as bool, and you assign fi->lan_en from bool.
-But you check condition by fi->lan_en & ICE_FLTR_INFO_LB_LAN_FORCE_MASK ?
-It rases questions if fi->lan_en a bool why use fi->lan_en & ICE_FLTR_INFO_=
-LB_LAN_FORCE_MASK then?
-And if fi->lan_en is a bitmask why not use FIELD_GET(ICE_FLTR_INFO_LB_LAN_F=
-ORCE_MASK, fi->lan_en) and
-why not something like:
+thank you for your reply!
 
-if (!FIELD_GET(ICE_FLTR_INFO_LB_LAN_FORCE_MASK, fi->lan_en))
-    FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_MASK, &fi->lan_en, lan_en);
+> PPS drops somehow for TAP, any reason for that?
 
-It could preserve unrelated bits (like FORCE) and make the code resilient t=
-o future changes in bit positions?
+I have no explicit explanation for that except general overheads coming
+with this implementation.
 
->  }
->=20
->  /**
-> @@ -2669,9 +2674,9 @@ ice_fill_sw_rule(struct ice_hw *hw, struct
-> ice_fltr_info *f_info,
->  		return;
->  	}
->=20
-> -	if (f_info->lb_en)
-> +	if (f_info->lb_en & ICE_FLTR_INFO_LB_LAN_VALUE_MASK)
->  		act |=3D ICE_SINGLE_ACT_LB_ENABLE;
-> -	if (f_info->lan_en)
-> +	if (f_info->lan_en & ICE_FLTR_INFO_LB_LAN_VALUE_MASK)
->  		act |=3D ICE_SINGLE_ACT_LAN_ENABLE;
->=20
->  	switch (f_info->lkup_type) {
-> diff --git a/drivers/net/ethernet/intel/ice/ice_switch.h
-> b/drivers/net/ethernet/intel/ice/ice_switch.h
-> index 671d7a5f359f..a7dc4bfec3a0 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_switch.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_switch.h
-> @@ -72,6 +72,13 @@ enum ice_src_id {
->  	ICE_SRC_ID_LPORT,
->  };
->=20
-> +#define ICE_FLTR_INFO_LB_LAN_VALUE_MASK BIT(0) #define
-> +ICE_FLTR_INFO_LB_LAN_FORCE_MASK BIT(1)
-> +#define ICE_FLTR_INFO_LB_LAN_FORCE_ENABLED	\
-> +	(ICE_FLTR_INFO_LB_LAN_VALUE_MASK |	\
-> +	 ICE_FLTR_INFO_LB_LAN_FORCE_MASK)
-> +#define ICE_FLTR_INFO_LB_LAN_FORCE_DISABLED
-> +ICE_FLTR_INFO_LB_LAN_FORCE_MASK
-> +
->  struct ice_fltr_info {
->  	/* Look up information: how to look up packet */
->  	enum ice_sw_lkup_type lkup_type;
-> --
-> 2.43.0
+> 
+> Btw, I had some questions:
+> 
+> 1) most of the patches in this series would introduce non-trivial
+> impact on the performance, we probably need to benchmark each or split
+> the series. What's more we need to run TCP benchmark
+> (throughput/latency) as well as pktgen see the real impact
 
+What could be done, IMO, is to activate tun_ring_consume() /
+tap_ring_consume() before enabling tun_ring_produce(). Then we could see
+if this alone drops performance.
+
+For TCP benchmarks, you mean userspace performance like iperf3 between a
+host and a guest system?
+
+> 
+> 2) I see this:
+> 
+>         if (unlikely(tun_ring_produce(&tfile->tx_ring, queue, skb))) {
+>                 drop_reason = SKB_DROP_REASON_FULL_RING;
+>                 goto drop;
+>         }
+> 
+> So there could still be packet drop? Or is this related to the XDP path?
+
+Yes, there can be packet drops after a ptr_ring resize or a ptr_ring
+unconsume. Since those two happen so rarely, I figured we should just
+drop in this case.
+
+> 
+> 3) The LLTX change would have performance implications, but the
+> benmark doesn't cover the case where multiple transmission is done in
+> parallel
+
+Do you mean multiple applications that produce traffic and potentially
+run on different CPUs?
+
+> 
+> 4) After the LLTX change, it seems we've lost the synchronization with
+> the XDP_TX and XDP_REDIRECT path?
+
+I must admit I did not take a look at XDP and cannot really judge if/how
+lltx has an impact on XDP. But from my point of view, __netif_tx_lock()
+instead of __netif_tx_acquire(), is executed before the tun_net_xmit()
+call and I do not see the impact for XDP, which calls its own methods.
+> 
+> 5) The series introduces various ptr_ring helpers with lots of
+> ordering stuff which is complicated, I wonder if we first have a
+> simple patch to implement the zero packet loss
+
+I personally don't see how a simpler patch is possible without using
+discouraged practices like returning NETDEV_TX_BUSY in tun_net_xmit or
+spin locking between producer and consumer. But I am open for
+suggestions :)
+
+> 
+>>
+>> This patch series includes tun/tap, and vhost-net because they share
+>> logic. Adjusting only one of them would break the others. Therefore, the
+>> patch series is structured as follows:
+>> 1+2: new ptr_ring helpers for 3
+>> 3: tun/tap: tun/tap: add synchronized ring produce/consume with queue
+>> management
+>> 4+5+6: tun/tap: ptr_ring wrappers and other helpers to be called by
+>> vhost-net
+>> 7: tun/tap & vhost-net: only now use the previous implemented functions to
+>> not break git bisect
+>> 8: tun/tap: drop get ring exports (not used anymore)
+>>
+>> Possible future work:
+>> - Introduction of Byte Queue Limits as suggested by Stephen Hemminger
+> 
+> This seems to be not easy. The tx completion depends on the userspace behaviour.
+
+I agree, but I really would like to reduce the buffer bloat caused by the
+default 500 TUN / 1000 TAP packet queue without losing performance.
+
+> 
+>> - Adaption of the netdev queue flow control for ipvtap & macvtap
+>>
+>> [1] Link: https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
+>> [2] Link: https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
+>>
+> 
+> Thanks
+> 
+
+Thanks! :)
 
