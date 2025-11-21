@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-240899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E9DC7BEBD
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:10:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D07C7BEC6
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:12:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B2690366E94
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 23:10:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4039C367089
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 23:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CA8310629;
-	Fri, 21 Nov 2025 23:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D249D2DE6EF;
+	Fri, 21 Nov 2025 23:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gfy3Mwfe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YU4VRKu3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C962D8762
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 23:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7434B2D5C74
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 23:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763766613; cv=none; b=ZaB0v+QqkgkXzFP/7jDNdNBt4LgaXPm0IPD4TkyeYcePbYL1jdVq6yQEbOYKv4bsgHB8eTTYb89rMJg3b2EXLIWHjioZ6HbLgKLv6I+aPlZzIaFJPmRBQAWq2SgZtwtbeAcUfVjtFl4vKz/hrbrtV2gNtkwoXpF8hMtdrZJl2VU=
+	t=1763766745; cv=none; b=QDtSMcIDcZBMfJ3VityLPTgwgnTggIESpBcbP1fEY0bKr1fPCke+VrOZW1XKKV0LzY+cBeG94XJQcnpcNp4liNouK+YNYcr63oW10GbfmVgM8Nz8OJkfRkn9ekrhui6p7mDAQhK2QTdVT7bZFqtn80FmVIQlqgCb+5eJVdoN4Nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763766613; c=relaxed/simple;
-	bh=VdHSOcTtxGxUrX1sBmgMTtbKzqAZgA48oaPuJfmSDVo=;
+	s=arc-20240116; t=1763766745; c=relaxed/simple;
+	bh=b0GsJjNOkd23Y8b/rhP04LJ129wq4rJm6upoQsP5r58=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=WbVuzLAJMbl9kI2eeYhjtczraIbLL48d8JCNn0znbMiHilQqGHvlI5c1pYRf2n/1BcCmJ9Dxw0UfPR+SYXjuNg9288kT3uhWG73uOcX7BtDWEDp1SFueQplHIE39pz4skpDVXK09C9Htyz1acDzSyS6KQGgzNLilq/TJlJ8gg34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gfy3Mwfe; arc=none smtp.client-ip=209.85.128.182
+	 Mime-Version:Content-Type; b=nTgcI9pBd/x2f7nUawN89ziI0GP3qzJbJ5prGpwgAykdujPNcJ7d+QiVuQrYrthcwTVohXY4vpwL3QeDZmBt8WmOZf2JVBW3wQjWNfjUtbyd5dkvEJ+MCROK6k/doGYFYafiDUKFNpiI+g8/eDhKUgChM9pkd4GmMO21ZsT8Dps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YU4VRKu3; arc=none smtp.client-ip=74.125.224.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-78a76afeff6so27769507b3.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 15:10:07 -0800 (PST)
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-63fc6115d65so2172610d50.0
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 15:12:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763766605; x=1764371405; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763766737; x=1764371537; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XIhyiakhBQz7pP1gby69E80SsuyQpol3QkLbw3g393Q=;
-        b=Gfy3MwfeBAYXXFSDqQBu+dxtBEWzVHhV0k67Me+B+IKfi+rm+AIm0fF2tWd0W9FSw5
-         E5V1rel0jQnt9SLmNNetqtkoJf0MBJt7biWmIwdC+4QJ8nDyI17AozBJiDvDtnjM8yzG
-         DslS4SMJkKhYDTT7oz3p6hLHoGrJZRZB0Tv8NBbLcz8YyPYQ3FuSIKvtFXjTaBVQ7ciW
-         9zrNdBDsFFdDGc7kZxNsakPMklVf6HMDWWNlSYgZZ5BBocjzQVtQSEV/7gEqQUuS1Lb3
-         Hod9sk6sRY3/SEvktzUI8Q8WCthkPBDH1gVJLAdXoxMVOzoCtBcTvIMNA6tF7Tj60g4I
-         ofsg==
+        bh=ER0EqnipfQR28gz9kSpw01iLCYoIz+RpULRJggWqctc=;
+        b=YU4VRKu3K+fhPvpG5WaIudyNIZ9MR2lX/t4N6FlhwJHE4y99fp/WyEDf37YyMk0f2X
+         MnmZJ1OBbEb0lgvzD6ioYtO5DjaGob1xGbM1V5xyH6F02qYvdoHz72fGUb2ccuFMLAho
+         q3f6BPDfbRIyStg7hwT9cIQottnjVEYV9gvK+jJ2pEqCFRdPD3rK+PcvX9EWbhW6TkAI
+         oRXpNUGCjQW/FLxPZsVwt3hpRvjerp1NWUZ1O9+h03ye71GvKcU2lO1PGPjw5llybML1
+         W662/1N3I/1athQLStiSeYETXQfM3N2l0R8SYunrDN6Cxqd4WZyJ9ejjRKgQe5OvWDkC
+         SfkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763766605; x=1764371405;
+        d=1e100.net; s=20230601; t=1763766737; x=1764371537;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=XIhyiakhBQz7pP1gby69E80SsuyQpol3QkLbw3g393Q=;
-        b=WMccKhG2AODIUrirT/ztVZq6SR8qHalSkx62QuhVPe/fxRhhbL9Kar7Kq9/FGDO/OB
-         bw2Ymp1Oi2PvVF1u1RcppbXiqab3/u/t2h3Q6M+ik8Tovisy78XmRdXTqybGNjNDxRnN
-         7FB/oqKP3zUkyJ1mvyfQDOhUcDxRUoD6IYwRO6v2PPRFBqh44WHA679cS2kKKgt4w3Mg
-         vmkSVl3E0CI7m/i0HgNtkDTNr55B/AQHpsu/SlfbRBRkqh7VUayd2tmsJKkqL5TTIswj
-         LcG++uLiPqMm6aagG9zHWb9YvOxzDSA6JZ4HMdWlOiW6Kw6c6fsEnPrWDjJG0A6ha0es
-         B2lA==
-X-Gm-Message-State: AOJu0YzYraernGxKPV2+zJFE7rUizFk2hvWKNh3SIIit8GmfZGRDT84q
-	4zpSyFxauToI2sQyOR1Xy5BXRkxoD7e/tHyOBH4gXrBiT7ziYGgvyIoS
-X-Gm-Gg: ASbGnctsyF1GwqlSvlzgyaC4hTjQPz5KOyYk+zQ2SXPPu6r+jbwDzfw+bsHFXialxBc
-	Ks1ICmzxR1t/1egT3nJ0VkdbwD7ophvrgxqkWTU77zs7jnhPirP1QZgR49vopLXD2PqEwq6AMSg
-	wFktUcfI5YUo0HEAnRGhv9ktfS/xs+1guJfWpNXuT2WAEZ/axqRR4MH70e2ky4RAs5iL0iV1rFF
-	cYv9kMVIVQasdm3cMSQz2dDMneFD+V1tw8JHAG/+yskc6kY0mxnVAHelFSQuDYMcwXtCE/K3xdo
-	MLpRRAALMXBNQ+CGxiSZ9N9V9YwG3dOkBMv1C3dG+WQ7q73AzgnEUBeIdDmXr8FoNLD2pqWVvx2
-	R6uufJvUaQc5wMCJ/pcpIztyTSy66/E0sYuA2Kccvoz13CqcHFEz0NHM5nZC6s1pSC0zaQdTQuo
-	Q7ZrH+xMLYHZRgeIRekr1jlCMkcDGGUvLprDImRjSeSbqTMqbjLMl+yktojzb+KdrxxFs=
-X-Google-Smtp-Source: AGHT+IHfCNm/h1SWg6slN1yIU0nIrFVDdi5F9NffXFDZ8GMcG484usVNe9HQYWOgCoGXaTA5uDjGxg==
-X-Received: by 2002:a05:690c:b9e:b0:787:d2ee:e2d6 with SMTP id 00721157ae682-78a8b53930fmr29887407b3.34.1763766605302;
-        Fri, 21 Nov 2025 15:10:05 -0800 (PST)
+        bh=ER0EqnipfQR28gz9kSpw01iLCYoIz+RpULRJggWqctc=;
+        b=D2rbS46Hy+0C3MtwF4HtMIop4Dq7ZGM1u6gQTaUd7SwzZvSPNbaVFl1iiLVfICQEhi
+         mLJ16eLv9GspEv88caCpI1ne6onhgXqHFXXya48fBYYngfmgeK3qi7sTnGR5J7Ia8MpV
+         EDmYJRPa2agfo+KvJ6Hc/g4slFFZwveyPffdeE5WNGdHgIbe4DQ5jZmYhmaluIzI6FF8
+         P+CEYlfWwuO37179X78IYvEguFn2xdBpmyG4OOKre2zv3ez4uxmfiyjZiMKbiN+NUPz0
+         SzBV1u/a9Exz3del+6h45OFgSC33xQhuEJ3/m/v3EE07iLvGT5N3vB+zT0KZ83PcQ8yv
+         LvWg==
+X-Gm-Message-State: AOJu0YyxZswKBc7XmZp1osySCftd3ccTKxr8IYeCM6n/XeSnGNARUAh3
+	L/hjQ90IQlZUegONixprKRfCprtryOW65rVsx1Pie3aEHjVIImPvxcLU
+X-Gm-Gg: ASbGncs3mv0TDxwg17D3VUz3BoSmiwQtTgMAfRllu0cBR1jqoc01dPOQZxY/RHrPYCU
+	jgFAyLQfVq5IFYWb0c7VZxetmXQD0buZy+n8lvRBIo69Ki8z4mjepB0Hnom8jjVY9gSkBhERBDJ
+	3BuLzvmTFeRkYPBmpQg7GxsF7nBJLg/fNpIUzvmTYi7UdD9qKbdxZEvZcjbNbxCZpv1X2DhXGuw
+	YlxQAaact9douG8E27y+gF/C09gSW5oi1je/O+DxdO7RF6esM2tScq1c0gCnHvg5DUcpY5ankC7
+	k6pnAzy7tJsAXPixWXZmoCRHr7NolTnHkInBxQ0JnHgVrL7jQFqFV4BYYBY5yPuAhaW+4c9gKQE
+	WaL2Kc3bqgiuGbS7NYviBvybD/pAZ3DM9DTv4U5wYbJY1ExTW/BoBlHKNJVyofP1OTEgIUZh0BY
+	FMwKp8PY0n3nBMlZBBlj3HrcLWTQFLQsssgItpswP27RHe1+87cGHDGVjeO/6vkG3aOSzda+7Lz
+	NNhlg==
+X-Google-Smtp-Source: AGHT+IFtWJ6o3fFiC7w0yCo09Sxi6MfOMUc8IK5cJlx6nfs3tpvkiRuecR5cvjP6jh7JG3gHDx0YfA==
+X-Received: by 2002:a05:690e:40e:b0:641:eb21:d6ac with SMTP id 956f58d0204a3-64302ab2666mr2074060d50.44.1763766737456;
+        Fri, 21 Nov 2025 15:12:17 -0800 (PST)
 Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78a798804c4sm19847067b3.3.2025.11.21.15.10.03
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-642f70a6c44sm2131489d50.10.2025.11.21.15.12.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 15:10:04 -0800 (PST)
-Date: Fri, 21 Nov 2025 18:10:02 -0500
+        Fri, 21 Nov 2025 15:12:16 -0800 (PST)
+Date: Fri, 21 Nov 2025 18:12:16 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>, 
  davem@davemloft.net
@@ -88,11 +89,12 @@ Cc: netdev@vger.kernel.org,
  shuah@kernel.org, 
  linux-kselftest@vger.kernel.org, 
  Jakub Kicinski <kuba@kernel.org>
-Message-ID: <willemdebruijn.kernel.2fe8d4c058a2d@gmail.com>
-In-Reply-To: <20251121040259.3647749-1-kuba@kernel.org>
+Message-ID: <willemdebruijn.kernel.224bdf2fac125@gmail.com>
+In-Reply-To: <20251121040259.3647749-5-kuba@kernel.org>
 References: <20251121040259.3647749-1-kuba@kernel.org>
-Subject: Re: [PATCH net-next 0/5] selftests: hw-net: toeplitz: read config
- from the NIC directly
+ <20251121040259.3647749-5-kuba@kernel.org>
+Subject: Re: [PATCH net-next 4/5] selftests: hw-net: toeplitz: read
+ indirection table from the device
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,34 +106,82 @@ Content-Type: text/plain;
 Content-Transfer-Encoding: 7bit
 
 Jakub Kicinski wrote:
-> First patch here tries to auto-disable building the iouring sample.
-> Our CI will still run the iouring test(s), of course, but it looks
-> like the liburing updates aren't very quick in distroes and having
-> to hack around it when developing unrelated tests is a bit annoying.
+> Replace the simple modulo math with the real indirection table
+> read from the device. This makes the tests pass for mlx5 and
+> bnxt NICs.
 > 
-> Remaining 4 patches iron out running the Toeplitz hash test against
-> real NICs. I tested mlx5, bnxt and fbnic, they all pass now.
-> I switched to using YNL directly in the C code, can't see a reason
-> to get the info in Python and pass it to C via argv. The old code
-> likely did this because it predates YNL.
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  .../selftests/drivers/net/hw/toeplitz.c       | 24 ++++++++++++++++++-
+>  1 file changed, 23 insertions(+), 1 deletion(-)
 > 
-> Jakub Kicinski (5):
->   selftests: hw-net: auto-disable building the iouring C code
->   selftests: hw-net: toeplitz: make sure NICs have pure Toeplitz
->     configured
->   selftests: hw-net: toeplitz: read the RSS key directly from C
->   selftests: hw-net: toeplitz: read indirection table from the device
->   selftests: hw-net: toeplitz: give the test up to 4 seconds
+> diff --git a/tools/testing/selftests/drivers/net/hw/toeplitz.c b/tools/testing/selftests/drivers/net/hw/toeplitz.c
+> index 7420a4e201cc..a4d04438c313 100644
+> --- a/tools/testing/selftests/drivers/net/hw/toeplitz.c
+> +++ b/tools/testing/selftests/drivers/net/hw/toeplitz.c
+> @@ -68,6 +68,7 @@
+>  #define FOUR_TUPLE_MAX_LEN	((sizeof(struct in6_addr) * 2) + (sizeof(uint16_t) * 2))
+>  
+>  #define RSS_MAX_CPUS (1 << 16)	/* real constraint is PACKET_FANOUT_MAX */
+> +#define RSS_MAX_INDIR	(1 << 16)
+
+Only if respinning, maybe also fix alignment of RSS_MAX_CPUS
+  
+>  #define RPS_MAX_CPUS 16UL	/* must be a power of 2 */
+>  
+> @@ -105,6 +106,8 @@ struct ring_state {
+>  static unsigned int rx_irq_cpus[RSS_MAX_CPUS];	/* map from rxq to cpu */
+>  static int rps_silo_to_cpu[RPS_MAX_CPUS];
+>  static unsigned char toeplitz_key[TOEPLITZ_KEY_MAX_LEN];
+> +static unsigned int rss_indir_tbl[RSS_MAX_INDIR];
+> +static unsigned int rss_indir_tbl_size;
+>  static struct ring_state rings[RSS_MAX_CPUS];
+>  
+>  static inline uint32_t toeplitz(const unsigned char *four_tuple,
+> @@ -133,7 +136,12 @@ static inline uint32_t toeplitz(const unsigned char *four_tuple,
+>  /* Compare computed cpu with arrival cpu from packet_fanout_cpu */
+>  static void verify_rss(uint32_t rx_hash, int cpu)
+>  {
+> -	int queue = rx_hash % cfg_num_queues;
+> +	int queue;
+> +
+> +	if (rss_indir_tbl_size)
+> +		queue = rss_indir_tbl[rx_hash % rss_indir_tbl_size];
+> +	else
+> +		queue = rx_hash % cfg_num_queues;
+>  
+>  	log_verbose(" rxq %d (cpu %d)", queue, rx_irq_cpus[queue]);
+>  	if (rx_irq_cpus[queue] != cpu) {
+> @@ -517,6 +525,20 @@ static void read_rss_dev_info_ynl(void)
+>  
+>  	memcpy(toeplitz_key, rsp->hkey, rsp->_len.hkey);
+>  
+> +	if (rsp->_count.indir > RSS_MAX_INDIR)
+> +		error(1, 0, "RSS indirection table too large (%u > %u)",
+> +		      rsp->_count.indir, RSS_MAX_INDIR);
+> +
+> +	/* If indir table not available we'll fallback to simple modulo math */
+> +	if (rsp->_count.indir) {
+> +		memcpy(rss_indir_tbl, rsp->indir,
+> +		       rsp->_count.indir * sizeof(rss_indir_tbl[0]));
+
+It can be assumed that rsp->indir elements are sizeof(rss_indir_tbl[0])?
+
+Is there a way to have the test verify element size. I'm not that
+familiar with YNL.
+
+> +		rss_indir_tbl_size = rsp->_count.indir;
+> +
+> +		log_verbose("RSS indirection table size: %u\n",
+> +			    rss_indir_tbl_size);
+> +	}
+> +
+>  	ethtool_rss_get_rsp_free(rsp);
+>  	ethtool_rss_get_req_free(req);
+>  	ynl_sock_destroy(ys);
+> -- 
+> 2.51.1
 > 
->  .../testing/selftests/drivers/net/hw/Makefile | 23 ++++++-
->  .../selftests/drivers/net/hw/toeplitz.c       | 65 ++++++++++++++++++-
->  .../selftests/drivers/net/hw/toeplitz.py      | 28 ++++----
->  3 files changed, 98 insertions(+), 18 deletions(-)
 
-For the series:
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-
-Thanks for improving the test! Especially addressing the missing
-indirection table.
 
