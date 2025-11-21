@@ -1,150 +1,160 @@
-Return-Path: <netdev+bounces-240707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 930F4C7822E
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 10:25:37 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EEFCC782B8
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 10:34:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7052E343A8B
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:23:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 28C1536940
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:24:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060BC3431E4;
-	Fri, 21 Nov 2025 09:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5AF309DA1;
+	Fri, 21 Nov 2025 09:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wh3D+C67";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PI/AMUdh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347B1342CA2
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 09:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC15302CC7
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 09:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763716833; cv=none; b=X0h2XzhjScXRMmyTqaeZo12y4obyph6AOqajsl/A5NxnXHZysxg8gnlPEDpxZfGI7L76cOykCx14mXU4QWWbpvHwooY8qZfWNF7eu5ZdIRxbjsK/aHQL9qbwvwE6uLfqnJPZRtYrHGk5C+0AYmcVzE/7IJVzceNYbws+MKKBDvU=
+	t=1763716875; cv=none; b=gnscK6YxX4x3A3qiXouxxJNKsc6NNvYpKE0eWBl4AqtbyDdV83V44W7zIGGm0q65LBiPyZgnIPsSMUi0b0dnCfDgDyEwK4OslHTqS8cjd+nVpoFfLHghlqeQGnV3palK3tnzya/QZ2jWAhQ+jjXzSDIA0peLwFq1GiQgawd2ijI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763716833; c=relaxed/simple;
-	bh=cL1RS04Vlbg5/isdthq1+y1Pb3yMmqLyOIAoOc+x41Q=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=f5GurzJBnNFLwA54nfu+y7QNOmKLuQcnaSOW9km45LQaxYt66neCTByzJ7wdO4O4CoKH6iufJzp/lBol81YEhjPlXSkLJYpfopFKfPFSXqFWKNm6L2RTk/BdQHmgtPnRnOKr6g/0q0X71QV7Q66Kr1f3oi8fgqyL7hwLX6bGgjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-94908fb82e0so154180139f.3
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 01:20:31 -0800 (PST)
+	s=arc-20240116; t=1763716875; c=relaxed/simple;
+	bh=88bzWzZsrFl3P0XuSIsfcAZAJYQYQd2cXTWkuomn7dc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MbQVpEBwHa23dwPyWCRosIPxW2pkI6bg9yerRKxZmjq61iuaMyqs9XbZSiyp/kImwjYjEVA1AyzUafanMr1JP8p+iu7YCn7e8r9/sda8VnpBFS0qzSTzg2ns/sI9brKsGBpvGYFuR1XC9mPEFTAjMFnJoceQ24Jpx9SgQ52j3Nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wh3D+C67; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PI/AMUdh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763716872;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FTcna51xyD4gkYI2wkOSx2yGaNSja9/HdHczSqaL88Y=;
+	b=Wh3D+C67WNaHE2duYqLdyjWKq6DIDieRfTmdmilkk6rmXKqtdh21Snp1koWhXVdUJoiKLG
+	CQHFFfVGjA681+vEdAFSprYe/VQnPsZRHFxyjXmcpjPuBYAjPYypGPhYK2oDe9scFerB7d
+	Ocsf2Gw7Hh/CaED9uPfw+H7f+vGYPng=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-562-Prg98G-PPUGsZmgJLUtAsw-1; Fri, 21 Nov 2025 04:21:11 -0500
+X-MC-Unique: Prg98G-PPUGsZmgJLUtAsw-1
+X-Mimecast-MFC-AGG-ID: Prg98G-PPUGsZmgJLUtAsw_1763716870
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b70b2a89c22so192767666b.0
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 01:21:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763716870; x=1764321670; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FTcna51xyD4gkYI2wkOSx2yGaNSja9/HdHczSqaL88Y=;
+        b=PI/AMUdhLo2uKxjDL1m2MckyXemgWbGMpT/Cxq1IKr6NfppVbZX79JBQKXCRo9i7QZ
+         pnMH1jj+xlZo9tXL6Ac9HDHnWav4J2CfD1kvrhPtKY8tXhJ6MWs2QQIwrmNUn/pb069Y
+         kBCW6pw2kn2CLwsh4sVPR2nPVDh54pxGaVUoKSyhhWRUDYTAUSjwoaZv76r2BgBx7EOZ
+         4G9XAUwiwkHntGfRmfyuO7qrABF+IMTKp2fha8/hFGZgydvDQ0mdOUXlVfPYCTRXGsYn
+         DEFvSLtD/1e1xTAeJa2JSw142MzBserrGKvBTbnOys4dt4+0pcwYY30Pe9EWpNMtqH0h
+         M4Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763716831; x=1764321631;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Y57Wj2emBMA0I4GdDAAg7azio1mhTOb6C4GKyshX+cY=;
-        b=luZ9UDqEVuKYyoDOxIzpgZsY7ohox/eLxz+9LEaO1Hr61ZnkCbs040zmOj3+kvziSv
-         VoNgCetaJG2HAgcc6ySLVVagx/i1jbVZe77ObD4FxhEBthVtDkN8DTeAFvrPP4zgiYBN
-         yX1XEjBi4iLnfvbTSJ9dW2w1m6Q7MoKfFSIFYIfPYpg+N0R0s9H+ZxXqXt5rnGLUz3fZ
-         +mG+HdsLuVAONZ7zj/7I+uxfbgsKHZshru5vKo1umz9lJkgBmd/A57LMGwjX2HlVBN+Y
-         Du+DEUqYEM2yFkZshhBuGO4IJG/xl329bxKpEFgmilti2697zP4PLV3mX/UyeOTgpBhL
-         Ckog==
-X-Forwarded-Encrypted: i=1; AJvYcCU0xJmjARpBeVS9HUpccao/V0/XA46yEYu4zilJkSW7LlxC2R3RrlrKCGGc6eQy4tJba0e4Z1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLJ9hr4ndY5px4F3TuTI6vwJFlR/wwblAQzpc644XJLq/tFXZU
-	X+CaE+ENqcNQU6TG6QjyEx4LObIyiUCFTEBvhOH5KMwV5aspiqz5dUUukUUhRcB8ExxuUdcteDB
-	JqGizn0DRPuFD6H/74MWFVPeeoYz9LRoPo6YuenzOg14AauPzbIcAGgoaWt8=
-X-Google-Smtp-Source: AGHT+IEac/g/gQ2aIQk1kyITjzB+Ny9W97Qb1XEBlpBiMdpCj5JGgoWXsiWSPhL9UBO6t5j28HdwCKBQ/U0+5yIxQpUE1U/X72h0
+        d=1e100.net; s=20230601; t=1763716870; x=1764321670;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FTcna51xyD4gkYI2wkOSx2yGaNSja9/HdHczSqaL88Y=;
+        b=h4WXhTs829Tc+j+mpBBv7gck0q1+vAVsxpoTMrNxOYeT7sKiRiLYxrYB+f6tnjb2D7
+         +KCG05VeuFF2tnYj/jt1HpR/OOBJ8liU2YD3J0k5TEoEjEYQFuKyK7obCqu6eSIZ/KfH
+         p0C3QQAyFqiEGRgtfJcxLFtFhCX/cgBvd0bwCj39vGf1qRv+tv5dn5kLVgO2WI2MaBJp
+         RMos7LsXDZPceNHxM4N7Hq1M6it2Y3i0zQxx1ylLav5zQ7c7/1O/wOzpDd+nFSbXa0ud
+         EqCk+lFfbNjAZE3ejTYE5c2QZPkavCimQJQb1KYJmBLim8OK/IBU0SShOiX1tXO5AOQc
+         LOnw==
+X-Forwarded-Encrypted: i=1; AJvYcCXSFndi9GfWtdBPyMfG49Hm9OJdbwW7jKNJ2IW+AErmDzzkUCEnBo2Q94Y6ZSsW+gOsRflDEyE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfHBc0QyRoAjBsuUp55UC3K+o9ikfA359Ez7EX77P1YJffysPN
+	lxeQNeM4MaxhAJZ79bAQOCLWpeLiJwdF94toY2U/DNAwaEJQtNq5LHfasAp0LAGNPze27Qq77Za
+	GCeFziPD7UPWdI9MSm85PEN4Sc0PLEvsqD8no59ScFIytUD9camIDJKNXBA==
+X-Gm-Gg: ASbGncu+aAmoyX9te4bm7eYSOOg6yfjNcSWn/Onc7zJt4xUfmW+J5RTR/ev+BVUIdbe
+	PjwP2jtn592vfiHc38t5KMwp0WMHL1DMhUYgQXFpARZMP58p9iVeKHAZrHlSD/VdUMRgMK5P+fn
+	yGN3lnT02rLy95mLvkVmb4rhoMO3MFdH7hNiLoC6IeyFC2LpQ9wntV4xtRJLQqNC8KacxgdBq4q
+	+dwdyHJvjSP7rVT2bSpv5ueaqegllpYBvM44hN7kRLsT/hHdpzx2ksJW1wduq6duetqEd9Yxo3k
+	r+pt+mInn+UZb2F45Q4UmSvWKJY25UcHLvf49L48OKoIuERVmm+DuyN2R9Aow45wpLgKzTvjNkS
+	btkYRZqnJAOfN2BkWkZLaOdPvW23VbukSmE2f8p+cgADIAP002xvmKvgoP0Pg6g==
+X-Received: by 2002:a17:906:d553:b0:b04:48b5:6ea5 with SMTP id a640c23a62f3a-b766ef1d27emr179098266b.17.1763716869699;
+        Fri, 21 Nov 2025 01:21:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGy2fwvK+Qkff9FcCdDI2UgofRL9rFpwVTJ/zBHtBRxPZJ5JeGTjRIY7myDBG6TkqWfVfUsUQ==
+X-Received: by 2002:a17:906:d553:b0:b04:48b5:6ea5 with SMTP id a640c23a62f3a-b766ef1d27emr179095566b.17.1763716869171;
+        Fri, 21 Nov 2025 01:21:09 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b765504828esm406198066b.64.2025.11.21.01.21.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Nov 2025 01:21:08 -0800 (PST)
+Date: Fri, 21 Nov 2025 10:21:02 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] vsock: Ignore signal/timeout on connect() if already
+ established
+Message-ID: <fy3ep725gwaislzz6lyu27ckswp2iyy5gj6afw6jji6c3get3l@lqa6wpptq5ii>
+References: <20251117-vsock-interrupted-connect-v1-1-bc021e907c3f@rbox.co>
+ <dh6gl6xzufrxk23dwei3dcyljjlspjx3gwdhi6o3umtltpypkw@ef4n6llndg5p>
+ <98e2ac89-34e9-42d9-bfcf-e81e7a04504d@rbox.co>
+ <rptu2o7jpqw5u5g4xt76ntyupsak3dcs7rzfhzeidn6vcwf6ku@dcd47yt6ebhu>
+ <09c6de68-06aa-404d-9753-907eab61b9ab@rbox.co>
+ <663yvkk2sh5lesfvdeerlca567xb64qbwih52bxjftob3umsah@eamuykmarrfr>
+ <1b2255c7-0e97-4b37-b7ab-e13e90b7b0b9@rbox.co>
+ <06936b55-b359-4e3d-bec0-b157ca32d237@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3f06:b0:434:77cf:9df with SMTP id
- e9e14a558f8ab-435b8e790f1mr18431775ab.32.1763716831338; Fri, 21 Nov 2025
- 01:20:31 -0800 (PST)
-Date: Fri, 21 Nov 2025 01:20:31 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69202edf.a70a0220.2ea503.004c.GAE@google.com>
-Subject: [syzbot] [hams?] WARNING: refcount bug in nr_del_neigh (2)
-From: syzbot <syzbot+3f991c449d23d41216a2@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <06936b55-b359-4e3d-bec0-b157ca32d237@rbox.co>
 
-Hello,
+On Thu, Nov 20, 2025 at 10:12:20PM +0100, Michal Luczaj wrote:
+>On 11/19/25 20:52, Michal Luczaj wrote:
+>> ...
+>> To follow up, should I add a version of syzkaller's lockdep warning repro
+>> to vsock test suite? In theory it could test this fix here as well, but in
+>> practice the race window is small and hitting it (the brute way) takes
+>> prohibitively long.
+>
+>Replying to self to add more data.
+>
+>After reverting
+>
+>f7c877e75352 ("vsock: fix lock inversion in vsock_assign_transport()")
+>002541ef650b ("vsock: Ignore signal/timeout on connect() if already
+>established")
+>
+>adding
+>
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -2014,6 +2014,7 @@ static void test_stream_transport_change_client(const
+>struct test_opts *opts)
+>                        perror("socket");
+>                        exit(EXIT_FAILURE);
+>                }
+>+               enable_so_linger(s, 1);
+>
+>                ret = connect(s, (struct sockaddr *)&sa, sizeof(sa));
+>                /* The connect can fail due to signals coming from the
+>
+>is enough for vsock_test to trigger the lockdep warning syzkaller found.
+>
 
-syzbot found the following issue on:
+cool, so if it's only that, maybe is worth adding.
 
-HEAD commit:    407a06507c23 mlxsw: spectrum: Fix memory leak in mlxsw_sp_..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=10c11b42580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e46b8a1c645465a9
-dashboard link: https://syzkaller.appspot.com/bug?extid=3f991c449d23d41216a2
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+Thanks,
+Stefano
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/62d11ae9564e/disk-407a0650.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/997cf054bfb9/vmlinux-407a0650.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/827a9f03aefe/bzImage-407a0650.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3f991c449d23d41216a2@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-refcount_t: underflow; use-after-free.
-WARNING: CPU: 1 PID: 13218 at lib/refcount.c:28 refcount_warn_saturate+0x11a/0x1d0 lib/refcount.c:28
-Modules linked in:
-CPU: 1 UID: 0 PID: 13218 Comm: syz.3.2115 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-RIP: 0010:refcount_warn_saturate+0x11a/0x1d0 lib/refcount.c:28
-Code: 40 58 be 8b e8 07 a4 f9 fc 90 0f 0b 90 90 eb d7 e8 1b 88 36 fd c6 05 b9 84 dd 0a 01 90 48 c7 c7 a0 58 be 8b e8 e7 a3 f9 fc 90 <0f> 0b 90 90 eb b7 e8 fb 87 36 fd c6 05 96 84 dd 0a 01 90 48 c7 c7
-RSP: 0018:ffffc9001a9a7a58 EFLAGS: 00010246
-RAX: df5324e680d95e00 RBX: 0000000000000003 RCX: ffff88802f279e40
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
-RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffffbfff1bba684 R12: dffffc0000000000
-R13: ffffffff8c7f8848 R14: ffff888056783c3c R15: 0000000000000000
-FS:  00007f267354c6c0(0000) GS:ffff88812623b000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000007e2f0000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- nr_del_neigh+0x16c/0x1d0 net/netrom/nr_route.c:440
- nr_rt_ioctl+0xb1b/0xd50 net/netrom/nr_route.c:682
- sock_do_ioctl+0xdc/0x300 net/socket.c:1254
- sock_ioctl+0x576/0x790 net/socket.c:1375
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f267278f6c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f267354c038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f26729e5fa0 RCX: 00007f267278f6c9
-RDX: 00002000000000c0 RSI: 000000000000890c RDI: 0000000000000013
-RBP: 00007f2672811f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f26729e6038 R14: 00007f26729e5fa0 R15: 00007fff2eed0978
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
