@@ -1,197 +1,88 @@
-Return-Path: <netdev+bounces-240675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 465FDC778E2
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 07:20:59 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9A48C7794E
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 07:34:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0A2344E7A6A
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 06:20:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 7A5622CB10
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 06:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F98330EF62;
-	Fri, 21 Nov 2025 06:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8522632FA17;
+	Fri, 21 Nov 2025 06:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dB8FXIm1";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZzVotcWN"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="Na7DWAKw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045552E6CD9
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 06:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAAB32F74A
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 06:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763706008; cv=none; b=HY+qjbyuV6/Ii8dLaDhBKQLZTCUiXE3RO0/zn240bLO/2J4taSqmZKPju5COASUs9Lg4RDMloSsqOrXiGT3YpudZsx7NQKV6zYLOQGWNUqalF0ipErgHf/lrSPEiNPPSiy5JNa8rfnRLD4mBIN6FzQJSkc+YJSlnw7Y+S4EpChY=
+	t=1763706722; cv=none; b=MEnIoz/jkQorT92nJE5h7SHuFfKvGTjqSYDF4Jx5b1IS/+OxJXe9JZeimu23+1zNsEbzB+6Wi3eTNSoVM+Rnfqi4VDnqkNlaPPA08zVupUeokJNARFNJ5FGtbHIxKEuE6OFcPu31eajimaijo7I1QFZaS6/V0bWv6zIUS8jg8iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763706008; c=relaxed/simple;
-	bh=+sXfroQ9+Yeauo6qtLKIrEOaBpAUSForDBLtkR69j+Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=axwDZjpubD3UisPQtceF642DFPDrNfEBl+o3sZX2SxzDOjnQlQLiODNZSc4Rg3XK+E32tJvwQT7id05Q7gNrHb/ktqlKtUEVrl+ayt9ehlqF8vNXScNJddMo8A90aYOw5r5iWNodfCBYQJwpjyzPYDVUsb702OTwMMXJIyS+a2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dB8FXIm1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZzVotcWN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763706003;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ggRX1ZqBKGYN1jsO4rritRA352gi7SUTeQqpV7JnIS4=;
-	b=dB8FXIm1FUc4WrD1PlL1ZLIiSP2wqYevpy0YDFAuHdwgK4ZttTNKZDRsgTfHrbloqlAfM1
-	RW7YlJKbvC1hL3587WWyOHNlmiHRiRQ/xWml6sn4fHVGctQjj9lB4ARXy5N3Sv2/tzIrW+
-	MYJ/paFZyo8dCVjxk1ItBU9zF02dw1w=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-657-gwVsxQEpMcedmtdUyLrn9A-1; Fri, 21 Nov 2025 01:20:01 -0500
-X-MC-Unique: gwVsxQEpMcedmtdUyLrn9A-1
-X-Mimecast-MFC-AGG-ID: gwVsxQEpMcedmtdUyLrn9A_1763706000
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-29806c42760so73405025ad.2
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 22:20:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763706000; x=1764310800; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ggRX1ZqBKGYN1jsO4rritRA352gi7SUTeQqpV7JnIS4=;
-        b=ZzVotcWNAFIY4wjUHcCDrcmEIFmDnqb6ncnyhk6MxdOM1LD4j8gMTMAg/h/zWUH16v
-         AHAu5olHl7VHuJZwv8CqyYjRbmdp/qZHOaI7WPYoVp1/xzTIKrI1tgwRqYnFW4PgcAqU
-         QfLipFMCX7dlF7+wyJASakwFOjBnZgNM/xGAAbD+s523wTCiyzn5t4Kt/zm1rxB9x4Ja
-         hc/kGKfwHDtIG3Vvj2vVQNyiHuDZpIhfH7OUmL+tkAFqTh8+axsPRnb/ET2MKMvQElUd
-         jBKdV6EYmFViVEw7bOtVu026NTZTAiQVav+ZmMNlxHtDBYxazLGrqTBMJrBF4tDIw5XA
-         jIAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763706000; x=1764310800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ggRX1ZqBKGYN1jsO4rritRA352gi7SUTeQqpV7JnIS4=;
-        b=OhWLSdQzo82J8BYp1ulr3dnZwhNZNyIkAFa0EqbuO+47iI3p9FNJgN8pRNQiiHagCg
-         9cyVw7DZ0ino4jnzFqQLM7+2VrbhOlBy10hIOJSHAVqlSpab+631ue62yDP8qR4L7d2e
-         7KPglg68s0ZzaIxa7Km6WdECx5Dmbyd05fytRdqLVxI/O8WOAVK+O2AZJ+1lMYupUa3t
-         9kp0LrEGTkZ8wvuqPcPXGPZHRMUarc8OSdjjFnIB65eZHpUpVFMdr3ibyxSQY5Xc0haA
-         eF0732qxs+lAyPpUnyHv5ir6piUAqKirzaKR9LKEnZ63lnqtp9kJKglS5Nk2gXJn2vMV
-         j7Aw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVI7Q82pOeiBJvHiogWWaaeh3ZsnTO/D68nmdvkIedZq0rGHMIDTQcCAhczq4Stul5Pn/ucOo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfH72+Tlo5NG8gf9azYFXX5JuFU5JtaaGPUfmYsWy2hLRkj5Mq
-	MWigblNLiAySFiC9gFIcgAhxFHpifz5gJa0P5iRY+x6TlcrmwzO/7a81vymRC+3HN4j5ea+AB6w
-	VQTiPqUr2F25M3/gaFxIiEneroAd2ch5R3iLjfAUf2WCzfALewZ7Ibg4W3I4EuZGS/H2dj8efen
-	DTqnkA3Kk6kE5dMixixpVLJFNQLeoF0+PC
-X-Gm-Gg: ASbGncvdKCaDll48G1lgFRBi0ea2TCEgBDhuDcOCbdvDquI52Ee36nGKNrgmWLpClCW
-	hxuSAYkwEPrHmfWClWOOsys+e9ufrD5ClZa39mrv7R2JnG77f5BjBezqVhBFv6Y7If5a6iEy/hC
-	xMr5oWC3Vit2OMb0rDg6MOlMWemjbs6iz9pvniEgsUnwZ1KNGWpd7LFcI7d4bMc2BqyQ==
-X-Received: by 2002:a17:902:d2c8:b0:295:8da5:c634 with SMTP id d9443c01a7336-29b6be7891fmr14962925ad.9.1763706000105;
-        Thu, 20 Nov 2025 22:20:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEUmADglGq6E7uEJIg62yJdZRoNMyJghNrkeN6DUBkf5vF0UyhiAgyRbE/RfDCtL+AZds6YfvoKcPhuQ6RYwco=
-X-Received: by 2002:a17:902:d2c8:b0:295:8da5:c634 with SMTP id
- d9443c01a7336-29b6be7891fmr14962735ad.9.1763705999682; Thu, 20 Nov 2025
- 22:19:59 -0800 (PST)
+	s=arc-20240116; t=1763706722; c=relaxed/simple;
+	bh=A8G7TP69kECO+1gwzAdFDb+eJTaB6RV03QIkYqGegZQ=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=uG+JB0lggFjpyUCcQvU3E0ShJj4za0N1z0ZbiFKrmfwWWCkC8qhizXYXFFTQQMvy7Pg+j4Unaekgi7j5cCrravBh7mK899z2gpHRxAe4pjYcNSMIlAHBBR+ZQdjxGLZc5kGut6TDK2ZiJlpEiExQCCH1fy1+JoCCGznjB2fDa/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=Na7DWAKw; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 0CA74A0CC8
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 07:31:49 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:content-type:content-type:date:from:from:message-id
+	:mime-version:reply-to:subject:subject:to:to; s=mail; bh=A8G7TP6
+	9kECO+1gwzAdFDb+eJTaB6RV03QIkYqGegZQ=; b=Na7DWAKwm4Ly6ohd0BFySEa
+	fY0TboBCfzINa6RbPGcD/GNoxsgtJaRfWPiyyvINBvaXQ6sPebxc2rgjCh9sYcoh
+	F/SGbz2PxY0nYYeLpm167t769GnBqpIg1WnXye1L+iSAbL08xAThnNBJ1nC0Dej+
+	bUEoDs5nyqCjvlGmjOskLkT35Re36bp02W07PXOLtVXiH777daNl0/uxwTAhGz+m
+	X1Qb/7DNATVxfBVCJJCRNswQvIpp+1zXKVPVj5ybH0vGRbAC7qn4VyslIJPT7K/l
+	qu1/vLAdJPATFVLvf2RMSFDuesm7bLRASadQuzwT7zpD3FiV+0F6lTbmXgPs5xO4
+	FSkjCZ1g4ls5p3nE6pW8lNPMpfL3KZKNchE0bjGMfeqt3cMZgZsk+2QEVp+I5YHN
+	kkKt/+l4JDTFxYhYUH4z9MIKPBCAyng63r9ykbvgNIyjhNvwjBx2OAqVkxYe9y81
+	1iE4P6VKdRNa9jXdE3LSBdwn0gfixw385NJJGN7QK2ilHGEotldhmlUy+6vm4HUg
+	qcocoPbD3HM3AbfkFr6h+MK1prU9fQ1HWNdACoKS1F28enyWhwNeX74YPCINt27T
+	BJchRr7TvZu0gH03oHJNfudlFnjY6M+8ott202V4MT3/GYH08uAkm2+r1PC1SwbU
+	fx+g1ACKfZ21D+YMrCUs=
+Date: Fri, 21 Nov 2025 07:31:48 +0100
+From: Buday Csaba <buday.csaba@prolan.hu>
+To: <netdev@vger.kernel.org>
+Subject: [Question] Return value of mii_bus->write()
+Message-ID: <aSAHVPsxrM60lRIj@debianbuilder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
-In-Reply-To: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 21 Nov 2025 14:19:48 +0800
-X-Gm-Features: AWmQ_blptZAZY5T5Gzybc2BRw6WU6w0JP6uqFpewdXiABFkFXapZqQDd1Zn3LSk
-Message-ID: <CACGkMEuboys8sCJFUTGxHUeouPFnVqVLGQBefvmxYDe4ooLfLg@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 0/8] tun/tap & vhost-net: netdev queue flow
- control to avoid ptr_ring tail drop
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mst@redhat.com, eperezma@redhat.com, jon@nutanix.com, 
-	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1763706708;VERSION=8002;MC=3771310116;ID=105653;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A296767155F60756A
 
-On Thu, Nov 20, 2025 at 11:30=E2=80=AFPM Simon Schippers
-<simon.schippers@tu-dortmund.de> wrote:
->
-> This patch series deals with tun/tap and vhost-net which drop incoming
-> SKBs whenever their internal ptr_ring buffer is full. Instead, with this
-> patch series, the associated netdev queue is stopped before this happens.
-> This allows the connected qdisc to function correctly as reported by [1]
-> and improves application-layer performance, see our paper [2]. Meanwhile
-> the theoretical performance differs only slightly:
->
-> +--------------------------------+-----------+----------+
-> | pktgen benchmarks to Debian VM | Stock     | Patched  |
-> | i5 6300HQ, 20M packets         |           |          |
-> +-----------------+--------------+-----------+----------+
-> | TAP             | Transmitted  | 195 Kpps  | 183 Kpps |
-> |                 +--------------+-----------+----------+
-> |                 | Lost         | 1615 Kpps | 0 pps    |
-> +-----------------+--------------+-----------+----------+
-> | TAP+vhost_net   | Transmitted  | 589 Kpps  | 588 Kpps |
-> |                 +--------------+-----------+----------+
-> |                 | Lost         | 1164 Kpps | 0 pps    |
-> +-----------------+--------------+-----------+----------+
+I am preparing a patch to eliminate kernel-doc warnings in mdio_device.c
+and mdio_bus.c
 
-PPS drops somehow for TAP, any reason for that?
+I have ran into an ambiguity: what is mii_bus->write() supposed to
+return on success? Documentation/networking/phy.txt does not give any
+information about it, neither does the kdoc in include/linux/phy.h.
 
-Btw, I had some questions:
+It is clear that 0 is treated as success, and a negative indicates
+failure. The reference implementation also follows this convention.
+But the code in mdio_bus.c, for example: __mdiobus_modify_changed(),
+seems to also expect positive return values from write().
 
-1) most of the patches in this series would introduce non-trivial
-impact on the performance, we probably need to benchmark each or split
-the series. What's more we need to run TCP benchmark
-(throughput/latency) as well as pktgen see the real impact
+Is there any other implementation that allows positive return
+values for success? Should it be mentioned in kernel-doc?
 
-2) I see this:
-
-        if (unlikely(tun_ring_produce(&tfile->tx_ring, queue, skb))) {
-                drop_reason =3D SKB_DROP_REASON_FULL_RING;
-                goto drop;
-        }
-
-So there could still be packet drop? Or is this related to the XDP path?
-
-3) The LLTX change would have performance implications, but the
-benmark doesn't cover the case where multiple transmission is done in
-parallel
-
-4) After the LLTX change, it seems we've lost the synchronization with
-the XDP_TX and XDP_REDIRECT path?
-
-5) The series introduces various ptr_ring helpers with lots of
-ordering stuff which is complicated, I wonder if we first have a
-simple patch to implement the zero packet loss
-
->
-> This patch series includes tun/tap, and vhost-net because they share
-> logic. Adjusting only one of them would break the others. Therefore, the
-> patch series is structured as follows:
-> 1+2: new ptr_ring helpers for 3
-> 3: tun/tap: tun/tap: add synchronized ring produce/consume with queue
-> management
-> 4+5+6: tun/tap: ptr_ring wrappers and other helpers to be called by
-> vhost-net
-> 7: tun/tap & vhost-net: only now use the previous implemented functions t=
-o
-> not break git bisect
-> 8: tun/tap: drop get ring exports (not used anymore)
->
-> Possible future work:
-> - Introduction of Byte Queue Limits as suggested by Stephen Hemminger
-
-This seems to be not easy. The tx completion depends on the userspace behav=
-iour.
-
-> - Adaption of the netdev queue flow control for ipvtap & macvtap
->
-> [1] Link: https://unix.stackexchange.com/questions/762935/traffic-shaping=
--ineffective-on-tun-device
-> [2] Link: https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Pu=
-blications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
->
-
-Thanks
+Thanks,
+Csaba
 
 
