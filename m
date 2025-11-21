@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-240624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96E48C7705A
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:41:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B07A7C770FF
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:50:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 38630352C5C
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 02:40:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 5BDC029833
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 02:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA1A26ED5C;
-	Fri, 21 Nov 2025 02:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3CA2DA744;
+	Fri, 21 Nov 2025 02:50:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WeSowuwf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGDXDuAT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F3D25EFAE
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 02:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D1F36D4E1;
+	Fri, 21 Nov 2025 02:50:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763692848; cv=none; b=tKha7JoguK2Jadei31oZdi5rvgQUcpo3FHoUrHxZNIEXrhI/saCUWlGDvoTQgItc/zg2M/yhEvCRBv9bxnt8FQS50thiKxSz/A1uR6CXi6XlEOhDjufz4PWquRr1PRVvYIjHt3YS0u+NAVIvwV/rC18AoTiR3byCu+I3w85aFzA=
+	t=1763693442; cv=none; b=rhj/0/2N0JR5JYspe3WNCl4oiKu4kqGVBVyEEVjTTprfvhwubxOHkUmfSV6vgeyVw67CTU8sixedZ3dk3Fa+6j63Hk/EE9L3Ipb8pG8Dj/1sp2iZL6GQVGQf0OKkWz8N+BamKSqN2UflCnsvvS992h3I1Zr8I9UT/yrN5ROrMXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763692848; c=relaxed/simple;
-	bh=wvy7vG54ay50VLt5YwsCqfaZFYbFYhS359b2uX0UA64=;
+	s=arc-20240116; t=1763693442; c=relaxed/simple;
+	bh=DJh/dq/qC5eekl0ywcj3ulTiHKyT2JlTQJWnwKJi6M8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kMl/1ns6jjAGUHQfRWRH4fF/b/89ua6Ss5WZ7k0OEAFF7DV1f7WGhEcfoTuZOkF3CX0O2D5SZVfmVjNSCyhErGXF97hlDofKxQ06QiPdBUGsO8T+GqGMNkqx8EglZLaKjJkxm6zHZ5ebrvG6PhXwtvSY3p41tJsDDNhvtiweMII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WeSowuwf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7607C4CEF1;
-	Fri, 21 Nov 2025 02:40:47 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=IUibH5ur3SrX6b2OH6WnLkm4O6fvBVjbDTJRDYjUEO+qJfPPZABcc/E9VhXEtehKejwqc00vclsrjijR9vPGYKpOYSZbKlMGouoY875uN2m0fbC0Iuus9W9Mo2MiRmRjU32HiXd7gzDFPA04+vVxW0lBu9AoY3v9unFik+S3l80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGDXDuAT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6C83C4CEF1;
+	Fri, 21 Nov 2025 02:50:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763692848;
-	bh=wvy7vG54ay50VLt5YwsCqfaZFYbFYhS359b2uX0UA64=;
+	s=k20201202; t=1763693441;
+	bh=DJh/dq/qC5eekl0ywcj3ulTiHKyT2JlTQJWnwKJi6M8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WeSowuwf93dpL2t1DFw09DHDMjKBkbOGHALccqwAWfwlGIulldLR/yKMZRs8jgfd2
-	 amYnqNOZoJIEY4MO2DkAeDWl3FlFKyWcJA2JxXX+YhJcNJE782AKA+RJV+ROPZ2meH
-	 TrDetWWFki4FSSI6sgEfTCtPWVfpS1bHyaIMbnfqt3+NAJRjVZsjC32CUaT8s8KKxF
-	 qNHBEKiJnVlygZ2uFT946eDW8+FMPIBom/CsagfNWUY5RnRpkcw1apuW1zO5e6HlXd
-	 PdK+m5KiF/roZnM/9H8fWFTyiFr8MdtCzYp5V8VPEMKQ4HOI31G0+feF1zs8UNu04h
-	 wByomIbTYVUTg==
+	b=DGDXDuATJKhDHZtuiz38KC9bw14/U97V3Nm6Qxw2XsMKXUUsOiS4ndXxqLYdtBs+i
+	 USSRI1tUK2h7ZRtqHhSpljYShKnS+hGyUUYeeMc5M63ACKakDpxQBs0mbc8VsIf869
+	 TF+L0ujnFZnzv6Ixmv5kYsmHfHofNWIIiWZF8nrmuTvHvWrWd9/uYsuUUQbpPNkW0o
+	 amYf4JocGfI/XiCx9xowSEwhyvCrarvUR2vYq46t/VxIOFzoALWsYeXu0wZQPrKM5e
+	 QMFgBLqZ1RR807rET1sp0l4myLT3U2CEZWv59fElGAGFm2Tf0QTj6a0MQcjIpAGG0N
+	 FsoA74QTY79Bw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D253A41003;
-	Fri, 21 Nov 2025 02:40:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE363A41003;
+	Fri, 21 Nov 2025 02:50:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 0/1] Add tc filter example
+Subject: Re: [PATCH net V1] veth: reduce XDP no_direct return section to fix
+ race
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176369281300.1867628.5837310870541891115.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Nov 2025 02:40:13 +0000
-References: <20251119203618.263780-1-zahari.doychev@linux.com>
-In-Reply-To: <20251119203618.263780-1-zahari.doychev@linux.com>
-To: Zahari Doychev <zahari.doychev@linux.com>
-Cc: donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- jacob.e.keller@intel.com, ast@fiberby.net, matttbe@kernel.org,
- netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, johannes@sipsolutions.net
+ <176369340676.1872917.10033820911607185315.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Nov 2025 02:50:06 +0000
+References: <176356963888.337072.4805242001928705046.stgit@firesoul>
+In-Reply-To: <176356963888.337072.4805242001928705046.stgit@firesoul>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: netdev@vger.kernel.org, bigeasy@linutronix.de, bpf@vger.kernel.org,
+ eric.dumazet@gmail.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, makita.toshiaki@lab.ntt.co.jp, toshiaki.makita1@gmail.com,
+ kernel-team@cloudflare.com, mfleming@cloudflare.com,
+ maciej.fijalkowski@intel.com, dtatulea@nvidia.com, edumazet@google.com,
+ sdf@fomichev.me, andrew+netdev@lunn.ch, john.fastabend@gmail.com,
+ ast@kernel.org, daniel@iogearbox.net
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 19 Nov 2025 21:36:17 +0100 you wrote:
-> The patch in this series introduces an example tool that
-> creates, shows and deletes flower filter with two VLAN actions.
-> The example inserts a dummy action at index 0 to work around the
-> tc actions array oddity.
-> 
-> ---
-> v4:
-> - Fix tc-filter-add return error codes.
+On Wed, 19 Nov 2025 17:28:36 +0100 you wrote:
+> As explain in commit fa349e396e48 ("veth: Fix race with AF_XDP exposing
+> old or uninitialized descriptors") for veth there is a chance after
+> napi_complete_done() that another CPU can manage start another NAPI
+> instance running veth_pool(). For NAPI this is correctly handled as the
+> napi_schedule_prep() check will prevent multiple instances from getting
+> scheduled, but for the remaining code in veth_pool() this can run
+> concurrent with the newly started NAPI instance.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v4,1/1] ynl: samples: add tc filter example
-    https://git.kernel.org/netdev/net-next/c/8b4e023d79b7
+  - [net,V1] veth: reduce XDP no_direct return section to fix race
+    https://git.kernel.org/netdev/net/c/a14602fcae17
 
 You are awesome, thank you!
 -- 
