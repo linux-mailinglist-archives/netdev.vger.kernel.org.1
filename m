@@ -1,154 +1,122 @@
-Return-Path: <netdev+bounces-240767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4624C7925C
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 14:13:08 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27704C79965
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 14:44:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 55D31344327
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 13:09:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id CFE0D3377A
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 13:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 325563242B0;
-	Fri, 21 Nov 2025 13:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3FAA34D3AD;
+	Fri, 21 Nov 2025 13:35:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKjI11Lb"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ogEdLPAA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010DF344055
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 13:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC65434A76F
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 13:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763730557; cv=none; b=gkNRTMrNL8X5SAYzv7zZ700IJeBoPei2UFyAhEnwG05QPj2H+CJ7VtZRY+oQNsfulR5hBm554slbWx3g7D3fzvjin0S8sUTUCd8Db7/NDPV9Q3mu+pAXmPs4XWQm15fI96iK62pesFTTZDgxPWuH56hdw2UdZzsOeLXEEO7xio8=
+	t=1763732117; cv=none; b=LEVAx3iICL5egT/wO8akG53B0gyt9YZxh/eMPF3826Aa/pLDKyHUi1SR7vkDh8pgsO3/u8JAObL4Kq0dWOlQDCk1O4MnJEgzUfomZy/plgujzTQLHEYjH5HOB2SV/MrXKi9ONtniMe0ek7G/PR/7A7D7PQfpuvEPSbcfUoGb3wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763730557; c=relaxed/simple;
-	bh=1kNZgnokdRlI7YTTKd52iZEubsDvhWy0QKNmrWwpJ0w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WrYJOXJImSnpSwe/O2qwxHLWciE7TIB6DOe9LRvAl2AYc0uhtzelKwkpipBkFQ7ZAyGk71k1IzQt0iBOxU/xoVGcxh3m4RuJiuns9CVDFIlCqf1pNcKCw1x94RF/PDs1tYcr6/FcAHTyiDipmqpzRLXd2V8UV7kt981IDWxT8yQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PKjI11Lb; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4777771ed1aso13640495e9.2
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 05:09:12 -0800 (PST)
+	s=arc-20240116; t=1763732117; c=relaxed/simple;
+	bh=KXv9/DU644cIIz1nqtNrSpWhbnBLfejEZSSzjDiMVVk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ugeGRP+duSceRGcCwQHUYxGe0TbWAy6+RjgZaVXhNjCQgLJkoPmCCM5KbHvtT7iAyEPNTrFnYgEYV+WIkhdnvK7cRh2Usx/rjdlKwnquN/5JJ8o4LGv27hyUHuxI4QBguvznrSG3htQadUC1otK882ripw+CmSG9t5bjzLpMjss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ogEdLPAA; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-42b3d7c1321so1161500f8f.3
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 05:35:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763730550; x=1764335350; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=linaro.org; s=google; t=1763732114; x=1764336914; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=hFMlwqCTPV6LgIow9qjui4+mkS7CwcvLdBw7Wz/wxII=;
-        b=PKjI11Lbrao9/q+EcF7/R7iUe8qWdbKJNnC/ybSwz5qdmI+RvwYrhqZAoeIhPfiiMF
-         ENImnchXnLvtvMP2iKHnD56l+rnFYcZfbF2b6IiGxUWdNHFeOSlyF2Yz8Sn7IMHw0dIA
-         KCsZNpSlkX/W0BO8CFQ/QYTSOuman4vCRJMheQbhqMPpiSp1/S5N9FdtHXvE5ADz1tUi
-         QjikZZeFyHrvx2t5DIDt4wM9dOqdhWV5VH7FftJqhEXu3ArwIwwX8sO+c/98rk54G2vC
-         4nY/bRaBNcNLPLgwzbioUacR6sSArROqJZWMaxnqmg/Tb9xMo+rJjFnsARCvkf9m1WKs
-         8VAw==
+        bh=LTowRJGcYg0HhmMoZiyqiMQ9fvsrn/LxONuXHhgGuGM=;
+        b=ogEdLPAAW3Me4+lGFwwc5FfctRL+4g6qHDC6g5zT1/2vLHFh8hAaLpOMFZLVdZi4my
+         p3KX3FfHF5wcGgg8fGtJYiFXD9liu4S7lsyws1FZgPcGNKMycC7hesbhinCm6DAf2ogC
+         8uze+sF6M3pwGpDkWBsiYK2kTwcqyp6IUJ8tRGjghmP3MtDdQgkg4KFMEck97qzy2Y+d
+         WZrska0qz50eL/ZuzurG0ptkBSc3V41RqY9x8qbAEfh64sYuYNpAcL6uAfKGPzVK605i
+         1ZvTXmj692vnQmLACXTfWb5X9AhZUi3DVzkNCqLqDmT1xwCvuoa0NBFdyq36wlZcxQF4
+         2wRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763730550; x=1764335350;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1763732114; x=1764336914;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hFMlwqCTPV6LgIow9qjui4+mkS7CwcvLdBw7Wz/wxII=;
-        b=ptaaNzOJI3nTkBAlwgmygXertYWpXlEYdKG/6TdCno4RCy0gZUqRE8si/SKsUban2P
-         /XkoCz6ZM4Y/JBXf0Yn9D2q0hl5xAsL59ibKyj9lsj3eysYwtIXaa3KNXpACTC+342yi
-         OZ32e4gazsaJ6TOYvW0fEKIDr1mN1rgjTAjyc12T4NQrjpduIpEk2QpKKubUEm04TFR6
-         SsVyRJ3UWU2aT9Q0EmDstjBJEysfZxiw9d5XC335QojQhfwRkR1X2IaMwEASzM6hbNQl
-         vpPOBbwjZc36TGq/J6NI+69pxk1tATTZstUORmaj5x7yiSHZOEvF9Au/xjnVI34gtw3/
-         KCHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUeQmR01LxESjhU/9WbKF9340HEawmTSo7PnDCTcMMaDjiEEsqnC2HoBvXwKflQfpQOmGpq/14=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUCaAnQHwGmy/JEtDcj/7ix0lOY/ug3qnsHtui2KIYri0+z5xo
-	dSvnugep6fVoXI8CnFhnof0iR06K5dmLKN49LjIrfD2O8SfITSV/1Js9
-X-Gm-Gg: ASbGncvikPG5nMyosujr67cL28vRnA+SuPC4RIv/nvvfFJIHqh5ZdLlwhOiGPmFtCKn
-	VXMnCbbu9bHKQ7m+u2CO/eJBmL66YHpYhM5rdImh+H00tZH77/dxF+rQqAlFuNSqGvv28xsOW+E
-	EHQ4r2vhjfFAJq890d4YMJOkyIssirTskZBwau2dNHt4GQ/UQiobfbsn35jqTcEu5z4SFF7qU1l
-	OKwYs81ENaaZyvg+6yBLFB3QTrdM1GhUaY3xuwQWSDWtZUMAvWwqRvApUkrvM5PkGdTFoXeRraN
-	druHuKIfEB8B1XZ/UKbkqDAxYxf/qHpuahHTtHP97+R7SMOg6v67LkFDJdjuucvSascHSQyBAr7
-	hRISP/I45XURBRkxF70I9/hUWRESIy/qiXFX1v9kGrWVDcrXylaubglnChJqLhqdnBKzpTpschG
-	YDQJ3CCP/YYbIb2dyC/cstUZ6u4g7XxPUCTXS6GD8DawGyymW6mQpWGG86xuntMDA5bEu/iilUH
-	0iWOC4kMjA1LBBaeWE6lQr2gYAsktrvL9wyFqCEmycekPLAZ47lEUjaT5B2aLj4
-X-Google-Smtp-Source: AGHT+IHoItNRpoCOBTJdnxOZ5STshksMTUe0MQdPOU8mrz4QGa20rK1RibgJCBzaf5gs5Q0f4HIW/w==
-X-Received: by 2002:a05:600c:1994:b0:477:5aaa:57a6 with SMTP id 5b1f17b1804b1-477c016e402mr21494025e9.10.1763730550006;
-        Fri, 21 Nov 2025 05:09:10 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f20:6900:2d1a:1f47:fba3:71e8? (p200300ea8f2069002d1a1f47fba371e8.dip0.t-ipconnect.de. [2003:ea:8f20:6900:2d1a:1f47:fba3:71e8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf3aef57sm40152705e9.11.2025.11.21.05.09.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Nov 2025 05:09:09 -0800 (PST)
-Message-ID: <1ca0e3ed-faab-4203-be4e-9998d6d2b7ad@gmail.com>
-Date: Fri, 21 Nov 2025 14:09:08 +0100
+        bh=LTowRJGcYg0HhmMoZiyqiMQ9fvsrn/LxONuXHhgGuGM=;
+        b=rNMd7OdzbLeyJ873eB2Z5gstxspxq04iLqTJDTTOKsy+9fU6kw8h48Zie1k4mV9br9
+         YFv28QStf82A3RT0VSMKpBCZOTJcyHqkm5ylPfext3vnI9dxX9bfHrK3MK/V3KY2y6R5
+         uhlMsHGT+a/BACi2KQoc9tiv+cSR9DqtPoPeMRWKPwcGLZyR0orUE47sPHrNZRv3pwQA
+         +J6RF3PHJJ0GeH39xXTcrL3HZBe+FfsArnGjC0yTiJX3AKRvCXKWXZse9/DCLlN9+bna
+         AxBPoP1NZUKNavvL2CTtm5LX1Z4Kffu4O1459pg3rSyow9PFxLBme3u2cRcajpP3i+4h
+         XcOw==
+X-Forwarded-Encrypted: i=1; AJvYcCWxY7Bq2/4eXKOQybZiFi+DLciQLbLiTyHMlXYCnXK4TUX/aGEiWjCWcOa2MZHDlmYOQb7HgZI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGPOw9yCANiUAhZrkyRMO3H4W8nx4H7C095ee8gY4F6muEG+g3
+	3QaxbwOjThA6Z7wzf/fpVu/nQ0/Wtypa1x0KidTXUjzhz9Qrz6YySvwR3VWNmtRl7cs=
+X-Gm-Gg: ASbGncsoKlVs+Db33AGdpIiifxRHZMuCvOcqkhrvp8QPma2aY/vGwOLy0Wb5yNtYhvz
+	z2dndF0opCE8PYsebBIkzBsYQYSw+c6ZUiW4zYAeaqLXRWNxiasDHP1l/uu9v+9sOXraGrNuuMC
+	bZl7gzsUKF+D6TLnzv0fLLrusnixS7a6mNuhTF8y2JUZDcM5XlZ9Ki4zoPJxU9q1X8Wx/6XqOxQ
+	s04sJxaRDUV5caO9TGzm09x/n6PuoNwBxR15tmO+blOopFAqW2Gd2PgRwWRR6GRVprQ4uuB7sK9
+	5oIkZPrKfMMAJT25Nh7m7XRt/yUxoAYDx/nOUYeg4t+csA5PiEDs21pNAqWfqUDTAkHF82oWFO8
+	D3PzTajDGa5CruqCimtv3puuWFUFoKKhJpZPUPFwAK6ZVGr4QSoMxTYpIMgpwQc+RAd7QXl6+En
+	imGJ22k6mHB6kQGNJO
+X-Google-Smtp-Source: AGHT+IHmU/+0OTxZO/ujLXvOPYvw9YHDjZwUJsy0cCotaR0gtzRnkipBingnOhyq1CTayGE3YXHsxQ==
+X-Received: by 2002:a05:6000:230c:b0:428:52c7:feae with SMTP id ffacd0b85a97d-42cc1d0cd4emr2314094f8f.32.1763732114087;
+        Fri, 21 Nov 2025 05:35:14 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-42cb7f2e432sm10663506f8f.9.2025.11.21.05.35.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Nov 2025 05:35:13 -0800 (PST)
+Date: Fri, 21 Nov 2025 16:35:10 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Mohammad Heib <mheib@redhat.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next] i40e: delete a stray tab
+Message-ID: <aSBqjtA8oF25G1OG@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] r8169: add support for RTL8127ATF
-To: Fabio Baltieri <fabio.baltieri@gmail.com>
-Cc: Michael Zimmermann <sigmaepsilon92@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, nic_swsd@realtek.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <c6beb0d4-f65e-4181-80e6-212b0a938a15@lunn.ch>
- <aRxTk9wuRiH-9X6l@google.com> <89298d49-d85f-4dfd-954c-f8ca9b47f386@lunn.ch>
- <ff55848b-5543-4a8d-b8c2-88837db16c29@gmail.com>
- <aRzVApYF_8loj8Uo@google.com>
- <CAN9vWDK4LggAGZ-to41yHq4xoduMQdKpj-B6qTpoXiy2fnB=5Q@mail.gmail.com>
- <aRzsxg_MEnGgu2lB@google.com>
- <CAN9vWDKEDFmDiTuPB6ZQF02NYy0QiW2Oo7v4Zcu6tSiMH5Kj9Q@mail.gmail.com>
- <aR2baZuFBuA7Mx_x@google.com>
- <22b15123-b134-467c-835c-c9e0f1e19e29@gmail.com>
- <aSBWiuivrPG8vNKw@google.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <aSBWiuivrPG8vNKw@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-On 11/21/2025 1:09 PM, Fabio Baltieri wrote:
-> On Fri, Nov 21, 2025 at 12:17:33AM +0100, Heiner Kallweit wrote:
->> Could you please test whether the following fixes the chip hang on suspend / shutdown?
->>
->> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
->> index de304d1eb..97dbe8f89 100644
->> --- a/drivers/net/ethernet/realtek/r8169_main.c
->> +++ b/drivers/net/ethernet/realtek/r8169_main.c
->> @@ -1517,11 +1517,20 @@ static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
->>  
->>  static void rtl_set_d3_pll_down(struct rtl8169_private *tp, bool enable)
->>  {
->> -	if (tp->mac_version >= RTL_GIGA_MAC_VER_25 &&
->> -	    tp->mac_version != RTL_GIGA_MAC_VER_28 &&
->> -	    tp->mac_version != RTL_GIGA_MAC_VER_31 &&
->> -	    tp->mac_version != RTL_GIGA_MAC_VER_38)
->> -		r8169_mod_reg8_cond(tp, PMCH, D3_NO_PLL_DOWN, !enable);
->> +	switch (tp->mac_version) {
->> +	case RTL_GIGA_MAC_VER_02 ... RTL_GIGA_MAC_VER_24:
->> +	case RTL_GIGA_MAC_VER_28:
->> +	case RTL_GIGA_MAC_VER_31:
->> +	case RTL_GIGA_MAC_VER_38:
->> +		break;
->> +	case RTL_GIGA_MAC_VER_80:
->> +		r8169_mod_reg8_cond(tp, PMCH, D3_NO_PLL_DOWN, true);
->> +		break;
->> +	default:
->> +		r8169_mod_reg8_cond(tp, PMCH, D3HOT_NO_PLL_DOWN, true);
->> +		r8169_mod_reg8_cond(tp, PMCH, D3COLD_NO_PLL_DOWN, !enable);
->> +		break;
->> +	}
->>  }
->>  
->>  static void rtl_reset_packet_filter(struct rtl8169_private *tp)
-> 
-> Yes, patched it in and tested on both suspend and reboot without
-> touching the wol flags, seems to be working correctly.
-> 
-Great, thanks for the feedback!
+This return statement is indented one tab too far.  Delete a tab.
 
-> Thanks!
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 9d91a382612d..8b30a3accd31 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -2967,7 +2967,7 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+ 			dev_err(&pf->pdev->dev,
+ 				"Cannot add more MAC addresses: VF reached its maximum allowed limit (%d)\n",
+ 				mac_add_max);
+-				return -EPERM;
++			return -EPERM;
+ 		}
+ 		if (!vf_trusted) {
+ 			dev_err(&pf->pdev->dev,
+-- 
+2.51.0
 
 
