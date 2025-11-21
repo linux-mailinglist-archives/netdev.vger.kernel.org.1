@@ -1,297 +1,219 @@
-Return-Path: <netdev+bounces-240721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 786FCC788EF
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 11:41:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5340EC78911
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 11:46:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DD5F5361F26
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 10:41:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EAE5A4E3674
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 10:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D93433CEBC;
-	Fri, 21 Nov 2025 10:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82FEC3431E4;
+	Fri, 21 Nov 2025 10:46:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Bu97VSWF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RVgGAT7i"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012033.outbound.protection.outlook.com [40.107.200.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E9B2E7F11;
-	Fri, 21 Nov 2025 10:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.33
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763721658; cv=fail; b=H+PjXk5S92V+trEUw1M9T7CcuuubvejrVnMY4d8Y8xOBahSp6SzE5+h6O5NYLlkfgUOoTAvZH8r0Z2lv2ophV4o/+eANy5qoOQdkehwWLkmaFdbZI0jRrYEpX6cxeNI0/9UHIe9N8HhZ+sk1hAqywE8AskEPbJIZ0Rrt9Oyg+Ek=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763721658; c=relaxed/simple;
-	bh=S/5CG/2lLPYq2mi37loGmNWoh+nhDxq0qcsJ6QC5roI=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=GkR7Kfpf2V1pla1bOvXoKHAYZOVsHannKBNqGBKjyTzq2vN0aM6VF68aQRcwlH13ZuCDGx52SzeHtw6hVdGFEVY9ZCEbxKI0H5f8WRsFGqTZOXuEngl12/sLcP2ftvJsomCjbzEx1TKO4ntH3yGcBX4BPnRdh6zxuw3qRbKKt7s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Bu97VSWF; arc=fail smtp.client-ip=40.107.200.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bDfs79S5Ya8VglJgh/lLbxTqo6e8MYwLzde8cnUc8rQfKU+g0ZVprXUULdsN8VMVKpDM+n+O9mj30SyQPYjC1dGtSCWVoB2MEY4dDoWUbwDZw813msJN2djtsOnWgP106gRNWGU2Dk5Om/5HhkOF7xa2VivYkJsHHviCr/NBfgBS9XG3rAFSGeBpUaDiHE9ReWQPnzHHGMi28Mr6KqK47c+1hfgcKPJSE4ruMSr3sfP3hUmxN9V1YxA3H8va2lfKXAacqNqqFLO2xg2beRKCjsetXMqdzJToH/uPyRdIvU48x6wmpEcmVwMXcCJoj2CpCul2Kal069f2cjekA6yPPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ev7Fr/o2aBMdJ4NtnBjYmxj3u/UBRASb2gIB6Tght+U=;
- b=CtISkjw51oOQws5IbV3V9ldANVnLCDcUjJiW/FaV42e36XMXCKS0aWU75yG+PA6rz0HsqUIbGxLX68iYFQ64tlnhHOpeTw/fo/zU/NbdV+UpSZ7roIxUfjSd7gEF1ukUqf6OqsPbz16OO54SoNPP9g5u1pL2R8/o8D7+cTb27MPy92k2dQP5HBwMlFagu4sFlYSlfw0LIY7DQIEV5UwX9lHkvJqySpHPg6EmQs7n5qNaaDalXfsQLlL+Lisvzp3Tgsv6OfktU4sCO7xC/d7EGaGsOjUGtQcgun18kovXqjEUtV9HDxLPxMbaWN5a5pva1WyBdIpT0KYM7PqZlZ3E6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ev7Fr/o2aBMdJ4NtnBjYmxj3u/UBRASb2gIB6Tght+U=;
- b=Bu97VSWFkt1eBnj3J8m/GBgkqk4iNa/d/5bFABHxvlU8lLjfRzVq/njuJClIjVTvNujTLwBuXxlYJsCKnJWaqgA2JgWPEZei22PgXtDX0lnmK+KWGXtKUpHzb3U3wVboD17O3Qbo+G6e58Lxow3DSbp9rKjtVx/3wByfUyKrNtA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN2PR12MB4205.namprd12.prod.outlook.com (2603:10b6:208:198::10)
- by IA1PR12MB7495.namprd12.prod.outlook.com (2603:10b6:208:419::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Fri, 21 Nov
- 2025 10:40:54 +0000
-Received: from MN2PR12MB4205.namprd12.prod.outlook.com
- ([fe80::cdcb:a990:3743:e0bf]) by MN2PR12MB4205.namprd12.prod.outlook.com
- ([fe80::cdcb:a990:3743:e0bf%6]) with mapi id 15.20.9343.011; Fri, 21 Nov 2025
- 10:40:54 +0000
-Message-ID: <8d8cb631-1d72-436f-ac97-5449ba46ef42@amd.com>
-Date: Fri, 21 Nov 2025 10:40:49 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 00/23] Type2 device basic support
-Content-Language: en-US
-To: PJ Waskiewicz <ppwaskie@kernel.org>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-References: <20251119192236.2527305-1-alejandro.lucero-palau@amd.com>
- <e3d376c8a1ac1ee9b75d02f78bdc25f7c556bb20.camel@kernel.org>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <e3d376c8a1ac1ee9b75d02f78bdc25f7c556bb20.camel@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO6P265CA0013.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:339::19) To MN2PR12MB4205.namprd12.prod.outlook.com
- (2603:10b6:208:198::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2AF2D7387
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 10:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763722006; cv=none; b=iWFbrk68pK5o+cp/NA3NGj1bdPrs1kF0avf1HN2wgd8BMX1LYf6LbqhW9xeysBK4iEVWfjbPw0fZWmU1A9GH5AnV2NZDPDqPE+i8kfwn64R0DclU3kdiHbcWVUOUkaCIJjhB4xS/R+yUWUt6nlUwVM+71vkvTIIHEWXxx1Ta9Xw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763722006; c=relaxed/simple;
+	bh=IoKeewMqEqvP0bmflhtcozf0g3MwQaI4Yhft6Uthnrc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NqQiCBggaCMJkXPniDWtff5I94hT9zZ5qe2RLwPhn+0ezUnB20yoEkx2MfrYLnjnZNMVrbiRTp5rpU2kUb0NSzhv7jQz6fDczGyRDcxlOtG1CUCodCjWYfdvFLaYu0KRRdqyoLvT8N4dk0PGxgVOIhzQlpwm7H9p5HNuznLA380=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RVgGAT7i; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-29812589890so22558495ad.3
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 02:46:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763722004; x=1764326804; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=t+jQtIi6R3/Xo/ufxKPC6qm0gUE57Dr6R3PpZg3G3bk=;
+        b=RVgGAT7iLzj3srBr+nD5PD4aI9xsojU8H3Cx0g3u5hZdTRg/gTe1Z101goefp+zX5k
+         OxIFMMrTiQJ1XBBzrUdXLX7JFkGFFzQRohVU4hqBASR07evWXUqSW4Q5vnG0doX3XbWq
+         yxODvYbiP9JrutAAoHAuWO4iyxpT3lsI3llQp7j9YOwjgWbEtFzqHBBtXhTV87WCVb+7
+         U3EJNYRCRnvGy9ZnyBYz2TcxLJ31nvnMleQf3IVTC5JpnXasJDFwPpRkIoKV8VpZz2uR
+         oPKMhfAqBvOd/UJTi5qiXgBL8W3jhi3KpgV1KSlrlYAw56TaYH3A4x0ZTwd9u0GdL8FA
+         wQ/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763722004; x=1764326804;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t+jQtIi6R3/Xo/ufxKPC6qm0gUE57Dr6R3PpZg3G3bk=;
+        b=tf0W9hyDWtMe+lHXgNpYhXVoeXP7h+7aeo+g6X3tvwWSW8VHrQN8WnOg8fy1Ku4Vlx
+         SlYo/enwIBwjPmn5GDCRaAWbHxS/vJDqKf8TsCXUIxL0zIHACag4ltyDgkoT7Z2KOcr3
+         ZUN/pzg3vjkN2YqSkcA012qxeavoihULQ8yZihI6KSfeDZmQcAkEJ8S8wVb7dnVX9dOV
+         SmgcFRtGK7au3DH889SeOPrhs25kHKqCP1ZDfaZ8qLzK3kWf45fYVSTKApoQhNC0FgYG
+         awWOnCh/2Wzgcj1LiutRVdvZ1lc6qlbTd3J+w1r6DnHlM/dxlHaln/NAcnvcaT1UH3wv
+         PS2w==
+X-Gm-Message-State: AOJu0Yxku7ntbe1VrX3g7iaJQMDanE84BzbIwRIC1qXzmZ9ci9gLJ/jI
+	ZDUjek/y+VsDNGTm9ulvj15LPO9ijjWLgr0beeSTns/64vPGRio/4lNSaXz7Mg==
+X-Gm-Gg: ASbGncv7ro3xx7Z2fYuDevdi+uizg/0/5ygl3IIbv0vsTLqVJFr437pR7Iucvrfok4a
+	aqpwBQIevSzlT78sY0XcOweAqahmv3mOEk6VMFcneTAfOWJb5ms4dZR3vWdc/PqzM4EMVziXi4n
+	9whb/MezzFhPCJrunS2m2hw+WjsWWSgvYoLefVNrA/pFZ55SH3dSZ/aQDeErG2eS6CZZHsqhvaM
+	g1szq3HTdKavDWRXFA8uGAAcT3meLeeDt+JaXHbA04uXg9q4LAbdnM/p1FFUzD5NlqM4iPQ8FBt
+	LgioVcr33rCJboTzDlCXy8OI45my66j4ESv9jOBDmL2l8M+yDDtHqeL0QvoqHjNcQmku9RUpF9r
+	9jYt3Gv3MvxE3dz75FmYITUA7PVtsLy/XYdYplv20grbmngSKWGTPUH8qiORnshCeEgVsZ8yZOK
+	dlXXejNfP4
+X-Google-Smtp-Source: AGHT+IGM3Tnv0hnwaOvrFZQ0FP2TxVRH4LEdBvIs6xlX50jwt+kcq2E8pZwNoQWT5TAY6OTUuyyJfQ==
+X-Received: by 2002:a17:902:d511:b0:297:d4a5:6500 with SMTP id d9443c01a7336-29b6bec9822mr29067905ad.26.1763722003892;
+        Fri, 21 Nov 2025 02:46:43 -0800 (PST)
+Received: from fedora ([122.173.25.232])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b138bfdsm52398575ad.22.2025.11.21.02.46.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Nov 2025 02:46:43 -0800 (PST)
+From: Shi Hao <i.shihao.999@gmail.com>
+To: netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	pablo@netfilter.org,
+	kadlec@netfilter.org,
+	fw@strlen.de,
+	phil@nwl.cc,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	linux-kernel@vger.kernel.org,
+	Shi Hao <i.shihao.999@gmail.com>
+Subject: [PATCH v2] net: ipv4: fix spelling typos in comments
+Date: Fri, 21 Nov 2025 16:14:25 +0530
+Message-ID: <20251121104425.44527-1-i.shihao.999@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4205:EE_|IA1PR12MB7495:EE_
-X-MS-Office365-Filtering-Correlation-Id: ceb157ae-eabc-47ab-3f07-08de28ea724b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?emxpd3FmTHFhNWJaaFJibGFoSUJWRGhJODV5amlBNWUvbzlkeCtLVFNRUlhM?=
- =?utf-8?B?NTBsOTlOMkpjbHdselJJbVBiRUlUc29QNGpZcG5veVU2VVRweERoVXQ5U1JR?=
- =?utf-8?B?WEFRMEVkVEMzVmgrdUVIK0lPQXZCU1dGbGl5WHZVYmM1eTFyc0NzZGhaQkVC?=
- =?utf-8?B?YndpUHFhT3pkTDdWVlVOYmZZWDg4UGYyekhkR3d0Tjl1aXl5dHdqV0Y2NnJj?=
- =?utf-8?B?WCtFU2VLUVZya2p3eHYvUUdtUlFrVE1sdFd1aEJtaGVTeUgvdVpsdlZqTmFr?=
- =?utf-8?B?Z3YvT2k2MkdldFpRUzVSZ0U0aUhKVGJDRmRwaUdHSU03STVhMGJob2M4clJh?=
- =?utf-8?B?TGQ4djB1WWlpMnlZcUg0MVBRdXI3Zkh4TExrcjNucUs3THQwOEtrR2QvUE1k?=
- =?utf-8?B?Ulp2bFpzTWxuTDBuRjNybU9zUHRxdUxqejg3dXI3aGtkVVMyT1BXMzZJZ1BN?=
- =?utf-8?B?NUZ1ZjYrNW44RjIyaCsxL05JVElDcTM2VEgwNUVzWjF4enYxZXRFVDFsai94?=
- =?utf-8?B?VkpyZllvQ0FXbTZYU2tTYlNhY2dJbVJTTEgrUDNvVjhSMzNVdDV4cXlVb2lE?=
- =?utf-8?B?V2NJVEk2a0Z5cmNFT2lWWXJudUp4azhjS2VXTmZDRTBtYzI2ZVgvbml5TCsv?=
- =?utf-8?B?cnZvc0Y5bVNGRTlBU041c201V1l0bklqNTlxZ2pCTjY3dU5CdVYxaFlzREVG?=
- =?utf-8?B?ZzVSbEd2YmEzeG01SHpIVzQwN1ZLVkxLT2c0bzE0V0xQb2FxT2trY1BDVDFI?=
- =?utf-8?B?N2xmbWRmRFBMVDgwLzJqaDlIYStocC9aRFNTTTB5QkVDTUk3RUs4Ykx6NHR2?=
- =?utf-8?B?Q08xNmpielpkMy9PTmczM3ZrTzRKSTJKNE5hUGpYMDlMUktsaTVBMExJaEJv?=
- =?utf-8?B?VkMwZjVZL0EzV3dkeUFJTm1zeElMRWd0ZkR3MnRYMnhGZUF6OGZadFR6Sms2?=
- =?utf-8?B?cFNvK1ZZK1FlRy83Z0NQUklXRUVxS3U2eG1RSnZxNERRWU5pME1YMkFacjNM?=
- =?utf-8?B?ZnhDNitSa2t4VldaeGFCb2dnVGk4SVpPdTNJOU1DbThXUTJ4U1c1WVdTdE4y?=
- =?utf-8?B?K05LUDkwbG1nc2NtanlXZUZMVWRSVnlCK3ArNXVwWis5SGlTemhJUFVGeUpR?=
- =?utf-8?B?a3NOT04yM3Nld0UyZ0FuTS9rRWdLcGM0d2FaR0lyYjRKVXdEbVZ4VmticXRp?=
- =?utf-8?B?L1NxOFdHZmpGbUY5WE0veENSSW1MVmIxS0t1Tm1YZXB0aVQrUytjYkdCTFpF?=
- =?utf-8?B?ekpJUCtLdFUwTURIdjhDbTR4VEhHbG8wZGt6blh5MFJya3pTdjN0UnhsUmpo?=
- =?utf-8?B?VmhIQ29LOUxvd0xnMEQ0TC9VNE1tOHZRajhZY3dGU2xWQ2xmZE5UZTc4bTBB?=
- =?utf-8?B?QWhOUStheWxUSklGbytIR2F4aXVsQU8xc1doOWpLbUw5WHFWcU1MZ1FBRVJW?=
- =?utf-8?B?SXV0ZzJNUUY2eWpaanBYcWl4eEFLYlJTeFdwd3RaOVhHdFNlNUlPc2ZRZ3Jv?=
- =?utf-8?B?Smd1NGJ0RlMwemJjcE5lTmZLNzNENDNZektYY002SXVmRVEwQVJ2eTNlSDhH?=
- =?utf-8?B?Q2Raam85b1l5ZUlPeWY3TG94SnIzeE9iSll1eHNxWFl2VTBLclZ3L0tCbXdX?=
- =?utf-8?B?M1lDbVAxMEwrM0ZRak51RXEzeENpdTRmZ3FsNGE1RFM5RmQ4ZjB1RzdIUGtm?=
- =?utf-8?B?QWlkeU9pV1Y5UUNiQVhjRHpQemYveXh2NXk4ZS91TzZaSFJaQUc4YVJhQlNU?=
- =?utf-8?B?ZFpQR2V1NGpzQ1RxQWlpWENySTZ1VUwxSVBZazEwZWVyVDZzTXJoYnduZ1M5?=
- =?utf-8?B?ZTZVMU1GOUtCc2RyZXFpMlhzVnRFdTQrWEt3Q1NnUDVkNDVQWEpCZkl1QVBE?=
- =?utf-8?B?TmlHeEpBRTBvMmwra1RUcVF1bm1kaGxyK0tnYjA0SW5iVmNyaUFwMlhqcTZu?=
- =?utf-8?B?TWo2aVE4RE8ya2ZBWjUrMzcrQW1lemtocDdNVXgvTXN2bUl3a0t4SjF3akNZ?=
- =?utf-8?Q?szCS+NDnyTfSUS4HJPX/IhBUt9+LaQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4205.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WVRyWVFkSjVjT3VoM3B2WWNZQklwakM5R0pCeTVYQmNaWEhxbTZ4cUhNVk9C?=
- =?utf-8?B?bE53VG5rZ1padmJYM09UTmhVTm9Ra3lHamxNNldYVnlpTHoxWFJJcGtZa0lQ?=
- =?utf-8?B?SldwNDZCY2RVTEJwTVBncGxncEdHYzJNaUZxWXZEZEVhdndndmNSczJscXQ2?=
- =?utf-8?B?VE1TUnZkY2lkaVhWQTRDY05OMHArUjRReFUvRFVrd1JDZHVtSGtwcm8xWGFS?=
- =?utf-8?B?UStOalR3ZFVKMWVuSTJETVNRSExSQXpqMVFNYlFEZS9GWkJjWjRhMmsrYlE2?=
- =?utf-8?B?RytRbWE4U3gzR0QvK2pjYmhKTmVOS3BTQkZJMEdPSXFaZG40WlZMUzIyZi9S?=
- =?utf-8?B?b1h1cFFFY01QTXVaaDdxSXBNb3JmTUhYOHU2elFlaW5DZzdhbmMvbUo2UXI5?=
- =?utf-8?B?Z0p4MEVjMWJLNmRsVlp5UWEwVzNnU01vNmtkYzNpTGIzazFkSzN1RzFMd1p1?=
- =?utf-8?B?YTZubjhCd0Z3UDJHbWJrMFJZdjhINmdjMEc2dUxzamRDRGhnd0Rxd05heDV5?=
- =?utf-8?B?aUJWZGZKSHNmNW9hVW1TYUZlVGo4ZFE0Vzd5ZHNNSTd0ZmR1QXV3eTh0VVhW?=
- =?utf-8?B?Zmptcjc0NkVySlRtYWdaMk1ObnR5aEZRSStHQ1gwYTZnWGtRaDl6cy9SakNY?=
- =?utf-8?B?azY4SG83bUdsdFptY1JOUmloWEN5QWVIYU56TFBReVBjWDVCUnFTWmIvaFd0?=
- =?utf-8?B?elEwZnV4aFE2RjVuQjJEeEVDaVVCM1A2MDFTZEVQY0dtVkN5TXZud1I3dkdC?=
- =?utf-8?B?TGV3ckRNUzhDTnR1LzFZNDh0MUFiRnk4bVUyZnFTV0s4bDNjNjUvSGhmZDZ1?=
- =?utf-8?B?aEJWeUUvWi9USXd1T3pJMzVpUFVpYzFsQ25jM3JmSm85ZGRZLzNPQ01SWmVW?=
- =?utf-8?B?OGg3dk44UTBWbkltRDE4NElPdlR1WmVCc1JOSFJXdWg1ckg0djZHZEtxNm92?=
- =?utf-8?B?cElSQ05WMU5GNUZMVk04UnNCRC9HamlwVThMWHJyeHd6UXd0T0swaUdDeVNm?=
- =?utf-8?B?TlNTcjhUa29MRE5BZ0QzL2VBQVF0bDlHZDhNSkdFYjJXWFZydVVaVE9KaE1y?=
- =?utf-8?B?N3BsejdteG9ZbU9pQWtUSUN2dnhNNjIwMC84RkwvY0NxYmJEK1JqU1ZTMTc4?=
- =?utf-8?B?L2FtWWtpazZob1NOZW1WemJpdmxXUDdKeXJpYng1ZW4xem1WN3FiNHRDb291?=
- =?utf-8?B?Njk1SnhpMnFjUFUrRGR3WjdYb2lzSERySUF2VUhIWkxUbUU4a3p4VlJZSFph?=
- =?utf-8?B?L2RVR1d5MGdKRU54VGEzdE9VZURrUURqT2RzZUlwS0pFMncrWmxkQTVxbVFV?=
- =?utf-8?B?N1ZLWnNvZENPM2pBK1ZsTjVNcUd2VER5aHNTWE1WeDlrS2F4L28zeit1TXdz?=
- =?utf-8?B?ZnZsRnptVVdER2h2a1hqQmtING52UDJZZmJ5a2dXV2l0SVpTWTAvUm5RUWxV?=
- =?utf-8?B?RFdiVjVLaUNNSHF3MzJ0QkVzYXppbGtySzlrd2ZGK2VpUnFlVGhoekc1RTZh?=
- =?utf-8?B?czc5VW8xNFRrUWZOK3p2RUlEdXByd2Rqbkw3VXF0TUxSR3E2emhQWG9NR0Nr?=
- =?utf-8?B?UTRtM0hpMjFsZWlPWXRpL0tmNDVOUFRyRW4zeHlka2g3SUViU1M5ank3SDdz?=
- =?utf-8?B?eVJuOVAvY2w2Wnlhd2dyMk03aE4vV0ZGZ3dMSk5EZzBxSFZUR3FSODFUWGpL?=
- =?utf-8?B?MDQwblZPeHEvd0R2SWlxSndwYTJqTVpDOXB5MmRJSytYWVlKdWcxMDFNVzF4?=
- =?utf-8?B?QS9HYTFrbkhNeXBXYlZQSzRkekdpUmxPK283Uk5RQkVQT3IrUkE1aitGUXJo?=
- =?utf-8?B?NGxzWDB3M3ZIWGtKbm1zTG9La1RGMDRYSmFZM2JTOEZQVjZPdnEwcWYzWFFO?=
- =?utf-8?B?ZFgvRXpycG1aSDdyaDdqbEU0ZnFFMmQxb21qY2UrNjM2L3lBclZFRm1oeVJG?=
- =?utf-8?B?OVcxbHh6cGs1MVBibVhkZWdWbnh5eVFLeklaa2hEaHkyeFkwS3hCQjFtZm5j?=
- =?utf-8?B?Rzg2cXE3T1Y0L1Z3K2g2dnJjMUNyVC8wM284QkdqdFZ2eVJHRUNmR2dRbmdz?=
- =?utf-8?B?bjU5ckM4RS9GaG9kR1dNTlAzUVVnNzNEZzlUOEF2OE9ZOTN1Nnhya2IwYTdW?=
- =?utf-8?Q?sdNfl64k1gDx2DykQsWnhT7+2?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ceb157ae-eabc-47ab-3f07-08de28ea724b
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4205.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2025 10:40:53.9636
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 34YWxzywqKZ22DKWYj8yW7XYeK8zBW22rGE5WvL0Ag67CGT91jPfqYCivimFN+EprLFUPtcZIbV1xTVBs9D4Pg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7495
+Content-Transfer-Encoding: 8bit
 
+Correct spelling typos in several code comments.
 
-On 11/21/25 06:41, PJ Waskiewicz wrote:
-> On Wed, 2025-11-19 at 19:22 +0000, alejandro.lucero-palau@amd.com
-> wrote:
->
-> Hi Alejandro,
->
-> Sorry it's been a bit since I've been able to comment.  I've been
-> trying to test these patchsets with varying degrees of success.  Still
-> haven't gotten things up and running fully.  One comment below.
+- alignement -> alignment
+- wont -> won't
+- orignal -> original
+- substract -> subtract
+- Segement -> Segment
+- splitted -> split
 
+Signed-off-by: Shi Hao <i.shihao.999@gmail.com>
 
-Hi,
+---
 
+changes v2:
+- Update subject message
+- Add additional spelling typo fixes
+- Combined all typo fixes into single patch as requested
+---
+ net/ipv4/ip_fragment.c          | 2 +-
+ net/ipv4/netfilter/arp_tables.c | 2 +-
+ net/ipv4/syncookies.c           | 2 +-
+ net/ipv4/tcp.c                  | 2 +-
+ net/ipv4/tcp_input.c            | 4 ++--
+ net/ipv4/tcp_output.c           | 2 +-
+ 6 files changed, 7 insertions(+), 7 deletions(-)
 
-No worries!
+diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
+index f7012479713b..116ebdd1ec86 100644
+--- a/net/ipv4/ip_fragment.c
++++ b/net/ipv4/ip_fragment.c
+@@ -335,7 +335,7 @@ static int ip_frag_queue(struct ipq *qp, struct sk_buff *skb, int *refs)
 
+ 	/* Note : skb->rbnode and skb->dev share the same location. */
+ 	dev = skb->dev;
+-	/* Makes sure compiler wont do silly aliasing games */
++	/* Makes sure compiler won't do silly aliasing games */
+ 	barrier();
 
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> The patchset should be applied on the described base commit then
->> applying
->> Terry's v13 about CXL error handling. The first 4 patches come from
->> Dan's
->> for-6.18/cxl-probe-order branch with minor modifications.
->>
->> v21 changes;
->>
->>    patch1-2: v20 patch1 splitted up doing the code move in the second
->> 	    patch in v21. (Jonathan)
->>   
->>    patch1-4: adding my Signed-off tag along with Dan's
->>
->>    patch5: fix duplication of CXL_NR_PARTITION definition
->>
->>    patch7: dropped the cxl test fixes removing unused function. It was
->> 	  sent independently ahead of this version.
->>
->>    patch12: optimization for max free space calculation (Jonathan)
->>
->>    patch19: optimization for returning on error (Jonathan)
-> I cannot test these v21 patches or the v20 patches for the same reason.
-> I suspect v19 is also affected, but I was stuck on v17 for awhile (b4
-> was really not likely the prereq patches you required to get the tree
-> into a usable state to apply your patchset).
->
-> When I build and go to install the kernel mods, depmod fails:
->
-> DEPMOD  /lib/modules/6.18.0-rc6+
-> depmod: ERROR: Cycle detected: cxl_core -> cxl_mem -> cxl_port ->
-> cxl_core
-> depmod: ERROR: Cycle detected: cxl_core -> cxl_mem -> cxl_core
-> depmod: ERROR: Found 3 modules in dependency cycles!
->
-> I repro'd this on a few different systems, and just finally repro'd
-> this on a box outside of my work network.
->
-> This is unusable unfortunately, so I can't test this if I wanted to.
+ 	prev_tail = qp->q.fragments_tail;
+diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
+index 1cdd9c28ab2d..f4a339921a8d 100644
+--- a/net/ipv4/netfilter/arp_tables.c
++++ b/net/ipv4/netfilter/arp_tables.c
+@@ -59,7 +59,7 @@ static inline int arp_devaddr_compare(const struct arpt_devaddr_info *ap,
+ /*
+  * Unfortunately, _b and _mask are not aligned to an int (or long int)
+  * Some arches dont care, unrolling the loop is a win on them.
+- * For other arches, we only have a 16bit alignement.
++ * For other arches, we only have a 16bit alignment.
+  */
+ static unsigned long ifname_compare(const char *_a, const char *_b, const char *_mask)
+ {
+diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+index 569befcf021b..7d0d34329259 100644
+--- a/net/ipv4/syncookies.c
++++ b/net/ipv4/syncookies.c
+@@ -131,7 +131,7 @@ static __u32 check_tcp_syn_cookie(__u32 cookie, __be32 saddr, __be32 daddr,
 
+ /*
+  * MSS Values are chosen based on the 2011 paper
+- * 'An Analysis of TCP Maximum Segement Sizes' by S. Alcock and R. Nelson.
++ * 'An Analysis of TCP Maximum Segment Sizes' by S. Alcock and R. Nelson.
+  * Values ..
+  *  .. lower than 536 are rare (< 0.2%)
+  *  .. between 537 and 1299 account for less than < 1.5% of observed values
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 8a18aeca7ab0..0d1c8e805d24 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1600,7 +1600,7 @@ struct sk_buff *tcp_recv_skb(struct sock *sk, u32 seq, u32 *off)
+ 			return skb;
+ 		}
+ 		/* This looks weird, but this can happen if TCP collapsing
+-		 * splitted a fat GRO packet, while we released socket lock
++		 * split a fat GRO packet, while we released socket lock
+ 		 * in skb_splice_bits()
+ 		 */
+ 		tcp_eat_recv_skb(sk, skb);
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index e4a979b75cc6..6c09018b3900 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -1129,7 +1129,7 @@ static void tcp_update_pacing_rate(struct sock *sk)
+ 		do_div(rate, tp->srtt_us);
 
-I have been able to reproduce this, and I think after the changes 
-introduced in patches 2 & 3, we also need this:
+ 	/* WRITE_ONCE() is needed because sch_fq fetches sk_pacing_rate
+-	 * without any lock. We want to make sure compiler wont store
++	 * without any lock. We want to make sure compiler won't store
+ 	 * intermediate values in this location.
+ 	 */
+ 	WRITE_ONCE(sk->sk_pacing_rate,
+@@ -4868,7 +4868,7 @@ void tcp_sack_compress_send_ack(struct sock *sk)
+ 		__sock_put(sk);
 
+ 	/* Since we have to send one ack finally,
+-	 * substract one from tp->compressed_ack to keep
++	 * subtract one from tp->compressed_ack to keep
+ 	 * LINUX_MIB_TCPACKCOMPRESSED accurate.
+ 	 */
+ 	NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPACKCOMPRESSED,
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index b94efb3050d2..483d6b578503 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -2629,7 +2629,7 @@ static int tcp_mtu_probe(struct sock *sk)
+ 	interval = icsk->icsk_mtup.search_high - icsk->icsk_mtup.search_low;
+ 	/* When misfortune happens, we are reprobing actively,
+ 	 * and then reprobe timer has expired. We stick with current
+-	 * probing process by not resetting search range to its orignal.
++	 * probing process by not resetting search range to its original.
+ 	 */
+ 	if (probe_size > tcp_mtu_to_mss(sk, icsk->icsk_mtup.search_high) ||
+ 	    interval < READ_ONCE(net->ipv4.sysctl_tcp_probe_threshold)) {
+--
+2.51.0
 
-
-diff --git a/drivers/cxl/Kconfig b/drivers/cxl/Kconfig
-index 6b871cbbce13..94a3102ce86b 100644
---- a/drivers/cxl/Kconfig
-+++ b/drivers/cxl/Kconfig
-@@ -1,6 +1,6 @@
-  # SPDX-License-Identifier: GPL-2.0-only
-  menuconfig CXL_BUS
--       tristate "CXL (Compute Express Link) Devices Support"
-+       bool "CXL (Compute Express Link) Devices Support"
-         depends on PCI
-         select FW_LOADER
-         select FW_UPLOAD
-
-
-This changes implies neither CXL_BUS optionally being a module nor cxl_mem.
-
-
-This should be enough for at least you able to test the patchset.
-
-
-If this is agreed, I will send a v22 with it.
-
-
-Thank you!
-
-
-> My .config for CXL:
->
->
-> CONFIG_PCIEAER_CXL=y
-> CONFIG_CXL_BUS=m
-> CONFIG_CXL_PCI=y
-> # CONFIG_CXL_MEM_RAW_COMMANDS is not set
-> CONFIG_CXL_ACPI=m
-> CONFIG_CXL_PMEM=m
-> CONFIG_CXL_MEM=m
-> CONFIG_CXL_FEATURES=y
-> # CONFIG_CXL_EDAC_MEM_FEATURES is not set
-> CONFIG_CXL_PORT=m
-> CONFIG_CXL_SUSPEND=y
-> CONFIG_CXL_REGION=y
-> # CONFIG_CXL_REGION_INVALIDATION_TEST is not set
-> CONFIG_CXL_RAS=y
-> CONFIG_CXL_RCH_RAS=y
-> CONFIG_CXL_PMU=m
-> CONFIG_DEV_DAX_CXL=m
->
-> Pretty simple to repro.
->
-> $ make -j<N> && make modules && make modules_install
->
-> Hopefully there's a solution here that doesn't involve building the
-> whole mess into the kernel directly.
->
-> Cheers,
-> -PJ
 
