@@ -1,198 +1,156 @@
-Return-Path: <netdev+bounces-240741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95433C78DF5
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:42:25 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F56EC78DC0
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:40:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B757935D01B
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 11:39:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E63834ED43A
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 11:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19FF34C821;
-	Fri, 21 Nov 2025 11:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02C134B1A6;
+	Fri, 21 Nov 2025 11:36:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOKE6M3W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dV6TiyO6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771B9332EC8
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 11:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABBF346FDF
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 11:36:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763725019; cv=none; b=Zn8D55IVARrNxogx1hHrH6VWAAtVxIevOGjhW1H4G8t48lIeIDuhIfki1PFUD6MghYq9PgPD+2F7EO9VcQw7H+SUhyHYFX8CtgvQz3hGXF9z0wR82/8dvzWY3plipapte1GyhWL0bndb01RZkFXSfHq1n+vzJr7MTU1xOV62e9k=
+	t=1763724967; cv=none; b=T6zJ905A3hP4/K6yaHnmWTQdE2ESvc5tstsG1IKt6KsPXbgR/yvVFp7eEhvLK2qJN2eJFdjeuDEUXUGlbmzSumdNfHEzRNmjT+SAJ5+Q46I3Mxtox5rL4Kn6BNMlXrJ+ckDCYBQa2KWjo4LYtYqb9SbqurEzM+lArSV8fZI4wqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763725019; c=relaxed/simple;
-	bh=LOYpujHQoJKoShOTqgQ9QJ9SHzwlbcEAO9ZGw/MItV8=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=PINEVnOh8k7YKJSdP0tSExtPHtVy0aYTzatKrCls9vQyQyqhGz2hbD5RpLzrExlG6sCqrzVm3/071RB4rACyRpdc99rXKUlBq/dX7hROHHU5Jm2zi/0i0g6+2O9ygoLtU/GfE9aU48hITNv+IjZeSenN3Ch2VtTcpUHqJ00JR3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WOKE6M3W; arc=none smtp.client-ip=209.85.221.41
+	s=arc-20240116; t=1763724967; c=relaxed/simple;
+	bh=ftRTYtj+MIdNdrTL102wop7nvVmtJJk9dP87Q3JUdCo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aXAWIKeaGGmDRbpXzu4G4iqeqrCdWhZiTlVIqbgu5rN4hO9I01vtzXg5MbBpn/YYCNg7ei4fTVVdypGVybBou3c8lzMkZUwWmDhreCSXZwIklFmJIUXYMaWiERizQ+k8AXiYD3IdrkEFpCmjv1H0v2j7ypQFcXtLvWDGr/qyBUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dV6TiyO6; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42b3c965cc4so1014742f8f.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 03:36:54 -0800 (PST)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4779d47be12so15055985e9.2
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 03:36:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763725013; x=1764329813; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CS8gyqFzkQ6r/Z2UVvHxbPt1ypXcs3FwemCtMOsmk8s=;
-        b=WOKE6M3WUK5qGH1nUZNItVGAOnBqI48n/Zlz95GC7nUDWdm0gjVuAVt0Ef/mSk6AGS
-         Ql+DZLVaN97BolVfxXna9T0lWeGeCpC5iDxEkufsI6hz7r2RzoqvzT1E0F4XNAbIzy0b
-         9L6jG/Oarxp6KUQ75V2TUgOU7KegL4jfR6rcNhtn0owvMbyjSx35oU7MV9CefL4aZeNT
-         5sH5MUSb3vGvGhmu6CZaBj3NfwqnasOFRKRPv1ebaVKJwEIQJF8EWDVFj0ihLCLnDhfg
-         rJk9mAMJMPXlTIM8PeOJVGk31LnCSr60KCKuxGtKHpMyEJM6IJy07Z7P5yBsQN15gpWP
-         0xcQ==
+        d=gmail.com; s=20230601; t=1763724964; x=1764329764; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L1iu1X2rkalrqKSnE+I8dJ8h9QZAQz7+DuxtVRZln6A=;
+        b=dV6TiyO6yeyYY0Zt5haoYB/ex7ipCl4ini7vVhbp1BNMcHOlxaxQMVEGEMNkWLbZZJ
+         x7iGB/2y1cfecRyA1/Y4MVvDGQA6Q73aDUk0JPQc29LIv+Q6eviUX5flNG7PjU1ymGD9
+         UYB4c3jdMzuwbVYEI9raDzTb/60Dn4ByKAXkgi4luHtYkLj8eC0pFgxwfeu5FVElOZVK
+         nL2QCmcItRxP1Lk9GCozzPbZiIsARMi2HEfqKHEMzfZG0cTDQhFGLApd/N+JGzb2wXxJ
+         k5R+hFlUQM85c9upG81eaY4uIbl5bw58dP1ACsCcUf51fah2NxZ0APS2S0yLlW5VYUgD
+         gxDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763725013; x=1764329813;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CS8gyqFzkQ6r/Z2UVvHxbPt1ypXcs3FwemCtMOsmk8s=;
-        b=cmcnDLB5WAGkmuTk+tz81jUEKULHyCy+TZ2TiMTyYOnN+DfGvrQvdcQlj6XO9OfR9K
-         i6fZqmisEoB9FqkV8qXBhi8gKhaq00dWKlsvzTOz2Dji/0L7s1nKB8n79S+/9a0QmSwZ
-         vHhznI6wmhgTtL2rsckFtSI83iELRQPMzLvOTu8IZBPXD6rMmLRhWvjcTO3o4RcD9Bqd
-         rBnO681snTkdwlHDofTA5V9Z5hxX/h9mdWOFrfL7AIINalnAWNSQf2+LGo0NCCG06gZ7
-         E0tRp0INWBPrNU+5GWwV2qk6B2SIp80dXQQsTGuMlFlNSLg0d0Fl4Fr+SPR6H9wvzZwf
-         DVLA==
-X-Forwarded-Encrypted: i=1; AJvYcCWrdwpl6dsZoSP8ZKFHbQhrkXMTLzsQgfjJHQJETdu2dcZiCWkNW5wydB7Btw4DfBAiXo8kIhI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcdJ3oVHoKq/nQP8MEQjCN9qkaqP2j3IAlC+9nI2jlweXLI9Ro
-	8fVOlHgZ7pKyBeRCYD/ywpzX4hTC961gsXfIMq3wwTWbw2Az/MNMI8lc
-X-Gm-Gg: ASbGncvk0d41snJP3UqCwHM3FB28XnbCNqHe7WprglOb9q1MWy9MR7n4O3nBMauIYf8
-	isILxVKD8QYpWqy38Ek49CYXQAZR84hlCVcuLEXP+d+TyLesWztAjhB+nNexA+U7x4qd52c02Kw
-	l5fu/y77PVkX1THatGzkJ4Uk338SW6M4KZDF2i+O4tKatMO28x/AwIpDBIBepvnYK7UXiAqSxhx
-	0+xIQwZK9dRyiOS9Cq3WXtIF128dBp6m2e75Oi8nkcxkSUjOsQ2tLQXDiOR+czFnirToWzxb7Ue
-	DznHqcOQYQoUo7hBSRFyhYOGO5Nvcbk+yvgBgwR1rrYVijtqfP3rhJngVsBNdIzoLzNQ8KplqQy
-	rHkgCN9t4L2RRY7esizGU/nRbgxWOwiB7BcSwxFMpDlrEHNsCAAGvbaYTEsV5gyW2oLBztBx+B5
-	QEe8djyBkV2leKS3WUM3pTi4U=
-X-Google-Smtp-Source: AGHT+IEOAgZmPr6L2R2ZTzAQtOA1RU1DqXWvah0GGKJQuxKtItTZR/EwGeyivvDwMsUN+Ewo3KC8EQ==
-X-Received: by 2002:a05:6000:4026:b0:425:7e33:b4a9 with SMTP id ffacd0b85a97d-42cc125247bmr2705819f8f.0.1763725012584;
-        Fri, 21 Nov 2025 03:36:52 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:f819:b939:9ed6:5114])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fd9061sm10506268f8f.41.2025.11.21.03.36.51
+        d=1e100.net; s=20230601; t=1763724964; x=1764329764;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L1iu1X2rkalrqKSnE+I8dJ8h9QZAQz7+DuxtVRZln6A=;
+        b=cDdFOEKCVV5uYhzIGVQldEvzEWriQSd57OrPYEaAOC+U374oVj+lzsnJjABU5n6m6k
+         xLFYEUKVDtqPIwoGSnw0VhvK7jJOg9yZaFtzCzlKmfvXj/LYPq0xOOvD7Xt2lss3E41J
+         IBMR6sFFEpwq28VXGFUzxLcbpKcf8j1wrh1dKbKJnYGWlmsIFkJbmDOs6pTtYCmMdoAF
+         YqUKo3GxcQWfbzGkYDTVEQuKrbCuH8UE7+iqtuKLXh/f8oi0hwjKf3MWMYAmCpMV5rry
+         v15Zhhux+EJ0qmWXiOnDxn3g9jZWHtQrruqPtEwXEwfLsb9Yjhh1DTHEoYQj8CUnQ8oY
+         PxZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUIlcnYRdR3aL9eaJZx0JYvxX59xsYLBPsXSj6ETsUR3iRZxfGxCEWXniF9013LFSJJi6AbNJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUygxXLy8o+4WYed9kJQRN9VOx0IpzquNnIUs78gRl3ky1GMoD
+	bd276vxj2Y0Ro532p+00fzA84o3G8pM7M8eC0qsof00ZGPhuibpwckcG
+X-Gm-Gg: ASbGncvrzPicFyJeXaIeOiV6tK2PeSmCGzyaYuNJmvYZeflF4/IV5EV22zIOd1lon7K
+	v5vA4JgBAj6DIq0CJ/Mf9qRF0FBlxVOYlxvtx4QHdsQhnjbopJHBfpvohN03lbHH5esJNum1lm9
+	Ptli/NJ2YmTM/qdAqlhh6nC0yhEgdcQW7Je97FgkNhUpS1Rlv69IdI7bpAsXAlHmHjsadLXaahS
+	/gT9H9DHWhclKDIYZ44McpzYPWpPzjVK3oRo2XxuTU7ezKBHQfgtT8YvIpyc2SOP2jQE/gYNMtE
+	ed6KdOPp39Qq5ZTcy2pL+QWNtQsJZUqErN7FA8cxKBmF7TbZ/5OfhnTaW8LQV98hTHJNDOuSxAQ
+	xGR3nhpN6KBEL3cLpfYZdmroceJ19O7r065yuLAS05G2VKY/YWx3l850NoZpu9AIV6h1KmuVJJb
+	ICy9qddMe7IKB5hx3LgmZDbP5ds0jEOfiklNg=
+X-Google-Smtp-Source: AGHT+IENbIixTtlLAm9EX+vhw2xhihNg0J8d0rCtdFjldUByc3WPIQ755fW/IkVXGwQuhSLkmIA/DQ==
+X-Received: by 2002:a05:600c:354b:b0:46f:b327:ecfb with SMTP id 5b1f17b1804b1-477c0184c45mr19858395e9.9.1763724963551;
+        Fri, 21 Nov 2025 03:36:03 -0800 (PST)
+Received: from iku.Home ([2a06:5906:61b:2d00:9cce:8ab9:bc72:76cd])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf3558d5sm38732465e9.1.2025.11.21.03.36.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 03:36:52 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: "Remy D. Farley" <one-d-wide@protonmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,  netdev@vger.kernel.org,  Pablo Neira
- Ayuso <pablo@netfilter.org>,  Jozsef Kadlecsik <kadlec@netfilter.org>,
-  Florian Westphal <fw@strlen.de>,  Phil Sutter <phil@nwl.cc>,
-  netfilter-devel@vger.kernel.org,  coreteam@netfilter.org
-Subject: Re: [PATCH v5 2/6] doc/netlink: nftables: Add definitions
-In-Reply-To: <20251120151754.1111675-3-one-d-wide@protonmail.com>
-Date: Fri, 21 Nov 2025 11:33:06 +0000
-Message-ID: <m2qztr4o3x.fsf@gmail.com>
-References: <20251120151754.1111675-1-one-d-wide@protonmail.com>
-	<20251120151754.1111675-3-one-d-wide@protonmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Fri, 21 Nov 2025 03:36:03 -0800 (PST)
+From: Prabhakar <prabhakar.csengg@gmail.com>
+X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+To: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Russell King <linux@armlinux.org.uk>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>
+Cc: linux-renesas-soc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Prabhakar <prabhakar.csengg@gmail.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: [PATCH net-next 00/11] Add ETHSW support for Renesas RZ/T2H and RZ/N2H SoCs
+Date: Fri, 21 Nov 2025 11:35:26 +0000
+Message-ID: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-"Remy D. Farley" <one-d-wide@protonmail.com> writes:
+From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-> New enums/flags:
-> - payload-base
-> - range-ops
-> - registers
-> - numgen-types
-> - log-level
-> - log-flags
->
-> Added missing enumerations:
-> - bitwise-ops
->
-> Annotated with a doc comment:
-> - bitwise-ops
->
-> Signed-off-by: Remy D. Farley <one-d-wide@protonmail.com>
-> ---
->  Documentation/netlink/specs/nftables.yaml | 147 +++++++++++++++++++++-
->  1 file changed, 144 insertions(+), 3 deletions(-)
->
-> diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netlink/specs/nftables.yaml
-> index cce88819b..e0c25af1d 100644
-> --- a/Documentation/netlink/specs/nftables.yaml
-> +++ b/Documentation/netlink/specs/nftables.yaml
-> @@ -66,9 +66,23 @@ definitions:
->      name: bitwise-ops
->      type: enum
->      entries:
-> -      - bool
-> -      - lshift
-> -      - rshift
-> +      -
-> +        name: mask-xor  # aka bool (old name)
-> +        doc: |
-> +          mask-and-xor operation used to implement NOT, AND, OR and XOR
-> +            dreg = (sreg & mask) ^ xor
-> +          with these mask and xor values:
-> +                    mask    xor
-> +            NOT:    1       1
-> +            OR:     ~x      x
-> +            XOR:    1       x
-> +            AND:    x       0
+Hi All,
 
-This does not render acceptably in the HTML docs and it deviates from
-the way the text is presented in nf_tables.h - the description makes
-sense in the context of the expression defined by expr-bitwise-attrs
-which bitwise-ops is part of.
+This series of patches adds support for the Renesas RZ/T2H and RZ/N2H SoCs
+which integrate an Ethernet switch IP variant called ETHSW. The ETHSW is
+largely compatible with the A5PSW switch found on RZ/N1 SoCs, but has
+several key differences in register layout and hardware configuration. The
+series includes updates to the DSA driver, device tree bindings, and
+Kconfig to enable support for these SoCs.
 
-I suggest moving the doc to expr-bitwise-attrs, which has the advantage
-that the ynl doc generator already handles preformatted text for attr
-sets.
+Cheers,
+Prabhakar
 
-This diff should be sufficient; note the :: and block indentation:
+Lad Prabhakar (11):
+  net: dsa: tag_rzn1_a5psw: Drop redundant ETH_P_DSA_A5PSW definition
+  net: dsa: tag_rzn1_a5psw: Add RZ/T2H ETHSW tag protocol and register
+    ethsw tag driver
+  net: dsa: Kconfig: Expand config description to cover RZ/T2H and
+    RZ/N2H ETHSW
+  dt-bindings: net: dsa: renesas,rzn1-a5psw: Add RZ/T2H and RZ/N2H ETHSW
+    support
+  net: dsa: rzn1-a5psw: Add support for optional reset control
+  net: dsa: rzn1-a5psw: Add support for optional timestamp clock
+  net: dsa: rzn1-a5psw: Make switch topology configurable via OF data
+  net: dsa: rzn1-a5psw: Make DSA tag protocol configurable via OF data
+  net: dsa: rzn1-a5psw: Add support for management port frame length
+    adjustment
+  net: dsa: rzn1-a5psw: Add support for RZ/T2H Ethernet switch
+  net: dsa: Kconfig: Enable support for RZ/T2H and RZ/N2H SoCs
 
-diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netlink/specs/nftables.yaml
-index 136b2502a811..23106a68512f 100644
---- a/Documentation/netlink/specs/nftables.yaml
-+++ b/Documentation/netlink/specs/nftables.yaml
-@@ -68,15 +68,9 @@ definitions:
-     entries:
-       -
-         name: mask-xor  # aka bool (old name)
--        doc: |
--          mask-and-xor operation used to implement NOT, AND, OR and XOR
--            dreg = (sreg & mask) ^ xor
--          with these mask and xor values:
--                    mask    xor
--            NOT:    1       1
--            OR:     ~x      x
--            XOR:    1       x
--            AND:    x       0
-+        doc: >-
-+          mask-and-xor operation used to implement NOT, AND, OR and XOR boolean
-+          operations
-       # Spinx docutils display warning when interleaving attrsets with strings
-       - name: lshift
-       - name: rshift
-@@ -1014,6 +1008,22 @@ attribute-sets:
-         nested-attributes: hook-dev-attrs
-   -
-     name: expr-bitwise-attrs
-+    doc: |
-+      The bitwise expression supports boolean and shift operations. It
-+      implements the boolean operations by performing the following
-+      operation::
-+
-+          dreg = (sreg & mask) ^ xor
-+
-+          with these mask and xor values:
-+
-+          op      mask    xor
-+          ----    ----    ---
-+          NOT:     1       1
-+          OR:     ~x       x
-+          XOR:     1       x
-+          AND:     x       0
-+
-     attributes:
-       -
-         name: sreg
+ .../bindings/net/dsa/renesas,rzn1-a5psw.yaml  | 154 +++++++++++++++---
+ drivers/net/dsa/Kconfig                       |   9 +-
+ drivers/net/dsa/rzn1_a5psw.c                  |  58 +++++--
+ drivers/net/dsa/rzn1_a5psw.h                  |  25 ++-
+ include/net/dsa.h                             |   2 +
+ include/uapi/linux/if_ether.h                 |   2 +-
+ net/dsa/Kconfig                               |   6 +-
+ net/dsa/tag_rzn1_a5psw.c                      |  22 ++-
+ 8 files changed, 230 insertions(+), 48 deletions(-)
+
+-- 
+2.52.0
+
 
