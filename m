@@ -1,157 +1,192 @@
-Return-Path: <netdev+bounces-240886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C73DCC7BBF4
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 22:28:01 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C6B1C7BC0F
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 22:31:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EAFB24EC678
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 21:27:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0BE5935202D
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 21:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F3E3074A6;
-	Fri, 21 Nov 2025 21:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B003306B21;
+	Fri, 21 Nov 2025 21:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rw/AcWrK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aBtjt9q9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46399533D6;
-	Fri, 21 Nov 2025 21:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CA6305045
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 21:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763760466; cv=none; b=VbcE07WXXM3+nV1EkNoqmjxlqvY2a4s6bN9A2sQXI/Xa/ZEG+bQUaBO2DptH2FtKxYCtbJbPfX+76CQc5I25nzsAUxqUeYhhbo5daEEmp/6HlElVgdb2xRjKt+/F8IXEq01MDDlxG4gPXM5YQ0lNLEE1oORs9WZPYKk1meh62GQ=
+	t=1763760645; cv=none; b=ce8bAOYkqMXt23zLkk28IP/SfvKXPz3rsrSNPrhfranT0vZZOuL+tJz9EK0gZTRMDaJHk5Fe4hvw1ev5XrLmz6owp0Jv6rD7yYyNIJ1FtQZg1ptTayAqXxUC6qL09BWoFdhttFuIFR3w4uheaSaa+uTUlR2yFqgmltsZYLGrpLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763760466; c=relaxed/simple;
-	bh=HfH2F0h59eoZQ5tjmd4HRor9ZCg51HobUAnM7algTbw=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=hNdIhvEqRf3uC6OMBsok0GQd/BDQOZnXzIqXyZlAkd/XnymaXEV6MXLbmA1C1FX48vlgVeA8UgVRzmNE9i6WYDPZjKt21PjAZbpnb/QvykhH8bjJpR1V53M13H1EcfpuitLqHKzue5hNAdslsQVsnppsxgh5joowCjOKQ++SI4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rw/AcWrK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF067C4CEF1;
-	Fri, 21 Nov 2025 21:27:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763760466;
-	bh=HfH2F0h59eoZQ5tjmd4HRor9ZCg51HobUAnM7algTbw=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=Rw/AcWrKnZ/qvQlIfYkp11nHDLkTb00zgKyD6NZHO327FnITRfDO323bumWqcDdtT
-	 PAGPSIC6NwtelOuGLZMqJ2IlgzvA4vWclE89hhyKnW4FUz8BOo/Dm7tcDFv+1B6ltg
-	 uCx6Zi2+RDfAIi9k+SgSBTJGXlIckVCFF4asvN7tMGLPklvQcc+h/4CXignm8VIwCl
-	 Q45ggw4Wus8BiHoowZ/Tst/WxscflxW/sXuBAOzyM06g/zBBXggrEpH5Sa+7X0eAFj
-	 rGkrSYy/+edHIGmbttLwb1MEl3cM3WnanriKP9ZcodNRgvD0N2fChpJxyaQeUsxPDf
-	 KSfmwZg4/EuMw==
-Content-Type: multipart/mixed; boundary="===============2450436810576955457=="
+	s=arc-20240116; t=1763760645; c=relaxed/simple;
+	bh=D+5H3nNvGF2VIP+zpxewJTT4xj9DjwT6g7PTX/mjtl0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iAkaViCuZacZmd4wnVdzR+snSTY76Y1f11OPlNs3RUdUym5nbjjEJ4ntvC9SoQ0x2dFZ8KFpBaFsLadlInDjX+M2t4lUyWeYXBu99HTwurFO94gqLjdYfgRKMSNhCTOqCbkakwEvtwnub63Zxx57DGTppH3F53ju/QF0fitII5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aBtjt9q9; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4775ae5684fso11871665e9.1
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 13:30:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763760641; x=1764365441; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hcnfwnAnoq9Fhw37SyI9X8sGMiJgnd+Uv1hwKVjim2Q=;
+        b=aBtjt9q9x8J/RfcmVjOBX0RyjEqwc7T+KKKCmC8bLp/3fyixJQfNfp+Eg3yzwSZF9f
+         KsEKZ0XDMB7tlSDDY9rx+IJ68oNzgURCBrNWOdR6ybrSpBryDB34qEpLxokAqZMQ5+z4
+         1NojEzsF70DmyP5rcR8R7vuBPN7KBcaS9s7XRxDnIfWES7BGpZrcN8JmCoimwEbxrZT+
+         HMi5GVkiYp07m0jBjC/SdD94sG63AXUgpxnP0MeHYIbpTx5UcFtr5qsogER7JN9JiY+5
+         zAqJXE25TI/8YDAAzTEm0RQenqGn+z5/vjRp0L7DT76nJBFMc72C3BA1qDZtHbKt87LD
+         3tkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763760641; x=1764365441;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hcnfwnAnoq9Fhw37SyI9X8sGMiJgnd+Uv1hwKVjim2Q=;
+        b=vXPEAtBeYVjYQ8mVRdsd91A5r9WA1xZC42hsWLpZJA28RNw5xeiPazijVFVd/+6Zdz
+         JDmmfvoI1E8woWA33YAMIf6WLMv/+7jOxKu4lYuUsWbFgbxtW7HIpCpMKtE7O4ROj7OI
+         tbzW8wjBIbXn89CNzFbXZaImFTfTiCrXCgW3uI8hLIwhmRViBCbOwgOZDvZimvmrL4kh
+         2n/8Zwv9/8ox+FcemipqlsU3rDx7MBWvAQcISrJ5waQclNMUo+cns6nVCKstCGyqcK4E
+         xFifd/3TDaUxIx1lfKYEu14BaUl/fXwYVOlWqxV6xZYyAMZBZV5b9qGDG817hLuJmcKD
+         neQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXgRqBJ5w2txckmTAnaJiExGEo4f02ZhKqljfE7v1Vptc9E3U7FQgKOYpEl9QlqcTSGJzoeg18=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCX+fGhPrp6PcxSGLH8mPUiLwwwe5R7dalkwWBPd0Nnsqp5Ho6
+	v/SFNAVyVhPr3AmMaqPdEIh+Mbryn9PDdRk2jM8x3So5Tcx/gHaqmMIReLqnlReTX9cfu20ayAb
+	77n0Kmy/CHvTLHRB6b2b7Lg1hj6WR7lM=
+X-Gm-Gg: ASbGnctxHh7Mw82AYXtsNWtGqiBfN38nr1QNSevJdyVvMNQgXdkPnZsUti9VERoesgO
+	A5+VxdRsoU76zC0ntQI8QS0TL0d9z30OH/HhLZTi2rrUeQc4qQT36+6dRnHh+YcWW6imGrQAtKe
+	kJroBtQQ0iKWN4YLDaERInnhQ8aupCmuzHSUCUlABcJ+IsbPCIFrab66WzVPrGTFlUBxeaxyk29
+	ww/hxYpyzzi54r7jcBfW5EXfTMJhE4IxkuhuYH9h2eT+bRx/CXYpa8O99j/olFb61Y6ahVlzYim
+	fn4PE4/icTfgYPHJJikBrSr2v+Moa95Mcl4omaE=
+X-Google-Smtp-Source: AGHT+IHFza28/HLNlBLJhQc7+YEkrnjCLxc+DtrDhOWTi1679uZaJ42r/nuYALOcGS6zFbQIlAAVjgM+8yjpShMR5wE=
+X-Received: by 2002:a05:6000:22ca:b0:42b:3746:3b88 with SMTP id
+ ffacd0b85a97d-42cc1d22a43mr3976603f8f.57.1763760640501; Fri, 21 Nov 2025
+ 13:30:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <e7c311bb305d985c1a9ea19aef3fcd4094c7e03c600dfba9fc83438b285f5946@mail.kernel.org>
-In-Reply-To: <20251121205724.2934650-1-ameryhung@gmail.com>
-References: <20251121205724.2934650-1-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf-next v2 1/2] rqspinlock: Annotate rqspinlock lock acquiring functions with __must_check
-From: bot+bpf-ci@kernel.org
-To: ameryhung@gmail.com,bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,memxor@gmail.com,david.laight.linux@gmail.com,dave@stgolabs.net,paulmck@kernel.org,josh@joshtriplett.org,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri, 21 Nov 2025 21:27:45 +0000 (UTC)
+References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251121113553.2955854-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251121192700.3eg5h2eqk7bruxeu@skbuf> <CA+V-a8vyjt43TPUmu+1TFHFvQsBwYTzKFSQOQm=O3R0dpZWG_w@mail.gmail.com>
+ <20251121204833.hu4jfq6bx2kdamd3@skbuf>
+In-Reply-To: <20251121204833.hu4jfq6bx2kdamd3@skbuf>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Fri, 21 Nov 2025 21:30:14 +0000
+X-Gm-Features: AWmQ_bkQ2IeWhsgefdLasYqIq_ZXdqTdPdH9Mzx8FAtJ2y9VFLAWaJ5rpjXrzn8
+Message-ID: <CA+V-a8uA-p9wGXNVdf8Oykt518_2X6fyK6s2-R+G_AR2DqXckA@mail.gmail.com>
+Subject: Re: [PATCH net-next 02/11] net: dsa: tag_rzn1_a5psw: Add RZ/T2H ETHSW
+ tag protocol and register ethsw tag driver
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Russell King <linux@armlinux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============2450436810576955457==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Vladimir,
 
-> diff --git a/include/asm-generic/rqspinlock.h b/include/asm-generic/rqspinlock.h
-> index 6d4244d64..855c09435 100644
-> --- a/include/asm-generic/rqspinlock.h
-> +++ b/include/asm-generic/rqspinlock.h
-
-[ ... ]
-
-> @@ -171,7 +171,7 @@ static __always_inline void release_held_lock_entry(void)
->   * * -EDEADLK	- Lock acquisition failed because of AA/ABBA deadlock.
->   * * -ETIMEDOUT - Lock acquisition failed because of timeout.
->   */
-> -static __always_inline int res_spin_lock(rqspinlock_t *lock)
-> +static __always_inline __must_check int res_spin_lock(rqspinlock_t *lock)
->  {
->  	int val = 0;
+On Fri, Nov 21, 2025 at 8:48=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
+ wrote:
 >
-> @@ -223,27 +223,36 @@ static __always_inline void res_spin_unlock(rqspinlock_t *lock)
->  #define raw_res_spin_lock_init(lock) ({ *(lock) = (rqspinlock_t){0}; })
->  #endif
+> On Fri, Nov 21, 2025 at 08:29:04PM +0000, Lad, Prabhakar wrote:
+> > On Fri, Nov 21, 2025 at 7:27=E2=80=AFPM Vladimir Oltean <olteanv@gmail.=
+com> wrote:
+> > >
+> > > On Fri, Nov 21, 2025 at 11:35:28AM +0000, Prabhakar wrote:
+> > > > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> > > >
+> > > > Add an explicit tag protocol for the RZ/T2H ETHSW and register a se=
+parate
+> > > > ethsw tag driver so the existing A5PSW tag implementation can be re=
+used
+> > > > for RZ/T2H without code duplication.
+> > > >
+> > > > The ETHSW IP on RZ/T2H shares substantial commonality with the A5PS=
+W IP on
+> > > > RZ/N1, and the current tag driver does not touch the register field=
+s that
+> > > > differ between the two blocks.
+> > >
+> > > Tagging protocol drivers are specifically written to not deal with
+> > > register fields. I would like a clarification that this is a phrasing
+> > > mistake and you mean the packet header fields that differ between the
+> > > ETHSW and the A5PSW tag format.
+> > >
+> > Unlike the other drivers, tagging drivers don't have compatible
+> > strings to match against. For the ETHSW IP, the current driver is
+> > reused as-is. My intention with the comment was simply to point out
+> > that, if an issue ever arises that requires us to split the paths, we
+> > can future-proof things by using DSA_TAG_PROTO_* identifiers.
 >
-> -#define raw_res_spin_lock(lock)                    \
-> -	({                                         \
-> -		int __ret;                         \
-> -		preempt_disable();                 \
-> -		__ret = res_spin_lock(lock);	   \
-> -		if (__ret)                         \
-> -			preempt_enable();          \
-> -		__ret;                             \
-> -	})
-> +static __always_inline __must_check int raw_res_spin_lock(rqspinlock_t *lock)
-> +{
-> +	int ret;
-> +
-> +	preempt_disable();
-> +	ret = res_spin_lock(lock);
-> +	if (ret)
-> +		preempt_enable();
-> +
-> +	return ret;
-> +}
+> The tagging protocol's name uniquely defines the layout of the DSA
+> header and general interaction procedure required on RX and TX (for more
+> complex things such as PTP). It doesn't have to be further namespaced by
+> its users just because. In other words, two switch drivers using the
+> same tagging protocol with the same name is fine (even if due to a lack
+> of imagination, the tagging protocol's name comes just from its first
+> user), and introducing a new name for it would be unnecessary. For
+> example, felix_vsc9959.c, a switch different from ocelot_ext.c, uses
+> DSA_TAG_PROTO_OCELOT because the protocol is identical.
 >
->  #define raw_res_spin_unlock(lock) ({ res_spin_unlock(lock); preempt_enable(); })
->
-> -#define raw_res_spin_lock_irqsave(lock, flags)    \
-> -	({                                        \
-> -		int __ret;                        \
-> -		local_irq_save(flags);            \
-> -		__ret = raw_res_spin_lock(lock);  \
-> -		if (__ret)                        \
-> -			local_irq_restore(flags); \
-> -		__ret;                            \
-> -	})
-> +static __always_inline __must_check int
-> +__raw_res_spin_lock_irqsave(rqspinlock_t *lock, unsigned long *flags)
-> +{
-> +	unsigned long __flags;
-> +	int ret;
-> +
-> +	local_irq_save(__flags);
-> +	ret = raw_res_spin_lock(lock);
-> +	if (ret)
-> +		local_irq_restore(__flags);
-> +
-> +	*flags = __flags;
-> +	return ret;
-> +}
-> +
-> +#define raw_res_spin_lock_irqsave(lock, flags) __raw_res_spin_lock_irqsave(lock, &flags)
+> The exception would be when there exist packet headers which have
+> different layouts - then irrespective of whether those fields are
+> currently used or not, we should register a new driver.  This is the
+> only thing that matters.  I thought that you were saying that such
+> differences exist, but after your second reply, it seems not?
 
-The __must_check annotations will cause compiler warnings in
-kernel/locking/locktorture.c where torture_raw_res_spin_write_lock()
-and torture_raw_res_spin_write_lock_irq() ignore lock acquisition
-failures.
+The Tagged Frame Format is the same for both the SoCs (like below)
+---------------------------------------------------------------------------
+7 octets PREAMBLE
+1 octet SFD
+6 octets DESTINATION ADDRESS
+6 octets SOURCE ADDRESS
+2 octets ControlTag (default: E001h)
+2 octets ControlData
+4 octets ControlData2 (timestamp, portmask)
+2 octets type/length
+0..1500/9000 octets PAYLOAD DATA
+0..42 octets PAD
+4 octets FRAME CHECK SEQUENCE
 
-When raw_res_spin_lock() returns an error (deadlock or timeout), the
-torture test functions still return 0 to indicate success. The torture
-framework then calls the unlock functions, but the lock was never
-acquired. In res_spin_unlock(), this causes an out-of-bounds array
-access when computing locks[cnt - 1] with cnt=0, potentially corrupting
-per-CPU memory.
+Transmit processing (switch to CPU) is different,
+On RZ/N1:
+ControlData
+[0-3] =3D Port number where the frame was received
+[4-15] =3D reserved
 
-Should the torture test handle lock acquisition failures, or use
-different lock types that cannot fail?
+On RZ/T2H:
+ControlData
+[0-3] =3D Port number where the frame was received
+[4] =3D Timer used for timestamp
+[5] =3D reserved
+[6] =3D RED period indication
+[7-15] =3D reserved
 
+Also there are differences in receive processing (CPU to switch) the
+ControlData and ControlData2 bits differ.
 
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+Based on the feedback received I would need to register a new driver.
+Do you agree?
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19583558278
-
---===============2450436810576955457==--
+Cheers,
+Prabhakar
 
