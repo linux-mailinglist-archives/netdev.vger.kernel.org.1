@@ -1,255 +1,198 @@
-Return-Path: <netdev+bounces-240727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEA0BC78CB7
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:29:21 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95433C78DF5
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:42:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 026EE4EDAD9
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 11:27:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B757935D01B
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 11:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7920634AAE9;
-	Fri, 21 Nov 2025 11:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19FF34C821;
+	Fri, 21 Nov 2025 11:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOKE6M3W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2732F0C7E
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 11:26:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771B9332EC8
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 11:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763724399; cv=none; b=HPlpYTnxt5VjcqWx3JqU4809BcJHx190kyGe6oCDXIR/FsHR6tf1ifjfGUrZDxm33pM/c5hcTYRgjPG9XXAffdwOR4Q3lC87nVXvqb6LlsGRieKq/ZgIBuTBbPPdUB8xHsU7BfwIqVKnKXN4qnu+JgllLm3XoI3BjEPLkQhTUoc=
+	t=1763725019; cv=none; b=Zn8D55IVARrNxogx1hHrH6VWAAtVxIevOGjhW1H4G8t48lIeIDuhIfki1PFUD6MghYq9PgPD+2F7EO9VcQw7H+SUhyHYFX8CtgvQz3hGXF9z0wR82/8dvzWY3plipapte1GyhWL0bndb01RZkFXSfHq1n+vzJr7MTU1xOV62e9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763724399; c=relaxed/simple;
-	bh=Up/1xSeBkB0p2W4yVcqFz2y90IusIdqbhG7Z3DkQyOM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=S3qRvcbASLQpwsp+Bdito7Aw1f8IuU+tjed3+C3Eje5KvyHu9U6zQ19hETdO7cRHz1/g4Y1y8BT61ValfbYqlIw5redrKnGg+LnID0I32xjOUclpliYnhGX+uhQcoGZGS2jJj4B3C9cZEqmMlbkC/WoOeFLVOtMD6uR/m6XWsVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1763725019; c=relaxed/simple;
+	bh=LOYpujHQoJKoShOTqgQ9QJ9SHzwlbcEAO9ZGw/MItV8=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=PINEVnOh8k7YKJSdP0tSExtPHtVy0aYTzatKrCls9vQyQyqhGz2hbD5RpLzrExlG6sCqrzVm3/071RB4rACyRpdc99rXKUlBq/dX7hROHHU5Jm2zi/0i0g6+2O9ygoLtU/GfE9aU48hITNv+IjZeSenN3Ch2VtTcpUHqJ00JR3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WOKE6M3W; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-45085a4ab72so830614b6e.1
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 03:26:37 -0800 (PST)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42b3c965cc4so1014742f8f.0
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 03:36:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763725013; x=1764329813; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CS8gyqFzkQ6r/Z2UVvHxbPt1ypXcs3FwemCtMOsmk8s=;
+        b=WOKE6M3WUK5qGH1nUZNItVGAOnBqI48n/Zlz95GC7nUDWdm0gjVuAVt0Ef/mSk6AGS
+         Ql+DZLVaN97BolVfxXna9T0lWeGeCpC5iDxEkufsI6hz7r2RzoqvzT1E0F4XNAbIzy0b
+         9L6jG/Oarxp6KUQ75V2TUgOU7KegL4jfR6rcNhtn0owvMbyjSx35oU7MV9CefL4aZeNT
+         5sH5MUSb3vGvGhmu6CZaBj3NfwqnasOFRKRPv1ebaVKJwEIQJF8EWDVFj0ihLCLnDhfg
+         rJk9mAMJMPXlTIM8PeOJVGk31LnCSr60KCKuxGtKHpMyEJM6IJy07Z7P5yBsQN15gpWP
+         0xcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763724397; x=1764329197;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HeQ3fv25z6pOuPgCHIWGZAjgHMbUF84qDxUXEpKs5xA=;
-        b=ZJm5BnLpp4nSHv4wC2zlAKufs9A5idnuMGj4H5z/lHGPyyJLqbFY4kQkbZ6bhv1s8X
-         u30e7/ploVanQwnUFDsxzG0unPvGUZ02vyoarWw/vLOcMujqXwA5MJ9GH/HI8UjuGIUP
-         TI4zjUVg0wUyqC5nx0KsQ4SUM3wZ7eJ5XWMQ9VXDFKyOkQu/FAWU9KdCROs1SuaDFbt3
-         3qoFYsmPZnYZsR1jfIYd4I2ANVI1yL3/Y6jrZDUCIPWmr74hjIQ2Ji7PHPBWBUK6xDCs
-         M3axi38Qf9phTuG5p8S+D/7zHrk2szTVxXB6yhO8xzQQBpufQcxAPjIMLIGPfPTSvRCm
-         +MLg==
-X-Forwarded-Encrypted: i=1; AJvYcCUM+jMv9W0Y29zQehrdlSgFTUTAEYYDR+V4PitOkiuq1qBJiK+HUbiBIGcba4Ka14s7n7y8x0k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQeBYi7GrjPHdYXw0+ygXh2YkDRyPqxLJerkAjc4wS+Vvoh+Br
-	pm2sqxLSwJ13f0WzE+Gn6Tow8EdO78WzQg06p3jEryGR66FzDPK3rGgS
-X-Gm-Gg: ASbGnctznIw2EQKigqTONoaasGNKF3lZBqIkvLZZ37koTRi4F4C1y8jayh7iXEjGfBB
-	wtEvPHijVJehY7k1p632LA4rlMByNt6Dg2L9x6Im/v9eE1+avPNuL3ZKIT24aIgy58SNdiEooVG
-	mOzvKTIt0LNcgRz9p/oSdbtiQp6y02ZAivbU8ZMEP3Y2GH2HoAK2BbP4lyDpnE/SyWVHmDnF1UO
-	hiX9YyUC0qC7fDIaofPbTtC83K5/naebmr9t4f/MEMshNByh8J7FBqj43KgNl/R1f94kxQdG87r
-	KgogQJ9ua1pWv2bwYaSzaLBeDpL20g3/HEPzDFY38BqF8bE+lRBBJjtUMQXanwM6K0PCoR9ih27
-	IM3X3+oYrcGycILQ/OnNTjcO4m6gFc3+M2dD7RDTOUzoS1epMNQaaoamATbQz7yi8bwYVq0WNcp
-	AP9e/k5mJcLaAGHw==
-X-Google-Smtp-Source: AGHT+IFJloyur0rQ9obs1zwpoSsUNIFlCUAqnRwKRBTiMrW8I69Xl0Dp8rUnZV0AbBobB8c+GozWew==
-X-Received: by 2002:a05:6808:4fe5:b0:44f:6d6d:4a04 with SMTP id 5614622812f47-45112cf9e04mr777367b6e.58.1763724396661;
-        Fri, 21 Nov 2025 03:26:36 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:41::])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65782a38456sm1567810eaf.3.2025.11.21.03.26.35
+        d=1e100.net; s=20230601; t=1763725013; x=1764329813;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CS8gyqFzkQ6r/Z2UVvHxbPt1ypXcs3FwemCtMOsmk8s=;
+        b=cmcnDLB5WAGkmuTk+tz81jUEKULHyCy+TZ2TiMTyYOnN+DfGvrQvdcQlj6XO9OfR9K
+         i6fZqmisEoB9FqkV8qXBhi8gKhaq00dWKlsvzTOz2Dji/0L7s1nKB8n79S+/9a0QmSwZ
+         vHhznI6wmhgTtL2rsckFtSI83iELRQPMzLvOTu8IZBPXD6rMmLRhWvjcTO3o4RcD9Bqd
+         rBnO681snTkdwlHDofTA5V9Z5hxX/h9mdWOFrfL7AIINalnAWNSQf2+LGo0NCCG06gZ7
+         E0tRp0INWBPrNU+5GWwV2qk6B2SIp80dXQQsTGuMlFlNSLg0d0Fl4Fr+SPR6H9wvzZwf
+         DVLA==
+X-Forwarded-Encrypted: i=1; AJvYcCWrdwpl6dsZoSP8ZKFHbQhrkXMTLzsQgfjJHQJETdu2dcZiCWkNW5wydB7Btw4DfBAiXo8kIhI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcdJ3oVHoKq/nQP8MEQjCN9qkaqP2j3IAlC+9nI2jlweXLI9Ro
+	8fVOlHgZ7pKyBeRCYD/ywpzX4hTC961gsXfIMq3wwTWbw2Az/MNMI8lc
+X-Gm-Gg: ASbGncvk0d41snJP3UqCwHM3FB28XnbCNqHe7WprglOb9q1MWy9MR7n4O3nBMauIYf8
+	isILxVKD8QYpWqy38Ek49CYXQAZR84hlCVcuLEXP+d+TyLesWztAjhB+nNexA+U7x4qd52c02Kw
+	l5fu/y77PVkX1THatGzkJ4Uk338SW6M4KZDF2i+O4tKatMO28x/AwIpDBIBepvnYK7UXiAqSxhx
+	0+xIQwZK9dRyiOS9Cq3WXtIF128dBp6m2e75Oi8nkcxkSUjOsQ2tLQXDiOR+czFnirToWzxb7Ue
+	DznHqcOQYQoUo7hBSRFyhYOGO5Nvcbk+yvgBgwR1rrYVijtqfP3rhJngVsBNdIzoLzNQ8KplqQy
+	rHkgCN9t4L2RRY7esizGU/nRbgxWOwiB7BcSwxFMpDlrEHNsCAAGvbaYTEsV5gyW2oLBztBx+B5
+	QEe8djyBkV2leKS3WUM3pTi4U=
+X-Google-Smtp-Source: AGHT+IEOAgZmPr6L2R2ZTzAQtOA1RU1DqXWvah0GGKJQuxKtItTZR/EwGeyivvDwMsUN+Ewo3KC8EQ==
+X-Received: by 2002:a05:6000:4026:b0:425:7e33:b4a9 with SMTP id ffacd0b85a97d-42cc125247bmr2705819f8f.0.1763725012584;
+        Fri, 21 Nov 2025 03:36:52 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:f819:b939:9ed6:5114])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fd9061sm10506268f8f.41.2025.11.21.03.36.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 03:26:36 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 21 Nov 2025 03:26:08 -0800
-Subject: [PATCH RFC net-next 2/2] netconsole: add CONFIG_NETCONSOLE_NBCON
- for nbcon support
+        Fri, 21 Nov 2025 03:36:52 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: "Remy D. Farley" <one-d-wide@protonmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,  netdev@vger.kernel.org,  Pablo Neira
+ Ayuso <pablo@netfilter.org>,  Jozsef Kadlecsik <kadlec@netfilter.org>,
+  Florian Westphal <fw@strlen.de>,  Phil Sutter <phil@nwl.cc>,
+  netfilter-devel@vger.kernel.org,  coreteam@netfilter.org
+Subject: Re: [PATCH v5 2/6] doc/netlink: nftables: Add definitions
+In-Reply-To: <20251120151754.1111675-3-one-d-wide@protonmail.com>
+Date: Fri, 21 Nov 2025 11:33:06 +0000
+Message-ID: <m2qztr4o3x.fsf@gmail.com>
+References: <20251120151754.1111675-1-one-d-wide@protonmail.com>
+	<20251120151754.1111675-3-one-d-wide@protonmail.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251121-nbcon-v1-2-503d17b2b4af@debian.org>
-References: <20251121-nbcon-v1-0-503d17b2b4af@debian.org>
-In-Reply-To: <20251121-nbcon-v1-0-503d17b2b4af@debian.org>
-To: Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>, 
- horms@kernel.org, efault@gmx.de, john.ogness@linutronix.de, 
- pmladek@suse.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, calvin@wbinvd.org, asml.silence@gmail.com, 
- kernel-team@meta.com, gustavold@gmail.com, asantostc@gmail.com
-X-Mailer: b4 0.15-dev-a6db3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4833; i=leitao@debian.org;
- h=from:subject:message-id; bh=Up/1xSeBkB0p2W4yVcqFz2y90IusIdqbhG7Z3DkQyOM=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpIExoZ2WNk6LTQhAcz9lZEqVAXeRsGFwqZGYaR
- 1CcayasFTKJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaSBMaAAKCRA1o5Of/Hh3
- bd+ZEACGDuzNg3IOH6RiePIP06/7OidbUKYcoTtMZY/n08GFE/EFxsXgvX3iJ1/5PJwz3gpLoi2
- 2xs0hlsJZLeBnU92MkeJJK2GcJ2XV/GzXewvnyKS048jlA9Z/FjfGL3IzR8IGeXnpJcmEPDkkyD
- lKZcUwc7niTGDkuwDMOHDhnH2L2NwOadwvENYdMOPtrblpYYmTYppty+7COcvPotD0Hw/uwBq65
- ibcRriGq2CNxinDXa3nRbvm8BPBAsFrMggnBhhLCAceg9i+RqPCpihIzat4eBjgPxR58rqexrAt
- 9F7tpL0yrU2NTMtdSHK1nuJ51soZUMV81QFhbsVxZ5cxOWko89JsAHDwzRiv6b0F9UnljiMqcfx
- elqhJRxJofnCS8ciStv34kwFFb9aiQBITUBeTz/vXZq4IHv7A/nPnCNCTLlHyCnZ0ZMQ56M2PlG
- kioZXGkLLTrKAdeN2LZKzBJfCMMxgEMb6g/mmOui7T0kP5m70eqYlexNz/JvVW7QDLD9x8Au8yy
- GEh0TZyUUDXS5jB9V/Un6VrOAwqPEIHHNwt8YF3Us6V1Cv0Z4s4ck4ZiGJbAqZtUeVz023BbNQY
- /kGuSCsVSjRG8owd/mhTH0GFMtBidGXTfNL/JGZ8HXDlbNnbDUaup4vBSCrXOdgp7p0ddSX+CS8
- sbihCqt0r79hccQ==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain
 
-Add optional support for the nbcon infrastructure to netconsole via a new
-CONFIG_NETCONSOLE_NBCON compile-time option.
+"Remy D. Farley" <one-d-wide@protonmail.com> writes:
 
-The nbcon infrastructure provides a lock-free, priority-based console
-system that supports atomic printing from any context including NMI,
-with safe handover mechanisms between different priority levels. This
-makes it particularly suitable for crash-safe kernel logging.
+> New enums/flags:
+> - payload-base
+> - range-ops
+> - registers
+> - numgen-types
+> - log-level
+> - log-flags
+>
+> Added missing enumerations:
+> - bitwise-ops
+>
+> Annotated with a doc comment:
+> - bitwise-ops
+>
+> Signed-off-by: Remy D. Farley <one-d-wide@protonmail.com>
+> ---
+>  Documentation/netlink/specs/nftables.yaml | 147 +++++++++++++++++++++-
+>  1 file changed, 144 insertions(+), 3 deletions(-)
+>
+> diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netlink/specs/nftables.yaml
+> index cce88819b..e0c25af1d 100644
+> --- a/Documentation/netlink/specs/nftables.yaml
+> +++ b/Documentation/netlink/specs/nftables.yaml
+> @@ -66,9 +66,23 @@ definitions:
+>      name: bitwise-ops
+>      type: enum
+>      entries:
+> -      - bool
+> -      - lshift
+> -      - rshift
+> +      -
+> +        name: mask-xor  # aka bool (old name)
+> +        doc: |
+> +          mask-and-xor operation used to implement NOT, AND, OR and XOR
+> +            dreg = (sreg & mask) ^ xor
+> +          with these mask and xor values:
+> +                    mask    xor
+> +            NOT:    1       1
+> +            OR:     ~x      x
+> +            XOR:    1       x
+> +            AND:    x       0
 
-When disabled (default), netconsole uses the legacy console callbacks,
-maintaining full backward compatibility.
+This does not render acceptably in the HTML docs and it deviates from
+the way the text is presented in nf_tables.h - the description makes
+sense in the context of the expression defined by expr-bitwise-attrs
+which bitwise-ops is part of.
 
-PS: .write_atomic and .write_thread uses the same callback, given that
-there is no safe .write_atomic, so .write_atomic is called as the last
-resource. This is what CON_NBCON_ATOMIC_UNSAFE is telling nbcon.
+I suggest moving the doc to expr-bitwise-attrs, which has the advantage
+that the ynl doc generator already handles preformatted text for attr
+sets.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/Kconfig      | 14 ++++++++++
- drivers/net/netconsole.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 82 insertions(+)
+This diff should be sufficient; note the :: and block indentation:
 
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index ac12eaf11755..aa8771b5b723 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -369,6 +369,20 @@ config NETCONSOLE_PREPEND_RELEASE
- 	  message.  See <file:Documentation/networking/netconsole.rst> for
- 	  details.
- 
-+config NETCONSOLE_NBCON
-+	bool "Use nbcon infrastructure (EXPERIMENTAL)"
-+	depends on NETCONSOLE
-+	default n
-+	help
-+	  Enable nbcon support for netconsole. This uses the new lock-free
-+	  console infrastructure which supports threaded and atomic printing.
-+	  Given that netconsole does not support atomic operations, the current
-+	  implementation focuses on threaded callbacks, unless the host is
-+	  crashing, then it uses an unsafe atomic callbacks. This feature is
-+	  available for both extended and non-extended consoles.
+diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netlink/specs/nftables.yaml
+index 136b2502a811..23106a68512f 100644
+--- a/Documentation/netlink/specs/nftables.yaml
++++ b/Documentation/netlink/specs/nftables.yaml
+@@ -68,15 +68,9 @@ definitions:
+     entries:
+       -
+         name: mask-xor  # aka bool (old name)
+-        doc: |
+-          mask-and-xor operation used to implement NOT, AND, OR and XOR
+-            dreg = (sreg & mask) ^ xor
+-          with these mask and xor values:
+-                    mask    xor
+-            NOT:    1       1
+-            OR:     ~x      x
+-            XOR:    1       x
+-            AND:    x       0
++        doc: >-
++          mask-and-xor operation used to implement NOT, AND, OR and XOR boolean
++          operations
+       # Spinx docutils display warning when interleaving attrsets with strings
+       - name: lshift
+       - name: rshift
+@@ -1014,6 +1008,22 @@ attribute-sets:
+         nested-attributes: hook-dev-attrs
+   -
+     name: expr-bitwise-attrs
++    doc: |
++      The bitwise expression supports boolean and shift operations. It
++      implements the boolean operations by performing the following
++      operation::
 +
-+	  If unsure, say N to use the legacy console infrastructure.
++          dreg = (sreg & mask) ^ xor
 +
- config NETPOLL
- 	def_bool NETCONSOLE
- 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index f4b1706fb081..2943f00b83f6 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -1724,6 +1724,57 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
- 				   extradata_len);
- }
- 
-+#ifdef CONFIG_NETCONSOLE_NBCON
-+static void netcon_write_nbcon(struct console *con,
-+			       struct nbcon_write_context *wctxt,
-+			       bool extended)
-+{
-+	struct netconsole_target *nt;
++          with these mask and xor values:
 +
-+	lockdep_assert_held(&target_list_lock);
++          op      mask    xor
++          ----    ----    ---
++          NOT:     1       1
++          OR:     ~x       x
++          XOR:     1       x
++          AND:     x       0
 +
-+	list_for_each_entry(nt, &target_list, list) {
-+		if (nt->extended != extended || !nt->enabled ||
-+		    !netif_running(nt->np.dev))
-+			continue;
-+
-+		if (!nbcon_enter_unsafe(wctxt))
-+			continue;
-+
-+		if (extended)
-+			send_ext_msg_udp(nt, wctxt->outbuf, wctxt->len);
-+		else
-+			write_msg_target(nt, wctxt->outbuf, wctxt->len);
-+
-+		nbcon_exit_unsafe(wctxt);
-+	}
-+}
-+
-+static void netcon_write_nbcon_ext(struct console *con,
-+				   struct nbcon_write_context *wctxt)
-+{
-+	netcon_write_nbcon(con, wctxt, true);
-+}
-+
-+static void netcon_write_nbcon_basic(struct console *con,
-+				     struct nbcon_write_context *wctxt)
-+{
-+	netcon_write_nbcon(con, wctxt, false);
-+}
-+
-+static void netconsole_device_lock(struct console *con, unsigned long *flags)
-+{
-+	/* protects all the targets at the same time */
-+	spin_lock_irqsave(&target_list_lock, *flags);
-+}
-+
-+static void netconsole_device_unlock(struct console *con, unsigned long flags)
-+{
-+	spin_unlock_irqrestore(&target_list_lock, flags);
-+}
-+
-+#else
-+
- static void write_ext_msg(struct console *con, const char *msg,
- 			  unsigned int len)
- {
-@@ -1765,6 +1816,7 @@ static void write_msg(struct console *con, const char *msg, unsigned int len)
- 	}
- 	spin_unlock_irqrestore(&target_list_lock, flags);
- }
-+#endif
- 
- static int netconsole_parser_cmdline(struct netpoll *np, char *opt)
- {
-@@ -1923,14 +1975,30 @@ static void free_param_target(struct netconsole_target *nt)
- 
- static struct console netconsole_ext = {
- 	.name	= "netcon_ext",
-+#ifdef CONFIG_NETCONSOLE_NBCON
-+	.flags = CON_ENABLED | CON_EXTENDED | CON_NBCON | CON_NBCON_ATOMIC_UNSAFE,
-+	.write_thread = netcon_write_nbcon_ext,
-+	.write_atomic = netcon_write_nbcon_ext,
-+	.device_lock = netconsole_device_lock,
-+	.device_unlock = netconsole_device_unlock,
-+#else
- 	.flags	= CON_ENABLED | CON_EXTENDED,
- 	.write	= write_ext_msg,
-+#endif
- };
- 
- static struct console netconsole = {
- 	.name	= "netcon",
-+#ifdef CONFIG_NETCONSOLE_NBCON
-+	.flags = CON_ENABLED | CON_NBCON | CON_NBCON_ATOMIC_UNSAFE,
-+	.write_thread = netcon_write_nbcon_basic,
-+	.write_atomic = netcon_write_nbcon_basic,
-+	.device_lock = netconsole_device_lock,
-+	.device_unlock = netconsole_device_unlock,
-+#else
- 	.flags	= CON_ENABLED,
- 	.write	= write_msg,
-+#endif
- };
- 
- static int __init init_netconsole(void)
-
--- 
-2.47.3
-
+     attributes:
+       -
+         name: sreg
 
