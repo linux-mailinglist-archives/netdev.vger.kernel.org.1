@@ -1,122 +1,80 @@
-Return-Path: <netdev+bounces-240859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8943FC7B787
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 20:18:03 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 630BDC7B790
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 20:18:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88E943A5644
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 19:18:00 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 875B03475D9
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 19:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BBE12DA779;
-	Fri, 21 Nov 2025 19:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E192D2398;
+	Fri, 21 Nov 2025 19:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j8IT3Noq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GOAlVnFG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D95526F29F
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 19:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF42822B584
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 19:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763752673; cv=none; b=tm/Jo/p8Jv5mz9qoTQpXWi6A1ADahjQsBhqVTkkjObAESuOpAOLiZeyrR0eW4O/v+6xOdqX1zwP54A0bht2TRITyS5czeUnNrrlTBEiFE0Ho5cp+ACOf/P0GOuvvCo4fJLhA4mavi4rjtp33lNHnO7Allv5e5cuaANAN96rPncw=
+	t=1763752711; cv=none; b=KX+wW2OxrSoBeH29ONLe4M8mnxXT44zCzq42kUEMSHI0RypJCAGnffiq7OyFFVfpaI1BABmkeXfboECRmw1otJ8tesMXIltBlQ7ML2eFpsvEf0ebqthyZG/UY+ABdFI7EIdX22mOJaO0ZqtUfyu/NNvOYb2jH/18zm4YUY7Wquw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763752673; c=relaxed/simple;
-	bh=4sAVwsYY2YHBOEK48pCtdqBPT9jCA7HP8BBEHRinpiw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tiSpWD0HVX+aPhNQId68Y2IpnXdtBDUmJ6u250ZMcj8eHwMkig3AVPOOM/i8/Y/Sn0EozQN/bmFnMOjz9TmlqV/5F00QlUoc68PnDrsNO3Sq4emOhSMAHPjlKkrcO3LOeunu7BzhSnAZzw55AyBcIBqB6cD3cAFpXstFyeNYuQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j8IT3Noq; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-42b2cff817aso225441f8f.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 11:17:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763752668; x=1764357468; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y8iwBwhNwuioSSQWn7LFK7t0rJ8Mh2P5vp1THsx3YdU=;
-        b=j8IT3NoqDmMpUSg9gO3je6rP5DNc7uJQhf2dmXcQ04sgq43Z8nCTojxJrGcL+/hlM5
-         rabuzh+0wXwEf5Ux/GvhN9eVKROxTeUBf7NrA/dKaiq9PhJCQM/+ge62muDrHXlw4Adf
-         7SuPyGQ0YbYh3/TZNixM6jAGN3uJNiTTNgQGZgJ9XvuZSqfcSX6VBKGJXpjTrYlLwZK9
-         0sxL20Yqdmepz4szhyKDpp/dGV58+tqVrpQCoq+IjQdpVEueg5dgU65BgSPuhoSYDbsJ
-         I/48NXUZc6MqzAIITK+UFKqcUclSP26W7d37/D0yLx5vMrTIPHnAQrF8+iWZQCIulI89
-         JrLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763752668; x=1764357468;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y8iwBwhNwuioSSQWn7LFK7t0rJ8Mh2P5vp1THsx3YdU=;
-        b=m+YnpmHsuu/4QldOQu939AQTMf+lZRMTLsfxbcgEVPm0/Q0TdYOySTZqnkkrtPvbD+
-         +mBHG9+eMpnevTrNyzgV/aPxUHNPs6Z0VdbRLQhZJ/gRe8db/o3IkzbwByILid751QoE
-         4rT5a8HIpPO1CjtGG+t7mMsR65YVW0Rb0ZbYBT74GYzJ+ueuv01ceytUgeU53AFHsejb
-         VciwqLVJ0zNHWS1HPm5gLy0QnkJc/TaQcc1vzn+NhbJCok1XCL3eBaApGcPq2UJHEGzY
-         gikzEDT3EFmkp2aO88o5yy6zAb0vajlKQ+WEARvgKsq+1E6I6H3ic7V5K2MFc0NShZEc
-         oBdA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2sCxo9fLDQxyxleKfoqdGFc3xoY7HvBxM8cxZ/6CVz0ZVJSrGaG3RT8z57hiDTIbbgygxvxA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyW5zTWLVXvlR7F8mib4DTfC7fnhFA2A3keFNLmNjBfSESuN1i6
-	AVNolBeXhE6SwOPrjq8+LkYM8jRxrGqh/YpHviRr2FhwcNOpODlSmDB+
-X-Gm-Gg: ASbGncslold4DF/GxusFDPy3fnIMeW4lxZJXLmmSR7XyEP0gjxyry/H0x+XWtStEFvb
-	Jjw5Kx8BTqZa7ZC+Mw2wv2Ef5ULy5UIY/yuOee4ztKeelG/Wpmz4G0ZwRTbG2bL5z6f6ULZOWJC
-	1JT3aOyAjsV8zSE84oWqmF0vkMPnMuMp1ObyWn1gidw71cLQow+smkfoJEHxgAb1W8NRihgCBxV
-	mWIE31Od9R9HzR14aYdDgAKOQclRIkTci6XkrUjKeHmegwzUKj1CC+qKJJwF56wrXZ5PWSQCdfi
-	tW8fOLNUDe9pUv3PWchG6kq3knAeodXV6epD6xpKUCwVf+Jri+SOicynDjhT+gFKIVfKdXU5n/r
-	n7Pd4PP3+zppmInt5aNNNfXtXbvbthnFp2TsIy90EGZ8gFPkCwtn2aTg40Ysf2NEAPs+14rUHv5
-	iYxUw=
-X-Google-Smtp-Source: AGHT+IG+KrMg9GArGEp6Q0CjIrd17kh5O9dzvIO8tRrv+f2pfyIXfV6MHR1Wp42qXDKqxshdNqo9Gw==
-X-Received: by 2002:a05:600c:4443:b0:45f:2c33:2731 with SMTP id 5b1f17b1804b1-477c0169f1emr21053475e9.2.1763752668337;
-        Fri, 21 Nov 2025 11:17:48 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d106:d600:b19f:2efa:e88a:a382])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477c0d85360sm48129405e9.15.2025.11.21.11.17.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 11:17:46 -0800 (PST)
-Date: Fri, 21 Nov 2025 21:17:43 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Russell King <linux@armlinux.org.uk>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next 01/11] net: dsa: tag_rzn1_a5psw: Drop redundant
- ETH_P_DSA_A5PSW definition
-Message-ID: <20251121191743.5xyrsey56gr7e5e3@skbuf>
-References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251121113553.2955854-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	s=arc-20240116; t=1763752711; c=relaxed/simple;
+	bh=tdJuNaQ7FQbkvlGny5oggUNN5IH+iniRXZEiWIKGVa0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gtiVslsRrs4cqvsV56Y8zH05aBhcFpWWHLoDdqTJuDouFtRMFns9CMeZLX8xDXFcCR9TnZAWnJXeYB9clXX6KePWPv3ru/iXDIQhR9ZR+G3eOr5rR6rAN9pkZramZYBAEXj+84QQ8WHjyBN5TNDMszVDJTtzI4uvPhsp02xkTPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GOAlVnFG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F18FC4CEF1;
+	Fri, 21 Nov 2025 19:18:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763752710;
+	bh=tdJuNaQ7FQbkvlGny5oggUNN5IH+iniRXZEiWIKGVa0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GOAlVnFG89t47Lkaj7pC6Cn62c8LHq4KXj5r7EGHwLGjBE4bs8l8Oxl0nkrS5W5vG
+	 Z8Ws0dq5j9LKjxQ1Am5BJMpRaQx7OIIxItHZD1rugTdtyNGu2J+jaH0YzDUMaUIVY+
+	 vNk7fqRgFkFzF7qGIcr+PP5NYu234L0Mo/KgWmd2hNI8wXsxx4t9e07nEJc+7p9n2m
+	 lKRgikQKSfG25dAyLh6vvcQ1mREGWbCEntjvKSSoAyzKvFkG4vN/FSa/cftj1xCfGm
+	 Brty43lNOoC+8BEUQMKWsckJ8aSr7IPWPmptQQ2kNqG3JPAP7lTBmNyIflIYtCkcoH
+	 Z1NlZS/oz4TMw==
+Message-ID: <437c2cc9-37ce-40f1-91a2-cbfeb667da5c@kernel.org>
+Date: Fri, 21 Nov 2025 12:18:29 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251121113553.2955854-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] uapi: ioam6: adjust the maximum size of a schema
+Content-Language: en-US
+To: Justin Iurman <justin.iurman@uliege.be>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20251120163342.30312-1-justin.iurman@uliege.be>
+ <69709e39-a6e2-4289-9202-f5776109f42e@uliege.be>
+ <6d950048-4647-4e10-a4db-7c53d0cfabd9@kernel.org>
+ <55c4c96e-c11f-49d7-8207-4f5179d380a7@uliege.be>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <55c4c96e-c11f-49d7-8207-4f5179d380a7@uliege.be>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 21, 2025 at 11:35:27AM +0000, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On 11/21/25 11:55 AM, Justin Iurman wrote:
 > 
-> Remove the locally defined ETH_P_DSA_A5PSW protocol value from
-> tag_rzn1_a5psw.c. The macro is already provided by <linux/if_ether.h>,
-> which is included by this file, making the local definition redundant.
-> 
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> ---
+> You're right, it might be too risky. Besides, the current code (i.e.,
+> IOAM6_MAX_SCHEMA_DATA_LEN=1020) doesn't break anything per se, it was
+> mainly for convenience. Do you think it would be OK to introduce a new
+> constant in the uapi, as suggested above? Or did your comment also apply
+> to that part?
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+You cannot break any existing implementation which means kernel side you
+have to allow the current DATA_LEN. Given that there is little point in
+trying to change it now. If the spec has a 240B limit, you could return
+a warning message telling users when they exceed it. UAPI wise I think
+we are stuck with what exists.
 
