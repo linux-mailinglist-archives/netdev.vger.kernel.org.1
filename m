@@ -1,139 +1,181 @@
-Return-Path: <netdev+bounces-240875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A233CC7BB0B
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 21:56:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CED9FC7BB14
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 21:57:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5E7154E38A0
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 20:56:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9BF564E164D
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 20:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A6773002CA;
-	Fri, 21 Nov 2025 20:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3799303A13;
+	Fri, 21 Nov 2025 20:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h42BLlMM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OeYBgsDA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933002EB86C
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 20:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D802F7AB3
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 20:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763758554; cv=none; b=V6fCHvdMkPF4Oj1dSvoAF0KYs4BZOds9uf6KjUIWcGrM9K7ZcGGwQbVnMCAIfzmCZeWIlOuKjc/cZwOaM3SlLiFfRgCKxkqtYntbgqyQ5sEQFx5kC3s3dU6Ex4Iypqvv4hfYdnC7+mN61JhScr1FlrQODOT76fXolX88a67Fr4I=
+	t=1763758648; cv=none; b=kjVQF7icbAU6S70VlhAkXta0frDE7Q6h98sX4D+HnMsFxfVJYYrkE+C0wR7A+01ALAWuW+E3A0vo8Cre04wGgt354IxNaSzWneQHnk3joaDHeCjlieTm5U8mien8PM5+TuFNAVOGtcOiPPwaWvlFdCZpMrXSGqj+n22xJ3Q8jLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763758554; c=relaxed/simple;
-	bh=lYUK59Z9lErXRf5Bg+aGnzF3C82gccjJNbgCi2t10u4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F9h/8pa6pXyUjTlEKuBXq3/wJmrV8lYGrAg38jR92QK21fbJDdNggUqOy5+7Ht16Vjs//SjtxUQ6C8G2PT0Nqwed/B1nlrG9w4aIWrS3wtcwyh4UjfPF0U5PAp27n1CHWTmxaUnf984CF0eARmRv5yQK9c6IDUXOPqmd63Q5uOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h42BLlMM; arc=none smtp.client-ip=209.85.221.54
+	s=arc-20240116; t=1763758648; c=relaxed/simple;
+	bh=yEGSclzEy0HCMJpFnPYIguSWn7nHMtZipXnSVMNR4u0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LfYtwYist0fYchSwEH4U+ZC4oZEqetBgPEJVsRMx3PEIv4EYjBAq2VSUDYH/3IntbuGaLy0Sgkyhp/gbW/2aZaYNudGfhwnDv16gW+DC+enWQksuvxf61rujoT+d7fcU/8PGyu7+wYezL5mDEOXOrmz3o5ANZwre28KzLYs28zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OeYBgsDA; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-42b53b336e6so206047f8f.1
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:55:51 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-298250d7769so18552475ad.0
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:57:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763758550; x=1764363350; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SWLVJDOcbRGYcqao1ONr0boRiS6rHHZNiYodJCrm44Y=;
-        b=h42BLlMMyKXqPMLsi4gNQ2+Ng3XSpkwmx0dC8ZAE2SnutTlyVFr9pY8+RilB9q+2d/
-         HLxqtROSm0f1pebN7bNkNt6mHaYLXCkVEgAa9sL3UurrK4mIXrxbMsOxwEXrafDO9egE
-         6suiAh9LszwJLTOOQayGxo49dWcQeGWLESyEXmTbhKRCVHW6w16KErywrUhFEY4o+EVs
-         hKo+A+L87Fk5NmIC++Z7ox6IJ21nO/uSZQhYDw2ZEmWAtfWYr0grW/N+cP9ZmirQcPCf
-         FeCJzutmNv/w9cdXxaoSDLwnRMCfQ2g6A4+lXPY3D+kf8LQEGaPk2MrsG1UAQDm0R4s3
-         +nVg==
+        d=gmail.com; s=20230601; t=1763758645; x=1764363445; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0e90kbQuRFRNPGgj2N4VURR8qaKhd83Gb50woQGGFOE=;
+        b=OeYBgsDAvGPqWf5K+aUcmRXy04KvZriKtRVEsWFZ1vt/VvcsIvEIa3Ff/q1e/Bm9gn
+         iX7k4npBtv4eYEr1j5FeTIehKrBDT3ITNcc6/9G649U7d6rnSJMs2u1isPDGjjXLz+RJ
+         EcAQgNzKAczGOXnxY7LNNzW4HeDdneF+RbiTeGADjk0mXCY67F3Mbi7JkVtraArz7l//
+         tArcc1gDHM1ayPPFkJnkFMp2hni4XUaUQZu2+3eWYA4X15vDzc0Cvyc2ieGCL9s+W3ng
+         VcXVahvE1x7+zgsFv3HsQ4wJH/GNR2S2ezE76Z9avGCQN1DHLhrwrgnk3tBrnlJI0sxH
+         fIqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763758550; x=1764363350;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SWLVJDOcbRGYcqao1ONr0boRiS6rHHZNiYodJCrm44Y=;
-        b=DVHeX2jxE/0s1e/AhKVR+xWBQ8DyvewYkx6cFRUiZwqlRwRz3cSgnr2In97OJ/EOoQ
-         U55F2cMLWtlx9/ucU2hAB/dz6gTjKkFmAcUMO9xi9UMr7KzVTHWQDq+kkfxUg0ohs9hx
-         G8x5OWFfujjq1al8gaqu5f54EaPwmf6iRpAlVu4tjJJZftgUSpt27xXUG6JG/OsimDml
-         BWg9Tsreu5cs9LjB3KGwBA/pzl3yvU1dXYFyprh/s3Qv3ifdej5M3wL3j9ej5X1wPFe7
-         s1qFdq5QfXVUgtKR7sdTDq8bFrF13WabppDltQgpKtyciQK3CgEn4KoZZoXtD3mClDYI
-         KggA==
-X-Forwarded-Encrypted: i=1; AJvYcCVDA2S2WFgHpFvqEfJm38DecxsnZHMRbpZUNfjcCN+wReq/VfbLSFD/hsDNMttuO/DQ23KALYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwvpXA5lJxtKGaMnkNfiqowpyvFNBQpgPghYlxbvrvIAS0BxYo
-	z1NULD9EBHyYp2/GW02QANWzvYOizwt6QEQGPP5jGZkEiBMZl4Nd60MC
-X-Gm-Gg: ASbGncv9Ex+CEyZbhdBZETOubmAbjhPp83td6fA8Fv49K8Sp2W+X68imNlkPU8zoPZK
-	t9nXi99rrBGDu+VXmgL3M9sVf05oPic5ZbGyLDE6AkYYpbTpHWlnEr1dkeXZ8RzZ7maZuklKbEx
-	24ged9oCpzf7ttLjag6aCgFaoP7zuToBg/o+4ZZwzkmwAOT6jE+pmF+Di4KPxWlqhEVhdlYJ6n/
-	zs2LDHbcE9KTWhXtumlblRcmf4l7YnA7PLViO9Cx0IRKF8oqMqHAX7gA7VULejfWCLM/YmG5OrV
-	PSkBkyo1cNe+tSkJe56Wzo5NuQ/pAE1M3ysL2nj9m1Fo9KTC5441aW4fKb6Rx7VrqF2Ai6I5wPN
-	1E2df1xnwTZqBNhzymwBL7IA1ijhX4XGbpOvcNurYU+ToDaZDU4usHmPTF4MUpQJeMKwSky7kb4
-	iLb34=
-X-Google-Smtp-Source: AGHT+IEpBti2Vot/ywXlhz/7XNq56k24q9qvbPMpnhnia8lGLDa9AtxVQGq2oXuumoaffzRpt9mvgQ==
-X-Received: by 2002:a05:6000:1ac9:b0:429:c851:69bb with SMTP id ffacd0b85a97d-42cc3f99224mr1830789f8f.5.1763758549737;
-        Fri, 21 Nov 2025 12:55:49 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d106:d600:b19f:2efa:e88a:a382])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f2e556sm12847859f8f.5.2025.11.21.12.55.47
+        d=1e100.net; s=20230601; t=1763758645; x=1764363445;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0e90kbQuRFRNPGgj2N4VURR8qaKhd83Gb50woQGGFOE=;
+        b=Ur2ck9/GlhGvZS656V2N2BsC6zirtDtiF5Q26ytPIo+3BYMdjJ0ZkQJp/2OBm+0PkJ
+         t63iBfoQgJYJQsb3/kewS1n8E0jsxaCEJkGfx1pwu0S2g9279UuuwoCCOjQ5YyXFTUvy
+         j5qQqcNp7BbLf2dICVyDF93JCiB+muSqSCbDpcaWDePQywAJuBJHKU8OHBzti3l+2hrF
+         OcSkyHtqlG82iXgmnLK49N61jit5R9KgdBJAHmdAy1W6BTiI6Aa3hcOxAthiJyoSBpVM
+         PBJYkG59noLZa7/riV5W866HKM3U19iuXurT/uTfQMNt7xSxDJv+W1gkug0PNIeWFgAQ
+         /bVQ==
+X-Gm-Message-State: AOJu0YxG2ZcppIDVZimwAc2cU4L0pP4FMnNEQVmpbPG9yPe3wWOdCIU0
+	5U1XrvqD/I4PF6OggWGy4vDmZDz+YaBggfi9wTWgzqNaA38kh1eJ+J0l48OxCA==
+X-Gm-Gg: ASbGncvY9NiVQI7isgKcjBrvbYSVRPJW55CMhTRT7EDgOKzByLu7P7f+Zd260hduhpI
+	VEDCaPYhvITT7IdPEyhClM3U7cSqt3vIxO5nUn0ps+cLjiBR1HiEfbKuOy0U3I9xv2x5SAoI/lI
+	Esi73hGLonBoT90HgNI3UXyOS2CgnYC8Vfu8Nm3No5oo9j8ChMRCN6f02tJF8FNxx1vB6fjU/Yu
+	+1TRuKSHgFQAsuiHkH32m8w800swf++DyIdmv4IlIwv6l2I2A6W6RfeeUXq2q6loV/ONZs7a20y
+	xtMi1BPiFrKeCbkPbcHk9jJ45A4YQJhn/jGtFispBIUukrYdJuSVVXKrVgAaIO4z7k1hsnDVjE1
+	cqGupqw9QcObylTd11TuzjWxAFuPwBoKt6fW2/7t4blqB2IRmANSMKJWxGENLKJHpX86goNB0w+
+	MxDVuaMJ1PoA==
+X-Google-Smtp-Source: AGHT+IHDzW/1iR1xEDGJ0dwaoqoMH40/yX+pLY9Um5VI4qfzpikefyubAUzl+tIWVfX1qgXtQ8eZkA==
+X-Received: by 2002:a17:902:e890:b0:295:9cb5:ae07 with SMTP id d9443c01a7336-29b6c574f95mr49854655ad.38.1763758645359;
+        Fri, 21 Nov 2025 12:57:25 -0800 (PST)
+Received: from localhost ([2a03:2880:ff::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bd75dfeeaffsm6393615a12.5.2025.11.21.12.57.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 12:55:48 -0800 (PST)
-Date: Fri, 21 Nov 2025 22:55:46 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Russell King <linux@armlinux.org.uk>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next 08/11] net: dsa: rzn1-a5psw: Make DSA tag
- protocol configurable via OF data
-Message-ID: <20251121205546.6bqpo2bn5sp3uxxu@skbuf>
-References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251121113553.2955854-9-prabhakar.mahadev-lad.rj@bp.renesas.com>
+        Fri, 21 Nov 2025 12:57:25 -0800 (PST)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	memxor@gmail.com,
+	david.laight.linux@gmail.com,
+	dave@stgolabs.net,
+	paulmck@kernel.org,
+	josh@joshtriplett.org,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v2 1/2] rqspinlock: Annotate rqspinlock lock acquiring functions with __must_check
+Date: Fri, 21 Nov 2025 12:57:23 -0800
+Message-ID: <20251121205724.2934650-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251121113553.2955854-9-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 21, 2025 at 11:35:34AM +0000, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> 
-> Update the RZN1 A5PSW driver to obtain the DSA tag protocol from
-> device-specific data instead of using a hard-coded value. Add a new
-> `tag_proto` field to `struct a5psw_of_data` and use it in
-> `a5psw_get_tag_protocol()` to return the appropriate protocol for
-> each SoC.
-> 
-> This allows future SoCs such as RZ/T2H and RZ/N2H, which use the
-> DSA_TAG_PROTO_RZT2H_ETHSW tag format, to share the same driver
-> infrastructure without code duplication.
+Locking a resilient queued spinlock can fail when deadlock or timeout
+happen. Mark the lock acquring functions with __must_check to make sure
+callers always handle the returned error.
 
-Again the twitching when reading the commit title. I thought this has
-something to do with the "dsa-tag-protocol" property from
-Documentation/devicetree/bindings/net/dsa/dsa-port.yaml. The tagger *is*
-runtime-configurable if you implement the ds->ops->change_tag_protocol()
-API, and it's also possible to trigger that API function from OF
-properties. But this is not what the patch does, so it is confusing.
+Suggested-by: Andrii Nakryiko <andrii@kernel.org>
+Acked-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Signed-off-by: Amery Hung <ameryhung@gmail.com>
+---
+ include/asm-generic/rqspinlock.h | 47 +++++++++++++++++++-------------
+ 1 file changed, 28 insertions(+), 19 deletions(-)
 
-I think it would be more natural to say "choose tagging protocol based
-on compatible string".
+diff --git a/include/asm-generic/rqspinlock.h b/include/asm-generic/rqspinlock.h
+index 6d4244d643df..855c09435506 100644
+--- a/include/asm-generic/rqspinlock.h
++++ b/include/asm-generic/rqspinlock.h
+@@ -171,7 +171,7 @@ static __always_inline void release_held_lock_entry(void)
+  * * -EDEADLK	- Lock acquisition failed because of AA/ABBA deadlock.
+  * * -ETIMEDOUT - Lock acquisition failed because of timeout.
+  */
+-static __always_inline int res_spin_lock(rqspinlock_t *lock)
++static __always_inline __must_check int res_spin_lock(rqspinlock_t *lock)
+ {
+ 	int val = 0;
+ 
+@@ -223,27 +223,36 @@ static __always_inline void res_spin_unlock(rqspinlock_t *lock)
+ #define raw_res_spin_lock_init(lock) ({ *(lock) = (rqspinlock_t){0}; })
+ #endif
+ 
+-#define raw_res_spin_lock(lock)                    \
+-	({                                         \
+-		int __ret;                         \
+-		preempt_disable();                 \
+-		__ret = res_spin_lock(lock);	   \
+-		if (__ret)                         \
+-			preempt_enable();          \
+-		__ret;                             \
+-	})
++static __always_inline __must_check int raw_res_spin_lock(rqspinlock_t *lock)
++{
++	int ret;
++
++	preempt_disable();
++	ret = res_spin_lock(lock);
++	if (ret)
++		preempt_enable();
++
++	return ret;
++}
+ 
+ #define raw_res_spin_unlock(lock) ({ res_spin_unlock(lock); preempt_enable(); })
+ 
+-#define raw_res_spin_lock_irqsave(lock, flags)    \
+-	({                                        \
+-		int __ret;                        \
+-		local_irq_save(flags);            \
+-		__ret = raw_res_spin_lock(lock);  \
+-		if (__ret)                        \
+-			local_irq_restore(flags); \
+-		__ret;                            \
+-	})
++static __always_inline __must_check int
++__raw_res_spin_lock_irqsave(rqspinlock_t *lock, unsigned long *flags)
++{
++	unsigned long __flags;
++	int ret;
++
++	local_irq_save(__flags);
++	ret = raw_res_spin_lock(lock);
++	if (ret)
++		local_irq_restore(__flags);
++
++	*flags = __flags;
++	return ret;
++}
++
++#define raw_res_spin_lock_irqsave(lock, flags) __raw_res_spin_lock_irqsave(lock, &flags)
+ 
+ #define raw_res_spin_unlock_irqrestore(lock, flags) ({ raw_res_spin_unlock(lock); local_irq_restore(flags); })
+ 
+-- 
+2.47.3
 
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> ---
-
-Anyway I'm not reviewing this commit until the reason why you added a
-new name for this tagger becomes completely clear.
 
