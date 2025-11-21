@@ -1,70 +1,50 @@
-Return-Path: <netdev+bounces-240807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F24C7ACA6
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:17:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52607C7ACF4
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:21:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7E4FC342EB8
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 16:13:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39DBB3A1ED1
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 16:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14A834E779;
-	Fri, 21 Nov 2025 16:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9196234C9A7;
+	Fri, 21 Nov 2025 16:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aEWeIBeK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5840034FF6B
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 16:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD2634C838
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 16:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763741425; cv=none; b=XLP4x4sq7zyFhH9wFQ8sifIY0S4Aw3QlliLdL/qFda2293jOR/YPisRTFatYaWs3p4jzBZNCOnzxxnqz+rK7NaH0lvdTYiMcWLHlNUZaf4Ha3C5fevYUB1/cKmS2S7J74eEf/+M12xlXzIDRR+EOAMeSbq4cmZFcaCJiWU0PH3U=
+	t=1763742049; cv=none; b=g5WchNgGoY8jV7ln3wOkHCtxRccNk7uUlttnUBqoI1TKD1MaQAiliOYFG84JaJyXunYXx+az83XfslGyERTjq4ZRasWMr2vrSLzPHibyMqxENxUbNYywKF1A7CJ+xUBik/BV1XiAwbueLfYGePWd+JjQs2XdQLvnG0q5jyxRZE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763741425; c=relaxed/simple;
-	bh=koPu2OS4xs2Z4RrjCJxtqJsDcimXkzohnNY5nQoIwWc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HnOhTAjeClfhDO+jx4ndoJeFBuupQ8o3u3scqzcOb+3WOY6EZr+liOcA3n+XpDikK/Zf04ZQzb+eO83PKZFthVHJM7pvJeHhmse/0gnO3EQxzGYt1gNFrTCvtYw/oLhJXyqQrGorRUfjTrxpRaOwgtOAdQstcRSqyqqIye0GWSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id A86CF219AE;
-	Fri, 21 Nov 2025 16:10:14 +0000 (UTC)
-Authentication-Results: smtp-out1.suse.de;
-	none
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 59C3B3EA61;
-	Fri, 21 Nov 2025 16:10:14 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Rl8OCuaOIGmSeAAAD6G6ig
-	(envelope-from <krisman@suse.de>); Fri, 21 Nov 2025 16:10:14 +0000
-From: Gabriel Krisman Bertazi <krisman@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Gabriel Krisman Bertazi <krisman@suse.de>,
-	netdev@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH v2 3/3] io_uring: Introduce getsockname io_uring cmd
-Date: Fri, 21 Nov 2025 11:09:48 -0500
-Message-ID: <20251121160954.88038-4-krisman@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251121160954.88038-1-krisman@suse.de>
-References: <20251121160954.88038-1-krisman@suse.de>
+	s=arc-20240116; t=1763742049; c=relaxed/simple;
+	bh=6uD63G9bG5unvdGLVFpziWrZONgxhBixPttokQ+KGcA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TaJX3ktIpykv4O4/zUdXWsK0BJwnBPE8tJd7pC4Pi+k44Jp+QqCCAGqt5AiPvK6fLh8yXKoEgbQX9Drt/iH8j4eVyZpByUsXU8EKo42upmVjGsPoA9vsrsJYQg4eIBPoOyiomQaVUcyGn4lkbvYbheQ03ZMWBjjrx0XVa/0XMog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aEWeIBeK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D041C116D0;
+	Fri, 21 Nov 2025 16:20:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763742049;
+	bh=6uD63G9bG5unvdGLVFpziWrZONgxhBixPttokQ+KGcA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aEWeIBeKxUrmJ5sAduBOGjrmp9qnNYaMfARb7X2mcelcCEEi5DgbYA3kQUn6XyTxi
+	 AE4/s+NE1pRHkGX72woZtAEwF0QVWj7cxJxWhylfSefQ/T8KaKCvT2i2yfQJpxj9LF
+	 T2xItqdEc9pr+vRYyeg1mpu0Gl7yNpL+/tYsbMV9ukPSjCFlJQTIFOrgHFX2gOWFmx
+	 obvsfQV2J6sLvyEJKBYgI+YCHx5yy7rAaIPkDs/xi5dijoLM0fut6AlUk1f9rO5QdL
+	 19k6nKK8CneTT3sc0NHIYCoMHvw4oDO22+awO6gSZb0TKJwzH4xlH0NgJgfo3NBB81
+	 /0rdAG8OKNUpA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 345EB3A78593;
+	Fri, 21 Nov 2025 16:20:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,95 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Queue-Id: A86CF219AE
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -4.00
-X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
+Subject: Re: [PATCH iproute2-next v2 1/2] genl: add json support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176374201401.2493405.2218708038091698025.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Nov 2025 16:20:14 +0000
+References: <20251115171958.1517032-1-stephen@networkplumber.org>
+In-Reply-To: <20251115171958.1517032-1-stephen@networkplumber.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
 
-Introduce a socket-specific io_uring_cmd to support
-getsockname/getpeername via io_uring.  I made this an io_uring_cmd
-instead of a new operation to avoid polluting the command namespace with
-what is exclusively a socket operation.  In addition, since we don't
-need to conform to existing interfaces, this merges the
-getsockname/getpeername in a single operation, since the implementation
-is pretty much the same.
+Hello:
 
-This has been frequently requested, for instance at [1] and more
-recently in the project Discord channel. The main use-case is to support
-fixed socket file descriptors.
+This series was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-[1] https://github.com/axboe/liburing/issues/1356
+On Sat, 15 Nov 2025 09:19:16 -0800 you wrote:
+> Cleanup the old code and support for JSON output.
+> The non-json output is the same as before the patch.
+> 
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> ---
+> v2 - shorten lines and extra blanks in non-json output
+> 
+> [...]
 
-Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
----
- include/uapi/linux/io_uring.h |  1 +
- io_uring/cmd_net.c            | 23 +++++++++++++++++++++++
- 2 files changed, 24 insertions(+)
+Here is the summary with links:
+  - [iproute2-next,v2,1/2] genl: add json support
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=0f678c6cbaba
+  - [iproute2-next,v2,2/2] genl: move print_policy into genl
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=69942d75ccb7
 
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 3d921cbb84f8..6a97c5376019 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -1010,6 +1010,7 @@ enum io_uring_socket_op {
- 	SOCKET_URING_OP_GETSOCKOPT,
- 	SOCKET_URING_OP_SETSOCKOPT,
- 	SOCKET_URING_OP_TX_TIMESTAMP,
-+	SOCKET_URING_OP_GETSOCKNAME,
- };
- 
- /*
-diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
-index 27a09aa4c9d0..90f58f883f62 100644
---- a/io_uring/cmd_net.c
-+++ b/io_uring/cmd_net.c
-@@ -132,6 +132,27 @@ static int io_uring_cmd_timestamp(struct socket *sock,
- 	return -EAGAIN;
- }
- 
-+static int io_uring_cmd_getsockname(struct socket *sock,
-+				    struct io_uring_cmd *cmd,
-+				    unsigned int issue_flags)
-+{
-+	const struct io_uring_sqe *sqe = cmd->sqe;
-+	struct sockaddr_storage address;
-+	struct sockaddr __user *uaddr;
-+	unsigned int peer;
-+	int __user *ulen;
-+
-+	if (sqe->ioprio || sqe->__pad1 || sqe->len || sqe->rw_flags)
-+		return -EINVAL;
-+
-+	uaddr = u64_to_user_ptr(READ_ONCE(sqe->addr));
-+	ulen = u64_to_user_ptr(sqe->addr3);
-+	peer = READ_ONCE(sqe->optlen);
-+	if (peer > 1)
-+		return -EINVAL;
-+	return do_getsockname(sock, &address, 0, uaddr, ulen);
-+}
-+
- int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
- {
- 	struct socket *sock = cmd->file->private_data;
-@@ -159,6 +180,8 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 		return io_uring_cmd_setsockopt(sock, cmd, issue_flags);
- 	case SOCKET_URING_OP_TX_TIMESTAMP:
- 		return io_uring_cmd_timestamp(sock, cmd, issue_flags);
-+	case SOCKET_URING_OP_GETSOCKNAME:
-+		return io_uring_cmd_getsockname(sock, cmd, issue_flags);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
+You are awesome, thank you!
 -- 
-2.51.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
