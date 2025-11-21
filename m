@@ -1,234 +1,124 @@
-Return-Path: <netdev+bounces-240842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1496C7B06D
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 18:15:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08592C7B070
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 18:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7623B35E542
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:09:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 268713A31E3
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48EF1A3BD7;
-	Fri, 21 Nov 2025 17:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C966D29A326;
+	Fri, 21 Nov 2025 17:14:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="whq4ZY09"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="tmY8RPHM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB72521771C
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 17:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125232B2DA
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 17:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763744884; cv=none; b=RiQ4Z3aBLAirrwVJ7tMWr7beIoG2HKNa9noBhKOvhnE155jwBA+gMPR1H/892F+ymrPVJ/HlBQWVoFjwBCWLUf2EyvOJpwCIaxhHGmArWmov/1KznSsiINRQpaMIbthAo2OYVDbYVdcqudmX6EZVY3bc+O16aoxZ/o4TN7Zvwi8=
+	t=1763745293; cv=none; b=ihGYjZ6iGqX4q9vV5FXrOyF5cE1CHbVMHCEtehl/fr6dbMEnqmOzCYnYBvfmv8C3PLLJjB/Qmdwpo/5T9QESkZTnq1VYc3mGPTDroFYOOPNAaDpCuS+Mp1S8iOmZAQHswHxB5TDCPdhUcFG4+QlQwvA4DJ9O2+yDl9GU9JTioAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763744884; c=relaxed/simple;
-	bh=1auCa1RxEKcFDg9AxDDX42yca4RVULNr5t1KI7cNADI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bScqfwElTWbQlQuAg3+i2/TOjHBiyRMubq1WEIp9o9fjOnEz2996IXPqRBaIFw5RZ+Gc27XntkyGrgHJXZs1UdgT1hqot6cy4P7hZw+glduO/mKWKlZosU23D11rUuEr/Pq/cm9oZTT39RXne6EonxY3Fj4BwPPEYFrkrA2Wg5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=whq4ZY09; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-29516a36affso31644805ad.3
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 09:08:02 -0800 (PST)
+	s=arc-20240116; t=1763745293; c=relaxed/simple;
+	bh=9BzN6pC1GGXdrwzw8wjiYesifm7+I2vf0rXA5YKDHkE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rAavAoG9xN+kCNGor9xK/PMAkcG3zIcSpw+snEqwdvxjuSUYawI+RpPhjWGIKCX0sNPFy+O8X9WfYjkhvFLxfez5wFPB9tBESr5ZB2VQfqUk39ECsy9224m8ulXBmGlQZeGf6+0kJRecet2qf8CBHS921sPGxLI9v3wQrtKDeA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=tmY8RPHM; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-29568d93e87so20783915ad.2
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 09:14:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1763744882; x=1764349682; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eUlz30EyaM3mcQ4eUluqZp6Sq+g/W6QNwpjYYqJN4RY=;
-        b=whq4ZY09ANr8+kJhbmp3o9TaVKVP8IvJ5ordycFAob4VD0BCunYAi3l/KuobGI7hfm
-         xa8Q0yOtJ39cORQyPRjgDXD6IBorJefOWU3ehGovEU0BwpI3eS/GWEKL+MmVR/FY3Ppu
-         pdQw57ercnkwLPoFJ3n9J2Cnr3aXSFQFVaw0qxWPFY6kaPfvwojYAEuvOWNcZctJAMIS
-         ENX73bUMZqdNc4HdcdfFBNE5k8HktFJBZgPCac2IvbvGCNq5NO2WQoBuEHDi8j+tRJeb
-         OlgubdXmmT5raDOMSPQ+TCmVDNAAK7GIkgY8KwMTQWP5jq9OThtJE/VmqTpZ9rKqMc0v
-         CBnQ==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1763745291; x=1764350091; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7KI4P3ipTmobTgpfDGDvQPqfKrNYWqpgnGI/I2F7HDw=;
+        b=tmY8RPHMtjoedl+yeygkmGfcIPD8dG7A9GMl6LJBAHOmhYMM1lxP/XAQLEEEekpQZD
+         YmM9E2xgLeklV3TqJfIraTzjpdPUhEkhtlGJPdt76EkXEybrcgFb7sVxS6iqp2U5nR3V
+         D6w8U9GAz/c7btWwB4W+r29JsFA4iCW77qVDmqhpQlTuu07gANY7YFqy8QOznkSM3mFY
+         6hPBfpCHcVqva29E+GohxgyV/sqbzl99SeOV5KE5p8rgZTDrHDI7tbhXoM2o5QiZnn/6
+         a2MprxnbTy0OaYNa7ZURiZoqdMDRShulGJPnX9SSF3nNfSssE8OGsJlOnlzwWJ2U8se5
+         ZvKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763744882; x=1764349682;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=eUlz30EyaM3mcQ4eUluqZp6Sq+g/W6QNwpjYYqJN4RY=;
-        b=uRhwb0ieSxmKcIHYRKWVPT5OkxeRAakPEKMDmVbkfUJRL/5OqPAXKsd8JysFQkQVBR
-         JgdGCxYGq9iC13LQXDdEiRtukjk9zzD1wq3j/stPBmx8YHhPPxAkbvKl4vNoKsrQro1X
-         8kaA+g0k0/XGnV4Wiuh79uHR4GNJeogpiZKEqZRJXRcVICIT2hhOeXpZiaBa7KiZpoZh
-         PyeeTrXDYdMx9bFkk8k6UsenEX+aZm/xdsn7Ony2ExJvvOSNxVo74l6xkl5Tp4Gs7eLT
-         GOjConAa7ZgqIX59P54e6dPhr7yrOfxxMHArjmG24rr6F/kRGb23GTQ0Jhv4Gm1yZdXP
-         HObw==
-X-Forwarded-Encrypted: i=1; AJvYcCXn7fk87fZN15UWERt0WZvA0nD2tlSTniLg4psJNpOk/saj4qOQEGP3Za5SnCF5MQ4n41G+pBQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdWUiqqFl5YtD045A65uB4nh14ls3W1lLK5tsiHhv76mWjqNwD
-	wck5e57GhA8q/aflX83/YohCZ+WpWQre/e8RNOM1T3JZGHQchBYcVrSe6RmhOTAVpcsAguWiCw5
-	KYUnPfhoVPXSfbGkam6mRIT2zzCVrZRfvG0bw7CKs
-X-Gm-Gg: ASbGncvajv7owBokgBxlZlLilOzV7uD5QPwRj+oojtuqoDfz04iP7olOxO2TTYfOXwU
-	7WTGNDQRgrg2EstnpsctsRlaUDVAC4LoblXU9BDO0bF3y59lbecvwE78koteH+bC6AV2YdV3BpJ
-	kdvQGTMjgsHsvp0408UpgYAS3bZP7O2rBXVRmBmbYBIoWwb8bbTUIPxGME5uasDrXrvlnZRsi1s
-	1m8oLOwJX/3NtS+z3XBrj8N1z6PcKtpPzTCsc49gQBAQnOHux3rv90G3AReBkhkbO7yh67+S3Hd
-	BXA=
-X-Google-Smtp-Source: AGHT+IEV3la6NXwNJYZQykyfivCVrlP9CKWgNZcO5B4+Uua6dEeDizI+4rTgMUd9UBFFMOzW/aqgzbS+ZbO8yh9YJdA=
-X-Received: by 2002:a17:90b:5291:b0:32b:baaa:21b0 with SMTP id
- 98e67ed59e1d1-34733e2cf72mr3640309a91.6.1763744882053; Fri, 21 Nov 2025
- 09:08:02 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763745291; x=1764350091;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7KI4P3ipTmobTgpfDGDvQPqfKrNYWqpgnGI/I2F7HDw=;
+        b=Lf0/Q25xv1qDKTzUboyChqB8yX6GUKpKiRqfWq3GA/pUaBVf6/dgl/Az9/xETaCiKN
+         zVX9LEb63uCq/BT5v53rSouLNd/SEqVYa8NZfpIAbETl/BhkwFr20L0ChzFtF8TZzEfy
+         CLyIl0NLPFUo21CZoLCO4p/ipw0NzHFy7Tz/gSg/A/ggRlcFKS5WVt10myjMa3mNK71+
+         BcW2BqocOM/xZjA4beFqWkZM4wkFl4gvx252vrbjqDwox0KLqgM1hi+m0C2Hc1qDN9HO
+         dawo/HNfFtZHQbw+bLKQfHGpDJbSIHNz2KKFrlmAe7WrgLBqoUXcsq2m+PejmrNFbwuB
+         b8hg==
+X-Gm-Message-State: AOJu0YzSKstI3ltjivw7322EZh6uSRM7NCmFmbqZW4Us3WP+wfJZJonQ
+	1uwCM37n/kMYMiNSsdtzDgj0LPaWTz1Bpm9TO6USqCw207m0B7dRDcDlmKxAnOIFCzQ=
+X-Gm-Gg: ASbGncupoh1lhccKvzUUydCk3A1sCJnQZc6RM/z0VmuMkFrcH+Zpi+N7iWHr2IxE0vT
+	t84GJUNoniEYxn5tKL/NQVnjeaM1v3TsIIH7JlN5cPHebunkLjLBrqbITgCeMgm9SN/9IUJP3At
+	7F9H/a7aTwzH6IgpstVMLMe9yeMxfCVykuGKgjLL6cSUjyZ+AFIiSwEFMt7YeVKiY1Q5LVx46Rw
+	HL+xyUbc/iHRgy9zdU06eLc1jqrRUhN1reqy466V7+YLD9THqhDz1BlUb45NKR0JmaPvPLykLqH
+	Avz9mWv/yim9Oy2NmHsGMZ4OUf8Htg+wL/ZtUVuudC30neUph86Hxtr9heaG+1tf9UNy6Ux5A5o
+	cXSU6Pk50FmsbcFfihejsqhdwP9vf2fzkZ/BhzoN7E30PbWlPlcic/mLGXGUu1Jo5/xQv1bKlBE
+	iU7pIRmsyowwTxyYjTQ0fxm7V7JysorPaxeeOA9KMHAceXCCcvq0LbKLWHGY9HnTj1ChE+hKI5E
+	BdpGX9vZNLLoB4HNQ==
+X-Google-Smtp-Source: AGHT+IFwX+1n1CybGSFP8odZgHa3GgdFz2WWnfSVf8mv7RwE25JnDTUdQ/o3xOisWCfPlR7O9Mndow==
+X-Received: by 2002:a17:903:3c43:b0:298:d056:612d with SMTP id d9443c01a7336-29b6be94938mr30401665ad.9.1763745291336;
+        Fri, 21 Nov 2025 09:14:51 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1156:1:c8f:b917:4342:fa09? ([2620:10d:c090:500::7:9190])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b26fed2sm63058625ad.69.2025.11.21.09.14.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Nov 2025 09:14:50 -0800 (PST)
+Message-ID: <1cfe74a1-092c-406b-9fe5-e1206aedb473@davidwei.uk>
+Date: Fri, 21 Nov 2025 09:14:49 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121154100.1616228-1-edumazet@google.com>
-In-Reply-To: <20251121154100.1616228-1-edumazet@google.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 21 Nov 2025 12:07:51 -0500
-X-Gm-Features: AWmQ_bmybVGZVIrORa1Y4TA9kBMp3QrlgXdE_Zil7murYXAedVvfLvMx1XShElc
-Message-ID: <CAM0EoMmof-15_1car5Taws79h=v7jyOtDWtPxTwMp1590iXrYw@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: sched: fix TCF_LAYER_TRANSPORT handling in tcf_get_base_ptr()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot+f3a497f02c389d86ef16@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 2/7] selftests/net: add MemPrvEnv env
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>
+References: <20251120033016.3809474-1-dw@davidwei.uk>
+ <20251120033016.3809474-3-dw@davidwei.uk>
+ <20251120191823.368addb5@kernel.org>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20251120191823.368addb5@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 21, 2025 at 10:41=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> syzbot reported that tcf_get_base_ptr() can be called while transport
-> header is not set [1].
->
-> Instead of returning a dangling pointer, return NULL.
->
-> Fix tcf_get_base_ptr() callers to handle this NULL value.
->
-> [1]
->  WARNING: CPU: 1 PID: 6019 at ./include/linux/skbuff.h:3071 skb_transport=
-_header include/linux/skbuff.h:3071 [inline]
->  WARNING: CPU: 1 PID: 6019 at ./include/linux/skbuff.h:3071 tcf_get_base_=
-ptr include/net/pkt_cls.h:539 [inline]
->  WARNING: CPU: 1 PID: 6019 at ./include/linux/skbuff.h:3071 em_nbyte_matc=
-h+0x2d8/0x3f0 net/sched/em_nbyte.c:43
-> Modules linked in:
-> CPU: 1 UID: 0 PID: 6019 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(f=
-ull)
-> Call Trace:
->  <TASK>
->   tcf_em_match net/sched/ematch.c:494 [inline]
->   __tcf_em_tree_match+0x1ac/0x770 net/sched/ematch.c:520
->   tcf_em_tree_match include/net/pkt_cls.h:512 [inline]
->   basic_classify+0x115/0x2d0 net/sched/cls_basic.c:50
->   tc_classify include/net/tc_wrapper.h:197 [inline]
->   __tcf_classify net/sched/cls_api.c:1764 [inline]
->   tcf_classify+0x4cf/0x1140 net/sched/cls_api.c:1860
->   multiq_classify net/sched/sch_multiq.c:39 [inline]
->   multiq_enqueue+0xfd/0x4c0 net/sched/sch_multiq.c:66
->   dev_qdisc_enqueue+0x4e/0x260 net/core/dev.c:4118
->   __dev_xmit_skb net/core/dev.c:4214 [inline]
->   __dev_queue_xmit+0xe83/0x3b50 net/core/dev.c:4729
->   packet_snd net/packet/af_packet.c:3076 [inline]
->   packet_sendmsg+0x3e33/0x5080 net/packet/af_packet.c:3108
->   sock_sendmsg_nosec net/socket.c:727 [inline]
->   __sock_sendmsg+0x21c/0x270 net/socket.c:742
->   ____sys_sendmsg+0x505/0x830 net/socket.c:2630
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: syzbot+f3a497f02c389d86ef16@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/6920855a.a70a0220.2ea503.0058.GAE@=
-google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On 2025-11-20 19:18, Jakub Kicinski wrote:
+> On Wed, 19 Nov 2025 19:30:11 -0800 David Wei wrote:
+>> Memory provider HW selftests (i.e. zcrx, devmem) require setting up a
+>> netdev with e.g. flow steering rules. Add a new MemPrvEnv that sets up
+>> the test env, restoring it to the original state prior to the test. This
+>> also speeds up tests since each individual test case don't need to
+>> repeat the setup/teardown.
+> 
+> Hm, this feels a bit too specific to the particular use case.
+> I think we have a gap in terms of the Env classes for setting up
+> "a container" tests. Meaning - NetDrvEpEnv + an extra NetNs with
+> a netkit / veth.  init net gets set up to forward traffic to and
+> from the netkit / veth with BPF or routing. And the container
+> needs its own IP address from a new set of params.
+> 
+> I think that's the extent of the setup provided by the env.
+> We can then reuse the env for all "container+offload" cases.
+> The rest belongs in each test module.
 
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
-
-cheers,
-jamal
-
-> ---
->  include/net/pkt_cls.h |  2 ++
->  net/sched/em_cmp.c    |  5 ++++-
->  net/sched/em_nbyte.c  |  2 ++
->  net/sched/em_text.c   | 11 +++++++++--
->  4 files changed, 17 insertions(+), 3 deletions(-)
->
-> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-> index c64fd896b1f985c5f6a5b50cbb42ded640d0c9fe..99ac747b7906074c43b3eb8e3=
-4cf6c07235cc81d 100644
-> --- a/include/net/pkt_cls.h
-> +++ b/include/net/pkt_cls.h
-> @@ -536,6 +536,8 @@ static inline unsigned char * tcf_get_base_ptr(struct=
- sk_buff *skb, int layer)
->                 case TCF_LAYER_NETWORK:
->                         return skb_network_header(skb);
->                 case TCF_LAYER_TRANSPORT:
-> +                       if (!skb_transport_header_was_set(skb))
-> +                               break;
->                         return skb_transport_header(skb);
->         }
->
-> diff --git a/net/sched/em_cmp.c b/net/sched/em_cmp.c
-> index 64b637f18bc7d40509bf5c9f7679cfbc2922af1c..48c1bce74f498d0b4ee3d1efd=
-e96459b0dac5896 100644
-> --- a/net/sched/em_cmp.c
-> +++ b/net/sched/em_cmp.c
-> @@ -22,9 +22,12 @@ static int em_cmp_match(struct sk_buff *skb, struct tc=
-f_ematch *em,
->                         struct tcf_pkt_info *info)
->  {
->         struct tcf_em_cmp *cmp =3D (struct tcf_em_cmp *) em->data;
-> -       unsigned char *ptr =3D tcf_get_base_ptr(skb, cmp->layer) + cmp->o=
-ff;
-> +       unsigned char *ptr =3D tcf_get_base_ptr(skb, cmp->layer);
->         u32 val =3D 0;
->
-> +       if (!ptr)
-> +               return 0;
-> +       ptr +=3D cmp->off;
->         if (!tcf_valid_offset(skb, ptr, cmp->align))
->                 return 0;
->
-> diff --git a/net/sched/em_nbyte.c b/net/sched/em_nbyte.c
-> index 4f9f21a05d5e40aadfdc4c339b8178ad43dc2c8b..c65ffa5fff946edbc30a65ad9=
-9087bf664665e32 100644
-> --- a/net/sched/em_nbyte.c
-> +++ b/net/sched/em_nbyte.c
-> @@ -42,6 +42,8 @@ static int em_nbyte_match(struct sk_buff *skb, struct t=
-cf_ematch *em,
->         struct nbyte_data *nbyte =3D (struct nbyte_data *) em->data;
->         unsigned char *ptr =3D tcf_get_base_ptr(skb, nbyte->hdr.layer);
->
-> +       if (!ptr)
-> +               return 0;
->         ptr +=3D nbyte->hdr.off;
->
->         if (!tcf_valid_offset(skb, ptr, nbyte->hdr.len))
-> diff --git a/net/sched/em_text.c b/net/sched/em_text.c
-> index 6b3d0af72c39c7fb1e3290e24bf94f5bf9e0b358..692e2be1793e9961bcd4516ba=
-f54a05341f6ac5d 100644
-> --- a/net/sched/em_text.c
-> +++ b/net/sched/em_text.c
-> @@ -29,12 +29,19 @@ static int em_text_match(struct sk_buff *skb, struct =
-tcf_ematch *m,
->                          struct tcf_pkt_info *info)
->  {
->         struct text_match *tm =3D EM_TEXT_PRIV(m);
-> +       unsigned char *ptr;
->         int from, to;
->
-> -       from =3D tcf_get_base_ptr(skb, tm->from_layer) - skb->data;
-> +       ptr =3D tcf_get_base_ptr(skb, tm->from_layer);
-> +       if (!ptr)
-> +               return 0;
-> +       from =3D ptr - skb->data;
->         from +=3D tm->from_offset;
->
-> -       to =3D tcf_get_base_ptr(skb, tm->to_layer) - skb->data;
-> +       ptr =3D tcf_get_base_ptr(skb, tm->to_layer);
-> +       if (!ptr)
-> +               return 0;
-> +       to =3D ptr - skb->data;
->         to +=3D tm->to_offset;
->
->         return skb_find_text(skb, from, to, tm->config) !=3D UINT_MAX;
-> --
-> 2.52.0.460.gd25c4c69ec-goog
->
+Got it. You'd like me to basically reverse the current env setup. Move
+the netns, netkit/veth setup, bpf forwarding using the new LOCAL_PREFIX
+env var etc into the env setup. Move the NIC queue stuff back out into
+helpers and call it from the test module.
 
