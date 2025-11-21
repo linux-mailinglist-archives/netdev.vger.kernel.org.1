@@ -1,70 +1,120 @@
-Return-Path: <netdev+bounces-240638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCB4CC77252
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 04:20:31 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A90AFC77267
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 04:21:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EE24935F75A
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:19:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F33954E6DEC
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:21:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC1A2DF14A;
-	Fri, 21 Nov 2025 03:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B68E22EF646;
+	Fri, 21 Nov 2025 03:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KEv6e7Us"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJjTAyST"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F7C29B77C
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 03:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2C22EC55D;
+	Fri, 21 Nov 2025 03:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763695158; cv=none; b=iJTiPa+fLhFiJMp11ANBiUMXXNe1CaHOexJLIXuYJMFQZ1cL/iyMU/HAneA7qLYHkhebas20vRZYj0JERBIluEc0nQUex6e0hG2kwtR1JZsOtA8Uh5lCUgePRny8GJcUOwdS7DC6CYP/Hb4EgrpjfNdIRAW/sl0HA9+t5tHx7cw=
+	t=1763695250; cv=none; b=YKHaxDvk5Uk2NvuFapHInYDzSMO54HlwjzVp3TJRthvrz3farYU1JD/VNR6/QSLj2ON6YG5xD0cMvMzWX9NTcoiFHkbw9D63Lbq9VYNykFuLML04FI3Wa207FFRDv3aVBUYBWJn4ry+5Q+wu56j/oWHVPfojN9xVEwYRFMIsFcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763695158; c=relaxed/simple;
-	bh=9I0gmZTrLdx10DkU1dpqUfFndZ0psjEPqNUij5ibGxE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jj2N4fnlLQ5SxULsEAOP1yKkQ99/lXEbMUlBdS4iteg4K6X1uBa7MGh5EfRrVm/CE9FZQ0CQy1oPOKhyiOJSGHY4yz3oOrw0bUCMmXWjZBgpX8pDEPH+jctmPod3FuqcYj35TjD1L7jIYlcyUyxXkjtF2MSjj7jCLlDj764LxME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KEv6e7Us; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1A37C4CEF1;
-	Fri, 21 Nov 2025 03:19:17 +0000 (UTC)
+	s=arc-20240116; t=1763695250; c=relaxed/simple;
+	bh=CJIKfc1Nqd88lRsKzRVjuHrSjJutSjzWzdhWad5u9Vs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Upk92gkzVA8f3Ul76K/iLr8VgL6CPyRHW3uwcSMXXh3gX9I4noxvr5ObX+fsvKGg4ar5rKmEJe8zKKCTfNX1XjxiVD1ZmIRwfV/QSAHQn/MxX5M8n5EyPDPhySYUdZuDmFqo8i7INh3epqASJNk81XTQnWwHkIO53B/D4wLJX4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJjTAyST; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E505C116C6;
+	Fri, 21 Nov 2025 03:20:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763695158;
-	bh=9I0gmZTrLdx10DkU1dpqUfFndZ0psjEPqNUij5ibGxE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KEv6e7Us+Qkum34IBevadL2Ll3TzsuootFBB66xhYXuAqdEB/jwsJZb6eg2dzGBcN
-	 NOwEDAOC6F8DGhW+OQBU9fi17+fyxYxoiwb39OOaJFpczzcaySsV6jEaFP2e435RAH
-	 mgCec1DomtI+P0D6CzzKmAawfpisdvao3edjGzW+0IqUwZGbWff6oZEGsSohWjsIlq
-	 qdH/JSEZYyl8S+LqYsU/iSvi0eFLncJmaZXtXBgiv7LZyU+8aPuayDWlnBcPa9Z1fZ
-	 6Zn06fVt7NCrDAo8Ib2DkukfkG3ZsuEwJFZog43a6C8SQiP6PJYosLtHIQhC/Xfgyd
-	 Xz6rwsUz5xOmA==
-Date: Thu, 20 Nov 2025 19:19:16 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>
-Subject: Re: [PATCH net-next v1 4/7] selftests/net: add rand_ifname() helper
-Message-ID: <20251120191916.4f91ee3a@kernel.org>
-In-Reply-To: <20251120033016.3809474-5-dw@davidwei.uk>
-References: <20251120033016.3809474-1-dw@davidwei.uk>
-	<20251120033016.3809474-5-dw@davidwei.uk>
+	s=k20201202; t=1763695250;
+	bh=CJIKfc1Nqd88lRsKzRVjuHrSjJutSjzWzdhWad5u9Vs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MJjTAySTaL4LZ254SCFBk62aiSvSeSIUldIUS3cQDv6VVzPM/EAyJDuntlFvWYYML
+	 NlL19MUHmWq9niVOmYgmvSN41e3oi99u8qdvjPIdFN9vlQdwzSNJXZRbKLQ3MQjfTX
+	 aMJmlQz8MluDEpqWpziDzqLQU/lEDDzB9lXpQAJyqbpvqVGQJQFAlGyDbW8wRyjtak
+	 aqIhDLe+CENQrIqauX45U3jIAjpI2+SFzstqtEkJOpJkWR6evseawjJS+ztOPBFDEB
+	 Gha0djlIt/pMu8k+113x1CzcsZH+hfDtNyoBRT196wNllVJPHlYz23lfBw1DeDUuuI
+	 J2b0wzekzpRUQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 345B53A41007;
+	Fri, 21 Nov 2025 03:20:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5 0/6] devlink: net/mlx5: implement
+ swp_l4_csum_mode
+ via devlink params
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176369521502.1881381.16790594395316376229.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Nov 2025 03:20:15 +0000
+References: <20251119025038.651131-1-daniel.zahka@gmail.com>
+In-Reply-To: <20251119025038.651131-1-daniel.zahka@gmail.com>
+To: Daniel Zahka <daniel.zahka@gmail.com>
+Cc: jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+ schalla@marvell.com, bbhushan2@marvell.com, herbert@gondor.apana.org.au,
+ brett.creeley@amd.com, andrew+netdev@lunn.ch, michael.chan@broadcom.com,
+ pavan.chebbi@broadcom.com, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, sgoutham@marvell.com, lcherian@marvell.com,
+ gakula@marvell.com, jerinj@marvell.com, hkelam@marvell.com,
+ sbhatta@marvell.com, tariqt@nvidia.com, saeedm@nvidia.com, leon@kernel.org,
+ mbloch@nvidia.com, idosch@nvidia.com, petrm@nvidia.com, manishc@marvell.com,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, s-vadapalli@ti.com,
+ rogerq@kernel.org, loic.poulain@oss.qualcomm.com, ryazanov.s.a@gmail.com,
+ johannes@sipsolutions.net, olteanv@gmail.com,
+ michal.swiatkowski@linux.intel.com, aleksandr.loktionov@intel.com,
+ david.m.ertman@intel.com, vdumitrescu@nvidia.com, rmk+kernel@armlinux.org.uk,
+ alexander.sverdlin@gmail.com, lorenzo@kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org
 
-On Wed, 19 Nov 2025 19:30:13 -0800 David Wei wrote:
-> For upcoming netkit container datapath selftests I want to generate
-> randomised ifnames. Add a helper rand_ifname() to do this.
+Hello:
 
-The kernel will generate a name automatically, why do we need to create
-a specific one?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 18 Nov 2025 18:50:30 -0800 you wrote:
+> This series introduces a new devlink feature for querying param
+> default values, and resetting params to their default values. This
+> feature is then used to implement a new mlx5 driver param.
+> 
+> The series starts with two pure refactor patches: one that passes
+> through the extack to devlink_param::get() implementations. And a
+> second small refactor that prepares the netlink tlv handling code in
+> the devlink_param::get() path to better handle default parameter
+> values.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v5,1/6] devlink: pass extack through to devlink_param::get()
+    https://git.kernel.org/netdev/net-next/c/011d133bb988
+  - [net-next,v5,2/6] devlink: refactor devlink_nl_param_value_fill_one()
+    https://git.kernel.org/netdev/net-next/c/17a42aa465c0
+  - [net-next,v5,3/6] devlink: support default values for param-get and param-set
+    https://git.kernel.org/netdev/net-next/c/2a367002ed32
+  - [net-next,v5,4/6] net/mlx5: implement swp_l4_csum_mode via devlink params
+    https://git.kernel.org/netdev/net-next/c/b11d358bf8c3
+  - [net-next,v5,5/6] netdevsim: register a new devlink param with default value interface
+    https://git.kernel.org/netdev/net-next/c/72924056ebac
+  - [net-next,v5,6/6] selftest: netdevsim: test devlink default params
+    https://git.kernel.org/netdev/net-next/c/8be656cfb931
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
