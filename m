@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-240693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80438C77EBE
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:34:21 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5A72C77EEE
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:35:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 08EAE3211B
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 08:33:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6083C4E9A3A
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 08:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C8333A706;
-	Fri, 21 Nov 2025 08:33:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FDD33D6D4;
+	Fri, 21 Nov 2025 08:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pGSMPvxV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MNnepu+N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950D72E041D
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 08:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE6033A02B
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 08:33:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763713993; cv=none; b=mEwrNnhz0VuX7vICxKF3Rq3mPnTBxez+/Rj6zEctUS5J8MAfJ6McvyRCZDxLTzm3gTZ05niJNdUNRM5pLwgPPX2vK/i0cy52vFuoI+8ZfU6hGPz6fZ0bHJel+DFAaJYB3uXicw/YB2s5GlLggczuGFudJ8TlxNAxRXmHIK4OR+s=
+	t=1763713994; cv=none; b=JdKGcU2de4JNHj5IckT7UpVpSZs4b0xO0PjlHe6A3EKiHyjzovy1Z/N4q5v6lVkJgEg8nX6Z0q5RbAvTDDFXks4fD1Uq34U/+7P+bvEHPM1jECr96PUHF8QE85S2cA39bHqGahLTsYZK158lsjhYse6JqeTeTj6L7EQ+EPAxUxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763713993; c=relaxed/simple;
-	bh=EoxVpu/ORRnnVZ1X3PdYLlVKakhUMG2n2Ff/2U7UIgU=;
+	s=arc-20240116; t=1763713994; c=relaxed/simple;
+	bh=hQWilFT4N74eUvM8aeubIw76354Td+kefIBnh194ris=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ebmaSFFO+yQQNFgDFyEUkSF/98M49tYkEZ0UpNjMxL4ctPUnlAj39+2W+qx42zCUbpIH7rZWAxYmke8ZaDwmGmoBHzdKH5fipbdB7fyrKpLGleMF/+A3W7urEHmZbvAphWBS8NBhfaiQta3cQLPJq2k1wDYjC73lYOJtyE5kdM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pGSMPvxV; arc=none smtp.client-ip=209.85.222.202
+	 To:Cc:Content-Type; b=fNL4tiVy2P7InopmMkw7pKbbp89uY9D1w3kLVqkDvWpOtA+mph9Ta4X5K9IDZTNdKuFjdLxdziX85Q9A8zHRBHjS171T3zD9ZxfwpFIdrqDLaTNcYP/WR/VKg+rjjDWVhqdYzcX1E8d7AzgKKJ48ON0GSCngqLlhjKg1fc2b/Kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MNnepu+N; arc=none smtp.client-ip=209.85.219.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8b244ef3ed4so519092185a.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 00:33:11 -0800 (PST)
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8824f62b614so57256596d6.0
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 00:33:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763713990; x=1764318790; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763713991; x=1764318791; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9lqt1q44zF7W8hNtfP2b6O9ic+Fn7ESI1v1ZIvnwP7w=;
-        b=pGSMPvxVf73BrhUJMSrvIBmjZx24rh1iUowQjeBOPHteVJroXmvYruniIpwjnkPr65
-         i8Tb1Za6YQuQ0Auooaj8B5AnHP8bT5CzLKzUWIebGuAha+vk5J6pI2+5K2phKEiUywkq
-         keYFAkl0/7OlJpKgMefpCF+Br0u2YUWs7jqeclm6yyla0ffuI15MYW5Dn8EG1VrDELjH
-         gRCMNefRqzWkSVe6Ir3a58bAXEIwAftvpnrKABb01sxHjjBbFt4SQRi97BqrHz3tpf5O
-         tQ4sBs+CKiAVPqrGzq8EFpjCEsGS31ODV7a0ln+I4nPSGU5NI/1ybXjF48gsnLjnycwq
-         VgvQ==
+        bh=YOYqtLViuD52P/GQflD60QINVtQoHqDNLW4K39813P0=;
+        b=MNnepu+NTP0GlJ49tMVStBuI8ciQ6j70cGzFt4CdbetDTkjGzP0yiDFn1Wq+G4dTnY
+         L4EhVftK35gx2fEqP2ijdWMA/WAitmGConOJaxesgA+0dCcqTTkgSPJrjOIAWACW/gLB
+         qNqghMb1vUbpz1qOsXjW2jtx75EHxSknYWmscZcbAsSSvE8v2gHRhsJSJTR8q1jiP0Yn
+         0DzoirhR5dye/052zs5gtcf/fGzt04s2RfZ+n5aidy87YTyYANHptrOlAruX5olsinD/
+         kSzKy8YREggTZlbaIfB1TrDyEvDHj3gZQFKQRSll9ClUJOAA83TatTotcuazq1V1G7IL
+         UJxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763713990; x=1764318790;
+        d=1e100.net; s=20230601; t=1763713991; x=1764318791;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9lqt1q44zF7W8hNtfP2b6O9ic+Fn7ESI1v1ZIvnwP7w=;
-        b=Nd6qoDoLgc05ywZ4RLY+V3F4SqnFYguTgiGhlQ6vVhLYcxdq5QMV+alYt7hDZxPv64
-         XnE+vRNbmyjTqBIgXR1/TzAcu+VkWqiodQv+r+dhiJdTfLG0juiq5FIl5ld97SzBxeLM
-         N4cUtzxLGUQvO1hqN3x8RtA1am8hpAl/4MCU5lYrw76l2FA6gX2AiO9kOxV9SyHETKMz
-         x8ZxkY8bZDJstjfp7bCeO9VBn9fRw76ebfYua7Y5QHcGo798mJuWbo3kH1rAop15NbA8
-         NHiiZ6oMeumm0tuSvydROmCiMxyPXQW2veni5/ka64N5Tajr/7dwwjKH6q+QKul+M3Eg
-         1JOA==
-X-Forwarded-Encrypted: i=1; AJvYcCVrubGBTYO1T6bIz3TKpp1d8AZng4k9sjFTSRKGPoGCpGmm9Ob9IKUmXWDJqB4UwTRNfRNeUzY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSlUqmhkFn5lNNMAkcv91Ah/10cQIbEyHs9Lv+0I9ZehW6fkSu
-	IkFDvFK3k60lzS5flC0Dkc5OGRwMU/ag5T1D6eaknqOb4mqWohaAf1rTdOatpwGdNY7Lih1A/xY
-	CpTzjgZQdZvTvgw==
-X-Google-Smtp-Source: AGHT+IFpQsuTiAusVNJ+gkFZhFhSmmNC7dUNbFh7d7BiyaI8HJF29wT8XlYPMIZk1kAhyjb6CnsSDEZYRxEM6g==
-X-Received: from qtbbz5.prod.google.com ([2002:a05:622a:1e85:b0:4ee:c07:cabd])
+        bh=YOYqtLViuD52P/GQflD60QINVtQoHqDNLW4K39813P0=;
+        b=JCLN6ngOeNlQj10ypFls1lZcp6R66+JXPR/3Gx1XdXRg5q9voHeoFcqmPlbsaXrplH
+         osa+xWKc34epJAdlpTmM1CriQb3qdN0aISlElB55k7uqQCkZUw5SKLbs/Y07dpNpUGwd
+         7OEVEUPwG919LizGFCRRQcfN3XFyS+Y/kuU+cdgUYmkfXlRs2EwpqG6ywKlypzkCRYft
+         ERTki+3SATfbtzQnrDIoHXBUZPkJAH1KuiydKtzUKxRCqEij52gwVyCCF1eqfls3ydcz
+         IJTPShJZpqO/6lbxyFaceXTnEjgoDSJfQJaacGcbEX4fbvUWH6zESGrSZYwOnZUouwQV
+         ACpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXWIqsSfXl0Nw2seYjDLPFh05aCUFJ8IAhXZoGWwV+FnrfpuqA9xCoZR5xZQwDJP/jbixRUfbA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWnWN/JmradLJjvCfHIeBf8ywGPAT7DEEXvcSELgJ26x0NuEM9
+	n6ySnzlnrEsTjhpZ+vm4/Er+CngCZZVdWpVjjCsbO6vjy7lLhWNm2+Q9logLvokBCN2MV8Zx+9K
+	l39i84BwdoNTybA==
+X-Google-Smtp-Source: AGHT+IF/srsKD3oFfjjNQrJue4kHHOTHte2URKptos8olPZevLLyuzEWWdD+3qjq/Ct66sDxkWhZureJc6GAMQ==
+X-Received: from qvboo13.prod.google.com ([2002:a05:6214:450d:b0:882:4d6e:ae58])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:393:b0:4ee:1962:dd46 with SMTP id d75a77b69052e-4ee58916841mr20490331cf.79.1763713990311;
- Fri, 21 Nov 2025 00:33:10 -0800 (PST)
-Date: Fri, 21 Nov 2025 08:32:51 +0000
+ 2002:ad4:5c8e:0:b0:880:535d:d157 with SMTP id 6a1803df08f44-8847c544e8dmr21666806d6.31.1763713991553;
+ Fri, 21 Nov 2025 00:33:11 -0800 (PST)
+Date: Fri, 21 Nov 2025 08:32:52 +0000
 In-Reply-To: <20251121083256.674562-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251121083256.674562-1-edumazet@google.com>
 X-Mailer: git-send-email 2.52.0.460.gd25c4c69ec-goog
-Message-ID: <20251121083256.674562-10-edumazet@google.com>
-Subject: [PATCH v3 net-next 09/14] net_sched: sch_fq: prefetch one skb ahead
- in dequeue()
+Message-ID: <20251121083256.674562-11-edumazet@google.com>
+Subject: [PATCH v3 net-next 10/14] net: prefech skb->priority in __dev_xmit_skb()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -87,51 +86,32 @@ Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-prefetch the skb that we are likely to dequeue at the next dequeue().
+Most qdiscs need to read skb->priority at enqueue time().
 
-Also call fq_dequeue_skb() a bit sooner in fq_dequeue().
+In commit 100dfa74cad9 ("net: dev_queue_xmit() llist adoption")
+I added a prefetch(next), lets add another one for the second
+half of skb.
 
-This reduces the window between read of q.qlen and
-changes of fields in the cache line that could be dirtied
-by another cpu trying to queue a packet.
+Note that skb->priority and skb->hash share a common cache line,
+so this patch helps qdiscs needing both fields.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/sched/sch_fq.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ net/core/dev.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index 0b0ca1aa9251f959e87dd5dc504fbe0f4cbc75eb..6e5f2f4f241546605f8ba37f96275446c8836eee 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -480,7 +480,10 @@ static void fq_erase_head(struct Qdisc *sch, struct fq_flow *flow,
- 			  struct sk_buff *skb)
- {
- 	if (skb == flow->head) {
--		flow->head = skb->next;
-+		struct sk_buff *next = skb->next;
-+
-+		prefetch(next);
-+		flow->head = next;
- 	} else {
- 		rb_erase(&skb->rbnode, &flow->t_root);
- 		skb->dev = qdisc_dev(sch);
-@@ -712,6 +715,7 @@ static struct sk_buff *fq_dequeue(struct Qdisc *sch)
- 			goto begin;
- 		}
- 		prefetch(&skb->end);
-+		fq_dequeue_skb(sch, f, skb);
- 		if ((s64)(now - time_next_packet - q->ce_threshold) > 0) {
- 			INET_ECN_set_ce(skb);
- 			q->stat_ce_mark++;
-@@ -719,7 +723,6 @@ static struct sk_buff *fq_dequeue(struct Qdisc *sch)
- 		if (--f->qlen == 0)
- 			q->inactive_flows++;
- 		q->band_pkt_count[fq_skb_cb(skb)->band]--;
--		fq_dequeue_skb(sch, f, skb);
- 	} else {
- 		head->first = f->next;
- 		/* force a pass through old_flows to prevent starvation */
+diff --git a/net/core/dev.c b/net/core/dev.c
+index e19eb4e9d77c27535ab2a0ce14299281e3ef9397..53e2496dc4292284072946fd9131d3f9a0c0af44 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4246,6 +4246,7 @@ static inline int __dev_xmit_skb(struct sk_buff *skb, struct Qdisc *q,
+ 
+ 		llist_for_each_entry_safe(skb, next, ll_list, ll_node) {
+ 			prefetch(next);
++			prefetch(&next->priority);
+ 			skb_mark_not_on_list(skb);
+ 			rc = dev_qdisc_enqueue(skb, q, &to_free, txq);
+ 			count++;
 -- 
 2.52.0.460.gd25c4c69ec-goog
 
