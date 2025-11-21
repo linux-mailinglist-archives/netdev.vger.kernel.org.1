@@ -1,352 +1,306 @@
-Return-Path: <netdev+bounces-240821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52C1DC7AEA4
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:44:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16301C7AEF8
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:51:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 211814ECB86
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 16:41:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60E7F3A1E5D
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 16:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0F02E9EB1;
-	Fri, 21 Nov 2025 16:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E29E33B963;
+	Fri, 21 Nov 2025 16:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RjWqvx2/"
+	dkim=pass (2048-bit key) header.d=netstatz.com header.i=@netstatz.com header.b="QKTsyaSm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E5172E7F1C
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 16:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1703E1F09AD
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 16:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763743257; cv=none; b=Zvp/Dvyy5/4KeiozyP76EDVtGs3fpLzc1HpUJanqn1nNviyA30f9F1Jseg9KTnxiTRQ/LwYkO7dW/obknwZs2oAgoe6MDWz5XIdWXHArGwxuE2Eq4FBiKCZ6yjE/reN7sIyBgWwcVBiUtY9d3+aHOcX+VnZEEXJZj60kuhYvo7Q=
+	t=1763743830; cv=none; b=P/3RIlto0OsgpJ5xDP3KD/uGMfGOpKP5PhPPt7WKkFvd8Y1QscZ5QvCdxOqqSu7zVszZJgVZfNPvgRtazmCccfag5zHNKMEdvCyLJUfnzV6VLw1SZ0u7TMNomy7wPPFbPgA9sy6ERs2/Wjdloke2QLvXZexkaUgrVSW6ofYic38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763743257; c=relaxed/simple;
-	bh=cOlu56qTo1pZa1QDVW0RvIP0UVfYaHfDQyAPTO7iLU0=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XUVIOgd40XeI7plc/nXe+IYywgTUJ2aBnT7GS0JOCywp9rapB702ycKcIxOkVKlF+KNPbSltJTC9ufppk9Tclyx9stTrSlQbF3oFlTSjtM9200kbZesONwISEn3L+yIL3XSPKNSi9WF31eZj2q0H++5nqijQx9U53OAjDX4a1Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RjWqvx2/; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-297e264528aso25970265ad.2
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 08:40:55 -0800 (PST)
+	s=arc-20240116; t=1763743830; c=relaxed/simple;
+	bh=5+kCyy8X32jPH8aWSDVlDLqeMbE4PAZjRcD96juLnZI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hDfQ8SCZcEa1aHrqtAEMbwf8tV6QFIMTGq39XjkDBMzEoIkmE19LdgymYauz54Gea8ndBwrpyjiYv0xqTG5/6k1jjzyl9eTkW02JKNut+sE1gib9gDhmAvwNHfO3CWqhaksYLLhOswjyxE77tDldDFFkRzq3ACAqMd+F9Dn6d4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netstatz.com; spf=pass smtp.mailfrom=netstatz.com; dkim=pass (2048-bit key) header.d=netstatz.com header.i=@netstatz.com header.b=QKTsyaSm; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netstatz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netstatz.com
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-37b95f87d64so18358241fa.2
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 08:50:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763743255; x=1764348055; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7/WGtU0UVJKlb1wsfZJEXpuOAXqZ+cM323d7iu9zqyw=;
-        b=RjWqvx2/Sd5t+ehz+ch5XBbG5+3B0gOevFo/E6mS+Tc08YEf2n/sB1wCxwvnpBNIn0
-         prPSi5ROhwKpcCXfyY/w3yh3UbMoVz3yiBEcv6BnEr9GRPPBt0Pu6AlDREhpBA3yCHtw
-         X6PEKj7bIFLkdxK/HccU14AY3pK5hg7pzxWKb9OwzpeXzS2RTKdZftRj2Oe/XUJppaft
-         f0fRowX0t0hBmG/vk3wCgJ9mfedX4cWjlZig6NoX6buFggLWNdvcx3EIOsNKuhhwbEqv
-         +X6hZ1xR74j3y2DwzfCr80dXD81uDnJ+EiiNySeOyufrxf5WGEWfLqmPkjweV7emX0y/
-         t0Eg==
+        d=netstatz.com; s=google; t=1763743826; x=1764348626; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C5MBa0m1dkCz6cDYfdxHUo9JM+hNhCvoRZjJDMtofyU=;
+        b=QKTsyaSmKE+4CuPEW6SYOuyGdHvAw1u7WxwQ7T6Fl0EZGixr57ufBiswi1oin7UM+h
+         736o74Wru4Waomkk/NzCx8ZrhWjMPZC9VY5t2kLT+O7Mt0ZF65izSJ59pR8f7RbVwpKP
+         v6CvTlxkNJheIMi+rWPqYV0ILxlv6B6FFZ3sJYOil6vHX8dkhYvIIfvm/Fxt2e3sS8Q/
+         FGPpiIpVt5ve/lU/t2CfOvxenC5wQkAgujPJ1CYsPaluXBgMke8QIDU4dAIt8bka/nFu
+         HJWYZJtuOP45UkUXfZuTd5Si/NPznLuVpXdQ5gB015vKd1/RSF+OvTgsEQUUFVvh5jJ0
+         SzKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763743255; x=1764348055;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:message-id:date:cc:to:from:subject:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7/WGtU0UVJKlb1wsfZJEXpuOAXqZ+cM323d7iu9zqyw=;
-        b=jPkWLiePKn/WCODGZeeVh7cPWDXh7IY/8niaRbyv2SkkLHxnFu11nLCq+HrLFs69T5
-         6ouM8Pc5z17GK3Xqpt2YS4sBLL4EA7CNpe6zvWeYD5/zYquW43j4DN3d6OLB4vsunBcc
-         SDsz62tb+O8OLYK/58FyrpJFDNWgpCCB4EN+kX3yGmRMQeqRVV+3rxme7+AqAdSd2234
-         aEizxiWedrGH4Yq7sAcJoRn2MPv7Ajc9KAmWBx15fksLDgqNEr/q4LmSiS69c+syHx58
-         /TptRIC0de5WpMyR+tKHhbfdxksfLjSgZRH0CiQWa60qzcMUEAeKX6MOLbBrFGb91RLL
-         tAhA==
-X-Gm-Message-State: AOJu0YzOIy3ByU4tTtPWdqCE1gPSMWF0frDYZ1tNkuj9TNYQ1o0YAylx
-	0yjaAnmcx55SawKCeu2vxtEpKLzTofgPoJp798QiimXBUseKVcDA6zur
-X-Gm-Gg: ASbGncvUe1PIg2Q9m2bRkaJu28asmPY1njnOX7oGTF4GkwE0PTeIZswYFgYpjlmb/0F
-	4Yo5zYgXE6wgGQCcKBnUxLSAWradngY0qmT3owMTwt8A9W61/aIEBhRnPzZBxkSJiW6rLPgGnRs
-	WiPfTbxgwhNxIRChd/dJKx+nRhS1r6mo6iJcK2ftDapREYy2FAiVRD2aa7ynKAuV/vRnmptL5qp
-	z4wqd0pamEWNh9cwGHUmcJmaeu0S2zuC7dn0ZmGcaBIRPvpsNjyMjLXck/KFK0LuoxiEKl8mjKp
-	bQM5rF1qIAEF+gbFv9FaLvqBpRzsEjbvt7sBB7D0LkSwDMpF1Bq0ilwNykOrq8IcdjjLM8Khlvx
-	XM7Dw5XJYpBkG6SY2EAf7wkIU58ppAkBMebsBKfep30xEKHNw86p3RdKktjcCpmu9fllNHMFDGD
-	O5gQsRPWhfINE6a5SH19SJQwkhDr90FhwrdVcItlJiVh1h
-X-Google-Smtp-Source: AGHT+IFUCW9s6DyXeMDerEXVQ99uM+N77KRt+sSmtrMBGS8lUWe+ho+OTxm52vaB26Y1jocL9ATNkA==
-X-Received: by 2002:a17:903:3d0e:b0:29b:6750:c65f with SMTP id d9443c01a7336-29b6be8c8b0mr39068225ad.10.1763743255302;
-        Fri, 21 Nov 2025 08:40:55 -0800 (PST)
-Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b15b851sm60558615ad.43.2025.11.21.08.40.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 08:40:54 -0800 (PST)
-Subject: [net-next PATCH v5 9/9] fbnic: Replace use of internal PCS w/
- Designware XPCS
-From: Alexander Duyck <alexander.duyck@gmail.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
- davem@davemloft.net
-Date: Fri, 21 Nov 2025 08:40:52 -0800
-Message-ID: 
- <176374325295.959489.14521115864034905277.stgit@ahduyck-xeon-server.home.arpa>
-In-Reply-To: 
- <176374310349.959489.838154632023183753.stgit@ahduyck-xeon-server.home.arpa>
-References: 
- <176374310349.959489.838154632023183753.stgit@ahduyck-xeon-server.home.arpa>
-User-Agent: StGit/1.5
+        d=1e100.net; s=20230601; t=1763743826; x=1764348626;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=C5MBa0m1dkCz6cDYfdxHUo9JM+hNhCvoRZjJDMtofyU=;
+        b=tO/GuQsCHotrTp0c6ZjyJjXX7aII6or7MB2sAlEkqHH7mjva4GapRn6HBU2up05vwH
+         zA8230BAKQxPM2ZgPs2WmEMO9hfnzKi4rYN1dHeGRAzhVsoW8RDa61zDcLOosafTdWz7
+         fbWTkIo4KAGsxAGF9NJKAWl+j9ZIoI6UzlJTrRdsiO5QwNusmjykyaZ9w0JlQx/8rmsZ
+         yn2DXdQQJzbjy1bD9/U1Jw3NZrWw2IRToigOCTQJJrhXWb9FyFMOp4LeEt+cPJuW0zuQ
+         IQFSPu2+Y2Cx/UDRwxubo0B/IHMIyqv/CPOmpLmZNeVgzWM1MnlDoq6zFp3q1CNnU7q5
+         ANgw==
+X-Forwarded-Encrypted: i=1; AJvYcCWwX7shJ/iVf+i2D4HfzZkEkklXFwo4MH0ZKVKq6mFwKsFl20Tx6xxL9dCzZm5wiNqeRz+UOhI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPi36clEps7lk15kMRzeTzGk35shN1LxF8IGGRbVpsIlr6ubZ/
+	Kwr9sNFYSQ41w6gLT8W/Y29Xqsfg/nS5kHMT+LoH07yMR4nkhDn7/JrmCA1s4jxAT/AlMwCX158
+	DassT8HyoRilAweJWkkupfa0Mom5cEgbeO0ii7SpP5w==
+X-Gm-Gg: ASbGnctws5hqg4Gp4TmxkCTmZnQngUBeH9oH9YgP5ehG9I/OEmTBXE6fscr/dwf4b5V
+	X24ntmMKwlK5viRZz99x0mzsugny8xQkJvf8G0vhRQx/2l6+ikgK5a2CuSBFOG1K8hCvBdv4dQA
+	uNKks8jMT4s1cJ4laPtBXwjQKZ2nU6RAXKw7NbfvbyhOSPkMEPFVVPcfA+nqNvCsS4DQYIPJe7N
+	I6Dqisy9sejTlaUbRGXANACLKMQ+9oP0MG5Gj/p6CXnE3Du8V/zvSm5vMEi6UGxgqGqMlQw0w==
+X-Google-Smtp-Source: AGHT+IE1U9NMqfiTuQR2NWDZhwan6xsPMFs+3BLd+wmnsYIjPojl2ary5Q3gZ95UurBsW2namPVbgY6+Y+/T412qlR0=
+X-Received: by 2002:a2e:80ca:0:b0:37b:9b28:4282 with SMTP id
+ 38308e7fff4ca-37cd9183db3mr6995251fa.11.1763743825913; Fri, 21 Nov 2025
+ 08:50:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+References: <CAFJzfF9N4Hak23sc-zh0jMobbkjK7rg4odhic1DQ1cC+=MoQoA@mail.gmail.com>
+ <20251121060825.GR2912318@black.igk.intel.com>
+In-Reply-To: <20251121060825.GR2912318@black.igk.intel.com>
+From: Ian MacDonald <ian@netstatz.com>
+Date: Fri, 21 Nov 2025 11:50:14 -0500
+X-Gm-Features: AWmQ_bk4QDVbAx0NsBCk-cffKGGiRmDtYxhnl6UGbNr6Cy2VhTSh9uItPeyG_NU
+Message-ID: <CAFJzfF8aQ8KsOXTg6oaOa_Zayx=bPZtsat2h_osn8r4wyT2wOw@mail.gmail.com>
+Subject: Re: net: thunderbolt: missing ndo_set_mac_address breaks 802.3ad bonding
+To: Mika Westerberg <mika.westerberg@linux.intel.com>
+Cc: Mika Westerberg <westeri@kernel.org>, Yehezkel Bernat <YehezkelShB@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 1121032@bugs.debian.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Alexander Duyck <alexanderduyck@fb.com>
+On Fri, Nov 21, 2025 at 1:08=E2=80=AFAM Mika Westerberg
+<mika.westerberg@linux.intel.com> wrote:
+> Okay "breaks" is probably too strong word here. It was never even support=
+ed
+> :)
+Agreed, let's say the "magic fades".  I am guessing the same magic
+that allows this 0x8086 component to appear out of thin air.
+thunderbolt 0-2: new host found, vendor=3D0x8086 device=3D0x1
+>
+> Can you describe what are the actual commands you run so I can try to
+> setup on my side and see how this could be implemented?
 
-As we have exposed the PCS registers via the SWMII we can now start looking
-at connecting the XPCS driver to those registers and let it mange the PCS
-instead of us doing it directly from the fbnic driver.
+Sure, first the working variant for active-backup.
 
-For now this just gets us the ability to detect link. The hope is in the
-future to add some of the vendor specific registers to begin enabling XPCS
-configuration of the interface.
+One side shown in netplan using a single yaml file (Ubuntu 24.04 server)
 
-Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
----
- drivers/net/ethernet/meta/Kconfig               |    1 
- drivers/net/ethernet/meta/fbnic/fbnic_irq.c     |    2 
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.c  |    7 --
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |    4 +
- drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |  104 +++++++++++------------
- 5 files changed, 55 insertions(+), 63 deletions(-)
+root@ai2:~# networkctl status bond0
+=E2=97=8F 3: bond0
+                   Link File: /usr/lib/systemd/network/99-default.link
+                Network File: /run/systemd/network/10-netplan-bond0.network
+                       State: routable (configured)
+                Online state: online
+                        Type: bond
+                        Kind: bond
+                      Driver: bonding
+            Hardware Address: 02:92:d5:a7:f4:79
+                         MTU: 1500 (min: 68, max: 65535)
+                       QDisc: noqueue
+IPv6 Address Generation Mode: eui64
+                        Mode: active-backup
+                      Miimon: 500ms
+                     Updelay: 0
+                   Downdelay: 0
+    Number of Queues (Tx/Rx): 16/16
+            Auto negotiation: no
+                     Address: 10.10.13.2
+                              fe80::92:d5ff:fea7:f479
+           Activation Policy: up
+         Required For Online: yes
+           DHCP6 Client DUID: DUID-EN/Vendor:0000ab11ccb509966215f387
 
-diff --git a/drivers/net/ethernet/meta/Kconfig b/drivers/net/ethernet/meta/Kconfig
-index dff51f23d295..ca5c7ac2a5bc 100644
---- a/drivers/net/ethernet/meta/Kconfig
-+++ b/drivers/net/ethernet/meta/Kconfig
-@@ -26,6 +26,7 @@ config FBNIC
- 	depends on PTP_1588_CLOCK_OPTIONAL
- 	select NET_DEVLINK
- 	select PAGE_POOL
-+	select PCS_XPCS
- 	select PHYLINK
- 	select PLDMFW
- 	help
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-index 9b068b82f30a..02e8b0b257fe 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-@@ -133,7 +133,7 @@ static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *data)
- 
- 	/* Record link down events */
- 	if (!fbd->mac->get_link(fbd, fbn->aui, fbn->fec))
--		phylink_pcs_change(&fbn->phylink_pcs, false);
-+		phylink_pcs_change(fbn->pcs, false);
- 
- 	return IRQ_HANDLED;
- }
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index 65318a5b466e..81c9d5c9a4b2 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -697,10 +697,7 @@ void fbnic_reset_queues(struct fbnic_net *fbn,
-  **/
- void fbnic_netdev_free(struct fbnic_dev *fbd)
- {
--	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
--
--	if (fbn->phylink)
--		phylink_destroy(fbn->phylink);
-+	fbnic_phylink_destroy(fbd->netdev);
- 
- 	free_netdev(fbd->netdev);
- 	fbd->netdev = NULL;
-@@ -802,7 +799,7 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- 
- 	netif_tx_stop_all_queues(netdev);
- 
--	if (fbnic_phylink_init(netdev)) {
-+	if (fbnic_phylink_create(netdev)) {
- 		fbnic_netdev_free(fbd);
- 		return NULL;
- 	}
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-index deab789b2a6c..9129a658f8fa 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-@@ -44,7 +44,7 @@ struct fbnic_net {
- 
- 	struct phylink *phylink;
- 	struct phylink_config phylink_config;
--	struct phylink_pcs phylink_pcs;
-+	struct phylink_pcs *pcs;
- 
- 	u8 aui;
- 	u8 fec;
-@@ -108,6 +108,8 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
- 					struct ethtool_link_ksettings *cmd);
- int fbnic_phylink_get_fecparam(struct net_device *netdev,
- 			       struct ethtool_fecparam *fecparam);
-+int fbnic_phylink_create(struct net_device *netdev);
-+void fbnic_phylink_destroy(struct net_device *netdev);
- int fbnic_phylink_init(struct net_device *netdev);
- void fbnic_phylink_pmd_training_complete_notify(struct net_device *netdev);
- bool fbnic_check_split_frames(struct bpf_prog *prog,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index 20f88c8dcc79..09c5225111be 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright (c) Meta Platforms, Inc. and affiliates. */
- 
-+#include <linux/pcs/pcs-xpcs.h>
- #include <linux/phy.h>
- #include <linux/phylink.h>
- 
-@@ -101,56 +102,6 @@ int fbnic_phylink_get_fecparam(struct net_device *netdev,
- 	return 0;
- }
- 
--static struct fbnic_net *
--fbnic_pcs_to_net(struct phylink_pcs *pcs)
--{
--	return container_of(pcs, struct fbnic_net, phylink_pcs);
--}
--
--static void
--fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
--			    struct phylink_link_state *state)
--{
--	struct fbnic_net *fbn = fbnic_pcs_to_net(pcs);
--	struct fbnic_dev *fbd = fbn->fbd;
--
--	switch (fbn->aui) {
--	case FBNIC_AUI_25GAUI:
--		state->speed = SPEED_25000;
--		break;
--	case FBNIC_AUI_LAUI2:
--	case FBNIC_AUI_50GAUI1:
--		state->speed = SPEED_50000;
--		break;
--	case FBNIC_AUI_100GAUI2:
--		state->speed = SPEED_100000;
--		break;
--	default:
--		state->link = 0;
--		return;
--	}
--
--	state->duplex = DUPLEX_FULL;
--
--	state->link = (fbd->pmd_state == FBNIC_PMD_SEND_DATA) &&
--		      (rd32(fbd, FBNIC_PCS(MDIO_STAT1, 0)) &
--		       MDIO_STAT1_LSTATUS);
--}
--
--static int
--fbnic_phylink_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
--			 phy_interface_t interface,
--			 const unsigned long *advertising,
--			 bool permit_pause_to_mac)
--{
--	return 0;
--}
--
--static const struct phylink_pcs_ops fbnic_phylink_pcs_ops = {
--	.pcs_config = fbnic_phylink_pcs_config,
--	.pcs_get_state = fbnic_phylink_pcs_get_state,
--};
--
- static struct phylink_pcs *
- fbnic_phylink_mac_select_pcs(struct phylink_config *config,
- 			     phy_interface_t interface)
-@@ -158,7 +109,7 @@ fbnic_phylink_mac_select_pcs(struct phylink_config *config,
- 	struct net_device *netdev = to_net_dev(config->dev);
- 	struct fbnic_net *fbn = netdev_priv(netdev);
- 
--	return &fbn->phylink_pcs;
-+	return fbn->pcs;
- }
- 
- static int
-@@ -232,13 +183,33 @@ static const struct phylink_mac_ops fbnic_phylink_mac_ops = {
- 	.mac_link_up = fbnic_phylink_mac_link_up,
- };
- 
--int fbnic_phylink_init(struct net_device *netdev)
-+/**
-+ * fbnic_phylink_create - Phylink device creation
-+ * @netdev: Network Device struct to attach phylink device
-+ *
-+ * Initialize and attach a phylink instance to the device. The phylink
-+ * device will make use of the netdev struct to track carrier and will
-+ * eventually be used to expose the current state of the MAC and PCS
-+ * setup.
-+ *
-+ * Return: 0 on success, negative on failure
-+ **/
-+int fbnic_phylink_create(struct net_device *netdev)
- {
- 	struct fbnic_net *fbn = netdev_priv(netdev);
- 	struct fbnic_dev *fbd = fbn->fbd;
-+	struct phylink_pcs *pcs;
- 	struct phylink *phylink;
-+	int err;
-+
-+	pcs = xpcs_create_pcs_mdiodev(fbd->mdio_bus, 0);
-+	if (IS_ERR(pcs)) {
-+		err = PTR_ERR(pcs);
-+		dev_err(fbd->dev, "Failed to create PCS device: %d\n", err);
-+		return err;
-+	}
- 
--	fbn->phylink_pcs.ops = &fbnic_phylink_pcs_ops;
-+	fbn->pcs = pcs;
- 
- 	fbn->phylink_config.dev = &netdev->dev;
- 	fbn->phylink_config.type = PHYLINK_NETDEV;
-@@ -261,14 +232,35 @@ int fbnic_phylink_init(struct net_device *netdev)
- 	phylink = phylink_create(&fbn->phylink_config, NULL,
- 				 fbnic_phylink_select_interface(fbn->aui),
- 				 &fbnic_phylink_mac_ops);
--	if (IS_ERR(phylink))
--		return PTR_ERR(phylink);
-+	if (IS_ERR(phylink)) {
-+		err = PTR_ERR(phylink);
-+		dev_err(netdev->dev.parent,
-+			"Failed to create Phylink interface, err: %d\n", err);
-+		xpcs_destroy_pcs(pcs);
-+		return err;
-+	}
- 
- 	fbn->phylink = phylink;
- 
- 	return 0;
- }
- 
-+/**
-+ * fbnic_phylink_destroy - Teardown phylink related interfaces
-+ * @netdev: Network Device struct containing phylink device
-+ *
-+ * Detach and free resources related to phylink interface.
-+ **/
-+void fbnic_phylink_destroy(struct net_device *netdev)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+
-+	if (fbn->phylink)
-+		phylink_destroy(fbn->phylink);
-+	if (fbn->pcs)
-+		xpcs_destroy_pcs(fbn->pcs);
-+}
-+
- /**
-  * fbnic_phylink_pmd_training_complete_notify - PMD training complete notifier
-  * @netdev: Netdev struct phylink device attached to
-@@ -315,5 +307,5 @@ void fbnic_phylink_pmd_training_complete_notify(struct net_device *netdev)
- 		    FBNIC_PMD_SEND_DATA) != FBNIC_PMD_LINK_READY)
- 		return;
- 
--	phylink_pcs_change(&fbn->phylink_pcs, false);
-+	phylink_pcs_change(fbn->pcs, false);
- }
+Nov 21 16:10:03 ai2 systemd-networkd[720]: bond0: netdev ready
+Nov 21 16:10:03 ai2 systemd-networkd[720]: bond0: Configuring with
+/run/systemd/network/10-netplan-bond0.network.
+Nov 21 16:10:03 ai2 systemd-networkd[720]: bond0: Link UP
+Nov 21 16:10:08 ai2 systemd-networkd[720]: bond0: Gained carrier
+Nov 21 16:10:09 ai2 systemd-networkd[720]: bond0: Gained IPv6LL
 
+root@ai2:~# cat /etc/netplan/60-bonded-init.yaml
+network:
+  version: 2
+  renderer: networkd
 
+  ethernets:
+    thunderbolt0:
+      dhcp4: false
+
+    thunderbolt1:
+      dhcp4: false
+
+  bonds:
+    bond0:
+      interfaces: [thunderbolt0, thunderbolt1]
+      dhcp4: false
+      addresses: [10.10.13.2/30]
+      parameters:
+        mode: active-backup
+        mii-monitor-interval: 500
+
+The other side using a 3 file systemd-networkd variant (using on Debian 13)
+
+ai4:/etc/systemd/network# networkctl status bond0
+=E2=97=8F 3: bond0
+                 NetDev File: /etc/systemd/network/50-bond0.netdev
+                   Link File: /usr/lib/systemd/network/99-default.link
+                Network File: /etc/systemd/network/53-bond0.network
+                       State: routable (configured)
+                Online state: online
+                        Type: bond
+                        Kind: bond
+                      Driver: bonding
+            Hardware Address: 02:0f:03:70:86:fb
+                         MTU: 1500 (min: 68, max: 65535)
+                       QDisc: noqueue
+IPv6 Address Generation Mode: eui64
+                        Mode: active-backup
+                      Miimon: 500ms
+                     Updelay: 0
+                   Downdelay: 0
+    Number of Queues (Tx/Rx): 16/16
+            Auto negotiation: no
+                     Address: 10.10.13.1
+                              fe80::f:3ff:fe70:86fb
+           Activation Policy: up
+         Required For Online: yes
+          DHCPv6 Client DUID: DUID-EN/Vendor:0000ab112f49d10231f668bf
+
+Nov 21 11:21:55 ai4 systemd-networkd[700]: bond0: netdev ready
+Nov 21 11:21:55 ai4 systemd-networkd[700]: bond0: Configuring with
+/etc/systemd/network/53-bond0.network.
+Nov 21 11:21:55 ai4 systemd-networkd[700]: bond0: Link UP
+Nov 21 11:22:01 ai4 systemd-networkd[700]: bond0: Gained carrier
+Nov 21 11:22:02 ai4 systemd-networkd[700]: bond0: Gained IPv6LL
+
+ai4:/etc/systemd/network# cat 50-bond0.netdev
+# /etc/systemd/network/50-bond0.netdev
+[NetDev]
+Name=3Dbond0
+Kind=3Dbond
+
+[Bond]
+MIIMonitorSec=3D0.5s
+Mode=3Dactive-backup
+FailOverMACPolicy=3Dnone
+
+ai4:/etc/systemd/network# cat 52-thunderbolt-bond0-slaves.network
+# /etc/systemd/network/52-thunderbolt-bond0-slaves.network
+[Match]
+Name=3Dthunderbolt0 thunderbolt1
+
+[Network]
+Bond=3Dbond0
+
+ai4:/etc/systemd/network# cat 53-bond0.network
+# /etc/systemd/network/53-bond0.network
+[Match]
+Name=3Dbond0
+
+[Network]
+Address=3D10.10.13.1/30
+
+Changing the mode to LACP/802.3ad then results in the observed mac
+setting issues.
+
+systemd-networkd/Debian Side:
+
+ai4:/etc/systemd/network# cat 50-bond0.netdev
+# /etc/systemd/network/50-bond0.netdev
+[NetDev]
+Name=3Dbond0
+Kind=3Dbond
+
+[Bond]
+MIIMonitorSec=3D0.5s
+Mode=3D802.3ad
+TransmitHashPolicy=3Dlayer3+4
+
+and the netplan/Ubuntu Side:
+
+root@ai2:/etc/netplan# cat 60-bonded-init.yaml
+network:
+  version: 2
+  renderer: networkd
+
+  ethernets:
+    thunderbolt0:
+      dhcp4: false
+
+    thunderbolt1:
+      dhcp4: false
+
+  bonds:
+    bond0:
+      interfaces: [thunderbolt0, thunderbolt1]
+      dhcp4: false
+      addresses: [10.10.13.2/30]
+      parameters:
+        mode: 802.3ad
+        transmit-hash-policy: layer3+4
+        mii-monitor-interval: 500
+
+I typically reboot to apply the changes, to avoid some gaps in just
+doing a netplan generate/apply or systemd-networkd restart, which do
+not change the mode dynamically, as might be expected.
+
+On Fri, Nov 21, 2025 at 3:11=E2=80=AFAM Mika Westerberg
+<mika.westerberg@linux.intel.com> wrote:
+>
+> Okay since the MAC address is not really being used in the USB4NET protoc=
+ol
+> it should be fine to allow it to be changed.
+>
+> The below allows me to change it using "ip link set" command. I wonder if
+> you could try it with the bonding case and see it that makes any
+> difference?
+>
+> diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/mai=
+n.c
+> index dcaa62377808..57b226afeb84 100644
+> --- a/drivers/net/thunderbolt/main.c
+> +++ b/drivers/net/thunderbolt/main.c
+> @@ -1261,6 +1261,7 @@ static const struct net_device_ops tbnet_netdev_ops=
+ =3D {
+>         .ndo_open =3D tbnet_open,
+>         .ndo_stop =3D tbnet_stop,
+>         .ndo_start_xmit =3D tbnet_start_xmit,
+> +       .ndo_set_mac_address =3D eth_mac_addr,
+>         .ndo_get_stats64 =3D tbnet_get_stats64,
+>  };
+>
+> @@ -1281,6 +1282,9 @@ static void tbnet_generate_mac(struct net_device *d=
+ev)
+>         hash =3D jhash2((u32 *)xd->local_uuid, 4, hash);
+>         addr[5] =3D hash & 0xff;
+>         eth_hw_addr_set(dev, addr);
+> +
+> +       /* Allow changing it if needed */
+> +       dev->priv_flags |=3D IFF_LIVE_ADDR_CHANGE;
+>  }
+>
+>  static int tbnet_probe(struct tb_service *svc, const struct tb_service_i=
+d *id)
+
+Sure, I can give this a shot this weekend
 
