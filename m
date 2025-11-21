@@ -1,139 +1,170 @@
-Return-Path: <netdev+bounces-240810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B915C7AE1D
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:38:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E06CC7AE2C
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:39:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A53E3A131A
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 16:38:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25F213A1E7E
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 16:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCAE28466C;
-	Fri, 21 Nov 2025 16:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E21A286D5D;
+	Fri, 21 Nov 2025 16:39:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YIfJprRu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dmWZlj2o"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB2E2773C1
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 16:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F13285C88
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 16:39:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763743094; cv=none; b=GyjkbGNKXTF6EyWbqrnmbBXq8F1rqS9rqMomFrlXDisP5J+2A96NHmHcdjOlSSFhLpqkF+YQSKWwhbeM6k5zJud5qyzWWXwnRosOfzbfmgNZncREatmNIiTzPGmrnvf5MNnBg155/H1JdMtGJSfsMXXBiGwtPBvEP4GSPPPhik0=
+	t=1763743194; cv=none; b=bFxGxca8GQBflUlsS2VSkGaoG7xdlgHG0I2uVB4LPZ4CCMQLUlQ9lb0aK7FQAUhKlIOLJg4lI+HCV4b92A28U1bJYTyfmDojZnP8oBra3h6fZdQRM5Bee707eAZZ2vWbyViKRbfISrGREuL6sr9EQJkxriAzfG9lxB+ESX7ErVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763743094; c=relaxed/simple;
-	bh=M+wGC2FqvT2WeCRT/+dFkPsFqMfHWksKZ7kljulG0bU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D88QiI6C5OAkPGw/JnxxRSEoewyDt7iKue1g9U1z5BLFdIkHgaIqD9XiJyvsCddLcLgpJlZEjTTaH9mSS2IgMlXnSJpGvXrKU3C+0zlpg3vStTMJO8LZtDNU3FYYDhCAyJLvK5bnLsUUlUUeichtDgeCsDH6w5JJOu6Utxonl0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YIfJprRu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40050C4CEF1;
-	Fri, 21 Nov 2025 16:38:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763743094;
-	bh=M+wGC2FqvT2WeCRT/+dFkPsFqMfHWksKZ7kljulG0bU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YIfJprRu9uhTYfl1T5JEzfrM3v2QWGaKeHuZQ2hWgDXolaZhOsIYQ0wulsxRa6X43
-	 QUkuKhuwlGqYQ1mvHMAqOPe4ijvuC4iwsABTPHYWodAsGYmBu62BWtJ0wIFBuHY4Rd
-	 HgwgMjz4YXQpzDxXgRpcbZ12uUhKCz9yln60U7LHO3AYh8bYgFhp5SnsC1/gS3UgM8
-	 5GW0jRI2Tik2RWitcL9rhaesHhlo7N7ePp8Sp2Zw7JWoeH6fRCHcIhEeRnjElCqviz
-	 O6FqnJdqkTudyS6tQ14gg7MSPa/U0hGz8gkEdkfASXJz4BjdGBmwmrf3eZFgRUWvjE
-	 +nPZUeuJOm+zA==
-Message-ID: <6d950048-4647-4e10-a4db-7c53d0cfabd9@kernel.org>
-Date: Fri, 21 Nov 2025 09:38:13 -0700
+	s=arc-20240116; t=1763743194; c=relaxed/simple;
+	bh=tQBbJqBLvxVOjcMuI46orS1VNYDV0ORUa5QJx6jvvOU=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=AkpO44InOJQHjfYcT7p4mT6Zm9bauU/AXhXWp0bUAzMAG1xfj8ExSROhvFaxwEyumdGy6MgPbXbuonY2rpT8WU9GQEy0HmS9P6P0yl7dpNn3YD1+fWZa5mE+9E7h1sEJO+f7EH5MZyh+q+gPDE0v7P76fHKn3Y0UFInDdoZ87/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dmWZlj2o; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-794e300e20dso1819582b3a.1
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 08:39:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763743190; x=1764347990; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:user-agent:message-id:date
+         :cc:to:from:subject:from:to:cc:subject:date:message-id:reply-to;
+        bh=aOIvzR6LRlROF10XjfHXzrSCkv5N4sk+2Pw15FIzmvs=;
+        b=dmWZlj2oqUENrsa2ONMokoPI4mKzUm2gWOmlkqnz2C0VNIRv0hsLyc4uBa86/I10oZ
+         vA8VNWUa+iJiEGRD8flGerWnIKprHx3fbQXXh+EYqovP0l4/EGPQJYKDssZQM/QRhLbZ
+         4iKENCr4MlyqM10IVkFBwzBDXbkQG4SXk01RYAwBmqg3T2tzB8yPgqFYlX3i1LU0cNvA
+         4BR0u7uOZ8xvcAVbHwWkdYWqFBcDxiIAoM8G2GELOUqcLWX496jLi0dd0pe6eokV+pYL
+         +8bXkvLo6KAZvxhLs/7QsVWdRwiS2ViuEBc932lE/PGULMq3w8CZsLr6KhOdRlnNrqie
+         jWQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763743190; x=1764347990;
+        h=content-transfer-encoding:mime-version:user-agent:message-id:date
+         :cc:to:from:subject:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=aOIvzR6LRlROF10XjfHXzrSCkv5N4sk+2Pw15FIzmvs=;
+        b=AOpQ2qZOBDOGzISQNc+EdCbP8dErhej5ZscYRF0qbZxaqJaeK1fJ13bipWlA3RsgeM
+         jR9Kc3ai1pyt4aO7XyS/CymIySdb++h7iqU/yVBUtxF+pLKrBOfpIf3u85wynImUIJ3b
+         3iXztRlCDSPLySa6gIRmfQq++2eubBcXI3I6PF+KT+PTGlOKIHAi+ij0pHLc9UXmyPCY
+         yt4xK127FmJ5uPjdVC9YwmgS/Ko0H3zHcPs2LaWVc9Kv2Hv1TXSlN0+8bF+4B80lfSLt
+         +kRQw02isEEOqr+6qq9FWroxBmJu8gUXUPDMzABCbHvO9HRR0K4tulPB5gkh4jf6t7ft
+         LRvg==
+X-Gm-Message-State: AOJu0Yy3JTJY0ondaFTffbA1hI6hTX7Ws/yOufPtwg7IC//jDlRbShcO
+	p2FvIP419V6zKbwu9L4dC2iY7R02Yv6Pt1ucp9HCo+wIaE8uvL1NFzAS
+X-Gm-Gg: ASbGncuFj9Lrmal63d9si3rbuGFYljvRePSVER5hXGU27awDxAPFx+bHIecfKRkMOCp
+	NfikiIBYySbDx7e7Ke4Kd5AIiPXL40qTteDQW7W9ORG6NEmAg7FMvUDpJAPfmeWswcLYaU8cNAk
+	IUzeisQfw9JeOm2Ee4LXbW4To8RebgJ1w9byFMuidD9sOadMe58H0/sSk8GPZXEOpxRe6oqW8Jz
+	F4bE/QlaGvnOuh2EJO5qoMpnrZz/Aj1diWPq83N7CTfSn7SAMAjfO2O54ny+KQR9ua6+PsoRylj
+	kQ7mP+D1jzO3FmtFU+lh2L+XwM9WZnxaMLDHNMIxqzeSgki2/AbBeDOLhZDVWXL59JU/qeX0N5f
+	xNZ830rd4damPkC60znwiTr+Sn1sg5MnjaXrYrIOA3aO1yjcKA3IzNT1lhcvhB1svoJMjWdDSM+
+	1LdLoRAfv4bUUNdD3/1YKtGvS2d5SWVljuLcr4yeIfh4TmVztl+j91WwI=
+X-Google-Smtp-Source: AGHT+IF+m34vPuVaL2WgPfgaeF+wWXp1e3Nk+MIu5VybPdGx5M2ngrJ6OnYNW8SuXSZCImRpAp7zyw==
+X-Received: by 2002:a17:90b:3a84:b0:340:c094:fbff with SMTP id 98e67ed59e1d1-347298aa082mr7012512a91.10.1763743190502;
+        Fri, 21 Nov 2025 08:39:50 -0800 (PST)
+Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f174c9dasm6521697b3a.65.2025.11.21.08.39.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Nov 2025 08:39:49 -0800 (PST)
+Subject: [net-next PATCH v5 0/9] net: phy: Add support for fbnic PHY w/ 25G,
+ 50G, and 100G support
+From: Alexander Duyck <alexander.duyck@gmail.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
+ davem@davemloft.net
+Date: Fri, 21 Nov 2025 08:39:48 -0800
+Message-ID: 
+ <176374310349.959489.838154632023183753.stgit@ahduyck-xeon-server.home.arpa>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] uapi: ioam6: adjust the maximum size of a schema
-Content-Language: en-US
-To: Justin Iurman <justin.iurman@uliege.be>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20251120163342.30312-1-justin.iurman@uliege.be>
- <69709e39-a6e2-4289-9202-f5776109f42e@uliege.be>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <69709e39-a6e2-4289-9202-f5776109f42e@uliege.be>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-On 11/21/25 2:23 AM, Justin Iurman wrote:
-> On 11/20/25 17:33, Justin Iurman wrote:
->> With IPv6, the maximum size of the IOAM Pre-allocated Trace is 244 bytes
->> (see IOAM6_TRACE_DATA_SIZE_MAX), due to IPv6 Options length constraint.
->> However, RFC9197 defines the Opaque State Snapshot (i.e., a data field
->> that may be added by IOAM nodes in the pre-allocated trace) as follows:
->>
->>      0                   1                   2                   3
->>      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
->>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
->>     |   Length      |                     Schema ID                 |
->>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
->>     |                                                               |
->>     ~                        Opaque data                            ~
->>     |                                                               |
->>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
->>
->>     Length:
->>        1-octet unsigned integer.  It is the length in multiples of 4
->>        octets of the Opaque data field that follows Schema ID.
->>
->>     Schema ID:
->>        3-octet unsigned integer identifying the schema of Opaque data.
->>
->>     Opaque data:
->>        Variable-length field.  This field is interpreted as specified by
->>        the schema identified by the Schema ID.
->>
->> Based on that, IOAM6_MAX_SCHEMA_DATA_LEN was initially set to 1020 bytes
->> (i.e., 255 * 4), which is already bigger than what is allowed in a
->> pre-allocated trace. As a result, if the Opaque State Snapshot (i.e.,
->> schema) configured on an IOAM node exceeds 244 bytes, it would just
->> skip the insertion of its data. This patch sets a more realistic
->> boundary to avoid any confusion. Now, IOAM6_MAX_SCHEMA_DATA_LEN is set
->> to 240 bytes (i.e., IOAM6_TRACE_DATA_SIZE_MAX - 4, to account for its
->> 4-byte header).
->>
->> Fixes: 8c6f6fa67726 ("ipv6: ioam: IOAM Generic Netlink API")
->> Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
->> ---
->> Cc: Jakub Kicinski <kuba@kernel.org>
->> Cc: Paolo Abeni <pabeni@redhat.com>
->> ---
->>   include/uapi/linux/ioam6_genl.h | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/include/uapi/linux/ioam6_genl.h
->> b/include/uapi/linux/ioam6_genl.h
->> index 1733fbc51fb5..ce3d8bdabd3b 100644
->> --- a/include/uapi/linux/ioam6_genl.h
->> +++ b/include/uapi/linux/ioam6_genl.h
->> @@ -19,7 +19,7 @@ enum {
->>       IOAM6_ATTR_NS_DATA,    /* u32 */
->>       IOAM6_ATTR_NS_DATA_WIDE,/* u64 */
->>   -#define IOAM6_MAX_SCHEMA_DATA_LEN (255 * 4)
->> +#define IOAM6_MAX_SCHEMA_DATA_LEN 240
->>       IOAM6_ATTR_SC_ID,    /* u32 */
->>       IOAM6_ATTR_SC_DATA,    /* Binary */
->>       IOAM6_ATTR_SC_NONE,    /* Flag */
-> 
-> So, just to clarify, I know such changes in the uapi are generally
-> prohibited. However, in this specific context, I don't believe it breaks
-> backward compatibility (IMO). But I may be wrong...
-> 
-> Adding David to get his opinion from iproute2's point of view.
-> 
-> If we don't want to go that way, the alternative solution is to submit a
-> patch to net-next that adds a new constant IOAM6_MAX_SCHEMA_DATA_LEN_NEW
-> (=240) and a comment "/* Deprecated */" next to
-> IOAM6_MAX_SCHEMA_DATA_LEN. Then, submit a patch to iproute2-next to use
-> IOAM6_MAX_SCHEMA_DATA_LEN_NEW instead of IOAM6_MAX_SCHEMA_DATA_LEN.
+To transition the fbnic driver to using the XPCS driver we need to address
+the fact that we need a representation for the FW managed PMD that is
+actually a SerDes PHY to handle link bouncing during link training.
 
-It's been 4+ years since 8c6f6fa67726 went in; I think that is way too
-long to try to make a change to the uapi like this.
+This patch set introduces the necessary bits to the XPCS driver code to
+enable it to read 25G, 50G, and 100G speeds from the PCS ctrl1 register,
+and adds support for the approriate interfaces.
+
+The rest of this patch set enables the changes to fbnic to make use of
+these interfaces and expose a PMD that can provide a necessary link delay
+to avoid link flapping in the event that a cable is disconnected and
+reconnected, and to correctly expose the count for the link down events.
+
+With this we have the basic groundwork laid as with this all the bits and
+pieces are in place in terms of reading the configuration. The general plan
+for follow-on patch sets is to start looking at enabling changing the
+configuration in environments where that is supported.
+
+v2: Added XPCS code to the patch set
+    Dropped code adding bits for extended ability registers
+    Switched from enabling code in generic c45 to enabling code in fbnic_phy.c
+    Fixed several bugs related to phy state machine and use of resume
+    Moved PHY assignment into ndo_init/uninit
+    Renamed fbnic_swmii.c to fbnic_mdio.c
+v3: Modified XPCS to have it read link from PMA instead of using a phydev
+    Fixed naming for PCS vs PMA for CTRL1 register speed bit values
+    Added logic to XPCS to get speed from PCS CTRL1 register
+    Swapped fbnic link delay timer from tracking training start to end
+    Dropped driver code for fbnic_phy.c and phydev code from patches
+    Updated patch naming to match expectations for PCS changes
+    Cleaned up dead code and defines from earlier versions
+v4: Added back in defines for MDIO_CTRL1_SPEED[5G|2_5G] w/ comment
+    Swapped order between adding new _PMA_ defines and fixing the 5G/2.5G ones
+v5: Dropped adding support for 25G, 50G, 100G to genphy_c45 driver
+    Replaced use of MDIO_STAT1_LSTATUS with MDIO_PMD_RXDET_GLOBAL/0/1
+    Dropped PMAPMD naming where possible for just PMD
+    Dropped extra logic added to track link_down_events as it was redundant
+    Updated patch descriptions to try to more accurately reflect their changes
+    Updated PMD state tracking to address possible races
+
+---
+
+Alexander Duyck (9):
+      net: phy: Add MDIO_PMA_CTRL1_SPEED for 2.5G and 5G to reflect PMA values
+      net: pcs: xpcs: Add support for 25G, 50G, and 100G interfaces
+      net: pcs: xpcs: Fix PMA identifier handling in XPCS
+      net: pcs: xpcs: Add support for FBNIC 25G, 50G, 100G PMD
+      fbnic: Rename PCS IRQ to MAC IRQ as it is actually a MAC interrupt
+      fbnic: Add logic to track PMD state via MAC/PCS signals
+      fbnic: Add handler for reporting link down event statistics
+      fbnic: Add SW shim for MDIO interface to PMD and PCS
+      fbnic: Replace use of internal PCS w/ Designware XPCS
+
+
+ drivers/net/ethernet/meta/Kconfig             |   1 +
+ drivers/net/ethernet/meta/fbnic/Makefile      |   1 +
+ drivers/net/ethernet/meta/fbnic/fbnic.h       |  15 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |   2 +
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |   9 +
+ drivers/net/ethernet/meta/fbnic/fbnic_irq.c   |  34 +--
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.c   |  81 +++++---
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.h   |  41 +++-
+ drivers/net/ethernet/meta/fbnic/fbnic_mdio.c  | 195 ++++++++++++++++++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  11 +-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |   6 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |   9 +-
+ .../net/ethernet/meta/fbnic/fbnic_phylink.c   | 184 +++++++++++------
+ drivers/net/pcs/pcs-xpcs.c                    | 136 +++++++++++-
+ drivers/net/phy/phy-c45.c                     |   8 +-
+ include/linux/pcs/pcs-xpcs.h                  |   4 +-
+ include/uapi/linux/mdio.h                     |  23 ++-
+ 17 files changed, 613 insertions(+), 147 deletions(-)
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
+
+--
+
 
