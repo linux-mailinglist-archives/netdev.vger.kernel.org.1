@@ -1,306 +1,162 @@
-Return-Path: <netdev+bounces-240822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16301C7AEF8
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:51:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8934FC7AF86
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 18:02:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60E7F3A1E5D
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 16:51:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 460C83A3395
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E29E33B963;
-	Fri, 21 Nov 2025 16:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80002F1FD3;
+	Fri, 21 Nov 2025 17:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netstatz.com header.i=@netstatz.com header.b="QKTsyaSm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zkr4R4wo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1703E1F09AD
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 16:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8097C285C88;
+	Fri, 21 Nov 2025 17:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763743830; cv=none; b=P/3RIlto0OsgpJ5xDP3KD/uGMfGOpKP5PhPPt7WKkFvd8Y1QscZ5QvCdxOqqSu7zVszZJgVZfNPvgRtazmCccfag5zHNKMEdvCyLJUfnzV6VLw1SZ0u7TMNomy7wPPFbPgA9sy6ERs2/Wjdloke2QLvXZexkaUgrVSW6ofYic38=
+	t=1763744548; cv=none; b=nzYVThKADxcrUlC+mY3blmaMovATLD7V+09jTUQuRfVwaHfTP3qWL5X3r+ZT0SRACNvXSsSsfessv4+lKaWkiGZt4i2Vx6L92+aWyr7DCFVa2car0V0xYjo9JieTjz2l8IkoMoezkoIx67jGvjIT21kY0+1mL9Zz8CmxEt/ffLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763743830; c=relaxed/simple;
-	bh=5+kCyy8X32jPH8aWSDVlDLqeMbE4PAZjRcD96juLnZI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hDfQ8SCZcEa1aHrqtAEMbwf8tV6QFIMTGq39XjkDBMzEoIkmE19LdgymYauz54Gea8ndBwrpyjiYv0xqTG5/6k1jjzyl9eTkW02JKNut+sE1gib9gDhmAvwNHfO3CWqhaksYLLhOswjyxE77tDldDFFkRzq3ACAqMd+F9Dn6d4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netstatz.com; spf=pass smtp.mailfrom=netstatz.com; dkim=pass (2048-bit key) header.d=netstatz.com header.i=@netstatz.com header.b=QKTsyaSm; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netstatz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netstatz.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-37b95f87d64so18358241fa.2
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 08:50:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=netstatz.com; s=google; t=1763743826; x=1764348626; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C5MBa0m1dkCz6cDYfdxHUo9JM+hNhCvoRZjJDMtofyU=;
-        b=QKTsyaSmKE+4CuPEW6SYOuyGdHvAw1u7WxwQ7T6Fl0EZGixr57ufBiswi1oin7UM+h
-         736o74Wru4Waomkk/NzCx8ZrhWjMPZC9VY5t2kLT+O7Mt0ZF65izSJ59pR8f7RbVwpKP
-         v6CvTlxkNJheIMi+rWPqYV0ILxlv6B6FFZ3sJYOil6vHX8dkhYvIIfvm/Fxt2e3sS8Q/
-         FGPpiIpVt5ve/lU/t2CfOvxenC5wQkAgujPJ1CYsPaluXBgMke8QIDU4dAIt8bka/nFu
-         HJWYZJtuOP45UkUXfZuTd5Si/NPznLuVpXdQ5gB015vKd1/RSF+OvTgsEQUUFVvh5jJ0
-         SzKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763743826; x=1764348626;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=C5MBa0m1dkCz6cDYfdxHUo9JM+hNhCvoRZjJDMtofyU=;
-        b=tO/GuQsCHotrTp0c6ZjyJjXX7aII6or7MB2sAlEkqHH7mjva4GapRn6HBU2up05vwH
-         zA8230BAKQxPM2ZgPs2WmEMO9hfnzKi4rYN1dHeGRAzhVsoW8RDa61zDcLOosafTdWz7
-         fbWTkIo4KAGsxAGF9NJKAWl+j9ZIoI6UzlJTrRdsiO5QwNusmjykyaZ9w0JlQx/8rmsZ
-         yn2DXdQQJzbjy1bD9/U1Jw3NZrWw2IRToigOCTQJJrhXWb9FyFMOp4LeEt+cPJuW0zuQ
-         IQFSPu2+Y2Cx/UDRwxubo0B/IHMIyqv/CPOmpLmZNeVgzWM1MnlDoq6zFp3q1CNnU7q5
-         ANgw==
-X-Forwarded-Encrypted: i=1; AJvYcCWwX7shJ/iVf+i2D4HfzZkEkklXFwo4MH0ZKVKq6mFwKsFl20Tx6xxL9dCzZm5wiNqeRz+UOhI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPi36clEps7lk15kMRzeTzGk35shN1LxF8IGGRbVpsIlr6ubZ/
-	Kwr9sNFYSQ41w6gLT8W/Y29Xqsfg/nS5kHMT+LoH07yMR4nkhDn7/JrmCA1s4jxAT/AlMwCX158
-	DassT8HyoRilAweJWkkupfa0Mom5cEgbeO0ii7SpP5w==
-X-Gm-Gg: ASbGnctws5hqg4Gp4TmxkCTmZnQngUBeH9oH9YgP5ehG9I/OEmTBXE6fscr/dwf4b5V
-	X24ntmMKwlK5viRZz99x0mzsugny8xQkJvf8G0vhRQx/2l6+ikgK5a2CuSBFOG1K8hCvBdv4dQA
-	uNKks8jMT4s1cJ4laPtBXwjQKZ2nU6RAXKw7NbfvbyhOSPkMEPFVVPcfA+nqNvCsS4DQYIPJe7N
-	I6Dqisy9sejTlaUbRGXANACLKMQ+9oP0MG5Gj/p6CXnE3Du8V/zvSm5vMEi6UGxgqGqMlQw0w==
-X-Google-Smtp-Source: AGHT+IE1U9NMqfiTuQR2NWDZhwan6xsPMFs+3BLd+wmnsYIjPojl2ary5Q3gZ95UurBsW2namPVbgY6+Y+/T412qlR0=
-X-Received: by 2002:a2e:80ca:0:b0:37b:9b28:4282 with SMTP id
- 38308e7fff4ca-37cd9183db3mr6995251fa.11.1763743825913; Fri, 21 Nov 2025
- 08:50:25 -0800 (PST)
+	s=arc-20240116; t=1763744548; c=relaxed/simple;
+	bh=ioKhLSro9ujBAyOSRclCwpexaEBcrzxMjz6Lfns2rkM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=QEF1qn9Q9+Cn4E7veH9cL9wy2j7uqjJaMp+ZF0gbawjjvO6/yWgkPouyBIyDhD6N6EsQ2N77cd7L18gNc7zJb7idsNenESd48u5+tDmqiVQOZ2e4Sdzpvm84ugiFX3PBwT5aK2uXlC29a8BfGr6c08CQ1qVJOd6bYM43klTDGek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zkr4R4wo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48E13C4CEF1;
+	Fri, 21 Nov 2025 17:02:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763744548;
+	bh=ioKhLSro9ujBAyOSRclCwpexaEBcrzxMjz6Lfns2rkM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Zkr4R4wof6nc2vPCO3lr9fJP1NMyyVHqb67wBWJz9rNc1AwRkpxP+UgsFkuZKfqlt
+	 Kul8SZqqdwxHxCePCzYt3d/Egfp4gri+VVZgPBYY/aPqwwA4IWmk6p9wbbFcl4s06M
+	 H1nxc+1Im4gLQiJL0JI/4TX29/ASZT4zFZcxPFeNzb7IqoXIFC0+gOG+yJrpE4bo4T
+	 mUwA4BYFdEeF//3CI1XJGtBR21joi5iWbOwOqtfXvaF3+kyE7buQqtF9oXjS+A/rPZ
+	 DeCKzSE6hyJB6ecLTNm69yg3TVg6EVMHKuAobknAxyzb4jvpahVwlHIBcLdrdesa8+
+	 7InVDL8zNlTdg==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 00/14] mptcp: memcg accounting for passive sockets
+ & backlog processing
+Date: Fri, 21 Nov 2025 18:01:59 +0100
+Message-Id: <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAFJzfF9N4Hak23sc-zh0jMobbkjK7rg4odhic1DQ1cC+=MoQoA@mail.gmail.com>
- <20251121060825.GR2912318@black.igk.intel.com>
-In-Reply-To: <20251121060825.GR2912318@black.igk.intel.com>
-From: Ian MacDonald <ian@netstatz.com>
-Date: Fri, 21 Nov 2025 11:50:14 -0500
-X-Gm-Features: AWmQ_bk4QDVbAx0NsBCk-cffKGGiRmDtYxhnl6UGbNr6Cy2VhTSh9uItPeyG_NU
-Message-ID: <CAFJzfF8aQ8KsOXTg6oaOa_Zayx=bPZtsat2h_osn8r4wyT2wOw@mail.gmail.com>
-Subject: Re: net: thunderbolt: missing ndo_set_mac_address breaks 802.3ad bonding
-To: Mika Westerberg <mika.westerberg@linux.intel.com>
-Cc: Mika Westerberg <westeri@kernel.org>, Yehezkel Bernat <YehezkelShB@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 1121032@bugs.debian.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAebIGkC/zWNQQqDMBBFryKz7kASq2ivUlzYcYyDTQxJEEG8e
+ 0PBxVu8xfv/hMRROMGrOiHyLkk2X0Q/KqBl9JZRpuJglGm0Nho958KR0YVMAR07svgZaf1uFsU
+ FrOum7ahVveqfUGZC5FmO/8Ub7hqG6/oBviN0qnwAAAA=
+X-Change-ID: 20251121-net-next-mptcp-memcg-backlog-imp-33568c609094
+To: Eric Dumazet <edumazet@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ Peter Krystad <peter.krystad@linux.intel.com>, 
+ Florian Westphal <fw@strlen.de>, Christoph Paasch <cpaasch@apple.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ mptcp@lists.linux.dev, Davide Caratti <dcaratti@redhat.com>, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3632; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=ioKhLSro9ujBAyOSRclCwpexaEBcrzxMjz6Lfns2rkM=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDIVZvN/4li+ZMaPQsZ1t1NuTUsoVrgxfR9DOH9z4cTNE
+ o/bBIsMO0pZGMS4GGTFFFmk2yLzZz6v4i3x8rOAmcPKBDKEgYtTACYyo5Lhn3rnzvo1d5WU8gO2
+ KKhsXWtwTZRBpGieoJmizp8/bLIbFzH8j6j/unC5Tlb4hhuM+VZvjgZXb5z7Ib9vjajZZulrHJt
+ fMQAA
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Fri, Nov 21, 2025 at 1:08=E2=80=AFAM Mika Westerberg
-<mika.westerberg@linux.intel.com> wrote:
-> Okay "breaks" is probably too strong word here. It was never even support=
-ed
-> :)
-Agreed, let's say the "magic fades".  I am guessing the same magic
-that allows this 0x8086 component to appear out of thin air.
-thunderbolt 0-2: new host found, vendor=3D0x8086 device=3D0x1
->
-> Can you describe what are the actual commands you run so I can try to
-> setup on my side and see how this could be implemented?
+This series is split in two: the 4 first patches are linked to memcg
+accounting for passive sockets, and the rest introduce the backlog
+processing. They are sent together, because the first one appeared to be
+needed to get the second one fully working.
 
-Sure, first the working variant for active-backup.
+The second part includes RX path improvement built around backlog
+processing. The main goals are improving the RX performances _and_
+increase the long term maintainability.
 
-One side shown in netplan using a single yaml file (Ubuntu 24.04 server)
+- Patches 1-3: preparation work to ease the introduction of the next
+  patch.
 
-root@ai2:~# networkctl status bond0
-=E2=97=8F 3: bond0
-                   Link File: /usr/lib/systemd/network/99-default.link
-                Network File: /run/systemd/network/10-netplan-bond0.network
-                       State: routable (configured)
-                Online state: online
-                        Type: bond
-                        Kind: bond
-                      Driver: bonding
-            Hardware Address: 02:92:d5:a7:f4:79
-                         MTU: 1500 (min: 68, max: 65535)
-                       QDisc: noqueue
-IPv6 Address Generation Mode: eui64
-                        Mode: active-backup
-                      Miimon: 500ms
-                     Updelay: 0
-                   Downdelay: 0
-    Number of Queues (Tx/Rx): 16/16
-            Auto negotiation: no
-                     Address: 10.10.13.2
-                              fe80::92:d5ff:fea7:f479
-           Activation Policy: up
-         Required For Online: yes
-           DHCP6 Client DUID: DUID-EN/Vendor:0000ab11ccb509966215f387
+- Patch 4: fix memcg accounting for passive sockets. Note that this is a
+  (non-urgent) fix, but it depends on material that is currently only in
+  net-next, e.g. commit 4a997d49d92a ("tcp: Save lock_sock() for memcg
+  in inet_csk_accept().").
 
-Nov 21 16:10:03 ai2 systemd-networkd[720]: bond0: netdev ready
-Nov 21 16:10:03 ai2 systemd-networkd[720]: bond0: Configuring with
-/run/systemd/network/10-netplan-bond0.network.
-Nov 21 16:10:03 ai2 systemd-networkd[720]: bond0: Link UP
-Nov 21 16:10:08 ai2 systemd-networkd[720]: bond0: Gained carrier
-Nov 21 16:10:09 ai2 systemd-networkd[720]: bond0: Gained IPv6LL
+- Patches 5-6: preparation of the stack for backlog processing, removing
+  assumptions that will not hold true any more after the backlog
+  introduction.
 
-root@ai2:~# cat /etc/netplan/60-bonded-init.yaml
-network:
-  version: 2
-  renderer: networkd
+- Patches 7,8,10,11,12 are more cleanups that will make the backlog
+  patch a little less huge.
 
-  ethernets:
-    thunderbolt0:
-      dhcp4: false
+- Patch 9: somewhat an unrelated cleanup, included here not to forget
+  about it.
 
-    thunderbolt1:
-      dhcp4: false
+- Patches 13-14: The real work is done by them. Patch 13 introduces the
+  helpers needed to manipulate the msk-level backlog, and the data
+  struct itself, without any actual functional change. Patch 14 finally
+  uses the backlog for RX skb processing. Note that MPTCP can't use the
+  sk_backlog, as the MPTCP release callback can also release and
+  re-acquire the msk-level spinlock and core backlog processing works
+  under the assumption that such event is not possible.
+  A relevant point is memory accounts for skbs in the backlog. It's
+  somewhat "original" due to MPTCP constraints. Such skbs use space from
+  the incoming subflow receive buffer, do not use explicitly any forward
+  allocated memory, as we can't update the msk fwd mem while enqueuing,
+  nor we want to acquire again the ssk socket lock while processing the
+  skbs. Instead the msk borrows memory from the subflow and reserve it
+  for the backlog, see patch 5 and 14 for the gory details.
 
-  bonds:
-    bond0:
-      interfaces: [thunderbolt0, thunderbolt1]
-      dhcp4: false
-      addresses: [10.10.13.2/30]
-      parameters:
-        mode: active-backup
-        mii-monitor-interval: 500
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Paolo Abeni (14):
+      net: factor-out _sk_charge() helper
+      mptcp: factor-out cgroup data inherit helper
+      mptcp: grafting MPJ subflow earlier
+      mptcp: fix memcg accounting for passive sockets
+      mptcp: cleanup fallback data fin reception
+      mptcp: cleanup fallback dummy mapping generation
+      mptcp: ensure the kernel PM does not take action too late
+      mptcp: do not miss early first subflow close event notification
+      mptcp: make mptcp_destroy_common() static
+      mptcp: drop the __mptcp_data_ready() helper
+      mptcp: handle first subflow closing consistently
+      mptcp: borrow forward memory from subflow
+      mptcp: introduce mptcp-level backlog
+      mptcp: leverage the backlog for RX packet processing
 
-The other side using a 3 file systemd-networkd variant (using on Debian 13)
+ include/net/sock.h     |   2 +
+ net/core/sock.c        |  18 +++
+ net/ipv4/af_inet.c     |  17 +-
+ net/mptcp/fastopen.c   |   4 +-
+ net/mptcp/mib.c        |   1 -
+ net/mptcp/mib.h        |   1 -
+ net/mptcp/mptcp_diag.c |   3 +-
+ net/mptcp/pm.c         |   4 +-
+ net/mptcp/pm_kernel.c  |   2 +
+ net/mptcp/protocol.c   | 428 +++++++++++++++++++++++++++++++++++--------------
+ net/mptcp/protocol.h   |  51 +++++-
+ net/mptcp/subflow.c    |  42 +++--
+ 12 files changed, 417 insertions(+), 156 deletions(-)
+---
+base-commit: e2c20036a8879476c88002730d8a27f4e3c32d4b
+change-id: 20251121-net-next-mptcp-memcg-backlog-imp-33568c609094
 
-ai4:/etc/systemd/network# networkctl status bond0
-=E2=97=8F 3: bond0
-                 NetDev File: /etc/systemd/network/50-bond0.netdev
-                   Link File: /usr/lib/systemd/network/99-default.link
-                Network File: /etc/systemd/network/53-bond0.network
-                       State: routable (configured)
-                Online state: online
-                        Type: bond
-                        Kind: bond
-                      Driver: bonding
-            Hardware Address: 02:0f:03:70:86:fb
-                         MTU: 1500 (min: 68, max: 65535)
-                       QDisc: noqueue
-IPv6 Address Generation Mode: eui64
-                        Mode: active-backup
-                      Miimon: 500ms
-                     Updelay: 0
-                   Downdelay: 0
-    Number of Queues (Tx/Rx): 16/16
-            Auto negotiation: no
-                     Address: 10.10.13.1
-                              fe80::f:3ff:fe70:86fb
-           Activation Policy: up
-         Required For Online: yes
-          DHCPv6 Client DUID: DUID-EN/Vendor:0000ab112f49d10231f668bf
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-Nov 21 11:21:55 ai4 systemd-networkd[700]: bond0: netdev ready
-Nov 21 11:21:55 ai4 systemd-networkd[700]: bond0: Configuring with
-/etc/systemd/network/53-bond0.network.
-Nov 21 11:21:55 ai4 systemd-networkd[700]: bond0: Link UP
-Nov 21 11:22:01 ai4 systemd-networkd[700]: bond0: Gained carrier
-Nov 21 11:22:02 ai4 systemd-networkd[700]: bond0: Gained IPv6LL
-
-ai4:/etc/systemd/network# cat 50-bond0.netdev
-# /etc/systemd/network/50-bond0.netdev
-[NetDev]
-Name=3Dbond0
-Kind=3Dbond
-
-[Bond]
-MIIMonitorSec=3D0.5s
-Mode=3Dactive-backup
-FailOverMACPolicy=3Dnone
-
-ai4:/etc/systemd/network# cat 52-thunderbolt-bond0-slaves.network
-# /etc/systemd/network/52-thunderbolt-bond0-slaves.network
-[Match]
-Name=3Dthunderbolt0 thunderbolt1
-
-[Network]
-Bond=3Dbond0
-
-ai4:/etc/systemd/network# cat 53-bond0.network
-# /etc/systemd/network/53-bond0.network
-[Match]
-Name=3Dbond0
-
-[Network]
-Address=3D10.10.13.1/30
-
-Changing the mode to LACP/802.3ad then results in the observed mac
-setting issues.
-
-systemd-networkd/Debian Side:
-
-ai4:/etc/systemd/network# cat 50-bond0.netdev
-# /etc/systemd/network/50-bond0.netdev
-[NetDev]
-Name=3Dbond0
-Kind=3Dbond
-
-[Bond]
-MIIMonitorSec=3D0.5s
-Mode=3D802.3ad
-TransmitHashPolicy=3Dlayer3+4
-
-and the netplan/Ubuntu Side:
-
-root@ai2:/etc/netplan# cat 60-bonded-init.yaml
-network:
-  version: 2
-  renderer: networkd
-
-  ethernets:
-    thunderbolt0:
-      dhcp4: false
-
-    thunderbolt1:
-      dhcp4: false
-
-  bonds:
-    bond0:
-      interfaces: [thunderbolt0, thunderbolt1]
-      dhcp4: false
-      addresses: [10.10.13.2/30]
-      parameters:
-        mode: 802.3ad
-        transmit-hash-policy: layer3+4
-        mii-monitor-interval: 500
-
-I typically reboot to apply the changes, to avoid some gaps in just
-doing a netplan generate/apply or systemd-networkd restart, which do
-not change the mode dynamically, as might be expected.
-
-On Fri, Nov 21, 2025 at 3:11=E2=80=AFAM Mika Westerberg
-<mika.westerberg@linux.intel.com> wrote:
->
-> Okay since the MAC address is not really being used in the USB4NET protoc=
-ol
-> it should be fine to allow it to be changed.
->
-> The below allows me to change it using "ip link set" command. I wonder if
-> you could try it with the bonding case and see it that makes any
-> difference?
->
-> diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/mai=
-n.c
-> index dcaa62377808..57b226afeb84 100644
-> --- a/drivers/net/thunderbolt/main.c
-> +++ b/drivers/net/thunderbolt/main.c
-> @@ -1261,6 +1261,7 @@ static const struct net_device_ops tbnet_netdev_ops=
- =3D {
->         .ndo_open =3D tbnet_open,
->         .ndo_stop =3D tbnet_stop,
->         .ndo_start_xmit =3D tbnet_start_xmit,
-> +       .ndo_set_mac_address =3D eth_mac_addr,
->         .ndo_get_stats64 =3D tbnet_get_stats64,
->  };
->
-> @@ -1281,6 +1282,9 @@ static void tbnet_generate_mac(struct net_device *d=
-ev)
->         hash =3D jhash2((u32 *)xd->local_uuid, 4, hash);
->         addr[5] =3D hash & 0xff;
->         eth_hw_addr_set(dev, addr);
-> +
-> +       /* Allow changing it if needed */
-> +       dev->priv_flags |=3D IFF_LIVE_ADDR_CHANGE;
->  }
->
->  static int tbnet_probe(struct tb_service *svc, const struct tb_service_i=
-d *id)
-
-Sure, I can give this a shot this weekend
 
