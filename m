@@ -1,118 +1,122 @@
-Return-Path: <netdev+bounces-240620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04462C7700C
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:28:23 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47EFCC7702A
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:31:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6341E3495FC
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 02:28:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8D2784E3A47
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 02:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FFB2459EA;
-	Fri, 21 Nov 2025 02:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0FD272E45;
+	Fri, 21 Nov 2025 02:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eE9LHaH3"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0C9157A5A;
-	Fri, 21 Nov 2025 02:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F451D88D7;
+	Fri, 21 Nov 2025 02:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763692098; cv=none; b=KxCHjXqyN+LwxbN6sm/pQ7jqFIM9w3eoK8SAzKra9ubiejX5Wn07qQBi8jHlEDXTkPxNZA4JPK3Bi3YA43p+lTGTuFnlQBVTnUMGkObX8Z+eSGVRyCJCcI3KqWKrfCn25hmrkAnLFi5ESExWokZGpMP/Z27X/FgE2cNOmlhjbBc=
+	t=1763692258; cv=none; b=dPHnyaTR9B6xi0/9s2ptKYpGIv0LO+JLLSJalvU3GXUq3MRF/lmhWw6fZE1vSyOprSFRbxdyp4NAjk6C0PS20YsjsDPHdj+jYMc1nIA411Q6LlsjqjHZ+9NWk4M7nFs2JgsFBWrfWfQBXyb8ls+uSM/nZ1wxzBHW4zNxg9FOca0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763692098; c=relaxed/simple;
-	bh=0KSS2/XqoFDX2oUCbBuixk7EDSB0XCO0zpCJSm55RAE=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=FTUmHdty2LT7Scn7i2KWJJpViQ+bwv8phqh774wcy/zgR4y7Go6QYoS4ZrUHaQRDc35eg0hd1JKuxAZQpJxk/WGltXf1/DlWNaRkXOdqOUR7we0Bh2ZxFX8rRXQYf0CmXpBH50wpKVrXBfFNgGeo07h7vL2VnyFQDAy6ywbpKww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [202.112.113.212])
-	by APP-03 (Coremail) with SMTP id rQCowACHD9IRzh9pG958AQ--.11258S2;
-	Fri, 21 Nov 2025 10:27:35 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: krzk@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linville@tuxdriver.com,
-	aloisio.almeida@openbossa.org,
-	johannes@sipsolutions.net,
-	lauro.venancio@openbossa.org,
-	sameo@linux.intel.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	akpm@linux-foundation.org,
-	Ma Ke <make24@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] NFC: Fix error handling in nfc_genl_dump_targets
-Date: Fri, 21 Nov 2025 10:27:28 +0800
-Message-Id: <20251121022728.3661-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:rQCowACHD9IRzh9pG958AQ--.11258S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Gr4fuF4fWF4UXFWxZFyxKrg_yoWDKFX_Cw
-	10vry8u3yYqan8KrW7tw47ZF1SyanrtrWxWrn7trZ2y3y5ZFZrWrs5XwsxAr17uws8CF1U
-	A3Z5urWxu34UujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbDAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
-	1j6rxdM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVAC
-	Y4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJV
-	W8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI2
-	0VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwV
-	AFwVW8JwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIx
-	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
-	wI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
-	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUmLvtU
-	UUUU=
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+	s=arc-20240116; t=1763692258; c=relaxed/simple;
+	bh=ZNJ7IlFBKgvQnIy25U/SmLqcjvdVTuAY1B/5dIQjkoM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LV5SxFLmqDvyWt2oVgsJPB4CQMB2x0tjll+hRFVwUCIw1yk88GsnKyP4+D6n7qD2CzTXhZ35wOwylcs+T5jk2IoN5GOAhmn2+t1whfDixiV3omWlsDWjJybBfGC6p6jAwpzbRgtOdi7eNOZMXKp6PxQ0kqkGBQjwpclVnt/xiJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eE9LHaH3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7258C4CEF1;
+	Fri, 21 Nov 2025 02:30:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763692257;
+	bh=ZNJ7IlFBKgvQnIy25U/SmLqcjvdVTuAY1B/5dIQjkoM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eE9LHaH34o5ZZtIFzNHhp3nUqnl9CrxnoLy2aPRtRvjnQ9Jz9A6or900iSUXGUt9F
+	 zVk7/j3NMc4QZcyrsNIrXxXjmTErW04ErU2cI+fWhZwzuLsqOIcdp9G8IuJqlwQyuO
+	 oUn4lxJ4E0aUaZdfnaSDG2AGxPRGHbspJeSQ39dtqA3CnXQ9ogQSIz2OC6gf5gQMM1
+	 jAX0OrtyYNtebBeRKP9R66X3zvc7fW0Yx1nHYo/0R43N5m3k0wdWswmNL2G48N4gcu
+	 mRu5XVsL2wZH3/aRRBk6tUJFr92Fm73ORFottCQq+6h//MjkR51SZ3RCIXDPLrJK6s
+	 LuKuG/At0xyJw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAECA3A41003;
+	Fri, 21 Nov 2025 02:30:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 00/12] selftests: drv-net: convert GRO and
+ Toeplitz tests to work for drivers in NIPA
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176369222275.1865531.9454432875896275033.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Nov 2025 02:30:22 +0000
+References: <20251120021024.2944527-1-kuba@kernel.org>
+In-Reply-To: <20251120021024.2944527-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ willemdebruijn.kernel@gmail.com, shuah@kernel.org, sdf@fomichev.me,
+ krakauer@google.com, linux-kselftest@vger.kernel.org, petrm@nvidia.com,
+ matttbe@kernel.org
 
-nfc_genl_dump_targets() increments the device reference count via
-nfc_get_device() but fails to decrement it properly. nfc_get_device()
-calls class_find_device() which internally calls get_device() to
-increment the reference count. No corresponding put_device() is made
-to decrement the reference count.
+Hello:
 
-Add proper reference count decrementing using nfc_put_device() when
-the dump operation completes or encounters an error, ensuring balanced
-reference counting.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Found by code review.
+On Wed, 19 Nov 2025 18:10:12 -0800 you wrote:
+> Main objective of this series is to convert the gro.sh and toeplitz.sh
+> tests to be "NIPA-compatible" - meaning make use of the Python env,
+> which lets us run the tests against either netdevsim or a real device.
+> 
+> The tests seem to have been written with a different flow in mind.
+> Namely they source different bash "setup" scripts depending on arguments
+> passed to the test. While I have nothing against the use of bash and
+> the overall architecture - the existing code needs quite a bit of work
+> (don't assume MAC/IP addresses, support remote endpoint over SSH).
+> If I'm the one fixing it, I'd rather convert them to our "simplistic"
+> Python.
+> 
+> [...]
 
-Cc: stable@vger.kernel.org
-Fixes: 4d12b8b129f1 ("NFC: add nfc generic netlink interface")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
----
- net/nfc/netlink.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Here is the summary with links:
+  - [net-next,v3,01/12] selftests: net: py: coding style improvements
+    https://git.kernel.org/netdev/net-next/c/5cb7b71b76f1
+  - [net-next,v3,02/12] selftests: net: py: extract the case generation logic
+    https://git.kernel.org/netdev/net-next/c/80970e0fc07e
+  - [net-next,v3,03/12] selftests: net: py: add test variants
+    https://git.kernel.org/netdev/net-next/c/6ae67f115986
+  - [net-next,v3,04/12] selftests: drv-net: xdp: use variants for qstat tests
+    https://git.kernel.org/netdev/net-next/c/173227d7d6c4
+  - [net-next,v3,05/12] selftests: net: relocate gro and toeplitz tests to drivers/net
+    https://git.kernel.org/netdev/net-next/c/89268f7dbca1
+  - [net-next,v3,06/12] selftests: net: py: support ksft ready without wait
+    https://git.kernel.org/netdev/net-next/c/e02b52ecef5b
+  - [net-next,v3,07/12] selftests: net: py: read ip link info about remote dev
+    https://git.kernel.org/netdev/net-next/c/15011a57d0ec
+  - [net-next,v3,08/12] netdevsim: pass packets thru GRO on Rx
+    https://git.kernel.org/netdev/net-next/c/40dd789bc5a7
+  - [net-next,v3,09/12] selftests: drv-net: add a Python version of the GRO test
+    https://git.kernel.org/netdev/net-next/c/fdb0267d565a
+  - [net-next,v3,10/12] selftests: drv-net: hw: convert the Toeplitz test to Python
+    https://git.kernel.org/netdev/net-next/c/9cf9aa77a1f6
+  - [net-next,v3,11/12] netdevsim: add loopback support
+    https://git.kernel.org/netdev/net-next/c/358008f41d9b
+  - [net-next,v3,12/12] selftests: net: remove old setup_* scripts
+    https://git.kernel.org/netdev/net-next/c/bd28e5bddc1a
 
-diff --git a/net/nfc/netlink.c b/net/nfc/netlink.c
-index a18e2c503da6..9ae138ee91dd 100644
---- a/net/nfc/netlink.c
-+++ b/net/nfc/netlink.c
-@@ -159,6 +159,11 @@ static int nfc_genl_dump_targets(struct sk_buff *skb,
- 
- 	cb->args[0] = i;
- 
-+	if (rc < 0 || i >= dev->n_targets) {
-+		nfc_put_device(dev);
-+		cb->args[1] = 0;
-+	}
-+
- 	return skb->len;
- }
- 
+You are awesome, thank you!
 -- 
-2.17.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
