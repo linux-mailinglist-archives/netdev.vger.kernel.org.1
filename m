@@ -1,135 +1,106 @@
-Return-Path: <netdev+bounces-240611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52BC0C76EDB
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:04:19 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id F01C4C76F14
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:07:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C8019351D64
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 02:01:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA40F4E64A3
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 02:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E3F292918;
-	Fri, 21 Nov 2025 01:59:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C562DCF7D;
+	Fri, 21 Nov 2025 02:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tfQ+kffu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RDaxqjBX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049B228D82F
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 01:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0005328506B;
+	Fri, 21 Nov 2025 02:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763690380; cv=none; b=fue4HrdrRBAWmnZR+sDt2mKojd+Mr4X4+8J/ZLZTdsNuBvwM9WPQk54d/rK+DDm17ahjOKYSnf8QcJeU6u/zDNUCSTf3+jyTMSB+yvnccPJ78oH/siyCFhrmDx4sND9MYjZ1iEgqXHrpF5wwbIQamJtnXnmGlY2HEwOf7uBHelo=
+	t=1763690451; cv=none; b=ffNXFINGCSWAYdxyxCIevbXi8+3kbV4c4q/JA19X5gW8/79rECZBLA1Lha2SfDlBNYa/fAD77KQ8+cQgDAixzjUxTG6ZDjFtHekQTrrOOX6wTSzWBA1FPCWK9cWbNORXwpOVbLs+OYliUPjDvNmXIPleeCFqIIii714LuWzWCG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763690380; c=relaxed/simple;
-	bh=nTmR67vcxzQ35y9XXUKwhejR8p487YKbOcVxeDeeIXo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=AAP5SiZYFBgy17+bJ8nvNA9v9zWV8eSqD1QD48JUgqGsy2xVylMk/m9wXfhlaeoYah27P3oMLWaseVIiAOpNQSYMqstPbQYITogeHTUw7vDghlrTSu/C+GTdwEQs4QEbayg1x2xY40ZYw2dmvf+WTq95cJQJOby8aKQvahh5FSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--maze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tfQ+kffu; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--maze.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b969f3f5bb1so2839433a12.0
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 17:59:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763690378; x=1764295178; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1lv2owah3Q5gGnsvEuPsRQ3WtigDkSvOdHACxiziWag=;
-        b=tfQ+kffuxzIHh56EnQi2EBbNrUSzniuhkjt+bvJGJBM6qkFeQZvYZD18E4C/XBaivT
-         JYeTQSoI0x4BwpMlY0vCUZJibte/CxBN6JjyYllfFHAqwgY0qfAVSR8gnxnoOtaJaG4n
-         D1JjI9omVTEccFHinmTTeF/h9dtgd4jZD0X4BJgHMs9bTOR41aU9FLvCTQLTfG7Zj477
-         UHiRUHSbQQmez1XcYmDppPWoS2Pu0Nq9lLFhhjTBLIWCbr/XatpSHnfXw0M0QQBUqxkf
-         l43j1oB15u8Bt+KpJXWdyNfOBYawq0qq9EmNGCkK0ow9vKo7L/HTQ0BevI1qvGucCXgG
-         FPrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763690378; x=1764295178;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1lv2owah3Q5gGnsvEuPsRQ3WtigDkSvOdHACxiziWag=;
-        b=DmRQR/6lyOHutHxbBWt5xs6B6p+8UVOlcmtkU6r+CGBHRmFraY5mdvo8S5T6I1eKM4
-         Qb+oD7eaiF+ny/0UBm/MCwwZO7LWxHFrrLqG4BO4mQH3SWt5FgEeWlaywhYvP0r6PA10
-         NCdSe8NoqNVl1v3miohbtsRDOMQa5XujE8jwsaVZAnjBORGYrj+crGlVHoFHuJ1+RWU5
-         Y4Ymp1qEZg7tfkorvSgw+WmYis9WYlsMNHDKj9k9LhwCGXt2AqQsqYr+VA1SPKdgd5ca
-         LumreyUbVGLK5kQc+sZNPT/wSoSBiphVjEOi7RD1dGFYmCdTYGSa69+JYEIIovERJpQ8
-         0wUQ==
-X-Gm-Message-State: AOJu0Ywa+PLJASxeto5h/03tucfMjytZarg1mPo0Da9q/1pOHHajoNmI
-	hE8jdyV5fHsDkzXDusgyClhia3HgJPqMh02dbO/Y6JJ3iRx2U1+gGHoO0l5eK/gIfilQT1e+Hw=
-	=
-X-Google-Smtp-Source: AGHT+IEgiepQngkYa4nS7VAoljVzEM4N7b0jgDAGg+PBUAAxSepqjrb6BlolpwPgDNgpb96mvoA+ff5L
-X-Received: from dyji33.prod.google.com ([2002:a05:7300:7a21:b0:2a4:50ea:8fa8])
- (user=maze job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7301:7194:b0:2a4:3593:c7c1
- with SMTP id 5a478bee46e88-2a7194ab2a1mr168695eec.1.1763690378218; Thu, 20
- Nov 2025 17:59:38 -0800 (PST)
-Date: Thu, 20 Nov 2025 17:59:33 -0800
+	s=arc-20240116; t=1763690451; c=relaxed/simple;
+	bh=oURpXBr3KdDn9PGKvZ71lA/uZ3b0bjDvzcwrD9A6oco=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=taKhiaXc5frHQDNWREm4qxJpFaU8d+KFvCFd7YT6dRWSX70QYKIouNnGJ5sbARKzhOonrgglOi0caruCMPoNNsebcjyMkGWi0kZEPD+SuiO9hNUVgZH5xDQiaMYb4onNngNXlUWxHvyRmABM2GVRSFB3nfXJf7LuIKG+EVKvLxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RDaxqjBX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D0F3C4CEF1;
+	Fri, 21 Nov 2025 02:00:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763690450;
+	bh=oURpXBr3KdDn9PGKvZ71lA/uZ3b0bjDvzcwrD9A6oco=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RDaxqjBXt1j3UIdjy7D7SVnLs8g7GgWn0u8nIwwGC1fkiNvamtVFDj/FQO/M8D/eh
+	 ZYIA8xclzKyMLPZroHugJ3RkCZs5j9pKq0uWtuDFi0aBxiZtSOUzYSr5VSAEob6tbA
+	 +24SZmZdWrSItahXVbfOjubhuO2Q9wBLd3uWK8Q1anPuB2bUlhg79qq/F3gvp3PXJe
+	 GCBA+D0/jJI9zu1fGsaJShWGCCkqQPKRf5p99z7rHol3XvaTdbp8EZvcxoMvleDjLd
+	 cvjpgHB4iUi5H3cdt7LM8reUKZkE25YppGHm/F3OQ8XDVF7CXgsxWVC/aJfF3PxY64
+	 b0Fp/3p8/tkTA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE07F3A41003;
+	Fri, 21 Nov 2025 02:00:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.rc2.455.g230fcf2819-goog
-Message-ID: <20251121015933.3618528-1-maze@google.com>
-Subject: [PATCH net] net: fix propagation of EPERM from tcp_connect()
-From: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>
-To: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <zenczykowski@gmail.com>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/3] net: stmmac: pass struct device to init/exit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176369041551.1856901.1355582687378802410.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Nov 2025 02:00:15 +0000
+References: <aR2V0Kib7j0L4FNN@shell.armlinux.org.uk>
+In-Reply-To: <aR2V0Kib7j0L4FNN@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, wens@csie.org, davem@davemloft.net,
+ fustini@kernel.org, edumazet@google.com, wefu@redhat.com, guoren@kernel.org,
+ heiko@sntech.de, kuba@kernel.org, jan.petrous@oss.nxp.com,
+ jernej.skrabec@gmail.com, keguang.zhang@gmail.com,
+ prabhakar.mahadev-lad.rj@bp.renesas.com,
+ linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-rockchip@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-sunxi@lists.linux.dev, maxime.chevallier@bootlin.com,
+ mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ s32@nxp.com, samuel@sholland.org
 
-bpf CGROUP_INET_EGRESS hook can fail packet transmit resulting
-in -EPERM, however as this is not -ECONNREFUSED it results in tcp
-simply treating it as a lost packet resulting in a need to wait
-for retransmits and timeout before an error is signaled back
-to userspace.
+Hello:
 
-Android implements a lot of security/power savings policy
-in this hook, so these failures are common and more or less
-permanent (at least until something significant happens).
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-We cannot currently call bpf_set_retval() from that hook point
-and while this could be trivially fixed with a one line deletion,
-it's not clear if that's truly a good idea (would we want to
-be able to set arbitrary error values??).
+On Wed, 19 Nov 2025 10:02:56 +0000 you wrote:
+> Rather than passing the platform device to the ->init() and ->exit()
+> methods, make these methods useful for other devices by passing the
+> struct device instead. Update the implementations appropriately for
+> this change.
+> 
+> Move the calls for these methods into the core driver's probe and
+> remove methods from the stmmac_platform layer.
+> 
+> [...]
 
-If the hook *truly* wants to drop the packet without signaling
-an error, it should IMHO return '2' for congestion caused drop
-instead of '0' for drop.
+Here is the summary with links:
+  - [net-next,1/3] net: stmmac: pass struct device to init()/exit() methods
+    https://git.kernel.org/netdev/net-next/c/85081acc6b11
+  - [net-next,2/3] net: stmmac: move probe/remove calling of init/exit
+    https://git.kernel.org/netdev/net-next/c/32da89a840e8
+  - [net-next,3/3] net: stmmac: rk: convert to init()/exit() methods
+    https://git.kernel.org/netdev/net-next/c/1a62894e040d
 
-Another possibility would be to teach the hook to treat (a new)
-return value of '4' as meaning 'drop and return ECONNREFUSED',
-but this seems easier... furthermore EPERM seems like a better
-return to userspace for 'policy denied your transmit', while
-ECONNREFUSED seems to suggest the remote server refused it.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: bpf@vger.kernel.org
-Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
----
- net/ipv4/tcp_output.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 479afb714bdf..3ab21249e196 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -4336,7 +4336,7 @@ int tcp_connect(struct sock *sk)
- 	/* Send off SYN; include data in Fast Open. */
- 	err =3D tp->fastopen_req ? tcp_send_syn_data(sk, buff) :
- 	      tcp_transmit_skb(sk, buff, 1, sk->sk_allocation);
--	if (err =3D=3D -ECONNREFUSED)
-+	if (err =3D=3D -ECONNREFUSED || err =3D=3D -EPERM)
- 		return err;
-=20
- 	/* We change tp->snd_nxt after the tcp_transmit_skb() call
---=20
-2.52.0.rc2.455.g230fcf2819-goog
 
 
