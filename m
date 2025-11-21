@@ -1,160 +1,344 @@
-Return-Path: <netdev+bounces-240708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EEFCC782B8
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 10:34:38 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08485C7824C
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 10:26:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 28C1536940
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:24:01 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 10D5C3526E8
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:24:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5AF309DA1;
-	Fri, 21 Nov 2025 09:21:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C0D341AC7;
+	Fri, 21 Nov 2025 09:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wh3D+C67";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PI/AMUdh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EUmhfJxy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC15302CC7
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 09:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763716875; cv=none; b=gnscK6YxX4x3A3qiXouxxJNKsc6NNvYpKE0eWBl4AqtbyDdV83V44W7zIGGm0q65LBiPyZgnIPsSMUi0b0dnCfDgDyEwK4OslHTqS8cjd+nVpoFfLHghlqeQGnV3palK3tnzya/QZ2jWAhQ+jjXzSDIA0peLwFq1GiQgawd2ijI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763716875; c=relaxed/simple;
-	bh=88bzWzZsrFl3P0XuSIsfcAZAJYQYQd2cXTWkuomn7dc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MbQVpEBwHa23dwPyWCRosIPxW2pkI6bg9yerRKxZmjq61iuaMyqs9XbZSiyp/kImwjYjEVA1AyzUafanMr1JP8p+iu7YCn7e8r9/sda8VnpBFS0qzSTzg2ns/sI9brKsGBpvGYFuR1XC9mPEFTAjMFnJoceQ24Jpx9SgQ52j3Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wh3D+C67; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PI/AMUdh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763716872;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FTcna51xyD4gkYI2wkOSx2yGaNSja9/HdHczSqaL88Y=;
-	b=Wh3D+C67WNaHE2duYqLdyjWKq6DIDieRfTmdmilkk6rmXKqtdh21Snp1koWhXVdUJoiKLG
-	CQHFFfVGjA681+vEdAFSprYe/VQnPsZRHFxyjXmcpjPuBYAjPYypGPhYK2oDe9scFerB7d
-	Ocsf2Gw7Hh/CaED9uPfw+H7f+vGYPng=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-562-Prg98G-PPUGsZmgJLUtAsw-1; Fri, 21 Nov 2025 04:21:11 -0500
-X-MC-Unique: Prg98G-PPUGsZmgJLUtAsw-1
-X-Mimecast-MFC-AGG-ID: Prg98G-PPUGsZmgJLUtAsw_1763716870
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b70b2a89c22so192767666b.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 01:21:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763716870; x=1764321670; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FTcna51xyD4gkYI2wkOSx2yGaNSja9/HdHczSqaL88Y=;
-        b=PI/AMUdhLo2uKxjDL1m2MckyXemgWbGMpT/Cxq1IKr6NfppVbZX79JBQKXCRo9i7QZ
-         pnMH1jj+xlZo9tXL6Ac9HDHnWav4J2CfD1kvrhPtKY8tXhJ6MWs2QQIwrmNUn/pb069Y
-         kBCW6pw2kn2CLwsh4sVPR2nPVDh54pxGaVUoKSyhhWRUDYTAUSjwoaZv76r2BgBx7EOZ
-         4G9XAUwiwkHntGfRmfyuO7qrABF+IMTKp2fha8/hFGZgydvDQ0mdOUXlVfPYCTRXGsYn
-         DEFvSLtD/1e1xTAeJa2JSw142MzBserrGKvBTbnOys4dt4+0pcwYY30Pe9EWpNMtqH0h
-         M4Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763716870; x=1764321670;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FTcna51xyD4gkYI2wkOSx2yGaNSja9/HdHczSqaL88Y=;
-        b=h4WXhTs829Tc+j+mpBBv7gck0q1+vAVsxpoTMrNxOYeT7sKiRiLYxrYB+f6tnjb2D7
-         +KCG05VeuFF2tnYj/jt1HpR/OOBJ8liU2YD3J0k5TEoEjEYQFuKyK7obCqu6eSIZ/KfH
-         p0C3QQAyFqiEGRgtfJcxLFtFhCX/cgBvd0bwCj39vGf1qRv+tv5dn5kLVgO2WI2MaBJp
-         RMos7LsXDZPceNHxM4N7Hq1M6it2Y3i0zQxx1ylLav5zQ7c7/1O/wOzpDd+nFSbXa0ud
-         EqCk+lFfbNjAZE3ejTYE5c2QZPkavCimQJQb1KYJmBLim8OK/IBU0SShOiX1tXO5AOQc
-         LOnw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSFndi9GfWtdBPyMfG49Hm9OJdbwW7jKNJ2IW+AErmDzzkUCEnBo2Q94Y6ZSsW+gOsRflDEyE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfHBc0QyRoAjBsuUp55UC3K+o9ikfA359Ez7EX77P1YJffysPN
-	lxeQNeM4MaxhAJZ79bAQOCLWpeLiJwdF94toY2U/DNAwaEJQtNq5LHfasAp0LAGNPze27Qq77Za
-	GCeFziPD7UPWdI9MSm85PEN4Sc0PLEvsqD8no59ScFIytUD9camIDJKNXBA==
-X-Gm-Gg: ASbGncu+aAmoyX9te4bm7eYSOOg6yfjNcSWn/Onc7zJt4xUfmW+J5RTR/ev+BVUIdbe
-	PjwP2jtn592vfiHc38t5KMwp0WMHL1DMhUYgQXFpARZMP58p9iVeKHAZrHlSD/VdUMRgMK5P+fn
-	yGN3lnT02rLy95mLvkVmb4rhoMO3MFdH7hNiLoC6IeyFC2LpQ9wntV4xtRJLQqNC8KacxgdBq4q
-	+dwdyHJvjSP7rVT2bSpv5ueaqegllpYBvM44hN7kRLsT/hHdpzx2ksJW1wduq6duetqEd9Yxo3k
-	r+pt+mInn+UZb2F45Q4UmSvWKJY25UcHLvf49L48OKoIuERVmm+DuyN2R9Aow45wpLgKzTvjNkS
-	btkYRZqnJAOfN2BkWkZLaOdPvW23VbukSmE2f8p+cgADIAP002xvmKvgoP0Pg6g==
-X-Received: by 2002:a17:906:d553:b0:b04:48b5:6ea5 with SMTP id a640c23a62f3a-b766ef1d27emr179098266b.17.1763716869699;
-        Fri, 21 Nov 2025 01:21:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGy2fwvK+Qkff9FcCdDI2UgofRL9rFpwVTJ/zBHtBRxPZJ5JeGTjRIY7myDBG6TkqWfVfUsUQ==
-X-Received: by 2002:a17:906:d553:b0:b04:48b5:6ea5 with SMTP id a640c23a62f3a-b766ef1d27emr179095566b.17.1763716869171;
-        Fri, 21 Nov 2025 01:21:09 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b765504828esm406198066b.64.2025.11.21.01.21.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 01:21:08 -0800 (PST)
-Date: Fri, 21 Nov 2025 10:21:02 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] vsock: Ignore signal/timeout on connect() if already
- established
-Message-ID: <fy3ep725gwaislzz6lyu27ckswp2iyy5gj6afw6jji6c3get3l@lqa6wpptq5ii>
-References: <20251117-vsock-interrupted-connect-v1-1-bc021e907c3f@rbox.co>
- <dh6gl6xzufrxk23dwei3dcyljjlspjx3gwdhi6o3umtltpypkw@ef4n6llndg5p>
- <98e2ac89-34e9-42d9-bfcf-e81e7a04504d@rbox.co>
- <rptu2o7jpqw5u5g4xt76ntyupsak3dcs7rzfhzeidn6vcwf6ku@dcd47yt6ebhu>
- <09c6de68-06aa-404d-9753-907eab61b9ab@rbox.co>
- <663yvkk2sh5lesfvdeerlca567xb64qbwih52bxjftob3umsah@eamuykmarrfr>
- <1b2255c7-0e97-4b37-b7ab-e13e90b7b0b9@rbox.co>
- <06936b55-b359-4e3d-bec0-b157ca32d237@rbox.co>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3B03081C6;
+	Fri, 21 Nov 2025 09:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763716886; cv=fail; b=EVcKDQ6+Gy0NBtq91bVgp52ysEbyFM3rYUaYodL5oU6p5OD9ugvYjK2TojCcY0QUu3lzJ+fFgx/g7HGgr4oxPijNU2P6ZvbP0Gi1sxJJtsSIcci+jmRiWEN7cwyUCwlb0/XCp6REvEZz8Hvoe8QKh/kSX1D7+dSTKEcYCVz1FNk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763716886; c=relaxed/simple;
+	bh=Cg3bChY5rIND71AFMggpWWqQEmSsL4wArv9CBjrZ9ZU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FsUzsWEhGJkCO7axRg+Vlm/97e/pdMw86/0Gjf2pCVot1UgGkiIAwLxpVOWX4feoDvBGVRxK8OkKqIvNrqyRiCrkGUlEqvvovAQOP18JfbH6SHtdEdgeQQSuf445QKSMe7KB2x4tZkO0eG13cEheX9m3i4sWJa1gWFJggN2jLiY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EUmhfJxy; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763716885; x=1795252885;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Cg3bChY5rIND71AFMggpWWqQEmSsL4wArv9CBjrZ9ZU=;
+  b=EUmhfJxyBtKs1APX70axLQTOgr4pxOku6lq0RcrEbBK0i59ebNl7Xa9Y
+   3e4phYIX+cdJ2rHUSCekeaOUSEvKNL7LGztVeAPR0mtRJZsbPs7M9ghdV
+   SPkZGRfkgp2fN4LzDwp0IVcMsd2x18P62eiQS1U+x39HaPso9mhmPL/It
+   XfZTpbQPVuv89Jd9vVX1DjrkzMke68eqXa0gYwqJYSAsHq0Kh8Hl7eTgs
+   KdnDx1qUxIs1y89sQ+iq8jlssvodgXzWUfxIHWuqgKPn9Y4FnjS1awAua
+   UCkDYNFrcHqHq66vclgnTUmGEKhB5S8DZTsWAyDAivBH4hoDGd4ZbUnF6
+   Q==;
+X-CSE-ConnectionGUID: KuXB9tCjSsKA8DxGzYHUPA==
+X-CSE-MsgGUID: urXqhT4vTGG7j09ZyhsrWQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="88456909"
+X-IronPort-AV: E=Sophos;i="6.20,215,1758610800"; 
+   d="scan'208";a="88456909"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 01:21:20 -0800
+X-CSE-ConnectionGUID: ZjDqRMAvRsaHj7ms6/z11A==
+X-CSE-MsgGUID: 4E1o23oATWmpXWe956NEMw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,215,1758610800"; 
+   d="scan'208";a="196595849"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 01:21:19 -0800
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 21 Nov 2025 01:21:19 -0800
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Fri, 21 Nov 2025 01:21:19 -0800
+Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.14) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 21 Nov 2025 01:21:19 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZC1WgiSWsFmGvAVN94SXn68aWFnQFiZ7rSPYVA6VL6Mv+BzWLdAnxqPAjiF7aCEvOdZBa6p4kXxlArOYFyLW3vXjCaPDmYZvx9cx2p6eWqzMUl1emPf6m9h1DkL4neI0aCmQOupAJVQt2iH0RV8GcgHF3CwgEY0b2F3EI3xtqVb4OJs5QUkp5iJjAc0WqUQSqUlFatVRq4LzuwcK4KnNDI+bpGtqABlHRIzoONvppWVMWPs7STDrHuaGg/JP/EFZbNPzK+swbLTaR4xbj8TnzX7w3FH/PpqAqzE4g7HkvpU471X7VRZ7YcJnpMaoDM0rjFk5CmHzH12ybgG9Bn3Azg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K4C3I7TNIUS54Ure2uBwz5aGuGVysB8rQnsLsCWxgGM=;
+ b=W/CqFAt9hiyj/vy0vGKnhU6MXLkJ902qlgMTbBX95rCXNEf8BXOYi/1ztCSv12ORy9moahP0G4yV5TQalkJVX1/VGnkge3Y9Pg713OyBXEMooClDWm17FlNCXwXSRxTxrtETlvKhM9VzylvnEakG0dc57kU9xWmKaU/n16iaYLw0kaW7T71EFUrFeippaBhlKxvW9nEiHGpv8opIGLiMS3R4ycrwWOLC+g/jptJSQbXYWPCir3jARKBR3eOqXLmW1qyxirdChbREcf6S/E5QDHNnL09KSW8sk2dk8tcz4RrFwB0K2IeztlnDKY0OcIiJAI9ZYWLQy44S1wLMhHbQUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by PH8PR11MB6856.namprd11.prod.outlook.com (2603:10b6:510:22b::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.11; Fri, 21 Nov
+ 2025 09:21:11 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9343.009; Fri, 21 Nov 2025
+ 09:21:11 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Slepecki, Jakub" <jakub.slepecki@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "michal.swiatkowski@linux.intel.com"
+	<michal.swiatkowski@linux.intel.com>, "Slepecki, Jakub"
+	<jakub.slepecki@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next 4/8] ice: allow overriding
+ lan_en, lb_en in switch
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next 4/8] ice: allow overriding
+ lan_en, lb_en in switch
+Thread-Index: AQHcWj7Yly0Q2RHZ2UWt8T72RdAc9bT81jWA
+Date: Fri, 21 Nov 2025 09:21:11 +0000
+Message-ID: <IA3PR11MB89860CA2EBCCEDDF0C9E05D9E5D5A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20251120162813.37942-1-jakub.slepecki@intel.com>
+ <20251120162813.37942-5-jakub.slepecki@intel.com>
+In-Reply-To: <20251120162813.37942-5-jakub.slepecki@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|PH8PR11MB6856:EE_
+x-ms-office365-filtering-correlation-id: 9d88aa44-cf5b-4e33-7f48-08de28df4fe9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007|38070700021;
+x-microsoft-antispam-message-info: =?us-ascii?Q?63ox/uexBLu2f4gJ4yD5qLsghtCYpixlgVdBE+6wSLYsTSODaXl3RPOujtpZ?=
+ =?us-ascii?Q?900tL9nlyLPxkmiXrP8bEDN0rEVKyMfd/MR2Hko/S2nUHVV63e9jTTBE4xfH?=
+ =?us-ascii?Q?aD1N2siwXHZA881E95rKcvdBb/2EMkzNDBsv7KzOlpyClPA/z62BZ/2O+FaL?=
+ =?us-ascii?Q?qRIYQkDyttWKeWQQqnVnVNLKg/Yt/n4Aig4O2ODeMNU35LKEz9/2tycyF+I5?=
+ =?us-ascii?Q?eN9q5As8WPeongXYeRQzD1k/vIWgLcKACbaJ8TYZkTh6nX8KOvpDgFiV6JTl?=
+ =?us-ascii?Q?NIHfBXTdHhSWny5f4Z5GtPGZWDVGIc7n7slxEA/fL6bV0KYDGrfbogmtnAeF?=
+ =?us-ascii?Q?Umdxm88Z4xXLSe9OgkC/7hDYb6jcr3UqToAaW8xnjlnCt6XCHQBQLuM8U7PJ?=
+ =?us-ascii?Q?Oa0f7KP7C/Ww2uVSRSml3yptxEgvT50yXloSvc9cLr+kwOYRwSb72a33xccL?=
+ =?us-ascii?Q?GgQgSav4ePDHxHTsLPJ7tAxRse7aHtP9Y24y7lf8EAIO9HR+Z4C7gXkicPnd?=
+ =?us-ascii?Q?W6nMspS6Mhx0R6S3UpY3sbGEoeSUkCIyb2AXMtopopZgcMJ841JXJR8YRj/z?=
+ =?us-ascii?Q?OfTlFHvXhBI1+VZXp+iVyB4OnY4gXQz0Vf7c3rCNnPerjMt7OCqV2TzCCqeg?=
+ =?us-ascii?Q?4acXjWSGxrPdDDlX9PhoHpE8vKw1f0yJwb1QIiKHTw2/7yydbtxgJ22OqHh4?=
+ =?us-ascii?Q?Fw15Zam1qBYaJ0/RQRzysDH4p/qG/QlU3bsCGu6Cj4aUT7A/79A+dvUYfcIO?=
+ =?us-ascii?Q?D7TQooXMaUDEpHEJJYgUpHLFWHGQge8E6dSwXfcc240fUFrsIUXM8tgzUvUC?=
+ =?us-ascii?Q?IW1NYUpbpWpdFBsOHx+dyVenn0fjwiom4wJdeJHlSqyriZW2vZp4axU/3i+M?=
+ =?us-ascii?Q?eWpIoaObY27X9DDcxNbe7cwxWu6x+nLABE64MLw9bjyoqmXQZjQxj6RufSVK?=
+ =?us-ascii?Q?4dL9To7aC2c0+uTxvX0+jLlVLpbuttom9+WmXCxxnEJBrlSRN08X2ILlU6oP?=
+ =?us-ascii?Q?i7+Vd6Y4c9YDpAl7wficzygSyusmYUMuGwS8ESvySOSry9OUQ42SkzG8IG04?=
+ =?us-ascii?Q?d4kQ3vrZBn/vCWxZa49yqYKubnIsM756/xbCXR0PZvMTXLHp0dLfg2YHclaS?=
+ =?us-ascii?Q?WUzhG8TmNkwsIBai39e3pFeSCrUN0WIT1NfXaAuoJuxAhA2kr+YxMMaHtBMg?=
+ =?us-ascii?Q?iQl9Ev6n6msvRX+K76SwPfNfbz2MCGqKBNzJXPMDU7E0Dk8EIRICA5jHHEc0?=
+ =?us-ascii?Q?Ut/qjpLnymftxEN28uxxo7tGgCKjA4nI5EhxppIU5S/qwv0d8Njg773Lgo7P?=
+ =?us-ascii?Q?b30G2y596HYHWj9zlyxzjjE0XmSrgq/F1x3VXQVFMxlkYlZ7wB0AZWq/f5YC?=
+ =?us-ascii?Q?RI2Lt94gwawRvSDrqYsqJK6yQ5kJq2U6fEqrtOC4hP0iaD/Pb3aG1Hoe1MwB?=
+ =?us-ascii?Q?/BJPZyvI46sUCP1DQOpXYHbid4QTe3cYU5xlKlMnPXg8K+5LWxB4EZnYPvFS?=
+ =?us-ascii?Q?DIU65GlTSLlddK0Mabl8fHbIv8xh3tzRg3z3?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?y6jg0FxUli3QmQRxz4K/5O3cjTDMPdOowx53N09DYKiQhtvA2AtaMvN2YYD4?=
+ =?us-ascii?Q?FGKKK3Wt5T6fWjS6+B7hn36nRYtKEki1Q4sl8G3qwmivBObANherSh1ksv0+?=
+ =?us-ascii?Q?Ne+uCPo6w1EIXR5OxrpP6ZqoLcQenlZmsQkJtYNZZsfeBID5k1ahz3a7HAYt?=
+ =?us-ascii?Q?sqmoY4CI8RDfdMl6KDETec+SXDRqmQ7OdFHKP3NduAKv4jxKITrs0wrkNPwZ?=
+ =?us-ascii?Q?H1NFRCDYGpqOZSdos584eP9w3DK2kSyfQLzZOSFmh4JE20Eka21/MvtVIEmp?=
+ =?us-ascii?Q?MT1L+nHFymNZNeUs39y+oTKVP3PcbxJiv6i87Bz1Jj0uvas784QLptHUyG3y?=
+ =?us-ascii?Q?qAR9/d84lQB+PexK06j8In/gyCtiAjte/xTjH7Mt8KU03YzikEHQISm6rm9b?=
+ =?us-ascii?Q?58/z64IGsaI/pmtg7oQ7uR71kuuWocyPaLoyaQm8H1l0n0ona9sKiZwgYIQu?=
+ =?us-ascii?Q?IueqQM3yl5gvFjcQ9lMorm4X7lVBVKVmYTDoVFjyfk9AsZMqvH1hsIKURits?=
+ =?us-ascii?Q?+4+x3fjKt3CQPkzjsmo7TrFWQjB88oJxu+F3rIVcbSTetPD1Wpl24Oq2l+3t?=
+ =?us-ascii?Q?RBH64Z3sc9gRBCrbM3nkAEKteb33SwMW6BEpyJexiu28mXsEccAvM1SuR1NB?=
+ =?us-ascii?Q?A/pQc6RoxJ1RKtcIrM/YDdUZswRZf5aY6lrr/RNyIZxabpu7tCdo1+T2e3Pp?=
+ =?us-ascii?Q?xJvx4wlv9E9zawvWVuHrqRg9Ed2BHumFwdBsDZWizgr1AaxJUN+vd7QccnqZ?=
+ =?us-ascii?Q?IfOzCm21KdCrtUibwjH/JwmdnrKVWatQRyWVIyh1KAahM846PpOWQVerq+jN?=
+ =?us-ascii?Q?9JUtTzzwv3k0dugxlsw061IaELXhF5cACJeMAONcvhT1+Fo5kEvvBMiYuyOb?=
+ =?us-ascii?Q?3P+w7YVmpAsx0Ml88tjP0cvMEkdosG+s7R0pQnez6PDwBL31imrNvexlbWg0?=
+ =?us-ascii?Q?sB+ayv6VZm5jT4KgFZ7clmpKzEiFheYur4MFGmsb98R+duo5V3y36a28sLfG?=
+ =?us-ascii?Q?swGg9oVQkgsTppheywJUWR93mKf8gdf6LKom27wRl6RVpMzsq12Cb+Z39TEX?=
+ =?us-ascii?Q?k6uol7F0xFh1EExqVPU4avkWN58CVWVHPX/+km179AQdFtpOxMGI0mbAysgF?=
+ =?us-ascii?Q?cLXAdDOKs/MMtrQBEoI2T2IqjIUT5sxWHN29BO1TdVDT64WHMASQRakvq3dC?=
+ =?us-ascii?Q?PdXyXLqL1likTc4yGKmp3p4EQwrluPSumcKoja+ryB0eDvFfqcjBYmCjxEdV?=
+ =?us-ascii?Q?z7Ki412trsFdSnys3BvabnfNjR1ceypNi7mBWIm38ZCSl7DfZ2n05qFhC+TC?=
+ =?us-ascii?Q?rchR6jIgHDg9vTAuGcpHKsbHKU5QkJ/iEFkHeC8Y8EhkagD59HnEElf3lTm4?=
+ =?us-ascii?Q?FJbhjIuJRnhPCQkMb6TmV650AmFcmCwcCSDqmVZQD6nHUio2ncV5BjpOg2/A?=
+ =?us-ascii?Q?LcJoHlKPQN41upOLa5HcY4MltKkNAadFldWW16LWUq4kbF6xrkmIJhBbBxmE?=
+ =?us-ascii?Q?CiD/fwJ6/2rY3AVY8O9HFhtT0qpleiuH52VIIzYaQfa4VC8ANMzTaaBkDTjn?=
+ =?us-ascii?Q?jzKcfnq1+Bkz/3uCWhdOaZstHMM6giKhrHWWGNxLKcBt+Ee6+AnoTsBxRFZK?=
+ =?us-ascii?Q?Gw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <06936b55-b359-4e3d-bec0-b157ca32d237@rbox.co>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9d88aa44-cf5b-4e33-7f48-08de28df4fe9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2025 09:21:11.6067
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: tlDoLPRXuRboWSM8vhiuS/gluq/mj3c15j+7A04uB4xXAKmGHAw2T7GEuFPv4VM71DHWv/a4Xsvh5qQ0X5LSq2m17IDFeGjeURSgfDhWrBI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6856
+X-OriginatorOrg: intel.com
 
-On Thu, Nov 20, 2025 at 10:12:20PM +0100, Michal Luczaj wrote:
->On 11/19/25 20:52, Michal Luczaj wrote:
->> ...
->> To follow up, should I add a version of syzkaller's lockdep warning repro
->> to vsock test suite? In theory it could test this fix here as well, but in
->> practice the race window is small and hitting it (the brute way) takes
->> prohibitively long.
->
->Replying to self to add more data.
->
->After reverting
->
->f7c877e75352 ("vsock: fix lock inversion in vsock_assign_transport()")
->002541ef650b ("vsock: Ignore signal/timeout on connect() if already
->established")
->
->adding
->
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -2014,6 +2014,7 @@ static void test_stream_transport_change_client(const
->struct test_opts *opts)
->                        perror("socket");
->                        exit(EXIT_FAILURE);
->                }
->+               enable_so_linger(s, 1);
->
->                ret = connect(s, (struct sockaddr *)&sa, sizeof(sa));
->                /* The connect can fail due to signals coming from the
->
->is enough for vsock_test to trigger the lockdep warning syzkaller found.
->
 
-cool, so if it's only that, maybe is worth adding.
 
-Thanks,
-Stefano
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Jakub Slepecki
+> Sent: Thursday, November 20, 2025 5:28 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: linux-kernel@vger.kernel.org; netdev@vger.kernel.org; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; michal.swiatkowski@linux.intel.com;
+> Slepecki, Jakub <jakub.slepecki@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next 4/8] ice: allow overriding
+> lan_en, lb_en in switch
+>=20
+> Currently, lan_en and lb_en are determined based on switching mode,
+> destination MAC, and the lookup type, action type and flags of the
+> rule in question.  This gives little to no options for the user (such
+> as
+> ice_fltr.c) to enforce rules to behave in a specific way.
+>=20
+> Such functionality is needed to work with pairs of rules, for example,
+> when handling MAC forward to LAN together with MAC,VLAN forward to
+> loopback rules pair.  This case could not be easily deduced in a
+> context of a single filter without adding a specialized flag.
+>=20
+> Instead of adding a specialized flag to mark special scenario rules,
+> we add a slightly more generic flag to the lan_en and lb_en themselves
+> for the ice_fltr.c to request specific destination flags later on, for
+> example, to override value:
+>=20
+>     struct ice_fltr_info fi;
+>     fi.lb_en =3D ICE_FLTR_INFO_LB_LAN_FORCE_ENABLED;
+>     fi.lan_en =3D ICE_FLTR_INFO_LB_LAN_FORCE_DISABLED;
+>=20
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Jakub Slepecki <jakub.slepecki@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_switch.c | 21 +++++++++++++-------
+> -  drivers/net/ethernet/intel/ice/ice_switch.h |  7 +++++++
+>  2 files changed, 20 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c
+> b/drivers/net/ethernet/intel/ice/ice_switch.c
+> index 04e5d653efce..7b63588948fd 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_switch.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+> @@ -2538,8 +2538,9 @@ int ice_get_initial_sw_cfg(struct ice_hw *hw)
+>   */
+>  static void ice_fill_sw_info(struct ice_hw *hw, struct ice_fltr_info
+> *fi)  {
+> -	fi->lb_en =3D false;
+> -	fi->lan_en =3D false;
+> +	bool lan_en =3D false;
+> +	bool lb_en =3D false;
+> +
+>  	if ((fi->flag & ICE_FLTR_TX) &&
+>  	    (fi->fltr_act =3D=3D ICE_FWD_TO_VSI ||
+>  	     fi->fltr_act =3D=3D ICE_FWD_TO_VSI_LIST || @@ -2549,7 +2550,7
+> @@ static void ice_fill_sw_info(struct ice_hw *hw, struct
+> ice_fltr_info *fi)
+>  		 * packets to the internal switch that will be dropped.
+>  		 */
+>  		if (fi->lkup_type !=3D ICE_SW_LKUP_VLAN)
+> -			fi->lb_en =3D true;
+> +			lb_en =3D true;
+>=20
+>  		/* Set lan_en to TRUE if
+>  		 * 1. The switch is a VEB AND
+> @@ -2578,14 +2579,18 @@ static void ice_fill_sw_info(struct ice_hw
+> *hw, struct ice_fltr_info *fi)
+>  			     !is_unicast_ether_addr(fi-
+> >l_data.mac.mac_addr)) ||
+>  			    (fi->lkup_type =3D=3D ICE_SW_LKUP_MAC_VLAN &&
+>  			     !is_unicast_ether_addr(fi-
+> >l_data.mac.mac_addr)))
+> -				fi->lan_en =3D true;
+> +				lan_en =3D true;
+>  		} else {
+> -			fi->lan_en =3D true;
+> +			lan_en =3D true;
+>  		}
+>  	}
+>=20
+>  	if (fi->flag & ICE_FLTR_TX_ONLY)
+> -		fi->lan_en =3D false;
+> +		lan_en =3D false;
+> +	if (!(fi->lb_en & ICE_FLTR_INFO_LB_LAN_FORCE_MASK))
+> +		fi->lb_en =3D lb_en;
+> +	if (!(fi->lan_en & ICE_FLTR_INFO_LB_LAN_FORCE_MASK))
+> +		fi->lan_en =3D lan_en;
+For me it looks strange.
+What type the fi->lb_en has?=20
+fi->lb_en declared as bool, and you assign fi->lan_en from bool.
+But you check condition by fi->lan_en & ICE_FLTR_INFO_LB_LAN_FORCE_MASK ?
+It rases questions if fi->lan_en a bool why use fi->lan_en & ICE_FLTR_INFO_=
+LB_LAN_FORCE_MASK then?
+And if fi->lan_en is a bitmask why not use FIELD_GET(ICE_FLTR_INFO_LB_LAN_F=
+ORCE_MASK, fi->lan_en) and
+why not something like:
+
+if (!FIELD_GET(ICE_FLTR_INFO_LB_LAN_FORCE_MASK, fi->lan_en))
+    FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_MASK, &fi->lan_en, lan_en);
+
+It could preserve unrelated bits (like FORCE) and make the code resilient t=
+o future changes in bit positions?
+
+>  }
+>=20
+>  /**
+> @@ -2669,9 +2674,9 @@ ice_fill_sw_rule(struct ice_hw *hw, struct
+> ice_fltr_info *f_info,
+>  		return;
+>  	}
+>=20
+> -	if (f_info->lb_en)
+> +	if (f_info->lb_en & ICE_FLTR_INFO_LB_LAN_VALUE_MASK)
+>  		act |=3D ICE_SINGLE_ACT_LB_ENABLE;
+> -	if (f_info->lan_en)
+> +	if (f_info->lan_en & ICE_FLTR_INFO_LB_LAN_VALUE_MASK)
+>  		act |=3D ICE_SINGLE_ACT_LAN_ENABLE;
+>=20
+>  	switch (f_info->lkup_type) {
+> diff --git a/drivers/net/ethernet/intel/ice/ice_switch.h
+> b/drivers/net/ethernet/intel/ice/ice_switch.h
+> index 671d7a5f359f..a7dc4bfec3a0 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_switch.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_switch.h
+> @@ -72,6 +72,13 @@ enum ice_src_id {
+>  	ICE_SRC_ID_LPORT,
+>  };
+>=20
+> +#define ICE_FLTR_INFO_LB_LAN_VALUE_MASK BIT(0) #define
+> +ICE_FLTR_INFO_LB_LAN_FORCE_MASK BIT(1)
+> +#define ICE_FLTR_INFO_LB_LAN_FORCE_ENABLED	\
+> +	(ICE_FLTR_INFO_LB_LAN_VALUE_MASK |	\
+> +	 ICE_FLTR_INFO_LB_LAN_FORCE_MASK)
+> +#define ICE_FLTR_INFO_LB_LAN_FORCE_DISABLED
+> +ICE_FLTR_INFO_LB_LAN_FORCE_MASK
+> +
+>  struct ice_fltr_info {
+>  	/* Look up information: how to look up packet */
+>  	enum ice_sw_lkup_type lkup_type;
+> --
+> 2.43.0
 
 
