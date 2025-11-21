@@ -1,50 +1,68 @@
-Return-Path: <netdev+bounces-240840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0A0AC7B02B
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 18:12:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B1F1C7AF9E
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 18:04:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 02CC2383143
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:07:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 418BA3A3A84
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B693358D06;
-	Fri, 21 Nov 2025 17:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h8yJKG12"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8D334FF5C;
+	Fri, 21 Nov 2025 17:02:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A422F3587D5;
-	Fri, 21 Nov 2025 17:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAAED34F278
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 17:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763744596; cv=none; b=qOWto9tr3nHditSfeitgzsEUUl1Q+F6GU5+MqfGIfFbbKR/cj1H7RUAE+iDFox+lPmcZvrgLd4xtoPD4XrdjYyRoesnUz8354ceVKPzLTqp9PdINvfHJzpo8Ucztp6AR6EAvjWngAdr9VQyoIyRXh/L7brfz2q6C6ZmTJktTf1Q=
+	t=1763744566; cv=none; b=qeNEQttzbcQJgwIS2MAikKN0u71lbrFhQp05Mh9PG4H6oDBn1FThw+JEEDdzIxYjMZagcpXL5y0Onb4UOfsttBxwfgznEgtAblS90usOH0oe9YfJLsu2vm1DxJM4gAa4cT4sePQwbIiJVCchm1h6PEBkjfXlckk/ENtC7Ph5JMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763744596; c=relaxed/simple;
-	bh=yxIE8l3JZQR5JCywo+A5MPHo33+yYPDBOugaYFYC8vU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bfbEUnZTP2FbfZ5kZA5tf+7FK+hGxRpLbAuAhCiQRPHUEsjpXKzoYtGFUf2pGyELcZcV5Peg9JE2Y9XOKtBbfLXqZPSEuAdpnBnWnvKeYVxRNRNJiNTYwpx/s6TJKqj4SjDnwdsAppujj6L9Eaf+Baw5r6nLCpbXkUz1hi/ntCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h8yJKG12; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53308C116C6;
-	Fri, 21 Nov 2025 17:03:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763744596;
-	bh=yxIE8l3JZQR5JCywo+A5MPHo33+yYPDBOugaYFYC8vU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=h8yJKG12y7OUoUeypsziIg8Yxrgmvno2Uej5G5zLX/qleVWx/HMzRgfVzbciFYj1t
-	 tVUWpbRuZCQThIc983/MGYsMaUTeU+H2ud2iiHceBks09RNhZbEMlYdKsZT25mH+2Z
-	 a579Hsdu22e3RkynJB31u5Tzn0VrxbxC7YT7OZ8RRjZKJbBnrFxFnJiGhRGlWlLf3j
-	 UWht0gpn3pEbTAAHMYiCfeUs0npfO8TGze7ZyYEoPQl28XH/APWjzeatdPuf7KaIVY
-	 5Y6S3uThBr2SiAUs8aSearEUZg9e5Rxj08T4TOiIKMcpaurRU/k5ORZyr201RHXRV/
-	 qsal4Y8KXw09w==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 21 Nov 2025 18:02:13 +0100
-Subject: [PATCH net-next 14/14] mptcp: leverage the backlog for RX packet
- processing
+	s=arc-20240116; t=1763744566; c=relaxed/simple;
+	bh=tBAC1l069rZza6dG+NN40YVkYazo6FpRQbURbBbsfDU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mMDnuZ+9Pb/zuSoVXsH/2YHwT68tj5YqQKBqDaZ437LUH3HFahXPd7+lN/e8bV5DcVmyGBEdPsEj+zwxYqyTbFEzgKHMXsrJAlmZH3z2jdbpYXfGPNCmR43wmIOp0SRF5/YpKL/RJvEd/Tf4ufSGSUArANZOtSRAvQON4+jCB3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7c6d3676455so761340a34.2
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 09:02:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763744564; x=1764349364;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=di8+YvD0bRSp/lHQE7ROIloycNEsWSYf1FI8ZmXpLgg=;
+        b=Wbmkhzs9zkYpf8U3vSbD1X2REmADI/AEZETE2ElYt86x4GF7y+GYDyI0bSezfO25Bk
+         RPqCdUybhubMesM4r5wXXpChEzjLqnLWoaRd0h66p5WtdhKpLFE6R7VTdnryAbXa1Q/z
+         U2S5FhXcdwvAKTyTPiKo+2HvYq6uXrcyrtfbjCeMmx4tV5Khb73f6IxPoLyfNXmH9Js0
+         wZ+SgxxRr1QigvDw+muAqul3as2oH7Z7ZU+OHtxXqPCkwe+IduXrmfqUQURSjP8rYRX9
+         RsAJBMpYzXQtffxC1/WtsaMDRyos1reSppgPZFlKAIPx9u/IytDgO5VO8BakjBaNvoa9
+         NXXA==
+X-Gm-Message-State: AOJu0YzYj4SD6dKz2zGZ/sGy/wSfvLAfCLF28vEgBtaGgj2bchjvoWF/
+	2xRooVtYfuNbWwmZqc0/46Lq810ch0WcqEZNtyP569h0tggtbyEB8FHQ
+X-Gm-Gg: ASbGncsNk15W2vn0Pn2YMJh6/VqGQ0aKC3vUBgGHYR+JsIl/b5v8RkToohegJ6QXm/L
+	WqpNM2AoncKpn6eUFeFNcJu46oA9Zz/bDTgqbOw41f3iL4CxlXh5/gkYQVZ7E/8zPC3i1izVK8O
+	PV0fY1Tl+/OiyKBQcn0mwCSYAuQJx/NPGUyJ7TPJgOLdy5XziaoJidNsJf57POQt679KqvZf4Q4
+	dgJpvfa9xndaKRP7WIfVdJrAse7TatCN4H4aGG1okBCB7yd11SQNRwQjX8Pa606jtN76xJKfuoy
+	kW+yyf/+e6rfY4Y/tzJnXhXoUVk3WdSo5lL97g2kgFfohgS9XbTX3JMwEZ+UA+g09+ck5a0jVzZ
+	TEEZ1NF/HsYc7blsHla5KL/eNfBbFrRekcIa/VhvtD09KwWB2ZjO2T3ep8tIakR8C9FIurpnC5n
+	W9TQfzS2mom5QasQ==
+X-Google-Smtp-Source: AGHT+IEd1pdpsJYlB2fuhN5fltW09lm+K3UXG4zPUx83WuipQLTwqD5IsTD3tnKNseWYn944zuHisg==
+X-Received: by 2002:a05:6808:1b26:b0:450:3ff9:f4dd with SMTP id 5614622812f47-451159c9a75mr1014484b6e.24.1763744563522;
+        Fri, 21 Nov 2025 09:02:43 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:73::])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65782bacf02sm1803010eaf.15.2025.11.21.09.02.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Nov 2025 09:02:42 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next 0/2] net: marvell: modernize RX ring count ethtool
+ callbacks
+Date: Fri, 21 Nov 2025 09:02:34 -0800
+Message-Id: <20251121-marvell-v1-0-8338f3e55a4c@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,406 +71,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251121-net-next-mptcp-memcg-backlog-imp-v1-14-1f34b6c1e0b1@kernel.org>
-References: <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
-In-Reply-To: <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
-To: Eric Dumazet <edumazet@google.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- Peter Krystad <peter.krystad@linux.intel.com>, 
- Florian Westphal <fw@strlen.de>, Christoph Paasch <cpaasch@apple.com>
+X-B4-Tracking: v=1; b=H4sIACqbIGkC/x3MQQqDMBAF0KsMf23AGdRFrlK6iPrbDmhaEhFBv
+ LvQd4B3orI4K6KcKNy9+jcjijaC6ZPym8FnRIG11quahjWVncsSWhs6jv1o2iU0gl/hy4//9ED
+ mFjKPDc/rugHg3fwxYwAAAA==
+X-Change-ID: 20251121-marvell-0264eb5b214a
+To: Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- mptcp@lists.linux.dev, Davide Caratti <dcaratti@redhat.com>, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11951; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=EO6UaLraU7c+G3zNJSh1ZDma+EoTxHJngur0al91bNo=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDIVZiuseFX30OCNwvfLTRUXYjbzSXS/b6i5ekPicN+hg
- jq9W9sfdZSyMIhxMciKKbJIt0Xmz3xexVvi5WcBM4eVCWQIAxenAEzEqY2R4cIqbwPDCRUslaev
- LaouUT8h8Nf9y4WqR2zLVObqPatME2f4w5/00P76tGKb+/0eYt/8omwXuZw5bbt4ptJs+6fb0+X
- UuQE=
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+ kernel-team@meta.com, Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-a6db3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1151; i=leitao@debian.org;
+ h=from:subject:message-id; bh=tBAC1l069rZza6dG+NN40YVkYazo6FpRQbURbBbsfDU=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpIJsyp52PkH3rjxO+ewPUpPALhjW4xetCOAeA0
+ muKdkn3K72JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaSCbMgAKCRA1o5Of/Hh3
+ baYHD/4gBfFprBjBjo7VguhQYH52+wHmdEzrW48rAHmM6N3bGwG8kxVO5fOcCdeUOBTKLSy4goY
+ AgswWgtUsAWZbNFR6atxYBmIMiED41EtCgzVLeJbddm0utm4UBH4ZcAxSSL2F9Sqet0/zZmdiqB
+ NC/OtyFTsEx4Cv1mGMANu3h4p0ePXNJJUtjopb189g8HUQ4i0OHXytziOqIwfGS2y51rcnTukyW
+ 9hv8lOFQlEjWLfpjnu3/3EpuCWCg55tjledcyz5FF6ekgTYYHeVhhUgJ5iUsNvHr51XbWleBmiz
+ MISghen+q9T7Ax2QB05EcZUzFywjIouyUVDq/qfI4OVhvp/Fb8b9owVXYMGh1WfjcwKZJfkOgOT
+ tRLyk/bDPZ+wPsdpEsaBMr9OgE3objO3PQumedAodEaEQaShx+QerjqsNZLOD17UBueUEouYcDd
+ Y7/LKXT9237iZqIVBiIN4xbKmvqYkbDO5mDgIg/2ajr6e3w0EYNDqlBDlGFQfz32IGZlpVXK1lo
+ +g8QErODp7LT6l9q1EO4bhvJe5uyWxs8oqWqfNgDYScG8FOLD/LRdE6w0ylr+fBX48Lz7SLfugE
+ 1d++JihBsO4NYqmdy9QUbgY8vZVDNTAMn7YlzRmKWiybmrNF/etcSgfpKWuQrJyU01d50LtQypF
+ qCLsHG8VI3fuSpw==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-From: Paolo Abeni <pabeni@redhat.com>
+This series converts the Marvell mvneta and mvpp2 drivers to use the new
+.get_rx_ring_count ethtool operation, following the ongoing modernization
+of the ethtool API introduced in commit 84eaf4359c36 ("net: ethtool: add
+get_rx_ring_count callback to optimize RX ring queries").
 
-When the msk socket is owned or the msk receive buffer is full,
-move the incoming skbs in a msk level backlog list. This avoid
-traversing the joined subflows and acquiring the subflow level
-socket lock at reception time, improving the RX performances.
+The conversion simplifies the code by replacing the generic .get_rxnfc
+callback with the more specific .get_rx_ring_count callback for retrieving
+RX ring counts. For mvneta, this completely removes .get_rxnfc since it
+only handled ETHTOOL_GRXRINGS. For mvpp2, the GRXRINGS case is extracted
+while keeping other rxnfc handlers intact.
 
-When processing the backlog, use the fwd alloc memory borrowed from
-the incoming subflow. skbs exceeding the msk receive space are
-not dropped; instead they are kept into the backlog until the receive
-buffer is freed. Dropping packets already acked at the TCP level is
-explicitly discouraged by the RFC and would corrupt the data stream
-for fallback sockets.
-
-Special care is needed to avoid adding skbs to the backlog of a closed
-msk and to avoid leaving dangling references into the backlog
-at subflow closing time.
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+PS: These changes were compile-tested only.
 ---
- net/mptcp/protocol.c | 191 +++++++++++++++++++++++++++++++++++----------------
- net/mptcp/protocol.h |   2 +-
- 2 files changed, 132 insertions(+), 61 deletions(-)
+Breno Leitao (2):
+      net: mvneta: convert to use .get_rx_ring_count
+      net: mvpp2: extract GRXRINGS from .get_rxnfc
 
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index dfed036e0591..e4ccc57b6f57 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -665,6 +665,7 @@ static void __mptcp_add_backlog(struct sock *sk,
- {
- 	struct mptcp_sock *msk = mptcp_sk(sk);
- 	struct sk_buff *tail = NULL;
-+	struct sock *ssk = skb->sk;
- 	bool fragstolen;
- 	int delta;
- 
-@@ -678,22 +679,30 @@ static void __mptcp_add_backlog(struct sock *sk,
- 		tail = list_last_entry(&msk->backlog_list, struct sk_buff, list);
- 
- 	if (tail && MPTCP_SKB_CB(skb)->map_seq == MPTCP_SKB_CB(tail)->end_seq &&
--	    skb->sk == tail->sk &&
-+	    ssk == tail->sk &&
- 	    __mptcp_try_coalesce(sk, tail, skb, &fragstolen, &delta)) {
- 		skb->truesize -= delta;
- 		kfree_skb_partial(skb, fragstolen);
- 		__mptcp_subflow_lend_fwdmem(subflow, delta);
--		WRITE_ONCE(msk->backlog_len, msk->backlog_len + delta);
--		return;
-+		goto account;
- 	}
- 
- 	list_add_tail(&skb->list, &msk->backlog_list);
- 	mptcp_subflow_lend_fwdmem(subflow, skb);
--	WRITE_ONCE(msk->backlog_len, msk->backlog_len + skb->truesize);
-+	delta = skb->truesize;
-+
-+account:
-+	WRITE_ONCE(msk->backlog_len, msk->backlog_len + delta);
-+
-+	/* Possibly not accept()ed yet, keep track of memory not CG
-+	 * accounted, mptcp_graft_subflows() will handle it.
-+	 */
-+	if (!mem_cgroup_from_sk(ssk))
-+		msk->backlog_unaccounted += delta;
- }
- 
- static bool __mptcp_move_skbs_from_subflow(struct mptcp_sock *msk,
--					   struct sock *ssk)
-+					   struct sock *ssk, bool own_msk)
- {
- 	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(ssk);
- 	struct sock *sk = (struct sock *)msk;
-@@ -709,9 +718,6 @@ static bool __mptcp_move_skbs_from_subflow(struct mptcp_sock *msk,
- 		struct sk_buff *skb;
- 		bool fin;
- 
--		if (sk_rmem_alloc_get(sk) > sk->sk_rcvbuf)
--			break;
--
- 		/* try to move as much data as available */
- 		map_remaining = subflow->map_data_len -
- 				mptcp_subflow_get_map_offset(subflow);
-@@ -739,7 +745,7 @@ static bool __mptcp_move_skbs_from_subflow(struct mptcp_sock *msk,
- 
- 			mptcp_init_skb(ssk, skb, offset, len);
- 
--			if (true) {
-+			if (own_msk && sk_rmem_alloc_get(sk) < sk->sk_rcvbuf) {
- 				mptcp_subflow_lend_fwdmem(subflow, skb);
- 				ret |= __mptcp_move_skb(sk, skb);
- 			} else {
-@@ -863,7 +869,7 @@ static bool move_skbs_to_msk(struct mptcp_sock *msk, struct sock *ssk)
- 	struct sock *sk = (struct sock *)msk;
- 	bool moved;
- 
--	moved = __mptcp_move_skbs_from_subflow(msk, ssk);
-+	moved = __mptcp_move_skbs_from_subflow(msk, ssk, true);
- 	__mptcp_ofo_queue(msk);
- 	if (unlikely(ssk->sk_err))
- 		__mptcp_subflow_error_report(sk, ssk);
-@@ -896,7 +902,7 @@ void mptcp_data_ready(struct sock *sk, struct sock *ssk)
- 		if (move_skbs_to_msk(msk, ssk) && mptcp_epollin_ready(sk))
- 			sk->sk_data_ready(sk);
- 	} else {
--		__set_bit(MPTCP_DEQUEUE, &mptcp_sk(sk)->cb_flags);
-+		__mptcp_move_skbs_from_subflow(msk, ssk, false);
- 	}
- 	mptcp_data_unlock(sk);
- }
-@@ -2136,60 +2142,80 @@ static void mptcp_rcv_space_adjust(struct mptcp_sock *msk, int copied)
- 	msk->rcvq_space.time = mstamp;
- }
- 
--static struct mptcp_subflow_context *
--__mptcp_first_ready_from(struct mptcp_sock *msk,
--			 struct mptcp_subflow_context *subflow)
-+static bool __mptcp_move_skbs(struct sock *sk, struct list_head *skbs, u32 *delta)
- {
--	struct mptcp_subflow_context *start_subflow = subflow;
--
--	while (!READ_ONCE(subflow->data_avail)) {
--		subflow = mptcp_next_subflow(msk, subflow);
--		if (subflow == start_subflow)
--			return NULL;
--	}
--	return subflow;
--}
--
--static bool __mptcp_move_skbs(struct sock *sk)
--{
--	struct mptcp_subflow_context *subflow;
-+	struct sk_buff *skb = list_first_entry(skbs, struct sk_buff, list);
- 	struct mptcp_sock *msk = mptcp_sk(sk);
--	bool ret = false;
-+	bool moved = false;
- 
--	if (list_empty(&msk->conn_list))
--		return false;
--
--	subflow = list_first_entry(&msk->conn_list,
--				   struct mptcp_subflow_context, node);
--	for (;;) {
--		struct sock *ssk;
--		bool slowpath;
--
--		/*
--		 * As an optimization avoid traversing the subflows list
--		 * and ev. acquiring the subflow socket lock before baling out
--		 */
-+	*delta = 0;
-+	while (1) {
-+		/* If the msk recvbuf is full stop, don't drop */
- 		if (sk_rmem_alloc_get(sk) > sk->sk_rcvbuf)
- 			break;
- 
--		subflow = __mptcp_first_ready_from(msk, subflow);
--		if (!subflow)
-+		prefetch(skb->next);
-+		list_del(&skb->list);
-+		*delta += skb->truesize;
-+
-+		moved |= __mptcp_move_skb(sk, skb);
-+		if (list_empty(skbs))
- 			break;
- 
--		ssk = mptcp_subflow_tcp_sock(subflow);
--		slowpath = lock_sock_fast(ssk);
--		ret = __mptcp_move_skbs_from_subflow(msk, ssk) || ret;
--		if (unlikely(ssk->sk_err))
--			__mptcp_error_report(sk);
--		unlock_sock_fast(ssk, slowpath);
--
--		subflow = mptcp_next_subflow(msk, subflow);
-+		skb = list_first_entry(skbs, struct sk_buff, list);
- 	}
- 
- 	__mptcp_ofo_queue(msk);
--	if (ret)
-+	if (moved)
- 		mptcp_check_data_fin((struct sock *)msk);
--	return ret;
-+	return moved;
-+}
-+
-+static bool mptcp_can_spool_backlog(struct sock *sk, struct list_head *skbs)
-+{
-+	struct mptcp_sock *msk = mptcp_sk(sk);
-+
-+	/* After CG initialization, subflows should never add skb before
-+	 * gaining the CG themself.
-+	 */
-+	DEBUG_NET_WARN_ON_ONCE(msk->backlog_unaccounted && sk->sk_socket &&
-+			       mem_cgroup_from_sk(sk));
-+
-+	/* Don't spool the backlog if the rcvbuf is full. */
-+	if (list_empty(&msk->backlog_list) ||
-+	    sk_rmem_alloc_get(sk) > sk->sk_rcvbuf)
-+		return false;
-+
-+	INIT_LIST_HEAD(skbs);
-+	list_splice_init(&msk->backlog_list, skbs);
-+	return true;
-+}
-+
-+static void mptcp_backlog_spooled(struct sock *sk, u32 moved,
-+				  struct list_head *skbs)
-+{
-+	struct mptcp_sock *msk = mptcp_sk(sk);
-+
-+	WRITE_ONCE(msk->backlog_len, msk->backlog_len - moved);
-+	list_splice(skbs, &msk->backlog_list);
-+}
-+
-+static bool mptcp_move_skbs(struct sock *sk)
-+{
-+	struct list_head skbs;
-+	bool enqueued = false;
-+	u32 moved;
-+
-+	mptcp_data_lock(sk);
-+	while (mptcp_can_spool_backlog(sk, &skbs)) {
-+		mptcp_data_unlock(sk);
-+		enqueued |= __mptcp_move_skbs(sk, &skbs, &moved);
-+
-+		mptcp_data_lock(sk);
-+		mptcp_backlog_spooled(sk, moved, &skbs);
-+	}
-+	mptcp_data_unlock(sk);
-+	return enqueued;
- }
- 
- static unsigned int mptcp_inq_hint(const struct sock *sk)
-@@ -2255,7 +2281,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 
- 		copied += bytes_read;
- 
--		if (skb_queue_empty(&sk->sk_receive_queue) && __mptcp_move_skbs(sk))
-+		if (!list_empty(&msk->backlog_list) && mptcp_move_skbs(sk))
- 			continue;
- 
- 		/* only the MPTCP socket status is relevant here. The exit
-@@ -3556,8 +3582,7 @@ void __mptcp_check_push(struct sock *sk, struct sock *ssk)
- 
- #define MPTCP_FLAGS_PROCESS_CTX_NEED (BIT(MPTCP_PUSH_PENDING) | \
- 				      BIT(MPTCP_RETRANSMIT) | \
--				      BIT(MPTCP_FLUSH_JOIN_LIST) | \
--				      BIT(MPTCP_DEQUEUE))
-+				      BIT(MPTCP_FLUSH_JOIN_LIST))
- 
- /* processes deferred events and flush wmem */
- static void mptcp_release_cb(struct sock *sk)
-@@ -3567,9 +3592,12 @@ static void mptcp_release_cb(struct sock *sk)
- 
- 	for (;;) {
- 		unsigned long flags = (msk->cb_flags & MPTCP_FLAGS_PROCESS_CTX_NEED);
--		struct list_head join_list;
-+		struct list_head join_list, skbs;
-+		bool spool_bl;
-+		u32 moved;
- 
--		if (!flags)
-+		spool_bl = mptcp_can_spool_backlog(sk, &skbs);
-+		if (!flags && !spool_bl)
- 			break;
- 
- 		INIT_LIST_HEAD(&join_list);
-@@ -3591,7 +3619,7 @@ static void mptcp_release_cb(struct sock *sk)
- 			__mptcp_push_pending(sk, 0);
- 		if (flags & BIT(MPTCP_RETRANSMIT))
- 			__mptcp_retrans(sk);
--		if ((flags & BIT(MPTCP_DEQUEUE)) && __mptcp_move_skbs(sk)) {
-+		if (spool_bl && __mptcp_move_skbs(sk, &skbs, &moved)) {
- 			/* notify ack seq update */
- 			mptcp_cleanup_rbuf(msk, 0);
- 			sk->sk_data_ready(sk);
-@@ -3599,6 +3627,8 @@ static void mptcp_release_cb(struct sock *sk)
- 
- 		cond_resched();
- 		spin_lock_bh(&sk->sk_lock.slock);
-+		if (spool_bl)
-+			mptcp_backlog_spooled(sk, moved, &skbs);
- 	}
- 
- 	if (__test_and_clear_bit(MPTCP_CLEAN_UNA, &msk->cb_flags))
-@@ -3856,7 +3886,7 @@ static int mptcp_ioctl(struct sock *sk, int cmd, int *karg)
- 			return -EINVAL;
- 
- 		lock_sock(sk);
--		if (__mptcp_move_skbs(sk))
-+		if (mptcp_move_skbs(sk))
- 			mptcp_cleanup_rbuf(msk, 0);
- 		*karg = mptcp_inq_hint(sk);
- 		release_sock(sk);
-@@ -4061,6 +4091,22 @@ static void mptcp_graft_subflows(struct sock *sk)
- 	struct mptcp_subflow_context *subflow;
- 	struct mptcp_sock *msk = mptcp_sk(sk);
- 
-+	if (mem_cgroup_sockets_enabled) {
-+		LIST_HEAD(join_list);
-+
-+		/* Subflows joining after __inet_accept() will get the
-+		 * mem CG properly initialized at mptcp_finish_join() time,
-+		 * but subflows pending in join_list need explicit
-+		 * initialization before flushing `backlog_unaccounted`
-+		 * or MPTCP can later unexpectedly observe unaccounted memory.
-+		 */
-+		mptcp_data_lock(sk);
-+		list_splice_init(&msk->join_list, &join_list);
-+		mptcp_data_unlock(sk);
-+
-+		__mptcp_flush_join_list(sk, &join_list);
-+	}
-+
- 	mptcp_for_each_subflow(msk, subflow) {
- 		struct sock *ssk = mptcp_subflow_tcp_sock(subflow);
- 
-@@ -4072,10 +4118,35 @@ static void mptcp_graft_subflows(struct sock *sk)
- 		if (!ssk->sk_socket)
- 			mptcp_sock_graft(ssk, sk->sk_socket);
- 
-+		if (!mem_cgroup_sk_enabled(sk))
-+			goto unlock;
-+
- 		__mptcp_inherit_cgrp_data(sk, ssk);
- 		__mptcp_inherit_memcg(sk, ssk, GFP_KERNEL);
-+
-+unlock:
- 		release_sock(ssk);
- 	}
-+
-+	if (mem_cgroup_sk_enabled(sk)) {
-+		gfp_t gfp = GFP_KERNEL | __GFP_NOFAIL;
-+		int amt;
-+
-+		/* Account the backlog memory; prior accept() is aware of
-+		 * fwd and rmem only.
-+		 */
-+		mptcp_data_lock(sk);
-+		amt = sk_mem_pages(sk->sk_forward_alloc +
-+				   msk->backlog_unaccounted +
-+				   atomic_read(&sk->sk_rmem_alloc)) -
-+		      sk_mem_pages(sk->sk_forward_alloc +
-+				   atomic_read(&sk->sk_rmem_alloc));
-+		msk->backlog_unaccounted = 0;
-+		mptcp_data_unlock(sk);
-+
-+		if (amt)
-+			mem_cgroup_sk_charge(sk, amt, gfp);
-+	}
- }
- 
- static int mptcp_stream_accept(struct socket *sock, struct socket *newsock,
-diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-index fe0dca4122f2..313da78e2b75 100644
---- a/net/mptcp/protocol.h
-+++ b/net/mptcp/protocol.h
-@@ -124,7 +124,6 @@
- #define MPTCP_FLUSH_JOIN_LIST	5
- #define MPTCP_SYNC_STATE	6
- #define MPTCP_SYNC_SNDBUF	7
--#define MPTCP_DEQUEUE		8
- 
- struct mptcp_skb_cb {
- 	u64 map_seq;
-@@ -360,6 +359,7 @@ struct mptcp_sock {
- 
- 	struct list_head backlog_list;	/* protected by the data lock */
- 	u32		backlog_len;
-+	u32		backlog_unaccounted;
- };
- 
- #define mptcp_data_lock(sk) spin_lock_bh(&(sk)->sk_lock.slock)
+ drivers/net/ethernet/marvell/mvneta.c           | 14 +++-----------
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 11 ++++++++---
+ 2 files changed, 11 insertions(+), 14 deletions(-)
+---
+base-commit: e2c20036a8879476c88002730d8a27f4e3c32d4b
+change-id: 20251121-marvell-0264eb5b214a
 
--- 
-2.51.0
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
