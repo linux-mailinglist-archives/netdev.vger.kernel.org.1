@@ -1,94 +1,88 @@
-Return-Path: <netdev+bounces-240907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABE9CC7BEF0
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:16:25 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3733CC7BF12
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:28:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 796514E3259
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 23:14:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 01E0D4E1724
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 23:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FA3313540;
-	Fri, 21 Nov 2025 23:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8916630BF59;
+	Fri, 21 Nov 2025 23:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gj6sVInS"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="jSSqjGe/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5A231283E
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 23:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE142EDD7E
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 23:27:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763766843; cv=none; b=aDxLjh+YiMq2WyFHcWOHfR+7cpTizQJDBLXUG9e2O6I74rvBpmlQyoNYm0D5nJe5kxiHXUPIzmJSXH78mDzhvm7BQkULudZCFv0v41b2oUh+nYHecs/vq6YNWNhzzJSGT6c1uQRTucmYFYeJRj6YQ1iDnwCqgnMIQ54Aoy6HdjM=
+	t=1763767687; cv=none; b=T2XIyPc3e6eQekvwt7n/k42rrMQ6w9q3M5GTDwwijci92g1q/E9T0hS4XzoO1gZWdq2uVGETxWkXRhyJ26CJHZLaIGclI6uv6gpeqzEPCvCApicyNXMQoRSce6i6eZSH4WLR7fPzjLkXNCocmY6zuYfx0mlkGjHQNGG9eh4Rbr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763766843; c=relaxed/simple;
-	bh=j3HhbcDJGAZ+KHPYwNusGru13+91oPjZ9of1S1u8p4Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NQy732ZdZYqp1S1BS+tPyFHzJz7M1PCl5grgE+GT0r4ck0Gn5CkHGo/SQqxvUVHH6J+XxeYerpP+KS7v0DuCHtW4d9q0IFCMljQsgH3wUjiVmx3Gu61V7v4U9qOLkvvQY3ovv1XWq0zO3of8y/esGE5PUbIvg4Yaartcw4/7mm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gj6sVInS; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-29845b06dd2so31638515ad.2
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 15:14:00 -0800 (PST)
+	s=arc-20240116; t=1763767687; c=relaxed/simple;
+	bh=4x0yFS1G6/qQ3vA1WwHwNq63xJUDTisqyZbFdhGku4A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=chPtfLX5mfJsZlDe9ZkXn2YViLQTe75fVCWOHhIsPhzChCjNC8MJBb1fSxTWFtyz6du0Drh/RF+P1+v7ecbSTjXRcupNihtxMk616sixq9P5g5m5IBh8xinkc+1sVpswEu6nMK0ICbyCeH5L5WAsvjQD5y7GrYhmotxcxO4HNfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=jSSqjGe/; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7b852bb31d9so3062751b3a.0
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 15:27:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763766840; x=1764371640; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OC6A8mPFLhueq64eXidqCz96jiCjvdyEHQ90Q6pI/JM=;
-        b=Gj6sVInSdlZtMRf1/Rz1Sy3CHerTqUBUDtQcdW87zhr+XutSv8qIzxbn/mzqwaapQW
-         6BBmPv34MD02QtSsdSW3Clych1m/d1FxDLXwZOVJPY9Czn+RSfdhOMsx3/GFeBBELVo1
-         zu06WSs2a4x82IJa2AOlpexW49vpQ2f2MlSGHa620Argek3G/GVKbkBXZWNOyqz7dXsh
-         dM1oYNkQIzd/LU62Alq7t13ukr2zcZ9+cdelW3NWTt9X2iLsYUBsdG93W0Eg+o/F9Til
-         KJSfWw9FcZXLnj5JkId0boS0wOef4JI03lFEcDS0sjiHHnoMztZ2KQESzn5FYu+Bnvxs
-         jBTw==
+        d=asu.edu; s=google; t=1763767675; x=1764372475; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ACQddHZcDaCDM4L+eMLnqjgNPpNjJRnV3lGXdOduM+A=;
+        b=jSSqjGe/ypLpA69qXopBxdT/P8G2ic2dbIBix4tQJ2kdJXAuGnGJjRlUcygn1oqRM1
+         r8eXcQzH4Waz5RfZ0tOThotAg/Nzro7afoU5gFiUMEfmsQ6C0exLctML/2RhPJNZXhhL
+         lJoBA3c2RQDAGXPAetvesLZ+M9C/qxLYn6O3O+KTVlmnwRGzp8+giPcVQJL43wKoMih3
+         BUuOkni+p88W/nwrIFMB/qDfS42UR9CDsFid7LvMr2XOYzWqxFG8Rjr/FKGzhbb8qTjM
+         qqVGvp0uYrT2LpM9d7QBD806Gq3qQrUqKx82zPGvuxXOgHi2o0pwRMfL1YIjbRS89zKr
+         BH8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763766840; x=1764371640;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OC6A8mPFLhueq64eXidqCz96jiCjvdyEHQ90Q6pI/JM=;
-        b=j9aaTxBQ85N0WStDvrDn1Q46tRypNpkhlqkQxz9mnoECiklJYc50TEABc6c3DQbUDY
-         9YMF80JqKVOKn07T5PN0CZSJG1UGJSv4QgX1ScmpodD9NDlqcSI9VQNPWt3wZggeGTpn
-         FGlbmEU+SCY6O3k2Ij5ZVAfOpZ4AaZ5PvzObizbA7UWpJkZ8di6Kb9/fBTMaLhZGav7U
-         cAFtTbViU7Qgt+xLQKp7lSwXFl/l8gn/qgPKJN0nbSpiVpBLesAiZH+SnmYWSVR5c6+a
-         3CWQ8UhuJ1itMtlO9yCCrRDjXzJFUAJgfix33br3/wPU1/EiB/FqdymCRjud9tCM+QFi
-         jSTA==
-X-Gm-Message-State: AOJu0YwHoEjrNBmA5A7BpN3INUADK7ff9O9/pN7RqhP3mvUz8LwaccPM
-	y6hdHLJrY9/ghHKXgJajagV2YpIo4vFKlRUv5eWtuSAeN3l1jSLDVvcr
-X-Gm-Gg: ASbGncsqENMPa/wU1GvR1NIkNjS35gQDsT5eROo6iFKqOMe8kMnSt1MR6lPdL3w9Eta
-	8qSVGyCqWdzFj2uDBdKmvvURHUp2fc8pyINmGFifH/OBvPaFJ4PaO50lPzMAF4hqQs3dmrtPNLX
-	R7ocSxx4lwAMw3Rae3v1kfkSegdNd/kjkZPg0k/7s6216It9Duen0wyiSPvOlTLpFkF0Li5fCPd
-	7cBFX9j2rNICYMQjuN3rx53CC7zdvm4Js3yTUnpdocXlUjQzlEzGRCPwjKTQn+DKDaqJ6QrsBjV
-	VbV2+tsm7CGx+0bXVNzM7+smT9q3rbX7lj4n450HeuQ/n7YuUzTgD+U05ITWNLCEm7wdwyJ4hRb
-	lZZHUrwNnWGv/JHnf8WUG+7KvicebA3zEnSK4bCU7es/xeZko9JcRbgflT9VAD+iAsZh9OTeWav
-	G4gg89S+XpCqoyTQ==
-X-Google-Smtp-Source: AGHT+IFdIPv+fCYsGWSNxnZXtdjctxLEPTAGeo+FYiMRLUEiHSN3+03oqRfaaUe071hIg48Vweorfw==
-X-Received: by 2002:a17:903:2c9:b0:297:c638:d7c9 with SMTP id d9443c01a7336-29b6c3e813emr42894375ad.13.1763766840410;
-        Fri, 21 Nov 2025 15:14:00 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:48::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b111f65sm67791655ad.13.2025.11.21.15.13.59
+        d=1e100.net; s=20230601; t=1763767675; x=1764372475;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ACQddHZcDaCDM4L+eMLnqjgNPpNjJRnV3lGXdOduM+A=;
+        b=wYI0aFddKovSuwGLmzroZU+kv19mvgJ56R0AeY+i8srNSBHXrcUm3mcDwbsF+o7yJv
+         Vgueri1Hj25smYLRE41ajjFbbV5uQWupZhiR+4SvAebvfpq7wewLFsw97lRQyG/AoxuE
+         0oqbW4LFIHwrgf4HxrIJf0yqg8L4Pnm8RrkCsNIg0VHtmhwYzF2xlX3HQb1A8wgBF4UT
+         7kJ5nOuP4Ol05tE2T9+s7tJL7XLbnHli5JZ8OIimGUTgKMDJ0SqMWetQGPLx6fr/q8BD
+         RBQiZHZeSeleoo0YJwc4zSBN09vMvmNAtcMW99h2nMK9v2Gqe35E1A7EoFi7HqW8eSV9
+         zLZA==
+X-Gm-Message-State: AOJu0YytpyQjHQUVSaQ8U2ISE2HCY3hGV/i9CynYStulDnP8N06Pp87d
+	0MsfbHZ2dKuiXeaix4fvCM9iI+1HTB4ein1q7mShxCbq8r2dwQ/W8ceUfj+dVGQsKA==
+X-Gm-Gg: ASbGncv3+jQV3DTS6Hkrt5xHCw//Ymj3YpHMBJilLXA6JWiVKRr30b/EmQcXeJnXMkj
+	pMzenv/Z8pGPDKDHN9U4fG0YgVjrUK21/JG+qiD5O4J7DmCwqQIHWR/d53SB/NRA06zvX0qfauA
+	UMyIBpPq4d0WJCFFcwCZW0G+1PAA+ZBkMu5MTJTpafxSXLT+VG3u8Uu+5lqVt2hnc5Yx5oyU58D
+	GPQHZhAUAWkgg/zCkC8ZZCeJ1LuijTEzL9KFHH+7ofzgSccXvDaPDE5p7Jgr/G12qKMjyqGP6Jr
+	EO8il/qMf9lf40aSnMPQnCPJqOrkk3Cl8uRrBbeDxV3bgx5MGe7RMdF1XjOrt0wQWZaLymbBy8L
+	/Ni0xnzc9aHHRYDYxMjf3SpR5YpKR9qy5RmUy/DWaD4KS5i+kBqfaYO55KdWCnMj9oiTQO79Puc
+	KnGDWyTL53wTSmhaVUEUON+ZAYO6nF/i9F6ByVJ3kU
+X-Google-Smtp-Source: AGHT+IFmqosMYWpJDWj3TYGKEUWHYx3dE5wLEGG4lzl9FC1I9zK9qz+rYoFclwit74bSZLRBFroScQ==
+X-Received: by 2002:a05:7022:412:b0:11a:4ffb:9849 with SMTP id a92af1059eb24-11c9d811985mr1925590c88.21.1763767675380;
+        Fri, 21 Nov 2025 15:27:55 -0800 (PST)
+Received: from p1.tailc0aff1.ts.net (209-147-139-51.nat.asu.edu. [209.147.139.51])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11c93e6dbc8sm30222906c88.10.2025.11.21.15.27.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 15:14:00 -0800 (PST)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
+        Fri, 21 Nov 2025 15:27:54 -0800 (PST)
+From: Xiang Mei <xmei5@asu.edu>
+To: security@kernel.org
 Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	tj@kernel.org,
-	martin.lau@kernel.org,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v7 6/6] selftests/bpf: Test getting associated struct_ops in timer callback
-Date: Fri, 21 Nov 2025 15:13:52 -0800
-Message-ID: <20251121231352.4032020-7-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251121231352.4032020-1-ameryhung@gmail.com>
-References: <20251121231352.4032020-1-ameryhung@gmail.com>
+	toke@toke.dk,
+	xiyou.wangcong@gmail.com,
+	cake@lists.bufferbloat.net,
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net v5] net/sched: sch_cake: Fix incorrect qlen reduction in cake_drop
+Date: Fri, 21 Nov 2025 16:27:35 -0700
+Message-ID: <20251121232735.1020046-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,217 +91,175 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Make sure 1) a timer callback can also reference the associated
-struct_ops, and then make sure 2) the timer callback cannot get a
-dangled pointer to the struct_ops when the map is freed.
+In cake_drop(), qdisc_tree_reduce_backlog() is used to update the qlen
+and backlog of the qdisc hierarchy. Its caller, cake_enqueue(), assumes
+that the parent qdisc will enqueue the current packet. However, this
+assumption breaks when cake_enqueue() returns NET_XMIT_CN: the parent
+qdisc stops enqueuing current packet, leaving the tree qlen/backlog
+accounting inconsistent. This mismatch can lead to a NULL dereference
+(e.g., when the parent Qdisc is qfq_qdisc).
 
-The test schedules a timer callback from a struct_ops program since
-struct_ops programs do not pin the map. It is possible for the timer
-callback to run after the map is freed. The timer callback calls a
-kfunc that runs .test_1() of the associated struct_ops, which should
-return MAP_MAGIC when the map is still alive or -1 when the map is
-gone.
+This patch computes the qlen/backlog delta in a more robust way by
+observing the difference before and after the series of cake_drop()
+calls, and then compensates the qdisc tree accounting if cake_enqueue()
+returns NET_XMIT_CN.
 
-The first subtest added in this patch schedules the timer callback to
-run immediately, while the map is still alive. The second subtest added
-schedules the callback to run 500ms after syscall_prog runs and then
-frees the map right after syscall_prog runs. Both subtests then wait
-until the callback runs to check the return of the kfunc.
+To ensure correct compensation when ACK thinning is enabled, a new
+variable is introduced to keep qlen unchanged.
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
+Fixes: 15de71d06a40 ("net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit")
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
 ---
- .../bpf/prog_tests/test_struct_ops_assoc.c    | 81 +++++++++++++++++++
- .../bpf/progs/struct_ops_assoc_in_timer.c     | 77 ++++++++++++++++++
- 2 files changed, 158 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_assoc_in_timer.c
+v2: add missing cc
+v3: move qdisc_tree_reduce_backlog out of cake_drop
+v4: remove redundant variable and handle ack branch correctly
+v5: add the PoC as a test case
+---
+ net/sched/sch_cake.c                          | 52 +++++++++++--------
+ .../tc-testing/tc-tests/qdiscs/cake.json      | 28 ++++++++++
+ 2 files changed, 58 insertions(+), 22 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c b/tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
-index 02173504f675..461ded722351 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
-@@ -3,6 +3,7 @@
- #include <test_progs.h>
- #include "struct_ops_assoc.skel.h"
- #include "struct_ops_assoc_reuse.skel.h"
-+#include "struct_ops_assoc_in_timer.skel.h"
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index 32bacfc314c2..cf4d6454ca9c 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -1597,7 +1597,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
  
- static void test_st_ops_assoc(void)
- {
-@@ -101,10 +102,90 @@ static void test_st_ops_assoc_reuse(void)
- 	struct_ops_assoc_reuse__destroy(skel);
- }
+ 	qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
+ 	sch->q.qlen--;
+-	qdisc_tree_reduce_backlog(sch, 1, len);
  
-+static void test_st_ops_assoc_in_timer(void)
-+{
-+	struct struct_ops_assoc_in_timer *skel = NULL;
-+	int err;
+ 	cake_heapify(q, 0);
+ 
+@@ -1750,7 +1749,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	ktime_t now = ktime_get();
+ 	struct cake_tin_data *b;
+ 	struct cake_flow *flow;
+-	u32 idx, tin;
++	u32 idx, tin, prev_qlen, prev_backlog, drop_id;
++	bool same_flow = false;
+ 
+ 	/* choose flow to insert into */
+ 	idx = cake_classify(sch, &b, skb, q->flow_mode, &ret);
+@@ -1823,6 +1823,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		consume_skb(skb);
+ 	} else {
+ 		/* not splitting */
++		int ack_pkt_len = 0;
 +
-+	skel = struct_ops_assoc_in_timer__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "struct_ops_assoc_in_timer__open"))
-+		goto out;
-+
-+	err = bpf_program__assoc_struct_ops(skel->progs.syscall_prog,
-+					    skel->maps.st_ops_map, NULL);
-+	ASSERT_OK(err, "bpf_program__assoc_struct_ops");
-+
-+	err = struct_ops_assoc_in_timer__attach(skel);
-+	if (!ASSERT_OK(err, "struct_ops_assoc__attach"))
-+		goto out;
-+
-+	/*
-+	 * Run .test_1 by calling kfunc bpf_kfunc_multi_st_ops_test_1_prog_arg() and checks
-+	 * the return value. .test_1 will also schedule timer_cb that runs .test_1 again
-+	 * immediately.
-+	 */
-+	err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.syscall_prog), NULL);
-+	ASSERT_OK(err, "bpf_prog_test_run_opts");
-+
-+	/* Check the return of the kfunc after timer_cb runs */
-+	while (!READ_ONCE(skel->bss->timer_cb_run))
-+		sched_yield();
-+	ASSERT_EQ(skel->bss->timer_test_1_ret, 1234, "skel->bss->timer_test_1_ret");
-+	ASSERT_EQ(skel->bss->test_err, 0, "skel->bss->test_err_a");
-+out:
-+	struct_ops_assoc_in_timer__destroy(skel);
-+}
-+
-+static void test_st_ops_assoc_in_timer_no_uref(void)
-+{
-+	struct struct_ops_assoc_in_timer *skel = NULL;
-+	struct bpf_link *link;
-+	int err;
-+
-+	skel = struct_ops_assoc_in_timer__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "struct_ops_assoc_in_timer__open"))
-+		goto out;
-+
-+	err = bpf_program__assoc_struct_ops(skel->progs.syscall_prog,
-+					    skel->maps.st_ops_map, NULL);
-+	ASSERT_OK(err, "bpf_program__assoc_struct_ops");
-+
-+	link = bpf_map__attach_struct_ops(skel->maps.st_ops_map);
-+	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops"))
-+		goto out;
-+
-+	/*
-+	 * Run .test_1 by calling kfunc bpf_kfunc_multi_st_ops_test_1_prog_arg() and checks
-+	 * the return value. .test_1 will also schedule timer_cb that runs .test_1 again.
-+	 * timer_cb will run 500ms after syscall_prog runs, when the user space no longer
-+	 * holds a reference to st_ops_map.
-+	 */
-+	skel->bss->timer_ns = 500000000;
-+	err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.syscall_prog), NULL);
-+	ASSERT_OK(err, "bpf_prog_test_run_opts");
-+
-+	/* Detach and close struct_ops map to cause it to be freed */
-+	bpf_link__destroy(link);
-+	close(bpf_program__fd(skel->progs.syscall_prog));
-+	close(bpf_map__fd(skel->maps.st_ops_map));
-+
-+	/* Check the return of the kfunc after timer_cb runs */
-+	while (!READ_ONCE(skel->bss->timer_cb_run))
-+		sched_yield();
-+	ASSERT_EQ(skel->bss->timer_test_1_ret, -1, "skel->bss->timer_test_1_ret");
-+	ASSERT_EQ(skel->bss->test_err, 0, "skel->bss->test_err_a");
-+out:
-+	struct_ops_assoc_in_timer__destroy(skel);
-+}
-+
- void test_struct_ops_assoc(void)
- {
- 	if (test__start_subtest("st_ops_assoc"))
- 		test_st_ops_assoc();
- 	if (test__start_subtest("st_ops_assoc_reuse"))
- 		test_st_ops_assoc_reuse();
-+	if (test__start_subtest("st_ops_assoc_in_timer"))
-+		test_st_ops_assoc_in_timer();
-+	if (test__start_subtest("st_ops_assoc_in_timer_no_uref"))
-+		test_st_ops_assoc_in_timer_no_uref();
- }
-diff --git a/tools/testing/selftests/bpf/progs/struct_ops_assoc_in_timer.c b/tools/testing/selftests/bpf/progs/struct_ops_assoc_in_timer.c
-new file mode 100644
-index 000000000000..9d4e427568b2
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/struct_ops_assoc_in_timer.c
-@@ -0,0 +1,77 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <vmlinux.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_misc.h"
-+#include "../test_kmods/bpf_testmod.h"
-+#include "../test_kmods/bpf_testmod_kfunc.h"
-+
-+char _license[] SEC("license") = "GPL";
-+
-+struct elem {
-+	struct bpf_timer timer;
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 1);
-+	__type(key, int);
-+	__type(value, struct elem);
-+} array_map SEC(".maps");
-+
-+#define MAP_MAGIC 1234
-+int recur;
-+int test_err;
-+int timer_ns;
-+int timer_test_1_ret;
-+int timer_cb_run;
-+
-+__noinline static int timer_cb(void *map, int *key, struct bpf_timer *timer)
-+{
-+	struct st_ops_args args = {};
-+
-+	recur++;
-+	timer_test_1_ret = bpf_kfunc_multi_st_ops_test_1_prog_arg(&args, NULL);
-+	recur--;
-+
-+	timer_cb_run++;
-+
-+	return 0;
-+}
-+
-+SEC("struct_ops")
-+int BPF_PROG(test_1, struct st_ops_args *args)
-+{
-+	struct bpf_timer *timer;
-+	int key = 0;
-+
-+	if (!recur) {
-+		timer = bpf_map_lookup_elem(&array_map, &key);
-+		if (!timer)
-+			return 0;
-+
-+		bpf_timer_init(timer, &array_map, 1);
-+		bpf_timer_set_callback(timer, timer_cb);
-+		bpf_timer_start(timer, timer_ns, 0);
+ 		cobalt_set_enqueue_time(skb, now);
+ 		get_cobalt_cb(skb)->adjusted_len = cake_overhead(q, skb);
+ 		flow_queue_add(flow, skb);
+@@ -1834,7 +1836,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 			b->ack_drops++;
+ 			sch->qstats.drops++;
+ 			b->bytes += qdisc_pkt_len(ack);
+-			len -= qdisc_pkt_len(ack);
++			ack_pkt_len = qdisc_pkt_len(ack);
+ 			q->buffer_used += skb->truesize - ack->truesize;
+ 			if (q->rate_flags & CAKE_FLAG_INGRESS)
+ 				cake_advance_shaper(q, b, ack, now, true);
+@@ -1848,11 +1850,11 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 
+ 		/* stats */
+ 		b->packets++;
+-		b->bytes	    += len;
+-		b->backlogs[idx]    += len;
+-		b->tin_backlog      += len;
+-		sch->qstats.backlog += len;
+-		q->avg_window_bytes += len;
++		b->bytes	    += len - ack_pkt_len;
++		b->backlogs[idx]    += len - ack_pkt_len;
++		b->tin_backlog      += len - ack_pkt_len;
++		sch->qstats.backlog += len - ack_pkt_len;
++		q->avg_window_bytes += len - ack_pkt_len;
+ 	}
+ 
+ 	if (q->overflow_timeout)
+@@ -1927,24 +1929,30 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	if (q->buffer_used > q->buffer_max_used)
+ 		q->buffer_max_used = q->buffer_used;
+ 
+-	if (q->buffer_used > q->buffer_limit) {
+-		bool same_flow = false;
+-		u32 dropped = 0;
+-		u32 drop_id;
++	if (q->buffer_used <= q->buffer_limit)
++		return NET_XMIT_SUCCESS;
+ 
+-		while (q->buffer_used > q->buffer_limit) {
+-			dropped++;
+-			drop_id = cake_drop(sch, to_free);
++	prev_qlen = sch->q.qlen;
++	prev_backlog = sch->qstats.backlog;
+ 
+-			if ((drop_id >> 16) == tin &&
+-			    (drop_id & 0xFFFF) == idx)
+-				same_flow = true;
+-		}
+-		b->drop_overlimit += dropped;
++	while (q->buffer_used > q->buffer_limit) {
++		drop_id = cake_drop(sch, to_free);
++		if ((drop_id >> 16) == tin &&
++		    (drop_id & 0xFFFF) == idx)
++			same_flow = true;
 +	}
 +
-+	return MAP_MAGIC;
-+}
-+
-+SEC("syscall")
-+int syscall_prog(void *ctx)
-+{
-+	struct st_ops_args args = {};
-+	int ret;
-+
-+	ret = bpf_kfunc_multi_st_ops_test_1_prog_arg(&args, NULL);
-+	if (ret != MAP_MAGIC)
-+		test_err++;
-+
-+	return 0;
-+}
-+
-+SEC(".struct_ops.link")
-+struct bpf_testmod_multi_st_ops st_ops_map = {
-+	.test_1 = (void *)test_1,
-+};
++	/* Compute the droppped qlen and pkt length */
++	prev_qlen -= sch->q.qlen;
++	prev_backlog -= sch->qstats.backlog;
++	b->drop_overlimit += prev_backlog;
+ 
+-		if (same_flow)
+-			return NET_XMIT_CN;
++	if (same_flow) {
++		qdisc_tree_reduce_backlog(sch, prev_qlen - 1,
++					  prev_backlog - len);
++		return NET_XMIT_CN;
+ 	}
++	qdisc_tree_reduce_backlog(sch, prev_qlen, prev_backlog);
+ 	return NET_XMIT_SUCCESS;
+ }
+ 
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/cake.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/cake.json
+index c4c5f7ba0e0f..47ecd3fb1ea4 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/cake.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/cake.json
+@@ -441,5 +441,33 @@
+         "teardown": [
+             "$TC qdisc del dev $DUMMY handle 1: root"
+         ]
++    },
++    {
++	"id": "4366",
++	"name": "Enqueue CAKE with packets dropping",
++	"category": [
++	    "qdisc",
++	    "cake",
++	    "netem"
++	],
++	"plugins": {
++	    "requires": "nsPlugin"
++	},
++	"setup":[
++	    "$TC qdisc add dev $DUMMY handle 1: root qfq",
++	    "$TC class add dev $DUMMY parent 1: classid 1:1 qfq maxpkt 1024",
++	    "$TC qdisc add dev $DUMMY parent 1:1 handle 2: cake memlimit 9",
++	    "$TC filter add dev $DUMMY protocol ip parent 1: prio 1 u32 match ip protocol 1 0xff flowid 1:1",
++	    "ping -I$DUMMY -f -c1 -s64 -W1 10.10.10.1 || true",
++	    "$TC qdisc replace dev $DUMMY parent 1:1 handle 3: netem delay 0ms"
++	],
++	"cmdUnderTest": "ping -I$DUMMY -f -c1 -s64 -W1 10.10.10.1 || true",
++	"expExitCode": "0",
++	"verifyCmd": "$TC -s qdisc show dev $DUMMY",
++	"matchPattern": "qdisc qfq 1:",
++	"matchCount": "1",
++	"teardown": [
++	    "$TC qdisc del dev $DUMMY handle 1: root"
++	]
+     }
+ ]
 -- 
-2.47.3
+2.43.0
 
 
