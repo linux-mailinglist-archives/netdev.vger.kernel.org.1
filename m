@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-240621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47EFCC7702A
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:31:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 416E4C77024
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 03:31:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8D2784E3A47
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 02:31:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id EE78E2F6EB
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 02:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0FD272E45;
-	Fri, 21 Nov 2025 02:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDD427E045;
+	Fri, 21 Nov 2025 02:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eE9LHaH3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I/Z+pkG2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F451D88D7;
-	Fri, 21 Nov 2025 02:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D0727CB04
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 02:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763692258; cv=none; b=dPHnyaTR9B6xi0/9s2ptKYpGIv0LO+JLLSJalvU3GXUq3MRF/lmhWw6fZE1vSyOprSFRbxdyp4NAjk6C0PS20YsjsDPHdj+jYMc1nIA411Q6LlsjqjHZ+9NWk4M7nFs2JgsFBWrfWfQBXyb8ls+uSM/nZ1wxzBHW4zNxg9FOca0=
+	t=1763692261; cv=none; b=psp6A1Q8gvMnFppekhRnNJkqnLkH3rZk/Sdj5FBeSZ7kdS43IkyqxtUHZajaFXZQiXB7RiA//d2Y7podgQwvBHVOU1G0WQJMpEZFUz3RTEEG9AQtGko9V0HUULqIxxoLNMrQmWv5Jcm/Vro9H8Te2bBcgWgj0Ib/egk1JMSu+3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763692258; c=relaxed/simple;
-	bh=ZNJ7IlFBKgvQnIy25U/SmLqcjvdVTuAY1B/5dIQjkoM=;
+	s=arc-20240116; t=1763692261; c=relaxed/simple;
+	bh=foWsoqPQFbgcBhIcFsmUkf7F+sEdBrJ4J6s4XKl1j0c=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LV5SxFLmqDvyWt2oVgsJPB4CQMB2x0tjll+hRFVwUCIw1yk88GsnKyP4+D6n7qD2CzTXhZ35wOwylcs+T5jk2IoN5GOAhmn2+t1whfDixiV3omWlsDWjJybBfGC6p6jAwpzbRgtOdi7eNOZMXKp6PxQ0kqkGBQjwpclVnt/xiJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eE9LHaH3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7258C4CEF1;
-	Fri, 21 Nov 2025 02:30:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=J9ubxP8Ffb1laog4BuGO8GhmHtICzME8eH7cXhKqZZb8T3TsAb+T3Jn+PFo3V5rUKDMIqigKckuvcDz6wNGA0FrYeJYuWoooRiDNt3nxk+l26HJuIexZm6ZNGiQq69kOjY2YtJEVEmGdlbFuYdkweqKaiTPu4htdsePSGA2fM9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I/Z+pkG2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7488BC4CEF1;
+	Fri, 21 Nov 2025 02:30:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763692257;
-	bh=ZNJ7IlFBKgvQnIy25U/SmLqcjvdVTuAY1B/5dIQjkoM=;
+	s=k20201202; t=1763692259;
+	bh=foWsoqPQFbgcBhIcFsmUkf7F+sEdBrJ4J6s4XKl1j0c=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eE9LHaH34o5ZZtIFzNHhp3nUqnl9CrxnoLy2aPRtRvjnQ9Jz9A6or900iSUXGUt9F
-	 zVk7/j3NMc4QZcyrsNIrXxXjmTErW04ErU2cI+fWhZwzuLsqOIcdp9G8IuJqlwQyuO
-	 oUn4lxJ4E0aUaZdfnaSDG2AGxPRGHbspJeSQ39dtqA3CnXQ9ogQSIz2OC6gf5gQMM1
-	 jAX0OrtyYNtebBeRKP9R66X3zvc7fW0Yx1nHYo/0R43N5m3k0wdWswmNL2G48N4gcu
-	 mRu5XVsL2wZH3/aRRBk6tUJFr92Fm73ORFottCQq+6h//MjkR51SZ3RCIXDPLrJK6s
-	 LuKuG/At0xyJw==
+	b=I/Z+pkG2foTeXTVQzrf1xa9HuK8Maw/IZAiwXWo5fgBj9DARTIdxMtLKPrRqbEjnD
+	 5jy08TjCSCyugR4dy2zAh5afyaivPP2X+2fkq5FK0cfElPWnFqaJbOH6qpn4q+zM3L
+	 ts7opTn0993nUhnjomyjDBdvAnrCF5XfIIRaDb4ZXbfokXAQ7Z1h8R9rwE+jmlOGvd
+	 cnyAEy8LiH7rKe1gxAuyMLoxu6Ji7hBZQ1Hi15sh8kAtvWtsikv/th9rOxskzsDA+R
+	 6aUhNr0rCIyRqsAso3JoTGux7da4AGtRqaCHD4xIH6Ux+ck+y3biUHJXp41M/U57mI
+	 rLbr1sUZzekUQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAECA3A41003;
-	Fri, 21 Nov 2025 02:30:23 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC913A41003;
+	Fri, 21 Nov 2025 02:30:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,66 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 00/12] selftests: drv-net: convert GRO and
- Toeplitz tests to work for drivers in NIPA
+Subject: Re: [PATCH net-next] net: phy: fixed_phy: fix missing initialization
+ of
+ fixed phy link
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176369222275.1865531.9454432875896275033.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Nov 2025 02:30:22 +0000
-References: <20251120021024.2944527-1-kuba@kernel.org>
-In-Reply-To: <20251120021024.2944527-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- willemdebruijn.kernel@gmail.com, shuah@kernel.org, sdf@fomichev.me,
- krakauer@google.com, linux-kselftest@vger.kernel.org, petrm@nvidia.com,
- matttbe@kernel.org
+ <176369222433.1865531.13427564398081878544.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Nov 2025 02:30:24 +0000
+References: <dab6c10e-725e-4648-9662-39cc821723d0@gmail.com>
+In-Reply-To: <dab6c10e-725e-4648-9662-39cc821723d0@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: andrew@lunn.ch, linux@armlinux.org.uk, pabeni@redhat.com,
+ edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 19 Nov 2025 18:10:12 -0800 you wrote:
-> Main objective of this series is to convert the gro.sh and toeplitz.sh
-> tests to be "NIPA-compatible" - meaning make use of the Python env,
-> which lets us run the tests against either netdevsim or a real device.
+On Wed, 19 Nov 2025 08:05:45 +0100 you wrote:
+> Original change remove the link initialization from the passed struct
+> fixed_phy_status, but missed to add it in all places in the code.
 > 
-> The tests seem to have been written with a different flow in mind.
-> Namely they source different bash "setup" scripts depending on arguments
-> passed to the test. While I have nothing against the use of bash and
-> the overall architecture - the existing code needs quite a bit of work
-> (don't assume MAC/IP addresses, support remote endpoint over SSH).
-> If I'm the one fixing it, I'd rather convert them to our "simplistic"
-> Python.
-> 
-> [...]
+> Fixes: 9f07af1d2742 ("net: phy: fixed_phy: initialize the link status as up")
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  drivers/net/phy/fixed_phy.c | 1 +
+>  1 file changed, 1 insertion(+)
 
 Here is the summary with links:
-  - [net-next,v3,01/12] selftests: net: py: coding style improvements
-    https://git.kernel.org/netdev/net-next/c/5cb7b71b76f1
-  - [net-next,v3,02/12] selftests: net: py: extract the case generation logic
-    https://git.kernel.org/netdev/net-next/c/80970e0fc07e
-  - [net-next,v3,03/12] selftests: net: py: add test variants
-    https://git.kernel.org/netdev/net-next/c/6ae67f115986
-  - [net-next,v3,04/12] selftests: drv-net: xdp: use variants for qstat tests
-    https://git.kernel.org/netdev/net-next/c/173227d7d6c4
-  - [net-next,v3,05/12] selftests: net: relocate gro and toeplitz tests to drivers/net
-    https://git.kernel.org/netdev/net-next/c/89268f7dbca1
-  - [net-next,v3,06/12] selftests: net: py: support ksft ready without wait
-    https://git.kernel.org/netdev/net-next/c/e02b52ecef5b
-  - [net-next,v3,07/12] selftests: net: py: read ip link info about remote dev
-    https://git.kernel.org/netdev/net-next/c/15011a57d0ec
-  - [net-next,v3,08/12] netdevsim: pass packets thru GRO on Rx
-    https://git.kernel.org/netdev/net-next/c/40dd789bc5a7
-  - [net-next,v3,09/12] selftests: drv-net: add a Python version of the GRO test
-    https://git.kernel.org/netdev/net-next/c/fdb0267d565a
-  - [net-next,v3,10/12] selftests: drv-net: hw: convert the Toeplitz test to Python
-    https://git.kernel.org/netdev/net-next/c/9cf9aa77a1f6
-  - [net-next,v3,11/12] netdevsim: add loopback support
-    https://git.kernel.org/netdev/net-next/c/358008f41d9b
-  - [net-next,v3,12/12] selftests: net: remove old setup_* scripts
-    https://git.kernel.org/netdev/net-next/c/bd28e5bddc1a
+  - [net-next] net: phy: fixed_phy: fix missing initialization of fixed phy link
+    https://git.kernel.org/netdev/net-next/c/bd048f8ce6ce
 
 You are awesome, thank you!
 -- 
