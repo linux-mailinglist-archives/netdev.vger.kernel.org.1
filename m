@@ -1,144 +1,154 @@
-Return-Path: <netdev+bounces-240877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25CEEC7BB1A
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 21:57:38 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC48FC7BB38
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 21:59:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1FB794E3653
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 20:57:37 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2A803353F43
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 20:59:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85DA2F2603;
-	Fri, 21 Nov 2025 20:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6923302748;
+	Fri, 21 Nov 2025 20:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iilT4xm/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fFJ8GWOk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336052FFDC4
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 20:57:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C441241CB7
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 20:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763758650; cv=none; b=Fx14tyqttvJsg1nlHrYz3S5ZOKUfE7Si0WzrwSwaprA+GjgnW5nfiQxeeTW/cLo74l4haJvnuHCe40VnwXafZhOZHE3+OaU3QbAwi+bRxk0kkpJQJKKW6Yg7nskebXyKlcDjDi9ZaCpRuVDW9KrDd7n7kZaDxMxI+R4Hdi9TMds=
+	t=1763758766; cv=none; b=gHi3cdCMLyBVQaZkGdktbi24dg/767CebozTL/sJpTNkRY98L5f8p8UVhhC3UidrmOSgAxlCrRBm50pqqHmNP/y4R+nENyrsooySpqfI4SIVcUEq5e6siSObtM2h0oBG/iTsSbITHGJCRzfvEBTGbbjYvnoJOu3TD+aIIXzyxCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763758650; c=relaxed/simple;
-	bh=UPlzbUhG0sUdnlQKJ3marB1iLd6icHWptIoTFxih6EM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fWyaqopv6uZHdiqItw17+nfhHaJg5d6p3tTFQWfwrDxsG0J/WcQqSAuYc0TqC16j0vPlSkUiuRDGSPZo9GpDL/k3oU1ELqHlJb6+CUq07f1zxTU448fh5VgTy29D0nCeVai1yhZEdZz3HQ6GT15rVz5wnzp4c0fPad0sBXFG1Vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iilT4xm/; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1763758766; c=relaxed/simple;
+	bh=bBtrX5EFPZEAZC522dfsiRzfYQSbHJajcuBGnynMbnA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t2x3LvScKeW4Rl66YtypBFjNMUX6qPwJMvFoF6h7iovrFvDKgF6oDdvTPzD4FB8iYn+hQwOPytvI1v6/KpZLwSX32FX5waA8a2Yjz2FkQmRazPNc0noc/eOO3Vj0rqAIW4l8oU7ulOuoyzsVQbWqCFLoPPa9EAzLCJ+o6/Xlvvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fFJ8GWOk; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7bb710d1d1dso3654058b3a.1
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:57:27 -0800 (PST)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42b2a0c18caso1598099f8f.1
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:59:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763758646; x=1764363446; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1763758762; x=1764363562; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Poo6Sa9lcHdpaFK5k4oi0jUxnFCHoqA8HD7iXMrSA+c=;
-        b=iilT4xm/dFSHkuU070N5Hiuo1qJEmhP88GUDeqxsYfL14RiPtOeZy+npqERG3ZiFAb
-         shb0r63YXY4JhdYA7DaLr/8MovdVEGl0rP/ZsRJAet2xhBJNcrQ3vKSjzPjrbyzzYplN
-         xR5n3inkeMOyfSVzJ48dpM+H740T/Xm8ERlNvWgDpSqlrHxjkWFkG6XaPS+skolDvNO6
-         tQ62RRIS2VXovon2ABSzVcXmRtRLppMq/8BAgwTPyXSTjvveE4bjqxX6bg9+O/OE27xY
-         /42VTubNt95MQtEBykDcPYucmORzKvt+Jm7DOmcU3b1AcY/9pK3ecjS+6+GkyvpodE5E
-         CqFA==
+        bh=ompreuHERq3FUSzaEPD4bpaAyYj0ejhMujXL9v1zCZw=;
+        b=fFJ8GWOkqO76wiHeLrfhi1R4l+ekOuSLspy9BonAi1ZLEf1F6cvleCrXa6MM1oC9vD
+         qVu1uCWcFUnI0y+ehgxpf6DzkgPAjklBcmD4BdDOkxWmvqcTZeJwXTbnF9WdCH5y5MIn
+         EH+sI4G0iDH4q36c41RmLpCN5cNbMFQdIv4wlUfuUmndm3ICLCJp3p+FpfVXrQV8A+Lb
+         A+zgrJPMuHBgq5NmAmB0TQPBwVdtDeJo59j/1O/8Iuq+Mx6203/QE0thPBwI0nShwrsG
+         Iof61ZQRulBH1GDiyANFiuxoycymqBbuUis3AmxoLRvRwKV0b8ItAMeLfOQfYc3dyPzA
+         oHHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763758646; x=1764363446;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1763758762; x=1764363562;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Poo6Sa9lcHdpaFK5k4oi0jUxnFCHoqA8HD7iXMrSA+c=;
-        b=HXk7tC2rGK9k5c2a9WDZ1XK1zzBXdeixih9ooy6/1Y37v3l26k3lb2jaESMIkQvckm
-         IMHlcCE4sHsHjNTdF0pdMkpPavfebwyQtd3ouoNusv5QWNxGVOs9X2AuaGRphbaRPsZb
-         7OXw4hV9ji1Z7wk/eDS0OiC3Tt137NV/1yOz5MBqRDi3PDP/60HBBhFX0+RJmFaWMA/2
-         0uGqdtdIUUaJqG3/V+Jpi8D+bE9QYrBDmNuQxXxRVMkzElVIrEBLmiPoHXU1kNbu5qnk
-         p/IGsF3wmUBKZAMWJkFEDLHZJqEXfxleVndclicZ5l0NMT69G/aB5hSlQesN0ChOt2r3
-         fMHA==
-X-Gm-Message-State: AOJu0Yxqf97eAOhm4yXD2+RkNF2ui3mS5pHCgVgS54x0a5gb1SBg7OWh
-	Z57vM9mxlpGg8Ant0FSoQTK2dVmHZCqkVGMbURBIVsTmGoc/YfVQi1uJ
-X-Gm-Gg: ASbGncu2QQGwzgcTuRkriz4dxyQsK7QGGWdHlWtgeJDrkHTw7hyPHIpbRSf6sTcDY0c
-	cvh1+bL93AG06OKulTsu0We7eZ+GsSBPWxF85UOaDPYCOBz2mbLwIzbwyy3sJgxRkO/pe3Wcezd
-	U14BwDCLl76ark1LjuMQPfIFnjXOz5uDTn8eGO2SakCEYavv+Z0UIbC2nz05HrFuw+lHMVpxbzW
-	KBvSUukobuf0k6DsyymOOYkAEchXmUa+XDF1XlfinE8Mkyj67rQlBLQybGjDIQeAHsgdSnzO1TN
-	rEukBIbH13HHfHOlbJYRDGJKSpYo1CkcdFKq0bxY1o9rZKVt4tBqg6FEpM/9NV9GT2/CHMnVZtS
-	q1L/64twFWQ8kQrN2bgS85dY3lIKS7lO5NVnbL3NGgGZnvlNaSOfS+qSzLxRS7l7OK8AXCp6rUV
-	zyRXNkFNSaZpwpRw==
-X-Google-Smtp-Source: AGHT+IH//nlQhpFNWJFSpf0HqRxnQnhkjJv8FVJoHkSE0cLFRtULz+JaCnsHASmQaZHVZX45TQt2fQ==
-X-Received: by 2002:a05:6a00:4b12:b0:7b9:420:cc0f with SMTP id d2e1a72fcca58-7c58cb8e698mr4659490b3a.14.1763758646352;
-        Fri, 21 Nov 2025 12:57:26 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:4b::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f145845csm6956086b3a.61.2025.11.21.12.57.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 12:57:26 -0800 (PST)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	memxor@gmail.com,
-	david.laight.linux@gmail.com,
-	dave@stgolabs.net,
-	paulmck@kernel.org,
-	josh@joshtriplett.org,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v2 2/2] rqspinlock: Handle return of raw_res_spin_lock{_irqsave} in locktorture
-Date: Fri, 21 Nov 2025 12:57:24 -0800
-Message-ID: <20251121205724.2934650-2-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251121205724.2934650-1-ameryhung@gmail.com>
-References: <20251121205724.2934650-1-ameryhung@gmail.com>
+        bh=ompreuHERq3FUSzaEPD4bpaAyYj0ejhMujXL9v1zCZw=;
+        b=morrmgTT9jaygP2RrI7n4ZmkKqjyshkhI7o+n+qlax8Pu5XGPTzNsQ24fyVkh6Obi/
+         hUaUXYQwRCG43kibvFDu+C0AoxjMSNp1tapgtyhYyHw6+IwKgNp/3iHdSRpujr7AMAE5
+         dOm6ytyrDQCRlzxMxFKtmcNR9kd2Rw5ktvps6Gkk/N8eHtKUjijvXgASU48cGP6DeEWn
+         kvSUhjdMey5Nm+Q7ruTPqa77mbKaFin9O/MYRlPQotWVUJXslP+zYGF9qDNFx4UyFLD6
+         7NKsfs0LZVKJh+XwKGyI9VuoRgQzvICPbomOT/z6DKbyKc9f67lTE0bPBEW9V20x1EyW
+         8Gag==
+X-Forwarded-Encrypted: i=1; AJvYcCVOxNKDkISRJzxEqmw1ASGm5VJoXmoIZ42EUqdz9rpbwUWSBrpnlYc+ONHk62bLNLhM+5eFV7U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQWtEYgnskgeURAFkad+Kzrpq1GRxYTX1Ur4ae2x5lCZPTKF3P
+	7HQTgwu/bwQIy87KEGDWLo+UCOwRPqzQPS/k3AGQPSUGAo5D+CDapf91VfA97b7uHiXsZPyLLKR
+	H8CzWuG1XIlIwd/rZm/q9xo/M8pq436Y=
+X-Gm-Gg: ASbGncsvy1h6So+2+ztH8iJQnSL8qBx/iNlQHc6fFzAtSpCg6doBHppfTKJ5ewKwzMf
+	DorUllTElZGLzafJjI9EKIpAhPbW6AbiRQim+gLNnMS4XFtc0ux0CVnKXkajktTD1Cf6KNtb6G6
+	Chi5NW2gsTSZsgMMarXoTW85uWK6yI4vq0nVb+m4I9Ah1D2egpjbvC5YCGfc8ZU5fgWEHN4cLeX
+	tOJ1dfRPnX5O/Zu1UWRmU8ezSJ2YQNCf2CxnzRiq9ljCpSKcJFbkAvqwcm9PZVvorjUHVGjcYqe
+	xl7NSfOqbN8wMLyOLFBAX8EFZw1ltuNsH39m3bU=
+X-Google-Smtp-Source: AGHT+IEJnYj9tzPgEsH3/YX9J7g70T3nquwHQesZI2rg877VbuY1O9Me5EFeMIoOkC9QXWw8tDigW182DhTgyFQOpFc=
+X-Received: by 2002:a5d:5e01:0:b0:42b:3e20:f1b0 with SMTP id
+ ffacd0b85a97d-42cc1ac9b39mr4097573f8f.7.1763758762231; Fri, 21 Nov 2025
+ 12:59:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251121113553.2955854-4-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251121193002.hzjuijrs6gtoibuv@skbuf>
+In-Reply-To: <20251121193002.hzjuijrs6gtoibuv@skbuf>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Fri, 21 Nov 2025 20:58:56 +0000
+X-Gm-Features: AWmQ_bmUNeZEWkWbeRP4C_Eo6_UYOxEcRWlNLuxLNTPKm97Sw-9WbzKrfrrXu9I
+Message-ID: <CA+V-a8sWzBsnO6vNFirPJCT=S=jMDO1uw5HhvN0kQ2PpvumJ-Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 03/11] net: dsa: Kconfig: Expand config
+ description to cover RZ/T2H and RZ/N2H ETHSW
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Russell King <linux@armlinux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Return errors from raw_res_spin_lock{_irqsave}() to writelock(). This is
-simply to silence the unused result warning. lock_torture_writer()
-currently does not handle errors returned from writelock(). This aligns
-with the existing torture test for ww_mutex.
+Hi Vladimir,
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- kernel/locking/locktorture.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Thank you for the review.
 
-diff --git a/kernel/locking/locktorture.c b/kernel/locking/locktorture.c
-index ce0362f0a871..2b3686b96907 100644
---- a/kernel/locking/locktorture.c
-+++ b/kernel/locking/locktorture.c
-@@ -369,8 +369,7 @@ static rqspinlock_t rqspinlock;
- 
- static int torture_raw_res_spin_write_lock(int tid __maybe_unused)
- {
--	raw_res_spin_lock(&rqspinlock);
--	return 0;
-+	return raw_res_spin_lock(&rqspinlock);
- }
- 
- static void torture_raw_res_spin_write_unlock(int tid __maybe_unused)
-@@ -392,8 +391,12 @@ static struct lock_torture_ops raw_res_spin_lock_ops = {
- static int torture_raw_res_spin_write_lock_irq(int tid __maybe_unused)
- {
- 	unsigned long flags;
-+	int err;
-+
-+	err = raw_res_spin_lock_irqsave(&rqspinlock, flags);
-+	if (err)
-+		return err;
- 
--	raw_res_spin_lock_irqsave(&rqspinlock, flags);
- 	cxt.cur_ops->flags = flags;
- 	return 0;
- }
--- 
-2.47.3
+On Fri, Nov 21, 2025 at 7:30=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
+ wrote:
+>
+> On Fri, Nov 21, 2025 at 11:35:29AM +0000, Prabhakar wrote:
+> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> >
+> > Update the Kconfig entry for the RZN1 A5PSW tag driver to reflect that
+> > the same tagging format is also used by the ETHSW blocks found in Renes=
+as
+> > RZ/T2H and RZ/N2H SoCs.
+> >
+> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> > ---
+> >  net/dsa/Kconfig | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+> > index f86b30742122..a00eb3bdcd0f 100644
+> > --- a/net/dsa/Kconfig
+> > +++ b/net/dsa/Kconfig
+> > @@ -159,11 +159,11 @@ config NET_DSA_TAG_RTL8_4
+> >         switches with 8 byte protocol 4 tags, such as the Realtek RTL83=
+65MB-VC.
+> >
+> >  config NET_DSA_TAG_RZN1_A5PSW
+> > -     tristate "Tag driver for Renesas RZ/N1 A5PSW switch"
+> > +     tristate "Tag driver for Renesas RZ/N1 A5PSW and RZ/{T2H,N2H} ETH=
+SW switches"
+> >       help
+> >         Say Y or M if you want to enable support for tagging frames for
+> > -       Renesas RZ/N1 embedded switch that uses an 8 byte tag located a=
+fter
+> > -       destination MAC address.
+> > +       Renesas RZ/N1 A5PSW and RZ/{T2H,N2H} ETHSW embedded switches th=
+at use
+> > +       an 8-byte tag located after the destination MAC address.
+>
+> I think the device names are sufficiently strange with that forward
+> slash in them, that you shouldn't make them worse with the {}, at least
+> not in the full help text, and spell them out instead. It's hard for an
+> unfamiliar reader to know which punctuation marks to take literally and
+> which not to... (plus it makes it more difficult to find through grep)
+>
+Agreed, I will add the full device names.
 
+Cheers,
+Prabhakar
 
