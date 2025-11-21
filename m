@@ -1,190 +1,174 @@
-Return-Path: <netdev+bounces-240761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77B65C79164
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 13:56:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2206CC7916A
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 13:57:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 99221346594
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:53:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id D6E722DA78
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C945A2F12D7;
-	Fri, 21 Nov 2025 12:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B7733BBB6;
+	Fri, 21 Nov 2025 12:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="QK2QFgZd";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Rk98uZbY"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SS0lX0Bj";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="MFBwn/kE"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3760020013A
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6406033971F
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763729627; cv=none; b=Jd5I9oQkYKHWKRJHo1qHUPQMLZubPSwwD7kB2pZcwZ5Tpg4UX3czjImjtku2UsjBJTz9LlPE1IdkHzl3eo4q6OA2vo8LkBzrSc7KsF9oVvMBObLONNUv31WKpvLyynhqB5nwMSyvVve0cv+esFQ7HLAXDF5XHhAxyUm5vT6ZpB4=
+	t=1763729861; cv=none; b=cVTePm8boz8ooUkCa6d6UkX9mOj5xAEAc4x0VnUNGi0O2VSy/zfGbtDapbl5eeCl6HHler3OSgIiECV5ayvlxayTPqyk65r+e6e0Mi9DbKS6kXIg1ubY8jKAyby8gxl4Otc5wkH6ZJscfdgdBjVuEoxTTtuxrF6s20VS24CxJeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763729627; c=relaxed/simple;
-	bh=OdrCF76qfp03nCOmgAGzzFsyY9iwkH1W8MShjN3rNQA=;
+	s=arc-20240116; t=1763729861; c=relaxed/simple;
+	bh=6aQths3UmkYeqC5k0bvtNslIGIZrT3MXFPVLiSxAQ34=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OaOGeDU5OzSr8AunJ9hg+9L+zbet5ImHGuxTi0H6/ix+VD3kkGRxsO0S3y9mjiC9HkB/wzh+/8/dO7oY4I32Vi4Eh7i+l6otPRzyxw7Iq2F5lZeakMM867yGz6ztuIsnz1pnb7cBn8df2JT0DvNYkC9pvVn//Uhkzo+Wr/5wSLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=QK2QFgZd; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Rk98uZbY; arc=none smtp.client-ip=205.220.180.131
+	 To:Cc:Content-Type; b=EQX4QBncWy7buTuCEczK61/UeRZcqOSBjD+q2gEfg5bHo1IThiNZMuUiurGMM/myzkLB5SfOItNAwBMDSbJXuc/r/Pc4wlOaxGY8V2VICuAgx0Kp87b9+2VD1COlSEQpzWyMmdKFZq6Y2mpfPcTPnLMSEOgXINQi9APXXfUEZac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SS0lX0Bj; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=MFBwn/kE; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ALBkHLN3007810
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:53:45 GMT
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AL9SY8C3541419
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:57:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	tO2up59Xfzo3hrd+f9iIn3/gwb1F0q11MRs+kjEbBWs=; b=QK2QFgZd1OHp06vG
-	aISXYtvBYQbHoPOb3p70HJD1EeOUIMAxWgNbNDWwA2i/SvMjVdGuSQzap9YBSX21
-	arhXq69m3cidm9NJD3+qQT8EcUp3jORAGO1fn/YrAOO2IGkw4vZPutBBDr/0Nj8T
-	ySOhNuVl5Q2P4kMDr+l20E+pEA/S7WM9+9pj1j4HfsLrQB9iQ4yXTmgNHv/KQ5D6
-	yPD3trHxTV5KPeUujLH3CIAvSYqbkJp+eUALn0CA2zmA2cc95DPoYoeoaYmjY5sE
-	tGKTg+vcOY1JtyGDRoGjZxXNKDDN5uYVU05h4gK4yHQ/uNEx7tBvsPzoHuageUZL
-	qbImYw==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ajhkf1eun-1
+	DwmKzsHMjYB0IXHlncQwCvx4h47JoPSJMRH17NG9iWU=; b=SS0lX0Bj8ywQlvzJ
+	UltRimJwEsucxXYmff9kSHHdoO00WKOFAEZhI0YD8MVG5K/bQOnHmOvqWryMxvkN
+	SsRGtRrRUV17ru/rNKxTySixprTlj1MfHIfj8kWBO7ZhatB/8wLUEpKCOok+lWkD
+	HKWFfgy+ZdsQw1gO0GWMoWk/OTch6GZKiVcvwWjUYVKmE1lLYMyJVAIRlC1i6Hjd
+	X5BeHynoIlr/Lq88SCrwYVLV9qvFN0cuumcH4PrkoAyqo8sEk3oMd5OmPSogKtlk
+	CFUDZWjI3dj1l5c9bpaAU/N8++Ylevq/Tqt6yZ8DwcbvSdkG4ATZT+DvGNgW/dbX
+	bYaxQg==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ajng00kbe-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:53:45 +0000 (GMT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4ee0488e746so44121291cf.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 04:53:45 -0800 (PST)
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:57:37 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8b29b4864b7so270712185a.0
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 04:57:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1763729624; x=1764334424; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1763729839; x=1764334639; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tO2up59Xfzo3hrd+f9iIn3/gwb1F0q11MRs+kjEbBWs=;
-        b=Rk98uZbYjaESQnf/kRzFsx8T1xviJD6/v52UzhLZcGyRMNcGploX7Y+vcz6i1UVgMG
-         EOP1AYq9YHhmSu8UTsFKeY05sGI5bjlOTSb28Dj9185iUqumREZjGhDjb25FZhj+C8yc
-         ERzTn4eezrCTdjt3w4qG/pxLoiyjvr8293vBXS8HxdN5Nn5MfxuRn8U1jzsc8PCDoaqw
-         qmzDBcptbqEnTYLVDrjNE6NHNX5QSL7a/RM4HXj4tG+aGiAjs4R0+GkspTLbmC78g6Sy
-         zx4v4EAMUE6tElHz366tKkkCV7UeIWtBN3ul4mTJgYIIVA2MvYwjIM4u9U4AO+WaVNfn
-         iADQ==
+        bh=DwmKzsHMjYB0IXHlncQwCvx4h47JoPSJMRH17NG9iWU=;
+        b=MFBwn/kEb86jkRM7EcFH6XsdcnTIA1iM9qzfczQxYHrp65w+e9rvzSKVwwMcdvymgO
+         apoXZDFlcQ9UppXtyaAlysTZlpcmB/SbC6XX7p6HGZi2IlNx3BhA3WyoY3u4zHN2UpXH
+         UaN524yyoPQksSN8L3LjI/mYr49+xbIHlmklKzkiSSzT8/ZTlaQlzz5VKXZlhEOc5Ed6
+         QghstGdbIk9yVd8IGE/GrcxS6cIzmx3eK9qe9K7KsiTBsgmjXZBfDyvY5UxG0TVVxGzy
+         wYpIQE+22WUaKqubgHspKpaG9Azj0EvssxaVMkaUl+UB5UAg26c2kP5jRChfngZIMjBk
+         JSJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763729624; x=1764334424;
+        d=1e100.net; s=20230601; t=1763729839; x=1764334639;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=tO2up59Xfzo3hrd+f9iIn3/gwb1F0q11MRs+kjEbBWs=;
-        b=oaU6viu7DJO7/Hv0ZokizkDCS6xVplbtW/sDY2LHcLZG0THMeWJnTnqCQX089aNe+Y
-         uH8yEZtqE5rbUkmSrJ+a2yTpNOAmLCxnudyjFsY9eLg70BDXRi1LJyWdyxClGCE5JEgq
-         JijlecGaM7X3ynQZD1t6zKXioNQI9a1nAbXzUblwrzg8VvdaFE0roTbmqmBcsgNiQccS
-         lZ6biqjNZcH0suBpb2n4hHVg/QRkc8cRNWaZx1rUT76tkg9v5GFk8TOiwJ27HRjC2t4Y
-         lSlq9yYrNafy/NWKn1yDl/xdnycWvWW2X4EwZGc1I5rlfM2UcQZyZY8uo/e5RflIn3Uo
-         eIww==
-X-Forwarded-Encrypted: i=1; AJvYcCXl1YG9KOcvlWp3T5a9SqawYTpzKDisjKJ1sujtdxRk2lo1ur6MxBxW6T1ogJHUcgpkprtprSc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQn5/uRzUQhKOhEXoScD/nWjqkXQ/kSBXBLlNrZC44Z2rI7vPP
-	KwqIYNPUqkEtcVFFwf3zlG3KnYLTXoyVY4sYteSl7+MN9Bh9jOXusyovWOqqRG8hMPEp3FBcfXP
-	p4RJ7FHx+NHYuAGk0iAAlLY+oXZVc+K9NpYMD2QrXfOuhfSMSLgsiAY0LaJhEG3EG4k3Ef55Fu4
-	vgC4onMNj4h3kpiHJYq1FvsJwDO25oQrHxoQ==
-X-Gm-Gg: ASbGncvgeKuywIyblKzPLauxKCyFPsx3F20Qw3oQxH0sk2OxDma6lryvZf9F+a6SNOO
-	kYH7CROTmGzhQk9gq8CAjTfdFW4QyVz2B5qkbZ6aN9vJ+LsZVyGE5N9Pr6LxXuifz+zcEs0ZNea
-	DXsNHUJGKPnfe/b7E7OBqyKP83lnUa8+wZlN7LOR/h7Xq0d7Zqhcuy5Or++Uutx0umlj9h+F+Kz
-	iFL80LFKyj+KUFprpXPBup5Zg8=
-X-Received: by 2002:ac8:5e13:0:b0:4e8:916f:9716 with SMTP id d75a77b69052e-4ee4b5bf82fmr84967141cf.36.1763729624465;
-        Fri, 21 Nov 2025 04:53:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHi7sWSvF6cI24HgsCm7kzJoTPxYqrQnPfezhkj4HikNvi/PNFPv3JtZ3ZoH629GhuzEIk5NAV/bQMytwTQ/L0=
-X-Received: by 2002:ac8:5e13:0:b0:4e8:916f:9716 with SMTP id
- d75a77b69052e-4ee4b5bf82fmr84966781cf.36.1763729624027; Fri, 21 Nov 2025
- 04:53:44 -0800 (PST)
+        bh=DwmKzsHMjYB0IXHlncQwCvx4h47JoPSJMRH17NG9iWU=;
+        b=uJUzJUn4JHNGywrY/mQ5mziBFn9zIXIzHz7JHrMY4NJBfuJkHcnhz5J6qIeT2w3GrE
+         lL4HMmpH6ABdPzDYWxgs4kYfqQ+rO8szB97xySbix0hX8v6BlJFvsDf7QkuHORkTNSN1
+         Cw1q/uLy3/AlWLJ2CgikzkX0ffn0LfWWIzSFWUX7RJJHff7gW6jdhnA9KWMP4OWmOsoC
+         sodhkm6EkzYdZrpXhh5RkqLZIaF185crxInefSU01taLbmIwC93+l88XqSybyHwjOW0i
+         1UJSFBrP1VUfvhiXPI06/bNB6aI1n50RMWYiisuxdVo4xdEwYkt7TFADjJiAPGmQ5djx
+         XzNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/AEp2ZkGfbV3/fR2bKupRASvcgCHSRGQc/8L2iHrBZiRjw00uhmf4njilv1n80ZIk3Nzh7rg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznchGAQMhVlYU1+4izwEQSLsTuhhicadzoA7/9r3+Z0MkTZJJr
+	Q6NU9ESk4OE2hoUDkZ9qaBoWhRMu/5bmn7cNmRTTYLk2TK2NWBOH05bf+ucrIxfQYNRaaead0m9
+	vvvYscVi7ybUto/1ilfzXUvUBxPlj21QI/ZE3U+Rv3KV+cLP/N/TzZoKU8FF+1BG5f+rYyd70c8
+	qsoVwapEdSRe6Pw2xBWUdT2uN29edMPQHqFbv0mPfT62yY0O8=
+X-Gm-Gg: ASbGncsaZyqtCoUW86uDkitzc7zhwC3RMXX39scqIMZ7qTudCTn3AfVTluWQbCU60nY
+	Ts4ZU2/lumpSv1UYzlrht7He3McWmbZtqXbSB16zhv7G/HyWxkC1A7OCISxoMW6vgrYPi+lVmh8
+	W9aG566mQiC+576WuLL20f+iXp1NZxnK2r8dmDqj+1Kq6Qg3pujnoQYZI66EAQIdSQsmM/Ug9on
+	kWgAO2szIKCEvSALMyL7nI2zQY=
+X-Received: by 2002:a05:620a:4443:b0:8a2:fbb9:9b71 with SMTP id af79cd13be357-8b33d4d2ec3mr190395485a.69.1763729839128;
+        Fri, 21 Nov 2025 04:57:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG/ImViTUKGOyfaFGnKSiyBHKsWibQeBK1VDYCi3x/4vyE5fzALtIrIGwuZ9tVkYhuvFrLluHf3M2gnd3PpP14=
+X-Received: by 2002:a05:620a:4443:b0:8a2:fbb9:9b71 with SMTP id
+ af79cd13be357-8b33d4d2ec3mr190393685a.69.1763729838809; Fri, 21 Nov 2025
+ 04:57:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251120115208.345578-1-slark_xiao@163.com>
-In-Reply-To: <20251120115208.345578-1-slark_xiao@163.com>
+References: <20251120114115.344284-1-slark_xiao@163.com>
+In-Reply-To: <20251120114115.344284-1-slark_xiao@163.com>
 From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Fri, 21 Nov 2025 13:53:32 +0100
-X-Gm-Features: AWmQ_bkQopqDLgdwWx7LXFy6AzWKF8UE4fujb1Pwj1KbUpmItm7LETrhtD7qEr4
-Message-ID: <CAFEp6-338P9-xvKaJdwoZx1bGM3OyiZG=E+tjOdO_poh1rjsfw@mail.gmail.com>
-Subject: Re: [PATCH] net: wwan: t7xx: Make local function static
+Date: Fri, 21 Nov 2025 13:57:07 +0100
+X-Gm-Features: AWmQ_blXKjid85FNwGYBFWabbTi6weP_UdyHfIuSprbhW190IbkISzEzytYnTqE
+Message-ID: <CAFEp6-17so5xAbXYBv3vPdOsxmo7_+ELnXHxcQb5zZj7apTjzg@mail.gmail.com>
+Subject: Re: [PATCH] net: wwan: mhi: Keep modem name match with Foxconn T99W640
 To: Slark Xiao <slark_xiao@163.com>
-Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
-        haijun.liu@mediatek.com, ryazanov.s.a@gmail.com,
-        johannes@sipsolutions.net, andrew+netdev@lunn.ch, davem@davemloft.net,
-        edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: ryazanov.s.a@gmail.com, johannes@sipsolutions.net, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+        mani@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-GUID: R9B7ZO97QoxsWHk1OTLwBBwheC8Rhqfc
-X-Authority-Analysis: v=2.4 cv=ApPjHe9P c=1 sm=1 tr=0 ts=692060d9 cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Byx-y9mGAAAA:8 a=EUspDBNiAAAA:8
- a=n3u1Jso1Kkf-ApU8ncwA:9 a=QEXdDO2ut3YA:10 a=kacYvNCVWA4VmyqE58fU:22
-X-Proofpoint-ORIG-GUID: R9B7ZO97QoxsWHk1OTLwBBwheC8Rhqfc
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIxMDA5NSBTYWx0ZWRfX0ucp3+N/lrWv
- NYf8ZhARH74iXnLC6vgsrQSWRgw1mwelCEhPjZTUp9OAw6v67yv/ovmlgwP4s8oSNg2oJBG+/KN
- CKzH67MVma61DU7wSANK+JnLW37B6V8Kw5c+LKruCiQECbqpmDengt/BA9Iw1bv68ugokfMCded
- U3jQfQbagKSMvnwnCvmVPUHI7VtW90xXw2zFcidUBCpevT9Z1piMrBs3xkBpvc3CDA57/s/aDft
- XSO5yS9ApeTb9HdsmE55oxVFacs/+vdPQ4DZq8WZJtlbPFKLta9IxTUF5MTqgA/OTRui0S2t6k/
- 3aYF5Uj1i66aBbjrg7tq60EeH4Ks3+WJcQSG9lsA0Wli//CBFx8Dg1eZZta3fHo+lnszdMtC/6t
- TIItmhbW+X2qKfrjXTc6tdYK0MmgkQ==
+X-Proofpoint-ORIG-GUID: nmUAtMQBUc3wvxVeUaoVInZp_EkCfcev
+X-Authority-Analysis: v=2.4 cv=R+UO2NRX c=1 sm=1 tr=0 ts=692061c1 cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Byx-y9mGAAAA:8
+ a=jTkqkXBVwd2mT_Iii2oA:9 a=QEXdDO2ut3YA:10 a=IoWCM6iH3mJn3m4BftBB:22
+X-Proofpoint-GUID: nmUAtMQBUc3wvxVeUaoVInZp_EkCfcev
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIxMDA5NiBTYWx0ZWRfX37CueIqvhTYr
+ WWD4BIh/OsINxenqI766V1haRwKE+ujwwFcowumTkyUhLEr4htxArTiN4zLSxo8uejkMc8XLYBv
+ DgNfypR7Thj3uh5aWlhU9pA7N7yZcWIbqIcsl6cDE1zmfRts4FJgUB7/EFV1F5TDsJslDrx9oZm
+ wt0u1AnIxRLYkSmOY13v7w79iy+t/X8xgYtkyV+GPdydkXds4wTePEEU8GgK4AKqCNxlDXWOMJ3
+ M0+dctkl24VhuWr3gIxKa8sUOMrIZDQEhKhW+1lOEkng0yZdGkkEnHOcxEVR7Aj9T2KLhyODiUt
+ +xEwPMybETt+JzfrKwgh0rrrmFVYf2n95xy69dnaGl+TpI34KFXq03wwAs6OVDnGkTEauHodKc+
+ AGFqqOVW+013KE8Ouijf0yLQjhEhpA==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-21_03,2025-11-20_01,2025-10-01_01
+ definitions=2025-11-21_03,2025-11-21_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 adultscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
- lowpriorityscore=0 suspectscore=0 bulkscore=0 phishscore=0 clxscore=1015
+ impostorscore=0 phishscore=0 priorityscore=1501 bulkscore=0 adultscore=0
+ lowpriorityscore=0 spamscore=0 suspectscore=0 malwarescore=0 clxscore=1015
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511210095
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511210096
 
-On Thu, Nov 20, 2025 at 12:53=E2=80=AFPM Slark Xiao <slark_xiao@163.com> wr=
+Hi Slark,
+
+On Thu, Nov 20, 2025 at 12:41=E2=80=AFPM Slark Xiao <slark_xiao@163.com> wr=
 ote:
 >
-> This function was used in t7xx_hif_cldma.c only. Make it static
-> as it should be.
+> Correct it since M.2 device T99W640 has updated from T99W515.
+> We need to align it with MHI side otherwise this modem can't
+> get the network.
 >
+> Fixes: ae5a34264354 ("bus: mhi: host: pci_generic: Fix the modem name of =
+Foxconn T99W640")
+> Fixes: 65bc58c3dcad ("net: wwan: mhi: make default data link id configura=
+ble")
+
+Only the first Fixes tag is needed, as that=E2=80=99s where the mismatch wa=
+s
+introduced and should be considered the point of correction.
+
 > Signed-off-by: Slark Xiao <slark_xiao@163.com>
-
-I believe it would be best to target net-next for this change.
-
-Reviewed-by: Loic Poulain <loic.poulain@qualcomm.com>
-
 > ---
->  drivers/net/wwan/t7xx/t7xx_hif_cldma.c | 2 +-
->  drivers/net/wwan/t7xx/t7xx_hif_cldma.h | 2 --
->  2 files changed, 1 insertion(+), 3 deletions(-)
+>  drivers/net/wwan/mhi_wwan_mbim.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c b/drivers/net/wwan/t7=
-xx/t7xx_hif_cldma.c
-> index 97163e1e5783..bd16788882f0 100644
-> --- a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
-> +++ b/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
-> @@ -899,7 +899,7 @@ static void t7xx_cldma_hw_start_send(struct cldma_ctr=
-l *md_ctrl, int qno,
->   * @queue: CLDMA queue.
->   * @recv_skb: Receiving skb callback.
->   */
-> -void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
-> +static void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
->                              int (*recv_skb)(struct cldma_queue *queue, s=
-truct sk_buff *skb))
+> diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan=
+_mbim.c
+> index a142af59a91f..1d7e3ad900c1 100644
+> --- a/drivers/net/wwan/mhi_wwan_mbim.c
+> +++ b/drivers/net/wwan/mhi_wwan_mbim.c
+> @@ -98,7 +98,7 @@ static struct mhi_mbim_link *mhi_mbim_get_link_rcu(stru=
+ct mhi_mbim_context *mbim
+>  static int mhi_mbim_get_link_mux_id(struct mhi_controller *cntrl)
 >  {
->         queue->recv_skb =3D recv_skb;
-> diff --git a/drivers/net/wwan/t7xx/t7xx_hif_cldma.h b/drivers/net/wwan/t7=
-xx/t7xx_hif_cldma.h
-> index f2d9941be9c8..9d0107e18a7b 100644
-> --- a/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
-> +++ b/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
-> @@ -126,8 +126,6 @@ void t7xx_cldma_switch_cfg(struct cldma_ctrl *md_ctrl=
-, enum cldma_cfg cfg_id);
->  void t7xx_cldma_start(struct cldma_ctrl *md_ctrl);
->  int t7xx_cldma_stop(struct cldma_ctrl *md_ctrl);
->  void t7xx_cldma_reset(struct cldma_ctrl *md_ctrl);
-> -void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
-> -                            int (*recv_skb)(struct cldma_queue *queue, s=
-truct sk_buff *skb));
->  int t7xx_cldma_send_skb(struct cldma_ctrl *md_ctrl, int qno, struct sk_b=
-uff *skb);
->  void t7xx_cldma_stop_all_qs(struct cldma_ctrl *md_ctrl, enum mtk_txrx tx=
-_rx);
->  void t7xx_cldma_clear_all_qs(struct cldma_ctrl *md_ctrl, enum mtk_txrx t=
-x_rx);
+>         if (strcmp(cntrl->name, "foxconn-dw5934e") =3D=3D 0 ||
+> -           strcmp(cntrl->name, "foxconn-t99w515") =3D=3D 0 ||
+> +           strcmp(cntrl->name, "foxconn-t99w640") =3D=3D 0 ||
+>             strcmp(cntrl->name, "foxconn-t99w760") =3D=3D 0)
+>                 return WDS_BIND_MUX_DATA_PORT_MUX_ID;
+>
 > --
 > 2.25.1
 >
