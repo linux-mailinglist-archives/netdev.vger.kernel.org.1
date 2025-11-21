@@ -1,232 +1,225 @@
-Return-Path: <netdev+bounces-240894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8A23C7BD05
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 22:54:58 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25877C7BD7E
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 23:22:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF6AD3A7D9F
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 21:54:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1352635FCAC
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 22:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F76A2F1FDF;
-	Fri, 21 Nov 2025 21:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674D730ACFD;
+	Fri, 21 Nov 2025 22:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SP2uRQcc"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="WFSUgzjT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828F12EA732
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 21:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2383064A1
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 22:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763762080; cv=none; b=fVGUigkemvbtMoWoJGMS4wM8PpdkIyXv+JX01cvjOilGSfeASVqtPiS0i8JoM+ahIC3TTK1cSXMTKDvSdNofV2CY+zCTnp6/ytAhJKRXyHb0NMaDt0VE/C6fLnh4Lop3iFFleF6pnwK3LnQrZJki8UGX9e32L1IyPYuRw3PQgSA=
+	t=1763763608; cv=none; b=kCiZfGVi5I7DXzEc9dV4PgQ2POVpQS1//ySmHfdJsV5j1Bu4itW73NP4b2Vh7k28NK7nctVMMCzUnQVa5nS8/vbDEpuvuI77ZVRyFe9NQLxWTrazRkQ/goqB18KNm76Dud5Oc6t5AgLablNz5NrP/YQnVTS2C7+PwHctWHAQae4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763762080; c=relaxed/simple;
-	bh=kxc2ghZkIeKuja4o7j8KUlCiA7Mek4elgg/CODc+eP4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iDTsqyV0wtcYWVLxNm9jwJlF7jUA65LqK8nYtPijZnOot/+6CcJxBzHcIPlE4Uy/KJ2JSGCrpcm5ujjwoaZhx04EB3hPED+W5QA3Wi90x/jmFGWbk9mwi+H8G66hbTwtRy98vING2ohgJTblQZYYLUJrgYQJC/73PDbFava8pIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SP2uRQcc; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-78665368a5cso24528667b3.3
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 13:54:38 -0800 (PST)
+	s=arc-20240116; t=1763763608; c=relaxed/simple;
+	bh=g3Ql5JAp7mptlUZp2JDv6dBIgd/skiR01YPR0iGeJP8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zm5FIHpSlpW6c8DmQJv1pU8HNhv5ZmymQZ5SbK68OQ9tXczns9DaMe5cObHaODguMhqLohmkHjPzVXXfnzHg09Joa7mC48aFdLptlJu7G7U2MF0V1XLaDoZViIP2j7S3l3kNAduBlwtK3agbPbiFbF51rMTM9GggVHDjukUScz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=WFSUgzjT; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7b89c1ce9easo2873282b3a.2
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 14:20:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763762077; x=1764366877; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KKDKywxsPMgX4FVe6JHQ8TSPWLHfYapoOHUuWm/LY3M=;
-        b=SP2uRQccH+g9xA61zNVDnCaIMzho/v9gE5nhsQywafYLct65mPVaZbX9L9jXUqYSvj
-         j2+eVz9Oc2pI7/2Js/BSUfpDLl7x/GyNxsMSxob8nR18XAza4cfM2q2+GUUpOI35uZdF
-         Pc0JNeCoRzwUmz3wGKHfdcoc/KBKHCseSGhJazcyVQwQcoHr//25rEie4TI5P5ce1+ao
-         n8m3UslaO60ktFcXMYrCu9pCTjbzY1OMrAQl6QHt5SRR6AIYsaKy1TyelYT/FIX8vQZk
-         3CNwhM0FHtdrRAWujOTLyJNOIZa+BxN5iVRELvdd9Od+KHSX8am2I8vOXlFk/9PvBTKJ
-         kkbQ==
+        d=asu.edu; s=google; t=1763763602; x=1764368402; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4sUVNth8FAZgtbCcjfYNARaKtvymY9NltD2v12K6L98=;
+        b=WFSUgzjTTlvjvGjHwRI0MSYL85x5HyYfe7zrEaOEuOhQ/oz1RdDq7nGSlpjR3C3HTt
+         M3QCWT8qJ9aKjaE/5qn2Hq+8jVigTxgkxnxVukbksM7p1S9iqyioe/a3Ro+onjJX+NNf
+         Kqs6nbLHGM9vEX3dFmn2LNOtckfTTe1s7ovzLWWez07jy3X02k1VWioTXnMU9fhdFrHG
+         rbdIdWSm9ptNGNp5iirCslcN8GL9b77KPTJKOxxMflHw8HwDFSC7QvYtjzS4KVanP7ox
+         XS7sJprD3WXTtpDDUkMHGpOF29l27wBJ0W4Ean+/pXdHMvWj9Hc5nJd0ud7NVDiPnHAO
+         o2FQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763762077; x=1764366877;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KKDKywxsPMgX4FVe6JHQ8TSPWLHfYapoOHUuWm/LY3M=;
-        b=AjiClZ7iElyFXwtPL+4uYjX+DZtqQK9DsCJfCa42XVkW7o3Df03nG1A+HjUdtiT4Th
-         /rC2VBAjRcdVX6CXNyyNUrOQExY2UUeqOpDzAW3hvKMvm71LzXzv56fSLB8uN9jSFGP8
-         OhbDeKRmEC1pHTfn+gwqPxti08o84Ug9MKN1qsX5tfoBIDmKb1R6NgPvyEBVD3pJoMWz
-         kb2oRjjpztfxxvcufdVk3YMEcvwmD+VYNmfFXV2DNjzbK0F8AgD4Giyb0ujp1Yb9gpuW
-         iMVbY9v7PnyoiYGUucTZJ2c3/egUuDNDXb5HiLKSNXzJROmuEBBRIHtzW7P2XFz0fOA9
-         e3Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCXDAS/4vH3crSW2NXzd8vhoxJ/NAaYzC04NPCR/5bFNfCBuwSm53DwlbmWi4kShfoTW80U8f1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyIg2KT2UMSbiyZUCaDdbOc3/ZNAMJNPKWsyGHo2q3fdFKuX1a
-	+Ttx/PLsQuJWGElE6fJkLAG1luG+ejA8z3SzcQ/8H252VJ4MKqj9DNWi3Z7y7uXflz3rHhdBsOM
-	1+RkvzLcV267vjjpfhtRnLPHTLO68CbI=
-X-Gm-Gg: ASbGncui18+hJv41zUjbP2rKSbZaBP+PFF58HNUJ9NDPowTXUUFku8GYL/iMJCYhUpm
-	ryB5iGNaguaeeTM+47hLHszC3OI2uNzO2TDzTmgwiyTxp/4Nk3zbBE0Kgae1Tg6YBHPjox9qNY+
-	2oSJtr2EM9lr57EtXySNNKOz1a/oOJN67Xi7aikgc+UPqS+kss43R82gt+Kn98rL85DefXM2YJV
-	xngFTxmhaqkyR2BgejF+tMTOCiBOkKCGpNAycohDP/64uuSQmQYqMjGT8DU4+POSByJ2g8=
-X-Google-Smtp-Source: AGHT+IFv8lSM7z8+IQSXiRGzjcYlE3VnU8KftfivOThFbyGoAg73pBoXP9yS3Z6IfL30svn9r049Mnf49GZI6lzp1ws=
-X-Received: by 2002:a05:690c:4904:b0:788:1a92:4fec with SMTP id
- 00721157ae682-78a8b54837fmr28535427b3.69.1763762077432; Fri, 21 Nov 2025
- 13:54:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763763602; x=1764368402;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4sUVNth8FAZgtbCcjfYNARaKtvymY9NltD2v12K6L98=;
+        b=FBcoE8q5tE229tFz8XAoNYt4f9PCzhk855NqsynuFAuWGgHXjIB2qhr9xEEXh0y/U0
+         E4NJr2yxpbZeZjza85x/acWsQ+3FGNVKYdAWhii46/f4xP64mydGMn1Tn0bVN3WWWC4X
+         I0uUVSa2E2qwSIbBoI7IFeqNhqaYpC2VXNH3GBRsoLjEx9HNUao1BLIN1FW/8B+X3DTd
+         D17Dvn33SekewOGy0g3CtICU5JGNyFzn/gVfn3IRN/fVqwPGvnAczYFOZp0kZpbLoPHr
+         pTDLtrBcGCMtURhjdVeB2fisb5PmQQEQ13VDSeZYh4EY7g5HvqdHKOX6oz+sCpOEpIgH
+         7ciA==
+X-Gm-Message-State: AOJu0Yy13T9eIXQRJHlf3emgZD8qfB7OKTBm6JGAsHdv9ag3+7RMGXvc
+	nuYqOwBbpOJAY4nbCBMECSO5k2OKRJjjX5EXqLFW4ZO30R2z63GXyEIY7STiL1+jgA==
+X-Gm-Gg: ASbGncuem6V5w7mqQ+IMP/4F1wCFAJBq7vF9+MBpiK2QoZIRlyLQ/+DHYBx1HgrpLXH
+	QZ88COjNkfR9qheaVevX/4JkLebB40/lg/J/t4loJgENQBqwTAF1NPNJCtYb5dwux3VHcxb0xd+
+	qpuruErOo9ueDsJWytde3uLA5fkZqyGPiYKrKHGFu+UqXNyvE8Iki23iqSaqlebxqcAQggjbc1c
+	BmWbVQ+wnzmbFld0k7HZSavhQtcITWoA/QqRVSBv8fn64FAw5zFbvp6aVYHeXAaf7RiEtWbTimC
+	dSrT5wqCed2xT59wBPMVynKak5k74Gv3Uaq0pvIXHNdUdIQGwtS9pv5sCKSxh3IO7HZ4yeVC8Id
+	sfH2NXkkpkZRZqSyJ26g94SYncWt+TDFnU8bbMLoJm0O2UHmFPEPOFU7+k/XJSnw41crrrz/AkC
+	w1q1Y3mdNbixArPX7vRpAerBitawNDqEPuOWlonmXQ
+X-Google-Smtp-Source: AGHT+IH5VXK3OCSrTYKrEiAE26/rAsGhJzAoRU9EZdpEiwzHCfBWn/O9JUrzanqcZBYu+7tAfYC0ZQ==
+X-Received: by 2002:a05:7022:b882:b0:11b:bf3f:5251 with SMTP id a92af1059eb24-11c9d718e3bmr1213422c88.16.1763763601744;
+        Fri, 21 Nov 2025 14:20:01 -0800 (PST)
+Received: from p1.tailc0aff1.ts.net (209-147-139-51.nat.asu.edu. [209.147.139.51])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11c93de82c1sm20464204c88.3.2025.11.21.14.20.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Nov 2025 14:20:01 -0800 (PST)
+From: Xiang Mei <xmei5@asu.edu>
+To: security@kernel.org
+Cc: netdev@vger.kernel.org,
+	toke@toke.dk,
+	xiyou.wangcong@gmail.com,
+	cake@lists.bufferbloat.net,
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net v4] net/sched: sch_cake: Fix incorrect qlen reduction in cake_drop
+Date: Fri, 21 Nov 2025 15:19:54 -0700
+Message-ID: <20251121221954.907033-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121205724.2934650-1-ameryhung@gmail.com> <e7c311bb305d985c1a9ea19aef3fcd4094c7e03c600dfba9fc83438b285f5946@mail.kernel.org>
-In-Reply-To: <e7c311bb305d985c1a9ea19aef3fcd4094c7e03c600dfba9fc83438b285f5946@mail.kernel.org>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 21 Nov 2025 13:54:26 -0800
-X-Gm-Features: AWmQ_bncgu_q28NvI6KNCOpod1s-6Ivi2vGsnyRvzUR7pkN4pd0u0iyEnKtfxiw
-Message-ID: <CAMB2axOLh_sJL3FnPFPWr+s3dTjwGn4y+63vfbC3abT8+z2h-A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 1/2] rqspinlock: Annotate rqspinlock lock
- acquiring functions with __must_check
-To: bot+bpf-ci@kernel.org
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
-	david.laight.linux@gmail.com, dave@stgolabs.net, paulmck@kernel.org, 
-	josh@joshtriplett.org, kernel-team@meta.com, ast@kernel.org, 
-	martin.lau@kernel.org, eddyz87@gmail.com, yonghong.song@linux.dev, 
-	clm@meta.com, ihor.solodrai@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 21, 2025 at 1:27=E2=80=AFPM <bot+bpf-ci@kernel.org> wrote:
->
-> > diff --git a/include/asm-generic/rqspinlock.h b/include/asm-generic/rqs=
-pinlock.h
-> > index 6d4244d64..855c09435 100644
-> > --- a/include/asm-generic/rqspinlock.h
-> > +++ b/include/asm-generic/rqspinlock.h
->
-> [ ... ]
->
-> > @@ -171,7 +171,7 @@ static __always_inline void release_held_lock_entry=
-(void)
-> >   * * -EDEADLK        - Lock acquisition failed because of AA/ABBA dead=
-lock.
-> >   * * -ETIMEDOUT - Lock acquisition failed because of timeout.
-> >   */
-> > -static __always_inline int res_spin_lock(rqspinlock_t *lock)
-> > +static __always_inline __must_check int res_spin_lock(rqspinlock_t *lo=
-ck)
-> >  {
-> >       int val =3D 0;
-> >
-> > @@ -223,27 +223,36 @@ static __always_inline void res_spin_unlock(rqspi=
-nlock_t *lock)
-> >  #define raw_res_spin_lock_init(lock) ({ *(lock) =3D (rqspinlock_t){0};=
- })
-> >  #endif
-> >
-> > -#define raw_res_spin_lock(lock)                    \
-> > -     ({                                         \
-> > -             int __ret;                         \
-> > -             preempt_disable();                 \
-> > -             __ret =3D res_spin_lock(lock);       \
-> > -             if (__ret)                         \
-> > -                     preempt_enable();          \
-> > -             __ret;                             \
-> > -     })
-> > +static __always_inline __must_check int raw_res_spin_lock(rqspinlock_t=
- *lock)
-> > +{
-> > +     int ret;
-> > +
-> > +     preempt_disable();
-> > +     ret =3D res_spin_lock(lock);
-> > +     if (ret)
-> > +             preempt_enable();
-> > +
-> > +     return ret;
-> > +}
-> >
-> >  #define raw_res_spin_unlock(lock) ({ res_spin_unlock(lock); preempt_en=
-able(); })
-> >
-> > -#define raw_res_spin_lock_irqsave(lock, flags)    \
-> > -     ({                                        \
-> > -             int __ret;                        \
-> > -             local_irq_save(flags);            \
-> > -             __ret =3D raw_res_spin_lock(lock);  \
-> > -             if (__ret)                        \
-> > -                     local_irq_restore(flags); \
-> > -             __ret;                            \
-> > -     })
-> > +static __always_inline __must_check int
-> > +__raw_res_spin_lock_irqsave(rqspinlock_t *lock, unsigned long *flags)
-> > +{
-> > +     unsigned long __flags;
-> > +     int ret;
-> > +
-> > +     local_irq_save(__flags);
-> > +     ret =3D raw_res_spin_lock(lock);
-> > +     if (ret)
-> > +             local_irq_restore(__flags);
-> > +
-> > +     *flags =3D __flags;
-> > +     return ret;
-> > +}
-> > +
-> > +#define raw_res_spin_lock_irqsave(lock, flags) __raw_res_spin_lock_irq=
-save(lock, &flags)
->
-> The __must_check annotations will cause compiler warnings in
-> kernel/locking/locktorture.c where torture_raw_res_spin_write_lock()
-> and torture_raw_res_spin_write_lock_irq() ignore lock acquisition
-> failures.
+In cake_drop(), qdisc_tree_reduce_backlog() is used to update the qlen
+and backlog of the qdisc hierarchy. Its caller, cake_enqueue(), assumes
+that the parent qdisc will enqueue the current packet. However, this
+assumption breaks when cake_enqueue() returns NET_XMIT_CN: the parent
+qdisc stops enqueuing current packet, leaving the tree qlen/backlog
+accounting inconsistent. This mismatch can lead to a NULL dereference
+(e.g., when the parent Qdisc is qfq_qdisc).
 
-This should be fine. I compiled with gcc and clang and they all seem
-to not propagate the check more than one level.
+This patch computes the qlen/backlog delta in a more robust way by
+observing the difference before and after the series of cake_drop()
+calls, and then compensates the qdisc tree accounting if cake_enqueue()
+returns NET_XMIT_CN.
 
->
-> When raw_res_spin_lock() returns an error (deadlock or timeout), the
-> torture test functions still return 0 to indicate success. The torture
-> framework then calls the unlock functions, but the lock was never
-> acquired. In res_spin_unlock(), this causes an out-of-bounds array
-> access when computing locks[cnt - 1] with cnt=3D0, potentially corrupting
-> per-CPU memory.
->
-> Should the torture test handle lock acquisition failures, or use
-> different lock types that cannot fail?
->
+To ensure correct compensation when ACK thinning is enabled, a new
+variable is introduced to keep qlen unchanged.
 
-Deadlock should not happen in this case, but for the correctness of
-the code I can send another patch to address it if people find that
-necessary.
+Fixes: 15de71d06a40 ("net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit")
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+---
+v2: add missing cc
+v3: move qdisc_tree_reduce_backlog out of cake_drop
+v4: remove redundant variable and handle ack branch correctly
+---
+ net/sched/sch_cake.c | 52 +++++++++++++++++++++++++-------------------
+ 1 file changed, 30 insertions(+), 22 deletions(-)
 
-Perhaps something like this:
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index 32bacfc314c2..cf4d6454ca9c 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -1597,7 +1597,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+ 
+ 	qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
+ 	sch->q.qlen--;
+-	qdisc_tree_reduce_backlog(sch, 1, len);
+ 
+ 	cake_heapify(q, 0);
+ 
+@@ -1750,7 +1749,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	ktime_t now = ktime_get();
+ 	struct cake_tin_data *b;
+ 	struct cake_flow *flow;
+-	u32 idx, tin;
++	u32 idx, tin, prev_qlen, prev_backlog, drop_id;
++	bool same_flow = false;
+ 
+ 	/* choose flow to insert into */
+ 	idx = cake_classify(sch, &b, skb, q->flow_mode, &ret);
+@@ -1823,6 +1823,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		consume_skb(skb);
+ 	} else {
+ 		/* not splitting */
++		int ack_pkt_len = 0;
++
+ 		cobalt_set_enqueue_time(skb, now);
+ 		get_cobalt_cb(skb)->adjusted_len = cake_overhead(q, skb);
+ 		flow_queue_add(flow, skb);
+@@ -1834,7 +1836,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 			b->ack_drops++;
+ 			sch->qstats.drops++;
+ 			b->bytes += qdisc_pkt_len(ack);
+-			len -= qdisc_pkt_len(ack);
++			ack_pkt_len = qdisc_pkt_len(ack);
+ 			q->buffer_used += skb->truesize - ack->truesize;
+ 			if (q->rate_flags & CAKE_FLAG_INGRESS)
+ 				cake_advance_shaper(q, b, ack, now, true);
+@@ -1848,11 +1850,11 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 
+ 		/* stats */
+ 		b->packets++;
+-		b->bytes	    += len;
+-		b->backlogs[idx]    += len;
+-		b->tin_backlog      += len;
+-		sch->qstats.backlog += len;
+-		q->avg_window_bytes += len;
++		b->bytes	    += len - ack_pkt_len;
++		b->backlogs[idx]    += len - ack_pkt_len;
++		b->tin_backlog      += len - ack_pkt_len;
++		sch->qstats.backlog += len - ack_pkt_len;
++		q->avg_window_bytes += len - ack_pkt_len;
+ 	}
+ 
+ 	if (q->overflow_timeout)
+@@ -1927,24 +1929,30 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	if (q->buffer_used > q->buffer_max_used)
+ 		q->buffer_max_used = q->buffer_used;
+ 
+-	if (q->buffer_used > q->buffer_limit) {
+-		bool same_flow = false;
+-		u32 dropped = 0;
+-		u32 drop_id;
++	if (q->buffer_used <= q->buffer_limit)
++		return NET_XMIT_SUCCESS;
+ 
+-		while (q->buffer_used > q->buffer_limit) {
+-			dropped++;
+-			drop_id = cake_drop(sch, to_free);
++	prev_qlen = sch->q.qlen;
++	prev_backlog = sch->qstats.backlog;
+ 
+-			if ((drop_id >> 16) == tin &&
+-			    (drop_id & 0xFFFF) == idx)
+-				same_flow = true;
+-		}
+-		b->drop_overlimit += dropped;
++	while (q->buffer_used > q->buffer_limit) {
++		drop_id = cake_drop(sch, to_free);
++		if ((drop_id >> 16) == tin &&
++		    (drop_id & 0xFFFF) == idx)
++			same_flow = true;
++	}
++
++	/* Compute the droppped qlen and pkt length */
++	prev_qlen -= sch->q.qlen;
++	prev_backlog -= sch->qstats.backlog;
++	b->drop_overlimit += prev_backlog;
+ 
+-		if (same_flow)
+-			return NET_XMIT_CN;
++	if (same_flow) {
++		qdisc_tree_reduce_backlog(sch, prev_qlen - 1,
++					  prev_backlog - len);
++		return NET_XMIT_CN;
+ 	}
++	qdisc_tree_reduce_backlog(sch, prev_qlen, prev_backlog);
+ 	return NET_XMIT_SUCCESS;
+ }
+ 
+-- 
+2.43.0
 
-@@ -931,7 +931,11 @@ static int lock_torture_writer(void *arg)
-                if (!skip_main_lock) {
-                        if (acq_writer_lim > 0)
-                                j =3D jiffies;
--                       cxt.cur_ops->writelock(tid);
-+                       err =3D cxt.cur_ops->writelock(tid);
-+                       if (WARN_ON_ONCE(err)) {
-+                               lwsp->n_lock_fail++;
-+                               goto nested_unlock;
-+                       }
-                        if (WARN_ON_ONCE(lock_is_write_held))
-                                lwsp->n_lock_fail++;
-                        lock_is_write_held =3D true;
-@@ -951,6 +955,7 @@ static int lock_torture_writer(void *arg)
-                        WRITE_ONCE(last_lock_release, jiffies);
-                        cxt.cur_ops->writeunlock(tid);
-                }
-+nested_unlock:
-                if (cxt.cur_ops->nested_unlock)
-                        cxt.cur_ops->nested_unlock(tid, lockset_mask);
-
->
-> ---
-> AI reviewed your patch. Please fix the bug or email reply why it's not a =
-bug.
-> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/READM=
-E.md
->
-> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/195835=
-58278
 
