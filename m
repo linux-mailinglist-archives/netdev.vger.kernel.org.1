@@ -1,351 +1,144 @@
-Return-Path: <netdev+bounces-240682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0529FC77C19
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 08:50:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D91C77CE3
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:11:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sea.lore.kernel.org (Postfix) with ESMTPS id 972102D0F5
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 07:50:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id 9AD2C2AFE3
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 08:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D303F338909;
-	Fri, 21 Nov 2025 07:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A77338930;
+	Fri, 21 Nov 2025 08:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AaGLNKZi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j2IpuauI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A786C1C5D59;
-	Fri, 21 Nov 2025 07:50:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE05337B8A;
+	Fri, 21 Nov 2025 08:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763711423; cv=none; b=LxiiRnqK/ZmazccKhhUsywwvX+dOpP4oDI6OFIFcogr64I+P06zxg4l22YtsyvFAwoMXS5LSk51kCgcfNUs0tRmJRso7kw7wF9rtz27OpB9VgfcCDqwu93EwQgumsiMBvlXfw2ihaPiWio0utQFJhPeIIs87f08yEJLCLnFENrE=
+	t=1763712695; cv=none; b=eCaGaWRadNL4b16yxqD2W3istVOwtfMqCC0E+Qt+2LjZjjxoR32h2qUDy0OEZWcLutrHglYcO7IX8AhsWjEiyxbq5ppHKBIATh9noq3as5QY2XPKa3fZgRsyTJ4IL8U9F1w3OQgcd/Wm271RjLk+MgTDPhNFWYeWOD1jO+lRFBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763711423; c=relaxed/simple;
-	bh=Ofd7ZYO+qzo/OWnYAKnoavnGqiDvpuJ+17HtYhWf1ws=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k0oBmgK9XBGprwmzW37W0p85AD+GrBNORzA5ym+N7+M/uaKTXjL0qh5N3L1j5Oq7FHmzZIBkbKaDeusffb/nepHKTD3KaePzr7xiPyHYBAQmIhbQXU1mEYXJwjFeTwsLUNAUhwbGCGjT3IdnfxxFeIpw5x2S+iRUrWbOi4AFN7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AaGLNKZi; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 4DADBC10198;
-	Fri, 21 Nov 2025 07:49:55 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 97F3D60719;
-	Fri, 21 Nov 2025 07:50:17 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4FE2410371BD6;
-	Fri, 21 Nov 2025 08:50:06 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763711416; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=UihALN939dWtBx8J7xdZLo4PIOkiBcQrrRl1xffnn3c=;
-	b=AaGLNKZiCp1ON4rV/8afRL2xarmo40rJz8YMUk9aiUIRKoKT0iB+QR1ab+7vKTp07CSiuH
-	AECYlbEX/pHr8aOlYFfHCVY3gc+xEK4fRvE71oP9i6HxyITtCL1WfAP1L58nLFMqu+iSYt
-	4pLeVrV4Ee0GdWy7GM/FoumkSienWOJo5YD0d575Pqpc/KJYk4S1A7RgBIBl2Ari/yEKjM
-	G1scsObnBmOmQBVErp7AU71RlXRcZD+MYVDM0Qm+OrFTX7oPmfhubfG4PBGJKhkAwBg+lv
-	OQyu2RnjlKH/XbO0KFO3DcwxUgxVqnp7auviUnHX5dPpHd0v+nsDOwb8WNpK6g==
-Message-ID: <73a3228a-6124-4d42-985d-aca0e572bb8f@bootlin.com>
-Date: Fri, 21 Nov 2025 08:50:06 +0100
+	s=arc-20240116; t=1763712695; c=relaxed/simple;
+	bh=pW0UtR10YWkUN13SUy+0a/yKHaL/ruwN9XKz/Ak5/4Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cPieTxjLdHhmwBf/zmfpTolv3SidSlI4VLqiIf9o7gq3fvbkJcYPT/yY5Vl1lyqoBTybny44lx8nmgJPjygdUsxqZn8OobmHJ0iqtfvqTT4O4s9u4tP8mepKUE1Mqrvjprr+YHREYlamybtUtZGvmeCSA3+v+uj302REJV+ggR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j2IpuauI; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763712693; x=1795248693;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pW0UtR10YWkUN13SUy+0a/yKHaL/ruwN9XKz/Ak5/4Q=;
+  b=j2IpuauIfZd6o10OhBUk2dbrXtNrCzojKMLuW7Vqhi7MSNSLWp9IRzs1
+   J90hVY4AzxrZzPukjMq27qXYuNxJDan6UNhpo5XD7/OIo8JEXVYSyk3te
+   JFIVn/1DkMdOVLTsI6zYwupTFU+UxFKMsGciAU3hJxHFFloncQc47nykJ
+   H/fXzPUh241nbpseuymXSTs1DE+LwuAhDnefoMZNrw4Z5kex/Eks8YkFE
+   8amXEYRFmQ+aNaB6r+fRldLwuQxlnmKO+9EbITH6lMlBxUiLs2Bi38x2u
+   K7P5n5kz/+dYfSKgA5HrxEkX7jcSWGuInqcBYsPcc+HCe77JI0djc+RID
+   A==;
+X-CSE-ConnectionGUID: 5WrbQiBOQtedvSsgyb0VEQ==
+X-CSE-MsgGUID: oxa8D5KgRM+hNQAni3eBrg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="53373997"
+X-IronPort-AV: E=Sophos;i="6.20,215,1758610800"; 
+   d="scan'208";a="53373997"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 00:11:31 -0800
+X-CSE-ConnectionGUID: j2r2rfMMS+OlQfqZjrItYg==
+X-CSE-MsgGUID: aVeG8Nx5QAW9TNl/j3miGA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,215,1758610800"; 
+   d="scan'208";a="222275426"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by orviesa002.jf.intel.com with ESMTP; 21 Nov 2025 00:11:29 -0800
+Received: by black.igk.intel.com (Postfix, from userid 1001)
+	id EC88096; Fri, 21 Nov 2025 09:11:27 +0100 (CET)
+Date: Fri, 21 Nov 2025 09:11:27 +0100
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
+To: Ian MacDonald <ian@netstatz.com>
+Cc: Mika Westerberg <westeri@kernel.org>,
+	Yehezkel Bernat <YehezkelShB@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, 1121032@bugs.debian.org
+Subject: Re: net: thunderbolt: missing ndo_set_mac_address breaks 802.3ad
+ bonding
+Message-ID: <20251121081127.GS2912318@black.igk.intel.com>
+References: <CAFJzfF9N4Hak23sc-zh0jMobbkjK7rg4odhic1DQ1cC+=MoQoA@mail.gmail.com>
+ <20251121060825.GR2912318@black.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v18 00/15] net: phy: Introduce PHY ports
- representation
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
- Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
- Tariq Toukan <tariqt@nvidia.com>
-References: <20251120205508.553909-1-maxime.chevallier@bootlin.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251120205508.553909-1-maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251121060825.GR2912318@black.igk.intel.com>
 
-Hi folks,
+Hi,
 
-On 20/11/2025 21:54, Maxime Chevallier wrote:
-> Hi everyone,
+On Fri, Nov 21, 2025 at 07:08:25AM +0100, Mika Westerberg wrote:
+> Hi Ian,
 > 
-> This is v18 of the phy_port work. This iteration adds a missing 'static'
-> keyword in the ethtool_link_medium_names compared to V17. 
+> On Thu, Nov 20, 2025 at 03:59:15PM -0500, Ian MacDonald wrote:
+> > Hi,
+> > 
+> > Using two Thunderbolt network interfaces as slaves in a bonding device
+> > in mode 802.3ad (LACP) fails because the bonding driver cannot set the
+> > MAC address on the thunderbolt_net interfaces. The same setup works in
+> > mode active-backup.
+> > 
+> > Hardware: AMD Strix Halo (Framework connect to Sixunited AXB35 USB4 ports)
+> > Kernel:  6.12.57 (also reproduced on 6.16.12 and 6.18~rc6)
 > 
-> Patches 2 and 3 lack PHY maintainers reviews.
+> Okay "breaks" is probably too strong word here. It was never even supported
+> :)
 > 
-> This series conflicts with Tariq's 1.6Tbps (wow !) series :
+> > 
+> > Steps to reproduce:
+> > 1. Create a bond with mode 802.3ad and add thunderbolt0 and thunderbolt1
+> >    as slaves.
+> > 2. Bring up the bond and slaves.
 > 
-> https://lore.kernel.org/all/1763585297-1243980-1-git-send-email-tariqt@nvidia.com/
+> Can you describe what are the actual commands you run so I can try to
+> setup on my side and see how this could be implemented?
 
-It has been recently merged, I'll resend with a rebase on this works
-after the 24h cooldown.
+Okay since the MAC address is not really being used in the USB4NET protocol
+it should be fine to allow it to be changed.
 
-Any review is welcome in the meantime :)
+The below allows me to change it using "ip link set" command. I wonder if
+you could try it with the bonding case and see it that makes any
+difference?
 
-Thanks,
-
-Maxime
-
-> 
-> Thanks for everyone's patience and reviews on that work ! Now, the
-> usual blurb for the series description.
-> 
-> As a remainder, a few important notes :
-> 
->  - This is only a first phase. It instantiates the port, and leverage
->    that to make the MAC <-> PHY <-> SFP usecase simpler.
-> 
->  - Next phase will deal with controlling the port state, as well as the
->    netlink uAPI for that.
-> 
->  - The end-goal is to enable support for complex port MUX. This
->    preliminary work focuses on PHY-driven ports, but this will be
->    extended to support muxing at the MII level (Multi-phy, or compo PHY
->    + SFP as found on Turris Omnia for example).
-> 
->  - The naming is definitely not set in stone. I named that "phy_port",
->    but this may convey the false sense that this is phylib-specific.
->    Even the word "port" is not that great, as it already has several
->    different meanings in the net world (switch port, devlink port,
->    etc.). I used the term "connector" in the binding.
-> 
-> A bit of history on that work :
-> 
-> The end goal that I personnaly want to achieve is :
-> 
->             + PHY - RJ45
->             | 
->  MAC - MUX -+ PHY - RJ45
-> 
-> After many discussions here on netdev@, but also at netdevconf[1] and
-> LPC[2], there appears to be several analoguous designs that exist out
-> there.
-> 
-> [1] : https://netdevconf.info/0x17/sessions/talk/improving-multi-phy-and-multi-port-interfaces.html
-> [2] : https://lpc.events/event/18/contributions/1964/ (video isn't the
-> right one)
-> 
-> Take the MAchiatobin, it has 2 interfaces that looks like this :
-> 
->  MAC - PHY -+ RJ45
->             |
-> 	    + SFP - Whatever the module does
-> 
-> Now, looking at the Turris Omnia, we have :
-> 
-> 
->  MAC - MUX -+ PHY - RJ45
->             |
-> 	    + SFP - Whatever the module does
-> 
-> We can find more example of this kind of designs, the common part is
-> that we expose multiple front-facing media ports. This is what this
-> current work aims at supporting. As of right now, it does'nt add any
-> support for muxing, but this will come later on.
-> 
-> This first phase focuses on phy-driven ports only, but there are already
-> quite some challenges already. For one, we can't really autodetect how
-> many ports are sitting behind a PHY. That's why this series introduces a
-> new binding. Describing ports in DT should however be a last-resort
-> thing when we need to clear some ambiguity about the PHY media-side.
-> 
-> The only use-cases that we have today for multi-port PHYs are combo PHYs
-> that drive both a Copper port and an SFP (the Macchiatobin case). This
-> in itself is challenging and this series only addresses part of this
-> support, by registering a phy_port for the PHY <-> SFP connection. The
-> SFP module should in the end be considered as a port as well, but that's
-> not yet the case.
-> 
-> However, because now PHYs can register phy_ports for every media-side
-> interface they have, they can register the capabilities of their ports,
-> which allows making the PHY-driver SFP case much more generic.
-> 
-> Let me know what you think, I'm all in for discussions :)
-> 
-> Regards,
-> 
-> Changes in v18:
->  - Added a missing 'static' when declaring the medium names.
-> 
-> Changes in v17:
->  - Moved the medium names to patch 3
->  - Moved some mediums helpers out of uapi, and the logic into
->    net/ethtool/common.c instead of inline functions in headers
->  - Added a MAINTAINERS entry
->  - Aggregated reviews/tests
->  - Rebased on net-next
-> 
-> Changes in v16:
->  - From Andrew, relaxed the check on the number of pairs so that we only
->    fail when baseT is missing pairs
->  - Add a check for either 1, 2 or 4 pairs
->  - Lots of typos (mostly lanes -> pairs)
->  - Added Andrew's review tags (thanks again)
->  - From Rob, added an "else" statement in the ethernet-connector binding
->  - Changed the node name for ethernet connectors to be decimal
-> 
-> Changes in V15:
->  - Update bindings, docs and code to use pairs instead of lanes
->  - Make pairs only relevant for BaseT
-> 
-> Changes in V14:
->  - Fixed kdoc
->  - Use the sfp module_caps feature.
-> 
-> Changes in V13:
->  - Added phy_caps support for interface selection
->  - Aggregated tested-by tags
-> 
-> Changes in V12:
->  - Moved some of phylink's internal helpers to phy_caps for reuse in
->    phylib
->  - Fixed SFP interface selection
->  - Added Rob's review and changes in patch 6
-> 
-> Changes in V11:
->  - The ti,fiber-mode property was deprecated in favor of the
->    ethernet-connector binding
->  - The .attach_port was split into an MDI and an MII version
->  - I added the warning back in the AR8031 PHY driver
->  - There is now an init-time check on the number of lanes associated to
->    every linkmode, making sure the number of lanes is above or equal to
->    the minimum required
->  - Various typos were fixed all around
->  - We no longer use sfp_select_interface() for SFP interface validation
-> 
-> Changes in V10:
->  - Rebase on net-next
->  - Fix a typo reported by Köry
->  - Aggregate all reviews
->  - Fix the conflict on the qcom driver
-> 
-> Changes in V9:
->  - Removed maxItems and items from the connector binding
->  - Fixed a typo in the binding
-> 
-> Changes in V8:
->  - Added maxItems on the connector media binding
->  - Made sure we parse a single medium
->  - Added a missing bitwise macro
-> 
-> Changes in V7:
->  - Move ethtool_medium_get_supported to phy_caps
->  - support combo-ports, each with a given set of supported modes
->  - Introduce the notion of 'not-described' ports
-> 
-> Changes in V6:
-> 
->  - Fixed kdoc on patch 3
->  - Addressed a missing port-ops registration for the Marvell 88x2222
->    driver
->  - Addressed a warning reported by Simon on the DP83822 when building
->    without CONFIG_OF_MDIO
-> 
-> Changes in V5 :
-> 
->  - renamed the bindings to use the term "connector" instead of "port"
->  - Rebased, and fixed some issues reported on the 83822 driver
->  - Use phy_caps
-> 
-> Changes in V4 :
-> 
->  - Introduced a kernel doc
->  - Reworked the mediums definitions in patch 2
->  - QCA807x now uses the generic SFP support
->  - Fixed some implementation bugs to build the support list based on the
->    interfaces supported on a port
-> 
-> V17: https://lore.kernel.org/all/20251119195920.442860-1-maxime.chevallier@bootlin.com/
-> V16: https://lore.kernel.org/all/20251113081418.180557-2-maxime.chevallier@bootlin.com/
-> V15: https://lore.kernel.org/all/20251106094742.2104099-1-maxime.chevallier@bootlin.com/
-> V14: https://lore.kernel.org/netdev/20251013143146.364919-1-maxime.chevallier@bootlin.com/
-> V13: https://lore.kernel.org/netdev/20250921160419.333427-1-maxime.chevallier@bootlin.com/
-> V12: https://lore.kernel.org/netdev/20250909152617.119554-1-maxime.chevallier@bootlin.com/
-> V11: https://lore.kernel.org/netdev/20250814135832.174911-1-maxime.chevallier@bootlin.com/
-> V10: https://lore.kernel.org/netdev/20250722121623.609732-1-maxime.chevallier@bootlin.com/
-> V9: https://lore.kernel.org/netdev/20250717073020.154010-1-maxime.chevallier@bootlin.com/
-> V8: https://lore.kernel.org/netdev/20250710134533.596123-1-maxime.chevallier@bootlin.com/
-> v7: https://lore.kernel.org/netdev/20250630143315.250879-1-maxime.chevallier@bootlin.com/
-> V6: https://lore.kernel.org/netdev/20250507135331.76021-1-maxime.chevallier@bootlin.com/
-> V5: https://lore.kernel.org/netdev/20250425141511.182537-1-maxime.chevallier@bootlin.com/
-> V4: https://lore.kernel.org/netdev/20250213101606.1154014-1-maxime.chevallier@bootlin.com/
-> V3: https://lore.kernel.org/netdev/20250207223634.600218-1-maxime.chevallier@bootlin.com/
-> RFC V2: https://lore.kernel.org/netdev/20250122174252.82730-1-maxime.chevallier@bootlin.com/
-> RFC V1: https://lore.kernel.org/netdev/20241220201506.2791940-1-maxime.chevallier@bootlin.com/
-> 
-> Maxime
-> 
-> Maxime Chevallier (15):
->   dt-bindings: net: Introduce the ethernet-connector description
->   net: ethtool: Introduce ETHTOOL_LINK_MEDIUM_* values
->   net: phy: Introduce PHY ports representation
->   net: phy: dp83822: Add support for phy_port representation
->   dt-bindings: net: dp83822: Deprecate ti,fiber-mode
->   net: phy: Create a phy_port for PHY-driven SFPs
->   net: phy: Introduce generic SFP handling for PHY drivers
->   net: phy: marvell-88x2222: Support SFP through phy_port interface
->   net: phy: marvell: Support SFP through phy_port interface
->   net: phy: marvell10g: Support SFP through phy_port
->   net: phy: at803x: Support SFP through phy_port interface
->   net: phy: qca807x: Support SFP through phy_port interface
->   net: phy: Only rely on phy_port for PHY-driven SFP
->   net: phy: dp83822: Add SFP support through the phy_port interface
->   Documentation: networking: Document the phy_port infrastructure
-> 
->  .../bindings/net/ethernet-connector.yaml      |  57 +++
->  .../devicetree/bindings/net/ethernet-phy.yaml |  18 +
->  .../devicetree/bindings/net/ti,dp83822.yaml   |   9 +-
->  Documentation/networking/index.rst            |   1 +
->  Documentation/networking/phy-port.rst         | 111 ++++++
->  MAINTAINERS                                   |  10 +
->  drivers/net/phy/Makefile                      |   2 +-
->  drivers/net/phy/dp83822.c                     |  78 ++--
->  drivers/net/phy/marvell-88x2222.c             |  94 ++---
->  drivers/net/phy/marvell.c                     |  92 ++---
->  drivers/net/phy/marvell10g.c                  |  52 +--
->  drivers/net/phy/phy-caps.h                    |   5 +
->  drivers/net/phy/phy-core.c                    |   6 +
->  drivers/net/phy/phy_caps.c                    |  65 ++++
->  drivers/net/phy/phy_device.c                  | 337 +++++++++++++++++-
->  drivers/net/phy/phy_port.c                    | 212 +++++++++++
->  drivers/net/phy/qcom/at803x.c                 |  77 ++--
->  drivers/net/phy/qcom/qca807x.c                |  72 ++--
->  include/linux/ethtool.h                       |  36 +-
->  include/linux/phy.h                           |  63 +++-
->  include/linux/phy_port.h                      |  99 +++++
->  net/ethtool/common.c                          | 279 +++++++++------
->  22 files changed, 1394 insertions(+), 381 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
->  create mode 100644 Documentation/networking/phy-port.rst
->  create mode 100644 drivers/net/phy/phy_port.c
->  create mode 100644 include/linux/phy_port.h
-> 
+diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
+index dcaa62377808..57b226afeb84 100644
+--- a/drivers/net/thunderbolt/main.c
++++ b/drivers/net/thunderbolt/main.c
+@@ -1261,6 +1261,7 @@ static const struct net_device_ops tbnet_netdev_ops = {
+ 	.ndo_open = tbnet_open,
+ 	.ndo_stop = tbnet_stop,
+ 	.ndo_start_xmit = tbnet_start_xmit,
++	.ndo_set_mac_address = eth_mac_addr,
+ 	.ndo_get_stats64 = tbnet_get_stats64,
+ };
+ 
+@@ -1281,6 +1282,9 @@ static void tbnet_generate_mac(struct net_device *dev)
+ 	hash = jhash2((u32 *)xd->local_uuid, 4, hash);
+ 	addr[5] = hash & 0xff;
+ 	eth_hw_addr_set(dev, addr);
++
++	/* Allow changing it if needed */
++	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+ }
+ 
+ static int tbnet_probe(struct tb_service *svc, const struct tb_service_id *id)
+-- 
+2.51.0
 
 
