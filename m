@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-240903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54CA9C7BEE1
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:15:34 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 956CAC7BEE7
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:15:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A198C4E9792
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 23:14:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E02F34EBC86
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 23:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44D630FF27;
-	Fri, 21 Nov 2025 23:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4B53115A2;
+	Fri, 21 Nov 2025 23:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CzyhXA9y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TooVriJO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63A830507E
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 23:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC0330F544
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 23:13:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763766838; cv=none; b=nhB1jK7zPqWFSwd58tnzUp8CpkxcjloTDCKmktMIeY1R1qEYHkHolsMZDLs6bDWY7djovAlLD0wCD7NQb1/FQO1pxD3mwOy5Rn5WqtkoLEaxBs278z8EaZcn02b/MYmAhei72YxZXtkJXkjID0IHpBCqIUbuAcHRnVS6yPa7g10=
+	t=1763766839; cv=none; b=JTY6oc8jHitHFEwMmG/CUjpRioVZ+FNlSGX9PuVm4XEUhL3KnyvZFTKkfok5VePLoVu/JilplWMcWhtsCNsbOOya5gWz6U7yavyiO+5verWqv2NgnO5uQDhlxzjDeqn+4/S9Z+F1jkAa8cg89htkiokznk0gDMSUqgWozcE/HHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763766838; c=relaxed/simple;
-	bh=IXE5NXs13KPrnV73GmUXkZsEw28XI9clmQ32zXqDX6c=;
+	s=arc-20240116; t=1763766839; c=relaxed/simple;
+	bh=nuadBieIRqkX2X2xKigInlacOaV8KUksUNbusE6Cd0s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rvfR2VIpMB68mSLAGfvw0fDBNLqGgVGXG8wgWobwiVQiMbA3VUVUqLRh+ng6i1hqj0vTiD+7FGJkhRKJt/ErI0AltZ1ttDbqKz0KBfavUMjdHkoAnqauWhXZZFd5MVnbtHXCcIZpGZwTLXIfg2t7uJ6vThso/235AcRUESw54QU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CzyhXA9y; arc=none smtp.client-ip=209.85.210.169
+	 MIME-Version; b=sZY+gjFnJYhkbV3c8V1SAaMkXZyqoxOFEd6x7qk2ulYs97VHe9wELXGGfwgum2yvx2H3cI1apRoa0VOD/xcVRTT/Rv8jgPQBVzPfu5uMiqleHiHr153kzRyNkci1+NEXRaawc3ShJWGeBE4IkZyXumaSmzh9U5CUAz1RNB1S24E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TooVriJO; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7ba92341f83so3521519b3a.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 15:13:56 -0800 (PST)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7a9cdf62d31so3106075b3a.3
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 15:13:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763766836; x=1764371636; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763766837; x=1764371637; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Zun72wkC25mFH5P1n54KjmFwV5dNnQuwdD8Rxdm/l04=;
-        b=CzyhXA9y9nZrpbTcsVOTgi61xucFnFyzAaO+3u9qZH+HgxRcQ2ZQhyDuOChxXscccM
-         9KldP+VMj84G9hFxJSq/kLN1dX9ewS3nh/79i1sLUqwuEA0g2leBzj/X9ssuwlP20pFk
-         kgqUy5kiWxbl8oalOV2iRKILPkkWJ8JgdTjEvo5RiHmBcJjdDQhtyUdbuQRKed3uP6hL
-         zlhttUuyRTYKw7o5uQ2Mb3wQHt16q8+G8sNqVXKNQW11IOuBZLwwQjJz3faFcHKtfEbJ
-         ONqLK7vHg6f+c3IPSi1flo6kmHMKn+aNDy9OdcAxJzencTe9Y4JJ0eqC0zBx9qriv5Zk
-         1WFQ==
+        bh=vnoROxKfUGaKnMycvDbpiyKb0bwKma4edMq84tq9sMQ=;
+        b=TooVriJO9C3Y2YLwV7xNPQLp27/07mc0Viw92eGZbezMZEVcDnZyuYiB1cUgQyh17W
+         gPpJZdAU6+tnF+UUx+33nbZg9535nBYycdgo1Y7zdWaYY1v0XCWRjvch5oYemu1syySn
+         IIN9qncMUZuo9GR+yxnTeVKItJmOx3OVt6jTLG9g1C8+HNMbcxfySPok/lfhZtbUiU7H
+         32jT3UK894tdpXeuDnt3+lQsOI1B7NvLJyeSzrFTeR2FXvDvBtsegea0djLjiDU7R8cn
+         Ear8RfqfCVTOOKSVKXo2ss4QdiH9IAQz4O4HZR4n2ggaigdqqim2ELTLNLRqTFOaRFRQ
+         JzxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763766836; x=1764371636;
+        d=1e100.net; s=20230601; t=1763766837; x=1764371637;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Zun72wkC25mFH5P1n54KjmFwV5dNnQuwdD8Rxdm/l04=;
-        b=rZr7LSVd6Nk0pX/z5LkxHXA8nleU6s7ezIQ1EduvCi2ayJMpVBWx4PbcgX4NXmi+A7
-         t9qR50h0tKpagYxqOIJ2CHIkN5/OX/Se5iayC+1xphbOYj6EzQaSqCtT+P961E54hSKd
-         cuu0NmVNwkrF/iKwUsHIO7hfHSmlBK4M3HU+OXNSoIFipnWaaOyV5+nmRZo+YDE5WqT+
-         5pWdpcjjoYQ95+65LmKSl6fD5B2aIVepIr6/7S+DQZp76UQZ04emOF0R5JER0d0HdPEg
-         MvARphCdVA5exye2bzOxImg7kLAJUFzMn32535n3kKr56iWL9o39TBkt/bmtnchPR3Kt
-         +F3g==
-X-Gm-Message-State: AOJu0YzjXiNmJh1vKYjA+MLhyTe2mVyDHjFayhr/TsRtuiP8QtNXVEBQ
-	nGpw11583OeIEhKUHIaF9CCx4uPwvGZInPkWHCH77C5Nky2ustFlGyM6
-X-Gm-Gg: ASbGncvKwMb4tHMmlFEaFY+fc9kUJolTz2gNjIqA9fIbnbro27O9GcEvDHPwmlm+VZh
-	Tx9aNfr5uZHM9REv1PyXpzfGe+AQAtdrif9kJVtFEVLGQEiKyg8rM+OWCo8ZHSS2Cw9uFoXYuKJ
-	ajrDYifWSliigXZRUpktWaM9FvIg5tIPjV40JbuvBXkufVgZSyDnaclTvCzLvWdtSoEYe/rl7DO
-	v2oLi/xEHuK8P4PWvja5FlCSITj9FmMxmHGE9KSfkNAEHwDgYvmRd4HVbFDFSA7IC1AbyG2WlhA
-	/r0xfVQDhccsE8HUQnvIafKMbCY9uQo99p6F4fZ/lsA7vsZlB7pGONiJnKEQ66A06tl1dl/TSk6
-	GBaR4HB/APvmUO9OjGOPAZbfNHgXw5/486Q3cZEG4AsqDFdMR1d2KhDsCk/13M4EhNWKR9oGgkf
-	A1C3MOADOmM5aqkw==
-X-Google-Smtp-Source: AGHT+IGknyUN6BLCu4CDBacqL2tAK3IOVYN9LKKboQa8ioePLe8TeKGSmOvx9ZMWHDhgnLxTe1qBgw==
-X-Received: by 2002:a05:6a21:328d:b0:350:8066:6ebd with SMTP id adf61e73a8af0-3614eb8e093mr5078073637.13.1763766836054;
-        Fri, 21 Nov 2025 15:13:56 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:47::])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bd75e4ca0casm6410264a12.10.2025.11.21.15.13.55
+        bh=vnoROxKfUGaKnMycvDbpiyKb0bwKma4edMq84tq9sMQ=;
+        b=LSGQmKK9qjRKOgO0Ia9qclGdIK/WBxQ9EppCE81Ek/3pthZ/xZEg+UYYPcRL1tf1z4
+         FAclHdQhotGNpshjn1cOmGgIxTiLILBV8BogT/drf48WR8Zl1blBMy8hQbBUQIq0u/Lm
+         ON/NGS8CT+SKLlRoy9+Y1VZ6OCkqDAv1wVnM/tCYZe+5SleGPCErg9B6pkdoS8S50DD9
+         rVe/gao8KmG+2rkXQIAUe4oxUiCLGQfb7UB3WR98CnaIkiAynSzaPqyhD+P5CCGj9/Gd
+         bdAiTOqoC91FG0ynAo8EeH/p9BkZU3Bo2KoTNmnpxMyuuFbP8SVtYv4C/iv6Wc8in17l
+         jkBA==
+X-Gm-Message-State: AOJu0Yz9ZAa34tWiXdAi3fi6FmLV1GcHETbPEYFG2vDQwoj+LXtVTRep
+	c8etvAmbxy/uVls0R86hNJDLBz021wzKKSNDCh+av93pklhVmM/Y8bqG
+X-Gm-Gg: ASbGncsug3FPQu+RUwOyohgOEA19WFWqg25JtgUT+JfAc6xAaFJyXimDZDGlY5XPxSm
+	jC9adY5lUWozFWxI3q2oDuG49KalVI6wdTuMHtC5JunqS2WQ3wWOzgjIM1TpVnPByK+nT8n8LXj
+	BJPZw6ckeFd5CT2o0UvDvaCn/ZMDOxOOBl0VQkJiU0Y4gdzpMFU9TJTLx/OXCnkw4fgjjsXJYfM
+	Pzl2kXoVuV82mbYELPfvHnvujF4TAV3hm/efCK9DJBE4SbSRPZQJgG74jtpfUzhZNcw4h3DKp6l
+	rJfXgAfMr9/t/CwdVnm5UegnAYtFyvV9wbeAQNvrX4MVqQUFRh9A6XtLPomTXyDm2Jhsl06mczb
+	1yx16O6fBVPlUhTydqe7M6dLga5OVqmIuyu4E2NgrQBZdTZ6yG5rOkJl7xu4zMeLhjSCzcwh6il
+	KtpNb/iStcVZzV4umHeuoE7raH
+X-Google-Smtp-Source: AGHT+IE4bNQtdSaRmfKsxwlEdULVL8SfzjIXFqHjwRZ4C/P7oP8bPeIjIRf0NZVSFqAf6+/0/PET6w==
+X-Received: by 2002:a05:6a00:845:b0:7ab:4fce:fa1c with SMTP id d2e1a72fcca58-7c58c2ab130mr4199808b3a.1.1763766837265;
+        Fri, 21 Nov 2025 15:13:57 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:52::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3ed076244sm7034583b3a.7.2025.11.21.15.13.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 15:13:55 -0800 (PST)
+        Fri, 21 Nov 2025 15:13:56 -0800 (PST)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -83,9 +83,9 @@ Cc: netdev@vger.kernel.org,
 	martin.lau@kernel.org,
 	ameryhung@gmail.com,
 	kernel-team@meta.com
-Subject: [PATCH bpf-next v7 2/6] bpf: Support associating BPF program with struct_ops
-Date: Fri, 21 Nov 2025 15:13:48 -0800
-Message-ID: <20251121231352.4032020-3-ameryhung@gmail.com>
+Subject: [PATCH bpf-next v7 3/6] libbpf: Add support for associating BPF program with struct_ops
+Date: Fri, 21 Nov 2025 15:13:49 -0800
+Message-ID: <20251121231352.4032020-4-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251121231352.4032020-1-ameryhung@gmail.com>
 References: <20251121231352.4032020-1-ameryhung@gmail.com>
@@ -97,389 +97,157 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a new BPF command BPF_PROG_ASSOC_STRUCT_OPS to allow associating
-a BPF program with a struct_ops map. This command takes a file
-descriptor of a struct_ops map and a BPF program and set
-prog->aux->st_ops_assoc to the kdata of the struct_ops map.
-
-The command does not accept a struct_ops program nor a non-struct_ops
-map. Programs of a struct_ops map is automatically associated with the
-map during map update. If a program is shared between two struct_ops
-maps, prog->aux->st_ops_assoc will be poisoned to indicate that the
-associated struct_ops is ambiguous. The pointer, once poisoned, cannot
-be reset since we have lost track of associated struct_ops. For other
-program types, the associated struct_ops map, once set, cannot be
-changed later. This restriction may be lifted in the future if there is
-a use case.
-
-A kernel helper bpf_prog_get_assoc_struct_ops() can be used to retrieve
-the associated struct_ops pointer. The returned pointer, if not NULL, is
-guaranteed to be valid and point to a fully updated struct_ops struct.
-For struct_ops program reused in multiple struct_ops map, the return
-will be NULL.
-
-prog->aux->st_ops_assoc is protected by bumping the refcount for
-non-struct_ops programs and RCU for struct_ops programs. Since it would
-be inefficient to track programs associated with a struct_ops map, every
-non-struct_ops program will bump the refcount of the map to make sure
-st_ops_assoc stays valid. For a struct_ops program, it is protected by
-RCU as map_free will wait for an RCU grace period before disassociating
-the program with the map. The helper must be called in BPF program
-context or RCU read-side critical section.
-
-struct_ops implementers should note that the struct_ops returned may not
-be initialized nor attached yet. The struct_ops implementer will be
-responsible for tracking and checking the state of the associated
-struct_ops map if the use case expects an initialized or attached
-struct_ops.
+Add low-level wrapper and libbpf API for BPF_PROG_ASSOC_STRUCT_OPS
+command in the bpf() syscall.
 
 Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
- include/linux/bpf.h            | 16 +++++++
- include/uapi/linux/bpf.h       | 17 +++++++
- kernel/bpf/bpf_struct_ops.c    | 88 ++++++++++++++++++++++++++++++++++
- kernel/bpf/core.c              |  3 ++
- kernel/bpf/syscall.c           | 46 ++++++++++++++++++
- tools/include/uapi/linux/bpf.h | 17 +++++++
- 6 files changed, 187 insertions(+)
+ tools/lib/bpf/bpf.c      | 19 +++++++++++++++++++
+ tools/lib/bpf/bpf.h      | 21 +++++++++++++++++++++
+ tools/lib/bpf/libbpf.c   | 31 +++++++++++++++++++++++++++++++
+ tools/lib/bpf/libbpf.h   | 16 ++++++++++++++++
+ tools/lib/bpf/libbpf.map |  2 ++
+ 5 files changed, 89 insertions(+)
 
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index 09d5dc541d1c..3fb68540ee20 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -1727,6 +1727,8 @@ struct bpf_prog_aux {
- 		struct rcu_head	rcu;
- 	};
- 	struct bpf_stream stream[2];
-+	struct mutex st_ops_assoc_mutex;
-+	struct bpf_map __rcu *st_ops_assoc;
- };
+diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
+index b66f5fbfbbb2..21b57a629916 100644
+--- a/tools/lib/bpf/bpf.c
++++ b/tools/lib/bpf/bpf.c
+@@ -1397,3 +1397,22 @@ int bpf_prog_stream_read(int prog_fd, __u32 stream_id, void *buf, __u32 buf_len,
+ 	err = sys_bpf(BPF_PROG_STREAM_READ_BY_FD, &attr, attr_sz);
+ 	return libbpf_err_errno(err);
+ }
++
++int bpf_prog_assoc_struct_ops(int prog_fd, int map_fd,
++			      struct bpf_prog_assoc_struct_ops_opts *opts)
++{
++	const size_t attr_sz = offsetofend(union bpf_attr, prog_assoc_struct_ops);
++	union bpf_attr attr;
++	int err;
++
++	if (!OPTS_VALID(opts, bpf_prog_assoc_struct_ops_opts))
++		return libbpf_err(-EINVAL);
++
++	memset(&attr, 0, attr_sz);
++	attr.prog_assoc_struct_ops.map_fd = map_fd;
++	attr.prog_assoc_struct_ops.prog_fd = prog_fd;
++	attr.prog_assoc_struct_ops.flags = OPTS_GET(opts, flags, 0);
++
++	err = sys_bpf(BPF_PROG_ASSOC_STRUCT_OPS, &attr, attr_sz);
++	return libbpf_err_errno(err);
++}
+diff --git a/tools/lib/bpf/bpf.h b/tools/lib/bpf/bpf.h
+index e983a3e40d61..1f9c28d27795 100644
+--- a/tools/lib/bpf/bpf.h
++++ b/tools/lib/bpf/bpf.h
+@@ -733,6 +733,27 @@ struct bpf_prog_stream_read_opts {
+ LIBBPF_API int bpf_prog_stream_read(int prog_fd, __u32 stream_id, void *buf, __u32 buf_len,
+ 				    struct bpf_prog_stream_read_opts *opts);
  
- struct bpf_prog {
-@@ -2027,6 +2029,9 @@ static inline void bpf_module_put(const void *data, struct module *owner)
- 		module_put(owner);
- }
- int bpf_struct_ops_link_create(union bpf_attr *attr);
-+int bpf_prog_assoc_struct_ops(struct bpf_prog *prog, struct bpf_map *map);
-+void bpf_prog_disassoc_struct_ops(struct bpf_prog *prog);
-+void *bpf_prog_get_assoc_struct_ops(const struct bpf_prog_aux *aux);
- u32 bpf_struct_ops_id(const void *kdata);
- 
- #ifdef CONFIG_NET
-@@ -2074,6 +2079,17 @@ static inline int bpf_struct_ops_link_create(union bpf_attr *attr)
- {
- 	return -EOPNOTSUPP;
- }
-+static inline int bpf_prog_assoc_struct_ops(struct bpf_prog *prog, struct bpf_map *map)
-+{
-+	return -EOPNOTSUPP;
-+}
-+static inline void bpf_prog_disassoc_struct_ops(struct bpf_prog *prog)
-+{
-+}
-+static inline void *bpf_prog_get_assoc_struct_ops(const struct bpf_prog_aux *aux)
-+{
-+	return NULL;
-+}
- static inline void bpf_map_struct_ops_info_fill(struct bpf_map_info *info, struct bpf_map *map)
- {
- }
-diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-index f5713f59ac10..bf4e00b8e272 100644
---- a/include/uapi/linux/bpf.h
-+++ b/include/uapi/linux/bpf.h
-@@ -918,6 +918,16 @@ union bpf_iter_link_info {
-  *		Number of bytes read from the stream on success, or -1 if an
-  *		error occurred (in which case, *errno* is set appropriately).
-  *
-+ * BPF_PROG_ASSOC_STRUCT_OPS
-+ * 	Description
-+ * 		Associate a BPF program with a struct_ops map. The struct_ops
-+ * 		map is identified by *map_fd* and the BPF program is
-+ * 		identified by *prog_fd*.
++struct bpf_prog_assoc_struct_ops_opts {
++	size_t sz;
++	__u32 flags;
++	size_t :0;
++};
++#define bpf_prog_assoc_struct_ops_opts__last_field flags
++
++/**
++ * @brief **bpf_prog_assoc_struct_ops** associates a BPF program with a
++ * struct_ops map.
 + *
-+ * 	Return
-+ * 		0 on success or -1 if an error occurred (in which case,
-+ * 		*errno* is set appropriately).
++ * @param prog_fd FD for the BPF program
++ * @param map_fd FD for the struct_ops map to be associated with the BPF program
++ * @param opts optional options, can be NULL
 + *
-  * NOTES
-  *	eBPF objects (maps and programs) can be shared between processes.
-  *
-@@ -974,6 +984,7 @@ enum bpf_cmd {
- 	BPF_PROG_BIND_MAP,
- 	BPF_TOKEN_CREATE,
- 	BPF_PROG_STREAM_READ_BY_FD,
-+	BPF_PROG_ASSOC_STRUCT_OPS,
- 	__MAX_BPF_CMD,
- };
- 
-@@ -1894,6 +1905,12 @@ union bpf_attr {
- 		__u32		prog_fd;
- 	} prog_stream_read;
- 
-+	struct {
-+		__u32		map_fd;
-+		__u32		prog_fd;
-+		__u32		flags;
-+	} prog_assoc_struct_ops;
-+
- } __attribute__((aligned(8)));
- 
- /* The description below is an attempt at providing documentation to eBPF
-diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-index a41e6730edcf..0e4cf643b76f 100644
---- a/kernel/bpf/bpf_struct_ops.c
-+++ b/kernel/bpf/bpf_struct_ops.c
-@@ -533,6 +533,17 @@ static void bpf_struct_ops_map_put_progs(struct bpf_struct_ops_map *st_map)
- 	}
- }
- 
-+static void bpf_struct_ops_map_dissoc_progs(struct bpf_struct_ops_map *st_map)
-+{
-+	u32 i;
-+
-+	for (i = 0; i < st_map->funcs_cnt; i++) {
-+		if (!st_map->links[i])
-+			break;
-+		bpf_prog_disassoc_struct_ops(st_map->links[i]->prog);
-+	}
-+}
-+
- static void bpf_struct_ops_map_free_image(struct bpf_struct_ops_map *st_map)
- {
- 	int i;
-@@ -801,6 +812,9 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
- 			goto reset_unlock;
- 		}
- 
-+		/* Poison pointer on error instead of return for backward compatibility */
-+		bpf_prog_assoc_struct_ops(prog, &st_map->map);
-+
- 		link = kzalloc(sizeof(*link), GFP_USER);
- 		if (!link) {
- 			bpf_prog_put(prog);
-@@ -980,6 +994,8 @@ static void bpf_struct_ops_map_free(struct bpf_map *map)
- 	if (btf_is_module(st_map->btf))
- 		module_put(st_map->st_ops_desc->st_ops->owner);
- 
-+	bpf_struct_ops_map_dissoc_progs(st_map);
-+
- 	bpf_struct_ops_map_del_ksyms(st_map);
- 
- 	/* The struct_ops's function may switch to another struct_ops.
-@@ -1394,6 +1410,78 @@ int bpf_struct_ops_link_create(union bpf_attr *attr)
- 	return err;
- }
- 
-+int bpf_prog_assoc_struct_ops(struct bpf_prog *prog, struct bpf_map *map)
-+{
-+	struct bpf_map *st_ops_assoc;
-+
-+	guard(mutex)(&prog->aux->st_ops_assoc_mutex);
-+
-+	st_ops_assoc = rcu_dereference_protected(prog->aux->st_ops_assoc,
-+						 lockdep_is_held(&prog->aux->st_ops_assoc_mutex));
-+	if (st_ops_assoc && st_ops_assoc == map)
-+		return 0;
-+
-+	if (st_ops_assoc) {
-+		if (prog->type != BPF_PROG_TYPE_STRUCT_OPS)
-+			return -EBUSY;
-+
-+		rcu_assign_pointer(prog->aux->st_ops_assoc, BPF_PTR_POISON);
-+	} else {
-+		/*
-+		 * struct_ops map does not track associated non-struct_ops programs.
-+		 * Bump the refcount to make sure st_ops_assoc is always valid.
-+		 */
-+		if (prog->type != BPF_PROG_TYPE_STRUCT_OPS)
-+			bpf_map_inc(map);
-+
-+		rcu_assign_pointer(prog->aux->st_ops_assoc, map);
-+	}
-+
-+	return 0;
-+}
-+
-+void bpf_prog_disassoc_struct_ops(struct bpf_prog *prog)
-+{
-+	struct bpf_map *st_ops_assoc;
-+
-+	guard(mutex)(&prog->aux->st_ops_assoc_mutex);
-+
-+	st_ops_assoc = rcu_dereference_protected(prog->aux->st_ops_assoc,
-+						 lockdep_is_held(&prog->aux->st_ops_assoc_mutex));
-+	if (!st_ops_assoc || st_ops_assoc == BPF_PTR_POISON)
-+		return;
-+
-+	if (prog->type != BPF_PROG_TYPE_STRUCT_OPS)
-+		bpf_map_put(st_ops_assoc);
-+
-+	RCU_INIT_POINTER(prog->aux->st_ops_assoc, NULL);
-+}
-+
-+/*
-+ * Get a reference to the struct_ops struct (i.e., kdata) associated with a
-+ * program. Should only be called in BPF program context (e.g., in a kfunc).
-+ *
-+ * If the returned pointer is not NULL, it must points to a valid struct_ops.
-+ * The struct_ops map is not guaranteed to be initialized nor attached.
-+ * Kernel struct_ops implementers are responsible for tracking and checking
-+ * the state of the struct_ops if the use case requires an initialized or
-+ * attached struct_ops.
++ * @return 0 on success; negative error code, otherwise (errno is also set to
++ * the error code)
 + */
-+void *bpf_prog_get_assoc_struct_ops(const struct bpf_prog_aux *aux)
-+{
-+	struct bpf_struct_ops_map *st_map;
-+	struct bpf_map *st_ops_assoc;
++LIBBPF_API int bpf_prog_assoc_struct_ops(int prog_fd, int map_fd,
++					 struct bpf_prog_assoc_struct_ops_opts *opts);
 +
-+	st_ops_assoc = rcu_dereference_check(aux->st_ops_assoc, bpf_rcu_lock_held());
-+	if (!st_ops_assoc || st_ops_assoc == BPF_PTR_POISON)
-+		return NULL;
-+
-+	st_map = (struct bpf_struct_ops_map *)st_ops_assoc;
-+
-+	return &st_map->kvalue.data;
-+}
-+EXPORT_SYMBOL_GPL(bpf_prog_get_assoc_struct_ops);
-+
- void bpf_map_struct_ops_info_fill(struct bpf_map_info *info, struct bpf_map *map)
- {
- 	struct bpf_struct_ops_map *st_map = (struct bpf_struct_ops_map *)map;
-diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-index ef4448f18aad..7579cfe878f4 100644
---- a/kernel/bpf/core.c
-+++ b/kernel/bpf/core.c
-@@ -136,6 +136,7 @@ struct bpf_prog *bpf_prog_alloc_no_stats(unsigned int size, gfp_t gfp_extra_flag
- 	mutex_init(&fp->aux->used_maps_mutex);
- 	mutex_init(&fp->aux->ext_mutex);
- 	mutex_init(&fp->aux->dst_mutex);
-+	mutex_init(&fp->aux->st_ops_assoc_mutex);
- 
- #ifdef CONFIG_BPF_SYSCALL
- 	bpf_prog_stream_init(fp);
-@@ -286,6 +287,7 @@ void __bpf_prog_free(struct bpf_prog *fp)
- 	if (fp->aux) {
- 		mutex_destroy(&fp->aux->used_maps_mutex);
- 		mutex_destroy(&fp->aux->dst_mutex);
-+		mutex_destroy(&fp->aux->st_ops_assoc_mutex);
- 		kfree(fp->aux->poke_tab);
- 		kfree(fp->aux);
- 	}
-@@ -2896,6 +2898,7 @@ static void bpf_prog_free_deferred(struct work_struct *work)
+ #ifdef __cplusplus
+ } /* extern "C" */
  #endif
- 	bpf_free_used_maps(aux);
- 	bpf_free_used_btfs(aux);
-+	bpf_prog_disassoc_struct_ops(aux->prog);
- 	if (bpf_prog_is_dev_bound(aux))
- 		bpf_prog_dev_bound_destroy(aux->prog);
- #ifdef CONFIG_PERF_EVENTS
-diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
-index 792623a7c90b..b83a5850be96 100644
---- a/kernel/bpf/syscall.c
-+++ b/kernel/bpf/syscall.c
-@@ -6132,6 +6132,49 @@ static int prog_stream_read(union bpf_attr *attr)
- 	return ret;
+diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+index 706e7481bdf6..1d5424276d8b 100644
+--- a/tools/lib/bpf/libbpf.c
++++ b/tools/lib/bpf/libbpf.c
+@@ -14137,6 +14137,37 @@ int bpf_program__set_attach_target(struct bpf_program *prog,
+ 	return 0;
  }
  
-+#define BPF_PROG_ASSOC_STRUCT_OPS_LAST_FIELD prog_assoc_struct_ops.prog_fd
-+
-+static int prog_assoc_struct_ops(union bpf_attr *attr)
++int bpf_program__assoc_struct_ops(struct bpf_program *prog, struct bpf_map *map,
++				  struct bpf_prog_assoc_struct_ops_opts *opts)
 +{
-+	struct bpf_prog *prog;
-+	struct bpf_map *map;
-+	int ret;
++	int prog_fd, map_fd;
 +
-+	if (CHECK_ATTR(BPF_PROG_ASSOC_STRUCT_OPS))
++	prog_fd = bpf_program__fd(prog);
++	if (prog_fd < 0) {
++		pr_warn("prog '%s': can't associate BPF program without FD (was it loaded?)\n",
++			prog->name);
 +		return -EINVAL;
-+
-+	if (attr->prog_assoc_struct_ops.flags)
-+		return -EINVAL;
-+
-+	prog = bpf_prog_get(attr->prog_assoc_struct_ops.prog_fd);
-+	if (IS_ERR(prog))
-+		return PTR_ERR(prog);
++	}
 +
 +	if (prog->type == BPF_PROG_TYPE_STRUCT_OPS) {
-+		ret = -EINVAL;
-+		goto put_prog;
++		pr_warn("prog '%s': can't associate struct_ops program\n", prog->name);
++		return -EINVAL;
 +	}
 +
-+	map = bpf_map_get(attr->prog_assoc_struct_ops.map_fd);
-+	if (IS_ERR(map)) {
-+		ret = PTR_ERR(map);
-+		goto put_prog;
++	map_fd = bpf_map__fd(map);
++	if (map_fd < 0) {
++		pr_warn("map '%s': can't associate BPF map without FD (was it created?)\n", map->name);
++		return -EINVAL;
 +	}
 +
-+	if (map->map_type != BPF_MAP_TYPE_STRUCT_OPS) {
-+		ret = -EINVAL;
-+		goto put_map;
++	if (!bpf_map__is_struct_ops(map)) {
++		pr_warn("map '%s': can't associate non-struct_ops map\n", map->name);
++		return -EINVAL;
 +	}
 +
-+	ret = bpf_prog_assoc_struct_ops(prog, map);
-+
-+put_map:
-+	bpf_map_put(map);
-+put_prog:
-+	bpf_prog_put(prog);
-+	return ret;
++	return bpf_prog_assoc_struct_ops(prog_fd, map_fd, opts);
 +}
 +
- static int __sys_bpf(enum bpf_cmd cmd, bpfptr_t uattr, unsigned int size)
+ int parse_cpu_mask_str(const char *s, bool **mask, int *mask_sz)
  {
- 	union bpf_attr attr;
-@@ -6271,6 +6314,9 @@ static int __sys_bpf(enum bpf_cmd cmd, bpfptr_t uattr, unsigned int size)
- 	case BPF_PROG_STREAM_READ_BY_FD:
- 		err = prog_stream_read(&attr);
- 		break;
-+	case BPF_PROG_ASSOC_STRUCT_OPS:
-+		err = prog_assoc_struct_ops(&attr);
-+		break;
- 	default:
- 		err = -EINVAL;
- 		break;
-diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-index f5713f59ac10..bf4e00b8e272 100644
---- a/tools/include/uapi/linux/bpf.h
-+++ b/tools/include/uapi/linux/bpf.h
-@@ -918,6 +918,16 @@ union bpf_iter_link_info {
-  *		Number of bytes read from the stream on success, or -1 if an
-  *		error occurred (in which case, *errno* is set appropriately).
-  *
-+ * BPF_PROG_ASSOC_STRUCT_OPS
-+ * 	Description
-+ * 		Associate a BPF program with a struct_ops map. The struct_ops
-+ * 		map is identified by *map_fd* and the BPF program is
-+ * 		identified by *prog_fd*.
-+ *
-+ * 	Return
-+ * 		0 on success or -1 if an error occurred (in which case,
-+ * 		*errno* is set appropriately).
-+ *
-  * NOTES
-  *	eBPF objects (maps and programs) can be shared between processes.
-  *
-@@ -974,6 +984,7 @@ enum bpf_cmd {
- 	BPF_PROG_BIND_MAP,
- 	BPF_TOKEN_CREATE,
- 	BPF_PROG_STREAM_READ_BY_FD,
-+	BPF_PROG_ASSOC_STRUCT_OPS,
- 	__MAX_BPF_CMD,
- };
+ 	int err = 0, n, len, start, end = -1;
+diff --git a/tools/lib/bpf/libbpf.h b/tools/lib/bpf/libbpf.h
+index 5118d0a90e24..8866e5bf7b0c 100644
+--- a/tools/lib/bpf/libbpf.h
++++ b/tools/lib/bpf/libbpf.h
+@@ -1003,6 +1003,22 @@ LIBBPF_API int
+ bpf_program__set_attach_target(struct bpf_program *prog, int attach_prog_fd,
+ 			       const char *attach_func_name);
  
-@@ -1894,6 +1905,12 @@ union bpf_attr {
- 		__u32		prog_fd;
- 	} prog_stream_read;
- 
-+	struct {
-+		__u32		map_fd;
-+		__u32		prog_fd;
-+		__u32		flags;
-+	} prog_assoc_struct_ops;
++struct bpf_prog_assoc_struct_ops_opts; /* defined in bpf.h */
 +
- } __attribute__((aligned(8)));
- 
- /* The description below is an attempt at providing documentation to eBPF
++/**
++ * @brief **bpf_program__assoc_struct_ops()** associates a BPF program with a
++ * struct_ops map.
++ *
++ * @param prog BPF program
++ * @param map struct_ops map to be associated with the BPF program
++ * @param opts optional options, can be NULL
++ *
++ * @return 0, on success; negative error code, otherwise
++ */
++LIBBPF_API int
++bpf_program__assoc_struct_ops(struct bpf_program *prog, struct bpf_map *map,
++			      struct bpf_prog_assoc_struct_ops_opts *opts);
++
+ /**
+  * @brief **bpf_object__find_map_by_name()** returns BPF map of
+  * the given name, if it exists within the passed BPF object
+diff --git a/tools/lib/bpf/libbpf.map b/tools/lib/bpf/libbpf.map
+index 8ed8749907d4..84fb90a016c9 100644
+--- a/tools/lib/bpf/libbpf.map
++++ b/tools/lib/bpf/libbpf.map
+@@ -451,4 +451,6 @@ LIBBPF_1.7.0 {
+ 	global:
+ 		bpf_map__set_exclusive_program;
+ 		bpf_map__exclusive_program;
++		bpf_prog_assoc_struct_ops;
++		bpf_program__assoc_struct_ops;
+ } LIBBPF_1.6.0;
 -- 
 2.47.3
 
