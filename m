@@ -1,146 +1,218 @@
-Return-Path: <netdev+bounces-240750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FA65C78F48
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 13:12:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2A1BC78F5A
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 13:13:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E45B34ED90E
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:10:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8EA914EB87D
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76775346785;
-	Fri, 21 Nov 2025 12:09:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/BPqc2y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3201B3321D3;
+	Fri, 21 Nov 2025 12:11:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B206B3176E1
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A29434B1AF
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763726992; cv=none; b=jxjCFDvrQXBHTMA93w62qeaxd+me6Uxzmmju9FxZl+R5oQDX3KQ5UdqpBJkza696JaOwcOt0dZ9mJDDFiwBmPVfYnoRPZ+UVE9FlQVUc6SQoKLFvoKU7MIaeW39OK9i9RNA28mim2qQj+APoINkHdoFiFvA1c0bi4+rwitEgBY8=
+	t=1763727097; cv=none; b=hNHiuozZuGum7JPMmmwkSzELIbBsJBSKZ/JnF/edfxz4HzB0fe+Ov+sprUcTSlTXJ/8RXbUfH03EGnOIGbF51kCHeAQ4uYbT0TnPD1GmrTE26goLT8A1V/wysa1Bwq9NXGoJDpeoQbY6hB/tlbxKVqRHavucVXuRrX6/sqXiXE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763726992; c=relaxed/simple;
-	bh=gJ2JRo6SXwLf+9ulGbyK8L9kKPy5BDeC3fsCzHtzVM0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FocJs2OZr4dLkaxEpooU9KdSYMf8c8cTsCmL8ruG7kqflAiGyL56ntsu874evDTFJ3whDoJRPU4RFipuAPZKIoSed8DPq/+/AoB+/j+L+04S9oS2T5uiVnnnjqeVGulEJokaRRfdiCc0bxa2p4+BU07uZIVdspM0prCqy9FECYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L/BPqc2y; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42b3c965ca9so1125969f8f.1
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 04:09:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763726989; x=1764331789; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZOhuD3FYN2lFcG6XYARt5Zef8vPJNg6JJcAtWMIQOK4=;
-        b=L/BPqc2y7KdE7VWgXGaege02CJn6LVe58B8ZUhaFcIvuNUUQbq8XURaOnl7wO3HNjW
-         t6bhtwMLCvMueZ3S3gLiM91/Ppoa6Sp0eqA42scpM3gjkI0MB01vSP6iXf1BdImW4Wv3
-         as/vlvGKkFs6Sal5OZSHoOhZx7MGCBvmR28CxZ3Vxer5Za3j3LAXXNADGASHHdFLMpXp
-         cWewvmNvP/SbYsUXXNL3R6mNRKX/EhGGH3ZbIzi9mbO2fte49nRkcsk7MZ0UHDtWSjdD
-         Gz2XdMRmGa1/2zaFY4QW99tNtwR1ihlOki9/W/2DPwfOqynIhC5qNfwH0Cc+RhW/DcnM
-         zBPA==
+	s=arc-20240116; t=1763727097; c=relaxed/simple;
+	bh=2D5fuZ4CnSOfDrMMePKN/OyKAL0l1ZNmoSbpv5mEe7A=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dbZB6CGdJEfpoiDHj578LfATBJ44T0ToXGDVBzaLUIQV8r/Ai3lczyxrRzBWW2WMfleyo6rFRfLxYzGO9gkZPWwhc84zrWKRH6iwp0QQvCURe5H4KClzn3j2to2ipK2n1HZaLwKMJjYWNAcxxv19K2b5T93BvS2d712HRs2M+lU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-43478824a6fso18848445ab.3
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 04:11:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763726989; x=1764331789;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZOhuD3FYN2lFcG6XYARt5Zef8vPJNg6JJcAtWMIQOK4=;
-        b=Uv1c20Ec1om6FaowCBBptRIMeg9tBaSScnUlUCHg369vPE2qLiS8pIoqJNRhqS0l0D
-         bKZ6nwrMZ3xhSG+VvKuztwkF2Yodu9Oa3ysbZyv7ZhsroTAdYX8tooCsASrrQVvF+Y4C
-         XY+E8JowBBR2boBiOB0jdInfBeogN8GfkogoMGEZLCptW7VUkwBdNx0hG92L7ZF5jGjF
-         SlLZhxnw5We0fTf4bSFOs7Adm9djLFUE+aFg9EfDmKQYs11BhbDhwWk8ZMghOtG6fhw/
-         ogjq+yH2jgZ5BST/eO+Tuo4q8h0OjtVANlXTwVvcn71hONuVC390A5w3K03iw127eSIU
-         W+VA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOwHGs3tmeplYsG/ZlM2HTsX2g5geU5GvKuzeD7Cs2CXD4X7vrI+sgJTzoEFN4a10O17XgTv0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyRNeZ3zunhs7p71Bqz5YjGZLwL7IPLXvpKIwzJ1aTJIXG9/Cs
-	M60p3htT7oK3OncBL9jcJcFH8YhoePwASGrDdgN9PtBfKwHqvm6jysMk
-X-Gm-Gg: ASbGncvWVL3stdqK41/4qfhrE8RonLNxiEKY1/VDwtXsaSFWk3fMb8HuDAulffNJBoa
-	Ja4TEZJBODu7L1kvCLonqcIr9jf4f7D1FijKAW8Dct7mrAbWsAPdHnoG9qV5+lhYsG/C/ilMeMW
-	uz9NddMP9mqohJOxBleBdMRwv5Yih3b/C+Yflq265cgTNwsnzXLRFTBsVXJ659NI6XLpmYMMySS
-	Riw6qMgciskduSx8cWYd4OaXDQKKYk9s7kuxEDwV360yLP/q2kNdkQUQDkpndtMRJ2fj313GJhi
-	HbqIp7OJVfCOaC7idYaYOYmwC8bdMn5pEJ4zb3olR/VT2AgPsEHIFIRM9qN8hCQjIZggyEgPuFe
-	laZnP8qpjYs1+gbmo4Mbr2eVioIhrbfw/d3AhvZa9TbrGEjWf4E68wNGVu0LGYVz/dSlV/eD4Rx
-	7nFeRUGV8/0Ay4o8wpHBUhL1HUAA==
-X-Google-Smtp-Source: AGHT+IH8n/QkOXtXGlOicb4wsLtjqPV6gsrQePDU0F8CvJviDa7jL2c2AmKQvd/w+gkVUIyGcvOD9A==
-X-Received: by 2002:a5d:5f96:0:b0:42b:30d4:e3f0 with SMTP id ffacd0b85a97d-42cc1cf0fa3mr2085273f8f.22.1763726988710;
-        Fri, 21 Nov 2025 04:09:48 -0800 (PST)
-Received: from google.com ([37.228.206.31])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fd8d97sm10293196f8f.42.2025.11.21.04.09.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 04:09:48 -0800 (PST)
-Date: Fri, 21 Nov 2025 12:09:46 +0000
-From: Fabio Baltieri <fabio.baltieri@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Michael Zimmermann <sigmaepsilon92@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, nic_swsd@realtek.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] r8169: add support for RTL8127ATF
-Message-ID: <aSBWiuivrPG8vNKw@google.com>
-References: <c6beb0d4-f65e-4181-80e6-212b0a938a15@lunn.ch>
- <aRxTk9wuRiH-9X6l@google.com>
- <89298d49-d85f-4dfd-954c-f8ca9b47f386@lunn.ch>
- <ff55848b-5543-4a8d-b8c2-88837db16c29@gmail.com>
- <aRzVApYF_8loj8Uo@google.com>
- <CAN9vWDK4LggAGZ-to41yHq4xoduMQdKpj-B6qTpoXiy2fnB=5Q@mail.gmail.com>
- <aRzsxg_MEnGgu2lB@google.com>
- <CAN9vWDKEDFmDiTuPB6ZQF02NYy0QiW2Oo7v4Zcu6tSiMH5Kj9Q@mail.gmail.com>
- <aR2baZuFBuA7Mx_x@google.com>
- <22b15123-b134-467c-835c-c9e0f1e19e29@gmail.com>
+        d=1e100.net; s=20230601; t=1763727094; x=1764331894;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zV30rAUHe9nf5njvs4h81en2iC+xQgzdRBM2uW2ZegQ=;
+        b=GXiY6f7Igqj9TaEqs4jz65LDxHnQ2v5TeurbN2Z45wvz5HQcqC8uzAkWh4OkgFUQrd
+         ++WhgpCv/CYkFyChOzyKWcbHvaztpYJjDi3tjVuBJO/BTzqtAcwZsJc/m8AwPBnNOC9z
+         ZbI1ywrY8ug9OKuzdxpWc3EfRNcfwVQh+ERJ9AbRKeAaHiosoNFPO9SUeboJ9ixZc914
+         lbrqH32MzZbt0IJNGGlHFCkP4RC8AGcaZ5lmNK2I9ENF1t1mcKBMzD7AAJuAy/x43H8b
+         Xyyz/2sMfLdJ22/KDQiGqg31MnLfm0tt/wAxDmjYb1oXGRM5XYG7fiABl40GH5SPdJtU
+         vxXg==
+X-Forwarded-Encrypted: i=1; AJvYcCUkb7rRHdy/dkT5XS6M/cXfGjccahINK47XihpFTImRCnj6o75CxC/8GlBcK+Yqsi5Xr1GZKTU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi2UCDGHuA/AQHOOfPBhu9gtjRJqYxxFesenLvtUk6qBAV6PE8
+	oKMC6gHdk4K3y28+H+q2y7YwUiQlnE0Uwgmc7Nk8PxvfwKodvYpyVyjHzkVdZMWlGy/UbqBH24l
+	CZTdy3/NRpZI5FpHV6k/lX04EwUhOdyFc21djes5sjLDPcyJG2OqTcmAxHkM=
+X-Google-Smtp-Source: AGHT+IHbVGWfWIxz44VI+EgtiCO1Fa4flWCMu2SCDaKm0jcgj3g6PkOE0/IZyXHe2m0xdxZ0y/2RSZVHdkSoiFzX3f0038AMJKul
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <22b15123-b134-467c-835c-c9e0f1e19e29@gmail.com>
+X-Received: by 2002:a05:6e02:2608:b0:433:23ba:2d84 with SMTP id
+ e9e14a558f8ab-435b8c1f639mr17222345ab.17.1763727094346; Fri, 21 Nov 2025
+ 04:11:34 -0800 (PST)
+Date: Fri, 21 Nov 2025 04:11:34 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <692056f6.a70a0220.2ea503.004e.GAE@google.com>
+Subject: [syzbot] [mptcp?] WARNING in __mptcp_move_skbs_from_subflow (2)
+From: syzbot <syzbot+9475dcc0b42355ded022@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Nov 21, 2025 at 12:17:33AM +0100, Heiner Kallweit wrote:
-> Could you please test whether the following fixes the chip hang on suspend / shutdown?
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index de304d1eb..97dbe8f89 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -1517,11 +1517,20 @@ static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
->  
->  static void rtl_set_d3_pll_down(struct rtl8169_private *tp, bool enable)
->  {
-> -	if (tp->mac_version >= RTL_GIGA_MAC_VER_25 &&
-> -	    tp->mac_version != RTL_GIGA_MAC_VER_28 &&
-> -	    tp->mac_version != RTL_GIGA_MAC_VER_31 &&
-> -	    tp->mac_version != RTL_GIGA_MAC_VER_38)
-> -		r8169_mod_reg8_cond(tp, PMCH, D3_NO_PLL_DOWN, !enable);
-> +	switch (tp->mac_version) {
-> +	case RTL_GIGA_MAC_VER_02 ... RTL_GIGA_MAC_VER_24:
-> +	case RTL_GIGA_MAC_VER_28:
-> +	case RTL_GIGA_MAC_VER_31:
-> +	case RTL_GIGA_MAC_VER_38:
-> +		break;
-> +	case RTL_GIGA_MAC_VER_80:
-> +		r8169_mod_reg8_cond(tp, PMCH, D3_NO_PLL_DOWN, true);
-> +		break;
-> +	default:
-> +		r8169_mod_reg8_cond(tp, PMCH, D3HOT_NO_PLL_DOWN, true);
-> +		r8169_mod_reg8_cond(tp, PMCH, D3COLD_NO_PLL_DOWN, !enable);
-> +		break;
-> +	}
->  }
->  
->  static void rtl_reset_packet_filter(struct rtl8169_private *tp)
+Hello,
 
-Yes, patched it in and tested on both suspend and reboot without
-touching the wol flags, seems to be working correctly.
+syzbot found the following issue on:
 
-Thanks!
+HEAD commit:    fd95357fd8c6 Merge tag 'sched_ext-for-6.18-rc6-fixes-2' of..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17220e92580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1cd7f786c0f5182f
+dashboard link: https://syzkaller.appspot.com/bug?extid=9475dcc0b42355ded022
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-fd95357f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9301ea2e80a9/vmlinux-fd95357f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/13592a9d2a74/bzImage-fd95357f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9475dcc0b42355ded022@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 2 PID: 1143 at net/mptcp/protocol.c:718 __mptcp_move_skbs_from_subflow+0xeda/0x3360 net/mptcp/protocol.c:718
+Modules linked in:
+CPU: 2 UID: 0 PID: 1143 Comm: kworker/u32:7 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: krdsd rds_shutdown_worker
+RIP: 0010:__mptcp_move_skbs_from_subflow+0xeda/0x3360 net/mptcp/protocol.c:718
+Code: 75 f6 e8 09 a8 75 f6 8b 5c 24 18 8b 6c 24 70 01 5c 24 1c 89 ee 89 df e8 74 a2 75 f6 39 dd 0f 83 d9 f3 ff ff e8 e7 a7 75 f6 90 <0f> 0b 90 48 b8 00 00 00 00 00 fc ff df 48 8b 54 24 48 48 c1 ea 03
+RSP: 0018:ffffc90000537aa0 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000001508 RCX: ffffffff8b46af8c
+RDX: ffff888021412480 RSI: ffffffff8b46af99 RDI: 0000000000000004
+RBP: 00000000000010bc R08: 0000000000000004 R09: 0000000000001508
+R10: 00000000000010bc R11: 0000000000000001 R12: ffff88806b1b00e8
+R13: ffffffff9afc3e80 R14: dffffc0000000000 R15: ffff88806b1b0000
+FS:  0000000000000000(0000) GS:ffff888097a0d000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000000c230000 CR3: 00000000663a8000 CR4: 0000000000352ef0
+Call Trace:
+ <IRQ>
+ move_skbs_to_msk net/mptcp/protocol.c:833 [inline]
+ __mptcp_data_ready net/mptcp/protocol.c:853 [inline]
+ mptcp_data_ready+0x251/0x6c0 net/mptcp/protocol.c:870
+ subflow_state_change+0x4fb/0x800 net/mptcp/subflow.c:1870
+ tcp_rcv_state_process+0x453b/0x6490 net/ipv4/tcp_input.c:7073
+ tcp_v6_do_rcv+0x7b8/0x1dc0 net/ipv6/tcp_ipv6.c:1675
+ tcp_v6_rcv+0x2ab5/0x48f0 net/ipv6/tcp_ipv6.c:1922
+ ip6_protocol_deliver_rcu+0x188/0x1520 net/ipv6/ip6_input.c:438
+ ip6_input_finish+0x1e4/0x4b0 net/ipv6/ip6_input.c:489
+ NF_HOOK include/linux/netfilter.h:318 [inline]
+ NF_HOOK include/linux/netfilter.h:312 [inline]
+ ip6_input+0x105/0x2f0 net/ipv6/ip6_input.c:500
+ dst_input include/net/dst.h:474 [inline]
+ ip6_rcv_finish+0x1ac/0x580 net/ipv6/ip6_input.c:79
+ ip_sabotage_in+0x21e/0x290 net/bridge/br_netfilter_hooks.c:990
+ nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
+ nf_hook_slow+0xbe/0x200 net/netfilter/core.c:623
+ nf_hook.constprop.0+0x424/0x750 include/linux/netfilter.h:273
+ NF_HOOK include/linux/netfilter.h:316 [inline]
+ ipv6_rcv+0xa4/0x650 net/ipv6/ip6_input.c:311
+ __netif_receive_skb_one_core+0x12d/0x1e0 net/core/dev.c:6079
+ __netif_receive_skb+0x1d/0x160 net/core/dev.c:6192
+ netif_receive_skb_internal net/core/dev.c:6278 [inline]
+ netif_receive_skb+0x137/0x7b0 net/core/dev.c:6337
+ NF_HOOK include/linux/netfilter.h:318 [inline]
+ NF_HOOK include/linux/netfilter.h:312 [inline]
+ br_pass_frame_up+0x346/0x490 net/bridge/br_input.c:70
+ br_handle_frame_finish+0x12fe/0x1f00 net/bridge/br_input.c:222
+ br_nf_hook_thresh+0x307/0x410 net/bridge/br_netfilter_hooks.c:1167
+ br_nf_pre_routing_finish_ipv6+0x76a/0xfc0 net/bridge/br_netfilter_ipv6.c:154
+ NF_HOOK include/linux/netfilter.h:318 [inline]
+ br_nf_pre_routing_ipv6+0x3cd/0x8c0 net/bridge/br_netfilter_ipv6.c:184
+ br_nf_pre_routing+0x860/0x15b0 net/bridge/br_netfilter_hooks.c:508
+ nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
+ nf_hook_bridge_pre net/bridge/br_input.c:291 [inline]
+ br_handle_frame+0xb28/0x14e0 net/bridge/br_input.c:442
+ __netif_receive_skb_core.constprop.0+0xa25/0x4bd0 net/core/dev.c:5966
+ __netif_receive_skb_one_core+0xb0/0x1e0 net/core/dev.c:6077
+ __netif_receive_skb+0x1d/0x160 net/core/dev.c:6192
+ process_backlog+0x439/0x15e0 net/core/dev.c:6544
+ __napi_poll.constprop.0+0xba/0x550 net/core/dev.c:7594
+ napi_poll net/core/dev.c:7657 [inline]
+ net_rx_action+0x97f/0xef0 net/core/dev.c:7784
+ handle_softirqs+0x219/0x8e0 kernel/softirq.c:622
+ do_softirq kernel/softirq.c:523 [inline]
+ do_softirq+0xb2/0xf0 kernel/softirq.c:510
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:450
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ rcu_read_unlock_bh include/linux/rcupdate.h:936 [inline]
+ __dev_queue_xmit+0xb06/0x4490 net/core/dev.c:4790
+ dev_queue_xmit include/linux/netdevice.h:3365 [inline]
+ neigh_hh_output include/net/neighbour.h:531 [inline]
+ neigh_output include/net/neighbour.h:545 [inline]
+ ip6_finish_output2+0x1184/0x1cf0 net/ipv6/ip6_output.c:136
+ __ip6_finish_output+0x3cd/0x1010 net/ipv6/ip6_output.c:209
+ ip6_finish_output net/ipv6/ip6_output.c:220 [inline]
+ NF_HOOK_COND include/linux/netfilter.h:307 [inline]
+ ip6_output+0x253/0x710 net/ipv6/ip6_output.c:247
+ dst_output include/net/dst.h:464 [inline]
+ NF_HOOK include/linux/netfilter.h:318 [inline]
+ NF_HOOK include/linux/netfilter.h:312 [inline]
+ ip6_xmit+0x1512/0x23f0 net/ipv6/ip6_output.c:371
+ inet6_csk_xmit+0x444/0x7f0 net/ipv6/inet6_connection_sock.c:120
+ __tcp_transmit_skb+0x1d67/0x44d0 net/ipv4/tcp_output.c:1628
+ tcp_transmit_skb net/ipv4/tcp_output.c:1646 [inline]
+ tcp_write_xmit+0x12a9/0x86e0 net/ipv4/tcp_output.c:2999
+ __tcp_push_pending_frames+0xaf/0x390 net/ipv4/tcp_output.c:3182
+ tcp_send_fin+0x121/0x1050 net/ipv4/tcp_output.c:3800
+ __tcp_close+0xa46/0x1120 net/ipv4/tcp.c:3207
+ tcp_close+0x28/0x120 net/ipv4/tcp.c:3298
+ inet_release+0xed/0x200 net/ipv4/af_inet.c:437
+ inet6_release+0x4f/0x70 net/ipv6/af_inet6.c:487
+ __sock_release net/socket.c:662 [inline]
+ sock_release+0x91/0x1d0 net/socket.c:690
+ rds_tcp_conn_path_shutdown+0x1f9/0x410 net/rds/tcp_connect.c:220
+ rds_conn_shutdown+0x28b/0xaa0 net/rds/connection.c:399
+ process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3263
+ process_scheduled_works kernel/workqueue.c:3346 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3427
+ kthread+0x3c5/0x780 kernel/kthread.c:463
+ ret_from_fork+0x675/0x7d0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
