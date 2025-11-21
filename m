@@ -1,115 +1,148 @@
-Return-Path: <netdev+bounces-240772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04F9AC79C5A
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 14:55:02 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5F32C7A28E
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 15:31:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by tor.lore.kernel.org (Postfix) with ESMTPS id 2723C2F25E
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 13:53:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EA9C23644F8
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 14:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D1E34FF42;
-	Fri, 21 Nov 2025 13:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="z4ZZxd8r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC3B34D4DB;
+	Fri, 21 Nov 2025 14:23:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from localhost.localdomain (unknown [147.136.157.0])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E6A3242B0;
-	Fri, 21 Nov 2025 13:49:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FCF347BD7;
+	Fri, 21 Nov 2025 14:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.136.157.0
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763732994; cv=none; b=JSobePOwmTHIkXPMXLIPGaXDEly7IiD22aZ0JEKPP1jR7bK3HbnynNurcX/wkehr7g/iXT6rpSL3uLCd1oq3zYH/qJkcOJNpLxIR2IBoLnK94svaD9nQBevYfxNgKC3o7HrObYkoCcpCcV3cP9uQJHhNF6l8BnQgOh3fzC/82AI=
+	t=1763735038; cv=none; b=GAY9PYYc+uLCeuEul8GT7n3VFTPyNGgeLXz9zjQMF28cqXfY5CkpSrKypl+sLmGkmrqbbwzLEUhbAHf2s+bQ1pWebNjRmoUVO2q7Bjg1gtCKE3k4Yejmy1YCHK6jsAtSjJxIZg0bLMriyHgCn7Xgvg041F/EcJw2XY/G3CMYcVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763732994; c=relaxed/simple;
-	bh=QmkNw+lui6eQ4hjUROLo+jeuKO6ffm/m+JR0/j7ewkw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iVwFyhTozA5kb3Wvf3GjKhx4Q7tI+bKtcfbIfYv5EPCowb97aAes+bmW3odwbOaft1UI6Kj1s8lXihIkflD2bLjm73hzt5/mXy7NSEVUdmwq5NZkafj9apBZ4Q4MTQdD1HyWituSN5BL/Wgcyl2MVlsdMX4NEVPAt2fV8Ez98zE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=z4ZZxd8r; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ojEjdCjByEtRAyY2XHxAhRGYC0BgnRG/RIl16AmKynw=; b=z4ZZxd8rFNn0gwXgzZ1L4Lr2N2
-	Oa5e6yMVCLXSB9T+NGShgGnWdgzAG/Ba/eKrHeYhp4iZqq/AIqFMJKwLzI3Wq4cpHveCMGk9C99Lb
-	FPpAvExax+zo4fCphIZciwlzGc6cqrARdNS5XSCCynbbZfaWb0lbTOhOzLgWXigUicjo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vMRW6-00EjjM-3e; Fri, 21 Nov 2025 14:49:38 +0100
-Date: Fri, 21 Nov 2025 14:49:38 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Buday Csaba <buday.csaba@prolan.hu>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	s=arc-20240116; t=1763735038; c=relaxed/simple;
+	bh=60sxVDAq1Lua/ESxKf6v8ZWSpi7o7XjdCM21VOd1+64=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K/RGPqXJ2zlMCtNkRFIG9aN/JMaxIx1HIy+RBUvclkCLgkX7RlxxK/Y/Pa9cLZd9jV/ciNg55AbwqDn/jwozKN2b9UdPfTPHAB/MulysfiZggpmTKg7gQXQ1cRRyITI9GbRLw7z94JOV9MwRLwmEaxBVS4EYqrg2a9WdGjmJp4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=none smtp.mailfrom=localhost.localdomain; arc=none smtp.client-ip=147.136.157.0
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=localhost.localdomain
+Received: by localhost.localdomain (Postfix, from userid 1007)
+	id 8741C8B2A16; Fri, 21 Nov 2025 22:23:54 +0800 (+08)
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/1] net: mdio: eliminate kdoc warnings in
- mdio_device.c and mdio_bus.c
-Message-ID: <7d16f840-40d0-4eff-91f5-c977404ca6fc@lunn.ch>
-References: <b0313adbbb1232b6fd8d44c7eb8601aaac61818f.1763711078.git.buday.csaba@prolan.hu>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Michal Luczaj <mhal@rbox.co>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Cong Wang <cong.wang@bytedance.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next v3 0/3] bpf: Fix FIONREAD and copied_seq issues
+Date: Fri, 21 Nov 2025 22:23:21 +0800
+Message-ID: <20251121142352.297588-1-jiayuan.chen@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b0313adbbb1232b6fd8d44c7eb8601aaac61818f.1763711078.git.buday.csaba@prolan.hu>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 21, 2025 at 08:45:42AM +0100, Buday Csaba wrote:
-> Fix all warnings reported by scripts/kernel-doc in
-> mdio_device.c and mdio_bus.c
-> 
-> Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
-> ---
->  drivers/net/phy/mdio_bus.c    | 56 ++++++++++++++++++++++++++++++-----
->  drivers/net/phy/mdio_device.c |  6 ++++
->  2 files changed, 55 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-> index ef041ad66..a00dc7451 100644
-> --- a/drivers/net/phy/mdio_bus.c
-> +++ b/drivers/net/phy/mdio_bus.c
-> @@ -339,7 +339,7 @@ EXPORT_SYMBOL_GPL(mdio_bus_class);
->   * mdio_find_bus - Given the name of a mdiobus, find the mii_bus.
->   * @mdio_name: The name of a mdiobus.
->   *
-> - * Returns a reference to the mii_bus, or NULL if none found.  The
-> + * Returns: a reference to the mii_bus, or NULL if none found. The
->   * embedded struct device will have its reference count incremented,
->   * and this must be put_deviced'ed once the bus is finished with.
->   */
-> @@ -357,7 +357,7 @@ EXPORT_SYMBOL(mdio_find_bus);
->   * of_mdio_find_bus - Given an mii_bus node, find the mii_bus.
->   * @mdio_bus_np: Pointer to the mii_bus.
->   *
-> - * Returns a reference to the mii_bus, or NULL if none found.  The
-> + * Returns: a reference to the mii_bus, or NULL if none found. The
+syzkaller reported a bug [1] where a socket using sockmap, after being
+unloaded, exposed incorrect copied_seq calculation. The selftest I
+provided can be used to reproduce the issue reported by syzkaller.
 
-In these two cases you use "Returns:"
+TCP recvmsg seq # bug 2: copied E92C873, seq E68D125, rcvnxt E7CEB7C, fl 40
+WARNING: CPU: 1 PID: 5997 at net/ipv4/tcp.c:2724 tcp_recvmsg_locked+0xb2f/0x2910 net/ipv4/tcp.c:2724
+Call Trace:
+ <TASK>
+ receive_fallback_to_copy net/ipv4/tcp.c:1968 [inline]
+ tcp_zerocopy_receive+0x131a/0x2120 net/ipv4/tcp.c:2200
+ do_tcp_getsockopt+0xe28/0x26c0 net/ipv4/tcp.c:4713
+ tcp_getsockopt+0xdf/0x100 net/ipv4/tcp.c:4812
+ do_sock_getsockopt+0x34d/0x440 net/socket.c:2421
+ __sys_getsockopt+0x12f/0x260 net/socket.c:2450
+ __do_sys_getsockopt net/socket.c:2457 [inline]
+ __se_sys_getsockopt net/socket.c:2454 [inline]
+ __x64_sys_getsockopt+0xbd/0x160 net/socket.c:2454
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
->   * embedded struct device will have its reference count incremented,
->   * and this must be put once the bus is finished with.
->   *
-> @@ -405,6 +405,8 @@ static void mdiobus_stats_acct(struct mdio_bus_stats *stats, bool op, int ret)
->   * @addr: the phy address
->   * @regnum: register number to read
->   *
-> + * Return: The register value if successful, negative error code on failure
+A sockmap socket maintains its own receive queue (ingress_msg) which may
+contain data from either its own protocol stack or forwarded from other
+sockets.
 
+                                                     FD1:read()
+                                                     --  FD1->copied_seq++
+                                                         |  [read data]
+                                                         |
+                                [enqueue data]           v
+                  [sockmap]     -> ingress to self ->  ingress_msg queue
+FD1 native stack  ------>                                 ^
+-- FD1->rcv_nxt++               -> redirect to other      | [enqueue data]
+                                       |                  |
+                                       |             ingress to FD1
+                                       v                  ^
+                                      ...                 |  [sockmap]
+                                                     FD2 native stack
 
-And everywhere else "Return:".
+The issue occurs when reading from ingress_msg: we update tp->copied_seq
+by default, but if the data comes from other sockets (not the socket's
+own protocol stack), tcp->rcv_nxt remains unchanged. Later, when
+converting back to a native socket, reads may fail as copied_seq could
+be significantly larger than rcv_nxt.
 
-It would be nice if it was consistent.
+Additionally, FIONREAD calculation based on copied_seq and rcv_nxt is
+insufficient for sockmap sockets, requiring separate field tracking.
 
-	Andrew
+[1] https://syzkaller.appspot.com/bug?extid=06dbd397158ec0ea4983
+
+---
+
+v1 -> v3: Use skmsg.sk instead of extending BPF_F_XXX macro and fix CI
+          failure reported by ci
+v1: https://lore.kernel.org/bpf/20251117110736.293040-1-jiayuan.chen@linux.dev/
+
+Jiayuan Chen (3):
+  bpf, sockmap: Fix incorrect copied_seq calculation
+  bpf, sockmap: Fix FIONREAD for sockmap
+  bpf, selftest: Add tests for FIONREAD and copied_seq
+
+ include/linux/skmsg.h                         |  48 ++++-
+ net/core/skmsg.c                              |  28 ++-
+ net/ipv4/tcp_bpf.c                            |  26 ++-
+ net/ipv4/udp_bpf.c                            |  25 ++-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  | 203 +++++++++++++++++-
+ .../bpf/progs/test_sockmap_pass_prog.c        |   8 +
+ 6 files changed, 322 insertions(+), 16 deletions(-)
+
+-- 
+2.43.0
+
 
