@@ -1,139 +1,103 @@
-Return-Path: <netdev+bounces-240745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93423C78EA9
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:56:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23964C78E07
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:43:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9AA124E9CFC
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 11:55:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id 2596B28D49
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 11:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D53183081C6;
-	Fri, 21 Nov 2025 11:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C5x9E16Q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463042F8BD0;
+	Fri, 21 Nov 2025 11:43:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB9A2F1FE7
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 11:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B513930C636
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 11:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763726141; cv=none; b=hCLoC82NNnpAE2sTeQNz/c/8J4xjPUMiPTte42h8MEKAe8sIq84BXMTPpX9AaH4vxeKPAcI7nUifUOvi3Zq4JgqRpHGmlkjU0hjSWAgVU21TaEwre3QIfwR0EGPn8EdRymsoEfI6OXY9kjWR/UbcGEZE09p+aPuYr3sLJihHKnQ=
+	t=1763725412; cv=none; b=qQFHXUHmJoCsGZ7NjDaJqoY6fQfvPAZz5nT1tP6wiqR8ZI+F2QMQ43NFOm3PSIjBQys6im7yCGzLke4RX7aJwwxale8qbvGp2Ho8NKAEmoJX9L0cUYQpf4nzKqh5dorpeE1fj6apmZPx5fgXsPrCxlqw3m6JGfJ0JP1MUUJf7Hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763726141; c=relaxed/simple;
-	bh=BCuwsxN4wT9xb1KQ+7jRZodv0F6+z6Q1IawNA3LunJE=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=Gyh2pKo5DdxOJPhve6xPNM0tRrO50R1b5iUnT3ROMF4t3cJ4cqE0+Hy/uAUVR5eoY3tJ5ajZHshNgOn8Nn9fFQwrI8QFhYszSpkz9mEfu5xaF7s152jzy/XoNcJ66zYMuxEGx7COgIYhL8dBamGN0ORNhwx0yAcjDtgYFU1WasE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C5x9E16Q; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-42b379cd896so1143672f8f.3
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 03:55:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763726138; x=1764330938; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oDriZHKoYlumz0kyJ+iuC42fqsgc1CZpksWMuirWE2A=;
-        b=C5x9E16QbtpONLsKhXOr6T8ipoQ80MpBXXpx6SMwI0xySTR56AbMiv0ktergURdKJW
-         u3VsjlsCIaTERQQx6+s2XYDzyWZHXpWzsKBjLNhqihZqHu6xvtFNgA5ZcTjzNZjxE56b
-         Z8zAeMx4m+WKDGQLnwCfmTyF3qIEVkT0dPEfyi/2E/eFOdx7L4nbkQmJQhf2knTuxNlO
-         jtWdVLMmyoIQN85xE/vBtl5BxvcMWATfwKP8CCeYPiVhxTcd5WL6oIvc3RNrymyMlfTT
-         K16BzTGGZm3T3NNqkLPAV1wLZu3v3a3eZHcAlaLmICpWrNo6PkaU353gvNIyGbOmEaU3
-         k/ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763726138; x=1764330938;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oDriZHKoYlumz0kyJ+iuC42fqsgc1CZpksWMuirWE2A=;
-        b=iTkA27fvycD9zzSJRR31oisbJg7UECDnqZ3C54zxR1nPUhRzkRl1opVjsGF7EzgFYs
-         QpfloXNIjShv7ay6twlJiX1OXGcaA5A5U8bOxVNefJ99B+aAlH9mddUJ7Agmqg7kaSQc
-         taUXXXKqodXRDOKxSXbgQD3lKFztB8oG+Kfa2kLX2pwYNRDLfO/uel/Ljv56NJ1I5pzF
-         J1eXaf6gpYyzlIOvFeOAQwd1yNKGd0U9fMp3IZHOHS6W10VPrGxJ3QZoAGlaPN9Dia/j
-         IR8qBQC2EfddPZD9s4+9ZBJJepjXOnjVi4EYZy9Bh4HGklyjmgpdK+ImceNNMc/ndyFb
-         48zA==
-X-Forwarded-Encrypted: i=1; AJvYcCXxlufwMVYXclL9NSxfjfiKzi0GZRQiZPJGfTB1YhL6HJq0Qi2JH7Pz8a1nxP/JcHAUlARp6AA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjAGVk5wYXHQkF/MQJ1jmL8mQNYXw/T0jAyUjzmNbSUFaeEbZ0
-	zsYL7sf3UqWcttlK71dHf2/oqVfm49PaMbmPv0aF9Z3ISPrmSnSvSytT
-X-Gm-Gg: ASbGncszWJGbn9gtzbOGiHqI835hLTL8+3yOMZdkaJu6bT5D0jVFF69Qn5ORPKrpJOw
-	75diK0lENKFXHHykRKVPl62L46onPJEkChxN2NC7gcIcZZk5+cmpKtJuceTtn+NHf1vbkhfPmb7
-	VMeTi+ZeY5a++paT6Uk7SwHU1ZaHYFBp3DQ7rz5rab6KjMMiOPQPCMglbX3KNwM+2vFXSQgi8uW
-	OSFypZVubYCU3ju4SKbFh51XDaUubqMR80v4TogBIcbpnhgx870hcDLVFcspzDfR6WcE9RKh+GP
-	H/R2HlYQq89sZIthhiuhTplNnTUJUyCwKomUkRAQU1CKovmVZfxozpzjTL8fASLbyuggXULjpcT
-	GXhmDVzS4D4HLybtoxqJRB8wwjqMobzWK+5dBZQfsqXXhM702DDAJJfzAHPibOESyP9Tjr8jDxT
-	zcGQoIezoceE6QwefMk0KHzItHdMf3qpRTOQ==
-X-Google-Smtp-Source: AGHT+IH0a0jaDfCVovpxy3z9csXD4B+JfYy/Q8r+BidsjxSKcegW0mK4p8CA8FZ7pwMUWQkuiKA/BQ==
-X-Received: by 2002:a05:6000:2507:b0:42b:52c4:6631 with SMTP id ffacd0b85a97d-42cc19f5797mr2076239f8f.0.1763726138266;
-        Fri, 21 Nov 2025 03:55:38 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:f819:b939:9ed6:5114])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fd8e54sm10802902f8f.40.2025.11.21.03.55.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 03:55:37 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: "Remy D. Farley" <one-d-wide@protonmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,  netdev@vger.kernel.org,  Pablo Neira
- Ayuso <pablo@netfilter.org>,  Jozsef Kadlecsik <kadlec@netfilter.org>,
-  Florian Westphal <fw@strlen.de>,  Phil Sutter <phil@nwl.cc>,
-  netfilter-devel@vger.kernel.org,  coreteam@netfilter.org
-Subject: Re: [PATCH v5 4/6] doc/netlink: nftables: Add sub-messages
-In-Reply-To: <20251120151754.1111675-5-one-d-wide@protonmail.com>
-Date: Fri, 21 Nov 2025 11:40:55 +0000
-Message-ID: <m2ecpr4nqw.fsf@gmail.com>
-References: <20251120151754.1111675-1-one-d-wide@protonmail.com>
-	<20251120151754.1111675-5-one-d-wide@protonmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1763725412; c=relaxed/simple;
+	bh=+WXBgeboy6rtNVSH8ml+pXMUn813R/MlG2esAsn5p9E=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=s4oeYNXRwVPihQIdZcqMB24E0oSIGaHSoSNQDO7hV6l7MlLQvAsm6rxkRKEREz4u36cjyKGcEVUZ2WyUX3MF6QYQvdSRNLheLeI32q0j2OADVEQts4uTfL/XczrQlrgv+OYHfcywbWJKf/UXlZM8zNxbtu3+7PtJn8hRSSg2jaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1vMPXg-0003GG-RC; Fri, 21 Nov 2025 12:43:08 +0100
+Received: from lupine.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::4e] helo=lupine)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1vMPXe-001ZuI-0I;
+	Fri, 21 Nov 2025 12:43:06 +0100
+Received: from pza by lupine with local (Exim 4.98.2)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1vMPXd-000000005XB-4AQe;
+	Fri, 21 Nov 2025 12:43:05 +0100
+Message-ID: <951c27938acfb23e7af29603043143744f702808.camel@pengutronix.de>
+Subject: Re: [PATCH net-next 05/11] net: dsa: rzn1-a5psw: Add support for
+ optional reset control
+From: Philipp Zabel <p.zabel@pengutronix.de>
+To: Prabhakar <prabhakar.csengg@gmail.com>, 
+ =?ISO-8859-1?Q?Cl=E9ment_L=E9ger?=	 <clement.leger@bootlin.com>, Andrew
+ Lunn <andrew@lunn.ch>, Vladimir Oltean	 <olteanv@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet	 <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni	 <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski	 <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Simon Horman	 <horms@kernel.org>, Russell King
+ <linux@armlinux.org.uk>, Geert Uytterhoeven	 <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>
+Cc: linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Biju Das	
+ <biju.das.jz@bp.renesas.com>, Fabrizio Castro
+ <fabrizio.castro.jz@renesas.com>,  Lad Prabhakar
+ <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Date: Fri, 21 Nov 2025 12:43:05 +0100
+In-Reply-To: <20251121113553.2955854-6-prabhakar.mahadev-lad.rj@bp.renesas.com>
+References: 
+	<20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	 <20251121113553.2955854-6-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: p.zabel@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-"Remy D. Farley" <one-d-wide@protonmail.com> writes:
+On Fr, 2025-11-21 at 11:35 +0000, Prabhakar wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>=20
+> Add support for an optional reset control to the RZN1 A5PSW driver.
+> Obtain the reset line using
+> devm_reset_control_get_optional_exclusive_deasserted() during probe
+> to ensure that the Ethernet switch (ETHSW) block is properly released
+> from reset before initialization.
+>=20
+> This change prepares the driver for use on Renesas RZ/T2H and RZ/N2H
+> SoCs, where the ETHSW IP block is connected to a dedicated reset line
+> that must be controlled by software.
+>=20
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-> New sub-messsages:
-> - match
-> - range
-> - numgen
-> - log
->
-> Signed-off-by: Remy D. Farley <one-d-wide@protonmail.com>
-> ---
->  Documentation/netlink/specs/nftables.yaml | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->
-> diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netlink/specs/nftables.yaml
-> index 01f44da90..3cad6f857 100644
-> --- a/Documentation/netlink/specs/nftables.yaml
-> +++ b/Documentation/netlink/specs/nftables.yaml
-> @@ -1471,6 +1471,21 @@ sub-messages:
->        -
->          value: tproxy
->          attribute-set: expr-tproxy-attrs
-> +      -
-> +        value: match
-> +        attribute-set: compat-match-attrs
+Reviewed-by: Philipp Zabel <p.zabel@pengutronix.de>
 
-Prefer to keep the sub-message list sorted please.
-
-> +      -
-> +        value: range
-> +        attribute-set: range-attrs
-> +      -
-> +        value: numgen
-> +        attribute-set: numgen-attrs
-> +      -
-> +        value: log
-> +        attribute-set: log-attrs
-> +        # There're more sub-messages to go:
-> +        #   grep -A10 nft_expr_type
-> +        # and look for .name\s*=\s*"..."
->    -
->      name: obj-data
->      formats:
+regards
+Philipp
 
