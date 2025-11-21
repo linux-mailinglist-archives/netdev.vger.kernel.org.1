@@ -1,112 +1,123 @@
-Return-Path: <netdev+bounces-240747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D34F4C78EE5
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 13:04:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 267FCC78EFA
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 13:07:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7A64035742B
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:04:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CDA9635DDB9
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C30C0311C39;
-	Fri, 21 Nov 2025 12:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F14F34A79A;
+	Fri, 21 Nov 2025 12:06:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="n5935cNg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxgcDfvZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393342E093A
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B77346785;
+	Fri, 21 Nov 2025 12:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763726654; cv=none; b=sbwQiIkCLX7t7/j0Y1Qd+p0enHBgu78F30+RKnJ2rOUE4F0FTWK5V3NFr08Lc+GG+HnzTCyaoCnuDqKDoq/Jy4+GEzKiKlg/XYrCIEd4skMgLC6yX0uoQT4QZ8n2LOxNQJmlgbHlrRPNVehWop/9UCebM2EGOM42Hb2w2C5cVvc=
+	t=1763726812; cv=none; b=XARPzITp55i0rO8zq2DhG3SR969UT6c6m+OkDDV8Fhkfp2W/ugSPjpp4y2hkDm4FMSU+qQKyDYdON9LZkywNWTB2enbgclazDkvw76EBnPF1CfTRB+KNdPg5O2OWpelSloSpAmy38zD1hu3ZMOoVPdzlug1bffAwrXpzk1UFG0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763726654; c=relaxed/simple;
-	bh=dz9VKLn0WQmLrrBOnOtOHsQhLdntAvihYrX2caW9MZU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=glmLF3e/XNIh+1shi5R7StbrAmcxH0Vpr8hejdTT+s03GCIdvoLGEdhXiUaFkho+L8yXtPxgbgF8csO8KPUF7HYVHNOfYysqpkS32nr3AveY2kZlzNlk7g00aWhFWecyGVmAP/bmaLhW2CId41V8W9LOcna7EOdvjr+mjNy2lG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=n5935cNg; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 65ACB1A1C7F;
-	Fri, 21 Nov 2025 12:04:08 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 3A6D760719;
-	Fri, 21 Nov 2025 12:04:08 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EA70310371CF6;
-	Fri, 21 Nov 2025 13:04:00 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1763726647; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=qn8oEqQjcmd6CEjxpqT3b2zYZp/Y/5mbvScnLweKkFw=;
-	b=n5935cNgfgt/0SF2ev9crcoHzpfkF0g6foJM3k7UmpMwTDk86jFs3UAeEj1LqKVdKITqwQ
-	EbJ9O/jKx4bmFHRpuN9JwYl2EXIcGxJXmIxDm9ToYFTBPCdaAJfRI8lC3ly77Zklij9e12
-	Gay1jhrRaWeniUh8nV42T8Wb/211FDXCW7Ui2lu3tSSYWKG6oAZ5iD7w+wuYlp1+cZYbxu
-	qFl19DUhLy3KRzA+FnsTwrNuBUhVd5e3Jwilo65wWaptX5rkLQtyzhmc9xW53zTwicKpaL
-	81/pe2Wk49SR/i7igajQHrxFt6dKwfw0QVnz2OxaV6LCtXBzHMzFTWBgMtiFHw==
-Message-ID: <0423d36b-05fa-4a2b-858c-e6ef5ff1560d@bootlin.com>
-Date: Fri, 21 Nov 2025 13:03:59 +0100
+	s=arc-20240116; t=1763726812; c=relaxed/simple;
+	bh=e+w4JWef/hueSny6NsEj4e3hzhIwvQmxgphsfHCDEfA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=syFBA9hnBiLBf+AkOd14heFSbjkGMaRUqjfMXubaaXWM/j03Wc3PR5dPLxKjKC008GXPLsodhgCl3zlAdDOLFKSZReivPi09s5O0Ks7Am0gYE34qBKzeHW6dasLXyNMhRoW2H6cw0MF8LiuIO9nZNFXBhCm3oZlXGNlnfhRm8mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxgcDfvZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6779DC4CEF1;
+	Fri, 21 Nov 2025 12:06:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763726811;
+	bh=e+w4JWef/hueSny6NsEj4e3hzhIwvQmxgphsfHCDEfA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mxgcDfvZ9TlDzcRRrs6ykgmhIH2SWptIWo/gf/GabIQ5a33QUR7koAicCOYRTmL8U
+	 MxSj773JiG9mqReae9KlQOv0KFW3+lwdMwXGkIEpZZmLcrryERV7lSH2Ct0tCkNecX
+	 g+ouCVsTQApSMkkbV0+4h35kZzr+Ne0AR7K1XfKApeaAd2GEPrcoYfDtpyeejftICw
+	 hYgGe0sZIgd+BPQRR/s4AyeVCgnBNxWIlROqOyg0cSX38oO/IXARp2CS3Qq1qEht4y
+	 MGR40OWZubPtT/60TorCmfCwl9m/2ZBHyoEp2p40qnFdreyuBSbSmCpqrqzbVvmeXm
+	 ZiXw6QXqOBIPg==
+Date: Fri, 21 Nov 2025 12:06:46 +0000
+From: Lee Jones <lee@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 07/15] mfd: core: add ability for cells to probe
+ on a custom parent OF node
+Message-ID: <20251121120646.GB1117685@google.com>
+References: <20251118190530.580267-1-vladimir.oltean@nxp.com>
+ <20251118190530.580267-8-vladimir.oltean@nxp.com>
+ <20251120144136.GF661940@google.com>
+ <20251120153622.p6sy77coa3de6srw@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: stmmac: move stmmac_mac_finish() after
- stmmac_mac_config()
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <E1vMNoX-0000000FTBd-3Oup@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <E1vMNoX-0000000FTBd-3Oup@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251120153622.p6sy77coa3de6srw@skbuf>
 
-Hi Russell,
+On Thu, 20 Nov 2025, Vladimir Oltean wrote:
 
-On 21/11/2025 10:52, Russell King (Oracle) wrote:
-> Keep the functions and initialisers in the same order that they exist
-> in phylink_mac_ops. This is the preferred order for phylink methods
-> as it arranges the configuration methods by called order.
+> On Thu, Nov 20, 2025 at 02:41:36PM +0000, Lee Jones wrote:
+> > On Tue, 18 Nov 2025, Vladimir Oltean wrote:
+> > 
+> > > I would like the "nxp,sja1110a" driver, in the configuration below, to
+> > > be able to probe the drivers for "nxp,sja1110-base-t1-mdio" and for
+> > > "nxp,sja1110-base-tx-mdio" via mfd_add_devices():
+> > > 
+> > > 	ethernet-switch@0 {
+> > > 		compatible = "nxp,sja1110a";
+> > > 
+> > > 		mdios {
+> > > 			mdio@0 {
+> > > 				compatible = "nxp,sja1110-base-t1-mdio";
+> > > 			};
+> > > 
+> > > 			mdio@1 {
+> > > 				compatible = "nxp,sja1110-base-tx-mdio";
+> > > 			};
+> > > 		};
+> > > 	};
+> > 
+> > This device is not an MFD.
+> > 
+> > Please find a different way to instantiate these network drivers.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Ok.. but what is an MFD? I'm seriously interested in a definition.
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 970c670fc302..d16e522c1e7d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -932,7 +932,8 @@ static int stmmac_mac_finish(struct phylink_config *config, unsigned int mode,
->  	struct stmmac_priv *priv = netdev_priv(ndev);
->  
->  	if (priv->plat->mac_finish)
-> -		priv->plat->mac_finish(ndev, priv->plat->bsp_priv, mode, interface);
-> +		priv->plat->mac_finish(ndev, priv->plat->bsp_priv, mode,
-> +				       interface);
+> One data point: the VSC7512 (driver in drivers/mfd/ocelot-spi.c,
+> bindings in Documentation/devicetree/bindings/mfd/mscc,ocelot.yaml) is
+> almost the same class of hardware (except the embedded Cortex-M7 in
+> SJA1110 can't run Linux, and the CPU in VSC7512 can). It instantiates
+> MDIO bus children, like this patch proposes too, except it works with a
+> different device tree hierarchy which I need to adapt to, without breaking.
 
-This is just a line wrap, I don't really see the connexion with the
-commit log :( Some missing hunks in the commit maybe ?
+The devices should be different types i.e. be located in different
+subsystems.  If you're simply instantiating Watchdog timers, the code
+should live solely in drivers/watchdog.  If the devices all pertain to
+Networking, the code should live in the Networking subsystem, etc.
 
-Maxime
+MFD is Linuxisum, simply used to split devices up such that each
+component can be located it their own applicable subsystem and be
+reviewed and maintained by the subject matter experts of those domains.
 
->  
->  	return 0;
->  }
+TL;DR: if your device only deals with Networking, that's where it should
+live.  And from there, it should handle its own device registration and
+instantiation without reaching into other, non-related subsystems.
 
+-- 
+Lee Jones [李琼斯]
 
