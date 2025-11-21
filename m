@@ -1,175 +1,202 @@
-Return-Path: <netdev+bounces-240796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1678FC7A927
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 16:34:33 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E069FC7A9AE
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 16:46:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A6036342525
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 15:29:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 110824E69C2
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 15:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5875F33C50B;
-	Fri, 21 Nov 2025 15:29:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29EE72ED85F;
+	Fri, 21 Nov 2025 15:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vZd/AEpp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A354D314D2F
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 15:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994AB2C2ABF
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 15:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763738973; cv=none; b=g4BkVIIF9X4aG4q1+sJEbJmqbAxWWiZOlwEUP4zYacVsP1dL4I/OXJNb/0r5p3Uw60mfutg43GoqNJRPNt3VJ58JlmqcFdNoMBk/G3rIq0Y4WUWm2us9prs6zkh62mO9eqPcg+RmdBbLUD5LJJlFKJsVwjBSLKxI9AujiUXVXkA=
+	t=1763739668; cv=none; b=jmbH3UyDnG5DQGsziUTTSqaggpsFPgCCEC5C2yQDH8wKB4uRcJxpDlNug6ndaJIILIgwMqeAroZlNVHCKwT4t4i60U5WfrZWnfJV8Uiw+kmBmi8bkTSqernXwj/lItSfQzlm/1cNSk6XbxiaUNH1YBBl6a5OcZOlcqhdxjpzm1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763738973; c=relaxed/simple;
-	bh=bxa6VZON7cSk2oq9NS/86o6L0QmgUzgtEI0wBYgGTO4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MAregxBA9AX8Oa3VIm15DkOWDIqiTdvRZeDWm3YuyK9qGzT2/2b8VYUxEXzzuGuMMe2SGuLoOsvPlljG1RJoP2xzqP86fMbOuSjqjvsbKcCrySUQndSEcr2rzIs6RLcHN54riuGtuQXQxzhY/DcnsuhSjgwKsNj+25dMgJJVcro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-4330f62ef60so20145975ab.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 07:29:31 -0800 (PST)
+	s=arc-20240116; t=1763739668; c=relaxed/simple;
+	bh=IynZqOMMfpBgJAuRKWjrDqsopaMw/H61+216u2SLX7w=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mX/DWpyd+fQ2Bzsu+7Topdixe4Bg7leD0J4Mnlva0FyrT/nCHeKdG8cR6TrFksjbJqXBkaxh7jpL98ecpCBXCh39+coIshQMQ3HTMtEKZH2udGaYEL0iAgYPY6YF6qfylwZwi0PeLQigWeDjGLHKe8YPmVg3NG3Hmq6OgnC0STw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vZd/AEpp; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8b259f0da04so592134385a.0
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 07:41:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763739662; x=1764344462; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lG4EVSHa2p5X+4tm1xXh9hVt+9c2StBfQCA4bKx0F8g=;
+        b=vZd/AEppef94uPGGfWQ6WtgZ6Q4e1aTx7wIA1wMevOjJGR0Bd5BNydzNi7GyLkkxnc
+         evxitKyMPx3tq0n9Ss2Nnyizb6aQ9ODPpWEj9BI6CQdTCWQjXilDQWRe1Lto4IAGaxkx
+         wzUYPwAV3wHKmVttwyNWHmE3lHQ1Da6K7tB1a0cOVZ/5c6bDX3E2KV6c+wXEQ5h1cTo6
+         DZV7v5aT1XyF2BjovNPZNiYTriA7aenq0R7badGImwnFtHUTDAfqE5EOWZILyhLd9nvd
+         bVPKqsEMn87WPxLaJu9ImzjINI1k/wvhtRuuBQe5yB0MDVqS1EYsFmr9pK7KAv0j4kMT
+         6wCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763738971; x=1764343771;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1763739662; x=1764344462;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=cHJv7XUxlxqmqZsZZNhFmIn3h8MichNwFsBa+hW0lLg=;
-        b=k5HyTrW971epAOBVj5fS676UxWSlPm7NplZB7k5IFuaGxMg2rDNVhkE3j5Wjo2uRAW
-         xqi1a8LqUIQXrCWEVIM62lHtMCko/IZS0tW7SNXco4XW7iNLIrjZuvdk0SMEt4gJSlmM
-         xAtc0ilGwDOw2CfuFabP1HI0k9iadp/3PYFf5xC8svGTck7k45A/50wc3WnQVbqLE8cu
-         ig0+eIow3bCNBYmT9MBt9eYnCHtJhzWfYluxGNZ1UySauqd5GVvezEAt4U7mjaDiBvoc
-         k+I4OxWlR1F566zLOBBXGDk5wAes4apLSktZH/XAEJVEcNekGvUwEDBws5S0TSC9TcC4
-         lNnA==
-X-Forwarded-Encrypted: i=1; AJvYcCWdED5MBeV7NjXV1glM7YbM5o0tFugow6HS2nCVozcJb9oGWxgVESs2NIpzsSD3omoATpAA6DI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFJxTf30ZXGC3XofHVNwRIunoUpc7P73hPYntEyFxMl6ptcTxR
-	mC4VgHIOwMqrgbQOY3APH8SLNT70NaROx7MQYWSAoWr6FVjqhKQYU/4g1lT2f0MAd1OCUl2EL9/
-	2ckEYXNGO+ER822E4SCrrEh+Xj7G7OCiKdWT9oGY555QoYjFlchaeKUVpaos=
-X-Google-Smtp-Source: AGHT+IHwQ/wLN9AT8VbaHXLI/mc8KYaBB8oWx9sX7RVh5SaaDxRKOAWCYEnF2AIy3drJq/ZTyTo2Df1C+NPawzooEwgPJchrN+LW
+        bh=lG4EVSHa2p5X+4tm1xXh9hVt+9c2StBfQCA4bKx0F8g=;
+        b=j7Dh8xsBNaW4YS+F+Qxr4dHn7TYxu8FkiTXdX3iIZgDxroTJGNinNFv5z7GSiiTTTv
+         GDDykPqye13ldIO39MNwL7YCm5KU6lXSW0kJyDwD5O5UMYob+XbJuH283GymKe3D1s8F
+         QtKTDCfySTd/Nn74tx8k6K+i0GF61G3/uC5nqwUwyUieIduB+iwrjXhLBtesz3uWP1x8
+         xKoF5FcVfR5tXFRqJgE6QMuMLBZTthFvv1clmurZkLJn2rJx3d+fBng9jY7wxt30nULY
+         xMiEkfxz2/JHCXtxozkAlrBmxwf2oJp6mI9ukN58nooM6R7wvtSZpxnyz4nUIn/ZGNCj
+         u5dg==
+X-Forwarded-Encrypted: i=1; AJvYcCXXoJc2YDlYnKjMLAUcJW134goM76c7HWrHvUD9QMqGfn3ItD1oxYXRPooaIj0vhd8n5V+eJEo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTDg99qJzsKztQL2QAOXLBsisW7KKp/I20NHgAuNU70+WqgC0h
+	auRKhRFCjRdypbNJY3tv8cUZs8bxLaKQcrWohjQKql3ITEjDJQuLxikmDPMuOoMisL9d+Rhaj6Y
+	O5wHi/zPRhO85qw==
+X-Google-Smtp-Source: AGHT+IEvPI09mUn9Fupj1hX3tbEozFSlJc265lvngmSrDLIl2X8p/jX1evbyCp9g0O97Glbgm/0i0iEMCgi6sw==
+X-Received: from qkpc28.prod.google.com ([2002:a05:620a:269c:b0:8b2:eb77:a152])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4492:b0:8b2:735b:973b with SMTP id af79cd13be357-8b33d1d0e9emr276795485a.23.1763739662292;
+ Fri, 21 Nov 2025 07:41:02 -0800 (PST)
+Date: Fri, 21 Nov 2025 15:41:00 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:258d:b0:433:810c:db1 with SMTP id
- e9e14a558f8ab-435b8eb43f6mr19551835ab.20.1763738970847; Fri, 21 Nov 2025
- 07:29:30 -0800 (PST)
-Date: Fri, 21 Nov 2025 07:29:30 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6920855a.a70a0220.2ea503.0058.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in em_nbyte_match
-From: syzbot <syzbot+f3a497f02c389d86ef16@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.460.gd25c4c69ec-goog
+Message-ID: <20251121154100.1616228-1-edumazet@google.com>
+Subject: [PATCH net-next] net: sched: fix TCF_LAYER_TRANSPORT handling in tcf_get_base_ptr()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	syzbot+f3a497f02c389d86ef16@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+syzbot reported that tcf_get_base_ptr() can be called while transport
+header is not set [1].
 
-syzbot found the following issue on:
+Instead of returning a dangling pointer, return NULL.
 
-HEAD commit:    8e621c9a3375 Merge tag 'net-6.18-rc7' of git://git.kernel...
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=135a0e92580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=14b6a9313e132a6b
-dashboard link: https://syzkaller.appspot.com/bug?extid=f3a497f02c389d86ef16
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15e83658580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=149b4484580000
+Fix tcf_get_base_ptr() callers to handle this NULL value.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/bd46b2cfa172/disk-8e621c9a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/55fd403d139a/vmlinux-8e621c9a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f79c45db6fe5/bzImage-8e621c9a.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f3a497f02c389d86ef16@syzkaller.appspotmail.com
-
-syzkaller0: entered promiscuous mode
-syzkaller0: entered allmulticast mode
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 6013 at ./include/linux/skbuff.h:3071 skb_transport_header include/linux/skbuff.h:3071 [inline]
-WARNING: CPU: 0 PID: 6013 at ./include/linux/skbuff.h:3071 tcf_get_base_ptr include/net/pkt_cls.h:539 [inline]
-WARNING: CPU: 0 PID: 6013 at ./include/linux/skbuff.h:3071 em_nbyte_match+0x2d8/0x3f0 net/sched/em_nbyte.c:43
+[1]
+ WARNING: CPU: 1 PID: 6019 at ./include/linux/skbuff.h:3071 skb_transport_header include/linux/skbuff.h:3071 [inline]
+ WARNING: CPU: 1 PID: 6019 at ./include/linux/skbuff.h:3071 tcf_get_base_ptr include/net/pkt_cls.h:539 [inline]
+ WARNING: CPU: 1 PID: 6019 at ./include/linux/skbuff.h:3071 em_nbyte_match+0x2d8/0x3f0 net/sched/em_nbyte.c:43
 Modules linked in:
-CPU: 0 UID: 0 PID: 6013 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-RIP: 0010:skb_transport_header include/linux/skbuff.h:3071 [inline]
-RIP: 0010:tcf_get_base_ptr include/net/pkt_cls.h:539 [inline]
-RIP: 0010:em_nbyte_match+0x2d8/0x3f0 net/sched/em_nbyte.c:43
-Code: 31 c0 48 83 c4 10 5b 41 5c 41 5d 41 5e 41 5f 5d e9 8d 08 e4 01 cc e8 a7 a7 5a f8 90 0f 0b 90 e9 de fe ff ff e8 99 a7 5a f8 90 <0f> 0b 90 e9 f7 fd ff ff 89 d1 80 e1 07 fe c1 38 c1 0f 8c 71 fd ff
-RSP: 0018:ffffc900038fefd8 EFLAGS: 00010293
-RAX: ffffffff89655c27 RBX: ffff88803039f3c0 RCX: ffff88802f1d0000
-RDX: 0000000000000000 RSI: 000000000000ffff RDI: 000000000000ffff
-RBP: 000000000000ffff R08: ffff88802f1d0000 R09: 0000000000000003
-R10: 0000000000000002 R11: 0000000000000000 R12: dffffc0000000000
-R13: 1ffff11006073e8e R14: ffff8880301e5580 R15: 1ffff1100603cab0
-FS:  00005555576be500(0000) GS:ffff88812613b000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000002280 CR3: 0000000062390000 CR4: 00000000003526f0
+CPU: 1 UID: 0 PID: 6019 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full)
 Call Trace:
  <TASK>
- tcf_em_match net/sched/ematch.c:494 [inline]
- __tcf_em_tree_match+0x1ac/0x770 net/sched/ematch.c:520
- tcf_em_tree_match include/net/pkt_cls.h:512 [inline]
- basic_classify+0x115/0x2d0 net/sched/cls_basic.c:50
- tc_classify include/net/tc_wrapper.h:197 [inline]
- __tcf_classify net/sched/cls_api.c:1764 [inline]
- tcf_classify+0x4cf/0x1140 net/sched/cls_api.c:1860
- multiq_classify net/sched/sch_multiq.c:39 [inline]
- multiq_enqueue+0xfd/0x4c0 net/sched/sch_multiq.c:66
- dev_qdisc_enqueue+0x4e/0x260 net/core/dev.c:4118
- __dev_xmit_skb net/core/dev.c:4214 [inline]
- __dev_queue_xmit+0xe83/0x3b50 net/core/dev.c:4729
- packet_snd net/packet/af_packet.c:3076 [inline]
- packet_sendmsg+0x3e33/0x5080 net/packet/af_packet.c:3108
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:742
- ____sys_sendmsg+0x505/0x830 net/socket.c:2630
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
- __sys_sendmsg net/socket.c:2716 [inline]
- __do_sys_sendmsg net/socket.c:2721 [inline]
- __se_sys_sendmsg net/socket.c:2719 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f02b7d8f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffef050ec08 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f02b7fe5fa0 RCX: 00007f02b7d8f749
-RDX: 0000000000000004 RSI: 00002000000000c0 RDI: 0000000000000007
-RBP: 00007f02b7e13f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f02b7fe5fa0 R14: 00007f02b7fe5fa0 R15: 0000000000000003
- </TASK>
+  tcf_em_match net/sched/ematch.c:494 [inline]
+  __tcf_em_tree_match+0x1ac/0x770 net/sched/ematch.c:520
+  tcf_em_tree_match include/net/pkt_cls.h:512 [inline]
+  basic_classify+0x115/0x2d0 net/sched/cls_basic.c:50
+  tc_classify include/net/tc_wrapper.h:197 [inline]
+  __tcf_classify net/sched/cls_api.c:1764 [inline]
+  tcf_classify+0x4cf/0x1140 net/sched/cls_api.c:1860
+  multiq_classify net/sched/sch_multiq.c:39 [inline]
+  multiq_enqueue+0xfd/0x4c0 net/sched/sch_multiq.c:66
+  dev_qdisc_enqueue+0x4e/0x260 net/core/dev.c:4118
+  __dev_xmit_skb net/core/dev.c:4214 [inline]
+  __dev_queue_xmit+0xe83/0x3b50 net/core/dev.c:4729
+  packet_snd net/packet/af_packet.c:3076 [inline]
+  packet_sendmsg+0x3e33/0x5080 net/packet/af_packet.c:3108
+  sock_sendmsg_nosec net/socket.c:727 [inline]
+  __sock_sendmsg+0x21c/0x270 net/socket.c:742
+  ____sys_sendmsg+0x505/0x830 net/socket.c:2630
 
-
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot+f3a497f02c389d86ef16@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/6920855a.a70a0220.2ea503.0058.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ include/net/pkt_cls.h |  2 ++
+ net/sched/em_cmp.c    |  5 ++++-
+ net/sched/em_nbyte.c  |  2 ++
+ net/sched/em_text.c   | 11 +++++++++--
+ 4 files changed, 17 insertions(+), 3 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+index c64fd896b1f985c5f6a5b50cbb42ded640d0c9fe..99ac747b7906074c43b3eb8e34cf6c07235cc81d 100644
+--- a/include/net/pkt_cls.h
++++ b/include/net/pkt_cls.h
+@@ -536,6 +536,8 @@ static inline unsigned char * tcf_get_base_ptr(struct sk_buff *skb, int layer)
+ 		case TCF_LAYER_NETWORK:
+ 			return skb_network_header(skb);
+ 		case TCF_LAYER_TRANSPORT:
++			if (!skb_transport_header_was_set(skb))
++				break;
+ 			return skb_transport_header(skb);
+ 	}
+ 
+diff --git a/net/sched/em_cmp.c b/net/sched/em_cmp.c
+index 64b637f18bc7d40509bf5c9f7679cfbc2922af1c..48c1bce74f498d0b4ee3d1efde96459b0dac5896 100644
+--- a/net/sched/em_cmp.c
++++ b/net/sched/em_cmp.c
+@@ -22,9 +22,12 @@ static int em_cmp_match(struct sk_buff *skb, struct tcf_ematch *em,
+ 			struct tcf_pkt_info *info)
+ {
+ 	struct tcf_em_cmp *cmp = (struct tcf_em_cmp *) em->data;
+-	unsigned char *ptr = tcf_get_base_ptr(skb, cmp->layer) + cmp->off;
++	unsigned char *ptr = tcf_get_base_ptr(skb, cmp->layer);
+ 	u32 val = 0;
+ 
++	if (!ptr)
++		return 0;
++	ptr += cmp->off;
+ 	if (!tcf_valid_offset(skb, ptr, cmp->align))
+ 		return 0;
+ 
+diff --git a/net/sched/em_nbyte.c b/net/sched/em_nbyte.c
+index 4f9f21a05d5e40aadfdc4c339b8178ad43dc2c8b..c65ffa5fff946edbc30a65ad99087bf664665e32 100644
+--- a/net/sched/em_nbyte.c
++++ b/net/sched/em_nbyte.c
+@@ -42,6 +42,8 @@ static int em_nbyte_match(struct sk_buff *skb, struct tcf_ematch *em,
+ 	struct nbyte_data *nbyte = (struct nbyte_data *) em->data;
+ 	unsigned char *ptr = tcf_get_base_ptr(skb, nbyte->hdr.layer);
+ 
++	if (!ptr)
++		return 0;
+ 	ptr += nbyte->hdr.off;
+ 
+ 	if (!tcf_valid_offset(skb, ptr, nbyte->hdr.len))
+diff --git a/net/sched/em_text.c b/net/sched/em_text.c
+index 6b3d0af72c39c7fb1e3290e24bf94f5bf9e0b358..692e2be1793e9961bcd4516baf54a05341f6ac5d 100644
+--- a/net/sched/em_text.c
++++ b/net/sched/em_text.c
+@@ -29,12 +29,19 @@ static int em_text_match(struct sk_buff *skb, struct tcf_ematch *m,
+ 			 struct tcf_pkt_info *info)
+ {
+ 	struct text_match *tm = EM_TEXT_PRIV(m);
++	unsigned char *ptr;
+ 	int from, to;
+ 
+-	from = tcf_get_base_ptr(skb, tm->from_layer) - skb->data;
++	ptr = tcf_get_base_ptr(skb, tm->from_layer);
++	if (!ptr)
++		return 0;
++	from = ptr - skb->data;
+ 	from += tm->from_offset;
+ 
+-	to = tcf_get_base_ptr(skb, tm->to_layer) - skb->data;
++	ptr = tcf_get_base_ptr(skb, tm->to_layer);
++	if (!ptr)
++		return 0;
++	to = ptr - skb->data;
+ 	to += tm->to_offset;
+ 
+ 	return skb_find_text(skb, from, to, tm->config) != UINT_MAX;
+-- 
+2.52.0.460.gd25c4c69ec-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
