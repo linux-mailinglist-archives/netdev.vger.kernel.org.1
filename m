@@ -1,151 +1,201 @@
-Return-Path: <netdev+bounces-240867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A76D9C7B9A5
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 20:59:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E01EC7BA1B
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 21:26:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F3BE3A63B0
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 19:59:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D49F43A5C40
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 20:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488732BE7A1;
-	Fri, 21 Nov 2025 19:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M2aRlOs2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD52A2765F5;
+	Fri, 21 Nov 2025 20:26:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2AD20C463
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 19:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25012264CB
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 20:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763755169; cv=none; b=shZsw/T6k0v/wIOCaZG5mJI0tasT4I1fKiV9nqd6z3qAsTkOWdF0LPh4vFIBsPltJ69JDbgheMRQd3rzV8fJcSVmUACP1sroY6WiaMTrh4Mr4/ziX7B4B06/z1CPiSqQQJUfgqSYQDbn0MjopWPsMyZUBviUfLOSRTEHYhPyXRU=
+	t=1763756789; cv=none; b=du8rGn2YYSm371CGg0y/87Fb0Z6hzx7hs3Kt3oL01D3Q55J8+vCF8LDJTDIkJDCSYdzwoNHXRuSVCfiQEyLMMt/rUuVOq8rL1hKeP8qVbxri361/8MfrNk8bNtYOvu+Y60LNzZFloWJTdthPESEEh+4KDO/AkcP6mnwdZKgms6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763755169; c=relaxed/simple;
-	bh=HrNZhaxv7onlfpO3ao+whj9c0aPhYTP9eDswdxnDVH4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=XoXAFulj17MSjROvv3wZLKD2nAGXxyRqicRRwI+qgfK2E9fVU+4iVq9eTTCcwa4OIl2wn+axHdDKB+8K31SSiUbU1qgG9ID/7fLlQKMvLr0BJRYBPmxo27SD2hvztlX+XWGUGW9CKlwFyekg3gSJI9JiTj+MGrxMHRnQVUxMII8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M2aRlOs2; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4779ce2a624so21567615e9.2
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 11:59:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763755166; x=1764359966; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=T8Ep+Gc51oYUhnNGxeVHBvrIQTzHV7wIK3+gDjsdisQ=;
-        b=M2aRlOs2GDpiOx2QpAhr84ovxeTj0GUw60n/YgVymiW1m3mIuzVaoGsBQZl70p/3l3
-         ia7n5J15Hi4D8LLMDY+g9idOCd45anJJxAhB6tgdrICJKtVyCcvkfs8o1jd/vnNBZ0cu
-         NW0gpOKPo4kLcrRBWokj2W+plwRtJW8BgaDToZwET7JITaAvBumBJuQqWF5EtBUNQloM
-         Qj5aRMptB8BNFd93e7QwI8251WGGFpiuh9ERWMeMDg6Sh39HCeNBmcJ/COVCl/Q3Ip30
-         CWQ9PjQKvYsXKCFR+KUP1Tqdh0P6NMWP7Rwxqh+eY15DdVpjSVqN74pO+4QSWG1180Ds
-         ltBg==
+	s=arc-20240116; t=1763756789; c=relaxed/simple;
+	bh=CVbCQXjcXqmsI8PvgmNhYZ4hJ3PAVBKnVbnfJxC/mGk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=TIzNdGgm6Qz14i83HPJFp8+/JNQ2JEPQuqVDFngH0lbu8Kc8AkAbVNkzMYj0GQkNoExcFDXq4Xu6lbdXfj0Z+NJOYSv/4kRDMbi7B+Jm0CVOt5Okp7lKYHtes/NnvRwcYEzUIluBkbb0AFJAYsMJTDJn+mxrk9FZUffDnhdeuHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-949348b6c80so187630539f.1
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:26:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763755166; x=1764359966;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T8Ep+Gc51oYUhnNGxeVHBvrIQTzHV7wIK3+gDjsdisQ=;
-        b=pISIG6t796mEFeECPgY+87vUGSQRPneLXCrvIa9yBH2f/tnOdHhTHf6qOfzkq4v9sn
-         /P4kT4vosXFSKz6cB0lkGl1zKzCcc+67YEkBO+mcabluMXlUPnOiXBmZuQo52PK+nd5o
-         XEmBv59rC/SsmAK+7ri8D3EzT8DYKXyvpIJwonBd3ffYXBPbcn1d5nEcMRKsYQRoKO5/
-         f15Ey1MiqXaGVO7BODqzkbcfY1CzzkK3ejcltzWRhz6ue0jjcIzvurw5aWDx3e0JMj0s
-         FPj4XI5AJWWY/CglgQGp55CYVTEmcE3zQdoNjlqu8cfp+X0hiShP1L4mttsQYq6ASEuO
-         /h0g==
-X-Gm-Message-State: AOJu0Yy6UEt/XpTSeHs7SrM8AN/U8ZR1cfsCpUJ0sO/9kyoJw++l9Vuc
-	c71E5J2xSp00PIQCkfNHukLnNr2zBAEF50uBNbwHpJtGgYgb+BPcwUZY
-X-Gm-Gg: ASbGncu2aAPYqnPmekwcI/ruY0TFdBh2iWj1swP4pC/NeX12BQ0ZiaCjAljoW7irgMA
-	eemt6kSx+NtL6nwxUjPRO2fvgd//M2sppYZIjLube2+AfQ4RlmkhvtYgrhz1oZ7yX6mQEKcPtbc
-	yHHERdjAH8uhOCmWWQF/qDHGJD/2Zem03M72EdWqDAZaNTS/cf5yJgMGRi49TP5YRrhOssXWKfb
-	cA+S8DwjIvQyGgbEhqyMlfFRsXEtC1m7baorOB7XOSwsmMaLJ3NiYPt+Vsj+X6beO8K0orE/1bc
-	YySaTXuk2pFgQNjW1ZX8/bcO771xkK0NR7nfdEdMbeUVHUbtO+bz4kiaBMVYnAbv+Bv3+NBwyLf
-	fYPMbt5WQsqynnO9z0AP9AjoPSe4Cl48JTSD05Zzp1fxr/GeJ6WFW5eAPcqKzUyhf7SdhOlWOdl
-	QFj8dcArQ4l94eimO/Aqwl7bhK9jMypxA0OIlK0TedVtByitOa5ZJJiv48+++C6iDHXFutdNzQ+
-	F5SRC1VIOYzegtwrZ4/6NAZyGkE01AHq6ESciU3mHsKRt88Hj2giQ==
-X-Google-Smtp-Source: AGHT+IH5P86mF1M3xKWsN1AdNrDrU+YK8lyH0R8wXBUOWiT2daT7RxY1tTO3ZTQ9zZaQbN7Zn6+GWg==
-X-Received: by 2002:a05:600c:190c:b0:477:5c58:3d42 with SMTP id 5b1f17b1804b1-477c017d879mr39407505e9.10.1763755165492;
-        Fri, 21 Nov 2025 11:59:25 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f20:6900:adc4:1eb8:ca42:9808? (p200300ea8f206900adc41eb8ca429808.dip0.t-ipconnect.de. [2003:ea:8f20:6900:adc4:1eb8:ca42:9808])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf198a67sm62396735e9.0.2025.11.21.11.59.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Nov 2025 11:59:24 -0800 (PST)
-Message-ID: <f8c902b9-f40c-4966-bb31-560e100b3cc0@gmail.com>
-Date: Fri, 21 Nov 2025 20:59:23 +0100
+        d=1e100.net; s=20230601; t=1763756787; x=1764361587;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SN7QW5iP4HoHv7vHf/H+25kYWn7ovoYWMwTlKmZ7fkg=;
+        b=HsK/Zc7GJWT4Q3fZw6ZsuY+JomFE1s4T7sHQjnBXjM66e6i2pC28b71xBscks4n6jx
+         DyFypJtWHaq+EGrgdwnLyK8kpHY0hDoCIKEzBozfbTxROad+2yr4l8CAH8/nr+fY/4PI
+         W4qUET530JkZipIo0Rl6tdok/Cjb4JHAwSCDqGGStXviVjnyDYuX+XUT1vJdaqZWmmsZ
+         lf6ySzSQqfjAD5Q8syNeojTSu+EbE43k7nXvs5ovbJ4nNFhijIpfj6dIMBlbbBv80MJd
+         TgNQc15sfMTvB9i8UsuVsZ/A5yzREZti/h4pCQbg8svfxj006MHDsmE2EZEoryFO/4D2
+         BV2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXUlZg5h8WfLQo8duDmy4qm9AFaJfA5PV7SnJs6+n1A055aDvDIVXrvxqK4UtUemrB4Il9h1Fw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVeFmY2uFs2lbf/tAELan35y/C+5RRVFzCYhBdO40UiFWQxQV6
+	hOqsIYMMgFNMiWgZx+yUC8THd2f8IgeeTt8+iqamr8ni+dbFG6OGUX6FXEjya284gYzA5897kGv
+	Te2usLIXBbbF/o9ExvroT5EzrNuZsydNrLt+b1CQJuQ90Y6Iq+GMq7TFYVqA=
+X-Google-Smtp-Source: AGHT+IH45HYkobNWM41IaAbsfvUqRvxiVrEN5uCZcQeNjiTEKU4mWuVsc2smGZ3XADFijpVGTUbWTdXlx8r7f4ncFpJWSmGo71a1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] r8169: fix RTL8127 hang on suspend/shutdown
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- David Miller <davem@davemloft.net>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Fabio Baltieri <fabio.baltieri@gmail.com>
-References: <c8f46dfa-00b2-4802-9009-d732005e685b@gmail.com>
-Content-Language: en-US
-In-Reply-To: <c8f46dfa-00b2-4802-9009-d732005e685b@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:3499:b0:433:2a9b:165c with SMTP id
+ e9e14a558f8ab-435b8e51411mr30073355ab.27.1763756787052; Fri, 21 Nov 2025
+ 12:26:27 -0800 (PST)
+Date: Fri, 21 Nov 2025 12:26:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6920caf3.a70a0220.d98e3.004a.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_teardown_sdata (2)
+From: syzbot <syzbot+9b98dcd91414ddae4a56@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/21/2025 6:58 PM, Heiner Kallweit wrote:
-> There have been reports that RTL8127 hangs on suspend and shutdown,
-> partially disappearing from lspci until power-cycling.
-> According to Realtek disabling PLL's when switching to D3 should be
-> avoided on that chip version. Fix this by aligning disabling PLL's
-> with the vendor drivers, what in addition results in PLL's not being
-> disabled when switching to D3hot on other chip versions.
-> 
-> Fixes: f24f7b2f3af9 ("r8169: add support for RTL8127A")
-> Tested-by: Fabio Baltieri <fabio.baltieri@gmail.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 19 ++++++++++++++-----
->  1 file changed, 14 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index de304d1eb..97dbe8f89 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -1517,11 +1517,20 @@ static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
->  
->  static void rtl_set_d3_pll_down(struct rtl8169_private *tp, bool enable)
->  {
-> -	if (tp->mac_version >= RTL_GIGA_MAC_VER_25 &&
-> -	    tp->mac_version != RTL_GIGA_MAC_VER_28 &&
-> -	    tp->mac_version != RTL_GIGA_MAC_VER_31 &&
-> -	    tp->mac_version != RTL_GIGA_MAC_VER_38)
-> -		r8169_mod_reg8_cond(tp, PMCH, D3_NO_PLL_DOWN, !enable);
-> +	switch (tp->mac_version) {
-> +	case RTL_GIGA_MAC_VER_02 ... RTL_GIGA_MAC_VER_24:
-> +	case RTL_GIGA_MAC_VER_28:
-> +	case RTL_GIGA_MAC_VER_31:
-> +	case RTL_GIGA_MAC_VER_38:
-> +		break;
-> +	case RTL_GIGA_MAC_VER_80:
-> +		r8169_mod_reg8_cond(tp, PMCH, D3_NO_PLL_DOWN, true);
-> +		break;
-> +	default:
-> +		r8169_mod_reg8_cond(tp, PMCH, D3HOT_NO_PLL_DOWN, true);
-> +		r8169_mod_reg8_cond(tp, PMCH, D3COLD_NO_PLL_DOWN, !enable);
-> +		break;
-> +	}
->  }
->  
->  static void rtl_reset_packet_filter(struct rtl8169_private *tp)
+Hello,
 
-Will resubmit due to a missing blamed author.
+syzbot found the following issue on:
 
---
-pw-bot: cr
+HEAD commit:    6a23ae0a96a6 Linux 6.18-rc6
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=104e6692580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=14b6a9313e132a6b
+dashboard link: https://syzkaller.appspot.com/bug?extid=9b98dcd91414ddae4a56
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+userspace arch: i386
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/464c2673a9ca/disk-6a23ae0a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c2986bef024f/vmlinux-6a23ae0a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4077bdc25422/bzImage-6a23ae0a.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9b98dcd91414ddae4a56@syzkaller.appspotmail.com
+
+bond0: (slave wlan1): Releasing backup interface
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 10842 at net/mac80211/iface.c:861 ieee80211_teardown_sdata+0xd2/0x140 net/mac80211/iface.c:861
+Modules linked in:
+CPU: 0 UID: 0 PID: 10842 Comm: syz.0.1271 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+RIP: 0010:ieee80211_teardown_sdata+0xd2/0x140 net/mac80211/iface.c:861
+Code: f7 48 89 df 31 f6 31 d2 e8 0b 9b 00 00 48 81 c3 10 18 00 00 48 89 df 5b 41 5c 41 5e 41 5f 5d e9 94 bb 00 00 e8 3f a5 03 f7 90 <0f> 0b 90 4c 8d bb 30 0a 00 00 4c 89 f8 48 c1 e8 03 42 80 3c 20 00
+RSP: 0018:ffffc9001b87f050 EFLAGS: 00010287
+RAX: ffffffff8abc5ed1 RBX: ffff888059190d80 RCX: 0000000000080000
+RDX: ffffc9000b8c2000 RSI: 000000000001e9e7 RDI: 000000000001e9e8
+RBP: ffffc9001b87f1f0 R08: ffffffff8f7ceb77 R09: 1ffffffff1ef9d6e
+R10: dffffc0000000000 R11: ffffffff8abcbe10 R12: dffffc0000000000
+R13: ffff888059190c18 R14: ffff888059191a08 R15: ffff888059190000
+FS:  0000000000000000(0000) GS:ffff88812613b000(0063) knlGS:00000000f53f6b40
+CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+CR2: 000000008057f000 CR3: 00000000591a8000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ unregister_netdevice_many_notify+0x1cde/0x2390 net/core/dev.c:12305
+ unregister_netdevice_many net/core/dev.c:12347 [inline]
+ unregister_netdevice_queue+0x33c/0x380 net/core/dev.c:12161
+ unregister_netdevice include/linux/netdevice.h:3389 [inline]
+ _cfg80211_unregister_wdev+0x165/0x590 net/wireless/core.c:1284
+ ieee80211_if_remove+0x256/0x310 net/mac80211/iface.c:2334
+ ieee80211_del_iface+0x19/0x30 net/mac80211/cfg.c:237
+ rdev_del_virtual_intf net/wireless/rdev-ops.h:62 [inline]
+ cfg80211_remove_virtual_intf+0x231/0x3f0 net/wireless/util.c:2928
+ genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:742
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2630
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
+ __sys_sendmsg+0x164/0x220 net/socket.c:2716
+ do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+ __do_fast_syscall_32+0xb6/0x2b0 arch/x86/entry/syscall_32.c:306
+ do_fast_syscall_32+0x34/0x80 arch/x86/entry/syscall_32.c:331
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+RIP: 0023:0xf7f02539
+Code: 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
+RSP: 002b:00000000f53f655c EFLAGS: 00000206 ORIG_RAX: 0000000000000172
+RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 0000000080000200
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
+   4:	10 07                	adc    %al,(%rdi)
+   6:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
+   a:	10 08                	adc    %cl,(%rax)
+   c:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
+  20:	00 51 52             	add    %dl,0x52(%rcx)
+  23:	55                   	push   %rbp
+  24:	89 e5                	mov    %esp,%ebp
+  26:	0f 34                	sysenter
+  28:	cd 80                	int    $0x80
+* 2a:	5d                   	pop    %rbp <-- trapping instruction
+  2b:	5a                   	pop    %rdx
+  2c:	59                   	pop    %rcx
+  2d:	c3                   	ret
+  2e:	90                   	nop
+  2f:	90                   	nop
+  30:	90                   	nop
+  31:	90                   	nop
+  32:	90                   	nop
+  33:	90                   	nop
+  34:	90                   	nop
+  35:	90                   	nop
+  36:	90                   	nop
+  37:	90                   	nop
+  38:	90                   	nop
+  39:	90                   	nop
+  3a:	90                   	nop
+  3b:	90                   	nop
+  3c:	90                   	nop
+  3d:	90                   	nop
+  3e:	90                   	nop
+  3f:	90                   	nop
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
