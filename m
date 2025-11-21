@@ -1,49 +1,50 @@
-Return-Path: <netdev+bounces-240826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93E7BC7AFBF
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 18:06:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F506C7AFCE
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 18:08:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B14B0365861
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:03:08 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4048235D09E
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DFFD346E43;
-	Fri, 21 Nov 2025 17:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A608234DB5C;
+	Fri, 21 Nov 2025 17:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ilEO6GAI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rypruDlL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8913451A3;
-	Fri, 21 Nov 2025 17:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786DD340293;
+	Fri, 21 Nov 2025 17:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763744559; cv=none; b=D+dyM4f4420+ozdtjPaK8aZG4A0LUtSg3Pa4HJrIXtCg1mj97tGrSz+CtWlxqaze3bDxOJvybqnto4z+5a5gqKjiwW6NsmPJCRXHAT/hB5/PtlLv7gxRtpyp0UCmyJnMcUL9vEbM+PJNQNds4TGftEKGYQJrTt5T61/AmsAdOqg=
+	t=1763744562; cv=none; b=mYwFBWAvh6rXW4RIttcr4kiTYzKpoYYkhqCTVtbWpPJtTVhpzeJTiN7MoANB1lJ4BsutvC+qHPSWZgBeCGPRhSBBuXbFGO7ulQZ/pyr1kvQpSNsl/Fix59yzxYImdSHMpNdhvtz7iAljcYKtCt7GXHN0fUFBWUuO7QzrXpM1nZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763744559; c=relaxed/simple;
-	bh=jQ0UDB4U29x/KlnOx2L558m9xp5Y4bGvMVx4QgXsvAY=;
+	s=arc-20240116; t=1763744562; c=relaxed/simple;
+	bh=JqiyVRxMHEYtyT/rjFS/LpRedROqGTJ7vuKAa7M89V0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=X3PGst/2kjkSZ8KzeyN0a5i70U0VQiJtzX9Rnja/EtTNOay9UbI/j8ufr6RCSg7LxQl0abuBCAvXX1Op4uc/GufKu9ZIXja8LHbbdu2jEnQfBFGHMFbw1lLVW+PvyCqlEPXC99W861TkzLIGCnNsrK8+SyS71S52l4LTjdvjMB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ilEO6GAI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 895B0C4CEF1;
-	Fri, 21 Nov 2025 17:02:35 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=QSPmIB7s9AapUrGCbPJ92z2lDJ1JdiRQtGlR5DDjC6rV20wFmEaMLW5VLDLZ9GEP46RJEQjrPr5ZRZFBWF2SAQ0ZwLnYbHPQqzaTyMH9cUUTqbUHeZIZZJMTsOrZv/hHpXKqf3Cs1wDWr/mYYSjgy5aKyHFem/s2UHKg5UJC5Yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rypruDlL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF7D7C116D0;
+	Fri, 21 Nov 2025 17:02:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763744558;
-	bh=jQ0UDB4U29x/KlnOx2L558m9xp5Y4bGvMVx4QgXsvAY=;
+	s=k20201202; t=1763744562;
+	bh=JqiyVRxMHEYtyT/rjFS/LpRedROqGTJ7vuKAa7M89V0=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ilEO6GAIQEmvi73CO+PkIZFQJQVe0bSLd+kKfmOnlWX2iZL87CqdFE+GZVWihWM8d
-	 gXnDXPKmJKj5bLUvMJsneqO52HhCRT9E/+XM0BzdW1qJIiznpcshFrE0KKkcPi8tye
-	 2Qpymrjrfg34+SIwF1b3ZNkysGT0TDdQmDPRWiJoc8TSec4QmNmlmVap419R8tKw4V
-	 GfP1ubAx9A7sFa2kCcl3RciRw47kxo0y2zQ0FkM77nE3A7kZKcPZXAuiAI7zOrFM+1
-	 yK9kaJVddyIyw4LTzqp17Og5b5TT040P88fGIPEmOCTYFmOmyM/+vrsBD6KR52Py+a
-	 1D+un71sEVX1A==
+	b=rypruDlL4gS0xw+0N3B2/mLhGOZTuUqPTGK7eBk+c8rsdGFwKXnGFBYqDcUKqRidt
+	 Fccxo38dAP0e3U9THPLjJepQb46j9fKO5hplXBgcxlsnebTPAOQIsiPsitM4FdSwBR
+	 0CEZ1RAzTTg+uj3egKYoTahPIarjVPV9y2L4+lB8JPBT0qpUZCWJJENIgVR1wtmmQO
+	 3usRl/JCCfpjysLc3/ho9KyijRgdGg7YdZePeo2j+xwC5ozRQUD0rD4VMRU84S4fp9
+	 QtUnba0GdLI7fX246n7WbQ/gg3PyRJx03EXQRJI4ye+JtEoNK2sMA5eLCf9rB3CLYG
+	 2v6NmUUig9Kqw==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 21 Nov 2025 18:02:02 +0100
-Subject: [PATCH net-next 03/14] mptcp: grafting MPJ subflow earlier
+Date: Fri, 21 Nov 2025 18:02:03 +0100
+Subject: [PATCH net-next 04/14] mptcp: fix memcg accounting for passive
+ sockets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251121-net-next-mptcp-memcg-backlog-imp-v1-3-1f34b6c1e0b1@kernel.org>
+Message-Id: <20251121-net-next-mptcp-memcg-backlog-imp-v1-4-1f34b6c1e0b1@kernel.org>
 References: <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
 In-Reply-To: <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
 To: Eric Dumazet <edumazet@google.com>, 
@@ -67,101 +68,134 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  mptcp@lists.linux.dev, Davide Caratti <dcaratti@redhat.com>, 
  "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2932; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=TzG7leIFSjvo22mwXd7Xqen2NE60+AKXWYBJRpqRFhM=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDIVZgsnx991bsrfwRHTa9TEnH1z7h9DpjkBfY8286umR
- nQcM9vYUcrCIMbFICumyCLdFpk/83kVb4mXnwXMHFYmkCEMXJwCMJFTkxkZLkY0c/LkvL721P3S
- p0+P10nz5tfkrdo/my1+FcOWI+K32Bn+Gf7iTGx767X9cc5NvYzjb7c8rLmqruO+eP+sDQpWjxd
- YcQIA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4066; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=TRMQesoJ1teDIYpT9/7kCY3YsKcNcxDZavMqNyv2chc=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDIVZotwzwg9YZ3fZ3lO4h77TMG0r4mXGlc+thOa4Rw6p
+ VsnY7tTRykLgxgXg6yYIot0W2T+zOdVvCVefhYwc1iZQIYwcHEKwER2PmRkWNR9P6p5T+WX/wWn
+ r2nuEr8nvfXUPQ41kSK+43cWr3me1svIsGCtwP845kSDj4nHkrRqwn/ffCltcOWsM09kQ2//GwF
+ GZgA=
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
 From: Paolo Abeni <pabeni@redhat.com>
 
-Later patches need to ensure that all MPJ subflows are grafted to the
-msk socket before accept() completion.
+The passive sockets never got proper memcg accounting: the msk
+socket is associated with the memcg at accept time, but the
+passive subflows never got it right.
 
-Currently the grafting happens under the msk socket lock: potentially
-at msk release_cb time which make satisfying the above condition a bit
-tricky.
+At accept time, traverse the subflows list and associate each of them
+with the msk memcg, and try to do the same at join completion time, if
+the msk has been already accepted.
 
-Move the MPJ subflow grafting earlier, under the msk data lock, so that
-we can use such lock as a synchronization point.
-
+Fixes: cf7da0d66cc1 ("mptcp: Create SUBFLOW socket for incoming connections")
+Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/298
+Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/597
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/mptcp/protocol.c | 30 +++++++++++++++++++++++-------
- 1 file changed, 23 insertions(+), 7 deletions(-)
+ net/mptcp/protocol.c | 38 +++++++++++++++++++++++++++-----------
+ net/mptcp/protocol.h |  1 +
+ net/mptcp/subflow.c  | 10 ++++++++++
+ 3 files changed, 38 insertions(+), 11 deletions(-)
 
 diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 75bb1199bed9..2104ab1eda1d 100644
+index 2104ab1eda1d..67732d3c502c 100644
 --- a/net/mptcp/protocol.c
 +++ b/net/mptcp/protocol.c
-@@ -895,12 +895,6 @@ static bool __mptcp_finish_join(struct mptcp_sock *msk, struct sock *ssk)
- 	mptcp_subflow_joined(msk, ssk);
- 	spin_unlock_bh(&msk->fallback_lock);
- 
--	/* attach to msk socket only after we are sure we will deal with it
--	 * at close time
--	 */
--	if (sk->sk_socket && !ssk->sk_socket)
--		mptcp_sock_graft(ssk, sk->sk_socket);
--
- 	mptcp_subflow_ctx(ssk)->subflow_id = msk->subflow_id++;
- 	mptcp_sockopt_sync_locked(msk, ssk);
- 	mptcp_stop_tout_timer(sk);
-@@ -3647,6 +3641,20 @@ void mptcp_sock_graft(struct sock *sk, struct socket *parent)
+@@ -3651,8 +3651,11 @@ static void mptcp_sock_check_graft(struct sock *sk, struct sock *ssk)
+ 	write_lock_bh(&sk->sk_callback_lock);
+ 	sock = sk->sk_socket;
  	write_unlock_bh(&sk->sk_callback_lock);
+-	if (sock)
++	if (sock) {
+ 		mptcp_sock_graft(ssk, sock);
++		__mptcp_inherit_cgrp_data(sk, ssk);
++		__mptcp_inherit_memcg(sk, ssk, GFP_ATOMIC);
++	}
  }
  
-+/* Can be called without holding the msk socket lock; use the callback lock
-+ * to avoid {READ_,WRITE_}ONCE annotations on sk_socket.
-+ */
-+static void mptcp_sock_check_graft(struct sock *sk, struct sock *ssk)
+ bool mptcp_finish_join(struct sock *ssk)
+@@ -3970,6 +3973,28 @@ static int mptcp_listen(struct socket *sock, int backlog)
+ 	return err;
+ }
+ 
++static void mptcp_graft_subflows(struct sock *sk)
 +{
-+	struct socket *sock;
++	struct mptcp_subflow_context *subflow;
++	struct mptcp_sock *msk = mptcp_sk(sk);
 +
-+	write_lock_bh(&sk->sk_callback_lock);
-+	sock = sk->sk_socket;
-+	write_unlock_bh(&sk->sk_callback_lock);
-+	if (sock)
-+		mptcp_sock_graft(ssk, sock);
++	mptcp_for_each_subflow(msk, subflow) {
++		struct sock *ssk = mptcp_subflow_tcp_sock(subflow);
++
++		lock_sock(ssk);
++
++		/* Set ssk->sk_socket of accept()ed flows to mptcp socket.
++		 * This is needed so NOSPACE flag can be set from tcp stack.
++		 */
++		if (!ssk->sk_socket)
++			mptcp_sock_graft(ssk, sk->sk_socket);
++
++		__mptcp_inherit_cgrp_data(sk, ssk);
++		__mptcp_inherit_memcg(sk, ssk, GFP_KERNEL);
++		release_sock(ssk);
++	}
 +}
 +
- bool mptcp_finish_join(struct sock *ssk)
+ static int mptcp_stream_accept(struct socket *sock, struct socket *newsock,
+ 			       struct proto_accept_arg *arg)
  {
- 	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(ssk);
-@@ -3662,7 +3670,9 @@ bool mptcp_finish_join(struct sock *ssk)
- 		return false;
- 	}
+@@ -4017,16 +4042,7 @@ static int mptcp_stream_accept(struct socket *sock, struct socket *newsock,
+ 		msk = mptcp_sk(newsk);
+ 		msk->in_accept_queue = 0;
  
--	/* active subflow, already present inside the conn_list */
-+	/* Active subflow, already present inside the conn_list; is grafted
-+	 * either by __mptcp_subflow_connect() or accept.
-+	 */
- 	if (!list_empty(&subflow->node)) {
- 		spin_lock_bh(&msk->fallback_lock);
- 		if (!msk->allow_subflows) {
-@@ -3689,11 +3699,17 @@ bool mptcp_finish_join(struct sock *ssk)
- 		if (ret) {
- 			sock_hold(ssk);
- 			list_add_tail(&subflow->node, &msk->conn_list);
-+			mptcp_sock_check_graft(parent, ssk);
- 		}
- 	} else {
- 		sock_hold(ssk);
- 		list_add_tail(&subflow->node, &msk->join_list);
- 		__set_bit(MPTCP_FLUSH_JOIN_LIST, &msk->cb_flags);
+-		/* set ssk->sk_socket of accept()ed flows to mptcp socket.
+-		 * This is needed so NOSPACE flag can be set from tcp stack.
+-		 */
+-		mptcp_for_each_subflow(msk, subflow) {
+-			struct sock *ssk = mptcp_subflow_tcp_sock(subflow);
+-
+-			if (!ssk->sk_socket)
+-				mptcp_sock_graft(ssk, newsock);
+-		}
+-
++		mptcp_graft_subflows(newsk);
+ 		mptcp_rps_record_subflows(msk);
+ 
+ 		/* Do late cleanup for the first subflow as necessary. Also
+diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+index 6d9de13c1f9c..8c27f4b1789f 100644
+--- a/net/mptcp/protocol.h
++++ b/net/mptcp/protocol.h
+@@ -707,6 +707,7 @@ mptcp_subflow_delegated_next(struct mptcp_delegated_action *delegated)
+ 	return ret;
+ }
+ 
++void __mptcp_inherit_memcg(struct sock *sk, struct sock *ssk, gfp_t gfp);
+ void __mptcp_inherit_cgrp_data(struct sock *sk, struct sock *ssk);
+ 
+ int mptcp_is_enabled(const struct net *net);
+diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+index d98d151392d2..72b7efe388db 100644
+--- a/net/mptcp/subflow.c
++++ b/net/mptcp/subflow.c
+@@ -1712,6 +1712,16 @@ int __mptcp_subflow_connect(struct sock *sk, const struct mptcp_pm_local *local,
+ 	return err;
+ }
+ 
++void __mptcp_inherit_memcg(struct sock *sk, struct sock *ssk, gfp_t gfp)
++{
++	/* Only if the msk has been accepted already (and not orphaned).*/
++	if (!mem_cgroup_sockets_enabled || !sk->sk_socket)
++		return;
 +
-+		/* In case of later failures, __mptcp_flush_join_list() will
-+		 * properly orphan the ssk via mptcp_close_ssk().
-+		 */
-+		mptcp_sock_check_graft(parent, ssk);
- 	}
- 	mptcp_data_unlock(parent);
- 
++	mem_cgroup_sk_inherit(sk, ssk);
++	__sk_charge(ssk, gfp);
++}
++
+ void __mptcp_inherit_cgrp_data(struct sock *sk, struct sock *ssk)
+ {
+ #ifdef CONFIG_SOCK_CGROUP_DATA
 
 -- 
 2.51.0
