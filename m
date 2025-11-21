@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-240605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FEB0C76C1D
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDBA6C76C20
 	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 01:23:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A57704E3EFB
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 00:22:06 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0AA3C35F1F0
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 00:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C99266B6C;
-	Fri, 21 Nov 2025 00:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5F3258ECB;
+	Fri, 21 Nov 2025 00:21:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="EbQR1EcS"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="YTq3nnnS"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E1725C6F9
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 00:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45E126158C
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 00:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763684472; cv=none; b=YfKvYYfXqotmCzA+x7GXAGfs0Je04oPSpJIla2anxILfPTTa4GXLCANYxzuypHxK6IUGnthsxWSNKkySHEEB2RiU0E0lidHfP+SvSJl/qAX1DFMqj5nDxJzc35MFsHpgIax2N1mac3XHUfEPcNSfEsq1uxaMT4+9RY2Ir9xOPCU=
+	t=1763684474; cv=none; b=STVJCU0AKriY08Pkshn5sAemVsm6L2vuxXXKi32hxJXGfsdyY2V5zbU7/ysVGZvAOJjx1GvqSJLD//Uw9ejEZI0mDGRAQ0lB9LCFTLd0AZAONpIEs23i3aTe3TJBBzMfYGR/QPH2aEnBqUHpQq/1bBghctGtBMhuM4WKLkaom+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763684472; c=relaxed/simple;
-	bh=TiJ7du/bJLVd7FrcVB1Wn5eLmGQO4LJpoZ81v/AlVB4=;
+	s=arc-20240116; t=1763684474; c=relaxed/simple;
+	bh=849WOWRP3JJMleWDPrOiqnQVYYfHzdSA1nMA/fJl50o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kksB/yeL1FzCdgLQhHxwMfjaq1DEab6xePBmSeUL4KQeiNIWtHveNKD69zGA+hMKJX4O54sDCi4uJwrOmIPwIgjcd4QYBDysOUZrhg2ASxeM+FyMj3g53wGspJ3eekUIPO+CaUhOTT1usyw9J/bLeq/hjyiyS+VemHgGu/9SmbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=EbQR1EcS; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version; b=kuczwBRtf6/GNDyU0dJ9uMZ2mMOev7oGNXRiPzKruWtRaGxsToZ3/sJ04FX/YPR7+CcjUXGzHASzZcdXctVbguPCCwBqyF0ssindKj7dfhTd3RFfrCaLonfWdRhaHiQlpmoJg4WjM0ZVuBuFP1H9MyvPZ8jRVe5dkFhuZ8RTkyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=YTq3nnnS; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47774d3536dso11358085e9.0
-        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 16:21:10 -0800 (PST)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-477a219db05so9716485e9.2
+        for <netdev@vger.kernel.org>; Thu, 20 Nov 2025 16:21:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1763684469; x=1764289269; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1763684470; x=1764289270; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ReuLHRL+g94kJe1OeakAaiS5olz1aE0z/OwRB/MABw4=;
-        b=EbQR1EcSLo/Q9Ost9DLYz6sI35sqZudpn0a89syuOsRR2ynlor1HRMibI6LZHSPR09
-         GFuDWchBuw5vlhqeAUmWv2NCOcmuHEGYH1SELwsHFhrrWaGoIhTZZMS/kPfI2TyEMy19
-         EAjDAoYK9VfufsyZo02tVo4bqJomcrIIYjZ1MzVhu0SfDRc0iOaJFv8mRed9TKy86FUn
-         dUV8GvNYcCnLrLQt4fWsVZon2SYGfgKus22sOouDu0jUyVtHkQZtzS8O1reYemoMP8Ib
-         HiTpS7AL2HvNBONwUmKme/r2sC2DwL4BL7DMXSYBDc3oGjjXOFxy7i+q0U5MbhLRTwIe
-         6+ZQ==
+        bh=yWOMK9ygRLLvg/BClbIMmBQZdTSwy/r4SSSXX/AhkSU=;
+        b=YTq3nnnSjafI/R/ppROgckuHx2q5wM/uKqIdhiENJCu772QHt3J443VRdFvpt3BQE5
+         MoDTm05HaD2wj++d1uxN0hP2yrtD8qW7PTXby/pCFICbsYVI0ujHiT3S+EQWamubFGOR
+         L3xZF0vfIUBrxlSOT9SQSLy/X2A2iglRn3IXPwwNRdWEHIGIYw+BP/FTOCAlrkeZWPB8
+         1NdJeB8V1PXehI2bayg8bgdov5UNYnJhADGTepGxjwfdhptDX4o9U0gaYa6VLCop//Ak
+         +WKsMhy1ChcPaa58O9Ilo0+3vN5ptuc1RqUeIpcokqdNOArvu5ubNyHnZKZTtJDvkJXI
+         aSWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763684469; x=1764289269;
+        d=1e100.net; s=20230601; t=1763684470; x=1764289270;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ReuLHRL+g94kJe1OeakAaiS5olz1aE0z/OwRB/MABw4=;
-        b=wKAiYzJ1QE0yLDZ3tjjBlQvqsMlvxhY5G2auIGAOE0YuPe5y2XxjqKnvs2gTjqLumx
-         3fmShtoD/QgnCwjs6MuKZdQUctMd9dWS0QbHgXhANgtiqoDj+YD0RgCQ86upzfVuf5HJ
-         w9V4QWRGnDFQFbkuq4xNcGFY/OGTJ54M+gJpqUQrs0OG0vPlQQhlMb63pBh1Xj5NlBMR
-         tX159gUVK0RB9F/y/esrNuX7063zxpM33DhVjx6pSzxwNNIyLXo72KkuSpKX2njnkWFZ
-         zeoo6wwGq2QFhujAnJIMXIKiRNDjbW9TxPQYdPM9ICacvTB9Ek6/0cPSAHMdiAJlRKM/
-         rDxw==
-X-Gm-Message-State: AOJu0Yw49DrOHUgsG3icvaxB3T4G/iZ43Yj/UomuAaQMG4FHhhJrzX14
-	PaNDsKrI8TkJHW133HzDggAuLma/dczne4mhdFjbyEVX11GgVwyLxNGepkL4hNuX7iNJpggnKNF
-	QzQ4P2gRiEOnvNpVTNHVS60g7QHAK4stuXN88Zs6KRN6lqz/LMpb+cnhkkmdxHx05o3Y=
-X-Gm-Gg: ASbGncs1aOXpb2ySLSAwKuhxUSsbRGKIU0MsZMRPXtWqTV0chjHTzkfpHa4MNwhQNy0
-	uUnbIgZBZbB/I94+VGNjc2HtVkSLVNJkU8sPxA8C3r6thbFslqdwzbVY3JieTmvMV6VgpeLgM/H
-	hIaKmho/dZ+AzpZQUh3UPupWP/udAtF3vzhhIuIk5jIikO2cAX381YKI47motwCv0U7wSXtDeGA
-	vP1pQsXH/9fhv0x3elaYrRcs94jeMYxovwtzhaO+O6boTQhT4XCZRcee4o0h1kWhgCAw+RQEveY
-	FwXmrRwhvyqfmTwql5bBwHjTkTI1xeI3ZVW5P/okp+LRTC89amC2f0+zMM3or83OJMw5EhiDw2P
-	8tFtUs7mL5UrGPaMihDBJTsaMEZ2ueV+SqrJxRG/lqpTwoobZV939vzdAWQfNjU3VZNBSVBspgV
-	1nDSym/e0ZOtAKn3EooP5cMLnR
-X-Google-Smtp-Source: AGHT+IH8XqCKH+TSnVSR28auuUzdlBLcuSIXO6/h7JjbptXpvxDKudJz07hsSDrN7rxf3d3NXdsPXg==
-X-Received: by 2002:a05:600c:6d52:b0:475:dadd:c474 with SMTP id 5b1f17b1804b1-477b9ee479dmr30081365e9.10.1763684468839;
-        Thu, 20 Nov 2025 16:21:08 -0800 (PST)
+        bh=yWOMK9ygRLLvg/BClbIMmBQZdTSwy/r4SSSXX/AhkSU=;
+        b=vV/QsoKqXeX4KJJSh0kzsxPBMV+8DqyWRN8KWEFcT4vdSsDkhir9rH7gc4xvz2xJTY
+         vm+m3iy44LETz5kXgm7inxybfM49L6DYxiB6mIZyVeUDji//185LdDY6zyd6uBOWjKJO
+         vBLRF7Exg+VFwj9YpKtvQTiF/xFO4Liv7B9+Hi1xhgsIqHp5IIiKFzSn4aIPbSEp1/fL
+         EeP1EizphQkkpNvpOQuCq+yuqiaL52EyLyfYISt3cZ7n3C2knf3K6rHApXfgEINeh7To
+         JcS63OxGWOhBD4Z4IsZzK+jPMTnvE7H4h0yCYeoEU8zV4rcxS1hSc6bf852CHDWFS8d3
+         2CSQ==
+X-Gm-Message-State: AOJu0Yz688ZQVSSSYotW3sjkkh7PWY99WN+3NkdwdKxThvqqK229aaoi
+	SrEG+G+IQjVTGMJ3bh18LsyocnQA7N0KZ4AIKLm5xH4hT4+oBBDBUlAOUl6Tj1Gn2f40a3PMbog
+	FPc9ZTfxFtuguWULsr4h1ICmQlefxD1gRNxYqTyAeoWfIKjq3k7JojSirm+9nBu9pSxg=
+X-Gm-Gg: ASbGncvfIcKcfLIZFm0X9NgNjMXTheJbUrqQrpx0BIOO51xMh4qXm+dFGql2Pyi8LwR
+	qRC82ELGL1eS4heczcnZbgsp+V75Izo6+nDyvVCNFasqGctexB0LaI9LwYgB7V+KUfWHkWTcCVP
+	bSq+JyRRQhv1Q0TP52Bmu/Sw6+9mCF7BHS64fL0r+atag+TgZHbZnTiU60hv8VO85O4IZhC2dP/
+	DOgWeMK4jRmywUM5ySm1sGMzrqg2O8Bs1aM3iHQQGNjalTeYutaSBrO55x5xuYRASxaxmmhufgf
+	63pLFy8fc112zmX30YeqoewbppWj7N25JhjSIf9CyjT1tDMl9OfgwA0K35qp8OwopVqT7v83Rod
+	euqRSWIStePoaFvJL6R3SJmILKsXYNh2CE/2oimWXPqIlOog0WIX9Lgqhn4QmPYRZxySUf3NAsU
+	fJbDl+6+aVP49T9rEpzWGBdyO2
+X-Google-Smtp-Source: AGHT+IEsGcNz2n1/ubresf7uFbewKrO+sLZ9s6pti8NX7KmSXGXK/667M9/RU64XM7dlQ6m5r1pEJA==
+X-Received: by 2002:a05:600c:4685:b0:477:7768:8da4 with SMTP id 5b1f17b1804b1-477c10c84eamr1658275e9.7.1763684469794;
+        Thu, 20 Nov 2025 16:21:09 -0800 (PST)
 Received: from inifinity.mandelbit.com ([2001:67c:2fbc:1:85ee:9871:b95c:24cf])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf226bf7sm15287345e9.11.2025.11.20.16.21.06
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf226bf7sm15287345e9.11.2025.11.20.16.21.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 16:21:07 -0800 (PST)
+        Thu, 20 Nov 2025 16:21:09 -0800 (PST)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
 Cc: Ralf Lici <ralf@mandelbit.com>,
@@ -82,9 +82,9 @@ Cc: Ralf Lici <ralf@mandelbit.com>,
 	linux-kselftest@vger.kernel.org,
 	Shuah Khan <shuah@kernel.org>,
 	Antonio Quartulli <antonio@openvpn.net>
-Subject: [RFC net-next 10/13] ovpn: use bound device in UDP when available
-Date: Fri, 21 Nov 2025 01:20:41 +0100
-Message-ID: <20251121002044.16071-11-antonio@openvpn.net>
+Subject: [RFC net-next 11/13] selftests: ovpn: add test for bound device
+Date: Fri, 21 Nov 2025 01:20:42 +0100
+Message-ID: <20251121002044.16071-12-antonio@openvpn.net>
 X-Mailer: git-send-email 2.51.2
 In-Reply-To: <20251121002044.16071-1-antonio@openvpn.net>
 References: <20251121002044.16071-1-antonio@openvpn.net>
@@ -94,42 +94,292 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Ralf Lici <ralf@mandelbit.com>
 
-Use the socket’s bound network interface if it’s explicitly specified
-via the --bind-dev option in openvpn.
+Add a selftest to verify that when a socket is bound to a device, UDP
+traffic from ovpn is correctly routed through the specified interface.
 
+The test sets up a P2P session between two peers in separate network
+namespaces, connected via two veth pairs. It binds to both veth
+interfaces and uses tcpdump to confirm that traffic flows through the
+expected paths.
+
+Cc: Shuah Khan <shuah@kernel.org>
 Signed-off-by: Ralf Lici <ralf@mandelbit.com>
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 ---
- drivers/net/ovpn/udp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tools/testing/selftests/net/ovpn/Makefile     |   1 +
+ tools/testing/selftests/net/ovpn/common.sh    |   6 +-
+ tools/testing/selftests/net/ovpn/ovpn-cli.c   |  39 +++++--
+ tools/testing/selftests/net/ovpn/test-bind.sh | 103 ++++++++++++++++++
+ tools/testing/selftests/net/ovpn/test-mark.sh |   2 +-
+ 5 files changed, 137 insertions(+), 14 deletions(-)
+ create mode 100755 tools/testing/selftests/net/ovpn/test-bind.sh
 
-diff --git a/drivers/net/ovpn/udp.c b/drivers/net/ovpn/udp.c
-index d6a0f7a0b75d..328819f27e1e 100644
---- a/drivers/net/ovpn/udp.c
-+++ b/drivers/net/ovpn/udp.c
-@@ -154,6 +154,7 @@ static int ovpn_udp4_output(struct ovpn_peer *peer, struct ovpn_bind *bind,
- 		.fl4_dport = bind->remote.in4.sin_port,
- 		.flowi4_proto = sk->sk_protocol,
- 		.flowi4_mark = sk->sk_mark,
-+		.flowi4_oif = sk->sk_bound_dev_if,
- 	};
- 	int ret;
+diff --git a/tools/testing/selftests/net/ovpn/Makefile b/tools/testing/selftests/net/ovpn/Makefile
+index 7c87c95d957e..f219d87e2c44 100644
+--- a/tools/testing/selftests/net/ovpn/Makefile
++++ b/tools/testing/selftests/net/ovpn/Makefile
+@@ -26,6 +26,7 @@ LDLIBS += $(NL_LDLIBS)
+ TEST_FILES = common.sh
  
-@@ -231,7 +232,8 @@ static int ovpn_udp6_output(struct ovpn_peer *peer, struct ovpn_bind *bind,
- 		.fl6_dport = bind->remote.in6.sin6_port,
- 		.flowi6_proto = sk->sk_protocol,
- 		.flowi6_mark = sk->sk_mark,
--		.flowi6_oif = bind->remote.in6.sin6_scope_id,
-+		.flowi6_oif = sk->sk_bound_dev_if ?:
-+				      bind->remote.in6.sin6_scope_id,
- 	};
+ TEST_PROGS := \
++	test-bind.sh \
+ 	test-chachapoly.sh \
+ 	test-close-socket-tcp.sh \
+ 	test-close-socket.sh \
+diff --git a/tools/testing/selftests/net/ovpn/common.sh b/tools/testing/selftests/net/ovpn/common.sh
+index d926413c9f16..c802e4e50054 100644
+--- a/tools/testing/selftests/net/ovpn/common.sh
++++ b/tools/testing/selftests/net/ovpn/common.sh
+@@ -66,9 +66,11 @@ setup_listener() {
+ }
  
- 	local_bh_disable();
+ add_peer() {
++	dev=${2:-"any"}
++
+ 	if [ "${PROTO}" == "UDP" ]; then
+ 		if [ ${1} -eq 0 ]; then
+-			ip netns exec peer0 ${OVPN_CLI} new_multi_peer tun0 1 ${UDP_PEERS_FILE}
++			ip netns exec peer0 ${OVPN_CLI} new_multi_peer tun0 ${dev} 1 ${UDP_PEERS_FILE}
+ 
+ 			for p in $(seq 1 ${NUM_PEERS}); do
+ 				ip netns exec peer0 ${OVPN_CLI} new_key tun0 ${p} 1 0 ${ALG} 0 \
+@@ -79,7 +81,7 @@ add_peer() {
+ 			RADDR=$(awk "NR == ${1} {print \$3}" ${UDP_PEERS_FILE})
+ 			RPORT=$(awk "NR == ${1} {print \$4}" ${UDP_PEERS_FILE})
+ 			LPORT=$(awk "NR == ${1} {print \$6}" ${UDP_PEERS_FILE})
+-			ip netns exec peer${1} ${OVPN_CLI} new_peer tun${1} ${TX_ID} ${1} \
++			ip netns exec peer${1} ${OVPN_CLI} new_peer tun${1} ${dev} ${TX_ID} ${1} \
+ 				${LPORT} ${RADDR} ${RPORT}
+ 			ip netns exec peer${1} ${OVPN_CLI} new_key tun${1} ${TX_ID} 1 0 \
+ 				${ALG} 1 data64.key
+diff --git a/tools/testing/selftests/net/ovpn/ovpn-cli.c b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+index 4df596d29b8c..6d84380c76ad 100644
+--- a/tools/testing/selftests/net/ovpn/ovpn-cli.c
++++ b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+@@ -135,6 +135,7 @@ struct ovpn_ctx {
+ 	int key_id;
+ 
+ 	uint32_t mark;
++	const char *bind_dev;
+ 
+ 	const char *peers_file;
+ };
+@@ -542,6 +543,14 @@ static int ovpn_socket(struct ovpn_ctx *ctx, sa_family_t family, int proto)
+ 		}
+ 	}
+ 
++	if (ctx->bind_dev) {
++		if (setsockopt(s, SOL_SOCKET, SO_BINDTODEVICE, ctx->bind_dev,
++			       strlen(ctx->bind_dev) + 1) != 0) {
++			perror("setsockopt for SO_BINDTODEVICE");
++			return -1;
++		}
++	}
++
+ 	ret = bind(s, (struct sockaddr *)&local_sock, sock_len);
+ 	if (ret < 0) {
+ 		perror("cannot bind socket");
+@@ -1693,8 +1702,10 @@ static void usage(const char *cmd)
+ 		"\tkey_file: file containing the symmetric key for encryption\n");
+ 
+ 	fprintf(stderr,
+-		"* new_peer <iface> <peer_id> <tx_id> <lport> <raddr> <rport> [vpnaddr]: add new peer\n");
++		"* new_peer <iface> <dev> <peer_id> <tx_id> <lport> <raddr> <rport> [vpnaddr]: add new peer\n");
+ 	fprintf(stderr, "\tiface: ovpn interface name\n");
++	fprintf(stderr,
++		"\tdev: transport interface name to bind to, supports 'any'\n");
+ 	fprintf(stderr, "\tlport: local UDP port to bind to\n");
+ 	fprintf(stderr,
+ 		"\tpeer_id: peer ID found in data packets received from this peer\n");
+@@ -1705,8 +1716,10 @@ static void usage(const char *cmd)
+ 	fprintf(stderr, "\tvpnaddr: peer VPN IP\n");
+ 
+ 	fprintf(stderr,
+-		"* new_multi_peer <iface> <lport> <peers_file> [mark]: add multiple peers as listed in the file\n");
++		"* new_multi_peer <iface> <dev> <lport> <peers_file> [mark]: add multiple peers as listed in the file\n");
+ 	fprintf(stderr, "\tiface: ovpn interface name\n");
++	fprintf(stderr,
++		"\tdev: transport interface name to bind to, supports 'any'\n");
+ 	fprintf(stderr, "\tlport: local UDP port to bind to\n");
+ 	fprintf(stderr,
+ 		"\tpeers_file: text file containing one peer per line. Line format:\n");
+@@ -2227,37 +2240,41 @@ static int ovpn_parse_cmd_args(struct ovpn_ctx *ovpn, int argc, char *argv[])
+ 		}
+ 		break;
+ 	case CMD_NEW_PEER:
+-		if (argc < 7)
++		if (argc < 8)
+ 			return -EINVAL;
+ 
+-		ovpn->lport = strtoul(argv[5], NULL, 10);
++		ovpn->bind_dev = strcmp(argv[3], "any") == 0 ? NULL : argv[3];
++
++		ovpn->lport = strtoul(argv[6], NULL, 10);
+ 		if (errno == ERANGE || ovpn->lport > 65535) {
+ 			fprintf(stderr, "lport value out of range\n");
+ 			return -1;
+ 		}
+ 
+-		const char *vpnip = (argc > 8) ? argv[8] : NULL;
++		const char *vpnip = (argc > 9) ? argv[9] : NULL;
+ 
+-		ret = ovpn_parse_new_peer(ovpn, argv[3], argv[4], argv[6], argv[7],
++		ret = ovpn_parse_new_peer(ovpn, argv[4], argv[5], argv[7], argv[8],
+ 					  vpnip);
+ 		if (ret < 0)
+ 			return -1;
+ 		break;
+ 	case CMD_NEW_MULTI_PEER:
+-		if (argc < 5)
++		if (argc < 6)
+ 			return -EINVAL;
+ 
+-		ovpn->lport = strtoul(argv[3], NULL, 10);
++		ovpn->bind_dev = strcmp(argv[3], "any") == 0 ? NULL : argv[3];
++
++		ovpn->lport = strtoul(argv[4], NULL, 10);
+ 		if (errno == ERANGE || ovpn->lport > 65535) {
+ 			fprintf(stderr, "lport value out of range\n");
+ 			return -1;
+ 		}
+ 
+-		ovpn->peers_file = argv[4];
++		ovpn->peers_file = argv[5];
+ 
+ 		ovpn->mark = 0;
+-		if (argc > 5) {
+-			ovpn->mark = strtoul(argv[5], NULL, 10);
++		if (argc > 6) {
++			ovpn->mark = strtoul(argv[6], NULL, 10);
+ 			if (errno == ERANGE || ovpn->mark > UINT32_MAX) {
+ 				fprintf(stderr, "mark value out of range\n");
+ 				return -1;
+diff --git a/tools/testing/selftests/net/ovpn/test-bind.sh b/tools/testing/selftests/net/ovpn/test-bind.sh
+new file mode 100755
+index 000000000000..fd7c3c8fdf63
+--- /dev/null
++++ b/tools/testing/selftests/net/ovpn/test-bind.sh
+@@ -0,0 +1,103 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2020-2025 OpenVPN, Inc.
++#
++#	Author:	Ralf Lici <ralf@mandelbit.com>
++#		Antonio Quartulli <antonio@openvpn.net>
++
++#set -x
++set -e
++
++PROTO=UDP
++source ./common.sh
++
++cleanup
++
++modprobe -q ovpn || true
++
++# setup a P2P session between peer1 and peer2
++
++ip netns add peer1
++ip netns add peer2
++
++ip link add veth1 netns peer1 type veth peer name veth1 netns peer2
++ip link add veth2 netns peer1 type veth peer name veth2 netns peer2
++
++ip -n peer1 addr add 10.10.10.1/24 dev veth1
++ip -n peer1 link set veth1 up
++
++ip -n peer1 addr add 20.20.20.1/24 dev veth2
++ip -n peer1 link set veth2 up
++
++ip -n peer2 addr add 10.10.10.2/24 dev veth1
++ip -n peer2 link set veth1 up
++
++ip -n peer2 addr add 20.20.20.2/24 dev veth2
++ip -n peer2 link set veth2 up
++
++ip netns exec peer1 ${OVPN_CLI} new_iface tun1 P2P
++ip netns exec peer2 ${OVPN_CLI} new_iface tun2 P2P
++
++ip -n peer1 addr add 5.5.5.1 dev tun1
++ip -n peer1 link set tun1 up
++ip -n peer2 addr add 5.5.5.2 dev tun2
++ip -n peer2 link set tun2 up
++
++ip -n peer1 route add 5.5.5.0/24 dev tun1
++ip -n peer2 route add 5.5.5.0/24 dev tun2
++
++run_bind_test() {
++	dev1=${1}
++	dev2=${2}
++	raddr4_peer1=${3}
++	raddr4_peer2=${4}
++
++	touch /tmp/ovpn-bind1.log
++	touch /tmp/ovpn-bind2.log
++
++	ip netns exec peer1 ${OVPN_CLI} del_peer tun1 1 2>/dev/null || true
++	ip netns exec peer2 ${OVPN_CLI} del_peer tun2 10 2>/dev/null || true
++
++	# close any active socket
++	killall $(basename ${OVPN_CLI}) 2>/dev/null || true
++
++	ip netns exec peer1 ${OVPN_CLI} new_peer tun1 ${dev1} 1 10 1 ${raddr4_peer1} 1
++	ip netns exec peer1 ${OVPN_CLI} new_key tun1 1 1 0 ${ALG} 0 data64.key
++	ip netns exec peer2 ${OVPN_CLI} new_peer tun2 ${dev2} 10 1 1 ${raddr4_peer2} 1
++	ip netns exec peer2 ${OVPN_CLI} new_key tun2 10 1 0 ${ALG} 1 data64.key
++
++	ip netns exec peer1 ${OVPN_CLI} set_peer tun1 1 60 120
++	ip netns exec peer2 ${OVPN_CLI} set_peer tun2 10 60 120
++
++	timeout 2 ip netns exec peer1 tcpdump -i veth1 "${PROTO,,}" port 1 -n -q > /tmp/ovpn-bind1.log &
++	tcpdump1_pid=$!
++	timeout 2 ip netns exec peer1 tcpdump -i veth2 "${PROTO,,}" port 1 -n -q > /tmp/ovpn-bind2.log &
++	tcpdump2_pid=$!
++	sleep 0.5
++
++	ip netns exec peer1 ping -qfc 50 -w 1 5.5.5.2
++
++	wait ${tcpdump1_pid} || true
++	wait ${tcpdump2_pid} || true
++}
++
++run_bind_test veth1 any 10.10.10.2 10.10.10.1
++[ "$(grep -c -i udp /tmp/ovpn-bind1.log)" -ge 100 ]
++[ "$(grep -c -i udp /tmp/ovpn-bind2.log)" -eq 0 ]
++
++run_bind_test veth2 any 20.20.20.2 20.20.20.1
++[ "$(grep -c -i udp /tmp/ovpn-bind2.log)" -ge 100 ]
++[ "$(grep -c -i udp /tmp/ovpn-bind1.log)" -eq 0 ]
++
++run_bind_test any veth1 10.10.10.2 10.10.10.1
++[ "$(grep -c -i udp /tmp/ovpn-bind1.log)" -ge 100 ]
++[ "$(grep -c -i udp /tmp/ovpn-bind2.log)" -eq 0 ]
++
++run_bind_test any veth2 20.20.20.2 20.20.20.1
++[ "$(grep -c -i udp /tmp/ovpn-bind2.log)" -ge 100 ]
++[ "$(grep -c -i udp /tmp/ovpn-bind1.log)" -eq 0 ]
++
++cleanup
++
++modprobe -r ovpn || true
++
+diff --git a/tools/testing/selftests/net/ovpn/test-mark.sh b/tools/testing/selftests/net/ovpn/test-mark.sh
+index a4bfe938118d..c2600bb22e2c 100755
+--- a/tools/testing/selftests/net/ovpn/test-mark.sh
++++ b/tools/testing/selftests/net/ovpn/test-mark.sh
+@@ -26,7 +26,7 @@ for p in $(seq 0 3); do
+ done
+ 
+ # add peer0 with mark
+-ip netns exec peer0 ${OVPN_CLI} new_multi_peer tun0 1 ${UDP_PEERS_FILE} ${MARK}
++ip netns exec peer0 ${OVPN_CLI} new_multi_peer tun0 any 1 ${UDP_PEERS_FILE} ${MARK}
+ for p in $(seq 1 3); do
+ 	ip netns exec peer0 ${OVPN_CLI} new_key tun0 ${p} 1 0 ${ALG} 0 data64.key
+ done
 -- 
 2.51.2
 
