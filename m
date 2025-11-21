@@ -1,121 +1,112 @@
-Return-Path: <netdev+bounces-240703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDE7AC78092
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 10:02:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E50FEC780C8
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 10:07:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sin.lore.kernel.org (Postfix) with ESMTPS id 4D4DA2C39A
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:02:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTPS id 72FAE2D186
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 09:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D2633E344;
-	Fri, 21 Nov 2025 09:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="KN3AuEAh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC51333E369;
+	Fri, 21 Nov 2025 09:06:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23093385B6;
-	Fri, 21 Nov 2025 09:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2255333EAE5
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 09:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763715705; cv=none; b=MkNNpmp5cJky6+e1TpBuyGI7dvStqhAetE6bkQfaeIxR5rn5oYkda5V/PRVnFfoSRkFHPCfRs+liBDMMZnJiybfyfVlETHqImJ59Q6HtUJUwiDp0trlyX1jRH2G5HX2IhO8PF1Nr6qpsCjPR4JcRYeBUI+Elg+Bzh+fozmfFKV8=
+	t=1763715997; cv=none; b=I4mb0+9yRqdXvPJMEhZgKKLDnK3VqgmymjPd1iMuvHKfluAvK0zJ/UNsfRYXBRRTxmfDgBKZE9GSHIBSJAJyj4Hfg59p5onLLmgFhRCBPYxtQZlY4bpN2oi43cAdnY30mwKionysF3mklQAaa8kzXSAWcPDlYmvnROPN2hertZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763715705; c=relaxed/simple;
-	bh=s33B46/YG3Ae/KHvI7x5uGM6AbNBg1sUvTzL0tPaUGE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AHXKExso0dej6J271EipYvoq049FRBDprVrrodCuOVNQo9ygUSUU1czUJtxKXBoA8A5deaFu8qvwQOmga0uBVWJiWADP/SAWcXHXAerEzYgPB+L3iBXjPOIeRT8p+jxXPZEnA9i+R47lqZpvMs3Y+gfZs9CFHwjg8Uzy7JExTnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=KN3AuEAh; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 5AL916iQ43290234, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1763715667;
-	bh=nijRuWpr9kcEM7mz58cLAdPohd2LpCUI5CKUXlzoH+k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=KN3AuEAhtOHkC/yfQSC9Wue2ahyPjbrjwErUo9E42/GEIJXWn7BNxrLTfKBs3ok3g
-	 9tMjniY4NReW1FyiFX84Z+kPzXNI5eY3lIv3m7kJbjKU2ivMbWNo/qUP0G0YjbGlu9
-	 xGPjutIwlIpmj0gbHfMK6Lv1JcivGWxQ9qOKgV0+tT8Rso/GTrjk7H3C+zsN2XMmNA
-	 D3eRp+SL2R7GLgHWrK7IJVaSDKNzON/mX7UkDL9DVklO0YhOmEdbKZE/1prw4/kYKp
-	 1+JXojk47aRdwnPdCKUrVKxMh5s8oGEDk7/wYFLqlzP//l5vnTK/AfXtRBPVenFUtU
-	 LK1IJnGnjHeEg==
-Received: from RS-EX-MBS4.realsil.com.cn ([172.29.17.104])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 5AL916iQ43290234
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 21 Nov 2025 17:01:07 +0800
-Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
- RS-EX-MBS4.realsil.com.cn (172.29.17.104) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Fri, 21 Nov 2025 17:01:07 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS2.realsil.com.cn
- (172.29.17.102) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
- Transport; Fri, 21 Nov 2025 17:01:06 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Javen Xu
-	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v3] r8169: add support for RTL9151A
-Date: Fri, 21 Nov 2025 17:01:04 +0800
-Message-ID: <20251121090104.3753-1-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
+	s=arc-20240116; t=1763715997; c=relaxed/simple;
+	bh=aBZVXTtliSl0fE61ooeiKF65NPIvHb168yUY1QfBc/g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cbHt6qGWV3hCzVs/8IS4e2GeKnRSjPukWnniirUAGKxB/YPLaWIyN6sERyqup8GVmRTYJJbsBXOiKY4G+33Zm1YRT1OyEKK0TguBkACild3BmwM7rvyAdqOSK1z7M2FkWswmp51mxdTI/tWb4Pla6JecpK40iJZPd/ZkZxU9cZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vMN62-0002FF-8O; Fri, 21 Nov 2025 10:06:26 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vMN61-001YpB-0r;
+	Fri, 21 Nov 2025 10:06:25 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vMN61-00FrJC-0U;
+	Fri, 21 Nov 2025 10:06:25 +0100
+Date: Fri, 21 Nov 2025 10:06:25 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: linux-can@vger.kernel.org, Network Development <netdev@vger.kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: Re: [can/j1939] unregister_netdevice: waiting for vcan0 to become
+ free. Usage count = 2
+Message-ID: <aSArkb7-JNW-BjrG@pengutronix.de>
+References: <d2be2d6a-6cbb-4b13-9f86-a6b7fe94983a@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d2be2d6a-6cbb-4b13-9f86-a6b7fe94983a@I-love.SAKURA.ne.jp>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Javen Xu <javen_xu@realsil.com.cn>
+Hello Tetsuo,
 
-This adds support for chip RTL9151A. Its XID is 0x68b. It is bascially
-basd on the one with XID 0x688, but with different firmware file.
+On Thu, Nov 20, 2025 at 07:11:22PM +0900, Tetsuo Handa wrote:
+> Hello.
+> 
+> I am using a debug printk() patch for j1939_priv which records/counts where
+> refcount for j1939_priv has changed, and syzbot succeeded to record/count a
+> j1939_priv leak in next-20251119
+> ( https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84 ).
+> 
+> The output from the debug printk() patch is shown below. I think that
+> understanding what actions have been taken on this j1939_priv object will
+> help you finding the cause of j1939_priv leak bug.
 
-Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+Hm, looks like we have a race where new session is created in
+j1939_xtp_rx_rts(), just at the moment where we call
+j1939_can_rx_unregister().
 
----
-v2: Rebase to master, no content changes.
-v3: Rebase to net-next, no content changes.
----
- drivers/net/ethernet/realtek/r8169_main.c | 3 +++
- 1 file changed, 3 insertions(+)
+Haw about following change:
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index de304d1eb477..9fd0ca399d5f 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -59,6 +59,7 @@
- #define FIRMWARE_8125D_2	"rtl_nic/rtl8125d-2.fw"
- #define FIRMWARE_8125K_1	"rtl_nic/rtl8125k-1.fw"
- #define FIRMWARE_8125BP_2	"rtl_nic/rtl8125bp-2.fw"
-+#define FIRMWARE_9151A_1	"rtl_nic/rtl9151a-1.fw"
- #define FIRMWARE_8126A_2	"rtl_nic/rtl8126a-2.fw"
- #define FIRMWARE_8126A_3	"rtl_nic/rtl8126a-3.fw"
- #define FIRMWARE_8127A_1	"rtl_nic/rtl8127a-1.fw"
-@@ -111,6 +112,7 @@ static const struct rtl_chip_info {
- 	{ 0x7cf, 0x681,	RTL_GIGA_MAC_VER_66, "RTL8125BP", FIRMWARE_8125BP_2 },
+--- a/net/can/j1939/main.c
++++ b/net/can/j1939/main.c
+@@ -214,6 +214,7 @@ static void __j1939_rx_release(struct kref *kref)
+                                               rx_kref);
  
- 	/* 8125D family. */
-+	{ 0x7cf, 0x68b, RTL_GIGA_MAC_VER_64, "RTL9151A", FIRMWARE_9151A_1 },
- 	{ 0x7cf, 0x68a, RTL_GIGA_MAC_VER_64, "RTL8125K", FIRMWARE_8125K_1 },
- 	{ 0x7cf, 0x689,	RTL_GIGA_MAC_VER_64, "RTL8125D", FIRMWARE_8125D_2 },
- 	{ 0x7cf, 0x688,	RTL_GIGA_MAC_VER_64, "RTL8125D", FIRMWARE_8125D_1 },
-@@ -774,6 +776,7 @@ MODULE_FIRMWARE(FIRMWARE_8125D_1);
- MODULE_FIRMWARE(FIRMWARE_8125D_2);
- MODULE_FIRMWARE(FIRMWARE_8125K_1);
- MODULE_FIRMWARE(FIRMWARE_8125BP_2);
-+MODULE_FIRMWARE(FIRMWARE_9151A_1);
- MODULE_FIRMWARE(FIRMWARE_8126A_2);
- MODULE_FIRMWARE(FIRMWARE_8126A_3);
- MODULE_FIRMWARE(FIRMWARE_8127A_1);
--- 
-2.34.1
+        j1939_can_rx_unregister(priv);
++       j1939_cancel_active_session(priv, NULL);
+        j1939_ecu_unmap_all(priv);
+        j1939_priv_set(priv->ndev, NULL);
+        mutex_unlock(&j1939_netdev_lock);
 
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
