@@ -1,50 +1,49 @@
-Return-Path: <netdev+bounces-240823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8934FC7AF86
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 18:02:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C126DC7AF88
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 18:02:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 460C83A3395
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:02:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24C993A33FF
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 17:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80002F1FD3;
-	Fri, 21 Nov 2025 17:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB51333A6E9;
+	Fri, 21 Nov 2025 17:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zkr4R4wo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LjrsNAMk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8097C285C88;
-	Fri, 21 Nov 2025 17:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4312EF673;
+	Fri, 21 Nov 2025 17:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763744548; cv=none; b=nzYVThKADxcrUlC+mY3blmaMovATLD7V+09jTUQuRfVwaHfTP3qWL5X3r+ZT0SRACNvXSsSsfessv4+lKaWkiGZt4i2Vx6L92+aWyr7DCFVa2car0V0xYjo9JieTjz2l8IkoMoezkoIx67jGvjIT21kY0+1mL9Zz8CmxEt/ffLE=
+	t=1763744552; cv=none; b=ESPryXhelyC2BdPmpbSI43qk/em50tFl7Pr5aQAirKdxUjDDk7g5D4mjyG0NmFpG7JpGSkbjeCfk92YwI8UWSuZhXokXyDixiGftSZhWNXfO0etpe5RgfGm6x3te4OrwFk1qWlrg5Rx2he3EixbEIKBRICBfyteS3Clgyhcn3p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763744548; c=relaxed/simple;
-	bh=ioKhLSro9ujBAyOSRclCwpexaEBcrzxMjz6Lfns2rkM=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=QEF1qn9Q9+Cn4E7veH9cL9wy2j7uqjJaMp+ZF0gbawjjvO6/yWgkPouyBIyDhD6N6EsQ2N77cd7L18gNc7zJb7idsNenESd48u5+tDmqiVQOZ2e4Sdzpvm84ugiFX3PBwT5aK2uXlC29a8BfGr6c08CQ1qVJOd6bYM43klTDGek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zkr4R4wo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48E13C4CEF1;
-	Fri, 21 Nov 2025 17:02:25 +0000 (UTC)
+	s=arc-20240116; t=1763744552; c=relaxed/simple;
+	bh=E5wcI+z/Iyhniomwivx/9qPvXu9SKA6nPNoFpiR5cmI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=jowCLOzn/fZ5ruHuDBYCeoCMpkCN5LfBWxUjUDqXyD7PEthZES69AaiBcsoF68D8SVlG3XbsVA4PyFmCiv1fkPVK6ioZ4RD75x8//HGtgc6dacJ5fo1XFynWadujPngbv+/v8T6skLhU3Nc3SGa51UL7UcLHNVq6OOlodTitEPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LjrsNAMk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1246C4CEF1;
+	Fri, 21 Nov 2025 17:02:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763744548;
-	bh=ioKhLSro9ujBAyOSRclCwpexaEBcrzxMjz6Lfns2rkM=;
-	h=From:Subject:Date:To:Cc:From;
-	b=Zkr4R4wof6nc2vPCO3lr9fJP1NMyyVHqb67wBWJz9rNc1AwRkpxP+UgsFkuZKfqlt
-	 Kul8SZqqdwxHxCePCzYt3d/Egfp4gri+VVZgPBYY/aPqwwA4IWmk6p9wbbFcl4s06M
-	 H1nxc+1Im4gLQiJL0JI/4TX29/ASZT4zFZcxPFeNzb7IqoXIFC0+gOG+yJrpE4bo4T
-	 mUwA4BYFdEeF//3CI1XJGtBR21joi5iWbOwOqtfXvaF3+kyE7buQqtF9oXjS+A/rPZ
-	 DeCKzSE6hyJB6ecLTNm69yg3TVg6EVMHKuAobknAxyzb4jvpahVwlHIBcLdrdesa8+
-	 7InVDL8zNlTdg==
+	s=k20201202; t=1763744551;
+	bh=E5wcI+z/Iyhniomwivx/9qPvXu9SKA6nPNoFpiR5cmI=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=LjrsNAMk7EqdJ1rDyrSyFSMyqEcHyuhF3RGHfQMRWC97UPZA1jRUCce9HF9zwL6V+
+	 hUipubhu/Y6aKi2tanvmAzNIFk3j2vFJQUzNJhGMHpBmLsR4nFQQ5Dte9rulCycedt
+	 NO/5hiJ1dmZsEL6o50i+74MSw+6cK6nW6sFeGgG+1FdDj8FIhfSoemILQaXQof/6Lr
+	 EI+64s/qCmE+VzXBW3dzL/J/HAEgFlU8hbz+gaj+BWdaTNCWNypyqhSoIZ57IjtZE6
+	 0HFg46rXYzCrkp6j+WW4y2G0tDncymJduI73rTjStQu5Mr9L6IKE9M98D9o5/TBpOD
+	 7c8SrE7IvKZGg==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Subject: [PATCH net-next 00/14] mptcp: memcg accounting for passive sockets
- & backlog processing
-Date: Fri, 21 Nov 2025 18:01:59 +0100
-Message-Id: <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
+Date: Fri, 21 Nov 2025 18:02:00 +0100
+Subject: [PATCH net-next 01/14] net: factor-out _sk_charge() helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,10 +52,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAebIGkC/zWNQQqDMBBFryKz7kASq2ivUlzYcYyDTQxJEEG8e
- 0PBxVu8xfv/hMRROMGrOiHyLkk2X0Q/KqBl9JZRpuJglGm0Nho958KR0YVMAR07svgZaf1uFsU
- FrOum7ahVveqfUGZC5FmO/8Ub7hqG6/oBviN0qnwAAAA=
-X-Change-ID: 20251121-net-next-mptcp-memcg-backlog-imp-33568c609094
+Message-Id: <20251121-net-next-mptcp-memcg-backlog-imp-v1-1-1f34b6c1e0b1@kernel.org>
+References: <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
+In-Reply-To: <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
 To: Eric Dumazet <edumazet@google.com>, 
  Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
  Willem de Bruijn <willemb@google.com>, 
@@ -69,94 +67,106 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  mptcp@lists.linux.dev, Davide Caratti <dcaratti@redhat.com>, 
  "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3632; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=ioKhLSro9ujBAyOSRclCwpexaEBcrzxMjz6Lfns2rkM=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDIVZvN/4li+ZMaPQsZ1t1NuTUsoVrgxfR9DOH9z4cTNE
- o/bBIsMO0pZGMS4GGTFFFmk2yLzZz6v4i3x8rOAmcPKBDKEgYtTACYyo5Lhn3rnzvo1d5WU8gO2
- KKhsXWtwTZRBpGieoJmizp8/bLIbFzH8j6j/unC5Tlb4hhuM+VZvjgZXb5z7Ib9vjajZZulrHJt
- fMQAA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2662; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=hK0a1iO/ogfUyqYhDGeAlo+Zr9nsYO9S3nxWufSEKio=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDIVZgswZf5axP6QzecYl1HAWjGR2x4zj/BcOSbKtfTbw
+ 3BzN97kjlIWBjEuBlkxRRbptsj8mc+reEu8/Cxg5rAygQxh4OIUgImkHWZk2BCU5tAQzybe7Ryb
+ Y73ki4yvJ0OnAftP3lJeeY/NPzLeMvzTzNjg+PP6Nl/d3kWCrE8/Se9Nc8/YtoxvHtc/rlCmpAg
+ WAA==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-This series is split in two: the 4 first patches are linked to memcg
-accounting for passive sockets, and the rest introduce the backlog
-processing. They are sent together, because the first one appeared to be
-needed to get the second one fully working.
+From: Paolo Abeni <pabeni@redhat.com>
 
-The second part includes RX path improvement built around backlog
-processing. The main goals are improving the RX performances _and_
-increase the long term maintainability.
+Move out of __inet_accept() the code dealing charging newly
+accepted socket to memcg. MPTCP will soon use it to on a per
+subflow basis, in different contexts.
 
-- Patches 1-3: preparation work to ease the introduction of the next
-  patch.
+No functional changes intended.
 
-- Patch 4: fix memcg accounting for passive sockets. Note that this is a
-  (non-urgent) fix, but it depends on material that is currently only in
-  net-next, e.g. commit 4a997d49d92a ("tcp: Save lock_sock() for memcg
-  in inet_csk_accept().").
-
-- Patches 5-6: preparation of the stack for backlog processing, removing
-  assumptions that will not hold true any more after the backlog
-  introduction.
-
-- Patches 7,8,10,11,12 are more cleanups that will make the backlog
-  patch a little less huge.
-
-- Patch 9: somewhat an unrelated cleanup, included here not to forget
-  about it.
-
-- Patches 13-14: The real work is done by them. Patch 13 introduces the
-  helpers needed to manipulate the msk-level backlog, and the data
-  struct itself, without any actual functional change. Patch 14 finally
-  uses the backlog for RX skb processing. Note that MPTCP can't use the
-  sk_backlog, as the MPTCP release callback can also release and
-  re-acquire the msk-level spinlock and core backlog processing works
-  under the assumption that such event is not possible.
-  A relevant point is memory accounts for skbs in the backlog. It's
-  somewhat "original" due to MPTCP constraints. Such skbs use space from
-  the incoming subflow receive buffer, do not use explicitly any forward
-  allocated memory, as we can't update the msk fwd mem while enqueuing,
-  nor we want to acquire again the ssk socket lock while processing the
-  skbs. Instead the msk borrows memory from the subflow and reserve it
-  for the backlog, see patch 5 and 14 for the gory details.
-
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Acked-by: Geliang Tang <geliang@kernel.org>
+Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
-Paolo Abeni (14):
-      net: factor-out _sk_charge() helper
-      mptcp: factor-out cgroup data inherit helper
-      mptcp: grafting MPJ subflow earlier
-      mptcp: fix memcg accounting for passive sockets
-      mptcp: cleanup fallback data fin reception
-      mptcp: cleanup fallback dummy mapping generation
-      mptcp: ensure the kernel PM does not take action too late
-      mptcp: do not miss early first subflow close event notification
-      mptcp: make mptcp_destroy_common() static
-      mptcp: drop the __mptcp_data_ready() helper
-      mptcp: handle first subflow closing consistently
-      mptcp: borrow forward memory from subflow
-      mptcp: introduce mptcp-level backlog
-      mptcp: leverage the backlog for RX packet processing
+ include/net/sock.h |  2 ++
+ net/core/sock.c    | 18 ++++++++++++++++++
+ net/ipv4/af_inet.c | 17 +----------------
+ 3 files changed, 21 insertions(+), 16 deletions(-)
 
- include/net/sock.h     |   2 +
- net/core/sock.c        |  18 +++
- net/ipv4/af_inet.c     |  17 +-
- net/mptcp/fastopen.c   |   4 +-
- net/mptcp/mib.c        |   1 -
- net/mptcp/mib.h        |   1 -
- net/mptcp/mptcp_diag.c |   3 +-
- net/mptcp/pm.c         |   4 +-
- net/mptcp/pm_kernel.c  |   2 +
- net/mptcp/protocol.c   | 428 +++++++++++++++++++++++++++++++++++--------------
- net/mptcp/protocol.h   |  51 +++++-
- net/mptcp/subflow.c    |  42 +++--
- 12 files changed, 417 insertions(+), 156 deletions(-)
----
-base-commit: e2c20036a8879476c88002730d8a27f4e3c32d4b
-change-id: 20251121-net-next-mptcp-memcg-backlog-imp-33568c609094
+diff --git a/include/net/sock.h b/include/net/sock.h
+index a5f36ea9d46f..38d48cfe0741 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1631,6 +1631,8 @@ static inline void sk_mem_uncharge(struct sock *sk, int size)
+ 	sk_mem_reclaim(sk);
+ }
+ 
++void __sk_charge(struct sock *sk, gfp_t gfp);
++
+ #if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
+ static inline void sk_owner_set(struct sock *sk, struct module *owner)
+ {
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 3b74fc71f51c..b26a6cdc9bcd 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3448,6 +3448,24 @@ void __sk_mem_reclaim(struct sock *sk, int amount)
+ }
+ EXPORT_SYMBOL(__sk_mem_reclaim);
+ 
++void __sk_charge(struct sock *sk, gfp_t gfp)
++{
++	int amt;
++
++	gfp |= __GFP_NOFAIL;
++	if (mem_cgroup_from_sk(sk)) {
++		/* The socket has not been accepted yet, no need
++		 * to look at newsk->sk_wmem_queued.
++		 */
++		amt = sk_mem_pages(sk->sk_forward_alloc +
++				   atomic_read(&sk->sk_rmem_alloc));
++		if (amt)
++			mem_cgroup_sk_charge(sk, amt, gfp);
++	}
++
++	kmem_cache_charge(sk, gfp);
++}
++
+ int sk_set_peek_off(struct sock *sk, int val)
+ {
+ 	WRITE_ONCE(sk->sk_peek_off, val);
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index a31b94ce8968..08d811f11896 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -756,23 +756,8 @@ EXPORT_SYMBOL(inet_stream_connect);
+ void __inet_accept(struct socket *sock, struct socket *newsock, struct sock *newsk)
+ {
+ 	if (mem_cgroup_sockets_enabled) {
+-		gfp_t gfp = GFP_KERNEL | __GFP_NOFAIL;
+-
+ 		mem_cgroup_sk_alloc(newsk);
+-
+-		if (mem_cgroup_from_sk(newsk)) {
+-			int amt;
+-
+-			/* The socket has not been accepted yet, no need
+-			 * to look at newsk->sk_wmem_queued.
+-			 */
+-			amt = sk_mem_pages(newsk->sk_forward_alloc +
+-					   atomic_read(&newsk->sk_rmem_alloc));
+-			if (amt)
+-				mem_cgroup_sk_charge(newsk, amt, gfp);
+-		}
+-
+-		kmem_cache_charge(newsk, gfp);
++		__sk_charge(newsk, GFP_KERNEL);
+ 	}
+ 
+ 	sock_rps_record_flow(newsk);
 
-Best regards,
 -- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
+2.51.0
 
 
