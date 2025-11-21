@@ -1,157 +1,129 @@
-Return-Path: <netdev+bounces-240672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B423C77816
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 07:10:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1939C7788D
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 07:15:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 04F6F4E5D9E
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 06:08:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTPS id A0BD12CB40
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 06:15:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C205F29D29C;
-	Fri, 21 Nov 2025 06:08:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294702FE58C;
+	Fri, 21 Nov 2025 06:15:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="coHAvNQ6"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="vfYnPQj1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0863824BD;
-	Fri, 21 Nov 2025 06:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695492FE59F;
+	Fri, 21 Nov 2025 06:15:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763705310; cv=none; b=f447O7FhSh7ObWZObQ+x7Orn7Rw3N7Nvs39gSFkehPTaT8frNTs7AKdhYr9qzCFrdoQRPEx/HhUqgkDHUfbCkLkzATWTgIXaenOoGdqFKG9rS+Fs615xKYW8XPlVHxEKLrD0qDQVyj1w4sG2CXNQxkU9yxtTTm8v9cktE8o3pSs=
+	t=1763705704; cv=none; b=eK5uwfnl/J31+8PYlkhBkvJBuUAP0UvB7BcMOpQFCadpmdnbqKbKFTbYn97mgmkRajGYtalYlMWW77wPIchNB1JJ4kR4i8kCWWRLq2sKJx71qIT3n1QAN1O02HRa7uXsfMNod1bAec/x67EOLSLT87a7fe8+2cJdwaaTEfMFI+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763705310; c=relaxed/simple;
-	bh=cNczm5/+RlqqJ1v2QtDGwSCsVdfhdW3CsC3t9AGYG9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CcL2ZS626j7cvJzp2ccyRgH/kTNi8KuWDonOY0v+yWvB+TWVE5gfAN6mX+MzEqg0PIYaI8R7FNl+GtUQMlVkydMwycF+uBgxbYe1iNXv9dMlsx7j/EzwNGO57cs64fz06w7WobphagpuTlkkx7/GKsuZdX6YIg8FzV31xP3PceA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=coHAvNQ6; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1763705704; c=relaxed/simple;
+	bh=2E+PlPIMJlUFzlq+Ad5uxJAJFvt3j/JD5Aph1y8h4Ys=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CarrUOqoue+nFae2ZSb2JCHYJajnI7fiSrOyIcnbsBQJmaCWG45C2LPDA0miI37WlR6985114X27L8A8s2db/ymwEmxzLh4zZ3zVTgdj/Ndai0fud4gdDLwmDjF/A9j+664N3FqfyC7TJzwvTT5VtZYpRjmES6SIJ2wf3cjJoPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=vfYnPQj1; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763705309; x=1795241309;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cNczm5/+RlqqJ1v2QtDGwSCsVdfhdW3CsC3t9AGYG9Q=;
-  b=coHAvNQ6/FuE4MVvBijq93yKqSLXOGcIh/fxj3icNXrFXbXR1j3Yq7ig
-   AXwPOwNaYmi5F6rkNLYo2iggHZ1WKqshSjg9Ql95WHdzlHEm//LQvGUWW
-   RlsitRuUnUIkZyCkDd159oqLjdFKg12oyKZ5ml0kQBz6VJ6Nm2YraJaE8
-   94hqk9pOt7WDuJxKMv59fEfCP74Pm59QT0l3UmCTj2eIvToTXfM5mCUFm
-   TY6+B+g4jBOEWhBIxj9eqmUViMz/aIlwU4W9FxIPc6r38o7MCPH0mA8Cm
-   /k/yZuqhb0OEKN0e7ra+7Ohul/kzXP4l2EmS8CgijDiecZufk/3Gvvzz7
-   A==;
-X-CSE-ConnectionGUID: H8JrM/lsSguBthFz+RrL2A==
-X-CSE-MsgGUID: b3cGRm43TBGPCCkJbBCLEw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="65725384"
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1763705701; x=1795241701;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2E+PlPIMJlUFzlq+Ad5uxJAJFvt3j/JD5Aph1y8h4Ys=;
+  b=vfYnPQj13hDt6e2kY04FxtLAza6d6+QqCv6ZCAXnFo1XSLcoTyZLeYVH
+   0o9PaJYFaCSZlbzPvBv9yb9fRovc8mPb+pc3BP3LHFUmrh+cM/FVdZMvo
+   aB6xO6y09AUIfmlWsmDUTG5e8Ht7R3hBp5vxl/DDAt9Oy5Tln068ned6F
+   AvMyNaKBOvOfDeYLzRGq80t2oTARVaerm4TGFylpPdyqhYNuFkhTrKYuo
+   pzJEqxOKDUCjPXhG5ASsTyxC75XvTaZy9T1qOHadiehpMqktn6LCFfCOU
+   U4oP7faB7ynPwYqi1/DRA2h1QZbaFbfiDBx4sgSA5vET+7t6ORa3A5dW0
+   w==;
+X-CSE-ConnectionGUID: dFfjss4gRLuOCgpFmSYcog==
+X-CSE-MsgGUID: or3OLPtgSmy4UO1s56WH2A==
 X-IronPort-AV: E=Sophos;i="6.20,215,1758610800"; 
-   d="scan'208";a="65725384"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2025 22:08:28 -0800
-X-CSE-ConnectionGUID: PXAzYCOBSb2AU1iRA1t0BQ==
-X-CSE-MsgGUID: 7Mb+5zsyTWyAh+tiTzKgMg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,215,1758610800"; 
-   d="scan'208";a="192059215"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by fmviesa009.fm.intel.com with ESMTP; 20 Nov 2025 22:08:26 -0800
-Received: by black.igk.intel.com (Postfix, from userid 1001)
-	id 211F396; Fri, 21 Nov 2025 07:08:25 +0100 (CET)
-Date: Fri, 21 Nov 2025 07:08:25 +0100
-From: Mika Westerberg <mika.westerberg@linux.intel.com>
-To: Ian MacDonald <ian@netstatz.com>
-Cc: Mika Westerberg <westeri@kernel.org>,
-	Yehezkel Bernat <YehezkelShB@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, 1121032@bugs.debian.org
-Subject: Re: net: thunderbolt: missing ndo_set_mac_address breaks 802.3ad
- bonding
-Message-ID: <20251121060825.GR2912318@black.igk.intel.com>
-References: <CAFJzfF9N4Hak23sc-zh0jMobbkjK7rg4odhic1DQ1cC+=MoQoA@mail.gmail.com>
+   d="scan'208";a="280855884"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Nov 2025 23:15:00 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Thu, 20 Nov 2025 23:14:26 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Thu, 20 Nov 2025 23:14:24 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <UNGLinuxDriver@microchip.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net v3] net: lan966x: Fix the initialization of taprio
+Date: Fri, 21 Nov 2025 07:14:11 +0100
+Message-ID: <20251121061411.810571-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFJzfF9N4Hak23sc-zh0jMobbkjK7rg4odhic1DQ1cC+=MoQoA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Hi Ian,
+To initialize the taprio block in lan966x, it is required to configure
+the register REVISIT_DLY. The purpose of this register is to set the
+delay before revisit the next gate and the value of this register depends
+on the system clock. The problem is that the we calculated wrong the value
+of the system clock period in picoseconds. The actual system clock is
+~165.617754MHZ and this correspond to a period of 6038 pico seconds and
+not 15125 as currently set.
 
-On Thu, Nov 20, 2025 at 03:59:15PM -0500, Ian MacDonald wrote:
-> Hi,
-> 
-> Using two Thunderbolt network interfaces as slaves in a bonding device
-> in mode 802.3ad (LACP) fails because the bonding driver cannot set the
-> MAC address on the thunderbolt_net interfaces. The same setup works in
-> mode active-backup.
-> 
-> Hardware: AMD Strix Halo (Framework connect to Sixunited AXB35 USB4 ports)
-> Kernel:  6.12.57 (also reproduced on 6.16.12 and 6.18~rc6)
+Fixes: e462b2717380b4 ("net: lan966x: Add offload support for taprio")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 
-Okay "breaks" is probably too strong word here. It was never even supported
-:)
+---
+v2-v3:
+- start to use the define
 
-> 
-> Steps to reproduce:
-> 1. Create a bond with mode 802.3ad and add thunderbolt0 and thunderbolt1
->    as slaves.
-> 2. Bring up the bond and slaves.
+v1->v2:
+- add define for system clock and calculate the period in picoseconds
+---
+ drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Can you describe what are the actual commands you run so I can try to
-setup on my side and see how this could be implemented?
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c b/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
+index b4377b8613c3a..8c40db90ee8f6 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c
+@@ -1,11 +1,14 @@
+ // SPDX-License-Identifier: GPL-2.0+
+ 
+ #include <linux/ptp_classify.h>
++#include <linux/units.h>
+ 
+ #include "lan966x_main.h"
+ #include "vcap_api.h"
+ #include "vcap_api_client.h"
+ 
++#define LAN9X66_CLOCK_RATE	165617754
++
+ #define LAN966X_MAX_PTP_ID	512
+ 
+ /* Represents 1ppm adjustment in 2^59 format with 6.037735849ns as reference
+@@ -1126,5 +1129,5 @@ void lan966x_ptp_rxtstamp(struct lan966x *lan966x, struct sk_buff *skb,
+ u32 lan966x_ptp_get_period_ps(void)
+ {
+ 	/* This represents the system clock period in picoseconds */
+-	return 15125;
++	return PICO / LAN9X66_CLOCK_RATE;
+ }
+-- 
+2.34.1
 
-> 3. Observe that bonding fails to set the slave MAC addresses and logs:
-> 
->    [   25.922317] bond0: (slave thunderbolt0): The slave device
->    specified does not support setting the MAC address
->    [   25.922328] bond0: (slave thunderbolt0): Error -95 calling
->    set_mac_address
->    [   25.980235] bond0: (slave thunderbolt1): The slave device specified
->    does not support setting the MAC address
->    [   25.980242] bond0: (slave thunderbolt1): Error -95 calling
->    set_mac_address
-> 
-> Expected result:
-> - bond0 and both Thunderbolt interfaces share bond0's MAC address.
-> - 802.3ad operates normally and the link comes up.
-> 
-> Actual result:
-> - dev_set_mac_address(thunderboltX, bond0_mac) fails with -EOPNOTSUPP.
-> - bonding reports that the slave does not support setting the MAC address
->   and cannot use the interfaces in 802.3ad mode.
-> 
-> >From reading drivers/net/thunderbolt/main.c:
-> 
-> - thunderbolt_net generates a locally administered MAC from the
->   Thunderbolt UUID and sets it with eth_hw_addr_set().
-> - The net_device_ops for thunderbolt_net currently define:
->     .ndo_open
->     .ndo_stop
->     .ndo_start_xmit
->     .ndo_get_stats64
->   but do not implement .ndo_set_mac_address.
-> 
-> As a result, dev_set_mac_address() returns -EOPNOTSUPP and bonding treats
-> the device as not supporting MAC address changes.
-> 
-> A bit of research suggests it should be possible to implement
-> ndo_set_mac_address using
-> eth_mac_addr(), and, if appropriate, mark the device with
-> IFF_LIVE_ADDR_CHANGE so MAC changes while the interface is up are
-> allowed.   I have a feeling there is a lot more to it;
-
-Probably, I need to check this but first I need some way how to reproduce
-this :)
-
-> 
-> There is a corresponding downstream Debian bug with additional
-> hardware details https://bugs.debian.org/1121032
-> 
-> Thanks,
-> Ian
 
