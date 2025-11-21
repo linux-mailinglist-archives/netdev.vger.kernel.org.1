@@ -1,146 +1,104 @@
-Return-Path: <netdev+bounces-240655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39359C775D5
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 06:27:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B0B7C7765F
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 06:41:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D9977348D46
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 05:27:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTPS id AC4322BD31
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 05:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFC99274FEF;
-	Fri, 21 Nov 2025 05:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y0uVcbqE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B9E2EA16A;
+	Fri, 21 Nov 2025 05:41:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C47B214A9B;
-	Fri, 21 Nov 2025 05:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2E4274FEF
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 05:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763702839; cv=none; b=jyQ2h7M8AHLPzteJsmrRJeeRC46nQ6hpe0E09SWCKbOUk5XToEsi6wvsVLQ/myIAHLNXFaoPKMU/tQ5VVLBU/SC7aEmCofCBdyIWllc7jWKbzoXR6I7cNc6P+VjEOrkLi1/cP6UtiwI9rT+cYr0EQroq4ElWNUzwh3XadMzdKOQ=
+	t=1763703704; cv=none; b=YwBjiY+iR2lWQpnVUjOBfzsFCJocJD2tnfAtqcpkBkt5Gq7R0gHb1fa7tfPcfKB3n/r11H7OHm1JeyTR9uhzXQur0zCm9lY0W6y5ASFHfEiXBKS/fe5ybc6ovpaXNYqHvq1aC5S6nRQ8qh7gTbRECXQt/PCdf3P3xdy3/BR7G5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763702839; c=relaxed/simple;
-	bh=jgjPiFl6nMp/qJWlXf7i92nE2/VyDup9dr7tLT1/Nlw=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=Fzx0vLnQZF44spXet3XZFqdj6vWtGkdESPGZNviNKtgaYmXkm54KmhgJX0fDjTy/poM2TYiUBvX5gwLnArygR6geJyNxriCJD91nnHVcX9X8RiWzKq0R1gbJj53nBvpTM7IG+1POgLgYuXBerMqvFYgvdzA0ETa8RebhdnPL88g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y0uVcbqE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7ECDFC4CEF1;
-	Fri, 21 Nov 2025 05:27:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763702839;
-	bh=jgjPiFl6nMp/qJWlXf7i92nE2/VyDup9dr7tLT1/Nlw=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=Y0uVcbqEqtBkL59NUX3/uNqaE/tU4PMkK+5XdWgWdZhtoc1NFazn7Pz6vJe/QE1yz
-	 EX9Fxu2OXRQLV4FK5KtrwxYSWuk33PvKwj64RupTexwWz1YnX46zfPdd313iFwzQL7
-	 P+rt7YwH2qoFCT67PD7KhMU/dH912LVcU7cXblAqpowcjut38z+FTIOIPVHa/nfY8J
-	 KYPfpciCUn4tw7C5jczdofqjcUKN0vfl4QgoPGZ7Aw0e9289pJACVc2kYoPOizfIJS
-	 jZi8irsccYIsSgD5b1FhIDDeeXnefID64vVreTC36KY+oZCxRV+Fg4wOgDj7NFhawC
-	 vD8ujo5fpZibQ==
-Content-Type: multipart/mixed; boundary="===============6194490512902342718=="
+	s=arc-20240116; t=1763703704; c=relaxed/simple;
+	bh=Kn3J28aVMmGq6lo21uh5ZYTWPzceqvcAiZtS9zxPeYc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KBht1L3KebFh2UoYQuCZ2LXVa1aAjFwPIemXWvGdsLTNEHQ6gQyUjPMklAKR4HUTYcM2E53JYbuN3qS0ykiJ4uTv515i9niUSmW6CS0SwWSRdo+9qus1P/z29rJCogyxckRE62VMFe2PgOOXoBl3jM1ZNfz70WozYANlmpdxrUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vMJtW-0000dd-I7; Fri, 21 Nov 2025 06:41:18 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vMJtV-001XGc-0k;
+	Fri, 21 Nov 2025 06:41:17 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vMJtV-00FpBF-0D;
+	Fri, 21 Nov 2025 06:41:17 +0100
+Date: Fri, 21 Nov 2025 06:41:17 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Ma Ke <make24@iscas.ac.cn>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: dsa: microchip: fix mdio parent bus reference leak
+Message-ID: <aR_7fXEMhNeIhRwZ@pengutronix.de>
+References: <20251121042000.20119-1-make24@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <f85798386e18578290bba923bc4f0f8c399f903cf5d6c5efd580698e940ad3ec@mail.kernel.org>
-In-Reply-To: <20251121030013.60133-3-jiayuan.chen@linux.dev>
-References: <20251121030013.60133-3-jiayuan.chen@linux.dev>
-Subject: Re: [PATCH bpf-next v2 2/3] bpf, sockmap: Fix FIONREAD for sockmap
-From: bot+bpf-ci@kernel.org
-To: jiayuan.chen@linux.dev,bpf@vger.kernel.org
-Cc: jiayuan.chen@linux.dev,john.fastabend@gmail.com,jakub@cloudflare.com,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,horms@kernel.org,ncardwell@google.com,kuniyu@google.com,dsahern@kernel.org,andrii@kernel.org,eddyz87@gmail.com,ast@kernel.org,daniel@iogearbox.net,martin.lau@linux.dev,song@kernel.org,yonghong.song@linux.dev,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,shuah@kernel.org,mhal@rbox.co,sgarzare@redhat.com,cong.wang@bytedance.com,netdev@vger.kernel.org,linux-kernel@vger.kernel.org,linux-kselftest@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri, 21 Nov 2025 05:27:18 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251121042000.20119-1-make24@iscas.ac.cn>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
---===============6194490512902342718==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> index 0323a2b6c..49069b519 100644
-> --- a/include/linux/skmsg.h
-> +++ b/include/linux/skmsg.h
+On Fri, Nov 21, 2025 at 12:20:00PM +0800, Ma Ke wrote:
+> In ksz_mdio_register(), when of_mdio_find_bus() is called to get the
+> parent MDIO bus, it increments the reference count of the underlying
+> device. However, the reference are not released in error paths or
+> during switch teardown, causing a reference leak.
+> 
+> Add put_device() in the error path of ksz_mdio_register() and
+> ksz_teardown() to release the parent bus.
+> 
+> Found by code review.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 9afaf0eec2ab ("net: dsa: microchip: Refactor MDIO handling for side MDIO access")
+> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
 
-[ ... ]
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> index d73e03f77..4390deaeb 100644
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
+Thank you!
 
-[ ... ]
-
-> @@ -820,8 +821,11 @@ static void __sk_psock_purge_ingress_msg(struct sk_psock *psock)
->  		if (!msg->skb)
->  			atomic_sub(msg->sg.size, &psock->sk->sk_rmem_alloc);
->  		sk_msg_free(psock->sk, msg);
-> +		sk_psock_inc_msg_size(psock, -msg->sg.size);
->  		kfree(msg);
->  	}
-> +
-> +	WARN_ON_ONCE(psock->ingress_size);
->  }
-
-Can msg->sg.size be read after sk_msg_free()? Looking at sk_msg_free():
-
-  int sk_msg_free(struct sock *sk, struct sk_msg *msg)
-  {
-      return __sk_msg_free(sk, msg, msg->sg.start, true);
-  }
-
-And __sk_msg_free() at net/core/skmsg.c:207:
-
-  static int __sk_msg_free(struct sock *sk, struct sk_msg *msg, u32 i,
-                           bool charge)
-  {
-      ...
-      while (msg->sg.size) {
-          msg->sg.size -= sge->length;
-          ...
-      }
-      consume_skb(msg->skb);
-      sk_msg_init(msg);    // <-- this zeros the entire msg structure
-      return freed;
-  }
-
-And sk_msg_init() at include/linux/skmsg.h:193:
-
-  static inline void sk_msg_init(struct sk_msg *msg)
-  {
-      BUILD_BUG_ON(ARRAY_SIZE(msg->sg.data) - 1 != NR_MSG_FRAG_IDS);
-      memset(msg, 0, sizeof(*msg));    // <-- zeros everything
-      sg_init_marker(msg->sg.data, NR_MSG_FRAG_IDS);
-  }
-
-After sk_msg_free() completes, msg->sg.size is zero, so the line
-"sk_psock_inc_msg_size(psock, -msg->sg.size)" subtracts 0 instead of
-the actual message size. This means ingress_size will never be
-decremented during cleanup, and WARN_ON_ONCE(psock->ingress_size) will
-trigger whenever the ingress_msg queue contained messages.
-
-The fix would be to save msg->sg.size before calling sk_msg_free():
-
-  u32 msg_size = msg->sg.size;
-  if (!msg->skb)
-      atomic_sub(msg_size, &psock->sk->sk_rmem_alloc);
-  sk_msg_free(psock->sk, msg);
-  sk_psock_inc_msg_size(psock, -msg_size);
-  kfree(msg);
-
-[ ... ]
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19558612316
-
---===============6194490512902342718==--
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
