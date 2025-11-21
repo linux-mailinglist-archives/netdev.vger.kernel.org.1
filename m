@@ -1,80 +1,79 @@
-Return-Path: <netdev+bounces-240794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26FFDC7A8C7
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 16:28:23 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 372FEC7A8C4
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 16:28:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4414F4EE857
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 15:21:03 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A9E46361F37
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 15:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155CD34FF41;
-	Fri, 21 Nov 2025 15:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B359C351FA0;
+	Fri, 21 Nov 2025 15:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="icYJwEog"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="YumG26cq"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010039.outbound.protection.outlook.com [52.101.201.39])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010037.outbound.protection.outlook.com [52.101.85.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF56332EA2
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 15:17:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CC425A324
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 15:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763738276; cv=fail; b=tmMzWeNbhla52kbEbM7OKh76eTOYircscLfx2GLPP1x+FJ/+BMZ1IvnK/bsBuIx49FY6fb/YUN3Cln+BVxRAgFW756uc85XStJQ1fHFf2wGhZJbwiR3sUTA1LJd3zJk3HlkcmAXel50pedFrISfAd6vP+bfhPPiRU6lpeg+6SiE=
+	t=1763738274; cv=fail; b=fpAsm8mNMMDix6pfQHce1Uk8s0+S2cPpVs/QML23xLre1V8LGSHiiORZBacetrUGpb9Ivc35KHyGWKYS7YlNKQ0DB6QJdA6QK4NPj8aquXMEYoLSzINWk0hV/Jg4VERrdejMI8Y/8Au7J35YWRNvP4TffzIpdLxTGqdsgApK5Rc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763738276; c=relaxed/simple;
-	bh=Rg6infuoQi+pkY/ptB0M2AFSISCn4A6ABbTEQJl2DYY=;
+	s=arc-20240116; t=1763738274; c=relaxed/simple;
+	bh=TI9S2nPvFwyeTR/FC00Lo2Gz8ST4zo2DlZBGmhvhbqc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Opn53f+IPr53o0+hhdSU+CqMvzx1rauNeJNSiTl01pGOMpxE3dqBhrfER8iCUIAQR338nvqZxbQFXvPrKuBctEZZrOsRuEjR6P+SKcmNGqGyMRp2TmV4QRqaTyRgyniFWQqPnqsX13dVf/kKrUzzVb6qm3ERwBuKUhOplNL8PWY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=icYJwEog; arc=fail smtp.client-ip=52.101.201.39
+	 MIME-Version:Content-Type; b=fOO+x0QUXwklOMynI5Cqmv5aVn/m3P9ZcHkWinruG2KCCbYlDJSRmJ6MBsogABqzDFDDGKey4jNROOJfI4exB/YdrMZcGsDHTv4WOHAXsQiBNEhvNxHOpkAgeqtjoaAYo67RaPcQwmUZ4rBNjCWz9bmW6hr5cSoKJgk+PanoKPY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=YumG26cq; arc=fail smtp.client-ip=52.101.85.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tMBj5/vsxzTZfNP8YSzU79vvsbsWxQ0ZudHFPyLTLvK10t8q7Zdb01Qo2Ra297qTALYgVb/WbpWH1PwJqziHMg+ZJ7Zljb2ihdmUiOzCCkQudwhZ9MQb4M9r5Qn9VkE0u7NIPMquxuM2l/RuHFiexmEQYoICPNRGlazHjj2Fma9PNG1Jp1IEf0ZkXNA4pQRjuxOCiMV6IunEtcsZMTpRY2RaNpkOCkKNxMcA3pTTl0Gt0lzCFYw1uCf+iLuDlZj57OqMm7JDSGMltYsIwK7ofPKbWvqQK8uDi9dbkRdSO92QVncojIq89w1Ap1R1WCj352tO0fFiW/RsWlH8OxQ3Uw==
+ b=CUoMq8CVZKGyIGGP7dUSIumMIrutwjEbBtS/Swq/ZVenRJWhx81Vyz2z5wkyuJobrfVvkaOIV/ycTbep2kMnm7JoLLAwiyd0ykoSif/Yt//NpV9riT9twTccOjjFjchkFyg9S9RSdyiaAeQ+ZeQRSuM19Syq/dWotBD7NTKy0IeZwYx9FJVFhV3K3qhLQYrBY0qBompM1iICZq/SbGuAWLLJGNxykPS2ra9RWhKycqkxWtbiUFLB+3eQBboepKjOEFjupawaK+nJuCPoDmNZO6mSZJoWHG85/TKgIj5fO6J/IwWxl+vqQkunHOradsBFZEZT6tCFu/q09ypvlxU3pQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TKXNohB6PiT1/fqUiWEao+CxyBzP4JIApPOazO7lgZg=;
- b=WVMbHZDhQdcq2DpDBvm6VZoPvOOTJ1eXQWb7fLT7wicteWZfBEWYOxeLhbJ3WnPe7mWZzX9aqMn6Tbb+ZjW6HQJxuhPgdAid3ucVFdPM77wtzTkkAeft3US6MDLZ/tpWnER4SSU84n966WjMa3c7XcciWytvukdOu0aLCqeeERjJzOaifSHh2+g8Xad9hn6U5yVJA8hs3X3qEGavyeuVDA6ukNRwArNlGlxZRRxCp6e/bWsH2YVDcYgcB7Q3Gim4N1X41V1H6MW7wJCJqglwi/exVZzvzAsN/mwSpbEIURnVlg1+V8UqG0PTHknFScbhHGTDWqaPMKTDKYnBSYURaQ==
+ bh=A/Y0xTAkEaWUpOHpWkS3pCCd/ekrvvRPsX3Kfn/Vls4=;
+ b=ZOlMBYbUlQYVnbjeFcr2ZCUirdjelG6J44yPEZODazgEtnOjkWySeujC3fn4QOVbLB2q54BgkYdd+oDJsIRbntall0Pzgdtub4XFOqgdlw2Yq/EPOX7zvZS6rh9uL0KAtt6FMGpa0ux1HBEq/FPvsufQdGKo7OeHTrF3UCwiavxqfG6DP/78RDtch7lbblGlc8PICjCjbBAlwQ0SguCjdh4Yf5XFgsDrSii91ipKVX9+nWomYHwyuDYCoGEdq3DsouHcEcZLj6HafdvtzeJCeCwMb/JPosi4j+ClTWQoqHWMukSwL+XJ8gV7N9nLj2n5VRYiRfprzIfw7U6l0nY7FQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TKXNohB6PiT1/fqUiWEao+CxyBzP4JIApPOazO7lgZg=;
- b=icYJwEogZ2cfPWDSQ8/uJGeKh3hHqk7dYF+NxZysxm8gJ4jCLYSVYCPqR0z5qTDRfCuu0dtf1mYIuFODXntcWasM8RZFFLjL1uftdtBCNHvuemHmIO/uLIjvBN/TNYls6bk9OtZwy/72unkDNFpxtXmYtDLe2rLYGMOs14fwpc8h2i53FE7mdGdQoBeHTjLkCh0OS6uxsAIzsMnjBLshVSLRC+mhr8WKy6syJTJJrMs5ZnkRupFDpQQcy8fXhHRkxbOsyKumY9o50wOALukKbE5bqFFblawX1p1j7mWRdO4VjtGHLRTbg1k3XRCuvGlVvhKhEzruFay79s8neYXBJg==
-Received: from SJ0PR05CA0057.namprd05.prod.outlook.com (2603:10b6:a03:33f::32)
- by MN2PR12MB4079.namprd12.prod.outlook.com (2603:10b6:208:1d5::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.14; Fri, 21 Nov
- 2025 15:17:37 +0000
-Received: from BY1PEPF0001AE1D.namprd04.prod.outlook.com
- (2603:10b6:a03:33f:cafe::50) by SJ0PR05CA0057.outlook.office365.com
- (2603:10b6:a03:33f::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Fri,
- 21 Nov 2025 15:17:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ bh=A/Y0xTAkEaWUpOHpWkS3pCCd/ekrvvRPsX3Kfn/Vls4=;
+ b=YumG26cqNTu/G7Smy3qoxMoySqqgFF2pxBrUgRCe4UYoEZsNqCLyShTgZZ+pVtU7hqJezN/mGf4xmLomphFFNkdgMak9yBfJ4Vjx3WLSFS9praNfe6U/mSFiuF0lFsJ3PKBgKEwDErFHwtgrzwhE5K2d6JCB7fl2ZWflq0p6HwNnffMRS0+Mx15g12InaZ00+fH4Jy6QwjijaX3AiettUSl0Ot0H/38IQhc3z6fW+TSvy7LYSOC7o+vinBXeV/uu8Yq/LuNXExU54IdQDvhiXDlV22KiUrWJum88A1In1Q2j1uqGZQpT6urihy8ibqcaD9+T86DswxVa5fmd6Wje2Q==
+Received: from CH3P221CA0016.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:1e7::8)
+ by DM4PR12MB6542.namprd12.prod.outlook.com (2603:10b6:8:89::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.12; Fri, 21 Nov 2025 15:17:42 +0000
+Received: from CH2PEPF0000013E.namprd02.prod.outlook.com
+ (2603:10b6:610:1e7:cafe::e4) by CH3P221CA0016.outlook.office365.com
+ (2603:10b6:610:1e7::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.13 via Frontend Transport; Fri,
+ 21 Nov 2025 15:17:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BY1PEPF0001AE1D.mail.protection.outlook.com (10.167.242.106) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF0000013E.mail.protection.outlook.com (10.167.244.70) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9343.9 via Frontend Transport; Fri, 21 Nov 2025 15:17:37 +0000
+ 15.20.9343.9 via Frontend Transport; Fri, 21 Nov 2025 15:17:41 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 21 Nov
- 2025 07:17:20 -0800
+ 2025 07:17:25 -0800
 Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Fri, 21 Nov 2025 07:17:16 -0800
+ 15.2.2562.20; Fri, 21 Nov 2025 07:17:20 -0800
 From: Cosmin Ratiu <cratiu@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -84,9 +83,9 @@ CC: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	<jianbol@nvidia.com>, Sabrina Dubroca <sd@queasysnail.net>, Steffen Klassert
 	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
 	Leon Romanovsky <leonro@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: [RFC PATCH ipsec 1/2] xfrm: Add explicit offload_handle to some xfrm callbacks
-Date: Fri, 21 Nov 2025 17:16:43 +0200
-Message-ID: <20251121151644.1797728-2-cratiu@nvidia.com>
+Subject: [RFC PATCH ipsec 2/2] bonding: Maintain offloaded xfrm on all devices
+Date: Fri, 21 Nov 2025 17:16:44 +0200
+Message-ID: <20251121151644.1797728-3-cratiu@nvidia.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20251121151644.1797728-1-cratiu@nvidia.com>
 References: <20251121151644.1797728-1-cratiu@nvidia.com>
@@ -102,922 +101,585 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY1PEPF0001AE1D:EE_|MN2PR12MB4079:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4611defd-42d2-4544-bc8f-08de29111aa6
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000013E:EE_|DM4PR12MB6542:EE_
+X-MS-Office365-Filtering-Correlation-Id: 41978836-daf0-4c0a-f1bc-08de29111d98
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|7416014|376014;
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?T+I0XYfxxvGIebnHus9WUjg/jJAwcMJmtG8YZGm+njGpHaxLOHYH2R9bqTWJ?=
- =?us-ascii?Q?STMiuY9Tw2xmRVVWoEgeE9wJ2Xyyw0WolY404Q+qbQaPnFOWvoUKgqg5VKJ9?=
- =?us-ascii?Q?sW+uFdWemEYSc/CWCQsj2Z+cWeIVTOCm+T0lwpHaGuEapMa2/KAqhsJpYM0x?=
- =?us-ascii?Q?+zFfyg3xRYZ/upOXJKUTcEkcGX4yNIVarBou2sPU/7dVo+8bWpn+y4jfk4mr?=
- =?us-ascii?Q?G1L+OBB77TT+lSDPG7BDA31qyvERXK2erb4kEL2H4LwLmt6e0ex1h02tXtfb?=
- =?us-ascii?Q?CP/QsJVlhihsrje+dNq8W+WVFhFgcsLjDS7JMPs6A618c7344BjHvzOIwAWN?=
- =?us-ascii?Q?1Rb/3VM5dV87LGJH5NYzMFzO/Vlk/reEghFpx9Xtt8UTWnNLLoMkXYR4SGOD?=
- =?us-ascii?Q?UgJ566TCuMSjq7gUE2QAoaKmMNuKaXC2Df7IJEnltTRa9jQ6gPVLJJU1KAIM?=
- =?us-ascii?Q?Qix9m78jV1gxUecUKTpptaIQ024WAriezeQeKGN4iQ9hM1W7lEJlGKBKQ3Ek?=
- =?us-ascii?Q?JA2/2sZmQoQ6PUxBHAK42zVzkSsWoo0StkXp6mUm3+VanBKKOBsIDbBfI3zf?=
- =?us-ascii?Q?rYHkfD+LdcmMZDVnI8qVVU+zaHY7g0C0sVmpv8O/8yHgB+Pi/e1sRXzyIdEt?=
- =?us-ascii?Q?nj3j9YxTtDUtK7QHyhXcOqtuer5y34veMeNxPh9+AzileWSRH0XEzfpzlvut?=
- =?us-ascii?Q?2DRYpOejfrEgZVsw0kNl1Qio5Li21A0/7+HdTaF32KN2kIudSJwy6V4zyJUX?=
- =?us-ascii?Q?J2SMUgbo5O3HhBlIoVnsEHc9zyl/PVZhj7XjnNVh2ibUPc5gSeUepjjOc6H2?=
- =?us-ascii?Q?s2fgHuALdsBV57PtEvg1Cyyqp87OPQYUaf+PY5HCbSLJKseMnh9tNWCGUSqT?=
- =?us-ascii?Q?54NFZZxnQI1/xpvjN3HEKrsVtct8Bu7ruTcliBNOzVvC3I/OQ1DCUwH45Ky1?=
- =?us-ascii?Q?t01O3/NO/a0+g4JEqQzCzTRJJijdBI62ziAgxjZEmrZJ9JS9Ss/mF32RXbQ5?=
- =?us-ascii?Q?QBkg/nRIBhTZDtfAxvR/SFFyQRfjhuK25n9M5P7zlfwVVR0cWQzDoGwolprl?=
- =?us-ascii?Q?phXma7I6MWMKPMozveAU02gOm+shZKS0Gss5i5LzD/QifKzFi2867dXsFW9O?=
- =?us-ascii?Q?HNJ3gTTCvWbDLLMqXPjGGV13xY04xheXhbk2iQbmA26K4etOtJ5un8Gc4s/7?=
- =?us-ascii?Q?fapx/h1SWcwRvlo4LqFqSdrQM0o7mMGzIT2dsuMcBV9Q66PSIOAfixbmZZm9?=
- =?us-ascii?Q?pNZ8gArpmnG/Rc+vn7TyJUiTkysqbkOAPUtn2BfylgEt8DQHjP70MJpMwvIQ?=
- =?us-ascii?Q?AOqRXngwVhE4cRzzfZsLHBoTx30+moYXZLK0zzkR4vE/unaA87inHHSUAw/+?=
- =?us-ascii?Q?/GuubQKbCrVAa5HcCYRO8IdZPt3+opJDTnnMmIcUVO8zGTlWLJHIZE/3b+Qi?=
- =?us-ascii?Q?UAasVYL9b3nSLnJsY4hW5kMAWNzIA2X8XnpaxKD48+sL5ngKNtodSxJ2rQqw?=
- =?us-ascii?Q?q9p5FXdbXL3PMJFR9qsEp3z6zTDNHAw/W+bVT3jfdtPovOf6JZCbdOFaX4YS?=
- =?us-ascii?Q?o1TB1In6aFWr3NOsrjk=3D?=
+	=?us-ascii?Q?Cy6PDFdOsPImvPzkgTc1sRmypuC0nztiyntOcbggEAxPza8pV1l2a2vvqjIE?=
+ =?us-ascii?Q?Ivj3BkteUBvJwLLJxCSW4DLzyvadxD3xwh41P4xR/ByaGqOv/W2SW6qrLfhN?=
+ =?us-ascii?Q?ecEYGWmEUxJSK3JlQnxlutkTjYIuEiS3/P2Ex+TEVUV/YYgPoAHgtervew1a?=
+ =?us-ascii?Q?HozrttPVsozcc59XGJkCeL8O6iUp/veIxuVRoiY1F1bbg7F10CBpMMKDT2Jn?=
+ =?us-ascii?Q?h9mj7KBdOYBd4y8fVkqyIimxjlfyKc8SPU7UZQ921LdPuJE0UqAHjKKU8m9O?=
+ =?us-ascii?Q?wXgpfu2gYA84a+YYnnjl0G2Un79fkIcLNcKLmVtZvUvclRFhoQWeuX4HKy3W?=
+ =?us-ascii?Q?EW//8Rcq9w6lnZUVBgAOGuyjN7qIntblMCeup3ug3YzPjM8pF5nST5sTjvA7?=
+ =?us-ascii?Q?Ikg4ZZAka6mq84A0phljLzw6F4yAMymbSI/4tH7eMxYpcYaJsdIkciFNzP0T?=
+ =?us-ascii?Q?EY63UL017U2HT/se33vfzXre9jJlvINqPyvBFGjp4nxEPVj/nayrwSzTemnm?=
+ =?us-ascii?Q?OHsf0Xc+AOHmAyWA/P32U2xgU1nj/JB/JjO/cVVXLp445yBteu6yVv6g52Xg?=
+ =?us-ascii?Q?U7yGfI1aGy1k9z/BBGJDTFy7PFYDgka59GR2WrhP/3p5o+kAPlgFWWji9MNi?=
+ =?us-ascii?Q?D9ya9Wj8p05UNua89RuSovTCSwn4EK2u9YSjJYE3IscigIW/C2/kr1sqJxYm?=
+ =?us-ascii?Q?O6bn0mM8HuMia7xJYjN3v/0mPb2ZfcdHyHvCmQI+79KM2P+S61Ixra5gWmPS?=
+ =?us-ascii?Q?SYrf78Of7FJvp2XlSdSB1wzdMypOeqFJuuura5KU7YWGRoxTPitiu0Xq3Ru5?=
+ =?us-ascii?Q?8fxKfqQm4AEJb9xeKG4QGQzc7Yow81cIMiLtV4EFpI4nyi8ph+Yxun3n5N5L?=
+ =?us-ascii?Q?B7BsXaZqLGsF+1EpSzqXbSx8C9A8iQfcq6bgRKpNtJxEGUXmoEFB75/6GjDl?=
+ =?us-ascii?Q?YmiwpvDazsue8eyJCHE3CwfEhn1B3pAE6YpuENNOmrO15hWzQfXV8CthNUze?=
+ =?us-ascii?Q?ya8cLmKlv7GjaRCKA56A01J09EjZE0WTkux3r17lv/cmf4ciUjBTUfQhQSxf?=
+ =?us-ascii?Q?ExGMtpLE2IJ/bzlDDtkje+xKH926XE8KV0dwx/B82GN5/Yk2156TaAF9Bp82?=
+ =?us-ascii?Q?+sX1Yy6TzSbxMuz48xvBizcVHfF29txAOBXY6U/MF0jX5lTMGkyxbZ26z6YB?=
+ =?us-ascii?Q?G12uQA4QA624EKjFFg4Zel2F8W7JMbACPXgbBE41s8+N7QtWFSK7A26NfG5e?=
+ =?us-ascii?Q?TLUs6GlcTUTUavf9rTrLj0qcrYK8IQXPx7NwgPgYCtz+wlVniWCUPtY3uNCP?=
+ =?us-ascii?Q?+yxwYsQk0AFsa6duVrizxIoUb/nxuCuidN3UZarQFgA/vH2Xb6MoNKdyC/c1?=
+ =?us-ascii?Q?culRPFygGwgKCjecoLsH8RMdYzRFyc+3EpYo+P3kvwEQRsffFJpwfH/nHtAC?=
+ =?us-ascii?Q?fiI2a//vglWrXlB2x7KrCSGVhE4mIEfY9vMlp+bhDTMp2AtN7lHGHtmXw55b?=
+ =?us-ascii?Q?WAiOVt9fCt8vnFs3xihvWTfNqDovxCofTJ5IfrOYK5rgXKzbO4a8iMOmsiHF?=
+ =?us-ascii?Q?YzCEjQSk0Pgg0qtS8eE=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(7416014)(376014);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7416014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2025 15:17:37.0189
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2025 15:17:41.9413
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4611defd-42d2-4544-bc8f-08de29111aa6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41978836-daf0-4c0a-f1bc-08de29111d98
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BY1PEPF0001AE1D.namprd04.prod.outlook.com
+	CH2PEPF0000013E.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4079
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6542
 
-The offload handle is an opaque driver-managed value for an xfrm_state
-offload and is stored in xs->xso.offload_handle.
-But drivers accessing it directly means there is a 1:1 association
-between an xfrm_state and a device that state is offloaded on.
+The bonding driver manages offloaded SAs using the following strategy:
 
-Remove that 1:1 mapping by passing offload_handle as an argument to
-callbacks adding, deleting and freeing xfrm_states.
+An xfrm_state offloaded on the bond device with bond_ipsec_add_sa() uses
+'real_dev' on the xfrm_state xs to redirect the offload to the current
+active slave. The corresponding bond_ipsec_del_sa() (called with the xs
+spinlock held) redirects the unoffload call to real_dev. Finally,
+cleanup happens in bond_ipsec_free_sa(), which removes the offload from
+the device. Since the last call happens without the xs spinlock held,
+that is where the real work to unoffload actually happens.
 
-This unfortunately makes these API calls more verbose, but is necessary
-in the subsequent patch to fix some unpleasant bonding ipsec bugs.
+When the active slave changes to a new device a 3-step process is used
+to migrate all xfrm states to the new device:
+1. bond_ipsec_del_sa_all() unoffloads all states in bond->ipsec_list
+   from the previously active device.
+2. The active slave is flipped to the new device.
+3. bond_ipsec_add_sa_all() offloads all states in bond->ipsec_list to
+   the new device.
 
-After this patch, the meaning of xs->xso.offload_handle becomes 'the
-offload handle on the active device where this xfrm_state is offloaded'
-which implies there can be at most one such active device. The offload
-handle is still used directly in the xmit path.
+There can be two races which result in unencrypted IPSec packets being
+transmitted on the wire:
 
+1. Unencrypted IPSec packet on old_dev:
+CPU1 (xfrm_output)                   CPU2 (bond_change_active_slave)
+bond_ipsec_offload_ok -> true
+                                     bond_ipsec_del_sa_all
+bond_xmit_activebackup
+bond_dev_queue_xmit
+dev_queue_xmit on old_dev
+				     bond->curr_active_slave = new_dev
+				     bond_ipsec_add_sa_all
+
+2. Unencrypted IPSec packet on new_dev:
+CPU1 (xfrm_output)                   CPU2 (bond_change_active_slave)
+bond_ipsec_offload_ok -> true
+                                     bond->curr_active_slave = new_dev
+                                     bond_ipsec_migrate_sa_all
+bond_xmit_activebackup
+bond_dev_queue_xmit
+dev_queue_xmit on new_dev
+				     bond_ipsec_migrate_sa_all finishes
+
+This patch fixes both these issues. Bonding now maintain SAs on all
+devices by making use of the previous patch that allows the same xfrm
+state to be offloaded on multiple devices. This consists of:
+
+1. Maintaining two linked lists:
+- bond->ipsec_list is the list of xfrm states offloaded to the bonding
+  device.
+- Each slave has its own bond->ipsec_offloads list holding offloads of
+  bond->ipsec_list on that slave.
+These lists are protected by the existing bond->ipsec_lock mutex.
+
+2. When a slave is added (bond_enslave), bond_ipsec_add_sa_all now
+   offloads all xfrm states to the new device.
+
+3. When a slave is removed (__bond_release_one), bond_ipsec_del_sa_all
+   now removes all xfrm state offloads from that device.
+
+4. When the active slave is changed (bond_change_active_slave), a new
+   bond_ipsec_migrate_sa_all function switches xs->xso.real_dev and
+   xs->xso.offload handle for all offloaded xfrm states.
+   xdo_dev_state_advance_esn is also called on the new device to update
+   the esn state.
+
+5. Adding an offloaded xfrm state to the bond device must now iterate
+   through active slaves. To make that nice, RTNL is grabbed there. The
+   alternative is repeatedly grabbing each slave under the RCU lock,
+   holding it, releasing the lock to be able to offload a state, then
+   re-grabbing the RCU lock and releasing the slave. RTNL seems cleaner.
+
+6. bond_ipsec_del_sa (.xdo_dev_state_delete for bond) is unchanged, it
+   now only deletes the state from the active device and leaves the rest
+   for the xdo_dev_state_free callback, which can grab the required
+   locks.
+
+Fixes: 9a5605505d9c ("bonding: Add struct bond_ipesc to manage SA")
 Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
 ---
- Documentation/networking/xfrm_device.rst      | 13 +++--
- drivers/net/bonding/bond_main.c               | 57 ++++++++++++-------
- .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   | 20 +++++--
- .../inline_crypto/ch_ipsec/chcr_ipsec.c       | 25 ++++----
- .../net/ethernet/intel/ixgbe/ixgbe_ipsec.c    | 47 +++++++++------
- drivers/net/ethernet/intel/ixgbevf/ipsec.c    | 18 +++---
- .../marvell/octeontx2/nic/cn10k_ipsec.c       | 13 +++--
- .../mellanox/mlx5/core/en_accel/ipsec.c       | 26 +++++----
- .../net/ethernet/netronome/nfp/crypto/ipsec.c | 10 ++--
- drivers/net/netdevsim/ipsec.c                 |  8 ++-
- include/linux/netdevice.h                     |  7 ++-
- net/xfrm/xfrm_device.c                        |  3 +-
- net/xfrm/xfrm_state.c                         |  7 ++-
- 13 files changed, 159 insertions(+), 95 deletions(-)
+ drivers/net/bonding/bond_main.c | 283 +++++++++++++++++---------------
+ include/net/bonding.h           |  22 ++-
+ 2 files changed, 164 insertions(+), 141 deletions(-)
 
-diff --git a/Documentation/networking/xfrm_device.rst b/Documentation/networking/xfrm_device.rst
-index 122204da0fff..0f9291469a5e 100644
---- a/Documentation/networking/xfrm_device.rst
-+++ b/Documentation/networking/xfrm_device.rst
-@@ -67,14 +67,19 @@ Callbacks to implement
-         /* Crypto and Packet offload callbacks */
- 	int	(*xdo_dev_state_add)(struct net_device *dev,
-                                      struct xfrm_state *x,
-+				     unsigned long *offload_handle,
-                                      struct netlink_ext_ack *extack);
- 	void	(*xdo_dev_state_delete)(struct net_device *dev,
--                                        struct xfrm_state *x);
-+                                        struct xfrm_state *x,
-+					unsigned long offload_handle);
- 	void	(*xdo_dev_state_free)(struct net_device *dev,
--                                      struct xfrm_state *x);
-+				      struct xfrm_state *x,
-+				      unsigned long offload_handle);
- 	bool	(*xdo_dev_offload_ok) (struct sk_buff *skb,
--				       struct xfrm_state *x);
--	void    (*xdo_dev_state_advance_esn) (struct xfrm_state *x);
-+				       struct xfrm_state *x,
-+				       unsigned long offload_handle);
-+	void	(*xdo_dev_state_advance_esn) (struct xfrm_state *x,
-+					      unsigned long offload_handle);
- 	void    (*xdo_dev_state_update_stats) (struct xfrm_state *x);
- 
-         /* Solely packet offload callbacks */
 diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index e95e593cd12d..4c5b73786877 100644
+index 4c5b73786877..979e5aabf8d2 100644
 --- a/drivers/net/bonding/bond_main.c
 +++ b/drivers/net/bonding/bond_main.c
-@@ -456,10 +456,12 @@ static struct net_device *bond_ipsec_dev(struct xfrm_state *xs)
+@@ -452,6 +452,61 @@ static struct net_device *bond_ipsec_dev(struct xfrm_state *xs)
+ 	return slave->dev;
+ }
+ 
++static struct bond_ipsec_offload*
++bond_ipsec_dev_add_sa(struct net_device *dev, struct bond_ipsec *ipsec,
++		      struct netlink_ext_ack *extack)
++{
++	struct bond_ipsec_offload *offload;
++	int err;
++
++	if (!dev->xfrmdev_ops ||
++	    !dev->xfrmdev_ops->xdo_dev_state_add ||
++	    netif_is_bond_master(dev)) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Slave does not support ipsec offload");
++		return ERR_PTR(-EINVAL);
++	}
++
++	offload = kzalloc(sizeof(*offload), GFP_KERNEL);
++	if (!offload)
++		return ERR_PTR(-ENOMEM);
++
++	offload->ipsec = ipsec;
++	offload->dev = dev;
++	err = dev->xfrmdev_ops->xdo_dev_state_add(dev, ipsec->xs,
++						   &offload->handle, extack);
++	if (err)
++		return ERR_PTR(err);
++	return offload;
++}
++
++static void bond_ipsec_dev_del_sa(struct bond_ipsec_offload *offload)
++{
++	struct xfrm_state *xs = offload->ipsec->xs;
++	struct net_device *dev = offload->dev;
++
++	if (dev->xfrmdev_ops->xdo_dev_state_delete) {
++		spin_lock_bh(&xs->lock);
++		/* Don't double delete states killed by the user
++		 * from xs->xso.real_dev.
++		 */
++		if (dev != xs->xso.real_dev ||
++		    xs->km.state != XFRM_STATE_DEAD)
++			dev->xfrmdev_ops->xdo_dev_state_delete(dev, xs,
++							       offload->handle);
++		if (xs->xso.real_dev == dev)
++			xs->xso.real_dev = NULL;
++		spin_unlock_bh(&xs->lock);
++	}
++
++	if (dev->xfrmdev_ops->xdo_dev_state_free)
++		dev->xfrmdev_ops->xdo_dev_state_free(dev, xs, offload->handle);
++
++	list_del(&offload->list);
++	list_del(&offload->ipsec_list);
++	kfree(offload);
++}
++
+ /**
   * bond_ipsec_add_sa - program device with a security association
   * @bond_dev: pointer to the bond net device
-  * @xs: pointer to transformer state struct
-+ * @offload_handle: pointer to resulting offload handle
-  * @extack: extack point to fill failure reason
-  **/
- static int bond_ipsec_add_sa(struct net_device *bond_dev,
- 			     struct xfrm_state *xs,
-+			     unsigned long *offload_handle,
+@@ -464,111 +519,83 @@ static int bond_ipsec_add_sa(struct net_device *bond_dev,
+ 			     unsigned long *offload_handle,
  			     struct netlink_ext_ack *extack)
  {
- 	struct net_device *real_dev;
-@@ -497,7 +499,8 @@ static int bond_ipsec_add_sa(struct net_device *bond_dev,
+-	struct net_device *real_dev;
+-	netdevice_tracker tracker;
++	struct bond_ipsec_offload *offload, *tmp;
++	struct slave *slave, *curr_active;
+ 	struct bond_ipsec *ipsec;
++	struct list_head *iter;
+ 	struct bonding *bond;
+-	struct slave *slave;
+ 	int err;
+ 
+ 	if (!bond_dev)
+ 		return -EINVAL;
+ 
+-	rcu_read_lock();
+ 	bond = netdev_priv(bond_dev);
+-	slave = rcu_dereference(bond->curr_active_slave);
+-	real_dev = slave ? slave->dev : NULL;
+-	netdev_hold(real_dev, &tracker, GFP_ATOMIC);
+-	rcu_read_unlock();
+-	if (!real_dev) {
+-		err = -ENODEV;
+-		goto out;
+-	}
+-
+-	if (!real_dev->xfrmdev_ops ||
+-	    !real_dev->xfrmdev_ops->xdo_dev_state_add ||
+-	    netif_is_bond_master(real_dev)) {
+-		NL_SET_ERR_MSG_MOD(extack, "Slave does not support ipsec offload");
+-		err = -EINVAL;
+-		goto out;
+-	}
+-
+ 	ipsec = kmalloc(sizeof(*ipsec), GFP_KERNEL);
+ 	if (!ipsec) {
+ 		err = -ENOMEM;
  		goto out;
  	}
++	ipsec->xs = xs;
++	INIT_LIST_HEAD(&ipsec->offloads);
  
--	err = real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev, xs, extack);
-+	err = real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev, xs,
-+						       offload_handle, extack);
- 	if (!err) {
- 		xs->xso.real_dev = real_dev;
- 		ipsec->xs = xs;
-@@ -537,29 +540,33 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
+-	err = real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev, xs,
+-						       offload_handle, extack);
+-	if (!err) {
+-		xs->xso.real_dev = real_dev;
+-		ipsec->xs = xs;
+-		INIT_LIST_HEAD(&ipsec->list);
+-		mutex_lock(&bond->ipsec_lock);
+-		list_add(&ipsec->list, &bond->ipsec_list);
+-		mutex_unlock(&bond->ipsec_lock);
+-	} else {
+-		kfree(ipsec);
++	rtnl_lock();
++	mutex_lock(&bond->ipsec_lock);
++	curr_active = rtnl_dereference(bond->curr_active_slave);
++	bond_for_each_slave(bond, slave, iter) {
++		offload = bond_ipsec_dev_add_sa(slave->dev, ipsec, extack);
++		if (IS_ERR(offload)) {
++			err = PTR_ERR(offload);
++			goto err_slave_dev;
++		}
++		list_add_tail(&offload->list, &slave->ipsec_offloads);
++		list_add_tail(&offload->ipsec_list, &ipsec->offloads);
++		if (curr_active == slave)
++			*offload_handle = offload->handle;
  	}
- 
- 	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
-+		struct xfrm_state *xs = ipsec->xs;
 +
- 		/* If new state is added before ipsec_lock acquired */
--		if (ipsec->xs->xso.real_dev == real_dev)
-+		if (xs->xso.real_dev == real_dev)
- 			continue;
++	/* Mark the xs as 'active' on the current active device. */
++	if (curr_active)
++		xs->xso.real_dev = curr_active->dev;
++	list_add_tail(&ipsec->list, &bond->ipsec_list);
++	mutex_unlock(&bond->ipsec_lock);
++	rtnl_unlock();
++
++	return 0;
++
++err_slave_dev:
++	list_for_each_entry_safe(offload, tmp, &ipsec->offloads, ipsec_list)
++		bond_ipsec_dev_del_sa(offload);
++	kfree(ipsec);
++	mutex_unlock(&bond->ipsec_lock);
++	rtnl_unlock();
+ out:
+-	netdev_put(real_dev, &tracker);
+ 	return err;
+ }
  
--		if (real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev,
--							     ipsec->xs, NULL)) {
-+		if (real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev, xs,
-+							     &xs->xso.offload_handle,
-+							     NULL)) {
+-static void bond_ipsec_add_sa_all(struct bonding *bond)
++static void bond_ipsec_add_sa_all(struct bonding *bond, struct slave *new_slave,
++				  struct netlink_ext_ack *extack)
+ {
++	struct net_device *real_dev = new_slave->dev;
+ 	struct net_device *bond_dev = bond->dev;
+-	struct net_device *real_dev;
+ 	struct bond_ipsec *ipsec;
+ 	struct slave *slave;
+ 
+-	slave = rtnl_dereference(bond->curr_active_slave);
+-	real_dev = slave ? slave->dev : NULL;
+-	if (!real_dev)
+-		return;
++	INIT_LIST_HEAD(&new_slave->ipsec_offloads);
+ 
+ 	mutex_lock(&bond->ipsec_lock);
+-	if (!real_dev->xfrmdev_ops ||
+-	    !real_dev->xfrmdev_ops->xdo_dev_state_add ||
+-	    netif_is_bond_master(real_dev)) {
+-		if (!list_empty(&bond->ipsec_list))
+-			slave_warn(bond_dev, real_dev,
+-				   "%s: no slave xdo_dev_state_add\n",
+-				   __func__);
+-		goto out;
+-	}
+-
+ 	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
++		struct bond_ipsec_offload *offload;
+ 		struct xfrm_state *xs = ipsec->xs;
+ 
+-		/* If new state is added before ipsec_lock acquired */
+-		if (xs->xso.real_dev == real_dev)
+-			continue;
+-
+-		if (real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev, xs,
+-							     &xs->xso.offload_handle,
+-							     NULL)) {
++		offload = bond_ipsec_dev_add_sa(slave->dev, ipsec, extack);
++		if (IS_ERR(offload)) {
  			slave_warn(bond_dev, real_dev, "%s: failed to add SA\n", __func__);
  			continue;
  		}
  
--		spin_lock_bh(&ipsec->xs->lock);
-+		spin_lock_bh(&xs->lock);
- 		/* xs might have been killed by the user during the migration
- 		 * to the new dev, but bond_ipsec_del_sa() should have done
- 		 * nothing, as xso.real_dev is NULL.
- 		 * Delete it from the device we just added it to. The pending
- 		 * bond_ipsec_free_sa() call will do the rest of the cleanup.
- 		 */
--		if (ipsec->xs->km.state == XFRM_STATE_DEAD &&
-+		if (xs->km.state == XFRM_STATE_DEAD &&
- 		    real_dev->xfrmdev_ops->xdo_dev_state_delete)
- 			real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
--								    ipsec->xs);
--		ipsec->xs->xso.real_dev = real_dev;
--		spin_unlock_bh(&ipsec->xs->lock);
-+								    xs,
-+								    xs->xso.offload_handle);
-+		xs->xso.real_dev = real_dev;
-+		spin_unlock_bh(&xs->lock);
+-		spin_lock_bh(&xs->lock);
+-		/* xs might have been killed by the user during the migration
+-		 * to the new dev, but bond_ipsec_del_sa() should have done
+-		 * nothing, as xso.real_dev is NULL.
+-		 * Delete it from the device we just added it to. The pending
+-		 * bond_ipsec_free_sa() call will do the rest of the cleanup.
+-		 */
+-		if (xs->km.state == XFRM_STATE_DEAD &&
+-		    real_dev->xfrmdev_ops->xdo_dev_state_delete)
+-			real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
+-								    xs,
+-								    xs->xso.offload_handle);
+-		xs->xso.real_dev = real_dev;
+-		spin_unlock_bh(&xs->lock);
++		list_add_tail(&offload->list, &new_slave->ipsec_offloads);
++		list_add_tail(&offload->ipsec_list, &ipsec->offloads);
  	}
- out:
+-out:
  	mutex_unlock(&bond->ipsec_lock);
-@@ -569,9 +576,11 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
-  * bond_ipsec_del_sa - clear out this specific SA
-  * @bond_dev: pointer to the bond net device
-  * @xs: pointer to transformer state struct
-+ * @offload_handle: offload handle to delete
-  **/
- static void bond_ipsec_del_sa(struct net_device *bond_dev,
--			      struct xfrm_state *xs)
-+			      struct xfrm_state *xs,
-+			      unsigned long offload_handle)
- {
- 	struct net_device *real_dev;
- 
-@@ -587,7 +596,8 @@ static void bond_ipsec_del_sa(struct net_device *bond_dev,
- 		return;
- 	}
- 
--	real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev, xs);
-+	real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev, xs,
-+						    offload_handle);
  }
  
- static void bond_ipsec_del_sa_all(struct bonding *bond)
-@@ -604,7 +614,9 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
+@@ -600,47 +627,13 @@ static void bond_ipsec_del_sa(struct net_device *bond_dev,
+ 						    offload_handle);
+ }
+ 
+-static void bond_ipsec_del_sa_all(struct bonding *bond)
++static void bond_ipsec_del_sa_all(struct bonding *bond, struct slave *old_slave)
+ {
+-	struct net_device *bond_dev = bond->dev;
+-	struct net_device *real_dev;
+-	struct bond_ipsec *ipsec;
+-	struct slave *slave;
+-
+-	slave = rtnl_dereference(bond->curr_active_slave);
+-	real_dev = slave ? slave->dev : NULL;
+-	if (!real_dev)
+-		return;
++	struct bond_ipsec_offload *offload, *tmp;
  
  	mutex_lock(&bond->ipsec_lock);
- 	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
--		if (!ipsec->xs->xso.real_dev)
-+		struct xfrm_state *xs = ipsec->xs;
-+
-+		if (!xs->xso.real_dev)
- 			continue;
- 
- 		if (!real_dev->xfrmdev_ops ||
-@@ -616,23 +628,25 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
- 			continue;
- 		}
- 
--		spin_lock_bh(&ipsec->xs->lock);
--		ipsec->xs->xso.real_dev = NULL;
-+		spin_lock_bh(&xs->lock);
-+		xs->xso.real_dev = NULL;
- 		/* Don't double delete states killed by the user. */
--		if (ipsec->xs->km.state != XFRM_STATE_DEAD)
-+		if (xs->km.state != XFRM_STATE_DEAD)
- 			real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
--								    ipsec->xs);
--		spin_unlock_bh(&ipsec->xs->lock);
-+								    xs,
-+								    xs->xso.offload_handle);
-+		spin_unlock_bh(&xs->lock);
- 
- 		if (real_dev->xfrmdev_ops->xdo_dev_state_free)
--			real_dev->xfrmdev_ops->xdo_dev_state_free(real_dev,
--								  ipsec->xs);
-+			real_dev->xfrmdev_ops->xdo_dev_state_free(real_dev, xs,
-+								  xs->xso.offload_handle);
- 	}
+-	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+-		struct xfrm_state *xs = ipsec->xs;
+-
+-		if (!xs->xso.real_dev)
+-			continue;
+-
+-		if (!real_dev->xfrmdev_ops ||
+-		    !real_dev->xfrmdev_ops->xdo_dev_state_delete ||
+-		    netif_is_bond_master(real_dev)) {
+-			slave_warn(bond_dev, real_dev,
+-				   "%s: no slave xdo_dev_state_delete\n",
+-				   __func__);
+-			continue;
+-		}
+-
+-		spin_lock_bh(&xs->lock);
+-		xs->xso.real_dev = NULL;
+-		/* Don't double delete states killed by the user. */
+-		if (xs->km.state != XFRM_STATE_DEAD)
+-			real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
+-								    xs,
+-								    xs->xso.offload_handle);
+-		spin_unlock_bh(&xs->lock);
+-
+-		if (real_dev->xfrmdev_ops->xdo_dev_state_free)
+-			real_dev->xfrmdev_ops->xdo_dev_state_free(real_dev, xs,
+-								  xs->xso.offload_handle);
+-	}
++	list_for_each_entry_safe(offload, tmp, &old_slave->ipsec_offloads, list)
++		bond_ipsec_dev_del_sa(offload);
  	mutex_unlock(&bond->ipsec_lock);
  }
  
- static void bond_ipsec_free_sa(struct net_device *bond_dev,
--			       struct xfrm_state *xs)
-+			       struct xfrm_state *xs,
-+			       unsigned long offload_handle)
+@@ -648,33 +641,45 @@ static void bond_ipsec_free_sa(struct net_device *bond_dev,
+ 			       struct xfrm_state *xs,
+ 			       unsigned long offload_handle)
  {
- 	struct net_device *real_dev;
+-	struct net_device *real_dev;
++	struct bonding *bond = netdev_priv(bond_dev);
++	struct bond_ipsec_offload *offload, *tmp;
  	struct bond_ipsec *ipsec;
-@@ -652,7 +666,8 @@ static void bond_ipsec_free_sa(struct net_device *bond_dev,
- 	xs->xso.real_dev = NULL;
- 	if (real_dev->xfrmdev_ops &&
- 	    real_dev->xfrmdev_ops->xdo_dev_state_free)
--		real_dev->xfrmdev_ops->xdo_dev_state_free(real_dev, xs);
-+		real_dev->xfrmdev_ops->xdo_dev_state_free(real_dev, xs,
-+							  offload_handle);
- out:
- 	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
- 		if (ipsec->xs == xs) {
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-index 392723ef14e5..3db034a2db13 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-@@ -6482,9 +6482,11 @@ static const struct tlsdev_ops cxgb4_ktls_ops = {
+-	struct bonding *bond;
  
- static int cxgb4_xfrm_add_state(struct net_device *dev,
- 				struct xfrm_state *x,
-+				unsigned long *offload_handle,
- 				struct netlink_ext_ack *extack)
- {
- 	struct adapter *adap = netdev2adap(dev);
-+	const struct xfrmdev_ops *ops;
- 	int ret;
+-	if (!bond_dev)
+-		return;
++	mutex_lock(&bond->ipsec_lock);
++	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
++		if (ipsec->xs != xs)
++			continue;
  
- 	if (!mutex_trylock(&uld_mutex)) {
-@@ -6495,8 +6497,8 @@ static int cxgb4_xfrm_add_state(struct net_device *dev,
- 	if (ret)
- 		goto out_unlock;
+-	bond = netdev_priv(bond_dev);
++		list_for_each_entry_safe(offload, tmp, &ipsec->offloads,
++					 ipsec_list)
++			bond_ipsec_dev_del_sa(offload);
++
++		list_del(&ipsec->list);
++		kfree(ipsec);
++		break;
++	}
++	mutex_unlock(&bond->ipsec_lock);
++}
++
++static void bond_ipsec_migrate_sa_all(struct bonding *bond,
++				      struct slave *new_active)
++{
++	struct bond_ipsec_offload *offload;
  
--	ret = adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops->xdo_dev_state_add(dev, x,
--									extack);
-+	ops = adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops;
-+	ret = ops->xdo_dev_state_add(dev, x, offload_handle, extack);
+ 	mutex_lock(&bond->ipsec_lock);
+-	if (!xs->xso.real_dev)
+-		goto out;
++	list_for_each_entry(offload, &new_active->ipsec_offloads, list) {
++		struct xfrm_state *xs = offload->ipsec->xs;
  
- out_unlock:
- 	mutex_unlock(&uld_mutex);
-@@ -6504,9 +6506,11 @@ static int cxgb4_xfrm_add_state(struct net_device *dev,
- 	return ret;
- }
+-	real_dev = xs->xso.real_dev;
++		spin_lock_bh(&xs->lock);
++		if (xs->km.state != XFRM_STATE_DEAD) {
++			struct net_device *dev = new_active->dev;
  
--static void cxgb4_xfrm_del_state(struct net_device *dev, struct xfrm_state *x)
-+static void cxgb4_xfrm_del_state(struct net_device *dev, struct xfrm_state *x,
-+				 unsigned long offload_handle)
- {
- 	struct adapter *adap = netdev2adap(dev);
-+	const struct xfrmdev_ops *ops;
- 
- 	if (!mutex_trylock(&uld_mutex)) {
- 		dev_dbg(adap->pdev_dev,
-@@ -6516,15 +6520,18 @@ static void cxgb4_xfrm_del_state(struct net_device *dev, struct xfrm_state *x)
- 	if (chcr_offload_state(adap, CXGB4_XFRMDEV_OPS))
- 		goto out_unlock;
- 
--	adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops->xdo_dev_state_delete(dev, x);
-+	ops = adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops;
-+	ops->xdo_dev_state_delete(dev, x, offload_handle);
- 
- out_unlock:
- 	mutex_unlock(&uld_mutex);
- }
- 
--static void cxgb4_xfrm_free_state(struct net_device *dev, struct xfrm_state *x)
-+static void cxgb4_xfrm_free_state(struct net_device *dev, struct xfrm_state *x,
-+				  unsigned long offload_handle)
- {
- 	struct adapter *adap = netdev2adap(dev);
-+	const struct xfrmdev_ops *ops;
- 
- 	if (!mutex_trylock(&uld_mutex)) {
- 		dev_dbg(adap->pdev_dev,
-@@ -6534,7 +6541,8 @@ static void cxgb4_xfrm_free_state(struct net_device *dev, struct xfrm_state *x)
- 	if (chcr_offload_state(adap, CXGB4_XFRMDEV_OPS))
- 		goto out_unlock;
- 
--	adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops->xdo_dev_state_free(dev, x);
-+	ops = adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops;
-+	ops->xdo_dev_state_free(dev, x, offload_handle);
- 
- out_unlock:
- 	mutex_unlock(&uld_mutex);
-diff --git a/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c b/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
-index 49b57bb5fac1..90a101711a98 100644
---- a/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
-+++ b/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
-@@ -76,11 +76,14 @@ static int ch_ipsec_xmit(struct sk_buff *skb, struct net_device *dev);
- static void *ch_ipsec_uld_add(const struct cxgb4_lld_info *infop);
- static void ch_ipsec_advance_esn_state(struct xfrm_state *x);
- static void ch_ipsec_xfrm_free_state(struct net_device *dev,
--				     struct xfrm_state *x);
-+				     struct xfrm_state *x,
-+				     unsigned long offload_handle);
- static void ch_ipsec_xfrm_del_state(struct net_device *dev,
--				    struct xfrm_state *x);
-+				    struct xfrm_state *x,
-+				    unsigned long offload_handle);
- static int ch_ipsec_xfrm_add_state(struct net_device *dev,
- 				   struct xfrm_state *x,
-+				   unsigned long *offload_handle,
- 				   struct netlink_ext_ack *extack);
- 
- static const struct xfrmdev_ops ch_ipsec_xfrmdev_ops = {
-@@ -228,6 +231,7 @@ static int ch_ipsec_setkey(struct xfrm_state *x,
-  */
- static int ch_ipsec_xfrm_add_state(struct net_device *dev,
- 				   struct xfrm_state *x,
-+				   unsigned long *offload_handle,
- 				   struct netlink_ext_ack *extack)
- {
- 	struct ipsec_sa_entry *sa_entry;
-@@ -306,29 +310,28 @@ static int ch_ipsec_xfrm_add_state(struct net_device *dev,
- 	if (x->props.flags & XFRM_STATE_ESN)
- 		sa_entry->esn = 1;
- 	ch_ipsec_setkey(x, sa_entry);
--	x->xso.offload_handle = (unsigned long)sa_entry;
-+	*offload_handle = (unsigned long)sa_entry;
- out:
- 	return res;
- }
- 
- static void ch_ipsec_xfrm_del_state(struct net_device *dev,
--				    struct xfrm_state *x)
-+				    struct xfrm_state *x,
-+				    unsigned long offload_handle)
- {
- 	/* do nothing */
--	if (!x->xso.offload_handle)
-+	if (!offload_handle)
- 		return;
- }
- 
- static void ch_ipsec_xfrm_free_state(struct net_device *dev,
--				     struct xfrm_state *x)
-+				     struct xfrm_state *x,
-+				     unsigned long offload_handle)
- {
--	struct ipsec_sa_entry *sa_entry;
--
--	if (!x->xso.offload_handle)
-+	if (!offload_handle)
- 		return;
- 
--	sa_entry = (struct ipsec_sa_entry *)x->xso.offload_handle;
--	kfree(sa_entry);
-+	kfree((struct ipsec_sa_entry *)offload_handle);
- 	module_put(THIS_MODULE);
- }
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c
-index d1f4073b36f9..385413206887 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c
-@@ -9,7 +9,8 @@
- #define IXGBE_IPSEC_KEY_BITS  160
- static const char aes_gcm_name[] = "rfc4106(gcm(aes))";
- 
--static void ixgbe_ipsec_del_sa(struct net_device *dev, struct xfrm_state *xs);
-+static void ixgbe_ipsec_del_sa(struct net_device *dev, struct xfrm_state *xs,
-+			       unsigned long offload_handle);
- 
- /**
-  * ixgbe_ipsec_set_tx_sa - set the Tx SA registers
-@@ -321,7 +322,8 @@ void ixgbe_ipsec_restore(struct ixgbe_adapter *adapter)
- 
- 		if (r->used) {
- 			if (r->mode & IXGBE_RXTXMOD_VF)
--				ixgbe_ipsec_del_sa(adapter->netdev, r->xs);
-+				ixgbe_ipsec_del_sa(adapter->netdev, r->xs,
-+						   r->xs->xso.offload_handle);
- 			else
- 				ixgbe_ipsec_set_rx_sa(hw, i, r->xs->id.spi,
- 						      r->key, r->salt,
-@@ -330,7 +332,8 @@ void ixgbe_ipsec_restore(struct ixgbe_adapter *adapter)
- 
- 		if (t->used) {
- 			if (t->mode & IXGBE_RXTXMOD_VF)
--				ixgbe_ipsec_del_sa(adapter->netdev, t->xs);
-+				ixgbe_ipsec_del_sa(adapter->netdev, t->xs,
-+						   t->xs->xso.offload_handle);
- 			else
- 				ixgbe_ipsec_set_tx_sa(hw, i, t->key, t->salt);
+-	xs->xso.real_dev = NULL;
+-	if (real_dev->xfrmdev_ops &&
+-	    real_dev->xfrmdev_ops->xdo_dev_state_free)
+-		real_dev->xfrmdev_ops->xdo_dev_state_free(real_dev, xs,
+-							  offload_handle);
+-out:
+-	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+-		if (ipsec->xs == xs) {
+-			list_del(&ipsec->list);
+-			kfree(ipsec);
+-			break;
++			xs->xso.real_dev = dev;
++			xs->xso.offload_handle = offload->handle;
++			if (dev->xfrmdev_ops->xdo_dev_state_advance_esn)
++				dev->xfrmdev_ops->xdo_dev_state_advance_esn(xs);
  		}
-@@ -560,10 +563,12 @@ static int ixgbe_ipsec_check_mgmt_ip(struct net_device *dev,
-  * ixgbe_ipsec_add_sa - program device with a security association
-  * @dev: pointer to device to program
-  * @xs: pointer to transformer state struct
-+ * @offload_handle: pointer to resulting offload handle
-  * @extack: extack point to fill failure reason
-  **/
- static int ixgbe_ipsec_add_sa(struct net_device *dev,
- 			      struct xfrm_state *xs,
-+			      unsigned long *offload_handle,
- 			      struct netlink_ext_ack *extack)
- {
- 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(dev);
-@@ -698,7 +703,7 @@ static int ixgbe_ipsec_add_sa(struct net_device *dev,
- 
- 		ixgbe_ipsec_set_rx_sa(hw, sa_idx, rsa.xs->id.spi, rsa.key,
- 				      rsa.salt, rsa.mode, rsa.iptbl_ind);
--		xs->xso.offload_handle = sa_idx + IXGBE_IPSEC_BASE_RX_INDEX;
-+		*offload_handle = sa_idx + IXGBE_IPSEC_BASE_RX_INDEX;
- 
- 		ipsec->num_rx_sa++;
- 
-@@ -739,7 +744,7 @@ static int ixgbe_ipsec_add_sa(struct net_device *dev,
- 
- 		ixgbe_ipsec_set_tx_sa(hw, sa_idx, tsa.key, tsa.salt);
- 
--		xs->xso.offload_handle = sa_idx + IXGBE_IPSEC_BASE_TX_INDEX;
-+		*offload_handle = sa_idx + IXGBE_IPSEC_BASE_TX_INDEX;
- 
- 		ipsec->num_tx_sa++;
++		spin_unlock_bh(&xs->lock);
  	}
-@@ -757,8 +762,10 @@ static int ixgbe_ipsec_add_sa(struct net_device *dev,
-  * ixgbe_ipsec_del_sa - clear out this specific SA
-  * @dev: pointer to device to program
-  * @xs: pointer to transformer state struct
-+ * @offload_handle: offload handle to delete
-  **/
--static void ixgbe_ipsec_del_sa(struct net_device *dev, struct xfrm_state *xs)
-+static void ixgbe_ipsec_del_sa(struct net_device *dev, struct xfrm_state *xs,
-+			       unsigned long offload_handle)
- {
- 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(dev);
- 	struct ixgbe_ipsec *ipsec = adapter->ipsec;
-@@ -770,12 +777,12 @@ static void ixgbe_ipsec_del_sa(struct net_device *dev, struct xfrm_state *xs)
- 		struct rx_sa *rsa;
- 		u8 ipi;
+ 	mutex_unlock(&bond->ipsec_lock);
+ }
+@@ -1236,10 +1241,6 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
+ 	if (old_active == new_active)
+ 		return;
  
--		sa_idx = xs->xso.offload_handle - IXGBE_IPSEC_BASE_RX_INDEX;
-+		sa_idx = offload_handle - IXGBE_IPSEC_BASE_RX_INDEX;
- 		rsa = &ipsec->rx_tbl[sa_idx];
+-#ifdef CONFIG_XFRM_OFFLOAD
+-	bond_ipsec_del_sa_all(bond);
+-#endif /* CONFIG_XFRM_OFFLOAD */
+-
+ 	if (new_active) {
+ 		new_active->last_link_up = jiffies;
  
- 		if (!rsa->used) {
- 			netdev_err(dev, "Invalid Rx SA selected sa_idx=%d offload_handle=%lu\n",
--				   sa_idx, xs->xso.offload_handle);
-+				   sa_idx, offload_handle);
- 			return;
+@@ -1267,6 +1268,11 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
+ 	if (bond_uses_primary(bond))
+ 		bond_hw_addr_swap(bond, new_active, old_active);
+ 
++#ifdef CONFIG_XFRM_OFFLOAD
++	if (new_active)
++		bond_ipsec_migrate_sa_all(bond, new_active);
++#endif /* CONFIG_XFRM_OFFLOAD */
++
+ 	if (bond_is_lb(bond)) {
+ 		bond_alb_handle_active_change(bond, new_active);
+ 		if (old_active)
+@@ -1311,10 +1317,6 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
  		}
+ 	}
  
-@@ -800,11 +807,11 @@ static void ixgbe_ipsec_del_sa(struct net_device *dev, struct xfrm_state *xs)
- 		memset(rsa, 0, sizeof(struct rx_sa));
- 		ipsec->num_rx_sa--;
- 	} else {
--		sa_idx = xs->xso.offload_handle - IXGBE_IPSEC_BASE_TX_INDEX;
-+		sa_idx = offload_handle - IXGBE_IPSEC_BASE_TX_INDEX;
+-#ifdef CONFIG_XFRM_OFFLOAD
+-	bond_ipsec_add_sa_all(bond);
+-#endif /* CONFIG_XFRM_OFFLOAD */
+-
+ 	/* resend IGMP joins since active slave has changed or
+ 	 * all were sent on curr_active_slave.
+ 	 * resend only if bond is brought up with the affected
+@@ -2241,6 +2243,10 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+ 		goto err_detach;
+ 	}
  
- 		if (!ipsec->tx_tbl[sa_idx].used) {
- 			netdev_err(dev, "Invalid Tx SA selected sa_idx=%d offload_handle=%lu\n",
--				   sa_idx, xs->xso.offload_handle);
-+				   sa_idx, offload_handle);
- 			return;
- 		}
++#ifdef CONFIG_XFRM_OFFLOAD
++	bond_ipsec_add_sa_all(bond, new_slave, extack);
++#endif
++
+ 	res = bond_master_upper_dev_link(bond, new_slave, extack);
+ 	if (res) {
+ 		slave_dbg(bond_dev, slave_dev, "Error %d calling bond_master_upper_dev_link\n", res);
+@@ -2530,6 +2536,10 @@ static int __bond_release_one(struct net_device *bond_dev,
+ 		bond_select_active_slave(bond);
+ 	}
  
-@@ -833,6 +840,7 @@ static const struct xfrmdev_ops ixgbe_xfrmdev_ops = {
- void ixgbe_ipsec_vf_clear(struct ixgbe_adapter *adapter, u32 vf)
- {
- 	struct ixgbe_ipsec *ipsec = adapter->ipsec;
++#ifdef CONFIG_XFRM_OFFLOAD
++	bond_ipsec_del_sa_all(bond, slave);
++#endif
++
+ 	bond_set_carrier(bond);
+ 	if (!bond_has_slaves(bond))
+ 		eth_hw_addr_random(bond_dev);
+@@ -3931,6 +3941,7 @@ static int bond_master_netdev_event(unsigned long event,
+ #ifdef CONFIG_XFRM_OFFLOAD
+ 		xfrm_dev_state_flush(dev_net(bond_dev), bond_dev, true);
+ #endif /* CONFIG_XFRM_OFFLOAD */
++
+ 		break;
+ 	case NETDEV_REGISTER:
+ 		bond_create_proc_entry(event_bond);
+diff --git a/include/net/bonding.h b/include/net/bonding.h
+index 49edc7da0586..deb8904adb25 100644
+--- a/include/net/bonding.h
++++ b/include/net/bonding.h
+@@ -156,6 +156,20 @@ struct bond_params {
+ 	u8 ad_actor_system[ETH_ALEN + 2];
+ };
+ 
++struct bond_ipsec {
 +	struct xfrm_state *xs;
- 	int i;
++	struct list_head list;  /* Entry in bond_dev->ipsec_list. */
++	struct list_head offloads;  /* Offloads of xs on slave devs. */
++};
++
++struct bond_ipsec_offload {
++	struct bond_ipsec *ipsec;
++	struct list_head list;  /* Entry in slave->ipsec_offloads. */
++	struct list_head ipsec_list;  /* Entry in parent bond_ipsec. */
++	struct net_device *dev;
++	unsigned long handle;
++};
++
+ struct slave {
+ 	struct net_device *dev; /* first - useful for panic debug */
+ 	struct bonding *bond; /* our master */
+@@ -188,6 +202,9 @@ struct slave {
+ 	struct delayed_work notify_work;
+ 	struct kobject kobj;
+ 	struct rtnl_link_stats64 slave_stats;
++#ifdef CONFIG_XFRM_OFFLOAD
++	struct list_head ipsec_offloads;
++#endif
+ };
  
- 	if (!ipsec)
-@@ -843,9 +851,11 @@ void ixgbe_ipsec_vf_clear(struct ixgbe_adapter *adapter, u32 vf)
- 		if (!ipsec->rx_tbl[i].used)
- 			continue;
- 		if (ipsec->rx_tbl[i].mode & IXGBE_RXTXMOD_VF &&
--		    ipsec->rx_tbl[i].vf == vf)
-+		    ipsec->rx_tbl[i].vf == vf) {
-+			xs = ipsec->rx_tbl[i].xs;
- 			ixgbe_ipsec_del_sa(adapter->netdev,
--					   ipsec->rx_tbl[i].xs);
-+					   xs, xs->xso.offload_handle);
-+		}
- 	}
+ static inline struct slave *to_slave(struct kobject *kobj)
+@@ -206,11 +223,6 @@ struct bond_up_slave {
+  */
+ #define BOND_LINK_NOCHANGE -1
  
- 	/* search tx sa table */
-@@ -853,9 +863,11 @@ void ixgbe_ipsec_vf_clear(struct ixgbe_adapter *adapter, u32 vf)
- 		if (!ipsec->tx_tbl[i].used)
- 			continue;
- 		if (ipsec->tx_tbl[i].mode & IXGBE_RXTXMOD_VF &&
--		    ipsec->tx_tbl[i].vf == vf)
--			ixgbe_ipsec_del_sa(adapter->netdev,
--					   ipsec->tx_tbl[i].xs);
-+		    ipsec->tx_tbl[i].vf == vf) {
-+			xs = ipsec->tx_tbl[i].xs;
-+			ixgbe_ipsec_del_sa(adapter->netdev, xs,
-+					   xs->xso.offload_handle);
-+		}
- 	}
- }
- 
-@@ -935,7 +947,8 @@ int ixgbe_ipsec_vf_add_sa(struct ixgbe_adapter *adapter, u32 *msgbuf, u32 vf)
- 	memcpy(xs->aead->alg_name, aes_gcm_name, sizeof(aes_gcm_name));
- 
- 	/* set up the HW offload */
--	err = ixgbe_ipsec_add_sa(adapter->netdev, xs, NULL);
-+	err = ixgbe_ipsec_add_sa(adapter->netdev, xs, &xs->xso.offload_handle,
-+				 NULL);
- 	if (err)
- 		goto err_aead;
- 
-@@ -1039,7 +1052,7 @@ int ixgbe_ipsec_vf_del_sa(struct ixgbe_adapter *adapter, u32 *msgbuf, u32 vf)
- 		xs = ipsec->tx_tbl[sa_idx].xs;
- 	}
- 
--	ixgbe_ipsec_del_sa(adapter->netdev, xs);
-+	ixgbe_ipsec_del_sa(adapter->netdev, xs, xs->xso.offload_handle);
- 
- 	/* remove the xs that was made-up in the add request */
- 	kfree_sensitive(xs);
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ipsec.c b/drivers/net/ethernet/intel/ixgbevf/ipsec.c
-index fce35924ff8b..6d5585f51991 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ipsec.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ipsec.c
-@@ -259,10 +259,12 @@ static int ixgbevf_ipsec_parse_proto_keys(struct net_device *dev,
-  * ixgbevf_ipsec_add_sa - program device with a security association
-  * @dev: pointer to net device to program
-  * @xs: pointer to transformer state struct
-+ * @offload_handle: pointer to resulting offload_handle
-  * @extack: extack point to fill failure reason
-  **/
- static int ixgbevf_ipsec_add_sa(struct net_device *dev,
- 				struct xfrm_state *xs,
-+				unsigned long *offload_handle,
- 				struct netlink_ext_ack *extack)
- {
- 	struct ixgbevf_adapter *adapter;
-@@ -344,7 +346,7 @@ static int ixgbevf_ipsec_add_sa(struct net_device *dev,
- 		/* the preparations worked, so save the info */
- 		memcpy(&ipsec->rx_tbl[sa_idx], &rsa, sizeof(rsa));
- 
--		xs->xso.offload_handle = sa_idx + IXGBE_IPSEC_BASE_RX_INDEX;
-+		*offload_handle = sa_idx + IXGBE_IPSEC_BASE_RX_INDEX;
- 
- 		ipsec->num_rx_sa++;
- 
-@@ -385,7 +387,7 @@ static int ixgbevf_ipsec_add_sa(struct net_device *dev,
- 		/* the preparations worked, so save the info */
- 		memcpy(&ipsec->tx_tbl[sa_idx], &tsa, sizeof(tsa));
- 
--		xs->xso.offload_handle = sa_idx + IXGBE_IPSEC_BASE_TX_INDEX;
-+		*offload_handle = sa_idx + IXGBE_IPSEC_BASE_TX_INDEX;
- 
- 		ipsec->num_tx_sa++;
- 	}
-@@ -397,9 +399,11 @@ static int ixgbevf_ipsec_add_sa(struct net_device *dev,
-  * ixgbevf_ipsec_del_sa - clear out this specific SA
-  * @dev: pointer to net device to program
-  * @xs: pointer to transformer state struct
-+ * @offload_handle: offload handle to remove
-  **/
- static void ixgbevf_ipsec_del_sa(struct net_device *dev,
--				 struct xfrm_state *xs)
-+				 struct xfrm_state *xs,
-+				 unsigned long offload_handle)
- {
- 	struct ixgbevf_adapter *adapter;
- 	struct ixgbevf_ipsec *ipsec;
-@@ -412,11 +416,11 @@ static void ixgbevf_ipsec_del_sa(struct net_device *dev,
- 		return;
- 
- 	if (xs->xso.dir == XFRM_DEV_OFFLOAD_IN) {
--		sa_idx = xs->xso.offload_handle - IXGBE_IPSEC_BASE_RX_INDEX;
-+		sa_idx = offload_handle - IXGBE_IPSEC_BASE_RX_INDEX;
- 
- 		if (!ipsec->rx_tbl[sa_idx].used) {
- 			netdev_err(dev, "Invalid Rx SA selected sa_idx=%d offload_handle=%lu\n",
--				   sa_idx, xs->xso.offload_handle);
-+				   sa_idx, offload_handle);
- 			return;
- 		}
- 
-@@ -425,11 +429,11 @@ static void ixgbevf_ipsec_del_sa(struct net_device *dev,
- 		memset(&ipsec->rx_tbl[sa_idx], 0, sizeof(struct rx_sa));
- 		ipsec->num_rx_sa--;
- 	} else {
--		sa_idx = xs->xso.offload_handle - IXGBE_IPSEC_BASE_TX_INDEX;
-+		sa_idx = offload_handle - IXGBE_IPSEC_BASE_TX_INDEX;
- 
- 		if (!ipsec->tx_tbl[sa_idx].used) {
- 			netdev_err(dev, "Invalid Tx SA selected sa_idx=%d offload_handle=%lu\n",
--				   sa_idx, xs->xso.offload_handle);
-+				   sa_idx, offload_handle);
- 			return;
- 		}
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-index 77543d472345..8f65106e5f20 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-@@ -665,6 +665,7 @@ static int cn10k_ipsec_inb_add_state(struct xfrm_state *x,
- 
- static int cn10k_ipsec_outb_add_state(struct net_device *dev,
- 				      struct xfrm_state *x,
-+				      unsigned long *offload_handle,
- 				      struct netlink_ext_ack *extack)
- {
- 	struct cn10k_tx_sa_s *sa_entry;
-@@ -692,7 +693,7 @@ static int cn10k_ipsec_outb_add_state(struct net_device *dev,
- 		return err;
- 	}
- 
--	x->xso.offload_handle = (unsigned long)sa_info;
-+	*offload_handle = (unsigned long)sa_info;
- 	/* Enable static branch when first SA setup */
- 	if (!pf->ipsec.outb_sa_count)
- 		static_branch_enable(&cn10k_ipsec_sa_enabled);
-@@ -702,15 +703,18 @@ static int cn10k_ipsec_outb_add_state(struct net_device *dev,
- 
- static int cn10k_ipsec_add_state(struct net_device *dev,
- 				 struct xfrm_state *x,
-+				 unsigned long *offload_handle,
- 				 struct netlink_ext_ack *extack)
- {
- 	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
- 		return cn10k_ipsec_inb_add_state(x, extack);
- 	else
--		return cn10k_ipsec_outb_add_state(dev, x, extack);
-+		return cn10k_ipsec_outb_add_state(dev, x, offload_handle,
-+						  extack);
- }
- 
--static void cn10k_ipsec_del_state(struct net_device *dev, struct xfrm_state *x)
-+static void cn10k_ipsec_del_state(struct net_device *dev, struct xfrm_state *x,
-+				  unsigned long offload_handle)
- {
- 	struct cn10k_tx_sa_s *sa_entry;
- 	struct qmem *sa_info;
-@@ -722,7 +726,7 @@ static void cn10k_ipsec_del_state(struct net_device *dev, struct xfrm_state *x)
- 
- 	pf = netdev_priv(dev);
- 
--	sa_info = (struct qmem *)x->xso.offload_handle;
-+	sa_info = (struct qmem *)offload_handle;
- 	sa_entry = (struct cn10k_tx_sa_s *)sa_info->base;
- 	memset(sa_entry, 0, sizeof(struct cn10k_tx_sa_s));
- 	/* Disable SA in CPT h/w */
-@@ -734,7 +738,6 @@ static void cn10k_ipsec_del_state(struct net_device *dev, struct xfrm_state *x)
- 	if (err)
- 		netdev_err(dev, "Error (%d) deleting SA\n", err);
- 
--	x->xso.offload_handle = 0;
- 	qmem_free(pf->dev, sa_info);
- 
- 	/* If no more SA's then update netdev feature for potential change
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-index 801527947c23..a83403b1101b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-@@ -47,11 +47,6 @@
- #define MLX5_IPSEC_RESCHED msecs_to_jiffies(1000)
- #define MLX5E_IPSEC_TUNNEL_SA XA_MARK_1
- 
--static struct mlx5e_ipsec_sa_entry *to_ipsec_sa_entry(struct xfrm_state *x)
--{
--	return (struct mlx5e_ipsec_sa_entry *)x->xso.offload_handle;
--}
+-struct bond_ipsec {
+-	struct list_head list;
+-	struct xfrm_state *xs;
+-};
 -
- static struct mlx5e_ipsec_pol_entry *to_ipsec_pol_entry(struct xfrm_policy *x)
- {
- 	return (struct mlx5e_ipsec_pol_entry *)x->xdo.offload_handle;
-@@ -767,6 +762,7 @@ static int mlx5e_ipsec_create_dwork(struct mlx5e_ipsec_sa_entry *sa_entry)
- 
- static int mlx5e_xfrm_add_state(struct net_device *dev,
- 				struct xfrm_state *x,
-+				unsigned long *offload_handle,
- 				struct netlink_ext_ack *extack)
- {
- 	struct mlx5e_ipsec_sa_entry *sa_entry = NULL;
-@@ -868,7 +864,7 @@ static int mlx5e_xfrm_add_state(struct net_device *dev,
- 	}
- 
- out:
--	x->xso.offload_handle = (unsigned long)sa_entry;
-+	*offload_handle = (unsigned long)sa_entry;
- 	if (allow_tunnel_mode)
- 		mlx5_eswitch_unblock_encap(priv->mdev);
- 
-@@ -899,9 +895,11 @@ static int mlx5e_xfrm_add_state(struct net_device *dev,
- 	return err;
- }
- 
--static void mlx5e_xfrm_del_state(struct net_device *dev, struct xfrm_state *x)
-+static void mlx5e_xfrm_del_state(struct net_device *dev, struct xfrm_state *x,
-+				 unsigned long offload_handle)
- {
--	struct mlx5e_ipsec_sa_entry *sa_entry = to_ipsec_sa_entry(x);
-+	struct mlx5e_ipsec_sa_entry *sa_entry =
-+		(struct mlx5e_ipsec_sa_entry *)offload_handle;
- 	struct mlx5e_ipsec *ipsec = sa_entry->ipsec;
- 	struct mlx5e_ipsec_sa_entry *old;
- 
-@@ -912,9 +910,11 @@ static void mlx5e_xfrm_del_state(struct net_device *dev, struct xfrm_state *x)
- 	WARN_ON(old != sa_entry);
- }
- 
--static void mlx5e_xfrm_free_state(struct net_device *dev, struct xfrm_state *x)
-+static void mlx5e_xfrm_free_state(struct net_device *dev, struct xfrm_state *x,
-+				  unsigned long offload_handle)
- {
--	struct mlx5e_ipsec_sa_entry *sa_entry = to_ipsec_sa_entry(x);
-+	struct mlx5e_ipsec_sa_entry *sa_entry =
-+		(struct mlx5e_ipsec_sa_entry *)offload_handle;
- 	struct mlx5e_ipsec *ipsec = sa_entry->ipsec;
- 
- 	if (x->xso.flags & XFRM_DEV_OFFLOAD_FLAG_ACQ)
-@@ -1054,7 +1054,8 @@ void mlx5e_ipsec_cleanup(struct mlx5e_priv *priv)
- 
- static void mlx5e_xfrm_advance_esn_state(struct xfrm_state *x)
- {
--	struct mlx5e_ipsec_sa_entry *sa_entry = to_ipsec_sa_entry(x);
-+	struct mlx5e_ipsec_sa_entry *sa_entry =
-+		(struct mlx5e_ipsec_sa_entry *)x->xso.offload_handle;
- 	struct mlx5e_ipsec_work *work = sa_entry->work;
- 	bool need_update;
- 
-@@ -1068,7 +1069,8 @@ static void mlx5e_xfrm_advance_esn_state(struct xfrm_state *x)
- 
- static void mlx5e_xfrm_update_stats(struct xfrm_state *x)
- {
--	struct mlx5e_ipsec_sa_entry *sa_entry = to_ipsec_sa_entry(x);
-+	struct mlx5e_ipsec_sa_entry *sa_entry =
-+		(struct mlx5e_ipsec_sa_entry *)x->xso.offload_handle;
- 	struct mlx5e_ipsec_rule *ipsec_rule = &sa_entry->ipsec_rule;
- 	struct net *net = dev_net(x->xso.dev);
- 	u64 trailer_packets = 0, trailer_bytes = 0;
-diff --git a/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c b/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c
-index 9e7c285eaa6b..c259c40bc867 100644
---- a/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c
-+++ b/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c
-@@ -268,6 +268,7 @@ static void set_sha2_512hmac(struct nfp_ipsec_cfg_add_sa *cfg, int *trunc_len)
- 
- static int nfp_net_xfrm_add_state(struct net_device *dev,
- 				  struct xfrm_state *x,
-+				  unsigned long *offload_handle,
- 				  struct netlink_ext_ack *extack)
- {
- 	struct nfp_ipsec_cfg_mssg msg = {};
-@@ -542,15 +543,16 @@ static int nfp_net_xfrm_add_state(struct net_device *dev,
- 	}
- 
- 	/* 0 is invalid offload_handle for kernel */
--	x->xso.offload_handle = saidx + 1;
-+	*offload_handle = saidx + 1;
- 	return 0;
- }
- 
--static void nfp_net_xfrm_del_state(struct net_device *dev, struct xfrm_state *x)
-+static void nfp_net_xfrm_del_state(struct net_device *dev, struct xfrm_state *x,
-+				   unsigned long offload_handle)
- {
- 	struct nfp_ipsec_cfg_mssg msg = {
- 		.cmd = NFP_IPSEC_CFG_MSSG_INV_SA,
--		.sa_idx = x->xso.offload_handle - 1,
-+		.sa_idx = offload_handle - 1,
- 	};
- 	struct nfp_net *nn;
- 	int err;
-@@ -561,7 +563,7 @@ static void nfp_net_xfrm_del_state(struct net_device *dev, struct xfrm_state *x)
- 	if (err)
- 		nn_warn(nn, "Failed to invalidate SA in hardware\n");
- 
--	xa_erase(&nn->xa_ipsec, x->xso.offload_handle - 1);
-+	xa_erase(&nn->xa_ipsec, offload_handle - 1);
- }
- 
- static const struct xfrmdev_ops nfp_net_ipsec_xfrmdev_ops = {
-diff --git a/drivers/net/netdevsim/ipsec.c b/drivers/net/netdevsim/ipsec.c
-index 47cdee5577d4..146dec01d0e8 100644
---- a/drivers/net/netdevsim/ipsec.c
-+++ b/drivers/net/netdevsim/ipsec.c
-@@ -131,6 +131,7 @@ static int nsim_ipsec_parse_proto_keys(struct net_device *dev,
- 
- static int nsim_ipsec_add_sa(struct net_device *dev,
- 			     struct xfrm_state *xs,
-+			     unsigned long *offload_handle,
- 			     struct netlink_ext_ack *extack)
- {
- 	struct nsim_ipsec *ipsec;
-@@ -193,19 +194,20 @@ static int nsim_ipsec_add_sa(struct net_device *dev,
- 	/* the XFRM stack doesn't like offload_handle == 0,
- 	 * so add a bitflag in case our array index is 0
- 	 */
--	xs->xso.offload_handle = sa_idx | NSIM_IPSEC_VALID;
-+	*offload_handle = sa_idx | NSIM_IPSEC_VALID;
- 	ipsec->count++;
- 
- 	return 0;
- }
- 
--static void nsim_ipsec_del_sa(struct net_device *dev, struct xfrm_state *xs)
-+static void nsim_ipsec_del_sa(struct net_device *dev, struct xfrm_state *xs,
-+			      unsigned long offload_handle)
- {
- 	struct netdevsim *ns = netdev_priv(dev);
- 	struct nsim_ipsec *ipsec = &ns->ipsec;
- 	u16 sa_idx;
- 
--	sa_idx = xs->xso.offload_handle & ~NSIM_IPSEC_VALID;
-+	sa_idx = offload_handle & ~NSIM_IPSEC_VALID;
- 	if (!ipsec->sa[sa_idx].used) {
- 		netdev_err(ns->netdev, "Invalid SA for delete sa_idx=%d\n",
- 			   sa_idx);
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index d1a687444b27..46045acc9a44 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1018,11 +1018,14 @@ struct netdev_bpf {
- struct xfrmdev_ops {
- 	int	(*xdo_dev_state_add)(struct net_device *dev,
- 				     struct xfrm_state *x,
-+				     unsigned long *offload_handle,
- 				     struct netlink_ext_ack *extack);
- 	void	(*xdo_dev_state_delete)(struct net_device *dev,
--					struct xfrm_state *x);
-+					struct xfrm_state *x,
-+					unsigned long offload_handle);
- 	void	(*xdo_dev_state_free)(struct net_device *dev,
--				      struct xfrm_state *x);
-+				      struct xfrm_state *x,
-+				      unsigned long offload_handle);
- 	bool	(*xdo_dev_offload_ok) (struct sk_buff *skb,
- 				       struct xfrm_state *x);
- 	void	(*xdo_dev_state_advance_esn) (struct xfrm_state *x);
-diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 44b9de6e4e77..5c60ca36e586 100644
---- a/net/xfrm/xfrm_device.c
-+++ b/net/xfrm/xfrm_device.c
-@@ -325,7 +325,8 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
- 	else
- 		xso->type = XFRM_DEV_OFFLOAD_CRYPTO;
- 
--	err = dev->xfrmdev_ops->xdo_dev_state_add(dev, x, extack);
-+	err = dev->xfrmdev_ops->xdo_dev_state_add(dev, x, &xso->offload_handle,
-+						  extack);
- 	if (err) {
- 		xso->dev = NULL;
- 		xso->dir = 0;
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index d213ca3653a8..56bf824ec7a1 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -767,7 +767,8 @@ void xfrm_dev_state_delete(struct xfrm_state *x)
- 	struct net_device *dev = READ_ONCE(xso->dev);
- 
- 	if (dev) {
--		dev->xfrmdev_ops->xdo_dev_state_delete(dev, x);
-+		dev->xfrmdev_ops->xdo_dev_state_delete(dev, x,
-+						       xso->offload_handle);
- 		spin_lock_bh(&xfrm_state_dev_gc_lock);
- 		hlist_add_head(&x->dev_gclist, &xfrm_state_dev_gc_list);
- 		spin_unlock_bh(&xfrm_state_dev_gc_lock);
-@@ -787,7 +788,8 @@ void xfrm_dev_state_free(struct xfrm_state *x)
- 		spin_unlock_bh(&xfrm_state_dev_gc_lock);
- 
- 		if (dev->xfrmdev_ops->xdo_dev_state_free)
--			dev->xfrmdev_ops->xdo_dev_state_free(dev, x);
-+			dev->xfrmdev_ops->xdo_dev_state_free(dev, x,
-+							     xso->offload_handle);
- 		WRITE_ONCE(xso->dev, NULL);
- 		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
- 		netdev_put(dev, &xso->dev_tracker);
-@@ -1542,6 +1544,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 			xso->flags = XFRM_DEV_OFFLOAD_FLAG_ACQ;
- 			netdev_hold(dev, &xso->dev_tracker, GFP_ATOMIC);
- 			error = dev->xfrmdev_ops->xdo_dev_state_add(dev, x,
-+								    &xso->offload_handle,
- 								    NULL);
- 			if (error) {
- 				xso->dir = 0;
+ /*
+  * Here are the locking policies for the two bonding locks:
+  * Get rcu_read_lock when reading or RTNL when writing slave list.
 -- 
 2.45.0
 
