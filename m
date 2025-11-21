@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-240755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9350DC79107
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 13:51:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37F06C7911C
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 13:52:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4A8034EC4BD
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:49:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B42A14ED46B
+	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 12:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2283246FD;
-	Fri, 21 Nov 2025 12:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E193148BF;
+	Fri, 21 Nov 2025 12:49:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SuSyy081"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lu9wWn16"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D93A2F5A13
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FF133971F
+	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 12:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763729363; cv=none; b=aIpbHy/AcanBo40lj9N0zdCMwpXkW8RkoIz9rd+U89+t0F8VufohI9z/WeVxyBUpjXMHxN3DBixQszmbOyx8zKlDaBTiun4yyP8qxqDFEIrtkMGlbS4Fe8CwJCSg9To1bQCDRvxo/fi/h1FNUBwt7gFz5ohcMa/NsT3tnJ/nbeA=
+	t=1763729370; cv=none; b=lwWnZzJQ/KczOOaM40rbsI8HHyVp9DVitGhbQYv1Op7jPbEbX3l00lUSmb+xBnl92vkTYJq2zZJfpjerWiOhDQPAijqKm41DDeZHE897dgt5Q2gaPzl3jLj4nsphbc0LMCM82wJU7NbBeiclIN+EHAA7+vUQBOsCwSkSTl2EKEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763729363; c=relaxed/simple;
-	bh=xTW7lVbfJsgnlziO9m7HRTBaTgvYhjTEK5XGbQnoB3Q=;
+	s=arc-20240116; t=1763729370; c=relaxed/simple;
+	bh=943o/E3WhvuTJbGcZYEZLtSogyGbkwqMFYHMQzSvjCQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=C+jZG+EoLBZ+HfjbMGdA9rj9nfM4oUeB5iepw0vbVk4iL0jW0ZWoGSnKrvvXTVSc5nTipzoIFNz+XhrkRwtrhzNjWQLgAPCssTm+O/gxqXa8Zuf1Hsuks9StnHANhkgJdD5YTh9OOARQwoifebre8gqtERjM8SI0niWoFkyClD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SuSyy081; arc=none smtp.client-ip=209.85.214.173
+	 In-Reply-To:To:Cc; b=Wqh00lhufF3eDnpOU+A2M3PAOPWVN2W/sI1sVgMvITmTHXA6kOamPbRZB+Sd5Q0+ehGIlVFadXj/cBsaffQbcpmi+4iP8gQrttvMM8S4gEDgr4vuc7MTCm0oYlD/4ZGwJqBOMvtanFA/I5uhX1QDZ5WBdOxymDvUcfKhDry2Rqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lu9wWn16; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2984dfae0acso30745215ad.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 04:49:21 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2958db8ae4fso20131715ad.2
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 04:49:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763729361; x=1764334161; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763729367; x=1764334167; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uKBmUb8EWfQ3VixqXwZwtOjhnNqHJe7y4QanLPyxD5w=;
-        b=SuSyy081RDHOKYo9u3icd9+cCB4iEvbdDcMvZGeOEWRBNJ0FL/GOaViCx4/AJOQrzX
-         VQvcdps3MO7lw53crA0CudtCHlZ1f8r0CrVc4IGKfmwsmooZJzZ7PYSPF8ErlvRTR5rC
-         xN6DEO2mC9DIod9kN9zpI+HJQbCQbQ/RqWdMbRwjXimF7a9scy4pvu/zTesFhlOMHYNq
-         zilws2IYLnlBnA7A3KjO9vGciegwen1mYv9Q0wBnuuMQGAGpIi1w8U3orHrJEqJabUF7
-         GNC3t3exv9EtL1WaiLp698RTCYIZIjIMPJDr0M1ta9HfKi+SbEzPzcBzmM/ctSXJpYOC
-         p6pA==
+        bh=XOi063mzQTa4JvkotZ6ma8LlWFlm5oJE+mks/V5WdV8=;
+        b=Lu9wWn16PVB6a9HoxOwq5W6bKhvhTF3aj3Spc33BeHpTWNRVYQ2corj3IPAKX84LLj
+         Ea67JUHp7QYtttIQvje6OmkM7OjUOPzGlZ4VwLg7+SrPW+3FI8EA7ATCkX7XlzTN1sAE
+         6JYREnbkVKTTRvWGYBOVPOE37ACs7Jo//z1IRNqhyGkIhoeOXDLLJnAa+2/OZW7UPGvJ
+         96A7Ga6epPN3AXSNYcs7cUyfjiCQZvRpD7YkvKLe9geAdebfq6knNmdQZVqtrTGD4DsO
+         Gw2k1Yduq50gZLQWMw/PakySb4i6AxVZFRpQB+jovCYDN22OQmDN9+It5+9n1L9jX2qc
+         +lSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763729361; x=1764334161;
+        d=1e100.net; s=20230601; t=1763729367; x=1764334167;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=uKBmUb8EWfQ3VixqXwZwtOjhnNqHJe7y4QanLPyxD5w=;
-        b=mxPJ/3vxAn4kUAJaQDLVKtQrZ00SYSn7MxgBK2w9oCi646KN9SJB9OoleJw2XZfKrX
-         Z5aZLFy75EkzAc66aEnoLLEDKlQHXEu3kEkZcjVyKu+oMxcK5elg4bD7LkBtu+F1FBLh
-         o+iKzANFunwrZ4CvNZ87tbJi4wumts6pXOo/fGNTO1vkMe2GlfCBBBBamlVDc76DwRMP
-         uQ7IrV3Y5t45mL+nTht7FCezMwC27KfxHUkVjH19lEGk7CtSQb+DqVsi+HA5ctU87y5n
-         8H9SlXakXSXb3Oqu7ZwBqk5MQlP1tEsrECEBQ71go0i+XVhrDJ9NCT4mWX7DSCMStZZE
-         ysBg==
-X-Gm-Message-State: AOJu0YwwSUTCODVYtKbQMZBeH5Kr4rjaROgAl3t7rNDEJJwCoppEOyeV
-	5epfWkLYyGpWPE3PX/rwL3vGAX7+tq3pnj3LGJcg3UrVvsBpKC7Vg9t0qC33u9Y2dAvbC7FF
-X-Gm-Gg: ASbGncu01sgsl1S7Q6tk+8Yx7R/qiZEPShXzkT9Et6ZcLUdXv+YXGl8jOSQ4LsBOAes
-	tUURGt0aDy/bj1cAwrHcwofdvmnPKrtDcAj1fAphkG1K804KovuNKJ+qDSv2t1iZf3VIXsdrT9a
-	jHr1KTl41sFLYLkKJ19LyleWctckDiEV+5Wt6cJjrAfc7E9KLWktC1F2AUK4wqPXbi43kaEgiCd
-	46qyDFLjVNTDQwsipiVAGE9nh9Eec/JBQyunQQZtdxYaBRPY7pxFw9YnSZX4CUJruJqjo2Mjxks
-	sNXdvObKlGcVa9NsWsSwrBZyFWGmoSHOxqLiNlO0QQuDPhFDsjEVqHVO3vtttx2B7vbZYOIUcRB
-	cS6TmM5m1w+JAa1/5PxEz2b+Ngu+V30/g9I/vjxxUFr4wd86NPhnqIrxSJlBhTMBqxlS+D44n31
-	PCLa/vQnJQxFSeIz+M
-X-Google-Smtp-Source: AGHT+IGADjPBSv6dneXmHvy/d7ImNW4K6lxe2fy+G/Ozmk9OtVRsRVjcF0a8edFY+XOXLca6s+ACgQ==
-X-Received: by 2002:a17:903:2c06:b0:297:fc22:3a9f with SMTP id d9443c01a7336-29b6bf19f1dmr29423045ad.38.1763729360830;
-        Fri, 21 Nov 2025 04:49:20 -0800 (PST)
+        bh=XOi063mzQTa4JvkotZ6ma8LlWFlm5oJE+mks/V5WdV8=;
+        b=otZtm6wVk/qugQridMtaaCwEOYLeIPO5gDcMc4Dsa5iOUQP9euQinMrJt8+VkVD0ZK
+         LQ8K+5x/L3jhyIAeCbaLanF0LyvfieUijVcxjVlrfUITmb95kHziGIxtAEOq/jUQF5Zh
+         R+c01gNZ58cVQNetKqDYY0gXQuyoGKR3kQgUUpzcN1iZx6h7FdDjPbvM2UYvOxnsnKhJ
+         IvvlbKb/UQn/yUGF2apu1Xx2lLzk3iJLuBMLeGxsjaQw9xO1ppCkxQA0C1V+JqUTBA/N
+         aTDi3WMU2cVdxhjA7xKHjlKCeskiqX2zEFsXRBst83s8zfWGA9fqcdAf/S7/7TQMXY2o
+         zVtg==
+X-Gm-Message-State: AOJu0YwzaGN5fV4ivryIpsnigAqczr2NbSyr292BRLBPpXvz5m6vHXF0
+	usahjn8Wk3GNmdfbFib8W8KEAPqQwYN006/i7zAaHeJI4Fgf7pKxSz7h32GsRQLd1NUFL/2J
+X-Gm-Gg: ASbGncsBkDVXTnDB6BNA5mNi7z0bjiBmGQWCL8P2vvX6dkzPqxP7pAGnlwM5wVowF0Q
+	rAMKV43xKmyGJsPSKFzboQSZkywd0xX6yW1Rp9jSAWSQ5PptW+YR33b5ZsBIww62XSuDx/CtLBm
+	AuYJuUszgminBinpKoEeWLUCD8SINIWiqV6AlNokeyBdogItDD/cU1ubuux5YNE51c507guwbS5
+	W9IbkDHcw5yH4eN2+scvuB6VLMUTEHuuaEijSC2k3YMkKNJ4gSd56jXHezQ1Iq1VnA2aFkdaMlR
+	u4yZ1j1O+3YFC8Fsfu5kgP6EL3BVCIdeuQS/YcUx0MMKxfpNaqZIFBMEBx/1Y30LnGgF8a/uuyN
+	4VRxG+l3PBr9k4zuMrJeCDYOzIz+c5mGAHlns1bg0+9BJzo3yB6PoMeEBKzvjg5dmHnpK79f8d6
+	AOsEibkczB4s7pq+cK
+X-Google-Smtp-Source: AGHT+IHZjut3DLUP7fZbcavzB1Ab59YsXD493M8mvRve2OHuj9woOxQFvnDZ0vVYtMS9y3UkFMvdhQ==
+X-Received: by 2002:a17:903:40cf:b0:295:105:c87d with SMTP id d9443c01a7336-29b6c571898mr26619785ad.32.1763729366824;
+        Fri, 21 Nov 2025 04:49:26 -0800 (PST)
 Received: from [192.168.15.94] ([2804:7f1:ebc3:6e1:12e1:8eff:fe46:88b8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b274752sm56644045ad.75.2025.11.21.04.49.15
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b274752sm56644045ad.75.2025.11.21.04.49.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 04:49:20 -0800 (PST)
+        Fri, 21 Nov 2025 04:49:26 -0800 (PST)
 From: Andre Carvalho <asantostc@gmail.com>
-Date: Fri, 21 Nov 2025 12:49:00 +0000
-Subject: [PATCH net-next v6 1/5] netconsole: add target_state enum
+Date: Fri, 21 Nov 2025 12:49:01 +0000
+Subject: [PATCH net-next v6 2/5] netconsole: convert 'enabled' flag to enum
+ for clearer state management
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,7 +85,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251121-netcons-retrigger-v6-1-9c03f5a2bd6f@gmail.com>
+Message-Id: <20251121-netcons-retrigger-v6-2-9c03f5a2bd6f@gmail.com>
 References: <20251121-netcons-retrigger-v6-0-9c03f5a2bd6f@gmail.com>
 In-Reply-To: <20251121-netcons-retrigger-v6-0-9c03f5a2bd6f@gmail.com>
 To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -94,41 +95,243 @@ To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  linux-kselftest@vger.kernel.org, Andre Carvalho <asantostc@gmail.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1763729347; l=747;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1763729347; l=8901;
  i=asantostc@gmail.com; s=20250807; h=from:subject:message-id;
- bh=BLduFEel2At1ZpRoHzUB/43M6t0wpDLHJLh+eokOBeA=;
- b=i5LMsfARwRqneqwPou9ysaSmPXgBprcP+Cdxs4zWJpbgkFhrfOS1RNzxP4zJ9iujoEomejMWo
- TKx/4fNVTYbDBn+xFqIHIFbB4/zBHsT8jC7e3G5y4sHcD3GQNroRnUP
+ bh=943o/E3WhvuTJbGcZYEZLtSogyGbkwqMFYHMQzSvjCQ=;
+ b=1HmsMOFjyC4EL1ONKMO0gUZ6h9k6a8xv0LG/leSVTvarJv5GXc1J14zSO1Kr33ZWmyYhtl+SF
+ M1QmWAvoBb7C8+03LdQJI2K3v/VzlgOsmJDl8W8J9qx2PUEXmuNoah1
 X-Developer-Key: i=asantostc@gmail.com; a=ed25519;
  pk=eWre+RwFHCxkiaQrZLsjC67mZ/pZnzSM/f7/+yFXY4Q=
 
-From: Breno Leitao <leitao@debian.org>
+This patch refactors the netconsole driver's target enabled state from a
+simple boolean to an explicit enum (`target_state`).
 
-Introduces a enum to track netconsole target state which is going to
-replace the enabled boolean.
+This allow the states to be expanded to a new state in the upcoming
+change.
 
+Co-developed-by: Breno Leitao <leitao@debian.org>
 Signed-off-by: Breno Leitao <leitao@debian.org>
 Signed-off-by: Andre Carvalho <asantostc@gmail.com>
 ---
- drivers/net/netconsole.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/net/netconsole.c | 52 ++++++++++++++++++++++++++----------------------
+ 1 file changed, 28 insertions(+), 24 deletions(-)
 
 diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 9cb4dfc242f5..e2ec09f238a0 100644
+index e2ec09f238a0..b21ecea60d52 100644
 --- a/drivers/net/netconsole.c
 +++ b/drivers/net/netconsole.c
-@@ -119,6 +119,11 @@ enum sysdata_feature {
- 	MAX_SYSDATA_ITEMS = 4,
- };
+@@ -135,12 +135,12 @@ enum target_state {
+  * @sysdata_fields:	Sysdata features enabled.
+  * @msgcounter:	Message sent counter.
+  * @stats:	Packet send stats for the target. Used for debugging.
+- * @enabled:	On / off knob to enable / disable target.
++ * @state:	State of the target.
+  *		Visible from userspace (read-write).
+  *		We maintain a strict 1:1 correspondence between this and
+  *		whether the corresponding netpoll is active or inactive.
+  *		Also, other parameters of a target may be modified at
+- *		runtime only when it is disabled (enabled == 0).
++ *		runtime only when it is disabled (state == STATE_DISABLED).
+  * @extended:	Denotes whether console is extended or not.
+  * @release:	Denotes whether kernel release version should be prepended
+  *		to the message. Depends on extended console.
+@@ -170,7 +170,7 @@ struct netconsole_target {
+ 	u32			msgcounter;
+ #endif
+ 	struct netconsole_target_stats stats;
+-	bool			enabled;
++	enum target_state	state;
+ 	bool			extended;
+ 	bool			release;
+ 	struct netpoll		np;
+@@ -262,6 +262,7 @@ static struct netconsole_target *alloc_and_init(void)
+ 	nt->np.local_port = 6665;
+ 	nt->np.remote_port = 6666;
+ 	eth_broadcast_addr(nt->np.remote_mac);
++	nt->state = STATE_DISABLED;
  
-+enum target_state {
-+	STATE_DISABLED,
-+	STATE_ENABLED,
-+};
-+
- /**
-  * struct netconsole_target - Represents a configured netconsole target.
-  * @list:	Links this target into the target_list.
+ 	return nt;
+ }
+@@ -280,7 +281,7 @@ static void netconsole_process_cleanups_core(void)
+ 	mutex_lock(&target_cleanup_list_lock);
+ 	list_for_each_entry_safe(nt, tmp, &target_cleanup_list, list) {
+ 		/* all entries in the cleanup_list needs to be disabled */
+-		WARN_ON_ONCE(nt->enabled);
++		WARN_ON_ONCE(nt->state == STATE_ENABLED);
+ 		do_netpoll_cleanup(&nt->np);
+ 		/* moved the cleaned target to target_list. Need to hold both
+ 		 * locks
+@@ -403,7 +404,7 @@ static void trim_newline(char *s, size_t maxlen)
+ 
+ static ssize_t enabled_show(struct config_item *item, char *buf)
+ {
+-	return sysfs_emit(buf, "%d\n", to_target(item)->enabled);
++	return sysfs_emit(buf, "%d\n", to_target(item)->state == STATE_ENABLED);
+ }
+ 
+ static ssize_t extended_show(struct config_item *item, char *buf)
+@@ -570,8 +571,8 @@ static ssize_t enabled_store(struct config_item *item,
+ 		const char *buf, size_t count)
+ {
+ 	struct netconsole_target *nt = to_target(item);
++	bool enabled, current_enabled;
+ 	unsigned long flags;
+-	bool enabled;
+ 	ssize_t ret;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+@@ -580,9 +581,10 @@ static ssize_t enabled_store(struct config_item *item,
+ 		goto out_unlock;
+ 
+ 	ret = -EINVAL;
+-	if (enabled == nt->enabled) {
++	current_enabled = nt->state == STATE_ENABLED;
++	if (enabled == current_enabled) {
+ 		pr_info("network logging has already %s\n",
+-			nt->enabled ? "started" : "stopped");
++			current_enabled ? "started" : "stopped");
+ 		goto out_unlock;
+ 	}
+ 
+@@ -615,16 +617,16 @@ static ssize_t enabled_store(struct config_item *item,
+ 		if (ret)
+ 			goto out_unlock;
+ 
+-		nt->enabled = true;
++		nt->state = STATE_ENABLED;
+ 		pr_info("network logging started\n");
+ 	} else {	/* false */
+ 		/* We need to disable the netconsole before cleaning it up
+ 		 * otherwise we might end up in write_msg() with
+-		 * nt->np.dev == NULL and nt->enabled == true
++		 * nt->np.dev == NULL and nt->state == STATE_ENABLED
+ 		 */
+ 		mutex_lock(&target_cleanup_list_lock);
+ 		spin_lock_irqsave(&target_list_lock, flags);
+-		nt->enabled = false;
++		nt->state = STATE_DISABLED;
+ 		/* Remove the target from the list, while holding
+ 		 * target_list_lock
+ 		 */
+@@ -653,7 +655,7 @@ static ssize_t release_store(struct config_item *item, const char *buf,
+ 	ssize_t ret;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+-	if (nt->enabled) {
++	if (nt->state == STATE_ENABLED) {
+ 		pr_err("target (%s) is enabled, disable to update parameters\n",
+ 		       config_item_name(&nt->group.cg_item));
+ 		ret = -EINVAL;
+@@ -680,7 +682,7 @@ static ssize_t extended_store(struct config_item *item, const char *buf,
+ 	ssize_t ret;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+-	if (nt->enabled) {
++	if (nt->state == STATE_ENABLED)  {
+ 		pr_err("target (%s) is enabled, disable to update parameters\n",
+ 		       config_item_name(&nt->group.cg_item));
+ 		ret = -EINVAL;
+@@ -704,7 +706,7 @@ static ssize_t dev_name_store(struct config_item *item, const char *buf,
+ 	struct netconsole_target *nt = to_target(item);
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+-	if (nt->enabled) {
++	if (nt->state == STATE_ENABLED) {
+ 		pr_err("target (%s) is enabled, disable to update parameters\n",
+ 		       config_item_name(&nt->group.cg_item));
+ 		mutex_unlock(&dynamic_netconsole_mutex);
+@@ -725,7 +727,7 @@ static ssize_t local_port_store(struct config_item *item, const char *buf,
+ 	ssize_t ret = -EINVAL;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+-	if (nt->enabled) {
++	if (nt->state == STATE_ENABLED) {
+ 		pr_err("target (%s) is enabled, disable to update parameters\n",
+ 		       config_item_name(&nt->group.cg_item));
+ 		goto out_unlock;
+@@ -747,7 +749,7 @@ static ssize_t remote_port_store(struct config_item *item,
+ 	ssize_t ret = -EINVAL;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+-	if (nt->enabled) {
++	if (nt->state == STATE_ENABLED) {
+ 		pr_err("target (%s) is enabled, disable to update parameters\n",
+ 		       config_item_name(&nt->group.cg_item));
+ 		goto out_unlock;
+@@ -770,7 +772,7 @@ static ssize_t local_ip_store(struct config_item *item, const char *buf,
+ 	int ipv6;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+-	if (nt->enabled) {
++	if (nt->state == STATE_ENABLED) {
+ 		pr_err("target (%s) is enabled, disable to update parameters\n",
+ 		       config_item_name(&nt->group.cg_item));
+ 		goto out_unlock;
+@@ -795,7 +797,7 @@ static ssize_t remote_ip_store(struct config_item *item, const char *buf,
+ 	int ipv6;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+-	if (nt->enabled) {
++	if (nt->state == STATE_ENABLED) {
+ 		pr_err("target (%s) is enabled, disable to update parameters\n",
+ 		       config_item_name(&nt->group.cg_item));
+ 		goto out_unlock;
+@@ -830,7 +832,7 @@ static ssize_t remote_mac_store(struct config_item *item, const char *buf,
+ 	ssize_t ret = -EINVAL;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+-	if (nt->enabled) {
++	if (nt->state == STATE_ENABLED) {
+ 		pr_err("target (%s) is enabled, disable to update parameters\n",
+ 		       config_item_name(&nt->group.cg_item));
+ 		goto out_unlock;
+@@ -1326,7 +1328,7 @@ static void drop_netconsole_target(struct config_group *group,
+ 	 * The target may have never been enabled, or was manually disabled
+ 	 * before being removed so netpoll may have already been cleaned up.
+ 	 */
+-	if (nt->enabled)
++	if (nt->state == STATE_ENABLED)
+ 		netpoll_cleanup(&nt->np);
+ 
+ 	config_item_put(&nt->group.cg_item);
+@@ -1444,7 +1446,7 @@ static int netconsole_netdev_event(struct notifier_block *this,
+ 			case NETDEV_RELEASE:
+ 			case NETDEV_JOIN:
+ 			case NETDEV_UNREGISTER:
+-				nt->enabled = false;
++				nt->state = STATE_DISABLED;
+ 				list_move(&nt->list, &target_cleanup_list);
+ 				stopped = true;
+ 			}
+@@ -1725,7 +1727,8 @@ static void write_ext_msg(struct console *con, const char *msg,
+ 
+ 	spin_lock_irqsave(&target_list_lock, flags);
+ 	list_for_each_entry(nt, &target_list, list)
+-		if (nt->extended && nt->enabled && netif_running(nt->np.dev))
++		if (nt->extended && nt->state == STATE_ENABLED &&
++		    netif_running(nt->np.dev))
+ 			send_ext_msg_udp(nt, msg, len);
+ 	spin_unlock_irqrestore(&target_list_lock, flags);
+ }
+@@ -1745,7 +1748,8 @@ static void write_msg(struct console *con, const char *msg, unsigned int len)
+ 
+ 	spin_lock_irqsave(&target_list_lock, flags);
+ 	list_for_each_entry(nt, &target_list, list) {
+-		if (!nt->extended && nt->enabled && netif_running(nt->np.dev)) {
++		if (!nt->extended && nt->state == STATE_ENABLED &&
++		    netif_running(nt->np.dev)) {
+ 			/*
+ 			 * We nest this inside the for-each-target loop above
+ 			 * so that we're able to get as much logging out to
+@@ -1901,7 +1905,7 @@ static struct netconsole_target *alloc_param_target(char *target_config,
+ 			 */
+ 			goto fail;
+ 	} else {
+-		nt->enabled = true;
++		nt->state = STATE_ENABLED;
+ 	}
+ 	populate_configfs_item(nt, cmdline_count);
+ 
 
 -- 
 2.52.0
