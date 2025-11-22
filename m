@@ -1,181 +1,92 @@
-Return-Path: <netdev+bounces-240955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05F3AC7CC66
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 11:16:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64028C7CC76
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 11:18:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7F5F3344702
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 10:16:12 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 10CE8345109
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 10:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F3A2F12A2;
-	Sat, 22 Nov 2025 10:16:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711E31494A8;
+	Sat, 22 Nov 2025 10:18:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eiNkRK7F"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="ANiA5gZ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902A6CA5A
+	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 10:18:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763806697; cv=none; b=fB5h5hyycqgchqM4pjGif+/PmH8bzpa0tyvom4rMktM9HVTXqyQaXsIOhc9tMDjR6AHcaBuWLkZjUF15w7Dyev9qSdl7fcXNQdrKDxeL19WVxUxgsBRY727fkKtdbCR1x1j8Ciw52mObx1vgpy+BNL7B1lQT8Nio6M/mJibV5i0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763806697; c=relaxed/simple;
+	bh=/ie7fr7qfZOhjGcC4xEajrrkpWzhF5CAg/Lj58q3YMY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TE72uGCRPhHoHli9fwhdlaHCDJQFvzt9rZ7kJjG9ViscQROj9kXg4LSVXcpN8ecOP/Qvwv5XoDY8ssnHS4BDFYY1m69K0Oz+RpzpyTijUkdV6L1ocOKrIMakuKQtsvitDpqRgpEFCE+axD+SPytu3ECKkwLc5dWNnaG8DDpEPc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=ANiA5gZ+; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3833295DB8
-	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 10:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763806567; cv=none; b=pG/iFwE5H4hz400JkOFwOd6QnpT1VPd+46/UHz+xYW7GU918zt9f7Oi8yW4pSC8QfOefPhBkPwaIoJ9cbnuLjDLSYhm6qPpee5mLlfyxc4RK5jUvgE1xIiA4AoOSul3duHvp4J8fZpaa3aSkhlhYHYHaPdoFOkIxickWQOQ2T6s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763806567; c=relaxed/simple;
-	bh=okpyZGlEFjEuEDFNYuruZwkefkPmV4EIGxCGt77K1j4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=An92Wor9Xbx8Zvqlc35J+sRvBGPpVuaI7V9E/zIml9hb6dmJ4m/ZiAF6bldoxEZ4yI3bJgEd0auJe0o/wa4j81H8jbRZb1oIPFm7nPvtfAwEJ/Ekr6zJyVB7VfNNJjQ2BbLOb6YwZxi5I4rDZsp4IPw7V1ghgkBKAFTxXhAmJ2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eiNkRK7F; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b735e278fa1so567116866b.0
-        for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 02:16:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763806563; x=1764411363; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mS/vz1rW7oaq1ahBZ3rleu8uUoiOnYHPIRfP3oM2Z9Q=;
-        b=eiNkRK7FWVQQ4EFDGPfIPJkC8lovp7vBYF/9D8EplMpXmMyibk0T1MjtegsoC2UPrl
-         KpOrI2dRYkx8o7MmTvZiurG2k2MK3qPG3QzU4k71AAgU6yckiRV2R6FXtmiGvRYvHkll
-         R9KjbSsjV2f3rx2nC3lHAAT2GGo7oG5ojlbeJ8HVTEK8/2qR/2TozhBL5nB0VA4rrXfF
-         tu6Q33YDZN2VhkoevrlSxD/kN21wuSgXXXzNgGELpDggjNmswQDgH20wD+7CJzNy/E61
-         NdiCVgCZ6FlE9Sbj9EMfrjbdBcvAqBHbQF20DHZO5tzsaSr9zjwN1hjAezc/7dVaY0P4
-         8/EQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763806563; x=1764411363;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mS/vz1rW7oaq1ahBZ3rleu8uUoiOnYHPIRfP3oM2Z9Q=;
-        b=PDL0zjc/ovGe6hv4jtfdmZy+g9u8ydjpResgL52O60wKJpPCHe/y3sH0aUIDm149Jy
-         PDChKCdu5xYEevpVlTpKZTlnxW+YdUd1f2N4Ic5Mz2Ui2BcKIvUiNMFbnlkQt/+zIOQI
-         QEuz4+MVy0bBuWwV9m2cWUrpQ7B8etZE2GoeJQMZ1mkFCfSmwNmTbGWfaaFg9MJHgSAU
-         jQUXYQk/BxHkPq55RSXiTTpyRC4v27jHe+ZCYHSZya6LHtqopTSB1KWhKp3Ez2d5GWqe
-         QyMizlchsy1F645/heXwFscuhCPXdg8qoCplxYli0s53w9+BnO5Nj+0dn48oRR20MSNu
-         dGzg==
-X-Forwarded-Encrypted: i=1; AJvYcCUiQMayTChrtafspYr9yk0cCgreIVKAnmUh+6G+fq1Gv1HOsL1ih/fwyrWko1YgZb+IVopBR7E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXIOFS4gSEM50WSTin+gQ6EstNWq9oeF7jR4wexJD8Lq7mm7Ho
-	i77kIaCxQcJ35iPlYXIfTsPJIxpodOifgkNBlUMe1jdFP7eGASpXoC9G
-X-Gm-Gg: ASbGncsO1KVcgvd9bYBOFOU724CDHgE2pg/Xy5je/1fUzPGyFrC4X4kE+aRj1hoq6i+
-	/gUuYtS9KFG3cmWH8Mw8c10rflIqtxOO6DIWphfEOxLxKeu8yalqezr+FZrAIY4BeypsoXOZxp4
-	Hjml3wDIoqUHOQVzaRfQSnlfZjAu0Pmh5SGyMWTHzJdLp6xcRBFwSblFY28L+9tbFGINFsgwOai
-	GZLKWPcjX0iYjJj59Yv5N/IXuE/z6IcusI4nMbDwiiyb/bK4DbioJkrovXGbewc5frsIiinyXhZ
-	x/ovJWSSyXOhoH/MfqxH23Azbfb2YltwfgmIcLyK2wd0wjwQpiEd3WFsWdrn9yYsMOMHHhSHsrb
-	/iJNIyw9DWMmPuMV4xMO1p6kHzbnZIEkgAa4K/NA/ql536L/J0xm45rsE4qGRlWxKepLhrwHpLp
-	sEVRjPeGMDjoyeqYq/Qi5r0eFyF+mujFlW2c6o
-X-Google-Smtp-Source: AGHT+IFvc6Tdcl0gKFGge7EMecimqjBsOE5KfFFBnMOWlWkZjJiEqjTrnAEKRSLZBoXUKpD+VYqOVw==
-X-Received: by 2002:a17:907:1c26:b0:b70:5aa6:1535 with SMTP id a640c23a62f3a-b767157138dmr624288566b.18.1763806562727;
-        Sat, 22 Nov 2025 02:16:02 -0800 (PST)
-Received: from localhost (ip87-106-108-193.pbiaas.com. [87.106.108.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654ff3962sm698791966b.50.2025.11.22.02.16.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Nov 2025 02:16:02 -0800 (PST)
-Date: Sat, 22 Nov 2025 11:16:00 +0100
-From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, gnoack@google.com, willemdebruijn.kernel@gmail.com,
-	matthieu@buffet.re, linux-security-module@vger.kernel.org,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	yusongping@huawei.com, artem.kuzin@huawei.com,
-	konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v4 12/19] selftests/landlock: Test socketpair(2)
- restriction
-Message-ID: <20251122.4795c4c3bb03@gnoack.org>
-References: <20251118134639.3314803-1-ivanov.mikhail1@huawei-partners.com>
- <20251118134639.3314803-13-ivanov.mikhail1@huawei-partners.com>
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id C18C7200BBBD;
+	Sat, 22 Nov 2025 11:18:13 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be C18C7200BBBD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1763806693;
+	bh=3LlhpuaHGm5ihGh+wXm3jYgSMazoNXGqGu16QyCmZao=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ANiA5gZ+InTU1g3y3mqomIwZ0ffju3Sn0Q4k4ZJnn7TGF8k/2lKThMC6/ktmYXr+g
+	 uV5irVg+36mqnfliz4YrFdw/jQ0EdxAikE1lhYw318WIxTlTttzRY9RnTg2ABgDTVf
+	 fmWjHFkXdOz+R0U6o3Nw9vk/UF/gu7VJtDngIFJloc0yDQzEsDASnUzwpjpz+ctxUw
+	 dWKdSKiMes2OUNZSDLvDKV7MP00YnijKl+Cn3L/KbCaRH54oHr3lhAH/DJIuVmmNG0
+	 7Ats6JZlNOTFZhg9vEkFkjWcBAGds24NRdW/1VZgYxjVpxUkHkfy8RSfPnB9v/xsVS
+	 mqDm1U+xKDaew==
+Message-ID: <59f897f8-4358-418d-a6ed-d422bb6d7cb4@uliege.be>
+Date: Sat, 22 Nov 2025 11:18:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251118134639.3314803-13-ivanov.mikhail1@huawei-partners.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] uapi: ioam6: adjust the maximum size of a schema
+To: David Ahern <dsahern@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20251120163342.30312-1-justin.iurman@uliege.be>
+ <69709e39-a6e2-4289-9202-f5776109f42e@uliege.be>
+ <6d950048-4647-4e10-a4db-7c53d0cfabd9@kernel.org>
+ <55c4c96e-c11f-49d7-8207-4f5179d380a7@uliege.be>
+ <437c2cc9-37ce-40f1-91a2-cbfeb667da5c@kernel.org>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <437c2cc9-37ce-40f1-91a2-cbfeb667da5c@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 18, 2025 at 09:46:32PM +0800, Mikhail Ivanov wrote:
-> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testing/selftests/landlock/socket_test.c
-> index e22e10edb103..d1a004c2e0f5 100644
-> --- a/tools/testing/selftests/landlock/socket_test.c
-> +++ b/tools/testing/selftests/landlock/socket_test.c
-> @@ -866,4 +866,59 @@ TEST_F(tcp_protocol, alias_restriction)
->  	}
->  }
->  
-> +static int test_socketpair(int family, int type, int protocol)
-> +{
-> +	int fds[2];
-> +	int err;
-> +
-> +	err = socketpair(family, type | SOCK_CLOEXEC, protocol, fds);
-> +	if (err)
-> +		return errno;
-> +	/*
-> +	 * Mixing error codes from close(2) and socketpair(2) should not lead to
-> +	 * any (access type) confusion for this test.
-> +	 */
-> +	if (close(fds[0]) != 0)
-> +		return errno;
-> +	if (close(fds[1]) != 0)
-> +		return errno;
-
-Very minor nit: the function leaks an FD if it returns early after the
-first close() call failed.  (Highly unlikely to happen though.)
-
-> +	return 0;
-> +}
-> +
-> +TEST_F(mini, socketpair)
-> +{
-> +	const struct landlock_ruleset_attr ruleset_attr = {
-> +		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
-> +	};
-> +	const struct landlock_socket_attr unix_socket_create = {
-> +		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
-> +		.family = AF_UNIX,
-> +		.type = SOCK_STREAM,
-> +		.protocol = 0,
-> +	};
-> +	int ruleset_fd;
-> +
-> +	/* Tries to create socket when ruleset is not established. */
-> +	ASSERT_EQ(0, test_socketpair(AF_UNIX, SOCK_STREAM, 0));
-> +	ruleset_fd =
-> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-> +	ASSERT_LE(0, ruleset_fd);
-> +
-> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
-> +				       &unix_socket_create, 0));
-> +	enforce_ruleset(_metadata, ruleset_fd);
-> +	ASSERT_EQ(0, close(ruleset_fd));
-> +
-> +	/* Tries to create socket when protocol is allowed */
-> +	EXPECT_EQ(0, test_socketpair(AF_UNIX, SOCK_STREAM, 0));
-> +
-> +	ruleset_fd =
-> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-
-You may want to check that landlock_create_ruleset() succeeded here:
-
-ASSERT_LE(0, ruleset_fd)
-
-> +	enforce_ruleset(_metadata, ruleset_fd);
-> +	ASSERT_EQ(0, close(ruleset_fd));
-> +
-> +	/* Tries to create socket when protocol is restricted. */
-> +	EXPECT_EQ(EACCES, test_socketpair(AF_UNIX, SOCK_STREAM, 0));
-> +}
-> +
->  TEST_HARNESS_MAIN
-> -- 
-> 2.34.1
+On 11/21/25 20:18, David Ahern wrote:
+> On 11/21/25 11:55 AM, Justin Iurman wrote:
+>>
+>> You're right, it might be too risky. Besides, the current code (i.e.,
+>> IOAM6_MAX_SCHEMA_DATA_LEN=1020) doesn't break anything per se, it was
+>> mainly for convenience. Do you think it would be OK to introduce a new
+>> constant in the uapi, as suggested above? Or did your comment also apply
+>> to that part?
 > 
+> You cannot break any existing implementation which means kernel side you
+> have to allow the current DATA_LEN. Given that there is little point in
+> trying to change it now. If the spec has a 240B limit, you could return
+> a warning message telling users when they exceed it. UAPI wise I think
+> we are stuck with what exists.
 
-Otherwise, looks good.
-–Günther
+That's what I suspected and feared. Anyway, as I said, this change was 
+purely for convenience, so no big deal. I think this is a good idea to 
+return a warning to users, thanks! I'll submit that to net-next.
 
