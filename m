@@ -1,156 +1,296 @@
-Return-Path: <netdev+bounces-240999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 320D3C7D4AC
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 18:16:52 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA733C7D4BF
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 18:21:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C115D3A7F94
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 17:16:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1417634B554
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 17:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04651150997;
-	Sat, 22 Nov 2025 17:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="viAECdnb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA37264612;
+	Sat, 22 Nov 2025 17:20:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF4E2AD25
-	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 17:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B863225B1D2;
+	Sat, 22 Nov 2025 17:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763831806; cv=none; b=Dy5lI/bFhPp5ePxZu2vKCD1JVcS33hwCucYW/LZgFsZti2CaDCN31TYxBO0d8IE86I/6kDQe/I3067IVtB1X5ebs+1fghSEhMS2xewKb/4+mDu+BJmA71acWT8xrQmftHobC7fMODjYFSvDJYaL/E7YX00j2R4ewQ4Gpri5bQtE=
+	t=1763832014; cv=none; b=jdW54Lf+LFrik6b1JSpLuCLj5dXbIgE8LwQ4/kIMvLKsWthJrfTWkomupGg16x0ZXLeR4o4MGfOCEK1FjgogbYU8wcK8Am61z8tYzndBR1ZCJMxvm9h/cKOwk5MBIGUiSomZueiRr4HfDheE3M9AkSajKvT5MdtYdkX67LnbXs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763831806; c=relaxed/simple;
-	bh=gG6EdQ2Now9tJKxmh99T8C3R3yFJ//sVYl6zY+ZM+zE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nKn9wb0id3/9uKTz3pujpIQOP8slfuwMfxQjI4od/OuQo4rZw5Lu1JvNgnBtPnYpnDgunKGqPRBHqR3eXNGK2E8qqYPpC8wzCYbE2MVWejHL1NxhEvn5t4iQBWYpgrXadafzPDECj7FjgsGAcP4tZ3gU63/gLT/J/Oe2DcYAu/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=viAECdnb; arc=none smtp.client-ip=74.125.224.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-63fc72db706so2545300d50.2
-        for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 09:16:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1763831804; x=1764436604; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gG6EdQ2Now9tJKxmh99T8C3R3yFJ//sVYl6zY+ZM+zE=;
-        b=viAECdnbENQ1d+ToAm5yxZeerIWyZA01ZaqCBpHdGOp51Ge7NA5YgBYPmNJTcwkd+x
-         UfZ5AhWqRDUaqZrsVcX7W8nrW+tMiZkarA20dzYKt8OXimZ5dcP34PCAHARXo20VyY5M
-         DWHpDdF8KVdRwyUfp7C+SOq8w3HhhmL1blJnQb0t2aTaXF5M74SwwA4CHQxrpX15tHby
-         4wN/bnaXct09Ph+a6D+LShP2mZytG0W7Koon1lEUkW1kHMhFO823Mb1FnL71Jx2oA7hy
-         IKXVLwZF7wYpe5DoN2upGdi+mfyReNg+j1v0WEeKPTjjgzUsnHkexQ5BrzXH5HdIDVJy
-         WDqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763831804; x=1764436604;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gG6EdQ2Now9tJKxmh99T8C3R3yFJ//sVYl6zY+ZM+zE=;
-        b=jxtruTei7/Hqe6JR9yNWjf8QUPUNwtleNJVPUAK2KJefgdQ8Y+FAKUhINF7ZJyY5Fg
-         rpMXv9ZH5PW3ZQZVcTBuMwgixB4SuqgRgki8L3sKUyfIvrvn1WU47jAWeBzW1MwwMI3z
-         uinmH+dEsd9RPwfeRTHzn4gy8Jrnaiw8sREQjxs/WdDHKcwzgAFqVE1EycT+hELZc/bx
-         fue27TIPUlK8HgNhrAresHG0txAXgJm0K7DnU91qFV64hK1lPmV4GpczfAxCtGcqTsVi
-         NjttdKXOaYb5zTZj7L0sxJWaik4BBfH2SozDqeZwVjQ0ewSRQLBj4tvE7uYehlcblQmH
-         uvsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWS8vNyj/mM6b3uGjNdnr8dSWNlA4SzREj6GPtbtsLM3wYFSg62CIJJVxtEFI1TPJtY7Tp338g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRRUHiN8m+dfS92QryGQLT4xE0IsZ6pRZj7IjT0eFoBto9iKyI
-	147XqP+rZ55Dsn3lAqiaAf2NljYf1QbuoOZy7o8vgu5vL11OrDYsYHqzafPMuOyr9XQkjgTKp3S
-	J+CqzQpdkBNZJRO7oyygKuXvy/DfYb6g2+yoftk9P
-X-Gm-Gg: ASbGncvHkqOYdqxsoDX1HClo9ftEmqtrHDVWf05LkikgskwD5W6rcLAkll/OC9UT7Iq
-	I5E4n5Fb3u7nCI6Si4YP1QMPURty4TQUOpESy2oe13pLBHVx59lRp/2minlTFniFrkfl8a8Ih46
-	wTruCyAL/kCnyNZCOwjwvJVX5qoRphyV5ccGK5JS2rZEBXnrPHXH83DPtbIgOII/GtnrrJutqbq
-	ylcBKX9X+JXWJECnCq9XpLoTx63ZdsKla3PtO+S8bkcWcSYzha4HmayuPBfZBcmo+RgEOaP2nQH
-	ozFKlbJJ/vJ+LQ==
-X-Google-Smtp-Source: AGHT+IHK5rUR9perKRLa2hqvo0xMbU0NPIit4ZRIRAIMQWnrSZ1pjbue5IDqidsDail2xWUXo1Fx8TNMPIv9jSWEbw4=
-X-Received: by 2002:a05:690e:1482:b0:641:f5bc:69a2 with SMTP id
- 956f58d0204a3-64302b43c48mr4251080d50.80.1763831804084; Sat, 22 Nov 2025
- 09:16:44 -0800 (PST)
+	s=arc-20240116; t=1763832014; c=relaxed/simple;
+	bh=sz/pDSTTApR9cxIHGR7p2n+30eVMwOoqzVr4UMvOmMU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=VcK2jWS2y4cqT511RS7ZJRlHRebImywvt3RiFApshsKLz61TQAKt6zbIWY5M1THXITkkb4i8TpT6JQ6RWECmbg4Y+3VdpDRJY5vx6qu6cT0qHEBZpRAaCRjl8eJQRaxq1BknRrndHGf/hxk0XAHwT8qvcKz0jrzWMzLaeuz+IIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dDJjD6BKbzJ468G;
+	Sun, 23 Nov 2025 01:19:12 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id DA983140276;
+	Sun, 23 Nov 2025 01:20:01 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 22 Nov 2025 20:19:59 +0300
+Message-ID: <d97948f7-9933-1044-9137-b424b81ab926@huawei-partners.com>
+Date: Sat, 22 Nov 2025 20:19:56 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251110123807.07ff5d89@phoenix> <aR/qwlyEWm/pFAfM@pop-os.localdomain>
- <CAM0EoMkPdyqEMa0f4msEveGJxxd9oYaV4f3NatVXR9Fb=iCTcw@mail.gmail.com>
- <aSDdYoK7Vhw9ONzN@pop-os.localdomain> <20251121161322.1eb61823@phoenix.local> <20251121175556.26843d75@kernel.org>
-In-Reply-To: <20251121175556.26843d75@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 22 Nov 2025 12:16:32 -0500
-X-Gm-Features: AWmQ_blEgxQqjqbPca4g4IIx1fXgMdgr7MKgDDF7zmrM2MHksKZScsuwUie_Toc
-Message-ID: <CAM0EoMnoocCVQbky3NQZt1kkHbEYsKgTEspBd4YbfqmSd=1=wQ@mail.gmail.com>
-Subject: Re: [Bug 220774] New: netem is broken in 6.18
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, will@willsroot.io, 
-	jschung2@proton.me, savy@syst3mfailure.io
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v4 06/19] landlock: Add hook on socket creation
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>
+CC: <mic@digikod.net>, <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
+	<matthieu@buffet.re>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20251118134639.3314803-1-ivanov.mikhail1@huawei-partners.com>
+ <20251118134639.3314803-7-ivanov.mikhail1@huawei-partners.com>
+ <20251122.78c6cd69a873@gnoack.org>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20251122.78c6cd69a873@gnoack.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
-On Fri, Nov 21, 2025 at 8:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri, 21 Nov 2025 16:13:22 -0800 Stephen Hemminger wrote:
-> > On Fri, 21 Nov 2025 13:45:06 -0800
-> > Cong Wang <xiyou.wangcong@gmail.com> wrote:
-> >
-> > > On Fri, Nov 21, 2025 at 07:52:37AM -0500, Jamal Hadi Salim wrote:
-> > >
-> > > > jschung2@proton.me: Can you please provide more details about what =
-you
-> > > > are trying to do so we can see if a different approach can be
-> > > > prescribed?
-> > > >
-> > >
-> > > An alternative approach is to use eBPF qdisc to replace netem, but:
-> > > 1) I am not sure if we could duplicate and re-inject a packet in eBPF=
- Qdisc
-> > > 2) I doubt everyone wants to write eBPF code when they already have a
-> > > working cmdline.
-> > >
-> > > BTW, Jamal, if your plan is to solve them one by one, even if it coul=
-d work,
-> > > it wouldn't scale. There are still many users don't get hit by this
-> > > regression yet (not until hitting LTS or major distro).
-> >
-> > The bug still needs to be fixed.
-> > eBPF would still have the same kind of issues.
->
-> I guess we forgot about mq.. IIRC mq doesn't come into play in
-> duplication, we should be able to just adjust the check to allow
-> the mq+netem hierarchy?
+On 11/22/2025 2:41 PM, Günther Noack wrote:
+> On Tue, Nov 18, 2025 at 09:46:26PM +0800, Mikhail Ivanov wrote:
+>> Add hook on security_socket_create(), which checks whether the socket
+>> of requested protocol is allowed by domain.
+>>
+>> Due to support of masked protocols Landlock tries to find one of the
+>> 4 rules that can allow creation of requested protocol.
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>> Changes since v3:
+>> * Changes LSM hook from socket_post_create to socket_create so
+>>    creation would be blocked before socket allocation and initialization.
+>> * Uses credential instead of domain in hook_socket create.
+>> * Removes get_raw_handled_socket_accesses.
+>> * Adds checks for rules with wildcard type and protocol values.
+>> * Minor refactoring, fixes.
+>>
+>> Changes since v2:
+>> * Adds check in `hook_socket_create()` to not restrict kernel space
+>>    sockets.
+>> * Inlines `current_check_access_socket()` in the `hook_socket_create()`.
+>> * Fixes commit message.
+>>
+>> Changes since v1:
+>> * Uses lsm hook arguments instead of struct socket fields as family-type
+>>    values.
+>> * Packs socket family and type using helper.
+>> * Fixes commit message.
+>> * Formats with clang-format.
+>> ---
+>>   security/landlock/setup.c  |  2 +
+>>   security/landlock/socket.c | 78 ++++++++++++++++++++++++++++++++++++++
+>>   security/landlock/socket.h |  2 +
+>>   3 files changed, 82 insertions(+)
+>>
+>> diff --git a/security/landlock/setup.c b/security/landlock/setup.c
+>> index bd53c7a56ab9..140a53b022f7 100644
+>> --- a/security/landlock/setup.c
+>> +++ b/security/landlock/setup.c
+>> @@ -17,6 +17,7 @@
+>>   #include "fs.h"
+>>   #include "id.h"
+>>   #include "net.h"
+>> +#include "socket.h"
+>>   #include "setup.h"
+>>   #include "task.h"
+>>   
+>> @@ -68,6 +69,7 @@ static int __init landlock_init(void)
+>>   	landlock_add_task_hooks();
+>>   	landlock_add_fs_hooks();
+>>   	landlock_add_net_hooks();
+>> +	landlock_add_socket_hooks();
+>>   	landlock_init_id();
+>>   	landlock_initialized = true;
+>>   	pr_info("Up and running.\n");
+>> diff --git a/security/landlock/socket.c b/security/landlock/socket.c
+>> index 28a80dcad629..d7e6e7b92b7a 100644
+>> --- a/security/landlock/socket.c
+>> +++ b/security/landlock/socket.c
+>> @@ -103,3 +103,81 @@ int landlock_append_socket_rule(struct landlock_ruleset *const ruleset,
+>>   
+>>   	return err;
+>>   }
+>> +
+>> +static int check_socket_access(const struct landlock_ruleset *dom,
+>> +			       uintptr_t key,
+>> +			       layer_mask_t (*const layer_masks)[],
+>> +			       access_mask_t handled_access)
+>> +{
+>> +	const struct landlock_rule *rule;
+>> +	struct landlock_id id = {
+>> +		.type = LANDLOCK_KEY_SOCKET,
+>> +	};
+>> +
+>> +	id.key.data = key;
+> 
+> This line can be made part of the designated initializer:
+> 
+>      struct landlock_id id = {
+>        .type = ...,
+>        .key.data = ...,
+>      };
+> 
 
-Yes, something like that - but imo it would be fugly to do that check
-in current code just for mq.
-I proposed to add another qdisc ops which checks for cross-qdisc
-semantics. This ops will be invoked by a qdisc's change/init - sort of
-what pci quirks ops does. For example in this case it will disallow
-setting up netem when it would cause loops but have the quirck checker
-allow multiple children such as with mq with as long as none is
-looping. I believe some sort of "feature bits" checking should work
-here.
+Indeed, thats would be better.
 
-The majority of the bugs we are dealing with follow the formula of:
-a) create a nonsense hierarchy of qdiscs which has no pratical value,
-b) start sending packets
-c) netlink cmds to change hierarchy some more; It's more fun if you
-can get packets stuck - the formula in this case includes non-working
-conserving qdsiscs somewhere in the hierarchy
-d) send more packets
-e) profit
-Current init/change are not really designed to catch things that deal
-with children or parents, so catching #a or #c is a challenge. We do
-"make it work" eventually but it keeps adding these "checks" for
-nonsense setups adds more unnecessary code.
+> 
+>> +	rule = landlock_find_rule(dom, id);
+>> +	if (landlock_unmask_layers(rule, handled_access, layer_masks,
+>> +				   LANDLOCK_NUM_ACCESS_SOCKET))
+>> +		return 0;
+>> +	return -EACCES;
+>> +}
+>> +
+>> +static int hook_socket_create(int family, int type, int protocol, int kern)
+>> +{
+>> +	layer_mask_t layer_masks[LANDLOCK_NUM_ACCESS_SOCKET] = {};
+>> +	access_mask_t handled_access;
+>> +	const struct access_masks masks = {
+>> +		.socket = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> +	};
+>> +	const struct landlock_cred_security *const subject =
+>> +		landlock_get_applicable_subject(current_cred(), masks, NULL);
+>> +	uintptr_t key;
+>> +
+>> +	if (!subject)
+>> +		return 0;
+>> +	/* Checks only user space sockets. */
+>> +	if (kern)
+>> +		return 0;
+>> +
+>> +	handled_access = landlock_init_layer_masks(
+>> +		subject->domain, LANDLOCK_ACCESS_SOCKET_CREATE, &layer_masks,
+>> +		LANDLOCK_KEY_SOCKET);
+> 
+> Nit: I had to double check to confirm that the same PF_INET/PF_PACKET
+> transformation (which net/socket.c refers to as the "uglymoron") has
+> already happened on the arguments before hook_socket_create() gets
+> called from there.  Maybe it's worth a brief mention in a comment
+> here.
 
-Perhaps its time to start this effort and use this specific scenario
-as a use case.
+Ok, thanks!
 
-cheers,
-jamal
+> 
+>> +	/*
+>> +	 * Error could happen due to parameters are outside of the allowed range,
+> 
+> Grammar nit: drop the "are"
+> 
+> Suggestion: "If this error happens, the parameters are outside of the
+> allowed range, so this combination can't have been added to the
+> ruleset previously."
+
+Thanks, I'll use it.
+
+> 
+>> +	 * so this combination couldn't be added in ruleset previously.
+>> +	 * Therefore, it's not permitted.
+>> +	 */
+>> +	if (pack_socket_key(family, type, protocol, &key) == -EACCES)
+>> +		return -EACCES;
+> 
+> BUG: pack_socket_key() does never return -EACCES!
+
+Thanks a lot, will be fixed!
+
+> 
+> (Consider whether that function should really return an error?  Maybe
+> a boolean would be better, if you anyway need a different error code
+> in both locations where it is called.)
+
+Agreed
+
+> 
+> Can this code path actually get hit, or do the entry points for
+> creating sockets refuse these wrong values at an earlier stage with
+> EINVAL already?
+
+There are checks for family and type ranges in __sock_create. Protocol
+ranges should be checked in methods specific to protocol family after
+LSM hook is triggered. But it would be safer to keep this check in order
+to be independent of the specific kernel version.
+
+> 
+>> +	if (check_socket_access(subject->domain, key, &layer_masks,
+>> +				handled_access) == 0)
+>> +		return 0;
+>> +
+>> +	/* Ranges were already checked. */
+>> +	(void)pack_socket_key(family, TYPE_ALL, protocol, &key);
+>> +	if (check_socket_access(subject->domain, key, &layer_masks,
+>> +				handled_access) == 0)
+>> +		return 0;
+>> +
+>> +	(void)pack_socket_key(family, type, PROTOCOL_ALL, &key);
+>> +	if (check_socket_access(subject->domain, key, &layer_masks,
+>> +				handled_access) == 0)
+>> +		return 0;
+>> +
+>> +	(void)pack_socket_key(family, TYPE_ALL, PROTOCOL_ALL, &key);
+>> +	if (check_socket_access(subject->domain, key, &layer_masks,
+>> +				handled_access) == 0)
+>> +		return 0;
+>> +
+>> +	return -EACCES;
+>> +}
+> 
+> It initially doesn't look very nice to drop the error from
+> pack_socket_key() repeatedly.  The call repeats the bounds checks and
+> requires more cross-function reasoning to understand.
+
+Agreed
+
+> 
+> Since 'key' is an uintptr_t anyway, and the wildcards are all ones,
+> maybe a simpler way is to define masks for the wildcards?
+> 
+>      const uintptr_t any_type_mask     = (union key){.data.type     = UINT8_MAX}.packed;
+>      const uintptr_t any_protocol_mask = (union key){.data.protocol = UINT16_MAX}.packed;
+> 
+> and then, after calling pack_socket_key() once with error check, use
+> the combinations
+> 
+>    * key
+>    * key | any_type
+>    * key | any_protocol
+>    * key | any_type | any_protocol
+> 
+> to construct the wildcard-enabled keys in the four calls to
+> check_socket_access()?  You could have compile-time assertions or
+> tests to check that the masking does the same as packing it from
+> scratch when passing -1.
+> 
+> (That being said, I don't feel strongly about it.)
+
+It seems clearer and simpler to me, so I think we should use your
+approach. Probably, pack_socket_key() should be changed to pack values
+using bit operations instead of socket_key structure:
+	key = protocol << 16 | type << 8 | family;
+
+> 
+> Remark on the side: I was briefly confused why we don't need to guard
+> on CONFIG_SECURITY_NETWORK, but this is already required by
+> CONFIG_LANDLOCK. So that looks good.
+> 
+> –Günther
 
