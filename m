@@ -1,136 +1,182 @@
-Return-Path: <netdev+bounces-240918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0C3AC7C0CA
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 01:58:15 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70147C7C119
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 02:08:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CBF23A3E47
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:58:14 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 341E934039B
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 01:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8645123AE62;
-	Sat, 22 Nov 2025 00:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5580E1DF736;
+	Sat, 22 Nov 2025 01:08:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1BXMDJn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f9Ide80P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5921F09AD;
-	Sat, 22 Nov 2025 00:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AFFB38F9C;
+	Sat, 22 Nov 2025 01:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763773092; cv=none; b=Xtv0Y+nOZqrft64jr8mQvnFvNY2yO9uAksxeNfkQPRc1N9XcbW8fz9I1liTPziXlu8Wq0pDiafJKno6ZDO9hftt8D5wxp5/kqEoP3wKgnN3+8F1gckX1eQ8r1MyAw4BUHytHiqSn3vthQjKno9SF8pzuEXikEamxXX6RklwR9fs=
+	t=1763773707; cv=none; b=hrJwVK7QnN6GaP06xcIYMqR81S14gU4kdqn+uZ2cFdua+5+bGP7d7nxntrhZafZY/FLf674d6tklPkeDlj+8Gtsdvb+mkVMKtYtij7JF1UNDCM94wBkI9Z5AcTXVJxkGy1aPiOJ2O00Vz+y5/trLWQZeDPeyxl15dap2jhcxRb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763773092; c=relaxed/simple;
-	bh=7dOS1urwg7ekPGlLg8CEDeNygH4QNwE9tnPY363vY0c=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=E94MAFihJOXNSDfBrc/il44KWfR/K3T737zyBpN/Q8vv0kRjV5AO2/TT09NC9kPDedAHc6+vxJfFmbFwgnc/zv9m3MTwfXEiOejVcfRrXdcqCP7HmG714D3kr+SuSZdGi9qkDPQx1kdLZzG95wXd5FR/Q5eSJqaAVxfi9jfvLZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1BXMDJn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90797C4CEF1;
-	Sat, 22 Nov 2025 00:58:07 +0000 (UTC)
+	s=arc-20240116; t=1763773707; c=relaxed/simple;
+	bh=vF5qOA/PMpQo4KzrucMrEDXZiRGYqeVx1tqeKDogbVs=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=oSR3DCwKg/D8MwZAKUagm8eHeLK7aALj+CqR/tvJEVLoiJ0YrQBvCaPuEG6LhBE6NwHU8D6O/WJcsg5yqLwx+XfYUfJmmhiqSC0/zQeAVVZh/GsillMWyfecM5Xm9kcYZmd+cjwoIRJMGUGqiHQYohM4u5B1nr7KHQ5z+C13tWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f9Ide80P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BE32C4CEF1;
+	Sat, 22 Nov 2025 01:08:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763773087;
-	bh=7dOS1urwg7ekPGlLg8CEDeNygH4QNwE9tnPY363vY0c=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=M1BXMDJnzWKoq/RhWeSRF1xxTV9r3LuMyB0EukCY/boNCO7u77FviLFEEHuedGxF9
-	 s9p5oKYEV5CNdN1Y6D2pE3YPpJ2TgVkC70fdaOdi70S1Gi0c+ktwZ8tGAlWYAyawBb
-	 EwTs+lHr06hKDFKefC+osX0t5nXn7fZ5CfaEN9b9kpgDeY8tuOj1bpHm0FMWiWy4IH
-	 zTlmh7R5uElcZHTbWUME5tteF4kTvOV/8u3ECODXKBouQzHkh4sLCSXAj0PQwyBG/3
-	 AiiEG5OyJ3Xvy643aRHThS1aGGgfEAlky4K05vNJ1UkZaFHmiohF12ii8eIcgsv064
-	 RyKyS/SstnmOQ==
-Content-Type: multipart/mixed; boundary="===============8715300661097654828=="
+	s=k20201202; t=1763773706;
+	bh=vF5qOA/PMpQo4KzrucMrEDXZiRGYqeVx1tqeKDogbVs=;
+	h=Subject:From:To:Date:In-Reply-To:References:From;
+	b=f9Ide80PZmGRxH2MqsPuE30kFXk2Ult8xHI4uCiLsprlGIK0hUvgCh+Plj/5jWj4s
+	 mKbToycSucurDJXEyPSFYZL7UJEcFIA9l96a/aQiNPOcTiKq2rNnzfFnj2gRuypIYK
+	 onwGud37gekYYA77zeN7tnPR/kQN1FO86UiCSxEDqRBjhOMIc5Qqn+EG7N4BubEL6i
+	 19rj44XBAhMeHVceKi6eXspMdmSClQ/wlRZJe05XAoRnagCf8TXzlVmL2sX9TXt5Bm
+	 rVpaxOhOTVtJg8TXrX1O1+p/EotwVPYkaMCXIg0/3IhQ2LHTxfUDB9pn1yeS9BdEO1
+	 Y95Qw6SvUptVQ==
+Message-ID: <6689415773004afd10b3a0035862dd4faaf78021.camel@kernel.org>
+Subject: Re: [PATCH v21 00/23] Type2 device basic support
+From: PJ Waskiewicz <ppwaskie@kernel.org>
+To: Alejandro Lucero Palau <alucerop@amd.com>,
+ alejandro.lucero-palau@amd.com, 	linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, 	edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, dave.jiang@intel.com
+Date: Fri, 21 Nov 2025 17:08:25 -0800
+In-Reply-To: <8d8cb631-1d72-436f-ac97-5449ba46ef42@amd.com>
+References: <20251119192236.2527305-1-alejandro.lucero-palau@amd.com>
+	 <e3d376c8a1ac1ee9b75d02f78bdc25f7c556bb20.camel@kernel.org>
+	 <8d8cb631-1d72-436f-ac97-5449ba46ef42@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <b277d408a2a94c37fb452fef7192ce1c1fcc0ef5288e9a26e3c7373db18c1f7a@mail.kernel.org>
-In-Reply-To: <20251121231352.4032020-4-ameryhung@gmail.com>
-References: <20251121231352.4032020-4-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf-next v7 3/6] libbpf: Add support for associating BPF program with struct_ops
-From: bot+bpf-ci@kernel.org
-To: ameryhung@gmail.com,bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,tj@kernel.org,martin.lau@kernel.org,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Sat, 22 Nov 2025 00:58:07 +0000 (UTC)
 
---===============8715300661097654828==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, 2025-11-21 at 10:40 +0000, Alejandro Lucero Palau wrote:
+>=20
+> On 11/21/25 06:41, PJ Waskiewicz wrote:
+> > On Wed, 2025-11-19 at 19:22 +0000, alejandro.lucero-palau@amd.com
+> > wrote:
+> >=20
+> > Hi Alejandro,
+> >=20
+> > Sorry it's been a bit since I've been able to comment.=C2=A0 I've been
+> > trying to test these patchsets with varying degrees of success.=C2=A0
+> > Still
+> > haven't gotten things up and running fully.=C2=A0 One comment below.
+>=20
+>=20
+> Hi,
+>=20
+>=20
+> No worries!
+>=20
+>=20
+> > > From: Alejandro Lucero <alucerop@amd.com>
+> > >=20
+> > > The patchset should be applied on the described base commit then
+> > > applying
+> > > Terry's v13 about CXL error handling. The first 4 patches come
+> > > from
+> > > Dan's
+> > > for-6.18/cxl-probe-order branch with minor modifications.
+> > >=20
+> > > v21 changes;
+> > >=20
+> > > =C2=A0=C2=A0 patch1-2: v20 patch1 splitted up doing the code move in =
+the
+> > > second
+> > > 	=C2=A0=C2=A0=C2=A0 patch in v21. (Jonathan)
+> > > =C2=A0=20
+> > > =C2=A0=C2=A0 patch1-4: adding my Signed-off tag along with Dan's
+> > >=20
+> > > =C2=A0=C2=A0 patch5: fix duplication of CXL_NR_PARTITION definition
+> > >=20
+> > > =C2=A0=C2=A0 patch7: dropped the cxl test fixes removing unused funct=
+ion.
+> > > It was
+> > > 	=C2=A0 sent independently ahead of this version.
+> > >=20
+> > > =C2=A0=C2=A0 patch12: optimization for max free space calculation
+> > > (Jonathan)
+> > >=20
+> > > =C2=A0=C2=A0 patch19: optimization for returning on error (Jonathan)
+> > I cannot test these v21 patches or the v20 patches for the same
+> > reason.
+> > I suspect v19 is also affected, but I was stuck on v17 for awhile
+> > (b4
+> > was really not likely the prereq patches you required to get the
+> > tree
+> > into a usable state to apply your patchset).
+> >=20
+> > When I build and go to install the kernel mods, depmod fails:
+> >=20
+> > DEPMOD=C2=A0 /lib/modules/6.18.0-rc6+
+> > depmod: ERROR: Cycle detected: cxl_core -> cxl_mem -> cxl_port ->
+> > cxl_core
+> > depmod: ERROR: Cycle detected: cxl_core -> cxl_mem -> cxl_core
+> > depmod: ERROR: Found 3 modules in dependency cycles!
+> >=20
+> > I repro'd this on a few different systems, and just finally repro'd
+> > this on a box outside of my work network.
+> >=20
+> > This is unusable unfortunately, so I can't test this if I wanted
+> > to.
+>=20
+>=20
+> I have been able to reproduce this, and I think after the changes=20
+> introduced in patches 2 & 3, we also need this:
+>=20
+>=20
+>=20
+> diff --git a/drivers/cxl/Kconfig b/drivers/cxl/Kconfig
+> index 6b871cbbce13..94a3102ce86b 100644
+> --- a/drivers/cxl/Kconfig
+> +++ b/drivers/cxl/Kconfig
+> @@ -1,6 +1,6 @@
+> =C2=A0=C2=A0# SPDX-License-Identifier: GPL-2.0-only
+> =C2=A0=C2=A0menuconfig CXL_BUS
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tristate "CXL (Compute Express Link=
+) Devices Support"
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool "CXL (Compute Express Link) De=
+vices Support"
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 depends on PCI
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 select FW_LOADER
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 select FW_UPLOAD
+>=20
+>=20
+> This changes implies neither CXL_BUS optionally being a module nor
+> cxl_mem.
+>=20
+>=20
+> This should be enough for at least you able to test the patchset.
+>=20
+>=20
+> If this is agreed, I will send a v22 with it.
 
-> diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
-> index b66f5fbfb..21b57a629 100644
-> --- a/tools/lib/bpf/bpf.c
-> +++ b/tools/lib/bpf/bpf.c
+This seems reasonable to me to make things work.
 
-[ ... ]
+I'd definitely want Dave or Dan to weigh in though since this does make
+CXL no longer be modular, and it's either built-in or not.  Personally,
+if this is the price to pay for the non-asynchronous nature of memdev
+creation for a Type2 driver, I'm fine with that.
 
-> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-> index 706e7481b..1d5424276 100644
-> --- a/tools/lib/bpf/libbpf.c
-> +++ b/tools/lib/bpf/libbpf.c
-> @@ -14137,6 +14137,37 @@ int bpf_program__set_attach_target(struct bpf_program *prog,
->  	return 0;
->  }
->
-> +int bpf_program__assoc_struct_ops(struct bpf_program *prog, struct bpf_map *map,
-> +				  struct bpf_prog_assoc_struct_ops_opts *opts)
-> +{
-> +	int prog_fd, map_fd;
-> +
-> +	prog_fd = bpf_program__fd(prog);
-> +	if (prog_fd < 0) {
-> +		pr_warn("prog '%s': can't associate BPF program without FD (was it loaded?)\n",
-> +			prog->name);
+I'm rebuilding now and will rebase my drivers onto this, and hopefully
+be testing again over the weekend.  If things start looking good, I'll
+send some Tested-by: and also review more deeply.
 
-Can prog->name be accessed here when prog is NULL?  The function
-bpf_program__fd() returns libbpf_err(-EINVAL) when prog is NULL,
-which makes prog_fd < 0 true, then prog->name is dereferenced.
-
-Similarly for the map parameter below:
-
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (prog->type == BPF_PROG_TYPE_STRUCT_OPS) {
-> +		pr_warn("prog '%s': can't associate struct_ops program\n", prog->name);
-> +		return -EINVAL;
-> +	}
-> +
-> +	map_fd = bpf_map__fd(map);
-> +	if (map_fd < 0) {
-> +		pr_warn("map '%s': can't associate BPF map without FD (was it created?)\n", map->name);
-
-The function bpf_map__fd() returns libbpf_err(-EINVAL) when map is
-NULL, making this condition true, then map->name is dereferenced.
-
-The function bpf_program__set_attach_target() above checks for NULL
-explicitly before accessing the prog pointer.  Should this function
-follow the same pattern?
-
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (!bpf_map__is_struct_ops(map)) {
-> +		pr_warn("map '%s': can't associate non-struct_ops map\n", map->name);
-> +		return -EINVAL;
-> +	}
-> +
-> +	return bpf_prog_assoc_struct_ops(prog_fd, map_fd, opts);
-> +}
-
-[ ... ]
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19586343154
-
---===============8715300661097654828==--
+Cheers,
+-PJ
 
