@@ -1,296 +1,180 @@
-Return-Path: <netdev+bounces-241000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA733C7D4BF
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 18:21:01 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCCC0C7D4C5
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 18:25:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1417634B554
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 17:20:19 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A136A4E1010
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 17:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA37264612;
-	Sat, 22 Nov 2025 17:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A5A25EFAE;
+	Sat, 22 Nov 2025 17:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="HkA1L65x"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B863225B1D2;
-	Sat, 22 Nov 2025 17:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E464F150997
+	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 17:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763832014; cv=none; b=jdW54Lf+LFrik6b1JSpLuCLj5dXbIgE8LwQ4/kIMvLKsWthJrfTWkomupGg16x0ZXLeR4o4MGfOCEK1FjgogbYU8wcK8Am61z8tYzndBR1ZCJMxvm9h/cKOwk5MBIGUiSomZueiRr4HfDheE3M9AkSajKvT5MdtYdkX67LnbXs0=
+	t=1763832296; cv=none; b=YuHtguC4r/K/zHRkT7PMyf/4VU76nr9DU0NBmrC2ya2e98WuTHJKsxuwYzvT9oJD5uun8shphODpBgjRqzIjpyH87B1OQDHHRAGgZclY66Fv0no1QwLkbY792hAbJLfvme0jCuihbBZPZHUebPDt+KOiA4lKvV1QXy++KhHVkFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763832014; c=relaxed/simple;
-	bh=sz/pDSTTApR9cxIHGR7p2n+30eVMwOoqzVr4UMvOmMU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=VcK2jWS2y4cqT511RS7ZJRlHRebImywvt3RiFApshsKLz61TQAKt6zbIWY5M1THXITkkb4i8TpT6JQ6RWECmbg4Y+3VdpDRJY5vx6qu6cT0qHEBZpRAaCRjl8eJQRaxq1BknRrndHGf/hxk0XAHwT8qvcKz0jrzWMzLaeuz+IIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dDJjD6BKbzJ468G;
-	Sun, 23 Nov 2025 01:19:12 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id DA983140276;
-	Sun, 23 Nov 2025 01:20:01 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 22 Nov 2025 20:19:59 +0300
-Message-ID: <d97948f7-9933-1044-9137-b424b81ab926@huawei-partners.com>
-Date: Sat, 22 Nov 2025 20:19:56 +0300
+	s=arc-20240116; t=1763832296; c=relaxed/simple;
+	bh=g7ULHR4fQ4gTOEtOtX2W/mP1FAR6W8EHgt9kljda59s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aApwpry/z2sEfcppv6hliQnTX54FgiFulXPvoT5DkDPDa4j1D1jZsgXYle1OBY/B0lidBa2jZuetQ9VuA5hpm0GjDoKLGKwiSZcwjsBZgDhjGsoD2kqw0Vi85va1mhJPzsUkvI4SwznII7Hfx0uk2i/Z/C0tgazzse/7/Hep+IY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=HkA1L65x; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-34374febdefso3274669a91.0
+        for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 09:24:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1763832294; x=1764437094; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mogt2vG3TzthIHV1SrUDRyVH6E6RlWh2L5W1Rtq21p4=;
+        b=HkA1L65xvGCFY4glWqw4WrXK8FXgQbEWQVosVatL3XxTvSf3XmBiQIGmpzf8hiFmIW
+         Cg6XGHu43bQKkK5p3krZWtTyOLnV/ro/Is+gZ7KTPhuXuB8yplWdFvP+ctPJVKAYwUXB
+         OgGuzEy+rLXSgK6zLa2FwZvWSXhdBa1FPWnoyxob4Zkwg17TmKNwJ8iRAOlY6CKLhuwv
+         UiA77lT0UoY2CcD9kxPhNlPcmRUgw9XIh9dC6DyT56FCG8euIkWTnVc2onoi0QpmvAim
+         DNYpBOJ3Y9M1bO6rnqwze/7Vi3HrP4Pvjmc1vy9Xtx7U1QLXYgMDf6ToK9BvL6TWLgUm
+         5YhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763832294; x=1764437094;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Mogt2vG3TzthIHV1SrUDRyVH6E6RlWh2L5W1Rtq21p4=;
+        b=q+EGlYQpz+fyrN/7idr/XoHxThkNQTuKTNAOI69lVJ2rDOyoo+eQ7dtv6DzhT8uqrL
+         xBdonPbohignMlUlTOUZ+nb0m2ySixqMM91Wx6HYN5ydONxHpzD4GklNvuDg9EmBZchx
+         uKNtKp+g3UsLUMyA7+Fj9IajquCyfRrc7Xq6ll4gC2g6q2LfGvfluGdRfQ1XbbjTJJEX
+         UUK/fYD0ncLNPBoByX8tcE0/YBJRGYl0NKQz1FTwocA+O0zGWD4EuO3EkK5NuKDyckya
+         dvRV2F3O7rCIpk5MUSsD6d5fM25pMT/KCG3/2AZKvRT/G1y/7HkOwmbiQDLBtwyiWlGn
+         iekg==
+X-Forwarded-Encrypted: i=1; AJvYcCU9dt8BM5+p7eEjCvcNkaSl4YvugIzzomHPfhJ7Xednf0fbIOUdOcHGEm2eOWTPT2N/zcdSWN8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWw261xibQ/WVHPdGmdRw9Y0jupRRxTZ8CO+wzhDy0GJOPWO1H
+	1EDmeaR4jT+SbeV+c1MEoI05VQtiQWnyn6Dnrp6eFKpWjvH0eNOMVXRmnkGE8yh+NR4KbV0zpW4
+	IBWpMf0q1LQUzSUFPmMB4YsxOxjRgaoiY0SZ3ZPOi
+X-Gm-Gg: ASbGnctyoTWX6nIhNnYcEe0PXXR2L8K61XGQGR1WL38oExI09W2jyYvO011Gn/CCXTo
+	uB40k7EwzE98idhtEx5WbSEMJKEUtN1dnfivY7bCC0euBWcEq9/OjUVm4nYMFBowqvjhCHeeN72
+	BhiRJ5i2q9vRtcJGUWttFQB1/K4kCYa8zFh/l9DR4ilFlL27llPuFH4lGTusbCysWJ8zTP1dOVH
+	y+kT9duJMoTmDaj+DujJRIjxG+m3LKAZtWWsqnV0MV0CM2md6pcBuMuhAMQ4zc9eGidg7ucjdCJ
+	lztm9p6A0viyQw==
+X-Google-Smtp-Source: AGHT+IEqOac+BFYpxfM0/uO36LtiOuNfPOYc5xaD5nOBsqTV/iFqdEYsjiW7QKEkeeq6eJD3nbzdYW5oq57rIKceRv4=
+X-Received: by 2002:a17:90b:5183:b0:341:2141:d809 with SMTP id
+ 98e67ed59e1d1-34733f3d481mr7005864a91.26.1763832294239; Sat, 22 Nov 2025
+ 09:24:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v4 06/19] landlock: Add hook on socket creation
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>
-CC: <mic@digikod.net>, <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
-	<matthieu@buffet.re>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20251118134639.3314803-1-ivanov.mikhail1@huawei-partners.com>
- <20251118134639.3314803-7-ivanov.mikhail1@huawei-partners.com>
- <20251122.78c6cd69a873@gnoack.org>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20251122.78c6cd69a873@gnoack.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+References: <20251110123807.07ff5d89@phoenix> <aR/qwlyEWm/pFAfM@pop-os.localdomain>
+ <CAM0EoMkPdyqEMa0f4msEveGJxxd9oYaV4f3NatVXR9Fb=iCTcw@mail.gmail.com> <oXMTlZ5OaURBe0X3RZCO7zyNf6JJFPYvDW0AiXEg0bXJwXXYJutLhhjmUbetBUD_pGChlN7hDCCx9xFOtj8Hke5G7SM3-u5FQFC5e4T1wPY=@proton.me>
+In-Reply-To: <oXMTlZ5OaURBe0X3RZCO7zyNf6JJFPYvDW0AiXEg0bXJwXXYJutLhhjmUbetBUD_pGChlN7hDCCx9xFOtj8Hke5G7SM3-u5FQFC5e4T1wPY=@proton.me>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Sat, 22 Nov 2025 12:24:43 -0500
+X-Gm-Features: AWmQ_bnWz70tEA_PHxhbkiZ9FEAU4DfGsk_s0DtN1pn3FeENFXUZhpYAqSk5WBs
+Message-ID: <CAM0EoM=i6MsHeBYu6d-+bkxVWWHcj9b9ibM+dHr3w27mUMMhBw@mail.gmail.com>
+Subject: Re: Fw: [Bug 220774] New: netem is broken in 6.18
+To: =?UTF-8?B?7KCV7KeA7IiY?= <jschung2@proton.me>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, will@willsroot.io, savy@syst3mfailure.io
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/22/2025 2:41 PM, Günther Noack wrote:
-> On Tue, Nov 18, 2025 at 09:46:26PM +0800, Mikhail Ivanov wrote:
->> Add hook on security_socket_create(), which checks whether the socket
->> of requested protocol is allowed by domain.
->>
->> Due to support of masked protocols Landlock tries to find one of the
->> 4 rules that can allow creation of requested protocol.
->>
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->> Changes since v3:
->> * Changes LSM hook from socket_post_create to socket_create so
->>    creation would be blocked before socket allocation and initialization.
->> * Uses credential instead of domain in hook_socket create.
->> * Removes get_raw_handled_socket_accesses.
->> * Adds checks for rules with wildcard type and protocol values.
->> * Minor refactoring, fixes.
->>
->> Changes since v2:
->> * Adds check in `hook_socket_create()` to not restrict kernel space
->>    sockets.
->> * Inlines `current_check_access_socket()` in the `hook_socket_create()`.
->> * Fixes commit message.
->>
->> Changes since v1:
->> * Uses lsm hook arguments instead of struct socket fields as family-type
->>    values.
->> * Packs socket family and type using helper.
->> * Fixes commit message.
->> * Formats with clang-format.
->> ---
->>   security/landlock/setup.c  |  2 +
->>   security/landlock/socket.c | 78 ++++++++++++++++++++++++++++++++++++++
->>   security/landlock/socket.h |  2 +
->>   3 files changed, 82 insertions(+)
->>
->> diff --git a/security/landlock/setup.c b/security/landlock/setup.c
->> index bd53c7a56ab9..140a53b022f7 100644
->> --- a/security/landlock/setup.c
->> +++ b/security/landlock/setup.c
->> @@ -17,6 +17,7 @@
->>   #include "fs.h"
->>   #include "id.h"
->>   #include "net.h"
->> +#include "socket.h"
->>   #include "setup.h"
->>   #include "task.h"
->>   
->> @@ -68,6 +69,7 @@ static int __init landlock_init(void)
->>   	landlock_add_task_hooks();
->>   	landlock_add_fs_hooks();
->>   	landlock_add_net_hooks();
->> +	landlock_add_socket_hooks();
->>   	landlock_init_id();
->>   	landlock_initialized = true;
->>   	pr_info("Up and running.\n");
->> diff --git a/security/landlock/socket.c b/security/landlock/socket.c
->> index 28a80dcad629..d7e6e7b92b7a 100644
->> --- a/security/landlock/socket.c
->> +++ b/security/landlock/socket.c
->> @@ -103,3 +103,81 @@ int landlock_append_socket_rule(struct landlock_ruleset *const ruleset,
->>   
->>   	return err;
->>   }
->> +
->> +static int check_socket_access(const struct landlock_ruleset *dom,
->> +			       uintptr_t key,
->> +			       layer_mask_t (*const layer_masks)[],
->> +			       access_mask_t handled_access)
->> +{
->> +	const struct landlock_rule *rule;
->> +	struct landlock_id id = {
->> +		.type = LANDLOCK_KEY_SOCKET,
->> +	};
->> +
->> +	id.key.data = key;
-> 
-> This line can be made part of the designated initializer:
-> 
->      struct landlock_id id = {
->        .type = ...,
->        .key.data = ...,
->      };
-> 
+Hi =EC=A0=95=EC=A7=80=EC=88=98,
 
-Indeed, thats would be better.
+On Sat, Nov 22, 2025 at 1:56=E2=80=AFAM =EC=A0=95=EC=A7=80=EC=88=98 <jschun=
+g2@proton.me> wrote:
+>
+>
+> #!/bin/bash
+>
+> set -euo pipefail
+>
+> DEV=3D"wlo0"
+> QUEUE=3D"1"
+> RTP_DST_PORT=3D"5004"
+> DUP_PCT=3D"25%"
+> CORR_PCT=3D"60%"
+> DELAY=3D"1ms"
+> VERIFY_SECONDS=3D15
+>
+> usage(){ echo "Usage: sudo $0 [-d DEV] [-q QUEUE] [-P UDP_PORT]"; exit 1;=
+ }
+> while [[ $# -gt 0 ]]; do
+>   case "$1" in
+>     -d) DEV=3D"$2"; shift 2;;
+>     -q) QUEUE=3D"$2"; shift 2;;
+>     -P) RTP_DST_PORT=3D"$2"; shift 2;;
+>     *) usage;;
+>   endac
+> done || true
+>
+> [[ -d /sys/class/net/$DEV ]] || { echo "No such dev $DEV"; exit 1; }
+>
+>
+> if ! tc qdisc show dev "$DEV" | grep -q ' qdisc mq '; then
+>   echo "Setting root qdisc to mq.."
+>   tc qdisc replace dev "$DEV" root handle 1: mq
+> fi
+>
+>
+> echo "Adding ntuple to steer UDP dport $RTP_DST_PORT -> tx-queue $QUEUE..=
+."
+> ethtool -N "$DEV" flow-type udp4 dst-port $RTP_DST_PORT action $QUEUE || =
+{
+>   echo "some flows will still land on :$QUEUE"
+> }
+>
+>
+> echo "Attaching netem duplicate=3D$DUP_PCT corr=3D$CORR_PCT delay=3D$DELA=
+Y on parent :$QUEUE.."
+> tc qdisc replace dev "$DEV" parent :$QUEUE handle ${QUEUE}00: \
+>   netem duplicate "$DUP_PCT" "$CORR_PCT" delay "$DELAY"
+>
+> tc qdisc show dev "$DEV"
+>
+> echo
+> echo "Start an RTP/WebRTC/SFU downlink to a test client on UDP port $RTP_=
+DST_PORT."
+> echo "Capturing for $VERIFY_SECONDS s to observe duplicates by RTP seqno.=
+."
+> timeout "$VERIFY_SECONDS" tcpdump -ni "$DEV" "udp and dst port $RTP_DST_P=
+ORT" -vv -c 0 2>/dev/null | head -n 3 || true
+>
+>
+> if command -v tshark >/dev/null 2>&1; then
+>   echo "tshark live RTP view :"
+>   timeout "$VERIFY_SECONDS" tshark -i "$DEV" -f "udp dst port $RTP_DST_PO=
+RT" -q -z rtp,streams || true
+> fi
+>
+> echo
+> echo "Netem stats, see duplicated counters under handle ${QUEUE}00:):"
+> tc -s qdisc show dev "$DEV" | sed -n '1,200p'
+>
 
-> 
->> +	rule = landlock_find_rule(dom, id);
->> +	if (landlock_unmask_layers(rule, handled_access, layer_masks,
->> +				   LANDLOCK_NUM_ACCESS_SOCKET))
->> +		return 0;
->> +	return -EACCES;
->> +}
->> +
->> +static int hook_socket_create(int family, int type, int protocol, int kern)
->> +{
->> +	layer_mask_t layer_masks[LANDLOCK_NUM_ACCESS_SOCKET] = {};
->> +	access_mask_t handled_access;
->> +	const struct access_masks masks = {
->> +		.socket = LANDLOCK_ACCESS_SOCKET_CREATE,
->> +	};
->> +	const struct landlock_cred_security *const subject =
->> +		landlock_get_applicable_subject(current_cred(), masks, NULL);
->> +	uintptr_t key;
->> +
->> +	if (!subject)
->> +		return 0;
->> +	/* Checks only user space sockets. */
->> +	if (kern)
->> +		return 0;
->> +
->> +	handled_access = landlock_init_layer_masks(
->> +		subject->domain, LANDLOCK_ACCESS_SOCKET_CREATE, &layer_masks,
->> +		LANDLOCK_KEY_SOCKET);
-> 
-> Nit: I had to double check to confirm that the same PF_INET/PF_PACKET
-> transformation (which net/socket.c refers to as the "uglymoron") has
-> already happened on the arguments before hook_socket_create() gets
-> called from there.  Maybe it's worth a brief mention in a comment
-> here.
+Thanks for the config.
 
-Ok, thanks!
+If you can talk about it: I was more interested in what your end goal is.
+From the dev name it seems $DEV is a wireless device? Are you
+replicating these RTP packets across different ssids mapped to
+different hw queues? Are you forwarding these packets? The ethtool
+config indicates the RX direction but the netem replication is on the
+tx.
+And in the short term if a tc action could achieve what you are trying
+to achieve - would that work for you?
 
-> 
->> +	/*
->> +	 * Error could happen due to parameters are outside of the allowed range,
-> 
-> Grammar nit: drop the "are"
-> 
-> Suggestion: "If this error happens, the parameters are outside of the
-> allowed range, so this combination can't have been added to the
-> ruleset previously."
-
-Thanks, I'll use it.
-
-> 
->> +	 * so this combination couldn't be added in ruleset previously.
->> +	 * Therefore, it's not permitted.
->> +	 */
->> +	if (pack_socket_key(family, type, protocol, &key) == -EACCES)
->> +		return -EACCES;
-> 
-> BUG: pack_socket_key() does never return -EACCES!
-
-Thanks a lot, will be fixed!
-
-> 
-> (Consider whether that function should really return an error?  Maybe
-> a boolean would be better, if you anyway need a different error code
-> in both locations where it is called.)
-
-Agreed
-
-> 
-> Can this code path actually get hit, or do the entry points for
-> creating sockets refuse these wrong values at an earlier stage with
-> EINVAL already?
-
-There are checks for family and type ranges in __sock_create. Protocol
-ranges should be checked in methods specific to protocol family after
-LSM hook is triggered. But it would be safer to keep this check in order
-to be independent of the specific kernel version.
-
-> 
->> +	if (check_socket_access(subject->domain, key, &layer_masks,
->> +				handled_access) == 0)
->> +		return 0;
->> +
->> +	/* Ranges were already checked. */
->> +	(void)pack_socket_key(family, TYPE_ALL, protocol, &key);
->> +	if (check_socket_access(subject->domain, key, &layer_masks,
->> +				handled_access) == 0)
->> +		return 0;
->> +
->> +	(void)pack_socket_key(family, type, PROTOCOL_ALL, &key);
->> +	if (check_socket_access(subject->domain, key, &layer_masks,
->> +				handled_access) == 0)
->> +		return 0;
->> +
->> +	(void)pack_socket_key(family, TYPE_ALL, PROTOCOL_ALL, &key);
->> +	if (check_socket_access(subject->domain, key, &layer_masks,
->> +				handled_access) == 0)
->> +		return 0;
->> +
->> +	return -EACCES;
->> +}
-> 
-> It initially doesn't look very nice to drop the error from
-> pack_socket_key() repeatedly.  The call repeats the bounds checks and
-> requires more cross-function reasoning to understand.
-
-Agreed
-
-> 
-> Since 'key' is an uintptr_t anyway, and the wildcards are all ones,
-> maybe a simpler way is to define masks for the wildcards?
-> 
->      const uintptr_t any_type_mask     = (union key){.data.type     = UINT8_MAX}.packed;
->      const uintptr_t any_protocol_mask = (union key){.data.protocol = UINT16_MAX}.packed;
-> 
-> and then, after calling pack_socket_key() once with error check, use
-> the combinations
-> 
->    * key
->    * key | any_type
->    * key | any_protocol
->    * key | any_type | any_protocol
-> 
-> to construct the wildcard-enabled keys in the four calls to
-> check_socket_access()?  You could have compile-time assertions or
-> tests to check that the masking does the same as packing it from
-> scratch when passing -1.
-> 
-> (That being said, I don't feel strongly about it.)
-
-It seems clearer and simpler to me, so I think we should use your
-approach. Probably, pack_socket_key() should be changed to pack values
-using bit operations instead of socket_key structure:
-	key = protocol << 16 | type << 8 | family;
-
-> 
-> Remark on the side: I was briefly confused why we don't need to guard
-> on CONFIG_SECURITY_NETWORK, but this is already required by
-> CONFIG_LANDLOCK. So that looks good.
-> 
-> –Günther
+cheers,
+jamal
 
