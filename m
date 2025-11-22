@@ -1,199 +1,139 @@
-Return-Path: <netdev+bounces-240932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 733F3C7C2AA
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 03:16:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4BECC7C2AE
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 03:17:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 67C294E1472
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 02:16:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8B8344E032D
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 02:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE6A22D7A5;
-	Sat, 22 Nov 2025 02:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C8CA23183B;
+	Sat, 22 Nov 2025 02:17:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qJEh+XZw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OmjpBe+Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1640019D065
-	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 02:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF6D201033
+	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 02:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763777763; cv=none; b=UwQPUkjbupEqsIdqWCri+SlRI32n78sjgqAiUR22T/6dZpjwUhpEIcIT2nQ4iCSlbBefXjx+M329StBBI6uR7a5xwNsPDzQRq7qUnbeBdJ+VFQaSyoWvDz5Mh67dpU68SvfWCcbCDQpwxor+SAFeZPOY52PsfTbOFHvm6pXxgbs=
+	t=1763777820; cv=none; b=bkRDEpaA47gZF/BYWbLnBEhKwzLZW73t6QYf4JYjRY4Yc37XhDQPWOe7tRkdPzUm6azrQW0C1CcM5EG0e46sNdqQkch6iJqNxH8kBjLh9aBbG8OR0GncwSIAiElF181gBJGQtmf+BZk35wjbkQnpHNiESKt/4XD7d+hcPn7zCig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763777763; c=relaxed/simple;
-	bh=BHFJkb65NF6jyvP92hQZHaZ7yu+Ipv4m4/djl5gPcR4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gC4fmVbj9Fza7QylxEaWMIylM2T3iGdiLjNQBzQBmNveTgN1yFDGzpMAeI+A7+B2ZKSjsS1xeFCIAGp0bMej2IweM2bo4EbJ4IMiB3P79zoJwx9YsmXq2t673hixcgtPDA4UmBmrp9aRcGW61hexXo2IIfR+VCsMsIrK/NNs9S4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qJEh+XZw; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7b86e0d9615so3104540b3a.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 18:16:01 -0800 (PST)
+	s=arc-20240116; t=1763777820; c=relaxed/simple;
+	bh=HcTrfLl0nwxO5b2LTWB2R002IRkel0ACVCeGY+W8t2Y=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=B+GgpcGWIrndCtc0EHgpPghLHK+ptaBlc8L+1mbDvUpu0J8MU3j8PL5e5wC5bFfRXfHWOukdMgVFABVYk5dqbsoXqcWgDtR+1nu5jPzHJvtywKib52ubXdkvgk4+QCHtoToGlRmTfcymDq3KfrGaRPRifE8qWbsxxpN6mvcdtxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OmjpBe+Y; arc=none smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-63fc6115d65so2241104d50.0
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 18:16:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763777761; x=1764382561; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1763777818; x=1764382618; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MwZHqk6D7/ztotFEOHDmupQkGYG2hAiZI4I+YGJ0Cng=;
-        b=qJEh+XZwr2LDy3eFEKJtiZ8jGVMHXLfLVrkQMBDfZ8oX7HnrBHSwQGJOw+SjPgXplv
-         3N++gIwLRnR3rIzlTaeKvjT0yr2sbsigq2pueJSYyTQvxiEpfrcDWkn8jLlpQBwO+eDm
-         mVe4k65Cea4iOUJjT4wvun43hejgdCUUTtotvFTLwBLYSi9ukPkXjSOBVCbbKlDwXF+g
-         +6erRFK0LDLthlNcBGUuabOIxIQ2Fv6hF7TW7NMPCj7JEDT9zrufTbN6ln5rTraCdOts
-         YRg5jO2hD+pcF3sJqhTnY0IXchpkslGSaexT9o+fhsyP+lLOWrGI2mBBvBFqeKUFGbsn
-         Mrrw==
+        bh=fZH1duZnEPXr5MV5XSfY2om1ciAirSpLv1SrLG39apQ=;
+        b=OmjpBe+YkaMd06KW4juBXlmrzO5506AxVnV/FI6Fu27wVtgb8Yj+S7NHg0ZSEB7p6s
+         gmlc/+8GhJj8Aki7a7D8Tp2gHkxrFORSFkcbH/RzG9j3w5AY3GyvMyWrifVwbleb+t5t
+         GbT865EVyXawPMEbpD0rICtHvCPI+UxhewrHzQ3ETGonSxuzvGa8Ld8lYqO51LOYmFY1
+         Unarl5Vq3ifIg6I4yxvFlFc/Gy5gEH1iAygdGNRe6yyoZNeHX/f5IaMJj4QZSVsHdBMQ
+         2FdCDYiwtWEgvwd3ammzbPJ23U5bftyZ+6zBqAK72xqIUqzRIETg1tQ59DibYvrz8nem
+         HbPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763777761; x=1764382561;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=MwZHqk6D7/ztotFEOHDmupQkGYG2hAiZI4I+YGJ0Cng=;
-        b=n+fLIkaje5tqGmQUgyOLKMgwMt1M8s4MsQ/ScftqP+gKMRWKUDbjezw+qXLfQ/N3id
-         qkJuci5/P4GWF4QtKJ6xe9NnntowTcA8hW0bvpg7BPBeSEhiGrwMIIl6fgfAxd1rxqNS
-         kT8CFIAPhbezTb8pIQmAopwnzB0pLyK4XBeKs6lGLnvKMrLLn7iHG5TPlErqbHEZhnnO
-         Ero5ne3OgTXl+UeI5+J5rotS07WtFRpfAB3zh3K0AnHYEU2HXFXkSWD0za7Rd7a6IDRl
-         6lOEHC06q9jf2PIWeGftOvBfhTKY6ESPf/oqXvdpG7sij1UBJvqRKPv0qyPNu4iwpBSt
-         8pgw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGSYh6TNzybyJbBoohAz1saCd9SYYuikgYcHGcxFpitN/z3Z+udwApw4Xlc4WhdVQV80P5Ab8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpUzRBcwEYR6fPZei9to3X70uoxriRyk1BBNzOpN7GYMFodLqq
-	DboCgt4RrFn1N9Wbll5+6RQOATygJGpu6QSlhEs+V7NUH/e9Uf42v4R8UUTZlqtUA+wMXT/8y8b
-	wIZkTj3hpGLSEpjmNTtDrM4+S6O59IFpi8qwhybQIpGXguBbqQgqRmXc7l9g=
-X-Gm-Gg: ASbGncszjUJx9qoG7yEj+2XcgGclf4/pDtr2/r8ZhYDBevxPPMxtSGYFocJl0jWpQ+w
-	6A9HahzaaHHjwkbh686I3/giY2ouyi6JbiZNp5TS2I/W9mxB2hND49M5QfkgmymbM4KE/u++2Cs
-	6FQ37sSCAG7bEOo0XNRRqCC11wPWCcHEPOWznnCLsTqvZ0uhwqSMikJL7QM8VOxv6WZL1iju3Q9
-	SAmubzMjojGNXeVJNz9vwpX0h7BDxrFlFONroTxLkhTRrzUesfkyZ28X4btDWt0GbajEbw3WzB1
-	Dli+8rPHHJJ6gWkcmdm/pDArGHQK
-X-Google-Smtp-Source: AGHT+IFUCKrwrkIcJ5jIciiCusYue03VCH60BWqW2feFIKgRses9GzdMsYNos9kodqTwN4Qd4PyVYtvrtAC+VnfymC4=
-X-Received: by 2002:a05:7022:6610:b0:11b:9386:825e with SMTP id
- a92af1059eb24-11c9d8720a1mr1680122c88.43.1763777761039; Fri, 21 Nov 2025
- 18:16:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763777818; x=1764382618;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fZH1duZnEPXr5MV5XSfY2om1ciAirSpLv1SrLG39apQ=;
+        b=tnaLRgCsqWPxA48Qc2vJYUZhIOqO0kMRY9Bz++P+pn7dGWcMXtZ8l3ix3R7Wm3L2oe
+         iQL4PYI17foG3/w/GxXRLOSB8DeSS62+wJ+WcbwbZUaY5tf5ELOZztmj147mYIlPA6z1
+         6SLtcV66V5+K4F+vijQtmw1SAABZjwbD9Yz7SlLE8qRC/pQbRxLIcMZPtT9AorMAtPuJ
+         KP6/p6B/TMDlA5kavvSEnv02m4aev2/QnAeoCZtiWipLp76rPPPOGLqTtbJIRW0SSU3n
+         gUgIv36j1tfpqE7eMPTSbua3XsqdjMEfgTUy1aMcZwtAk4NHdG5i++5tNeMVXmgHIYIU
+         n8MA==
+X-Forwarded-Encrypted: i=1; AJvYcCWcaiU++3QjyXg3nSFNUfsHRCoY+3teuXA2YAS6XDu9oxR0cq/gcHS6wORBnwcasPwZwXmkt28=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWE3W6b5UVQ8TZVkyx4bzd9S9EADmBz7pLiInOZnyWZI3F+3+D
+	mm0CJNpIHTa8bQMjNqxyzBHSN6H/qLaBEhNmO0FDtK/aIBSKlCKJa33V
+X-Gm-Gg: ASbGncsU5KFwyLt9euRL4hNix6LgWB9pkJPMjF6xkxkTPzBPfWAWKH2pZx37DHOYG+y
+	zkEYAaIi+ECA8YXedAPjMXwYCScd9MlGnE2CNrcpQqtjqDcJ/82JUwB5yOXo7UYUV6J999LouvU
+	sMfphQJbK4c1S4d/0FNpxMthxFz5yUyMAFrBHVJPnBykHwGo0iXDA9ujJfjWLh69+UWf3QvzZMq
+	qLkoGEUDptSSS7dKBIfTVThF1VrGjaVr5AbzjDwuuj5jY435jJ1b1Tm+BWP4YXvpS01JATSXvvD
+	hTSOLSPmrLeJnb5rQeyCW8SIyXUvQsW7eBUNLbFbHMJJkgaAmlAlIRThjwPb627aypwhixNfNee
+	kRO4LUherCHlgsOykbrIrnd54M8qL/T+yATZB+5v5dacmtJaYfjnGYRq4fOIE2IpxHj5vlUbomH
+	Fdtx8IcCuTyox9WQipKdH1rbrTm2Cpnc/27RwcnxIFl9tS+DqPuSjR2XKwT8RMd85QLHQ=
+X-Google-Smtp-Source: AGHT+IHoO6qNAUPw4+8PucvKAsU+85vfg1dtDVD5lxUKXjlhSCB8zRWLNk0AzYZnMtp7pZX7xPRC8A==
+X-Received: by 2002:a05:690e:1511:b0:63f:a324:bbf3 with SMTP id 956f58d0204a3-64302ab18damr3307134d50.42.1763777818152;
+        Fri, 21 Nov 2025 18:16:58 -0800 (PST)
+Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-642f707a9b9sm2278959d50.6.2025.11.21.18.16.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Nov 2025 18:16:57 -0800 (PST)
+Date: Fri, 21 Nov 2025 21:16:57 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ willemb@google.com, 
+ petrm@nvidia.com, 
+ dw@davidwei.uk, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.53e77e2eea78@gmail.com>
+In-Reply-To: <20251121173203.7bc1a3f4@kernel.org>
+References: <20251121040259.3647749-1-kuba@kernel.org>
+ <20251121040259.3647749-5-kuba@kernel.org>
+ <willemdebruijn.kernel.224bdf2fac125@gmail.com>
+ <20251121173203.7bc1a3f4@kernel.org>
+Subject: Re: [PATCH net-next 4/5] selftests: hw-net: toeplitz: read
+ indirection table from the device
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251121160954.88038-1-krisman@suse.de> <20251121160954.88038-3-krisman@suse.de>
-In-Reply-To: <20251121160954.88038-3-krisman@suse.de>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 21 Nov 2025 18:15:50 -0800
-X-Gm-Features: AWmQ_bkwrD2nvWkLk9hhcPJr_JfmdYMmx4MR6B5cjS0XjdSIov_5qt_nublNG5s
-Message-ID: <CAAVpQUAPrmDH6-ZiEioJ_sohbQ-kBu1MFBssPVzY34FRnsnz0w@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] socket: Split out a getsockname helper for io_uring
-To: Gabriel Krisman Bertazi <krisman@suse.de>
-Cc: Jens Axboe <axboe@kernel.dk>, netdev@vger.kernel.org, io-uring@vger.kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 21, 2025 at 8:10=E2=80=AFAM Gabriel Krisman Bertazi <krisman@su=
-se.de> wrote:
->
-> Similar to getsockopt, split out a helper to check security and issue
-> the operation from the main handler that can be used by io_uring.
->
-> Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
-> ---
->  include/linux/socket.h |  2 ++
->  net/socket.c           | 34 +++++++++++++++++++---------------
->  2 files changed, 21 insertions(+), 15 deletions(-)
->
-> diff --git a/include/linux/socket.h b/include/linux/socket.h
-> index 937fe331ff1e..5afb5ef2990c 100644
-> --- a/include/linux/socket.h
-> +++ b/include/linux/socket.h
-> @@ -453,6 +453,8 @@ extern int __sys_connect(int fd, struct sockaddr __us=
-er *uservaddr,
->                          int addrlen);
->  extern int __sys_listen(int fd, int backlog);
->  extern int __sys_listen_socket(struct socket *sock, int backlog);
-> +extern int do_getsockname(struct socket *sock, struct sockaddr_storage *=
-address,
-> +                         int peer, struct sockaddr __user *usockaddr, in=
-t __user *usockaddr_len);
->  extern int __sys_getsockname(int fd, struct sockaddr __user *usockaddr,
->                              int __user *usockaddr_len, int peer);
->  extern int __sys_socketpair(int family, int type, int protocol,
-> diff --git a/net/socket.c b/net/socket.c
-> index ee438b9425da..9c110b529cdd 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -2127,6 +2127,24 @@ SYSCALL_DEFINE3(connect, int, fd, struct sockaddr =
-__user *, uservaddr,
->         return __sys_connect(fd, uservaddr, addrlen);
->  }
->
-> +int do_getsockname(struct socket *sock, struct sockaddr_storage *address=
-, int peer,
-> +                  struct sockaddr __user *usockaddr, int __user *usockad=
-dr_len)
-> +{
-> +       int err;
-> +
-> +       if (peer)
-> +               err =3D security_socket_getpeername(sock);
-> +       else
-> +               err =3D security_socket_getsockname(sock);
-> +       if (err)
-> +               return err;
-> +       err =3D READ_ONCE(sock->ops)->getname(sock, (struct sockaddr *)ad=
-dress, peer);
-> +       if (err < 0)
-> +               return err;
-> +       /* "err" is actually length in this case */
-> +       return move_addr_to_user(address, err, usockaddr, usockaddr_len);
-> +}
-> +
->  /*
->   *     Get the address (remote or local ('name')) of a socket object. Mo=
-ve the
->   *     obtained name to user space.
-> @@ -2137,27 +2155,13 @@ int __sys_getsockname(int fd, struct sockaddr __u=
-ser *usockaddr,
->         struct socket *sock;
->         struct sockaddr_storage address;
+Jakub Kicinski wrote:
+> On Fri, 21 Nov 2025 18:12:16 -0500 Willem de Bruijn wrote:
+> > > +	if (rsp->_count.indir > RSS_MAX_INDIR)
+> > > +		error(1, 0, "RSS indirection table too large (%u > %u)",
+> > > +		      rsp->_count.indir, RSS_MAX_INDIR);
+> > > +
+> > > +	/* If indir table not available we'll fallback to simple modulo math */
+> > > +	if (rsp->_count.indir) {
+> > > +		memcpy(rss_indir_tbl, rsp->indir,
+> > > +		       rsp->_count.indir * sizeof(rss_indir_tbl[0]));  
+> > 
+> > It can be assumed that rsp->indir elements are sizeof(rss_indir_tbl[0])?
+> > 
+> > Is there a way to have the test verify element size. I'm not that
+> > familiar with YNL.
+> 
+> I suspect the reaction may be because drivers often use a smaller type.
+> But at the uAPI level the indirection table has always been represented
+> as an array of u32 (I mean the ioctl). And in the core we also always
+> deal with u32s. The Netlink type is not allowed to change either 
+> (it's a "C array" not individual attributes so members must be known
+> size).
+> 
+> LMK if you want me to add an assert or rework this. We could technically
+> keep the rsp struct around and use it directly?
+> 
+> Not fully convinced it's worth a respin, but LMK.. :)
 
-Could you move this to do_getsockname() ?
-
-The patch 3 also does not need to define it.
-
-
->         CLASS(fd, f)(fd);
-> -       int err;
->
->         if (fd_empty(f))
->                 return -EBADF;
->         sock =3D sock_from_file(fd_file(f));
->         if (unlikely(!sock))
->                 return -ENOTSOCK;
-> -
-> -       if (peer)
-> -               err =3D security_socket_getpeername(sock);
-> -       else
-> -               err =3D security_socket_getsockname(sock);
-> -       if (err)
-> -               return err;
-> -
-> -       err =3D READ_ONCE(sock->ops)->getname(sock, (struct sockaddr *)&a=
-ddress, peer);
-> -       if (err < 0)
-> -               return err;
-> -
-> -       /* "err" is actually length in this case */
-> -       return move_addr_to_user(&address, err, usockaddr, usockaddr_len)=
-;
-> +       return do_getsockname(sock, &address, peer, usockaddr, usockaddr_=
-len);
->  }
->
->  SYSCALL_DEFINE3(getsockname, int, fd, struct sockaddr __user *, usockadd=
-r,
-> --
-> 2.51.0
->
+Not at all. Thanks for that uAPI context.
 
