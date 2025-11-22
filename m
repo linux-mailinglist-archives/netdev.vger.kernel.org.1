@@ -1,385 +1,249 @@
-Return-Path: <netdev+bounces-240958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54820C7CCC4
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 11:49:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2A4EC7CDC4
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 12:07:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ACDB04E19EF
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 10:49:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04A423A920F
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 11:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6CD9286422;
-	Sat, 22 Nov 2025 10:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA152F2905;
+	Sat, 22 Nov 2025 11:04:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KULxkexQ"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="BJDrgaHu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013036.outbound.protection.outlook.com [52.101.72.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C012459F7
-	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 10:49:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763808552; cv=none; b=bT0icRxYFK/LZIbZOVUdWfYUeqU34YObB+7TpjECP5siEX9Hkyx8RMqgPC5y6qae9v5X4PRMPevpa3/AAVKYr6wwMVZ9pk56Ih4gyeTefdOnpYH9qlP0CroFGSHRdN1XGdReZdEQAPWMmDV0bBL93jrw8l+qNBzDGpYQBa61waM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763808552; c=relaxed/simple;
-	bh=TYswH870hXYIzZojFLMU4d7bPmU2mTLiVm3ZOrZEML4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=su77bH8e+S3Npossjn9AosMORcdYDVMf6Yd/5tv0CN+E3ec3UXNbzas/QGjo00a5m5/KAl5xGtqGvQC9fmioHaJXoG2vvteez5wcF+ixZ9GTHkbUBtCbhq0es+N99bPSzqSLhawrkyccKBVvWYvIVEH4ey7Y1HbPPPhqUoMrtBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KULxkexQ; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b736ffc531fso413949466b.1
-        for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 02:49:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763808548; x=1764413348; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0gnSeK29WCUH1isiB8XCY9MtuGLgdRazHelY/B4236A=;
-        b=KULxkexQAzfMdqoYwR1YyIupJMmtz9jnQRfWP0S7hJ0HzmuOTg73PjgjPatJqglXHd
-         8TyjWQFn7+GvRGOsJSp1SjeEHtADNxegX1GcDCzVm3Mho575/S5dsdFGBpdFxU/44t4s
-         ijlLvTNYXHf797YIpC1mdD7c/xvrrIfegIYXGf7zRhzGc4ksHn3b9TeGkMXIP/eSzokc
-         E7XxQyZhwb6/vbjFeTMAHqISQHFHoWh2Y5T2Iictn09HKj87u3j27vKeAtyPwMIS+QI+
-         axKuRsw7txTwLnz159mu9FBPfgjnoaEvd7wt6LwWw9IEzaFm+aGlJTKnfRvIaIP6B0yD
-         5qbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763808548; x=1764413348;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0gnSeK29WCUH1isiB8XCY9MtuGLgdRazHelY/B4236A=;
-        b=O/Y/xHxc8fAk5gtQj4CCj7TGbm+oSRpzSH1Fmx4JmQEZB5h+LV2IvccG0wYDYDuZgS
-         euDCRFtMwkY1pfim1MBmEX0dWyJ9Pj1pVCXMJLlQlv2IYzDxEBZJL2b+GqcvB0K01aeD
-         Yme8p8bPUWxpwMgyeDUZlOIPuNOnAmus1JD7OfxR9A2TZ4Zxy0K4RxFNAH7xaCx04OEw
-         iUpydgtU/CnkpBg767akjhzZjSAb+OP/jfUpLAb007R8QVrU+KdmTp/AhOVD4VrJhOyy
-         sUOlUl6fpX6f/ylTGKqXJFWdo9JEvI3MasK9STOst+YwL9nwUtX8z4z9fllh7FhkN8hu
-         j1Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCWtyiU9bONb0J092jAXNi644H0chE+iEXrZG2FFrUEKQCmUAebbpf5HmueDpyYXpmigk1WhWcg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycGcBvjoyLk5i/TZFlm7a1c1ToZ2iISgEJMKCq6i3vQ4ZIx+jX
-	lS4ctJwPLha/qlxbaIdmQrYwE3cOwdir+2KPCPAwmpC4wJ7EgCWgySLb
-X-Gm-Gg: ASbGncsQNI1taKSBYWU+qinIKzB/i/KGpw0y8BUI08ONkztbSCmY4b6xw38iWZN8PiE
-	rN9I7k6EIRDlinpnU15EEZ41R0AYmCEpS+IefqEZmOJlTrO1aGuQ76T66MwwRjlGlJ/m0UkD5K6
-	WHJAvDz0weZy2aG8b0CpUH7tS+HgWq0bQfPLG+gX0fOGcBD+qwACiI/YY4rIveCS0wZ3bazqusb
-	yNk+wx2Kg0GwR5Cpgz86SiltYF9Pz5pB47McV1/JC98PtqcoSDQVRNuY/3FHfRXz/XF00VnE436
-	WvRhECwriyqhZu4PtCLTPYpc4zViQ+Iju7I3o48iAc0GeFCFYI/35KJm/PMhHvvkN/4l5R7MmwG
-	BSXf17hpO1FEBOyeiHBSlEzkw6q/8W9YUhiF7v2ACmyZUhi9N2QCatGZOOCKpx5Baf03Q0XixL0
-	tBF1EPdXYR8XPSf3BYAHOBXixgSm/AXYbELJjHXY+eormxxs4=
-X-Google-Smtp-Source: AGHT+IHEqpb/CHX1L+AE/5T97F41QM9rFCHKz3O7GJJX7312ChR3axS74WXLzxav0V8Ci6ajPzUrGg==
-X-Received: by 2002:a17:907:7206:b0:b73:7c3e:e17c with SMTP id a640c23a62f3a-b767170ad29mr674301266b.44.1763808547805;
-        Sat, 22 Nov 2025 02:49:07 -0800 (PST)
-Received: from localhost (ip87-106-108-193.pbiaas.com. [87.106.108.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654d7a0f4sm709458066b.26.2025.11.22.02.49.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Nov 2025 02:49:07 -0800 (PST)
-Date: Sat, 22 Nov 2025 11:49:05 +0100
-From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, gnoack@google.com, willemdebruijn.kernel@gmail.com,
-	matthieu@buffet.re, linux-security-module@vger.kernel.org,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	yusongping@huawei.com, artem.kuzin@huawei.com,
-	konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v4 01/19] landlock: Support socket access-control
-Message-ID: <20251122.e645d2f1b8a1@gnoack.org>
-References: <20251118134639.3314803-1-ivanov.mikhail1@huawei-partners.com>
- <20251118134639.3314803-2-ivanov.mikhail1@huawei-partners.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F178A2EE611;
+	Sat, 22 Nov 2025 11:04:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.36
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763809485; cv=fail; b=R5zhsONab0LE5EehrY011dIDAKRgifADpJE5DbccBbygAcytWTtuNMcun8aUWXYj/4F5hXCkF+y2HP6OS0LM60hbRapPHl1wm+bTPdweY1MxvMcaF8E5XnO0F4WrVApRva/MY/UqIyTay7ZC+qzQsG1rnuyrp60qUpIeYW7pZEk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763809485; c=relaxed/simple;
+	bh=5++H1kJaw5/mC9rcqYNEgmA2k5DzGpL78ualORG2l9Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=KjEir4PGKr6KasSkyEqccH60wYkh25JRrd52vJHa6+u26JT6hH0//qx5YsiftAq9RadPU82NxvqC5qW8nsZYZPNNFOgQMjemHWGkzygkI9V7iolr4TkHv6/Ot+2mjRXeIsAantspwL2lzyxhS5cChCE11Nbs+q0cyed9Z7zwVAo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=fail smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=BJDrgaHu; arc=fail smtp.client-ip=52.101.72.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cwJvfpd+A4Nol+CCjD3obpnCQzGOLDY1LJc+2/X8c3s/vb/SM2JXuYobpI4CsKkIIKEHm2U1AjuaFW5T+KwJ/E4wQXM8/mBP24zBvQlHJNhxt3TMH90GjzrE6QEo5nN/LBCcMImv71roh9/HpITrqpkvITS7TR3I750KdSZBNn2K0hj+sOq3WMdy4rdlxTEcWS1ZSx1G9Lyc3IztpDinkl6d/gkYVw7+n8Tdx81HvtdDLaJGDNtG3qv1vAXxiLmansPiem+Z+Oukr2u1/B94fXy5KulQsRdU/K+K2XSnHOFzOAEWZLXA5lPMkny+5z6ODgPXxTfvbt1qhAh8Y7Qauw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uwfZ1sB3WSOQkZwn8yhmNOOLhhQT3/Jeo+TH5qlRBh0=;
+ b=yaVC7tfCj3XnOF0Rdlt7b5In4KqXjHp9mMUqeHqGszdGUIwT2uYPVUjrQFk62hYIRcPQks25jKsECyqluTAh7I6f14AOP3HqdoModx5P5l+mcirRDXEBYPlZo1DiXYCG8fJEOD90km40v/xZ6Yi4Hdy/BC1xsJUb4BpA9A9tzG2SCplQBD2PdMa1oLgfF3LIQ3HvPCYoiFpbdO/UYkJa2/R6fPvYTOm9bLrweWsip8DaXGZErI+ZaiaXgW+siZzEtwZMWr1pDh/kTmCGaeGgFfRXoP2Nqi9mN1Mh73t5cj6IwsyNpgwwUFvJ1Hs9B9o0VVwsuJrGm/TWYBsqlOe8mA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uwfZ1sB3WSOQkZwn8yhmNOOLhhQT3/Jeo+TH5qlRBh0=;
+ b=BJDrgaHuewLQU8VXRfrIAUaMZct7ZzhGGGIq+caFAmg6ceTaI0ilTBzwx2Dhu0wHfKmh+WfqpCmLBD6XFAp4AHGaUttFz8ad6OqDyTu7SPYt6Pb5q92y1+Y90FNytklr4whSC4TXC27zzoKBFxlS4rufmCMr4LP4znKR/l4ZtnlSqRs6mCl5D9mY71+hrzqVW0p8KQgBCYgFY1tXLwci/vDo6MLxrWz8WhBv87OBOabrsosMbNNbnPjr+2JC0fQgzQ3v9cpNx45tCyKoUGZNFygeax8illSdw/nax7tRMUDgYEg9RFu4LqlDB6lgtXsyKyjFuQD8KiidQyNJjeq6kA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by DU4PR04MB11056.eurprd04.prod.outlook.com (2603:10a6:10:58c::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.14; Sat, 22 Nov
+ 2025 11:04:40 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::8063:666f:9a2e:1dab]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::8063:666f:9a2e:1dab%5]) with mapi id 15.20.9343.011; Sat, 22 Nov 2025
+ 11:04:40 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Tan Tee Min <tee.min.tan@linux.intel.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: phy: dp83867: implement configurability for SGMII in-band auto-negotiation
+Date: Sat, 22 Nov 2025 13:04:27 +0200
+Message-Id: <20251122110427.133035-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM9P192CA0015.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21d::20) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251118134639.3314803-2-ivanov.mikhail1@huawei-partners.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|DU4PR04MB11056:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c3845cf-0588-4a79-6f1a-08de29b6ecdb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|10070799003|19092799006|7416014|376014|1800799024|366016|52116014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?J8w1nr8umRjykT5x8th2MWQlFcU4mGX1FHby2haGaqgtDynlZfS2i5Jq3mrg?=
+ =?us-ascii?Q?f62d5rbaA+nKWdkT0AgFqkPJTjzdPwYoJHqLOzNTVVr2BJW1ucQ0j02sEJ1l?=
+ =?us-ascii?Q?EQ+S8vc+Qp4fnlyn76xR+E+gYCHLcIf7PH+cIh0kb8HpO38jJiQwa5bI7Ron?=
+ =?us-ascii?Q?qp3sRaNwdXfJpAs6zC/uQqAjNLdOrGmEAcf2cmQq85QXZ2UOwkZz1WL2RWE9?=
+ =?us-ascii?Q?HClO49HTgLt/AzayyH0JZmkpsxecnhKZmsnhIM/SA8tNqJ6vyCTEEAVZzNy8?=
+ =?us-ascii?Q?UYKKq7s+6ajgPaewnfEYZJY3YA9km3XEV+A13hnqJrAY3M2C75NuW26kzNvG?=
+ =?us-ascii?Q?EleZzvzZXJzUb7vdjYcQnSlgXFvj/x0UkS0gx2qNdOe+Tdv6rxT4m1J26Rla?=
+ =?us-ascii?Q?MIDm3HksP1PMb9aCRVssXyY596r9SMewJyhpMpCmWb4wzO5W8CyGxknRVsGI?=
+ =?us-ascii?Q?cf5+8biqj2G6Xh7tFyzdbBLEPMh7SDAcJWNXoHt0+3YASkS5XolQu53Kz/eo?=
+ =?us-ascii?Q?158K6p1F8KMsSY++0EffLBfVMLh3+9aahnJZz0lYKPI6LuKL6/7LlhoIlifo?=
+ =?us-ascii?Q?/PJSRcw+yMi2n19IFVvQFf2hs/bLLrzS8bUM/+ceCQ4dTCGb55qEBDENVumM?=
+ =?us-ascii?Q?eYuppscw+Nzyf+RtpchBVRjR0ykqSuLHLUQEdvC46VSBSvgn3XbJZ2aUvgHQ?=
+ =?us-ascii?Q?lptV1SPdF0XbjhLF5bZuQ48twnyuDRbLSWj+fLx09V33He4F3XVuZ8phcfAm?=
+ =?us-ascii?Q?OH3dE+FTaxtGtSk3LCGct6cdVJcRbsnALbfqwXyBryyw+zLGA10eUZCr1k0Q?=
+ =?us-ascii?Q?CUFqwofrBk0Uy3gpR4b82DfJifBuGfOmmxaN4tgQqWZThxnFMLC5UuXJSRS/?=
+ =?us-ascii?Q?kTbq/tld2Fa+pv2NjaUoPXFC1nIFDXzS9bQgXB6a/F9N6yJw41XkJFwGgrf7?=
+ =?us-ascii?Q?WOfPiff7ne8XSQUsvaqtVJ0XoFZYenV60KXqnqoyFQFqtfPTviDsxBQetKiX?=
+ =?us-ascii?Q?p9iUK5OzGYZWf9Ncdbtds4orLuUcYOZZj2I0TX4V4A/ZOLHAX8IpRpJZcsXH?=
+ =?us-ascii?Q?7NQ+Zu0zxS79otTyIc9VFTGHD4Reghc46ueo3zi09hAT+jLbrKNYkGfeFozr?=
+ =?us-ascii?Q?E77g+GHHAAKBPibmRcms3BisJoSnEpzZJQoNrO37cD8dD2YG7/jGBXx5d/Z1?=
+ =?us-ascii?Q?ifm9RHfZ1cFoxf5K+Y1e3HuygrQAYV3I3jPn5/gSh7ejzpglGj+faKJ0jyuz?=
+ =?us-ascii?Q?Lb9rBse+6cPEKFy1fyAfl9HYZsq3TvSu/fIdqfR2VyofXGxyrZn7wpZJZBdK?=
+ =?us-ascii?Q?i3XdRu/TBhPnaTW8U4zVm53uRsLcR0sBAQulpaIFCro5FEMcbDDRP4XZS0Hc?=
+ =?us-ascii?Q?EQj3nBHnQ3VeIdwnwegkk1r+R4sM2noYxOQhBxTfcO125Y9DGN+NtCZ70B+t?=
+ =?us-ascii?Q?8U3VyD4cm8Anz5SPyhjxqX+cinQ9mjhk?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(19092799006)(7416014)(376014)(1800799024)(366016)(52116014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?34ow2umoX//lZqgbPiR2K1XO5HG+iuP5B1BBnsQYStzu51p7eJx0KKlp7yBs?=
+ =?us-ascii?Q?MyRH68Q36PPsDhfImRoyjGHjCzZAHGkX50QWfGwH7rN5UfEsiR8zT0LNp59u?=
+ =?us-ascii?Q?RGJb/hPqrNFt6KjOpbkDF83NKH1O+y459cvadKV40+z1SnPqi7dti5fpvOZu?=
+ =?us-ascii?Q?3oQCMMMNlFMBAFYr7Il6j8jxqAowZCIa8OtZTZHs4XBWKONN9WNsB7teY7h2?=
+ =?us-ascii?Q?dY2LDU7bp/Koold12o5Wtv324e530MayNI+3unOLUf3EVcfBuywsLcXS948Q?=
+ =?us-ascii?Q?T2ZAk5N1dW/2fD4jZqMxNpyWCMAE65UpuO2iiPOwdd6X97rjH77whsiQuMJp?=
+ =?us-ascii?Q?tfz3oHqqC0nnWMlGpRKVeXHz0c9puwjIZtrObC/Miou+2JoAnP5v95UBjUBh?=
+ =?us-ascii?Q?hsBM5c4xGp8aX8NBCeCraHaDqcsS/T8Po+Tznfpt7WFZa9PCn6awluMIeRBF?=
+ =?us-ascii?Q?sb1tfdLkFyWLubJfcaYyY5G0tyk0AC7h3PruV+e3q8WTugTYX2HHxjVYHYMs?=
+ =?us-ascii?Q?n9bMqo58IZxAkRmL6rtBGYEEZvGszGImYOJmaDlPtWvn733pc8iBECQGx4+Q?=
+ =?us-ascii?Q?9a+GEd1lYRIo0l3VfwAQv2ehpLgtY6Bj3DD/wCpC03/ToK38VldGJC+PpIDo?=
+ =?us-ascii?Q?PIAvuEpOeFtWzbq3x9hfZ6dl/NF8B6DTm7gUlG3u0TmX0fVuReope5Whj1UV?=
+ =?us-ascii?Q?U67Jv1XScrxMbSwsIr7+fygI2LsC8dcXPVhXA1h2+KEdghByh1uxqJJlG6zO?=
+ =?us-ascii?Q?AVzIPOSdJszmblp5sM6iRZCZYw7rdgwKNuEl/SivF58b6OCKijiMK0nyU0Tr?=
+ =?us-ascii?Q?E9f09DMQO/6/k7cEHDU6vdc3l+KjwUx8iadkNdYfiJoHpGfs8hHXummNcIMv?=
+ =?us-ascii?Q?RipdLltQ1wfOo/f+hJx4B/7WbV8UrjOdTyAyWQUJJ4EQElK9VEIcGamuJJCO?=
+ =?us-ascii?Q?ZgP2TI0cxaLsDdjwqkISQUQcse5kTbrCEukEf6Ot8wwUAxYsKyGQZ1Ar/2Rt?=
+ =?us-ascii?Q?i9V+oZM9FUUo2/b/EBXtpK2EJAE71NqZyrJoGyHh2ZrzIH/+gk3usaQCCOHM?=
+ =?us-ascii?Q?8sMEMECq3WAxA8ecJDdmWUG/GKpuf9flZuePF8UYaH0/8kHpv/WG0iN+b/h4?=
+ =?us-ascii?Q?D7sfunjebRlbNjTpB+z8oEz8QJ9DRHMjIfpbrv6om3/1gAs5f9dsrjdUvqtq?=
+ =?us-ascii?Q?pCXRSgk04raV2H5fWcijlMswlxGDBdz86FgwIm6iKllT9czndx4dfb3eqlkI?=
+ =?us-ascii?Q?diUJo6OigooZpcz8VZ8KY4q5p64o6bmL+H8vuJIoJkMQmtH1X6x1ywI/Zz4o?=
+ =?us-ascii?Q?h96Zv+zhoo2UuTpbT6n2WC//kmbT6mRoPK2/jzvPluNgvV5EPle1JxNchRN2?=
+ =?us-ascii?Q?ISr5yMqAaPU7HavewI/g/KtJqdKpqrFb6xdXMvroXTB+KhnE+32relyarnAd?=
+ =?us-ascii?Q?i1IF816qpayAG/E0VcHfzr3najx+boab8EZYu9RB+h4D0shRBYb8MoEQ8mfQ?=
+ =?us-ascii?Q?xyb5wn3zBl1CNQlvR4KHULeLPL3svaOJJ1wjlxIoxXwRXNyJ+xhDC9sHB7hh?=
+ =?us-ascii?Q?MvXuW4dQnBYCkT9/9ZO+6oJo/m4HtF+Evbe9Wrkq2IySf5s03IBmuwH2n2e3?=
+ =?us-ascii?Q?sFHTlG7qDCPA4ZA8RpPpHh0=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c3845cf-0588-4a79-6f1a-08de29b6ecdb
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2025 11:04:40.0122
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2xEwAKt+vzmiNBI7f5cCipbOgR/PRM/4cs8GnrYwX62q+nTBhYJ2qhjhvbddbBh8P6d6Q7h/IgV52KyUyStLxw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB11056
 
-Hello!
+Implement the inband_caps() and config_inband() PHY driver methods, to
+allow working with PCS devices that do not support or want in-band to be
+used.
 
-On Tue, Nov 18, 2025 at 09:46:21PM +0800, Mikhail Ivanov wrote:
-> It is possible to create sockets of the same protocol with different
-> protocol number values. For example, TCP sockets can be created using one
-> of the following commands:
->     1. fd = socket(AF_INET, SOCK_STREAM, 0);
->     2. fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-> Whereas IPPROTO_TCP = 6. Protocol number 0 correspond to the default
-> protocol of the given protocol family and can be mapped to another
-> value.
-> 
-> Socket rules do not perform such mappings to not increase complexity
-> of rules definition and their maintenance.
+There is a complication due to existing logic from commit c76acfb7e19d
+("net: phy: dp83867: retrigger SGMII AN when link change") which might
+re-enable what dp83867_config_inband() has disabled. So we need to
+modify dp83867_link_change_notify() to use phy_modify_changed() when
+temporarily disabling in-band autoneg. If the return code is 0, it means
+the original in-band was disabled and we need to keep it disabled.
+If the return code is 1, the original was enabled and we need to
+re-enable it. If negative, there was an error, which was silent before,
+and remains silent now.
 
-Minor phrasing nit: Maybe we can phrase this constructively, like
-"rules operate on the socket(2) parameters as they are passed by the
-user, before this mapping happens"?
+dp83867_config_inband() and dp83867_link_change_notify() are serialized
+by the phydev->lock.
 
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ drivers/net/phy/dp83867.c | 36 +++++++++++++++++++++++++++++-------
+ 1 file changed, 29 insertions(+), 7 deletions(-)
 
-> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
-> index f030adc462ee..030c96cb5d25 100644
-> --- a/include/uapi/linux/landlock.h
-> +++ b/include/uapi/linux/landlock.h
-> @@ -45,6 +45,11 @@ struct landlock_ruleset_attr {
->  	 * flags`_).
->  	 */
->  	__u64 handled_access_net;
-> +	/**
-> +	 * @handled_access_socket: Bitmask of handled actions performed on sockets
-> +	 * (cf. `Socket flags`).
-> +	 */
-> +	__u64 handled_access_socket;
+diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
+index 36a0c1b7f59c..5f5de01c41e1 100644
+--- a/drivers/net/phy/dp83867.c
++++ b/drivers/net/phy/dp83867.c
+@@ -937,15 +937,15 @@ static void dp83867_link_change_notify(struct phy_device *phydev)
+ 	 * whenever there is a link change.
+ 	 */
+ 	if (phydev->interface == PHY_INTERFACE_MODE_SGMII) {
+-		int val = 0;
++		int val;
+ 
+-		val = phy_clear_bits(phydev, DP83867_CFG2,
+-				     DP83867_SGMII_AUTONEG_EN);
+-		if (val < 0)
+-			return;
++		val = phy_modify_changed(phydev, DP83867_CFG2,
++					 DP83867_SGMII_AUTONEG_EN, 0);
+ 
+-		phy_set_bits(phydev, DP83867_CFG2,
+-			     DP83867_SGMII_AUTONEG_EN);
++		/* Keep the in-band setting made by dp83867_config_inband() */
++		if (val != 0)
++			phy_set_bits(phydev, DP83867_CFG2,
++				     DP83867_SGMII_AUTONEG_EN);
+ 	}
+ }
+ 
+@@ -1116,6 +1116,25 @@ static int dp83867_led_polarity_set(struct phy_device *phydev, int index,
+ 			  DP83867_LED_POLARITY(index), polarity);
+ }
+ 
++static unsigned int dp83867_inband_caps(struct phy_device *phydev,
++					phy_interface_t interface)
++{
++	if (interface == PHY_INTERFACE_MODE_SGMII)
++		return LINK_INBAND_ENABLE | LINK_INBAND_DISABLE;
++
++	return 0;
++}
++
++static int dp83867_config_inband(struct phy_device *phydev, unsigned int modes)
++{
++	int val = 0;
++
++	if (modes == LINK_INBAND_ENABLE)
++		val = DP83867_SGMII_AUTONEG_EN;
++
++	return phy_modify(phydev, DP83867_CFG2, DP83867_SGMII_AUTONEG_EN, val);
++}
++
+ static struct phy_driver dp83867_driver[] = {
+ 	{
+ 		.phy_id		= DP83867_PHY_ID,
+@@ -1149,6 +1168,9 @@ static struct phy_driver dp83867_driver[] = {
+ 		.led_hw_control_set = dp83867_led_hw_control_set,
+ 		.led_hw_control_get = dp83867_led_hw_control_get,
+ 		.led_polarity_set = dp83867_led_polarity_set,
++
++		.inband_caps	= dp83867_inband_caps,
++		.config_inband	= dp83867_config_inband,
+ 	},
+ };
+ module_phy_driver(dp83867_driver);
+-- 
+2.34.1
 
-This struct can only be extended at the end, for ABI compatibility reasons.
-
-In the call to landlock_create_ruleset(2), the user passes the __user
-pointer to this struct along with its size (as known to the user at
-compile time).  When we copy this into the kernel, we blank out the
-struct and only copy the prefix of the caller-supplied size.  The
-implementation is in copy_min_struct_from_user() in landlock/syscalls.c.
-
-When you rearrange the order, please also update it in other places
-where these fields are mentioned next to each other, for
-consistency. I'll try to point it out where I see it in the review,
-but I might miss some places.
-
->  	/**
->  	 * @scoped: Bitmask of scopes (cf. `Scope flags`_)
->  	 * restricting a Landlock domain from accessing outside
-> @@ -140,6 +145,11 @@ enum landlock_rule_type {
->  	 * landlock_net_port_attr .
->  	 */
->  	LANDLOCK_RULE_NET_PORT,
-> +	/**
-> +	 * @LANDLOCK_RULE_SOCKET: Type of a &struct
-> +	 * landlock_socket_attr.
-                               ^
-
-Nit: Adjacent documentation has a space before the dot.
-I assume this is needed for kernel doc formatting?
-
-> +	 */
-> +	LANDLOCK_RULE_SOCKET,
->  };
->  
->  /**
-> @@ -191,6 +201,33 @@ struct landlock_net_port_attr {
->  	__u64 port;
->  };
->  
-> +/**
-> + * struct landlock_socket_attr - Socket protocol definition
-> + *
-> + * Argument of sys_landlock_add_rule().
-> + */
-> +struct landlock_socket_attr {
-> +	/**
-> +	 * @allowed_access: Bitmask of allowed access for a socket protocol
-> +	 * (cf. `Socket flags`_).
-> +	 */
-> +	__u64 allowed_access;
-> +	/**
-> +	 * @family: Protocol family used for communication
-> +	 * (cf. include/linux/socket.h).
-> +	 */
-> +	__s32 family;
-> +	/**
-> +	 * @type: Socket type (cf. include/linux/net.h)
-> +	 */
-> +	__s32 type;
-> +	/**
-> +	 * @protocol: Communication protocol specific to protocol family set in
-> +	 * @family field.
-
-This is specific to both the @family and the @type, not just the @family.
-
-From socket(2):
-
-  Normally only a single protocol exists to support a particular
-  socket type within a given protocol family.
-
-For instance, in your commit message above the protocol in the example
-is IPPROTO_TCP, which would imply the type SOCK_STREAM, but not work
-with SOCK_DGRAM.
-
-> +	 */
-> +	__s32 protocol;
-> +} __attribute__((packed));
-
-Since we are in the UAPI header, please also document the wildcard
-values for @type and @protocol.
-
-(Remark, should those be exposed as constants?)
-
-
-> diff --git a/security/landlock/access.h b/security/landlock/access.h
-> index 7961c6630a2d..03ccd6fbfe83 100644
-> --- a/security/landlock/access.h
-> +++ b/security/landlock/access.h
-> @@ -40,6 +40,8 @@ typedef u16 access_mask_t;
->  static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_ACCESS_FS);
->  /* Makes sure all network access rights can be stored. */
->  static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_ACCESS_NET);
-> +/* Makes sure all socket access rights can be stored. */
-> +static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_ACCESS_SOCKET);
->  /* Makes sure all scoped rights can be stored. */
->  static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_SCOPE);
->  /* Makes sure for_each_set_bit() and for_each_clear_bit() calls are OK. */
-> @@ -49,6 +51,7 @@ static_assert(sizeof(unsigned long) >= sizeof(access_mask_t));
->  struct access_masks {
->  	access_mask_t fs : LANDLOCK_NUM_ACCESS_FS;
->  	access_mask_t net : LANDLOCK_NUM_ACCESS_NET;
-> +	access_mask_t socket : LANDLOCK_NUM_ACCESS_SOCKET;
->  	access_mask_t scope : LANDLOCK_NUM_SCOPE;
-
-(Please re-adjust field order for consistency with UAPI)
-
->  };
-
-> diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
-> index dfcdc19ea268..a34d2dbe3954 100644
-> --- a/security/landlock/ruleset.c
-> +++ b/security/landlock/ruleset.c
-> @@ -55,15 +56,15 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
->  	return new_ruleset;
->  }
->  
-> -struct landlock_ruleset *
-> -landlock_create_ruleset(const access_mask_t fs_access_mask,
-> -			const access_mask_t net_access_mask,
-> -			const access_mask_t scope_mask)
-> +struct landlock_ruleset *landlock_create_ruleset(
-> +	const access_mask_t fs_access_mask, const access_mask_t net_access_mask,
-> +	const access_mask_t socket_access_mask, const access_mask_t scope_mask)
-
-(Please re-adjust field order for consistency with UAPI)
-
->  {
->  	struct landlock_ruleset *new_ruleset;
->  
->  	/* Informs about useless ruleset. */
-> -	if (!fs_access_mask && !net_access_mask && !scope_mask)
-> +	if (!fs_access_mask && !net_access_mask && !socket_access_mask &&
-> +	    !scope_mask)
-
-(Please re-adjust field order for consistency with UAPI)
-
->  		return ERR_PTR(-ENOMSG);
->  	new_ruleset = create_ruleset(1);
->  	if (IS_ERR(new_ruleset))
-> @@ -72,6 +73,9 @@ landlock_create_ruleset(const access_mask_t fs_access_mask,
->  		landlock_add_fs_access_mask(new_ruleset, fs_access_mask, 0);
->  	if (net_access_mask)
->  		landlock_add_net_access_mask(new_ruleset, net_access_mask, 0);
-> +	if (socket_access_mask)
-> +		landlock_add_socket_access_mask(new_ruleset, socket_access_mask,
-> +						0);
-
-(Please re-adjust order of these "if"s for consistency with UAPI)
-
->  	if (scope_mask)
->  		landlock_add_scope_mask(new_ruleset, scope_mask, 0);
->  	return new_ruleset;
-
-> diff --git a/security/landlock/ruleset.h b/security/landlock/ruleset.h
-> index 1a78cba662b2..a60ede2fc2a5 100644
-> --- a/security/landlock/ruleset.h
-> +++ b/security/landlock/ruleset.h
-> @@ -189,10 +204,9 @@ struct landlock_ruleset {
->  	};
->  };
->  
-> -struct landlock_ruleset *
-> -landlock_create_ruleset(const access_mask_t access_mask_fs,
-> -			const access_mask_t access_mask_net,
-> -			const access_mask_t scope_mask);
-> +struct landlock_ruleset *landlock_create_ruleset(
-> +	const access_mask_t access_mask_fs, const access_mask_t access_mask_net,
-> +	const access_mask_t access_mask_socket, const access_mask_t scope_mask);
-
-(Please re-adjust field order for consistency with UAPI)
-
-> index 000000000000..28a80dcad629
-> --- /dev/null
-> +++ b/security/landlock/socket.c
-> @@ -0,0 +1,105 @@
-> [...]
-> +#define TYPE_ALL (-1)
-> +#define PROTOCOL_ALL (-1)
-
-Should these definitions go into the UAPI header (with a LANDLOCK_ prefix)?
-
-
-> diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
-> index 33eafb71e4f3..e9f500f97c86 100644
-> --- a/security/landlock/syscalls.c
-> +++ b/security/landlock/syscalls.c
-> @@ -101,9 +104,10 @@ static void build_check_abi(void)
->  	 */
->  	ruleset_size = sizeof(ruleset_attr.handled_access_fs);
->  	ruleset_size += sizeof(ruleset_attr.handled_access_net);
-> +	ruleset_size += sizeof(ruleset_attr.handled_access_socket);
->  	ruleset_size += sizeof(ruleset_attr.scoped);
-(Please re-adjust field order for consistency with UAPI)
-
->  	BUILD_BUG_ON(sizeof(ruleset_attr) != ruleset_size);
-> -	BUILD_BUG_ON(sizeof(ruleset_attr) != 24);
-> +	BUILD_BUG_ON(sizeof(ruleset_attr) != 32);
-> [...]
-
-> @@ -237,6 +248,11 @@ SYSCALL_DEFINE3(landlock_create_ruleset,
->  	    LANDLOCK_MASK_ACCESS_NET)
->  		return -EINVAL;
->  
-> +	/* Checks socket content (and 32-bits cast). */
-> +	if ((ruleset_attr.handled_access_socket |
-> +	     LANDLOCK_MASK_ACCESS_SOCKET) != LANDLOCK_MASK_ACCESS_SOCKET)
-> +		return -EINVAL;
-> +
->  	/* Checks IPC scoping content (and 32-bits cast). */
->  	if ((ruleset_attr.scoped | LANDLOCK_MASK_SCOPE) != LANDLOCK_MASK_SCOPE)
->  		return -EINVAL;
-> @@ -244,6 +260,7 @@ SYSCALL_DEFINE3(landlock_create_ruleset,
->  	/* Checks arguments and transforms to kernel struct. */
->  	ruleset = landlock_create_ruleset(ruleset_attr.handled_access_fs,
->  					  ruleset_attr.handled_access_net,
-> +					  ruleset_attr.handled_access_socket,
->  					  ruleset_attr.scoped);
-
-(Please re-adjust field order for consistency with UAPI)
-
->  	if (IS_ERR(ruleset))
->  		return PTR_ERR(ruleset);
-> [...]
-
-> @@ -407,6 +458,8 @@ static int add_rule_net_port(struct landlock_ruleset *ruleset,
->   *   &landlock_net_port_attr.allowed_access is not a subset of the ruleset
->   *   handled accesses)
->   * - %EINVAL: &landlock_net_port_attr.port is greater than 65535;
-> + * - %EINVAL: &landlock_socket_attr.{family, type} are greater than 254 or
-> + *   &landlock_socket_attr.protocol is greater than 65534;
-
-Hmm, this is a bit annoying that these values have such unusual
-bounds, even though the input parameters are 32 bit.  We are exposing
-a little bit that we are internally storing this with only 8 and 16
-bits...  (I don't know a better solution immediately either, though. I
-think we discussed this on a previous version of the patch set as well
-and ended up with permitting larger values than the narrower SOCK_MAX
-etc bounds.)
-
->   * - %ENOMSG: Empty accesses (e.g. &landlock_path_beneath_attr.allowed_access is
->   *   0);
->   * - %EBADF: @ruleset_fd is not a file descriptor for the current thread, or a
-> @@ -439,6 +492,8 @@ SYSCALL_DEFINE4(landlock_add_rule, const int, ruleset_fd,
->  		return add_rule_path_beneath(ruleset, rule_attr);
->  	case LANDLOCK_RULE_NET_PORT:
->  		return add_rule_net_port(ruleset, rule_attr);
-> +	case LANDLOCK_RULE_SOCKET:
-> +		return add_rule_socket(ruleset, rule_attr);
->  	default:
->  		return -EINVAL;
->  	}
-
-–Günther
 
