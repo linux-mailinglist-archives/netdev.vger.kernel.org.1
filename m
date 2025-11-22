@@ -1,127 +1,267 @@
-Return-Path: <netdev+bounces-240949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E30EC7C8F5
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 08:00:57 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20B76C7C90A
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 08:03:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4382E35E359
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 07:00:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4B0084E3315
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 07:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7062BE048;
-	Sat, 22 Nov 2025 07:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5640F2DF145;
+	Sat, 22 Nov 2025 07:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="nBaWpsjq"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBB128A1D5;
-	Sat, 22 Nov 2025 07:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF2D1F37A1;
+	Sat, 22 Nov 2025 07:03:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763794853; cv=none; b=JKA/ThvxHq3cjDyCcEgvJFeFAdfbu3lAE4OJ/Rd39g3wGXMOUtIcW7gmuDAQ5prL7lB4lTp3s/h8BVU8pi9y/a33i78FPg5bIpJU5I8Lpjp9pPqMiuA4cWFkrA7orceL4Yue4N5RSAZ6oZBZIOnMoP1uwVbCaSOlsiRQpMgbBBo=
+	t=1763795029; cv=none; b=loJz1umLr8pNsYxzxB6fIpu0MjEVqAv62nbhlbhwfDKUJpZtG5pt3J4QNZPUp3Pw9EAQPqQuE+QacDTsCOHe2zsWCuK8H47q0wZCKlWtHlNJotYdNDl96JDcMfH/dorRFE1cKyV41TIoH7ZOI+lHJC7JiyGl2Xn9fx9pCG8aS1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763794853; c=relaxed/simple;
-	bh=8Osi5iDt3XT7mUdLNIoUCcqkrboxgTQCtfl4wtyE/p4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iRExlxPLlwfyvSNwSHktEH4j0m8iLpPaRYt/WK9/KTxAGDXntjRMdEMXd4WBB7UoejUtcsLpwA19Hu/bJoFopPRnzgOePtQMl5toElMiT+NgE86WXIz9xJz2R4AEZQkYgy1y9uOwobtdVgCjsDXBOSD6PkNIMsBboOkKH1GvN+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 5AM70bXd092775;
-	Sat, 22 Nov 2025 16:00:37 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 5AM70bE1092771
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 22 Nov 2025 16:00:37 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <85b701a9-511d-4cf2-8c9c-5fade945f187@I-love.SAKURA.ne.jp>
-Date: Sat, 22 Nov 2025 16:00:36 +0900
+	s=arc-20240116; t=1763795029; c=relaxed/simple;
+	bh=4DNT74O83rpfg9lpILaihFi/E0iM7wiCeukShvcIIg0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DEfTX1sio0N3WKFBP6zJFxWSPM6lERM0sr1bhvArJ3rpye9QutjTrQvSVaRRXANLSCcZRW8Avk/Hs9p6a2ov9RlLJ1h2EliC+B73h+GZySnKmBe17Ck964VTeUjqgZLOIexv6/ULDTPOyu4pY9bClH6YqsUkgqyE43sXduyyNAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=nBaWpsjq; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 16F02212070F; Fri, 21 Nov 2025 23:03:47 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 16F02212070F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1763795027;
+	bh=r0cvwqhSVkvElalGOoVJsrZPJjG6Fo0xBbUMg8aw8IM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nBaWpsjqbZXBFaHz0wfI7oUgaRmYz9WRJNG4Dii25WhxE4GjcdXVyOlL3Eym5UZsN
+	 IFMwh26FZYO3wFZDna3Jt3lp7Zz6EACdBQvbM3sP9bty4LipJfHqKz2Evx18iebSY2
+	 TJb5kDtHaCPXGII7/sLELxmAikgfcFPktWpOlfso=
+Date: Fri, 21 Nov 2025 23:03:47 -0800
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Simon Horman <horms@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next, v3] net: mana: Implement ndo_tx_timeout and
+ serialize queue resets per port.
+Message-ID: <20251122070347.GA14726@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20251110103541.GA30450@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <aRNsHUjW3PybGXCK@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [can/j1939] unregister_netdevice: waiting for vcan0 to become
- free. Usage count = 2
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: linux-can@vger.kernel.org, Network Development <netdev@vger.kernel.org>,
-        Marc Kleine-Budde <mkl@pengutronix.de>
-References: <d2be2d6a-6cbb-4b13-9f86-a6b7fe94983a@I-love.SAKURA.ne.jp>
- <aSArkb7-JNW-BjrG@pengutronix.de>
- <3679c610-5795-4ddf-81ad-a9a043bab3fc@I-love.SAKURA.ne.jp>
- <aSA4JMyFNdliTpli@pengutronix.de>
- <c95f5436-3e7e-43b8-820b-e380f059b9f8@I-love.SAKURA.ne.jp>
- <aSA_hyGuitJDHpB3@pengutronix.de>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <aSA_hyGuitJDHpB3@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav102.rs.sakura.ne.jp
-X-Virus-Status: clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aRNsHUjW3PybGXCK@horms.kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On 2025/11/21 19:31, Oleksij Rempel wrote:
->> diff --git a/net/can/j1939/transport.c b/net/can/j1939/transport.c
->> index fbf5c8001c9d..b22568fecba5 100644
->> --- a/net/can/j1939/transport.c
->> +++ b/net/can/j1939/transport.c
->> @@ -1492,6 +1492,8 @@ static struct j1939_session *j1939_session_new(struct j1939_priv *priv,
->>  	struct j1939_session *session;
->>  	struct j1939_sk_buff_cb *skcb;
->>  
->> +	if (priv->ndev->reg_state != NETREG_REGISTERED)
->> +		return NULL;
->>  	session = kzalloc(sizeof(*session), gfp_any());
->>  	if (!session)
->>  		return NULL;
->>
+On Tue, Nov 11, 2025 at 05:02:21PM +0000, Simon Horman wrote:
+> On Mon, Nov 10, 2025 at 02:35:41AM -0800, Dipayaan Roy wrote:
+> > Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detected
+> > and a device-controlled port reset for all queues can be scheduled to a
+> > ordered workqueue. The reset for all queues on stall detection is
+> > recomended by hardware team.
+> > 
+> > The change introduces a single ordered workqueue
+> > ("mana_per_port_queue_reset_wq") with WQ_UNBOUND | WQ_MEM_RECLAIM and
+> > queues exactly one work_struct per port onto it.
 > 
-> Yes, it make sense to proactively prevent the session. Good idea.
+> I see that this goes some way to addressing Jakub's feedback
+> on the commit message in his review of v2. But I this paragraph
+> isn't adding much in it's current form. It seems to me some
+> explanation of why why WQ_UNBOUND and WQ_MEM_RECLAIM are used is
+> appropriate.
 > 
-
-Done updating my patch. But it turned out that your guess was correct before
-syzbot tries my patch. A sample j1939 program (generated by Google AI search)
-succeeded to trigger this race if below delay injection patch is applied.
-
---- a/net/can/j1939/transport.c
-+++ b/net/can/j1939/transport.c
-@@ -1492,6 +1494,9 @@ static struct j1939_session *j1939_session_new(struct j1939_priv *priv,
-        struct j1939_session *session;
-        struct j1939_sk_buff_cb *skcb;
-
-+       printk("j1939_session_new() delay start\n");
-+       mdelay(5000); // <= Run "ip link del dev vcan0 type vcan" here.
-+       printk("j1939_session_new() delay end\n");
-        session = kzalloc(sizeof(*session), gfp_any());
-        if (!session)
-                return NULL;
-
-So, not only we need to make sure that all existing j1939_session are destroyed
-but also we need to make sure that no new j1939_session is created if underlying
-net_device is no longer in NETREG_REGISTERED state.
-
-F.Y.I. Below change did not help. Also, although j1939_netdev_notify(NETDEV_UNREGISTER)
-is called periodically, j1939_cancel_active_session(priv, NULL) is called only once
-because j1939_sk_netdev_event_unregister(priv) calls j1939_priv_set(priv->ndev, NULL)
- from __j1939_rx_release(). There is currently no mechanism to retry when we hit
-the race above.
-
---- a/net/can/j1939/main.c
-+++ b/net/can/j1939/main.c
-@@ -214,6 +214,7 @@ static void __j1939_rx_release(struct kref *kref)
-                                               rx_kref);
+> [1] https://lore.kernel.org/all/20251029182233.59aea2d3@kernel.org/
+>
+Sure, I can add short explanation on the flag usage.
  
-        j1939_can_rx_unregister(priv);
-+       j1939_cancel_active_session(priv, NULL);
-        j1939_ecu_unmap_all(priv);
-        j1939_priv_set(priv->ndev, NULL);
-        mutex_unlock(&j1939_netdev_lock);
+> > Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> > Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+> > ---
+> > Changes in v3:
+> >   -Fixed commit meesage, removed rtnl_trylock and added
+> >    disable_work_sync, fixed mana_queue_reset_work, and few
+> >    cosmetics.
+> > Changes in v2:
+> >   -Fixed cosmetic changes.
+> > ---
+> > ---
+> >  drivers/net/ethernet/microsoft/mana/mana_en.c | 78 ++++++++++++++++++-
+> >  include/net/mana/gdma.h                       |  7 +-
+> >  include/net/mana/mana.h                       |  7 ++
+> >  3 files changed, 90 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > index cccd5b63cee6..636df3b066c5 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > @@ -298,6 +298,42 @@ static int mana_get_gso_hs(struct sk_buff *skb)
+> >  	return gso_hs;
+> >  }
+> >  
+> > +static void mana_per_port_queue_reset_work_handler(struct work_struct *work)
+> > +{
+> > +	struct mana_queue_reset_work *reset_queue_work =
+> > +			container_of(work, struct mana_queue_reset_work, work);
+> > +
+> > +	struct mana_port_context *apc = container_of(reset_queue_work,
+> > +						     struct mana_port_context,
+> > +						     queue_reset_work);
+> > +	struct net_device *ndev = apc->ndev;
+> > +	int err;
+> > +
+> > +	rtnl_lock();
+> > +
+> > +	/* Pre-allocate buffers to prevent failure in mana_attach later */
+> > +	err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
+> > +	if (err) {
+> > +		netdev_err(ndev, "Insufficient memory for reset post tx stall detection\n");
+> > +		goto out;
+> > +	}
+> > +
+> > +	err = mana_detach(ndev, false);
+> > +	if (err) {
+> > +		netdev_err(ndev, "mana_detach failed: %d\n", err);
+> > +		goto dealloc_pre_rxbufs;
+> > +	}
+> > +
+> > +	err = mana_attach(ndev);
+> > +	if (err)
+> > +		netdev_err(ndev, "mana_attach failed: %d\n", err);
+> > +
+> > +dealloc_pre_rxbufs:
+> > +	mana_pre_dealloc_rxbufs(apc);
+> > +out:
+> > +	rtnl_unlock();
+> > +}
+> > +
+> >  netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+> >  {
+> >  	enum mana_tx_pkt_format pkt_fmt = MANA_SHORT_PKT_FMT;
+> > @@ -802,6 +838,23 @@ static int mana_change_mtu(struct net_device *ndev, int new_mtu)
+> >  	return err;
+> >  }
+> >  
+> > +static void mana_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+> > +{
+> > +	struct mana_port_context *apc = netdev_priv(netdev);
+> > +	struct mana_context *ac = apc->ac;
+> > +	struct gdma_context *gc = ac->gdma_dev->gdma_context;
+> > +
+> > +	/* Already in service, hence tx queue reset is not required.*/
+> > +	if (gc->in_service)
+> > +		return;
+> > +
+> > +	/* Note: If there are pending queue reset work for this port(apc),
+> > +	 * subsequent request queued up from here are ignored. This is because
+> > +	 * we are using the same work instance per port(apc).
+> > +	 */
+> > +	queue_work(ac->per_port_queue_reset_wq, &apc->queue_reset_work.work);
+> > +}
+> > +
+> >  static int mana_shaper_set(struct net_shaper_binding *binding,
+> >  			   const struct net_shaper *shaper,
+> >  			   struct netlink_ext_ack *extack)
+> > @@ -884,7 +937,9 @@ static const struct net_device_ops mana_devops = {
+> >  	.ndo_bpf		= mana_bpf,
+> >  	.ndo_xdp_xmit		= mana_xdp_xmit,
+> >  	.ndo_change_mtu		= mana_change_mtu,
+> > -	.net_shaper_ops         = &mana_shaper_ops,
+> > +	.ndo_tx_timeout		= mana_tx_timeout,
+> > +	.net_shaper_ops		= &mana_shaper_ops,
+> > +
+> >  };
+> >  
+> >  static void mana_cleanup_port_context(struct mana_port_context *apc)
+> > @@ -3244,6 +3299,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+> >  	ndev->min_mtu = ETH_MIN_MTU;
+> >  	ndev->needed_headroom = MANA_HEADROOM;
+> >  	ndev->dev_port = port_idx;
+> > +	ndev->watchdog_timeo = 15 * HZ;
+> >  	SET_NETDEV_DEV(ndev, gc->dev);
+> >  
+> >  	netif_set_tso_max_size(ndev, GSO_MAX_SIZE);
+> > @@ -3283,6 +3339,10 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+> >  
+> >  	debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs, &apc->speed);
+> >  
+> > +	/* Initialize the per port queue reset work.*/
+> > +	INIT_WORK(&apc->queue_reset_work.work,
+> > +		  mana_per_port_queue_reset_work_handler);
+> > +
+> 
+> I think it would make more sense to move this to before the call to
+> register_netdev(), which is a few lines above this hunk.
+> 
+> I suppose that because a watchdog timeout is involved, it won't happen in
+> practice, but in theory could fire ndo_tx_timeout before INIT_WORK is
+> called, resulting in access to the work queue before it is initialised.
+>
+Sure, will address this in next version. 
+> >  	return 0;
+> >  
+> >  free_indir:
+> > @@ -3488,6 +3548,15 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+> >  	if (ac->num_ports > MAX_PORTS_IN_MANA_DEV)
+> >  		ac->num_ports = MAX_PORTS_IN_MANA_DEV;
+> >  
+> > +	ac->per_port_queue_reset_wq =
+> > +			alloc_ordered_workqueue("mana_per_port_queue_reset_wq",
+> > +						WQ_UNBOUND | WQ_MEM_RECLAIM);
+> > +	if (!ac->per_port_queue_reset_wq) {
+> > +		dev_err(dev, "Failed to allocate per port queue reset workqueue\n");
+> > +		err = -ENOMEM;
+> > +		goto out;
+> > +	}
+> > +
+> >  	if (!resuming) {
+> >  		for (i = 0; i < ac->num_ports; i++) {
+> >  			err = mana_probe_port(ac, i, &ac->ports[i]);
+> 
+> It is not strictly related to this patch, but the lines above the hunk
+> below look like this:
+> 
+> 		apc = netdev_priv(ndev);
+> 		if (!ndev) {
+> 			if (i == 0)
+> 				dev_err(dev, "No net device to remove\n");
+> 
+> If ndev is null then the call to netdev_priv() will result in a
+> NULL pointer dereference. So I think it should be moved
+> to after the check for !ndev.
+> 
+Thanks for pointing this, I will fix this along with my next version.
+> > @@ -3557,6 +3626,8 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+> >  			goto out;
+> >  		}
+> >  
+> > +		disable_work_sync(&apc->queue_reset_work.work);
+> > +
+> >  		/* All cleanup actions should stay after rtnl_lock(), otherwise
+> >  		 * other functions may access partially cleaned up data.
+> >  		 */
+> 
+> Comments on code flagged by Claude Code with
+> https://github.com/masoncl/review-prompts/
+
+Thanks Simon for the review. I will send the rebased next version with all the
+comments addressed.
+
+
+Regards
 
 
