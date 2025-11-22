@@ -1,140 +1,142 @@
-Return-Path: <netdev+bounces-240909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 735A4C7BFDD
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 01:06:31 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1101AC7BFEB
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 01:10:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33B353A6D77
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:06:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5F9A734EA18
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3382DDAB;
-	Sat, 22 Nov 2025 00:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5F43594A;
+	Sat, 22 Nov 2025 00:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="dF3EBsnL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A0610F1
-	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 00:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A041318E20
+	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 00:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763769987; cv=none; b=TJbajeNvpydna867s1DVvi1UEfKY6yYLgj3rqNfSzd5zdjAsCIcEJdKKxfJbB4KLFBjqXFukrw7EDiJPPAiye2qJkcRWCA++iMO7iU9zsEm+CIxsOOi+BVixD+KYB9gc+GiLllZJmXeC56Vx8j4lR87sMmbatp3mzwyq7p0DRiI=
+	t=1763770212; cv=none; b=CeGrykXneIv5osRSN3MwZLZ5Bnf8pdOB4L1gi3XjaQrsMseEwWR4J2k2s4zXP4ZS+oGmDF1bZ6JuN5WDGh4KhMELy+roQYVWdjX+uEosbUmUeZLnvKJiyLXR2bZPV3LiwRIGdEPBCug5Ng07cmtwmgB8ShGjfvoD1QeTR29FCzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763769987; c=relaxed/simple;
-	bh=QMqFHrLRF2sEwwhyJw8PKqwtIp5BOzl+dOzP3Jwtxqw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=e6szAxkdrdsgcvY17w5ei2YUPCdQD6/gScyJK2orQLJhtZPyip6izS4ZpvpvV8CprEAWBQAkGLAPv+/t/fZ6b1L3weOm8M/lObvGJflPszjOyaMuNOB9dDW3btcHXJ0K7uK6Ld4aHsLLt3PJP40Hc+srwd7rVSb1hyp3VfuNvlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-433817220f5so39078955ab.1
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 16:06:25 -0800 (PST)
+	s=arc-20240116; t=1763770212; c=relaxed/simple;
+	bh=rvhN+UrIpp5KBh/jS9D/Vga20XhGPMaE2GB7C8/fL4s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r4i/424m7hJomMksaDb1AG9E1DKO+EZ6Eys8Zrg53neKnC94XOMTD+cP9M5swEC/MGGtgthNQe/nQsfv08vXkTHvNIAaWULfVjtP/olLeiPXT9GiRbQp7S9Gd0YKpXycjV7MsK8Oc8KuH8AF3gTNZ0exn+fTaHXEI3zujqWOxEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=dF3EBsnL; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-343ee44d89aso3946286a91.2
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 16:10:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1763770210; x=1764375010; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5/Qn5J8WAi+Jn6RgdNF6erSiLxDQRcmUkmlYRm66bKs=;
+        b=dF3EBsnLMkz0JHqYdWlsbTf/FeSyKLV2OARjHIhOsEkwSYvPlatHrLc+Iiqn7Z3zIp
+         O/XRYadXOtu2nBOlJZIBq7jVUg5aX9BGIScvJalI6d5k3ayDuhTwbNKR8+PWSF6332bM
+         yKQxg4lMk8bCzwXvDp2rOc6vI0A1fulTCZqIFRJZWYGFDE/UOBNcyEqJI7H8El2RAfkE
+         RJzf2pEOBy8oWFB75S92gIzO0usVn3M8ripylphRayMl/u4c7irEwzc1YMcSl0QZEbOx
+         y+MIDlr1BhX2RPXUwt+lKkse/i7QvkebuNG0/YWaeyJwmwPpEtrMxkkxaQe2Fd0xxE75
+         ifig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763769985; x=1764374785;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jtvE0OLq9JMcVYo5nnhquCGv1ot2drpBn582H3Pz9lw=;
-        b=aWlAZ9y0sGtrlH2eNFXqUQkFf70Yp5Wklkf51XgY7skGmp1T/3trswWO5hwhJ8M++r
-         BnGOpKGDF6Il0tmDyROIlBgVQATlR0tugrfGlJmeziMVUtSxhUHvo+FFrzBHaghOy+Oq
-         CRNnXsFzhuBB9DkiZrhcKUpcec72PzWB8xXmQWkvX5sL4DnqMrpRkrIgXSw8AriEcgbt
-         UjG3lrwDR2F5/nM7N7e+lk43hJ3LOzc48TyNf7Kd2LtRNldhDX+htru3/HyqtaGC9agl
-         TYwJmtzNPhM74g4GdIKRuHrSs8/ah7IQHbQB8BQckLjovdmM+9emia09wKizorCs9bum
-         IbCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVBhMs8udpbZYYH8+jp5y0kwyo9DZ8TgOmCSv1FNqN7VZ1SFeyyqfdp5CtS7N0CgcOT7inrAwc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLVu02KL944MbAX/VGC9/YtNcRhcF/PdJ5gpJGPdEMIV0/QdJh
-	i8KgLDrN5A4sCMgdukcDoXAuL7kuUb4VCTwh1Lb30Uzck2RtedG11VJt3DuuRb6wPk0Al/qcsrd
-	9WgNIbfsrhpfqnHfX+o3XtvhJ0anVBAKnvuHJW9h7Aw/idr+ZG3ca4xa35/A=
-X-Google-Smtp-Source: AGHT+IE+QJmDDkGIgMAu8FHV3mLKf4AH8Af+8S5eu0cnacFRZHXH2fiHHjKL6EoCgmUWP0JtQY1lnUobdb/0DC8x3l6gQ62NIb37
+        d=1e100.net; s=20230601; t=1763770210; x=1764375010;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5/Qn5J8WAi+Jn6RgdNF6erSiLxDQRcmUkmlYRm66bKs=;
+        b=Rrw3xP9pkmZvPk+avQoDK/kRczJY5YmtFw8y85hdxxPXF38nEikE8njqi7pfhyySV4
+         5UZgg5Iqu6mqGA7dIvyCquw9mpSXb0Mrt8Bi7fsAZ/K7zvOjnTO3MoAZs7wpKYyFPdNg
+         4UraKh5lsKZ2APVLn2rR/w/sMjuRVbTn9xtYyXyCWC1A7ZI0Nh/Vn/G5sWIyichKI2Bo
+         roxegZxOmr7QwiNpN7xMIwAnpQ0bkHyv8B7x4gWxG66KYNNXHBh9ABp0VVjArleGm+Xc
+         XJ0TUyIBmzCUsKauuMIzFIqCulgspz9M7Jx89FlUnM//T59TtZdMb3g81xHZ7eufmnHG
+         eMwQ==
+X-Gm-Message-State: AOJu0YxX2XBQxME6ajbyvPRoYAPDW8wnD5P8n3iyvs9Sc5WhmGiYKlT1
+	XIgS+foddNvo9Rnm623CcteYx2PCcT6HgCdOXye4pbcs0xUxKDGPLFtqSoEV4vqP/7fuTEYkO4H
+	UKDto
+X-Gm-Gg: ASbGncsLfh/V5727zTg0dBm6K4oFERb23KnfBtg5Lb4vdnQLRYz0bb85lMVYQDH92eM
+	CGDiqxak1Vb6oCSjSa3aksBAmyP8BDdb8GUtJK2l9TOa4iolUnZd0tZ9UVTq7Yobj22brJS3jle
+	Et51DmjBSchTC46EK2EQqcVfpV9LCpSKqBmJBD7PfhYBX7maRi+XVDFQ+AONKh0tvxq1GA+x2Xi
+	WSQ1CCin0aXTFOCPbEvzTA1i2RKP7wLOBF92hfxMjoamIvumvuIEXoBjUBQfjsscTxWFHOyJnB0
+	J8YV5FouKk9EwAWwtIBFsi12az7RJR9VYiBFNRiMwWx+ErlTIrgBUgiR61iyiAgoh72xaoFlxtJ
+	MnsfABzGBIsDHa56G2qn8q4nnVZ65LjwaCd0r9KN6yeHSQZUWEUb7xbKKql09iXtenXEXm7quXe
+	zHmC14AG+DpSqALbW2NvnKn19Ax16PPwnWjxD9Ndd7zeu1wI+f9CC2
+X-Google-Smtp-Source: AGHT+IErdoGIRXA75bRJhgS2+dN0uCNsySrQcClC67jXs5Lj8Ow1hFEWyJN1I7U1lil3enMhzT2kqA==
+X-Received: by 2002:a17:90b:2f44:b0:340:c64d:38d3 with SMTP id 98e67ed59e1d1-34733e60958mr5055120a91.12.1763770209741;
+        Fri, 21 Nov 2025 16:10:09 -0800 (PST)
+Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-345b01d934csm7302304a91.1.2025.11.21.16.10.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Nov 2025 16:10:09 -0800 (PST)
+Date: Fri, 21 Nov 2025 16:10:07 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Zhengyi Fu <i@fuzy.me>
+Cc: netdev@vger.kernel.org
+Subject: Re: [BUG] iproute2 - ip -d -j tuntap outputs malformed JSON
+Message-ID: <20251121161007.4c7ebae6@phoenix.local>
+In-Reply-To: <87jyzkvwoq.fsf@fuzy.me>
+References: <87jyzkvwoq.fsf@fuzy.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:221e:b0:433:1d5a:5157 with SMTP id
- e9e14a558f8ab-435b9052669mr38134895ab.6.1763769985215; Fri, 21 Nov 2025
- 16:06:25 -0800 (PST)
-Date: Fri, 21 Nov 2025 16:06:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6920fe81.a70a0220.d98e3.004f.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_mgd_probe_ap_send (3)
-From: syzbot <syzbot+a59b5291776979816910@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Fri, 21 Nov 2025 12:25:41 +0800
+Zhengyi Fu <i@fuzy.me> wrote:
 
-syzbot found the following issue on:
+> Hi iproute2 maintainers,
+>=20
+>     $ sudo ip -d -j tuntap
+>     [{"ifname":"tun0","flags":["tun","persist"],"processes":["name":"ssh"=
+,"pid":86812]}]
+>=20
+> The =E2=80=9Cprocesses=E2=80=9D value looks like it should be an array of=
+ objects, so
+> the inner braces seem to be missing:
+>=20
+>     [{"ifname":"tun0","flags":["tun","persist"],"processes":[{"name":"ssh=
+","pid":86812}]}]
+>=20
+> Could you confirm whether this is a formatting bug or if the output is
+> intentionally flattened?
+>=20
+> Thanks!
+>=20
 
-HEAD commit:    6a23ae0a96a6 Linux 6.18-rc6
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=140fc8b4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=14b6a9313e132a6b
-dashboard link: https://syzkaller.appspot.com/bug?extid=a59b5291776979816910
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-userspace arch: i386
+It should be an array of objects. You can confirm by seeing the output
+with multiple processes.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Does this fix it?
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/464c2673a9ca/disk-6a23ae0a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c2986bef024f/vmlinux-6a23ae0a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4077bdc25422/bzImage-6a23ae0a.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a59b5291776979816910@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 36 at net/mac80211/mlme.c:4406 ieee80211_mgd_probe_ap_send+0x4e5/0x590 net/mac80211/mlme.c:4406
-Modules linked in:
-CPU: 0 UID: 0 PID: 36 Comm: kworker/u8:2 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:ieee80211_mgd_probe_ap_send+0x4e5/0x590 net/mac80211/mlme.c:4406
-Code: 41 5f 5d e9 2d f5 d7 f6 e8 48 04 eb f6 90 0f 0b 90 e9 0c fc ff ff e8 3a 04 eb f6 90 0f 0b 90 e9 4c ff ff ff e8 2c 04 eb f6 90 <0f> 0b 90 e9 a9 fc ff ff 48 c7 c1 90 1b 7d 8f 80 e1 07 80 c1 03 38
-RSP: 0018:ffffc90000ac79c0 EFLAGS: 00010293
-RAX: ffffffff8ad4ffe4 RBX: dffffc0000000000 RCX: ffff888143691e40
-RDX: 0000000000000000 RSI: ffffffff8d8f4f27 RDI: ffff888143691e40
-RBP: 0000000000000002 R08: ffff888143691e40 R09: 000000000000000c
-R10: 000000000000000c R11: 0000000000000000 R12: 1ffff1100b1d6ba0
-R13: ffff888058eb4d80 R14: ffff888058eb6ad2 R15: ffff888058eb5d00
-FS:  0000000000000000(0000) GS:ffff88812613b000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000c3dfece CR3: 000000002e504000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- cfg80211_wiphy_work+0x2bb/0x470 net/wireless/core.c:435
- process_one_work kernel/workqueue.c:3263 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+diff --git a/ip/iptuntap.c b/ip/iptuntap.c
+index b7018a6f..6718ec6c 100644
+--- a/ip/iptuntap.c
++++ b/ip/iptuntap.c
+@@ -314,6 +314,7 @@ static void show_processes(const char *name)
+                                   !strcmp(name, value)) {
+                                SPRINT_BUF(pname);
+=20
++                               open_json_object(NULL);
+                                if (get_task_name(pid, pname, sizeof(pname)=
+))
+                                        print_string(PRINT_ANY, "name",
+                                                     "%s", "<NULL>");
+@@ -322,6 +323,7 @@ static void show_processes(const char *name)
+                                                     "%s", pname);
+=20
+                                print_uint(PRINT_ANY, "pid", "(%d)", pid);
++                               close_json_object();
+                        }
+=20
+                        free(key);
 
