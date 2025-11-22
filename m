@@ -1,147 +1,119 @@
-Return-Path: <netdev+bounces-240995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3980EC7D2B2
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 15:23:12 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 510D6C7D2EB
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 15:49:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDBD43AA3AC
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 14:23:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 22B7F4E21EC
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 14:49:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE081F5EA;
-	Sat, 22 Nov 2025 14:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E8F1E834E;
+	Sat, 22 Nov 2025 14:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qnio5SsT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EMAvc320"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987411FDD
-	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 14:23:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A833F9C0
+	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 14:49:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763821389; cv=none; b=hjW1VCYnlTEIPeKWQv0+nhjkWRnFKXG5uFc+Tnh/9WZ0lxv04k1s1I1wN9SWj1xZ4YJ662fMrLOi7iFFwt3lJvtAPLMfWVJX1MT8ZrLxIfnaA/sxcxAG2QDbiRLTE6wm+c9CH5kUnS7WJuddPot1zzYKYEpErk/cGaDNjQJM7BY=
+	t=1763822975; cv=none; b=UPNJA1WBlNTxNRtjNvkih69TKLZ0Tgxs2//ggIi7RQc9uL9UGsaAgTk4pvIf/gciGfxreADkDdsh7WfOT1I7IWMlhaS/N7Wsl1bcsqupGDw+pRWTvARAvNwi0VJIBaBioJGSt2CjzjalhtBd4BgT2CBzlJD6ZLB/O3JGnDy/Wn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763821389; c=relaxed/simple;
-	bh=FKrMNSANrBkQ22Pod7R1j+jhP6J9vZ9e8+oS5B44M1o=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=s8QhE/Sfdnl8mAiEEEbSBTJwZG+DblD261lqX4JPFcl89feGzBjz854U69VqBmiBb3sZOhXTdbTnh3vM+yNYaHN9zzgERup6BXPVBl/v/xaPWXG/t1CFce+MQk2ZbgJ3WNOYGE7W9dI3/e9djEkXPmDekTgn1c5u8EfS9hpNjIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qnio5SsT; arc=none smtp.client-ip=209.85.128.43
+	s=arc-20240116; t=1763822975; c=relaxed/simple;
+	bh=QPHsFaEGdsHZP3oOjgcmB4o7/cQm6i9haQ+GHIzrDuk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t7e8DC4wzO6qHxkFqPU2qx2FL4Qa/oXSbBiGesqeMjBEmmEhA2EgY3aaHU4Gp9F5p3Z0FalFIU1H5anfOj8wHHScdEAxTRQ7EyOLT47DZbV1OatrEFj3buDc2EOZdVVeK0ON1s3XIaW65XT7lxCjrLLjKqPA+4x2AdpNd1kfkUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EMAvc320; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4779cc419b2so29729385e9.3
-        for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 06:23:06 -0800 (PST)
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3437af8444cso3151632a91.2
+        for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 06:49:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763821385; x=1764426185; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=giPYyGhz2pEDYJA5pglbKzcooyNSi+qkZ3uFDmTohXs=;
-        b=Qnio5SsTFr+mFC4cLEwzr91/bJR30PHs2a9PMRetVFCMViVVVkcxlETN6x/B8QxlEY
-         ndE/GxIg75VoU2N3ctlFtYryGwix80hnyC/zeNzWpN2Lvw344k7F7ZusT4akQ11HaSz5
-         sfGxwTASwrlZLGmNKXReD34FoiMnB+DdnqdZtelT03am4X+G1rxxB9I3RVfsitrztYkc
-         8La5jkBhLyPLvBcCaEZCNPWCCO2/m8UAE+OMqWg00eK8IOWb1176lKrfqu7oiJolL7eN
-         rRF2LVlFX25dOOCBSpPZ2K+70Nz+DoFEIKj3V8Ke0bPlwotAjhH5IwUsqME2wntiDtm3
-         s39w==
+        d=gmail.com; s=20230601; t=1763822973; x=1764427773; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=58Per5Q1gJAZcYO3oiuYP4SdqAFuNQCINA72VmEADHI=;
+        b=EMAvc320z5wwSVnTbds2fyUt5rZO1sCsYYJz0o/IUK9mIn40q/XeMecHfpiJnAElce
+         XKHcB+Gg0TCY4y62jsbNeywyZU8EK7AUvy+9ZjVtnmK2TjGv28Jywltc51jX7G081/8H
+         6Uuo6D9kJHQHXWZMfOme4rtWZsVky1JmggSg1rlM3guo/KpD/eCk+TTbqyg+voL0K2Nt
+         f3CJA35unN1W2BvkRV84IOqiLnGzIuW+Zbye46NWwDqFILjTXIJAr5u3lbZfPolLzMmN
+         2izia4sKZkd15sJEqu8rIYpvt4uXfayGA8jRNttB1MkwILjV/qIsXoINfqxCYmqVAjpf
+         7n4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763821385; x=1764426185;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=giPYyGhz2pEDYJA5pglbKzcooyNSi+qkZ3uFDmTohXs=;
-        b=nFcMBjpjtlPDAnwTZRLf+GWK+pDcm+h8xm1NxWg6T39IaRgkwYtprKZDGOnapb3/b8
-         64XmyzM1QsG9SGLWy+pGjP7hAVSBjjAocxOBlLSLA4GHYGh3Y0gBZ7JYB+tOJb2AwPyp
-         ViEsAoGzw/l/JcZg2EKqQ5Pnnf+KIOdW0L9S5+WuCOuSzJixavdBRHKW/75xkSDA3FzQ
-         jY6XlXTheWThqYan+lrRd2llLMPeYsSsUJlFxB2DIxmKvVUcBU8Aqhop6d1hb2g1ZnUV
-         KcRyAnTw3t2ehEiFqdJG/HRU6NzASaC2wUeHeugrkYEl6JYvgtJAqIKZH2oOcIDHlIis
-         Y5ag==
-X-Forwarded-Encrypted: i=1; AJvYcCWtnNXwaS9Xp2spVN0I3/P1NC7h06jOBSpuO0GsNR6hYFIRC0Vm8ttqkSKKSTqZOG5q2boXT8A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8Si0P/jTK1tUBroXIXfGt0NBtOapBO7+SEv3RxaVd4UPHHyoq
-	1IHLRz0gWiiIbA4obAit0YHIfljw9ewDu3TXKZN9VywdjEy8/EBwxZRW
-X-Gm-Gg: ASbGnct0oYcay7aLQ6DzzMFshPPrOYQxNL/A2p5wKUNN6kacRtM6VqUotnAQg4N/McJ
-	TODpi8/8YmH24yhamRdx7AvqU5SKsH2qMTzaykeEpyj2PRALqP2rDHfDrLdO7hoNznqQ09ImqNm
-	q/HKKBKq6CeyAZmaAjt9VBVy0rg4Wa0Ufx8bU9ritN9rTL+sgzv+iA1cd6+vhZtfQWaFxPCJgiQ
-	N3QrkL159wT/pA8wUNqlTZLIHuNhhY6Zl7KFNC9sc8SG/bjUyuPtkbQrgpD7ysACvSjFu8zMXhX
-	H9IYTHdgHpq/p0KWRBWOV+AI+0BngRrJfdpTZGDa/POJvidjXRYGn/rTkvGP+p6V6GQIhvIFj/1
-	juRiRjmxxIWp5wnBTcpb5XZ7LbCkSVEBDaq/a2YlSD96CLEqYmsL77p9iD8qWuQn6AVWXzRVfUh
-	1/WR+KXlh3ZgNloh3DanZycuzdtPuphWk4qmtUSw6N5MREx3Kk9Ni4MLJYNonDGV3VtX6sPLpPK
-	wh+tA7pqqsSygzlahpCBURtWO2huMMAbT2Uy7DkjAtfDtBkw+BBvA==
-X-Google-Smtp-Source: AGHT+IFWhtD0nk/nnYp6O5FLdSyGm5y5kK8ptUjMSLwBkwHoF6/rE5c1T2vNJLoIWkfSEJ+qC71Y1A==
-X-Received: by 2002:a05:600c:1547:b0:477:63db:c718 with SMTP id 5b1f17b1804b1-477c114307emr62289135e9.16.1763821384679;
-        Sat, 22 Nov 2025 06:23:04 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f33:5200:e1a9:c2ef:2449:e771? (p200300ea8f335200e1a9c2ef2449e771.dip0.t-ipconnect.de. [2003:ea:8f33:5200:e1a9:c2ef:2449:e771])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a9df8db3sm104875075e9.11.2025.11.22.06.23.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Nov 2025 06:23:04 -0800 (PST)
-Message-ID: <d7faae7e-66bc-404a-a432-3a496600575f@gmail.com>
-Date: Sat, 22 Nov 2025 15:23:02 +0100
+        d=1e100.net; s=20230601; t=1763822973; x=1764427773;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=58Per5Q1gJAZcYO3oiuYP4SdqAFuNQCINA72VmEADHI=;
+        b=gBLsGXFLSUAZaz3yHIvAE3FU9GIRJd64KUOh+s5Qp1Vnri0xi72/evixK2GmtHJpWW
+         1Z6PP60lN7x/dme09u+spq04QpNvrHAnzSPFUFNqOtzafKV6VcIZUFp/qVH0V+Ob5Sjl
+         QtiIyi0nr8NfNk9CR5XqWI0FiZBwolT/fwxk5GbxwbJjAX+OCiKZdBhkigHQPN6pGOAM
+         t0ct3WbLsUsiijeYDtJQUdSt65nrkG9E3WwbqWlBephebMUtuUYAeEg2JAqzs+ieg2QK
+         ai0cCPR2yzie+opJFZfJR0EpfaYACEYx/KZ3zv34mSUdqS+66gA6gEP4bdccbtCRwfWs
+         u4UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWZ5bAj1U8hzbrQE4pVy9a3NZ6JDHyxoRbfn2GBnodZ8PtCHVUM1Nlu3sqqHbd5LkYhlOKarc8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUROSI4Bh0gL5panNwTw98ELPY7cQUQfHCwBFnIH2IxHhKYTds
+	frQ0ROMFIltvW5AikkYp+DgphycRUy4emWW/B0esMcr2llBZ+btAH6zd
+X-Gm-Gg: ASbGncvK5udmHSN+mbwYHoQPmdDnpLHM8G2Q82jXT43og3BqBEcPU7d4Nfs4mFB+6UG
+	r3g5Ji1R/zIVbVEPOiHArGPdYiK58LCJRZw+rX7pPvLQcW7Njyz8QdPPwIqueGQ6P3eRZpVMqvt
+	Q0Onem0pjxebSqnCgv/wGoUa1i+PT/9tdHA6FkseZXIC3FP92VALtdW3KCMPOTUzn/9jXdV++e9
+	1B5mr0Xun/00lZfqrPunKvHXkAPfxmAb/MzbS/TWfKwYr6j4mF2//BTZONTgNfD2krzNhZz7BDu
+	x2kHM/Q+0AY6IlBy9XNxD/u+sC338W6KSuF9UsroR/UNdyMe3a965FcHp2xU3IfVF1XIo5M93r2
+	7hDOrHPqle1IVEelMUTDlWgv6fECPwhO9uD0DJ/u827rRxKesOLA87xYIAvduKsQSfrfKOEMKuI
+	U5s+3A+lRNvzd8
+X-Google-Smtp-Source: AGHT+IHy+rtf55tHyiiQ4CEv5cvwEWRUsQzuw96USB2qMeqTBBtebSf4M22L0dXJgG6e0YZ2uDzt6w==
+X-Received: by 2002:a17:90b:544b:b0:32e:749d:fcb7 with SMTP id 98e67ed59e1d1-34733e786f5mr5891436a91.13.1763822973356;
+        Sat, 22 Nov 2025 06:49:33 -0800 (PST)
+Received: from fedora ([2401:4900:1f32:205a:77ed:572c:240f:9404])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34727c4b64bsm8639801a91.10.2025.11.22.06.49.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Nov 2025 06:49:33 -0800 (PST)
+Date: Sat, 22 Nov 2025 20:19:06 +0530
+From: ShiHao <i.shihao.999@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: kerneljasonxing@gmail.com, davem@davemloft.net, horms@kernel.org,
+	i.shihao.999@gmail.com, kuniyu@google.com,
+	linux-kernel@vger.kernel.org, ncardwell@google.com,
+	netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH] net: ipv4: fix spelling typo in comment
+Message-ID: <aSHNYmb-3biUl6yr@fedora>
+References: <20251119172239.41963-1-i.shihao.999@gmail.com>
+ <CAL+tcoCthG3AzW4Gs=XeWjMGYo+UoZSu34N0tJju4+0jr++j6g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH RESUBMIT net] r8169: fix RTL8127 hang on suspend/shutdown
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- David Miller <davem@davemloft.net>
-Cc: Chun-Hao Lin <hau@realtek.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Fabio Baltieri <fabio.baltieri@gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoCthG3AzW4Gs=XeWjMGYo+UoZSu34N0tJju4+0jr++j6g@mail.gmail.com>
 
-There have been reports that RTL8127 hangs on suspend and shutdown,
-partially disappearing from lspci until power-cycling.
-According to Realtek disabling PLL's when switching to D3 should be
-avoided on that chip version. Fix this by aligning disabling PLL's
-with the vendor drivers, what in addition results in PLL's not being
-disabled when switching to D3hot on other chip versions.
+On Thu, Nov 20, 2025 at 09:53:50AM +0800, Jason Xing wrote:
+> On Thu, Nov 20, 2025 at 1:30 AM Shi Hao <i.shihao.999@gmail.com> wrote:
 
-Fixes: f24f7b2f3af9 ("r8169: add support for RTL8127A")
-Tested-by: Fabio Baltieri <fabio.baltieri@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/realtek/r8169_main.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+> I think minor typo patches regarding networking should be squashed
+> into one as they are easier to review at one time.
+>
+> Please repost them as one after ~24 hours.
+>
+> Thanks,
+> Jasoni
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index de304d1eb..97dbe8f89 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -1517,11 +1517,20 @@ static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
- 
- static void rtl_set_d3_pll_down(struct rtl8169_private *tp, bool enable)
- {
--	if (tp->mac_version >= RTL_GIGA_MAC_VER_25 &&
--	    tp->mac_version != RTL_GIGA_MAC_VER_28 &&
--	    tp->mac_version != RTL_GIGA_MAC_VER_31 &&
--	    tp->mac_version != RTL_GIGA_MAC_VER_38)
--		r8169_mod_reg8_cond(tp, PMCH, D3_NO_PLL_DOWN, !enable);
-+	switch (tp->mac_version) {
-+	case RTL_GIGA_MAC_VER_02 ... RTL_GIGA_MAC_VER_24:
-+	case RTL_GIGA_MAC_VER_28:
-+	case RTL_GIGA_MAC_VER_31:
-+	case RTL_GIGA_MAC_VER_38:
-+		break;
-+	case RTL_GIGA_MAC_VER_80:
-+		r8169_mod_reg8_cond(tp, PMCH, D3_NO_PLL_DOWN, true);
-+		break;
-+	default:
-+		r8169_mod_reg8_cond(tp, PMCH, D3HOT_NO_PLL_DOWN, true);
-+		r8169_mod_reg8_cond(tp, PMCH, D3COLD_NO_PLL_DOWN, !enable);
-+		break;
-+	}
- }
- 
- static void rtl_reset_packet_filter(struct rtl8169_private *tp)
--- 
-2.52.0
+Hi everyone.I recently sent a second patch for most of the spelling typos
+which were in the net/ipv4/ directory and combined them all into this second
+patch however there are also spelling typos in the net/ipv6 directory too
+should i combine this new directory fixes  with the previous one? or should
+i just send a new separate patch for the ipv6 directory. I am new to this
+so any guidance would be greatly appreciated .
 
+
+Thanks
 
