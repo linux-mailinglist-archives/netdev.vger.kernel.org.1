@@ -1,265 +1,140 @@
-Return-Path: <netdev+bounces-240908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3733CC7BF12
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:28:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 735A4C7BFDD
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 01:06:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 01E0D4E1724
-	for <lists+netdev@lfdr.de>; Fri, 21 Nov 2025 23:28:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33B353A6D77
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8916630BF59;
-	Fri, 21 Nov 2025 23:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="jSSqjGe/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3382DDAB;
+	Sat, 22 Nov 2025 00:06:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE142EDD7E
-	for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 23:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A0610F1
+	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 00:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763767687; cv=none; b=T2XIyPc3e6eQekvwt7n/k42rrMQ6w9q3M5GTDwwijci92g1q/E9T0hS4XzoO1gZWdq2uVGETxWkXRhyJ26CJHZLaIGclI6uv6gpeqzEPCvCApicyNXMQoRSce6i6eZSH4WLR7fPzjLkXNCocmY6zuYfx0mlkGjHQNGG9eh4Rbr0=
+	t=1763769987; cv=none; b=TJbajeNvpydna867s1DVvi1UEfKY6yYLgj3rqNfSzd5zdjAsCIcEJdKKxfJbB4KLFBjqXFukrw7EDiJPPAiye2qJkcRWCA++iMO7iU9zsEm+CIxsOOi+BVixD+KYB9gc+GiLllZJmXeC56Vx8j4lR87sMmbatp3mzwyq7p0DRiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763767687; c=relaxed/simple;
-	bh=4x0yFS1G6/qQ3vA1WwHwNq63xJUDTisqyZbFdhGku4A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=chPtfLX5mfJsZlDe9ZkXn2YViLQTe75fVCWOHhIsPhzChCjNC8MJBb1fSxTWFtyz6du0Drh/RF+P1+v7ecbSTjXRcupNihtxMk616sixq9P5g5m5IBh8xinkc+1sVpswEu6nMK0ICbyCeH5L5WAsvjQD5y7GrYhmotxcxO4HNfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=jSSqjGe/; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7b852bb31d9so3062751b3a.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 15:27:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1763767675; x=1764372475; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ACQddHZcDaCDM4L+eMLnqjgNPpNjJRnV3lGXdOduM+A=;
-        b=jSSqjGe/ypLpA69qXopBxdT/P8G2ic2dbIBix4tQJ2kdJXAuGnGJjRlUcygn1oqRM1
-         r8eXcQzH4Waz5RfZ0tOThotAg/Nzro7afoU5gFiUMEfmsQ6C0exLctML/2RhPJNZXhhL
-         lJoBA3c2RQDAGXPAetvesLZ+M9C/qxLYn6O3O+KTVlmnwRGzp8+giPcVQJL43wKoMih3
-         BUuOkni+p88W/nwrIFMB/qDfS42UR9CDsFid7LvMr2XOYzWqxFG8Rjr/FKGzhbb8qTjM
-         qqVGvp0uYrT2LpM9d7QBD806Gq3qQrUqKx82zPGvuxXOgHi2o0pwRMfL1YIjbRS89zKr
-         BH8Q==
+	s=arc-20240116; t=1763769987; c=relaxed/simple;
+	bh=QMqFHrLRF2sEwwhyJw8PKqwtIp5BOzl+dOzP3Jwtxqw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=e6szAxkdrdsgcvY17w5ei2YUPCdQD6/gScyJK2orQLJhtZPyip6izS4ZpvpvV8CprEAWBQAkGLAPv+/t/fZ6b1L3weOm8M/lObvGJflPszjOyaMuNOB9dDW3btcHXJ0K7uK6Ld4aHsLLt3PJP40Hc+srwd7rVSb1hyp3VfuNvlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-433817220f5so39078955ab.1
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 16:06:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763767675; x=1764372475;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ACQddHZcDaCDM4L+eMLnqjgNPpNjJRnV3lGXdOduM+A=;
-        b=wYI0aFddKovSuwGLmzroZU+kv19mvgJ56R0AeY+i8srNSBHXrcUm3mcDwbsF+o7yJv
-         Vgueri1Hj25smYLRE41ajjFbbV5uQWupZhiR+4SvAebvfpq7wewLFsw97lRQyG/AoxuE
-         0oqbW4LFIHwrgf4HxrIJf0yqg8L4Pnm8RrkCsNIg0VHtmhwYzF2xlX3HQb1A8wgBF4UT
-         7kJ5nOuP4Ol05tE2T9+s7tJL7XLbnHli5JZ8OIimGUTgKMDJ0SqMWetQGPLx6fr/q8BD
-         RBQiZHZeSeleoo0YJwc4zSBN09vMvmNAtcMW99h2nMK9v2Gqe35E1A7EoFi7HqW8eSV9
-         zLZA==
-X-Gm-Message-State: AOJu0YytpyQjHQUVSaQ8U2ISE2HCY3hGV/i9CynYStulDnP8N06Pp87d
-	0MsfbHZ2dKuiXeaix4fvCM9iI+1HTB4ein1q7mShxCbq8r2dwQ/W8ceUfj+dVGQsKA==
-X-Gm-Gg: ASbGncv3+jQV3DTS6Hkrt5xHCw//Ymj3YpHMBJilLXA6JWiVKRr30b/EmQcXeJnXMkj
-	pMzenv/Z8pGPDKDHN9U4fG0YgVjrUK21/JG+qiD5O4J7DmCwqQIHWR/d53SB/NRA06zvX0qfauA
-	UMyIBpPq4d0WJCFFcwCZW0G+1PAA+ZBkMu5MTJTpafxSXLT+VG3u8Uu+5lqVt2hnc5Yx5oyU58D
-	GPQHZhAUAWkgg/zCkC8ZZCeJ1LuijTEzL9KFHH+7ofzgSccXvDaPDE5p7Jgr/G12qKMjyqGP6Jr
-	EO8il/qMf9lf40aSnMPQnCPJqOrkk3Cl8uRrBbeDxV3bgx5MGe7RMdF1XjOrt0wQWZaLymbBy8L
-	/Ni0xnzc9aHHRYDYxMjf3SpR5YpKR9qy5RmUy/DWaD4KS5i+kBqfaYO55KdWCnMj9oiTQO79Puc
-	KnGDWyTL53wTSmhaVUEUON+ZAYO6nF/i9F6ByVJ3kU
-X-Google-Smtp-Source: AGHT+IFmqosMYWpJDWj3TYGKEUWHYx3dE5wLEGG4lzl9FC1I9zK9qz+rYoFclwit74bSZLRBFroScQ==
-X-Received: by 2002:a05:7022:412:b0:11a:4ffb:9849 with SMTP id a92af1059eb24-11c9d811985mr1925590c88.21.1763767675380;
-        Fri, 21 Nov 2025 15:27:55 -0800 (PST)
-Received: from p1.tailc0aff1.ts.net (209-147-139-51.nat.asu.edu. [209.147.139.51])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11c93e6dbc8sm30222906c88.10.2025.11.21.15.27.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 15:27:54 -0800 (PST)
-From: Xiang Mei <xmei5@asu.edu>
-To: security@kernel.org
-Cc: netdev@vger.kernel.org,
-	toke@toke.dk,
-	xiyou.wangcong@gmail.com,
-	cake@lists.bufferbloat.net,
-	bestswngs@gmail.com,
-	Xiang Mei <xmei5@asu.edu>
-Subject: [PATCH net v5] net/sched: sch_cake: Fix incorrect qlen reduction in cake_drop
-Date: Fri, 21 Nov 2025 16:27:35 -0700
-Message-ID: <20251121232735.1020046-1-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1763769985; x=1764374785;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jtvE0OLq9JMcVYo5nnhquCGv1ot2drpBn582H3Pz9lw=;
+        b=aWlAZ9y0sGtrlH2eNFXqUQkFf70Yp5Wklkf51XgY7skGmp1T/3trswWO5hwhJ8M++r
+         BnGOpKGDF6Il0tmDyROIlBgVQATlR0tugrfGlJmeziMVUtSxhUHvo+FFrzBHaghOy+Oq
+         CRNnXsFzhuBB9DkiZrhcKUpcec72PzWB8xXmQWkvX5sL4DnqMrpRkrIgXSw8AriEcgbt
+         UjG3lrwDR2F5/nM7N7e+lk43hJ3LOzc48TyNf7Kd2LtRNldhDX+htru3/HyqtaGC9agl
+         TYwJmtzNPhM74g4GdIKRuHrSs8/ah7IQHbQB8BQckLjovdmM+9emia09wKizorCs9bum
+         IbCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVBhMs8udpbZYYH8+jp5y0kwyo9DZ8TgOmCSv1FNqN7VZ1SFeyyqfdp5CtS7N0CgcOT7inrAwc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLVu02KL944MbAX/VGC9/YtNcRhcF/PdJ5gpJGPdEMIV0/QdJh
+	i8KgLDrN5A4sCMgdukcDoXAuL7kuUb4VCTwh1Lb30Uzck2RtedG11VJt3DuuRb6wPk0Al/qcsrd
+	9WgNIbfsrhpfqnHfX+o3XtvhJ0anVBAKnvuHJW9h7Aw/idr+ZG3ca4xa35/A=
+X-Google-Smtp-Source: AGHT+IE+QJmDDkGIgMAu8FHV3mLKf4AH8Af+8S5eu0cnacFRZHXH2fiHHjKL6EoCgmUWP0JtQY1lnUobdb/0DC8x3l6gQ62NIb37
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:221e:b0:433:1d5a:5157 with SMTP id
+ e9e14a558f8ab-435b9052669mr38134895ab.6.1763769985215; Fri, 21 Nov 2025
+ 16:06:25 -0800 (PST)
+Date: Fri, 21 Nov 2025 16:06:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6920fe81.a70a0220.d98e3.004f.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_mgd_probe_ap_send (3)
+From: syzbot <syzbot+a59b5291776979816910@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-In cake_drop(), qdisc_tree_reduce_backlog() is used to update the qlen
-and backlog of the qdisc hierarchy. Its caller, cake_enqueue(), assumes
-that the parent qdisc will enqueue the current packet. However, this
-assumption breaks when cake_enqueue() returns NET_XMIT_CN: the parent
-qdisc stops enqueuing current packet, leaving the tree qlen/backlog
-accounting inconsistent. This mismatch can lead to a NULL dereference
-(e.g., when the parent Qdisc is qfq_qdisc).
+Hello,
 
-This patch computes the qlen/backlog delta in a more robust way by
-observing the difference before and after the series of cake_drop()
-calls, and then compensates the qdisc tree accounting if cake_enqueue()
-returns NET_XMIT_CN.
+syzbot found the following issue on:
 
-To ensure correct compensation when ACK thinning is enabled, a new
-variable is introduced to keep qlen unchanged.
+HEAD commit:    6a23ae0a96a6 Linux 6.18-rc6
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=140fc8b4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=14b6a9313e132a6b
+dashboard link: https://syzkaller.appspot.com/bug?extid=a59b5291776979816910
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+userspace arch: i386
 
-Fixes: 15de71d06a40 ("net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit")
-Signed-off-by: Xiang Mei <xmei5@asu.edu>
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/464c2673a9ca/disk-6a23ae0a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c2986bef024f/vmlinux-6a23ae0a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4077bdc25422/bzImage-6a23ae0a.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a59b5291776979816910@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 36 at net/mac80211/mlme.c:4406 ieee80211_mgd_probe_ap_send+0x4e5/0x590 net/mac80211/mlme.c:4406
+Modules linked in:
+CPU: 0 UID: 0 PID: 36 Comm: kworker/u8:2 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+Workqueue: events_unbound cfg80211_wiphy_work
+RIP: 0010:ieee80211_mgd_probe_ap_send+0x4e5/0x590 net/mac80211/mlme.c:4406
+Code: 41 5f 5d e9 2d f5 d7 f6 e8 48 04 eb f6 90 0f 0b 90 e9 0c fc ff ff e8 3a 04 eb f6 90 0f 0b 90 e9 4c ff ff ff e8 2c 04 eb f6 90 <0f> 0b 90 e9 a9 fc ff ff 48 c7 c1 90 1b 7d 8f 80 e1 07 80 c1 03 38
+RSP: 0018:ffffc90000ac79c0 EFLAGS: 00010293
+RAX: ffffffff8ad4ffe4 RBX: dffffc0000000000 RCX: ffff888143691e40
+RDX: 0000000000000000 RSI: ffffffff8d8f4f27 RDI: ffff888143691e40
+RBP: 0000000000000002 R08: ffff888143691e40 R09: 000000000000000c
+R10: 000000000000000c R11: 0000000000000000 R12: 1ffff1100b1d6ba0
+R13: ffff888058eb4d80 R14: ffff888058eb6ad2 R15: ffff888058eb5d00
+FS:  0000000000000000(0000) GS:ffff88812613b000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000000c3dfece CR3: 000000002e504000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ cfg80211_wiphy_work+0x2bb/0x470 net/wireless/core.c:435
+ process_one_work kernel/workqueue.c:3263 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
 ---
-v2: add missing cc
-v3: move qdisc_tree_reduce_backlog out of cake_drop
-v4: remove redundant variable and handle ack branch correctly
-v5: add the PoC as a test case
----
- net/sched/sch_cake.c                          | 52 +++++++++++--------
- .../tc-testing/tc-tests/qdiscs/cake.json      | 28 ++++++++++
- 2 files changed, 58 insertions(+), 22 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index 32bacfc314c2..cf4d6454ca9c 100644
---- a/net/sched/sch_cake.c
-+++ b/net/sched/sch_cake.c
-@@ -1597,7 +1597,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 
- 	qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
- 	sch->q.qlen--;
--	qdisc_tree_reduce_backlog(sch, 1, len);
- 
- 	cake_heapify(q, 0);
- 
-@@ -1750,7 +1749,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	ktime_t now = ktime_get();
- 	struct cake_tin_data *b;
- 	struct cake_flow *flow;
--	u32 idx, tin;
-+	u32 idx, tin, prev_qlen, prev_backlog, drop_id;
-+	bool same_flow = false;
- 
- 	/* choose flow to insert into */
- 	idx = cake_classify(sch, &b, skb, q->flow_mode, &ret);
-@@ -1823,6 +1823,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		consume_skb(skb);
- 	} else {
- 		/* not splitting */
-+		int ack_pkt_len = 0;
-+
- 		cobalt_set_enqueue_time(skb, now);
- 		get_cobalt_cb(skb)->adjusted_len = cake_overhead(q, skb);
- 		flow_queue_add(flow, skb);
-@@ -1834,7 +1836,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 			b->ack_drops++;
- 			sch->qstats.drops++;
- 			b->bytes += qdisc_pkt_len(ack);
--			len -= qdisc_pkt_len(ack);
-+			ack_pkt_len = qdisc_pkt_len(ack);
- 			q->buffer_used += skb->truesize - ack->truesize;
- 			if (q->rate_flags & CAKE_FLAG_INGRESS)
- 				cake_advance_shaper(q, b, ack, now, true);
-@@ -1848,11 +1850,11 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 
- 		/* stats */
- 		b->packets++;
--		b->bytes	    += len;
--		b->backlogs[idx]    += len;
--		b->tin_backlog      += len;
--		sch->qstats.backlog += len;
--		q->avg_window_bytes += len;
-+		b->bytes	    += len - ack_pkt_len;
-+		b->backlogs[idx]    += len - ack_pkt_len;
-+		b->tin_backlog      += len - ack_pkt_len;
-+		sch->qstats.backlog += len - ack_pkt_len;
-+		q->avg_window_bytes += len - ack_pkt_len;
- 	}
- 
- 	if (q->overflow_timeout)
-@@ -1927,24 +1929,30 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	if (q->buffer_used > q->buffer_max_used)
- 		q->buffer_max_used = q->buffer_used;
- 
--	if (q->buffer_used > q->buffer_limit) {
--		bool same_flow = false;
--		u32 dropped = 0;
--		u32 drop_id;
-+	if (q->buffer_used <= q->buffer_limit)
-+		return NET_XMIT_SUCCESS;
- 
--		while (q->buffer_used > q->buffer_limit) {
--			dropped++;
--			drop_id = cake_drop(sch, to_free);
-+	prev_qlen = sch->q.qlen;
-+	prev_backlog = sch->qstats.backlog;
- 
--			if ((drop_id >> 16) == tin &&
--			    (drop_id & 0xFFFF) == idx)
--				same_flow = true;
--		}
--		b->drop_overlimit += dropped;
-+	while (q->buffer_used > q->buffer_limit) {
-+		drop_id = cake_drop(sch, to_free);
-+		if ((drop_id >> 16) == tin &&
-+		    (drop_id & 0xFFFF) == idx)
-+			same_flow = true;
-+	}
-+
-+	/* Compute the droppped qlen and pkt length */
-+	prev_qlen -= sch->q.qlen;
-+	prev_backlog -= sch->qstats.backlog;
-+	b->drop_overlimit += prev_backlog;
- 
--		if (same_flow)
--			return NET_XMIT_CN;
-+	if (same_flow) {
-+		qdisc_tree_reduce_backlog(sch, prev_qlen - 1,
-+					  prev_backlog - len);
-+		return NET_XMIT_CN;
- 	}
-+	qdisc_tree_reduce_backlog(sch, prev_qlen, prev_backlog);
- 	return NET_XMIT_SUCCESS;
- }
- 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/cake.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/cake.json
-index c4c5f7ba0e0f..47ecd3fb1ea4 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/cake.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/cake.json
-@@ -441,5 +441,33 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY handle 1: root"
-         ]
-+    },
-+    {
-+	"id": "4366",
-+	"name": "Enqueue CAKE with packets dropping",
-+	"category": [
-+	    "qdisc",
-+	    "cake",
-+	    "netem"
-+	],
-+	"plugins": {
-+	    "requires": "nsPlugin"
-+	},
-+	"setup":[
-+	    "$TC qdisc add dev $DUMMY handle 1: root qfq",
-+	    "$TC class add dev $DUMMY parent 1: classid 1:1 qfq maxpkt 1024",
-+	    "$TC qdisc add dev $DUMMY parent 1:1 handle 2: cake memlimit 9",
-+	    "$TC filter add dev $DUMMY protocol ip parent 1: prio 1 u32 match ip protocol 1 0xff flowid 1:1",
-+	    "ping -I$DUMMY -f -c1 -s64 -W1 10.10.10.1 || true",
-+	    "$TC qdisc replace dev $DUMMY parent 1:1 handle 3: netem delay 0ms"
-+	],
-+	"cmdUnderTest": "ping -I$DUMMY -f -c1 -s64 -W1 10.10.10.1 || true",
-+	"expExitCode": "0",
-+	"verifyCmd": "$TC -s qdisc show dev $DUMMY",
-+	"matchPattern": "qdisc qfq 1:",
-+	"matchCount": "1",
-+	"teardown": [
-+	    "$TC qdisc del dev $DUMMY handle 1: root"
-+	]
-     }
- ]
--- 
-2.43.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
