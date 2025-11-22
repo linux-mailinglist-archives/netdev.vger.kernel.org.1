@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-240923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE514C7C16B
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 02:23:08 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1EAAC7C17A
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 02:32:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1071F35923B
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 01:23:08 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 062FE35E410
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 01:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6CC629BDB0;
-	Sat, 22 Nov 2025 01:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C7AC17B43F;
+	Sat, 22 Nov 2025 01:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HfMWG4t5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b6vJJnty"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1AC1552FD;
-	Sat, 22 Nov 2025 01:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78DF635;
+	Sat, 22 Nov 2025 01:32:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763774583; cv=none; b=rQiZsr0q8uVt9xXVmgbZ22N/eDUki7TSq9Q569N9w0GIie7FlV81+Rrasjl4pjfl2SSDAyB2bqFM7BJ104Wf7N0hOkk9fYGzGFU80Nr/V8L13LIBpoTc5eDYG0Vt9k20ootc8OIKfv0LrCxAio4dGjZNs8qzYzO3acOzda+3ZUo=
+	t=1763775126; cv=none; b=c9JR5Ag4fbTlaZFWwy13kIDd6TzfNBn9Wo48bsIeVGZiEvrrlYxTwh0mgEXEfDmq60+bwrib55JPG7DH20f3Sa+GZLAfuPiLalqnTpq3aG+RWEBkqJSuAec4a7OvUKNXv0ffdprtu99kmMSaMd4ojjoFsGvgIFJQgV/12wNrxfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763774583; c=relaxed/simple;
-	bh=OIsLl4+xHKtTwnUmzVpR5Rzu4f8fsJsjrkR1+Cjih9U=;
+	s=arc-20240116; t=1763775126; c=relaxed/simple;
+	bh=9jja5RBFI/62fBBaW7kkTvtGSP8TFmPwFFbYq5vcbsg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A0dqI1J5TmChUUW4CGUMl83ftSjo59G6YgolE2392A9cDEYPvCC2Ilr1A350zHV4Kt78/fYGrUCbQOVU+ctI+RI5q6GsAW7X7cK4emGw4K3eh3EQsOjh4iND5cqDyEXKXJdSZhDVWCT5rIpDeh9YN4CiVZkrJ+ioZZedf82ChlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HfMWG4t5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C24A4C4CEF1;
-	Sat, 22 Nov 2025 01:23:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=R8Vjo4bJrpyRC8tASzi7QAlRA3GtSCyCFn22y955EGzrrIWEeFAiy44cI3bLSORLpSx38y7/Kdfik0lElFVvSxeZGwp+dyRTgaGN/s0awSAuQI692iEAV/GtbErl4s/mRm9R1ysxu6xq3/F++ThsDex9mk7NdOGJMA5s93+Y1x8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b6vJJnty; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C73FAC4CEF1;
+	Sat, 22 Nov 2025 01:32:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763774583;
-	bh=OIsLl4+xHKtTwnUmzVpR5Rzu4f8fsJsjrkR1+Cjih9U=;
+	s=k20201202; t=1763775125;
+	bh=9jja5RBFI/62fBBaW7kkTvtGSP8TFmPwFFbYq5vcbsg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HfMWG4t5gt+T6/6yNhtWcFTs/GLDnnr66XggzEAN4FkIx4KjTu3d6dHaNx2/coe0a
-	 2fWAsJVAaK/HgV32keh29Kjta89SHQpZji9W7DIJsjEu0yq2pYwmF10SSXBqRzCH+c
-	 eN9ntTgpdILgWh0dt8KOVclCWm6BFVhWIfPpkWipfNsFdHxNCiVSTAL9+lGsYJipBX
-	 /g9NKu/fqkyo4x4k/JOl415/vt78jD/AVNta2cdFoduGhLHggp5UncnPI+BvGVaUvT
-	 d2+5nFVal04Xe/Z/X0MyrySVkb5C3Lvs33vpPKHSmPXhb3TgL8+e7NIzwwz1ZkNVFP
-	 /VZ1qu3fIsZDg==
-Date: Fri, 21 Nov 2025 17:23:01 -0800
+	b=b6vJJntyLRWWONB2oFm83bMQNdBVXMOvYiNZc09d6fomP6wTE/WurGSj/5Dtk4f5+
+	 Hb6USRXoLX6bN9Ha9m/yJmzLiluA4uLiEkz3cQ42HS/zweatgHRkx1h0qoQajAuonL
+	 N1A6b9U46ZNCIRkWOpR9iWD9yazNDD0tvmUNZJS0qEEQJU3hS/6oG/FRX308LMpkN2
+	 NldpP5p/BdlVurzNNulTN9m2GDxQSh/a4vjZtykoveNls5F2Kg8dFfMvC9a6IM0oWD
+	 tCYH3Aj2y1UUBm+jPXNt1CHwIDdUtsxMg/yVUbkcsbPAg7cPqfQMkfVdfJqOc0/h4T
+	 zLXP6Rtt4qdFA==
+Date: Fri, 21 Nov 2025 17:32:03 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>, Mohammad Heib
- <mheib@redhat.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
-Subject: Re: [PATCH net-next] i40e: delete a stray tab
-Message-ID: <20251121172301.3f488693@kernel.org>
-In-Reply-To: <d396e86c-e466-4630-8b1f-7f5b640d88a5@intel.com>
-References: <aSBqjtA8oF25G1OG@stanley.mountain>
-	<d396e86c-e466-4630-8b1f-7f5b640d88a5@intel.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ willemb@google.com, petrm@nvidia.com, dw@davidwei.uk, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 4/5] selftests: hw-net: toeplitz: read
+ indirection table from the device
+Message-ID: <20251121173203.7bc1a3f4@kernel.org>
+In-Reply-To: <willemdebruijn.kernel.224bdf2fac125@gmail.com>
+References: <20251121040259.3647749-1-kuba@kernel.org>
+	<20251121040259.3647749-5-kuba@kernel.org>
+	<willemdebruijn.kernel.224bdf2fac125@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,17 +64,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 21 Nov 2025 14:35:07 -0800 Tony Nguyen wrote:
-> On 11/21/2025 5:35 AM, Dan Carpenter wrote:
-> > This return statement is indented one tab too far.  Delete a tab.
-> > 
-> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>  
+On Fri, 21 Nov 2025 18:12:16 -0500 Willem de Bruijn wrote:
+> > +	if (rsp->_count.indir > RSS_MAX_INDIR)
+> > +		error(1, 0, "RSS indirection table too large (%u > %u)",
+> > +		      rsp->_count.indir, RSS_MAX_INDIR);
+> > +
+> > +	/* If indir table not available we'll fallback to simple modulo math */
+> > +	if (rsp->_count.indir) {
+> > +		memcpy(rss_indir_tbl, rsp->indir,
+> > +		       rsp->_count.indir * sizeof(rss_indir_tbl[0]));  
 > 
-> netdev maintainers. This seems straightforward enough, did you want to 
-> take this directly?
+> It can be assumed that rsp->indir elements are sizeof(rss_indir_tbl[0])?
+> 
+> Is there a way to have the test verify element size. I'm not that
+> familiar with YNL.
 
-Will, do!
- 
-> Reviewed-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+I suspect the reaction may be because drivers often use a smaller type.
+But at the uAPI level the indirection table has always been represented
+as an array of u32 (I mean the ioctl). And in the core we also always
+deal with u32s. The Netlink type is not allowed to change either 
+(it's a "C array" not individual attributes so members must be known
+size).
 
+LMK if you want me to add an assert or rework this. We could technically
+keep the rsp struct around and use it directly?
+
+Not fully convinced it's worth a respin, but LMK.. :)
 
