@@ -1,139 +1,98 @@
-Return-Path: <netdev+bounces-240933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4BECC7C2AE
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 03:17:04 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 612D5C7C2BA
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 03:20:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8B8344E032D
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 02:17:03 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 095DB34A17A
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 02:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C8CA23183B;
-	Sat, 22 Nov 2025 02:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC5E26F476;
+	Sat, 22 Nov 2025 02:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OmjpBe+Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gfTlm42D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF6D201033
-	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 02:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76932A1AA;
+	Sat, 22 Nov 2025 02:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763777820; cv=none; b=bkRDEpaA47gZF/BYWbLnBEhKwzLZW73t6QYf4JYjRY4Yc37XhDQPWOe7tRkdPzUm6azrQW0C1CcM5EG0e46sNdqQkch6iJqNxH8kBjLh9aBbG8OR0GncwSIAiElF181gBJGQtmf+BZk35wjbkQnpHNiESKt/4XD7d+hcPn7zCig=
+	t=1763778042; cv=none; b=dkV1K+L38LgdrJpTM6b7jqpZ89Fb5sBxz+crdLeY3EVIV4D0osO4bCoxqo8fDD+0SfCohQMv3flJ0her+Z7HpnFtWJdlNFD2nqpkRGTgD7zsZAQ3NbCvqG5OeWMGtBg+b5lL5/YK6sfEOEdx/re33YAdY/EIV6VRxmoUDvY2EKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763777820; c=relaxed/simple;
-	bh=HcTrfLl0nwxO5b2LTWB2R002IRkel0ACVCeGY+W8t2Y=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=B+GgpcGWIrndCtc0EHgpPghLHK+ptaBlc8L+1mbDvUpu0J8MU3j8PL5e5wC5bFfRXfHWOukdMgVFABVYk5dqbsoXqcWgDtR+1nu5jPzHJvtywKib52ubXdkvgk4+QCHtoToGlRmTfcymDq3KfrGaRPRifE8qWbsxxpN6mvcdtxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OmjpBe+Y; arc=none smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-63fc6115d65so2241104d50.0
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 18:16:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763777818; x=1764382618; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fZH1duZnEPXr5MV5XSfY2om1ciAirSpLv1SrLG39apQ=;
-        b=OmjpBe+YkaMd06KW4juBXlmrzO5506AxVnV/FI6Fu27wVtgb8Yj+S7NHg0ZSEB7p6s
-         gmlc/+8GhJj8Aki7a7D8Tp2gHkxrFORSFkcbH/RzG9j3w5AY3GyvMyWrifVwbleb+t5t
-         GbT865EVyXawPMEbpD0rICtHvCPI+UxhewrHzQ3ETGonSxuzvGa8Ld8lYqO51LOYmFY1
-         Unarl5Vq3ifIg6I4yxvFlFc/Gy5gEH1iAygdGNRe6yyoZNeHX/f5IaMJj4QZSVsHdBMQ
-         2FdCDYiwtWEgvwd3ammzbPJ23U5bftyZ+6zBqAK72xqIUqzRIETg1tQ59DibYvrz8nem
-         HbPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763777818; x=1764382618;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fZH1duZnEPXr5MV5XSfY2om1ciAirSpLv1SrLG39apQ=;
-        b=tnaLRgCsqWPxA48Qc2vJYUZhIOqO0kMRY9Bz++P+pn7dGWcMXtZ8l3ix3R7Wm3L2oe
-         iQL4PYI17foG3/w/GxXRLOSB8DeSS62+wJ+WcbwbZUaY5tf5ELOZztmj147mYIlPA6z1
-         6SLtcV66V5+K4F+vijQtmw1SAABZjwbD9Yz7SlLE8qRC/pQbRxLIcMZPtT9AorMAtPuJ
-         KP6/p6B/TMDlA5kavvSEnv02m4aev2/QnAeoCZtiWipLp76rPPPOGLqTtbJIRW0SSU3n
-         gUgIv36j1tfpqE7eMPTSbua3XsqdjMEfgTUy1aMcZwtAk4NHdG5i++5tNeMVXmgHIYIU
-         n8MA==
-X-Forwarded-Encrypted: i=1; AJvYcCWcaiU++3QjyXg3nSFNUfsHRCoY+3teuXA2YAS6XDu9oxR0cq/gcHS6wORBnwcasPwZwXmkt28=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWE3W6b5UVQ8TZVkyx4bzd9S9EADmBz7pLiInOZnyWZI3F+3+D
-	mm0CJNpIHTa8bQMjNqxyzBHSN6H/qLaBEhNmO0FDtK/aIBSKlCKJa33V
-X-Gm-Gg: ASbGncsU5KFwyLt9euRL4hNix6LgWB9pkJPMjF6xkxkTPzBPfWAWKH2pZx37DHOYG+y
-	zkEYAaIi+ECA8YXedAPjMXwYCScd9MlGnE2CNrcpQqtjqDcJ/82JUwB5yOXo7UYUV6J999LouvU
-	sMfphQJbK4c1S4d/0FNpxMthxFz5yUyMAFrBHVJPnBykHwGo0iXDA9ujJfjWLh69+UWf3QvzZMq
-	qLkoGEUDptSSS7dKBIfTVThF1VrGjaVr5AbzjDwuuj5jY435jJ1b1Tm+BWP4YXvpS01JATSXvvD
-	hTSOLSPmrLeJnb5rQeyCW8SIyXUvQsW7eBUNLbFbHMJJkgaAmlAlIRThjwPb627aypwhixNfNee
-	kRO4LUherCHlgsOykbrIrnd54M8qL/T+yATZB+5v5dacmtJaYfjnGYRq4fOIE2IpxHj5vlUbomH
-	Fdtx8IcCuTyox9WQipKdH1rbrTm2Cpnc/27RwcnxIFl9tS+DqPuSjR2XKwT8RMd85QLHQ=
-X-Google-Smtp-Source: AGHT+IHoO6qNAUPw4+8PucvKAsU+85vfg1dtDVD5lxUKXjlhSCB8zRWLNk0AzYZnMtp7pZX7xPRC8A==
-X-Received: by 2002:a05:690e:1511:b0:63f:a324:bbf3 with SMTP id 956f58d0204a3-64302ab18damr3307134d50.42.1763777818152;
-        Fri, 21 Nov 2025 18:16:58 -0800 (PST)
-Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
-        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-642f707a9b9sm2278959d50.6.2025.11.21.18.16.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 18:16:57 -0800 (PST)
-Date: Fri, 21 Nov 2025 21:16:57 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- willemb@google.com, 
- petrm@nvidia.com, 
- dw@davidwei.uk, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.53e77e2eea78@gmail.com>
-In-Reply-To: <20251121173203.7bc1a3f4@kernel.org>
-References: <20251121040259.3647749-1-kuba@kernel.org>
- <20251121040259.3647749-5-kuba@kernel.org>
- <willemdebruijn.kernel.224bdf2fac125@gmail.com>
- <20251121173203.7bc1a3f4@kernel.org>
-Subject: Re: [PATCH net-next 4/5] selftests: hw-net: toeplitz: read
- indirection table from the device
+	s=arc-20240116; t=1763778042; c=relaxed/simple;
+	bh=8Ep1rCg829/oXBKGJtjkB9NIJmPXTlxwn4nVf42Q4SA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=T/QXaAegtdilByIgFctmrL0BJnzaG/TnEL2UEQcBTDTVsitxmwI/ptGVr3jFwOzGBnZQQL3k9eMeB4dXOoAx/Z0mqcP65Pq7vKC7lHb21B7ymkdOZfNu2spxsjQQF5qn5r1HOJXFHynEuOn8LjniZMi/vtwKFeO0gkfogT5KMUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gfTlm42D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44186C4CEF1;
+	Sat, 22 Nov 2025 02:20:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763778042;
+	bh=8Ep1rCg829/oXBKGJtjkB9NIJmPXTlxwn4nVf42Q4SA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gfTlm42DX6mCOI1OeiEIUXfyJh7niFj298wgovz9r6N8gA+wbWSJhyUxatD0YLQDx
+	 tkvT2LmG2/Ck6AgzgPDosIP1Bcnr/f0oJ/X47Atvg2oyj+qtKZCzEht6txCcQyUdb0
+	 a41Cj2NZrIwOUWHktg8Y0crNPyH0XvAJ0tREUzKnFRguEh6xRrDkP6xu4b1F02pcNo
+	 zItiiZcCR0+dO3azS20LnyFj8fL+VyJhLlT1m77K7STa5pOVMBnEkXWmX01LMXmM3W
+	 v7h7kvwk+fp+lTGDepJ2fnBZ8HKwZwZK0rFMUUiBHEDxuEIlkBa3+tRy1K/oPuIh9X
+	 s9R1P0gmBMWuA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0DD3A78B25;
+	Sat, 22 Nov 2025 02:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: phy: mxl-gpy: fix bogus error on USXGMII and
+ integrated PHY
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176377800676.2657243.13369818267269550167.git-patchwork-notify@kernel.org>
+Date: Sat, 22 Nov 2025 02:20:06 +0000
+References: 
+ <f744f721a1fcc5e2e936428c62ff2c7d94d2a293.1763648168.git.daniel@makrotopia.org>
+In-Reply-To: 
+ <f744f721a1fcc5e2e936428c62ff2c7d94d2a293.1763648168.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: lxu@maxlinear.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, Raju.Lakkaraju@microchip.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Jakub Kicinski wrote:
-> On Fri, 21 Nov 2025 18:12:16 -0500 Willem de Bruijn wrote:
-> > > +	if (rsp->_count.indir > RSS_MAX_INDIR)
-> > > +		error(1, 0, "RSS indirection table too large (%u > %u)",
-> > > +		      rsp->_count.indir, RSS_MAX_INDIR);
-> > > +
-> > > +	/* If indir table not available we'll fallback to simple modulo math */
-> > > +	if (rsp->_count.indir) {
-> > > +		memcpy(rss_indir_tbl, rsp->indir,
-> > > +		       rsp->_count.indir * sizeof(rss_indir_tbl[0]));  
-> > 
-> > It can be assumed that rsp->indir elements are sizeof(rss_indir_tbl[0])?
-> > 
-> > Is there a way to have the test verify element size. I'm not that
-> > familiar with YNL.
-> 
-> I suspect the reaction may be because drivers often use a smaller type.
-> But at the uAPI level the indirection table has always been represented
-> as an array of u32 (I mean the ioctl). And in the core we also always
-> deal with u32s. The Netlink type is not allowed to change either 
-> (it's a "C array" not individual attributes so members must be known
-> size).
-> 
-> LMK if you want me to add an assert or rework this. We could technically
-> keep the rsp struct around and use it directly?
-> 
-> Not fully convinced it's worth a respin, but LMK.. :)
+Hello:
 
-Not at all. Thanks for that uAPI context.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 20 Nov 2025 14:17:13 +0000 you wrote:
+> As the interface mode doesn't need to be updated on PHYs connected with
+> USXGMII and integrated PHYs, gpy_update_interface() should just return 0
+> in these cases rather than -EINVAL which has wrongly been introduced by
+> commit 7a495dde27ebc ("net: phy: mxl-gpy: Change gpy_update_interface()
+> function return type"), as this breaks support for those PHYs.
+> 
+> Fixes: 7a495dde27ebc ("net: phy: mxl-gpy: Change gpy_update_interface() function return type")
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: phy: mxl-gpy: fix bogus error on USXGMII and integrated PHY
+    https://git.kernel.org/netdev/net/c/ec3803b5917b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
