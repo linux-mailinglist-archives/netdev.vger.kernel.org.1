@@ -1,95 +1,73 @@
-Return-Path: <netdev+bounces-240921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85DA4C7C13B
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 02:17:11 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C35D0C7C165
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 02:20:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DB315356750
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 01:17:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7C0954E061B
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 01:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7E7244670;
-	Sat, 22 Nov 2025 01:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8E023E320;
+	Sat, 22 Nov 2025 01:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rIT4TU8n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85CEB38F9C
-	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 01:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 734B0610B;
+	Sat, 22 Nov 2025 01:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763774227; cv=none; b=T0h2gaXVzO4flI1KxCSQt2QIUq9tirs1NdWcottqkqU0HGXGozp/YEPxDuwpvCdhTRmUps31CRgx2X+J8SsTSdhKmFnqhctmxzcq9VGOwIDX6+/8tDlxXoC7Yh8Eg9TaOAmLalDKJ0AnUA7O0Gx5r7d7XBEY/9D2sCbY7RPMkfM=
+	t=1763774454; cv=none; b=MGB1/KrOpfLnDNGZbbI6bkU7++dEq+rmcCNAI+7GEvRMG1DyVoE59XBkHw58OxOteWi4VX7QXc2+KngQyH5bprXZb4C9u+5ZwmQ/T+sMpBQ0aZSS9Q1UGgsw1Pu5Nvy9dXtTkWFm9dki8zZcEdfguyrvdHXJsH7wdnHojd21pSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763774227; c=relaxed/simple;
-	bh=WMkOOnc7lW16bqTV7elMZfje/Ou6G70+Yq1wBSRahgc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=LSjDPWmQATfSu+OtbMI9fSS3jgRVAgZJHP3tmmP1YyzBlJXLQ6VE1TE7CqIKOHuW9eCu7dx+qLrU3KdRW7yk5cGQYWlYlssnmwUXev6V3r8ykNHeqoElPKId63Ichm8c/lp2gtuMp4ngCxMFHw6Mu+AdtOvq9XceP0oLWMDAenY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-94908fb82e0so216202739f.3
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 17:17:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763774223; x=1764379023;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UZSU65QgF/FBmE4nfihqRERT5QTB/HlH/UzGV+EFLBo=;
-        b=ZxXGVFlp5HlTNkDbD/XO+NPaiTtElyM2lb5gvljerWl45zPisYMmYf3viRBSweBPFC
-         AYq6MTVmRI3Xq1G4C0zeDCECimE24BrM/64CuHsqtEgopzTy7c9qgDuIPaTXsjnvue3W
-         YAzeJZDvRwIrNZjzcSflA1umItzTlx38ecMxMty9zCbHpeKSfizrlmOsu7y/ctbMQygS
-         HCXUi1XofQR2onvhRguLAvnvPU21NMCluDNSqdJME/aNyVgaqq6whW1gdWW64DLf6NIG
-         B8w1LG8bY890nj+tkdSyXyKQCbgMrw9mhISCehYjmNAe5N1tymqKSEO0Bfa1XRNU2mvv
-         pFVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWmyEJSz/ouUQa1aTYzAd+dXgZ/dWGc7nMMyO1cGbj/8fVlB53O7/fF/g6JgY9Ve+vrNvj/z90=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTy0M0DNBbdFiPGJT1IZzNRjgkSv2qXNf5nVPa+7MFoASNttsI
-	yRm1QVKarEJk49XwwBhw1chOTkwpt1Y0MpBEk5bEmXHfUoTW3Djnr3CuwaQnFr56wsz8oA2nGmr
-	L78HHLx+WlT7KlkCdaOoI50CHpVZUCFBZNB/SDn+/2iawytKExtIlYsGKV+0=
-X-Google-Smtp-Source: AGHT+IG/+InU6l3SCKRBCtqkGdLhhTDnXg4Q87LoKI3LfM9Ku6m3WSw99nfIzBsnT2r9jMHVCZCPpbGqxnWboVEZ10RRp44G37j0
+	s=arc-20240116; t=1763774454; c=relaxed/simple;
+	bh=WtXQ8fU8ffL8uV5h3hbyMMzu0IGX8DPV0a3OKVCs858=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GWl3xQadcZVr1FH9f/do4QptgR4YYXJ6nUL8qOT6KapniXdjh2nWMsQv5Ksg9TU0yX9yGzI4x+ay/3z0tr76GRMMmlwSROsPwp/qonwaz7RpqFvwod+4VI0IQi5T6kjl0DVaxx4Hj2TxrTW9DKlA9SehczBX7SKCO+ecEiyzC84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rIT4TU8n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9068DC4CEF1;
+	Sat, 22 Nov 2025 01:20:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763774454;
+	bh=WtXQ8fU8ffL8uV5h3hbyMMzu0IGX8DPV0a3OKVCs858=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rIT4TU8nquhDGEFNOdzTl2BMeiXa7z5obds2CzTNPgp0B/olqxcPHEs1lrjPbXgdq
+	 WDbKN0zPW2i4qmoO4+ofPWDYvfltUbnNdiTphbDoF8H30tmtsRjRW+ZpZbLdB0UVVj
+	 scs+C05cXphUWISaB6WZGfgYjSiDuNVSUM3O51/Xqnr/REwTLXTHUakGiA3UW0A1xT
+	 0E+neO9kpuJpaIgNZ1PVVsDl/EGui6iow+KwSsHjNbF7iLyY5O4K0fYpfvDFagI6Be
+	 xYDvwo0DuqmBKvz30HXlW+ulUCp/nhjPuOVNMg3QwqEk2jI3edSZnpUm72qmqA1dK2
+	 0UW/Jl5DdW/4Q==
+Date: Fri, 21 Nov 2025 17:20:52 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima
+ <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn
+ <willemb@google.com>
+Cc: Gabriel Krisman Bertazi <krisman@suse.de>, Jens Axboe <axboe@kernel.dk>,
+ netdev@vger.kernel.org, io-uring@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v2 1/3] socket: Unify getsockname and getpeername
+ implementation
+Message-ID: <20251121172052.225f994d@kernel.org>
+In-Reply-To: <20251121160954.88038-2-krisman@suse.de>
+References: <20251121160954.88038-1-krisman@suse.de>
+	<20251121160954.88038-2-krisman@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:180d:b0:433:7c77:be58 with SMTP id
- e9e14a558f8ab-435b8e716ffmr45102085ab.29.1763774223595; Fri, 21 Nov 2025
- 17:17:03 -0800 (PST)
-Date: Fri, 21 Nov 2025 17:17:03 -0800
-In-Reply-To: <6920855a.a70a0220.2ea503.0058.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69210f0f.a70a0220.d98e3.0050.GAE@google.com>
-Subject: Re: [syzbot] [net?] WARNING in em_nbyte_match
-From: syzbot <syzbot+f3a497f02c389d86ef16@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, eric.dumazet@gmail.com, 
-	horms@kernel.org, jeremy@azazel.net, jhs@mojatatu.com, jiri@resnulli.us, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, pablo@netfilter.org, syzkaller-bugs@googlegroups.com, 
-	tom@herbertland.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot has bisected this issue to:
+On Fri, 21 Nov 2025 11:09:46 -0500 Gabriel Krisman Bertazi wrote:
+>  include/linux/socket.h |  4 +--
+>  net/compat.c           |  4 +--
+>  net/socket.c           | 55 ++++++++++--------------------------------
 
-commit 66e4c8d950083df8e12981babca788e1635c92b6
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Tue May 10 03:57:39 2022 +0000
-
-    net: warn if transport header was not set
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15b34c2a580000
-start commit:   8e621c9a3375 Merge tag 'net-6.18-rc7' of git://git.kernel...
-git tree:       net
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=17b34c2a580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=13b34c2a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=14b6a9313e132a6b
-dashboard link: https://syzkaller.appspot.com/bug?extid=f3a497f02c389d86ef16
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15e83658580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=149b4484580000
-
-Reported-by: syzbot+f3a497f02c389d86ef16@syzkaller.appspotmail.com
-Fixes: 66e4c8d95008 ("net: warn if transport header was not set")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+socket layer maintainers, please review
 
