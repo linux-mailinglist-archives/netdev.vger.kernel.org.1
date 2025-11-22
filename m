@@ -1,144 +1,322 @@
-Return-Path: <netdev+bounces-240952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1B3AC7CB40
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 10:19:03 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D19C7CC0F
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 10:53:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C0B43A85B6
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 09:19:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6CCAB4E156E
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 09:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71E92F2905;
-	Sat, 22 Nov 2025 09:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770302EBDC0;
+	Sat, 22 Nov 2025 09:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="LxzyhzH0"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="U+w+ChaV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D93372C3248
+	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 09:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763805229; cv=none; b=px0tNktG4JELR+AHt3i3uqhCcCADCeChMgU4liCrl3z3N5enDJvLAohvFcT8z1eQ5Yre+F/EKj4uANUnNyZqyxM6gMgtISnqnYdvYuIG1akKWfveWGH9Pzq2QGF1BI4q8R/0kznSeK9/agp8KLumKmiwOMeFeDNZwj3X3wt3zfM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763805229; c=relaxed/simple;
+	bh=QQfXvTfw3xPvid42g9GEyQZTBylHv1dLF9oQF8K7WCo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LDuZoV9AoEj+Z4jQY8PFksW2/9j9fXN6WTUmVYhjv5YGdUwVYlNpYmSzLDEv7If8F7G2WwOUxpr3ZRaPB5HBDtmWV6apEgP1L05taLycWGv4i4teRu7QeUkHrWjBRMPPGeby79D9JA5BmGzxfXlqbIsMPpdCL9/jia+CiRV8gng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=U+w+ChaV; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606A4280CD2
-	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 09:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763803139; cv=none; b=sy/74JRdo1KRc0YdfGijVXA2eqiju8Fpkz/l2C7JhAK8BfvBKY2nq7DdgHV/XxlYxS0cEhnV9T1Ac+/Nk6hYXvlCNYWxry8r6exsKqUgtakgf9LfhcTdLBjyq7pGeoT89t9pVN41XzQ8GpokxMazjM5RgJ1UjcG7msvXR3hyspQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763803139; c=relaxed/simple;
-	bh=3Y6g3pyQ7xItiex/CLdc74fmNKXzVEtgCADpye94/G4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S++z5At8tpGDAziVkmurESa5hqGO7+mkBL7xxNzC3igNMyEA+Eywzbg/immLiLnB1GVw1qo/C+qdMMJi6F5GtfUBvoKeNCKiYaOdC/2kdTkBXAMWgfhUEqUk1q4Fw95dKwssq0TZ/OYI4Z9ZMf2sUa6kGRFwDTXCt5Azh+f3cds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=LxzyhzH0; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42b2a0c18caso1762557f8f.1
-        for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 01:18:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1763803133; x=1764407933; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=53xJV33swqTLqvE9PnvUfsctO42OXLht9ChQmj1HdnU=;
-        b=LxzyhzH0poPND554n6rvew8q3Tv5CrRYwlNakwjNqrLelxmHsKgrmb4ufX5OLJL5XQ
-         tTKH0gHgeypDe4e9AM+U3hQ2c6B5ZZWaTtX09VWdUp797Eau+Yh7fyN27G5fkKsu0evU
-         wyWz81RYCWdBIQSy3SEz5QQBRtFZ2ylSIt8WTS/6FMafqAzBoRW1e9OGyXbhpAO3yUe5
-         RF0uUmMp5jDxuGwS3EaL8zUMaWrCleOEr8R8jn5BdJBZDFFcJ8P1HtBdusc6Fo4k1LHF
-         n2qTzrybL6iwAKT+wzSyMKHNp0xXpLuyXytbilr/zr7gz/NogDh3fGiaY6WZ6UdkieC9
-         RiRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763803133; x=1764407933;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=53xJV33swqTLqvE9PnvUfsctO42OXLht9ChQmj1HdnU=;
-        b=NX0IECXTKxHaiTvj9qWepyY78BruD3ZK5QOuuYWF5dkBmwiKQcdkdNCfXH9wRUti1z
-         5dogt4FtWE1suBplnbc8ZApwHn3prvz+VtkWE2noc02qfn6lwCGEnDSYdo+1Z/bHXltm
-         OZ9g7WoupBTH5vd0HOXPSpgY4KaF8wywq1ckJEmasDhIkzt6kuxpXvfFdKrz5GDYNTrp
-         qFg1WSCNVqMCC3SnBWUNLcMgQCkvTGuZBoSE3ep2OhdyKQNvyb3g551WxAQNDEhs4f8g
-         22ak8OB+RSbKCUTKKCMq+11AhLzMNNoaMrsXoeGKeQK0kWjzSESIQBzb+hjnnKE/5TU7
-         ALsw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyF1n+UPbeulkyD7AyCQLuKDUZYPlbVSYJ2qej8vWe/g/yO4UBt8tgQBRdy/5JpshDgOZCyys=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz36gt8jWfUnAXO8DBvcYWTarHN73O5/vcS8tFypPD+4L/uRLAq
-	AIYKK9hif4XzwE0i2hbhvjuOWpHtjZeKwKKOJdl6MzfaA5W6sWWmLJfJvRxceT5fH3o=
-X-Gm-Gg: ASbGnct90knMKOB3y4TX9bslUtRExPWtXk9r3dOIgofJ5P4rIpLOI5JANHpBewBDK26
-	AFblrR25oKeGIh/3YADF1zmy1UYD3kw3vUghH1yDKWAx7v+T7r0Ru9xq+FkaUGSE55KJUNaWpOW
-	NyQ27V3fdojq1cdJSKLYneEjGOThywtSsgNdUg3RAHWjdjdwXx9PlQUkf43uyqjKlhEhgXoZmjR
-	tn+MjfnFk9OJ2uAabceKjys7aEvQv43aETWtAHBZbbI+e4D1S/0psbOdCmJGpoQDaZylVsdcjZh
-	RuS9+sNRncYkpKc3rSjS/nEKBc2nyvIdBJgCkrdVcflcDtWnqObL2vrJUiK/JDZS8/QnMmSjxWP
-	lwn0m3pPql+j4fF7XbUn1nIsMvnxg8W57qHikuPTN4Lg54MSCj+X+bvQZ8aouf8zNdJDrKtgFUr
-	5SB+ilVINQgIj1qfsgPi5eroDKRqhEsqA=
-X-Google-Smtp-Source: AGHT+IGhv/ltDYbUC0qVNfi4WFC7UzIuD90H79TWw0dTFe8qWwKov+G9K1DtiG1LYn9cp3AujCyZqw==
-X-Received: by 2002:a05:6000:4012:b0:428:5673:11e0 with SMTP id ffacd0b85a97d-42cc1d1999dmr5618342f8f.40.1763803133010;
-        Sat, 22 Nov 2025 01:18:53 -0800 (PST)
-Received: from FV6GYCPJ69 ([2001:1ae9:6084:ab00:7d8c:1d72:b43a:e19a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f34ffesm16607741f8f.10.2025.11.22.01.18.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Nov 2025 01:18:52 -0800 (PST)
-Date: Sat, 22 Nov 2025 10:18:51 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, david.hunter.linux@gmail.com, 
-	khalid@kernel.org, linux-kernel-mentees@lists.linuxfoundation.org, 
-	syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v4] team: Move team device type change at the end of
- team_port_add
-Message-ID: <6wrz2ldfbfhzolevx5246he3hekgevqmhxwt65hbmvyijkzayq@yadj4nwt2yvi>
-References: <20251122002027.695151-1-zlatistiv@gmail.com>
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id E0361200BBB8;
+	Sat, 22 Nov 2025 10:53:43 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be E0361200BBB8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1763805224;
+	bh=+r2T3eBi7KF6SHIbowMXi7bky7eLTkgkRvdEl/gBCcc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=U+w+ChaVmfvpp4rDoDaqqtDYs7d6jQsjCpBRUgZuohpVyMs5D0xilvptK5uRafk8x
+	 +XfLRhHSoQcWSC2TnwGWOjgK0B5MaPKxYHqpv4GxPRHkI1LM4PSsmc4xNb698iAwSa
+	 S1jeqdfqwPwQGrGUgLAQpLZ8yqo50ojAujytRpNO48If3dtxZ5ChH3nRIupOJOKjL9
+	 gspb9EMOciYu3+FranjTI9l6V4TDl4nvsPUa+m/9wBFOcQXbVaqxZh81nw074gEKI7
+	 LiXRtXA88rMcO/wuwPXPKH/NTNnLABNjb3DliggtZRC5SrqqsLHWQAOBD9htCi0wmc
+	 aDHmI9/3SgQvA==
+Message-ID: <edb1d889-480d-4ef0-ae96-fa99d00aaaad@uliege.be>
+Date: Sat, 22 Nov 2025 10:53:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251122002027.695151-1-zlatistiv@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 2/3] ipv6: Disable IPv6 Destination Options RX
+ processing by default
+To: Tom Herbert <tom@herbertland.com>
+Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
+ justin.iurman@uliege.be
+References: <20251112001744.24479-1-tom@herbertland.com>
+ <20251112001744.24479-3-tom@herbertland.com>
+ <d7793ec7-7d34-4a46-8f17-c4ff1152e232@uliege.be>
+ <CALx6S369Cb-9mtD3hSS0udTHZ_4r5d+2UD8zfsonjfM7QrHhAA@mail.gmail.com>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <CALx6S369Cb-9mtD3hSS0udTHZ_4r5d+2UD8zfsonjfM7QrHhAA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Sat, Nov 22, 2025 at 01:20:27AM +0100, zlatistiv@gmail.com wrote:
->Attempting to add a port device that is already up will expectedly fail,
->but not before modifying the team device header_ops.
->
->In the case of the syzbot reproducer the gre0 device is
->already in state UP when it attempts to add it as a
->port device of team0, this fails but before that
->header_ops->create of team0 is changed from eth_header to ipgre_header
->in the call to team_dev_type_check_change.
->
->Later when we end up in ipgre_header() struct ip_tunnel* points to nonsense
->as the private data of the device still holds a struct team.
->
->Example sequence of iproute2 commands to reproduce the hang/BUG():
->ip link add dev team0 type team
->ip link add dev gre0 type gre
->ip link set dev gre0 up
->ip link set dev gre0 master team0
->ip link set dev team0 up
->ping -I team0 1.1.1.1
->
->Move team_dev_type_check_change down where all other checks have passed
->as it changes the dev type with no way to restore it in case
->one of the checks that follow it fail.
->
->Also make sure to preserve the origial mtu assignment:
->  - If port_dev is not the same type as dev, dev takes mtu from port_dev
->  - If port_dev is the same type as dev, port_dev takes mtu from dev
->
->This is done by adding a conditional before the call to dev_set_mtu
->to prevent it from assigning port_dev->mtu = dev->mtu and instead
->letting team_dev_type_check_change assign dev->mtu = port_dev->mtu.
->The conditional is needed because the patch moves the call to
->team_dev_type_check_change past dev_set_mtu.
->
->Testing:
->  - team device driver in-tree selftests
->  - Add/remove various devices as slaves of team device
->  - syzbot
->
->Reported-by: syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
->Closes: https://syzkaller.appspot.com/bug?extid=a2a3b519de727b0f7903
->Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
->Signed-off-by: Nikola Z. Ivanov <zlatistiv@gmail.com>
+On 11/21/25 22:23, Tom Herbert wrote:
+> On Thu, Nov 13, 2025 at 5:17 AM Justin Iurman <justin.iurman@uliege.be> wrote:
+>>
+>> On 11/12/25 01:16, Tom Herbert wrote:
+>>> Set IP6_DEFAULT_MAX_HBH_OPTS_CNT to zero. This disables
+>>
+>> s/IP6_DEFAULT_MAX_HBH_OPTS_CNT/IP6_DEFAULT_MAX_DST_OPTS_CNT
+>>
+>>> processing of Destinations Options extension headers by default.
+>>> Processing can be enabled by setting the net.ipv6.max_dst_opts_number
+>>> to a non-zero value.
+>>>
+>>> The rationale for this is that Destination Options pose a serious risk
+>>> of Denial off Service attack. The problem is that even if the
+>>> default limit is set to a small number (previously it was eight) there
+>>> is still the possibility of a DoS attack. All an attacker needs to do
+>>> is create and MTU size packet filled  with 8 bytes Destination Options
+>>> Extension Headers. Each Destination EH simply contains a single
+>>> padding option with six bytes of zeroes.
+>>>
+>>> In a 1500 byte MTU size packet, 182 of these dummy Destination
+>>> Options headers can be placed in a packet. Per RFC8200, a host must
+>>> accept and process a packet with any number of Destination Options
+>>> extension headers. So when the stack processes such a packet it is
+>>> a lot of work and CPU cycles that provide zero benefit. The packet
+>>> can be designed such that every byte after the IP header requires
+>>> a conditional check and branch prediction can be rendered useless
+>>> for that. This also may mean over twenty cache misses per packet.
+>>> In other words, these packets filled with dummy Destination Options
+>>> extension headers are the basis for what would be an effective DoS
+>>> attack.
+>>
+>> How about a new document to update RFC8200 Sec. 4.1.? Maybe we can get
+>> 6man consensus to enforce only one occurrence (vs. 2 for the Dest) for
+>> each extension header. Let alone the recommended order (without
+>> normative language), we could...
+> 
+> Hi Justin,
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Hi Tom,
+
+> It's a nice idea, but given the turnaround times for the IETF process
+
+Indeed, but I think we'll need that at some point. I'll craft something 
+and send it to 6man to get feedback.
+
+> it would take years. Also to implement that in the stack isn't
+
+I don't think it would be difficult thanks to struct inet6_skb_parm that 
+is stored in the control buffer of skb's. We already have some flags 
+that are set, and offsets defined.
+
+> particularly trivial. Avoiding the potential DoS attack is the higher
+> priority problem IMO, and disabling DestOpts by default will have
+> little impact since almost no one is using them..
+
+Agree, but both issues are linked. If we don't explicitly limit (funny, 
+in this case, I'd be OK to use that term ;-) the number of Destination 
+Options header to 2 (as it should be), then the attack surface increases.
+
+>>
+>> OLD:
+>>      Each extension header should occur at most once, except for the
+>>      Destination Options header, which should occur at most twice (once
+>>      before a Routing header and once before the upper-layer header).
+>>
+>> NEW:
+>>      Each extension header MUST occur at most once, except for the
+>>      Destination Options header, which MUST occur at most twice (once
+>>      before a Routing header and once before the upper-layer header).
+>>
+>> ...and...
+>>
+>> OLD:
+>>      IPv6 nodes must accept and attempt to process extension headers in
+>>      any order and occurring any number of times in the same packet,
+>>      except for the Hop-by-Hop Options header, which is restricted to
+>>      appear immediately after an IPv6 header only.  Nonetheless, it is
+>>      strongly advised that sources of IPv6 packets adhere to the above
+>>      recommended order until and unless subsequent specifications revise
+>>      that recommendation.
+>>
+>> NEW:
+>>      IPv6 nodes must accept and attempt to process extension headers in
+>>      any order in the same packet,
+>>      except for the Hop-by-Hop Options header, which is restricted to
+>>      appear immediately after an IPv6 header only.  Nonetheless, it is
+>>      strongly advised that sources of IPv6 packets adhere to the above
+>>      recommended order until and unless subsequent specifications revise
+>>      that recommendation.
+>>
+>>> Disabling Destination Options is not a major issue for the following
+>>> reasons:
+>>>
+>>> * Linux kernel only supports one Destination Option (Home Address
+>>>     Option). There is no evidence this has seen any real world use
+>>
+>> IMO, this is precisely the one designed for such real world end-to-end
+>> use cases (e.g., PDM [RFC8250] and PDMv2 [draft-ietf-ippm-encrypted-pdmv2]).
+> 
+> Sure, but  where is the Linux implementation? Deployment?
+
+Maybe they'll send it upstream one day, who knows.
+
+>>
+>>> * On the Internet packets with Destination Options are dropped with
+>>>     a high enough rate such that use of Destination Options is not
+>>>     feasible
+>>
+>> I wouldn't say that a 10-20% drop is *that* bad (i.e., "not feasible")
+>> for sizes < 64 bytes. But anyway...
+> 
+> The drop rates for Destination Options vary by size of the extension
+> header. AP NIC data shows that 32 bytes options have about a 30% drop
+> rate, 64 byte options have about a 40% drop rate, but 128 byte options
+> have over 80% drop rate. The drops are coming from routers and not
+> hosts, Linux has no problem with different sizes. As you know from the
+> 6man list discussions, I proposed a minimum level of support that
+> routers must forward packets with up to 64 bytes of extension headers,
+> but that draft was rejected because of concerns that it would ossify
+> an already ossified protocol :-(. Even if a 40% drop rate isn't "that
+> bad" the 80% drop rate of 128 bytes EH would seem to qualify as "bad".
+> In any case, no one in IETF has offered an alternative plan to address
+> the high loss rates and without a solution I believe it's fair to say
+> that use of Destination Options is not feasible.
+
+The difference with APNIC's measurements lies in the fact that they 
+reach end-users located behind ISPs, where EHs are heavily filtered. So 
+their measurements are worst case scenarios (not saying they are not 
+representative, just that it's a different location in networks). This 
+becomes "less" problematic (don't get me wrong, there are still EH 
+filters) if you remain at the core/edge (e.g., cloud providers, etc).
+
+>>
+>>> * It is unknown however quite possible that no one anywhere is using
+>>>     Destination Options for anything but experiments, class projects,
+>>>     or DoS. If someone is using them in their private network thenthatit
+>>>     it's easy enough to configure a non-zero limit for their use case
+>>> ---
+>>>    include/net/ipv6.h | 7 +++++--
+>>>    1 file changed, 5 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+>>> index 74fbf1ad8065..723a254c0b90 100644
+>>> --- a/include/net/ipv6.h
+>>> +++ b/include/net/ipv6.h
+>>> @@ -86,8 +86,11 @@ struct ip_tunnel_info;
+>>>     * silently discarded.
+>>>     */
+>>>
+>>> -/* Default limits for Hop-by-Hop and Destination options */
+>>> -#define IP6_DEFAULT_MAX_DST_OPTS_CNT  8
+>>> +/* Default limits for Hop-by-Hop and Destination options. By default
+>>> + * packets received with Destination Options headers are dropped to thwart
+>>> + * Denial of Service attacks (see sysctl documention)
+>>> + */
+>>> +#define IP6_DEFAULT_MAX_DST_OPTS_CNT  0
+>>>    #define IP6_DEFAULT_MAX_HBH_OPTS_CNT         8
+>>>    #define IP6_DEFAULT_MAX_DST_OPTS_LEN         INT_MAX /* No limit */
+>>>    #define IP6_DEFAULT_MAX_HBH_OPTS_LEN         INT_MAX /* No limit */
+>>
+>> I'd rather prefer to update RFC8200 and enforce a maximum of 2
+>> occurrences for the Dest, and keep the default limit of 8 options.
+>>
+>> Also, regardless of what we do here (and this remark also applies to the
+>> Hop-by-Hop), I think it's reasonable for a *host* to drop packets with a
+>> number of Hbh or Dest options that exceeds the configured limit.
+>> However, for a router (i.e., forwarding mode), I'd prefer to skip the EH
+>> chain rather than drop packets (for obvious reasons).
+> 
+> I considered that, but there is a problem in that when we process HBH
+> options we don't know if we're a host (i.e. the final destination) or
+> a router (i.e. the packet will be forwarded). I would prefer to keep
+
+Correct. We may consider calling ip6_route_input() earlier (this is what 
+IOAM does already), for example before calling ipv6_parse_hopopts() in 
+ip6_rcv_core(), instead of doing it in ip6_rcv_finish_core(). Otherwise, 
+we'd need to rely on ipv6_chk_addr_ret(). Maybe something like (not tested):
+
+diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+index a23eb8734e15..0351b7fc58ee 100644
+--- a/net/ipv6/exthdrs.c
++++ b/net/ipv6/exthdrs.c
+@@ -119,6 +119,7 @@ static bool ip6_parse_tlv(bool hopbyhop,
+  	const unsigned char *nh = skb_network_header(skb);
+  	int off = skb_network_header_len(skb);
+  	bool disallow_unknowns = false;
++	int ipv6_chk_addr_ret = -1;
+  	int tlv_count = 0;
+  	int padlen = 0;
+
+@@ -166,8 +167,30 @@ static bool ip6_parse_tlv(bool hopbyhop,
+  			}
+  		} else {
+  			tlv_count++;
+-			if (tlv_count > max_count)
+-				goto bad;
++			if (tlv_count > max_count) {
++				/* Drop a Destination Options header when its
++				 * number of options exceeds the configured
++				 * limit.
++				 */
++				if (!hopbyhop)
++					goto bad;
++
++				/* Drop a Hop-by-Hop Options header when its
++				 * number of options exceeds the configured
++				 * limit IF we're the destination. Otherwise,
++				 * just skip it.
++				 */
++				if (ipv6_chk_addr_ret == -1)
++					ipv6_chk_addr_ret = ipv6_chk_addr(
++							dev_net(skb->dev),
++							&ipv6_hdr(skb)->daddr,
++							skb->dev, 0);
++
++				if (ipv6_chk_addr_ret)
++					goto bad;
++
++				goto skip;
++			}
+
+  			if (hopbyhop) {
+  				switch (nh[off]) {
+@@ -210,6 +233,7 @@ static bool ip6_parse_tlv(bool hopbyhop,
+  					break;
+  				}
+  			}
++skip:
+  			padlen = 0;
+  		}
+  		off += optlen;
+
+> it simple and drop whenever a limit is exceeded. RFC9673 does allow a
+> host to skip over HBH options, but IMO it's too risky to blindly
+> accept a packet without verifying all the headers.
+
+For a host, I agree. But as a router, I really don't think we should 
+drop packets if the limit is exceeded. In that case, we just don't care, 
+we're routers, it's not our job to decide if we drop a packet because of 
+EHs. Otherwise, we'd be doing the same as operators' policies and 
+hardware limitation in transit ASs, and we'd be exacerbating the 
+ossification.
+
+Justin
+
+> Tom
+
 
