@@ -1,128 +1,121 @@
-Return-Path: <netdev+bounces-240945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A47C7C7CB
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 06:11:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D69DEC7C7F4
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 06:26:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE7493A458C
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 05:11:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C29A3A5E27
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 05:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C2D293C42;
-	Sat, 22 Nov 2025 05:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0FB298CB2;
+	Sat, 22 Nov 2025 05:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CJudIYq9"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KpIMLLJT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2163D1E32B7
-	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 05:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA1E8248C;
+	Sat, 22 Nov 2025 05:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763788291; cv=none; b=tt5VPl0tfuD0fP4k1S25+bjdfs9VT72Xmf3RxNPdOJom079CQGtl0yNAVJd85IexkE6jvP3N4YhCOICUIhJbjBXb0u6twRN7s7/FkhusHQjFEHU3dMtL+QaK61GByhGure/+eFaJB0mBDx6MjoKrYxnK+LExpKHt1BKC3Kq74a4=
+	t=1763789171; cv=none; b=fH/pTx7DCnqpAU8h+vjaJ/s2POIjJJU3b7ARGi3LCN43xGigSMSZx5HYcVmVeL8Z20Es/Qxkufs1IqBkBAQWROrkgHfPbBg1BDXuhvbt5RQB/5V70uPaau+0hhXWgBzTmr7uFj/Xggr90L3Rxmi1Er17JRVQXLLMFozi4L1yV+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763788291; c=relaxed/simple;
-	bh=4WGmKEIxbtDHlLD/Nd+bS+imm5eMK6cpxlzp+VYfRxg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Lu9vEKqa5nqPP759TEDD1XaVUmmbretBqmM+h6BEIivWYqZiM9J8bebn/CDq9ZJ8Gk7Z5QASGvG08sJOe0Gm+EzNNIWJQhd6TWhISPbY+a8K4viX7hRatnb9ss1EcypWlE2VZXg3E2vsmGmw7rnyqNufsv2z+JnFK/biSMJqnvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CJudIYq9; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7aab7623f42so2763268b3a.2
-        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 21:11:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763788289; x=1764393089; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XD35sfMmXX/8uwN3Reakd+1vNNEvDnIPQgNPtrlxRTo=;
-        b=CJudIYq91L9SUbmbYNEUrYAnZKfMf1m9yxl61zSrKA0AAFExIJZ2rNPUr8ibZbEKK6
-         u3LR5vCMcQSQDUfeWUSWNh66puJMcXdF6FO3tPzmjS71J2et1j7lEthF4nOPj2z15L+Z
-         HsQA27a0fq16R53A8mrtLeuGG3wI0JQZ7gf0ACoF3sGKH7kX4ruPy+9wwTOfLL9W7iHh
-         Frs9wCk3rhZLGgyh4g8szDywqgKHbRMECowM4fkBHvCbrj6XTr3Lv148sD4aJZd8MdYp
-         DNAhSHra0iQpqoCgJ3r0jy6pzOACcdF3dr2wpFeC66giEhVJeIJmHwxNIFNIV2dRghlm
-         rJbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763788289; x=1764393089;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XD35sfMmXX/8uwN3Reakd+1vNNEvDnIPQgNPtrlxRTo=;
-        b=C0PFVnzmUBEdsVKXlWooq80GQ5D9PBjBIXvTOpT8qQh89Ml1le/NNKX3VciIn1cNdn
-         s1Z935b1pMoZKpA1RSGRzoSdbnFWKKFKMm0c3sgYis1/gb49EyUw69qqcVQQ67NLRwM4
-         Obmi0B3aY60qXt3NDBHqp8uiO6eWpQIP0jVpLzSqn2jMho5TNwQpwwvNPp0tb7bbXDpb
-         7ltjrMqMQ3cTZ7Qw9R3YkBYOxcODjq8CRwkXWpe6N2PTrUFCED0P6kRExF77FukZ/sNb
-         aB7Gp6iN3RmYXDfe6I2L4NHdRzcjr3MV52JN03qzd6j1zeRSm0lxuqE9fYZdnRG6k/bg
-         JdqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkzx4nmof4rkOjfuOv54xlMLLSgLTdgG6UvFZW2F0Df5pVHoXCeChxWwvwKO2AOGbpogrfG1o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3kcjbshJZwLOmvCdZPKecfLJWz7N4ZuPWgJVC89PCrDdfyG4o
-	MNg7QmxnwHXgouSq038is/i4gdSNdavxBIHEXn3aSiBIb3qO4t115f5V
-X-Gm-Gg: ASbGncupOTtX4Nl+nkgUKaNPRasIVm8CpYpF8LsDsLKDo78/jrOEqIKEEqMz305GBW0
-	UBjVaAMrxAMNY1YDIlsoaZ5JjcpG+312yFWtLKAlUwK8vSIihM2GMytsv3q6TV3IwWCh1YgMWTJ
-	EBG+CwlKho+v6bmv94FxkaLa0pohJ8yG5/ADJ5peK4dx2yiwBycNmeT12iitToJNFQIERD7trAx
-	dcweUT757kQ7/nibE+pZUH8ZKz4HlaQaa99rGCH9J5SleWXaQVExVqiqFR8E54PAlonc+UyswHL
-	QV5QLgHGxUd4HFjuptKaHXgeMMpa3mbKdrGxvh8BcEADnbeHx84lokabqwQMs6bxVjZs/yr5Gvk
-	fO0jJy5bUs+UPI7VNSnSbrPyMPf3jqo5LvnZybFWMMabr1RkJ39Cvy88fvHD+HDXpTzxV5wRtO8
-	wIVXnqr+rZATMmBl3UqrOnhZfm+L1WEMk5/b5CpkZ2Zk40K6Orurpohhr4
-X-Google-Smtp-Source: AGHT+IG9Q03bPNHSm20d14MPGr3lTLdYYAHYo0XRJMJ+EIwHE6+VCt4DBVJByvBpi4KUwi3LGgHy8w==
-X-Received: by 2002:a05:6a00:b91:b0:7ab:5d1b:2d18 with SMTP id d2e1a72fcca58-7c58e6047eamr5756614b3a.26.1763788289323;
-        Fri, 21 Nov 2025 21:11:29 -0800 (PST)
-Received: from DESKTOP-EBUR9LD.localdomain (vsc10.ee.nsysu.edu.tw. [140.117.167.143])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c418e4f989sm7474745b3a.11.2025.11.21.21.11.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 21:11:29 -0800 (PST)
-From: Chia-Liang Wang <wjliang627@gmail.com>
-X-Google-Original-From: Chia-Liang Wang <a0979625527@icloud.com>
-To: edumazet@google.com,
-	kuniyu@google.com,
-	pabeni@redhat.com,
-	willemb@google.com,
-	davem@davemloft.net,
-	kuba@kernel.org
-Cc: horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chia-Liang Wang <a0979625527@icloud.com>
-Subject: [PATCH] net: socket: add missing declaration for update_socket_protocol
-Date: Sat, 22 Nov 2025 13:10:21 +0800
-Message-ID: <20251122051021.19709-1-a0979625527@icloud.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1763789171; c=relaxed/simple;
+	bh=kwljizUI98j6FDC5giRb816TYPaeHDktNIIy6PsqgNM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UeLWRs+Hh5gYoPBmhK1FXe42ShOR65Z5bSk9zI7drqnxdE1XJflvRbUmZHDBaCrtCorvYl838UsM23QPdS4NWw4ucStriRTm00ULyfmRXFXHyGXQNzEC8P9ytrafk1fXZNwAzIuvVUUipz6QGXchPwDNldgN1cC2Z2bHq9Mh53w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=KpIMLLJT; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=c5V9J0beKdgdfQfPkvHz2sh9GzdYtkBFfZSbSS2wzd4=; b=KpIMLLJTRTnIsWNcdPxySN5uo8
+	ui1H2aRsIHhXcYELwUFyXWRTSL1I0+tsjz5wflP0Wo7Q9esjveURT/Ppn0TuiNzR5LJORBHbVon/8
+	WZl428j9WvlX7ll7tCBTRUWx9mtBdStjwbuWqWjAwZVH7O7hxeB0wkzWt3jKO+JYUdHFORRpmBYjA
+	UC60IMyJqsQ6MgNQOHLHgLnxsPSVbyfPlLy7uUibBkzZEeR9bL5Trdu6d/XZnfdlvwxFIBUzuCLn2
+	9KKc73M3cH7wlvX1hTC5S6lMNI4Yyu0Sd2CuLUSn9mnt+gAyL11sWYoYuEzImUddaTNxXRZHDBDZu
+	jAaE5Tlw==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vMg8P-00000009HTv-0gTg;
+	Sat, 22 Nov 2025 05:26:09 +0000
+Message-ID: <2c849887-ce85-4f1a-b180-5f29211aa625@infradead.org>
+Date: Fri, 21 Nov 2025 21:26:08 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ath: wil6210: fix a bunch of kernel-doc warnings
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Johannes Berg <johannes@sipsolutions.net>,
+ linux-wireless@vger.kernel.org
+References: <20251117020213.443126-1-rdunlap@infradead.org>
+ <aSBjbqQtQFgRTDS0@horms.kernel.org>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <aSBjbqQtQFgRTDS0@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When building with C=1, sparse reports the following warning:
 
-net/socket.c:1735:21: warning: symbol 'update_socket_protocol' was not declared. Should it be static?
 
-The function update_socket_protocol() is defined as __weak, intended
-to be overwritten by architecture-specific implementations. Therefore,
-it cannot be static.
+On 11/21/25 5:04 AM, Simon Horman wrote:
+> On Sun, Nov 16, 2025 at 06:02:13PM -0800, Randy Dunlap wrote:
+>> scripts/kernel-doc.py reports 51 kernel-doc warnings in wil6210.h.
+>> Fix all kernel-doc warnings reported in wil6210.h.
+>>
+>> Several comments are changed from "/**" to "/*" since it appears that
+>> "/**" was used for many non-kernel-doc comments.
+>>
+>> - add kernel-doc for missing function parameters
+>> - add one function "Returns:"
+>> - correct kernel-doc struct name to match actual struct name in 2 places
+>>
+>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> 
+> ...
+> 
+>> @@ -444,8 +444,7 @@ static inline u8 mk_cidxtid(u8 cid, u8 t
+>>   * parse_cidxtid - parse @cidxtid field
+>>   * @cid: store CID value here
+>>   * @tid: store TID value here
+>> - *
+>> - * @cidxtid field encoded as bits 0..3 - CID; 4..7 - TID
+>> + * @cidxtid: field encoded as bits 0..3 - CID; 4..7 - TID
+> 
+> Hi Randy,
+> 
+> I wonder if it would make sense to move the @cidxtid line
+> so it is above the @cid line. In which case the order of
+> the documentation of the parameters would match their order
+> in the subject.
 
-Add a declaration in include/net/sock.h to fix this sparse warning.
+I've looked at a lot of kernel-doc comments. I prefer in-order
+comments, but so many of them are out of order that I don't bother
+with them.
 
-Signed-off-by: Chia-Liang Wang <a0979625527@icloud.com>
----
- include/net/sock.h | 2 ++
- 1 file changed, 2 insertions(+)
+> But either way, this patch looks good to me.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+>>   */
+>>  static inline void parse_cidxtid(u8 cidxtid, u8 *cid, u8 *tid)
+>>  {
+> 
+> ...
+> 
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 60bcb13f045c..2081b6599edc 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -3103,4 +3103,6 @@ static inline bool sk_is_readable(struct sock *sk)
- 
- 	return false;
- }
-+
-+int update_socket_protocol(int family, int type, int protocol);
- #endif	/* _SOCK_H */
+thanks.
 -- 
-2.43.0
+~Randy
 
 
