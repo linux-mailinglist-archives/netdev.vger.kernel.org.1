@@ -1,104 +1,136 @@
-Return-Path: <netdev+bounces-240917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74AA2C7C076
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 01:50:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0C3AC7C0CA
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 01:58:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 177183A58F4
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:50:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CBF23A3E47
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 00:58:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C60323505E;
-	Sat, 22 Nov 2025 00:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8645123AE62;
+	Sat, 22 Nov 2025 00:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1BXMDJn"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 537D423ABAA;
-	Sat, 22 Nov 2025 00:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5921F09AD;
+	Sat, 22 Nov 2025 00:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763772621; cv=none; b=iRGnWT7cSQ+YpcJIUDfM6o+3YMWtv+leWcD3IIwzMgetziLzzrDcJWgo5hGOUUR8uj2ttPTy9TGqefN01VP7oNpQwPPlZc62u9TR+hg2rWYRD8YJs0aBzek3zBzDKuPwHXtvPtrUJdsK/a+GopYvIxBvg6vVC1Qhwy+xxCIFYg4=
+	t=1763773092; cv=none; b=Xtv0Y+nOZqrft64jr8mQvnFvNY2yO9uAksxeNfkQPRc1N9XcbW8fz9I1liTPziXlu8Wq0pDiafJKno6ZDO9hftt8D5wxp5/kqEoP3wKgnN3+8F1gckX1eQ8r1MyAw4BUHytHiqSn3vthQjKno9SF8pzuEXikEamxXX6RklwR9fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763772621; c=relaxed/simple;
-	bh=GMaYv5sMp4dLdH33xgWI2Beq5esJVRfV1HKZiAbEEGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VweGE7FO0etHW2K9jMroSTxAiQx6yH3mQhe7eNbZbS+GljftAmeQEGabttFpd2p2oOHvYDLBb5OFnkSt0HPp6BeHLKW7xGwKCwbiabzXoKlbN5BLm5KHYyt4z12TobfitxcW+a0wPYxw8GzVFdg+OFdHuo7DA/IdcwtN9mQqOCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-cf-692108c499c7
-Date: Sat, 22 Nov 2025 09:50:07 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, kernel_team@skhynix.com, harry.yoo@oracle.com,
-	hawk@kernel.org, andrew+netdev@lunn.ch, david@redhat.com,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
-	ziy@nvidia.com, willy@infradead.org, toke@redhat.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, axboe@kernel.dk,
-	ncardwell@google.com, kuniyu@google.com, dsahern@kernel.org,
-	almasrymina@google.com, sdf@fomichev.me, dw@davidwei.uk,
-	ap420073@gmail.com, dtatulea@nvidia.com, shivajikant@google.com,
-	io-uring@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] netmem, io_uring/zcrx: access pp fields
- through @desc in net_iov
-Message-ID: <20251122005007.GA57205@system.software.com>
-References: <20251121040047.71921-1-byungchul@sk.com>
- <72e3ecdf-343e-4d1b-9886-67d48372a06e@gmail.com>
+	s=arc-20240116; t=1763773092; c=relaxed/simple;
+	bh=7dOS1urwg7ekPGlLg8CEDeNygH4QNwE9tnPY363vY0c=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=E94MAFihJOXNSDfBrc/il44KWfR/K3T737zyBpN/Q8vv0kRjV5AO2/TT09NC9kPDedAHc6+vxJfFmbFwgnc/zv9m3MTwfXEiOejVcfRrXdcqCP7HmG714D3kr+SuSZdGi9qkDPQx1kdLZzG95wXd5FR/Q5eSJqaAVxfi9jfvLZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1BXMDJn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90797C4CEF1;
+	Sat, 22 Nov 2025 00:58:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763773087;
+	bh=7dOS1urwg7ekPGlLg8CEDeNygH4QNwE9tnPY363vY0c=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=M1BXMDJnzWKoq/RhWeSRF1xxTV9r3LuMyB0EukCY/boNCO7u77FviLFEEHuedGxF9
+	 s9p5oKYEV5CNdN1Y6D2pE3YPpJ2TgVkC70fdaOdi70S1Gi0c+ktwZ8tGAlWYAyawBb
+	 EwTs+lHr06hKDFKefC+osX0t5nXn7fZ5CfaEN9b9kpgDeY8tuOj1bpHm0FMWiWy4IH
+	 zTlmh7R5uElcZHTbWUME5tteF4kTvOV/8u3ECODXKBouQzHkh4sLCSXAj0PQwyBG/3
+	 AiiEG5OyJ3Xvy643aRHThS1aGGgfEAlky4K05vNJ1UkZaFHmiohF12ii8eIcgsv064
+	 RyKyS/SstnmOQ==
+Content-Type: multipart/mixed; boundary="===============8715300661097654828=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <72e3ecdf-343e-4d1b-9886-67d48372a06e@gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHe885OzsuR6el+WagubBQySwUXsTUD0nHL6KI0QXSozvmaJsy
-	L2kROUwtyWu3uUmtC94zWDKd2ChnllYmirpMbYkmXitN0QrLaZLffvyeP//n+fBQuGiOcKak
-	ihROqWBlYlJACGbsHxxopdykPsZRd1SzlI4qrI08tFw7jqGyagNANUOFJCp7f4VAC09+4qiu
-	KRtDxqZxgCbVj0k01jbCR5/KvxCoObcBRyOFr0k0m91JoC5DAQ91mqtI1JBp5aOepjISDdf+
-	4aF2TRWBrg4+I1CbbidafDMNUG9pE4buD0ajbvMIgbSqAoB+La3mtS+H+cEuTH3VB4zpUxcT
-	jMXUgTFGzRCf0elTmaeVnkzPu1RGX32NZPRzJXzG2DiPMflZsyTzfWyAYL6aeknmra6Vz8zr
-	XcK3nRIESDiZNI1THgyMEST0//BIGsPSV/Ky8ExwE8sDdhSkfWF76QK5waYiFW5jgnaHA9Zx
-	no1Jej+0WJbXvAPtBaf6W/h5QEDhdA4PWlV3QB6gqB20BFbm+9oyQhrBou76NS2iE2DHjP26
-	3r66apSwMU57QsvKBGaL4PRuWLFC2bQdfQROfMsBNnak98Lnhlf/riym4OiY/zrvgi8qLUQR
-	oDWbWjWbWjX/W3UArwYiqSJNzkplvt4JGQppundcolwPVj+h/NLv041griuyBdAUENsLw2P3
-	SEU8Ni05Q94CIIWLHYSTfqtKKGEzLnDKxGhlqoxLbgG7KULsJDy8eF4ios+yKdw5jkvilBtT
-	jLJzzgQi1yBevM/JuNQtaFYR4HXM7FKkjXPdF+EX1N7XXRcYHo9rrUOhrktOJ4pXFDDqeOj1
-	9JDYqGjHGxcj9Kp4txL2bue90IdmtbzP4O9ZDWNUC7msTl617FWrClabkHdiWLMiLNLjY3D9
-	memQo5+nKi5vfTSf0mnEb0fdmguTjYqJ5AT2kCeuTGb/Aq6Cpg0FAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Ra0hTYRyHe885OzsOFyeddVAonZhNTSsUXlAjieqloMQvQma69NCGOmWb
-	5gJDMS0XXhHSuWIROHVascTLKBPnJbU0XeYSb1i2nKWmFVqiOSPy28Pzf36f/hTuMka4U1KZ
-	kpXLxMlCkkfwzofmHu6kvKRHBi0CaFjNhPrpFg5cq7dhUFvXBKBhopiE2sGbBPzx+BcOH5ny
-	MNhqsgFor2gg4Wz3DBdOVX8i4LNbzTicKX5JwoW8AQKa7/Vy4JumIg4cMNeSsDl7mgstJi0J
-	J+s3ObBXU0vA2+PPCdit2wt/9n8BcKTShMEH43Fw2DxDwKqcIgB/r271VV2T3BMHUGPtewy9
-	qyglkLWtD0Otmgku0hnT0dMaP2R5nY6MdQUkMi6XcVFrywqGCnMXSPRtdoxAi20jJHr4eQlD
-	r3SdXLRi3B9JX+SFJbLJ0gxWHnQ8nicZ/S5Km8UyN9S5eDYox9TAiWLoYKatJAd3MEH7MGPT
-	No6DSdqXsVrXtr2A9mfmRzu4asCjcDqfw0zn3AVqQFGudCJTUxjsaPg0ZEqGG7e1Cy1h+r46
-	/9V7mN7Kj4SDcdqPsW7MYY4Epz0Y/Qbl0E50ODO3lA8c7EZ7M+1NPVgJ4Gt2rDU71pr/ax3A
-	64BAKstIEUuTQwIVSRKVTJoZmJCaYgRbH6/OWi9tAd8tZzoATQGhMz/yiqfUhSPOUKhSOgBD
-	4UIB3x6ypfiJYtV1Vp4aJ09PZhUdwIMihPv4Z6PZeBf6qljJJrFsGiv/d8UoJ/dskKIMCRis
-	r2oUxQx7iwoaNpVP1odGC8qRImqXHdqn9KIL0SHnqIM+BklCRICrOab3UumNMi+3WHH6afOQ
-	b2yBbbdB9GJNK2sKqqgNE7TfyQoKDY+YPGbUfzikOLlyqiaibHHeZ6RYNdBT5C+Lut//Vlfs
-	eXl9SuoZuHxNvxDYJSQUEvFRP1yuEP8BF23cqO0CAAA=
-X-CFilter-Loop: Reflected
+Message-Id: <b277d408a2a94c37fb452fef7192ce1c1fcc0ef5288e9a26e3c7373db18c1f7a@mail.kernel.org>
+In-Reply-To: <20251121231352.4032020-4-ameryhung@gmail.com>
+References: <20251121231352.4032020-4-ameryhung@gmail.com>
+Subject: Re: [PATCH bpf-next v7 3/6] libbpf: Add support for associating BPF program with struct_ops
+From: bot+bpf-ci@kernel.org
+To: ameryhung@gmail.com,bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,tj@kernel.org,martin.lau@kernel.org,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Sat, 22 Nov 2025 00:58:07 +0000 (UTC)
 
-On Fri, Nov 21, 2025 at 01:02:44PM +0000, Pavel Begunkov wrote:
-> On 11/21/25 04:00, Byungchul Park wrote:
-> > Convert all the legacy code directly accessing the pp fields in net_iov
-> > to access them through @desc in net_iov.
-> 
-> Byungchul, that was already converted in the appropriate tree.
+--===============8715300661097654828==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Nice!
+> diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
+> index b66f5fbfb..21b57a629 100644
+> --- a/tools/lib/bpf/bpf.c
+> +++ b/tools/lib/bpf/bpf.c
 
-	Byungchul
-> 
-> --
-> Pavel Begunkov
-> 
+[ ... ]
+
+> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+> index 706e7481b..1d5424276 100644
+> --- a/tools/lib/bpf/libbpf.c
+> +++ b/tools/lib/bpf/libbpf.c
+> @@ -14137,6 +14137,37 @@ int bpf_program__set_attach_target(struct bpf_program *prog,
+>  	return 0;
+>  }
+>
+> +int bpf_program__assoc_struct_ops(struct bpf_program *prog, struct bpf_map *map,
+> +				  struct bpf_prog_assoc_struct_ops_opts *opts)
+> +{
+> +	int prog_fd, map_fd;
+> +
+> +	prog_fd = bpf_program__fd(prog);
+> +	if (prog_fd < 0) {
+> +		pr_warn("prog '%s': can't associate BPF program without FD (was it loaded?)\n",
+> +			prog->name);
+
+Can prog->name be accessed here when prog is NULL?  The function
+bpf_program__fd() returns libbpf_err(-EINVAL) when prog is NULL,
+which makes prog_fd < 0 true, then prog->name is dereferenced.
+
+Similarly for the map parameter below:
+
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (prog->type == BPF_PROG_TYPE_STRUCT_OPS) {
+> +		pr_warn("prog '%s': can't associate struct_ops program\n", prog->name);
+> +		return -EINVAL;
+> +	}
+> +
+> +	map_fd = bpf_map__fd(map);
+> +	if (map_fd < 0) {
+> +		pr_warn("map '%s': can't associate BPF map without FD (was it created?)\n", map->name);
+
+The function bpf_map__fd() returns libbpf_err(-EINVAL) when map is
+NULL, making this condition true, then map->name is dereferenced.
+
+The function bpf_program__set_attach_target() above checks for NULL
+explicitly before accessing the prog pointer.  Should this function
+follow the same pattern?
+
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!bpf_map__is_struct_ops(map)) {
+> +		pr_warn("map '%s': can't associate non-struct_ops map\n", map->name);
+> +		return -EINVAL;
+> +	}
+> +
+> +	return bpf_prog_assoc_struct_ops(prog_fd, map_fd, opts);
+> +}
+
+[ ... ]
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19586343154
+
+--===============8715300661097654828==--
 
