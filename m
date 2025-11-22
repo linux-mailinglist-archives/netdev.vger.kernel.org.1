@@ -1,121 +1,134 @@
-Return-Path: <netdev+bounces-240946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-240947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D69DEC7C7F4
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 06:26:16 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BF52C7C806
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 06:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C29A3A5E27
-	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 05:26:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 73B5B34B558
+	for <lists+netdev@lfdr.de>; Sat, 22 Nov 2025 05:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0FB298CB2;
-	Sat, 22 Nov 2025 05:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F17926D4DE;
+	Sat, 22 Nov 2025 05:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KpIMLLJT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xn6zY+b0"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA1E8248C;
-	Sat, 22 Nov 2025 05:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1EA5293C42
+	for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 05:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763789171; cv=none; b=fH/pTx7DCnqpAU8h+vjaJ/s2POIjJJU3b7ARGi3LCN43xGigSMSZx5HYcVmVeL8Z20Es/Qxkufs1IqBkBAQWROrkgHfPbBg1BDXuhvbt5RQB/5V70uPaau+0hhXWgBzTmr7uFj/Xggr90L3Rxmi1Er17JRVQXLLMFozi4L1yV+w=
+	t=1763790308; cv=none; b=KKdTNExJZnw5lAX+WVNVdEnPsoAjcKnV2S3b/U6ob7v3wEDP63s+kO6jr4IGn83nQj6hYffmG11VfOoxmXwnY+QwolbvVOIbj7n+YO1OOgYAqieLbWOPEoKmQqOTQn719siL1d75prsrhPoY6L/3Sf0NqFscZMs+2SRa13QVWgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763789171; c=relaxed/simple;
-	bh=kwljizUI98j6FDC5giRb816TYPaeHDktNIIy6PsqgNM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UeLWRs+Hh5gYoPBmhK1FXe42ShOR65Z5bSk9zI7drqnxdE1XJflvRbUmZHDBaCrtCorvYl838UsM23QPdS4NWw4ucStriRTm00ULyfmRXFXHyGXQNzEC8P9ytrafk1fXZNwAzIuvVUUipz6QGXchPwDNldgN1cC2Z2bHq9Mh53w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=KpIMLLJT; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=c5V9J0beKdgdfQfPkvHz2sh9GzdYtkBFfZSbSS2wzd4=; b=KpIMLLJTRTnIsWNcdPxySN5uo8
-	ui1H2aRsIHhXcYELwUFyXWRTSL1I0+tsjz5wflP0Wo7Q9esjveURT/Ppn0TuiNzR5LJORBHbVon/8
-	WZl428j9WvlX7ll7tCBTRUWx9mtBdStjwbuWqWjAwZVH7O7hxeB0wkzWt3jKO+JYUdHFORRpmBYjA
-	UC60IMyJqsQ6MgNQOHLHgLnxsPSVbyfPlLy7uUibBkzZEeR9bL5Trdu6d/XZnfdlvwxFIBUzuCLn2
-	9KKc73M3cH7wlvX1hTC5S6lMNI4Yyu0Sd2CuLUSn9mnt+gAyL11sWYoYuEzImUddaTNxXRZHDBDZu
-	jAaE5Tlw==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vMg8P-00000009HTv-0gTg;
-	Sat, 22 Nov 2025 05:26:09 +0000
-Message-ID: <2c849887-ce85-4f1a-b180-5f29211aa625@infradead.org>
-Date: Fri, 21 Nov 2025 21:26:08 -0800
+	s=arc-20240116; t=1763790308; c=relaxed/simple;
+	bh=2gl9gVDIxZaiWHwDj/40w+f1RDpdlAYcXoZ2OWjUxSg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r8LpJJ3m+EAf7JOq3rDS5eQ1mwfP9zpNOF+BQghAiwD2H3C7GeTsgh7Z38M+OSdW+a/8QTPFEj0IczwLh5kEDMlFm6dac1O/6bHDs2cfW39Pa6GZT0qvjJM9f+oF3aMkNVdGjDgaG8bBGdsMaIW5Vo1oFpeq7NrLMY23sCozIns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xn6zY+b0; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7bab7c997eeso2963151b3a.0
+        for <netdev@vger.kernel.org>; Fri, 21 Nov 2025 21:45:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763790306; x=1764395106; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YenTUml7bZ0JODI2rNiGWeX/UZHdxzPssmYma55zzUY=;
+        b=Xn6zY+b0pfxYKtmjR5fftiHkmMiXYep3D469RQCNtunBMP6iaQQ97EdxmIyHZ76EbR
+         OvhljF9qQW12HuUKKf9kiT/+YOLl4fzggzSd34pz42UBIwHm5nmwzi5m4vkT8z7dZxEN
+         pIMMbgftHNgBXfkCbiCs7Y5pEcAwdDabzWtfmz2GboohBhqFjpZclnFTIj16W3Y+348y
+         hhSxojcT2Cx7zNk1cBmPzzoScnOV1HgmNU8quOPG1WKrnjDitQLznf1oP7OITlPSLJ11
+         3A8v2e3UWrdIMaE6UFMmPxp0wavO2llCEsp0XhfvYlb/Rkm4E4EvBsDNgyGKDWjn/fMV
+         Hvow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763790306; x=1764395106;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YenTUml7bZ0JODI2rNiGWeX/UZHdxzPssmYma55zzUY=;
+        b=nuPnBGTk1Ga0BVR3afpAU9Aadb1f0v3PwS5dx8JnfoWLe9DXNsIZmBqzbbv4T6xMXW
+         25fflrR6MJV3ed7v1qHLq/HiYZW4ASJt4/D8zczZ/KnkHQWN3BaE5SpRMhQEQDqZZZBV
+         5A+MwK91xqL1UNjrPzYPX34djFKaj+o6RsC+0cI70kfnU3bK/SQr7G+EfmmB3aL+K2V0
+         X6xEsuYrvWCfdOOD2Sd4F8SPyedHxGEYC3VYIBw56JkS6qn6jxK2YNFRwTuOjdgYCQJ3
+         c1JP1pdtsfaSHgp0evlc4PVyy1QDJg5SfGR1QYHmu5mm5IpA3DoA5XmdAHIzLIFfx63+
+         JRPg==
+X-Forwarded-Encrypted: i=1; AJvYcCVg/PcraUD8os4nsDmalv6OBiJux6dNA3LXSX/1jDNEYzUt89rTANJuKff2ejpITEwddjLwN1c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywx10NOnNFopUOw3gJLbWqV6S3Mxfq+oKtWKvcP3BZ3WfTg9YUa
+	2Wm1M7cXUNDHrbPCsg7fn4T4Hc48kk+3VHwBsEzxzcQGssyzj85YGScOs5DbTwOMQtLXc/ff6bX
+	UzU7NOoICp29FA3kyxBDYxMw8xwJXUABGx7qm9EIz
+X-Gm-Gg: ASbGncv6PUer05ppngyECRg2ty4OVyLETz2iP1vMUz+pimPITZ1MyEFOJBd7vgfPnsI
+	smsFv2+vKRhcA1H8d15j6WXeWr9OFJcVcghSNS9Dtj+Db1HOn2BktwdY8z8F/t6UfltEB/Dxukv
+	qi4myZzedafttKse30AZJhrmL5DniJYZ/K7kk3jNF1QBgKeK60FJyKcH04iWd1hq6VbjnWuCjvp
+	8TDb8m+1Y8Av+oGSvJNbbODj6/HGDjoqt+TSvpHAy3zPxWn/bhcHy67bTu8qg4wGKwssPVkit+w
+	g4cXwFBz5TCWtnmhk2I2x8NZx43s
+X-Google-Smtp-Source: AGHT+IGg4pMXEm4ZqlxDYZ0tZHgbXc8sFy1CHLUd8VkJMjzd/RX4+J46x9ql9k9X9dWK5ElSb9EzqwW1lw9MDGqtTy4=
+X-Received: by 2002:a05:7022:ef06:b0:11b:9386:a3c0 with SMTP id
+ a92af1059eb24-11c9d872c1dmr1965765c88.43.1763790305358; Fri, 21 Nov 2025
+ 21:45:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ath: wil6210: fix a bunch of kernel-doc warnings
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Johannes Berg <johannes@sipsolutions.net>,
- linux-wireless@vger.kernel.org
-References: <20251117020213.443126-1-rdunlap@infradead.org>
- <aSBjbqQtQFgRTDS0@horms.kernel.org>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <aSBjbqQtQFgRTDS0@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251122051021.19709-1-a0979625527@icloud.com>
+In-Reply-To: <20251122051021.19709-1-a0979625527@icloud.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Fri, 21 Nov 2025 21:44:54 -0800
+X-Gm-Features: AWmQ_blpyFdUm70dEhnuMiWYOIrVRbokeosB5To3DP5d_MZJRL_H6Yl6NOfNgFs
+Message-ID: <CAAVpQUAxOJDx5fH0XWe1aUD9mJLDwNzMsRq8MoBZ8-UBPPiYLg@mail.gmail.com>
+Subject: Re: [PATCH] net: socket: add missing declaration for update_socket_protocol
+To: Chia-Liang Wang <wjliang627@gmail.com>
+Cc: edumazet@google.com, pabeni@redhat.com, willemb@google.com, 
+	davem@davemloft.net, kuba@kernel.org, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chia-Liang Wang <a0979625527@icloud.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Nov 21, 2025 at 9:11=E2=80=AFPM Chia-Liang Wang <wjliang627@gmail.c=
+om> wrote:
+>
+> When building with C=3D1, sparse reports the following warning:
+>
+> net/socket.c:1735:21: warning: symbol 'update_socket_protocol' was not de=
+clared. Should it be static?
+>
+> The function update_socket_protocol() is defined as __weak, intended
+> to be overwritten by architecture-specific implementations. Therefore,
+> it cannot be static.
+>
+> Add a declaration in include/net/sock.h to fix this sparse warning.
+
+Sparse just doesn't understand the context.
+
+The function is wrapped with __bpf_hook_start() that
+should suppress the real warning by compilers.
 
 
-
-On 11/21/25 5:04 AM, Simon Horman wrote:
-> On Sun, Nov 16, 2025 at 06:02:13PM -0800, Randy Dunlap wrote:
->> scripts/kernel-doc.py reports 51 kernel-doc warnings in wil6210.h.
->> Fix all kernel-doc warnings reported in wil6210.h.
->>
->> Several comments are changed from "/**" to "/*" since it appears that
->> "/**" was used for many non-kernel-doc comments.
->>
->> - add kernel-doc for missing function parameters
->> - add one function "Returns:"
->> - correct kernel-doc struct name to match actual struct name in 2 places
->>
->> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> 
-> ...
-> 
->> @@ -444,8 +444,7 @@ static inline u8 mk_cidxtid(u8 cid, u8 t
->>   * parse_cidxtid - parse @cidxtid field
->>   * @cid: store CID value here
->>   * @tid: store TID value here
->> - *
->> - * @cidxtid field encoded as bits 0..3 - CID; 4..7 - TID
->> + * @cidxtid: field encoded as bits 0..3 - CID; 4..7 - TID
-> 
-> Hi Randy,
-> 
-> I wonder if it would make sense to move the @cidxtid line
-> so it is above the @cid line. In which case the order of
-> the documentation of the parameters would match their order
-> in the subject.
-
-I've looked at a lot of kernel-doc comments. I prefer in-order
-comments, but so many of them are out of order that I don't bother
-with them.
-
-> But either way, this patch looks good to me.
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> 
->>   */
->>  static inline void parse_cidxtid(u8 cidxtid, u8 *cid, u8 *tid)
->>  {
-> 
-> ...
-> 
-
-thanks.
--- 
-~Randy
-
+>
+> Signed-off-by: Chia-Liang Wang <a0979625527@icloud.com>
+> ---
+>  include/net/sock.h | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 60bcb13f045c..2081b6599edc 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -3103,4 +3103,6 @@ static inline bool sk_is_readable(struct sock *sk)
+>
+>         return false;
+>  }
+> +
+> +int update_socket_protocol(int family, int type, int protocol);
+>  #endif /* _SOCK_H */
+> --
+> 2.43.0
+>
 
