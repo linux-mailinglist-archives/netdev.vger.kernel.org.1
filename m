@@ -1,169 +1,123 @@
-Return-Path: <netdev+bounces-241047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 214CFC7E05E
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 12:36:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC99EC7E167
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 14:30:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 966604E1881
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 11:36:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 902F53ABF5D
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 13:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F10A2D23B8;
-	Sun, 23 Nov 2025 11:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CiEK8K05"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1360F190477;
+	Sun, 23 Nov 2025 13:30:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB0F29E10B
-	for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 11:36:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E8D72628
+	for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 13:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763897811; cv=none; b=J8rsX7vkpwaf1NrsT90MEXT0J20yluNO6bnzxy3rtuwI9zFq/d/1+kXalb9LuEAajvFWprh3WVzBS0bcBconXzdILlMynKV19PjLTVuppnz1cQ3inTwp4T+RNrShFraXCgI3z2M7cURtKyPhR6p06u1bLwdZ9f0Ax/88ZcuiHsU=
+	t=1763904644; cv=none; b=PwZcIAM6DMbXDV2gywqkutF7KIjv4YAgCITYY0tLXNY1xuMYVYx60dQ8qLEX0V/tjGdAUwxD4/1pStHbRGmIF/hlYLkW+Kl8dDmqZhWDuzfaV6t9TOjc90wqH3r+1SVadYtu4oejPlHgjdi1kgqKOVXv/SQHVUphf7+2Fc2paT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763897811; c=relaxed/simple;
-	bh=ja6UFnzGAB4ebKVAp8A8FBBLaCeSYVrAk0QZPuMqtSo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V2Oc9PyTro2ebZFne3MfS2oU0N7O6v4pJfTo2Lp1VysdUgy/NGjNzt3kj23uu/ByAkvND2PMQWRm6i2wkukWN8vcjLwp5MisdC33IZrpNfonknpnkwWzFw4rD6l5DdR6buwGl+IXzKTma8AGXDd97gPTWcWo3DPhIFRO7F+IIBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CiEK8K05; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-429c8d1be2eso376319f8f.0
-        for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 03:36:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763897808; x=1764502608; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HfwuTUTAUfU1xG2cflPLZU4s1JAz92iyW+2u9F/7P6Q=;
-        b=CiEK8K05pvo4JomSPBeYbJu2tVtdOy8vpAniXH8yMcJHs45WNU+OTuFn5o1ouIsh1/
-         4q1ODsFpXrkKIPAt2uaukMZsz7+0zkOU4JUy4mUaECQdtQFJQJ660MWfXg1EbPURNf7l
-         3SzP5dhvRm3bt98NfblmLTgUDG5g0ONyydvWwhqtWnoqjICrSx3IadWS/c5471vAElle
-         CRy29K5UnIz7Ij6zS2fcmFJV/HfqIy8EaiD6iOZxThhH37RXC7/qgIm15sPymyXeqIA3
-         aMUh5RvgynN2LaZXv8dm9/HbcQIMeITEcVPiBPcbNIuo9cmG1wDdrAidJjE+ZTTwAPiK
-         Ngpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763897808; x=1764502608;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HfwuTUTAUfU1xG2cflPLZU4s1JAz92iyW+2u9F/7P6Q=;
-        b=VqPgCBYxdygt8lvxRUwuDLgITP1pti3B2cQjEPs02seuG7WLZsuDEWQELVDOwpC0yd
-         HjelJp+dgAfI5SOvzS36ML1mUaHXHkZuNRpU5eR4pC8Rqb+46u5lqQpFTC2a4asA5dOK
-         1XWwXt5W/NNolW+JDNHRBq1s+C3tBtFJM8rVz0prlSCHAWXfRHqf68LVi0YlnoBdmrP9
-         1fGyKg7RvyDyRVY03tBVX6P5SLSBMtZTaGPnTCvFYME2dczPqqRjdBuE1xyOel8Wkfsl
-         vHwRxvHRRJWAHARIXt68J1E6sSpWpw9GzOYbfyw5lvTvDCiuv0nHf3LIr0fLZUO7iGdz
-         Yp6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUPAYV3J9tS+jeOhbg7XE+aREZAtyZSqztieZED4Jz7HM3SUVzovRUC3PhnDp4O0EM2lwifSMA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8wdUIkAo9zA9FFJittXpBboazq+ftcwaMkhSQNso60uUEVBAY
-	vKtxikSu1aSLzg9GFRybB93wlbriYLntz301VF6e7bGJvVp8/EM/bj7a
-X-Gm-Gg: ASbGnctO422w+MWCR7gEDq3z7reBBWj08VJ+CXCDq/5S1cOdMXF1xWcISX9s+0wx9H+
-	OkiHnZxsLBgoq2ndwfkOChe+QSf7HFMN32dPrcdawDrMOc4tkIir/GoBlZIdLrfSFt7/X5dG5Uo
-	rI0Bd2z5nN0AQc7a73IttA7Jpv8GEtstbe0vBrpu4L5sSLCa124B+iSo9pPwagBFHyB0rwO8F6v
-	R5myysI3l1kHKgSdgEezZuuVrkpfjRnd/VlGo32y5Xpp/skP/jbZrhLWq3pfZHWpDW4xbkwgck2
-	6ZvoksUHJZg3p1nhVpEoluxWE4vVcFH2RqbRAOpdf0pTHXlw8/yyXg/8jatXRxJSZgDNv046a7r
-	aRor+4AU1HU7YZ+xfTuMCW4YB14kTzeHchlFuPrlRrwf7GXGh/2PAylilwLnlqCt34raeyJypns
-	kqVAI=
-X-Google-Smtp-Source: AGHT+IFYbDFURjdFNzDsXM81xihMEV6/yHyWNUp8Xym4Agx1uNZFO0N3vjkBtnV6TVXFITr30mic6Q==
-X-Received: by 2002:a5d:5d89:0:b0:429:bdaa:9672 with SMTP id ffacd0b85a97d-42cc3f5f766mr4429554f8f.3.1763897807474;
-        Sun, 23 Nov 2025 03:36:47 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d106:d600:272e:6a6f:51d7:2024])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f363c0sm22232822f8f.18.2025.11.23.03.36.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Nov 2025 03:36:46 -0800 (PST)
-Date: Sun, 23 Nov 2025 13:36:43 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Ma Ke <make24@iscas.ac.cn>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, o.rempel@pengutronix.de, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: microchip: fix mdio parent bus reference leak
-Message-ID: <20251123113643.cf2kc7i5cvdkkaf2@skbuf>
-References: <20251121042000.20119-1-make24@iscas.ac.cn>
+	s=arc-20240116; t=1763904644; c=relaxed/simple;
+	bh=t2X+sBqgcT6nd1g3JjPpxhAaqkMxjSu1z/LJBGzNP0M=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=hD3FL+FWe+9sD9qsrPmdCQ6MnYpKoACyPLYoPz/1UknbUOen21QSQX6DdPyKcpuDvh7GxQ2kzQWxl+wYtdO6JsvhWlLeJ9immvZmASmVPZbEpHW4xzoybWODk4dqKNoEr+fnZXW4tUHElyK4A0xvWtKqvwVXJoh2yyPjEaU66WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: esmtpsz20t1763904632t7bc04ae6
+X-QQ-Originating-IP: yMzwJojfjZL/kQaVLDG3aIN9XQQUOOEbVvqxQShzGOs=
+Received: from smtpclient.apple ( [183.241.14.219])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sun, 23 Nov 2025 21:30:29 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 2594309119891335526
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251121042000.20119-1-make24@iscas.ac.cn>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH net-next v2] net: bonding: use workqueue to make sure peer
+ notify updated in lacp mode
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+In-Reply-To: <0b9e0c0e-9684-495f-ba30-9fc77b7b33b5@redhat.com>
+Date: Sun, 23 Nov 2025 21:30:19 +0800
+Cc: netdev@vger.kernel.org,
+ Jay Vosburgh <jv@jvosburgh.net>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Hangbin Liu <liuhangbin@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <AE75D960-0AFD-4F18-9B1F-1F693338C056@bamaicloud.com>
+References: <20251118090305.35558-1-tonghao@bamaicloud.com>
+ <9eb3b5bd-5866-49fb-b4fc-5491cb3d426c@redhat.com>
+ <0b9e0c0e-9684-495f-ba30-9fc77b7b33b5@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+X-Mailer: Apple Mail (2.3826.700.81)
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz3b-0
+X-QQ-XMAILINFO: NUTz4BkILuKLnp6KaM7rVWevn4eg8DlJZU9zN0XAkpiRjt6IKz7FEgVs
+	+OKe57XnxqVjbxvqiOXKz0WJsk6djs9iVdADQthXoirwn2AS9hG5W7eXMGG9+Cg0pLRE889
+	lDarEdu+JLAGyajQjWPxYDNIsPfo6k7YhRWvMYVq2x0ya+u4ZmkEeHNO2l7L9QITFGPrWnq
+	vr4hnJQ4q0pR81TSSgE08OEXg5bsCUOG16YXJEHH5FQTa2kmAjpa/Lua4iqh1FLhciY4/Wc
+	uD86ULqdnU4oTrOoddwn9CUNquzwrqi/S37QSnw9RypS6FXsOepsPza8cZfvCF6pozqk0f8
+	MkZXUuELYbdl/11m3Dabo90JAimzo40mn/h4NqncG7MYHy4eZ8sh0gS9cVy7tEavPeft5kA
+	pqFt7pV/EqIkjZFIJr+gMSboWhSH/LCUJHsL5DCnpxrfsoYF+dMToLn8Q0d43kJiQK+t9b/
+	r7k3anSHRt8e2LDMbbzyLCsCtwJl0IvKh2T0uI+Ooki3ytyy0lJyfcTOL/p6ZZK3ygpy2+Q
+	d1l22nfram/sak5w/1v/tDBwfFl6XwqQ+1RciGb4Uhd6sjgCD3XHP5EQRInZKwfAIKYru7C
+	0Lx3CxPNV/IwdasdLym75EskI/z9PbkMqeWd+4SQc7ZMruhdfn7sfJOJ01YxgAqEWge9cK7
+	7wf+/vWsTBWfI+G9SJaSyjQKs9DDaU83QNO8EZ2KACAzYU3f9uwt149dmQoNVh4bUpSV4pG
+	luggZbnAILq3uQmMp4BtIWrU15YYO3Laob5CqBLQOo/aFbKvzmRe1WiMgYNZoPCivicHFEF
+	rnTGSJSr5oz9czq6Wq4LbyJVWvb+eB4A/949DLo6/6dysS87Ggw2wPmz6Z7bbmbXbK7ybU/
+	IqbHX0qtcFVw4kcehTZzLyk7bozsVzl7LA9C273BlxVA6oiQA034Cs04QKQWtixD0TRrerR
+	io19rT9xbDpz+qhdH/J9HHzsC5RFfV3iI5sgnbfumxjp0v652Wz5uMQc/3It8PzlGEQTUi3
+	vpO116oA==
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-QQ-RECHKSPAM: 0
 
-On Fri, Nov 21, 2025 at 12:20:00PM +0800, Ma Ke wrote:
-> In ksz_mdio_register(), when of_mdio_find_bus() is called to get the
-> parent MDIO bus, it increments the reference count of the underlying
-> device. However, the reference are not released in error paths or
-> during switch teardown, causing a reference leak.
-> 
-> Add put_device() in the error path of ksz_mdio_register() and
-> ksz_teardown() to release the parent bus.
-> 
-> Found by code review.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 9afaf0eec2ab ("net: dsa: microchip: Refactor MDIO handling for side MDIO access")
-> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
-> ---
->  drivers/net/dsa/microchip/ksz_common.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index 933ae8dc6337..49c0420a6df8 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -2795,6 +2795,11 @@ static int ksz_mdio_register(struct ksz_device *dev)
->  	}
->  
->  put_mdio_node:
-> +	if (ret && dev->parent_mdio_bus) {
-> +		put_device(&dev->parent_mdio_bus->dev);
-> +		dev->parent_mdio_bus = NULL;
-> +	}
-> +
->  	of_node_put(mdio_np);
->  	of_node_put(parent_bus_node);
->  
-> @@ -3110,6 +3115,11 @@ static void ksz_teardown(struct dsa_switch *ds)
->  		ksz_irq_free(&dev->girq);
->  	}
->  
-> +	if (dev->parent_mdio_bus) {
-> +		put_device(&dev->parent_mdio_bus->dev);
-> +		dev->parent_mdio_bus = NULL;
-> +	}
-> +
->  	if (dev->dev_ops->teardown)
->  		dev->dev_ops->teardown(ds);
->  }
-> -- 
-> 2.17.1
-> 
 
-Thank you for the patch.
 
-I see 2 problems:
+> On Nov 20, 2025, at 20:42, Paolo Abeni <pabeni@redhat.com> wrote:
+>=20
+>=20
+> On 11/20/25 1:33 PM, Paolo Abeni wrote:
+>> On 11/18/25 10:03 AM, Tonghao Zhang wrote:
+>>> +static void bond_peer_notify_handler(struct work_struct *work)
+>>> +{
+>>> + struct bonding *bond =3D container_of(work, struct bonding,
+>>> +     peer_notify_work.work);
+>>> +
+>>> + if (!rtnl_trylock())
+>>> + goto rearm;
+>>=20
+>> Why trylock() here? This is process context, you could just call
+>>=20
+>> rtnl_lock();
+>>=20
+>> and no re-schedule.
+>=20
+> Whoops, sorry, I lacked the context. ndo_close() will try to flush the
+> work under the rtnl lock; the workqueue must not block on such lock to
+> avoid deadlock.
+>=20
+> Still a comment above would be nice/useful for future memory.
+Yes, I will add a comment in bond_work_init_all(), so if others add new =
+workqueue, they should see the reminder.
+>=20
+> /P
 
-1. I'm not sure that releasing the reference to the parent_mdio_bus
-   device is compatible with devres, since the MDIO bus created by
-   ksz_mdio_register() will continue to exist after we release the
-   parent_mdio_bus reference. I think it would be better to remove
-   devres, introduce ksz_mdio_unregister(), and only release the
-   reference once our MDIO bus is unregistered.
 
-2. Error path handling is incomplete:
-
-	ret = ksz_mdio_register(dev);
-	if (ret < 0) {
-		dev_err(dev->dev, "failed to register the mdio");
-		goto out_ptp_clock_unregister;
-	}
-
-	ret = ksz_dcb_init(dev);
-	if (ret)
-		goto out_ptp_clock_unregister; // needs to call ksz_mdio_unregister()
 
