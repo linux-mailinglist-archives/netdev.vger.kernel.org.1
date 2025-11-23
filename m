@@ -1,128 +1,103 @@
-Return-Path: <netdev+bounces-241023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06A07C7DAB3
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 03:07:53 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 223C8C7DAC6
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 03:16:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B36DE3AAF89
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 02:07:51 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EFB074E0EE3
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 02:16:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330121EEA49;
-	Sun, 23 Nov 2025 02:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C821FECAB;
+	Sun, 23 Nov 2025 02:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="22Al1hVI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OutvcRMG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07281A0728
-	for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 02:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E161B532F;
+	Sun, 23 Nov 2025 02:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763863670; cv=none; b=GUH2QCWcwI8nT3E2qbdRrmsCTRBsjNFz9QCbSnKdzriWEpRbqHAUDkV5fJgKxXyWr/y3nQkNyY1zRmgWl3rAVRa2w8A8BR2ZWTmjOb+ty3JOhkr7DA1TXvi8Nx6xEHopp5wfVDvz20kqRpdx3eaN+226csdIlUThZC8rOKHrhyc=
+	t=1763864167; cv=none; b=sK8Aptyt9CY+CY4DgTfEsbCV80AZe8uJ9ufFvRcNcI1FN1BnaVNQShUKqbn8ZIzQj9QUXLJG0zlmJCfjKu27FvPtTWbWEODHgbRI79zrL0DFh/imDUrWloD2Y1pRY/I8LjMFnIavGbijXSSoXzOFLWPDN1O/rftvg4UXPGgKcpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763863670; c=relaxed/simple;
-	bh=4c0Sw81Ia9ndAt5YEnRgp/kupoHNBrXg5JI+nAP7urU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YAZOtkl4SpCix+WJmCXPuylbLdFcJWSqMNAcRwe7gdNw7VYR1kQXhjgRy4uE6Z6IPBZqFXPC+NvMUSU0rRUNexLylipsyPNR8VL4I4TglQUmtgf9iLdr8JTQOxHN+N9QDI45gvAO/izWSX2PcC7U0Y8JoCp3rD0f6f2SPeNCxQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=22Al1hVI; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3436d6bdce8so3913719a91.3
-        for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 18:07:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1763863668; x=1764468468; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HZIoteEzegCW+0JXd1Jo93XG2PVvQC5dBeKHebsF4jQ=;
-        b=22Al1hVICZ9Lk4qgGK4Bwoe5yKilKbBnrW3eSh82Bfz9WdYFvY+HNBOmxk/4xzDxZB
-         Ti0RrTlJOI8cSuudBP8DtjLgbHBbbpNWxH9JkvGdzoUR3ATUAo+2VuToqdAwtkHQsYUw
-         P1ZolZVQiNae9J3vfROyJSeYdON2zLkcb893tKxww6j1ziTEhhn3LlM+NYjvqwzwf5Ov
-         mIu6WPEuyVq8DW/3a4p76EJ5+/8C+6ojd/XpgW6g/kWTOnIKAKlag9/ZHil4Df6EjlxR
-         FsamhiKTvfvBmOyIcohr7cF//9/dVQ7rM8lutGhJtnRV9gFHid61ZE7AuwqCa+6SOPRC
-         UGTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763863668; x=1764468468;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HZIoteEzegCW+0JXd1Jo93XG2PVvQC5dBeKHebsF4jQ=;
-        b=BXedTT4H7cNxdb5M0/zt9c4PDxebMU6TS97agigKzpXS+gdVhIumsL0ubYMR8k2PZs
-         vI7H1sJDX2S2ISOQbtRk70pot6E5iHCLDMJx5LNvI+Th3wgtmd2w3/jy25s+nEwt+6w0
-         vnDQa7sJsrh2bRrFKlhbl0tVO50evgYnghHuJgIULiUqqTsABfAk3tmln5/ENnsJ4O+U
-         UjLazN/z0h/1gOJgYWKv2oD6vPbgDK/yOLM7bvueetJ43/JzDy2Lf1LAsppt1UAWcgg1
-         t9ZvCTxC1Jg0RuzS/ac9FXlvojnzSeOtHaFE3OJPLi7jhSInqUhWNTKFBqKyjBJjR1TK
-         ek3g==
-X-Gm-Message-State: AOJu0YzTd2zyGT3tTDMbEsoOXDp0dif05x9tFYDIhwqsq24ZDR9doDm4
-	Natx33hSWk7tgKh34HY8Kv1vnIHcMyZvV4/Ev+2Ib+vPBCOV8GUE3zhZgaYWaanEYLY=
-X-Gm-Gg: ASbGncvcjDEvGAlt5IWffpeWv6ADLuUlTfa3lz/KQzpwTG5bajc9E7VyUPc6bCN8XJD
-	TjhGNbIFqID7cEl31rfILArxYJXgIExOAySp8m13DlHTtzrwTYKu7Y3zR44R16/r+SG/aTTz17t
-	RQcaeA/QPju5swduANfj52S2wexg6RiCLI2dhi4aml/pQPIqFtHK1zp7NLkj6Vx+UFM2SyHvb49
-	ieYxSUEhrJ/hOY1aiHRjrmFS0VoktEu9dTu2raOI8E8/PVrWX19jIvQiNLXl6zfZIsCeoVEhLt3
-	5qwhidZCRLzEySvLgB/Xl9f39J5tQVNjZBoKA8djlm+cEodj5ueQarem1tasa7R7BLbSIygiGxK
-	1gO6p2Ii96vYL3GeC3siCg9JL+r1TMsXwuS4Eya6wKtV4M3fj868qaPdAgTpVBj52qPdmFBnyrl
-	+QvtayKMQ0dErnGc85k+Q1rcIixvusEncrfWYLSFrpx3sJKZtJFQ==
-X-Google-Smtp-Source: AGHT+IHRMXTXKXjEyorE/OR+JgIhlUmGW/33HECEKNiQG1+7IFPbdCPZ/lFmn8eUQeIV+QYEJHx+xg==
-X-Received: by 2002:a17:90b:582e:b0:343:a631:28b1 with SMTP id 98e67ed59e1d1-34733e94c4bmr7781670a91.16.1763863668056;
-        Sat, 22 Nov 2025 18:07:48 -0800 (PST)
-Received: from [192.168.86.109] ([136.27.45.11])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3ed379558sm10098989b3a.25.2025.11.22.18.07.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Nov 2025 18:07:47 -0800 (PST)
-Message-ID: <ceb11201-0520-407b-b5ca-f32d1e3bfdee@davidwei.uk>
-Date: Sat, 22 Nov 2025 18:07:46 -0800
+	s=arc-20240116; t=1763864167; c=relaxed/simple;
+	bh=e94l83o1RWwx3LdVcJkpyQgQwHfMYIJ+I+UxsnyuSQ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M7APugHChnfgB1x9wP5trFM0biRrcXaiINwJMb5FfLCi9iJw7L4IKWyFXIR7duQZ5tLUNoTd48tnS/KN7I9t3h/Kr1R0GL+cR55yOd2N9yIRnNKnmMDZW1JzgcFcbXLuuHKeD/7gx6FdzHJ1imCk0JmH0bo6cDKP2CL/DtGCmGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OutvcRMG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6495AC4CEF5;
+	Sun, 23 Nov 2025 02:16:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763864166;
+	bh=e94l83o1RWwx3LdVcJkpyQgQwHfMYIJ+I+UxsnyuSQ4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OutvcRMGS51L+tCg2ClFkt/7I+juAVXAjqWOTCpTMqL5JcTvwuihzJRCLCLEgD1Hs
+	 CvYiQZKaxSAbZhVi27U3sxI5IZxZuoL/fP4JDZKnO/aWG01ucAB3B+c6PbE9hbQkRR
+	 Je3e3XBu3Uq6GzRZ8U5GsQ7XNj/CKgqL+JyJrUWyASYHcQVTlBYva/KBQ6t5dYsmTv
+	 O7UKwDcP1reNZSVTBOm4RLwpyVvgnAx/6VuSR8Qt1xfxhbH9W7YGVug46j10gJGtfY
+	 xYW4Gp0dTmkW59TQwMjPcbI0O9M8vuL7HKpt4w93RtIIXvLN3gIrgWzWVe1KgsTtDk
+	 3QiS1VVW+XZBQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	kuniyu@google.com,
+	adelodunolaoluwa@yahoo.com,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests: af_unix: don't use SKIP for expected failures
+Date: Sat, 22 Nov 2025 18:16:01 -0800
+Message-ID: <20251123021601.158709-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/5] selftests: hw-net: toeplitz: read the RSS
- key directly from C
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, willemb@google.com,
- petrm@nvidia.com, shuah@kernel.org, linux-kselftest@vger.kernel.org
-References: <20251121040259.3647749-1-kuba@kernel.org>
- <20251121040259.3647749-4-kuba@kernel.org>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20251121040259.3647749-4-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2025-11-20 20:02, Jakub Kicinski wrote:
-> Now that we have YNL support for RSS accessing the RSS info from
-> C is very easy. Instead of passing the RSS key from Python do it
-> directly in the C code.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->   .../testing/selftests/drivers/net/hw/Makefile |  6 ++-
->   .../selftests/drivers/net/hw/toeplitz.c       | 41 ++++++++++++++++++-
->   .../selftests/drivers/net/hw/toeplitz.py      |  5 ---
->   3 files changed, 44 insertions(+), 8 deletions(-)
-> 
-[...]
-> diff --git a/tools/testing/selftests/drivers/net/hw/toeplitz.c b/tools/testing/selftests/drivers/net/hw/toeplitz.c
-> index afc5f910b006..7420a4e201cc 100644
-> --- a/tools/testing/selftests/drivers/net/hw/toeplitz.c
-> +++ b/tools/testing/selftests/drivers/net/hw/toeplitz.c
-[...]
-> @@ -551,7 +590,7 @@ static void parse_opts(int argc, char **argv)
->   	}
->   
->   	if (!have_toeplitz)
-> -		error(1, 0, "Must supply rss key ('-k')");
-> +		read_rss_dev_info_ynl();
+netdev CI reserves SKIP in selftests for cases which can't be executed
+due to setup issues, like missing or old commands. Tests which are
+expected to fail must use XFAIL.
 
-Do you also want to remove the case 'k' and other no longer used code,
-or is there still a valid use for them e.g. someone calling `toeplitz`
-manually?
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: kuniyu@google.com
+CC: adelodunolaoluwa@yahoo.com
+CC: shuah@kernel.org
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/net/af_unix/unix_connreset.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/tools/testing/selftests/net/af_unix/unix_connreset.c
+index bffef2b54bfd..6eb936207b31 100644
+--- a/tools/testing/selftests/net/af_unix/unix_connreset.c
++++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
+@@ -161,8 +161,12 @@ TEST_F(unix_sock, reset_closed_embryo)
+ 	char buf[16] = {};
+ 	ssize_t n;
+ 
+-	if (variant->socket_type == SOCK_DGRAM)
+-		SKIP(return, "This test only applies to SOCK_STREAM and SOCK_SEQPACKET");
++	if (variant->socket_type == SOCK_DGRAM) {
++		snprintf(_metadata->results->reason,
++			 sizeof(_metadata->results->reason),
++			 "Test only applies to SOCK_STREAM and SOCK_SEQPACKET");
++		exit(KSFT_XFAIL);
++	}
+ 
+ 	/* Close server without accept()ing */
+ 	close(self->server);
+-- 
+2.51.1
+
 
