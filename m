@@ -1,136 +1,79 @@
-Return-Path: <netdev+bounces-241053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 161D8C7E332
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 17:04:33 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E9A9C7E37B
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 17:26:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E6FBB34802A
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 16:04:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BD7C64E1109
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 16:26:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6972D23AD;
-	Sun, 23 Nov 2025 16:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C609A2C3272;
+	Sun, 23 Nov 2025 16:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVZZ9Qrl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kO6AroMu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DA620FA81
-	for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 16:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0A21096F;
+	Sun, 23 Nov 2025 16:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763913864; cv=none; b=ILQpD+MJI+GKYY0pr76Tp+j/AcjuudUa3faNpyJSS7lyUMXiJlwwYbV+QkfSx3dZCxq3QzDo4axlPGKthvTdN5PNbgP8N2eYGUDW2LWVI6No8tnf+jJleziZf/R9s4ieoZoh8N1SrphT7UXdqb1zeEbrgqZlyn3XIp06oi/5a1U=
+	t=1763915164; cv=none; b=ovBIVoqdwo2LsHcEryuIe8xzAYmNe4ICl0htnYyrdVa0T5pxB3JOtC1XgG4wKBqxgA65ETiWUopBlIEY0CH2XqouCQ96SFQYIH08QuSgVZG/Wzo+BQ2oJ6u02W9o0QboCnGp3vsSGHNqtOCKhhyUoeaHs2HEQXWVLaG1Mauo9Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763913864; c=relaxed/simple;
-	bh=CL1KNqvx3hKWBDdtbcfQkROj6ESl02CxpZWcnQNp1BY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bt3e1wtqqc6nIVkrd8ZEtnU0qgcJ4XhbSc4JIKEG5mJpRlKui4C4AVProq5eabtyw0kHz56etH0Gp1dmgVLJ5wPVB3y4t71aadRuqACzZcKLIjUcazlfSmTe7CRBaYYfToGgZTsANQV4L41TKYoYigAtZnyzqpdcXFbYxpbcOXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVZZ9Qrl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BD59C113D0;
-	Sun, 23 Nov 2025 16:04:21 +0000 (UTC)
+	s=arc-20240116; t=1763915164; c=relaxed/simple;
+	bh=IpypDbETTmlOiIImLrwJORIbNMHAYctmL/8ZP3CQDt0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sCslcwe5qMOwhP9/U7H8Yh0P5oIiVIjHmZVUnksZkmONK2Rdgm7RkiVGpzHXOLL15421eVWlGpZinTUOjIC2SILGlyfhHs/wxjpDCNlzKeCsl/sL7yuBi8AW2i3zrtq9jdY5FTtNZ2Jhs6G7CHNvl3KOAn9Waxf10s5ZstGeYkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kO6AroMu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36F1FC113D0;
+	Sun, 23 Nov 2025 16:26:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763913864;
-	bh=CL1KNqvx3hKWBDdtbcfQkROj6ESl02CxpZWcnQNp1BY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BVZZ9Qrl0gbpvoGGLasTjdrJFq/XfVxJnPN/hJqBaAIgPqjnF+EQAipvUrlXbi+Pb
-	 0iiQVjK0wgp+DVQL0XPRj84m92BkFZtqciApVbJ2p5bvJ6P8hrj8oWPUShg7+CCbHi
-	 ebiLg+diSd86sWsPbimLomHHpzs0ppQApl/1ihVy7YgylIwXLt5LoLrxcCAxZe+0gF
-	 fH8319xW9aAXjual2RCHDrCV6bQaPDZR/Tdp53DqV1Uddod/AFwGYsJtwUUSuxTgLm
-	 bmZRwUwOZ6KELyWiHTPleIfuO9cAYQhbeNwxsw893dGePupKJPh+6KqvfkNPwUSQgR
-	 Yp+2Bnge6VjSg==
-Date: Sun, 23 Nov 2025 16:04:19 +0000
-From: Simon Horman <horms@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jan Stancek <jstancek@redhat.com>,
-	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
-	=?utf-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Petr Machata <petrm@nvidia.com>
-Subject: Re: [PATCHv6 net-next] tools: ynl: add YNL test framework
-Message-ID: <aSMwg9vRBobjhiw5@horms.kernel.org>
-References: <20251119025742.11611-1-liuhangbin@gmail.com>
+	s=k20201202; t=1763915163;
+	bh=IpypDbETTmlOiIImLrwJORIbNMHAYctmL/8ZP3CQDt0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kO6AroMuEmP/rEciBJx/zMeN8pCllhvUzUIDV9MGzHKO5xF9wr8TX4LMYz8gJG/yM
+	 hp6PgcrXzEjgnVzXDzdtdZ/04ongMoSSzYjRm+sx/mx8Q6KJk1eXjWNQ7V6StgYOYo
+	 YuEwJ6YuNqRwVKUpxKWk8WmZRzdRUv/nrRWBUHXgVtYN6UGJnmEu6YuVlUbvn1Hqgb
+	 bkdU7BG5BiX76O3neRksceyqpizrIto9Js61L5tQM0kG+O7RKzSqeQ4q4pizmxURfI
+	 7iBfSfor3Y0lXFMTKcp10zL+Y/35DLXvGY+DpP6A5JKf7rpsDVefeN3gf56nuDa7h1
+	 l5ofUhCyrpMeQ==
+Date: Sun, 23 Nov 2025 08:26:01 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed
+ <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Mark Bloch
+ <mbloch@nvidia.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+ <linux-rdma@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe Shemesh
+ <moshe@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu
+ <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next V2 00/14] devlink and mlx5: Support
+ cross-function rate scheduling
+Message-ID: <20251123082601.04bf8043@kernel.org>
+In-Reply-To: <1763882580-1295213-1-git-send-email-tariqt@nvidia.com>
+References: <1763882580-1295213-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251119025742.11611-1-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 19, 2025 at 02:57:42AM +0000, Hangbin Liu wrote:
+On Sun, 23 Nov 2025 09:22:46 +0200 Tariq Toukan wrote:
+> This series by Cosmin and Jiri adds support for cross-function rate
+> scheduling in devlink and mlx5.
 
-...
-
-> diff --git a/tools/net/ynl/Makefile b/tools/net/ynl/Makefile
-
-...
-
-> @@ -49,5 +49,9 @@ install: libynl.a lib/*.h
->  	@echo -e "\tINSTALL pyynl"
->  	@pip install --prefix=$(DESTDIR)$(prefix) .
->  	@make -C generated install
-> +	@make -C tests install
->  
-> -.PHONY: all clean distclean install $(SUBDIRS)
-> +run_tests:
-> +	@$(MAKE) -C tests run_tests
-> +
-> +.PHONY: all clean distclean install run_tests $(SUBDIRS)
-> diff --git a/tools/net/ynl/tests/Makefile b/tools/net/ynl/tests/Makefile
-> new file mode 100644
-> index 000000000000..38161217e249
-> --- /dev/null
-> +++ b/tools/net/ynl/tests/Makefile
-> @@ -0,0 +1,32 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Makefile for YNL tests
-> +
-> +TESTS := \
-> +	test_ynl_cli.sh \
-> +	test_ynl_ethtool.sh \
-> +# end of TESTS
-> +
-> +all: $(TESTS)
-> +
-> +run_tests:
-> +	@for test in $(TESTS); do \
-> +		./$$test; \
-> +	done
-> +
-> +install: $(TESTS)
-> +	@mkdir -p $(DESTDIR)/usr/bin
-> +	@mkdir -p $(DESTDIR)/usr/share/kselftest
-> +	@cp ../../../testing/selftests/kselftest/ktap_helpers.sh $(DESTDIR)/usr/share/kselftest/
-> +	@for test in $(TESTS); do \
-> +		name=$$(basename $$test .sh); \
-> +		sed -e 's|^ynl=.*|ynl="ynl"|' \
-> +		    -e 's|^ynl_ethtool=.*|ynl_ethtool="ynl-ethtool"|' \
-> +		    -e 's|KSELFTEST_KTAP_HELPERS=.*|KSELFTEST_KTAP_HELPERS="/usr/share/kselftest/ktap_helpers.sh"|' \
-> +		    $$test > $(DESTDIR)/usr/bin/$$name; \
-> +		chmod +x $(DESTDIR)/usr/bin/$$name; \
-> +	done
-> +
-> +clean:
-> +	@# Nothing to clean
-> +
-> +.PHONY: all install clean run_tests
-
-Hi Hangbin,
-
-As the parent and sibling Makefiles support the distclean target I think
-this one probably should too.
-
-...
+networking/devlink/index.rst:55: WARNING: duplicated entry found in toctree: networking/devlink/devlink-linecard
+networking/devlink/index.rst:55: WARNING: duplicated entry found in toctree: networking/devlink/devlink-eswitch-attr
+-- 
+pw-bot: cr
 
