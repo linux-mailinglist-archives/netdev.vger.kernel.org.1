@@ -1,77 +1,79 @@
-Return-Path: <netdev+bounces-241016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98B92C7DA48
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 01:51:16 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89B77C7DA4B
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 01:51:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 70D654E0408
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 00:51:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1CFA3352100
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 00:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F6F14AD20;
-	Sun, 23 Nov 2025 00:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22381D90DD;
+	Sun, 23 Nov 2025 00:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Od0if0Sg"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="KA/kdmTQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B7A132117
-	for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 00:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D7113A3F7
+	for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 00:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763859073; cv=none; b=m48U+Z8zMWbwFU8Q4sPfrv048/T5JFffMxVFXv9cjIPgH4EywGufiM0wwX9CYA2ub3mDl3gRQli9oJuUfseE1r9S6oxEzemOKw9QOKx7yVSUdKu83m7Ss2h011KQ0O/UHc0iHZDWZxZZuKWaiLsDJQzAjImOzrlYJa+4abZQ8go=
+	t=1763859074; cv=none; b=gWVcOGNcbpqOTOf0EtUxcz8gyDxsYEJJDx7Q3mKX1T/AlPPl+k6tsfdLhbAjyFaJLNKxWOwJ9douoSvcBPA+gqwbs1/8E59Yb33Ces2dL/zn7IWHLGCdb+hO1z/bQUGGo1F0brIrv9vksTo39rApJJowXqcslmt4Kny65qxE3VM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763859073; c=relaxed/simple;
-	bh=zKcgxsAl4Xwle0rcTS0nyKIUL1CgeylOJPD/p6xGbug=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vGSzcenIdKC42+qWOBb1YaxnNv+RIZJuTOmKlBH5GZ+BF1l4spvNFFz1Nipn40kBvgDaXfP89QoJc2HQxR3r72z73I1SfOdiuIJDFfnBtyVoiq4f0ZTUUHWSba+vlwveckH+nfHUNTiU9e89/lC8cg3bA6qM33gpeqyQkbRxBAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Od0if0Sg; arc=none smtp.client-ip=209.85.210.48
+	s=arc-20240116; t=1763859074; c=relaxed/simple;
+	bh=Ig1lK/Pwnwhecei1VzTrt9WosWgBzuGkCQEK1V3+2Us=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VAhL6oOd7DtLwt9zb+mwjppMU2G1t0bV7+M/ZWmo3p15VB8vi2geYJhpv4j34QawF3emb0oThRNUrpjZOAYRHaPOabJcDlNoWCgmVHY61n+5BQYrahI3J1mm2VGAyFfdrOyL44hFlqNfLBw7kuyu8a4MRT8ZjkUjN25FMR0Hz1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=KA/kdmTQ; arc=none smtp.client-ip=209.85.160.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7c7545310b8so1533960a34.1
-        for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 16:51:11 -0800 (PST)
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-3eae4e590a4so1087340fac.1
+        for <netdev@vger.kernel.org>; Sat, 22 Nov 2025 16:51:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1763859070; x=1764463870; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=x4NLLmI91q2cEC2JO9nQ+1yyXiaCpBryxRcW6rorq+w=;
-        b=Od0if0SgSZAO+34PF395aKKHeADSdMLGHmDU2hFffQwVEj8cqTjJPfgpIAfqYzXhIE
-         CEnHH+EiNXQLz0UYe9kb6P3fim3cg+hHv3k6w9fnKNI12AQfUVub2a0Edvti5MiZlTPY
-         OcVZc+Anf4gADMhG7MDFPgtqiaHjAkOWgZqhiKw406/yKf77hs57VqK84VBW7/4nlqPK
-         QIEpgLG0CATaoR1pX2ov+yeBOB8YLM8owcds1C9Q1/rLwZzOSiBI7owtDUL+/EIf8bQ1
-         gwlelvlCj/KOxHXiYWKGxizgJSprimzrD7NIkz3NzMwjP88ulBjR7tKJNqzs+6SmeQ3M
-         Ivnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763859070; x=1764463870;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1763859072; x=1764463872; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=x4NLLmI91q2cEC2JO9nQ+1yyXiaCpBryxRcW6rorq+w=;
-        b=SDx23gVPqFgSt9EyzYtOrx/OV1nwoJxQOUEp3nCbakvEW0YlIQ+4bCGMg0/qngy2Z7
-         V1cVGqdPuS82Py0PslOMI7v8cAFDRQ+l8mKVbjt/05S79sVFVJi5E+YO0oJ7JxMeAwa4
-         VsIWUVUOY1BNx0DyHU6MSePODLkupJX9mlrEfMuH5oWSNq8N3FU9Pxie+pM55Z6Scr/v
-         xqzKPX/LFG5Rx5IiSfkCaX9BMtUyEjAbLoYro3nNkpU8fJPT/Q5YHi5Fvnqc6pje1oDW
-         aJayCWYtw1ukcrNkJ2PA9TuF85sQNFloPjZbrYvAp3UrLninoBA25rTDFdVgDIEzabxe
-         3DBQ==
-X-Gm-Message-State: AOJu0Yxij2Go0+/b9plM9eAAPB5wuuxv3a+XcSoXq4m4rJ+UqVrdhPse
-	/+YKswPwwwK4N3XnA3bod2+iJFa3hIwzAUIRcDuVnZz4n3/+/TGozZestWVwmpVTKi5ol9KFeuV
-	5JofM
-X-Gm-Gg: ASbGncsQKEQYFDVggE7jN3WmVtSR5iBnI4mzqe596JBkmaN2ATl8p+Up+YVLDDJHyYe
-	0GQ41jMfGEBBocK2KzwlZRQ5uEueT/KJOpj/tWL6j3O54VQhMaF5qCU5175GXrgLY8B45e90/2L
-	VfnJoIbk5HNsDOd6GrnBieyzRe3xxghGSj68InRwvpEMwnfv5wP6Wy0UJfTVYAhgp1GToWEPbve
-	QJj+fmwctfC6TXpIMW1K8vwfWrGNyY6wOODD4iHc3k4m2bJf4JMsSGvyxcp0wA9ooghlprtyRix
-	MTXUI2iZtTzzeINloL8MEhUUMUnLjKmSpOvcvFtm66+6mcEXo53YtYezc/cgH9x/vRA6O4ytyIU
-	b4pd68yk9cAxT1Qvr4DXwxYRKgEHXJa4eq2JX1Xv+rmfItqCoL5Hki2SfGW0DtqpCZvG/81NbzN
-	BBcWTItwsdRUI8bObhIEguQPoY2B0TCe+D5nZL2e/DGYP6+furbIY=
-X-Google-Smtp-Source: AGHT+IEMttVa90sqFaSWZRtNFbvocIq+VdIqZyBlLRuZZJL54tgLNMo/yNYFPygqaxQIBYN0SHLKfA==
-X-Received: by 2002:a05:6830:4409:b0:7c7:59ed:ca0d with SMTP id 46e09a7af769-7c798cfc904mr3118237a34.36.1763859070507;
-        Sat, 22 Nov 2025 16:51:10 -0800 (PST)
+        bh=AdddjUsrOEJ/NFoBu1ta8xZknX/7x/tr4B8p3DMPG8c=;
+        b=KA/kdmTQTD0HWRFAp5BtP8DlztDAHq31jTZLdShmDPFSiVAMD9ZN4hxRc+1UbJuXEo
+         OxzvApMO/mHwtuJC1GDT/e/rt2VwxpgfsiOnZOPQ5zWnIX4bR9Kavjcd7iRW4m2Oi0Ff
+         XdHA6taKfwLkNpNTmc1jwuohWW0NIzt1V/vV3Hst1Rk6Kx7V65LAqbLMgP6QcxePDHxQ
+         0hshB0Xg9qJHsxjqI5qnMki779ptOD+qon+M2OZPIrNAnq1gzJZEGWOEmLq/fZrtQnSM
+         QXR9A3ZDAOrQA0SqkUXCddsda4A1+yUtemqaWykE14X+IM3zqe8xA5B8DAksYBK+tPsz
+         sRYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763859072; x=1764463872;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=AdddjUsrOEJ/NFoBu1ta8xZknX/7x/tr4B8p3DMPG8c=;
+        b=WrGGKCE5hGs6IhrhLwzpkieBJKdEyUyyDhHpAnKyOZrfy06DE/zTUR7wSTsjAW9yOl
+         ZqMLgtcZbdu9bUy7Inej5o4r9XVX2x5e6SfQ9XUyfGsjVfDelL5rCeY6/ScspxqlZ0CR
+         Vdn91Ws2iAdvGvE3hY9vOMxoIiaJRUiNPhIbVQvZ9ZaxygZITXKZO5epbrJvUsF7QUsX
+         1si2VK++4mPG5M29PZNaAdwUDq11loGRm9rD3nNaDKlk1ctlkUjaYRVEVm605uWwEVt9
+         Ju/Ac5ryy1FOZWxuXaFAaKHl1g3n1caFnr6vW/kkgUouZqGorT3suIRpqlOFcIcKlM9H
+         2+4A==
+X-Gm-Message-State: AOJu0Yy3/sFvpW3xTGk8OCIam2AzkdVZigP/WM8HFMcQD8d7uQlGBCDs
+	YV2Msmek48eCEr2owsXA0uuBD1GbF6g51oCsndmU/9Bqz4+hz+8ydG71LaM6V5tCVzQmjYWE9fS
+	hQQij
+X-Gm-Gg: ASbGncuIGjFVaqUfg1VwQa6zjnykG9u8C+aX74Ttam4YQ/lSKAeb+hUlNfvxx+4XvSG
+	tKcEjUvUWWpp6IfeXzifdWRYJPEIj5P+Jf44YfjXX+289JKLG3pawt65/P/32kuevZN4REXzJdx
+	h58OHuhfHuFjlixJebxyXTsVC/o0OIPYrL16z1VLdRs7yY1rqewp7sxUZDWkZ6yqFDBMdCwquae
+	Nd7v4CdQgEA5DLHQ7MnRgawyrfZE6HklEd0mqT9IDmLHwWlevTbQAJc2rm4/uVt+t0eAulKzxmY
+	xEDYr/w0hRuXSe70gRUO7Wg/M+fsFy+gbtk6l/t6NbH4sfSUSCahQAQwVjUAjrm9y/cmHgUSCj7
+	S6RI504vPIFN7wWBy5P/Kgvtss+V8b4XRDwvIge1kjbICEq5ayO3/8yMjr+euNL3XPEoIPoj4RV
+	VUvYcJv3YodoAyhNLwPCCbidHUrKVL1tItsJ16Cv7G
+X-Google-Smtp-Source: AGHT+IEO2a/49GlrN5KigG/1aTrJqxbNHnFGCiOBBCQk49cpbdyMI0Pyb/KTViwa25Si/EOb5mPPeA==
+X-Received: by 2002:a05:6808:448d:b0:44d:badf:f41a with SMTP id 5614622812f47-45115aa5f76mr2702024b6e.32.1763859071944;
+        Sat, 22 Nov 2025 16:51:11 -0800 (PST)
 Received: from localhost ([2a03:2880:12ff:3::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c78d4021afsm3818612a34.25.2025.11.22.16.51.09
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-450ffe65e6asm2721478b6e.6.2025.11.22.16.51.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Nov 2025 16:51:09 -0800 (PST)
+        Sat, 22 Nov 2025 16:51:11 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -80,10 +82,12 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH net-next v2 0/5] selftests/net: add container ping test
-Date: Sat, 22 Nov 2025 16:51:03 -0800
-Message-ID: <20251123005108.3694230-1-dw@davidwei.uk>
+Subject: [PATCH net-next v2 1/5] selftests/net: parametrise iou-zcrx.py with ksft_variants
+Date: Sat, 22 Nov 2025 16:51:04 -0800
+Message-ID: <20251123005108.3694230-2-dw@davidwei.uk>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251123005108.3694230-1-dw@davidwei.uk>
+References: <20251123005108.3694230-1-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,52 +96,232 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchset is mostly prep work for adding a data path test for netkit
-bind queue API used by iou zcrx and AF_XDP.
+Use ksft_variants to parametrise tests in iou-zcrx.py to either use
+single queues or RSS contexts, reducing duplication.
 
-Use ksft_variants in iou-zcrx.py to run the same test cases with both
-single queue or RSS. With changes in v2 this is a bit of an unrelated
-drive by change but I'll keep it in this series.
-
-Add a new test env NetDrvContEnv that sets up a container based test
-with a netkit pair. This only works with netkit for now, but can be
-extended to support e.g. veth.
-
-The netdev core cannot forward net_iovs, and so to get skbs containing
-net_iovs into a container, add a basic bpf tc/ingress prog to forward
-skbs into a netkit pair.
-
-For a remote to talk to the netns netkit, it needs a publicly routable
-IP. Add a new env var LOCAL_PREFIX_V{4,6} that defines such a prefix.
-
-Finally, add a basic ping test that brings everything together.
-
-v2:
- - remove ksft_run suffix, MemPrvEnv, rand_ifname, bpf C loader
- - implement NetDrvContEnv
- - redo nk_netns.py ping test
- - fix docs
-
-David Wei (5):
-  selftests/net: parametrise iou-zcrx.py with ksft_variants
-  selftests/net: add bpf skb forwarding program
-  selftests/net: add LOCAL_PREFIX_V{4,6} env to HW selftests
-  selftests/net: add env for container based tests
-  selftests/net: add a netkit netns ping test
-
- .../testing/selftests/drivers/net/README.rst  |   7 +
- .../selftests/drivers/net/hw/.gitignore       |   2 +
- .../testing/selftests/drivers/net/hw/Makefile |   1 +
+Signed-off-by: David Wei <dw@davidwei.uk>
+---
  .../selftests/drivers/net/hw/iou-zcrx.py      | 162 ++++++++----------
- .../drivers/net/hw/lib/py/__init__.py         |   5 +-
- .../selftests/drivers/net/hw/nk_forward.bpf.c |  49 ++++++
- .../selftests/drivers/net/hw/nk_netns.py      |  23 +++
- .../selftests/drivers/net/lib/py/__init__.py  |   5 +-
- .../selftests/drivers/net/lib/py/env.py       | 106 +++++++++++-
- 9 files changed, 266 insertions(+), 94 deletions(-)
- create mode 100644 tools/testing/selftests/drivers/net/hw/nk_forward.bpf.c
- create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
+ 1 file changed, 73 insertions(+), 89 deletions(-)
 
+diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+index 712c806508b5..2c5acfb4f5dc 100755
+--- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
++++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+@@ -3,132 +3,114 @@
+ 
+ import re
+ from os import path
+-from lib.py import ksft_run, ksft_exit, KsftSkipEx
++from lib.py import ksft_run, ksft_exit, KsftSkipEx, ksft_variants, KsftNamedVariant
+ from lib.py import NetDrvEpEnv
+ from lib.py import bkg, cmd, defer, ethtool, rand_port, wait_port_listen
++from lib.py import EthtoolFamily
+ 
+ 
+-def _get_current_settings(cfg):
+-    output = ethtool(f"-g {cfg.ifname}", json=True)[0]
+-    return (output['rx'], output['hds-thresh'])
+-
+-
+-def _get_combined_channels(cfg):
+-    output = ethtool(f"-l {cfg.ifname}").stdout
+-    values = re.findall(r'Combined:\s+(\d+)', output)
+-    return int(values[1])
+-
+-
+-def _create_rss_ctx(cfg, chan):
+-    output = ethtool(f"-X {cfg.ifname} context new start {chan} equal 1").stdout
++def create_rss_ctx(cfg):
++    output = ethtool(f"-X {cfg.ifname} context new start {cfg.target} equal 1").stdout
+     values = re.search(r'New RSS context is (\d+)', output).group(1)
+-    ctx_id = int(values)
+-    return (ctx_id, defer(ethtool, f"-X {cfg.ifname} delete context {ctx_id}"))
++    return int(values)
+ 
+ 
+-def _set_flow_rule(cfg, port, chan):
+-    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} action {chan}").stdout
++def set_flow_rule(cfg):
++    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {cfg.port} action {cfg.target}").stdout
+     values = re.search(r'ID (\d+)', output).group(1)
+     return int(values)
+ 
+ 
+-def _set_flow_rule_rss(cfg, port, ctx_id):
+-    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} context {ctx_id}").stdout
++def set_flow_rule_rss(cfg, rss_ctx_id):
++    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {cfg.port} context {rss_ctx_id}").stdout
+     values = re.search(r'ID (\d+)', output).group(1)
+     return int(values)
+ 
+ 
+-def test_zcrx(cfg) -> None:
+-    cfg.require_ipver('6')
+-
+-    combined_chans = _get_combined_channels(cfg)
+-    if combined_chans < 2:
+-        raise KsftSkipEx('at least 2 combined channels required')
+-    (rx_ring, hds_thresh) = _get_current_settings(cfg)
+-    port = rand_port()
+-
+-    ethtool(f"-G {cfg.ifname} tcp-data-split on")
+-    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
++def single(cfg):
++    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
++    channels = channels['combined-count']
++    if channels < 2:
++        raise KsftSkipEx('Test requires NETIF with at least 2 combined channels')
+ 
+-    ethtool(f"-G {cfg.ifname} hds-thresh 0")
+-    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
++    rings = cfg.ethnl.rings_get({'header': {'dev-index': cfg.ifindex}})
++    rx_rings = rings['rx']
++    hds_thresh = rings.get('hds-thresh', 0)
+ 
+-    ethtool(f"-G {cfg.ifname} rx 64")
+-    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
++    cfg.ethnl.rings_set({'header': {'dev-index': cfg.ifindex},
++                         'tcp-data-split': 'enabled',
++                         'hds-thresh': 0,
++                         'rx': 64})
++    defer(cfg.ethnl.rings_set, {'header': {'dev-index': cfg.ifindex},
++                                'tcp-data-split': 'unknown',
++                                'hds-thresh': hds_thresh,
++                                'rx': rx_rings})
+ 
+-    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
++    cfg.target = channels - 1
++    ethtool(f"-X {cfg.ifname} equal {cfg.target}")
+     defer(ethtool, f"-X {cfg.ifname} default")
+ 
+-    flow_rule_id = _set_flow_rule(cfg, port, combined_chans - 1)
++    flow_rule_id = set_flow_rule(cfg)
+     defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
+ 
+-    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
+-    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 12840"
+-    with bkg(rx_cmd, exit_wait=True):
+-        wait_port_listen(port, proto="tcp")
+-        cmd(tx_cmd, host=cfg.remote)
+ 
++def rss(cfg):
++    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
++    channels = channels['combined-count']
++    if channels < 2:
++        raise KsftSkipEx('Test requires NETIF with at least 2 combined channels')
+ 
+-def test_zcrx_oneshot(cfg) -> None:
+-    cfg.require_ipver('6')
++    rings = cfg.ethnl.rings_get({'header': {'dev-index': cfg.ifindex}})
++    rx_rings = rings['rx']
++    hds_thresh = rings.get('hds-thresh', 0)
+ 
+-    combined_chans = _get_combined_channels(cfg)
+-    if combined_chans < 2:
+-        raise KsftSkipEx('at least 2 combined channels required')
+-    (rx_ring, hds_thresh) = _get_current_settings(cfg)
+-    port = rand_port()
++    cfg.ethnl.rings_set({'header': {'dev-index': cfg.ifindex},
++                         'tcp-data-split': 'enabled',
++                         'hds-thresh': 0,
++                         'rx': 64})
++    defer(cfg.ethnl.rings_set, {'header': {'dev-index': cfg.ifindex},
++                                'tcp-data-split': 'unknown',
++                                'hds-thresh': hds_thresh,
++                                'rx': rx_rings})
+ 
+-    ethtool(f"-G {cfg.ifname} tcp-data-split on")
+-    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
++    cfg.target = channels - 1
++    ethtool(f"-X {cfg.ifname} equal {cfg.target}")
++    defer(ethtool, f"-X {cfg.ifname} default")
+ 
+-    ethtool(f"-G {cfg.ifname} hds-thresh 0")
+-    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
++    rss_ctx_id = create_rss_ctx(cfg)
++    defer(ethtool, f"-X {cfg.ifname} delete context {rss_ctx_id}")
+ 
+-    ethtool(f"-G {cfg.ifname} rx 64")
+-    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
++    flow_rule_id = set_flow_rule_rss(cfg, rss_ctx_id)
++    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
+ 
+-    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
+-    defer(ethtool, f"-X {cfg.ifname} default")
+ 
+-    flow_rule_id = _set_flow_rule(cfg, port, combined_chans - 1)
+-    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
++@ksft_variants([
++    KsftNamedVariant("single", single),
++    KsftNamedVariant("rss", rss),
++])
++def test_zcrx(cfg, setup) -> None:
++    cfg.require_ipver('6')
+ 
+-    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1} -o 4"
+-    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 4096 -z 16384"
++    setup(cfg)
++    rx_cmd = f"{cfg.bin_local} -s -p {cfg.port} -i {cfg.ifname} -q {cfg.target}"
++    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {cfg.port} -l 12840"
+     with bkg(rx_cmd, exit_wait=True):
+-        wait_port_listen(port, proto="tcp")
++        wait_port_listen(cfg.port, proto="tcp")
+         cmd(tx_cmd, host=cfg.remote)
+ 
+ 
+-def test_zcrx_rss(cfg) -> None:
++@ksft_variants([
++    KsftNamedVariant("single", single),
++    KsftNamedVariant("rss", rss),
++])
++def test_zcrx_oneshot(cfg, setup) -> None:
+     cfg.require_ipver('6')
+ 
+-    combined_chans = _get_combined_channels(cfg)
+-    if combined_chans < 2:
+-        raise KsftSkipEx('at least 2 combined channels required')
+-    (rx_ring, hds_thresh) = _get_current_settings(cfg)
+-    port = rand_port()
+-
+-    ethtool(f"-G {cfg.ifname} tcp-data-split on")
+-    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
+-
+-    ethtool(f"-G {cfg.ifname} hds-thresh 0")
+-    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
+-
+-    ethtool(f"-G {cfg.ifname} rx 64")
+-    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
+-
+-    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
+-    defer(ethtool, f"-X {cfg.ifname} default")
+-
+-    (ctx_id, delete_ctx) = _create_rss_ctx(cfg, combined_chans - 1)
+-    flow_rule_id = _set_flow_rule_rss(cfg, port, ctx_id)
+-    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
+-
+-    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
+-    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 12840"
++    setup(cfg)
++    rx_cmd = f"{cfg.bin_local} -s -p {cfg.port} -i {cfg.ifname} -q {cfg.target} -o 4"
++    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {cfg.port} -l 4096 -z 16384"
+     with bkg(rx_cmd, exit_wait=True):
+-        wait_port_listen(port, proto="tcp")
++        wait_port_listen(cfg.port, proto="tcp")
+         cmd(tx_cmd, host=cfg.remote)
+ 
+ 
+@@ -137,7 +119,9 @@ def main() -> None:
+         cfg.bin_local = path.abspath(path.dirname(__file__) + "/../../../drivers/net/hw/iou-zcrx")
+         cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
+ 
+-        ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg, ))
++        cfg.ethnl = EthtoolFamily()
++        cfg.port = rand_port()
++        ksft_run(globs=globals(), cases=[test_zcrx, test_zcrx_oneshot], args=(cfg, ))
+     ksft_exit()
+ 
+ 
 -- 
 2.47.3
 
