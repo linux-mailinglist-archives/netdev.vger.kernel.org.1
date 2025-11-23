@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-241046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92734C7DE70
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 09:48:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 214CFC7E05E
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 12:36:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42E2F3A99A4
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 08:48:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 966604E1881
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 11:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0BF204F93;
-	Sun, 23 Nov 2025 08:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F10A2D23B8;
+	Sun, 23 Nov 2025 11:36:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="l5u7xl+Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CiEK8K05"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F4113AF2
-	for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 08:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB0F29E10B
+	for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 11:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763887683; cv=none; b=jilBp+8UJBOEPNOjHH4YSoqEycxKCHsV+WsVlFtZhHeibqlQethA4ACgPczKvDEzEpTkgRx7jHpHX1vfFX9lFbwJEr5t94FRBCjW6HOLfxxvCL3h8f7xJ27C6UADmx35eg/IWxj1a31yCFEKkIeExDm6GSbVLQJIyNBgC97zKTU=
+	t=1763897811; cv=none; b=J8rsX7vkpwaf1NrsT90MEXT0J20yluNO6bnzxy3rtuwI9zFq/d/1+kXalb9LuEAajvFWprh3WVzBS0bcBconXzdILlMynKV19PjLTVuppnz1cQ3inTwp4T+RNrShFraXCgI3z2M7cURtKyPhR6p06u1bLwdZ9f0Ax/88ZcuiHsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763887683; c=relaxed/simple;
-	bh=h4SQyosY1eGTJ/rRlYmy3ASX2LGqAIsKmFB9HLfnu+o=;
+	s=arc-20240116; t=1763897811; c=relaxed/simple;
+	bh=ja6UFnzGAB4ebKVAp8A8FBBLaCeSYVrAk0QZPuMqtSo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wxqn+xiEKRF2CHTk2arIcgG0LRJ1qNgpPtr53IQAz0WwnP+HeMgoOVPPm8VgW2ViKh7gV4lNgJ08ZNfTI7/YuRssW/L84XqYNccXA0M1/l8e1Viejw7lhC5Ide3ZcIm3lN8z8dHHd1OG8OEb1IjBG3fium5AFAGoJb+enFiFi7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=l5u7xl+Y; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5w9TBs6f6PMZqeUvDfvd2Z0K+crtpRu8aQyOxCYaiZg=; b=l5u7xl+Yu9iPwjJFyG0AppFlU4
-	6j18KQ4AwQbDMUxqx84liBAXmoa0/rR6HkMtEHcwJuudnDIvsqlzWtX44F7tAi33rbWaGKs6YBwT5
-	qWYuPmwZDoKSAIwbOs9HtOYUy0tQNEn+N7GjJE26bPRDR3drhvvASoQ6NI00WACObGKyne8ttAxer
-	vsMlujQasbu2PlG7uAoxpE8M+kCWyw0zO5Wy7036XiaqlPa9zGMxo12Qb2anYU88wDd8JmptbUcpr
-	xFJyN3pNn/pMFtLUlh4Y17jt1e6wGu4OoLD2rFTjW+4Niem1D2Ctea1X3Y7JMHJWN+j++nAiM+2XZ
-	w2pdvC2A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58278)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vN5l5-000000000kk-0c8N;
-	Sun, 23 Nov 2025 08:47:47 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vN5l0-0000000079D-0EuB;
-	Sun, 23 Nov 2025 08:47:42 +0000
-Date: Sun, 23 Nov 2025 08:47:41 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Cc: netdev@vger.kernel.org, imx@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Kieran Bingham <kieran.bingham@ideasonboard.com>,
-	Stefan Klug <stefan.klug@ideasonboard.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@denx.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	Frank Li <Frank.Li@nxp.com>, Heiko Schocher <hs@denx.de>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Joakim Zhang <qiangqing.zhang@nxp.com>, Joy Zou <joy.zou@nxp.com>,
-	Marcel Ziswiler <marcel.ziswiler@toradex.com>,
-	Marco Felsch <m.felsch@pengutronix.de>,
-	Martyn Welch <martyn.welch@collabora.com>,
-	Mathieu Othacehe <othacehe@gnu.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Richard Hu <richard.hu@technexion.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Stefano Radaelli <stefano.radaelli21@gmail.com>,
-	Wei Fang <wei.fang@nxp.com>,
-	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
-Subject: Re: [PATCH] net: stmmac: imx: Do not stop RX_CLK in Rx LPI state for
- i.MX8MP
-Message-ID: <aSLKLYuz0WA2LpFF@shell.armlinux.org.uk>
-References: <20251123053518.8478-1-laurent.pinchart@ideasonboard.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=V2Oc9PyTro2ebZFne3MfS2oU0N7O6v4pJfTo2Lp1VysdUgy/NGjNzt3kj23uu/ByAkvND2PMQWRm6i2wkukWN8vcjLwp5MisdC33IZrpNfonknpnkwWzFw4rD6l5DdR6buwGl+IXzKTma8AGXDd97gPTWcWo3DPhIFRO7F+IIBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CiEK8K05; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-429c8d1be2eso376319f8f.0
+        for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 03:36:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763897808; x=1764502608; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HfwuTUTAUfU1xG2cflPLZU4s1JAz92iyW+2u9F/7P6Q=;
+        b=CiEK8K05pvo4JomSPBeYbJu2tVtdOy8vpAniXH8yMcJHs45WNU+OTuFn5o1ouIsh1/
+         4q1ODsFpXrkKIPAt2uaukMZsz7+0zkOU4JUy4mUaECQdtQFJQJ660MWfXg1EbPURNf7l
+         3SzP5dhvRm3bt98NfblmLTgUDG5g0ONyydvWwhqtWnoqjICrSx3IadWS/c5471vAElle
+         CRy29K5UnIz7Ij6zS2fcmFJV/HfqIy8EaiD6iOZxThhH37RXC7/qgIm15sPymyXeqIA3
+         aMUh5RvgynN2LaZXv8dm9/HbcQIMeITEcVPiBPcbNIuo9cmG1wDdrAidJjE+ZTTwAPiK
+         Ngpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763897808; x=1764502608;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HfwuTUTAUfU1xG2cflPLZU4s1JAz92iyW+2u9F/7P6Q=;
+        b=VqPgCBYxdygt8lvxRUwuDLgITP1pti3B2cQjEPs02seuG7WLZsuDEWQELVDOwpC0yd
+         HjelJp+dgAfI5SOvzS36ML1mUaHXHkZuNRpU5eR4pC8Rqb+46u5lqQpFTC2a4asA5dOK
+         1XWwXt5W/NNolW+JDNHRBq1s+C3tBtFJM8rVz0prlSCHAWXfRHqf68LVi0YlnoBdmrP9
+         1fGyKg7RvyDyRVY03tBVX6P5SLSBMtZTaGPnTCvFYME2dczPqqRjdBuE1xyOel8Wkfsl
+         vHwRxvHRRJWAHARIXt68J1E6sSpWpw9GzOYbfyw5lvTvDCiuv0nHf3LIr0fLZUO7iGdz
+         Yp6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUPAYV3J9tS+jeOhbg7XE+aREZAtyZSqztieZED4Jz7HM3SUVzovRUC3PhnDp4O0EM2lwifSMA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8wdUIkAo9zA9FFJittXpBboazq+ftcwaMkhSQNso60uUEVBAY
+	vKtxikSu1aSLzg9GFRybB93wlbriYLntz301VF6e7bGJvVp8/EM/bj7a
+X-Gm-Gg: ASbGnctO422w+MWCR7gEDq3z7reBBWj08VJ+CXCDq/5S1cOdMXF1xWcISX9s+0wx9H+
+	OkiHnZxsLBgoq2ndwfkOChe+QSf7HFMN32dPrcdawDrMOc4tkIir/GoBlZIdLrfSFt7/X5dG5Uo
+	rI0Bd2z5nN0AQc7a73IttA7Jpv8GEtstbe0vBrpu4L5sSLCa124B+iSo9pPwagBFHyB0rwO8F6v
+	R5myysI3l1kHKgSdgEezZuuVrkpfjRnd/VlGo32y5Xpp/skP/jbZrhLWq3pfZHWpDW4xbkwgck2
+	6ZvoksUHJZg3p1nhVpEoluxWE4vVcFH2RqbRAOpdf0pTHXlw8/yyXg/8jatXRxJSZgDNv046a7r
+	aRor+4AU1HU7YZ+xfTuMCW4YB14kTzeHchlFuPrlRrwf7GXGh/2PAylilwLnlqCt34raeyJypns
+	kqVAI=
+X-Google-Smtp-Source: AGHT+IFYbDFURjdFNzDsXM81xihMEV6/yHyWNUp8Xym4Agx1uNZFO0N3vjkBtnV6TVXFITr30mic6Q==
+X-Received: by 2002:a5d:5d89:0:b0:429:bdaa:9672 with SMTP id ffacd0b85a97d-42cc3f5f766mr4429554f8f.3.1763897807474;
+        Sun, 23 Nov 2025 03:36:47 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d106:d600:272e:6a6f:51d7:2024])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f363c0sm22232822f8f.18.2025.11.23.03.36.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Nov 2025 03:36:46 -0800 (PST)
+Date: Sun, 23 Nov 2025 13:36:43 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Ma Ke <make24@iscas.ac.cn>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, o.rempel@pengutronix.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: dsa: microchip: fix mdio parent bus reference leak
+Message-ID: <20251123113643.cf2kc7i5cvdkkaf2@skbuf>
+References: <20251121042000.20119-1-make24@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,103 +92,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251123053518.8478-1-laurent.pinchart@ideasonboard.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20251121042000.20119-1-make24@iscas.ac.cn>
 
-On Sun, Nov 23, 2025 at 02:35:18PM +0900, Laurent Pinchart wrote:
-> The i.MX8MP-based Debix Model A board experiences an interrupt storm
-> on the ENET_EQOS IRQ (135) when connected to an EEE-enabled peer.
+On Fri, Nov 21, 2025 at 12:20:00PM +0800, Ma Ke wrote:
+> In ksz_mdio_register(), when of_mdio_find_bus() is called to get the
+> parent MDIO bus, it increments the reference count of the underlying
+> device. However, the reference are not released in error paths or
+> during switch teardown, causing a reference leak.
 > 
-> Setting the eee-broken-1000t DT property in the PHY node solves the
-> problem, which confirms that the issue is related to EEE. Device trees
-> for 8 boards in the mainline kernel, including the i.MX8MP EVK, set the
-> property, which indicates the issue is likely not limited to the Debix
-> board, although some of those device trees may have blindly copied the
-> property from the EVK.
+> Add put_device() in the error path of ksz_mdio_register() and
+> ksz_teardown() to release the parent bus.
 > 
-> The IRQ is documented in the reference manual as the logical OR of 4
-> signals:
+> Found by code review.
 > 
-> - ENET QOS TSN LPI RX Exit Interrupt
-> - ENET QOS TSN Host System Interrupt
-> - ENET QOS TSN Host System RX Channel Interrupts, Logical OR of
->   channels[4:0]
-> - ENET QOS TSN Host System TX Channel Interrupts, Logical OR of
->   channels[4:0]
-> 
-> Debugging the issue showed no unmasked interrupt sources from the Host
-> System Interrupt (GMAC_INT_STATUS), Host System RX Channel Interrupts or
-> Host System TX Channel Interrupts (MTL_INT_STATUS, MTL_CHAN_INT_CTRL and
-> DMA_CHAN_STATUS) that was flagged at an unexpected high rate. This
-> leaves the LPI RX Exit Interrupt as the most likely culprit.
-> 
-> The reference manual doesn't clearly indicate what the interrupt signal
-> is, but from its name we can reasonably infer that it would be connected
-> to the EQOS lpi_intr_o output. That interrupt is cleared when reading
-> the LPI control/status register. However, its deassertion is synchronous
-> to the RX clock domain, so it will take time to clear. It appears that
-> it could even fail to clear at all, as in the following sequence of
-> events:
-> 
-> - When the PHY exits LPI mode, it restarts generating the RX clock
->   (clk_rx_i input signal to the GMAC).
-> - The MAC detects exit from LPI, and asserts lpi_intr_o. This triggers
->   the ENET_EQOS interrupt.
-> - Before the CPU has time to process the interrupt, the PHY enters LPI
->   mode again, and stops generating the RX clock.
-> - The CPU processes the interrupt and reads the GMAC4_LPI_CTRL_STATUS
->   registers. This does not clear lpi_intr_o as there's no clk_rx_i.
-> 
-> The ENET_EQOS interrupt will keep firing until the PHY resumes
-> generating the RX clock when it eventually exits LPI mode again.
-> 
-> As LPI exit is reported by the LPIIS bit in GMAC_INT_STATUS, the
-> lpi_intr_o signal may not have been meant to be wired to a CPU
-> interrupt. It can't be masked in GMAC registers, and OR'ing it to the
-> other GMAC interrupt signals seems to be a design mistake as it makes it
-> impossible to selectively mask the interrupt in the GIC either.
-> 
-> Setting the STMMAC_FLAG_RX_CLK_RUNS_IN_LPI platform data flag gets rid
-> of the interrupt storm, which confirms the above theory.
-> 
-> The i.MX8DXL and i.MX93, which also integrate an EQOS, may also be
-> affected, as hinted by the eee-broken-1000t property being set in the
-> i.MX8DXL EVK and the i.MX93 Variscite SoM device trees. The reference
-> manual of the i.MX93 indicates that the ENET_EQOS interrupt also OR's
-> the "ENET QOS TSN LPI RX exit Interrupt", while the i.MX8DXL reference
-> manual doesn't provide details about the ENET_EQOS interrupt.
-> 
-> Additional testing is needed with the i.MX8DXL and i.MX93, so for now
-> set the flag for the i.MX8MP only. The eee-broken-1000t property could
-> possibly be removed from some of the i.MX8MP device trees, but that also
-> require per-board testing.
-> 
-> Suggested-by: Russell King <linux@armlinux.org.uk>
-> Signed-off-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> Cc: stable@vger.kernel.org
+> Fixes: 9afaf0eec2ab ("net: dsa: microchip: Refactor MDIO handling for side MDIO access")
+> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
 > ---
-> I have CC'ed authors and maintainers of the i.MX8DXL, i.MX8MP and i.MX93
-> device trees that set the eee-broken-1000t property for awareness. To
-> test if the property can be dropped, you will need to
+>  drivers/net/dsa/microchip/ksz_common.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 > 
-> - Connect the EQOS interface to an EEE-enabled peer with a 1000T link.
-> - Drop the eee-broken-1000t property from the device tree.
-> - Boot the board and check with `ethtool --show-eee` that EEE is active.
-> - Check the number of interrupts received from the EQOS in
->   /proc/interrupts. After boot on my system (with an NFS root) I have
->   ~6000 interrupts when no interrupt storm occurs, and hundreds of
->   thousands otherwise.
-> - Apply this patch and check that EEE works as expected without any
->   interrupt storm. For i.MX8DXL and i.MX93, you will need to set the
->   STMMAC_FLAG_RX_CLK_RUNS_IN_LPI in the corresponding imx_dwmac_ops
->   instances in drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c.
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> index 933ae8dc6337..49c0420a6df8 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -2795,6 +2795,11 @@ static int ksz_mdio_register(struct ksz_device *dev)
+>  	}
+>  
+>  put_mdio_node:
+> +	if (ret && dev->parent_mdio_bus) {
+> +		put_device(&dev->parent_mdio_bus->dev);
+> +		dev->parent_mdio_bus = NULL;
+> +	}
+> +
+>  	of_node_put(mdio_np);
+>  	of_node_put(parent_bus_node);
+>  
+> @@ -3110,6 +3115,11 @@ static void ksz_teardown(struct dsa_switch *ds)
+>  		ksz_irq_free(&dev->girq);
+>  	}
+>  
+> +	if (dev->parent_mdio_bus) {
+> +		put_device(&dev->parent_mdio_bus->dev);
+> +		dev->parent_mdio_bus = NULL;
+> +	}
+> +
+>  	if (dev->dev_ops->teardown)
+>  		dev->dev_ops->teardown(ds);
+>  }
+> -- 
+> 2.17.1
+> 
 
-Hang on... also check 100M connections, as I indicated, the lpi_intr_o
-is slow to clear even when the receive clock is running (it takes for
-receive clock cycles - 160ns for 100M, 32ns for 1G.)
+Thank you for the patch.
 
-So, I suspect you still get a storm, but it's not as severe.
+I see 2 problems:
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+1. I'm not sure that releasing the reference to the parent_mdio_bus
+   device is compatible with devres, since the MDIO bus created by
+   ksz_mdio_register() will continue to exist after we release the
+   parent_mdio_bus reference. I think it would be better to remove
+   devres, introduce ksz_mdio_unregister(), and only release the
+   reference once our MDIO bus is unregistered.
+
+2. Error path handling is incomplete:
+
+	ret = ksz_mdio_register(dev);
+	if (ret < 0) {
+		dev_err(dev->dev, "failed to register the mdio");
+		goto out_ptp_clock_unregister;
+	}
+
+	ret = ksz_dcb_init(dev);
+	if (ret)
+		goto out_ptp_clock_unregister; // needs to call ksz_mdio_unregister()
 
