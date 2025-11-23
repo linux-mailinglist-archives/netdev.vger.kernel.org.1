@@ -1,214 +1,197 @@
-Return-Path: <netdev+bounces-241044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60B82C7DD6B
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 08:30:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92734C7DE70
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 09:48:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 72E3C351129
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 07:26:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42E2F3A99A4
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 08:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3CCB2D061A;
-	Sun, 23 Nov 2025 07:24:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0BF204F93;
+	Sun, 23 Nov 2025 08:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SDse8PdG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="l5u7xl+Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010053.outbound.protection.outlook.com [52.101.85.53])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B372D7DE1;
-	Sun, 23 Nov 2025 07:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763882694; cv=fail; b=GcBrShM5YEzroy27NnnUk+gtMzBw26PPKI05JIBIFtuytkM4q4xTLgkzRgLYmScRxyVWkbZSewxEcVHu0cAlP2NMDVXb6M6WV1bZfHsX8FLexaCTxIuO2VoD45peoVGdKNBR35tGsddNiKbYSlrZGVGkontAk/Mk5Bn6mQIwODc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763882694; c=relaxed/simple;
-	bh=akdES0X+iKGn4rltOupcPwz7Jf/mU/JyeskXjIgx3P4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eRdf8yaN9ky/k55qF0aFMLJ+YDJthO3qZHFiQmqWylkPzjSDEG0X+KTM/gmv5D6D/v+kC+7hHPln4D3j4Bnpr1uWCJyBO1DEVcJicrPic8TP8l9pJQb4oE1OgDWxLlwHVtuWhX2/QLcAwhtRSpXxbxWhxKWp9t4U02s+WUbzZlo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SDse8PdG; arc=fail smtp.client-ip=52.101.85.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k4wyaR4b6RXQaVd4skX/i3ocXQDdyUmOevS11VJmOias4+BKobZisjqVC9/D8ki05i1W2HZdZopjWfcmO/wkH+oZ7QBEijsPyjcyhQTeY6mQgeVM0hsTFY7bQv/I0MFtzX5VUtCEzf7KwHjzt/RjFMFEF1OZbzVlq4kHz6u2dnCiZsMroJQEHzNHXNI2iKe/hJyjvKor498tLO1TY7KJ1StQDMUIgNi3CM2YimNp1iQPp9gsXYoS4WH+rUHtrwmG/qS1s/g8R5fKBaMHDDWPivtz3+QqVTPfqfXVJOS+JEqU54Nqo29yhoJbMqXluCVfbygxaT3FwyyRY1HTUL8Z1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CTEHFT1VQ+M5GMuB3KgAYIkobtSsghZZ7vtK9OdaRq4=;
- b=En9rH51cN3BOvyDJvcKFxQbCCtiyC4kUrhUAnDb4RKhedEENDiUY4FeT912OTejcynMEL5yP+PHqMwSqVf7vikCru+Nm5U79JqCFxj4/Hmsng9q/EBhmVjvNThUlG9pEBBB3hndTjjvJl0JWNUAWbotPd9nNkpfpHBSPU1ihkHsXP7W2MxgvcyhiquMJdMC3uPcYWYxEEvTQxPkQPXjaOmmSpPl6DVpIWvRjuq0JK/a+a9OSZReWLVTQHHMepOj6wN1MCuN7hxRTul+M/InmQhmHiaI1jRQAVzxYBAFo1n1/ru0HEo3zb8+hLOwXC8wgbVwbPm28sebpaUkkkmoKGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CTEHFT1VQ+M5GMuB3KgAYIkobtSsghZZ7vtK9OdaRq4=;
- b=SDse8PdGEVr0Y/KUwfcyLfXq7mnmZSnCbB3t7ZLt9q53w6w5V/UZIjzV9anZbnrmVVwvDDMV4VhcFlG3y6Ng0jEU/QRJyLwBw2bdZSsryghAqWgdVvfbz+HKDtNgOZZrKEbrC4ANuIIcizs/2JNKoMvZRVOD0jVflVzrA1n8z0PHtloi1xkwS7NMhzx5KcgIqTgOVVpxL40mceY6CYiWLRNwoz6Adj9xuK/4ZuxlwCySCwmOCerDJF+07+OaOS/TXb+m4haWdtyHhg/BVu7ZME1bDo2I7wLgPyGlFqWQqH5Tt+N2LVUz8/0n7Jsf113v8nhrtP98wdrmVDI+6WIFCA==
-Received: from SA9PR11CA0001.namprd11.prod.outlook.com (2603:10b6:806:6e::6)
- by LV8PR12MB9333.namprd12.prod.outlook.com (2603:10b6:408:1fa::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.15; Sun, 23 Nov
- 2025 07:24:48 +0000
-Received: from SN1PEPF000397B2.namprd05.prod.outlook.com
- (2603:10b6:806:6e:cafe::42) by SA9PR11CA0001.outlook.office365.com
- (2603:10b6:806:6e::6) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.15 via Frontend Transport; Sun,
- 23 Nov 2025 07:24:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF000397B2.mail.protection.outlook.com (10.167.248.56) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9366.7 via Frontend Transport; Sun, 23 Nov 2025 07:24:48 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 22 Nov
- 2025 23:24:39 -0800
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sat, 22 Nov
- 2025 23:24:38 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Sat, 22
- Nov 2025 23:24:32 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, "Leon
- Romanovsky" <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
-	<mbloch@nvidia.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe Shemesh
-	<moshe@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu
-	<cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next V2 14/14] net/mlx5: Document devlink rates
-Date: Sun, 23 Nov 2025 09:23:00 +0200
-Message-ID: <1763882580-1295213-15-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
-In-Reply-To: <1763882580-1295213-1-git-send-email-tariqt@nvidia.com>
-References: <1763882580-1295213-1-git-send-email-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F4113AF2
+	for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 08:47:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763887683; cv=none; b=jilBp+8UJBOEPNOjHH4YSoqEycxKCHsV+WsVlFtZhHeibqlQethA4ACgPczKvDEzEpTkgRx7jHpHX1vfFX9lFbwJEr5t94FRBCjW6HOLfxxvCL3h8f7xJ27C6UADmx35eg/IWxj1a31yCFEKkIeExDm6GSbVLQJIyNBgC97zKTU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763887683; c=relaxed/simple;
+	bh=h4SQyosY1eGTJ/rRlYmy3ASX2LGqAIsKmFB9HLfnu+o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wxqn+xiEKRF2CHTk2arIcgG0LRJ1qNgpPtr53IQAz0WwnP+HeMgoOVPPm8VgW2ViKh7gV4lNgJ08ZNfTI7/YuRssW/L84XqYNccXA0M1/l8e1Viejw7lhC5Ide3ZcIm3lN8z8dHHd1OG8OEb1IjBG3fium5AFAGoJb+enFiFi7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=l5u7xl+Y; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=5w9TBs6f6PMZqeUvDfvd2Z0K+crtpRu8aQyOxCYaiZg=; b=l5u7xl+Yu9iPwjJFyG0AppFlU4
+	6j18KQ4AwQbDMUxqx84liBAXmoa0/rR6HkMtEHcwJuudnDIvsqlzWtX44F7tAi33rbWaGKs6YBwT5
+	qWYuPmwZDoKSAIwbOs9HtOYUy0tQNEn+N7GjJE26bPRDR3drhvvASoQ6NI00WACObGKyne8ttAxer
+	vsMlujQasbu2PlG7uAoxpE8M+kCWyw0zO5Wy7036XiaqlPa9zGMxo12Qb2anYU88wDd8JmptbUcpr
+	xFJyN3pNn/pMFtLUlh4Y17jt1e6wGu4OoLD2rFTjW+4Niem1D2Ctea1X3Y7JMHJWN+j++nAiM+2XZ
+	w2pdvC2A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58278)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vN5l5-000000000kk-0c8N;
+	Sun, 23 Nov 2025 08:47:47 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vN5l0-0000000079D-0EuB;
+	Sun, 23 Nov 2025 08:47:42 +0000
+Date: Sun, 23 Nov 2025 08:47:41 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: netdev@vger.kernel.org, imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Kieran Bingham <kieran.bingham@ideasonboard.com>,
+	Stefan Klug <stefan.klug@ideasonboard.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@denx.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Frank Li <Frank.Li@nxp.com>, Heiko Schocher <hs@denx.de>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Joakim Zhang <qiangqing.zhang@nxp.com>, Joy Zou <joy.zou@nxp.com>,
+	Marcel Ziswiler <marcel.ziswiler@toradex.com>,
+	Marco Felsch <m.felsch@pengutronix.de>,
+	Martyn Welch <martyn.welch@collabora.com>,
+	Mathieu Othacehe <othacehe@gnu.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Richard Hu <richard.hu@technexion.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Stefano Radaelli <stefano.radaelli21@gmail.com>,
+	Wei Fang <wei.fang@nxp.com>,
+	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
+Subject: Re: [PATCH] net: stmmac: imx: Do not stop RX_CLK in Rx LPI state for
+ i.MX8MP
+Message-ID: <aSLKLYuz0WA2LpFF@shell.armlinux.org.uk>
+References: <20251123053518.8478-1-laurent.pinchart@ideasonboard.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000397B2:EE_|LV8PR12MB9333:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5c57bc89-6e17-4bc6-60e3-08de2a616268
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?uqQUtUSgk+0jaaPaN9/rXpgKx3aFHkGMoqlq9gOyjMi1ASwwI4oEWkBLIyvY?=
- =?us-ascii?Q?uU+n1edqbWTD19bBFfHaB1wqQRGAx51D/e7SHhdoN0jENWgW3R8HLOz64pwb?=
- =?us-ascii?Q?QftRiG7fu05S1eFeeZIuLuN6QFxsj6gzF10vYkdBTRPtf4ljvTdcWXu8e5WE?=
- =?us-ascii?Q?B2TTkqf4EN6g921rlYFajNM7p035L/JjfEIZCcpYPvUJ/HoeE4qfH51OMGiO?=
- =?us-ascii?Q?4ZabWJp7pOSFyGdGpgOsQMFqjc733lfUqJeEMFhFqCup+1ll7DsUpboLGiJA?=
- =?us-ascii?Q?A5lWQrhKLIqv4Qd2iDwN9n3QWhpzoogR+iJlbDeAmt0My0c1Q5DR36BkSNoV?=
- =?us-ascii?Q?/LkrhvE8uWi1/vOHzShg+KujkvcTrG8aF3bAPBmwsP6bPm7thJSCJgeIPdJH?=
- =?us-ascii?Q?JaS3cKoxtsocayfnnIXdRxFDQBHFNseJQRbKvjq13opjLjcPms6alLFfnb7D?=
- =?us-ascii?Q?HksUEq/D6HMOKXy8ifIKc2aYvLbyWb/IRjtWyBryg1E3mzqtmfo4hY0fEv24?=
- =?us-ascii?Q?W99wu7a7UX4qeviarf+KM09ax72k6nI8hUXU3sQx5TmNTKLCjnYOpAGIZA6S?=
- =?us-ascii?Q?c6kkdmBkWiis0N+XzLCFNw6t+Ip3A4IqvNX4p4rJA8HT6rHzc1PJum4OwBuh?=
- =?us-ascii?Q?cbnpY9RdP8mvz9bEKmhkBVp58cEtZB7vfepxmNWoYyo8GMlSpPj3L2/nvypz?=
- =?us-ascii?Q?DGEaAI86SUJoZQ9HPvczwLGtpNkLhuIG+lAuo0g4/c2FB8K2l7UBYDTRCUfI?=
- =?us-ascii?Q?W2vw1YYEdIWCmO3wl9TRWumvZv2Z8JpxjX+JAdfmWTNhW1GqwXlMV8BUAPXk?=
- =?us-ascii?Q?/QQDXJF/UEreNRFLcyv4wjsDsMRY/n/IIm/HIip5G9IpUl1OyPRuVp0sFzCT?=
- =?us-ascii?Q?lRFwQB9iONm1eKxzwyaAO5xaeg0tq7dtP1Topd9trmZTHKQ3oKqmj6PJEpuJ?=
- =?us-ascii?Q?Qol6Jgjwij4VxkKlBHmg4nolbC51pHx6wj8P2y8P1cyVRTp6frWfytbm7vXj?=
- =?us-ascii?Q?lPnXYCxWMCLdUhaKwCHEeVOkXCVsAivezVsaMxwNIpjkfsG328fbi0aeOA/m?=
- =?us-ascii?Q?0FFeLVxj4vjqErXOfeIHgpI89Q86lS0SnU+9xngu8Or/ALxLQ2DBVYQB+OOx?=
- =?us-ascii?Q?LsuuIHrO4vdkhHiam8ROeOCtEQ5UD5wdeVcv9eriy6LsCibrIP5ntke4+mZN?=
- =?us-ascii?Q?TaT7Vr8VuTJRz/vfKN61c2Nt6oBzxX1b2kPfL2rlB7OUzTgftJ4GxzV5JeMz?=
- =?us-ascii?Q?BbxLJUQK38vrLKuGGLimVA+kPLtGcCnr8pKOlVUb2ihTqe8ZRitSWAUIQI8m?=
- =?us-ascii?Q?dxCoNq3A/6LEvvH9VijPj0GJImNsDRDUBY433tMRTWbhcQAPqntRQuz5ErdY?=
- =?us-ascii?Q?SdljXUUcPqAkcRFv43PyRPor1YEW53YvYDJ66+Yomkr4SDFdWE9iCMVsylfz?=
- =?us-ascii?Q?CyD7ednZpSdNEhMfRZRp6gcCPaUxDG+W0y5MW0TKgptxOs5bKX6aKoBa54S6?=
- =?us-ascii?Q?/P8snJfac5hlN09FQ2I1PSHjnyP8h88EYwvXUrnqU6nraX3iG/3qMnIby1DD?=
- =?us-ascii?Q?jzDdKbKKrjCPBJR6rB4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Nov 2025 07:24:48.2764
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5c57bc89-6e17-4bc6-60e3-08de2a616268
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000397B2.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9333
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251123053518.8478-1-laurent.pinchart@ideasonboard.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Cosmin Ratiu <cratiu@nvidia.com>
+On Sun, Nov 23, 2025 at 02:35:18PM +0900, Laurent Pinchart wrote:
+> The i.MX8MP-based Debix Model A board experiences an interrupt storm
+> on the ENET_EQOS IRQ (135) when connected to an EEE-enabled peer.
+> 
+> Setting the eee-broken-1000t DT property in the PHY node solves the
+> problem, which confirms that the issue is related to EEE. Device trees
+> for 8 boards in the mainline kernel, including the i.MX8MP EVK, set the
+> property, which indicates the issue is likely not limited to the Debix
+> board, although some of those device trees may have blindly copied the
+> property from the EVK.
+> 
+> The IRQ is documented in the reference manual as the logical OR of 4
+> signals:
+> 
+> - ENET QOS TSN LPI RX Exit Interrupt
+> - ENET QOS TSN Host System Interrupt
+> - ENET QOS TSN Host System RX Channel Interrupts, Logical OR of
+>   channels[4:0]
+> - ENET QOS TSN Host System TX Channel Interrupts, Logical OR of
+>   channels[4:0]
+> 
+> Debugging the issue showed no unmasked interrupt sources from the Host
+> System Interrupt (GMAC_INT_STATUS), Host System RX Channel Interrupts or
+> Host System TX Channel Interrupts (MTL_INT_STATUS, MTL_CHAN_INT_CTRL and
+> DMA_CHAN_STATUS) that was flagged at an unexpected high rate. This
+> leaves the LPI RX Exit Interrupt as the most likely culprit.
+> 
+> The reference manual doesn't clearly indicate what the interrupt signal
+> is, but from its name we can reasonably infer that it would be connected
+> to the EQOS lpi_intr_o output. That interrupt is cleared when reading
+> the LPI control/status register. However, its deassertion is synchronous
+> to the RX clock domain, so it will take time to clear. It appears that
+> it could even fail to clear at all, as in the following sequence of
+> events:
+> 
+> - When the PHY exits LPI mode, it restarts generating the RX clock
+>   (clk_rx_i input signal to the GMAC).
+> - The MAC detects exit from LPI, and asserts lpi_intr_o. This triggers
+>   the ENET_EQOS interrupt.
+> - Before the CPU has time to process the interrupt, the PHY enters LPI
+>   mode again, and stops generating the RX clock.
+> - The CPU processes the interrupt and reads the GMAC4_LPI_CTRL_STATUS
+>   registers. This does not clear lpi_intr_o as there's no clk_rx_i.
+> 
+> The ENET_EQOS interrupt will keep firing until the PHY resumes
+> generating the RX clock when it eventually exits LPI mode again.
+> 
+> As LPI exit is reported by the LPIIS bit in GMAC_INT_STATUS, the
+> lpi_intr_o signal may not have been meant to be wired to a CPU
+> interrupt. It can't be masked in GMAC registers, and OR'ing it to the
+> other GMAC interrupt signals seems to be a design mistake as it makes it
+> impossible to selectively mask the interrupt in the GIC either.
+> 
+> Setting the STMMAC_FLAG_RX_CLK_RUNS_IN_LPI platform data flag gets rid
+> of the interrupt storm, which confirms the above theory.
+> 
+> The i.MX8DXL and i.MX93, which also integrate an EQOS, may also be
+> affected, as hinted by the eee-broken-1000t property being set in the
+> i.MX8DXL EVK and the i.MX93 Variscite SoM device trees. The reference
+> manual of the i.MX93 indicates that the ENET_EQOS interrupt also OR's
+> the "ENET QOS TSN LPI RX exit Interrupt", while the i.MX8DXL reference
+> manual doesn't provide details about the ENET_EQOS interrupt.
+> 
+> Additional testing is needed with the i.MX8DXL and i.MX93, so for now
+> set the flag for the i.MX8MP only. The eee-broken-1000t property could
+> possibly be removed from some of the i.MX8MP device trees, but that also
+> require per-board testing.
+> 
+> Suggested-by: Russell King <linux@armlinux.org.uk>
+> Signed-off-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> ---
+> I have CC'ed authors and maintainers of the i.MX8DXL, i.MX8MP and i.MX93
+> device trees that set the eee-broken-1000t property for awareness. To
+> test if the property can be dropped, you will need to
+> 
+> - Connect the EQOS interface to an EEE-enabled peer with a 1000T link.
+> - Drop the eee-broken-1000t property from the device tree.
+> - Boot the board and check with `ethtool --show-eee` that EEE is active.
+> - Check the number of interrupts received from the EQOS in
+>   /proc/interrupts. After boot on my system (with an NFS root) I have
+>   ~6000 interrupts when no interrupt storm occurs, and hundreds of
+>   thousands otherwise.
+> - Apply this patch and check that EEE works as expected without any
+>   interrupt storm. For i.MX8DXL and i.MX93, you will need to set the
+>   STMMAC_FLAG_RX_CLK_RUNS_IN_LPI in the corresponding imx_dwmac_ops
+>   instances in drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c.
 
-It seems rates were not documented in the mlx5-specific file, so add
-examples on how to limit VFs and groups and also provide an example of
-the intended way to achieve cross-esw scheduling.
+Hang on... also check 100M connections, as I indicated, the lpi_intr_o
+is slow to clear even when the receive clock is running (it takes for
+receive clock cycles - 160ns for 100M, 32ns for 1G.)
 
-Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- Documentation/networking/devlink/mlx5.rst | 33 +++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+So, I suspect you still get a storm, but it's not as severe.
 
-diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
-index 4bba4d780a4a..62c4d7bf0877 100644
---- a/Documentation/networking/devlink/mlx5.rst
-+++ b/Documentation/networking/devlink/mlx5.rst
-@@ -419,3 +419,36 @@ User commands examples:
- 
- .. note::
-    This command can run over all interfaces such as PF/VF and representor ports.
-+
-+Rates
-+=====
-+
-+mlx5 devices can limit transmission of individual VFs or a group of them via
-+the devlink-rate API in switchdev mode.
-+
-+User commands examples:
-+
-+- Print the existing rates::
-+
-+    $ devlink port function rate show
-+
-+- Set a max tx limit on traffic from VF0::
-+
-+    $ devlink port function rate set pci/0000:82:00.0/1 tx_max 10Gbit
-+
-+- Create a rate group with a max tx limit and adding two VFs to it::
-+
-+    $ devlink port function rate add pci/0000:82:00.0/group1 tx_max 10Gbit
-+    $ devlink port function rate set pci/0000:82:00.0/1 parent group1
-+    $ devlink port function rate set pci/0000:82:00.0/2 parent group1
-+
-+- Same scenario, with a min guarantee of 20% of the bandwidth for the first VFs::
-+
-+    $ devlink port function rate add pci/0000:82:00.0/group1 tx_max 10Gbit
-+    $ devlink port function rate set pci/0000:82:00.0/1 parent group1 tx_share 2Gbit
-+    $ devlink port function rate set pci/0000:82:00.0/2 parent group1
-+
-+- Cross-device scheduling::
-+
-+    $ devlink port function rate add pci/0000:82:00.0/group1 tx_max 10Gbit
-+    $ devlink port function rate set pci/0000:82:00.1/32769 parent pci/0000:82:00.0/group1
 -- 
-2.31.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
