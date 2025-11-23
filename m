@@ -1,79 +1,132 @@
-Return-Path: <netdev+bounces-241054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E9A9C7E37B
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 17:26:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AC03C7E384
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 17:26:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BD7C64E1109
-	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 16:26:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 717C63A8807
+	for <lists+netdev@lfdr.de>; Sun, 23 Nov 2025 16:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C609A2C3272;
-	Sun, 23 Nov 2025 16:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEAF2D3218;
+	Sun, 23 Nov 2025 16:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kO6AroMu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SNIIDiP8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0A21096F;
-	Sun, 23 Nov 2025 16:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A022C3272
+	for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 16:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763915164; cv=none; b=ovBIVoqdwo2LsHcEryuIe8xzAYmNe4ICl0htnYyrdVa0T5pxB3JOtC1XgG4wKBqxgA65ETiWUopBlIEY0CH2XqouCQ96SFQYIH08QuSgVZG/Wzo+BQ2oJ6u02W9o0QboCnGp3vsSGHNqtOCKhhyUoeaHs2HEQXWVLaG1Mauo9Ro=
+	t=1763915205; cv=none; b=pZQj6vuftjt5nr9miGxnSbacN+kC3dqQp2EIOuStscg3f6dSL4KpEB3Fa1DaRYPBGghMOgxOoZfmYQNKTtoFCgq4czkr7S+yPkdc0blQxnOjtd22k2uTTmveiJKVID4HJ+ZveYrwovtEs2AEqUqa4IHyCPxzbREfz8HzdAGUeoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763915164; c=relaxed/simple;
-	bh=IpypDbETTmlOiIImLrwJORIbNMHAYctmL/8ZP3CQDt0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sCslcwe5qMOwhP9/U7H8Yh0P5oIiVIjHmZVUnksZkmONK2Rdgm7RkiVGpzHXOLL15421eVWlGpZinTUOjIC2SILGlyfhHs/wxjpDCNlzKeCsl/sL7yuBi8AW2i3zrtq9jdY5FTtNZ2Jhs6G7CHNvl3KOAn9Waxf10s5ZstGeYkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kO6AroMu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36F1FC113D0;
-	Sun, 23 Nov 2025 16:26:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763915163;
-	bh=IpypDbETTmlOiIImLrwJORIbNMHAYctmL/8ZP3CQDt0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kO6AroMuEmP/rEciBJx/zMeN8pCllhvUzUIDV9MGzHKO5xF9wr8TX4LMYz8gJG/yM
-	 hp6PgcrXzEjgnVzXDzdtdZ/04ongMoSSzYjRm+sx/mx8Q6KJk1eXjWNQ7V6StgYOYo
-	 YuEwJ6YuNqRwVKUpxKWk8WmZRzdRUv/nrRWBUHXgVtYN6UGJnmEu6YuVlUbvn1Hqgb
-	 bkdU7BG5BiX76O3neRksceyqpizrIto9Js61L5tQM0kG+O7RKzSqeQ4q4pizmxURfI
-	 7iBfSfor3Y0lXFMTKcp10zL+Y/35DLXvGY+DpP6A5JKf7rpsDVefeN3gf56nuDa7h1
-	 l5ofUhCyrpMeQ==
-Date: Sun, 23 Nov 2025 08:26:01 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed
- <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Mark Bloch
- <mbloch@nvidia.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <linux-rdma@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Moshe Shemesh
- <moshe@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu
- <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next V2 00/14] devlink and mlx5: Support
- cross-function rate scheduling
-Message-ID: <20251123082601.04bf8043@kernel.org>
-In-Reply-To: <1763882580-1295213-1-git-send-email-tariqt@nvidia.com>
-References: <1763882580-1295213-1-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1763915205; c=relaxed/simple;
+	bh=JqqkbPPOMTGL7UZFdxUpPrXHPq5mMtVOVKmvQnQXf1Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XChZTOUf/jyMP6zFiFtw6r6ILgkaK8MLxUD12CzmGw4xOvE6ZH6LrZ/z3UgQNfiigj8ZfGedlIYCUpicxtsHJ8PedLcjGNAz5rbjZ3gAvhNAMOwyl2kIlEfDUoDhIG8Clk9VqqBLMSj76mvEhFZ7x2G37YY7mHoxwdWeWicpkRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SNIIDiP8; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-786943affbaso25327847b3.0
+        for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 08:26:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763915202; x=1764520002; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=/yEak0/VhIVcITIVmPRu+n2pxJ6V2Ej3mVS7RKEQmPI=;
+        b=SNIIDiP8FSn87febVoRvIEQGBMJB5GhjzTmU+D3FiPhMG3y4ShsoTTMdgV0sr6evsp
+         htoDB9MXvdCucQkjwLYDUkCOkhP2Q7MNY/xvM5qxX4gExO6Zzh7FJx565Tg1jbPGxmRC
+         56AVwN7bzhR+DvAJhwTGABO+towGGeuDjBBBURnE/ZAJOqn4V4VZLjpqQ9MDavDGO1Qf
+         IMl5p0JtkH5RdRpyeR0+K2rgv/aNOvCzXTmr8WINvWbzETrIPkg9uPzY36EbfzURe059
+         6d+qxVTnPe7CgYTIFVBsSn7OS+tTaIqm//rRzXtpxYpSX05mQHjNNN8swuwHR4owv77z
+         Jjqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763915202; x=1764520002;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/yEak0/VhIVcITIVmPRu+n2pxJ6V2Ej3mVS7RKEQmPI=;
+        b=vk5D5sIgXXYkmtimViFybFsKkyTDuO1PB2zDT7Bc7k36gM2fHXdmn7f2x78etsKy16
+         dfMUFoHM67gYh9m5sCPNlb0BFko0KA2yyI2DCY4w2UDDMvPUhIWgWuK/uvrNFixQ+vYS
+         77Q2WuaR8gpSamvDZIIU8a5FNaPYT1mU8Ezw2qi3ewpwNLoTaIED5e6NKxmP987QYqlb
+         Fq4V47fgCHMlcJTF354PQcwn9k+dmAVz4fXWEE+MX5q54wUo2+3CBh3coqcFYVIsXdOh
+         OCAzYXgEuIWYZPzMc9+TSrwQryfV3+wmEVZDEHQsw4oHO2dkuo7LTOQZhOFodjXYWwTd
+         oIjg==
+X-Forwarded-Encrypted: i=1; AJvYcCVzUn15Jzr3zPmxM5U+cMtITmweKkPwV9uG4FdRMiuPeyINfVM0kBbbjufKMqDN7AAhbgoeSAg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwaCL6C79lA6mlHfogawlqsWZ4Ugp3uao8t6JOEJNi4VQMr/D8
+	nAmXjmNDLpEPW00Bfp+qllCZQjORD8AgRKNcvPWB3jONtnmWqVGRWKjbO6CV0I1lUM17oQ0i/mv
+	UXDQyA3uY0REAwVSuAM7nAPWG7ZWJhcM=
+X-Gm-Gg: ASbGncvQRIEBY6xRLSkCJiago074B/KCMQFw6gh3juxbjjWfZOrTV4tXCWP1YqflGrG
+	D8kRqg2Ci6KCSB2eNNg6zb2kDGp4D6LS8qfLCaiU5vf3ukHeB/G1EIppD5L4/1FCxsNUw5cnX5c
+	suxqS3GzHdJDT9DcxF7zSiNfJu2iSmOJcHDt6BHZEOh45VwN5MvrMgx8BIZHUYiD4TNF/sVfqSh
+	Q86vLsYFTW4zM9RLwJuFnOyXwc2NQJ/Crad8BqblZfQXJAtapz2yM0r0IcwTbaABtrMuiZZyIX0
+	JPZYgtZPEH4CoRGvyxpqsN4PgfU=
+X-Google-Smtp-Source: AGHT+IF0L7jy0r/zGjcxwan3uQk1Q16wBySTMX2Viw4qC0rxSKQ1Elz0YswWZYmqPDDa2e5IKa3k1qB/6/WMBEE6cE4=
+X-Received: by 2002:a05:690c:fce:b0:787:ffc0:40c7 with SMTP id
+ 00721157ae682-78a8b576c0cmr66318837b3.68.1763915202429; Sun, 23 Nov 2025
+ 08:26:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20251120195055.3127-1-fabio.baltieri@gmail.com>
+ <f263daf0-70c2-46c2-af25-653ff3179cb0@gmail.com> <aSDLYiBftMR9ArUI@google.com>
+ <b012587a-2c38-4597-9af9-3ba723ba6cba@gmail.com>
+In-Reply-To: <b012587a-2c38-4597-9af9-3ba723ba6cba@gmail.com>
+From: Michael Zimmermann <sigmaepsilon92@gmail.com>
+Date: Sun, 23 Nov 2025 17:26:31 +0100
+X-Gm-Features: AWmQ_bnmXFXnZk3E-9ArMUzkwcxSpAiF99kueXp6ClNTv-q45ZUQk9s7lDIgVpA
+Message-ID: <CAN9vWDLGSDQQMPBVesOwAR3vvPko+ZG-eyxrL96OUM=1J05Ojg@mail.gmail.com>
+Subject: Re: [PATCH v2] r8169: add support for RTL8127ATF
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Fabio Baltieri <fabio.baltieri@gmail.com>, nic_swsd@realtek.com, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, 23 Nov 2025 09:22:46 +0200 Tariq Toukan wrote:
-> This series by Cosmin and Jiri adds support for cross-function rate
-> scheduling in devlink and mlx5.
+> +       }, {
+> +               PHY_ID_MATCH_EXACT(0x001ccbff),
+> +               .name           = "Realtek SFP PHY Mode",
+> +               .flags          = PHY_IS_INTERNAL,
+> +               .probe          = rtl822x_probe,
+> +               .get_features   = rtlgen_sfp_get_features,
+> +               .config_aneg    = rtlgen_sfp_config_aneg,
+> +               .read_status    = rtl822x_read_status,
+> +               .suspend        = genphy_suspend,
+> +               .resume         = rtlgen_resume,
+> +               .read_page      = rtl821x_read_page,
+> +               .write_page     = rtl821x_write_page,
+> +               .read_mmd       = rtl822x_read_mmd,
+> +               .write_mmd      = rtl822x_write_mmd,
 
-networking/devlink/index.rst:55: WARNING: duplicated entry found in toctree: networking/devlink/devlink-linecard
-networking/devlink/index.rst:55: WARNING: duplicated entry found in toctree: networking/devlink/devlink-eswitch-attr
--- 
-pw-bot: cr
+I didn't get a chance to test your patch, yet, but is this intended to
+match RTL8127AF? Because that's not it's phy id. It's the same as
+RTL_8261C and currently matches "Realtek Internal NBASE-T PHY":
+
+# cat /proc/self/net/r8127/enp8s0/debug/eth_phy
+
+Dump Ethernet PHY
+
+Offset  Value
+------  -----
+
+####################page 0##################
+
+0x00:   0040 798d 001c c890 1c01 0000 0064 2001
+0x08:   0000 0000 0000 0000 0000 0000 0000 2000
+####################extra reg##################
+
+0xa400: 0040 798d 001c c890 1c01 0000 0064 2001
+0xa410: 0000 0000 0000
+0xa434: 0a0c
+0xa5d0: 0000 0000 0001 4000
+0xa61a: 0400
+0xa6d0: 0000 0000 0000
 
