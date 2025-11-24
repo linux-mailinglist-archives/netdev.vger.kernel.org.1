@@ -1,59 +1,55 @@
-Return-Path: <netdev+bounces-241287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56B41C82580
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 20:51:57 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFD59C825AA
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 20:54:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 141433AE4DB
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:51:56 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6D4543425CD
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD18C32D42A;
-	Mon, 24 Nov 2025 19:51:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58F832C94D;
+	Mon, 24 Nov 2025 19:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t/pWjGPP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MkLYKsw/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B938632D0C0
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 19:51:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F2832C931
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 19:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764013906; cv=none; b=oaB/dim8a0debGuc3bh2v56n7+q7SR4l/PAslt5AfQzsE5l6uIOGt0QofBSSLvwxfxaOnJEkMZz3uKa3Dkqj/PvsV5IjfnQBeqQHuwtCDNrCF8bXN5aGLwJWNDLJopX8Zzx14dH06Bwxn1T7yNcObnZS6Kzjs1d3l3rQA1MheHU=
+	t=1764014032; cv=none; b=K/eP5jP4kJj5vzQbxUqseS9+03aywsnIYKtPhFUOLK4gibBuk3edy/BFX94dAImM0+e/wv3/dovineNI+p0o99XY2LsdCS6NaumaA1C2J4gL0petI8uqYDz+YTWvtO30QxOLr2btETMWY4AJ8sOqQkEVdoGBrik6YQ6bJ4RP64I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764013906; c=relaxed/simple;
-	bh=MYnjRhcGU93/edLNkMgYcrHuxocITcOkVUnH3Ba/ilQ=;
+	s=arc-20240116; t=1764014032; c=relaxed/simple;
+	bh=ygjCoJlzKYjnUIquD2gE26CzK05w0Am2PCQxK4dgOJw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GRTZmY2vcgK94A0pjO5f3kUr45S22LnoiDyjta1jJiR4YO4rlQ++/yiw4VNfKX44dUTJTm2tZMYWveB/baqn8wC/KMxVd6czo+tL8JgabN6tLROOjns8R1FYJ3qXldfQEP8FiazuqyNQPDY7hsF/rt7abKiWYhrw+KrZs5+3QnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t/pWjGPP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFAB1C4CEF1;
-	Mon, 24 Nov 2025 19:51:45 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ZV/SN0zppmcZnObqN0uUcZAc4Yd2IJ4t5HIr4AKoadJNW9CfAXQmGfnlSMa0K3lW5EtG4lb/JxHyFUcappVpvTZwIRZ+OmiHvygUG/b9dWFh1EcpLM8jg1uRRQCWU0yUug/q7vFRvxcs2ibdenewxER9HQVme7uA66WE+D33hpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MkLYKsw/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A094C4CEF1;
+	Mon, 24 Nov 2025 19:53:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764013906;
-	bh=MYnjRhcGU93/edLNkMgYcrHuxocITcOkVUnH3Ba/ilQ=;
+	s=k20201202; t=1764014032;
+	bh=ygjCoJlzKYjnUIquD2gE26CzK05w0Am2PCQxK4dgOJw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t/pWjGPPtk6JbVqGD8+FK1gi9mqY/Oxkw1vXacrJAugp9PHZctEbzlS6yJMl/7t6H
-	 lGPAMt+PT1Du/PIegjZiIhLYZp9X7dcJBZuuCk3WmP4uKkMkfIfU7K2h3UigWRZ12Z
-	 YdtMZqncbA+Ix/oduGoKxFKp6MbGr5pqfq43jf8G2F8vJuBz20NFaisD2fDFIYW/RK
-	 DwgWZfGSVUnxXC1huNMRaj6OE4wa8smAsIOh9r2wkhBabvyBmlMcWqQTii8/yMDW5l
-	 w3K1UCC7IugN9rtm4lDauC1ilZxdrBca07/AexUs6mDWCgslT8mFaHHl4iAo0U2k0/
-	 N6n51oz1iZ4TA==
-Date: Mon, 24 Nov 2025 11:51:45 -0800
+	b=MkLYKsw/cs8bJqxQu7rbZ0JQ4TLioK/iC8CjQwdHnbvqWBwYbf9GYMVRKu58DgBmb
+	 6dot+6qLjIDsG7E79rkZ4ZcfK3AbOdnjeycxdITubCoaS/3kpDu1pdybjg+FiJtI5c
+	 KHLqOFFTM9GxSrYPvvMzwmnqRoUY5XjNh3LDSqtRswO3YxgVrvw6XyVQ1PNQYQyx/2
+	 S2bKQcvtCnSZ3sOltPgnT/YPWV83LMNtYZAtIssi56QYfAcx4om67kUeUTzFUWUJJS
+	 sOy/0Zm3zYD4Nz687Eyln8eB3cgBF1p8AjD+nVzg7oqYTmCbTZ7zUmWQ8s8LZgZKGf
+	 e/GapcEXWgOwQ==
+Date: Mon, 24 Nov 2025 11:53:51 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v1 net-next 1/2] selftest: af_unix: Create its own
- .gitignore.
-Message-ID: <20251124115145.0e6bb004@kernel.org>
-In-Reply-To: <20251124194424.86160-2-kuniyu@google.com>
-References: <20251124194424.86160-1-kuniyu@google.com>
-	<20251124194424.86160-2-kuniyu@google.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [TEST] so_peek_off flakes on new NIPA systems
+Message-ID: <20251124115351.4af1f596@kernel.org>
+In-Reply-To: <CAAVpQUC85zujcLMFKFh_+FtvFWcuPLqJQm=Gv0-4HuXkZWjQwQ@mail.gmail.com>
+References: <20251124070722.1e828c53@kernel.org>
+	<CAAVpQUC85zujcLMFKFh_+FtvFWcuPLqJQm=Gv0-4HuXkZWjQwQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,42 +59,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 24 Nov 2025 19:43:33 +0000 Kuniyuki Iwashima wrote:
-> Somehow AF_UNIX tests have reused ../.gitignore,
-> but now NIPA warns about it.
+On Mon, 24 Nov 2025 11:04:02 -0800 Kuniyuki Iwashima wrote:
+> > So effectively we're been running some old copy of af_unix tests since
+> > this flag was added.  
 > 
-> Let's create .gitignore under af_unix/.
+> Yeah, apparently I no longer run tests on AL :p
 
-Thanks for following up!
+:)
 
-NIPA says it doesn't apply:
+> and this is not a problem now on Fedora, right ?
 
-error: patch failed: tools/testing/selftests/net/.gitignore:35
-error: tools/testing/selftests/net/.gitignore: patch does not apply
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
-
-Does it have a dependency in net or on the list?
-
-> new file mode 100644
-> index 000000000000..694bcb11695b
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/af_unix/.gitignore
-> @@ -0,0 +1,8 @@
-> +diag_uid
-> +msg_oob
-> +scm_inq
-> +scm_pidfd
-> +scm_rights
-> +so_peek_off
-> +unix_connect
-> +unix_connreset
-> \ No newline at end of file
-
-nit: missing new line
--- 
-pw-bot: cr
+Right, not a problem for us any more.
+I was just explaining why we're hitting it now.
 
