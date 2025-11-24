@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-241217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B0CDC81921
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:31:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB81C81933
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:32:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 155F04E7B39
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:30:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C9473AD8B9
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A5731960B;
-	Mon, 24 Nov 2025 16:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B813E31A7E2;
+	Mon, 24 Nov 2025 16:29:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="bNfjCNiL"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="AQQslhdQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D68A31961F
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 16:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA3231987E
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 16:29:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764001767; cv=none; b=kcHHJV4JwbcgIdgkd8qslCYABEnLpB2gENakZ5tY2se07/DwcAQzAidnWr9sZ+uY/iJ9avg2d57z8NZKMCGm6oNLHaxdn6cKpd9aAGPjEzi5vaUgaNOjkNteeq1r51PxxAn6kULWsjFYGiKHX8F/8RrlZEJH3EmZxO9rAVVk7TQ=
+	t=1764001768; cv=none; b=aDd/WYkQiVrOAQlu7igHsWowSedwBDZVVSTa6hYKHG5zkDMPZ73mQG1gDaFWt6ad4Z+XMl8GG+t0rgFGRo1lYRo0bUHZmY4nc1/l3KVmLadpQAuPWPajT4OaEasOIhw+RPYL5UBvA80s4yHhpytxL2DkhxuLUXX/6nPViCD5fnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764001767; c=relaxed/simple;
-	bh=M897/SDpxhoK9zXe71PrNl7kc+Jqcww+nJj/LVgAMpI=;
+	s=arc-20240116; t=1764001768; c=relaxed/simple;
+	bh=MU/ruSwdgu7ZTe+KLZ7rC3jj5LdE4ydA2vZkFq3JTy0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=AO5PiDm2l7s0belQPlQfVX7XWtkuJ0M5lgUlQpD1/vvTSc6cWSgDjv8M6FvkAHQYLsrA7csDjVQ65dvKTiL0jjED9LSW3V9ZsOsewZ1GZKigjmC+49d47Nf2ncQ8XKheH7p+u8ACmtKKoYglhDYsz5gEziRxkIyKRLCy2N17Cdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=bNfjCNiL; arc=none smtp.client-ip=209.85.208.46
+	 In-Reply-To:To:Cc; b=H0D8+QA7eYhUDqyiIBBKBgf2uyG87u+I/41ok/O5MmE6g+t9t/ZmIzOFcnK++2uMRTTq5mlprPYgWJjIdj/jJ5xAZumNFQ+pQjrEuXtRSiN/1I0OHZXKD++tgl9QiuHppYWaiflIH/pY5zrbyp1far7o/ZXIi82KLuKK2KEGgU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=AQQslhdQ; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-640a0812658so7277661a12.0
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 08:29:25 -0800 (PST)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b739ef3f739so274383866b.1
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 08:29:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1764001764; x=1764606564; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1764001765; x=1764606565; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=x1HORh6gjVh4LdU+FkfxFyRR2cSB+1/UIRPvTLOyuz0=;
-        b=bNfjCNiLt5jNHxsL7jyhggub/5hl/Cq6Zp7myr2wagMKy2+hs/0nSQRTOCHHZVFs4w
-         MkN2q6sTL28jgP3J1zrZ8p2N3E9fUn9dB0gzwIBgtFEeaQkpECYmHJDM2hH3VWstFcB5
-         7NZ8GZ3/hFevDOipWWqP7AiHd0IaitU2j/0P2tll8lOdWFgrjw52jDEwDHw+28gqA/fG
-         GYw+GVjb9by0HMczkqtHh5SOtcuffPEM5kt01eWAWOFLjgMSs+54HAey/pqiGbb3ZRwE
-         xprHngC1IliCGLuAtD9NlqumZ2ZjEL7qqnhKCSxB4H01DOs1kgxsg8sNZkjvGr+eZmkj
-         pW3Q==
+        bh=ENkvBstyOEdyNpek06avXaGXZm24i5NlmDUrQly8KrM=;
+        b=AQQslhdQtawxAhleI2i8Ub8kw+lc+qh8PBCHQs3FgNIebI7Uk5H8vYn9DmmQGTtN6n
+         QUFjPOVU9MWLRAWMdghvLOKahopZKU4pt7JGN6UT18MC/vmbHzZyW1CSijirF83mG0BS
+         l7JzSkT3Qqiafnt5hPhTu0D1W09aoxFTPU7M3JmT838Qs2xwBtyVEpIJPcj76BM+b93w
+         5PxN/CawakYfn/fJQa6EEKcn2rFVYf8xCUv8jtGcWgmPmfcj8wyVLBjXui8mEWgbOpae
+         D3t4BktI0ocjp7TJzUau8oZCna1qMnPW7yjB3FUBRsbxXuqhCwBmnK0MFanv+bIXeqv+
+         NeTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764001764; x=1764606564;
+        d=1e100.net; s=20230601; t=1764001765; x=1764606565;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=x1HORh6gjVh4LdU+FkfxFyRR2cSB+1/UIRPvTLOyuz0=;
-        b=p/xG8LpvhJGkBRsLRJ531kw0Ez+iQ1G0brSVhhgDwozd2GCeHr2tV8maiOKNKyfceD
-         9va2BQfqT1z4FveRX9xBX0w/jn+QE9G5dthSzRwYevTFv9Nb+FtS8dWeGl4ALIjE/6k+
-         8/N16gNgc82ItZ25XJ2ZrZbagxVY+2GOe8lzl/Wf5NYgRUYyxW42gLN+ff4HdiqjXBCs
-         cPxZYZHhowSPhfSXLXRlNQo6y1xvyKCWljbNFweXNaMORzJIlBqgwN3yonRZ0AypyUYt
-         vPOjGtfCNfm4//k2wPfMJmuApoRhfH2scjBBsR7wuQSSdU9iWfLYZSIWUFEReIF9+C5Y
-         MwVQ==
-X-Gm-Message-State: AOJu0YxNUGIOHwNj0wwGPCOW2vJMxsiJoXyVtfOYA4sG5WIKp8QWT0Yp
-	ZliiUBrGi4N5AXRDyFPXM81ctVOOMg+OZL/ZmnRsOOi2DUmJ3GxaBZ74aQ5URRz0knQ=
-X-Gm-Gg: ASbGncsixDmIa05xWS2bTsE9Q3Nn3e1/0cCGgGt/Jiy3QT+xhE68OOSE6J9YbU/7h2T
-	PpdTAFt+1uIhKWQmfaIeUWLmOUsSr4OtHeWXH9DkIzUXcAq0gwCOHDTpimYHNMPseoJKgKxAJrO
-	Fu2IJI4GL0SXlUBsXXI6DMlkE//u0eUsm/z0PmDM0gDevZni6g9mgeKobFjOXDvTcRrHsxAx8bo
-	tajP5mtDwFxHodw7vS9Ck7Trfn7yhBkxX68g/YaZT0UaCCMrdI8r907nlc77GN+hFssADV+NCZ+
-	13H5Tdp1c2FpLF3vEfAZMl0pcY5mZQ5FEHmPUY/wLijcX7nWjRQAwQt9DPpVSDpRxhm5G4GMbk9
-	ZBaM3IIhDHsSJJubnWNBWIk/rcvOS9HqJUh4izxbZstB4hhsKKyulaH0cw6CEwbd6SNimehuwpE
-	ByT9RgXot1O2djGrjJF3mxLTvT4zcTKfbRvdWuEpV34PhMUTXLlfOBSDGhF5Agkoooq4g=
-X-Google-Smtp-Source: AGHT+IGkiByVCAFR1LcfpdngTyoSGOoyNMrKBgscsFWAnmlwv7a40sc5G2oVFD1QNc82lnEBpj3Y3g==
-X-Received: by 2002:a05:6402:1ed1:b0:641:3651:7107 with SMTP id 4fb4d7f45d1cf-6455444a01emr13079842a12.12.1764001763666;
-        Mon, 24 Nov 2025 08:29:23 -0800 (PST)
+        bh=ENkvBstyOEdyNpek06avXaGXZm24i5NlmDUrQly8KrM=;
+        b=gyKgbVbTKGeXX8nKlI/AZCjhZW0E3GMnTj63pHJ19ANQO1QNu5VdDKTz2DLA5b034L
+         dAHpM42iVyhrTRaxXC+kBSIfBIJRUO2UEtshvHfh+kn3VoPcud2eGchS7JBSE7bgq6kF
+         0ooiB2+dH0yEP7olRjNH7mbiywj7vOap8CT0REZ8hxZh/9Ft9c0b55B8nU0I/ZfDBQYJ
+         y+5bX/eIzgaOK7zw9Kn1STSYOAMRqN5YNJ0sRgG+BwOJMhFnWypvDU7BmVkV97W8blw9
+         86zSsLItyqsP+Jt7rraVOvG6HUKs4uF+oQbJHp8RO65NeoSm7sTrwx7p7yYhPAJqNvN6
+         c+jQ==
+X-Gm-Message-State: AOJu0YyfnMENHJqUblxn76yInybBY2rpxjgqsOdMI6b73RNlYcob2N1Q
+	PefamuRUkQJSnY0OvdToEmKSIx6RQM3AzM5Llwjg/RZaj9qByuUC10uKIPOthemeUeE3pZisn/I
+	/jjZv
+X-Gm-Gg: ASbGncujVYKOtCnAEcQyKFPQsY+RKeCtXj2qXwvGFe2Lf6gEcNGHsHjof2EvwCrDkQu
+	Yn70UrntvvbEhvFXxRd2Bzqo2fNgLOLPQglDt2GfCg+EJOM0Qio0JDpz6+VBcKR+QZwQFy7TgsE
+	h03a/CS93YA1tasWQK8yyLcXlxlkE0HGpoSGKdpmZFCRp7JD5uKmVzCqdps/NRofowC2auGBD6F
+	Rw4vQWvcVTve4ol37Fswp2zSBjmHzXzEmpn1vgbyDQZaZZScOm0bbBuuEzpHzRxRrMdQvZRdg+d
+	mh+BVqHRv+4xDdncg17lZrSs20h6F3nvqGJCIHmRBG+AvblDR+BQ4fLx9IXpthU+M3SF82KTXdm
+	J0WVLcpDci10TRaZpCPdab1hlG53YNTDT1uNVe2+nAQV/7Ti7qCRWE9PmvzqEIjGmqES7CJJm90
+	yef2EAZ366j7jL+dzyxPDGJGKCt7A0OYWd2HoRiT+qkMzOZgXGFp2QG0njRU3c6PgnFTQ=
+X-Google-Smtp-Source: AGHT+IF5xyurXXP0BA3FnD2djf88fsra58fuq/X7FDvmpHwNNCtycxL4hKHkxP7dPH1k5xAtqUafwg==
+X-Received: by 2002:a17:906:fd8a:b0:b72:af1f:af7d with SMTP id a640c23a62f3a-b76716d9f65mr1434344366b.29.1764001764907;
+        Mon, 24 Nov 2025 08:29:24 -0800 (PST)
 Received: from cloudflare.com (79.184.84.214.ipv4.supernova.orange.pl. [79.184.84.214])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-645363b5a46sm12594968a12.8.2025.11.24.08.29.23
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7655050d05sm1311431566b.70.2025.11.24.08.29.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 08:29:23 -0800 (PST)
+        Mon, 24 Nov 2025 08:29:24 -0800 (PST)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 24 Nov 2025 17:28:47 +0100
-Subject: [PATCH RFC bpf-next 11/15] bpf, verifier: Remove side effects from
- may_access_direct_pkt_data
+Date: Mon, 24 Nov 2025 17:28:48 +0100
+Subject: [PATCH RFC bpf-next 12/15] bpf, verifier: Turn seen_direct_write
+ flag into a bitmap
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +86,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-11-8978f5054417@cloudflare.com>
+Message-Id: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-12-8978f5054417@cloudflare.com>
 References: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-0-8978f5054417@cloudflare.com>
 In-Reply-To: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-0-8978f5054417@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -93,103 +94,88 @@ Cc: netdev@vger.kernel.org, kernel-team@cloudflare.com,
  Martin KaFai Lau <martin.lau@linux.dev>
 X-Mailer: b4 0.15-dev-07fe9
 
-The may_access_direct_pkt_data() helper sets env->seen_direct_write as a
-side effect, which creates awkward calling patterns:
+Convert seen_direct_write from a boolean to a bitmap (seen_packet_access)
+in preparation for tracking additional packet access patterns.
 
-- check_special_kfunc() has a comment warning readers about the side effect
-- specialize_kfunc() must save and restore the flag around the call
-
-Make the helper a pure function by moving the seen_direct_write flag
-setting to call sites that need it.
+No functional change.
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- kernel/bpf/verifier.c | 33 ++++++++++++---------------------
- 1 file changed, 12 insertions(+), 21 deletions(-)
+ include/linux/bpf_verifier.h |  6 +++++-
+ kernel/bpf/verifier.c        | 11 ++++++-----
+ 2 files changed, 11 insertions(+), 6 deletions(-)
 
+diff --git a/include/linux/bpf_verifier.h b/include/linux/bpf_verifier.h
+index 4c497e839526..42ce94ce96ba 100644
+--- a/include/linux/bpf_verifier.h
++++ b/include/linux/bpf_verifier.h
+@@ -637,6 +637,10 @@ enum priv_stack_mode {
+ 	PRIV_STACK_ADAPTIVE,
+ };
+ 
++enum packet_access_flags {
++	PA_F_DIRECT_WRITE = BIT(0),
++};
++
+ struct bpf_subprog_info {
+ 	/* 'start' has to be the first field otherwise find_subprog() won't work */
+ 	u32 start; /* insn idx of function entry point */
+@@ -760,7 +764,7 @@ struct bpf_verifier_env {
+ 	bool bpf_capable;
+ 	bool bypass_spec_v1;
+ 	bool bypass_spec_v4;
+-	bool seen_direct_write;
++	u8 seen_packet_access;	/* combination of enum packet_access_flags */
+ 	bool seen_exception;
+ 	struct bpf_insn_aux_data *insn_aux_data; /* array of per-insn state */
+ 	const struct bpf_line_info *prev_linfo;
 diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index ff40e5e65c43..64a04b7dd500 100644
+index 64a04b7dd500..4c84b0cd399e 100644
 --- a/kernel/bpf/verifier.c
 +++ b/kernel/bpf/verifier.c
-@@ -6085,13 +6085,9 @@ static bool may_access_direct_pkt_data(struct bpf_verifier_env *env,
- 		if (meta)
- 			return meta->pkt_access;
- 
--		env->seen_direct_write = true;
- 		return true;
- 
- 	case BPF_PROG_TYPE_CGROUP_SOCKOPT:
--		if (t == BPF_WRITE)
+@@ -7625,7 +7625,7 @@ static int check_mem_access(struct bpf_verifier_env *env, int insn_idx, u32 regn
+ 					value_regno);
+ 				return -EACCES;
+ 			}
 -			env->seen_direct_write = true;
--
- 		return true;
- 
- 	default:
-@@ -7619,15 +7615,17 @@ static int check_mem_access(struct bpf_verifier_env *env, int insn_idx, u32 regn
- 			err = check_stack_write(env, regno, off, size,
- 						value_regno, insn_idx);
- 	} else if (reg_is_pkt_pointer(reg)) {
--		if (t == BPF_WRITE && !may_access_direct_pkt_data(env, NULL, t)) {
--			verbose(env, "cannot write into packet\n");
--			return -EACCES;
--		}
--		if (t == BPF_WRITE && value_regno >= 0 &&
--		    is_pointer_value(env, value_regno)) {
--			verbose(env, "R%d leaks addr into packet\n",
--				value_regno);
--			return -EACCES;
-+		if (t == BPF_WRITE) {
-+			if (!may_access_direct_pkt_data(env, NULL, BPF_WRITE)) {
-+				verbose(env, "cannot write into packet\n");
-+				return -EACCES;
-+			}
-+			if (value_regno >= 0 && is_pointer_value(env, value_regno)) {
-+				verbose(env, "R%d leaks addr into packet\n",
-+					value_regno);
-+				return -EACCES;
-+			}
-+			env->seen_direct_write = true;
++			env->seen_packet_access |= PA_F_DIRECT_WRITE;
  		}
  		err = check_packet_access(env, regno, off, size, false);
  		if (!err && t == BPF_READ && value_regno >= 0)
-@@ -13766,11 +13764,11 @@ static int check_special_kfunc(struct bpf_verifier_env *env, struct bpf_kfunc_ca
- 		if (meta->func_id == special_kfunc_list[KF_bpf_dynptr_slice]) {
- 			regs[BPF_REG_0].type |= MEM_RDONLY;
- 		} else {
--			/* this will set env->seen_direct_write to true */
- 			if (!may_access_direct_pkt_data(env, NULL, BPF_WRITE)) {
+@@ -13768,7 +13768,7 @@ static int check_special_kfunc(struct bpf_verifier_env *env, struct bpf_kfunc_ca
  				verbose(env, "the prog does not allow writes to packet data\n");
  				return -EINVAL;
  			}
-+			env->seen_direct_write = true;
+-			env->seen_direct_write = true;
++			env->seen_packet_access |= PA_F_DIRECT_WRITE;
  		}
  
  		if (!meta->initialized_dynptr.id) {
-@@ -21810,7 +21808,6 @@ static void specialize_kfunc(struct bpf_verifier_env *env,
- 			     u32 func_id, u16 offset, unsigned long *addr)
- {
- 	struct bpf_prog *prog = env->prog;
--	bool seen_direct_write;
- 	void *xdp_kfunc;
- 	bool is_rdonly;
+@@ -21200,6 +21200,7 @@ static int convert_ctx_accesses(struct bpf_verifier_env *env)
+ 	struct bpf_prog *new_prog;
+ 	enum bpf_access_type type;
+ 	bool is_narrower_load;
++	bool seen_direct_write;
+ 	int epilogue_idx = 0;
  
-@@ -21827,16 +21824,10 @@ static void specialize_kfunc(struct bpf_verifier_env *env,
- 		return;
- 
- 	if (func_id == special_kfunc_list[KF_bpf_dynptr_from_skb]) {
--		seen_direct_write = env->seen_direct_write;
- 		is_rdonly = !may_access_direct_pkt_data(env, NULL, BPF_WRITE);
- 
- 		if (is_rdonly)
- 			*addr = (unsigned long)bpf_dynptr_from_skb_rdonly;
--
--		/* restore env->seen_direct_write to its original value, since
--		 * may_access_direct_pkt_data mutates it
--		 */
--		env->seen_direct_write = seen_direct_write;
+ 	if (ops->gen_epilogue) {
+@@ -21227,13 +21228,13 @@ static int convert_ctx_accesses(struct bpf_verifier_env *env)
+ 		}
  	}
  
- 	if (func_id == special_kfunc_list[KF_bpf_set_dentry_xattr] &&
+-	if (ops->gen_prologue || env->seen_direct_write) {
++	seen_direct_write = env->seen_packet_access & PA_F_DIRECT_WRITE;
++	if (ops->gen_prologue || seen_direct_write) {
+ 		if (!ops->gen_prologue) {
+ 			verifier_bug(env, "gen_prologue is null");
+ 			return -EFAULT;
+ 		}
+-		cnt = ops->gen_prologue(insn_buf, env->seen_direct_write,
+-					env->prog);
++		cnt = ops->gen_prologue(insn_buf, seen_direct_write, env->prog);
+ 		if (cnt >= INSN_BUF_SIZE) {
+ 			verifier_bug(env, "prologue is too long");
+ 			return -EFAULT;
 
 -- 
 2.43.0
