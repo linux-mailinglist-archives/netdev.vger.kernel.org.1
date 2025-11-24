@@ -1,127 +1,182 @@
-Return-Path: <netdev+bounces-241079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6895DC7EBF7
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 02:33:55 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8EC1C7EC30
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 02:43:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0C84E3425EC
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 01:33:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2F0614E1143
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 01:43:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72A872631;
-	Mon, 24 Nov 2025 01:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BE526F28F;
+	Mon, 24 Nov 2025 01:43:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gRu6Q0MU"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="NpkJ36/d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6698C8CE
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 01:33:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656C22A1BB
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 01:43:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763948031; cv=none; b=SEq6PuVzmH3yhkdwaPQCNVKNSfte6Cj25Gt+uxJmn9F8cigpsnMCr7yoYUJKKVn19zDtXw2hFVjw/FN/KAYTxg1feju6WTAKHTWcNTgtasqC1LNuBRGy8AYvM+f04z4ISQkfCyW8q1m3UZpFvBzBKUa7AlnKlaBG23UsEZ747jc=
+	t=1763948584; cv=none; b=L9bEgLr/QcLIf0PmkoRdubJZRa44wbx1Cnclks66MsJWKUk18XUu6IXmfr85aB1v3AgZ1bs9r4HMpGaB4gvSFdxTPD1JMeuoqIZo9QzNlrkdLGWZF0K9Cx8AlROVetxOy4qCfNsBYH8lrMjRzH6NKZNVMSm3Jxbj7YtyFhXbC9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763948031; c=relaxed/simple;
-	bh=5K3N+qLD569Jy/s6d4OCEOGGbKeC5whB9OMKRMgljN4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DVYZ1TTZfeOSyv+gaku91v9Fp7Af4vt7Xb9yvy/Du6NL7fIf/cqdJyFzjVlLwVwPBu95r/mzMCsPsf5SdVyLz15ChAP7HYtgaGth7biIxWUStNNOd+S6ZtnM+eCv0C6cGAHQ+RzLljL4QD4NCyk9gDLooFsS3zC8vR0ODJEXzuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gRu6Q0MU; arc=none smtp.client-ip=209.85.217.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-5dbddd71c46so1514758137.2
-        for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 17:33:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763948028; x=1764552828; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pN+gqjrmJZG5LtP0SEyScR2TDuYDbSmg3gkIbqkEec4=;
-        b=gRu6Q0MUrbyLvkravb4aXHNtiDGA/0i3NuiiGml1d8RfliKXnSI9RqyBt0oI6WkWeZ
-         WQELVgpyulSZfH4teN0jPEj53m6lcvV5tSXu5fQqw6G78qT1ug0CzRyb5npVB5Sh3oV3
-         pF5rIBCPOb/HKzF1UlFZUlC9ETvDC8i91HXwjXndS9T1J/Ac2/SFANZijKrg4VrtB8dH
-         mQiTxxUHtnFIYiBEgin0UlAnm6Z5crJqkZVIN3W6OJ2kOUg8RC87PMicWb2SLTIxqW88
-         ZOypWGQILcrEdAd46Zb6cBgPZ2JBAack5K1PPREgm7DJPkCPepoDyCGLJANeUuXYBdzq
-         uMiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763948028; x=1764552828;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pN+gqjrmJZG5LtP0SEyScR2TDuYDbSmg3gkIbqkEec4=;
-        b=q8jmT0tqkOUfgGxI9KlgTvPxoJ9RNBDncOPGNHMXyKHwH2nwrDxpIL+wITzZ2brty3
-         ON5nXfJIgBfPQ9ItwLgJnMbkBnFKMhzaJWx1PUGlHmCb2mTDYKYb9ZwMYK0O+62cUdRU
-         N+oFx5KrFPpMeAlyAjCJPURQlde5bfSuXOOvQ2ZAvvJZ+hokk8mrLNHmZg8OZsSZJyot
-         IdLmIruCYsiD580Q0xJncapTnb80BabsEFIrFI+1KRSsTu+AdUeVEpETa8uzdHVSUjiZ
-         ORGrrO19msHx7x6Z2aveLJbreSE81YZrY4r4NQ2AohGJAYzX8DWb1CNfrBLpSNn35EK2
-         l02Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWdwTH7Zl6CqZ49nK415rVeBOl4QCAaQ3Og/cpP7S158cexGE5fX5OOYuPCxGdbfrrQUmbAjQI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQaJ4p77JxW1XY+lyLsfAfKZFDnTm8I98e1qF9D0QWx121mx2K
-	xLheRq0e3LO+ABpSE8xOVrTpFKQNk/DVXBpM6GijxNz6lNz917KyfczrDivJPmEGts/VynM+lw6
-	IIVhj5VjQWkeJWPec4Ix4rexeQ0TxGsYpn/yZ
-X-Gm-Gg: ASbGncuCMB13DJZsZk4lUq+MoplkaEfh1Re94M47/dtbtbqsdho6E2Hy1vaEsiFkm9W
-	GV1Ua/R7kMcs2I9ChGH+jD2gfG9y2DEJe8A6cKHnKeMyrumYoKMszo/JvkrLSwO2E478KgCtG3W
-	pVvL6N1Z0VhX+Dy64rrbci7X/Xyv3OSMJQbQV8Bg5kpi+nNBm6siZCsu5qO9bzfk+Seq4uO9yTu
-	/5sc57JVO8DuwVgiH73WH8s98dZPeaOMT9Iw2hOBy4u91bQZzJke4pyctFTgLqUqVfysORKoY1V
-	FfiN86067Y95OfLWm2LwYMVO/q8/ZUlrvzwOrlI=
-X-Google-Smtp-Source: AGHT+IFmJxbuNCnLx1K9AUN6sEjak9hqaW6Sjo0QbxTkjD/P/WLZeJgxpulT3LdUe/NvhObr1zkEl5JEiq3EqE4u6II=
-X-Received: by 2002:a05:6102:5a8d:b0:5db:e851:938e with SMTP id
- ada2fe7eead31-5e1de1ed4b6mr2578129137.10.1763948027866; Sun, 23 Nov 2025
- 17:33:47 -0800 (PST)
+	s=arc-20240116; t=1763948584; c=relaxed/simple;
+	bh=ozNzqa5lM1rfYL3Y/EG9GQdkehC0FLdl6UN3cIuExOs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=p+jIG3vdY7spm+UZTacFeHOMXsy6T/8TFV2XjqkO7RKvZ5vLMcXPNZ5JV3MgC3x3fwolPRxw/nuv2JtFxIAh0Xw2qSTK67fU+N0ilSaN7C6nTP1GVDItItSUE1Juj8uj4hbrwwUdQQ/jAy8IP+ujrGolgS2qpzhfHyJNr2pHVMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=NpkJ36/d; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1763948573; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=A1EbcseolQAwUyCoqK462ORt/W2RvlJsY2WyxT7sFKE=;
+	b=NpkJ36/dmGkNxI9+WvSC+51m9LPfPpcYjAuMkzoYIjF55uVg1CNmYdhvgmSwGva4rgVveKSM8nfIbjoSdJgLi9P8A1anHJoIaOl7VY3Wfu8tZbY7WWPsNIg1IKJROFS9sErvL0Yoayc6C5FQvJk9YVIudZJGqqyw73KhwIa/WSc=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Wt9ObMd_1763948571 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 24 Nov 2025 09:42:52 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Dong Yibo <dong100@mucse.com>,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Vivian Wang <wangruikang@iscas.ac.cn>,
+	MD Danish Anwar <danishanwar@ti.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: [PATCH net-next v16 0/5] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Mon, 24 Nov 2025 09:42:46 +0800
+Message-Id: <20251124014251.63761-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <bug-220774-17063@https.bugzilla.kernel.org/> <bug-220774-17063-qOQ3KbbRZE@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220774-17063-qOQ3KbbRZE@https.bugzilla.kernel.org/>
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Date: Sun, 23 Nov 2025 17:33:36 -0800
-X-Gm-Features: AWmQ_bl2XiEpQlLnHDVMpXJZM024jY5mbxLbPO5rnbUb5vCDpgvgYmU-FPHVdAM
-Message-ID: <CAM_iQpW7WE17Xad_YVsOpz5_+uJzB2_7zOPQE3xOoT-nt4UAXQ@mail.gmail.com>
-Subject: Fwd: [Bug 220774] netem is broken in 6.18
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: William Liu <will@willsroot.io>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Git-Hash: a3a1abf7b067
+Content-Transfer-Encoding: 8bit
 
----------- Forwarded message ---------
-From: <bugzilla-daemon@kernel.org>
-Date: Fri, Nov 21, 2025 at 3:39=E2=80=AFPM
-Subject: [Bug 220774] netem is broken in 6.18
-To: <xiyou.wangcong@gmail.com>
+Add a driver framework for EEA that will be available in the future.
+
+This driver is currently quite minimal, implementing only fundamental
+core functionalities. Key features include: I/O queue management via
+adminq, basic PCI-layer operations, and essential RX/TX data
+communication capabilities. It also supports the creation,
+initialization, and management of network devices (netdev). Furthermore,
+the ring structures for both I/O queues and adminq have been abstracted
+into a simple, unified, and reusable library implementation,
+facilitating future extension and maintenance.
+
+v16:
+    1. follow the advices from @ALOK TIWARI
+       http://lore.kernel.org/all/5ff95a71-69e5-4cb6-9b2a-5224c983bdc2@oracle.com
+
+v15:
+    1. remove 'default m' from eea kconfig
+    2. free the resources when open failed.
+
+v14:
+    1. some tiny fixes
+
+v13:
+    1. fix some tiny fixes @Simon
+
+v12:
+    I encountered some issues with sending the v11 patches, as they were quite
+    messy. Therefore, I'm resending them as v12.
+
+v11:
+    1. remove auto clean __free(kfree)
+    2. some tiny fixes
+
+v10:
+    1. name the jump labels after the target @Jakub
+    2. rm __GFP_ZERO from dma_alloc_coherent @Jakub
+v9:
+    1. some fixes for ethtool from http://lore.kernel.org/all/20251027183754.52fe2a2c@kernel.org
+
+v8: 1. rename eea_net_tmp to eea_net_init_ctx
+    2. rm code that allocs memory to destroy queues
+    3. some other minor changes
+
+v7: 1. remove the irrelative code from ethtool commit
+    2. build every commits with W12
+
+v6: Split the big one commit to five commits
+v5: Thanks for the comments from Kalesh Anakkur Purayil, ALOK TIWARI
+v4: Thanks for the comments from Troy Mitchell, Przemek Kitszel, Andrew Lunn, Kalesh Anakkur Purayil
+v3: Thanks for the comments from Paolo Abenchi
+v2: Thanks for the comments from Simon Horman and Andrew Lunn
+v1: Thanks for the comments from Simon Horman and Andrew Lunn
 
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220774
 
-Gerlinde (lrGerlinde@mailfence.com) changed:
 
-           What    |Removed                     |Added
----------------------------------------------------------------------------=
--
-                 CC|                            |lrGerlinde@mailfence.com
 
---- Comment #2 from Gerlinde (lrGerlinde@mailfence.com) ---
-You know, in our HA and ECMP setup we sometimes get this strange thing: pac=
-kets
-are not lost, but some flows get duplicated for a few hundert milliseconds.=
- Not
-all flows, only the unlucky ones that get hashed through the broken path. A=
-nd
-this makes debugging really a pain, because all metrics say =E2=80=9Cno los=
-s=E2=80=9D, but the
-application still behave stupid.
 
-So we use netem duplicate on a single mq-queue to copy exactly this situati=
-on.
+
+
+
+
+
+Xuan Zhuo (5):
+  eea: introduce PCI framework
+  eea: introduce ring and descriptor structures
+  eea: probe the netdevice and create adminq
+  eea: create/destroy rx,tx queues for netdevice open and stop
+  eea: introduce ethtool support
+
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/alibaba/Kconfig          |  28 +
+ drivers/net/ethernet/alibaba/Makefile         |   5 +
+ drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
+ drivers/net/ethernet/alibaba/eea/eea_adminq.c | 421 ++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_adminq.h |  70 ++
+ drivers/net/ethernet/alibaba/eea/eea_desc.h   | 156 ++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.c    | 276 ++++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.h    |  50 ++
+ drivers/net/ethernet/alibaba/eea/eea_net.c    | 589 +++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_net.h    | 196 +++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.c    | 585 +++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.h    |  67 ++
+ drivers/net/ethernet/alibaba/eea/eea_ring.c   | 260 ++++++
+ drivers/net/ethernet/alibaba/eea/eea_ring.h   |  91 ++
+ drivers/net/ethernet/alibaba/eea/eea_rx.c     | 787 ++++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_tx.c     | 402 +++++++++
+ 19 files changed, 4002 insertions(+)
+ create mode 100644 drivers/net/ethernet/alibaba/Kconfig
+ create mode 100644 drivers/net/ethernet/alibaba/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
 
 --
-You may reply to this email to add a comment.
+2.32.0.3.g01195cf9f
 
-You are receiving this mail because:
-You are on the CC list for the bug.
 
