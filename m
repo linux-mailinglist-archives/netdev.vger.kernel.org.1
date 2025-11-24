@@ -1,204 +1,204 @@
-Return-Path: <netdev+bounces-241161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18F61C80DAD
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 14:53:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BD55C80DCE
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 14:55:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C63DF3A4E8D
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 13:53:28 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 230454E1834
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 13:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3270930B52B;
-	Mon, 24 Nov 2025 13:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4609830B53C;
+	Mon, 24 Nov 2025 13:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b="QPd06RrO"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="QjSaNPlJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-of-o57.zoho.eu (sender-of-o57.zoho.eu [136.143.169.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E7F13790B
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 13:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763992407; cv=pass; b=BRgliPfMgKKWfgpDD5BdgiF89wjf9CAgZGd1WkM6eUnrRASOF/59RlUHQNxvbT4L5IZd2izY6Zr9GgwD7rj6XvjX5COun5WrRUee5/6PkoEYVvIYI+7pJFwRlQ2EBbflC5/OHx4KYVK0HwvYwxLd8ddm6NmgWgDsK7ZdbP+uyqc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763992407; c=relaxed/simple;
-	bh=s5h8gSB7v6bsXNAhS9y3RI1hx5UQsmHua34zCqEP0I4=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Hn6OH5z0vspFAYhgxLIEw20xDd6Zyaa18Q2vlTNO7T1TZ40kE11hfQFT6m2xllozNe9kfhyu5bvJLfB9koJvEr/1xc0nBzDzYqONoIr9EUNOn422qz3sOAOfNbIXGkMzpP2JvhBkk/DsAST6OzmF+SyPsztzaEU6UnIUsm0SFk4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net; spf=pass smtp.mailfrom=azey.net; dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b=QPd06RrO; arc=pass smtp.client-ip=136.143.169.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=azey.net
-ARC-Seal: i=1; a=rsa-sha256; t=1763992373; cv=none; 
-	d=zohomail.eu; s=zohoarc; 
-	b=CdXkQYfMBGRUPeUpKV4Uh5qSRG9zF1JFpwjI74FnDy4z2PAGW6Pwp+c+lZBtt3xOn7tqZv7CGWjDCl6TX8JGdrtmQxzkgxnSc8giuc7QtDug8evyZ7GYnA8ZQqAFVhDbHUTIGkKtYR4Av9z2kfzuj9P5DKfLJ0sKDh1/ec2dix8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1763992373; h=Content-Type:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
-	bh=rBkX/nDuN24GUNqkAosSgW7yt3kwIvRuz+2yBGUA6hE=; 
-	b=IhO6d2xM+BtEU6ppNc42SlBXp2NuX1spGH2WOYDH9beTkUlVt/ll0rHT6YHVQK/LOunqeM3nwMdVDf94s/2I5Tnu/zqo9xqp4AVSYNwo8UxT1XR6zzE6YMqnGweBHd9NXeJeCDZF4LDmtcd11onjPcECO5Tdx6l7pG/i1wQv990=
-ARC-Authentication-Results: i=1; mx.zohomail.eu;
-	dkim=pass  header.i=azey.net;
-	spf=pass  smtp.mailfrom=me@azey.net;
-	dmarc=pass header.from=<me@azey.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1763992373;
-	s=zmail; d=azey.net; i=me@azey.net;
-	h=Date:Date:From:From:To:To:Subject:Subject:Message-ID:MIME-Version:Content-Type:Message-Id:Reply-To:Cc;
-	bh=rBkX/nDuN24GUNqkAosSgW7yt3kwIvRuz+2yBGUA6hE=;
-	b=QPd06RrOe6IVecQxCNPH5+JtrlR0SlpgQZiIffVVaOmOkIjFEKKTFz1TiA0vo6HA
-	5Y+43PjGQsD+ry5sqS3HL7Tj2DRkGZ6Oj7W8nlbtuSF1bsGDQ5kyBTI9c855oFoLuDB
-	jSVmRahiF4UCR8hdP+a1x0RVvqdh/HRb0QS7hFhI=
-Received: by mx.zoho.eu with SMTPS id 1763992368103378.52597944823765;
-	Mon, 24 Nov 2025 14:52:48 +0100 (CET)
-Date: Mon, 24 Nov 2025 14:52:45 +0100
-From: azey <me@azey.net>
-To: David Ahern <dsahern@kernel.org>, 
-	nicolasdichtel <nicolas.dichtel@6wind.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] net/ipv6: allow device-only routes via the multipath API
-Message-ID: <3k3facg5fiajqlpntjqf76cfc6vlijytmhblau2f2rdstiez2o@um2qmvus4a6b>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E334030B514
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 13:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763992510; cv=none; b=gLpTS+Yu8gGn4hV7EKZH2Wu3mQQoB0YafpjZJ9GwS1YWBg41pZIzR7u+8hW1/q3zO4ENu/C7J6JftAreJwXIDWSO4c3/7M0+AwikQwj+kF0Mmx29rhGug54BbdQoVPB/gynKY3domuF7m5CMO1kZ25ySd54e0HWve0UVHXvH73k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763992510; c=relaxed/simple;
+	bh=/CKSvAOlVY8BjN8XbCmfdPH2F1Z/MzSriDHooJwKonA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VEj5QWmRu3UW9BUlJ+Pj6EMAYpOWsjf+3j5cFtwUPj2cBEt0oJblfCQx0bsIq918H5DxaN3cuvXxvM4TWLmPE4GZXYy1AEom68nvxES5ijFWyr+7GP++rwe0CE/5lqVTsI355qiD5e06XtWKNfLYVMHiTPqj0BEtJTdP6XxlGlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=QjSaNPlJ; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4779a637712so26190045e9.1
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 05:55:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1763992506; x=1764597306; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YPuHiWYXlxCT3REvX5xilRSzoHSOopPnik0KnitVPIc=;
+        b=QjSaNPlJFOSKJAyKnonLAh8vyfbteye7+90MDqGKQBWFwCM8zYJSrd5ZWIHmnsOWxv
+         Y6X0lwfjn86zUPBJZYIdnAPzwboxNslbZUuBFqdBhbuc4OEROzrCQGnLjAUUUMnsOm0C
+         tmRms3HjweOWsvLDTFcyGaTPvpUHSn+9GejzsuejgNG1YH5S+G4gC6Dthqxq6wYJeD1p
+         Nz9Dcmdi4bPCAKvQlDDRjzm1L32aAOIH+UkRR1Gy4NYMDg8z/T5p8dV8v71yAqj1yZuv
+         AG8I7xh8uJqdzxPYekUoEKNGT89RRu0MT/g5d+L0Bm9gD7Yp1zJU/UN5a97EYY8u+Tvv
+         lMYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763992506; x=1764597306;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YPuHiWYXlxCT3REvX5xilRSzoHSOopPnik0KnitVPIc=;
+        b=r884s+CtcxWDD5RtNYo4os220jU3eWoYmFT/diHCrHwPgHSJ2pzOE0DSH7o7c4vtIQ
+         Q83ypoh0wMAEPDmD0HTT7dFizinVKHtTshP4aK+02WO6sa84nX3cNfjkwPNCvH4sQGVO
+         j2Nh5d0SZGv9i5MLjc/y9EeLfU6gleHAqeviZdfw5C9KlS4zBUZbOwpQbl4rUvRpdyIq
+         JYFH+qx6Ofp/f89/TNUIehQiXaBEsoWztyLdf23qb2V1ksiqoKGr6FRHvNnPhLxTTXY/
+         C5RSoUESXxE7/M/hhtrC5Axp6YY2IDOnk37m/OxiKhNfM4uVNSVd+frWuNY7Sts5FLNb
+         PHcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXEd272oMYX003GBE/DK0AGqnv5Vu9nAu96s0l4bINqRrrnca8B/3hODUXiLsF8J1JH9nkMgRg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7NpztJ6auCdlXfFlGk7IDMHIRRwPgt3tq5SpqrEDp4uyr8Qry
+	k621c+yv+dXo8yVfWPhLJoTCMSr4CRRKCs7trW9BAZBhaqLnPdTF5vk2C7UeGC/0JYw=
+X-Gm-Gg: ASbGncvt0bjOPV+RRZSOwuY/uPEG3qT2k6h5Dm//vNJSR6crikdOGYUvSJo73DyeEb2
+	Zd1Dv2vA6bnTTNopztDQFq4rRURfg56iXSpT4bRIgvP5Jtu7dnlF+ahWZPaFNkPORATtVJcWhJq
+	QSxdMDdgZCC7HETGY8GtIarDFWg+Q6l0CZzEYE8I941E6Giwe5qFqsNCUFHAB8eLPCpEaFhg0ef
+	7dnCF5N4oFpShNUVXDIJyj6mFppqMreDRBSDEOxrqsJZUmRhhn+3+SvOBLDz0doUr0x0gXyk5sn
+	Yv2x3eofgey4eod5r2JgsNNOrpk6aTwk8rR6qU7m3J7hAuIiDPHysaA0ewcfL7ZiKxao2jFBkyH
+	p/rZNnDenonAOdJlqpWjNel+z9H4Uv6dxm6p5b0hxjnM7/rwlQuYtaolzbQBpbAauncz++1UEv0
+	6I4BBQU+x7ccf71A==
+X-Google-Smtp-Source: AGHT+IG1aXy33KmNHg9WN5SPhjEuMzD0hduDeGynMkb23F8zv3/FcRZI9YIQut5OtqH8of2UvaqP+w==
+X-Received: by 2002:a05:600c:1ca0:b0:477:75eb:a643 with SMTP id 5b1f17b1804b1-477c0165b4emr139649225e9.4.1763992506054;
+        Mon, 24 Nov 2025 05:55:06 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f49a7bsm28133751f8f.19.2025.11.24.05.55.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Nov 2025 05:55:05 -0800 (PST)
+Date: Mon, 24 Nov 2025 14:55:02 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, horms@kernel.org, efault@gmx.de,
+	john.ogness@linutronix.de, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	calvin@wbinvd.org, asml.silence@gmail.com, kernel-team@meta.com,
+	gustavold@gmail.com, asantostc@gmail.com
+Subject: Re: [PATCH RFC net-next 2/2] netconsole: add CONFIG_NETCONSOLE_NBCON
+ for nbcon support
+Message-ID: <aSRjtgmr9xKOX1Ek@pathway.suse.cz>
+References: <20251121-nbcon-v1-0-503d17b2b4af@debian.org>
+ <20251121-nbcon-v1-2-503d17b2b4af@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="alsnc4vfxlzkwrw2"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Zoho-Virus-Status: 1
-X-Zoho-Virus-Status: 1
-X-Zoho-AV-Stamp: zmail-av-1.4.3/263.908.66
-X-ZohoMailClient: External
+In-Reply-To: <20251121-nbcon-v1-2-503d17b2b4af@debian.org>
 
+On Fri 2025-11-21 03:26:08, Breno Leitao wrote:
+> Add optional support for the nbcon infrastructure to netconsole via a new
+> CONFIG_NETCONSOLE_NBCON compile-time option.
+> 
+> The nbcon infrastructure provides a lock-free, priority-based console
+> system that supports atomic printing from any context including NMI,
+> with safe handover mechanisms between different priority levels. This
+> makes it particularly suitable for crash-safe kernel logging.
+> 
+> When disabled (default), netconsole uses the legacy console callbacks,
+> maintaining full backward compatibility.
+> 
+> PS: .write_atomic and .write_thread uses the same callback, given that
+> there is no safe .write_atomic, so .write_atomic is called as the last
+> resource. This is what CON_NBCON_ATOMIC_UNSAFE is telling nbcon.
 
---alsnc4vfxlzkwrw2
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: [PATCH v2] net/ipv6: allow device-only routes via the multipath API
-MIME-Version: 1.0
+Makes sense. CON_NBCON_ATOMIC_UNSAFE also explains why target_list_lock
+need not be synchronized with nbcon context locking [*]. The _unsafe_
+.write_atomic() callback might be called only by the final
+nbcon_atomic_flush_unsafe() when even the nbcon context
+synchronization can be ignored.
 
-At some point after b5d2d75e079a ("net/ipv6: Do not allow device only
-routes via the multipath API"), the IPv6 stack was updated such that
-device-only multipath routes can be installed and work correctly.
+[*] For example, see how port->lock is synchronized with the nbcon
+    context by uart_port_lock() wrapper.
 
-This change removes checks that prevent them from being installed,
-and adds a fib6_explicit_ecmp flag to fib6_info. The flag is only
-checked in rt6_qualify_for_ecmp() and exists to prevent regressions.
+> --- a/drivers/net/Kconfig
+> +++ b/drivers/net/Kconfig
+> @@ -369,6 +369,20 @@ config NETCONSOLE_PREPEND_RELEASE
+>  	  message.  See <file:Documentation/networking/netconsole.rst> for
+>  	  details.
+>  
+> +config NETCONSOLE_NBCON
+> +	bool "Use nbcon infrastructure (EXPERIMENTAL)"
+> +	depends on NETCONSOLE
+> +	default n
+> +	help
+> +	  Enable nbcon support for netconsole. This uses the new lock-free
 
-Signed-off-by: azey <me@azey.net>
----
-Changes in v2:
-- Added fib6_explicit_ecmp flag to fib6_info to prevent regressions.
-  Very simple (and naive) fix, all it does is flag routes created as
-  multipath and check for the flag in rt6_qualify_for_ecmp().
-  I'm not sure whether it should be an RTF_ flag in fib6_flags instead,
-  but there aren't any unused bits in that field so I made it separate.
-- Removed hanging has_gateway as reported by <lkp@intel.com> bot
+Strictly speaking, it is not lock-free. The main feature is that it is
+threaded so that it does not block the printk() caller.
 
-Link to v1:
-  https://lore.kernel.org/netdev/a6vmtv3ylu224fnj5awi6xrgnjoib5r2jm3kny672h=
-emsk5ifi@ychcxqnmy5us/
----
- include/net/ip6_fib.h   |  3 ++-
- include/net/ip6_route.h |  5 +++--
- net/ipv6/route.c        | 11 ++---------
- 3 files changed, 7 insertions(+), 12 deletions(-)
+Nbcon consoles also support synchronous flushing in emergecy situations.
+But it does not work with netconsoles because they do not support
+atomic operations. They are flushed only by the final desperate flush
+in panic() when all locks are ignored.
 
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index 88b0dd4d8e09..da9d03cbbab4 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -196,7 +196,8 @@ struct fib6_info {
- 					dst_nocount:1,
- 					dst_nopolicy:1,
- 					fib6_destroying:1,
--					unused:4;
-+					fib6_explicit_ecmp:1,
-+					unused:3;
-=20
- 	struct list_head		purge_link;
- 	struct rcu_head			rcu;
-diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
-index 7c5512baa4b2..5f00e9e252c2 100644
---- a/include/net/ip6_route.h
-+++ b/include/net/ip6_route.h
-@@ -73,8 +73,9 @@ static inline bool rt6_need_strict(const struct in6_addr =
-*daddr)
- static inline bool rt6_qualify_for_ecmp(const struct fib6_info *f6i)
- {
- 	/* the RTF_ADDRCONF flag filters out RA's */
--	return !(f6i->fib6_flags & RTF_ADDRCONF) && !f6i->nh &&
--		f6i->fib6_nh->fib_nh_gw_family;
-+	return f6i->fib6_explicit_ecmp ||
-+		(!(f6i->fib6_flags & RTF_ADDRCONF) && !f6i->nh &&
-+		f6i->fib6_nh->fib_nh_gw_family);
- }
-=20
- void ip6_route_input(struct sk_buff *skb);
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index aee6a10b112a..7ac69bf5ccf2 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -5119,7 +5119,6 @@ static int rtm_to_fib6_multipath_config(struct fib6_c=
-onfig *cfg,
- 	}
-=20
- 	do {
--		bool has_gateway =3D cfg->fc_flags & RTF_GATEWAY;
- 		int attrlen =3D rtnh_attrlen(rtnh);
-=20
- 		if (attrlen > 0) {
-@@ -5133,17 +5132,9 @@ static int rtm_to_fib6_multipath_config(struct fib6_=
-config *cfg,
- 						       "Invalid IPv6 address in RTA_GATEWAY");
- 					return -EINVAL;
- 				}
--
--				has_gateway =3D true;
- 			}
- 		}
-=20
--		if (newroute && (cfg->fc_nh_id || !has_gateway)) {
--			NL_SET_ERR_MSG(extack,
--				       "Device only routes can not be added for IPv6 using the multipa=
-th API.");
--			return -EINVAL;
--		}
--
- 		rtnh =3D rtnh_next(rtnh, &remaining);
- 	} while (rtnh_ok(rtnh, remaining));
-=20
-@@ -5448,6 +5439,8 @@ static int ip6_route_multipath_add(struct fib6_config=
- *cfg,
- 			goto cleanup;
- 		}
-=20
-+		rt->fib6_explicit_ecmp =3D true;
-+
- 		err =3D ip6_route_info_create_nh(rt, &r_cfg, GFP_KERNEL, extack);
- 		if (err) {
- 			rt =3D NULL;
+> +	  console infrastructure which supports threaded and atomic printing.
+> +	  Given that netconsole does not support atomic operations, the current
+> +	  implementation focuses on threaded callbacks, unless the host is
+> +	  crashing, then it uses an unsafe atomic callbacks. This feature is
+> +	  available for both extended and non-extended consoles.
+> +
+> +	  If unsure, say N to use the legacy console infrastructure.
+> +
+>  config NETPOLL
+>  	def_bool NETCONSOLE
+>  
+> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> index f4b1706fb081..2943f00b83f6 100644
+> --- a/drivers/net/netconsole.c
+> +++ b/drivers/net/netconsole.c
+> @@ -1724,6 +1724,57 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+>  				   extradata_len);
+>  }
+>  
+> +#ifdef CONFIG_NETCONSOLE_NBCON
+> +static void netcon_write_nbcon(struct console *con,
+> +			       struct nbcon_write_context *wctxt,
+> +			       bool extended)
+> +{
+> +	struct netconsole_target *nt;
+> +
+> +	lockdep_assert_held(&target_list_lock);
+> +
+> +	list_for_each_entry(nt, &target_list, list) {
+> +		if (nt->extended != extended || !nt->enabled ||
+> +		    !netif_running(nt->np.dev))
+> +			continue;
+> +
+> +		if (!nbcon_enter_unsafe(wctxt))
+> +			continue;
+> +
+> +		if (extended)
+> +			send_ext_msg_udp(nt, wctxt->outbuf, wctxt->len);
+> +		else
+> +			write_msg_target(nt, wctxt->outbuf, wctxt->len);
 
-base-commit: bd10acae08aeb9cd2f555acdbacb98b9fbb02a27
---=20
-2.51.0
+If you accepted the rename in the 1st patch then this would be ;-)
 
+		if (extended)
+			send_ext_msg_udp(nt, wctxt->outbuf, wctxt->len);
+		else
+			send_msg_udp(nt, wctxt->outbuf, wctxt->len);
 
---alsnc4vfxlzkwrw2
-Content-Type: application/pgp-signature; name="signature.asc"
+> +
+> +		nbcon_exit_unsafe(wctxt);
+> +	}
+> +}
 
------BEGIN PGP SIGNATURE-----
+Otherwise, it looks good from my POV.
 
-iHUEABYKAB0WIQQsyzQDQ/6KK5HOf3X5T0pxxcIejwUCaSRjLQAKCRD5T0pxxcIe
-j/WdAQC5XfnFt5i3LGoLoDcsdOXkgll0eLgliYVd9CZnpMkyvAEA1/PeFW98Al2j
-fZ12LSAl4M6sUmppD80haqluvb5GJQk=
-=UlVp
------END PGP SIGNATURE-----
-
---alsnc4vfxlzkwrw2--
+Best Regards,
+Petr
 
