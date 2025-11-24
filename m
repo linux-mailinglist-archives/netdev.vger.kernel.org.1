@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-241100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62D5CC7F391
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 08:40:55 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB9E2C7F39F
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 08:41:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21B173A2692
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 07:40:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 959CB3427F8
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 07:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EECE72E8DEC;
-	Mon, 24 Nov 2025 07:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4C952E8E0B;
+	Mon, 24 Nov 2025 07:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+r+w/Fg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8KGulUx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D432E888A
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 07:40:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25DD22EA490
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 07:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763970051; cv=none; b=Ks8l/2PKA+wNHIMDNN1TpkV9gWAgUUFORYXVioCdlmsFmy0nXCpcU5HdA6D6yvAOS8sCckEmMO42jaQsvC27VlFlmw2LA0MIKvmqcVoEXfCsRML/lD4/X5KaK1waitlJHX1d+nW3yTYt+f+mEpv2OlsoJxQtHZSrCr0iedWwx4g=
+	t=1763970056; cv=none; b=bRPbjzqQ2RhUH3PSM6trN2ST0GqtP/hnpvdnena2YP+jMNlL09oYIy4SMZO2SGvSdtsdcYruLqgsr+8dAbdl7P4QIROrgHOWofCZ3MntgD+sY3z6b6oOWTyvqVdfTOEDpGXS3bszNd7L9LdP2pHE/aVJgEqDvCpPCUEyhEhJBbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763970051; c=relaxed/simple;
-	bh=hKAm1QP5iQ7ylT35WgFBWAPfi25FIgtwnqpMskXuvBc=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=HMrmmUYEx2kIxmEwqoZlbPKUEqwcCY7xPcwT4dfyUqUP6w9aS81dA/QjAgspSek0CLiU/OaT/BJxkmJ4vdeXtLNsJH9rNV66Tn2gSDigBbYuonyjQibU7Pu2e1MyGaV1nkeNBFVENy1i+AfGwL15dE9+shpgDB8MdpQs8oYkywY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d+r+w/Fg; arc=none smtp.client-ip=209.85.210.170
+	s=arc-20240116; t=1763970056; c=relaxed/simple;
+	bh=ufCbvxIRBVQHCzUSRhXUdWL2YVW5ycqhQc1EXb99qW8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Fw2F/NZJKEbd9Gsu1wUOTx+LFxYBAiJJbYVxESA0R0pMK+ngo0UruL5GkcbZxdqcabWTe6ixf89ChJkq1GsM9bvyOWHpsEcxFszTmy5cn5GT2yTycmuxR57A78EvuKuxo5UjuZAX+KSkAH5HvoNP3wYlBtY7/JxhGbAneg3VeMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l8KGulUx; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7bb3092e4d7so4293981b3a.0
-        for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 23:40:50 -0800 (PST)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7b80fed1505so4518210b3a.3
+        for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 23:40:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763970050; x=1764574850; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=v3ae9Tov7fRV3Uo1/Dek/6qZPUMAqPH7nxpirY9041o=;
-        b=d+r+w/FgMR1uAX2L6ltDFBVKP+B9z82ehM3ttYgd7eNmPMxF73HaV8m1rHySvjBxQ5
-         ZUPH/CYCbxMudlQeovqfNAnjppnvAUM5ktRe4mDnGYWk26LN7fYpNAi/8Ja7VfEL+CE7
-         m2WlRNjiBwxPAwTGyIrbkMrYUPs1t3WHuJGXSl7JoD6oxxHqZMiJ8c2c+PPYO4ypJkUw
-         P/pgWsVifPicWTviHmicSHkvKlrXX2bK/RgkJ5ObpORR1pa2E7czX2CYdx3xffaVNT4q
-         RJgVtefe8JOy0yHkrBqV1gVxcUCXoPy1CsC8tXNskrHZN4m8w9TakF/rRJ2ch9cr6s4T
-         AAIw==
+        d=gmail.com; s=20230601; t=1763970054; x=1764574854; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R+K9MAxb4ZBBa8U7x004Sm9bCoWfglzoRMNcWRH1ZAc=;
+        b=l8KGulUx7MjlHjMos/qgnBHgPA8K7nTPU3wmGqlkx9ygstXS2OhAD2g73wmJYLnOD8
+         QcmO4X6IpNMJMXKNLKOYiaPGRMuLAXlQEDah89teGY1YbJyMgMgljnacdeDJjTheq+li
+         j7dDTBX6WHI0gcs0s9IHGi4Wm4aK3r+PgjH2KqGevJyIXR+S+4aQTmhm9oiFycTG062f
+         B628nvA5/v+iLeqp9hRX4uaF2EzgWEcrWrvtuhz/BihOcVk86lEEPeY+KwLF+lVkl5HQ
+         j6u+lHvpJaNxQUjr4tE/2e0IBKAXwogc/UIIBEA3UygOKZ8COJX2K++sXJwFBb4153fZ
+         zi5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763970050; x=1764574850;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v3ae9Tov7fRV3Uo1/Dek/6qZPUMAqPH7nxpirY9041o=;
-        b=a6wj2ORwgl+r+e8fWy5BiqZmvgH8Uf2L1tNtEhIfQN3q+CT4pjfQFQWCcx+3o6WzuT
-         trFIRCHstakXU/ftIAnIhdhrwbrzttH6EI7DMA2cAsFHFpa+flOtPGf4pRtVv10gIX31
-         nS+fBtRT9rO7ub5eV6V27L+M+Kto5tjAPH/qlpIpKspxF6TZ3J7RFVzWjWqifDsWcxN5
-         /uEuMD+fb6imi8dnyCyh8X02i2tjf3GjxrOpGyOyXlpifkAlhdvTXJkIBcHXpMMZhHN1
-         x4MvpOaDUeFc5IZkRLvJ+Zq2nowH5ytEF1NGaY7ajxB14JVUu483HlYXtkRkXxg7GLmE
-         J+vA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTVj/jUJffoPt5+tCV6KZh1TnOSEBdyeeeMGKQduCzpHPthhSWbxYFtLf/DInzG7ePFCCSwTI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmoSvOmoWmtgXLK0exfLRHwsWvgUdWuK1Jp3rgQTc5hFdeOPU3
-	nwGIl2pZJDPvMuGu2DBVW4GZMtTgx5sOPaLAskmIalMy2Rb22GKlluBb
-X-Gm-Gg: ASbGncukcJxCgGCMu1mz3e08mrYjUV0z5NHHgT6jTGRal9ShKlPzPAv3oP8z2/tViUX
-	38cuGIHnbSw5C336prGatjj9JGxOsnEpXEGstQx63CIffiCuD1KbJe9+y+MmZ5vGeI6Vro3kgN6
-	sc7C0rnXV8EaKnBZrl306BIhQGbD825jsYIW6Y+k8JrMMVct+Z2tPQFRgytHujlrO6NdHduMsK7
-	nwu7xrUzw2FdNUedQQcRApGFtM0EKOsR0tyQ96gpcn0CkJbk07aSS7ZNOC51FCgQG7lotiUq9Oc
-	k2G89TeTr7GVpmpKwCnwZ/N7fI9GMXX2n3q+eUoj+5T3xfLGghZ1AanwnwpjcBb6Hj7LXOhIBlS
-	E8WsvOHrrGeo+QR8BD4CWtHgBU5ugwPcWM6JEhR2uCkSWzLFkh9EA8UjsfSWNzkw5e5whGcDRL/
-	f3C9RTvR/B
-X-Google-Smtp-Source: AGHT+IEeIql7pb0dkGALdREf6Wnlrxqh98FLLAtvq3DFqrdy2TFXbtLBHe88eniPMafYpkrG+cQ8oQ==
-X-Received: by 2002:a05:6a20:3ca3:b0:35e:11ff:45c0 with SMTP id adf61e73a8af0-3614ee21050mr12748684637.55.1763970049661;
-        Sun, 23 Nov 2025 23:40:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763970054; x=1764574854;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=R+K9MAxb4ZBBa8U7x004Sm9bCoWfglzoRMNcWRH1ZAc=;
+        b=qnXQQY2GoVuO+vs2zbZVd+FfN9sA99jAQ8Rblsh61rucagXsuhQRPpbVcOEARkNeDU
+         BpONBc/kGeLWIYRd04PaUM157IE7B7o3Pu84TogJUzZj3lEx0lL+G1zfqCMpKRyqlRwF
+         KKDhqOm3gXm/+O9JJW1OvYLJMd0BXjgjWQMja2W0sBtUXi/1dqGOm8aG8t1qFgY1Y84f
+         LeJ12h0kY6FKtb6ycgSR1wHHox5lxYHD7xo89IZ/IhS2HQwuaxVJZEAkeMk/PH/wH/94
+         iblyhBbQ5KmsGNvCy87wCzLoiaFRFrkrRG9EIP+rRze+p5yLHZNjD5m5PKL5PDx/zTG4
+         Xtvw==
+X-Forwarded-Encrypted: i=1; AJvYcCUogsOocrM6HNZrea6V5H5FX2UABPglQY9e4EFGzhmOfyr3oZfRUIlvDV3YZGjCoSuWcKoUQes=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPrcynh/CAuZVBM8/HoT4kIm1DxC/jiZBkMoVnPxFAA0DZAlrh
+	LAuvF0CmEVdqaxlrhkCPMFYqi5gLN8HAqZAL9JB4/TRsrVwupZKafb7gXSQUjg==
+X-Gm-Gg: ASbGncuv1DJw7/CcXk+/qMjR1hpbjp+v8kFTvX2xadXu+l/vuBBMXLIFqlaThTPVEgR
+	eB6a7RlzTR9o+JXfqs+w+7gUDcer15yWjj4cI5PUKNcLUy3WnKnFKTTxTsTNbirlzOLuXh76G6s
+	j9LTANpwyPhcclUGxBt0OtzO2A+8DfAGeVQNsk1Myxb14H0khRzrmo3GRxRxo/a1LWGcYQ0AeFB
+	LSbdNRIQgZ8eOLzVKguKpB96iM7Ss/rGx5SoD/HYm6Kh1NVNGV6zB05nE4gF37quxhPW26T6B8k
+	Zl+8JAvQSDOF83xW7GAapqaG530/JZkiyJyHx/qtFbSMUFiaCLsSAAXpFNl7ThkR9ja9J/hVHmE
+	u3L/QhYNvd50SzXCdjvSdQi+ywXjNmH7kFhj1r1xE0K8J/6+cu6D7UQXw3EcylgClmn0vY2nLRE
+	sKlmiKkTdaMs14V0Zqgb8=
+X-Google-Smtp-Source: AGHT+IEPYnRgpYVEveCbU01kGtjxHAKa5FApKeCv+NruF3NYPEK3DWUd1nec9k94JoygcajJ+fMyFg==
+X-Received: by 2002:a05:6a20:729e:b0:35d:5d40:6d65 with SMTP id adf61e73a8af0-3614eaf5281mr12077444637.5.1763970054294;
+        Sun, 23 Nov 2025 23:40:54 -0800 (PST)
 Received: from aheev.home ([2401:4900:8fce:eb65:99e9:53c:32e6:4996])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f024b4aesm13410818b3a.33.2025.11.23.23.40.45
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f024b4aesm13410818b3a.33.2025.11.23.23.40.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Nov 2025 23:40:49 -0800 (PST)
+        Sun, 23 Nov 2025 23:40:53 -0800 (PST)
 From: Ally Heev <allyheev@gmail.com>
-Subject: [RFT net-next PATCH RESEND 0/2] ethernet: intel: fix freeing
- uninitialized pointers with __free
-Date: Mon, 24 Nov 2025 13:10:40 +0530
-Message-Id: <20251124-aheev-fix-free-uninitialized-ptrs-ethernet-intel-v1-0-a03fcd1937c0@gmail.com>
+Date: Mon, 24 Nov 2025 13:10:41 +0530
+Subject: [PATCH RESEND RFT net-next 1/2] ice: remove __free usage in
+ ice_flow
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,6 +86,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20251124-aheev-fix-free-uninitialized-ptrs-ethernet-intel-v1-1-a03fcd1937c0@gmail.com>
+References: <20251124-aheev-fix-free-uninitialized-ptrs-ethernet-intel-v1-0-a03fcd1937c0@gmail.com>
+In-Reply-To: <20251124-aheev-fix-free-uninitialized-ptrs-ethernet-intel-v1-0-a03fcd1937c0@gmail.com>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
  Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
  Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -94,47 +98,61 @@ Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, Ally Heev <allyheev@gmail.com>, 
  Simon Horman <horms@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1250; i=allyheev@gmail.com;
- h=from:subject:message-id; bh=hKAm1QP5iQ7ylT35WgFBWAPfi25FIgtwnqpMskXuvBc=;
- b=owGbwMvMwCU2zXbRFfvr1TKMp9WSGDJVuH8JZcQ4PdmQktghYcHQyPNXLvWN98Ps9aU7KlLOT
- fn18rNLRykLgxgXg6yYIgujqJSf3iapCXGHk77BzGFlAhnCwMUpABMxmcvwi7niw2P7f86bJDr6
- He3MnC8JqebN+Hf/ZqxH6H/+Ct1ddgz/C1KMz2QfTVkk724QIxtTaCpiteHpnNV715+apK2VJfK
- fFQA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1688; i=allyheev@gmail.com;
+ h=from:subject:message-id; bh=ufCbvxIRBVQHCzUSRhXUdWL2YVW5ycqhQc1EXb99qW8=;
+ b=owGbwMvMwCU2zXbRFfvr1TKMp9WSGDJVuH+fLT8i4MiarX3V2Zfz45EtZhER13qC9RZ2f5gsf
+ 8Im5cfGjlIWBjEuBlkxRRZGUSk/vU1SE+IOJ32DmcPKBDKEgYtTACaiIMfwV6h4w7q5V16Ixuxm
+ UhHxm80bEcQcUJAZGNYclnRZxP/0W0aGQ4tnBK49Nfv1myveZsyHYvm2Hlml7uQwOWOpUkzB7a+
+ LOAE=
 X-Developer-Key: i=allyheev@gmail.com; a=openpgp;
  fpr=01151A4E2EB21A905EC362F6963DA2D43FD77B1C
 
-Uninitialized pointers with `__free` attribute can cause undefined
-behavior as the memory assigned randomly to the pointer is freed
-automatically when the pointer goes out of scope.
-
-We could just fix it by initializing the pointer to NULL, but, as usage of
-cleanup attributes is discouraged in net [1], trying to achieve cleanup
+usage of cleanup attributes is discouraged in net [1], achieve cleanup
 using goto
+
+Suggested-by: Simon Horman <horms@kernel.org>
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/all/aPiG_F5EBQUjZqsl@stanley.mountain/
+Signed-off-by: Ally Heev <allyheev@gmail.com>
 
 [1] https://docs.kernel.org/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
 
 Signed-off-by: Ally Heev <allyheev@gmail.com>
 ---
-Ally Heev (2):
-      ice: remove __free usage in ice_flow
-      idpf: remove __free usage in idpf_virtchnl
+ drivers/net/ethernet/intel/ice/ice_flow.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
- drivers/net/ethernet/intel/ice/ice_flow.c       |  6 ++++--
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 28 +++++++++++++++++--------
- 2 files changed, 23 insertions(+), 11 deletions(-)
----
-base-commit: 24598358a1b4ca1d596b8e7b34a7bc76f54e630f
-change-id: 20251113-aheev-fix-free-uninitialized-ptrs-ethernet-intel-abc0cc9278d8
+diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
+index 6d5c939dc8a515c252cd2b77d155b69fa264ee92..dd62f5f14d60401d6a24cb9f86664425db1532d0 100644
+--- a/drivers/net/ethernet/intel/ice/ice_flow.c
++++ b/drivers/net/ethernet/intel/ice/ice_flow.c
+@@ -1573,7 +1573,7 @@ ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
+ 			 struct ice_parser_profile *prof, enum ice_block blk)
+ {
+ 	u64 id = find_first_bit(prof->ptypes, ICE_FLOW_PTYPE_MAX);
+-	struct ice_flow_prof_params *params __free(kfree);
++	struct ice_flow_prof_params *params = NULL;
+ 	u8 fv_words = hw->blk[blk].es.fvw;
+ 	int status;
+ 	int i, idx;
+@@ -1621,12 +1621,14 @@ ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
+ 			      params->attr, params->attr_cnt,
+ 			      params->es, params->mask, false, false);
+ 	if (status)
+-		return status;
++		goto out;
+ 
+ 	status = ice_flow_assoc_fdir_prof(hw, blk, dest_vsi, fdir_vsi, id);
+ 	if (status)
+ 		ice_rem_prof(hw, blk, id);
+ 
++out:
++	kfree(params);
+ 	return status;
+ }
+ 
 
-Best regards,
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQQBFRpOLrIakF7DYvaWPaLUP9d7HAUCaRn0WAAKCRCWPaLUP9d7
-HPCSAP4tu8ld+4Og65tjSYNChRqIR4Gn8C546JFeozyQW6uj3wD/SQEPIidSAYbb
-klXrZrKIBOc/avt55S2+krl241aNJA8=
-=guHM
------END PGP SIGNATURE-----
 -- 
-Ally Heev <allyheev@gmail.com>
+2.47.3
 
 
