@@ -1,241 +1,352 @@
-Return-Path: <netdev+bounces-241238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CFA0C81DDC
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:18:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FFAC81E5A
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:29:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D109B348463
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:18:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 295023A910F
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59079339A8;
-	Mon, 24 Nov 2025 17:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182CD299A84;
+	Mon, 24 Nov 2025 17:29:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="btVV5XHA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eiNYAC0u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939063A1D2;
-	Mon, 24 Nov 2025 17:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764004690; cv=fail; b=s9xUnI2KUovzyvtWx35V+GO49DhxOCVIjxmMpclndxg0KlWnpWFBtRZd46CO0BiZcQCxPPds4c7QivEAg5XuSAREzltLSBxpMvUvqw3MzmRtcr7gV7EXY1IpZ5vuBsrVMfDxJk0BHvEYiOQ2Kr2EMbBSROwoBxSjtLFX0bSPEFo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764004690; c=relaxed/simple;
-	bh=WMIjo14BhP9f1zJGi0pkX4YlnoJ7pphu4zWQw+OdWxA=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=cwUQyO5qUKnueC2dOdLfBYYMteziN7czBOV1l5XxdLr9lPV9pLPNYZLnDylVZQxO4hRH2Es8CvOTCBQCwH1nfhZ6EnYxKolpeTom/8PcSgyo6vRiZTxzkeqLO5a8bnq7rg0yUtbN6Tsv0lRpKEFXIH/W6jOReaWrYCgkbIPkIuQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=btVV5XHA; arc=fail smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764004688; x=1795540688;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=WMIjo14BhP9f1zJGi0pkX4YlnoJ7pphu4zWQw+OdWxA=;
-  b=btVV5XHA4MMngje6NVNkn7/zy73WkmwAg9Ic8vb/3mo4zLzjLZfGmIhV
-   w9JQOwz+7qCXjhOIAO1DRaFBBj9cjp3l7WoxDeAT0HysWGC18nrSV3+Uz
-   gDaDdNjnRNMx6qP5OGDi7MQDHQshR0XvEARmb3q2BmU1CxuTnW1EMw0Iy
-   zKSYnt/ThHrFlBWtqnrO9DEUyDdMb0VJ2qzKyCBkqTMSQRssMtaut5nHB
-   y6NZZNu90EnRaMxGsKbekDUkPhvHB2XStYEJ8iXqVCnLTwWq4bdSK57HN
-   V0D2xaJ03bAe2UVVmsb34mGk6jRMBX8cfEMtfPxOFDeJ/F09SDvGbtOCj
-   Q==;
-X-CSE-ConnectionGUID: bPP4/hcmRCGivxsd1lgrKw==
-X-CSE-MsgGUID: CvxwqXgnQnWRmLxeO8/PIA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11623"; a="65892044"
-X-IronPort-AV: E=Sophos;i="6.20,223,1758610800"; 
-   d="scan'208";a="65892044"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 09:18:07 -0800
-X-CSE-ConnectionGUID: 5XslqXZBQT2htwOCgvCNNg==
-X-CSE-MsgGUID: PA5V2g0mSACOW5UQ6NSEqg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,223,1758610800"; 
-   d="scan'208";a="229677332"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 09:18:08 -0800
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 24 Nov 2025 09:18:07 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Mon, 24 Nov 2025 09:18:07 -0800
-Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.5) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 24 Nov 2025 09:18:06 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VihBfHl0gQReEOk9BmRo/07l5jQsc5fBNzfurxPOtal0jbMNGYVkshfdlF8adbytuIRFjetSqOEdYNLy3XeboeMDUFdjCJQIasInyw2xKh15xsaM02oIEPeFad5aYnM22FO0MX/HRPz5YocP6J2mtJY5fV/GKqnvS2Iubc7codtZSmQfxZcAJ+ITcy2iP7ZPeGGRps54R6G4AJGoyl4Fc6XxyiU1CQMcESEuE02L7psREcglc1xxLizIJBm4wt9Zqiy4K5XxG6SZSrvPi+vlujYlh2SYqQSgA5XssjZyMjnuTxZhuqp21S7DR+HwqNGGyZDhrSigIGqHZmXXNrE43Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Qlch5yKtapCJe0tqTJA6kWR9WdJoj2i+5c/tmycBHJY=;
- b=bZ6N+2KtKqPkx6i8DfaNGZUaXexhf1GlUmNqcujZAEdQXNV5UN/iz0aW5bYzyHBJslO52JlmB09gK8qEsQPPGLElhqKNP5r2Tu1nvIjybbRwQp3N2Zj6HXa2r7inKbnGnvcH6dg0oadk5x/S/lcgto3I5lI/NO+BHosbMlsmDNHw5sJCzmFcOZfXs9gkWbbHhNvAfxDZUtJBgb0xP+HPD83+EYIRfm/ArR8g7Cyxl0hY3zc/Y57CgCkHJTG98040NSKt6L3/QlQxNYhLXsr9+oBnJPWRE6JGUgGDq1EA9L0DO5u2S3akY/GaxMPy6qNSaNeGQvgjrOKdzqKwHPMgfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by SJ0PR11MB5917.namprd11.prod.outlook.com (2603:10b6:a03:42b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.17; Mon, 24 Nov
- 2025 17:18:04 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.9343.016; Mon, 24 Nov 2025
- 17:18:04 +0000
-Message-ID: <c7bd3f03-fa2f-495c-94cb-8e310608cee6@intel.com>
-Date: Mon, 24 Nov 2025 18:17:56 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ice: fix broken Rx on VFs
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Jakub Slepecki <jakub.slepecki@intel.com>,
-	<nxne.cnse.osdt.itp.upstreaming@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20251124170735.3077425-1-aleksander.lobakin@intel.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20251124170735.3077425-1-aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL0P290CA0012.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::12) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3095722B5A5
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 17:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764005352; cv=none; b=uC/P/dkkK+gqRdZTxnc0T9HLAMg4xJ30EPE1n+zl+ibI1d1A5+CHLt8a0BqMbur1baJmqHAxnYNvPPN2X73leHi7ewhTpx0uU6u5+Lhhdg/xEuWexIZT5zax4mT4BdH/IZ8eHbXahDaXmkFP/HZf2itdfvIgDeV7kRuDC6iqe38=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764005352; c=relaxed/simple;
+	bh=3qLHJf58X1rJfwubqdevEmvmYGbazTZQfyknMon5N6A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dRhgpXql9dS2IvXrxYvNi0N5OFVIun2IOshDoJZ5seZNsrZsGySFZ1LiBSleo2FRVScC7Dzlt5h8HBUZZGW1zeOidn6eDkwH728F8Yceot2DpZlrF8sCCzQHgSSr14f3FsYhXioQ+ckkV8h7VbB+UBSkc+PxmJhE8XHJJkdTYEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eiNYAC0u; arc=none smtp.client-ip=74.125.224.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-640d43060d2so3909923d50.2
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 09:29:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764005348; x=1764610148; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=htvUcTUPA56KhF8RfozM4+oaK1XLvT7ELpBPdkeAVFU=;
+        b=eiNYAC0uLJn0jQyeNDcUmZIU02WQtsvWMCpc7Viuc4XCcJCs6k51w7sbaZWpbK8I/O
+         c6gkh11MNfrLhICB0RjwgC/OHydzv9fh/v4JHhBBpxkKKsLk8QE59QaCIBISbzxQ2UGm
+         X7Z1o+grZZI1bTgJQwqzr2q0zReZ/HftLRh1RvDilUiWb71naZ3RC3gl/oW9poDcRa3x
+         PoPHYDLdla/fX3/2RiuUgBjBzOdPyHtltRlZBTNDH2hiJnsxicGzPYV33lEqp8QhLsdz
+         H644k3uNtwQCH881h/ofjVfrECPinETlsLdxfFsro3HCVTcfYw37Ow+HbIGt2HRsdXm1
+         MJWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764005348; x=1764610148;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=htvUcTUPA56KhF8RfozM4+oaK1XLvT7ELpBPdkeAVFU=;
+        b=Fk7qz/Hz/BAYGkftpgjGhIo2YTJPeA2RSF15QRL2xQT0sVKvlVn8TdDkdUO61rh/OE
+         GgcOd5qN9gLFkzd63U8z0Bd4zcrWExPqUcNcQRrb1LXbZoGSq1yo5LlzTS8uEnWVwkm9
+         W8VVpQ1zJIJSg3MbPAqc4yscz6CEhidpcUk0XK3Et06SYNaFfjADa6UcyhtRtG8LbLIX
+         7gYfHOGQ2sKqFrkVngXuBU7H5eQLvKIYAiClC1x/sqvXhQJQOAm+nCJDRnO//cUj0X0M
+         RjJJRLyBkiiyv9EHM5B6p8apAV0hRsStnQ3bOhfgUE0vTVaFxTND2o+uo/n/7PgnauDq
+         qUJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX07R8FEIakOMio9jUBJFQlarbPK3P6VQIjyIrVeUzidH/WkVEnyBBiVii+VrvFstDJjYHsP40=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxW1ewHILwb+LZ+K/6bYyyHC8oN62Fwean5dpoKIdw34z7QLAd7
+	E8s0aiqHNS92HxE98QzPIj6rI+bP1RTBoRoxYGHdhMs5Lvmq993nIdF9
+X-Gm-Gg: ASbGnctB7O43FdhJt2rB9Pb2+DDr0Uwmv5feJ3X6cqGe1iuIAFOZ3O9axq5VkM9XVGr
+	GXlYL5Rgr0GyPqU0UfC4gombdtWIyg86aGTBDlONIyN6gOnQDuak1x45e3CwPp8vlnK4nxRHmKc
+	QXy8qu5KKYwRRbs8gB+MOvXX2qNEAM3gtm9SJ2zXKwGCljflUCCUrg93U8LYy4EhLu6JdrMtBID
+	fXsJ62UYDPao46+buXtF17Jo/+lPAOb3GnMmPE0zqU+6O7I00V9t8uDe/g6hWeeIc6o7XGemIKZ
+	AbwEw8+0bppOhKa1Gz4RHC1vQ1HFeXDgreYIOk+O7rgftbZd7jhyA8LSrDVHswo/xNKEvdq/saD
+	9AFatwwpaggP/QwHvuIxHpDjL4ygK5ARivblWxxderSVdzqUlgiWRSK3I83Sb+2AWN/2YVsE9lM
+	RiLEEF0kxwB0x/0vP4t+UEHp9bgkyT2Ux9fNBddWlvwShDMQ==
+X-Google-Smtp-Source: AGHT+IFYxI8+kC4SMzaSmWEIUBq/nX6leHMHPY4z9dnG9Xg+5o4fzvBdNWYf/WnztH/joMxi+JejpA==
+X-Received: by 2002:a05:690e:1482:b0:640:c9c1:a329 with SMTP id 956f58d0204a3-64302a66b95mr8027675d50.32.1764005347883;
+        Mon, 24 Nov 2025 09:29:07 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:9::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78a7987f4e0sm47087047b3.4.2025.11.24.09.29.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Nov 2025 09:29:07 -0800 (PST)
+Date: Mon, 24 Nov 2025 09:29:05 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, berrange@redhat.com,
+	Sargun Dhillon <sargun@sargun.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v11 03/13] vsock: reject bad
+ VSOCK_NET_MODE_LOCAL configuration for G2H
+Message-ID: <aSSV4RlRcW+uGy+n@devvm11784.nha0.facebook.com>
+References: <20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com>
+ <20251120-vsock-vmtest-v11-3-55cbc80249a7@meta.com>
+ <swa5xpovczqucynffqgfotyx34lziccwpqomnm5a7iwmeyixfv@uehtzbdj53b4>
+ <aSC3IX81A3UhtD3N@devvm11784.nha0.facebook.com>
+ <g4xir3lupnjybh7fqig6xonp32ubotdf3emmrozdm52tpaxvxn@2t4ueynb7hqr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|SJ0PR11MB5917:EE_
-X-MS-Office365-Filtering-Correlation-Id: a669c498-29cb-42b5-8776-08de2b7d6d6b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?bVg1bXJRSXNPWnBpeUhDc2pBRlVIN3k4R2VMZWpGSTNRQTFuZXEzRHcwWFpD?=
- =?utf-8?B?VnhSZThyeGxQUksrZWJRTVNXRFFwSEtPUjYzb3NnN01mNkxEUUJ6UlB4azN1?=
- =?utf-8?B?SDdZTUl6OVdNcnQ3Q1Y1a0dodklSRk1ldjQ2NVJwZEhkK3NOdFplTDd1WnVR?=
- =?utf-8?B?ekVLODRXeGJiRXVCRFJoTEdhWUtuSE83Y1NMMXNsZ2RVbjF0VjRUYTNobmdE?=
- =?utf-8?B?cDVzdks5ampjWHpZMEd5SGZERGtWMDZodTVsQXc0TVVKdERFNGEySWlZNFZz?=
- =?utf-8?B?M2g2L3YzaGhKMXVTYTlXZEZXMjYwUG41eGFqZ2k5YzdlWWJLNTVhMktJZXVV?=
- =?utf-8?B?N01sblMwdGJUems3UWFkY0wvRC82YUEzSkJCQ29ORWdWZDFRZ0FQMnFsZVMx?=
- =?utf-8?B?S1pqOEt3QnVESGRNSUZBWVlBdEo1L2RJUFJDczNtRzJZdmFrZG0wcDBTcENn?=
- =?utf-8?B?Q0ZiOTNJM29hYzgzazdEcXQ4eVFaTTMwMGYwZkxueTBEczJNNFRzRnF5akY0?=
- =?utf-8?B?R2JwdmQ5VVBrVUNxcFE3VkRsdTVCMVRqcmtYY292Q1BXU0ZnZFBtWTdsQVh6?=
- =?utf-8?B?WjdidzNzNm14SmdvMXFuMkJ6VDd6MzNhN1h2NUFKL3pkVVA4ZmxBZ2dteEJS?=
- =?utf-8?B?Z3lDZHhaWHBLTEZ3SDNkN0tKaDM3WVA1MDRPeVB1K3UvdHd0d0NPYmRtc2NC?=
- =?utf-8?B?UG0rcmVvSnlwS2lGelM2blYwalVYMjRMUkw0ZUhuQ3VPN3orNmcvTjEyYzBa?=
- =?utf-8?B?Z2xXclN3Q3FKcTd4RFhjcUFUcUFMQ0lRQ3dJeUpONlJUczhRMEk2bThERVVh?=
- =?utf-8?B?bjhnUGczUHFOZnJjUVh4Z0QzS2NaSE80aWNSd1ZqN3lqOERURERSd01kUjhn?=
- =?utf-8?B?ZTlBK0NPcG5lSGVaR1YrQWJTM0pTckNBSXpqUHhmMjJDc3hWc2ozMnpKSzIv?=
- =?utf-8?B?VGN4TmRWelNDWTVqdFpPU0lueW11ZndudG05SzAzR1AyaGdqVHRFbUZSZG9C?=
- =?utf-8?B?NHFHL1NiNHdLYnlFNjBUTFFFcGxCYVZDczZ0QmRJRHIwZGtRMkZ3S2tWbWpw?=
- =?utf-8?B?YW5ENi9oWjg3c1BxenZ0SVpUMmNtZ1ZuVXVQRGxnRnB5clN5YVVWZitkM0xn?=
- =?utf-8?B?VkhQcTY4RHI4WmpRamNmTmZtRzNHcm9IaFlIaTFqTmRpZE1HYXRBUjkzVW9Y?=
- =?utf-8?B?WlFrVHp3clQ2QkwwRlhjRlg0QnBZVSszQzZXQ2p2YVRZcStaRjRWZGFxOVdL?=
- =?utf-8?B?ZUxYb2lXMHRuNzNJT0FBMi9NcFlWMGxLcU4zTlZlVUJrN2lBa0V6NjlVOEJo?=
- =?utf-8?B?MmQ4Ulc1dEo4UWJ1S2taZjVkcjlsdk9xUnZ1Z0RmYjJIUVBtWDdqVVRjL3RV?=
- =?utf-8?B?WjNuVDdwKzdtQWdjZjV1ekdOWDRHQmJpeU84ZDlBcDJHL2dRaXpuUjBBZmcr?=
- =?utf-8?B?UzNabU93eXRsY3pveWtHcEVEV1orOU1lOUMrM2lOUGpidGhjaXJVNCtmQmVB?=
- =?utf-8?B?QnNSR0Q3OVJrVnRRWW1GakY2T1RXLzNSdXE2N0Q2MzFDempVdmFaRDNKRnBk?=
- =?utf-8?B?dUcycjZPdGZSVDE4aVZFcGNGMDJLVFN6amcvcWVFekgxTTRjTThYU014eERo?=
- =?utf-8?B?TTJkNE40QkpkZlcxV1dHcEg1VmlIcW13RkpCMDdITTZZNTNPL3I1M3BYRzRq?=
- =?utf-8?B?dEVZSlgxeEF3aDRJc1BKZHJ6dXMvRTMxT21TcDQwR2pCL0dlVlpOTTRUWkFW?=
- =?utf-8?B?OU5EMThlZ2lVRlRCYmNIK0doUk1mYlRTYUFqRXBTbk1wLzNMakNvOG1QT0dy?=
- =?utf-8?B?R2pWbm12L1dacGlIbkh4VzNkREsrcVMzMGdaWDg1ajMvc3IwUVBsQTdqZzhL?=
- =?utf-8?B?bGdsOGpEVXpjYWFIMElXcVdKYkhJazIxOENNOXE1c1VPK1p5MWZ6bWdpWllJ?=
- =?utf-8?Q?9SrwGNbr323J4InxucRI3m2PF5E5bTWw?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZHpkSzVMMThKZHlxK1luTlRQbzRib0g4Ymp4Vm1BSFRObytVMDNQckc4dGQ1?=
- =?utf-8?B?SEpFWitkL081dFhxRHdEZUs1clkyMFFDaVNHNU1vN2ZpQlhhN2IzOEJadjc4?=
- =?utf-8?B?Rlp5Y1I4bjlVZGg2WHBDRTBnS0tJd243RGRpNDRVRTZRT2pVZkQvbnNaLy9V?=
- =?utf-8?B?MkpCcXQwR0hOZjVCSVBTSnU4RG9Yd1UvbXZFNEFBM1dUR01NWnlVQkxuS3pR?=
- =?utf-8?B?SEdrREEvc3Mzem1Rd2gwU0dFRksvQkMzUEhBN1dNdUxUbHdTcnVqaGo2RjNC?=
- =?utf-8?B?VkhmcnZTaStkYStDdFFMM3l6OElkS2V3TEU3aHgwUHd1dW1paktDQkpWM3Z1?=
- =?utf-8?B?MDZma0t3N1VRSVB2TE8weDJ3TnBHUkovaFlQSjFwRENUQ2NQUGdnQis4d1Jo?=
- =?utf-8?B?Qmw3Tk1hdDhlZnMwbHlmVFpmdDhrYUd1VjBDNFh5c3R4aVdTaE01Q1RUR0dn?=
- =?utf-8?B?R041clN2ek5tdWlINmYyM2ZoNzVhbFJvSWFQUWhhUFRUWlFxWFZQSFpZeitr?=
- =?utf-8?B?dGdYTzZzRkdMdjUrdndBd1o2SEVDM3NETDZLZ1RKcUhSejhDL0IyVi9iUjd0?=
- =?utf-8?B?aWtER1lhSkRsb0xyRU50ZjNCVDhOUHlOa0hLWFQ5ZE8xY01qZDArdDB0QVBU?=
- =?utf-8?B?KzM2eC9ONWlhR2sxOE05dDMvMkp5cHhlSi8wd0o4MzE4NUxUUGRmZ3YyTXZV?=
- =?utf-8?B?cDB0SkJsdTczVjM3bS9CSkR6NmxqMThpbnAyT0JsLzV5VlRMdEVjS0lTU0J3?=
- =?utf-8?B?RXk3OEdDZXFON2cvOFAyQ3BBVnpWTUV4dlZOclBFNHB3anc5dFFCcnBkN243?=
- =?utf-8?B?eUpNN0JEQ0FMQ0U2UW9kNEZORUtXcU9OdHZiSHQ0VG5EVzdURjcxZDFHV1hX?=
- =?utf-8?B?WGE0M3pkNEZRVGhiZW9sbStqaklYdUllQ0NzVWNHeTlaZTNpUG9pOEQ2NHcw?=
- =?utf-8?B?Z1VZMXZwUDZlZElST0w2NVNkT1hSeDNOVTdtNC9TbmY3Q2JwZ0lHTi94R0tY?=
- =?utf-8?B?OE5SRXBmY2p2czdFQXo1L096OEdMc1dxbXFucm1lNGJROExYdlFCZVZBN1hM?=
- =?utf-8?B?N21GRVdta2dVOGJQdDlGbzlubWZWY3RrQlR2eWNNNjYwQktxWTl4OG9HS2l0?=
- =?utf-8?B?cXo1UlhlcmJEaXdDOFZtalVXR2w5S0EyZWs1ZW9hK21OR1RwQ0JSc0lMMDYv?=
- =?utf-8?B?RythajM3OHdubjBWcDFKdkJOUEJWSDF2alZlTFdlYk9LNWZzNDBaRGM4T3M3?=
- =?utf-8?B?YTQ5djlpUTd1TkRQQkZDUmlwK0c4dGZzbFJIV0RmYW5mUkQ1dlFWajZqblZ6?=
- =?utf-8?B?MHNjNTJCQmhNdE5CNjVZZVYwUU9raXVnRDZHcnRzcGR4V3hGTjFCSElhc0hZ?=
- =?utf-8?B?c3lmWjlsODdERkswTkQzVWM1VEw3QldPakJudlVGYksweDFRWEdSenRNbWQz?=
- =?utf-8?B?d3UxMFVwMEd3MGliVy81NjduWTFoa014TFBUS3h1ZHVkRmlnbzdLV29hOWll?=
- =?utf-8?B?Yi90RllHRFpMbzgrTnhQbHJhcjY5d2I4WlN1Z0pEYjhRdEQxZUdlaWdrQlEr?=
- =?utf-8?B?ZnZER1hhL2szdU4vWDNxQ2tFNy9pSWJFaGJUYlFSOTBPUWE1NmVYblVwWTA1?=
- =?utf-8?B?L2VDdm9mM3RTYXd5VmRHMjVxK2FRLzBKR1ZjR0x6alJwd2hmcGdzZmkzdlVs?=
- =?utf-8?B?Sk1GTDhGT2lCaDFKSVNpODdhdXUyT2NIV2VjOHdYYUl1THU3UEUvc0dnTVk3?=
- =?utf-8?B?Q29raHNwMVZYeFFyNUE2MEV3K2MyanNBSkVEQ3FERWFPRmZ5TFpPRGJGZ0VQ?=
- =?utf-8?B?djJRYWVodTZjMjlWNGdIYnpHSVUwQ3BzcnpYZ1l3R04zalJFZzdVZS9TbUVH?=
- =?utf-8?B?b01EcCtEOCt4UWlWSUxtSTYzaW9PeHhrQStVblJIVXZETEdpY1dYU0dlVzRN?=
- =?utf-8?B?cUJyK09pYTZpWHJvaE9jNTZwZ3FmVCttTWRuUUtaNzNyb2U1amRBRzBSZjY5?=
- =?utf-8?B?SnhQK29yWjJVdWwrZWJpbFBmQ1VROGRob1YvbDlKUlRaVkpxTWNBQ1E5cTFl?=
- =?utf-8?B?dW5BK2xLa1JLWHgyOUN3cmluaUZhUDNCSmZ1b3VtZzZ4ejRJWnNETjhjQm1K?=
- =?utf-8?B?dXdMSkpidHhjMmQrUXJmK1FhS2lza1BGaVNZTzUybjhyclFyTEpZTHVhbzlk?=
- =?utf-8?B?SlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a669c498-29cb-42b5-8776-08de2b7d6d6b
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2025 17:18:04.2640
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: itf2V4GS/l35vxQV8WT65A8H3twP+wU6BbJpNIT2a40NMHUKvnriSklU8sdsC1JzDz4L/ch1Rnb1BLSKdJLgxHJGmzs8KBRAJ/b2u8w5Krs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5917
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <g4xir3lupnjybh7fqig6xonp32ubotdf3emmrozdm52tpaxvxn@2t4ueynb7hqr>
 
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Date: Mon, 24 Nov 2025 18:07:35 +0100
-
-Ooops, missed a tag, sorry...
-
-> Since the tagged commit, ice stopped respecting Rx buffer length
-> passed from VFs.
-> At that point, the buffer length was hardcoded in ice, so VFs still
-> worked up to some point (until, for example, a VF wanted an MTU
-> larger than its PF).
-> The next commit 93f53db9f9dc ("ice: switch to Page Pool"), broke
-> Rx on VFs completely since ice started accounting per-queue buffer
-> lengths again, but now VF queues always had their length zeroed, as
-> ice was already ignoring what iavf was passing to it.
+On Mon, Nov 24, 2025 at 11:10:19AM +0100, Stefano Garzarella wrote:
+> On Fri, Nov 21, 2025 at 11:01:53AM -0800, Bobby Eshleman wrote:
+> > On Fri, Nov 21, 2025 at 03:24:25PM +0100, Stefano Garzarella wrote:
+> > > On Thu, Nov 20, 2025 at 09:44:35PM -0800, Bobby Eshleman wrote:
+> > > > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > >
+> > > > Reject setting VSOCK_NET_MODE_LOCAL with -EOPNOTSUPP if a G2H transport
+> > > > is operational. Additionally, reject G2H transport registration if there
+> > > > already exists a namespace in local mode.
+> > > >
+> > > > G2H sockets break in local mode because the G2H transports don't support
+> > > > namespacing yet. The current approach is to coerce packets coming out of
+> > > > G2H transports into VSOCK_NET_MODE_GLOBAL mode, but it is not possible
+> > > > to coerce sockets in the same way because it cannot be deduced which
+> > > > transport will be used by the socket. Specifically, when bound to
+> > > > VMADDR_CID_ANY in a nested VM (both G2H and H2G available), it is not
+> > > > until a packet is received and matched to the bound socket that we
+> > > > assign the transport. This presents a chicken-and-egg problem, because
+> > > > we need the namespace to lookup the socket and resolve the transport,
+> > > > but we need the transport to know how to use the namespace during
+> > > > lookup.
+> > > >
+> > > > For that reason, this patch prevents VSOCK_NET_MODE_LOCAL from being
+> > > > used on systems that support G2H, even nested systems that also have H2G
+> > > > transports.
+> > > >
+> > > > Local mode is blocked based on detecting the presence of G2H devices
+> > > > (when possible, as hyperv is special). This means that a host kernel
+> > > > with G2H support compiled in (or has the module loaded), will still
+> > > > support local mode if there is no G2H (e.g., virtio-vsock) device
+> > > > detected. This enables using the same kernel in the host and in the
+> > > > guest, as we do in kselftest.
+> > > >
+> > > > Systems with only namespace-aware transports (vhost-vsock, loopback) can
+> > > > still use both VSOCK_NET_MODE_GLOBAL and VSOCK_NET_MODE_LOCAL modes as
+> > > > intended.
+> > > >
+> > > > Add supports_local_mode() transport callback to indicate
+> > > > transport-specific local mode support.
+> > > >
+> > > > These restrictions can be lifted in a future patch series when G2H
+> > > > transports gain namespace support.
+> > > >
+> > > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > > ---
+> > > > Changes in v11:
+> > > > - vhost_transport_supports_local_mode() returns false to keep things
+> > > >  disabled until support comes online (Stefano)
+> > > > - add comment above supports_local_mode() cb to clarify (Stefano)
+> > > > - Remove redundant `ret = 0` initialization in vsock_net_mode_string()
+> > > >  (Stefano)
+> > > > - Refactor vsock_net_mode_string() to separate parsing from validation
+> > > >  (Stefano)
+> > > > - vmci returns false for supports_local_mode(), with comment
+> > > >
+> > > > Changes in v10:
+> > > > - move this patch before any transports bring online namespacing (Stefano)
+> > > > - move vsock_net_mode_string into critical section (Stefano)
+> > > > - add ->supports_local_mode() callback to transports (Stefano)
+> > > > ---
+> > > > drivers/vhost/vsock.c            |  6 ++++++
+> > > > include/net/af_vsock.h           | 11 +++++++++++
+> > > > net/vmw_vsock/af_vsock.c         | 32 ++++++++++++++++++++++++++++++++
+> > > > net/vmw_vsock/hyperv_transport.c |  6 ++++++
+> > > > net/vmw_vsock/virtio_transport.c | 13 +++++++++++++
+> > > > net/vmw_vsock/vmci_transport.c   | 12 ++++++++++++
+> > > > net/vmw_vsock/vsock_loopback.c   |  6 ++++++
+> > > > 7 files changed, 86 insertions(+)
+> > > >
+> > > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > > > index 69074656263d..4e3856aa2479 100644
+> > > > --- a/drivers/vhost/vsock.c
+> > > > +++ b/drivers/vhost/vsock.c
+> > > > @@ -64,6 +64,11 @@ static u32 vhost_transport_get_local_cid(void)
+> > > > 	return VHOST_VSOCK_DEFAULT_HOST_CID;
+> > > > }
+> > > >
+> > > > +static bool vhost_transport_supports_local_mode(void)
+> > > > +{
+> > > > +	return false;
+> > > > +}
+> > > > +
+> > > > /* Callers that dereference the return value must hold vhost_vsock_mutex or the
+> > > >  * RCU read lock.
+> > > >  */
+> > > > @@ -412,6 +417,7 @@ static struct virtio_transport vhost_transport = {
+> > > > 		.module                   = THIS_MODULE,
+> > > >
+> > > > 		.get_local_cid            = vhost_transport_get_local_cid,
+> > > > +		.supports_local_mode	  = vhost_transport_supports_local_mode,
+> > > >
+> > > > 		.init                     = virtio_transport_do_socket_init,
+> > > > 		.destruct                 = virtio_transport_destruct,
+> > > > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > > > index 59d97a143204..e24ef1d9fe02 100644
+> > > > --- a/include/net/af_vsock.h
+> > > > +++ b/include/net/af_vsock.h
+> > > > @@ -180,6 +180,17 @@ struct vsock_transport {
+> > > > 	/* Addressing. */
+> > > > 	u32 (*get_local_cid)(void);
+> > > >
+> > > > +	/* Return true if the transport is compatible with
+> > > > +	 * VSOCK_NET_MODE_LOCAL. Otherwise, return false.
+> > > > +	 *
+> > > > +	 * Transports should return false if they lack local-mode namespace
+> > > > +	 * support (e.g., G2H transports like hyperv-vsock and vmci-vsock).
+> > > > +	 * virtio-vsock returns true only if no device is present in order to
+> > > > +	 * enable local mode in nested scenarios in which virtio-vsock is
+> > > > +	 * loaded or built-in, but nonetheless unusable by sockets.
+> > > > +	 */
+> > > > +	bool (*supports_local_mode)(void);
+> > > > +
+> > > > 	/* Read a single skb */
+> > > > 	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
+> > > >
+> > > > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > > > index 243c0d588682..120adb9dad9f 100644
+> > > > --- a/net/vmw_vsock/af_vsock.c
+> > > > +++ b/net/vmw_vsock/af_vsock.c
+> > > > @@ -91,6 +91,12 @@
+> > > >  *   and locked down by a namespace manager. The default is "global". The mode
+> > > >  *   is set per-namespace.
+> > > >  *
+> > > > + *   Note: LOCAL mode is only supported when using namespace-aware transports
+> > > > + *   (vhost-vsock, loopback). If a guest-to-host transport (virtio-vsock,
+> > > > + *   hyperv-vsock, vmci-vsock) is operational, attempts to set LOCAL mode will
+> > > > + *   fail with EOPNOTSUPP, as these transports do not support per-namespace
+> > > > + *   isolation.
+> > > > + *
+> > > >  *   The modes affect the allocation and accessibility of CIDs as follows:
+> > > >  *
+> > > >  *   - global - access and allocation are all system-wide
+> > > > @@ -2794,6 +2800,15 @@ static int vsock_net_mode_string(const struct ctl_table *table, int write,
+> > > > 	else
+> > > > 		return -EINVAL;
+> > > >
+> > > > +	mutex_lock(&vsock_register_mutex);
+> > > > +	if (mode == VSOCK_NET_MODE_LOCAL &&
+> > > > +	    transport_g2h && transport_g2h->supports_local_mode &&
+> > > > +	    !transport_g2h->supports_local_mode()) {
+> > > > +		mutex_unlock(&vsock_register_mutex);
+> > > > +		return -EOPNOTSUPP;
+> > > > +	}
+> > > > +	mutex_unlock(&vsock_register_mutex);
+> > > 
+> > > Wait, I think we already discussed about this, vsock_net_write_mode() must
+> > > be called with the lock held.
+> > > 
+> > > See
+> > > https://lore.kernel.org/netdev/aRTTwuuXSz5CvNjt@devvm11784.nha0.facebook.com/
+> > > 
+> > 
+> > Ah right, oversight on my part.
+> > 
+> > > Since I guess we need another version of this patch, can you check the
+> > > commit description to see if it reflects what we are doing now
+> > > (e.g vhost is not enabled)?
+> > > 
+> > > Also I don't understand why for vhost we will enable it later, but for
+> > > virtio_transport and vsock_loopback we are enabling it now, also if this
+> > > patch is before the support on that transports. I'm a bit confused.
+> > > 
+> > > If something is unclear, let's discuss it before sending a new version.
+> > > 
+> > > 
+> > > What I had in mind was, add this patch and explain why we need this new
+> > > callback (like you did), but enable the support in the patches that
+> > > really enable it for any transport. But maybe what is not clear to me is
+> > > that we need this only for G2H. But now I'm confused about the discussion
+> > > around vmci H2G. We decided to discard also that one, but here we are not
+> > > checking that?
+> > > I mean here we are calling supports_local_mode() only on G2H IIUC.
+> > 
+> > Ah right, VMCI broke my original mental model of only needing this check
+> > for G2H (originally I didn't realize VMCI was H2G too).
+> > 
+> > I think now, we actually need to do this check for all of the transports
+> > no? Including h2g, g2h, local, and dgram?
+> > 
+> > Additionally, the commit description needs to be updated to reflect that.
 > 
-> Restore the line that initializes the buffer length on VF queues
-> basing on the virtchnl messages.
+> Let's take a step back, though, because I tried to understand the problem
+> better and I'm confused.
 > 
-> Fixes: 3a4f419f7509 ("ice: drop page splitting and recycling")
-> Reported-by: Jakub Slepecki <jakub.slepecki@intel.com>
+> For example, in vmci (G2H side), when a packet arrives, we always use
+> vsock_find_connected_socket(), which only searches in GLOBAL. So connections
+> originating from the host can only reach global sockets in the guest. In
+> this direction (host -> guest), we should be fine, right?
+> 
+> Now let's consider the other direction, from guest to host, so the
+> connection should be generated via vsock_connect().
+> Here I see that we are not doing anything with regard to the source
+> namespace. At this point, my question is whether we should modify
+> vsock_assign_transport() or transport->stream_allow() to do this for each
+> stream, and not prevent loading a G2H module a priori.
+> 
+> For example, stream_allow() could check that the socket namespace is
+> supported by the assigned transport. E.g., vmci can check that if the
+> namespace mode is not GLOBAL, then it returns false. (Same thing in
+> virtio-vsock, I mean the G2H driver).
+> 
+> This should solve the guest -> host direction, but at this point I wonder if
+> I'm missing something.
 
-Suggested-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+For the G2H connect case that is true, but the situation gets a little
+fuzzier on the G2H RX side w/ VMADDR_CID_ANY listeners.
 
-> Reviewed-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
-> I'd like this to go directly to net-next to quickly unbreak VFs
-> (the related commits are not in the mainline yet).
-Thanks,
-Olek
+Let's say we have a nested system w/ both virtio-vsock and vhost-vsock.
+We have a listener in namespace local on VMADDR_CID_ANY. So far, no
+transport is assigned, so we can't call t->stream_allow() yet.
+virtio-vsock only knows of global mode, so its lookup will fail (unless
+we hack in some special case to virtio_transport_recv_pkt() to scan
+local namespaces). vhost-vsock will work as expected. Letting local mode
+sockets be silently unreachable by virtio-vsock seems potentially
+confusing for users. If the system were not nested, we can pre-resolve
+VMADDR_CID_ANY in bind() and handle things upfront as well. Rejecting
+local mode outright is just a broad guardrail.
+
+If we're trying to find a less heavy-handed option, we might be able to
+do the following:
+
+- change bind(cid) w/ cid != VMADDR_CID_ANY to directly assign the transport
+  for all socket types (not just SOCK_DGRAM)
+
+- vsock_assign_transport() can outright fail if !t->supports_local_mode()
+  and sock_net(sk) has mode local
+
+- bind(VMADDR_CID_ANY) can maybe print (once) to dmesg a warning that
+  only the H2G transport will land on VMADDR_CID_ANY sockets.
+
+I'm certainly open to other suggestions.
+
+Best,
+Bobby
 
