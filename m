@@ -1,143 +1,152 @@
-Return-Path: <netdev+bounces-241262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA7C4C820CD
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:15:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0C26C820FB
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:19:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D9F374E6547
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:15:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B663C3A714B
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F2A2BE64F;
-	Mon, 24 Nov 2025 18:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F0DI7Gcj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5985E3176E4;
+	Mon, 24 Nov 2025 18:19:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFA072628
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 18:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829742BEC3A
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 18:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764008137; cv=none; b=olghLpQnxb3WSZXpbs7kQYQOR9aGNPYDCR16+NXdbQvf1qrWkHPTVwPF721b0uHkbzZTZTWR4goQEE52fKCvlYP+LVkbXwWulRjID2Hj9+Okkkg1xoYyM6fHkx09ifIsUSZXavjDtLQalKhWgPu1ln/a0SShB3Ohv6FX/9vt25Q=
+	t=1764008353; cv=none; b=kVx6oJeAZiVpna6ZS4S+lEXXeO33I1sSfwuQ+zOaF0Cef5NGEYt5uWCVnNgkmBG8o5XoQl3zZ+f3zaj6NDxBjb/eYgAx39qiMqg7D/kb9808psxPFnvalXzYCuaw0zpTmsy9Oe6HYM7JFiDJkhwyxrywRmDMlqkUwgKASaug3Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764008137; c=relaxed/simple;
-	bh=9OsOtu2FdRcdJ07h5ePZqFdT7LILIFGuF6mCtnACmDk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=GLYzS/7SPSwjOs4IafiE081EYoeoI9b5t5hXBw5kUVSGN1UYkqpdrlYyla9hZEgjVeGu9sU//08SGdiSHfIo8ghiuQy6NG5cSqIZbqYj+tMhGjwnhkXSMYbkjYEuj8c2CeFlVWNTS3Pe1+vg0S7WgNWmXqXI09VueY1aLyKbsiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F0DI7Gcj; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1764008353; c=relaxed/simple;
+	bh=DQb/k2j72kq3h6DefjrDlkyB8NhxV1RHIqAAE20HbAw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YyXhMvCcV7APJ7bS8o6V+KfM6iDUseF9HQkRko6Ys/pq7IbGontatqPC7PT+zJjVYxnwQEgIR81yzEvNn4kQGWOmVD/lXKu9QBdrVdk1rWGGh2plulFeaezoNG+OvtqQP4PhvqwQRC6XMMXZ1nAcM4x4jH3kC6B1WN3D+qU1My8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-787c9f90eccso47554007b3.3
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 10:15:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764008134; x=1764612934; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ocgYXOVPq3H23c7s3bIbF+RIkWJqwfLZLsXUE58QTME=;
-        b=F0DI7GcjN2Zh6kP52XzPrWWK6vpuf1FxNx5vvkjnRgGw8bfowb63tX768OP3OD3zfB
-         fPFU86xibhiaLPmuxnbvSD7owo+a95j4I6lFfKt/ORyg2aIubCQpj5m9jYoA/TK/hNm9
-         T8mUnumI0aiC+hxLcCHPuyU1Yiprx3wHYnYpqp7p4OIRnFqDpjH/Cllev1RAm866pnst
-         RhU+JtGnli4K64yoMczcyeppe/FfQmsPRayxbfs+h/vWPTe8HWg2U6DFbfQV3GvH3Wbl
-         V3kxzPEsAeD8JmqgWI6CyHg/1v0zrWkFw/AvrkNevhlK025GcklTuf6VD8PIAdK6U8gN
-         zkHw==
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-656d9230cf2so2177762eaf.1
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 10:19:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764008134; x=1764612934;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ocgYXOVPq3H23c7s3bIbF+RIkWJqwfLZLsXUE58QTME=;
-        b=EOc6p416/NQDdCzs879VqhTlNUoIguvX2bYqrWDUAYDi/vVoSIFtDr4SSA6AiOOchU
-         3LkETJGLSU3l+h4iMB/i+7cBcmmfRKCQadjuUi5p804ZEAhj82Fzdl7Ms4bGDJSuJkLg
-         nmBrSHFLH1cW4DjyqLJxILfsqAMpaFglUYRMYyRfwPB+bH4tiNCDuSA6fpDpb0xb+QjJ
-         YxfKrZNL8sqqWKUajayXFInkhymHBXSGUQHi8EmTv2Ht+0ccxn//Hlz68ZJ5Dwugsy9p
-         UTmH93eYCyjFL0FWXhjae04lKe8knZxFkdfIXjaT+97NWBbjf6aHv8C84nb3pVibKwfV
-         d/pg==
-X-Forwarded-Encrypted: i=1; AJvYcCV1Fm7j8Ce6qT13vf3M7WJ10qoswyEP5zi40MBS3limwoRA54QZFQo8km5FNs7obGZybP69toE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzx4x7lhjrqD3y0FS76aWwhFPHht5jHbG8LyrTq417/ADjOFvSs
-	ei+5Zq6nu+ybsjUlDnCr+EuZQZ40TzvYuFfYFKlErliM8Dk7zSFm3qnt
-X-Gm-Gg: ASbGncuvpDwN7FZWe1qJhEmIufArHSMqcL8U0jbsH6Z2xys/HlrkzcMDTaXPgpaKppN
-	joJCcPG9X2H9Q2tXR690KBwe0b1l2OaLaHj8C/rbywwqHQLni7Q8n6W1B/YsO4qAEJ+IUCwyz0Q
-	MfUdfW5xgsGRz/47sD9u0lrb2g23wY++jfbUsB0cNvDk5lX0GhdNWn+ZJYT+PYat7/rhbqA67Vx
-	OpofYQNQqhuBzMUcH/uuwU0IV3HboLRL2vyQqRFZZxQEf74wpz9kIHRjsw2ylvNedi3ZbYP/R5e
-	K46EovSubxbbZH31bYchKv5E6omt0PrYKgOyqMlFL179NPYby1PMzu3UFJlIHBnxn+Ivl8RQDQS
-	pHMX+a87uoFOgfwUIDVbPxC2cVPYgGZCyXwdnfW8ouTB1tFgmHRuFU49bQ/1cCx5T754eLwkjeR
-	RuG+ELyusHICWlsOxJGuqeSMnrEbwAnQYvZ8PJ161u/HjCeA95r1Ce/NIfAsmi8+Xml/E=
-X-Google-Smtp-Source: AGHT+IHKw38JYHIxZFzyhwOjV8GuTsmYuY4+zL8F9XRTar88RbjKnm9PRPGZuonaN2Z6WT66KIVDGg==
-X-Received: by 2002:a05:690c:4482:b0:786:a185:13b6 with SMTP id 00721157ae682-78a8b4aec25mr105084257b3.22.1764008134312;
-        Mon, 24 Nov 2025 10:15:34 -0800 (PST)
-Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78a798a5decsm46985517b3.21.2025.11.24.10.15.33
+        d=1e100.net; s=20230601; t=1764008350; x=1764613150;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IrBYJv3jpcXtBLif6gwGlufqp80XQnYmUSZ0wjLcnKs=;
+        b=VI/1urFiH7JMu/5YYBQ5BKi10KW6+rBBbyestP9e2bBTlMHaTulcE3qzbWhxX8iNbA
+         l9JsU2pEoembWzjTf6Db95qhFj091M43IzXlp+wCil68p9q9MTGsF5J7TxdumPFBSTg8
+         p5Nm4pilAR4nxowhokNCcRcI0sd5WB1+S83hdmGzG0Lome5w/BJTyYembZf1+V/1IfE7
+         FxPxX6uMVse5YEWw5fKGZofftc3k/iAmSqMOV1P/cio8GEE06Bq7vr1blVmNs9qHmY6M
+         DS7vW8AJk/VQa7bJHCKJudH1KLUnu9YmwnAcEKfYx3yzBoBCZmkIADdKIIkt+KbeTAir
+         A2Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCUgQNrCShDWdHxJDj0oLTNQ7sfIYiCPWVp0bPxY3tOcImtcBxMvleb2hUs3SdWI55y5nH9EqqU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwXSi9EsapqCO6aaI6k93mu1puJXQPPBsmUdX+im4hv/YJ9TL/
+	kurruLYJ2NZTGt0MZFjCZaoewN8HTV1M0a+7ODLMVckP0MZ8a9NKDR7K
+X-Gm-Gg: ASbGncspdeUsuayLl2G0Z9ELHCmyt0jEHtR/t/eVw5zIzUHTPVID5q2exsfLOyUG43B
+	jc13NnLE66WLl0tcJfuU1mxwa2zvxB3UhqhmoJtdSlLRkqfwxZSNMLvUAkbCxlxkV30qGO/gL/0
+	W9NJi9mrlBsIkWgA8uy/4hOYdnxBeIq38edL+5S8Emdfc8G1YxyPsuFeyt1OMQK9ThvKVct8GXj
+	C27CPN4nJsc0sXsmA0VxyoIs+5DuST95fM7FrBYRGkVlgvLneIT7gNesuIEKZCq0mOpIr/3qeYh
+	iGpT7UCjVJ7PCpvQlFxH/fvZqiTjDH2QZ6+Gm2F054f2dOjF9+Pd9NADHYnqhKULV8EKdIVuOZX
+	Z6ju3DI+DiFkqUZbyQ+t8UYVM8yrgYqsYa+0eR1S/hJa/5PxUCPCBNtUiGiCsHT+vbRcXJcBzr7
+	uHCCXHq/KrubpL12fuetxUw5Q=
+X-Google-Smtp-Source: AGHT+IHN2guu0lOJRAchvtzZtXVImuKk1r8c5bUrPHuOn465etORV5ArmjggyAzYO0W8Q8OTyoelgg==
+X-Received: by 2002:a05:6820:c307:20b0:638:3df8:c802 with SMTP id 006d021491bc7-6579253dda5mr3493925eaf.5.1764008350405;
+        Mon, 24 Nov 2025 10:19:10 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:3::])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65782a38448sm3744154eaf.1.2025.11.24.10.19.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 10:15:33 -0800 (PST)
-Date: Mon, 24 Nov 2025 13:15:33 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jason Xing <kernelxing@tencent.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.1e69bae6de428@gmail.com>
-In-Reply-To: <aSSdH58ozNT-zWLM@fedora>
-References: <20251124161324.16901-1-ankitkhushwaha.linux@gmail.com>
- <willemdebruijn.kernel.6edcbeb29a45@gmail.com>
- <aSSdH58ozNT-zWLM@fedora>
-Subject: Re: [PATCH] selftests/net: initialize char variable to null
+        Mon, 24 Nov 2025 10:19:09 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next 0/8] net: intel: migrate to .get_rx_ring_count()
+ ethtool callback
+Date: Mon, 24 Nov 2025 10:19:04 -0800
+Message-Id: <20251124-gxring_intel-v1-0-89be18d2a744@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJihJGkC/x3MUQrCMBAFwKss77sBE1KsuYqI1PqMC7JKEkqg9
+ O5C5wCzobIoK5JsKFy16teQxA+C5T1bptMnkiCcwuh9iC73opbvao0fRz9f4hKn+DhPGAS/wpf
+ 2o7vC2JyxN9z2/Q9J/rrXaAAAAA==
+X-Change-ID: 20251124-gxring_intel-e1a94c484b78
+To: aleksander.lobakin@intel.com, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: michal.swiatkowski@linux.intel.com, michal.kubiak@intel.com, 
+ maciej.fijalkowski@intel.com, intel-wired-lan@lists.osuosl.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-a6db3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1808; i=leitao@debian.org;
+ h=from:subject:message-id; bh=DQb/k2j72kq3h6DefjrDlkyB8NhxV1RHIqAAE20HbAw=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpJKGcss5h66lWxzY/HzxdBVjCPRVyagLYFOqiR
+ zR9KyrwA3mJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaSShnAAKCRA1o5Of/Hh3
+ bdWgD/9JmS+66OvWT6Zd4MHRTn9lgAAgOOgDJrBSJIvkn4dOS+Y2rm5z34h2DG2HxQTxnOWYSn6
+ YKQn1uYrJ33e+cLLtvpSp1nq3IZ4KpcZziV6zXSb2sBHP/PuOlxcS/YvZ9V7W0mAhOl61RXXhGT
+ tP5nkaQ7Z+3JKZAp/7HqSj+heRsuGRCdOOzRhvpy1vNUFTg+F+uk+6dFxB1fEnmoDnD44jVp68z
+ TSGjqW9rbCK7mGFkox6mvc6Shl/0Sy5ldCRqt3CfrheqgmLRsUDfnG+tpgKYG53XHC07qQl1upS
+ CSwOU5b5Lpb+WQTBqxq7jf/uWbg5JjYEUmp+dFb72AUEy+iVKeqipFe8xWIYxFnEFzzB+xRyRqt
+ BBiLSjnDQOOI34oux2c0hF/tVKyWrZcfgxfRHV+e6n8UsRvwinmheXMtFiLebogsCx7ybxtSO40
+ 7994JL+AVGMKnajwBFpXIjr08mRyJE5UeR09PzuK7iYQatmKlJsBgywpiEkR02KfG9C3FOuAq6L
+ r7zStRwaKJYTx2WzxlDRxJjI9Hgt1flz5xis6dgCEjc/19weGOmq4aTF7dwkPMGiMkk2dFe16zw
+ Z5OCO0tZ3nYjPGumTYv73ap1wEIj0vWYTMF3If4HJ1MTm4ZRTCWp5XEIy7oPHBS6VcWjWXkQWvu
+ VtY9n2v0FfY9vkw==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Ankit Khushwaha wrote:
-> On Mon, Nov 24, 2025 at 12:46:52PM -0500, Willem de Bruijn wrote:
-> > Ankit Khushwaha wrote:
-> > > char variable in 'so_txtime.c' & 'txtimestamp.c' left uninitilized
-> > > by when switch default case taken. raises following warning.
-> > > 
-> > > 	txtimestamp.c:240:2: warning: variable 'tsname' is used uninitialized
-> > > 	whenever switch default is taken [-Wsometimes-uninitialized]
-> > > 
-> > > 	so_txtime.c:210:3: warning: variable 'reason' is used uninitialized
-> > > 	whenever switch default is taken [-Wsometimes-uninitialized]
-> > > 
-> > > initialize these variables to NULL to fix this.
-> > > 
-> > > Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-> > 
-> > These are false positives as the default branches in both cases exit
-> > the program with error(..).
-> > 
-> > Since we do not observe these in normal kernel compilations: are you
-> > enabling non-standard warnings?
-> 
-> Hi Willem,
-> 
-> this warning appeared while building the 'tools/testing/selftests/net'
-> multiple times. 
-> Cmd used to build
-> 	make -C tools/testing/selftests/net  CC=clang V=1 -j8
-> 
-> while test building by "make -C tools/testing/selftests/ CC=clang V=1
-> -j8" doesn't raises these warning.
+This series migrates Intel network drivers to use the new .get_rx_ring_count()
+ethtool callback introduced in commit 84eaf4359c36 ("net: ethtool: add
+get_rx_ring_count callback to optimize RX ring queries").
 
-This does not reproduce for me.
+The new callback simplifies the .get_rxnfc() implementation by removing
+ETHTOOL_GRXRINGS handling and moving it to a dedicated callback. This provides
+a cleaner separation of concerns and aligns these drivers with the modern
+ethtool API.
 
-Can you share the full clang command that V=1 outputs, as well as the
-output oof clang --version.
+The series updates the following Intel drivers:
+  - idpf
+  - igb
+  - igc
+  - ixgbevf
+  - fm10k
+
+PS: These changes were compile-tested only.
+
+---
+Breno Leitao (8):
+      i40e: extract GRXRINGS from .get_rxnfc
+      iavf: extract GRXRINGS from .get_rxnfc
+      ice: extract GRXRINGS from .get_rxnfc
+      idpf: extract GRXRINGS from .get_rxnfc
+      igb: extract GRXRINGS from .get_rxnfc
+      igc: extract GRXRINGS from .get_rxnfc
+      ixgbevf: extract GRXRINGS from .get_rxnfc
+      fm10k: extract GRXRINGS from .get_rxnfc
+
+ drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c | 17 +++--------------
+ drivers/net/ethernet/intel/i40e/i40e_ethtool.c   | 19 +++++++++++++++----
+ drivers/net/ethernet/intel/iavf/iavf_ethtool.c   | 18 ++++++++++++++----
+ drivers/net/ethernet/intel/ice/ice_ethtool.c     | 19 +++++++++++++++----
+ drivers/net/ethernet/intel/idpf/idpf_ethtool.c   | 23 ++++++++++++++++++++---
+ drivers/net/ethernet/intel/igb/igb_ethtool.c     | 12 ++++++++----
+ drivers/net/ethernet/intel/igc/igc_ethtool.c     | 11 ++++++++---
+ drivers/net/ethernet/intel/ixgbevf/ethtool.c     | 14 +++-----------
+ 8 files changed, 86 insertions(+), 47 deletions(-)
+---
+base-commit: e05021a829b834fecbd42b173e55382416571b2c
+change-id: 20251124-gxring_intel-e1a94c484b78
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
+
 
