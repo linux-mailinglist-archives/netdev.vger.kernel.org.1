@@ -1,290 +1,180 @@
-Return-Path: <netdev+bounces-241095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6711DC7EFEF
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 06:29:31 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 067F6C7F22F
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 07:59:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D6B2B344A45
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 05:29:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A32934E1554
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 06:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C062BDC1C;
-	Mon, 24 Nov 2025 05:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3CF2DA760;
+	Mon, 24 Nov 2025 06:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="Qt+LLT0z"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EAA28850B;
-	Mon, 24 Nov 2025 05:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE312BE64A
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 06:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763962167; cv=none; b=Iqf6Qe6JoeqCFkO7uKYOLqaBIlpd+40X8Kh1JCl/tIny/UcQaPx1+lHczJ3N0jJness14Pol4D+uhfPKLLxUMsP7sZ0tVv7X06j+oOipJ6YnoHN2DpHo/zr8yrPSl/GpzsRrDVZYE7ufeeKC6TtWtA9OLKNBjsEFlN6QJG1oz2Q=
+	t=1763967536; cv=none; b=IDpJjr0PFMmZFPSRflmNWYXhcBsJC3chyE0D5s7cey36DV+7GON8ypi9nEn6kviCCpAGTA0SFMyATD5gR1Jtpy2ZBd3ZvTWlTogIo1quEYdXnwi+PaHMIU22qbkzjiKg9fALVfVPdnL6efpz28zwYBHTd7SIE46nGCWl1gdZdB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763962167; c=relaxed/simple;
-	bh=4Ar0Ce/7CI/bXhZYfPTIVvbKKA37/EI2x/2Kuj07W4g=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=bBnPCCW1tU9S2iw7vinm0wE0NIfLo0pRoXSZIUWKsElChKeonExpNJmQdLYMKnCktcJ3OHYEHIy35QvgJTYySbzseulRkTS4MLblZmPYKczgHNIrkatm2HzJ86IXJU3c8ildJQQ+IbXVNMiYowvPjnml49vgUnQYYVVJXp5CJo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [127.0.0.2] (unknown [114.241.85.109])
-	by APP-05 (Coremail) with SMTP id zQCowACXnW4E7SNpt23VAQ--.20861S2;
-	Mon, 24 Nov 2025 13:28:38 +0800 (CST)
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-Date: Mon, 24 Nov 2025 13:28:27 +0800
-Subject: [PATCH net-next v2] net: spacemit: Remove broken flow control
- support
+	s=arc-20240116; t=1763967536; c=relaxed/simple;
+	bh=l8eiXO8rLwx4DAVLn5/wQcVrlKf9yu8RCDkwk1D7Tn0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=Mpdcdct97Oiuy36N997LsfGeYHOjkDGCBJ1WyZT6gXT0yG4j65vd7NdCFqmJcynejz4x/z0hmClmnM4a2H9tyOQB8JZZV++jVPbbedakb/lEp1ozCB1xUi5RxI6R8DNcpm1Dj8pY+sUq+RSnl7UUnnCxOoBbCvRHGSYwdnrHCK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=Qt+LLT0z reason="signature verification failed"; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=FWluz43lSYY1ueJhMsEr8zx/CyCgc5IJD4LBhmShDrw=; b=Q
+	t+LLT0z8CAS/HIRH0luLVRaTsdlKBDWizFmfnxv9JpzxVp1XVPufJJeAn0eARy95
+	pOaZFsTU4Y28+pGP28mAzAOoUUVKIcatbymp6yJf089bR8g5k+6/WmZ24zMaCMU1
+	vxH2cpSymWUJkKE8nyoftPFbbBUGg0Wze90sqjW+UA=
+Received: from slark_xiao$163.com ( [112.97.80.230] ) by
+ ajax-webmail-wmsvr-40-108 (Coremail) ; Mon, 24 Nov 2025 14:57:04 +0800
+ (CST)
+Date: Mon, 24 Nov 2025 14:57:04 +0800 (CST)
+From: "Slark Xiao" <slark_xiao@163.com>
+To: "Loic Poulain" <loic.poulain@oss.qualcomm.com>
+Cc: "Sergey Ryazanov" <ryazanov.s.a@gmail.com>,
+	"Daniele Palmas" <dnlplm@gmail.com>,
+	"Muhammad Nuzaihan" <zaihan@unrealasia.net>,
+	"Johannes Berg" <johannes@sipsolutions.net>,
+	"Andrew Lunn" <andrew+netdev@lunn.ch>,
+	"Eric Dumazet" <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	"Jakub Kicinski" <kuba@kernel.org>,
+	"Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org,
+	"Qiang Yu" <quic_qianyu@quicinc.com>,
+	"Manivannan Sadhasivam" <mani@kernel.org>,
+	"Johan Hovold" <johan@kernel.org>
+Subject: Re:Re: Re: [RFC PATCH v2 0/6] net: wwan: add NMEA port type support
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
+ 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
+In-Reply-To: <CAFEp6-3pvrMmyRg37Vyv_NhXeOukY9A4TYBE9f42zMR5i04k_Q@mail.gmail.com>
+References: <20250624213801.31702-1-ryazanov.s.a@gmail.com>
+ <CAFEp6-08JX1gDDn2-hP5AjXHCGsPYHe05FscQoyiP_OaSQfzqQ@mail.gmail.com>
+ <fc1f5d15-163c-49d7-ab94-90e0522b0e57@gmail.com>
+ <CAFEp6-1xoFW6xpQHPN4_XNtbjwvW=TUdFrOkFKwM+-rEH7WqMg@mail.gmail.com>
+ <e8d7bab.2987.19936a78b86.Coremail.slark_xiao@163.com>
+ <19a5c6e0-fd2a-4cba-92ed-b5c09d68e90c@gmail.com>
+ <317b6512.6a9b.1995168196c.Coremail.slark_xiao@163.com>
+ <CAFEp6-0jAV9XV-v5X_iwR+DzyC-qytnDFaRubT2KEQav1KzTew@mail.gmail.com>
+ <CAGRyCJG-JvPu5Gizn8qEZy0QNYgw6yVxz6_KW0K0HUfhZsrmbw@mail.gmail.com>
+ <CAGRyCJE28yf-rrfkFbzu44ygLEvoUM7fecK1vnrghjG_e9UaRA@mail.gmail.com>
+ <CAFEp6-18FHj1Spw-=2j_cccmLTKHDS3uHR4ONw8geiTyWrxN2Q@mail.gmail.com>
+ <16c0b1fa-9617-4ee1-b82f-e6237d7b5f6f@gmail.com>
+ <CAGRyCJGHv19PJ+hyaTYf40GeGRHMXKi-qO0sgREnS3=7rfWGqA@mail.gmail.com>
+ <90747682-22c6-4cb6-a6d1-3bef4aeab70e@gmail.com>
+ <6d92e13b.5e8c.19a81315289.Coremail.slark_xiao@163.com>
+ <CAFEp6-3pvrMmyRg37Vyv_NhXeOukY9A4TYBE9f42zMR5i04k_Q@mail.gmail.com>
+X-NTES-SC: AL_Qu2dAfWduEwp4iOfYekfmk8Sg+84W8K3v/0v1YVQOpF8jCLpwR86WnZKGEDdzciXDzKFlxqzVSpcwOV9UKJ3Xpk1ASlWppjS49Nl4we0d3IYGQ==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251124-k1-ethernet-actually-remove-fc-v2-1-5e77ab69b791@iscas.ac.cn>
-X-B4-Tracking: v=1; b=H4sIAPrsI2kC/y2N2w6CMBAFf4Xss2toxYL8isGk1kUaoeC2NBjCv
- 1svj5PJObOCJ7bkoc5WYIrW29ElkLsMTKfdndDeEoPM5VEIWeBDIIWO2FFAbcKs+/6FTMMYCVu
- DZa6qgyjLvKhOkE4mptYu38AZPhtHS4DmZ5iecyqGv75qT2jGYbChzqLaiwrZqMu6QbNtbxBH/
- XGqAAAA
-X-Change-ID: 20251124-k1-ethernet-actually-remove-fc-706831770489
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Yixun Lan <dlan@gentoo.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- Troy Mitchell <troy.mitchell@linux.spacemit.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: netdev@vger.kernel.org, linux-riscv@lists.infradead.org, 
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org, 
- Vivian Wang <wangruikang@iscas.ac.cn>
-X-Mailer: b4 0.14.3
-X-CM-TRANSID:zQCowACXnW4E7SNpt23VAQ--.20861S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3Wr4rKr48Zw48GFy7AFW7twb_yoWxGw4kpF
-	W5X3s2yF4UXFsYgFs3Jw4UAFy3Ga4xtrnruFyfCw4Fg3ZIyr97CFy0k3W7CFykurW8WryY
-	gw4jy3W8GF4DX37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+Message-ID: <40f27470.6281.19ab4a6d782.Coremail.slark_xiao@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:bCgvCgDnz5fAASRpcvAoAA--.30W
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiGRUQZGkj8biDYAABsZ
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-The current flow control implementation doesn't handle autonegotiation
-and ethtool operations properly. Remove it for now so we don't claim
-support for something that doesn't really work. A better implementation
-will be sent in future patches.
-
-Fixes: bfec6d7f2001 ("net: spacemit: Add K1 Ethernet MAC")
-Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
----
-Starting at v2 as this is the net-next successor of:
-
-  https://lore.kernel.org/spacemit/20251031-k1-ethernet-remove-fc-v1-1-1ae3f1d6508c@iscas.ac.cn/
----
- drivers/net/ethernet/spacemit/k1_emac.c | 110 --------------------------------
- 1 file changed, 110 deletions(-)
-
-diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
-index 220eb5ce7583..c85dc742c404 100644
---- a/drivers/net/ethernet/spacemit/k1_emac.c
-+++ b/drivers/net/ethernet/spacemit/k1_emac.c
-@@ -46,8 +46,6 @@
- #define EMAC_RX_FRAMES			64
- #define EMAC_RX_COAL_TIMEOUT		(600 * 312)
- 
--#define DEFAULT_FC_PAUSE_TIME		0xffff
--#define DEFAULT_FC_FIFO_HIGH		1600
- #define DEFAULT_TX_ALMOST_FULL		0x1f8
- #define DEFAULT_TX_THRESHOLD		1518
- #define DEFAULT_RX_THRESHOLD		12
-@@ -132,9 +130,6 @@ struct emac_priv {
- 	u32 tx_delay;
- 	u32 rx_delay;
- 
--	bool flow_control_autoneg;
--	u8 flow_control;
--
- 	/* Softirq-safe, hold while touching hardware statistics */
- 	spinlock_t stats_lock;
- };
-@@ -179,9 +174,7 @@ static void emac_set_mac_addr_reg(struct emac_priv *priv,
- 
- static void emac_set_mac_addr(struct emac_priv *priv, const unsigned char *addr)
- {
--	/* We use only one address, so set the same for flow control as well */
- 	emac_set_mac_addr_reg(priv, addr, MAC_ADDRESS1_HIGH);
--	emac_set_mac_addr_reg(priv, addr, MAC_FC_SOURCE_ADDRESS_HIGH);
- }
- 
- static void emac_reset_hw(struct emac_priv *priv)
-@@ -200,9 +193,6 @@ static void emac_reset_hw(struct emac_priv *priv)
- 
- static void emac_init_hw(struct emac_priv *priv)
- {
--	/* Destination address for 802.3x Ethernet flow control */
--	u8 fc_dest_addr[ETH_ALEN] = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x01 };
--
- 	u32 rxirq = 0, dma = 0;
- 
- 	regmap_set_bits(priv->regmap_apmu,
-@@ -228,12 +218,6 @@ static void emac_init_hw(struct emac_priv *priv)
- 		DEFAULT_TX_THRESHOLD);
- 	emac_wr(priv, MAC_RECEIVE_PACKET_START_THRESHOLD, DEFAULT_RX_THRESHOLD);
- 
--	/* Configure flow control (enabled in emac_adjust_link() later) */
--	emac_set_mac_addr_reg(priv, fc_dest_addr, MAC_FC_SOURCE_ADDRESS_HIGH);
--	emac_wr(priv, MAC_FC_PAUSE_HIGH_THRESHOLD, DEFAULT_FC_FIFO_HIGH);
--	emac_wr(priv, MAC_FC_HIGH_PAUSE_TIME, DEFAULT_FC_PAUSE_TIME);
--	emac_wr(priv, MAC_FC_PAUSE_LOW_THRESHOLD, 0);
--
- 	/* RX IRQ mitigation */
- 	rxirq = FIELD_PREP(MREGBIT_RECEIVE_IRQ_FRAME_COUNTER_MASK,
- 			   EMAC_RX_FRAMES);
-@@ -1018,57 +1002,6 @@ static int emac_mdio_init(struct emac_priv *priv)
- 	return ret;
- }
- 
--static void emac_set_tx_fc(struct emac_priv *priv, bool enable)
--{
--	u32 val;
--
--	val = emac_rd(priv, MAC_FC_CONTROL);
--
--	FIELD_MODIFY(MREGBIT_FC_GENERATION_ENABLE, &val, enable);
--	FIELD_MODIFY(MREGBIT_AUTO_FC_GENERATION_ENABLE, &val, enable);
--
--	emac_wr(priv, MAC_FC_CONTROL, val);
--}
--
--static void emac_set_rx_fc(struct emac_priv *priv, bool enable)
--{
--	u32 val = emac_rd(priv, MAC_FC_CONTROL);
--
--	FIELD_MODIFY(MREGBIT_FC_DECODE_ENABLE, &val, enable);
--
--	emac_wr(priv, MAC_FC_CONTROL, val);
--}
--
--static void emac_set_fc(struct emac_priv *priv, u8 fc)
--{
--	emac_set_tx_fc(priv, fc & FLOW_CTRL_TX);
--	emac_set_rx_fc(priv, fc & FLOW_CTRL_RX);
--	priv->flow_control = fc;
--}
--
--static void emac_set_fc_autoneg(struct emac_priv *priv)
--{
--	struct phy_device *phydev = priv->ndev->phydev;
--	u32 local_adv, remote_adv;
--	u8 fc;
--
--	local_adv = linkmode_adv_to_lcl_adv_t(phydev->advertising);
--
--	remote_adv = 0;
--
--	if (phydev->pause)
--		remote_adv |= LPA_PAUSE_CAP;
--
--	if (phydev->asym_pause)
--		remote_adv |= LPA_PAUSE_ASYM;
--
--	fc = mii_resolve_flowctrl_fdx(local_adv, remote_adv);
--
--	priv->flow_control_autoneg = true;
--
--	emac_set_fc(priv, fc);
--}
--
- /*
-  * Even though this MAC supports gigabit operation, it only provides 32-bit
-  * statistics counters. The most overflow-prone counters are the "bytes" ones,
-@@ -1425,42 +1358,6 @@ static void emac_ethtool_get_regs(struct net_device *dev,
- 			emac_rd(priv, MAC_GLOBAL_CONTROL + i * 4);
- }
- 
--static void emac_get_pauseparam(struct net_device *dev,
--				struct ethtool_pauseparam *pause)
--{
--	struct emac_priv *priv = netdev_priv(dev);
--
--	pause->autoneg = priv->flow_control_autoneg;
--	pause->tx_pause = !!(priv->flow_control & FLOW_CTRL_TX);
--	pause->rx_pause = !!(priv->flow_control & FLOW_CTRL_RX);
--}
--
--static int emac_set_pauseparam(struct net_device *dev,
--			       struct ethtool_pauseparam *pause)
--{
--	struct emac_priv *priv = netdev_priv(dev);
--	u8 fc = 0;
--
--	if (!netif_running(dev))
--		return -ENETDOWN;
--
--	priv->flow_control_autoneg = pause->autoneg;
--
--	if (pause->autoneg) {
--		emac_set_fc_autoneg(priv);
--	} else {
--		if (pause->tx_pause)
--			fc |= FLOW_CTRL_TX;
--
--		if (pause->rx_pause)
--			fc |= FLOW_CTRL_RX;
--
--		emac_set_fc(priv, fc);
--	}
--
--	return 0;
--}
--
- static void emac_get_drvinfo(struct net_device *dev,
- 			     struct ethtool_drvinfo *info)
- {
-@@ -1634,8 +1531,6 @@ static void emac_adjust_link(struct net_device *dev)
- 		}
- 
- 		emac_wr(priv, MAC_GLOBAL_CONTROL, ctrl);
--
--		emac_set_fc_autoneg(priv);
- 	}
- 
- 	phy_print_status(phydev);
-@@ -1715,8 +1610,6 @@ static int emac_phy_connect(struct net_device *ndev)
- 		goto err_node_put;
- 	}
- 
--	phy_support_asym_pause(phydev);
--
- 	phydev->mac_managed_pm = true;
- 
- 	emac_update_delay_line(priv);
-@@ -1886,9 +1779,6 @@ static const struct ethtool_ops emac_ethtool_ops = {
- 	.get_sset_count		= emac_get_sset_count,
- 	.get_strings		= emac_get_strings,
- 	.get_ethtool_stats	= emac_get_ethtool_stats,
--
--	.get_pauseparam		= emac_get_pauseparam,
--	.set_pauseparam		= emac_set_pauseparam,
- };
- 
- static const struct net_device_ops emac_netdev_ops = {
-
----
-base-commit: 6a23ae0a96a600d1d12557add110e0bb6e32730c
-change-id: 20251124-k1-ethernet-actually-remove-fc-706831770489
-
-Best regards,
--- 
-Vivian "dramforever" Wang
-
+CkF0IDIwMjUtMTEtMTkgMTk6Mjc6NDksICJMb2ljIFBvdWxhaW4iIDxsb2ljLnBvdWxhaW5Ab3Nz
+LnF1YWxjb21tLmNvbT4gd3JvdGU6Cj5IaSBTbGFyaywKPgo+T24gRnJpLCBOb3YgMTQsIDIwMjUg
+YXQgODowOOKAr0FNIFNsYXJrIFhpYW8gPHNsYXJrX3hpYW9AMTYzLmNvbT4gd3JvdGU6Cj4+Cj4+
+Cj4+IEF0IDIwMjUtMTAtMTMgMDY6NTU6MjgsICJTZXJnZXkgUnlhemFub3YiIDxyeWF6YW5vdi5z
+LmFAZ21haWwuY29tPiB3cm90ZToKPj4gPkhpIERhbmllbGUsCj4+ID4KPj4gPk9uIDEwLzEwLzI1
+IDE2OjQ3LCBEYW5pZWxlIFBhbG1hcyB3cm90ZToKPj4gPj4gSWwgZ2lvcm5vIG1lciA4IG90dCAy
+MDI1IGFsbGUgb3JlIDIzOjAwIFNlcmdleSBSeWF6YW5vdgo+PiA+PiA8cnlhemFub3Yucy5hQGdt
+YWlsLmNvbT4gaGEgc2NyaXR0bzoKPj4gPj4+IE9uIDEwLzIvMjUgMTg6NDQsIExvaWMgUG91bGFp
+biB3cm90ZToKPj4gPj4+PiBPbiBUdWUsIFNlcCAzMCwgMjAyNSBhdCA5OjIy4oCvQU0gRGFuaWVs
+ZSBQYWxtYXMgPGRubHBsbUBnbWFpbC5jb20+IHdyb3RlOgo+PiA+Pj4+IFsuLi5dCj4+ID4+Pj4+
+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC93d2FuL3d3YW5faHdzaW0uYyBiL2RyaXZlcnMvbmV0
+L3d3YW4vd3dhbl9od3NpbS5jCj4+ID4+Pj4+IGluZGV4IGE3NDhiM2VhMTYwMi4uZTRiMWJiZmY5
+YWYyIDEwMDY0NAo+PiA+Pj4+PiAtLS0gYS9kcml2ZXJzL25ldC93d2FuL3d3YW5faHdzaW0uYwo+
+PiA+Pj4+PiArKysgYi9kcml2ZXJzL25ldC93d2FuL3d3YW5faHdzaW0uYwo+PiA+Pj4+PiBAQCAt
+MjM2LDcgKzIzNiw3IEBAIHN0YXRpYyB2b2lkIHd3YW5faHdzaW1fbm1lYV9lbXVsX3RpbWVyKHN0
+cnVjdCB0aW1lcl9saXN0ICp0KQo+PiA+Pj4+PiAgICAgICAgICAgLyogNDMuNzQ3NTQ3MjIyOTg5
+MDkgTiAxMS4yNTc1OTgzNTkyMjg3NSBFIGluIERNTSBmb3JtYXQgKi8KPj4gPj4+Pj4gICAgICAg
+ICAgIHN0YXRpYyBjb25zdCB1bnNpZ25lZCBpbnQgY29vcmRbNCAqIDJdID0geyA0MywgNDQsIDg1
+MjgsIDAsCj4+ID4+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgMTEsIDE1LCA0NTU5LCAwIH07Cj4+ID4+Pj4+IC0gICAgICAgc3RydWN0IHd3
+YW5faHdzaW1fcG9ydCAqcG9ydCA9IGZyb21fdGltZXIocG9ydCwgdCwgbm1lYV9lbXVsLnRpbWVy
+KTsKPj4gPj4+Pj4gKyAgICAgICBzdHJ1Y3Qgd3dhbl9od3NpbV9wb3J0ICpwb3J0ID0gdGltZXJf
+Y29udGFpbmVyX29mKHBvcnQsIHQsCj4+ID4+Pj4+IG5tZWFfZW11bC50aW1lcik7Cj4+ID4+Pj4+
+Cj4+ID4+Pj4+IGl0J3MgYmFzaWNhbGx5IHdvcmtpbmcgZmluZSBpbiBvcGVyYXRpdmUgbW9kZSB0
+aG91Z2ggdGhlcmUncyBhbiBpc3N1ZQo+PiA+Pj4+PiBhdCB0aGUgaG9zdCBzaHV0ZG93biwgbm90
+IGFibGUgdG8gcHJvcGVybHkgdGVybWluYXRlLgo+PiA+Pj4+Pgo+PiA+Pj4+PiBVbmZvcnR1bmF0
+ZWx5IEkgd2FzIG5vdCBhYmxlIHRvIGdhdGhlciB1c2VmdWwgdGV4dCBsb2dzIGJlc2lkZXMgdGhl
+IHBpY3R1cmUgYXQKPj4gPj4+Pj4KPj4gPj4+Pj4gaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2Zp
+bGUvZC8xM09iV2lrdWlNTVVFTmwyYVplcnp4RkJnNTdPQjFLTmovdmlldz91c3A9c2hhcmluZwo+
+PiA+Pj4+Pgo+PiA+Pj4+PiBzaG93aW5nIGFuIG9vcHMgd2l0aCB0aGUgZm9sbG93aW5nIGNhbGwg
+c3RhY2s6Cj4+ID4+Pj4+Cj4+ID4+Pj4+IF9fc2ltcGxlX3JlY3Vyc2l2ZV9yZW1vdmFsCj4+ID4+
+Pj4+IHByZWVtcHRfY291bnRfYWRkCj4+ID4+Pj4+IF9fcGZ4X3JlbW92ZV9vbmUKPj4gPj4+Pj4g
+d3dhbl9yZW1vdmVfcG9ydAo+PiA+Pj4+PiBtaGlfd3dhbl9jdHJsX3JlbW92ZQo+PiA+Pj4+PiBt
+aGlfZHJpdmVyX3JlbW92ZQo+PiA+Pj4+PiBkZXZpY2VfcmVtb3ZlCj4+ID4+Pj4+IGRldmljZV9k
+ZWwKPj4gPj4+Pj4KPj4gPj4+Pj4gYnV0IHRoZSBpc3N1ZSBpcyBzeXN0ZW1hdGljLiBBbnkgaWRl
+YT8KPj4gPj4+Pj4KPj4gPj4+Pj4gQXQgdGhlIG1vbWVudCBJIGRvbid0IGhhdmUgdGhlIHRpbWUg
+dG8gZGVidWcgdGhpcyBkZWVwZXIsIEkgZG9uJ3QgZXZlbgo+PiA+Pj4+PiBleGNsdWRlIHRoZSBj
+aGFuY2UgdGhhdCBpdCBjb3VsZCBiZSBzb21laG93IHJlbGF0ZWQgdG8gdGhlIG1vZGVtLiBJCj4+
+ID4+Pj4+IHdvdWxkIGxpa2UgdG8gZnVydGhlciBsb29rIGF0IHRoaXMsIGJ1dCBJJ20gbm90IHN1
+cmUgZXhhY3RseSB3aGVuIEkKPj4gPj4+Pj4gY2FuLi4uLgo+PiA+Pj4+Cj4+ID4+Pj4gVGhhbmtz
+IGEgbG90IGZvciB0ZXN0aW5nLCBTZXJnZXksIGRvIHlvdSBrbm93IHdoYXQgaXMgd3Jvbmcgd2l0
+aCBwb3J0IHJlbW92YWw/Cj4+ID4+Pgo+PiA+Pj4gRGFuaWVsZSwgdGhhbmtzIGEgbG90IGZvciB2
+ZXJpZnlpbmcgdGhlIHByb3Bvc2FsIG9uIGEgcmVhbCBoYXJkd2FyZSBhbmQKPj4gPj4+IHNoYXJp
+bmcgdGhlIGJ1aWxkIGZpeC4KPj4gPj4+Cj4+ID4+PiBVbmZvcnR1bmF0ZWx5LCBJIHVuYWJsZSB0
+byByZXByb2R1Y2UgdGhlIGNyYXNoLiBJIGhhdmUgdHJpZWQgbXVsdGlwbGUKPj4gPj4+IHRpbWVz
+IHRvIHJlYm9vdCBhIFZNIHJ1bm5pbmcgdGhlIHNpbXVsYXRvciBtb2R1bGUgZXZlbiB3aXRoIG9w
+ZW5lZCBHTlNTCj4+ID4+PiBkZXZpY2UuIE5vIGx1Y2suIEl0IHJlYm9vdHMgYW5kIHNodXRkb3du
+cyBzbW9vdGhseS4KPj4gPj4+Cj4+ID4+Cj4+ID4+IEkndmUgcHJvYmFibHkgZmlndXJlZCBvdXQg
+d2hhdCdzIGhhcHBlbmluZy4KPj4gPj4KPj4gPj4gVGhlIHByb2JsZW0gc2VlbXMgdGhhdCB0aGUg
+Z25zcyBkZXZpY2UgaXMgbm90IGNvbnNpZGVyZWQgYSB3d2FuX2NoaWxkCj4+ID4+IGJ5IGlzX3d3
+YW5fY2hpbGQgYW5kIHRoaXMgbWFrZXMgZGV2aWNlX3VucmVnaXN0ZXIgaW4gd3dhbl9yZW1vdmVf
+ZGV2Cj4+ID4+IHRvIGJlIGNhbGxlZCB0d2ljZS4KPj4gPj4KPj4gPj4gRm9yIHRlc3RpbmcgSSd2
+ZSBvdmVyd3JpdHRlbiB0aGUgZ25zcyBkZXZpY2UgY2xhc3Mgd2l0aCB0aGUgZm9sbG93aW5nIGhh
+Y2s6Cj4+ID4+Cj4+ID4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC93d2FuL3d3YW5fY29yZS5j
+IGIvZHJpdmVycy9uZXQvd3dhbi93d2FuX2NvcmUuYwo+PiA+PiBpbmRleCA0ZDI5ZmI4YzE2Yjgu
+LjMyYjNmN2M0YTQwMiAxMDA2NDQKPj4gPj4gLS0tIGEvZHJpdmVycy9uZXQvd3dhbi93d2FuX2Nv
+cmUuYwo+PiA+PiArKysgYi9kcml2ZXJzL25ldC93d2FuL3d3YW5fY29yZS5jCj4+ID4+IEBAIC01
+OTksNiArNTk5LDcgQEAgc3RhdGljIGludCB3d2FuX3BvcnRfcmVnaXN0ZXJfZ25zcyhzdHJ1Y3Qg
+d3dhbl9wb3J0ICpwb3J0KQo+PiA+PiAgICAgICAgICAgICAgICAgIGduc3NfcHV0X2RldmljZShn
+ZGV2KTsKPj4gPj4gICAgICAgICAgICAgICAgICByZXR1cm4gZXJyOwo+PiA+PiAgICAgICAgICB9
+Cj4+ID4+ICsgICAgICAgZ2Rldi0+ZGV2LmNsYXNzID0gJnd3YW5fY2xhc3M7Cj4+ID4+Cj4+ID4+
+ICAgICAgICAgIGRldl9pbmZvKCZ3d2FuZGV2LT5kZXYsICJwb3J0ICVzIGF0dGFjaGVkXG4iLCBk
+ZXZfbmFtZSgmZ2Rldi0+ZGV2KSk7Cj4+ID4+Cj4+ID4+IGFuZCBub3cgdGhlIHN5c3RlbSBwb3dl
+cnMgb2ZmIHdpdGhvdXQgaXNzdWVzLgo+PiA+Pgo+PiA+PiBTbywgbm90IHN1cmUgaG93IHRvIGZp
+eCBpdCBwcm9wZXJseSwgYnV0IGF0IGxlYXN0IGRvZXMgdGhlIGFuYWx5c2lzCj4+ID4+IG1ha2Ug
+c2Vuc2UgdG8geW91Pwo+PiA+Cj4+ID5OaWNlIGNhdGNoISBJIGhhZCBhIGRvdWJ0IHJlZ2FyZGlu
+ZyBjb3JyZWN0IGNoaWxkIHBvcnQgZGV0ZWN0aW9uLiBMZXQgbWUKPj4gPmRvdWJsZSBjaGVjaywg
+YW5kIHRoYW5rIHlvdSBmb3IgcG9pbnRpbmcgbWUgdG8gdGhlIHBvc3NpYmxlIHNvdXJjZSBvZgo+
+PiA+aXNzdWVzLgo+PiA+Cj4+ID4tLQo+PiA+U2VyZ2V5Cj4+Cj4+IEhpIFNlcmdleSwKPj4gU29y
+cnkgZm9yIGJvdGhlcmluZyB0aGlzIHRocmVhZCBhZ2Fpbi4KPj4gRG8gd2UgaGF2ZSBhbnkgdXBk
+YXRlcyBvbiB0aGlzIHBvdGVudGlhbCBpc3N1ZT8gSWYgdGhpcyBpc3N1ZSBpcyBub3QgYSBiaWcg
+cHJvYmxlbSwKPj4gQ291bGQgd2UgY29tbWl0IHRoZXNlIHBhdGNoZXMgaW50byBhIGJyYW5jaCB0
+aGVuIGV2ZXJ5IG9uZSBjb3VsZCBoZWxwIGRlYnVnCj4+IGl0IGJhc2VkIG9uIHRoaXMgYmFzZSBj
+b2RlPwo+PiBJIHRoaW5rIHdlIHNoYWxsIGhhdmUgYSBiYXNlIHRvIGRldmVsb3AuIE5vIGNvZGUg
+aXMgcGVyZmVjdC4KPgo+V2Ugc2hvdWxkbuKAmXQgbWVyZ2UgYSBzZXJpZXMgdGhhdCBpcyBrbm93
+biB0byBiZSBicm9rZW4gb3IgY2F1c2VzCj5jcmFzaGVzLiBIb3dldmVyLCBiYXNlZCBvbiBEYW5p
+ZWxl4oCZcyBmZWVkYmFjaywgdGhlIHNlcmllcyBjYW4gYmUKPmZpeGVkLgo+Cj5Zb3UgY2FuIGNo
+ZWNrIHRoZSB0ZW50YXRpdmUgZml4IGhlcmU6Cj5odHRwczovL2dpdGh1Yi5jb20vbG9pY3BvdWxh
+aW4vbGludXgvY29tbWl0cy93d2FuL3BlbmRpbmcKPlRoaXMgYnJhbmNoIGluY2x1ZGVzIFNlcmdl
+eeKAmXMgcGF0Y2ggZnJvbSB0aGUgbWFpbGluZyBsaXN0IGFsb25nIHdpdGggYQo+cHJvcG9zZWQg
+Zml4Lgo+Cj5JZiB5b3UgY2FuIHRlc3QgaXQgb24geW91ciBzaWRlLCB0aGF0IHdvdWxkIGJlIHZl
+cnkgaGVscGZ1bC4KPgpJIHdpbGwgaGF2ZSBhIHRyeSBiYXNlZCBvbiB0aGlzIGJyYW5jaCBvbiBv
+dXIgcHJvZHVjdHMuCkxldCdzIHN0YXkgaW4gdG91Y2guCgo+QWxzbywgaXTigJlzIGZpbmUgdG8g
+cmVzdWJtaXQgdGhlIGNvcnJlY3RlZCBzZXJpZXMgd2l0aG91dCB0aGUgUkZDIHRhZywKPmFzIGxv
+bmcgYXMgeW91IGtlZXAgU2VyZ2V5IGFzIHRoZSBvcmlnaW5hbCBhdXRob3IuCj4KPlJlZ2FyZHMs
+Cj5Mb2ljCg==
 
