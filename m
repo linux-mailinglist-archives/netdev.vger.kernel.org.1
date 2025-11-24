@@ -1,161 +1,260 @@
-Return-Path: <netdev+bounces-241271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB369C82128
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:21:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 15303C82186
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:26:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA7344E7C75
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:21:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 819454E7B42
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1CE3203BE;
-	Mon, 24 Nov 2025 18:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082E4319600;
+	Mon, 24 Nov 2025 18:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aYs2SJEg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D131531D375
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 18:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C25285073
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 18:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764008362; cv=none; b=AaAq8HxCLPZxZE39w/wvdqvuelHTqJuhM4iNW0wvPA8ENuyB34MR7DqDM9DLu/kjqYYJGIFE10LN/pwxKkumpVFyfWZIyG7JkHkIB8fAHTxx3SVeVltbL49ufkz+PBjc3n+ZKrIrzSQ+E0taD5gvmh8AyDnrh980Iz7v52lY6sQ=
+	t=1764008760; cv=none; b=GJvKkOVdUrlybvyg8ob6a5GQQ4WfFOZwqb1t9DRAYeFSOKbbw/Kgl/1P/hn5soiamjuW+Edyopx7VKXu+jFw8UKKz4EHNphD0NJ9sKYOHhquL2xtS31jrgzZo3dMN6jQgL6yvYkznx29gb7wNnCLNQNKIwapZYY3q4jEGUV6C6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764008362; c=relaxed/simple;
-	bh=+tr0rXCH3AppraOpbUulaj+yjW39IimK04ZXWNj9Ab8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jHVHa1ZoqbrioCmZtZ40rCvhuaKKyjgwxYZTIYHtjVvsIs/VG1txmUXTuVDLe6mrySAhcN/TbUgXowOQD4dXypPVlb0uBOj5AforGEUCT6kI/Nz6BIVv4nPneysxB1bsnrmZvmWNBm3D9YAQZy4arLs2ZWAeXxrGZQevc8X0p8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1764008760; c=relaxed/simple;
+	bh=6AZSCjx0be8QNYc1b9ABiliBH6YVQDDfi0R5FIkWxp8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SG3TRu5qJBhyrENZMkdGcx7h/7haaYNfbRK3ssSocdtydwUzPuG9nL0+Wn9m8WbtvrfxYBfyT1yw2cO4CQpFs8Ur+oaepuPXaRveYHJhKCGNaeAqus0MB3AZBmKVtGQuZE19j5M1wojwaO+uw4C5yTnLjFSv7KdoOkMY5hX3eFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aYs2SJEg; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-3d70c5bb455so1644795fac.1
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 10:19:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764008360; x=1764613160;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7895017c722so43377627b3.2
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 10:25:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764008758; x=1764613558; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Fm7T4kYpemJMMvjDtiDQYS0ccg85PvSfsO/Tmuk9TY0=;
-        b=Mp09pClV3hd5f8Jz//n6kMRwxPDsc2APDssJ0h+MdZGvt71roCKHRY8ILDCBfsDzxU
-         kH5SHFgr1SHeX5zmMrcbICXz86FX73HNwON7tNmcRa908M+IviV9bfx41U0+cSLUXROL
-         neNAQs2mlldr+LUNb4cJkeiVfF60RQejCl5PNEUBq+XR6+c0WkgG/Scr5hEtbVVpIOTZ
-         hLqp7o/2ww064eB8xUF64FgE9bmevLp1fuBBH44OSrTddpm7cBFIT1EkPWSuDYJE6AMB
-         H/VVrWQkzzrNB02xm3t3GrqEnUhawPzloRpj4tA21SukxADRw/c6XbqA4CAx7jB4uq6W
-         d+4w==
-X-Forwarded-Encrypted: i=1; AJvYcCU41GG7KkKVARajzzK/45L6q6emjGmRY4Dh0nFu04IfFBqrfm4kI6DgxECRIyaM8MhplymPTfs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMrdC5g+6pg6kfkFvfYbIOVBAn+Dx7sG4mgMrQW11zNKZMo6Of
-	dAs7inKnLPmUzEYcJLnEcIHXNF5/jVohUeFir6zpFlAijpx8ElD315YY
-X-Gm-Gg: ASbGncs7620WL5Wxezq3Gb7tRyGz86tYzYdfKaqqkwYt+wVjxuSxDwGxdjYsPUqoPSp
-	2FOWRbCcoZnGGOF5cKk5B1hCGX74Ep+CfcTjWBzeAVUl/7zDfmEPcCiQWCi8TMg6QWanzfcN5rt
-	IMNNpDp3SJKOLAh8ax87bpSwHd2UvB1TvtmO1a99cgXSI9MtGuDBtKcaPmxcqTinCCKD7U6nvXm
-	+73t95L/0ZliuabfXBi3mvbkx5/F2eDqLmBBGyA1BwGQehzF/lPI6/yWy+GmN0BgOHfL24Oyogg
-	lQ3hCnEEGw0TSW4JltR06ywU6nJUta4Ih6udQLyXBB1A5DRD3mMbEtlxobDvShfx+rus7iEuPXC
-	MbiEAmvk0xkiSb94OGg6+QYwc6FqShb6JlmTE/503sWsioa+k+SYfuVaiakeLSS5vJ8dd8jh+ba
-	JkKXDwrkC7E/7azg==
-X-Google-Smtp-Source: AGHT+IHk6DmiZ9rpOaxacJxdWVhUPb7ROk8BC/Lrjvw36nO5cYN272dniKUvdPt3nFoemdv0k23irQ==
-X-Received: by 2002:a05:6871:a509:b0:3ec:3464:6a01 with SMTP id 586e51a60fabf-3ecbe2e2531mr4998928fac.22.1764008359961;
-        Mon, 24 Nov 2025 10:19:19 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:5d::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ec9c2cf16asm6481464fac.5.2025.11.24.10.19.19
+        bh=TEB0IVYhYkoeWOmDLi9JAiu4Bvgo6alBDSG0PHHn3mY=;
+        b=aYs2SJEgbdLftah9Q6DJVJMu6BeScc9QWlcEvA6WBeSJbZt72ixRMCvqjg49a4U6HS
+         po3S4QhcWgXgsItovmDpnS4GN+d8mVirwSlG8YGNP0vaFVWkyxdzsd2fTFjxj/6PwO2x
+         PgNvChWqHkDfKQJShotCcbqiWH9aVU/fKVjIYxVGGkEy9GhWqxJgcxt+hKxir0Cj+6fV
+         tNmCFMofRG1t1gexRmZtrp1xBZT/uHTzxRphTvnZpTzBa8fqtKaNbuBI+nx+yW5ywjVi
+         hk/TEX7d50YeaiRxicbV8xT4sh4zK/bvsPEf/ZUCJKF/AAKx4glQmOPC8JVvsGihApKw
+         Ei2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764008758; x=1764613558;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TEB0IVYhYkoeWOmDLi9JAiu4Bvgo6alBDSG0PHHn3mY=;
+        b=nHxCAXgkK7IPJkieRzyurqTddiKxct3BEa/tIg07D2DFewMWtQpvzv7zZ3ifrihI5Y
+         IG9o0Wh7Uc9V8ql0HPFwAqPRe4QJoTVxqqnJkppeczpRFlGgjHvZm+OJ2zRww5nLqn+d
+         Jdq6s8TeEAUMu3rGh7ezH5dgODL9/zVRxTYwDMOLOsTMscaegIBJIqV1SR11TMTMJqEA
+         sHkJr2Anz8gdEODA9uxEg33vJjA27oD/+9ZXgile1OWdu9mN5dvY+3HB+pWWJ10JEAxo
+         x112orX7bJZMKYmGQ15DWMfCZf92bw8VllODjVXfTn33SvQ+QyVhIxSnLfH4mS+T/rTQ
+         wLhA==
+X-Forwarded-Encrypted: i=1; AJvYcCWNawKeV7PocHmAHgeBQ8P7J39IXPW3+2EvFZJl2JKoKI5VIZeX6SY7VNC14vCcHMrVei1M/Sg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8JKSTpBdpxqhLeaE9wf1yLhZJIzavuPxb49lJjrkAxK35SgW3
+	UPicrJv+asyRv6odiC3A59x5D2XnrPvotvj3EGLF2TCEUJq4uiyUwaBN
+X-Gm-Gg: ASbGnctz/kdDl1BRTUJttQ5Wpq2l0SBCamtjwp5+oShgfzgTvx14mJzjHdM/ABcFYt2
+	msk00FcxshGRhW+Tyj0k+T4mN12CJNUDaEI7nvu9Ha+opqEXMRrJT0LVGcUBSlM1MgpMsESsB1r
+	A01gSw80sXSfcKYl+rO7WCfnYO435URd7/uE94i1T8MXQFZevoNvhdzi7zw8Oy7VRgljNMUqjjp
+	ygDzoswUTj4g7B1JEUm3gLbBMm2wkDUbMweKJ6ZLFmbwWgMDjVwSeUq6bXniaYzHu3gkm5kpHLw
+	6jCKp5av9hnwnborGrLLFskoXyQpMvubwBbLn3R8i8BUvtlQwdaRa7Mbnp2KekjSy+lMCL2gmxJ
+	txFyqCePJLI5RQteTzS24SdDd09+qj5Vts2Ivue7l9dP9VXiY6NrOjJ8DpJQEuprVmBzqx8BlZv
+	LAB1HW7fhfBtrt/XNzhJKpgyZGbn/lgDWxgLiiANmzFngrJw==
+X-Google-Smtp-Source: AGHT+IE0ZjSbPsIZXUiMdmSARGNpUZsggdBivDiPOdxixaSe4XdXku94FoT+/xG3xq+0F2N/k+75ZA==
+X-Received: by 2002:a05:690c:6c0a:b0:787:eca1:50cf with SMTP id 00721157ae682-78a8b55dafemr91578177b3.50.1764008757922;
+        Mon, 24 Nov 2025 10:25:57 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:4::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78a798a8106sm46963977b3.19.2025.11.24.10.25.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 10:19:19 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 24 Nov 2025 10:19:12 -0800
-Subject: [PATCH net-next 8/8] fm10k: extract GRXRINGS from .get_rxnfc
+        Mon, 24 Nov 2025 10:25:57 -0800 (PST)
+Date: Mon, 24 Nov 2025 10:25:56 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, berrange@redhat.com,
+	Sargun Dhillon <sargun@sargun.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v11 03/13] vsock: reject bad
+ VSOCK_NET_MODE_LOCAL configuration for G2H
+Message-ID: <aSSjNLrRmaOLkuBN@devvm11784.nha0.facebook.com>
+References: <20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com>
+ <20251120-vsock-vmtest-v11-3-55cbc80249a7@meta.com>
+ <swa5xpovczqucynffqgfotyx34lziccwpqomnm5a7iwmeyixfv@uehtzbdj53b4>
+ <aSC3IX81A3UhtD3N@devvm11784.nha0.facebook.com>
+ <g4xir3lupnjybh7fqig6xonp32ubotdf3emmrozdm52tpaxvxn@2t4ueynb7hqr>
+ <aSSV4RlRcW+uGy+n@devvm11784.nha0.facebook.com>
+ <qvu2mgxs7scbuwcb2ui7eh3qe3l7mlcjq6e2favd4aqcs52r2r@oqbrlp4gxdwl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251124-gxring_intel-v1-8-89be18d2a744@debian.org>
-References: <20251124-gxring_intel-v1-0-89be18d2a744@debian.org>
-In-Reply-To: <20251124-gxring_intel-v1-0-89be18d2a744@debian.org>
-To: aleksander.lobakin@intel.com, Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: michal.swiatkowski@linux.intel.com, michal.kubiak@intel.com, 
- maciej.fijalkowski@intel.com, intel-wired-lan@lists.osuosl.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-a6db3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1896; i=leitao@debian.org;
- h=from:subject:message-id; bh=+tr0rXCH3AppraOpbUulaj+yjW39IimK04ZXWNj9Ab8=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpJKGdghtwLmciShpO+hE5nMVvZSncmpHb5w+dv
- GWfQi0xDpuJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaSShnQAKCRA1o5Of/Hh3
- bbtbD/0Vk0xiqTFHZzmeMTEhz0ob741q7xVzRMymgLSJXw7eSNIwOzXeIVsoN3wJ/mVaMB28xsm
- mjRUf4HqK0HA2pmdVUi+MZVXG4LD63Qt3XWlj8oyb0iIrSuwpY02UGWkWN0Ry4FjMLuRHwLO6QF
- FrHGwuBCoFbZ+M8aE64uqAF/rRaTX97ZTY6/o4gPfkxtzfJJ99lr/DP1xQgjr5rM0Xb3wXu01W8
- 03mGJTg4lGgp8NLBE/6WSRLgyuQE0KpEJDg60iQgfC86R/ysrNoGmV4Fsa1LmOsLE2xeZtiPCB2
- HBye5VM4ciChfusUhN7wpnWbtRsz6esv+FcgFHZhzLp7v4BNDDd0EOCODb8mjPmOOKDs4Wp22ra
- xwuyupifJ4y9SUS5dPuMa8bAOQboHmzh4bym61lUWT0RCv96W46gOkRSGuhZvj9ACgkr2pLLNL2
- AzaVSl8R6D/iqC2G9bGsdpKbLjoMP6hx8BNt1DNEpwN7Le8TSolSaOTBWmvDu3/9zkCWLKdUQOz
- sm/XBYxY1JXuaVG4w8cl6WzPRcJ0p+Br8RxPJvasxn7whhRR5kAv3Za5rwaNwf7Zf/tuBmhzP3x
- 9VMdP5qSjtqjOe8fijA4LXqYTJcRdaaGkA1L2dJNBeJSR6Y38KqEscHc/x3tXN1hAGZqVMHDT1/
- 5EJWH6oCFLFcX4Q==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <qvu2mgxs7scbuwcb2ui7eh3qe3l7mlcjq6e2favd4aqcs52r2r@oqbrlp4gxdwl>
 
-Commit 84eaf4359c36 ("net: ethtool: add get_rx_ring_count callback to
-optimize RX ring queries") added specific support for GRXRINGS callback,
-simplifying .get_rxnfc.
+On Mon, Nov 24, 2025 at 06:54:45PM +0100, Stefano Garzarella wrote:
+> On Mon, Nov 24, 2025 at 09:29:05AM -0800, Bobby Eshleman wrote:
+> > On Mon, Nov 24, 2025 at 11:10:19AM +0100, Stefano Garzarella wrote:
+> > > On Fri, Nov 21, 2025 at 11:01:53AM -0800, Bobby Eshleman wrote:
+> > > > On Fri, Nov 21, 2025 at 03:24:25PM +0100, Stefano Garzarella wrote:
+> > > > > On Thu, Nov 20, 2025 at 09:44:35PM -0800, Bobby Eshleman wrote:
+> 
+> [...]
+> 
+> > > >
+> > > > > Since I guess we need another version of this patch, can you check the
+> > > > > commit description to see if it reflects what we are doing now
+> > > > > (e.g vhost is not enabled)?
+> > > > >
+> > > > > Also I don't understand why for vhost we will enable it later, but for
+> > > > > virtio_transport and vsock_loopback we are enabling it now, also if this
+> > > > > patch is before the support on that transports. I'm a bit confused.
+> > > > >
+> > > > > If something is unclear, let's discuss it before sending a new version.
+> > > > >
+> > > > >
+> > > > > What I had in mind was, add this patch and explain why we need this new
+> > > > > callback (like you did), but enable the support in the patches that
+> > > > > really enable it for any transport. But maybe what is not clear to me is
+> > > > > that we need this only for G2H. But now I'm confused about the discussion
+> > > > > around vmci H2G. We decided to discard also that one, but here we are not
+> > > > > checking that?
+> > > > > I mean here we are calling supports_local_mode() only on G2H IIUC.
+> > > >
+> > > > Ah right, VMCI broke my original mental model of only needing this check
+> > > > for G2H (originally I didn't realize VMCI was H2G too).
+> > > >
+> > > > I think now, we actually need to do this check for all of the transports
+> > > > no? Including h2g, g2h, local, and dgram?
+> > > >
+> > > > Additionally, the commit description needs to be updated to reflect that.
+> > > 
+> > > Let's take a step back, though, because I tried to understand the problem
+> > > better and I'm confused.
+> > > 
+> > > For example, in vmci (G2H side), when a packet arrives, we always use
+> > > vsock_find_connected_socket(), which only searches in GLOBAL. So connections
+> > > originating from the host can only reach global sockets in the guest. In
+> > > this direction (host -> guest), we should be fine, right?
+> > > 
+> > > Now let's consider the other direction, from guest to host, so the
+> > > connection should be generated via vsock_connect().
+> > > Here I see that we are not doing anything with regard to the source
+> > > namespace. At this point, my question is whether we should modify
+> > > vsock_assign_transport() or transport->stream_allow() to do this for each
+> > > stream, and not prevent loading a G2H module a priori.
+> > > 
+> > > For example, stream_allow() could check that the socket namespace is
+> > > supported by the assigned transport. E.g., vmci can check that if the
+> > > namespace mode is not GLOBAL, then it returns false. (Same thing in
+> > > virtio-vsock, I mean the G2H driver).
+> > > 
+> > > This should solve the guest -> host direction, but at this point I wonder if
+> > > I'm missing something.
+> > 
+> > For the G2H connect case that is true, but the situation gets a little
+> > fuzzier on the G2H RX side w/ VMADDR_CID_ANY listeners.
+> > 
+> > Let's say we have a nested system w/ both virtio-vsock and vhost-vsock.
+> > We have a listener in namespace local on VMADDR_CID_ANY. So far, no
+> > transport is assigned, so we can't call t->stream_allow() yet.
+> > virtio-vsock only knows of global mode, so its lookup will fail (unless
+> 
+> What is the problem of failing in this case?
+> I mean, we are documenting that G2H will not be able to reach socket in
+> namespaces with "local" mode. Old (and default) behaviour is still allowing
+> them, right?
+> 
+> I don't think it conflicts with the definition of “local” either, because
+> these connections are coming from outside, and the user doesn't expect to be
+> able to receive them in a “local” namespace, unless there is a way to put
+> the device in the namespace (as with net). But this method doesn't exist
+> yet, and by documenting it sufficiently, we can say that it will be
+> supported in the future, but not for now.
+> 
+> > we hack in some special case to virtio_transport_recv_pkt() to scan
+> > local namespaces). vhost-vsock will work as expected. Letting local mode
+> > sockets be silently unreachable by virtio-vsock seems potentially
+> > confusing for users. If the system were not nested, we can pre-resolve
+> > VMADDR_CID_ANY in bind() and handle things upfront as well. Rejecting
+> > local mode outright is just a broad guardrail.
+> 
+> Okay, but in that case, we are not supporting “local” mode too, but we are
+> also preventing “global” from being used on these when we are in a nested
+> environment. What is the advantage of this approach?
+> 
+> > 
+> > If we're trying to find a less heavy-handed option, we might be able to
+> > do the following:
+> > 
+> > - change bind(cid) w/ cid != VMADDR_CID_ANY to directly assign the
+> > transport
+> >  for all socket types (not just SOCK_DGRAM)
+> 
+> That would be nice, but it wouldn't solve the problem with VMADDR_CID_ANY,
+> which I guess is the use case in 99% of cases.
+> 
+> > 
+> > - vsock_assign_transport() can outright fail if !t->supports_local_mode()
+> >  and sock_net(sk) has mode local
+> 
+> But in this case, why not reusing stream_allow() ?
+> 
+> > 
+> > - bind(VMADDR_CID_ANY) can maybe print (once) to dmesg a warning that
+> >  only the H2G transport will land on VMADDR_CID_ANY sockets.
+> 
+> mmm, I'm not sure about that, we should ask net maintainer, but IMO
+> documenting that in af_vsock.c and man pages should be fine, till G2H will
+> support that.
+> 
+> > 
+> > I'm certainly open to other suggestions.
+> 
+> IMO we should avoid the failure when loading G2H, which is more confusing
+> than just discard connection from the host to a "local" namespace. We should
+> try at least to support the "global" namespace.
+> 
+> Thanks,
+> Stefano
 
-Remove the handling of GRXRINGS in .get_rxnfc() by moving it to the new
-.get_rx_ring_count().
 
-This simplifies the RX ring count retrieval and aligns fm10k with the new
-ethtool API for querying RX ring parameters.
+I'm 100% fine with that approach. I just wanted to make sure we landed
+in the right place for how users may encounter places that there is no
+local mode support.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c | 17 +++--------------
- 1 file changed, 3 insertions(+), 14 deletions(-)
+So for next steps, we can drop this patch and add explicit logic in
+->stream_allow() to allow local mode for vhost/loopback and reject for
+others? Plus, add documentation about what happens for VMADDR_CID_ANY
+(will only receive vhost/loopback traffic in local mode)?
 
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-index bf2029144c1d..76e42abca965 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-@@ -734,22 +734,11 @@ static int fm10k_get_rssh_fields(struct net_device *dev,
- 	return 0;
- }
- 
--static int fm10k_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
--			   u32 __always_unused *rule_locs)
-+static u32 fm10k_get_rx_ring_count(struct net_device *dev)
- {
- 	struct fm10k_intfc *interface = netdev_priv(dev);
--	int ret = -EOPNOTSUPP;
- 
--	switch (cmd->cmd) {
--	case ETHTOOL_GRXRINGS:
--		cmd->data = interface->num_rx_queues;
--		ret = 0;
--		break;
--	default:
--		break;
--	}
--
--	return ret;
-+	return interface->num_rx_queues;
- }
- 
- static int fm10k_set_rssh_fields(struct net_device *dev,
-@@ -1160,7 +1149,7 @@ static const struct ethtool_ops fm10k_ethtool_ops = {
- 	.set_ringparam		= fm10k_set_ringparam,
- 	.get_coalesce		= fm10k_get_coalesce,
- 	.set_coalesce		= fm10k_set_coalesce,
--	.get_rxnfc		= fm10k_get_rxnfc,
-+	.get_rx_ring_count	= fm10k_get_rx_ring_count,
- 	.get_regs               = fm10k_get_regs,
- 	.get_regs_len           = fm10k_get_regs_len,
- 	.self_test		= fm10k_self_test,
-
--- 
-2.47.3
-
+Best,
+Bobby
 
