@@ -1,125 +1,104 @@
-Return-Path: <netdev+bounces-241286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 209B0C8252C
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 20:44:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B41C82580
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 20:51:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 37C70349696
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:44:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 141433AE4DB
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:51:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F4A3271F4;
-	Mon, 24 Nov 2025 19:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD18C32D42A;
+	Mon, 24 Nov 2025 19:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pevEc7Nu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t/pWjGPP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F14F325483
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 19:44:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B938632D0C0
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 19:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764013471; cv=none; b=ZKiUSjn2UCkk2GkPhcw973nitv311x+woXwfYCLJqigSh26GN6KtoI1n9AtLaxJ1dMwr8vRaS897tw61LELkUdbxcsNXI1pA9F4nPMHTGQoNCTedbxPUlLd/JU5QsGkm6UzAemLpiTzDbVDGsM2Eaz49xYjykLVluaGkefAkVhI=
+	t=1764013906; cv=none; b=oaB/dim8a0debGuc3bh2v56n7+q7SR4l/PAslt5AfQzsE5l6uIOGt0QofBSSLvwxfxaOnJEkMZz3uKa3Dkqj/PvsV5IjfnQBeqQHuwtCDNrCF8bXN5aGLwJWNDLJopX8Zzx14dH06Bwxn1T7yNcObnZS6Kzjs1d3l3rQA1MheHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764013471; c=relaxed/simple;
-	bh=LBbpFGRx25U3EjboDytduBUqzcGkLL9Zfgq4YEVNSDE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RN54k+RSbVV9gjxft8QBiFEm9k99xTLEwTC21dR+xf79zGz2JSBB8X/cyzO6s3BYkNU9ogUO1gIFi7l8237ZNXi0pD7vmT4wg/UjPcT2W/IAx8h3Fm+ClnKoaoEvMmrD3dmeMeVeVSIfRfhYk+HxzRV/DQit57uCCLNu8tKLnuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pevEc7Nu; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3436d81a532so9245392a91.3
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 11:44:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764013469; x=1764618269; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UM/52Ll1lDwXA45TXkg/Z20IxHr9hxPwTnKe9jkP/Qg=;
-        b=pevEc7NuxDtnF+ski0Kws3OIhWgJNgBnOMpGfMUyqx36MiyLhdaL9ZVCAKOgTDRC+o
-         MU5JzxHwL2tD+PG9EYB5ydbYCXdhGj1l1N/LVW+635VWHnmivhn2al9M4GVFOZ7QxJ9U
-         LJiYtovP/Iek0DPM08iWmIKK4Y2co0BA0VKj8KGeMKXpa+WBw0MhyGb3UPlr3oKhGy6s
-         LkQDNXGK5WKMJW+it1GQKUgy3Yw6Kj+ykdUkz/b70xsBv9Hy+Er/yDhtsU3C4nGHmMod
-         gOSV5QEaaU9hXi6upHhyuDYo/1Qsw0LbaypdMr99U2xiR3WP+KwPiBfC/7iwjxW7Gj7U
-         IPSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764013469; x=1764618269;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UM/52Ll1lDwXA45TXkg/Z20IxHr9hxPwTnKe9jkP/Qg=;
-        b=lhKq3B1Uz3t9daAR0w3v+aDmRLJ0ZlZ2yv2rC4ahZfbuM6bui9VlLwEokM/XmhKH0R
-         fpuQ4PcXQ6uy7oQT1gTg3NIDS11lfNOCJ7OZujrygwz3zNr5vzsG8o+7aAq2k8BTqcjv
-         HitMbvG7SWUomTtVIrvyKhysJLSfAL1yOPlWswrLGkjAscseCilJTNTLb5PbmnQInrwq
-         7qtTOSxuT8QlgkwAZeKi38k5tmHIshxxYxZfhXUeMEejz1GexgJyLTREE4nQPDQ7PU5K
-         /fr4Dq3qRTHbCKauw1/sSAuCa5bg0USkWBGFB+9TmWWvebl71zkYl2r+9JYcgQ/b2zhj
-         lXCw==
-X-Forwarded-Encrypted: i=1; AJvYcCXlg43CT4ZWdh1GoeUMbG/otW6Rlkkm6RuK+Dp4Vaddh+rASDcRixcnrxPJFMBwad8sPBnCVhc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNGVlvy9WVYXsVlGvkrHjdB9qGe5WT6JoKLpeycWJLzXqHH92K
-	hq/LE6J4y24pRGzRwzGb9jbYgt6KnxC4C+iIRLLqqFe4rN7ecxLayFowvQp3jp7ZjHaqpjZ5bXX
-	6DBEGsA==
-X-Google-Smtp-Source: AGHT+IHYRiMMViMg1TNnHV695x58qWaiVXeMD84tcptS+PCLQZVc/tPkj9IbvIpInrAQ66WeK/Ot31VkHMw=
-X-Received: from pjboj12.prod.google.com ([2002:a17:90b:4d8c:b0:33f:e888:4aad])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:35cc:b0:33b:cfac:d5c6
- with SMTP id 98e67ed59e1d1-34733f487f1mr11536198a91.29.1764013469325; Mon, 24
- Nov 2025 11:44:29 -0800 (PST)
-Date: Mon, 24 Nov 2025 19:43:34 +0000
-In-Reply-To: <20251124194424.86160-1-kuniyu@google.com>
+	s=arc-20240116; t=1764013906; c=relaxed/simple;
+	bh=MYnjRhcGU93/edLNkMgYcrHuxocITcOkVUnH3Ba/ilQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GRTZmY2vcgK94A0pjO5f3kUr45S22LnoiDyjta1jJiR4YO4rlQ++/yiw4VNfKX44dUTJTm2tZMYWveB/baqn8wC/KMxVd6czo+tL8JgabN6tLROOjns8R1FYJ3qXldfQEP8FiazuqyNQPDY7hsF/rt7abKiWYhrw+KrZs5+3QnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t/pWjGPP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFAB1C4CEF1;
+	Mon, 24 Nov 2025 19:51:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764013906;
+	bh=MYnjRhcGU93/edLNkMgYcrHuxocITcOkVUnH3Ba/ilQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=t/pWjGPPtk6JbVqGD8+FK1gi9mqY/Oxkw1vXacrJAugp9PHZctEbzlS6yJMl/7t6H
+	 lGPAMt+PT1Du/PIegjZiIhLYZp9X7dcJBZuuCk3WmP4uKkMkfIfU7K2h3UigWRZ12Z
+	 YdtMZqncbA+Ix/oduGoKxFKp6MbGr5pqfq43jf8G2F8vJuBz20NFaisD2fDFIYW/RK
+	 DwgWZfGSVUnxXC1huNMRaj6OE4wa8smAsIOh9r2wkhBabvyBmlMcWqQTii8/yMDW5l
+	 w3K1UCC7IugN9rtm4lDauC1ilZxdrBca07/AexUs6mDWCgslT8mFaHHl4iAo0U2k0/
+	 N6n51oz1iZ4TA==
+Date: Mon, 24 Nov 2025 11:51:45 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v1 net-next 1/2] selftest: af_unix: Create its own
+ .gitignore.
+Message-ID: <20251124115145.0e6bb004@kernel.org>
+In-Reply-To: <20251124194424.86160-2-kuniyu@google.com>
+References: <20251124194424.86160-1-kuniyu@google.com>
+	<20251124194424.86160-2-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251124194424.86160-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.52.0.460.gd25c4c69ec-goog
-Message-ID: <20251124194424.86160-3-kuniyu@google.com>
-Subject: [PATCH v1 net-next 2/2] selftest: af_unix: Extend recv() timeout in so_peek_off.c.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-so_peek_off.c is reported to be flaky on NIPA:
+On Mon, 24 Nov 2025 19:43:33 +0000 Kuniyuki Iwashima wrote:
+> Somehow AF_UNIX tests have reused ../.gitignore,
+> but now NIPA warns about it.
+> 
+> Let's create .gitignore under af_unix/.
 
-  # # so_peek_off.c:149:two_chunks_overlap_blocking:Expected -1 (-1) != bytes (-1)
-  # # two_chunks_overlap_blocking: Test terminated by assertion
-  # #          FAIL  so_peek_off.stream.two_chunks_overlap_blocking
+Thanks for following up!
 
-The test fork()s a child process to send() data after 1ms to
-wake up the parent process being blocked (up to 3ms) on recv().
+NIPA says it doesn't apply:
 
-But, from the log, the parent woke up after 3ms timeout, so it
-could be too short when the host is overloaded.
+error: patch failed: tools/testing/selftests/net/.gitignore:35
+error: tools/testing/selftests/net/.gitignore: patch does not apply
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
 
-Let's extend it to 5s.
+Does it have a dependency in net or on the list?
 
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Closes: https://lore.kernel.org/netdev/20251124070722.1e828c53@kernel.org/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- tools/testing/selftests/net/af_unix/so_peek_off.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> new file mode 100644
+> index 000000000000..694bcb11695b
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/af_unix/.gitignore
+> @@ -0,0 +1,8 @@
+> +diag_uid
+> +msg_oob
+> +scm_inq
+> +scm_pidfd
+> +scm_rights
+> +so_peek_off
+> +unix_connect
+> +unix_connreset
+> \ No newline at end of file
 
-diff --git a/tools/testing/selftests/net/af_unix/so_peek_off.c b/tools/testing/selftests/net/af_unix/so_peek_off.c
-index 1a77728128e5..86e7b0fb522d 100644
---- a/tools/testing/selftests/net/af_unix/so_peek_off.c
-+++ b/tools/testing/selftests/net/af_unix/so_peek_off.c
-@@ -36,8 +36,8 @@ FIXTURE_VARIANT_ADD(so_peek_off, seqpacket)
- FIXTURE_SETUP(so_peek_off)
- {
- 	struct timeval timeout = {
--		.tv_sec = 0,
--		.tv_usec = 3000,
-+		.tv_sec = 5,
-+		.tv_usec = 0,
- 	};
- 	int ret;
- 
+nit: missing new line
 -- 
-2.52.0.460.gd25c4c69ec-goog
-
+pw-bot: cr
 
