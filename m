@@ -1,180 +1,149 @@
-Return-Path: <netdev+bounces-241159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E23FC80ACC
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 14:10:54 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 160CAC80D03
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 14:39:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AC7F3A7179
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 13:08:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C1F444E5924
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 13:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DFB73043C5;
-	Mon, 24 Nov 2025 13:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE96E307AD3;
+	Mon, 24 Nov 2025 13:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Tg6nN7s3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GtlS8s/y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C00303C93
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 13:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD90A306495;
+	Mon, 24 Nov 2025 13:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763989724; cv=none; b=C3JWrfOaBstBcq0EDfQUhn9n1ubi5muydFXCTw2jDrFjnhFMxd5Ps7MDvNdSvobJ9/MYGBIlcJYxkU9I6GjTHH+ffvSwVyi8nWgsK+OVc6wY/sy4MaSCCHXHlQsX6HpOqQl34oDhoNkyygUWNw1VLr/M6ZGhhqULNEbDMV0Q9tA=
+	t=1763991578; cv=none; b=mOrTsvtTy753MlbBjzyOL+5MDE7VfD7pfJEewg79nxFdYgnkF583GJ3MUsWODMtOx8+029jbQtDZJ5R1WWIsD0lVIvUFjH6Zk9cXExsucpStqDWUdpNb0qS83tXClXhFozFl8aH2+Eb3SjYkzRSWAR1dkvn9emM5We8daSmmsIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763989724; c=relaxed/simple;
-	bh=LRQLpElnCTWDWNW9Td6/qX0W+seZnE0G09+QK9uBOiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s5/iZHVoUA6bhGSr/2o5eoJ1RyfRwKbK6pAA15roZH09YVJrLLn6qCH1GUqrCicF/uDD/NNr3nj+Ahfm6XUXByfaeWRO5WRAo+EUpyghlufbg6f22CAXSlWXW9qn3nWPnkPKYA2VcaRucIT+boPrQk0Ts+Hku7RW0/nWzCscfiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Tg6nN7s3; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47789cd2083so24955795e9.2
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 05:08:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1763989720; x=1764594520; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OFiNT2yuBLPQnDGcfP34CBXyTQtTTHRIFkGdeL1qNTA=;
-        b=Tg6nN7s3nvWOX++gmZUJLVXllmzSJIMXILbVPPC8hE/M1L7Mg2ZprgHDXVcA/4qZmV
-         AKqNcDycO+UD/asjW6F/ZmGgZ5aiXJfMJwCIYWTOstvo8fDodHFujz1O11G7pgcOCjPd
-         HZKcRRjAC2TBSKLxpmC/jchn7jeHLPVuOZVT066net0xDf4MzvTLAUnaFAB4uqw6UNnZ
-         Y+USy8VZ3dAxFKMeYIr9Yq6ZbaslnvIxGGPBz/DDRY1PJSnJMHKJOleUyNYVEl2oQQMc
-         FjPDEe8a1yjhxrrtqr9eCtzacGjClv7Rw5S+XTbHvofbkA1ntkwAZfDojegbLZ2Gbqz8
-         u5kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763989720; x=1764594520;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OFiNT2yuBLPQnDGcfP34CBXyTQtTTHRIFkGdeL1qNTA=;
-        b=V4lnkCDCtncPKcK4XokSXubeyOv+UeEFpxQxobVqj48HE3R7iSLqkH56TdvnuzKcRW
-         eyKsZJmbNcGTfSFIbriiYYHwFcM8k5h+EhfVidbu8abFIKKOMPgoE60BCspEGEFnuJ3Q
-         +WHyHKTjes7zEFrDxI9GjEjroK+rglc5bA+EU21aG2mfwAM0wHzEkq4UuxF1RLW1bZSG
-         fbDRpPbyn5HAZTHwoJ8WQV11W2tNjGzHvDVglbddyqtmfLRU3VbrZQVw4GH3C1QPE6RQ
-         2SKAb7RSNy8Jy5b6JKGFaVbF7rHzMXHYmGN992ywK/yB0+rIXoU8RyAVAHM+hOsdzWtF
-         1Zkw==
-X-Forwarded-Encrypted: i=1; AJvYcCVbSFdv5INW827nQh9PvQzo3krUH+hVFkZ8HZSi7ddd11qHzvIL8t1+0UDGIhfQK78k0ZzWJz8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxz6h6foCJLHrck3jK503yPOdVEb9RoryukNdNDDb6LR+M3dC2P
-	ZXNEJYPdMU/cht+6K95+0XILO/OJDgmH0G6HpudUVlqpDMgeaN1Se8jg0QGD8v7hyvo=
-X-Gm-Gg: ASbGnctObQZNsQerN0Rga15lcsKSjXsibMEQihQ70v9AdYSk1BnEeCUAr0IGYbcEI2j
-	LkocnRhZsJppl3MIZjDq2EsUd91zt4iccUNC37Nz0AHS5YR9QEzS/oXB1KrJGt3GCqHKTmQnwCg
-	Q2D+86yiDXo7wQN4VpvVWSUVxciYJ2zPjXUA6XgmweQuI+lexetDkdGpdvDq+rJchyOwDNXr5aB
-	gnrKWFr7Au7+QY5uo+lLK1HduSd80uSxBlHTKIPuPjTNaWWPCMSHmXpn+FytCOfcBZilWYigwns
-	d0ROOAWg+ihFK9Sjnw28dqtQpXrUgc3wuDQIpZ086jxZw3b7sB9em/4cZxG6Umon5zJxa6QSJBA
-	9CDk4fiMIk4QsQkYirhSACbqLoVq/Mj+8yG4rNdTYPOCb0vlw58k6dpJvYzo6HHOL+o9oK5sItP
-	4/rBeK4p0k8RRG+w==
-X-Google-Smtp-Source: AGHT+IFxd/ZKfXS+EiW3Bb+wPwpdBt+GnQG44EQt8KOfagxj4/d+mHzOdami5PdyEs3Q4/rVvSsLrg==
-X-Received: by 2002:a05:600c:3543:b0:477:1ae1:fa5d with SMTP id 5b1f17b1804b1-477c1142268mr93235725e9.20.1763989720132;
-        Mon, 24 Nov 2025 05:08:40 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f2e574sm28198949f8f.3.2025.11.24.05.08.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 05:08:39 -0800 (PST)
-Date: Mon, 24 Nov 2025 14:08:36 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, horms@kernel.org, efault@gmx.de,
-	john.ogness@linutronix.de, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	calvin@wbinvd.org, asml.silence@gmail.com, kernel-team@meta.com,
-	gustavold@gmail.com, asantostc@gmail.com
-Subject: Re: [PATCH RFC net-next 1/2] netconsole: extract message
- fragmentation into write_msg_target()
-Message-ID: <aSRY1AI7zDF-h-A9@pathway.suse.cz>
-References: <20251121-nbcon-v1-0-503d17b2b4af@debian.org>
- <20251121-nbcon-v1-1-503d17b2b4af@debian.org>
+	s=arc-20240116; t=1763991578; c=relaxed/simple;
+	bh=N3yvsqVm0PJlZusMyFsk+KcUCnmo4tz7hXnLuS8Lf1Q=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=oeoJRc0RyHBBAKO4MU1h2VZhTMIUUDN/LVAFWJw7RD2kmmumc+RJk6pCBQ7kC27hZ2+lQByZJpQK8+bOtv508CZIrtbfv9U8BejoWnHJ6hBnPV2znOMPmCgJlHScYywFjPGQUhOUZG6QRR4SgpPaEDqb03nrGzdw0NHoiVnYbOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GtlS8s/y; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763991577; x=1795527577;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=N3yvsqVm0PJlZusMyFsk+KcUCnmo4tz7hXnLuS8Lf1Q=;
+  b=GtlS8s/y7VHu33LaLA+jOfn3xzYVzflslJauEYiFmgpo1XuOxTAu5x5x
+   bXwB9Pbj/cpfdl4fOamxXJLxVIa+ShBqtu+v+bIen3Znajb8fzr91shsd
+   hmeFKyR4pdsfwJnPt11UMGAoODq070E9dTQpFIeXMbt/ycQGCFMENGD5Y
+   enT2IHp1hqM1ROCtx77k5njHwsx4VJ/7u4fDXj9L1ABBxh13fQ9Xa9HZ6
+   8IoXndXsd8XpYBYouRFz1TuqnDoZg/i6a5gOwkPhkmLmd8TjPnCbeoOz0
+   OK9lmmVZMUMpZ8rEVoiCGDivQP75tXuO3YXpgmUTcahNtu69JNeAhWSqf
+   Q==;
+X-CSE-ConnectionGUID: ycr+2d0kS4yxCAySaF3UvA==
+X-CSE-MsgGUID: sy+CvR5YTqWTtg5cquv0Rg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11623"; a="83379575"
+X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
+   d="scan'208";a="83379575"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 05:39:36 -0800
+X-CSE-ConnectionGUID: sqr3meneRlWX2YnoQ/LVzQ==
+X-CSE-MsgGUID: KFq1qs2oR1KFeBa69NSZyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
+   d="scan'208";a="192142889"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.97])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 05:39:31 -0800
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Mon, 24 Nov 2025 15:39:28 +0200 (EET)
+To: yongxin.liu@windriver.com
+cc: LKML <linux-kernel@vger.kernel.org>, Netdev <netdev@vger.kernel.org>, 
+    david.e.box@linux.intel.com, chao.qin@intel.com, 
+    yong.liang.choong@linux.intel.com, kuba@kernel.org, 
+    platform-driver-x86@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] platform/x86: intel_pmc_ipc: fix ACPI buffer memory
+ leak
+In-Reply-To: <20251124075748.3028295-1-yongxin.liu@windriver.com>
+Message-ID: <f1124090-a8e4-6220-093a-47c449c98436@linux.intel.com>
+References: <20251124075748.3028295-1-yongxin.liu@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251121-nbcon-v1-1-503d17b2b4af@debian.org>
+Content-Type: text/plain; charset=US-ASCII
 
-On Fri 2025-11-21 03:26:07, Breno Leitao wrote:
-> Refactor the message fragmentation logic in write_msg() by extracting it
-> into a separate write_msg_target() helper function. This makes the code
-> more maintainable and prepares for future reuse in nbcon support for
-> non-extended consoles.
+On Mon, 24 Nov 2025, yongxin.liu@windriver.com wrote:
+
+> From: Yongxin Liu <yongxin.liu@windriver.com>
 > 
-> The helper function takes a target, message, and length, then handles
-> splitting the message into MAX_PRINT_CHUNK-sized fragments for sending
-> via send_udp().
+> The intel_pmc_ipc() function uses ACPI_ALLOCATE_BUFFER to allocate memory
+> for the ACPI evaluation result but never frees it, causing a 192-byte
+> memory leak on each call.
 > 
-> No functional change intended.
-
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -1559,6 +1559,20 @@ static void append_release(char *buf)
->  	scnprintf(buf, MAX_PRINT_CHUNK, "%s,", release);
->  }
->  
-> +static void write_msg_target(struct netconsole_target *nt, const char *msg,
-> +			     unsigned int len)
-> +{
-> +	const char *tmp = msg;
-> +	int frag, left = len;
-> +
-> +	while (left > 0) {
-> +		frag = min(left, MAX_PRINT_CHUNK);
-> +		send_udp(nt, tmp, frag);
-> +		tmp += frag;
-> +		left -= frag;
-> +	}
-> +}
-> +
->  static void send_fragmented_body(struct netconsole_target *nt,
->  				 const char *msgbody, int header_len,
->  				 int msgbody_len, int extradata_len)
-> @@ -1748,13 +1760,7 @@ static void write_msg(struct console *con, const char *msg, unsigned int len)
->  			 * at least one target if we die inside here, instead
->  			 * of unnecessarily keeping all targets in lock-step.
->  			 */
-> -			tmp = msg;
-> -			for (left = len; left;) {
-> -				frag = min(left, MAX_PRINT_CHUNK);
-> -				send_udp(nt, tmp, frag);
-> -				tmp += frag;
-> -				left -= frag;
-> -			}
-> +			write_msg_target(nt, msg, len);
-
-I would call the new function send_msg_udp() to make it symetric with:
-
-static void write_ext_msg(struct console *con, const char *msg,
-			  unsigned int len)
-{
-[...]
-			send_ext_msg_udp(nt, msg, len);
-[...]
-}
-
-By other words, use "write_*()" when struct console * is passed
-and send_*_udp() when struct netconsole_target * is passed.
-
-The inconsistence confused me... ;-)
-
-Note that write_msg()/write_ext_msg() are cut&pasted.
-The only difference would be send_msg_udp()/send_ext_msg_udp().
-
->  		}
+> This leak is triggered during network interface initialization when the
+> stmmac driver calls intel_mac_finish() -> intel_pmc_ipc().
+> 
+>   unreferenced object 0xffff96a848d6ea80 (size 192):
+>     comm "dhcpcd", pid 541, jiffies 4294684345
+>     hex dump (first 32 bytes):
+>       04 00 00 00 05 00 00 00 98 ea d6 48 a8 96 ff ff  ...........H....
+>       00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00  ................
+>     backtrace (crc b1564374):
+>       kmemleak_alloc+0x2d/0x40
+>       __kmalloc_noprof+0x2fa/0x730
+>       acpi_ut_initialize_buffer+0x83/0xc0
+>       acpi_evaluate_object+0x29a/0x2f0
+>       intel_pmc_ipc+0xfd/0x170
+>       intel_mac_finish+0x168/0x230
+>       stmmac_mac_finish+0x3d/0x50
+>       phylink_major_config+0x22b/0x5b0
+>       phylink_mac_initial_config.constprop.0+0xf1/0x1b0
+>       phylink_start+0x8e/0x210
+>       __stmmac_open+0x12c/0x2b0
+>       stmmac_open+0x23c/0x380
+>       __dev_open+0x11d/0x2c0
+>       __dev_change_flags+0x1d2/0x250
+>       netif_change_flags+0x2b/0x70
+>       dev_change_flags+0x40/0xb0
+> 
+> Add kfree() to properly release the allocated buffer.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 7e2f7e25f6ff ("arch: x86: add IPC mailbox accessor function and add SoC register access")
+> Signed-off-by: Yongxin Liu <yongxin.liu@windriver.com>
+> ---
+>  include/linux/platform_data/x86/intel_pmc_ipc.h | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/include/linux/platform_data/x86/intel_pmc_ipc.h b/include/linux/platform_data/x86/intel_pmc_ipc.h
+> index 1d34435b7001..2fd5e684ce26 100644
+> --- a/include/linux/platform_data/x86/intel_pmc_ipc.h
+> +++ b/include/linux/platform_data/x86/intel_pmc_ipc.h
+> @@ -89,6 +89,7 @@ static inline int intel_pmc_ipc(struct pmc_ipc_cmd *ipc_cmd, struct pmc_ipc_rbuf
+>  		return -EINVAL;
 >  	}
->  	spin_unlock_irqrestore(&target_list_lock, flags);
+>  
+> +	kfree (obj);
 
-Otherwise, I confirm that it is just a refactoring with no
-functional change.
+Good catch but this fix doesn't address all possible paths. So please use 
+cleanup.h instead:
 
-Feel free to use, ideally after the renaming function:
+	union acpi_object *obj __free(kfree) = buffer.pointer;
 
-Reviewed-by: Petr Mladek <pmladek@suse.com>
+And don't forget to add the #include.
 
-Best Regards,
-Petr
+>  	return 0;
+>  #else
+>  	return -ENODEV;
+> 
+
+-- 
+ i.
+
 
