@@ -1,384 +1,146 @@
-Return-Path: <netdev+bounces-241294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA043C8269A
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 21:31:10 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 619D2C8272F
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 21:55:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 05AA734AB9F
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 20:31:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 489604E0719
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 20:55:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9059258ECB;
-	Mon, 24 Nov 2025 20:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1319F2BDC17;
+	Mon, 24 Nov 2025 20:54:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hvk9NlTH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="H42p/666"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="yavHB9Un"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73DF238C0D
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 20:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E518258ECC
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 20:54:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764016266; cv=none; b=MU1WXSdwZkbnE0FLMR1U3G8H7mpbEpfwwFqXBOypiE0WT79R1KsaHXiYqqJ47JUiv3gIkkWq39kZh5eyu0Ztr9CJSEVqiiFa8yXJN9xMW0/5uf6lIyTcLRQAomhclvVj+mjYYMhJXEwRbQ7gNW43L/LHF4gxDtAUr5VOu6EZ1uM=
+	t=1764017699; cv=none; b=iZIn2phjFbWA/n0tdeq4ftmTdShq2fjbcwCyLC4tn+Oo4uTnRwDneCZ2kJ06bcM/NuaPCme25/8+YRZkLlRzvHAn/f99eWk7JVnfmyrGBulHRPUucLK9lNPk0WaOmnHBPW/6f+cU3l4UtsJQDklafP7lvBd3cEvjCPVUGIlUjYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764016266; c=relaxed/simple;
-	bh=fchSxyOzP25TXlOhKWqDfPOikpwASRplcfW3WbkoNjc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QTx2JI0GYAEnXQZggnHo2cuEYPYCoTrvxvNdhNGnSX6XEadvJdWdihME/493Lh7SQnY74ejVmRTJrueajAWzzSMcVA1zNhO3eLL6Yl1U3S4ctpFGhE9NVg3hLMyAHrXRPpIRRLPbF6BYCXjFZ63/+P4fFYT2tshpxkRr6kA5LJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hvk9NlTH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=H42p/666; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764016261;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2pAhvittlmQzx3f0gLjregk5ZIv3cBZgLn95qIAE8ZI=;
-	b=Hvk9NlTHQtxCLifWXM4cUkAFIg/yKLlSf+8oSMxRFlLh0jwO/mai/XiemE4bOWFmlv6+Qw
-	G3ukj2Cf+R2fkAsUq5w4mI24rFB07GMvy2QDX6pttuIkmDwIEPdQX2ikhveepGHSBOUVP1
-	8KQ/NinY2YNTpN2V0LvrXBKaHD42uSw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-537-s5ztoMt9NTSETthuG5u_fQ-1; Mon, 24 Nov 2025 15:31:00 -0500
-X-MC-Unique: s5ztoMt9NTSETthuG5u_fQ-1
-X-Mimecast-MFC-AGG-ID: s5ztoMt9NTSETthuG5u_fQ_1764016259
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4776079ada3so38535085e9.1
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 12:31:00 -0800 (PST)
+	s=arc-20240116; t=1764017699; c=relaxed/simple;
+	bh=K1a3+HOrSUCs/GuNClTDn5ZdPIhnEk8yVdo1MsAC+YU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Rw0SwWgJQhCf52yv0kSO08G9ZIz+CrsVguaZJq13WqtHmFAavg24692U1tzzmNeIMmYgXS9w7To4YnfoTCRMNblq5ivehuj3f6FRRnAl8t9KqUvmhshRPiMXMinfxvKCtbEEBwL+dex2cMzb0wHUN3f+XGUjJK2tBfEF55/idKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=yavHB9Un; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3438d4ae152so5279446a91.1
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 12:54:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764016259; x=1764621059; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2pAhvittlmQzx3f0gLjregk5ZIv3cBZgLn95qIAE8ZI=;
-        b=H42p/6665Ts1D741WG5T4k1ESNd0k2C0qG4k7iw0oNZWwgfFTKwba7/fd0a6Ti3OSJ
-         6fMj3urfIAht0TACg3MBT33k8sXuQemRZKng8Uwf+35yzJ6zmA6w7j38U+ocL7guDtCQ
-         YpM60ZDc3zPIAUCIgkCj4Bu+UDp2v4mvNzsT+tMwcZ/YP47XYd9HAe9q+igdkL2PsG3z
-         yFoVOM4gpstX9xrWV8+tLQPUhCp98aVF+ORDXpqg7v2OPphIKKDqKIfzvdkdnSCf6ots
-         qQ0wmWzex2uIZ3bgJyq9X3LAbE08j74UmQu/lfR2hxlJ2cGoT81Dd7oPp3oMF4539aH7
-         W0yw==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1764017696; x=1764622496; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=txp/6sDDr/nBaH4fj2XxwLJxlcNL7N6bsQHh70oQCmo=;
+        b=yavHB9Unhz98sbr+exdEN2SGduzCiuD+8Zvre9mzyImxDB6bc9wA8ziwGb1vJkp2bY
+         cgT8PdTRK1PbehnQDLxu/q7uX4obhVAngo/952gRv4tARiSDOKuGshXAJkxfT5UpqUjZ
+         XIlmMxEI+VQbuGip9KxSUaZ310ovUbeMUS56lIWvouZoqrPZ/J6o3kdtl+ZMcd+/9lxz
+         NK7cvNGMV3paf7jN06COXHZUgRbk+0Zom4iotdfGrEH1szv2tKegND2EprZsl0ofp7Di
+         GA7EV8DBa+5ZspuwuCMVEXfTgMat5zqevp+3CbseMIaD9jXIAPjdbG1mTIz/oH7Kxw0V
+         L4zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764016259; x=1764621059;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2pAhvittlmQzx3f0gLjregk5ZIv3cBZgLn95qIAE8ZI=;
-        b=ls03G6kPmls7CvbXsHtbal4CpvhS6ayd+TxGGwAy81w5atGaoUj4CVMtLXiYSFoVc5
-         YCXImNt53cTQWTYWW3ytFyljd/8vetQzvdHGn0lCVW9Fo+7T2hz63ebkIlCR1otkyQTu
-         LD8YN+7UGqzFNG3j1EZvapZ/ViYBXT0ryX7+ROrrU7TpgcaxqqmtFb3X5yUG5h/KInNc
-         ef32f+SO5QxXhwTjYZQGieAxempje49tQbz3ZfECdiDqEst6VrdfioYtpV9dfiwIc8xn
-         SIQfO8SIARJ5NiTn1qOFshlSAXiz14tekI+6X/zVwNYZlVR1WLhHkUlBnhTqNQL/Jp0J
-         p2DQ==
-X-Gm-Message-State: AOJu0YwW3ujw5U9J85PidXwkpNSlYTt35FhL8BoCck34vVzt/njsXoan
-	q4pNhzZm/TPIdfRfkb06ChiJK6GSfp4ljObW8ICkHzo3OBZT6Uwd1jcOvT/6zVg8xL5mkl/dPzR
-	x0fB9DAv4fjH0x9FJPxHuCReCa5Ovck5K8Scbf6W4oxBYhrDnnNc8eZDNJg==
-X-Gm-Gg: ASbGncsKyyslTghF+JpF5XmJv7DXnl6/xUHpix3zo09gQIzeLXbMk4LrnMCqNqxyIFY
-	9MG6NvbIbNs+jZbce4FhU4szEyrTIy6O1p9nCAw1JizWavAW0tZzYnePh9r2eWNYkcI6gyYX5lR
-	ToT0hOTZDQzd+qLt+cqPQwDrZ73sIt4MH0PCOmH9goNt2oi6weUOWsIqim6+gB/DhOPYBRO37qF
-	Za+Dd0m1Tf0D83D88hx6fzs0xSSlykpjI3a9kQSdB+Pwq6NUqzFaGPk3k7fkOuqbHvBlrrNgowf
-	Bkyda4aPs3zppe7Ym2HUu/PkGyGQByw1X4VerCzyB/fSbSkE6BWSBH95gI28YHy6J21jtr08D6B
-	rkBZWxozErWCNDiElL5Y1qb2OicnsKg==
-X-Received: by 2002:a05:600c:4f53:b0:475:e007:bae0 with SMTP id 5b1f17b1804b1-47904b12f35mr1563285e9.16.1764016258910;
-        Mon, 24 Nov 2025 12:30:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF/lEpl8A5WguuB6gHGGKA9y2m2N0osP3IPKnjrOrlZgIcHz+3JrCvGBt4heE09qmmCrwPUqw==
-X-Received: by 2002:a05:600c:4f53:b0:475:e007:bae0 with SMTP id 5b1f17b1804b1-47904b12f35mr1562925e9.16.1764016258335;
-        Mon, 24 Nov 2025 12:30:58 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf1e868bsm206492455e9.4.2025.11.24.12.30.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 12:30:57 -0800 (PST)
-Date: Mon, 24 Nov 2025 15:30:54 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
-	virtualization@lists.linux.dev, parav@nvidia.com,
-	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
-	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
-Subject: Re: [PATCH net-next v12 03/12] virtio: Expose generic device
- capability operations
-Message-ID: <20251124152548-mutt-send-email-mst@kernel.org>
-References: <20251119191524.4572-1-danielj@nvidia.com>
- <20251119191524.4572-4-danielj@nvidia.com>
+        d=1e100.net; s=20230601; t=1764017696; x=1764622496;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=txp/6sDDr/nBaH4fj2XxwLJxlcNL7N6bsQHh70oQCmo=;
+        b=RB2pgnxtMI9FP9C9dJXXPYgWmt8JQjk+wGmIVoNjmexWEs74IPmlIoaON0ww5N/zAV
+         xIYsnjfbP2PZ+rSkDftoPXTieInHvE/7SQvyl+HcnNgcy2t8PHumJYgmLKAjL7AjC5jI
+         jD0K5t0YIp2YBmtYpUfEVC/4/0GbrL665FK3GlL56XFr7xljGYnn5OTyTcTeJaizh6Hg
+         BAcovtW8vz1mtYd+OPncvMR61lbkimNf3/HnH7UoZXo7ldSYQW8Ehz3dWQoz4G2+b0zD
+         aAwwzUdeaok2SgK/QGsTXmPG9cQJ+y//D90LpOBTjH0Oj3S2r2chjXXqI9hax+5GckZ+
+         CP2A==
+X-Forwarded-Encrypted: i=1; AJvYcCX1TE1xFg8QpbJwG0iWdHO+6D91lHWSRqF1R+9TW09zJ7Qj5ynVn3sH2cP0XepsKpol4RKbPwE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmEMAmSAAecvuDZVcyR2tUBhyZTU5yKgyUR+Nqr4sIeZAg0BEH
+	oJcw5AnwrtGd/AAbRTQ+NyHe0xFHPNdLb5VdyS21I6MKYo+lnBqKbqdhEIQCRlZZoL66XDTVuTh
+	Mt0WqzOA9DZDfEMYgEWkldnTNfhnHmqDqJ74jz4iv
+X-Gm-Gg: ASbGncv9K+yDWRsX/rZCfcRQluhAPF+Tgn9+ZR8xXHQkVAbbap1jdRM+IUfdQee21f+
+	uvFOW1BbPxwOy6DdmA2xcbb2IQK2AvlkDaZz1FjPXkvASHCgWeJXiw24O+jqcU51lgcxB4RI8jH
+	QcTF68ge16qFVYqDvvh4rWGMyfxJUVfo9cT11Ec7PtAZ7NRxcw+6NoCt/XQyixHzHMUA5widIvV
+	rSUH6vqr6oZPgLtouXCpuUehVna4sDOTIaPm0e7uniGL+S1yv8w458rB5e+DbmPV38og2JRH4XC
+	I+gWSMU1ZAngAA==
+X-Google-Smtp-Source: AGHT+IE7Ap7iaok63M1k3FuV41+3o3+bFo8SnCtg318bZ6zgUNc5bq50oQfFXj0eJwBtba8CpdF3Xwp4dh6+O/WRbus=
+X-Received: by 2002:a17:90a:d00c:b0:340:e529:5572 with SMTP id
+ 98e67ed59e1d1-34733e6cac7mr11892908a91.8.1764017696374; Mon, 24 Nov 2025
+ 12:54:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251119191524.4572-4-danielj@nvidia.com>
+References: <bug-220774-17063@https.bugzilla.kernel.org/> <bug-220774-17063-qOQ3KbbRZE@https.bugzilla.kernel.org/>
+ <CAM_iQpW7WE17Xad_YVsOpz5_+uJzB2_7zOPQE3xOoT-nt4UAXQ@mail.gmail.com>
+In-Reply-To: <CAM_iQpW7WE17Xad_YVsOpz5_+uJzB2_7zOPQE3xOoT-nt4UAXQ@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 24 Nov 2025 15:54:44 -0500
+X-Gm-Features: AWmQ_bmg30VNsZqHcgMDDKOTgAHgnm9s8-xb62AgKHLRt9zQx_yiKYlMdL3HDUE
+Message-ID: <CAM0EoMmpuCdD6LpSOPuy0cXEvr7aJhSRDOhqzQ5mrq8-zjJaxQ@mail.gmail.com>
+Subject: Re: [Bug 220774] netem is broken in 6.18
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: William Liu <will@willsroot.io>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, lrGerlinde@mailfence.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 19, 2025 at 01:15:14PM -0600, Daniel Jurgens wrote:
-> Currently querying and setting capabilities is restricted to a single
-> capability and contained within the virtio PCI driver. However, each
-> device type has generic and device specific capabilities, that may be
-> queried and set. In subsequent patches virtio_net will query and set
-> flow filter capabilities.
-> 
-> This changes the size of virtio_admin_cmd_query_cap_id_result. It's safe
-> to do because this data is written by DMA, so a newer controller can't
-> overrun the size on an older kernel.
-> 
-> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
-> Reviewed-by: Parav Pandit <parav@nvidia.com>
-> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> 
-> ---
-> v4: Moved this logic from virtio_pci_modern to new file
->     virtio_admin_commands.
-> 
-> v12:
->   - Removed uapi virtio_pci include in virtio_admin.h. MST
->   - Added virtio_pci uapi include to virtio_admin_commands.c
->   - Put () around cap in macro. MST
->   - Removed nonsense comment above VIRTIO_ADMIN_MAX_CAP. MST
->   - +1 VIRTIO_ADMIN_MAX_CAP when calculating array size. MST
->   - Updated commit message
-> ---
->  drivers/virtio/Makefile                |  2 +-
->  drivers/virtio/virtio_admin_commands.c | 91 ++++++++++++++++++++++++++
->  include/linux/virtio_admin.h           | 80 ++++++++++++++++++++++
->  include/uapi/linux/virtio_pci.h        |  6 +-
->  4 files changed, 176 insertions(+), 3 deletions(-)
->  create mode 100644 drivers/virtio/virtio_admin_commands.c
->  create mode 100644 include/linux/virtio_admin.h
-> 
-> diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
-> index eefcfe90d6b8..2b4a204dde33 100644
-> --- a/drivers/virtio/Makefile
-> +++ b/drivers/virtio/Makefile
-> @@ -1,5 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0
-> -obj-$(CONFIG_VIRTIO) += virtio.o virtio_ring.o
-> +obj-$(CONFIG_VIRTIO) += virtio.o virtio_ring.o virtio_admin_commands.o
->  obj-$(CONFIG_VIRTIO_ANCHOR) += virtio_anchor.o
->  obj-$(CONFIG_VIRTIO_PCI_LIB) += virtio_pci_modern_dev.o
->  obj-$(CONFIG_VIRTIO_PCI_LIB_LEGACY) += virtio_pci_legacy_dev.o
-> diff --git a/drivers/virtio/virtio_admin_commands.c b/drivers/virtio/virtio_admin_commands.c
-> new file mode 100644
-> index 000000000000..a2254e71e8dc
-> --- /dev/null
-> +++ b/drivers/virtio/virtio_admin_commands.c
-> @@ -0,0 +1,91 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +#include <linux/virtio.h>
-> +#include <linux/virtio_config.h>
-> +#include <linux/virtio_admin.h>
-> +#include <uapi/linux/virtio_pci.h>
-> +
-> +int virtio_admin_cap_id_list_query(struct virtio_device *vdev,
-> +				   struct virtio_admin_cmd_query_cap_id_result *data)
-> +{
-> +	struct virtio_admin_cmd cmd = {};
-> +	struct scatterlist result_sg;
-> +
-> +	if (!vdev->config->admin_cmd_exec)
-> +		return -EOPNOTSUPP;
-> +
-> +	sg_init_one(&result_sg, data, sizeof(*data));
-> +	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_CAP_ID_LIST_QUERY);
-> +	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SELF);
-> +	cmd.result_sg = &result_sg;
-> +
-> +	return vdev->config->admin_cmd_exec(vdev, &cmd);
-> +}
-> +EXPORT_SYMBOL_GPL(virtio_admin_cap_id_list_query);
-> +
-> +int virtio_admin_cap_get(struct virtio_device *vdev,
-> +			 u16 id,
-> +			 void *caps,
-> +			 size_t cap_size)
+Hi lrGerlinde@mailfence.com (sorry, no name on that email!),
+
+On Sun, Nov 23, 2025 at 8:33=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.com=
+> wrote:
+>
+> ---------- Forwarded message ---------
+> From: <bugzilla-daemon@kernel.org>
+> Date: Fri, Nov 21, 2025 at 3:39=E2=80=AFPM
+> Subject: [Bug 220774] netem is broken in 6.18
+> To: <xiyou.wangcong@gmail.com>
+>
+>
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D220774
+>
+> Gerlinde (lrGerlinde@mailfence.com) changed:
+>
+>            What    |Removed                     |Added
+> -------------------------------------------------------------------------=
+---
+>                  CC|                            |lrGerlinde@mailfence.com
+>
+> --- Comment #2 from Gerlinde (lrGerlinde@mailfence.com) ---
+> You know, in our HA and ECMP setup we sometimes get this strange thing: p=
+ackets
+> are not lost, but some flows get duplicated for a few hundert millisecond=
+s. Not
+> all flows, only the unlucky ones that get hashed through the broken path.=
+ And
+> this makes debugging really a pain, because all metrics say =E2=80=9Cno l=
+oss=E2=80=9D, but the
+> application still behave stupid.
+>
+> So we use netem duplicate on a single mq-queue to copy exactly this situa=
+tion.
 
 
-I still don't get why cap_size needs to be as large as size_t.
+I may be misunderstanding: You seem to be using a single mq-queue with
+netem and your requirement seems to be replicating the packet on that
+single mq-queue? You mention "flow" - how do you map these to the
+queues?
+BTW, you may be aware of this, but you should also be able to mirror
+arbitrary flows of choice without resorting to using netem.
+Can you share your config?
 
-if you don't care what's it size is, just say "unsigned".
-or u8 as a hint to users it's a small value.
-
-> +{
-> +	struct virtio_admin_cmd_cap_get_data *data;
-> +	struct virtio_admin_cmd cmd = {};
-> +	struct scatterlist result_sg;
-> +	struct scatterlist data_sg;
-> +	int err;
-> +
-> +	if (!vdev->config->admin_cmd_exec)
-> +		return -EOPNOTSUPP;
-> +
-> +	data = kzalloc(sizeof(*data), GFP_KERNEL);
-
-uses kzalloc without including linux/slab.h
+cheers,
+jamal
 
 
-
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	data->id = cpu_to_le16(id);
-> +	sg_init_one(&data_sg, data, sizeof(*data));
-> +	sg_init_one(&result_sg, caps, cap_size);
-> +	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_DEVICE_CAP_GET);
-> +	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SELF);
-> +	cmd.data_sg = &data_sg;
-> +	cmd.result_sg = &result_sg;
-> +
-> +	err = vdev->config->admin_cmd_exec(vdev, &cmd);
-> +	kfree(data);
-> +
-> +	return err;
-> +}
-> +EXPORT_SYMBOL_GPL(virtio_admin_cap_get);
-> +
-> +int virtio_admin_cap_set(struct virtio_device *vdev,
-> +			 u16 id,
-> +			 const void *caps,
-> +			 size_t cap_size)
-> +{
-> +	struct virtio_admin_cmd_cap_set_data *data;
-> +	struct virtio_admin_cmd cmd = {};
-> +	struct scatterlist data_sg;
-> +	size_t data_size;
-> +	int err;
-> +
-> +	if (!vdev->config->admin_cmd_exec)
-> +		return -EOPNOTSUPP;
-> +
-> +	data_size = sizeof(*data) + cap_size;
-> +	data = kzalloc(data_size, GFP_KERNEL);
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	data->id = cpu_to_le16(id);
-> +	memcpy(data->cap_specific_data, caps, cap_size);
-> +	sg_init_one(&data_sg, data, data_size);
-> +	cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_DRIVER_CAP_SET);
-> +	cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SELF);
-> +	cmd.data_sg = &data_sg;
-> +	cmd.result_sg = NULL;
-> +
-> +	err = vdev->config->admin_cmd_exec(vdev, &cmd);
-> +	kfree(data);
-> +
-> +	return err;
-> +}
-> +EXPORT_SYMBOL_GPL(virtio_admin_cap_set);
-> diff --git a/include/linux/virtio_admin.h b/include/linux/virtio_admin.h
-> new file mode 100644
-> index 000000000000..4ab84d53c924
-> --- /dev/null
-> +++ b/include/linux/virtio_admin.h
-> @@ -0,0 +1,80 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only
-> + *
-> + * Header file for virtio admin operations
-> + */
-> +
-> +#ifndef _LINUX_VIRTIO_ADMIN_H
-> +#define _LINUX_VIRTIO_ADMIN_H
-> +
-> +struct virtio_device;
-> +struct virtio_admin_cmd_query_cap_id_result;
-> +
-> +/**
-> + * VIRTIO_CAP_IN_LIST - Check if a capability is supported in the capability list
-> + * @cap_list: Pointer to capability list structure containing supported_caps array
-> + * @cap: Capability ID to check
-> + *
-> + * The cap_list contains a supported_caps array of little-endian 64-bit integers
-> + * where each bit represents a capability. Bit 0 of the first element represents
-> + * capability ID 0, bit 1 represents capability ID 1, and so on.
-> + *
-> + * Return: 1 if capability is supported, 0 otherwise
-> + */
-> +#define VIRTIO_CAP_IN_LIST(cap_list, cap) \
-> +	(!!(1 & (le64_to_cpu(cap_list->supported_caps[(cap) / 64]) >> (cap) % 64)))
-> +
-> +/**
-> + * virtio_admin_cap_id_list_query - Query the list of available capability IDs
-> + * @vdev: The virtio device to query
-> + * @data: Pointer to result structure (must be heap allocated)
-> + *
-> + * This function queries the virtio device for the list of available capability
-> + * IDs that can be used with virtio_admin_cap_get() and virtio_admin_cap_set().
-> + * The result is stored in the provided data structure.
-> + *
-> + * Return: 0 on success, -EOPNOTSUPP if the device doesn't support admin
-> + * operations or capability queries, or a negative error code on other failures.
-> + */
-> +int virtio_admin_cap_id_list_query(struct virtio_device *vdev,
-> +				   struct virtio_admin_cmd_query_cap_id_result *data);
-> +
-> +/**
-> + * virtio_admin_cap_get - Get capability data for a specific capability ID
-> + * @vdev: The virtio device
-> + * @id: Capability ID to retrieve
-> + * @caps: Pointer to capability data structure (must be heap allocated)
-> + * @cap_size: Size of the capability data structure
-> + *
-> + * This function retrieves a specific capability from the virtio device.
-> + * The capability data is stored in the provided buffer. The caller must
-> + * ensure the buffer is large enough to hold the capability data.
-> + *
-> + * Return: 0 on success, -EOPNOTSUPP if the device doesn't support admin
-> + * operations or capability retrieval, or a negative error code on other failures.
-> + */
-> +int virtio_admin_cap_get(struct virtio_device *vdev,
-> +			 u16 id,
-> +			 void *caps,
-> +			 size_t cap_size);
-> +
-> +/**
-> + * virtio_admin_cap_set - Set capability data for a specific capability ID
-> + * @vdev: The virtio device
-> + * @id: Capability ID to set
-> + * @caps: Pointer to capability data structure (must be heap allocated)
-> + * @cap_size: Size of the capability data structure
-> + *
-> + * This function sets a specific capability on the virtio device.
-> + * The capability data is read from the provided buffer and applied
-> + * to the device. The device may validate the capability data before
-> + * applying it.
-> + *
-> + * Return: 0 on success, -EOPNOTSUPP if the device doesn't support admin
-> + * operations or capability setting, or a negative error code on other failures.
-> + */
-> +int virtio_admin_cap_set(struct virtio_device *vdev,
-> +			 u16 id,
-> +			 const void *caps,
-> +			 size_t cap_size);
-> +
-> +#endif /* _LINUX_VIRTIO_ADMIN_H */
-> diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
-> index c691ac210ce2..2e35fd8d4a95 100644
-> --- a/include/uapi/linux/virtio_pci.h
-> +++ b/include/uapi/linux/virtio_pci.h
-> @@ -315,15 +315,17 @@ struct virtio_admin_cmd_notify_info_result {
->  
->  #define VIRTIO_DEV_PARTS_CAP 0x0000
->  
-> +#define VIRTIO_ADMIN_MAX_CAP 0x0fff
-> +
->  struct virtio_dev_parts_cap {
->  	__u8 get_parts_resource_objects_limit;
->  	__u8 set_parts_resource_objects_limit;
->  };
->  
-> -#define MAX_CAP_ID __KERNEL_DIV_ROUND_UP(VIRTIO_DEV_PARTS_CAP + 1, 64)
-> +#define VIRTIO_ADMIN_CAP_ID_ARRAY_SIZE __KERNEL_DIV_ROUND_UP(VIRTIO_ADMIN_MAX_CAP + 1, 64)
->  
->  struct virtio_admin_cmd_query_cap_id_result {
-> -	__le64 supported_caps[MAX_CAP_ID];
-> +	__le64 supported_caps[VIRTIO_ADMIN_CAP_ID_ARRAY_SIZE];
->  };
->  
->  struct virtio_admin_cmd_cap_get_data {
-> -- 
-> 2.50.1
-
+> --
+> You may reply to this email to add a comment.
+>
+> You are receiving this mail because:
+> You are on the CC list for the bug.
 
