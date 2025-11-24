@@ -1,175 +1,180 @@
-Return-Path: <netdev+bounces-241158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BC36C80A43
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 14:03:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E23FC80ACC
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 14:10:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 985533A6DF5
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 13:02:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AC7F3A7179
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 13:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A1B302CC3;
-	Mon, 24 Nov 2025 13:02:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DFB73043C5;
+	Mon, 24 Nov 2025 13:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bTT6Rd5u";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="M/3U7RqK"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Tg6nN7s3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F290D2FC88B
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 13:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C00303C93
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 13:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763989364; cv=none; b=IjmD8VpsM1OneUnZ5c7b1049xJ2uNATvdPlNk30EkpNlgdOto0P9CO+P7GEBMEB0dvyAFMGd2N2s6kUKDDD1NMATGFShTJscSTM3Y8uteObgO8eZPuD5M3Gaii/evKZ86WRe7xFov98qUSh4XdWh62+KCvoeY39AmGuNKlP6jc0=
+	t=1763989724; cv=none; b=C3JWrfOaBstBcq0EDfQUhn9n1ubi5muydFXCTw2jDrFjnhFMxd5Ps7MDvNdSvobJ9/MYGBIlcJYxkU9I6GjTHH+ffvSwVyi8nWgsK+OVc6wY/sy4MaSCCHXHlQsX6HpOqQl34oDhoNkyygUWNw1VLr/M6ZGhhqULNEbDMV0Q9tA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763989364; c=relaxed/simple;
-	bh=/PVux6/qhCM5j7QxIjZ3C4HJECU8mM2bPzRAiDoZo58=;
+	s=arc-20240116; t=1763989724; c=relaxed/simple;
+	bh=LRQLpElnCTWDWNW9Td6/qX0W+seZnE0G09+QK9uBOiM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AR44gaDkPQILB+I3hM03WMmgE7Qjc0w5SJtw4taYVAIEOHmj2G0XMLQQNNJOLa1eZAZ3NivqTMTTP9lZ3iVM4a3wcCZKTpi8cBFeY+2gVr+Vcc79RNMf9lmOb2eok59hhshLtsP1gCybopV78T8XgwZRgiRd7y7UIEuLK5AN9JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bTT6Rd5u; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=M/3U7RqK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763989361;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S6hJnZw3kn5s0TB1aRyIXGCws54UxhojaW//4vyMORM=;
-	b=bTT6Rd5udepofJVsC+L7PBT8sq55uOovQ3BWHbvelnH3XJKnUi8wKLHrP3BzAqb3kWHTH7
-	SL9CAVrJyv3cvYt6qehKKXInRGRcl8DG+pvFB2xNYN4r0efRIws9v6WfQwJ+ooECJ+riK5
-	g4ORvHliOtCoyaRFZOtiXDCKRFW3aYA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-422-CTf55FyVPBaU3lUVnMt60w-1; Mon, 24 Nov 2025 08:02:39 -0500
-X-MC-Unique: CTf55FyVPBaU3lUVnMt60w-1
-X-Mimecast-MFC-AGG-ID: CTf55FyVPBaU3lUVnMt60w_1763989358
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6450f3e7e71so3800070a12.3
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 05:02:39 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=s5/iZHVoUA6bhGSr/2o5eoJ1RyfRwKbK6pAA15roZH09YVJrLLn6qCH1GUqrCicF/uDD/NNr3nj+Ahfm6XUXByfaeWRO5WRAo+EUpyghlufbg6f22CAXSlWXW9qn3nWPnkPKYA2VcaRucIT+boPrQk0Ts+Hku7RW0/nWzCscfiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Tg6nN7s3; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47789cd2083so24955795e9.2
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 05:08:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763989358; x=1764594158; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1763989720; x=1764594520; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S6hJnZw3kn5s0TB1aRyIXGCws54UxhojaW//4vyMORM=;
-        b=M/3U7RqKwoX/HQ6+7Z+Hm4PIr+G5jC0MLb61qrWXNCW+jJ8QW4rLemQ5VX4SooPW/N
-         9QpiAyFMEE+gOwQF9rxJa0/d8CiCuvq/8QUYzhy+XMhoNXNDr9O4OlfIvknFF+b2PqW4
-         F/HlCxuyjj6F9Geis6aAICSo6bFY8YSDn1lxNUwin+86ntEaZPE7HWHpnSh6PCXuSpS+
-         s7WobXG29eFEcW92QiHagmY/jIev8ATdzvFjqvoAUrjBOeF+KyIxqN2YeKD9BwpKP/rf
-         9kTWVN/XWqSicoJPnF/MK9EUhVcnOd7F6HZ7+dQ17jyzu0rr/sGNYMDoFliIJcJqOJ2H
-         eDfQ==
+        bh=OFiNT2yuBLPQnDGcfP34CBXyTQtTTHRIFkGdeL1qNTA=;
+        b=Tg6nN7s3nvWOX++gmZUJLVXllmzSJIMXILbVPPC8hE/M1L7Mg2ZprgHDXVcA/4qZmV
+         AKqNcDycO+UD/asjW6F/ZmGgZ5aiXJfMJwCIYWTOstvo8fDodHFujz1O11G7pgcOCjPd
+         HZKcRRjAC2TBSKLxpmC/jchn7jeHLPVuOZVT066net0xDf4MzvTLAUnaFAB4uqw6UNnZ
+         Y+USy8VZ3dAxFKMeYIr9Yq6ZbaslnvIxGGPBz/DDRY1PJSnJMHKJOleUyNYVEl2oQQMc
+         FjPDEe8a1yjhxrrtqr9eCtzacGjClv7Rw5S+XTbHvofbkA1ntkwAZfDojegbLZ2Gbqz8
+         u5kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763989358; x=1764594158;
+        d=1e100.net; s=20230601; t=1763989720; x=1764594520;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=S6hJnZw3kn5s0TB1aRyIXGCws54UxhojaW//4vyMORM=;
-        b=vhhpGJLlFo/xdM0tzxEsFxRnL1FRQP2I4RtKXv2ccjWcdU3riXvRuqVYDU2aN4LBWJ
-         7qExPeBnNrnw4WJ4UwVsynmSj9+FI3SjnluVTyWsbII9LTchqJD1RlXWHzBxAHeVEzub
-         Bk7tDBCnp9ThzOjqWnP+OfX3XA5xiVtxgRfeIRgvIxzaPAcmnRtFZIZybDAuWcLEOw0Z
-         4DorWssFiifE5XZtxvM9rW1vd7IVJSgIHRmWA1gkzQldKf2q1m61tglw0l+O0CY6c/3i
-         /MFOanfoXknQK1ucLWCTbEN8AtTFm7xHf7KgvDbzlS1FU4IEe4+c3vCELyFx2EmwPs3I
-         PtNA==
-X-Forwarded-Encrypted: i=1; AJvYcCVeGLygzc8LruRsYPVl15xgkLGTFLfUQVpiI6pH8GLykcnlObOP6OzAaXndGDoxIinNAgZYxzI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywz/G8GHL+1KYWO/7PsvFTclR3J7zWqS8Sb1D017yLtfvjvtVzj
-	LnaN1uQcYpOr3/7M9zykXAgJLxznqeI/p2tp34bdbux4uxoK2mT/mC6k93HSMxuArBSPuVIoip5
-	XGKolnEnexixQoyEi0yXRbCzbZ57nYJ3VW04rXTZpGru3ekM00XCZA5SiyA==
-X-Gm-Gg: ASbGncs5c3hhj+azi0PsoAUv1kQeeMrBgaZgHkSJ2f2nkUfLQXAw1cerf4eEi3g4A40
-	0212OT8OlJLmVn5kketjeh3khAp5EK3f5JnJS/NWkzKMy9Yht5qvHU1e+pw/tPvCVADiA8aAokL
-	FR8BJi67DQCXSuzzVgYkU4Rnv9YaK31GPa04ahDL3U3ynvqrlKhgzlbNtaF4MAYWHWHkH+J8LnM
-	8RU8lNu4sT85YoDxxGY5XJTZV0fNedxGufnOgEZXmH5XN7Io1qj5UX2TmHc6tgQ9vv5ykB4Xbsa
-	e+6yM6ZxIusDrItWbc+AlOgltU3GEof+y1+AO74jNRzCPGw0FTkix6slGKL6uGNBdhVBfwZUMPW
-	ZSTl+poZDVDP3HosUQMq31MI9l3555lWVS+JMTcWZLw5gJVhppnORQH7NBdr4ag==
-X-Received: by 2002:a17:907:d93:b0:b73:806c:bab2 with SMTP id a640c23a62f3a-b76716d9e43mr1032885966b.33.1763989358002;
-        Mon, 24 Nov 2025 05:02:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH6ykVWPpSwinXanlRQWJeJ0XHFosSyO4ErfL2/mdTAE1Kjbm2jyYgIoPoi+6fsdx/pUINlNw==
-X-Received: by 2002:a17:907:d93:b0:b73:806c:bab2 with SMTP id a640c23a62f3a-b76716d9e43mr1032879766b.33.1763989357321;
-        Mon, 24 Nov 2025 05:02:37 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b76a6bcfad2sm303348166b.68.2025.11.24.05.02.34
+        bh=OFiNT2yuBLPQnDGcfP34CBXyTQtTTHRIFkGdeL1qNTA=;
+        b=V4lnkCDCtncPKcK4XokSXubeyOv+UeEFpxQxobVqj48HE3R7iSLqkH56TdvnuzKcRW
+         eyKsZJmbNcGTfSFIbriiYYHwFcM8k5h+EhfVidbu8abFIKKOMPgoE60BCspEGEFnuJ3Q
+         +WHyHKTjes7zEFrDxI9GjEjroK+rglc5bA+EU21aG2mfwAM0wHzEkq4UuxF1RLW1bZSG
+         fbDRpPbyn5HAZTHwoJ8WQV11W2tNjGzHvDVglbddyqtmfLRU3VbrZQVw4GH3C1QPE6RQ
+         2SKAb7RSNy8Jy5b6JKGFaVbF7rHzMXHYmGN992ywK/yB0+rIXoU8RyAVAHM+hOsdzWtF
+         1Zkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVbSFdv5INW827nQh9PvQzo3krUH+hVFkZ8HZSi7ddd11qHzvIL8t1+0UDGIhfQK78k0ZzWJz8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxz6h6foCJLHrck3jK503yPOdVEb9RoryukNdNDDb6LR+M3dC2P
+	ZXNEJYPdMU/cht+6K95+0XILO/OJDgmH0G6HpudUVlqpDMgeaN1Se8jg0QGD8v7hyvo=
+X-Gm-Gg: ASbGnctObQZNsQerN0Rga15lcsKSjXsibMEQihQ70v9AdYSk1BnEeCUAr0IGYbcEI2j
+	LkocnRhZsJppl3MIZjDq2EsUd91zt4iccUNC37Nz0AHS5YR9QEzS/oXB1KrJGt3GCqHKTmQnwCg
+	Q2D+86yiDXo7wQN4VpvVWSUVxciYJ2zPjXUA6XgmweQuI+lexetDkdGpdvDq+rJchyOwDNXr5aB
+	gnrKWFr7Au7+QY5uo+lLK1HduSd80uSxBlHTKIPuPjTNaWWPCMSHmXpn+FytCOfcBZilWYigwns
+	d0ROOAWg+ihFK9Sjnw28dqtQpXrUgc3wuDQIpZ086jxZw3b7sB9em/4cZxG6Umon5zJxa6QSJBA
+	9CDk4fiMIk4QsQkYirhSACbqLoVq/Mj+8yG4rNdTYPOCb0vlw58k6dpJvYzo6HHOL+o9oK5sItP
+	4/rBeK4p0k8RRG+w==
+X-Google-Smtp-Source: AGHT+IFxd/ZKfXS+EiW3Bb+wPwpdBt+GnQG44EQt8KOfagxj4/d+mHzOdami5PdyEs3Q4/rVvSsLrg==
+X-Received: by 2002:a05:600c:3543:b0:477:1ae1:fa5d with SMTP id 5b1f17b1804b1-477c1142268mr93235725e9.20.1763989720132;
+        Mon, 24 Nov 2025 05:08:40 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f2e574sm28198949f8f.3.2025.11.24.05.08.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 05:02:36 -0800 (PST)
-Date: Mon, 24 Nov 2025 14:02:29 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, berrange@redhat.com, 
-	Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v11 05/13] vsock: add netns support to virtio
- transports
-Message-ID: <fa5j32kwvwitddkhbuenwqygtue3j2i4kquzl4lsnlp42y244z@zijsgsjjvido>
-References: <20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com>
- <20251120-vsock-vmtest-v11-5-55cbc80249a7@meta.com>
- <v6dpp4j4pjnrsa5amw7uubbqtpnxb4odpjhyjksr4mqes2qbzg@3bsjx5ofbwl4>
- <aSC3lwPvj0G6L8Sh@devvm11784.nha0.facebook.com>
+        Mon, 24 Nov 2025 05:08:39 -0800 (PST)
+Date: Mon, 24 Nov 2025 14:08:36 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, horms@kernel.org, efault@gmx.de,
+	john.ogness@linutronix.de, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	calvin@wbinvd.org, asml.silence@gmail.com, kernel-team@meta.com,
+	gustavold@gmail.com, asantostc@gmail.com
+Subject: Re: [PATCH RFC net-next 1/2] netconsole: extract message
+ fragmentation into write_msg_target()
+Message-ID: <aSRY1AI7zDF-h-A9@pathway.suse.cz>
+References: <20251121-nbcon-v1-0-503d17b2b4af@debian.org>
+ <20251121-nbcon-v1-1-503d17b2b4af@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aSC3lwPvj0G6L8Sh@devvm11784.nha0.facebook.com>
+In-Reply-To: <20251121-nbcon-v1-1-503d17b2b4af@debian.org>
 
-On Fri, Nov 21, 2025 at 11:03:51AM -0800, Bobby Eshleman wrote:
->On Fri, Nov 21, 2025 at 03:39:25PM +0100, Stefano Garzarella wrote:
->> On Thu, Nov 20, 2025 at 09:44:37PM -0800, Bobby Eshleman wrote:
->> > From: Bobby Eshleman <bobbyeshleman@meta.com>
->> >
->> > Add netns support to loopback and vhost. Keep netns disabled for
->> > virtio-vsock, but add necessary changes to comply with common API
->> > updates.
->> >
->> > This is the patch in the series when vhost-vsock namespaces actually
->> > come online.  Hence, vhost_transport_supports_local_mode() is switched
->> > to return true.
->> >
->> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->> > ---
->> > Changes in v11:
->> > - reorder with the skb ownership patch for loopback (Stefano)
->> > - toggle vhost_transport_supports_local_mode() to true
->> >
->> > Changes in v10:
->> > - Splitting patches complicates the series with meaningless placeholder
->> >  values that eventually get replaced anyway, so to avoid that this
->> >  patch combines into one. Links to previous patches here:
->> >  - Link: https://lore.kernel.org/all/20251111-vsock-vmtest-v9-3-852787a37bed@meta.com/
->> >  - Link: https://lore.kernel.org/all/20251111-vsock-vmtest-v9-6-852787a37bed@meta.com/
->> >  - Link: https://lore.kernel.org/all/20251111-vsock-vmtest-v9-7-852787a37bed@meta.com/
->> > - remove placeholder values (Stefano)
->> > - update comment describe net/net_mode for
->> >  virtio_transport_reset_no_sock()
->> > ---
->> > drivers/vhost/vsock.c                   | 47 ++++++++++++++++++------
->> > include/linux/virtio_vsock.h            |  8 +++--
->> > net/vmw_vsock/virtio_transport.c        | 10 ++++--
->> > net/vmw_vsock/virtio_transport_common.c | 63 ++++++++++++++++++++++++---------
->> > net/vmw_vsock/vsock_loopback.c          |  8 +++--
->> > 5 files changed, 103 insertions(+), 33 deletions(-)
->>
->> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->
->If we move the supports_local_mode() changes into this patch (for virtio
->and loopback, as I bring up in other discussion), should I drop this
->trailer or carry it forward?
+On Fri 2025-11-21 03:26:07, Breno Leitao wrote:
+> Refactor the message fragmentation logic in write_msg() by extracting it
+> into a separate write_msg_target() helper function. This makes the code
+> more maintainable and prepares for future reuse in nbcon support for
+> non-extended consoles.
+> 
+> The helper function takes a target, message, and length, then handles
+> splitting the message into MAX_PRINT_CHUNK-sized fragments for sending
+> via send_udp().
+> 
+> No functional change intended.
 
-I'll take a second look in any case, so maybe better to remove it if the 
-patch will change.
+> --- a/drivers/net/netconsole.c
+> +++ b/drivers/net/netconsole.c
+> @@ -1559,6 +1559,20 @@ static void append_release(char *buf)
+>  	scnprintf(buf, MAX_PRINT_CHUNK, "%s,", release);
+>  }
+>  
+> +static void write_msg_target(struct netconsole_target *nt, const char *msg,
+> +			     unsigned int len)
+> +{
+> +	const char *tmp = msg;
+> +	int frag, left = len;
+> +
+> +	while (left > 0) {
+> +		frag = min(left, MAX_PRINT_CHUNK);
+> +		send_udp(nt, tmp, frag);
+> +		tmp += frag;
+> +		left -= frag;
+> +	}
+> +}
+> +
+>  static void send_fragmented_body(struct netconsole_target *nt,
+>  				 const char *msgbody, int header_len,
+>  				 int msgbody_len, int extradata_len)
+> @@ -1748,13 +1760,7 @@ static void write_msg(struct console *con, const char *msg, unsigned int len)
+>  			 * at least one target if we die inside here, instead
+>  			 * of unnecessarily keeping all targets in lock-step.
+>  			 */
+> -			tmp = msg;
+> -			for (left = len; left;) {
+> -				frag = min(left, MAX_PRINT_CHUNK);
+> -				send_udp(nt, tmp, frag);
+> -				tmp += frag;
+> -				left -= frag;
+> -			}
+> +			write_msg_target(nt, msg, len);
 
-Thanks for asking!
-Stefano
+I would call the new function send_msg_udp() to make it symetric with:
 
+static void write_ext_msg(struct console *con, const char *msg,
+			  unsigned int len)
+{
+[...]
+			send_ext_msg_udp(nt, msg, len);
+[...]
+}
+
+By other words, use "write_*()" when struct console * is passed
+and send_*_udp() when struct netconsole_target * is passed.
+
+The inconsistence confused me... ;-)
+
+Note that write_msg()/write_ext_msg() are cut&pasted.
+The only difference would be send_msg_udp()/send_ext_msg_udp().
+
+>  		}
+>  	}
+>  	spin_unlock_irqrestore(&target_list_lock, flags);
+
+Otherwise, I confirm that it is just a refactoring with no
+functional change.
+
+Feel free to use, ideally after the renaming function:
+
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+
+Best Regards,
+Petr
 
