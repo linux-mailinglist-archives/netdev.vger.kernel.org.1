@@ -1,249 +1,172 @@
-Return-Path: <netdev+bounces-241336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8758DC82C96
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 00:12:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29BAC82D4E
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 00:42:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1923E4E38B9
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 23:12:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC8C53AA356
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 23:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D44B2F656A;
-	Mon, 24 Nov 2025 23:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC522D0607;
+	Mon, 24 Nov 2025 23:42:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ccuXeqhI";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="V9/eLG/5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bMJaBaVM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACBC2F363C
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 23:12:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8862BDC0B
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 23:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764025951; cv=none; b=oi0z9NJrLCducVMEYF+KYAd9BlQizpW/dw2/jiB7xlopfougoSfjDBPE5ARuzVUUCWgnSXF7L9O4Dl2KO0HCUQjqc35JNGYEv0WDar4Egix4fmkO18V81sr8qIPxySEsXKdD2XpMCvHgEwqvxjvXSg/MFnbhie47SawDsEe9nHw=
+	t=1764027749; cv=none; b=LXK9GIoGtPkFtqPMGZIBeSc9GylJNwTbqeBkdRVh08Eu48qBxyaXJEi0MZJTgcDENVG2NKS55ufnfiSrb/5shs89D6bmOeNilPPcEY/L34fVAl5XNMqJze3AMKyO6A6jo3N7y1IQSQdh+3Lb+CUaopp+KEIs5TgXDAUvg8awLAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764025951; c=relaxed/simple;
-	bh=t+dQyxsBUhLUAbNkjKawqLLJkl8sAq5hrGHFsew7x/Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V4XatH6SlenW5stXCZTPPIfV+uIUlR7i83bsEXFAXIPt5wvRAp7Me6NXWwyOAVGCp8tJ/Am9n4eAruEJ83JeT+nkEFZJdwo8weYQJhSet6Y5HQDigUdsSUToi3C8Bzn+A02AiuCRepzvVc5gqETt0fblj9jgRUaOFjpt7fn8X0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ccuXeqhI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=V9/eLG/5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764025948;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bbkmiqvkCCftq3VuUnSJTTGS10mvI3AeaWokAUq0+2o=;
-	b=ccuXeqhIejNUupROJs72e+Cdk9AiW9mpA3YU+h5MMaBdE+J0PvUKb+HlxSuBBuF8A2IIDY
-	wnN55EpuWVUW4v0zmAt/juBrDNHVNoT7FPNYlcXE/tnF1IpBNMFH6DUX0bbSEUHzsPqCRs
-	S48jMzbLdGV62WT9n84R9Ql5O4a6or8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-176-W7sDxujFNC2vyeKe7SyIMA-1; Mon, 24 Nov 2025 18:12:26 -0500
-X-MC-Unique: W7sDxujFNC2vyeKe7SyIMA-1
-X-Mimecast-MFC-AGG-ID: W7sDxujFNC2vyeKe7SyIMA_1764025945
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477212937eeso28394375e9.2
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 15:12:26 -0800 (PST)
+	s=arc-20240116; t=1764027749; c=relaxed/simple;
+	bh=dG0C2S+L2R3WtJH9tdP29ghbxSjbg7+VtnphMfrKoEQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a8UhlcC7flVL5ZlARibDKPztr6kIZTN07nPI6cxIPSjSuh6h48nDtYdzWd8/xSFX3E2GWzcaYNpUlPAtTnET6Z5VXlaXad5rIL0staAICVD/9tFfEosuXWRvyfpClJ+T2LngWM3mxp3FO3m1KBdwcdyABCBvfusdUJv5j67mlIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bMJaBaVM; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-43326c74911so26725765ab.2
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 15:42:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764025945; x=1764630745; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bbkmiqvkCCftq3VuUnSJTTGS10mvI3AeaWokAUq0+2o=;
-        b=V9/eLG/5ZsY09tPo1LTpcLMGqvh3GP1u9MvRu3lHQndymW2gRYgjMRp2Q5uyHY7aKH
-         n+jXl5G4u4/43IcnRlDs2UKMLcWYINgtQXkqzcAFJtY8FcUFTCFfYzWpmiUeEmAJd7c3
-         oUWxxcqcnoGN43vgUjAOI9p/BzKPq0duBmnOVpEe/hnRicQedXXehonkJ6n3bEDW6OGC
-         bXyFhHYz67kU60lRDWilAiNOMwTMk3B30N4MYy0pSBzl37Lz3BvrDr1dUdMUYXLiPUG1
-         Kv36rcM6mYC7AvYcgX6E0s7uQ1t4IZ0a7MyC6rFSFd0X5plYoB8MfGjQjoAHK1GHSNZl
-         tIfQ==
+        d=gmail.com; s=20230601; t=1764027746; x=1764632546; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w3apy2CyU2bh8Lc5v04oP/DIoqnkdbNgF8gnG9rkBtU=;
+        b=bMJaBaVMEP48YG5KtvpQpg8hEB9ObXzr+cpsLlC/ftRYlS9xrWo/R98eW4yebHSuOz
+         qRtY9DpUakEqSLLb7S8SVAiNJsIdfTnWSApy4lQFnn3r1GnIX4tCnJRLaWTwV0rDyk5X
+         sVwqqWUnnRwNrTrx5h0BcpQGv/wVydCRvfzmoR3phRk6XVbdeiM51D5r1D+HyDmNkbZf
+         uxkfnG5tfIONQPqHLqIDJYqZEa9s3ZT9UTrYja+CNfzBHlmtRgrSbAoZ/31wjYEOZM1v
+         +f69kBms98OWDyeikSt1nHHVeDeyesRqiaC7NtTpGeoem+vn84C8ZNv9uXkU01yoKUTC
+         LcMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764025945; x=1764630745;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bbkmiqvkCCftq3VuUnSJTTGS10mvI3AeaWokAUq0+2o=;
-        b=DOn58e2pGr0InLHMEAHRodbwxvxeOTP+FFsdqAgXP4p2/pcrHwjccsiJQluvHK7uTp
-         SJZkQYYLPENlXIjBRzslBZcosAOz0iIPH6onm3ndSXj5W9SkNO3j9qIVOzfcdc+HUkFo
-         z4N+bJ8QpWsbhtTKViofzqejhF6wu9HFGromjwm8GE9BnVy/U36Jzh/6EcNwvjX8E4Ep
-         z5Pk/yY2oXtTZkLt8PgbPjHuU0FdPc/zeT3skaLxp7b28U5UFOTE7ci/kjC6zi2GacYk
-         VTpjgxdXpPKqZxebHUmlt+/ISkCTLhYBT3NB++SYdo5KFSg1BqtA3jRr8LgIOylGVk0A
-         meWQ==
-X-Gm-Message-State: AOJu0Yy1ta7VeXSF90DNkH/KdQh6jqzaKMtyeg+il5hysxM7RxDDTFoh
-	fV4m3KLVJ+bEWjJnwQtleqlQYl3RWYTMuSbkvbgx9g85PeJd9pwilwX2kzCT7WGbOmTtkCHCTnU
-	U6k2LghuSM2f9C+aVrOuD/ziTq8S1nGPERGHHIfChHyb079cWUNPIgxycNg==
-X-Gm-Gg: ASbGncvbNeCtkykNh7MPOK7GXvlI+hlkzCG6eyextJFuiNGFJ8eoLBMUsBZetfGIudT
-	ewkEEGlrNffuYZgy0pTu9+jISG7tRYxg0/+lopb5tkVH8yJhoxa0OfvbIRDQgLuUVU+UeXdMIG5
-	3SRdlcN4akCV30QNWiItay8NEg6IVsqJOwMjBOXAVwU6QK5vZmSwh8C1FMy0cuEAmncz1s5EeeE
-	IRzrSAek9tNjpL+DztCtoWjSrmqZX0wtfRStGSp1RBsENV8YZk1P2cYNv+Ztydha5ivn26RZs63
-	H4bRPbKjnKc/Dl6QDNJ5CzFOJyWF54cRsrnikJXNNuUxg9QKSsiQflbUNsMh0ogfgjNQkZnMgE9
-	i42Rs09/5YUYJNTbWxlmbV1EJE3aTYQ==
-X-Received: by 2002:a05:600c:4f46:b0:477:63a4:88fe with SMTP id 5b1f17b1804b1-477c1103099mr131145985e9.2.1764025945312;
-        Mon, 24 Nov 2025 15:12:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE97kAFAAvBCPRt2eYieLcnYMtDDOkrkjPisgwhzw+CQWl2ZNHnhkcNLeBayfDzFQDI18+Wbg==
-X-Received: by 2002:a05:600c:4f46:b0:477:63a4:88fe with SMTP id 5b1f17b1804b1-477c1103099mr131145785e9.2.1764025944867;
-        Mon, 24 Nov 2025 15:12:24 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bd1580cbsm104150135e9.2.2025.11.24.15.12.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 15:12:24 -0800 (PST)
-Date: Mon, 24 Nov 2025 18:12:21 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Dan Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
-	virtualization@lists.linux.dev, parav@nvidia.com,
-	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
-	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
-Subject: Re: [PATCH net-next v12 10/12] virtio_net: Add support for IPv6
- ethtool steering
-Message-ID: <20251124180941-mutt-send-email-mst@kernel.org>
-References: <20251119191524.4572-1-danielj@nvidia.com>
- <20251119191524.4572-11-danielj@nvidia.com>
- <20251124165246-mutt-send-email-mst@kernel.org>
- <16f665a8-6b4b-4722-93d7-69f792798be4@nvidia.com>
+        d=1e100.net; s=20230601; t=1764027746; x=1764632546;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=w3apy2CyU2bh8Lc5v04oP/DIoqnkdbNgF8gnG9rkBtU=;
+        b=gKAfeZuUvi3aObZX+Ejqj2BLNOdHCmtU7v04mMQ6NKtvJI7knuREEyKXzfUkhw56yJ
+         WFjeNsYQRaBMja+2Df/qn9C/myNwezBbbFduCkrbvwGXhVMbV/R26EgGzL0qsSzTDbfo
+         7n6jcaO4gqnS2fcI0N01PRNpH9ciN2m7HO0cZZb+f6T2Zdo84ii5UgGbzp3/TXzoy6ZX
+         f45696kTBfIl2raSTShG+d0KA/KwdVr8isfKxB1JFaRT+lQdm8q2sm7D0btKqE365iCR
+         6d0uoQGJMlQDOUQv0P3h6jh3fN70BOoQYu+X9Rkvcg+PsylMcQXBL67Mj3TKgSK4DWOx
+         HcMA==
+X-Gm-Message-State: AOJu0YyjDt4MNzTJeZbwfudjS+vRreofjQ0BnK6Qa7qJturyZn/mv/3i
+	C/YETF6Rw5WdWy3SFN2galp8u9wzMs811AvmLDskZ7AIMOz04ghBAFGIRTf7ZQrxr8q/CdVBeVf
+	sDCWlEPpJtkX083xWlD5S/BfBPbM+ViI=
+X-Gm-Gg: ASbGnctAGeiy+t3c01lrjXNyEWl2z4GpnFa14yF7bxTvE97epPXf+M4VD/lk7AUgyrO
+	uDVJkVPjVyo4RvMoisGs93VrA7WZCMm8RgYu1kh3kJDkUlenAjHLzwvMCTU/AsqQmI6JX+ETita
+	1hSj1iZKK0/4QaUYbyARwCLgPsn2SBFe9b0QJuKTH4hSv2Jm7iSyxkGUJRvDCDVZeWxgheM0u+B
+	yJh5L0bBwJc7Gz+Vuznn2JrM/eokDzpusSf0ZX36MdD81Hsm8NewqyDoQ1zrGT4UPRMNfs=
+X-Google-Smtp-Source: AGHT+IFhjvOgyNk/ahK1jKtOHPvBR51MmjnhrjCGQLG42lR8Yu6Hk1kGORg6yuxlKqs/mXoSn5MuPF95NqWv2N9KyMk=
+X-Received: by 2002:a05:6e02:1a06:b0:433:4f6b:4ca with SMTP id
+ e9e14a558f8ab-435dd0de78cmr7882615ab.24.1764027746430; Mon, 24 Nov 2025
+ 15:42:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <16f665a8-6b4b-4722-93d7-69f792798be4@nvidia.com>
+References: <20251124171409.3845-1-fmancera@suse.de>
+In-Reply-To: <20251124171409.3845-1-fmancera@suse.de>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 25 Nov 2025 07:41:50 +0800
+X-Gm-Features: AWmQ_bnE-Ua7Eq7VP_JZmltG_86Z7uUmIs67PUNX4Qyc6wi6NWDFRmM2Qm4MzIQ
+Message-ID: <CAL+tcoBKMfVnTtkwBRk9JBGbJtahyJVt4g8swsYRUk1b97LgHQ@mail.gmail.com>
+Subject: Re: [PATCH net v6] xsk: avoid data corruption on cq descriptor number
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, csmate@nop.hu, maciej.fijalkowski@intel.com, 
+	bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me, 
+	hawk@kernel.org, daniel@iogearbox.net, ast@kernel.org, 
+	john.fastabend@gmail.com, magnus.karlsson@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 24, 2025 at 05:04:30PM -0600, Dan Jurgens wrote:
-> On 11/24/25 3:59 PM, Michael S. Tsirkin wrote:
-> > On Wed, Nov 19, 2025 at 01:15:21PM -0600, Daniel Jurgens wrote:
-> >> Implement support for IPV6_USER_FLOW type rules.
-> >>
-> 
-> >>  	return false;
-> >> @@ -5958,11 +5989,33 @@ static void parse_ip4(struct iphdr *mask, struct iphdr *key,
-> >>  	}
-> >>  }
-> >>  
-> >> +static void parse_ip6(struct ipv6hdr *mask, struct ipv6hdr *key,
-> >> +		      const struct ethtool_rx_flow_spec *fs)
-> >> +{
-> > 
-> > I note logic wise it is different from ipv4, it is looking at the fs.
-> 
-> I'm not following you here. They both get the l3_mask and l3_val from
-> the flow spec.
+On Tue, Nov 25, 2025 at 1:14=E2=80=AFAM Fernando Fernandez Mancera
+<fmancera@suse.de> wrote:
+>
+> Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+> production"), the descriptor number is stored in skb control block and
+> xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
+> pool's completion queue.
+>
+> skb control block shouldn't be used for this purpose as after transmit
+> xsk doesn't have control over it and other subsystems could use it. This
+> leads to the following kernel panic due to a NULL pointer dereference.
+>
+>  BUG: kernel NULL pointer dereference, address: 0000000000000000
+>  #PF: supervisor read access in kernel mode
+>  #PF: error_code(0x0000) - not-present page
+>  PGD 0 P4D 0
+>  Oops: Oops: 0000 [#1] SMP NOPTI
+>  CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-a=
+md64 #1 PREEMPT(lazy)  Debian 6.16.12-1
+>  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debia=
+n-1.17.0-1 04/01/2014
+>  RIP: 0010:xsk_destruct_skb+0xd0/0x180
+>  [...]
+>  Call Trace:
+>   <IRQ>
+>   ? napi_complete_done+0x7a/0x1a0
+>   ip_rcv_core+0x1bb/0x340
+>   ip_rcv+0x30/0x1f0
+>   __netif_receive_skb_one_core+0x85/0xa0
+>   process_backlog+0x87/0x130
+>   __napi_poll+0x28/0x180
+>   net_rx_action+0x339/0x420
+>   handle_softirqs+0xdc/0x320
+>   ? handle_edge_irq+0x90/0x1e0
+>   do_softirq.part.0+0x3b/0x60
+>   </IRQ>
+>   <TASK>
+>   __local_bh_enable_ip+0x60/0x70
+>   __dev_direct_xmit+0x14e/0x1f0
+>   __xsk_generic_xmit+0x482/0xb70
+>   ? __remove_hrtimer+0x41/0xa0
+>   ? __xsk_generic_xmit+0x51/0xb70
+>   ? _raw_spin_unlock_irqrestore+0xe/0x40
+>   xsk_sendmsg+0xda/0x1c0
+>   __sys_sendto+0x1ee/0x200
+>   __x64_sys_sendto+0x24/0x30
+>   do_syscall_64+0x84/0x2f0
+>   ? __pfx_pollwake+0x10/0x10
+>   ? __rseq_handle_notify_resume+0xad/0x4c0
+>   ? restore_fpregs_from_fpstate+0x3c/0x90
+>   ? switch_fpu_return+0x5b/0xe0
+>   ? do_syscall_64+0x204/0x2f0
+>   ? do_syscall_64+0x204/0x2f0
+>   ? do_syscall_64+0x204/0x2f0
+>   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>   </TASK>
+>  [...]
+>  Kernel panic - not syncing: Fatal exception in interrupt
+>  Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xf=
+fffffff80000000-0xffffffffbfffffff)
+>
+> Instead use the skb destructor_arg pointer along with pointer tagging.
+> As pointers are always aligned to 8B, use the bottom bit to indicate
+> whether this a single address or an allocated struct containing several
+> addresses.
+>
+> Fixes: 30f241fcf52a ("xsk: Fix immature cq descriptor production")
+> Closes: https://lore.kernel.org/netdev/0435b904-f44f-48f8-afb0-68868474bf=
+1c@nop.hu/
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 
-yes but ipv4 is buggy in your patch.
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
-> > 
-> >> +	const struct ethtool_usrip6_spec *l3_mask = &fs->m_u.usr_ip6_spec;
-> >> +	const struct ethtool_usrip6_spec *l3_val  = &fs->h_u.usr_ip6_spec;
-> >> +
-> >> +	if (!ipv6_addr_any((struct in6_addr *)l3_mask->ip6src)) {
-> >> +		memcpy(&mask->saddr, l3_mask->ip6src, sizeof(mask->saddr));
-> >> +		memcpy(&key->saddr, l3_val->ip6src, sizeof(key->saddr));
-> >> +	}
-> >> +
-> >> +	if (!ipv6_addr_any((struct in6_addr *)l3_mask->ip6dst)) {
-> >> +		memcpy(&mask->daddr, l3_mask->ip6dst, sizeof(mask->daddr));
-> >> +		memcpy(&key->daddr, l3_val->ip6dst, sizeof(key->daddr));
-> >> +	}
-> > 
-> > Is this enough?
-> > For example, what if user tries to set up a filter by l4_proto ?
-> > 
-> 
-> That's in the next patch.
+Could you also post a patch on top of net-next as it has diverged from
+the net tree?
 
-yes but if just this one is applied (e.g. by bisect)?
-
-
-> > 
-> >> +}
-> >> +
-> >>  static bool has_ipv4(u32 flow_type)
-> >>  {
-> >>  	return flow_type == IP_USER_FLOW;
-> >>  }
-> >>  
-> >> +static bool has_ipv6(u32 flow_type)
-> >> +{
-> >> +	return flow_type == IPV6_USER_FLOW;
-> >> +}
-> >> +
-> dr);
-> >>  
-> >> -	if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
-> >> -	    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4 ||
-> >> -	    fs->m_u.usr_ip4_spec.l4_4_bytes ||
-> >> -	    fs->m_u.usr_ip4_spec.ip_ver ||
-> >> -	    fs->m_u.usr_ip4_spec.proto)
-> >> -		return -EINVAL;
-> >> +		if (fs->h_u.usr_ip6_spec.l4_4_bytes ||
-> >> +		    fs->m_u.usr_ip6_spec.l4_4_bytes)
-> >> +			return -EINVAL;
-> >>  
-> >> -	parse_ip4(v4_m, v4_k, fs);
-> >> +		parse_ip6(v6_m, v6_k, fs);
-> > 
-> > 
-> > why does ipv6 not check unsupported fields unlike ipv4?
-> 
-> The UAPI for user_ip6 doesn't make the same assertions:
-> 
-> /**
-> 
->  * struct ethtool_usrip6_spec - general flow specification for IPv6
-> 
->  * @ip6src: Source host
-> 
->  * @ip6dst: Destination host
-> 
->  * @l4_4_bytes: First 4 bytes of transport (layer 4) header
-> 
->  * @tclass: Traffic Class
-> 
->  * @l4_proto: Transport protocol number (nexthdr after any Extension
-> Headers)                                          ]
->  */
-> 
-> /**
->  * struct ethtool_usrip4_spec - general flow specification for IPv4
->  * @ip4src: Source host
->  * @ip4dst: Destination host
->  * @l4_4_bytes: First 4 bytes of transport (layer 4) header
->  * @tos: Type-of-service
->  * @ip_ver: Value must be %ETH_RX_NFC_IP4; mask must be 0
->  * @proto: Transport protocol number; mask must be 0
->  */
-> 
-> A check of l4_proto is probably reasonable though, since this is adding
-> filter by IP only, so l4_proto should be unset.
-
-
-maybe run this by relevant maintainers.
-> 
-> > 
-> >> +	} else {
-> >> +		selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
-> >> +		selector->length = sizeof(struct iphdr);
-> >> +
-> >> +		if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
-> >> +		    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4 ||
-> >> +		    fs->m_u.usr_ip4_spec.l4_4_bytes ||
-> >> +		    fs->m_u.usr_ip4_spec.ip_ver ||
-> >> +		    fs->m_u.usr_ip4_spec.proto)
-> >> +			return -EINVAL;
-> >> +
-> >> +		parse_ip4(v4_m, v4_k, fs);
-> >> +	}
-> >>  
-> >>  	return 0;
-> >>  }
-> >> -- 
-> >> 2.50.1
-> > 
-
+Thanks,
+Jason
 
