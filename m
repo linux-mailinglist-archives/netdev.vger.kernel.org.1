@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-241213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93394C81901
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:30:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 345E3C81912
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:30:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 26FE14E715B
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:30:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EC2CC4E75AC
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7673191D4;
-	Mon, 24 Nov 2025 16:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D385D31960F;
+	Mon, 24 Nov 2025 16:29:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="LK1QSQZt"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="OfNjbizE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A7B3168EE
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 16:29:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9BE23191B7
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 16:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764001762; cv=none; b=I/OFKA1FlJ98rSgQ8EaUEQvx6xzlbqoSi6YXCPAC8veDIpdKvAsncxLr6RJhfjW6Ox99XVBsC9p8G03UxZc6CyUqJUNuHtz6N+Efta/A0FcZiVdkHbYZwKOJAwuWHpI+fpkyDpl0LOLPPU5qXUNNsegORdUQhOgMe+7sdNRUCFM=
+	t=1764001764; cv=none; b=FG9Gcl+R1eKbfj1lrQImv1Mzb+MXz8Jw+KJBHJZNY1BJC/6lvPV/uOxhIGXneRL6RgCXSeauZBPkjuFdHhuyHHZYmTA1N2f50vfDPchQ/dmbsaA8X/Z5+myBHBs3zHUYJoEdDAnL1necNtdR0PjLHSwfWmWCcmcEI03hKmQ2xHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764001762; c=relaxed/simple;
-	bh=2TstOQGZI+t6IG/RQmJzivYCP7vC9451vLQeJGKYZwg=;
+	s=arc-20240116; t=1764001764; c=relaxed/simple;
+	bh=dBBJNBM9lwB3nIzNG7eIWw8ZLh10JiMWH7jW9NWEH5I=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UMz/tQoDaHVhbC2BxlzxVwfoTnH7XOGC+CYD6t8Fsn8HtAVNHN7J7HWgReoklz8iOeNXwajnx909L34yqwRotxo+oCa6o0At9MmQ5MFLfQgVL6KDnDeq1EoPPWceRmxfSYjnvE6DyS17DXPawKdgJEGCACJCQjTFzGdxh/Y0B5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=LK1QSQZt; arc=none smtp.client-ip=209.85.208.53
+	 In-Reply-To:To:Cc; b=DUzv6naA3QynFyiT3cU6Wihduz/pTurS9fuEEzWsMN0qsT626LTcSFOKegK/p0SlC75prH6BgPEuiASX08wuX2OQptEe4oLDvHBDd4eUrFYpIKM8hH+dMSQ2PfBOse4KjpQQI9sJEAsC4Hmx859jVLwmqwC/CuX1OUPTyvGRkGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=OfNjbizE; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-644fcafdce9so6910248a12.1
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 08:29:20 -0800 (PST)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-640b06fa959so7596687a12.3
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 08:29:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1764001759; x=1764606559; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1764001760; x=1764606560; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=P7GGD3nxk2ZeIfkq5u+0+t/ac19i5zLpF7Qwyc+ASyo=;
-        b=LK1QSQZtW+P8Pf5A9uaQxt34qCmx52sD6/7TG39U3ZcpEKmwdQqZR83shIwV5JllIO
-         FifLc6///smgSEERkEqWNOg0eqqEwhijZ2mGU7he6/+TC4dViClZ4G6Hh9BnUpzJLz8F
-         qOsMNxk9gpnUD3IS667hH9Dt2xAfLO35MbsZxHaMifAVLA8xV3m/zE3iygpXQZhwKgny
-         Anwk9/WoPO9wAvvKVauvEzFhkm/msYjGT86s+Rwz+Ujk9cFpdmuMZqV9GukntW35GJdM
-         uWJ1Whm0dQx3+/jAbjJ/z4uc7EmFZ+7/Ix93MVz1xuPenUZeIduh4ddtgorRVHAdqUag
-         UNEg==
+        bh=uMmoF1WyxWUVhcv2mNwvbfP/vLAgX/en8ow3WzUaKdc=;
+        b=OfNjbizEKJHvkE7XD8bo5XaENtMp6vWAp0W0hCUliDaHvidanJjGbfdqjZ4EcfSWCZ
+         dzicXKQE/8SOy82Osn448zJORRDK/nXEEQ05JMhsFKgqVvbmi8Hn6DUCBblU9jR3i9WV
+         K29xHNob1u6uqKX/Q3a41wuSzX2oUc7oTyGFs+losNgmO0/+kjB73tuwS2SZ9cPKQ0Lo
+         3BRuBJkNtMdXQlia/BvCdDmEYTDj633hn+8hzIMc/UOGi8/yUurClL3cYoKeWXkk7PCl
+         JSERZEKsjCgDKdIkAgKQu764CSWmQOYU/PObtRlYriNvD3caf+yTaV8IB/KHt0BOOR9l
+         jg9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764001759; x=1764606559;
+        d=1e100.net; s=20230601; t=1764001760; x=1764606560;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=P7GGD3nxk2ZeIfkq5u+0+t/ac19i5zLpF7Qwyc+ASyo=;
-        b=Pp5bCHdLvKybZMSvz3znhlyOVboV5lW5bhDtS1VIQYnnSBFru4AimYfRg25LBCKTiN
-         dGuF974J+rInr6xwyKaRL/KFOo2VVHf8z/gSmd6fGTlP4L6VPJvDb7AmFdbyEqQBnJEO
-         Nq9mluGADcGvkIzkZDcQIvWlri0Jrc5sT0fJiiighEZ90grZSkx/GQU0+QwOkOblnd3K
-         oi53/JtsG6WNlKj1WoEmHEqElayOeEUd5txPktYGQ4ekSgt9SWTU3DPp6SU0QA1UTyRb
-         TVW/sISBOxhz7yahMH4vDLCqwxsmAyyBFv970Hj8HSdSa+pCN+/3dK9WCRj1fgqQVVWr
-         7N8g==
-X-Gm-Message-State: AOJu0Yy1OUlZrBt0JkdOcWj3+IIYrBTK8vifJdow1AyAPK/URRlasbVm
-	pR85LfhuFPAPcWoInu/B/j2eWLFt0f7H3ElTKmrvNCChydIVbT/X8lQnANx5jBwfg34=
-X-Gm-Gg: ASbGncvGqqC65sE2pDOa8wUvupyMpo3xtR87NpsoK8tuI35Yu1ilUfFJF60oM/Hg5aJ
-	8mN+3UQVbuRiGaul6Jhqy2GFaVfwivNeroVxhhlku6v0S5O65qDvTqvvQgPPQjDHCqyRzaErYS8
-	OUWg0Oi9NcklzOqh1O2IMLdstXBPG+PHfoD4XEac2c/4Ta2CffXkH9t3t01PF8bwuNCIHI1iFdd
-	eD03yWwlbGbI28CrazbBvqceYwkhuTEh6lwkuEm7Q+ar897QB7HtEEYSp41A4JOwo9XRDjiBlWc
-	mG1ZElvMM1rQ5Czh7nW0tD4QVjwP9jaQMVhCs+Gt6VKj17+COcRyIGoYsD5v1TaNGWnnMKZFjMf
-	l1lY/+MPTsOLanCBS/CBEWO60It4BThbla0CqR2v8Zfw67oKsIfE6OLhj4NZNOHTJrVZSB5cPpi
-	SoLvkna2SRRg1LzsWz+CvVCRzZ8QkmJgjTaykmLB8pG5FTwx7MOnYrmL4e
-X-Google-Smtp-Source: AGHT+IFNU9Sjiy8GyWZ31945ZZveM/PNlMy7b/lYkNZj5BB1SrOutmeZUgFN9nNnopRohbgsWGoPUw==
-X-Received: by 2002:a05:6402:50d4:b0:640:9b62:a8bb with SMTP id 4fb4d7f45d1cf-64554677ab5mr10593555a12.22.1764001758617;
-        Mon, 24 Nov 2025 08:29:18 -0800 (PST)
+        bh=uMmoF1WyxWUVhcv2mNwvbfP/vLAgX/en8ow3WzUaKdc=;
+        b=B11J/enkNtw9TEViQz9FqrFvngmAjaShHTORq2OAkIlfTvIXZpWYxsuoC1yOZxucjv
+         pEieM1hP7vfwGERxDJzfPKLOvcuZM5cgPz+3hR8BOSYngpF+muA/9GAN2bI37ohsJlcq
+         oyOhRgoAn0AqeEphrdnsZc9hOH4WZ3rZyw22jdE50KnXKaAkUEhmaiTpfwEgCu/WxhW7
+         ysIOWP3FwjmFCTAHwkGgqR15bCMoLCOdsAp68/ni38xfRyunocK+FScc2lK1m4FC7uaZ
+         thPA4Nwa+4LU4WGBWqPU7CA7pA1i8P7qERnvLafUmbZhmplAZIa3Eiyim0nGEBXHuV/q
+         +ezw==
+X-Gm-Message-State: AOJu0Yx1drER9MCi6v6d7SPYN8jnYF/s8MIKbWJOYmGALAfr22yiTKpZ
+	Rj94jmnmSpFbERAAKa/VMZuzjEZH5ZS+LoBStQMh9kI/A7qMPxyCnBns9LWqDR/ipZlhW2FmQVX
+	EQ+XP
+X-Gm-Gg: ASbGncsVgcr0TUK+ZF8ygGxCCbaVDPTesO5qTkCvEksxPL6g227Su+VkCbwoGvWFW0/
+	QBt8hkScmgtVH48LW9lUgVIAEIbvkfI1A3cw2/MsOkt2AGKdQslSwlfrfjx3MhHWnk0zCPCxCj6
+	knFcC28RieTJxRSrnw89ux761EcsAxtQRgI47lLZyChfub4Rh3Y+S/xyyWEzo9uq2MDb2QKXFe9
+	V0jcfQj/GuOpQ3LrcVURVX+BPtCyM6I4Xz88WWkTkrXr6r1Dn11nFkRqPyqb2G2IH+G0/f5WeKe
+	/V7W+b4ZaA6VSo1uG7wL2hnR+u7QbcImLyDwA5gyegdAx+c/BotEbCoXgDZIz9oVQGsHk2Iu/4i
+	hpSEZ4111A+0+evSwN0VjBdhCylXUPXDCwKn2eU7VWQF165pKE+9wv0f102gJTtLV2ppe5c6NVm
+	vEv7SDF5w5auRNgh6n1Aqlq5ml5ZYNe7/eLUzkMWiPmWmb3BxzCNhBwxrU
+X-Google-Smtp-Source: AGHT+IEGHT2H6DgkF2j3zNLW0uQCTluvlrloCK+PiFdA+fvxy/R60b5jESaEnu6z4FC5JiLsxz5B4Q==
+X-Received: by 2002:a17:907:96a6:b0:b50:a389:7aa4 with SMTP id a640c23a62f3a-b7671547e0fmr1220083266b.13.1764001759920;
+        Mon, 24 Nov 2025 08:29:19 -0800 (PST)
 Received: from cloudflare.com (79.184.84.214.ipv4.supernova.orange.pl. [79.184.84.214])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-645363b5e97sm12524775a12.9.2025.11.24.08.29.18
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654ff3962sm1344035566b.50.2025.11.24.08.29.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 08:29:18 -0800 (PST)
+        Mon, 24 Nov 2025 08:29:19 -0800 (PST)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 24 Nov 2025 17:28:43 +0100
-Subject: [PATCH RFC bpf-next 07/15] veth: Call skb_metadata_set when
+Date: Mon, 24 Nov 2025 17:28:44 +0100
+Subject: [PATCH RFC bpf-next 08/15] xsk: Call skb_metadata_set when
  skb->data points at metadata end
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -85,7 +86,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-7-8978f5054417@cloudflare.com>
+Message-Id: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-8-8978f5054417@cloudflare.com>
 References: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-0-8978f5054417@cloudflare.com>
 In-Reply-To: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-0-8978f5054417@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -97,37 +98,29 @@ Prepare to track skb metadata location independently of MAC header offset.
 
 Following changes will make skb_metadata_set() record where metadata ends
 relative to skb->head. Hence the helper must be called when skb->data
-points right past the metadata area.
+already points past the metadata area.
 
-Unlike other drivers, veth calls skb_metadata_set() after eth_type_trans(),
-which pulls the Ethernet header and moves skb->data. This violates the
-future calling convention.
-
-Adjust the driver to pull the MAC header after calling skb_metadata_set().
+Adjust AF_XDP to pull from skb->data before calling skb_metadata_set().
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- drivers/net/veth.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/core/xdp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 87a63c4bee77..61f218d83f80 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -876,11 +876,11 @@ static struct sk_buff *veth_xdp_rcv_skb(struct veth_rq *rq,
- 	else
- 		skb->data_len = 0;
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index 9100e160113a..e86ac1d6ad6d 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -768,8 +768,8 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
  
--	skb->protocol = eth_type_trans(skb, rq->dev);
--
  	metalen = xdp->data - xdp->data_meta;
- 	if (metalen)
- 		skb_metadata_set(skb, metalen);
-+
-+	skb->protocol = eth_type_trans(skb, rq->dev);
- out:
- 	return skb;
- drop:
+ 	if (metalen > 0) {
+-		skb_metadata_set(skb, metalen);
+ 		__skb_pull(skb, metalen);
++		skb_metadata_set(skb, metalen);
+ 	}
+ 
+ 	skb_record_rx_queue(skb, rxq->queue_index);
 
 -- 
 2.43.0
