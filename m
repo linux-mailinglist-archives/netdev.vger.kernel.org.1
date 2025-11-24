@@ -1,256 +1,140 @@
-Return-Path: <netdev+bounces-241099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57A43C7F339
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 08:38:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62D5CC7F391
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 08:40:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5DBB04E3CAC
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 07:38:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21B173A2692
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 07:40:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFC02E8B61;
-	Mon, 24 Nov 2025 07:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EECE72E8DEC;
+	Mon, 24 Nov 2025 07:40:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="clJ996sZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+r+w/Fg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFA42E6CAF
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 07:37:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D432E888A
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 07:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763969880; cv=none; b=Apve40zwmYMdk3u/7Vxv5GPvwcAmVRpiO6H6aOILdun+CHwHa/r/yq31BovSQcp3ppI6G6OxCuJilJKOpcvyKHAlnpJerAVyUxvVaSI87IsD2qe3YiGzpgu42+cfM+HRDwj0vxRE94PMy2S3dALKzUX5pTPrm+LjWOXWnlI3AcI=
+	t=1763970051; cv=none; b=Ks8l/2PKA+wNHIMDNN1TpkV9gWAgUUFORYXVioCdlmsFmy0nXCpcU5HdA6D6yvAOS8sCckEmMO42jaQsvC27VlFlmw2LA0MIKvmqcVoEXfCsRML/lD4/X5KaK1waitlJHX1d+nW3yTYt+f+mEpv2OlsoJxQtHZSrCr0iedWwx4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763969880; c=relaxed/simple;
-	bh=L6UsiUVq4Hy1qkiJpSbXkJmsK2RIAypmdIF+zOofEaQ=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=a1a9VvVjaUzC1xpxNfEZyIl/I0rYeZcP8J61t14owbjUGZFz9nq4QMBRwAwfPFfiAcjMIawunHUAnbj6PI3lXdI38SPIa0ejm2OdnBczk3gxLudgqhDRcTRU+Vq02Mf5T1mBDN7CMNIn9R/lwfMxk9zZVjj2eztm5h6bKQjro7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=clJ996sZ; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1763970051; c=relaxed/simple;
+	bh=hKAm1QP5iQ7ylT35WgFBWAPfi25FIgtwnqpMskXuvBc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=HMrmmUYEx2kIxmEwqoZlbPKUEqwcCY7xPcwT4dfyUqUP6w9aS81dA/QjAgspSek0CLiU/OaT/BJxkmJ4vdeXtLNsJH9rNV66Tn2gSDigBbYuonyjQibU7Pu2e1MyGaV1nkeNBFVENy1i+AfGwL15dE9+shpgDB8MdpQs8oYkywY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d+r+w/Fg; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-47798ded6fcso23679955e9.1
-        for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 23:37:58 -0800 (PST)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7bb3092e4d7so4293981b3a.0
+        for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 23:40:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763969877; x=1764574677; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=057LI+BddSRkiIjLPqC4kxKOlSN/GKmbmOLr53ttQV0=;
-        b=clJ996sZmNw0mbss7YEXi8y6TgVzouELhDD1OlAGkff3ABpnioUA7+xBGo/lT0F1Ot
-         +L7H2s8J9ZNXh4SXxeCNMQ5QVIVAQeFKnnjFzSZ4mEgecQcZdCKfMtxMg96x046twzaa
-         RP6zdCTy60EsvusO1BE0gAqUDmCnlxUb459MYFw2N1Ls30d1s7XuepZGwYQzSdRwCq8A
-         uWPH4fXR0Ys/TahMoQw9JJwa/ddQkFAlAR754l1WcBpjR1tnuVUQ93RUmjKeNO/F1LI+
-         Itxe4yKuoJ8+iyLKQc/zEhpsdEzmBbeGbK+1NPOGamyX0xxKhvuf0Lo44SxEoVXVtTMm
-         uKZQ==
+        d=gmail.com; s=20230601; t=1763970050; x=1764574850; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=v3ae9Tov7fRV3Uo1/Dek/6qZPUMAqPH7nxpirY9041o=;
+        b=d+r+w/FgMR1uAX2L6ltDFBVKP+B9z82ehM3ttYgd7eNmPMxF73HaV8m1rHySvjBxQ5
+         ZUPH/CYCbxMudlQeovqfNAnjppnvAUM5ktRe4mDnGYWk26LN7fYpNAi/8Ja7VfEL+CE7
+         m2WlRNjiBwxPAwTGyIrbkMrYUPs1t3WHuJGXSl7JoD6oxxHqZMiJ8c2c+PPYO4ypJkUw
+         P/pgWsVifPicWTviHmicSHkvKlrXX2bK/RgkJ5ObpORR1pa2E7czX2CYdx3xffaVNT4q
+         RJgVtefe8JOy0yHkrBqV1gVxcUCXoPy1CsC8tXNskrHZN4m8w9TakF/rRJ2ch9cr6s4T
+         AAIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763969877; x=1764574677;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=057LI+BddSRkiIjLPqC4kxKOlSN/GKmbmOLr53ttQV0=;
-        b=eMstwKUvTNdG54cmh31g9xMCj+SSo9/Dlbylca078+MFgHvlXB6oT+qwC2dTQeY2Tz
-         C3K8PVVzx49VShH+6HEKtDikw+sJH9WQRIgb4yw8YKvuhJ8TqiOMJAYC7D1EbQbprDEy
-         2AX30GIMzPyd4lBx/Tmt0mfoNZLVs2yVY6NKgzP3WGRSosqe5ROIa/q50S656u1a1PZu
-         ocPiQOV8s0/feoBmD2s+31C0b9Vo41tyDRZI2AWEu8ra937RjrWfui/Cx6DGSFlzoFWZ
-         C2Cm6NRifdyX4WefGHiB4fKEdywhTP7pT3UuUK7JG/UHpEitCSQXaBQZklAGVIlVZxZr
-         mkSw==
-X-Gm-Message-State: AOJu0Yy1SthJ73Ub0fqvx83oGysMF+423WmIeK4yw82BGFbsF+uH6fms
-	yDKgU4jNi498t9NM6SxxKGiLuUf3eRMb8sX+mEdyy+yFcvkqjsOvrDTZ
-X-Gm-Gg: ASbGncsbzaX74U1MWImAXmAtDdH85B8T5ziQe3QX8iAPcJBiwuOfkP8ofXnnaWgA1Qo
-	QyIWqjH0nWcHJ02fs9jnga81bia9bYnW7ZIUdwubRjFvCwXiK5DMRMBXpyaNLbWLgcd77qvhihp
-	uUIzAwMsN8+FdoxHsNkFog/FPpExGGQ4j+BVh5M7WccGwWfK6ermZ93xxTglZhFFeYdbkNXpsKq
-	eMeJrHzHsFVQ0hAXJuBGyDYyyOrrqf4iYN04YenkunbdFRvEola169UUfKc6PnoR5AVtvFvoB10
-	Yj9WHclfb1j/vumzm0uu6YEvyMFPMsynoHtmcSOgwn3x1tgGVm1Ri8hSpwRzpT1AgolbuecbHfN
-	1E6GK04+/FzhdXaWxS5VuPVtHagbwr/lgAsJZEYTV0KAdE8xg5GVRE/d2xfZzQLcEx8n6duro7n
-	mwPLwqPHCdm+3WNrLmYhAkrd+1Lhai3zW5tHB+8UaUp0kb0mhH0XjBaiNCBlsxn2tI8gjkmTMbh
-	iQIsnim1qmEDygrc0wwEcp1nsTnCM58IfWL/KsxEuojT/3ZAPMUDzrQkELPHVHJ
-X-Google-Smtp-Source: AGHT+IHWsQVQ2WADcI76ZR42FiTxlj9AR4O5AahSjI6SVe5tlVn94DxrLxwOqTuj5ZHAz9XuqxR9zw==
-X-Received: by 2002:a05:600c:1caa:b0:477:8b77:155f with SMTP id 5b1f17b1804b1-477c10d4935mr107454015e9.8.1763969875535;
-        Sun, 23 Nov 2025 23:37:55 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f26:3000:c1bc:7440:20d8:29bc? (p200300ea8f263000c1bc744020d829bc.dip0.t-ipconnect.de. [2003:ea:8f26:3000:c1bc:7440:20d8:29bc])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477c0d85360sm174216005e9.15.2025.11.23.23.37.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 23 Nov 2025 23:37:54 -0800 (PST)
-Message-ID: <91bcb837-3fab-4b4e-b495-038df0932e44@gmail.com>
-Date: Mon, 24 Nov 2025 08:37:53 +0100
+        d=1e100.net; s=20230601; t=1763970050; x=1764574850;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v3ae9Tov7fRV3Uo1/Dek/6qZPUMAqPH7nxpirY9041o=;
+        b=a6wj2ORwgl+r+e8fWy5BiqZmvgH8Uf2L1tNtEhIfQN3q+CT4pjfQFQWCcx+3o6WzuT
+         trFIRCHstakXU/ftIAnIhdhrwbrzttH6EI7DMA2cAsFHFpa+flOtPGf4pRtVv10gIX31
+         nS+fBtRT9rO7ub5eV6V27L+M+Kto5tjAPH/qlpIpKspxF6TZ3J7RFVzWjWqifDsWcxN5
+         /uEuMD+fb6imi8dnyCyh8X02i2tjf3GjxrOpGyOyXlpifkAlhdvTXJkIBcHXpMMZhHN1
+         x4MvpOaDUeFc5IZkRLvJ+Zq2nowH5ytEF1NGaY7ajxB14JVUu483HlYXtkRkXxg7GLmE
+         J+vA==
+X-Forwarded-Encrypted: i=1; AJvYcCXTVj/jUJffoPt5+tCV6KZh1TnOSEBdyeeeMGKQduCzpHPthhSWbxYFtLf/DInzG7ePFCCSwTI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmoSvOmoWmtgXLK0exfLRHwsWvgUdWuK1Jp3rgQTc5hFdeOPU3
+	nwGIl2pZJDPvMuGu2DBVW4GZMtTgx5sOPaLAskmIalMy2Rb22GKlluBb
+X-Gm-Gg: ASbGncukcJxCgGCMu1mz3e08mrYjUV0z5NHHgT6jTGRal9ShKlPzPAv3oP8z2/tViUX
+	38cuGIHnbSw5C336prGatjj9JGxOsnEpXEGstQx63CIffiCuD1KbJe9+y+MmZ5vGeI6Vro3kgN6
+	sc7C0rnXV8EaKnBZrl306BIhQGbD825jsYIW6Y+k8JrMMVct+Z2tPQFRgytHujlrO6NdHduMsK7
+	nwu7xrUzw2FdNUedQQcRApGFtM0EKOsR0tyQ96gpcn0CkJbk07aSS7ZNOC51FCgQG7lotiUq9Oc
+	k2G89TeTr7GVpmpKwCnwZ/N7fI9GMXX2n3q+eUoj+5T3xfLGghZ1AanwnwpjcBb6Hj7LXOhIBlS
+	E8WsvOHrrGeo+QR8BD4CWtHgBU5ugwPcWM6JEhR2uCkSWzLFkh9EA8UjsfSWNzkw5e5whGcDRL/
+	f3C9RTvR/B
+X-Google-Smtp-Source: AGHT+IEeIql7pb0dkGALdREf6Wnlrxqh98FLLAtvq3DFqrdy2TFXbtLBHe88eniPMafYpkrG+cQ8oQ==
+X-Received: by 2002:a05:6a20:3ca3:b0:35e:11ff:45c0 with SMTP id adf61e73a8af0-3614ee21050mr12748684637.55.1763970049661;
+        Sun, 23 Nov 2025 23:40:49 -0800 (PST)
+Received: from aheev.home ([2401:4900:8fce:eb65:99e9:53c:32e6:4996])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f024b4aesm13410818b3a.33.2025.11.23.23.40.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Nov 2025 23:40:49 -0800 (PST)
+From: Ally Heev <allyheev@gmail.com>
+Subject: [RFT net-next PATCH RESEND 0/2] ethernet: intel: fix freeing
+ uninitialized pointers with __free
+Date: Mon, 24 Nov 2025 13:10:40 +0530
+Message-Id: <20251124-aheev-fix-free-uninitialized-ptrs-ethernet-intel-v1-0-a03fcd1937c0@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] r8169: improve MAC EEE handling
-To: Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Ally Heev <allyheev@gmail.com>, 
+ Simon Horman <horms@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1250; i=allyheev@gmail.com;
+ h=from:subject:message-id; bh=hKAm1QP5iQ7ylT35WgFBWAPfi25FIgtwnqpMskXuvBc=;
+ b=owGbwMvMwCU2zXbRFfvr1TKMp9WSGDJVuH8JZcQ4PdmQktghYcHQyPNXLvWN98Ps9aU7KlLOT
+ fn18rNLRykLgxgXg6yYIgujqJSf3iapCXGHk77BzGFlAhnCwMUpABMxmcvwi7niw2P7f86bJDr6
+ He3MnC8JqebN+Hf/ZqxH6H/+Ct1ddgz/C1KMz2QfTVkk724QIxtTaCpiteHpnNV715+apK2VJfK
+ fFQA=
+X-Developer-Key: i=allyheev@gmail.com; a=openpgp;
+ fpr=01151A4E2EB21A905EC362F6963DA2D43FD77B1C
 
-Let phydev->enable_tx_lpi control whether MAC enables TX LPI, instead of
-enabling it unconditionally. This way TX LPI is disabled if e.g. link
-partner doesn't support EEE. This helps to avoid potential issues like
-link flaps.
+Uninitialized pointers with `__free` attribute can cause undefined
+behavior as the memory assigned randomly to the pointer is freed
+automatically when the pointer goes out of scope.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+We could just fix it by initializing the pointer to NULL, but, as usage of
+cleanup attributes is discouraged in net [1], trying to achieve cleanup
+using goto
+
+[1] https://docs.kernel.org/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
+
+Signed-off-by: Ally Heev <allyheev@gmail.com>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 73 +++++++++++------------
- 1 file changed, 36 insertions(+), 37 deletions(-)
+Ally Heev (2):
+      ice: remove __free usage in ice_flow
+      idpf: remove __free usage in idpf_virtchnl
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index cbacf1ef87a..33a83bf9035 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2425,26 +2425,6 @@ void r8169_apply_firmware(struct rtl8169_private *tp)
- 	}
- }
- 
--static void rtl8168_config_eee_mac(struct rtl8169_private *tp)
--{
--	/* Adjust EEE LED frequency */
--	if (tp->mac_version != RTL_GIGA_MAC_VER_38)
--		RTL_W8(tp, EEE_LED, RTL_R8(tp, EEE_LED) & ~0x07);
--
--	rtl_eri_set_bits(tp, 0x1b0, 0x0003);
--}
--
--static void rtl8125a_config_eee_mac(struct rtl8169_private *tp)
--{
--	r8168_mac_ocp_modify(tp, 0xe040, 0, BIT(1) | BIT(0));
--	r8168_mac_ocp_modify(tp, 0xeb62, 0, BIT(2) | BIT(1));
--}
--
--static void rtl8125b_config_eee_mac(struct rtl8169_private *tp)
--{
--	r8168_mac_ocp_modify(tp, 0xe040, 0, BIT(1) | BIT(0));
--}
--
- static void rtl_rar_exgmac_set(struct rtl8169_private *tp, const u8 *addr)
- {
- 	rtl_eri_write(tp, 0xe0, ERIAR_MASK_1111, get_unaligned_le32(addr));
-@@ -3253,8 +3233,6 @@ static void rtl_hw_start_8168e_2(struct rtl8169_private *tp)
- 
- 	RTL_W8(tp, MCU, RTL_R8(tp, MCU) & ~NOW_IS_OOB);
- 
--	rtl8168_config_eee_mac(tp);
--
- 	RTL_W8(tp, DLLPR, RTL_R8(tp, DLLPR) | PFM_EN);
- 	RTL_W32(tp, MISC, RTL_R32(tp, MISC) | PWM_EN);
- 	rtl_mod_config5(tp, Spi_en, 0);
-@@ -3279,8 +3257,6 @@ static void rtl_hw_start_8168f(struct rtl8169_private *tp)
- 	RTL_W8(tp, DLLPR, RTL_R8(tp, DLLPR) | PFM_EN);
- 	RTL_W32(tp, MISC, RTL_R32(tp, MISC) | PWM_EN);
- 	rtl_mod_config5(tp, Spi_en, 0);
--
--	rtl8168_config_eee_mac(tp);
- }
- 
- static void rtl_hw_start_8168f_1(struct rtl8169_private *tp)
-@@ -3330,8 +3306,6 @@ static void rtl_hw_start_8168g(struct rtl8169_private *tp)
- 	rtl_eri_write(tp, 0xc0, ERIAR_MASK_0011, 0x0000);
- 	rtl_eri_write(tp, 0xb8, ERIAR_MASK_0011, 0x0000);
- 
--	rtl8168_config_eee_mac(tp);
--
- 	rtl_w0w1_eri(tp, 0x2fc, 0x01, 0x06);
- 	rtl_eri_clear_bits(tp, 0x1b0, BIT(12));
- 
-@@ -3472,8 +3446,6 @@ static void rtl_hw_start_8168h_1(struct rtl8169_private *tp)
- 	rtl_eri_write(tp, 0xc0, ERIAR_MASK_0011, 0x0000);
- 	rtl_eri_write(tp, 0xb8, ERIAR_MASK_0011, 0x0000);
- 
--	rtl8168_config_eee_mac(tp);
--
- 	RTL_W8(tp, DLLPR, RTL_R8(tp, DLLPR) & ~PFM_EN);
- 	RTL_W8(tp, MISC_1, RTL_R8(tp, MISC_1) & ~PFM_D3COLD_EN);
- 
-@@ -3521,8 +3493,6 @@ static void rtl_hw_start_8168ep(struct rtl8169_private *tp)
- 	rtl_eri_write(tp, 0xc0, ERIAR_MASK_0011, 0x0000);
- 	rtl_eri_write(tp, 0xb8, ERIAR_MASK_0011, 0x0000);
- 
--	rtl8168_config_eee_mac(tp);
--
- 	rtl_w0w1_eri(tp, 0x2fc, 0x01, 0x06);
- 
- 	RTL_W8(tp, DLLPR, RTL_R8(tp, DLLPR) & ~TX_10M_PS_EN);
-@@ -3578,8 +3548,6 @@ static void rtl_hw_start_8117(struct rtl8169_private *tp)
- 	rtl_eri_write(tp, 0xc0, ERIAR_MASK_0011, 0x0000);
- 	rtl_eri_write(tp, 0xb8, ERIAR_MASK_0011, 0x0000);
- 
--	rtl8168_config_eee_mac(tp);
--
- 	RTL_W8(tp, DLLPR, RTL_R8(tp, DLLPR) & ~PFM_EN);
- 	RTL_W8(tp, MISC_1, RTL_R8(tp, MISC_1) & ~PFM_D3COLD_EN);
- 
-@@ -3820,11 +3788,6 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
- 
- 	rtl_loop_wait_low(tp, &rtl_mac_ocp_e00e_cond, 1000, 10);
- 
--	if (tp->mac_version == RTL_GIGA_MAC_VER_61)
--		rtl8125a_config_eee_mac(tp);
--	else
--		rtl8125b_config_eee_mac(tp);
--
- 	rtl_disable_rxdvgate(tp);
- }
- 
-@@ -4827,6 +4790,41 @@ static int rtl8169_poll(struct napi_struct *napi, int budget)
- 	return work_done;
- }
- 
-+static void rtl_enable_tx_lpi(struct rtl8169_private *tp, bool enable)
-+{
-+	if (!rtl_supports_eee(tp))
-+		return;
-+
-+	switch (tp->mac_version) {
-+	case RTL_GIGA_MAC_VER_34 ... RTL_GIGA_MAC_VER_52:
-+		/* Adjust EEE LED frequency */
-+		if (tp->mac_version != RTL_GIGA_MAC_VER_38)
-+			RTL_W8(tp, EEE_LED, RTL_R8(tp, EEE_LED) & ~0x07);
-+		if (enable)
-+			rtl_eri_set_bits(tp, 0x1b0, 0x0003);
-+		else
-+			rtl_eri_clear_bits(tp, 0x1b0, 0x0003);
-+		break;
-+	case RTL_GIGA_MAC_VER_61:
-+		if (enable) {
-+			r8168_mac_ocp_modify(tp, 0xe040, 0, 0x0003);
-+			r8168_mac_ocp_modify(tp, 0xeb62, 0, 0x0006);
-+		} else {
-+			r8168_mac_ocp_modify(tp, 0xe040, 0x0003, 0);
-+			r8168_mac_ocp_modify(tp, 0xeb62, 0x0006, 0);
-+		}
-+		break;
-+	case RTL_GIGA_MAC_VER_63 ... RTL_GIGA_MAC_VER_LAST:
-+		if (enable)
-+			r8168_mac_ocp_modify(tp, 0xe040, 0, 0x0003);
-+		else
-+			r8168_mac_ocp_modify(tp, 0xe040, 0x0003, 0);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
- static void r8169_phylink_handler(struct net_device *ndev)
- {
- 	struct rtl8169_private *tp = netdev_priv(ndev);
-@@ -4834,6 +4832,7 @@ static void r8169_phylink_handler(struct net_device *ndev)
- 
- 	if (netif_carrier_ok(ndev)) {
- 		rtl_link_chg_patch(tp);
-+		rtl_enable_tx_lpi(tp, tp->phydev->enable_tx_lpi);
- 		pm_request_resume(d);
- 	} else {
- 		pm_runtime_idle(d);
+ drivers/net/ethernet/intel/ice/ice_flow.c       |  6 ++++--
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 28 +++++++++++++++++--------
+ 2 files changed, 23 insertions(+), 11 deletions(-)
+---
+base-commit: 24598358a1b4ca1d596b8e7b34a7bc76f54e630f
+change-id: 20251113-aheev-fix-free-uninitialized-ptrs-ethernet-intel-abc0cc9278d8
+
+Best regards,
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQQBFRpOLrIakF7DYvaWPaLUP9d7HAUCaRn0WAAKCRCWPaLUP9d7
+HPCSAP4tu8ld+4Og65tjSYNChRqIR4Gn8C546JFeozyQW6uj3wD/SQEPIidSAYbb
+klXrZrKIBOc/avt55S2+krl241aNJA8=
+=guHM
+-----END PGP SIGNATURE-----
 -- 
-2.52.0
+Ally Heev <allyheev@gmail.com>
 
 
