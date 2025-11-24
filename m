@@ -1,300 +1,199 @@
-Return-Path: <netdev+bounces-241131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BF37C7FD6F
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 11:20:29 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C96D6C7FFBE
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 11:48:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8F214341DA8
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 10:20:28 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 39AB44E3FBF
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 10:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889CF26E175;
-	Mon, 24 Nov 2025 10:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9259E13B293;
+	Mon, 24 Nov 2025 10:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P6v3uGsA"
+	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="qZqJq229"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7A226C3A2;
-	Mon, 24 Nov 2025 10:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763979624; cv=fail; b=nq1ysy2VPfJIL9pXkJtlVTy+ups2WpdETHGyCATWH07FdIVCvJqJq8zhlmvGvRipPfjc9pijSYcx5qkeLuDsJ27DC0rxNPPHSw+grGdk0TgIPTBqgTS0YafkKZUqDZgjo7EJ+65afSSBbN2aJ5L6JOlXREkaV/ofCh/md9Y+XqI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763979624; c=relaxed/simple;
-	bh=jrSokwE7eCvFC7U3yUbwcJxcvxWbzt4JojbSl3pg13Q=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eUoNQIg6tcN3WYncA2efRtyMz0atFf9EEXI//bv9wGBPRA7PLpqoVl+SQj8BNtDzmJZDz8lQ1G74C71iSphf7bCVx/VwgRxenOqQIOtNkv0ZrICFUuwsaG/p6XguCQ09SWBS1Actvr4YFmgf8oZpSRUNN4Q3yHNefNeldySaG2s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P6v3uGsA; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763979622; x=1795515622;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=jrSokwE7eCvFC7U3yUbwcJxcvxWbzt4JojbSl3pg13Q=;
-  b=P6v3uGsAOWIu4zRrKPp8hT7Nz4wsABr6Ihnj4/J3iyThwj6IviCsojLW
-   rUZaf6GPTNKZIP+Y9y4Rm+1n84t/RAKKXDOOytAfhc7YMkCzEaXtpJ/xQ
-   pBqu03WUSKY87Ds3n6ULnge1MecF/SNqCWgeZPxxpbb0cqMYqIph78gxI
-   Bim9OlEOwDPTneCLfjvBMgs7gpsFl3oiCFzE6Q3mNn5WGVdmkf/s6WmPr
-   IAfU01LTvMa/jicBzT/DIAx7d3xbA570qK7ellBwVvZiQ4H65OC/PywND
-   Yt/W2+W7RFlNsbTME8GfULbOjqARgOIANp/3xGUgvaW4uOnoahgpbznp+
-   Q==;
-X-CSE-ConnectionGUID: f2CophmFQHOuq25v03hCmw==
-X-CSE-MsgGUID: /Ng0l1EARjq+1YHkHlExFg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11622"; a="65671206"
-X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
-   d="scan'208";a="65671206"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 02:20:22 -0800
-X-CSE-ConnectionGUID: y9fzN2pgRpG4ChKD1xIvoQ==
-X-CSE-MsgGUID: oc+ESZbbSWG5JyI0h8nFGA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
-   d="scan'208";a="192172757"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 02:20:21 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 24 Nov 2025 02:20:21 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Mon, 24 Nov 2025 02:20:21 -0800
-Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.19) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 24 Nov 2025 02:20:20 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bXGfk/tBtqBEwXwJHHm3L/+Y+FBQ/5tPWfg9Fpz2cBFoHQbPPS3Ns4o2tKDmqD2QYgn1+ZlTWEio2vZxkxrZjNJI9aPHl6Xoy+OilxA+GfQTB60kRtUhbT4sB2d8vzk6P+6QVEcQgUn1n1GHArETNMuPaIwAKn3CpbFboeEXrgHIGQoBU8MC62M47/Qn7qRThV903ogi9eujuxkKe4T3bBmpglEzOl12ORzehIPzShiU1PHo+DML/Om+xkRxA4D2SI5h7UxeBL/+2xeBq8wRKoPB7aBnPdZphEgkEb6i3U3p1aLE2N79bNjYW1SeKHnY2vXTdJFLljeuu46TA7PnUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J4rQR14SSDXh06WMwBkY6A8ECVmUDVtRYusXbceeCyE=;
- b=ny3c8ghmE7+m9kGFsls47fX41SmH8Cl00yqic9wP9hYLw/avsUfaYZX+hC6XH6rQN+XS6w2ASYHQZm9g/QWyVfHe0HemLAer+AGpaUkPM7iVDu00Tk4pLKLm0mya8Dpgr74bHZMCy0/3tF6NVKKuXH/QjmVjn77w8sHREmqCXIGosn4XOur/JAGR/nW5786/KH+T0g9Kq0rKDZkEUWNeQaw7tCx7+tiOYa3IYYFc6kji6x4rjG93ZK7NhxvpeL3vu9M1zG1YQwi2GbuIwg0+UC9P3HQug/ZQIN+/5zSd5vEmNuhbSRxpmn9WCBrSX+m393g4UuyTAZ7NEqCdYbLsUw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CYYPR11MB8308.namprd11.prod.outlook.com (2603:10b6:930:b9::19)
- by LV3PR11MB8676.namprd11.prod.outlook.com (2603:10b6:408:20f::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.17; Mon, 24 Nov
- 2025 10:20:19 +0000
-Received: from CYYPR11MB8308.namprd11.prod.outlook.com
- ([fe80::68e1:d6c5:d11d:4858]) by CYYPR11MB8308.namprd11.prod.outlook.com
- ([fe80::68e1:d6c5:d11d:4858%7]) with mapi id 15.20.9343.016; Mon, 24 Nov 2025
- 10:20:19 +0000
-Message-ID: <ef41487b-ecfb-4b25-83a2-c97d6aa3c813@intel.com>
-Date: Mon, 24 Nov 2025 11:20:11 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next 4/8] ice: allow overriding
- lan_en, lb_en in switch
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "michal.swiatkowski@linux.intel.com"
-	<michal.swiatkowski@linux.intel.com>
-References: <20251120162813.37942-1-jakub.slepecki@intel.com>
- <20251120162813.37942-5-jakub.slepecki@intel.com>
- <IA3PR11MB89860CA2EBCCEDDF0C9E05D9E5D5A@IA3PR11MB8986.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Jakub Slepecki <jakub.slepecki@intel.com>
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298
- Gdansk - KRS 101882 - NIP 957-07-52-316
-In-Reply-To: <IA3PR11MB89860CA2EBCCEDDF0C9E05D9E5D5A@IA3PR11MB8986.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR0902CA0032.eurprd09.prod.outlook.com
- (2603:10a6:802:1::21) To CYYPR11MB8308.namprd11.prod.outlook.com
- (2603:10b6:930:b9::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8B02248A5
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 10:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763981315; cv=none; b=tKTgPI/vyU0Kn1kP5+/bvoAYR3tG3mkqvR7Byz30O4fCDG2apGdlvDFERqNkFQiwN94hMP84bqaO+OwADa38V1P6M0iaq7uc7aGbqMTNZg75Wh53VPqx4RjBAqc0WDkEiFN/x+BAtIVwQ8Sr79ZtcTKQDa1MglwuhhVOwD2cY8o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763981315; c=relaxed/simple;
+	bh=1yb3M4hfB/tKbjzz3y5h6f2pqjVegDPjjgujDu0OjoE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tRnryVJIFkZ8WzrfF8kyqRtKZVSNmLGs5UqLWE5OoqMg8dADSPDbsEyp3CBkhUjV+XJH6LloIOUIH1NzeySx1SctJy6eFI2v/iaCnmOH0SasiXF4u+LB8U4tWRQrFDLNJUgaEOnhhZ9/g+3fwWDVkx2JwX9yXdIGxjMzP8oJekU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=qZqJq229; arc=none smtp.client-ip=45.145.95.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
+	t=1763981301; bh=1yb3M4hfB/tKbjzz3y5h6f2pqjVegDPjjgujDu0OjoE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=qZqJq229HjzYDpjHhk1uIZgEV+Yk3kD3EwdI+5Fz2BXXf0/ndnxkvIOsFxFSXCLXn
+	 FerNXDAs9BD7+bZo+kiL8/r9NKjy+FKV1OiNLcCBz4Ou7eyXxiFNga5uDJpZhWxVAu
+	 VIyRh10bGvGoKibYlBpJxOc+FTsrZp2UX8mHqR+zCqVyneWSiN+gdDi4/FLOpj2N+B
+	 vUorOeKIsQEarRVdCiKZLCFORoHG/rae3zOTJWQitk9b29lfuuFtQTqLnlaXucAPEl
+	 Mc8DH5BqACua4r1J53Znepd1Q53xykfbwgto5D3Llt1X3XS22J3MYFXxYK3MLUQxcN
+	 XHHMlOjAEZ3/Q==
+To: Xiang Mei <xmei5@asu.edu>, security@kernel.org
+Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com,
+ cake@lists.bufferbloat.net, bestswngs@gmail.com, Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH net v5] net/sched: sch_cake: Fix incorrect qlen
+ reduction in cake_drop
+In-Reply-To: <20251121232735.1020046-1-xmei5@asu.edu>
+References: <20251121232735.1020046-1-xmei5@asu.edu>
+Date: Mon, 24 Nov 2025 11:48:14 +0100
+X-Clacks-Overhead: GNU Terry Pratchett
+Message-ID: <87ms4bn1u9.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CYYPR11MB8308:EE_|LV3PR11MB8676:EE_
-X-MS-Office365-Filtering-Correlation-Id: 381c152f-99fe-4550-dbef-08de2b43115d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?T1EzblUvLy8yOHUvYmpqaC9nVlZuRmJoVGdYTkVmNXlNSkpxWnFxeGxhdmpm?=
- =?utf-8?B?WjZIdE84cm44clVRMkd5aXNrMHd0bEJvM05vbzZ5aFhuWndXRGI5OVRiSXBv?=
- =?utf-8?B?NVRUMW96djhLOG50aTRES0NwSVppLzBkdHIvYXp5WVlHRyt1cXhmZ1hzNGV5?=
- =?utf-8?B?bTNENi9BNmE5aDhVZ3dDY0xzclNwYzEvN2F6UTN3am1aTG5DdDZLZVZrZWV0?=
- =?utf-8?B?WFVTbkpleDU2VWVUNStzNkZYL0IwcXlqTFF5MkthNm5WVllzVlJwajBCaS80?=
- =?utf-8?B?bWlyVVNvdmNMUE96d3FyMHNHaXN3cmpZV1pTMnB2OTF6MGt2Z3ZBT1M3bnRB?=
- =?utf-8?B?dXdPY0gzOFU3anlpOW8xbFVrU3ZCZ0ZCZDM0ZHo0eVg3Nll1Y2RNMFpQNysv?=
- =?utf-8?B?M0lBR3VWdUJETlA3ZXUvNjVYZmZzU3hXc2JSd3ZIelpGd0dueEEwbVJ5RFFX?=
- =?utf-8?B?TVBMRkRpRzl4UDRFWjk5T2dnSUZxaDBYa2NmZ0l2c2tFaVF0SnBhR2VVUWFo?=
- =?utf-8?B?aS9zbkUyT1J1bngxc00xSUNhWTd1RG1hZ2FXTUJXSVhTam9SZDZxQXhUcVBx?=
- =?utf-8?B?cUFJdVpkY1lna1ZVTWp5dmtZbzVFNXoxeExKOXYrT1htenJlbnI2MlBVNWM4?=
- =?utf-8?B?TVJpR0ZvdXJZUmFvQW83KzJqWWhIQTJ3Y05EZ2tWZi9ubmwwc3AyUzE1Ty9z?=
- =?utf-8?B?S09xbXFUQmVCNlVMNzA0OEZLOVA2RHBHd3kxNjZvZHF2UmgxODBzbzUwRHE0?=
- =?utf-8?B?anY2NXE1V0NVR21VOUlLOWhEM1krOHNBVTU4ZU5UZ2ZNZVBZSnowWDlUek92?=
- =?utf-8?B?N1ZDckhBSHlBSUExRTRsb3R4cnJleG9ldmZXbnY3NmdIeXZoRkR0ejhBZGpC?=
- =?utf-8?B?ZTFYUm8xaTQrblByNWdFNFVrckd4NE9acmlzWnNGSnZJQUVaZWlraUQ3aUtD?=
- =?utf-8?B?OXNJS2ZoTTFkMUVTeWxickhDaW5GMmxyNm9RUlRHTmZqRlRKZVlPNnY1dUp1?=
- =?utf-8?B?OTlSbFE3U1Z4VEtySEp2OFFSM1F2WEg5UnhYd29RTWtvM2VXQVYzelZJNTBY?=
- =?utf-8?B?ZjJCdnR6d2I2TkhFdHIxTDY2SXFjc2ZCNHBqdUtrTlNlTllYRjRzb2ZSLzU4?=
- =?utf-8?B?bFN1a09nTmlkanF0UWZPT3ltRHVoQVFMQWUyd3lWaEY5ellJVHQ3ODNOaGs3?=
- =?utf-8?B?SytUY3hMRk5UNHBvNHN5MG8wTFVja3hkYVBUZlhRZzRER0dtZGxoTzV6Qjls?=
- =?utf-8?B?ajNoK2xzQ1Z4VnU2Q2pCa3MyQjNHQ0lrSndCTHRWU2lvcnFMV1dXSDkrRjBy?=
- =?utf-8?B?Y2pJbkl0T2o4dlRFNkJma1dkejFBSHVFMWUzZlpwMWlhVmZORmxwcmh3d1VB?=
- =?utf-8?B?MERVMVo4dkpGVlB2YmgzbnV0cGtrMEtOWmI1eUpZZC9KRlpwcWE5WE5EUlZx?=
- =?utf-8?B?M2VDbzZJS09nVFZnenNJNWcxb3JJRy9BQ1ZkdG9nVG94WE5ZVVM2WWJpaHBL?=
- =?utf-8?B?aENqM3ZaZDJtQkN0QmlvL29CMDdzN0VHc2NDS3pSYjUzYmNkeHo2dEVqclg2?=
- =?utf-8?B?bHlyVkFFaGtoQUJvdWZSdXRXQ3hZMkw1TjRFbkx2T1oxeHRtNTFxcjBhcTVJ?=
- =?utf-8?B?S21EWmNGbzRZdzBIaGpoZEwrL202Vlp5WkkzdkZoWGt4ZW5LeGZtMmhqa2M3?=
- =?utf-8?B?VENDWGtQRUNYTGFhWVhWT1NvU3VGSHZPNEJ4eDFoNE1ZTW9FdktlZnA4WVhn?=
- =?utf-8?B?Yi9aQ1NkZWI5SGprUUJuNnlVUHlZeXRtYytqeFhpMEFOUmtlUytUNnVsYUVY?=
- =?utf-8?B?Rjl0QUF6Qld6RmdrR0d0YUZqaFlCUzIrczVJT3VUVG92eFg2Y1k3SVlJZjNU?=
- =?utf-8?B?SkFRYmROVzc5THNiaytLV1F3QSs5T2E0UnpYbVkwR3RpakVDWkoveDJzSnFH?=
- =?utf-8?Q?gLdE4uKZgkF8HM5jBB6wI8On1YKxkBxn?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8308.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZEVwZUlJSlN3YVdlYjVxNzQ3NEtXR1NCOFhnL3I0dmMzT0d3K0EzRjBPSE5B?=
- =?utf-8?B?TmhYVGM4c2s4cDhWNHVwdEJZTklxakhoYWVKZU5nRXgxa0dOK1RjSlBvOWV6?=
- =?utf-8?B?Uks3ZWlIVTAxMGplaXg2TjJOVTZZMDZjcnlTL0F1aDkwRm8yM0NSL3VwZnJ5?=
- =?utf-8?B?RzhUV09xdWxhU0FabGVLQkZJNURlWVJjYU14OEUxRnZ6YThXaDN2RUJyWVFH?=
- =?utf-8?B?Tlg3SG1aVVloVUczcnlBeXpDNFY1NmlXQ3BTWStlTUdLQUpSQjBqbXgrZnpS?=
- =?utf-8?B?Qm5nRzdRZGNHb1dIcUZlbjNOYVpaNldDSDB5SERNTGowaDQyVVR4RUJpZUJq?=
- =?utf-8?B?Q2svUXFzL1RNbGRWd3BNQWdrTGxtTldlZ3AvWlljd0tFcUNreW9FZ0FPbm1E?=
- =?utf-8?B?dFc3RUp5SlZ0bDlaZytLdXZWM2NnbWptMit5VG1OOGkwajBJTWp4cE9ieWFW?=
- =?utf-8?B?cU1GcElWeWxKZFNzdG1QaWR4bXFDUmhaZysyTWw0dGJHa3BQZDFEdVBJY21L?=
- =?utf-8?B?RXBTb3NKd1FuZjBEUVNLS1NhUlhhOFV2dENrZFJWSTllVHBpYk9RTWtNb0Fo?=
- =?utf-8?B?SWYwaDVKcU1JYVhudDdaN09pQm11amkrNXNPSE1GQm12aXFVWlVPN0M3Z0ll?=
- =?utf-8?B?Kyt4Si9KMTVpTndTU2dnbU9NMmtSNDdCS2duRG1CY2hncUZYNElieWpEcmJM?=
- =?utf-8?B?dFBjbUNiekMwQmVYRm52S2VEZ0xUZnQ4WHVrM3k0ZzlUTW03eTVVZVpuREJm?=
- =?utf-8?B?VHhrTWg2aFBOWklvZEVqS2dDaDFibjRGRVRqRG04dmtMeU9OWkJQUGFCbGNT?=
- =?utf-8?B?bWpxbk9HRkxLb2tHU1F2aStRajAvSXRhSk9mak14UUs4cFpZbWlON2NpS0kv?=
- =?utf-8?B?b09IdGU5THVLaWJrZms4THhjRnpzKzB6MUs5OGZvNUZjbGJWQ3Y5aWY2NHov?=
- =?utf-8?B?SXcyYUFnNWhJUXZYeFMwZGhFUmNSZmxuNUhHRjA4dU40bWVMTEtUZEk1MzlR?=
- =?utf-8?B?c1J3c0dsR3ZIbkxHTjJqVitYWmRwOTM4RCtJbFV2UUFhZ3lYSGtYcmdDb1NJ?=
- =?utf-8?B?OHd3a3pWTEZJYWp5d2ZMeWRQbUlrSURTWDJ1b2dlZ0RQZExwekdZbWdVSXI5?=
- =?utf-8?B?MlpWa3FUVVRmOXlhdnNsWFVPQjJld1lzMEtyS2pLaSs0aDV2Q0xGTGFFWHFh?=
- =?utf-8?B?KzJ0USt5SnplWWFoVVIyMnVwTU5YQzFBS0NpRHRjQUpEUG93RDFFU0h4eEdu?=
- =?utf-8?B?NjJwMkhFSzhmU2djR1RBSU1wdWcxQ25Hc3hRcnppbEdkTU43WGZ1VjdheGJN?=
- =?utf-8?B?VjU2L1htVUE1eUYvaE4vR0lBWWlScEh0UG90R1UrK0lxLzRpWlBhT1JGVWxm?=
- =?utf-8?B?NGYwQUxFZS8xWHR3S0E4TnE1VGtpREFtNWd2eGtXcTc5MzJybkx1cEFuWmNu?=
- =?utf-8?B?TlFKNUpzK2xpdi9JMzU0S3N2MjFTMytlamQ4cmE2QVY0MDBjRDNvVm1RQXM1?=
- =?utf-8?B?eHh2MStwQVhqVGFxdWluTmlIRWw3M3VZMFo3Vzc0bXFaY0VNK2JUbUVjdWFZ?=
- =?utf-8?B?QUI3b2tzeWVRbC9ldmtjcmJWUUMzMXl6cXVnUVhsQ0JhTDU1cTlvU3JncHdu?=
- =?utf-8?B?TmxBeE1SZnM2TS9CUDFWYTNBYUxqRVdBVC9xeDJnNnllWGtlNzArUm1QNGdy?=
- =?utf-8?B?cXFzSmJVbzg1eUEzOWRDbVh4S0tqcnZZWk0vUXZRUjhTd2lQYzRORmFQWXNh?=
- =?utf-8?B?V0VmVHREb1Q3VUlXc1Q4WVkrYjBNQmdNZ1o1UlpmY1pFZ1RPQW5ObFowSC9n?=
- =?utf-8?B?dmx5ZjRiNG9UNDJMZ0V6aUM1TE9UWXVqdnczelhCcEdpR1RvNFYzRUdzQVZC?=
- =?utf-8?B?NU1DbUpjekg5V2FTSS9pS293dGJ3SlNyZFVPSHZ5REIrMk02UEhhTDhGcjU2?=
- =?utf-8?B?TEU5K2EyMXRRVGRtRDdTbStoUTlrN2tJMU5OTzdDTG1IWDZqbU4zMjZSUzh5?=
- =?utf-8?B?SHozb08zVXF6SXB4MlJ3NzVITUNBWGlXOXZxcjRaOG4yN1Y2dW13U1ltb2Jn?=
- =?utf-8?B?dTZ1bWt6SFhGWHlrN2FkR3BJWEdmTUV1V0lyajNsVEhCeVlmUEh0UENlclN0?=
- =?utf-8?B?Q2tzVmlhbmxCSE1LMld1cCtyOEtHY05hRFlCK2d1b0Erakl6YnJHblBueXcx?=
- =?utf-8?B?enc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 381c152f-99fe-4550-dbef-08de2b43115d
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8308.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2025 10:20:19.0092
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Tkes2rbeqs9hcAZEpXzium73/eIewgIRp1FJeedVUCHV3PiwrlaoS3gHQUFDTXINYfCI7sHUwTnTZR0p3OldmHYnqcAJo7CyRdsZWT14nQE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8676
-X-OriginatorOrg: intel.com
+Content-Type: text/plain
 
-On 2025-11-21 10:21, Loktionov, Aleksandr wrote:
->> -----Original Message-----
->> diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c
->> b/drivers/net/ethernet/intel/ice/ice_switch.c
->> index 04e5d653efce..7b63588948fd 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_switch.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_switch.c
->> @@ -2538,8 +2538,9 @@ int ice_get_initial_sw_cfg(struct ice_hw *hw)
->>    */
->>   static void ice_fill_sw_info(struct ice_hw *hw, struct ice_fltr_info
->> *fi)  {
->> -	fi->lb_en = false;
->> -	fi->lan_en = false;
->> +	bool lan_en = false;
->> +	bool lb_en = false;
->> +
->>   	if ((fi->flag & ICE_FLTR_TX) &&
->>   	    (fi->fltr_act == ICE_FWD_TO_VSI ||
->>   	     fi->fltr_act == ICE_FWD_TO_VSI_LIST || @@ -2549,7 +2550,7
->> @@ static void ice_fill_sw_info(struct ice_hw *hw, struct
->> ice_fltr_info *fi)
->>   		 * packets to the internal switch that will be dropped.
->>   		 */
->>   		if (fi->lkup_type != ICE_SW_LKUP_VLAN)
->> -			fi->lb_en = true;
->> +			lb_en = true;
->>
->>   		/* Set lan_en to TRUE if
->>   		 * 1. The switch is a VEB AND
->> @@ -2578,14 +2579,18 @@ static void ice_fill_sw_info(struct ice_hw
->> *hw, struct ice_fltr_info *fi)
->>   			     !is_unicast_ether_addr(fi-
->>> l_data.mac.mac_addr)) ||
->>   			    (fi->lkup_type == ICE_SW_LKUP_MAC_VLAN &&
->>   			     !is_unicast_ether_addr(fi-
->>> l_data.mac.mac_addr)))
->> -				fi->lan_en = true;
->> +				lan_en = true;
->>   		} else {
->> -			fi->lan_en = true;
->> +			lan_en = true;
->>   		}
->>   	}
->>
->>   	if (fi->flag & ICE_FLTR_TX_ONLY)
->> -		fi->lan_en = false;
->> +		lan_en = false;
->> +	if (!(fi->lb_en & ICE_FLTR_INFO_LB_LAN_FORCE_MASK))
->> +		fi->lb_en = lb_en;
->> +	if (!(fi->lan_en & ICE_FLTR_INFO_LB_LAN_FORCE_MASK))
->> +		fi->lan_en = lan_en;
-> For me it looks strange.
-> What type the fi->lb_en has?
-> fi->lb_en declared as bool, and you assign fi->lan_en from bool.
-> But you check condition by fi->lan_en & ICE_FLTR_INFO_LB_LAN_FORCE_MASK ?
+Xiang Mei <xmei5@asu.edu> writes:
 
-I agree this can look strange.  lb_en and lan_en are both u8 in
-ice_switch.h:/^struct ice_fltr_info/ and we assign them from bool.
-Before, even though we had the same implicit conversion bool -> u8 we
-did not use either of u8s to hold anything else.
+> In cake_drop(), qdisc_tree_reduce_backlog() is used to update the qlen
+> and backlog of the qdisc hierarchy. Its caller, cake_enqueue(), assumes
+> that the parent qdisc will enqueue the current packet. However, this
+> assumption breaks when cake_enqueue() returns NET_XMIT_CN: the parent
+> qdisc stops enqueuing current packet, leaving the tree qlen/backlog
+> accounting inconsistent. This mismatch can lead to a NULL dereference
+> (e.g., when the parent Qdisc is qfq_qdisc).
+>
+> This patch computes the qlen/backlog delta in a more robust way by
+> observing the difference before and after the series of cake_drop()
+> calls, and then compensates the qdisc tree accounting if cake_enqueue()
+> returns NET_XMIT_CN.
+>
+> To ensure correct compensation when ACK thinning is enabled, a new
+> variable is introduced to keep qlen unchanged.
+>
+> Fixes: 15de71d06a40 ("net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit")
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> ---
+> v2: add missing cc
+> v3: move qdisc_tree_reduce_backlog out of cake_drop
+> v4: remove redundant variable and handle ack branch correctly
+> v5: add the PoC as a test case
 
-> It rases questions if fi->lan_en a bool why use fi->lan_en & ICE_FLTR_INFO_LB_LAN_FORCE_MASK then?
-> And if fi->lan_en is a bitmask why not use FIELD_GET(ICE_FLTR_INFO_LB_LAN_FORCE_MASK, fi->lan_en) and
-> why not something like:
-> 
-> if (!FIELD_GET(ICE_FLTR_INFO_LB_LAN_FORCE_MASK, fi->lan_en))
->      FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_MASK, &fi->lan_en, lan_en);
-> 
-> It could preserve unrelated bits (like FORCE) and make the code resilient to future changes in bit positions?
+Please split the test case into its own patch and send both as a series.
 
-The latter.  Original intention, one of, was to avoid implying this
-can be extended, because it should not: for better customization we
-have "advanced" rules, and "simple" rules shouldn't try to chase them.
-Instead, porting everything to "advanced" rules would be more reasonable.
-I make an exception here, because cost of any other option is way higher.
+Otherwise, the changes LGTM apart from the few nits below:
 
-That being said, I don't see any reason to not use
-FIELD_{GET,PREP,MODIFY}.  I will modify this accordingly across the
-series.
+> ---
+>  net/sched/sch_cake.c                          | 52 +++++++++++--------
+>  .../tc-testing/tc-tests/qdiscs/cake.json      | 28 ++++++++++
+>  2 files changed, 58 insertions(+), 22 deletions(-)
+>
+> diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+> index 32bacfc314c2..cf4d6454ca9c 100644
+> --- a/net/sched/sch_cake.c
+> +++ b/net/sched/sch_cake.c
+> @@ -1597,7 +1597,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+>  
+>  	qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
+>  	sch->q.qlen--;
+> -	qdisc_tree_reduce_backlog(sch, 1, len);
+>  
+>  	cake_heapify(q, 0);
+>  
+> @@ -1750,7 +1749,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+>  	ktime_t now = ktime_get();
+>  	struct cake_tin_data *b;
+>  	struct cake_flow *flow;
+> -	u32 idx, tin;
+> +	u32 idx, tin, prev_qlen, prev_backlog, drop_id;
+> +	bool same_flow = false;
 
-Thanks!
+Please make sure to maintain the reverse x-mas tree ordering of the
+variable declarations.
 
->>   }
->>
->>   /**
+>  
+>  	/* choose flow to insert into */
+>  	idx = cake_classify(sch, &b, skb, q->flow_mode, &ret);
+> @@ -1823,6 +1823,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+>  		consume_skb(skb);
+>  	} else {
+>  		/* not splitting */
+> +		int ack_pkt_len = 0;
+> +
+>  		cobalt_set_enqueue_time(skb, now);
+>  		get_cobalt_cb(skb)->adjusted_len = cake_overhead(q, skb);
+>  		flow_queue_add(flow, skb);
+> @@ -1834,7 +1836,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+>  			b->ack_drops++;
+>  			sch->qstats.drops++;
+>  			b->bytes += qdisc_pkt_len(ack);
+> -			len -= qdisc_pkt_len(ack);
+> +			ack_pkt_len = qdisc_pkt_len(ack);
+
+There's a qdisc_tree_reduce_backlog() that uses qdisc_pkt_len(ack) just
+below this; let's also change that to use ack_pkt_len while we're at it.
+
+>  			q->buffer_used += skb->truesize - ack->truesize;
+>  			if (q->rate_flags & CAKE_FLAG_INGRESS)
+>  				cake_advance_shaper(q, b, ack, now, true);
+> @@ -1848,11 +1850,11 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+>  
+>  		/* stats */
+>  		b->packets++;
+> -		b->bytes	    += len;
+> -		b->backlogs[idx]    += len;
+> -		b->tin_backlog      += len;
+> -		sch->qstats.backlog += len;
+> -		q->avg_window_bytes += len;
+> +		b->bytes	    += len - ack_pkt_len;
+> +		b->backlogs[idx]    += len - ack_pkt_len;
+> +		b->tin_backlog      += len - ack_pkt_len;
+> +		sch->qstats.backlog += len - ack_pkt_len;
+> +		q->avg_window_bytes += len - ack_pkt_len;
+>  	}
+>  
+>  	if (q->overflow_timeout)
+> @@ -1927,24 +1929,30 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+>  	if (q->buffer_used > q->buffer_max_used)
+>  		q->buffer_max_used = q->buffer_used;
+>  
+> -	if (q->buffer_used > q->buffer_limit) {
+> -		bool same_flow = false;
+> -		u32 dropped = 0;
+> -		u32 drop_id;
+> +	if (q->buffer_used <= q->buffer_limit)
+> +		return NET_XMIT_SUCCESS;
+>  
+> -		while (q->buffer_used > q->buffer_limit) {
+> -			dropped++;
+> -			drop_id = cake_drop(sch, to_free);
+> +	prev_qlen = sch->q.qlen;
+> +	prev_backlog = sch->qstats.backlog;
+>  
+> -			if ((drop_id >> 16) == tin &&
+> -			    (drop_id & 0xFFFF) == idx)
+> -				same_flow = true;
+> -		}
+> -		b->drop_overlimit += dropped;
+> +	while (q->buffer_used > q->buffer_limit) {
+> +		drop_id = cake_drop(sch, to_free);
+> +		if ((drop_id >> 16) == tin &&
+> +		    (drop_id & 0xFFFF) == idx)
+> +			same_flow = true;
+> +	}
+> +
+> +	/* Compute the droppped qlen and pkt length */
+> +	prev_qlen -= sch->q.qlen;
+> +	prev_backlog -= sch->qstats.backlog;
+> +	b->drop_overlimit += prev_backlog;
+
+drop_overlimit was accounted in packets before, so this should be += prev_qlen.
+
+-Toke
 
