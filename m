@@ -1,222 +1,134 @@
-Return-Path: <netdev+bounces-241277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8748C82266
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:49:05 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7746C822F0
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:55:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1B0E54E7FB7
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:48:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E840D34A85D
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:54:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4DE2D3A96;
-	Mon, 24 Nov 2025 18:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8973931A072;
+	Mon, 24 Nov 2025 18:54:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nIFmV5ve"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jaJZZFHd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A642BE05E
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 18:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6492E3176FD
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 18:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764010114; cv=none; b=YlJ0Fuy+XYX+GgWLNx199CqdxSAjfOi6lrXGHki55GfobgUJ3nrxGnrVOwCWYXrQj9iUDtcmgc1VWiM4fCF7mi92Y6oNdLSeib+JNRXI/jwix0km0Fy4Wg3d5ooQ+hyAcW2UYwtu8HBKRPtUaMJ59asvKo3anF/0n3ItiVQfR+8=
+	t=1764010458; cv=none; b=PdXxAGV1xzeV7KU6Zwucy5O+QXrEO/c+/INhvzEOv9qBJAg+wB/LV35qnQiQmUoyMgo4+GTic/aodyd14yYoUYIPuUSAf8f0cUcCUH8c0cLs/g8k+NG5yBnLs1+m33HuxL46mol8elYzcfvPV9QFqkPXWAFnQkntReCOij0e2B4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764010114; c=relaxed/simple;
-	bh=etSRP1bin/LvJA7hkO/mmT1L6XzYQ6JxdR2TBVK+bpY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=B6Ar5bANb1T0CmvqBv66h7QyPxF+I927R/OdDkoLGhf6XEH8kAAWJAJjNxzsT5whXyl952CtuIVBPH0kWNhpCQ4lwrCoOOXUDeLxEJKgjgxNNsr5s1A9MYkPgSm1ze2aE9MsB/6h+46FY4Wn048JKIOL8RbIKo21HKHlEXcxaUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nIFmV5ve; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764010113; x=1795546113;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=etSRP1bin/LvJA7hkO/mmT1L6XzYQ6JxdR2TBVK+bpY=;
-  b=nIFmV5ve8th2K6NgtHiLSOwEACwzkaxSsxrZDVXwf/+bAEUnDco23ao1
-   tiuqhIz6Bm1Suj2jkO68soIhdhkyuKQF3fhuWdwcQMaAHCNAC2dqRBmIs
-   h09z6IsBXiX/aFLRXouf47u+deqJsrD7LCCRZCGK2cRdyU0L6OjRYZVNt
-   F48bDls2u0hAlD9KYit9yHj0EWSVFREHTi1OkhFrTzdYOdw33AGDsMHkr
-   sIZpiEVDlGV5mdS/a2zGCPdcJ3FxxYJc9gVpXaujXnMlu6zutvN4+kNEA
-   jg6x3YART+16ejeJJQHPR1+hADLxrZIzxC3OO+88faEtYghJwlZmrphw4
-   Q==;
-X-CSE-ConnectionGUID: JH1y1qvYRESf9UkswJ4Ckg==
-X-CSE-MsgGUID: RFIV6ZBARHq+Rl7jisVTJA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11623"; a="76341858"
-X-IronPort-AV: E=Sophos;i="6.20,223,1758610800"; 
-   d="scan'208";a="76341858"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 10:48:33 -0800
-X-CSE-ConnectionGUID: MnbvZNVFSjWS2gPl4zBwpw==
-X-CSE-MsgGUID: e5titSlLTOqnXFZT4tVTJw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,223,1758610800"; 
-   d="scan'208";a="196575020"
-Received: from aus-labsrv3.an.intel.com ([10.123.116.23])
-  by orviesa003.jf.intel.com with ESMTP; 24 Nov 2025 10:48:32 -0800
-From: Sreedevi Joshi <sreedevi.joshi@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Sreedevi Joshi <sreedevi.joshi@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Emil Tantilov <emil.s.tantilov@intel.com>
-Subject: [PATCH iwl-net v2 3/3] idpf: Fix RSS LUT NULL ptr issue after soft reset
-Date: Mon, 24 Nov 2025 12:47:50 -0600
-Message-Id: <20251124184750.3625097-4-sreedevi.joshi@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251124184750.3625097-1-sreedevi.joshi@intel.com>
-References: <20251124184750.3625097-1-sreedevi.joshi@intel.com>
+	s=arc-20240116; t=1764010458; c=relaxed/simple;
+	bh=TEK7y+I345Za9ATxX+knyA/Uh489WPY9Dd1JCZP1I5g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VzP7O8AODyRf6feRRhZ4aUSa02Mo0uZ13mO1Y1lFkYKCYlJBfHMoCVUF2TgnK4btY1cNRLdsTgLbEXrnXinzQWB7PNXNuOKjDPJaT6hFtmN4nHVssmDbWp7ugdYJ73OTHuEmcvKveDngvhiqUNbLAzVYbWPXwymxSo2ny/+YR6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jaJZZFHd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DCB4C19425
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 18:54:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764010458;
+	bh=TEK7y+I345Za9ATxX+knyA/Uh489WPY9Dd1JCZP1I5g=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=jaJZZFHd9EbEwx/HXqWrnJzLLWTmDsjeCYIq0msXegrh1uOLQsYkLcGsOqDhYGYa1
+	 ulVE7WOFxgFtpE2/6TkwNTfV+9Rh0FSoTOohVIha1MYp1K5u2GOOF4aS+plyAfBAle
+	 vAZP1pWHSc2BhkypnD2nz0a3oVcYZoWGxiPrhyCwtfso6TjC0ca6YjyLVtMdloPCZj
+	 YjsoUkmPkN4DfXzzlBmRG07pBRUjbMkoJH5hAhMxXKO6mhdkj9L8ykHTsvk6JpcSId
+	 e4dHeGWi1OOrSvjb2TfH3swea0z/yg8jzYuM1iQ+XmmH3i9ds4f6wja6p20TfYTyKh
+	 Wz2iE90nWxrRA==
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-64175dfc338so7809137a12.0
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 10:54:18 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUvBR4ZEDLCXnbSV8oS4SAs52bTnMCqqrEVwA9VN3q+4ZZAvfkZg+tQBRhqr5xkSDhS7XKvF20=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxtat01lOc6HaU8SWsveCLqaU6MgC3CebJ13ZT6iOZK+TN20pln
+	nt6c+jxlHMu/gigiKJ5uFBu06m+/4ES4eNKceAqf6yiSY18SeJaWRrPip28Onm1HHZq/kkvi4cp
+	SKcIqYlvN6NwI1QidYMXXmAreInVeZA==
+X-Google-Smtp-Source: AGHT+IFReAtDFuSFDhp918Ohx2vHaiN5KlMAX/uodATZY6O/YB75rQVqkELqtwQbH271c/8FxbJ2Dkum3f0Uu3OWMzM=
+X-Received: by 2002:a05:6402:5252:b0:643:4e9c:d166 with SMTP id
+ 4fb4d7f45d1cf-6455443ed4cmr10891528a12.8.1764010456224; Mon, 24 Nov 2025
+ 10:54:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250911151001.108744-1-ariel.dalessandro@collabora.com>
+ <20250911151001.108744-4-ariel.dalessandro@collabora.com> <20250912140619.GA1293647-robh@kernel.org>
+ <fb20e4fe-df0a-4089-a7cf-e82bfe1f8e00@collabora.com>
+In-Reply-To: <fb20e4fe-df0a-4089-a7cf-e82bfe1f8e00@collabora.com>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 24 Nov 2025 12:54:04 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+eeiw9oaqQPWt2=rZSX98Pak_oB=tfQFvEehwLZ=S52g@mail.gmail.com>
+X-Gm-Features: AWmQ_blUF-g1qhHGkKsa6U6HY_V7mtf4Q-WkpVuhZVm09t2HSWt6-IOrweXVTPs
+Message-ID: <CAL_Jsq+eeiw9oaqQPWt2=rZSX98Pak_oB=tfQFvEehwLZ=S52g@mail.gmail.com>
+Subject: Re: [PATCH v2 03/12] dt-bindings: net: Convert Marvell 8897/8997
+ bindings to DT schema
+To: "Ariel D'Alessandro" <ariel.dalessandro@collabora.com>
+Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch, 
+	andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com, 
+	broonie@kernel.org, chunkuang.hu@kernel.org, conor+dt@kernel.org, 
+	davem@davemloft.net, dmitry.torokhov@gmail.com, edumazet@google.com, 
+	flora.fu@mediatek.com, heiko@sntech.de, houlong.wei@mediatek.com, 
+	jeesw@melfas.com, kernel@collabora.com, krzk+dt@kernel.org, kuba@kernel.org, 
+	lgirdwood@gmail.com, linus.walleij@linaro.org, 
+	louisalexis.eyraud@collabora.com, luiz.dentz@gmail.com, 
+	maarten.lankhorst@linux.intel.com, marcel@holtmann.org, 
+	matthias.bgg@gmail.com, mchehab@kernel.org, minghsiu.tsai@mediatek.com, 
+	mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com, 
+	sean.wang@kernel.org, simona@ffwll.ch, support.opensource@diasemi.com, 
+	tiffany.lin@mediatek.com, tzimmermann@suse.de, yunfei.dong@mediatek.com, 
+	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, linux-rockchip@lists.infradead.org, 
+	linux-sound@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-During soft reset, the RSS LUT is freed and not restored unless the
-interface is up. If an ethtool command that accesses the rss lut is
-attempted immediately after reset, it will result in NULL ptr
-dereference. Also, there is no need to reset the rss lut if the soft reset
-does not involve queue count change.
-
-After soft reset, set the RSS LUT to default values based on the updated
-queue count only if the reset was a result of a queue count change and
-the LUT was not configured by the user. In all other cases, don't touch
-the LUT.
-
-Steps to reproduce:
-
-** Bring the interface down (if up)
-ifconfig eth1 down
-
-** update the queue count (eg., 27->20)
-ethtool -L eth1 combined 20
-
-** display the RSS LUT
-ethtool -x eth1
-
-[82375.558338] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[82375.558373] #PF: supervisor read access in kernel mode
-[82375.558391] #PF: error_code(0x0000) - not-present page
-[82375.558408] PGD 0 P4D 0
-[82375.558421] Oops: Oops: 0000 [#1] SMP NOPTI
-<snip>
-[82375.558516] RIP: 0010:idpf_get_rxfh+0x108/0x150 [idpf]
-[82375.558786] Call Trace:
-[82375.558793]  <TASK>
-[82375.558804]  rss_prepare.isra.0+0x187/0x2a0
-[82375.558827]  rss_prepare_data+0x3a/0x50
-[82375.558845]  ethnl_default_doit+0x13d/0x3e0
-[82375.558863]  genl_family_rcv_msg_doit+0x11f/0x180
-[82375.558886]  genl_rcv_msg+0x1ad/0x2b0
-[82375.558902]  ? __pfx_ethnl_default_doit+0x10/0x10
-[82375.558920]  ? __pfx_genl_rcv_msg+0x10/0x10
-[82375.558937]  netlink_rcv_skb+0x58/0x100
-[82375.558957]  genl_rcv+0x2c/0x50
-[82375.558971]  netlink_unicast+0x289/0x3e0
-[82375.558988]  netlink_sendmsg+0x215/0x440
-[82375.559005]  __sys_sendto+0x234/0x240
-[82375.559555]  __x64_sys_sendto+0x28/0x30
-[82375.560068]  x64_sys_call+0x1909/0x1da0
-[82375.560576]  do_syscall_64+0x7a/0xfa0
-[82375.561076]  ? clear_bhb_loop+0x60/0xb0
-[82375.561567]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-<snip>
-
-Fixes: 02cbfba1add5 ("idpf: add ethtool callbacks")
-Signed-off-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Reviewed-by: Emil Tantilov <emil.s.tantilov@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_lib.c  | 19 +++----------------
- drivers/net/ethernet/intel/idpf/idpf_txrx.c |  2 +-
- drivers/net/ethernet/intel/idpf/idpf_txrx.h |  1 +
- 3 files changed, 5 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index a2fc081fd68a..b5a6aa1209fa 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -1484,8 +1484,6 @@ static int idpf_vport_open(struct idpf_vport *vport, bool rtnl)
- {
- 	struct idpf_netdev_priv *np = netdev_priv(vport->netdev);
- 	struct idpf_adapter *adapter = vport->adapter;
--	struct idpf_vport_config *vport_config;
--	struct idpf_rss_data *rss_data;
- 	int err;
- 
- 	if (np->state != __IDPF_VPORT_DOWN)
-@@ -1579,19 +1577,6 @@ static int idpf_vport_open(struct idpf_vport *vport, bool rtnl)
- 
- 	idpf_restore_features(vport);
- 
--	vport_config = adapter->vport_config[vport->idx];
--	rss_data = &vport_config->user_config.rss_data;
--
--	if (!rss_data->rss_lut) {
--		err = idpf_init_rss_lut(vport);
--		if (err) {
--			dev_err(&adapter->pdev->dev,
--				"Failed to initialize RSS LUT for vport %u: %d\n",
--				vport->vport_id, err);
--			goto disable_vport;
--		}
--	}
--
- 	err = idpf_config_rss(vport);
- 	if (err) {
- 		dev_err(&adapter->pdev->dev, "Failed to configure RSS for vport %u: %d\n",
-@@ -2059,7 +2044,6 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 		idpf_vport_stop(vport, false);
- 	}
- 
--	idpf_deinit_rss_lut(vport);
- 	/* We're passing in vport here because we need its wait_queue
- 	 * to send a message and it should be getting all the vport
- 	 * config data out of the adapter but we need to be careful not
-@@ -2085,6 +2069,9 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 	if (err)
- 		goto err_open;
- 
-+	if (reset_cause == IDPF_SR_Q_CHANGE && !netif_is_rxfh_configured(vport->netdev))
-+		idpf_fill_dflt_rss_lut(vport);
+On Wed, Oct 1, 2025 at 12:28=E2=80=AFPM Ariel D'Alessandro
+<ariel.dalessandro@collabora.com> wrote:
+>
+> Rob,
+>
+> On 9/12/25 11:06 AM, Rob Herring wrote:
+> > On Thu, Sep 11, 2025 at 12:09:52PM -0300, Ariel D'Alessandro wrote:
+> >> Convert the existing text-based DT bindings for Marvell 8897/8997
+> >> (sd8897/sd8997) bluetooth devices controller to a DT schema.
+> >>
+> >> While here:
+> >>
+> >> * bindings for "usb1286,204e" (USB interface) are dropped from the DT
+> >>    schema definition as these are currently documented in file [0].
+> >> * DT binding users are updated to use bluetooth generic name
+> >>    recommendation.
+> >>
+> >> [0] Documentation/devicetree/bindings/net/btusb.txt
+> >>
+> >> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+> >> ---
+> >>   .../net/bluetooth/marvell,sd8897-bt.yaml      | 79 +++++++++++++++++=
 +
- 	if (current_state == __IDPF_VPORT_UP)
- 		err = idpf_vport_open(vport, false);
- 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 21820bd26631..45afdd87fba0 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -4643,7 +4643,7 @@ int idpf_config_rss(struct idpf_vport *vport)
-  * idpf_fill_dflt_rss_lut - Fill the indirection table with the default values
-  * @vport: virtual port structure
-  */
--static void idpf_fill_dflt_rss_lut(struct idpf_vport *vport)
-+void idpf_fill_dflt_rss_lut(struct idpf_vport *vport)
- {
- 	struct idpf_adapter *adapter = vport->adapter;
- 	u16 num_active_rxq = vport->num_rxq;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 2bfb87b82a9b..423cc9486dce 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -1086,6 +1086,7 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector);
- void idpf_vport_intr_deinit(struct idpf_vport *vport);
- int idpf_vport_intr_init(struct idpf_vport *vport);
- void idpf_vport_intr_ena(struct idpf_vport *vport);
-+void idpf_fill_dflt_rss_lut(struct idpf_vport *vport);
- int idpf_config_rss(struct idpf_vport *vport);
- int idpf_init_rss_lut(struct idpf_vport *vport);
- void idpf_deinit_rss_lut(struct idpf_vport *vport);
--- 
-2.43.0
+> >>   .../devicetree/bindings/net/btusb.txt         |  2 +-
+> >>   .../bindings/net/marvell-bt-8xxx.txt          | 83 -----------------=
+--
+> >
+> >>   .../dts/rockchip/rk3288-veyron-fievel.dts     |  2 +-
+> >>   .../boot/dts/rockchip/rk3288-veyron-jaq.dts   |  2 +-
+> >>   arch/arm64/boot/dts/mediatek/mt8173-elm.dtsi  |  2 +-
+> >
+> > .dts files should be separate patches. Please send the bindings patches
+> > separately per subsystem so subsystem maintainers can apply them. All
+> > the Mediatek dts changes can be 1 series.
+>
+> Ack, will fix in v3.
 
+Are you going to send v3 still?
+
+Rob
 
