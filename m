@@ -1,492 +1,316 @@
-Return-Path: <netdev+bounces-241305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5064C829CF
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 22:58:12 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CE99C829D8
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 22:59:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AF94F34BDE2
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 21:57:27 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9347234A7AF
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 21:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F668331215;
-	Mon, 24 Nov 2025 21:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662BC331A78;
+	Mon, 24 Nov 2025 21:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QJIviHEr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QYjwwmWJ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hJMyp1Ix"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE8B330D3B;
-	Mon, 24 Nov 2025 21:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764021438; cv=fail; b=CKWY3qxr9/S+EWF/I8LIvjsFmD6qXZejhoFkHvycQ4uyjKBdGzMh1L3UVtQv0PSw0bOIVbYKMLMpM1Yz6ALEJIwOyxnHREYZZznPJrh+Tyx3mE6+6GER3B3N34ZUaQBCEQHtO+LDQgwpeUP7IzqInoIfzh2o/9gnRK424qfUU5Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764021438; c=relaxed/simple;
-	bh=mtQ5xJE3A8kc4N8HZ0KiXAu3QHlyU7BWrRNqYbk8OTY=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=p5oJk0L5k6MD0hWpHPoqg8wMEQF00rThOY9Xv02dOjbIvbx15Mcz3nedQkuZEvD15yqdeN90VsL+BURuBnO8LHj/AT2TK91KGOwzC+smiqdmfJzwb6eoTHwdzboKPgsUf5zDl4nTBXYT/2VnPYlMLaeJUbvW1KZaJL+/+xbtIpQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QJIviHEr; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764021435; x=1795557435;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:mime-version;
-  bh=mtQ5xJE3A8kc4N8HZ0KiXAu3QHlyU7BWrRNqYbk8OTY=;
-  b=QJIviHErX/E9Ft3YwvYrj4wnyNv429TKkUTDAsqmgtgbEa2JyPfkCkfE
-   GcvsoVHGasNC/RCa0fJcrtSgX8BU3iKWWMoVQbMatKl/SSsSsGB0fcE9L
-   t4MvcAjhCLibOs6rswE0bkg5U4bTdP9qn16CsQMoRo7tZWYbU/TVndmIC
-   DjNZOVkflBnP9bSMK6zgmOka18arzDVQ36ludippazURzjYMTLZ1vbbMm
-   I5zfEWUqkiZeIBuIrpy1ooj1MJmQ9QSNYo9yTPg/0/22RGG+IF5ZWy8Ou
-   iCMcEptpdLzmlspurQ28SYLPr4SuVGKbaw0S+4tlP/ZUJ7KS8JIMM5l/d
-   g==;
-X-CSE-ConnectionGUID: nVj24qTHQW2TItwdCW4WDw==
-X-CSE-MsgGUID: g+sbw8mUTumHEHatjItDlQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11623"; a="66064416"
-X-IronPort-AV: E=Sophos;i="6.20,223,1758610800"; 
-   d="asc'?scan'208";a="66064416"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 13:57:12 -0800
-X-CSE-ConnectionGUID: 93xKtAYIQ5Kz0s3+Z7jp5w==
-X-CSE-MsgGUID: +1wX36wcTfKwlZAXO1S2dg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,223,1758610800"; 
-   d="asc'?scan'208";a="192534444"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 13:57:11 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 24 Nov 2025 13:57:10 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Mon, 24 Nov 2025 13:57:10 -0800
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.18)
- by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 24 Nov 2025 13:57:10 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CJc6ZLLUuI1SejzIKBdzIfJB9KEr01KN26TgA7kB8XikA2RkbcXyUW8LCR0XXyGsCBHyto/X1Pvc0fTeiOp2paxW4gItAFsKtdMiXIQs/ilO6jZQZdyHXa7+C1NU4lPopC9GfE6nL8ydKB4X4k33/halTOcLlGmKgrXHb7/3DAqLJpvrJewCo1ysuvSOzKAIo2xXkbMfko2rbicbLV81JOW0qgbW4GY61PgtEFo/FukamEqiknmD+nUCJwQftJ7hdvCv67fsOaJ1Aotp/UGE7x8KiCYy0lqoX3Q9sRF0Rp0qGGmi8Y37tNphWISolEsUSFQ2He17k2CBXl0TkIb1wQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RNX9ra3SObaH8Q9CCSzQ/M27ofindGEZWOn0hK/bcKs=;
- b=SGgBd4oVyukI84zlGWVEJuevejJeYhKF3grlMIuhleAeIUV9GvJRVJpCOknHmquoGgTFIn4p+4R8nEUjiGkeTdSWCxtDmc2uU85rKGo+0Pjkrt6kTAOILHosMKOqqujgktSyLskTkPXY4a4k0TertHml3AmOsXhjwBkNS4QgqXvz+0EMnWeOSRUqzPQVH0w5swVdvQGS0P5yZmzOpdyWrMQxibvaXG5ls1KPEGj642WnskhzQHUUDLsP0olDhXAbxz0VqA2coK/PGl//Np7+DUccfddUzFdpU/xkrdHHl1Na4bHd0MNBB6lmlBxQExXxz/24kOqXnl1LSLzgJUeZqw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by IA4PR11MB9444.namprd11.prod.outlook.com (2603:10b6:208:563::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.17; Mon, 24 Nov
- 2025 21:57:07 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%3]) with mapi id 15.20.9343.016; Mon, 24 Nov 2025
- 21:57:07 +0000
-Message-ID: <89804208-cc00-4769-9f01-4928544504ab@intel.com>
-Date: Mon, 24 Nov 2025 13:57:01 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH] i40e: fix ptp time increment while link
- is down
-To: =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus@blochl.de>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>
-CC: Richard Cochran <richardcochran@gmail.com>, =?UTF-8?Q?Markus_Bl=C3=B6chl?=
-	<markus.bloechl@ipetronik.com>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20251119-i40e_ptp_link_down-v1-1-b351fed254b3@blochl.de>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <20251119-i40e_ptp_link_down-v1-1-b351fed254b3@blochl.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="------------5YGCbTs0s0g5oHLB40KXHt4n"
-X-ClientProxiedBy: YQBP288CA0026.CANP288.PROD.OUTLOOK.COM
- (2603:10b6:c01:9d::23) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A044331A5D
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 21:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764021564; cv=none; b=fBXHxyWuRrdj0JCSxnXyo+iqyVt9cpKraW1a8CZDGcdsVueGj5XMRC0RWLsPidgzsJQrZXGK8d6SwjnhBkQAchrFTDiKLghYjuIpk9WcxIICeJlQ9wurzYnbQBDK7we6EXagjA8U4HTzHfwVjgWxZcZSXLT1/hg4/sJYqL7F2xw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764021564; c=relaxed/simple;
+	bh=Js9zql4OgnnEBD7cr5m1CxyZi+lfX0iqvKkLedjQ8QA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gZ+stGsgoDafBo1Xe2c3eEzv9ABFl3FfRGAH+KaP44OpScQpATjqlV+586ZmfhugtuYuf/OcycmJ+Q0oEdhT1nT68LCDfgzBEvMxWUzcCkxcs2TKw37QbbX4G9czF+KdMW+McaP1vJyHHNGYisgFBd7t3pjRoFTHJe38JNgibpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QYjwwmWJ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hJMyp1Ix; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764021561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H+YMo5H3YOL7jAqTWtFFIZqMJZpECBZ8f74TJyFBR38=;
+	b=QYjwwmWJfz/DiEHYGHcSmu9tHiZ+CAAUxZjDs1pWgTafYYcIRpGOJf4t/99K3jg7G/2ETZ
+	O7azMIpQ37TtIRGaFxc2AbAprayrMxE+SK2BxVLe1gvC/5V1T5UJU9JqJ1HHeYFtJeP+Qx
+	q0rGr7dW52OhY8cm1Ia4PmvlM3bnh4I=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-655-dNbbSN_0PVG8N2M99FvPQg-1; Mon, 24 Nov 2025 16:59:20 -0500
+X-MC-Unique: dNbbSN_0PVG8N2M99FvPQg-1
+X-Mimecast-MFC-AGG-ID: dNbbSN_0PVG8N2M99FvPQg_1764021559
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-429cbed2b8fso2665712f8f.1
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 13:59:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764021559; x=1764626359; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H+YMo5H3YOL7jAqTWtFFIZqMJZpECBZ8f74TJyFBR38=;
+        b=hJMyp1Ixw9fdCh+1Q+phI+rBDp4Ki+kv1GABPQECVYz5D7qp3vHu9MNZH/iUzyJ40/
+         E8XknxomVEppBmhBQ+6zHj/wmbmb6WNDaCYCnpoaGViv/GVsbbQdK38PpYSFr4gnqr3T
+         ZUdbrQQ4+3mX1jMymO/1648zgVSt0T07oXmCQ41JlImAi2ejPC3F6nN5kaM/pU6Y5cje
+         s8Es6WIc9Ts8WOm8P2lzuCgVbQju9dkS7Vfp7nryu3fdRtiH0+zJmEjkW/fJqJR/jdPt
+         HdpHXHUJ0CWq2jBFFyUfFdTC5V8yggoZFvbPxAbWsjV5i7ce3Kja5/NSMiDNaZz8Ha4e
+         gGzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764021559; x=1764626359;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H+YMo5H3YOL7jAqTWtFFIZqMJZpECBZ8f74TJyFBR38=;
+        b=s2Lktwjbw4Xkduy9p5rvI+tjMlXA4mFIGocQWzHqOxUfmH2rTvyYjX1jS064lgEixY
+         9jHIPZ8j1KCkPZAx3FZ6TS+tEvaLLVHOrcbw9GOS0/vG0v29On9cUsfbDZJxZ4rmD7+R
+         YT5TF0huwBEZBWcL/ZX93Yb/JwPjl/pIyXOPqqMGSLuWFP4nsukSF2FOX9MWPsVaVh0Y
+         scZyfkqDjWf/ZCm4qKMgIEQeyDomD9BrmNeqtdEj6CMN1v2r/xint5ioVSVRpWSQe9Zs
+         NdfVDD711ebHFFkSJrQW/rQBVdAG7+ROUEwGk7HsRMAV9Iaf/wid4yrguHm/kjAa/nao
+         P2nw==
+X-Gm-Message-State: AOJu0Yw3HADo5FdcvYhrV7pyXds+GyOOx1kZCSMdhZxYKp0beLurhE1W
+	rF8QgXzgsEE2m/5zE076yHQqFiAN4oW64kI7U96WLbpowy2NjJMqrwUTg3C+inMHFuFPXVl8zqE
+	cO8PuAr/vcxt/AuwIEy97SDvs5zovmb/w/xJy+VHHcPsblffxdvKE4T5iYiFrZPylvQ==
+X-Gm-Gg: ASbGncu1Ln8+zBYnZH3E1cuG6muvlsEkFXcwiMvbOejQgXC5fZwXUpkcInx3iu5YTyj
+	HiFsXHks5KZUGJujCftXmkVLAyS3vED7rbLUZNvtwyFAkjk1gsd9BvMXrRzHLI5gX/oSmQCzKej
+	i/wWfCpA8wt2W6Y9PsurBOY5y5SqSfl3S9CnWkukQ39FulUJFBxKIxZOoR3mlkBDL3FQ6iV1F76
+	yFYsW7iXZbHIdctOr5DxZTu3eVunQVcxobRs51aqrQVSrFxHC1YC4D+y15/YLa/JO42R/5rUX3T
+	X415v3g9zRfzVlzft5MLqyab91xFWX8aDFCvZ83t70KXLFqlkvAPlIUJt058qlwWw/ozcDw3dxD
+	Rf2venKM27X8v7AD2ybckB8NhmHkl3g==
+X-Received: by 2002:a05:6000:420e:b0:426:d5a0:bac8 with SMTP id ffacd0b85a97d-42cc1d19624mr15321383f8f.56.1764021558706;
+        Mon, 24 Nov 2025 13:59:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFOmSX5mj9MaFFqRaX6/7n+Y65AhzF6tbw5qWchg4LDEwTyYYy89Tcq3gxbCKSQXJxm4RNtRQ==
+X-Received: by 2002:a05:6000:420e:b0:426:d5a0:bac8 with SMTP id ffacd0b85a97d-42cc1d19624mr15321363f8f.56.1764021558157;
+        Mon, 24 Nov 2025 13:59:18 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f34ffesm31331232f8f.10.2025.11.24.13.59.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Nov 2025 13:59:17 -0800 (PST)
+Date: Mon, 24 Nov 2025 16:59:14 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
+	virtualization@lists.linux.dev, parav@nvidia.com,
+	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
+	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+Subject: Re: [PATCH net-next v12 10/12] virtio_net: Add support for IPv6
+ ethtool steering
+Message-ID: <20251124165246-mutt-send-email-mst@kernel.org>
+References: <20251119191524.4572-1-danielj@nvidia.com>
+ <20251119191524.4572-11-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|IA4PR11MB9444:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8fa16fa8-67d8-461e-0be3-08de2ba46810
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?aStqbmp1M3lOZXo5RHpZUG5hOGVueVZ0YzRqUGwza091SVR0VEJpVkJCS25l?=
- =?utf-8?B?bzBLNW84aWVCY2djVkp2QjZaQyttdnNWZExnaGJiUUZvSHNxbkhUVXFVQkxQ?=
- =?utf-8?B?dFBRZjNId0YzbFBXdHBvajBCSld3RDlCTEZzZUZUazdtaUN0VERWaVZiWDYv?=
- =?utf-8?B?RlFCVUpzbXBaWDZ2dlZqUmFibEdTOEcyVFlUdkd5SzJVU0syRzRkdnF2ai9k?=
- =?utf-8?B?VGpncjF2RnVtZHh4UlhrMkduMnVjcTFjdUowWTZqL3dGTVpINTBtM2ZVU3Bs?=
- =?utf-8?B?USswcFIwV3lxZytQZU9Da3hNVUpsbHM4MUdrRlNTU1ZRTUdoZldBZDFFZU1W?=
- =?utf-8?B?S3pmS3o2S1BUUGVObmpUNVA5aXVJWktQMGIvczNLSlRPMmQ3UkpxOUF3S3ow?=
- =?utf-8?B?ZFQ1eGVsQTJaQ3NnL05oVmZEQjRtMC9uaWk1bVhHc3lhK0hWL3NJSEdDSjIw?=
- =?utf-8?B?bnRDYmU3WGsrZnVqZXNraVR2ZU0yaW5TckpCVnFLNkhYOHBoR0YxUDZ1VHpl?=
- =?utf-8?B?bDgwWm1FSTE3VWtzSmhJcEhsdHpWdEtDbnpLemRyeXE0VkU3R2VJSXkxVG9F?=
- =?utf-8?B?bWVqYjNPcFlTMmJ0NnBadG50S2ZrT3VHcDZjU2pWU1c2ZE5KdUthcDRoeGs2?=
- =?utf-8?B?NUxaYVJ4K2FSVmJLODNXUmp6b3cvRkR6R2xUeExGcGNYQ3o1OEJmZGNDcDdR?=
- =?utf-8?B?VDVJU0EvazZuNTRXS2Y1Ni8wWHB6UXlySVFyRWVaMmYyWVk5d0hadEhpS3lF?=
- =?utf-8?B?MXpaaUNoUmMyNU0xOFdKYUFUQzJOald0MitrWGRKSWpmZ2Z0TDE0amR3cm1i?=
- =?utf-8?B?ZitOM3FtMW43RzRJVDVtdXgvWE1WMDVVSWZsYzRrdjhyTy9hOVpiSkY2ajla?=
- =?utf-8?B?VytPcGk0bS8wRmJBdTNFNEJpTHlGUmNzbWk3T2FCSkovQTZHQUh3SHJTNEt0?=
- =?utf-8?B?VFFBczAwbmNwRmlRQUxTb3laem9hcDNOTmd5Vm1HZTJNV3pRU2VWT24rZzd4?=
- =?utf-8?B?Z1k2UDlhM1h0b1o4L2xjWlg2V2huQW5MaUJpNWs1cW1UbnZiYWY4K01UTGNS?=
- =?utf-8?B?QnJYRk1DbVZlMXFOZ25XTmhaelhRNmo0bENXU3NmMVgvNjRocENycHVtUnZE?=
- =?utf-8?B?ZEsvMjl5MXhvY3B6ZnErRXIyVEp0YmtqbkdmRWxkenRyak1BdFFKejZnNk52?=
- =?utf-8?B?bCs0eFBqSWJ0c21SeDlNdHlQNGh0dm11Y3drTWpPY04yVmlyK3FmcHRYTkZz?=
- =?utf-8?B?MXZWR3BqQi9EbjhtK0JIcHdXbHJPR1JKaFpybGNvSWVXSHR5RHpnY0Q1QjlP?=
- =?utf-8?B?Z2VqRUtTWVVXMUZnc3Q5bWRuZmhIYTg1WmdYMTJKQVpmVGpsK2c5MkM5MkFX?=
- =?utf-8?B?b1FkV3gvdzRZUzNPdWtBTW5OaDZzb25EbjFvN1pUaG5EN0lrVVNRTGx6dlVv?=
- =?utf-8?B?Z3U0eTUyOWE4Q2Z2djg5a0sxRHNZSTBLbDJwS1A1V2huUWhoeDNkelNHVFMy?=
- =?utf-8?B?aFNBM252QUZqOWN6aHhONzNaUHJ3V1JUSVlwL3AvcUZub1Q0R0VDSVhhMUkx?=
- =?utf-8?B?RFJDRmVWMUh1WUUxVEpQNm1CZFp3Zm12bzUyUTBFUVBJVzZhYVM1bEVuUE9K?=
- =?utf-8?B?WURFazhaTUFNd21aR1Bqb2JrWVVvUU9hNXNIMzRCbXZFU1lwM3FSbzhweTNY?=
- =?utf-8?B?c1RiWjJnNGlDeFhuMllmY3VMU2dtbHI3QXMrbFU5SkNTZy9yY0ZUazFDeEFW?=
- =?utf-8?B?ZkRhSXpIWGxlQVVJOXdJcDVoSmJkdVFtR0dUTXM4YWpLWHA3WkRWQmc2bll2?=
- =?utf-8?B?Z0cxYTJLVGJWQUJMREdZTUJ5TFB3OUF1VVdyV3BEazBZWTVWWXVmeHg2bmJ6?=
- =?utf-8?B?cWs1WnFSZ1hrL3BPUFNLNVhjWEtLQWw3bXBnL2pkOHBlWloram1zMFNQaHRC?=
- =?utf-8?Q?5V/niNVvbnHIO13f2zOH+gc8HhgX6lhy?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L2w2N2paNitWR1RGaGk3NEx4b2dGTXRDL1czMFdiQ3V1aVJ3MVYrY2grQnNB?=
- =?utf-8?B?ZjI1R3l2dWpuZWd2MkMrTzZScS9DMFFwaE5ER2JINSs0cWxOS0dSUUNtNmZH?=
- =?utf-8?B?bndSRlEwM2laN2NVb1ppdG95aUFQVDlldThLNThBYlZiMGZHTWRRYmZwVWlG?=
- =?utf-8?B?Ym9SY2xVc1l3NUJtQ3V3VCtxR1ZBUUN1S3ZvUk83UmszaStuU2MxRTR4TU5o?=
- =?utf-8?B?V2EvVnBCMHlkNzRnZFpiVEZVVjVKTmJIK05KbzdKVThTMjZOb3YraTljQ2dJ?=
- =?utf-8?B?RjNxWHZ0M1JGaEhTdG94Uks4TllxTEN1UWRKaTJUSFRTN04wNmFOWVU1Y2d3?=
- =?utf-8?B?MW5pTGgwK1Q3enFURXAvVjd4aUxrMExYbWFjR2E4WVZLRGZ3aEdsd0o5RlN1?=
- =?utf-8?B?azBRRWFHMHI3OHhzRzliblk5S3R6MDF4dmdhMk02YjR1OSsyblpVSHo0cUNa?=
- =?utf-8?B?cVRMYTk5em5QRzQ5cTVyNGlBMlZjdC9xR3UvV1lPa2lmZHdIRk53U05SS1Ax?=
- =?utf-8?B?YWNzZzhXNzhaK0pURjB6TEM5V3hTMDc4N3BQUTFjWEJmemQ5UWtPUkl5K3JY?=
- =?utf-8?B?N2NiaGpOajU2bGVVemxRUUpWdUtoa0tZMkxmWmtEY2t4NjBlQzJaSXUvd1pz?=
- =?utf-8?B?R2dqUkRZU244dTZ1TE5jSVA5eXMzVlJIRmE4UWo3NE1uRTBJRWYrMWN5cXVH?=
- =?utf-8?B?S3lhRGgrRFI0VTZZNGhsalpxQUYrbWZhRU93WkFRbm8wMUM5R1o1bmFVNy9s?=
- =?utf-8?B?d0hBUC9TaklIbDlIMFo5RzVrZmJ6RzdYMFpIT2NMdHh5ZXk3VWZISGsxaEtM?=
- =?utf-8?B?MG5lUUJLY2d0VHhuME4wSklDNWY1VC8vSlQ4TG1INm4wZEd5cyttSUVyamFa?=
- =?utf-8?B?WEJFTG1GcGVocytwckVYWXErcHU5Nm1QNFZKbXI5dFp0RW5sQ0Q1NnN0S1g2?=
- =?utf-8?B?VW1qYjY4aEhXME84a3dEVVlkRXg5SDJTc3RtellmeFMrZWI0T2EyK21QMkx5?=
- =?utf-8?B?Q0RNblk3M2xSRG9mazQ3YjZoWkd6R2ZyUWV0MGdYTHg5dmF4VzFhTlIxc01x?=
- =?utf-8?B?akFVZVkycE1tUG90Vm1SLzltejRUTWoxZ1N5dEFodkd0NUlNZlUra0t2T1RJ?=
- =?utf-8?B?U2VTNnRQQ1FiT1VPMXoyT050QjhIK0t2VWZZbDZDc000WWVBV05LYWo3Zm01?=
- =?utf-8?B?TFhGT3pwbktjWnBkUTAyQmEwV3JRRVFOaVlocHRSbGVsSCtycXg5Y0hIYnAw?=
- =?utf-8?B?MDRiT2srejAzUTVXTkRlaFQ5N3I3NXpaYlFrcm5JSkkwY3FOd0loQmpPMUhp?=
- =?utf-8?B?L3MxbjNuOXNxU2J0M1pyWWN0WHVzN2NrVEIxNGxmeklNTFAvKy9uVmVqWENq?=
- =?utf-8?B?S0pndEljdXpKWkpGSnZ1Y0l6T1VybVJIamhWQ3ppcytZci93dGdiRkpoNXBT?=
- =?utf-8?B?b2xJT2NIQURpTE1YSnhlV1pjcW9tQjVwSUpGeXRCVzdNdG0yb1NnaWFBaWZp?=
- =?utf-8?B?Q0VqRDhiL2hSUFJHZ3VFeTlad1plc3pDWlF5aGFpZkFUaCt2SURSQ1VHNWJW?=
- =?utf-8?B?ay9ZRVh6a3BiMUQzcnZkS1BwUHB2RkpkNFRHTEp4YmxleFh4d3pXWko3Y2du?=
- =?utf-8?B?U09wZGluZ1NTTlJFalh4dWY0Y3dUdU15dkVaVWVCVXBRYStNMGxZNnM4S3kv?=
- =?utf-8?B?a3k4RHVLTGZQaFpPejJVb2M5d3BLWGtGaWZhWUVRZG5DQjl4azdmV0N2Tzkv?=
- =?utf-8?B?cGRGSTZLazlsN2FacWRlbTZ0RUJSczlDbGhRQ3JueGs4bzUxV3diU01TZWJE?=
- =?utf-8?B?aHRjNmFXU1hJK2oxQzBTWDJEMmlWeGE1M3lHVEp0Nzc2bHR2bHlONjF4TnFG?=
- =?utf-8?B?c254YnhuTWdUaUlmRG1IeWdIc3ppTVgwbUxHbGtxQU1jY0RDS2pwdnpZTjU1?=
- =?utf-8?B?c3pOZHZFUFFKVFNLcWZQbEdnTmpMbUIwV2dycDRMYUg3K2tRR0c4ZFlWcEtV?=
- =?utf-8?B?bHpQcjFxSlZuR3dVa0gza0VnZWQrall4aDdlRi9hakVkQng3aTR5aEJUbkR1?=
- =?utf-8?B?cTh3UTFLY2tDQ2cybUFDb1VNTFo2eGU1SkNqWk9LbC9uQUdlaGttYWlWRnNk?=
- =?utf-8?B?RFZ1eGkvWXhtYnZ0VDRwTGlJcXBLQm5Ed3JKYmpzZnZ5blVkK2xlRnBSMjRT?=
- =?utf-8?B?TFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8fa16fa8-67d8-461e-0be3-08de2ba46810
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2025 21:57:07.4947
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: funC096boWCv6uYFWs8nLGwF1lREH0ZalhZGyywAVDYQQg3f/ju0FgtOjmiHQ3OcktnP2Oz5UZXN8ZhDmU96fO7Pk2A9V5IGna9zft2sbxs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR11MB9444
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119191524.4572-11-danielj@nvidia.com>
 
---------------5YGCbTs0s0g5oHLB40KXHt4n
-Content-Type: multipart/mixed; boundary="------------q0RyqSVp1H2tmn8wWy9Oq3kv";
- protected-headers="v1"
-Message-ID: <89804208-cc00-4769-9f01-4928544504ab@intel.com>
-Date: Mon, 24 Nov 2025 13:57:01 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH] i40e: fix ptp time increment while link
- is down
-To: =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus@blochl.de>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Richard Cochran <richardcochran@gmail.com>,
- =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus.bloechl@ipetronik.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251119-i40e_ptp_link_down-v1-1-b351fed254b3@blochl.de>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <20251119-i40e_ptp_link_down-v1-1-b351fed254b3@blochl.de>
-
---------------q0RyqSVp1H2tmn8wWy9Oq3kv
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-
-
-On 11/19/2025 8:09 AM, Markus Bl=C3=B6chl wrote:
-> When an X710 ethernet port with an active ptp daemon (like the ptp4l an=
-d phc2sys combo)
-> suddenly loses its link and regains it after a while, the ptp daemon ha=
-s a hard time
-> to recover synchronization and sometimes entirely fails to do so.
->=20
-> The issue seems to be related to a wrongly configured increment while t=
-he link is down.
-> This could not be observed with the Intel reference driver. We identifi=
-ed the fix to appear in
-> Intels official ethernet-linux-i40e release version 2.17.4.
->=20
-> Include the relevant changes in the kernel version of this driver.
->=20
-> Fixes: beb0dff1251d ("i40e: enable PTP")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Markus Bl=C3=B6chl <markus@blochl.de>
+On Wed, Nov 19, 2025 at 01:15:21PM -0600, Daniel Jurgens wrote:
+> Implement support for IPV6_USER_FLOW type rules.
+> 
+> Example:
+> $ ethtool -U ens9 flow-type ip6 src-ip fe80::2 dst-ip fe80::4 action 3
+> Added rule with ID 0
+> 
+> The example rule will forward packets with the specified source and
+> destination IP addresses to RX ring 3.
+> 
+> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 > ---
-
-I checked through our out-of-tree history and can confirm essentially
-this exact code was added there back in 2021, but the developer never
-managed to get around to upstreaming this fix.
-
-Thanks for discovering and resolving that gap!
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-
-> Tested with an X710 at 10G link speed and kernel version 6.12.42.
+> v4: commit message typo
+> 
+> v12:
+>   - refactor calculate_flow_sizes. MST
+>   - Move parse_ip6 l3_mask check to TCP/UDP patch. MST
+>   - Set eth proto to ipv6 as needed. MST
+>   - Also check l4_4_bytes mask is 0 in setup_ip_key_mask. MST
+>   - Remove tclass check in setup_ip_key_mask. If it's not suppored it
+>     will be caught in validate_classifier_selectors.  MST
+>   - Changed error return in setup_ip_key_mask to -EINVAL
 > ---
->  drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h |  9 +++
->  drivers/net/ethernet/intel/i40e/i40e_ptp.c        | 68 +++++++++++++++=
-++++++--
->  drivers/net/ethernet/intel/i40e/i40e_register.h   |  9 +++
->  drivers/net/ethernet/intel/i40e/i40e_type.h       |  8 +++
->  4 files changed, 89 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h b/driver=
-s/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-> index cc02a85ad42b..ec176e9569ad 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-> @@ -1488,6 +1488,15 @@ enum i40e_aq_link_speed {
->  	I40E_LINK_SPEED_25GB	=3D BIT(I40E_LINK_SPEED_25GB_SHIFT),
->  };
-> =20
-> +enum i40e_prt_mac_pcs_link_speed {
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_UNKNOWN =3D 0,
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_100MB,
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_1GB,
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_10GB,
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_40GB,
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_20GB
-> +};
-> +
->  struct i40e_aqc_module_desc {
->  	u8 oui[3];
->  	u8 reserved1;
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/e=
-thernet/intel/i40e/i40e_ptp.c
-> index 33535418178b..ee6927e2c6f8 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-> @@ -847,6 +847,65 @@ void i40e_ptp_rx_hwtstamp(struct i40e_pf *pf, stru=
-ct sk_buff *skb, u8 index)
->  	i40e_ptp_convert_to_hwtstamp(skb_hwtstamps(skb), ns);
+> ---
+>  drivers/net/virtio_net.c | 92 +++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 82 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index b0b9972fe624..bb8ec4265da5 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -5922,6 +5922,34 @@ static bool validate_ip4_mask(const struct virtnet_ff *ff,
+>  	return true;
 >  }
-> =20
-> +/**
-> + * i40e_ptp_get_link_speed_hw - get the link speed
-> + * @pf: Board private structure
-> + *
-> + * Calculate link speed depending on the link status.
-> + * Return the link speed.
-> + **/
-> +static enum i40e_aq_link_speed i40e_ptp_get_link_speed_hw(struct i40e_=
-pf *pf)
+>  
+> +static bool validate_ip6_mask(const struct virtnet_ff *ff,
+> +			      const struct virtio_net_ff_selector *sel,
+> +			      const struct virtio_net_ff_selector *sel_cap)
 > +{
-> +	bool link_up =3D pf->hw.phy.link_info.link_info & I40E_AQ_LINK_UP;
-> +	enum i40e_aq_link_speed link_speed =3D I40E_LINK_SPEED_UNKNOWN;
-> +	struct i40e_hw *hw =3D &pf->hw;
+> +	bool partial_mask = !!(sel_cap->flags & VIRTIO_NET_FF_MASK_F_PARTIAL_MASK);
+> +	struct ipv6hdr *cap, *mask;
 > +
-> +	if (link_up) {
-> +		struct i40e_link_status *hw_link_info =3D &hw->phy.link_info;
+> +	cap = (struct ipv6hdr *)&sel_cap->mask;
+> +	mask = (struct ipv6hdr *)&sel->mask;
 > +
-> +		i40e_aq_get_link_info(hw, true, NULL, NULL);
-> +		link_speed =3D hw_link_info->link_speed;
-> +	} else {
-> +		enum i40e_prt_mac_link_speed prtmac_linksta;
-> +		u64 prtmac_pcs_linksta;
+> +	if (!ipv6_addr_any(&mask->saddr) &&
+> +	    !check_mask_vs_cap(&mask->saddr, &cap->saddr,
+> +			       sizeof(cap->saddr), partial_mask))
+> +		return false;
 > +
-> +		prtmac_linksta =3D (rd32(hw, I40E_PRTMAC_LINKSTA(0))
-> +			& I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_MASK)
-> +			>> I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT;
-> +		if (prtmac_linksta =3D=3D I40E_PRT_MAC_LINK_SPEED_40GB) {
-> +			link_speed =3D I40E_LINK_SPEED_40GB;
-> +		} else {
-> +			i40e_aq_debug_read_register(hw,
-> +						    I40E_PRTMAC_PCS_LINK_STATUS1(0),
-> +						    &prtmac_pcs_linksta,
-> +						    NULL);
+> +	if (!ipv6_addr_any(&mask->daddr) &&
+> +	    !check_mask_vs_cap(&mask->daddr, &cap->daddr,
+> +			       sizeof(cap->daddr), partial_mask))
+> +		return false;
 > +
-> +			prtmac_pcs_linksta =3D (prtmac_pcs_linksta
-> +			& I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_MASK)
-> +			>> I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT;
+> +	if (mask->nexthdr &&
+> +	    !check_mask_vs_cap(&mask->nexthdr, &cap->nexthdr,
+> +			       sizeof(cap->nexthdr), partial_mask))
+> +		return false;
 > +
-> +			switch (prtmac_pcs_linksta) {
-> +			case I40E_PRT_MAC_PCS_LINK_SPEED_100MB:
-> +				link_speed =3D I40E_LINK_SPEED_100MB;
-> +				break;
-> +			case I40E_PRT_MAC_PCS_LINK_SPEED_1GB:
-> +				link_speed =3D I40E_LINK_SPEED_1GB;
-> +				break;
-> +			case I40E_PRT_MAC_PCS_LINK_SPEED_10GB:
-> +				link_speed =3D I40E_LINK_SPEED_10GB;
-> +				break;
-> +			case I40E_PRT_MAC_PCS_LINK_SPEED_20GB:
-> +				link_speed =3D I40E_LINK_SPEED_20GB;
-> +				break;
-> +			default:
-> +				link_speed =3D I40E_LINK_SPEED_UNKNOWN;
-> +			}
-> +		}
-> +	}
-> +
-> +	return link_speed;
+> +	return true;
 > +}
 > +
->  /**
->   * i40e_ptp_set_increment - Utility function to update clock increment=
- rate
->   * @pf: Board private structure
-> @@ -857,16 +916,14 @@ void i40e_ptp_rx_hwtstamp(struct i40e_pf *pf, str=
-uct sk_buff *skb, u8 index)
->   **/
->  void i40e_ptp_set_increment(struct i40e_pf *pf)
+>  static bool validate_mask(const struct virtnet_ff *ff,
+>  			  const struct virtio_net_ff_selector *sel)
 >  {
-> -	struct i40e_link_status *hw_link_info;
-> +	enum i40e_aq_link_speed link_speed;
->  	struct i40e_hw *hw =3D &pf->hw;
->  	u64 incval;
->  	u32 mult;
-> =20
-> -	hw_link_info =3D &hw->phy.link_info;
-> +	link_speed =3D i40e_ptp_get_link_speed_hw(pf);
-> =20
-> -	i40e_aq_get_link_info(&pf->hw, true, NULL, NULL);
-> -
-> -	switch (hw_link_info->link_speed) {
-> +	switch (link_speed) {
->  	case I40E_LINK_SPEED_10GB:
->  		mult =3D I40E_PTP_10GB_INCVAL_MULT;
->  		break;
-> @@ -909,6 +966,7 @@ void i40e_ptp_set_increment(struct i40e_pf *pf)
->  	/* Update the base adjustement value. */
->  	WRITE_ONCE(pf->ptp_adj_mult, mult);
->  	smp_mb(); /* Force the above update. */
-> +	i40e_ptp_set_1pps_signal_hw(pf);
->  }
-> =20
->  /**
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/=
-net/ethernet/intel/i40e/i40e_register.h
-> index 432afbb64201..c4051dbcc297 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_register.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
-> @@ -530,6 +530,15 @@
->  #define I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_SHIFT 0
->  #define I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_MASK I40E_MASK(0xF=
-FFF, \
->  	I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_SHIFT)
-> +/* _i=3D0...3 */ /* Reset: GLOBR */
-> +#define I40E_PRTMAC_PCS_LINK_STATUS1(_i) (0x0008C200 + ((_i) * 4))
-> +#define I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT 24
-> +#define I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_MASK I40E_MASK(0x7, I4=
-0E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT)
-> +#define I40E_PRTMAC_PCS_LINK_STATUS2 0x0008C220
-> +/* _i=3D0...3 */ /* Reset: GLOBR */
-> +#define I40E_PRTMAC_LINKSTA(_i) (0x001E2420 + ((_i) * 4))
-> +#define I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT 27
-> +#define I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_MASK I40E_MASK(0x7, I40E_PR=
-TMAC_LINKSTA_MAC_LINK_SPEED_SHIFT)
->  #define I40E_GLNVM_FLA 0x000B6108 /* Reset: POR */
->  #define I40E_GLNVM_FLA_LOCKED_SHIFT 6
->  #define I40E_GLNVM_FLA_LOCKED_MASK I40E_MASK(0x1, I40E_GLNVM_FLA_LOCKE=
-D_SHIFT)
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/=
-ethernet/intel/i40e/i40e_type.h
-> index ed8bbdb586da..98c8c5709e5f 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_type.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
-> @@ -115,6 +115,14 @@ enum i40e_queue_type {
->  	I40E_QUEUE_TYPE_UNKNOWN
->  };
-> =20
-> +enum i40e_prt_mac_link_speed {
-> +	I40E_PRT_MAC_LINK_SPEED_100MB =3D 0,
-> +	I40E_PRT_MAC_LINK_SPEED_1GB,
-> +	I40E_PRT_MAC_LINK_SPEED_10GB,
-> +	I40E_PRT_MAC_LINK_SPEED_40GB,
-> +	I40E_PRT_MAC_LINK_SPEED_20GB
-> +};
+> @@ -5936,6 +5964,9 @@ static bool validate_mask(const struct virtnet_ff *ff,
+>  
+>  	case VIRTIO_NET_FF_MASK_TYPE_IPV4:
+>  		return validate_ip4_mask(ff, sel, sel_cap);
 > +
->  struct i40e_link_status {
->  	enum i40e_aq_phy_type phy_type;
->  	enum i40e_aq_link_speed link_speed;
->=20
-> ---
-> base-commit: 8b690556d8fe074b4f9835075050fba3fb180e93
-> change-id: 20251119-i40e_ptp_link_down-47934f9e155d
->=20
-> Best regards,
+> +	case VIRTIO_NET_FF_MASK_TYPE_IPV6:
+> +		return validate_ip6_mask(ff, sel, sel_cap);
+>  	}
+>  
+>  	return false;
+> @@ -5958,11 +5989,33 @@ static void parse_ip4(struct iphdr *mask, struct iphdr *key,
+>  	}
+>  }
+>  
+> +static void parse_ip6(struct ipv6hdr *mask, struct ipv6hdr *key,
+> +		      const struct ethtool_rx_flow_spec *fs)
+> +{
+
+I note logic wise it is different from ipv4, it is looking at the fs.
+
+> +	const struct ethtool_usrip6_spec *l3_mask = &fs->m_u.usr_ip6_spec;
+> +	const struct ethtool_usrip6_spec *l3_val  = &fs->h_u.usr_ip6_spec;
+> +
+> +	if (!ipv6_addr_any((struct in6_addr *)l3_mask->ip6src)) {
+> +		memcpy(&mask->saddr, l3_mask->ip6src, sizeof(mask->saddr));
+> +		memcpy(&key->saddr, l3_val->ip6src, sizeof(key->saddr));
+> +	}
+> +
+> +	if (!ipv6_addr_any((struct in6_addr *)l3_mask->ip6dst)) {
+> +		memcpy(&mask->daddr, l3_mask->ip6dst, sizeof(mask->daddr));
+> +		memcpy(&key->daddr, l3_val->ip6dst, sizeof(key->daddr));
+> +	}
+
+Is this enough?
+For example, what if user tries to set up a filter by l4_proto ?
 
 
---------------q0RyqSVp1H2tmn8wWy9Oq3kv--
+> +}
+> +
+>  static bool has_ipv4(u32 flow_type)
+>  {
+>  	return flow_type == IP_USER_FLOW;
+>  }
+>  
+> +static bool has_ipv6(u32 flow_type)
+> +{
+> +	return flow_type == IPV6_USER_FLOW;
+> +}
+> +
+>  static int setup_classifier(struct virtnet_ff *ff,
+>  			    struct virtnet_classifier **c)
+>  {
+> @@ -6099,6 +6152,7 @@ static bool supported_flow_type(const struct ethtool_rx_flow_spec *fs)
+>  	switch (fs->flow_type) {
+>  	case ETHER_FLOW:
+>  	case IP_USER_FLOW:
+> +	case IPV6_USER_FLOW:
+>  		return true;
+>  	}
+>  
+> @@ -6138,6 +6192,8 @@ static void calculate_flow_sizes(struct ethtool_rx_flow_spec *fs,
+>  		++(*num_hdrs);
+>  		if (has_ipv4(fs->flow_type))
+>  			size += sizeof(struct iphdr);
+> +		else if (has_ipv6(fs->flow_type))
+> +			size += sizeof(struct ipv6hdr);
+>  	}
+>  
+>  	BUG_ON(size > 0xff);
+> @@ -6165,7 +6221,10 @@ static void setup_eth_hdr_key_mask(struct virtio_net_ff_selector *selector,
+>  
+>  	if (num_hdrs > 1) {
+>  		eth_m->h_proto = cpu_to_be16(0xffff);
+> -		eth_k->h_proto = cpu_to_be16(ETH_P_IP);
+> +		if (has_ipv4(fs->flow_type))
+> +			eth_k->h_proto = cpu_to_be16(ETH_P_IP);
+> +		else
+> +			eth_k->h_proto = cpu_to_be16(ETH_P_IPV6);
+>  	} else {
+>  		memcpy(eth_m, &fs->m_u.ether_spec, sizeof(*eth_m));
+>  		memcpy(eth_k, &fs->h_u.ether_spec, sizeof(*eth_k));
+> @@ -6176,20 +6235,33 @@ static int setup_ip_key_mask(struct virtio_net_ff_selector *selector,
+>  			     u8 *key,
+>  			     const struct ethtool_rx_flow_spec *fs)
+>  {
+> +	struct ipv6hdr *v6_m = (struct ipv6hdr *)&selector->mask;
+>  	struct iphdr *v4_m = (struct iphdr *)&selector->mask;
+> +	struct ipv6hdr *v6_k = (struct ipv6hdr *)key;
+>  	struct iphdr *v4_k = (struct iphdr *)key;
+>  
+> -	selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
+> -	selector->length = sizeof(struct iphdr);
+> +	if (has_ipv6(fs->flow_type)) {
+> +		selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV6;
+> +		selector->length = sizeof(struct ipv6hdr);
+>  
+> -	if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
+> -	    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4 ||
+> -	    fs->m_u.usr_ip4_spec.l4_4_bytes ||
+> -	    fs->m_u.usr_ip4_spec.ip_ver ||
+> -	    fs->m_u.usr_ip4_spec.proto)
+> -		return -EINVAL;
+> +		if (fs->h_u.usr_ip6_spec.l4_4_bytes ||
+> +		    fs->m_u.usr_ip6_spec.l4_4_bytes)
+> +			return -EINVAL;
+>  
+> -	parse_ip4(v4_m, v4_k, fs);
+> +		parse_ip6(v6_m, v6_k, fs);
 
---------------5YGCbTs0s0g5oHLB40KXHt4n
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
------BEGIN PGP SIGNATURE-----
+why does ipv6 not check unsupported fields unlike ipv4?
 
-wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaSTUrQUDAAAAAAAKCRBqll0+bw8o6CN2
-AP4yemQ+q9G7CEdQHwS9H7S4C0nMUtUsmZBnY6UiAto9/wEAsyGs/Nr56LQURKQz+/cAgy5tDSvL
-aMCgbkJLYry9DQs=
-=Ax30
------END PGP SIGNATURE-----
+> +	} else {
+> +		selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
+> +		selector->length = sizeof(struct iphdr);
+> +
+> +		if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
+> +		    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4 ||
+> +		    fs->m_u.usr_ip4_spec.l4_4_bytes ||
+> +		    fs->m_u.usr_ip4_spec.ip_ver ||
+> +		    fs->m_u.usr_ip4_spec.proto)
+> +			return -EINVAL;
+> +
+> +		parse_ip4(v4_m, v4_k, fs);
+> +	}
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.50.1
 
---------------5YGCbTs0s0g5oHLB40KXHt4n--
 
