@@ -1,149 +1,210 @@
-Return-Path: <netdev+bounces-241229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B251C819D8
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:38:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D3C0C81A53
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:45:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 280634E6C97
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:38:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F8EF3A4C94
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6042129B217;
-	Mon, 24 Nov 2025 16:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95712BD5A2;
+	Mon, 24 Nov 2025 16:44:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UERqPXaH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FrIiqskb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAB429A9FE
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 16:38:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A612BD013;
+	Mon, 24 Nov 2025 16:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764002304; cv=none; b=q7KRohZY3JxSVBmumTy/4JIfzuTi11PrRpRq11UYn/IY3KTmLfuCjycVGQrkv/MTmVol1/MxN6YqJfLV+1rPeFl3a9in2PwBnaDKDJE601VlnVC7CQbXWb0XFeTFfjcS95GlKA/GmjGWUvNofUsbRK/YC8YaAjzYFIBxGqwtxwY=
+	t=1764002665; cv=none; b=M4/WNnxRIhb6f/DDn64iEKnvI6H+JVBjL4a0Pq4CsSJBrN3AurdB9/c+LOzdBe3iL0SXTJtpgxkM1j3Ex6slNZ1bmyMIqrb9R/CKT+usW9ayeAySeA275JPC3y4XWEWXYAgdygnjmxUeCK+Xp+kCu1KwoFBTpYOZjvA/b8h9yRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764002304; c=relaxed/simple;
-	bh=3rbprMtPD2eY2sunMvqf5QJbAo/YyKZdpHGRmjm/2r0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fRBU/ZG0BVGBM2xL57+lI1wYxOjRr8nFDeoTYt/X51zLF4QpxbcKvpozCri1j+PL6dmE7s5Ts0bEPw31E9ybknhBUfJOTNyyV5ymQcWn5E03fGu/2kwjq2WkT2y38UnZdPQR2gmIyESaaux7CbMAyrYjlxjX837BR3CjJUUYiEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UERqPXaH; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4edb8d6e98aso716581cf.0
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 08:38:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764002301; x=1764607101; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xiUM7KRSU7QlAoTqTS99+whGuPwaEZKawwdmzgZ1kjc=;
-        b=UERqPXaHwFw2xOtZIf4nbis2HsKIxp9a/jjf6AJ2sFSCde8bn7vN8gd8HjrOvYoNy+
-         6VnOrpzZ/CgbRtXxqPAhraEn8WK35c7OGnz53hsdTeQAPiNS1CfCYlFsI51TqYBzRpjC
-         8k/G35A2JmRj+9RuUX6eWHbbnbJ6w7nV7baNoHLW/oJmE62MfLbd10c9FYlwYKgmOACu
-         tEh+KipbtECOg8fnOngyKZrDkehmmQexhdO/oJOdPnY62b1rZcGn58O7BtHEkaAKy672
-         0jpmDqHszAWJQE+rbond5njkJ9nzTs8rw+tlhxZ4RB4QvaDqW7mzXRy7803HXymHXG4r
-         7Vjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764002301; x=1764607101;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xiUM7KRSU7QlAoTqTS99+whGuPwaEZKawwdmzgZ1kjc=;
-        b=TMAZmO7kmDVvASQNMEvrBbwNtDToiZ899z52bUOn3JxKL9UinAc7SCahYr3hnK0rlk
-         6u+tXSfaigSA/vsYWwYKiSdu34k369zgIV+/Kj3uwu0Z0aQF6Sy7rFSu8XP/SWJ7sbtK
-         /X9KDAtwDbYlAw1TJpobANiGtIKoxh655y1aznL6pPJqTP26j+v3JKe7zINOv1Ih0Xq3
-         aRpN3EaFOed9PJ0Ej41wUEWTCkZaro/MIAEb0eUNTLCee01cVQZToTKQa8mitNHyk5ip
-         QvzwE4UwPHFnBix1VA1zu9jB/TfskKM5rtf5fIXfrHFc/oBbPnQdaUTtJIqvnkzq8Kmn
-         secQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWSg9ztqK93VwW4zLq4kjZTDbziPBVuY7IMNpOjrQVwXP4s4ut+FPnTHK41gH8zuNd3Vq89OJ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5kw1V0CxNvDC1NhOxByqKGRsUhwvPjv+EZVi24yFI5kDExWi2
-	Zrmw+QiB7YpWWHHyPdzaXUCIcMLJRvbxqNLGGK9TaN0T1Xyz58oHXC+m7SqKosCGSHqd31VXCO7
-	6SrVRFJZ60CJ929tU86VCH3059bnxVXtUBu1tCuT5
-X-Gm-Gg: ASbGncvnD9F+Yb/AhcD/8nFc9yLHyaJm1nwp2hEsn+2d3GMrSLiR2o8D7IRZzNChLE+
-	H4j6PfpVTO2nTUGveUNmplr813jUarO9CMYZ7eXcogxScbIdl2i57jCMR29/W2Hfek/DVedMwDO
-	xUlDh+uQnhwcDJv1ffxviGDEDq2TvNYTfcPD91kX5LGtyjD5qNtdZ8ulD00AWC+9VoPkcsWYbWg
-	kagaFl4HeKVAFBAbiScU57L3cMRBpN6AArKOu372BJSkkScbPqLHloPwIAlUuaEw70iXxfwkcqy
-	7ZvCtIC0pUyG7jDEKGlU+9NaNt4GAuJ1w4hR1FE6rnvoGpQSCx6Zd00QQZr3
-X-Google-Smtp-Source: AGHT+IHGabRdkq6JBCyIFXsY37bTEL4i538496MbkfOLHxciWDC6S2u+QQ4UU/atzHT3/Gfcu29wScT7XCStNnx4Bfw=
-X-Received: by 2002:a05:622a:15c7:b0:4ed:ff77:1a87 with SMTP id
- d75a77b69052e-4ee6108d8aamr11313521cf.19.1764002300774; Mon, 24 Nov 2025
- 08:38:20 -0800 (PST)
+	s=arc-20240116; t=1764002665; c=relaxed/simple;
+	bh=VfRk0Gq4weG8EQRxjLjNBEfFFt3k0AUt+s0lMf2o0hA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M7uasH/LtOEdk2ArpIc7fY4JlTSr/5c+nZ03B7JY25xCwetYD+N/Me9yt8pqGKrsdnZtHgqyMF2AculjNX7BeFontSPKPfMrLdr15S4KGW1cHM6ReegmQCU4t77z4kOTiBp40EwnU5/mlc5507J0q+cNsSrciF0cwzEhnlggkYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FrIiqskb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63399C116D0;
+	Mon, 24 Nov 2025 16:44:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764002665;
+	bh=VfRk0Gq4weG8EQRxjLjNBEfFFt3k0AUt+s0lMf2o0hA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FrIiqskbY03moY5cHsHXsAToElIwprLNpiQ+z5nnrLJE96R9GHunJqoIsoQs07332
+	 2Mf6HSqvULegeDOA+GfnKVg/H65Bta/Sd6pABJlIBGcvSx+MEtA+M0w+nVYmI41pgO
+	 6pHV+8hGozm+dXR+cJE9rw53Kwo28wITOvR6gUbqLuhvBbbwwtyqrWWa7LoNUBYICy
+	 7zvZg6jx6vUwAlarHdmDpIoJgdi/4L5afPCrkAXlweWn9h68zoAPky60RxTvQJv7kp
+	 gvAdDjFX0G2FqSifT1ia/XqIxztDl4cODrG2vkUIAM1nIK1v2BP2rOOYhyL0SAcfsk
+	 ZhLy38utKKbBw==
+Date: Mon, 24 Nov 2025 16:44:21 +0000
+From: Simon Horman <horms@kernel.org>
+To: Siva Reddy Kallam <siva.kallam@broadcom.com>
+Cc: leonro@nvidia.com, jgg@nvidia.com, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, vikas.gupta@broadcom.com,
+	selvin.xavier@broadcom.com, anand.subramanian@broadcom.com,
+	usman.ansari@broadcom.com
+Subject: Re: [PATCH v3 5/8] RDMA/bng_re: Add infrastructure for enabling
+ Firmware channel
+Message-ID: <aSSLZZM4vgG_SZcm@horms.kernel.org>
+References: <20251117171136.128193-1-siva.kallam@broadcom.com>
+ <20251117171136.128193-6-siva.kallam@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251124071831.4cbbf412@kernel.org> <willemdebruijn.kernel.1fe4306a89d08@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.1fe4306a89d08@gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Mon, 24 Nov 2025 11:38:03 -0500
-X-Gm-Features: AWmQ_bmToGaiwX6D0ZhRW-Hnr6JZouoxJYqMprYnSFkzEEsZAEBJvERzeg-rbaU
-Message-ID: <CADVnQym7Whnbc9xf_dew-ey1fGFBY1dSf6RJ=9qLNP=u+NYOEw@mail.gmail.com>
-Subject: Re: [TEST] tcp_zerocopy_maxfrags.pkt fails
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251117171136.128193-6-siva.kallam@broadcom.com>
 
-On Mon, Nov 24, 2025 at 11:33=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jakub Kicinski wrote:
-> > Hi Willem!
-> >
-> > I migrated netdev CI to our own infra now, and the slightly faster,
-> > Fedora-based system is failing tcp_zerocopy_maxfrags.pkt:
-> >
-> > # tcp_zerocopy_maxfrags.pkt:56: error handling packet: incorrect outbou=
-nd data payload
-> > # script packet:  1.000237 P. 36:37(1) ack 1
-> > # actual packet:  1.000235 P. 36:37(1) ack 1 win 1050
-> > # not ok 1 ipv4
-> > # tcp_zerocopy_maxfrags.pkt:56: error handling packet: incorrect outbou=
-nd data payload
-> > # script packet:  1.000209 P. 36:37(1) ack 1
-> > # actual packet:  1.000208 P. 36:37(1) ack 1 win 1050
-> > # not ok 2 ipv6
-> > # # Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
-> >
-> > https://netdev-ctrl.bots.linux.dev/logs/vmksft/packetdrill/results/3999=
-42/13-tcp-zerocopy-maxfrags-pkt/stdout
-> >
-> > This happens on both debug and non-debug kernel (tho on the former
-> > the failure is masked due to MACHINE_SLOW).
->
-> That's an odd error.
->
-> The test send an msg_iov of 18 1 byte fragments. And verifies that
-> only 17 fit in one packet, followed by a single 1 byte packet. The
-> test does not explicitly initialize payload, but trusts packetdrill
-> to handle that. Relevant snippet below.
->
-> Packetdrill complains about payload contents. That error is only
-> generated by the below check in run_packet.c. Pretty straightforward.
->
-> Packetdrill agrees that the packet is one byte long. The win argument
-> is optional on outgoing packets, not relevant to the failure.
->
-> So somehow the data in that frag got overwritten in the short window
-> between when it was injected into the kernel and when it was observed?
-> Seems so unlikely.
->
-> Sorry, I'm a bit at a loss at least initially as to the cause.
+On Mon, Nov 17, 2025 at 05:11:23PM +0000, Siva Reddy Kallam wrote:
 
-I agree this is odd. It looks like either a very concerning kernel
-bug, or very concerning packetdrill bug. :-)
+...
 
-Could someone please run the test with tcpump in the background to
-capture the full packet contents, to verify that indeed the packet has
-the wrong contents?
+> diff --git a/drivers/infiniband/hw/bng_re/bng_dev.c b/drivers/infiniband/hw/bng_re/bng_dev.c
 
-This would help make sure that this is a kernel bug and not a
-packetdrill bug. :-)
+...
 
-thanks,
-neal
+> @@ -105,6 +105,69 @@ static void bng_re_fill_fw_msg(struct bnge_fw_msg *fw_msg, void *msg,
+>  	fw_msg->timeout = timeout;
+>  }
+>  
+> +static int bng_re_net_ring_free(struct bng_re_dev *rdev,
+> +				u16 fw_ring_id, int type)
+> +{
+> +	struct bnge_auxr_dev *aux_dev = rdev->aux_dev;
+
+Hi Siva,
+
+rdev is dereferenced unconditionally here...
+
+> +	struct hwrm_ring_free_input req = {};
+> +	struct hwrm_ring_free_output resp;
+> +	struct bnge_fw_msg fw_msg = {};
+> +	int rc = -EINVAL;
+> +
+> +	if (!rdev)
+> +		return rc;
+
+... but it is assumed that rdev may be NULL here.
+
+This does not seem consistent.
+
+IMHO a good approach would be to drop this check, and the one below,
+and only call bng_re_net_ring_free() in contexts where  rdev
+and aux_dev are not NULL.
+
+But I didn't look carefully to see if that idea matches the rest
+of the code.
+
+Flagged by Smatch.
+
+> +
+> +	if (!aux_dev)
+> +		return rc;
+> +
+> +	bng_re_init_hwrm_hdr((void *)&req, HWRM_RING_FREE);
+> +	req.ring_type = type;
+> +	req.ring_id = cpu_to_le16(fw_ring_id);
+> +	bng_re_fill_fw_msg(&fw_msg, (void *)&req, sizeof(req), (void *)&resp,
+> +			    sizeof(resp), BNGE_DFLT_HWRM_CMD_TIMEOUT);
+> +	rc = bnge_send_msg(aux_dev, &fw_msg);
+> +	if (rc)
+> +		ibdev_err(&rdev->ibdev, "Failed to free HW ring:%d :%#x",
+> +			  req.ring_id, rc);
+> +	return rc;
+> +}
+
+...
+
+> diff --git a/drivers/infiniband/hw/bng_re/bng_fw.c b/drivers/infiniband/hw/bng_re/bng_fw.c
+
+...
+
+> +static int bng_re_process_qp_event(struct bng_re_rcfw *rcfw,
+> +				   struct creq_qp_event *qp_event,
+> +				   u32 *num_wait)
+> +{
+> +	struct bng_re_hwq *hwq = &rcfw->cmdq.hwq;
+> +	struct bng_re_crsqe *crsqe;
+> +	u32 req_size;
+> +	u16 cookie;
+> +	bool is_waiter_alive;
+> +	struct pci_dev *pdev;
+> +	u32 wait_cmds = 0;
+> +	int rc = 0;
+
+rc is always 0, so it may be slightly nicer to remove this variable and
+simply return 0.
+
+Flagged by Coccinelle.
+
+> +
+> +	pdev = rcfw->pdev;
+> +	switch (qp_event->event) {
+> +	case CREQ_QP_EVENT_EVENT_QP_ERROR_NOTIFICATION:
+> +		dev_err(&pdev->dev, "Received QP error notification\n");
+> +		break;
+> +	default:
+> +		/*
+> +		 * Command Response
+> +		 * cmdq->lock needs to be acquired to synchronie
+> +		 * the command send and completion reaping. This function
+> +		 * is always called with creq->lock held. Using
+> +		 * the nested variant of spin_lock.
+> +		 *
+> +		 */
+> +
+> +		spin_lock_nested(&hwq->lock, SINGLE_DEPTH_NESTING);
+> +		cookie = le16_to_cpu(qp_event->cookie);
+> +		cookie &= BNG_FW_MAX_COOKIE_VALUE;
+> +		crsqe = &rcfw->crsqe_tbl[cookie];
+> +
+> +		if (WARN_ONCE(test_bit(FIRMWARE_STALL_DETECTED,
+> +				       &rcfw->cmdq.flags),
+> +		    "Unreponsive rcfw channel detected.!!")) {
+> +			dev_info(&pdev->dev,
+> +				 "rcfw timedout: cookie = %#x, free_slots = %d",
+> +				 cookie, crsqe->free_slots);
+> +			spin_unlock(&hwq->lock);
+> +			return rc;
+> +		}
+> +
+> +		if (crsqe->is_waiter_alive) {
+> +			if (crsqe->resp) {
+> +				memcpy(crsqe->resp, qp_event, sizeof(*qp_event));
+> +				/* Insert write memory barrier to ensure that
+> +				 * response data is copied before clearing the
+> +				 * flags
+> +				 */
+> +				smp_wmb();
+> +			}
+> +		}
+> +
+> +		wait_cmds++;
+> +
+> +		req_size = crsqe->req_size;
+> +		is_waiter_alive = crsqe->is_waiter_alive;
+> +
+> +		crsqe->req_size = 0;
+> +		if (!is_waiter_alive)
+> +			crsqe->resp = NULL;
+> +
+> +		crsqe->is_in_used = false;
+> +
+> +		hwq->cons += req_size;
+> +
+> +		spin_unlock(&hwq->lock);
+> +	}
+> +	*num_wait += wait_cmds;
+> +	return rc;
+> +}
+
+...
 
