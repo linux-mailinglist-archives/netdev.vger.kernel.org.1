@@ -1,151 +1,149 @@
-Return-Path: <netdev+bounces-241086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5010CC7EC66
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 02:50:18 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DACBC7ECE8
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 03:14:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 28A574E11C4
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 01:50:17 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CDEEE343AA0
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 02:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B0C13D521;
-	Mon, 24 Nov 2025 01:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="r0MJ2/KD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46FBE276028;
+	Mon, 24 Nov 2025 02:14:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8918635;
-	Mon, 24 Nov 2025 01:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83677274B30
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 02:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763949013; cv=none; b=jlB3ALi/t26vEjo81pGjF0dnmaHdsiAVwtjHF2o5+Vb3XyY4jjLLHKXv3Dx757pyrMTFhEYmhFhaJn/oa3n/tO+gKodu0aaoa/EvkSMtHYx6ziktNyrIK8+cNuY1lUKbDveFTsvzWYeLRj0mGsclkpgQJh5FcYDseFMVUmTfMSo=
+	t=1763950477; cv=none; b=YIDmHG9wARc5oK+RymYp7krD2hw7oJNkW339wydywkPGdMahbiSJmpc3JMkUUQ6ZXmO6LoPx5s/D2jxxuTtc1ytUSw9GAIc4AT9YY+1Mi5cZn+S7FDVacL612rY4y8RV3orV4zxoPPgIyHk6AAN0d7M1J7U5N50T+ZjoVP8NCgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763949013; c=relaxed/simple;
-	bh=EexIyOjZ4MDB9GPBPW6h8zFermI8XFMArfsCCAQ1yaY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=rVDFmKNSViaLVTVh0PjE/2ZXQTG7SAIw+oE9DI3b8peM+I2XIb0SYcLKwjO6NopEkiM3h4ku5L94WVkt6FLrycnpQRbMV2XzpUh7uAPa8lRlq78f/D6wIpaeqBb/kUkiSjWET0+jrmJaZ6bGUHt82/ER6l/JTEPJKC8HVpBYPS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=r0MJ2/KD; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1763949008;
-	bh=xrwgy+29SeeNQ0b0x/eBH5VPFsDbXGbDnQtmmgMA0e0=;
-	h=Date:From:To:Cc:Subject:From;
-	b=r0MJ2/KDbKwy97gvArb82HWWDhufKq4eLFc1aXcbSXCXgoIradGnrV1sXXX/kQ56S
-	 QsCoHZNJ5bi+CPDAesHjtPGz5WZ+1t9Q4CG4pB00g3924rOZP5noM98MPcsPQ8XbiM
-	 jDN3rfy1Zlbhb8eJ2s+ql5mfcOfkBanEyCVgoZEfVPjaQfB8GB4Bus41bv6M19zUQc
-	 8t+0vyBPqEFZFY+kYLe4a4HSdWVsFpdUFsChwcsB3WixDxiDKz+K7H/YL/hkiRdsqH
-	 RTjATHbwlfW0U6fvTCvK+Zz8ShvlAEo74v6PpHFuQWFoEUXYDbmK72KOcPScakKi8T
-	 bS0GS+zaBMtdA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dF80J0xy1z4wCm;
-	Mon, 24 Nov 2025 12:50:06 +1100 (AEDT)
-Date: Mon, 24 Nov 2025 12:50:06 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
-Cc: Networking <netdev@vger.kernel.org>, Bala-Vignesh-Reddy
- <reddybalavignesh9979@gmail.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the
- mm-nonmm-unstable tree
-Message-ID: <20251124125006.3953f1d5@canb.auug.org.au>
+	s=arc-20240116; t=1763950477; c=relaxed/simple;
+	bh=SQJppYga/QDWWMbMQov2Py1BjOB+UQCF5MXkF4ESzZk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=adSlrzcTNOKL59pOt8rn2gyTDPobak7c8s+P9LvFpHWGRt+NP/ahl/LpMHll6mfRBNE7/5MFtsU5LCtKrZjDs7DYMnsKRaY0stlMa+bG5LdAgktFMlbqjW7ZdgoaIVyidoqffg2nTfUAs+8jGDVWzcAyEMmz8gDBl4Ntyd9lcJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-948faee04b5so288440039f.2
+        for <netdev@vger.kernel.org>; Sun, 23 Nov 2025 18:14:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763950474; x=1764555274;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lwbYDO1W7tpbfeon2Bg26pMTQhJlnIRU/gIWio2icr4=;
+        b=DrhqjkAJH5UN5sVTGCx+mA3l4UMvUWFV0P6JbrOCwsHZFynxHMx6h31scc3J7AFkxb
+         1y//rekT6E1JrOOI+yFrZmBIh5D8dZzxp29X28KR4A5EJDJCxJkdBJBYDYBwAwhWvxMz
+         9FKQHw5KTbxZWPLYrARlINUhcrLqcv9MTt1YtICtX1HJWefW8Py75QubzXn2KMAZOyWG
+         9VMx3wV5PZ/Pj2tbJH6G5RQZF3L9P9k9XCRTqGng1SxH93ohieBuuj+s6ZeGGTlpu9PK
+         c99mFMnrLMNwt9L6HfBYUYS8WOAJO4wTfaAt66YFsVP28OGxPUwiUQ/W81KYUn2ehTmt
+         /VOw==
+X-Forwarded-Encrypted: i=1; AJvYcCWyG60NoghB88pubeKKx/Gec09KKbDGUY+wsV3keHrK/aLSsDMvldXUoKwy8VVWzaojVbpXS9w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5Tvo5e0vVznM45F+fURYIVyNb8MK4VPm2eq8TUc88bJca6ExX
+	l6yAgp8o3QnEKFinyk80Uw7s3RLFj6/yFc6OlPe9S2MQPc1kNMZyiGLDLOMqOhZBqqfKqljKtcX
+	vQHF+hDfKDyM2c596L2BrHqX1YemjA8XfKuvK5uv1blkED3iVVDsghqXlMPE=
+X-Google-Smtp-Source: AGHT+IFzn3F9oQe8kIm1DeVSy18UA901kRBkit3KpghLFHxVKsmOc1LpuGCPoO2SB3iUKR2+42KYO96YAX0AnXxBrZokbArLVrTC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/y87jSbv5hknfprRYnzUxBoH";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Received: by 2002:a92:ca0f:0:b0:434:6f6a:fba4 with SMTP id
+ e9e14a558f8ab-435b8c18b77mr89672315ab.5.1763950474682; Sun, 23 Nov 2025
+ 18:14:34 -0800 (PST)
+Date: Sun, 23 Nov 2025 18:14:34 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6923bf8a.a70a0220.2ea503.0076.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_ocb_rx_no_sta (2)
+From: syzbot <syzbot+b364457b2d1d4e4a3054@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
---Sig_/y87jSbv5hknfprRYnzUxBoH
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-Hi all,
+syzbot found the following issue on:
 
-Today's linux-next merge of the net-next tree got conflicts in:
+HEAD commit:    23cb64fb7625 Merge tag 'soc-fixes-6.18-3' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=179e0514580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a1db0fea040c2a9f
+dashboard link: https://syzkaller.appspot.com/bug?extid=b364457b2d1d4e4a3054
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11de1742580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12ad1e0a580000
 
-  tools/testing/selftests/drivers/net/gro.c
-  tools/testing/selftests/drivers/net/hw/toeplitz.c
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-23cb64fb.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f456267fe311/vmlinux-23cb64fb.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/cbc9bf9bce21/bzImage-23cb64fb.xz
 
-between commit:
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b364457b2d1d4e4a3054@syzkaller.appspotmail.com
 
-  7edd42093cb0 ("selftests: complete kselftest include centralization")
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 15 at net/mac80211/ocb.c:63 ieee80211_ocb_rx_no_sta+0x511/0x5d0 net/mac80211/ocb.c:63
+Modules linked in:
+CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:ieee80211_ocb_rx_no_sta+0x511/0x5d0 net/mac80211/ocb.c:63
+Code: 48 0a 00 00 48 c7 c7 40 88 8a 8c 48 89 de 4c 89 fa 48 83 c4 18 5b 41 5c 41 5d 41 5e 41 5f 5d e9 85 25 4c f6 e8 00 a7 e4 f6 90 <0f> 0b 90 48 83 c4 18 5b 41 5c 41 5d 41 5e 41 5f 5d e9 b9 00 00 00
+RSP: 0018:ffffc9000041f470 EFLAGS: 00010246
+RAX: ffffffff8adb6c60 RBX: ffff8880596e0d80 RCX: ffff88801ab1c900
+RDX: 0000000000000100 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: 0000000000000001 R08: 0000000000000000 R09: ffffffff8adb6809
+R10: 000000000000000c R11: 0000000000000100 R12: ffffffff8adb6809
+R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88804464b40a
+FS:  0000000000000000(0000) GS:ffff88808d730000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000561f9cf3b950 CR3: 000000004130f000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ ieee80211_accept_frame net/mac80211/rx.c:4432 [inline]
+ ieee80211_prepare_and_rx_handle+0x2555/0x6770 net/mac80211/rx.c:4994
+ __ieee80211_rx_handle_packet net/mac80211/rx.c:5304 [inline]
+ ieee80211_rx_list+0x2294/0x2c10 net/mac80211/rx.c:5451
+ ieee80211_rx_napi+0x1a8/0x3d0 net/mac80211/rx.c:5474
+ ieee80211_rx include/net/mac80211.h:5214 [inline]
+ ieee80211_handle_queued_frames+0xe8/0x1f0 net/mac80211/main.c:453
+ tasklet_action_common+0x36c/0x580 kernel/softirq.c:925
+ handle_softirqs+0x286/0x870 kernel/softirq.c:622
+ run_ksoftirqd+0x9b/0x100 kernel/softirq.c:1063
+ smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
-from the mm-nonmm-unstable tree and commits:
 
-  89268f7dbca1 ("selftests: net: relocate gro and toeplitz tests to drivers=
-/net")
-  fdb0267d565a ("selftests: drv-net: add a Python version of the GRO test")
-  9cf9aa77a1f6 ("selftests: drv-net: hw: convert the Toeplitz test to Pytho=
-n")
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-from the net-next tree.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
---=20
-Cheers,
-Stephen Rothwell
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
-diff --cc tools/testing/selftests/drivers/net/gro.c
-index 76aa75469a8c,995b492f5bcb..000000000000
---- a/tools/testing/selftests/drivers/net/gro.c
-+++ b/tools/testing/selftests/drivers/net/gro.c
-@@@ -57,7 -57,8 +57,8 @@@
-  #include <string.h>
-  #include <unistd.h>
- =20
- -#include "../../kselftest.h"
- +#include "kselftest.h"
-+ #include "../../net/lib/ksft.h"
- =20
-  #define DPORT 8000
-  #define SPORT 1500
-diff --cc tools/testing/selftests/drivers/net/hw/toeplitz.c
-index 4b58152d5a49,afc5f910b006..000000000000
---- a/tools/testing/selftests/drivers/net/hw/toeplitz.c
-+++ b/tools/testing/selftests/drivers/net/hw/toeplitz.c
-@@@ -52,7 -52,8 +52,8 @@@
-  #include <sys/types.h>
-  #include <unistd.h>
- =20
- -#include "../../../kselftest.h"
- +#include "kselftest.h"
-+ #include "../../../net/lib/ksft.h"
- =20
-  #define TOEPLITZ_KEY_MIN_LEN	40
-  #define TOEPLITZ_KEY_MAX_LEN	60
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
---Sig_/y87jSbv5hknfprRYnzUxBoH
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmkjuc4ACgkQAVBC80lX
-0Gz/rgf+I73HhbpYIqv6sHjqcRRdMOveEW/yAa/G3+BB0ZRrP71dtgKKbVJiOJZN
-CCJn+0SkU1Q40bw2C/9TZN6/h3JyIge+zLiqrkt4Yid6/7QS5fe8YxImwBZPKoFZ
-gx0iQHfc7uzPyDu/U1frttQRVIV/wzMMvatgTl5bj0O0FdtF0ypAQZAjcq3sbvIw
-qddo7OcH0D+rSztkNwoTTCiHWLF2KHG48wcTTrduwkpFDEzOsdVBOAmQAelyhtJH
-TtwQjAr1WDhjO5ZLb3Bw5BAQIYXlK8H8b5GcdUZnBDEvuIGPOfk2lEG7GOwz60OX
-l8l2KcgP/t6FXb9Jc12AqydbXr4oig==
-=j0qQ
------END PGP SIGNATURE-----
-
---Sig_/y87jSbv5hknfprRYnzUxBoH--
+If you want to undo deduplication, reply with:
+#syz undup
 
