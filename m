@@ -1,260 +1,206 @@
-Return-Path: <netdev+bounces-241272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15303C82186
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:26:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FB2FC821F4
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:37:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 819454E7B42
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:26:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4311A3A899B
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082E4319600;
-	Mon, 24 Nov 2025 18:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6D831987E;
+	Mon, 24 Nov 2025 18:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aYs2SJEg"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="eDAijSx3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012067.outbound.protection.outlook.com [52.101.43.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C25285073
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 18:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764008760; cv=none; b=GJvKkOVdUrlybvyg8ob6a5GQQ4WfFOZwqb1t9DRAYeFSOKbbw/Kgl/1P/hn5soiamjuW+Edyopx7VKXu+jFw8UKKz4EHNphD0NJ9sKYOHhquL2xtS31jrgzZo3dMN6jQgL6yvYkznx29gb7wNnCLNQNKIwapZYY3q4jEGUV6C6Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764008760; c=relaxed/simple;
-	bh=6AZSCjx0be8QNYc1b9ABiliBH6YVQDDfi0R5FIkWxp8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SG3TRu5qJBhyrENZMkdGcx7h/7haaYNfbRK3ssSocdtydwUzPuG9nL0+Wn9m8WbtvrfxYBfyT1yw2cO4CQpFs8Ur+oaepuPXaRveYHJhKCGNaeAqus0MB3AZBmKVtGQuZE19j5M1wojwaO+uw4C5yTnLjFSv7KdoOkMY5hX3eFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aYs2SJEg; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7895017c722so43377627b3.2
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 10:25:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764008758; x=1764613558; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=TEB0IVYhYkoeWOmDLi9JAiu4Bvgo6alBDSG0PHHn3mY=;
-        b=aYs2SJEgbdLftah9Q6DJVJMu6BeScc9QWlcEvA6WBeSJbZt72ixRMCvqjg49a4U6HS
-         po3S4QhcWgXgsItovmDpnS4GN+d8mVirwSlG8YGNP0vaFVWkyxdzsd2fTFjxj/6PwO2x
-         PgNvChWqHkDfKQJShotCcbqiWH9aVU/fKVjIYxVGGkEy9GhWqxJgcxt+hKxir0Cj+6fV
-         tNmCFMofRG1t1gexRmZtrp1xBZT/uHTzxRphTvnZpTzBa8fqtKaNbuBI+nx+yW5ywjVi
-         hk/TEX7d50YeaiRxicbV8xT4sh4zK/bvsPEf/ZUCJKF/AAKx4glQmOPC8JVvsGihApKw
-         Ei2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764008758; x=1764613558;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TEB0IVYhYkoeWOmDLi9JAiu4Bvgo6alBDSG0PHHn3mY=;
-        b=nHxCAXgkK7IPJkieRzyurqTddiKxct3BEa/tIg07D2DFewMWtQpvzv7zZ3ifrihI5Y
-         IG9o0Wh7Uc9V8ql0HPFwAqPRe4QJoTVxqqnJkppeczpRFlGgjHvZm+OJ2zRww5nLqn+d
-         Jdq6s8TeEAUMu3rGh7ezH5dgODL9/zVRxTYwDMOLOsTMscaegIBJIqV1SR11TMTMJqEA
-         sHkJr2Anz8gdEODA9uxEg33vJjA27oD/+9ZXgile1OWdu9mN5dvY+3HB+pWWJ10JEAxo
-         x112orX7bJZMKYmGQ15DWMfCZf92bw8VllODjVXfTn33SvQ+QyVhIxSnLfH4mS+T/rTQ
-         wLhA==
-X-Forwarded-Encrypted: i=1; AJvYcCWNawKeV7PocHmAHgeBQ8P7J39IXPW3+2EvFZJl2JKoKI5VIZeX6SY7VNC14vCcHMrVei1M/Sg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8JKSTpBdpxqhLeaE9wf1yLhZJIzavuPxb49lJjrkAxK35SgW3
-	UPicrJv+asyRv6odiC3A59x5D2XnrPvotvj3EGLF2TCEUJq4uiyUwaBN
-X-Gm-Gg: ASbGnctz/kdDl1BRTUJttQ5Wpq2l0SBCamtjwp5+oShgfzgTvx14mJzjHdM/ABcFYt2
-	msk00FcxshGRhW+Tyj0k+T4mN12CJNUDaEI7nvu9Ha+opqEXMRrJT0LVGcUBSlM1MgpMsESsB1r
-	A01gSw80sXSfcKYl+rO7WCfnYO435URd7/uE94i1T8MXQFZevoNvhdzi7zw8Oy7VRgljNMUqjjp
-	ygDzoswUTj4g7B1JEUm3gLbBMm2wkDUbMweKJ6ZLFmbwWgMDjVwSeUq6bXniaYzHu3gkm5kpHLw
-	6jCKp5av9hnwnborGrLLFskoXyQpMvubwBbLn3R8i8BUvtlQwdaRa7Mbnp2KekjSy+lMCL2gmxJ
-	txFyqCePJLI5RQteTzS24SdDd09+qj5Vts2Ivue7l9dP9VXiY6NrOjJ8DpJQEuprVmBzqx8BlZv
-	LAB1HW7fhfBtrt/XNzhJKpgyZGbn/lgDWxgLiiANmzFngrJw==
-X-Google-Smtp-Source: AGHT+IE0ZjSbPsIZXUiMdmSARGNpUZsggdBivDiPOdxixaSe4XdXku94FoT+/xG3xq+0F2N/k+75ZA==
-X-Received: by 2002:a05:690c:6c0a:b0:787:eca1:50cf with SMTP id 00721157ae682-78a8b55dafemr91578177b3.50.1764008757922;
-        Mon, 24 Nov 2025 10:25:57 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:4::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78a798a8106sm46963977b3.19.2025.11.24.10.25.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 10:25:57 -0800 (PST)
-Date: Mon, 24 Nov 2025 10:25:56 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, berrange@redhat.com,
-	Sargun Dhillon <sargun@sargun.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v11 03/13] vsock: reject bad
- VSOCK_NET_MODE_LOCAL configuration for G2H
-Message-ID: <aSSjNLrRmaOLkuBN@devvm11784.nha0.facebook.com>
-References: <20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com>
- <20251120-vsock-vmtest-v11-3-55cbc80249a7@meta.com>
- <swa5xpovczqucynffqgfotyx34lziccwpqomnm5a7iwmeyixfv@uehtzbdj53b4>
- <aSC3IX81A3UhtD3N@devvm11784.nha0.facebook.com>
- <g4xir3lupnjybh7fqig6xonp32ubotdf3emmrozdm52tpaxvxn@2t4ueynb7hqr>
- <aSSV4RlRcW+uGy+n@devvm11784.nha0.facebook.com>
- <qvu2mgxs7scbuwcb2ui7eh3qe3l7mlcjq6e2favd4aqcs52r2r@oqbrlp4gxdwl>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7952BDC05;
+	Mon, 24 Nov 2025 18:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764009467; cv=fail; b=rciU1XPHgGE4t5FzhU/rK+e5+8mYNHwpV8hRLlCxkG3HGfO1keSkz9wOdfHWi9GPN85dL+sZEamF7BNoLHIfxnqM4wBAhv9/ex0Rv998V6cDCTruFmqcPNNhnSRMSxUojN/PcHfnH+md2MoGjAyB00YMyO/Je8gaeM/SFzXHDSU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764009467; c=relaxed/simple;
+	bh=ULcoLqxBQLzm3bReQkA7+yl+Sxs/dCB/f1BD0ttYZqg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=fqf0ZvdkN1p+niAmV9M8Mq5yPNkgD0s597K8vvBeI2XVMT9NgQq0BJnSNEiTEPR6q1JmelaPjJR6VgcNN9A3caAJK5r/x0MZbkGJS4yHjv0dgsdJjb9lQKxpZP7QyPQwEotNzzfI0sxcC29NoOtUK4/vLOU6xnOtL3L4j7jAStc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=eDAijSx3; arc=fail smtp.client-ip=52.101.43.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gSF4EMdN7eeHxplFj5J6Hv2EpjhPP2xvH2ZyQEmnX3hjOVtG+HsOFguNIHE1+0nwafbNtFFriw1sB+izq2rC3LlIyCUrFS4pAye4hWfN0GSo9vakrT2l83FqEgcVoj2XlbDGCQR2I5eN0ybJZpFmB5x51rAXBQyL+bnASYowxcVpEAZLUcH8FC+x2yNAkkASLCfxcHgXiR5jAWrNYlWDHpCYoQmmDexdJgVACe3qVmSiekO4y0f2RTfFzwOeOm3zNRqTwwJJ/Y5lmhBDcDUmIlI8gQzKwW8r+R9CKwu9q86NdwCW6R26tQ4obh1qbhTgeRfdLcbDLxRwRxgKyDUupQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=osqKJO4ab4vJOxwrML3aBBBqcksUxgzqmkVnJuPaKP8=;
+ b=rbXDwuOjo1fHOzcieoa/GvISPzz+9R6DeQgLiAVu4J4PE5gV4cdoPCKBjIre52K3j0O7She1wFJiJFKg8g2+T0k7/F0kXum6DrVB8r5e48qxJKZnMfLy3XzVM7TOZ9rw9JV/IAhm4zLI5HiwcrgF7+uxiQO8n3FcJ/6o6Ekx49Skfj8DA8tbIlDOOfKjtTuOMUw0sCv0lG90MP/l5Vv6+pyzyAxlmnKBTw1j5S60ok+EaHW7hq6jArzz00mYZGNgYqmcQt3KPS03yND0HHPeoCEjZQKzL00aoRhU+W47qwAA1geJMVFLtgvMOhRLNckqAIk/4tino9grK1Eqo6cUVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=osqKJO4ab4vJOxwrML3aBBBqcksUxgzqmkVnJuPaKP8=;
+ b=eDAijSx3BKKHqVYXAosGg5bztAz1IMxC1ltssLSlXjx0PvZoHbRs018YRPhC+GB0MxSPlC/MN7n8g+TUZ+nvZf3MYXiI8z+TVzdpql4AkeGVG5H3R5DyBsIKC/i72Ae7/dQQZgYiwYir6LX39tfT/cKgF3jvydUsZA7imZboTt+Uj5g4PNzYCo3d7PNXO7zfsj45XE7U27xWTrZrrMw2OAspA1+JtC1Oh85mfGc2p8lYdyvMHu1LmqsQ/NyVCoVPso0AqYlVs0/38d0u3MMAvybasNJFBvSVJBkG5zrXHxpHeTJauCutzUikLb+lDx61sJ9D1pv52dGj5gG6gbqtVw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
+ by DM4PR12MB5963.namprd12.prod.outlook.com (2603:10b6:8:6a::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9343.17; Mon, 24 Nov 2025 18:37:43 +0000
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2%4]) with mapi id 15.20.9343.016; Mon, 24 Nov 2025
+ 18:37:43 +0000
+Message-ID: <cbb5488b-4923-4032-a037-7ff851772a64@nvidia.com>
+Date: Mon, 24 Nov 2025 20:37:37 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5e: Fix validation logic in rate limiting
+To: Danielle Costantino <dcostantino@meta.com>, netdev@vger.kernel.org
+Cc: kuba@kernel.org, tariqt@nvidia.com, pabeni@redhat.com, saeedm@nvidia.com,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251124180043.2314428-1-dcostantino@meta.com>
+From: Gal Pressman <gal@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <20251124180043.2314428-1-dcostantino@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TLZP290CA0010.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:9::9)
+ To CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <qvu2mgxs7scbuwcb2ui7eh3qe3l7mlcjq6e2favd4aqcs52r2r@oqbrlp4gxdwl>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|DM4PR12MB5963:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7e9913a3-e23b-41f6-2479-08de2b888de6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aUxoQ09lSm41Zm1PM3BMVjJ2dUp3NkxYMG5zQXNKYmJsOXZ4dzVqbnJtRlBY?=
+ =?utf-8?B?TFc1WVRVaDY4aXh6bERsYVc4OFJZcDFaWm5JZVVUbVJMeUlCc25RRTFBNjBl?=
+ =?utf-8?B?VER6QnBaS3hXRU0zWW5IWkxZUFgwS0tvOXBJS3BmRzllUnI3MTI1ZkkxeFdP?=
+ =?utf-8?B?bTF0SG1nUHhMUW4xOThzZTIwcFMzYmRSRlVwRi9BV0ZUVzMzWVBxTGluWlpC?=
+ =?utf-8?B?SlpzY2lXdm1xZ3RxV2tMOXFYTnJhSjVEbkRjOS9GdiswVDJZV0FrM0FoWUhC?=
+ =?utf-8?B?cWQzZVcvNzMyN0VxVXNhc0NYTnJNay84SVd5b0tSTEpSdEhXY2xPNE5DaVQ1?=
+ =?utf-8?B?UFYwR1ZobE5ScFQyNFFjcElpRlFzTysrZlJjTEZVMVpMb09nMFpqZVZKd1ZT?=
+ =?utf-8?B?dTc4WEx0bWdSOTArQjBxcnFUQUJWOFlCWktKejlhN1FhZzJrZ1RKdmFMRVdn?=
+ =?utf-8?B?M0ZoMDJSTHpJaG5vS0pWQ292S3BJS0lKSmw5ZjNEanBodnNtMVVSaTkzK2VC?=
+ =?utf-8?B?bDc2VTFRS2tsWEJHODh1d083a1FRa2JheDE3dlFMVWcvT2JzcXd6ZmxvR0Rk?=
+ =?utf-8?B?elJvV0dzN1dUcDZWeExCZ3lsL3BiU0FPTWVBK0hxMW5VaitJVThGWXlSMjVS?=
+ =?utf-8?B?eVNDT0JmRndYc2FFWDBIdjJ6OUwzSG1RdVVma05KbWlIUnRwM2p6Wkptb2dZ?=
+ =?utf-8?B?Vnk3bWJZdVNNd3h3RXlpRFlvR0kzMk4vREtuT2h5VUV3VmhNZk5HYU9jNFJ0?=
+ =?utf-8?B?dW5JK3BwK2k3MWVFcUJTbVdjbVlGS3Uwd01GMWwzOVREWkxHdVBBcmY3encv?=
+ =?utf-8?B?azlVOVpCM09EclhUYzVLRkFzYVJoZkF6bzc3ZEQrQm0wTXJSY3JBN0Q3cERj?=
+ =?utf-8?B?RHNvYmt3OGpQcnZlRGZvWGEzQjVmS09qK1J4b0NrdzNIbWdWN204VjM0NXBq?=
+ =?utf-8?B?ZUlEN3NUNytKd29ENmtxMll3azdjbm56bWVFY0V1VnN0Z0FxQWNQQTQweXhG?=
+ =?utf-8?B?SkxIeDQ0VE54RHg0azZ6eG5oN3B6cENFN1JyS2hpdkphakZqTTNCL24wazFQ?=
+ =?utf-8?B?NG1Xc2Vpc3dSR3lXZWUvUnFjMUpvNS9oYzNJQ2R4dW1wTWNwQjg3MzZoSXR6?=
+ =?utf-8?B?ZG5hWTMweHBBWHd0WWJyS0N4QTlCRjZleGFmOThqcHo1eG9YdmRlYTJjNlMx?=
+ =?utf-8?B?TUkyQUJPeENidXNVTkovRjYzTStTZTgrL2d4MXdzVHBRSGtIeVpXN2JrMEl3?=
+ =?utf-8?B?bm9hVk12R3VST1Q1bURwdFhIbU45RUdxd0dkRklhcDI1NWtEenVOOXpUbExO?=
+ =?utf-8?B?L2JoZ2xGWnFiSDJ5bWlBYnVnOUpoM2xwcjY5am9TWHFITm9vdkY1YzVTWUJI?=
+ =?utf-8?B?VTl0d2U0SDVtYzFoaFZhOGswaW4venVxekE0UGZmQ2E4TlFkSjdjWS9sMkNq?=
+ =?utf-8?B?SjdrSWdDamJiRW40MmZGYVlEdTRHbUFZTjEzVms1SFBmekczU3ZpL3hDOEFC?=
+ =?utf-8?B?dUdaTnpsS08yKy9RMkszZ1FYdkJ0aThQTWRmTm9zRlRlTC9lS0lZQXl4UXFI?=
+ =?utf-8?B?aTgzRkVjZTMvaEVQaW9qa0RiZ3JFSzVsUzVlZTJPZ09TNjlJYkJHeGdCdTVQ?=
+ =?utf-8?B?YUhHZ1ZPSnQxU0psOTczL3ZSbjlvVGVjb3RyRWpoM1pIMGdqR2xoRTZXY0dz?=
+ =?utf-8?B?cGJXYU1VL1l1TW5xNEJyTCtHMnBKVzI5d0xmZ09WdEdqcit5dkxXSU41QXVW?=
+ =?utf-8?B?a2h4NnhIQXY4NGJIQXpERmRQdHRPb2Nvc0JHTENINk1qOTcyZjRzV2N6TmJz?=
+ =?utf-8?B?anovZW13bXJRNWVITnJiM2NQZlBXMTV2bEpKTDFTc3doOThDME9saXNEbW4v?=
+ =?utf-8?B?VUk4YTFPQjhlSzljWGwxVXh4bHFRM2dYMXhVLy9KV2h3VytCTllDcUU2bDVQ?=
+ =?utf-8?Q?H8GUM+84g8usCWXvawXlyV+oZF6FNTgH?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TWdGazVja1pwVFg5KzhDd3l2VEhRSW9vWStGaS9sa1dDV1VCTXI1dkYvK1RL?=
+ =?utf-8?B?b2ExWnNrc2pmUHVWZGtDQzVHVGYySWc4clNwM016S0RXWDF5bnFaeXZ6am1F?=
+ =?utf-8?B?SUxxY1V3eTBFTWtLZVVvb29ZQ2FBYksxYytsNkdVNk5LRWptV2hlUVNDb1ZY?=
+ =?utf-8?B?T0h6SVRhY2NaVkVCalNjNWZTeEhRakNUSW1MMlZqaWFjcTRvcTRZME5xazlB?=
+ =?utf-8?B?NTE5YkczbGwvdVYwT1U4WnZZNlVFU1NRbHExY0ZrYW5tcnNxQy93cjlGQ3h1?=
+ =?utf-8?B?d2xLUzQxNHY0QjR2RC9pMExhVSs3YzRzZnlOV0x0NGZBZGNQWUQ3STZ5aEJt?=
+ =?utf-8?B?RWlnVjBvQmVXUVB0ZHRKa0xFb09vRUNWNGRNV09ZaVVzRTNCbWxrWGtqbHhk?=
+ =?utf-8?B?cVlHcEp4cHZ1ZUJ6QktiL2dUTWtxREJHRjdXVDRqYUIwbzJJdTQzSHJIRlRl?=
+ =?utf-8?B?VDdPTTFnS3BvOStYMFBCR0Z3UDFTQnRFeGdWdmtlNVVGU0ZodEp1dUpmWlYw?=
+ =?utf-8?B?QTRJY1lGNjAxVjEzY0FGRGpObTBoQU1MNk9IQTd5NGUxTGdNZlV6ZEFoUmlt?=
+ =?utf-8?B?RzAyaWpHWU54d2MvY2hrWWtsRS9sVGFMRUhvcUFpcThZcXdqVmtyKzZ2TmFs?=
+ =?utf-8?B?TWtlM1RUb0JxQmJmNjRmTDA3Mi9kRVJWVW1tVnpNVGxQQlRWVk16T280M2NX?=
+ =?utf-8?B?SGloSWE3YjNKVVBqQlFERW9DUkdvK0tqY1lHYmhiQVh3N05uVk4zdms1bGZS?=
+ =?utf-8?B?MzIxMG5UM3BlS2RKZXJLRHNWM0xSZElJY2dHc3B3ZmVmSExCRnZxcGp0SW10?=
+ =?utf-8?B?aEN0TkxGamJtTEpUelViQ051SnA1dW5xRnJuRVZPSWxBT1VLWU1SZExoMkxB?=
+ =?utf-8?B?aHAyNWxZWGNOUGg3c2p2QW5NSFFSbXQ3blo4MGpZZFh5bUljemhOZ2g5SG54?=
+ =?utf-8?B?WTJDckI4SlgvTndNcjlOUVBIYWtacDZweFVUSk5DSkhKbU1vT25YUktlZ25s?=
+ =?utf-8?B?azdnWjB1aTVXbHdxLzNLRkovVVgrOGhjMkl0WUcwaDZnQnNuM0U1aTFCbExt?=
+ =?utf-8?B?TFY0RldHb0o0SEthMzk2cWxOaFFKd2NCSHlvY0cvRU5QU0NGazMydS8zcmlz?=
+ =?utf-8?B?UTgraWlxdjkzN1pSaHIvb3Yyai9rNlI5WUxDRVQxMFhsTUhMOURJNHFyd0Z1?=
+ =?utf-8?B?am1xRWhvaXFzTXhQNm8xdTk3NjZFMHUxTHV4OVBXNnFnV3dLYlJaUWErbHI2?=
+ =?utf-8?B?Wmk0MUxkQjR1NnRvbWxKT1NUbzM0M3p6dFpld1FaeUxrM09aUGJTOThKdG5w?=
+ =?utf-8?B?NDZwSjdqVW1Ub2wzTFJHSWJJbUh1Vkk5eXNaL255cjIwb0p3eHF6OUZhQVhi?=
+ =?utf-8?B?Q1h3MVBibmtlVXhTb2lqTU5QWVlUYnZXaXdtNU1tOUhubFQzT0dXMGtSci9R?=
+ =?utf-8?B?eGhZUm1qNFZMMm9SdWxZUktDSmFVbHJvWTROZlNkdExBK3ZnNENpaUEyeEJT?=
+ =?utf-8?B?YWVUVkRMQVJvbEJvRElFaEJ2STBkcTl5L2MxREozV3lVRWpySnRtZWVzZGFO?=
+ =?utf-8?B?Z2NoaVpPTVZJMWNvZE1oTFlKSFRkY2tsMW5yUC9XY0NkVVhaWjM1S25iUDlh?=
+ =?utf-8?B?Sk1LbFFXRHc3RGFEK1ZzMFJoZjZzcldYa0FHOWRKMHJHdTUvMnVrdG5VMDE4?=
+ =?utf-8?B?Y0x3Q2RITThMOW5aQUQ1ZVRYNUJtcFRXa0lIRjFIeG1Sa1puQm8xeGwzZ0Rs?=
+ =?utf-8?B?aE81MVQ1dGxReFNhbVNCazRPQldZY0dPQVc3enc4cllodmVoYk9iZktFaFZk?=
+ =?utf-8?B?YVVmOS9lZlJmS1BtdEQyL3p1K3JJb05SbEx2TDlKMFZ2UWF2Z1BCb2NONEIv?=
+ =?utf-8?B?N0R6ZE5DNHpMS09hb3RacDZrZk1Pejc2RE1scjc5ZVBjQ3doMWgxN2xhd3p1?=
+ =?utf-8?B?WDVIaktvWTBjNTk4ZUIvRW9YYWdCNzkraFNSWVZ6NUNFM2RzT2g2UzNraWVO?=
+ =?utf-8?B?U3ZhWHBLTTNjem1SVm12cVRGdGRLeW5Sbm5sSkhBWmpBSXFGVnFCTEtHZlFP?=
+ =?utf-8?B?Ukkyc2EvL29XWGdTTkU4ejFmdklXclVqK2NwRUY5N3FIWmRRamVteXpqTGlT?=
+ =?utf-8?Q?wY9I=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e9913a3-e23b-41f6-2479-08de2b888de6
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2025 18:37:43.2461
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3xU7iqNp3L0qbq9qlsbWAoHHvUl2lrrQGZ7xuFaqMsP+iPOnd7HUHqd6wtrh4GoF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5963
 
-On Mon, Nov 24, 2025 at 06:54:45PM +0100, Stefano Garzarella wrote:
-> On Mon, Nov 24, 2025 at 09:29:05AM -0800, Bobby Eshleman wrote:
-> > On Mon, Nov 24, 2025 at 11:10:19AM +0100, Stefano Garzarella wrote:
-> > > On Fri, Nov 21, 2025 at 11:01:53AM -0800, Bobby Eshleman wrote:
-> > > > On Fri, Nov 21, 2025 at 03:24:25PM +0100, Stefano Garzarella wrote:
-> > > > > On Thu, Nov 20, 2025 at 09:44:35PM -0800, Bobby Eshleman wrote:
+On 24/11/2025 20:00, Danielle Costantino wrote:
+> The rate limiting validation condition currently checks the output
+> variable max_bw_value[i] instead of the input value
+> maxrate->tc_maxrate[i]. This causes the validation to compare an
+> uninitialized or stale value rather than the actual requested rate.
 > 
-> [...]
+> The condition should check the input rate to properly validate against
+> the upper limit:
 > 
-> > > >
-> > > > > Since I guess we need another version of this patch, can you check the
-> > > > > commit description to see if it reflects what we are doing now
-> > > > > (e.g vhost is not enabled)?
-> > > > >
-> > > > > Also I don't understand why for vhost we will enable it later, but for
-> > > > > virtio_transport and vsock_loopback we are enabling it now, also if this
-> > > > > patch is before the support on that transports. I'm a bit confused.
-> > > > >
-> > > > > If something is unclear, let's discuss it before sending a new version.
-> > > > >
-> > > > >
-> > > > > What I had in mind was, add this patch and explain why we need this new
-> > > > > callback (like you did), but enable the support in the patches that
-> > > > > really enable it for any transport. But maybe what is not clear to me is
-> > > > > that we need this only for G2H. But now I'm confused about the discussion
-> > > > > around vmci H2G. We decided to discard also that one, but here we are not
-> > > > > checking that?
-> > > > > I mean here we are calling supports_local_mode() only on G2H IIUC.
-> > > >
-> > > > Ah right, VMCI broke my original mental model of only needing this check
-> > > > for G2H (originally I didn't realize VMCI was H2G too).
-> > > >
-> > > > I think now, we actually need to do this check for all of the transports
-> > > > no? Including h2g, g2h, local, and dgram?
-> > > >
-> > > > Additionally, the commit description needs to be updated to reflect that.
-> > > 
-> > > Let's take a step back, though, because I tried to understand the problem
-> > > better and I'm confused.
-> > > 
-> > > For example, in vmci (G2H side), when a packet arrives, we always use
-> > > vsock_find_connected_socket(), which only searches in GLOBAL. So connections
-> > > originating from the host can only reach global sockets in the guest. In
-> > > this direction (host -> guest), we should be fine, right?
-> > > 
-> > > Now let's consider the other direction, from guest to host, so the
-> > > connection should be generated via vsock_connect().
-> > > Here I see that we are not doing anything with regard to the source
-> > > namespace. At this point, my question is whether we should modify
-> > > vsock_assign_transport() or transport->stream_allow() to do this for each
-> > > stream, and not prevent loading a G2H module a priori.
-> > > 
-> > > For example, stream_allow() could check that the socket namespace is
-> > > supported by the assigned transport. E.g., vmci can check that if the
-> > > namespace mode is not GLOBAL, then it returns false. (Same thing in
-> > > virtio-vsock, I mean the G2H driver).
-> > > 
-> > > This should solve the guest -> host direction, but at this point I wonder if
-> > > I'm missing something.
-> > 
-> > For the G2H connect case that is true, but the situation gets a little
-> > fuzzier on the G2H RX side w/ VMADDR_CID_ANY listeners.
-> > 
-> > Let's say we have a nested system w/ both virtio-vsock and vhost-vsock.
-> > We have a listener in namespace local on VMADDR_CID_ANY. So far, no
-> > transport is assigned, so we can't call t->stream_allow() yet.
-> > virtio-vsock only knows of global mode, so its lookup will fail (unless
+>     } else if (maxrate->tc_maxrate[i] <= upper_limit_gbps) {
 > 
-> What is the problem of failing in this case?
-> I mean, we are documenting that G2H will not be able to reach socket in
-> namespaces with "local" mode. Old (and default) behaviour is still allowing
-> them, right?
+> This aligns with the pattern used in the first branch, which correctly
+> checks maxrate->tc_maxrate[i] against upper_limit_mbps.
 > 
-> I don't think it conflicts with the definition of “local” either, because
-> these connections are coming from outside, and the user doesn't expect to be
-> able to receive them in a “local” namespace, unless there is a way to put
-> the device in the namespace (as with net). But this method doesn't exist
-> yet, and by documenting it sufficiently, we can say that it will be
-> supported in the future, but not for now.
+> The current implementation can lead to unreliable validation behavior:
 > 
-> > we hack in some special case to virtio_transport_recv_pkt() to scan
-> > local namespaces). vhost-vsock will work as expected. Letting local mode
-> > sockets be silently unreachable by virtio-vsock seems potentially
-> > confusing for users. If the system were not nested, we can pre-resolve
-> > VMADDR_CID_ANY in bind() and handle things upfront as well. Rejecting
-> > local mode outright is just a broad guardrail.
+> - For rates between 25.5 Gbps and 255 Gbps, if max_bw_value[i] is 0
+>   from initialization, the GBPS path may be taken regardless of whether
+>   the actual rate is within bounds
 > 
-> Okay, but in that case, we are not supporting “local” mode too, but we are
-> also preventing “global” from being used on these when we are in a nested
-> environment. What is the advantage of this approach?
+> - When processing multiple TCs (i > 0), max_bw_value[i] contains the
+>   value computed for the previous TC, affecting the validation logic
 > 
-> > 
-> > If we're trying to find a less heavy-handed option, we might be able to
-> > do the following:
-> > 
-> > - change bind(cid) w/ cid != VMADDR_CID_ANY to directly assign the
-> > transport
-> >  for all socket types (not just SOCK_DGRAM)
+> - The overflow check for rates exceeding 255 Gbps may not trigger
+>   consistently depending on previous array values
 > 
-> That would be nice, but it wouldn't solve the problem with VMADDR_CID_ANY,
-> which I guess is the use case in 99% of cases.
+> This patch ensures the validation correctly examines the requested rate
+> value for proper bounds checking.
 > 
-> > 
-> > - vsock_assign_transport() can outright fail if !t->supports_local_mode()
-> >  and sock_net(sk) has mode local
-> 
-> But in this case, why not reusing stream_allow() ?
-> 
-> > 
-> > - bind(VMADDR_CID_ANY) can maybe print (once) to dmesg a warning that
-> >  only the H2G transport will land on VMADDR_CID_ANY sockets.
-> 
-> mmm, I'm not sure about that, we should ask net maintainer, but IMO
-> documenting that in af_vsock.c and man pages should be fine, till G2H will
-> support that.
-> 
-> > 
-> > I'm certainly open to other suggestions.
-> 
-> IMO we should avoid the failure when loading G2H, which is more confusing
-> than just discard connection from the host to a "local" namespace. We should
-> try at least to support the "global" namespace.
-> 
-> Thanks,
-> Stefano
+> Fixes: 43b27d1bd88a ("net/mlx5e: Fix wraparound in rate limiting for values above 255 Gbps")
+> Signed-off-by: Danielle Costantino <dcostantino@meta.com>
 
-
-I'm 100% fine with that approach. I just wanted to make sure we landed
-in the right place for how users may encounter places that there is no
-local mode support.
-
-So for next steps, we can drop this patch and add explicit logic in
-->stream_allow() to allow local mode for vhost/loopback and reject for
-others? Plus, add documentation about what happens for VMADDR_CID_ANY
-(will only receive vhost/loopback traffic in local mode)?
-
-Best,
-Bobby
+Thanks Danielle!
+Reviewed-by: Gal Pressman <gal@nvidia.com>
 
