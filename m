@@ -1,142 +1,175 @@
-Return-Path: <netdev+bounces-241156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E63FCC80A1F
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 14:01:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BC36C80A43
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 14:03:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D28084E223B
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 13:01:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 985533A6DF5
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 13:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54962FD1B6;
-	Mon, 24 Nov 2025 13:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A1B302CC3;
+	Mon, 24 Nov 2025 13:02:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="fin26cxW";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="pIa8HBWS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bTT6Rd5u";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="M/3U7RqK"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B8026FD97
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 13:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F290D2FC88B
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 13:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763989298; cv=none; b=sE/NCRbDtH6QAtvOo0fICT42BXDKGlsscSXEBHO4EOvXhlEjJzzKzuofcJeZATDJM3i7BfE9HUPLhocWo/i6zGF9UXy0yVnEA6gfZV/lUjcXYz0VnDXcRrGxS+jPgmG6t1AC5n7OFtWF9BuCFH/ypAFez7oh+Nh3dM6FLJJn8vU=
+	t=1763989364; cv=none; b=IjmD8VpsM1OneUnZ5c7b1049xJ2uNATvdPlNk30EkpNlgdOto0P9CO+P7GEBMEB0dvyAFMGd2N2s6kUKDDD1NMATGFShTJscSTM3Y8uteObgO8eZPuD5M3Gaii/evKZ86WRe7xFov98qUSh4XdWh62+KCvoeY39AmGuNKlP6jc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763989298; c=relaxed/simple;
-	bh=jsu7s+T2hdTTkKBqqMPLD/M7523mqaUhylW8ZPWXwSQ=;
+	s=arc-20240116; t=1763989364; c=relaxed/simple;
+	bh=/PVux6/qhCM5j7QxIjZ3C4HJECU8mM2bPzRAiDoZo58=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r1qf/MhG39kkEB0bulECfz9h51GZroxyIiKv9oPDDjyqmszBR1CaYoHSHct/x4yKRgFLJdYVumCguZhpzSNqP8z7Myewm/2163plXgtZhde7KWuiSi8aXChWjEE4Jww/7tkJrJGNKqX4L5LNlZSTTDe6dv1EOjDfeD4SAklyGzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=fin26cxW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=pIa8HBWS; arc=none smtp.client-ip=202.12.124.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 5465D7A00E2;
-	Mon, 24 Nov 2025 08:01:34 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Mon, 24 Nov 2025 08:01:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1763989294; x=
-	1764075694; bh=sZ2wW7m63ycOgq95DSiJKdYFGA6MDBaQH243p9HHFw0=; b=f
-	in26cxWrezenuGiEcaXG9hDBPZKis4tQsaXr/F2By/wXd08A41vAhD9WxolAt6EL
-	wRfxws99ro3VtbPIwW1/3Vrj2EB0a4rCS6LQLgUNvpIIsn2Gedmco45Oo8FJOmmR
-	rQaNlzv0+Ab4FTSlF2D4MVCHgxGgVWMFhQMGDaPNTl9GnRkyUsAWhtUZxUnRqYAK
-	3qY1XYsHGqGzySrTTvDV/gBkn8p7voCLevWwePGSvJRzbvS3EdQ00hCLBLMcng9P
-	0l7kQJ4dJyani696GQF80lq6PIUSr92/nMy0RkANQDQYH5Ge2grdN9yK4rLYIrOX
-	szvtKmufK6emOL3K92pNQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1763989294; x=1764075694; bh=sZ2wW7m63ycOgq95DSiJKdYFGA6MDBaQH24
-	3p9HHFw0=; b=pIa8HBWSxHe7jX2xTGumNCiPouZcXttCMLybtRZUt5UgY7iO4z9
-	GuvbUAAa1Cbr8VxlFmsRgyqkQ1QxUdeVupUfGZuGdzo6iDOc2aZCeXS7lElNGDIY
-	LMPWUKHxoKv/p6V3+wXSrdNq2m27AyUC0RNdb9sXx2sNsEckxKkqhJqh1/YM2aWc
-	nbPqVUVQ4o0Gwpgh+J/2H7YY/fsx5kAkzPDZL4ZtjsW//Zi22pS/nODguVPPIXzW
-	hQr4qlDpElOJfcN6OYmg5cL8GT4KMxVk6zW3yoSts29lIfWzdiPLuszMHnh+77V3
-	8wme1as8Kdbp6Bdr7i21iJ/UzL7xeZKz7sw==
-X-ME-Sender: <xms:LFckaf1qhOHbcIiuA8FMDRRvnIIWO2RbPPV3MjOBFf0Qiqs01O5qBg>
-    <xme:LFckaZ-uofscD1cSXcSWBwgVAI7pgEry_MRl0c3rz0p7Vo6_zENMIyROZKxJ3NAB3
-    NJPDxiNVDK-1bsUayR6MOQJfRidFGVurHZ_lIGG1at9eK-O8ZDWuIoJ>
-X-ME-Received: <xmr:LFckac5OGROds4sVEYPLLlCY75Fh2M6yTPupmfgWhGVq-1etPtwS2vqCH37g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvfeekieejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduuddpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepjhhirghnsgholhesnhhvihguihgrrdgtoh
-    hmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsrg
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhht
-    sehsvggtuhhnvghtrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrd
-    grphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpth
-    htohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-ME-Proxy: <xmx:LFckaZsMreWNVZYC6IrPJvWsHE8ZeQd_no0qfvAYoNlyt8y5tCocMA>
-    <xmx:LFckaW3ZNhXngv7M-kR1pg_acyvjNBHjpI7ZsvKn0uvYZtRT5bfk4A>
-    <xmx:LFckaaq-3HiT_gI9ya48qP6wYaqenPMKDJSgSS4R9ZWuhONTjHLTrg>
-    <xmx:LFckaeKAjEBR8-piM21FyPYL4FRNTT75ZkJGYfVVandcb1tkGff2gQ>
-    <xmx:LlckaRjE-RoqNeCorUSVJBU5xjcZwrUD-HY_k7P2mLfzXrzU9S2h1HB5>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 24 Nov 2025 08:01:32 -0500 (EST)
-Date: Mon, 24 Nov 2025 14:01:30 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jianbo Liu <jianbol@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	steffen.klassert@secunet.com,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH ipsec v2] xfrm: Fix inner mode lookup in tunnel mode GSO
- segmentation
-Message-ID: <aSRXKqA3M_pE9wfq@krikkit>
-References: <20251120035856.12337-1-jianbol@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AR44gaDkPQILB+I3hM03WMmgE7Qjc0w5SJtw4taYVAIEOHmj2G0XMLQQNNJOLa1eZAZ3NivqTMTTP9lZ3iVM4a3wcCZKTpi8cBFeY+2gVr+Vcc79RNMf9lmOb2eok59hhshLtsP1gCybopV78T8XgwZRgiRd7y7UIEuLK5AN9JA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bTT6Rd5u; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=M/3U7RqK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763989361;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S6hJnZw3kn5s0TB1aRyIXGCws54UxhojaW//4vyMORM=;
+	b=bTT6Rd5udepofJVsC+L7PBT8sq55uOovQ3BWHbvelnH3XJKnUi8wKLHrP3BzAqb3kWHTH7
+	SL9CAVrJyv3cvYt6qehKKXInRGRcl8DG+pvFB2xNYN4r0efRIws9v6WfQwJ+ooECJ+riK5
+	g4ORvHliOtCoyaRFZOtiXDCKRFW3aYA=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-422-CTf55FyVPBaU3lUVnMt60w-1; Mon, 24 Nov 2025 08:02:39 -0500
+X-MC-Unique: CTf55FyVPBaU3lUVnMt60w-1
+X-Mimecast-MFC-AGG-ID: CTf55FyVPBaU3lUVnMt60w_1763989358
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6450f3e7e71so3800070a12.3
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 05:02:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763989358; x=1764594158; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S6hJnZw3kn5s0TB1aRyIXGCws54UxhojaW//4vyMORM=;
+        b=M/3U7RqKwoX/HQ6+7Z+Hm4PIr+G5jC0MLb61qrWXNCW+jJ8QW4rLemQ5VX4SooPW/N
+         9QpiAyFMEE+gOwQF9rxJa0/d8CiCuvq/8QUYzhy+XMhoNXNDr9O4OlfIvknFF+b2PqW4
+         F/HlCxuyjj6F9Geis6aAICSo6bFY8YSDn1lxNUwin+86ntEaZPE7HWHpnSh6PCXuSpS+
+         s7WobXG29eFEcW92QiHagmY/jIev8ATdzvFjqvoAUrjBOeF+KyIxqN2YeKD9BwpKP/rf
+         9kTWVN/XWqSicoJPnF/MK9EUhVcnOd7F6HZ7+dQ17jyzu0rr/sGNYMDoFliIJcJqOJ2H
+         eDfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763989358; x=1764594158;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S6hJnZw3kn5s0TB1aRyIXGCws54UxhojaW//4vyMORM=;
+        b=vhhpGJLlFo/xdM0tzxEsFxRnL1FRQP2I4RtKXv2ccjWcdU3riXvRuqVYDU2aN4LBWJ
+         7qExPeBnNrnw4WJ4UwVsynmSj9+FI3SjnluVTyWsbII9LTchqJD1RlXWHzBxAHeVEzub
+         Bk7tDBCnp9ThzOjqWnP+OfX3XA5xiVtxgRfeIRgvIxzaPAcmnRtFZIZybDAuWcLEOw0Z
+         4DorWssFiifE5XZtxvM9rW1vd7IVJSgIHRmWA1gkzQldKf2q1m61tglw0l+O0CY6c/3i
+         /MFOanfoXknQK1ucLWCTbEN8AtTFm7xHf7KgvDbzlS1FU4IEe4+c3vCELyFx2EmwPs3I
+         PtNA==
+X-Forwarded-Encrypted: i=1; AJvYcCVeGLygzc8LruRsYPVl15xgkLGTFLfUQVpiI6pH8GLykcnlObOP6OzAaXndGDoxIinNAgZYxzI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz/G8GHL+1KYWO/7PsvFTclR3J7zWqS8Sb1D017yLtfvjvtVzj
+	LnaN1uQcYpOr3/7M9zykXAgJLxznqeI/p2tp34bdbux4uxoK2mT/mC6k93HSMxuArBSPuVIoip5
+	XGKolnEnexixQoyEi0yXRbCzbZ57nYJ3VW04rXTZpGru3ekM00XCZA5SiyA==
+X-Gm-Gg: ASbGncs5c3hhj+azi0PsoAUv1kQeeMrBgaZgHkSJ2f2nkUfLQXAw1cerf4eEi3g4A40
+	0212OT8OlJLmVn5kketjeh3khAp5EK3f5JnJS/NWkzKMy9Yht5qvHU1e+pw/tPvCVADiA8aAokL
+	FR8BJi67DQCXSuzzVgYkU4Rnv9YaK31GPa04ahDL3U3ynvqrlKhgzlbNtaF4MAYWHWHkH+J8LnM
+	8RU8lNu4sT85YoDxxGY5XJTZV0fNedxGufnOgEZXmH5XN7Io1qj5UX2TmHc6tgQ9vv5ykB4Xbsa
+	e+6yM6ZxIusDrItWbc+AlOgltU3GEof+y1+AO74jNRzCPGw0FTkix6slGKL6uGNBdhVBfwZUMPW
+	ZSTl+poZDVDP3HosUQMq31MI9l3555lWVS+JMTcWZLw5gJVhppnORQH7NBdr4ag==
+X-Received: by 2002:a17:907:d93:b0:b73:806c:bab2 with SMTP id a640c23a62f3a-b76716d9e43mr1032885966b.33.1763989358002;
+        Mon, 24 Nov 2025 05:02:38 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH6ykVWPpSwinXanlRQWJeJ0XHFosSyO4ErfL2/mdTAE1Kjbm2jyYgIoPoi+6fsdx/pUINlNw==
+X-Received: by 2002:a17:907:d93:b0:b73:806c:bab2 with SMTP id a640c23a62f3a-b76716d9e43mr1032879766b.33.1763989357321;
+        Mon, 24 Nov 2025 05:02:37 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b76a6bcfad2sm303348166b.68.2025.11.24.05.02.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Nov 2025 05:02:36 -0800 (PST)
+Date: Mon, 24 Nov 2025 14:02:29 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, berrange@redhat.com, 
+	Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v11 05/13] vsock: add netns support to virtio
+ transports
+Message-ID: <fa5j32kwvwitddkhbuenwqygtue3j2i4kquzl4lsnlp42y244z@zijsgsjjvido>
+References: <20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com>
+ <20251120-vsock-vmtest-v11-5-55cbc80249a7@meta.com>
+ <v6dpp4j4pjnrsa5amw7uubbqtpnxb4odpjhyjksr4mqes2qbzg@3bsjx5ofbwl4>
+ <aSC3lwPvj0G6L8Sh@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20251120035856.12337-1-jianbol@nvidia.com>
+In-Reply-To: <aSC3lwPvj0G6L8Sh@devvm11784.nha0.facebook.com>
 
-2025-11-20, 05:56:09 +0200, Jianbo Liu wrote:
-> Commit 61fafbee6cfe ("xfrm: Determine inner GSO type from packet inner
-> protocol") attempted to fix GSO segmentation by reading the inner
-> protocol from XFRM_MODE_SKB_CB(skb)->protocol. This was incorrect
-> because the field holds the inner L4 protocol (TCP/UDP) instead of the
-> required tunnel protocol. Also, the memory location (shared by
-> XFRM_SKB_CB(skb) which could be overwritten by xfrm_replay_overflow())
-> is prone to corruption. This combination caused the kernel to select
-> the wrong inner mode and get the wrong address family.
-> 
-> The correct value is in xfrm_offload(skb)->proto, which is set from
-> the outer tunnel header's protocol field by esp[4|6]_gso_encap(). It
-> is initialized by xfrm[4|6]_tunnel_encap_add() to either IPPROTO_IPIP
-> or IPPROTO_IPV6, using xfrm_af2proto() and correctly reflects the
-> inner packet's address family.
-> 
-> Fixes: 61fafbee6cfe ("xfrm: Determine inner GSO type from packet inner protocol")
-> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-> ---
-> V2:
->  - Update commit message.
+On Fri, Nov 21, 2025 at 11:03:51AM -0800, Bobby Eshleman wrote:
+>On Fri, Nov 21, 2025 at 03:39:25PM +0100, Stefano Garzarella wrote:
+>> On Thu, Nov 20, 2025 at 09:44:37PM -0800, Bobby Eshleman wrote:
+>> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+>> >
+>> > Add netns support to loopback and vhost. Keep netns disabled for
+>> > virtio-vsock, but add necessary changes to comply with common API
+>> > updates.
+>> >
+>> > This is the patch in the series when vhost-vsock namespaces actually
+>> > come online.  Hence, vhost_transport_supports_local_mode() is switched
+>> > to return true.
+>> >
+>> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>> > ---
+>> > Changes in v11:
+>> > - reorder with the skb ownership patch for loopback (Stefano)
+>> > - toggle vhost_transport_supports_local_mode() to true
+>> >
+>> > Changes in v10:
+>> > - Splitting patches complicates the series with meaningless placeholder
+>> >  values that eventually get replaced anyway, so to avoid that this
+>> >  patch combines into one. Links to previous patches here:
+>> >  - Link: https://lore.kernel.org/all/20251111-vsock-vmtest-v9-3-852787a37bed@meta.com/
+>> >  - Link: https://lore.kernel.org/all/20251111-vsock-vmtest-v9-6-852787a37bed@meta.com/
+>> >  - Link: https://lore.kernel.org/all/20251111-vsock-vmtest-v9-7-852787a37bed@meta.com/
+>> > - remove placeholder values (Stefano)
+>> > - update comment describe net/net_mode for
+>> >  virtio_transport_reset_no_sock()
+>> > ---
+>> > drivers/vhost/vsock.c                   | 47 ++++++++++++++++++------
+>> > include/linux/virtio_vsock.h            |  8 +++--
+>> > net/vmw_vsock/virtio_transport.c        | 10 ++++--
+>> > net/vmw_vsock/virtio_transport_common.c | 63 ++++++++++++++++++++++++---------
+>> > net/vmw_vsock/vsock_loopback.c          |  8 +++--
+>> > 5 files changed, 103 insertions(+), 33 deletions(-)
+>>
+>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>
+>If we move the supports_local_mode() changes into this patch (for virtio
+>and loopback, as I bring up in other discussion), should I drop this
+>trailer or carry it forward?
 
-Thanks Jianbo.
+I'll take a second look in any case, so maybe better to remove it if the 
+patch will change.
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Thanks for asking!
+Stefano
 
--- 
-Sabrina
 
