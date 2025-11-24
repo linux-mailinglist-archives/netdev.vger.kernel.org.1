@@ -1,78 +1,79 @@
-Return-Path: <netdev+bounces-241292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB56C82618
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 21:09:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 437B3C82615
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 21:09:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E86E634A4D6
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 20:09:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBF4B3AD2F0
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 20:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A3D32E153;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0635F32E156;
 	Mon, 24 Nov 2025 20:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Y+HB3zHo"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="nEvl05tB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2670F32E12B
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 20:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430D632E12F
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 20:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764014929; cv=none; b=NM/F0WYdrwWLDeLxtV2kBuu2ILRFCetXNawaHqvSvD31SmUkQu6ZV+gs54tZFkKQd0ANzcVuyerg8VCOiCOcvqpd6YiZQ5HbOmGM/2K6sK+ZUwAl9Up929FIf4wrHlAuKtBg3j8JERykNC3a7LaD4BeLkt7DKxvxJEnPaAPdbos=
+	t=1764014929; cv=none; b=f8mRgC49iW3q7xPXB75B63uDnuTs0Bju0JZO+e/g3u8ckVV1bltbSn/8RRBAI+VGezDRSmf+Pjel9BX79sj8yBx6vnOea8PxH9pf5xQBCkf99QQiSUmqDCNOFj3nNyNfmGQph23K3T6OEyWUBUZvLkMLwSdZpl2VgWKvbGGcibQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764014929; c=relaxed/simple;
-	bh=lChGcFqZY0fxTjXAxFDuEargDMHeFwxNTjS6YeZ4Wng=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IxwXFTQwcqVVcHALO2RlsguB+S/5lddvFyjzMc7wtSxTSwES+l4qwnwu4PEXop1ujDz5yfHW7lthz46E/ujvhh5QUFI7IqCuy+AVzIDM6E83WftlaNKVwDUaDQ8U0g5aYkji4ZORPHSgn+cvVAtTQU6xU5BnI9dYpE8ADVlzZsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Y+HB3zHo; arc=none smtp.client-ip=209.85.160.169
+	bh=VI8VGK1e/q2I42k6jxF0jgWe+NIMZ+YiLyaDHhaP5EI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=gJqqgI/jz4CvSFbimK5LhokTUqKSMBWTHQILGEru7dMtijjEJkDjOdhGWxP7PazJRyuHsASawP9r46gqo6vvIFrNdggXMIV+9Ptj+Hj052mPpMC2UsneA6Ubz9Xv4A1FIbN+7Yb7gaFsRZrQouN4z9kBp6rwJ96js+tvOn6X3xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=nEvl05tB; arc=none smtp.client-ip=209.85.160.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ee14ba3d9cso47219841cf.1
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 12:08:46 -0800 (PST)
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ee0084fd98so39641271cf.3
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 12:08:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1764014926; x=1764619726; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=n/OeSvcHJmBNYWbxlm+UxnJ1I86MdUTBmmLneYzI86g=;
-        b=Y+HB3zHoMk+x3Z5eznBYfY1TkaJJNPwH/bJdPHIMa+kU5byp/0l8TbXAtlk0PFnpym
-         ULM8dkE1W7tU1CH2DFy8MQtQazAUbi2by2DCuMgL924Spmt3FpFcb7B2eeom9cus0zuy
-         lyBVLYiPGqz+wdN9zRE+njbKWhDL9sMeYV+ptw+V4CmL5tRvJWhwuin37q2vFqd6auAh
-         WMfDFzHp+aF6AcAlg57MK67jGCmQYFMXvwBALEKvFLDXoNXD/agtpzyI8kYhxZBZCNOT
-         zIThEl2UBi9pT1Jxxc7TN6LttDahZBi8hP5ANyA5ztwXicp/VEdwG+31PZ62qvEGWXGn
-         n5dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764014926; x=1764619726;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1764014927; x=1764619727; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=n/OeSvcHJmBNYWbxlm+UxnJ1I86MdUTBmmLneYzI86g=;
-        b=iXKjFN8/HT7h5ut53nHIyNFoV4jrgPmP7iRvnTqBAdbCpeDjDS7HHkx6P8aKeLzAjm
-         iap9CQIIRFnKdVHsOcVUBx1c4J8WfadYcQOmBf2J+zcYRxGdwMhLobUi3qO3pxvYJo+Q
-         e4ukIqX14BA8IloB6swHxs1oDtAKdXza4MyQtVgJPewDOnWGiRwYh228v4cfVh4SDpRF
-         mgTNrxsj+ZON7TIrutatzQHE3TFrRTpOgjLiwEVeBBXE6ad/0SBe4NSch0o+kQhjTWqG
-         ckPARbo1AN4p1zryhQpbPb8Jjmbw+uD2a6yJQDf9mCz0rrDSGnrsfvz3xBpwPXlLW5L9
-         OTJg==
-X-Forwarded-Encrypted: i=1; AJvYcCVISlq0dSxJcUOQx9o4A5S0EkF+7Ae8pjVCgT4kdE0D0aCQ07mlBuwcW1iNQ84B4cUZyQDkT5Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6R6HQB2ew/LYg5u8r/gCnLxkG+woHOhZAr17cdjUT/AdHs3II
-	OsrHJ+6fjWrvg0kKCmYzTbT3GjwfjqIxeom0+0n68HYsN9FXxNIp9+YbEukqGHUd1LuO/VQv30N
-	37nL1gg==
-X-Gm-Gg: ASbGncvO4V3rjvO/+3R6uRoLOw+STX9McxzU06UbVbHGcfByzs7sGDxYZIeTLyPhl9T
-	MoS3MDXvxmvyTUl+nOJcUZTyEwGohgFLjFEp38lOA2ggqXDpOP7PmALJICb8UsS9g8GsRlmzzPI
-	qv801sQZgXN/CpDss/jSImvvpUqvMG5baGjmCG0hHYfW/YJf9wauVbXh0/JEtdcl+YP8eDrtrTs
-	Ydio/SeewCTrRHGIwXiImYYH7C03Tbn7WQjew3Kl8uzubflPfaHejPl5j+JpjdlnFmnTvuoR00O
-	PJBoYmHWFXDG4BgTcL3T8iNk8dYTamjaJqaENQ5PFKH3T7NG8FjKKH1Q9P5uG5a0uwFMAeFIuc+
-	w8j48JSvbORZ6KKSLouzFCyLZg2Gx5lnML7rmk0ta3gz+HB6Up0UY8NNduy6ap+ViuCxbd45f4A
-	typJY/NHlAuPk=
-X-Google-Smtp-Source: AGHT+IExN2Ls2+Qxi4WH01dAMhgB54yvm9f+Im7RpnPmaNg/p543arMKvekfLWqxM2tXfFEbMSumJQ==
-X-Received: by 2002:a05:622a:1909:b0:4ee:2942:c4fb with SMTP id d75a77b69052e-4ee5882d9d4mr187432211cf.31.1764014925612;
-        Mon, 24 Nov 2025 12:08:45 -0800 (PST)
+        bh=hLaiDCq6yDuwTRLt5kfPPRKYdI27SWliFJEXJpdU4tc=;
+        b=nEvl05tBCwhZRn9BzmOJyfnjuDSOM39AxccZSl7iIKI25IFKz9nA+r1K0BdgMXJgwh
+         PFOjibKZ/UJyEJs3vdcKW8U1uY/L9TaLP3sKwl0ch4qKGNhyMRBnxUJk/i2CmgjDFTM7
+         7j0A2agQwupYjW/pACxo1/vHZbTgilnVf8rYQVMX3t0zmVc+TBMsydHwVHrzHqMVT23T
+         GhV28T3b2wjB03dG1OUBDN3ulBxyFmbG9lsaT7dqh+9glmK/5ruUkAlgx3A9luP1ql/H
+         HB0+cbzP8ZTi+y+YfiaTjS6Ii6k1sqXSsnn5fif5ONquXHKy2Y8OMZEjP9f4WAZ2njGz
+         oB4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764014927; x=1764619727;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hLaiDCq6yDuwTRLt5kfPPRKYdI27SWliFJEXJpdU4tc=;
+        b=sXTRt4YSphsaG2cEEAL3f8lmXjzxjm3Ly24zpb2ThAop0Fvvuh+aKKLMoGUCPU2Ehb
+         AmnkkHck4sf85/7mEjJHd6V9xAsCE51D9+vRXB9P0FveG+Oo2PfgFYVgaeqewxLSNWM+
+         TNMwoCTb+mAAFMH1HQIqb3b90XQ/ktbbCi3d7yMitrve7kYH7sQ2uyWwF3rMZv9L1MiO
+         M0a+Y7lSlTCwK8lYp5L9l0RO7IDUQzBl90vMp7VAQnKpuP0NPsIyv+FV0BHdhEoyErd2
+         iOGSzXd7J5Xqm2oxACiqVI8asEuYnD6Fj195AZ2AWkdP4e2/pchviqKj6PDpWBKwEZKj
+         9Pmw==
+X-Forwarded-Encrypted: i=1; AJvYcCWlHQtvPfj8pV47BlL+7uUubDDvVEluiGyK/vs/oYKnJxlc0mrStmLWxDx7qHwZJfnRfWqgLPY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoayNkGZPbU0aU+NA3OC4gATRoDZ490EQ1nlT2NBUuLgVtODKS
+	0NXE4e4Ktgbh0RbJyYZWLqqwvW33x8euSM1HjdZ2SgeTrc+i4JkMWNUCD5hIQsMs4g==
+X-Gm-Gg: ASbGncsg5X8udDr+kFYdaPsQd4sN167sgg/lg8Za5hLzb4h9/hTaj4A1TXG/0Nzwqqr
+	jSPjjyuIeey24iLhcOaU79d5tUGg1mlIKi1jXE/tM6AKvf3tKz7mkPlhugtO7UsJ8JaNWkXeHGF
+	O37A+MfodwvpHWrITlwS7uaqFoc19ZQiKc1r22L3e+J7oB2jMf8xMhJMQfDDTCiXEG9e6sgut/M
+	WYuyOyOGUTUrM0QmIXnmwqtxzY00D3CMMh1qxR2vf5rW6/znIliVpBqcFUf3T8blxklOZ6bbqFH
+	c/Emnbe5pD4Z5HW5o/e5ChSKdNlqYafW0ZJftTlIVOPYpBQ7pAu3nXGw9Yine/R0cgEr8GcYn2Q
+	eCf1/645EKl2hHTr+wxKg+TxEzvahkbFtqWmZjw4jT7ZXBzz1dwvoFmj9V0ZRUzgwYTgQn/UJq5
+	NIzYTYtfXepAA=
+X-Google-Smtp-Source: AGHT+IFsKrxVSVDo4P6CQuVGQZeJNaTWZR6v6px3cERaJZ8zTehrJupyj0TxODHl1p71ncjQ4K0Feg==
+X-Received: by 2002:a05:622a:ce:b0:4eb:9eaf:ab4d with SMTP id d75a77b69052e-4ee58b14616mr192155361cf.62.1764014927051;
+        Mon, 24 Nov 2025 12:08:47 -0800 (PST)
 Received: from majuu.waya ([70.50.89.69])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee48e90b62sm93195231cf.34.2025.11.24.12.08.44
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee48e90b62sm93195231cf.34.2025.11.24.12.08.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 12:08:45 -0800 (PST)
+        Mon, 24 Nov 2025 12:08:46 -0800 (PST)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -82,11 +83,14 @@ Cc: jiri@resnulli.us,
 	xiyou.wangcong@gmail.com,
 	netdev@vger.kernel.org,
 	dcaratti@redhat.com,
+	Victor Nogueira <victor@mojatatu.com>,
 	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net-next 1/2] net/sched: act_mirred: Fix infinite loop
-Date: Mon, 24 Nov 2025 15:08:24 -0500
-Message-Id: <20251124200825.241037-1-jhs@mojatatu.com>
+Subject: [PATCH net-next 2/2] selftests/tc-testing: Add test cases exercising mirred redirects (with loops)
+Date: Mon, 24 Nov 2025 15:08:25 -0500
+Message-Id: <20251124200825.241037-2-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251124200825.241037-1-jhs@mojatatu.com>
+References: <20251124200825.241037-1-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,37 +99,131 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When doing multiport mirroring we dont detect infinite loops.
+From: Victor Nogueira <victor@mojatatu.com>
 
-Example (see the first accompanying tdc test):
-packet showing up on port0 ingress mirred redirect --> port1 egress
-packet showing up on port1 egress mirred redirect --> port0 ingress
+Add two tdc test cases for mirred which cause loops.
+The first one does a redirect dev1 ingress -> dummy egress -> dev1 ingress
+The second one does a redirect dummy egress -> dev1 ingress -> dummy egress
 
-Example 2 (see the second accompanying tdc test)
-port0 egress --> port1 ingress --> port0 egress
-
-Fix this by remembering the source dev where mirred ran as opposed to
-destination/target dev
-
-Fixes: fe946a751d9b ("net/sched: act_mirred: add loop detection")
+Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- net/sched/act_mirred.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../tc-testing/tc-tests/actions/mirred.json   | 103 ++++++++++++++++++
+ 1 file changed, 103 insertions(+)
 
-diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-index f27b583def78..7315179197fd 100644
---- a/net/sched/act_mirred.c
-+++ b/net/sched/act_mirred.c
-@@ -453,7 +453,7 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
- 		return retval;
- 	}
- 
--	xmit->sched_mirred_dev[xmit->sched_mirred_nest++] = dev;
-+	xmit->sched_mirred_dev[xmit->sched_mirred_nest++] = skb->dev;
- 
- 	m_mac_header_xmit = READ_ONCE(m->tcfm_mac_header_xmit);
- 	m_eaction = READ_ONCE(m->tcfm_eaction);
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
+index b73bd255ea36..97800f2e26f2 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
+@@ -1052,5 +1052,108 @@
+             "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
+             "$TC actions flush action mirred"
+         ]
++    },
++    {
++        "id": "6941",
++        "name": "Redirect multiport: dev1 ingress -> dummy egress -> dev1 ingress (Loop)",
++        "category": [
++            "filter",
++            "mirred"
++        ],
++        "plugins": {
++            "requires": [
++                "nsPlugin",
++                "scapyPlugin"
++            ]
++        },
++        "scapy": {
++            "iface": "$DEV0",
++            "count": 1,
++            "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
++        },
++        "setup": [
++            "$IP link set dev $DUMMY up || true",
++            "$TC qdisc add dev $DEV1 clsact",
++            "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred egress redirect dev $DUMMY index 1",
++            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
++            "$TC qdisc add dev $DUMMY clsact",
++            "$TC filter add dev $DUMMY egress protocol ip prio 10 matchall action mirred ingress redirect dev $DEV1 index 2"
++        ],
++        "cmdUnderTest": "$TC -j -s actions get action mirred index 1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j -s actions get action mirred index 1",
++        "matchJSON": [
++            {
++                "total acts": 0
++            },
++            {
++                "actions": [
++                    {
++                        "order": 1,
++                        "kind": "mirred",
++                        "mirred_action": "redirect",
++                        "direction": "egress",
++                        "index": 1,
++                        "stats": {
++                            "packets": 1
++                        },
++                        "not_in_hw": true
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            "$TC qdisc del dev $DEV1 clsact",
++            "$TC qdisc del dev $DUMMY clsact"
++        ]
++    },
++    {
++        "id": "ceb4",
++        "name": "Redirect multiport: dummy egress -> dev1 ingress -> dummy egress (Loop)",
++        "category": [
++            "filter",
++            "mirred"
++        ],
++        "plugins": {
++            "requires": [
++                "nsPlugin"
++            ]
++        },
++        "setup": [
++            "$IP link set dev $DUMMY up || true",
++            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
++            "$TC qdisc add dev $DUMMY clsact",
++            "$TC filter add dev $DUMMY egress protocol ip prio 10 matchall action mirred ingress redirect dev $DEV1 index 1",
++            "$TC qdisc add dev $DEV1 clsact",
++            "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred egress redirect dev $DUMMY index 2"
++        ],
++        "cmdUnderTest": "ping -c1 -W0.01 -I $DUMMY 10.10.10.1",
++        "expExitCode": "1",
++        "verifyCmd": "$TC -j -s actions get action mirred index 1",
++        "matchJSON": [
++            {
++                "total acts": 0
++            },
++            {
++                "actions": [
++                    {
++                        "order": 1,
++                        "kind": "mirred",
++                        "mirred_action": "redirect",
++                        "direction": "ingress",
++                        "index": 1,
++                        "stats": {
++                            "packets": 2,
++                            "overlimits": 1
++                        },
++                        "not_in_hw": true
++                    }
++                ]
++            }
++        ],
++        "teardown": [
++            "$TC qdisc del dev $DUMMY clsact",
++            "$TC qdisc del dev $DEV1 clsact"
++        ]
+     }
+ ]
 -- 
 2.34.1
 
