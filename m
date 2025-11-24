@@ -1,199 +1,238 @@
-Return-Path: <netdev+bounces-241132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C96D6C7FFBE
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 11:48:47 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9443C7FFEE
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 11:52:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 39AB44E3FBF
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 10:48:37 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 36E14342111
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 10:52:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9259E13B293;
-	Mon, 24 Nov 2025 10:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9DF02FAC16;
+	Mon, 24 Nov 2025 10:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="qZqJq229"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mInr/qGK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8B02248A5
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 10:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDDA2F9987
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 10:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763981315; cv=none; b=tKTgPI/vyU0Kn1kP5+/bvoAYR3tG3mkqvR7Byz30O4fCDG2apGdlvDFERqNkFQiwN94hMP84bqaO+OwADa38V1P6M0iaq7uc7aGbqMTNZg75Wh53VPqx4RjBAqc0WDkEiFN/x+BAtIVwQ8Sr79ZtcTKQDa1MglwuhhVOwD2cY8o=
+	t=1763981527; cv=none; b=jq0YwGWryI1MKOFOx21ng8oCYzF1dmxI8tIlYBgpXJoTXkeyv6Kesyv6x3cKaPxJVtKX212SWldO6iTziUv4oLXaV3YhyHv9RR7t73VIYWBou8kBEWNppwVfbE8ozDQ079tmyHnbAcYCooydMl8NcK5b5yM5UFTLzV4WkrMxxz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763981315; c=relaxed/simple;
-	bh=1yb3M4hfB/tKbjzz3y5h6f2pqjVegDPjjgujDu0OjoE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=tRnryVJIFkZ8WzrfF8kyqRtKZVSNmLGs5UqLWE5OoqMg8dADSPDbsEyp3CBkhUjV+XJH6LloIOUIH1NzeySx1SctJy6eFI2v/iaCnmOH0SasiXF4u+LB8U4tWRQrFDLNJUgaEOnhhZ9/g+3fwWDVkx2JwX9yXdIGxjMzP8oJekU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=qZqJq229; arc=none smtp.client-ip=45.145.95.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
-	t=1763981301; bh=1yb3M4hfB/tKbjzz3y5h6f2pqjVegDPjjgujDu0OjoE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=qZqJq229HjzYDpjHhk1uIZgEV+Yk3kD3EwdI+5Fz2BXXf0/ndnxkvIOsFxFSXCLXn
-	 FerNXDAs9BD7+bZo+kiL8/r9NKjy+FKV1OiNLcCBz4Ou7eyXxiFNga5uDJpZhWxVAu
-	 VIyRh10bGvGoKibYlBpJxOc+FTsrZp2UX8mHqR+zCqVyneWSiN+gdDi4/FLOpj2N+B
-	 vUorOeKIsQEarRVdCiKZLCFORoHG/rae3zOTJWQitk9b29lfuuFtQTqLnlaXucAPEl
-	 Mc8DH5BqACua4r1J53Znepd1Q53xykfbwgto5D3Llt1X3XS22J3MYFXxYK3MLUQxcN
-	 XHHMlOjAEZ3/Q==
-To: Xiang Mei <xmei5@asu.edu>, security@kernel.org
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com,
- cake@lists.bufferbloat.net, bestswngs@gmail.com, Xiang Mei <xmei5@asu.edu>
-Subject: Re: [PATCH net v5] net/sched: sch_cake: Fix incorrect qlen
- reduction in cake_drop
-In-Reply-To: <20251121232735.1020046-1-xmei5@asu.edu>
-References: <20251121232735.1020046-1-xmei5@asu.edu>
-Date: Mon, 24 Nov 2025 11:48:14 +0100
-X-Clacks-Overhead: GNU Terry Pratchett
-Message-ID: <87ms4bn1u9.fsf@toke.dk>
+	s=arc-20240116; t=1763981527; c=relaxed/simple;
+	bh=Nel7FZErsVTR5AJ0l1KUl8c4jxDfHnzRgpNjWNNowDM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Za/6pF+1HeFvZmIugJ5wtJ/dNoUiEkpduDxEcC38rdWc/r8guy9fhyTN5P6Zmqi0Z0Mq0mJ8LEdvZoYPoysIgGJob+lXaYhlBy0hiJ0zVbMcooLcoI/zKZEJH1laFTCfACPjeoQugohMsrZV00MnYMoDXW82QVKsUBSNjp+HRew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mInr/qGK; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4779a4fb9bfso89925e9.0
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 02:52:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763981523; x=1764586323; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HpxmS1rh+TvJjifFQqBSZjtvzj8hJPtK/fgbxoLiMac=;
+        b=mInr/qGKi1KujnVc3EjL5KaPwmITGz6Kxzye9qHUY7iY5eruQBfY/RbNLg/Cnv47ZT
+         U6H1d7iyh4qIcq8IwxE+q+fOtisAApXE/B8uXatOnKAuZ7IBSRppeMOBYkswdJ6Oz3lK
+         652zG9URM71W3u+2xAnZ6OvrHWRTK6gjRB+WjyF0VKCQTObcmg7TZqmzfk2oVTiBAtm1
+         16UATaXTCWbYo6+/FBDQI3ghSBt3Q8OOJXTp0c0Y9Fy8rNbf91MnQiZeKmweC7AWMtFn
+         Aia+XZqrdyT4A8G1bQjy2ZUiD8TmHaEq1NQp9HKBJo3ycpI4dKD8PmZgJOIAFbXHtx03
+         j1Tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763981523; x=1764586323;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HpxmS1rh+TvJjifFQqBSZjtvzj8hJPtK/fgbxoLiMac=;
+        b=HKWY1yPZvOFc+OuEaH5LHNnQU5xvZrNadLlko8MBqhFZtEAIy+oUrznhxGxjmZbOjQ
+         UqYbViAyEZF7tMLmtGW4F6RfwY+k0e8H9Z25JYvz+EfzG2ZimQ1cKiQb2K4vj96x/Ifz
+         3u815DnenE3gWxtqpRF3USn0gBaIn3ysFwVuoj2ddN1vzsszJ4+PnWIN9senAi6aacPf
+         +WcFAP+tIAoW00j2MmTlUMkc1zkWX1KJ8XcGiYxVhfRHT211s754WwLLwgaH5gp750Zo
+         3nHj3mE8xrUL/Zt3pgnQ5IP4uYolQTNelFtuqdRrjEp0mIsKcwScf5JdgPiFwub1ADu/
+         Sn0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV877awO+Zs/zTLAhvsoH7dTHTHvu5QrK5Ixbp62kwrC1POYEN0z/qDZYV3Lhc3mcBiEZpCeBw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMAugNhkYGYZxlPmU+6IDZkqnX9L7lVaI0OnXZVw8vNGI1hX29
+	FOVQ1+jFTyyXKdp4ema2Yfib0EiRcUE0+6mdP1cpXe5XzwkjptdFKQTitwWsxQi27VnI0lH3lGS
+	VeYbJfPr69wErl3Su7bq76pn7lI+IUEIWFYp9r5yK
+X-Gm-Gg: ASbGnctR66jbeZ02oqOsOw55HD7nxYFUzT8ZMCdmHgPA6on2QZW3BQzZBGIjoYeAtA/
+	pqRJs6Q6w4nik/gRHUXV6G1FbbPVyWN0Q/2oZ9uMW6LtXuHzxU+mPHAyGF/0OCP7sOpuKwfySNO
+	KGBD2bsXbjQGU2aPtPXt/VdOm+ddgkHgdDul5h5WWtDLprUMqFET/mKmtYNKIj58zSdPCrBxc2Q
+	o+LG1RD+L3v6SBHVDk5SiPZ7zTi1c7m9+qBQeiejyIPL9OfC99gQwDzr9sNVD1/oVOlra1tgIX7
+	TAG9AwM=
+X-Google-Smtp-Source: AGHT+IF22QHiRShwy0PNGubA4NozhAovK3+cvWApeflXs47OCki2QvEgos4UcFdY3X1d20qrAJLxvPy1WjNMWz9nz+4=
+X-Received: by 2002:a05:600c:c1c8:10b0:477:76ea:ba7a with SMTP id
+ 5b1f17b1804b1-477c5ea4a2bmr1041565e9.3.1763981523108; Mon, 24 Nov 2025
+ 02:52:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20251122140839.3922015-1-almasrymina@google.com> <DS4PPF7551E6552ECCF95AE9C177DEF07F8E5D0A@DS4PPF7551E6552.namprd11.prod.outlook.com>
+In-Reply-To: <DS4PPF7551E6552ECCF95AE9C177DEF07F8E5D0A@DS4PPF7551E6552.namprd11.prod.outlook.com>
+From: YiFei Zhu <zhuyifei@google.com>
+Date: Mon, 24 Nov 2025 02:51:50 -0800
+X-Gm-Features: AWmQ_bl2ejYEDqgSm31Iu3olmZmBqyCwAIhOCZtCkXdCQaanfp4saa25LSksAEA
+Message-ID: <CAA-VZP=mvGBOhkc-hmCsmP=uN_qb5ZG1dwhbO2cOyrAYS0wPDw@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next v1] idpf: export RX hardware
+ timestamping information to XDP
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+Cc: Mina Almasry <almasrymina@google.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	"Lobakin, Aleksander" <aleksander.lobakin@intel.com>, Richard Cochran <richardcochran@gmail.com>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Xiang Mei <xmei5@asu.edu> writes:
-
-> In cake_drop(), qdisc_tree_reduce_backlog() is used to update the qlen
-> and backlog of the qdisc hierarchy. Its caller, cake_enqueue(), assumes
-> that the parent qdisc will enqueue the current packet. However, this
-> assumption breaks when cake_enqueue() returns NET_XMIT_CN: the parent
-> qdisc stops enqueuing current packet, leaving the tree qlen/backlog
-> accounting inconsistent. This mismatch can lead to a NULL dereference
-> (e.g., when the parent Qdisc is qfq_qdisc).
+On Mon, Nov 24, 2025 at 12:33=E2=80=AFAM Loktionov, Aleksandr
+<aleksandr.loktionov@intel.com> wrote:
 >
-> This patch computes the qlen/backlog delta in a more robust way by
-> observing the difference before and after the series of cake_drop()
-> calls, and then compensates the qdisc tree accounting if cake_enqueue()
-> returns NET_XMIT_CN.
 >
-> To ensure correct compensation when ACK thinning is enabled, a new
-> variable is introduced to keep qlen unchanged.
 >
-> Fixes: 15de71d06a40 ("net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit")
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> ---
-> v2: add missing cc
-> v3: move qdisc_tree_reduce_backlog out of cake_drop
-> v4: remove redundant variable and handle ack branch correctly
-> v5: add the PoC as a test case
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Mina Almasry
+> > Sent: Saturday, November 22, 2025 3:09 PM
+> > To: netdev@vger.kernel.org; bpf@vger.kernel.org; linux-
+> > kernel@vger.kernel.org
+> > Cc: YiFei Zhu <zhuyifei@google.com>; Alexei Starovoitov
+> > <ast@kernel.org>; Daniel Borkmann <daniel@iogearbox.net>; David S.
+> > Miller <davem@davemloft.net>; Jakub Kicinski <kuba@kernel.org>; Jesper
+> > Dangaard Brouer <hawk@kernel.org>; John Fastabend
+> > <john.fastabend@gmail.com>; Stanislav Fomichev <sdf@fomichev.me>;
+> > Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> > <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
+> > Eric Dumazet <edumazet@google.com>; Paolo Abeni <pabeni@redhat.com>;
+> > Lobakin, Aleksander <aleksander.lobakin@intel.com>; Richard Cochran
+> > <richardcochran@gmail.com>; intel-wired-lan@lists.osuosl.org; Mina
+> > Almasry <almasrymina@google.com>
+> > Subject: [Intel-wired-lan] [PATCH net-next v1] idpf: export RX
+> > hardware timestamping information to XDP
+> >
+> > From: YiFei Zhu <zhuyifei@google.com>
+> >
+> > The logic is similar to idpf_rx_hwtstamp, but the data is exported as
+> > a BPF kfunc instead of appended to an skb.
+> >
+> > A idpf_queue_has(PTP, rxq) condition is added to check the queue
+> > supports PTP similar to idpf_rx_process_skb_fields.
+> >
+> > Cc: intel-wired-lan@lists.osuosl.org
+> >
+> > Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > ---
+> >  drivers/net/ethernet/intel/idpf/xdp.c | 27
+> > +++++++++++++++++++++++++++
+> >  1 file changed, 27 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/intel/idpf/xdp.c
+> > b/drivers/net/ethernet/intel/idpf/xdp.c
+> > index 21ce25b0567f..850389ca66b6 100644
+> > --- a/drivers/net/ethernet/intel/idpf/xdp.c
+> > +++ b/drivers/net/ethernet/intel/idpf/xdp.c
+> > @@ -2,6 +2,7 @@
+> >  /* Copyright (C) 2025 Intel Corporation */
+> >
+> >  #include "idpf.h"
+> > +#include "idpf_ptp.h"
+> >  #include "idpf_virtchnl.h"
+> >  #include "xdp.h"
+> >  #include "xsk.h"
+> > @@ -369,6 +370,31 @@ int idpf_xdp_xmit(struct net_device *dev, int n,
+> > struct xdp_frame **frames,
+> >                                      idpf_xdp_tx_finalize);
+> >  }
+> >
+> > +static int idpf_xdpmo_rx_timestamp(const struct xdp_md *ctx, u64
+> > +*timestamp) {
+> > +     const struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_desc;
+> > +     const struct libeth_xdp_buff *xdp =3D (typeof(xdp))ctx;
+> > +     const struct idpf_rx_queue *rxq;
+> > +     u64 cached_time, ts_ns;
+> > +     u32 ts_high;
+> > +
+> > +     rx_desc =3D xdp->desc;
+> > +     rxq =3D libeth_xdp_buff_to_rq(xdp, typeof(*rxq), xdp_rxq);
+> > +
+> > +     if (!idpf_queue_has(PTP, rxq))
+> > +             return -ENODATA;
+> > +     if (!(rx_desc->ts_low & VIRTCHNL2_RX_FLEX_TSTAMP_VALID))
+> > +             return -ENODATA;
+> RX flex desc fields are little=E2=80=91endian.
+> You already convert ts_high with le32_to_cpu(), but test ts_low directly =
+against the mask.
+> On big=E2=80=91endian this can misdetect the bit and spuriously return -E=
+NODATA.
+> Please convert ts_low to host order before the bit test.
+> See existing IDPF/ICE patterns where descriptor words are leXX_to_cpu()=
+=E2=80=91converted prior to FIELD_GET() / bit checks.
+> Also, per the XDP RX metadata kfunc docs, -ENODATA must reflect true abse=
+nce of per=E2=80=91packet metadata; endianness=E2=80=91correct testing is r=
+equired to uphold the semantic.
 
-Please split the test case into its own patch and send both as a series.
+The logic is copied as verbatim from idpf_rx_hwtstamp:
 
-Otherwise, the changes LGTM apart from the few nits below:
+static void
+idpf_rx_hwtstamp(const struct idpf_rx_queue *rxq,
+                 const struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_desc,
+                 struct sk_buff *skb)
+{
+        u64 cached_time, ts_ns;
+        u32 ts_high;
 
-> ---
->  net/sched/sch_cake.c                          | 52 +++++++++++--------
->  .../tc-testing/tc-tests/qdiscs/cake.json      | 28 ++++++++++
->  2 files changed, 58 insertions(+), 22 deletions(-)
+        if (!(rx_desc->ts_low & VIRTCHNL2_RX_FLEX_TSTAMP_VALID))
+                return;
+
+        cached_time =3D READ_ONCE(rxq->cached_phc_time);
+
+        ts_high =3D le32_to_cpu(rx_desc->ts_high);
+        ts_ns =3D idpf_ptp_tstamp_extend_32b_to_64b(cached_time, ts_high);
+[...]
+
+I assume that is incorrect and would need to be fixed too?
+
+YiFei Zhu
+
+> > +
+> > +     cached_time =3D READ_ONCE(rxq->cached_phc_time);
+> > +
+> > +     ts_high =3D le32_to_cpu(rx_desc->ts_high);
+> > +     ts_ns =3D idpf_ptp_tstamp_extend_32b_to_64b(cached_time,
+> > ts_high);
+> > +
+> > +     *timestamp =3D ts_ns;
+> > +     return 0;
+> > +}
+> > +
+> >  static int idpf_xdpmo_rx_hash(const struct xdp_md *ctx, u32 *hash,
+> >                             enum xdp_rss_hash_type *rss_type)  { @@ -
+> > 392,6 +418,7 @@ static int idpf_xdpmo_rx_hash(const struct xdp_md
+> > *ctx, u32 *hash,  }
+> >
+> >  static const struct xdp_metadata_ops idpf_xdpmo =3D {
+> > +     .xmo_rx_timestamp       =3D idpf_xdpmo_rx_timestamp,
+> >       .xmo_rx_hash            =3D idpf_xdpmo_rx_hash,
+> >  };
+> >
+> >
+> > base-commit: e05021a829b834fecbd42b173e55382416571b2c
+> > --
+> > 2.52.0.rc2.455.g230fcf2819-goog
 >
-> diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-> index 32bacfc314c2..cf4d6454ca9c 100644
-> --- a/net/sched/sch_cake.c
-> +++ b/net/sched/sch_cake.c
-> @@ -1597,7 +1597,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
->  
->  	qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
->  	sch->q.qlen--;
-> -	qdisc_tree_reduce_backlog(sch, 1, len);
->  
->  	cake_heapify(q, 0);
->  
-> @@ -1750,7 +1749,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
->  	ktime_t now = ktime_get();
->  	struct cake_tin_data *b;
->  	struct cake_flow *flow;
-> -	u32 idx, tin;
-> +	u32 idx, tin, prev_qlen, prev_backlog, drop_id;
-> +	bool same_flow = false;
-
-Please make sure to maintain the reverse x-mas tree ordering of the
-variable declarations.
-
->  
->  	/* choose flow to insert into */
->  	idx = cake_classify(sch, &b, skb, q->flow_mode, &ret);
-> @@ -1823,6 +1823,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
->  		consume_skb(skb);
->  	} else {
->  		/* not splitting */
-> +		int ack_pkt_len = 0;
-> +
->  		cobalt_set_enqueue_time(skb, now);
->  		get_cobalt_cb(skb)->adjusted_len = cake_overhead(q, skb);
->  		flow_queue_add(flow, skb);
-> @@ -1834,7 +1836,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
->  			b->ack_drops++;
->  			sch->qstats.drops++;
->  			b->bytes += qdisc_pkt_len(ack);
-> -			len -= qdisc_pkt_len(ack);
-> +			ack_pkt_len = qdisc_pkt_len(ack);
-
-There's a qdisc_tree_reduce_backlog() that uses qdisc_pkt_len(ack) just
-below this; let's also change that to use ack_pkt_len while we're at it.
-
->  			q->buffer_used += skb->truesize - ack->truesize;
->  			if (q->rate_flags & CAKE_FLAG_INGRESS)
->  				cake_advance_shaper(q, b, ack, now, true);
-> @@ -1848,11 +1850,11 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
->  
->  		/* stats */
->  		b->packets++;
-> -		b->bytes	    += len;
-> -		b->backlogs[idx]    += len;
-> -		b->tin_backlog      += len;
-> -		sch->qstats.backlog += len;
-> -		q->avg_window_bytes += len;
-> +		b->bytes	    += len - ack_pkt_len;
-> +		b->backlogs[idx]    += len - ack_pkt_len;
-> +		b->tin_backlog      += len - ack_pkt_len;
-> +		sch->qstats.backlog += len - ack_pkt_len;
-> +		q->avg_window_bytes += len - ack_pkt_len;
->  	}
->  
->  	if (q->overflow_timeout)
-> @@ -1927,24 +1929,30 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
->  	if (q->buffer_used > q->buffer_max_used)
->  		q->buffer_max_used = q->buffer_used;
->  
-> -	if (q->buffer_used > q->buffer_limit) {
-> -		bool same_flow = false;
-> -		u32 dropped = 0;
-> -		u32 drop_id;
-> +	if (q->buffer_used <= q->buffer_limit)
-> +		return NET_XMIT_SUCCESS;
->  
-> -		while (q->buffer_used > q->buffer_limit) {
-> -			dropped++;
-> -			drop_id = cake_drop(sch, to_free);
-> +	prev_qlen = sch->q.qlen;
-> +	prev_backlog = sch->qstats.backlog;
->  
-> -			if ((drop_id >> 16) == tin &&
-> -			    (drop_id & 0xFFFF) == idx)
-> -				same_flow = true;
-> -		}
-> -		b->drop_overlimit += dropped;
-> +	while (q->buffer_used > q->buffer_limit) {
-> +		drop_id = cake_drop(sch, to_free);
-> +		if ((drop_id >> 16) == tin &&
-> +		    (drop_id & 0xFFFF) == idx)
-> +			same_flow = true;
-> +	}
-> +
-> +	/* Compute the droppped qlen and pkt length */
-> +	prev_qlen -= sch->q.qlen;
-> +	prev_backlog -= sch->qstats.backlog;
-> +	b->drop_overlimit += prev_backlog;
-
-drop_overlimit was accounted in packets before, so this should be += prev_qlen.
-
--Toke
 
