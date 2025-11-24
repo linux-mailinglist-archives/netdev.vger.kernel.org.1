@@ -1,141 +1,166 @@
-Return-Path: <netdev+bounces-241280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1B0BC8238D
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 20:04:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36EBCC823C0
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 20:09:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95B2A3A8C86
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:04:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 768494E7DEA
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B2C22FDE6;
-	Mon, 24 Nov 2025 19:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC1919C566;
+	Mon, 24 Nov 2025 19:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uHlXhYsw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QNSGELp8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C9886323
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 19:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1B622FDE6;
+	Mon, 24 Nov 2025 19:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764011084; cv=none; b=qcCXKDx27JJL39tCx1NrZ3+DDYVJzcovDNP1ZjPZfNU3OoQgobbjXKNlUjSKZ/zSzucTOxBfkHK2iqaK1K96ILx4V2iaPxi+WRKSrBm4CwgI38DwgUeGGaSpCWDSRHmKpWC1dNMuUl1iLuLLrg7j9eamenVlkKrSLuTazRlrbp8=
+	t=1764011206; cv=none; b=gUdganKgDWSnEXYUimCUTnZg/UPygBMM4A3zSe2q+rag3ieejp0XY8QYeUCq8k6dikxnoJPaV7pVYJHgrw5OFAe6NqPVrQB8a2b++2y3ufEvkOYmOuMtxg+veI18qsdYzy7FKStxitYws2Sww3IeJICCCIYSm2Sf2elHtOXwGg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764011084; c=relaxed/simple;
-	bh=CSQKuJk84tG5ZuWblxkRtwsJUOaSkI60JAWLrWLe3bY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vm+/Kpa5+g3qD3VBvEETVcvbVNr+KP6l2+5ixP4zpIGVsVKrdc0GkhroU6JTOzbQSJstQ+WmG8w6gHyqBbneLw+EaUK8J17R7DDWWtoflk0Ncef89TI1rKIFPcJFGdeNGsCgshgu9Ln4vRFqkUb/QVz3Z8BjapFVQN0S89WiSNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uHlXhYsw; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7b9215e55e6so3199336b3a.2
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 11:04:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764011082; x=1764615882; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WR+6r0zKf/drbXIpCKmIt1A8MN9jIT0Qrpcwq+dE+OU=;
-        b=uHlXhYswLIxZZc9O+ELh8/kkyszDHsygulhXg5vmgqWPufbMyBhd/X+PacxI8OLiRc
-         zC5RrB5LqUVeAWcJd2juQhy7vrXNeknZR56C2L2EsS9LRuu6YSQS/j7YXPLCozJng1VI
-         neg7EX5tF7UbjLqc19CqP7jczM2F5REvpSf0CzVy+hQCUbmuDA9j6IZ6XrRG4l/KtdK+
-         Xvgc7UyTZeVjWum1MtXcaraqzT/GNXoKefJDg5/5cxIbBlRkVztmvDieyFWcAC2WnlFd
-         oMi8FTF9M/Q3nmmi4vAlym6lnLHJhmwEVWy0vt81T/XtLDX+9KJjrb+3PsApg6bcW/Cr
-         WCQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764011082; x=1764615882;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WR+6r0zKf/drbXIpCKmIt1A8MN9jIT0Qrpcwq+dE+OU=;
-        b=TqqIGNqKbYzD/fTiJbaVMySib7zpLeSinuYpCEQXXX5KLQhr2bS5+JFoHKdXQQe0x8
-         ABiAi8WNNjjvtORLv35HLofPWUOROZFKEc6pR1FxKjNnQMvD3LtB9eznYcMGezqQ8TJE
-         g4Tifj/pj0bhu6tW6OQFP3vTN1CSYzymYjLyPFwPMpWi5Qap3g2/lrM1wGZpxliupES2
-         Iqt9qU/GCG8urVmdzQGRcM4xh9P+Wjljd+Q8pT4eXC6Hz3Urv1rk/MsPsbTuAsQz08b/
-         RyzBdbFEUo/J3uYynQ6VWvBY6orcIFfli8ngX9Cdc+wr9OjiZyrzkF3sfq7c+F7XS9sh
-         3n3A==
-X-Forwarded-Encrypted: i=1; AJvYcCUVvAzgic6ugv2wyEL6bV0SVUkbIInX4xbSRG3bSN4hRWhXixVhH7hEE8pEr8t3Z6kNCQQ/Lxc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpE4Brs7y1nKZE9M9MSo/G33hOEZdGviUXP/HkCkUgw5bhzXk5
-	V3Lf1GhoVjSltlMgVEp5HZ+fdyzt81c7EefnHrjUv8MUQ5zwkKkMe2bOjqWhO2Dt6qKwfIYpiue
-	h7FtTU0byMv41XvltJ+mrlQbj62NcmaNi25r+QlEi
-X-Gm-Gg: ASbGncv13vX9QfrAOlZXfaFLVdx8Hyi8td+y2zn6toV74tU6G98wPBy4qtXW8DpuQ7r
-	zLTgWUh9tdNothLgKfX34HvOUs/XN+c3JfKMAVHOwHGa6WDgmx4rIOCgR5FbVnwE8mEy2i0fZDM
-	fnwa4gxUpSPKJwTUiCjgFDZVtftPYXyWWPDFFPuKhPkV7Yhb2ieUBXII7CWmudibmyl3r6cXV9Y
-	tsi4Xq/kvexpyMGdZcmEQCbstadeDi+euZxssS+Eip9qrmWlExGxwhvRLPQ47WK9LghWggp2o6W
-	pLnMESoVbOBB1Q59IMooHy4IaA==
-X-Google-Smtp-Source: AGHT+IHh5m3hlVaahpzcudnWQ3fCeNJ3tekhi53iK1WM2SS3hAZv7gdQapj8YFpy6+Ki/IsS63hBQp0tvIEyLcMAXZ4=
-X-Received: by 2002:a05:7022:ec85:b0:11a:61df:252a with SMTP id
- a92af1059eb24-11cb3ecc587mr92399c88.6.1764011081678; Mon, 24 Nov 2025
- 11:04:41 -0800 (PST)
+	s=arc-20240116; t=1764011206; c=relaxed/simple;
+	bh=fe0erM8R9qW71HS5W6EhaBBvXJPfvqC44rg6g2gDjZA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sC0QHOBwe5fbVw1F4x5dtb7Q3cCcsPxM3dWdmmS4g+UsA6zDv8STLXskBCDGJZoc+vAaT1J+2RN7ZpzJtte/HyEJWEVQ+jcoeLmQNAFWE5f3iO+BR7VEJuGK6un/p9kLcNNHj0JE94pguyloHB/yxzqz2nMtaZ8WVsW96g+cRnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QNSGELp8; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=3W6tshEv8Go6fhWCI8+DSQfwCo6C/vcmIDwOMjM0L6s=; b=QNSGELp8jZV4fXBl5SnTkNMcDn
+	hddd8nSyPj3BraGNiHVUKEZe1eBEMK8no+16GU0P9nRJ2XksqYAaPSQ428t12hJsHBv3o0GmdBGGW
+	8LUdxlzncRWvPqGoen09Sxlf/hRt8UdcqHJ5LucyPTA601JzU6qVLXEXScy469SPjBDrG0Amr9q6G
+	oqV3OfwJg1B5E7JvvkXodJVdioVr8fa6ZoorHzhXhJ/1UoFX77kbDsWImvFv2/jzohnM3MmX2byI4
+	NGYIVMoj36uU31XFJ/NttxLLwke76pwmnIOimADOMGm76duMPKHgbUfYh5FoJBm3nRZdSPAwWgeRo
+	psQms/vw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54602)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vNbtD-0000000025Z-2DoX;
+	Mon, 24 Nov 2025 19:06:19 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vNbt6-000000008Tp-3SQu;
+	Mon, 24 Nov 2025 19:06:12 +0000
+Date: Mon, 24 Nov 2025 19:06:12 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Yao Zi <ziyao@disroot.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Frank <Frank.Sae@motor-comm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
+	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
+	Kexy Biscuit <kexybiscuit@aosc.io>, Runhua He <hua@aosc.io>,
+	Xi Ruoyao <xry111@xry111.site>
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Add glue driver for
+ Motorcomm YT6801 ethernet controller
+Message-ID: <aSSspDCPM_5-l24a@shell.armlinux.org.uk>
+References: <20251124163211.54994-1-ziyao@disroot.org>
+ <20251124163211.54994-3-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251123021601.158709-1-kuba@kernel.org>
-In-Reply-To: <20251123021601.158709-1-kuba@kernel.org>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 24 Nov 2025 11:04:30 -0800
-X-Gm-Features: AWmQ_blSdvmtWJwNQ8jGnk9Px5x3RGff27Wq9xqCsiFfSeVUkAeaeoS6umNClMQ
-Message-ID: <CAAVpQUDBGYf_2vt3yjYO_vPFyV_bH8rNoNJAAxiSb2OhpXxKkA@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftests: af_unix: don't use SKIP for expected failures
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	adelodunolaoluwa@yahoo.com, shuah@kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251124163211.54994-3-ziyao@disroot.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Sat, Nov 22, 2025 at 6:16=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> netdev CI reserves SKIP in selftests for cases which can't be executed
-> due to setup issues, like missing or old commands. Tests which are
-> expected to fail must use XFAIL.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Mon, Nov 24, 2025 at 04:32:10PM +0000, Yao Zi wrote:
+> +static int motorcomm_setup_irq(struct pci_dev *pdev,
+> +			       struct stmmac_resources *res,
+> +			       struct plat_stmmacenet_data *plat)
+> +{
+> +	int ret;
+> +
+> +	ret = pci_alloc_irq_vectors(pdev, 6, 6, PCI_IRQ_MSIX);
+> +	if (ret > 0) {
+> +		res->rx_irq[0]	= pci_irq_vector(pdev, 0);
+> +		res->tx_irq[0]	= pci_irq_vector(pdev, 4);
+> +		res->irq	= pci_irq_vector(pdev, 5);
+> +
+> +		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+> +
+> +		return 0;
+> +	}
+> +
+> +	dev_info(&pdev->dev, "failed to allocate MSI-X vector: %d\n", ret);
+> +	dev_info(&pdev->dev, "try MSI instead\n");
+> +
+> +	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI);
+> +	if (ret < 0)
+> +		return dev_err_probe(&pdev->dev, ret,
+> +				     "failed to allocate MSI\n");
+> +
+> +	res->irq = pci_irq_vector(pdev, 0);
+> +
+> +	return 0;
+> +}
+> +
+> +static int motorcomm_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> +{
+...
+> +	ret = motorcomm_setup_irq(pdev, &res, plat);
+> +	if (ret)
+> +		return dev_err_probe(&pdev->dev, ret, "failed to setup IRQ\n");
+> +
+> +	motorcomm_init(priv);
+> +
+> +	res.addr = priv->base + GMAC_OFFSET;
+> +
+> +	return stmmac_dvr_probe(&pdev->dev, plat, &res);
 
-Good to know that, thanks !
+If stmmac_dvr_probe() fails, then it will return an error code. This
+leaves the PCI MSI interrupt allocated...
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+> +}
+> +
+> +static void motorcomm_remove(struct pci_dev *pdev)
+> +{
+> +	stmmac_dvr_remove(&pdev->dev);
+> +	pci_free_irq_vectors(pdev);
 
+... which stood out because of the presence of this function doing
+stuff after the call to stmmac_dvr_remove().
 
-> ---
-> CC: kuniyu@google.com
-> CC: adelodunolaoluwa@yahoo.com
-> CC: shuah@kernel.org
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  tools/testing/selftests/net/af_unix/unix_connreset.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/tools=
-/testing/selftests/net/af_unix/unix_connreset.c
-> index bffef2b54bfd..6eb936207b31 100644
-> --- a/tools/testing/selftests/net/af_unix/unix_connreset.c
-> +++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
-> @@ -161,8 +161,12 @@ TEST_F(unix_sock, reset_closed_embryo)
->         char buf[16] =3D {};
->         ssize_t n;
->
-> -       if (variant->socket_type =3D=3D SOCK_DGRAM)
-> -               SKIP(return, "This test only applies to SOCK_STREAM and S=
-OCK_SEQPACKET");
-> +       if (variant->socket_type =3D=3D SOCK_DGRAM) {
-> +               snprintf(_metadata->results->reason,
-> +                        sizeof(_metadata->results->reason),
-> +                        "Test only applies to SOCK_STREAM and SOCK_SEQPA=
-CKET");
-> +               exit(KSFT_XFAIL);
-> +       }
->
->         /* Close server without accept()ing */
->         close(self->server);
-> --
-> 2.51.1
->
+So... reviewing the other stmmac PCI drivers:
+
+- dwmac-intel calls pci_alloc_irq_vectors() but does not call
+  pci_free_irq_vectors(). This looks like a bug.
+- dwmac-intel calls pcim_enable_device() in its probe function, and
+  also its intel_eth_pci_resume() - pcim_enable_device() is the devres
+  managed function, so we end up adding more and more devres entries
+  each time intel_eth_pci_resume() is resumed. Note that
+  intel_eth_pci_suspend() doesn't disable the device. So, this should
+  probably be the non-devres version.
+- dwmac-loongson looks sane, but the checks for ld->multichan before
+  calling loongson_dwmac_msi_clear() look unnecessary, as
+  pci_free_irq_vectors() can be safely called even if MSI/MSI-X have
+  not been (successfully) allocated.
+
+So, I wonder whether there is scope to have a common way to clean up
+PCI drivers. Could you look into this please?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
