@@ -1,79 +1,93 @@
-Return-Path: <netdev+bounces-241204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF548C817CF
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:07:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D576C8181A
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:13:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 32C5E342BB6
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:06:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 758F33A198E
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F830314B9D;
-	Mon, 24 Nov 2025 16:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A3C314D12;
+	Mon, 24 Nov 2025 16:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="i/uR/N1r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="buAQ4PFk"
 X-Original-To: netdev@vger.kernel.org
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA2D30FF1C;
-	Mon, 24 Nov 2025 16:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30C2314D07
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 16:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764000363; cv=none; b=WpWLrwGDEusZhXmziHIHPFd0J2X+6dAtD3nqeXjthNjyAlf5IOSrVr2lCRP9p0wwVQXxtJjzlyjhZ26Raj5z738KMwVWhVKu49gb6VgRenf85hcKVRESehi4N0g06K4xQ7oKfqLApRqY8zgr7EoafIfmN7/ONKrGWuLCDQYpkCI=
+	t=1764000826; cv=none; b=IJJtWlQDPSCjtmUsCPjoRHe93cNiYgvNmNqsxaXX0SkOmIfXl75fnANEcdU7m4ylAjWZnW0ziIDOUz+NmavrIMj7yzf+PhyxIDPr4veRRR/s/2m6Bpl8D5f99i8rCnplcTjVOIiybTdLm1jrxPt12wggnqki3egbNj9pylZe9N4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764000363; c=relaxed/simple;
-	bh=tVGA3qkz7Jn3pFsnWVBSvJRfpOJhIduZOIwHA2N9N7s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rqoq28sSHJ/lYF/MWNQDS7GSG8/RuqJqaNfkLqyxxFxwiLGCtdBLzK+bvxVCaqDKS+NVPi2bccwgVuBnjq67PM+6ma1akwimvupJh5ndJ/Bh8lBT7qU3Aag19bA77bmAiZ42D9Om6mzdibcRS9l9hyF2qhXjmKJuUXBaNrAQHy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=i/uR/N1r; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
-Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id 5304C22F71;
-	Mon, 24 Nov 2025 17:06:00 +0100 (CET)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id CMQpHf2NTp7J; Mon, 24 Nov 2025 17:05:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1764000351; bh=tVGA3qkz7Jn3pFsnWVBSvJRfpOJhIduZOIwHA2N9N7s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=i/uR/N1r6RVrndde0GpFFQVYpW569G6uBJfViOPC+XGrcbLVCKC6CPmcMw8zByR50
-	 8fY+97d9+V9FJagF2DyGck6pHQSoBynmpcSxngMNtRLYen13nclgUf9syCetMyOQpz
-	 SvlLFkGBFZCZ3zx4rxBzGa/u+J3Qn4/9Qhj9ySt3PvI0yfkaaTrgxLzNPBlbvPnYlB
-	 Dun1EFr3X14/PvTiATHkuf5iklGoLNhMxqwn1kJGJPyGGQsJnJHGOdjBVe5yRxDDaQ
-	 m0enm0sSlQltZJjAxtMXi1/s/jDgLZJbINqQdpMsVnn6nLleA68wCAmUjyiuFdLnnj
-	 SO5AW+/g3fX/Q==
-From: Yao Zi <ziyao@disroot.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1764000826; c=relaxed/simple;
+	bh=jjSP/LYJNyk9jWpRW8gGli2ejZT4h4Y4QXCFB+0nMY0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZLor/0VNgPAgw1xnZszceHGU31ohH8g5K94H+Lx5bWRhJMomUo6pFS1TxJNdJsSM2OL4HVIuKmLXO3RQ2gzPVAlIVqUay8pSwnPbC5+rn/Li+uVEfy+bvH9Z6A1oymdl6WUzvPBZ5dXLyLSNKnWnCMfWd0PlUlrQhw1Sufp0leY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=buAQ4PFk; arc=none smtp.client-ip=209.85.214.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2953e415b27so53743155ad.2
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 08:13:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764000824; x=1764605624; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JBGbhFp9ofE9mZ/RF8edJWFX3twAnfhW+YguioC3Mc8=;
+        b=buAQ4PFkBITu0j3pSM4PNcJqA1eSQZ/l1YJe3O6rdDkPpjC46JRNkQuLwCM9JyDbM9
+         fZLR5HndvCvd5jqFF6lsDToKlYQE2BFN8zMw80KcKzSDj6kb4X5YFDvvD+UpPK86D1cH
+         vEp78Ke5rfGMx/3vOpLL7da9/zuCQOZ4YDvDeBXsDKn83vC3PBSjfkjKkloRvUsFGiYS
+         D+4lfaf8nddHYlzbDkJD42lnAy+j1WQ2gS9oKAe6E+NO8/gJ37VU4rxPCYYEs3LhVaSS
+         HEbHxaSEs/Fw0KEzplilb82YA2SlE7/S4VIDWU+xuC0s/pz6b93I9y3j+16PQ4tmxbqc
+         jcTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764000824; x=1764605624;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JBGbhFp9ofE9mZ/RF8edJWFX3twAnfhW+YguioC3Mc8=;
+        b=Fnv/t78oLltxJ6j7r73FHjPgae7VspwG9UctQcKEhvXOpItCcs6n5oM/CAqK6cgf9J
+         ufy4fXrBcpVM2wl3Q+ZYU6zXwnPk1vYJWRVe1cuZQINvmsiMfTKUAaxUZj/MAz/+sFSv
+         k7HzvQ6sfC/6MswcBWJABDWWXVjuqfJr2H1qhgZbVexR++3mUqvF1gSFocf7cUlmepFy
+         VcLlOP6HOeIG2PABvZvwbKEoUtsTPBGQmn+3cJTbTHZTvhmZgdW+9ijGIpwzGCU+G2QA
+         3BUEHCwpm9WcJ9fkG/ZFMm5CFB6hsfobdLOt79GOzdQaNjDnJjjR2vyUr14fKNZ0iq9h
+         dBEg==
+X-Gm-Message-State: AOJu0Ywyi84PGL7Cv4YY4KdQWa2dIfZ4icOh3rpoKTqA1UgkcefNMXQk
+	cHTq0SKmAuRONHr4BsB/nb1zpRWKlXB2Gnwlkt7ug1cn65xvX6uqeYMa
+X-Gm-Gg: ASbGncvmv8aOOyxb02PCA/CvRIAO6ENI06S4tzDK+mlCd5fLhe7urHeOlSgBekT0D9c
+	73JAnhEC4lJ2M/tG9dchTsSBH1U3UP70Sj44yfkohqQcfhPbGxgq7M75lWD2tCFxYxgJ/Pmu2Q6
+	aQJJY82F0A1Jp4QCDoTCQzu+HPV57L1vHQ5GlZ3E081We6Jv4QgwHp9VNfTI8VKBtvE/Z1F5y77
+	tk7Sm1vYb3QjXizpu65Lc2bPzshZnFkj9buMExejmx7uLgjgnwJKJ7/ieDRW5o/34GX6NGe3Gpm
+	zhyz3X36dOki75vtmWPdVl9vnpQYQjlQlpYQtxlns6Z4RyCiLnGWe3jdW2qpCoQV97fCeCFFvWZ
+	s5m/WOVo92F4dWVKtowmcHo+yHGryzCfdiTfiHrcTxIMol0HAcb/GVsl7gSxzkwZS03mFhVCSqL
+	NXBD9md1FC+pm7LgCj1cNX3eTLVb1dGQ==
+X-Google-Smtp-Source: AGHT+IFyAWItYzJREMkeo/sQHkp6vA4cekHCSsVdluSIl/JP4S//ICISujXNC1QfyubZ0laErlhTCw==
+X-Received: by 2002:a17:903:2343:b0:295:68df:da34 with SMTP id d9443c01a7336-29b6bf5d332mr123003615ad.53.1764000819261;
+        Mon, 24 Nov 2025 08:13:39 -0800 (PST)
+Received: from fedora ([103.120.31.122])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b29b517sm138118745ad.82.2025.11.24.08.13.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Nov 2025 08:13:38 -0800 (PST)
+From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Xing <kernelxing@tencent.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Yanteng Si <si.yanteng@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Philipp Stanner <phasta@kernel.org>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Yao Zi <ziyao@disroot.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Furong Xu <0x1207@gmail.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>
 Cc: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Mingcong Bai <jeffbai@aosc.io>,
-	Kexy Biscuit <kexybiscuit@aosc.io>,
-	Yanteng Si <siyanteng@cqsoftware.com.cn>
-Subject: [PATCH net-next v5 3/3] net: stmmac: pci: Use generic PCI suspend/resume routines
-Date: Mon, 24 Nov 2025 16:04:17 +0000
-Message-ID: <20251124160417.51514-4-ziyao@disroot.org>
-In-Reply-To: <20251124160417.51514-1-ziyao@disroot.org>
-References: <20251124160417.51514-1-ziyao@disroot.org>
+	Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+Subject: [PATCH] selftests/net: initialize char variable to null
+Date: Mon, 24 Nov 2025 21:43:24 +0530
+Message-ID: <20251124161324.16901-1-ankitkhushwaha.linux@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,95 +96,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert STMMAC PCI glue driver to use the generic platform
-suspend/resume routines for PCI controllers, instead of implementing its
-own one.
+char variable in 'so_txtime.c' & 'txtimestamp.c' left uninitilized
+by when switch default case taken. raises following warning.
 
-Signed-off-by: Yao Zi <ziyao@disroot.org>
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Reviewed-by: Yanteng Si <siyanteng@cqsoftware.com.cn>
+	txtimestamp.c:240:2: warning: variable 'tsname' is used uninitialized
+	whenever switch default is taken [-Wsometimes-uninitialized]
+
+	so_txtime.c:210:3: warning: variable 'reason' is used uninitialized
+	whenever switch default is taken [-Wsometimes-uninitialized]
+
+initialize these variables to NULL to fix this.
+
+Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  3 +-
- .../net/ethernet/stmicro/stmmac/stmmac_pci.c  | 36 ++-----------------
- 2 files changed, 5 insertions(+), 34 deletions(-)
+ tools/testing/selftests/net/so_txtime.c   | 2 +-
+ tools/testing/selftests/net/txtimestamp.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index ad7ae3618099..907fe2e927f0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -376,8 +376,9 @@ config DWMAC_LOONGSON
- 
- config STMMAC_PCI
- 	tristate "STMMAC PCI bus support"
--	depends on STMMAC_ETH && PCI
-+	depends on PCI
- 	depends on COMMON_CLK
-+	select STMMAC_LIBPCI
- 	help
- 	  This selects the platform specific bus support for the stmmac driver.
- 	  This driver was tested on XLINX XC2V3000 FF1152AMT0221
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-index afb1c53ca6f8..270ad066ced3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-@@ -14,6 +14,7 @@
- #include <linux/dmi.h>
- 
- #include "stmmac.h"
-+#include "stmmac_libpci.h"
- 
- struct stmmac_pci_info {
- 	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
-@@ -102,37 +103,6 @@ static const struct stmmac_pci_info snps_gmac5_pci_info = {
- 	.setup = snps_gmac5_default_data,
- };
- 
--static int stmmac_pci_suspend(struct device *dev, void *bsp_priv)
--{
--	struct pci_dev *pdev = to_pci_dev(dev);
--	int ret;
--
--	ret = pci_save_state(pdev);
--	if (ret)
--		return ret;
--
--	pci_disable_device(pdev);
--	pci_wake_from_d3(pdev, true);
--	return 0;
--}
--
--static int stmmac_pci_resume(struct device *dev, void *bsp_priv)
--{
--	struct pci_dev *pdev = to_pci_dev(dev);
--	int ret;
--
--	pci_restore_state(pdev);
--	pci_set_power_state(pdev, PCI_D0);
--
--	ret = pci_enable_device(pdev);
--	if (ret)
--		return ret;
--
--	pci_set_master(pdev);
--
--	return 0;
--}
--
- /**
-  * stmmac_pci_probe
-  *
-@@ -212,8 +182,8 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
- 	plat->safety_feat_cfg->prtyen = 1;
- 	plat->safety_feat_cfg->tmouten = 1;
- 
--	plat->suspend = stmmac_pci_suspend;
--	plat->resume = stmmac_pci_resume;
-+	plat->suspend = stmmac_pci_plat_suspend;
-+	plat->resume = stmmac_pci_plat_resume;
- 
- 	return stmmac_dvr_probe(&pdev->dev, plat, &res);
- }
--- 
-2.51.2
+diff --git a/tools/testing/selftests/net/so_txtime.c b/tools/testing/selftests/net/so_txtime.c
+index 8457b7ccbc09..b76df1efc2ef 100644
+--- a/tools/testing/selftests/net/so_txtime.c
++++ b/tools/testing/selftests/net/so_txtime.c
+@@ -174,7 +174,7 @@ static int do_recv_errqueue_timeout(int fdt)
+ 	msg.msg_controllen = sizeof(control);
+
+ 	while (1) {
+-		const char *reason;
++		const char *reason = NULL;
+
+ 		ret = recvmsg(fdt, &msg, MSG_ERRQUEUE);
+ 		if (ret == -1 && errno == EAGAIN)
+diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
+index dae91eb97d69..bcc14688661d 100644
+--- a/tools/testing/selftests/net/txtimestamp.c
++++ b/tools/testing/selftests/net/txtimestamp.c
+@@ -217,7 +217,7 @@ static void print_timestamp_usr(void)
+ static void print_timestamp(struct scm_timestamping *tss, int tstype,
+ 			    int tskey, int payload_len)
+ {
+-	const char *tsname;
++	const char *tsname = NULL;
+
+ 	validate_key(tskey, tstype);
+
+--
+2.52.0
 
 
