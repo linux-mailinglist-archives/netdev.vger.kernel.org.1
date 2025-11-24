@@ -1,85 +1,77 @@
-Return-Path: <netdev+bounces-241196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ABF5C813BE
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:07:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3AB4C8147F
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:18:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2B6BA4E1315
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 15:07:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3A5A3A6C57
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 15:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678A3296159;
-	Mon, 24 Nov 2025 15:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0238730AAC1;
+	Mon, 24 Nov 2025 15:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YiVXH5Qj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RZA26I/v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4395F28725B
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 15:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20C127FB1E
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 15:18:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763996844; cv=none; b=tlZ5fY/KiScXrWwtowW1IF2E/VX8A8KSTW+wbSEo9CWm4Qx0zoT8EBV5W6LPNzzmni8GKN8FGb6I/DMzngM1W1KyPtwpbQfiW9/ahQ4/RQtd6csRTbtrI95nIX8AL6qpvZx1UYxn+SoL1ZLnyCaL5Ae2g4m07ayyf4SL4FeEkJg=
+	t=1763997512; cv=none; b=bYwh4N5CBhssHxqbezFli5o/AiOmsA/wFAxoiUg1xaEbrHHpJ9zShg50xZoyIX0GVhjTacIUeMVOn4Voyqcjm2Fo65Aq9MzMbzg4H1A0KUHnuF14U/ASjGg3KL2QCHRHwQGwiAr71QQjHFx60ciMdkpkaC+coew3rcT0HvXnSLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763996844; c=relaxed/simple;
-	bh=KWfvD5bbHnsXFh/tjkiC+gj921RN1CFu/6sCcsqk0UQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Mc2oo4ZX7OlGajIX3Xkm+5hnkSJ6huB+G108O+XpoDeS+STgQS8bbXHbrYvTZ++KS9Vb+Gur9ixsLhj42oqIOZWs6X/kjEyzTldtP8WwdYUdOBrWI8ix5KdsIPLvH++tXejdCDS+o70e5+PCGEQVwTXZUhd9C3GfisESuoizsmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YiVXH5Qj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0421C4CEF1;
-	Mon, 24 Nov 2025 15:07:23 +0000 (UTC)
+	s=arc-20240116; t=1763997512; c=relaxed/simple;
+	bh=DbTxJOtlnG+452WILNUM3WASSzpPs3RC3wLJQXIbpWM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=lNc7CAaIk9szh+6tv3T3e7S8QhT+MrgzUjdpZALB7i8MpNBliuI/Rif2MBcoGaNTg8TRO+eRmaRIGFQu6sTuTjbAO/MUu7refzLgoMlZS0MHbu7eQ1Hj/SB+YNuh1Z8f87aADWDVFBNmE2bIYKjKI0gE7EcU2Idn0QVC+o+rfzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RZA26I/v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41425C4CEF1;
+	Mon, 24 Nov 2025 15:18:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763996843;
-	bh=KWfvD5bbHnsXFh/tjkiC+gj921RN1CFu/6sCcsqk0UQ=;
+	s=k20201202; t=1763997512;
+	bh=DbTxJOtlnG+452WILNUM3WASSzpPs3RC3wLJQXIbpWM=;
 	h=Date:From:To:Cc:Subject:From;
-	b=YiVXH5QjP/Fy0mZV+CRfu6i4jGri/n5CRZ45irE8Yfb1g6ld+Q2t2D2sTLQ6DbFSH
-	 l2oAU7HbuaLLk87zodFgnYydPnBXpkhojsh7o4AWBcyCKo74/9kt0kF+U1nqFMWvQA
-	 /Dv4v2uT6BeWR4IX0Mvr63WHRJR2cp7M+Uo2Y9NVd7XMcZkkHHahE3iLxnCyB1YHav
-	 8Z4Awz3c2u2D/F6p2W6HqIKLgcyaBY5j4jlb/r0DMgi5f+1o37jLPf6gB4JpKP+4uL
-	 6Sjx4sFVPkVBQu+IAfC3CojufwQf5Tn6GPQFMuRhZKvM8ubzlxvI/Rx62lewBXSFTZ
-	 jy4v3wX3yEZaw==
-Date: Mon, 24 Nov 2025 07:07:22 -0800
+	b=RZA26I/vDbheo10jDR+18alplaAFcncICfEZLA+WpKjkjnk00YZeY+OKq1MvChcin
+	 jaPpLWjw07Fw5cCxi+CEVdjCjbyQ/R/Z84bvUlFvoigSHckSq2RJq3hIP9DU/Vc9cz
+	 t2PXmubokcOVhcFlpwwbh6u8fAmoEfuAATbW76jzeUlNSK6bwrHjo6YkTywqGRFhoB
+	 Bb0IZ6e2ZOMYO+QfJnZm2T8SiXy3oiosH4Xj65iZtFJJemJHbCMuYKp7BA+C+rrt+N
+	 OJHP7y+fYc/EmB0DPnAEWen7diqRBc/wyekwUPaO7AHNX7IACYxPIelSdUGrTiNb1T
+	 MkkeNtbxz48/Q==
+Date: Mon, 24 Nov 2025 07:18:31 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: [TEST] so_peek_off flakes on new NIPA systems
-Message-ID: <20251124070722.1e828c53@kernel.org>
+To: Willem de Bruijn <willemb@google.com>
+Cc: netdev@vger.kernel.org
+Subject: [TEST] tcp_zerocopy_maxfrags.pkt fails
+Message-ID: <20251124071831.4cbbf412@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Kuniyuki!
+Hi Willem!
 
-We upgraded our system for NIPA recently to netdev foundation one=20
-(as you know). Looks like net/af_unix: so_peek_off is flaking
-on both debug and non-debug builds quite a lot with:
+I migrated netdev CI to our own infra now, and the slightly faster,
+Fedora-based system is failing tcp_zerocopy_maxfrags.pkt:
 
-# # so_peek_off.c:149:two_chunks_overlap_blocking:Expected -1 (-1) !=3D byt=
-es (-1)
-# # two_chunks_overlap_blocking: Test terminated by assertion
-# #          FAIL  so_peek_off.stream.two_chunks_overlap_blocking
+# tcp_zerocopy_maxfrags.pkt:56: error handling packet: incorrect outbound data payload
+# script packet:  1.000237 P. 36:37(1) ack 1 
+# actual packet:  1.000235 P. 36:37(1) ack 1 win 1050 
+# not ok 1 ipv4
+# tcp_zerocopy_maxfrags.pkt:56: error handling packet: incorrect outbound data payload
+# script packet:  1.000209 P. 36:37(1) ack 1 
+# actual packet:  1.000208 P. 36:37(1) ack 1 win 1050 
+# not ok 2 ipv6
+# # Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
 
-https://netdev-ctrl.bots.linux.dev/logs/vmksft/net-dbg/results/399761/134-s=
-o-peek-off/stdout
+https://netdev-ctrl.bots.linux.dev/logs/vmksft/packetdrill/results/399942/13-tcp-zerocopy-maxfrags-pkt/stdout
 
-The newer system is 10-20% faster it's also moved from AWS Linux to
-Fedora. But I suspect the real reason is that our old system had
-quietly broken compilation of af_unix selftests
-because of Wflex-array-member-not-at-end which AWS Linux gcc doesn't
-understand:
-
-gcc: error: unrecognized command-line option =E2=80=98-Wflex-array-member-n=
-ot-at-end=E2=80=99
-make: *** [../../lib.mk:222: /home/virtme/testing/wt-1/tools/testing/selfte=
-sts/net/af_unix/diag_uid] Error 1
-
-So effectively we're been running some old copy of af_unix tests since
-this flag was added.
+This happens on both debug and non-debug kernel (tho on the former 
+the failure is masked due to MACHINE_SLOW).
 
