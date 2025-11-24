@@ -1,149 +1,204 @@
-Return-Path: <netdev+bounces-241160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 160CAC80D03
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 14:39:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18F61C80DAD
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 14:53:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C1F444E5924
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 13:39:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C63DF3A4E8D
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 13:53:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE96E307AD3;
-	Mon, 24 Nov 2025 13:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3270930B52B;
+	Mon, 24 Nov 2025 13:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GtlS8s/y"
+	dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b="QPd06RrO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from sender-of-o57.zoho.eu (sender-of-o57.zoho.eu [136.143.169.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD90A306495;
-	Mon, 24 Nov 2025 13:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763991578; cv=none; b=mOrTsvtTy753MlbBjzyOL+5MDE7VfD7pfJEewg79nxFdYgnkF583GJ3MUsWODMtOx8+029jbQtDZJ5R1WWIsD0lVIvUFjH6Zk9cXExsucpStqDWUdpNb0qS83tXClXhFozFl8aH2+Eb3SjYkzRSWAR1dkvn9emM5We8daSmmsIY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763991578; c=relaxed/simple;
-	bh=N3yvsqVm0PJlZusMyFsk+KcUCnmo4tz7hXnLuS8Lf1Q=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=oeoJRc0RyHBBAKO4MU1h2VZhTMIUUDN/LVAFWJw7RD2kmmumc+RJk6pCBQ7kC27hZ2+lQByZJpQK8+bOtv508CZIrtbfv9U8BejoWnHJ6hBnPV2znOMPmCgJlHScYywFjPGQUhOUZG6QRR4SgpPaEDqb03nrGzdw0NHoiVnYbOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GtlS8s/y; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763991577; x=1795527577;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=N3yvsqVm0PJlZusMyFsk+KcUCnmo4tz7hXnLuS8Lf1Q=;
-  b=GtlS8s/y7VHu33LaLA+jOfn3xzYVzflslJauEYiFmgpo1XuOxTAu5x5x
-   bXwB9Pbj/cpfdl4fOamxXJLxVIa+ShBqtu+v+bIen3Znajb8fzr91shsd
-   hmeFKyR4pdsfwJnPt11UMGAoODq070E9dTQpFIeXMbt/ycQGCFMENGD5Y
-   enT2IHp1hqM1ROCtx77k5njHwsx4VJ/7u4fDXj9L1ABBxh13fQ9Xa9HZ6
-   8IoXndXsd8XpYBYouRFz1TuqnDoZg/i6a5gOwkPhkmLmd8TjPnCbeoOz0
-   OK9lmmVZMUMpZ8rEVoiCGDivQP75tXuO3YXpgmUTcahNtu69JNeAhWSqf
-   Q==;
-X-CSE-ConnectionGUID: ycr+2d0kS4yxCAySaF3UvA==
-X-CSE-MsgGUID: sy+CvR5YTqWTtg5cquv0Rg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11623"; a="83379575"
-X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
-   d="scan'208";a="83379575"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 05:39:36 -0800
-X-CSE-ConnectionGUID: sqr3meneRlWX2YnoQ/LVzQ==
-X-CSE-MsgGUID: KFq1qs2oR1KFeBa69NSZyA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
-   d="scan'208";a="192142889"
-Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.97])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 05:39:31 -0800
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Mon, 24 Nov 2025 15:39:28 +0200 (EET)
-To: yongxin.liu@windriver.com
-cc: LKML <linux-kernel@vger.kernel.org>, Netdev <netdev@vger.kernel.org>, 
-    david.e.box@linux.intel.com, chao.qin@intel.com, 
-    yong.liang.choong@linux.intel.com, kuba@kernel.org, 
-    platform-driver-x86@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net] platform/x86: intel_pmc_ipc: fix ACPI buffer memory
- leak
-In-Reply-To: <20251124075748.3028295-1-yongxin.liu@windriver.com>
-Message-ID: <f1124090-a8e4-6220-093a-47c449c98436@linux.intel.com>
-References: <20251124075748.3028295-1-yongxin.liu@windriver.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E7F13790B
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 13:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763992407; cv=pass; b=BRgliPfMgKKWfgpDD5BdgiF89wjf9CAgZGd1WkM6eUnrRASOF/59RlUHQNxvbT4L5IZd2izY6Zr9GgwD7rj6XvjX5COun5WrRUee5/6PkoEYVvIYI+7pJFwRlQ2EBbflC5/OHx4KYVK0HwvYwxLd8ddm6NmgWgDsK7ZdbP+uyqc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763992407; c=relaxed/simple;
+	bh=s5h8gSB7v6bsXNAhS9y3RI1hx5UQsmHua34zCqEP0I4=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Hn6OH5z0vspFAYhgxLIEw20xDd6Zyaa18Q2vlTNO7T1TZ40kE11hfQFT6m2xllozNe9kfhyu5bvJLfB9koJvEr/1xc0nBzDzYqONoIr9EUNOn422qz3sOAOfNbIXGkMzpP2JvhBkk/DsAST6OzmF+SyPsztzaEU6UnIUsm0SFk4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net; spf=pass smtp.mailfrom=azey.net; dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b=QPd06RrO; arc=pass smtp.client-ip=136.143.169.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=azey.net
+ARC-Seal: i=1; a=rsa-sha256; t=1763992373; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=CdXkQYfMBGRUPeUpKV4Uh5qSRG9zF1JFpwjI74FnDy4z2PAGW6Pwp+c+lZBtt3xOn7tqZv7CGWjDCl6TX8JGdrtmQxzkgxnSc8giuc7QtDug8evyZ7GYnA8ZQqAFVhDbHUTIGkKtYR4Av9z2kfzuj9P5DKfLJ0sKDh1/ec2dix8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1763992373; h=Content-Type:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
+	bh=rBkX/nDuN24GUNqkAosSgW7yt3kwIvRuz+2yBGUA6hE=; 
+	b=IhO6d2xM+BtEU6ppNc42SlBXp2NuX1spGH2WOYDH9beTkUlVt/ll0rHT6YHVQK/LOunqeM3nwMdVDf94s/2I5Tnu/zqo9xqp4AVSYNwo8UxT1XR6zzE6YMqnGweBHd9NXeJeCDZF4LDmtcd11onjPcECO5Tdx6l7pG/i1wQv990=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=azey.net;
+	spf=pass  smtp.mailfrom=me@azey.net;
+	dmarc=pass header.from=<me@azey.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1763992373;
+	s=zmail; d=azey.net; i=me@azey.net;
+	h=Date:Date:From:From:To:To:Subject:Subject:Message-ID:MIME-Version:Content-Type:Message-Id:Reply-To:Cc;
+	bh=rBkX/nDuN24GUNqkAosSgW7yt3kwIvRuz+2yBGUA6hE=;
+	b=QPd06RrOe6IVecQxCNPH5+JtrlR0SlpgQZiIffVVaOmOkIjFEKKTFz1TiA0vo6HA
+	5Y+43PjGQsD+ry5sqS3HL7Tj2DRkGZ6Oj7W8nlbtuSF1bsGDQ5kyBTI9c855oFoLuDB
+	jSVmRahiF4UCR8hdP+a1x0RVvqdh/HRb0QS7hFhI=
+Received: by mx.zoho.eu with SMTPS id 1763992368103378.52597944823765;
+	Mon, 24 Nov 2025 14:52:48 +0100 (CET)
+Date: Mon, 24 Nov 2025 14:52:45 +0100
+From: azey <me@azey.net>
+To: David Ahern <dsahern@kernel.org>, 
+	nicolasdichtel <nicolas.dichtel@6wind.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] net/ipv6: allow device-only routes via the multipath API
+Message-ID: <3k3facg5fiajqlpntjqf76cfc6vlijytmhblau2f2rdstiez2o@um2qmvus4a6b>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="alsnc4vfxlzkwrw2"
+Content-Disposition: inline
+X-Zoho-Virus-Status: 1
+X-Zoho-Virus-Status: 1
+X-Zoho-AV-Stamp: zmail-av-1.4.3/263.908.66
+X-ZohoMailClient: External
 
-On Mon, 24 Nov 2025, yongxin.liu@windriver.com wrote:
 
-> From: Yongxin Liu <yongxin.liu@windriver.com>
-> 
-> The intel_pmc_ipc() function uses ACPI_ALLOCATE_BUFFER to allocate memory
-> for the ACPI evaluation result but never frees it, causing a 192-byte
-> memory leak on each call.
-> 
-> This leak is triggered during network interface initialization when the
-> stmmac driver calls intel_mac_finish() -> intel_pmc_ipc().
-> 
->   unreferenced object 0xffff96a848d6ea80 (size 192):
->     comm "dhcpcd", pid 541, jiffies 4294684345
->     hex dump (first 32 bytes):
->       04 00 00 00 05 00 00 00 98 ea d6 48 a8 96 ff ff  ...........H....
->       00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00  ................
->     backtrace (crc b1564374):
->       kmemleak_alloc+0x2d/0x40
->       __kmalloc_noprof+0x2fa/0x730
->       acpi_ut_initialize_buffer+0x83/0xc0
->       acpi_evaluate_object+0x29a/0x2f0
->       intel_pmc_ipc+0xfd/0x170
->       intel_mac_finish+0x168/0x230
->       stmmac_mac_finish+0x3d/0x50
->       phylink_major_config+0x22b/0x5b0
->       phylink_mac_initial_config.constprop.0+0xf1/0x1b0
->       phylink_start+0x8e/0x210
->       __stmmac_open+0x12c/0x2b0
->       stmmac_open+0x23c/0x380
->       __dev_open+0x11d/0x2c0
->       __dev_change_flags+0x1d2/0x250
->       netif_change_flags+0x2b/0x70
->       dev_change_flags+0x40/0xb0
-> 
-> Add kfree() to properly release the allocated buffer.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 7e2f7e25f6ff ("arch: x86: add IPC mailbox accessor function and add SoC register access")
-> Signed-off-by: Yongxin Liu <yongxin.liu@windriver.com>
-> ---
->  include/linux/platform_data/x86/intel_pmc_ipc.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/linux/platform_data/x86/intel_pmc_ipc.h b/include/linux/platform_data/x86/intel_pmc_ipc.h
-> index 1d34435b7001..2fd5e684ce26 100644
-> --- a/include/linux/platform_data/x86/intel_pmc_ipc.h
-> +++ b/include/linux/platform_data/x86/intel_pmc_ipc.h
-> @@ -89,6 +89,7 @@ static inline int intel_pmc_ipc(struct pmc_ipc_cmd *ipc_cmd, struct pmc_ipc_rbuf
->  		return -EINVAL;
->  	}
->  
-> +	kfree (obj);
+--alsnc4vfxlzkwrw2
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: [PATCH v2] net/ipv6: allow device-only routes via the multipath API
+MIME-Version: 1.0
 
-Good catch but this fix doesn't address all possible paths. So please use 
-cleanup.h instead:
+At some point after b5d2d75e079a ("net/ipv6: Do not allow device only
+routes via the multipath API"), the IPv6 stack was updated such that
+device-only multipath routes can be installed and work correctly.
 
-	union acpi_object *obj __free(kfree) = buffer.pointer;
+This change removes checks that prevent them from being installed,
+and adds a fib6_explicit_ecmp flag to fib6_info. The flag is only
+checked in rt6_qualify_for_ecmp() and exists to prevent regressions.
 
-And don't forget to add the #include.
+Signed-off-by: azey <me@azey.net>
+---
+Changes in v2:
+- Added fib6_explicit_ecmp flag to fib6_info to prevent regressions.
+  Very simple (and naive) fix, all it does is flag routes created as
+  multipath and check for the flag in rt6_qualify_for_ecmp().
+  I'm not sure whether it should be an RTF_ flag in fib6_flags instead,
+  but there aren't any unused bits in that field so I made it separate.
+- Removed hanging has_gateway as reported by <lkp@intel.com> bot
 
->  	return 0;
->  #else
->  	return -ENODEV;
-> 
+Link to v1:
+  https://lore.kernel.org/netdev/a6vmtv3ylu224fnj5awi6xrgnjoib5r2jm3kny672h=
+emsk5ifi@ychcxqnmy5us/
+---
+ include/net/ip6_fib.h   |  3 ++-
+ include/net/ip6_route.h |  5 +++--
+ net/ipv6/route.c        | 11 ++---------
+ 3 files changed, 7 insertions(+), 12 deletions(-)
 
--- 
- i.
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index 88b0dd4d8e09..da9d03cbbab4 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -196,7 +196,8 @@ struct fib6_info {
+ 					dst_nocount:1,
+ 					dst_nopolicy:1,
+ 					fib6_destroying:1,
+-					unused:4;
++					fib6_explicit_ecmp:1,
++					unused:3;
+=20
+ 	struct list_head		purge_link;
+ 	struct rcu_head			rcu;
+diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
+index 7c5512baa4b2..5f00e9e252c2 100644
+--- a/include/net/ip6_route.h
++++ b/include/net/ip6_route.h
+@@ -73,8 +73,9 @@ static inline bool rt6_need_strict(const struct in6_addr =
+*daddr)
+ static inline bool rt6_qualify_for_ecmp(const struct fib6_info *f6i)
+ {
+ 	/* the RTF_ADDRCONF flag filters out RA's */
+-	return !(f6i->fib6_flags & RTF_ADDRCONF) && !f6i->nh &&
+-		f6i->fib6_nh->fib_nh_gw_family;
++	return f6i->fib6_explicit_ecmp ||
++		(!(f6i->fib6_flags & RTF_ADDRCONF) && !f6i->nh &&
++		f6i->fib6_nh->fib_nh_gw_family);
+ }
+=20
+ void ip6_route_input(struct sk_buff *skb);
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index aee6a10b112a..7ac69bf5ccf2 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -5119,7 +5119,6 @@ static int rtm_to_fib6_multipath_config(struct fib6_c=
+onfig *cfg,
+ 	}
+=20
+ 	do {
+-		bool has_gateway =3D cfg->fc_flags & RTF_GATEWAY;
+ 		int attrlen =3D rtnh_attrlen(rtnh);
+=20
+ 		if (attrlen > 0) {
+@@ -5133,17 +5132,9 @@ static int rtm_to_fib6_multipath_config(struct fib6_=
+config *cfg,
+ 						       "Invalid IPv6 address in RTA_GATEWAY");
+ 					return -EINVAL;
+ 				}
+-
+-				has_gateway =3D true;
+ 			}
+ 		}
+=20
+-		if (newroute && (cfg->fc_nh_id || !has_gateway)) {
+-			NL_SET_ERR_MSG(extack,
+-				       "Device only routes can not be added for IPv6 using the multipa=
+th API.");
+-			return -EINVAL;
+-		}
+-
+ 		rtnh =3D rtnh_next(rtnh, &remaining);
+ 	} while (rtnh_ok(rtnh, remaining));
+=20
+@@ -5448,6 +5439,8 @@ static int ip6_route_multipath_add(struct fib6_config=
+ *cfg,
+ 			goto cleanup;
+ 		}
+=20
++		rt->fib6_explicit_ecmp =3D true;
++
+ 		err =3D ip6_route_info_create_nh(rt, &r_cfg, GFP_KERNEL, extack);
+ 		if (err) {
+ 			rt =3D NULL;
 
+base-commit: bd10acae08aeb9cd2f555acdbacb98b9fbb02a27
+--=20
+2.51.0
+
+
+--alsnc4vfxlzkwrw2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQQsyzQDQ/6KK5HOf3X5T0pxxcIejwUCaSRjLQAKCRD5T0pxxcIe
+j/WdAQC5XfnFt5i3LGoLoDcsdOXkgll0eLgliYVd9CZnpMkyvAEA1/PeFW98Al2j
+fZ12LSAl4M6sUmppD80haqluvb5GJQk=
+=UlVp
+-----END PGP SIGNATURE-----
+
+--alsnc4vfxlzkwrw2--
 
