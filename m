@@ -1,234 +1,176 @@
-Return-Path: <netdev+bounces-241221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B511AC81939
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:32:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E404C81945
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:32:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4D59C4E7674
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:31:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E68374E6E37
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 16:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4332E31B108;
-	Mon, 24 Nov 2025 16:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B5073168E0;
+	Mon, 24 Nov 2025 16:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="dGOsyWBj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J052Fxy0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D20931A814
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 16:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F13B31AF3C
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 16:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764001772; cv=none; b=BaKwfxDSd8pDfW4NgzJQg9EgNX3Hq5NGi8OaC1otymHpAXY9w6izDwJR6YqGUCmiiiSh5jwZMEd2CA3KuP+67iubOfMplQpOpTuTRkfzyOtgtUd7lFjxCZjHFmQu7SPX0KD+2dSUKXsdCzaFZlzZIHao2cpmKC1HU2nU/IPmXoM=
+	t=1764001775; cv=none; b=C3SMySkA2J9vP3B3IdF/bSda/+AM4XRYuFq94upaB5J/Db80XPpLxGwcLBqufRk8uSVwZKYm99RQ2CT7JmBo6Xiu+ZfZzeojxEx/XgxjtHhNPWcVsAnsiR6DNVyIDo2MWdRGtalgRRElb98Xt+gVB8KQu6snNjVHeq6Nxd4oY9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764001772; c=relaxed/simple;
-	bh=UAInQ+1vDLAGa6d9dmaxYhqAGIKQzZ9+tIIoI/hgJq0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Iic7anUPUpX3ixkbXRsXAbOARRo/DsPc0FpQ97FzMI/8cgcs3K5bkvIiuPOsO+6LQHIZR2Ek5FWVA7VsAxVSgpthS2eyIOf5/dn+guak+hE8DIB3O08HjJ89OiMFC6nYcyge771vWzYmb6ykoFzk7kY168rxdik1SV4n6I5Upns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=dGOsyWBj; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-640b0639dabso7762872a12.3
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 08:29:30 -0800 (PST)
+	s=arc-20240116; t=1764001775; c=relaxed/simple;
+	bh=F/p/HJ0/jHiLQSXLO3hCOO+zAtgb4lO8dstTsLDVbN8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=HD4z5tHYvSigb1Z/YP/Ay9xv+JlJtjzesw7/W3HwngRsmcvBo3cXlR3M9oK+hMgvW3JBuSGg2/ikoCAPgYxgf30l/VJk+kjFt1lbiRoJBDlRix72UMSCzCybTFgWlLG9D39RfOr0AGAvxjri3o2k/lKdfluMKV/lok14JUOuzCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J052Fxy0; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-78a835353e4so40477487b3.2
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 08:29:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1764001769; x=1764606569; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HehKTi7HG5k0VmidZAFWiuea5SnTnA46ALpIVUGcCBU=;
-        b=dGOsyWBjEoIJbsb47SV5T9sdoR00njREZm72ZDLKGjjZtOhXpguiqJ6flMV/DUHAk3
-         j3wMn+/R/A234XQZRjfg3xcQDgK9NriYufne2CKDQJ/fLpKp0R3OYCT3sT7dt8npW8H6
-         0Thtv203nMfh5mi8v9/RnSyKoDKCnHEHXoxEH7qdywSG4fzvsQiY9hpGsI0BKz3F2lE/
-         s2lyGF3OE9V79NgtuqNm6M/cdC/KHfg5pfAAEAfWsTUuwmmyt1A9nJ6M2OxI8o3LLhEx
-         CJntaYKEYf96JAdxZDpL9lF+VAOlgsQBY1tkgUmZo1uKI/ztXHRj2AF44Ekzn5TLKOe6
-         4BlQ==
+        d=gmail.com; s=20230601; t=1764001772; x=1764606572; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EXs6TXJv7ekh4mmD2BOASV1Zx3Fsj+Ymhs6dgEcpKxI=;
+        b=J052Fxy0+bhrCa5oNmy6OFgLP11AdmgaKX0q5AjjZnXNy9SW5B33VqGn/VOJO23F/Y
+         i8f46+JD0uPlq/tyeUU6WR7lgHVubRuu4qMFPmi1lClnD0Y61SgCXtjCZfPjgQiaio5O
+         /ad/GrGQUBwCQTdNIWWmoYlCUUOp0Lq17E6oU2X9Mf+85v25/09fH2bEyon6BNLcztgI
+         wa2LOTMyp3lPVmNSu6jBYmMeULNkB30j4M0JrdP0NW7CDpdFx2RzrVPQi13y4T9CoEuP
+         K2Y3NNJr05hm1Aw0E0MpPqZbLz0Ci/BEc/NQuNA4LhmmRB3ivBMrp3gT99zIe79vzz5W
+         CXGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764001769; x=1764606569;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HehKTi7HG5k0VmidZAFWiuea5SnTnA46ALpIVUGcCBU=;
-        b=EIGaDFCttg9XS827mLbKS6ZpDr4Cs82pqjqBt9jGf2Yo9kr7Pobwi5t+wZctmPZCor
-         1W69ptcAvELcOZMoYMDK0cR61J6mvJ4gwJjkqF9A8TcdsA4Q4af5OkuMD2wi8l4hkOhG
-         v3l7m+NLfDl4vgpK2q6pOECN9Syqr5rWarTp3rgWHSxQiewszuOK9YNSkZTdLFZYyJjT
-         JoeezFXvsf/3cXivYdadFmjKcWTUtTH2QdDMdM9Kgi9MMpXlKnQKSiV5c1ldheTa0Tl+
-         rbdWhTzXW0QDISDCC0+UkJYtiKOqt+0nipfTZAfd9K9w0eef9yRbzphikCHFGxKjV7JR
-         +yZQ==
-X-Gm-Message-State: AOJu0YwGNC67KI1vfhsLgLi3gUWA4FHD4C306cYkPnFR0G13tSLFjCfV
-	NnHKEAP6+TTwjW2ENUBnFaWDooXO7EpV67iQYgBb1tca5ZM6ZrYfohRXiT5wRRz8tso=
-X-Gm-Gg: ASbGnctFuOqGfy1gjseT5f4oihPPbbF5SHHAV+wasWCc8vjHsLt6HMH2/S3mE9qIqXU
-	AXVhM0qVQOmZF+qHG3+/6Q0SMPy5sZIe594pG1NrDoAG4Tka12xaTMVG7ZPL+/XEvF/swcQRzo6
-	KjbhjmAdd+fHWYmbC79ZSH6n53BgCGKHZLtvCjRYqM9qufaxlpZqq46YAN/EL+cGgKJfdwMAfKI
-	O6sOv1PDsqWNp7bF9y/95ulQNW2YzQmuU5ar50w5j60s2eu1pQDE4CYlwz5YgFb9Lk+dFsX5w89
-	jYI7y9eK8tZhMtiGHtj4sa5k46onoqco4JlzpfguSJv26wVpmUK1hWHRMnFbp+E5TbPeu0ADLqq
-	FdxmnxlOS046Bk8wZR6fUqz/2BCqBXrrbWS0i5N9+LydqQTTExXxNxYdbO08tSBEcMhyfI4QQyH
-	mj5vhWJnIlgIBp58rjvTBPtzFspuguso+TktEJDOkanuA4qD11NFi7hEuF
-X-Google-Smtp-Source: AGHT+IGTfsGW03jQxs84v0YwM0SH5pLUw2DgIM7xyazuFdCl5sDn9njDLi/heBgRs+exPj5SGMRyUg==
-X-Received: by 2002:a17:907:6d06:b0:b73:7652:efc2 with SMTP id a640c23a62f3a-b76718c3862mr1359876566b.60.1764001768853;
-        Mon, 24 Nov 2025 08:29:28 -0800 (PST)
-Received: from cloudflare.com (79.184.84.214.ipv4.supernova.orange.pl. [79.184.84.214])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b76550512d2sm1334759566b.67.2025.11.24.08.29.28
+        d=1e100.net; s=20230601; t=1764001772; x=1764606572;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EXs6TXJv7ekh4mmD2BOASV1Zx3Fsj+Ymhs6dgEcpKxI=;
+        b=wM2GA2V44ZO7ZF+drDaj/k7qAnCzBbopTcHsjahY0VCliqDkHVzoVjteb4AoulCuwH
+         9m0PUCEuyyK/BSzAZxWIrqFgJbRfk3/JB/XtP42RCdT6uDg/JWcLZ+vs/DoViTdDlhCk
+         1bgiyHPLY63fGTtcBQunc+gJdCkYnCuIvDSI3i/2lfjb06rkQJ5dGlnOr7CgTUGalPWw
+         auaLtp4KdCxofZR+6vUZA8GHUmb9xUvTRSRP1dCjMmw8hQLJx1jBHux4Ko5U2INUXefl
+         w5fn1nGLe1jCeg6QLjJJwbPSbJwqt25jLWk9xWwNGkn7kVs8YpUOYL00i46h7H9UciDA
+         HYHw==
+X-Gm-Message-State: AOJu0YyuuLt18KnAVnnUsEl1oYX/21cYASwtwKnzO5X8FB2aqOaTc2HB
+	8gd3O75QgTZz4FJ0da+xZ0hK0o1GNzs2M7IbX28eFwOTyKFKSgR4VRzb
+X-Gm-Gg: ASbGncu+L3D0H5dJD2jUG7RL2as8rURLJanDxY0L4FP4YBOpnXAjTqsieIVApuY1UdL
+	0IyIj6WDSf+MgKhKgVJngS3fnKqfHfG/4O/dt2RlOiUAN1TfnfDPOmHrCR//fCVo9+xwKW0etCX
+	n4t2kYpuGBpSp7j53qbitrgQA5jYJCSgC3S6I27nMwyQnr//HwPn9LPVmovYzq4hNFPMqKpgF25
+	uAer+F9ZOU2DGsjro7ov+4HzBCirlz/4UlWZe235//v0BFO8aZheWrZXnaqf8MMb2YROTXZmfy7
+	3pxoyQ5l6gDZuvuk6q2AsKHeCVnS18I7UO0PtZ7xiLbhgACpuWNVqLG2C9rMqEq5bOalewMCqEj
+	+5QCa1uaH3pQ18E6rVz+wZx+d1XJOdzr7ogPJAg1DvzpTiS83zBraJehL1zVS+8m2Fj+HxIoxeK
+	hHtPOctIj3tHvRXTFVZgkzvgv0U6S4gWbLkpN7678/ExK/iTIq7zzqzniwfPl/VNOSQXeR4JDiF
+	jK//w==
+X-Google-Smtp-Source: AGHT+IGw2zzWJixsO2IN3R+1XP+R3jMDdKaoUbOzVFqNI0EM2QPF0TsNm0BHrHdqMhYl4bERvp6RSQ==
+X-Received: by 2002:a05:690e:128e:b0:633:a260:14a1 with SMTP id 956f58d0204a3-64302a3e9a3mr7575612d50.18.1764001772598;
+        Mon, 24 Nov 2025 08:29:32 -0800 (PST)
+Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-642f707a9b9sm5114267d50.6.2025.11.24.08.29.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 08:29:28 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 24 Nov 2025 17:28:51 +0100
-Subject: [PATCH RFC bpf-next 15/15] bpf: Realign skb metadata for TC progs
- using data_meta
+        Mon, 24 Nov 2025 08:29:31 -0800 (PST)
+Date: Mon, 24 Nov 2025 11:29:31 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>
+Cc: netdev@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.1fe4306a89d08@gmail.com>
+In-Reply-To: <20251124071831.4cbbf412@kernel.org>
+References: <20251124071831.4cbbf412@kernel.org>
+Subject: Re: [TEST] tcp_zerocopy_maxfrags.pkt fails
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-15-8978f5054417@cloudflare.com>
-References: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-0-8978f5054417@cloudflare.com>
-In-Reply-To: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-0-8978f5054417@cloudflare.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, kernel-team@cloudflare.com, 
- Martin KaFai Lau <martin.lau@linux.dev>
-X-Mailer: b4 0.15-dev-07fe9
 
-After decoupling metadata location from MAC header offset, a gap can appear
-between metadata and skb->data on L2 decapsulation (e.g., VLAN, GRE). This
-breaks the BPF data_meta pointer which assumes metadata is directly before
-skb->data.
+Jakub Kicinski wrote:
+> Hi Willem!
+> 
+> I migrated netdev CI to our own infra now, and the slightly faster,
+> Fedora-based system is failing tcp_zerocopy_maxfrags.pkt:
+> 
+> # tcp_zerocopy_maxfrags.pkt:56: error handling packet: incorrect outbound data payload
+> # script packet:  1.000237 P. 36:37(1) ack 1 
+> # actual packet:  1.000235 P. 36:37(1) ack 1 win 1050 
+> # not ok 1 ipv4
+> # tcp_zerocopy_maxfrags.pkt:56: error handling packet: incorrect outbound data payload
+> # script packet:  1.000209 P. 36:37(1) ack 1 
+> # actual packet:  1.000208 P. 36:37(1) ack 1 win 1050 
+> # not ok 2 ipv6
+> # # Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
+> 
+> https://netdev-ctrl.bots.linux.dev/logs/vmksft/packetdrill/results/399942/13-tcp-zerocopy-maxfrags-pkt/stdout
+> 
+> This happens on both debug and non-debug kernel (tho on the former 
+> the failure is masked due to MACHINE_SLOW).
 
-Introduce bpf_skb_meta_realign() kfunc to close the gap by moving metadata
-to immediately precede the MAC header. Inject a call to it in
-tc_cls_act_prologue() when the verifier detects data_meta access
-(PA_F_DATA_META_LOAD flag).
+That's an odd error.
 
-Update skb_data_move() to handle the gap case: on skb_push(), move metadata
-to the top of the head buffer; on skb_pull() where metadata is already
-detached, leave it in place.
+The test send an msg_iov of 18 1 byte fragments. And verifies that
+only 17 fit in one packet, followed by a single 1 byte packet. The
+test does not explicitly initialize payload, but trusts packetdrill
+to handle that. Relevant snippet below.
 
-This restores data_meta functionality for TC programs while keeping the
-performance benefit of avoiding memmove on L2 decapsulation for programs
-that don't use data_meta.
+Packetdrill complains about payload contents. That error is only
+generated by the below check in run_packet.c. Pretty straightforward.
 
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
----
- include/linux/skbuff.h | 25 +++++++++++++++--------
- net/core/filter.c      | 55 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 70 insertions(+), 10 deletions(-)
+Packetdrill agrees that the packet is one byte long. The win argument
+is optional on outgoing packets, not relevant to the failure.
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 8868db976e1f..24c4e216d0cb 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -4600,19 +4600,28 @@ static inline void skb_data_move(struct sk_buff *skb, const int len,
- 	if (!meta_len)
- 		goto no_metadata;
- 
--	meta_end = skb_metadata_end(skb);
--	meta = meta_end - meta_len;
--
--	if (WARN_ON_ONCE(meta_end + len != skb->data ||
--			 meta_len > skb_headroom(skb))) {
-+	/* Not enough headroom left for metadata. Drop it. */
-+	if (WARN_ONCE(meta_len > skb_headroom(skb),
-+		      "skb headroom smaller than metadata")) {
- 		skb_metadata_clear(skb);
- 		goto no_metadata;
- 	}
- 
--	memmove(meta + len, meta, meta_len + n);
--	skb_shinfo(skb)->meta_end += len;
--	return;
-+	meta_end = skb_metadata_end(skb);
-+	meta = meta_end - meta_len;
- 
-+	/* Metadata in front of data before push/pull. Keep it that way. */
-+	if (meta_end == skb->data - len) {
-+		memmove(meta + len, meta, meta_len + n);
-+		skb_shinfo(skb)->meta_end += len;
-+		return;
-+	}
-+
-+	if (len < 0) {
-+		/* Data pushed. Move metadata to the top. */
-+		memmove(skb->head, meta, meta_len);
-+		skb_shinfo(skb)->meta_end = meta_len;
-+	}
- no_metadata:
- 	memmove(skb->data, skb->data - len, n);
- }
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 334421910107..91100c923f2c 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -9125,11 +9125,62 @@ static int bpf_gen_ld_abs(const struct bpf_insn *orig,
- 	return insn - insn_buf;
- }
- 
-+__bpf_kfunc_start_defs();
-+
-+__bpf_kfunc void bpf_skb_meta_realign(struct __sk_buff *skb_)
-+{
-+	struct sk_buff *skb = (typeof(skb))skb_;
-+	u8 *meta_end = skb_metadata_end(skb);
-+	u8 meta_len = skb_metadata_len(skb);
-+	u8 *meta;
-+	int gap;
-+
-+	gap = skb_mac_header(skb) - meta_end;
-+	if (!meta_len || !gap)
-+		return;
-+
-+	if (WARN_ONCE(gap < 0, "skb metadata end past mac header")) {
-+		skb_metadata_clear(skb);
-+		return;
-+	}
-+
-+	meta = meta_end - meta_len;
-+	memmove(meta + gap, meta, meta_len);
-+	skb_shinfo(skb)->meta_end += gap;
-+
-+	bpf_compute_data_pointers(skb);
-+}
-+
-+__bpf_kfunc_end_defs();
-+
-+BTF_KFUNCS_START(tc_cls_act_hidden_ids)
-+BTF_ID_FLAGS(func, bpf_skb_meta_realign, KF_TRUSTED_ARGS)
-+BTF_KFUNCS_END(tc_cls_act_hidden_ids)
-+
-+BTF_ID_LIST_SINGLE(bpf_skb_meta_realign_ids, func, bpf_skb_meta_realign)
-+
- static int tc_cls_act_prologue(struct bpf_insn *insn_buf, u32 pkt_access_flags,
- 			       const struct bpf_prog *prog)
- {
--	return bpf_unclone_prologue(insn_buf, pkt_access_flags, prog,
--				    TC_ACT_SHOT);
-+	struct bpf_insn *insn = insn_buf;
-+	int cnt;
-+
-+	if (pkt_access_flags & PA_F_DATA_META_LOAD) {
-+		/* Realign skb metadata for access through data_meta pointer.
-+		 *
-+		 * r6 = r1; // r6 will be "u64 *ctx"
-+		 * r0 = bpf_skb_meta_realign(r1); // r0 is undefined
-+		 * r1 = r6;
-+		 */
-+		*insn++ = BPF_MOV64_REG(BPF_REG_6, BPF_REG_1);
-+		*insn++ = BPF_CALL_KFUNC(0, bpf_skb_meta_realign_ids[0]);
-+		*insn++ = BPF_MOV64_REG(BPF_REG_1, BPF_REG_6);
-+	}
-+	cnt = bpf_unclone_prologue(insn, pkt_access_flags, prog, TC_ACT_SHOT);
-+	if (!cnt && insn > insn_buf)
-+		*insn++ = prog->insnsi[0];
-+
-+	return cnt + insn - insn_buf;
- }
- 
- static bool tc_cls_act_is_valid_access(int off, int size,
+So somehow the data in that frag got overwritten in the short window
+between when it was injected into the kernel and when it was observed?
+Seems so unlikely.
 
--- 
-2.43.0
+Sorry, I'm a bit at a loss at least initially as to the cause.
+
+----
+
+   // send a zerocopy iov of 18 elements:
+   +1 sendmsg(4, {msg_name(...)=...,
+                  msg_iov(18)=[{..., 1}, {..., 1}, {..., 1}, {..., 1},
+                               {..., 1}, {..., 1}, {..., 1}, {..., 1},
+                               {..., 1}, {..., 1}, {..., 1}, {..., 1},
+                               {..., 1}, {..., 1}, {..., 1}, {..., 1},
+                               {..., 1}, {..., 1}],
+                  msg_flags=0}, MSG_ZEROCOPY) = 18
+
+   // verify that it is split in one skb of 17 frags + 1 of 1 frag
+   // verify that both have the PSH bit set
+   +0 > P. 19:36(17) ack 1
+   +0 < . 1:1(0) ack 36 win 257
+
+   +0 > P. 36:37(1) ack 1
+   +0 < . 1:1(0) ack 37 win 257
+
+----
+
+/* Verify TCP/UDP payload matches expected value. */
+static int verify_outbound_live_payload(
+        struct packet *actual_packet,
+        struct packet *script_packet, char **error)
+{
+        /* Diff the TCP/UDP data payloads. We've already implicitly
+         * checked their length by checking the IP and TCP/UDP headers.
+         */
+        assert(packet_payload_len(actual_packet) ==
+               packet_payload_len(script_packet));
+        if (memcmp(packet_payload(script_packet),
+                   packet_payload(actual_packet),
+                   packet_payload_len(script_packet)) != 0) {
+                asprintf(error, "incorrect outbound data payload");
+                return STATUS_ERR;
+        }
+        return STATUS_OK;
+}
 
 
