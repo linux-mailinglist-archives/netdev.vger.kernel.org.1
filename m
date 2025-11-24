@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-241269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F010C82130
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:21:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8B63C8213A
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 19:21:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 659403AB337
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:20:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F7C83AFB3E
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E4831C57B;
-	Mon, 24 Nov 2025 18:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C513731E0F7;
+	Mon, 24 Nov 2025 18:19:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1E031770F
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 18:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CF731BC9E
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 18:19:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764008360; cv=none; b=PyoE92Hzih3k4JTR8LSm8nny8nW3xCKa8OYaXsL6wQLnFWXVgBFbtGS5uSemwvqjBauUl3anhycFZLXQbHqtaUGVv2rRe6b/5+HYlcUN2vHIZB4WXbZTf5fs8VAxiPNScTfNlxLXKvANmI2RRwlU8DD/ASHbrboNrPsOVtatCg0=
+	t=1764008361; cv=none; b=tVWfdKAlXXbQHkkxhus1BoQ28SyxhUFMoukwNJZ0hiDUPCizrWzBMydyLMTHbTntAoJZPneZTTZvNjyNrwPlSwsJzvPcG8sR1L3AAbsXH/YCQX/2fMKzS+QXPiTkYvjK/sm5L5wytLHjORbVhPaqZuPZqxTxpX8KLW//UH8C0J8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764008360; c=relaxed/simple;
-	bh=r7kjPpO3EmMUKZOQEZlWjxTq3oyKJiuHGfOq2mFvYMA=;
+	s=arc-20240116; t=1764008361; c=relaxed/simple;
+	bh=v3FELT954aTfsjXFGCQjBmaqRQsN/PNh4kyuahjVzFw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=O2NljbdzUtVeBRwciyjEEfi4wlmkeykoy5uXFdgjEaNxBgbGn2MXl6lI4D+oraC52Vr5RAtN6R8U4BeipTDWDhRcw3cMBz1ybGg8aduzM4u+NcmLJ9x31u91P1kypizcsw8OE3PdfPfDxEEKbQKwvnEnqM3WYDynveMTPicD6/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.49
+	 In-Reply-To:To:Cc; b=TWLaz2/U3LSyXPqV14f+Uuiy3mGwHp8ji8UGG3GTG3tONmcJwBt8hJNUNn11WEjbVRT9GpGgFM8RUc2PGOxRA5flVm2yA/yYkduLaIWXGglxmCcvLJc2YkgnHG8bnufMbH8Ml/YXX2thJ0MJnGSZFFCvI7WkK9opUikmELXMzoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-3ec4d494383so2792746fac.3
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 10:19:18 -0800 (PST)
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7c7533dbd87so3304559a34.2
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 10:19:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764008358; x=1764613158;
+        d=1e100.net; s=20230601; t=1764008359; x=1764613159;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=XdOK/+JSUKsUAuFyuE3vjj9D8Qk2MEeTKmCgASJ6/Kc=;
-        b=d/QU/BdU4++8Gnp3SiwbesnUff/DlEvK0eapeWgOKUi3N5yLWIpht2XctpesnGx1wJ
-         4V07JRlGZNlHacwnrtaCAH2cjYfo+7/O23rV/Z6d7Jx4XFGfbKjxd0iNT9PZihvp+tjC
-         qz7fEpAY0sBzdWJdxwfXj43CzYNqKl13u8YgoFhXKkBwPgTjj1cRjl9viAmO1iebz+Ty
-         ljqnn7CUjXBOWh++lUSF9vixKvbQzv/CL+WFwddknI8Bm0/ybX8L0dJj9cgABKupb4la
-         GuDHRArTcMh5qnNUfqv5wmqbPyu8v0CboQktJZVJCfuyrwXJf+XFtfsYgHCiZBbqKFhS
-         FMwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUwZHxvVdV7pVOI1hvuj8Mg16SSIIqD/5kiwhBNXzZbga7NWrCQKYlyR2yXVLajTtX6cY3IpfE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0ze17FAXwPFk68xvQ2p632vPp/O4d18fqto0JIgYf7e39NDoK
-	JChr6WnKnj3uWhyP4skTMH5bNoC/oDPVMZeMxSMJ660liectiT3QcfL7
-X-Gm-Gg: ASbGncsPRxmyMfU7uOBiJMSaDyGA3l+WE+aJyOGFwQB2wb9PWRnCBMOeY80W9ArvGL3
-	cfpvcux3bnXNNzeNny1E4UnE3xwWB4a2x8775KY2AlW133YRaEColLkyzlc36CK8lznC2bI4otF
-	X4LGMrk8jz8snx1yJcjmTWU0v+l4hux61Fesiff+5iapif2KQOYTGRZiQQ1+WRqntUGeKsPByDV
-	1p6EK3A1r0JFD6saFMJQbzb0q9bl12mwnDjx8Xxieav36zqQ1JgMTxDxcINZmfoHb7BVov7+IhF
-	NTBgrsAeM46xSLxvk2ZsL+V/AZbbb7rOTQORM3irU0Nqd5PLRlQqFR52svAp+39H1nIehR1RmyM
-	j/MqJO7CC9e2Uo9PsyPoj+T2snCR82+qBeLR01cqVAKLsA5o/5Gyp57gSyxP0i0qRbNtUBOxDEQ
-	MWreaqErYF2ug9Bw==
-X-Google-Smtp-Source: AGHT+IFsMYMZsraWZeN3BUvD1HXeX+FpLoZiZgRtlLXlHtafV46HeiFiZHENmrqbuDEprBt45CmkCg==
-X-Received: by 2002:a05:6870:a2d1:b0:3e7:e20a:39fb with SMTP id 586e51a60fabf-3ed1fd4ff6cmr52374fac.11.1764008357879;
-        Mon, 24 Nov 2025 10:19:17 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:72::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ec9dc8e103sm6508744fac.19.2025.11.24.10.19.17
+        bh=lpuv5uBb34S2sKQbL15mp3kM5Ctt2dd8AM4k33sXpoA=;
+        b=m48dJSW4CLyV/X11cTL5xQmf8Yb0qfm4q4i+Tj2XNQ3MnyylM0ByrRyWhzvTQMqrku
+         B/smlpMN0A65z57+OjaPbyC+vUCQHQFS0hvGPkxnzwuOFT27teaK7uPj+9ynyAlh/GY0
+         7JzeabHrrVXNakjaCdLCvZ/YXDSTJJr9gKdkM44VZqgpP/kaEaBI/GodMKoXRg7D0PfT
+         ZNQBbxsnirFDy0KdZ4UWHVeE6cPS5+jp05qPyBpeYWvUZxUkqxK2STDdTfr5/37fjbI2
+         HILoAnjnsrYj4Chexu/OS6LhTEyIn+pAop8meU2tSwcUK2TtpkC9lClm3tIfyq7btLKq
+         46XA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmtPux2IMPh/W+arEINDRj3WxECJgYBolWS2lUpf38uuaq+m+UZjUxuCkLCx1ybvi9AB2HBeo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6oAQOMw7ECi+xI7Qn9Mn2pt8dHQpDk69Uglmb5ZvUB1QiywCv
+	t33mIhXFIau+FMr7BylfuJo3GTzatUI8MsYmZw6GVb/XmaOOgHTKlftI
+X-Gm-Gg: ASbGncvnmwcKf2IBxVvydlZ/1iRAIK6hjnFVfdU6XCTP59xqEIIDZdSBKHzmdtYDwH9
+	w5MBQjqKLr8ifMDSiet+C9Hao5MY5pUZ4IAe3DbHPAsRjXF9BNcnd5DGeJZyxxpK9E0C93Ycsfd
+	xTWZ348e4DxGqbEjlNMB/+kSAc82STHQC/0eC5vsCguHA0kBqHHwNFeURfRLYa4lp81giGcjRQB
+	vzgAAcPb35BVXeQTErdTt5XTrVjCgrTzeE7MP4VssQ01YoF+TNp21d1pHvwKoRR2kARsLTVLMDg
+	1fwVi1gKkqxpQhtXSUZTfimBgPu0MDJ/JVGws+/Wf76LqA5dSM308OL3WFAGjXFKsdMIM7QaIdq
+	pEvjVEja0S8kJKjdSA+GZwCtm00Lc33N1V/9h3a/GoYa50VnqXj2XkkOM1AFn2S4EUWetSn8ryP
+	9O5t7q8HYG9hYMNQ==
+X-Google-Smtp-Source: AGHT+IGLyTlOGAFidnFnYcwBbuXw23XYxP3MgOKH7xbrMv0wbPQmYh/J64HtXsWHCv78nNaDS0I0GA==
+X-Received: by 2002:a05:6830:71a9:b0:7c7:6626:b595 with SMTP id 46e09a7af769-7c798b57595mr7147761a34.3.1764008358888;
+        Mon, 24 Nov 2025 10:19:18 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:5d::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c78d32f601sm5513512a34.12.2025.11.24.10.19.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 10:19:17 -0800 (PST)
+        Mon, 24 Nov 2025 10:19:18 -0800 (PST)
 From: Breno Leitao <leitao@debian.org>
-Date: Mon, 24 Nov 2025 10:19:10 -0800
-Subject: [PATCH net-next 6/8] igc: extract GRXRINGS from .get_rxnfc
+Date: Mon, 24 Nov 2025 10:19:11 -0800
+Subject: [PATCH net-next 7/8] ixgbevf: extract GRXRINGS from .get_rxnfc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251124-gxring_intel-v1-6-89be18d2a744@debian.org>
+Message-Id: <20251124-gxring_intel-v1-7-89be18d2a744@debian.org>
 References: <20251124-gxring_intel-v1-0-89be18d2a744@debian.org>
 In-Reply-To: <20251124-gxring_intel-v1-0-89be18d2a744@debian.org>
 To: aleksander.lobakin@intel.com, Tony Nguyen <anthony.l.nguyen@intel.com>, 
@@ -84,20 +84,20 @@ Cc: michal.swiatkowski@linux.intel.com, michal.kubiak@intel.com,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com, 
  Breno Leitao <leitao@debian.org>
 X-Mailer: b4 0.15-dev-a6db3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1850; i=leitao@debian.org;
- h=from:subject:message-id; bh=r7kjPpO3EmMUKZOQEZlWjxTq3oyKJiuHGfOq2mFvYMA=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpJKGdKv15ipu1j1gMS0Jhfn4ft7Ly7jrvTdWd7
- 8Q8gdOtGemJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaSShnQAKCRA1o5Of/Hh3
- bZXdD/9kWqQNyNoVCNuwu1DAB8IoqQYDXO4gblgkYeyAIwCF/DUfqZrg2iDMn9NHesx6ez06K6C
- M7wn38DzZvlSqJrfMIrYg6xL73sziCXQiH3hM1ltLbzw+q9AYTeyCygU1+iPTBvK7LeGOl34Toe
- d3JTPQt5UvVZAbvPAB5AKdxPYyvwRmLfx53TLQZ0eB7ax9HF6HJZpJhSeq3ltsZ+QeXG21Loz2e
- lVGA5pO53PT+o2NnOEUu82x2yXl6PbDwiMhvBh9y1PEYrJ8ZsfsG+vUTEhsVIUgCByfZURwbyKK
- tweLnG8+7BJK7PmNr69HoIiOPS0QKy/v2D6JBaLkDJvULUj+qX2f2fgw+YnxwTWUV3NMHP5X74s
- c8wdVpFdmvJ2K5rVpgAF7LrLszl5E4arCAM/gTLAIvw5PBm7Jh0Qh1s6RGJKStuwbDeD0SV/O7x
- mVUOcHYDJsRuNw+57hNhso1Nj3Egq49AG6ib6/qpU7C8LdwKOovDoZSFqufrpn3s1K0LWmyaJis
- 8gYTMHTFYxZMG2gYceACrWq85RHj1FVmgG7aWS4rTR/y/yj5djXjMV7l2aaOId+/1o5XqSacFyv
- P1MyNAswjYdYpGQpB3S+E/Z/pOcLkRNdumq5dCRm66Z+OcW95Z5fehVxmtoCH8vrl6O1kQItFqO
- 3BFnOwlIYyUIs8g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1941; i=leitao@debian.org;
+ h=from:subject:message-id; bh=v3FELT954aTfsjXFGCQjBmaqRQsN/PNh4kyuahjVzFw=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpJKGdS6QcA3NViqOUrQv3y1/oRQL8hlQDzAOWm
+ PfRac3kV4qJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaSShnQAKCRA1o5Of/Hh3
+ bYeGD/9Qc0SPn9JXbdTvMKmq46s4CjUHTti9396l4b4GyFTAlxrjl/N11ZXZRU9VRLExRJL8DF5
+ SYO8qrjrZ8dFz1Vfxz/HoGCky2YLmVpT9KLWNCygZbkKzUuY6ndPFdTDpL9AtRFQrp1CXx2sYub
+ 2mqQWn3WTL5kVGOOVVs4diQZg/PNG4C/Ad8NQkkzI7abHxxzIqh9TBz0Y4HcoGPPiH2kVFkglq2
+ hNNAN0Fj4NdHZ9iee7abuKVslhJcakSCH3HwtmbDfHYuVn7q+mJAirZPBOU56zYxDeXHoK7WksU
+ jznJ6x0AOnxrq9q38SZutudQmmwTPVPR9GrSA6/eECKViLGDkAP3TMpk7WRX0930/ZmVW9xhu6U
+ e7aQKYK9SQbFMj4f4mM4VTU13P4TqA0HW8geLupV5+XieysIoftsneh4znma+wuyEDPlpKtPC/X
+ oK3i27eKmqpxpflNMbnrL+VdcZOuV2IJ8i0NbC/Hi8AsFWTP6zv3zW7hRP/zRO/SUoFzqA1R1iV
+ 2Rm5igOcZyIwp9zNiysOPLAkodu3nvKLCqTfGQI57oZ6HTc3Capln2RLn3NVSbiirYUiyashH+f
+ zFafDBfvP35pPTkIs4r/fRkYLrmqV1DV1i1GUGJ+p0QM6O0LoHO2te/8LOO9ANJ4nD3O9nxr9MW
+ 2y1VmnoSHYF1rVA==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
@@ -108,49 +108,49 @@ simplifying .get_rxnfc.
 Remove the handling of GRXRINGS in .get_rxnfc() by moving it to the new
 .get_rx_ring_count().
 
-This simplifies the RX ring count retrieval and aligns igc with the new
+This simplifies the RX ring count retrieval and aligns ixgbevf with the new
 ethtool API for querying RX ring parameters.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/intel/ixgbevf/ethtool.c | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index bb783042d1af..e94c1922b97a 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1091,15 +1091,19 @@ static int igc_ethtool_get_rxfh_fields(struct net_device *dev,
+diff --git a/drivers/net/ethernet/intel/ixgbevf/ethtool.c b/drivers/net/ethernet/intel/ixgbevf/ethtool.c
+index bebad564188e..537a60d5276f 100644
+--- a/drivers/net/ethernet/intel/ixgbevf/ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbevf/ethtool.c
+@@ -867,19 +867,11 @@ static int ixgbevf_set_coalesce(struct net_device *netdev,
  	return 0;
  }
  
-+static u32 igc_ethtool_get_rx_ring_count(struct net_device *dev)
-+{
-+	struct igc_adapter *adapter = netdev_priv(dev);
-+
-+	return adapter->num_rx_queues;
-+}
-+
- static int igc_ethtool_get_rxnfc(struct net_device *dev,
- 				 struct ethtool_rxnfc *cmd, u32 *rule_locs)
+-static int ixgbevf_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
+-			     u32 *rules __always_unused)
++static u32 ixgbevf_get_rx_ring_count(struct net_device *dev)
  {
- 	struct igc_adapter *adapter = netdev_priv(dev);
+ 	struct ixgbevf_adapter *adapter = netdev_priv(dev);
  
- 	switch (cmd->cmd) {
+-	switch (info->cmd) {
 -	case ETHTOOL_GRXRINGS:
--		cmd->data = adapter->num_rx_queues;
+-		info->data = adapter->num_rx_queues;
 -		return 0;
- 	case ETHTOOL_GRXCLSRLCNT:
- 		cmd->rule_cnt = adapter->nfc_rule_count;
- 		return 0;
-@@ -2170,6 +2174,7 @@ static const struct ethtool_ops igc_ethtool_ops = {
- 	.set_coalesce		= igc_ethtool_set_coalesce,
- 	.get_rxnfc		= igc_ethtool_get_rxnfc,
- 	.set_rxnfc		= igc_ethtool_set_rxnfc,
-+	.get_rx_ring_count	= igc_ethtool_get_rx_ring_count,
- 	.get_rxfh_indir_size	= igc_ethtool_get_rxfh_indir_size,
- 	.get_rxfh		= igc_ethtool_get_rxfh,
- 	.set_rxfh		= igc_ethtool_set_rxfh,
+-	default:
+-		hw_dbg(&adapter->hw, "Command parameters not supported\n");
+-		return -EOPNOTSUPP;
+-	}
++	return adapter->num_rx_queues;
+ }
+ 
+ static u32 ixgbevf_get_rxfh_indir_size(struct net_device *netdev)
+@@ -987,7 +979,7 @@ static const struct ethtool_ops ixgbevf_ethtool_ops = {
+ 	.get_ethtool_stats	= ixgbevf_get_ethtool_stats,
+ 	.get_coalesce		= ixgbevf_get_coalesce,
+ 	.set_coalesce		= ixgbevf_set_coalesce,
+-	.get_rxnfc		= ixgbevf_get_rxnfc,
++	.get_rx_ring_count	= ixgbevf_get_rx_ring_count,
+ 	.get_rxfh_indir_size	= ixgbevf_get_rxfh_indir_size,
+ 	.get_rxfh_key_size	= ixgbevf_get_rxfh_key_size,
+ 	.get_rxfh		= ixgbevf_get_rxfh,
 
 -- 
 2.47.3
