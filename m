@@ -1,161 +1,129 @@
-Return-Path: <netdev+bounces-241242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A49FFC81F6E
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:47:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F307C81F9E
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 18:50:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 08F984E709C
-	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:47:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C21CB3A9964
+	for <lists+netdev@lfdr.de>; Mon, 24 Nov 2025 17:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABEA2C0F84;
-	Mon, 24 Nov 2025 17:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C332C0287;
+	Mon, 24 Nov 2025 17:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQcv2Wfs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C/VvTzU3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073812C374B
-	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 17:46:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E8EF4F1
+	for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 17:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764006415; cv=none; b=f81x6jC55m5bDt+423GmKKY+jmknZHDk8fq57Lugp1jCnx26NOiWcU159u+c0tGdSaMHiXeI87/Dkb1HzaIQ+yZpokuBuOPzjpBwe5j7UjorryYso+91GzkII0d71IX019gjQa2ulC7o+nw02u6L8Ar61ZIOONobI6d5Qc4BRK4=
+	t=1764006617; cv=none; b=pktTDJdYhDIpqAyo91AKDiGKgOLqFApLdc6XYIZYjwyEwJIK88pjQVVTHdL8U55SaVemAPqZ3LYkFyOhrvStqqfK2bw7+uxLfiaj9G0Z1Y4nyP/d0U/uPBQIDe3jwy+HCJ1chP5h9cwGg5IGIK2mDQohn7XCznC73lRdWv9ju+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764006415; c=relaxed/simple;
-	bh=5QMUaB3UItvdOk2MFBD3uzK1qE9srvOCD3sKMnkMU7w=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=L65HwdCbipPRLn+SXJH5pbLQaA0WDpliFghzjh8ZHVODvk29fG/tdYNmY0BylRKOhmXpUUsNt986jGP0dlZZ2vYZmV0U/mip1onuqdDRtxxuZoTgLM/3n5xBguo31yV3yqm7qwrSbtcay7w/aJWtiO0tiCapmhMGcYK30tAAD28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GQcv2Wfs; arc=none smtp.client-ip=74.125.224.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-63fc6d9fde5so3896478d50.3
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 09:46:53 -0800 (PST)
+	s=arc-20240116; t=1764006617; c=relaxed/simple;
+	bh=+yYPC8KsCo8fPjR43wM9pYhgrEnInORTQoD2780troQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=c1J71DPp9l2W+fBSV7sLdNbNAEIowv1+/Fc+ap0JiO0hczaUCj+DdG7sV1NJqK4QIIc+99ZniMcnpRGRbA1ZgSNre+XHMEZq6DfuPGPVhLFBp5IT6n7S8UfbGYiSyD8MWUqVc95JEas6rVRY2CWVRt9TjbcLzM1X0J7LY6sCIBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C/VvTzU3; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8b30b6abb7bso1209417885a.1
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 09:50:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764006413; x=1764611213; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0hvHQdU4GV30EKSntbN+1hV2iN97Sxz4IGxkWVntgLM=;
-        b=GQcv2WfsBNv2Kpc2YsojWOmO1oHedfglyzir1ERidEop6Z8cMHcgRT8gl2Ku8tKn7o
-         hBi9m1oCD9tGyam0Z+J63xafOOLN7Kgqjjl9oeY2n52wgMrIbvkPfXdmTNLLkjhLNUHF
-         OdTQvrsbzOqu0ImtwJCGXIO5wxfEuz1ZGiComjQYUw8y2m6Xh+c5ELsKrkhtUvZNozjP
-         J923F+I91pmK0OE34zUyTnsZAMebTPSWzM3r962tnx6O303xGy35dqhptnQjFB945off
-         MNmYudhuFBLibwEo/FeyEl/fXI/q6dt/XCHczikDbNargi5ECQlRCtaVtTS1bngswy/a
-         8Fpw==
+        d=google.com; s=20230601; t=1764006614; x=1764611414; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=47uBwxT/cO53bOeTBvLnfNPxhQaXOvEG8FHb8QH09Xg=;
+        b=C/VvTzU3NC2SQWB5QhvqxNJw0XV4D3hLdr2gW7CxfsMphvULAQu9oUfHCEvTYAMZdq
+         YeDbrwUWgION85zlJ3ZMB/PeTrRjfYu8GQQsP86jF5+8Ar3VBfUF7NmUreypKfaIdz9+
+         14Q0GgRv99YhYbE/yGjE/TkKV1F0ylwhQk/2rg1VmIFVNJ/O8WuJb3ZKjS5/GEfA3onC
+         jN4B3rZ/GXm/C9EHadKkXdYlpdjlPCwVA0eXQEA3MawMpScTKhwUb0tgV4GyPDcC9LSc
+         MH8rFGatgeUQ6iJqWX3WON17CVVYPB9B/HL9LO877qRcI1hkx4dL33oUYR3B5rK7YOIQ
+         w9IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764006413; x=1764611213;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+        d=1e100.net; s=20230601; t=1764006614; x=1764611414;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0hvHQdU4GV30EKSntbN+1hV2iN97Sxz4IGxkWVntgLM=;
-        b=MZGy7aThFL0Y0h6wNVyIllOc+K0xizdf4RZQoIPiDN3yRuhknPR8UmEeAfhSd2NOzE
-         YXyxAxn064+VCtt79D6Hv5sQXTl/YFuq9Jr1sJt4sxp+foGmc5ryvT8KuMmIGuMicoCn
-         GkdIQUjROU1QITkRgShNd/K2ZdYkMk/8L9ZnZ11BksjYi7CgAt/LAyFE/1ENEJN9VZnj
-         Dsx4YFrlkgu7xjA8fp67j2hkFTU5AWkQE7zuifhRyEODrktaIkhb7g+2fk3YYgz0fUi+
-         Q4Wl31ol4wQB4Gshgjq3mzesGACkCMuRkm6s9bKAUvWuTicDJigRo/LkBUuFrmFXnfLM
-         1tnw==
-X-Gm-Message-State: AOJu0YzOomL+BGL786i/iOwL3uDa8WiwyUmmDf6RyzS+E57oagMj/V/5
-	yU4mrYAm3KGfeAcTEKtZbUM9dfRWoURCDx1aYky2y313iOtuZZxQ9fLf
-X-Gm-Gg: ASbGnct1e5QG7K+esZ3jnvYZSfY94jIQUrb7oGrnz3nOgVSrpj3K8D1mW9CH6P3bDEK
-	2j2AnzWoVbsurIOk+rt0gCoJNtX5RpsRVT+RLeBfqqyFzYVTZePzkwHcBirppzx7d5sKgG2QuuP
-	Fa2zEcRLW04RnO6p+2xgra1Uf+uqtE9NaudPnJIXsSMVDnC6evM4MasR2H1piDAVn1y1Q5lCNVF
-	XyXF9FEAIU8VfbxVIfwXf77xqJZy8UZK449YoJm0rNVemoWnMJjUk6GcCTSGbuPkZ/T8YdMWLgA
-	a4z7h1S3oe6FwIAwdt7tzSDP/qswnffp0gm4DjSn3GfYYdC5uIEqAxb8VN+yWxnas1wIPVculrK
-	/ju7yxS7DWWaCmKyWRXVbnoY63KHhHmhishxc/N2mO7x9TTzhGMd8XYZO+4werEpPkY/VVzQvr5
-	VfZ47cGO2ZWpnSSvSXPjHp5l+gh6mWUCz9C/XyGx/BPpjfkZU2hywJswpIY52O9YtsBio=
-X-Google-Smtp-Source: AGHT+IFZLS+sg4uY4W+GnSk7FxLFLQkNJQifO8MidMav+DX9v0PbFy6py458azKZF49Wq/pFCb5C9w==
-X-Received: by 2002:a05:690e:4298:10b0:63f:9cef:d5f4 with SMTP id 956f58d0204a3-64302abbe69mr7439363d50.36.1764006412975;
-        Mon, 24 Nov 2025 09:46:52 -0800 (PST)
-Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78a798a5decsm46733137b3.21.2025.11.24.09.46.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 09:46:52 -0800 (PST)
-Date: Mon, 24 Nov 2025 12:46:52 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Xing <kernelxing@tencent.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-Message-ID: <willemdebruijn.kernel.6edcbeb29a45@gmail.com>
-In-Reply-To: <20251124161324.16901-1-ankitkhushwaha.linux@gmail.com>
-References: <20251124161324.16901-1-ankitkhushwaha.linux@gmail.com>
-Subject: Re: [PATCH] selftests/net: initialize char variable to null
+        bh=47uBwxT/cO53bOeTBvLnfNPxhQaXOvEG8FHb8QH09Xg=;
+        b=H7LO1CokjS/ETOqoLNU0JoFw2u62Z/1pye/vcA33nzINRp9fd4glUxc9C6jwgNaQcL
+         246SEEvCXwrM7anpNm6ny7wgzxB24jOOWw8QrYSc17TLmq8WAmZ+ctncHf48bMagUREb
+         wGJwPrZ2g8FVKoZPL01Jmn5kIbuGq9PeKkZbpzU3kb5ujKecpPC1vqDpo3MYZC0sm45X
+         WR1VMyfRGrkMJK4cCsFRfkiWLW6/EeG9h70IAPc6YRzPIAOWvZXvn6km/tU0IUZJiEVW
+         hER3iqQ3vl6NSvWPmtTUblef/jXI3eSTppeJ2zj4VnFQy9PAnZfk27ZZNJyqhwIQW6f2
+         neIg==
+X-Forwarded-Encrypted: i=1; AJvYcCUdlFc0DYa3BSyTR1jRHA7pyaGmPcf0FPKbk3lKwrc4r1tuE4o20mPR9sZjfxDBzV6etzlQzdo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzm2StuPrdPWmze7GunR8ey0sh6LcV181YIADNcRjvWdEdjUs1d
+	L/mVtWPChtxIg3ck952IAx89M/6krjT+fmKf8++JAGELzLWccBWcmGwO1ri6EHRRYUPJfZtqb8e
+	S340NITaLmzGQ2w==
+X-Google-Smtp-Source: AGHT+IHn0v/E2u/Lfar4h1MWnoe4q8sPWcsehwmaS6Ne9EDaqqlp6tgYkT1O9Dk2SHL3lLgT0ca+37eC26K/YA==
+X-Received: from qknor9.prod.google.com ([2002:a05:620a:6189:b0:8b2:44f9:8e0a])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4506:b0:8b2:5df1:9341 with SMTP id af79cd13be357-8b33d5f8f25mr1700963985a.75.1764006614495;
+ Mon, 24 Nov 2025 09:50:14 -0800 (PST)
+Date: Mon, 24 Nov 2025 17:50:09 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+X-Mailer: git-send-email 2.52.0.460.gd25c4c69ec-goog
+Message-ID: <20251124175013.1473655-1-edumazet@google.com>
+Subject: [PATCH net-next 0/4] tcp: provide better locality for retransmit timer
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Ankit Khushwaha wrote:
-> char variable in 'so_txtime.c' & 'txtimestamp.c' left uninitilized
-> by when switch default case taken. raises following warning.
-> 
-> 	txtimestamp.c:240:2: warning: variable 'tsname' is used uninitialized
-> 	whenever switch default is taken [-Wsometimes-uninitialized]
-> 
-> 	so_txtime.c:210:3: warning: variable 'reason' is used uninitialized
-> 	whenever switch default is taken [-Wsometimes-uninitialized]
-> 
-> initialize these variables to NULL to fix this.
-> 
-> Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+TCP stack uses three timers per flow, currently spread this way:
 
-These are false positives as the default branches in both cases exit
-the program with error(..).
+- sk->sk_timer : keepalive timer
+- icsk->icsk_retransmit_timer : retransmit timer
+- icsk->icsk_delack_timer : delayed ack timer
 
-Since we do not observe these in normal kernel compilations: are you
-enabling non-standard warnings?
+This series moves the retransmit timer to sk->sk_timer location,
+to increase data locality in TX paths.
 
-> ---
->  tools/testing/selftests/net/so_txtime.c   | 2 +-
->  tools/testing/selftests/net/txtimestamp.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/so_txtime.c b/tools/testing/selftests/net/so_txtime.c
-> index 8457b7ccbc09..b76df1efc2ef 100644
-> --- a/tools/testing/selftests/net/so_txtime.c
-> +++ b/tools/testing/selftests/net/so_txtime.c
-> @@ -174,7 +174,7 @@ static int do_recv_errqueue_timeout(int fdt)
->  	msg.msg_controllen = sizeof(control);
-> 
->  	while (1) {
-> -		const char *reason;
-> +		const char *reason = NULL;
-> 
->  		ret = recvmsg(fdt, &msg, MSG_ERRQUEUE);
->  		if (ret == -1 && errno == EAGAIN)
-> diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
-> index dae91eb97d69..bcc14688661d 100644
-> --- a/tools/testing/selftests/net/txtimestamp.c
-> +++ b/tools/testing/selftests/net/txtimestamp.c
-> @@ -217,7 +217,7 @@ static void print_timestamp_usr(void)
->  static void print_timestamp(struct scm_timestamping *tss, int tstype,
->  			    int tskey, int payload_len)
->  {
-> -	const char *tsname;
-> +	const char *tsname = NULL;
-> 
->  	validate_key(tskey, tstype);
-> 
-> --
-> 2.52.0
-> 
+keepalive timers are not often used, this change should be neutral for them.
 
+After the series we have following fields:
+
+- sk->tcp_retransmit_timer : retransmit timer, in sock_write_tx group
+- icsk->icsk_delack_timer : delayed ack timer
+- icsk->icsk_keepalive_timer : keepalive timer
+
+Moving icsk_delack_timer in a beter location would also be welcomed.
+
+Eric Dumazet (4):
+  tcp: rename icsk_timeout() to tcp_timeout_expires()
+  net: move sk_dst_pending_confirm and sk_pacing_status to sock_read_tx
+    group
+  tcp: introduce icsk->icsk_keepalive_timer
+  tcp: remove icsk->icsk_retransmit_timer
+
+ .../net_cachelines/inet_connection_sock.rst   |  2 +-
+ include/net/inet_connection_sock.h            | 20 ++++++++------
+ include/net/sock.h                            | 13 ++++++---
+ net/core/sock.c                               |  4 +--
+ net/ipv4/inet_connection_sock.c               | 12 ++++-----
+ net/ipv4/inet_diag.c                          |  8 +++---
+ net/ipv4/tcp_ipv4.c                           |  8 +++---
+ net/ipv4/tcp_timer.c                          | 23 ++++++++--------
+ net/ipv6/tcp_ipv6.c                           |  8 +++---
+ net/mptcp/protocol.c                          | 27 +++++++++----------
+ net/mptcp/protocol.h                          |  2 +-
+ .../selftests/bpf/progs/bpf_iter_tcp4.c       |  8 +++---
+ .../selftests/bpf/progs/bpf_iter_tcp6.c       |  8 +++---
+ 13 files changed, 74 insertions(+), 69 deletions(-)
+
+-- 
+2.52.0.460.gd25c4c69ec-goog
 
 
