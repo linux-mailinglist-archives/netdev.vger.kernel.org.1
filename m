@@ -1,184 +1,156 @@
-Return-Path: <netdev+bounces-241617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2FE5C86DCE
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 20:50:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2A0C86DD1
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 20:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 508D83B3CC1
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 19:50:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A69E43B3FC5
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 19:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2E22528FD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1DD6332ED3;
 	Tue, 25 Nov 2025 19:50:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D151433AD85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C5D33AD88
 	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 19:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764100229; cv=none; b=hN7L9snlDXeTYYE1Ua123PXMnVKuRt2ScoZYt5+2fU7GkjNByONWKwfgijWEe3dj0w2F8x0IHczRbRKsMLxz31+9DdoEn2S1DZKnrrez0UnR5oZZCgfqhGUj+tJ2U3AP6J4PBKfjtNeLsbiG35wDovPACpGymB9bWIyPgU2LMeU=
+	t=1764100229; cv=none; b=J3URh0+s0zgHziCy2VBFDHGvZSRdNDKaA5hSUG7yCCAq8JlCYnZAN8gk5ekFqm6g+noZCgtiwPD72m4/iNstb1BLzYMemA3rJlzjYXWXcfieWpOb55/EKxOFweVHe58QLY/j4Wtm46sPxoYujkX27Bq7XSYyB0J1Hx9yyE0RN5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764100229; c=relaxed/simple;
-	bh=fl5l8k2ZZtIkMqIumx38NaO5Y8WM+0hdDm7vW12RQ7w=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PDOkLxw1W/Q+5Ovg32Y9UzGOL61+ff3GGpeghqf9fzAuypcWMz6hPrvOCrkObf1ZrA2I5vLARvQnm4WsxMseEybh/27wFaEnDTwq3qpiW8uOtIZk10YE/C2Xu/nmAI0C2sRYSmOEWnkuSfwFoe8p+U+ZW+NNOZoihF1VnNakhsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
+	bh=kcHfv/w1thHUu+kM28yyVnV7qJuVu+8vXz5EmX5dU0c=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qvYogXIHjhjXzDkLd3RhuGkid/d7Sb7qoq/nYY6A/KU8fIVBV2bAV4+iDBXvcpo0t57J43g0wG1eb2Gh5FqU0n++5Up1R72JcXNepmf4JLjuW7nS93VqM/5usBbLR61qOIOmlV4p6Ux36SDj39zX8+phYgx14TeTv0dP/O0SrqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-93bc56ebb0aso439746239f.0
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-433312ee468so1673515ab.1
         for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 11:50:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1764100227; x=1764705027;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ppBFuX/0ILqZWhl2srv5dJ6jYles2CmNqIe9VLWtPDw=;
-        b=OqkGPZxfhVbVD1nGwZ1OpHOgIG1VZyZFq4gX0lnQOiAdw8LjeEbvmtrPbtrF7kMAFg
-         coWVOcE7Kuo1kdXWktsSXWq/m+gj0vFX8RwcqIeNRoUALlT/isTzSs6/0FAmOkfrR6G8
-         gNw7OBGZK4VwKx5VKwKkuQUGMPqrPniviozrzDiLvEqHr++5kLUsdrZsE9Li4fmqnIX7
-         3cAQ3RfAk4/tpI51bGewh0WQSt4Gu6m/lDPS4P2N+K3oscpkAfZxBSLkpBcg8MJApd1b
-         1C19sKRF3oNsu5B2rYoNasUjPcS/hsyXxwj96ecJdpNvS3sof8ZtwkL85FALb0Gqavrm
-         KmWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJgcDl5twV0e7LjMtre3DlLnA/7TzP7Hxj0ClMhhASKBJ5QyEIQZuFWT4VpkwHK3VHdof4E2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxI3Pl2k2ZSrsyu9xfBy95tHSv5Li0t4Is3JEgcYlhlOAX3wxh1
-	Hj4fTpVaAlzsk7bXJCRlRqz3q2CEX2XJQx0ncCR4TmL7ZpyTh5axMbWY+rhfXwfaSMzOVsIzalu
-	Yor+Q2eCnti2N5K+vXXnRXVA8UBZDPhXXSpRzw6f3itzN/g6WKEMSMRQiPlI=
-X-Google-Smtp-Source: AGHT+IHzCCZn4DHCqnfmi+U4VllXcpVuUMBWBdVv8Qsaflu5EVJ791HjHIgGRCRum4zF/g1vqd0SjUPVN3uBOkCdEfkkuSqlAXtj
+        bh=bTq1C08jxLq0mjK/fkl1LEJjL3jX06dpWDp2JZxDY9Y=;
+        b=FCqNPo5lTZ1qP55DlAJFDlHZE6PNd6uJXeQtABPveibEj5woycx1LzKlVJl8kOFwct
+         tY4A6tOWY+gEVmkx4SnT8dIkECYM1UHdox1c83QcoYF0E6lUvUXoBRDXwAolzuzh/Qd3
+         +euxj9qT4ZgZHcT70I/YctR9uKLNkKFpu3habRnyPCquBM4baJ3C18OgF/kRzBYFxP7u
+         AxGvZWgiVPjqpIRD3pwkiVACtHfvcrMV1n207VTKtB9hM6N7X055MztL1ufksRaqnHf7
+         6JxSJtRML9u8Q5IjWrVHWm7zYaJYY4eY9I4UtV/y45xc0AIe1RbU5l09xJ0MfJyah4wO
+         QpmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUhflD3DtR1v5k25yriXAjlgjldWCYyAGijXafAd2G03dS1WTWQ4x8gzeKjWRv6Wsx7fRCfupU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvGuKi3svA5l9qBmdfMRiDkiGpl7e/Suww8WYxYY9k/AbpRz2Q
+	LHDcy7Ma6hYcU4z3BWQalythuZKnklGIb00LoKEfE34jE2GgCjU+OwrUI4LdaXfY4cVoAXi1i1j
+	YQyhuM50VMUMM5Wk61bS2laPsUlk80IIoQb0Z5uaSa+PdsnxbRQ8hYlAv1uo=
+X-Google-Smtp-Source: AGHT+IFCRAfw28e98qC/9ugvEMowkcuK8yggxpTve8KozzLys5D6kuQDwQvvWthTuc0dKuCHWiDon8FCqdVF3WHFHA8px5N7LapV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:156a:b0:434:96ea:ff6e with SMTP id
- e9e14a558f8ab-435dd13b1e8mr36028035ab.39.1764100226986; Tue, 25 Nov 2025
- 11:50:26 -0800 (PST)
-Date: Tue, 25 Nov 2025 11:50:26 -0800
+X-Received: by 2002:a05:6e02:178a:b0:434:96ea:ca19 with SMTP id
+ e9e14a558f8ab-435b913657cmr136188375ab.17.1764100227216; Tue, 25 Nov 2025
+ 11:50:27 -0800 (PST)
+Date: Tue, 25 Nov 2025 11:50:27 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69260882.a70a0220.d98e3.00b4.GAE@google.com>
-Subject: [syzbot] [net?] divide error in __tcp_select_window (4)
-From: syzbot <syzbot+3a92d359bc2ec6255a33@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	geliang@kernel.org, horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
-	linux-kernel@vger.kernel.org, matttbe@kernel.org, ncardwell@google.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Message-ID: <69260883.a70a0220.d98e3.00b5.GAE@google.com>
+Subject: [syzbot] [net?] [can?] KMSAN: uninit-value in em_canid_match
+From: syzbot <syzbot+5d8269a1e099279152bc@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
+	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, mkl@pengutronix.de, 
+	netdev@vger.kernel.org, pabeni@redhat.com, socketcan@hartkopp.net, 
+	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    e2c20036a887 Merge branch 'devlink-net-mlx5-implement-swp_..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1164c484580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a881ccda32df4e75
-dashboard link: https://syzkaller.appspot.com/bug?extid=3a92d359bc2ec6255a33
+HEAD commit:    ac3fd01e4c1e Linux 6.18-rc7
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1703e612580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=61a9bf3cc5d17a01
+dashboard link: https://syzkaller.appspot.com/bug?extid=5d8269a1e099279152bc
 compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13f8fa12580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=113a5a12580000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12040e58580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=117d797c580000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/07279e689a07/disk-e2c20036.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b13e2e59c1ed/vmlinux-e2c20036.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f6f519394597/bzImage-e2c20036.xz
-
-The issue was bisected to:
-
-commit ae155060247be8dcae3802a95bd1bdf93ab3215d
-Author: Paolo Abeni <pabeni@redhat.com>
-Date:   Tue Nov 18 07:20:24 2025 +0000
-
-    mptcp: fix duplicate reset on fastclose
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11f698b4580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=13f698b4580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=15f698b4580000
+disk image: https://storage.googleapis.com/syzbot-assets/227434a45737/disk-ac3fd01e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d8117003dbb5/vmlinux-ac3fd01e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a13125fb7a7d/bzImage-ac3fd01e.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3a92d359bc2ec6255a33@syzkaller.appspotmail.com
-Fixes: ae155060247b ("mptcp: fix duplicate reset on fastclose")
+Reported-by: syzbot+5d8269a1e099279152bc@syzkaller.appspotmail.com
 
-RBP: 00007ffff9acee10 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007f66e9be5fa0 R14: 00007f66e9be5fa0 R15: 0000000000000006
- </TASK>
-Oops: divide error: 0000 [#1] SMP KASAN PTI
-CPU: 0 UID: 0 PID: 6068 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-RIP: 0010:__tcp_select_window+0x824/0x1320 net/ipv4/tcp_output.c:3336
-Code: ff ff ff 44 89 f1 d3 e0 89 c1 f7 d1 41 01 cc 41 21 c4 e9 a9 00 00 00 e8 ca 49 01 f8 e9 9c 00 00 00 e8 c0 49 01 f8 44 89 e0 99 <f7> 7c 24 1c 41 29 d4 48 bb 00 00 00 00 00 fc ff df e9 80 00 00 00
-RSP: 0018:ffffc90003017640 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88807b469e40
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc90003017730 R08: ffff888033268143 R09: 1ffff1100664d028
-R10: dffffc0000000000 R11: ffffed100664d029 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  000055557faa0500(0000) GS:ffff888126135000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f64a1912ff8 CR3: 0000000072122000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- tcp_select_window net/ipv4/tcp_output.c:281 [inline]
- __tcp_transmit_skb+0xbc7/0x3aa0 net/ipv4/tcp_output.c:1568
- tcp_transmit_skb net/ipv4/tcp_output.c:1649 [inline]
- tcp_send_active_reset+0x2d1/0x5b0 net/ipv4/tcp_output.c:3836
- mptcp_do_fastclose+0x27e/0x380 net/mptcp/protocol.c:2793
- mptcp_disconnect+0x238/0x710 net/mptcp/protocol.c:3253
- mptcp_sendmsg_fastopen+0x2f8/0x580 net/mptcp/protocol.c:1776
- mptcp_sendmsg+0x1774/0x1980 net/mptcp/protocol.c:1855
+syzkaller0: entered promiscuous mode
+syzkaller0: entered allmulticast mode
+=====================================================
+BUG: KMSAN: uninit-value in em_canid_match+0x2f0/0x360 net/sched/em_canid.c:104
+ em_canid_match+0x2f0/0x360 net/sched/em_canid.c:104
+ tcf_em_match net/sched/ematch.c:494 [inline]
+ __tcf_em_tree_match+0x215/0xc70 net/sched/ematch.c:520
+ tcf_em_tree_match include/net/pkt_cls.h:512 [inline]
+ basic_classify+0x154/0x480 net/sched/cls_basic.c:50
+ tc_classify include/net/tc_wrapper.h:197 [inline]
+ __tcf_classify net/sched/cls_api.c:1764 [inline]
+ tcf_classify+0x855/0x1cb0 net/sched/cls_api.c:1860
+ multiq_classify net/sched/sch_multiq.c:39 [inline]
+ multiq_enqueue+0x82/0x590 net/sched/sch_multiq.c:66
+ dev_qdisc_enqueue net/core/dev.c:4118 [inline]
+ __dev_xmit_skb net/core/dev.c:4214 [inline]
+ __dev_queue_xmit+0x1d91/0x5e60 net/core/dev.c:4729
+ dev_queue_xmit include/linux/netdevice.h:3365 [inline]
+ packet_xmit+0x8f/0x710 net/packet/af_packet.c:275
+ packet_snd net/packet/af_packet.c:3076 [inline]
+ packet_sendmsg+0x9173/0xa2a0 net/packet/af_packet.c:3108
  sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0xe5/0x270 net/socket.c:742
- __sys_sendto+0x3bd/0x520 net/socket.c:2244
- __do_sys_sendto net/socket.c:2251 [inline]
- __se_sys_sendto net/socket.c:2247 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2247
+ __sock_sendmsg+0x333/0x3d0 net/socket.c:742
+ ____sys_sendmsg+0x7e0/0xd80 net/socket.c:2630
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2684
+ __sys_sendmsg net/socket.c:2716 [inline]
+ __do_sys_sendmsg net/socket.c:2721 [inline]
+ __se_sys_sendmsg net/socket.c:2719 [inline]
+ __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2719
+ x64_sys_call+0x1dfd/0x3e30 arch/x86/include/generated/asm/syscalls_64.h:47
  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ do_syscall_64+0xd9/0xfa0 arch/x86/entry/syscall_64.c:94
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f66e998f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffff9acedb8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f66e9be5fa0 RCX: 00007f66e998f749
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007ffff9acee10 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007f66e9be5fa0 R14: 00007f66e9be5fa0 R15: 0000000000000006
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__tcp_select_window+0x824/0x1320 net/ipv4/tcp_output.c:3336
-Code: ff ff ff 44 89 f1 d3 e0 89 c1 f7 d1 41 01 cc 41 21 c4 e9 a9 00 00 00 e8 ca 49 01 f8 e9 9c 00 00 00 e8 c0 49 01 f8 44 89 e0 99 <f7> 7c 24 1c 41 29 d4 48 bb 00 00 00 00 00 fc ff df e9 80 00 00 00
-RSP: 0018:ffffc90003017640 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88807b469e40
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc90003017730 R08: ffff888033268143 R09: 1ffff1100664d028
-R10: dffffc0000000000 R11: ffffed100664d029 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  000055557faa0500(0000) GS:ffff888126135000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f64a1912ff8 CR3: 0000000072122000 CR4: 00000000003526f0
-----------------
-Code disassembly (best guess), 2 bytes skipped:
-   0:	ff 44 89 f1          	incl   -0xf(%rcx,%rcx,4)
-   4:	d3 e0                	shl    %cl,%eax
-   6:	89 c1                	mov    %eax,%ecx
-   8:	f7 d1                	not    %ecx
-   a:	41 01 cc             	add    %ecx,%r12d
-   d:	41 21 c4             	and    %eax,%r12d
-  10:	e9 a9 00 00 00       	jmp    0xbe
-  15:	e8 ca 49 01 f8       	call   0xf80149e4
-  1a:	e9 9c 00 00 00       	jmp    0xbb
-  1f:	e8 c0 49 01 f8       	call   0xf80149e4
-  24:	44 89 e0             	mov    %r12d,%eax
-  27:	99                   	cltd
-* 28:	f7 7c 24 1c          	idivl  0x1c(%rsp) <-- trapping instruction
-  2c:	41 29 d4             	sub    %edx,%r12d
-  2f:	48 bb 00 00 00 00 00 	movabs $0xdffffc0000000000,%rbx
-  36:	fc ff df
-  39:	e9 80 00 00 00       	jmp    0xbe
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4985 [inline]
+ slab_alloc_node mm/slub.c:5288 [inline]
+ kmem_cache_alloc_node_noprof+0x989/0x16b0 mm/slub.c:5340
+ kmalloc_reserve+0x13c/0x4b0 net/core/skbuff.c:579
+ __alloc_skb+0x347/0x7d0 net/core/skbuff.c:670
+ alloc_skb include/linux/skbuff.h:1383 [inline]
+ alloc_skb_with_frags+0xc5/0xa60 net/core/skbuff.c:6671
+ sock_alloc_send_pskb+0xacc/0xc60 net/core/sock.c:2965
+ packet_alloc_skb net/packet/af_packet.c:2926 [inline]
+ packet_snd net/packet/af_packet.c:3019 [inline]
+ packet_sendmsg+0x743d/0xa2a0 net/packet/af_packet.c:3108
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x333/0x3d0 net/socket.c:742
+ ____sys_sendmsg+0x7e0/0xd80 net/socket.c:2630
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2684
+ __sys_sendmsg net/socket.c:2716 [inline]
+ __do_sys_sendmsg net/socket.c:2721 [inline]
+ __se_sys_sendmsg net/socket.c:2719 [inline]
+ __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2719
+ x64_sys_call+0x1dfd/0x3e30 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 0 UID: 0 PID: 6067 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(none) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+=====================================================
 
 
 ---
@@ -188,7 +160,6 @@ syzbot engineers can be reached at syzkaller@googlegroups.com.
 
 syzbot will keep track of this issue. See:
 https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
 If the report is already addressed, let syzbot know by replying with:
 #syz fix: exact-commit-title
