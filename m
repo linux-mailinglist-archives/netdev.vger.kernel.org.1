@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-241591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09279C863C3
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:37:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 796BAC863C6
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:37:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F1D06353164
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:36:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8857735317A
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:37:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F86532AADC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CBA32B988;
 	Tue, 25 Nov 2025 17:36:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BWyZMKKP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="axXbt80O"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5868E32824A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE19332A3E1;
 	Tue, 25 Nov 2025 17:36:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764092206; cv=none; b=IZt2WVaca4BF4dObQhpSrYJuWjjq2cjipFYxKCNjdDUB8qYGXWcYETPUUBMlB/ZkAAL7XIW9fUpTDf5b5eqS+oA7YbAf/UpRZD7sF+90DweofISQWZTw1w6Pjcr2uZW/K1mpofXNd1rRpod24x73aCDcnDkeV9UBe2gbQiUfi0Y=
+	t=1764092206; cv=none; b=jW/bu11CKXBNnAeK2uID/0WsgHQO8Nlri9Pxr7xVxkyC0bWOLiSzJQeRAgtAC1CF8TfUUdlABe14iY7C7pKCjX7bMXeIdC0bziWvYuTaEQiQgC7UKhmC5OIJ2BGYr92XwaQgwxGQxDrQKG2jnWQrRnPN8ZhGMP/9XgWHur/goGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764092206; c=relaxed/simple;
-	bh=+DFq6dbzD3lc+CDVNerVm77IALgzgfxpNZyKVSb2ApU=;
+	bh=7JJU128tDJ+PyF5G7UAG3ifJrnbZV7vGBTPFHmlcVHc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iBBdB8OLdM00VK6GnKdlq32fOrDBWhylFnkwhXSlXjHh0sNnHiN8Q4BPhJfI9Rgaa8MNmVBGcXlP2CSIDt70IvW6zhbAnDy4uAcSMRs4k602K6myzkYkCAsnPufT12cmb23314+oYrq8ETAwsas+AZYi/SSMNKk+h1iPw6l9a2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BWyZMKKP; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=iacQbSpM1QaqTOh5io2zRDlqMIHOfiQD3fD0Dg7EKivPxlbh3IZ1eAUk3RRDB/zNCYPYFkRE+Q24EPNYRu6KC131tparkO8dhIfZ84uCsjb2GwmpOxJsJz+L0tbEcpncDfwbh94y3LfSkBG9RSJt1HfZxaBomqIlPgLdlfRIJQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=axXbt80O; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764092204; x=1795628204;
+  t=1764092205; x=1795628205;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+DFq6dbzD3lc+CDVNerVm77IALgzgfxpNZyKVSb2ApU=;
-  b=BWyZMKKPCybtv2v17FYpOGEz5Gl915vsTN5c8QqS6pTHXIwk622r5b8x
-   N4ffVPqUM30IxfDx13b1FxS2MXrXpIOhvSpe77zcgXxkJODW4HSoajqva
-   JnDDqN22Vi97L+54RL3jv9Dfg37as9TJL9xy53illqPZURw3iUV0C/Pf2
-   C3O4Ue5h7thKdHAr0VXdBzgYfSh+8/Pp/mpgjRfms6B/RrgIsnboHKH0e
-   W2OfHjbnBBD0dy3oizt69TSHpcuGzpsojfgEnE4TTpF/rEgXMKrW+xFi6
-   TAgNoHxCTE+WculcbTwoE/O8OaUbYaqiv8d0NTO1Uo+tA7TyPdLp/ubDW
-   w==;
-X-CSE-ConnectionGUID: YapaV8IDTHyVwwT9zyEDNQ==
-X-CSE-MsgGUID: wgkdenwwTPmBsvWFddI0hw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="69979879"
+  bh=7JJU128tDJ+PyF5G7UAG3ifJrnbZV7vGBTPFHmlcVHc=;
+  b=axXbt80Od/C5tIOFTcO6xL7FJHxOJYKRcDAoHS6zZqHkymzD1738J53X
+   Q5LLlp2Qbok9GxJh6da2hgg3dNrI6A1tzKF62be51jIredVSMpcoGAErG
+   Uoq7ZIotL0JGpHLc74TOSmA7YjMFgdGqzxwsVCieuyhpF2QVavlnFc4n+
+   bPTnFmDviHLj2eZaqs7sebB1NQw/V+OAGix67SFJJKE9uMhbZQZTIujj6
+   C8rbwWeGUVzdUBu9KGNqZDYUll8SBaxWKU9QhHL/nlGhpFCzcLurRL9jA
+   1WT0NX9IxbsKX+LkWMH7BfhcAJhz0z0o6siDgQbrXx88wyi3Xf5Om0kwz
+   Q==;
+X-CSE-ConnectionGUID: 2cbnuSUZS9yMv0VuPE+r/w==
+X-CSE-MsgGUID: CcLitvPoQpqWZHCiDlu4Gg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="69979889"
 X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
-   d="scan'208";a="69979879"
+   d="scan'208";a="69979889"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 09:36:38 -0800
-X-CSE-ConnectionGUID: oDga+snDRSe9QN1Pz3pnew==
-X-CSE-MsgGUID: lls53vmoQ7ytKkRrLVdvhg==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 09:36:41 -0800
+X-CSE-ConnectionGUID: lPf9As8yQfeQnFdQgUVrcA==
+X-CSE-MsgGUID: uG4UwnLnQmaHtDL2hWSgug==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
-   d="scan'208";a="216040337"
+   d="scan'208";a="216040375"
 Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa002.fm.intel.com with ESMTP; 25 Nov 2025 09:36:34 -0800
+  by fmviesa002.fm.intel.com with ESMTP; 25 Nov 2025 09:36:38 -0800
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
@@ -74,9 +74,9 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	nxne.cnse.osdt.itp.upstreaming@intel.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-next 1/5] libeth: pass Rx queue index to PP when creating a fill queue
-Date: Tue, 25 Nov 2025 18:35:59 +0100
-Message-ID: <20251125173603.3834486-2-aleksander.lobakin@intel.com>
+Subject: [PATCH iwl-next 2/5] libeth: handle creating pools with unreadable buffers
+Date: Tue, 25 Nov 2025 18:36:00 +0100
+Message-ID: <20251125173603.3834486-3-aleksander.lobakin@intel.com>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251125173603.3834486-1-aleksander.lobakin@intel.com>
 References: <20251125173603.3834486-1-aleksander.lobakin@intel.com>
@@ -88,158 +88,111 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since recently, page_pool_create() accepts optional stack index of
-the Rx queue which the pool will be created for. It can then be
-used on control path for stuff like memory providers.
-Add the same field to libeth_fq and pass the index from all the
-drivers using libeth for managing Rx to simplify implementing MP
-support later.
-idpf has one libeth_fq per buffer/fill queue and each Rx queue has
-two fill queues, but since fill queues can never be shared, we can
-store the corresponding Rx queue index there during the
-initialization to pass it to libeth.
+libeth uses netmems for quite some time already, so in order to
+support unreadable frags / memory providers, it only needs to set
+PP_FLAG_ALLOW_UNREADABLE_NETMEM when needed.
+Also add a couple sanity checks to make sure the driver didn't mess
+up the configuration options and, in case when an MP is installed,
+return the truesize always equal to PAGE_SIZE, so that
+libeth_rx_alloc() will never try to allocate frags. Memory providers
+manage buffers on their own and expect 1:1 buffer / HW Rx descriptor
+association.
+
+Bonus: mention in the libeth_sqe_type description that
+LIBETH_SQE_EMPTY should also be used for netmem Tx SQEs -- they
+don't need DMA unmapping.
 
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_txrx.h |  2 ++
- include/net/libeth/rx.h                     |  2 ++
- drivers/net/ethernet/intel/iavf/iavf_txrx.c |  1 +
- drivers/net/ethernet/intel/ice/ice_base.c   |  2 ++
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 13 +++++++++++++
- drivers/net/ethernet/intel/libeth/rx.c      |  1 +
- 6 files changed, 21 insertions(+)
+ include/net/libeth/tx.h                |  2 +-
+ drivers/net/ethernet/intel/libeth/rx.c | 42 ++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 75b977094741..1f368c4e0a76 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -744,6 +744,7 @@ libeth_cacheline_set_assert(struct idpf_tx_queue, 64,
-  * @q_id: Queue id
-  * @size: Length of descriptor ring in bytes
-  * @dma: Physical address of ring
-+ * @rxq_idx: stack index of the corresponding Rx queue
-  * @q_vector: Backreference to associated vector
-  * @rx_buffer_low_watermark: RX buffer low watermark
-  * @rx_hbuf_size: Header buffer size
-@@ -788,6 +789,7 @@ struct idpf_buf_queue {
- 	dma_addr_t dma;
+diff --git a/include/net/libeth/tx.h b/include/net/libeth/tx.h
+index c3db5c6f1641..a66fc2b3a114 100644
+--- a/include/net/libeth/tx.h
++++ b/include/net/libeth/tx.h
+@@ -12,7 +12,7 @@
  
- 	struct idpf_q_vector *q_vector;
-+	u16 rxq_ixd;
- 
- 	u16 rx_buffer_low_watermark;
- 	u16 rx_hbuf_size;
-diff --git a/include/net/libeth/rx.h b/include/net/libeth/rx.h
-index 5d991404845e..3b3d7acd13c9 100644
---- a/include/net/libeth/rx.h
-+++ b/include/net/libeth/rx.h
-@@ -71,6 +71,7 @@ enum libeth_fqe_type {
-  * @xdp: flag indicating whether XDP is enabled
-  * @buf_len: HW-writeable length per each buffer
-  * @nid: ID of the closest NUMA node with memory
-+ * @idx: stack index of the corresponding Rx queue
-  */
- struct libeth_fq {
- 	struct_group_tagged(libeth_fq_fp, fp,
-@@ -88,6 +89,7 @@ struct libeth_fq {
- 
- 	u32			buf_len;
- 	int			nid;
-+	u32			idx;
- };
- 
- int libeth_rx_fq_create(struct libeth_fq *fq, struct napi_struct *napi);
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-index 363c42bf3dcf..d3c68659162b 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-@@ -771,6 +771,7 @@ int iavf_setup_rx_descriptors(struct iavf_ring *rx_ring)
- 		.count		= rx_ring->count,
- 		.buf_len	= LIBIE_MAX_RX_BUF_LEN,
- 		.nid		= NUMA_NO_NODE,
-+		.idx		= rx_ring->queue_index,
- 	};
- 	int ret;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index eadb1e3d12b3..1aa40f13947e 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -607,6 +607,7 @@ static int ice_rxq_pp_create(struct ice_rx_ring *rq)
- 	struct libeth_fq fq = {
- 		.count		= rq->count,
- 		.nid		= NUMA_NO_NODE,
-+		.idx		= rq->q_index,
- 		.hsplit		= rq->vsi->hsplit,
- 		.xdp		= ice_is_xdp_ena_vsi(rq->vsi),
- 		.buf_len	= LIBIE_MAX_RX_BUF_LEN,
-@@ -629,6 +630,7 @@ static int ice_rxq_pp_create(struct ice_rx_ring *rq)
- 		.count		= rq->count,
- 		.type		= LIBETH_FQE_HDR,
- 		.nid		= NUMA_NO_NODE,
-+		.idx		= rq->q_index,
- 		.xdp		= ice_is_xdp_ena_vsi(rq->vsi),
- 	};
- 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 828f7c444d30..5e397560a515 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -557,6 +557,7 @@ static int idpf_rx_hdr_buf_alloc_all(struct idpf_buf_queue *bufq)
- 		.type	= LIBETH_FQE_HDR,
- 		.xdp	= idpf_xdp_enabled(bufq->q_vector->vport),
- 		.nid	= idpf_q_vector_to_mem(bufq->q_vector),
-+		.idx	= bufq->rxq_ixd,
- 	};
- 	int ret;
- 
-@@ -698,6 +699,7 @@ static int idpf_rx_bufs_init_singleq(struct idpf_rx_queue *rxq)
- 		.count	= rxq->desc_count,
- 		.type	= LIBETH_FQE_MTU,
- 		.nid	= idpf_q_vector_to_mem(rxq->q_vector),
-+		.idx	= rxq->idx,
- 	};
- 	int ret;
- 
-@@ -757,6 +759,7 @@ static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq,
- 		.hsplit		= idpf_queue_has(HSPLIT_EN, bufq),
- 		.xdp		= idpf_xdp_enabled(bufq->q_vector->vport),
- 		.nid		= idpf_q_vector_to_mem(bufq->q_vector),
-+		.idx		= bufq->rxq_ixd,
- 	};
- 	int ret;
- 
-@@ -1900,6 +1903,16 @@ static int idpf_rxq_group_alloc(struct idpf_vport *vport, u16 num_rxq)
- 							LIBETH_RX_LL_LEN;
- 			idpf_rxq_set_descids(vport, q);
- 		}
-+
-+		if (!idpf_is_queue_model_split(vport->rxq_model))
-+			continue;
-+
-+		for (j = 0; j < vport->num_bufqs_per_qgrp; j++) {
-+			struct idpf_buf_queue *bufq;
-+
-+			bufq = &rx_qgrp->splitq.bufq_sets[j].bufq;
-+			bufq->rxq_ixd = rx_qgrp->splitq.rxq_sets[0]->rxq.idx;
-+		}
- 	}
- 
- err_alloc:
+ /**
+  * enum libeth_sqe_type - type of &libeth_sqe to act on Tx completion
+- * @LIBETH_SQE_EMPTY: unused/empty OR XDP_TX/XSk frame, no action required
++ * @LIBETH_SQE_EMPTY: empty OR netmem/XDP_TX/XSk frame, no action required
+  * @LIBETH_SQE_CTX: context descriptor with empty SQE, no action required
+  * @LIBETH_SQE_SLAB: kmalloc-allocated buffer, unmap and kfree()
+  * @LIBETH_SQE_FRAG: mapped skb frag, only unmap DMA
 diff --git a/drivers/net/ethernet/intel/libeth/rx.c b/drivers/net/ethernet/intel/libeth/rx.c
-index 62521a1f4ec9..8874b714cdcc 100644
+index 8874b714cdcc..11e6e8f353ef 100644
 --- a/drivers/net/ethernet/intel/libeth/rx.c
 +++ b/drivers/net/ethernet/intel/libeth/rx.c
-@@ -156,6 +156,7 @@ int libeth_rx_fq_create(struct libeth_fq *fq, struct napi_struct *napi)
- 		.order		= LIBETH_RX_PAGE_ORDER,
- 		.pool_size	= fq->count,
- 		.nid		= fq->nid,
-+		.queue_idx	= fq->idx,
- 		.dev		= napi->dev->dev.parent,
- 		.netdev		= napi->dev,
- 		.napi		= napi,
+@@ -6,6 +6,7 @@
+ #include <linux/export.h>
+ 
+ #include <net/libeth/rx.h>
++#include <net/netdev_queues.h>
+ 
+ /* Rx buffer management */
+ 
+@@ -139,9 +140,47 @@ static bool libeth_rx_page_pool_params_zc(struct libeth_fq *fq,
+ 	fq->buf_len = clamp(mtu, LIBETH_RX_BUF_STRIDE, max);
+ 	fq->truesize = fq->buf_len;
+ 
++	/*
++	 * Allow frags only for kernel pages. `fq->truesize == pp->max_len`
++	 * will always fall back to regular page_pool_alloc_netmems()
++	 * regardless of the MTU / FQ buffer size.
++	 */
++	if (pp->flags & PP_FLAG_ALLOW_UNREADABLE_NETMEM)
++		fq->truesize = pp->max_len;
++
+ 	return true;
+ }
+ 
++/**
++ * libeth_rx_page_pool_check_unread - check input params for unreadable MPs
++ * @fq: buffer queue to check
++ * @pp: &page_pool_params for the queue
++ *
++ * Make sure we don't create an invalid pool with full-frame unreadable
++ * buffers, bidirectional unreadable buffers or so, and configure the
++ * ZC payload pool accordingly.
++ *
++ * Return: true on success, false on invalid input params.
++ */
++static bool libeth_rx_page_pool_check_unread(const struct libeth_fq *fq,
++					     struct page_pool_params *pp)
++{
++	if (!netif_rxq_has_unreadable_mp(pp->netdev, pp->queue_idx))
++		return true;
++
++	/* For now, the core stack doesn't allow XDP with unreadable frags */
++	if (fq->xdp)
++		return false;
++
++	/* It should be either a header pool or a ZC payload pool */
++	if (fq->type == LIBETH_FQE_HDR)
++		return !fq->hsplit;
++
++	pp->flags |= PP_FLAG_ALLOW_UNREADABLE_NETMEM;
++
++	return fq->hsplit;
++}
++
+ /**
+  * libeth_rx_fq_create - create a PP with the default libeth settings
+  * @fq: buffer queue struct to fill
+@@ -165,6 +204,9 @@ int libeth_rx_fq_create(struct libeth_fq *fq, struct napi_struct *napi)
+ 	struct page_pool *pool;
+ 	int ret;
+ 
++	if (!libeth_rx_page_pool_check_unread(fq, &pp))
++		return -EINVAL;
++
+ 	pp.dma_dir = fq->xdp ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
+ 
+ 	if (!fq->hsplit)
 -- 
 2.51.1
 
