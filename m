@@ -1,218 +1,159 @@
-Return-Path: <netdev+bounces-241578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DA4BC85FE8
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:37:22 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5736C86079
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:48:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5641834C562
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:37:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4F4064E2880
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59FBF329362;
-	Tue, 25 Nov 2025 16:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1536242D8E;
+	Tue, 25 Nov 2025 16:48:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nndKed/q"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="NkyrtaWK";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="QaOs8DyH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3275C1487E9;
-	Tue, 25 Nov 2025 16:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1228E218596
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764088638; cv=none; b=Za4ZqkZw/trIYQCF6cM+4sSoSQ9ZzDE6V+NHTVXTW2MUNzHeBE0JnJvi5NM7xkltYMxcfGTeudwIF25FEpLWYMYuKJyiT5ZHena7DojF4zl9I4fvtsMpibopg/AHhOYq1FmG/zy7afpgs5y8SBtTW21aDqSze3XhSMyc3aOk+Q0=
+	t=1764089287; cv=none; b=NlxIRBaCp9awfejoajSuOjjde7A3MloMF+rUfSqOWcY5ekjMq9osgO7iaK/GvoGnC0+M7EGqQv9PMB2q8PofcbMjGaDDOKzOcVtbRAPFPdiYDZoQ+9Yn8EOQcCSLbX8mHzLUatnhvKt+oLFpkl7GZG9WWoU8Bw/Ew0u2NKaiDgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764088638; c=relaxed/simple;
-	bh=nBeML0ip1QW4LgnV9TIkkO+eD75Thqh7vMCTrOjDcoU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=GZQ4DsbF2A9arTibA2HzYaYB6+d3U6yzvj4WushzG5JhWTIYoTjvLl0ivSZ4t/vhMn6/ps6MSPhT1bHnmDyg9oU+yF8QRrThk3gAMnYKsfUspT8XxIT40BuNAfezXG96iqtZ4XG77JR2MfX2J3th5wbrLUPH7gh0tykhfLwzpp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nndKed/q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 975F9C4CEF1;
-	Tue, 25 Nov 2025 16:37:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764088637;
-	bh=nBeML0ip1QW4LgnV9TIkkO+eD75Thqh7vMCTrOjDcoU=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=nndKed/qvsGzyjQlpMxhJr5D8NDa+9pN2yxdtF96KeTreqZpkq5/JTdojK6YoKppl
-	 Zy9vAqTZcpuSVzs5ajKlCPCfw6m4ru9lIoDvdlWnzCoAG9obF3xqT2UbR7iLQ60KRA
-	 rKaSUfhg03RpuG+CkMbnHA7/iqyVuPqQwu1V2Yif6hWxg84aFi/THEe5qpcw8IAc58
-	 +4EB+VkfYwbXU6Z94DYDb/vb7d9LMSYYeOajfYIHxo8K2Oycuf7/25YdT30DF2A+GR
-	 cIt+d6oPRB5OfjY2Jvn1Gn+egl5ivHiUDrjRFabwbEpK7wTSiDDm9FnR+mWKoh33uh
-	 J7WHOcJmDK2sA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81943D0EE00;
-	Tue, 25 Nov 2025 16:37:17 +0000 (UTC)
-From: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>
-Date: Wed, 26 Nov 2025 00:37:12 +0800
-Subject: [PATCH net-next] net: stmmac: dwmac: Disable flushing frames on Rx
- Buffer Unavailable
+	s=arc-20240116; t=1764089287; c=relaxed/simple;
+	bh=r2DFfPpZ2i3kDSKtZaDOyK+wMS9Iax66aLaU3RTMlmw=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=seJf2YYBStE4w3rTEwvH/KCqS1lMS472XcXw2ivetuCYUV9JfMYkSJ84CC6zDDI60OlXchZ6Ao2ZiOOFcfzbdJuD8e+uLVRDbFBl3BufpJ/A9YsfO7lXDFTmlvanvHOjV0e9+D0HFPxlJ05ji6cURGiNqXMJnTviATuXlDlCKTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=NkyrtaWK; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=QaOs8DyH; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AP9rtCt1979085
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:48:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	owFn4+22Dt9h0dvI5JhAaFVHZpEFy+gIYCPbJTU02SE=; b=NkyrtaWKHf3BksNV
+	co4/ZHHxJhVoEF38sLym/5hqSiUzlEvODNp1Htw0MyKx51h6lriWRYpdBaNEA9qw
+	qfAPLZDkTcLFO00YMIH0tIMpdSyrkTxBQAAc66UZ+9SvkA66g0+Hlmg5F5CVOac4
+	5bwA9HAMGUrTmK4xG5HdZM6gGdOzReCNKyUrldKOkFMgz5O277T5Vqo0K1ZEjHvF
+	OZfMJSSk03Cn0ha/HI52HePRwh84J7R3/QhqJ6cMVyxVrylbjdEQ+sNv4uPpsRxb
+	+x2OIswkstWjmFDvPLSRPD63e1DcGNxoh+YaKvth9MM9Fg4lLJ0OIB3WngbfZyIX
+	DqJUHg==
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4amw9gucuu-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:48:04 +0000 (GMT)
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-7bb2303fe94so5843246b3a.3
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 08:48:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1764089284; x=1764694084; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=owFn4+22Dt9h0dvI5JhAaFVHZpEFy+gIYCPbJTU02SE=;
+        b=QaOs8DyHAjFwWRdc61RTtjiKeTwfr4Mr5AdaZf7YTHc8YwdxHqkgqPmITdjkE2irHg
+         TBMLDo9QOkubcwXmPZ2MnBqS5dDJRepGV7imKp6Hgu4Yr7BsRE9/DsWbVz0batYAszay
+         nSqpTKFGP+L4CAJoRHhIXhQjdPyqcA4G1A55c83jICAu1SV5IFgNb9/AjNEKKBC/STSp
+         ECxXi6i1UeFlaJkMWjlRoysdQsVq4I7Ekx6r1fW/OSVrYOE6b0aC/UO83wNwDeZtHvoh
+         CfCuxmY/9DjL2jQQ9FEQNDYEdggt80vcunCXel3QYh6HbjYjB4Nc93vQpyl1yNVOjFSD
+         vYjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764089284; x=1764694084;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=owFn4+22Dt9h0dvI5JhAaFVHZpEFy+gIYCPbJTU02SE=;
+        b=XaDljOM5GtWPYCIwoiRq4Ahznpo51pGom334vhOsxJuDkS12RMiAcylx4d0QJzZDEf
+         ieh+hSthzZlXx9X8BCXOq1IyARVJXpeNJ+OxkE+Yo4he9THUqDXQOQlzEUuNO/M84F+l
+         V2tOg1vEnP1pUjM3YdZSBmqKfoFMEYsKl/e5Vx6lBbWa0v54KPVQVRL3JfCOH4KWLhLk
+         IAfcspTqG0ZNGR+/+ygxyHhjhdq3KPnt3sua0zOpYd5PfYJkhROigavOQa+Rv1IeyNjN
+         7uYsgq+wphVVmNawwa0qYIoJjmJ6lOt8rznwWD/l3WEjlihZqjWNujNZ9gSnRJ/mOwwM
+         2xHg==
+X-Forwarded-Encrypted: i=1; AJvYcCXJ+2fmniAsg0eDdxTMwkaInCL+0iQ9+iArP6OSdvcOo+D9r5ZmzUuWFPR5TLZ7FxVwZ0eBgAs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZ74TEENhezMLjfxaHtjx4eks2L99Zus4L5gHf3RYG8eqCbTXn
+	76E8i9qdkT1hj7yFMaYZZs5jgLpZNafpXffS13nKpX9q0sg884n1yaMm4LFm0q9+X7lNOnNjGlT
+	hAKUaUOkM7GYwICZc5ZZ+1RD0MVzBZpab5uBLDLHaE9luJgq4o0Y3obSFNg8=
+X-Gm-Gg: ASbGnctJUApAeOU8vckxZ5bz6vI1VlnQq8XTQxsK7rlOsxx78BzzfkCDyWoxucZ447p
+	AfzlB4I7C6I6YT14/lvr0m0kFt62E4m470c04kKrJR4if60dvTM8Kl434l3RO7CcjOYcZ4PuEAP
+	yIt2ZxDkLun4ew0TaUOjJyQ2DJB2+7JOiKS+G3VgaeBdHlC6Sw0045pPCZjSkNPRPTTZjoSEUX1
+	H83yW7vL5th3Oae+B+WQhEVEZLnpHT6p+YQjH2slLdaN/bZ9UD+ThQUJRastUzrt6bF79633DsO
+	DBqkuIPls6MxniBlzZrrDdWz3O6c1lzUnX581X7Um3BFG0QQxQV6FwfFGWeTCqiSrl/40oHpBEQ
+	JUlC9nQThHsbVI6rn4PtwgKKWVKB3EOdlyWRTpX9uD1nf5Yw2Xm+d5OI=
+X-Received: by 2002:a05:6a21:3399:b0:34f:ec32:6a4b with SMTP id adf61e73a8af0-36150ef8195mr16032890637.32.1764089283761;
+        Tue, 25 Nov 2025 08:48:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGPShcOIsEaNc3uW4NqPkq5KubUsXBKSz0C3elunNAPNo63sqiGW9+gfV1cqdAWum0P0h9A5Q==
+X-Received: by 2002:a05:6a21:3399:b0:34f:ec32:6a4b with SMTP id adf61e73a8af0-36150ef8195mr16032862637.32.1764089283269;
+        Tue, 25 Nov 2025 08:48:03 -0800 (PST)
+Received: from [10.227.110.203] (i-global254.qualcomm.com. [199.106.103.254])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f0d55b71sm18841191b3a.55.2025.11.25.08.48.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Nov 2025 08:48:02 -0800 (PST)
+Message-ID: <9627ce3e-9744-4250-9e6b-708771343c89@oss.qualcomm.com>
+Date: Tue, 25 Nov 2025 08:48:01 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] wireless-2025-11-20
+From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        "ath12k@lists.infradead.org" <ath12k@lists.infradead.org>
+References: <20251120085433.8601-3-johannes@sipsolutions.net>
+ <69b2d01e-38f3-4a6a-a7e6-5d94d42fe65a@oss.qualcomm.com>
+Content-Language: en-US
+In-Reply-To: <69b2d01e-38f3-4a6a-a7e6-5d94d42fe65a@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251126-a10_ext_fix-v1-1-d163507f646f@altera.com>
-X-B4-Tracking: v=1; b=H4sIADfbJWkC/x2MSwqAMAwFr1KyttAUItariIifqNlUaUWE4t0NL
- ucxbwpkTsIZWlMg8S1ZjqiAlYF5H+PGVhZl8M4Toic7ohv4uYZVHkuBsHE0heBq0MeZWOe/1kH
- ky0Y1oX/fDzRrBKVnAAAA
-X-Change-ID: 20251125-a10_ext_fix-5951805b9906
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Rohan G Thomas <rohan.g.thomas@altera.com>, 
- Matthew Gerlach <matthew.gerlach@altera.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1764088636; l=6674;
- i=rohan.g.thomas@altera.com; s=20250815; h=from:subject:message-id;
- bh=1yOOam2AS2+5uDLyswXLrju6hz3Fas3Llt1CFCEF2XQ=;
- b=0nGCrQtOBgw4LLg/JEC16HfXKFngX7ZaZTAAG3vvYoi54fUKNVpkF6bRXIgxRlb7WXsCcGQjU
- dUDM7EjLUYEBhyqE0IYhZ/QVwrrpo3yYvvkDOPFJ42WkL9Oa9jBoOvv
-X-Developer-Key: i=rohan.g.thomas@altera.com; a=ed25519;
- pk=5yZXkXswhfUILKAQwoIn7m6uSblwgV5oppxqde4g4TY=
-X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
- with auth_id=494
-X-Original-From: Rohan G Thomas <rohan.g.thomas@altera.com>
-Reply-To: rohan.g.thomas@altera.com
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI1MDE0MCBTYWx0ZWRfX4OqJPIPWXlvf
+ jirCX46mbkBAS1AF3KlcrhFxXIpN5e9Xq/tZfcdVONAKSule9+Hbe4nLrs2xRD9b8Rp91LphnFz
+ DFW1gP2NYcAkrDVYgLGvbF9nT8YCvcl82ueUlKrCewVJnDEPfeD46dMKFdVtA9Vp6VfJk+OovlF
+ NbG6RoI9nPAd8kPxOx9krvNTY5mnkkD6Esyw2y5oYaqSlXs9TKLZKbVdmsfAVH35CA+IsxWiEjV
+ WX5qF+gr3aNw9uber8E5cV9fPx3UTpHa2E8oXnzZhoWhqxt15jkCI8nENP33XAmPypj5E18fIlZ
+ yfW+5s9NXj2lKtXvsp5G5TcMfE07slOWQDrEr6Nbg==
+X-Authority-Analysis: v=2.4 cv=H53WAuYi c=1 sm=1 tr=0 ts=6925ddc4 cx=c_pps
+ a=WW5sKcV1LcKqjgzy2JUPuA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=9x0bo0beFLz6AYJxxT0A:9 a=QEXdDO2ut3YA:10
+ a=OpyuDcXvxspvyRM73sMx:22
+X-Proofpoint-ORIG-GUID: KCvsuJ_Psr0AEX1N1zVq2DBQk5bb9v0O
+X-Proofpoint-GUID: KCvsuJ_Psr0AEX1N1zVq2DBQk5bb9v0O
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-25_02,2025-11-25_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 spamscore=0 lowpriorityscore=0 adultscore=0 suspectscore=0
+ malwarescore=0 bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2511250140
 
-From: Rohan G Thomas <rohan.g.thomas@altera.com>
+On 11/20/2025 10:05 AM, Jeff Johnson wrote:
+> On 11/20/2025 12:53 AM, Johannes Berg wrote:
+>> Hi,
+>>
+>> Looks like things are quieting down, I fear maybe _too_ quiet
+>> since we only have a single fix for rtw89 scanning.
+> 
+> Isn't that the way it is supposed to be heading into -rc7?
+> :)
+> 
+> BTW internally we're finalizing the ath12k-ng => ath-next merge.
+> It's a non-trivial merge of around 100 patches on top of around 60 patches
+> since the branch point.
+> 
+> Current goal is get it to you next week for the v6.19 merge window.
 
-In Store and Forward mode, flushing frames when the receive buffer is
-unavailable, can cause the MTL Rx FIFO to go out of sync. This results
-in buffering of a few frames in the FIFO without triggering Rx DMA
-from transferring the data to the system memory until another packet
-is received. Once the issue happens, for a ping request, the packet is
-forwarded to the system memory only after we receive another packet
-and hece we observe a latency equivalent to the ping interval.
+Update: We are still validating the merged code and hence we will not be
+issuing a pull request for v6.19 merge window.
 
-64 bytes from 192.168.2.100: seq=1 ttl=64 time=1000.344 ms
-
-Also, we can observe constant gmacgrp_debug register value of
-0x00000120, which indicates "Reading frame data".
-
-The issue is not reproducible after disabling frame flushing when Rx
-buffer is unavailable. But in that case, the Rx DMA enters a suspend
-state due to buffer unavailability. To resume operation, software
-must write to the receive_poll_demand register after adding new
-descriptors, which reactivates the Rx DMA.
-
-This issue is observed in the socfpga platforms which has dwmac1000 IP
-like Arria 10, Cyclone V and Agilex 7. Issue is reproducible after
-running iperf3 server at the DUT for UDP lower packet sizes.
-
-Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c | 5 +++--
- drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h     | 1 +
- drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c     | 5 +++++
- drivers/net/ethernet/stmicro/stmmac/hwif.h          | 3 +++
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   | 2 ++
- 5 files changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-index 6d9b8fac3c6d0fd76733ab4a1a8cce2420fa40b4..5877fec9f6c30ed18cdcf5398816e444e0bd0091 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-@@ -135,10 +135,10 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
- 
- 	if (mode == SF_DMA_MODE) {
- 		pr_debug("GMAC: enable RX store and forward mode\n");
--		csr6 |= DMA_CONTROL_RSF;
-+		csr6 |= DMA_CONTROL_RSF | DMA_CONTROL_DFF;
- 	} else {
- 		pr_debug("GMAC: disable RX SF mode (threshold %d)\n", mode);
--		csr6 &= ~DMA_CONTROL_RSF;
-+		csr6 &= ~(DMA_CONTROL_RSF | DMA_CONTROL_DFF);
- 		csr6 &= DMA_CONTROL_TC_RX_MASK;
- 		if (mode <= 32)
- 			csr6 |= DMA_CONTROL_RTC_32;
-@@ -262,6 +262,7 @@ const struct stmmac_dma_ops dwmac1000_dma_ops = {
- 	.dma_rx_mode = dwmac1000_dma_operation_mode_rx,
- 	.dma_tx_mode = dwmac1000_dma_operation_mode_tx,
- 	.enable_dma_transmission = dwmac_enable_dma_transmission,
-+	.enable_dma_reception = dwmac_enable_dma_reception,
- 	.enable_dma_irq = dwmac_enable_dma_irq,
- 	.disable_dma_irq = dwmac_disable_dma_irq,
- 	.start_tx = dwmac_dma_start_tx,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-index d1c149f7a3dd9e472b237101666e11878707f0f2..054ecb20ce3f68bce5da3efaf36acf33e430d3f0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-@@ -169,6 +169,7 @@ static inline u32 dma_chan_base_addr(u32 base, u32 chan)
- #define NUM_DWMAC4_DMA_REGS	27
- 
- void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan);
-+void dwmac_enable_dma_reception(void __iomem *ioaddr, u32 chan);
- void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
- 			  u32 chan, bool rx, bool tx);
- void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-index 467f1a05747ecf0be5b9f3392cd3d2049d676c21..97a803d68e3a2f120beaa7c3254748cf404236df 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-@@ -33,6 +33,11 @@ void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
- 	writel(1, ioaddr + DMA_CHAN_XMT_POLL_DEMAND(chan));
- }
- 
-+void dwmac_enable_dma_reception(void __iomem *ioaddr, u32 chan)
-+{
-+	writel(1, ioaddr + DMA_CHAN_RCV_POLL_DEMAND(chan));
-+}
-+
- void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
- 			  u32 chan, bool rx, bool tx)
- {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-index f257ce4b6c66e0bbd3180d54ac7f5be934153a6b..df6e8a567b1f646f83effbb38d8e53441a6f6150 100644
---- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-@@ -201,6 +201,7 @@ struct stmmac_dma_ops {
- 	void (*dma_diagnostic_fr)(struct stmmac_extra_stats *x,
- 				  void __iomem *ioaddr);
- 	void (*enable_dma_transmission)(void __iomem *ioaddr, u32 chan);
-+	void (*enable_dma_reception)(void __iomem *ioaddr, u32 chan);
- 	void (*enable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
- 			       u32 chan, bool rx, bool tx);
- 	void (*disable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
-@@ -261,6 +262,8 @@ struct stmmac_dma_ops {
- 	stmmac_do_void_callback(__priv, dma, dma_diagnostic_fr, __args)
- #define stmmac_enable_dma_transmission(__priv, __args...) \
- 	stmmac_do_void_callback(__priv, dma, enable_dma_transmission, __args)
-+#define stmmac_enable_dma_reception(__priv, __args...) \
-+	stmmac_do_void_callback(__priv, dma, enable_dma_reception, __args)
- #define stmmac_enable_dma_irq(__priv, __args...) \
- 	stmmac_do_void_callback(__priv, dma, enable_dma_irq, __priv, __args)
- #define stmmac_disable_dma_irq(__priv, __args...) \
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 6cacedb2c9b3fefdd4c9ec8ba98d389443d21ebd..1ecca60baf74286da7f156b4c3c835b3cbabf1ba 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4973,6 +4973,8 @@ static inline void stmmac_rx_refill(struct stmmac_priv *priv, u32 queue)
- 	rx_q->rx_tail_addr = rx_q->dma_rx_phy +
- 			    (rx_q->dirty_rx * sizeof(struct dma_desc));
- 	stmmac_set_rx_tail_ptr(priv, priv->ioaddr, rx_q->rx_tail_addr, queue);
-+	/* Wake up Rx DMA from the suspend state if required */
-+	stmmac_enable_dma_reception(priv, priv->ioaddr, queue);
- }
- 
- static unsigned int stmmac_rx_buf1_len(struct stmmac_priv *priv,
-
----
-base-commit: e3daf0e7fe9758613bec324fd606ed9caa187f74
-change-id: 20251125-a10_ext_fix-5951805b9906
-
-Best regards,
--- 
-Rohan G Thomas <rohan.g.thomas@altera.com>
-
-
+/jeff
 
