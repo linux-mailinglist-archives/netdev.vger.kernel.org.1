@@ -1,137 +1,171 @@
-Return-Path: <netdev+bounces-241432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3615C83F87
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 09:26:24 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9E4DC83FE5
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 09:34:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5F87034C508
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 08:26:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 70CD44E3C95
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 08:34:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E832D9EC8;
-	Tue, 25 Nov 2025 08:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6422C2D0C64;
+	Tue, 25 Nov 2025 08:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIv7TBHo"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Ru9Lz2ZW";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="fAc107OA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128F32D948F
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 08:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C561129B8D3
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 08:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764059179; cv=none; b=K9jD0L2yCHAuUpxMpnEQZIwJ6O9LpI/TgRlJFp6aH/UpapeIvomlfQ1Gl3+rYa5vDP0Hg1HLxHAsCOaxHPlpWtrhKOPdI1VzRNKSiWplFG4ttxS5rUEuK4MxtPwQOPj63VJz0mMowVk4WxoeszbfXi/fBqzDrde9eMpun5+DQ8M=
+	t=1764059645; cv=none; b=QTGYWbjTI56Q/63tGu7EeMBC70rkNawQ73JU+EUKirkTxefLF1/8Zr5/D274VrHatm4+Vpz4Dc5SaJWYEH0wpCyEpv5VMlW1eszmExKuN63ryIozFY7VfBRKqdLPNvQonYJ5bgATv/ct5qal4Z3lMa+XkZ1ffkZZ3fRxeuDk38w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764059179; c=relaxed/simple;
-	bh=Afh3LuqY8T6H1cQlXtonHTUKu9vzJFqvaorplKdD1Hw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uABhrFHapdfx7FNMJviV66GWiiPUEdm7SWijscnRBgquWq3+E+eSlqC8gIAyFxyA39soQcrW9zrALjF48x37SGVpMp3FSI4N8E07hzusKQRseQMx5OVZOMIgRju8oiLNe5gv/7fAjrubCN/ZYTDMocQcRkc0tcStuw7EMId6HMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIv7TBHo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C6DDC116D0;
-	Tue, 25 Nov 2025 08:26:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764059178;
-	bh=Afh3LuqY8T6H1cQlXtonHTUKu9vzJFqvaorplKdD1Hw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QIv7TBHo4ffmvfz6MSNJcIjiOjwlc/CyNHBeoOPfs242j16mPB5y6Pt7lmUpdlHrx
-	 Pk3C9bcp8mq0biYOFbM9ggmn3A9r08hrSZh6waXALb7HcXv0MLj4U2eInYrgKzDLn5
-	 vi04ekvr7PMSZNSw8vVTOHmrgejrGSI/PxUzujD1HNl/lGTegSKe5x7Br40pr9rJFc
-	 ftImSMnq+s85zqyBJGWYE+n/fea/9NgnX9DiGaPphrrTg1VPcCHkaChis3HnpVOdBc
-	 vKzuicrhtsENvDnJZiC8p+xMC3QlTr7bOx5t3md2JqGpE5yTXG1ctVMPX1b0p2vQcE
-	 XBMT2m5dWnIiA==
-Date: Tue, 25 Nov 2025 09:26:14 +0100
-From: Antoine Tenart <atenart@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	andrew+netdev@lunn.ch, netdev@vger.kernel.org, Liang Li <liali@redhat.com>, 
-	Beniamino Galvani <b.galvani@gmail.com>
-Subject: Re: [PATCH net] net: vxlan: prevent NULL deref in vxlan_xmit_one
-Message-ID: <emskewx4qfgxdhp6tvfx5fgz2nkcuv6sln6cde7m5jqm2rybmj@odtf6g5zu2no>
-References: <20251124163103.23131-1-atenart@kernel.org>
- <20251124195119.0199d58a@kernel.org>
+	s=arc-20240116; t=1764059645; c=relaxed/simple;
+	bh=Ae1CPKP+xBxCglEbrpge43O/fims8vio58fFNmUJ8ek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HFdAXHACfNPCnNnHNLZbwq2Q5d9vpJc5SDhPfjCaSWigPQi3ooJs7HDf2AffKImxAZsVzmEuvtfsBSwtt7pZI03PPI1xzNFwiZI2MvVBfwCH9LskUpcFqCordZ4yDVYDw+bLjyDCoEK+aVwcJohQIWip2dc+AHXS3b2/iQJx3ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Ru9Lz2ZW; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=fAc107OA; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AP2gfY81820690
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 08:34:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	1HuTVZV0zOwiNRmWH4P6b323jWmP7HMng/IpPHgTUz8=; b=Ru9Lz2ZWzQO/3M89
+	PNaJxhXxMyQM6nquajPIPWRPBcOanxCi30DQVoyRAM3Hgepcc1oP5YzlEIpvgPgn
+	H0SuZ/+K8Aa0UYIQb1Kp3V+VP2dd7fNMAsRUjFp+799nOTnQYfwm4qkUvh4dzldY
+	MkIMjRMLdmSOHSQ9fOmMrqEsd5bi6VmW/M96/5l0TK79N0+aG5eJ7j52zlEGZG4X
+	pB6qAO+eZeUEfpfxLgpyXQkMCJqbWidkXp1y5oD6juHLzJ8RNNjmms3vdEXTfmGQ
+	ee1EG/mXLb11f0Ag9Q7QxJW9TNxbG9vVC1u5Yw1rTIFyehKaIBcyN19dCGe/rhE8
+	foebpg==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4amp6h3cpb-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 08:34:02 +0000 (GMT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8a1c15daa69so355693185a.1
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 00:34:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1764059642; x=1764664442; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1HuTVZV0zOwiNRmWH4P6b323jWmP7HMng/IpPHgTUz8=;
+        b=fAc107OAJiqCCRIQzxollCplXQDVHLBu8HjyT6VCThhZCxik+qD6ToIJPrwrc5NOcY
+         2cgyxHH8WrKcEoRwX2jKjq+jv+m6+Dl1moiSCdPw1v8tJzOtTqveAVLrpssmu+Fb85vP
+         MT25cvSZu7SmPfnUPwGGbtllpeW2STzZ+OUsNK+AHneLaJZGKWeBBN69Jtt6kkVEYeus
+         VoVfggvejtcKJv3ZDkDW+NRVRtZbl5kIGf/mhMgpajz2UdBa+bESRC1Unut6sKwwC5Mc
+         TQDiRJdosKkXm/D2s0KJLY0jdsCb4KX6K3unlBFgxFyF8IY/ehKcwBcEDjrlF/TktdWP
+         5+CQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764059642; x=1764664442;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1HuTVZV0zOwiNRmWH4P6b323jWmP7HMng/IpPHgTUz8=;
+        b=ZqdbgctE9IwwZTUE360sRt1SsEJm3nEXXpXQM7k+R1ztivrRw9g1iEoSRy68E6NUoS
+         1I83YA6sDbWsdUQsYUdaxL2cRJx5WRkZ1pvX+FF7XtzOBuVs2vTZDUzHgk/cDT2zw+06
+         YF3MDSWm90jsYk+LuBFouCyX9sEM6XVdlbTimvitmjFgViAsSWPCKDEuE9+n+hb2lQld
+         nZ5wSxRQLnbIZzJWa2QDsfZVT06YgY8hCWhsWXLkKhc5jLxHWohP3ag7r0zsNl5beafA
+         WENqtaDSvMBuIbxBE31t+ur+n5S+IrXhM5oUQWygorFDEOSkRaxaNKVchhHtQNiLS2pU
+         yRBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUxHlMhf7I9yfs7J4G61KuVMqkzfb7OuQWVmyL8OCC6+428MDsEStUNAAMf251ABHx25ULMylk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3ataSUfKSjw5kdh3Br4dC51jyeZwvnsCsIJrNSIWN23u4crfu
+	1dj0xkVCFk6ddDT2ziKLPCWOu/8D3EYX4KbENwYYGSaj6gGxJIo5dkszwvHFDq7BDNxqs0xussA
+	jqocU1i4sm6uztNnTz2SSmZDymg6AdsUMJ7tynIF9yT2e9Dr/0NftTKVXFQCh+q7swQNgJxtFcD
+	V9A9wACeh5D+eiu120X29RTfxag04tqBoqmw==
+X-Gm-Gg: ASbGncutLRvPBNsuFH8l2kkByQ8nmIAudM3j+YM0icdzbshklzfnuPD+oIwcSklmWSa
+	f/Y93FkEe05Pxiu75b2P+n3HkXsUK/Cz10jIVJQ/ZgcIWvgrYbhupzVdjxRikCF+FyIVuzm/eZc
+	kYqNvIzJCOXreg6WihfsotvjzV6TMzHUrbZSWVvLVwPLGUpvwe8zlkfA3xnIlT0xMHQp55iWb13
+	XNn+R17WTz5n3Cu2ecNJ1CAou0=
+X-Received: by 2002:a05:620a:2a09:b0:8b2:3371:e9d6 with SMTP id af79cd13be357-8b4ebdbdbffmr283057585a.62.1764059641759;
+        Tue, 25 Nov 2025 00:34:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGaseWVAd751kOoaG8NHYwslj38Zrk6O8JLCJx+cvSt2cnr4Ko/CUvPRCyBqK18JpfM6MZSYZSfMgY4c9iswDM=
+X-Received: by 2002:a05:620a:2a09:b0:8b2:3371:e9d6 with SMTP id
+ af79cd13be357-8b4ebdbdbffmr283055885a.62.1764059641373; Tue, 25 Nov 2025
+ 00:34:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251124195119.0199d58a@kernel.org>
+References: <20251125070900.33324-1-slark_xiao@163.com>
+In-Reply-To: <20251125070900.33324-1-slark_xiao@163.com>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Tue, 25 Nov 2025 09:33:50 +0100
+X-Gm-Features: AWmQ_bkqz4KYJ1wn6Khm7G8j9m-uhXdl-_D171Xxib4-ZX3-5oqIogJjeWNSWco
+Message-ID: <CAFEp6-3i1HdDvqgw3Ye7+rhz7QBLsxEL4dJnj9qctpbG8sq8Cw@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: wwan: mhi: Keep modem name match with Foxconn T99W640
+To: Slark Xiao <slark_xiao@163.com>
+Cc: ryazanov.s.a@gmail.com, johannes@sipsolutions.net, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+        mani@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI1MDA2OCBTYWx0ZWRfXxx5EXay+4qo+
+ bQJ3w7rKhPFv/VfoG4THk9L5N8HjY9wGa9xh/TMZd2xvsGure2bUr3kqkSq7eZoBMSMzcq48nSV
+ NScZZbEo9wwIoqbD/OOl1e4EA18ee+H3Ezg/nQZ0X6UrW8ZdJQydHZjqikZ2SK0HgT1T4Trt690
+ ssPmSd/WXNs4BZOKNIcYJr2ITKLSquZD/8QeBjsoYi9PUXUGGsV/4t+P4rLw8/4lUuZtG0VhQMV
+ Z4n/UrFUMXFWc4p/x4XnTxSKosyl4Uzi77w80QptFg1p3j3k/bnrZN8ojwhQargRXH088x4jIEx
+ t6NVTdWh83ZNVLDAFdpvWTndRSnX2zDphigz1gkTBVjK00JbT+MLIoWURU4aIhpjaNWaOdD1j61
+ EP0/lX8tiY6unaf8bU+lttsYd2jorw==
+X-Proofpoint-GUID: -Z0vDuXOw71_yUJ68r_AABaB4E92aVuI
+X-Proofpoint-ORIG-GUID: -Z0vDuXOw71_yUJ68r_AABaB4E92aVuI
+X-Authority-Analysis: v=2.4 cv=GoFPO01C c=1 sm=1 tr=0 ts=692569fa cx=c_pps
+ a=qKBjSQ1v91RyAK45QCPf5w==:117 a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Byx-y9mGAAAA:8 a=EUspDBNiAAAA:8
+ a=rGU52pVM9EWxqS3BAjAA:9 a=QEXdDO2ut3YA:10 a=NFOGd7dJGGMPyQGDc5-O:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-25_02,2025-11-24_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 impostorscore=0 bulkscore=0 adultscore=0
+ phishscore=0 clxscore=1015 lowpriorityscore=0 priorityscore=1501 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511250068
 
-On Mon, Nov 24, 2025 at 07:51:19PM -0800, Jakub Kicinski wrote:
-> On Mon, 24 Nov 2025 17:30:59 +0100 Antoine Tenart wrote:
-> > Neither sock4 nor sock6 pointers are guaranteed to be non-NULL in
-> > vxlan_xmit_one, e.g. if the iface is brought down. This can lead to the
-> > following NULL dereference:
-> > 
-> >   BUG: kernel NULL pointer dereference, address: 0000000000000010
-> >   Oops: Oops: 0000 [#1] SMP NOPTI
-> >   RIP: 0010:vxlan_xmit_one+0xbb3/0x1580
-> >   Call Trace:
-> >    vxlan_xmit+0x429/0x610
-> >    dev_hard_start_xmit+0x55/0xa0
-> >    __dev_queue_xmit+0x6d0/0x7f0
-> >    ip_finish_output2+0x24b/0x590
-> >    ip_output+0x63/0x110
-> > 
-> > Mentioned commits changed the code path in vxlan_xmit_one and as a side
-> > effect the sock4/6 pointer validity checks in vxlan(6)_get_route were
-> > lost. Fix this by adding back checks.
-> > 
-> > Since both commits being fixed were released in the same version (v6.7)
-> > and are strongly related, bundle the fixes in a single commit.
-> > 
-> > Reported-by: Liang Li <liali@redhat.com>
-> > Fixes: 6f19b2c136d9 ("vxlan: use generic function for tunnel IPv4 route lookup")
-> > Fixes: 2aceb896ee18 ("vxlan: use generic function for tunnel IPv6 route lookup")
-> > Cc: Beniamino Galvani <b.galvani@gmail.com>
-> > Signed-off-by: Antoine Tenart <atenart@kernel.org>
-> 
-> clang sayeth:
-> 
-> ../drivers/net/vxlan/vxlan_core.c:2548:7: warning: variable 'err' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
->  2548 |                 if (unlikely(!sock6)) {
->       |                     ^~~~~~~~~~~~~~~~
-> ../include/linux/compiler.h:77:22: note: expanded from macro 'unlikely'
->    77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
->       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-> ../drivers/net/vxlan/vxlan_core.c:2631:6: note: uninitialized use occurs here
->  2631 |         if (err == -ELOOP)
->       |             ^~~
-> ../drivers/net/vxlan/vxlan_core.c:2548:3: note: remove the 'if' if its condition is always false
->  2548 |                 if (unlikely(!sock6)) {
->       |                 ^~~~~~~~~~~~~~~~~~~~~~~
->  2549 |                         reason = SKB_DROP_REASON_DEV_READY;
->       |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->  2550 |                         goto tx_error;
->       |                         ~~~~~~~~~~~~~~
->  2551 |                 }
->       |                 ~
-> ../drivers/net/vxlan/vxlan_core.c:2464:7: warning: variable 'err' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
->  2464 |                 if (unlikely(!sock4)) {
->       |                     ^~~~~~~~~~~~~~~~
-> ../include/linux/compiler.h:77:22: note: expanded from macro 'unlikely'
->    77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
->       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-> ../drivers/net/vxlan/vxlan_core.c:2631:6: note: uninitialized use occurs here
->  2631 |         if (err == -ELOOP)
->       |             ^~~
-> ../drivers/net/vxlan/vxlan_core.c:2464:3: note: remove the 'if' if its condition is always false
->  2464 |                 if (unlikely(!sock4)) {
->       |                 ^~~~~~~~~~~~~~~~~~~~~~~
->  2465 |                         reason = SKB_DROP_REASON_DEV_READY;
->       |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->  2466 |                         goto tx_error;
->       |                         ~~~~~~~~~~~~~~
->  2467 |                 }
->       |                 ~
-> ../drivers/net/vxlan/vxlan_core.c:2352:9: note: initialize the variable 'err' to silence this warning
->  2352 |         int err;
->       |                ^
->       |                 = 0
+On Tue, Nov 25, 2025 at 8:09=E2=80=AFAM Slark Xiao <slark_xiao@163.com> wro=
+te:
+>
+> Correct it since M.2 device T99W640 has updated from T99W515.
+> We need to align it with MHI side otherwise this modem can't
+> get the network.
+>
+> Fixes: ae5a34264354 ("bus: mhi: host: pci_generic: Fix the modem name of =
+Foxconn T99W640")
+> Signed-off-by: Slark Xiao <slark_xiao@163.com>
 
-I missed that somehow... will fix in v2. Thanks!
+Reviewed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+
+> ---
+> v2: correct changes based on net base. Remove extra Fixes contents
+> ---
+>  drivers/net/wwan/mhi_wwan_mbim.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan=
+_mbim.c
+> index c814fbd756a1..f8bc9a39bfa3 100644
+> --- a/drivers/net/wwan/mhi_wwan_mbim.c
+> +++ b/drivers/net/wwan/mhi_wwan_mbim.c
+> @@ -98,7 +98,7 @@ static struct mhi_mbim_link *mhi_mbim_get_link_rcu(stru=
+ct mhi_mbim_context *mbim
+>  static int mhi_mbim_get_link_mux_id(struct mhi_controller *cntrl)
+>  {
+>         if (strcmp(cntrl->name, "foxconn-dw5934e") =3D=3D 0 ||
+> -           strcmp(cntrl->name, "foxconn-t99w515") =3D=3D 0)
+> +           strcmp(cntrl->name, "foxconn-t99w640") =3D=3D 0)
+>                 return WDS_BIND_MUX_DATA_PORT_MUX_ID;
+>
+>         return 0;
+> --
+> 2.25.1
+>
 
