@@ -1,371 +1,283 @@
-Return-Path: <netdev+bounces-241495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37CBFC84813
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:35:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46E55C84819
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:35:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E60BA3A2802
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 10:35:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 087B13A338C
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 10:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CF82EB845;
-	Tue, 25 Nov 2025 10:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 260C230499D;
+	Tue, 25 Nov 2025 10:35:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Anv+QVvg"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ndk00SN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013004.outbound.protection.outlook.com [40.107.159.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f100.google.com (mail-vs1-f100.google.com [209.85.217.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C58266B6C
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 10:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.4
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764066926; cv=fail; b=VVq7lLUXOGP72CehK90Nt7/MdsEHR08Z0X40q+SS8ggkeau3/2PqfJLzvNpCbEbS19LdJWc+GbI5WWZfhMIBUxvY4kppOEMStVj4MgGXnTydilJRxwsNKdr5bbgSK2AnEEdJAtyk1VQgVUv+KogWft58Cv1MSSHEOZnksl7NdcQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764066926; c=relaxed/simple;
-	bh=gwqHqx/hN732Ui825xkL7x0C3faWhtUSQ0DFFnP4nLg=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=eDpk2l47O+STEY/KaHbDoZqXDcGhEnAgRvGbNtOiycMGrckdRTzO/xGHEJ9mMse6RP9sqQlDeA8VrU6pIef85onQ1jvIjLv2YQQ0HkPsj8nWp8oK9nkYFxXeU7yWCm1/jf2yBN7SmV08sXRITqGvnb9R20karfJ34bnkKrza6KY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Anv+QVvg; arc=fail smtp.client-ip=40.107.159.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=O60x9uzXPZ9eo/FLwwAhdLszglQuzgaX49wlyQWpKkj5yY391dMjscL14vI/2LqFItHPqVo0aHaMWhMePzWbSvaDSO4sbYgz1g+3f75WH7xLAI1eEPCw+RGYDqn2ARVAemPOO4DkfLlmKS36343A5RetE0FzBWCDUeaZXOo0yCHJU+SCNDgRCyEA1zF+1JgOG/6IMvDVTGuJeIutsGnKsUdD3n3eZvD8cxCUsACoupaMvkZznVFwnmtpzcB2RMAhSwu58UkLUyZCrogp4ZZv3hOQmZx344cl0Xsb/ybueYGDl6w77WybUlO64GR/JECE2D9OQh062IOG1xHf4hkYQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9PmuP+LDqLFgH8XMPcrlP0CQGxAQGiYJm8O99eAh61U=;
- b=EszJK1CK9cNyZdNn6Ik5TPOjkZI3iBLmKUIBrLdrPdklQCC2xuJH0SiLGGBz5tk6HzOX7wdjPSm+6M+dQd6nseIoAAD+c0lPmBBwoN1LnbjxmU+mHFXm81dgE2NCEpfdIvhO60ZfrZdas2MiC/JNWmJuf3XFiKzvbygWE/YcJ8YEsd+aMfZMLh1Q6kj5l+m1rntaF9rjwNHNEUbpwyjL5LcDhtMRoPybAYIVpcS3jFJ7HJvROg4kH60P2WOq0enQR7Q90l6BscUkxylVjYZRTnjxmq4+tcMOoy24ZCe5xqXyLnuzE3/L8q1IJ0+/REkwrqHq21w3yZHMjHn2ilPT7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9PmuP+LDqLFgH8XMPcrlP0CQGxAQGiYJm8O99eAh61U=;
- b=Anv+QVvgXUBYKDNwHcOqAqwsn9XMBJhsanaXXb32Rvuj2hPF+inSJ+v4VkSYAMQyQMFnozgKg+V66V/VtNRPG170aZMQs38n47vZDPaSBOitFsu9FpDPsAAuvK6w7sH0ZMui5r8tjNQjmdcUbj6/rLIkjML6E3BSmSh9+NSE32XuPQivmj18Bf72gsy+YO67Ge+qXntfiL3EY5jAb/rNPRKXWEoQPJ9pwEsfds6NU3m/Bk7Kni5JSQJTt8RRKLlEkl03L0sJ0uOT7fZKt1yKtbhcYYYmUCssz/MndFObeDku7vOqwAW2rrK2QZYV28XvbOoHBF2maGyqmPQpFqSApQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
- by DB8PR04MB6811.eurprd04.prod.outlook.com (2603:10a6:10:fa::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.18; Tue, 25 Nov
- 2025 10:35:20 +0000
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::8063:666f:9a2e:1dab]) by AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::8063:666f:9a2e:1dab%5]) with mapi id 15.20.9343.016; Tue, 25 Nov 2025
- 10:35:19 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexander Wilhelm <alexander.wilhelm@westermo.com>
-Subject: [PATCH v2 net-next] net: pcs: lynx: accept in-band autoneg for 2500base-x
-Date: Tue, 25 Nov 2025 12:35:07 +0200
-Message-Id: <20251125103507.749654-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AS4P195CA0030.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d6::17) To AM9PR04MB8585.eurprd04.prod.outlook.com
- (2603:10a6:20b:438::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7BC266B6C
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 10:35:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.100
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764066942; cv=none; b=ER3kCq8QneD0mJBa2YsR4qGNyqK1olKRbHbe4W8pJZ6pXEwCWYG9U12QRZNW41Ls9cCBOe+gTRqJJYph5rJ31B6FRwqbh7stxf+X9ElvdmTbZET0TclC53QF8n6XN+QtvV6ANbSKxWhpl3kPrjBNfWaT8Fsl8nazdurnzOLUMRM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764066942; c=relaxed/simple;
+	bh=+vWl1NFT9GyAoSpTzVVvHN+V8qRL0QEyI6KgwlpV9/s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lKeQ0Fubbt63wW7GoXDARSxl6UJWtBV6r27OA52DYXh2+jcQFfnzUeImMO0WD5z2zyzuRmshbldf5IeB/+eh5p3JB7vRGMI3x8XbG2sIC05Vb9RR4H/PTfxfMQoQPkL3xTto3J9sZ/tHUUNnZh+zzb2YXm4v2JW4dV5WMcYwWDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ndk00SN4; arc=none smtp.client-ip=209.85.217.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-vs1-f100.google.com with SMTP id ada2fe7eead31-5dd6fbe5091so2293534137.1
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 02:35:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764066939; x=1764671739;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xiqx+T7ETIaXmkrexUn4F/7oBDDgHHWDBd9QJeL+hsk=;
+        b=sRGMSU6mUCVMzDcX4x4yJsOytoz0ks9I+OdiAK+wvhn3uLYKZQZAJhAtjFggPCfpAV
+         nFA1CgzwW0uuRJjgmXNnamzlsVbNn3QbrZ4plqwPXEp1PhBe6QOCuUnNRaVsEWsEI7H/
+         uMNXs3TuiHp95/fU0XkxNH2vdsReb5GTvD/lmjxIFwgD28RTVFeLGc6NtmCw9R0Ba5ra
+         u+cOTPmK0TQZfLpyESQ132bL5w7LfPMDPcD9M+2p+tR/A+RmXBRc/khFx40RxbfFbZNo
+         soTnwoKiUyhKxnBsx5XvKaF64dgW+2M7aV9MzlGOLbx62qktFZbPxTuTNpxujvyVkk91
+         +92A==
+X-Forwarded-Encrypted: i=1; AJvYcCXudON7Hdxxtcegw/HM2P2eyzs+0BRHCSFjFnMMZFZBDs5vIDijMTVFygmc/DBwZ3+T4afJ3SM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwinGFAuBsYKLf17gkPQYGdfzT8UIwOh+wW3cl6h5uUkGhcHpic
+	F9G9U4Mg7aNSp27+frRIUHdLFkY4xbisuvB2rx0STdsJkPtoJ4F1tNosJXYupy99coT5kzlMyou
+	UJNTEf1p/C5WBw21QWk5eNzKnJ+Hm0hskhuAuzZWMbVaiOvt1/E8NPiIVJ3sw7TKAZ523r1cTwt
+	yNjM9f1GE/MW1EXTDlgMcQRMxQ/Fdy3ZRq4rgCXYVMhTHb8/5gt40bpe3WhGfQ4RVHA7pdEcmWa
+	8MPQIiNnA==
+X-Gm-Gg: ASbGncshV5D1LgewW46T07DgRabqkzJEksGSoPAuo+0A1uD9zuHKR/9X9b9d9WSdfj8
+	fB7+uScJtawNCOSw4lqeggxS9xLUYlLokwmEJVEWd+yQ8kpmQYncs0kyoROhmZrjfzXqpYn0nF5
+	7H0glJrPpzTMzcnc07fc/194fgyhZF6eh7FEMx9orsG/uL4CLxTFv11zXCINC45kEVEKy58Vat9
+	0atrGVhZg17oEPY7l1NSmCdjjvYpV0kPuA5dDA6UvwUN6TG3aTaeBuJCymvaMkw4PXRycE0proe
+	sUG7ii9rFG5s+GRyW6rYPfSjrofdKGLmydt35eHzvfwgGVF9tZ4KjeG0hlTbND5CjY5R53j4Nql
+	WuaCTM40INoO2CwKDaBXXaa2eGfuenhq+ZWYTwuJtQctU9y44AdPNv5/IyJICPYDaisKNaeNPWL
+	hGSLjQCmavelSz3E6/92UpdcYhe5l3j1cWPKJWza10
+X-Google-Smtp-Source: AGHT+IFDW4ue1OzdfqPS1QMUfu033Mg7KhE/zdVS4RvTelSAjqk8UcjsFvKucU1jZamqoowHi20EHYXpo6Wg
+X-Received: by 2002:a05:6102:441b:b0:5df:b5d4:e45d with SMTP id ada2fe7eead31-5e1de43f9ccmr4500035137.33.1764066939279;
+        Tue, 25 Nov 2025 02:35:39 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-1.dlp.protect.broadcom.com. [144.49.247.1])
+        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-5e1bdde361esm2029013137.5.2025.11.25.02.35.39
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 25 Nov 2025 02:35:39 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3438744f11bso12555856a91.2
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 02:35:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1764066938; x=1764671738; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=xiqx+T7ETIaXmkrexUn4F/7oBDDgHHWDBd9QJeL+hsk=;
+        b=Ndk00SN4BL2ZjwHv99h/0IUH47i5B6iLOmiqJuVohrn/GXmSRq4ypJCLMsgiEMlcI+
+         Wc37Dnm07DIvs8wuyEMmM4L+9N8wJsVTVjzEMwApK/V0ZGqJJFSgK+lY8MP0REfhbwZk
+         aXDmjXv2ycBzg+BN2UjplwaEqqCLIkQ7yr6/o=
+X-Forwarded-Encrypted: i=1; AJvYcCV+JIzBo08BU2Ou/9bYK0rEdV/sJqYn/iya1RY84DtcSheUncgnGq2j/W++oLiewu91xQ+Y+/I=@vger.kernel.org
+X-Received: by 2002:a17:90b:4b09:b0:341:6164:c27d with SMTP id 98e67ed59e1d1-34733e2d49amr13893785a91.3.1764066937688;
+        Tue, 25 Nov 2025 02:35:37 -0800 (PST)
+X-Received: by 2002:a17:90b:4b09:b0:341:6164:c27d with SMTP id
+ 98e67ed59e1d1-34733e2d49amr13893758a91.3.1764066937206; Tue, 25 Nov 2025
+ 02:35:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|DB8PR04MB6811:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1272d5c1-a578-4c10-226b-08de2c0e540b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|376014|19092799006|1800799024|366016|10070799003;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?1H6iSDjFaJWH8kpiuZSfmSCypeI7BAWMyavw3dTrGvsaAnsStUCA1uMGCKZW?=
- =?us-ascii?Q?iDDqqZI5HD4DamPsYzJF2i/bPnNGC+bxswBVBQ45k6hgYK5lisA6N5B7HZ8h?=
- =?us-ascii?Q?O9pf7qf24luOSmGJi8TnPj/PO3B/ppyShV/Tpz3XOQKONo+AqO8zBCzqZcDN?=
- =?us-ascii?Q?SnmJJKW9uZPvyEK7h8GgZO9UrJz3472CVeWHf546/gH7dMiCqYUnYfdQkNtS?=
- =?us-ascii?Q?fwgdsEs6M4QFoVOFYpzJw5LjhMff/xNL6ZdlhRkcewCECi8IVhNujAwGl0WI?=
- =?us-ascii?Q?S6ZfAJVZecuDN8wCOMVxtPbsPyXQRX25itdzzRKnBuYPZ+ANGyouKRPv+UTF?=
- =?us-ascii?Q?laNEGytTJzSA0+2srDhD/w8t1iDtz9H2gZDB1nEka2IcWDnlaOYawpWMda1g?=
- =?us-ascii?Q?ZsoABN+t052BMuwl9pYk7yI9VlHUIcBbU5tF/4SljnstY2oyyVEWnakdmmy9?=
- =?us-ascii?Q?wOFOo146Xw5fk+ivuTF++UhTr1zbFhynNlQboCJnMcz/i+NeaI+N9G2x2Ai/?=
- =?us-ascii?Q?/nzoaLk5AT8bR+/FY6LzLRwK8ZDkPEV9DkwHTF3CNDjJbhdrf/tqyLHMpCZ1?=
- =?us-ascii?Q?mZ0n2SyYao8JhJ3ksWmSXs5EWgl0OrBwHhT4CyHUkxOMPG6CJTI6C6DFgSuE?=
- =?us-ascii?Q?6fF4T+ksCfyO6xYl6E3ZiuEmalS01ds0ysikSiycdjiHkQ8/4VmijFZcGe+c?=
- =?us-ascii?Q?uJibHZe1ZRIDqPqiJGFSjiUr/zYtsSBI9/Qm+5OHuRCva3FNvtxFg3La2V/m?=
- =?us-ascii?Q?bKMs+KO628OJ36c4PtMly0pHblvHucbs/R4cAtW1W5NsdCPNW7biRVPfwksA?=
- =?us-ascii?Q?Pk/BkqPOA4FVoKOgITxiiqtt0SkCTmo1cDM4uU0l7vWdYZjhSR28mOb65seT?=
- =?us-ascii?Q?sbtiKCcScrqdzXZles7GvXKg8rOpQRE/HJ2WrZugLo/Q5mSqqjU4Up9hvky8?=
- =?us-ascii?Q?ro7faBmDN83QAt5VwXeAmX81rlFsKqI9esGa0KDLH1c0XmbdygpyN0nkbZMv?=
- =?us-ascii?Q?Ulz1sSEXrHGN/sqqxuhdIWxfkyLYkpjwYpey1dKo2JL0HodBK+5bN+B6XEQj?=
- =?us-ascii?Q?yOwvQr2nhdlXuM8bVdVqkiZwyHrVkE4fj2YGMNKzbcKu08HP78wkxeUPbL8I?=
- =?us-ascii?Q?/Jq5aEBHn/uhHEdlQg+DOH9wBI4WgcMOBYRuKlT6tcgFduhUhifjbCwjoCt6?=
- =?us-ascii?Q?WdzQSjGiO4L/QpC8ImB8ernEps0KIoKdMD/Zv9O89tVDMl39cis489iFe3s/?=
- =?us-ascii?Q?SH1FBpcsntGOLJy2pY7KR/DVXa4j/0D4D7lgyD3ir43LHZDeW99l+rU6rqUu?=
- =?us-ascii?Q?L6kLmuiSeYDglT4j1yB0/RBVc+2ariYsyBUY0ZOjOPteEC1OTyNjxVZwcT2l?=
- =?us-ascii?Q?d0Q0WWslS/H51ajXpuGgcspDQukOLNWBsp2opWBqPZs1KxqGSKzglUbV0qkO?=
- =?us-ascii?Q?XvFFrHPVJ0XEMABoRxks/n1QJu4gqIKt+OllK8p9gKvfhheZt5iplQ=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(19092799006)(1800799024)(366016)(10070799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?zWnkOR42Pu0gdm2pVsJAdeMXrUpoDJT9FDMJQbWaxtcyA7oUP606Y2w4wqUE?=
- =?us-ascii?Q?7KTJiqkbxnG5yUz/AqoK8rcnwbFIk7L5415BlpyjCH3cCbTEx028lZxeaXw/?=
- =?us-ascii?Q?CPDxF3o88d0V3iKRBBxMLLn7d4NVcXB/Vc4Nv1yfoo02UYV/8CyVjoBMIKHP?=
- =?us-ascii?Q?ZWgrdaNeyNaSb2ckrirD0wfZjVblDc6bgdkbUBsJY0rbRPYKa3+n5WdUHOX3?=
- =?us-ascii?Q?5ZCtafaUa5JtFpcArNyNEFVpEtFaZevuDZXFhwSiqCgUGF88hLR9z3EYB/Jk?=
- =?us-ascii?Q?/DfR3s2gGlFFPRIj+lfTnfXJkD3cl7r9JBzupkd0Osp33oz0ojksV21Dds2y?=
- =?us-ascii?Q?VjaJmhwGTOJkxXLio6WI4w1Aj4SyrOdbLOmEI1l4ooIj9/0X1qaut+NPYnVq?=
- =?us-ascii?Q?DIKIBjudSlX6DI5hwVdl+MN90lt4xaapnFfUlV56sSR0haZbP9YbQ1hvcR5J?=
- =?us-ascii?Q?eD2odNMEuBvM7CvFYQtFKp2hqK9ruNyskep0elikj1E4Ns5PPQ3mxF/2+BGf?=
- =?us-ascii?Q?YMD/6hT7R9+T0OMrv6Bo0MPvaZSNuyf4uTE965/OFWzSjcjINqfTeswgRhh5?=
- =?us-ascii?Q?Bvoa1rhEgnXy470WfO3hiV5DWZoS42fjsOcgbkjHetKC0oF8YnyaZ5ROvHj3?=
- =?us-ascii?Q?g4DFj8xpcdrlYGr7O3KxDLE2gz3NZDM/B7o/dX06C+hGAjmahy1m21TslILN?=
- =?us-ascii?Q?fTLyJMs9HOOAQOPE2ZLEiO2O8Oj8gf1xebYbHJlU6QXKhofOGSq+3+Q5Je6c?=
- =?us-ascii?Q?Cghr/L0DUQCqieQsFzzhzfLf0VpkWc9Lc1CYU0m1artx7pglFFdq4n18lhi2?=
- =?us-ascii?Q?45UZ6UUkcrCYIVMssUz6NIRDvEV0Tnao/QNXrRau/pVDecDw1TKVu9RlPStY?=
- =?us-ascii?Q?U+zENPKivGdpfP7n9lBpMoEXUs8wRo9UlIG/jPvqmMUoLRwOv0nVv6ZU2d+f?=
- =?us-ascii?Q?iXxIhrs1s7ImWbCXukud8LgNDU/5YJhRH115IyNrCymnG5vufILTKkDve2Bw?=
- =?us-ascii?Q?HNqYoZLna6igIPgkn8UGDeZI7SQgpRMIbh+NWyoF9/XlPrE7Lr0rMhhVWhqk?=
- =?us-ascii?Q?dFDRT4qHtwFesIGE0fP10X7f2yWK0Ue0rBAvoWZOpBF7T+YaME8KniMRwD5L?=
- =?us-ascii?Q?F9HXd+Ekhe37kgZeQZnFLfNi1NAfk72ieQmyg02B/+7V+gRFoAea3ZfC3Ah8?=
- =?us-ascii?Q?puEk5zdCrCIGc2mBXYBsnBCFLh7glpEYDIUAFsNPHM2GCYkmpAf8y0Hd4bGe?=
- =?us-ascii?Q?l93ULfAMXG0TM6akL6Wfl68588qqhji72EgW3FXu9maG3ZlLiGWGyEyVNnDK?=
- =?us-ascii?Q?zLS6y9aLzGsrGSiwxlFLuCQKVx+zmUu/kxvp4f/JrceIgGuje1EY6zB+fGW0?=
- =?us-ascii?Q?DlpO9XwuTUHPE3z9L7TZHc5ha3qBmwzPJH2b5svi/iAdPOBhMMECbx0o+x/l?=
- =?us-ascii?Q?UPWZf6l48/dP6Pkyxs2XtxS/dqJtXJ4i2eM2eS5815PMeePB8z27DZHV12cQ?=
- =?us-ascii?Q?fn8RwOgb+ar6jyT5JNz/PF/8xyY3wwPA5tksV6ILs8XHETXZBBo0ZFyrGBn1?=
- =?us-ascii?Q?rwHzJ90GReuzyVxmvsdBjZCfjDg3rYqupNhuqAICtJDJbg4kLOnemrlkhTE6?=
- =?us-ascii?Q?7rqWsPgsyd0PY9EfMOlIgEg=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1272d5c1-a578-4c10-226b-08de2c0e540b
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2025 10:35:19.6019
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9fOsYmoqOWijG5umAa54x2V1sX4h7btkf59fwbCKFD9B0X+WjcV2mLFneQGmgxt3O2AgQtLxhw17elnf+kgZvA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB6811
+References: <20251117171136.128193-1-siva.kallam@broadcom.com>
+ <20251117171136.128193-5-siva.kallam@broadcom.com> <aSSMpzADtbAOBU2r@horms.kernel.org>
+In-Reply-To: <aSSMpzADtbAOBU2r@horms.kernel.org>
+From: Siva Reddy Kallam <siva.kallam@broadcom.com>
+Date: Tue, 25 Nov 2025 16:05:25 +0530
+X-Gm-Features: AWmQ_blS7u7UyAuIQ-l6ny2AVjnw2tcjbryGMQeY27S4GES7zcK-SqNQt3RgJUI
+Message-ID: <CAMet4B55Usiq25oFOPMY6O_A9PUBgM3a8_pEWfbzt49DdaUtag@mail.gmail.com>
+Subject: Re: [PATCH v3 4/8] RDMA/bng_re: Allocate required memory resources
+ for Firmware channel
+To: Simon Horman <horms@kernel.org>
+Cc: leonro@nvidia.com, jgg@nvidia.com, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org, vikas.gupta@broadcom.com, selvin.xavier@broadcom.com, 
+	anand.subramanian@broadcom.com, usman.ansari@broadcom.com
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000350f82064468d7f3"
 
-Testing in two circumstances:
+--000000000000350f82064468d7f3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-1. back to back optical SFP+ connection between two LS1028A-QDS ports
-   with the SCH-26908 riser card
-2. T1042 with on-board AQR115 PHY using "OCSGMII", as per
-   https://lore.kernel.org/lkml/aIuEvaSCIQdJWcZx@FUE-ALEWI-WINX/
+On Mon, Nov 24, 2025 at 10:19=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> On Mon, Nov 17, 2025 at 05:11:22PM +0000, Siva Reddy Kallam wrote:
+>
+> ...
+>
+> > +static void bng_re_dev_uninit(struct bng_re_dev *rdev)
+> > +{
+> > +     bng_re_free_rcfw_channel(&rdev->rcfw);
+> > +     bng_re_destroy_chip_ctx(rdev);
+> > +     if (test_and_clear_bit(BNG_RE_FLAG_NETDEV_REGISTERED, &rdev->flag=
+s))
+> > +             bnge_unregister_dev(rdev->aux_dev);
+> > +}
+> > +
+> >  static int bng_re_dev_init(struct bng_re_dev *rdev)
+> >  {
+> >       int rc;
+> > @@ -170,14 +184,18 @@ static int bng_re_dev_init(struct bng_re_dev *rde=
+v)
+> >
+> >       bng_re_query_hwrm_version(rdev);
+> >
+> > +     rc =3D bng_re_alloc_fw_channel(&rdev->bng_res, &rdev->rcfw);
+> > +     if (rc) {
+> > +             ibdev_err(&rdev->ibdev,
+> > +                       "Failed to allocate RCFW Channel: %#x\n", rc);
+> > +             goto fail;
+> > +     }
+> > +
+> >       return 0;
+> > -}
+> >
+> > -static void bng_re_dev_uninit(struct bng_re_dev *rdev)
+> > -{
+> > -     bng_re_destroy_chip_ctx(rdev);
+> > -     if (test_and_clear_bit(BNG_RE_FLAG_NETDEV_REGISTERED, &rdev->flag=
+s))
+> > -             bnge_unregister_dev(rdev->aux_dev);
+> > +fail:
+> > +     bng_re_dev_uninit(rdev);
+> > +     return rc;
+>
+> Hi Siva,
+>
+> IMHO, I think that it would best to handle unwind using a ladder
+> of goto statements, that reverse the order of the incremental
+> initialisation performed by this function.
+>
+> As is, this may not have much effect, other than seeming to duplicate
+> bng_re_dev_uninit(). But I think that as bng_re_dev_init() grows,
+> as it does in this patch-set, this will lead to clearer error handling
+> (and ideally a lower chance of bugs later).
+>
+> I would also suggest that it would be best to name the label
+> after what tit does, rather than somewhat general name 'fail'.
 
-strongly suggests that enabling in-band auto-negotiation is actually
-possible when the lane baud rate is 3.125 Gbps.
+Thanks Simon. I will send a patch to fix this.
+>
+> >  }
+> >
+> >  static int bng_re_add_device(struct auxiliary_device *adev)
+>
+> ...
 
-It was previously thought that this would not be the case, because it
-was only tested on 2500base-x links with on-board Aquantia PHYs, where
-it was noticed that MII_LPA is always reported as zero, and it was
-thought that this is because of the PCS.
+--000000000000350f82064468d7f3
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Test case #1 above shows it is not, and the configured MII_ADVERTISE on
-system A ends up in the MII_LPA on system B, when in 2500base-x mode
-(IF_MODE=0).
-
-Test case #2, which uses "SGMII" auto-negotiation (IF_MODE=3) for the
-3.125 Gbps lane, is actually a misconfiguration, but it is what led to
-the discovery.
-
-There is actually an old bug in the Lynx PCS driver - it expects all
-register values to contain their default out-of-reset values, as if the
-PCS were initialized by the Reset Configuration Word (RCW) settings.
-There are 2 cases in which this is problematic:
-- if the bootloader (or previous kexec-enabled Linux) wrote a different
-  IF_MODE value
-- if dynamically changing the SerDes protocol from 1000base-x to
-  2500base-x, e.g. by replacing the optical SFP module.
-
-Specifically in test case #2, an accidental alignment between the
-bootloader configuring the PCS to expect SGMII in-band code words, and
-the AQR115 PHY actually transmitting SGMII in-band code words when
-operating in the "OCSGMII" system interface protocol, led to the PCS
-transmitting replicated symbols at 3.125 Gbps baud rate. This could only
-have happened if the PCS saw and reacted to the SGMII code words in the
-first place.
-
-Since test #2 is invalid from a protocol perspective (there seems to be
-no standard way of negotiating the data rate of 2500 Mbps with SGMII,
-and the lower data rates should remain 10/100/1000), in-band auto-negotiation
-for 2500base-x effectively means Clause 37 (i.e. IF_MODE=0).
-
-Make 2500base-x be treated like 1000base-x in this regard, by removing
-all prior limitations and calling lynx_pcs_config_giga().
-
-This adds a new feature: LINK_INBAND_ENABLE and at the same time fixes
-the Lynx PCS's long standing problem that the registers (specifically
-IF_MODE, but others could be misconfigured as well) are not written by
-the driver to the known valid values for 2500base-x.
-
-Co-developed-by: Alexander Wilhelm <alexander.wilhelm@westermo.com>
-Signed-off-by: Alexander Wilhelm <alexander.wilhelm@westermo.com>
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
-v1->v2:
-- use phylink_mii_c22_pcs_get_state() instead of
-  lynx_pcs_get_state_2500basex()
-- remove the lynx_pcs_link_up_2500basex() handling, just like 100base-x
-  does nothing in pcs_link_up()
-
- drivers/net/pcs/pcs-lynx.c | 77 +++-----------------------------------
- 1 file changed, 5 insertions(+), 72 deletions(-)
-
-diff --git a/drivers/net/pcs/pcs-lynx.c b/drivers/net/pcs/pcs-lynx.c
-index 677f92883976..73e1364ad1ed 100644
---- a/drivers/net/pcs/pcs-lynx.c
-+++ b/drivers/net/pcs/pcs-lynx.c
-@@ -40,12 +40,12 @@ static unsigned int lynx_pcs_inband_caps(struct phylink_pcs *pcs,
- {
- 	switch (interface) {
- 	case PHY_INTERFACE_MODE_1000BASEX:
-+	case PHY_INTERFACE_MODE_2500BASEX:
- 	case PHY_INTERFACE_MODE_SGMII:
- 	case PHY_INTERFACE_MODE_QSGMII:
- 		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE;
- 
- 	case PHY_INTERFACE_MODE_10GBASER:
--	case PHY_INTERFACE_MODE_2500BASEX:
- 		return LINK_INBAND_DISABLE;
- 
- 	case PHY_INTERFACE_MODE_USXGMII:
-@@ -80,27 +80,6 @@ static void lynx_pcs_get_state_usxgmii(struct mdio_device *pcs,
- 	phylink_decode_usxgmii_word(state, lpa);
- }
- 
--static void lynx_pcs_get_state_2500basex(struct mdio_device *pcs,
--					 struct phylink_link_state *state)
--{
--	int bmsr;
--
--	bmsr = mdiodev_read(pcs, MII_BMSR);
--	if (bmsr < 0) {
--		state->link = false;
--		return;
--	}
--
--	state->link = !!(bmsr & BMSR_LSTATUS);
--	state->an_complete = !!(bmsr & BMSR_ANEGCOMPLETE);
--	if (!state->link)
--		return;
--
--	state->speed = SPEED_2500;
--	state->pause |= MLO_PAUSE_TX | MLO_PAUSE_RX;
--	state->duplex = DUPLEX_FULL;
--}
--
- static void lynx_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 			       struct phylink_link_state *state)
- {
-@@ -108,13 +87,11 @@ static void lynx_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 
- 	switch (state->interface) {
- 	case PHY_INTERFACE_MODE_1000BASEX:
-+	case PHY_INTERFACE_MODE_2500BASEX:
- 	case PHY_INTERFACE_MODE_SGMII:
- 	case PHY_INTERFACE_MODE_QSGMII:
- 		phylink_mii_c22_pcs_get_state(lynx->mdio, neg_mode, state);
- 		break;
--	case PHY_INTERFACE_MODE_2500BASEX:
--		lynx_pcs_get_state_2500basex(lynx->mdio, state);
--		break;
- 	case PHY_INTERFACE_MODE_USXGMII:
- 	case PHY_INTERFACE_MODE_10G_QXGMII:
- 		lynx_pcs_get_state_usxgmii(lynx->mdio, state);
-@@ -152,7 +129,8 @@ static int lynx_pcs_config_giga(struct mdio_device *pcs,
- 		mdiodev_write(pcs, LINK_TIMER_HI, link_timer >> 16);
- 	}
- 
--	if (interface == PHY_INTERFACE_MODE_1000BASEX) {
-+	if (interface == PHY_INTERFACE_MODE_1000BASEX ||
-+	    interface == PHY_INTERFACE_MODE_2500BASEX) {
- 		if_mode = 0;
- 	} else {
- 		/* SGMII and QSGMII */
-@@ -202,15 +180,9 @@ static int lynx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
- 	case PHY_INTERFACE_MODE_1000BASEX:
- 	case PHY_INTERFACE_MODE_SGMII:
- 	case PHY_INTERFACE_MODE_QSGMII:
-+	case PHY_INTERFACE_MODE_2500BASEX:
- 		return lynx_pcs_config_giga(lynx->mdio, ifmode, advertising,
- 					    neg_mode);
--	case PHY_INTERFACE_MODE_2500BASEX:
--		if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) {
--			dev_err(&lynx->mdio->dev,
--				"AN not supported on 3.125GHz SerDes lane\n");
--			return -EOPNOTSUPP;
--		}
--		break;
- 	case PHY_INTERFACE_MODE_USXGMII:
- 	case PHY_INTERFACE_MODE_10G_QXGMII:
- 		return lynx_pcs_config_usxgmii(lynx->mdio, ifmode, advertising,
-@@ -271,42 +243,6 @@ static void lynx_pcs_link_up_sgmii(struct mdio_device *pcs,
- 		       if_mode);
- }
- 
--/* 2500Base-X is SerDes protocol 7 on Felix and 6 on ENETC. It is a SerDes lane
-- * clocked at 3.125 GHz which encodes symbols with 8b/10b and does not have
-- * auto-negotiation of any link parameters. Electrically it is compatible with
-- * a single lane of XAUI.
-- * The hardware reference manual wants to call this mode SGMII, but it isn't
-- * really, since the fundamental features of SGMII:
-- * - Downgrading the link speed by duplicating symbols
-- * - Auto-negotiation
-- * are not there.
-- * The speed is configured at 1000 in the IF_MODE because the clock frequency
-- * is actually given by a PLL configured in the Reset Configuration Word (RCW).
-- * Since there is no difference between fixed speed SGMII w/o AN and 802.3z w/o
-- * AN, we call this PHY interface type 2500Base-X. In case a PHY negotiates a
-- * lower link speed on line side, the system-side interface remains fixed at
-- * 2500 Mbps and we do rate adaptation through pause frames.
-- */
--static void lynx_pcs_link_up_2500basex(struct mdio_device *pcs,
--				       unsigned int neg_mode,
--				       int speed, int duplex)
--{
--	u16 if_mode = 0;
--
--	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) {
--		dev_err(&pcs->dev, "AN not supported for 2500BaseX\n");
--		return;
--	}
--
--	if (duplex == DUPLEX_HALF)
--		if_mode |= IF_MODE_HALF_DUPLEX;
--	if_mode |= IF_MODE_SPEED(SGMII_SPEED_2500);
--
--	mdiodev_modify(pcs, IF_MODE,
--		       IF_MODE_HALF_DUPLEX | IF_MODE_SPEED_MSK,
--		       if_mode);
--}
--
- static void lynx_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
- 			     phy_interface_t interface,
- 			     int speed, int duplex)
-@@ -318,9 +254,6 @@ static void lynx_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
- 	case PHY_INTERFACE_MODE_QSGMII:
- 		lynx_pcs_link_up_sgmii(lynx->mdio, neg_mode, speed, duplex);
- 		break;
--	case PHY_INTERFACE_MODE_2500BASEX:
--		lynx_pcs_link_up_2500basex(lynx->mdio, neg_mode, speed, duplex);
--		break;
- 	case PHY_INTERFACE_MODE_USXGMII:
- 	case PHY_INTERFACE_MODE_10G_QXGMII:
- 		/* At the moment, only in-band AN is supported for USXGMII
--- 
-2.34.1
-
+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
+fyIFUZVWSBcxHWtNNVK4Oi0mqSJut0p/SwfLg6IMaVBU9VdXgVmw35CgcX/9B1ITmih041Oz+Qyo
+wTULsXik3lHJuyhYevN9h4259CoDPt+tpaykVaqa4luUmGv8k3F6aC4+fZl83ywHGVun9fBVk/GE
+2hmynyIEon1w6Me72fdjaPht4V1tbZBu/76zGxBiBFc13nAKU0dYrvIGPgKN9j0HDuOVC7UhhdTq
+Gw+wN3sPJk9D2VtNAzNGw0sa/eJF1wQiBy4RVYG9r0MCAwEAAaOCAdwwggHYMA4GA1UdDwEB/wQE
+AwIFoDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDov
+L3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5Bggr
+BgEFBQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUG
+A1UdIAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUF
+BwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDag
+NKAyhjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwIwYD
+VR0RBBwwGoEYc2l2YS5rYWxsYW1AYnJvYWRjb20uY29tMBMGA1UdJQQMMAoGCCsGAQUFBwMEMB8G
+A1UdIwQYMBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1UdDgQWBBTNBMIvX7vsfxNYWor1Hxth
+tmNmHzANBgkqhkiG9w0BAQsFAAOCAgEAJDoTbZO7LdV1ut7GZK90O0jIsqSEJT1CqxcFnoWsIoxV
+i/YuVL61y6Pm+Twv6/qzkLprsYs7SNIf/JfosIRPSFz6S7Yuq9sGXNKpdPyCaALMbWtPQDwdNhT7
+uJgZw5Rq9FQRZgAJNC9+HBtCdnzIW5GUmw040YclUNHFEKDfycJMKjSPez044QcDoN0T2mIzOM8O
+Dt+sJTrC1YJ6+HI6F2H6igZUL79y9qYUz8FNshyITihg/1VBVCiMU9WRK3tNfUlLFzLBuTTr245d
+xMh/e75vypL3qDSF4UG6Mpy++Plsnjfwab70KFFyCvNwB2hT1g/y8MLgslfxJl6fCyGdWqOmUB2J
+QiuiqbSy8mlnucIPuGWQqqt8VBQjxKYIHdjXtkvw0uVvOHUC2QJWfGWDhMncxF5LFoaRPer4tlXJ
+b5zmz9Mn+uQPQQLYUqYzs+EvX1REmGLGUuzlaNwAC20+8CVPY2EkU1mjU78+aW5Zbb2MyjQrLc6J
+5IdkekEtk+xjpM992MC/aNMTpWIWhorGq8NmPXbuoUZf9MSi7WrVCaO69ro68FXPTErr/e13lJ/5
+GAkwcxdTC+YVPVa/xpdHyAFW03/Oow/7fV8qjy6PAWfqEV97D2Tspc2aEFkbeuFS6UkPRy1OKjGc
+/IUTSY4h9roe7Bh1ecqtofP9XL8E88sxggJXMIICUwIBATBiMFIxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBD
+QSAyMDIzAgxoOshI0IGR+aGCCXkwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIGsy
+w2F4mOw3DK0ZjaT/ngF2ba5d1J3JmCaH3N0Y3iKZMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEw
+HAYJKoZIhvcNAQkFMQ8XDTI1MTEyNTEwMzUzOFowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQME
+ASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJ
+YIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAHoRP1XGP7wxrAFhPy8soP0jNoiYSkAgFttXzQpd
+ym1Z8bkZ0aUEj4/CAJg70nW+jHi9ZbTAPP+NGbuPh8K+cyXzZG9ORulhcvsnFHdTnYEe1wKYjPty
+b+4gKtgCJjP+oZNcc4qgTKt/gdvd+L9Q7NzwYbnHLsyQ1v/bLESgCKloStAqplr4kPlPTDpAQdxJ
+8LqpHwnPtnY9WA9MAML7nZQjSc1EOYTWJqF4gr+KeiYEE1bDhEjrM+iHxogtPSyBRhTT5r+8xPII
+eEg5u+2291TLkuQQJlzpo8Ym+E6zKAkFYYLI3kgzW1HNkL5FGqh3rEL0Eso80xISA21e3g7XxG4=
+--000000000000350f82064468d7f3--
 
