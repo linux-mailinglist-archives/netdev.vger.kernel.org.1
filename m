@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-241474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14840C843B7
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 10:30:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E385C843C0
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 10:30:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A3AFA4E8A18
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 09:30:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 504144E1AD8
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 09:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29BE62DC337;
-	Tue, 25 Nov 2025 09:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11D52C3245;
+	Tue, 25 Nov 2025 09:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="M8CvhryR"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="GpG5SoZL"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40CA2C3245
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 09:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585B31DF75A
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 09:30:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764063029; cv=none; b=Xy8DL82oeg+E/dewAt6JHjWRhCyMlIayWPK/5fXajAa9xCxq7J5T0znCpe/GA2YhQAmhN/Eab7wj6P2l7E1OzXqiDOg9cXNTYFYFf91VeGvCMGJHiHuQb24kA+CWrSQ6AX9+bSwSW0sdlDebPBEPrvkNV5gKLPPK/9Tzx0DGU78=
+	t=1764063054; cv=none; b=ulXwQ0PRulZWzNEaU6w68B0QMtK8Ue7mG9kelogo5Tw+qtQtNtCoP9E+tJ0xdMAirQ/Ru5pm9p3yWqud2LmpSXHgkWv/rNntoM388xlrxzQ/7o1D2lJ1/W+UW4Li3IrQ6FSp1++K4NmZlgwczqTOdrST2TmHJIfsmKY4VvVRXG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764063029; c=relaxed/simple;
-	bh=tCWFekDlPnxLEEe1VrnqVBflKAxWBtoDal7VkqZXg7o=;
+	s=arc-20240116; t=1764063054; c=relaxed/simple;
+	bh=01xvl8nub52BXwOAuZs9GJxMLSf40a0zqaG6x0feemQ=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=swaJ7HPX654irOaNQVxTyAWMuTeXkSBxl58E2BTW2ChDYcQn4s45xlqQhmVN7lqRgoiuLmZf1sJg5E9NJEhcoBkU243ep84+CMHSEdXi21GuGirs17PwCq4kmzpvJoMrxGqCwgpnj4PNvapdd2wVncKIOblzy1s5tXwgsMxQOp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=M8CvhryR; arc=none smtp.client-ip=62.96.220.36
+	 Content-Type:Content-Disposition:In-Reply-To; b=QywsYO4tSUIRCE9QE2uaUKlM7OPOPgzAF0EONCTRPindEyi9aKNhVVly+OYjGJIrN8D2/GHS5alGUAGuMxms8GmjbEdWagIFDQqmA1jqkxElCYPKhK6a9k2/pFVjJHkoG5Lm8pMF7TfCFVRUqLG9Vgxn27p0MbCmpsvNDSeRRZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=GpG5SoZL; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 0CE872088A;
-	Tue, 25 Nov 2025 10:30:24 +0100 (CET)
+	by mx1.secunet.com (Postfix) with ESMTP id 559FF201D5;
+	Tue, 25 Nov 2025 10:30:51 +0100 (CET)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bQlDZwA3vRDg; Tue, 25 Nov 2025 10:30:23 +0100 (CET)
+ with ESMTP id KCTMJF750sOn; Tue, 25 Nov 2025 10:30:50 +0100 (CET)
 Received: from EXCH-02.secunet.de (unknown [10.32.0.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 72F7420758;
-	Tue, 25 Nov 2025 10:30:23 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 72F7420758
+	by mx1.secunet.com (Postfix) with ESMTPS id BDA1020892;
+	Tue, 25 Nov 2025 10:30:50 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com BDA1020892
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1764063023;
-	bh=alB6epYxpbZu415BB7AQW2D0BpZSOsd6CwBG3BPCpJs=;
+	s=202301; t=1764063050;
+	bh=+hv8FDRZ1a+Nxn/L5MdnfuXGMZS0NOF1QR3Pe4LhLCE=;
 	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=M8CvhryRQ0T0Jcx9EHqecj10acRO8Ks/df3rVL/vPkeIPXf/imF8uMmK77ceC5PQI
-	 7lgNj/Dw0yVYiN4bBRFrpUoDh2ZE7VgTw/Nykma0Ph3BNoUeijMcFwX+YlkElngLUR
-	 COFSUHmBvpzZ1hbh3Fyurzj+FOyNOaBC/2/KdD+jrpWKXIfvGI4XabdCTuOTR8FdPl
-	 4sVkRfO0Fut6Lurij/q+gVL+WFH8H3ilwJMvrTqPGoBTOEiiIQcfHM2o9BG6tOjzwr
-	 LHHSUipd8otYm+KURGy5t6EgWd19JorMCQEzmsmZm7pEeWYcoJB9n1jEJL5NHmw7kZ
-	 eJCtDOByHJXEw==
+	b=GpG5SoZLuDDa/AuLwIyXQ2C2IA2wSTz9BclH9lonG2iIxtn8ewIWCwRbjaf9/D/pB
+	 up/VG5g6ujAYIqxx2HqcDJ9ZqKX5tr+rpWKKflQm3HX5PLEjlqhsjk4Sikd4cv32H/
+	 VYD5d5hlCkat5a7YTDtzlu5AvIEAai0vvRI4tu6uRkbTm1uw2zBzUOWQ/Hx58uVTDb
+	 0uiHiH1YdYTBwQe/+eV/eM6y2pjYVT7Mmjk1QctG81oIAJKkIoHDuJOEcHvOA/rmma
+	 y86Ic1MNfGkIEPn1TUiyCBwsizuQ06MMtuO87Dwx+xA/s1R+qoZXLhLm2wrHHJ0RI/
+	 mksm93KjQ4SZA==
 Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
  (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Tue, 25 Nov
- 2025 10:30:22 +0100
-Date: Tue, 25 Nov 2025 10:30:16 +0100
+ 2025 10:30:50 +0100
+Date: Tue, 25 Nov 2025 10:30:43 +0100
 From: Antony Antony <antony.antony@secunet.com>
 To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
 	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
 CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <devel@linux-ipsec.org>
-Subject: [PATCH RFC ipsec-next 4/5] xfrm: reqid is invarient in old migration
-Message-ID: <9a5b60029d95a264b5fdeaba396200419b4f4bc3.1764061159.git.antony.antony@secunet.com>
+Subject: [PATCH RFC ipsec-next 5/5] xfrm: check that SA is in VALID state
+ before use
+Message-ID: <e9209b246d7af0a893e017ac56a8594f3ab658a3.1764061159.git.antony.antony@secunet.com>
 Reply-To: <antony.antony@secunet.com>
 References: <cover.1764061158.git.antony.antony@secunet.com>
 Precedence: bulk
@@ -84,48 +85,40 @@ Organization: secunet
 X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
  EXCH-02.secunet.de (10.32.0.172)
 
-During the XFRM_MSG_MIGRATE the reqid remains invariant.
+During migration, a state/SA may have been deleted or become invalid.
+Since skb(s) may still hold a reference to this deleted state, it could
+be reused inadvertently. Using a migrated SA could result in reusing
+the same IV for AES-GCM, which must be avoided for an output SA.
+
+Add a check to ensure the state is in XFRM_STATE_VALID before use.
+This check is useful for both output and input data paths.
+
+Call chain:
+  xfrm_output_one()
+    xfrm_state_check_expire()
+      if (x->km.state != XFRM_STATE_VALID) ---> new check
+         return -EINVAL;
+      encapsulate the packet
 
 Signed-off-by: Antony Antony <antony.antony@secunet.com>
 ---
- net/xfrm/xfrm_state.c | 2 +-
- net/xfrm/xfrm_user.c  | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ net/xfrm/xfrm_state.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 17c3de65fb00..91e0898c458f 100644
+index 91e0898c458f..c9c5a2daa86f 100644
 --- a/net/xfrm/xfrm_state.c
 +++ b/net/xfrm/xfrm_state.c
-@@ -2148,7 +2148,7 @@ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
+@@ -2265,6 +2265,9 @@ EXPORT_SYMBOL(xfrm_state_update);
  
- 	/* add state */
- 	if (xfrm_addr_equal(&x->id.daddr, &m->new_daddr, m->new_family) ||
--			x->props.reqid != xc->props.reqid) {
-+		x->props.reqid != xc->props.reqid) {
- 		/* a care is needed when the destination address or the reqid
- 		 * of the state is to be updated as it is a part of triplet */
- 		xfrm_state_insert(xc);
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index cc5c816f01ed..b14a11b74788 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -3098,6 +3098,7 @@ static int copy_from_user_migrate(struct xfrm_migrate *ma,
- 		ma->proto = um->proto;
- 		ma->mode = um->mode;
- 		ma->old_reqid = um->reqid;
-+		ma->new_reqid = um->reqid; /* reqid is invariant in XFRM_MSG_MIGRATE */
- 
- 		ma->old_family = um->old_family;
- 		ma->new_family = um->new_family;
-@@ -3285,7 +3286,7 @@ static int xfrm_do_migrate_state(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			xfrm_send_migrate_state(um, encap, xuo);
- 		} else {
- 			if (extack && !extack->_msg)
--				    NL_SET_ERR_MSG(extack, "State migration clone failed");
-+				NL_SET_ERR_MSG(extack, "State migration clone failed");
- 			err = -EINVAL;
- 		}
- 	} else {
+ int xfrm_state_check_expire(struct xfrm_state *x)
+ {
++	if (x->km.state != XFRM_STATE_VALID)
++		return -EINVAL;
++
+ 	/* All counters which are needed to decide if state is expired
+ 	 * are handled by SW for non-packet offload modes. Simply skip
+ 	 * the following update and save extra boilerplate in drivers.
 -- 
 2.39.5
 
