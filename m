@@ -1,77 +1,91 @@
-Return-Path: <netdev+bounces-241347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7418C82EEE
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 01:26:52 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96B2FC82EF1
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 01:29:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A2EC14E1276
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 00:26:51 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F04F934AEC8
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 00:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 552021DA61B;
-	Tue, 25 Nov 2025 00:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17CF1DF25F;
+	Tue, 25 Nov 2025 00:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ma6gDb4/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="L17Nb8Mh"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323B33EA8D
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 00:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341513EA8D;
+	Tue, 25 Nov 2025 00:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764030409; cv=none; b=CjV6PjGY1jr7AZc0NXPejBQnUnb4vSAnleExanngLNcwSVykvhpPBqji81lI6S+EQ5Eow8sPeGbknJQvuxO0oOq2tJ04ZjrSPrW47DN9qGAGKTx5fVoVlnS3kHVfxvbYQkVaOm0G0I4ksnpt++1fhodunV0GIONileHRhN//QMQ=
+	t=1764030585; cv=none; b=doWSCMXAjpOAoCLWKN6ROkrHU2OfaT0Vga/aDsOgkMfIEWSJGd+M8OmRqvH2wpnqBT5bfuX3XmYzITa0FoLkwYbSxuHGRZTTsiZBznEzcFQaUb+o5KgtapUcBTaZtaon6wUM/3IPbR4PboRQlrWcf55Gbba1EWLCJ01id6T/fhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764030409; c=relaxed/simple;
-	bh=Y9mC9WIBCIQmcP1DvNjjmfm/t+jbQUZGHBkQDRsJAwQ=;
+	s=arc-20240116; t=1764030585; c=relaxed/simple;
+	bh=C2HlEMsvyQMCnybCB7SaC+I40kgvVfnrxFOIhwRCxoI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SVl8/28PrK/X7Sb1bH8k0p0maB6St4Qs1GmQq6AWLtIGdPQLxb1gn+6/av/J1bWEX6/l4Ks66etyw44H3Q75r0Cipr8c6L12RddOxtIisg2Rwfa3rC1ZpzCf330sL5eHfFpJrbv2275eDNXs2rarGuxpZcgykx4iZJeXNAb3XuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ma6gDb4/; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=suQJP3eXP4CbfPcHztufyZeoI0Kuaj/+q0dk7CY1v9uR8Xb1dpDSHqOURoU9AgtxZ62k87RTII4Fw/lakWC2aByU6g9FNHir8Qycc433cQI6yeQLrr16xeBmT5r4WGDSjqDKe3a/rS8h/7Irl1TmrP3aLZHJRW5HgVRg2Q4IMKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=L17Nb8Mh; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1nGtpAGtRpw42mNhdvsLox7KtduwvyOV9K1WcddwTac=; b=Ma6gDb4/J48fZGtWyIfwUv8g8N
-	K0vrBgQMrj487WbYCK1ytyXPZR3EkGhY1NnR3mn+Z5Ru0prIirwVlOLP2r/5W4TT6JQViSi03InRv
-	1dXyx6rs5DJKczYPdJIInDmNWfy8SltvBX5Mt+1bOjn+8ZmkZ/dLjXOyIBjLOaI4IWaA=;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=uyDn49yZ3JolAXWifLKxq5HAVN38ilksH6HBgYuR0nY=; b=L1
+	7Nb8MhGnQygQto0HcUvmLyukrHQst/i8Nw41kohjxc5NkmgX+Ps3zuSnyHDoL8oGdBijaPzUW6+MQ
+	zyexHb9Idk4+9y5ViEvxKCrtThwLOC9hT6cO9vu45b6mu9oDJYLsnqoXlC2wroPgG3xN/DVu4ZfZ6
+	VNtVlalW78OMa5c=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vNgtB-00ExaZ-4U; Tue, 25 Nov 2025 01:26:37 +0100
-Date: Tue, 25 Nov 2025 01:26:37 +0100
+	id 1vNgw1-00ExbS-H6; Tue, 25 Nov 2025 01:29:33 +0100
+Date: Tue, 25 Nov 2025 01:29:33 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Realtek linux nic maintainers <nic_swsd@realtek.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] r8169: improve MAC EEE handling
-Message-ID: <cf43702b-e743-44a2-8398-427dccdcdbc1@lunn.ch>
-References: <91bcb837-3fab-4b4e-b495-038df0932e44@gmail.com>
+To: Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: yongxin.liu@windriver.com, LKML <linux-kernel@vger.kernel.org>,
+	Netdev <netdev@vger.kernel.org>, david.e.box@linux.intel.com,
+	chao.qin@intel.com, yong.liang.choong@linux.intel.com,
+	kuba@kernel.org, platform-driver-x86@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] platform/x86: intel_pmc_ipc: fix ACPI buffer memory
+ leak
+Message-ID: <72fcaebe-afb6-49ef-a6fd-69aa0f8c7a39@lunn.ch>
+References: <20251124075748.3028295-1-yongxin.liu@windriver.com>
+ <f1124090-a8e4-6220-093a-47c449c98436@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <91bcb837-3fab-4b4e-b495-038df0932e44@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f1124090-a8e4-6220-093a-47c449c98436@linux.intel.com>
 
-On Mon, Nov 24, 2025 at 08:37:53AM +0100, Heiner Kallweit wrote:
-> Let phydev->enable_tx_lpi control whether MAC enables TX LPI, instead of
-> enabling it unconditionally. This way TX LPI is disabled if e.g. link
-> partner doesn't support EEE. This helps to avoid potential issues like
-> link flaps.
+> Good catch but this fix doesn't address all possible paths. So please use 
+> cleanup.h instead:
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> 	union acpi_object *obj __free(kfree) = buffer.pointer;
+> 
+> And don't forget to add the #include.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+  1.6.5. Using device-managed and cleanup.h constructs¶
+
+  Low level cleanup constructs (such as __free()) can be used when
+  building APIs and helpers, especially scoped iterators. However,
+  direct use of __free() within networking core and drivers is
+  discouraged. Similar guidance applies to declaring variables
+  mid-function.
 
     Andrew
+
+---
+pw-bot: cr
 
