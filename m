@@ -1,95 +1,136 @@
-Return-Path: <netdev+bounces-241572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CE96C85F3A
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:23:00 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 397B6C85F09
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:21:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 27792352E47
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:20:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 069494E262D
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 588C41F1518;
-	Tue, 25 Nov 2025 16:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38FF222B584;
+	Tue, 25 Nov 2025 16:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="w3o2DKI4"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OrrWBpEn"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B2522A4EB;
-	Tue, 25 Nov 2025 16:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FB8221F24
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:21:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764087612; cv=none; b=DneK9z/r8yK45uIOLPnpR5vB47KrhK/33dAcl3YQiPare6Dcb8+zgI3vRMlDxcPveibjiLcnANfLjIGQQKGm+OhnMVE6aZgI30PkOwKl8Pnn6cKsPU2F1NQ90uWCWwTFyvfw5OtrgK4IazSCP2PqKn/noCpeMNua5oLb4dcxosU=
+	t=1764087672; cv=none; b=uCl0znM5/9+EIyxGbYkNXnpaQdmK0DNxEv3wWRkgiivLPPS9vQq8gyCbsRdsl/Hv1Y3L9HdvkLCBeQiYVqxOhKMs01gPuotw0PDcCG45S1hTyOzrmsyg6O8/UYrhcYCJ5SPMR8GnBbOFzlxY+wsdZsul/jNty4TM+0L9SiFY13g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764087612; c=relaxed/simple;
-	bh=Sb8PYC39UtTJVw/SBaIg/BW0P8JGqchWhqkLuKMq/CQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cDub35UYos+grcPaluNONkY1NxZahsSIsSx1S/hZvqXGaUO+K0VRWFbN3iUxQVnJwGuDHBLBIkBqzptqHVhlbA2tqy+M8CVVOEqE/FAOBHKzYqGaqJsxPOwcekBMG2QDmwT3LwTj/kNLXnJPeHFXF5fLoZEMoR9XVVnNRNts0q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=w3o2DKI4; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=saycRsU5HZMgrOY6FgBWMKFyWl/Pb+ueWB3SQnvSrKg=; b=w3o2DKI4vhH8siIz+Ag5QoM0DM
-	D6e9JwwJqeesT9Qv6NyfNATkUYlLFuDwbehTs6rx84MCTDoJIxs1v6krOq1rioZtcs4PMXHyLcnnK
-	aveMsCrlcRCnqxNCbKge3GApcjDj0G5IfMoh3rSk0fGWuNopkpEJNHZgNOwDO9MYu6uA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vNvlm-00F23M-VE; Tue, 25 Nov 2025 17:19:58 +0100
-Date: Tue, 25 Nov 2025 17:19:58 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Wei Fang <wei.fang@nxp.com>, claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, aziz.sellami@nxp.com, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 net-next 3/3] net: enetc: update the base address of
- port MDIO registers for ENETC v4
-Message-ID: <c177a361-84dc-4523-8b1f-5c6a4437b064@lunn.ch>
-References: <20251119102557.1041881-1-wei.fang@nxp.com>
- <20251119102557.1041881-4-wei.fang@nxp.com>
- <46765613-9a04-454b-8555-21f6fd965008@redhat.com>
+	s=arc-20240116; t=1764087672; c=relaxed/simple;
+	bh=1bIw1A2QtCjzztIE3Q6so7JPCvttUNWYX23SVcGvk2c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Sv4cDjGOFpkkhIlstgmxbLasEKFLl1bx5xAlrOJqKsx3S3xS+8aQhYqfNLaDSAckdSKHAhQnJK0ZYJM1BIMspMVa0fTxFLr67zmeC1NSS6CN4C8bdBsw1qlXkc8WfA4uzBcX9w8ykgYrHwNv0Z7Yu/GoUKU1fqKWCWtcGh6TI30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=OrrWBpEn; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-297e264528aso61187325ad.2
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 08:21:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1764087665; x=1764692465; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IoNUCPpkEhFwVICHMikfiUoeVdx3sH7SM8PEs/6W0wI=;
+        b=OrrWBpEnmuxe5PN5fK7YrIOUDu6ZAdyCpnoyeFfsD/chzYQhBHIhYxDM1Yg8zmOK7l
+         RtQmor2chHgYl8bIE5VH72FHbFKsw8tfFWjvUZELFRlW9TAWm2FoYaUoCOXVf82W3RQ6
+         1N/CqKNEBLlkWUEPF+5grcdWVnjUjf8zEWA0NsX8+DwejYfvtZQeEBMjtnpMqCS1wy23
+         UW9emEriILIa/0auB6DUfOcKpqT+OOABRZK66bKNJ5yDpzn/AqMQBVR6/ihRJsdaKoo9
+         0x5FTwrllMd0tdZ5nNOqsrVDQ3KeUkevspV6yCo8nBua/n7bVsHhO708h0jvf+th/duY
+         BXvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764087665; x=1764692465;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IoNUCPpkEhFwVICHMikfiUoeVdx3sH7SM8PEs/6W0wI=;
+        b=L8tFt1aWXhZsKf1L75ZT9uhAiu9hipgmNBagj9mNYJq9fj6BY6+FqpA0dKGPiHuTkA
+         gSyqj9YfaXcr1LUQI+BdAlD3aMyxNa7rBkVAosJJOGhDzViH1uXg1k03DoXy7kc1nXjg
+         APVq7/uq0FOFDhGPHaVIZ/dRAlRxD+QZWYh9PMLCs0mS6EoY44Nmo2NsybwFx0cCxYd1
+         CF3sBj7vZIVLtO7ZbOYDUA065gIJMgcSFJjtUyJOguF1gZkibAdY6VaJhovwxbpNQyXq
+         UBpvOFHGIe8yKa6J/eUdN7mmKshZsSPaw7zE8oqf11/Lw+LaNxmhBgEOegZRuQwxc+5F
+         ammQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWVVve4I7/2XEoKBc4uQQmHgEZdMj7TpK5CV+XGS7OPF5cZPuoN8Vr0J1/3Zt8XFXV0Kc3hS+0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOMCHlE7wC35Jz59z6l0B+XEVMldIQo0TK1Q9bF3NRzxBcaA3c
+	511MTOEQqiW/py9ICHSg0byquo9b723kN6bLTnGnusUAhbQs5xfHxHHcHvdEP3sUK94YkC4iJsV
+	GK3omS1aDGGw9RIufE5nFwPp2TO7bdbZdI73uyokL
+X-Gm-Gg: ASbGncvxApz/bi2zfJh60HU73o+Xt8JTlee3R3V36AfXqQyonzrl1j2ouyFnsSLnZZE
+	RLTnYQheGRXA1caiQ4KCfLMT55OZZCFaoaTEgJ/CwTcT9Sxtz6Cye7xD1qrUJ2hWMNAe2P0w0sb
+	n9hsr/GCAitEGTPBAZXxHIokFeDaJyiVFSwCEHt5VMAsI1xD+lT8fWQpP/emKGcyktXJLxX+v0y
+	ehBRVxB6JRhJvIW0qKAGvjTE7jr7FkK303YT9lTTVAngPY0XPG18/e5M6mFAXwAajfDPSw/mYBv
+	834=
+X-Google-Smtp-Source: AGHT+IEqYHw3y+hE6sCCuItIMhSMd5GEV/Qlf0Xba0ruWhe57oBl6Z8BuS7Qy4FL/Hno/bVF4d+QwQ07Zb0O/h0YnB0=
+X-Received: by 2002:a17:90b:3bcc:b0:340:d578:f298 with SMTP id
+ 98e67ed59e1d1-3475ebe6779mr3232207a91.8.1764087664749; Tue, 25 Nov 2025
+ 08:21:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <46765613-9a04-454b-8555-21f6fd965008@redhat.com>
+References: <20251124200825.241037-1-jhs@mojatatu.com> <20251124145115.30c01882@kernel.org>
+In-Reply-To: <20251124145115.30c01882@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 25 Nov 2025 11:20:52 -0500
+X-Gm-Features: AWmQ_bmceMgMhep1ASgFnT0l5nobal20EYCqDASNP9vJm51thzGo-NonZTmDJjE
+Message-ID: <CAM0EoM=jDt_CeCop82aH=Fch+4M9QawX4aQdKdiUCsdFzuC2rQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net/sched: act_mirred: Fix infinite loop
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
+	dcaratti@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 25, 2025 at 11:05:06AM +0100, Paolo Abeni wrote:
-> On 11/19/25 11:25 AM, Wei Fang wrote:
-> > Each ENETC has a set of external MDIO registers to access its external
-> > PHY based on its port EMDIO bus, these registers are used for MDIO bus
-> > access, such as setting the PHY address, PHY register address and value,
-> > read or write operations, C22 or C45 format, etc. The base address of
-> > this set of registers has been modified in ENETC v4 and is different
-> > from that in ENETC v1. So the base address needs to be updated so that
-> > ENETC v4 can use port MDIO to manage its own external PHY.
-> > 
-> > Additionally, if ENETC has the PCS layer, it also has a set of internal
-> > MDIO registers for managing its on-die PHY (PCS/Serdes). The base address
-> > of this set of registers is also different from that of ENETC v1, so the
-> > base address also needs to be updated so that ENETC v4 can support the
-> > management of on-die PHY through the internal MDIO bus.
-> > 
-> > Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> 
-> Andrew, it's not clear to me if you are with the current patch version,
-> could you please chime-in?
+On Mon, Nov 24, 2025 at 5:51=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 24 Nov 2025 15:08:24 -0500 Jamal Hadi Salim wrote:
+> > When doing multiport mirroring we dont detect infinite loops.
+> >
+> > Example (see the first accompanying tdc test):
+> > packet showing up on port0 ingress mirred redirect --> port1 egress
+> > packet showing up on port1 egress mirred redirect --> port0 ingress
+> >
+> > Example 2 (see the second accompanying tdc test)
+> > port0 egress --> port1 ingress --> port0 egress
+> >
+> > Fix this by remembering the source dev where mirred ran as opposed to
+> > destination/target dev
+> >
+> > Fixes: fe946a751d9b ("net/sched: act_mirred: add loop detection")
+> > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>
+> Hm, this breaks net/fib_tests.sh:
+>
+> # 23.80 [+0.00] IPv4 rp_filter tests
+> # 25.63 [+1.84]     TEST: rp_filter passes local packets                 =
+               [FAIL]
+> # 26.65 [+1.02]     TEST: rp_filter passes loopback packets              =
+               [FAIL]
+>
+> https://netdev-3.bots.linux.dev/vmksft-net/results/400301/10-fib-tests-sh=
+/stdout
+>
+> Not making a statement on whether the fix itself is acceptable
+> but if it is we gotta fix that test too..
 
-I say merge it. I'm not sure it is the best of architectures, but i
-don't have time to dig into all the details in order to suggest
-something better.
+Sigh. I will look into it later.
+Note: Fixing this (and the netem loop issue) would have been trivial
+if we had those two skb ttl fields that were taken away.
+The human hours spent trying to detect and prevent infinite loops!
 
-	Andrew
+cheers,
+jamal
+
+> --
+> pw-bot: cr
 
