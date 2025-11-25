@@ -1,95 +1,50 @@
-Return-Path: <netdev+bounces-241511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A669CC84C25
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 12:37:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C73CBC84C5B
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 12:41:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B0D23B17A7
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:37:28 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B5A8E4E9CC2
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C362F60D6;
-	Tue, 25 Nov 2025 11:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05D26315D25;
+	Tue, 25 Nov 2025 11:40:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="MNqzmWEK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RIFXXtmT"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic314-19.consmr.mail.gq1.yahoo.com (sonic314-19.consmr.mail.gq1.yahoo.com [98.137.69.82])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5395B26FD97
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 11:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=98.137.69.82
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C906F315776;
+	Tue, 25 Nov 2025 11:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764070647; cv=none; b=OQo5zPoQqbA9YAUXguUgDhGrZZ7wTR+wE4VipfVM8POfHJyLQ7kKfGaY4aLpYaD81i5gYv4q820MIbCXcICNuSwxw1RjDO1PnvMYY8nIWP6zZZnx+uyhFl1frpY/wMiKvyUyUKQ6Adcok7qtGQuSsgLb0v2qx9rhxoPDFXv8c8w=
+	t=1764070850; cv=none; b=h1YKTxNY7QtiaE57ZklRdjVgYaliXdtM8VnC8YpRe6CKvkqyHmBKhGMKHxxi+G6R83ENVB0wwi6UXa/q+g5OK7U0o6j1uGGTWanW/N6c0x6qXQvnemT+2tcNtaR56MEcn23079HkXeYZRET41MOdotN6hGeWewURtM09hc08BWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764070647; c=relaxed/simple;
-	bh=n68/8w8Vz20Pp7RS6P80VVfiPvTaaD6DyXSzFNVk4VM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=t5IzbEZ6hmdFAnfF8d8MejywNDizwpKV9uYVl8lwAsda0ZzijWfM1p1neG1Lgj7IAglbaISjN7wMTRSpO3aqgWYA5v8TUPRj7eMJL5jPoWFmFYgs3CQT0IcWPd5wNsRg3gW3Nu8fRFidl53CoBeHNSDpHDreubRvvR6Lqsy0Trk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=MNqzmWEK; arc=none smtp.client-ip=98.137.69.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1764070639; bh=Aivk+Xo6Ed+LL8ift0X6oFeNEKF6SQ/3fN2hlA4qTb8=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=MNqzmWEK/q73jLCEKQAMEd+GvwSuv80XiT96FndQvrKQf3IoTgSTx7JxMLmqkUDkEmbGBMAKxtjlJOieJ0Ev86Pkz7zjaRp7VOMXggAilYFuolRFFziB8FrJDm/9suEJ1uqGqgrcF+7VwLL1UpDdLCpYwEzrzg+tjoqkpuT56HjPn6bTKHtV+ZAJad7pfYaOHE/rC6tiuNoIrDZhkMokMQkZyLYgQSpptpG5jnn9KLjPKrTJ5p84wWMSpB1dQyAHqPASwDuTyh2lv/uIPwSXKepWXZi4tVoUlsp1iBQyCNZubSl3GfaKbO6FcESwO8xNY6KzptI6evIX+ATHdTqadA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1764070639; bh=nzXBr8OLxgaTEOBnGkv1RZyFCpDhL83qLIW9S/cSD8s=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=aaQQ3nryrSRy7w5acxHCG8RaPCoYQFFYaXOW9YtcVooAGRVjMIuvlAmjRBBVftY8KbtMPAMx3Ex6PpneG55/tOyDgDc5JhwmGwQ4JLS3u7ezDDk7TQsStZycM23KD/gQywSVvbHxtEe7Yu4ZJiSGAN8FxCDAnbbIldlHAztrtU1GFpxD61baV0nIb+xpMcEITnAP8NxXwO3RGsyVn0lAH8vHGYLKb+kEoYysZx6rUxxBemvz7JhJLtvBxCkyEHLzF2+r4HSYn7YDAL0lP3UJ0y6awfHorKpGM8KfMjBfkGI4n/85vymhJeATsdDCAIS17PV3PZ5k4wlrpGOyLqB2tA==
-X-YMail-OSG: bkMrI3kVM1ksCYSAUFvOhW4xkjY.xGI.0niUTFdJjVedBCD9HvVKbN02GhYm4mi
- CiWUz4ltD0WSGHuOCep2mk4shieKcH1QtVSe4zpCbTpheR89TPSiiLRubW9wvHAWIud5gHb0z4eM
- p24Ejo.OE8ZG96WK3VraGRHSUFVmw_ZNewrJ0q53Pwi60AyktJDd8TLLAbTFimfXspXLjvFzN8cG
- Cg.SBriBPKA9scWcAec2opADkVXYzgwrFiw1cYVc.pjPCbh_jWn7aiXQ5Qmz_ftTwlFhevmqaGxo
- bAgQ0GyrLY15E8xwcQn3YsMz.dWV9Gf5pjruFlj233ganeExsI3Xr1jg9jsdIJLJDYYl4r_O9q7G
- gI6fG.dU6YvxSSMo4ptAfaxnnMjblbu5105DD27Sm4QU14B0.Aa0PdTr5qt2nBy0GMq6qigV2e1g
- UgvH30V2oQUTkWDWdWqGqtA.PQymgMcZQJW7PS1PPfY5QU5Z0_.ieu76d.iRaDaI34F7Y6Yjt9DB
- c.IWGMmZ2JCf4NxM455cqgjkYradUvNjx_Blm7K6RUvrQigA4SmJ7sR7TPVIEj6kNzAJSOH3QCrx
- g3R3rrEhOb4sd6M6okmrnzqSjWE6OqQ8i1pxMw2wh68pp_xaZnOUAm1w4vP1xj_QeUAD6IZhv0IX
- Ic5BVILX9XzIE_Ro7oeGEjtq_IujzNilEe7nY5EjW.E4kJr1h8O1g3U35CKBxFIDZi4Umh4EnEkq
- E3eK8gikJ_4SuLpTijoEjmy5kImjBKiW6HOkfn538pZOUWGGU1C6g0LcZ45Udk7PQWAqZRvU3jCI
- 46iO2jd.PIfBDaUF9Rzhzhiujwz6d8vKfLtZzMBsaF2QWnyvyzJqho017iFtkcfXw2m4owWz4L_w
- 5v5n2w8AiUXSCcI.kxji_ji3mUJfzLjPi3854_UfpoypSxschemc_4bHTbWAjQ0B8pgEnrWaCCpT
- mN9qR.Z.63Xnqm8OeyH6s6MIc4VKMOwfIDm5o2DduvX4iVF6zhjePkmJ.WKfJqicVi1keUQChMnT
- gSXGiF._mM4m5ZG25QhOvfnc7VQVdkIsJYDmFr7WSrZyGH_.75oa4xDpM42t88Xpdv0dmHFpvjDw
- rIf3AHI.le5ZPR.9Z.0M7vPA7yCf6whVJim6o1Ecmbw82zBrZZ_uw_lE25Gvhw7iZHYs_tLRkfU1
- p049LeXuPHy5J1OCoOX9VhRCgBiYAMI4m3KGm25m2DVzilqsF9fYj3K2JMZqoRTdf.Stq5hOlBDB
- XV_RICceDEdpHroLpbd7CflysF61gG8TnUmS2YsigdeXAyMJlGAcDbIMFKvi0ygxpsAaO_mCTeMg
- jrlDpgVFWWY60S3VVLnMfmx4RtGYB1XySwFA3cWWDtgN2IruaKDtNCQjoAHmwwVUxA7NzA8PWAU1
- RZj0.atMh04OGDnsiV1S8Z3EyACUmAUYCIC.GSFMYCbH4kbZ8kszEjWozrlCg8ZxWfRs2_7NGvlY
- iyEzBMKrNaJwpPhwqxPyYKTjJyrXF8ktmuarFuLj5YLDLH6nYVh9d5sQKjwBgak9ykMSCITafE.s
- 6fuxLUAXi.Ovd6bKF8m04hZaA48j2OzNKY_i02gTBSmct_VsR0_E23fj.1M_8O5lL7nMcN91wPTS
- y31ApcHp02cSfl5odpdDT98GK7UwTtGHweuxu_O1NISNTlZ1cIkPlEHTVUOKqjAVPX_8Y8hYJU8o
- bS1duhjQ1VY.HstIRnef.0bjjPsFpc_WN3X.FWdD0vx.sHnv3caxAxz1TxapmytvFIakAZT8IXG0
- ywE8fTiaJuP2t7.t5II6x1HL7KOciHyGXLFK.OH7_oMxX3b5DjwNm1AIWUCD2jQxouUqFJ8vg0SE
- nJ46C_FxXo3HNPJSMWZrKqxBb..IAYD2SOdmEal88MvMCST1L_doisnl4FMHcct0rCieaw14i.So
- 49NLgAmNLZFgcAr_Boc2_ifkpEd0DgLjJOWcTVWw3ZGUoarvN_cMqtF2JfQgm7OA4kl1opZmuYZ.
- LeUFLEcJnU4e7nuiygLKL_ioE3zfpxNLQZCX_kOpwdpDTT8cven2UOXbiG8tV.cMjy43yKlhTEWm
- q4t85p8ycJrc1ZIXWX1SVreq6HCUtsRaRdK4DVkyPtF.fU8pD3p3GkmqHAZxAaUT7xTHyPlOghya
- 1ImxLLm0MxdAC1jQtc8wVhhRR2O3QLf6BpR_xYPR.o15QRwr6YKizz8qyIlngN481NaD73a8_QvL
- KWhDNqSYEs5OQeE6Suqn5ZAfoXuAF3YkCh7tqD2FcGF1R2ppheQ1Erc7UsT1x8VY_OU6Lbc52KLI
- y2HqxrCXbz5eo6eELLOUPPjhW
-X-Sonic-MF: <adelodunolaoluwa@yahoo.com>
-X-Sonic-ID: dd081103-3322-4c45-bd93-39a5a0a3f307
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic314.consmr.mail.gq1.yahoo.com with HTTP; Tue, 25 Nov 2025 11:37:19 +0000
-Received: by hermes--production-bf1-694dc9467b-bgdsm (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID b98e5df8cac04b0f1d435e78fb7b22a3;
-          Tue, 25 Nov 2025 11:37:16 +0000 (UTC)
-From: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-To: kuniyu@google.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	david.hunter.linux@gmail.com,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	oe-kbuild-all@lists.linux.dev,
-	Sunday Adelodun <adelodunolaoluwa@yahoo.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH net-next] selftests: af_unix: remove unused stdlib.h include
-Date: Tue, 25 Nov 2025 12:36:48 +0100
-Message-ID: <20251125113648.25903-1-adelodunolaoluwa@yahoo.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1764070850; c=relaxed/simple;
+	bh=hxfa3Wz6MKpJejE1ht5kl3ss5kF2RMA0erJFOXnjR5Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=e8cauNu0xBbgwUpeNfygsB+Nznxw3fQj+xAv2TuzDT1gx+OPllh/Nz4wUnTLFEmrmVfXKQY9V7et6C8/UX15pV24U2AeGMH8Y/MGrdW8+Qa29phTIeN8+u6gxIRAAQefg77lyxSjvE/mqCWe0yvS8LIiMA7kZ6Vd5w30q8yGapA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RIFXXtmT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6788CC116D0;
+	Tue, 25 Nov 2025 11:40:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764070850;
+	bh=hxfa3Wz6MKpJejE1ht5kl3ss5kF2RMA0erJFOXnjR5Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RIFXXtmTc6/pRspX/ULbnOvwl3iIS4VnuPVft8CeeayY3P1i0aKLOo5cDUEXmZfM2
+	 Jd1UvHwyoL6ZzoTX/Ht6L04O9vAMeQGCDonT2bgToHih8bcUHkeuKpPsIEJ0i4w9mr
+	 AtBwdCV7SYXlpd2MH7f39Z9DBlxhUNEmfjHo+mHjOVc3c1fcyRNkG200e1eUjmA8TF
+	 0OHYyhpiISeq9ouM2KodmxXo8Y2zVPD9WpMGExzxiA9iAhAMzy3aU5gOR1qhoT5cV8
+	 kJshCAvqe056xHoRTDBPVDCwXqF+PgVF9Z35ltrZZTv9Gb8TB8WW67mAKuXOpVzliB
+	 cD4eDeJ0ySZTg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CDA3A8D14D;
+	Tue, 25 Nov 2025 11:40:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,34 +52,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-References: <20251125113648.25903-1-adelodunolaoluwa.ref@yahoo.com>
+Subject: Re: [PATCH net v6 0/5] net: dsa: microchip: Fix resource releases in
+ error path
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176407081300.696372.2913522306370415132.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Nov 2025 11:40:13 +0000
+References: <20251120-ksz-fix-v6-0-891f80ae7f8f@bootlin.com>
+In-Reply-To: <20251120-ksz-fix-v6-0-891f80ae7f8f@bootlin.com>
+To: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, richardcochran@gmail.com, arun.ramadoss@microchip.com,
+ pascal.eberhard@se.com, miquel.raynal@bootlin.com,
+ thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
-The unix_connreset.c test included <stdlib.h>, but no symbol from that
-header is used. This causes a fatal build error under certain
-linux-next configurations where stdlib.h is not available.
+Hello:
 
-Remove the unused include to fix the build.
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/r/202511221800.hcgCKvVa-lkp@intel.com/
-Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
----
- tools/testing/selftests/net/af_unix/unix_connreset.c | 1 -
- 1 file changed, 1 deletion(-)
+On Thu, 20 Nov 2025 10:11:59 +0100 you wrote:
+> Hi all,
+> 
+> I worked on adding PTP support for the KSZ8463. While doing so, I ran
+> into a few bugs in the resource release process that occur when things go
+> wrong arount IRQ initialization.
+> 
+> This small series fixes those bugs.
+> 
+> [...]
 
-diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/tools/testing/selftests/net/af_unix/unix_connreset.c
-index bffef2b54bfd..9844e829aed5 100644
---- a/tools/testing/selftests/net/af_unix/unix_connreset.c
-+++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
-@@ -14,7 +14,6 @@
-  */
- 
- #define _GNU_SOURCE
--#include <stdlib.h>
- #include <string.h>
- #include <fcntl.h>
- #include <unistd.h>
+Here is the summary with links:
+  - [net,v6,1/5] net: dsa: microchip: common: Fix checks on irq_find_mapping()
+    https://git.kernel.org/netdev/net/c/7b3c09e16679
+  - [net,v6,2/5] net: dsa: microchip: ptp: Fix checks on irq_find_mapping()
+    https://git.kernel.org/netdev/net/c/9e059305be41
+  - [net,v6,3/5] net: dsa: microchip: Don't free uninitialized ksz_irq
+    https://git.kernel.org/netdev/net/c/25b62cc5b22c
+  - [net,v6,4/5] net: dsa: microchip: Free previously initialized ports on init failures
+    https://git.kernel.org/netdev/net/c/0f80e21bf622
+  - [net,v6,5/5] net: dsa: microchip: Fix symetry in ksz_ptp_msg_irq_{setup/free}()
+    https://git.kernel.org/netdev/net/c/d0b8fec8ae50
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
