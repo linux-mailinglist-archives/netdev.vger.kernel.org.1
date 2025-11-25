@@ -1,273 +1,123 @@
-Return-Path: <netdev+bounces-241646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D49D1C87171
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 21:44:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC66AC872DC
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 21:58:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7C4354E1809
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 20:44:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F28204E1058
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 20:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4B92DF146;
-	Tue, 25 Nov 2025 20:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653F42E1EE7;
+	Tue, 25 Nov 2025 20:58:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AkLU+TAE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YNpNNUSY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20ED5241679
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 20:44:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5F02629D
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 20:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764103446; cv=none; b=DW8YdtQRg1ocoxxhgadqulWEYOoVQpB8J7c8f19RqAq5VuPuZFMsqi35SwnGNMnlDDMolngGAqY8etJbpmnU7IaYIoOjS357AVnJGgfYAMwPcacXS6HY1sHjA/GvbDwbQF5yfOjTmbMrGIkn2Q9svtjfbYDqFFYoDbfxqbtb330=
+	t=1764104300; cv=none; b=j5H2NEVA0c3P79PQ0gqWl0C2YvuJhwQg9ZTwW6S4X2EVO0VVUpAdprMZ6dEVlD2xwOKyDa9uLyCuQdlQJsLaEXRaz43w5c844a/iewamRkao9GlB2aG0UJdeOw6/tHeRe2Ki9wO558jZgvmkKjG1pzRm+3Z830lU7SDBhBsy2U8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764103446; c=relaxed/simple;
-	bh=9mdznmO3wUK4MjEQ+LZho0iNWTstEZv+If4W1+7o9bU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=iDrHfFsqC8jsI05KlD5c3zloR+51/Wje7wi5VPhNO35LeONbt8nds+tXaphT+0V5ocObfSLY6nZEDH9pO7uV0xmOoKFfzeIwiKGBPTT4VHZ4DwepS3KsYb37nvYRhDp2jqsyHcRAP3hb7akqrdpqE9QYUdwwlkUPdRa8fbqQaDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AkLU+TAE; arc=none smtp.client-ip=74.125.224.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-64306a32ed2so3506268d50.2
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 12:44:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764103444; x=1764708244; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+khoHZPaphdRPp3QxoZeI3NByUKX1JJPYRUrZ2Auvtw=;
-        b=AkLU+TAEGqFbZt14UR4nSom/rWtydJPVmiaRPvKhWGSCLmdycxwpGRuyFwENEdMSLS
-         LayaBpVaeWkcNRO6c+hfoWpqKOy2Xmx6yy9KM4bes+yh27AI8bStVrSiN0zhhMsLxvqB
-         v6htzAp7FySxQIt9ohDPzGg+0e2cLVmGI7Tucey/a49x9one/OWgFO2Kf6MuSRe/hPCy
-         6dUAl5SOOOhND6laRZItXQg6Vz+ZVtH1TxFmYfGEh42dhUmNNuZfRIB4JEzI3EwCcHrT
-         ylPlUVGfEmYcCogUKDsGV0KeQz739cABX2DJuDHsB6UPCiVwrHx+5p/E2gqYlFpJS2Ml
-         iB/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764103444; x=1764708244;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+khoHZPaphdRPp3QxoZeI3NByUKX1JJPYRUrZ2Auvtw=;
-        b=QVrSl5QSzOKWv0kD7ZlDdwIjkFjglFoaIld2mMmAGb53NAwnlO4SzAgqxlHdxugPj5
-         cxul33lvfsJ2I25YsRBy+WX1M93tpBsvweLvmipgJqlLsBsQJ10u5NhkVaG2OUgluzaY
-         b/u5OMK+tNo0mna5MwES0Lu/NGzdcjCMzE9s5gopp1F0gS4hjKpZ19yCyKHIjSt9AnWR
-         FjVfCgaY8+19Ptn34VjnRIF1eAgFrYU2BqLqilQLSKvzwUqFnuzM7Zn/O2NlDIr6ODCd
-         6CwERtcFkyZNEPoTpD0zf6Ijph5QE2g//eeDFpPjecAOv5onwd/+co/qkWNORCl/0IsD
-         BisQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkz2ALI68LJ9Zqap0ZYfwC8RwchIsPmVjlZRCzVki5BAOX43VKNMi93VzIqRwOPmMfC2gwWdA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzDJe0H0TRFmedsjYPpMvMWfOKEF/t6QDoSelnGzl8W4N8LdPA
-	zV7AJK3x7sI/DvkSYV1GrsjRtnO/sHLcvDbaGdZhBwYtEKglGX5+Bd8Iw1+qhA==
-X-Gm-Gg: ASbGnctnphPnY/GoZrj/fmyxeShvR6EgIG9im0bbME9co86pEadeMJw5TeQfow+mgjq
-	6UNGarxlnvFRPvt3EQJtHLvoK5HQOxvFpFS6Sz334x0AAd6Syq6yWcHiXNpyFNS+unE1Fnz04n/
-	53lISnIyPa4EOvkjGVCudxnk4Z+Z1edRI3qBGCunkJgWEMYnVlFwiUvd/ahTW6Zp/y65OcCQ+GM
-	CRxrQ4KWZpPNDLHXoAXgI4luHrCDWE5TdgPRaZElLTl9fCCS1Dyz4G9K3FSAdtd/+XV429EwS+c
-	R+G8Cz1NiZIQWx2+XiIAHqufgktMV1YQ8EusMQ8Uj7OnM2stEN3u47cjxPOBcMFVYCyjV+t1A1n
-	Dy+zadd8u+e58IMWgPwImRaRSPbOtGbd0l9bbEi0J1h8NJJbXbIyipGADM7VBJFfmm8CU4M5yUZ
-	uWIvRg1sPBN6tLZn1IkhJzgmZeOD2USZaivCf8mlHCPWaxeos6pM+XJTkNWHUXyGW47vGs20ENC
-	N5qQw==
-X-Google-Smtp-Source: AGHT+IHujq/6V9mKy90dSniQiCQQnRv6pVyD3bQ/oDaXPnP5Iofgu+ymJon2Qds/xkwPr79kQOkB9w==
-X-Received: by 2002:a05:690e:4089:b0:63f:a856:5f56 with SMTP id 956f58d0204a3-64302a2a196mr11638191d50.5.1764103443761;
-        Tue, 25 Nov 2025 12:44:03 -0800 (PST)
-Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78a7987f5efsm59505087b3.9.2025.11.25.12.44.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 12:44:03 -0800 (PST)
-Date: Tue, 25 Nov 2025 15:44:02 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Neal Cardwell <ncardwell@google.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- netdev@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.2303cd61bcc5e@gmail.com>
-In-Reply-To: <CADVnQykwTjoTVV_jBmUXAMKato-3MwS+j6PdyVFtTxjndcC=bQ@mail.gmail.com>
-References: <20251124071831.4cbbf412@kernel.org>
- <willemdebruijn.kernel.1fe4306a89d08@gmail.com>
- <CADVnQym7Whnbc9xf_dew-ey1fGFBY1dSf6RJ=9qLNP=u+NYOEw@mail.gmail.com>
- <willemdebruijn.kernel.39fa9d8834471@gmail.com>
- <CADVnQykwTjoTVV_jBmUXAMKato-3MwS+j6PdyVFtTxjndcC=bQ@mail.gmail.com>
-Subject: Re: [TEST] tcp_zerocopy_maxfrags.pkt fails
+	s=arc-20240116; t=1764104300; c=relaxed/simple;
+	bh=L2pF+jS+BRJC+UyyDYoi8uc4qbbZUIfBZlVxwU+COBU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RN6ONgh3H4EujKnWLK2qZPTVxq3d114fwL0+TZtYSK9R0EFFYHk503n1NjsfaAOyyMGJ3Vwy2zm57qooMwBR32+GxUZSn9XA8NfwKgOWOGtqdiw63fnbOrNBeS8EK7BsFk6YEL9eUM8KAPgoysCp9HiGFPGIaUvXyVn+LbdnWtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YNpNNUSY; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764104298; x=1795640298;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=L2pF+jS+BRJC+UyyDYoi8uc4qbbZUIfBZlVxwU+COBU=;
+  b=YNpNNUSYeYcJ6GV8x2ENPtDgQla9cBMIp1/Ds+3T6Ua639Pc1rc4SGDd
+   s+Hcy4XoWeqgWYYfEc/bgT2Oafn9JxCvSXevvy5xR8FTYmfCNA+kvHZdH
+   S5vnxsuAxaAKhzwPt+q/JWGt5LGzTcYVsA9JN9cmfLXZX1ZashH8OUdLz
+   2MM2p5q4w4r620hpHbdebVS8kEiy26mH2JQWX8rh7wXtzgs+ldVqxpP+F
+   hRNisHAdHv+ODnRSSTMert9Ms2fcenGzjvTYAQJX0/7HvFmBCsmYjUq80
+   hwUqP05WTbdVn7KQLbdc6I2LD8cpQ+LEOP5QW73artGBAvSvAdYHQk7D4
+   w==;
+X-CSE-ConnectionGUID: uS+k4h7hQzSIMnenq4Pv9Q==
+X-CSE-MsgGUID: IsW8ZfdDQ/GOvgDLqDHC8w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="83524438"
+X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
+   d="scan'208";a="83524438"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 12:58:18 -0800
+X-CSE-ConnectionGUID: LobwiEWvRdW3MDlWESOMRw==
+X-CSE-MsgGUID: WDnDyDZuQAmRhEKs+byv7w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
+   d="scan'208";a="216103516"
+Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 25 Nov 2025 12:58:15 -0800
+Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vO073-000000002Ft-0vIs;
+	Tue, 25 Nov 2025 20:58:13 +0000
+Date: Wed, 26 Nov 2025 04:57:57 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: mctp: test: move TX packetqueue from dst
+ to dev
+Message-ID: <202511260426.yF8pjfPX-lkp@intel.com>
+References: <20251125-dev-mctp-test-tx-queue-v1-1-3a1daa4e99e1@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251125-dev-mctp-test-tx-queue-v1-1-3a1daa4e99e1@codeconstruct.com.au>
 
-Neal Cardwell wrote:
-> On Tue, Nov 25, 2025 at 2:49=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Neal Cardwell wrote:
-> > > On Mon, Nov 24, 2025 at 11:33=E2=80=AFAM Willem de Bruijn
-> > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > >
-> > > > Jakub Kicinski wrote:
-> > > > > Hi Willem!
-> > > > >
-> > > > > I migrated netdev CI to our own infra now, and the slightly fas=
-ter,
-> > > > > Fedora-based system is failing tcp_zerocopy_maxfrags.pkt:
-> > > > >
-> > > > > # tcp_zerocopy_maxfrags.pkt:56: error handling packet: incorrec=
-t outbound data payload
-> > > > > # script packet:  1.000237 P. 36:37(1) ack 1
-> > > > > # actual packet:  1.000235 P. 36:37(1) ack 1 win 1050
-> > > > > # not ok 1 ipv4
-> > > > > # tcp_zerocopy_maxfrags.pkt:56: error handling packet: incorrec=
-t outbound data payload
-> > > > > # script packet:  1.000209 P. 36:37(1) ack 1
-> > > > > # actual packet:  1.000208 P. 36:37(1) ack 1 win 1050
-> > > > > # not ok 2 ipv6
-> > > > > # # Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
-> > > > >
-> > > > > https://netdev-ctrl.bots.linux.dev/logs/vmksft/packetdrill/resu=
-lts/399942/13-tcp-zerocopy-maxfrags-pkt/stdout
-> > > > >
-> > > > > This happens on both debug and non-debug kernel (tho on the for=
-mer
-> > > > > the failure is masked due to MACHINE_SLOW).
-> > > >
-> > > > That's an odd error.
-> > > >
-> > > > The test send an msg_iov of 18 1 byte fragments. And verifies tha=
-t
-> > > > only 17 fit in one packet, followed by a single 1 byte packet. Th=
-e
-> > > > test does not explicitly initialize payload, but trusts packetdri=
-ll
-> > > > to handle that. Relevant snippet below.
-> > > >
-> > > > Packetdrill complains about payload contents. That error is only
-> > > > generated by the below check in run_packet.c. Pretty straightforw=
-ard.
-> > > >
-> > > > Packetdrill agrees that the packet is one byte long. The win argu=
-ment
-> > > > is optional on outgoing packets, not relevant to the failure.
-> > > >
-> > > > So somehow the data in that frag got overwritten in the short win=
-dow
-> > > > between when it was injected into the kernel and when it was obse=
-rved?
-> > > > Seems so unlikely.
-> > > >
-> > > > Sorry, I'm a bit at a loss at least initially as to the cause.
-> > >
-> > > I agree this is odd. It looks like either a very concerning kernel
-> > > bug, or very concerning packetdrill bug. :-)
-> > >
-> > > Could someone please run the test with tcpump in the background to
-> > > capture the full packet contents, to verify that indeed the packet =
-has
-> > > the wrong contents?
-> > >
-> > > This would help make sure that this is a kernel bug and not a
-> > > packetdrill bug. :-)
-> >
-> > I'm not able to reproduce this on my own machine with the latest nn.
-> > But could reproduce it on the netdev machine.
-> >
-> > I assume all payload is supposed to be zeroed. And indeed the packet
-> > seen has a non-zero single byte of payload: 0x60.
-> >
-> > Is there any chance that this happens on some kernel with
-> > unsubmitted patches, but not on netdev-nn/main on this machine either=
-?
-> >
-> > ----
-> >
-> > tcp_zerocopy_maxfrags.pkt:56: error handling packet: incorrect
-> > outbound data payload
-> > script packet:  1.000169 P. 36:37(1) ack 1
-> > actual packet:  1.000167 P. 36:37(1) ack 1 win 1050
-> >
-> > 14:42:01.330694 tun0  Out IP6 fd3d:a0b:17d6::1.webcache >
-> > fd3d:fa7b:d17d::1.50901: Flags [P.], seq 19:36, ack 1, win 1050,
-> > length 17: HTTP
-> >         0x0000:  6000 842c 0025 0640 fd3d 0a0b 17d6 0000
-> >         0x0010:  0000 0000 0000 0001 fd3d fa7b d17d 0000
-> >         0x0020:  0000 0000 0000 0001 1f90 c6d5 f7fe 05e9
-> >         0x0030:  0000 0001 5018 041a e883 0000 0000 0000
-> >         0x0040:  0000 0000 0000 0000 0000 0000 00
-> > 14:42:01.330723 tun0  In  IP6 fd3d:fa7b:d17d::1.50901 >
-> > fd3d:a0b:17d6::1.webcache: Flags [.], ack 36, win 257, length 0
-> >         0x0000:  6000 0000 0014 06ff fd3d fa7b d17d 0000
-> >         0x0010:  0000 0000 0000 0001 fd3d 0a0b 17d6 0000
-> >         0x0020:  0000 0000 0000 0001 c6d5 1f90 0000 0001
-> >         0x0030:  f7fe 05fa 5010 0101 e21b 0000
-> > 14:42:01.330727 tun0  Out IP6 fd3d:a0b:17d6::1.webcache >
-> > fd3d:fa7b:d17d::1.50901: Flags [P.], seq 36:37, ack 1, win 1050,
-> > length 1: HTTP
-> >         0x0000:  6000 842c 0015 0640 fd3d 0a0b 17d6 0000
-> >         0x0010:  0000 0000 0000 0001 fd3d fa7b d17d 0000
-> >         0x0020:  0000 0000 0000 0001 1f90 c6d5 f7fe 05fa
-> >         0x0030:  0000 0001 5018 041a e873 0000 60
-> =
+Hi Jeremy,
 
-> Looking at the tests in tools/testing/selftests/net/packetdrill/, I
-> don't see anything that sets the --send_omit_free packetdrill flag.
-> That flag is needed for TCP zero copy tests, to ensure that
-> packetdrill doesn't free the send() buffer after the send() call.
-> =
+kernel test robot noticed the following build warnings:
 
-> Because the test didn't use the --send_omit_free flag, packetdrill
-> freed the buffer. And the memory probably got reused before the
-> transmit. Perhaps for an IPv6 packet, whose first byte is 0x60, and
-> thus what was transmitted was the garbage 0x60.
-> =
+[auto build test WARNING on e05021a829b834fecbd42b173e55382416571b2c]
 
-> Does that sound plausible, Willem? If you agree, do you have cycles to
-> cook a commit of some kind to fix this?
-> =
+url:    https://github.com/intel-lab-lkp/linux/commits/Jeremy-Kerr/net-mctp-test-move-TX-packetqueue-from-dst-to-dev/20251125-095938
+base:   e05021a829b834fecbd42b173e55382416571b2c
+patch link:    https://lore.kernel.org/r/20251125-dev-mctp-test-tx-queue-v1-1-3a1daa4e99e1%40codeconstruct.com.au
+patch subject: [PATCH net-next] net: mctp: test: move TX packetqueue from dst to dev
+config: riscv-randconfig-r072-20251126 (https://download.01.org/0day-ci/archive/20251126/202511260426.yF8pjfPX-lkp@intel.com/config)
+compiler: riscv32-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251126/202511260426.yF8pjfPX-lkp@intel.com/reproduce)
 
-> One option is to put the  --send_omit_free flag near the top of the
-> /tools/testing/selftests/net/packetdrill/tcp_zerocopy_maxfrags.pkt
-> script.
-> =
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511260426.yF8pjfPX-lkp@intel.com/
 
-> Thanks!
-> =
+All warnings (new ones prefixed by >>):
 
-> neal
+>> net/mctp/test/utils.c:96:27: warning: 'test_pktqueue_magic' defined but not used [-Wunused-const-variable=]
+      96 | static const unsigned int test_pktqueue_magic = 0x5f713aef;
+         |                           ^~~~~~~~~~~~~~~~~~~
 
-Thanks Neal!
 
-I verified that that fixed the failure. And that our original Google
-internal runner passes that flag on the command line, only for these
-zerocopy tests.
+vim +/test_pktqueue_magic +96 net/mctp/test/utils.c
 
-I can send a fix.
+80bcf05e54e0e2 Jeremy Kerr 2025-07-02  95  
+80bcf05e54e0e2 Jeremy Kerr 2025-07-02 @96  static const unsigned int test_pktqueue_magic = 0x5f713aef;
+80bcf05e54e0e2 Jeremy Kerr 2025-07-02  97  
 
-Only, the ipv4 test appears to be failing with a different error.
-Equally surprising. It times out just waiting for the SYNACK.
-
-    ./ksft_runner.sh tcp_zerocopy_maxfrags.pkt
-    TAP version 13
-    1..2
-    tcp_zerocopy_maxfrags.pkt:25: error handling packet: Timed out waitin=
-g for packet
-
-Which corresponds with the last line in this snippet.
-
-    0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
-   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
-   +0 setsockopt(3, SOL_SOCKET, SO_ZEROCOPY, [1], 4) =3D 0
-
-   // Each pinned zerocopy page is fully accounted to skb->truesize.
-   // This test generates a worst case packet with each frag storing
-   // one byte, but increasing truesize with a page (64KB on PPC).
-   +0 setsockopt(3, SOL_SOCKET, SO_SNDBUF, [2000000], 4) =3D 0
-
-   +0 bind(3, ..., ...) =3D 0
-   +0 listen(3, 1) =3D 0
-
-   +0 < S 0:0(0) win 32792 <mss 1000,sackOK,nop,nop,nop,wscale 7>
-   +0 > S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK,nop,wscale 8>
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
