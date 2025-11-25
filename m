@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-241593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FC3FC863CF
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:37:25 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58B84C863D8
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 104A74E8E70
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:37:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 97A0B353387
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E0232BF5D;
-	Tue, 25 Nov 2025 17:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA77932D0ED;
+	Tue, 25 Nov 2025 17:36:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dHegYmI9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WViJ3pr9"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D4832AADD;
-	Tue, 25 Nov 2025 17:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BB932C95B;
+	Tue, 25 Nov 2025 17:36:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764092207; cv=none; b=m8cRUiLmxFiBePp4M9EpRlHNKq/QNsiydUIfSypNXF5YtbtsJujogngCAv1C4sKeLNxdeGbTzhhrh9XLauAHvcinax8S7DnsHiPUSl0zVRsm2yjA8lEi2sWhj6rmmjK3GqJCG+NenslyfJPoCc8t4Vhk4NX3/BLyoptxLVaZvMo=
+	t=1764092211; cv=none; b=C6Dk1nadBBG0cKwMQncnGL5TrrwHviKVEOQw7Tbj3pfs5A4lw7Sso8pDqcKCVAChbMqYYOuyOMANJHBDaWYv+Y0j+SBl1HPRsp/0jkH7FXEAGF8D43RQlL0cYfZN50ItvpsmspAEtdnCvE8LEuRdx2THeTB3ztcgrMsyBcnUxG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764092207; c=relaxed/simple;
-	bh=hiQCTOP4/S5xPr0kEs71P8ohuU8clI3OaBh/kWSlaPc=;
+	s=arc-20240116; t=1764092211; c=relaxed/simple;
+	bh=h2pk/dERUPYTRmIq07kM949YUqsGfjYiE9oKHWqOD+E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V0ZqLADu49X5GHPPUFlOeSpJ5gJ3o9UKnIyfq5pzP2RlIggxLlpSAJl4XSr68l7Jb6+vjotFy2IoNaRfIFuLrkNe0SVEi1bWyjVc/BavrqMZ4cBrnLTTTY2NbNMEJymEZqnNSY5PNs4tqBJ6Ryvntgr99qp9cdmFmOntEA65w6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dHegYmI9; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=hv72A91wMpY9scoIVxNP0Iiroio83nlPrmRjxRmniiz53h14CBV2D5XU1DddPLgCpj6WyT/Drr3eHsy0iLopYptMxRBoqe4OiiPc3wGnitGE8ZP0d+0ioyGR+I3l/Cl1wo/EFPlQBEx0MoIkXyR1DbOTIDt/KHZR+ox4ukzVJkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WViJ3pr9; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764092206; x=1795628206;
+  t=1764092210; x=1795628210;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hiQCTOP4/S5xPr0kEs71P8ohuU8clI3OaBh/kWSlaPc=;
-  b=dHegYmI9Z4Uv80w3IuIMGf0nCBCLHFHWTDkiPNNzwV0sZNbTcBi7TVwV
-   mLdGapSbE/vG603Yzpn7Pwyj9FWVniwe482L2oycPXx0ABvO3wLLu0Kbj
-   s9xL6DpEW9u7Cdzn0wZSTR+OSkJXXAeby/RQJdfMceTGq1XBf67kNuaJR
-   z+vavBdtIbi//qfOWGx62AzUHmPkm93FmtRmvnXKBZqc26Dn38541U9a3
-   R/Eo07M8yaUzU5AkT6fMVi9uAUBcZH1y8kISXtWqoReHCDNUiE07wKTQi
-   0+vTBVTT6ukxlfAUYf0j4Aop9GJcZqdflbBI2uyvLFJjzGoUJaZFc5lyx
-   A==;
-X-CSE-ConnectionGUID: nWdpxwfXSrSZ/sMIgaXkYw==
-X-CSE-MsgGUID: DxiZoV7vQ9CRa6YGzSmRFA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="69979903"
+  bh=h2pk/dERUPYTRmIq07kM949YUqsGfjYiE9oKHWqOD+E=;
+  b=WViJ3pr9n82mUkzlRpWn5XwWPE87U7aqMT9xeU5vjNzDkapXoRcZgSBY
+   MU5bM06hjEa+B28eNViw6MMPmRtEyWPUgDz7oa2jknBineJyoCPHYBn6W
+   4tZIIUHXjAPNK7Ny9N4/V/Sp2cfj0juQTexLd1qQiwbg1BBI5BeDaiES2
+   w4C5Cj2DpaCu2hFuGGrvY28M38Cv2UXisGonJWh/9uXGVMU7Ooc+8jYl1
+   g50VyGbF/SULIUK6Gcg2U95fyJMZ/NbgfxKM7JBF51xJbwQV2iIJWWuDI
+   S/yzeE//ZrDvF1eEnYe1uG6+w/oizHcGxL8RblHsq12BQOnW1HJQ+906Q
+   Q==;
+X-CSE-ConnectionGUID: 8vDEJgH1SmCD1oeVaYqENA==
+X-CSE-MsgGUID: X2DKcc6fR7SfV1Mxj2uznQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="69979913"
 X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
-   d="scan'208";a="69979903"
+   d="scan'208";a="69979913"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 09:36:44 -0800
-X-CSE-ConnectionGUID: 83E69N6LRfueqL1R3ySKew==
-X-CSE-MsgGUID: bf3w1m7bTKqmPJ2OYgTqdA==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 09:36:48 -0800
+X-CSE-ConnectionGUID: 1q3t7kDdQLisWBQOuAmOQA==
+X-CSE-MsgGUID: +Icz3oWHRiWspliIUfUkjQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
-   d="scan'208";a="216040404"
+   d="scan'208";a="216040420"
 Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa002.fm.intel.com with ESMTP; 25 Nov 2025 09:36:41 -0800
+  by fmviesa002.fm.intel.com with ESMTP; 25 Nov 2025 09:36:45 -0800
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
@@ -74,9 +74,9 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	nxne.cnse.osdt.itp.upstreaming@intel.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-next 3/5] ice: migrate to netdev ops lock
-Date: Tue, 25 Nov 2025 18:36:01 +0100
-Message-ID: <20251125173603.3834486-4-aleksander.lobakin@intel.com>
+Subject: [PATCH iwl-next 4/5] ice: implement Rx queue management ops
+Date: Tue, 25 Nov 2025 18:36:02 +0100
+Message-ID: <20251125173603.3834486-5-aleksander.lobakin@intel.com>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251125173603.3834486-1-aleksander.lobakin@intel.com>
 References: <20251125173603.3834486-1-aleksander.lobakin@intel.com>
@@ -88,297 +88,422 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Queue management ops unconditionally enable netdev locking. The same
-lock is taken by default by several NAPI configuration functions,
-such as napi_enable() and netif_napi_set_irq().
-Request ops locking in advance and make sure we use the _locked
-counterparts of those functions to avoid deadlocks, taking the lock
-manually where needed (suspend/resume, queue rebuild and resets).
+Now ice is ready to get queue_mgmt_ops support. It already has API
+to disable/reconfig/enable one particular queue (for XSk). Reuse as
+much of its code as possible to implement Rx queue management
+callbacks and vice versa -- ice_queue_mem_{alloc,free}() can be
+reused during ifup/ifdown to elide code duplication.
+With this, ice passes the io_uring zcrx selftests, meaning the Rx
+part of netmem/MP support is done.
 
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_lib.h    |  6 ++-
- drivers/net/ethernet/intel/ice/ice_lib.c    | 56 +++++++++++++++++----
- drivers/net/ethernet/intel/ice/ice_main.c   | 49 ++++++++++--------
- drivers/net/ethernet/intel/ice/ice_sf_eth.c |  1 +
- drivers/net/ethernet/intel/ice/ice_xsk.c    |  4 +-
- 5 files changed, 82 insertions(+), 34 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_lib.h    |   5 +
+ drivers/net/ethernet/intel/ice/ice_txrx.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_base.c   | 192 ++++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_main.c   |   2 +-
+ drivers/net/ethernet/intel/ice/ice_sf_eth.c |   2 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c   |  26 ++-
+ 6 files changed, 163 insertions(+), 66 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
-index 2cb1eb98b9da..d9c94c06c657 100644
+index d9c94c06c657..781319f70118 100644
 --- a/drivers/net/ethernet/intel/ice/ice_lib.h
 +++ b/drivers/net/ethernet/intel/ice/ice_lib.h
-@@ -53,9 +53,11 @@ struct ice_vsi *
- ice_vsi_setup(struct ice_pf *pf, struct ice_vsi_cfg_params *params);
+@@ -4,6 +4,8 @@
+ #ifndef _ICE_LIB_H_
+ #define _ICE_LIB_H_
  
- void ice_vsi_set_napi_queues(struct ice_vsi *vsi);
--void ice_napi_add(struct ice_vsi *vsi);
++#include <net/netdev_queues.h>
++
+ #include "ice.h"
+ #include "ice_vlan.h"
+ 
+@@ -126,4 +128,7 @@ void ice_clear_feature_support(struct ice_pf *pf, enum ice_feature f);
+ void ice_init_feature_support(struct ice_pf *pf);
+ bool ice_vsi_is_rx_queue_active(struct ice_vsi *vsi);
+ void ice_vsi_update_l2tsel(struct ice_vsi *vsi, enum ice_l2tsel l2tsel);
++
++extern const struct netdev_queue_mgmt_ops ice_queue_mgmt_ops;
++
+ #endif /* !_ICE_LIB_H_ */
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+index e440c55d9e9f..f741301c28b6 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.h
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+@@ -409,6 +409,8 @@ u16
+ ice_select_queue(struct net_device *dev, struct sk_buff *skb,
+ 		 struct net_device *sb_dev);
+ void ice_clean_tx_ring(struct ice_tx_ring *tx_ring);
++void ice_queue_mem_free(struct net_device *dev, void *per_queue_mem);
++void ice_zero_rx_ring(struct ice_rx_ring *rx_ring);
+ void ice_clean_rx_ring(struct ice_rx_ring *rx_ring);
+ int ice_setup_tx_ring(struct ice_tx_ring *tx_ring);
+ int ice_setup_rx_ring(struct ice_rx_ring *rx_ring);
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index 1aa40f13947e..77d09dc6a48d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -651,6 +651,42 @@ static int ice_rxq_pp_create(struct ice_rx_ring *rq)
+ 	return err;
+ }
+ 
++static int ice_queue_mem_alloc(struct net_device *dev, void *per_queue_mem,
++			       int idx)
++{
++	const struct ice_netdev_priv *priv = netdev_priv(dev);
++	const struct ice_rx_ring *real = priv->vsi->rx_rings[idx];
++	struct ice_rx_ring *new = per_queue_mem;
++	int ret;
++
++	new->count = real->count;
++	new->netdev = real->netdev;
++	new->q_index = real->q_index;
++	new->q_vector = real->q_vector;
++	new->vsi = real->vsi;
++
++	ret = ice_rxq_pp_create(new);
++	if (ret)
++		return ret;
++
++	if (!netif_running(dev))
++		return 0;
++
++	ret = __xdp_rxq_info_reg(&new->xdp_rxq, new->netdev, new->q_index,
++				 new->q_vector->napi.napi_id, new->rx_buf_len);
++	if (ret)
++		goto err_destroy_fq;
++
++	xdp_rxq_info_attach_page_pool(&new->xdp_rxq, new->pp);
++
++	return 0;
++
++err_destroy_fq:
++	ice_rxq_pp_destroy(new);
++
++	return ret;
++}
++
+ /**
+  * ice_vsi_cfg_rxq - Configure an Rx queue
+  * @ring: the ring being configured
+@@ -665,23 +701,12 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+ 	int err;
+ 
+ 	if (ring->vsi->type == ICE_VSI_PF || ring->vsi->type == ICE_VSI_SF) {
+-		if (!xdp_rxq_info_is_reg(&ring->xdp_rxq)) {
+-			err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
+-						 ring->q_index,
+-						 ring->q_vector->napi.napi_id,
+-						 ring->rx_buf_len);
+-			if (err)
+-				return err;
+-		}
 -
-+void ice_vsi_set_napi_queues_locked(struct ice_vsi *vsi);
- void ice_vsi_clear_napi_queues(struct ice_vsi *vsi);
-+void ice_vsi_clear_napi_queues_locked(struct ice_vsi *vsi);
-+
-+void ice_napi_add(struct ice_vsi *vsi);
+ 		ice_rx_xsk_pool(ring);
+ 		err = ice_realloc_rx_xdp_bufs(ring, ring->xsk_pool);
+ 		if (err)
+ 			return err;
  
- int ice_vsi_release(struct ice_vsi *vsi);
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 15621707fbf8..8f79dd022e91 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -2695,7 +2695,7 @@ void ice_vsi_close(struct ice_vsi *vsi)
- 	if (!test_and_set_bit(ICE_VSI_DOWN, vsi->state))
- 		ice_down(vsi);
- 
--	ice_vsi_clear_napi_queues(vsi);
-+	ice_vsi_clear_napi_queues_locked(vsi);
- 	ice_vsi_free_irq(vsi);
- 	ice_vsi_free_tx_rings(vsi);
- 	ice_vsi_free_rx_rings(vsi);
-@@ -2764,12 +2764,13 @@ void ice_dis_vsi(struct ice_vsi *vsi, bool locked)
- }
- 
- /**
-- * ice_vsi_set_napi_queues - associate netdev queues with napi
-+ * ice_vsi_set_napi_queues_locked - associate netdev queues with napi
-  * @vsi: VSI pointer
-  *
-  * Associate queue[s] with napi for all vectors.
-+ * Must be called only with the netdev_lock taken.
-  */
--void ice_vsi_set_napi_queues(struct ice_vsi *vsi)
-+void ice_vsi_set_napi_queues_locked(struct ice_vsi *vsi)
- {
- 	struct net_device *netdev = vsi->netdev;
- 	int q_idx, v_idx;
-@@ -2777,7 +2778,6 @@ void ice_vsi_set_napi_queues(struct ice_vsi *vsi)
- 	if (!netdev)
- 		return;
- 
--	ASSERT_RTNL();
- 	ice_for_each_rxq(vsi, q_idx)
- 		netif_queue_set_napi(netdev, q_idx, NETDEV_QUEUE_TYPE_RX,
- 				     &vsi->rx_rings[q_idx]->q_vector->napi);
-@@ -2789,17 +2789,37 @@ void ice_vsi_set_napi_queues(struct ice_vsi *vsi)
- 	ice_for_each_q_vector(vsi, v_idx) {
- 		struct ice_q_vector *q_vector = vsi->q_vectors[v_idx];
- 
--		netif_napi_set_irq(&q_vector->napi, q_vector->irq.virq);
-+		netif_napi_set_irq_locked(&q_vector->napi, q_vector->irq.virq);
- 	}
- }
- 
- /**
-- * ice_vsi_clear_napi_queues - dissociate netdev queues from napi
-+ * ice_vsi_set_napi_queues - associate VSI queues with NAPIs
-  * @vsi: VSI pointer
-  *
-+ * Version of ice_vsi_set_napi_queues_locked() that takes the netdev_lock,
-+ * to use it outside of the net_device_ops context.
-+ */
-+void ice_vsi_set_napi_queues(struct ice_vsi *vsi)
-+{
-+	struct net_device *netdev = vsi->netdev;
-+
-+	if (!netdev)
-+		return;
-+
-+	netdev_lock(netdev);
-+	ice_vsi_set_napi_queues_locked(vsi);
-+	netdev_unlock(netdev);
-+}
-+
-+/**
-+ * ice_vsi_clear_napi_queues_locked - dissociate netdev queues from napi
-+ * @vsi: VSI to process
-+ *
-  * Clear the association between all VSI queues queue[s] and napi.
-+ * Must be called only with the netdev_lock taken.
-  */
--void ice_vsi_clear_napi_queues(struct ice_vsi *vsi)
-+void ice_vsi_clear_napi_queues_locked(struct ice_vsi *vsi)
- {
- 	struct net_device *netdev = vsi->netdev;
- 	int q_idx, v_idx;
-@@ -2807,12 +2827,11 @@ void ice_vsi_clear_napi_queues(struct ice_vsi *vsi)
- 	if (!netdev)
- 		return;
- 
--	ASSERT_RTNL();
- 	/* Clear the NAPI's interrupt number */
- 	ice_for_each_q_vector(vsi, v_idx) {
- 		struct ice_q_vector *q_vector = vsi->q_vectors[v_idx];
- 
--		netif_napi_set_irq(&q_vector->napi, -1);
-+		netif_napi_set_irq_locked(&q_vector->napi, -1);
+ 		if (ring->xsk_pool) {
+-			xdp_rxq_info_unreg(&ring->xdp_rxq);
+-
+ 			rx_buf_len =
+ 				xsk_pool_get_rx_frame_size(ring->xsk_pool);
+ 			err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
+@@ -700,20 +725,10 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+ 			dev_info(dev, "Registered XDP mem model MEM_TYPE_XSK_BUFF_POOL on Rx ring %d\n",
+ 				 ring->q_index);
+ 		} else {
+-			err = ice_rxq_pp_create(ring);
++			err = ice_queue_mem_alloc(ring->netdev, ring,
++						  ring->q_index);
+ 			if (err)
+ 				return err;
+-
+-			if (!xdp_rxq_info_is_reg(&ring->xdp_rxq)) {
+-				err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
+-							 ring->q_index,
+-							 ring->q_vector->napi.napi_id,
+-							 ring->rx_buf_len);
+-				if (err)
+-					goto err_destroy_fq;
+-			}
+-			xdp_rxq_info_attach_page_pool(&ring->xdp_rxq,
+-						      ring->pp);
+ 		}
  	}
  
- 	ice_for_each_txq(vsi, q_idx)
-@@ -2822,6 +2841,25 @@ void ice_vsi_clear_napi_queues(struct ice_vsi *vsi)
- 		netif_queue_set_napi(netdev, q_idx, NETDEV_QUEUE_TYPE_RX, NULL);
+@@ -722,7 +737,7 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+ 	if (err) {
+ 		dev_err(dev, "ice_setup_rx_ctx failed for RxQ %d, err %d\n",
+ 			ring->q_index, err);
+-		goto err_destroy_fq;
++		goto err_clean_rq;
+ 	}
+ 
+ 	if (ring->xsk_pool) {
+@@ -753,12 +768,12 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+ 		err = ice_alloc_rx_bufs(ring, num_bufs);
+ 
+ 	if (err)
+-		goto err_destroy_fq;
++		goto err_clean_rq;
+ 
+ 	return 0;
+ 
+-err_destroy_fq:
+-	ice_rxq_pp_destroy(ring);
++err_clean_rq:
++	ice_clean_rx_ring(ring);
+ 
+ 	return err;
+ }
+@@ -1425,27 +1440,7 @@ static void ice_qp_reset_stats(struct ice_vsi *vsi, u16 q_idx)
+ 		       sizeof(vsi->xdp_rings[q_idx]->ring_stats->stats));
  }
  
-+/**
-+ * ice_vsi_clear_napi_queues - dissociate VSI queues from NAPIs
-+ * @vsi: VSI to process
-+ *
-+ * Version of ice_vsi_clear_napi_queues_locked() that takes the netdev lock,
-+ * to use it outside of the net_device_ops context.
-+ */
-+void ice_vsi_clear_napi_queues(struct ice_vsi *vsi)
+-/**
+- * ice_qp_clean_rings - Cleans all the rings of a given index
+- * @vsi: VSI that contains rings of interest
+- * @q_idx: ring index in array
+- */
+-static void ice_qp_clean_rings(struct ice_vsi *vsi, u16 q_idx)
+-{
+-	ice_clean_tx_ring(vsi->tx_rings[q_idx]);
+-	if (vsi->xdp_rings)
+-		ice_clean_tx_ring(vsi->xdp_rings[q_idx]);
+-	ice_clean_rx_ring(vsi->rx_rings[q_idx]);
+-}
+-
+-/**
+- * ice_qp_dis - Disables a queue pair
+- * @vsi: VSI of interest
+- * @q_idx: ring index in array
+- *
+- * Returns 0 on success, negative on failure.
+- */
+-int ice_qp_dis(struct ice_vsi *vsi, u16 q_idx)
++static int __ice_qp_dis(struct ice_vsi *vsi, u16 q_idx)
+ {
+ 	struct ice_txq_meta txq_meta = { };
+ 	struct ice_q_vector *q_vector;
+@@ -1484,23 +1479,35 @@ int ice_qp_dis(struct ice_vsi *vsi, u16 q_idx)
+ 	}
+ 
+ 	ice_vsi_ctrl_one_rx_ring(vsi, false, q_idx, false);
+-	ice_qp_clean_rings(vsi, q_idx);
+ 	ice_qp_reset_stats(vsi, q_idx);
+ 
++	ice_clean_tx_ring(vsi->tx_rings[q_idx]);
++	if (vsi->xdp_rings)
++		ice_clean_tx_ring(vsi->xdp_rings[q_idx]);
++
+ 	return fail;
+ }
+ 
+ /**
+- * ice_qp_ena - Enables a queue pair
++ * ice_qp_dis - Disables a queue pair
+  * @vsi: VSI of interest
+  * @q_idx: ring index in array
+  *
+  * Returns 0 on success, negative on failure.
+  */
+-int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
++int ice_qp_dis(struct ice_vsi *vsi, u16 q_idx)
 +{
-+	struct net_device *netdev = vsi->netdev;
++	int ret;
 +
-+	if (!netdev)
-+		return;
++	ret = __ice_qp_dis(vsi, q_idx);
++	ice_clean_rx_ring(vsi->rx_rings[q_idx]);
 +
-+	netdev_lock(netdev);
-+	ice_vsi_clear_napi_queues_locked(vsi);
-+	netdev_unlock(netdev);
++	return ret;
 +}
 +
- /**
-  * ice_napi_add - register NAPI handler for the VSI
-  * @vsi: VSI for which NAPI handler is to be registered
++static int __ice_qp_ena(struct ice_vsi *vsi, u16 q_idx, int fail)
+ {
+ 	struct ice_q_vector *q_vector;
+-	int fail = 0;
+ 	bool link_up;
+ 	int err;
+ 
+@@ -1518,10 +1525,6 @@ int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
+ 		ice_tx_xsk_pool(vsi, q_idx);
+ 	}
+ 
+-	err = ice_vsi_cfg_single_rxq(vsi, q_idx);
+-	if (!fail)
+-		fail = err;
+-
+ 	q_vector = vsi->rx_rings[q_idx]->q_vector;
+ 	ice_qvec_cfg_msix(vsi, q_vector, q_idx);
+ 
+@@ -1542,3 +1545,80 @@ int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
+ 
+ 	return fail;
+ }
++
++/**
++ * ice_qp_ena - Enables a queue pair
++ * @vsi: VSI of interest
++ * @q_idx: ring index in array
++ *
++ * Returns 0 on success, negative on failure.
++ */
++int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
++{
++	return __ice_qp_ena(vsi, q_idx, ice_vsi_cfg_single_rxq(vsi, q_idx));
++}
++
++static int ice_queue_start(struct net_device *dev, void *per_queue_mem,
++			   int idx)
++{
++	const struct ice_netdev_priv *priv = netdev_priv(dev);
++	struct ice_rx_ring *real = priv->vsi->rx_rings[idx];
++	struct ice_rx_ring *new = per_queue_mem;
++	struct napi_struct *napi;
++	int ret;
++
++	real->pp = new->pp;
++	real->rx_fqes = new->rx_fqes;
++	real->hdr_fqes = new->hdr_fqes;
++	real->hdr_pp = new->hdr_pp;
++
++	real->hdr_truesize = new->hdr_truesize;
++	real->truesize = new->truesize;
++	real->rx_hdr_len = new->rx_hdr_len;
++	real->rx_buf_len = new->rx_buf_len;
++
++	memcpy(&real->xdp_rxq, &new->xdp_rxq, sizeof(new->xdp_rxq));
++
++	ret = ice_setup_rx_ctx(real);
++	if (ret)
++		return ret;
++
++	napi = &real->q_vector->napi;
++
++	page_pool_enable_direct_recycling(real->pp, napi);
++	if (real->hdr_pp)
++		page_pool_enable_direct_recycling(real->hdr_pp, napi);
++
++	ret = ice_alloc_rx_bufs(real, ICE_DESC_UNUSED(real));
++
++	return __ice_qp_ena(priv->vsi, idx, ret);
++}
++
++static int ice_queue_stop(struct net_device *dev, void *per_queue_mem,
++			  int idx)
++{
++	const struct ice_netdev_priv *priv = netdev_priv(dev);
++	struct ice_rx_ring *real = priv->vsi->rx_rings[idx];
++	int ret;
++
++	ret = __ice_qp_dis(priv->vsi, idx);
++	if (ret)
++		return ret;
++
++	page_pool_disable_direct_recycling(real->pp);
++	if (real->hdr_pp)
++		page_pool_disable_direct_recycling(real->hdr_pp);
++
++	ice_zero_rx_ring(real);
++	memcpy(per_queue_mem, real, sizeof(*real));
++
++	return 0;
++}
++
++const struct netdev_queue_mgmt_ops ice_queue_mgmt_ops = {
++	.ndo_queue_mem_alloc	= ice_queue_mem_alloc,
++	.ndo_queue_mem_free	= ice_queue_mem_free,
++	.ndo_queue_mem_size	= sizeof(struct ice_rx_ring),
++	.ndo_queue_start	= ice_queue_start,
++	.ndo_queue_stop		= ice_queue_stop,
++};
 diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 2533876f1a2f..c0432182b482 100644
+index c0432182b482..9eb27a0d984b 100644
 --- a/drivers/net/ethernet/intel/ice/ice_main.c
 +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -3523,6 +3523,7 @@ static void ice_set_ops(struct ice_vsi *vsi)
+@@ -3523,7 +3523,7 @@ static void ice_set_ops(struct ice_vsi *vsi)
  	}
  
  	netdev->netdev_ops = &ice_netdev_ops;
-+	netdev->request_ops_lock = true;
+-	netdev->request_ops_lock = true;
++	netdev->queue_mgmt_ops = &ice_queue_mgmt_ops;
  	netdev->udp_tunnel_nic_info = &pf->hw.udp_tunnel_nic;
  	netdev->xdp_metadata_ops = &ice_xdp_md_ops;
  	ice_set_ethtool_ops(netdev);
-@@ -5533,16 +5534,17 @@ static int ice_reinit_interrupt_scheme(struct ice_pf *pf)
- 
- 	/* Remap vectors and rings, after successful re-init interrupts */
- 	ice_for_each_vsi(pf, v) {
--		if (!pf->vsi[v])
-+		struct ice_vsi *vsi = pf->vsi[v];
-+
-+		if (!vsi)
- 			continue;
- 
--		ret = ice_vsi_alloc_q_vectors(pf->vsi[v]);
-+		ret = ice_vsi_alloc_q_vectors(vsi);
- 		if (ret)
- 			goto err_reinit;
--		ice_vsi_map_rings_to_vectors(pf->vsi[v]);
--		rtnl_lock();
--		ice_vsi_set_napi_queues(pf->vsi[v]);
--		rtnl_unlock();
-+
-+		ice_vsi_map_rings_to_vectors(vsi);
-+		ice_vsi_set_napi_queues(vsi);
- 	}
- 
- 	ret = ice_req_irq_msix_misc(pf);
-@@ -5555,13 +5557,15 @@ static int ice_reinit_interrupt_scheme(struct ice_pf *pf)
- 	return 0;
- 
- err_reinit:
--	while (v--)
--		if (pf->vsi[v]) {
--			rtnl_lock();
--			ice_vsi_clear_napi_queues(pf->vsi[v]);
--			rtnl_unlock();
--			ice_vsi_free_q_vectors(pf->vsi[v]);
--		}
-+	while (v--) {
-+		struct ice_vsi *vsi = pf->vsi[v];
-+
-+		if (!vsi)
-+			continue;
-+
-+		ice_vsi_clear_napi_queues(vsi);
-+		ice_vsi_free_q_vectors(vsi);
-+	}
- 
- 	return ret;
- }
-@@ -5623,14 +5627,17 @@ static int ice_suspend(struct device *dev)
- 	 * to CPU0.
- 	 */
- 	ice_free_irq_msix_misc(pf);
-+
- 	ice_for_each_vsi(pf, v) {
--		if (!pf->vsi[v])
-+		struct ice_vsi *vsi = pf->vsi[v];
-+
-+		if (!vsi)
- 			continue;
--		rtnl_lock();
--		ice_vsi_clear_napi_queues(pf->vsi[v]);
--		rtnl_unlock();
--		ice_vsi_free_q_vectors(pf->vsi[v]);
-+
-+		ice_vsi_clear_napi_queues(vsi);
-+		ice_vsi_free_q_vectors(vsi);
- 	}
-+
- 	ice_clear_interrupt_scheme(pf);
- 
- 	pci_save_state(pdev);
-@@ -6760,7 +6767,7 @@ static void ice_napi_enable_all(struct ice_vsi *vsi)
- 		ice_init_moderation(q_vector);
- 
- 		if (q_vector->rx.rx_ring || q_vector->tx.tx_ring)
--			napi_enable(&q_vector->napi);
-+			napi_enable_locked(&q_vector->napi);
- 	}
- }
- 
-@@ -7204,7 +7211,7 @@ static void ice_napi_disable_all(struct ice_vsi *vsi)
- 		struct ice_q_vector *q_vector = vsi->q_vectors[q_idx];
- 
- 		if (q_vector->rx.rx_ring || q_vector->tx.tx_ring)
--			napi_disable(&q_vector->napi);
-+			napi_disable_locked(&q_vector->napi);
- 
- 		cancel_work_sync(&q_vector->tx.dim.work);
- 		cancel_work_sync(&q_vector->rx.dim.work);
-@@ -7504,7 +7511,7 @@ int ice_vsi_open(struct ice_vsi *vsi)
- 		if (err)
- 			goto err_set_qs;
- 
--		ice_vsi_set_napi_queues(vsi);
-+		ice_vsi_set_napi_queues_locked(vsi);
- 	}
- 
- 	err = ice_up_complete(vsi);
 diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-index 1a2c94375ca7..2c3db1b03055 100644
+index 2c3db1b03055..41e1606a8222 100644
 --- a/drivers/net/ethernet/intel/ice/ice_sf_eth.c
 +++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-@@ -58,6 +58,7 @@ static int ice_sf_cfg_netdev(struct ice_dynamic_port *dyn_port,
+@@ -58,7 +58,7 @@ static int ice_sf_cfg_netdev(struct ice_dynamic_port *dyn_port,
  	eth_hw_addr_set(netdev, dyn_port->hw_addr);
  	ether_addr_copy(netdev->perm_addr, dyn_port->hw_addr);
  	netdev->netdev_ops = &ice_sf_netdev_ops;
-+	netdev->request_ops_lock = true;
+-	netdev->request_ops_lock = true;
++	netdev->queue_mgmt_ops = &ice_queue_mgmt_ops;
  	SET_NETDEV_DEVLINK_PORT(netdev, devlink_port);
  
  	err = register_netdev(netdev);
-diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
-index 989ff1fd9110..4168cd58d4d8 100644
---- a/drivers/net/ethernet/intel/ice/ice_xsk.c
-+++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
-@@ -33,9 +33,9 @@ ice_qvec_toggle_napi(struct ice_vsi *vsi, struct ice_q_vector *q_vector,
- 		return;
- 
- 	if (enable)
--		napi_enable(&q_vector->napi);
-+		napi_enable_locked(&q_vector->napi);
- 	else
--		napi_disable(&q_vector->napi);
-+		napi_disable_locked(&q_vector->napi);
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index ad76768a4232..b00fa436472d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -530,17 +530,13 @@ void ice_rxq_pp_destroy(struct ice_rx_ring *rq)
+ 	rq->hdr_pp = NULL;
  }
  
+-/**
+- * ice_clean_rx_ring - Free Rx buffers
+- * @rx_ring: ring to be cleaned
+- */
+-void ice_clean_rx_ring(struct ice_rx_ring *rx_ring)
++void ice_queue_mem_free(struct net_device *dev, void *per_queue_mem)
+ {
+-	u32 size;
++	struct ice_rx_ring *rx_ring = per_queue_mem;
+ 
+ 	if (rx_ring->xsk_pool) {
+ 		ice_xsk_clean_rx_ring(rx_ring);
+-		goto rx_skip_free;
++		return;
+ 	}
+ 
+ 	/* ring already cleared, nothing to do */
+@@ -567,8 +563,12 @@ void ice_clean_rx_ring(struct ice_rx_ring *rx_ring)
+ 	}
+ 
+ 	ice_rxq_pp_destroy(rx_ring);
++}
++
++void ice_zero_rx_ring(struct ice_rx_ring *rx_ring)
++{
++	size_t size;
+ 
+-rx_skip_free:
+ 	/* Zero out the descriptor ring */
+ 	size = ALIGN(rx_ring->count * sizeof(union ice_32byte_rx_desc),
+ 		     PAGE_SIZE);
+@@ -579,6 +579,16 @@ void ice_clean_rx_ring(struct ice_rx_ring *rx_ring)
+ 	rx_ring->next_to_use = 0;
+ }
+ 
++/**
++ * ice_clean_rx_ring - Free Rx buffers
++ * @rx_ring: ring to be cleaned
++ */
++void ice_clean_rx_ring(struct ice_rx_ring *rx_ring)
++{
++	ice_queue_mem_free(rx_ring->netdev, rx_ring);
++	ice_zero_rx_ring(rx_ring);
++}
++
  /**
+  * ice_free_rx_ring - Free Rx resources
+  * @rx_ring: ring to clean the resources from
 -- 
 2.51.1
 
