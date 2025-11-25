@@ -1,339 +1,191 @@
-Return-Path: <netdev+bounces-241544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78322C8595A
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 15:56:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6127EC85935
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 15:55:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 04CA64ECF3E
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 14:53:34 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EAEBD3517B9
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 14:54:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC67021ABDC;
-	Tue, 25 Nov 2025 14:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6EB1327BF5;
+	Tue, 25 Nov 2025 14:54:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ABQRGpbL";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cfcFu2mT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9693326959
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 14:53:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38AFB13AD05
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 14:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764082407; cv=none; b=Lf0CDyxA4DoP2vUHFX1YFp4/cdMLgSFe2q/Gu3tpst58zFwfODTeonPiM6wVWsbDyluxw6KZZxQSaMscTHIvy/t16YbkJ5TzSLueDBmJrtRzTmPLdvhAaxxdb2XHhEP1o8Qaq6JDp7ezqvDdzJmCECsT2lmEIIbQ+JTHXeR43uc=
+	t=1764082476; cv=none; b=RnYT4STFBQmNOCbG/miBAkp0k4oA/aaxedxPMJQN9T6MHKrbwD5vlpXkVg94kYOUM+IXTDtVh24KFxs9dz6jDKdNzn70OBVnSE3qPap2y8akDPgxytdvUBuJCxPZRDmUgtNs64Z9J/wI/4rODqhx3uRJGBDRBYfvcQWPXPv7GBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764082407; c=relaxed/simple;
-	bh=7yrCoyUYTnytN76+GRYmNVMRrrYLaTD+oZan3ei3owI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Pqpy7kRxbXmCjwqJl9yIiERhmCQj3OmvdwmZ2yZVwfhBbfTs9kMu6IvoNVjinPesu5IaNo5Gkns8C1wuYq8tuTJ7mx65zL3jCjcSHIokn2M5P1Pt/iq7/d/rFSvxJuxNtjcbFZTZ4H72ifgM4Q+Q3Se/TVAyFnKVc/tlfQcjStU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-4330f62ef60so48049455ab.0
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 06:53:25 -0800 (PST)
+	s=arc-20240116; t=1764082476; c=relaxed/simple;
+	bh=8xC7HaADQYW3D+KtCunFe74uUCqkHpl2Q0DkBJIPChA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OEBL4sAwjIz6D2y7fdQhP/55Dvht/z3PO8FmOS2vD/64fHv0JtxnXt7T8aHLGBpAys+d4jw8SM0UO6bxnUMF05OrthmEYVWG/tF620JWH7BG0wW5/U3dOcP+SBbR0/pgw0WE4e0JoUFrl9H9AWsIIdFQbJdwO8sH4/xvkFFNvEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ABQRGpbL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cfcFu2mT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764082474;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vUrStbCWzacPZeRn/CeAW92WYQYkVd+P3AlUH3cXvno=;
+	b=ABQRGpbL3GrR1YpqoHIq879WeEhlpbPOgBwprtY8Zx00sZ7sqQ41oLSeMv3hvD7u3I9x+x
+	Ycdj40ZyZXboS+FzES+iSLZgYJKBN5/55lc6NF4x+mu/1QW2D1TEMLEV9111weofHbVkss
+	7b58/rVB0BSdf2M8zcsjQhBne/ECuBY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-611-WAoEv2GiMgW25xcD2TWODw-1; Tue, 25 Nov 2025 09:54:31 -0500
+X-MC-Unique: WAoEv2GiMgW25xcD2TWODw-1
+X-Mimecast-MFC-AGG-ID: WAoEv2GiMgW25xcD2TWODw_1764082469
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42b3c965ce5so4602488f8f.2
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 06:54:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764082469; x=1764687269; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vUrStbCWzacPZeRn/CeAW92WYQYkVd+P3AlUH3cXvno=;
+        b=cfcFu2mT/kKAEmorPEqCPxak8/pldhwbINDn/xrL4io3ji1L4N4klw8sgrqUATvU1f
+         HNN2w2V2bh9KiKb/yJj3csEINNzl+zAvXZF7vTPLzkmzVGygrT6biiEbATDCfXDSsRU3
+         qqz0wtqaSQoasNM+ScGRDNjv/jUB3Y9Ax8NhlSXiuo9eqIgwqkjrc+wGj+Tfkgf/bz4b
+         h7pRuAi+/cJE44PPQQNaBvDFOayQURYMhD2v9gR4vck0gj9yG7H+P6DJwuuF415S4n/S
+         yMbWSDwaDkK2xid8MWiFlSdlV8rbLrYOnK7cDKzFg53BcdYiB2Vt113w4wIEJ7WxzSF7
+         +jMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764082405; x=1764687205;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QOA03dBPZiH7SCa2ITGq3r5TJoapfypfq+bcamX9nSE=;
-        b=TuwmGusikCYi6fmP3nNEJVyoYertjiSaBv0H7exyddja4OJ2o0W/d7Rlcxx7XhEU07
-         9xVNkJxEDsOuAjkgpKoWfe3qdzlTBzlbthu/3x1STTav9R4Qg16pbSWXQ1hOFOuiMoWs
-         dOseDQqsdlzCxHlA/xxDnY+hDNMNIm6YCEjN0BJ9RtUbqdyBiCnm71qxzccH3DuEm8gi
-         PouZkvXjputf1d1kbW7DykWfLU+XQ3u5j4WRp/sSHKdoP3P72ZphOdh8TZXSlTQtGeS+
-         HR/tCw5x1jZSbFLeBoq/x3fVeT/FoiDCGjByRxzSOT6O//DRPAixOSxvT32gvBnnry7D
-         rqpw==
-X-Forwarded-Encrypted: i=1; AJvYcCWkwj/6QooR75sHf4bRvUqN9Wft00RvMZF4A4MNl2Rlq844zjrgMUZiZE7xGLRQS7CeJcJ0Dk8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyS2CpomlaUJCzKFA8zA697P/AZCvc17dgPL60XIft2qhKRBTTG
-	gLTVz1Gfrf17fl9kNWR6K/MuMjZQjVvYPSKkgwv7JsdTZHFg+/jQT4iJ4tICAnvQEGD5nB9qWb0
-	nT6EG2WmTINW6YCzXaWVqxJ1heMk3nqBCrD3e49/vBQpcixXWCyu3u7IwDpo=
-X-Google-Smtp-Source: AGHT+IHMnhD38uWXqVjboY8dbQ+ujG3Mzk1eorjWVlGzEJ9/bwXPPK7UfwUen20ZAGdXM2q5psGAcbLW00qGPpIjHifwOdXP7daJ
+        d=1e100.net; s=20230601; t=1764082469; x=1764687269;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vUrStbCWzacPZeRn/CeAW92WYQYkVd+P3AlUH3cXvno=;
+        b=K0M0fu1XFlWLR6xDUsyw/+tvELaYGexUySJ59WHRYmHq9AMnXRuWVmO8NF0vvRqg/C
+         Cvz78jOVxiOtLdxsG0eLjQ+1DE4Ga06KTWmTJmzP2t85dHGlKhiU04EyY1ilnWxPbSCS
+         jlDJpVf2OYOJ37kWb68kopPWDGpJ7QY1v6I2fEeJZBZVLdT2bTY22xSAacOHKBJ7CRNu
+         8+PKLTa+Rgg+njtKwNarZP6bWcjBd1Og4uVabZBIwXw6dEE46LlsQGwI1joxo3UMt+ZM
+         78i6jU3UjorncEi7VmdvBYVWxd4oi7+SJg/Ar7Mfx2WpDe5RIkHkHKB5R4krtnZrZxXK
+         iYNw==
+X-Forwarded-Encrypted: i=1; AJvYcCXMeTg0+b+v6S9et4G82iwRCieKP4EAKsHfDoSHg1+x+2bvMOaRKGjvkCX145C9i4396nfSfGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykG/pFVeiDipFTiQl6aSn8dcmFPPOde+R/jiFf2ylH/yECoO9A
+	4/eSm4ZcrAz/I6QRlnJadCtp4Eu3+D2TX70mVHVZLkx1NzpL9gcILtMT6Y3HDBEOXu0c6AiOAjO
+	SyFoNXcCoJZGvAsp1ijnlahjw+eQIvR7+EC/1Mkbuk2Xy7H/BWc7OW3Axvw==
+X-Gm-Gg: ASbGnct25bl8JKj0KzRmzJFtqaor4JuR3aebOYOv7v8a3SZxEym5Z59X5fujk3yUgPG
+	/23COgDjLkCOQ6ZiLlfMKPaZDqMMiA9TUXSqge7h2hnpejAR8XFcsNDvIwkrLgWZXYdbqbUhuA4
+	HeJvRmAPmZvMDq+FctdIoamop51r89qsgAZzzV2FHyjw4jCt42uSTnYUkd+4juzcX/Kf98f1mHB
+	7BBw80TDhJ+dK/1Os12S+abnnMRJfkGmxpDOV9Fyk5uEkj60hyJPWS8Uv/Esq4hhw1Hh/9nCpa/
+	BvFVXCKq5NTr+1+kGnGvM5WpH6IE7x8WZWJSYQ7aTb+HVP0+9T3FseYSWpXhmLR+yzcm6gD0Qgl
+	N1BoFOewJZKq+rrY=
+X-Received: by 2002:a05:6000:1841:b0:429:b525:6df5 with SMTP id ffacd0b85a97d-42e0f1fc3f8mr3305590f8f.3.1764082469383;
+        Tue, 25 Nov 2025 06:54:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF7rvJRNZU8Dcdx4PHJxDxhuM/oczmqfkFeajyK44cHiOkIrlaShhTGgJMJROx6QVQcGeq/5w==
+X-Received: by 2002:a05:6000:1841:b0:429:b525:6df5 with SMTP id ffacd0b85a97d-42e0f1fc3f8mr3305550f8f.3.1764082468871;
+        Tue, 25 Nov 2025 06:54:28 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f3635bsm35190453f8f.17.2025.11.25.06.54.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Nov 2025 06:54:28 -0800 (PST)
+Date: Tue, 25 Nov 2025 09:54:25 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v6 1/8] ptr_ring: add __ptr_ring_full_next() to
+ predict imminent fullness
+Message-ID: <20251125092904-mutt-send-email-mst@kernel.org>
+References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
+ <20251120152914.1127975-2-simon.schippers@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1806:b0:42d:8b25:47ed with SMTP id
- e9e14a558f8ab-435b8e3d9f4mr140727555ab.6.1764082404851; Tue, 25 Nov 2025
- 06:53:24 -0800 (PST)
-Date: Tue, 25 Nov 2025 06:53:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6925c2e4.a70a0220.d98e3.00ab.GAE@google.com>
-Subject: [syzbot] [net?] possible deadlock in inet_shutdown (2)
-From: syzbot <syzbot+8840610b1405ddb12baa@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251120152914.1127975-2-simon.schippers@tu-dortmund.de>
 
-Hello,
+On Thu, Nov 20, 2025 at 04:29:06PM +0100, Simon Schippers wrote:
+> Introduce the __ptr_ring_full_next() helper, which lets callers check
+> if the ptr_ring will become full after the next insertion. This is useful
+> for proactively managing capacity before the ring is actually full.
+> Callers must ensure the ring is not already full before using this
+> helper. This is because __ptr_ring_discard_one() may zero entries in
+> reverse order, the slot after the current producer position may be
+> cleared before the current one. This must be considered when using this
+> check.
+> 
+> Note: This function is especially relevant when paired with the memory
+> ordering guarantees of __ptr_ring_produce() (smp_wmb()), allowing for
+> safe producer/consumer coordination.
+> 
+> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Co-developed-by: Jon Kohler <jon@nutanix.com>
+> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> ---
+>  include/linux/ptr_ring.h | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
+> 
+> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+> index 534531807d95..da141cc8b075 100644
+> --- a/include/linux/ptr_ring.h
+> +++ b/include/linux/ptr_ring.h
+> @@ -96,6 +96,31 @@ static inline bool ptr_ring_full_bh(struct ptr_ring *r)
+>  	return ret;
+>  }
+>  
+> +/*
+> + * Checks if the ptr_ring will become full after the next insertion.
 
-syzbot found the following issue on:
+Is this for the producer or the consumer? A better name would
+reflect that.
 
-HEAD commit:    d724c6f85e80 Add linux-next specific files for 20251121
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=13977a12580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=68d11c703cf8e4a0
-dashboard link: https://syzkaller.appspot.com/bug?extid=8840610b1405ddb12baa
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+> + *
+> + * Note: Callers must ensure that the ptr_ring is not full before calling
+> + * this function,
 
-Unfortunately, I don't have any reproducer for this issue yet.
+how?
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0ccfc806f65a/disk-d724c6f8.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c2ec31ffb05e/vmlinux-d724c6f8.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c25d9c0c1917/bzImage-d724c6f8.xz
+> as __ptr_ring_discard_one invalidates entries in
+> + * reverse order. Because the next entry (rather than the current one)
+> + * may be zeroed after an insertion, failing to account for this can
+> + * cause false negatives when checking whether the ring will become full
+> + * on the next insertion.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8840610b1405ddb12baa@syzkaller.appspotmail.com
+this part confuses more than it clarifies.
 
-block nbd5: Receive control failed (result -107)
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Not tainted
-------------------------------------------------------
-kworker/u9:4/5836 is trying to acquire lock:
-ffff888054cbb560 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1693 [inline]
-ffff888054cbb560 (sk_lock-AF_INET){+.+.}-{0:0}, at: inet_shutdown+0x6a/0x390 net/ipv4/af_inet.c:928
+> + */
+> +static inline bool __ptr_ring_full_next(struct ptr_ring *r)
+> +{
+> +	int p;
+> +
+> +	if (unlikely(r->size <= 1))
+> +		return true;
+> +
+> +	p = r->producer + 1;
+> +
+> +	if (unlikely(p >= r->size))
+> +		p = 0;
+> +
+> +	return r->queue[p];
+> +}
+> +
+>  /* Note: callers invoking this in a loop must use a compiler barrier,
+>   * for example cpu_relax(). Callers must hold producer_lock.
+>   * Callers are responsible for making sure pointer that is being queued
+> -- 
+> 2.43.0
 
-but task is already holding lock:
-ffff888077f49e70 (&nsock->tx_lock){+.+.}-{4:4}, at: recv_work+0x1b71/0x1ca0 drivers/block/nbd.c:1020
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #5 (&nsock->tx_lock){+.+.}-{4:4}:
-       lock_acquire+0x117/0x350 kernel/locking/lockdep.c:5868
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x187/0x1350 kernel/locking/mutex.c:770
-       nbd_handle_cmd drivers/block/nbd.c:1143 [inline]
-       nbd_queue_rq+0x257/0xf10 drivers/block/nbd.c:1207
-       blk_mq_dispatch_rq_list+0x4c0/0x1900 block/blk-mq.c:2137
-       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
-       blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
-       __blk_mq_sched_dispatch_requests+0xdac/0x1570 block/blk-mq-sched.c:307
-       blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
-       blk_mq_run_hw_queue+0x348/0x4f0 block/blk-mq.c:2375
-       blk_mq_dispatch_list+0xd0c/0xe00 include/linux/spinlock.h:-1
-       blk_mq_flush_plug_list+0x469/0x550 block/blk-mq.c:2986
-       __blk_flush_plug+0x3d3/0x4b0 block/blk-core.c:1225
-       blk_finish_plug block/blk-core.c:1252 [inline]
-       __submit_bio+0x2d3/0x5a0 block/blk-core.c:651
-       __submit_bio_noacct_mq block/blk-core.c:724 [inline]
-       submit_bio_noacct_nocheck+0x2eb/0xa50 block/blk-core.c:755
-       submit_bh fs/buffer.c:2829 [inline]
-       block_read_full_folio+0x599/0x830 fs/buffer.c:2447
-       filemap_read_folio+0x117/0x380 mm/filemap.c:2496
-       do_read_cache_folio+0x358/0x590 mm/filemap.c:4096
-       read_mapping_folio include/linux/pagemap.h:1017 [inline]
-       read_part_sector+0xb6/0x2b0 block/partitions/core.c:722
-       adfspart_check_ICS+0xa4/0xa50 block/partitions/acorn.c:360
-       check_partition block/partitions/core.c:141 [inline]
-       blk_add_partitions block/partitions/core.c:589 [inline]
-       bdev_disk_changed+0x75f/0x14b0 block/partitions/core.c:693
-       blkdev_get_whole+0x380/0x510 block/bdev.c:765
-       bdev_open+0x31e/0xd30 block/bdev.c:974
-       blkdev_open+0x457/0x600 block/fops.c:703
-       do_dentry_open+0x7ce/0x1420 fs/open.c:962
-       vfs_open+0x3b/0x340 fs/open.c:1094
-       do_open fs/namei.c:4597 [inline]
-       path_openat+0x33ce/0x3d90 fs/namei.c:4756
-       do_filp_open+0x1fa/0x410 fs/namei.c:4783
-       do_sys_openat2+0x121/0x1c0 fs/open.c:1432
-       do_sys_open fs/open.c:1447 [inline]
-       __do_sys_openat fs/open.c:1463 [inline]
-       __se_sys_openat fs/open.c:1458 [inline]
-       __x64_sys_openat+0x138/0x170 fs/open.c:1458
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #4 (&cmd->lock){+.+.}-{4:4}:
-       lock_acquire+0x117/0x350 kernel/locking/lockdep.c:5868
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x187/0x1350 kernel/locking/mutex.c:770
-       nbd_queue_rq+0xc8/0xf10 drivers/block/nbd.c:1199
-       blk_mq_dispatch_rq_list+0x4c0/0x1900 block/blk-mq.c:2137
-       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
-       blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
-       __blk_mq_sched_dispatch_requests+0xdac/0x1570 block/blk-mq-sched.c:307
-       blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
-       blk_mq_run_hw_queue+0x348/0x4f0 block/blk-mq.c:2375
-       blk_mq_dispatch_list+0xd0c/0xe00 include/linux/spinlock.h:-1
-       blk_mq_flush_plug_list+0x469/0x550 block/blk-mq.c:2986
-       __blk_flush_plug+0x3d3/0x4b0 block/blk-core.c:1225
-       blk_finish_plug block/blk-core.c:1252 [inline]
-       __submit_bio+0x2d3/0x5a0 block/blk-core.c:651
-       __submit_bio_noacct_mq block/blk-core.c:724 [inline]
-       submit_bio_noacct_nocheck+0x2eb/0xa50 block/blk-core.c:755
-       submit_bh fs/buffer.c:2829 [inline]
-       block_read_full_folio+0x599/0x830 fs/buffer.c:2447
-       filemap_read_folio+0x117/0x380 mm/filemap.c:2496
-       do_read_cache_folio+0x358/0x590 mm/filemap.c:4096
-       read_mapping_folio include/linux/pagemap.h:1017 [inline]
-       read_part_sector+0xb6/0x2b0 block/partitions/core.c:722
-       adfspart_check_ICS+0xa4/0xa50 block/partitions/acorn.c:360
-       check_partition block/partitions/core.c:141 [inline]
-       blk_add_partitions block/partitions/core.c:589 [inline]
-       bdev_disk_changed+0x75f/0x14b0 block/partitions/core.c:693
-       blkdev_get_whole+0x380/0x510 block/bdev.c:765
-       bdev_open+0x31e/0xd30 block/bdev.c:974
-       blkdev_open+0x457/0x600 block/fops.c:703
-       do_dentry_open+0x7ce/0x1420 fs/open.c:962
-       vfs_open+0x3b/0x340 fs/open.c:1094
-       do_open fs/namei.c:4597 [inline]
-       path_openat+0x33ce/0x3d90 fs/namei.c:4756
-       do_filp_open+0x1fa/0x410 fs/namei.c:4783
-       do_sys_openat2+0x121/0x1c0 fs/open.c:1432
-       do_sys_open fs/open.c:1447 [inline]
-       __do_sys_openat fs/open.c:1463 [inline]
-       __se_sys_openat fs/open.c:1458 [inline]
-       __x64_sys_openat+0x138/0x170 fs/open.c:1458
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #3 (set->srcu){.+.?}-{0:0}:
-       lock_sync+0xba/0x160 kernel/locking/lockdep.c:5916
-       srcu_lock_sync include/linux/srcu.h:197 [inline]
-       __synchronize_srcu+0x96/0x3a0 kernel/rcu/srcutree.c:1503
-       blk_throtl_init+0x298/0x410 block/blk-throttle.c:1324
-       tg_set_conf+0x1c6/0x4b0 block/blk-throttle.c:1359
-       cgroup_file_write+0x3a1/0x740 kernel/cgroup/cgroup.c:4312
-       kernfs_fop_write_iter+0x3af/0x540 fs/kernfs/file.c:352
-       new_sync_write fs/read_write.c:593 [inline]
-       vfs_write+0x5c9/0xb30 fs/read_write.c:686
-       ksys_write+0x145/0x250 fs/read_write.c:738
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #2 (&q->q_usage_counter(io)#17){++++}-{0:0}:
-       lock_acquire+0x117/0x350 kernel/locking/lockdep.c:5868
-       blk_alloc_queue+0x538/0x620 block/blk-core.c:461
-       blk_mq_alloc_queue block/blk-mq.c:4410 [inline]
-       __blk_mq_alloc_disk+0x15c/0x340 block/blk-mq.c:4457
-       loop_add+0x411/0xad0 drivers/block/loop.c:2206
-       loop_init+0xd9/0x170 drivers/block/loop.c:2441
-       do_one_initcall+0x1fb/0x870 init/main.c:1378
-       do_initcall_level+0x104/0x190 init/main.c:1440
-       do_initcalls+0x59/0xa0 init/main.c:1456
-       kernel_init_freeable+0x334/0x4b0 init/main.c:1688
-       kernel_init+0x1d/0x1d0 init/main.c:1578
-       ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-
--> #1 (fs_reclaim){+.+.}-{0:0}:
-       lock_acquire+0x117/0x350 kernel/locking/lockdep.c:5868
-       __fs_reclaim_acquire mm/page_alloc.c:4301 [inline]
-       fs_reclaim_acquire+0x72/0x100 mm/page_alloc.c:4315
-       might_alloc include/linux/sched/mm.h:317 [inline]
-       slab_pre_alloc_hook mm/slub.c:4899 [inline]
-       slab_alloc_node mm/slub.c:5234 [inline]
-       kmem_cache_alloc_node_noprof+0x48/0x710 mm/slub.c:5310
-       __alloc_skb+0x255/0x430 net/core/skbuff.c:679
-       alloc_skb_fclone include/linux/skbuff.h:1433 [inline]
-       tcp_stream_alloc_skb+0x3d/0x350 net/ipv4/tcp.c:910
-       tcp_sendmsg_locked+0x1c6f/0x5550 net/ipv4/tcp.c:1217
-       tcp_sendmsg+0x2f/0x50 net/ipv4/tcp.c:1412
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg+0x19c/0x270 net/socket.c:746
-       sock_write_iter+0x279/0x360 net/socket.c:1199
-       new_sync_write fs/read_write.c:593 [inline]
-       vfs_write+0x5c9/0xb30 fs/read_write.c:686
-       ksys_write+0x145/0x250 fs/read_write.c:738
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (sk_lock-AF_INET){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3165 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
-       validate_chain+0xb9b/0x2130 kernel/locking/lockdep.c:3908
-       __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
-       lock_acquire+0x117/0x350 kernel/locking/lockdep.c:5868
-       lock_sock_nested+0x48/0x100 net/core/sock.c:3762
-       lock_sock include/net/sock.h:1693 [inline]
-       inet_shutdown+0x6a/0x390 net/ipv4/af_inet.c:928
-       nbd_mark_nsock_dead+0x2e9/0x560 drivers/block/nbd.c:318
-       recv_work+0x1b86/0x1ca0 drivers/block/nbd.c:1021
-       process_one_work+0x93a/0x15e0 kernel/workqueue.c:3261
-       process_scheduled_works kernel/workqueue.c:3344 [inline]
-       worker_thread+0x9b0/0xee0 kernel/workqueue.c:3425
-       kthread+0x711/0x8a0 kernel/kthread.c:463
-       ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-
-other info that might help us debug this:
-
-Chain exists of:
-  sk_lock-AF_INET --> &cmd->lock --> &nsock->tx_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&nsock->tx_lock);
-                               lock(&cmd->lock);
-                               lock(&nsock->tx_lock);
-  lock(sk_lock-AF_INET);
-
- *** DEADLOCK ***
-
-3 locks held by kworker/u9:4/5836:
- #0: ffff8881405f8148 ((wq_completion)nbd5-recv){+.+.}-{0:0}, at: process_one_work+0x841/0x15e0 kernel/workqueue.c:3236
- #1: ffffc9000417fb80 ((work_completion)(&args->work)){+.+.}-{0:0}, at: process_one_work+0x868/0x15e0 kernel/workqueue.c:3237
- #2: ffff888077f49e70 (&nsock->tx_lock){+.+.}-{4:4}, at: recv_work+0x1b71/0x1ca0 drivers/block/nbd.c:1020
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5836 Comm: kworker/u9:4 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Workqueue: nbd5-recv recv_work
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_circular_bug+0x2ee/0x310 kernel/locking/lockdep.c:2043
- check_noncircular+0x134/0x160 kernel/locking/lockdep.c:2175
- check_prev_add kernel/locking/lockdep.c:3165 [inline]
- check_prevs_add kernel/locking/lockdep.c:3284 [inline]
- validate_chain+0xb9b/0x2130 kernel/locking/lockdep.c:3908
- __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
- lock_acquire+0x117/0x350 kernel/locking/lockdep.c:5868
- lock_sock_nested+0x48/0x100 net/core/sock.c:3762
- lock_sock include/net/sock.h:1693 [inline]
- inet_shutdown+0x6a/0x390 net/ipv4/af_inet.c:928
- nbd_mark_nsock_dead+0x2e9/0x560 drivers/block/nbd.c:318
- recv_work+0x1b86/0x1ca0 drivers/block/nbd.c:1021
- process_one_work+0x93a/0x15e0 kernel/workqueue.c:3261
- process_scheduled_works kernel/workqueue.c:3344 [inline]
- worker_thread+0x9b0/0xee0 kernel/workqueue.c:3425
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-Bluetooth: hci4: command 0x0406 tx timeout
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
