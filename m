@@ -1,248 +1,268 @@
-Return-Path: <netdev+bounces-241588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F034C862CF
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:18:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 789CCC866C3
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 19:04:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EDB73AC125
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:18:28 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 600094E2B4A
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711ED329C73;
-	Tue, 25 Nov 2025 17:18:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0643329C4D;
+	Tue, 25 Nov 2025 18:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="JNY5p0/7";
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="mK/PG1DR"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LMS3VTbW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0AD277C9A;
-	Tue, 25 Nov 2025 17:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.151.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764091107; cv=fail; b=CZG0JqJ3pR/qYwpIHjFQmnNhuQolTd3W3GypErBnYafVtBY8DfNKILY9+yVt2F19GKRvrQijrxth2Fu/dyEo2zqdqgT7NZYkAEPWN1CqFK8sHVZUpITXbGlcfFhw0aehRGn3E4KuueA+qeUgw/ESV76/+g0fD6xUCpnrqZ5lI3g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764091107; c=relaxed/simple;
-	bh=qDlAsF81+OFmC935iXkr3eFVk9ci5oxGESxaDx2Bv28=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=G9ZDjjWlor5dWtDkPbYOGeORc8h6Lz2nK5hL8bDvxwg3R5UYRqJUguxDpyKrg1LtNfEDr0T8FmrzOleREWIjsDY3o12y3HLUccuLTrn2lZAzXmr9ga/E15JTjWR+Uy2DqtrMZQ+stA0Fihl27wmInSzkT0VfBS3lB3/0z7vDeWU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=JNY5p0/7; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=mK/PG1DR; arc=fail smtp.client-ip=148.163.151.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
-Received: from pps.filterd (m0127837.ppops.net [127.0.0.1])
-	by mx0a-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5APGKcqj2184024;
-	Tue, 25 Nov 2025 09:18:19 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=proofpoint20171006; bh=y3JXyEb9emgzo
-	GZOWW/swByJPtgIsblLqFLtLUepdLA=; b=JNY5p0/7I5CLPuLc1itusP07PQ2er
-	agifZ6H+HnAfqQn/RrUbynECPNfT+xuCijcAH7zwV0MC5a7IHcGazqs3xaVB/sXi
-	VreaPm9aWopZecTWuIyEhCN51V6YQ2yMtM+5wy/mDq2co4HjEYSWe17S9BNmT7fS
-	PEI0J5/zr2YscC7XRa46x5nV7Mk2Y45Z5G/96GjwMBWCStBhI+oiziFve5rKF4RC
-	kJIZmB6Dr4yILHmhtpfx9QYaT8omqXZqzrsGi65qNsAOmHLXhDfvP7POQR1ZWuHw
-	VeEfOHkk+Y8vk5DkXGlTDQTpgZJQ4Ga2ELJcXdwx94HwUgGv0k/8hud8w==
-Received: from ch4pr04cu002.outbound.protection.outlook.com (mail-northcentralusazon11023115.outbound.protection.outlook.com [40.107.201.115])
-	by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 4anfw404hn-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 25 Nov 2025 09:18:19 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ShT7k0ccfRRZk0zEF6AWQdWWu/wqBC0EZ3FZtyBDrZw6JpkuwBG4wA4UaDgWkbuDyuXrSa70ydSfTWJsyeImIMpd/4rxubqI21gqgqfQg6ySV5EtrFrmSNFB0vZp4SHvYVXx8ARVEBEMvXavtZq4OI1toLzfkWNnij5p4B7yE9ftvIDAQa0Yo0k5cnAFbdtndJqZ4pyMT1fz9Lmas4Hpn85pq1B6RCA6Q5r15ncIva1l3zncuyYHBygKgPWV73YqDyp/WrOuIhVn6GNRca8vMtwmM80XzWhi3l0zHLGJS5pxLacVEyef+DWYZ5AgbPWfQTz96Gx3NdEMq6WV1NO7LA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=y3JXyEb9emgzoGZOWW/swByJPtgIsblLqFLtLUepdLA=;
- b=CfWSfCPMd0phpJrjysgC1nmeE4Y3gseGf7G98m/AygdWFrV/w24F9J4eTdHXqI+Oz8Zn/wZaJAeD86nNFoBGDtcpCgAC5c0aY9+qZwMGbw7keNmWGO/VQdL1WZcWRbog+/Dm+jfDPfIJLskYJwNf4oVV0ffOlIow/lQZqglKM1x0vGI3IcQJLpoblXpELsEkMg2pQCkyURvaFXwOElYf/2G1aEl+UsTp2e9tdA8alF4/62AejhQ6Qpf1Fe4cfn88y9Myc3zfWt3wM+jqVpvDlCyWppGMA+EkJFGiyY/BIr8ufevk/evRRBWw3bAnUH378EXRs6jJCRw63XYJwFkxUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y3JXyEb9emgzoGZOWW/swByJPtgIsblLqFLtLUepdLA=;
- b=mK/PG1DRd7C8t2mHHJUCcCFBXezoAa/0KM3rukji6wp2hxSuBSLOFOG3NDVkahN1b9aq4Dovb3o1pk8l9nrIYDA9HUm5KlII8mO5uX2pWPuVz1Sd81gY3XhOSnheCMf0yUwHDDTCNJStUJQv5DwqfNizPAD1B1fK0z1V6P4hIzfjrH6NT/RutSerTZmzNTdRF+qvZjT/j4PHJpSzHh9Bz9veM9V+iXz6VqcwEBJIj2osZzrTyE2xRpSp/TmM23xagfhsR9mLWVAZwj+rf/uhvkValO985KV/1PM4b2lYJAz44y3QfzSSQHyxkgFoSCfALphsSHUnFLwZTVpQGepZfQ==
-Received: from LV0PR02MB11133.namprd02.prod.outlook.com
- (2603:10b6:408:333::18) by SJ2PR02MB9365.namprd02.prod.outlook.com
- (2603:10b6:a03:4c0::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.17; Tue, 25 Nov
- 2025 17:18:15 +0000
-Received: from LV0PR02MB11133.namprd02.prod.outlook.com
- ([fe80::10e5:8031:1b1b:b2dc]) by LV0PR02MB11133.namprd02.prod.outlook.com
- ([fe80::10e5:8031:1b1b:b2dc%4]) with mapi id 15.20.9343.016; Tue, 25 Nov 2025
- 17:18:15 +0000
-From: Jon Kohler <jon@nutanix.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux.dev,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Jon Kohler <jon@nutanix.com>
-Subject: [PATCH net-next] vhost/net: check peek_head_len after signal to guest to avoid delays
-Date: Tue, 25 Nov 2025 11:00:33 -0700
-Message-ID: <20251125180034.1167847-1-jon@nutanix.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: PH8PR21CA0003.namprd21.prod.outlook.com
- (2603:10b6:510:2ce::14) To LV0PR02MB11133.namprd02.prod.outlook.com
- (2603:10b6:408:333::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AB0279918
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 18:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764093853; cv=none; b=FLho2JXZu00tyzY+KbMBXiNhzKel0ezFjO84DyJNmg1m6WDkcXmULpAngCqiF5qHjqcveGOeMJ+pr66Xr/uS6KK6C7s/2bGKa+OEnHJm4hqudvLF5C05/J++Mmx1qxa4GgiHPcVoG2UqxbZUVkGQhrRe7aYQytbOPvXnoAHhiLI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764093853; c=relaxed/simple;
+	bh=MAN1Je7TPaDMLRdBr0droWaKityTEcsy8RZZnZZc6no=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=NvCvdPAoRSGoDGmKQxxFGci9fup7njHNJUVyFSkICrxrOkJ5q99Dp9XkEWbWEM3fu1k4y4T8S2xM9sz8LksEkHN6rOlHU7d92RdaeRv+mOm+VwuYGGDPtGAfGtPG3M/fMFuXi+yXoa29iWmk72FFpfqtYG0vMzVFI4wJNUvPnK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LMS3VTbW; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 2D6F61A1D40;
+	Tue, 25 Nov 2025 18:04:08 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id EDDBE606A1;
+	Tue, 25 Nov 2025 18:04:07 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EDE09102F08A7;
+	Tue, 25 Nov 2025 19:03:58 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1764093846; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=dBBoz5z3l2BX+xX1UKTnTROr59ODxTu+uvr5PipWPkQ=;
+	b=LMS3VTbWslcD43lTwSyPemQzLhiEJ/0B+aQ8RYT7v2Eg7rvTdwgwlR7Eamh6nmajlk7sz+
+	W5gs66uK1UxLbzLD9igYvxLWBDQI9xC4Qg1ADUmJMKTWXVIlAkoybmFmF3bGLQmuvoH3/z
+	KZPDgsRup1QcH0cCxnIJFeMPB4jTgRpayW6yT9Ygoj6DVvGTT10Ek/hqcA+eQZkFq4SqZb
+	Dm4SIhvTH+wJbADNJMPGT/vPza7LPFZU8qcFdSOj1Cex94lkJ9808RJ5g2WlkGiFrXMIgk
+	2Fxi7WGo06gvCq/VP14pI1WDdjNvBIRuS71jygVDaAuqezW/2GLfBXChQWr44A==
+Message-ID: <bd6b9659-8721-43d0-be60-12af0342b500@bootlin.com>
+Date: Tue, 25 Nov 2025 19:03:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV0PR02MB11133:EE_|SJ2PR02MB9365:EE_
-X-MS-Office365-Filtering-Correlation-Id: d2928c52-05dd-41cc-d9a1-08de2c469ebb
-x-proofpoint-crosstenant: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|376014|1800799024|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?liqww2g6m4/4fUTLP1W/m0HpYG0G0gRORM9xiQFTS0+eQhoh0/IINGdU03pS?=
- =?us-ascii?Q?yg08WQaxUUtyQn7QCaGCqToUZGh9r283avGYjA8RocN+e/LA8exlKXIqyIH7?=
- =?us-ascii?Q?zb+h0ROImo6o7X7KUFNxIYTAg2lJ0MVXVujk9gGzNqu3GYYRgeTLxz6h7s0a?=
- =?us-ascii?Q?Mx7J+0vfiQPGyIR1cIVA16taGtANiotgCGHKH9HDeqPqE59wPAPF5uU5enov?=
- =?us-ascii?Q?zSsbEkMh7vH6ym4nqOdLwZl5VWLjg97e1PRO5x5KTZ+L62FGSNlbexlW/zA4?=
- =?us-ascii?Q?ADPa112SAKYgaCNVbnXb19pUo3P/XdzwWBG9V8SIeVMA1ru2uJKfI1no1TaI?=
- =?us-ascii?Q?cc1HwfXNdWbo1ohsVK5kYFponRpJjLkl4kXMFiryFg1GaNeUyHaLl4uDHgx2?=
- =?us-ascii?Q?nnQSYcFEU7SIxp6LkwSIifHvaaVKbr0FzSh1WW/6L15km3GWk8NbskRrng1d?=
- =?us-ascii?Q?a3xsklkdBcSDkUE/5clYNxZXUvT1EmGxJB4AXBB0BT1igBKrCyRa+P3BZbDy?=
- =?us-ascii?Q?+sH2DDyM4fW7yhKpjUUXvanrzLEwPHpwebEWOj6Infw8nQPN+CfC+2T8ZRQx?=
- =?us-ascii?Q?qcfUgKWvJt4Pe+AJUsADewvJ48O+5M8F6BE3SSSHldo5bacDUpXY7saecnGX?=
- =?us-ascii?Q?px18nxV/49qRtPCFuVMxjUJdZTEMJ+UYcd0YsEuQ1E1XBa2CbX6qlee9lekY?=
- =?us-ascii?Q?nuAR9auPp1bNdEVfqAzMgTDVOMOWUHC+veVleu4fhWNM4CtBsdb/AWm1ibE/?=
- =?us-ascii?Q?gGkCSxy7XNKp1J8qbLCBJwEbps8K30YSnIN9vl5vduJkwj8Itk6Hgfj4a/OX?=
- =?us-ascii?Q?gEwMUyhfZYZx7yu2kL22eyXRIicZhGx0fA3DrEy672ox1r/MZc+7+vDM7HWw?=
- =?us-ascii?Q?haaOVuROCAtTrZlTXMD3LzSUtW2kxvpYz1WEf+YKTLwASapc0/d6eQKXxzks?=
- =?us-ascii?Q?IbcX5MS2UeCyqRj9/kFIwjlfqqjZUOWkPQ9TMuPmu5F3b1Jld8yGDF40lPJ6?=
- =?us-ascii?Q?AvHrtDwzkz09qqfWpel3Klh/V6lUP7rsD1zvVC7BSbQbPuGD1StaFuutO26S?=
- =?us-ascii?Q?p0K4MsXnqIDVfD6zENdSGFCnbB6R+JllDoMlT8cZNQLeb7DHYPv1Fj++/nUl?=
- =?us-ascii?Q?ACs2QuZldYjRuY0sEoKVOryeGSLTuhJQTBN5qk+DIi6Ebh2ccQO2tEqh9WWI?=
- =?us-ascii?Q?WJhAZx5gf2F1usydNitAVDliclAueINJ7NQCvQxxZduYCmVN+hfg2uIUt5ro?=
- =?us-ascii?Q?4srCxLOv8iUwEytdUzHU1KDl0RzJ/Ph68R47ja8PY4dhaMb9oSw74/sKpxYX?=
- =?us-ascii?Q?H5iFAlY/JZKeZOjOJWBQtvrN/LHWX8yA33gXMwAzXI5oDZuhLWLHKm8p7o8M?=
- =?us-ascii?Q?t7t6ZlbZXY8pFiv5D3VjCvwoSBZ8zJ7likUz8jzhxayCcgnhNjcHEI24hfLI?=
- =?us-ascii?Q?oChBUFq83YTX5zdTW0Vyw6iKfeuxfBQlirZYVMZ7Xpy4lBC8qZ0OxVWI1Xse?=
- =?us-ascii?Q?JsW5opVogMo6OsvO8h7fs/YY0ZwoMhLX2nZH?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV0PR02MB11133.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?eqzTSaDLKizweBwhWm7qAuj5OjqoNVShe4jySDdL+0TSu0jEYpHKI/zZYflG?=
- =?us-ascii?Q?vxh0fDBLgAqOvj9Aw10oh/UTV3ainAMhuYOEa4QAuU9ZR22SSCuzVjcxmwgR?=
- =?us-ascii?Q?D5OUAYxb3yW2Ij2y2eDHvxa4t2aBfBF1sQeb3ZvWw3MTfTYD9WlER939TWKZ?=
- =?us-ascii?Q?EUrZnH2q/fFva22L7DgYqOOvzf0Ue8DtlV/IfKlYYuUvgnJVk/802gDT413t?=
- =?us-ascii?Q?VQFQ0YKO4SOnL/pfZVTd/0YA4jUYCvjueY5KX+sxJ7POX2rrAi0J+z17jQj3?=
- =?us-ascii?Q?Xpb9qbKMgsWW6CJyOjS8C2Hhg/kLFDGu1hLjdkoMdZmpMwg1ZXy62lNnt6Qh?=
- =?us-ascii?Q?eJXemmGRWi588ymnrC6v76mUnv50T7v+n1td9eVY+UzFOQDeKIKAjmoqYfPq?=
- =?us-ascii?Q?WXlYpEuJXh6ZqMY2GbQXXM5NdvszVFlLwLv1j21wagtbrlabt6sEg2wr0UQw?=
- =?us-ascii?Q?TO3tQdY+mKEStd8VUqTV2eu6BvExJ0zbrH4HMZ83voswBZwjFH6NnK6pOd/F?=
- =?us-ascii?Q?zups3l8zQg0q8urrhkV/cNPjs7RiSxhNhIjQyPpkNXjM7G4WTQmedkhsmyRy?=
- =?us-ascii?Q?FQsdt6zbii3e9LOX7XhcaVbtV/E9EVgw7gpqVure7oQGnLnPk4zUA4Sw6A6M?=
- =?us-ascii?Q?Q8io2FgPfN4gf2aXfbM2dzRJ6Z0Zvm85CrnBH5Px6kP2vw1lDJAhWuEeUm19?=
- =?us-ascii?Q?STAd9WFeYfp//mjx0l6uljyo3e3mwH0XIqsl9LVWMpjeiaoAuCDSNPtgrdCA?=
- =?us-ascii?Q?1a4DK6EqPEpRQ6BJjvpOK9hormMRna9nl+nhqNOcKlijJzLfCLAzzC+U1QsD?=
- =?us-ascii?Q?y0icAsi+Le3JUymSF24afTQl479i0OmgqqdCIQ+Gn2LcL/USTK1Cy8SuXV1A?=
- =?us-ascii?Q?dlCjUWAObzSJnXJYEO+fFf3At+TU0Co81LkayCvjDFYhpiSReGyXRmr8XvH3?=
- =?us-ascii?Q?bTDOk63wtbLTyIzNIqwzarFswmmysdbrflNCVLTM84LvEAf85DhZDOoY8wdw?=
- =?us-ascii?Q?gctWZl7lc2GLRe8rx0d+39ytHyJ7wGwgXjKWn2V8fiRd4K+WKV/etEtWpzdV?=
- =?us-ascii?Q?VjFOH0bqWHt+eZvDC6cIl8MnKCL34FlcjNW04QruMS4O0/vOwdR7u37X9tBZ?=
- =?us-ascii?Q?8V6U+wXY+hD1A8JCq/eMA0gOK80dlitmBSH+e4geecu+rbpWpdk4+fyfTzyj?=
- =?us-ascii?Q?w3hS2Ui7+riSSp99KA/NT9PCp7bhmTvU8RkLIlAobt7EbOpsFgUVs4ClUgrz?=
- =?us-ascii?Q?zO2dKPgEpcLxRLq0VeHqc3gAeXUPVCv08SbczltZHy9NWssKmGu1ZgsGm0Ri?=
- =?us-ascii?Q?EA432Sl1cSr1iu5UcLJc8K+chG5E0iy3vF02lj3NVmXl1kAvNpmBpxBeMcz0?=
- =?us-ascii?Q?snVpbA3FvPunIQrE1OwPXLPOXrsFW/+y72LUGd0vebLb/OuDS0k7flt3qqUv?=
- =?us-ascii?Q?jrTZR1ju4kXPODYk6zzG4R0IR0DrMLEKly1LmomMqOr7/lkldAaSlIiI/AG5?=
- =?us-ascii?Q?OPL+i6Tb2uCtYJ4BTAWPaOljrcvBdGswJeWgsv21bOT3Kq3GmSmXGcRBHpPR?=
- =?us-ascii?Q?NWTUJw9tn3/YKfNBZEtJPI1w5KKxITYxDYB+3L7oC1qzQs+JizKx/0gyuKa6?=
- =?us-ascii?Q?WA=3D=3D?=
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d2928c52-05dd-41cc-d9a1-08de2c469ebb
-X-MS-Exchange-CrossTenant-AuthSource: LV0PR02MB11133.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2025 17:18:15.6302
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8m7Cqyced69z6mSKVMErF6db8iomaw+5Fk5HqsxFH3JpRumOVO11ChZPtApiTU8RXa+jMZEFm7RZ+J2hyV66077kX1I5E7FEStmBs4KLOAA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR02MB9365
-X-Proofpoint-GUID: WNX5CWbPhmK9qVxYwpqd_LF0Q-lltc_m
-X-Authority-Analysis: v=2.4 cv=NfzrFmD4 c=1 sm=1 tr=0 ts=6925e4db cx=c_pps
- a=8YD3JtO18OBpAIphJ6JiAg==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
- a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
- a=xqWC_Br6kY4A:10 a=6UeiqGixMTsA:10 a=0kUYKlekyDsA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=64Cc0HZtAAAA:8 a=NxMCxB6-z5oOyHCSQ6cA:9
-X-Proofpoint-ORIG-GUID: WNX5CWbPhmK9qVxYwpqd_LF0Q-lltc_m
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI1MDE0NCBTYWx0ZWRfX6vwQBhyns0wS
- /NFg6leFKyuHgndVr3GjP21o3iDjhDGV+uhzDQN1RVCD79SbghlbhuQuWqiBcqA6VWl3XV72atl
- dnHGEW6T2MsLfejRPRniph8o6KSXVI8/IYClk74r+/Zj8rQPXW9lFFQ1+mtSZjkTnjmCc54B1s7
- XZWk6onTA2iErYsK6ZnaCw64p+P1g7AMj7ATPKlM3ceSMAxGs5cz2zHkpE9Q08xTMb4ABBJHDYc
- yKxCJED4LSODrSyg1sPxVKabw8WWuI2wks1JeenNh6kd2f9jRQY3DZlgq0SJ2Zt0sa+ZJVHBKIW
- 5c3Pv3Tgsb7SkQLLbi0W50I1fSHJWoRAEYQuwlYNGMjYaCR80+lKbRN82BcsCUUvptj4OSCcQan
- OKrboyev4t4Ml5pmehk2T4KOBKXT9g==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-25_02,2025-11-25_01,2025-10-01_01
-X-Proofpoint-Spam-Reason: safe
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: stmmac: dwmac: Disable flushing frames on
+ Rx Buffer Unavailable
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: rohan.g.thomas@altera.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Matthew Gerlach <matthew.gerlach@altera.com>
+References: <20251126-a10_ext_fix-v1-1-d163507f646f@altera.com>
+ <58ec46bb-5850-4dde-a1ea-d242f7d95409@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <58ec46bb-5850-4dde-a1ea-d242f7d95409@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-In non-busypoll handle_rx paths, if peek_head_len returns 0, the RX
-loop breaks, the RX wait queue is re-enabled, and vhost_net_signal_used
-is called to flush done_idx and notify the guest if needed.
 
-However, signaling the guest can take non-trivial time. During this
-window, additional RX payloads may arrive on rx_ring without further
-kicks. These new payloads will sit unprocessed until another kick
-arrives, increasing latency. In high-rate UDP RX workloads, this was
-observed to occur over 20k times per second.
 
-To minimize this window and improve opportunities to process packets
-promptly, immediately call peek_head_len after signaling. If new packets
-are found, treat it as a busy poll interrupt and requeue handle_rx,
-improving fairness to TX handlers and other pending CPU work. This also
-helps suppress unnecessary thread wakeups, reducing waker CPU demand.
+On 25/11/2025 18:15, Maxime Chevallier wrote:
+> Hi Rohan,
+> 
+> On 25/11/2025 17:37, Rohan G Thomas via B4 Relay wrote:
+>> From: Rohan G Thomas <rohan.g.thomas@altera.com>
+>>
+>> In Store and Forward mode, flushing frames when the receive buffer is
+>> unavailable, can cause the MTL Rx FIFO to go out of sync. This results
+>> in buffering of a few frames in the FIFO without triggering Rx DMA
+>> from transferring the data to the system memory until another packet
+>> is received. Once the issue happens, for a ping request, the packet is
+>> forwarded to the system memory only after we receive another packet
+>> and hece we observe a latency equivalent to the ping interval.
+>>
+>> 64 bytes from 192.168.2.100: seq=1 ttl=64 time=1000.344 ms
+>>
+>> Also, we can observe constant gmacgrp_debug register value of
+>> 0x00000120, which indicates "Reading frame data".
+>>
+>> The issue is not reproducible after disabling frame flushing when Rx
+>> buffer is unavailable. But in that case, the Rx DMA enters a suspend
+>> state due to buffer unavailability. To resume operation, software
+>> must write to the receive_poll_demand register after adding new
+>> descriptors, which reactivates the Rx DMA.
+>>
+>> This issue is observed in the socfpga platforms which has dwmac1000 IP
+>> like Arria 10, Cyclone V and Agilex 7. Issue is reproducible after
+>> running iperf3 server at the DUT for UDP lower packet sizes.
+>>
+>> Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+>> Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
+> 
+> Should this be a fix ?
+> 
+> Can you elaborate on how to reproduce this ? I've given this a try on
+> CycloneV and I can't see any difference in the ping results and iperf3
+> results.
+> 
+> From the DUT, I've tried :
+>  - iperf3 -c 192.168.X.X -u -b 0 -l 64
+>  - iperf3 -c 192.168.X.X -u -b 0 -l 64 -R
 
-Signed-off-by: Jon Kohler <jon@nutanix.com>
----
- drivers/vhost/net.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+Ah ! my iperf3 peer wasn't sending packets hard enough. I switched to a
+more powerful LP and I can now see the huge latencies by doing :
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 35ded4330431..04cb5f1dc6e4 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1015,6 +1015,27 @@ static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
- 	struct vhost_virtqueue *tvq = &tnvq->vq;
- 	int len = peek_head_len(rnvq, sk);
- 
-+	if (!len && rnvq->done_idx) {
-+		/* When idle, flush signal first, which can take some
-+		 * time for ring management and guest notification.
-+		 * Afterwards, check one last time for work, as the ring
-+		 * may have received new work during the notification
-+		 * window.
-+		 */
-+		vhost_net_signal_used(rnvq, *count);
-+		*count = 0;
-+		if (peek_head_len(rnvq, sk)) {
-+			/* More work came in during the notification
-+			 * window. To be fair to the TX handler and other
-+			 * potentially pending work items, pretend like
-+			 * this was a busy poll interruption so that
-+			 * the RX handler will be rescheduled and try
-+			 * again.
-+			 */
-+			*busyloop_intr = true;
-+		}
-+	}
-+
- 	if (!len && rvq->busyloop_timeout) {
- 		/* Flush batched heads first */
- 		vhost_net_signal_used(rnvq, *count);
--- 
-2.43.0
+1 - ping the CycloneV from test machine :
+
+PING 192.168.2.41 (192.168.2.41) 56(84) bytes of data.
+64 bytes from 192.168.2.41: icmp_seq=1 ttl=64 time=0.387 ms
+64 bytes from 192.168.2.41: icmp_seq=2 ttl=64 time=0.196 ms
+64 bytes from 192.168.2.41: icmp_seq=3 ttl=64 time=0.193 ms
+64 bytes from 192.168.2.41: icmp_seq=4 ttl=64 time=0.207 ms
+
+2 - on cycloneV, Run iperf3 -c 192.168.X.X -u -b 0 -l 64 -R
+
+3 - Re-ping :
+
+PING 192.168.2.41 (192.168.2.41) 56(84) bytes of data.
+64 bytes from 192.168.2.41: icmp_seq=1 ttl=64 time=1022 ms
+64 bytes from 192.168.2.41: icmp_seq=2 ttl=64 time=1024 ms
+64 bytes from 192.168.2.41: icmp_seq=3 ttl=64 time=1024 ms
+
+
+This behaviour disapears after your patch :)
+
+Maxime
+
+
+>  - iperf3 -c 192.168.X.X
+>  - iperf3 -c 192.168.X.X -R
+> 
+> I'm reading the same results with and without the patch
+> 
+> I've done ping tests as well, the latency seems to be the same with and
+> without this patch, at around 0.193ms RTT.
+> 
+> I'm not familiar with the SF_DMA_MODE though, any thing special to do to
+> enter that mode ?
+> 
+> Thanks,
+> 
+> Maxime
+> 
+>> ---
+>>  drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c | 5 +++--
+>>  drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h     | 1 +
+>>  drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c     | 5 +++++
+>>  drivers/net/ethernet/stmicro/stmmac/hwif.h          | 3 +++
+>>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   | 2 ++
+>>  5 files changed, 14 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+>> index 6d9b8fac3c6d0fd76733ab4a1a8cce2420fa40b4..5877fec9f6c30ed18cdcf5398816e444e0bd0091 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+>> @@ -135,10 +135,10 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
+>>  
+>>  	if (mode == SF_DMA_MODE) {
+>>  		pr_debug("GMAC: enable RX store and forward mode\n");
+>> -		csr6 |= DMA_CONTROL_RSF;
+>> +		csr6 |= DMA_CONTROL_RSF | DMA_CONTROL_DFF;
+>>  	} else {
+>>  		pr_debug("GMAC: disable RX SF mode (threshold %d)\n", mode);
+>> -		csr6 &= ~DMA_CONTROL_RSF;
+>> +		csr6 &= ~(DMA_CONTROL_RSF | DMA_CONTROL_DFF);
+>>  		csr6 &= DMA_CONTROL_TC_RX_MASK;
+>>  		if (mode <= 32)
+>>  			csr6 |= DMA_CONTROL_RTC_32;
+>> @@ -262,6 +262,7 @@ const struct stmmac_dma_ops dwmac1000_dma_ops = {
+>>  	.dma_rx_mode = dwmac1000_dma_operation_mode_rx,
+>>  	.dma_tx_mode = dwmac1000_dma_operation_mode_tx,
+>>  	.enable_dma_transmission = dwmac_enable_dma_transmission,
+>> +	.enable_dma_reception = dwmac_enable_dma_reception,
+>>  	.enable_dma_irq = dwmac_enable_dma_irq,
+>>  	.disable_dma_irq = dwmac_disable_dma_irq,
+>>  	.start_tx = dwmac_dma_start_tx,
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+>> index d1c149f7a3dd9e472b237101666e11878707f0f2..054ecb20ce3f68bce5da3efaf36acf33e430d3f0 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+>> @@ -169,6 +169,7 @@ static inline u32 dma_chan_base_addr(u32 base, u32 chan)
+>>  #define NUM_DWMAC4_DMA_REGS	27
+>>  
+>>  void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan);
+>> +void dwmac_enable_dma_reception(void __iomem *ioaddr, u32 chan);
+>>  void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+>>  			  u32 chan, bool rx, bool tx);
+>>  void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+>> index 467f1a05747ecf0be5b9f3392cd3d2049d676c21..97a803d68e3a2f120beaa7c3254748cf404236df 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+>> @@ -33,6 +33,11 @@ void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
+>>  	writel(1, ioaddr + DMA_CHAN_XMT_POLL_DEMAND(chan));
+>>  }
+>>  
+>> +void dwmac_enable_dma_reception(void __iomem *ioaddr, u32 chan)
+>> +{
+>> +	writel(1, ioaddr + DMA_CHAN_RCV_POLL_DEMAND(chan));
+>> +}
+>> +
+>>  void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+>>  			  u32 chan, bool rx, bool tx)
+>>  {
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+>> index f257ce4b6c66e0bbd3180d54ac7f5be934153a6b..df6e8a567b1f646f83effbb38d8e53441a6f6150 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+>> @@ -201,6 +201,7 @@ struct stmmac_dma_ops {
+>>  	void (*dma_diagnostic_fr)(struct stmmac_extra_stats *x,
+>>  				  void __iomem *ioaddr);
+>>  	void (*enable_dma_transmission)(void __iomem *ioaddr, u32 chan);
+>> +	void (*enable_dma_reception)(void __iomem *ioaddr, u32 chan);
+>>  	void (*enable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
+>>  			       u32 chan, bool rx, bool tx);
+>>  	void (*disable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
+>> @@ -261,6 +262,8 @@ struct stmmac_dma_ops {
+>>  	stmmac_do_void_callback(__priv, dma, dma_diagnostic_fr, __args)
+>>  #define stmmac_enable_dma_transmission(__priv, __args...) \
+>>  	stmmac_do_void_callback(__priv, dma, enable_dma_transmission, __args)
+>> +#define stmmac_enable_dma_reception(__priv, __args...) \
+>> +	stmmac_do_void_callback(__priv, dma, enable_dma_reception, __args)
+>>  #define stmmac_enable_dma_irq(__priv, __args...) \
+>>  	stmmac_do_void_callback(__priv, dma, enable_dma_irq, __priv, __args)
+>>  #define stmmac_disable_dma_irq(__priv, __args...) \
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> index 6cacedb2c9b3fefdd4c9ec8ba98d389443d21ebd..1ecca60baf74286da7f156b4c3c835b3cbabf1ba 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> @@ -4973,6 +4973,8 @@ static inline void stmmac_rx_refill(struct stmmac_priv *priv, u32 queue)
+>>  	rx_q->rx_tail_addr = rx_q->dma_rx_phy +
+>>  			    (rx_q->dirty_rx * sizeof(struct dma_desc));
+>>  	stmmac_set_rx_tail_ptr(priv, priv->ioaddr, rx_q->rx_tail_addr, queue);
+>> +	/* Wake up Rx DMA from the suspend state if required */
+>> +	stmmac_enable_dma_reception(priv, priv->ioaddr, queue);
+>>  }
+>>  
+>>  static unsigned int stmmac_rx_buf1_len(struct stmmac_priv *priv,
+>>
+>> ---
+>> base-commit: e3daf0e7fe9758613bec324fd606ed9caa187f74
+>> change-id: 20251125-a10_ext_fix-5951805b9906
+>>
+>> Best regards,
+> 
+> 
 
 
