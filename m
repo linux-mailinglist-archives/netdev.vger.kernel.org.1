@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-241428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03653C83CC4
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 08:53:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68B2DC83CD3
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 08:54:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5C69B34C424
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 07:52:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A1BC3B0434
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 07:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB00B2DC32A;
-	Tue, 25 Nov 2025 07:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF04B2DE6EF;
+	Tue, 25 Nov 2025 07:52:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EHALn+Bb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KvcvSCk5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0C72D97B8
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 07:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CEF02D9EF4
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 07:52:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764057131; cv=none; b=DxhrrscAyL11wqGA3+eu0YEZexUhp4k+HmkzippHJRdxwF5J1LxpZBKzNNMmwQXj6vQxVey81hz/vBR2NsJWPjy2v9bbOe2FsTfY0OGSuq7aP2DmjfmtA521NCRLWHh/BcdagqyrcvhngK5oIej3ycD9n3Wp7lD1OE7fU6NXBco=
+	t=1764057133; cv=none; b=G/7Gxi5/p+nM8MWs3ISczsI55jDHh72G8hzsDJ3nZOkH+bVGI7m3sQT3l69QzzRayg0gJRdLTk3mRhKcdSTxVUsTt9ryloCm0pg6NGRkqESkMagDO7G3AwPwZrhzACi9i7IRkjv5oiyMhYR/PTRcC0N2WJjHbLgC7OEdUx0nFvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764057131; c=relaxed/simple;
-	bh=Nvfu7MM5pHEDLKIO/mlFFCj+GO54Sm9aobXGKhtPtE8=;
+	s=arc-20240116; t=1764057133; c=relaxed/simple;
+	bh=q1IKP+j9PFBXI9VECNtuhPrYa6qPbjLTzChyrHb6Ui0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ac4w/Vx78pRSSAM/LSUf/9kpx0fDkKW4aYZROfVFPnVMnpwuvEHSzCeEwZm57BtbBf6NIyU39/urndwrcOZ4IdcRqNpnXfsEV6uMXbi4owbN9d/Rtw/9Cu370ukwpl0NyMaOEBP+Bb+9rCVMykgokyQQLAOKE7OSmXD5W0/r7WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EHALn+Bb; arc=none smtp.client-ip=209.85.208.52
+	 MIME-Version; b=j1CfNMSw+OObSZNqxsd0e6T1xVCkmC1x8vnkLZdh6OXiI4XN/2sb0E8kB9KHaqh8l83FeTMtq+UIK56Rgz/9vOrNZVLfCw5tx8RrU0bBvTHEDq1MS50fdyq2gysrd/TvCcfqYtmbmawuejUUWEKbeb8AMkfQ6/ZWHpdJ7VJAWug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KvcvSCk5; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-640860f97b5so7237981a12.2
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 23:52:09 -0800 (PST)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-640aaa89697so7174531a12.3
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 23:52:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764057128; x=1764661928; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764057129; x=1764661929; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+cLF6OW+2TrUATylsfca7SRjZ4XkxUire7MR3XBf0nc=;
-        b=EHALn+BbgPfKg8yjgyzLBLA7SfWKDsd+nm6mfuldWcgYSaZ11kO+Q6iiA24vYBh5eH
-         ol+qcwlPlQP0lduPceSrkl3e1rvglZ+LvPknuv39Pc23an2e0TZjDnhktWVn8nT94B3k
-         xROqQnYp8FtHO8OPPTD8gC8psV0JJQRqRbutlhI3pwMNTUJ+VVw3U28nbZN23mHcl4vt
-         JWrHT8V3++qHk7Su8JLxe18CP0jAdpnq48Ned9XW3Pz5/safCnNARuDI6bT+SOkWHLdD
-         SGuaZbJi/KjOjHdG6jXFPP8spd5uoX9HtqLT0P+5COn+tYsAuV4oKoXowVBFkIo8Hm/Q
-         depA==
+        bh=0V+iOBjztOFiOh8XvFtucaeDeOd2zLS6YUjWGQu28Ko=;
+        b=KvcvSCk58BkXcnjQeIhGGClq3+qDZS94+R/LL128FtdGmb0Zavs7Dj5pip5jLzGEgf
+         huNDNLCbWfFmyKg4PQujH2l1wSfUoeWe1q46lN2oqTBfFO/Ibrbpk0+LGlZkcOI9uWto
+         8LKBeMgFEvvGohslgLzCJYgQTV6pMwf5A8OSTA0a4yjKNqjAdlje3uBTHDKz0cxNRreb
+         njm1s25/bRssJRVl/3v7wvxgjyyYc5lX1OVHYFMsfeQKzNGUgCM0lmUFeMeiHZFBiqAD
+         H6OBh89larz/Oau4QqDjo1mjro1OU6nxfzVdtSLAsmEdAY7D3tH8RmI/GWdiNSkt7lbX
+         hJBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764057128; x=1764661928;
+        d=1e100.net; s=20230601; t=1764057129; x=1764661929;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=+cLF6OW+2TrUATylsfca7SRjZ4XkxUire7MR3XBf0nc=;
-        b=uLVldJs4AYQsy8TetjNenY+f2rZkcChfn3aES7F0Sup05JfFTZ6qKFDcep/KJgCPDK
-         YYMmsPdOCb5EifixRd1047nFNikgYa049lz5pI61hkxDIVTlQCH8PZN9T4XZSFs+za+A
-         hRz8nfEY3Skg4JQpEA2mWFkvUpcfv4kpbMnQzPI8E47mlKVh+Ow/k4K6xKdgthLvPrB2
-         nXt7WaRLG3AGmfzMdweJl/cOIwC1TCfyz52danZT2Aw5WjjQqCXoZODE32t+OY+pbwjX
-         SW5fImF7RURUHdncrg8QnBh9CA+6rBF6dAcUKNiNxJJaqy69bZ0xkoS8XL/Sc8JKjLOw
-         OmcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXmZi8SmTaGFx7C8al4sgB1dmYhwQuNnL1ex9C5+/EvMfO1iw9ZYWZYYCEkHGjNOmGzKb3gSpU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDy9h49QrXsJh23jRwOjSAviXzAyq+Wr7rjuVCqZbXWC6NvINl
-	Cdn0KCn54qXuxATH7PHwjWfg+E7I/lri9fp9AER2Fr63KHJ0MLXrzsuY
-X-Gm-Gg: ASbGncsy/lWSoacgxLyJfp97A6fo4WHfyxxeQoA8Eq8FHmxnFaZ84ttBdj1l9PG7kvX
-	6W+B3UTH9gUgxwKiPIl3eySje44wTdEgs5vdHnvIQUys7MzO3ciQ3oIlfIcrIyPlyihDjIbMr1n
-	bdVGjyt87do+9MSMqFOHV8NDFm1lomMLrFLH56EaG14D2uZd6GTrCukP29n9+kzKgZr/A/K1719
-	t+C5as84NioKDBaw3q0rLrcDTHtqTiQGHkYAchJR9JIGBGiUDvF3RYv4094ELAdEutcN4JnPtLw
-	YYbtalVNO8SwIMCFVFrptTNfocjyps4BaQ7VoOkFMEC9ScbDdVhrVTj0Ghiweor6qTSxeLM+zrJ
-	xBR0bY3SooMPqha0gNCIgnt8kNGoxGCuZrh4SS8Cw/iYi5C9JTeC/61EJ8TvaVRD0OVdjTnwR6z
-	K8gM0tlUZuI5zJIRmECUbYC/esPVaUcBeGkhj+h4baDrA/82XPaNGU4ApP48nqEK5b2K8=
-X-Google-Smtp-Source: AGHT+IGyoTxPMMJ9r04O6fUQyypFHVb2CsZTh5pjSnqd6/53xcOrWoq/NvrC4HH7fZ1Tgl32q5x1UQ==
-X-Received: by 2002:a05:6402:2348:b0:640:80cc:f08e with SMTP id 4fb4d7f45d1cf-645eb78686cmr1637901a12.26.1764057127790;
-        Mon, 24 Nov 2025 23:52:07 -0800 (PST)
+        bh=0V+iOBjztOFiOh8XvFtucaeDeOd2zLS6YUjWGQu28Ko=;
+        b=i1/8s88zzSih79emdELF8KSJq0WQzJ/4l7uP1I5wf3PRou/SFomDmHe7nZsko6cN0G
+         Ez4TMC6dhSYa5o1D8sB6wq0/FE0H0XcvLD1mT+VySQdc1PwpsB+WJE53GEHNowuXyvfg
+         +K6KePTaGwHBxPIUTnPrvegabi/LSpUaqWLh8tMJRr115ceIBE55rNIuwpfCdCbXHaWH
+         lv79IvmN32KjDqjq8uYyCCNMWa/t/hNCETgHuaqxhP4z5nqL+VO+a53VWEjcHThUlaGz
+         /Ke6tyF8i1NDCQebHL1mVOrk4WtymIKTzj91ujO09NoeXIdnKoBvaQKvsMC9AiJxAPWH
+         B+NQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX8UOPg+myoBQ8AlL7Gnne9AipvEflFE+bHyz1D9nR6jvIOmnjGlhiT1dCGxcQZi0lofbfS0WI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKmZBULEI8Od0pVg027K2PCIiSMV1wdm0l9XaYXkqRxHFaNrl3
+	nx+PKT6G3DVryLUYeUXotyiAeViQtQ21fKJQeZepFGNCir+Eb3AFEu4r
+X-Gm-Gg: ASbGncszsex3R7/kCEGlNgdgjkzNjLIhJTB9fpdFCdMfj03wj8qmNqsl1C41iI5lpxg
+	h7QuCfASL8ZLQYjRpPKxVdo1epPeViK6/0iXnA4LuWEyWioYXn7/pr9kWZ+bYegEcCyoekDbScl
+	KLim5p0zktLFH6LomnO9yjbuvVDiiWYplFfQC5p6H9BN+z0AcOzgSwDYHe4fvVzvo4GbNhYOJVF
+	yIZ/2+HyaxQAfWE0xbX7eVB2PkrMQbKXB6BB47RtC+SBHrCTZ+k65+symppf8CI92f5LQ2+8IEb
+	deY1uYW/exZ/rbt9lOszZSwKJuCfJh5SYgyyOEXeRSFUb8alCbFu6k6YlNXnGPpnK2c2op1Xu3D
+	s4Dx6YNx90T7i3foeK1gWiRREe4Gtu3Q81lHZCz0mz6ggZzANYxMy6DP2zdwDBlDNuwDy/eJYic
+	rb8CMIf9ZhiNNEEF7CuPqygGdGG4jj42biqwywTEnv9DVTcWN1oGjYIajLP54BxoWJNM0qArE4O
+	wbZow==
+X-Google-Smtp-Source: AGHT+IFk77GelQTFcD92LcQnmuvfhCPsowRD//MZHMAJK96B1Vx8M3nO5H9fm/u7Xvl37U98LQQeqQ==
+X-Received: by 2002:a05:6402:2111:b0:640:a9fb:3464 with SMTP id 4fb4d7f45d1cf-645544421efmr12259245a12.7.1764057128901;
+        Mon, 24 Nov 2025 23:52:08 -0800 (PST)
 Received: from localhost (dslb-002-205-018-238.002.205.pools.vodafone-ip.de. [2.205.18.238])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6453642d307sm14469110a12.19.2025.11.24.23.52.07
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-645363b62cesm14126718a12.13.2025.11.24.23.52.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 23:52:07 -0800 (PST)
+        Mon, 24 Nov 2025 23:52:08 -0800 (PST)
 From: Jonas Gorski <jonas.gorski@gmail.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -86,9 +87,9 @@ To: Florian Fainelli <florian.fainelli@broadcom.com>,
 Cc: Florian Fainelli <f.fainelli@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 5/7] net: dsa: b53: fix BCM5325/65 ARL entry multicast port masks
-Date: Tue, 25 Nov 2025 08:51:48 +0100
-Message-ID: <20251125075150.13879-6-jonas.gorski@gmail.com>
+Subject: [PATCH net-next 6/7] net: dsa: b53: fix BCM5325/65 ARL entry VIDs
+Date: Tue, 25 Nov 2025 08:51:49 +0100
+Message-ID: <20251125075150.13879-7-jonas.gorski@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251125075150.13879-1-jonas.gorski@gmail.com>
 References: <20251125075150.13879-1-jonas.gorski@gmail.com>
@@ -100,124 +101,144 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We currently use the mask 0xf for writing and reading b53_entry::port,
-but this is only correct for unicast ARL entries. Multicast ARL entries
-use a bitmask, and 0xf is not enough space for ports > 3, which includes
-the CPU port.
+BCM5325/65's ARL entry registers do not contain the VID, only the search
+result register does. ARL entries have a separate VID entry register for
+the index into the VLAN table.
 
-So extend the mask accordingly to also fit port 4 (bit 4) and MII (bit
-5). According to the datasheet the multicast port mask is [60:48],
-making it 12 bit wide, but bits 60-55 are reserved anyway, and collide
-with the priority field at [60:59], so I am not sure if this is valid.
-Therefore leave it at the actual used range, [53:48].
-
-The ARL search result register differs a bit, and there the mask is only
-[52:48], so only spanning the user ports. The MII port bit is
-contained in the Search Result Extension register. So create a separate
-search result parse function that properly handles this.
+So make ARL entry accessors use the VID entry registers instead, and
+move the VLAN ID field definition to the search register definition.
 
 Fixes: c45655386e53 ("net: dsa: b53: add support for FDB operations on 5325/5365")
 Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
 ---
- drivers/net/dsa/b53/b53_common.c |  4 +++-
- drivers/net/dsa/b53/b53_priv.h   | 25 +++++++++++++++++++++----
- drivers/net/dsa/b53/b53_regs.h   |  8 +++++++-
- 3 files changed, 31 insertions(+), 6 deletions(-)
+ drivers/net/dsa/b53/b53_common.c |  9 +++++++--
+ drivers/net/dsa/b53/b53_priv.h   | 12 ++++++------
+ drivers/net/dsa/b53/b53_regs.h   |  7 +++++--
+ 3 files changed, 18 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 91b0b4de475f..09a64812cd84 100644
+index 09a64812cd84..ac995f36ed95 100644
 --- a/drivers/net/dsa/b53/b53_common.c
 +++ b/drivers/net/dsa/b53/b53_common.c
-@@ -2119,10 +2119,12 @@ static void b53_arl_search_read_25(struct b53_device *dev, u8 idx,
- 				   struct b53_arl_entry *ent)
+@@ -1853,19 +1853,24 @@ static int b53_arl_rw_op(struct b53_device *dev, unsigned int op)
+ static void b53_arl_read_entry_25(struct b53_device *dev,
+ 				  struct b53_arl_entry *ent, u8 idx)
  {
++	u8 vid_entry;
  	u64 mac_vid;
-+	u8 ext;
  
-+	b53_read8(dev, B53_ARLIO_PAGE, B53_ARL_SRCH_RSLT_EXT_25, &ext);
- 	b53_read64(dev, B53_ARLIO_PAGE, B53_ARL_SRCH_RSTL_0_MACVID_25,
++	b53_read8(dev, B53_ARLIO_PAGE, B53_ARLTBL_VID_ENTRY_25(idx),
++		  &vid_entry);
+ 	b53_read64(dev, B53_ARLIO_PAGE, B53_ARLTBL_MAC_VID_ENTRY(idx),
  		   &mac_vid);
 -	b53_arl_to_entry_25(ent, mac_vid);
-+	b53_arl_search_to_entry_25(ent, mac_vid, ext);
++	b53_arl_to_entry_25(ent, mac_vid, vid_entry);
  }
  
- static void b53_arl_search_read_89(struct b53_device *dev, u8 idx,
+ static void b53_arl_write_entry_25(struct b53_device *dev,
+ 				   const struct b53_arl_entry *ent, u8 idx)
+ {
++	u8 vid_entry;
+ 	u64 mac_vid;
+ 
+-	b53_arl_from_entry_25(&mac_vid, ent);
++	b53_arl_from_entry_25(&mac_vid, &vid_entry, ent);
++	b53_write8(dev, B53_ARLIO_PAGE, B53_ARLTBL_VID_ENTRY_25(idx), vid_entry);
+ 	b53_write64(dev, B53_ARLIO_PAGE, B53_ARLTBL_MAC_VID_ENTRY(idx),
+ 		    mac_vid);
+ }
 diff --git a/drivers/net/dsa/b53/b53_priv.h b/drivers/net/dsa/b53/b53_priv.h
-index bd821d60ac90..24df3ab64395 100644
+index 24df3ab64395..ea99e4d322bd 100644
 --- a/drivers/net/dsa/b53/b53_priv.h
 +++ b/drivers/net/dsa/b53/b53_priv.h
-@@ -348,8 +348,8 @@ static inline void b53_arl_to_entry_25(struct b53_arl_entry *ent,
+@@ -341,7 +341,7 @@ static inline void b53_arl_to_entry(struct b53_arl_entry *ent,
+ }
+ 
+ static inline void b53_arl_to_entry_25(struct b53_arl_entry *ent,
+-				       u64 mac_vid)
++				       u64 mac_vid, u8 vid_entry)
+ {
+ 	memset(ent, 0, sizeof(*ent));
+ 	ent->is_valid = !!(mac_vid & ARLTBL_VALID_25);
+@@ -352,7 +352,7 @@ static inline void b53_arl_to_entry_25(struct b53_arl_entry *ent,
+ 		     ARLTBL_DATA_PORT_ID_S_25;
+ 	if (!is_multicast_ether_addr(ent->mac) && ent->port == B53_CPU_PORT)
+ 		ent->port = B53_CPU_PORT_25;
+-	ent->vid = (mac_vid >> ARLTBL_VID_S_65) & ARLTBL_VID_MASK_25;
++	ent->vid = vid_entry;
+ }
+ 
+ static inline void b53_arl_to_entry_89(struct b53_arl_entry *ent,
+@@ -381,7 +381,7 @@ static inline void b53_arl_from_entry(u64 *mac_vid, u32 *fwd_entry,
+ 		*fwd_entry |= ARLTBL_AGE;
+ }
+ 
+-static inline void b53_arl_from_entry_25(u64 *mac_vid,
++static inline void b53_arl_from_entry_25(u64 *mac_vid, u8 *vid_entry,
+ 					 const struct b53_arl_entry *ent)
+ {
+ 	*mac_vid = ether_addr_to_u64(ent->mac);
+@@ -390,14 +390,13 @@ static inline void b53_arl_from_entry_25(u64 *mac_vid,
+ 	else
+ 		*mac_vid |= ((u64)ent->port << ARLTBL_DATA_PORT_ID_S_25) &
+ 			    ARLTBL_DATA_PORT_ID_MASK_25;
+-	*mac_vid |= (u64)(ent->vid & ARLTBL_VID_MASK_25) <<
+-			  ARLTBL_VID_S_65;
+ 	if (ent->is_valid)
+ 		*mac_vid |= ARLTBL_VALID_25;
+ 	if (ent->is_static)
+ 		*mac_vid |= ARLTBL_STATIC_25;
+ 	if (ent->is_age)
+ 		*mac_vid |= ARLTBL_AGE_25;
++	*vid_entry = ent->vid;
+ }
+ 
+ static inline void b53_arl_from_entry_89(u64 *mac_vid, u32 *fwd_entry,
+@@ -422,7 +421,8 @@ static inline void b53_arl_search_to_entry_25(struct b53_arl_entry *ent,
  	ent->is_age = !!(mac_vid & ARLTBL_AGE_25);
  	ent->is_static = !!(mac_vid & ARLTBL_STATIC_25);
  	u64_to_ether_addr(mac_vid, ent->mac);
--	ent->port = (mac_vid >> ARLTBL_DATA_PORT_ID_S_25) &
--		     ARLTBL_DATA_PORT_ID_MASK_25;
-+	ent->port = (mac_vid & ARLTBL_DATA_PORT_ID_MASK_25) >>
-+		     ARLTBL_DATA_PORT_ID_S_25;
- 	if (!is_multicast_ether_addr(ent->mac) && ent->port == B53_CPU_PORT)
- 		ent->port = B53_CPU_PORT_25;
- 	ent->vid = (mac_vid >> ARLTBL_VID_S_65) & ARLTBL_VID_MASK_25;
-@@ -388,8 +388,8 @@ static inline void b53_arl_from_entry_25(u64 *mac_vid,
- 	if (!is_multicast_ether_addr(ent->mac) && ent->port == B53_CPU_PORT_25)
- 		*mac_vid |= (u64)B53_CPU_PORT << ARLTBL_DATA_PORT_ID_S_25;
- 	else
--		*mac_vid |= (u64)(ent->port & ARLTBL_DATA_PORT_ID_MASK_25) <<
--				  ARLTBL_DATA_PORT_ID_S_25;
-+		*mac_vid |= ((u64)ent->port << ARLTBL_DATA_PORT_ID_S_25) &
-+			    ARLTBL_DATA_PORT_ID_MASK_25;
- 	*mac_vid |= (u64)(ent->vid & ARLTBL_VID_MASK_25) <<
- 			  ARLTBL_VID_S_65;
- 	if (ent->is_valid)
-@@ -414,6 +414,23 @@ static inline void b53_arl_from_entry_89(u64 *mac_vid, u32 *fwd_entry,
- 		*fwd_entry |= ARLTBL_AGE_89;
- }
- 
-+static inline void b53_arl_search_to_entry_25(struct b53_arl_entry *ent,
-+					      u64 mac_vid, u8 ext)
-+{
-+	memset(ent, 0, sizeof(*ent));
-+	ent->is_valid = !!(mac_vid & ARLTBL_VALID_25);
-+	ent->is_age = !!(mac_vid & ARLTBL_AGE_25);
-+	ent->is_static = !!(mac_vid & ARLTBL_STATIC_25);
-+	u64_to_ether_addr(mac_vid, ent->mac);
-+	ent->vid = (mac_vid >> ARLTBL_VID_S_65) & ARLTBL_VID_MASK_25;
-+	ent->port = (mac_vid & ARL_SRCH_RSLT_PORT_ID_MASK_25) >>
-+		    ARL_SRCH_RSLT_PORT_ID_S_25;
-+	if (is_multicast_ether_addr(ent->mac) && (ext & ARL_SRCH_RSLT_EXT_MC_MII))
-+		ent->port |= BIT(B53_CPU_PORT_25);
-+	else if (!is_multicast_ether_addr(ent->mac) && ent->port == B53_CPU_PORT)
-+		ent->port = B53_CPU_PORT_25;
-+}
-+
- static inline void b53_arl_search_to_entry_63xx(struct b53_arl_entry *ent,
- 						u64 mac_vid, u16 fwd_entry)
- {
+-	ent->vid = (mac_vid >> ARLTBL_VID_S_65) & ARLTBL_VID_MASK_25;
++	ent->vid = (mac_vid & ARL_SRCH_RSLT_VID_MASK_25) >>
++		   ARL_SRCH_RSLT_VID_S_25;
+ 	ent->port = (mac_vid & ARL_SRCH_RSLT_PORT_ID_MASK_25) >>
+ 		    ARL_SRCH_RSLT_PORT_ID_S_25;
+ 	if (is_multicast_ether_addr(ent->mac) && (ext & ARL_SRCH_RSLT_EXT_MC_MII))
 diff --git a/drivers/net/dsa/b53/b53_regs.h b/drivers/net/dsa/b53/b53_regs.h
-index 505979102ed5..54b1016eb7eb 100644
+index 54b1016eb7eb..54a278db67c9 100644
 --- a/drivers/net/dsa/b53/b53_regs.h
 +++ b/drivers/net/dsa/b53/b53_regs.h
-@@ -332,7 +332,7 @@
- #define   ARLTBL_VID_MASK_25		0xff
+@@ -329,11 +329,9 @@
+ #define B53_ARLTBL_MAC_VID_ENTRY(n)	((0x10 * (n)) + 0x10)
+ #define   ARLTBL_MAC_MASK		0xffffffffffffULL
+ #define   ARLTBL_VID_S			48
+-#define   ARLTBL_VID_MASK_25		0xff
  #define   ARLTBL_VID_MASK		0xfff
  #define   ARLTBL_DATA_PORT_ID_S_25	48
--#define   ARLTBL_DATA_PORT_ID_MASK_25	0xf
-+#define   ARLTBL_DATA_PORT_ID_MASK_25	GENMASK_ULL(53, 48)
- #define   ARLTBL_VID_S_65		53
+ #define   ARLTBL_DATA_PORT_ID_MASK_25	GENMASK_ULL(53, 48)
+-#define   ARLTBL_VID_S_65		53
  #define   ARLTBL_AGE_25			BIT_ULL(61)
  #define   ARLTBL_STATIC_25		BIT_ULL(62)
-@@ -378,6 +378,12 @@
+ #define   ARLTBL_VALID_25		BIT_ULL(63)
+@@ -353,6 +351,9 @@
+ #define   ARLTBL_STATIC_89		BIT(14)
+ #define   ARLTBL_VALID_89		BIT(15)
  
- /* Single register search result on 5325/5365 */
- #define B53_ARL_SRCH_RSTL_0_MACVID_25	0x24
-+#define   ARL_SRCH_RSLT_PORT_ID_S_25	48
-+#define   ARL_SRCH_RSLT_PORT_ID_MASK_25	GENMASK_ULL(52, 48)
++/* BCM5325/BCM565 ARL Table VID Entry N Registers (8 bit) */
++#define B53_ARLTBL_VID_ENTRY_25(n)	((0x2 * (n)) + 0x30)
 +
-+/* BCM5325/5365 Search result extend register (8 bit) */
-+#define B53_ARL_SRCH_RSLT_EXT_25	0x2c
-+#define   ARL_SRCH_RSLT_EXT_MC_MII	BIT(2)
+ /* Maximum number of bin entries in the ARL for all switches */
+ #define B53_ARLTBL_MAX_BIN_ENTRIES	4
  
- /* ARL Search Data Result (32 bit) */
- #define B53_ARL_SRCH_RSTL_0		0x68
+@@ -380,6 +381,8 @@
+ #define B53_ARL_SRCH_RSTL_0_MACVID_25	0x24
+ #define   ARL_SRCH_RSLT_PORT_ID_S_25	48
+ #define   ARL_SRCH_RSLT_PORT_ID_MASK_25	GENMASK_ULL(52, 48)
++#define   ARL_SRCH_RSLT_VID_S_25	53
++#define   ARL_SRCH_RSLT_VID_MASK_25	GENMASK_ULL(60, 53)
+ 
+ /* BCM5325/5365 Search result extend register (8 bit) */
+ #define B53_ARL_SRCH_RSLT_EXT_25	0x2c
 -- 
 2.43.0
 
