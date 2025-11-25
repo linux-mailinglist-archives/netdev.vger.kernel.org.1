@@ -1,171 +1,100 @@
-Return-Path: <netdev+bounces-241653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 802C0C87347
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 22:19:12 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6BFCC8734A
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 22:19:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 263AA34B3B6
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 21:18:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ACE404E2A64
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 21:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B392F9987;
-	Tue, 25 Nov 2025 21:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D642FB978;
+	Tue, 25 Nov 2025 21:19:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Q/mIFDJA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127BF2F83A3
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 21:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3822FB093;
+	Tue, 25 Nov 2025 21:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764105521; cv=none; b=R5oNPe78ciNYfGl+SQ1HcNn+3zGTBsDWi8eaeRXL2B4XgeJb8kUK7RU5Mc1cB1cGZ17atk3tBJjIerc2YgkzDOr9WaXlMBYG7C+n8q6KFDYVMbWVPOkOSWsKBwuHFw6xGNMiCGnKyYQsDnMZH78xQvFBLOfd8HFIoX9/0jUjt24=
+	t=1764105561; cv=none; b=IsllopxILaQubTo+7QnYcbYkaxig+fJfgoB2UQPiFxfUX49aUKRJxhs5aVLnB6nK8xSv5M8anl1Me7OX0n/BqMvnRKliiGFn8WYCCoWSE87Nu0tULyaOtu3xr0MIB92hKpLC03H8V1qVJrdqtrR308ItiXpKvyDbMSBYbH0kDBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764105521; c=relaxed/simple;
-	bh=qcexi1bPWJuzu2lN97A4DhK6uT9hXAc0Wa0eqtGksSQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BeYx+kTuYC0CfsFjzTTew93sQlk+MN4PpASuPUKG1WWKAi3GodOighp2OUE8VcGqzU/raMnU25NAWyWN9x0DYfj+ztzvdk75crg2qBG0RN5ThmAnsFK4WDCYE8IPskJNbey8+aWLFSmzdBxMK3up7emFIKasfI2RnrA/O4cahVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 1AE9C5BD6A;
-	Tue, 25 Nov 2025 21:18:35 +0000 (UTC)
-Authentication-Results: smtp-out2.suse.de;
-	none
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D283A3EA63;
-	Tue, 25 Nov 2025 21:18:34 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id PuTULCodJmm7bwAAD6G6ig
-	(envelope-from <krisman@suse.de>); Tue, 25 Nov 2025 21:18:34 +0000
-From: Gabriel Krisman Bertazi <krisman@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Gabriel Krisman Bertazi <krisman@suse.de>,
-	netdev@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1764105561; c=relaxed/simple;
+	bh=yKeUegFI0QE/9BsO7g5nTK0hXwYhBIFU9sEfp8HoFXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TcPgPre1x0xAnfgKjRpcA796ucaRalxcgvNtyp4t9i96Xgc963VdaOFPo44V7h0OibrnmLa8DZcReR8cYgzgiXQjw1i5KBkXK/REAuvWoChMv9e+xBNQEloEoLdnVjouX9edcITjyyjhymi56EMNIwgHn4vDML0U/mKF6EtUlz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Q/mIFDJA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=L+cBTRRQGE2v1BWrrSCYxS5xPces5KE3phitGCPEZc4=; b=Q/mIFDJAMg6Y7+Z5dFQdj64tcG
+	ltB53b2q6U6LjaY/7cpwYah+1fOAlZ4o9o14KIlE8S00xYsIrfX3ZwiS2auSkYR+wlVc1UGyiJDTf
+	UfaR9FTk/tzT12sqd7srC1aHe9B8pekZnE4oakLmwY3pNRKws7GOyWrqevIDLVwJj/7E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vO0RL-00F3Ks-GA; Tue, 25 Nov 2025 22:19:11 +0100
+Date: Tue, 25 Nov 2025 22:19:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH v4 3/3] io_uring: Introduce getsockname io_uring cmd
-Date: Tue, 25 Nov 2025 16:18:01 -0500
-Message-ID: <20251125211806.2673912-4-krisman@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251125211806.2673912-1-krisman@suse.de>
-References: <20251125211806.2673912-1-krisman@suse.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Patrice Chotard <patrice.chotard@foss.st.com>
+Subject: Re: [PATCH net-next 1/9] dt-bindings: phy: rename
+ transmit-amplitude.yaml to phy-common-props.yaml
+Message-ID: <0faccdb7-0934-4543-9b7f-a655a632fa86@lunn.ch>
+References: <20251122193341.332324-1-vladimir.oltean@nxp.com>
+ <20251122193341.332324-2-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Spam-Level: 
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
-X-Rspamd-Queue-Id: 1AE9C5BD6A
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -4.00
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251122193341.332324-2-vladimir.oltean@nxp.com>
 
-Introduce a socket-specific io_uring_cmd to support
-getsockname/getpeername via io_uring.  I made this an io_uring_cmd
-instead of a new operation to avoid polluting the command namespace with
-what is exclusively a socket operation.  In addition, since we don't
-need to conform to existing interfaces, this merges the
-getsockname/getpeername in a single operation, since the implementation
-is pretty much the same.
+On Sat, Nov 22, 2025 at 09:33:33PM +0200, Vladimir Oltean wrote:
+> I would like to add more properties similar to tx-p2p-microvolt, and I
+> don't think it makes sense to create one schema for each such property
+> (transmit-amplitude.yaml, lane-polarity.yaml, transmit-equalization.yaml
+> etc).
+> 
+> Instead, let's rename to phy-common-props.yaml, which makes it a more
+> adequate host schema for all the above properties.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>  .../{transmit-amplitude.yaml => phy-common-props.yaml}    | 8 ++++----
 
-This has been frequently requested, for instance at [1] and more
-recently in the project Discord channel. The main use-case is to support
-fixed socket file descriptors.
+So there is nothing currently referencing this file?
 
-[1] https://github.com/axboe/liburing/issues/1356
-
-Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
-
----
-v3->v4:
-  - properly pass peer down to network layer (Stefan)
-v2->v3:
-  - Don't pass sockaddr_storage pointer parameter
----
- include/uapi/linux/io_uring.h |  1 +
- io_uring/cmd_net.c            | 22 ++++++++++++++++++++++
- 2 files changed, 23 insertions(+)
-
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 3d921cbb84f8..6a97c5376019 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -1010,6 +1010,7 @@ enum io_uring_socket_op {
- 	SOCKET_URING_OP_GETSOCKOPT,
- 	SOCKET_URING_OP_SETSOCKOPT,
- 	SOCKET_URING_OP_TX_TIMESTAMP,
-+	SOCKET_URING_OP_GETSOCKNAME,
- };
- 
- /*
-diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
-index 27a09aa4c9d0..5d11caf5509c 100644
---- a/io_uring/cmd_net.c
-+++ b/io_uring/cmd_net.c
-@@ -132,6 +132,26 @@ static int io_uring_cmd_timestamp(struct socket *sock,
- 	return -EAGAIN;
- }
- 
-+static int io_uring_cmd_getsockname(struct socket *sock,
-+				    struct io_uring_cmd *cmd,
-+				    unsigned int issue_flags)
-+{
-+	const struct io_uring_sqe *sqe = cmd->sqe;
-+	struct sockaddr __user *uaddr;
-+	unsigned int peer;
-+	int __user *ulen;
-+
-+	if (sqe->ioprio || sqe->__pad1 || sqe->len || sqe->rw_flags)
-+		return -EINVAL;
-+
-+	uaddr = u64_to_user_ptr(READ_ONCE(sqe->addr));
-+	ulen = u64_to_user_ptr(sqe->addr3);
-+	peer = READ_ONCE(sqe->optlen);
-+	if (peer > 1)
-+		return -EINVAL;
-+	return do_getsockname(sock, peer, uaddr, ulen);
-+}
-+
- int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
- {
- 	struct socket *sock = cmd->file->private_data;
-@@ -159,6 +179,8 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 		return io_uring_cmd_setsockopt(sock, cmd, issue_flags);
- 	case SOCKET_URING_OP_TX_TIMESTAMP:
- 		return io_uring_cmd_timestamp(sock, cmd, issue_flags);
-+	case SOCKET_URING_OP_GETSOCKNAME:
-+		return io_uring_cmd_getsockname(sock, cmd, issue_flags);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
--- 
-2.51.0
-
+	Andrew
 
