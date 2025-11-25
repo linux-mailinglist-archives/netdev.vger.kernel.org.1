@@ -1,94 +1,128 @@
-Return-Path: <netdev+bounces-241386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DD22C8348F
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 05:00:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC467C8349E
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 05:01:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4FBB44E4731
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:00:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 958D54E6A4C
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 854871A8F84;
-	Tue, 25 Nov 2025 04:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE39914A60F;
+	Tue, 25 Nov 2025 04:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BvG4FSRD"
+	dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b="U5wUxwwP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender-of-o59.zoho.eu (sender-of-o59.zoho.eu [136.143.169.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C6E39FD9;
-	Tue, 25 Nov 2025 04:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764043244; cv=none; b=LVFBJvB4umKc8f4uPkdu+T6a/K55mTsOwMRaYW9z0qPQhSBbBpFesDs80R8wzSiO876T6alfUtlWzSlQO98PkexR0XCr3ZglRkFqDXdX1f2XT3LFsCI4j3ObZp+wmNwydULwnZVxSLvPjNV2Wlu8mf7RPlb3iAua29KAC3aOeM8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764043244; c=relaxed/simple;
-	bh=wW40DeYPI08euhu6hMkmthD56BMfvMvbUuoigRl/LU8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mgTqEtNtTuhjihDNk4YLOvqwmET/rnavdIDHDHVgfcuIwRg3HURHjnm3zRYy6KGWHi0T4hcTNXY8YJc5SHyTIn7tNZ7PHApabM8qE48IUcnNnzDNGASVHj6OqSZvgV4FMsMq6fiwrgLVxiXPoR0vv5sURM0iu/ALDovAbs6auT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BvG4FSRD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B834FC4CEF1;
-	Tue, 25 Nov 2025 04:00:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764043243;
-	bh=wW40DeYPI08euhu6hMkmthD56BMfvMvbUuoigRl/LU8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BvG4FSRDAmVQdlRlDiV7zpL8uOI+W009GzJD0MR/4kAri+snuSltfA8slrU7BpOC6
-	 G1FPEPuz4DnzjhVU1hdpMIwWr568oDalc+EO2Nnr512pj5eTGVe8mJOn7musRErVQ9
-	 LPMSIrOs6lHwC92sJ/dfqMkudKrkq8T9t6pDuw260wBPmcBtCl6xcXCj/IJWaGfcux
-	 Ygouere+IjDk0y3LnxlMGnCgs8dDqH2RD/qkrW1QgD4dZjMJgodlA1c02bIANlUe6N
-	 ubSxa294HtcRVZ/twc4O0FtADKZUokUiNJzzuXgxMTgjHFykxPUzMqFxlADvLVECJQ
-	 oev7IOgvpcvrg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEE03A8A3CC;
-	Tue, 25 Nov 2025 04:00:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632231A8F84
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 04:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764043296; cv=pass; b=IaSyVn3jV8IxGKgi2g3bSRJ5hCbfA19s+V3WhnwtNHm1xaBkCDjinIIROHvDg2mK3OBMSIBu1g9Tt2mDGUZXfndY+ZTZtL9EqbJRxF9H6TeRMfm6P6FPteetPzn4wS4NYUWxl/SGJGjnYNZrIUW8mGsIKkrwONb6gLiAYb28P+k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764043296; c=relaxed/simple;
+	bh=8F3XelqSq45y9rIznL0gWRAHrEkAqvXw7ANWTZ3hTxs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=WYoQ7aWHjMNNcJT2GVyQRbigA0Dkpwr18beZCbO5yfG2EDDH+FhmXHTg1cR39SmeGTmaddV9TEEB1tsRf3xvgaLSTROxaRBGgmGNAr40hXRR82g3Vfx9RxaAz+Nfa74B5w/XxI4WN6CtCTUpd5/VnGT99nKqTQ3eipbTFWt5MDI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net; spf=pass smtp.mailfrom=azey.net; dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b=U5wUxwwP; arc=pass smtp.client-ip=136.143.169.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=azey.net
+ARC-Seal: i=1; a=rsa-sha256; t=1764043259; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=Cxh7S+78DqUwgLI9TfBPRnsavjYrDXw71TqiQtV6nf0ixT9B2StxoYXOxTyIJAx8/QUVPp9j+3QKVi+9jkM8eWlBj1cW/ote9/5AoD3GIKq4M8rfKrgY1SvZd22Pwq7q6mNLXOtEUX1sMdlSJHz6qFkcPYqSHwZFqpqCpxl4Jv0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1764043259; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=QugXX12w3LHqvxJnSQymcS9aIZXCYX5Hl1ahmESbSgs=; 
+	b=G8Z+8Vv/zRlbwd+5P+4RvZWx69JX/w26yhoEKCWDz61ODLg8YMkKcGOALQrkAPkQ7XroFGWRz8Ge7l2B0z8lg5g5HUvSWC3Et7jfHCXOjyQWxuPkOy39ExXfybQUNJ4dyj6nrms2TJ6A+YrIcQGsmilye1zQiNn3qpEyBdAhWnU=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=azey.net;
+	spf=pass  smtp.mailfrom=me@azey.net;
+	dmarc=pass header.from=<me@azey.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1764043259;
+	s=zmail; d=azey.net; i=me@azey.net;
+	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=QugXX12w3LHqvxJnSQymcS9aIZXCYX5Hl1ahmESbSgs=;
+	b=U5wUxwwPxR8/mZJM5eAUfnje9IxtqXEsVUl/VhbPTx8Td2q8T53t6z+bCVw1KDQT
+	Z1tBGLJNewpMjD3zTqZnnclFVjxiINLK3xuitwY4ENCKUbCdtO5EubCxMrQl4K53PN4
+	v2dswXlDPb11oihamVo2oazxwtwBQpr6XSc0BgpE=
+Received: from mail.zoho.eu by mx.zoho.eu
+	with SMTP id 1764043259072215.8427170083147; Tue, 25 Nov 2025 05:00:59 +0100 (CET)
+Date: Tue, 25 Nov 2025 05:00:59 +0100
+From: azey <me@azey.net>
+To: "Jakub Kicinski" <kuba@kernel.org>
+Cc: "David Ahern" <dsahern@kernel.org>,
+	"nicolasdichtel" <nicolas.dichtel@6wind.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Eric Dumazet" <edumazet@google.com>,
+	"Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
+	"netdev" <netdev@vger.kernel.org>,
+	"linux-kernel" <linux-kernel@vger.kernel.org>
+Message-ID: <19ab92bfcaa.fc063ed1450036.1152663278874953682@azey.net>
+In-Reply-To: <20251124192550.09866129@kernel.org>
+References: <3k3facg5fiajqlpntjqf76cfc6vlijytmhblau2f2rdstiez2o@um2qmvus4a6b>
+	<20251124190044.22959874@kernel.org>
+	<19ab902473c.cef7bda2449598.3788324713972830782@azey.net> <20251124192550.09866129@kernel.org>
+Subject: Re: [PATCH v2] net/ipv6: allow device-only routes via the multipath
+ API
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net-next] ipvlan: fix sparse warning about __be32 ->
- u32
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176404320651.181232.1752669675998121765.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Nov 2025 04:00:06 +0000
-References: <20251121155112.4182007-1-skorodumov.dmitry@huawei.com>
-In-Reply-To: <20251121155112.4182007-1-skorodumov.dmitry@huawei.com>
-To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
- julian@outer-limits.org, gnault@redhat.com, linux-kernel@vger.kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 21 Nov 2025 18:51:08 +0300 you wrote:
-> Fixed a sparse warning:
+On 2025-11-25 04:25:50 +0100  Jakub Kicinski <kuba@kernel.org> wrote:
+> On Tue, 25 Nov 2025 04:15:25 +0100 azey wrote:
+> > On 2025-11-25 04:00:44 +0100  Jakub Kicinski <kuba@kernel.org> wrote:
+> > > On Mon, 24 Nov 2025 14:52:45 +0100 azey wrote:  
+> > > > Signed-off-by: azey <me@azey.net>  
+> > > 
+> > > We need real/legal names because licenses are a legal matter.
+> > > -- 
+> > > pw-bot: cr  
+> > 
+> > I was under the impression this was clarified in d4563201f33a
+> > ("Documentation: simplify and clarify DCO contribution example
+> > language") to not be the case, are there different rules for this
+> > subsystem? I think it qualifies as a "known identity" since I use
+> > the alias basically everywhere (github, website, GPG, email, etc).
 > 
-> ipvlan_core.c:56: warning: incorrect type in argument 1
-> (different base types) expected unsigned int [usertype] a
-> got restricted __be32 const [usertype] s_addr
+> My understanding is that if I know you, I can apply your patch even 
+> if you use your nick name (rather than what you have in your passport
+> letter for letter).
 > 
-> Force cast the s_addr to u32
+> I don't know you.
 > 
-> [...]
+> If you're saying that I can do some research and find out who you are
+> please be aware that we deal with 700 individual per release just
+> in networking.
 
-Here is the summary with links:
-  - [v3,net-next] ipvlan: fix sparse warning about __be32 -> u32
-    https://git.kernel.org/netdev/net-next/c/f296b73d17a4
+My main concern is that I keep my on/offline identities very separated,
+so you couldn't find me by my real name anywhere online. And offline,
+my legal name is common enough that you couldn't single me out by it
+alone either.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+My understanding is that the sign-off name should be what you can
+identify and contact me by in case of any problems, which my legal
+name is not. As per Linus' commit I linked:
 
+> the sign-off needed to be something we could check back with.
 
+> we've always accepted nicknames
+
+> the wording [..] shouldn't be causing unnecessary angst and pain,
+> or scare away people who go by preferred naming.
+
+If the concern is that it isn't unique enough, I could change it to
+azey7f as that's a username I use when just azey isn't available,
+though my commits are always authored "azey <me@azey.net>".
 
