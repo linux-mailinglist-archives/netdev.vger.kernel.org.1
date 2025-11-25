@@ -1,134 +1,295 @@
-Return-Path: <netdev+bounces-241467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E91C5C84336
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 10:22:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D83C4C8434B
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 10:25:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0D3F14E81F4
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 09:22:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 910EB3AB36A
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 09:25:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97085269CE6;
-	Tue, 25 Nov 2025 09:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D8229E112;
+	Tue, 25 Nov 2025 09:25:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aXNI4l3r";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="nUrSStRk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LNsF2wHy";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="XAf0C06b"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FD9269B1C
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 09:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5788269B1C
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 09:25:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764062551; cv=none; b=KOkytGbFN0SgMbhoXa6FeVhVp5JTYSm22J9+t4ndSkydM9aC6TVvBg+vSfmER6nJusLYP0kHMK3qs3HRz76nDMqtRL6cPcPfomS0Cbuf86ZeaIQSDrPFM0nFhszDu229R1DBUTFxXpL2W1V6sEcDBGenB/0RAHisesfP90kuZfA=
+	t=1764062705; cv=none; b=p17RCKjWWVnyl+ZUnb1rPEyODyq0lGOOO2kxX7xS5t57QDEEKdp5OjAFmg+N4wfF34KbeRjp1k8YDHpcB0zzTLTEBImmRfwtUECEeP8PIMouMX1MdlCZK5Vgj5pp0lIkkAKr64EVztAzJ4elaWXXMfekPXSaujUa7KC6icGvEP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764062551; c=relaxed/simple;
-	bh=d9QfXw9j5nCTdluX52ct0/3g3ewF1ZOiUx5/M5ROZ1Q=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:Cc:
-	 In-Reply-To:Content-Type; b=t7SUn6EijXqCON1dMFZINHpgeYV7OUSI69Kj0RX52uNt210yvTXLkXSN1p7uHf4RiPJzdvN91Bb84ggAIL+HfXx43GBz6xQGt8HtF3J2/9DXaZS6+he4QNg4AgWNxegiVOGrSi7U2eqhqMdJAs5ASIUgXqFMgsmJrumTy5ALdcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aXNI4l3r; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nUrSStRk; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1764062705; c=relaxed/simple;
+	bh=hjHfVR6JY50I/PUS5QXDEWVC2vBDOcIlWiJtzvzvF00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IQRpMj3bIsufdJLVH0X56CND2PKCpryYnXp7g8VDL1AiRnXCkM8nQoxnqbAw/xltQebtF2Rf4MfQZ7piBbVVArFEpXfNTBCOg62sUxdTe6tcM+SDT6e7G2znp5pfhXLxsNCm5Oj13tVNmfmzYNUe4mFWuxJoSEXABWo4ks48Kq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LNsF2wHy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=XAf0C06b; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764062548;
+	s=mimecast20190719; t=1764062702;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=p8JZAKMb72KNGpUvq/R2dmJOIcIW6mORgzE61trYq6M=;
-	b=aXNI4l3rZEoALlZghuTAD4t3k+C6IA0rgbzqQHVGzZz7gxMQ0uRC3O+AvF6THQ1+PBGMaL
-	C7VoAdCeHH2ytSTRqrD+fEDSivwmJN9K57mjHe+9tlmiombVkZHF5UvKbZ2qpegQLN5w/i
-	vrhHDTgB7aCtN4sR5xb3GfHNxtKxLOM=
+	bh=H+N/esHuq8L2QAewoJC5E7AAXPZDfyRFaWXpHRgQYro=;
+	b=LNsF2wHy/Yp9MBrDlAHtPUKD+xB4JdgrihTf8D5FNqXFVWGuTswPbH8WeY7venANFk/nXV
+	YxzmNcsDoIN8PllyBN9hW17eVmi7tn9g3h2WZMgzgm4ZOZr8pPepW7zlER932Rnb7MJLVL
+	2GrOThz3EtTI7nIv/H5636FZPVzor9M=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-98-mtbNhIsdM5KxVzxXRMKrXw-1; Tue, 25 Nov 2025 04:22:26 -0500
-X-MC-Unique: mtbNhIsdM5KxVzxXRMKrXw-1
-X-Mimecast-MFC-AGG-ID: mtbNhIsdM5KxVzxXRMKrXw_1764062545
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42b3339cab7so3509026f8f.0
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 01:22:26 -0800 (PST)
+ us-mta-132-qptBveCyM8CMFPrEC3mcAg-1; Tue, 25 Nov 2025 04:25:00 -0500
+X-MC-Unique: qptBveCyM8CMFPrEC3mcAg-1
+X-Mimecast-MFC-AGG-ID: qptBveCyM8CMFPrEC3mcAg_1764062700
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42b2c8fb84fso2789639f8f.2
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 01:25:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764062545; x=1764667345; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:cc:content-language
-         :references:to:from:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=p8JZAKMb72KNGpUvq/R2dmJOIcIW6mORgzE61trYq6M=;
-        b=nUrSStRkIVk4SrNpwKClY9hwIrA66qayfLXxCidNo5YH2yngnh0Ldb/dyjy5ufDPPB
-         9u7n/YdlogNtFLJCC8KYDJrGeAb0kcT+eVvnkUk7k/npbKCudFqvsmhTqdvpFHDRKSNQ
-         qk0ZvW7B3Ud3R97Tb0pisS/FxEPJYoK59VEFZYSjItKEjHLFAtjmyrkVEukDQu1x67vP
-         /Vu0NDeNa9722x+gL+0NSLHpwJfIPhu36wIO1RkE2lThxFVvcN8Qh2L2r80iTCsDbWhc
-         tFxZWrXGqE95z6mCg1li+0hJXb57/ttmOLiNSaJPg5winI7WJhyFGeAYAii3pEXMf1XZ
-         Uouw==
+        d=redhat.com; s=google; t=1764062699; x=1764667499; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=H+N/esHuq8L2QAewoJC5E7AAXPZDfyRFaWXpHRgQYro=;
+        b=XAf0C06bcnZU5GQBpnYc/ujSfbP4jG6w/4pSicwNvfsYD41SZDdgNtSWBxEaO7GLyC
+         dAxnJgeH/qrnjHGZW3p+lFjvyfhH86XdG1JNTfujquhjICMEfbX7TUhhOsFjb0nI/jUx
+         tap79FJrryKktv5PcOQM0FmtAHgtlaOiiMy9jE/wYHVSOD1EzHao6fWUIoKg210233x5
+         OPNHn2X92FReS6CHDhyUUcrfZWglSBv8NcaW9ROB+agdwfufqZ08Q5YM3I/1NaQG1Tys
+         z/AvlIWfGDluYvXOQa26O3GC85VKHu/qJvoiqojKTNe/HtfwjthDGpxvr/BmS/mm/96p
+         +AQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764062545; x=1764667345;
-        h=content-transfer-encoding:in-reply-to:cc:content-language
-         :references:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p8JZAKMb72KNGpUvq/R2dmJOIcIW6mORgzE61trYq6M=;
-        b=Li62YnlwI4whbXkmZXxSgW4dYOCFW53ivS8UDzM8Lb4i2IN/mvb63ueVA811UzhmCK
-         vHsT6pxS9iOicQk67iF7xw8LX0lcWVKyQ5VMO1hPn24NSPB12VReQNuI6R3g8lI0VG1O
-         MBjgj9xXNc7V8kxUWY2wpnPr9eyK0Jki6W3K4XYRZrdLDB317JtUoevwYlXva85h3cxZ
-         o1+r5z3NoxPUfUIqvYpcsIg79n2JTHWwSGD1jSvRDD5HOq5Eg97jE6433tMMxIyxVQHs
-         pc4/ewaMMYFLLSm+HG6XQPTzeWRzt3AODKZMc8g4+h/c+Hy2rco2DECFv5TeseNt6/6w
-         EN2Q==
-X-Gm-Message-State: AOJu0YyIucjzQgl/8UKW/ZYZG7jSo+kiASG3y25BUnFsq7Vol7BzwtIP
-	2IBG65Vv35nH95hmrqy2l7YWUYGJ7SiL1Is6iph4sXQcSzfevImi0tu+E5fiPFnw8Z4QUTUdWN6
-	vP0zMJDqu9mxEpdGhoqKX2yCvQUa1CLenIw9NVtP1FFKpl3S3r8ibH2vhJw==
-X-Gm-Gg: ASbGncuHwylVu8cX4P/EvR1883oSxBwOgaA5Sfjdw126KHcIiLxSwDi3d1k2SQoHMPO
-	Gb7BEv/mMu/sfiW5fNHM3/gq4t0hgPfjs0CuMhYdaM4Ty9ozISgwKMBY6RPCIkIiPHPqb+GbWRA
-	88gFtqSmhdc3KWpgv7BeJiQEYtGjbikxJDV8Gv1jiYoQMa1sqhHr9s/uDueO96b5hdpUliwgM+g
-	qp9yzNYTbn4F1FdA8WQk5RqpcVszQ7X5ezPMJN9LBy9lG6bhzKqdDGCNIqaH/4qFJNO/xpnUPnP
-	ij9rSz8sLLuhRfidh/9sEfHgrnb0JLodiFvi+fktqEFH+y88QnYs92fxQ39QmEcrxIM5izLoUeQ
-	U8deFFjYpLEjHhA==
-X-Received: by 2002:a05:600c:4f87:b0:477:76c2:49c9 with SMTP id 5b1f17b1804b1-47904acae93mr15474105e9.2.1764062545266;
-        Tue, 25 Nov 2025 01:22:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGAxsr/ubfN5YpYd4v5eJSL+F7mCFnQZ4058Ogje1+SdICGpg+eoVD6KSI9ATHXp50CNkWDhQ==
-X-Received: by 2002:a05:600c:4f87:b0:477:76c2:49c9 with SMTP id 5b1f17b1804b1-47904acae93mr15473845e9.2.1764062544770;
-        Tue, 25 Nov 2025 01:22:24 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.231])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf36f535sm245502945e9.8.2025.11.25.01.22.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Nov 2025 01:22:23 -0800 (PST)
-Message-ID: <526b5396-459d-4d02-8635-a222d07b46d7@redhat.com>
-Date: Tue, 25 Nov 2025 10:22:22 +0100
+        d=1e100.net; s=20230601; t=1764062699; x=1764667499;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H+N/esHuq8L2QAewoJC5E7AAXPZDfyRFaWXpHRgQYro=;
+        b=R7OvWKvmSXEUP2XCsfycexrDRC9tOxyYskunSsEV8JR6w9Yq8JsVyM52L52AgL2uNe
+         TChrt7/KwF5CNlvFB1bUrEyEygYrXH/PkHN++tQS9rvCC0mDFCiRE+CaZ66EKnG2GzHB
+         LqYEzVl0WouQ9Xks6TfcovDexOQtvlQwlnGkCjlZJflwZqrN/fJBUc58pdV02HonG3+W
+         BlYqVRUyEyT5vt6kqg/1kBAhjQ77jS1+majK3tFOiqFt9O5LnHqfAjwurpcgr5+/zm/9
+         2EBEjG6pUosqYhjw+nMOAUVY949Va13q2ihaomF1cY5OJaUbRXDpOZinPS5yRcUadQh/
+         kNng==
+X-Forwarded-Encrypted: i=1; AJvYcCX+9qYaCHq0KN26uK3Z/CFGojWR+Yfqg+DZSv1OD+d/OACid54bU+i95aKYW540/2eB/s5ySD0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYI2ueBATqya1csJFnK+5bNqGaKIK3seWucTpWiOUHOK80H3a/
+	1b1PmrMO9102Oc3ehwshVmipYUuOl/nt1JuQuSpEQZZsBM+3QMo650q2jCUPQqZMx/8sgLVpWiM
+	R5jWqTawK/Squtf1kQSnt/k961e0dumjDpcW3iXKYZU8FnwGahHmp47NoHA==
+X-Gm-Gg: ASbGncvn4PujyzmAD9njyGqHMcbMdOZ/vJGDj2ahgg2E2FaSIRKf/9RjU3epUiYSJLH
+	MfyOwvLyWiWN3GbaUUvPTXZKl9BNR6xMrPJNH6/evGOm5NAu/4X4bRUk+rqOkGrq7JMq7WXpK07
+	IUeOv7jZLwU/HHqYCbfpN87KBzvT1Va0a4sL18a+zhD0MP2Y5eGEs6hVZr0npF1s++xMWLzX36X
+	Qar1jj+H7nbKYUVdyZSfvNqFHeZTcGk3olkCS9cnboInCvIeYrUUjS58Cif5FNtf5h7nMD2Jw/q
+	Gl2dQBLI1bfBdm8YlPo7BpEhR6205bIu/fZR6UWrczUvnFQ7ayQ3LS3UgkotK5xhy+WswnR+cy9
+	pJnavaFyhgETt60q5jyREt9zoOFEYJn2Pueh6Y42OU6OUcrrq+e1n+UlGk0/daQ==
+X-Received: by 2002:a05:6000:3109:b0:42b:3592:1b88 with SMTP id ffacd0b85a97d-42e0f350255mr1946066f8f.50.1764062699431;
+        Tue, 25 Nov 2025 01:24:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFOINmS8NH5yU9ZL8Nf4fEf6WMmOdQHifzU7OMqNv6Owof/NynMw2jUGB1PZoQSH+fj3xbBUw==
+X-Received: by 2002:a05:6000:3109:b0:42b:3592:1b88 with SMTP id ffacd0b85a97d-42e0f350255mr1946011f8f.50.1764062698849;
+        Tue, 25 Nov 2025 01:24:58 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fb91f4sm33924782f8f.31.2025.11.25.01.24.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Nov 2025 01:24:58 -0800 (PST)
+Date: Tue, 25 Nov 2025 10:24:35 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, berrange@redhat.com, 
+	Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v11 03/13] vsock: reject bad
+ VSOCK_NET_MODE_LOCAL configuration for G2H
+Message-ID: <btejwapjdpapzk2jldxzffswbaqvsh4f5nb46otrghortyqbi2@2gdsthrxibjl>
+References: <20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com>
+ <20251120-vsock-vmtest-v11-3-55cbc80249a7@meta.com>
+ <swa5xpovczqucynffqgfotyx34lziccwpqomnm5a7iwmeyixfv@uehtzbdj53b4>
+ <aSC3IX81A3UhtD3N@devvm11784.nha0.facebook.com>
+ <g4xir3lupnjybh7fqig6xonp32ubotdf3emmrozdm52tpaxvxn@2t4ueynb7hqr>
+ <aSSV4RlRcW+uGy+n@devvm11784.nha0.facebook.com>
+ <qvu2mgxs7scbuwcb2ui7eh3qe3l7mlcjq6e2favd4aqcs52r2r@oqbrlp4gxdwl>
+ <aSSjNLrRmaOLkuBN@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: deadlock in virtnet_xdp_set()
-From: Paolo Abeni <pabeni@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>
-References: <e6a561af-0e3d-4ac6-bdbf-581cbb21de33@redhat.com>
-Content-Language: en-US
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-In-Reply-To: <e6a561af-0e3d-4ac6-bdbf-581cbb21de33@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aSSjNLrRmaOLkuBN@devvm11784.nha0.facebook.com>
 
-On 11/25/25 10:21 AM, Paolo Abeni wrote:
-> the NIPA CI reported this deadlock in the virtio_net driver:
-> 
-> https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
-> 
-> while running the xdp self-test (tools/testing/selftests/drivers/net/xdp.py)
-> 
-> Quickly skimming over it I suspect a race similar to the one addressed
-> by commit 1e20324b23f0 ("virtio-net: don't re-enable refill work too
-> early when NAPI is disabled").
-> 
-> Could you please have a better look?
+On Mon, Nov 24, 2025 at 10:25:56AM -0800, Bobby Eshleman wrote:
+>On Mon, Nov 24, 2025 at 06:54:45PM +0100, Stefano Garzarella wrote:
+>> On Mon, Nov 24, 2025 at 09:29:05AM -0800, Bobby Eshleman wrote:
+>> > On Mon, Nov 24, 2025 at 11:10:19AM +0100, Stefano Garzarella wrote:
+>> > > On Fri, Nov 21, 2025 at 11:01:53AM -0800, Bobby Eshleman wrote:
+>> > > > On Fri, Nov 21, 2025 at 03:24:25PM +0100, Stefano Garzarella wrote:
+>> > > > > On Thu, Nov 20, 2025 at 09:44:35PM -0800, Bobby Eshleman wrote:
+>>
+>> [...]
+>>
+>> > > >
+>> > > > > Since I guess we need another version of this patch, can you check the
+>> > > > > commit description to see if it reflects what we are doing now
+>> > > > > (e.g vhost is not enabled)?
+>> > > > >
+>> > > > > Also I don't understand why for vhost we will enable it later, but for
+>> > > > > virtio_transport and vsock_loopback we are enabling it now, also if this
+>> > > > > patch is before the support on that transports. I'm a bit confused.
+>> > > > >
+>> > > > > If something is unclear, let's discuss it before sending a new version.
+>> > > > >
+>> > > > >
+>> > > > > What I had in mind was, add this patch and explain why we need this new
+>> > > > > callback (like you did), but enable the support in the patches that
+>> > > > > really enable it for any transport. But maybe what is not clear to me is
+>> > > > > that we need this only for G2H. But now I'm confused about the discussion
+>> > > > > around vmci H2G. We decided to discard also that one, but here we are not
+>> > > > > checking that?
+>> > > > > I mean here we are calling supports_local_mode() only on G2H IIUC.
+>> > > >
+>> > > > Ah right, VMCI broke my original mental model of only needing this check
+>> > > > for G2H (originally I didn't realize VMCI was H2G too).
+>> > > >
+>> > > > I think now, we actually need to do this check for all of the transports
+>> > > > no? Including h2g, g2h, local, and dgram?
+>> > > >
+>> > > > Additionally, the commit description needs to be updated to reflect that.
+>> > >
+>> > > Let's take a step back, though, because I tried to understand the problem
+>> > > better and I'm confused.
+>> > >
+>> > > For example, in vmci (G2H side), when a packet arrives, we always use
+>> > > vsock_find_connected_socket(), which only searches in GLOBAL. So connections
+>> > > originating from the host can only reach global sockets in the guest. In
+>> > > this direction (host -> guest), we should be fine, right?
+>> > >
+>> > > Now let's consider the other direction, from guest to host, so the
+>> > > connection should be generated via vsock_connect().
+>> > > Here I see that we are not doing anything with regard to the source
+>> > > namespace. At this point, my question is whether we should modify
+>> > > vsock_assign_transport() or transport->stream_allow() to do this for each
+>> > > stream, and not prevent loading a G2H module a priori.
+>> > >
+>> > > For example, stream_allow() could check that the socket namespace is
+>> > > supported by the assigned transport. E.g., vmci can check that if the
+>> > > namespace mode is not GLOBAL, then it returns false. (Same thing in
+>> > > virtio-vsock, I mean the G2H driver).
+>> > >
+>> > > This should solve the guest -> host direction, but at this point I wonder if
+>> > > I'm missing something.
+>> >
+>> > For the G2H connect case that is true, but the situation gets a little
+>> > fuzzier on the G2H RX side w/ VMADDR_CID_ANY listeners.
+>> >
+>> > Let's say we have a nested system w/ both virtio-vsock and vhost-vsock.
+>> > We have a listener in namespace local on VMADDR_CID_ANY. So far, no
+>> > transport is assigned, so we can't call t->stream_allow() yet.
+>> > virtio-vsock only knows of global mode, so its lookup will fail (unless
+>>
+>> What is the problem of failing in this case?
+>> I mean, we are documenting that G2H will not be able to reach socket in
+>> namespaces with "local" mode. Old (and default) behaviour is still allowing
+>> them, right?
+>>
+>> I don't think it conflicts with the definition of “local” either, because
+>> these connections are coming from outside, and the user doesn't expect to be
+>> able to receive them in a “local” namespace, unless there is a way to put
+>> the device in the namespace (as with net). But this method doesn't exist
+>> yet, and by documenting it sufficiently, we can say that it will be
+>> supported in the future, but not for now.
+>>
+>> > we hack in some special case to virtio_transport_recv_pkt() to scan
+>> > local namespaces). vhost-vsock will work as expected. Letting local mode
+>> > sockets be silently unreachable by virtio-vsock seems potentially
+>> > confusing for users. If the system were not nested, we can pre-resolve
+>> > VMADDR_CID_ANY in bind() and handle things upfront as well. Rejecting
+>> > local mode outright is just a broad guardrail.
+>>
+>> Okay, but in that case, we are not supporting “local” mode too, but we are
+>> also preventing “global” from being used on these when we are in a nested
+>> environment. What is the advantage of this approach?
+>>
+>> >
+>> > If we're trying to find a less heavy-handed option, we might be able to
+>> > do the following:
+>> >
+>> > - change bind(cid) w/ cid != VMADDR_CID_ANY to directly assign the
+>> > transport
+>> >  for all socket types (not just SOCK_DGRAM)
+>>
+>> That would be nice, but it wouldn't solve the problem with VMADDR_CID_ANY,
+>> which I guess is the use case in 99% of cases.
+>>
+>> >
+>> > - vsock_assign_transport() can outright fail if !t->supports_local_mode()
+>> >  and sock_net(sk) has mode local
+>>
+>> But in this case, why not reusing stream_allow() ?
+>>
+>> >
+>> > - bind(VMADDR_CID_ANY) can maybe print (once) to dmesg a warning that
+>> >  only the H2G transport will land on VMADDR_CID_ANY sockets.
+>>
+>> mmm, I'm not sure about that, we should ask net maintainer, but IMO
+>> documenting that in af_vsock.c and man pages should be fine, till G2H will
+>> support that.
+>>
+>> >
+>> > I'm certainly open to other suggestions.
+>>
+>> IMO we should avoid the failure when loading G2H, which is more confusing
+>> than just discard connection from the host to a "local" namespace. We should
+>> try at least to support the "global" namespace.
+>>
+>> Thanks,
+>> Stefano
+>
+>
+>I'm 100% fine with that approach. I just wanted to make sure we landed
+>in the right place for how users may encounter places that there is no
+>local mode support.
 
-Whoops, sorry for the dup, I forgot adding netdev.
+Yeah, I see, thanks for that!
 
-/P
+>
+>So for next steps, we can drop this patch and add explicit logic in
+>->stream_allow() to allow local mode for vhost/loopback and reject for
+>others?
+
+Yep, I would add the logic in the "vsock: add netns to vsock core" 
+patch, including the changes to stream_allow(), supporting in all 
+transports only the global mode. In the next patches we can support 
+`local` mode in related transports (I guess for now just loopback and 
+vhost-vsock).
+
+> Plus, add documentation about what happens for VMADDR_CID_ANY
+>(will only receive vhost/loopback traffic in local mode)?
+
+I'd document that in af_vsock.c when we talk about "local". I'll make it 
+clear that not all transports support it, and we can mention that 
+example.
+
+When we will merge this series, we should also send a patch to the 
+vsock(7) manpage [1] to describe namespace support because I guess that 
+will be the entry point of the user.
+
+Thanks,
+Stefano
+
+[1] 
+https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/tree/man/man7/vsock.7
 
 
