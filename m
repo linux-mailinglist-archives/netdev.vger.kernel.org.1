@@ -1,152 +1,192 @@
-Return-Path: <netdev+bounces-241581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84713C860AC
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:54:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D9FF2C860AF
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:55:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 47F944E4182
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:54:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DEBA84E3738
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51361329C45;
-	Tue, 25 Nov 2025 16:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40525329399;
+	Tue, 25 Nov 2025 16:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="apIzVQrX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICcfg524";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oz7s6MO8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C18432938E
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA3332936F
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764089642; cv=none; b=lr3dNfPbRNBIiwPHMV6gnRzdixe6DHs5+d/WsrrgwRecpjzjTzLP1cnZfl4yDUUekRY3Gf+rWGn+q/bUKtqmIXtOv3AQATAewWqvk9ox7TZLbix++RbeXhtrHUkwOU9oLKV9hGfoh94Ut6BLm3ZsO5C5H+A3gheMenlemE8bPdk=
+	t=1764089691; cv=none; b=Ul6smbCzfVQTzn9hhpceny1/+SuzrvvgeHhpinJqgEUTZAfclorqGPLZ3ezLk26TZKr6uuC9srZtlghBnYYDR6+0kkusj/RvgqYozH3tcnrd3isXDE9TG8taGNRI2FbXkpinkp15m1FlB/VQ1W9P59/hXo69Q6JXyqpY6wO+wxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764089642; c=relaxed/simple;
-	bh=aUplM0Q+WymYe+1A/lZP7aug9PsfhHdEn+gWO5zCenM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BtOxNx+YAqOVYQMCOQv8Egx6xghLf0dMrVRFqx/zNnxZKMVXjPobJN3ZvAYZgE7/deikJRGnQEfzX/uO8DSh82B7tRbph2T/YR6BHnpCubIBFDReEL1EEv2X9jTeCJSgyUAoTkdiVC8vlgAqIpDab/3eXxYEQUKAFjt9rQc2laU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=apIzVQrX; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-297ec50477aso24475855ad.1
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 08:53:59 -0800 (PST)
+	s=arc-20240116; t=1764089691; c=relaxed/simple;
+	bh=M1xVC7gLm/5kXEcyVn8F+hiOuj4fAZSxatNimx4cXKI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cE+gam6YSMGrwED/dQcNivC5J6J8fjCwAfILFCjgiwDM0Uen98Tl3W7CnQW8qAno8V7qSB5OOIIC62AR7pC7NePcl+oASUEQrzUt9nhuIAMlNJWkXi+tfN5Z2gxtlpeuNZcLsXjjr7iAm0vhIZRnMNrv5+wPQUDSgzFDiQQltKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICcfg524; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Oz7s6MO8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764089688;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VSyjzVF3bRMyEucyth0abh8Rzk8q/nESWV3mm3a9fMs=;
+	b=ICcfg524yyWncZ46IOSHVChjwYI3HeeZegxEEnf1aj0wvS26uhPhhTf7QuEdUjkfKny+Bt
+	qWX+o4c+Oh5iB/O6+kwYutNmoSeCgJRkIa/p+GEPmcg3Sni/QYjaNOpZHDFLUfvbcJJMmo
+	/1GvpdqqIGx6shlUmMvbGw96CdD24YU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-676-1rVAWoN6Meyh1L4BUnFTFg-1; Tue, 25 Nov 2025 11:54:46 -0500
+X-MC-Unique: 1rVAWoN6Meyh1L4BUnFTFg-1
+X-Mimecast-MFC-AGG-ID: 1rVAWoN6Meyh1L4BUnFTFg_1764089684
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4775d110fabso50344245e9.1
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 08:54:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764089639; x=1764694439; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6s18FMY7uyV1u44mRCnu5uh2i4blp0jl9qxnh4O2Nz0=;
-        b=apIzVQrXn1eJ3b4cYXW4b0RSsqx/8AUv0ki1imPuN0shCz6xwUOoV1nLxYy0t5EPiC
-         EkT/p9BuQrPrQGG3R4Ygg37PyhJ5QkWPktWbZLC6el6QFpSKf2H+/cd3V7HGtwcyQLTt
-         N5cWzIIwM8Is+1AphzFN2kc/atq3a06B1pB/gELvomI0Zz0G0mqWbXEA4vbM2M1BH06Z
-         YsBElocCWuBFPyB2h8bCTe++Wt1VaVEdMe2D7Eb5w50LQf8nmRvNplXzZFFBfomxNG6k
-         atW3Y4dU5NxUFK6y19R9t9ym67my3qgbTA6cMqRh8AZusi2f84j4ZOzGfDCsgjrCfxia
-         EKWg==
+        d=redhat.com; s=google; t=1764089683; x=1764694483; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VSyjzVF3bRMyEucyth0abh8Rzk8q/nESWV3mm3a9fMs=;
+        b=Oz7s6MO8s4itO6fJyW7LuGeA+YQYLb63NmnVODYfKsSpxbJPrwWcAIyiyC6Nrc0jDq
+         hyD24dLZInuSLysOTuSSnRbVOcWH3Ej8UinzdHLOAUzr2XRl0JMoKJEDvJClltBWDJ/5
+         dlUEErJThDdC/uNkNn55Tl+URgCHiz/o2x2au9HFFzq+T1Dy6nWluZ22CIqBi/+JkZWg
+         KDz0CfJOAmFDNKxePNyfITPTLtf2rfbRNUZW2ISigiWKpTOXWzg+x4P7a3vLRlQdXkA6
+         cc6QLRrdKFhJTXn8iETjRQibxktidIGg4Zg2JEOCuXVAis6kPxrRRU61a4AKEAkX+5as
+         kKDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764089639; x=1764694439;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6s18FMY7uyV1u44mRCnu5uh2i4blp0jl9qxnh4O2Nz0=;
-        b=hmp6/s9OpLmPQQD4Xv2EEqX2TZbWUtTwQLwoRMwQrb2pSBCgz13z95K237pooNNaSz
-         zsMO5wWNctkscEbn7mqhSULCSQqwVX4jQQiXxWZUYJL2RnSJsbXSC8K3BF0qWQEzTCi8
-         aTwbWthbrE9wqQVBEvMNxGlSWbDbquccvivAF1nDNtlbwG1Bbr9uqNZ6LTFEvkqyODfN
-         1riwQiHaTbw5ghbzWK7tUyhYS7e03Qs0/VfZmpLsdyyIlZfpig6lDo48ZFcVdmeAhlac
-         faYOphtED3p9TIDVse4n6YPcS/vwd6rSO/bMyug8f5y3Z5KaBQxvfa9MOdTG8VoojmoK
-         U87w==
-X-Gm-Message-State: AOJu0YyfPxb3swxGYjwi+HLbxrOofiFg3tnd7muEaczm+YFSiaJ9U1JV
-	JWHR2p/9k1g1XyTpIVuC4jiaH0mP0wr4GsB0vEl9hI970SO3PfsrS0P+
-X-Gm-Gg: ASbGncsaGBWrmTPFZIt2FAS0qCygd6ORzB3Jf9WEAFW9kHoP26TN/A0fUkGvO65KVQm
-	kwQPQchDBElUWvMk1ySv6YcDcJOHOjoHH2fPpjsOSPS+GPjFI5SWAf69EtV/ppYINvOlks0GkIN
-	ilr4poiJOiIAjbvMmr02khkVnj/bJdrMaW/kMkKuViCPlBgan6zWELHvyBf6srIsk/tp8zFPviL
-	EXIyoqaMklXP6r0cNwQSZF0okKhQMDZNuS0I3Zau6c7+oWvsMpcU729XtVaw3TIHmKmB02oBdnr
-	FENh+iwsowQm4Xx+kzRP5qbUSfqn8j7hTpgfv8pYMhI+DCDbSqqQzXl1rrqTNPBEq3F4T0Qwasf
-	kOXFPUKe3IkPurhGXfIuu6pdbOwvYaQnsqiZ8NAkerlELmzKsmtllVcpfG72HeCs/aQFCY8xwhO
-	8Pomes5fpfkTZx7Vg=
-X-Google-Smtp-Source: AGHT+IHbazQEvSJes2O1nzZNAo1c74boxJ0wjTnr/HuZ/uGnkJLH8XoebhI/9J0mCujwUj3AMXkadw==
-X-Received: by 2002:a17:902:f78c:b0:297:eb3c:51ed with SMTP id d9443c01a7336-29b5e38c16dmr231490695ad.16.1764089639434;
-        Tue, 25 Nov 2025 08:53:59 -0800 (PST)
-Received: from fedora ([103.120.31.122])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b2ad643sm172438435ad.91.2025.11.25.08.53.54
+        d=1e100.net; s=20230601; t=1764089683; x=1764694483;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VSyjzVF3bRMyEucyth0abh8Rzk8q/nESWV3mm3a9fMs=;
+        b=oK+0hkG0bW6Jazpnz2c/mjQkxBKA6W8O+7IP53LfC/HJQFJr8xIdTkvaRD9ey5voBc
+         pA13xdgYMw3KyITSVzhBUpp3G1hQMZdYVbf5lJzZ8s6OEBRPpqhzqKrR2qvmlFJL/Ue7
+         kUEQadXObdTt8MNQ0HJ5mMzuRJ842WpaRxnJpZLzZ+TM3ddyO+xkCGmT0D8DBAOuamFo
+         93kC7se4RsGr68oFnGhCPtW1LpTyqOFauQ8wzUYW8OGQhFRxGlyik+KQrk0JEvtt0vV6
+         YGbmfqtFNJUNPZQQKC+iWa26bWb+hGNgC3Gr4YmXSrWjIBf76n41050w4jQeBSDkOiXW
+         nP1g==
+X-Forwarded-Encrypted: i=1; AJvYcCXxvkBSrnd9B3V+5ZQ+YDr9+LoHPHyvUEBWFDFhLRHqh5UPWpfXW4aC3Hlz43Xm+YzRhh/4T34=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4pSna6MntbGy8T6WgONiSVCRcuyr9hpq9UjgdovqJfpFvjgrn
+	xtCw2PY3C26P1x+KIt+dBW3wsklQbUa+idhStN3k6G+3TfSjAkfPv09Fk5kWnkCHfoDvKIaNLQp
+	IhrE04sW8Ui1HInrPAgOhkRq5r13KR+T1ExCUZKN65OrO5nSYuzthwd0cIQ==
+X-Gm-Gg: ASbGncsBbjBpbVKOjj2DyxroIDeH3QTsaYRghMbFmf7l6bZzf3SyfabraAOoq4US15f
+	+p/Us7FRc7fBy9vX85VsGiVHIzloYLlBwvx1CU90Av/w5+kJcuKD0KxhWJnqHl7us60dc3TvQyV
+	6OKcqtCPe6lotpxlzCmvD25I8hqWeeTQGNqsXvCj+E15VR8KojOK7H8A8iQwtyuSPBpDTOK/ysH
+	lSaK7jse6SdCwVtz7yoSey2hj8ipsM5yS99hE/jyS46NQhWa2Xe5Y/g+McF3t0LN/4BcYwsFDU1
+	ox/hNbAux/lJPGqp3fMvkqgg/ctwGJs52BiwEFIfsSu7ubgX7MbYi4T+c51Cs5L/yeS55kXc4GG
+	GgoRefIkTfnPPo3o=
+X-Received: by 2002:a05:600c:c8c:b0:471:1435:b0ea with SMTP id 5b1f17b1804b1-47904b242eemr43823265e9.24.1764089683432;
+        Tue, 25 Nov 2025 08:54:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFI01s5vSZlwPc1XuZyxkfAjV2ILVY5rmqifLiNvt5a+hPHMgV9ZhgyCmVtX0zbnJSE6jyd/w==
+X-Received: by 2002:a05:600c:c8c:b0:471:1435:b0ea with SMTP id 5b1f17b1804b1-47904b242eemr43822735e9.24.1764089682896;
+        Tue, 25 Nov 2025 08:54:42 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf1e86b3sm317496245e9.6.2025.11.25.08.54.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 08:53:58 -0800 (PST)
-From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Xing <kernelxing@tencent.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-Subject: [PATCH net-next v2] selftests/net: initialize char variable to null
-Date: Tue, 25 Nov 2025 22:23:02 +0530
-Message-ID: <20251125165302.20079-1-ankitkhushwaha.linux@gmail.com>
-X-Mailer: git-send-email 2.52.0
+        Tue, 25 Nov 2025 08:54:42 -0800 (PST)
+Date: Tue, 25 Nov 2025 11:54:39 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v6 3/8] tun/tap: add synchronized ring
+ produce/consume with queue management
+Message-ID: <20251125100655-mutt-send-email-mst@kernel.org>
+References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
+ <20251120152914.1127975-4-simon.schippers@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251120152914.1127975-4-simon.schippers@tu-dortmund.de>
 
-char variable in 'so_txtime.c' & 'txtimestamp.c' were left uninitilized
-when switch default case taken. which raises following warning.
+On Thu, Nov 20, 2025 at 04:29:08PM +0100, Simon Schippers wrote:
+> Implement new ring buffer produce and consume functions for tun and tap
+> drivers that provide lockless producer-consumer synchronization and
+> netdev queue management to prevent ptr_ring tail drop and permanent
+> starvation.
+> 
+> - tun_ring_produce(): Produces packets to the ptr_ring with proper memory
+>   barriers and proactively stops the netdev queue when the ring is about
+>   to become full.
+> 
+> - __tun_ring_consume() / __tap_ring_consume(): Internal consume functions
+>   that check if the netdev queue was stopped due to a full ring, and wake
+>   it when space becomes available. Uses memory barriers to ensure proper
+>   ordering between producer and consumer.
+> 
+> - tun_ring_consume() / tap_ring_consume(): Wrapper functions that acquire
+>   the consumer lock before calling the internal consume functions.
+> 
+> Key features:
+> - Proactive queue stopping using __ptr_ring_full_next() to stop the queue
+>   before it becomes completely full.
+> - Not stopping the queue when the ptr_ring is full already, because if
+>   the consumer empties all entries in the meantime, stopping the queue
+>   would cause permanent starvation.
 
-	txtimestamp.c:240:2: warning: variable 'tsname' is used uninitialized
-	whenever switch default is taken [-Wsometimes-uninitialized]
+what is permanent starvation? this comment seems to answer this
+question:
 
-	so_txtime.c:210:3: warning: variable 'reason' is used uninitialized
-	whenever switch default is taken [-Wsometimes-uninitialized]
 
-initializing these variables to NULL to fix this.
+	/* Do not stop the netdev queue if the ptr_ring is full already.
+	 * The consumer could empty out the ptr_ring in the meantime
+	 * without noticing the stopped netdev queue, resulting in a
+	 * stopped netdev queue and an empty ptr_ring. In this case the
+	 * netdev queue would stay stopped forever.
+	 */
 
-Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
----
-changelog:
-v2:
-change patch name to net-next.
 
-v1:
-https://lore.kernel.org/all/20251124161324.16901-1-ankitkhushwaha.linux@gmail.com/
----
- tools/testing/selftests/net/so_txtime.c   | 2 +-
- tools/testing/selftests/net/txtimestamp.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+why having a single entry in
+the ring we never use helpful to address this?
 
-diff --git a/tools/testing/selftests/net/so_txtime.c b/tools/testing/selftests/net/so_txtime.c
-index 8457b7ccbc09..b76df1efc2ef 100644
---- a/tools/testing/selftests/net/so_txtime.c
-+++ b/tools/testing/selftests/net/so_txtime.c
-@@ -174,7 +174,7 @@ static int do_recv_errqueue_timeout(int fdt)
- 	msg.msg_controllen = sizeof(control);
 
- 	while (1) {
--		const char *reason;
-+		const char *reason = NULL;
 
- 		ret = recvmsg(fdt, &msg, MSG_ERRQUEUE);
- 		if (ret == -1 && errno == EAGAIN)
-diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
-index dae91eb97d69..bcc14688661d 100644
---- a/tools/testing/selftests/net/txtimestamp.c
-+++ b/tools/testing/selftests/net/txtimestamp.c
-@@ -217,7 +217,7 @@ static void print_timestamp_usr(void)
- static void print_timestamp(struct scm_timestamping *tss, int tstype,
- 			    int tskey, int payload_len)
- {
--	const char *tsname;
-+	const char *tsname = NULL;
 
- 	validate_key(tskey, tstype);
+In fact, all your patch does to solve it, is check
+netif_tx_queue_stopped on every consumed packet.
 
---
-2.52.0
+
+I already proposed:
+
+static inline int __ptr_ring_peek_producer(struct ptr_ring *r)
+{
+        if (unlikely(!r->size) || r->queue[r->producer])
+                return -ENOSPC;
+        return 0;
+}
+
+And with that, why isn't avoiding the race as simple as
+just rechecking after stopping the queue?
+
+__ptr_ring_produce();
+if (__ptr_ring_peek_producer())
+	netif_tx_stop_queue
+	if (!__ptr_ring_peek_producer())
+		netif_tx_wake_queue(txq);
+
+
+
+
+
+
+
+-- 
+MST
 
 
