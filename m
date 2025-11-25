@@ -1,64 +1,74 @@
-Return-Path: <netdev+bounces-241679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55062C8758D
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 23:36:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDDE6C87584
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 23:36:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 88E864EBA61
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 22:35:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90DCF3B5F78
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 22:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26A933FE20;
-	Tue, 25 Nov 2025 22:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02E8314D1B;
+	Tue, 25 Nov 2025 22:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="dYC/Vodo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="REPQ/ZpA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200F833F8D2;
-	Tue, 25 Nov 2025 22:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062AF2EFD91
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 22:36:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764110020; cv=none; b=WFHQ52lEZFBtlk2aC4vL2SvHSIgAeLNgZhY2tsEhUObUT/xqVUgBqV+fpvhcVYfXCDn638thc1kJNHEfdMPUzRDnWPNvmq32qSew1NdYRR8RDV+RSb2B3o/qxViKBoN/x9wfm6QTYfurEYaAZWXJezFYOnbettSt0RKt6KWguBM=
+	t=1764110198; cv=none; b=OZfPXzUU29IsnDx0tf9qKwaZj0yZsgUwmAQI/vYs4zyv63rjcsjW4DZC6nwh6skPwFEYsGuHxEAi1dzxp0GFD7CLTldq1UoJg2EwY8zRbiw2zhoqL2lI3E8Odl1Gx8iK7klAXb3xt/4cCykXFwDWe59ZFG71YwBaVKUTDQboqug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764110020; c=relaxed/simple;
-	bh=dN/TnNPylo9A9QSP94vr9a6n9mwd7vHCVPpFiUiKl68=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HjqUtYEZaXaaSAIk+0RTKi3QzZNVyOzwtKgUFrknlF07PkxZWflrNvnAvPE43gat0nIrCIMkPFyd8HKto+sC5bINqg4YwyexRgiceG1ntpPWVFpNnSYxFOGEvZThLPRwU+5/0oDwfSjMXPrLlp1vZv/p6LtGHAWX6z9OCvZ6np0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=dYC/Vodo; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id E4FB26026C;
-	Tue, 25 Nov 2025 23:33:36 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1764110017;
-	bh=KEIyZlBt5ANXgCIg1tIMzlRcOXaKZNTQ+/VibBB3J48=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dYC/VodofS8w3AJ16BnQ+oNUwfQ04gh/TfU99vVMiZKzb1gG8FitEEVolP3sWny6J
-	 7OXaWxTBYLAFU/k30n4tGofpwGCZFqUEI2ZqGyRBXTtrQrA97KydEhifL53BYA1Zhr
-	 NsVCUBIWHqe84UmBm4elgnMuXj6nZbroaeLMeEzah3SO67VxKd6flg6HG7ZELYNNGK
-	 2/W3ygoGntWylwnRxEaiN6mXX8Ltp+HMx1FsR52xJevb2ve0UEw91l0NqkXdv311Dk
-	 L3UyLXt8sOy1KQUiKNT/n02O9stl4h1cyeKXsvoBs7thPlpr1q1MZf1TZf4VRzxXqb
-	 7jo+IaHECrjHQ==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1764110198; c=relaxed/simple;
+	bh=hcRJtIbfuGCj6EbbhHXb5AH940Gb3VVqfGDLXmM7GYA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RXPV6o5FA/jqvD3HjuW/8oe5STi1SiX7F41BzLBBMT1E52bCvjyJIeXnV7ruAxaVr9jr88ekqObh3dBREg75KMItZvDrJjPwM2lKfWezCEOyW12DCS/78M/fqowByHw6Jc9YEAVUdd/smVmEyfd7gXoKgEVw0fIO2hn/4GTOY8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=REPQ/ZpA; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764110197; x=1795646197;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=hcRJtIbfuGCj6EbbhHXb5AH940Gb3VVqfGDLXmM7GYA=;
+  b=REPQ/ZpAhTRopmNCfKZAjxu3RPK/r5NavyqxypHLuVxNhDh09o7LUJqA
+   HHANFd2kTSlJGlmgw9CetFqxsIQcthi+dwn4hNFeqDPYXJi8pvKuVtri/
+   SyfCdktkXESH6GpabjWScSES+ysUEYa9yY9S8Uq3SVu66bzXghOYtLED7
+   mwvymcrLUcvhgUIpQqEKbgXRATJyrLl3UiwZRdHFq6sz/0z24vROmrt3/
+   J6AoF+7xJhgPV3XBSEKxBdkyA120qE7oyKeIIdzt808Q0LHUGB26KUBpR
+   hfbyRNd2GehJdQeg1TIjYx55kwduzaFNvoRMhAOyKWe6DBYZsm3eDoyVN
+   A==;
+X-CSE-ConnectionGUID: Li+SwvGNRnqZLW+tP9o4qg==
+X-CSE-MsgGUID: 8DneApJ8QUKviFMNLf234w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="68729871"
+X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
+   d="scan'208";a="68729871"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 14:36:36 -0800
+X-CSE-ConnectionGUID: xZXg10n6R6q6ygzM4PJsHw==
+X-CSE-MsgGUID: 3Wqjr1bdTW2BP6YrcnHOCw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
+   d="scan'208";a="193209539"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa009.fm.intel.com with ESMTP; 25 Nov 2025 14:36:36 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net-next 16/16] netfilter: nf_tables: improve UAPI kernel-doc comments
-Date: Tue, 25 Nov 2025 22:33:12 +0000
-Message-ID: <20251125223312.1246891-17-pablo@netfilter.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251125223312.1246891-1-pablo@netfilter.org>
-References: <20251125223312.1246891-1-pablo@netfilter.org>
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 00/11][pull request] Intel Wired LAN Driver Updates 2025-11-25 (ice, idpf, iavf, ixgbe, ixgbevf, e1000e)
+Date: Tue, 25 Nov 2025 14:36:19 -0800
+Message-ID: <20251125223632.1857532-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,96 +77,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Randy Dunlap <rdunlap@infradead.org>
+Arkadiusz adds support for unmanaged DPLL for ice E830 devices; device
+settings are fixed but can be queried by DPLL.
 
-In include/uapi/linux/netfilter/nf_tables.h,
-correct the kernel-doc comments for mistyped enum names and enum values to
-avoid these kernel-doc warnings and improve the documentation:
+Grzegorz commonizes firmware loading process across all ice devices.
 
-nf_tables.h:896: warning: Enum value 'NFT_EXTHDR_OP_TCPOPT' not described
- in enum 'nft_exthdr_op'
-nf_tables.h:896: warning: Excess enum value 'NFT_EXTHDR_OP_TCP' description
- in 'nft_exthdr_op'
+Birger Koblitz adds support for 10G-BX to ixgbe.
 
-nf_tables.h:1210: warning: expecting prototype for enum
- nft_flow_attributes. Prototype was for enum nft_offload_attributes instead
+Natalia cleans up ixgbevf_q_vector struct removing an unused field.
 
-nf_tables.h:1428: warning: expecting prototype for enum nft_reject_code.
- Prototype was for enum nft_reject_inet_code instead
+Emil converts vport state tracking from enum to bitmap and removes
+unneeded states for idpf.
 
-(add beginning '@' to each enum value description:)
-nf_tables.h:1493: warning: Enum value 'NFTA_TPROXY_FAMILY' not described
- in enum 'nft_tproxy_attributes'
-nf_tables.h:1493: warning: Enum value 'NFTA_TPROXY_REG_ADDR' not described
- in enum 'nft_tproxy_attributes'
-nf_tables.h:1493: warning: Enum value 'NFTA_TPROXY_REG_PORT' not described
- in enum 'nft_tproxy_attributes'
+Tony removes an unneeded check from e1000e.
 
-nf_tables.h:1796: warning: expecting prototype for enum
- nft_device_attributes. Prototype was for enum
- nft_devices_attributes instead
+Alok Tiwari removes an unnecessary second call to
+ixgbe_non_sfp_link_config() and adjusts the checked member, in idpf, to
+reflect the member that is later used. He also fixes various typos and
+messages for better clarity misc Intel drivers.
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- include/uapi/linux/netfilter/nf_tables.h | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+The following are changes since commit 61e628023d79386e93d2d64f8b7af439d27617a6:
+  Merge branch 'net_sched-speedup-qdisc-dequeue'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
 
-diff --git a/include/uapi/linux/netfilter/nf_tables.h b/include/uapi/linux/netfilter/nf_tables.h
-index 7c0c915f0306..45c71f7d21c2 100644
---- a/include/uapi/linux/netfilter/nf_tables.h
-+++ b/include/uapi/linux/netfilter/nf_tables.h
-@@ -881,7 +881,7 @@ enum nft_exthdr_flags {
-  * enum nft_exthdr_op - nf_tables match options
-  *
-  * @NFT_EXTHDR_OP_IPV6: match against ipv6 extension headers
-- * @NFT_EXTHDR_OP_TCP: match against tcp options
-+ * @NFT_EXTHDR_OP_TCPOPT: match against tcp options
-  * @NFT_EXTHDR_OP_IPV4: match against ipv4 options
-  * @NFT_EXTHDR_OP_SCTP: match against sctp chunks
-  * @NFT_EXTHDR_OP_DCCP: match against dccp otions
-@@ -1200,7 +1200,7 @@ enum nft_ct_attributes {
- #define NFTA_CT_MAX		(__NFTA_CT_MAX - 1)
- 
- /**
-- * enum nft_flow_attributes - ct offload expression attributes
-+ * enum nft_offload_attributes - ct offload expression attributes
-  * @NFTA_FLOW_TABLE_NAME: flow table name (NLA_STRING)
-  */
- enum nft_offload_attributes {
-@@ -1410,7 +1410,7 @@ enum nft_reject_types {
- };
- 
- /**
-- * enum nft_reject_code - Generic reject codes for IPv4/IPv6
-+ * enum nft_reject_inet_code - Generic reject codes for IPv4/IPv6
-  *
-  * @NFT_REJECT_ICMPX_NO_ROUTE: no route to host / network unreachable
-  * @NFT_REJECT_ICMPX_PORT_UNREACH: port unreachable
-@@ -1480,9 +1480,9 @@ enum nft_nat_attributes {
- /**
-  * enum nft_tproxy_attributes - nf_tables tproxy expression netlink attributes
-  *
-- * NFTA_TPROXY_FAMILY: Target address family (NLA_U32: nft_registers)
-- * NFTA_TPROXY_REG_ADDR: Target address register (NLA_U32: nft_registers)
-- * NFTA_TPROXY_REG_PORT: Target port register (NLA_U32: nft_registers)
-+ * @NFTA_TPROXY_FAMILY: Target address family (NLA_U32: nft_registers)
-+ * @NFTA_TPROXY_REG_ADDR: Target address register (NLA_U32: nft_registers)
-+ * @NFTA_TPROXY_REG_PORT: Target port register (NLA_U32: nft_registers)
-  */
- enum nft_tproxy_attributes {
- 	NFTA_TPROXY_UNSPEC,
-@@ -1783,7 +1783,7 @@ enum nft_synproxy_attributes {
- #define NFTA_SYNPROXY_MAX (__NFTA_SYNPROXY_MAX - 1)
- 
- /**
-- * enum nft_device_attributes - nf_tables device netlink attributes
-+ * enum nft_devices_attributes - nf_tables device netlink attributes
-  *
-  * @NFTA_DEVICE_NAME: name of this device (NLA_STRING)
-  * @NFTA_DEVICE_PREFIX: device name prefix, a simple wildcard (NLA_STRING)
+Alok Tiwari (5):
+  ixgbe: avoid redundant call to ixgbe_non_sfp_link_config()
+  idpf: use desc_ring when checking completion queue DMA allocation
+  idpf: correct queue index in Rx allocation error messages
+  ice: fix comment typo and correct module format string
+  iavf: clarify VLAN add/delete log messages and lower log level
+
+Arkadiusz Kubalewski (1):
+  ice: add support for unmanaged DPLL on E830 NIC
+
+Birger Koblitz (1):
+  ixgbe: Add 10G-BX support
+
+Emil Tantilov (1):
+  idpf: convert vport state to bitmap
+
+Grzegorz Nitka (1):
+  ice: unify PHY FW loading status handler for E800 devices
+
+Natalia Wochtman (1):
+  ixgbevf: ixgbevf_q_vector clean up
+
+Tony Nguyen (1):
+  e1000e: Remove unneeded checks
+
+ .../device_drivers/ethernet/intel/ice.rst     |  80 +++++
+ drivers/net/ethernet/intel/e1000e/ethtool.c   |   6 +-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  12 +-
+ .../net/ethernet/intel/ice/devlink/health.c   |   4 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  12 +
+ drivers/net/ethernet/intel/ice/ice_common.c   | 214 ++++++++----
+ drivers/net/ethernet/intel/ice/ice_common.h   |   8 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 311 ++++++++++++++++--
+ drivers/net/ethernet/intel/ice/ice_dpll.h     |  11 +
+ drivers/net/ethernet/intel/ice/ice_fdir.c     |   2 +-
+ .../net/ethernet/intel/ice/ice_fw_update.c    |   2 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  14 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  46 +++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   1 +
+ drivers/net/ethernet/intel/idpf/idpf.h        |  12 +-
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    |  12 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |  24 +-
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   |   2 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  12 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   |   4 +-
+ drivers/net/ethernet/intel/idpf/xdp.c         |   2 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |   7 +
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |   2 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  |  43 ++-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h  |   2 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |   2 +
+ drivers/net/ethernet/intel/ixgbevf/ixgbevf.h  |  18 +-
+ 28 files changed, 718 insertions(+), 151 deletions(-)
+
 -- 
-2.47.3
+2.47.1
 
 
