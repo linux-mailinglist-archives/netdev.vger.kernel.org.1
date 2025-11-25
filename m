@@ -1,678 +1,267 @@
-Return-Path: <netdev+bounces-241528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1F1DC850E3
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 13:59:16 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01A44C851DA
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 14:10:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3AAC34EA01B
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 12:58:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7E879350321
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 13:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A5E321F48;
-	Tue, 25 Nov 2025 12:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A69A321F5E;
+	Tue, 25 Nov 2025 13:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PIa+hEUO";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PvzW5J2u"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="58n+PjxN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013006.outbound.protection.outlook.com [40.93.201.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C130320CC3
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 12:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764075508; cv=none; b=ZaUVd34j1ezawwdlnPin+M3qhwsVpq9XIATh+6yv1I2JDw4k5CfRQceXD8Nru+mgdw4HnVNZL0rm5wMpS8IphZyUmvN2+hgpL4uF630+9bdhpALzosTDfzMujf1xXzwpQPS6UrgCScmyuPvXs73n72uXGVgSwsyoD72g6ugumts=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764075508; c=relaxed/simple;
-	bh=z6xwYMx1ZTgnAf2GsWO1M6tvpH5fITifUCOr17917eE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AQdHeb0X5pbr9Q0xoadue1lHuIZcOE4pkHRN5dttFXZmOvxykDXP+ZNVHoNiTw5IHrslBLFLeUfOU9mqQTWh/VAugY+b2ziKmBPNmLFkKEa4NedjLoqdaZks1lAYLlg7fxV6MbWNMzCT+j7WlMG9cVsDkBs96v38boFRgybJujY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PIa+hEUO; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PvzW5J2u; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764075505;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZobjZoKfwXrzxmqwbkou1OOzeaNCsJasa95pMzw6YlA=;
-	b=PIa+hEUOUF83izjrSrOLHpfemIWjfFTK4iXKmlTy13eXMNE4x3unsIOelqODVFy45EpJ9o
-	mpPFfmC7qC+WNEvoM4baFyBWv3nRrzJXzVWBh+TtkNkQnZDAz1+GPFiLRbrzHNQgejuAI2
-	tprv3qtrK29fSatk+5dS6yJSz4lbgtI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-gkRtyrnjNVC1JGxpOELHcA-1; Tue, 25 Nov 2025 07:58:24 -0500
-X-MC-Unique: gkRtyrnjNVC1JGxpOELHcA-1
-X-Mimecast-MFC-AGG-ID: gkRtyrnjNVC1JGxpOELHcA_1764075503
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477939321e6so31638715e9.0
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 04:58:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764075503; x=1764680303; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZobjZoKfwXrzxmqwbkou1OOzeaNCsJasa95pMzw6YlA=;
-        b=PvzW5J2u5lWOrn+uc3L+MTK5O5eqQphsR5YaS0nL+UJsI5ZJW6ElREPGGD9y0Cx21A
-         aB0SW/c5Ces1hcPhbS6cdKUNT3u68VqwRuFGgnAS3Qhsms+tfazswjYtUxUJ/bVXU9HT
-         qxz4DNmcHg6YxF0WBML2EVImHCKcWnSsyJJYON5/7YPVH7hxhc0z5APEWlNBJz7FG9kE
-         +RriDW0QuS8Te38l8McGHT7OFc4ka+n2H7hOmuDTov/F1Ado9aFR0A0PR+glezrVvDgN
-         +KD5PUnD3+8ejNGe4Adhvu/+DqQmM/eAVCrW9QToKViXYrn8z1Rg6Dhv5YocZ4v0JXyV
-         o0Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764075503; x=1764680303;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZobjZoKfwXrzxmqwbkou1OOzeaNCsJasa95pMzw6YlA=;
-        b=Zf9eWqPxVDoiSVLv1lgn7nIof+fih17m3vXCnqY7HUzuHEobSOzL9xSmkTI/tjXSB3
-         qSFP5oG+FTABJkUEWAAPQXjoZAZ14fq9zm6IppCMzX8xi7EhhDtq9xEVRBSxbL1+ZOtZ
-         n+/Iiy7Z1AHfIFwjqb9zl1hPa9yCz/wYkiIdHjP0+Tw/77eD/xBnMdWkgWh/cBB36hEh
-         xdV/uJXXlt+3WTVLnQXJVLsweq1YEgqs6HlN3QKrDER0bDcsUlKISza8VA/uZJIY/+X0
-         1ALnGwg/wqPQ2Vl3DvbfPmi5dKQICd+5xZLvVP86vMYfY17J5Ralz1AXizLeyxUGx0pa
-         9gAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWlKRHL51INZSzZUP/NXhO20OYIKH3gvw4Jg1srWZETvqug5v6DI5P609F9kOXIJgv/uNiavek=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynJ+ydZ8UHA5QNbRdQn84CE14PVcRDn3KYSboQf8OBETlNRc7R
-	EXH51pIjU4X/c+Uc369yRZprBR//EcgX1Gn38Cw9fM/cld0DrNXKStqnjTjOhBYqMbODMb420an
-	HKCHuoF1E49PhzmRm5btdJMyPkSLYMp6RmgFkZECeFEzjgIlKbZZ9AF2b4w==
-X-Gm-Gg: ASbGncvaDaz7VJud0kWW99rFb0y/7PIW7QK/YTBlBVFwbJOHLTxVgIvMfHJpWGDEFub
-	YzVRDFjRSaJpm9vXK84H6Ow/dGv+tKrVH6GB5Cn2y7wRtN/TZCQGMwax+hv9J9JL3kgb3FcaKAg
-	O3MsM9TCo2ei4sIc4JdrOT3bSQGZFt38m5LZCdbJEc2kYNOziDCeVa2LApF8JHv7uhShM3A4zNB
-	YvwC7M4ySmW/O2e9pE4RMPHLuuWgGeRZBqMlKreqgYUorKNl7hChK7zJSazNKpG6Ei8Lv5txdoR
-	g1TPU6mAut5yRYvH2NWTPbHAOS7Gt5Dy6kEffHG0CuG0xj6M4UIa/ZGrduBApgO3kmUGkoXBeZG
-	/S4Vo8Kmw8lb9/w==
-X-Received: by 2002:a05:600c:8b37:b0:45d:d97c:236c with SMTP id 5b1f17b1804b1-47904b1ad25mr23227345e9.21.1764075502511;
-        Tue, 25 Nov 2025 04:58:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGFWqCm2Z2ZZtdnoQR4DjLUuZTf/8khC3tfCapXFMn8mAe2zhFE5g4zopGYaMg2S7GVJmkt2w==
-X-Received: by 2002:a05:600c:8b37:b0:45d:d97c:236c with SMTP id 5b1f17b1804b1-47904b1ad25mr23226945e9.21.1764075501929;
-        Tue, 25 Nov 2025 04:58:21 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.231])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477c0d85360sm246238125e9.15.2025.11.25.04.58.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Nov 2025 04:58:20 -0800 (PST)
-Message-ID: <3d5ef6e5-cfcc-4994-a8d2-857821b79ed8@redhat.com>
-Date: Tue, 25 Nov 2025 13:58:18 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0830322A13;
+	Tue, 25 Nov 2025 13:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.6
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764076212; cv=fail; b=i56rDEMFi/zbaAtC/SBsS2UvTbLXdlb7tsOAtFOWDM06ZCJs4k6V8ngEWegf+tmHuBohwWO5AuJdHopdGUydtTVTzR3bwmJb601wWdhCsSmL4gKp70ST4oNEaYfLUmzExdFNN/qf7NnAoA79eWC7UP0rRiua0Qjy4tBIuzTbbso=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764076212; c=relaxed/simple;
+	bh=iVcxsei8TgQwhH3r1v81CcRymLk2h3MROO1xAbvPCEI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QdcZ3oyw83Cla9/i/oujS5jY3sPWMqIivUbR+81AS8k7zyMGOdgx4cbFHP2/4BheefmHC7ik+y1cGmIx3GCeWBkhk6vFNUM34FofmRFFZbGfvaLCzZzj5jHUCLjQsu+pXcr2zPX4QimDA6RIBGbd+3cjWWco4e9c36fC8bkL6ks=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=58n+PjxN; arc=fail smtp.client-ip=40.93.201.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=arsf42G8/dATLt1L4a1j/h5r2LWkb7FFT5HhsN951SmVAEJeZNXwTZTFRzJlh+btL/RRZXVbY4YNtQs91qzKyuznMHNEq2Y/Ro/TPA4upOkvOwPBVxEBKM3yYAMX4thD63kCWnprHkbFIqB7npiIZOX6YYVYO7IafTEymx/AgLBlMNMGpspPdeRso4QSGgKfz/SjkoQ05b8pteaKgFZ4n9SAg2NgC0oex7wCufFHmiwk+gRIwHMXXJvG2+AIc22w30cr2lrGm+ZPNqIXDkgHs2u9XKYtgqWeS6foHhCx8ZMmV7GYCJiFcDDrvE5OFRkzjCiVXZ6KYCHxjDHwh8LBQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iVcxsei8TgQwhH3r1v81CcRymLk2h3MROO1xAbvPCEI=;
+ b=qlVMcjCUrLpjW7k3ZSx51IFgiALNAP0euGdFluUQfoy4PnLg/2dh7gocC/BdOtSighGXxfT1qfUNqIdWfvuqwIn8cAvaW2sFsYPo7TIJoSSt9+i5ozBYvx2NzNH/nA3b0WCSPdrjDnxssPPmRqVwdrUOdCzVW+oBkIBFaTUBxrsDQlAahtXtd4a9faKQb9mdlM3oQz8vXP4eDQtxc+perU+KLwG7v3KdeD3cDtfNnaWlYM01wjWKUpLGA4lgg3QnUL9My0L5Iestclvfyk4iqs5BC/EsXE1iUFu+yD6HD9PH3BD54PLXHMjmDyMpCL/5PGR8rwrbeTe6jpLcy0eJWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iVcxsei8TgQwhH3r1v81CcRymLk2h3MROO1xAbvPCEI=;
+ b=58n+PjxNtk/IiGxQLQAYrha8J8jpZiQbXFcbeyHFjcr4ASqPAcdd5CweJ+nyJMjYkGt7V0QDQx1qou8WqiYDeExbFWRkAIl7VrJ8k5EAfF4kheZ2v43xsROrxROWAr2bH28ZRN/Q9rQl0cg+8LkGMFn2RlfUDGy28WjuDX4XXulckaKCqsusxQdEChbysqdK3gicqG1NW8xARrNJoqpqOpC3wdJBZxfVxn510VBp0DUkgb51KO+tmL0MwNYToGhYv2QOcm2LI7ldBVGV/NUXe5aOX2VotknDSuw11QFSYSB2yinKwAVMFOR/dnr4zrgaK6dTEahgYNb9HaQspblilg==
+Received: from SA1PR11MB8278.namprd11.prod.outlook.com (2603:10b6:806:25b::19)
+ by DS4PPFCD40128AE.namprd11.prod.outlook.com (2603:10b6:f:fc02::4f) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.11; Tue, 25 Nov
+ 2025 13:10:07 +0000
+Received: from SA1PR11MB8278.namprd11.prod.outlook.com
+ ([fe80::3a83:d243:3600:8ecf]) by SA1PR11MB8278.namprd11.prod.outlook.com
+ ([fe80::3a83:d243:3600:8ecf%6]) with mapi id 15.20.9366.009; Tue, 25 Nov 2025
+ 13:10:07 +0000
+From: <Parthiban.Veerasooran@microchip.com>
+To: <horms@kernel.org>
+CC: <piergiorgio.beruto@gmail.com>, <andrew@lunn.ch>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 1/2] net: phy: phy-c45: add SQI and SQI+
+ support for OATC14 10Base-T1S PHYs
+Thread-Topic: [PATCH net-next v2 1/2] net: phy: phy-c45: add SQI and SQI+
+ support for OATC14 10Base-T1S PHYs
+Thread-Index: AQHcWEg9qwUK9eNs30OCPiUaHs0547T+msQAgATOTgA=
+Date: Tue, 25 Nov 2025 13:10:07 +0000
+Message-ID: <d2e9183b-6843-4529-8b41-06ac19418fda@microchip.com>
+References: <20251118045946.31825-1-parthiban.veerasooran@microchip.com>
+ <20251118045946.31825-2-parthiban.veerasooran@microchip.com>
+ <aSGioGmSP9rtSLpB@horms.kernel.org>
+In-Reply-To: <aSGioGmSP9rtSLpB@horms.kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB8278:EE_|DS4PPFCD40128AE:EE_
+x-ms-office365-filtering-correlation-id: 02317dd2-84fe-4109-7242-08de2c23f4a0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?L2pDWjRWQnRIZzN5ak5IVVlqOHVkTjFmUDJqUjd4VUNjZ1FJZXMyemhuNmgv?=
+ =?utf-8?B?NlJKS1pHS0dKSFNMaWhybUxuU0N6QWRNc1RNNjJnQUtFQXdnYUVlZjUrQWpo?=
+ =?utf-8?B?eHN2VzBJck4zZXBzNHVPUS9OY1lORy92U2p1V2ZuRDdrQkpBVTFpSVFpYTdB?=
+ =?utf-8?B?N2E3TTVkWjVHdFpzV1k3TGt4Y2RzREQvRVI5UndTbDRGdEJpUTJWSWJjOGhX?=
+ =?utf-8?B?MHNSbFhibzMwS3JxTUZ3ZlRZWW00UUhHTDAxRjJScmY2S09oUkZwNTliSzZt?=
+ =?utf-8?B?TkNBT0daWCsrSTY1Y0VhM2EwdXNQeFRXUWRVTmxDOTBvTXB6ZmdSSGd0ZVln?=
+ =?utf-8?B?MkZPME0zbGVBZ2dCRG1FTzQyaFdnYVp1d013aVU5RFRJdjJQclZoZ3hxNHRh?=
+ =?utf-8?B?eHRUYmNSb2M5bFdZZmxvUWRVUVRrdGh0YVpsUnczSSs5cERIT3hBQ2JiYkVu?=
+ =?utf-8?B?SXMzbWp4emRHU3lvMUUvK2hETW1ITFdyYTdlMTJIdHRZZHNlK2YwQ3JRM2pH?=
+ =?utf-8?B?TFRCdDN6c3ZPNHpRTjZreHFhOHNHaENyeUpSdUR2akFheWUwRkxRMi8wSC85?=
+ =?utf-8?B?dUlxM1BzenBPMFphb1RBbUlFQ1VwaS9WZjNWYTZBSXdHRXVFOFhNR0oyYkM4?=
+ =?utf-8?B?ZmJYNmVkSDBUdEN3blRyeGFzWk9KeXBZajRXNnRndVVCd2Q3aUZSUG1XTFVk?=
+ =?utf-8?B?Mlo1Q1BZNkU1ejJ0SnlYRHExUDA1dE1uMFBJUzd0SXJVRnBKOFRFMk44SnZj?=
+ =?utf-8?B?S2EvUFk0VnBCVzlHSk9Pc1VoQ1ltOEJCdDV5N2hRc3d1d1ZjL0krTERJWTgr?=
+ =?utf-8?B?S2h4Wlc4T3lEbHBPSW5wZFpyKzJBYXpia293OHMxaTJWMS9CeDlBSlJzVzhp?=
+ =?utf-8?B?UkxpMkN0S3Q0bjJtNmpiV0JHckZOazIyMG8vMnJOelpzRmRSYVY5MEpPeUJh?=
+ =?utf-8?B?TmlNM1VidWM1eDAzM0pSOFZJWWNuM2JQa2hiZTY1N0hBZkZvYUJMR3hCMy9k?=
+ =?utf-8?B?eEtXMFR0aTBlQWdxdStKWU9BcmtXVUVnelIwbkU4Qk9MRDBvdG9BZjNQTVRU?=
+ =?utf-8?B?LzErQnMzbkpQdi8wZmRJc0EyL08zM3ZQaXZ4VG9Cd1lUTU5rSGVSbzlJZEVh?=
+ =?utf-8?B?YXo3ZXVzS1RnTWQ3b254VU5UWWlMZWRwd0RMVUt2MXdaY0tnUDM1RVk0bEp1?=
+ =?utf-8?B?SnhncE5WOUxHTitxL2IyN2xRMnhKWXgvYmw2Q0w0NWJhTUtMWm5QVWdqd3By?=
+ =?utf-8?B?anlpbkVEam4xQ1RsZjVSVHQwb1AyaTBYUXp1UUowTFUyb01BTXFveUdENmtm?=
+ =?utf-8?B?dHFKczNSTThOUHRveXE3VFZucDlTRVJtTmpNMEhMKzYrazQybFZraDkxekV6?=
+ =?utf-8?B?NnhVakJRV1NiOGg4UmF1ZWZ6YWpCT2hyRW9UUEFJRnMwcnlsMWhINVB3Y1Mx?=
+ =?utf-8?B?VVJPUDcwSE8wenhIMzdWRVhjTWdneW1XUGtEbkhqeENEZTZNY3lmQWJmWmV2?=
+ =?utf-8?B?a1FHMjc1bEJZelArd3lZNkVNeFBzLzZUNFZsNHQ5VkNPVlhscGlrNkEvL2VJ?=
+ =?utf-8?B?TmYwNzQza2pMa0FXL1UvOHg3WjRISXIvRmxJT1BzWmxweUpmcExqRG1sOTcv?=
+ =?utf-8?B?TTdHRFp2UnRYa3lEZVNhdTJkYWhXWVhYU2xYSHljVVgzN3dDOWFGNEp1Nmdz?=
+ =?utf-8?B?cm5rYWF2bkc1eXlWZTQvRkZaajkyTlczY05YalV1c2E3SDl4VENRTi9wVmFu?=
+ =?utf-8?B?TEtYbzZadk10UklValo2dllPdzg5MiswTjJRTUxrMzBrTXNhVXRiM0FrM3o0?=
+ =?utf-8?B?MDVKa3FnNU1YNXNUQ3FxZWxBUVZmMmVHNm1UWjJoWGhUZk9maFFVNUFTc1Bt?=
+ =?utf-8?B?ME5nR1FvM3Z5akdtN1QwMi9QSmlMbU0rZ2x2aElJMkcyUmc3aC9wZFVSSTFX?=
+ =?utf-8?B?N0RGQjg3Z2J5RWlmUlNjQW0ybW5YNC9NaVVGRVJTK0FtRW5oUFZZR3had1ZV?=
+ =?utf-8?B?RXRTZ1doLzl3MDdhaUFKUW5LeDd5MlNtRVBwTGI3QUVWYjBFZ0tvdDRCWGgr?=
+ =?utf-8?Q?xXphX1?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB8278.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?ZklhdWQ1YWdBUHF6SHhKOFZBQkRkZ0ZkN0hEOWE0MkJXZFRhaUFuN3JYaTZn?=
+ =?utf-8?B?UDZDazRnSHhxcVNIT3RlTWZidnlleTlJOCttbDB4Nyt1dWx4NmhQL1ZkZjFw?=
+ =?utf-8?B?ZVRyQ1k1akJzTktTcytJU2Jkb0hQQlgzU1JqSXVKYnBjWWdwZ2JjN3V6d05h?=
+ =?utf-8?B?alhXSmxWTXlqVzlYL2pTYytjSUVnQUg5V3FZaktsUWJMNldIOGVrU0YwZVRJ?=
+ =?utf-8?B?NlgxNjlvMyszODZyU0c4VmV0VXZNYzhjbmh2T3FrYm54NTkwNEN4bHQ5Y29C?=
+ =?utf-8?B?NUhmRzhIc2U1SFVBeEIxOVJ6Y1lZTUdQbVZPUnNLRCtFc3dtWkZ4T2pRMGoy?=
+ =?utf-8?B?amp6RkliR2JpVHRhWXVqY2FHaGtUWE44WkxBUldYZllpa1FDQWxsYkNUaTc1?=
+ =?utf-8?B?SmdWelE1MUIxc1BwOW5nQ09jSTdEMW16YnZwMzl0V1Z3b3B6QVdNbVVBRE1Q?=
+ =?utf-8?B?RjlYcTZDS2hUWTlOY1YralN5SjRuV3ZueFJsdkdRZ1lqSG50OVl6Vmx6UGlU?=
+ =?utf-8?B?VVozU2ZDWHZ4YVpZYzhwTElDZTR5TGNFT2IvVzM2bXFZYmg0SWMreXNwYVVB?=
+ =?utf-8?B?TWJzWDlWclo1VDFBb3ZUT1ZQVksvTk1acE5Fb1U1eVk4T3BON09yMzRGemZl?=
+ =?utf-8?B?Q2NncDNOZ2F1NVZiREU5RXluOFRoclRMdTVKb2lleTAxejFKN0o2aHFSRnNv?=
+ =?utf-8?B?dVlEQjR5M1lJY1Q1dmsva1NIWXFQQ3F1V2ZOVitYU1BaYlZyL2tQZTFOV0lJ?=
+ =?utf-8?B?MFF2SXgwWkFkdVNmM2kwZXFlckJkcXVRSlpUaUxkMFRNYUprUmlzdlVQNnJ0?=
+ =?utf-8?B?a0Y0WHVDUGN6Q2lDN0RPa2ZQMllhWnQwb2FLNHlCcjhqZ1BKRXNtekFIMmNE?=
+ =?utf-8?B?bWhJcVZhZ0FwK29idVlJR1JxMEdmWHVXZnpabm8ybFc2VDVGLzR5MXFXR1Vq?=
+ =?utf-8?B?a2VrWXZXb1dSZ3czT04xa1V5ajBMcXdBcHVvQi9QblkwekdheXp1R0wxZDhY?=
+ =?utf-8?B?SE11VmNQSStGT2FjcU5USEQzQW1ZQ0VyYVB6MThEKzRtenFwZlprQkg2cE5M?=
+ =?utf-8?B?cjU1a3dsaUxnMFBIcXZwQnhidVdjZVFPbUZINHkxQ2ZVZmhnRzVQTEk1dVAv?=
+ =?utf-8?B?TkJQL0orMlkxNjZTT0pzZ0ZVOFJ2OUt2dm8xd0ZsMktjN25Kblhnd0FMU3VZ?=
+ =?utf-8?B?VnNTMG9FQTJVclo2aGNGcEpUMElJUUVCVjN6VzVHTkxQalV0OW01U0VSM1ZO?=
+ =?utf-8?B?aEs2alpDYnc2am4vYm9YRzdUQnRtaUtjOGdLSXMzZ01zVE82cUtWdVF5ZUFv?=
+ =?utf-8?B?dnpBVWZ3WUFpTnp4S0JmUFA2ZDNORHkvdzQwSWsySGhCcHBvTHMzckpGbnNY?=
+ =?utf-8?B?THY4WWg0Qng5aXd2NjZaeW8wZ3RlWHNTWkpHYXJBU0ljakFYQnB2TmZCV0p5?=
+ =?utf-8?B?T2ZTcDFvYUdUSXQvYjhrL3NKcVNFbk56ZHNWOE5sOWJFbll6SUVZNGhvSUQ5?=
+ =?utf-8?B?eHJqR29FT3BuN1NGVTZnUUZIOXZ3ZHZIbGlmM3BvZk5aQXRKbVV1YlJCY0NQ?=
+ =?utf-8?B?dUVwRVdkclFKMlNTaWxQMlF6UGlGT1JmelBhdmc0NEMybTQ0Q25UNGdQbUE3?=
+ =?utf-8?B?L0UwUXBzeFQ4a3BzZDZ6emI4RExOZGxlVmhYYlF0OXZkanYwTkhoRzVaY0M1?=
+ =?utf-8?B?bEY4TXUxSklmaUwwdVZGMjVpRVZ3d1ZLVDY4SVdkNHovZzZTc09jQXRPU0xT?=
+ =?utf-8?B?NG93Z01xNE40djUwenMxbG5ESGFOMGoreEZyWkdoaHpoQ3BiVnlRZDltaGpa?=
+ =?utf-8?B?NXZqQUNYZDNEemR2MDQyRzQwcU9PcmVVQllBWUdiWFplQnV5VWlqUmgzVk5H?=
+ =?utf-8?B?empocXFadVE3Nmg2WHVQclNyVHlTSU5sODhVYWIyVHBSU2xtcmZWSEpUR0Fz?=
+ =?utf-8?B?R2ExWEpucURuanhseGs3dWM4ZXI2VWlURjMzQ2tSa0lWK3h0Um5SZ29tdDdo?=
+ =?utf-8?B?YTd0cllqMnc4UUxtc2p3ODZDTFREMi9LanVxQ29wdzkxSUhuaGxrZ1J5VTVR?=
+ =?utf-8?B?djF3Z2RaZ2FYb2FUdXpNd0lCa1ljTEVSaFRPWjNkcGxTUnZ1L0ZEb2FRYjRs?=
+ =?utf-8?B?M1JYMlQ2VWVpL0QxM1BzeUE1a29YZDhhaE5ZVWlPZmR0MURUVzNrSkxSOUNY?=
+ =?utf-8?B?cnc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FD96C8EDE9B6FA4EA41ACDBF9C9A171A@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 01/12] ipvlan: Support MACNAT mode
-To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>, netdev@vger.kernel.org,
- Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Xiao Liang <shaw.leon@gmail.com>,
- Guillaume Nault <gnault@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Julian Vetter <julian@outer-limits.org>, Stanislav Fomichev
- <sdf@fomichev.me>, Etienne Champetier <champetier.etienne@gmail.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: andrey.bokhanko@huawei.com, "David S. Miller" <davem@davemloft.net>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>
-References: <20251120174949.3827500-1-skorodumov.dmitry@huawei.com>
- <20251120174949.3827500-2-skorodumov.dmitry@huawei.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251120174949.3827500-2-skorodumov.dmitry@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB8278.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 02317dd2-84fe-4109-7242-08de2c23f4a0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Nov 2025 13:10:07.2332
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Cw8Yv9PpxmHi8QNQCakY6m4pRbImHu+1ulAAoM6sl2IfIw/k6WfN1TZqbN1CT0YEfcskbyJdsJ+zDfQE1Wkc6qBngFQl2jEl15qjNYNdiDC2V7DqxBeAf9PiSLhYAl9i
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPFCD40128AE
 
-On 11/20/25 6:49 PM, Dmitry Skorodumov wrote:
-> @@ -90,6 +90,26 @@ works in this mode and hence it is L3-symmetric (L3s). This will have slightly l
->  performance but that shouldn't matter since you are choosing this mode over plain-L3
->  mode to make conn-tracking work.
->  
-> +4.4 L2_MACNAT mode:
-> +-------------------
-> +
-> +This mode extends the L2 mode and is primarily designed for desktop virtual
-> +machines that need to bridge to wireless interfaces. In standard L2 mode,
-> +you must configure IP addresses on slave interfaces to enable frame
-> +multiplexing between slaves and the master.
-
-We should avoid adding more divisive language to the kernel. Here there
-are no uAPI constraints, please use inclusive synonyms.
-
-Also since you are touching this, please consider an additional patch to
-update the existing ipvlan.rst accordingly.
-
-> @@ -78,11 +80,13 @@ struct ipvl_addr {
->  		struct in6_addr	ip6;	 /* IPv6 address on logical interface */
->  		struct in_addr	ip4;	 /* IPv4 address on logical interface */
->  	} ipu;
-> +	u8			hwaddr[ETH_ALEN];
->  #define ip6addr	ipu.ip6
->  #define ip4addr ipu.ip4
->  	struct hlist_node	hlnode;  /* Hash-table linkage */
->  	struct list_head	anode;   /* logical-interface linkage */
->  	ipvl_hdr_type		atype;
-> +	u64			tstamp;
->  	struct rcu_head		rcu;
->  };
->  
-> @@ -91,6 +95,7 @@ struct ipvl_port {
->  	possible_net_t		pnet;
->  	struct hlist_head	hlhead[IPVLAN_HASH_SIZE];
->  	struct list_head	ipvlans;
-> +	struct packet_type	ipvl_ptype;
->  	u16			mode;
->  	u16			flags;
->  	u16			dev_id_start;
-> @@ -103,6 +108,7 @@ struct ipvl_port {
->  
->  struct ipvl_skb_cb {
->  	bool tx_pkt;
-> +	void *mark;
->  };
->  #define IPVL_SKB_CB(_skb) ((struct ipvl_skb_cb *)&((_skb)->cb[0]))
->  
-> @@ -151,12 +157,34 @@ static inline void ipvlan_clear_vepa(struct ipvl_port *port)
->  	port->flags &= ~IPVLAN_F_VEPA;
->  }
->  
-> +static inline bool ipvlan_is_macnat(struct ipvl_port *port)
-> +{
-> +	return port->mode == IPVLAN_MODE_L2_MACNAT;
-> +}
-> +
-> +static inline void ipvlan_mark_skb(struct sk_buff *skb, struct net_device *dev)
-> +{
-> +	IPVL_SKB_CB(skb)->mark = dev;
-
-Quite unintuitive name to store a device ptr;
-
-> +}
-> +
-> +static inline bool ipvlan_is_skb_marked(struct sk_buff *skb,
-> +					struct net_device *dev)
-> +{
-> +	return (IPVL_SKB_CB(skb)->mark == dev);
-> +}
-> +
->  void ipvlan_init_secret(void);
->  unsigned int ipvlan_mac_hash(const unsigned char *addr);
->  rx_handler_result_t ipvlan_handle_frame(struct sk_buff **pskb);
-> +void ipvlan_skb_crossing_ns(struct sk_buff *skb, struct net_device *dev);
->  void ipvlan_process_multicast(struct work_struct *work);
-> +void ipvlan_multicast_enqueue(struct ipvl_port *port,
-> +			      struct sk_buff *skb, bool tx_pkt);
->  int ipvlan_queue_xmit(struct sk_buff *skb, struct net_device *dev);
->  void ipvlan_ht_addr_add(struct ipvl_dev *ipvlan, struct ipvl_addr *addr);
-> +int ipvlan_add_addr(struct ipvl_dev *ipvlan,
-> +		    void *iaddr, bool is_v6, const u8 *hwaddr);
-> +void ipvlan_del_addr(struct ipvl_dev *ipvlan, void *iaddr, bool is_v6);
->  struct ipvl_addr *ipvlan_find_addr(const struct ipvl_dev *ipvlan,
->  				   const void *iaddr, bool is_v6);
->  bool ipvlan_addr_busy(struct ipvl_port *port, void *iaddr, bool is_v6);
-> diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
-> index dea411e132db..5127f4832a8c 100644
-> --- a/drivers/net/ipvlan/ipvlan_core.c
-> +++ b/drivers/net/ipvlan/ipvlan_core.c
-> @@ -225,6 +225,42 @@ unsigned int ipvlan_mac_hash(const unsigned char *addr)
->  	return hash & IPVLAN_MAC_FILTER_MASK;
->  }
->  
-> +static int ipvlan_macnat_xmit_phydev(struct ipvl_port *port,
-> +				     struct sk_buff *skb,
-> +				     bool lyr3h_valid,
-> +				     void *lyr3h, int addr_type)
-
-Possibly using l3hdr_valid, l3hdr instead of the above will make the
-following more readable.
-
-> +{
-> +	struct sk_buff *orig_skb = skb;
-> +
-> +	skb = skb_unshare(skb, GFP_ATOMIC);
-> +	if (!skb)
-> +		return NET_XMIT_DROP;
-> +
-> +	/* Use eth-addr of main as source. */
-> +	skb_reset_mac_header(skb);
-> +	ether_addr_copy(skb_eth_hdr(skb)->h_source, port->dev->dev_addr);
-> +
-> +	if (!lyr3h_valid) {
-> +		lyr3h = ipvlan_get_L3_hdr(port, skb, &addr_type);
-> +		orig_skb = skb; /* no need to reparse */
-> +	}
-> +
-> +	/* ToDo: Handle ICMPv6 for neighbours discovery.*/
-
-I think we need this feature in the initial submission.
-
-> +	if (lyr3h && addr_type == IPVL_ARP) {
-> +		if (skb != orig_skb)
-> +			lyr3h = ipvlan_get_L3_hdr(port, skb, &addr_type);
-> +
-> +		if (lyr3h) {
-> +			struct arphdr *arph = (struct arphdr *)lyr3h;
-> +
-> +			ether_addr_copy((u8 *)(arph + 1), port->dev->dev_addr);
-> +		}
-> +	}
-> +
-> +	skb->dev = port->dev;
-> +	return dev_queue_xmit(skb);
-> +}
-> +
->  void ipvlan_process_multicast(struct work_struct *work)
->  {
->  	struct ipvl_port *port = container_of(work, struct ipvl_port, wq);
-> @@ -285,9 +321,25 @@ void ipvlan_process_multicast(struct work_struct *work)
->  
->  		if (tx_pkt) {
->  			/* If the packet originated here, send it out. */
-> -			skb->dev = port->dev;
-> -			skb->pkt_type = pkt_type;
-> -			dev_queue_xmit(skb);
-> +			if (ipvlan_is_macnat(port)) {
-> +				/* Inject as rx-packet to main dev. */
-> +				nskb = skb_clone(skb, GFP_ATOMIC);
-> +				if (nskb) {
-
-The more idiomatic form would be:
-
-				if (!nskb)
-					// error handling
-
-> +					consumed = true;
-> +					local_bh_disable();
-> +					nskb->pkt_type = pkt_type;
-> +					nskb->dev = port->dev;
-> +					dev_forward_skb(port->dev, nskb);
-> +					local_bh_enable();
-> +				}
-> +				/* Send out */
-
-Too mant level of indentation, please move to a separate helper.
-
-> +				ipvlan_macnat_xmit_phydev(port, skb, false,
-> +							  NULL, -1);
-
-You should likely drop the packet if clone fails
-
-> +			} else {
-> +				skb->dev = port->dev;
-> +				skb->pkt_type = pkt_type;
-> +				dev_queue_xmit(skb);
-> +			}
->  		} else {
->  			if (consumed)
->  				consume_skb(skb);
-
-[...]> @@ -661,6 +860,61 @@ static int ipvlan_xmit_mode_l2(struct
-sk_buff *skb, struct net_device *dev)
->  	return dev_queue_xmit(skb);
->  }
->  
-> +static int ipvlan_xmit_mode_macnat(struct sk_buff *skb, struct net_device *dev)
-> +{
-> +	struct ipvl_dev *ipvlan = netdev_priv(dev);
-> +	struct ethhdr *eth = skb_eth_hdr(skb);
-> +	struct ipvl_addr *addr;
-> +	int addr_type;
-> +	void *lyr3h;
-> +
-> +	/* Ignore tx-packets from host and don't allow to use main addr. */
-> +	if (ether_addr_equal(eth->h_source, dev->dev_addr) ||
-> +	    ether_addr_equal(eth->h_source, ipvlan->phy_dev->dev_addr))
-> +		goto out_drop;
-> +
-> +	/* Mark SKB in advance */
-> +	skb = skb_share_check(skb, GFP_ATOMIC);
-> +	if (!skb)
-> +		return NET_XMIT_DROP;
-> +	ipvlan_mark_skb(skb, ipvlan->phy_dev);
-This is the xmit path ...
-
-> +
-> +	lyr3h = ipvlan_get_L3_hdr(ipvlan->port, skb, &addr_type);
-> +	if (lyr3h)
-> +		ipvlan_macnat_addr_learn(ipvlan, lyr3h, addr_type,
-> +					 eth->h_source);
-> +
-> +	if (is_multicast_ether_addr(eth->h_dest)) {
-> +		skb_reset_mac_header(skb);
-> +		ipvlan_skb_crossing_ns(skb, NULL);
-> +		ipvlan_multicast_enqueue(ipvlan->port, skb, true);
-> +		return NET_XMIT_SUCCESS;
-> +	} else if (ether_addr_equal(eth->h_dest, ipvlan->phy_dev->dev_addr)) {
-> +		/* It is a packet from child with destination to main port.
-> +		 * Pass it to main.
-> +		 */
-> +		skb->pkt_type = PACKET_HOST;
-> +		skb->dev = ipvlan->phy_dev;
-> +		dev_forward_skb(ipvlan->phy_dev, skb);
-> +		return NET_XMIT_SUCCESS;
-> +	} else if (lyr3h) {
-> +		addr = ipvlan_addr_lookup(ipvlan->port, lyr3h, addr_type, true);
-> +		if (addr) {
-> +			if (ipvlan_is_private(ipvlan->port))
-> +				goto out_drop;
-> +
-> +			ipvlan_rcv_frame(addr, addr_type, &skb, true);
-> +			return NET_XMIT_SUCCESS;
-> +		}
-> +	}
-> +
-> +	return ipvlan_macnat_xmit_phydev(ipvlan->port, skb, true, lyr3h,
-> +					 addr_type);
-> +out_drop:
-> +	consume_skb(skb);
-> +	return NET_XMIT_DROP;
-> +}
-> +
->  int ipvlan_queue_xmit(struct sk_buff *skb, struct net_device *dev)
->  {
->  	struct ipvl_dev *ipvlan = netdev_priv(dev);
-> @@ -675,6 +929,8 @@ int ipvlan_queue_xmit(struct sk_buff *skb, struct net_device *dev)
->  	switch(port->mode) {
->  	case IPVLAN_MODE_L2:
->  		return ipvlan_xmit_mode_l2(skb, dev);
-> +	case IPVLAN_MODE_L2_MACNAT:
-> +		return ipvlan_xmit_mode_macnat(skb, dev);
->  	case IPVLAN_MODE_L3:
->  #ifdef CONFIG_IPVLAN_L3S
->  	case IPVLAN_MODE_L3S:
-> @@ -724,8 +980,7 @@ static rx_handler_result_t ipvlan_handle_mode_l3(struct sk_buff **pskb,
->  
->  	addr = ipvlan_addr_lookup(port, lyr3h, addr_type, true);
->  	if (addr)
-> -		ret = ipvlan_rcv_frame(addr, pskb, false);
-> -
-> +		ret = ipvlan_rcv_frame(addr, addr_type, pskb, false);
->  out:
->  	return ret;
->  }
-> @@ -737,17 +992,23 @@ static rx_handler_result_t ipvlan_handle_mode_l2(struct sk_buff **pskb,
->  	struct ethhdr *eth = eth_hdr(skb);
->  	rx_handler_result_t ret = RX_HANDLER_PASS;
->  
-> -	if (is_multicast_ether_addr(eth->h_dest)) {
-> -		if (ipvlan_external_frame(skb, port)) {
-> -			struct sk_buff *nskb = skb_clone(skb, GFP_ATOMIC);
-> +	/* Ignore already seen packets. */
-> +	if (ipvlan_is_skb_marked(skb, port->dev))
-
-... and this is the receiver path. Nothing guaratees the CB is preserved
-in between and that random data in there will not confuse the above
-check. Also I'm not sure what you are trying to filter out here.
-
-> +		return RX_HANDLER_PASS;
->  
-> +	if (is_multicast_ether_addr(eth->h_dest)) {
-> +		if (ipvlan_external_frame(skb, port) ||
-> +		    ipvlan_is_macnat(port)) {
->  			/* External frames are queued for device local
->  			 * distribution, but a copy is given to master
->  			 * straight away to avoid sending duplicates later
->  			 * when work-queue processes this frame. This is
->  			 * achieved by returning RX_HANDLER_PASS.
->  			 */
-> +			struct sk_buff *nskb = skb_clone(skb, GFP_ATOMIC);
-> +
->  			if (nskb) {
-> +				ipvlan_mark_skb(skb, port->dev);
->  				ipvlan_skb_crossing_ns(nskb, NULL);
->  				ipvlan_multicast_enqueue(port, nskb, false);
->  			}
-> @@ -770,6 +1031,7 @@ rx_handler_result_t ipvlan_handle_frame(struct sk_buff **pskb)
->  
->  	switch (port->mode) {
->  	case IPVLAN_MODE_L2:
-> +	case IPVLAN_MODE_L2_MACNAT:
->  		return ipvlan_handle_mode_l2(pskb, port);
->  	case IPVLAN_MODE_L3:
->  		return ipvlan_handle_mode_l3(pskb, port);
-> diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
-> index 660f3db11766..f27af7709a5b 100644
-> --- a/drivers/net/ipvlan/ipvlan_main.c
-> +++ b/drivers/net/ipvlan/ipvlan_main.c
-> @@ -16,6 +16,15 @@ static int ipvlan_set_port_mode(struct ipvl_port *port, u16 nval,
->  
->  	ASSERT_RTNL();
->  	if (port->mode != nval) {
-> +		/* Don't allow switch off the learnable bridge mode.
-> +		 * Flags also must be set from the first port-link setup.
-> +		 */
-> +		if (port->mode == IPVLAN_MODE_L2_MACNAT ||
-> +		    (nval == IPVLAN_MODE_L2_MACNAT && port->count > 1)) {
-> +			netdev_err(port->dev, "MACNAT mode cannot be changed.\n");
-> +			return -EINVAL;
-> +		}
-> +
->  		list_for_each_entry(ipvlan, &port->ipvlans, pnode) {
->  			flags = ipvlan->dev->flags;
->  			if (nval == IPVLAN_MODE_L3 || nval == IPVLAN_MODE_L3S) {
-> @@ -40,7 +49,10 @@ static int ipvlan_set_port_mode(struct ipvl_port *port, u16 nval,
->  			ipvlan_l3s_unregister(port);
->  		}
->  		port->mode = nval;
-> +		if (port->mode == IPVLAN_MODE_L2_MACNAT)
-> +			dev_add_pack(&port->ipvl_ptype);
->  	}
-> +
->  	return 0;
->  
->  fail:
-> @@ -59,6 +71,67 @@ static int ipvlan_set_port_mode(struct ipvl_port *port, u16 nval,
->  	return err;
->  }
->  
-> +static int ipvlan_macnat_port_rcv(struct sk_buff *skb, struct net_device *wdev,
-> +				  struct packet_type *pt,
-> +				  struct net_device *orig_wdev)
-> +{
-> +	struct ipvl_port *port;
-> +	struct ipvl_addr *addr;
-> +	struct ethhdr *eth;
-> +	int addr_type;
-> +	void *lyr3h;
-> +
-> +	port = container_of(pt, struct ipvl_port, ipvl_ptype);
-> +	/* We are interested only in outgoing packets.
-> +	 * rx-path is handled in rx_handler().
-> +	 */
-> +	if (skb->pkt_type != PACKET_OUTGOING ||
-> +	    ipvlan_is_skb_marked(skb, port->dev))
-> +		goto out;
-> +
-> +	skb = skb_share_check(skb, GFP_ATOMIC);
-> +	if (!skb)
-> +		goto no_mem;
-> +
-> +	/* data should point to eth-header */
-> +	skb_push(skb, skb->data - skb_mac_header(skb));
-> +	skb->dev = port->dev;
-> +	eth = eth_hdr(skb);
-> +
-> +	if (is_multicast_ether_addr(eth->h_dest)) {
-> +		ipvlan_skb_crossing_ns(skb, NULL);
-> +		skb->protocol = eth_type_trans(skb, skb->dev);
-> +		skb->pkt_type = PACKET_HOST;
-> +		ipvlan_mark_skb(skb, port->dev);
-> +		ipvlan_multicast_enqueue(port, skb, false);
-> +		return NET_RX_SUCCESS;
-> +	}
-> +
-> +	lyr3h = ipvlan_get_L3_hdr(port, skb, &addr_type);
-> +	if (!lyr3h)
-> +		goto out;
-> +
-> +	addr = ipvlan_addr_lookup(port, lyr3h, addr_type, true);
-> +	if (addr) {
-
-The `if` condition is supposed to catch the exceptional condition/error
-path, nor the other way around.
-
-> +		struct ipvl_dev *ipvlan = addr->master;
-> +		int ret, len;
-> +
-> +		ipvlan_skb_crossing_ns(skb, ipvlan->dev);
-> +		skb->protocol = eth_type_trans(skb, skb->dev);
-> +		skb->pkt_type = PACKET_HOST;
-> +		ipvlan_mark_skb(skb, port->dev);
-> +		len = skb->len + ETH_HLEN;
-> +		ret = netif_rx(skb);
-> +		ipvlan_count_rx(ipvlan, len, ret == NET_RX_SUCCESS, false);
-> +		return NET_RX_SUCCESS;
-> +	}
-> +
-> +out:
-> +	dev_kfree_skb(skb);
-> +no_mem:
-> +	return NET_RX_DROP;
-> +}
-> +
->  static int ipvlan_port_create(struct net_device *dev)
->  {
->  	struct ipvl_port *port;
-> @@ -84,6 +157,11 @@ static int ipvlan_port_create(struct net_device *dev)
->  	if (err)
->  		goto err;
->  
-> +	port->ipvl_ptype.func = ipvlan_macnat_port_rcv;
-> +	port->ipvl_ptype.type = htons(ETH_P_ALL);
-> +	port->ipvl_ptype.dev = dev;
-> +	port->ipvl_ptype.list.prev = LIST_POISON2;
-
-LIST_HEAD_INIT()
-
-> +
->  	netdev_hold(dev, &port->dev_tracker, GFP_KERNEL);
->  	return 0;
->  
-> @@ -100,6 +178,8 @@ static void ipvlan_port_destroy(struct net_device *dev)
->  	netdev_put(dev, &port->dev_tracker);
->  	if (port->mode == IPVLAN_MODE_L3S)
->  		ipvlan_l3s_unregister(port);
-> +	if (port->ipvl_ptype.list.prev != LIST_POISON2)
-
-!list_empty()
-
-> +		dev_remove_pack(&port->ipvl_ptype);
->  	netdev_rx_handler_unregister(dev);
->  	cancel_work_sync(&port->wq);
->  	while ((skb = __skb_dequeue(&port->backlog)) != NULL) {
-> @@ -189,10 +269,13 @@ static int ipvlan_open(struct net_device *dev)
->  	else
->  		dev->flags &= ~IFF_NOARP;
->  
-> -	rcu_read_lock();
-> -	list_for_each_entry_rcu(addr, &ipvlan->addrs, anode)
-> -		ipvlan_ht_addr_add(ipvlan, addr);
-> -	rcu_read_unlock();
-> +	/* for learnable, addresses will be obtained from tx-packets. */
-> +	if (!ipvlan_is_macnat(ipvlan->port)) {
-> +		rcu_read_lock();
-> +		list_for_each_entry_rcu(addr, &ipvlan->addrs, anode)
-> +			ipvlan_ht_addr_add(ipvlan, addr);
-> +		rcu_read_unlock();
-> +	}
->  
->  	return 0;
->  }
-> @@ -581,11 +664,21 @@ int ipvlan_link_new(struct net_device *dev, struct rtnl_newlink_params *params,
->  	INIT_LIST_HEAD(&ipvlan->addrs);
->  	spin_lock_init(&ipvlan->addrs_lock);
->  
-> -	/* TODO Probably put random address here to be presented to the
-> -	 * world but keep using the physical-dev address for the outgoing
-> -	 * packets.
-> +	/* Flags are per port and latest update overrides. User has
-> +	 * to be consistent in setting it just like the mode attribute.
->  	 */
-> -	eth_hw_addr_set(dev, phy_dev->dev_addr);
-> +	if (data && data[IFLA_IPVLAN_MODE])
-> +		mode = nla_get_u16(data[IFLA_IPVLAN_MODE]);
-> +
-> +	if (mode != IPVLAN_MODE_L2_MACNAT) {
-> +		/* TODO Probably put random address here to be presented to the
-> +		 * world but keep using the physical-dev addr for the outgoing
-> +		 * packets.
-
-Not sure why you trimmed the existing comment
-
-> +		 */
-> +		eth_hw_addr_set(dev, phy_dev->dev_addr);
-> +	} else {
-> +		eth_hw_addr_random(dev);
-> +	}
->  
->  	dev->priv_flags |= IFF_NO_RX_HANDLER;
->  
-> @@ -597,6 +690,9 @@ int ipvlan_link_new(struct net_device *dev, struct rtnl_newlink_params *params,
->  	port = ipvlan_port_get_rtnl(phy_dev);
->  	ipvlan->port = port;
->  
-> +	if (data && data[IFLA_IPVLAN_FLAGS])
-> +		port->flags = nla_get_u16(data[IFLA_IPVLAN_FLAGS]);
-
-This looks like a change of behavior that could potentially break the
-user-space.
-
-> +
->  	/* If the port-id base is at the MAX value, then wrap it around and
->  	 * begin from 0x1 again. This may be due to a busy system where lots
->  	 * of slaves are getting created and deleted.
-> @@ -625,19 +721,13 @@ int ipvlan_link_new(struct net_device *dev, struct rtnl_newlink_params *params,
->  	if (err)
->  		goto remove_ida;
->  
-> -	/* Flags are per port and latest update overrides. User has
-> -	 * to be consistent in setting it just like the mode attribute.
-> -	 */
-> -	if (data && data[IFLA_IPVLAN_FLAGS])
-> -		port->flags = nla_get_u16(data[IFLA_IPVLAN_FLAGS]);
-> -
-> -	if (data && data[IFLA_IPVLAN_MODE])
-> -		mode = nla_get_u16(data[IFLA_IPVLAN_MODE]);
-> -
->  	err = ipvlan_set_port_mode(port, mode, extack);
->  	if (err)
->  		goto unlink_netdev;
->  
-> +	if (ipvlan_is_macnat(port))
-> +		dev_set_allmulti(dev, 1);
-> +
->  	list_add_tail_rcu(&ipvlan->pnode, &port->ipvlans);
->  	netif_stacked_transfer_operstate(phy_dev, dev);
->  	return 0;
-> @@ -657,6 +747,9 @@ void ipvlan_link_delete(struct net_device *dev, struct list_head *head)
->  	struct ipvl_dev *ipvlan = netdev_priv(dev);
->  	struct ipvl_addr *addr, *next;
->  
-> +	if (ipvlan_is_macnat(ipvlan->port))
-> +		dev_set_allmulti(dev, -1);
-> +
->  	spin_lock_bh(&ipvlan->addrs_lock);
->  	list_for_each_entry_safe(addr, next, &ipvlan->addrs, anode) {
->  		ipvlan_ht_addr_del(addr);
-> @@ -793,6 +886,9 @@ static int ipvlan_device_event(struct notifier_block *unused,
->  		break;
->  
->  	case NETDEV_CHANGEADDR:
-> +		if (ipvlan_is_macnat(port))
-> +			break;
-> +
->  		list_for_each_entry(ipvlan, &port->ipvlans, pnode) {
->  			eth_hw_addr_set(ipvlan->dev, dev->dev_addr);
->  			call_netdevice_notifiers(NETDEV_CHANGEADDR, ipvlan->dev);
-> @@ -813,7 +909,8 @@ static int ipvlan_device_event(struct notifier_block *unused,
->  }
->  
->  /* the caller must held the addrs lock */
-> -static int ipvlan_add_addr(struct ipvl_dev *ipvlan, void *iaddr, bool is_v6)
-> +int ipvlan_add_addr(struct ipvl_dev *ipvlan, void *iaddr, bool is_v6,
-> +		    const u8 *hwaddr)
-
-I guess that using a separate new helper with the new argument will make
-the diff smaller and easier to read.
-
-/P
-
+SGkgU2ltb24sDQoNClRoYW5rIHlvdSBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaC4NCg0KT24gMjIv
+MTEvMjUgNToxNiBwbSwgU2ltb24gSG9ybWFuIHdyb3RlOg0KPiBFWFRFUk5BTCBFTUFJTDogRG8g
+bm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlvdSBrbm93IHRoZSBj
+b250ZW50IGlzIHNhZmUNCj4gDQo+IE9uIFR1ZSwgTm92IDE4LCAyMDI1IGF0IDEwOjI5OjQ1QU0g
+KzA1MzAsIFBhcnRoaWJhbiBWZWVyYXNvb3JhbiB3cm90ZToNCj4gDQo+IC4uLg0KPiANCj4+IEBA
+IC0xNjk1LDMgKzE2OTUsODkgQEAgaW50IGdlbnBoeV9jNDVfb2F0YzE0X2NhYmxlX3Rlc3Rfc3Rh
+cnQoc3RydWN0IHBoeV9kZXZpY2UgKnBoeWRldikNCj4+ICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBPQVRDMTRfSEREX1NUQVJUX0NPTlRST0wpOw0KPj4gICB9DQo+PiAgIEVYUE9SVF9T
+WU1CT0woZ2VucGh5X2M0NV9vYXRjMTRfY2FibGVfdGVzdF9zdGFydCk7DQo+PiArDQo+PiArLyoq
+DQo+PiArICogZ2VucGh5X2M0NV9vYXRjMTRfZ2V0X3NxaV9tYXggLSBHZXQgbWF4aW11bSBzdXBw
+b3J0ZWQgU1FJIG9yIFNRSSsgbGV2ZWwgb2YNCj4+ICsgKiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIE9BVEMxNCAxMEJhc2UtVDFTIFBIWQ0KPj4gKyAqIEBwaHlkZXY6IHBvaW50ZXIgdG8g
+dGhlIFBIWSBkZXZpY2Ugc3RydWN0dXJlDQo+PiArICoNCj4+ICsgKiBUaGlzIGZ1bmN0aW9uIHJl
+YWRzIHRoZSBhZHZhbmNlZCBjYXBhYmlsaXR5IHJlZ2lzdGVyIHRvIGRldGVybWluZSB0aGUgbWF4
+aW11bQ0KPj4gKyAqIHN1cHBvcnRlZCBTaWduYWwgUXVhbGl0eSBJbmRpY2F0b3IgKFNRSSkgb3Ig
+U1FJKyBsZXZlbA0KPj4gKyAqDQo+PiArICogUmV0dXJuOg0KPj4gKyAqICogTWF4aW11bSBTUUkv
+U1FJKyBsZXZlbCAo4omlMCkNCj4+ICsgKiAqIC1FT1BOT1RTVVBQIGlmIG5vdCBzdXBwb3J0ZWQN
+Cj4+ICsgKiAqIE5lZ2F0aXZlIGVycm5vIG9uIHJlYWQgZmFpbHVyZQ0KPj4gKyAqLw0KPj4gK2lu
+dCBnZW5waHlfYzQ1X29hdGMxNF9nZXRfc3FpX21heChzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2
+KQ0KPj4gK3sNCj4+ICsgICAgIHU4IGJpdHM7DQo+PiArICAgICBpbnQgcmV0Ow0KPj4gKw0KPj4g
+KyAgICAgcmV0ID0gcGh5X3JlYWRfbW1kKHBoeWRldiwgTURJT19NTURfVkVORDIsIE1ESU9fT0FU
+QzE0X0FERkNBUCk7DQo+PiArICAgICBpZiAocmV0IDwgMCkNCj4+ICsgICAgICAgICAgICAgcmV0
+dXJuIHJldDsNCj4+ICsNCj4+ICsgICAgIC8qIENoZWNrIGZvciBTUUkrIGNhcGFiaWxpdHkNCj4+
+ICsgICAgICAqIDAgLSBTUUkrIGlzIG5vdCBzdXBwb3J0ZWQNCj4+ICsgICAgICAqICgzLTgpIGJp
+dHMgZm9yICg4LTI1NikgU1FJKyBsZXZlbHMgc3VwcG9ydGVkDQo+PiArICAgICAgKi8NCj4+ICsg
+ICAgIGJpdHMgPSBGSUVMRF9HRVQoT0FUQzE0X0FERkNBUF9TUUlQTFVTX0NBUEFCSUxJVFksIHJl
+dCk7DQo+PiArICAgICBpZiAoYml0cykgew0KPj4gKyAgICAgICAgICAgICBwaHlkZXYtPm9hdGMx
+NF9zcWlwbHVzX2JpdHMgPSBiaXRzOw0KPj4gKyAgICAgICAgICAgICAvKiBNYXggc3FpKyBsZXZl
+bCBzdXBwb3J0ZWQ6ICgyIF4gYml0cykgLSAxICovDQo+PiArICAgICAgICAgICAgIHJldHVybiBC
+SVQoYml0cykgLSAxOw0KPj4gKyAgICAgfQ0KPj4gKw0KPj4gKyAgICAgLyogQ2hlY2sgZm9yIFNR
+SSBjYXBhYmlsaXR5DQo+PiArICAgICAgKiAwIC0gU1FJIGlzIG5vdCBzdXBwb3J0ZWQNCj4+ICsg
+ICAgICAqIDEgLSBTUUkgaXMgc3VwcG9ydGVkICgwLTcgbGV2ZWxzKQ0KPj4gKyAgICAgICovDQo+
+PiArICAgICBpZiAocmV0ICYgT0FUQzE0X0FERkNBUF9TUUlfQ0FQQUJJTElUWSkNCj4+ICsgICAg
+ICAgICAgICAgcmV0dXJuIE9BVEMxNF9TUUlfTUFYX0xFVkVMOw0KPj4gKw0KPj4gKyAgICAgcmV0
+dXJuIC1FT1BOT1RTVVBQOw0KPj4gK30NCj4+ICtFWFBPUlRfU1lNQk9MKGdlbnBoeV9jNDVfb2F0
+YzE0X2dldF9zcWlfbWF4KTsNCj4+ICsNCj4+ICsvKioNCj4+ICsgKiBnZW5waHlfYzQ1X29hdGMx
+NF9nZXRfc3FpIC0gR2V0IFNpZ25hbCBRdWFsaXR5IEluZGljYXRvciAoU1FJKSBmcm9tIGFuIE9B
+VEMxNA0KPj4gKyAqICAgICAgICAgICAgICAgICAgICAgICAgICAxMEJhc2UtVDFTIFBIWQ0KPj4g
+KyAqIEBwaHlkZXY6IHBvaW50ZXIgdG8gdGhlIFBIWSBkZXZpY2Ugc3RydWN0dXJlDQo+PiArICoN
+Cj4+ICsgKiBUaGlzIGZ1bmN0aW9uIHJlYWRzIHRoZSBTUUkrIG9yIFNRSSB2YWx1ZSBmcm9tIGFu
+IE9BVEMxNC1jb21wYXRpYmxlDQo+PiArICogMTBCYXNlLVQxUyBQSFkuIElmIFNRSSsgY2FwYWJp
+bGl0eSBpcyBzdXBwb3J0ZWQsIHRoZSBmdW5jdGlvbiByZXR1cm5zIHRoZQ0KPj4gKyAqIGV4dGVu
+ZGVkIFNRSSsgdmFsdWU7IG90aGVyd2lzZSwgaXQgcmV0dXJucyB0aGUgYmFzaWMgU1FJIHZhbHVl
+Lg0KPj4gKyAqDQo+PiArICogUmV0dXJuOg0KPj4gKyAqICogU1FJL1NRSSsgdmFsdWUgb24gc3Vj
+Y2Vzcw0KPj4gKyAqICogTmVnYXRpdmUgZXJybm8gb24gcmVhZCBmYWlsdXJlDQo+PiArICovDQo+
+PiAraW50IGdlbnBoeV9jNDVfb2F0YzE0X2dldF9zcWkoc3RydWN0IHBoeV9kZXZpY2UgKnBoeWRl
+dikNCj4+ICt7DQo+PiArICAgICB1OCBzaGlmdDsNCj4+ICsgICAgIGludCByZXQ7DQo+PiArDQo+
+PiArICAgICAvKiBDYWxjdWxhdGUgYW5kIHJldHVybiBTUUkrIHZhbHVlIGlmIHN1cHBvcnRlZCAq
+Lw0KPj4gKyAgICAgaWYgKHBoeWRldi0+b2F0YzE0X3NxaXBsdXNfYml0cykgew0KPiANCj4gSGkg
+UGFydGhpYmFuLA0KPiANCj4gQUZBSUNUIG9hdGMxNF9zcWlwbHVzX2JpdHMgd2lsbCBhbHdheXMg
+YmUgMCB1bnRpbA0KPiBnZW5waHlfYzQ1X29hdGMxNF9nZXRfc3FpX21heCgpIGlzIGNhbGxlZCwg
+YWZ0ZXIgd2hpY2gNCj4gaXQgbWF5IGJlIHNvbWUgb3RoZXIgdmFsdWUuDQo+IA0KPiBCdXQgYWNj
+b3JkaW5nIHRvIHRoZSBmbG93IG9mIGxpbmtzdGF0ZV9wcmVwYXJlX2RhdGEoKQ0KPiBpdCBzZWVt
+cyB0aGF0IGdlbnBoeV9jNDVfb2F0YzE0X2dldF9zcWlfbWF4KCkNCj4gd2lsbCBiZSBjYWxsZWQg
+YWZ0ZXIgZ2VucGh5X2M0NV9vYXRjMTRfZ2V0X3NxaSgpLg0KPiANCj4gSW4gd2hpY2ggY2FzZSB0
+aGUgY29uZGl0aW9uIGFib3ZlIHdpbGwgYmUgZmFsc2UNCj4gKHVubGVzcyBnZW5waHlfYzQ1X29h
+dGMxNF9nZXRfc3FpX21heCB3YXMgc29tZWhvdyBhbHJlYWR5DQo+IGNhbGxlZCBieSBzb21lIG90
+aGVyIG1lYW5zLikNCj4gDQo+IFRoaXMgZG9lc24ndCBzZWVtIHRvIGJlIGluIGxpbmUgd2l0aCB0
+aGUgaW50ZW50aW9uIG9mIHRoaXMgY29kZS4NCj4gDQo+IEZsYWdnZWQgYnkgQ2xhdWRlIENvZGUg
+d2l0aCBodHRwczovL2dpdGh1Yi5jb20vbWFzb25jbC9yZXZpZXctcHJvbXB0cy8NCkdvb2QgY2F0
+Y2ghIG9hdGMxNF9zcWlwbHVzX2JpdHMgaXMgbm90IHVwZGF0ZWQgdGhlIGZpcnN0IHRpbWUgDQpn
+ZW5waHlfYzQ1X29hdGMxNF9nZXRfc3FpKCkgaXMgY2FsbGVkLCBhbmQgaXMgbGF0ZXIgdXBkYXRl
+ZCBieSANCmdlbnBoeV9jNDVfb2F0YzE0X2dldF9zcWlfbWF4KCkuIFRoYW5rIHlvdSBmb3IgcG9p
+bnRpbmcgaXQgb3V0OyBJIHdpbGwgDQpmaXggaXQgaW4gdGhlIG5leHQgdmVyc2lvbi4NCg0KQmVz
+dCByZWdhcmRzLA0KUGFydGhpYmFuIFYNCj4gDQo+PiArICAgICAgICAgICAgIHJldCA9IHBoeV9y
+ZWFkX21tZChwaHlkZXYsIE1ESU9fTU1EX1ZFTkQyLA0KPj4gKyAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgTURJT19PQVRDMTRfRENRX1NRSVBMVVMpOw0KPj4gKyAgICAgICAgICAgICBp
+ZiAocmV0IDwgMCkNCj4+ICsgICAgICAgICAgICAgICAgICAgICByZXR1cm4gcmV0Ow0KPj4gKw0K
+Pj4gKyAgICAgICAgICAgICAvKiBTUUkrIHVzZXMgTiBNU0JzIG91dCBvZiA4IGJpdHMsIGxlZnQt
+YWxpZ25lZCB3aXRoIHBhZGRpbmcgMSdzDQo+PiArICAgICAgICAgICAgICAqIENhbGN1bGF0ZSB0
+aGUgcmlnaHQtc2hpZnQgbmVlZGVkIHRvIGlzb2xhdGUgdGhlIE4gYml0cy4NCj4+ICsgICAgICAg
+ICAgICAgICovDQo+PiArICAgICAgICAgICAgIHNoaWZ0ID0gOCAtIHBoeWRldi0+b2F0YzE0X3Nx
+aXBsdXNfYml0czsNCj4+ICsNCj4+ICsgICAgICAgICAgICAgcmV0dXJuIChyZXQgJiBPQVRDMTRf
+RENRX1NRSVBMVVNfVkFMVUUpID4+IHNoaWZ0Ow0KPj4gKyAgICAgfQ0KPj4gKw0KPj4gKyAgICAg
+LyogUmVhZCBhbmQgcmV0dXJuIFNRSSB2YWx1ZSBpZiBTUUkrIGNhcGFiaWxpdHkgaXMgbm90IHN1
+cHBvcnRlZCAqLw0KPj4gKyAgICAgcmV0ID0gcGh5X3JlYWRfbW1kKHBoeWRldiwgTURJT19NTURf
+VkVORDIsIE1ESU9fT0FUQzE0X0RDUV9TUUkpOw0KPj4gKyAgICAgaWYgKHJldCA8IDApDQo+PiAr
+ICAgICAgICAgICAgIHJldHVybiByZXQ7DQo+PiArDQo+PiArICAgICByZXR1cm4gcmV0ICYgT0FU
+QzE0X0RDUV9TUUlfVkFMVUU7DQo+PiArfQ0KPj4gK0VYUE9SVF9TWU1CT0woZ2VucGh5X2M0NV9v
+YXRjMTRfZ2V0X3NxaSk7DQo+IA0KPiAuLi4NCg0K
 
