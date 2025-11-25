@@ -1,201 +1,176 @@
-Return-Path: <netdev+bounces-241502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 442D2C84AD2
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 12:14:59 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1F36C84B19
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 12:17:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF16B3AF121
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:14:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 86A62350E3D
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E123314D24;
-	Tue, 25 Nov 2025 11:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8447A311592;
+	Tue, 25 Nov 2025 11:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Apw6PckY"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="MlrsdxcD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABCA29B795;
-	Tue, 25 Nov 2025 11:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5922B279334;
+	Tue, 25 Nov 2025 11:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764069268; cv=none; b=bn0MCpxfdtDE0Cq7aIIkp2Zf7GONfB860ka6wexVy9qdIplt3aQsLfokN4Z0XA41vaemz3+GQC0zF0Za4YPx4uBBTMRBvWAIH9I8uS6couBup7WZNBFj7Do6wX4M2f/jA2vTXtOK6HRM0XlNI2o3fRuKxPyaW0/1FcUyB6vvoF0=
+	t=1764069367; cv=none; b=CVVr2N5armJKKIpMZB30U+Pt16soAimOeW4e+5YdVoUIyW8xEChzbTw9qLuv9DYmuTBgghe7s4VzybYxMxh1iVRGJ6k+R7M5cpZToD2WlXUYP0Y8PrdLuLEATyc1J3bz//W8bLvQhGvPxVcdUueCbI0q/iJwRWTpw2rK0UjR+uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764069268; c=relaxed/simple;
-	bh=qbUUhkHMMS6TzCWYjcxYyy4qDl0GXU1qI+8Zc1eZChQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dEY+8AhHWSYFcTgfy/lqlYJziGFB8eGWUbz0Vy03wI7shoBRqkVnG2kmCRMxYf+9eZGmKg8WPaD8LMGIsJMns/dWIwQVRDwSdj4Km6XDcOYMANGuU5P/nbe9l2qew3qmj2qdXEkoHN8CcGfvXiEPV3iaD14+W9ijgAh/BOnjIys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Apw6PckY; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5APAbBGs021895;
-	Tue, 25 Nov 2025 11:13:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=iTzCQ0
-	JY9WXcpFe0GcHNAFxfP6m3HtlAT1T4iO9Gfcc=; b=Apw6PckY3rnC5B0WdNF3QA
-	/ptC56UYvJSOj5XRkR6SmKG+NhyZ3OViL2gm3tI/Igdcws3g9lZM0CFHvD9/Bozh
-	jMsiS3CvQw/b19mvM+89kLAOi0mZsDkF3qfwTu1rSehCpZlp4+Iq5Mm3Hs2asvgc
-	YUMia3aBaZ+p8cMqXR2MhXVK7Ajz4g6IZwJu8rpLxTYLV2IEw/yHYsFqqd7ZGrEq
-	DcmnAxEW5/Pa4LJKyjq00ZALFDDg/XJWdbq4BCwLm+3cfizkpb+gUvr2Fb8lrnQD
-	CiFH4RaE1AWYbNe/p2Zt8NuBkBZ/z1p+K1ILPSO5JKNxRH3mp4ABZu7px+72z/Rg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak3kjvg64-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Nov 2025 11:13:38 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5APB8fNn004514;
-	Tue, 25 Nov 2025 11:13:37 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak3kjvg60-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Nov 2025 11:13:37 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5APAkiV9025097;
-	Tue, 25 Nov 2025 11:13:36 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4akt71b152-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Nov 2025 11:13:36 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5APBDaAK26870436
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 25 Nov 2025 11:13:36 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 05DD958055;
-	Tue, 25 Nov 2025 11:13:36 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7258158066;
-	Tue, 25 Nov 2025 11:13:27 +0000 (GMT)
-Received: from [9.109.198.169] (unknown [9.109.198.169])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 25 Nov 2025 11:13:27 +0000 (GMT)
-Message-ID: <0caa9d00-3f69-4ade-b93b-eea307fe6f72@linux.ibm.com>
-Date: Tue, 25 Nov 2025 16:43:25 +0530
+	s=arc-20240116; t=1764069367; c=relaxed/simple;
+	bh=Ip64xUfPHkgew7xpzZ7PNaFPgDrh7O5mRfg0xTeQwTk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tyRnPuLxbwEaGjLzc327+mVpwspdT4bpvPCKuLSfrFgeXTQaao9rrE4J6Zp/QiKV4tjC6bSOqYwD3rvA7pghy0WPFvqzBVF4pPZZU7xY92f0U85WZu0wUGof0HJ/PBemAt6rMCxPZT8e/gbf1wa9aJguj0Kb9jO4K2eR1amxPno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=MlrsdxcD; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id EB686A079F;
+	Tue, 25 Nov 2025 12:15:53 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=Nl3hW5Z6IaAKy/ThA3ZCAbDyqXFPOZPXjA3rXI/HNTg=; b=
+	MlrsdxcDLoNPyz5CnjwSwlTF3x/G/d+VZ/tOeNyQ1j5uVYJdUWmJVtDMUm6ICvGI
+	Ek/PZ4Suo6tBf5QDTkicm4UkP7R9Lifnuc9/+Ki6VOCts3OpWrogS6Q9fwmGjiG9
+	7PblEkpEo1j3LNIsyKUJi/gYQcGL8O7wZ/nBRjtzR3jNgDlpjWyFlB0S7ity6Oao
+	HWEHG/VY6erNqT49vS+WlHc1KLVMYhJON06/SdAvcViCbM629RSikB1hJ9x+kktR
+	fA6gbCJlzbU+/vXsHVMyanbUN0whPCRSvdPndgcAIBt5OOFT9+h+vxtMLW43+J7H
+	YSjA9aaE82owe5f/HRsfS8Lu18XFXDrwkOVBWX4SairtW5U9WGdgvrTj1qLRv1hW
+	pkInGGd1amk5L4JU6Y0l4Bo0J8nSq1+kzfqzENbE13iEzx7HXa5CmeDlqWrYaH/N
+	yAxprmFq8n+YfEv0vQc+KRoENLv1xaItTOP1KNTs233qIwcK2SD2uG6kC9vDtEjC
+	VNtLL8FK0DpIQ/5VcqSGsKmGoc12p7/YnKecRime2K4jePPzufa9EoKmaon+8kLJ
+	8LOe3BvWw7OnvIpdFav7D6Z2UoNfW4D3Zpo8Ohux1Fj6TZQ07a8fq32O19nykoEu
+	Q+tiQA8fpGFVa/YAwxNgh7hSKG/M34fOGACheZzKCNI=
+From: Buday Csaba <buday.csaba@prolan.hu>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: Buday Csaba <buday.csaba@prolan.hu>
+Subject: [PATCH net-next 1/1] net: mdio: reset PHY before attempting to access ID register
+Date: Tue, 25 Nov 2025 12:15:51 +0100
+Message-ID: <6cb97b7bfd92d8dc1c1c00662114ece03b6d2913.1764069248.git.buday.csaba@prolan.hu>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC blktests fix PATCH] tcp: use GFP_ATOMIC in tcp_disconnect
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Cc: "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
-        "hare@suse.de" <hare@suse.de>, "sagi@grimberg.me" <sagi@grimberg.me>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "dlemoal@kernel.org"
- <dlemoal@kernel.org>,
-        "wagi@kernel.org" <wagi@kernel.org>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "yukuai3@huawei.com" <yukuai3@huawei.com>,
-        "xni@redhat.com"
- <xni@redhat.com>,
-        "linan122@huawei.com" <linan122@huawei.com>,
-        "bmarzins@redhat.com" <bmarzins@redhat.com>,
-        "john.g.garry@oracle.com" <john.g.garry@oracle.com>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "ncardwell@google.com" <ncardwell@google.com>,
-        "kuniyu@google.com" <kuniyu@google.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "dsahern@kernel.org" <dsahern@kernel.org>,
-        "kuba@kernel.org"
- <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "horms@kernel.org" <horms@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20251125061142.18094-1-ckulkarnilinux@gmail.com>
- <aSVMXYCiEGpETx-X@infradead.org>
- <ea2958c9-4571-4169-8060-6456892e6b15@nvidia.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <ea2958c9-4571-4169-8060-6456892e6b15@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Vkxy-U0qUoUhomun77kqQwsiNtCzPsru
-X-Authority-Analysis: v=2.4 cv=frbRpV4f c=1 sm=1 tr=0 ts=69258f62 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=BI5xwJ-P1ppPWS6GoS0A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: tBWR1YSg00FE8aDfNrJdzyEipIN7sKvr
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIyMDAwOCBTYWx0ZWRfX9xZSQ1PTRjtO
- ic95MvoVhO6juL1TXjxsTkTU+27vS6PN7JrpUzce+o2uteOlicsg9mOwFZPDu6ZiAUWWVwdYG37
- 3N+QHBbeIz9GL4UAe/R6AFyPXSACa70XLN0/x7rBj+uoNMc/lkvQAG0Xho1x9cpMbWUwY3aunc0
- L01MPVGLCzQhbdl5eBDtkntGRnOJPUuFw68/rVph+7KecViWhPuebCI1EZgKtxxS7X7/DLW6eiq
- 5Iqu4UC7Tnz4lj5nEPbxNGxpcnBQpJdkwG7aJmC5JqvfIHrJUkFa2H1DOX7kyUEmAwEX8HXz7m/
- duvITe/zSGq8RYgSuu8LMBqlM/9X/A62I7XmT+iJGmtw7qZhK1NZSYHK8GCJz+Rc4eXdgbbIIck
- BXhDs3PdPVN2HjJD4c9F+wkWcc9N/Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-25_02,2025-11-24_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 clxscore=1011 spamscore=0 lowpriorityscore=0
- impostorscore=0 bulkscore=0 adultscore=0 priorityscore=1501 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511220008
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1764069352;VERSION=8002;MC=174721073;ID=136232;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A296767155F607062
+
+When the ID of an Ethernet PHY is not provided by the 'compatible'
+string in the device tree, its actual ID is read via the MDIO bus.
+For some PHYs this could be unsafe, since a hard reset may be
+necessary to safely access the MDIO registers.
+
+Add a fallback mechanism for such devices: when reading the ID
+fails, the reset will be asserted, and the ID read is retried.
+
+This allows such devices to be used with an autodetected ID.
+
+The fallback mechanism is activated in the error handling path, and
+the return code of fwnode_mdiobus_register_phy() is unaltered, except
+when the reset fails with -EPROBE_DEFER, which is propagated to the
+caller.
+
+Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
+---
+Patch split from a larger series:
+https://lore.kernel.org/all/cover.1761732347.git.buday.csaba@prolan.hu/
+
+The refactoring parts of the previous patchset were already merged,
+leaving this one. Functionally identical to:
+https://lore.kernel.org/all/5f8d93021a7aa6eeb4fb67ab27ddc7de9101c59f.1761732347.git.buday.csaba@prolan.hu/
+
+Comments were added for clarity.
+---
+ drivers/net/mdio/fwnode_mdio.c | 40 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
+index ba7091518..c1988cc37 100644
+--- a/drivers/net/mdio/fwnode_mdio.c
++++ b/drivers/net/mdio/fwnode_mdio.c
+@@ -12,6 +12,7 @@
+ #include <linux/of.h>
+ #include <linux/phy.h>
+ #include <linux/pse-pd/pse.h>
++#include "../phy/mdio-private.h"
+ 
+ MODULE_AUTHOR("Calvin Johnson <calvin.johnson@oss.nxp.com>");
+ MODULE_LICENSE("GPL");
+@@ -114,6 +115,34 @@ int fwnode_mdiobus_phy_device_register(struct mii_bus *mdio,
+ }
+ EXPORT_SYMBOL(fwnode_mdiobus_phy_device_register);
+ 
++/* Hard-reset a PHY before registration */
++static int fwnode_reset_phy(struct mii_bus *bus, u32 addr,
++			    struct fwnode_handle *phy_node)
++{
++	struct mdio_device *tmpdev;
++	int rc;
++
++	/* Create a temporary MDIO device to allocate reset resources */
++	tmpdev = mdio_device_create(bus, addr);
++	if (IS_ERR(tmpdev))
++		return PTR_ERR(tmpdev);
++
++	device_set_node(&tmpdev->dev, fwnode_handle_get(phy_node));
++	rc = mdio_device_register_reset(tmpdev);
++	if (rc) {
++		mdio_device_free(tmpdev);
++		return rc;
++	}
++
++	mdio_device_reset(tmpdev, 1);
++	mdio_device_reset(tmpdev, 0);
++
++	mdio_device_unregister_reset(tmpdev);
++	mdio_device_free(tmpdev);
++
++	return 0;
++}
++
+ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+ 				struct fwnode_handle *child, u32 addr)
+ {
+@@ -129,8 +158,17 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+ 		return PTR_ERR(mii_ts);
+ 
+ 	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
+-	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
++	if (is_c45 || fwnode_get_phy_id(child, &phy_id)) {
+ 		phy = get_phy_device(bus, addr, is_c45);
++		if (IS_ERR(phy)) {
++			/* get_phy_device() failed, retry after a reset */
++			rc = fwnode_reset_phy(bus, addr, child);
++			if (rc == -EPROBE_DEFER)
++				goto clean_mii_ts;
++			else if (!rc)
++				phy = get_phy_device(bus, addr, is_c45);
++		}
++	}
+ 	else
+ 		phy = phy_device_create(bus, addr, phy_id, 0, NULL);
+ 	if (IS_ERR(phy)) {
+
+base-commit: e2c20036a8879476c88002730d8a27f4e3c32d4b
+-- 
+2.39.5
 
 
-
-On 11/25/25 12:58 PM, Chaitanya Kulkarni wrote:
-> On 11/24/25 22:27, Christoph Hellwig wrote:
->> I don't think GFP_ATOMIC is right here, you want GFP_NOIO.
->>
->> And just use the scope API so that you don't have to pass a gfp_t
->> several layers down.
->>
->>
-> are you saying something like this ?
-> 
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index 29ad4735fac6..56d0a3777a4d 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -1438,17 +1438,28 @@ static void nvme_tcp_free_queue(struct nvme_ctrl *nctrl, int qid)
->   	struct nvme_tcp_ctrl *ctrl = to_tcp_ctrl(nctrl);
->   	struct nvme_tcp_queue *queue = &ctrl->queues[qid];
->   	unsigned int noreclaim_flag;
-> +	unsigned int noio_flag;
->   
->   	if (!test_and_clear_bit(NVME_TCP_Q_ALLOCATED, &queue->flags))
->   		return;
->   
->   	page_frag_cache_drain(&queue->pf_cache);
->   
-> +	/**
-> +	 * Prevent memory reclaim from triggering block I/O during socket
-> +	 * teardown. The socket release path fput -> tcp_close ->
-> +	 * tcp_disconnect -> tcp_send_active_reset may allocate memory, and
-> +	 * allowing reclaim to issue I/O could deadlock if we're being called
-> +	 * from block device teardown (e.g., del_gendisk -> elevator cleanup)
-> +	 * which holds locks that the I/O completion path needs.
-> +	 */
-> +	noio_flag = memalloc_noio_save();
->   	noreclaim_flag = memalloc_noreclaim_save();
->   	/* ->sock will be released by fput() */
->   	fput(queue->sock->file);
->   	queue->sock = NULL;
->   	memalloc_noreclaim_restore(noreclaim_flag);
-> +	memalloc_noio_restore(noio_flag);
->   
->   	kfree(queue->pdu);
->   	mutex_destroy(&queue->send_mutex);
-
-The memalloc_noreclaim_save() above shall already prevent filesystem reclaim,
-so if the goal is to avoid fs_reclaim, we should not need an additional
-memalloc_noio_save() here. That makes me wonder whether we are looking at the
-correct code path. If this teardown path (nvme_tcp_free_queue()) is indeed executed,
-it should already be avoiding filesystem reclaim in the first place.
-
-Thanks,
---Nilay
 
