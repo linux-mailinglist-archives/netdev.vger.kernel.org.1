@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-241348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96B2FC82EF1
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 01:29:49 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48F76C82F5A
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 01:50:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F04F934AEC8
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 00:29:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 34A4C4E14DB
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 00:50:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17CF1DF25F;
-	Tue, 25 Nov 2025 00:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11FCB1EE7DC;
+	Tue, 25 Nov 2025 00:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="L17Nb8Mh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oG8kDB32"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341513EA8D;
-	Tue, 25 Nov 2025 00:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E122A1E520C
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 00:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764030585; cv=none; b=doWSCMXAjpOAoCLWKN6ROkrHU2OfaT0Vga/aDsOgkMfIEWSJGd+M8OmRqvH2wpnqBT5bfuX3XmYzITa0FoLkwYbSxuHGRZTTsiZBznEzcFQaUb+o5KgtapUcBTaZtaon6wUM/3IPbR4PboRQlrWcf55Gbba1EWLCJ01id6T/fhY=
+	t=1764031844; cv=none; b=jx/N5vqOKYcx4BAIazJbiQH4riCGka62wEiDFDOeXBlHqmNBpyH5Ju9BR3nAZj4vjjz49LJhMG3SMgSymmKl1PN+rdp3Q34wDMgHcPs3QmANpzwE+RfNscNf5Lps/aNugcqoCELvbvjO1A0bW3vU60ZnQzVGyX2ZyfOwVER6vVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764030585; c=relaxed/simple;
-	bh=C2HlEMsvyQMCnybCB7SaC+I40kgvVfnrxFOIhwRCxoI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=suQJP3eXP4CbfPcHztufyZeoI0Kuaj/+q0dk7CY1v9uR8Xb1dpDSHqOURoU9AgtxZ62k87RTII4Fw/lakWC2aByU6g9FNHir8Qycc433cQI6yeQLrr16xeBmT5r4WGDSjqDKe3a/rS8h/7Irl1TmrP3aLZHJRW5HgVRg2Q4IMKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=L17Nb8Mh; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=uyDn49yZ3JolAXWifLKxq5HAVN38ilksH6HBgYuR0nY=; b=L1
-	7Nb8MhGnQygQto0HcUvmLyukrHQst/i8Nw41kohjxc5NkmgX+Ps3zuSnyHDoL8oGdBijaPzUW6+MQ
-	zyexHb9Idk4+9y5ViEvxKCrtThwLOC9hT6cO9vu45b6mu9oDJYLsnqoXlC2wroPgG3xN/DVu4ZfZ6
-	VNtVlalW78OMa5c=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vNgw1-00ExbS-H6; Tue, 25 Nov 2025 01:29:33 +0100
-Date: Tue, 25 Nov 2025 01:29:33 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: yongxin.liu@windriver.com, LKML <linux-kernel@vger.kernel.org>,
-	Netdev <netdev@vger.kernel.org>, david.e.box@linux.intel.com,
-	chao.qin@intel.com, yong.liang.choong@linux.intel.com,
-	kuba@kernel.org, platform-driver-x86@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] platform/x86: intel_pmc_ipc: fix ACPI buffer memory
- leak
-Message-ID: <72fcaebe-afb6-49ef-a6fd-69aa0f8c7a39@lunn.ch>
-References: <20251124075748.3028295-1-yongxin.liu@windriver.com>
- <f1124090-a8e4-6220-093a-47c449c98436@linux.intel.com>
+	s=arc-20240116; t=1764031844; c=relaxed/simple;
+	bh=/fjM8ZVgYQLFvnSPn40XHr9mF0nwTi+jwKUv08fdqZQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Lp6hp/ziPeKPbkR7d169wN8M+i2UXLF8X/U7m06Q4+TepIaIxao2JdpDcsPULCgjPVafKNvki0WoEabv6yhkeYKfgK9frSuJbfOhpViGjrJ0UnBkxuhikQ5DIFLfLejhKwTzb5hbhYJFOQzpU1gjGoFOkht0EmwyXyaN6Khe0Gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oG8kDB32; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FB52C4CEF1;
+	Tue, 25 Nov 2025 00:50:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764031843;
+	bh=/fjM8ZVgYQLFvnSPn40XHr9mF0nwTi+jwKUv08fdqZQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=oG8kDB32+cmxMqHnv/x5CDDVo/Fl1vQGs4cXZ+wVQOJdJYe05cDM8WXjL+ws4DZGq
+	 1a6pcnGa0p9H+wzIebNeDEZjqAhop7i8Y8rUdBA0nq8vdoMJ3kbrn1+VWUQY3ISGXV
+	 BgJ3y3wu7Fv5n98G3kfLrX5Ma1mUBDts7qwxhUJQr5fCOPnA3y5v8qdQKTzq3X0MK0
+	 Nm+W25oiD0Fj8eiscn2zb3O60Qoi0ifp8EjYdJkq7SU2rxzPMzTDBJa4Xmj1+M41v7
+	 eXmiaUP+o6KlI3b7jBiWsqKDFgSo9lUEKQ53LtEv8mf70EEAimhytI3ia4KP6Rh3vl
+	 wkObNKbbE2HPw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 723153A8A3C1;
+	Tue, 25 Nov 2025 00:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <f1124090-a8e4-6220-093a-47c449c98436@linux.intel.com>
+Subject: Re: [PATCH iproute2] tuntap: add missing brackets to json output
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176403180626.133538.10568118341935314151.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Nov 2025 00:50:06 +0000
+References: <20251123165345.7131-1-stephen@networkplumber.org>
+In-Reply-To: <20251123165345.7131-1-stephen@networkplumber.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, i@fuzy.me
 
-> Good catch but this fix doesn't address all possible paths. So please use 
-> cleanup.h instead:
+Hello:
+
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
+
+On Sun, 23 Nov 2025 08:53:06 -0800 you wrote:
+> The set of processes attached to tuntap are displayed
+> as JSON array, but was missing the inner brackets to
+> allow for multiple processes.
 > 
-> 	union acpi_object *obj __free(kfree) = buffer.pointer;
+> Fixes: 689bef5dc97a ("tuntap: support JSON output")
+> Reported-by: Zhengyi Fu <i@fuzy.me>
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 > 
-> And don't forget to add the #include.
+> [...]
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+Here is the summary with links:
+  - [iproute2] tuntap: add missing brackets to json output
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=9cc782b36abe
 
-  1.6.5. Using device-managed and cleanup.h constructs¶
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  Low level cleanup constructs (such as __free()) can be used when
-  building APIs and helpers, especially scoped iterators. However,
-  direct use of __free() within networking core and drivers is
-  discouraged. Similar guidance applies to declaring variables
-  mid-function.
 
-    Andrew
-
----
-pw-bot: cr
 
