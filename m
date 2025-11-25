@@ -1,163 +1,138 @@
-Return-Path: <netdev+bounces-241537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15A5EC8568A
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 15:25:59 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7A8FC85693
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 15:26:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 977C73A8269
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 14:25:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6620B34E02E
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 14:26:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392F83254AC;
-	Tue, 25 Nov 2025 14:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB9F32548C;
+	Tue, 25 Nov 2025 14:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d0ilBhc+";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="lZSpnCes"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvuktbP2";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BYh6bBEb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A0D32548C
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 14:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040312D7D42
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 14:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764080742; cv=none; b=pJk8hsya07FVro9y3Li5FWQyvDrpC2hc1r61Pnrq1A0vX+1Wo1EVkIFASjE+Y8koqO58XyyEb5kR9jjKTwaFdB7ebfUYRVhJxvKiThKjInbgVlDA35hU0kGblGKTyAHYIWKbXzVqlPr7cMtXudylqYYom+SXzMW6EiY3UX6jeXI=
+	t=1764080790; cv=none; b=HZEgmlHq3LG7i062yKJPDu/FolSr8SlTMOKjZlnEVpY3JLYRQapv/64ey72gAKDE9DngYL13xSChY8AUehdTm5NGfw0AZjR9j8aAjvgcBLZI/U0HBr5nWBUg9UWuMzCBow1uQCjTDntsfeBwVdOu1wd+Jb9e8ffnPs2xHpe3csw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764080742; c=relaxed/simple;
-	bh=qVH4EgDap5qTz2I7vTky5yddvl4rhwAfwva1oxLfzPk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UKauEPW8WQoKBj/Wu/JNgqqR7TX0PJrKJUl6W9gBJcS884ChZLfdOsFnYZKtLIkg4txB6+wYjgxEqq9eQnBdJeJQIeRNytltVwaVYzGTCY54uemRO6tOJJ/lzB3VVyEsCDTBpv0Htq89nj6JlaRzOafDwBMTj29iySlT+ee8qSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d0ilBhc+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=lZSpnCes; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1764080790; c=relaxed/simple;
+	bh=U5u6saZn2iTIpVEynp6gDRuhzzrTr4z4UIohxHUoVDk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=az146jUFgr4TRMifHcVPVoYB8aof665euTPpPBo4RnJU86C3qrn433Fs8RSKuSeg1FrbkAweX5W0FruLEptBJeQW4WATZlFJvlP+rKaJqSYe1vofdjy2kEgYBJeGKKscANNJ9eSz9C5sqDoPshKw3Qx4WZAPgWaUW/3k2/I/Hqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gvuktbP2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BYh6bBEb; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764080739;
+	s=mimecast20190719; t=1764080787;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Vr0i1Bnz9J7tkbwtcawYQEZH/SpsaGOcMG1YHu/LOuk=;
-	b=d0ilBhc+guYx11fJTXH/XA7hkZ1oT+HVaf2ssoxo+iB3F+mfqOWjC1ueYVgm7PXFLhUz8b
-	BGACnewmmkikJ7Sx5TNzj7Nr18k89z7iaM1TEcUVz6+YQ/+ewTyg3YsDD+W1HCAJHX6rTj
-	9JmtEvLOCkrZtnlWZ4ZaY2zBvcavPUI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=U5u6saZn2iTIpVEynp6gDRuhzzrTr4z4UIohxHUoVDk=;
+	b=gvuktbP2m+38dDRqfQlkfxhW+qPScXIaYtoQgtESBSu4LCcJkIYhe+6q5QBBpsG4QeyF/I
+	+vdJ+4EzpJIlI6s3S5AIbP31B47j8Pk1iXC6W7sAbN1zmwz6hWMbx6mNuEujvGhNVbs67Z
+	dJ6/rTqXzFUrPUbs9Yq5Z/8wYFfOCFg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-615-fp6g-O10POOG5JOZPtGosQ-1; Tue, 25 Nov 2025 09:25:38 -0500
-X-MC-Unique: fp6g-O10POOG5JOZPtGosQ-1
-X-Mimecast-MFC-AGG-ID: fp6g-O10POOG5JOZPtGosQ_1764080737
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42b2ad29140so3170096f8f.0
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 06:25:38 -0800 (PST)
+ us-mta-532-avoRfvcMO-SMOicavHx4JA-1; Tue, 25 Nov 2025 09:26:26 -0500
+X-MC-Unique: avoRfvcMO-SMOicavHx4JA-1
+X-Mimecast-MFC-AGG-ID: avoRfvcMO-SMOicavHx4JA_1764080786
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47799717212so43628405e9.3
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 06:26:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764080737; x=1764685537; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vr0i1Bnz9J7tkbwtcawYQEZH/SpsaGOcMG1YHu/LOuk=;
-        b=lZSpnCes+51fxt4Q9Ikd6RiFKJ3O9ooFzfGY2mgdbH02TPiRfDAe30dueJmlKy83G/
-         wxq9HZum93R30w2oBhxxJuDXK1khWo2/+qwFxUyCUn1EfClGAYmWgeucwknhQIOuNlHv
-         CiOcuAlwUVJBwwu3bfoCBPSrTqgD/XLdK68sGZ9tVOkm9XGkgUFSNjuaKx6Nw5DKX4+y
-         FERYZo4iErBC+lcYqqfLZMd2z3mL8IAAK6Bb9P1RMX0SRJNgXgDwFWxGOQ9QIrR0UFSk
-         B6qLqodvnBlTY+uPhVWQtT+MyMt+Hb9PL/y4XGrKLYTB4WpvdGlWfYppYg2H7qCwxM2S
-         OeFQ==
+        d=redhat.com; s=google; t=1764080785; x=1764685585; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=U5u6saZn2iTIpVEynp6gDRuhzzrTr4z4UIohxHUoVDk=;
+        b=BYh6bBEbPFM8J5DAMYEKVWbOt7U+JC49lvPl9sR2AcRPD5o2uW1l5jF8tC2Ogn5sKc
+         gejaHdRHshYKfxcq/9YjW3lVFE30ZV69zYAg5fyb4552y6d4hdbRtXlCigxEmOCScFyQ
+         VT8kscu2NgWYjlpsibg4PuVqfW1UV+JZFHCg2HP1+arL3qjCtbcuuSiju7Tk6rOFCMbb
+         mMXpT0pHHP3Q4ibyPYHoE+sOuSh/N7uuRuUc1U2XgOBkIiOBPcdAPoGnJPqw6uyEedHq
+         DPQgJZv1R6rZ53JE8ltDZ29GV18M74eXLHQEhD10If0pO1v2srkx5fJpmXVBzhIPtmd7
+         8c0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764080737; x=1764685537;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vr0i1Bnz9J7tkbwtcawYQEZH/SpsaGOcMG1YHu/LOuk=;
-        b=B8gnzhrQigcTtZ8OPHlGYFtH4zeZD0o7qNzbts0hQZMS8c53DNZn7sPqGIzhEKrSHI
-         NIFQjkzF+Md0I1QSq6lpYAW8g8c50M4RaoJgUQ1eWlqkWgF7lUMknzVf1zh9ZKQdG4A2
-         uuwKuCuErf14IekSSYrhOoMiPfFxLPbRtWByrz1A2wCxQIpTeHiX1AH221VpLKGz7ibX
-         EcB7Jv5tiX3ZQUZ2G90BNcXN7hVEXID++A/za1kDxpJOEaqrBtzE/ziPoWydUkWTiLk2
-         cKq5m0+H+xMYpA3cbZMAT7gwMm/4QMB6RHLxubrk2LXCPFaKi78n7Xczb7V22w5Ki4vt
-         X+pA==
-X-Gm-Message-State: AOJu0Yx1jUsDPYAwWVuux4dXS+XOywylWwOuMasgU74k37MpckeKoarn
-	5yY2Y8yvv+krRvYg5c8LuSVLPpvzfjfKpyuJ6Hq86Okn3Hpjk67OM9vNIbyS63mBqI1wsCUAxiJ
-	v8zJrT6dQLSI6yQDVoFcW5LZbDsLvTMIT+Gy8YFzXfclQLeCPfX5/bHJm2F/70R+hPA==
-X-Gm-Gg: ASbGnctEhGQXeRMybcgMOUk2TS3bmWvDMbzNrzhDqevPtL0Wl+azi7dv0ZtPTBx2mdP
-	2bbq7pJcsh70D4Dw07nbemfrwVGtnQPhNcYMbBR7vqmY+9pQUQbF9fW43K1x14X47E08XOWBnVp
-	rcBin+2JK/2kTZCZZQzxaOXarWjT6Rcjthdup9xW3Ej25HmGxSPZQBzwKo757wi5hRIese52Lvs
-	VK+4HHzqrSweuoWVrSfH33tNStPDxOLUYoETABXfR2LvCSXS1lj23a89DD65vYZvAFfhjcN32q0
-	eiHCJBmDBD3IKEXh4IfL8/7KwCxSfnCyq/0xVd9oKdzoyadqC9oS+sEHK/u1JqniOxXq0He2x4c
-	N3BmtAdnvdjLBCJd5wAlcGdvCQ1eVMQ==
-X-Received: by 2002:a05:600c:548b:b0:477:6d96:b3c8 with SMTP id 5b1f17b1804b1-477c01c4c03mr159629705e9.23.1764080736778;
-        Tue, 25 Nov 2025 06:25:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFGWUY3ORBZQM8nQhsClHy4gnQBeQmJgXaZyttfwnGynYrZLxOGj2nr3DxzGuetAdDy9u3GgQ==
-X-Received: by 2002:a05:600c:548b:b0:477:6d96:b3c8 with SMTP id 5b1f17b1804b1-477c01c4c03mr159629425e9.23.1764080736339;
-        Tue, 25 Nov 2025 06:25:36 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477bf355933sm262722995e9.2.2025.11.25.06.25.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 06:25:35 -0800 (PST)
-Date: Tue, 25 Nov 2025 09:25:32 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
-	virtualization@lists.linux.dev, parav@nvidia.com,
-	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
-	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
-Subject: Re: [PATCH net-next v12 07/12] virtio_net: Implement layer 2 ethtool
- flow rules
-Message-ID: <20251125092418-mutt-send-email-mst@kernel.org>
-References: <20251119191524.4572-1-danielj@nvidia.com>
- <20251119191524.4572-8-danielj@nvidia.com>
+        d=1e100.net; s=20230601; t=1764080785; x=1764685585;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U5u6saZn2iTIpVEynp6gDRuhzzrTr4z4UIohxHUoVDk=;
+        b=gOvQZLH2zq865C12t1rnV/b0uEWAW0fTAdId/OruPFnSZweBwZYJ9kyvcpNv6xM7QD
+         Sugji2qMvJZndcXENxuKKsb3LAclujVL8YajjIHy8zhCbwqrC959wNQQGGVJYp750o+O
+         hSOjdIKHjtc08Rc+O4Obli0m2nt3MOTgzcOtHdbcnFCWvzW7p23ZzP/uBjeo3JyuysCt
+         kXYPuDVX1hkuig+LQOdcjn9uY27bwqKRM/P4LnQ8G1BysDbAQrn20xCXv7vAlar2DxTw
+         ZBTAWFxTgDFVTIhiqqgETKIJAIPzZ3KMHe5seKw81RGmvn2lskZ/yigPHoPN9O2qAWHk
+         YObg==
+X-Forwarded-Encrypted: i=1; AJvYcCVcf1Q1rY22F6OJBGCARZbEGuUOAXFPYKMCudhgg2T/x/3seA/z6kGs8NLmKIvB27Pr07tOYDo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0Boq6ahjiSvgicOz//eEbbS7mWVIN0p3seimxwuEV4jURSAZK
+	9zOswb8yiOAZDee3qHBxtVXAz2l63wxd3zdhz/z3vGAPI74bFx3oLKHddF3Ih3xHVLmzqhAIm3i
+	DsIC7L77CHH0VeFoqAYOOmuVjkxim2t8qxbGaXBSXmSkVhybxFe9gEuNoHL4XDF7uVQ==
+X-Gm-Gg: ASbGncuHqgmvI2bcQLcGOE7dAlY1dNCK60GoIzhCsVgxwYy0+bJ1vtL4y2zPp/rajSb
+	DrKNnFjq9luR0X7PbDwDshQw4u5PzEg5jZRVlRAiT4a8Y1vAxzX1F1I6o/5tToBoPeW5ejzqsRn
+	03maCvZ6xVXYUC1rc71cJVx9DazzMGw/NROOEuiwGibnJoy/qvIm1ifr89Bor0/nPRn4llmqH3Y
+	xLUFmVLEt9ZvWpWb2d/mpRWoeD5I+vx8PqRM8KQZMkqUMCFzXeaWjsJcrMcknnlLQ6cJe14NpUK
+	r3v3AF2zRMM9CjtGvGTFBJiv/3A1RvUW/8Y8lYgEo6cjsZ3csntvBfPZ0HqoM6iVr35HWnjpVlZ
+	N/a3h8OD7yV0n4g==
+X-Received: by 2002:a05:600c:3590:b0:477:54f9:6ac2 with SMTP id 5b1f17b1804b1-477c104fc20mr195497525e9.0.1764080785115;
+        Tue, 25 Nov 2025 06:26:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHZaXfPVxOtd161tPfaP0p6wFtwkV3+ZR42m4+eNaUmo7DrGyyx5OQkx0VodjapltytgGteDQ==
+X-Received: by 2002:a05:600c:3590:b0:477:54f9:6ac2 with SMTP id 5b1f17b1804b1-477c104fc20mr195497055e9.0.1764080784670;
+        Tue, 25 Nov 2025 06:26:24 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.153.231])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-479040a9cf4sm21155365e9.1.2025.11.25.06.26.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Nov 2025 06:26:24 -0800 (PST)
+Message-ID: <12d4a794-24f4-4201-8671-38851edb7942@redhat.com>
+Date: Tue, 25 Nov 2025 15:26:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251119191524.4572-8-danielj@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 07/12] ipvlan: Don't allow children to use IPs of
+ main
+To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>, netdev@vger.kernel.org,
+ Kuniyuki Iwashima <kuniyu@google.com>, Xiao Liang <shaw.leon@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Julian Vetter <julian@outer-limits.org>,
+ Ido Schimmel <idosch@nvidia.com>, Guillaume Nault <gnault@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ Etienne Champetier <champetier.etienne@gmail.com>,
+ linux-kernel@vger.kernel.org
+Cc: andrey.bokhanko@huawei.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>
+References: <20251120174949.3827500-1-skorodumov.dmitry@huawei.com>
+ <20251120174949.3827500-8-skorodumov.dmitry@huawei.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251120174949.3827500-8-skorodumov.dmitry@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 19, 2025 at 01:15:18PM -0600, Daniel Jurgens wrote:
-> +static int virtnet_ethtool_flow_insert(struct virtnet_ff *ff,
-> +				       struct ethtool_rx_flow_spec *fs,
-> +				       u16 curr_queue_pairs)
-> +{
-> +	struct virtnet_ethtool_rule *eth_rule;
-> +	int err;
-> +
-> +	if (!ff->ff_supported)
-> +		return -EOPNOTSUPP;
-> +
-> +	err = validate_flow_input(ff, fs, curr_queue_pairs);
-> +	if (err)
-> +		return err;
-> +
-> +	eth_rule = kzalloc(sizeof(*eth_rule), GFP_KERNEL);
-> +	if (!eth_rule)
-> +		return -ENOMEM;
-> +
-> +	err = xa_alloc(&ff->ethtool.rules, &fs->location, eth_rule,
-> +		       XA_LIMIT(0, le32_to_cpu(ff->ff_caps->rules_limit) - 1),
-> +		       GFP_KERNEL);
-> +	if (err)
-> +		goto err_rule;
-> +
-> +	eth_rule->flow_spec = *fs;
-> +
-> +	err = build_and_insert(ff, eth_rule);
-> +	if (err)
-> +		goto err_xa;
+On 11/20/25 6:49 PM, Dmitry Skorodumov wrote:
+> Remember all ip-addresses on main iface and check
+> in ipvlan_addr_busy() that addr is not used on main.
 
+Why?
 
-btw kind of inelegant that we change fs->location if build_and_insert fails.
-restore it?
+Why using in_dev_for_each_ifa_rcu()/in6_dev->addr_list is not good enough?
 
-> +	return err;
-> +
-> +err_xa:
-> +	xa_erase(&ff->ethtool.rules, eth_rule->flow_spec.location);
-> +
-> +err_rule:
-> +	fs->location = RX_CLS_LOC_ANY;
-> +	kfree(eth_rule);
-> +
-> +	return err;
-> +}
+Note that IP addtion on the main interface can race with
+ipvlan_addr_busy() even with the code you are proposing.
+
+/P
 
 
