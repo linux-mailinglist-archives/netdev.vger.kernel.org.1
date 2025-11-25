@@ -1,65 +1,60 @@
-Return-Path: <netdev+bounces-241358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B8CAC83219
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:47:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 660BBC83222
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:49:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A942C4E3FB1
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 02:47:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 392D84E1922
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 02:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC9B14BF92;
-	Tue, 25 Nov 2025 02:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3031A18DB2A;
+	Tue, 25 Nov 2025 02:49:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HplQ5l70"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZpSz7ncO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8141A295;
-	Tue, 25 Nov 2025 02:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077431A295;
+	Tue, 25 Nov 2025 02:49:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764038852; cv=none; b=BIFQcBf+Qg0S8KZi2Yx14GiHkfvsgzIsRo0VG2g7upBkyqNeu/UdZo3XoDTwI8SLNnfQgGYa/mxx93R3Zq0Agk39cgzigkE30n7jsKnok9cZYmg7w1+UFNDqQCRoBeWaLBszSjvm6L2BwgltpFtRjdelTJtV9MOb8tkFybwuqwM=
+	t=1764038977; cv=none; b=eeuu+MPvYPOv2HACbMykDsC2ChL7+CH+1L5dXdDRmhYz1EHCXBP4Ia6VNFOVTClXawdW15s8Ezr6jMqs/YNblkXMPlxLsEaRu6z6MhVeT9BhtvEPeu8DoYY0TIOh2YzyGFQ8j+B1w0PIFhtCGWDcRcyzAQ9rBQc0Zf+y3n+thRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764038852; c=relaxed/simple;
-	bh=7Ws/PbUNVl0lL6lS4g6QyFe+ZcfmM3/1TNjllqxL5NU=;
+	s=arc-20240116; t=1764038977; c=relaxed/simple;
+	bh=aQMq1HTfzbqqDNq85zDNzwztVfRbyKNQRIJr8AGkkYc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AvUfSV7iV6xZhuywzZJiQL0ZZotHKQLBjBsNVRb8UuZ24Z0sC50xo9TtAF84mYGGOmHzYSeSq135f6/75rp/YcogHELk85IcusZCXWCIjDm1U4VqKF6Ye3U0m4QKM2Sym4OoNm7PoPwGy4OSXyCztYahf6o5/iNABBK22ZRXzqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HplQ5l70; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C2F4C4CEF1;
-	Tue, 25 Nov 2025 02:47:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=bkBHqBxa2dGcIqFzl9djV26W7/5cn+OHx2sa8BG4eGh8F33/ZBIalaaNCbroRolV1T5CEzUxJwbBGtlZk+BFxkLsGeiE3Dlaxy4kgkPdPtX5Icz0MuNFgP+1Bi19KqrhPXIfubPZ0TEjMZnCN6dOOP2dv+lFw726zfRlXGX5R5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZpSz7ncO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EF48C116C6;
+	Tue, 25 Nov 2025 02:49:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764038851;
-	bh=7Ws/PbUNVl0lL6lS4g6QyFe+ZcfmM3/1TNjllqxL5NU=;
+	s=k20201202; t=1764038976;
+	bh=aQMq1HTfzbqqDNq85zDNzwztVfRbyKNQRIJr8AGkkYc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HplQ5l70hjnVJ1gxxUIdSHwiqclcKmNTSunj+ZcPl2/2vICsQPKb7N/1chWROdcDf
-	 tABFBPI4Lt3J0UQ+6/+1pC4M5k8FLyxjfafychqIDnttVlyNnzZi3Otyu4sPckGR+E
-	 KkLEZGv4Qmj4ke4OyyHv+SgM6mK9OzUJoDAPqt+597B+9ZEvIr9S84SAvfKHEukQLI
-	 n1y+mkkPwz/GdHKomZsEY3pUfhzlYy6ctIWJ1ITxbKiUue2z+C/fr75VajdtRwc+63
-	 rc07z8XxIVwme/Zhfmyhulo054XUBQC4cXcvOtREMewGHafokF78sfwpmUqfF8qEDw
-	 1si6Q74vahNpQ==
-Date: Mon, 24 Nov 2025 18:47:29 -0800
+	b=ZpSz7ncO52vz+IVE91r+VNKoc6DFG/YRn9jmavAN3OLZNgaohsoS/DndJ5GQS233y
+	 QvH/Te3234VjcJaLZuYt5hc3t/4aOyKONrH/OHYYdFqT9FSuSmWvVQND9npgXvrs8C
+	 okuZNIpPBP6miaKGU4CxLwqELT4jUBQP7/IopYu1AePiulcQRY/6kvaD6YgsaPNgQV
+	 GZS2/lsEVP/OSn0HJFC01CWEYCOwSMPuwTwh0XWWiNc47RFmZqV4/BlwiDwh3HRBtt
+	 HwTV2hAXbj6rQW+Tb+9UOBNPZZY5hmPvfQxgoXNlkVqAyCvf2v7crvkirlJFIPz6+g
+	 0PL1nMYgVPTFA==
+Date: Mon, 24 Nov 2025 18:49:35 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Byungchul Park <byungchul@sk.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, kernel_team@skhynix.com, harry.yoo@oracle.com,
- hawk@kernel.org, andrew+netdev@lunn.ch, david@redhat.com,
- lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
- ziy@nvidia.com, willy@infradead.org, toke@redhat.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- asml.silence@gmail.com, axboe@kernel.dk, ncardwell@google.com,
- kuniyu@google.com, dsahern@kernel.org, almasrymina@google.com,
- sdf@fomichev.me, dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com,
- shivajikant@google.com, io-uring@vger.kernel.org
-Subject: Re: [PATCH net-next 2/3] netmem, devmem, tcp: access pp fields
- through @desc in net_iov
-Message-ID: <20251124184729.7e365941@kernel.org>
-In-Reply-To: <20251121040047.71921-2-byungchul@sk.com>
-References: <20251121040047.71921-1-byungchul@sk.com>
-	<20251121040047.71921-2-byungchul@sk.com>
+To: David Wei <dw@davidwei.uk>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ willemb@google.com, petrm@nvidia.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/5] selftests: hw-net: auto-disable building
+ the iouring C code
+Message-ID: <20251124184935.6c4ceb3d@kernel.org>
+In-Reply-To: <c8876216-c37d-4d7d-9301-b051273e69b0@davidwei.uk>
+References: <20251121040259.3647749-1-kuba@kernel.org>
+	<20251121040259.3647749-2-kuba@kernel.org>
+	<c8876216-c37d-4d7d-9301-b051273e69b0@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,12 +64,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 21 Nov 2025 13:00:46 +0900 Byungchul Park wrote:
-> Convert all the legacy code directly accessing the pp fields in net_iov
-> to access them through @desc in net_iov.
+On Sat, 22 Nov 2025 16:55:05 -0800 David Wei wrote:
+> > +# Check if io_uring supports zero-copy receive
+> > +HAS_IOURING_ZCRX := $(shell \
+> > +	echo -e '#include <liburing.h>\n' \
+> > +	     'void *func = (void *)io_uring_register_ifq;\n' \
+> > +	     'int main() {return 0;}' | \
+> > +	$(CC) -luring -x c - -o /dev/null 2>&1 && echo y)
+> > +
+> > +ifeq ($(HAS_IOURING_ZCRX),y)
+> > +COND_GEN_FILES += iou-zcrx
+> > +else
+> > +$(warning excluding iouring tests, liburing not installed or too old)  
+> 
+> Would you want to mention the min ver needed (2.10)?
 
-Please repost just this patch. The last one needs to come after the
-merge window, when io-uring and net core changes converge in one tree.
--- 
-pw-bot: cr
+I think people would update to latest upstream if they update?
+I suspect we'll have to update this check if new dependencies
+come up, the version will become stale..
 
