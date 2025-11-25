@@ -1,114 +1,127 @@
-Return-Path: <netdev+bounces-241395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70FCDC83568
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 05:33:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4158C8358E
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 05:41:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 34C274E34D3
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:33:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 593E83AF3C3
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E85727FD52;
-	Tue, 25 Nov 2025 04:33:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039F427F749;
+	Tue, 25 Nov 2025 04:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mnohj4AH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e6LcBvj0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D647422D4C8
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 04:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9534288D6;
+	Tue, 25 Nov 2025 04:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764045200; cv=none; b=igZI+myKSEI23B625CNsiIxNu2JhSVJIr00uCoG5zHoDYxo+uh05cRkvZzNWdkVq8SWBpAh23IWhnjg6uALvXAn4d6+JxTaXlShtkxG/EfFXvNzxo9Yh2PrM6krVTR4Sdo41xFE0Z/AGdKcm85iMupd0uO9zclQeWNUunA14kg4=
+	t=1764045660; cv=none; b=BXbLhYhvb7lm8OAJgCbhlxjqFCAiqAXhpckal0BxCKAsqlmTkwVU83cQh3OM2zClDL+hLKvJM3qSV5zp4K4PgMcPAZkT5jm4vjpeyL3elxz19pZnwU9kF2zmS+/2KQ0aLQnAvyk2xVA9I8Y0qnXvo3u4MzJElB/vprYPGN4Z07I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764045200; c=relaxed/simple;
-	bh=0tfEFF31HO0p5AVtPB2m9wDnsam1+lKDH7iW1ZAWsmQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VoWutSbKsqyVWIsElOFnAJX3KT5DfHAFTKKcDv3zrK/cBWQS8nBrFNdI5lVY7nAHcYmh+ABU/78H11POwKO6g1b/k9Y2NAjC7Qq35RjjeTSBQlmoh8J4gcEQvQpzzDgKU4r8jC6mP7ny7gCuR7NVfGaqyVWrqIGvBWnMUT85vwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mnohj4AH; arc=none smtp.client-ip=209.85.214.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-299d40b0845so82116035ad.3
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 20:33:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764045198; x=1764649998; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R+zjcbL0tDzyXVFIG46xwFstTpucFPpn3y7+gA5A08g=;
-        b=Mnohj4AHeZlOByBRoTEWRze1h3kZj5lPfowL/d2fWSZuigOeAnYZOEZdv6tOQNBNAh
-         2h8YUva70VTdfsDTrRbV9hRJJXTsGxVZxUZ2MspcO4IF3CcSYP720sJAYrDgSrECDUFH
-         v/Ojh3uxCU6vrVx4Y3XhlV7y95hSBtILYUQeBIhbT8u3KE1ol+7iq1XdrjFS+2tyZBcL
-         k92m2DQnaYlYKN1sad1uRWi0N8rOTZtU/G5Po4EaFC3s3zLIUkOzs6/lB0+a2grzX5CH
-         rWPJLGg1bb30eI8MqsQI5J5FTUOIUE/S+qy3oFBD22v4yuf9sW631XR3vz2z2qoToX91
-         dadA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764045198; x=1764649998;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R+zjcbL0tDzyXVFIG46xwFstTpucFPpn3y7+gA5A08g=;
-        b=q0KJoYv37A506n1gwsIZNJh4XBnkJ4UVvaX2ZtbP3TPjRZHOjegZz19MKr37jxfESH
-         YGXPZrFYttPzvGbILyLL7Gw4uSsjJXkx6rmBl1jf2A7AWOZMresdaY5WrCcDeHT8h1h0
-         K06co0IH6LEIBeDbIlyK10YoC3qkmIq1LJp6mk8zHblQwFTmLDBteEWoZnQyJVoFCWSI
-         dUq5XYhSjea6rg2G13KFS9whwNIPN+HWWogUAp/SxrwGGpWSfwctjm49GoJ4Gj9hX3Rh
-         Pdj4CXApVpLAoLjZYX/s0W+JN5Oe4PW/liaM2FJnZeB92ptny/HpBSIYTCOl5yGX3dec
-         ifmg==
-X-Forwarded-Encrypted: i=1; AJvYcCVOnVt/Ok/rbM3HP8CaPScK1GbPsfcjo2xpD2niTvi0NJLLgSdqc+EUWCX5h7qBcYDGR0l/NHo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yybi2FFFOtwgqVx8Z9a2cFwDHJK0EqtLN7Z7M5A+x76E0CafQgF
-	3+hSOwMDsGIN0BjKu870Q5QSH1w0dkf/LjW9BlvYH2TBpfrluSS+RVdk
-X-Gm-Gg: ASbGnctdekfLHvrmYXNB7RAHKPAvJMHnnRrQKsAehr55BqZ8ZZ/lV6jopACZKo9lO7a
-	AxR1kcw+80/GCKPGiIT3TIY6N1JnqdObdHH0+Sw2RpyECAj2rGibnS/s872G4JR+ij7DS/SQ435
-	5TzY3h6YvzqC6pjcle7PpNYveJTsu3NE9UvdEgKOqgz4h3AP0p7713Wm9ycIqgizs2jqLl7QUgc
-	svH4mPNZPO81zxKOQMUHG6JE6gRCaSHM1wCtcmAHFnwlq+f7HD5vGwXAboy4qOL/IXgpmRN4lNu
-	S+VEB1dbBx8OrTwoc6Lo/v3u5UFR4VwTq7dvkDhPnm43m7BAGujK5rmx4PVKxtQbW0xaWBXfM5v
-	1USc7pMUCKlST2sP9j7rKFbrHpo31If2159RPNt+GgzdTTVnwBsxt+2gyZvNRx6WjfsNcBsoSf5
-	qmYhkUEPpq/r/CqcCCbxksjwsJ95bAAw==
-X-Google-Smtp-Source: AGHT+IG5wQiSA6DoLuqSdaHSi1FyIN7DulB2JAUjgDcIX0e3566wQM/LBnN9t0ZmEp/7FjsrZS6E7Q==
-X-Received: by 2002:a17:902:ebca:b0:295:9e4e:4092 with SMTP id d9443c01a7336-29bab1daa12mr16030285ad.56.1764045197941;
-        Mon, 24 Nov 2025 20:33:17 -0800 (PST)
-Received: from fedora ([103.120.31.122])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b2a6b22sm149678695ad.86.2025.11.24.20.33.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 20:33:17 -0800 (PST)
-Date: Tue, 25 Nov 2025 10:03:10 +0530
-From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jason Xing <kernelxing@tencent.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests/net: initialize char variable to null
-Message-ID: <aSUxhmqXmIPSdbHm@fedora>
-References: <20251124161324.16901-1-ankitkhushwaha.linux@gmail.com>
- <willemdebruijn.kernel.6edcbeb29a45@gmail.com>
- <aSSdH58ozNT-zWLM@fedora>
- <willemdebruijn.kernel.1e69bae6de428@gmail.com>
+	s=arc-20240116; t=1764045660; c=relaxed/simple;
+	bh=QYR4hjfoqH52yadclOSEYGCayQv9/Ag6fW1jB4kKIcA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=meg9sYnSbOlMF4qm34SK3YyBvK9jmkXiwBdLtVIQwEXRsTo5PWK/yVXPOc0XsbH4kiH/1beVu5nAnfzQjB/nMSJhtN3UKsoD9TjGYNm0G2zMG1Oj0MpSs/6C7JBhlgI6R+qUpUw8aMJ6BhEg1ujLPDxTawZ0IGi21/7n6uuEfyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e6LcBvj0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51B79C4CEF1;
+	Tue, 25 Nov 2025 04:41:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764045660;
+	bh=QYR4hjfoqH52yadclOSEYGCayQv9/Ag6fW1jB4kKIcA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=e6LcBvj0yOCj/VknX2c9F7F2Cta6bW7aS4T/hDuEZ5EzgZJBl/DeTUAcXjLOiTVN1
+	 QSyBBRD8ZRJsc/LtNxZ5Ivi8x0IE2swWR7GJAEhQJr8LTajLMi8Ks99vIYs1x495Rv
+	 cq+qrLvA2SBx0Xc0N2xLpZx2FIKXE2/sGLH0sIQB96wpNSh8Qp+C5FSailLzY6YMzx
+	 tHH15kQ6wC/zXiM3rwuZ+UdmYwFM86xLQUp4u8fVlPSa+TMZs4mfKR6Mqr8zBTisZ6
+	 FTE0cmyYa9bQ0d7EcXhVThwXEVt/vwjg6vf5dVaVSSTKDrVfurpGUjdME8Z5UZS+uY
+	 uI6A/Ys3Regag==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 340673A8A3CC;
+	Tue, 25 Nov 2025 04:40:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <willemdebruijn.kernel.1e69bae6de428@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/14] mptcp: memcg accounting for passive
+ sockets
+ & backlog processing
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176404562300.189804.16757204264695752077.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Nov 2025 04:40:23 +0000
+References: 
+ <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
+In-Reply-To: 
+ <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: edumazet@google.com, kuniyu@google.com, pabeni@redhat.com,
+ willemb@google.com, davem@davemloft.net, kuba@kernel.org, horms@kernel.org,
+ dsahern@kernel.org, martineau@kernel.org, geliang@kernel.org,
+ peter.krystad@linux.intel.com, fw@strlen.de, cpaasch@apple.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, mptcp@lists.linux.dev,
+ dcaratti@redhat.com
 
-On Mon, Nov 24, 2025 at 01:15:33PM -0500, Willem de Bruijn wrote:
-> This does not reproduce for me.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 21 Nov 2025 18:01:59 +0100 you wrote:
+> This series is split in two: the 4 first patches are linked to memcg
+> accounting for passive sockets, and the rest introduce the backlog
+> processing. They are sent together, because the first one appeared to be
+> needed to get the second one fully working.
 > 
-> Can you share the full clang command that V=1 outputs, as well as the
-> output oof clang --version.
+> The second part includes RX path improvement built around backlog
+> processing. The main goals are improving the RX performances _and_
+> increase the long term maintainability.
+> 
+> [...]
 
-Hi Willem,
-I have added clang output in 
-https://gist.github.com/ankitkhushwaha/8e93e3d37917b3571a7ce0e9c9806f18
+Here is the summary with links:
+  - [net-next,01/14] net: factor-out _sk_charge() helper
+    https://git.kernel.org/netdev/net-next/c/075b19c211df
+  - [net-next,02/14] mptcp: factor-out cgroup data inherit helper
+    https://git.kernel.org/netdev/net-next/c/bd92dd8e03d9
+  - [net-next,03/14] mptcp: grafting MPJ subflow earlier
+    https://git.kernel.org/netdev/net-next/c/e777a7fb06b1
+  - [net-next,04/14] mptcp: fix memcg accounting for passive sockets
+    https://git.kernel.org/netdev/net-next/c/68c7c3867145
+  - [net-next,05/14] mptcp: cleanup fallback data fin reception
+    https://git.kernel.org/netdev/net-next/c/85f22b8e1e9d
+  - [net-next,06/14] mptcp: cleanup fallback dummy mapping generation
+    https://git.kernel.org/netdev/net-next/c/2834f8edd74d
+  - [net-next,07/14] mptcp: ensure the kernel PM does not take action too late
+    https://git.kernel.org/netdev/net-next/c/2ca1b8926fda
+  - [net-next,08/14] mptcp: do not miss early first subflow close event notification
+    https://git.kernel.org/netdev/net-next/c/48a395605e08
+  - [net-next,09/14] mptcp: make mptcp_destroy_common() static
+    https://git.kernel.org/netdev/net-next/c/9d8295960300
+  - [net-next,10/14] mptcp: drop the __mptcp_data_ready() helper
+    https://git.kernel.org/netdev/net-next/c/38a4a469c850
+  - [net-next,11/14] mptcp: handle first subflow closing consistently
+    https://git.kernel.org/netdev/net-next/c/0eeb372deebc
+  - [net-next,12/14] mptcp: borrow forward memory from subflow
+    https://git.kernel.org/netdev/net-next/c/9db5b3cec4ec
+  - [net-next,13/14] mptcp: introduce mptcp-level backlog
+    https://git.kernel.org/netdev/net-next/c/ee458a3f314e
+  - [net-next,14/14] mptcp: leverage the backlog for RX packet processing
+    https://git.kernel.org/netdev/net-next/c/6228efe0cc01
 
-Thanks,
-Ankit
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
