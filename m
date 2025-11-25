@@ -1,176 +1,141 @@
-Return-Path: <netdev+bounces-241703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16BABC87859
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 00:51:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C58DC8786E
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 00:54:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C1ED3B6BD0
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 23:50:50 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1C3DC4E15D3
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 23:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF83C2F28F4;
-	Tue, 25 Nov 2025 23:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 706FA2EC081;
+	Tue, 25 Nov 2025 23:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XANxQzH7";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AKy3ZVkK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qtpw89cL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED33A2F12C6
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 23:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7FD25B311
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 23:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764114631; cv=none; b=raVi8iPaQZlrJUVY7BdU160320gcizgBCTd99RIHKr8peusaaTniawdLKqyO02ePcgjgFwcSgkdTb4x3eNfTVCn4oQQtcu8XiEWKcUn72Lo67g9S0uUjLFsVjq47X2MoROMWETjMT4hUAfDzxrH4gmJNFhx6/f8NVZt6UvUrwYc=
+	t=1764114863; cv=none; b=SFQhA6Xyei+4p9NCvin/rC2a6j1N5k54xDnTHXCaFXey5JeSPVT3aGsVLJSr/mqlqJXolfQUSyAlknPIURiik1vWriZBJ7dMG0Ysb0fJYfKMb2Uq+V8ILXnR6gcKTgbdtm26lus/pMfCfo2B8sxOG561mLDKw7+8LkaiawLblvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764114631; c=relaxed/simple;
-	bh=VR/QlSFYXfB2XAkyEqk2La815NaXCesg1lVuqP0+cyE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HjmzFLfGKxX+ogIQ5cC0dqtOVN+/qmt2p29wdwkmLfAJ25eisXqkZWFuuZBwXRSkWEvEEAOUlTTA/nCVU5DslY3yZ0jHRwiiB5dEzumGakE/TTYANuHJqokNTiH2qtVZNsIrtQJT8jpcg+4IMXzm4CWti8TicLZUt9j8wKM/6Ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XANxQzH7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AKy3ZVkK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764114628;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rIwS7E0jdpZel3anL6UezeiFSzMWSTuk00aa6Qzm+5s=;
-	b=XANxQzH7zied/lawSDkulHUT9yhZBs81lP5QZLr2Tfk7DXwZi9JkQjI6B7QfQrYY6uEkS9
-	hy+VpFxKhxDqWNaozPAll69epsLEvZNdMnUi9Vbg1kfp963C4KET3kJw6NnE+UYVn+XGPt
-	kQjVUqvfKrvLJbJyhEEB7oEM1y+JvYg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-173-RomyHxNjO7GGkxysxViM9A-1; Tue, 25 Nov 2025 18:50:26 -0500
-X-MC-Unique: RomyHxNjO7GGkxysxViM9A-1
-X-Mimecast-MFC-AGG-ID: RomyHxNjO7GGkxysxViM9A_1764114624
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477563e531cso51846745e9.1
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 15:50:25 -0800 (PST)
+	s=arc-20240116; t=1764114863; c=relaxed/simple;
+	bh=UmA+zl3Jz/3zmGCtyMZouwtZhX1vm0jkAbwHClmqIJ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=owS4/BG2FHfO0xBmowARffLTeMKEWOGJKPkQo9BQMwHoKLjf5EKJvlUZN8HduFf3Vjo7ytv4XD1Lk+BVc5XaaynRo7EjFbAQF1h9uEKh6mZRBE9qlsNPqPak18cIddte/m/ifkdpruir73sLzEtTMIv1mZd9sWWPBRh2DuQRN/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qtpw89cL; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-340bb1cb9ddso5047838a91.2
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 15:54:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764114624; x=1764719424; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rIwS7E0jdpZel3anL6UezeiFSzMWSTuk00aa6Qzm+5s=;
-        b=AKy3ZVkKL1lF1IVsOpuUpB0EsE1qPUgLKNQJyujF7MBqRno9gF64A/IPOmoqELpIDS
-         GU5U2EHwMmk25vGrwPAnmLDGEkCpp5PlbmHbR4pj3Z68FQf1qByvjY8oZxYSdcTigDKu
-         4CWmsF67v+s9q5gzNkxbc5Ys/AOjSjYsc9RfZdJufT8BFGuFM8uLxJ+SHazvBhxhoLa7
-         CFmDK8k42IMAe6jlCETQtb6MZ1KMjGfMvQsgAZT25D7e5p92sJ9Q1xlmSoUlcjT2id8/
-         garHq+bqIcu9IIlTj1EEVYQYFOU1I6aVEs+t8/22e+euL9QJH4Ivf4U7CpichSuYR3pe
-         CkxA==
+        d=gmail.com; s=20230601; t=1764114861; x=1764719661; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d3RPqln1ANJzd5R6QcbYwk0cJfLEX6kIEy3vJdt+mSo=;
+        b=Qtpw89cLqhlxE1Nz3zIbwiz1BGeJpFafeyuT+9pRmA8XYDA00pWpBugGdo1amncSLG
+         VC4D0XpQPFOEcRfQNg4WTQz4vXi0V0CoAiDavhINiJgyoSClNeDc8wxpetCOQUvnycM2
+         6YwP5ayjCdT06eoKHuv1rCOhBJ5sdtujpBjWVW4oMSaqKKtNxtWlUmkeQSWe/KIllQkN
+         er2QBtTW8t7AGZlPy2GVROE9DiKjch3HwfijGR07neFQY4HvwFIs3QMlCoOfjMViuFaJ
+         6T/+Bp8YnnOUZYElrsQGoUzHiF0TZhDDL96ESgSuvEywA7jOzCOzdrV9WVZOZVdgg0CU
+         SFeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764114624; x=1764719424;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rIwS7E0jdpZel3anL6UezeiFSzMWSTuk00aa6Qzm+5s=;
-        b=GPTiSK3XwbAeu4MYV9caAhk78W81uJ6KaJQ6Qb+chjiKWZacf4t3roH5Ytff72NTnS
-         jauAWJkm5wKMw+9CszpQETg97FDYX0jSKlP1f6p9rAy75gpXZtpRt8fO/T2t67/08tu6
-         +mT3LS7Q1151qFbguqUAvQ0edYHC5L7STIPLVjIOAgIARJbXh/0jju/si8cTT0XutoRM
-         stDA620qbykK+gvJphbKe+DoMaBffRrINl3wqkkJJF9mJH8pAgpBUI4vsBbXX6jMrr1g
-         5v3Pa0tAJIemgSm/v7JLuXXzutUjD7O+DMRRjkiQVAKvh4XyE3pAEbkTlqClfmFoz1UC
-         CsOg==
-X-Forwarded-Encrypted: i=1; AJvYcCWpqHWDnVU6ilyCkEztqNVQ0coHCOkWLExWR/rTxPaZ1fSgdPEcw7/iKNMl8/9kpUbNYmJPDPo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySZ8w0O1kdVdwNgninN9m29wcINkI4rPRLt+YH6NXzG1mWpYZ9
-	e2uywgXLa3RhtTPKj+JgRDzkcmEqWV4iw5no6FJCMf2wGUpd1zUJvWIJWz72iSVg0jgolXtB7bq
-	3cGouaqIZfVqU4Ilf20zs/SWtucVuXCv3K8f/kNaxOmaMN67V3DNMtf6+Aw==
-X-Gm-Gg: ASbGncu4uNwxOT3BqrHQo6bNKLov5r0bC2MRRUTQ9+f8SD8LMO2JPd3S19uh4xlAxZ9
-	K78vGmxNOIZ/D56icZmOxXCGq40hZrwJdTQVWnKcP/bHkOqDZcO0QzKaTyUsF/6esHTRimzT0Xi
-	+33MMYRHmvSNeLRCW9bNsnYp1bOlO+W8jDmEWSnCW5jDKRIHX55Q5JcLkuQLOwc958ASzJS1r3P
-	7+jttHpmaSMnCNQXXgQBRC1kEMZcQw1P+igdexho6qK1exFnBuBXCcKEIkr6Vx8rHmEklIL5+is
-	DnqpAqjq/DU26YvCt1kY1o/gECmikkzUV4CgabLZgThZmC+U/ae4hDYXQhHE60e1JSyyklQYlXF
-	vf+zQ1f90K1ABLE09sFNG/YdvnxlBJw==
-X-Received: by 2002:a05:600c:1c25:b0:46e:4586:57e4 with SMTP id 5b1f17b1804b1-477c114ed70mr261113185e9.24.1764114624362;
-        Tue, 25 Nov 2025 15:50:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFnq4RJlt9m2aS6c4TGKhjJ1S2uVgEkT/HKNHftYudQTJJrbCWeUDlCnlsQl791oaHujLBMkw==
-X-Received: by 2002:a05:600c:1c25:b0:46e:4586:57e4 with SMTP id 5b1f17b1804b1-477c114ed70mr261112975e9.24.1764114623865;
-        Tue, 25 Nov 2025 15:50:23 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-479052def4bsm26279025e9.13.2025.11.25.15.50.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 15:50:23 -0800 (PST)
-Date: Tue, 25 Nov 2025 18:50:20 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jon Kohler <jon@nutanix.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] vhost/net: check peek_head_len after signal to
- guest to avoid delays
-Message-ID: <20251125184936-mutt-send-email-mst@kernel.org>
-References: <20251125180034.1167847-1-jon@nutanix.com>
+        d=1e100.net; s=20230601; t=1764114861; x=1764719661;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=d3RPqln1ANJzd5R6QcbYwk0cJfLEX6kIEy3vJdt+mSo=;
+        b=AEfT/VbBPOdHK9MTZ9o6L3I8GQD/Uxv9cNdcZ2TjsYMdiUujO0gYY8sxJp+bRqM5Mr
+         qy2Lwb1L46s9XizbagfoJTIxRZGchjyTwUtHbJU7QaXiS2Vy4fBVGi+JBUG7tQVADS7d
+         SozcolHS3Y9uyptZSRaAgmUi4dtg1YMfrXemK1L5GVYwOSzJx/FRT//1aASmbNwFH10w
+         BeDZpPfx5w7tSTKE4fdVamD9hUq090D3EOLegLwLlWzbJ/jgRSjiCe58rWoj2oTX416s
+         8z1u+/VWNhlTXIm75LUzOYD4lgU6QYS+On4jMJbdznKMjbmkl4egCHkpQLoC5TK4DJem
+         sl1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU1GIfBud+wp9IlrkZz7F2nw8RKkF/wYbvzQ/5hKw5KA7KiVOatevVx28FrzvqiOcFqNG2/lBo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypvMVHPloCjCd4Ba4/QiiLQKHUdx2pvuqoKLkPIQJ/1RXGNKwO
+	WJvataGYnBKD2UOlYpqN4NTtZ1RZ9lB/W6Vl3VxKUxdR6mao9xiQlghio8mSFPL06ECvt/hywkD
+	s0Qr6BrDTLtCTiwZn2ga3NC3bk9kB38A=
+X-Gm-Gg: ASbGncv/2SMSGwrU5lW7lrSWDUd634254R77OFqJaJWprB0JUbEy5JU6nA0VLvwmnOD
+	cXDXGjkHJavXqYEu2yEaPN4pkLwGtsdUZ+x2qw6V3pmfIfzeiWIpObjNhvSlL8jQIByBPjW2rUE
+	7fniHtK/1VASdcerx9uhYyJ7O+B+lt6M3lQkE37E0chPmiUnxRKG4c5hZrtLsJuklW99nIdvFul
+	f7XdXE1H7pn6KSTRnk8ljERpwLcDqJZsOVXAap2Q3I0m21enQtYi+QTTGtM4wn4uOdI1QALqnK7
+	B6uIlysPBu8=
+X-Google-Smtp-Source: AGHT+IF6DOi7rb9isyagDTFCSIeNpairvyjgWvoz5d1kCo9mQEw0RTdWc+nqLtog+K5EXGn+7yuTYDMM0zhR2x9reFQ=
+X-Received: by 2002:a17:90b:3502:b0:32e:a5ae:d00 with SMTP id
+ 98e67ed59e1d1-34733e72350mr16761843a91.13.1764114861031; Tue, 25 Nov 2025
+ 15:54:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251125180034.1167847-1-jon@nutanix.com>
+References: <20251121231352.4032020-1-ameryhung@gmail.com> <20251121231352.4032020-4-ameryhung@gmail.com>
+In-Reply-To: <20251121231352.4032020-4-ameryhung@gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Tue, 25 Nov 2025 15:54:07 -0800
+X-Gm-Features: AWmQ_bm7thx54-FFcBIeNbOReQG7DwMzS9jTc_MbqlUFWTrGKvBtFbX0cRXJ5o0
+Message-ID: <CAEf4BzYaiBYKEvLZk78MMj1R1yjeTZ5P=C7QCrUquh250ENcpA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v7 3/6] libbpf: Add support for associating BPF
+ program with struct_ops
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
+	kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 25, 2025 at 11:00:33AM -0700, Jon Kohler wrote:
-> In non-busypoll handle_rx paths, if peek_head_len returns 0, the RX
-> loop breaks, the RX wait queue is re-enabled, and vhost_net_signal_used
-> is called to flush done_idx and notify the guest if needed.
-> 
-> However, signaling the guest can take non-trivial time. During this
-> window, additional RX payloads may arrive on rx_ring without further
-> kicks. These new payloads will sit unprocessed until another kick
-> arrives, increasing latency. In high-rate UDP RX workloads, this was
-> observed to occur over 20k times per second.
-> 
-> To minimize this window and improve opportunities to process packets
-> promptly, immediately call peek_head_len after signaling. If new packets
-> are found, treat it as a busy poll interrupt and requeue handle_rx,
-> improving fairness to TX handlers and other pending CPU work. This also
-> helps suppress unnecessary thread wakeups, reducing waker CPU demand.
-> 
-> Signed-off-by: Jon Kohler <jon@nutanix.com>
-
-Given this is supposed to be a performance improvement,
-pls include info on the effect this has on performance. Thanks!
-
+On Fri, Nov 21, 2025 at 3:14=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wr=
+ote:
+>
+> Add low-level wrapper and libbpf API for BPF_PROG_ASSOC_STRUCT_OPS
+> command in the bpf() syscall.
+>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
 > ---
->  drivers/vhost/net.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
-> 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 35ded4330431..04cb5f1dc6e4 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -1015,6 +1015,27 @@ static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
->  	struct vhost_virtqueue *tvq = &tnvq->vq;
->  	int len = peek_head_len(rnvq, sk);
->  
-> +	if (!len && rnvq->done_idx) {
-> +		/* When idle, flush signal first, which can take some
-> +		 * time for ring management and guest notification.
-> +		 * Afterwards, check one last time for work, as the ring
-> +		 * may have received new work during the notification
-> +		 * window.
-> +		 */
-> +		vhost_net_signal_used(rnvq, *count);
-> +		*count = 0;
-> +		if (peek_head_len(rnvq, sk)) {
-> +			/* More work came in during the notification
-> +			 * window. To be fair to the TX handler and other
-> +			 * potentially pending work items, pretend like
-> +			 * this was a busy poll interruption so that
-> +			 * the RX handler will be rescheduled and try
-> +			 * again.
-> +			 */
-> +			*busyloop_intr = true;
-> +		}
-> +	}
-> +
->  	if (!len && rvq->busyloop_timeout) {
->  		/* Flush batched heads first */
->  		vhost_net_signal_used(rnvq, *count);
-> -- 
-> 2.43.0
+>  tools/lib/bpf/bpf.c      | 19 +++++++++++++++++++
+>  tools/lib/bpf/bpf.h      | 21 +++++++++++++++++++++
+>  tools/lib/bpf/libbpf.c   | 31 +++++++++++++++++++++++++++++++
+>  tools/lib/bpf/libbpf.h   | 16 ++++++++++++++++
+>  tools/lib/bpf/libbpf.map |  2 ++
+>  5 files changed, 89 insertions(+)
+>
 
+[...]
+
+>
+> +int bpf_program__assoc_struct_ops(struct bpf_program *prog, struct bpf_m=
+ap *map,
+> +                                 struct bpf_prog_assoc_struct_ops_opts *=
+opts)
+> +{
+> +       int prog_fd, map_fd;
+> +
+> +       prog_fd =3D bpf_program__fd(prog);
+> +       if (prog_fd < 0) {
+> +               pr_warn("prog '%s': can't associate BPF program without F=
+D (was it loaded?)\n",
+> +                       prog->name);
+> +               return -EINVAL;
+
+This is an error return path from the public libbpf API, please use
+libbpf_err() everywhere to ensure errno is set. Missed this in earlier
+revisions, sorry.
+
+> +       }
+> +
+> +       if (prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS) {
+> +               pr_warn("prog '%s': can't associate struct_ops program\n"=
+, prog->name);
+> +               return -EINVAL;
+> +       }
+> +
+
+[...]
 
