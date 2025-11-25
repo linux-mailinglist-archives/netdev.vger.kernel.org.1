@@ -1,141 +1,105 @@
-Return-Path: <netdev+bounces-241708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5947C8788C
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 00:57:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 897FEC878A1
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 00:59:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 987634E06AD
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 23:57:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E9ED3AE53D
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 23:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04AC72F1FE9;
-	Tue, 25 Nov 2025 23:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8496E2F0C66;
+	Tue, 25 Nov 2025 23:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gf0ajQpz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wHn0gM9O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA7B27990A
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 23:57:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C89256C84
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 23:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764115048; cv=none; b=EZ4Qghjg/wDmhuq74zHzUP0mKCtjnYFX4Z0zgkks37V+9Q8T4RoQZSJrl1ktm2LNdA2P8RHHpBM4XAdF1zRnz5fQZV552BtaxEGNqp/ydVF6t6qY0DOcaoRQdEpaELf4af7RuoHTnHp3vAbpnDrRyqEYw/f+Zt+bJO9o7DbP4+U=
+	t=1764115192; cv=none; b=n2r5gAZ1EAN7F+I/dTxIxsxezmbVLmuvE2svy1S9MU3mALq3TAymJ2a+HR/A7VMGIqnCbzLukayXUa+l5fXPzcBgdb/Lxifg948PP8Soc3dyABSG/9OMk75/WnUielm5EbRiUAuNchuCPvzmfsXyLzv0/J9wq7iqenEelr0c9b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764115048; c=relaxed/simple;
-	bh=E7Vhxuxnd5dJfb3+F6Sp1aDAooveiAzLlYqO8i1/WjU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rfov1c/ci14Y5WTde2oyjupLaYb35g9CVMzidRtdtqVHeNL1um/lFrlNcBdpfq8GzcyP3qmSAi2EhmnnhiyvhEtEJNjnxDElNwDuUMSv75FWuzcdRjSeRCLqSG1Tp32avzcCjqXSW0hLrIWH9Le/rjLo78uMmy+6WmfjImzEgPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gf0ajQpz; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764115047; x=1795651047;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=E7Vhxuxnd5dJfb3+F6Sp1aDAooveiAzLlYqO8i1/WjU=;
-  b=Gf0ajQpzrcCuGclMWJsINoLoeQNRpd4FVclvBrKQKRUXbyavP3IThl9P
-   pEMAuBa7peYIUuuuilQlGBe4G/5po7ORHpjjGMiwFUzFmeeoAO/+kaD4c
-   h4bzOYWJrdzRsLldY6HGpJC2SyTRQCa7tdlB69X3gUVUyhFv1xrcqVU5/
-   QgTEwymJn5Y/QlwsJ4gnAXER0StRUIwXBG4SozBLtLD0sAk5K4YPcNLFo
-   S7Y+H+wx3p9uvsafDoOKcXk/fyAbaw8sKGXnzzIZtG3kBNUkEpPuC6AR8
-   vI3IKLL48lLMMGn/sF96DG+uiIX8IzIFCITyJ0JnV9+npCCB44pcu/H/B
-   Q==;
-X-CSE-ConnectionGUID: VqMLDfezQ4OrLZ/jTo6auA==
-X-CSE-MsgGUID: peHVb+SNSfGEwATRCct+0g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="66305315"
-X-IronPort-AV: E=Sophos;i="6.20,227,1758610800"; 
-   d="scan'208";a="66305315"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 15:57:26 -0800
-X-CSE-ConnectionGUID: /6d2zgObRySKi6hiZ4qTgQ==
-X-CSE-MsgGUID: h3doMYfGSZq97NwrlfMlhg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,227,1758610800"; 
-   d="scan'208";a="192041245"
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 25 Nov 2025 15:57:23 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vO2uP-000000002Mz-185N;
-	Tue, 25 Nov 2025 23:57:21 +0000
-Date: Wed, 26 Nov 2025 07:56:50 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Tonghao Zhang <tonghao@bamaicloud.com>,
-	Jay Vosburgh <jv@jvosburgh.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: Re: [PATCH net-next v1 4/5] net: bonding: add the
- READ_ONCE/WRITE_ONCE for outside lock accessing
-Message-ID: <202511260755.PsI0heoq-lkp@intel.com>
-References: <20251125084451.11632-5-tonghao@bamaicloud.com>
+	s=arc-20240116; t=1764115192; c=relaxed/simple;
+	bh=X+UV3u+Q49e8jqKO8GCdnEJLoPsSDkePyMd6qLGXqYk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A0V9EUnw6hcgHXFpb0A/16qEeZovGYVuz+nJok6/WCqL1PZBcFFR5lE6nhIrMui6yU0fVmKgGKlHVz78u3rhWvU1mCtWjTyk8mIFPtZV3knLnfVrK93ZP2j7yY5BjYOSFY6fh9A+6JikygotY+eTds8TAIINvJHK72226WOKlac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wHn0gM9O; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2984dfae0acso95667505ad.0
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 15:59:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1764115190; x=1764719990; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X+UV3u+Q49e8jqKO8GCdnEJLoPsSDkePyMd6qLGXqYk=;
+        b=wHn0gM9OmGqeK82I2tNRns7O1PyVpiU3XdKFD0O/277EeS/siPGTKdFeJ7n/XcwLCG
+         KQaV7Bq6tNHshIXllkPasTFbrJCMuBRUGJYXN9LMoL8zkSHeNjyuLs3qoCNtESYNcTtg
+         A0L+Sdg73QxGnbqcZX9tKOiFB1W9mun854PgAqSuGxAe0WtdYug5zvYfyBjAZQOQp6eI
+         k28Q8F4b5j/Fsa8oL2hksZ8NdkyX3SkBHone6aWi2Xp0AYt+pxlEJGaf0O7RaKJkfsKI
+         XXCbZpfmpWx4ZhTmylFA/itL2s5LaaD/o5m3VFfmplCWCgSNyH6h4CAtOEb6TXxIJGfL
+         YQWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764115190; x=1764719990;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=X+UV3u+Q49e8jqKO8GCdnEJLoPsSDkePyMd6qLGXqYk=;
+        b=GcoFMaGpoyp16Sf9Wd8zoBPhbM1Bppc2uvT79JR9BwJ3FUZ8zUBUkvV2UQm6MQnYlo
+         CUkgYGaKJD7F/vy/NPLiv8+OmRgKnI0bCb9Ocyh7Z+XdfTOo2fFUSY4PxINaXFhBa6BZ
+         oyXC8nyHCWRdsEAxOYv6UXfwHf2OwK8GkATKChiiUN8GrBJP9F8hzaunPejS9ET7KRr7
+         Z00EtxBQhgNItX8lPeh+cT1TGOnzeh6p6s+toBaE9slYSffWejA9p3mWqsPtChKcyNFN
+         wxrft+svyXUAfDTqWjJULoJUffgeZAGJ5Yd/dpYP7rlamBcN8vgQWJv1pprkVYEPj5pd
+         dhBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUNOqpL29A0tZ6k0HtojPB9w7xQHA62GHAhW0FhcnFs9k7nrvKmmMDNf3HuHfF77Q++KmgvyJA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyD+kuyegIHt1rYi8Uo4O3/H/EN6i7p3VBUi0829tpPSRFp2Pf7
+	vNiae/1oc0fFJ5+vqcXFK5i+o5dFjg3S3gd0XysXpWlZRX5L9lVeXfCJZmJMiNjayYvsSi6gRsX
+	2+YPvTd+2lBL4DTI5qQh790EA7syAapDbvl9KFJjh
+X-Gm-Gg: ASbGncvh5N71K0MhLjwHQCFQ3WcoHhfxYFAKrKTVsx0aioQvE6b9zL25Q9Rpkyv8iCO
+	xHr6XZAmfouD4BVWoJYJgtMZgVf9TFoMYhn+9tkKGbXrPz5GwtfHReGwqOhkgS0tZ8yraCshLWo
+	mj3p33imsaIsjGlYJn4YGEk072gDic+r3Ki7DwD5e5ZMY5eAfs16EWfqj0h8S+J9SXjhMY6UT01
+	qGt94VRHBYp7dUsVFgaB5i9pspxhg1qnlgD7K4+c7AKUsOLKK6IK4oHDuBXHPNcfc2Ci1h/Boky
+	FFfaUwmUCxPfu54APlUqpUAbAQ==
+X-Google-Smtp-Source: AGHT+IH+iD7QiGL52IruI6Y4H7C8A8j1AMErb0TxoPMCxGDtYpJ0IkSgDj9R5xsFS7FQSOqg6b7V1u3A17ck3mV7/28=
+X-Received: by 2002:a05:7022:218:b0:11b:b61a:a497 with SMTP id
+ a92af1059eb24-11cbba4ab48mr3618305c88.37.1764115190064; Tue, 25 Nov 2025
+ 15:59:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251125084451.11632-5-tonghao@bamaicloud.com>
+References: <20251124175013.1473655-1-edumazet@google.com> <20251124175013.1473655-2-edumazet@google.com>
+In-Reply-To: <20251124175013.1473655-2-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 25 Nov 2025 15:59:38 -0800
+X-Gm-Features: AWmQ_blnv3dUfDVisTEl-Juk2KeL5MCrS-FrXkQv7uLbXv7zZUD6GXQOt2AS0BY
+Message-ID: <CAAVpQUBK3rGabHzxwqRD2ht5BQkTiNXwGYsGj_+EVeKH=d9TUA@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/4] tcp: rename icsk_timeout() to tcp_timeout_expires()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Tonghao,
+On Mon, Nov 24, 2025 at 9:50=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> In preparation of sk->tcp_timeout_timer introduction,
+> rename icsk_timeout() helper and change its argument to plain
+> 'const struct sock *sk'.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Tonghao-Zhang/net-bonding-use-workqueue-to-make-sure-peer-notify-updated-in-lacp-mode/20251125-164825
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20251125084451.11632-5-tonghao%40bamaicloud.com
-patch subject: [PATCH net-next v1 4/5] net: bonding: add the READ_ONCE/WRITE_ONCE for outside lock accessing
-config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20251126/202511260755.PsI0heoq-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251126/202511260755.PsI0heoq-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511260755.PsI0heoq-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/net/bonding/bond_main.c:1207:2: error: unterminated function-like macro invocation
-    1207 |         WRITE_ONCE(bond->send_peer_notif,
-         |         ^
-   include/asm-generic/rwonce.h:58:9: note: macro 'WRITE_ONCE' defined here
-      58 | #define WRITE_ONCE(x, val)                                              \
-         |         ^
->> drivers/net/bonding/bond_main.c:6585:37: error: expected '}'
-    6585 | MODULE_IMPORT_NS("NETDEV_INTERNAL");
-         |                                     ^
-   drivers/net/bonding/bond_main.c:1206:1: note: to match this '{'
-    1206 | {
-         | ^
-   2 errors generated.
-
-
-vim +1207 drivers/net/bonding/bond_main.c
-
-  1203	
-  1204	/* Peer notify update handler. Holds only RTNL */
-  1205	static void bond_peer_notify_reset(struct bonding *bond)
-  1206	{
-> 1207		WRITE_ONCE(bond->send_peer_notif,
-  1208			   bond->params.num_peer_notif *
-  1209			   max(1, bond->params.peer_notif_delay);
-  1210	}
-  1211	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
