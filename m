@@ -1,77 +1,80 @@
-Return-Path: <netdev+bounces-241423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F197CC83CA3
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 08:52:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FD1AC83CA9
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 08:52:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6B39534AB45
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 07:52:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94F783A7548
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 07:52:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35CC2C17A3;
-	Tue, 25 Nov 2025 07:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6682D7804;
+	Tue, 25 Nov 2025 07:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SLa9ZhC9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OFZMa1TM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B9713AD05
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 07:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFF529DB6C
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 07:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764057125; cv=none; b=iMVcjiYzGBhcECSZfg5OZARswjKXFb6LqeLyEOXN/9RVf61zWO9zGxJ66aG3GlBiCc2v4yTBaKNfNqKjW6ABb/zQ8eob0tSpyeZofgOqokihr+qnb4UB3CrDd6JhABXtq4qaPCtrA7pCxf6JYo9bbtpLlRa5RYxqjj6tcfQiYn0=
+	t=1764057126; cv=none; b=aFc2uZI4g6BreunH86Ll2XZTbLf06BaTcsSC9+20JnZi2dx+uaqGxplXb3Kv03k/M98WBm8M9/VLQc1Cus+mYR3tr+myfIwqCJqfiOK6kGdaDrcQWlUqLQvJvlLhToUscs2N5L9Ef/MlnGlIFqOiJMckCRyI1L3iJbJuI9gtbhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764057125; c=relaxed/simple;
-	bh=ToYcyZUZTw+Dm3jQvNFQCQnxSnWfBapFKpCC53qV3qA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yb+L+C/rvkBYoF401eWgK7r8k277tRm67thRg8L/dbj54accwwhvdaYhZPKHb7oeeUSN/lS8J6PCymIIaurcAeUc/EudvtnUvY6l1KmFh0q4UUKglYmfhiyOBw5BA4CrCkGDdxHCjuAXHsIyI3iCdntsGD6doKd35h79akpGmPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SLa9ZhC9; arc=none smtp.client-ip=209.85.208.51
+	s=arc-20240116; t=1764057126; c=relaxed/simple;
+	bh=QQ9ntuYhygUsjfxWjbJZY9/FX0sWkRHe9KfAHu92J2Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=n2zXhnRR7aOZFUIk8oI/sBHp1YbRF95hwKhMVvTFVOWzg45V2LW9iURDnt08QHU+vpTI6xZSTVJtQs+08rqeL+j0Dx3GvWWhkc27BXXg3CtxmTVp1tUzyu7xA52c5hObGIgIN4O5alUlpuIf/z49bQldZChx5+QBkzpM/ukvJDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OFZMa1TM; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-640bd9039fbso8672768a12.2
-        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 23:52:03 -0800 (PST)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b735b89501fso583968566b.0
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 23:52:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764057122; x=1764661922; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mfd8iMecbKSRaGKozpyXTdFbCrjtIOnZra1xqPtKkQw=;
-        b=SLa9ZhC9TELXbyEY3fbNR1kOR0ksTICz5F9gp0+mhzrmUrKPpRxp7LjggUEXKcAy4B
-         TW7SmKeXB2lFcaPSQZGegsQL+/MW4fZzvRhpDd7CanwRfs4le/dKYFsaJXriXfuQBA4k
-         4CUDPOQwNUPnjpzeKgrD3VIrukjBgZ/PTGzR22wa9s0MNECxdD/9PxVPb5gyGrAFrDc1
-         t10pKt7ROgyQQbYxDKwpfc6BPoqz/tRfLXHVBfpX4FZU1JfAO/CT9gDQHBEef4dmhXsh
-         SyW4sxPxV53gGmdMMIK1u5wv/Y3AhDLdXyFevSTuZDghcmkCFvLKEOWKb4nf3MKwp164
-         FOpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764057122; x=1764661922;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1764057123; x=1764661923; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Mfd8iMecbKSRaGKozpyXTdFbCrjtIOnZra1xqPtKkQw=;
-        b=R4bSbhOin24y+8dCyWHbAtZGfAmJopaGz2l1baMr9jse8NW87MRS1n2NuWWzRls4xP
-         cnXA4kg3VXdID1SSMviNczxXsUPESaTuMajd/W3s7T379NA9piRjsi96/x84/vnoIxj1
-         nTAHvQ0Ljw3MQkTLHpf9DgZ5LQWpJ9RVGl36wPGL6+ujszNNTgTFqe5wl/9KTAisabOn
-         76F5o8KVqIptslb4LKRKuo11rysEuL3AYhCAmAlihsIA6Q6Z6/jmMBqVWJ1YZAYDq2bZ
-         rz4PDQJrssl8EV4s0yyL2MhRJWeVIR6VPgLvlMvmZNS/RA3YJjNJ6XOHpa10c8jhgW64
-         cOVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUp7XGqukdWRmAp7Hj8HqGkBC/v6xoIZjzx7ASAj9xQYGxLaQJJHHsBM8viPI6LNzNkpKU5eJE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUdW/3JKkL8z9wftxIKYzH0lWd7PGCnyrKST7FhEMUboub8ykJ
-	SGBDd01X5586PVoezKLy2M4skjx7zVHEVEKLUujEelygU93FQgpwCt7E
-X-Gm-Gg: ASbGnctfDccTQe0BbvUJRCqlSgDf7f507+rtuF3MjbrK8ZYN9EaNvtqiyxWjWPL95Hq
-	6E6xHiiqXwiCTJNUu0Fu7J/XGzD4vCEAEY9PZ/xg47Xbv94RKyPTN7ItpLZVx7/2twIvdFyqbwc
-	b2lp6+3thjBeYLx758ijqAMORzYIktZ3OB2tcS2xWZo7Xh052d4tciNksC49Fnx0RQ1JoLBX6pQ
-	rhD4SbWO+kycvNS4PuU8HAKYcjqBz/T1O6zXrT6rTUYvXodk0UjD1GlCrpga3O4JQ5H1+JfmC+S
-	NDamaORXPLEf/5KNoB5+4SMsJb7E6nK/sp4YvV4Q1I4yofbgCxCrIO/slaY0RkxpgxXkTbXdd5k
-	xyWaYzt3PBrKxXPy1+ROzAdQmfLAnSJsRfP3Ev1CoB2Q2nbq40vYsn4a/Cd9280xKna4N7VFJ08
-	W1oE2wkOg62fcuGgqli0fnn0NvoDM5stWnYmq4mgHaoLPG9lAsbAK+ta2k5LTe1nnP+F4=
-X-Google-Smtp-Source: AGHT+IGmD+DylYSGbM5stDnM6zjuqD48rF3doPTMWL4VJEpnFKbHOAwE9FpZFFCdbGAze7TxqlXHUA==
-X-Received: by 2002:a17:907:3e10:b0:b76:5143:edea with SMTP id a640c23a62f3a-b76716953e1mr1435650766b.30.1764057121991;
-        Mon, 24 Nov 2025 23:52:01 -0800 (PST)
+        bh=ZOFFbceL7ixCdLph1FgW62yHiAksNzDjiAkR6G7AzZY=;
+        b=OFZMa1TM/jsJMeLCNNZoQwdtJUU8d40uxMmxWMJTTDKJ4Tv+fPgkbcigT49IJ7QU/0
+         wnFtitz9JMa7ADHQFJCWj8qnEAHGdBUcfQTwntczCzP2wbbmruIkmzwZLQWL9MTvdyP6
+         QLffg+9LeO/XmLVbThjbCh/lVZNA7RAlZZVe/bUZD8pId+HtyHbLXJ2TqdS1DJPgUlOy
+         ECxD1UW0gFbp6dPrv5h8zJT3dGpUh1y9OK7FldBlrVv6yVFlBrBNzMW1sKq9deu+8D5N
+         iXND0be1TbclvOSIRlRGwbASRDbC9w7lH9VsrHfVPfSFxkJCl4OTShp+nua1bzdVFStF
+         iVzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764057123; x=1764661923;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZOFFbceL7ixCdLph1FgW62yHiAksNzDjiAkR6G7AzZY=;
+        b=tEuTxEJDORCJVPU8+2CzoAFLuCIpXWzjARIVxJLnV/Jd65J24EjaKfLClgu5IXEPIP
+         SU8zRuanrznEaMzpOIF+cC+xbWDxQfxBabebiirl0Qa/RpFcj0H1SxSFmhw8yQCCUck2
+         L+IIwWlP6nR6A92W1lUVii0VA/TnffubKSNW4jT0E20U62V0SudC4JRuyoO7PyyOXjac
+         6s5p0rvTwaOZ1XTWv3aeloc8lXYnyqEQRnIKHDy9zp8t/LUizl3Ahl7za6xChYU0TOP2
+         xxksO/UkputDKjjTJWug7fhQbigHCzvj73B60NN4RvNlbExMaQ5eryCv6cDuMMq4jg9+
+         Grwg==
+X-Forwarded-Encrypted: i=1; AJvYcCVLo01+FfA0ZjCyOefplUWQ6sVqHcVazcKrsMv8J/tHAIpyTqtUt5kegYQSq+CVJPPNJ5Sp3qU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVRZKDMuHa7czT7rzPG++Sdjxzcvy+CkZ41xOMY/oG5zdhONq4
+	H4c1KmASkoahxIiysa2RT67d3fue6KVzH4+715OaExYaCy8Y7nvbW3Zg
+X-Gm-Gg: ASbGncueEVB/YDeMgNiVVRk9Rg4t4/cx3t8OtGf/eTNmYylrOG+r4DeY2R+BEUr7ZIu
+	LENNq9tyfu2XYs3/CC8/HtKTmrhGcANexQqeBrxH4Vdyxs8tFqXxODGmqxTxALggTD16ZnYWs4/
+	aOpSXV21JlruA+IjRJhnafkqnRYW0iYmfPmGRPQ3mLA9kIzMR9qRMr2G+5Ga/4ZncZfnDqrAPOa
+	KZ4v2eyjXqgQzIIj5FFXS7yPxjdS8dgy5Z4HG6ZXWsGEAti2JgEAGf85QU6jnswxTlSiKNYaq9J
+	HuHBsd8+wAU61NZy1/0hUXRrHXDogTaI7QFN11beY+GqXJDIDbLUL9AmMnGdQS2mbGjdY/r77OJ
+	+2p8WhVJ+oLToSJ7xgBwCULEYl0xV52hM8YW7vBwqLSzQzghDQtTkiWI8orGdRHgYpmrUYWKaGu
+	e6R/lyuO10qmzzaMTeOEscpTi17unvS60gWsbr4Ih1hVad+RGpEYsEGnuZzzfsGBF9C+dqD+bEf
+	tZ5HA==
+X-Google-Smtp-Source: AGHT+IHPFwvqG3ONIsm/AzjrLUIRNEbm0l92p/sdhNru/P9U5+Z4BpK4CrBOtHk9NZMM7UpCONTnkw==
+X-Received: by 2002:a17:907:7f19:b0:b73:9b49:2dc7 with SMTP id a640c23a62f3a-b76c558f4b0mr157643366b.52.1764057123075;
+        Mon, 24 Nov 2025 23:52:03 -0800 (PST)
 Received: from localhost (dslb-002-205-018-238.002.205.pools.vodafone-ip.de. [2.205.18.238])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654d80665sm1485802266b.31.2025.11.24.23.52.01
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654d7cb3bsm1536176766b.27.2025.11.24.23.52.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 23:52:01 -0800 (PST)
+        Mon, 24 Nov 2025 23:52:02 -0800 (PST)
 From: Jonas Gorski <jonas.gorski@gmail.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -84,10 +87,12 @@ To: Florian Fainelli <florian.fainelli@broadcom.com>,
 Cc: Florian Fainelli <f.fainelli@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 0/7] net: dsa: b53: fix ARL accesses for BCM5325/65 and allow VID 0
-Date: Tue, 25 Nov 2025 08:51:43 +0100
-Message-ID: <20251125075150.13879-1-jonas.gorski@gmail.com>
+Subject: [PATCH net-next 1/7] net: dsa: b53: fix VLAN_ID_IDX write size for BCM5325/65
+Date: Tue, 25 Nov 2025 08:51:44 +0100
+Message-ID: <20251125075150.13879-2-jonas.gorski@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251125075150.13879-1-jonas.gorski@gmail.com>
+References: <20251125075150.13879-1-jonas.gorski@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,47 +101,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ARL entries on BCM5325 and BCM5365 were broken significantly in two
-ways:
+Since BCM5325 and BCM5365 only support up to 256 VLANs, the VLAN_ID_IDX
+register is only 8 bit wide, not 16 bit, so use an appropriate accessor.
 
-- Entries for the CPU port were using the wrong port id, pointing to a
-  non existing port.
-- Setting the VLAN ID for entries was not done, adding them all to VLAN
-  0 instead.
+Fixes: c45655386e53 ("net: dsa: b53: add support for FDB operations on 5325/5365")
+Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+---
+ drivers/net/dsa/b53/b53_common.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-While the former technically broke any communication to the CPU port,
-with the latter they were added to the currently unused VID 0, so they
-never became effective. Presumably the default PVID was set to 1 because
-of these issues 0 was broken (and the root cause not found).
-
-So fix writing and reading entries on BCM5325/65 by first fixing the CPU
-port entries, then fixing setting the VLAN ID for entries.
-
-Finally, re-allow VID 0 for BCM5325/65 to allow the whole 1-15 VLAN ID
-range to be available to users, and align VLAN handling with all other
-switch chips.
-
-Sent to net-next as it would cause an ugly, non trivial merge conflict
-with net-next when added to net, and I don't want to subject the
-maintainers to that. I will take care of sending adapted versions to
-stable once it hit linus' tree.
-
-Jonas Gorski (7):
-  net: dsa: b53: fix VLAN_ID_IDX write size for BCM5325/65
-  net: dsa: b53: fix extracting VID from entry for BCM5325/65
-  net: dsa: b53: use same ARL search result offset for BCM5325/65
-  net: dsa: b53: fix CPU port unicast ARL entries for BCM5325/65
-  net: dsa: b53: fix BCM5325/65 ARL entry multicast port masks
-  net: dsa: b53: fix BCM5325/65 ARL entry VIDs
-  net: dsa: b53: allow VID 0 for BCM5325/65
-
- drivers/net/dsa/b53/b53_common.c | 88 ++++++++++++--------------------
- drivers/net/dsa/b53/b53_priv.h   | 40 +++++++++++----
- drivers/net/dsa/b53/b53_regs.h   | 19 ++++---
- 3 files changed, 78 insertions(+), 69 deletions(-)
-
-
-base-commit: cc1b62512abf19c635fe304e253953ca3b33ffa2
+diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+index 72c85cd34a4e..7f24d2d8f938 100644
+--- a/drivers/net/dsa/b53/b53_common.c
++++ b/drivers/net/dsa/b53/b53_common.c
+@@ -1966,8 +1966,12 @@ static int b53_arl_op(struct b53_device *dev, int op, int port,
+ 
+ 	/* Perform a read for the given MAC and VID */
+ 	b53_write48(dev, B53_ARLIO_PAGE, B53_MAC_ADDR_IDX, mac);
+-	if (!is5325m(dev))
+-		b53_write16(dev, B53_ARLIO_PAGE, B53_VLAN_ID_IDX, vid);
++	if (!is5325m(dev)) {
++		if (is5325(dev) || is5365(dev))
++			b53_write8(dev, B53_ARLIO_PAGE, B53_VLAN_ID_IDX, vid);
++		else
++			b53_write16(dev, B53_ARLIO_PAGE, B53_VLAN_ID_IDX, vid);
++	}
+ 
+ 	/* Issue a read operation for this MAC */
+ 	ret = b53_arl_rw_op(dev, 1);
 -- 
 2.43.0
 
