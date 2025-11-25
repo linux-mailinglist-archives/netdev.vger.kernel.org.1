@@ -1,128 +1,135 @@
-Return-Path: <netdev+bounces-241388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC467C8349E
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 05:01:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05FABC83495
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 05:01:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 958D54E6A4C
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:01:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 025584E3858
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:01:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE39914A60F;
-	Tue, 25 Nov 2025 04:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ADC614A60F;
+	Tue, 25 Nov 2025 04:01:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b="U5wUxwwP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qb4W4Rf6"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-of-o59.zoho.eu (sender-of-o59.zoho.eu [136.143.169.59])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632231A8F84
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 04:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764043296; cv=pass; b=IaSyVn3jV8IxGKgi2g3bSRJ5hCbfA19s+V3WhnwtNHm1xaBkCDjinIIROHvDg2mK3OBMSIBu1g9Tt2mDGUZXfndY+ZTZtL9EqbJRxF9H6TeRMfm6P6FPteetPzn4wS4NYUWxl/SGJGjnYNZrIUW8mGsIKkrwONb6gLiAYb28P+k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764043296; c=relaxed/simple;
-	bh=8F3XelqSq45y9rIznL0gWRAHrEkAqvXw7ANWTZ3hTxs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=WYoQ7aWHjMNNcJT2GVyQRbigA0Dkpwr18beZCbO5yfG2EDDH+FhmXHTg1cR39SmeGTmaddV9TEEB1tsRf3xvgaLSTROxaRBGgmGNAr40hXRR82g3Vfx9RxaAz+Nfa74B5w/XxI4WN6CtCTUpd5/VnGT99nKqTQ3eipbTFWt5MDI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net; spf=pass smtp.mailfrom=azey.net; dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b=U5wUxwwP; arc=pass smtp.client-ip=136.143.169.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=azey.net
-ARC-Seal: i=1; a=rsa-sha256; t=1764043259; cv=none; 
-	d=zohomail.eu; s=zohoarc; 
-	b=Cxh7S+78DqUwgLI9TfBPRnsavjYrDXw71TqiQtV6nf0ixT9B2StxoYXOxTyIJAx8/QUVPp9j+3QKVi+9jkM8eWlBj1cW/ote9/5AoD3GIKq4M8rfKrgY1SvZd22Pwq7q6mNLXOtEUX1sMdlSJHz6qFkcPYqSHwZFqpqCpxl4Jv0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1764043259; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=QugXX12w3LHqvxJnSQymcS9aIZXCYX5Hl1ahmESbSgs=; 
-	b=G8Z+8Vv/zRlbwd+5P+4RvZWx69JX/w26yhoEKCWDz61ODLg8YMkKcGOALQrkAPkQ7XroFGWRz8Ge7l2B0z8lg5g5HUvSWC3Et7jfHCXOjyQWxuPkOy39ExXfybQUNJ4dyj6nrms2TJ6A+YrIcQGsmilye1zQiNn3qpEyBdAhWnU=
-ARC-Authentication-Results: i=1; mx.zohomail.eu;
-	dkim=pass  header.i=azey.net;
-	spf=pass  smtp.mailfrom=me@azey.net;
-	dmarc=pass header.from=<me@azey.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1764043259;
-	s=zmail; d=azey.net; i=me@azey.net;
-	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=QugXX12w3LHqvxJnSQymcS9aIZXCYX5Hl1ahmESbSgs=;
-	b=U5wUxwwPxR8/mZJM5eAUfnje9IxtqXEsVUl/VhbPTx8Td2q8T53t6z+bCVw1KDQT
-	Z1tBGLJNewpMjD3zTqZnnclFVjxiINLK3xuitwY4ENCKUbCdtO5EubCxMrQl4K53PN4
-	v2dswXlDPb11oihamVo2oazxwtwBQpr6XSc0BgpE=
-Received: from mail.zoho.eu by mx.zoho.eu
-	with SMTP id 1764043259072215.8427170083147; Tue, 25 Nov 2025 05:00:59 +0100 (CET)
-Date: Tue, 25 Nov 2025 05:00:59 +0100
-From: azey <me@azey.net>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: "David Ahern" <dsahern@kernel.org>,
-	"nicolasdichtel" <nicolas.dichtel@6wind.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Eric Dumazet" <edumazet@google.com>,
-	"Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
-	"netdev" <netdev@vger.kernel.org>,
-	"linux-kernel" <linux-kernel@vger.kernel.org>
-Message-ID: <19ab92bfcaa.fc063ed1450036.1152663278874953682@azey.net>
-In-Reply-To: <20251124192550.09866129@kernel.org>
-References: <3k3facg5fiajqlpntjqf76cfc6vlijytmhblau2f2rdstiez2o@um2qmvus4a6b>
-	<20251124190044.22959874@kernel.org>
-	<19ab902473c.cef7bda2449598.3788324713972830782@azey.net> <20251124192550.09866129@kernel.org>
-Subject: Re: [PATCH v2] net/ipv6: allow device-only routes via the multipath
- API
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAA31A08BC;
+	Tue, 25 Nov 2025 04:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764043283; cv=none; b=Wk873pG87ldha0u4BZiyo93llx1H8pjTZ8up7yQ271+N18MQykzMTLqOTqW/QYgFmDrBaxqwEmIu/NQnygmErwcGcMq1WcPtX8Dwo3BwCvS/nfEEgTGZvqipwabSAWmBFsCQGK63Ve3grdHXEoyOnRxFe9FWFFRcWxjK2wk48+c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764043283; c=relaxed/simple;
+	bh=noWNmsId45ZeifrOlfH6mMR0VrmwkWZ6zYS8nnrBPoY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=folqLJRNmjbDhysLkXkszUqBFVOZuPsQ0J1zDCJfDkG0WlT8EnCbwDgcm/RSRpeEUAjXeYyP5FGPbiqg56+b3NzyDqB9VRecIeP/Z8AW8zBeL/TZ3FS3ccbZ2w/jhDFASY8BOtMquS18pWFMzhs0q9DP4cOucufQHQVsRP7WO14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qb4W4Rf6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7257C4CEF1;
+	Tue, 25 Nov 2025 04:01:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764043283;
+	bh=noWNmsId45ZeifrOlfH6mMR0VrmwkWZ6zYS8nnrBPoY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Qb4W4Rf6dcMuhndBOCJQPmNvmiFZMdJBcyJv3vvyldUdON0Bmt6qM+LfgW6osuSNK
+	 U38o9WsY9lI+bUq53QM6ZZhTFAXLau8K1phukRoPrXJh2j/AXDyhQCinlBctfG+fgp
+	 6S7J3eOc7OTXdlvNipXaN54KCBAH/+DHl6mEblEiKXs386QpoqIH+69GBL7iIvfwwv
+	 kQrKSO/pGakH4jz2x2vIwvSFL9nExiGeiNvnlDkhu/OiCnbc8Dx/e1xam4Q99UFzsI
+	 LWTIgsAWsD4Ygh3O1/jyuBiot4F4fMU9uYSC/rAmw74hk3JAU+u70LTvAGmW38Obgk
+	 oTQqFyRbTDb/A==
+Date: Mon, 24 Nov 2025 20:01:21 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ Daniel Golle <daniel@makrotopia.org>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham
+ I <kishon@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Eric
+ Woudstra <ericwouds@gmail.com>, Marek =?UTF-8?B?QmVow7pu?=
+ <kabel@kernel.org>, Lee Jones <lee@kernel.org>, Patrice Chotard
+ <patrice.chotard@foss.st.com>
+Subject: Re: [PATCH net-next 5/9] phy: add phy_get_rx_polarity() and
+ phy_get_tx_polarity()
+Message-ID: <20251124200121.5b82f09e@kernel.org>
+In-Reply-To: <20251122193341.332324-6-vladimir.oltean@nxp.com>
+References: <20251122193341.332324-1-vladimir.oltean@nxp.com>
+	<20251122193341.332324-6-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Importance: Medium
-User-Agent: Zoho Mail
-X-Mailer: Zoho Mail
 
-On 2025-11-25 04:25:50 +0100  Jakub Kicinski <kuba@kernel.org> wrote:
-> On Tue, 25 Nov 2025 04:15:25 +0100 azey wrote:
-> > On 2025-11-25 04:00:44 +0100  Jakub Kicinski <kuba@kernel.org> wrote:
-> > > On Mon, 24 Nov 2025 14:52:45 +0100 azey wrote:  
-> > > > Signed-off-by: azey <me@azey.net>  
-> > > 
-> > > We need real/legal names because licenses are a legal matter.
-> > > -- 
-> > > pw-bot: cr  
-> > 
-> > I was under the impression this was clarified in d4563201f33a
-> > ("Documentation: simplify and clarify DCO contribution example
-> > language") to not be the case, are there different rules for this
-> > subsystem? I think it qualifies as a "known identity" since I use
-> > the alias basically everywhere (github, website, GPG, email, etc).
+On Sat, 22 Nov 2025 21:33:37 +0200 Vladimir Oltean wrote:
+> Add helpers in the generic PHY folder which can be used using 'select
+> GENERIC_PHY_COMMON_PROPS' from Kconfig, without otherwise needing to
+> enable GENERIC_PHY.
 > 
-> My understanding is that if I know you, I can apply your patch even 
-> if you use your nick name (rather than what you have in your passport
-> letter for letter).
+> These helpers need to deal with the slight messiness of the fact that
+> the polarity properties are arrays per protocol, and with the fact that
+> there is no default value mandated by the standard properties, all
+> default values depend on driver and protocol (PHY_POL_NORMAL may be a
+> good default for SGMII, whereas PHY_POL_AUTO may be a good default for
+> PCIe).
 > 
-> I don't know you.
+> Push the supported mask of polarities to these helpers, to simplify
+> drivers such that they don't need to validate what's in the device tree
+> (or other firmware description).
 > 
-> If you're saying that I can do some research and find out who you are
-> please be aware that we deal with 700 individual per release just
-> in networking.
+> The proposed maintainership model is joint custody between netdev and
+> linux-phy, because of the fact that these properties can be applied to
+> Ethernet PCS blocks just as well as Generic PHY devices. I've added as
+> maintainers those from "ETHERNET PHY LIBRARY", "NETWORKING DRIVERS" and
+> "GENERIC PHY FRAMEWORK".
 
-My main concern is that I keep my on/offline identities very separated,
-so you couldn't find me by my real name anywhere online. And offline,
-my legal name is common enough that you couldn't single me out by it
-alone either.
+I dunno.. ain't no such thing as "joint custody" maintainership.
+We have to pick one tree. Given the set of Ms here, I suspect 
+the best course of action may be to bubble this up to its own tree.
+Ask Konstantin for a tree in k.org, then you can "co-post" the patches
+for review + PR link in the cover letter (e.g. how Tony from Intel
+submits their patches). This way not networking and PHY can pull
+the shared changes with stable commit IDs.
 
-My understanding is that the sign-off name should be what you can
-identify and contact me by in case of any problems, which my legal
-name is not. As per Linus' commit I linked:
+We can do out-of-sequence netdev call tomorrow if folks want to talk
+this thru (8:30am Pacific)
 
-> the sign-off needed to be something we could check back with.
+> +GENERIC PHY COMMON PROPERTIES
+> +M:	Andrew Lunn <andrew@lunn.ch>
+> +M:	"David S. Miller" <davem@davemloft.net>
+> +M:	Eric Dumazet <edumazet@google.com>
+> +M:	Heiner Kallweit <hkallweit1@gmail.com>
+> +M:	Jakub Kicinski <kuba@kernel.org>
+> +M:	Kishon Vijay Abraham I <kishon@kernel.org>
+> +M:	Paolo Abeni <pabeni@redhat.com>
+> +R:	Russell King <linux@armlinux.org.uk>
+> +M:	Vinod Koul <vkoul@kernel.org>
 
-> we've always accepted nicknames
+checkpatch nit: apparently it wants all Ms first, then all Rs.
 
-> the wording [..] shouldn't be causing unnecessary angst and pain,
-> or scare away people who go by preferred naming.
-
-If the concern is that it isn't unique enough, I could change it to
-azey7f as that's a username I use when just azey isn't available,
-though my commits are always authored "azey <me@azey.net>".
+> +L:	linux-phy@lists.infradead.org
+> +L:	netdev@vger.kernel.org
+> +S:	Maintained
+> +Q:	https://patchwork.kernel.org/project/linux-phy/list/
+> +Q:	https://patchwork.kernel.org/project/netdevbpf/list/
+> +T:	git git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git
+> +T:	git git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
+> +T:	git git://git.kernel.org/pub/scm/linux/kernel/git/phy/linux-phy.git
+> +F:	Documentation/devicetree/bindings/phy/phy-common-props.yaml
+> +F:	drivers/phy/phy-common-props.c
+-- 
+pw-bot: cr
 
