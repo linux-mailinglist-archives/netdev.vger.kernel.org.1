@@ -1,62 +1,66 @@
-Return-Path: <netdev+bounces-241356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36DB9C831FE
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:42:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E78AC83207
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:43:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 298684E4C7B
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 02:42:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4B903ADCE7
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 02:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66A51D5ACE;
-	Tue, 25 Nov 2025 02:42:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D888B1EBFE0;
+	Tue, 25 Nov 2025 02:43:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dXZHO44d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EDMMBRgH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB96C17A586;
-	Tue, 25 Nov 2025 02:42:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25691E9906;
+	Tue, 25 Nov 2025 02:43:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764038540; cv=none; b=dAHkZohSMJ50XGIu9KNF5+L8NGd4aRBo+DlPn6LlSrXrpivaLqeAdlUwHjPR1i82zZCur6DW9cYFyCIcaN7gB0JzG0SUdM5hUboKmAc5Ocxg6y9Qs+RncgLlw2esCot3zYP96+DrFQTMQ2xzskQAX4NFX8fEBqULf4T5n5DOfBA=
+	t=1764038614; cv=none; b=hprzfou57+2lfNCY3peKngWzRfcajEUabUzR2B23ArgXj7H1Nta2PfFKyQtL1MVg0CqdZ5SwulCTZvT92RXXUnsKVPJiVz+qp9wX/FjbKKt/Uw7xCd8zaftypjT3dpQsJ0PQXwSI3GDXs2NOpHh0uWYbxCchPlKeIp4BDe77sQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764038540; c=relaxed/simple;
-	bh=HxIBb6IJuj1ay7v2huR39TeIaAqU2Qf7YlCaC+lE1cs=;
+	s=arc-20240116; t=1764038614; c=relaxed/simple;
+	bh=f69EJsOFiMvJuO1H+Aq5rxAHuqwikNpa7xTqrPpABbs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YB6Tsmg6MIAy/AadAiHDEbqSX9lxDo+84I15LSP0ShQAUrpnrMVeibS+9diB/hGwRBT/ZviwRm6xFg/SbkTCtjnaP2w9h3j5eVQgcXii7+WskUzTeatHIVPjYxgmkBUbM8H6a/7xAGc6gid4YMYNBu3TIFPsflESp3IV1bcOIMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dXZHO44d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C60A6C4CEF1;
-	Tue, 25 Nov 2025 02:42:19 +0000 (UTC)
+	 MIME-Version:Content-Type; b=kibq8Vx5ZfmXm5Hn6dRi63swegY0+RyJYfYAgV8HhOnKSMtZXM64DELevrQSMd6djlE9wVcS3i5oPktK4uynuXVTGbVCT0UL7Xn8UCyC2fztNnASPnVtgc4h5KlNeWcm0OvgZFf9fZvYezJRyLOejUzjSVAofw8/w6Bdt+Y5myw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EDMMBRgH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 639D4C4CEF1;
+	Tue, 25 Nov 2025 02:43:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764038540;
-	bh=HxIBb6IJuj1ay7v2huR39TeIaAqU2Qf7YlCaC+lE1cs=;
+	s=k20201202; t=1764038614;
+	bh=f69EJsOFiMvJuO1H+Aq5rxAHuqwikNpa7xTqrPpABbs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dXZHO44d3osgJpkicr3TDmAZ++WJ08wFW2gB9Kp7gTFFCQOnUG0YJEm978I0SuOwI
-	 q2Gf1XhEeJjT713bJQk8F6K2QPcm7fffuf7TszMOTA9Kul6K1bS3SFWM/XgXbP6njl
-	 74LVNoD3rRGBHDFcezIrChankE2LbSo7QM++0t3Sw6zuFfvrds7CqCCirGDvcVXJsi
-	 l4hMli1eVmfFy29CP1OEyk/EcN7HjB/23NAOoCL42dPxz0Rz+R5PD6bbQP6VoR2j4b
-	 Dh5C7ucFJC6/EdRbhKczo2scUwIpfrtJB41T0tahLcV3jJ+TvxMiTbEUmet6tz/KzM
-	 JK0y7rWiQWZ/Q==
-Date: Mon, 24 Nov 2025 18:42:19 -0800
+	b=EDMMBRgHziFCqo5ZJm0PMdFLUtkwJTiYL6z7VrwLUN/0KtvEbiWVsmUDHcTT/1LMP
+	 bBa79kc9u1ZExb7zAiWZWRJVU485StvqJIHFfbl2FSeuj5Vpc1S6bH8MgB9NWOk32L
+	 /+cFETndNCvbt/EcESbC45JanuDAOzME941LIb9voxOpcUIQClx38WtmqK9dvDW8iY
+	 TjjgUEYH3paePotW0IvOuJQ3e5O1Bg3D8JG7jbU8uycuYr2hMNJdVSkzB6Fbn4Yyns
+	 4gdsuygFEIVsAm8dliLn76dD5t5budwqPyl17wdzvNknU1m4ygwTNI2pUGcX3F92Hy
+	 L+kLHUJzQqp3Q==
+Date: Mon, 24 Nov 2025 18:43:32 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Slark Xiao" <slark_xiao@163.com>
-Cc: "Loic Poulain" <loic.poulain@oss.qualcomm.com>, ryazanov.s.a@gmail.com,
- johannes@sipsolutions.net, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, mani@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: wwan: mhi: Keep modem name match with Foxconn
- T99W640
-Message-ID: <20251124184219.0a34e86e@kernel.org>
-In-Reply-To: <623c5da7.9de2.19ab555133e.Coremail.slark_xiao@163.com>
-References: <20251120114115.344284-1-slark_xiao@163.com>
-	<20251121180827.708ef7cd@kicinski-fedora-PF5CM1Y0>
-	<605b720.2853.19ab3b330e3.Coremail.slark_xiao@163.com>
-	<CAFEp6-07uXzDdXrw=A5dxhNc81LN3e-UXyw9ht7iAJr44M9A4A@mail.gmail.com>
-	<623c5da7.9de2.19ab555133e.Coremail.slark_xiao@163.com>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Donald Hunter
+ <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet
+ <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+ <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-rdma@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Moshe Shemesh
+ <moshe@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu
+ <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next 00/14] devlink and mlx5: Support cross-function
+ rate scheduling
+Message-ID: <20251124184332.317a652f@kernel.org>
+In-Reply-To: <f828d5d5-6ba3-4e9c-a7fb-3a0193f7e9bf@gmail.com>
+References: <1763644166-1250608-1-git-send-email-tariqt@nvidia.com>
+	<20251120193942.51832b96@kernel.org>
+	<f828d5d5-6ba3-4e9c-a7fb-3a0193f7e9bf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,21 +70,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 24 Nov 2025 18:07:22 +0800 (CST) Slark Xiao wrote:
-> I see. Actually this patch was generated in mhi code base.
-> But I didn't see any difference of this file between mhi and net.
-> And, there is another commit may affect this change:
-> 
-> https://lore.kernel.org/netdev/20251119105615.48295-3-slark_xiao@163.com/
-> -	    strcmp(cntrl->name, "foxconn-t99w515") == 0)
-> +	    strcmp(cntrl->name, "foxconn-t99w515") == 0 ||
-> +	    strcmp(cntrl->name, "foxconn-t99w760") == 0)
-> 
-> I edited above commit firstly and now it's reviewed status but not applied.
-> If I update this change based net or net-dev, above T99W760 support 
-> commit then would have a conflict since they are not a common
-> series. How shall I do to avoid this potential conflict?
+On Sun, 23 Nov 2025 08:57:58 +0200 Tariq Toukan wrote:
+> I submitted the code before my weekend as we have a gap of ~1.5 working 
+> days (timezones + Friday). It could be utilized for collecting feedback 
+> on the proposed solution, or even get it accepted.
 
-Are you saying you have to concurrent submissions changing one file?
-If yes please repost them as a series.
+Makes sense, our recommendation is to throw in an RFC in the subjects
+in this case. Saves the back and forth.
 
