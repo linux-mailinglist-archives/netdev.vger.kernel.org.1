@@ -1,131 +1,160 @@
-Return-Path: <netdev+bounces-241558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D229CC85DD0
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:05:07 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD3BC85E30
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:11:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59D813B41CF
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:05:04 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D4DD1342AB7
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:11:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532792264CD;
-	Tue, 25 Nov 2025 16:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8F523183F;
+	Tue, 25 Nov 2025 16:11:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gKJm/w5h"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iKabxgKF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BB520A5F3
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:04:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16F7222578
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764086699; cv=none; b=h2tYxaLWdUeKgQboMYd8dZj6P4d9CJaOm29oh7PLsJfUEU8J91k58Ld+SlyW4fdGRpIfNuWeG2+odnuzzJcoArpf3J/0m2k3++WuZoCyZgwDPSFR2vE1uPOD3HVeriAkqHkUBPlogCrFP8RBDPIMRRREtJYsklmRbMEQXLHHmmw=
+	t=1764087099; cv=none; b=WabqKmfVl+H9jjRfZwIlq/qrtDtgss4YgX94/F5bO+Rzmuxc+35qFw9C/mfUth0IRFvu/ftV6SlyJFVUwViP4w0D+HUhMRRyv/it/6ldNKUNr8LmeCROWfXHBlJtf9/e/LgJYhRVxTR9wp4+ysVP4tTcq4KKNHvswMz6w6Y1xUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764086699; c=relaxed/simple;
-	bh=UyyByTuY+3Pmfua0Po9WTijBQVKNAcXITMdPGJvxnzo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=NJVmmCiYY9demjdbT8qWB7bmlpyY/E4DndMCgW+SdFnUhW9Rd79wluajXCXv+9V06roso0eM6j804kGXn+u12TYQ5aLC4pGG1GMwHYZL2YRMG1NHLZOTrFguO9mlw4LbH34Gziot/GM9L9ORf446RNSTk6CmICOBOIchiW3c87Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gKJm/w5h; arc=none smtp.client-ip=74.125.224.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-640f88b8613so4386134d50.2
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 08:04:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764086695; x=1764691495; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ufovA9njBrcJJicKUMIOkwxg5WNvQhR6uFRYNHpjveE=;
-        b=gKJm/w5h8yNPbxByrDZvgfL6xjepOPMj/BlbvNPP4E/bWLms3gJvF+2EARCsHcjpfp
-         mDPqeeeiO/VJS3ZU5WUx9/nMwznv0d/9pNdjNE3EOrFPONpjEBPSiXXLCeS+hUc4ujCi
-         AvxjDbfYI+H4LUf5jKvpHhzaYZsjW0OXL3dRSWn9YoaKWKRYih0+UsWMDdhAQq4BcY0r
-         +XNj59OkYcNYMcNfO3sPpmZMWJ8hUsqJ9HV6r7HSoWFcUD0/JmWvRIpvhDBg9UJR19Ai
-         gqjLvd47/NbKWRGbW6Mvk4MXQ0ldOcEcPeGbVMZMvt/uslp/3vyL4oJq4uRhg7DkjQ9V
-         ZtFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764086695; x=1764691495;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ufovA9njBrcJJicKUMIOkwxg5WNvQhR6uFRYNHpjveE=;
-        b=pJcpbZPuSv5a8Yy8x0FurqQHTIrmX+NlTDTa6tnkUUDauOfj3wngBKVtcuKFCSlmEz
-         X6Dreh8kysCgznMQTewn9nMTadADhHbL8ti0ozqi8rJUcduz72xr6MrocNcb2aoJ4mmG
-         TwW/yG6BZRolteCWDwfKNLvXFyZKq8L+l/QT8HlNFkH9+/nVdkMBclB0kGUSHcS+KvEF
-         RJs1t01Qsqgga14blIFBW4TBpdq4KuK99o8cNuBibH6dDzbTo+iXyExsbxkAS3mtZowg
-         PnTZF8sqEgYiCQhJX4mjHKjES9eZUC9h/qmEV+xSFekI3DkwC6vTSLs644juhURNhEqB
-         5dFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXNPC0t5HNjAZsAcUF7FDxO3075sSRqdrz9BrjjGtyftvyWQfF3MrpgDFAoM8ffPvqAEVRyCUA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxSVKkIazz1sq0RJvQ/+UPsPoGHdhRMV8LTMQMj8fMUqCTOxcY
-	QX9V1amUcRldkSgVshQJ8j4u0/B5DbloqG1JjJALac/Zwa9Rz5qvSpZ5
-X-Gm-Gg: ASbGncvSyZxk9L0wExj9sCpEwGuee9hqUSJtAd1LA290YqAizYBBfqRc6CcveteO1ac
-	BcpS3rlayp8wrzS4vLJWGL7Z87DHtGeADkSsWglGg+Glw45JSu8UI+qj0cQ0TbNUiPvCIMXhxyn
-	viSsSlXUGvTB3vW5mi0cNcQN3PpvsCQJmzCXTMPeLtZtR7uH0Bn2V/UeckYY8IjWflNYd9wVqQK
-	Vf2FGWuD7emipkrv3eLPO1V0otXEuTia84Axq90EQ8m6An6NKmn5x7IgFqE36q3WI79LpIcTQph
-	+MsBxid4oQCKdfqlbtUDpfpkdIWUa/eW/xTkjj+j7NcifLtxFu6SRioxYUdBtJ5x8t/UbExm4uk
-	sveDljLKox2z8w1xFzfBgEQ1D7CPT1CDkWERbwHz0DGvPFoljHMRKGQajxIhWNVNDeAt27SUmqi
-	RUv01yqvhIXdQ8jotFb1mVEOzeYSQnSCoxgopHd7XqQQ8EtaHRF6SEZHYVx5NhyXI/rgs=
-X-Google-Smtp-Source: AGHT+IFMsVqQio40MqwigTpnntui9rbl+ng5ZfDUQwZJ043z1MBQaQ5WaAyam/USMadKLWIPTN7vBA==
-X-Received: by 2002:a05:690e:214c:b0:63f:a06e:9a7d with SMTP id 956f58d0204a3-64302ad9f66mr8502542d50.64.1764086695379;
-        Tue, 25 Nov 2025 08:04:55 -0800 (PST)
-Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78a798a77d0sm56497707b3.22.2025.11.25.08.04.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 08:04:54 -0800 (PST)
-Date: Tue, 25 Nov 2025 11:04:54 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jason Xing <kernelxing@tencent.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.10c7edf4c3dd1@gmail.com>
-In-Reply-To: <aSUxhmqXmIPSdbHm@fedora>
-References: <20251124161324.16901-1-ankitkhushwaha.linux@gmail.com>
- <willemdebruijn.kernel.6edcbeb29a45@gmail.com>
- <aSSdH58ozNT-zWLM@fedora>
- <willemdebruijn.kernel.1e69bae6de428@gmail.com>
- <aSUxhmqXmIPSdbHm@fedora>
-Subject: Re: [PATCH] selftests/net: initialize char variable to null
+	s=arc-20240116; t=1764087099; c=relaxed/simple;
+	bh=nA+k6iX459snoTOM0GGJbS4jLXPAcaEsfIkYacHVgUU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jNfUb9+BEDxpVVEHmjDtN5BkB9+3paXL/6Sj8Y/5M/NNe+aWr1l8EhQErUW0ib9q9l3LpDxnVdzTDvBU8vSJUSkgcJnPw0fNrQ3pVWGiugN3seS/y9PzABu3Qw5Kk8+CM8dywqb7X/2KKh8bYncAFgMaQzNi6usp+vF9fuPKez4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iKabxgKF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764087096;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=cbzUnzLbnw2rNklTyEmC18llDge/w8iFlOT6nojAbRM=;
+	b=iKabxgKFO+WmEmKhEgtSL8S027q75CeTxqViZ1JAsFuGgLDO/nERUadTnzgLhvrh+qjURV
+	9TZ2D0iE3HAmKu+rdymsszBIu50d4VMDbwkvbtFUIsEbAO3jNdycraQxF8+TSsjQ3lnVQL
+	YzBPhOBDk9NCLrbkxVBpEv6bL+SH4U8=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-122-8Ks9OxspOVW3hLDSjfJWig-1; Tue,
+ 25 Nov 2025 11:11:33 -0500
+X-MC-Unique: 8Ks9OxspOVW3hLDSjfJWig-1
+X-Mimecast-MFC-AGG-ID: 8Ks9OxspOVW3hLDSjfJWig_1764087088
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0A4EF1800561;
+	Tue, 25 Nov 2025 16:11:28 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.32.183])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DA13A1800451;
+	Tue, 25 Nov 2025 16:11:24 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Shuah Khan <shuah@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: [PATCH net-next 00/10] geneve: introduce double tunnel GSO/GRO
+Date: Tue, 25 Nov 2025 17:11:05 +0100
+Message-ID: <cover.1764056123.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Ankit Khushwaha wrote:
-> On Mon, Nov 24, 2025 at 01:15:33PM -0500, Willem de Bruijn wrote:
-> > This does not reproduce for me.
-> > 
-> > Can you share the full clang command that V=1 outputs, as well as the
-> > output oof clang --version.
-> 
-> Hi Willem,
-> I have added clang output in 
-> https://gist.github.com/ankitkhushwaha/8e93e3d37917b3571a7ce0e9c9806f18
-> 
-> Thanks,
-> Ankit
+This is the [belated] incarnation of topic discussed in the last Neconf
+[1].
 
-I see. This is with clang-21. It did not trigger for me with clang-19.
+In container orchestration in virtual environments there is a consistent
+usage of double UDP tunneling - specifically geneve. Such setup lack
+support of GRO and GSO for inter VM traffic.
 
-I was able to reproduce with Ubuntu 25.10.
+After commit b430f6c38da6 ("Merge branch 'virtio_udp_tunnel_08_07_2025'
+of https://github.com/pabeni/linux-devel") and the qemu cunter-part, VMs
+are able to send/receive GSO over UDP aggregated packets.
 
-Okay, good to suppress these false positives with normal builds.
+This series introduces the missing bit for full end-to-end aggregation
+in the above mentioned scenario. Specifically:
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+- introduces a new netdev feature set to generalize existing per device
+driver GSO admission check.1
+- adds GSO partial support for the geneve and vxlan drivers
+- introduces and use a geneve option to assist double tunnel GRO
+- adds some simple functional tests for the above.
+
+The new device features set is not strictly needed for the following
+work, but avoids the introduction of trivial `ndo_features_check` to
+support GSO partial and thus possible performance regression due to the
+additional indirect call. Such feature set could be leveraged by a
+number of existing drivers (intel, meta and possibly wangxun) to avoid
+duplicate code/tests. Such part has been omitted here to keep the series
+small.
+
+Both GSO partial support and double GRO support have some downsides.
+With the first in place, GSO partial packets will traverse the network
+stack 'downstream' the outer geneve UDP tunnel and will be visible by
+the udp/IP/IPv6 and by netfilter. Currently only H/W NICs implement GSO
+partial support and such packets are visible only via software taps.
+
+Double UDP tunnel GRO will cook 'GSO partial' like aggregate packets,
+i.e. the inner UDP encapsulation headers set will still carry the
+wire-level lengths and csum, so that segmentation considering such
+headers parts of a giant, constant encapsulation header will yield the
+correct result.
+
+The correct GSO packet layout is applied when the packet traverse the
+outermost geneve encapsulation.
+
+Both GSO partial and double UDP encap are disabled by default and must
+be explicitly enabled via, respectively ethtool and geneve device
+configuration.
+
+Finally note that the GSO partial feature could potentially be applied
+to all the other UDP tunnels, but this series limits its usage to geneve
+and vxlan devices.
+
+Link: https://netdev.bots.linux.dev/netconf/2024/paolo.pdf [1]
+
+Paolo Abeni (10):
+  net: introduce mangleid_features
+  geneve: expose gso partial features for tunnel offload
+  vxlan: expose gso partial features for tunnel  offload
+  geneve: add netlink support for GRO hint
+  geneve: constify geneve_hlen()
+  geneve: pass the geneve device ptr to geneve_build_skb()
+  geneve: add GRO hint output path
+  geneve: extract hint option at GRO stage
+  geneve: use GRO hint option in the RX path
+  selftests: net: tests for add double tunneling GRO/GSO
+
+ Documentation/netlink/specs/rt-link.yaml      |   3 +
+ drivers/net/geneve.c                          | 520 +++++++++++++++++-
+ drivers/net/vxlan/vxlan_core.c                |  16 +-
+ include/linux/netdevice.h                     |   5 +-
+ include/net/udp_tunnel.h                      |  32 ++
+ include/uapi/linux/if_link.h                  |   1 +
+ net/core/dev.c                                |   4 +-
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../testing/selftests/net/double_udp_encap.sh | 340 ++++++++++++
+ 9 files changed, 888 insertions(+), 34 deletions(-)
+ create mode 100755 tools/testing/selftests/net/double_udp_encap.sh
+
+-- 
+2.52.0
 
 
