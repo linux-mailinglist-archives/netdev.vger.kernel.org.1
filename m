@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-241378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91794C833C3
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:30:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F7E5C833C9
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:30:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4CBC74E3029
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:30:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1B853AC6E1
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C03145B16;
-	Tue, 25 Nov 2025 03:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE44C23ED75;
+	Tue, 25 Nov 2025 03:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QKOOSggi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o3pcItko"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA113B2A0
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 03:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B911F1313;
+	Tue, 25 Nov 2025 03:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764041445; cv=none; b=t4xPexHHHCq6w372p7Kb4pFjA5h3zvVcF0MVVnFX5/nR+sVhmzKmQL5LSkyQmrx3JChWQaF+0NXd3/WThc8PGLIfHRmcknUgIsqiQwnzSYmyJEjlupa060MwfLsaJb7gKgJ92kV2g090iSDSS8yjXwwlv3JcdD1k/ldz+HXkHu8=
+	t=1764041447; cv=none; b=ozTKU96fyrOn3fMXT7VyihJNDOZfcMSUfGAeH9XYDb3bXvhm9xPns5XBzUIaRisMBIhGcxVNyhXXo6/jTCEqCtg+l5NwtiMNFNXx9aHonA62Fs87W7PXbBsMTLeHYXBP2fMlfFejtV3+XP2AurjW2NUQFnDzO/AVRZjJmq7vQl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764041445; c=relaxed/simple;
-	bh=Hb9qcQEvsFkWMcf71mkDzO9+31f3zEiOXoEdUdGpepE=;
+	s=arc-20240116; t=1764041447; c=relaxed/simple;
+	bh=+MMACuO/EEO4urTCKiwdOmj7uPrXVNGTmbL2+n0lnzM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ok7mThJPg5205GPh8tcYMpGt9+zGqOKf8VgxRAfTGWPL/znl2vxIH1oJ25NAAWuh4HWYtgCnSu7eZq/aKx+N7mK0tHMNVbbBGw/lBKSbgAEFPSzYOB8m4qcbAhWEew7XkDZaETdfjdVJSlUIwQR+Ckt3g3eAHyJvG93Ho0h0vso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QKOOSggi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6193C4CEF1;
-	Tue, 25 Nov 2025 03:30:44 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=X9A06JoKhY4CUserCfjpzjPthQHkbt7YR5Uwsdrgq7f3AB/KP01pLYb6xM2foYhY0XFTqcnUhyWJ8JAJsZ7abTE7XeSpQGNp1FU8H08wKLeawTVc4WmJCjxdZrChzcDujtELD8GsqnJRuqXy7MD8X5ka0e3gemjVz5EZkoI1eoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o3pcItko; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47499C116B1;
+	Tue, 25 Nov 2025 03:30:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764041444;
-	bh=Hb9qcQEvsFkWMcf71mkDzO9+31f3zEiOXoEdUdGpepE=;
+	s=k20201202; t=1764041446;
+	bh=+MMACuO/EEO4urTCKiwdOmj7uPrXVNGTmbL2+n0lnzM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QKOOSggi2F4/Vd9YPL5CD5c2cPoqwoHNrzJlsp6FqGYg02jJliwJ3GzNTHeqAhsIN
-	 O8FMCG9Rh58Wv5nNPwuPgEDzim2zKoVVcuncylbKZ/xHBeCF3QLs/G2LLAvrCDQ8ng
-	 zPtay4z1/xmlpb0gBy2pUZcVCGlu/OO7y6ARfBgB5TdsRBsljzXvuxHDx7yFqq8nIR
-	 pY0BvtyUWsEL06yUqAD1JdAr9zPRE9Oq6GGBP9k15Jw3vHqwqdyswJ5NrigISwU85E
-	 tZ5JJrM0v0kN4b8ITWePHjBVU2EVdqZgOMCIuM8EtJc6zgbOSpsXka1YO6Le888CDw
-	 WhG+H9qzQhgcw==
+	b=o3pcItko9zKxmfabH+qtiw0UrdOaw6RCi87/MoY5Iob7TyDDZz7F4bwfLMOc6aSk1
+	 DCe7RzCpCYXD9PigIgTepkVXghnEu8CfMHe9RLiMMZBmUtgd5UL4iKMWHileOUWq9o
+	 QzbJBQ6ueb4Qb20wwGM1lWnPKphLIIfnBPz5EqbzzQwANe+xBBc9olXMO6jwHiZBeg
+	 xc/kN7DEsf6keT/DH32F+t86VwfwLl4OBAOCLlQqWrW3Q0Cs07sdy8t17kMZbQmZpc
+	 sfF/B+fOX482paWu+lzr58sSkw7UVhM7V3WwzSfW9wGKW6PjNIYw44JPJVlQj9Q3X1
+	 8Ilksd4J+Cssg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1413A8A3CA;
-	Tue, 25 Nov 2025 03:30:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3F7D63A8A3CA;
+	Tue, 25 Nov 2025 03:30:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: optimize eth_type_trans() vs
- CONFIG_STACKPROTECTOR_STRONG=y
+Subject: Re: [PATCH net-next] selftests: af_unix: don't use SKIP for expected
+ failures
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176404140776.172437.10107001254735892374.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Nov 2025 03:30:07 +0000
-References: <20251121061725.206675-1-edumazet@google.com>
-In-Reply-To: <20251121061725.206675-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- kuniyu@google.com, willemb@google.com, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
+ <176404140900.172437.13828660486764737049.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Nov 2025 03:30:09 +0000
+References: <20251123021601.158709-1-kuba@kernel.org>
+In-Reply-To: <20251123021601.158709-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ kuniyu@google.com, adelodunolaoluwa@yahoo.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 21 Nov 2025 06:17:25 +0000 you wrote:
-> Some platforms exhibit very high costs with CONFIG_STACKPROTECTOR_STRONG=y
-> when a function needs to pass the address of a local variable to external
-> functions.
+On Sat, 22 Nov 2025 18:16:01 -0800 you wrote:
+> netdev CI reserves SKIP in selftests for cases which can't be executed
+> due to setup issues, like missing or old commands. Tests which are
+> expected to fail must use XFAIL.
 > 
-> eth_type_trans() (and its callers) is showing this anomaly on AMD EPYC 7B12
-> platforms (and maybe others).
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: kuniyu@google.com
+> CC: adelodunolaoluwa@yahoo.com
+> CC: shuah@kernel.org
+> CC: linux-kselftest@vger.kernel.org
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: optimize eth_type_trans() vs CONFIG_STACKPROTECTOR_STRONG=y
-    https://git.kernel.org/netdev/net-next/c/ec1e48e97feb
+  - [net-next] selftests: af_unix: don't use SKIP for expected failures
+    https://git.kernel.org/netdev/net-next/c/e254c212cd9c
 
 You are awesome, thank you!
 -- 
