@@ -1,137 +1,116 @@
-Return-Path: <netdev+bounces-241644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7775C8715A
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 21:41:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C7F6C87168
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 21:42:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60F233AC186
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 20:41:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDF363B08A3
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 20:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548452DE6FE;
-	Tue, 25 Nov 2025 20:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D4C29E0E6;
+	Tue, 25 Nov 2025 20:42:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1bdf/Vc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b0QRS2hQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E1B2DCC03
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 20:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2021A9FA4
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 20:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764103283; cv=none; b=L4yve+wkwVehDT96aR1ecod/bm5aNCJFwnf9oDl7cvBl4uVw1MPpkqbpRCfQJtB8c27/JxAXF2gvzhBvRUh1sigA7K8DS0NQO/B/lrv7sFDe8wmyVMlQbr94Dxo0JJvbk9T2IcFarNEwJ5HakkBR2l7NVvsVhyzz+FS323+GbJw=
+	t=1764103342; cv=none; b=auOblBnyz8bpYluj08P/RhgD55xzK/fDFKj9wgwp/uOGF1vNFFK4XiH7ZpzjMfDcUURXF51YORRspzv/mdUx7c4nmXDa9Ror+ZOMO0cU8veZUa+qNl/Il1hCh+8VeMrdPMQJYi4VOIB35YFc9db0kGB7UXVN7NPWRLRm+ritjNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764103283; c=relaxed/simple;
-	bh=b8/nlt8ySur5mYAp0cy5opUeHPZV6hdxWLfR3l/E6aI=;
-	h=Content-Type:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To; b=mXqMgbvqID/Po/n8BhIolAXRU8UmYeLvaasld6mEFxzB1pjl7Plb8bsPTxFMg/lI/2L5ppxwrr1Sm4OEUFTDZhCmTmrVFXwv7JWFGM8BM+ezv7Dcx3QDiaNsyL74wltRqZ3V4MNDhHsql0DPw0CM9dXlaNRmVXJdCDf657QUyqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L1bdf/Vc; arc=none smtp.client-ip=209.85.214.182
+	s=arc-20240116; t=1764103342; c=relaxed/simple;
+	bh=rAwu7od3Ig4NqIN7e2uSUs1FVPZ+2Q7sQSsIkrvJzeM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ncIdImTxqUoPm4w6TtWAWcCoPix3wzQt2DCw++VQ8ryXfVEQFcUUc2jLUsC/uY3pIqHbpHbDLRblx92Q3kPyu50sn/bAxB01IZv4OoMtNdpUh0epE/Co8iacJFitlcW9kgxZS3P+8rqnqx52XLHI47uliPNs1pM5xTeV/MDEptw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b0QRS2hQ; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-298039e00c2so83905505ad.3
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 12:41:21 -0800 (PST)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-429c8d1be2eso679662f8f.0
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 12:42:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764103281; x=1764708081; darn=vger.kernel.org;
-        h=in-reply-to:from:content-language:subject:references:cc:to
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b8/nlt8ySur5mYAp0cy5opUeHPZV6hdxWLfR3l/E6aI=;
-        b=L1bdf/Vc2Phn9w+CrA9Q4LnqlxgYLY1WJtE82m/sEJ6eBnjbyFbVMv2poXvfEEq7lY
-         ClM+PFN6XPA1elTTxw9GrKI9bwHOZuE2V0B/R6cZnfBEzGsGv+7d8wttrCYdNxbXpQMv
-         sX0CvXxOslxe5T8UtSSRUamL5QP2ulwsHwfXg7ba8GxgSphxNOECs1CwGaEJbXzD+Hc8
-         z16mv44DknvIx0X02TFTYDXU40VpFg3R18Hzw03N7qCdzgk2mlD2tdPLNL1jqSY4SuEL
-         0qp8yRIM5MkLkhKqyps1qVToWQtc3L7NeP1+Axz3rtF9MYW9sSWVdKs/6GNo7ItEthcq
-         jGeQ==
+        d=gmail.com; s=20230601; t=1764103339; x=1764708139; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=g/AUE+w4FR4w7EMLBkAOfRzsYhVrT0p72HoCrpmdLCo=;
+        b=b0QRS2hQm67bVPGSTSmH54qqfUVLqLzFloe49+w3W5Z/XmohG/rrL/6dxgD6WyHb6f
+         K7cODg2etfBgU6AciC43CaGt/ZGeGqr/2lNvu9OIaih25U7pd7Bc7CF9Y1d2yB6gz2ts
+         vm19rwniiAVp57hzxnUP35AgT+OELeRD8JFR8E9TPBVnhIrh1j1AN852yCXvteO+c4wR
+         lu7y4dNBMBhMxaw27EmTmaVoyjZvej2qhIWR5MmEYiF7nEWpaX/sDupd10eVl7BvbktC
+         nQE//JgJKnD/8X3U2sBPGlnmkXXgip1OtJOnBmid+tN0hprOtxzHoSRXnqb/gQUx1vZ3
+         GPCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764103281; x=1764708081;
-        h=in-reply-to:from:content-language:subject:references:cc:to
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=b8/nlt8ySur5mYAp0cy5opUeHPZV6hdxWLfR3l/E6aI=;
-        b=kUjcZrRT0WEPvOUABv5Jz3M2gYIYTiNMyb/f+LWJQceE4gPA8T65raMY2Or+kld0Z2
-         JwWQJjbSJgZ+3moOthngpXUs0gfBMLjmYeLkKrB5xQTNNNUCIbIRHftrq+PJzLlpcuBN
-         nANl8k4ux2PNSGpg0ECK2Jm2ufl84WnNjjxBhn6DGd0mk4f1JY2aFykNnQ1Zb1bhz4SL
-         pyutxdV4Vl3dtrInwWr3FTHaSdyM7JmG26cXJs7PaU6vANqQZNiYSg7bj09eDwl5+Nxl
-         gXLAmjzpjOsee0Lwg72Iz7qkxZVNgf+ADfncnzTisaFu0bqwzcL0ZfxHe6m7RPSCX7LG
-         LwmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0UpWxmqlpJu0oxz6vAbMGkYnps7y3YG3wNmlJNrZ2kud81SmLQFCloCTCE4nyoGk8FjwYFVs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyu0hSRpfCvsiN36PSV2duXg8DtLZGEg/ZOsK8Qi1PQ0Ar4pRVy
-	rp8zyhjkpV/+N5yCQNqMyRAFz46nj1rjrH5us4gSwTUn0p04FGl8nrIw2Ki3jw==
-X-Gm-Gg: ASbGncsSvN+f8o3NsYFL+5Wbmc9c/pR0nYAU3KeAhVOkozORot70ODz9yrVC1DYgIN4
-	lLmyXLZLkaraSwrHBWErTfqwScM+LHtWQSUnE7Fcq+qFyzJlIqe4Jg0yNFBbqx2SJWg4IwaIKg1
-	gj5tpRBLaL0KoOVvkInIsWCKYlJsOwqH3qxj/ukud1GAOWSuihMlxT9cxifwB7ctsxPL4vi4exq
-	MXSiYiZxCA3c9r1eoaOH85DA+3VVblkIAyBXpHs/mx6frJDcA0iV24VTPQ/gmWohDXukd38nf48
-	HjHIAQM4dklb899CzfmnlChZGbkD+6LXVrpyEapCzz+CVRPL+/4RreLvmTLW8or4yUwfGzJSHkF
-	yJdVoEdgy2kj/VyUlki4dAfbjMJ+RkG75WeTKA5jjYrnjP845bi3uuoNlJK4IKs06rtsB+S2v/q
-	e6CQRZnXH1RSpUcgta6uX8sQZtgCxBi5fbf+/ps3DcnHimZuaRANW9NQ0=
-X-Google-Smtp-Source: AGHT+IFV47nEd3y7SLfstE9Tps7Y92mxwql0nKOJI4//bjaoh6qrj9/i3RasuyIXbhKn1fqIXAQigA==
-X-Received: by 2002:a17:903:947:b0:290:9332:eebd with SMTP id d9443c01a7336-29b6be8c682mr183970255ad.10.1764103281161;
-        Tue, 25 Nov 2025 12:41:21 -0800 (PST)
-Received: from ?IPV6:2405:201:31:d869:2a74:b29f:f7bf:865c? ([2405:201:31:d869:2a74:b29f:f7bf:865c])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b2809b6sm176030905ad.76.2025.11.25.12.41.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Nov 2025 12:41:20 -0800 (PST)
-Content-Type: multipart/mixed; boundary="------------cdEetcsmS6OAIzPxepPAn7h1"
-Message-ID: <9a2b03dc-acd0-467d-a4e6-feb5cf6165f9@gmail.com>
-Date: Wed, 26 Nov 2025 02:11:08 +0530
+        d=1e100.net; s=20230601; t=1764103339; x=1764708139;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g/AUE+w4FR4w7EMLBkAOfRzsYhVrT0p72HoCrpmdLCo=;
+        b=bNeW61uoS5vQuTihZWE5ooMYPrWnakuDLpcyh4WouZNCudny8LtwvpB23KUho1D3tc
+         vksYTz9bV0wMbQ69nfYs0wcsfwUAbMaw9pK+K1/6NhzEojL2QcVZWbt1nYMzFFYDA7BC
+         w+WIZoeSnwTjBFTW6lkDWyFgndAO2vMr5ZJGDXeApWErllUnsnwR94eTwQPVx5SMRnwo
+         G1M8RyFRhiBafuaYdTLvYGNJ3cgQmkhz+n28wQTmaZaB0R7mDwFm4KR8yQINLXONTbdg
+         LCCRX+ZHmQN2WpJnyCuRQk8N56OGqufzo1U+PLTmpnWOy0pw52imGW19ltrepXksiC5/
+         GP4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV5ZNFzf8bwduXTuCd81WnjeVsBrNPs7aFrj1Tu7dLyBHtdqkEzAQ7nKnU8a2YNalg0fR4LpMw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5MkIIgW4v5j1FQRFPn6mrYWxknDCxRU8vraaG8tDMkVZnNuJi
+	Q8bOPgYpY0DXMJ7w3wW2uW3NjULsBSn/zKE6fEOHrSXb3wehIYlGma8t
+X-Gm-Gg: ASbGncs2AdNPnSmu0Hkz4s8NGb2Gli0321/0jqjSPVecpOsx6711fhTC0Gq6AsNt0aC
+	l9krIoIXXsUo/JJb8bA2rD8IBLMob3i4r/gmdB3NH7nW5WZUZF0kXiKo/o5ICXuHtJu1i8HF4vm
+	z8gdXobw80cLThClVA70MDsgGRCHrxqAgnh2BpQZCJ9L74QAPv8mfcHLVmBn/0tXuHeZrX2I3+n
+	zoxyB5mjEuFP2HSpej2JegkOOUi7f8xZ12WvM+Mke75YC2ay+xLoIdSaWBCEroGuD6DzaoluBcc
+	zu7Qzxf1xM341jaelWKUKyWuT1dSlBqz9x8eSXJaLsueUIKrOKhA2nBNJuGRcGA61Pn0e3dcMRb
+	hXEgOS3YKbhNfXErLH46AyjCesWS/PnNBWRKrilPOrsYJ8FAgL0b+iG9YK+761m7SkuhDI2tc6c
+	R0x0Nwzd7b1S94rg==
+X-Google-Smtp-Source: AGHT+IHgNnBm5YWUVW6u0g8PR6nFQpSwsxhpHokFNGnunRVwV83McGAhdoS0yK0tHPys4trkbLZE7A==
+X-Received: by 2002:a05:600c:1551:b0:477:9f61:8c20 with SMTP id 5b1f17b1804b1-477c311cdd1mr102602195e9.2.1764103338948;
+        Tue, 25 Nov 2025 12:42:18 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d106:d600:a04c:7112:155f:2ee5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4790ab8b21fsm8353315e9.0.2025.11.25.12.42.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Nov 2025 12:42:18 -0800 (PST)
+Date: Tue, 25 Nov 2025 22:42:15 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	=?utf-8?B?w4FsdmFybyBGZXJuw6FuZGV6?= Rojas <noltari@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 4/7] net: dsa: b53: fix CPU port unicast ARL
+ entries for BCM5325/65
+Message-ID: <20251125204215.2lz44qdegapgncn5@skbuf>
+References: <20251125075150.13879-1-jonas.gorski@gmail.com>
+ <20251125075150.13879-1-jonas.gorski@gmail.com>
+ <20251125075150.13879-5-jonas.gorski@gmail.com>
+ <20251125075150.13879-5-jonas.gorski@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: syzbot+5d8269a1e099279152bc@syzkaller.appspotmail.com
-Cc: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-References: <69260883.a70a0220.d98e3.00b5.GAE@google.com>
-Subject: Re: [syzbot] [net?] [can?] KMSAN: uninit-value in em_canid_match
-Content-Language: en-US
-From: shaurya <ssranevjti@gmail.com>
-In-Reply-To: <69260883.a70a0220.d98e3.00b5.GAE@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251125075150.13879-5-jonas.gorski@gmail.com>
+ <20251125075150.13879-5-jonas.gorski@gmail.com>
 
-This is a multi-part message in MIME format.
---------------cdEetcsmS6OAIzPxepPAn7h1
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Tue, Nov 25, 2025 at 08:51:47AM +0100, Jonas Gorski wrote:
+> On BCM5325 and BCM5365, unicast ARL entries use 8 as the value for the
+> CPU port, so we need to translate it to/from 5 as used for the CPU port
+> at most other places.
+> +	ent->port = (mac_vid >> ARLTBL_DATA_PORT_ID_S_25) &
+> +		     ARLTBL_DATA_PORT_ID_MASK_25;
+> +	if (!is_multicast_ether_addr(ent->mac) && ent->port == B53_CPU_PORT)
+> +		ent->port = B53_CPU_PORT_25;
 
-#syz test:
-git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
-
---------------cdEetcsmS6OAIzPxepPAn7h1
-Content-Type: text/x-patch; charset=UTF-8;
- name="0001-net-sched-em_canid-add-length-check-before-reading-C.patch"
-Content-Disposition: attachment;
- filename*0="0001-net-sched-em_canid-add-length-check-before-reading-C.pa";
- filename*1="tch"
-Content-Transfer-Encoding: base64
-
-RnJvbSAxMzcwODZmMjVjOGFhNTJlNDIyMjM1NTM0NWU0MjE4ZTQxMDE4OGM1IE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBTaGF1cnlhIFJhbmUgPHNzcmFuZV9iMjNAZWUudmp0
-aS5hYy5pbj4KRGF0ZTogV2VkLCAyNiBOb3YgMjAyNSAwMjowNjo1MSArMDUzMApTdWJqZWN0
-OiBbUEFUQ0hdIG5ldC9zY2hlZDogZW1fY2FuaWQ6IGFkZCBsZW5ndGggY2hlY2sgYmVmb3Jl
-IHJlYWRpbmcgQ0FOIElECgpBZGQgYSBjaGVjayB0byB2ZXJpZnkgdGhhdCB0aGUgc2tiIGhh
-cyBhdCBsZWFzdCBzaXplb2YoY2FuaWRfdCkgYnl0ZXMKYmVmb3JlIHJlYWRpbmcgdGhlIENB
-TiBJRCBmcm9tIHNrYi0+ZGF0YS4gVGhpcyBwcmV2ZW50cyByZWFkaW5nCnVuaW5pdGlhbGl6
-ZWQgbWVtb3J5IHdoZW4gcHJvY2Vzc2luZyBtYWxmb3JtZWQgcGFja2V0cyB0aGF0IGRvbid0
-CmNvbnRhaW4gYSB2YWxpZCBDQU4gZnJhbWUuCgpSZXBvcnRlZC1ieTogc3l6Ym90KzVkODI2
-OWExZTA5OTI3OTE1MmJjQHN5emthbGxlci5hcHBzcG90bWFpbC5jb20KQ2xvc2VzOiBodHRw
-czovL3N5emthbGxlci5hcHBzcG90LmNvbS9idWc/ZXh0aWQ9NWQ4MjY5YTFlMDk5Mjc5MTUy
-YmMKRml4ZXM6IGYwNTdiYmI2ZjllZCAoIm5ldDogZW1fY2FuaWQ6IEVtYXRjaCBydWxlIHRv
-IG1hdGNoIENBTiBmcmFtZXMgYWNjb3JkaW5nIHRvIHRoZWlyIGlkZW50aWZpZXJzIikKU2ln
-bmVkLW9mZi1ieTogU2hhdXJ5YSBSYW5lIDxzc3JhbmVfYjIzQGVlLnZqdGkuYWMuaW4+Ci0t
-LQogbmV0L3NjaGVkL2VtX2NhbmlkLmMgfCAzICsrKwogMSBmaWxlIGNoYW5nZWQsIDMgaW5z
-ZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL25ldC9zY2hlZC9lbV9jYW5pZC5jIGIvbmV0L3Nj
-aGVkL2VtX2NhbmlkLmMKaW5kZXggNTMzN2JjNDYyNzU1Li5hOWI2Y2FiNzBmZjEgMTAwNjQ0
-Ci0tLSBhL25ldC9zY2hlZC9lbV9jYW5pZC5jCisrKyBiL25ldC9zY2hlZC9lbV9jYW5pZC5j
-CkBAIC05OSw2ICs5OSw5IEBAIHN0YXRpYyBpbnQgZW1fY2FuaWRfbWF0Y2goc3RydWN0IHNr
-X2J1ZmYgKnNrYiwgc3RydWN0IHRjZl9lbWF0Y2ggKm0sCiAJaW50IGk7CiAJY29uc3Qgc3Ry
-dWN0IGNhbl9maWx0ZXIgKmxwOwogCisJaWYgKHNrYi0+bGVuIDwgc2l6ZW9mKGNhbmlkX3Qp
-KQorCQlyZXR1cm4gMDsKKwogCWNhbl9pZCA9IGVtX2NhbmlkX2dldF9pZChza2IpOwogCiAJ
-aWYgKGNhbl9pZCAmIENBTl9FRkZfRkxBRykgewotLSAKMi4zNC4xCgo=
-
---------------cdEetcsmS6OAIzPxepPAn7h1--
+Why not use is_unicast_ether_addr() to have a more clear correlation
+between the commit message and the code?
 
