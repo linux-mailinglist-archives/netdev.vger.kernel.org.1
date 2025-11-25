@@ -1,127 +1,112 @@
-Return-Path: <netdev+bounces-241396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4158C8358E
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 05:41:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 141D4C835C8
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 05:56:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 593E83AF3C3
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:41:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5B793ADC7C
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039F427F749;
-	Tue, 25 Nov 2025 04:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 821E621D3EA;
+	Tue, 25 Nov 2025 04:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e6LcBvj0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J+1iTx7S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9534288D6;
-	Tue, 25 Nov 2025 04:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593A513777E;
+	Tue, 25 Nov 2025 04:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764045660; cv=none; b=BXbLhYhvb7lm8OAJgCbhlxjqFCAiqAXhpckal0BxCKAsqlmTkwVU83cQh3OM2zClDL+hLKvJM3qSV5zp4K4PgMcPAZkT5jm4vjpeyL3elxz19pZnwU9kF2zmS+/2KQ0aLQnAvyk2xVA9I8Y0qnXvo3u4MzJElB/vprYPGN4Z07I=
+	t=1764046561; cv=none; b=eSoAzvHzXLjfcTqeltUBmYiaQtnMi9c2AiaBaPcTC5UdETT0WmuIl0dGihYMmGl79RE9uBjTVqRyPLemKj6v/zuVeYuWi3TRnFivAA/ZkHBAQVzS5VZPq8g9EvZ0YdEWAHs5vcUA3e/OaVD5CGOgKjC4VrLAQ/dG+Vu3M6WKpy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764045660; c=relaxed/simple;
-	bh=QYR4hjfoqH52yadclOSEYGCayQv9/Ag6fW1jB4kKIcA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=meg9sYnSbOlMF4qm34SK3YyBvK9jmkXiwBdLtVIQwEXRsTo5PWK/yVXPOc0XsbH4kiH/1beVu5nAnfzQjB/nMSJhtN3UKsoD9TjGYNm0G2zMG1Oj0MpSs/6C7JBhlgI6R+qUpUw8aMJ6BhEg1ujLPDxTawZ0IGi21/7n6uuEfyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e6LcBvj0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51B79C4CEF1;
-	Tue, 25 Nov 2025 04:41:00 +0000 (UTC)
+	s=arc-20240116; t=1764046561; c=relaxed/simple;
+	bh=/mEny0NKX2iSik1Rj4RafVjhPmCQi0Zei1V/lU3lcEs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oSyEcFi1CFMamZGvqr+fYK8sYaHzbvFm07FAM5KJVuHKSTQ6nLOjS8NjkVsBMRF0AtPiUs4Ko1N+l+CkKGR9BtYQt2AU5A1VsPhfkxoL8K4eCyCxLX9SPeYu/N3Ij1wmn2qpBJ+0i8gMJxONDTQwvkvLQDW7g1hM7SnxcpTasuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J+1iTx7S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4172C116B1;
+	Tue, 25 Nov 2025 04:55:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764045660;
-	bh=QYR4hjfoqH52yadclOSEYGCayQv9/Ag6fW1jB4kKIcA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=e6LcBvj0yOCj/VknX2c9F7F2Cta6bW7aS4T/hDuEZ5EzgZJBl/DeTUAcXjLOiTVN1
-	 QSyBBRD8ZRJsc/LtNxZ5Ivi8x0IE2swWR7GJAEhQJr8LTajLMi8Ks99vIYs1x495Rv
-	 cq+qrLvA2SBx0Xc0N2xLpZx2FIKXE2/sGLH0sIQB96wpNSh8Qp+C5FSailLzY6YMzx
-	 tHH15kQ6wC/zXiM3rwuZ+UdmYwFM86xLQUp4u8fVlPSa+TMZs4mfKR6Mqr8zBTisZ6
-	 FTE0cmyYa9bQ0d7EcXhVThwXEVt/vwjg6vf5dVaVSSTKDrVfurpGUjdME8Z5UZS+uY
-	 uI6A/Ys3Regag==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 340673A8A3CC;
-	Tue, 25 Nov 2025 04:40:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1764046559;
+	bh=/mEny0NKX2iSik1Rj4RafVjhPmCQi0Zei1V/lU3lcEs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=J+1iTx7SeEOVxvuxmb0e200RmqLxL/JYJ1ptAOj3uE8yE6T4ftBE1zzrGZ1sGDoyQ
+	 0S6fkFx5GSxRXVIm+G3+zixAiSktxoQh3rauDS4mVsFPxxpgK4rKasb9EjxGOBCuNt
+	 Md/6TCKREGZT2IHaGUrKX/Zn0jbfSH73eX6HYmjEv0UWWgpWRKwohJxmK/Q1c1TNoG
+	 lGSoVDxz7QnIPQ5MEsoL/9Bzu5Yoz/YVvpJGgFEP4eNWShKZXMKAMk1OcTObZXesqw
+	 ziB01CVbadO+7MFbq2GlPswUlnpRCro8y93kZ3kFdbqlXgXpCA5fLmIrPEfoLaU85F
+	 3a28UjlMobi7A==
+Date: Tue, 25 Nov 2025 10:25:51 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Slark Xiao <slark_xiao@163.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+	Loic Poulain <loic.poulain@oss.qualcomm.com>, ryazanov.s.a@gmail.com, johannes@sipsolutions.net, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: wwan: mhi: Keep modem name match with Foxconn
+ T99W640
+Message-ID: <mo2f3j475zadtaouv4t3gtjgpnwckpatixyn5hy7lhe6zphsw4@gwho33yxgkb6>
+References: <20251121180827.708ef7cd@kicinski-fedora-PF5CM1Y0>
+ <605b720.2853.19ab3b330e3.Coremail.slark_xiao@163.com>
+ <CAFEp6-07uXzDdXrw=A5dxhNc81LN3e-UXyw9ht7iAJr44M9A4A@mail.gmail.com>
+ <623c5da7.9de2.19ab555133e.Coremail.slark_xiao@163.com>
+ <20251124184219.0a34e86e@kernel.org>
+ <33bc243d.33c6.19ab8fa1cb4.Coremail.slark_xiao@163.com>
+ <20251124191226.5c4efa14@kernel.org>
+ <2188324.36f7.19ab902e6b5.Coremail.slark_xiao@163.com>
+ <20251124192111.566126f9@kernel.org>
+ <1a29d59a.3b7b.19ab910e6bc.Coremail.slark_xiao@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/14] mptcp: memcg accounting for passive
- sockets
- & backlog processing
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176404562300.189804.16757204264695752077.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Nov 2025 04:40:23 +0000
-References: 
- <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
-In-Reply-To: 
- <20251121-net-next-mptcp-memcg-backlog-imp-v1-0-1f34b6c1e0b1@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: edumazet@google.com, kuniyu@google.com, pabeni@redhat.com,
- willemb@google.com, davem@davemloft.net, kuba@kernel.org, horms@kernel.org,
- dsahern@kernel.org, martineau@kernel.org, geliang@kernel.org,
- peter.krystad@linux.intel.com, fw@strlen.de, cpaasch@apple.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, mptcp@lists.linux.dev,
- dcaratti@redhat.com
+In-Reply-To: <1a29d59a.3b7b.19ab910e6bc.Coremail.slark_xiao@163.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 21 Nov 2025 18:01:59 +0100 you wrote:
-> This series is split in two: the 4 first patches are linked to memcg
-> accounting for passive sockets, and the rest introduce the backlog
-> processing. They are sent together, because the first one appeared to be
-> needed to get the second one fully working.
+On Tue, Nov 25, 2025 at 11:31:23AM +0800, Slark Xiao wrote:
 > 
-> The second part includes RX path improvement built around backlog
-> processing. The main goals are improving the RX performances _and_
-> increase the long term maintainability.
+> At 2025-11-25 11:21:11, "Jakub Kicinski" <kuba@kernel.org> wrote:
+> >On Tue, 25 Nov 2025 11:16:06 +0800 (CST) Slark Xiao wrote:
+> >> At 2025-11-25 11:12:26, "Jakub Kicinski" <kuba@kernel.org> wrote:
+> >> >On Tue, 25 Nov 2025 11:06:30 +0800 (CST) Slark Xiao wrote:  
+> >> >> >Are you saying you have to concurrent submissions changing one file?
+> >> >> >If yes please repost them as a series.    
+> >> >> One patch of previous series has been applied.   
+> >> >
+> >> >To the mhi tree?  
+> >> 
+> >> Yes. It has been applied to mhi-next branch. That patch applied
+> >> before posting this patch .
+> >
+> >In this tree? 
+> >https://git.kernel.org/pub/scm/linux/kernel/git/mani/mhi.git/
+> Yes. 
+> >That'd be unacceptable for a drivers/net/ patch.
+> >But I don't see such a patch here. 
+> >Just patches to drivers/bus/mhi/
+> The patch for drivers/net still in a reviewed status, but not applied.
+> MHI side has inform NET side about the apply status. 
+> https://lore.kernel.org/netdev/176361751471.6039.14437856360980124388.b4-ty@oss.qualcomm.com/
 > 
-> [...]
+> So currently it shall be pending in NET side?
 
-Here is the summary with links:
-  - [net-next,01/14] net: factor-out _sk_charge() helper
-    https://git.kernel.org/netdev/net-next/c/075b19c211df
-  - [net-next,02/14] mptcp: factor-out cgroup data inherit helper
-    https://git.kernel.org/netdev/net-next/c/bd92dd8e03d9
-  - [net-next,03/14] mptcp: grafting MPJ subflow earlier
-    https://git.kernel.org/netdev/net-next/c/e777a7fb06b1
-  - [net-next,04/14] mptcp: fix memcg accounting for passive sockets
-    https://git.kernel.org/netdev/net-next/c/68c7c3867145
-  - [net-next,05/14] mptcp: cleanup fallback data fin reception
-    https://git.kernel.org/netdev/net-next/c/85f22b8e1e9d
-  - [net-next,06/14] mptcp: cleanup fallback dummy mapping generation
-    https://git.kernel.org/netdev/net-next/c/2834f8edd74d
-  - [net-next,07/14] mptcp: ensure the kernel PM does not take action too late
-    https://git.kernel.org/netdev/net-next/c/2ca1b8926fda
-  - [net-next,08/14] mptcp: do not miss early first subflow close event notification
-    https://git.kernel.org/netdev/net-next/c/48a395605e08
-  - [net-next,09/14] mptcp: make mptcp_destroy_common() static
-    https://git.kernel.org/netdev/net-next/c/9d8295960300
-  - [net-next,10/14] mptcp: drop the __mptcp_data_ready() helper
-    https://git.kernel.org/netdev/net-next/c/38a4a469c850
-  - [net-next,11/14] mptcp: handle first subflow closing consistently
-    https://git.kernel.org/netdev/net-next/c/0eeb372deebc
-  - [net-next,12/14] mptcp: borrow forward memory from subflow
-    https://git.kernel.org/netdev/net-next/c/9db5b3cec4ec
-  - [net-next,13/14] mptcp: introduce mptcp-level backlog
-    https://git.kernel.org/netdev/net-next/c/ee458a3f314e
-  - [net-next,14/14] mptcp: leverage the backlog for RX packet processing
-    https://git.kernel.org/netdev/net-next/c/6228efe0cc01
+This patch has no build dependency with the MHI patch that I applied to
+mhi-next [1]. So please rebase on top of net/net-next and repost, so that this
+one can go through netdev for v6.19.
 
-You are awesome, thank you!
+- Mani
+
+[1] https://lore.kernel.org/all/20251119105615.48295-2-slark_xiao@163.com
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+மணிவண்ணன் சதாசிவம்
 
