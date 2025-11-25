@@ -1,283 +1,212 @@
-Return-Path: <netdev+bounces-241496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46E55C84819
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:35:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4AF0C848D3
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:47:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 087B13A338C
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 10:35:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A15184E8C8F
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 10:46:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 260C230499D;
-	Tue, 25 Nov 2025 10:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 054D831327A;
+	Tue, 25 Nov 2025 10:46:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ndk00SN4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ghL6TZui";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="oHZjatak"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f100.google.com (mail-vs1-f100.google.com [209.85.217.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7BC266B6C
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 10:35:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1AB26ED46
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 10:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764066942; cv=none; b=ER3kCq8QneD0mJBa2YsR4qGNyqK1olKRbHbe4W8pJZ6pXEwCWYG9U12QRZNW41Ls9cCBOe+gTRqJJYph5rJ31B6FRwqbh7stxf+X9ElvdmTbZET0TclC53QF8n6XN+QtvV6ANbSKxWhpl3kPrjBNfWaT8Fsl8nazdurnzOLUMRM=
+	t=1764067616; cv=none; b=ucY0D+oN5AqnkYOxlIjqMgOcUe9Q8AiBUrZnyxSLLwREf5zh5TaTP3zTCCsrVlazch6XowIU3QY/2yTjTt3EKR683Ax6MljvjrR5mzyQyMhgZwkapIDJ8Xu+7vNbXmTzkcKbGNfFJGTOy7A75egeYBaIIvjx2jjNR5pCfsWt6jQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764066942; c=relaxed/simple;
-	bh=+vWl1NFT9GyAoSpTzVVvHN+V8qRL0QEyI6KgwlpV9/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lKeQ0Fubbt63wW7GoXDARSxl6UJWtBV6r27OA52DYXh2+jcQFfnzUeImMO0WD5z2zyzuRmshbldf5IeB/+eh5p3JB7vRGMI3x8XbG2sIC05Vb9RR4H/PTfxfMQoQPkL3xTto3J9sZ/tHUUNnZh+zzb2YXm4v2JW4dV5WMcYwWDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ndk00SN4; arc=none smtp.client-ip=209.85.217.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vs1-f100.google.com with SMTP id ada2fe7eead31-5dd6fbe5091so2293534137.1
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 02:35:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764066939; x=1764671739;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xiqx+T7ETIaXmkrexUn4F/7oBDDgHHWDBd9QJeL+hsk=;
-        b=sRGMSU6mUCVMzDcX4x4yJsOytoz0ks9I+OdiAK+wvhn3uLYKZQZAJhAtjFggPCfpAV
-         nFA1CgzwW0uuRJjgmXNnamzlsVbNn3QbrZ4plqwPXEp1PhBe6QOCuUnNRaVsEWsEI7H/
-         uMNXs3TuiHp95/fU0XkxNH2vdsReb5GTvD/lmjxIFwgD28RTVFeLGc6NtmCw9R0Ba5ra
-         u+cOTPmK0TQZfLpyESQ132bL5w7LfPMDPcD9M+2p+tR/A+RmXBRc/khFx40RxbfFbZNo
-         soTnwoKiUyhKxnBsx5XvKaF64dgW+2M7aV9MzlGOLbx62qktFZbPxTuTNpxujvyVkk91
-         +92A==
-X-Forwarded-Encrypted: i=1; AJvYcCXudON7Hdxxtcegw/HM2P2eyzs+0BRHCSFjFnMMZFZBDs5vIDijMTVFygmc/DBwZ3+T4afJ3SM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwinGFAuBsYKLf17gkPQYGdfzT8UIwOh+wW3cl6h5uUkGhcHpic
-	F9G9U4Mg7aNSp27+frRIUHdLFkY4xbisuvB2rx0STdsJkPtoJ4F1tNosJXYupy99coT5kzlMyou
-	UJNTEf1p/C5WBw21QWk5eNzKnJ+Hm0hskhuAuzZWMbVaiOvt1/E8NPiIVJ3sw7TKAZ523r1cTwt
-	yNjM9f1GE/MW1EXTDlgMcQRMxQ/Fdy3ZRq4rgCXYVMhTHb8/5gt40bpe3WhGfQ4RVHA7pdEcmWa
-	8MPQIiNnA==
-X-Gm-Gg: ASbGncshV5D1LgewW46T07DgRabqkzJEksGSoPAuo+0A1uD9zuHKR/9X9b9d9WSdfj8
-	fB7+uScJtawNCOSw4lqeggxS9xLUYlLokwmEJVEWd+yQ8kpmQYncs0kyoROhmZrjfzXqpYn0nF5
-	7H0glJrPpzTMzcnc07fc/194fgyhZF6eh7FEMx9orsG/uL4CLxTFv11zXCINC45kEVEKy58Vat9
-	0atrGVhZg17oEPY7l1NSmCdjjvYpV0kPuA5dDA6UvwUN6TG3aTaeBuJCymvaMkw4PXRycE0proe
-	sUG7ii9rFG5s+GRyW6rYPfSjrofdKGLmydt35eHzvfwgGVF9tZ4KjeG0hlTbND5CjY5R53j4Nql
-	WuaCTM40INoO2CwKDaBXXaa2eGfuenhq+ZWYTwuJtQctU9y44AdPNv5/IyJICPYDaisKNaeNPWL
-	hGSLjQCmavelSz3E6/92UpdcYhe5l3j1cWPKJWza10
-X-Google-Smtp-Source: AGHT+IFDW4ue1OzdfqPS1QMUfu033Mg7KhE/zdVS4RvTelSAjqk8UcjsFvKucU1jZamqoowHi20EHYXpo6Wg
-X-Received: by 2002:a05:6102:441b:b0:5df:b5d4:e45d with SMTP id ada2fe7eead31-5e1de43f9ccmr4500035137.33.1764066939279;
-        Tue, 25 Nov 2025 02:35:39 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-1.dlp.protect.broadcom.com. [144.49.247.1])
-        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-5e1bdde361esm2029013137.5.2025.11.25.02.35.39
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 25 Nov 2025 02:35:39 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3438744f11bso12555856a91.2
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 02:35:38 -0800 (PST)
+	s=arc-20240116; t=1764067616; c=relaxed/simple;
+	bh=Ud7pIRA4Z7Jly5QQoFb0O3a9JDsvXMxAHCyvat1w0jg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K64TtZJq4qghBHW22IjPMNgy66E3mOxx/p90BBnMgk/m6wAnAmLaniFfZHLgdxInvZkSno3LpVZF38muZ2Frym1bnuTtCeat8v7UDU73FWirV+pOZR58QtqEfz/rfz0m9DzWf80lxYI3YE++Ovoz52jULxB9AB70ko/fX+ShUXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ghL6TZui; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=oHZjatak; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764067613;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OYAYVMsEi+5ZQ8xw/QuX6lwcbwAan3VcdA5SJfLfCOE=;
+	b=ghL6TZuivVoTNuDCLWiN+PfQCL3hHsDiZ2/hTRI9uDm5vq5+Bnej51ctDu0or2n/8R0OGf
+	V/VuLhxiP15uAG8xI8tEN8cozt0GZ1EQCnspVQ8VQ9qVg7YUj5cPXLeRvS6Jf3jktPABGg
+	iJj01/3u+99dm+N/mhNXzPRl0B6Uhv0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-135-6X1SZ6_ZP-mFlz4B22nmRQ-1; Tue, 25 Nov 2025 05:46:51 -0500
+X-MC-Unique: 6X1SZ6_ZP-mFlz4B22nmRQ-1
+X-Mimecast-MFC-AGG-ID: 6X1SZ6_ZP-mFlz4B22nmRQ_1764067610
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4779981523fso55197255e9.2
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 02:46:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1764066938; x=1764671738; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xiqx+T7ETIaXmkrexUn4F/7oBDDgHHWDBd9QJeL+hsk=;
-        b=Ndk00SN4BL2ZjwHv99h/0IUH47i5B6iLOmiqJuVohrn/GXmSRq4ypJCLMsgiEMlcI+
-         Wc37Dnm07DIvs8wuyEMmM4L+9N8wJsVTVjzEMwApK/V0ZGqJJFSgK+lY8MP0REfhbwZk
-         aXDmjXv2ycBzg+BN2UjplwaEqqCLIkQ7yr6/o=
-X-Forwarded-Encrypted: i=1; AJvYcCV+JIzBo08BU2Ou/9bYK0rEdV/sJqYn/iya1RY84DtcSheUncgnGq2j/W++oLiewu91xQ+Y+/I=@vger.kernel.org
-X-Received: by 2002:a17:90b:4b09:b0:341:6164:c27d with SMTP id 98e67ed59e1d1-34733e2d49amr13893785a91.3.1764066937688;
-        Tue, 25 Nov 2025 02:35:37 -0800 (PST)
-X-Received: by 2002:a17:90b:4b09:b0:341:6164:c27d with SMTP id
- 98e67ed59e1d1-34733e2d49amr13893758a91.3.1764066937206; Tue, 25 Nov 2025
- 02:35:37 -0800 (PST)
+        d=redhat.com; s=google; t=1764067610; x=1764672410; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OYAYVMsEi+5ZQ8xw/QuX6lwcbwAan3VcdA5SJfLfCOE=;
+        b=oHZjatakuPeV9Qp6wNj7qNB1rm6l/8BHxa84ez2rXOUc2LDeUx9HDBdPNCKB4ybKIV
+         bmBWs1Y2Y2O6+DAYYlDz/51mm9sRItFL7bXvGNWPPDci5WEu8XQVBt9LiqEzKwCkDut6
+         Lmc3aK8sddHkX73etYNi8db2vBj4kYbU6p8DuWjQrLu7ehtOptml6GkCIhfCzFUb+DlM
+         IBQdsUNcQaL0Pxg0mYVMh86+8PBoT9Sp4+6ozpTKxQXtEJOtIz9u9LnUJxeFKqYpYqLQ
+         FFumIpWl3T8rc4Izdq77rVa3pmG/DSBmLuc++VXnrcficEbfmPoOHrQs41/seCQsh/ab
+         SGSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764067610; x=1764672410;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OYAYVMsEi+5ZQ8xw/QuX6lwcbwAan3VcdA5SJfLfCOE=;
+        b=eEoJcJEy5+XhtM9R0jUMbOy9d4zuL0ijzHqdtkt842YrqxER3AABTpm3Odg6SdyTMg
+         os0TZJ9SfJSMLR4NjDbVtFlyxqPpUv6QIpEeqAayCjOntIYunlEWj+3dxB7a8+fi98AV
+         0RMcRLHz4tlKV5dgK+G1jcatRDEExu+OPsIBwajH+QSzC9PAAxNDbCsJAuOoTfiHRZme
+         a2hdL00Plg1SgKLng+ybeQNdz5z4vCyusjrontI0dgI/1JaAChoTta/WaYZIkQR8YsP+
+         fcejX3sEJg9AMhlAbFoWVay/UmKsNRKYaw7S90NlvkpzZwmjjCw9rKzhqr1CEMyIfUUm
+         pj8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXPNRf+NZKcpduYbLZfLMx8nwfLB6Tm1ryA+7zrOvZXaNTFyC4XJXzberpDL/UM8DfKJ7FFFuc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzByyDKf+R5jlsjhPSfSnT9+6sOgqNgxt72KUulB58WxJOtJStD
+	RkTnbN8JzzHyBNPKMYev49iSUxgchEbt+HFgbGev9+1wy5FQ5uaRyiSSXd0BDx9ORYQ4XTU0RP7
+	J9RRv8POloGzFrSOd5uo8TPkIhysWmFwVg/WyvPIn2G1RpFbdGbVbSVS9SA==
+X-Gm-Gg: ASbGncvfRvKarWqUVjWHp5wE3Vhqu60Eq1KitGFviUOKyDe9BuBRtx8woTUg1oihe+R
+	WA09iOMPtkO68c5rFlbLdbVpljQj5Z8xuPUWD0emPc4YVod6wKZpDHwxWp2fYZn6uBHmqDdx310
+	d6PDHjAhMnTTDrceBUzj47HqxeBRzWD+JzB7uoWJz75otCuJayVaCgf1EK69NO/u2U2egLpp6d/
+	6yFbvqxpiyo7lz3WmSsbXBszxMvmvF9mrBQ8ESH6k88AnoeYIEWZyLeFGwB3NX2iUYh1WYxBF7J
+	dthok1/kIpZrIrB+mdzmVTRlTvj0PLkwBP+cy2SUaoEkRF4lcE5JPvsnf1lzOMO8hDCtllwkrw0
+	n0pkUT5EDjGtDnQ==
+X-Received: by 2002:a05:600c:3ba4:b0:477:95a0:fe95 with SMTP id 5b1f17b1804b1-477c1123ae7mr218159455e9.24.1764067610095;
+        Tue, 25 Nov 2025 02:46:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEAJfWhKgd09T2car/i+8ldH3Cwh2rfeHteEUcaudCDaxCulu+WwtnB46ubUTkQ9KQ4y6UHUw==
+X-Received: by 2002:a05:600c:3ba4:b0:477:95a0:fe95 with SMTP id 5b1f17b1804b1-477c1123ae7mr218158975e9.24.1764067609714;
+        Tue, 25 Nov 2025 02:46:49 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.153.231])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fd8e54sm34315468f8f.40.2025.11.25.02.46.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Nov 2025 02:46:48 -0800 (PST)
+Message-ID: <ea2ce128-537a-4718-aa70-d9192cfb94b8@redhat.com>
+Date: Tue, 25 Nov 2025 11:46:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251117171136.128193-1-siva.kallam@broadcom.com>
- <20251117171136.128193-5-siva.kallam@broadcom.com> <aSSMpzADtbAOBU2r@horms.kernel.org>
-In-Reply-To: <aSSMpzADtbAOBU2r@horms.kernel.org>
-From: Siva Reddy Kallam <siva.kallam@broadcom.com>
-Date: Tue, 25 Nov 2025 16:05:25 +0530
-X-Gm-Features: AWmQ_blS7u7UyAuIQ-l6ny2AVjnw2tcjbryGMQeY27S4GES7zcK-SqNQt3RgJUI
-Message-ID: <CAMet4B55Usiq25oFOPMY6O_A9PUBgM3a8_pEWfbzt49DdaUtag@mail.gmail.com>
-Subject: Re: [PATCH v3 4/8] RDMA/bng_re: Allocate required memory resources
- for Firmware channel
-To: Simon Horman <horms@kernel.org>
-Cc: leonro@nvidia.com, jgg@nvidia.com, linux-rdma@vger.kernel.org, 
-	netdev@vger.kernel.org, vikas.gupta@broadcom.com, selvin.xavier@broadcom.com, 
-	anand.subramanian@broadcom.com, usman.ansari@broadcom.com
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000350f82064468d7f3"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v07 8/9] hinic3: Add netdev notifier interfaces
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Markus Elfring <Markus.Elfring@web.de>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ luosifu <luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>,
+ Shen Chenyang <shenchenyang1@hisilicon.com>,
+ Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+ Shi Jing <shijing34@huawei.com>, Luo Yang <luoyang82@h-partners.com>,
+ Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi <gur.stavi@huawei.com>
+References: <cover.1763555878.git.zhuyikai1@h-partners.com>
+ <ff986bcacacf77b6d86a241139eedee9fce4145c.1763555878.git.zhuyikai1@h-partners.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <ff986bcacacf77b6d86a241139eedee9fce4145c.1763555878.git.zhuyikai1@h-partners.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---000000000000350f82064468d7f3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 11/19/25 1:43 PM, Fan Gong wrote:
+> Add netdev notifier interfaces.
+> As we stipulate that netdevices with a vlan depth greater than 1
+> should disable the offload feature, Layer 1 vlan netdevices use
+> notifier to modify vlan_features.
 
-On Mon, Nov 24, 2025 at 10:19=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
-ote:
->
-> On Mon, Nov 17, 2025 at 05:11:22PM +0000, Siva Reddy Kallam wrote:
->
-> ...
->
-> > +static void bng_re_dev_uninit(struct bng_re_dev *rdev)
-> > +{
-> > +     bng_re_free_rcfw_channel(&rdev->rcfw);
-> > +     bng_re_destroy_chip_ctx(rdev);
-> > +     if (test_and_clear_bit(BNG_RE_FLAG_NETDEV_REGISTERED, &rdev->flag=
-s))
-> > +             bnge_unregister_dev(rdev->aux_dev);
-> > +}
-> > +
-> >  static int bng_re_dev_init(struct bng_re_dev *rdev)
-> >  {
-> >       int rc;
-> > @@ -170,14 +184,18 @@ static int bng_re_dev_init(struct bng_re_dev *rde=
-v)
-> >
-> >       bng_re_query_hwrm_version(rdev);
-> >
-> > +     rc =3D bng_re_alloc_fw_channel(&rdev->bng_res, &rdev->rcfw);
-> > +     if (rc) {
-> > +             ibdev_err(&rdev->ibdev,
-> > +                       "Failed to allocate RCFW Channel: %#x\n", rc);
-> > +             goto fail;
-> > +     }
-> > +
-> >       return 0;
-> > -}
-> >
-> > -static void bng_re_dev_uninit(struct bng_re_dev *rdev)
-> > -{
-> > -     bng_re_destroy_chip_ctx(rdev);
-> > -     if (test_and_clear_bit(BNG_RE_FLAG_NETDEV_REGISTERED, &rdev->flag=
-s))
-> > -             bnge_unregister_dev(rdev->aux_dev);
-> > +fail:
-> > +     bng_re_dev_uninit(rdev);
-> > +     return rc;
->
-> Hi Siva,
->
-> IMHO, I think that it would best to handle unwind using a ladder
-> of goto statements, that reverse the order of the incremental
-> initialisation performed by this function.
->
-> As is, this may not have much effect, other than seeming to duplicate
-> bng_re_dev_uninit(). But I think that as bng_re_dev_init() grows,
-> as it does in this patch-set, this will lead to clearer error handling
-> (and ideally a lower chance of bugs later).
->
-> I would also suggest that it would be best to name the label
-> after what tit does, rather than somewhat general name 'fail'.
+As mentioned by Jakub in the previous revision, the net stack can send
+packets with multiple stacked vlans. You need to implement
+ndo_features_check(), check for the problematic packet layout there and
+ev return a smaller features check excluding the relevant offloads.
 
-Thanks Simon. I will send a patch to fix this.
->
-> >  }
-> >
-> >  static int bng_re_add_device(struct auxiliary_device *adev)
->
-> ...
+> +static u16 hinic3_get_vlan_depth(struct net_device *netdev)
+> +{
+> +	u16 vlan_depth = 0;
+> +
+> +#if defined(CONFIG_VLAN_8021Q) || defined(CONFIG_VLAN_8021Q_MODULE)
+> +	while (is_vlan_dev(netdev)) {
+> +		netdev = vlan_dev_priv(netdev)->real_dev;
+> +		vlan_depth++;
+> +	}
+> +#endif
+> +	return vlan_depth;
 
---000000000000350f82064468d7f3
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+AFAICS the above can return any number >=
+HINIC3_MAX_VLAN_DEPTH_OFFLOAD_SUPPORT ...
 
-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
-fyIFUZVWSBcxHWtNNVK4Oi0mqSJut0p/SwfLg6IMaVBU9VdXgVmw35CgcX/9B1ITmih041Oz+Qyo
-wTULsXik3lHJuyhYevN9h4259CoDPt+tpaykVaqa4luUmGv8k3F6aC4+fZl83ywHGVun9fBVk/GE
-2hmynyIEon1w6Me72fdjaPht4V1tbZBu/76zGxBiBFc13nAKU0dYrvIGPgKN9j0HDuOVC7UhhdTq
-Gw+wN3sPJk9D2VtNAzNGw0sa/eJF1wQiBy4RVYG9r0MCAwEAAaOCAdwwggHYMA4GA1UdDwEB/wQE
-AwIFoDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDov
-L3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5Bggr
-BgEFBQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUG
-A1UdIAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUF
-BwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDag
-NKAyhjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwIwYD
-VR0RBBwwGoEYc2l2YS5rYWxsYW1AYnJvYWRjb20uY29tMBMGA1UdJQQMMAoGCCsGAQUFBwMEMB8G
-A1UdIwQYMBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1UdDgQWBBTNBMIvX7vsfxNYWor1Hxth
-tmNmHzANBgkqhkiG9w0BAQsFAAOCAgEAJDoTbZO7LdV1ut7GZK90O0jIsqSEJT1CqxcFnoWsIoxV
-i/YuVL61y6Pm+Twv6/qzkLprsYs7SNIf/JfosIRPSFz6S7Yuq9sGXNKpdPyCaALMbWtPQDwdNhT7
-uJgZw5Rq9FQRZgAJNC9+HBtCdnzIW5GUmw040YclUNHFEKDfycJMKjSPez044QcDoN0T2mIzOM8O
-Dt+sJTrC1YJ6+HI6F2H6igZUL79y9qYUz8FNshyITihg/1VBVCiMU9WRK3tNfUlLFzLBuTTr245d
-xMh/e75vypL3qDSF4UG6Mpy++Plsnjfwab70KFFyCvNwB2hT1g/y8MLgslfxJl6fCyGdWqOmUB2J
-QiuiqbSy8mlnucIPuGWQqqt8VBQjxKYIHdjXtkvw0uVvOHUC2QJWfGWDhMncxF5LFoaRPer4tlXJ
-b5zmz9Mn+uQPQQLYUqYzs+EvX1REmGLGUuzlaNwAC20+8CVPY2EkU1mjU78+aW5Zbb2MyjQrLc6J
-5IdkekEtk+xjpM992MC/aNMTpWIWhorGq8NmPXbuoUZf9MSi7WrVCaO69ro68FXPTErr/e13lJ/5
-GAkwcxdTC+YVPVa/xpdHyAFW03/Oow/7fV8qjy6PAWfqEV97D2Tspc2aEFkbeuFS6UkPRy1OKjGc
-/IUTSY4h9roe7Bh1ecqtofP9XL8E88sxggJXMIICUwIBATBiMFIxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBD
-QSAyMDIzAgxoOshI0IGR+aGCCXkwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIGsy
-w2F4mOw3DK0ZjaT/ngF2ba5d1J3JmCaH3N0Y3iKZMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEw
-HAYJKoZIhvcNAQkFMQ8XDTI1MTEyNTEwMzUzOFowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQME
-ASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJ
-YIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAHoRP1XGP7wxrAFhPy8soP0jNoiYSkAgFttXzQpd
-ym1Z8bkZ0aUEj4/CAJg70nW+jHi9ZbTAPP+NGbuPh8K+cyXzZG9ORulhcvsnFHdTnYEe1wKYjPty
-b+4gKtgCJjP+oZNcc4qgTKt/gdvd+L9Q7NzwYbnHLsyQ1v/bLESgCKloStAqplr4kPlPTDpAQdxJ
-8LqpHwnPtnY9WA9MAML7nZQjSc1EOYTWJqF4gr+KeiYEE1bDhEjrM+iHxogtPSyBRhTT5r+8xPII
-eEg5u+2291TLkuQQJlzpo8Ym+E6zKAkFYYLI3kgzW1HNkL5FGqh3rEL0Eso80xISA21e3g7XxG4=
---000000000000350f82064468d7f3--
+> +}
+> +
+> +static int hinic3_netdev_event(struct notifier_block *notifier,
+> +			       unsigned long event, void *ptr)
+> +{
+> +	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(ndev);
+> +	u16 vlan_depth;
+> +
+> +	if (!is_vlan_dev(ndev))
+> +		return NOTIFY_DONE;
+> +
+> +	netdev_hold(ndev, &nic_dev->tracker, GFP_ATOMIC);
+> +
+> +	switch (event) {
+> +	case NETDEV_REGISTER:
+> +		vlan_depth = hinic3_get_vlan_depth(ndev);
+> +		if (vlan_depth == HINIC3_MAX_VLAN_DEPTH_OFFLOAD_SUPPORT)
+
+... so here you should use '>='> +			ndev->vlan_features &=
+(~HINIC3_VLAN_CLEAR_OFFLOAD);
+> +
+> +		break;
+> +
+> +	default:
+> +		break;
+> +	}
+> +
+> +	netdev_put(ndev, &nic_dev->tracker);
+> +
+> +	return NOTIFY_DONE;
+> +}
+> +
+> +static struct notifier_block hinic3_netdev_notifier = {
+> +	.notifier_call = hinic3_netdev_event,
+> +};
+> +
+>  static void init_intr_coal_param(struct net_device *netdev)
+>  {
+>  	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> @@ -309,6 +364,36 @@ static int hinic3_set_default_hw_feature(struct net_device *netdev)
+>  	return 0;
+>  }
+>  
+> +static void hinic3_register_notifier(struct net_device *netdev)
+> +{
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> +	int err;
+> +
+> +	mutex_lock(&hinic3_netdev_notifiers_mutex);
+> +	hinic3_netdev_notifiers_ref_cnt++;
+> +	if (hinic3_netdev_notifiers_ref_cnt == 1) {
+
+Why do you need this notifier accounting? Instead you should be able to
+call hinic3_register_notifier() only once.
+
+/P
+
 
