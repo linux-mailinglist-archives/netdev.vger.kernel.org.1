@@ -1,94 +1,88 @@
-Return-Path: <netdev+bounces-241372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B388BC83337
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:16:27 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 061A9C83344
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:17:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A45904E4403
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:16:26 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 78B8234C73D
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B35B1A83F9;
-	Tue, 25 Nov 2025 03:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C621DF246;
+	Tue, 25 Nov 2025 03:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b="1c6MYFxx"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="J1981Hlv"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-of-o58.zoho.eu (sender-of-o58.zoho.eu [136.143.169.58])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8462A1C7;
-	Tue, 25 Nov 2025 03:16:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764040569; cv=pass; b=L9X2mTueuFHyW2R5BpauhixbpTbEFl6iGr/rmXodYvyvmx1dl3ZGq908IoNIg84nN4/87UBKLbohR4y7u+bLaWFfgssFo4x9rpsIlyTvSvsm7+sv2N5i0D3umOMH5kqhR6Bs9nAtfdTdIx2Bl8QuozyLBijIpM2AkSyCaKZ4E/4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764040569; c=relaxed/simple;
-	bh=LiKsBfIhITdIfEkwcRpX6Uvyc9RO9g/3brcIusyI/wc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=Quz54de9FcfVOYL7yfBH9usp2K6Ex9mOeccj8LdBzO45/7Lyy7qGsxOSiul2UcrTO8IxmdG2eOGrlfNp1ndWqGsHw7Kpep5fUHHOSuFcmJ4ilAFH+OaCm5NC0uZ05JdMJ2Wi8ias2TMZvigbKHDHci1uAZjIdM9c54ijmmDfrLo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net; spf=pass smtp.mailfrom=azey.net; dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b=1c6MYFxx; arc=pass smtp.client-ip=136.143.169.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=azey.net
-ARC-Seal: i=1; a=rsa-sha256; t=1764040527; cv=none; 
-	d=zohomail.eu; s=zohoarc; 
-	b=PkkBaYckwjWegrpu/fgcL57VzAkvnNI349e1lKiYi2Wh3Dqkk48wbp06UawBPfgB6mbczr5vKRHKW1VQXHmqWKQcfWF94Dz6WjXfyZ3AvIUE1QpGkMUTOCbJt61xzfDiYDyPA2c9zN1QRkj7Hcvphl/Zuw17siQcCRCdKmPHRis=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1764040527; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=6KFyFUeue7vnoz79vdihPq5QsxgMrrMVUwU+A4GO7c4=; 
-	b=VPdYEQpvZvfU41AJZFSCk+n2TAxSuQo/W5jBnVzmmOfXkloqGSYZ8GEznF/n12J/u6BOEVS0ntR1+38CA/wkbGYO8JS76dzYtNVmCwhNs55MmkssfegxXiIKVALqNBDvjSm/zwexKJNW3DrGu/mBQFHsr338qy/Jhmc7YIiPteI=
-ARC-Authentication-Results: i=1; mx.zohomail.eu;
-	dkim=pass  header.i=azey.net;
-	spf=pass  smtp.mailfrom=me@azey.net;
-	dmarc=pass header.from=<me@azey.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1764040527;
-	s=zmail; d=azey.net; i=me@azey.net;
-	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=6KFyFUeue7vnoz79vdihPq5QsxgMrrMVUwU+A4GO7c4=;
-	b=1c6MYFxxPQBLUeJQw4tHSdxBAZH3ijaW7YP4MZWyrnbCW01PE4vM6msv7z8NItwg
-	1Q/omBCqB7LKHEZ/YeHPslqM7tf3JOIRXk3buHV9S6qWk6K2qmimprsp4jLf9qJLNvd
-	JY2jrvkudqGAeWcDGqiXZ5mB+Jy3xhVlfES1OhuQ=
-Received: from mail.zoho.eu by mx.zoho.eu
-	with SMTP id 1764040525649893.4123499982568; Tue, 25 Nov 2025 04:15:25 +0100 (CET)
-Date: Tue, 25 Nov 2025 04:15:25 +0100
-From: azey <me@azey.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774573BB40;
+	Tue, 25 Nov 2025 03:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764040618; cv=none; b=NOOeRkVnrrUBc+GbSk56toO7p/TsGuV6teIvo9HUYbQvmUjg1dzLeXAz3stqkm7NP6BW/GxgUVqIUINRNCmxe7qJ19EIbvq82Qmilrzt+ZZY6M4ytu8PKxKUsNualzYUe6vaEqBRRUrEdXz+ZkuX5HlNqIKGR/W3kB6d1Mk6QJU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764040618; c=relaxed/simple;
+	bh=Eb+CsBLKRF4bX6YeAxTeNsqj12I40NF7LuYhu0I8WpQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=UL4R0EnURog5Yqjmlx8kLqbcVMqWceuaeiIexY5ymDFUDqJENPRoi7/xZ6oCOPcpvAZq8nFYsKDEBcKI9+V9y2RcOmToWj2ipeRlE32ylmwNoBqJ29D4V57Ov4nmxaXxFVrx8CoHv/geJb1suA95N0lG2YOyKTnPgrfwDU4VaVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=J1981Hlv reason="signature verification failed"; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=kduv4pqZzHOHB0/LoCeVpOKG+nGLj211R3Y/2LFcRZE=; b=J
+	1981Hlvlc6IXj3R/5ZjG+AWK1FCQaJddFSDcWEMnJ4hIIlAzeVy4yIuuR/SVwYLJ
+	edKbL+9brtvpU/ReveZlZ8g8TDDMvY+5ISXACdWtQp6Llj6zkBObDuL6gAO9hZlR
+	f5RcV8Eb3uZBLZ73bFGSsfnCNJyweZzI13uNxcGRkk=
+Received: from slark_xiao$163.com ( [112.97.86.199] ) by
+ ajax-webmail-wmsvr-40-145 (Coremail) ; Tue, 25 Nov 2025 11:16:06 +0800
+ (CST)
+Date: Tue, 25 Nov 2025 11:16:06 +0800 (CST)
+From: "Slark Xiao" <slark_xiao@163.com>
 To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: "David Ahern" <dsahern@kernel.org>,
-	"nicolasdichtel" <nicolas.dichtel@6wind.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Eric Dumazet" <edumazet@google.com>,
-	"Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
-	"netdev" <netdev@vger.kernel.org>,
-	"linux-kernel" <linux-kernel@vger.kernel.org>
-Message-ID: <19ab902473c.cef7bda2449598.3788324713972830782@azey.net>
-In-Reply-To: <20251124190044.22959874@kernel.org>
-References: <3k3facg5fiajqlpntjqf76cfc6vlijytmhblau2f2rdstiez2o@um2qmvus4a6b> <20251124190044.22959874@kernel.org>
-Subject: Re: [PATCH v2] net/ipv6: allow device-only routes via the multipath
- API
+Cc: "Loic Poulain" <loic.poulain@oss.qualcomm.com>, ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	mani@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re:Re: [PATCH] net: wwan: mhi: Keep modem name match with Foxconn
+ T99W640
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
+ 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
+In-Reply-To: <20251124191226.5c4efa14@kernel.org>
+References: <20251120114115.344284-1-slark_xiao@163.com>
+ <20251121180827.708ef7cd@kicinski-fedora-PF5CM1Y0>
+ <605b720.2853.19ab3b330e3.Coremail.slark_xiao@163.com>
+ <CAFEp6-07uXzDdXrw=A5dxhNc81LN3e-UXyw9ht7iAJr44M9A4A@mail.gmail.com>
+ <623c5da7.9de2.19ab555133e.Coremail.slark_xiao@163.com>
+ <20251124184219.0a34e86e@kernel.org>
+ <33bc243d.33c6.19ab8fa1cb4.Coremail.slark_xiao@163.com>
+ <20251124191226.5c4efa14@kernel.org>
+X-NTES-SC: AL_Qu2dBvyfv00t4CScZOkfmk8Sg+84W8K3v/0v1YVQOpF8jCvr1wwvfEV5A37r3OS2MCGAlzmbfQFAyedmcIpqVZgHlfznoG2ORH+gm+duRxYKrQ==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Importance: Medium
-User-Agent: Zoho Mail
-X-Mailer: Zoho Mail
+Message-ID: <2188324.36f7.19ab902e6b5.Coremail.slark_xiao@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:kSgvCgD3F9N2HyVpJCUqAA--.4069W
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbCvxaI7GklH3YtcwAA32
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-On 2025-11-25 04:00:44 +0100  Jakub Kicinski <kuba@kernel.org> wrote:
-> On Mon, 24 Nov 2025 14:52:45 +0100 azey wrote:
-> > Signed-off-by: azey <me@azey.net>
-> 
-> We need real/legal names because licenses are a legal matter.
-> -- 
-> pw-bot: cr
-
-I was under the impression this was clarified in d4563201f33a
-("Documentation: simplify and clarify DCO contribution example
-language") to not be the case, are there different rules for this
-subsystem? I think it qualifies as a "known identity" since I use
-the alias basically everywhere (github, website, GPG, email, etc).
+CkF0IDIwMjUtMTEtMjUgMTE6MTI6MjYsICJKYWt1YiBLaWNpbnNraSIgPGt1YmFAa2VybmVsLm9y
+Zz4gd3JvdGU6Cj5PbiBUdWUsIDI1IE5vdiAyMDI1IDExOjA2OjMwICswODAwIChDU1QpIFNsYXJr
+IFhpYW8gd3JvdGU6Cj4+ID5BcmUgeW91IHNheWluZyB5b3UgaGF2ZSB0byBjb25jdXJyZW50IHN1
+Ym1pc3Npb25zIGNoYW5naW5nIG9uZSBmaWxlPwo+PiA+SWYgeWVzIHBsZWFzZSByZXBvc3QgdGhl
+bSBhcyBhIHNlcmllcy4gIAo+PiBPbmUgcGF0Y2ggb2YgcHJldmlvdXMgc2VyaWVzIGhhcyBiZWVu
+IGFwcGxpZWQuIAo+Cj5UbyB0aGUgbWhpIHRyZWU/CgpZZXMuIEl0IGhhcyBiZWVuIGFwcGxpZWQg
+dG8gbWhpLW5leHQgYnJhbmNoLiBUaGF0IHBhdGNoIGFwcGxpZWQgYmVmb3JlIHBvc3RpbmcgdGhp
+cwpwYXRjaCAuCg==
 
