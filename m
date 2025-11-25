@@ -1,180 +1,148 @@
-Return-Path: <netdev+bounces-241517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C9EFC84D36
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 12:55:28 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1E4C84D75
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 12:58:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A84334E3A92
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:55:10 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D45C534E020
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D7431691E;
-	Tue, 25 Nov 2025 11:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cjbR12Vx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5168E3164B5;
+	Tue, 25 Nov 2025 11:57:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from localhost.localdomain (unknown [147.136.157.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FCC31619E;
-	Tue, 25 Nov 2025 11:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C468314A89;
+	Tue, 25 Nov 2025 11:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.136.157.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764071709; cv=none; b=VfcDzdKqFxAEq6Xzb0LU+/WvMrGtO4rFHWG1P/OMmFb7ptfbsvWcT4ue0CZ7DKeWwECJHi2gTEFvdoHHCoir25LDdtjvPhHl2ABK1g3JNQXrmvWwc91ERjxunXRm/58eI3Ezkz0L6wFyzUOUEEKuyxEFemiO+jyZpBGvJstMV70=
+	t=1764071875; cv=none; b=ZkhkBk3E9qMrqWyD/5esgHcPnQCAS+Zs6/vcyp5Io5s9x3dUc87Emn5UNNCV1K0ZirR3y8vJgRkeeTqgxcyy+Vdg5sLM4hA0sxYeVzU8mUyr2a0IenHND+Ey4pQUSLIaU76G5NtwZvW8RoLCQE0FUyohnvvVZofZ5ZMUFWoThWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764071709; c=relaxed/simple;
-	bh=I6TQ4S0UvxcnLt/xLkNRycww4xLPRWth3MjNv1Ty4pQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rRFafIB3Cjw20wrpU1U9dZe4fVx6OVC3hI4dwnaBaw7s01hMloT0bSmf1ndly8JKQhkYEZunq123g9N0a4jWqn19NdvfHXvXCQWhg3qu7hOrMKB+qAY4Ijk4eEoBKd9OtIDlIXtdAfEJHODr9FqBB4eF7wkPZ7FgdzgUi8mDzqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cjbR12Vx; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AP85Lru025998;
-	Tue, 25 Nov 2025 11:54:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=2pxgtr
-	DWmy7eTaSMnEPoviLmQdhhfwo9tIlruuWMXUA=; b=cjbR12Vx6Z+pU+Tuhevt65
-	c9dW2YL+cblYfTERImzQc7IIBb+WLVYoRIcoPe8kaXhIjjuEAfGGrXhy0ortbIVx
-	jwlznSjOeHl01Sfw3sxxxoKMEfDTfEpmdjh71acpgh8A3fD9xfvcYENL3m1PvEsH
-	os6Au+azMQfR6zwCr+CHDOTZomuY+UfLnOrYYJOeb/vS3TEZymGOl2EfYLyJLvUm
-	tgERr178hDz8F+O6npcmXWuQlCHVR6EakSllxMjTStHVsa7x8x15dK1UCM+jlImm
-	Cu6jo0141cyCLbWVwugAsjwNLPYbWz3J1+Lyaw0t62lC0lHtSAVdnySIYhBSP73Q
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak4phwd40-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Nov 2025 11:54:41 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5APBbCdH010950;
-	Tue, 25 Nov 2025 11:54:40 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak4phwd3y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Nov 2025 11:54:40 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5APBieds030755;
-	Tue, 25 Nov 2025 11:54:39 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4akqgsbuqw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 25 Nov 2025 11:54:39 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5APBscio24838408
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 25 Nov 2025 11:54:39 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B7A7A58043;
-	Tue, 25 Nov 2025 11:54:38 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E2C7F58059;
-	Tue, 25 Nov 2025 11:54:30 +0000 (GMT)
-Received: from [9.109.198.169] (unknown [9.109.198.169])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 25 Nov 2025 11:54:30 +0000 (GMT)
-Message-ID: <c6e88bc3-8cc9-4503-a472-7692468ac218@linux.ibm.com>
-Date: Tue, 25 Nov 2025 17:24:29 +0530
+	s=arc-20240116; t=1764071875; c=relaxed/simple;
+	bh=h+0zY3hYZrpAB5Wqkh5NLThM1vTJvoHZwkygu2+9/5U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KpB+W8pfdd4KObgIgTlQdUUHgwKIRcDv48Ql/PmzL5AMJX9eb9eGnB9N9qz2tvXgvFxzFYWLqOd9iZLMNoLnGnquRIOf1K2BBVQf4QFD1eM03R9lT3hHg4rO7KOnGLqRboLPSM6amXiwRpoNFcFOsRyTNomyIBoPAuACXZx2rjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=none smtp.mailfrom=localhost.localdomain; arc=none smtp.client-ip=147.136.157.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=localhost.localdomain
+Received: by localhost.localdomain (Postfix, from userid 1007)
+	id 65EBA8B2A0B; Tue, 25 Nov 2025 19:57:46 +0800 (+08)
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Michal Luczaj <mhal@rbox.co>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Cong Wang <cong.wang@bytedance.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next v4 0/3] bpf: Fix FIONREAD and copied_seq issues
+Date: Tue, 25 Nov 2025 19:56:37 +0800
+Message-ID: <20251125115709.249440-1-jiayuan.chen@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC blktests fix PATCH] tcp: use GFP_ATOMIC in tcp_disconnect
-To: Christoph Hellwig <hch@lst.de>
-Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        "kbusch@kernel.org" <kbusch@kernel.org>, "hare@suse.de" <hare@suse.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "dlemoal@kernel.org" <dlemoal@kernel.org>,
-        "wagi@kernel.org"
- <wagi@kernel.org>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "yukuai3@huawei.com" <yukuai3@huawei.com>,
-        "xni@redhat.com"
- <xni@redhat.com>,
-        "linan122@huawei.com" <linan122@huawei.com>,
-        "bmarzins@redhat.com" <bmarzins@redhat.com>,
-        "john.g.garry@oracle.com" <john.g.garry@oracle.com>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "ncardwell@google.com" <ncardwell@google.com>,
-        "kuniyu@google.com" <kuniyu@google.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "dsahern@kernel.org" <dsahern@kernel.org>,
-        "kuba@kernel.org"
- <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "horms@kernel.org" <horms@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20251125061142.18094-1-ckulkarnilinux@gmail.com>
- <aSVMXYCiEGpETx-X@infradead.org>
- <ea2958c9-4571-4169-8060-6456892e6b15@nvidia.com>
- <0caa9d00-3f69-4ade-b93b-eea307fe6f72@linux.ibm.com>
- <20251125112111.GA22545@lst.de>
- <234bab6c-6d31-4c93-8a69-5b3687ba9b85@linux.ibm.com>
- <20251125113009.GA22874@lst.de>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20251125113009.GA22874@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIyMDAxNiBTYWx0ZWRfX+gB8hFGESNa+
- rLSSySu64nxEfDrxZYQGlQRTgJYxxtncZQw0OF8Rlk0+ZjvrJJO4FsugSBSRvtSjZlOZLGxhvw/
- CLEQxhJSL1ura0xsKksySA0ttslXptDO0+EQbVyfOKVW6JZAwSvPv1eRhGcblGSfUiW20afdTQz
- wi/LRZw8gTtSz4pYNKvHCs3q1BcDYIZ0kFi7FPHuF3miOwrLrIDRKWfYmH4leQyQjgNJOG0AuFW
- HbBbtvXLeI4SeX6LqgKkrbZ6XjIkO/rkdBtW1WL6fD0rUUo2N17Asb+N17XToHQjEF52ne5hqka
- HkR8+X6IiIs4tCvJao7GBfkJ46lcyqfyb9gNjkNTw3bnhfmJ11x4mvxxVTpE9eqjV9hpLgyvpyK
- Ij9UiGqf4fxSrP5fMhQzsKuRQbSCUA==
-X-Proofpoint-ORIG-GUID: AEQPSXV2ydGNTqwVbmTapqeQVKAF554X
-X-Authority-Analysis: v=2.4 cv=CcYFJbrl c=1 sm=1 tr=0 ts=69259901 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=Dx6jXT7FOQMUIc5gBgQA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: AyOLiBIDLwXvYgj-rDV-m897x1pRDSHV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-25_02,2025-11-24_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 clxscore=1015 adultscore=0 spamscore=0
- phishscore=0 priorityscore=1501 bulkscore=0 impostorscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
- definitions=main-2511220016
+Content-Transfer-Encoding: 8bit
 
+syzkaller reported a bug [1] where a socket using sockmap, after being
+unloaded, exposed incorrect copied_seq calculation. The selftest I
+provided can be used to reproduce the issue reported by syzkaller.
 
+TCP recvmsg seq # bug 2: copied E92C873, seq E68D125, rcvnxt E7CEB7C, fl 40
+WARNING: CPU: 1 PID: 5997 at net/ipv4/tcp.c:2724 tcp_recvmsg_locked+0xb2f/0x2910 net/ipv4/tcp.c:2724
+Call Trace:
+ <TASK>
+ receive_fallback_to_copy net/ipv4/tcp.c:1968 [inline]
+ tcp_zerocopy_receive+0x131a/0x2120 net/ipv4/tcp.c:2200
+ do_tcp_getsockopt+0xe28/0x26c0 net/ipv4/tcp.c:4713
+ tcp_getsockopt+0xdf/0x100 net/ipv4/tcp.c:4812
+ do_sock_getsockopt+0x34d/0x440 net/socket.c:2421
+ __sys_getsockopt+0x12f/0x260 net/socket.c:2450
+ __do_sys_getsockopt net/socket.c:2457 [inline]
+ __se_sys_getsockopt net/socket.c:2454 [inline]
+ __x64_sys_getsockopt+0xbd/0x160 net/socket.c:2454
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-On 11/25/25 5:00 PM, Christoph Hellwig wrote:
-> On Tue, Nov 25, 2025 at 04:58:32PM +0530, Nilay Shroff wrote:
->> >From git history, I see that was added to avoid memory reclaim  to avoid
->> possible circular locking dependency. This commit 83e1226b0ee2 ("nvme-tcp:
->> fix possible circular locking when deleting a controller under memory
->> pressure") adds it.
-> 
-> I suspect this was intended to be noio, and we should just switch to
-> that.
-> 
-Yeah, I agree that this should be changed to noio. However, it seems that
-this alone may not be sufficient to fix the lockdep splat reported here.
-Since the real work of fput() might be deferred to another thread, using a noio
-scope in this path may not have the intended effect and could end up being
-redundant. 
+A sockmap socket maintains its own receive queue (ingress_msg) which may
+contain data from either its own protocol stack or forwarded from other
+sockets.
 
-That said, I noticed another fix from Chaitanya [1], where fput() is replaced
-with __fput_sync(). With that change in place, combining the noio scope adjustment
-with the switch to __fput_sync() should indeed address the lockdep issue. Given
-that both problems have very similar lockdep signatures, it might make sense to
-merge these two changes into a single fix.
+                                                     FD1:read()
+                                                     --  FD1->copied_seq++
+                                                         |  [read data]
+                                                         |
+                                [enqueue data]           v
+                  [sockmap]     -> ingress to self ->  ingress_msg queue
+FD1 native stack  ------>                                 ^
+-- FD1->rcv_nxt++               -> redirect to other      | [enqueue data]
+                                       |                  |
+                                       |             ingress to FD1
+                                       v                  ^
+                                      ...                 |  [sockmap]
+                                                     FD2 native stack
 
-[1] https://lore.kernel.org/all/20251125005950.41046-1-ckulkarnilinux@gmail.com/
+The issue occurs when reading from ingress_msg: we update tp->copied_seq
+by default, but if the data comes from other sockets (not the socket's
+own protocol stack), tcp->rcv_nxt remains unchanged. Later, when
+converting back to a native socket, reads may fail as copied_seq could
+be significantly larger than rcv_nxt.
 
-Thanks,
---Nilay
+Additionally, FIONREAD calculation based on copied_seq and rcv_nxt is
+insufficient for sockmap sockets, requiring separate field tracking.
+
+[1] https://syzkaller.appspot.com/bug?extid=06dbd397158ec0ea4983
+
+---
+
+v1 -> v4: Use skmsg.sk instead of extending BPF_F_XXX macro and fix CI
+          failure reported by CI
+v1: https://lore.kernel.org/bpf/20251117110736.293040-1-jiayuan.chen@linux.dev/
+
+Jiayuan Chen (3):
+  bpf, sockmap: Fix incorrect copied_seq calculation
+  bpf, sockmap: Fix FIONREAD for sockmap
+  bpf, selftest: Add tests for FIONREAD and copied_seq
+
+ include/linux/skmsg.h                         |  58 ++++-
+ net/core/skmsg.c                              |  28 ++-
+ net/ipv4/tcp_bpf.c                            |  26 ++-
+ net/ipv4/udp_bpf.c                            |  25 ++-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  | 203 +++++++++++++++++-
+ .../bpf/progs/test_sockmap_pass_prog.c        |   8 +
+ 6 files changed, 331 insertions(+), 17 deletions(-)
+
+-- 
+2.43.0
+
 
