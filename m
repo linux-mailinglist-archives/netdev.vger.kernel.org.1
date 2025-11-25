@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-241367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB14AC832F2
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:11:00 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48DF6C832F8
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:11:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ACD714E1EB2
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:10:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 43B0E4E2850
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:11:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A5A1DC997;
-	Tue, 25 Nov 2025 03:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E411F099C;
+	Tue, 25 Nov 2025 03:10:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z5J1Ioue"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="homdYzWj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAA23FFD;
-	Tue, 25 Nov 2025 03:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1844E1E9B35;
+	Tue, 25 Nov 2025 03:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764040257; cv=none; b=giqkZN1t7JLnRu6Wje8+4KZ7hC/IVk9Zh+mTOE3JDWz1pCKbuGkvWx4oaPaWB8I2VD/f4R2ce7U6l61X0FpEgnick3P5R9db3XMLB5JkrY7xvDqSKU3v/C01l2RJHvvrbc4LQdy6QTw1M++KttGE0CBXH+JoD9E1gSTzeyiPyBY=
+	t=1764040259; cv=none; b=jWU9cwY8bsSsRfgWb2HZyJhJsUOMT/YV/wyeaSc6VNvNMN+uUPJo/b1jZ5OMAnkHLEn7ddSlHKdNarAH/+cGyxU/dxBjhRWCndNVZQyK1wHoRKgtI1l/4DFlgpPUGhjSLWrBKqVyQiwnaLrmYd8kRMD/pRTKDKA/I2Z9iVFK65U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764040257; c=relaxed/simple;
-	bh=c3dQl9qBpkyZCPX218+UL6dMyDicas++BTXTRzI8EEE=;
+	s=arc-20240116; t=1764040259; c=relaxed/simple;
+	bh=9yTLMeCE6/5L2p8IaQYF/6/kfLa5biw61uFeneajF/I=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=k4FOno0I5m+MkEajpNFAeQY8mozppJcLyaB8PKHWreNFAuHAw0vFOHKZ5k54lbxkwjbMBP9UCGFp3RlWbBsbn+ByaW+dOyCQtiKtG0elQ3Kx/rtyU6RSq5us+uGErEvBPORV4W11q/51iS/56kObr/MDMm43RSCzCGLkRONNXus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z5J1Ioue; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33A34C4CEF1;
-	Tue, 25 Nov 2025 03:10:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=nTfGkQdl+XrASef4IN3C8vnjRjplHTrKbd4gyPnlo+TJKR0/BZelVZPwH2NvS8lj2H9RAP75TEXB6c4+RwLuDR89cad2ra9S7+5QFsTVxWlodsVASt+fe8QYM2oyVB+ei/W55ueDLy508cxoQ/bsVD6WB39J7fxBHAchg48zSa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=homdYzWj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A887CC4CEF1;
+	Tue, 25 Nov 2025 03:10:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764040257;
-	bh=c3dQl9qBpkyZCPX218+UL6dMyDicas++BTXTRzI8EEE=;
+	s=k20201202; t=1764040258;
+	bh=9yTLMeCE6/5L2p8IaQYF/6/kfLa5biw61uFeneajF/I=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Z5J1IouegTcba91Wsv0m+5DIBk3TUuAoRz0jfOEv6xACP1ko5rZ3gDJbVSX5QeRPD
-	 EwAB5R82mNPNLVmkBcvS5duiKt0taK7oehvIazEnuzUA3ae7YzFQ2X6ueODId7sTmp
-	 mcDgA+j5DFhUB9m9Nl2NiHcgqyAoUYdsQML/V8rLSL/TZdoGheju0Shx/RYifpEdCa
-	 svfzYWdHR6QKUSVx3UEro5E8+Qy8kWeRaZcrIhCMr+ElOsxhQdX4BDQVxX7wQtelj+
-	 Cyjd1HejyyeTYcjDoDXFuQqYaHJGbDYVrIvBIijrCuhdiOVBfdi9vl+57A4xGuyJmJ
-	 Uz3lN9mwig0bw==
+	b=homdYzWj5mRV/DLvH/Nc3ngLqF6GCQDCG6QNksYomnbwFcp7ELKwgDC9pxF6Naz2y
+	 GIdanGOEAXccbK5lVzhIGCyGZKuFMh7Tn0+lPY8CUIqZq5pKJYPWiQBwBPAnxmfCY2
+	 wgsktSTw8ojQFdsHLHasJPdzt/fyukdnt48u95l+pt/RH2qkV/rfP7gEGWHhy4iAVs
+	 xaz2+szqXWQ73mgVaZnmZznBwT2OVcks3BLJWaEwHIE1WHdefNK2W9SDUGva/GLd6q
+	 E5KL7knNZ81RBoZxgu15J74FzMYmiybHjruL9p+XDKacrlNErrwyaKP431XuzeV90+
+	 QH8q3/r2PNwJA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B473A8A3CA;
-	Tue, 25 Nov 2025 03:10:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF9B3A8A3CA;
+	Tue, 25 Nov 2025 03:10:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,51 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] selftests: hw-net: toeplitz: read config
- from
- the NIC directly
+Subject: Re: [PATCH net-next] i40e: delete a stray tab
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176404021999.167368.18155495583479444469.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Nov 2025 03:10:19 +0000
-References: <20251121040259.3647749-1-kuba@kernel.org>
-In-Reply-To: <20251121040259.3647749-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- willemb@google.com, petrm@nvidia.com, dw@davidwei.uk, shuah@kernel.org,
- linux-kselftest@vger.kernel.org
+ <176404022124.167368.5823229144968982813.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Nov 2025 03:10:21 +0000
+References: <aSBqjtA8oF25G1OG@stanley.mountain>
+In-Reply-To: <aSBqjtA8oF25G1OG@stanley.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: mheib@redhat.com, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 20 Nov 2025 20:02:54 -0800 you wrote:
-> First patch here tries to auto-disable building the iouring sample.
-> Our CI will still run the iouring test(s), of course, but it looks
-> like the liburing updates aren't very quick in distroes and having
-> to hack around it when developing unrelated tests is a bit annoying.
+On Fri, 21 Nov 2025 16:35:10 +0300 you wrote:
+> This return statement is indented one tab too far.  Delete a tab.
 > 
-> Remaining 4 patches iron out running the Toeplitz hash test against
-> real NICs. I tested mlx5, bnxt and fbnic, they all pass now.
-> I switched to using YNL directly in the C code, can't see a reason
-> to get the info in Python and pass it to C via argv. The old code
-> likely did this because it predates YNL.
-> 
-> [...]
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net-next,1/5] selftests: hw-net: auto-disable building the iouring C code
-    https://git.kernel.org/netdev/net-next/c/f81171fecd0c
-  - [net-next,2/5] selftests: hw-net: toeplitz: make sure NICs have pure Toeplitz configured
-    https://git.kernel.org/netdev/net-next/c/27c512af190e
-  - [net-next,3/5] selftests: hw-net: toeplitz: read the RSS key directly from C
-    https://git.kernel.org/netdev/net-next/c/aa91dbf3eda2
-  - [net-next,4/5] selftests: hw-net: toeplitz: read indirection table from the device
-    https://git.kernel.org/netdev/net-next/c/c0105ffc5056
-  - [net-next,5/5] selftests: hw-net: toeplitz: give the test up to 4 seconds
-    https://git.kernel.org/netdev/net-next/c/5aadc155849e
+  - [net-next] i40e: delete a stray tab
+    https://git.kernel.org/netdev/net-next/c/ef0b78b5b6cb
 
 You are awesome, thank you!
 -- 
