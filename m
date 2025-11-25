@@ -1,136 +1,111 @@
-Return-Path: <netdev+bounces-241573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 397B6C85F09
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:21:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE847C85F4C
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:24:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 069494E262D
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:21:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5A903B4215
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38FF222B584;
-	Tue, 25 Nov 2025 16:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OrrWBpEn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73F523B63E;
+	Tue, 25 Nov 2025 16:22:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FB8221F24
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C1E238176;
+	Tue, 25 Nov 2025 16:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764087672; cv=none; b=uCl0znM5/9+EIyxGbYkNXnpaQdmK0DNxEv3wWRkgiivLPPS9vQq8gyCbsRdsl/Hv1Y3L9HdvkLCBeQiYVqxOhKMs01gPuotw0PDcCG45S1hTyOzrmsyg6O8/UYrhcYCJ5SPMR8GnBbOFzlxY+wsdZsul/jNty4TM+0L9SiFY13g=
+	t=1764087754; cv=none; b=UMR4jVopEH/iKTLc+V/2gbLi3lSQ65DgMlYWAvsCV3BkOiaSbEaexAd0MEQydv0gfAeoMg0m3tFolKwHIC1mHYZFydXI6b/4hpNC0MwbiEUOgkcOaRZzKpfByxqIFeSq8bqujh+a5dVIVHucJPF2QuY+I3hLJZqpbSd2s0eNB8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764087672; c=relaxed/simple;
-	bh=1bIw1A2QtCjzztIE3Q6so7JPCvttUNWYX23SVcGvk2c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Sv4cDjGOFpkkhIlstgmxbLasEKFLl1bx5xAlrOJqKsx3S3xS+8aQhYqfNLaDSAckdSKHAhQnJK0ZYJM1BIMspMVa0fTxFLr67zmeC1NSS6CN4C8bdBsw1qlXkc8WfA4uzBcX9w8ykgYrHwNv0Z7Yu/GoUKU1fqKWCWtcGh6TI30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=OrrWBpEn; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-297e264528aso61187325ad.2
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 08:21:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1764087665; x=1764692465; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IoNUCPpkEhFwVICHMikfiUoeVdx3sH7SM8PEs/6W0wI=;
-        b=OrrWBpEnmuxe5PN5fK7YrIOUDu6ZAdyCpnoyeFfsD/chzYQhBHIhYxDM1Yg8zmOK7l
-         RtQmor2chHgYl8bIE5VH72FHbFKsw8tfFWjvUZELFRlW9TAWm2FoYaUoCOXVf82W3RQ6
-         1N/CqKNEBLlkWUEPF+5grcdWVnjUjf8zEWA0NsX8+DwejYfvtZQeEBMjtnpMqCS1wy23
-         UW9emEriILIa/0auB6DUfOcKpqT+OOABRZK66bKNJ5yDpzn/AqMQBVR6/ihRJsdaKoo9
-         0x5FTwrllMd0tdZ5nNOqsrVDQ3KeUkevspV6yCo8nBua/n7bVsHhO708h0jvf+th/duY
-         BXvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764087665; x=1764692465;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IoNUCPpkEhFwVICHMikfiUoeVdx3sH7SM8PEs/6W0wI=;
-        b=L8tFt1aWXhZsKf1L75ZT9uhAiu9hipgmNBagj9mNYJq9fj6BY6+FqpA0dKGPiHuTkA
-         gSyqj9YfaXcr1LUQI+BdAlD3aMyxNa7rBkVAosJJOGhDzViH1uXg1k03DoXy7kc1nXjg
-         APVq7/uq0FOFDhGPHaVIZ/dRAlRxD+QZWYh9PMLCs0mS6EoY44Nmo2NsybwFx0cCxYd1
-         CF3sBj7vZIVLtO7ZbOYDUA065gIJMgcSFJjtUyJOguF1gZkibAdY6VaJhovwxbpNQyXq
-         UBpvOFHGIe8yKa6J/eUdN7mmKshZsSPaw7zE8oqf11/Lw+LaNxmhBgEOegZRuQwxc+5F
-         ammQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWVVve4I7/2XEoKBc4uQQmHgEZdMj7TpK5CV+XGS7OPF5cZPuoN8Vr0J1/3Zt8XFXV0Kc3hS+0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOMCHlE7wC35Jz59z6l0B+XEVMldIQo0TK1Q9bF3NRzxBcaA3c
-	511MTOEQqiW/py9ICHSg0byquo9b723kN6bLTnGnusUAhbQs5xfHxHHcHvdEP3sUK94YkC4iJsV
-	GK3omS1aDGGw9RIufE5nFwPp2TO7bdbZdI73uyokL
-X-Gm-Gg: ASbGncvxApz/bi2zfJh60HU73o+Xt8JTlee3R3V36AfXqQyonzrl1j2ouyFnsSLnZZE
-	RLTnYQheGRXA1caiQ4KCfLMT55OZZCFaoaTEgJ/CwTcT9Sxtz6Cye7xD1qrUJ2hWMNAe2P0w0sb
-	n9hsr/GCAitEGTPBAZXxHIokFeDaJyiVFSwCEHt5VMAsI1xD+lT8fWQpP/emKGcyktXJLxX+v0y
-	ehBRVxB6JRhJvIW0qKAGvjTE7jr7FkK303YT9lTTVAngPY0XPG18/e5M6mFAXwAajfDPSw/mYBv
-	834=
-X-Google-Smtp-Source: AGHT+IEqYHw3y+hE6sCCuItIMhSMd5GEV/Qlf0Xba0ruWhe57oBl6Z8BuS7Qy4FL/Hno/bVF4d+QwQ07Zb0O/h0YnB0=
-X-Received: by 2002:a17:90b:3bcc:b0:340:d578:f298 with SMTP id
- 98e67ed59e1d1-3475ebe6779mr3232207a91.8.1764087664749; Tue, 25 Nov 2025
- 08:21:04 -0800 (PST)
+	s=arc-20240116; t=1764087754; c=relaxed/simple;
+	bh=qB0xmOJ8kffWlzkOUo7IgIFlqKInbkNyJftYVwb7L5I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sou1UOXUuJ3WzPZ7fuAfMXp+4H75Wdq3EnxBV+S18TL/YQSo4pGEeX3zhgFP6dt0zVkXqsQ+Ic2rZfHCJdg0xBLBTTN7RaSaadPLddWOyKc9gR1MMwmxul7ltmvTqh7c7UpUxfp6/iUDBjbmV3Xq17gzNasi/LJVLC6/tsjzEpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf14.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay04.hostedemail.com (Postfix) with ESMTP id DD81C1A0281;
+	Tue, 25 Nov 2025 16:22:23 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf14.hostedemail.com (Postfix) with ESMTPA id 76A773D;
+	Tue, 25 Nov 2025 16:22:20 +0000 (UTC)
+Date: Tue, 25 Nov 2025 11:23:04 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Leon Hwang <leon.hwang@linux.dev>
+Cc: netdev@vger.kernel.org, hawk@kernel.org, ilias.apalodimas@linaro.org,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ kerneljasonxing@gmail.com, lance.yang@linux.dev, jiayuan.chen@linux.dev,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, Leon
+ Huang Fu <leon.huangfu@shopee.com>
+Subject: Re: [RFC PATCH net-next] page_pool: Add page_pool_release_stalled
+ tracepoint
+Message-ID: <20251125112304.493ea1ee@gandalf.local.home>
+In-Reply-To: <20251125082207.356075-1-leon.hwang@linux.dev>
+References: <20251125082207.356075-1-leon.hwang@linux.dev>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251124200825.241037-1-jhs@mojatatu.com> <20251124145115.30c01882@kernel.org>
-In-Reply-To: <20251124145115.30c01882@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 25 Nov 2025 11:20:52 -0500
-X-Gm-Features: AWmQ_bmceMgMhep1ASgFnT0l5nobal20EYCqDASNP9vJm51thzGo-NonZTmDJjE
-Message-ID: <CAM0EoM=jDt_CeCop82aH=Fch+4M9QawX4aQdKdiUCsdFzuC2rQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] net/sched: act_mirred: Fix infinite loop
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
-	dcaratti@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Server: rspamout07
+X-Rspamd-Queue-Id: 76A773D
+X-Stat-Signature: 8kiqc41gsj186tu5zn7dq8ht5stme3of
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX18DVnSu8qsB8YHNQi4IYFrBCWT3192d/DQ=
+X-HE-Tag: 1764087740-249652
+X-HE-Meta: U2FsdGVkX1/k/4FUUqfj/UNxaXdovF4iGJPv6Ni36yi0sbIdryDdf4W87NeY4Oi5QtfF18FvQQlEt/EwjABcDKPiz+PAhB9nUXG2FAjFPV8CpSWdDopJ4TSAU5eVKEBRRbXn/PpqNWH3LEAfzivrtixoS7gDU4coVaNncHOcEBYUFbrFKBsx2DMrilw/Gdox6i8TQG5xPsF7VuqyFDm2dIcOVkzl4jF+5GgQ7+y5GU8tT0BWUbtBW5g5ICOwzKwRKz4AX8Od4+oyNYqCfE/Ghftu63vIYIcWu3hh24V+AZe2ZPb1AWQS0AiqWDDej0xz
 
-On Mon, Nov 24, 2025 at 5:51=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 24 Nov 2025 15:08:24 -0500 Jamal Hadi Salim wrote:
-> > When doing multiport mirroring we dont detect infinite loops.
-> >
-> > Example (see the first accompanying tdc test):
-> > packet showing up on port0 ingress mirred redirect --> port1 egress
-> > packet showing up on port1 egress mirred redirect --> port0 ingress
-> >
-> > Example 2 (see the second accompanying tdc test)
-> > port0 egress --> port1 ingress --> port0 egress
-> >
-> > Fix this by remembering the source dev where mirred ran as opposed to
-> > destination/target dev
-> >
-> > Fixes: fe946a751d9b ("net/sched: act_mirred: add loop detection")
-> > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
->
-> Hm, this breaks net/fib_tests.sh:
->
-> # 23.80 [+0.00] IPv4 rp_filter tests
-> # 25.63 [+1.84]     TEST: rp_filter passes local packets                 =
-               [FAIL]
-> # 26.65 [+1.02]     TEST: rp_filter passes loopback packets              =
-               [FAIL]
->
-> https://netdev-3.bots.linux.dev/vmksft-net/results/400301/10-fib-tests-sh=
-/stdout
->
-> Not making a statement on whether the fix itself is acceptable
-> but if it is we gotta fix that test too..
+On Tue, 25 Nov 2025 16:22:07 +0800
+Leon Hwang <leon.hwang@linux.dev> wrote:
 
-Sigh. I will look into it later.
-Note: Fixing this (and the netem loop issue) would have been trivial
-if we had those two skb ttl fields that were taken away.
-The human hours spent trying to detect and prevent infinite loops!
+> +TRACE_EVENT(page_pool_release_stalled,
+> +
+> +	TP_PROTO(const struct page_pool *pool, int inflight, int sec),
+> +
+> +	TP_ARGS(pool, inflight, sec),
+> +
+> +	TP_STRUCT__entry(
+> +		__field(const struct page_pool *, pool)
+> +		__field(int,			  inflight)
+> +		__field(int,			  sec)
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__entry->pool		= pool;
+> +		__entry->inflight	= inflight;
+> +		__entry->sec		= sec;
+> +	),
+> +
+> +	TP_printk("page_pool=%p id=%d inflight=%d sec=%d",
+> +		  __entry->pool, __entry->pool->user.id, __entry->inflight, __entry->sec)
 
-cheers,
-jamal
+You can't do: __entry->pool->user.id
 
-> --
-> pw-bot: cr
+The TP_fast_assign() is executed when the tracepoint is triggered. The
+TP_printk() is executed when the trace is read. That can happen seconds,
+minutes, hours, days, even months after the pool was assigned.
+
+That __entry->pool can very well be freed a long time ago.
+
+If you need the id, you need to record it in the TP_fast_assign():
+
+	__entry->id		= pool->user.id
+
+and print that.
+
+-- Steve
+
+
+> +);
+> +
 
