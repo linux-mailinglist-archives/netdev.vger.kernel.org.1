@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-241368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48DF6C832F8
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:11:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35797C83307
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 04:11:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 43B0E4E2850
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:11:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E06453AE456
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 03:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E411F099C;
-	Tue, 25 Nov 2025 03:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0146F207A0B;
+	Tue, 25 Nov 2025 03:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="homdYzWj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c7VhwAXg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1844E1E9B35;
-	Tue, 25 Nov 2025 03:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C703B1FFC48;
+	Tue, 25 Nov 2025 03:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764040259; cv=none; b=jWU9cwY8bsSsRfgWb2HZyJhJsUOMT/YV/wyeaSc6VNvNMN+uUPJo/b1jZ5OMAnkHLEn7ddSlHKdNarAH/+cGyxU/dxBjhRWCndNVZQyK1wHoRKgtI1l/4DFlgpPUGhjSLWrBKqVyQiwnaLrmYd8kRMD/pRTKDKA/I2Z9iVFK65U=
+	t=1764040260; cv=none; b=AJQ0KFE81fVFf6/Mw+C3HuWdbTfsFCYn2/ibXMXhrQ9yK59TK8h4yUSaFRiuQQUTdOB5/FTOYTJ5t+o0Q0LDZbePxWhISwhjujne+SZjmKg6BQsyPUexTX3trTPne5yb4sGEgB2hlrGGxZ7jUmseBpPCIVb32/lGnbMPsta/3Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764040259; c=relaxed/simple;
-	bh=9yTLMeCE6/5L2p8IaQYF/6/kfLa5biw61uFeneajF/I=;
+	s=arc-20240116; t=1764040260; c=relaxed/simple;
+	bh=W7o467FUJCAvte668Za4SMtl5MroyU0t0GpTDeOW8BY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nTfGkQdl+XrASef4IN3C8vnjRjplHTrKbd4gyPnlo+TJKR0/BZelVZPwH2NvS8lj2H9RAP75TEXB6c4+RwLuDR89cad2ra9S7+5QFsTVxWlodsVASt+fe8QYM2oyVB+ei/W55ueDLy508cxoQ/bsVD6WB39J7fxBHAchg48zSa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=homdYzWj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A887CC4CEF1;
-	Tue, 25 Nov 2025 03:10:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=knD8/ftTNIAd5Vpg4nxIGJ7bzvJ6arNGmg+i3HfhqWwlXSB5+r0fH8C3FgfsCClEKF+swsBl3e7dVZWE9i3i/4RfrbXNLV0xT0a1KEOnZye30GGNPEl96bEFpKkyfy2fw2XGItksyY3CodPT1HHd1bncv7YFYNq4AIP/9/cNpAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c7VhwAXg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 503D7C4CEF1;
+	Tue, 25 Nov 2025 03:11:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764040258;
-	bh=9yTLMeCE6/5L2p8IaQYF/6/kfLa5biw61uFeneajF/I=;
+	s=k20201202; t=1764040260;
+	bh=W7o467FUJCAvte668Za4SMtl5MroyU0t0GpTDeOW8BY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=homdYzWj5mRV/DLvH/Nc3ngLqF6GCQDCG6QNksYomnbwFcp7ELKwgDC9pxF6Naz2y
-	 GIdanGOEAXccbK5lVzhIGCyGZKuFMh7Tn0+lPY8CUIqZq5pKJYPWiQBwBPAnxmfCY2
-	 wgsktSTw8ojQFdsHLHasJPdzt/fyukdnt48u95l+pt/RH2qkV/rfP7gEGWHhy4iAVs
-	 xaz2+szqXWQ73mgVaZnmZznBwT2OVcks3BLJWaEwHIE1WHdefNK2W9SDUGva/GLd6q
-	 E5KL7knNZ81RBoZxgu15J74FzMYmiybHjruL9p+XDKacrlNErrwyaKP431XuzeV90+
-	 QH8q3/r2PNwJA==
+	b=c7VhwAXgdA2DHFHEcWtyvrjtNxRZPWA/9Y0vumvXxN/ealXAGegyzdmtIIazAm4ar
+	 gKX9nWw20Q9Ugej0X0w1AsY0pi4zDR6VX9EIDUgfYbnNBIIlsoEvT5yZDnSXcChMn0
+	 o3m/95F/pla4ovYOn1yJftT39utcTaP2IAnVaFgg16MGuCN+eAfCGy76mqm5QB1GFv
+	 m2lEIMyT55QfrDYTqnrk2iSCRxi/gmEDvfk89+FGupcCCiPlRzKkE0T1ARczOlHhmw
+	 MF9OQLkIwwe7X307QsfaN1ILA+vtjWS2rLZn0fyfjhjXJMKADhVj/E9oJX+5hlpI3/
+	 XnTxcZXbkqbnA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF9B3A8A3CA;
-	Tue, 25 Nov 2025 03:10:22 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E853A8A3CA;
+	Tue, 25 Nov 2025 03:10:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] i40e: delete a stray tab
+Subject: Re: [PATCH net-next] selftests: netconsole: ensure required log level
+ is set on netcons_basic
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176404022124.167368.5823229144968982813.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Nov 2025 03:10:21 +0000
-References: <aSBqjtA8oF25G1OG@stanley.mountain>
-In-Reply-To: <aSBqjtA8oF25G1OG@stanley.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: mheib@redhat.com, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+ <176404022275.167368.10236479114735000178.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Nov 2025 03:10:22 +0000
+References: <20251121-netcons-basic-loglevel-v1-1-577f8586159c@gmail.com>
+In-Reply-To: <20251121-netcons-basic-loglevel-v1-1-577f8586159c@gmail.com>
+To: Andre Carvalho <asantostc@gmail.com>
+Cc: leitao@debian.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 21 Nov 2025 16:35:10 +0300 you wrote:
-> This return statement is indented one tab too far.  Delete a tab.
+On Fri, 21 Nov 2025 15:00:22 +0000 you wrote:
+> This commit ensures that the required log level is set at the start of
+> the test iteration.
 > 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Part of the cleanup performed at the end of each test iteration resets
+> the log level (do_cleanup in lib_netcons.sh) to the values defined at the
+> time test script started. This may cause further test iterations to fail
+> if the default values are not sufficient.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] i40e: delete a stray tab
-    https://git.kernel.org/netdev/net-next/c/ef0b78b5b6cb
+  - [net-next] selftests: netconsole: ensure required log level is set on netcons_basic
+    https://git.kernel.org/netdev/net-next/c/00f3b3251814
 
 You are awesome, thank you!
 -- 
