@@ -1,157 +1,139 @@
-Return-Path: <netdev+bounces-241570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40DE0C85E87
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:15:39 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E9BEC85E8D
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:16:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 55E7034D59D
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:13:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 97A304E9765
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213C525A321;
-	Tue, 25 Nov 2025 16:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C4BC26ED48;
+	Tue, 25 Nov 2025 16:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="ebIH6JJ8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fMsAT1k+"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A436223E25B;
-	Tue, 25 Nov 2025 16:12:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BC32673B7
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764087173; cv=none; b=OA849cmkfX7NQHYGiXYTFY608kpF6hcjCViH3kIDgsM5VznCIeYYPkj4HAq5TqmYM6H/LRj4xPBTieVE+AC19WQbqLeueHNec8NRkfGabIsgulMCtqFm834G8U+UKJqmsdD0z8UsonqyAWozkVuUzpFZdPB+UQtqv0TuQQP7rGo=
+	t=1764087294; cv=none; b=uqyx5m4aXi/kfGzQWZ4VliQnlH1OxEJke9j3TFmPzZHjGTD6Xk7qUUAfoeddk1kMFHzF/M3T+TT2hfFV1bI4yaFPKyT3Tir8a1wBr/4HeNJsmcTMWP7LAumsaI+nvJqqiIvURqQGewB8IbkaeuWQnxbSMMbT+0wlwmtoQ0Ecdt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764087173; c=relaxed/simple;
-	bh=ZGjxfZY1T4WtOL0dofyXFExRpRAOlIYSMFqncdvu0is=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i/+/Y10rNfNUCtJVstyH+LP2JxyuYmGnGgJi95d36GvUSJ53cfMF0H1Ute+cqsItUX/Y7AThi5CYoSttO3D+OI/DuJDL2sazojmxQVWigdCVXA6gI10j4nm3Ejy70LsSaMEQoTKuizWBa99hsodS+nk9+ALesvuV0IzyiD4UfME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=ebIH6JJ8; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.248] ([129.217.186.248])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5APGCZCE009708
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 25 Nov 2025 17:12:36 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1764087156;
-	bh=ZGjxfZY1T4WtOL0dofyXFExRpRAOlIYSMFqncdvu0is=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=ebIH6JJ8Kw29xdqIAjIYB7wz6imBtZ6DEcQ9GdgbKlhikr6uFCLzwIKoDaM5Hgccs
-	 btqPaCkabwVfS5mCfG9dujRcPYNqIm8ytOQLC3lF6rphlsrLEqeMz9MA5OxaZxfHFj
-	 GJ8ajOFDQxzk+qwAUrEMT2cx0ORfQ+wJKsjFj4/w=
-Message-ID: <ce371d19-e69a-4d8e-a9a0-f3e20439a094@tu-dortmund.de>
-Date: Tue, 25 Nov 2025 17:12:35 +0100
+	s=arc-20240116; t=1764087294; c=relaxed/simple;
+	bh=R/c+flV58muomrMmtU53qd47lYbsYHti807vgioeMVc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=K4s1Raj3NljHtTGIsXavLqeeNsVSexN0H5OBHXtfuzR16oANwpSm3XuQUIYbzwxKYs/Rg4BAY8bfEJSGksnMdVmCwN7ZvD+SDMqumYcaiOG5/vuHzNrmXY4I32hB8k/uDBxg3GYOQEWa+vYpo0PDvYmY9h7AxkG98n1uVj4GDJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fMsAT1k+; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-78ab039ddb4so20777887b3.3
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 08:14:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764087292; x=1764692092; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eVmS8M56197Tx9BpV9mIjAisdUefrXPhKempHf2Fxfk=;
+        b=fMsAT1k+3mEr5Py5F/el9qw9cKM2qagZKs2tTCVv/VueKLLjvKAjegNM/GRvVsyXrB
+         64flQs4dyQdpRBG7SBOJbdlpWp7JU8MhHSuozqUiGdRtHMa7kMlklIXlMQOEcS+iy8hq
+         9CYe1Nv2jeWLBA347zvSk9iOG8l5qRIJcT66jD1AkcI6CeUTvF3pluGlIOiQtgdjps7t
+         cBNjZkP92yKMHTvFDqRSdczRBvwpDxdBIj0ub+PRleLli4ewA6IeoRAUXLvQiQ/Xo1Bu
+         w/3Ko+gXSgE6hXgUzz2jypjsjIUKpCMD36Pu9fEDiKnyU2SGRuWty1tc41Yf6K1t0Y4d
+         1s9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764087292; x=1764692092;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eVmS8M56197Tx9BpV9mIjAisdUefrXPhKempHf2Fxfk=;
+        b=sWy5lLI4EDrXwVKELlPuojxncAXAFMaLZaIEqArHx4UD1VmaXKgPeLo/hSD9jwXT0c
+         cXt/GHk6KBlYRn4BFbxDyJcGio3w6KDv5UqIjbfdfcXmUHkUe/4oCcLT/eDFpMH4Ki84
+         DhKW8paK+PwZd7Fy7GFEVufiypdGAB06n8iSeL1bqqGDOUeK3jc8dPqA0oy9lbBlAIKp
+         gcB+Zm140tI+xsORf/S4EFqs/TY+lUiimMWjSaYbhIZuJifCk58eJK8230v0+Y1pV4nF
+         bG9aAYhLAXAYRbYOvqXl8QAWel9nT/U9RiGhP03lWyWZcG6/HsveD0kgbLgU6g3cZjPi
+         Ht8w==
+X-Forwarded-Encrypted: i=1; AJvYcCWhbi2XsKH9+URnJ3QlfB4N+biHZetN/JENr1Nr5RjU9i4ECQVDxNoZXQVFrYB5riJ/l6J5h1E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB/LXa7EsxWltGjhcDNVVNvs2rmzoFZCxzll0V/bPwVom801IT
+	ArM2BsvaVlDbcJz23kGlKBn4pbzHNrsxd2p2gCxdZxM6kqHhf9t9wIxS
+X-Gm-Gg: ASbGncvQVzI0XSnDpN6kMxsVrvn4/Nt8ihCe/XG1pI6IF5+kiMjB/VoSnKE59r+FAUM
+	kv8ld5wt8LfGfeKCWi0qLoegnv0MiINw6V/ZtgGh8nAtPUacg8b7PjIc1Q3pc5cq8TUfU9yxg4Q
+	QjVozBLmNMNQA2d9swXCbf57Plz1DCc6iUa1uFqmU0WJ3SMwmyOZ6rYYfoy+sQk1B7mOcMj3I6/
+	1fxeXmQu6V6ezwg1+fnC18qzBse01ddtsgiUleCMe9bzILNRZ7pCvcNQZBs8lYrPJuzhgtz8hh1
+	/kAcKNhCzMzPHrh8vL7BD9SmLJc9T+xNdnevSww0r1guBqHWhMVbKp2c2M0ZT/IhBRJgc5XiMpt
+	o2VAIyUwAyhaz01hrjK4hYYeRPa7iedDOsuaSxI74sQsP5ZHPunDqQ5uvgzzVTearmMDzV0TZPR
+	xOVLLqhO3CliZzZ2AEFhAL+ZWmuvLZA024ADzA9DIScEOaO9WnuEmRd6k77Z2vGHbWHXw=
+X-Google-Smtp-Source: AGHT+IGns59BnaijYD+D80rBffETQUdnkBAppOq3jxlYqt7u9mCa/2kNEHDwIJ/hkYPW9Yqvb0kGlA==
+X-Received: by 2002:a05:690c:e1f:b0:786:4fd5:e5de with SMTP id 00721157ae682-78a8b56e89cmr138239077b3.67.1764087291625;
+        Tue, 25 Nov 2025 08:14:51 -0800 (PST)
+Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78a7995a738sm56901637b3.57.2025.11.25.08.14.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Nov 2025 08:14:51 -0800 (PST)
+Date: Tue, 25 Nov 2025 11:14:50 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jason Xing <kernelxing@tencent.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.2f2a6f8b32ff1@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.10c7edf4c3dd1@gmail.com>
+References: <20251124161324.16901-1-ankitkhushwaha.linux@gmail.com>
+ <willemdebruijn.kernel.6edcbeb29a45@gmail.com>
+ <aSSdH58ozNT-zWLM@fedora>
+ <willemdebruijn.kernel.1e69bae6de428@gmail.com>
+ <aSUxhmqXmIPSdbHm@fedora>
+ <willemdebruijn.kernel.10c7edf4c3dd1@gmail.com>
+Subject: Re: [PATCH] selftests/net: initialize char variable to null
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v6 2/8] ptr_ring: add helper to check if consume
- created space
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-        jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
- <20251120152914.1127975-3-simon.schippers@tu-dortmund.de>
- <20251125095650-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <20251125095650-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On 11/25/25 16:01, Michael S. Tsirkin wrote:
-> On Thu, Nov 20, 2025 at 04:29:07PM +0100, Simon Schippers wrote:
->> Add __ptr_ring_consume_created_space() to check whether the previous
->> __ptr_ring_consume() call successfully consumed an element and created
->> space in the ring buffer. This enables callers to conditionally notify
->> producers when space becomes available.
->>
->> The function is only valid immediately after a single consume operation
->> and should not be used after calling __ptr_ring_consume_batched().
->>
->> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->> Co-developed by: Jon Kohler <jon@nutanix.com>
->> Signed-off-by: Jon Kohler <jon@nutanix.com>
->> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->> ---
->>  include/linux/ptr_ring.h | 17 +++++++++++++++++
->>  1 file changed, 17 insertions(+)
->>
->> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
->> index da141cc8b075..76d6840b45a3 100644
->> --- a/include/linux/ptr_ring.h
->> +++ b/include/linux/ptr_ring.h
->> @@ -453,6 +453,23 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
->>  	return ret;
->>  }
->>  
->> +/*
->> + * Check if the previous consume operation created space
+Willem de Bruijn wrote:
+> Ankit Khushwaha wrote:
+> > On Mon, Nov 24, 2025 at 01:15:33PM -0500, Willem de Bruijn wrote:
+> > > This does not reproduce for me.
+> > > 
+> > > Can you share the full clang command that V=1 outputs, as well as the
+> > > output oof clang --version.
+> > 
+> > Hi Willem,
+> > I have added clang output in 
+> > https://gist.github.com/ankitkhushwaha/8e93e3d37917b3571a7ce0e9c9806f18
+> > 
+> > Thanks,
+> > Ankit
 > 
-> space?
+> I see. This is with clang-21. It did not trigger for me with clang-19.
 > 
-> what does this mean?
+> I was able to reproduce with Ubuntu 25.10.
 > 
->> + *
->> + * Returns true if the last call to __ptr_ring_consume() has created
->> + * space in the ring buffer (i.e., an element was consumed).
->> + *
->> + * Note: This function is only valid immediately after a single call to
->> + * __ptr_ring_consume(). If multiple calls to ptr_ring_consume*() have
->> + * been made, this check must be performed after each call individually.
->> + * Likewise, do not use this function after calling
->> + * __ptr_ring_consume_batched().
+> Okay, good to suppress these false positives with normal builds.
 > 
-> API-wise, it is a really weird function.  So is 
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
 > 
-> {
-> 	p = __ptr_ring_consume
-> 
-> 	return !!p
-> }
-> 
-> guaranteed to be equivalent to 
-> 
-> {
-> 	p = __ptr_ring_consume
-> 
-> 	return !!__ptr_ring_consume_created_space
-> }
 
-I am a bit confused. You were the one recommending this function to me,
-see [1].
+The patch status is already changes requested.
 
-Maybe the comments need rework here, but the function should be fine.
+Please resubmit and target [PATCH net-next]
 
-Thanks
-
-[1] Link: https://lore.kernel.org/netdev/20250922221553.47802-1-simon.schippers@tu-dortmund.de/T/#mb722e8ae4ceb5df24f74305c6145561883d4e987
-
-> 
-> 
-> 
->> + */
->> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r)
->> +{
->> +	return r->consumer_tail >= r->consumer_head;
->> +}
->> +
->>  /* Cast to structure type and call a function without discarding from FIFO.
->>   * Function must return a value.
->>   * Callers must take consumer_lock.
->> -- 
->> 2.43.0
-> 
 
