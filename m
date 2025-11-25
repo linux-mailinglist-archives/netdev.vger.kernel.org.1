@@ -1,235 +1,233 @@
-Return-Path: <netdev+bounces-241586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 109BDC862AD
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:16:22 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEEFAC862E4
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:19:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A9603B3DC9
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:15:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 409E43505E1
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B7C329E73;
-	Tue, 25 Nov 2025 17:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF27329E51;
+	Tue, 25 Nov 2025 17:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="D+wGRgtp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BhLHZvb7";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="esSiQknh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3143C324B0A;
-	Tue, 25 Nov 2025 17:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29911329399
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 17:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764090928; cv=none; b=oP71tXd5lZBBS2XirqY3YO+3KBR0l8IjN5gLT3V8lvrwl5dXwMmzIBpdI/UEa1i9Y49qRk/XubnSdmxjzBhNIKTzDoaG3mvnPUIdSBfYz10JgelMPiXgCbjlO6JxgT4mP6OmBUWXkQrgUv7M7xkUu4L1hb6Hb6++VpeTGhp9RLA=
+	t=1764091141; cv=none; b=Q5K8nnb2V3uE7+vprji1kawunRA66AZ0xSWfcYKN+4IW8kKw23qwB2I4Xdc4VZkKw8Mp1PWgscBx1nZsY3xFe49jGgj980sXPl08FcZFJfECx/NTcUTwuyroLQlvEQ1zoaRhdzplu8UHdsIz2MHeE9clTjkLex5M6pp8zm2UaaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764090928; c=relaxed/simple;
-	bh=RBivun6zk4kvZILIUbR5Gys3JRzErIoQlYXqM0NpN7o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=deoB/nl/mt129iDvIC4N6LV3QFmk/zScpJgRNjpfhft9o8SxuYIoZCuOPn5rA4vxAbZxmybLqIbVw4FKg+awaXEq7qxL4CMru4u999PC5Ff+aZbQDs4ZFpgxcNp59XLGmmcOPSMhK9aBq/b+HdfJLUaq7LcNj3vTfIFTGMLczVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=D+wGRgtp; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 277334E418B3;
-	Tue, 25 Nov 2025 17:15:24 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id DA583606A1;
-	Tue, 25 Nov 2025 17:15:23 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9291C102F0891;
-	Tue, 25 Nov 2025 18:15:17 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1764090923; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=eRMUjzvc385emaM00QkruAlsCUJkwg3kL1OtudlNM8o=;
-	b=D+wGRgtpGAyb2M8Agj+56AXrxl6+occfRjhl8yC2nBpOqT004FDP55HpGanCzwgiqpDbTd
-	34z5t8Cgxi+lBpRfxOW3kxXxyaxuPqWLYFBU869BV2x1l7A6Zx4f7PSO5bDPFWrFeJT+lI
-	Ul7XzTaYhVCd93gFGSjGbXcJsQMM6ZJOcz6YkNPg6qs2ehKlElkDbco3sypwsEbfzBQYwS
-	75mUXzFBtSgWij5Hrh6EtI12mGMUcaEs1W+oiCkaD/4bXvvZ0BLIETnBk1iXjKSoK3GOPU
-	PZk481ms0GIAvcoGM30X+uoOFLr9qJNsrTNeP7yGYryFzQT2xBbu57XlSH442A==
-Message-ID: <58ec46bb-5850-4dde-a1ea-d242f7d95409@bootlin.com>
-Date: Tue, 25 Nov 2025 18:15:16 +0100
+	s=arc-20240116; t=1764091141; c=relaxed/simple;
+	bh=ZPhuaik0VAApbpX38pTQnqYDsCZCeVuWDwCiA5Naac0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lDwilpdvO/0g87QgEuHm65uLCEgrwQTUO15iAcQfgoffeyZvxfyv1S+P52V7ZeQbk+kt42UvqRHPKua3l1mGgNCsKyzVVO177WQAr/5uZGJ/MAccDVNJA4o8YXnpOYZmnEwU9jCIQor6Z0y7tkr96sYZTck9yo58l0x0ANSPt7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BhLHZvb7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=esSiQknh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764091139;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QTDXgrG1WH/0PGWngFbUewy7r2hDyrl7ob2LIaTylyw=;
+	b=BhLHZvb7jOeixfrtVhmtDrcjLP9ebr2NrniJVF0R3Co9O+A/ERgZHCt3WKqbrxjB4ObXA3
+	3hgV+Z9B+nm4BdUe7cjsYe2CiRr/MUgw2n+1gWMzn2VFjReb7qo3JtR7FpO4IXTr/Q/CbB
+	buU+kJlhvO0mdGqHZTlZ6FExeoCqg/s=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-FL2Z6F-jN7eq2XdbPao0Uw-1; Tue, 25 Nov 2025 12:18:56 -0500
+X-MC-Unique: FL2Z6F-jN7eq2XdbPao0Uw-1
+X-Mimecast-MFC-AGG-ID: FL2Z6F-jN7eq2XdbPao0Uw_1764091136
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-429cbd8299cso2840462f8f.1
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 09:18:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764091135; x=1764695935; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QTDXgrG1WH/0PGWngFbUewy7r2hDyrl7ob2LIaTylyw=;
+        b=esSiQknhwwgSIxH9h576nP+e3IdyPqKvNk6TgDZ3TruRZLZAnBpjaedxhfIEn2EJRU
+         ykeM4nzQQMjsPI+Uwb2Hb3gwJ+lLOfl67oXdL4sIhag4xwJiqBr/4XA+7zCeGUH7Lq4w
+         utYileQ9cYRnvOsksG5PcTIi2EAIrRI8OE0xTYTWNGNFcyq+tuLD7eX4rg47qboDNEEz
+         DA8ca9igTMgz0gyfDukrHjz/w8HU+pUugX10d+MqScE6JeFyz5BJbC1Vdkw2QPzP1ddc
+         LzoiVS9JoVrFqgz4CVW6wM4PhwJo90uA09sW4RooldqP2vjzFce8Pdf3Gq0cyqdT8huh
+         qdMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764091135; x=1764695935;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QTDXgrG1WH/0PGWngFbUewy7r2hDyrl7ob2LIaTylyw=;
+        b=E4xL1IZ1YKCdGUtyqnVo4OXmGsMXa19dl/C+xlQ/hegw/1QoShp43E5B+Dlgcw+fx7
+         gzG5PkEvTg0f54BLdetogbQRJ9rBYBKJPOXD+WXLy07JLhICiPEZuTO1hut4qVPWqEU8
+         NAQBiNOSHTYpY3iwWL8YjgvH+A8dllgX2I/ey8cNJO3kycbNLjrYJdBwHT8HCY/g227W
+         oadeXdfRQXWG8uRGIDqoX80AnZOEQ9K0mfBHheqCTo7F0wYYBqOzxWwcYZxgdhqahOEk
+         3bf6W7xJ9kmo9pIo0M2HH/5aLSkLhNiuphgkq3glNNlGo2IZg8jwpmeLryl+MmEdUHzo
+         b/OQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUZcikP1pJoRk1SOfk5q83JrUSAp27w10cUQM6J98K4t2z0V85M40uLV/P1QI2O0/ifDUigmws=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKNsXO131fY8nUk1NGTsNVj80REIojTMeSe0qHHVkJ7EB0rN1o
+	wDiNk4WzeKalhnjRmDPld4qEUzRiQBEJXssUGs+dFSzifAB89RdlQT5tvCUVoG+h0xCQwVE7E5+
+	2OARuLQZueYob29eKBg6wxAQ3wHs793RZqP8hTAwlSCymGXnjjZhIzHBSUA==
+X-Gm-Gg: ASbGncvZO8Dia+58tkV9h0QSXnUFeD7yZPqzHuFP2dr8NAdzOCVOfXBBlJXPob9HkxA
+	Hhi/PWw/5L+5aMIb0VaxmeM5L+G6Kj/0gRWvykytUO+AfmOzseazX8P3xUCBF8tu0MSTGp4kpbQ
+	iaE8qZDkkFd/QSFyTcZWF4gIibgqMq96JAY49OIdtwHp98qn3D5iZPdEWaL8U6PQYYsta9hNUfv
+	Xv1LIlReuRLY80ugAOsm41zUT/gEv5D/kwaQuH+o7t9Sli3u9mxiUaHeYMzIzYFqm2GpJDjTpgU
+	fiADWbeLTsWb4qW4URr2Ix9z32VTqFp6SEzgfEQp+JjMfQtHOmtInTINhCo7x8bYmEdmv+4Kq2+
+	LMD+FTkQyFXfv3yQ=
+X-Received: by 2002:a05:6000:1863:b0:42b:4267:83c2 with SMTP id ffacd0b85a97d-42cc1cbd18dmr16972091f8f.16.1764091135220;
+        Tue, 25 Nov 2025 09:18:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGDwBcpmQPbHfHTQwxxY5Q+qsOpgYiD3CvZ3WNNO7Ii75RTIrUMAIH9/jzA1J2eiQuQn7dHrw==
+X-Received: by 2002:a05:6000:1863:b0:42b:4267:83c2 with SMTP id ffacd0b85a97d-42cc1cbd18dmr16972058f8f.16.1764091134693;
+        Tue, 25 Nov 2025 09:18:54 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fa3592sm34039004f8f.21.2025.11.25.09.18.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Nov 2025 09:18:54 -0800 (PST)
+Date: Tue, 25 Nov 2025 12:18:51 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v6 2/8] ptr_ring: add helper to check if consume
+ created space
+Message-ID: <20251125120122-mutt-send-email-mst@kernel.org>
+References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
+ <20251120152914.1127975-3-simon.schippers@tu-dortmund.de>
+ <20251125095650-mutt-send-email-mst@kernel.org>
+ <ce371d19-e69a-4d8e-a9a0-f3e20439a094@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: stmmac: dwmac: Disable flushing frames on
- Rx Buffer Unavailable
-To: rohan.g.thomas@altera.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Matthew Gerlach <matthew.gerlach@altera.com>
-References: <20251126-a10_ext_fix-v1-1-d163507f646f@altera.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251126-a10_ext_fix-v1-1-d163507f646f@altera.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ce371d19-e69a-4d8e-a9a0-f3e20439a094@tu-dortmund.de>
 
-Hi Rohan,
-
-On 25/11/2025 17:37, Rohan G Thomas via B4 Relay wrote:
-> From: Rohan G Thomas <rohan.g.thomas@altera.com>
+On Tue, Nov 25, 2025 at 05:12:35PM +0100, Simon Schippers wrote:
+> On 11/25/25 16:01, Michael S. Tsirkin wrote:
+> > On Thu, Nov 20, 2025 at 04:29:07PM +0100, Simon Schippers wrote:
+> >> Add __ptr_ring_consume_created_space() to check whether the previous
+> >> __ptr_ring_consume() call successfully consumed an element and created
+> >> space in the ring buffer. This enables callers to conditionally notify
+> >> producers when space becomes available.
+> >>
+> >> The function is only valid immediately after a single consume operation
+> >> and should not be used after calling __ptr_ring_consume_batched().
+> >>
+> >> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >> Co-developed by: Jon Kohler <jon@nutanix.com>
+> >> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> >> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> >> ---
+> >>  include/linux/ptr_ring.h | 17 +++++++++++++++++
+> >>  1 file changed, 17 insertions(+)
+> >>
+> >> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+> >> index da141cc8b075..76d6840b45a3 100644
+> >> --- a/include/linux/ptr_ring.h
+> >> +++ b/include/linux/ptr_ring.h
+> >> @@ -453,6 +453,23 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
+> >>  	return ret;
+> >>  }
+> >>  
+> >> +/*
+> >> + * Check if the previous consume operation created space
+> > 
+> > space?
+> > 
+> > what does this mean?
+> > 
+> >> + *
+> >> + * Returns true if the last call to __ptr_ring_consume() has created
+> >> + * space in the ring buffer (i.e., an element was consumed).
+> >> + *
+> >> + * Note: This function is only valid immediately after a single call to
+> >> + * __ptr_ring_consume(). If multiple calls to ptr_ring_consume*() have
+> >> + * been made, this check must be performed after each call individually.
+> >> + * Likewise, do not use this function after calling
+> >> + * __ptr_ring_consume_batched().
+> > 
+> > API-wise, it is a really weird function.  So is 
+> > 
+> > {
+> > 	p = __ptr_ring_consume
+> > 
+> > 	return !!p
+> > }
+> > 
+> > guaranteed to be equivalent to 
+> > 
+> > {
+> > 	p = __ptr_ring_consume
+> > 
+> > 	return !!__ptr_ring_consume_created_space
+> > }
 > 
-> In Store and Forward mode, flushing frames when the receive buffer is
-> unavailable, can cause the MTL Rx FIFO to go out of sync. This results
-> in buffering of a few frames in the FIFO without triggering Rx DMA
-> from transferring the data to the system memory until another packet
-> is received. Once the issue happens, for a ping request, the packet is
-> forwarded to the system memory only after we receive another packet
-> and hece we observe a latency equivalent to the ping interval.
+> I am a bit confused. You were the one recommending this function to me,
+> see [1].
 > 
-> 64 bytes from 192.168.2.100: seq=1 ttl=64 time=1000.344 ms
+> Maybe the comments need rework here, but the function should be fine.
 > 
-> Also, we can observe constant gmacgrp_debug register value of
-> 0x00000120, which indicates "Reading frame data".
+> Thanks
 > 
-> The issue is not reproducible after disabling frame flushing when Rx
-> buffer is unavailable. But in that case, the Rx DMA enters a suspend
-> state due to buffer unavailability. To resume operation, software
-> must write to the receive_poll_demand register after adding new
-> descriptors, which reactivates the Rx DMA.
-> 
-> This issue is observed in the socfpga platforms which has dwmac1000 IP
-> like Arria 10, Cyclone V and Agilex 7. Issue is reproducible after
-> running iperf3 server at the DUT for UDP lower packet sizes.
-> 
-> Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-> Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
+> [1] Link: https://lore.kernel.org/netdev/20250922221553.47802-1-simon.schippers@tu-dortmund.de/T/#mb722e8ae4ceb5df24f74305c6145561883d4e987
 
-Should this be a fix ?
 
-Can you elaborate on how to reproduce this ? I've given this a try on
-CycloneV and I can't see any difference in the ping results and iperf3
-results.
+I see, (an element was consumed) part confused, instead of clarifying.
+That is not the question - it was consumed.
 
-From the DUT, I've tried :
- - iperf3 -c 192.168.X.X -u -b 0 -l 64
- - iperf3 -c 192.168.X.X -u -b 0 -l 64 -R
- - iperf3 -c 192.168.X.X
- - iperf3 -c 192.168.X.X -R
 
-I'm reading the same results with and without the patch
 
-I've done ping tests as well, the latency seems to be the same with and
-without this patch, at around 0.193ms RTT.
+Let me try:
 
-I'm not familiar with the SF_DMA_MODE though, any thing special to do to
-enter that mode ?
+Returns true if the last call to __ptr_ring_consume() has created
+space in the ring buffer (i.e., a new element can be produced).
 
-Thanks,
 
-Maxime
+Note: Because of batching, a successful call to __ptr_ring_consume
+does not guarantee that the next call to __ptr_ring_produce
+will succeed.
 
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c | 5 +++--
->  drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h     | 1 +
->  drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c     | 5 +++++
->  drivers/net/ethernet/stmicro/stmmac/hwif.h          | 3 +++
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   | 2 ++
->  5 files changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> index 6d9b8fac3c6d0fd76733ab4a1a8cce2420fa40b4..5877fec9f6c30ed18cdcf5398816e444e0bd0091 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> @@ -135,10 +135,10 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
->  
->  	if (mode == SF_DMA_MODE) {
->  		pr_debug("GMAC: enable RX store and forward mode\n");
-> -		csr6 |= DMA_CONTROL_RSF;
-> +		csr6 |= DMA_CONTROL_RSF | DMA_CONTROL_DFF;
->  	} else {
->  		pr_debug("GMAC: disable RX SF mode (threshold %d)\n", mode);
-> -		csr6 &= ~DMA_CONTROL_RSF;
-> +		csr6 &= ~(DMA_CONTROL_RSF | DMA_CONTROL_DFF);
->  		csr6 &= DMA_CONTROL_TC_RX_MASK;
->  		if (mode <= 32)
->  			csr6 |= DMA_CONTROL_RTC_32;
-> @@ -262,6 +262,7 @@ const struct stmmac_dma_ops dwmac1000_dma_ops = {
->  	.dma_rx_mode = dwmac1000_dma_operation_mode_rx,
->  	.dma_tx_mode = dwmac1000_dma_operation_mode_tx,
->  	.enable_dma_transmission = dwmac_enable_dma_transmission,
-> +	.enable_dma_reception = dwmac_enable_dma_reception,
->  	.enable_dma_irq = dwmac_enable_dma_irq,
->  	.disable_dma_irq = dwmac_disable_dma_irq,
->  	.start_tx = dwmac_dma_start_tx,
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> index d1c149f7a3dd9e472b237101666e11878707f0f2..054ecb20ce3f68bce5da3efaf36acf33e430d3f0 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> @@ -169,6 +169,7 @@ static inline u32 dma_chan_base_addr(u32 base, u32 chan)
->  #define NUM_DWMAC4_DMA_REGS	27
->  
->  void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan);
-> +void dwmac_enable_dma_reception(void __iomem *ioaddr, u32 chan);
->  void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
->  			  u32 chan, bool rx, bool tx);
->  void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> index 467f1a05747ecf0be5b9f3392cd3d2049d676c21..97a803d68e3a2f120beaa7c3254748cf404236df 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> @@ -33,6 +33,11 @@ void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
->  	writel(1, ioaddr + DMA_CHAN_XMT_POLL_DEMAND(chan));
->  }
->  
-> +void dwmac_enable_dma_reception(void __iomem *ioaddr, u32 chan)
-> +{
-> +	writel(1, ioaddr + DMA_CHAN_RCV_POLL_DEMAND(chan));
-> +}
-> +
->  void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
->  			  u32 chan, bool rx, bool tx)
->  {
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> index f257ce4b6c66e0bbd3180d54ac7f5be934153a6b..df6e8a567b1f646f83effbb38d8e53441a6f6150 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> @@ -201,6 +201,7 @@ struct stmmac_dma_ops {
->  	void (*dma_diagnostic_fr)(struct stmmac_extra_stats *x,
->  				  void __iomem *ioaddr);
->  	void (*enable_dma_transmission)(void __iomem *ioaddr, u32 chan);
-> +	void (*enable_dma_reception)(void __iomem *ioaddr, u32 chan);
->  	void (*enable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
->  			       u32 chan, bool rx, bool tx);
->  	void (*disable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
-> @@ -261,6 +262,8 @@ struct stmmac_dma_ops {
->  	stmmac_do_void_callback(__priv, dma, dma_diagnostic_fr, __args)
->  #define stmmac_enable_dma_transmission(__priv, __args...) \
->  	stmmac_do_void_callback(__priv, dma, enable_dma_transmission, __args)
-> +#define stmmac_enable_dma_reception(__priv, __args...) \
-> +	stmmac_do_void_callback(__priv, dma, enable_dma_reception, __args)
->  #define stmmac_enable_dma_irq(__priv, __args...) \
->  	stmmac_do_void_callback(__priv, dma, enable_dma_irq, __priv, __args)
->  #define stmmac_disable_dma_irq(__priv, __args...) \
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 6cacedb2c9b3fefdd4c9ec8ba98d389443d21ebd..1ecca60baf74286da7f156b4c3c835b3cbabf1ba 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -4973,6 +4973,8 @@ static inline void stmmac_rx_refill(struct stmmac_priv *priv, u32 queue)
->  	rx_q->rx_tail_addr = rx_q->dma_rx_phy +
->  			    (rx_q->dirty_rx * sizeof(struct dma_desc));
->  	stmmac_set_rx_tail_ptr(priv, priv->ioaddr, rx_q->rx_tail_addr, queue);
-> +	/* Wake up Rx DMA from the suspend state if required */
-> +	stmmac_enable_dma_reception(priv, priv->ioaddr, queue);
->  }
->  
->  static unsigned int stmmac_rx_buf1_len(struct stmmac_priv *priv,
-> 
-> ---
-> base-commit: e3daf0e7fe9758613bec324fd606ed9caa187f74
-> change-id: 20251125-a10_ext_fix-5951805b9906
-> 
-> Best regards,
+Note2: This function is only valid immediately after a single call to
+__ptr_ring_consume(). If multiple calls to ptr_ring_consume*() have
+been made, and you want to know whether any of them created space,
+it is not enough to call this after the last __ptr_ring_consume -
+instead, this check must be performed after each call individually.
+Likewise, do not use this function after calling
+__ptr_ring_consume_batched().
+
+
+
+
+> > 
+> > 
+> > 
+> >> + */
+> >> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r)
+> >> +{
+> >> +	return r->consumer_tail >= r->consumer_head;
+> >> +}
+> >> +
+> >>  /* Cast to structure type and call a function without discarding from FIFO.
+> >>   * Function must return a value.
+> >>   * Callers must take consumer_lock.
+> >> -- 
+> >> 2.43.0
+> > 
 
 
