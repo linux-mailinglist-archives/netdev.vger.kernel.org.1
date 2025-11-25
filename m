@@ -1,464 +1,386 @@
-Return-Path: <netdev+bounces-241400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A119C836D4
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 06:57:16 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B917C836FB
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 07:12:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 203CB4E1CCD
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 05:57:15 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 405174E1F19
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 06:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD39285CB6;
-	Tue, 25 Nov 2025 05:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D295E284671;
+	Tue, 25 Nov 2025 06:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VBpSf57g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJsgLfNk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74F91E505
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 05:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B7670808
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 06:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764050231; cv=none; b=GfL4+PCF1b6j1mixpAx3kcaKVTF8wMyRV2VT/4A7O1pQ4nZk5wmfR5TUEiJoL611zIVeInP5SA5/LFW6o0lpPrCfhT76QfPHcqXiWlDUGSq24IKFdqUNIFVAo3wAQiwVH4MtjpqpzyANwRB4e7hdJJTj5+ffXPNq32mHgNu3dLU=
+	t=1764051117; cv=none; b=qEV8dAgZfl4Lb2ujMGe0cE5W/eJln8QSYkH/OYVRXg7bcNmQlhrQBcUSvJzYO6a7mDjuunyCextBVEYqHcHBT9/OlCAZG8tL3yaRAlKNwN3u13TC19HcE5MgBA1Qfc32yNLHICsAk8MEKJ/RSgKhtBQsGxyFCV8hs182BTpHl+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764050231; c=relaxed/simple;
-	bh=UW9Tqd2TDYRuqCCLTVTStq4/ICmNEU2x6zVex0AiG9g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u7Fg+vOFGYTdRKoVdwcIMovuOuR50ZWmAN1Pgmrk6m+pOVmmJrBvYz68B7yh3sT0Sewc0BhRp0VTvB9sWUnwacrBhPPlLGGR361YabiX27/s7KNVD/AS6T1ajA19VTGmcbjTlq4sMm2tW5Wt+GLD/HAALG+/WPg/wZsWVXocqE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VBpSf57g; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764050230; x=1795586230;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UW9Tqd2TDYRuqCCLTVTStq4/ICmNEU2x6zVex0AiG9g=;
-  b=VBpSf57gdMmO/RnOwbKUpgWMaJR1C0kA1uC9UEQq2IZQQZVvb2g6pCxH
-   aHAki6SpEGRfeMZxpK8Qu9I7KwE/mKb+FE9eKhROmztpN4vbzkQ9U974/
-   rp8TWnJI//Epmj5cR0zSiVF5uQOg06/muErFQ77+JP6kv7BzKSp0lvu4k
-   8OXWaJ+3iZy1WbAk38Ns/jX3WsRThny0ezoDr1R2zJp65CPNvdu7zRvTa
-   pMpbaiuf0Ek41L8h222hS9LOFntMrnrxLBO3QUFGUBxx9P3neLWpLRntu
-   /08GLNsCDC7LY+42sUBtiUHY1y5XjowAXI48NFhX6feaFyg3hGCLU/xlG
-   A==;
-X-CSE-ConnectionGUID: dGQkFbFQQfyF5rap+gBZnw==
-X-CSE-MsgGUID: qqr5v38sRl28lNdQ8QfKWQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11623"; a="66093480"
-X-IronPort-AV: E=Sophos;i="6.20,224,1758610800"; 
-   d="scan'208";a="66093480"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2025 21:57:10 -0800
-X-CSE-ConnectionGUID: 3vakAxV7SYyTxpeQmJEdpQ==
-X-CSE-MsgGUID: CZ9md+JrRfKv9IIhcP2rbQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,224,1758610800"; 
-   d="scan'208";a="192353809"
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 24 Nov 2025 21:57:06 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vNm2x-000000001Ph-45hl;
-	Tue, 25 Nov 2025 05:57:03 +0000
-Date: Tue, 25 Nov 2025 13:56:08 +0800
-From: kernel test robot <lkp@intel.com>
-To: Antoine Tenart <atenart@kernel.org>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	andrew+netdev@lunn.ch
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Antoine Tenart <atenart@kernel.org>, netdev@vger.kernel.org,
-	Liang Li <liali@redhat.com>,
-	Beniamino Galvani <b.galvani@gmail.com>
-Subject: Re: [PATCH net] net: vxlan: prevent NULL deref in vxlan_xmit_one
-Message-ID: <202511251305.hL5BkEXK-lkp@intel.com>
-References: <20251124163103.23131-1-atenart@kernel.org>
+	s=arc-20240116; t=1764051117; c=relaxed/simple;
+	bh=kOkNIvN1eBDyIIR5UFAea374YA3imceJmrR1WhA8m1c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Iaxm/0y+MC7wR5tu8icBIfmQNl0IumtXhtTcg0XSJVR0iE7FOTEl40qDVeYMseZzaV3d+7TM01J8Yuny4q2jsFWi6/yLFi33f+EcdZdNZOKojJkmCu39cKb0ldEbO3Ox20FFv/fnPf7ABSQzAUiEVOpfvv5GCu4mZBlzhTDD8TU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iJsgLfNk; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b99bfb451e5so3437994a12.2
+        for <netdev@vger.kernel.org>; Mon, 24 Nov 2025 22:11:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764051115; x=1764655915; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bkiTJ64envQtQwGCvlmHEL0Yi2p9cJmBWIu/uym8Nb0=;
+        b=iJsgLfNkPRCiZ7xAeOR6Xgev8emy/xcPrtOa0YNTjds+SG3pEloZpvP29BJV0IQPys
+         xn7YV2l3UayG3ccTfpm9JtNU88ynwumONK+G2NjFvMUbraaEaONoyOlM0iAaXx1cj8cv
+         van/nOkXRdHbrQ4wyNhmP75aIFA8Picv8Pla4Pc8T4kXbKk69W7e1u3atfUFWZodgh2/
+         hhMOUzBgcAo0oX0zzX7h8YIOfWJcn/FPWoRlG+xf0OC637NPSn/dLX3fL99y5BM2Fagu
+         hGZm8M7y9LrHM8mbOwT9v7xQBnEFnWQfZ/Ij7o9SOMQFW8w1p4YDe49VrrzxNkhkr6oQ
+         h3BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764051115; x=1764655915;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bkiTJ64envQtQwGCvlmHEL0Yi2p9cJmBWIu/uym8Nb0=;
+        b=S6YUFl1x7UsbDg2XdVl0E3TQ/+nf+pcDAp3E12SfDJEbMCqpC6AWjKVVA4BBFI2ATE
+         L8qg/d/R0D75P6fb3EYL9+30WLM0YTK70UQZRM0FrmzCX4wHuqpFXmqIPVszIcsCbmRG
+         QlB8yhXgeHh5NkPeRheP75h9DjpoEu9WVCmXMQCBvzS83449ORNbzFDml0zR5XIE5q13
+         wHlJO9YCIrpvpWui+9/985Q5LaZKbTADJFF0rLAd0yt5CNr9TTU3u9kEcdkyp3Q7uf3w
+         F9Rp/ntc7JO6khAAuLOcFPg+JrbT0T6eWHWA1bZVk0ilZ+bLRr5ioI/s7hHXA/e2i1bP
+         25Ig==
+X-Gm-Message-State: AOJu0YylBE2aril9ZVtpK8jyvr0Ha2JJHioEe6bEuSQkr7JuqLuA0eM7
+	KAECgXpaTWfVtS1dLN7COJ1vLlifHI0spL/UCEE6UtFUx6Uy27WlbjWA
+X-Gm-Gg: ASbGncv1MD3wYlBfaw+oeDxYG/+ElogLXG1WqNTMJdz2w082y3/pDLaumvE2xQQK3nE
+	8LWtqlLjjuwKjBn04RfVn4991VlnGJJsspRkDyF+WFrb/q6DoexFMcUHekvEMnUsdI7XNF8EO1B
+	fbION5XOeXEkrgUBnRS3tuzc6P7RaUljDL6AGN3G3jblphymN/UR27fHHRZ8+Gn3yltm9QzsR0a
+	KPVPsAi3A0NKfkEYCaSM+upKSaj+6vdn2YXlLG5ojJQoFBsU9B1YZZ1WZKjP3Jxyhqyytpm1UJo
+	rMkRPWEAaKNTT0gQvEWyD4ODcAex2A5uWgZtd+nWEDki4jnJeX2nCyvHHb23K5Y62lNxbh4qk/j
+	xQnnsRy7+UOBpNITmtuaxEIPIfZQCDFEbwnc4npazgaxQ/RDBNw0XOozSKr/1p66yphWBQrttqm
+	GNuRsaXMXC9Xkcxcfdxhfu9B+rzeqlHWdVD3Ha8QaRs0QYEOM=
+X-Google-Smtp-Source: AGHT+IEhyBGYmBqcMW4mCIOa0l9IPFgJCvx68Vx8io7PP2ETpWasHPA9ziuU7ZPIs+Pc1UjjkblQng==
+X-Received: by 2002:a05:7300:f14d:b0:2a4:3592:c5f7 with SMTP id 5a478bee46e88-2a941564d39mr723067eec.8.1764051114978;
+        Mon, 24 Nov 2025 22:11:54 -0800 (PST)
+Received: from localhost (ip70-175-132-216.oc.oc.cox.net. [70.175.132.216])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a6fc5b122dsm59099476eec.5.2025.11.24.22.11.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Nov 2025 22:11:54 -0800 (PST)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: kbusch@kernel.org,
+	hch@lst.de,
+	hare@suse.de,
+	sagi@grimberg.me,
+	axboe@kernel.dk,
+	dlemoal@kernel.org,
+	wagi@kernel.org,
+	mpatocka@redhat.com,
+	yukuai3@huawei.com,
+	xni@redhat.com,
+	linan122@huawei.com,
+	bmarzins@redhat.com,
+	john.g.garry@oracle.com,
+	edumazet@google.com,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: [RFC blktests fix PATCH] tcp: use GFP_ATOMIC in tcp_disconnect
+Date: Mon, 24 Nov 2025 22:11:42 -0800
+Message-Id: <20251125061142.18094-1-ckulkarnilinux@gmail.com>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251124163103.23131-1-atenart@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-Hi Antoine,
+tcp_disconnect() calls tcp_send_active_reset() with gfp_any(), which
+returns GFP_KERNEL in process context. This can trigger a circular
+locking dependency when called during block device teardown that
+involves network-backed storage.
 
-kernel test robot noticed the following build warnings:
+The deadlock scenario occurs with storage configurations like MD RAID
+over NVMeOF TCP when tearing down the block device:
 
-[auto build test WARNING on net/main]
+CPU0 (mdadm --stop /dev/mdX):          CPU1 (NVMe I/O submission):
+================================       ===========================
+del_gendisk()
+  blk_unregister_queue()
+    elevator_set_none()
+      elevator_switch()
+        __synchronize_srcu()
+          [holds set->srcu]
+          [waits for operations]
+                                       nvme_tcp_queue_rq()
+                                         nvme_tcp_try_send()
+                                           tcp_sendmsg()
+                                             lock_sock_nested()
+                                               [holds sk_lock-AF_INET-NVME]
+                                               [can wait for set->srcu]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Antoine-Tenart/net-vxlan-prevent-NULL-deref-in-vxlan_xmit_one/20251125-003536
-base:   net/main
-patch link:    https://lore.kernel.org/r/20251124163103.23131-1-atenart%40kernel.org
-patch subject: [PATCH net] net: vxlan: prevent NULL deref in vxlan_xmit_one
-config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20251125/202511251305.hL5BkEXK-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251125/202511251305.hL5BkEXK-lkp@intel.com/reproduce)
+    [cleanup triggers NVMe disconnect]
+    nvme_tcp_teardown_io_queues()
+      nvme_tcp_free_queue()
+        sock_release()
+          __sock_release()
+            tcp_close()
+              lock_sock_nested()
+                [holds sk_lock-AF_INET-NVME]
+                __tcp_close()
+                  tcp_disconnect()
+                    tcp_send_active_reset()
+                      alloc_skb(gfp_any())
+                        [GFP_KERNEL in process context]
+                        kmem_cache_alloc_node()
+                          fs_reclaim_acquire()
+                            [can trigger writeback]
+                            [needs block layer]
+                            [waits for set->srcu]
+                            *** DEADLOCK ***
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511251305.hL5BkEXK-lkp@intel.com/
+blktests ./check md/001:
 
-All warnings (new ones prefixed by >>):
+[   95.764798] run blktests md/001 at 2025-11-24 21:13:10
+[   96.020965] brd: module loaded
+[   96.098934] Key type psk registered
+[   96.237974] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+[   96.244988] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+[   96.286775] nvmet: Created nvm controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+[   96.290980] nvme nvme0: creating 48 I/O queues.
+[   96.304554] nvme nvme0: mapped 48/0/0 default/read/poll queues.
+[   96.322530] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr 127.0.0.1:4420, hostnqn: nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+[   96.414331] md: async del_gendisk mode will be removed in future, please upgrade to mdadm-4.5+
+[   96.414427] block device autoloading is deprecated and will be removed.
+[   96.473347] md/raid1:md127: active with 1 out of 2 mirrors
+[   96.474602] md127: detected capacity change from 0 to 2093056
+[   96.665424] md127: detected capacity change from 2093056 to 0
+[   96.665433] md: md127 stopped.
+[   96.694365] nvme nvme0: Removing ctrl: NQN "blktests-subsystem-1"
+[   96.708310] block nvme0n1: no available path - failing I/O
+[   96.708379] block nvme0n1: no available path - failing I/O
+[   96.708414] block nvme0n1: no available path - failing I/O
+[   96.708734] block nvme0n1: no available path - failing I/O
+[   96.708745] block nvme0n1: no available path - failing I/O
+[   96.708761] block nvme0n1: no available path - failing I/O
 
->> drivers/net/vxlan/vxlan_core.c:2548:7: warning: variable 'err' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-    2548 |                 if (unlikely(!sock6)) {
-         |                     ^~~~~~~~~~~~~~~~
-   include/linux/compiler.h:77:22: note: expanded from macro 'unlikely'
-      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
-         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/vxlan/vxlan_core.c:2631:6: note: uninitialized use occurs here
-    2631 |         if (err == -ELOOP)
-         |             ^~~
-   drivers/net/vxlan/vxlan_core.c:2548:3: note: remove the 'if' if its condition is always false
-    2548 |                 if (unlikely(!sock6)) {
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~
-    2549 |                         reason = SKB_DROP_REASON_DEV_READY;
-         |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    2550 |                         goto tx_error;
-         |                         ~~~~~~~~~~~~~~
-    2551 |                 }
-         |                 ~
-   drivers/net/vxlan/vxlan_core.c:2464:7: warning: variable 'err' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-    2464 |                 if (unlikely(!sock4)) {
-         |                     ^~~~~~~~~~~~~~~~
-   include/linux/compiler.h:77:22: note: expanded from macro 'unlikely'
-      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
-         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/vxlan/vxlan_core.c:2631:6: note: uninitialized use occurs here
-    2631 |         if (err == -ELOOP)
-         |             ^~~
-   drivers/net/vxlan/vxlan_core.c:2464:3: note: remove the 'if' if its condition is always false
-    2464 |                 if (unlikely(!sock4)) {
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~
-    2465 |                         reason = SKB_DROP_REASON_DEV_READY;
-         |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    2466 |                         goto tx_error;
-         |                         ~~~~~~~~~~~~~~
-    2467 |                 }
-         |                 ~
-   drivers/net/vxlan/vxlan_core.c:2352:9: note: initialize the variable 'err' to silence this warning
-    2352 |         int err;
-         |                ^
-         |                 = 0
-   2 warnings generated.
+[   96.812432] ======================================================
+[   96.816828] WARNING: possible circular locking dependency detected
+[   96.821054] 6.18.0-rc6lblk-fnext+ #7 Tainted: G                 N
+[   96.825312] ------------------------------------------------------
+[   96.830181] nvme/2595 is trying to acquire lock:
+[   96.833374] ffffffff82e487e0 (fs_reclaim){+.+.}-{0:0}, at: kmem_cache_alloc_node_noprof+0x5a/0x770
+[   96.839640]
+               but task is already holding lock:
+[   96.843657] ffff88810c503358 (sk_lock-AF_INET-NVME){+.+.}-{0:0}, at: tcp_close+0x15/0x80
+[   96.849247]
+               which lock already depends on the new lock.
 
+[   96.854869]
+               the existing dependency chain (in reverse order) is:
+[   96.860473]
+               -> #4 (sk_lock-AF_INET-NVME){+.+.}-{0:0}:
+[   96.865028]        lock_sock_nested+0x2e/0x70
+[   96.868084]        tcp_sendmsg+0x1a/0x40
+[   96.870833]        sock_sendmsg+0xed/0x110
+[   96.873677]        nvme_tcp_try_send_cmd_pdu+0x13e/0x260 [nvme_tcp]
+[   96.878007]        nvme_tcp_try_send+0xb3/0x330 [nvme_tcp]
+[   96.881344]        nvme_tcp_queue_rq+0x342/0x3d0 [nvme_tcp]
+[   96.884399]        blk_mq_dispatch_rq_list+0x29a/0x800
+[   96.887237]        __blk_mq_sched_dispatch_requests+0x3de/0x5f0
+[   96.891116]        blk_mq_sched_dispatch_requests+0x29/0x70
+[   96.894166]        blk_mq_run_work_fn+0x76/0x1b0
+[   96.896710]        process_one_work+0x211/0x630
+[   96.899162]        worker_thread+0x184/0x330
+[   96.901503]        kthread+0x10d/0x250
+[   96.903570]        ret_from_fork+0x29a/0x300
+[   96.905888]        ret_from_fork_asm+0x1a/0x30
+[   96.908186]
+               -> #3 (set->srcu){.+.+}-{0:0}:
+[   96.910188]        __synchronize_srcu+0x49/0x170
+[   96.911882]        elevator_switch+0xc9/0x330
+[   96.913459]        elevator_change+0x133/0x1b0
+[   96.915079]        elevator_set_none+0x3b/0x80
+[   96.916714]        blk_unregister_queue+0xb0/0x120
+[   96.918450]        __del_gendisk+0x14e/0x3c0
+[   96.920700]        del_gendisk+0x75/0xa0
+[   96.922098]        nvme_ns_remove+0xf2/0x230 [nvme_core]
+[   96.924044]        nvme_remove_namespaces+0xf2/0x150 [nvme_core]
+[   96.926220]        nvme_do_delete_ctrl+0x71/0x90 [nvme_core]
+[   96.928310]        nvme_delete_ctrl_sync+0x3b/0x50 [nvme_core]
+[   96.930429]        nvme_sysfs_delete+0x34/0x40 [nvme_core]
+[   96.932450]        kernfs_fop_write_iter+0x16d/0x220
+[   96.934271]        vfs_write+0x37b/0x520
+[   96.935746]        ksys_write+0x67/0xe0
+[   96.937141]        do_syscall_64+0x76/0xa60
+[   96.938645]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   96.940628]
+               -> #2 (&q->elevator_lock){+.+.}-{4:4}:
+[   96.942903]        __mutex_lock+0xa2/0x1150
+[   96.944434]        elevator_change+0x9b/0x1b0
+[   96.946046]        elv_iosched_store+0x116/0x190
+[   96.947746]        kernfs_fop_write_iter+0x16d/0x220
+[   96.949524]        vfs_write+0x37b/0x520
+[   96.951506]        ksys_write+0x67/0xe0
+[   96.952934]        do_syscall_64+0x76/0xa60
+[   96.954457]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   96.956489]
+               -> #1 (&q->q_usage_counter(io)){++++}-{0:0}:
+[   96.959011]        blk_alloc_queue+0x30e/0x350
+[   96.960664]        blk_mq_alloc_queue+0x61/0xd0
+[   96.962293]        scsi_alloc_sdev+0x2a0/0x3e0
+[   96.963954]        scsi_probe_and_add_lun+0x1bd/0x430
+[   96.965782]        __scsi_add_device+0x109/0x120
+[   96.967461]        ata_scsi_scan_host+0x97/0x1c0
+[   96.969198]        async_run_entry_fn+0x30/0x130
+[   96.970903]        process_one_work+0x211/0x630
+[   96.972577]        worker_thread+0x184/0x330
+[   96.974097]        kthread+0x10d/0x250
+[   96.975448]        ret_from_fork+0x29a/0x300
+[   96.977050]        ret_from_fork_asm+0x1a/0x30
+[   96.978705]
+               -> #0 (fs_reclaim){+.+.}-{0:0}:
+[   96.981265]        __lock_acquire+0x1468/0x2210
+[   96.982950]        lock_acquire+0xd3/0x2f0
+[   96.984445]        fs_reclaim_acquire+0x99/0xd0
+[   96.986141]        kmem_cache_alloc_node_noprof+0x5a/0x770
+[   96.988171]        __alloc_skb+0x15f/0x190
+[   96.989681]        tcp_send_active_reset+0x3f/0x1e0
+[   96.991248]        tcp_disconnect+0x551/0x770
+[   96.992851]        __tcp_close+0x2c7/0x520
+[   96.994327]        tcp_close+0x20/0x80
+[   96.995727]        inet_release+0x34/0x60
+[   96.997168]        __sock_release+0x3d/0xc0
+[   96.998688]        sock_close+0x14/0x20
+[   97.000058]        __fput+0xf1/0x2c0
+[   97.001388]        task_work_run+0x58/0x90
+[   97.002922]        exit_to_user_mode_loop+0x12c/0x150
+[   97.004720]        do_syscall_64+0x2a0/0xa60
+[   97.006256]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   97.008279]
+               other info that might help us debug this:
 
-vim +2548 drivers/net/vxlan/vxlan_core.c
+[   97.011827] Chain exists of:
+                 fs_reclaim --> set->srcu --> sk_lock-AF_INET-NVME
 
-  2334	
-  2335	void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
-  2336			    __be32 default_vni, struct vxlan_rdst *rdst, bool did_rsc)
-  2337	{
-  2338		struct dst_cache *dst_cache;
-  2339		struct ip_tunnel_info *info;
-  2340		struct ip_tunnel_key *pkey;
-  2341		struct ip_tunnel_key key;
-  2342		struct vxlan_dev *vxlan = netdev_priv(dev);
-  2343		const struct iphdr *old_iph;
-  2344		struct vxlan_metadata _md;
-  2345		struct vxlan_metadata *md = &_md;
-  2346		unsigned int pkt_len = skb->len;
-  2347		__be16 src_port = 0, dst_port;
-  2348		struct dst_entry *ndst = NULL;
-  2349		int addr_family;
-  2350		__u8 tos, ttl;
-  2351		int ifindex;
-  2352		int err;
-  2353		u32 flags = vxlan->cfg.flags;
-  2354		bool use_cache;
-  2355		bool udp_sum = false;
-  2356		bool xnet = !net_eq(vxlan->net, dev_net(vxlan->dev));
-  2357		enum skb_drop_reason reason;
-  2358		bool no_eth_encap;
-  2359		__be32 vni = 0;
-  2360	
-  2361		no_eth_encap = flags & VXLAN_F_GPE && skb->protocol != htons(ETH_P_TEB);
-  2362		reason = skb_vlan_inet_prepare(skb, no_eth_encap);
-  2363		if (reason)
-  2364			goto drop;
-  2365	
-  2366		reason = SKB_DROP_REASON_NOT_SPECIFIED;
-  2367		old_iph = ip_hdr(skb);
-  2368	
-  2369		info = skb_tunnel_info(skb);
-  2370		use_cache = ip_tunnel_dst_cache_usable(skb, info);
-  2371	
-  2372		if (rdst) {
-  2373			memset(&key, 0, sizeof(key));
-  2374			pkey = &key;
-  2375	
-  2376			if (vxlan_addr_any(&rdst->remote_ip)) {
-  2377				if (did_rsc) {
-  2378					/* short-circuited back to local bridge */
-  2379					vxlan_encap_bypass(skb, vxlan, vxlan,
-  2380							   default_vni, true);
-  2381					return;
-  2382				}
-  2383				goto drop;
-  2384			}
-  2385	
-  2386			addr_family = vxlan->cfg.saddr.sa.sa_family;
-  2387			dst_port = rdst->remote_port ? rdst->remote_port : vxlan->cfg.dst_port;
-  2388			vni = (rdst->remote_vni) ? : default_vni;
-  2389			ifindex = rdst->remote_ifindex;
-  2390	
-  2391			if (addr_family == AF_INET) {
-  2392				key.u.ipv4.src = vxlan->cfg.saddr.sin.sin_addr.s_addr;
-  2393				key.u.ipv4.dst = rdst->remote_ip.sin.sin_addr.s_addr;
-  2394			} else {
-  2395				key.u.ipv6.src = vxlan->cfg.saddr.sin6.sin6_addr;
-  2396				key.u.ipv6.dst = rdst->remote_ip.sin6.sin6_addr;
-  2397			}
-  2398	
-  2399			dst_cache = &rdst->dst_cache;
-  2400			md->gbp = skb->mark;
-  2401			if (flags & VXLAN_F_TTL_INHERIT) {
-  2402				ttl = ip_tunnel_get_ttl(old_iph, skb);
-  2403			} else {
-  2404				ttl = vxlan->cfg.ttl;
-  2405				if (!ttl && vxlan_addr_multicast(&rdst->remote_ip))
-  2406					ttl = 1;
-  2407			}
-  2408			tos = vxlan->cfg.tos;
-  2409			if (tos == 1)
-  2410				tos = ip_tunnel_get_dsfield(old_iph, skb);
-  2411			if (tos && !info)
-  2412				use_cache = false;
-  2413	
-  2414			if (addr_family == AF_INET)
-  2415				udp_sum = !(flags & VXLAN_F_UDP_ZERO_CSUM_TX);
-  2416			else
-  2417				udp_sum = !(flags & VXLAN_F_UDP_ZERO_CSUM6_TX);
-  2418	#if IS_ENABLED(CONFIG_IPV6)
-  2419			switch (vxlan->cfg.label_policy) {
-  2420			case VXLAN_LABEL_FIXED:
-  2421				key.label = vxlan->cfg.label;
-  2422				break;
-  2423			case VXLAN_LABEL_INHERIT:
-  2424				key.label = ip_tunnel_get_flowlabel(old_iph, skb);
-  2425				break;
-  2426			default:
-  2427				DEBUG_NET_WARN_ON_ONCE(1);
-  2428				goto drop;
-  2429			}
-  2430	#endif
-  2431		} else {
-  2432			if (!info) {
-  2433				WARN_ONCE(1, "%s: Missing encapsulation instructions\n",
-  2434					  dev->name);
-  2435				goto drop;
-  2436			}
-  2437			pkey = &info->key;
-  2438			addr_family = ip_tunnel_info_af(info);
-  2439			dst_port = info->key.tp_dst ? : vxlan->cfg.dst_port;
-  2440			vni = tunnel_id_to_key32(info->key.tun_id);
-  2441			ifindex = 0;
-  2442			dst_cache = &info->dst_cache;
-  2443			if (test_bit(IP_TUNNEL_VXLAN_OPT_BIT, info->key.tun_flags)) {
-  2444				if (info->options_len < sizeof(*md))
-  2445					goto drop;
-  2446				md = ip_tunnel_info_opts(info);
-  2447			}
-  2448			ttl = info->key.ttl;
-  2449			tos = info->key.tos;
-  2450			udp_sum = test_bit(IP_TUNNEL_CSUM_BIT, info->key.tun_flags);
-  2451		}
-  2452		src_port = udp_flow_src_port(dev_net(dev), skb, vxlan->cfg.port_min,
-  2453					     vxlan->cfg.port_max, true);
-  2454	
-  2455		rcu_read_lock();
-  2456		if (addr_family == AF_INET) {
-  2457			struct vxlan_sock *sock4;
-  2458			u16 ipcb_flags = 0;
-  2459			struct rtable *rt;
-  2460			__be16 df = 0;
-  2461			__be32 saddr;
-  2462	
-  2463			sock4 = rcu_dereference(vxlan->vn4_sock);
-  2464			if (unlikely(!sock4)) {
-  2465				reason = SKB_DROP_REASON_DEV_READY;
-  2466				goto tx_error;
-  2467			}
-  2468	
-  2469			if (!ifindex)
-  2470				ifindex = sock4->sock->sk->sk_bound_dev_if;
-  2471	
-  2472			rt = udp_tunnel_dst_lookup(skb, dev, vxlan->net, ifindex,
-  2473						   &saddr, pkey, src_port, dst_port,
-  2474						   tos, use_cache ? dst_cache : NULL);
-  2475			if (IS_ERR(rt)) {
-  2476				err = PTR_ERR(rt);
-  2477				reason = SKB_DROP_REASON_IP_OUTNOROUTES;
-  2478				goto tx_error;
-  2479			}
-  2480	
-  2481			if (flags & VXLAN_F_MC_ROUTE)
-  2482				ipcb_flags |= IPSKB_MCROUTE;
-  2483	
-  2484			if (!info) {
-  2485				/* Bypass encapsulation if the destination is local */
-  2486				err = encap_bypass_if_local(skb, dev, vxlan, AF_INET,
-  2487							    dst_port, ifindex, vni,
-  2488							    &rt->dst, rt->rt_flags);
-  2489				if (err)
-  2490					goto out_unlock;
-  2491	
-  2492				if (vxlan->cfg.df == VXLAN_DF_SET) {
-  2493					df = htons(IP_DF);
-  2494				} else if (vxlan->cfg.df == VXLAN_DF_INHERIT) {
-  2495					struct ethhdr *eth = eth_hdr(skb);
-  2496	
-  2497					if (ntohs(eth->h_proto) == ETH_P_IPV6 ||
-  2498					    (ntohs(eth->h_proto) == ETH_P_IP &&
-  2499					     old_iph->frag_off & htons(IP_DF)))
-  2500						df = htons(IP_DF);
-  2501				}
-  2502			} else if (test_bit(IP_TUNNEL_DONT_FRAGMENT_BIT,
-  2503					    info->key.tun_flags)) {
-  2504				df = htons(IP_DF);
-  2505			}
-  2506	
-  2507			ndst = &rt->dst;
-  2508			err = skb_tunnel_check_pmtu(skb, ndst, vxlan_headroom(flags & VXLAN_F_GPE),
-  2509						    netif_is_any_bridge_port(dev));
-  2510			if (err < 0) {
-  2511				goto tx_error;
-  2512			} else if (err) {
-  2513				if (info) {
-  2514					struct ip_tunnel_info *unclone;
-  2515	
-  2516					unclone = skb_tunnel_info_unclone(skb);
-  2517					if (unlikely(!unclone))
-  2518						goto tx_error;
-  2519	
-  2520					unclone->key.u.ipv4.src = pkey->u.ipv4.dst;
-  2521					unclone->key.u.ipv4.dst = saddr;
-  2522				}
-  2523				vxlan_encap_bypass(skb, vxlan, vxlan, vni, false);
-  2524				dst_release(ndst);
-  2525				goto out_unlock;
-  2526			}
-  2527	
-  2528			tos = ip_tunnel_ecn_encap(tos, old_iph, skb);
-  2529			ttl = ttl ? : ip4_dst_hoplimit(&rt->dst);
-  2530			err = vxlan_build_skb(skb, ndst, sizeof(struct iphdr),
-  2531					      vni, md, flags, udp_sum);
-  2532			if (err < 0) {
-  2533				reason = SKB_DROP_REASON_NOMEM;
-  2534				goto tx_error;
-  2535			}
-  2536	
-  2537			udp_tunnel_xmit_skb(rt, sock4->sock->sk, skb, saddr,
-  2538					    pkey->u.ipv4.dst, tos, ttl, df,
-  2539					    src_port, dst_port, xnet, !udp_sum,
-  2540					    ipcb_flags);
-  2541	#if IS_ENABLED(CONFIG_IPV6)
-  2542		} else {
-  2543			struct vxlan_sock *sock6;
-  2544			struct in6_addr saddr;
-  2545			u16 ip6cb_flags = 0;
-  2546	
-  2547			sock6 = rcu_dereference(vxlan->vn6_sock);
-> 2548			if (unlikely(!sock6)) {
-  2549				reason = SKB_DROP_REASON_DEV_READY;
-  2550				goto tx_error;
-  2551			}
-  2552	
-  2553			if (!ifindex)
-  2554				ifindex = sock6->sock->sk->sk_bound_dev_if;
-  2555	
-  2556			ndst = udp_tunnel6_dst_lookup(skb, dev, vxlan->net, sock6->sock,
-  2557						      ifindex, &saddr, pkey,
-  2558						      src_port, dst_port, tos,
-  2559						      use_cache ? dst_cache : NULL);
-  2560			if (IS_ERR(ndst)) {
-  2561				err = PTR_ERR(ndst);
-  2562				ndst = NULL;
-  2563				reason = SKB_DROP_REASON_IP_OUTNOROUTES;
-  2564				goto tx_error;
-  2565			}
-  2566	
-  2567			if (flags & VXLAN_F_MC_ROUTE)
-  2568				ip6cb_flags |= IP6SKB_MCROUTE;
-  2569	
-  2570			if (!info) {
-  2571				u32 rt6i_flags = dst_rt6_info(ndst)->rt6i_flags;
-  2572	
-  2573				err = encap_bypass_if_local(skb, dev, vxlan, AF_INET6,
-  2574							    dst_port, ifindex, vni,
-  2575							    ndst, rt6i_flags);
-  2576				if (err)
-  2577					goto out_unlock;
-  2578			}
-  2579	
-  2580			err = skb_tunnel_check_pmtu(skb, ndst,
-  2581						    vxlan_headroom((flags & VXLAN_F_GPE) | VXLAN_F_IPV6),
-  2582						    netif_is_any_bridge_port(dev));
-  2583			if (err < 0) {
-  2584				goto tx_error;
-  2585			} else if (err) {
-  2586				if (info) {
-  2587					struct ip_tunnel_info *unclone;
-  2588	
-  2589					unclone = skb_tunnel_info_unclone(skb);
-  2590					if (unlikely(!unclone))
-  2591						goto tx_error;
-  2592	
-  2593					unclone->key.u.ipv6.src = pkey->u.ipv6.dst;
-  2594					unclone->key.u.ipv6.dst = saddr;
-  2595				}
-  2596	
-  2597				vxlan_encap_bypass(skb, vxlan, vxlan, vni, false);
-  2598				dst_release(ndst);
-  2599				goto out_unlock;
-  2600			}
-  2601	
-  2602			tos = ip_tunnel_ecn_encap(tos, old_iph, skb);
-  2603			ttl = ttl ? : ip6_dst_hoplimit(ndst);
-  2604			skb_scrub_packet(skb, xnet);
-  2605			err = vxlan_build_skb(skb, ndst, sizeof(struct ipv6hdr),
-  2606					      vni, md, flags, udp_sum);
-  2607			if (err < 0) {
-  2608				reason = SKB_DROP_REASON_NOMEM;
-  2609				goto tx_error;
-  2610			}
-  2611	
-  2612			udp_tunnel6_xmit_skb(ndst, sock6->sock->sk, skb, dev,
-  2613					     &saddr, &pkey->u.ipv6.dst, tos, ttl,
-  2614					     pkey->label, src_port, dst_port, !udp_sum,
-  2615					     ip6cb_flags);
-  2616	#endif
-  2617		}
-  2618		vxlan_vnifilter_count(vxlan, vni, NULL, VXLAN_VNI_STATS_TX, pkt_len);
-  2619	out_unlock:
-  2620		rcu_read_unlock();
-  2621		return;
-  2622	
-  2623	drop:
-  2624		dev_dstats_tx_dropped(dev);
-  2625		vxlan_vnifilter_count(vxlan, vni, NULL, VXLAN_VNI_STATS_TX_DROPS, 0);
-  2626		kfree_skb_reason(skb, reason);
-  2627		return;
-  2628	
-  2629	tx_error:
-  2630		rcu_read_unlock();
-  2631		if (err == -ELOOP)
-  2632			DEV_STATS_INC(dev, collisions);
-  2633		else if (err == -ENETUNREACH)
-  2634			DEV_STATS_INC(dev, tx_carrier_errors);
-  2635		dst_release(ndst);
-  2636		DEV_STATS_INC(dev, tx_errors);
-  2637		vxlan_vnifilter_count(vxlan, vni, NULL, VXLAN_VNI_STATS_TX_ERRORS, 0);
-  2638		kfree_skb_reason(skb, reason);
-  2639	}
-  2640	
+[   97.015506]  Possible unsafe locking scenario:
 
+[   97.017718]        CPU0                    CPU1
+[   97.019363]        ----                    ----
+[   97.020984]   lock(sk_lock-AF_INET-NVME);
+[   97.022399]                                lock(set->srcu);
+[   97.024415]                                lock(sk_lock-AF_INET-NVME);
+[   97.026798]   lock(fs_reclaim);
+[   97.027927]
+                *** DEADLOCK ***
+
+[   97.030010] 2 locks held by nvme/2595:
+[   97.031353]  #0: ffff88810047b388 (&sb->s_type->i_mutex_key#10){+.+.}-{4:4}, at: __sock_release+0x30/0xc0
+[   97.034820]  #1: ffff88810c503358 (sk_lock-AF_INET-NVME){+.+.}-{0:0}, at: tcp_close+0x15/0x80
+[   97.037806]
+               stack backtrace:
+[   97.039367] CPU: 2 UID: 0 PID: 2595 Comm: nvme Tainted: G                 N  6.18.0-rc6lblk-fnext+ #7 PREEMPT(voluntary)
+[   97.039370] Tainted: [N]=TEST
+[   97.039371] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+[   97.039372] Call Trace:
+[   97.039374]  <TASK>
+[   97.039375]  dump_stack_lvl+0x75/0xb0
+[   97.039379]  print_circular_bug+0x26a/0x330
+[   97.039381]  check_noncircular+0x12f/0x150
+[   97.039385]  __lock_acquire+0x1468/0x2210
+[   97.039388]  lock_acquire+0xd3/0x2f0
+[   97.039390]  ? kmem_cache_alloc_node_noprof+0x5a/0x770
+[   97.039393]  fs_reclaim_acquire+0x99/0xd0
+[   97.039395]  ? kmem_cache_alloc_node_noprof+0x5a/0x770
+[   97.039396]  kmem_cache_alloc_node_noprof+0x5a/0x770
+[   97.039397]  ? __alloc_skb+0x15f/0x190
+[   97.039400]  ? __alloc_skb+0x15f/0x190
+[   97.039401]  __alloc_skb+0x15f/0x190
+[   97.039403]  tcp_send_active_reset+0x3f/0x1e0
+[   97.039405]  tcp_disconnect+0x551/0x770
+[   97.039407]  __tcp_close+0x2c7/0x520
+[   97.039408]  tcp_close+0x20/0x80
+[   97.039410]  inet_release+0x34/0x60
+[   97.039412]  __sock_release+0x3d/0xc0
+[   97.039413]  sock_close+0x14/0x20
+[   97.039414]  __fput+0xf1/0x2c0
+[   97.039416]  task_work_run+0x58/0x90
+[   97.039418]  exit_to_user_mode_loop+0x12c/0x150
+[   97.039420]  do_syscall_64+0x2a0/0xa60
+[   97.039422]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   97.039423] RIP: 0033:0x7f869032e317
+[   97.039425] Code: 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+[   97.039430] RSP: 002b:00007fff7ceb31c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+[   97.039432] RAX: 0000000000000001 RBX: 00007fff7ceb44bd RCX: 00007f869032e317
+[   97.039433] RDX: 0000000000000001 RSI: 00007f869044c719 RDI: 0000000000000003
+[   97.039433] RBP: 0000000000000003 R08: 0000000017c8a850 R09: 00007f86903c44e0
+[   97.039434] R10: 00007f8690252130 R11: 0000000000000246 R12: 00007f869044c719
+[   97.039435] R13: 0000000017c8a4c0 R14: 0000000017c8a4c0 R15: 0000000017c8b680
+[   97.039438]  </TASK>
+[   97.263257] brd: module unloaded
+
+Fix this by using GFP_ATOMIC instead of gfp_any() in tcp_disconnect().
+This matches the existing pattern in __tcp_close() which already uses
+GFP_ATOMIC when calling tcp_send_active_reset() (tcp.c:3246).
+gfp_any() only considers softirq vs process context, but doesn't
+account for lock context where sleeping is unsafe.
+
+The issue was discovered with blktests md/001, which creates an MD RAID1
+array with internal bitmap over NVMe-TCP, then stops the array. This
+triggers the block device removal -> elevator cleanup -> network teardown
+path that exposes the circular dependency.
+
+Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+---
+
+Hi,
+
+Full disclosure: I'm not an expert in this area, if there is a better
+solution, I'll be happy to try that.
+
+-ck
+
+---
+ net/ipv4/tcp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 8a18aeca7ab0..9fd01a8b90b5 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -3363,14 +3363,15 @@ int tcp_disconnect(struct sock *sk, int flags)
+ 	} else if (unlikely(tp->repair)) {
+ 		WRITE_ONCE(sk->sk_err, ECONNABORTED);
+ 	} else if (tcp_need_reset(old_state)) {
+-		tcp_send_active_reset(sk, gfp_any(), SK_RST_REASON_TCP_STATE);
++		/* Use GFP_ATOMIC since we're holding sk_lock */
++		tcp_send_active_reset(sk, GFP_ATOMIC, SK_RST_REASON_TCP_STATE);
+ 		WRITE_ONCE(sk->sk_err, ECONNRESET);
+ 	} else if (tp->snd_nxt != tp->write_seq &&
+ 		   (1 << old_state) & (TCPF_CLOSING | TCPF_LAST_ACK)) {
+ 		/* The last check adjusts for discrepancy of Linux wrt. RFC
+ 		 * states
+ 		 */
+-		tcp_send_active_reset(sk, gfp_any(),
++		tcp_send_active_reset(sk, GFP_ATOMIC,
+ 				      SK_RST_REASON_TCP_DISCONNECT_WITH_DATA);
+ 		WRITE_ONCE(sk->sk_err, ECONNRESET);
+ 	} else if (old_state == TCP_SYN_SENT)
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.40.0
+
 
