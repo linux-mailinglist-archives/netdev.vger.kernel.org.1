@@ -1,190 +1,145 @@
-Return-Path: <netdev+bounces-241595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 288F6C863E4
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:38:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11E5EC8643B
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:42:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5AE03B4027
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:37:52 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 59C35341A08
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:42:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86B132D441;
-	Tue, 25 Nov 2025 17:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07265329E60;
+	Tue, 25 Nov 2025 17:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UYFRyfiS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZ+ldf+7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C9632A3CC;
-	Tue, 25 Nov 2025 17:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D69518FDBE
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 17:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764092213; cv=none; b=abuz8zdC7PlzaiVYUQD4olmoH1h2paoxgbvNp1L3as1n/Sp9VjIvoDZ2uuD6EYefOTSGsAk29StHs/X1knhPMdUk9iYr7mCVxYV+BNA/ZrmiyI7n9bX7p1SqKUGpQTpHU9rTfE5XFpnJO5x/kPPIwXz6//k3OqPM48z6/H2y2/E=
+	t=1764092564; cv=none; b=Vc7LFXSWRYsuxOE2a2wJlOUrxZZmci0CLpHSuvc0Un/nyzvaF2+a/Q1CWNUqBJOl4Ppd16kfgfl7DeHtnp4XNByzfq6Xr/1oLr6acB+6fzippWpAmWpydGfPhpxJvryAev9xCAA9rs1aOkZ57wwDhvvhT7y2F0IKRpkF1ciZal4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764092213; c=relaxed/simple;
-	bh=DckpuTLHr+h44ictMmml2fKM41YlxFMkmDarCT3LOPM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HeNFeN80RhzBMo1CdtJKWz9dxrQeAKHkn7NQ7RsbNlUAut1oBh4T2AeXY5K5m0RRwPL4O7aDhsA1nKsvAPcPfsvC5lA/JzktgYdLJ1s8TddOHXhMbAtE8gA3eVIFRGgePx2bzCjoK4higFMh8tXKqs2WJ4lRndbooQ/cTkgEVgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UYFRyfiS; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764092212; x=1795628212;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DckpuTLHr+h44ictMmml2fKM41YlxFMkmDarCT3LOPM=;
-  b=UYFRyfiSrG3sL8SaTOLP2Pvyxu45HJ4jsQDdLzwQjYVaDnWUfPFRC+iF
-   yZ5Mi0is86ubFgLXrd2AdPl9hxRmOEZZOIZISIaasV6NkytKKOq5emNu3
-   dboDNRVa44xo5byfICKp5WcLsQGU7CQwCz+CGzBr9HweMsAIPCH2a6T6T
-   EJ88rUVC+68ACps/WSvyPANkYhV61SD+FaD0PZ86/D7Pqo1zs4ZT9OxNT
-   pLuLaON/fwZZvJ5FzDIikOg6p9uxCo4FMp0UCYsi/Ca1B/t3hLU7R+G++
-   GSqlVeD2KeQ2i/AKb/7dYKLdSX2TrerC+R6oFP0gh/dkKXrS3IAwKp0yu
-   w==;
-X-CSE-ConnectionGUID: D7v+CpU8T76A12ByLok0yw==
-X-CSE-MsgGUID: Y59BkbnmS7O4p086+iTKWw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="69979927"
-X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
-   d="scan'208";a="69979927"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 09:36:52 -0800
-X-CSE-ConnectionGUID: DoZsEv1SRKOmu96wqKZmSQ==
-X-CSE-MsgGUID: 9b02swwvT4uoQHfnAYAfBw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,226,1758610800"; 
-   d="scan'208";a="216040434"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa002.fm.intel.com with ESMTP; 25 Nov 2025 09:36:48 -0800
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	nxne.cnse.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-next 5/5] ice: add support for transmitting unreadable frags
-Date: Tue, 25 Nov 2025 18:36:03 +0100
-Message-ID: <20251125173603.3834486-6-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251125173603.3834486-1-aleksander.lobakin@intel.com>
-References: <20251125173603.3834486-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1764092564; c=relaxed/simple;
+	bh=y4tyX8TPr8Fd4sNfx70JolFLTf3E7Kwk14TnfD7hLbA=;
+	h=Content-Type:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To; b=XJL5RxPRBzE6dMjEWSmnoFmMzdcmFABIJCwvyewtC3UHssogIV3tEkVWrNNeue0zENhWlQEEFZ3geG3rKgdwmlLkJmjnF4PdIIXFoNPXXKzynFX9ELeEQtfAOnUREIuD9lMIIwfDy7sKAKyh01UiB0aqqKw/jct1JxRJh5bU4HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iZ+ldf+7; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-298456bb53aso72539065ad.0
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 09:42:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764092563; x=1764697363; darn=vger.kernel.org;
+        h=in-reply-to:from:content-language:subject:references:cc:to
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y4tyX8TPr8Fd4sNfx70JolFLTf3E7Kwk14TnfD7hLbA=;
+        b=iZ+ldf+7J+48YlNUr8gtiuj+IDnbVTjyVO8IkfbT5A74/Z0IO4Y7bprWNkOp+ss7ob
+         skbsxGrfo+svDMi/vq1EJSlFcEbzydnTQPwp8tKWW9q5K5zGE/EnnNfrIHqh8YEci/jA
+         o2LohtOwLL6eaza3NEonhO7RRHVIvct+6IyDXWeFRhi35FufVXWp36VHZTU/6mmcWUlU
+         vnlEIE97cZzP30MVF2ioaiFPcWLlEHzdr6DJIDu+MX8fMyb8k5oBCXZ/FcOQdJNJB1SW
+         J7b05+EXHnrAxCtaOfwg37OWv+SAcTKkaL6TiuPQ6koIcusjYtiqTX3wMi6/JFwD0IuB
+         DDGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764092563; x=1764697363;
+        h=in-reply-to:from:content-language:subject:references:cc:to
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=y4tyX8TPr8Fd4sNfx70JolFLTf3E7Kwk14TnfD7hLbA=;
+        b=E+3349ckudNBGzOi72Ur/0vBf9p0oJEfanQv2vCbzHq+EQuaEwGJew/7kltPaE71TO
+         kaUmowxthFuVozOeA2Ynj2uCcv9XD5AhXf0luKgH4jMarhBjBsY84s2aWx+5weqKy+Oy
+         lWW+nxGDBZTGmdBzQcV4N9Kz+h5Pczqo3jf03kR8KYj799hoj1QclfIrKQBsvZwJdDAs
+         QjjfYv9L/3aKZdIYYmcwL8juMgHNG5OFD9hv/iHBRWFyODm38U40UIaoLRj+FrgDdoo8
+         XpJvjIBi4CZyAd9C5DAYlgWrS0svYcEOhQ1lq6GOZaTKNNTTRk6OBAmiykeD+dkU/044
+         Bvgg==
+X-Forwarded-Encrypted: i=1; AJvYcCU4NbxYo3xxYnPqxVi3RVIVqfRhbfbbJ3Kdz4BjsPsIynz018cFv+EF4DggLfAM78K4pObhbeA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1t2FX7agjipSZoX/mCyI4WzAb/A1dh2we8SBE6295aQSU1cro
+	loYrO7QEdBvolxWIv04cWF3GCHlCqOswF9vVOUZb/P9Fb0Xk9EddPB5h
+X-Gm-Gg: ASbGncu4hcMoe3Pd4pSNQAUyGel7gT27ooDtfjZy2tggYkatiEA9BuWb+xGiIwKD//A
+	wbMeXR0msD2Bkaj2kpuCGOv6NYOhoQWfp/rsETlu5yZtWdSQn+4qDbAKG8bxIUNeMp8p3M+SM3j
+	vuymNQ92MZlsIIhRtMQmTzpyzy023lrzzb7Eh8oZNgdfInS5AkX3WeRII98jIuG0T8Jus1yrqb5
+	jr3xwBkinHO3ddLdbffsOy0lzQXllpRptpFlbYoZYR4kxlf7Pd7DEDopEpGz512GRRRAmheGl+4
+	IAIf3GlEth1hajyNV+hM7vWg6hkQH+JzEJ1YB0MYhHqTNyNR772tEfmj7KvHo5FC/46uCuK+XWV
+	fwXYgzoxC6Edl5dHezdmvFCCv2xKqH8G1AJ5gKgVYvtCaulX3TqxtXNzcqhwLUtrHIes7xAOcJM
+	7/twsk2wXUFp6EPei+tEzmwAPaZay6X3veGrksDly+
+X-Google-Smtp-Source: AGHT+IFGM18V5BmoNcYUf2okviT2kmAXvknm9jZn5oKlaoNk7p3xJlIfxznSGPSVf/lbXXzEGazn2g==
+X-Received: by 2002:a17:903:2451:b0:294:9813:4512 with SMTP id d9443c01a7336-29b6c3dba71mr192201425ad.3.1764092562714;
+        Tue, 25 Nov 2025 09:42:42 -0800 (PST)
+Received: from ?IPV6:2405:201:31:d869:c163:7f74:bed9:a2d1? ([2405:201:31:d869:c163:7f74:bed9:a2d1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b1075basm170831165ad.21.2025.11.25.09.42.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Nov 2025 09:42:42 -0800 (PST)
+Content-Type: multipart/mixed; boundary="------------45qQ0oCK0HZ0Ruk4XZVcr08P"
+Message-ID: <3e74d313-99df-4aeb-87b3-612f4f3634f0@gmail.com>
+Date: Tue, 25 Nov 2025 23:12:38 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+References: <6925da1b.a70a0220.d98e3.00af.GAE@google.com>
+Subject: Re: [syzbot] [batman?] KMSAN: uninit-value in skb_clone
+Content-Language: en-US
+From: shaurya <ssranevjti@gmail.com>
+In-Reply-To: <6925da1b.a70a0220.d98e3.00af.GAE@google.com>
 
-Advertise netmem Tx support in ice. The only change needed is to set
-ICE_TX_BUF_FRAG conditionally, only when skb_frag_is_net_iov() is
-false. Otherwise, the Tx buffer type will be ICE_TX_BUF_EMPTY and
-the driver will skip the DMA unmapping operation.
+This is a multi-part message in MIME format.
+--------------45qQ0oCK0HZ0Ruk4XZVcr08P
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c   |  1 +
- drivers/net/ethernet/intel/ice/ice_sf_eth.c |  1 +
- drivers/net/ethernet/intel/ice/ice_txrx.c   | 17 +++++++++++++----
- 3 files changed, 15 insertions(+), 4 deletions(-)
+#syz test:
+git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 9eb27a0d984b..0ac28b45e0fa 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -3524,6 +3524,7 @@ static void ice_set_ops(struct ice_vsi *vsi)
- 
- 	netdev->netdev_ops = &ice_netdev_ops;
- 	netdev->queue_mgmt_ops = &ice_queue_mgmt_ops;
-+	netdev->netmem_tx = true;
- 	netdev->udp_tunnel_nic_info = &pf->hw.udp_tunnel_nic;
- 	netdev->xdp_metadata_ops = &ice_xdp_md_ops;
- 	ice_set_ethtool_ops(netdev);
-diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-index 41e1606a8222..51ad13c9d7f9 100644
---- a/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-@@ -59,6 +59,7 @@ static int ice_sf_cfg_netdev(struct ice_dynamic_port *dyn_port,
- 	ether_addr_copy(netdev->perm_addr, dyn_port->hw_addr);
- 	netdev->netdev_ops = &ice_sf_netdev_ops;
- 	netdev->queue_mgmt_ops = &ice_queue_mgmt_ops;
-+	netdev->netmem_tx = true;
- 	SET_NETDEV_DEVLINK_PORT(netdev, devlink_port);
- 
- 	err = register_netdev(netdev);
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index b00fa436472d..494bcfed75af 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -113,11 +113,17 @@ ice_prgm_fdir_fltr(struct ice_vsi *vsi, struct ice_fltr_desc *fdir_desc,
- static void
- ice_unmap_and_free_tx_buf(struct ice_tx_ring *ring, struct ice_tx_buf *tx_buf)
- {
--	if (tx_buf->type != ICE_TX_BUF_XDP_TX && dma_unmap_len(tx_buf, len))
-+	switch (tx_buf->type) {
-+	case ICE_TX_BUF_DUMMY:
-+	case ICE_TX_BUF_FRAG:
-+	case ICE_TX_BUF_SKB:
-+	case ICE_TX_BUF_XDP_XMIT:
- 		dma_unmap_page(ring->dev,
- 			       dma_unmap_addr(tx_buf, dma),
- 			       dma_unmap_len(tx_buf, len),
- 			       DMA_TO_DEVICE);
-+		break;
-+	}
- 
- 	switch (tx_buf->type) {
- 	case ICE_TX_BUF_DUMMY:
-@@ -337,12 +343,14 @@ static bool ice_clean_tx_irq(struct ice_tx_ring *tx_ring, int napi_budget)
- 			}
- 
- 			/* unmap any remaining paged data */
--			if (dma_unmap_len(tx_buf, len)) {
-+			if (tx_buf->type != ICE_TX_BUF_EMPTY) {
- 				dma_unmap_page(tx_ring->dev,
- 					       dma_unmap_addr(tx_buf, dma),
- 					       dma_unmap_len(tx_buf, len),
- 					       DMA_TO_DEVICE);
-+
- 				dma_unmap_len_set(tx_buf, len, 0);
-+				tx_buf->type = ICE_TX_BUF_EMPTY;
- 			}
- 		}
- 		ice_trace(clean_tx_irq_unmap_eop, tx_ring, tx_desc, tx_buf);
-@@ -1492,7 +1500,8 @@ ice_tx_map(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first,
- 				       DMA_TO_DEVICE);
- 
- 		tx_buf = &tx_ring->tx_buf[i];
--		tx_buf->type = ICE_TX_BUF_FRAG;
-+		if (!skb_frag_is_net_iov(frag))
-+			tx_buf->type = ICE_TX_BUF_FRAG;
- 	}
- 
- 	/* record SW timestamp if HW timestamp is not available */
-@@ -2367,7 +2376,7 @@ void ice_clean_ctrl_tx_irq(struct ice_tx_ring *tx_ring)
- 		}
- 
- 		/* unmap the data header */
--		if (dma_unmap_len(tx_buf, len))
-+		if (tx_buf->type != ICE_TX_BUF_EMPTY)
- 			dma_unmap_single(tx_ring->dev,
- 					 dma_unmap_addr(tx_buf, dma),
- 					 dma_unmap_len(tx_buf, len),
--- 
-2.51.1
+--------------45qQ0oCK0HZ0Ruk4XZVcr08P
+Content-Type: text/x-patch; charset=UTF-8;
+ name="0001-hsr-fix-NULL-pointer-dereference-in-skb_clone-with-h.patch"
+Content-Disposition: attachment;
+ filename*0="0001-hsr-fix-NULL-pointer-dereference-in-skb_clone-with-h.pa";
+ filename*1="tch"
+Content-Transfer-Encoding: base64
 
+RnJvbSA5YmRlODZhZDJlZDYzYWNjMDlhMjVlNjY1MDI4ZGJhZGE3ZjVmMGFjIE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBTaGF1cnlhIFJhbmUgPHNzcmFuZV9iMjNAZWUudmp0
+aS5hYy5pbj4KRGF0ZTogVHVlLCAyNSBOb3YgMjAyNSAyMzowMjozMyArMDUzMApTdWJqZWN0
+OiBbUEFUQ0hdIGhzcjogZml4IE5VTEwgcG9pbnRlciBkZXJlZmVyZW5jZSBpbiBza2JfY2xv
+bmUgd2l0aCBodyB0YWcKIGluc2VydGlvbgoKV2hlbiBoYXJkd2FyZSBIU1IgdGFnIGluc2Vy
+dGlvbiBpcyBlbmFibGVkIChORVRJRl9GX0hXX0hTUl9UQUdfSU5TKSBhbmQKZnJhbWUtPnNr
+Yl9zdGQgaXMgTlVMTCwgYm90aCBoc3JfY3JlYXRlX3RhZ2dlZF9mcmFtZSgpIGFuZApwcnBf
+Y3JlYXRlX3RhZ2dlZF9mcmFtZSgpIHdpbGwgY2FsbCBza2JfY2xvbmUoKSB3aXRoIGEgTlVM
+TCBza2IgcG9pbnRlciwKY2F1c2luZyBhIGtlcm5lbCBjcmFzaC4KCkZpeCB0aGlzIGJ5IGFk
+ZGluZyBOVUxMIGNoZWNrcyBmb3IgZnJhbWUtPnNrYl9zdGQgYmVmb3JlIGNhbGxpbmcKc2ti
+X2Nsb25lKCkgaW4gYm90aCBmdW5jdGlvbnMuCgpSZXBvcnRlZC1ieTogc3l6Ym90KzJmYTM0
+NDM0OGE1NzliNzc5ZTA1QHN5emthbGxlci5hcHBzcG90bWFpbC5jb20KRml4ZXM6IGYyNjZh
+NjgzYTQ4MCAoXCJuZXQvaHNyOiBCZXR0ZXIgZnJhbWUgZGlzcGF0Y2hcIikKU2lnbmVkLW9m
+Zi1ieTogU2hhdXJ5YSBSYW5lIDxzc3JhbmVfYjIzQGVlLnZqdGkuYWMuaW4+Ci0tLQogbmV0
+L2hzci9oc3JfZm9yd2FyZC5jIHwgNCArKysrCiAxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRp
+b25zKCspCgpkaWZmIC0tZ2l0IGEvbmV0L2hzci9oc3JfZm9yd2FyZC5jIGIvbmV0L2hzci9o
+c3JfZm9yd2FyZC5jCmluZGV4IDMzOWYwZDIyMDIxMi4uN2JkODI3NjdjNTQ0IDEwMDY0NAot
+LS0gYS9uZXQvaHNyL2hzcl9mb3J3YXJkLmMKKysrIGIvbmV0L2hzci9oc3JfZm9yd2FyZC5j
+CkBAIC0zNDEsNiArMzQxLDggQEAgc3RydWN0IHNrX2J1ZmYgKmhzcl9jcmVhdGVfdGFnZ2Vk
+X2ZyYW1lKHN0cnVjdCBoc3JfZnJhbWVfaW5mbyAqZnJhbWUsCiAJCWhzcl9zZXRfcGF0aF9p
+ZChmcmFtZSwgaHNyX2V0aGhkciwgcG9ydCk7CiAJCXJldHVybiBza2JfY2xvbmUoZnJhbWUt
+PnNrYl9oc3IsIEdGUF9BVE9NSUMpOwogCX0gZWxzZSBpZiAocG9ydC0+ZGV2LT5mZWF0dXJl
+cyAmIE5FVElGX0ZfSFdfSFNSX1RBR19JTlMpIHsKKwkJaWYgKCFmcmFtZS0+c2tiX3N0ZCkK
+KwkJCXJldHVybiBOVUxMOwogCQlyZXR1cm4gc2tiX2Nsb25lKGZyYW1lLT5za2Jfc3RkLCBH
+RlBfQVRPTUlDKTsKIAl9CiAKQEAgLTM4NSw2ICszODcsOCBAQCBzdHJ1Y3Qgc2tfYnVmZiAq
+cHJwX2NyZWF0ZV90YWdnZWRfZnJhbWUoc3RydWN0IGhzcl9mcmFtZV9pbmZvICpmcmFtZSwK
+IAkJfQogCQlyZXR1cm4gc2tiX2Nsb25lKGZyYW1lLT5za2JfcHJwLCBHRlBfQVRPTUlDKTsK
+IAl9IGVsc2UgaWYgKHBvcnQtPmRldi0+ZmVhdHVyZXMgJiBORVRJRl9GX0hXX0hTUl9UQUdf
+SU5TKSB7CisJCWlmICghZnJhbWUtPnNrYl9zdGQpCisJCQlyZXR1cm4gTlVMTDsKIAkJcmV0
+dXJuIHNrYl9jbG9uZShmcmFtZS0+c2tiX3N0ZCwgR0ZQX0FUT01JQyk7CiAJfQogCi0tIAoy
+LjM0LjEKCg==
+
+--------------45qQ0oCK0HZ0Ruk4XZVcr08P--
 
