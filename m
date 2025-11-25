@@ -1,106 +1,136 @@
-Return-Path: <netdev+bounces-241697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C131C87736
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 00:19:32 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96A28C87769
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 00:30:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 38045353DEC
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 23:19:32 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 43492353DA3
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 23:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66502ED87C;
-	Tue, 25 Nov 2025 23:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8532ED869;
+	Tue, 25 Nov 2025 23:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Tmkl9DgG"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="mbsOAtOI"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653892C327E;
-	Tue, 25 Nov 2025 23:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517B7283FE5;
+	Tue, 25 Nov 2025 23:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764112766; cv=none; b=hd+sYs5oFw6YRL9iNLKczboGpGNyzbDU2uqfjDuAAbS3sQ0+uLMipKjSPAzAmA8zGXE1ur194XnT2L7cTN8pEVgBGU857Oyf5wt7tPpN1x7gi7f7ovDQdRjAxL12rUTWBBh7KWn7enOwSpeMJK9gyUr1UCE6e5DV5/bgbUbFi6A=
+	t=1764113446; cv=none; b=bRC9NHLvBYsaw5p89XUzff6FdwUNaxEht33Imr2ww3ApBZqW4/sKbiowz7WB9BjmRvsc0mQ8uzHcOCkUwxMYql4zd+TbfmYpA67k/A5PQ0yVcZ7NY+aIHOoSIJrj/FaQ4Zf0j55e72b1XPijHaTtMC62Cy6cwmfNpWb8a4vuWeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764112766; c=relaxed/simple;
-	bh=oFdOAM6ZwpderCZqBuZ+lnCixgHSDB3mwSe5yeRR/M0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E7Jk6vSbqAbl4ygFa9Ulxpa6lV2mXFbg/hphHf5wEzvCjdMBRl2HIpIc5iY3DI6AMfCgGqoi02Y20R+OM9i1GMmoyk5xj+v/oyrBqCd+2fGogNs52GM+TX76xzt0fyNpx73Gtes8AuyYcOEdp1OGvD5vwB+GM+vbUQDXlY1Ez9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Tmkl9DgG; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ukMBHd2xprh1k/N8cNGlN+MYj/FJerUlkN0OU+0nrSM=; b=Tmkl9DgGtXT1tFoDpAdbmsXLu2
-	wPfi67ITjX3MMczRG20rf2PbUhq4ZGCG/KDNkBGrpGO+cN+ZFzUAi1UFWV1q9dAU55D65VFvfK/+v
-	CijIMS61dPmELwsL21oN9hO8F057RmwJbKrEu0o9u66hmRyhu7TYQJL4I1Xcyzr9ienz1xQ78akqf
-	RquMtihWgU9RyHFTEoJ+Hw2IsjlFXCPXyzGrOLfg2QnvLGfG0eFuUlqnxqH1oCpROSyT/AjVs7xCl
-	VuniJyZ9A2qMyXOxayYK+EASCMWoEKAOE3jDp0UaeuKiqTAxpRI140EdlLrjJIwKMqVxAEAdPTBM4
-	4wrPwEKQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56056)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vO2JU-000000003IU-2m6E;
-	Tue, 25 Nov 2025 23:19:12 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vO2JQ-000000001AF-0Uv7;
-	Tue, 25 Nov 2025 23:19:08 +0000
-Date: Tue, 25 Nov 2025 23:19:07 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: rohan.g.thomas@altera.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Fugang Duan <fugang.duan@nxp.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: stmmac: Fix E2E delay mechanism
-Message-ID: <aSY5ayT0X_zFeYFs@shell.armlinux.org.uk>
-References: <20251125-ext-ptp-fix-v1-1-83f9f069cb36@altera.com>
+	s=arc-20240116; t=1764113446; c=relaxed/simple;
+	bh=1CL7F/EPmacklDgNHadvP88WPBBCXgrMdxbbyV9HARA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=HSUlTCWJfusVownanOWq7W3+V9k8hA4Z4YqLGYdCzVOlRxM3WeUHbAY/WFn/Dr8YCbtyg0Lcmq+QydnVi6s/m7VkknvbTi267VXI7/cqegXg3/jGudDT7z8ATRDWERvpWcFiMdm2AsrAYBfXuBVUOH+zmzO/SQWO2qYevRTz+jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=mbsOAtOI; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1764113441;
+	bh=zNjLddHCpjTdStFZIMsK7u7349FlcRJmEkd1jofbSF4=;
+	h=Date:From:To:Cc:Subject:From;
+	b=mbsOAtOIvymDKgbuh6GcVbPtBO/ROReOWr6ADegDDlHHdpNnxCGsQE35FunJbGQES
+	 OlBbfBw7IlafNLfZ2xIgOY2rxQOqrGDd9oC5AnXrfurri0/ziWP5WgOOMU/hnBAFYC
+	 DQLBmCG74KamsRd2PHKo8ZQMkZIGHfZWNHiv4QzW4d0h22SAspps4vfVb4QKDvL7Yg
+	 O9HIUkFrAYwrjwAbD7JbmgkXgsH5k3hTYk3Yz3x5O01qmW6WzFc9gWxUMP2MzEw11t
+	 wilPjvra+x1uF4Nd6PeQkErUVinXelX6PmpC9doOb07tX9TnjtTcI36v3kOv4O+kjF
+	 JJ5sB4N0+UwHg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dGJpS5gXmz4w1g;
+	Wed, 26 Nov 2025 10:30:39 +1100 (AEDT)
+Date: Wed, 26 Nov 2025 10:30:39 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the net-next tree with the
+ mm-nonmm-unstable tree
+Message-ID: <20251126103039.222a1589@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251125-ext-ptp-fix-v1-1-83f9f069cb36@altera.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: multipart/signed; boundary="Sig_/St=H6mm/KUPwvf4+Tjheqk6";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Tue, Nov 25, 2025 at 10:50:02PM +0800, Rohan G Thomas via B4 Relay wrote:
-> From: Rohan G Thomas <rohan.g.thomas@altera.com>
-> 
-> For E2E delay mechanism, "received DELAY_REQ without timestamp" error
-> messages shows up for dwmac v3.70+ and dwxgmac IPs.
-> 
-> This issue affects socfpga platforms, Agilex7 (dwmac 3.70) and
-> Agilex5 (dwxgmac). According to the databook, to enable timestamping
-> for all events, the SNAPTYPSEL bit in the MAC_Timestamp_Control
+--Sig_/St=H6mm/KUPwvf4+Tjheqk6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-bits
+Hi all,
 
-> register must be set to 2'b00, and the TSEVNTENA bit must be cleared
-> to 0'b0.
+Today's linux-next merge of the net-next tree got a conflict in:
 
-Are you sure 3.70 is the appropriate point. According to the 3.74
-databook, SNAPTYPSEL changed between 3.5 and 3.6.
+  tools/testing/selftests/drivers/net/hw/toeplitz.c
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+between commit:
+
+  f48b6111ba40 ("selftests: complete kselftest include centralization")
+
+from the mm-nonmm-unstable tree and commit:
+
+  aa91dbf3eda2 ("selftests: hw-net: toeplitz: read the RSS key directly fro=
+m C")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc tools/testing/selftests/drivers/net/hw/toeplitz.c
+index 4b58152d5a49,a4d04438c313..000000000000
+--- a/tools/testing/selftests/drivers/net/hw/toeplitz.c
++++ b/tools/testing/selftests/drivers/net/hw/toeplitz.c
+@@@ -52,7 -52,11 +52,11 @@@
+  #include <sys/types.h>
+  #include <unistd.h>
+ =20
++ #include <ynl.h>
++ #include "ethtool-user.h"
++=20
+ -#include "../../../kselftest.h"
+ +#include "kselftest.h"
++ #include "../../../net/lib/ksft.h"
+ =20
+  #define TOEPLITZ_KEY_MIN_LEN	40
+  #define TOEPLITZ_KEY_MAX_LEN	60
+
+--Sig_/St=H6mm/KUPwvf4+Tjheqk6
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmkmPB8ACgkQAVBC80lX
+0GwljAgAhQxGnf7JM5bPtPAgMVXY4tSNHQfapralpqTo5PwD/H3IsY07Bo2YdnNP
+AyxuYR4MRDjDPirTv7QPWGWiwOGIpmSZ7hV73HFwJRdK/idhlOrH79spzw14I4N5
+uKj3e9X4SKLpoKb2mGir91/5hqxDcwRQV0iFpG9SMlsAlV/NfMWrN2iRYgPKdNy3
+YBtKkikGrn6EW0YOxhTpGfESRjNpFgpa5fK87HAqn8Z08ZnRqdgwAnvUgyc+Yf46
+2HxPFBpP5BDpck2D6Ez2TU3Jkwvz1m2zsaQxHtfhzQo9Js8udrQXYAa8liJWXK2w
+qxkcZI4D0AWuHT5OK2g70oAdjEjw4g==
+=PkBu
+-----END PGP SIGNATURE-----
+
+--Sig_/St=H6mm/KUPwvf4+Tjheqk6--
 
