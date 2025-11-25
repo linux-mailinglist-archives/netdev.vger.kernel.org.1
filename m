@@ -1,81 +1,99 @@
-Return-Path: <netdev+bounces-241550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8428C85AA4
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:08:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AD63C85B93
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 16:15:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7B6564EB1A6
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 15:03:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE5973A2D96
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 15:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66B8326934;
-	Tue, 25 Nov 2025 15:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55092327C1A;
+	Tue, 25 Nov 2025 15:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YvhVu9Mj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9blSrgO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8BEF22DF99;
-	Tue, 25 Nov 2025 15:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299CA327C12
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 15:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764083025; cv=none; b=CPOoMc1ILF71G118kIY8hbc8A89H0oT/20ioLRLOU99c2HZIl1tIrTmYmv3W1Ioy6gA8OfgZ6zsfqmGenPoomTvPFj8seTcxutsFuFc02zQrMz2aT9Z1smweCqID1UUXvgLYFH+pepI31lS5m7gPqMow9PLqnmNMkV+gjare9vE=
+	t=1764083754; cv=none; b=GcEYcYYs71AfiDSH09oe9oJvQ697ABi3KotjK4/Lx7qrJsnTsL4RjlqbcwX1DqHE24mQmuocn3A4+mE08FIXuqN7rKXttcbc0YUp816SRmPhN31f/qmPrNcdpa5LttUC7O2NWcDdyt80xN35ZcNHCUvCuTP/OqYZKZWEZrX3EeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764083025; c=relaxed/simple;
-	bh=RhmWVOiXLffJHAyEb03rsB54dnoWWSfIq0sUpCQDnio=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ERnsn9UgHC5jz62sPVcPKnYmcYhKNfResxOr8DK/keBapQPQkgIW+pOcfYr2nfdN40nm/O3x88OgFpNGfB+vmb9c8F9QWCF1+GLaQXeqMwa1eLIO+TRLq/J88BOzX2CLuBBi3eQRphVTNdvSJbC9HFWg+toCEEXRlq9dzvRSwIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YvhVu9Mj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE4B9C4CEF1;
-	Tue, 25 Nov 2025 15:03:44 +0000 (UTC)
+	s=arc-20240116; t=1764083754; c=relaxed/simple;
+	bh=K1JjRo2hUFdAtHdoVAFMajKI3GQegMhwkD77uUmVv4I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W25IX4g7gIMCfts1lLB+rO/KROf1EZaNWiB6UYVwa49AGTOCKjDKBbAKfaxSzYeAhpqRShJwiifKp6G9iQitIWkEPpxj9idB2JFncR5TkGMTWkYrEc8GiZQpfeyThvjvNZty586U7lommrOViu1KWdN4TpvWLF0CKTlDSgqBeGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9blSrgO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61693C4CEF1;
+	Tue, 25 Nov 2025 15:15:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764083025;
-	bh=RhmWVOiXLffJHAyEb03rsB54dnoWWSfIq0sUpCQDnio=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YvhVu9MjDRqlmuwu8LG4CNHqXYhwUeMiiMp4P6mJV2AIdMARH+SqPmMheePEwayMN
-	 5kw4RqkaRAkMFEQ8/TiWbsWZb77TOFbsOYsHOO4BXCv7GiQgz1LhSu2K1N4TjlTB4s
-	 zEZS5sjWKO/U7K3wAnm/mrpmVikZ9k2LrJOgupwrr0vckbKby3EzHDZzt1FdmdJTLO
-	 28mFT0l4WMa2MRK8aTn4jW1OzBHniGqX0j2DKy2SunrCMccQsM60ISoLh1mli6ysiH
-	 oQQmxFLvURJmVZmPsBCMa6HO2HFqXRh0O1GUBt5XGev5tTeYf4Vx3dMu7yin/uJxHp
-	 /ZmN9A2jAxWaA==
-Date: Tue, 25 Nov 2025 07:03:43 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
- <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Mark Bloch <mbloch@nvidia.com>, Gal
- Pressman <gal@nvidia.com>, Sabrina Dubroca <sd@queasysnail.net>, Shahar
- Shitrit <shshitrit@nvidia.com>
-Subject: Re: [PATCH net-next] docs: tls: Enhance TLS resync async process
- documentation
-Message-ID: <20251125070343.47d9498b@kernel.org>
-In-Reply-To: <1764054037-1307522-1-git-send-email-tariqt@nvidia.com>
-References: <1764054037-1307522-1-git-send-email-tariqt@nvidia.com>
+	s=k20201202; t=1764083753;
+	bh=K1JjRo2hUFdAtHdoVAFMajKI3GQegMhwkD77uUmVv4I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b9blSrgODs4qwEbSPPxIv19bQS7XBvQyWD3llvzhJqj82krfTfD7M3nQSy2s/alK5
+	 O5gyETyaVSoh6FC3TcmeUlmmKuQDCpbgfJ08VIFvmaDKgv1LzTNRjp0cUP6gLiFpWD
+	 LhKuSMM/MfzzbikDhTqUdvqNfO5vqDbikEq/SN72oumXDzhzHX43AgP/Lrsdabcttl
+	 1ChFuF5t+hnerdeF2i5KCDvfJlziP63xP2sljZoSIV/lhRhRavJeUjY7e3TIpSX1tQ
+	 r5kdJGmVFukNbEnbdADnqNyyJ62HfRc+Fb9yQdLmF75nZnkVukzndRQvRqkbiiRqyz
+	 Q7hgxkOtWLU5w==
+Date: Tue, 25 Nov 2025 15:15:49 +0000
+From: Simon Horman <horms@kernel.org>
+To: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
+Cc: netdev@vger.kernel.org, Byungho An <bh74.an@samsung.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Girish K S <ks.giri@samsung.com>,
+	Siva Reddy <siva.kallam@samsung.com>,
+	Vipul Pandya <vipul.pandya@samsung.com>
+Subject: Re: [PATCH net] net: sxgbe: fix potential NULL dereference in
+ sxgbe_rx()
+Message-ID: <aSXIJZ3EztBeCfPg@horms.kernel.org>
+References: <20251121123834.97748-1-aleksei.kodanev@bell-sw.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251121123834.97748-1-aleksei.kodanev@bell-sw.com>
 
-On Tue, 25 Nov 2025 09:00:37 +0200 Tariq Toukan wrote:
-> Expand the tls-offload.rst documentation to provide a more detailed
-> explanation of the asynchronous resync process, including the role
-> of struct tls_offload_resync_async in managing resync requests on
-> the kernel side.
+On Fri, Nov 21, 2025 at 12:38:34PM +0000, Alexey Kodanev wrote:
+> Currently, when skb is null, the driver prints an error and then
+> dereferences skb on the next line.
 > 
-> Also, add documentation for helper functions
-> tls_offload_rx_resync_async_request_start/ _end/ _cancel.
+> To fix this, let's add a 'break' after the error message to switch
+> to sxgbe_rx_refill(), which is similar to the approach taken by the
+> other drivers in this particular case, e.g. calxeda with xgmac_rx().
+> 
+> Found during a code review.
+> 
+> Fixes: 1edb9ca69e8a ("net: sxgbe: add basic framework for Samsung 10Gb ethernet driver")
+> Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
 
-Documentation/networking/tls-offload.rst:342: ERROR: Unexpected indentation.
-Documentation/networking/tls-offload.rst:344: WARNING: Block quote ends without a blank line; unexpected unindent.
--- 
-pw-bot: cr
+Thanks Alexey,
+
+I think this is a case where it is hard to know the true effects
+without running the system. But I'm assuming that we aren't in
+a position to do so. So instead we need to try to reason at
+the code level.
+
+From that perspective I do see that:
+1. Without this change there will be a NULL pointer dereference *boob*
+2. It seems that the refill logic should work with the proposed solution
+
+So, I do expect this helps.
+And I do think it can be accepted without hw testing.
+But I do have a lower confidence level than I would if there
+was hw testing.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
