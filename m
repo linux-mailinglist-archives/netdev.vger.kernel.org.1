@@ -1,136 +1,113 @@
-Return-Path: <netdev+bounces-241535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 222B0C855B2
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 15:18:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90C92C85666
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 15:24:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3E4534EA05B
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 14:18:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42BA33A6768
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 14:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA2F3246FE;
-	Tue, 25 Nov 2025 14:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD0E324B1E;
+	Tue, 25 Nov 2025 14:24:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ap5kYhL0";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KjOqHMOh"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="QF8YmHXR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAFB31BC84
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 14:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5D731C57B
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 14:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764080280; cv=none; b=V/jNL8SuIFwnSm3/lssvG/t/BYVCqin3UYDz1BJekyy1g8dBeAdf0ZMBPiyF1xWVQwmcWWCjdsTv9x/3J2G0BzfaQdkcyt4ZcQSOHTJsrBWa8yi+oF6Ac/+g05zyKnp2Lr7bcYBOMYdwsfjFRNxKwyNOeMzIt+eQe3rqUAI01Xk=
+	t=1764080640; cv=none; b=KpZjgS57EZzGgwMCAO9RMhZG2hCxvlJa1RbflH/r+kKHWpwad+hGRZ6M8ei0x2/1nNr+HAc6obVNyx6wEonobcq7mRRbr7l1l5WeyqENSiXBgApuR3h602FqM4qOyQbaGopxXr+4Ox7Hiu0IAKtL3zFy4NWXNFRYs7OrYwHFKKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764080280; c=relaxed/simple;
-	bh=2Ur0OJdRZLxQxQ7Ppyeg130nQxzLy00N2xieou1E18U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EQIvrJhoR5bOPeWO6hJuxsFdDdd876qbmYicnEuG5/Gn6iyvjz29JDFEZAthy4VMhHj4TZwZBfli0vKppEITgx4EzTkH9w9zGghvxsbBh9BL/A1Qm7nqEbRpb6c1TSqSunHkerIDb8ddu2X7ZnUQmGe1nDN7xVVpJDhHS4HpGB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ap5kYhL0; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KjOqHMOh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764080278;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FSwJ5fwmRDxewMfNoKhcg97Z3bqu6PXdkjiIvWnFQ9Y=;
-	b=ap5kYhL0P7y7uusVIMyTjXiT/lh+174QFDEYS8TzsLgtfKyMSlfNnRzqPpr46xrf/MfCIi
-	+tfXVT7QT1BaPi+NICdKbBSr41UxT0yljqTLNzHo1CMYW93Wl9nEEf0fsZKqO3JaMA6wHe
-	WQ4oJej7+W1cUdJuM9BO5IdkM+WSZ0I=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-112-j3sq_gwtMim0Xv1AfoERjA-1; Tue, 25 Nov 2025 09:17:55 -0500
-X-MC-Unique: j3sq_gwtMim0Xv1AfoERjA-1
-X-Mimecast-MFC-AGG-ID: j3sq_gwtMim0Xv1AfoERjA_1764080274
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b736eca894fso449529266b.1
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 06:17:55 -0800 (PST)
+	s=arc-20240116; t=1764080640; c=relaxed/simple;
+	bh=6LqfH0zJp1SrXC9x7HOD/hDkEmKu/xLJPb3kSuBSxAE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KM3Dsuxnq/H2giIgvxb77hf/e3je3erQjr4UJiAGbt2sQRKVuV/HzizRyDVc7ORz9ZIiB6MAVRw84XfwscdcvdtPxQmsuCO0ysN4b6YWkhh/XCcYenhscW12cqef+nv4E6AF47jw6V5bLAlyhLDTLWn6Y9tRjwyMGsLDCgw+6/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=QF8YmHXR; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6419b7b4b80so7883093a12.2
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 06:23:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764080274; x=1764685074; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FSwJ5fwmRDxewMfNoKhcg97Z3bqu6PXdkjiIvWnFQ9Y=;
-        b=KjOqHMOhkwn0uw0rkWPfTWbEuXImU+ltd5lgURdSdTgO7OC92tLS4D6Z1Dui9Gukq8
-         yI00TVFZenRGRtMG67Pj2i2ASbWMCqTzAHCGXN7OJumFQQlsm1rReEsTt4e/3ObXe4CS
-         a0QzS8dD9rkISJ9jcSrpdxz/fS5tObG1bR9HpmlwEypVkFN2zH+R84aeaOdrjstlvX45
-         5mqpNbdVqjXzaxSZMkmo/uYlC9QLoRB3alXwuGCyz5qIzn5phU7wziJIriDpaSH1o8sp
-         SczC7BxWTqMB38XZKpX6C1mFHDY8xOpkIZjusa5UNplSNSwUF1T33l5+1F0/0n5iMdz0
-         /tzw==
+        d=cloudflare.com; s=google09082023; t=1764080637; x=1764685437; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6LqfH0zJp1SrXC9x7HOD/hDkEmKu/xLJPb3kSuBSxAE=;
+        b=QF8YmHXRAWwk0dH6yrLCnzq0GFv49raJy1vcOv1Blu+pbbXsfK/mgDx5z2QWsgBl6k
+         7nfVdrhbGI/gH0u7iXWIFqb/WiwIrnJb5vcqLtrMKmWc4m694J2scWRECp8hgtwdmIet
+         HpfkMusoKmG109uW7Ftg00rMvp6ZQaKhO7ithytjblJClmjtLIL7KF3yfZfOltHOgPAd
+         eGgHFiIIat2/xdCdv7nkW1b6+YcHjHrc5llZYzanDfQtWmJC/QzVoNsuaydkdt2xgMQD
+         Q4PQ/Syg9HAwRpFEBsAhSOiy69SVJTbBhNDx2IN0pBy5ndDUEAeK5uk+eHgEMVbYLY17
+         9PbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764080274; x=1764685074;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1764080637; x=1764685437;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FSwJ5fwmRDxewMfNoKhcg97Z3bqu6PXdkjiIvWnFQ9Y=;
-        b=p9nqQfoVLXKQUho/axbmWT0nNgkA6EFlZ8mpLUQNVOkparGqs40mby657o9bpdxPHv
-         P4ng1QRy7+rqN388hz34pNOfQl2KSoyIFDy3imVrIfFfC/slLZreU8cYxLLJWi36SwdA
-         oJK87fTQmQbm3XmnxPhUiiJGYp8AfJtWVaCYgVA7Y8Nqe00i7LaQMlBh4s4fnlcKR/px
-         JB9g0UMnECiREFkhXaosudv2SsAIvTK7kY5lgUg59cpZCWcaSiCc3Rzc8D2UDocdxg0v
-         SFqTqR9ek8OBgULNiRziHRyLM8Tojk5K6DHzuN3pde4+Ch1YD6BC5RDKX54VMIOgt5An
-         +XYw==
-X-Forwarded-Encrypted: i=1; AJvYcCUde3zXp1F4hjUAoJqFerQewoyF698HNMtw147IgeU/iczIlsQR0a9cEqLa02pMC7PKBse5XFM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxibLsuhOLPHhYjT97ecz3wI6l68X7mPVxIQUc1245DaWZ8y00H
-	d+QSfhhi9suSzJNG/65ttHiADqN99gb0LQ5uoAr2kvEzWAP64eKBRWEaBxfVh2ErWHfD/iMgHoX
-	4kADWPOB6jrTSBCkrcLSWU/VnyIhq3i6W/fNjKwMgDeFyvdPUPaXj6ou/0g==
-X-Gm-Gg: ASbGncueeheNiUOShiQhCL2rkCMuo24+zVrsftFFeE8npuQjDRwEBEP392b2WPrV2rw
-	FvdyrRU0o4zYcpdUqvwxTZ+wc1r9It1t9/WWeZf8MwC3N6EDscc6YPosX8R8ioMOzKoWln1Tkqt
-	Pbk0C5ti2NMBP+aabBHKmvVlrowLe7X2JdBZ/4hcqZjWBrprOiI3lwwwv2PKCkT5hGG9c6U7zs3
-	iAN3oMvUoqgyAnx1UkDnGGpdbZL/21di5RhIfyh4llzDX9YIs1uirJh0mMHF3cP+2Tlbwtucx0A
-	xi4EcQnY0hxhM5xG9hSxWoFl7zUhxkx3mUfNIbQX6BspZxxXJvJVdhMWnT7BRNpBzPIohGWuXeH
-	rtVxJ7QVEPbVTgg==
-X-Received: by 2002:a17:906:ee8c:b0:b73:572d:3b07 with SMTP id a640c23a62f3a-b767170ccb3mr1838885066b.28.1764080274269;
-        Tue, 25 Nov 2025 06:17:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFsrmrV2cBWDr+ZSzNL9o2G3mEYj/CXK8Uil/l4NJOy/CwceejmUKWQCZ9oPoMhj102mNMv9w==
-X-Received: by 2002:a17:906:ee8c:b0:b73:572d:3b07 with SMTP id a640c23a62f3a-b767170ccb3mr1838881166b.28.1764080273904;
-        Tue, 25 Nov 2025 06:17:53 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.231])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654cf0435sm1599810766b.4.2025.11.25.06.17.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Nov 2025 06:17:53 -0800 (PST)
-Message-ID: <c9d2f2d4-7d8c-4acb-9960-805a3c6d83e0@redhat.com>
-Date: Tue, 25 Nov 2025 15:17:52 +0100
+        bh=6LqfH0zJp1SrXC9x7HOD/hDkEmKu/xLJPb3kSuBSxAE=;
+        b=uV8bqXFV01XT2KOHbirHbCptQb40FImhWCqPDOhjXjaG5Qe9YozSKGwpL40eYbWlRP
+         Qm3suKH3IVul7tPZ+G4Q2yPLKhI2eLeaENxa7Jf0elWH9W2kCySxPO7zCzDlhLaRcTpO
+         ImQxUqvnd/TXYTpqCn4JqNabGdae3XnRr60I123FxApsQGG/LigJmGmqsdd/TGvScRk7
+         8hKM4pY/ul2GGXgVAuskcgkTt4FxhyjzQmf19ngWZAXW0QYqP2ywWWFTJgTMkJgBIXCG
+         ofDtbMFF23LxAbSZX5IbiOy9/8ENg1XEHvlZtti6bDHPtGlfZ+Bo4rS9RFJHn5s9lmWp
+         Frwg==
+X-Forwarded-Encrypted: i=1; AJvYcCUeSCVljASeJXDnaieWcY3YcNg+1qLaPvD1krpWplWBpUwZBON8BdCDEHYZqFHJEej8J5BWReA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw40ruKbn6EVmMtO9PJVSUI2D1c5Bla5yW1+pYmoqjgv+vcho6s
+	phypU6IvZ/44AA0dZnnyAKu8stXIs3n29MspzEMuHksvztE9ji6vgLJ2pf+2Z6vKsaw=
+X-Gm-Gg: ASbGnctjgf4+XEfE6rY2NyOEyPKaPenhkYUBbfpjjKcfFwvPL9YxrICb3TGz/viChGG
+	EP/9ZW3UXmkEXChzPLXQPvZ0ZZJ2kZmBkOyWay95Zf8zhB2W7v4YeMKJ8DditdTHqHveI1eAKkn
+	J9dqDOTf8QRFJg7Gj1EGJ597mSsdSPcSVqaM8AttPemWZjCxcc7/EIkqpIpci1TgSsGWQ3ni2VA
+	YsV4PGGL72UYmXMk9RCBdwfirPneYYfe0/ZK0pWXZ3wIsr3vUsw1t0ckBSelgJ7ERXcmcJZt8hF
+	9zwXJX6zAanEkUgGmmhaIGA9kaLmv44nIRDJ/xT1WybN2emRVnS6Wrg/ymcfryLC84ikgHKKoBq
+	ii4z54MXb2uo3M0jHomHL380BQtIqZ6GjFgMH1jTuATesZVkDnBfbbTsRRPY4mHrhY7pSK14ZFq
+	Snn7gsYAvCokaDgQ==
+X-Google-Smtp-Source: AGHT+IGsyvKHdORKwFth+3NCAwQtMjuvaLmVXYSXCUsqAqneazOk5U0n4dygLYxdjqbi1pYRvYvXyw==
+X-Received: by 2002:a17:906:b4a:b0:b73:53ab:cfa1 with SMTP id a640c23a62f3a-b76715ab9ebmr1277500966b.17.1764080636819;
+        Tue, 25 Nov 2025 06:23:56 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:46])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654ce15e7sm1627635166b.8.2025.11.25.06.23.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Nov 2025 06:23:56 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: bot+bpf-ci@kernel.org
+Cc: bpf@vger.kernel.org,  netdev@vger.kernel.org,
+ kernel-team@cloudflare.com, martin.lau@linux.dev, ast@kernel.org,
+ andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org,
+ eddyz87@gmail.com, yonghong.song@linux.dev, clm@meta.com,
+ ihor.solodrai@linux.dev
+Subject: Re: [PATCH RFC bpf-next 15/15] bpf: Realign skb metadata for TC
+ progs using data_meta
+In-Reply-To: <4d340abe294ac0290710c745f5f48bfb89b12ed3ac2be1c2df6d85848b45724f@mail.kernel.org>
+	(bot's message of "Mon, 24 Nov 2025 16:58:04 +0000 (UTC)")
+References: <20251124-skb-meta-safeproof-netdevs-rx-only-v1-15-8978f5054417@cloudflare.com>
+	<4d340abe294ac0290710c745f5f48bfb89b12ed3ac2be1c2df6d85848b45724f@mail.kernel.org>
+Date: Tue, 25 Nov 2025 15:23:55 +0100
+Message-ID: <87cy565gxw.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 06/12] ipvlan: Take addr_lock in ipvlan_open()
-To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, Xiao Liang <shaw.leon@gmail.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Stanislav Fomichev <sdf@fomichev.me>,
- Etienne Champetier <champetier.etienne@gmail.com>,
- linux-kernel@vger.kernel.org
-Cc: andrey.bokhanko@huawei.com, edumazet@google.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
-References: <20251120174949.3827500-1-skorodumov.dmitry@huawei.com>
- <20251120174949.3827500-7-skorodumov.dmitry@huawei.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251120174949.3827500-7-skorodumov.dmitry@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 11/20/25 6:49 PM, Dmitry Skorodumov wrote:
-> It was forgotten to lock addrs in ipvlan_open().
-> 
-> Seems that code was initially written in assumption
-> that any address change occurs under rtnl_lock(). But
-> it's not true for the ipv6 case. So, we have to
-> take addr_lock in ipvlan_open().
-> 
-> Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+On Mon, Nov 24, 2025 at 04:58 PM GMT, bot+bpf-ci@kernel.org wrote:
+> This appears to fix the bug introduced by commit 016079023cef ("net:
+> Track skb metadata end separately from MAC offset"). Should this include
+> a Fixes: tag?
+>
+> The earlier commit message explicitly noted: "Note that this breaks BPF
+> skb metadata access through skb->data_meta when there is a gap between
+> meta_end and skb->data. Following BPF verifier changes address this."
+>
+> This commit is one of those follow-up changes that addresses the
+> breakage.
 
-... same here. This looks like 'net' material and need a fixes tag.
-
-/P
-
+False-positive feedback, naturally. Both breaking change and the fix
+belong to the same patch series, so Fixes tagging rules don't apply.
 
