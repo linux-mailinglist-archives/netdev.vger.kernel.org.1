@@ -1,162 +1,140 @@
-Return-Path: <netdev+bounces-241493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9CFBC8471A
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:22:27 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACFE3C84750
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:24:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 130DD4E9A80
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 10:21:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 26FEF4E9667
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 10:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11A33019A4;
-	Tue, 25 Nov 2025 10:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473DD2F5A08;
+	Tue, 25 Nov 2025 10:21:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b="jdkvyeoz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25E12FE06F
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 10:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9221A2EDD69
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 10:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764066006; cv=none; b=lDxNfwE+u5x0mnY1OTIWOSskvnFp/kgj1mTL9+GgVEY3Bjh3anfHZ5+4EAueMifzWA9uxPPJ6bGkECC87FEnCbyM/3u2Qfg5iHPSjP0vz1Tv5Y6kXaoQ2DjWNWbgkrrstbd655SAhJ3BxxazfU06Qr3hp6GfvaRto4KUYVrR4pM=
+	t=1764066107; cv=none; b=uxrr8fVne5Tp6pc1mzLRAeN9cvmk4EJHQb+6ULbOnqVnHvvYEfijii1EdCRh4N2i2niGm+LPjMSf9ou5+jmVYE5OIqZVSPfDIz5flmSOfaSh9NfAg8OHznMPtBxBerAntQupI7fBEcTlJr3IbA7nJGilbRrdxYFbzAtTV7WZR7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764066006; c=relaxed/simple;
-	bh=dXV72bqndpkkvzq9o6QtXIzE69babSsUr1zwRzXjy7A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=PB3+Thnh3FbVXXyxR4aIYoSWKDpN0oNVvVKGy4NDuajGzM18xwl0NuvYYEk6qerFUk79zmVDSVkEqeyrMwCkcgG7nBPBWIRfjx74lf3Cp/eHSDCHA/FE6XbQYUjGwBFkwN8eTmlb31yoTVjzdygkbP1MQxeJKKLr4Kl+dR4040A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-6574ace76dbso2137311eaf.3
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 02:20:04 -0800 (PST)
+	s=arc-20240116; t=1764066107; c=relaxed/simple;
+	bh=+rOwk2RA33dF4WiOqSAVuKiVTIehuiVNfhftsKo0a7Y=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=cG4wdqWQSvR65GC2g1oKBbSitq6vZjIy2mPhHQZ8RWDOE02K/Fg5cngC5B0JkLURcYD6Puw4kkp0Hmk/oT7B3YqCZu7glehPnatf8/J0cJkyIs7VdhKMCBiR/u+8Uugoag73mrF3C/fW5KuagUQ9n0svyULxULR4rTuVjuYD9nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=jdkvyeoz; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mandelbit.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42b3d4d9ca6so4322235f8f.2
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 02:21:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mandelbit.com; s=google; t=1764066103; x=1764670903; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=usqUI61O5uSfjYi62jMQ9TXpUJFFLlygNvx27CjAFUM=;
+        b=jdkvyeozp6FBewcmin2f+Ojw7B+yJhFxvgWS5HHQXq1juPMHYF4hLczdsOYn5hGQEb
+         dRKDsvKOaC1royyzmAHsONXC3Jl9t2JLdKaSzGrWsIssbzPZD9b6WtN/RKy05AQCr8Y/
+         sxjBFY6RZUKHkT1a04HrQVp8DgHfDE6WZ/OC3TZ3VWwxxHWtyXKn3NSBrVWg4mv6+aOY
+         trgcjCUglASxEQSRiBsIhrMepSHFfo+n72s82o5w1xrxK64gDNN5V34iVJ1mkjqkG+UN
+         1FW+K1M6oeEpLYceCRgtCJ5toQVCPrwaa3dZgCZ1ozzc3R74jwkklXn5nRqiSXHiJCfV
+         xjHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764066004; x=1764670804;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Tvbta4fVdZn9vAqQBg3FZCIOEShaAvkwCR4RcvEMvMU=;
-        b=MLa5drNxNbUOl7RvX5kLoOqG6aWsGoRuqtmGtom7N9Tlvzz+eb9z0EHYYUwJlmjha5
-         DGSklCgcAqmxDeMG8HBaZwQ4J1oGw6Ih3SvNaNbYHKlcg7b2v210qD4N0D+ch4bcO2QI
-         +XTnZI4pBaAs7TRgRUHDp5Q9Y65QUphSQNcP2hALn9tDXlaJkcoXD8bJi/Mx/We5bczu
-         ibvtTXwPM1lxeSH/xDCcUQbKeT2lAhlx9VT9Z6F7H0HKO3seqWvjaBPHHEVZJXb3gSaz
-         683xjqEqYXkSKA79fVDAzJcyLcssUoIA9WOg/BSIPAT6k3wuLn00RsvsqqszQ3rFrGXJ
-         iTdA==
-X-Forwarded-Encrypted: i=1; AJvYcCV7A6UQ1DUkLuFLe0Kwipns77SutMFRaET1ChJaFqf1ttlqU/IVeT16/32kzj7/L4UxEwfkd2E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxN/49hU7345whvmlVPtuFUBO/82ZWXs/SOaSPGTbB9aeW9H7T0
-	/Js0de7rB2C3yjeOFCo/2KH4ADz3p+dN4WBGVLcw7LluOYwnvLzXNygDojdWMw==
-X-Gm-Gg: ASbGncun+h2fM3TWgALR9S9TbQBiuIh0OhQY4/LjTamHQSTLj4QEjKUjyzfqPkRFNI7
-	KlgbkmT7ibprfV6ZOxsQ/3EOPdg75S8vLy8IE3bEwhcdiOXmbSJmw0ruU0wD73/QQIkYVQmxlwO
-	a47Zju8ijknru3ppYBPtIgMkJff6pdBLToxljhrBlNOI8XrM4EI4kF1efPL1+y/clJwXEc52zIz
-	gAQcULRSdShVTdXaDtx7kEZmp+el8eHOYIbJE+2Qq2fRLboiVc3F4XDnZre3otsTJNQkccNgFg9
-	IvXFaQd6IpIHZH3yhgWXUMgA9RMZgR9h+5TXYf+gw1dUd5FfnKlDeLlrxfzTRPoqF4Bli5jiPUm
-	V1uShVhZZT/fn4CPXy34F5Dvbi3Zob+WRf40DE7z7qDs10NkVzPOoYaQOoIiURLvJlGbPLCwtGH
-	S0Tv7vbw+NN8XP67wGlezS
-X-Google-Smtp-Source: AGHT+IG0n0J7rKRKrTWwDRtn+YiwdUe/ykWABXHXC6gNlvNKhYZ7bef0l5IiHuvPmD0px4kFdMhhrg==
-X-Received: by 2002:a05:6830:2b0c:b0:7c7:6da2:6d6d with SMTP id 46e09a7af769-7c798c4acb9mr8363612a34.5.1764066003793;
-        Tue, 25 Nov 2025 02:20:03 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c78d4280ddsm6145336a34.29.2025.11.25.02.20.03
+        d=1e100.net; s=20230601; t=1764066103; x=1764670903;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=usqUI61O5uSfjYi62jMQ9TXpUJFFLlygNvx27CjAFUM=;
+        b=p5fn+K5BRt8h8rP0yLNGuvuZNU3/f+B3O4SKqWrHhlmuQ6WkkccXGQmOLbiHzNlmu2
+         BKFfrM8VyEZT0qrm+P8TKRnxoeetwJkKGaTNuw0EieEFazWHPaUpKRjTngKb06Yp0q3X
+         hCZKIRVhlaYsCaiR0iuXVGJt32deDiVAfHj+kCLl4VQJQi9GfSPC7bpqhW8TH5DPFu7c
+         8C3Nx9zvLO8uvUqwxXF4blNjKxLzN4dGQDP6ZrBJLhyd6bh/5FSiDtvg4EGfGNkJIrnz
+         3JZErgHf0vCDTowEPG7bXrtnJJAwx4/GhTdh9eVFv7ZLdBWbRxdzUJAraLjPKETxZWt3
+         TpPg==
+X-Gm-Message-State: AOJu0Yw39FminJOuC74u3lOEvmu4UY/FyrlmtPKB/MlcXzQgsVtNjzZq
+	R0iKQAr7zaM6F9WQHjMTkCgjb3e5bRrTEA9+7YUcuA2JIU8QLFjD2E9HHKF6Cg/0cuN2u6MBIW9
+	awBRwEpE=
+X-Gm-Gg: ASbGnct0+lnPfW2S9fDoTokSexizXFtEIt00VPN9GaNnlfCBaWqGtjjSZt1kXClyB3N
+	mH5ivuYud/tv3Lt8NSrXiL7ND8Jatf3jmbbfBPeDEV8S60Kbxm5f9OwwCCn2tmostfbixa0IuJ7
+	P05S6HpYS8xVZuzBHDEISicBTT7QnAApjBhtMxDUinIrW6NEhKLQw9bjvRtYjjjDhZtDms1noY1
+	nmglSFUbnK+1I3EIOwDVFau2/ZoI9D0JgwSKCuvD8FFRFd4q86IDthieFxlJ1cA8j3UBgRwtuBU
+	b9/6cPOf47ngwY1SJ40rh/G78G5sxKeOlKqulnYXwBVKkK264CQ8z1O2GZMwZFa1TFnDw4SaUjo
+	9PVDbo0GEKuJ6Aq2jiN0u2BnvDWt7M9tb4RhKUdDSPcY8BPDfKpbqaaL+K8eM0ORICSGFsrXezY
+	cGGTEDlOWGfsreGoYDKB6MWN7hPeKMIgjtIEPXBbyMH3KFVWJy0Pr0G76MhlqxXquJPqgL
+X-Google-Smtp-Source: AGHT+IEKq67HVyAxXm2ukowHdBKE7/qTnckkb26kV1Fs3NCGHtrM7e7hMBSQbvVfFDTOevRhJMgmpA==
+X-Received: by 2002:a5d:5f44:0:b0:429:d350:802d with SMTP id ffacd0b85a97d-42cc1d34848mr14714622f8f.45.1764066102726;
+        Tue, 25 Nov 2025 02:21:42 -0800 (PST)
+Received: from ?IPv6:2a01:e11:600c:d1a0:3dc8:57d2:efb7:51a8? ([2a01:e11:600c:d1a0:3dc8:57d2:efb7:51a8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fd8c47sm34796036f8f.38.2025.11.25.02.21.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 02:20:03 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Tue, 25 Nov 2025 02:19:51 -0800
-Subject: [PATCH net-next v2 8/8] fm10k: extract GRXRINGS from .get_rxnfc
+        Tue, 25 Nov 2025 02:21:42 -0800 (PST)
+Message-ID: <e6a3845a7522e692fa3de69ec7f1f9c9a683223e.camel@mandelbit.com>
+Subject: Re: [RFC net-next 02/13] selftests: ovpn: add notification parsing
+ and matching
+From: Ralf Lici <ralf@mandelbit.com>
+To: Sabrina Dubroca <sd@queasysnail.net>, Antonio Quartulli
+	 <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	linux-kselftest@vger.kernel.org, Shuah Khan <shuah@kernel.org>
+Date: Tue, 25 Nov 2025 11:21:41 +0100
+In-Reply-To: <aSR--l90hvP6Fkld@krikkit>
+References: <20251121002044.16071-1-antonio@openvpn.net>
+	 <20251121002044.16071-3-antonio@openvpn.net> <aSR--l90hvP6Fkld@krikkit>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251125-gxring_intel-v2-8-f55cd022d28b@debian.org>
-References: <20251125-gxring_intel-v2-0-f55cd022d28b@debian.org>
-In-Reply-To: <20251125-gxring_intel-v2-0-f55cd022d28b@debian.org>
-To: aleksander.lobakin@intel.com, Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kernel-team@meta.com, 
- Breno Leitao <leitao@debian.org>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-X-Mailer: b4 0.15-dev-a6db3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1964; i=leitao@debian.org;
- h=from:subject:message-id; bh=dXV72bqndpkkvzq9o6QtXIzE69babSsUr1zwRzXjy7A=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpJYLIAMYpRybdfkoBMBylttuJo/I+zxk10WasV
- OHTbp/453GJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaSWCyAAKCRA1o5Of/Hh3
- beq9D/sGrH7k8zyr42hndTHDhiu3C+5sa8ejE3PTLKXfz8VGFpSwkznKO3f7QGhI+fhLBP0aPN1
- FO/fj0bnQA55HE3/gO6mdw+Y6Y4LFlL41U3T6Z5pLty6QrgbpOKeRTVoXA7NJeNiGB1Mgyaa+O4
- 2nqjhJsF93MHNuBOONOtiq1Hjz4QrbMqPLacFotgrEobYEqjR+HWYIIlrpaHcifg6Pf4J2Y6B4W
- UPV63dTdvs68k037miseUbQSqRfLa+RanPmZUby4C1TOWqfJCIjoP/XF59uWtuIhGat39Ri83oD
- sZLxizdb5iEVehz827agbw5CDq8i2E/xOveVYBGZNDNJxkgg3Dp7GFOu4dUoYJx1FqwGDSqtp+7
- T6QaUEiDadl57/vHgGTjTBLtsNRDgKfkpqeOVPAnxrILZ5mSVDiW/iFzFVT3Fik1TdvB11Cc4+X
- 1U8w5+ISyAJx6jQ8Y7mO3fh10d0boHc+1EMJjY7reRm2cNvZ193tW46EaeDd72gmvUr0WYql0V+
- qMztuITVslcHA0JkDqJGoZ5ULWLF33SRDwjh/WtCnbjMlICzk5Qs4tWJ6GCj1N8cgrhJdYgRrAq
- n1oHTCrplBgL07N+ldMZpwJdZC24gl3MB2Q/jWiww8Sg64qRJA6oya4FYHqLfFH0nGQq31EMb+m
- x7CGTmvx2hs3cfw==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Commit 84eaf4359c36 ("net: ethtool: add get_rx_ring_count callback to
-optimize RX ring queries") added specific support for GRXRINGS callback,
-simplifying .get_rxnfc.
+On Mon, 2025-11-24 at 16:51 +0100, Sabrina Dubroca wrote:
+> 2025-11-21, 01:20:33 +0100, Antonio Quartulli wrote:
+> > diff --git a/tools/testing/selftests/net/ovpn/common.sh
+> > b/tools/testing/selftests/net/ovpn/common.sh
+> > index 88869c675d03..b91cf17ab01f 100644
+> > --- a/tools/testing/selftests/net/ovpn/common.sh
+> > +++ b/tools/testing/selftests/net/ovpn/common.sh
+> [...]
+> > @@ -82,6 +99,23 @@ add_peer() {
+> > =C2=A0	fi
+> > =C2=A0}
+> > =C2=A0
+> > +compare_ntfs() {
+> > +	if [ ${#tmp_jsons[@]} -gt 0 ]; then
+> > +		[ "$FLOAT" =3D=3D 1 ] && suffix=3D"-float"
+> > +		expexted=3D"json/peer${1}${suffix}.json"
+>=20
+> nit: expected?
 
-Remove the handling of GRXRINGS in .get_rxnfc() by moving it to the new
-.get_rx_ring_count().
+Will fix, thanks.
 
-This simplifies the RX ring count retrieval and aligns fm10k with the new
-ethtool API for querying RX ring parameters.
+> > +		received=3D"${tmp_jsons[$1]}"
+> > +
+> > +		kill -TERM ${listener_pids[$1]} || true
+> > +		wait ${listener_pids[$1]} || true
+> > +		printf "Checking notifications for peer ${1}... "
+> > +		diff <(jq -s "${JQ_FILTER}" ${expexted}) \
+> > +			<(jq -s "${JQ_FILTER}" ${received})
+> > +		echo "OK"
+>=20
+> Should that OK be conditional on what diff returns?
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c | 17 +++--------------
- 1 file changed, 3 insertions(+), 14 deletions(-)
+We run selftests with set -e, so if the jsons don=E2=80=99t match, the scri=
+pt
+will print the diff and exit. That said, I agree the current code isn=E2=80=
+=99t
+very clear, so I=E2=80=99ll make the "OK" conditional.
 
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-index bf2029144c1d..76e42abca965 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-@@ -734,22 +734,11 @@ static int fm10k_get_rssh_fields(struct net_device *dev,
- 	return 0;
- }
- 
--static int fm10k_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
--			   u32 __always_unused *rule_locs)
-+static u32 fm10k_get_rx_ring_count(struct net_device *dev)
- {
- 	struct fm10k_intfc *interface = netdev_priv(dev);
--	int ret = -EOPNOTSUPP;
- 
--	switch (cmd->cmd) {
--	case ETHTOOL_GRXRINGS:
--		cmd->data = interface->num_rx_queues;
--		ret = 0;
--		break;
--	default:
--		break;
--	}
--
--	return ret;
-+	return interface->num_rx_queues;
- }
- 
- static int fm10k_set_rssh_fields(struct net_device *dev,
-@@ -1160,7 +1149,7 @@ static const struct ethtool_ops fm10k_ethtool_ops = {
- 	.set_ringparam		= fm10k_set_ringparam,
- 	.get_coalesce		= fm10k_get_coalesce,
- 	.set_coalesce		= fm10k_set_coalesce,
--	.get_rxnfc		= fm10k_get_rxnfc,
-+	.get_rx_ring_count	= fm10k_get_rx_ring_count,
- 	.get_regs               = fm10k_get_regs,
- 	.get_regs_len           = fm10k_get_regs_len,
- 	.self_test		= fm10k_self_test,
-
--- 
-2.47.3
-
+--=20
+Ralf Lici
+Mandelbit Srl
 
