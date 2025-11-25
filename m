@@ -1,225 +1,293 @@
-Return-Path: <netdev+bounces-241513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9294BC84C64
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 12:41:56 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50AAFC84CA0
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 12:45:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DDF6C350762
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:41:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 70FFC349430
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:45:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A203168E0;
-	Tue, 25 Nov 2025 11:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CBB314A89;
+	Tue, 25 Nov 2025 11:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TfjVzikk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MUzArxIT";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TfjVzikk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MUzArxIT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gb570MeP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0367F3164B5
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 11:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E58E2F39B9
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 11:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764070858; cv=none; b=fvgV2Hjedm0TvSsLBGlffjyahd6AqZ3wzZZd36TmYPzWLqwjEWRFyEN3TTQcJR67nvfB/1NUWtORCgmeGHlv0WDFF5VB0pyB5n/3mvsdQKHuwC1MA+L8xLGy3haW6LeERZA2dL07o+JI/Y1o23bArZS695rCO3+knGQyoVTJQnU=
+	t=1764071148; cv=none; b=msfTbYsfTCTl00m2wQe3H8bKGlIk53eiBYWR+b88CZkYhkE3E/2e8nRfi4PtdKEkLvh1k3qfiHfsN+BEIFYpTyOvk+HYYKbwT8Ow1qF29SH6HHzrxbJcq3vJbdlpyPCd1CQ1rLqc+3CEXWOjFSvP9pZukzHgXuViPzIa5ux5w7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764070858; c=relaxed/simple;
-	bh=A8B9HwgzTGzkMAxCiLd0An8l/9lEOiA7nO5uNyinpCk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FgEiZxjXMQLTM5gzwiAoCXWgEr3lVDt8AkyqtNmD583pW7qW3QB3dMoS/47BmVbMb/F7T7aDXCqb5IDSUuf7dBQXQ4z2ig1yfSAd0sxAOfBdBA9jOKkuWRe2yvejcGmX2z72Zztkz8qlvep+Ua6Zxa/cxQOBPy7vDm/EJoBP7Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TfjVzikk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MUzArxIT; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TfjVzikk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MUzArxIT; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 204B7227CD;
-	Tue, 25 Nov 2025 11:40:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764070855; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pTcqT3HGjPxaavxWGploLrx5S6tE9aabBkwHdsWjic0=;
-	b=TfjVzikkxR06KrE8E7CGppgQ6BQ/AoI7YB7Ma1qna5+d/TrtfCN709bJF0IwVx/DjTt2Mo
-	Ev3gIsYooN2gNKNd2HqS4rpsHKK1TcczVn5nL6Fuf2tNq3SiwYs6OjaseIcjFwPERF4j3a
-	Yf0MjCukoXlw24k1IErkfkYRGzbYXb4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764070855;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pTcqT3HGjPxaavxWGploLrx5S6tE9aabBkwHdsWjic0=;
-	b=MUzArxITzlQOjGszDUGqknK3E3lH84Hpz2n4w4OVcwrK4uRZCELUrRH2+3RaKCsxTbt3bh
-	dJpadNA4LdcZyKDw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764070855; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pTcqT3HGjPxaavxWGploLrx5S6tE9aabBkwHdsWjic0=;
-	b=TfjVzikkxR06KrE8E7CGppgQ6BQ/AoI7YB7Ma1qna5+d/TrtfCN709bJF0IwVx/DjTt2Mo
-	Ev3gIsYooN2gNKNd2HqS4rpsHKK1TcczVn5nL6Fuf2tNq3SiwYs6OjaseIcjFwPERF4j3a
-	Yf0MjCukoXlw24k1IErkfkYRGzbYXb4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764070855;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pTcqT3HGjPxaavxWGploLrx5S6tE9aabBkwHdsWjic0=;
-	b=MUzArxITzlQOjGszDUGqknK3E3lH84Hpz2n4w4OVcwrK4uRZCELUrRH2+3RaKCsxTbt3bh
-	dJpadNA4LdcZyKDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3B9A23EA63;
-	Tue, 25 Nov 2025 11:40:54 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id QG23C8aVJWnUQAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Tue, 25 Nov 2025 11:40:54 +0000
-Message-ID: <955e2de1-32f6-42e3-8358-b8574188ce62@suse.de>
-Date: Tue, 25 Nov 2025 12:40:49 +0100
+	s=arc-20240116; t=1764071148; c=relaxed/simple;
+	bh=eUpQhDWpgpZlAeQnEl90VyphU89LAG4Ey1HWcwW2mTc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CZCWwsxeQXjXA/0iGbf7rpAt2VTMr528B0PvNqY/SSCYIY5SBq0hmkn2hyLpohqLxLN5I3u3mbKVTf+gBBPZeZEWsMMvIOyysiRy8vzCdksXYWB4SFU1HE6gvIQW/apClSvZkP+TYLmcHKf1u05T5yiahL02KRMkcXzta7B5gKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gb570MeP; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-343684a06b2so5406626a91.1
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 03:45:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764071146; x=1764675946; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D2nSxZr296cTLk2jDylXNLI5Wnnk8TWh4DK2ghNWJUw=;
+        b=gb570MePP+WCMZUyD8Bb+cb6El4SA813QjmIx06Z7YtqcCplXZi7VpmsnqLMZADmrd
+         ddXriTN84aOtpW1+r9a3KE+Vka7z+UOeHgwIde3zS0sA7QARxfOWhpMfZV2QUaNrpKPG
+         wC3AWukLX4/HAP2v0h58GqIvJWRp3/1y9TAWeOo6WbBNQtIw9g42gS6wLw93SZ2Y4Sqs
+         +BGSrgoVTglWd0waAIXFAnf9P8VFxCRgFu8vVz+Nq6CJxgKirj+PNWthhIfDUCfZ5Jep
+         zZGxpIMEQcAiz/koq9e+aTW88EiU5ffHOQzl+9v6RdjrXzasHclMqzw4Cbicbr7ByQGT
+         cjnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764071146; x=1764675946;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=D2nSxZr296cTLk2jDylXNLI5Wnnk8TWh4DK2ghNWJUw=;
+        b=Pyey+cWfuKTcuHTdAE+H1N2+kl1QmTvMPJYrm/z/I5LuBBoPVLcJkSq05VD3HgU0Xy
+         58f6w/Ss52oxw6tmuzr0ya5ut4pYfe501kGbVRmKTS/ZkhAxB+DMaA5QVhuK1PtzF1ml
+         LY7OGTQhnLlqlr9GiFHV13ytN/oHI3UU9bWL9iI5kr6lytgEeaccgvNIiNKJtFNjuCpU
+         /7Bjw92XfuiThMZO1snmsyyM7R1/0PX3j1aq/L8knBaIhwef4maYv9+4m0v1pTHY6oRo
+         KKBvLSI2RCYNE3qXMp+p4t4k1h5ff1uo6D3JReOULjuLyt+DNLbwWQlTw+xhAMh1eu1W
+         9hmg==
+X-Forwarded-Encrypted: i=1; AJvYcCW1HXnmSgLOZ8o05vVU6/DiViQEHFG4s0FBQyYOYKi0sxyYz0JDC4ihMYqq3iyuY31rCZNRKwg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzL4lixLoAyw19XBK3mB42JCwjB/VbDXZihCjMTMOAOuV76Bx5C
+	DYP37L6AK7b352fPxN1O+q1LZfto1PNDg5WkxkYbfbIv8pG3mbZPZ+eKYr4maE0gmLiwKA3zWtR
+	OyvCfYYUdP3bwixL/r7H0DHb5k+/KbraZRO3c
+X-Gm-Gg: ASbGncs7T5KN1tcOep1PRCp5ktD3DpF0J4NMM3uxXunaIOxu2y0xJy9Q0/0tnYM7DO+
+	yy9qXitO6ws4ljkhJzC4pYF++ZmHBIJEiU61Lhk+ZSqweB4Q7wpdP8m7fYjmghFB2GMuWwlJMH8
+	yE3zLljjnXMeNxZ/8teGLChcpKPxNfXvMTpRar3EhJjDfsa1rdPgdfBzh6Uqfw3N+cS1HPeE4G2
+	ZuZ4Dl+544SPidx2FgATzqWYLysPZzi5si7uBwzl0j5UV1OxY87Cr+GYCle17VYJ8XfQBlP+MmM
+	wUbFl0XIF866dZ8QYWi8F7ape0Wt
+X-Google-Smtp-Source: AGHT+IHBOafY5cOuAu68UmWFeJRNGfrKPEO8ulraWmif4ReiD5qaWhPlEmkkBTl3byctOZGb69yOYVzYUiHR+dE0gwQ=
+X-Received: by 2002:a17:90b:540b:b0:341:88c9:aefb with SMTP id
+ 98e67ed59e1d1-34733e53d8cmr13413313a91.5.1764071145829; Tue, 25 Nov 2025
+ 03:45:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v6] xsk: avoid data corruption on cq descriptor number
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: netdev@vger.kernel.org, csmate@nop.hu, maciej.fijalkowski@intel.com,
- bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me,
- hawk@kernel.org, daniel@iogearbox.net, ast@kernel.org,
- john.fastabend@gmail.com, magnus.karlsson@intel.com
-References: <20251124171409.3845-1-fmancera@suse.de>
- <CAL+tcoBKMfVnTtkwBRk9JBGbJtahyJVt4g8swsYRUk1b97LgHQ@mail.gmail.com>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <CAL+tcoBKMfVnTtkwBRk9JBGbJtahyJVt4g8swsYRUk1b97LgHQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nop.hu,intel.com,davemloft.net,google.com,kernel.org,redhat.com,fomichev.me,iogearbox.net,gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TAGGED_RCPT(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
-X-Spam-Level: 
+References: <20251125075150.13879-1-jonas.gorski@gmail.com> <20251125075150.13879-8-jonas.gorski@gmail.com>
+In-Reply-To: <20251125075150.13879-8-jonas.gorski@gmail.com>
+From: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>
+Date: Tue, 25 Nov 2025 12:45:10 +0100
+X-Gm-Features: AWmQ_blDl7oLgUL8MeVJe2KJRsFITUkpxv_Mc7NRmNFtb6ga-jYy4nQlpiBe1uk
+Message-ID: <CAKR-sGdrJ4Zdw_j1Xj2DbRk0ksrjLS7xYcYGa_LDZsfT4ODhdw@mail.gmail.com>
+Subject: Re: [PATCH net-next 7/7] net: dsa: b53: allow VID 0 for BCM5325/65
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/25/25 12:41 AM, Jason Xing wrote:
-> On Tue, Nov 25, 2025 at 1:14 AM Fernando Fernandez Mancera
-> <fmancera@suse.de> wrote:
->>
->> Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
->> production"), the descriptor number is stored in skb control block and
->> xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
->> pool's completion queue.
->>
->> skb control block shouldn't be used for this purpose as after transmit
->> xsk doesn't have control over it and other subsystems could use it. This
->> leads to the following kernel panic due to a NULL pointer dereference.
->>
->>   BUG: kernel NULL pointer dereference, address: 0000000000000000
->>   #PF: supervisor read access in kernel mode
->>   #PF: error_code(0x0000) - not-present page
->>   PGD 0 P4D 0
->>   Oops: Oops: 0000 [#1] SMP NOPTI
->>   CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
->>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
->>   RIP: 0010:xsk_destruct_skb+0xd0/0x180
->>   [...]
->>   Call Trace:
->>    <IRQ>
->>    ? napi_complete_done+0x7a/0x1a0
->>    ip_rcv_core+0x1bb/0x340
->>    ip_rcv+0x30/0x1f0
->>    __netif_receive_skb_one_core+0x85/0xa0
->>    process_backlog+0x87/0x130
->>    __napi_poll+0x28/0x180
->>    net_rx_action+0x339/0x420
->>    handle_softirqs+0xdc/0x320
->>    ? handle_edge_irq+0x90/0x1e0
->>    do_softirq.part.0+0x3b/0x60
->>    </IRQ>
->>    <TASK>
->>    __local_bh_enable_ip+0x60/0x70
->>    __dev_direct_xmit+0x14e/0x1f0
->>    __xsk_generic_xmit+0x482/0xb70
->>    ? __remove_hrtimer+0x41/0xa0
->>    ? __xsk_generic_xmit+0x51/0xb70
->>    ? _raw_spin_unlock_irqrestore+0xe/0x40
->>    xsk_sendmsg+0xda/0x1c0
->>    __sys_sendto+0x1ee/0x200
->>    __x64_sys_sendto+0x24/0x30
->>    do_syscall_64+0x84/0x2f0
->>    ? __pfx_pollwake+0x10/0x10
->>    ? __rseq_handle_notify_resume+0xad/0x4c0
->>    ? restore_fpregs_from_fpstate+0x3c/0x90
->>    ? switch_fpu_return+0x5b/0xe0
->>    ? do_syscall_64+0x204/0x2f0
->>    ? do_syscall_64+0x204/0x2f0
->>    ? do_syscall_64+0x204/0x2f0
->>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
->>    </TASK>
->>   [...]
->>   Kernel panic - not syncing: Fatal exception in interrupt
->>   Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
->>
->> Instead use the skb destructor_arg pointer along with pointer tagging.
->> As pointers are always aligned to 8B, use the bottom bit to indicate
->> whether this a single address or an allocated struct containing several
->> addresses.
->>
->> Fixes: 30f241fcf52a ("xsk: Fix immature cq descriptor production")
->> Closes: https://lore.kernel.org/netdev/0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu/
->> Suggested-by: Jakub Kicinski <kuba@kernel.org>
->> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-> 
-> Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-> 
-> Could you also post a patch on top of net-next as it has diverged from
-> the net tree?
-> 
+El mar, 25 nov 2025 a las 8:52, Jonas Gorski
+(<jonas.gorski@gmail.com>) escribi=C3=B3:
+>
+> Now that writing ARL entries works properly, we can actually use VID 0
+> as the default untagged VLAN for BCM5325 and BCM5365 as well, so use 0
+> as default PVID always.
+>
+> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> ---
+>  drivers/net/dsa/b53/b53_common.c | 49 +++++++++++---------------------
+>  1 file changed, 17 insertions(+), 32 deletions(-)
+>
+> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_c=
+ommon.c
+> index ac995f36ed95..4eff64204897 100644
+> --- a/drivers/net/dsa/b53/b53_common.c
+> +++ b/drivers/net/dsa/b53/b53_common.c
+> @@ -870,14 +870,6 @@ static void b53_enable_stp(struct b53_device *dev)
+>         b53_write8(dev, B53_MGMT_PAGE, B53_GLOBAL_CONFIG, gc);
+>  }
+>
+> -static u16 b53_default_pvid(struct b53_device *dev)
+> -{
+> -       if (is5325(dev) || is5365(dev))
+> -               return 1;
+> -       else
+> -               return 0;
+> -}
+> -
+>  static bool b53_vlan_port_needs_forced_tagged(struct dsa_switch *ds, int=
+ port)
+>  {
+>         struct b53_device *dev =3D ds->priv;
+> @@ -906,14 +898,12 @@ int b53_configure_vlan(struct dsa_switch *ds)
+>         struct b53_device *dev =3D ds->priv;
+>         struct b53_vlan vl =3D { 0 };
+>         struct b53_vlan *v;
+> -       int i, def_vid;
+>         u16 vid;
+> -
+> -       def_vid =3D b53_default_pvid(dev);
+> +       int i;
+>
+>         /* clear all vlan entries */
+>         if (is5325(dev) || is5365(dev)) {
+> -               for (i =3D def_vid; i < dev->num_vlans; i++)
+> +               for (i =3D 0; i < dev->num_vlans; i++)
+>                         b53_set_vlan_entry(dev, i, &vl);
+>         } else {
+>                 b53_do_vlan_op(dev, VTA_CMD_CLEAR);
+> @@ -927,7 +917,7 @@ int b53_configure_vlan(struct dsa_switch *ds)
+>          * entry. Do this only when the tagging protocol is not
+>          * DSA_TAG_PROTO_NONE
+>          */
+> -       v =3D &dev->vlans[def_vid];
+> +       v =3D &dev->vlans[0];
+>         b53_for_each_port(dev, i) {
+>                 if (!b53_vlan_port_may_join_untagged(ds, i))
+>                         continue;
+> @@ -935,16 +925,15 @@ int b53_configure_vlan(struct dsa_switch *ds)
+>                 vl.members |=3D BIT(i);
+>                 if (!b53_vlan_port_needs_forced_tagged(ds, i))
+>                         vl.untag =3D vl.members;
+> -               b53_write16(dev, B53_VLAN_PAGE, B53_VLAN_PORT_DEF_TAG(i),
+> -                           def_vid);
+> +               b53_write16(dev, B53_VLAN_PAGE, B53_VLAN_PORT_DEF_TAG(i),=
+ 0);
+>         }
+> -       b53_set_vlan_entry(dev, def_vid, &vl);
+> +       b53_set_vlan_entry(dev, 0, &vl);
+>
+>         if (dev->vlan_filtering) {
+>                 /* Upon initial call we have not set-up any VLANs, but up=
+on
+>                  * system resume, we need to restore all VLAN entries.
+>                  */
+> -               for (vid =3D def_vid + 1; vid < dev->num_vlans; vid++) {
+> +               for (vid =3D 1; vid < dev->num_vlans; vid++) {
+>                         v =3D &dev->vlans[vid];
+>
+>                         if (!v->members)
+> @@ -1280,7 +1269,6 @@ static int b53_setup(struct dsa_switch *ds)
+>         struct b53_device *dev =3D ds->priv;
+>         struct b53_vlan *vl;
+>         unsigned int port;
+> -       u16 pvid;
+>         int ret;
+>
+>         /* Request bridge PVID untagged when DSA_TAG_PROTO_NONE is set
+> @@ -1310,8 +1298,7 @@ static int b53_setup(struct dsa_switch *ds)
+>         }
+>
+>         /* setup default vlan for filtering mode */
+> -       pvid =3D b53_default_pvid(dev);
+> -       vl =3D &dev->vlans[pvid];
+> +       vl =3D &dev->vlans[0];
+>         b53_for_each_port(dev, port) {
+>                 vl->members |=3D BIT(port);
+>                 if (!b53_vlan_port_needs_forced_tagged(ds, port))
+> @@ -1740,7 +1727,7 @@ int b53_vlan_add(struct dsa_switch *ds, int port,
+>         if (pvid)
+>                 new_pvid =3D vlan->vid;
+>         else if (!pvid && vlan->vid =3D=3D old_pvid)
+> -               new_pvid =3D b53_default_pvid(dev);
+> +               new_pvid =3D 0;
+>         else
+>                 new_pvid =3D old_pvid;
+>         dev->ports[port].pvid =3D new_pvid;
+> @@ -1790,7 +1777,7 @@ int b53_vlan_del(struct dsa_switch *ds, int port,
+>         vl->members &=3D ~BIT(port);
+>
+>         if (pvid =3D=3D vlan->vid)
+> -               pvid =3D b53_default_pvid(dev);
+> +               pvid =3D 0;
+>         dev->ports[port].pvid =3D pvid;
+>
+>         if (untagged && !b53_vlan_port_needs_forced_tagged(ds, port))
+> @@ -2269,7 +2256,7 @@ int b53_br_join(struct dsa_switch *ds, int port, st=
+ruct dsa_bridge bridge,
+>         struct b53_device *dev =3D ds->priv;
+>         struct b53_vlan *vl;
+>         s8 cpu_port =3D dsa_to_port(ds, port)->cpu_dp->index;
+> -       u16 pvlan, reg, pvid;
+> +       u16 pvlan, reg;
+>         unsigned int i;
+>
+>         /* On 7278, port 7 which connects to the ASP should only receive
+> @@ -2278,8 +2265,7 @@ int b53_br_join(struct dsa_switch *ds, int port, st=
+ruct dsa_bridge bridge,
+>         if (dev->chip_id =3D=3D BCM7278_DEVICE_ID && port =3D=3D 7)
+>                 return -EINVAL;
+>
+> -       pvid =3D b53_default_pvid(dev);
+> -       vl =3D &dev->vlans[pvid];
+> +       vl =3D &dev->vlans[0];
+>
+>         if (dev->vlan_filtering) {
+>                 /* Make this port leave the all VLANs join since we will =
+have
+> @@ -2295,9 +2281,9 @@ int b53_br_join(struct dsa_switch *ds, int port, st=
+ruct dsa_bridge bridge,
+>                                     reg);
+>                 }
+>
+> -               b53_get_vlan_entry(dev, pvid, vl);
+> +               b53_get_vlan_entry(dev, 0, vl);
+>                 vl->members &=3D ~BIT(port);
+> -               b53_set_vlan_entry(dev, pvid, vl);
+> +               b53_set_vlan_entry(dev, 0, vl);
+>         }
+>
+>         b53_read16(dev, B53_PVLAN_PAGE, B53_PVLAN_PORT_MASK(port), &pvlan=
+);
+> @@ -2336,7 +2322,7 @@ void b53_br_leave(struct dsa_switch *ds, int port, =
+struct dsa_bridge bridge)
+>         struct b53_vlan *vl;
+>         s8 cpu_port =3D dsa_to_port(ds, port)->cpu_dp->index;
+>         unsigned int i;
+> -       u16 pvlan, reg, pvid;
+> +       u16 pvlan, reg;
+>
+>         b53_read16(dev, B53_PVLAN_PAGE, B53_PVLAN_PORT_MASK(port), &pvlan=
+);
+>
+> @@ -2361,8 +2347,7 @@ void b53_br_leave(struct dsa_switch *ds, int port, =
+struct dsa_bridge bridge)
+>         b53_write16(dev, B53_PVLAN_PAGE, B53_PVLAN_PORT_MASK(port), pvlan=
+);
+>         dev->ports[port].vlan_ctl_mask =3D pvlan;
+>
+> -       pvid =3D b53_default_pvid(dev);
+> -       vl =3D &dev->vlans[pvid];
+> +       vl =3D &dev->vlans[0];
+>
+>         if (dev->vlan_filtering) {
+>                 /* Make this port join all VLANs without VLAN entries */
+> @@ -2374,9 +2359,9 @@ void b53_br_leave(struct dsa_switch *ds, int port, =
+struct dsa_bridge bridge)
+>                         b53_write16(dev, B53_VLAN_PAGE, B53_JOIN_ALL_VLAN=
+_EN, reg);
+>                 }
+>
+> -               b53_get_vlan_entry(dev, pvid, vl);
+> +               b53_get_vlan_entry(dev, 0, vl);
+>                 vl->members |=3D BIT(port);
+> -               b53_set_vlan_entry(dev, pvid, vl);
+> +               b53_set_vlan_entry(dev, 0, vl);
+>         }
+>  }
+>  EXPORT_SYMBOL(b53_br_leave);
+> --
+> 2.43.0
+>
 
-I think that is handled by maintainers when merging the branches. A 
-repost would be wrong because linux-next.git and linux.git will have a 
-different variant of the same commit..
+Thank you so much for these patches.
 
-Please, let me know if I am wrong here.
+I've tested all of them on a Huawei HG556a (bcm6358 + bcm5325).
 
-Thanks,
-Fernando.
+Tested-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
 
