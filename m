@@ -1,85 +1,161 @@
-Return-Path: <netdev+bounces-241509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id DADBDC84BD8
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 12:30:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29AA4C84C19
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 12:35:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6D72E350296
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:30:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 83ED14E839B
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 11:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C9C2749CE;
-	Tue, 25 Nov 2025 11:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D58227603C;
+	Tue, 25 Nov 2025 11:35:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F88813B293;
-	Tue, 25 Nov 2025 11:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D5627467D
+	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 11:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764070218; cv=none; b=oGZ3D9CLwphedn5tDm/9nR6e9KT4H3gxTu87EgqGCPkwR6/25TMG/rXioLNFzSQkEsjfrTdykqFKJWBiQdMaF6MPIPENEtVxslBButFATNGJkndHLbS/3SYE07eM+HijgXj7+/4XvOtGLzdo6FHgwPHcMPS5WEqr/JQxjDnYqns=
+	t=1764070527; cv=none; b=UdkdZy4KPfcV2Z5nuqhahWOnzbeGixj4N1RXD7Zu2TcUKM81YB+Nu7QV4hRmQSc12GAYbtCD9o0NtIlmDMdyY3NcZzHRGLZC+PDQO9lUwdRmzYpyPGia+boTSKBcwei/VVdImExW+c+A9vGy5LWKGnKLkb38lS2EJ4QANhnfVUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764070218; c=relaxed/simple;
-	bh=PA6q4jExRYoV42xW6SK2Css5rDz07tyaC2bIYYki7rQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=upbAZCbsOqvUBQDDO39i9GVBMK/ioa58IsJ6az311g9r0obM9XMYrlHjkhQvzoed2qWM8CU1RXyjBa/d265tn7hEiof/NZj/CFfbl8ElXueQ4fJez+BUaoC6KSYs1NKrkDsVSvTjeiJhq/SAq0GIYvfxiq5mCtkzQ0t9Gwc4yos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id F304368B05; Tue, 25 Nov 2025 12:30:09 +0100 (CET)
-Date: Tue, 25 Nov 2025 12:30:09 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-	"kbusch@kernel.org" <kbusch@kernel.org>,
-	"hare@suse.de" <hare@suse.de>,
-	"sagi@grimberg.me" <sagi@grimberg.me>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"dlemoal@kernel.org" <dlemoal@kernel.org>,
-	"wagi@kernel.org" <wagi@kernel.org>,
-	"mpatocka@redhat.com" <mpatocka@redhat.com>,
-	"yukuai3@huawei.com" <yukuai3@huawei.com>,
-	"xni@redhat.com" <xni@redhat.com>,
-	"linan122@huawei.com" <linan122@huawei.com>,
-	"bmarzins@redhat.com" <bmarzins@redhat.com>,
-	"john.g.garry@oracle.com" <john.g.garry@oracle.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"ncardwell@google.com" <ncardwell@google.com>,
-	"kuniyu@google.com" <kuniyu@google.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [RFC blktests fix PATCH] tcp: use GFP_ATOMIC in tcp_disconnect
-Message-ID: <20251125113009.GA22874@lst.de>
-References: <20251125061142.18094-1-ckulkarnilinux@gmail.com> <aSVMXYCiEGpETx-X@infradead.org> <ea2958c9-4571-4169-8060-6456892e6b15@nvidia.com> <0caa9d00-3f69-4ade-b93b-eea307fe6f72@linux.ibm.com> <20251125112111.GA22545@lst.de> <234bab6c-6d31-4c93-8a69-5b3687ba9b85@linux.ibm.com>
+	s=arc-20240116; t=1764070527; c=relaxed/simple;
+	bh=N9e9kXKrkLY3hdJMVKAOJQ64uFmsSyeVEVDaOqkBz68=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FGiD8B26wHmZh80UoyF2EMaKBys5cYP6u/4KbUeJ5b/L5eJ4SGkRlsDXMsHFPefmkghmZGuVZaMxk6+yIMh8ivEC8JMQzhUqc1XsLaoN5BLv6fXfVYsQCFNW8iaxPc6CYGaNq2f9HHdOS1+2ji7f9TF8raOylOBbx1bC3NyJvGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-43376637642so50352595ab.2
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 03:35:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764070525; x=1764675325;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ChoXgka1YWDsPKLbtTABFBVAbPQcMKaAZFHLUr1f2I8=;
+        b=SnT+bnYgFwf8uHjkn9IHc4bbPEFIoS1VMdopwMZB/ERN8c1rP+VEfVj1EPzsOLoBfr
+         Aj6QfZiGm9/OAoXBYBPgp5we0qVFFtfdI8n3/11XEDQeqet6fZ6hHvrmSTmfOllWuY8G
+         xckvw7ldkeiTeZO9yoQJ5Y1VXtWnIi8q1nAeiGtRWzaoRaIdf747FJzTGKOBqCcr15FV
+         pMyci27HY1meoNeKk7HlrAsobvOEOaKh2FwgKsw6W+GPAl5mv4Da7luwqdIWqeIpwU3w
+         Euoef3gsDP0ACmoAXg5RwVzLXlcLa7z1vDR/ATYFi1nY8wdWqeq1OUcHWk2U0Cn0dncX
+         S4iw==
+X-Forwarded-Encrypted: i=1; AJvYcCVvGFujwfcWlj2njf4RR+PcoU131aR+dPHBuuGDm+qNysAnl11EcrZGWNMKdDf1Fh6erRAX6a0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1T5tbROfCRtwvjxnDfDBDheYVqZurBpMR53CKpoaj0G4Gdhx4
+	Gakrnt85b9JkaVqCRe9cw4PNcfbL7bzoMQKYCPudA/Qm4UigQiD3qGmJJmVBB+2dMpY0qGn6FTh
+	lNCUuCeYmCz0csdFyxH+RhPYP3T0Gmgm8pWMhU8Ja6AXcx13KLQCxFJVYc4g=
+X-Google-Smtp-Source: AGHT+IG/+ZXI4COkQeVB/sPLJPpDukEVsRV4EgCEQSp8GzW14yrp3MQgKhPKcvOMXnVRsAvqwXRkEe9bPBZrSiXNxBhWmj+Buyoz
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <234bab6c-6d31-4c93-8a69-5b3687ba9b85@linux.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Received: by 2002:a05:6e02:3810:b0:433:51fd:4cda with SMTP id
+ e9e14a558f8ab-435b98c5d10mr118389165ab.25.1764070525069; Tue, 25 Nov 2025
+ 03:35:25 -0800 (PST)
+Date: Tue, 25 Nov 2025 03:35:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6925947d.a70a0220.d98e3.00a6.GAE@google.com>
+Subject: [syzbot] [hams?] KMSAN: uninit-value in sixpack_receive_buf (4)
+From: syzbot <syzbot+ecdb8c9878a81eb21e54@syzkaller.appspotmail.com>
+To: ajk@comnets.uni-bremen.de, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, linux-hams@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Nov 25, 2025 at 04:58:32PM +0530, Nilay Shroff wrote:
-> >From git history, I see that was added to avoid memory reclaim  to avoid
-> possible circular locking dependency. This commit 83e1226b0ee2 ("nvme-tcp:
-> fix possible circular locking when deleting a controller under memory
-> pressure") adds it.
+Hello,
 
-I suspect this was intended to be noio, and we should just switch to
-that.
+syzbot found the following issue on:
 
+HEAD commit:    fd95357fd8c6 Merge tag 'sched_ext-for-6.18-rc6-fixes-2' of..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14b20e92580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=61a9bf3cc5d17a01
+dashboard link: https://syzkaller.appspot.com/bug?extid=ecdb8c9878a81eb21e54
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/68372e629a75/disk-fd95357f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d18e790887c9/vmlinux-fd95357f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4eb563ad2c24/bzImage-fd95357f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ecdb8c9878a81eb21e54@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in sixpack_decode drivers/net/hamradio/6pack.c:891 [inline]
+BUG: KMSAN: uninit-value in sixpack_receive_buf+0xcf1/0x2d20 drivers/net/hamradio/6pack.c:413
+ sixpack_decode drivers/net/hamradio/6pack.c:891 [inline]
+ sixpack_receive_buf+0xcf1/0x2d20 drivers/net/hamradio/6pack.c:413
+ tty_ldisc_receive_buf+0x1f7/0x2c0 drivers/tty/tty_buffer.c:391
+ tty_port_default_receive_buf+0xd7/0x1a0 drivers/tty/tty_port.c:37
+ receive_buf drivers/tty/tty_buffer.c:445 [inline]
+ flush_to_ldisc+0x43e/0xe30 drivers/tty/tty_buffer.c:495
+ process_one_work kernel/workqueue.c:3263 [inline]
+ process_scheduled_works+0xb91/0x1d80 kernel/workqueue.c:3346
+ worker_thread+0xedf/0x1590 kernel/workqueue.c:3427
+ kthread+0xd5c/0xf00 kernel/kthread.c:463
+ ret_from_fork+0x1f5/0x4c0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4985 [inline]
+ slab_alloc_node mm/slub.c:5288 [inline]
+ __do_kmalloc_node mm/slub.c:5649 [inline]
+ __kmalloc_noprof+0xabb/0x1b40 mm/slub.c:5662
+ kmalloc_noprof include/linux/slab.h:961 [inline]
+ tty_buffer_alloc drivers/tty/tty_buffer.c:180 [inline]
+ __tty_buffer_request_room+0x3d4/0x7a0 drivers/tty/tty_buffer.c:273
+ __tty_insert_flip_string_flags+0x157/0x6f0 drivers/tty/tty_buffer.c:309
+ tty_insert_flip_char include/linux/tty_flip.h:77 [inline]
+ uart_insert_char+0x368/0x930 drivers/tty/serial/serial_core.c:3457
+ serial8250_read_char+0x1ba/0x670 drivers/tty/serial/8250/8250_port.c:1641
+ serial8250_rx_chars drivers/tty/serial/8250/8250_port.c:1658 [inline]
+ serial8250_handle_irq+0x930/0x1110 drivers/tty/serial/8250/8250_port.c:1822
+ serial8250_default_handle_irq+0x116/0x370 drivers/tty/serial/8250/8250_port.c:1846
+ serial8250_interrupt+0xcb/0x430 drivers/tty/serial/8250/8250_core.c:82
+ __handle_irq_event_percpu+0x11e/0xf80 kernel/irq/handle.c:203
+ handle_irq_event_percpu kernel/irq/handle.c:240 [inline]
+ handle_irq_event+0xe0/0x2a0 kernel/irq/handle.c:257
+ handle_edge_irq+0x2a9/0xb50 kernel/irq/chip.c:855
+ generic_handle_irq_desc include/linux/irqdesc.h:173 [inline]
+ handle_irq arch/x86/kernel/irq.c:254 [inline]
+ call_irq_handler arch/x86/kernel/irq.c:-1 [inline]
+ __common_interrupt+0x9d/0x180 arch/x86/kernel/irq.c:325
+ common_interrupt+0x4c/0xb0 arch/x86/kernel/irq.c:318
+ asm_common_interrupt+0x2b/0x40 arch/x86/include/asm/idtentry.h:688
+
+CPU: 1 UID: 0 PID: 13878 Comm: kworker/u8:21 Tainted: G        W           syzkaller #0 PREEMPT(none) 
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+Workqueue: events_unbound flush_to_ldisc
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
