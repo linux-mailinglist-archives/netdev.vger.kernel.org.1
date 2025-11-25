@@ -1,218 +1,258 @@
-Return-Path: <netdev+bounces-241603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 457DAC866EA
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 19:06:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C4F5C863ED
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:39:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 02B8934EFC8
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 18:06:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C70173B69C7
+	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 17:38:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546D932C333;
-	Tue, 25 Nov 2025 18:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F50632AAD3;
+	Tue, 25 Nov 2025 17:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="2MT85Y8W"
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="uC33mvsz";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="SvGvOQ9j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE8F32C93B;
-	Tue, 25 Nov 2025 18:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764093957; cv=none; b=XphZuKqStmpO7RNMwY2OryUv+zTZx4I0X7VHDpp9YTzETzyNgE1bgFyoSYKYCTencIQVOW4X0eP/lWFXVQhXazO9ky90vqBz1Qxi24IGwkfta5hGm6H11LdINOOvhCzwlKumIhW1l2pQfEUm8VbCatZDpUPJsZD2sszms+fHKwE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764093957; c=relaxed/simple;
-	bh=5U/S5kssDGyaZEH+ttQKL5xYLbM+ySOM7z6cUAiJ8Tw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fR0VT6w9Q3QMpsB5UChmFiQigmbmugjM0sY++i5vjryukpfqZ3mrHdVAv8DfeP25J47WJd5Xrjk11Po0N/8SHKIcNjSFJ1xqL2n27USptf2PYlFPKtPfaLg1GEdAU0Xzc8QUjXl8eGJRF6odCX65XAJYRUE6cDYDzdyH7ac/XzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=2MT85Y8W; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id B748E4E418B9;
-	Tue, 25 Nov 2025 18:05:52 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 83FEF606A1;
-	Tue, 25 Nov 2025 18:05:52 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8C31A102F08B4;
-	Tue, 25 Nov 2025 19:05:48 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1764093951; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=lp+Mc2LjVyhDfZiwstCaChFpHcgAv27Nujzsi0u4HYw=;
-	b=2MT85Y8WbOH/m30D+UIp0mzIxbW0XIkxpgaKXoqNFqVjl+uJrbiMolxTm7BkcQ8ICAOtDc
-	lQoeSqDR/N+HxoZohW3agU9D8VRYd6MpLCAtXB1t82kHFtzMgcR8s9cE8U+o3Jclhgl1Ot
-	iRjxhH/2dY/9lyEZLceMytSCQ2THl5kCZmcWNIV3ehsEFcyBEi011lxuFp6cnQQIvE2EjI
-	Ijcd30oQ6zCON1gSoZMHi052SrixULQ2AUvBuzAQGpp6vPIKCPQTcQnssJVwknWhJcngGx
-	PPTWJEAFiKTJ6Z6Wa16J+lFLf5ZwMvUJuNF745DCtiAlv/iCGHKIetdBzZFPaA==
-Message-ID: <bcfcfcb1-33d3-4e03-95c7-565f6a76f3d8@bootlin.com>
-Date: Tue, 25 Nov 2025 19:05:47 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635EE18FDBE;
+	Tue, 25 Nov 2025 17:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.151.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764092254; cv=fail; b=iecPGBxhOlZML8fJyzmKnme6fhQYuiMINm27bNP9Ur/QbObhVwj4VY6HalJQACDor0wxAWrZS5npS1hSeygOnCzxLkI1aN0O//5yncvyuo8JMDcvOsK9F0L7rgwmtSZuyGqHGuadKIFl+vQTEgztvI0K1deG2u5boOqfs219Hh4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764092254; c=relaxed/simple;
+	bh=U7NPw9YTLm8Pn0dIW1Hb/TU5c2nxaRKkKKmpg2R1kgQ=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Btq4qwCyH0tLVwbfysqbA+Yyv4rx4mKxXYPYIl9NAV6PdVzhHDo9poHDtNyRLLZYIesbWfn1x5dqKAK95MJ/GIcYlvrYderh/THCV0yJHm80aMhDoK7v1WucjNziHTF6Px0nR4FMqm5hAh7wHCVf6NPpkxExRBgI5Pi7cpteQfo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=uC33mvsz; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=SvGvOQ9j; arc=fail smtp.client-ip=148.163.151.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
+Received: from pps.filterd (m0127837.ppops.net [127.0.0.1])
+	by mx0a-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5APGKYVp2183742;
+	Tue, 25 Nov 2025 09:37:16 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
+	content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=proofpoint20171006; bh=FdS4HgqOvmFwi
+	tm+RKHdrT4ha2uP4cIFkIgWNrhHn+I=; b=uC33mvsz4N2wphlkzC2tJvfEd3+xp
+	/4THv46anCvZeJUoHRE9VcNSKEfuQ8nUK99eXKQHpyuyJOCDQj/OPfOIraRBn5CX
+	5zcg026H5YawWuE/eRu4JRdWBGWFTC2f17JuV26CRGGDOZ3VFIJn+0C9UGWuM1WB
+	UpicDidbyIFYNENuuPOqTPL3her/oGlfibk5uechGAh+sXszeRJNBHUdJY1ui3Dq
+	Ds0hbQAUnHcjMbV0m5E8FRJC3A8Wr1yzyKJ/+pznA6kO1GDfjxi6kedxXtHt2BOa
+	dDnftp6iIktS3WpBqYjauajnmeUZ7tgLk+h7LitV3YIrTXGuRfbkzmt/Q==
+Received: from sn4pr2101cu001.outbound.protection.outlook.com (mail-southcentralusazon11022099.outbound.protection.outlook.com [40.93.195.99])
+	by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 4anfw405wn-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 25 Nov 2025 09:37:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nbBL1PJQHvqVWDvMbvOoKfbaFIzBONDB9fsnU1PoT+KVPd/EZxs3q+BFlsU9e68uo7ba2Ww93TIvw0p+QYWqIu+vAqL3qdJQd5U32V/UyRRvj/4zAG/C8Xrl7R/hOQ8ZlsJuXMRJ0XwMWBVLM31yQ8PRuOtbYei7s0xTxVGYoTPD8MjOwnhCH4WxsmTn3va2GBPHrqHqusDhlU4tkoS2NlRzESo6RCDIDylVOpQz3BKSQD4g+lfklGz05baBO5Fwf1BezYVgHa8cGwMJk6+ADKvCLAdbX01/0I7gr4nW1gy8XqC/GDny0cK0wQARoubOByPlG5qVK6t9YY6npDlDew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FdS4HgqOvmFwitm+RKHdrT4ha2uP4cIFkIgWNrhHn+I=;
+ b=kzQAOxlCRXtWHwyNBbMb81r1QgV2K3W1y0GYboyBEeU4wZXkkyvURlOAinlqPpI+BNlxKKYMWLm/XkiyB8zEXZqBIc4a7TJ54jyME2+4TbOQe5Pbh/LORzAfWb6A3QRmrw0oJRAQ/eYHTLchYfX0phAs46DASyTsnHJR+zBiX9VOzWyByg4i6ZHhqlWocWEnVfH89EIgfw2OYvjkyjZmoYcwEV3pYswhuLH5hIHD/5tlaj/Y87+ctOxy31SF1jvp3hYHt/bfoVxzjHD/gAU9VgjbQXbMTNfHYnPCLepImzQ6yZcf8fdOGyZM6IHmwWeCTN/3FZAL7EVxdsBmryoABg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FdS4HgqOvmFwitm+RKHdrT4ha2uP4cIFkIgWNrhHn+I=;
+ b=SvGvOQ9jY3tvFaQ3rHdyHUjcKJe16xm2Uk+oG25YY0/rYXKx+cskY+QrCflV6D6H9OWlZh0MV8ZZ1taYkjfPaahGlUp4QOhMbwjOQRPu8LB9cVp8Rq2YS4vmm1y+ROnKgNub2t7+UETykwXSoUB6A1jnlWJ86RQE8h8dKKzf64cmrrSwb/EVaEs2JvLSbD+qCtND+0Rx+nU/gDrhm+Hxn6HylWtojurxnsy+8I8C02YYywGvtf2Bjh1BvB5Ynj2Vu3PIEHOPy6he6qmUFmhO4tRHKKy2E5hsgYvs5sZAnXYPLZQ7SFEZFIq+H6l+02qdiT5Kx/epAeKCysnOEOVe5w==
+Received: from LV0PR02MB11133.namprd02.prod.outlook.com
+ (2603:10b6:408:333::18) by SA3PR02MB10926.namprd02.prod.outlook.com
+ (2603:10b6:806:47f::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.11; Tue, 25 Nov
+ 2025 17:37:14 +0000
+Received: from LV0PR02MB11133.namprd02.prod.outlook.com
+ ([fe80::10e5:8031:1b1b:b2dc]) by LV0PR02MB11133.namprd02.prod.outlook.com
+ ([fe80::10e5:8031:1b1b:b2dc%4]) with mapi id 15.20.9343.016; Tue, 25 Nov 2025
+ 17:37:14 +0000
+From: Jon Kohler <jon@nutanix.com>
+To: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Cong Wang <xiyou.wangcong@gmail.com>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+        Jon Kohler <jon@nutanix.com>, Ido Schimmel <idosch@nvidia.com>,
+        Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] flow_dissector: save computed hash in __skb_get_hash_symmetric_net()
+Date: Tue, 25 Nov 2025 11:19:27 -0700
+Message-ID: <20251125181930.1192165-1-jon@nutanix.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: PH0PR07CA0002.namprd07.prod.outlook.com
+ (2603:10b6:510:5::7) To LV0PR02MB11133.namprd02.prod.outlook.com
+ (2603:10b6:408:333::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: stmmac: dwmac: Disable flushing frames on
- Rx Buffer Unavailable
-To: rohan.g.thomas@altera.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Matthew Gerlach <matthew.gerlach@altera.com>
-References: <20251126-a10_ext_fix-v1-1-d163507f646f@altera.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251126-a10_ext_fix-v1-1-d163507f646f@altera.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV0PR02MB11133:EE_|SA3PR02MB10926:EE_
+X-MS-Office365-Filtering-Correlation-Id: 43d770b5-7660-49e2-33b8-08de2c49455b
+x-proofpoint-crosstenant: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|52116014|7416014|376014|366016|38350700014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?gEwLCt9uasL06qZzBVqULMaG7FUb8hs1rekc3u4oWuHmE7egjL8RNuzOcY0w?=
+ =?us-ascii?Q?AKFJnniKGvDZ3k6O1kSqd1vjb79VN8jYUWfjhTmRw0ciRmdrR8J7tcrYZUqg?=
+ =?us-ascii?Q?ZYJJWSz4/GtHmOHDqSLuvZD7EzoF9oWZNM+CZ5c/v/QtXItRqsm393hNsSUD?=
+ =?us-ascii?Q?Z2kCKkzLxjog0504x0Ubnc5mmI749RQf7NraQdLt6WkdRK6kmL1II2+wEPx9?=
+ =?us-ascii?Q?IWrfWY2myoLKGcg5X5aKzUV/YR8fY2F8iFoGHBraB23uWGOha4RUq6d8snoz?=
+ =?us-ascii?Q?NRW0+SW4UBvb4JbO6YIz6CNW2ADhhRVLbjjwTWsJ/K2pfCro76iYbkbMu7UD?=
+ =?us-ascii?Q?1SCgc8nnztMLgUs8CabIwbAcjWuqpV287BfgeKz8Yah2iqDjGYpX3ujhXuup?=
+ =?us-ascii?Q?duhoL32Sup8LECQwTqCB+OK8UfM0FnJKDrI/5GQjNlsN9XycWigOZ7mCJnEL?=
+ =?us-ascii?Q?MFzmU2RNHMSeINU4X41GPeCP71SOjOzvGXUyB0WvpgRcy+eC/VTyojB+XwA+?=
+ =?us-ascii?Q?gDBu3NDUu6zsLEBY6YSggb6V32hjafzJtZKlHIuntmJe9ERZomAUaBod+dLI?=
+ =?us-ascii?Q?KUiysFIocbFlL4Ol4KS8mo6iVSJGX5dC1w+0+rIaLJH6KJTuU71fa99cUW2b?=
+ =?us-ascii?Q?XJCqJ/6bxCWVgqeU1FXg4D4Y5eIaL3naPsuYbA8pFSY0SPiT4/ub7UjDitef?=
+ =?us-ascii?Q?SvzTYvIgf5pjuepWwzXJ6DRzBUvmI4rpPR6y3VM9/qRXCYrWzMgKrxoE5FXc?=
+ =?us-ascii?Q?X5YzrqAY0kQ/ilL/MbLM3211sJiJeYnj2qGn/8RFxFtXtunnGrQACQ9sNgBB?=
+ =?us-ascii?Q?OGMckRILh21SYo5E58BlXjtdnqA/cKJ2KSUz2xm9SC2eXw/jwZ8mgcyz+jBZ?=
+ =?us-ascii?Q?PekLLi80EnkZwOzfno3o5DM2w+wFSEtnsOVWB7UfpkqEyAAt0URunJdmcH+6?=
+ =?us-ascii?Q?HRZBisJGE9/sbAZAqB3oEm+sxCDNfBZVgwm/IL9x/gyWEbWmOLWHw3gcZAWu?=
+ =?us-ascii?Q?M0aps/SRpHwL7a2z3/oV2R8p+AhvHztApfwCYI/s4v5zP+4ObNJQnt/yfYbU?=
+ =?us-ascii?Q?mt0V9A4x/Yt/sYbdoOMXcJh6YbMj/wW2VrROEtP78RBRKILUa+AH/3DptD/N?=
+ =?us-ascii?Q?ay4sre3Tuh/4AYXhBGSyDIHvMr9sBLEFVu+ILGSqkxAVlJL/cZchpT3nA2X7?=
+ =?us-ascii?Q?pDZSeCF+4SIsAfPGpffkq/kmY5KQPRaTRdGqwpbVGRdGEpu5sDT932mB4/lM?=
+ =?us-ascii?Q?TbeQ9PFJA9byiZCyfXCzFagbhJl0pe+VWmIGx47e2fR8uRhCqE1nRaea95bf?=
+ =?us-ascii?Q?eulvdlkol4AslNjD5fy/ew+cTRWQHTDWY8AWVXX6fXELfJzWPb+3XrXNFwvM?=
+ =?us-ascii?Q?6Wr3Zee4SaFVXeNOsW56OlL6cadNcuAZldYONr6ja/qAB6m5a4QLLVy7vKDc?=
+ =?us-ascii?Q?wGdf0Thb3+qTKLRoeAz4WNVBqgUrQYbyT4xs2eooy/KHHmtGmA+SUQQ++hm2?=
+ =?us-ascii?Q?2KaQ7yGtPbg+rrOEb0q/3gGnxusS7XEGUp/xL6rERYrJuLDQO/r7WMtTpQ?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV0PR02MB11133.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(52116014)(7416014)(376014)(366016)(38350700014)(921020);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?6KWdy6PmqP4RHNZelpbbwAQw1wRycMic2mPAtsj6Z0mZ8Gfe97uIb5kdZBgv?=
+ =?us-ascii?Q?gq4/OrkUgzDikRqzneM8EjiAOqBsfRniQgPwlAHOIdZqZjMSXZ4DGOWwdln4?=
+ =?us-ascii?Q?dkaQmTA8qJFIRJc4HD62qa2KokrL8OgjG/Q7RdVBVWjRsE8uCjznCchbNRJa?=
+ =?us-ascii?Q?od7Gr9Ofq0y0YY8zRgrGE93cQA3s8QpUqbcVm77LSNiFjz9/67QurI9Oxw8T?=
+ =?us-ascii?Q?28Hldu1VBxgUWQOYgI1Sbb67dvPDgZfMfSz907l/Dc32ZI5guzgWSE1jNH5l?=
+ =?us-ascii?Q?egLFG8RjN+W2/26p+8eElbTIia4DoZsjdiJqXbQ+HSQloFR31tlksBo4oMW6?=
+ =?us-ascii?Q?5LTUxP90bGS/GbIPW2HQjIFbuwT9pj4SwGaZO8/nSxSLz/hdweKq29xceFDz?=
+ =?us-ascii?Q?lFRI3/1rfajcTs8Uwp9zZLrA1tQyaJx+JyaE3Wz5NiEl2EqzEy42ibyi0phi?=
+ =?us-ascii?Q?poyCwT0pEtw+3MKbgsKwTSuvK+A7ydQIoiIGmu+/A2ebBMmxPuEROVd8WuIX?=
+ =?us-ascii?Q?47PRrhMH+mLL3no2qlT09bISCyB1qNCjNn3wELwIJYkJkwdjumvsG6JpFo91?=
+ =?us-ascii?Q?++M4aK1DRmQyjZLjV6ut4lGJ0ZNh53V+BYIFheJ79586vfLYDIaKx/OvP5S6?=
+ =?us-ascii?Q?GAfHjNqSzB0g2uhzmu2466yNoZnZ+ZEh1h/YKELqteIH4r/ErtxwfV+/b2q/?=
+ =?us-ascii?Q?yskwibQRBsDMGyt4Hx8W3m402p1V9KQaiE67ZcFUziT1jZSgzu/Osm+3puu3?=
+ =?us-ascii?Q?wJ9Kn5N4aPhnp6o558tUkwpDep2G6se6zI+epkmV7lsoPHzIN20Nv5Q6WuyM?=
+ =?us-ascii?Q?Ptgi3SELlHgRaLmd/J79nhP9Vp8+hX4GKynRSJDXHq2+rOmZWdwtEeUtGAEs?=
+ =?us-ascii?Q?TMszhxfXCDa6Ac2gWKJl4r074usaUEx+RzZhixjtUI+t/1VqSt3MndQEGkfx?=
+ =?us-ascii?Q?/+po43BOD/y1yhQKmIsgqz2Jp1TgccXOGfm7IOpwqUuNhwya2Frv+0kPtu3Z?=
+ =?us-ascii?Q?pdY5asEb6o7ciCg36OZjSIdLVgU6uGhfil1BaJtSKOjZ4ELLpCLhE3v/utQD?=
+ =?us-ascii?Q?0QhRgabFkxZ36dJJYC4TXqE1WNXyxcaW1WSEAfSXVGQ/mCoEzSlhpGTsRw18?=
+ =?us-ascii?Q?HrjA72QHjv1PxN0i74bNlbmw3YIMnGfONhVdr19SLbWwboBxBcHcweBItPKa?=
+ =?us-ascii?Q?zD3jB84OYQNDsOzJzcLimqhbR8WGA1CUrP0dHCfHXdIyua0T0pno3WRogmwR?=
+ =?us-ascii?Q?e0Otzu5eCyGKVNH3b0ZCW0NZ0e3WI542KIsn5ouIJsK+tWLiLtHp58C0buc7?=
+ =?us-ascii?Q?szL9Jzr9LiUcVohjeoluBCm57l8InJ/3s25WVgzryQmlc3ZMavH028/ASM5N?=
+ =?us-ascii?Q?9jM1BOVpxLKkTll4Ye+oubr1fYwwaMMeOFEen9T/sEKqB4u82lluolYigFX+?=
+ =?us-ascii?Q?HE7zQyzeJ9Ucs17iIllS6xqVmwdX3ZrU/S6nkghfL4zG1mQlS14wGfyGJLfo?=
+ =?us-ascii?Q?NYRONkC4LQiH3LNx119R4eJ1GQFQRBZwdxrUaDmVvLHLZhKK8MjElwHNulq/?=
+ =?us-ascii?Q?cOKdxhCQL65/aZ9oKwvl1jaFyaQP3/1SKCnWIXJxUJixyP1WCTfbDwKtBEbV?=
+ =?us-ascii?Q?kQ=3D=3D?=
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43d770b5-7660-49e2-33b8-08de2c49455b
+X-MS-Exchange-CrossTenant-AuthSource: LV0PR02MB11133.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2025 17:37:14.1790
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0Rp0FUS26DQyHozjn3Vid4C3X3v87xUOrNrUHgPFCyH7ghX08jtLShbn/Vzzm+wqi3ZI9S6FG/WxaZhPBkAuDzDrW1c5IF2eLXP7NwurjOA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR02MB10926
+X-Proofpoint-GUID: NL2-NvmxZdUNcG4YNh2A_ajDSVZjF_ee
+X-Authority-Analysis: v=2.4 cv=NfzrFmD4 c=1 sm=1 tr=0 ts=6925e94c cx=c_pps
+ a=QfAu5cRUQmedtNjS8psswA==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=6UeiqGixMTsA:10 a=0kUYKlekyDsA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=64Cc0HZtAAAA:8 a=ruzGN110qosAd2R3pxoA:9
+X-Proofpoint-ORIG-GUID: NL2-NvmxZdUNcG4YNh2A_ajDSVZjF_ee
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI1MDE0NyBTYWx0ZWRfX4qf0gRwvbtlj
+ hAUrpBa/Md2jU1JqHRMx6CG0MdrN68XnFceC+tVffR/4tDVr9sETSaA0zGWq9r9qQdZVxcJ3zJr
+ 6t1aB4ZAnYO7UHZD2bSnRU/Sg2Jz1gmwLp0Wo/Tyb7y0b1yOnAalObMabhHkt2r4GRgrmMQm2f7
+ c+N6QyyKVxHnEi459VBx6QlQWrgolf5rIHaooav9fX7+SZ577egALZZKseIennIr0rTFJoPXyR9
+ JoLaZcAXm2pd/0V2iRi3VOQ08CFf8TyF7/JhFD6vOWNsuaqytyah6A3ucuEOwD36O7MBuFdRIeY
+ y8bJ0QkXeZpG/tFVWKDWsU4GZFj0cdC+QggbjeJZ0+QgzqlOn26NvCdwHH2dkZfb/5I0IuJNYiX
+ LGhwC6kwIJAnQ1ti/ItWczD9AYEY9g==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-25_02,2025-11-25_01,2025-10-01_01
+X-Proofpoint-Spam-Reason: safe
 
-Hi,
+tun.c changed from skb_get_hash() to __skb_get_hash_symmetric() on
+commit feec084a7cf4 ("tun: use symmetric hash"), which exposes an
+overhead for OVS datapath, where ovs_dp_process_packet() has to
+calculate the hash again because __skb_get_hash_symmetric() does not
+retain the hash that it calculates.
 
-On 25/11/2025 17:37, Rohan G Thomas via B4 Relay wrote:
-> From: Rohan G Thomas <rohan.g.thomas@altera.com>
-> 
-> In Store and Forward mode, flushing frames when the receive buffer is
-> unavailable, can cause the MTL Rx FIFO to go out of sync. This results
-> in buffering of a few frames in the FIFO without triggering Rx DMA
-> from transferring the data to the system memory until another packet
-> is received. Once the issue happens, for a ping request, the packet is
-> forwarded to the system memory only after we receive another packet
-> and hece we observe a latency equivalent to the ping interval.
-> 
-> 64 bytes from 192.168.2.100: seq=1 ttl=64 time=1000.344 ms
-> 
-> Also, we can observe constant gmacgrp_debug register value of
-> 0x00000120, which indicates "Reading frame data".
-> 
-> The issue is not reproducible after disabling frame flushing when Rx
-> buffer is unavailable. But in that case, the Rx DMA enters a suspend
-> state due to buffer unavailability. To resume operation, software
-> must write to the receive_poll_demand register after adding new
-> descriptors, which reactivates the Rx DMA.
-> 
-> This issue is observed in the socfpga platforms which has dwmac1000 IP
-> like Arria 10, Cyclone V and Agilex 7. Issue is reproducible after
-> running iperf3 server at the DUT for UDP lower packet sizes.
-> 
-> Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-> Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
+Save the computed hash in __skb_get_hash_symmetric_net() so that the
+calcuation work does not go to waste.
 
-I'll let others comment on the correctness of the dwmac1000 part, but
-still :
+Fixes: feec084a7cf4 ("tun: use symmetric hash")
+Signed-off-by: Jon Kohler <jon@nutanix.com>
+---
+ include/linux/skbuff.h    | 4 ++--
+ net/core/flow_dissector.c | 7 +++++--
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
-Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
-
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c | 5 +++--
->  drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h     | 1 +
->  drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c     | 5 +++++
->  drivers/net/ethernet/stmicro/stmmac/hwif.h          | 3 +++
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   | 2 ++
->  5 files changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> index 6d9b8fac3c6d0fd76733ab4a1a8cce2420fa40b4..5877fec9f6c30ed18cdcf5398816e444e0bd0091 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> @@ -135,10 +135,10 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
->  
->  	if (mode == SF_DMA_MODE) {
->  		pr_debug("GMAC: enable RX store and forward mode\n");
-> -		csr6 |= DMA_CONTROL_RSF;
-> +		csr6 |= DMA_CONTROL_RSF | DMA_CONTROL_DFF;
->  	} else {
->  		pr_debug("GMAC: disable RX SF mode (threshold %d)\n", mode);
-> -		csr6 &= ~DMA_CONTROL_RSF;
-> +		csr6 &= ~(DMA_CONTROL_RSF | DMA_CONTROL_DFF);
->  		csr6 &= DMA_CONTROL_TC_RX_MASK;
->  		if (mode <= 32)
->  			csr6 |= DMA_CONTROL_RTC_32;
-> @@ -262,6 +262,7 @@ const struct stmmac_dma_ops dwmac1000_dma_ops = {
->  	.dma_rx_mode = dwmac1000_dma_operation_mode_rx,
->  	.dma_tx_mode = dwmac1000_dma_operation_mode_tx,
->  	.enable_dma_transmission = dwmac_enable_dma_transmission,
-> +	.enable_dma_reception = dwmac_enable_dma_reception,
->  	.enable_dma_irq = dwmac_enable_dma_irq,
->  	.disable_dma_irq = dwmac_disable_dma_irq,
->  	.start_tx = dwmac_dma_start_tx,
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> index d1c149f7a3dd9e472b237101666e11878707f0f2..054ecb20ce3f68bce5da3efaf36acf33e430d3f0 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> @@ -169,6 +169,7 @@ static inline u32 dma_chan_base_addr(u32 base, u32 chan)
->  #define NUM_DWMAC4_DMA_REGS	27
->  
->  void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan);
-> +void dwmac_enable_dma_reception(void __iomem *ioaddr, u32 chan);
->  void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
->  			  u32 chan, bool rx, bool tx);
->  void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> index 467f1a05747ecf0be5b9f3392cd3d2049d676c21..97a803d68e3a2f120beaa7c3254748cf404236df 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> @@ -33,6 +33,11 @@ void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
->  	writel(1, ioaddr + DMA_CHAN_XMT_POLL_DEMAND(chan));
->  }
->  
-> +void dwmac_enable_dma_reception(void __iomem *ioaddr, u32 chan)
-> +{
-> +	writel(1, ioaddr + DMA_CHAN_RCV_POLL_DEMAND(chan));
-> +}
-> +
->  void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
->  			  u32 chan, bool rx, bool tx)
->  {
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> index f257ce4b6c66e0bbd3180d54ac7f5be934153a6b..df6e8a567b1f646f83effbb38d8e53441a6f6150 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> @@ -201,6 +201,7 @@ struct stmmac_dma_ops {
->  	void (*dma_diagnostic_fr)(struct stmmac_extra_stats *x,
->  				  void __iomem *ioaddr);
->  	void (*enable_dma_transmission)(void __iomem *ioaddr, u32 chan);
-> +	void (*enable_dma_reception)(void __iomem *ioaddr, u32 chan);
->  	void (*enable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
->  			       u32 chan, bool rx, bool tx);
->  	void (*disable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
-> @@ -261,6 +262,8 @@ struct stmmac_dma_ops {
->  	stmmac_do_void_callback(__priv, dma, dma_diagnostic_fr, __args)
->  #define stmmac_enable_dma_transmission(__priv, __args...) \
->  	stmmac_do_void_callback(__priv, dma, enable_dma_transmission, __args)
-> +#define stmmac_enable_dma_reception(__priv, __args...) \
-> +	stmmac_do_void_callback(__priv, dma, enable_dma_reception, __args)
->  #define stmmac_enable_dma_irq(__priv, __args...) \
->  	stmmac_do_void_callback(__priv, dma, enable_dma_irq, __priv, __args)
->  #define stmmac_disable_dma_irq(__priv, __args...) \
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 6cacedb2c9b3fefdd4c9ec8ba98d389443d21ebd..1ecca60baf74286da7f156b4c3c835b3cbabf1ba 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -4973,6 +4973,8 @@ static inline void stmmac_rx_refill(struct stmmac_priv *priv, u32 queue)
->  	rx_q->rx_tail_addr = rx_q->dma_rx_phy +
->  			    (rx_q->dirty_rx * sizeof(struct dma_desc));
->  	stmmac_set_rx_tail_ptr(priv, priv->ioaddr, rx_q->rx_tail_addr, queue);
-> +	/* Wake up Rx DMA from the suspend state if required */
-> +	stmmac_enable_dma_reception(priv, priv->ioaddr, queue);
->  }
->  
->  static unsigned int stmmac_rx_buf1_len(struct stmmac_priv *priv,
-> 
-> ---
-> base-commit: e3daf0e7fe9758613bec324fd606ed9caa187f74
-> change-id: 20251125-a10_ext_fix-5951805b9906
-> 
-> Best regards,
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index ff90281ddf90..f58afa49a50e 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -1568,9 +1568,9 @@ __skb_set_sw_hash(struct sk_buff *skb, __u32 hash, bool is_l4)
+ 	__skb_set_hash(skb, hash, true, is_l4);
+ }
+ 
+-u32 __skb_get_hash_symmetric_net(const struct net *net, const struct sk_buff *skb);
++u32 __skb_get_hash_symmetric_net(const struct net *net, struct sk_buff *skb);
+ 
+-static inline u32 __skb_get_hash_symmetric(const struct sk_buff *skb)
++static inline u32 __skb_get_hash_symmetric(struct sk_buff *skb)
+ {
+ 	return __skb_get_hash_symmetric_net(NULL, skb);
+ }
+diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+index 1b61bb25ba0e..4a74dcc4799c 100644
+--- a/net/core/flow_dissector.c
++++ b/net/core/flow_dissector.c
+@@ -1864,9 +1864,10 @@ EXPORT_SYMBOL(make_flow_keys_digest);
+ 
+ static struct flow_dissector flow_keys_dissector_symmetric __read_mostly;
+ 
+-u32 __skb_get_hash_symmetric_net(const struct net *net, const struct sk_buff *skb)
++u32 __skb_get_hash_symmetric_net(const struct net *net, struct sk_buff *skb)
+ {
+ 	struct flow_keys keys;
++	u32 flow_hash;
+ 
+ 	__flow_hash_secret_init();
+ 
+@@ -1874,7 +1875,9 @@ u32 __skb_get_hash_symmetric_net(const struct net *net, const struct sk_buff *sk
+ 	__skb_flow_dissect(net, skb, &flow_keys_dissector_symmetric,
+ 			   &keys, NULL, 0, 0, 0, 0);
+ 
+-	return __flow_hash_from_keys(&keys, &hashrnd);
++	flow_hash = __flow_hash_from_keys(&keys, &hashrnd);
++	__skb_set_sw_hash(skb, flow_hash, flow_keys_have_l4(&keys));
++	return flow_hash;
+ }
+ EXPORT_SYMBOL_GPL(__skb_get_hash_symmetric_net);
+ 
+-- 
+2.43.0
 
 
