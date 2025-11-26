@@ -1,191 +1,71 @@
-Return-Path: <netdev+bounces-242106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7979C8C63D
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 00:55:00 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 752F7C8C65D
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 00:59:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D084A4E3062
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 23:54:59 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 22B1A3435B5
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 23:59:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD4F30102A;
-	Wed, 26 Nov 2025 23:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13D02F12DF;
+	Wed, 26 Nov 2025 23:59:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="XSyCVcI5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hgDDGwM4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23F12F7446;
-	Wed, 26 Nov 2025 23:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADBC25785D
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 23:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764201297; cv=none; b=L+ZBO8N69i6xOaof8o8QKlt9X8S32r4JzCDKE3ZWaTc9C6sLZhExSziNB1/rf5RLyh3JCrQDi2V72plRg3QlWhwqSrgLcBNb+iNZsyIiBrRS2Z4rIXNKw7z7+CvNL9zVXD4sGQlRrO5DqI8gK1oIOHC+NELpW0mDg0NGS9MN2NA=
+	t=1764201579; cv=none; b=PBIJL2TSr7ozWqhaz3FObxV4aQp1ubHXnl3gJ9yzWWJthen8shbQb3chMrBnPIgD8XNRrFQwC3j+VSNGQogGd+0JchhoZm9hjCTqTOLSDL4Cqi6kL4p8wfrfi+pibDixNKhDa1CRLaRYkACprbRXPYsAPwEbfNwKcoun1YfIFSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764201297; c=relaxed/simple;
-	bh=UO9rrjLu/3nGllgpQPfy1ArB9Oggq5rKnHVwzO2DQQ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=o4+M4EzQL6muaWPbKw+ExFtvjyYBalwRwkHdc+TwQePlnrKeP58O5/+PWSVRN8kRBzBtm+wd/fehPXWXnNw3OjsYfJf1TF9YZKugx06ogwr0DZ/m/6ek1+Hw/XpC5a0xMmT1wA0stLHTxKfHc6iEYtBlIt8EZZ4dPxBX7EkMO6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=XSyCVcI5; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1764201293;
-	bh=gdWCdQKLrZ1IKe2k159kqNewkt3Qx9O7dc2xspuSE2w=;
-	h=Date:From:To:Cc:Subject:From;
-	b=XSyCVcI5QX0+OnVd6vqNNhMrWgQOPPw5rwmOA0AIGAa798Sf0JO0ErBQZEF10Xzte
-	 e3hbz9UfxdvGpDMQnIbBgFGLDMy2Xn5FE2+QfeGPqosMO38AMdzfqmZYOdE/Kx/zVW
-	 Jhm7cwK160THKXQpzTLqjVkP/nXieCUa1ZpO9eE7Dv2ufgL/Er7KgTbNJQ7+20eQuH
-	 hQHA5yri0JvPxL4N8DcezjkFqlK1hLvOxRViTQNqQW73GFqXKllvbmWB4qnsRN154u
-	 OKPktpRqIxZC7I5oZtQKUahcbgJ5bs9qQRe/EX8Sf3hN2LlDceCXeDdCO24g9vMc5x
-	 7d3qealYFxtmw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dGxHw3JsQz4wCk;
-	Thu, 27 Nov 2025 10:54:50 +1100 (AEDT)
-Date: Thu, 27 Nov 2025 10:54:50 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Fernando Fernandez Mancera <fmancera@suse.de>, Jason Xing
- <kernelxing@tencent.com>, Networking <netdev@vger.kernel.org>, Linux Kernel
- Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20251127105450.4a1665ec@canb.auug.org.au>
+	s=arc-20240116; t=1764201579; c=relaxed/simple;
+	bh=XXesTwQBQxQbkts5VRZ6Fay9AF3QN7VI+NHyBf4U1P4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MQFuFfFHt0uBdzqwF8zAxbG4GdcmdHfXnXLJ8rGunuw+FmbwJerP8mqZIlTd7WwJ7PK3Xx/h0eTS9doyLvQ1keWHaqVzZF/wCjRFsr1ArB1PNFaw7jP4HF0QTUHLDmwHbrGgxoRER4Sf+xlIdMEsxpWdk+6oOHCVRv5xMRoFazk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hgDDGwM4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A21CFC116B1;
+	Wed, 26 Nov 2025 23:59:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764201579;
+	bh=XXesTwQBQxQbkts5VRZ6Fay9AF3QN7VI+NHyBf4U1P4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hgDDGwM4o+6cSFa/jYz0n5oNQWucs/hx8tOVqThQAO2WipxL+zZgRiYT0j6GFc3BM
+	 J5onfLozskLEX+4BAhfROnapDV80PC3WP7tShdOHoBeYY7u+dsIyVAORcE4hZAkOTn
+	 q6GyXJxRn12qr2cOZTVj7ddiM8T26TPOxIjiq2lmXifwtV4Q505YK4D5vdAUNALIOZ
+	 539oQ2ZmsVfgFKFDEV6W4BW+UNgQ0XOlNme7RJZ87HgfUCqwq4bKr5my+AtlDWbsfU
+	 q2ZWGAbsWRTjBe4NeTh8IedGFWrrcFlwavcQ8W4v3dVLPQsiT1PblDtvQc7a3zRTvR
+	 p9AKkgtmMQr2A==
+Date: Wed, 26 Nov 2025 15:59:37 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Donald
+ Hunter <donald.hunter@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Shuah Khan <shuah@kernel.org>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH net-next 00/10] geneve: introduce double tunnel GSO/GRO
+Message-ID: <20251126155937.05a8c280@kernel.org>
+In-Reply-To: <cover.1764056123.git.pabeni@redhat.com>
+References: <cover.1764056123.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/oi75ACJbygayEf_J=mfveHd";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/oi75ACJbygayEf_J=mfveHd
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-Hi all,
+On Tue, 25 Nov 2025 17:11:05 +0100 Paolo Abeni wrote:
+> This is the [belated] incarnation of topic discussed in the last Neconf
+> [1].
 
-Today's linux-next merge of the net-next tree got a conflict in:
-
-  net/xdp/xsk.c
-
-between commit:
-
-  0ebc27a4c67d ("xsk: avoid data corruption on cq descriptor number")
-
-from the net tree and commit:
-
-  8da7bea7db69 ("xsk: add indirect call for xsk_destruct_skb")
-
-from the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc net/xdp/xsk.c
-index 69bbcca8ac75,bcfd400e9cf8..000000000000
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@@ -591,43 -560,50 +590,42 @@@ static u32 xsk_get_num_desc(struct sk_b
-  static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
-  				      struct sk_buff *skb)
-  {
- -	struct xsk_addr_node *pos, *tmp;
- +	u32 num_descs =3D xsk_get_num_desc(skb);
- +	struct xsk_addrs *xsk_addr;
-  	u32 descs_processed =3D 0;
-  	unsigned long flags;
- -	u32 idx;
- +	u32 idx, i;
- =20
-- 	spin_lock_irqsave(&pool->cq_lock, flags);
-+ 	spin_lock_irqsave(&pool->cq_prod_lock, flags);
-  	idx =3D xskq_get_prod(pool->cq);
- =20
- -	xskq_prod_write_addr(pool->cq, idx,
- -			     (u64)(uintptr_t)skb_shinfo(skb)->destructor_arg);
- -	descs_processed++;
- +	if (unlikely(num_descs > 1)) {
- +		xsk_addr =3D (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
- =20
- -	if (unlikely(XSKCB(skb)->num_descs > 1)) {
- -		list_for_each_entry_safe(pos, tmp, &XSKCB(skb)->addrs_list, addr_node) {
- +		for (i =3D 0; i < num_descs; i++) {
-  			xskq_prod_write_addr(pool->cq, idx + descs_processed,
- -					     pos->addr);
- +					     xsk_addr->addrs[i]);
-  			descs_processed++;
- -			list_del(&pos->addr_node);
- -			kmem_cache_free(xsk_tx_generic_cache, pos);
-  		}
- +		kmem_cache_free(xsk_tx_generic_cache, xsk_addr);
- +	} else {
- +		xskq_prod_write_addr(pool->cq, idx,
- +				     xsk_skb_destructor_get_addr(skb));
- +		descs_processed++;
-  	}
-  	xskq_prod_submit_n(pool->cq, descs_processed);
-- 	spin_unlock_irqrestore(&pool->cq_lock, flags);
-+ 	spin_unlock_irqrestore(&pool->cq_prod_lock, flags);
-  }
- =20
-  static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
-  {
-- 	unsigned long flags;
--=20
-- 	spin_lock_irqsave(&pool->cq_lock, flags);
-+ 	spin_lock(&pool->cq_cached_prod_lock);
-  	xskq_prod_cancel_n(pool->cq, n);
-- 	spin_unlock_irqrestore(&pool->cq_lock, flags);
-+ 	spin_unlock(&pool->cq_cached_prod_lock);
-  }
- =20
-- static void xsk_destruct_skb(struct sk_buff *skb)
- -static void xsk_inc_num_desc(struct sk_buff *skb)
- -{
- -	XSKCB(skb)->num_descs++;
- -}
- -
- -static u32 xsk_get_num_desc(struct sk_buff *skb)
- -{
- -	return XSKCB(skb)->num_descs;
- -}
- -
-+ INDIRECT_CALLABLE_SCOPE
-+ void xsk_destruct_skb(struct sk_buff *skb)
-  {
-  	struct xsk_tx_metadata_compl *compl =3D &skb_shinfo(skb)->xsk_meta;
- =20
-
---Sig_/oi75ACJbygayEf_J=mfveHd
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmknk0oACgkQAVBC80lX
-0GzYbggAk84eCYL7uvzEU1Gylfx5tugEcwva4YL2ReQxB8RfjWZ4H8ypwZ07LCXq
-gSEcJpRS3uGheLUgnjsqBOXjyo792uvxKTFzAHo6XW392hVvGmHwxtCSf3lCyGTK
-ZRDo0qciu8J3ey2k06ggYSwxuYlXdOGOWlNtFQv8N0WedwnrW4LQEPJ/Zufs5Cnb
-4sU5UngixFCNKMA/UDQZZSIYiQfsNpELEEMTarObaJUQeaqRxHxqdIf3fTBulFw7
-psQtM4xB0Y6F+9S4s/wmm+ZMm2/0qDqmf8nhZ+XSyMJEocUWC6uJ2Ygi+8GfdVJ+
-OTbKeAON0HW8AfPC3Uy89ee9/iOfjA==
-=HAxk
------END PGP SIGNATURE-----
-
---Sig_/oi75ACJbygayEf_J=mfveHd--
+You mentioned off-list that the ai-reported issues here are real, so:
+pw-bot: cr
 
