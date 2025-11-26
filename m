@@ -1,192 +1,204 @@
-Return-Path: <netdev+bounces-241859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 311BCC8976D
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 12:14:36 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2144CC8977D
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 12:15:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCCA33B2686
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 11:14:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D9BFF4E0499
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 11:15:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F53320382;
-	Wed, 26 Nov 2025 11:14:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72DD131D399;
+	Wed, 26 Nov 2025 11:15:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="ZXRUy89u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DzyG8aWe"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4BD0219A86;
-	Wed, 26 Nov 2025 11:14:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B9C2DF154;
+	Wed, 26 Nov 2025 11:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764155667; cv=none; b=JkI6nXF/0eNjGE9K4brluRlBJYZZQpmkKMiwyi4bTenVwPtlmTrjG76wApiTJcWUJyrz4yJ6uljLA8l1qg66NrQaDZe0Ba9jLBcqg1KYTOn5egM32I28K/G8Y2Q5y4a4JYXJWH2zKxW+Svp6BvmxUffpe7XDLSi9yyLVtNqx4aQ=
+	t=1764155711; cv=none; b=KdCrn6Y3XjCAK45EM1/Gqm3Hwtw68POGd8pkKnPJPqtmCkepKQxAD+1skeQdhV569nRinX6nPnAKMdDB8P0qf2PdRqjRCbiUD2kewIMbvRosKYUaCltMZvprwUvSPZS8FVCF6FRP2gW20M59ilUrwcoiwdmVQomAEy+8bLgHf6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764155667; c=relaxed/simple;
-	bh=3kB3VPNFQAhuxGa6tM1C5udkJOUKs5pLTNOekPXiELc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cfw/yoD4twRT60dxpLw6E3TOyxVBSA7cUy6HYvBonmNp153hqMaYNuSGTUnGuq4waltr8kHBdJ6vNBCHOvjcnIHdcfC6z3tYCzybIJawdHQeHI73n6oP/SgyX9BZQSAOEhAMrICL2r9Zo/AyOZHkBZM/PSrDjNYVPNeS6yYY3Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=ZXRUy89u; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=w8d8HkGlrqvwcgdedF2R9zrbiIWX+UmAkB48YnlIjUY=; b=ZXRUy89ujMdpZlfRBgYAZZ4KAQ
-	N8vm91aRdV0nshI3bSrJ//DFt0C0vd52bqlFFYj3OXLe80Si21a297z2JzmWso/xw08BayVyfPSKO
-	3Z2HQfAa+aI1vCq/0rrEouUKdT3AHH93vq/YR4P7RBLq8m/bLRQKk4gTLto/cndSUVp1jlo1cksBm
-	S/LU4SGK1e3D9jScHfbs/PgAIrcC1A7c6lC9gnm7bXZ8/KRzY0P6fwtdq3Tfeu/zxjM7ofjnF8iKp
-	XvBWhZGsfikg7ny7r0xEoz8SVO1zT96iuRFGk+/B32OVYimfeS8TcPkwTIyiUTT+3Yxztw1fesqdF
-	vI7Ukv5uJLcIPAM6NacG6+uAeZuwQOCL7EP9I2wYG5WLpf+BNFPevmvz+aU8KJkThFnzRq8nk8JjO
-	cczkNwMTVEKZX7knsLQCs1+kNkUMRJR1yczqFAB4MOsxeq176menwXq/1a1YP1r3YzLRjGzBeITcg
-	DXJFWlWye10K4d2qtaep9uQs;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vODTZ-00FpBW-0F;
-	Wed, 26 Nov 2025 11:14:21 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: netdev@vger.kernel.org
-Cc: metze@samba.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Xin Long <lucien.xin@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH] net: define IPPROTO_SMBDIRECT and SOL_SMBDIRECT constants
-Date: Wed, 26 Nov 2025 12:14:06 +0100
-Message-ID: <20251126111407.1786854-1-metze@samba.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1764155711; c=relaxed/simple;
+	bh=uneOr7UWZf997xNbwcbBJk5N8EI2Gi/4Wedz6v7jNMo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CLDZ3/zqyxStfNpSznO9Pg/0YOZKR5soNLuHUK55hZJa8A4ukqZZK3lLbiJq9GPqNyukYOU1BZvPjk2U/3L2VD13bOiAsiD+bj7tGRhdlLn4sw0aZ+0hgtC6/l7tsU/2Pv5Aig/I49avhM+KzE7YptvGO4okf+T2N+Ql0VY3rnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DzyG8aWe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 526CBC113D0;
+	Wed, 26 Nov 2025 11:15:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764155710;
+	bh=uneOr7UWZf997xNbwcbBJk5N8EI2Gi/4Wedz6v7jNMo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DzyG8aWeOR42SDlaOgizksjhLiulP0dpuaaJwm901Gkbm8lIHHWLhcC/htPxtOSzb
+	 u+Exvfor8+3cddjribvlqtDV55x4LbkgV2IF6xtVsfRC7iK1e07WBDgNNka/mTOjTX
+	 x77e0nqaUSg7S3YYpoTFBDnmio6GV8nVewwDI8HCCPD1MJchdFDh7Mg7PBFFQ5K5gL
+	 V6mq/P9Jf8QZihLAbJpD5eyqChjYj0VmGqI6f52s/HuKk3kEf9cUcUduw+NCcFMqai
+	 BtG2sRyEJgw+RL9i5sbgykepmRwb/gQY1Q1ervb7LtEdcpxQjPQ3cFWqYYNa8e0zDZ
+	 RRmjv680yxJxQ==
+Message-ID: <0be119c2-4b5f-4aa6-bb20-b3e8a8b4cf82@kernel.org>
+Date: Wed, 26 Nov 2025 12:15:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net] net: fix propagation of EPERM from tcp_connect()
+Content-Language: en-GB, fr-BE
+To: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Lorenzo Colitti <lorenzo@google.com>, Neal Cardwell <ncardwell@google.com>,
+ bpf@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
+ Jakub Kicinski <kuba@kernel.org>
+References: <20251121015933.3618528-1-maze@google.com>
+ <CANP3RGeK_NE+U9R59QynCr94B7543VLJnF_Sp3eecKCMCC3XRw@mail.gmail.com>
+ <20251121064333.3668e50e@kernel.org>
+ <CAHo-OoxLYpbXMZFY+b7Wb8Dh1MNQXb2WEPNnV_+d_MOisipy=A@mail.gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <CAHo-OoxLYpbXMZFY+b7Wb8Dh1MNQXb2WEPNnV_+d_MOisipy=A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This patch adds IPPROTO_SMBDIRECT and SOL_SMBDIRECT constants to the
-networking subsystem. These definitions are essential for applications
-to set socket options and protocol identifiers related to the SMBDIRECT
-protocol, defined in [MS-SMBD] by Microsoft. It is used as wrapper
-around RDMA in order to provide a transport for SMB3, but Microsoft also
-uses it as transport for other protocols.
+Hi Maciej,
 
-SMBDIRECT works over Infiniband, RoCE and iWarp.
-RoCEv2 is based on IP/UDP and iWarp is based on IP/TCP,
-so these use IP addresses natively.
-Infiniband and RoCEv1 require IPOIB in order to be used for
-SMBDIRECT.
+(+cc MPTCP list)
 
-So instead of adding a PF_SMBDIRECT, which would only use AF_INET[6],
-we use IPPROTO_SMBDIRECT instead, this uses a number not
-allocated from IANA, as it would not appear in an IP header.
+On 26/11/2025 02:08, Maciej Żenczykowski wrote:
+>> FWIW this breaks the mptcp_join.sh test, too:
+> 
+> What do you mean by 'too', does it break something else as well, or
+> just the quoted mptcp_join?
+> 
+>> https://netdev-3.bots.linux.dev/vmksft-mptcp/results/394900/1-mptcp-join-sh/stdout
+> 
+> My still very preliminary investigation is that this is actually
+> correct (though obviously the tests need to be adjusted).
+> 
+> See tools/testing/selftests/net/mptcp/mptcp_join.sh:89
+> 
+> # generated using "nfbpf_compile '(ip && (ip[54] & 0xf0) == 0x30) ||
+> #                                (ip6 && (ip6[74] & 0xf0) == 0x30)'"
+> CBPF_MPTCP_SUBOPTION_ADD_ADDR=...
+> 
+> mptcp_join.sh:365
+>       if ! ip netns exec $ns2 $tables -A OUTPUT -p tcp \
+>                       -m tcp --tcp-option 30 \
+>                       -m bpf --bytecode \
+>                       "$CBPF_MPTCP_SUBOPTION_ADD_ADDR" \
+>                       -j DROP
+> 
+> So basically this is using iptables -j DROP which presumably
+> propagates to EPERM and thus results in a faster local failure...
 
-This is similar to IPPROTO_SMC, IPPROTO_MPTCP and IPPROTO_QUIC,
-which are linux specific values for the socket() syscall.
+I don't think that's what caused the issue: according to the logs, two
+tests have failed: "delete and re-add" and "flush re-add" and they don't
+use the mentioned snippet. Still it might be caused by a Netfilter rule,
+because they both call:
 
-  socket(AF_INET, SOCK_STREAM, IPPROTO_SMBDIRECT);
-  socket(AF_INET6, SOCK_STREAM, IPPROTO_SMBDIRECT);
+  reset_with_tcp_filter "..." ns2 10.0.3.2 REJECT OUTPUT
 
-This will allow the existing smbdirect code used by
-cifs.ko and ksmbd.ko to be moved behind the socket layer [1],
-so that there's less special handling. Only sock_sendmsg()
-sock_recvmsg() are used, so that the main stream handling
-is done all the same for tcp, smbdirect and later also quic.
+This helper will call:
 
-The special RDMA read/write handling will be via direct
-function calls as they are currently done for the in kernel
-consumers.
+  iptables -A OUTPUT -s 10.0.3.2 -j REJECT
 
-As a start __sock_create(kern=0)/sk->sk_kern_sock == 0 will
-still cause a -EPROTONOSUPPORT. So only in kernel consumers
-will be supported for now.
+Note that you can easily reproduce the issue by only launching the
+problematic tests with './mptcp_join.sh "<test name or id>"', e.g.
 
-Once I have developed a stable interface for the RDMA read/write
-handling using sendmsg/recvmsg with MSG_OOB and msg_control,
-it will also exposed to userspace in order to allow Samba to
-use it.
+  cd tools/testing/selftests/net/mptcp
+  ./mptcp_join.sh "delete and re-add"
 
-[1]
-https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/master-ipproto-smbdirect
+> Although this is probably trying to replicate packet loss rather than
+> a local error...
+> 
+> So I'm not sure if I should:
+> (a) fix the asserts with new values (presumably easiest by far),
+> or
+> (b) change how it does DROP to make it more like network packet loss
+> (maybe an extra namespace, so the drop is in a diff netns, during
+> forwarding??? not even sure if that would help though, or maybe add
+> drop on other netns INPUT instead of OUTPUT).
+> or
+> (c) introduce some iptables -j DROP_CN type return... (seems like that
+> might be worthwhile anyway)
 
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Willem de Bruijn <willemb@google.com>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Xin Long <lucien.xin@gmail.com>
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Cc: linux-rdma@vger.kernel.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
+From what I understand, with your RFC patch, a "connect()" (or
+"kernel_connect()") will get an error because of the Netfilter rule. If
+that's normal, then probably the expected results can be adapted, e.g.
+from ...
 
----
+  join_syn_tx=3 join_connect_err=1 \
+          chk_join_nr 2 2 2
 
-In order to avoid conflicts with the addition of IPPROTO_QUIC,
-the patch is based on netdev-next/main + the patch adding
-IPPROTO_QUIC and SOL_QUIC [2].
+... to ...
 
-[2]
-https://lore.kernel.org/quic/0cb58f6fcf35ac988660e42704dae9960744a0a7.1763994509.git.lucien.xin@gmail.com/T/#u
+  join_connect_err=2 \
+          chk_join_nr 2 2 2
 
-As the numbers of IPPROTO_QUIC and SOL_QUIC are already used
-in various userspace applications it would be good to have
-this merged to netdev-next/main even if the actual
-implementation is still waiting for review.
+At least that would show the effect of your patch.
 
-Having IPPROTO_SMBDIRECT+SOL_SMBDIRECT merged would also make
-thinks easier for me.
----
- include/linux/socket.h  | 1 +
- include/uapi/linux/in.h | 2 ++
- 2 files changed, 3 insertions(+)
+An important note: the selftests can be executed on older kernels: if
+your patch is changing the behaviour, and it is a fix that is going to
+be backported to stable, that's fine. If that's not a fix, the selftests
+should continue to work with and without the kernel patch. Then, the
+Netfilter rule should probably be adapted instead, maybe by moving it to
+the other side (ns1) in INPUT if that still makes the tests valid.
 
-diff --git a/include/linux/socket.h b/include/linux/socket.h
-index b4563ffe552b..350a579a87da 100644
---- a/include/linux/socket.h
-+++ b/include/linux/socket.h
-@@ -402,6 +402,7 @@ struct ucred {
- #define SOL_SMC		286
- #define SOL_VSOCK	287
- #define SOL_QUIC	288
-+#define SOL_SMBDIRECT	289
- 
- /* IPX options */
- #define IPX_TYPE	1
-diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
-index 34becd90d3a6..b30caa6db8ca 100644
---- a/include/uapi/linux/in.h
-+++ b/include/uapi/linux/in.h
-@@ -85,6 +85,8 @@ enum {
- #define IPPROTO_RAW		IPPROTO_RAW
-   IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
- #define IPPROTO_SMC		IPPROTO_SMC
-+  IPPROTO_SMBDIRECT = 257,	/* RDMA based transport (mostly used by SMB3) */
-+#define IPPROTO_SMBDIRECT	IPPROTO_SMBDIRECT
-   IPPROTO_QUIC = 261,		/* A UDP-Based Multiplexed and Secure Transport	*/
- #define IPPROTO_QUIC		IPPROTO_QUIC
-   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
+Cheers,
+Matt
 -- 
-2.43.0
+Sponsored by the NGI0 Core fund.
 
 
