@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-241976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34D49C8B3E9
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:39:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80544C8B3E3
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:39:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7F0E3A25B7
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 17:37:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1C1F3B8CAC
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 17:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E6C2315761;
-	Wed, 26 Nov 2025 17:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F4A313E02;
+	Wed, 26 Nov 2025 17:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="KDR6fhWd"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="vgCSQK0f"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2309312836;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F87311C37;
 	Wed, 26 Nov 2025 17:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764178601; cv=none; b=OYUXJaGW8guY2OncLSgr5n25s+ChhrRB7qfTSlB60HTFpu9YyqYpzSRusDk6wKIo7ngjU1q9oNs3ExlCbwPtIJ4K9QMqg5VOyL/etmF4JeQgUTju7U39aFTv+JUlT3Y2JbiXArqMuGLuHYavXoNZQ+9g2rrEZ41lXrD2TeUy6ac=
+	t=1764178600; cv=none; b=dYBPP7nm+fPtEZ48l1y3irEvH85Zs4HMMYFNrgfSwMulw3OgONT9H7ND42SSqMUSd+pKFx/zz34HQGgUlq5RWzMx13KA5a2Ry3FoGj1bS/gZhYCNfbTMUeaFgcnTyO3oMGtWRRXGuS51aD1pg4ML7yrg8BNxuVgMxlTWlAIj6sI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764178601; c=relaxed/simple;
-	bh=oAc5lLTvSoXT1miS4IBqz89hqPf/jtLfqkSsakiDm5M=;
+	s=arc-20240116; t=1764178600; c=relaxed/simple;
+	bh=6za08evM4/3iaYHy0vKK/WiWcDhIqI4gEH19T3HckHY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WxPsMka4XqwtyGWZdo1oL107BUxHwtCJcSUo4fTMCTCy0chO4l4cK4c4431l4Dxx32el7ZAtZRXMJlVhozH5XiL4uxpwEPFlmrENjWlmSsnOoo1qWEWrhqQTExNAg764AMxycq3TJ2nh3mmzo09rMnSKwCnP9MuYlysHjzzxybo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=KDR6fhWd; arc=none smtp.client-ip=193.104.135.124
+	 MIME-Version:Content-Type; b=EFrMjly2PcQ9vcPvZ0lhgznjs7YsXpxIhe2PMKUS7KmXp5r2KJKw9smBMuNVqkB6HEDBSpV2ZsDvCXRAYaP++PqsttFvvuayv+p2BcHbVBN1c01aq2d/hS8jSdztAUbSWe5qvwAaSlDlBWmFlYKgZ8z1srOrl09GhWYrMCozE9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=vgCSQK0f; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
 	s=202008; t=1764178585;
-	bh=oAc5lLTvSoXT1miS4IBqz89hqPf/jtLfqkSsakiDm5M=;
+	bh=6za08evM4/3iaYHy0vKK/WiWcDhIqI4gEH19T3HckHY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KDR6fhWd+xCVxkICDStMC9xcrFTkWjBCPiZ7TtPrvwmI+jFH/tL/1u+zeTSMpwFo0
-	 bP2By3iG++Jrg918alD2+pIdpyxBIpDBnQm0QBOoQL2s1MX3jXXvIYQs4SlnUxSr4c
-	 B9UsMlqsT+j8X+YNYE7g3e/tqaKipNXWblLj02f5qk5VYMzojbuCem1B7ltopZQmY4
-	 4wcCY/Gb4XaG3WhI1j3YcHbwbjIN+HT4PZNMzPO60aQ+I+H9eEEkVLnDKVc/5TAWSu
-	 8cSn05aD0yPibHN3p0HaiALlsMUhJHvfKoj6h0sFg0jcyXV/Dth6XMYzyqZVRXT+AJ
-	 ZeoCw41l/QTBg==
+	b=vgCSQK0f2u+8HNOs9XHRFoCxwd9eR7SbzRGb+0VcZec/7kLtrSQ70D/ug72Yn4957
+	 1flU/psoPx3wPm+BV1zjUNxmPQ5H8BvaGFjLM45jgOHdkHjwOdF14M81LfMpnNLyGp
+	 oVnBlqj+hhgnp0zT0oXT8ReWxIyn1pThHRAZDGOuPk+5no1N2BKiiwb2LPlYgXd3x3
+	 JNpxvIBwTQPNt8U2SzjFRu/JzFtRwpbJXS1/xPDxvRY+w3sz/8CknW0vGYq9yb3Juw
+	 3JbY1HnslZEkjc30ZjCnvyOTqf5jK22PvKZF8CD6qPSm56cL7CM+HlXHbrOgD2IUwg
+	 dwX/94osRMQBw==
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id A06126010D;
+	by mail1.fiberby.net (Postfix) with ESMTPSA id A1EFC6010F;
 	Wed, 26 Nov 2025 17:36:25 +0000 (UTC)
 Received: by x201s (Postfix, from userid 1000)
-	id E1067204071; Wed, 26 Nov 2025 17:35:52 +0000 (UTC)
+	id ECDB8204309; Wed, 26 Nov 2025 17:35:52 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
@@ -61,9 +61,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Jordan Rife <jordan@jrife.io>
-Subject: [PATCH wireguard v4 09/10] tools: ynl: add sample for wireguard
-Date: Wed, 26 Nov 2025 17:35:41 +0000
-Message-ID: <20251126173546.57681-10-ast@fiberby.net>
+Subject: [PATCH wireguard v4 10/10] wireguard: netlink: generate netlink code
+Date: Wed, 26 Nov 2025 17:35:42 +0000
+Message-ID: <20251126173546.57681-11-ast@fiberby.net>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251126173546.57681-1-ast@fiberby.net>
 References: <20251126173546.57681-1-ast@fiberby.net>
@@ -76,178 +76,272 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add a sample application for WireGuard, using the generated C library.
+This patch adopts netlink policies and command definitions
+generated by ynl-gen, thus completing the conversion to YNL.
 
-The main benefit of this is to exercise the generated library,
-which might be useful for future selftests.
+Given that the old and new policies are functionally identical
+and have just been moved to a new file, it serves to verify
+that the policies generated from the spec are identical to the
+previous policy code.
 
-In order to support usage with a pre-YNL wireguard.h in /usr/include,
-the former header guard is added to Makefile.deps as well.
+The following functions are renamed:
+  wg_get_device_dump() -> wg_get_device_dumpit()
+  wg_set_device()      -> wg_set_device_doit()
 
-Example:
-  $ make -C tools/net/ynl/lib
-  $ make -C tools/net/ynl/generated
-  $ make -C tools/net/ynl/samples wireguard
-  $ ./tools/net/ynl/samples/wireguard
-  usage: ./tools/net/ynl/samples/wireguard <ifindex|ifname>
-  $ sudo ./tools/net/ynl/samples/wireguard wg-test
-  Interface 3: wg-test
-      Peer 6adfb183a4a2c94a2f92dab5ade762a4788[...]:
-          Data: rx: 42 / tx: 42 bytes
-          Allowed IPs:
-              0.0.0.0/0
-              ::/0
+The new files are covered by the existing drivers/net/wireguard/
+pattern in MAINTAINERS.
+
+No behavioural changes intended.
 
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 ---
- MAINTAINERS                       |   1 +
- tools/net/ynl/Makefile.deps       |   2 +
- tools/net/ynl/samples/.gitignore  |   1 +
- tools/net/ynl/samples/wireguard.c | 104 ++++++++++++++++++++++++++++++
- 4 files changed, 108 insertions(+)
- create mode 100644 tools/net/ynl/samples/wireguard.c
+ drivers/net/wireguard/Makefile            |  2 +-
+ drivers/net/wireguard/generated/netlink.c | 73 +++++++++++++++++++++++
+ drivers/net/wireguard/generated/netlink.h | 30 ++++++++++
+ drivers/net/wireguard/netlink.c           | 60 ++-----------------
+ 4 files changed, 109 insertions(+), 56 deletions(-)
+ create mode 100644 drivers/net/wireguard/generated/netlink.c
+ create mode 100644 drivers/net/wireguard/generated/netlink.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a72fe5ce334b6..dfc7b7a017561 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -27665,6 +27665,7 @@ L:	netdev@vger.kernel.org
- S:	Maintained
- F:	Documentation/netlink/specs/wireguard.yaml
- F:	drivers/net/wireguard/
-+F:	tools/net/ynl/samples/wireguard.c
- F:	tools/testing/selftests/wireguard/
- 
- WISTRON LAPTOP BUTTON DRIVER
-diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-index 865fd2e8519ed..a9a5348b31a3b 100644
---- a/tools/net/ynl/Makefile.deps
-+++ b/tools/net/ynl/Makefile.deps
-@@ -48,3 +48,5 @@ CFLAGS_tc:= $(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
- 	$(call get_hdr_inc,_TC_SKBEDIT_H,tc_act/tc_skbedit.h) \
- 	$(call get_hdr_inc,_TC_TUNNEL_KEY_H,tc_act/tc_tunnel_key.h)
- CFLAGS_tcp_metrics:=$(call get_hdr_inc,_LINUX_TCP_METRICS_H,tcp_metrics.h)
-+CFLAGS_wireguard:=$(call get_hdr_inc,_LINUX_WIREGUARD_H,wireguard.h) \
-+	-D _WG_UAPI_WIREGUARD_H # alternate pre-YNL guard
-diff --git a/tools/net/ynl/samples/.gitignore b/tools/net/ynl/samples/.gitignore
-index 05087ee323ba2..6fbed294feac0 100644
---- a/tools/net/ynl/samples/.gitignore
-+++ b/tools/net/ynl/samples/.gitignore
-@@ -8,3 +8,4 @@ rt-link
- rt-route
- tc
- tc-filter-add
-+wireguard
-diff --git a/tools/net/ynl/samples/wireguard.c b/tools/net/ynl/samples/wireguard.c
+diff --git a/drivers/net/wireguard/Makefile b/drivers/net/wireguard/Makefile
+index dbe1f8514efc3..00cbcc9ab69da 100644
+--- a/drivers/net/wireguard/Makefile
++++ b/drivers/net/wireguard/Makefile
+@@ -13,5 +13,5 @@ wireguard-y += peerlookup.o
+ wireguard-y += allowedips.o
+ wireguard-y += ratelimiter.o
+ wireguard-y += cookie.o
+-wireguard-y += netlink.o
++wireguard-y += netlink.o generated/netlink.o
+ obj-$(CONFIG_WIREGUARD) := wireguard.o
+diff --git a/drivers/net/wireguard/generated/netlink.c b/drivers/net/wireguard/generated/netlink.c
 new file mode 100644
-index 0000000000000..43f3551eb101a
+index 0000000000000..3ef8c29908c28
 --- /dev/null
-+++ b/tools/net/ynl/samples/wireguard.c
-@@ -0,0 +1,104 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <arpa/inet.h>
-+#include <string.h>
-+#include <stdio.h>
-+#include <errno.h>
-+#include <ynl.h>
++++ b/drivers/net/wireguard/generated/netlink.c
+@@ -0,0 +1,73 @@
++// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
++/* Do not edit directly, auto-generated from: */
++/*	Documentation/netlink/specs/wireguard.yaml */
++/* YNL-GEN kernel source */
++/* YNL-ARG --function-prefix wg */
++/* To regenerate run: tools/net/ynl/ynl-regen.sh */
 +
-+#include "wireguard-user.h"
++#include <net/netlink.h>
++#include <net/genetlink.h>
 +
-+static void print_allowed_ip(const struct wireguard_wgallowedip *aip)
-+{
-+	char addr_out[INET6_ADDRSTRLEN];
++#include "netlink.h"
 +
-+	if (!inet_ntop(aip->family, aip->ipaddr, addr_out, sizeof(addr_out))) {
-+		addr_out[0] = '?';
-+		addr_out[1] = '\0';
-+	}
-+	printf("\t\t\t%s/%u\n", addr_out, aip->cidr_mask);
-+}
++#include <uapi/linux/wireguard.h>
++#include <linux/time_types.h>
 +
-+/* Only printing public key in this demo. For better key formatting,
-+ * use the constant-time implementation as found in wireguard-tools.
-+ */
-+static void print_peer_header(const struct wireguard_wgpeer *peer)
-+{
-+	unsigned int i;
-+	uint8_t *key = peer->public_key;
-+	unsigned int len = peer->_len.public_key;
++/* Common nested types */
++const struct nla_policy wireguard_wgallowedip_nl_policy[WGALLOWEDIP_A_FLAGS + 1] = {
++	[WGALLOWEDIP_A_FAMILY] = { .type = NLA_U16, },
++	[WGALLOWEDIP_A_IPADDR] = NLA_POLICY_MIN_LEN(4),
++	[WGALLOWEDIP_A_CIDR_MASK] = { .type = NLA_U8, },
++	[WGALLOWEDIP_A_FLAGS] = NLA_POLICY_MASK(NLA_U32, 0x1),
++};
 +
-+	if (len != 32)
-+		return;
-+	printf("\tPeer ");
-+	for (i = 0; i < len; i++)
-+		printf("%02x", key[i]);
-+	printf(":\n");
-+}
++const struct nla_policy wireguard_wgpeer_nl_policy[WGPEER_A_PROTOCOL_VERSION + 1] = {
++	[WGPEER_A_PUBLIC_KEY] = NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
++	[WGPEER_A_PRESHARED_KEY] = NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
++	[WGPEER_A_FLAGS] = NLA_POLICY_MASK(NLA_U32, 0x7),
++	[WGPEER_A_ENDPOINT] = NLA_POLICY_MIN_LEN(16),
++	[WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL] = { .type = NLA_U16, },
++	[WGPEER_A_LAST_HANDSHAKE_TIME] = NLA_POLICY_EXACT_LEN(16),
++	[WGPEER_A_RX_BYTES] = { .type = NLA_U64, },
++	[WGPEER_A_TX_BYTES] = { .type = NLA_U64, },
++	[WGPEER_A_ALLOWEDIPS] = NLA_POLICY_NESTED_ARRAY(wireguard_wgallowedip_nl_policy),
++	[WGPEER_A_PROTOCOL_VERSION] = { .type = NLA_U32, },
++};
 +
-+static void print_peer(const struct wireguard_wgpeer *peer)
-+{
-+	unsigned int i;
++/* WG_CMD_GET_DEVICE - dump */
++static const struct nla_policy wireguard_get_device_nl_policy[WGDEVICE_A_IFNAME + 1] = {
++	[WGDEVICE_A_IFINDEX] = { .type = NLA_U32, },
++	[WGDEVICE_A_IFNAME] = { .type = NLA_NUL_STRING, .len = 15, },
++};
 +
-+	print_peer_header(peer);
-+	printf("\t\tData: rx: %llu / tx: %llu bytes\n",
-+	       peer->rx_bytes, peer->tx_bytes);
-+	printf("\t\tAllowed IPs:\n");
-+	for (i = 0; i < peer->_count.allowedips; i++)
-+		print_allowed_ip(&peer->allowedips[i]);
-+}
++/* WG_CMD_SET_DEVICE - do */
++static const struct nla_policy wireguard_set_device_nl_policy[WGDEVICE_A_PEERS + 1] = {
++	[WGDEVICE_A_IFINDEX] = { .type = NLA_U32, },
++	[WGDEVICE_A_IFNAME] = { .type = NLA_NUL_STRING, .len = 15, },
++	[WGDEVICE_A_PRIVATE_KEY] = NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
++	[WGDEVICE_A_PUBLIC_KEY] = NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
++	[WGDEVICE_A_FLAGS] = NLA_POLICY_MASK(NLA_U32, 0x1),
++	[WGDEVICE_A_LISTEN_PORT] = { .type = NLA_U16, },
++	[WGDEVICE_A_FWMARK] = { .type = NLA_U32, },
++	[WGDEVICE_A_PEERS] = NLA_POLICY_NESTED_ARRAY(wireguard_wgpeer_nl_policy),
++};
 +
-+static void build_request(struct wireguard_get_device_req *req, char *arg)
-+{
-+	char *endptr;
-+	int ifindex;
++/* Ops table for wireguard */
++const struct genl_split_ops wireguard_nl_ops[2] = {
++	{
++		.cmd		= WG_CMD_GET_DEVICE,
++		.start		= wg_get_device_start,
++		.dumpit		= wg_get_device_dumpit,
++		.done		= wg_get_device_done,
++		.policy		= wireguard_get_device_nl_policy,
++		.maxattr	= WGDEVICE_A_IFNAME,
++		.flags		= GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= WG_CMD_SET_DEVICE,
++		.doit		= wg_set_device_doit,
++		.policy		= wireguard_set_device_nl_policy,
++		.maxattr	= WGDEVICE_A_PEERS,
++		.flags		= GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DO,
++	},
++};
+diff --git a/drivers/net/wireguard/generated/netlink.h b/drivers/net/wireguard/generated/netlink.h
+new file mode 100644
+index 0000000000000..5dc977ee9e7c9
+--- /dev/null
++++ b/drivers/net/wireguard/generated/netlink.h
+@@ -0,0 +1,30 @@
++/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
++/* Do not edit directly, auto-generated from: */
++/*	Documentation/netlink/specs/wireguard.yaml */
++/* YNL-GEN kernel header */
++/* YNL-ARG --function-prefix wg */
++/* To regenerate run: tools/net/ynl/ynl-regen.sh */
 +
-+	ifindex = strtol(arg, &endptr, 0);
-+	if (endptr != arg + strlen(arg) || errno != 0)
-+		ifindex = 0;
-+	if (ifindex > 0)
-+		wireguard_get_device_req_set_ifindex(req, ifindex);
-+	else
-+		wireguard_get_device_req_set_ifname(req, arg);
-+}
++#ifndef _LINUX_WIREGUARD_GEN_H
++#define _LINUX_WIREGUARD_GEN_H
 +
-+int main(int argc, char **argv)
-+{
-+	struct wireguard_get_device_list *devs;
-+	struct wireguard_get_device_req *req;
-+	struct ynl_sock *ys;
++#include <net/netlink.h>
++#include <net/genetlink.h>
 +
-+	if (argc < 2) {
-+		fprintf(stderr, "usage: %s <ifindex|ifname>\n", argv[0]);
-+		return 1;
-+	}
++#include <uapi/linux/wireguard.h>
++#include <linux/time_types.h>
 +
-+	req = wireguard_get_device_req_alloc();
-+	build_request(req, argv[1]);
++/* Common nested types */
++extern const struct nla_policy wireguard_wgallowedip_nl_policy[WGALLOWEDIP_A_FLAGS + 1];
++extern const struct nla_policy wireguard_wgpeer_nl_policy[WGPEER_A_PROTOCOL_VERSION + 1];
 +
-+	ys = ynl_sock_create(&ynl_wireguard_family, NULL);
-+	if (!ys)
-+		return 2;
++/* Ops table for wireguard */
++extern const struct genl_split_ops wireguard_nl_ops[2];
 +
-+	devs = wireguard_get_device_dump(ys, req);
-+	if (!devs)
-+		goto err_close;
++int wg_get_device_start(struct netlink_callback *cb);
++int wg_get_device_done(struct netlink_callback *cb);
 +
-+	ynl_dump_foreach(devs, d) {
-+		unsigned int i;
++int wg_get_device_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
++int wg_set_device_doit(struct sk_buff *skb, struct genl_info *info);
 +
-+		printf("Interface %d: %s\n", d->ifindex, d->ifname);
-+		for (i = 0; i < d->_count.peers; i++)
-+			print_peer(&d->peers[i]);
-+	}
-+	wireguard_get_device_list_free(devs);
-+	wireguard_get_device_req_free(req);
-+	ynl_sock_destroy(ys);
-+
-+	return 0;
-+
-+err_close:
-+	fprintf(stderr, "YNL (%d): %s\n", ys->err.code, ys->err.msg);
-+	wireguard_get_device_req_free(req);
-+	ynl_sock_destroy(ys);
-+	return 3;
-+}
++#endif /* _LINUX_WIREGUARD_GEN_H */
+diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
+index 0ce0bda8c1ce8..1da7e98d0d509 100644
+--- a/drivers/net/wireguard/netlink.c
++++ b/drivers/net/wireguard/netlink.c
+@@ -9,6 +9,7 @@
+ #include "socket.h"
+ #include "queueing.h"
+ #include "messages.h"
++#include "generated/netlink.h"
+ 
+ #include <uapi/linux/wireguard.h>
+ 
+@@ -18,39 +19,6 @@
+ #include <crypto/utils.h>
+ 
+ static struct genl_family genl_family;
+-static const struct nla_policy peer_policy[WGPEER_A_MAX + 1];
+-static const struct nla_policy allowedip_policy[WGALLOWEDIP_A_MAX + 1];
+-
+-static const struct nla_policy device_policy[WGDEVICE_A_MAX + 1] = {
+-	[WGDEVICE_A_IFINDEX]		= { .type = NLA_U32 },
+-	[WGDEVICE_A_IFNAME]		= { .type = NLA_NUL_STRING, .len = IFNAMSIZ - 1 },
+-	[WGDEVICE_A_PRIVATE_KEY]	= NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
+-	[WGDEVICE_A_PUBLIC_KEY]		= NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
+-	[WGDEVICE_A_FLAGS]		= NLA_POLICY_MASK(NLA_U32, 0x1),
+-	[WGDEVICE_A_LISTEN_PORT]	= { .type = NLA_U16 },
+-	[WGDEVICE_A_FWMARK]		= { .type = NLA_U32 },
+-	[WGDEVICE_A_PEERS]		= NLA_POLICY_NESTED_ARRAY(peer_policy),
+-};
+-
+-static const struct nla_policy peer_policy[WGPEER_A_MAX + 1] = {
+-	[WGPEER_A_PUBLIC_KEY]				= NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
+-	[WGPEER_A_PRESHARED_KEY]			= NLA_POLICY_EXACT_LEN(WG_KEY_LEN),
+-	[WGPEER_A_FLAGS]				= NLA_POLICY_MASK(NLA_U32, 0x7),
+-	[WGPEER_A_ENDPOINT]				= NLA_POLICY_MIN_LEN(sizeof(struct sockaddr)),
+-	[WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL]	= { .type = NLA_U16 },
+-	[WGPEER_A_LAST_HANDSHAKE_TIME]			= NLA_POLICY_EXACT_LEN(sizeof(struct __kernel_timespec)),
+-	[WGPEER_A_RX_BYTES]				= { .type = NLA_U64 },
+-	[WGPEER_A_TX_BYTES]				= { .type = NLA_U64 },
+-	[WGPEER_A_ALLOWEDIPS]				= NLA_POLICY_NESTED_ARRAY(allowedip_policy),
+-	[WGPEER_A_PROTOCOL_VERSION]			= { .type = NLA_U32 }
+-};
+-
+-static const struct nla_policy allowedip_policy[WGALLOWEDIP_A_MAX + 1] = {
+-	[WGALLOWEDIP_A_FAMILY]		= { .type = NLA_U16 },
+-	[WGALLOWEDIP_A_IPADDR]		= NLA_POLICY_MIN_LEN(sizeof(struct in_addr)),
+-	[WGALLOWEDIP_A_CIDR_MASK]	= { .type = NLA_U8 },
+-	[WGALLOWEDIP_A_FLAGS]		= NLA_POLICY_MASK(NLA_U32, 0x1),
+-};
+ 
+ static struct wg_device *lookup_interface(struct nlattr **attrs,
+ 					  struct sk_buff *skb)
+@@ -199,7 +167,7 @@ get_peer(struct wg_peer *peer, struct sk_buff *skb, struct dump_ctx *ctx)
+ 	return -EMSGSIZE;
+ }
+ 
+-static int wg_get_device_start(struct netlink_callback *cb)
++int wg_get_device_start(struct netlink_callback *cb)
+ {
+ 	struct wg_device *wg;
+ 
+@@ -210,7 +178,7 @@ static int wg_get_device_start(struct netlink_callback *cb)
+ 	return 0;
+ }
+ 
+-static int wg_get_device_dump(struct sk_buff *skb, struct netlink_callback *cb)
++int wg_get_device_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ {
+ 	struct wg_peer *peer, *next_peer_cursor;
+ 	struct dump_ctx *ctx = DUMP_CTX(cb);
+@@ -304,7 +272,7 @@ static int wg_get_device_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 	 */
+ }
+ 
+-static int wg_get_device_done(struct netlink_callback *cb)
++int wg_get_device_done(struct netlink_callback *cb)
+ {
+ 	struct dump_ctx *ctx = DUMP_CTX(cb);
+ 
+@@ -502,7 +470,7 @@ static int set_peer(struct wg_device *wg, struct nlattr **attrs)
+ 	return ret;
+ }
+ 
+-static int wg_set_device(struct sk_buff *skb, struct genl_info *info)
++int wg_set_device_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	struct wg_device *wg = lookup_interface(info->attrs, skb);
+ 	u32 flags = 0;
+@@ -616,24 +584,6 @@ static int wg_set_device(struct sk_buff *skb, struct genl_info *info)
+ 	return ret;
+ }
+ 
+-static const struct genl_split_ops wireguard_nl_ops[] = {
+-	{
+-		.cmd = WG_CMD_GET_DEVICE,
+-		.start = wg_get_device_start,
+-		.dumpit = wg_get_device_dump,
+-		.done = wg_get_device_done,
+-		.policy = device_policy,
+-		.maxattr = WGDEVICE_A_IFNAME,
+-		.flags = GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DUMP,
+-	}, {
+-		.cmd = WG_CMD_SET_DEVICE,
+-		.doit = wg_set_device,
+-		.policy = device_policy,
+-		.maxattr = WGDEVICE_A_PEERS,
+-		.flags = GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DO,
+-	}
+-};
+-
+ static struct genl_family genl_family __ro_after_init = {
+ 	.split_ops = wireguard_nl_ops,
+ 	.n_split_ops = ARRAY_SIZE(wireguard_nl_ops),
 -- 
 2.51.0
 
