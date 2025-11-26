@@ -1,148 +1,641 @@
-Return-Path: <netdev+bounces-241795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64075C88467
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 07:30:22 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2305C88476
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 07:30:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 678EC4E1A8E
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 06:30:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 09BE5352E57
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 06:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97736314D39;
-	Wed, 26 Nov 2025 06:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7299318142;
+	Wed, 26 Nov 2025 06:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hv2uUHj+";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="UZpH0zdO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BUiqmDFS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB23A316905
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 06:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764138618; cv=none; b=TtJRULhISEHSz887u1mstaUtxNt7pjqCykVXo7YFGe64Ht3eK5vB0aIOyOgTJ+oAdIJhCHxivECvmhvmMJWcadyXdwCJZ04bJ2gF3iLWB/Id+mXOmWPbF319QXkEhJO/Xo5rsU+kRE0KLpUySWxmxKzfD0Qprlc043dRYZt6iLo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764138618; c=relaxed/simple;
-	bh=shDW0bp9CYlSovPFi/gL4KjEH8ciVonuyi+rYc3qW8U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eUZ+rHYz+hlw6R1AdrA4RdI7jdNGGceI2IB/Tr8f+0/3YQMTYuzxdxzqnpLyB7Qpf72EkjfReZEBP8llhphYb3ml3gn3cFU8rivPs8MtTA1w8QGMast4KTmAhcBkGzJakmzHR1W0MqMT7vCsRWG/zKg8EElNTvWGuGHB3uX1oCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hv2uUHj+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=UZpH0zdO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764138615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=shDW0bp9CYlSovPFi/gL4KjEH8ciVonuyi+rYc3qW8U=;
-	b=Hv2uUHj+R4wtwKBzfHOsyWPkP+SkT2iDXeSQc++FeLtJIH/CApmnIVa+DqCsk4tNBrdfkd
-	BvA+cw9i9VfH9u7JeBPDiZlsND/xSIGbd0nrOrI2UxvUST77DWuwsd+D5jFYg6qZy0BuH/
-	oCRi/LEex7gmShthZFwFSScZC2GnRTI=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-516-e91AXvZYMx6DS3I3lJwwng-1; Wed, 26 Nov 2025 01:30:14 -0500
-X-MC-Unique: e91AXvZYMx6DS3I3lJwwng-1
-X-Mimecast-MFC-AGG-ID: e91AXvZYMx6DS3I3lJwwng_1764138613
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-343daf0f488so6473429a91.1
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 22:30:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764138613; x=1764743413; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=shDW0bp9CYlSovPFi/gL4KjEH8ciVonuyi+rYc3qW8U=;
-        b=UZpH0zdOGRlHs6kxRtcOUADQ5YtGZzb6lz/Fckn/FTASHVkPPGuTk7bKiy6ihSP7Km
-         1bn6S1I3pxkVDFhv5NW3H7OB+OA/0pS10n3ARCMNxcfoc/4td0Ez4IJPwYNZpxW8WuTI
-         fX1rNVHoxHWeyU6/3zl/vq12SvSuYp9sfV3J6bFQyqRVX0Bzg5Ua64ZDTm2Gozu4ITMJ
-         HsvSy2zeUVehAgOAZ2ElHGaFqijQdJ5A5mQGRvaiwuLnazfPuErJWjNP7qIi0n20ttHt
-         lgha8CZf0PlaeM7V6AeYs3UpfMwxoMszlxYhdjKIk/acOzexhIc0D+Q7xgjKCJswBc+P
-         A60A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764138613; x=1764743413;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=shDW0bp9CYlSovPFi/gL4KjEH8ciVonuyi+rYc3qW8U=;
-        b=HX7gfZmJ+sFlMtmfu4z4IzVOHHXMLOoRKPjexz3n65bERyoATZ9g6LItWcif+X4Jqs
-         aYaRHk9UIqbaLQHtfP70CKvUyuFDYzb+Vh+mcMpdVmZOuLvFebsQZxb12Xxm83m+sq7t
-         yOe8Q2YEUyqyfwl4gMrL8x3CRLvu48Ny+9kZZFUVRVoqEv/dofea29iZ1/bFtM11eU12
-         f+/CyplKNFt/27gUwto0gbWIYnZ5mxhjHXvSeCmsdGtQWTMhjQZ/4jteQm/Vv2yPw1oj
-         dV4LJO0Pd7giwxDYo8e9HOgFIBJie9WuwVO77opPccqNQ8GraR7PkNO1iwhX43UQINMv
-         UYfg==
-X-Forwarded-Encrypted: i=1; AJvYcCVEWli0ihzDI5mXgM+IcN3mFVRVkuFE4xDZtYcmolFy3hvsR/nMQlblgyexAfjVSxV36dm8+mU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMg5rEoKJK+Cj7pKUOWYr3YQ+SbEcZq7x+bskOa7ehGQxqpvEY
-	vNg/kwTpJg4T0AUX8MmtSpsJLmgTJ3rd2EQYpWRPUR8f5u6SlMrhmMrqMORg/X5wipado8Y0+68
-	JO/Uj1BK3JaBxl3sR3cCvarz0n2BFciZB3eMp/JKbvnB3VmWYKepQzZjCtvuFYVo78puZ0zGJ+L
-	rYHO3CxjIjTLodCxNe/kC1JnHxg6Ax1K9i
-X-Gm-Gg: ASbGnctQ1cj9aOQp68eBLtcjNmRlDszfTSp2k5W0gMS+RzvFzCDvMYPtPHrDPmrL5W/
-	eF8H6ymxtyq6bSNr8xqyU1Lyhb/lPkDzH5RNPbTLDjwcTqmg9IMJI4xfq7iCAnmdG7dLRnKncxY
-	aCm6CKAklUt1TI5StLf0EfxJCwoZYlTBIz872XrzKezPJeUBhUyk+XfTXOjtOW8tgiTVc=
-X-Received: by 2002:a17:90b:2f83:b0:341:194:5e7d with SMTP id 98e67ed59e1d1-3475ed51453mr5743351a91.24.1764138612822;
-        Tue, 25 Nov 2025 22:30:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFeL2+MjlKvJTulnscTHHFaOIKShldd6HAyu8s9k6V/8uabjg3AQSXsiYn3FxybeY1hV6sKpHRSMvuAzqJKStI=
-X-Received: by 2002:a17:90b:2f83:b0:341:194:5e7d with SMTP id
- 98e67ed59e1d1-3475ed51453mr5743332a91.24.1764138612403; Tue, 25 Nov 2025
- 22:30:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DE11EB195;
+	Wed, 26 Nov 2025 06:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764138629; cv=fail; b=RdSIBhLomldbK9oq5EkkN6wL8dOu27hOJppLPVKbsU/r+YkHhXM9DstA5xunlH/UjJ+8m8BMm/riGaAu3uZibYMXViXfcKbQGAyQD8xN6ONMC0Ig9Kc/y5Biz1MxeiSuNBynq6uUm+Q/T7JJZh9abv8H4A5jd+5N2crer3ArHaQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764138629; c=relaxed/simple;
+	bh=HKpFVmHUAUPdQB50S+i54YN4hxhkQAjNh8/U4N6SmcA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=PxcLNxr6ZJNG+1CprQYF3nZJYYQvYgFTK5JFXbPjDHuCKk2gpjpgeui2NCKOalzubY3PGhW2xZiT+3myZtrry9zBlYx5oWKQad1JwUDb+7DoCFdNlUgo+xFqYICPeceuyF95IVwPKa7mef+j1GwzvPcAiEjcEbngG6UsCUn/Egc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BUiqmDFS; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764138628; x=1795674628;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=HKpFVmHUAUPdQB50S+i54YN4hxhkQAjNh8/U4N6SmcA=;
+  b=BUiqmDFShT2NqZlw52da39spNZ9E51CV66LbCSGZLnH2dmWndSXiYoYJ
+   +ZV3kpeRoA1byF/t52H9teZv+JUCJBFtSk1qorr0ae+vzsX8QAPNybTzz
+   4IP2Ac6MqhD1O7I+G4/rT2/mqPQsTK5AOhQYYLCq3N24FDjhSJtpWgCuk
+   etv075pYfNTIohmejPsjGTj0oXWtI/L7KPC8zwokARX/mpL2mWlXzdrCc
+   8OjRKW4nHQAApIMImuS/FNBFFFZjYpT7DaRdZXWXcQx7oOIGs7rmPwc1D
+   fjRdqa5A14nQIlHXNuJfjC7Wd55dHDhBuWPi51LBc+4QnAHmEX45kzzsZ
+   Q==;
+X-CSE-ConnectionGUID: O9XoFuzfSiOHCKyYPIywPA==
+X-CSE-MsgGUID: qqoH9TAaQfCFaNrzyAtFPg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="66114189"
+X-IronPort-AV: E=Sophos;i="6.20,227,1758610800"; 
+   d="scan'208";a="66114189"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 22:30:27 -0800
+X-CSE-ConnectionGUID: LYh6XJyFStyYGwe39atb0A==
+X-CSE-MsgGUID: 0tCpqzxXTHSgxkOO9krJcA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,227,1758610800"; 
+   d="scan'208";a="223822741"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2025 22:30:26 -0800
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 25 Nov 2025 22:30:25 -0800
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Tue, 25 Nov 2025 22:30:25 -0800
+Received: from PH8PR06CU001.outbound.protection.outlook.com (40.107.209.29) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 25 Nov 2025 22:30:25 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=f24EWCkcsYjaipZ7nzirTWCONSw6/u9DT9VgIzZaC0VyoSxDBQtkB1fNMIp2+2/hbp9ScBrmJwL+BqS04V0BWEFbNEumIkvpUsmODjksjTpluor7VRpAI3iWbAgP3bQ8E7aVLOGVfPah5+dvjhNEVZWQuvnjaW9PARMwGJrvolFgeqSRZ+MQ3q/53cmAG9h4tlTBEICod0Ufest4pteSVaMs0yjR6fZD9hBiDsBDRMfEfZA/bG9HAtDe90wQ7EaSvMaeSEEn6Vj6rIE7HXdYIS3plajvRqQwD1QiCBCeGhp3AD4o/pQVh2JxlsmCYJ7S1vsFjXhPtALJuVvNBW3vaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wNssS7ycJGtsmy6wp+5ec5CKfrx2pefIZnx3AWfY/qI=;
+ b=Ym7dZl9sCgaJlkGS8HVxQaNtk6yS3GG2JKQow5CrAMgajPDQ2D12gJusMLMr6UeS4TR57o4TMFU+og/RGpH9jDBDbdZ0A6Rk69rN/WKuDMylfKl2uXdVcmt0iasLwWbhZlg/DuA4uw3Qq/EuUgpHhUt6UaEROckvcMAPlrdA5zPnfHkzcakuz7+o+hsa0txpdN4OAalSR1p2nMNzob1TAbODmWgGphw5FiY5ZmVYwlC2unvqLD1LG/JQdjukHdF3liUQjQPqQe0+GJuR3lPa1uXBXV0EFVqSF1Fc8svjWJQP3cQ8ATuJb3wobuBj/g1jdM3GDwJVRAjZDljD5wBPBA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by IA3PR11MB9423.namprd11.prod.outlook.com (2603:10b6:208:582::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.17; Wed, 26 Nov
+ 2025 06:30:22 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.9343.016; Wed, 26 Nov 2025
+ 06:30:22 +0000
+Message-ID: <abf25d3d-30af-479f-9342-9955ec23d92f@intel.com>
+Date: Wed, 26 Nov 2025 07:30:18 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1 1/1] idpf: Fix kernel-doc descriptions to avoid
+ warnings
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20251124174239.941037-1-andriy.shevchenko@linux.intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20251124174239.941037-1-andriy.shevchenko@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DUZPR01CA0111.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4bb::12) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251125222754.1737443-1-jon@nutanix.com>
-In-Reply-To: <20251125222754.1737443-1-jon@nutanix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 26 Nov 2025 14:29:58 +0800
-X-Gm-Features: AWmQ_blHu1BZqv-6yOkAhpdiGvIH6FCxP2EMvVPtPSNF_eBgleWvB8nW8HekDzQ
-Message-ID: <CACGkMEvK1M_h783QyEXJ5jz25T-Vtkj4=-_dPLzYGwPg8NSU5Q@mail.gmail.com>
-Subject: Re: [PATCH net v3] virtio-net: avoid unnecessary checksum calculation
- on guest RX
-To: Jon Kohler <jon@nutanix.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|IA3PR11MB9423:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4821eb92-7017-4fd9-59ca-08de2cb5470a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?ZTFSc1RmY1pMTWNJNUdGTGMzdkMwRkRsa2FzMlpSTmJ0RjlEOWFhNk55dmZs?=
+ =?utf-8?B?U2dkakJDV0s3ZmpkZ3l4TGlGZElaYnZhN0hXRDdnV2lUWVRITWwyU004V09N?=
+ =?utf-8?B?SW1FdXRVQXRoQyt1SW80UkxsZ1U0OVFIUDhYUWFnQnNHTFUvMFJodUQwd2tL?=
+ =?utf-8?B?WDVVSDI2Y09FdGl1ZldWQ3MrYnBsSXFvWGQrUmlPZ2loYUNUUHd5WlMydmd6?=
+ =?utf-8?B?TFJNM2x1TnJ5Qk9qYmxmbkdHaE1nYjBCVXBnWkxVZGYzMDNNNDZFcGw5L2ZU?=
+ =?utf-8?B?WDRyKzg3UmdpaFpxeUNBUjF6WWlwSTBoRy9teXYxSEYvaERuMzQxZVhianhz?=
+ =?utf-8?B?dnpOeWJ4YzBNMEN6TDUyWElhM1FBak5hZE5WUXp5ZGdZU3dmaTdrMFFWbWU2?=
+ =?utf-8?B?OEVuL2Z6MWg2V2VaM0JiN2dXMkVyOEo3TkRRMHFRVXVCNEQxdTBLN09BWXdm?=
+ =?utf-8?B?L1hPc3pndVpObmtOMGt4eC96clA1clBtNXVkcXYwOXk3b3d6Rnk5dHZRRHR1?=
+ =?utf-8?B?ZUIyNFFvTUl3UkJUMDhhZVdMMnE4VFVIVVpKa24vM0VIQWc4STJwVklNc2Vz?=
+ =?utf-8?B?RGhOUDZoYjYvRDVxdTd1VktrYTgycnRTeG80bG9hYTdjYWlpT0llVVlnY1dM?=
+ =?utf-8?B?LzR5UjVvS2FBK0N3K3FhSXp5MHNGRWc5NGlwenM5emhnbFRpZUVxTEZhNUhR?=
+ =?utf-8?B?Z3lzUWhOLytFOWpPYktwNnNJWWpWSG5KRnhIbisxZENRazhiY0x1OGQ5SFBD?=
+ =?utf-8?B?UmdvdWVIY0VRUjR6WEpHM0NDd0VGNDh0eTZqeWs2Z1BybENSUks4N0hNcVFu?=
+ =?utf-8?B?R1UzMkFMeDVqNmp2OWduZ2lxQzhmRUx3NnNKdG5YZFRUTW5EUlRZenI3Vitx?=
+ =?utf-8?B?L2k5K3BrSGpiNUhsQ3FJMzR1enlzZWdJdjlpdWprOVQ3aS9hWjhLNGdPM0do?=
+ =?utf-8?B?enZjaUpCMkdQWVEySkZ0c3l5NUc2UFBNeWxaY1pnWExHN2dtMTBUT1lxZktP?=
+ =?utf-8?B?WkpBa1ZldE5GVmN1dHdRM2ZuUkszUzRYeGM2cW4waElXZ0w3YStVRGVHZ3lQ?=
+ =?utf-8?B?dkl1NktYcGc0VW5pOThNZlpOUDlVRDBpdndpbGRpaHVzYXlpNGFhMW9rLy9E?=
+ =?utf-8?B?YkM2dTNpMXowSkY4b1pjR3pLYW5YVW03cGxxYlEwRTJvM3lFemFJOW1vZlRi?=
+ =?utf-8?B?YUpENms3eUFCNjRTd3pPanIrOVoyMjRiUnN0aHAwUHFVVlIwaFZJSmQyUi9q?=
+ =?utf-8?B?emFXV010ZWR5TU1FUzhGL2gzdmZJVWViSjJsNEdrN1RmVmZ1MjM2MWJjVEor?=
+ =?utf-8?B?SWN1RzhCYk8yQTVSSll3Y3BxMURMWVFzbFJsK2tueGtGVFJYZjIraFU4c21R?=
+ =?utf-8?B?NUd5Y1JaZkg1aTVRYk5oTWgvQ2VTL3FubzBZMkRZZlpUazhzencyWEJVODRF?=
+ =?utf-8?B?NDR1NmdRenc2MGJVVmhLcW45emtBQ0dmTGhBaFdiVllYaGZLS3dkWjcvSjVx?=
+ =?utf-8?B?cndoRzIwL2pSTkVaeHNNdWtiZFFLL3REeUtGQVZBRGwzMDZzN2srREVaU25Z?=
+ =?utf-8?B?c1J3NVFpRzBtb0srSFpVMSthemtRc3lkMkxIVmVYM2dUY1F6M0xZVHBMWm9J?=
+ =?utf-8?B?R2oyTlExbTZoRFhGYThXemNsSVhpc3BzZlRENnRlQmdFYjZZTzFNSDdpUE8x?=
+ =?utf-8?B?MU1ZZE9zc09BY2pXdGQwbUNJbC9jWFUrM3NJaEZQbUgvSmd0ZzB5Wit6ZTNB?=
+ =?utf-8?B?SThuZjJOUldtTjFBbjZ0VS80c0lsaW0rUjAwNGNIclRpVFlaM2NPRXhEUGky?=
+ =?utf-8?B?ckpibGpmSWJvR0lmaU9OT3U3VDlRWnJHRjB6ZmRnRVptOFdKOWtkT3RXWm1H?=
+ =?utf-8?B?Mkd3WFgwNStLNUsxQjdnS0lSNVRYaEx5U2oxOG0vNE5HUkJXTkdWWWdkcnJq?=
+ =?utf-8?Q?5Clv3ZPUBSpox/0XTwo71pb+ulyGWeKE?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c3B5aVBNYnlJRlYxWEY4dTdlc0Q2WXY5YmJtUjRiVjF4SWsreVY5MzFvcTR0?=
+ =?utf-8?B?aHBISURid2RraitPZ2dlb0RHd1VVc1pqT0tXaUNmQXVrcUdvNVcrRVlQYmw5?=
+ =?utf-8?B?S3plL0xLQXQ1aFZOUVpFendSOG10UzJ0aWpidFA3ZjBqbCt1TmhkbS9tR1pC?=
+ =?utf-8?B?azREWVNPWDNEeFh2c0d4YVVuRzlmTTlwYTlDV2FIbXppQUU2b2QxVTZnVzFD?=
+ =?utf-8?B?M0IwT2pTc0NWUzYrL0JzVmdLUytKelNhUUZJN09WSnR2S0pVaW96MHpyUnY0?=
+ =?utf-8?B?TWhjUEFETjJmaW9XbFJ3UCttWVBIQ3lPeVkvbjdrc3NxM3Vzc0p6dU1wRWp0?=
+ =?utf-8?B?THNjTWNPcG9Sb3Z5aTBkTTlBR2RIKzJ1UmdqdlQzVW5LQmVOVktTREFQVzd2?=
+ =?utf-8?B?UGNad0FzQ3hnR2I4S1ZHMHEzQjcvdzFObjVSQVRzWWFTSnJqeFBkKzVxVzNt?=
+ =?utf-8?B?ZDhKNnhvdVh6dWY0YXVkT3dtei9qdWlNeVJRRTZhTlJWTEJIaE85ejNudFM1?=
+ =?utf-8?B?WnFURytoanI3dExZT3ZDWnRjWngvS2kza2xIelZtOUkzTkEzaFJCM2JpK3d0?=
+ =?utf-8?B?ei9pRzd1K3ZBSVkrNURWQlY3a2hIV0pBWFQzekhJRzVZZ3pYNjNqeFBzT2FZ?=
+ =?utf-8?B?RGFwZVJWSjFIczlydnB5WkFhMHJ0T3dBWE55a0xIR3Q2a1ZaL2RFNzgwbC83?=
+ =?utf-8?B?SHgrMEh1aDk3ZGFBV3RUMzdiNVcwY0dyZGE3T2hod2kza2ZIQWR0V3Foby9n?=
+ =?utf-8?B?WURteXQ2TUZjYUQwQ3g0THU5bm5oRU9YOHVOc2RkOW44YjAreFFCSjhEZFNS?=
+ =?utf-8?B?a3FwYmI1dGdFTk1GMXZRSXZ1ZVFkOGNEZzB6RHNadU0rQXpENUdwOUV6S21u?=
+ =?utf-8?B?bnVDbW9iOG9KditqUmVtcWczd0hLd21mVkVCMTF2ZGhxR1RjSnNhU2VyZzZt?=
+ =?utf-8?B?LzB1SHhXVGQyd2IzUGN3NGVyTUpPVy9hRU5BbnJGVVl2V1MwNGt1NHBqWlk5?=
+ =?utf-8?B?ZHVUNXdKQVlETjZHbHU2VXpZbm9BVURpOXRPMnVyUWh5VnVvTWlrOEgrVnpR?=
+ =?utf-8?B?bEtFOE5qT0JReGdYZ244NWJMMDZjTzJmd1lwRXNldEVuck9xNFhQSXBxQk1m?=
+ =?utf-8?B?TlNPWFRvYmEyNExhL1VMN2k3OHlPSlJOMWd4WUczcGNPU2FPOVZ0YUdiandm?=
+ =?utf-8?B?QXdhb0pZT2QvaXNVYkp6aU1MdUszaHBVYnNpK2xqRHRxK3FZQXg5NnowVE5j?=
+ =?utf-8?B?YS9SOWlVSEIrNU5DdS9CRStkbm93TmhHL2tSeENURitpMDMvRlZoUXpJeGli?=
+ =?utf-8?B?Vm1BK0NFeE81NjJmdWVqMG9uTk9iNVM5SmRLNm53TmkyZXFlMURMMG5UbWpF?=
+ =?utf-8?B?emZUZVMzby9kNlBjS25WdlJSUWh0T0ROWHZnOS9qcGFvMGlPM3dCN09UcUgv?=
+ =?utf-8?B?aU5VN3BHalUyU3hqUy85aVBFWkQrbVNLS2lHSEN2OGNsVDBaMkR6YWhNTzR6?=
+ =?utf-8?B?VWlMTnh6RExOYmlFMTlEcXVGUzdWZXN3UzNiVHoxTHhiOUlqRUZabVVOVWpt?=
+ =?utf-8?B?L1dVdlF0bWNpdWFiMWNzVldEdDdKZzgyRjYzYm9QK2ZlLzVSN2F2eEt4em9y?=
+ =?utf-8?B?UGN2c0tZT25pWk5HSGs3N0RjZXJQcmdLcGFWNndPczh2QVlIQnpCOFRJUzFz?=
+ =?utf-8?B?YW1hVjlRY2R2QmkvMVZESjhkZEJzSmhRTTRDK3hpRmNHcXZ0cC9hMXBwYTMz?=
+ =?utf-8?B?a0hQcDZRdnZRZnhiNHg5V3Z5SGcyNmcvRGN5bk1WK1VSOHB0NVRTQkd4NmlI?=
+ =?utf-8?B?dzRzUjFZT0I0ME1lazVKWXdrUXdRSGlNRmd2Wnp6Zm5kbEVPTzBkMTQ1eVZI?=
+ =?utf-8?B?WUxxZ1JYalBJc3hMdHhpTW02cnJUZ1E0c0JLYzhocUc0cUJ4c0xrVzNpczRH?=
+ =?utf-8?B?M1pCeWtwWGkvcG0xQ0NrSWhBcmlRNEdFWTB6clVKVHc4cCtsOTRaRUUrTmhy?=
+ =?utf-8?B?d2luMGQreWc4cURCaEd4dkJ5TmRsZFRHVUpFOWZBOTlHcExOZFEwY3R6Yk5H?=
+ =?utf-8?B?ZjZRS29rQU5jaGpLbTJSV3VQblF4VXB2WEY1djNpZFVWRDlzRkFTeU40QzBk?=
+ =?utf-8?B?Mkh4VHZPcmVLM25md0VPeFkzOGF0L3VCNEpnS1oxaWNKeTB1VGVBR1dvTnVS?=
+ =?utf-8?Q?UUYvBgL9hbh1R1/J+FPq0oM=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4821eb92-7017-4fd9-59ca-08de2cb5470a
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2025 06:30:22.7542
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: e8fd2dPKQlAtxBIlx4zLpBJQRxYnHPWjf7OSlqLy5Hdo12nEb3wH99lHNsf3XxRZzpbyy7se57ASecSAhM3KVvLDjKpax7VG4K7AsF9x9z4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB9423
+X-OriginatorOrg: intel.com
 
-On Wed, Nov 26, 2025 at 5:46=E2=80=AFAM Jon Kohler <jon@nutanix.com> wrote:
->
-> Commit a2fb4bc4e2a6 ("net: implement virtio helpers to handle UDP
-> GSO tunneling.") inadvertently altered checksum offload behavior
-> for guests not using UDP GSO tunneling.
->
-> Before, tun_put_user called tun_vnet_hdr_from_skb, which passed
-> has_data_valid =3D true to virtio_net_hdr_from_skb.
->
-> After, tun_put_user began calling tun_vnet_hdr_tnl_from_skb instead,
-> which passes has_data_valid =3D false into both call sites.
->
-> This caused virtio hdr flags to not include VIRTIO_NET_HDR_F_DATA_VALID
-> for SKBs where skb->ip_summed =3D=3D CHECKSUM_UNNECESSARY. As a result,
-> guests are forced to recalculate checksums unnecessarily.
->
-> Restore the previous behavior by ensuring has_data_valid =3D true is
-> passed in the !tnl_gso_type case, but only from tun side, as
-> virtio_net_hdr_tnl_from_skb() is used also by the virtio_net driver,
-> which in turn must not use VIRTIO_NET_HDR_F_DATA_VALID on tx.
->
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Fixes: a2fb4bc4e2a6 ("net: implement virtio helpers to handle UDP GSO tun=
-neling.")
-> Signed-off-by: Jon Kohler <jon@nutanix.com>
+On 11/24/25 18:42, Andy Shevchenko wrote:
+> In many functions the Return section is missing. Fix kernel-doc
+> descriptions to address that and other warnings.
+> 
+> Before the change:
+> 
+> $ scripts/kernel-doc -none -Wreturn drivers/net/ethernet/intel/idpf/idpf_txrx.c 2>&1 | wc -l
+> 85
+> 
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 > ---
+>   drivers/net/ethernet/intel/idpf/idpf_txrx.c | 96 +++++++++++++--------
+>   1 file changed, 59 insertions(+), 37 deletions(-)
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+this is small change and leaves the driver good for long future to come
+I think it is net-positive in terms of minor annoyances for rebase or 
+backports, so:
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-(Should this go -stable?)
+side note:
+Alex did analogous work for the ice driver, and I stopped him going
+public, as it was counted in thousands lines changes for little benefit
 
-Thanks
+usual rant about kdoc warnings:
+agghr!!
+
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> index 828f7c444d30..28eb34c35d57 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> @@ -19,6 +19,8 @@ LIBETH_SQE_CHECK_PRIV(u32);
+>    * Make sure we don't exceed maximum scatter gather buffers for a single
+>    * packet.
+>    * TSO case has been handled earlier from idpf_features_check().
+> + *
+> + * Return: %true if skb exceeds max descriptors per packet, %false otherwise.
+>    */
+>   static bool idpf_chk_linearize(const struct sk_buff *skb,
+>   			       unsigned int max_bufs,
+> @@ -172,7 +174,7 @@ static void idpf_tx_desc_rel_all(struct idpf_vport *vport)
+>    * idpf_tx_buf_alloc_all - Allocate memory for all buffer resources
+>    * @tx_q: queue for which the buffers are allocated
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_tx_buf_alloc_all(struct idpf_tx_queue *tx_q)
+>   {
+> @@ -196,7 +198,7 @@ static int idpf_tx_buf_alloc_all(struct idpf_tx_queue *tx_q)
+>    * @vport: vport to allocate resources for
+>    * @tx_q: the tx ring to set up
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_tx_desc_alloc(const struct idpf_vport *vport,
+>   			      struct idpf_tx_queue *tx_q)
+> @@ -297,7 +299,7 @@ static int idpf_compl_desc_alloc(const struct idpf_vport *vport,
+>    * idpf_tx_desc_alloc_all - allocate all queues Tx resources
+>    * @vport: virtual port private structure
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_tx_desc_alloc_all(struct idpf_vport *vport)
+>   {
+> @@ -548,7 +550,7 @@ static void idpf_rx_buf_hw_update(struct idpf_buf_queue *bufq, u32 val)
+>    * idpf_rx_hdr_buf_alloc_all - Allocate memory for header buffers
+>    * @bufq: ring to use
+>    *
+> - * Returns 0 on success, negative on failure.
+> + * Return: 0 on success, negative on failure.
+>    */
+>   static int idpf_rx_hdr_buf_alloc_all(struct idpf_buf_queue *bufq)
+>   {
+> @@ -600,7 +602,7 @@ static void idpf_post_buf_refill(struct idpf_sw_queue *refillq, u16 buf_id)
+>    * @bufq: buffer queue to post to
+>    * @buf_id: buffer id to post
+>    *
+> - * Returns false if buffer could not be allocated, true otherwise.
+> + * Return: %false if buffer could not be allocated, %true otherwise.
+>    */
+>   static bool idpf_rx_post_buf_desc(struct idpf_buf_queue *bufq, u16 buf_id)
+>   {
+> @@ -649,7 +651,7 @@ static bool idpf_rx_post_buf_desc(struct idpf_buf_queue *bufq, u16 buf_id)
+>    * @bufq: buffer queue to post working set to
+>    * @working_set: number of buffers to put in working set
+>    *
+> - * Returns true if @working_set bufs were posted successfully, false otherwise.
+> + * Return: %true if @working_set bufs were posted successfully, %false otherwise.
+>    */
+>   static bool idpf_rx_post_init_bufs(struct idpf_buf_queue *bufq,
+>   				   u16 working_set)
+> @@ -717,7 +719,7 @@ static int idpf_rx_bufs_init_singleq(struct idpf_rx_queue *rxq)
+>    * idpf_rx_buf_alloc_all - Allocate memory for all buffer resources
+>    * @rxbufq: queue for which the buffers are allocated
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_rx_buf_alloc_all(struct idpf_buf_queue *rxbufq)
+>   {
+> @@ -745,7 +747,7 @@ static int idpf_rx_buf_alloc_all(struct idpf_buf_queue *rxbufq)
+>    * @bufq: buffer queue to create page pool for
+>    * @type: type of Rx buffers to allocate
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq,
+>   			     enum libeth_fqe_type type)
+> @@ -779,7 +781,7 @@ static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq,
+>    * idpf_rx_bufs_init_all - Initialize all RX bufs
+>    * @vport: virtual port struct
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   int idpf_rx_bufs_init_all(struct idpf_vport *vport)
+>   {
+> @@ -834,7 +836,7 @@ int idpf_rx_bufs_init_all(struct idpf_vport *vport)
+>    * @vport: vport to allocate resources for
+>    * @rxq: Rx queue for which the resources are setup
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_rx_desc_alloc(const struct idpf_vport *vport,
+>   			      struct idpf_rx_queue *rxq)
+> @@ -896,7 +898,7 @@ static int idpf_bufq_desc_alloc(const struct idpf_vport *vport,
+>    * idpf_rx_desc_alloc_all - allocate all RX queues resources
+>    * @vport: virtual port structure
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_rx_desc_alloc_all(struct idpf_vport *vport)
+>   {
+> @@ -1424,7 +1426,7 @@ void idpf_vport_queues_rel(struct idpf_vport *vport)
+>    * dereference the queue from queue groups.  This allows us to quickly pull a
+>    * txq based on a queue index.
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_vport_init_fast_path_txqs(struct idpf_vport *vport)
+>   {
+> @@ -1557,7 +1559,7 @@ void idpf_vport_calc_num_q_desc(struct idpf_vport *vport)
+>    * @vport_msg: message to fill with data
+>    * @max_q: vport max queue info
+>    *
+> - * Return 0 on success, error value on failure.
+> + * Return: 0 on success, error value on failure.
+>    */
+>   int idpf_vport_calc_total_qs(struct idpf_adapter *adapter, u16 vport_idx,
+>   			     struct virtchnl2_create_vport *vport_msg,
+> @@ -1692,7 +1694,7 @@ static void idpf_rxq_set_descids(const struct idpf_vport *vport,
+>    * @vport: vport to allocate txq groups for
+>    * @num_txq: number of txqs to allocate for each group
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
+>   {
+> @@ -1784,7 +1786,7 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
+>    * @vport: vport to allocate rxq groups for
+>    * @num_rxq: number of rxqs to allocate for each group
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_rxq_group_alloc(struct idpf_vport *vport, u16 num_rxq)
+>   {
+> @@ -1913,7 +1915,7 @@ static int idpf_rxq_group_alloc(struct idpf_vport *vport, u16 num_rxq)
+>    * idpf_vport_queue_grp_alloc_all - Allocate all queue groups/resources
+>    * @vport: vport with qgrps to allocate
+>    *
+> - * Returns 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_vport_queue_grp_alloc_all(struct idpf_vport *vport)
+>   {
+> @@ -1942,8 +1944,9 @@ static int idpf_vport_queue_grp_alloc_all(struct idpf_vport *vport)
+>    * idpf_vport_queues_alloc - Allocate memory for all queues
+>    * @vport: virtual port
+>    *
+> - * Allocate memory for queues associated with a vport.  Returns 0 on success,
+> - * negative on failure.
+> + * Allocate memory for queues associated with a vport.
+> + *
+> + * Return: 0 on success, negative on failure.
+>    */
+>   int idpf_vport_queues_alloc(struct idpf_vport *vport)
+>   {
+> @@ -2170,7 +2173,7 @@ static void idpf_tx_handle_rs_completion(struct idpf_tx_queue *txq,
+>    * @budget: Used to determine if we are in netpoll
+>    * @cleaned: returns number of packets cleaned
+>    *
+> - * Returns true if there's any budget left (e.g. the clean is finished)
+> + * Return: %true if there's any budget left (e.g. the clean is finished)
+>    */
+>   static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
+>   				 int *cleaned)
+> @@ -2396,7 +2399,7 @@ void idpf_tx_splitq_build_flow_desc(union idpf_tx_flex_desc *desc,
+>   }
+>   
+>   /**
+> - * idpf_tx_splitq_has_room - check if enough Tx splitq resources are available
+> + * idpf_txq_has_room - check if enough Tx splitq resources are available
+>    * @tx_q: the queue to be checked
+>    * @descs_needed: number of descriptors required for this packet
+>    * @bufs_needed: number of Tx buffers required for this packet
+> @@ -2527,6 +2530,8 @@ unsigned int idpf_tx_res_count_required(struct idpf_tx_queue *txq,
+>    * idpf_tx_splitq_bump_ntu - adjust NTU and generation
+>    * @txq: the tx ring to wrap
+>    * @ntu: ring index to bump
+> + *
+> + * Return: the next ring index hopping to 0 when wraps around
+>    */
+>   static unsigned int idpf_tx_splitq_bump_ntu(struct idpf_tx_queue *txq, u16 ntu)
+>   {
+> @@ -2795,7 +2800,7 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
+>    * @skb: pointer to skb
+>    * @off: pointer to struct that holds offload parameters
+>    *
+> - * Returns error (negative) if TSO was requested but cannot be applied to the
+> + * Return: error (negative) if TSO was requested but cannot be applied to the
+>    * given skb, 0 if TSO does not apply to the given skb, or 1 otherwise.
+>    */
+>   int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off)
+> @@ -2873,6 +2878,8 @@ int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off)
+>    *
+>    * Since the TX buffer rings mimics the descriptor ring, update the tx buffer
+>    * ring entry to reflect that this index is a context descriptor
+> + *
+> + * Return: pointer to the next descriptor
+>    */
+>   static union idpf_flex_tx_ctx_desc *
+>   idpf_tx_splitq_get_ctx_desc(struct idpf_tx_queue *txq)
+> @@ -2891,6 +2898,8 @@ idpf_tx_splitq_get_ctx_desc(struct idpf_tx_queue *txq)
+>    * idpf_tx_drop_skb - free the SKB and bump tail if necessary
+>    * @tx_q: queue to send buffer on
+>    * @skb: pointer to skb
+> + *
+> + * Return: always NETDEV_TX_OK
+>    */
+>   netdev_tx_t idpf_tx_drop_skb(struct idpf_tx_queue *tx_q, struct sk_buff *skb)
+>   {
+> @@ -2992,7 +3001,7 @@ static bool idpf_tx_splitq_need_re(struct idpf_tx_queue *tx_q)
+>    * @skb: send buffer
+>    * @tx_q: queue to send buffer on
+>    *
+> - * Returns NETDEV_TX_OK if sent, else an error code
+> + * Return: NETDEV_TX_OK if sent, else an error code
+>    */
+>   static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
+>   					struct idpf_tx_queue *tx_q)
+> @@ -3118,7 +3127,7 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
+>    * @skb: send buffer
+>    * @netdev: network interface device structure
+>    *
+> - * Returns NETDEV_TX_OK if sent, else an error code
+> + * Return: NETDEV_TX_OK if sent, else an error code
+>    */
+>   netdev_tx_t idpf_tx_start(struct sk_buff *skb, struct net_device *netdev)
+>   {
+> @@ -3268,10 +3277,10 @@ idpf_rx_splitq_extract_csum_bits(const struct virtchnl2_rx_flex_desc_adv_nic_3 *
+>    * @rx_desc: Receive descriptor
+>    * @decoded: Decoded Rx packet type related fields
+>    *
+> - * Return 0 on success and error code on failure
+> - *
+>    * Populate the skb fields with the total number of RSC segments, RSC payload
+>    * length and packet type.
+> + *
+> + * Return: 0 on success and error code on failure
+>    */
+>   static int idpf_rx_rsc(struct idpf_rx_queue *rxq, struct sk_buff *skb,
+>   		       const struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_desc,
+> @@ -3369,6 +3378,8 @@ idpf_rx_hwtstamp(const struct idpf_rx_queue *rxq,
+>    * This function checks the ring, descriptor, and packet information in
+>    * order to populate the hash, checksum, protocol, and
+>    * other fields within the skb.
+> + *
+> + * Return: 0 on success and error code on failure
+>    */
+>   static int
+>   __idpf_rx_process_skb_fields(struct idpf_rx_queue *rxq, struct sk_buff *skb,
+> @@ -3463,6 +3474,7 @@ static u32 idpf_rx_hsplit_wa(const struct libeth_fqe *hdr,
+>    * @stat_err_field: field from descriptor to test bits in
+>    * @stat_err_bits: value to mask
+>    *
+> + * Return: %true if any of given @stat_err_bits are set, %false otherwise.
+>    */
+>   static bool idpf_rx_splitq_test_staterr(const u8 stat_err_field,
+>   					const u8 stat_err_bits)
+> @@ -3474,8 +3486,8 @@ static bool idpf_rx_splitq_test_staterr(const u8 stat_err_field,
+>    * idpf_rx_splitq_is_eop - process handling of EOP buffers
+>    * @rx_desc: Rx descriptor for current buffer
+>    *
+> - * If the buffer is an EOP buffer, this function exits returning true,
+> - * otherwise return false indicating that this is in fact a non-EOP buffer.
+> + * Return: %true if the buffer is an EOP buffer, %false otherwise, indicating
+> + * that this is in fact a non-EOP buffer.
+>    */
+>   static bool idpf_rx_splitq_is_eop(struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_desc)
+>   {
+> @@ -3494,7 +3506,7 @@ static bool idpf_rx_splitq_is_eop(struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_de
+>    * expensive overhead for IOMMU access this provides a means of avoiding
+>    * it by maintaining the mapping of the page to the system.
+>    *
+> - * Returns amount of work completed
+> + * Return: amount of work completed
+>    */
+>   static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
+>   {
+> @@ -3624,7 +3636,7 @@ static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
+>    * @buf_id: buffer ID
+>    * @buf_desc: Buffer queue descriptor
+>    *
+> - * Return 0 on success and negative on failure.
+> + * Return: 0 on success and negative on failure.
+>    */
+>   static int idpf_rx_update_bufq_desc(struct idpf_buf_queue *bufq, u32 buf_id,
+>   				    struct virtchnl2_splitq_rx_buf_desc *buf_desc)
+> @@ -3751,6 +3763,7 @@ static void idpf_rx_clean_refillq_all(struct idpf_buf_queue *bufq, int nid)
+>    * @irq: interrupt number
+>    * @data: pointer to a q_vector
+>    *
+> + * Return: always IRQ_HANDLED
+>    */
+>   static irqreturn_t idpf_vport_intr_clean_queues(int __always_unused irq,
+>   						void *data)
+> @@ -3872,6 +3885,8 @@ static void idpf_vport_intr_dis_irq_all(struct idpf_vport *vport)
+>   /**
+>    * idpf_vport_intr_buildreg_itr - Enable default interrupt generation settings
+>    * @q_vector: pointer to q_vector
+> + *
+> + * Return: value to be written back to HW to enable interrupt generation
+>    */
+>   static u32 idpf_vport_intr_buildreg_itr(struct idpf_q_vector *q_vector)
+>   {
+> @@ -4003,6 +4018,8 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
+>   /**
+>    * idpf_vport_intr_req_irq - get MSI-X vectors from the OS for the vport
+>    * @vport: main vport structure
+> + *
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_vport_intr_req_irq(struct idpf_vport *vport)
+>   {
+> @@ -4213,7 +4230,7 @@ static void idpf_vport_intr_napi_ena_all(struct idpf_vport *vport)
+>    * @budget: Used to determine if we are in netpoll
+>    * @cleaned: returns number of packets cleaned
+>    *
+> - * Returns false if clean is not complete else returns true
+> + * Return: %false if clean is not complete else returns %true
+>    */
+>   static bool idpf_tx_splitq_clean_all(struct idpf_q_vector *q_vec,
+>   				     int budget, int *cleaned)
+> @@ -4240,7 +4257,7 @@ static bool idpf_tx_splitq_clean_all(struct idpf_q_vector *q_vec,
+>    * @budget: Used to determine if we are in netpoll
+>    * @cleaned: returns number of packets cleaned
+>    *
+> - * Returns false if clean is not complete else returns true
+> + * Return: %false if clean is not complete else returns %true
+>    */
+>   static bool idpf_rx_splitq_clean_all(struct idpf_q_vector *q_vec, int budget,
+>   				     int *cleaned)
+> @@ -4283,6 +4300,8 @@ static bool idpf_rx_splitq_clean_all(struct idpf_q_vector *q_vec, int budget,
+>    * idpf_vport_splitq_napi_poll - NAPI handler
+>    * @napi: struct from which you get q_vector
+>    * @budget: budget provided by stack
+> + *
+> + * Return: how many packets were cleaned
+>    */
+>   static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
+>   {
+> @@ -4431,7 +4450,9 @@ static void idpf_vport_intr_map_vector_to_qs(struct idpf_vport *vport)
+>    * idpf_vport_intr_init_vec_idx - Initialize the vector indexes
+>    * @vport: virtual port
+>    *
+> - * Initialize vector indexes with values returened over mailbox
+> + * Initialize vector indexes with values returned over mailbox.
+> + *
+> + * Return: 0 on success, negative on failure
+>    */
+>   static int idpf_vport_intr_init_vec_idx(struct idpf_vport *vport)
+>   {
+> @@ -4497,8 +4518,9 @@ static void idpf_vport_intr_napi_add_all(struct idpf_vport *vport)
+>    * idpf_vport_intr_alloc - Allocate memory for interrupt vectors
+>    * @vport: virtual port
+>    *
+> - * We allocate one q_vector per queue interrupt. If allocation fails we
+> - * return -ENOMEM.
+> + * Allocate one q_vector per queue interrupt.
+> + *
+> + * Return: 0 on success, if allocation fails we return -ENOMEM.
+>    */
+>   int idpf_vport_intr_alloc(struct idpf_vport *vport)
+>   {
+> @@ -4585,7 +4607,7 @@ int idpf_vport_intr_alloc(struct idpf_vport *vport)
+>    * idpf_vport_intr_init - Setup all vectors for the given vport
+>    * @vport: virtual port
+>    *
+> - * Returns 0 on success or negative on failure
+> + * Return: 0 on success or negative on failure
+>    */
+>   int idpf_vport_intr_init(struct idpf_vport *vport)
+>   {
+> @@ -4624,7 +4646,7 @@ void idpf_vport_intr_ena(struct idpf_vport *vport)
+>    * idpf_config_rss - Send virtchnl messages to configure RSS
+>    * @vport: virtual port
+>    *
+> - * Return 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   int idpf_config_rss(struct idpf_vport *vport)
+>   {
+> @@ -4660,7 +4682,7 @@ static void idpf_fill_dflt_rss_lut(struct idpf_vport *vport)
+>    * idpf_init_rss - Allocate and initialize RSS resources
+>    * @vport: virtual port
+>    *
+> - * Return 0 on success, negative on failure
+> + * Return: 0 on success, negative on failure
+>    */
+>   int idpf_init_rss(struct idpf_vport *vport)
+>   {
 
 
