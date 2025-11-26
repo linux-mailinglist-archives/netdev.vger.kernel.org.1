@@ -1,153 +1,146 @@
-Return-Path: <netdev+bounces-241914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CB49C8A4D4
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 15:22:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86176C8A4F7
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 15:25:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3F2AF4E1647
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 14:22:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 54A2E4E18D6
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 14:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06AB2EDD41;
-	Wed, 26 Nov 2025 14:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5441B2FCC04;
+	Wed, 26 Nov 2025 14:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rJEiXJL1"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="k0ooTJYI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1280D2868AD
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 14:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE69258CDC;
+	Wed, 26 Nov 2025 14:25:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764166972; cv=none; b=okPeEFOeroT+GLzLcu8Jndz4fNO0ksnofukDHdvgkKP3juc76+3ukTmefmkdtsADukeLRTZVNcwC67iGhXIT35+oor63/WhONYXdzy8Qs9j8W8sSusTI4ZJdPtFng8xcE5IcFK16D0ojdYaECECoSjEsafI590FZ6McXqxjm/6A=
+	t=1764167117; cv=none; b=qdPbgONKLIaWrNheJZCDBmNsrhbTbL0q9S/tibwoQ33GAtuZMvl7EMPNEm4fPE+O6mCGGwT/iPNLXgPLugVOVPAksORfjZGWqD8CSR/pQAhxl4z3nb1ByBQYZ8bnKrDpKmHcR96sKUnyGlzx1L4/YFEM0TpEQg4YN+gEOwxyj8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764166972; c=relaxed/simple;
-	bh=O4gGoJx2vP3qOF1ZvgPkANtdErrgbludkhfPhJsqHno=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sWIPbSpNL6YfZby/HT0FLdEH8UkASrXTXOOyuRNI1pJuFYdoNJObHDAKKMdVOnTBau6LwZMADDGH4wI5RAZ6n82la8yb8oQ8kU6seOf9RJAfjXZMrg6CoNDqP7cXN0JGRpNSVXkWiuQjph4vVuqVtTf++fdbojBPvLS1ivUEAMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rJEiXJL1; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AQ8DfQI005649;
-	Wed, 26 Nov 2025 14:22:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=G5Vqd0r93B10i1z87P15EO59OcIG0RZ8wdsHOKzFq
-	UA=; b=rJEiXJL1wJ+pYRn6s2dLpyF+PcESt/6nhANCDl4NDEA/fAtGDJX2Be4qw
-	Wa7WQFVCKZv90V/cZHnMxjgEY+iMFCq2+whq7xoJFa9vu+hHptX/lV1gPEtDi9Xa
-	7gLkBm4DkqSkMtOzs0gbXXTvoqHuUq1T63/g5aEse66XDWPpB5DbVRTW+KtRY1K+
-	q481GYsl8DRljyneklamNDex/356zKvj62CwLHMC/sBt9T5S2CZPTeIiRh1bqFeN
-	LujIf15HDP1D33StzqmoLQ1izsy1RGQBWHbgCPJ3ud9IxIQjK3ZYPBF9YqjMip1R
-	viW+gnt7wVxTvYzAXOEt3mk1FM9bA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak4pj4rg2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Nov 2025 14:22:46 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5AQEGuJf031834;
-	Wed, 26 Nov 2025 14:22:46 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ak4pj4rfy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Nov 2025 14:22:46 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AQE8PeX013839;
-	Wed, 26 Nov 2025 14:22:45 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4akrgnb0jp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Nov 2025 14:22:44 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AQEMg6F62062964
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 26 Nov 2025 14:22:43 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DBEBB2004B;
-	Wed, 26 Nov 2025 14:22:42 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B104B20040;
-	Wed, 26 Nov 2025 14:22:42 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 26 Nov 2025 14:22:42 +0000 (GMT)
-From: Heiko Carstens <hca@linux.ibm.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Alexandra Winter <wintera@linux.ibm.com>
-Cc: netdev@vger.kernel.org
-Subject: [PATCH net-next] dibs: Remove KMSG_COMPONENT macro
-Date: Wed, 26 Nov 2025 15:22:42 +0100
-Message-ID: <20251126142242.2124317-1-hca@linux.ibm.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1764167117; c=relaxed/simple;
+	bh=Ocfwjie9+FicOOaIBzOuGpVUjaUpRkYlK9kIutmZR7o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OU8Hzxd8T9cEWpEQwnFKjE9ny1Ng6Nx1D53nXPkoSp9YZAOBrQLePSwIhcXQ9nNa9ABFShH69AlYJVqYkMaxc9iE4Ye8k1i+ivAMgc0kjjAZerHGGNY9hC7FlJE7VDQH6iZPlsh3AjCXHREKU/YTHUMvX+OJPcT56ya0YdD75DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=k0ooTJYI; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 8725A4E418F3;
+	Wed, 26 Nov 2025 14:25:12 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 578AB60721;
+	Wed, 26 Nov 2025 14:25:12 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 64B5A102F08EF;
+	Wed, 26 Nov 2025 15:25:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1764167111; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=Sbs0A8qAYuq+r/+1fjxriavvnUhEfhMgY7SBF5X8V08=;
+	b=k0ooTJYIYW0FYBMVhrgVBpA7A6kXMyqERAgQSrzwOurSlWfmkbqR/cAmccU11VWLC5YJEI
+	n6WrPplsAi0/qCeWTP5rC5r6OVtJarSahnvu8/ytGNtL2IhjV2o4qcZLK1BKZ9REOhbIne
+	GpHwbaHF7/xV6QP11Em8OqvJQxr/vpKrq/B/xhMU6iRCotsKbsvezuDAlSdbcWdLA7WkHY
+	PgHtTABkVp75O1gL9djdWOv4/kvWgJGTXQQtoWevSW4VHF0gnednfaSxWzHACT5hKJnynF
+	DcFAau2f9LPmwhjE9ZTrqGuSx7982EfRtb9Sv1Y9Gy4TO0KRoTFUYh71zTNEkA==
+Message-ID: <9c2518d8-a0ea-46ba-9069-999c2574cd24@bootlin.com>
+Date: Wed, 26 Nov 2025 15:25:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTIyMDAxNiBTYWx0ZWRfX0wl7z6Xp4M81
- 7nBe1/NXi2HHPRh3Awkve8/hmTQExrCo1jBECeUgwKSMgc2I6hcnD/JJV24aJi1PRSTa87Ax+Nc
- X1VESOwFUB+1YGC9DCiZPORmD1qo4PwsZmiAOoh3S5hahPZh0C7eU6Yzm71WE+aklKyjG2+Lmor
- D9NdJVwpmTmN7B0S/cJ6HaC0gQvX+iaX5VmO7Xe+Po6KGC5kkokd7OH13s1Lv5OYr/okExNPOrX
- cuu83WYD2twghCagjL/KEqOkIVPkZVzXY5PmhwdiJoEeyMp3TG4MukiLG57+s5SgqIyfi8OR14/
- h6NRdGB9k+6IDSeEU6f4t9TJF8n39afzab+t1gy077U5nxXKjlamnQWSRoY6fEpoUc0qwql25PV
- pOygg/YGgwWNL+Vs4U/SsZ/DFMkOeQ==
-X-Proofpoint-ORIG-GUID: dswi6run_7vGqcrLi2kQmCBipti7ywMo
-X-Authority-Analysis: v=2.4 cv=CcYFJbrl c=1 sm=1 tr=0 ts=69270d36 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=07d9gI8wAAAA:8 a=VnNF1IyMAAAA:8
- a=x8b-iUPIWsrqbuzLT4EA:9 a=e2CUPOnPG4QKp8I52DXD:22
-X-Proofpoint-GUID: aEM0bNpRpww3MNFqUqGs3iO3R8-5GeOz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-25_02,2025-11-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 clxscore=1015 adultscore=0 spamscore=0
- phishscore=0 priorityscore=1501 bulkscore=0 impostorscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
- definitions=main-2511220016
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/9] dt-bindings: phy: rename
+ transmit-amplitude.yaml to phy-common-props.yaml
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ Daniel Golle <daniel@makrotopia.org>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Eric Woudstra <ericwouds@gmail.com>, =?UTF-8?B?TWFyZWsgQmVo4oia4oirbg==?=
+ <kabel@kernel.org>, Lee Jones <lee@kernel.org>,
+ Patrice Chotard <patrice.chotard@foss.st.com>,
+ Holger Brunck <holger.brunck@hitachienergy.com>
+References: <20251122193341.332324-1-vladimir.oltean@nxp.com>
+ <20251122193341.332324-2-vladimir.oltean@nxp.com>
+ <0faccdb7-0934-4543-9b7f-a655a632fa86@lunn.ch>
+ <20251125214450.qeljlyt3d27zclfr@skbuf>
+ <b4597333-e485-426d-975e-3082895e09f6@lunn.ch>
+ <20251126072638.wqwbhhab3afxvm7x@skbuf>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251126072638.wqwbhhab3afxvm7x@skbuf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-The KMSG_COMPONENT macro is a leftover of the s390 specific "kernel message
-catalog" from 2008 [1] which never made it upstream.
+Hi,
 
-The macro was added to s390 code to allow for an out-of-tree patch which
-used this to generate unique message ids. Also this out-of-tree doesn't
-exist anymore.
+On 26/11/2025 08:26, Vladimir Oltean wrote:
+> +Maxime, Holger
+> thread at https://lore.kernel.org/netdev/20251122193341.332324-2-vladimir.oltean@nxp.com/
+> 
+> On Tue, Nov 25, 2025 at 11:33:09PM +0100, Andrew Lunn wrote:
+>>> Yeah, although as things currently stand, I'd say that is the lesser of
+>>> problems. The only user (mv88e6xxx) does something strange: it says it
+>>> wants to configure the TX amplitude of SerDes ports, but instead follows
+>>> the phy-handle and applies the amplitude specified in that node.
+>>>
+>>> I tried to mentally follow how things would work in 2 cases:
+>>> 1. PHY referenced by phy-handle is internal, then by definition it's not
+>>>    a SerDes port.
+>>> 2. PHY referenced by phy-handle is external, then the mv88e6xxx driver
+>>>    looks at what is essentially a device tree description of the PHY's
+>>>    TX, and applies that as a mirror image to the local SerDes' TX.
+>>>
+>>> I think the logic is used in mv88e6xxx through case #2, i.e. we
+>>> externalize the mv88e6xxx SerDes electrical properties to an unrelated
+>>> OF node, the connected Ethernet PHY.
+>>
+>> My understanding of the code is the same, #2. Although i would
+>> probably not say it is an unrelated node. I expect the PHY is on the
+>> other end of the SERDES link which is having the TX amplitudes
+>> set. This clearly will not work if there is an SFP cage on the other
+>> end, but it does for an SGMII PHY.
+> 
+> It is unrelated in the sense that the SGMII PHY is a different kernel
+> object, and the mv88e6xxx is polluting its OF node with properties which
+> it then interprets as its own, when the PHY driver may have wanted to
+> configure its SGMII TX amplitude too, via those same generic properties.
+> 
+>> I guess this code is from before the time Russell converted the
+>> mv88e6xxx SERDES code into PCS drivers. The register being set is
+>> within the PCS register set.  The mv88e6xxx also does not make use of
+>> generic phys to represent the SERDES part of the PCS. So there is no
+>> phys phandle to follow since there is no phy.
+> 
+> In my view, the phy-common-props.yaml are supposed to be applicable to either:
+> (1) a network PHY with SerDes host-side connection (I suppose the media
+>     side electrical properties would be covered by Maxime's phy_port
+>     work - Maxime, please confirm).
 
-The pattern of how the KMSG_COMPONENT is used was partially also used for
-non s390 specific code, for whatever reasons.
+True, but we could definitely conceive applying phy-common-props.yaml on
+the media-side as well :) I don't have a use-case for it right now
+though, and we don't yet have detailed descriptions of the electrical
+properties.
 
-Remove the macro in order to get rid of a pointless indirection.
-
-[1] https://lwn.net/Articles/292650/
-
-Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
----
- drivers/dibs/dibs_main.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/dibs/dibs_main.c b/drivers/dibs/dibs_main.c
-index dac14d843af7..b8c16586706c 100644
---- a/drivers/dibs/dibs_main.c
-+++ b/drivers/dibs/dibs_main.c
-@@ -6,8 +6,7 @@
-  *
-  *  Copyright IBM Corp. 2025
-  */
--#define KMSG_COMPONENT "dibs"
--#define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
-+#define pr_fmt(fmt) "dibs: " fmt
- 
- #include <linux/module.h>
- #include <linux/types.h>
--- 
-2.51.0
+Maxime
 
 
