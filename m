@@ -1,145 +1,175 @@
-Return-Path: <netdev+bounces-242041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C99FC8BC0E
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:03:10 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A558C8BCE7
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:20:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A806F4E5C8C
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 20:02:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 90774359C63
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 20:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D90633D6C7;
-	Wed, 26 Nov 2025 20:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1F4341642;
+	Wed, 26 Nov 2025 20:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AhEfGA74"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AL+MXQ/s";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0n0WmMPp";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ryujBFC0";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Y2yoHJDp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDE9302748
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 20:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0778633F39F
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 20:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764187368; cv=none; b=lyXrvQsfF9Rt35erlKcwFqeDwLMkzPLqxDTkx0fkU/LM+NoIX3U4zJdSPAEzV4tLU7/3eqYuE4MgU/iUdCQ9nz4BLPLS1mvBds8N5PrFosy0txH4AI7ZAgIilCE4O3XC1vxPUFQAJjYZ5VNkwGjbPk9ounDW0bnsP9o2xReKJVQ=
+	t=1764188404; cv=none; b=DznCCeh1BKyc49GPkVKImSqCPYQqVXcuxUAEQfoToe0vatRSHqr1u7f0YYneezqVyCmehig8POVOGmsc3nEd4VnojA3U1rkVW51VKwUijUPDl9KNyE4u3vUDmBIiZU30dBHGQ401QrUTEfglKyo//YKFVxTy1xi3dlDqlT2wIeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764187368; c=relaxed/simple;
-	bh=io2b3WP5mJSrzoPU9P3LKCt9DN2B8GXCdJ4X44P7TU4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XyW+WPYjrxoUQ/zSivgZiDNqOhgHKZohEtk/yb/+OWIIhalTI9NVyPVncqbhPU32anX8NxXCp8TSik+mUWRVENQS+UPG1rUIR0n7GSihF6fx48bMZDOk8h4dFHuSh3gf6nM84nACbotl/NdILeLNLfXA/8pknKPrvnUVXe6eHWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AhEfGA74; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-42b379cd896so111536f8f.3
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 12:02:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764187365; x=1764792165; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=io2b3WP5mJSrzoPU9P3LKCt9DN2B8GXCdJ4X44P7TU4=;
-        b=AhEfGA74+WtLFdY7FUEVVqG/COqUjj68ANLx3nAvKOy3eGB6YdK2IR8pdSKXMx0UB/
-         zto+FrF2N4GVjCURo5ZE3v++mNOCXPdqt08VuHNhEWisIHjlvMo79+eiX2R7H3pLFKKY
-         ZtZ0v3Has5Hb1Ek31pYuB3E/0YH6evR2f9n1f6H/9WRyEh1lgulbfWwoTpe8zRRrncBr
-         zsXFppqoke0qHuTdFdPQ/sMXa+OgqdiE9ad+1+tVp8BcmPgGqh1e5l/xp0bTScyDCWCJ
-         0uZ3VFuqs4D3YtqnL4ldYgMnfxcp34k3sA0d8wMwfTIaI3Er9MI+jy8+Y7L+BaEbCJ6X
-         exVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764187365; x=1764792165;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=io2b3WP5mJSrzoPU9P3LKCt9DN2B8GXCdJ4X44P7TU4=;
-        b=kyvrNe32Tx9cds5XGJMJGdxiP43EYG/5eRZE3OxffbwquzW96mIOF4f3Y/4U9gq7cb
-         EEJpc3n9/wzTmLG2k+HcqQ5Jor5yVSL5MkvPNiKbP+wdxnoJf7QLtjq0AVBIlZFLjGIU
-         HWvtC/+RhnoxKsoJE9en9VlgdRbHkSRiE3QmHwgsKHVdwfO5wqVBAqQQ9RnOyrB0a/ga
-         QM7nTRVJqPwIV+7SuPuySr6c2UlwHoL9ofpUJXvKd9WHam+simHDyrzYO3MoJ+/0np9d
-         8ZngKYWdrY2Nkspv6tu8yV/07u2j24wggQVlMmbKptt5J9dAnqKl7D5AC7QVk88VZND2
-         0brQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWf7j0YnGLoIhOZwz3EnIhmTNMxJAiMfeGTnr7UxqzpSTPKTxd3UzqvNqt+JaiId1sAVypg7TE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxy7wwfaXKDi1/J8XzuaTWdT0wi3ca77ikQxymyREay6vY1ng9Z
-	VbAarvetzNgU4osSpSUlemNFflxer1DAbgxyUz/w6PVCtkqyFcxYl1lnLpnGnCZZNWlisVDLZZD
-	lix9law1k+C46/JhjoNWSNWeqhV9a4L0=
-X-Gm-Gg: ASbGnctKHbXqBdwF/P4CKQmLdUT4JmE9W9Z6fjUsG+NRcvbUDaC3E2lZ88kx1MUq4vD
-	AygyRFHFiG4bXXOW+HWZ5IIey9IXMIASoqW6PLbMwvwZHwIWKL8eBB07SiwzcpUFZINwyShUh34
-	8xZdZiUlNoyzYgybdLPk6Hu7fJZYTaVlbRiNgoNxSgevB8kQRMxgG54uBuTClYMdwoJDns3blG4
-	W0na/jOV47PPwbaeyM/iqtq7ScsmlGz7G4U4jj8ya2uFA/+RaQ+uQUN171/opd+kXApAlwJgYg6
-	v4pwoebTOm1K39ZGGHOjp/ZjcTji
-X-Google-Smtp-Source: AGHT+IHhPTLf5CTLCoQ18EsMIZtWnWzd5QhbLVXWFL+PMuHp5nvUjMTQ/DYhFP88GSmklCKy+nnqz6NENwZFNXmLY3I=
-X-Received: by 2002:a05:6000:26cc:b0:427:9d7:86f9 with SMTP id
- ffacd0b85a97d-42cc1d19d6dmr21241880f8f.47.1764187364909; Wed, 26 Nov 2025
- 12:02:44 -0800 (PST)
+	s=arc-20240116; t=1764188404; c=relaxed/simple;
+	bh=z7sOYHy8J0lnmrliZ3kmLku30Y0juS3r3eF7C9Og0zY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SCV6+79o/0hCpK4rIxZybip594+ynGzEA4T1iL/ij/W5cyT+LqIcwa4Vog3p5waFdEmAEdUwK2naNSVH8iwEXtJIT+gjbCKSsnYB1acO9PHNI7JHzLdn5O5gPsaKa+4aQkFaGi9jStqFKBHpz2b3z9x1/Wmolq9K7Xw/gX7mK+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AL+MXQ/s; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0n0WmMPp; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ryujBFC0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Y2yoHJDp; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id EC7FD336BE;
+	Wed, 26 Nov 2025 20:20:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764188401; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=8ZGGIf+chp9/73JzcwFoh722FFjDNNtO2bWbpDyFzbQ=;
+	b=AL+MXQ/s2YMzTgBbb8xK4NLnq/frBTmW/oXXxXnE6REmqKg7FLSJnlek/wUU1ex4B49lqB
+	9r0k+x6PqY1dpSMlFxH+FRHKZQRbAYEOHDsYSP2IiD3AVt7PEnfhTEtYfb2tR9KlbDA9YA
+	nrZNXvJZrv6BV/uTwjvRzdhdPzSiGRg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764188401;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=8ZGGIf+chp9/73JzcwFoh722FFjDNNtO2bWbpDyFzbQ=;
+	b=0n0WmMPpEMDKCaW12dhJGCzyxjUvHeZgSKSaSrOeUAVjYojs35vOVP0RP4rTlmag+cqAAF
+	zV+Mb9pR1h9RpSDw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ryujBFC0;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Y2yoHJDp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764188400; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=8ZGGIf+chp9/73JzcwFoh722FFjDNNtO2bWbpDyFzbQ=;
+	b=ryujBFC0hJ6eFrPhXFfJA7OQ6j+x1X7THJy5/RHONSNDmwgYDGVMio9bYcccBQ2As5xQqD
+	4KJj0NPa4z734T1ahzUOIokgl0xnHhJoLVIejQjZT+UXSpbLfNhiG5F11LgnDb6c+h6L+s
+	hMU6x8lQVOxLwJXorewGCPxjz4PJhv8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764188400;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=8ZGGIf+chp9/73JzcwFoh722FFjDNNtO2bWbpDyFzbQ=;
+	b=Y2yoHJDpuAsLfnMA8qXUedGewqlq4+QWlvg2I+zYylE2PybpxI6MnchmkVO/AfIrUqkNSc
+	EZHbky2TOosad+CA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4BB1C3EA63;
+	Wed, 26 Nov 2025 20:20:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id tGNTD/BgJ2mDEQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Wed, 26 Nov 2025 20:20:00 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
+	shuah@kernel.org,
+	horms@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	dsahern@kernel.org,
+	davem@davemloft.net,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH 1/2 net-next] ipv6: use the right ifindex when replying to icmpv6 from localhost
+Date: Wed, 26 Nov 2025 21:19:42 +0100
+Message-ID: <20251126201943.4480-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251121113553.2955854-9-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251121205546.6bqpo2bn5sp3uxxu@skbuf>
-In-Reply-To: <20251121205546.6bqpo2bn5sp3uxxu@skbuf>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Wed, 26 Nov 2025 20:02:17 +0000
-X-Gm-Features: AWmQ_bmTU2niYWdcaSdZep0i6gskfGJjESBHVN_mhWxbtBqTU4OVzxNhhj_FZfk
-Message-ID: <CA+V-a8vH+qCgNti+dHVXqfa02-zMnbUKw2gScWyeuh=EhL8HaA@mail.gmail.com>
-Subject: Re: [PATCH net-next 08/11] net: dsa: rzn1-a5psw: Make DSA tag
- protocol configurable via OF data
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Russell King <linux@armlinux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,suse.de:dkim];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCVD_TLS_ALL(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: EC7FD336BE
 
-Hi Vladimir,
+When replying to a ICMPv6 echo request that comes from localhost address
+the right output ifindex is 1 (lo) and not rt6i_idev dev index. Use the
+skb device ifindex instead. This fixes pinging to a local address from
+localhost source address.
 
-Thank you for the review.
+$ ping6 -I ::1 2001:1:1::2 -c 3
+PING 2001:1:1::2 (2001:1:1::2) from ::1 : 56 data bytes
+64 bytes from 2001:1:1::2: icmp_seq=1 ttl=64 time=0.037 ms
+64 bytes from 2001:1:1::2: icmp_seq=2 ttl=64 time=0.069 ms
+64 bytes from 2001:1:1::2: icmp_seq=3 ttl=64 time=0.122 ms
 
-On Fri, Nov 21, 2025 at 8:55=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
->
-> On Fri, Nov 21, 2025 at 11:35:34AM +0000, Prabhakar wrote:
-> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> >
-> > Update the RZN1 A5PSW driver to obtain the DSA tag protocol from
-> > device-specific data instead of using a hard-coded value. Add a new
-> > `tag_proto` field to `struct a5psw_of_data` and use it in
-> > `a5psw_get_tag_protocol()` to return the appropriate protocol for
-> > each SoC.
-> >
-> > This allows future SoCs such as RZ/T2H and RZ/N2H, which use the
-> > DSA_TAG_PROTO_RZT2H_ETHSW tag format, to share the same driver
-> > infrastructure without code duplication.
->
-> Again the twitching when reading the commit title. I thought this has
-> something to do with the "dsa-tag-protocol" property from
-> Documentation/devicetree/bindings/net/dsa/dsa-port.yaml. The tagger *is*
-> runtime-configurable if you implement the ds->ops->change_tag_protocol()
-> API, and it's also possible to trigger that API function from OF
-> properties. But this is not what the patch does, so it is confusing.
->
-> I think it would be more natural to say "choose tagging protocol based
-> on compatible string".
->
-Ok, I will update the commit message in v2.
+2001:1:1::2 ping statistics
+3 packets transmitted, 3 received, 0% packet loss, time 2032ms
+rtt min/avg/max/mdev = 0.037/0.076/0.122/0.035 ms
 
-> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > ---
->
-> Anyway I'm not reviewing this commit until the reason why you added a
-> new name for this tagger becomes completely clear.
-As discussed in patch 2/11 the format fields vary, so this change is
-needed to support the new SoC.
+Fixes: 1b70d792cf67 ("ipv6: Use rt6i_idev index for echo replies to a local address")
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+ net/ipv6/icmp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Cheers,
-Prabhakar
+diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+index 5d2f90babaa5..5de254043133 100644
+--- a/net/ipv6/icmp.c
++++ b/net/ipv6/icmp.c
+@@ -965,7 +965,9 @@ static enum skb_drop_reason icmpv6_echo_reply(struct sk_buff *skb)
+ 	fl6.daddr = ipv6_hdr(skb)->saddr;
+ 	if (saddr)
+ 		fl6.saddr = *saddr;
+-	fl6.flowi6_oif = icmp6_iif(skb);
++	fl6.flowi6_oif = ipv6_addr_type(&fl6.daddr) & IPV6_ADDR_LOOPBACK ?
++			 skb->dev->ifindex :
++			 icmp6_iif(skb);
+ 	fl6.fl6_icmp_type = type;
+ 	fl6.flowi6_mark = mark;
+ 	fl6.flowi6_uid = sock_net_uid(net, NULL);
+-- 
+2.51.1
+
 
