@@ -1,138 +1,111 @@
-Return-Path: <netdev+bounces-241815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0242C88B08
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:40:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E4B8C88B11
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:41:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CF2E03575C4
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:39:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E762F3A25A7
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0ECD319847;
-	Wed, 26 Nov 2025 08:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9AA319867;
+	Wed, 26 Nov 2025 08:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O6QFVRs1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="USkmG8zd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670D630FC1D;
-	Wed, 26 Nov 2025 08:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06B03176E4
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 08:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764146372; cv=none; b=TmH21Xn1pDinlqveRBkiVVWgtIWVWCx62IQMcMkZbSrgqmRyRUSOjy/6GyS0Wtw4oUe1O6sTZBNut3LZR+MRyVBzRAZU+TysiHn9iqFY6YJkZEE0JWw3MNgzEuqgD2oNVyW9yHt0Fpkz6h8G38IDzYdTm5Qx8gTXorUnZA5GCRA=
+	t=1764146485; cv=none; b=KrI3mBk4NekgK3FeVfrVKR5dx+m5YU9TqTCrxY7HPQ5BB1wKs9QbkhjjE5H+6FSKDFWxrkTTKGPRFqgCKs7QM4eJVBAIrbU3nFPnRKnzbLFr6Az1TKOVBZdfsi7dAtDhgnsvLusYFRzn7619rmKmiUSbLKbwccxCwtl2F6yVt4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764146372; c=relaxed/simple;
-	bh=oyveJ8q/G9dWeEH8sazloAw9I8YtyoEMfWjwG29AkUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D4ajXccgb3Eg1mBXny/+gZkX0Ne8nyD+g7kIuerN9gPG7yf49IvY+Y3Vvc6Ea0x0nS+uAOi/gqIAARNgNC6SvdfdmmEfXa8upq5/30Xca9F5xlwLWr7Syd6O3mZQrXhYb4Fwi4ZyWzeRboi/tnKipAgxgM6KOVpVNH81tacPYy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O6QFVRs1; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764146370; x=1795682370;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=oyveJ8q/G9dWeEH8sazloAw9I8YtyoEMfWjwG29AkUs=;
-  b=O6QFVRs16HNJ1qkRxUwT+UP8g5FZo2WRsFX5iVkNuNgaOj/kXR2HKrKj
-   4lUReWY5DLaUNi2oplKslRx5cHcYkocysGZehCau7rbR4xyhzUMdFA0ke
-   Jbqu2NIpXu1jxCJuIpoFsnNoTNZx6JDpKmexbwUzOO7Oqbc1OM3I4ldmN
-   DQZk15GbUOqXJz1SXYSica1FxJMHMqAmGlJp66yvm0fyk06bh7/RqXCfe
-   IRQKShaM0HojHGhPTlcPhTyMsYzZ4mlE/hNMst/Y7jU9qXa3wqNeHPZ/G
-   VzqKl4WIBX4JUp4CyRPTIYoQ6qle23mn8L4vNurOcOAcKXFR00hxpDmd7
-   Q==;
-X-CSE-ConnectionGUID: 7SJJveX3QFCkOxCNhj7MUw==
-X-CSE-MsgGUID: xHsLTyIRR5SGqXLt2fAiow==
-X-IronPort-AV: E=McAfee;i="6800,10657,11624"; a="66254562"
-X-IronPort-AV: E=Sophos;i="6.20,228,1758610800"; 
-   d="scan'208";a="66254562"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 00:39:30 -0800
-X-CSE-ConnectionGUID: nLonSe3hTm2/JSdiBCUflQ==
-X-CSE-MsgGUID: l/7kE/pRT2uWPQ2V+gAa0Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,228,1758610800"; 
-   d="scan'208";a="193308811"
-Received: from rvuia-mobl.ger.corp.intel.com (HELO localhost) ([10.245.245.89])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 00:39:27 -0800
-Date: Wed, 26 Nov 2025 10:39:25 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-Cc: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	s=arc-20240116; t=1764146485; c=relaxed/simple;
+	bh=yJ4Q+EZAX2DHWm5GOippjxx3Hf1lg9I9KPKII2LXViA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X1jg7kKX+s2kUD9hKBDOHBoZ/mxFu1UvVp9W0uQ70iVSGFi2B5A96Wc3wbOGfsFV05ASLk/v/p5nHnRHv6VUpZIT5IULCt7JVkl0ODoOIpY6T/Mw1gR4czk4oHjD8BmpqFgteV5xBJp91Fv/MF+nHnHOrzTqDCePsud8B4nW+xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=USkmG8zd; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7a435a3fc57so6758885b3a.1
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 00:41:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764146483; x=1764751283; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2QvYg4d87Kbc5FICk6rTyHOqTSX8B7tbAnUpz5K33QQ=;
+        b=USkmG8zdOKTugQUO3CC5amak5MNdeJweFAb8XnE+d28xfNLuyP2YlBVvtw0I5crsOL
+         H/31nPoZnrEVZ47nvJavlEEiyTjoEthtr7SdzAPrBjnQETaxpz/cN/14fk7kfmqE09D+
+         M1wiur8pfPmNUNVNjP/71Kb/Pj403jocbgiDTXuLdaAXp21Z8INE4OIu2AUwm97+kZnF
+         5tJFuGO/fc8AjlfWC7tR/KPsn0HoSutEsZdGt9anA5sWDOQ8v3Sh2CkWYvRVKXJ2u9ao
+         g8WQE8DQdr/9amWEsJtLi0I5cvpchu5IgO8Pzciuq5gmZj0wvmdi8PHdgSf1dlrCA7Fz
+         qoGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764146483; x=1764751283;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2QvYg4d87Kbc5FICk6rTyHOqTSX8B7tbAnUpz5K33QQ=;
+        b=FaCg0A9Z+zyI9GyriZdElNlM5DYE9Md5V3e8WnfXG7fweZacP63FSistcCT7FB6oRi
+         rOUjW6p+PRT4I1l/HpB5luKGhhO2VRF+K+Ano9SdRkOTcaN5bX7IprwCB9ibdLrCmvyI
+         UEp1wGykFMU5+L+dF5dgJTpjFca/UD18bV9wTbWm1LNi3ZtGAADHF0FVEuy5bZkHDAW5
+         /kANS/Nh+XxfYzTScuDoTpHWqnpQnxbJ8PG9bOn0cXvZEH6cG/aCSADVRx0Wv8ALilnP
+         5x9/6tdMrYaIxi6SPeddJaJmHc8uaQSYq6fF7jg/NssYCXpcAUjRF1lpZbsMBPDglFLH
+         n05A==
+X-Gm-Message-State: AOJu0YzbPcdEg8mVJ8RdnSiR0/MHwY/ce+GPhf2hZyZU14nUDy9X25OV
+	U7t13xdgyCjdWI7K1ojTNZRKh0Hu1Se5GhsN7forxy/8C2xMuJvtcEumeIV/lQ==
+X-Gm-Gg: ASbGnctO/fyCYS8uSUXDpukZ2Dj928hVX8GJebexpuv7of3n9e/3V076ubiGIxzxbN1
+	pClieROPMOI+2bQNgfyzHLezbgUCnUYYaPjzcRcYD12bMEKY2mw9TGaoEIO8RaocrkQ1ik30xFf
+	uAa0PYEHvIco1GjFkX3WNDv0I5zVpL5LMfy9NiU8eUvcWDluAxIEUN40oa822/k+PDoOdRR7zL0
+	xBMXnCnghRnk7fO24nMiga7CtpN0+eK8UP43/2O3oSEHSqZY2O4kQUk5W0j/HsvwcmK4lGftb9y
+	gTbgqKnzy8dQVHhNtXROfLJUC5AAKUbGVN/LQNVgW093tH8ObCXIvwkWFVsexKGhw3AukLoendq
+	UrIjllXUDEBXpqA7xPoz84U+gRSSovShpWH1Hk0u7ojMcFayomMPcdoDKACGVANqlhO9KdzcgSm
+	JlWe+xo5MDWjYEBvxvl8SKiQ==
+X-Google-Smtp-Source: AGHT+IEq8TLDu5upoHkXPWgpj9NVznwTnPz1hJXMUFIrKBM/KqkZM54x/BydMoApG5eHtM9d6kcZBA==
+X-Received: by 2002:a05:6a00:98a:b0:7ad:df61:e686 with SMTP id d2e1a72fcca58-7c58e113767mr20328041b3a.16.1764146482715;
+        Wed, 26 Nov 2025 00:41:22 -0800 (PST)
+Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f024adcfsm20918248b3a.31.2025.11.26.00.41.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Nov 2025 00:41:22 -0800 (PST)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net v1 1/1] idpf: Fix kernel-doc descriptions to avoid
- warnings
-Message-ID: <aSa8vXXM6ShdtVvN@smile.fi.intel.com>
-References: <20251124174239.941037-1-andriy.shevchenko@linux.intel.com>
- <abf25d3d-30af-479f-9342-9955ec23d92f@intel.com>
- <IA3PR11MB8986A3FDF77D49598C5F4C89E5DEA@IA3PR11MB8986.namprd11.prod.outlook.com>
- <aSayDu8yVe7prrsx@smile.fi.intel.com>
- <IA3PR11MB8986CF43DFB0EFBFDABA34EFE5DEA@IA3PR11MB8986.namprd11.prod.outlook.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/2] net: dsa: yt921x: Fix parsing MIB attributes
+Date: Wed, 26 Nov 2025 16:40:18 +0800
+Message-ID: <20251126084024.2843851-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <IA3PR11MB8986CF43DFB0EFBFDABA34EFE5DEA@IA3PR11MB8986.namprd11.prod.outlook.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 26, 2025 at 08:06:30AM +0000, Loktionov, Aleksandr wrote:
-> > -----Original Message-----
-> > From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> > Sent: Wednesday, November 26, 2025 8:54 AM
-> > On Wed, Nov 26, 2025 at 07:24:40AM +0000, Loktionov, Aleksandr wrote:
-> > > > -----Original Message-----
-> > > > From: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
-> > > > Sent: Wednesday, November 26, 2025 7:30 AM On 11/24/25 18:42, Andy
-> > > > Shevchenko wrote:
+v1: https://lore.kernel.org/r/20251118091237.2208994-1-mmyangfl@gmail.com
+  - reword commit message and add a fixes tag
+  - add #defines for each MIB location
 
-...
+David Yang (2):
+  net: dsa: yt921x: Fix parsing MIB attributes
+  net: dsa: yt921x: Use macros for MIB locations
 
-> > > > > - * idpf_tx_splitq_has_room - check if enough Tx splitq resources
-> > > > > are available
-> > > > > + * idpf_txq_has_room - check if enough Tx splitq resources are
-> > > > > + available
+ drivers/net/dsa/yt921x.c | 105 +++++++++++++++++++--------------------
+ drivers/net/dsa/yt921x.h |  54 ++++++++++++++++++++
+ 2 files changed, 104 insertions(+), 55 deletions(-)
 
-> > > Strange idpf_tx_splitq_bump_ntu() is not idpf_txq_has_room Can you
-> > > doublecheck?
-> > 
-> > I didn't get. What do you mean? Please elaborate.
-> 
-> In the kdoc I see function was renamed: idpf_tx_splitq_has_room -> idpf_txq_has_room
-> But I don't see idpf_txq_has_room() function name in the patch.
-> Only idpf_tx_splitq_build_flow_desc() before and idpf_tx_res_count_required() after.
-> Could it be a mistake?
-
-No, it's not a mistake. This is in the category of fixing other kernel doc issues.
-Citing the commit message "...and other warnings."
-
-You can run kernel-doc locally and test.
-
-> Everything else looks good for me.
-
-I believe everything including the above looks good.
-
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-
-Thank you!
-
--- 
-With Best Regards,
-Andy Shevchenko
-
+--
+2.51.0
 
 
