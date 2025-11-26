@@ -1,104 +1,145 @@
-Return-Path: <netdev+bounces-241801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5F4AC88586
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:03:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0509C885A0
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:07:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2B302341A8F
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 07:03:33 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6EC6B347097
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 07:07:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D7321FF46;
-	Wed, 26 Nov 2025 07:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3064D270ED7;
+	Wed, 26 Nov 2025 07:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="cvIdG2ZG"
+	dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b="JQ7SWZ8v"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E467714F125;
-	Wed, 26 Nov 2025 07:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE1C22FDFF
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 07:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764140608; cv=none; b=Vju3vclsWoM6PPgDYFf3rUCoJslSRUWZ/mlanPwyHLuLQfxoOMorqtCkOBv6fhUT3ylXU45Fo0eT9dx1cJjR5HMuSp7EL4bdI0sim1FDBHtz31zzO46i8atZ6d9Di45p51Z3BBdkDV2/92RdHP9eL69bHlVVIvIFeBgv7xU8SzY=
+	t=1764140832; cv=none; b=Op3V8BZyNM1IxtZ+zii9mwMXp/q0Q4pXv4M876ssZ/+dG22D32xWCb8DoHRzMruvpFvj8DG4bRTYgJ9Tfh0KkvtQmrC1Vv4VBZLJcRpTxbzk++3WYZHTvovKXvD+Kg4s0pkKsQmZa+o7fiueP9XNfBBqqfE+8XDKqHtFKHQexhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764140608; c=relaxed/simple;
-	bh=Bmmkv7T6dGQcJdSedI3iuVD30ai2V9CJ2hnh9q1tMKY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gs0Jt7UtwGYzYzgbUYKGGGFL+okFCzBfeO/WxE7zVbhowVQSUbh80dXBD0nXoV/jFBJer1s9pSElS7zyVbWcwWBxkIHAXHXbacr7P6vMehMNLJ9bTaPswjTJbLT6IEK3kxyURA969Kav22VL246eVWu4yznqtnLG686XtySMpUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=cvIdG2ZG; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id CC562A07F4;
-	Wed, 26 Nov 2025 08:03:21 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-type:content-type:date:from:from:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=mail; bh=ehBqv8v0apj+HEXDWptk3ipMZQiMB58+XRdwFmrPYpU=; b=
-	cvIdG2ZGGp0GnUReJKVpRdwWvTYwt1ZTG/1J4ABP8CNMrEdEQE7SRt+Dlyxs1lRi
-	3zGL7j81RYrjOIDC0bGLPdEzMke1SiCrW9Dw3clyzblavQvRxnyEuLe6Tmb4l6ah
-	vOXb12Tw/cGE6K13OeX1yHdefjgmvv3OyHLemLunHsosl4YCi/Fw9KTRqVAj6fj+
-	MLwBrpns50JlL9dmGniUnzGTrb0BBVV5UTJVI35sGHWy0780kBWGHOL/1pCutjyo
-	I4n/LFNgNyDnkNUMn6J1RBY80fLcEFHSfDimo4o+pEkMFOXSGd143/hmbN6okhsl
-	Nj0K1UT5rOJH7vHofi7vxOcvfTbvuRCPUPCaz517EpoLmzkirIdefobfNxgfgZGp
-	yGjRhKKKQHoThBsVYCwd5Wote0rmdnQU714yZOkHz0QJiCDSrvtre43/kwXsiQsP
-	YrkTSwZHYUZlGS8KWwP2WmnON03R2X6e3oB9d25H4ZtEaT5yRqfE9/M3X66tjPWL
-	RF87ZkqHmoEuCbEeJ/aHD/s8FedfHGjJ0dyx43yhliHdV6pkwEsLDcySekV9//9r
-	Zgy9sqyXJq6CuedYAC66Tja6+yRy9ZbDXmAIZYTvrkajy4A4DmZeO95QYmyi7n+y
-	XawInvhNFkXAbW2QqMjPVSjQ4h3KBHqEuxeim0iIqDc=
-Date: Wed, 26 Nov 2025 08:03:21 +0100
-From: Buday Csaba <buday.csaba@prolan.hu>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/1] net: mdio: reset PHY before attempting to
- access ID register
-Message-ID: <aSamOWYSdMC0117A@debianbuilder>
-References: <6cb97b7bfd92d8dc1c1c00662114ece03b6d2913.1764069248.git.buday.csaba@prolan.hu>
- <20251125184335.040f015e@kernel.org>
+	s=arc-20240116; t=1764140832; c=relaxed/simple;
+	bh=VB4nQunFf+O3DmYPGWwxjYu5Lg4IWPHg/FOy86FFr0I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BwsqZIvT4TWJW+ExNRtC38PZJk4PQdzpkkgeYbnKBCYextBxRWtKtiJB6EPMNGYmVrZjhy+HGCBu1bC1wAjGgRjgEEQOhg1DSonvx+SRnGX6LMkpLPtJnuZFTnhoYPG9LdyPdc87to6atdCtb8EKFr+gdFeI6kPsLKF3ynrVRAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in; spf=none smtp.mailfrom=ee.vjti.ac.in; dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b=JQ7SWZ8v; arc=none smtp.client-ip=209.85.214.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ee.vjti.ac.in
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-298145fe27eso99565085ad.1
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 23:07:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vjti.ac.in; s=google; t=1764140830; x=1764745630; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kXm+TGMia1g3kmuDV/aF57ZmqWwNOjaNm4FLB34Qkxc=;
+        b=JQ7SWZ8va3yOG83pZgWPCtQoST0TmPwJka/mUlaX09ebW/KU5viLIYQoDWdDNMtPXC
+         zO6/7qjqDanY3+m6VJ2jPLaZI5WgqgKurhpKX4EUXxyqwbTurZNVO1zSW8jqNki7Qfut
+         4N+ynQI5lEvv3GhonqK+kXdK9H9KLIXcEC4ME=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764140830; x=1764745630;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kXm+TGMia1g3kmuDV/aF57ZmqWwNOjaNm4FLB34Qkxc=;
+        b=J4fx7Ja1gU/lr49ttdrGFBSypgpM1qL+RNNgPFgCfBqPqdkyNhli5LRKW0ZefxlJgt
+         eLd2MftB6wTrn7O5tWDDrJHckTQMFCxnVTn0fjH+XrENHXhoyKtneBXe5WMrTuPd8ccl
+         1Y/oJgivC98RPoKrndIpsPn4OE/grwRcgkzO6oArm9u8GC7Qpr80LDtu6QZBpJCjWtQi
+         UMdiM3LlQ41/LAmVi5u3Mn+7EuimCl+Y1mXBsSmv9opZPP11Figh/EZ+x4+NFC9wbxhq
+         PBU5Ht9PNyg9LTC0L3pt3xdn8SjMowG573yoemK2492AQND2ZRYSWJaTE0ncTFZmUG4V
+         4+dA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrx9WfPxA2hOx8JsZUJhy7CZ/yc6ecp6NG8jcjb4SDGpKhNW1z+LRC9bEnQTCj3IAwJisbvSU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybYhAL0u2A7p9VGJdmUkYrRxqVms6aZ07C2pEboa75PAaptgSA
+	Qu39S+e2YLgyzGT/9q6bbTIz54FeNGeXYsE2W8nrcNhurrYIwzgK4rFRN5ki6rc+8AQ=
+X-Gm-Gg: ASbGncuw4rarGuMjIcB7ehAt77RsJ6ZK4MCkgkSCY7P0HQbtIK/Uz7kkTpeJO5gA0/B
+	BrjlS3p55pwiQcHHXWXjzC8rGe6RS3DGZ6FYsbPFksauZWWDta1nFG8G7ECxbVopjbT8msnoYpx
+	KMCnXojV08zyx9SmcNjtD4bDNq/KXAKb7ac5RFVTgehDdoIyEnTm3ERUyR7kYD49GsfCMR2XAKe
+	9+XCbQ3exBUHiqhgwqWGEJGqtmH9nXnNY2YZz2isB6Yr+RCGrGS5apVZe304X0r9HvkJrJnVq3M
+	VFaLqbA7EJJM6qlvuq5kfARFntCFhmK9Ql4ZepXcbB6L1oFHR787UZVcc7vmHPnG3YtzF5maNuV
+	n3UsD47MRv3baL4rR2jzxuyfPchfqC7F6UaEt31ToCBMs9QC+K9X+BPzO8QDuZzLXo8dh1P3hBJ
+	jSdp14tfObQSJyUt7/XeG2pJKRrLUptIH1SZbOUUvDXxTnjyMGua2vIgD0dN4lvj8PLbk=
+X-Google-Smtp-Source: AGHT+IGkJkFFiIZ7CfI+PiIjFnbPp5NR5QiZ9xPjeb3SVz81eUnXoOljRms9fCxUpzbe+iXyOsOtgw==
+X-Received: by 2002:a17:902:f70c:b0:298:6a9b:238b with SMTP id d9443c01a7336-29bab1d74ddmr58569865ad.51.1764140829664;
+        Tue, 25 Nov 2025 23:07:09 -0800 (PST)
+Received: from ranegod-HP-ENVY-x360-Convertible-13-bd0xxx.. ([2405:201:31:d869:7ab4:fdd5:842b:6bfe])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b105e4csm183853715ad.2.2025.11.25.23.06.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Nov 2025 23:07:09 -0800 (PST)
+From: ssrane_b23@ee.vjti.ac.in
+X-Google-Original-From: ssranevjti@gmail.com
+To: Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Rostislav Lisovy <lisovy@gmail.com>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev,
+	david.hunter.linux@gmail.com,
+	khalid@kernel.org,
+	Shaurya Rane <ssrane_b23@ee.vjti.ac.in>,
+	syzbot+5d8269a1e099279152bc@syzkaller.appspotmail.com
+Subject: [PATCH v2] net/sched: em_canid: fix uninit-value in em_canid_match
+Date: Wed, 26 Nov 2025 12:36:41 +0530
+Message-Id: <20251126070641.39532-1-ssranevjti@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251125184335.040f015e@kernel.org>
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1764140601;VERSION=8002;MC=1114099128;ID=129138;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2998FD515F607362
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 25, 2025 at 06:43:35PM -0800, Jakub Kicinski wrote:
-> On Tue, 25 Nov 2025 12:15:51 +0100 Buday Csaba wrote:
-> > When the ID of an Ethernet PHY is not provided by the 'compatible'
-> > string in the device tree, its actual ID is read via the MDIO bus.
-> > For some PHYs this could be unsafe, since a hard reset may be
-> > necessary to safely access the MDIO registers.
-> 
-> You may be missing exports because it doesn't build with allmodconfig:
-> 
-> ERROR: modpost: "mdio_device_register_reset" [drivers/net/mdio/fwnode_mdio.ko] undefined!
-> ERROR: modpost: "mdio_device_unregister_reset" [drivers/net/mdio/fwnode_mdio.ko] undefined!
-> -- 
-> pw-bot: cr
-> 
+From: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
 
-I do not know how, but I missed that.
+Use pskb_may_pull() to ensure the CAN ID is accessible in the linear
+data buffer before reading it. A simple skb->len check is insufficient
+because it only verifies the total data length but does not guarantee
+the data is present in skb->data (it could be in fragments).
 
-The previous version has built fine, but the declarations were moved to
-an internal header file, so I guess that EXPORT_SYMBOL on either of these
-functions would not be appropriate anymore.
+pskb_may_pull() both validates the length and pulls fragmented data
+into the linear buffer if necessary, making it safe to directly
+access skb->data.
 
-I must find an other solution.
+Reported-by: syzbot+5d8269a1e099279152bc@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=5d8269a1e099279152bc
+Fixes: f057bbb6f9ed ("net: em_canid: Ematch rule to match CAN frames according to their identifiers")
+Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+---
+v2: Use pskb_may_pull() instead of skb->len check to properly
+    handle fragmented skbs (Eric Dumazet)
+---
+ net/sched/em_canid.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Regards,
-Csaba
+diff --git a/net/sched/em_canid.c b/net/sched/em_canid.c
+index 5337bc462755..2214b548fab8 100644
+--- a/net/sched/em_canid.c
++++ b/net/sched/em_canid.c
+@@ -99,6 +99,9 @@ static int em_canid_match(struct sk_buff *skb, struct tcf_ematch *m,
+ 	int i;
+ 	const struct can_filter *lp;
+ 
++	if (!pskb_may_pull(skb, sizeof(canid_t)))
++		return 0;
++
+ 	can_id = em_canid_get_id(skb);
+ 
+ 	if (can_id & CAN_EFF_FLAG) {
+-- 
+2.34.1
 
 
