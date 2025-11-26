@@ -1,129 +1,406 @@
-Return-Path: <netdev+bounces-242076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A18C8C146
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 22:46:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCBEAC8C134
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 22:46:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D5DF934A7A7
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:46:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8E86F4E2245
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE1623195E6;
-	Wed, 26 Nov 2025 21:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 199032DC35C;
+	Wed, 26 Nov 2025 21:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="gg81uigJ"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="tHBmI425"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900B02E6CA0
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 21:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AECB1DFE26;
+	Wed, 26 Nov 2025 21:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764193569; cv=none; b=ILm6KCpS2SdIlbmX0gzPu8SOEkZOgpSFcEmNyQkFcynRJ32O/y62xANA1+PltaPOBkFHycH7pn3heQC1JT4q2z9ELw7DeNbx0nd1R+9QR4C22awG3x3dDJJwAQCySfhMdN2sfC2+8MRTzuAw/47mwGQdpya0L+UK0BbZ2hvqWOc=
+	t=1764193557; cv=none; b=ogcIzEZq5VL8gMCXm1nTVY/6+sAJiBvYVv3jF1ILZZUlG17maxhpUFdksU5dg2g9YS2SgntMuAHLbG9m0YtlG4nCXtGrAbxL1WzgZdkJg/LPCsLysR3KUOTRBrufBBVEeGtd8jeo+/myLiVkBgxJJ2AmHoJIa9DVxDybSbb9Gpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764193569; c=relaxed/simple;
-	bh=eHQD5ZWYTKJ5pBQ2l+KQFGoT1AEPijvyxf4X4cwZ+8g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TDRIgFaQIKgyO0/4uq/dP66r4vHN8rn2GApnRJgdLV23OqJIEgCtYgpDE5D1cRPPsZ0BmC8HZ3mJrPOh1ScQham4Hkd4N9qIVtqjEYSRhcuyJ5H/zoZdufVgbdsjmtqIWj8pCZgo+5ADbLtDI9olNpVP8Ub6fEwVt11eBNRFD/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=gg81uigJ; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b735b89501fso31603666b.0
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 13:46:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1764193565; x=1764798365; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DR4A76Dv8qf/+6WmZVEh6koqxlO2WxAmz56oNgGMFDY=;
-        b=gg81uigJukUZgFx4FvmiB0bv6phOBtZXCOc1OZOI1Sw0Kyh17cNG6dSYyM4q9oexY3
-         jb5DUOq1AuaiPZCkee2vJIKTQqW9bS1sTI1T0eVshE87LRyjmyKR1yLFvP3ESy2pFnTe
-         tCnKqBnmXCSj3OqG75M1AGnWdkLsBIkhg3EIU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764193565; x=1764798365;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DR4A76Dv8qf/+6WmZVEh6koqxlO2WxAmz56oNgGMFDY=;
-        b=IVWfPACqERQ5MUndUIkNNmj17e9w6wD1OBYqMDWKAY4Kopz/4ka5gV7SOm1wAK+9oM
-         iizTPDVa5GkwimyYFaaKtH/HeRWG7dQYpXXqOriZZDHvcoVb91tX1a85S19pHhnSdl34
-         EOlH6YIKyBLbFxH1jxtGwvRLCAqx8Ew+I5DvBQ0YvnXOjIPNZz3N3GuM/p689m4wcR0t
-         DI89QUCi1w5bllDqeZe3Rg4flY/iiLpCRfvfDv6gek958JcaBsIPZGFuAXYaFXxoAhYP
-         5SGefjFIO2vQroXyy7D+88f3wEWd2x/CHY9yppeBV07vA9I42oGP7KstGi/Ps4jV2HUg
-         b0Wg==
-X-Forwarded-Encrypted: i=1; AJvYcCWxYoOP4/6/VMVe1xyZSUYHQSG1oKNcwIeEkOVxozcnb9gNMCm6O7vfAtjuYqC1BaFHvdnWAJo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzV+W/jOTYVRLzF3anU5V9Y7LKzsA+KPee53jAy2ERF0M4rz87l
-	+DsoBzxC2sfWzsAfyG5t0JUKq6TFJNfwEHf61/L1fduQgYvhouBq36YxMO6nTeEefsP24G+us6y
-	vzKYizOvcPA==
-X-Gm-Gg: ASbGnct843gLI320+q3AED8SX51LwrMK7JfSNDAGKvgm/waUkvUdQc6ceVTzehyuLHU
-	rgjVIZjpcocQQqizxYYm3KNoxGOPx4/fmel7a4mXqjAna3vKrWY6DWcZb9cbsXHi1efMEB1PUfW
-	QamgMlGHUy8EoNr27JhNDmtUHP6pjrzTQRISlvwYDXaxfEPI3Y8BoAjSL2RZpK4GFh7ExYpU1aa
-	440noB48WR6zMOBYaCOSmRL9I9ME9iLoxbwVRiE4rdfFOE1FWWYCiGMvrr3l9ZsIHIJ3LfdLjKv
-	GKrke8lpzKOLvTdz4zA9Pg0n3hV/0MTdlKdNdR2YQxSnXtcRbjwOpWdz7YXGycqx9XhBUV0T8AL
-	6PTdcKCio97gXMgVjA76/1EUVtW2od4Msd8XauubKA+D8Ugno7fPdyn/rILxZwsZ1Vv9RoFG7gU
-	sLUIFa7LMHsqdPgSqwZKG+sefhkPSge3U7ogTR8DfVaF2RiXoly/ViCY4Nhk89
-X-Google-Smtp-Source: AGHT+IElwbqdcgpfXr8y6erfJDj+54wa5Y5n7pHkA2yeeXxMXnbJo4nn0XPKIAsZjltb8sH1axuQ3w==
-X-Received: by 2002:a17:907:7fa2:b0:b70:b3cb:3b30 with SMTP id a640c23a62f3a-b76c5595bb8mr870486566b.59.1764193564920;
-        Wed, 26 Nov 2025 13:46:04 -0800 (PST)
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com. [209.85.208.41])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7654cdd60csm1989894566b.3.2025.11.26.13.46.02
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Nov 2025 13:46:02 -0800 (PST)
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-64312565c10so445437a12.2
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 13:46:02 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXbLkDl/myIv8uHFc5W93qSpyJ6JJiwnO+d0yGws9fypOZIH2YbjafcR980C2ablqZk0MrjpXI=@vger.kernel.org
-X-Received: by 2002:a05:6402:13cb:b0:640:c454:e8 with SMTP id
- 4fb4d7f45d1cf-645eb2b7f7emr8102794a12.30.1764193562184; Wed, 26 Nov 2025
- 13:46:02 -0800 (PST)
+	s=arc-20240116; t=1764193557; c=relaxed/simple;
+	bh=HIJBYn+y0uxY+uSE6ubrC5jjUB7oLPb9BGNax91y7x8=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=raB9J0ZYS1H+ivsrcKjNGW7+N6UZN9RcJpZyrmvUwysyLnepBuR54/30z6YXvJ0U/KdIcFSQWzqSoqCMiqpmQna2j94sspujJ87bfkI+w8Y1MBLhUXire3UmwGMq1wslZx7uWd3OiFQgtB5FTPQaHCW3IF/WHIRSCkWWzr6lQIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=tHBmI425; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id CD017200E9DD; Wed, 26 Nov 2025 13:45:54 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CD017200E9DD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1764193554;
+	bh=eX09dQf92jA9bTIRhV2rsLKFlRPzmhb10VdoOdJtqCs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tHBmI425sHetfRWQvufq/YwVjGxHoqy0vSWCgvED1rsUnN4PHuaaqiSt93awQc6Yh
+	 efVGQasW0zUDseJ4IVNR+jk0Yu5PlhF1HUiozq9hgRjNdt4a/6aRlMyB98UUKldPsE
+	 LgCirMAq+ZREO+ZmKglP47lTCFS8RZExiwmSYl48=
+From: longli@linux.microsoft.com
+To: "K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Simon Horman <horms@kernel.org>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Erick Archer <erick.archer@outlook.com>,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Long Li <longli@microsoft.com>
+Subject: [Patch net-next v4] net: mana: Handle hardware recovery events when probing the device
+Date: Wed, 26 Nov 2025 13:45:52 -0800
+Message-Id: <1764193552-9712-1-git-send-email-longli@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251113005529.2494066-1-jon@nutanix.com> <CACGkMEtQZ3M-sERT2P8WV=82BuXCbBHeJX+zgxx+9X7OUTqi4g@mail.gmail.com>
- <E1226897-C6D1-439C-AB3B-012F8C4A72DF@nutanix.com> <CACGkMEuPK4=Tf3x-k0ZHY1rqL=2rg60-qdON8UJmQZTqpUryTQ@mail.gmail.com>
- <A0AFD371-1FA3-48F7-A259-6503A6F052E5@nutanix.com> <CACGkMEvD16y2rt+cXupZ-aEcPZ=nvU7+xYSYBkUj7tH=ER3f-A@mail.gmail.com>
- <121ABD73-9400-4657-997C-6AEA578864C5@nutanix.com> <CACGkMEtk7veKToaJO9rwo7UeJkN+reaoG9_XcPG-dKAho1dV+A@mail.gmail.com>
- <61102cff-bb35-4fe4-af61-9fc31e3c65e0@app.fastmail.com> <02B0FDF1-41D4-4A7D-A57E-089D2B69CEF2@nutanix.com>
- <32530984-cbaa-49e8-9c1e-34f04271538d@app.fastmail.com> <0D4EA459-C3E5-4557-97EB-17ABB4F817E5@nutanix.com>
-In-Reply-To: <0D4EA459-C3E5-4557-97EB-17ABB4F817E5@nutanix.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 26 Nov 2025 13:45:45 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wiEg3yO5znyPD+soCkVi_emP=wHrRZk2sv4VS768S3a2g@mail.gmail.com>
-X-Gm-Features: AWmQ_bkSLlyCoqZg3bYaZu1P_V2VILWs6lgJjJBJnYgDxxhAqc51xHDCsThFNYo
-Message-ID: <CAHk-=wiEg3yO5znyPD+soCkVi_emP=wHrRZk2sv4VS768S3a2g@mail.gmail.com>
-Subject: Re: [PATCH net-next] vhost: use "checked" versions of get_user() and put_user()
-To: Jon Kohler <jon@nutanix.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Jason Wang <jasowang@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, Netdev <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>, 
-	Sean Christopherson <seanjc@google.com>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <linux@armlinux.org.uk>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Krzysztof Kozlowski <krzk@kernel.org>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Drew Fustini <fustini@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, 26 Nov 2025 at 13:43, Jon Kohler <jon@nutanix.com> wrote:
->
-> Linus mentioned he might get into the mix and do a bulk
-> change and kill the whole thing once and for all, so I=E2=80=99m
-> simply trying to help knock an incremental amount of work
-> off the pile in advance of that (and reap some performance
-> benefits at the same time, at least on the x86 side).
+From: Long Li <longli@microsoft.com>
 
-So I'm definitely going to do some bulk conversion at some point, but
-honestly, I'll be a lot happier if most users already self-converted
-before that, and I only end up doing a "convert unmaintained old code
-that nobody really cares about".
+When MANA is being probed, it's possible that hardware is in recovery
+mode and the device may get GDMA_EQE_HWC_RESET_REQUEST over HWC in the
+middle of the probe. Detect such condition and go through the recovery
+service procedure.
 
-                  Linus
+Signed-off-by: Long Li <longli@microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+---
+Changes
+v2: Use a list for handling multiple devices.
+    Use disable_delayed_work_sync() on driver exit.
+    Replace atomic_t with flags to detect if interrupt happens before probe finishes
+
+v3: Rebase to latest net-next. Change list_for_each_entry_safe() to while(!list_empty()).
+
+v4: Remove "Fixes:" tag.
+
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 176 ++++++++++++++++--
+ include/net/mana/gdma.h                       |  12 +-
+ 2 files changed, 170 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 8fd70b34807a..efb4e412ec7e 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -15,6 +15,20 @@
+ 
+ struct dentry *mana_debugfs_root;
+ 
++struct mana_dev_recovery {
++	struct list_head list;
++	struct pci_dev *pdev;
++	enum gdma_eqe_type type;
++};
++
++static struct mana_dev_recovery_work {
++	struct list_head dev_list;
++	struct delayed_work work;
++
++	/* Lock for dev_list above */
++	spinlock_t lock;
++} mana_dev_recovery_work;
++
+ static u32 mana_gd_r32(struct gdma_context *g, u64 offset)
+ {
+ 	return readl(g->bar0_va + offset);
+@@ -387,6 +401,25 @@ EXPORT_SYMBOL_NS(mana_gd_ring_cq, "NET_MANA");
+ 
+ #define MANA_SERVICE_PERIOD 10
+ 
++static void mana_serv_rescan(struct pci_dev *pdev)
++{
++	struct pci_bus *parent;
++
++	pci_lock_rescan_remove();
++
++	parent = pdev->bus;
++	if (!parent) {
++		dev_err(&pdev->dev, "MANA service: no parent bus\n");
++		goto out;
++	}
++
++	pci_stop_and_remove_bus_device(pdev);
++	pci_rescan_bus(parent);
++
++out:
++	pci_unlock_rescan_remove();
++}
++
+ static void mana_serv_fpga(struct pci_dev *pdev)
+ {
+ 	struct pci_bus *bus, *parent;
+@@ -419,9 +452,12 @@ static void mana_serv_reset(struct pci_dev *pdev)
+ {
+ 	struct gdma_context *gc = pci_get_drvdata(pdev);
+ 	struct hw_channel_context *hwc;
++	int ret;
+ 
+ 	if (!gc) {
+-		dev_err(&pdev->dev, "MANA service: no GC\n");
++		/* Perform PCI rescan on device if GC is not set up */
++		dev_err(&pdev->dev, "MANA service: GC not setup, rescanning\n");
++		mana_serv_rescan(pdev);
+ 		return;
+ 	}
+ 
+@@ -440,9 +476,18 @@ static void mana_serv_reset(struct pci_dev *pdev)
+ 
+ 	msleep(MANA_SERVICE_PERIOD * 1000);
+ 
+-	mana_gd_resume(pdev);
++	ret = mana_gd_resume(pdev);
++	if (ret == -ETIMEDOUT || ret == -EPROTO) {
++		/* Perform PCI rescan on device if we failed on HWC */
++		dev_err(&pdev->dev, "MANA service: resume failed, rescanning\n");
++		mana_serv_rescan(pdev);
++		goto out;
++	}
+ 
+-	dev_info(&pdev->dev, "MANA reset cycle completed\n");
++	if (ret)
++		dev_info(&pdev->dev, "MANA reset cycle failed err %d\n", ret);
++	else
++		dev_info(&pdev->dev, "MANA reset cycle completed\n");
+ 
+ out:
+ 	gc->in_service = false;
+@@ -454,18 +499,9 @@ struct mana_serv_work {
+ 	enum gdma_eqe_type type;
+ };
+ 
+-static void mana_serv_func(struct work_struct *w)
++static void mana_do_service(enum gdma_eqe_type type, struct pci_dev *pdev)
+ {
+-	struct mana_serv_work *mns_wk;
+-	struct pci_dev *pdev;
+-
+-	mns_wk = container_of(w, struct mana_serv_work, serv_work);
+-	pdev = mns_wk->pdev;
+-
+-	if (!pdev)
+-		goto out;
+-
+-	switch (mns_wk->type) {
++	switch (type) {
+ 	case GDMA_EQE_HWC_FPGA_RECONFIG:
+ 		mana_serv_fpga(pdev);
+ 		break;
+@@ -475,12 +511,48 @@ static void mana_serv_func(struct work_struct *w)
+ 		break;
+ 
+ 	default:
+-		dev_err(&pdev->dev, "MANA service: unknown type %d\n",
+-			mns_wk->type);
++		dev_err(&pdev->dev, "MANA service: unknown type %d\n", type);
+ 		break;
+ 	}
++}
++
++static void mana_recovery_delayed_func(struct work_struct *w)
++{
++	struct mana_dev_recovery_work *work;
++	struct mana_dev_recovery *dev;
++	unsigned long flags;
++
++	work = container_of(w, struct mana_dev_recovery_work, work.work);
++
++	spin_lock_irqsave(&work->lock, flags);
++
++	while (!list_empty(&work->dev_list)) {
++		dev = list_first_entry(&work->dev_list,
++				       struct mana_dev_recovery, list);
++		list_del(&dev->list);
++		spin_unlock_irqrestore(&work->lock, flags);
++
++		mana_do_service(dev->type, dev->pdev);
++		pci_dev_put(dev->pdev);
++		kfree(dev);
++
++		spin_lock_irqsave(&work->lock, flags);
++	}
++
++	spin_unlock_irqrestore(&work->lock, flags);
++}
++
++static void mana_serv_func(struct work_struct *w)
++{
++	struct mana_serv_work *mns_wk;
++	struct pci_dev *pdev;
++
++	mns_wk = container_of(w, struct mana_serv_work, serv_work);
++	pdev = mns_wk->pdev;
++
++	if (pdev)
++		mana_do_service(mns_wk->type, pdev);
+ 
+-out:
+ 	pci_dev_put(pdev);
+ 	kfree(mns_wk);
+ 	module_put(THIS_MODULE);
+@@ -541,6 +613,17 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
+ 	case GDMA_EQE_HWC_RESET_REQUEST:
+ 		dev_info(gc->dev, "Recv MANA service type:%d\n", type);
+ 
++		if (!test_and_set_bit(GC_PROBE_SUCCEEDED, &gc->flags)) {
++			/*
++			 * Device is in probe and we received a hardware reset
++			 * event, the probe function will detect that the flag
++			 * has changed and perform service procedure.
++			 */
++			dev_info(gc->dev,
++				 "Service is to be processed in probe\n");
++			break;
++		}
++
+ 		if (gc->in_service) {
+ 			dev_info(gc->dev, "Already in service\n");
+ 			break;
+@@ -1938,8 +2021,19 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (err)
+ 		goto cleanup_mana;
+ 
++	/*
++	 * If a hardware reset event has occurred over HWC during probe,
++	 * rollback and perform hardware reset procedure.
++	 */
++	if (test_and_set_bit(GC_PROBE_SUCCEEDED, &gc->flags)) {
++		err = -EPROTO;
++		goto cleanup_mana_rdma;
++	}
++
+ 	return 0;
+ 
++cleanup_mana_rdma:
++	mana_rdma_remove(&gc->mana_ib);
+ cleanup_mana:
+ 	mana_remove(&gc->mana, false);
+ cleanup_gd:
+@@ -1963,6 +2057,35 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ disable_dev:
+ 	pci_disable_device(pdev);
+ 	dev_err(&pdev->dev, "gdma probe failed: err = %d\n", err);
++
++	/*
++	 * Hardware could be in recovery mode and the HWC returns TIMEDOUT or
++	 * EPROTO from mana_gd_setup(), mana_probe() or mana_rdma_probe(), or
++	 * we received a hardware reset event over HWC interrupt. In this case,
++	 * perform the device recovery procedure after MANA_SERVICE_PERIOD
++	 * seconds.
++	 */
++	if (err == -ETIMEDOUT || err == -EPROTO) {
++		struct mana_dev_recovery *dev;
++		unsigned long flags;
++
++		dev_info(&pdev->dev, "Start MANA recovery mode\n");
++
++		dev = kzalloc(sizeof(*dev), GFP_KERNEL);
++		if (!dev)
++			return err;
++
++		dev->pdev = pci_dev_get(pdev);
++		dev->type = GDMA_EQE_HWC_RESET_REQUEST;
++
++		spin_lock_irqsave(&mana_dev_recovery_work.lock, flags);
++		list_add_tail(&dev->list, &mana_dev_recovery_work.dev_list);
++		spin_unlock_irqrestore(&mana_dev_recovery_work.lock, flags);
++
++		schedule_delayed_work(&mana_dev_recovery_work.work,
++				      secs_to_jiffies(MANA_SERVICE_PERIOD));
++	}
++
+ 	return err;
+ }
+ 
+@@ -2067,6 +2190,10 @@ static int __init mana_driver_init(void)
+ {
+ 	int err;
+ 
++	INIT_LIST_HEAD(&mana_dev_recovery_work.dev_list);
++	spin_lock_init(&mana_dev_recovery_work.lock);
++	INIT_DELAYED_WORK(&mana_dev_recovery_work.work, mana_recovery_delayed_func);
++
+ 	mana_debugfs_root = debugfs_create_dir("mana", NULL);
+ 
+ 	err = pci_register_driver(&mana_driver);
+@@ -2080,6 +2207,21 @@ static int __init mana_driver_init(void)
+ 
+ static void __exit mana_driver_exit(void)
+ {
++	struct mana_dev_recovery *dev;
++	unsigned long flags;
++
++	disable_delayed_work_sync(&mana_dev_recovery_work.work);
++
++	spin_lock_irqsave(&mana_dev_recovery_work.lock, flags);
++	while (!list_empty(&mana_dev_recovery_work.dev_list)) {
++		dev = list_first_entry(&mana_dev_recovery_work.dev_list,
++				       struct mana_dev_recovery, list);
++		list_del(&dev->list);
++		pci_dev_put(dev->pdev);
++		kfree(dev);
++	}
++	spin_unlock_irqrestore(&mana_dev_recovery_work.lock, flags);
++
+ 	pci_unregister_driver(&mana_driver);
+ 
+ 	debugfs_remove(mana_debugfs_root);
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index a4cf307859f8..eaa27483f99b 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -382,6 +382,10 @@ struct gdma_irq_context {
+ 	char name[MANA_IRQ_NAME_SZ];
+ };
+ 
++enum gdma_context_flags {
++	GC_PROBE_SUCCEEDED	= 0,
++};
++
+ struct gdma_context {
+ 	struct device		*dev;
+ 	struct dentry		*mana_pci_debugfs;
+@@ -430,6 +434,8 @@ struct gdma_context {
+ 	u64 pf_cap_flags1;
+ 
+ 	struct workqueue_struct *service_wq;
++
++	unsigned long		flags;
+ };
+ 
+ static inline bool mana_gd_is_mana(struct gdma_dev *gd)
+@@ -600,6 +606,9 @@ enum {
+ /* Driver can send HWC periodically to query stats */
+ #define GDMA_DRV_CAP_FLAG_1_PERIODIC_STATS_QUERY BIT(21)
+ 
++/* Driver can handle hardware recovery events during probe */
++#define GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY BIT(22)
++
+ #define GDMA_DRV_CAP_FLAGS1 \
+ 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
+@@ -611,7 +620,8 @@ enum {
+ 	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
+ 	 GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE | \
+ 	 GDMA_DRV_CAP_FLAG_1_PERIODIC_STATS_QUERY | \
+-	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE)
++	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE | \
++	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+-- 
+2.43.0
+
 
