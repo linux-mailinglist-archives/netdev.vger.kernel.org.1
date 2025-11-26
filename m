@@ -1,251 +1,137 @@
-Return-Path: <netdev+bounces-241993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBE7C8B73E
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 19:35:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277DFC8B795
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 19:44:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 292D7345E4D
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:35:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAA4F3A2662
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158CF286400;
-	Wed, 26 Nov 2025 18:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26C730C605;
+	Wed, 26 Nov 2025 18:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TBGkIfMn"
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="kxMmI0Yg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE542248AE;
-	Wed, 26 Nov 2025 18:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D942278E53
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 18:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764182140; cv=none; b=tHj2ZhNZm+2OLadvkPlDh29ErtnV9kvVv5XfeYLrqn8A1WZtWmfZMPqS8Q9D8DF9tuy/63trKMzyp3+g+rhS2nQS94UOdB0F/YsZcM5trsEIsuonIH+8PWlWSlViYh2G6YPZfd2Hc3Pit0sjrBs/smEJ/33xylUHFBSfiI1cLA8=
+	t=1764182684; cv=none; b=XffNItQhYDwgt1DT33u/sd3x9LiIP/KJ9/SW/0vx9qIzxm/fN2BMohRD0/Ti4VzW1Qi+jP+elN8Epz6sw7vEcoH61Dl/vwx1EBh7aSdE1ALXSXBG5jmnwfBvwnHD1sPWxJKo6aLiYzeIbtjD5PWJvO6umyp4uK9Mx1qQU6aNg9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764182140; c=relaxed/simple;
-	bh=oTaJfHnKsmK6inQoltB8x3WChksALN+IW6Kq2p4t8P8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=e3c8kb0KSHPMKWMiBNF/G3BOZ5JrXI9ghUYyMWNlb9d2X9vTDwoxER6P5ZY0u9OCXyKp33QuMmApDo+a+JZ32+Z6tAuTLqkeSO1ZHe77ZyOg3mrI/IURlAncf+TmjzVbQ7viBRJxngEeRy0MS5P0fors0qbbIRvvZVq+tZpV8eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TBGkIfMn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15B8AC4CEF7;
-	Wed, 26 Nov 2025 18:35:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764182139;
-	bh=oTaJfHnKsmK6inQoltB8x3WChksALN+IW6Kq2p4t8P8=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=TBGkIfMn6szVeVn2AuROOCU8qv8ps8NCC0q66qob7yBtbmFnTvG9VK7H61gpzst7N
-	 YdgOlu4/HbUNxd0CAVxhIZ/S59Xh4qkZ1M03PN+9olXhbG5FICB7U0PUBAz6gcmuMh
-	 uUiCQyO0/NCay3OLu5DJd4+4npO0RufzU0GtLScJYDU7YE0AH40KsaEGJ2UyvlVCXg
-	 +eZO+4rwx2RhZsOTKbhfsug8qtv2GDEvy5GRgkRYE7czt0rZXk3TNFHAQkWrSGyepv
-	 Xz47jhzjpWWJp4m6tvrNS3x8cNSUNxDnQP38Aodk0a26smRyc4+T05k3137jGHGN7K
-	 5rsxcg2ba6B0g==
-Message-ID: <7f1e56067bdc46195a9e36f914aa103dc76d4f7f.camel@kernel.org>
-Subject: Re: [PATCH v21 15/23] sfc: get endpoint decoder
-From: PJ Waskiewicz <ppwaskie@kernel.org>
-To: Alejandro Lucero Palau <alucerop@amd.com>,
- alejandro.lucero-palau@amd.com, 	linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, 	edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, dave.jiang@intel.com
-Cc: Martin Habets <habetsm.xilinx@gmail.com>, Edward Cree
-	 <ecree.xilinx@gmail.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
- Ben Cheatham <benjamin.cheatham@amd.com>
-Date: Wed, 26 Nov 2025 10:35:38 -0800
-In-Reply-To: <34f7771f-7d6d-4bfd-9212-889433d80b4c@amd.com>
-References: <20251119192236.2527305-1-alejandro.lucero-palau@amd.com>
-	 <20251119192236.2527305-16-alejandro.lucero-palau@amd.com>
-	 <4aab1857efeaf2888b1c85cbac1fc5c8fc5c8cbc.camel@kernel.org>
-	 <34f7771f-7d6d-4bfd-9212-889433d80b4c@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
+	s=arc-20240116; t=1764182684; c=relaxed/simple;
+	bh=aohXC9EG90drxXkDwxAg88OpJ3K2oR6SDTPHxVxJOsc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pN71UPXiPYpXfKus8ZPX31NeuZelSMNtO3Q5HroDKNyHiRGl1zer9bLFHbypG4ssxETs95ftVs8+6q2uNQ87c4lNWJ2gbrXfsL/x18k/MhQaPHqNuDjQAIi++qL+NLs5g6TtkFdv345h7ljILACy60HnprL3E18R18bKC4P9zs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=kxMmI0Yg; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=runbox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <david.laight@runbox.com>)
+	id 1vOKVI-00AJ0W-Up; Wed, 26 Nov 2025 19:44:36 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
+	 s=selector1; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
+	References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date;
+	bh=jISugL4FXWcXTSUyi4aKYZq7sevZjSy4HXep8d5DTJ8=; b=kxMmI0YgN2+PyBaquv+Ukrgl8Z
+	Cv8s+PrSi5xIvrH5k19JxarZPJifAMMDX2z5wa8g0ZdkoNg+r3XgbvY8aqheFEnxitwV1zDZ3hak0
+	yQ518PI8hnIvjvUFgHybSEH28lSJcwKXbWKL6rSY53PxRhO6y/5vrTXPWPmiV7WjhG+sG2wbZ7c1L
+	0GIorhee0Es/w3t4VMEncGtBGPwTDlXuKI8dn4bO9R6nmTYCn6mqd17A9G8IedHKndpnFGb5fvGNH
+	8dGCtsCKaE0dm09SFt5YFQspgd5006q8q6f3O1ztT5+pvT2sv+WU8YWIvmXHklwaPXiKFXRX2eYW2
+	NZEJHlcg==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <david.laight@runbox.com>)
+	id 1vOKVI-0006dO-0r; Wed, 26 Nov 2025 19:44:36 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vOKUz-00ELuo-Du; Wed, 26 Nov 2025 19:44:17 +0100
+Date: Wed, 26 Nov 2025 18:44:15 +0000
+From: david laight <david.laight@runbox.com>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: ipconfig: Replace strncpy with
+ strscpy_pad in ic_proto_name
+Message-ID: <20251126184415.28f7fdc2@pumpkin>
+In-Reply-To: <B7B14C9F-C63B-4278-AA3F-12618681482A@linux.dev>
+References: <20251126111358.64846-1-thorsten.blum@linux.dev>
+	<20251126135042.06c1422b@pumpkin>
+	<B7B14C9F-C63B-4278-AA3F-12618681482A@linux.dev>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Alejandro,
+On Wed, 26 Nov 2025 15:45:50 +0100
+Thorsten Blum <thorsten.blum@linux.dev> wrote:
 
-On Wed, 2025-11-26 at 09:09 +0000, Alejandro Lucero Palau wrote:
->=20
-> On 11/26/25 01:27, PJ Waskiewicz wrote:
-> > Hi Alejandro,
-> >=20
-> > On Wed, 2025-11-19 at 19:22 +0000, alejandro.lucero-palau@amd.com
-> > wrote:
-> > > From: Alejandro Lucero <alucerop@amd.com>
-> > >=20
-> > > Use cxl api for getting DPA (Device Physical Address) to use
-> > > through
-> > > an
-> > > endpoint decoder.
-> > >=20
-> > > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> > > Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
-> > > Acked-by: Edward Cree <ecree.xilinx@gmail.com>
-> > > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> > > Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
-> > > Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> > > ---
-> > > =C2=A0=C2=A0drivers/net/ethernet/sfc/efx_cxl.c | 12 +++++++++++-
-> > > =C2=A0=C2=A01 file changed, 11 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/drivers/net/ethernet/sfc/efx_cxl.c
-> > > b/drivers/net/ethernet/sfc/efx_cxl.c
-> > > index d7c34c978434..1a50bb2c0913 100644
-> > > --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> > > +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> > > @@ -108,6 +108,14 @@ int efx_cxl_init(struct efx_probe_data
-> > > *probe_data)
-> > > =C2=A0=C2=A0		return -ENOSPC;
-> > > =C2=A0=C2=A0	}
-> > > =C2=A0=20
-> > > +	cxl->cxled =3D cxl_request_dpa(cxl->cxlmd,
-> > > CXL_PARTMODE_RAM,
-> > > +				=C2=A0=C2=A0=C2=A0=C2=A0 EFX_CTPIO_BUFFER_SIZE);
-> > I've been really struggling to get this flow working in my
-> > environment.
-> > The above function call has a call-chain like this:
-> >=20
-> > - cxl_request_dpa()
-> > =C2=A0=C2=A0 =3D> cxl_dpa_alloc()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D> __cxl_dpa_alloc()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D> __cxl_dpa_reserve=
-()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D>=
- __request_region()
-> >=20
-> > That last call to __request_region() is not handling a Type2 device
-> > that has its mem region defined as EFI Special Purpose memory.
-> > Basically if the underlying hardware has the memory region marked
-> > that
-> > way, it's still getting mapped into the host's physical address
-> > map,
-> > but it's explicitly telling the OS to bugger off and not try to map
-> > it
-> > as system RAM, which is what we want. Since this is being used as
-> > an
-> > acceleration path, we don't want the OS to muck about with it.
-> >=20
-> > The issue here is now that I have to build CXL into the kernel
-> > itself
-> > to get around the circular dependency issue with depmod, I see this
-> > when my kernel boots and the device trains, but *before* my driver
-> > loads:
-> >=20
-> > # cat /proc/iomem
-> > [...snip...]
-> > c050000000-c08fffffff : CXL Window 0
-> > =C2=A0=C2=A0 c050000000-c08fffffff : Soft Reserved
-> >=20
-> > That right there is my device.=C2=A0 And it's being presented correctly
-> > that
-> > it's reserved so the OS doesn't mess with it.=C2=A0 However, that call
-> > to
-> > __request_region() fails with -EBUSY since it can't take ownership
-> > of
-> > that region since it's already owned by the core.
-> >=20
-> > I can't just skip over this flow for DPA init, so I'm at a bit of a
-> > loss how to proceed.=C2=A0 How is your device presenting the .mem regio=
-n
-> > to
-> > the host?
->=20
->=20
-> Hi PJ,
->=20
->=20
-> My work is based on the device not using EFI_CONVENTIONAL_MEMORY +=20
-> EFI_MEMORY_SP but EFI_RESERVED_TYPE. In the first case the kernel can
-> try to use that memory and the BIOS goes through default
-> initialization,=20
+> On 26. Nov 2025, at 14:50, david laight wrote:
+> > On Wed, 26 Nov 2025 12:13:58 +0100
+> > Thorsten Blum <thorsten.blum@linux.dev> wrote:
+> >   
+> >> strncpy() is deprecated [1] for NUL-terminated destination buffers since
+> >> it does not guarantee NUL termination. Replace it with strscpy_pad() to
+> >> ensure NUL termination of the destination buffer while retaining the
+> >> NUL-padding behavior of strncpy().
+> >> 
+> >> Even though the identifier buffer has 252 usable bytes, strncpy()
+> >> intentionally copied only 251 bytes into the zero-initialized buffer,
+> >> implicitly relying on the last byte to act as the terminator. Switching
+> >> to strscpy_pad() removes the need for this trick and avoids using magic
+> >> numbers.
+> >> 
+> >> The source string is also NUL-terminated and satisfies the
+> >> __must_be_cstr() requirement of strscpy_pad().
+> >> 
+> >> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> >> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> >> ---
+> >> [...]  
+> > 
+> > Wrong change...
+> > There is no reason to pad the destination, and the correct alternative  
+> 
+> I agree, padding isn't necessary and strscpy() is enough.
+> 
+> > is to bound 'v - client_id' and then use memcpy().
+> > Then you don't need to modify the input buffer.  
+> 
+> Just to confirm - this comment is about the type parsing ('client_id'
+> before the comma), not about copying the value after the comma, right?
 
-I'm not sure I follow.  Your device is based on using
-EFI_RESERVED_TYPE?  Or is it based on the former?  My device is based
-on EFI_RESERVED_TYPE, which translates into the Soft Reserved status as
-a result of BIOS enumeration and the CXL core enumerating that memory
-resource.
+I've misread the code :-(
+Probably because it should be:
+static struct {
+	u8	type;
+	char	value[252]
+} dhcp_client_identifier;
 
-> the latter will avoid BIOS or kernel to mess with such a memory.
-> Because=20
-> there is no BIOS yet supporting this I had to remove DAX support from
-> the kernel and deal (for testing) with some BIOS initialization we
-> will=20
-> not have in production.
+There are also better conversion routines than kstrtou8().
+You really want one that returns the address of the failing character.
+Then the parsing would be easier to follow and wouldn't need to write
+to the buffer.
 
-Can you elaborate what you mean here?  Do you mean the proposed patches
-here are trying to work around this BIOS limitation?
+	David
 
-I'm not sure I understand what BIOS limitations you mean though.  I see
-on both an AMD and Intel host (CXL 2.0-capable) the same behavior that
-I'd expect of EFI_RESERVED_TYPE getting set aside so the OS doesn't
-mess with it.  This is on CRB-level stuff plus production-level
-platforms.
 
->=20
->=20
-> For your case I thought this work=20
-> https://lore.kernel.org/linux-cxl/20251120031925.87762-1-Smita.Koralahall=
-iChannabasappa@amd.com/T/#me2bc0d25a2129993e68df444aae073addf886751
-> =C2=A0
-> was solving your problem but after looking at it now, I think that
-> will=20
-> only be useful for Type3 and the hotplug case. Maybe it is time to
-> add=20
-> Type2 handling there. I'll study that patchset with more detail and=20
-> comment for solving your case.
+> 
+> Thanks,
+> Thorsten
+> 
+> 
 
-I just looked through that, and I might be able to cherry-pick some
-stuff.  I'll do the same offline and see if I can come up with a
-workable solution to get past this wall for now.
-
-That said though, I don't really want or care about DAX.  I can already
-find and map the underlying CXL.mem accelerated region through other
-means (RCRB, DVSEC, etc.).
-
-What I'm trying to do is get the regionX object to instantiate on my
-CXL.mem memory block, so that I can remove the region, ultimately
-tearing down the decoders, and allowing me to hotplug the device.  The
-patches here seem to still assume a Type3-ish device where there's DPA
-needing to get mapped into HPA, which our devices are already allocated
-in the decoders due to the EFI_RESERVED_TYPE enumeration.  But the
-patches aren't seeing that firmware already set them up, since the
-decoders haven't been committed yet.
-
-My root decoder has 1GB of space, which is the size of my endpoint
-device's memory size (1GB).  There is no DPA to map, and the HPA
-already appears "full" since the device is already configured in the
-decoder.
-
-TL;DR: if your device you're testing with presents the CXL.mem region
-as EFI_RESERVED_TYPE, I don't see how these patches are working.=20
-Unless you're doing something extra outside of the patches, which isn't
-obvious to me.
-
->=20
->=20
-> FWIW, last year in Vienna I raised the concern of the kernel doing=20
-> exactly what you are witnessing, and I proposed having a way for
-> taking=20
-> the device/memory from DAX but I was told unanimously that was not=20
-> necessary and if the BIOS did the wrong thing, not fixing that in the
-> kernel. In hindsight I would say this conflict was not well
-> understood=20
-> then (me included) with all the details, so maybe it is time to have=20
-> this capacity, maybe from user space or maybe specific kernel param=20
-> triggering the device passing from DAX.
-
-I do recall this.  Unfortunately I brought up similar concerns way back
-in Dublin in 2021 regarding all of this flow well before 2.0-capable
-hosts arrived.  I think I started asking the questions way too early,
-since this was of little to no concern at the time (nor was Type2
-device support).
-
-Cheers,
--PJ
 
