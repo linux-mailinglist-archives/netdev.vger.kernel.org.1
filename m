@@ -1,136 +1,110 @@
-Return-Path: <netdev+bounces-241772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50376C880AE
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 05:21:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 134D4C880C3
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 05:22:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A6B17353C2A
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 04:21:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF1F33A53C4
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 04:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50F53112D3;
-	Wed, 26 Nov 2025 04:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872F3301027;
+	Wed, 26 Nov 2025 04:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wq8STw7I"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XekQ2wZo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA811D6187
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 04:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9AE2248B3
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 04:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764130870; cv=none; b=R+NDFYVbEEFK7oLMy2r+UocEJxCNG0Av+bcGaVyMqs0mcSBpRjxkdKYy/qqqinKm+hJmZbGWxcLLjMUH/GB1qhilI/35TIDgz+NpDW1JWl/hhOiq/dKpvBLmlTlddIgHLp41dNX1vre2LbO1QUcJtWl4A0bZyjPZG9/Wib3DVno=
+	t=1764130964; cv=none; b=H0yC7KacnLIYCF5G6wJ0FGjNC+6BMh0+0Xh6jQjQ3RhmHEDfG1OeGkKxUHsQDshXG+MDsAapVkSaVzonqj02SMIY3hXky6Bd5Wci7Pr1prSiKsLVazozvfiHugeBv9By+e0m0sHLiYDIdDi8ZLLMq+bPt1S3FcwocxguqWv+9D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764130870; c=relaxed/simple;
-	bh=BkFlPk3+5nub7BZCjBNabDJurWqy94KOOmIC0GDOFag=;
+	s=arc-20240116; t=1764130964; c=relaxed/simple;
+	bh=RhGkATIBjHuKXg8BuLK/jvXD5X8qLYcsuE5rRk4MnA4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UCHjwEFJJst5EfPVb7eZbP+V7bqDri4uVOkIqZZStdOcE6a8vun2KOAc2//7SO2s9auTP2QLDa/XLOmbqaqJEiiQ5UceUYdu6C9QxRM6RzF3rFq33exFKnkyqBKnal8MIcwPM/gGNpfySJ9nktagY8gHBKgwdEXlwlIgnt8pVtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wq8STw7I; arc=none smtp.client-ip=209.85.219.48
+	 To:Cc:Content-Type; b=JX5Eq4mejPLgw86g2rZkIz/XV4reGZVKxp+AbVUB4wS5pKD3/PWipL4r58GijxjX2m9PGEGhjdL0a6PSMoLnEn0FyumaWP/w4vjPioGGBwKOV6f/Fu0LmsR3Y1MecZZOq877RACMeMg32kCd1eXbOoSaW87KVwWIc4ZaiRo0/Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XekQ2wZo; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-88244d1559eso5432106d6.0
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 20:21:07 -0800 (PST)
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ee19b1fe5dso80733011cf.0
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 20:22:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764130867; x=1764735667; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1764130962; x=1764735762; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v0WQSgW99+CubhdNpwBhumDm/WkmkjO1MJpCA99Mtzw=;
-        b=wq8STw7IyUGWcGrc7dw3Gva1AS9pA2QBZhFX9gr/KZSVZVFOR5fJovp1KAggojgETd
-         vQNr/alcRgVbDzGzRMtHkmD4hjKnJBt4tVxpInqaKcHJfQV8dwaCZEuWp++PCXBEqrBU
-         orq24O9sLQrPYa51CQVJfsRc/AqW28bo4o/qInpsBUECxq7zr6BI8qwMhRfzTemaQ4d4
-         Z0PsX2hW9mKsT131+wTT/hQxfCbzAcf7wEd/+kKrsYt0VSgaGic0Ln58gb1MwnP91Vzj
-         pMM2jKLu4SNefx6nmZK5Z9bSirqb/9G4yPQ1jfjqiNsiJrcX+zxyoGto8r5va/m7YX/6
-         Ed4w==
+        bh=RhGkATIBjHuKXg8BuLK/jvXD5X8qLYcsuE5rRk4MnA4=;
+        b=XekQ2wZoAXxTWAMEVTM2MqGqrgyWRZvXpS89qTevFEs+P0h3NLIRey/JoAzi/U8vqq
+         YGi4SHpbLQV2KFaC5nxj/31TJHxaCxVuxRrOvN5iKcKuavCFJ4AnJ3ZbI5MHHVGrg8cd
+         Bdc2+8Wok+Cb+0NZOg6mKNyH/mKTyKOeM1lkBJPGJjvfNdCvnU2IobfQd0QrE0lN9VsS
+         wpIqD2cpjIqQBtx2ImpyPXYBijh3VLWlciaQu1s4q1xcauVDhohFvyKKrqLMiwJJw3Ah
+         KfadpD9oULYgBJhsjVA6MgABP3sW/HQ9nSAw3gl0h7EEpLhise5PT/vOA3q0PDEQvG96
+         ZeAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764130867; x=1764735667;
+        d=1e100.net; s=20230601; t=1764130962; x=1764735762;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=v0WQSgW99+CubhdNpwBhumDm/WkmkjO1MJpCA99Mtzw=;
-        b=hWxO0kZpfYjt9dR4ug2nbTus71G2TtKs72Grdwg+TaJynvBWXHIxYvKKAVFscRQ/mW
-         1ieGmxaY3CYXIOTpSo65W2S2u9ZuOWeGxcGwQ9syJGVmFzUG1rDhgLdURoePr7pVYcO5
-         jkeRjbVP1yNakzK3KCCAnV0QKahVL0NRJg/OQqYekuhaAgFUgvhdTHhUlpn+bmO71nRN
-         lr4tv1ap2kcmZpeDciRolvVmgGTLIbzNn094/kQkYvokE7pV1dF4VdYKoBvKvo3zl5eg
-         8hHgZskL4YLO5WIfbieF4eh1FrRDFEOv556balhPSNl7cwsDv7k3Jz3aQ/wW6QLbW8YT
-         u1nw==
-X-Forwarded-Encrypted: i=1; AJvYcCWtlmbYdLn5shkKbT7WdQ1uVHBYiSqoReIvZXQU83sVobsI9uBvZRMhIGIA2G09noljCK4wF04=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwPOMMGO+0tKNraO4exa5zwEarXUkGQ/Qh5I+OJ8b14auz4/Un
-	zyb1/hMqjBRmlFWZLyGXRD9/lVfXhTnV+fXfLRXG9MelzDiqwoEe0IHC4TFTZwJa5xK238v+nE7
-	vvTn7A/TZ426cuS+I7VJXYlJBHKbM2V9jLchbO8PL
-X-Gm-Gg: ASbGncvrUDriW7KRBnbbREKWaaS9+By3RtdVVBa0wdNBzWa+/gZ2nPds+lR8OFVqjjd
-	pKaGRDO3cgGhtF4UsSC1MH1BFrwsSyl47rRM1wGSpwkwDfzAdeXdGQMhoicTMVpfaZDTuTH1OcH
-	z6py3pEnxfMhH/k2qTt8t2jVekWgRx3jGeLkgJaN5bvC5kgohm7uFfXW1zVim0RHAIrWgu1ofSF
-	5b1x1JrjOdvT1TgCGPdJaupvVBEH9Ayrsm1WD1qJk7uaiu2QjSP4vybhlvOvGFm7BvAww==
-X-Google-Smtp-Source: AGHT+IFleJTwznfh7QMv/AG0SGTuwrxVYkRp6eELQGLLc5UcBUyDg99Mf3CPsqqX8gWPb5Hu4F4A9V54ZvoAbPtY+Wg=
-X-Received: by 2002:a05:6214:2404:b0:880:5883:4d24 with SMTP id
- 6a1803df08f44-8847c45daf6mr255046516d6.9.1764130866514; Tue, 25 Nov 2025
- 20:21:06 -0800 (PST)
+        bh=RhGkATIBjHuKXg8BuLK/jvXD5X8qLYcsuE5rRk4MnA4=;
+        b=REDMH3oXtf9cHnHmpyEdHnuqcT8O9vYEh/Hn8V3gpjir1lxIdQLCPtZsx6SRFrCXKU
+         8MbaLb5BkfN37/jpJ66gNYMbMq+SRK5Zblim5qD5aQNw2pVJypSNtnRuzE36F7ghj2bd
+         F0Cv8KkYwMQaAsOZQyO/tBJ00vMxndoYiiBMMEv8OrpejKvX4/F1Z6ylKrLkfJgVgEav
+         f2wKLpNYdyDhdfX4LLiOIda0zqBttr21fnEaQ++gv8t9D2iVBaYxGq1ydOj8Pciiw5Sq
+         sJx/sJu8jqLVqMH6QdjT3lnESR7SKvMS+bRF6ru20Nxaw76Gae7xFmIvWXMGgXSS8Ore
+         HHOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7CnlGs1BUfHOckGksaG6BjWmp/ThbBYDLUooRtInz6DUo274F+KjW1fTuOUlq4STGj3J5GLM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJYghQFtUAYey7RLOt7mnvZ58+K6vWIObHV5nBv47mNJ0Ku7DQ
+	Xc+KCuDi8ch7wCWE5uysvXZpdAXxULpbAZXHoolHHkfmdoR/dfRsWrJKy+n1xdhqvK/IUrs0BMQ
+	ML9Zqw5rxV+zkuo+DqaLHWFC++YSeby03kiCRecO+
+X-Gm-Gg: ASbGncux4pnJC5s0H4Z+d68OiCyGqp0ULUSVjAPxo8dN7n27kfYrYFc6iMhtVmNamH9
+	90uRLbGJInGB19Hbql2UdXWNBGUVtFOVxiqkEKTM2axUdeJ6zgNwkaSUFZiuCn84ZP7EMR1+0zG
+	E+TNlMehm/tUHKibqALD8vEvCH3UpWrc5W9eU4x4tf9q6X+tkuCyJdPH2tmiVAvWdp+NTcQnpsc
+	EIIaR2UFMd+m1rA0rN7CTwt1rworSJZmc1GFKG3Iw3FnEY+csXZrP90gaJ9h6h1wNyyfyeexNLe
+	CT8I
+X-Google-Smtp-Source: AGHT+IGx9x/LBQUM0Tp2PGXo+ghnOqdp6tqUzhHx64nkalaAvyUzsAffNnBonLDKqjFuu3FqvrH8e8W8i48Gc4KsgNY=
+X-Received: by 2002:a05:622a:50c:b0:4ee:49b8:fb83 with SMTP id
+ d75a77b69052e-4efbdaf1cdemr67320161cf.59.1764130961629; Tue, 25 Nov 2025
+ 20:22:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251125223312.1246891-1-pablo@netfilter.org> <20251125223312.1246891-3-pablo@netfilter.org>
-In-Reply-To: <20251125223312.1246891-3-pablo@netfilter.org>
+References: <20251126034819.1705444-1-kuba@kernel.org> <CACKFLikXhRKfq33VaK4Y8Hjo5NEsg6drfjqpQ0YSA7GGd2f_5w@mail.gmail.com>
+In-Reply-To: <CACKFLikXhRKfq33VaK4Y8Hjo5NEsg6drfjqpQ0YSA7GGd2f_5w@mail.gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 25 Nov 2025 20:20:55 -0800
-X-Gm-Features: AWmQ_bl80ip7OhaAsTg46og0aFXG3CVUfPmo7hC2YvkaKQmGy5gAFvzr6Ttk86k
-Message-ID: <CANn89i+pLDYSCfz9Yq7MPw5+zS+k9VfL4EXZWxztDGbiL==-Gw@mail.gmail.com>
-Subject: Re: [PATCH net-next 02/16] netfilter: flowtable: consolidate xmit path
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net, 
-	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, fw@strlen.de, 
-	horms@kernel.org
+Date: Tue, 25 Nov 2025 20:22:30 -0800
+X-Gm-Features: AWmQ_blcyWKaBzwNjLW4ThgVNf6LzA4ZdHC9ysQOIvWlz71DTA-AbVvXqqInZKI
+Message-ID: <CANn89iL0JbKufHrMMLcrcF+BbF3WSUtkz-mytpvaw9UEwMmVGA@mail.gmail.com>
+Subject: Re: [PATCH net-next] eth: bnxt: make use of napi_consume_skb()
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	pavan.chebbi@broadcom.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 25, 2025 at 2:33=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.=
-org> wrote:
+On Tue, Nov 25, 2025 at 8:17=E2=80=AFPM Michael Chan <michael.chan@broadcom=
+.com> wrote:
 >
-> Use dev_queue_xmit() for the XMIT_NEIGH case. Store the interface index
-> of the real device behind the vlan/pppoe device, this introduces  an
-> extra lookup for the real device in the xmit path because rt->dst.dev
-> provides the vlan/pppoe device.
+> On Tue, Nov 25, 2025 at 7:48=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > As those following recent changes from Eric know very well
+> > using NAPI skb cache is crucial to achieve good perf, at
+> > least on recent AMD platforms. Make sure bnxt feeds the skb
+> > cache with Tx skbs.
+> >
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 >
-> XMIT_NEIGH now looks more similar to XMIT_DIRECT but the check for stale
-> dst and the neighbour lookup still remain in place which is convenient
-> to deal with network topology changes.
->
-> Note that nft_flow_route() needs to relax the check for _XMIT_NEIGH so
-> the existing basic xfrm offload (which only works in one direction) does
-> not break.
->
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> ---
->  include/net/netfilter/nf_flow_table.h |  1 +
->  net/netfilter/nf_flow_table_core.c    |  1 +
->  net/netfilter/nf_flow_table_ip.c      | 87 ++++++++++++++++-----------
->  net/netfilter/nf_flow_table_path.c    |  7 +--
->  4 files changed, 57 insertions(+), 39 deletions(-)
->
-> diff --git a/include/net/netfilter/nf_flow_table.h b/include/net/netfilte=
-r/nf_flow_table.h
-> index e9f72d2558e9..efede742106c 100644
-> --- a/include/net/netfilter/nf_flow_table.h
-> +++ b/include/net/netfilter/nf_flow_table.h
-> @@ -140,6 +140,7 @@ struct flow_offload_tuple {
->         u16                             mtu;
->         union {
->                 struct {
-> +                       u32             ifidx;
+> Thanks.
+> Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
-This ifidx should be moved after dst_cache, to avoid adding one hole
-for 64bit arches.
-
-(No need to resend the whole series, this can be fixed later in a
-stand alone patch)
-
->                         struct dst_entry *dst_cache;
->                         u32             dst_cookie;
->                 };
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
