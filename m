@@ -1,129 +1,238 @@
-Return-Path: <netdev+bounces-241904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7501DC8A0DD
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 14:33:27 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id C021DC8A101
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 14:38:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A4D67355F70
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 13:33:26 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 93CBB34FC8B
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 13:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E6C299ABF;
-	Wed, 26 Nov 2025 13:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0D7328B77;
+	Wed, 26 Nov 2025 13:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="ZCz+y+EK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cJdOM6DG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BWNegSZC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B974287272
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 13:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1069E316915
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 13:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764164003; cv=none; b=OPY0OnOVGEkVmFldxsKx70BnzaLP9XcWteBz4IAef5Y6Ppmq/3kmW+fmOWG6DU52vm4ZQZfKaz+Kr070v351+JuqxPpla6H22b15540y0v16ei26lMYrvGBIpFpkBuPMho/7o5MkYBZGiOqzlJeRchsaC2vitk0VZ80bRwQg1i8=
+	t=1764164317; cv=none; b=KoOYsRg48mqgM3iOYd+M6ls+ZfCIAfZcs2PJGN8HXcGlSYQScNy6ybAPeaJoxeIr4Q3BKBIKHibgQONTqjeI9Plv8WjedhhA89q52AjoSK9MoeUGAv8jhUlpXfv+sihf6qihVwuDBvgozKH7ouQ7cuATMOBVnH/D/jMITzyBdwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764164003; c=relaxed/simple;
-	bh=8xJH7M3jDOO5XRROrKa/hhCD9agYwzD+bt2hH4MXlEM=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=NVueosbCIHXppKY2WBtUp98OIDMvo9NFu5iVsc2G4qqzGxjk6pisBFwD7MRn6rWoESdHagLJkEZ3e7aiC5wJtPP3QWqsr3xrPPza/U0/xAQuvjDkBfGeUZfcOHok0iO54/sSDf+LdgTU96J/7bt+sEtp4NvDh6YfBcZB+ivj1Nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=ZCz+y+EK; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1764163997;
-	bh=8xJH7M3jDOO5XRROrKa/hhCD9agYwzD+bt2hH4MXlEM=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-	b=ZCz+y+EK5VWPObfO9XZ89MAh9G5CZeJ4HhdLcIG8jpc5q3//pFuGLvPNMVhi4Z6Dg
-	 NL5kxSDR179G2YvtRMUjv1fEG/F7XoSXen7JopXjBR/N6MIUn0DCojZuoyrTKCVgSD
-	 pXK3pQuHjZ+BJXMiqiran+3R44nhvYZduqvkh5CzAFL0I/06DpLUD+FAL3pWANpX85
-	 qIIrRVdRqu2G/A6adjL8Z1KgIOI6CFM3pR8bN0QbOx3qVq/O5cNfWfBgd+ktsy7WJE
-	 X3bt8ADcFGvtDvFG1thI9lRvpUMrhJJ3batGriXCoUA/ZX/LCoK76aEP7Kd6AwOlpq
-	 kT2xgQTSfgQCw==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 7FD2C600FF;
-	Wed, 26 Nov 2025 13:33:17 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 4A0DE201077;
-	Wed, 26 Nov 2025 13:32:22 +0000 (UTC)
-Message-ID: <43630b97-4dd4-423a-97e3-ca6aa3b56ad4@fiberby.net>
-Date: Wed, 26 Nov 2025 13:32:22 +0000
+	s=arc-20240116; t=1764164317; c=relaxed/simple;
+	bh=qVWDhyzeG/Z8JL3F0OP9m69Cq46/dVVMczXqz8KQbOw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nDKo8e9ArBE3YnqOL9d4OaX8F9U4Z7H+csa6uob/xiI9l0XR+aPlwRkaloriiGBrOIbmWm3ZP8r5SaG1tBsvc5LaMMxy8SLardjR+9OkjuH4OpVWstOzVRzpu0BCWCkDrqqnR6BwxXTBJb3bhpedPDSe1+96RPz24RMhpNWo2mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cJdOM6DG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BWNegSZC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764164313;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Mhs6sooJ56Q3btp7R+WL1sLMwD4EfCJBflvbYxzesYo=;
+	b=cJdOM6DGJ5FpTHMRr/l9xEAjdJpX2RiRagA37jjr7fO1RfyGOhAMQqp0yylzUmhhq/FT7G
+	rgdmPbmPS83H1vFsH0tvND9j5HPHpx/Oq1sR1vf9WXMIF3fOVrdsUz+S6yOjVSfh8J8CSU
+	sAjY5LrQ0PhRscJ7wwblgtU5o3bqqn0=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-631-U8neNuyqNWCu4kxQCjcR4Q-1; Wed, 26 Nov 2025 08:38:31 -0500
+X-MC-Unique: U8neNuyqNWCu4kxQCjcR4Q-1
+X-Mimecast-MFC-AGG-ID: U8neNuyqNWCu4kxQCjcR4Q_1764164310
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-6450e804cd9so6022206a12.3
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 05:38:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764164310; x=1764769110; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mhs6sooJ56Q3btp7R+WL1sLMwD4EfCJBflvbYxzesYo=;
+        b=BWNegSZCjvVnxBuohBOpTKo1i7A71//bLcAANQcZSGqNkcfDXOTK7H8IxJxPPnzCy4
+         Dzj46okhhDfWt/aThc9CTXmMskdsa3Vy2ndIaAkJbF53lIMyKFfCNVGVF32WtqIevz3Y
+         mlKtJcP/YL9Zl8N6cwfwuOfqGN5sgzVJp2rk5EZtk2KT6slMwxa1Vp/vxxxKh2x50oL5
+         iKp8zkcmU9bLqiw63PYQBuTLuST8yyYbuojKabdW2AiTbNKeJsbckQuZT+lxUldpBHUQ
+         QwQrUmYWNO5F2rDwiD1Wl49Df0LAF3HPtA3ebGAtvk3gsZH0Iu2+p+WYeG+xH5eUTYL/
+         bUoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764164310; x=1764769110;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mhs6sooJ56Q3btp7R+WL1sLMwD4EfCJBflvbYxzesYo=;
+        b=r6LVdY2gPvgO2M7viarHak2geRh+TgJzNfocUR/PAQ9ycIufmg9qMsjyghIHsGfMON
+         0d4Ah1morsK0AD6XePBEV9vtdNuSynFu92FsgwtWJvUHOerut990UgqTCYq7I8Q2EyZZ
+         S14RoxDzLqeJlu9UKyTJWHbychtUGbAC9u68C5yq1kUnzV0RvVTZH+g/G3avt47yWFxy
+         4MtZol/9OMimhsVe+h214ESQXHys+cK+NNa/ehwYPxZmQAyFcjAOKggEgScRUeTB9Buq
+         xft5kGsm4unu7vkRpO1pwD2b/N2yzH2UE1H51BRp76shDKy18R4cuJRipqHSrCxvc5pW
+         TqYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUQFLU5nAkKy0lozNSuHt6O9UDX319k0Bh+7PhNVjrL6B3ckDxTWzVtR4x/9URviaFsJQiLQeM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1xuffsHlsw/HJvK/Z1uzsO+fphEzG9tkug6JXI7z/OtLYEmUF
+	AsM6mSxHbMgmPoFGsCoCVlfzjRx7Ddvf4ZwisGqt6WhSENiVkzH+Jvz53VnP6+dpA/3I898Mq5j
+	f9AVJiqxM/3NBIMeRxp0pUcxBjO/D595pav6kXMp/TuDi7jj1mx+UU68/RQ==
+X-Gm-Gg: ASbGncthcxIfp/0iks9k2i5wM0YrHID3My6UE35xGlJaxtX7ojsMEZ9VxnMzHWarOl7
+	C9Gru8p+uF4Jw+PPmUAFXqeeh/FoUuqhZVQc42kAHfcPs06thjryuPpudJPd1JEW90+npEUxtS9
+	Q5bRquIEJbJIW65LYtezbfkdfxvEb3/zFzjyR+xTTN/kO0OduCz+c7NVoAjLzvHdiqBqHppaGm1
+	y7JLgQ8EyPuzOHRzjUS3N6RtSebANbDImDfQeeephWKKA1brtrhinAg9vECjMQkW30hqeKbZt/j
+	ZfrjHCAP6MSKetHLRuZAQEfY43EPZQcIBdqD5ju0vF2qCo1OtP6Jr8p67Zs4i8H5rT2/D1ZDIFa
+	LuwKdBSeDjHMzGZ+3upjeopim2XTHimISbesl8LhprzUYoZYF
+X-Received: by 2002:a05:6402:3489:b0:63c:4da1:9a10 with SMTP id 4fb4d7f45d1cf-645546a3c05mr16378913a12.31.1764164310122;
+        Wed, 26 Nov 2025 05:38:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHmZrPvuLqorBQCW4M+q1Ph2pYbinZMaUldcA+WNpMkTP4ojfgz3kplNRhWLiwfo17xPIT7cg==
+X-Received: by 2002:a05:6402:3489:b0:63c:4da1:9a10 with SMTP id 4fb4d7f45d1cf-645546a3c05mr16378881a12.31.1764164309584;
+        Wed, 26 Nov 2025 05:38:29 -0800 (PST)
+Received: from stex1 (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6453642d267sm17573469a12.22.2025.11.26.05.38.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Nov 2025 05:38:28 -0800 (PST)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: virtualization@lists.linux.dev
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	netdev@vger.kernel.org,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] vhost/vsock: improve RCU read sections around vhost_vsock_get()
+Date: Wed, 26 Nov 2025 14:38:26 +0100
+Message-ID: <20251126133826.142496-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-Subject: Re: [PATCH net-next] netlink: specs: add big-endian byte-order for
- u32 IPv4 addresses
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, "Matthieu Baerts (NGI0)"
- <matttbe@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Jacob Keller <jacob.e.keller@intel.com>,
- Yuyang Huang <yuyanghuang@google.com>, Daniel Borkmann <daniel@iogearbox.net>
-References: <20251125112048.37631-1-liuhangbin@gmail.com>
- <8564b02f-18f9-4132-ab69-5ee1babeb18c@fiberby.net> <aSaf1D-N5ONmnys8@fedora>
-Content-Language: en-US
-In-Reply-To: <aSaf1D-N5ONmnys8@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 11/26/25 6:36 AM, Hangbin Liu wrote:
-> Hi,
-> On Tue, Nov 25, 2025 at 05:03:13PM +0000, Asbjørn Sloth Tønnesen wrote:
->> I also checked how consistently defined the fields using the ipv6 display helper are,
->> and it looks like they could use some realignment too. Obviously not for this fix.
->>
->> git grep -C6 'display-hint.*ipv6$' Documentation/netlink/specs/
-> 
-> The ip6gre spec shows
-> -
->    name: local
->    display-hint: ipv6
-> -
->    name: remote
->    display-hint: ipv6
-> 
-> The dump result looks good.
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-Those two are defined in linkinfo-gre6-attrs, which is declared as a subset-of
-linkinfo-gre-attrs.
+vhost_vsock_get() uses hash_for_each_possible_rcu() to find the
+`vhost_vsock` associated with the `guest_cid`. hash_for_each_possible_rcu()
+should only be called within an RCU read section, as mentioned in the
+following comment in include/linux/rculist.h:
 
-In linkinfo-gre-attrs they are declared as:
+/**
+ * hlist_for_each_entry_rcu - iterate over rcu list of given type
+ * @pos:	the type * to use as a loop cursor.
+ * @head:	the head for your list.
+ * @member:	the name of the hlist_node within the struct.
+ * @cond:	optional lockdep expression if called from non-RCU protection.
+ *
+ * This list-traversal primitive may safely run concurrently with
+ * the _rcu list-mutation primitives such as hlist_add_head_rcu()
+ * as long as the traversal is guarded by rcu_read_lock().
+ */
 
--
-   name: local
-   type: binary
-   display-hint: ipv4-or-v6
--
-   name: remote
-   type: binary
-   display-hint: ipv4-or-v6
+Currently, all calls to vhost_vsock_get() are between rcu_read_lock()
+and rcu_read_unlock() except for calls in vhost_vsock_set_cid() and
+vhost_vsock_reset_orphans(). In both cases, the current code is safe,
+but we can make improvements to make it more robust.
 
-I have tested with deleting one or the other's display-helper, and at least
-in cli.py, this kind of display-hint overloading works.
+About vhost_vsock_set_cid(), when building the kernel with
+CONFIG_PROVE_RCU_LIST enabled, we get the following RCU warning when the
+user space issues `ioctl(dev, VHOST_VSOCK_SET_GUEST_CID, ...)` :
 
-> So for others ipv6 field, what alignment should we
-> use? Should we add checks: min-len: 16? Do we need byte-order: big-endian?
+  WARNING: suspicious RCU usage
+  6.18.0-rc7 #62 Not tainted
+  -----------------------------
+  drivers/vhost/vsock.c:74 RCU-list traversed in non-reader section!!
 
-IPv6 is always big-endian, the marking first becomes needed when/if we make
-them an u128 type. Until then it would just be nice if either all or none
-of them had the big-endian marking.
+  other info that might help us debug this:
 
-I prefer exact-len over min-len. The current tally is:
+  rcu_scheduler_active = 2, debug_locks = 1
+  1 lock held by rpc-libvirtd/3443:
+   #0: ffffffffc05032a8 (vhost_vsock_mutex){+.+.}-{4:4}, at: vhost_vsock_dev_ioctl+0x2ff/0x530 [vhost_vsock]
 
-$ git grep 'len.*: 16' Documentation/netlink/specs/ | cut -d: -f2- | sed -e 's/^ *//' | sort | uniq -c
-       7 exact-len: 16
-       5 len: 16
-       6 min-len: 16
-(assuming that only IPv6 has a length of 16)
+  stack backtrace:
+  CPU: 2 UID: 0 PID: 3443 Comm: rpc-libvirtd Not tainted 6.18.0-rc7 #62 PREEMPT(none)
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-7.fc42 06/10/2025
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x75/0xb0
+   dump_stack+0x14/0x1a
+   lockdep_rcu_suspicious.cold+0x4e/0x97
+   vhost_vsock_get+0x8f/0xa0 [vhost_vsock]
+   vhost_vsock_dev_ioctl+0x307/0x530 [vhost_vsock]
+   __x64_sys_ioctl+0x4f2/0xa00
+   x64_sys_call+0xed0/0x1da0
+   do_syscall_64+0x73/0xfa0
+   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+   ...
+   </TASK>
 
-"len: 16" as used in ovs_flow's ipv6-src and ipv6-dst only works because they
-are struct members, not attributes.
+This is not a real problem, because the vhost_vsock_get() caller, i.e.
+vhost_vsock_set_cid(), holds the `vhost_vsock_mutex` used by the hash
+table writers. Anyway, to prevent that warning, add lockdep_is_held()
+condition to hash_for_each_possible_rcu() to verify that either the
+caller is in an RCU read section or `vhost_vsock_mutex` is held when
+CONFIG_PROVE_RCU_LIST is enabled; and also clarify the comment for
+vhost_vsock_get() to better describe the locking requirements and the
+scope of the returned pointer validity.
+
+About vhost_vsock_reset_orphans(), currently this function is only
+called via vsock_for_each_connected_socket(), which holds the
+`vsock_table_lock` spinlock (which is also an RCU read-side critical
+section). However, add an explicit RCU read lock there to make the code
+more robust and explicit about the RCU requirements, and to prevent
+issues if the calling context changes in the future or if
+vhost_vsock_reset_orphans() is called from other contexts.
+
+Fixes: 834e772c8db0 ("vhost/vsock: fix use-after-free in network stack callers")
+Cc: stefanha@redhat.com
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ drivers/vhost/vsock.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index ae01457ea2cd..78cc66fbb3dd 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -64,14 +64,15 @@ static u32 vhost_transport_get_local_cid(void)
+ 	return VHOST_VSOCK_DEFAULT_HOST_CID;
+ }
+ 
+-/* Callers that dereference the return value must hold vhost_vsock_mutex or the
+- * RCU read lock.
++/* Callers must be in an RCU read section or hold the vhost_vsock_mutex.
++ * The return value can only be dereferenced while within the section.
+  */
+ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
+ {
+ 	struct vhost_vsock *vsock;
+ 
+-	hash_for_each_possible_rcu(vhost_vsock_hash, vsock, hash, guest_cid) {
++	hash_for_each_possible_rcu(vhost_vsock_hash, vsock, hash, guest_cid,
++				   lockdep_is_held(&vhost_vsock_mutex)) {
+ 		u32 other_cid = vsock->guest_cid;
+ 
+ 		/* Skip instances that have no CID yet */
+@@ -707,9 +708,15 @@ static void vhost_vsock_reset_orphans(struct sock *sk)
+ 	 * executing.
+ 	 */
+ 
++	rcu_read_lock();
++
+ 	/* If the peer is still valid, no need to reset connection */
+-	if (vhost_vsock_get(vsk->remote_addr.svm_cid))
++	if (vhost_vsock_get(vsk->remote_addr.svm_cid)) {
++		rcu_read_unlock();
+ 		return;
++	}
++
++	rcu_read_unlock();
+ 
+ 	/* If the close timeout is pending, let it expire.  This avoids races
+ 	 * with the timeout callback.
+-- 
+2.51.1
+
 
