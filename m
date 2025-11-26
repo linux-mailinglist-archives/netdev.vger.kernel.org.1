@@ -1,245 +1,388 @@
-Return-Path: <netdev+bounces-241783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B40DDC8835B
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 07:04:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03FD0C88364
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 07:07:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4CF53A1F19
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 06:04:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 961E93B2451
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 06:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB563164A9;
-	Wed, 26 Nov 2025 06:04:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45CE30E855;
+	Wed, 26 Nov 2025 06:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VgfOoukK";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HmYgamMT"
+	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="Dg/nxo+V"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013061.outbound.protection.outlook.com [40.93.201.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114BB315D40
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 06:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764137083; cv=none; b=Se8VpMvXJwIfNDJTqoPcvxddLsSq0Ak0eUGerNWtiZJymwxd2RyrBAeQFqcp/NvlcvK9TmdHeG4RV6hqcMf6O2eWqd3CY7qrvg3r2NZGYCuBjWaBelGb6HBdnvzdPB1s2i3AHC5l/kuBO3owHBhWwyBeeSTdI8k87zCH38nvOzg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764137083; c=relaxed/simple;
-	bh=6S/I0aqRZ/F7+hnivrbJxw1X0W/1DAFC2mRV55eaujE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ibx7/UbCayAWn3b5CakofHI7tbAsFAhT4SIH/OCl0W8qYgxu9Qf34/BFi44jhj0hF43Oxcgp7WYpUHnJCiqNRYQCoyYi998y9qTIJzXqTlDzq6ABqZdhU4HMvEnryuLxRtDPcLw4pXobLIltHr5wZuX3hxhiJSY1S2Z9EDP8RKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VgfOoukK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HmYgamMT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764137080;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OaB2KVWRNAbMaNATIpxj7yIi4zwUBMB8DFcAl65yplo=;
-	b=VgfOoukKIJoXszWkb1PQ0tKeZ3pw2oIpYqWd7I45vTTQZjUIpyADDXUp5U+xZ1BkmLOK88
-	Q+7cBJ/bEvtQ8DMmEHNpx/kFPrA548bP3DidQfFDa7pz1CTUUH7VOet88B/ucbI8jiaSp6
-	rPL6lEVB485Y4cMWhYj55FEJT75LQAU=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-232-D42i2hmRMF6QdfT2vEZEFA-1; Wed, 26 Nov 2025 01:04:37 -0500
-X-MC-Unique: D42i2hmRMF6QdfT2vEZEFA-1
-X-Mimecast-MFC-AGG-ID: D42i2hmRMF6QdfT2vEZEFA_1764137076
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34566e62f16so6823144a91.1
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 22:04:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764137076; x=1764741876; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OaB2KVWRNAbMaNATIpxj7yIi4zwUBMB8DFcAl65yplo=;
-        b=HmYgamMTT59pr5qvbw4uByk2H31nxir5JVJANcUewxLqGb9CoGvmVufMQ3C56HWIt9
-         v3EMlFKgL0txijfkMIJrqlcvzfoNd2tw/NvYjGy8ffZSCYi6r6o2jKBNUZHGPzvJszRs
-         xoRZlfO75IDXhkc+NAqWPrA2sqZz/4icv3t7jWAUgBNSAuC8Pj8wbsiu1mvDaXkWkkr3
-         pozlRWQu7D0xp5asLx8xLankf82fSMDxBMe1QWlUziuaoT6Qka0nQxWdzqQB9XQ5LqaR
-         IFFk4+d5E2JrunngzAZV2Er6XMkZ3ggxkW5tU/VqTYCMgqj8Rj0WyTtI6uDx9KNC2su5
-         7eqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764137076; x=1764741876;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OaB2KVWRNAbMaNATIpxj7yIi4zwUBMB8DFcAl65yplo=;
-        b=U5JCIjda89r1tqbj8SIQURVtKmpEqcBfSK5WHEe0Jb2/koQFk7c31JrI/OzlzGZFJB
-         fo5qZKt1zQRVfGjZcN0845tbM3O9GHdaeD9NiGUR8zw4Hzo7C+bH0uWeDFi9wK9MPaqm
-         GlaUJ0THzC6c6HIuGyW2Ukb91ewxw72wik6o6cNR9eeMwjHIwVMFZCm0mW4YO3PuEKNU
-         hCf4YvmiadUeSyXexgi+7soFlv5kw0Q9qBHWr1omQFoAKIBL8UGIcUFeNR2643g09j+P
-         vJ2fxMwY74Z4PkcEDEGyJ/VFjvXU4YF3AyVJHo8tzASR/eKg+hdiVZQmeWz4MQvecH3P
-         c0FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW+ySGdr3q0PGMV8T4haNsXDaFWOUTt06vQvBe9S5Q2029yRnPoD4+h4FEdiYGAM/bRexcXW/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1abSRnCg06Slikjai8OSGc7LqYIvAPwf5iWs5Id5Fbc6AnDxF
-	7mq3QgLo03ehWbPCzC6zc7JlVEJI7rmWsh3mAQc+v65+efHM5jNt6UVsNIBrv07en5CpE0ir8jb
-	0a9G3IZywMgcIWRLaJHmP64VO2oFkTymdlOpkDhD4P3U82j/iJGloq8OrPHnEqM22xP42aIZEXr
-	kf9/VaeLkQkidix5aubGVPwFXIMIy9mIp9
-X-Gm-Gg: ASbGncsrlzUjCB1rHV9OxnseTkKShwfBIqrXiPKYUwnjEHm1arPf4zUYCiw97bk/q2y
-	QLnONwxct9ZeQl1ibSYhESIaN0rI/EP0huzxL99Me9HXeqwSdCJol6fZg5FVTgo/K4qcfIi0tG4
-	f48CB6zSY/HLqo4OtP75HBf3DWw0/iVKUG2xQBhlx459xZPnItNWKlpJJEk6lit6kGxc4=
-X-Received: by 2002:a17:90b:3a81:b0:343:684c:f8ac with SMTP id 98e67ed59e1d1-34733e4c8fdmr16172929a91.8.1764137075873;
-        Tue, 25 Nov 2025 22:04:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGMgyGfGhHuIXlnMSRmydbJ73Umy+/ihi3Es7MfZVsIvdOL46Du5q/FBIP1Zh+sAGvjoTwtO6cxu9UWM/LPP4s=
-X-Received: by 2002:a17:90b:3a81:b0:343:684c:f8ac with SMTP id
- 98e67ed59e1d1-34733e4c8fdmr16172898a91.8.1764137075386; Tue, 25 Nov 2025
- 22:04:35 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C901448D5;
+	Wed, 26 Nov 2025 06:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764137253; cv=fail; b=acLm0KNmquIXbXaEYkDGlLk8xQMJT6ZtIAI0rm45CT0u2wTuQR07lrJJt55m/6JZddpaIuH7LObHOwpSg0dA/20Iw1HHBDNgpFZda+PQEBBe0TGseoDhxx1hcaQjFMJrQfx39EcODuVX7j2+/JX1umjD4jCI4dBNHK9dEf1aE0w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764137253; c=relaxed/simple;
+	bh=Ml/+JSFheu1e7H7EdlUIyO4S68l6J8kFDqKfVnIoTgM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=vAObMyz5kPaTsdOYd3Vx17v2BpPZGBFrf5Hu8vHEDJnUB+pD+zwDmMl02lArE9lF5JEXdugJz8YnJ8OaX2pBSCV2cT5OrJciJ+FcotlzlpnoeiJkGQNXXx7Wo0COPfP2TU7bH+Ewj/ACMJ7oD1OiOIQmhWc1C72W61PVy5NIyGs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=Dg/nxo+V; arc=fail smtp.client-ip=40.93.201.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ouzOJp7gEbA1GHVQbtnhvTBVX2Q3Tb/+onEG0H3yrMuqN+IUnJTAKFNQDjgcTgI9lM3dlDeJZGVjmaZAM3KX/mOeY84qecYmWUuOYwvcsrbPv+/5mJpEKCg5zD4ofdxQXFohAmhDdvGNgSuk3QC73mQFasKiRRZ5HflT7V0fraW4TKXswORfLL45mr/Pcgl54AV+R/1DWr8fTiIzpDk/e8cooG4CbRKMj4SBpA3D6p/7kZGkjj24qSiHVUiOMsQugKEHTvUk7Vb9rIzjLsB3jNBFusUgwJPynOMYIEU9MMOI8QJfBE+RgwyD8PHAr0ATIm7UA3SIoEGSiUsdH11qsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yMoEjPt0f7m0GtkBOpXCzvnnB7e5UnEzqM8/1B1Vnpk=;
+ b=t725U2wNP1CRAHazViZMSLLaODa9OfKuV61CcY2xQh8XLrRSWVcglDKzySYlpNZt08kMG74inNYUrcVDGUW12W8FOXov+0l3lvD1EY6wJjWYgBh4DjXPljpBM9H20IiznlpmOC0J4jn7YNsCqoT2W2YdmBALYYmKksRWXzZfDqco4rJ7TYl8ZkTwjbS2Rrf/yRrz+F36QROs8lFK+pSSpxitzzW2N6M5lcoAgSZ+7nSRoT494by9nNB9wNumwHG8mbanVVFRWsdHKeJ1CU/CtgQunX0N30ClQBor+/gR7hu5latCR7tKlgDMa/1gw+CdLixcSX2sd2sIm+q1AOJ/jg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yMoEjPt0f7m0GtkBOpXCzvnnB7e5UnEzqM8/1B1Vnpk=;
+ b=Dg/nxo+VOfwvAUH5qX5Yt4XPSvKSoIUOaQTKiD56iCT2EzEmwRd72rpDpDblEUhETThgRdZJ1Zg7BuhY39fLmrcyCJuHWwnfqC7lj/3KQTKjiwYYHbreqeRY7/hq0NDfjuV8iqMrrMKiBreCRn7LaxLQvUQYmyU3e6wUcanxkjI89pEJkWeGtQPk4JQn27WZ2onH2SY1oQZa3mBzA7NhfUXswQ7l96GiAPHa3/0RvLaKhip/AARTVoEQdzGqKDv6sYn0PgihmbeitjdUgVPXEy+oe1dmDLDqWR0jpMyWdzm2AH7cyrgUHYe4BtGL7zbCr9wedA5xt6nWaQpujfNwaQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=altera.com;
+Received: from DM6PR03MB5371.namprd03.prod.outlook.com (2603:10b6:5:24c::21)
+ by IA3PR03MB8384.namprd03.prod.outlook.com (2603:10b6:208:543::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.11; Wed, 26 Nov
+ 2025 06:07:28 +0000
+Received: from DM6PR03MB5371.namprd03.prod.outlook.com
+ ([fe80::8d3c:c90d:40c:7076]) by DM6PR03MB5371.namprd03.prod.outlook.com
+ ([fe80::8d3c:c90d:40c:7076%4]) with mapi id 15.20.9366.009; Wed, 26 Nov 2025
+ 06:07:28 +0000
+Message-ID: <9cea0b90-4b71-45cc-9c8b-ffeae8b7db07@altera.com>
+Date: Wed, 26 Nov 2025 11:37:19 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: stmmac: dwmac: Disable flushing frames on
+ Rx Buffer Unavailable
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Matthew Gerlach <matthew.gerlach@altera.com>
+References: <20251126-a10_ext_fix-v1-1-d163507f646f@altera.com>
+ <58ec46bb-5850-4dde-a1ea-d242f7d95409@bootlin.com>
+ <bd6b9659-8721-43d0-be60-12af0342b500@bootlin.com>
+Content-Language: en-US
+From: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
+In-Reply-To: <bd6b9659-8721-43d0-be60-12af0342b500@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA5PR01CA0235.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:1f4::17) To DM6PR03MB5371.namprd03.prod.outlook.com
+ (2603:10b6:5:24c::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251113005529.2494066-1-jon@nutanix.com> <CACGkMEtQZ3M-sERT2P8WV=82BuXCbBHeJX+zgxx+9X7OUTqi4g@mail.gmail.com>
- <E1226897-C6D1-439C-AB3B-012F8C4A72DF@nutanix.com> <CACGkMEuPK4=Tf3x-k0ZHY1rqL=2rg60-qdON8UJmQZTqpUryTQ@mail.gmail.com>
- <A0AFD371-1FA3-48F7-A259-6503A6F052E5@nutanix.com> <CACGkMEvD16y2rt+cXupZ-aEcPZ=nvU7+xYSYBkUj7tH=ER3f-A@mail.gmail.com>
- <121ABD73-9400-4657-997C-6AEA578864C5@nutanix.com>
-In-Reply-To: <121ABD73-9400-4657-997C-6AEA578864C5@nutanix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 26 Nov 2025 14:04:21 +0800
-X-Gm-Features: AWmQ_bmSzNmtLXzsLUvLhgWB8dvqy0Qa5CQPOMXfuQ7SoDSN1_7LIgv1Nc8s6u4
-Message-ID: <CACGkMEtk7veKToaJO9rwo7UeJkN+reaoG9_XcPG-dKAho1dV+A@mail.gmail.com>
-Subject: Re: [PATCH net-next] vhost: use "checked" versions of get_user() and put_user()
-To: Jon Kohler <jon@nutanix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Borislav Petkov <bp@alien8.de>, 
-	Sean Christopherson <seanjc@google.com>, linux-arm-kernel@lists.infradead.org, 
-	Russell King - ARM Linux <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>, krzk@kernel.org, 
-	alexandre.belloni@bootlin.com, Linus Walleij <linus.walleij@linaro.org>, 
-	fustini@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR03MB5371:EE_|IA3PR03MB8384:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0f0a86ed-00ce-49b4-3bba-08de2cb21407
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TFhRNFVHVnRyTjJ3WjRmN0RoRTR3V1NrMGVMU3ovUWIzUFI4VTd6cDJYUGcy?=
+ =?utf-8?B?a2pPYnpScjJtYXZZbDhYYUd2MXdkNU15b2xjdFJ0Q3BUTUxFWUUyb2N3WURD?=
+ =?utf-8?B?RWpPMXZBREJLYzMxMkJVakIwUmszZDA5U3RXZGRzVGJIOU0zek95RkdyY3Ey?=
+ =?utf-8?B?VGUwam4vNXZwc0NjckcrcVowb0dPRGdUQmMzUG9YQVc5ZTZPRUZZNUFkMFRt?=
+ =?utf-8?B?K0RMcndSNGsxbFUyb3JudlJtRUxHamVESXFUaWc4TWlYV0M0TTVXQ0pvMXkx?=
+ =?utf-8?B?dHg0cUkxMkcwT1NGd0tvS1d2Y21mY2p5S082Rjg0bWRTY0F6N0lLcE55Qi9y?=
+ =?utf-8?B?SHZuajdnV25MK2JNMXNGd2ZoQ0FObjFHQms1QVl6RmVZQXRMZGpJY3IxdnJZ?=
+ =?utf-8?B?cTBBV1dUMjkyd05KbDgvODJuRHMxZmNhT0xJZy9FbXZNbFlNbm13S3FyQmla?=
+ =?utf-8?B?aFBRVWV0RHFWMU9RTURDNllXOGxlWk9uWHV3bWxFZTNFaTgyZyt4MkZqVmRi?=
+ =?utf-8?B?b1UrbTcrK2JSRXMxZ0I2WVpXaDB4REp3M1c0dGN2ZDVpT3pTWjRPVXVmUzBU?=
+ =?utf-8?B?YTFQQk1hMEdOWnJXeG9KVWpGeWNwbVN3aXBzWGhpZVdwb2kwVmV4VDkxVW9J?=
+ =?utf-8?B?cW5JMjRlTmMrWkdCYy9aczJIN3FnQWdveUxRN2FFWWJGbUlZZG03MHhDcEVS?=
+ =?utf-8?B?SWFrcHhIRXlvSkJkaDdXV1l0dzZhVnV3OVJ0NnpiQlhCZE1WOVlkZ1RFTGt1?=
+ =?utf-8?B?aTNlQ3dwQTlMdndVVWUrN29XMFNBMU9pR0k4bDdtSktVYmFOd2J1M0VmanNj?=
+ =?utf-8?B?c1plcnN1MW5SZzRydFIxQ08zRFJxVGpVVzF4YjdlNmFvaEx3OFF4NTFGcUJI?=
+ =?utf-8?B?K3pCOTQzdVpORlZFMlR4TGwwNnEwWlRGT1FKd1RYUGd2MGc3c2dodkZ3TzJG?=
+ =?utf-8?B?RVBhd3pHMkI4L3RLTFI2Q1FKTzRtK0N2LzYrQWdqSkYycytVK1pMMWNlMlMx?=
+ =?utf-8?B?d2dwdXQ1YzRqaTY2MnAyRnM4RW1IbU9CWldTWUEvRkNaREZkQUs4NmlaSjF1?=
+ =?utf-8?B?YVNaWnpXeDZXTXk2TmM4NFhsdy9yOUw5TDdKbTNMWklhVkxKakU0TjVuMWNW?=
+ =?utf-8?B?ZWRPdDBkdDBSUDBLRHBubEpqTEEvenRmUGJYU0QzUDNTUklqS3VTOWlwRWw4?=
+ =?utf-8?B?UmlrYWpqMUxSTllLL1g5bzlCTjBkQStvQ2ZxYWN1a21pcWJzQS9ySUdEeWNl?=
+ =?utf-8?B?dDZmZlRNTkI5bGV6MksxbG4wWm9pZTdVaE1heDdQUnFBR05FR3lsbG1hRTAv?=
+ =?utf-8?B?UFo0bjhURWs3MkFFd0VIZ3EzTHROZGJqZmQvcWlvY2h3aEZxaS9TUGt4QmFS?=
+ =?utf-8?B?eTZoa1EvWDF0NDZnTnZ3V1RjMnd5dm1LWUhmZW9uTVlSUkVLMlVaYTZKbTNZ?=
+ =?utf-8?B?WTNlbmMxOEFuZm4vVjBydTFOWUFoNkJqWGF4eElwWkIrZm5NS2NMdXBkNlg3?=
+ =?utf-8?B?R0N3OFVaL2hmbUZmS2wzbWVpQWk4NUdJQ05FZDdKbTk5VVllTzVINnQxNmNK?=
+ =?utf-8?B?aGprQW1sV1I2YlpMN013dndXSWQxN2NyKzQ4cVlaeVd6VWRTckMwN2t1Vzkv?=
+ =?utf-8?B?Nmh4NmNodmpMU3hZUHRkbXR1SnJPY1oybTlGREFVY1FieitMM252MUo1SVoy?=
+ =?utf-8?B?WDNiSjJsQnV1Y2gwMnVNQWtUY3JLYk04ZUxHQ1NzTnA4WmVpOWViT0pDSE9B?=
+ =?utf-8?B?OXNLckk4a3VmVWlKeW90MjlGT0ZoYXF1VVBLZ1Z1YUtZc3dlcFErb1lzVU9J?=
+ =?utf-8?B?TlIyeGdWWURQL1o3enNnODZkZzVzWVdwSHlJelZLZE8wY3ZhV3hKd3hxZmts?=
+ =?utf-8?B?RlRMVWEyeU1mQkFhWHlFUFlRTS9kdFdnSzREWUVVOCs2b3hHUWpZbUhnbnNM?=
+ =?utf-8?Q?mDEp/FR2V2bnsMUYk3dK43A52DzQmmnm?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR03MB5371.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?S3VjYkE4bzMzMnJDS0trSkU1a2lwd1Q0MTBqVzdqVzN1bG5Xdmp2SURKOWU0?=
+ =?utf-8?B?VVZhd3FUa2JDb3JhRmJkZk5tbFpFZHlOUEt0UGgzdVZ6TUluWlVLcFVsWkJ4?=
+ =?utf-8?B?eTdnRWx3VWFtRnVKSFMwMTh4UGxOakRxdGo4ZkZBL2toaTIwTUVpa0ttY2hN?=
+ =?utf-8?B?R3FTSFpqWVUrUFhJbENxa2l4ZzhURGFxdmF4a2c2Ky9JbjF2bWxJQjl6dGJz?=
+ =?utf-8?B?OFRtdFVyd0xjdmF5RDlxYjJMWlNyWWZEQzRPOVpnNGZBT01ZM2NiNHZTeHlm?=
+ =?utf-8?B?TWZpWWl5QnlScXFsUGZRV2VKR2E3SWlUSFlxSHVKSnRYMXphOUN1SXZLTHZk?=
+ =?utf-8?B?WHBROTdiRFJWNWxseHBWdGdzUzU5Z2ZVYnB2SzBNVUFJMWkreUJwL0tlRjBs?=
+ =?utf-8?B?MU1HemNTMGo4amtKbi9ldmJ4WnptaDVuMUJNbTUxcU1CL1E3MThSZkljWUFm?=
+ =?utf-8?B?UjlFWGhkNEphaHJpOHJmWSs5WGRZN01MZ2Z6NEpwNlNtMFAyTUVWSDIrYW40?=
+ =?utf-8?B?OHVsQ0R5ZU1wSzZpZVZxeXI1VnlLOVJJangyUnFnVGlSQXZtMVdBRXlzL1Q2?=
+ =?utf-8?B?bHlWYnJpMUpnUEhWTUpNbWl6NGRQTUppQ1d5UkZDd3NqeW5FRW1Db09Ca2pn?=
+ =?utf-8?B?b2hDbDRMRlZxOGs4RDJxU3RzYWVibmVyL1V1cmJQS29wWDNydTNPaXJDaDJj?=
+ =?utf-8?B?ZTQzN1hvR29LWlJMeC9YT0FJcy8zeTRhUlROSm1WeE42cWYzd2lyYjYxSXc2?=
+ =?utf-8?B?VCt6KzhCTmQyVmtseXNkZmoxRlR3VjBVMGZmY1BPNGV6eEpsV0ZMNWx3VEx3?=
+ =?utf-8?B?ZklZMnE5d2pWbDI0TzUwdzVEbUU2Q05RVUtWZUlMaHlZUnMzT3J0V0lXNkh5?=
+ =?utf-8?B?ZjJldysrTm9Walo5M1UrQ2p2OSt2R29ab1ZzakJnVVBkQVQybkkvR0pDdW9Z?=
+ =?utf-8?B?c2d3VEp6TysvRWRPNWJPeVYxVjdHdDNOMkZXY3oyOTVqckNoaHBvMmRya3c5?=
+ =?utf-8?B?RXArTTltdjBkMTBPZ3JFT3laejN6aXAyY3RmTjRROVFUTGUrbDQxdmlPZXRm?=
+ =?utf-8?B?b2Q0WFdlbDZvYU1Ydkh5RHNlSFV5WkgySHZ2bGxsQ2xmV3B0dXFGL2o3dXRD?=
+ =?utf-8?B?TjI5aUZ2Ky94MEFwTmhTMnNMNHJwK3hyNlZkUWpHSTZiWUlvbGhjdEhTanhE?=
+ =?utf-8?B?bXBETnBHWTByTW5DS3B3cEVtQ2doM1BpK1I5aXd3TmJRbjF6SmhPSlM4aTNy?=
+ =?utf-8?B?bGhxaVYvcEhNbWZ1M0pFZjBDVXJqSmhQenpya3ZvN0V5eUdiVzdISHhMQkdX?=
+ =?utf-8?B?QlBrOHRYQ3Rza0RhanZSTDFhYy9Ba3RhQndxT3JRYWFkY2dYN2RiY3I1WThW?=
+ =?utf-8?B?R3Q3Mm1Nc2Y0cEFCSmxHVTMwTGo2VGVzc0x0dlphNHIrVFp3S0o1S3ZuN3Ro?=
+ =?utf-8?B?ZWtyZHBXTXRBaDVtNzF3eWgwL2ZqcVhMWGFpQXd3VTYwVERhLzl6Q2NXd21k?=
+ =?utf-8?B?UEt3QlNVYjN3U3l5VWFBZnNQTDEydFB4cWN2dGdieXV3eEpHN2RuOUtKRDlV?=
+ =?utf-8?B?bzNKYktzdnJWVXFLbnQvRHJQdktCQUkzeGhVTENEbVVPRXc1Q25wY2lyakNv?=
+ =?utf-8?B?ZmdheWpLRWgvQlNvUTFqdXNCMytRUXhxWXpiMVBHT1JRaXozYkFLTUF3UjZK?=
+ =?utf-8?B?TkxMdjJtL0JmY05GQVF4TE9ZMWk3dFBmQkxBU0RuNG5ET25XMWg2ZGlDSDdv?=
+ =?utf-8?B?bytGN1cwbUdTTzNpQzk3OHpleUpSODhYM2JXYTl0SUJKZisvZlFsVG5qRGlp?=
+ =?utf-8?B?eXByWWZseUliZUFuMi9mZWxhZjlrcEFYMTZDVzVPdHJKczFsSjlXWUYvTFN0?=
+ =?utf-8?B?WUJ1RFIwbUxIRDEybk4xMVNLR1VMMWE4K0hBQTJGZklnVlMxUnBDbkpGdmxp?=
+ =?utf-8?B?QjhnRHl0elp0R3F1ZWllbnkxb2t5NmhFcU5jWVcyV3VPK2t0ZjRmQ1NEbEta?=
+ =?utf-8?B?QzlWYWVtbkFxVExjNldvcFVHWTUxWWYyckNqUEJadVZxYUF1RklQMzJLdFUy?=
+ =?utf-8?B?U3VwTFVla3BZYTgzRUFxTVRJMm5Cek9MTXp5SWNoZExzTWlGcU0vUmR3WDZq?=
+ =?utf-8?B?enBPMHBNQVFxcVJJZU81K2J2QXZ2QUEwaFhCakQ2eDlMNTlpTVV5eGtBKzhZ?=
+ =?utf-8?B?UVE9PQ==?=
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f0a86ed-00ce-49b4-3bba-08de2cb21407
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR03MB5371.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2025 06:07:28.8546
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FhzetO9Tqdq3qYMwwxsxRzjOUiRKD0NWTGlG8AA6IknfFDgGsEX3cEGm2bdm98KTM7zYhW4Zn1OlET79iyA+9raoz+Q+TpsaC+G22hKGnNk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR03MB8384
 
-On Wed, Nov 26, 2025 at 3:45=E2=80=AFAM Jon Kohler <jon@nutanix.com> wrote:
->
->
->
-> > On Nov 19, 2025, at 8:57=E2=80=AFPM, Jason Wang <jasowang@redhat.com> w=
-rote:
-> >
-> > On Tue, Nov 18, 2025 at 1:35=E2=80=AFAM Jon Kohler <jon@nutanix.com> wr=
-ote:
-> >>
-> >>
-> >>> On Nov 16, 2025, at 11:32=E2=80=AFPM, Jason Wang <jasowang@redhat.com=
-> wrote:
-> >>>
-> >>> On Fri, Nov 14, 2025 at 10:53=E2=80=AFPM Jon Kohler <jon@nutanix.com>=
- wrote:
-> >>>>
-> >>>>
-> >>>>> On Nov 12, 2025, at 8:09=E2=80=AFPM, Jason Wang <jasowang@redhat.co=
-m> wrote:
-> >>>>>
-> >>>>> On Thu, Nov 13, 2025 at 8:14=E2=80=AFAM Jon Kohler <jon@nutanix.com=
-> wrote:
-> >>>>>>
-> >>>>>> vhost_get_user and vhost_put_user leverage __get_user and __put_us=
-er,
-> >>>>>> respectively, which were both added in 2016 by commit 6b1e6cc7855b
-> >>>>>> ("vhost: new device IOTLB API").
-> >>>>>
-> >>>>> It has been used even before this commit.
-> >>>>
-> >>>> Ah, thanks for the pointer. I=E2=80=99d have to go dig to find its g=
-enesis, but
-> >>>> its more to say, this existed prior to the LFENCE commit.
-> >>>>
-> >>>>>
-> >>>>>> In a heavy UDP transmit workload on a
-> >>>>>> vhost-net backed tap device, these functions showed up as ~11.6% o=
-f
-> >>>>>> samples in a flamegraph of the underlying vhost worker thread.
-> >>>>>>
-> >>>>>> Quoting Linus from [1]:
-> >>>>>>  Anyway, every single __get_user() call I looked at looked like
-> >>>>>>  historical garbage. [...] End result: I get the feeling that we
-> >>>>>>  should just do a global search-and-replace of the __get_user/
-> >>>>>>  __put_user users, replace them with plain get_user/put_user inste=
-ad,
-> >>>>>>  and then fix up any fallout (eg the coco code).
-> >>>>>>
-> >>>>>> Switch to plain get_user/put_user in vhost, which results in a sli=
-ght
-> >>>>>> throughput speedup. get_user now about ~8.4% of samples in flamegr=
-aph.
-> >>>>>>
-> >>>>>> Basic iperf3 test on a Intel 5416S CPU with Ubuntu 25.10 guest:
-> >>>>>> TX: taskset -c 2 iperf3 -c <rx_ip> -t 60 -p 5200 -b 0 -u -i 5
-> >>>>>> RX: taskset -c 2 iperf3 -s -p 5200 -D
-> >>>>>> Before: 6.08 Gbits/sec
-> >>>>>> After:  6.32 Gbits/sec
-> >>>>>
-> >>>>> I wonder if we need to test on archs like ARM.
-> >>>>
-> >>>> Are you thinking from a performance perspective? Or a correctness on=
-e?
-> >>>
-> >>> Performance, I think the patch is correct.
-> >>>
-> >>> Thanks
-> >>>
-> >>
-> >> Ok gotcha. If anyone has an ARM system stuffed in their
-> >> front pocket and can give this a poke, I=E2=80=99d appreciate it, as
-> >> I don=E2=80=99t have ready access to one personally.
-> >>
-> >> That said, I think this might end up in =E2=80=9Cwell, it is what it i=
-s=E2=80=9D
-> >> territory as Linus was alluding to, i.e. if performance dips on
-> >> ARM for vhost, then thats a compelling point to optimize whatever
-> >> ends up being the culprit for get/put user?
-> >>
-> >> Said another way, would ARM perf testing (or any other arch) be a
-> >> blocker to taking this change?
-> >
-> > Not a must but at least we need to explain the implication for other
-> > archs as the discussion you quoted are all for x86.
-> >
-> > Thanks
->
-> I=E2=80=99ll admit my ARM muscle is weak, but here=E2=80=99s my best take=
- on this:
->
-> Looking at arch/arm/include/asm/uaccess.h, the biggest thing that I
-> noticed is the CONFIG_CPU_SPECTRE ifdef, which already remaps
-> __get_user() to get_user(), so anyone running that in their kconfig
-> will already practically have the behavior implemented by this patch
-> by way of commit b1cd0a148063 ("ARM: spectre-v1: use get_user() for
-> __get_user()=E2=80=9D).
->
-> Same deal goes for __put_user() vs put_user by way of commit
-> e3aa6243434f ("ARM: 8795/1: spectre-v1.1: use put_user() for __put_user()=
-=E2=80=9D)
->
-> Looking at arch/arm/mm/Kconfig, there are a variety of scenarios
-> where CONFIG_CPU_SPECTRE will be enabled automagically. Looking at
-> commit 252309adc81f ("ARM: Make CONFIG_CPU_V7 valid for 32bit ARMv8 imple=
-mentations")
-> it says that "ARMv8 is a superset of ARMv7", so I=E2=80=99d guess that ju=
-st
-> about everything ARM would include this by default?
->
-> If so, that mean at least for a non-zero population of ARM=E2=80=99ers,
-> they wouldn=E2=80=99t notice anything from this patch, yea?
+Hi Maxime,
 
-Adding ARM maintainers for more thought.
+On 11/25/2025 11:33 PM, Maxime Chevallier wrote:
+> 
+> 
+> On 25/11/2025 18:15, Maxime Chevallier wrote:
+>> Hi Rohan,
+>>
+>> On 25/11/2025 17:37, Rohan G Thomas via B4 Relay wrote:
+>>> From: Rohan G Thomas <rohan.g.thomas@altera.com>
+>>>
+>>> In Store and Forward mode, flushing frames when the receive buffer is
+>>> unavailable, can cause the MTL Rx FIFO to go out of sync. This results
+>>> in buffering of a few frames in the FIFO without triggering Rx DMA
+>>> from transferring the data to the system memory until another packet
+>>> is received. Once the issue happens, for a ping request, the packet is
+>>> forwarded to the system memory only after we receive another packet
+>>> and hece we observe a latency equivalent to the ping interval.
+>>>
+>>> 64 bytes from 192.168.2.100: seq=1 ttl=64 time=1000.344 ms
+>>>
+>>> Also, we can observe constant gmacgrp_debug register value of
+>>> 0x00000120, which indicates "Reading frame data".
+>>>
+>>> The issue is not reproducible after disabling frame flushing when Rx
+>>> buffer is unavailable. But in that case, the Rx DMA enters a suspend
+>>> state due to buffer unavailability. To resume operation, software
+>>> must write to the receive_poll_demand register after adding new
+>>> descriptors, which reactivates the Rx DMA.
+>>>
+>>> This issue is observed in the socfpga platforms which has dwmac1000 IP
+>>> like Arria 10, Cyclone V and Agilex 7. Issue is reproducible after
+>>> running iperf3 server at the DUT for UDP lower packet sizes.
+>>>
+>>> Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+>>> Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
+>>
+>> Should this be a fix ?
+>>
+>> Can you elaborate on how to reproduce this ? I've given this a try on
+>> CycloneV and I can't see any difference in the ping results and iperf3
+>> results.
+>>
+>>  From the DUT, I've tried :
+>>   - iperf3 -c 192.168.X.X -u -b 0 -l 64
+>>   - iperf3 -c 192.168.X.X -u -b 0 -l 64 -R
+> 
+> Ah ! my iperf3 peer wasn't sending packets hard enough. I switched to a
+> more powerful LP and I can now see the huge latencies by doing :
+> 
+> 1 - ping the CycloneV from test machine :
+> 
+> PING 192.168.2.41 (192.168.2.41) 56(84) bytes of data.
+> 64 bytes from 192.168.2.41: icmp_seq=1 ttl=64 time=0.387 ms
+> 64 bytes from 192.168.2.41: icmp_seq=2 ttl=64 time=0.196 ms
+> 64 bytes from 192.168.2.41: icmp_seq=3 ttl=64 time=0.193 ms
+> 64 bytes from 192.168.2.41: icmp_seq=4 ttl=64 time=0.207 ms
+> 
+> 2 - on cycloneV, Run iperf3 -c 192.168.X.X -u -b 0 -l 64 -R
+> 
+> 3 - Re-ping :
+> 
+> PING 192.168.2.41 (192.168.2.41) 56(84) bytes of data.
+> 64 bytes from 192.168.2.41: icmp_seq=1 ttl=64 time=1022 ms
+> 64 bytes from 192.168.2.41: icmp_seq=2 ttl=64 time=1024 ms
+> 64 bytes from 192.168.2.41: icmp_seq=3 ttl=64 time=1024 ms
+> 
+> 
+> This behaviour disapears after your patch :)
+> 
+> Maxime
+> 
 
-Thanks
+Thanks for testing the patch.
 
->
-> Happy to learn otherwise if that read is incorrect!
->
-> Thanks all,
-> Jon
+Yes, this is the scenario adressed with the patch. By default driver
+configures for SF_DMA_MODE and issue is reproducible when we stress the
+mac with Rx Buffer Unavailable scenarios repeatedly.
+
+> 
+>>   - iperf3 -c 192.168.X.X
+>>   - iperf3 -c 192.168.X.X -R
+>>
+>> I'm reading the same results with and without the patch
+>>
+>> I've done ping tests as well, the latency seems to be the same with and
+>> without this patch, at around 0.193ms RTT.
+>>
+>> I'm not familiar with the SF_DMA_MODE though, any thing special to do to
+>> enter that mode ?
+>>
+>> Thanks,
+>>
+>> Maxime
+>>
+>>> ---
+>>>   drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c | 5 +++--
+>>>   drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h     | 1 +
+>>>   drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c     | 5 +++++
+>>>   drivers/net/ethernet/stmicro/stmmac/hwif.h          | 3 +++
+>>>   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   | 2 ++
+>>>   5 files changed, 14 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+>>> index 6d9b8fac3c6d0fd76733ab4a1a8cce2420fa40b4..5877fec9f6c30ed18cdcf5398816e444e0bd0091 100644
+>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+>>> @@ -135,10 +135,10 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
+>>>   
+>>>   	if (mode == SF_DMA_MODE) {
+>>>   		pr_debug("GMAC: enable RX store and forward mode\n");
+>>> -		csr6 |= DMA_CONTROL_RSF;
+>>> +		csr6 |= DMA_CONTROL_RSF | DMA_CONTROL_DFF;
+>>>   	} else {
+>>>   		pr_debug("GMAC: disable RX SF mode (threshold %d)\n", mode);
+>>> -		csr6 &= ~DMA_CONTROL_RSF;
+>>> +		csr6 &= ~(DMA_CONTROL_RSF | DMA_CONTROL_DFF);
+>>>   		csr6 &= DMA_CONTROL_TC_RX_MASK;
+>>>   		if (mode <= 32)
+>>>   			csr6 |= DMA_CONTROL_RTC_32;
+>>> @@ -262,6 +262,7 @@ const struct stmmac_dma_ops dwmac1000_dma_ops = {
+>>>   	.dma_rx_mode = dwmac1000_dma_operation_mode_rx,
+>>>   	.dma_tx_mode = dwmac1000_dma_operation_mode_tx,
+>>>   	.enable_dma_transmission = dwmac_enable_dma_transmission,
+>>> +	.enable_dma_reception = dwmac_enable_dma_reception,
+>>>   	.enable_dma_irq = dwmac_enable_dma_irq,
+>>>   	.disable_dma_irq = dwmac_disable_dma_irq,
+>>>   	.start_tx = dwmac_dma_start_tx,
+>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+>>> index d1c149f7a3dd9e472b237101666e11878707f0f2..054ecb20ce3f68bce5da3efaf36acf33e430d3f0 100644
+>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+>>> @@ -169,6 +169,7 @@ static inline u32 dma_chan_base_addr(u32 base, u32 chan)
+>>>   #define NUM_DWMAC4_DMA_REGS	27
+>>>   
+>>>   void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan);
+>>> +void dwmac_enable_dma_reception(void __iomem *ioaddr, u32 chan);
+>>>   void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+>>>   			  u32 chan, bool rx, bool tx);
+>>>   void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+>>> index 467f1a05747ecf0be5b9f3392cd3d2049d676c21..97a803d68e3a2f120beaa7c3254748cf404236df 100644
+>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+>>> @@ -33,6 +33,11 @@ void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
+>>>   	writel(1, ioaddr + DMA_CHAN_XMT_POLL_DEMAND(chan));
+>>>   }
+>>>   
+>>> +void dwmac_enable_dma_reception(void __iomem *ioaddr, u32 chan)
+>>> +{
+>>> +	writel(1, ioaddr + DMA_CHAN_RCV_POLL_DEMAND(chan));
+>>> +}
+>>> +
+>>>   void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+>>>   			  u32 chan, bool rx, bool tx)
+>>>   {
+>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+>>> index f257ce4b6c66e0bbd3180d54ac7f5be934153a6b..df6e8a567b1f646f83effbb38d8e53441a6f6150 100644
+>>> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
+>>> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+>>> @@ -201,6 +201,7 @@ struct stmmac_dma_ops {
+>>>   	void (*dma_diagnostic_fr)(struct stmmac_extra_stats *x,
+>>>   				  void __iomem *ioaddr);
+>>>   	void (*enable_dma_transmission)(void __iomem *ioaddr, u32 chan);
+>>> +	void (*enable_dma_reception)(void __iomem *ioaddr, u32 chan);
+>>>   	void (*enable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
+>>>   			       u32 chan, bool rx, bool tx);
+>>>   	void (*disable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
+>>> @@ -261,6 +262,8 @@ struct stmmac_dma_ops {
+>>>   	stmmac_do_void_callback(__priv, dma, dma_diagnostic_fr, __args)
+>>>   #define stmmac_enable_dma_transmission(__priv, __args...) \
+>>>   	stmmac_do_void_callback(__priv, dma, enable_dma_transmission, __args)
+>>> +#define stmmac_enable_dma_reception(__priv, __args...) \
+>>> +	stmmac_do_void_callback(__priv, dma, enable_dma_reception, __args)
+>>>   #define stmmac_enable_dma_irq(__priv, __args...) \
+>>>   	stmmac_do_void_callback(__priv, dma, enable_dma_irq, __priv, __args)
+>>>   #define stmmac_disable_dma_irq(__priv, __args...) \
+>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> index 6cacedb2c9b3fefdd4c9ec8ba98d389443d21ebd..1ecca60baf74286da7f156b4c3c835b3cbabf1ba 100644
+>>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> @@ -4973,6 +4973,8 @@ static inline void stmmac_rx_refill(struct stmmac_priv *priv, u32 queue)
+>>>   	rx_q->rx_tail_addr = rx_q->dma_rx_phy +
+>>>   			    (rx_q->dirty_rx * sizeof(struct dma_desc));
+>>>   	stmmac_set_rx_tail_ptr(priv, priv->ioaddr, rx_q->rx_tail_addr, queue);
+>>> +	/* Wake up Rx DMA from the suspend state if required */
+>>> +	stmmac_enable_dma_reception(priv, priv->ioaddr, queue);
+>>>   }
+>>>   
+>>>   static unsigned int stmmac_rx_buf1_len(struct stmmac_priv *priv,
+>>>
+>>> ---
+>>> base-commit: e3daf0e7fe9758613bec324fd606ed9caa187f74
+>>> change-id: 20251125-a10_ext_fix-5951805b9906
+>>>
+>>> Best regards,
+>>
+>>
+> 
+
+Best Regards,
+Rohan
 
 
