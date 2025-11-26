@@ -1,154 +1,177 @@
-Return-Path: <netdev+bounces-242054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D1F7C8BECA
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:56:27 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2C5FC8BED3
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:56:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03C4F3A74FE
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 20:56:26 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2667C358A04
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 20:56:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C66A33FE03;
-	Wed, 26 Nov 2025 20:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACB7342CA2;
+	Wed, 26 Nov 2025 20:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ao41VIod"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="dxqwd3jJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DB22D2390
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 20:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F9F221FDE;
+	Wed, 26 Nov 2025 20:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764190583; cv=none; b=MRV9JfXa8P5+SkMZonmP/pM7aya2ZLT3KlJMEcygiu3wKLRdvT42EsvWiZSTmnO6mF1IGSLgAnaR3qO7fENVLXGB1VuqZN68Bx8lzFF1DRbm6pe3b0emB1CPimkpAGhGAjhBT1/aBCn4yiWMYdWKSyA2ytuKWL7ealNM8pzWE4I=
+	t=1764190585; cv=none; b=hxvlWRMEyOM2r+wCGIrkbFiQxWHEi+8VYYysRTTpuINEOlUc0ozl2FQFG+xVNzXbdSHKVu4eGYYEYn+FXb1kYXOPMQE4eReXqRaZQgOK8Rj6ZY2kbD7a0JC7sgemwE+/THA73aZhkggBYkvZ+CnROt5E9mcMopc+GQ+aPcV6zDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764190583; c=relaxed/simple;
-	bh=Dt350O4s7/IUq+j9naCofzl4cWJ8WislzSXHIBeUF9w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XZ9fZArw2yve9/TdXXnXy42Dt8maeb4qRizHwbhue8j1hVmHq79oOslJOnPMphWD4+G0Y+Zj+1UMaCaPkI0mnaOnIQ+XNUvPqy+LvBLqVhvOtMa6iTd9AUR2P/J2/e3O3pFwAfsUSgfwuGq3hI7T/al8Cg4rnwtIRpMlKMVvH54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ao41VIod; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-42b32a5494dso141326f8f.2
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 12:56:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764190579; x=1764795379; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dt350O4s7/IUq+j9naCofzl4cWJ8WislzSXHIBeUF9w=;
-        b=ao41VIodm6FTNBwsolI2pjkHM5dolV5rBr19ho/wEOfbWyXWxa99W5ZM05PXpUO+zr
-         XeiuL5MPx9U8qwMiY7weF7Jd1TTqlDATdRVLVgY9gor64gBndr5/3wi5DprLjhxaYr29
-         Rmw+PemP6IFnkF0JGn704Bjy0QDEHIW6cOEx5DhUvShdLlmNteGO8mgh/p8dvo+jVAir
-         nXIXj24QPFsIgQViK7rykkHlNlGo0uOaW4RM+TG2R9NHPkH+Q8dPUaKGHLDOO5v5bFlQ
-         3lqyVDA9d3SDwjjkXkVKNRy6Eq6FAsRg03xG3fK+bIJzH5RDjR0K7GwL5FP3SF2GqP0n
-         Nrhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764190579; x=1764795379;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Dt350O4s7/IUq+j9naCofzl4cWJ8WislzSXHIBeUF9w=;
-        b=CdhSCw+gsZJPFTfSdi3WSAvRsbGNtLDkNSIsvev9u9dXPNmRWPeobOAdqNoR/1EDwb
-         tg3+dEe5zIU820F5RxDXLgcOWDrcG25YJJgGdeECjQZGFCt6Y3ElF8pOdIcka1M5yDqj
-         t/peJ6bbYpUmIXjFAJbfu6Nh1K3FQ7YtqneGS5ZRUBbub5peq/FijWA3SNLSS62J1eLm
-         e1EgxwbSSaIhQDiqR3Dww0rsc481x1z+xwkTXvgWPWmrblm4myCPdcW1/2AgKFwWJ+8G
-         GvPLAz2byt60RitL8h7dKL8ZHVunnXiUBBhqGtxf25kiXvWTpOinWlAsaYEDR9nDm/yO
-         7RhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjAuBaqMpMzS796X1wQsTSFPdgNBbTRoIAG7KElE5rTlzomSkUGnTMe/fVs6Ncm6iY0r8AQXs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxnd4VPFA0GIcUd387PjjZT2WKWEV4xGVQ3j1Ws2ihDNzFFIWP7
-	ViY9AumcgexcIYW+Oz/HQ40MsyrPNn2z+Ejli0GfwFvma01rx6p2szuHj+wX3I9lD17LH8m2jAF
-	5OgbDLnEAofTqxIy20xoayq0Jzd+fkus=
-X-Gm-Gg: ASbGncsOr19qcaY+JQPCT7ITm+HyYPOeT03CJ8DB9jr4+8LePgir9n/YPFh3ueNHYrb
-	HP58bOpYStGHNHCjIWWvhaXTzKkaz4BO9yQagJY7Zo2J/OPOnuNL7tKgAzEEmpfGZfSLl6CyFR/
-	dgyv/hyRKpnEN1Ud8Eiu8unhkHNzymyxr93/ES0Q+E6FgdYPXX1xG5EaGrltyd02Ia2FtQH2UmW
-	wIz198neZVA7wW9F4/OArTb6yVFhxhSl5fm0YhaImdvLaJTHvCAwCG/Ch+F95WSu21oFctM0ISQ
-	4To5wtp4
-X-Google-Smtp-Source: AGHT+IG0RXp7g3rwG1N9bVOtQ9ozNjjP0xKrNIIS8B+mwcvqHsgckTZtjgViUtn3Goop7bdPAsM6eed81Zilw5ZfTQI=
-X-Received: by 2002:a05:6000:2f81:b0:429:bc68:6c95 with SMTP id
- ffacd0b85a97d-42cc1d520camr24897838f8f.47.1764190579376; Wed, 26 Nov 2025
- 12:56:19 -0800 (PST)
+	s=arc-20240116; t=1764190585; c=relaxed/simple;
+	bh=5jJvPli9DarKyNmZ7GXV3BVik6hqowDTEf6PYgeEs9Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eA+eBB4nKyzRcRR1HbLAs1FWAbNrmRZofU5fQpQqF9zQ8nvQLtrw8GX7aRh9fCqbWh89CnjcaamyqU4Ny1hvQN7+5QvsVrnG+RXx5G+9XjnO7dtEk6EAWV7VKNciI843j72l64iEB6IZ+bE9d6LkEeDk9XB1j8zx53ZM8h6EtIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=dxqwd3jJ; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 6BC496026F;
+	Wed, 26 Nov 2025 21:56:17 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1764190577;
+	bh=eO/ssF6zuszta6wwQkf6r4iQ6SPNw2YcUmk/MWv4+8g=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dxqwd3jJL+5wqgV5Vhl5vaQQXTmaWu6mGdQCD0iiZocj337NwCnJioJ6ubTVpFbNk
+	 Hx4TFQYnxaiuzun/irFrjabjhUDFzo6ewtpqaKwoAHtAgEs/Vdn77+LObxeP2TsQ1J
+	 /FKrfrjGaGnWHFOPdNnb77ATBYTSnIgkeWnLSR2psPojRCRuO+X5AFlFgy/q78mV7B
+	 hTtKpg55esCMOo4bStEQap1nHHduY12SLKbOS+NfBXJQnIO0cXQ7EuCCgJVjtON3iV
+	 Z9f4K50KeiG0hHQFsZ9BA9xlG3m3wp2w37BdnlPFoxb6El8YSBbP591vuWbehwmnI9
+	 FvsNu/xi7wdkw==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net-next,v2 00/16] Netfilter updates for net-next
+Date: Wed, 26 Nov 2025 20:55:55 +0000
+Message-ID: <20251126205611.1284486-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112201937.1336854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251112201937.1336854-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <de098757-2088-4b34-8a9a-407f9487991c@lunn.ch> <CA+V-a8vgJcJ+EsxSwQzQbprjqhxy-QS84=wE6co+D50wOOOweA@mail.gmail.com>
- <0d13ed33-cb0b-4cb0-8af3-b54c2ad7537b@lunn.ch>
-In-Reply-To: <0d13ed33-cb0b-4cb0-8af3-b54c2ad7537b@lunn.ch>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Wed, 26 Nov 2025 20:55:53 +0000
-X-Gm-Features: AWmQ_bnVIRWusTHYXQG_pEIVx7CON6jGq6AQSdf9oiT5MLxC0fJE8jZLc8Q18PI
-Message-ID: <CA+V-a8vx5KTUD_j7+1TC9r5JrGo2fJ0D7XXJCc-oHidtbUN=ZA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: pcs: renesas,rzn1-miic:
- Add renesas,miic-phylink-active-low property
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
+v2: - Move ifidx to avoid adding a hole, per Eric Dumazet.
+    - Update pppoe xmit inline patch description, per Qingfang Deng.
 
-On Thu, Nov 13, 2025 at 9:58=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > Each of these IPs has its own link status pin as an input to the SoC:
->
-> > The above architecture is for the RZ/N1 SoC. For RZ/T2H SoC we dont
-> > have a SERCOS Controller. So in the case of RZ/T2H EVK the
-> > SWITCH_MII_LINK status pin is connected to the LED1 of VSC8541 PHY.
-> >
-> > The PHYLNK register [0] (section 10.2.5 page 763) allows control of
-> > the active level of the link.
-> > 0: High active (Default)
-> > 1: Active Low
-> >
-> > For example the SWITCH requires link-up to be reported to the switch
-> > via the SWITCH_MII_LINK input pin.
->
-> Why does the switch require this? The switch also needs to know the
-> duplex, speed etc. Link on its own is of not enough. So when phylink
-> mac_link_up is called, you tell it the speed, duplex and also that the
-> link is up. When the link goes down, mac_link_down callback will be
-> called and you tell it the link is down.
->
-Sorry for the delayed response. I was awaiting more info from the HW
-team on this. Below is the info I got from the HW info.
+-o-
 
-EtherPHY link-up and link-down status is required as a hardware IP
-feature, regardless of whether GMAC or ETHSW is used.
-In the case of GMAC, the software retrieves this information from
-EtherPHY via MDC/MDIO and then configures GMAC accordingly. In
-contrast, ETHSW provides dedicated pins for this purpose.
-For ETHSW, this information is also necessary for communication
-between two external nodes (e.g., Node A to Node B) that does not
-involve the host CPU, as the switching occurs entirely within ETHSW.
-This is particularly important for DLR (Device Level Ring: a
-redundancy protocol used in EtherNet/IP). DLR relies on detecting
-link-down events caused by cable issues as quickly as possible to
-enable fast switchover to a redundant path. Handling such path
-switching in software introduces performance impacts, which is why
-ETHSW includes dedicated pins.
-As for Active Level configuration, it is designed to provide
-flexibility to accommodate the specifications of external EtherPHY
-devices.
+Hi,
 
-Please share your thoughts.
+The following batch contains Netfilter updates for net-next:
+ 
+1) Move the flowtable path discovery code to its own file, the
+   nft_flow_offload.c mixes the nf_tables evaluation with the path
+   discovery logic, just split this in two for clarity.
+ 
+2) Consolidate flowtable xmit path by using dev_queue_xmit() and the
+   real device behind the layer 2 vlan/pppoe device. This allows to
+   inline encapsulation. After this update, hw_ifidx can be removed
+   since both ifidx and hw_ifidx now point to the same device.
+ 
+3) Support for IPIP encapsulation in the flowtable, extend selftest
+   to cover for this new layer 3 offload, from Lorenzo Bianconi.
+ 
+4) Push down the skb into the conncount API to fix duplicates in the
+   conncount list for packets with non-confirmed conntrack entries,
+   this is due to an optimization introduced in d265929930e2
+   ("netfilter: nf_conncount: reduce unnecessary GC").
+   From Fernando Fernandez Mancera.
+ 
+5) In conncount, disable BH when performing garbage collection 
+   to consolidate existing behaviour in the conncount API, also
+   from Fernando.
+ 
+6) A matching packet with a confirmed conntrack invokes GC if
+   conncount reaches the limit in an attempt to release slots.
+   This allows the existing extensions to be used for real conntrack
+   counting, not just limiting new connections, from Fernando.
+ 
+7) Support for updating ct count objects in nf_tables, from Fernando.
+ 
+8) Extend nft_flowtables.sh selftest to send IPv6 TCP traffic,
+   from Lorenzo Bianconi.
+ 
+9) Fixes for UAPI kernel-doc documentation, from Randy Dunlap.
 
-Cheers,
-Prabhakar
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-25-11-26
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 61e628023d79386e93d2d64f8b7af439d27617a6:
+
+  Merge branch 'net_sched-speedup-qdisc-dequeue' (2025-11-25 16:10:35 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-25-11-26
+
+for you to fetch changes up to 15a2af8160eb751ca7b7104d5fad80fd6a1c009d:
+
+  netfilter: nf_tables: improve UAPI kernel-doc comments (2025-11-26 20:52:40 +0000)
+
+----------------------------------------------------------------
+netfilter pull request 25-11-26
+
+----------------------------------------------------------------
+Fernando Fernandez Mancera (4):
+      netfilter: nf_conncount: rework API to use sk_buff directly
+      netfilter: nf_conncount: make nf_conncount_gc_list() to disable BH
+      netfilter: nft_connlimit: update the count if add was skipped
+      netfilter: nft_connlimit: add support to object update operation
+
+Lorenzo Bianconi (4):
+      netfilter: flowtable: Add IPIP rx sw acceleration
+      netfilter: flowtable: Add IPIP tx sw acceleration
+      selftests: netfilter: nft_flowtable.sh: Add IPIP flowtable selftest
+      selftests: netfilter: nft_flowtable.sh: Add the capability to send IPv6 TCP traffic
+
+Pablo Neira Ayuso (6):
+      netfilter: flowtable: move path discovery infrastructure to its own file
+      netfilter: flowtable: consolidate xmit path
+      netfilter: flowtable: inline vlan encapsulation in xmit path
+      netfilter: flowtable: inline pppoe encapsulation in xmit path
+      netfilter: flowtable: remove hw_ifidx
+      netfilter: flowtable: use tuple address to calculate next hop
+
+Randy Dunlap (2):
+      netfilter: ip6t_srh: fix UAPI kernel-doc comments format
+      netfilter: nf_tables: improve UAPI kernel-doc comments
+
+ include/linux/netdevice.h                          |  13 +
+ include/net/netfilter/nf_conntrack_count.h         |  17 +-
+ include/net/netfilter/nf_flow_table.h              |  26 +-
+ include/uapi/linux/netfilter/nf_tables.h           |  14 +-
+ include/uapi/linux/netfilter_ipv6/ip6t_srh.h       |  40 +--
+ net/ipv4/ipip.c                                    |  25 ++
+ net/netfilter/Makefile                             |   1 +
+ net/netfilter/nf_conncount.c                       | 193 ++++++++----
+ net/netfilter/nf_flow_table_core.c                 |   5 +-
+ net/netfilter/nf_flow_table_ip.c                   | 293 ++++++++++++++++---
+ net/netfilter/nf_flow_table_offload.c              |   2 +-
+ net/netfilter/nf_flow_table_path.c                 | 323 +++++++++++++++++++++
+ net/netfilter/nft_connlimit.c                      |  54 ++--
+ net/netfilter/nft_flow_offload.c                   | 252 ----------------
+ net/netfilter/xt_connlimit.c                       |  14 +-
+ net/openvswitch/conntrack.c                        |  16 +-
+ .../selftests/net/netfilter/nft_flowtable.sh       | 116 +++++++-
+ 17 files changed, 954 insertions(+), 450 deletions(-)
+ create mode 100644 net/netfilter/nf_flow_table_path.c
 
