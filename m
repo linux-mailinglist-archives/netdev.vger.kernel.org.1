@@ -1,163 +1,246 @@
-Return-Path: <netdev+bounces-241855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15B96C89663
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 11:55:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5CBAC896D6
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 12:01:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26D753AAC9B
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 10:55:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84D8C3AF51C
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 11:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BA931BC96;
-	Wed, 26 Nov 2025 10:54:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0375C29BD85;
+	Wed, 26 Nov 2025 11:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KDdUpBjl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7927248F7C
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 10:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3679431D371
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 11:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764154493; cv=none; b=aAfE7uIHgeXvR0OvMtFPZy225QcD0Sj2G8NVHL3RlhKcJ1/WLNLbexFFYB6u2zCYJDLL3NyBUGS0sKw1sCBSJmvQhXD6tXvdfsgdqDIcjNlc53dSpw3Krx4DXyvEF4A8GJIarLyi4z/Pc+rPBBp4XRlpcpSUXNRpOydD51bWTgY=
+	t=1764154852; cv=none; b=Fl+ePTPIRnqhxse+48oFaly1wB0IDEJSN4hLDnKdP1Hz1DDxOCw/hv07ZTjxT/LTMJdGxMGuzAimuuG0CtZLE9hMCu+VetwpjtYXGGWdpk4APBra+KRR8rc2TKXzuRKbUkOoj1p6f4FaYM1Z66HTU/fYWfSwMcWXRzNKmHPQ7XE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764154493; c=relaxed/simple;
-	bh=tEAuHtS8/XCUiYcXWYUoaNe7PaNE5xwF6AJ8POofAIg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=GFpfPyEUC7F1JhQ6AVTSaMBFxe7duhJW2LfvhFjPA23e6Gi+ddK5Mwvv5F9f3CDnYA5xGEAWdjt9ruX7QDTlWcXih+tCbr9DrhL+5bRndEHRz9tCPe0XvmZ6RXZJrsUTdtL+vFvxO0DWGI4meWqL55LlM5sM+km1PEJxNRDrd0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1764154852; c=relaxed/simple;
+	bh=msoYboerQ9GyfrtFtKxaOgrGBy5crqNw31fDrjzoNaM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uarIxnG42LImqpeU8qGQsD/gYNztmslUM3WxmK07oKclIqxIeOD9hlSHo+B5iHUVghqHH1ZnzTG6TAYOTflvnGNsqLrQ1+nuov9zXR2tvlUvU2DrTO+5h6AdAHK5Y9rOvJfrupCfSWp2yRr51TzZHefJKsD8Cq7I3+DIqJL2sp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KDdUpBjl; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-3e8f418e051so3827629fac.3
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 02:54:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764154490; x=1764759290;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-4332381ba9bso29350845ab.1
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 03:00:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764154850; x=1764759650; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rTTCxc4MaCFCb9ALndfPRwOpBtfwAOdIt5SutWfVfSI=;
-        b=m1cpheRm2+lK1JRU3sGNh1cKhojIVUq+i5On582NZoDc9MqNh4QnSIPVoDKTKwS/3Y
-         CEtX9eNewJCJ8fwqXHESeH/1u19abvSWcLED63pf9czW8l0/UzeX7Hl8ekrmiU4rEqZ8
-         ujKik+TPNugrU/BY/deviuYEQ4HDv3eexurlqAPd0Xy6HBF9yGUvRcejJj52Sr96sLGQ
-         4QQ+ytJ5Prg/ydEasoVYvS33fMt+uzK+iIE1Afh6A4I1TKWdSaXlreGXpUL4zV1PIEPy
-         B9Vkz9ypsjJg+V9N7SOWfoxA7RT6ufkqufQcu1mqDlj42Gk39rgYFApk459YO6wbtWvD
-         V6Vg==
-X-Forwarded-Encrypted: i=1; AJvYcCXYhU8JTGYbmcyENVSfVtL0MXSKBxYnp3bwOVMuqTPIssn6/fLhdHHOmkqfBH9u3vlmRONUtec=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIQmUYILpCDbXQnvWZN2ieW5Ars2DptLt1MBSjTfKusUmiIuwO
-	b6j2mRNCHx0JNDd2pWX7B7i8FudUWY1NHyAMIVIETjBof8n7ZMX48s+t/VQGSQ==
-X-Gm-Gg: ASbGnctzt4Q+kyF6Hc91n2dPa5Q8vDOoPxokEppSnoaRiC3yZF8KWDfCyNgcyskHsaq
-	ZmlX7+Gx/slc1HCD7FZha7z0taYOdmvlHtK3YsZt1dMzOt9MAzIW17TkslBc/QiCLIJQyFAgvk0
-	8YSRJ47nf/XlWwMAiYVwuV3WlmTUMUHW1+4Qlbawy4977JHEA03QJYgmQNsszA8qJeoK1UDQffB
-	+/+q35vKsPCfep8KFNsq470Jhg2bf2iwPLJfhykkls/XbwDF0nTzwQLTTizTGe8XuTAvSSqASas
-	kpx94WKjF0htAoe8Ahr+aZOsJnjgryDvTM6BYiXQ9Ig9pyKsaIRz6wcAL6OfxORt7ZgvGamJcji
-	4y9qYxTXTOwrW/pEucCarmMxSD+6c16ftJn8Qi1EEMtcHpeJb0czlaCniQqLeXU4BZBh6+Q+kTT
-	qUMTwauNMaF1LEPg==
-X-Google-Smtp-Source: AGHT+IFuKu9CL4OmitweQtj9FWFp7CoKQ0umbOJ8FTbSZuyLzYDItiE7AmncPJ0P+j0ZnTiSsNAoyA==
-X-Received: by 2002:a05:6870:ac08:b0:3ec:53a8:437d with SMTP id 586e51a60fabf-3ecbe28c21emr8317882fac.6.1764154489592;
-        Wed, 26 Nov 2025 02:54:49 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:4e::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ec9dc8e0e1sm8914485fac.18.2025.11.26.02.54.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 02:54:49 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Wed, 26 Nov 2025 02:54:40 -0800
-Subject: [PATCH net-next] net: thunder: convert to use .get_rx_ring_count
+        bh=uiVfog/xOrvqP7cd7C9oJ6i+ydH+RPdRpxqOC6g1mA0=;
+        b=KDdUpBjlDXGie319vOC97uPLzQP7fFnpnPO6MyTkuC4QQOlcnoSccw4zt0349Otz1+
+         Wh94Yj3bMGzkB4Hldxev5JOT6jS9nFCQ6SA9ZJeXY5N8PTTnQS40MV9paz+fFwNXfg+j
+         cmwpmu0vvPOJOGiuwYbgfNdwBG1dzpXvmXNVIEpDKoUBOEcIdJl2rskLWSRL8drwAMSw
+         i8f4S/jdIVNf4qTXq2zYM1IS5y9LQS7kr33zQ+qJpSTfR1KaPfR6Px10gGEtLYyZXrhT
+         CIdnEtPc2Q0TYyIMZG0TNgNHUy3fWsxnbo1vuZLXMFvWlpieSvFcLb9/GGH56YzM9hDn
+         wvrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764154850; x=1764759650;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uiVfog/xOrvqP7cd7C9oJ6i+ydH+RPdRpxqOC6g1mA0=;
+        b=BbiV0/IXNDpXIpH5zynWWRhyZOyvVoycDf9lJ9SFWfzMKPk5dKJD9fFo9chonxS3WV
+         +UbCYbp/XPmqZ5qncSuUB1aRfT0e4bkRgNp8UKY7aY0Qmx1jn3k4lxxGQefWY3gsGG3n
+         gsdz/P3XJMYTkbtx8B6sBClhmCAKNw+DkHECtoNJ0BCemF4aEHyYHZ1coPP2TSB0P1Iv
+         clM9SRIcY2AcG4O02mABFOSVrxm8V8pwxuZBv0/kTGMzjTnPbmDktJfF9Tj7cqJD5NPX
+         wJkVpaXnOrdgVQPZ4d/79AYJWzXy8MIF91FZr8ji2sMFNWTLtlmKH6DLdDqgEGFs6Akw
+         9w/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU+P9fuj8Wxp99Nd2J3mHB3oPH9Q7/WDBwr9tXduOSnS1SLUw/sn1zasD6QyNgKoY0Athxfq2A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4Kuzd3QokBNSfFxhGlEs7X7IUAu8WAm+hzmtFyndG5ssNZi1N
+	GM23K71Vsps0DSuSOnP1RL2bjwa2ATrYZY5z3EVzsW89azO9smWdEot4L3qM9rVQQS2idQi6jiJ
+	pcYQXBPDXOoQy2vpqQASKdtOq2jUjbrE=
+X-Gm-Gg: ASbGncu30PsT5PMDArSrAMwbOrCXC5xEZ60fd63+56GUt8QnbbmHWf6WYLT5zwrHZH6
+	MEnAvkYHOB/qvd9lwXtbKywwCbptH20zt2p7Qekilx8jM/jizTOVGX1J4p4KBSeuqZB5SY6KeS6
+	6pVhharoJ+rGA6914ygjHrUM4w/Nv3fHAxndWMCwkQ34xdXAavQj/eBOsxj3K/55rEV2NlmF7F1
+	DT4/AfD6Z7m/1kozLchgvmB9p4dNGyVQmQTQFqvQqfeZpAsuz0JtFCOGjEcCpwbgH3UM0ZX6h1q
+	rgYXZA==
+X-Google-Smtp-Source: AGHT+IHp5PB4YF4CDBA7GD5vFoLYmpIgo3uW2CCz98agh7AlBdh1hmpzzolECmczJSfEExIwt2TcVwuaSB3TiVAzXsQ=
+X-Received: by 2002:a05:6e02:250d:b0:433:78fa:8000 with SMTP id
+ e9e14a558f8ab-435dd0e8d2fmr50409875ab.24.1764154848993; Wed, 26 Nov 2025
+ 03:00:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251126-gxring_cavium-v1-1-a066c0c9e0c6@debian.org>
-X-B4-Tracking: v=1; b=H4sIAG/cJmkC/x3MQQrCMBAF0KsMf92ASTHQXEVESvpNZ+EoSS2B0
- rsLvgO8A41V2ZDkQOWuTd+GJH4Q5HW2QqcLkiBcwtX7EF3pVa088rzr9+UWjhNz9GMkMQg+lU/
- t/+8G4+aMfcP9PH8m9xnXaQAAAA==
-X-Change-ID: 20251126-gxring_cavium-de39ec6136ee
-To: Sunil Goutham <sgoutham@marvell.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kernel-team@meta.com, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-a6db3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2044; i=leitao@debian.org;
- h=from:subject:message-id; bh=tEAuHtS8/XCUiYcXWYUoaNe7PaNE5xwF6AJ8POofAIg=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpJtx4y8QFI1JwZMblGTo8qDkuZF4qybDcdBql5
- h0VQ5pCeuuJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaSbceAAKCRA1o5Of/Hh3
- bXeDEACBZgnKRto4wtRjoIQIlcSdnIQi3vbv5myNO6X0tvt4WG/399mJXEQO/w7BVFdDhSBWe+L
- Ewl50esS85iqi/nBJXAuIwKWWMx+ObIEsu//gm5NvHLQA6Yb2Vtk0zKP42Zid6ZJi/8Zxkm65Fo
- rkpRDzQs7DIhbkSBDngxHFI3WFHVMVteAt2/bTXEDJ3N4wBvdeMiGrzvaSvjiUQ+cFpoAm06Sy2
- t6A2N0V2pMba7+xLl8QHJ3cUcQsumW2ukspZoqR0yUCj0pncEr63nkZasALZZ6eK+ma34CzsR8W
- u6WijiHofTTvLkTGkAy+HGanOhQIT2FtVXtcVSQDwOREqQuploy4coJJO/7XLdzPSKDZ9ZSsvUx
- l7ieqs1i5vpB9cLyat0Bqneqx7tyEm76zQNiOF3ouOoUKID8sTVPbsM/6svfxJ3aUX0KXfEfkAw
- m9pwMBrUSnT0QrWfJ3KqOJxikgBki5dkpwau4yTB5p2M0NfG/UKBPeaZ6naOu5CqzPeQKONhrDk
- 9gXlAyd/BGrjAkqYt1ugWHiYtmlEgbI67u3OWsl41fLYhevyUTNohGl38Luw54cCcR7msjjqbYq
- +sscrornSqZFRod3ZYzr8w61/+RuN6uuVcK8kSMDgzSjvl+7R/UePxD3Qlp28k/uQov7jRpXd1M
- oX/nzKHO/SPJODg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+References: <20251124171409.3845-1-fmancera@suse.de> <CAL+tcoBKMfVnTtkwBRk9JBGbJtahyJVt4g8swsYRUk1b97LgHQ@mail.gmail.com>
+ <955e2de1-32f6-42e3-8358-b8574188ce62@suse.de> <CAL+tcoD83=UXpDaLZZFU2_EDKJS9ew2njLmoH9xeXcg5+E3UDQ@mail.gmail.com>
+ <aSXZ37i5CgGKn2RF@boxer> <CAL+tcoBw9OuMcpjy7eQq2=SDWRr+OGszbC+HNgbc_CVw6S=bWQ@mail.gmail.com>
+ <23b56ddb-f5a3-4b2b-bf75-e93aa39ab63f@suse.de>
+In-Reply-To: <23b56ddb-f5a3-4b2b-bf75-e93aa39ab63f@suse.de>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 26 Nov 2025 19:00:11 +0800
+X-Gm-Features: AWmQ_bmnlv1bwnmLYnfM-vDf9qbtgGp9o7tMAVnedZ4Pq6mx4O3jLlLZ1Vobq1w
+Message-ID: <CAL+tcoC+MzURCCuPQ2DJ2YpmAftNfm1WOrGrCzsL1MOnkBscgw@mail.gmail.com>
+Subject: Re: [PATCH net v6] xsk: avoid data corruption on cq descriptor number
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org, csmate@nop.hu, 
+	bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me, 
+	hawk@kernel.org, daniel@iogearbox.net, ast@kernel.org, 
+	john.fastabend@gmail.com, magnus.karlsson@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Convert the Cavium Thunder NIC VF driver to use the new .get_rx_ring_count
-ethtool operation instead of implementing .get_rxnfc solely for handling
-ETHTOOL_GRXRINGS command. This simplifies the code by removing the
-switch statement and replacing it with a direct return of the queue
-count.
+On Wed, Nov 26, 2025 at 5:15=E2=80=AFPM Fernando Fernandez Mancera
+<fmancera@suse.de> wrote:
+>
+> On 11/26/25 2:14 AM, Jason Xing wrote:
+> > On Wed, Nov 26, 2025 at 12:31=E2=80=AFAM Maciej Fijalkowski
+> > <maciej.fijalkowski@intel.com> wrote:
+> >>
+> >> On Tue, Nov 25, 2025 at 08:11:37PM +0800, Jason Xing wrote:
+> >>> On Tue, Nov 25, 2025 at 7:40=E2=80=AFPM Fernando Fernandez Mancera
+> >>> <fmancera@suse.de> wrote:
+> >>>>
+> >>>> On 11/25/25 12:41 AM, Jason Xing wrote:
+> >>>>> On Tue, Nov 25, 2025 at 1:14=E2=80=AFAM Fernando Fernandez Mancera
+> >>>>> <fmancera@suse.de> wrote:
+> >>>>>>
+> >>>>>> Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+> >>>>>> production"), the descriptor number is stored in skb control block=
+ and
+> >>>>>> xsk_cq_submit_addr_locked() relies on it to put the umem addrs ont=
+o
+> >>>>>> pool's completion queue.
+> >>>>>>
+> >>>>>> skb control block shouldn't be used for this purpose as after tran=
+smit
+> >>>>>> xsk doesn't have control over it and other subsystems could use it=
+. This
+> >>>>>> leads to the following kernel panic due to a NULL pointer derefere=
+nce.
+> >>>>>>
+> >>>>>>    BUG: kernel NULL pointer dereference, address: 0000000000000000
+> >>>>>>    #PF: supervisor read access in kernel mode
+> >>>>>>    #PF: error_code(0x0000) - not-present page
+> >>>>>>    PGD 0 P4D 0
+> >>>>>>    Oops: Oops: 0000 [#1] SMP NOPTI
+> >>>>>>    CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb1=
+4-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
+> >>>>>>    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.1=
+7.0-debian-1.17.0-1 04/01/2014
+> >>>>>>    RIP: 0010:xsk_destruct_skb+0xd0/0x180
+> >>>>>>    [...]
+> >>>>>>    Call Trace:
+> >>>>>>     <IRQ>
+> >>>>>>     ? napi_complete_done+0x7a/0x1a0
+> >>>>>>     ip_rcv_core+0x1bb/0x340
+> >>>>>>     ip_rcv+0x30/0x1f0
+> >>>>>>     __netif_receive_skb_one_core+0x85/0xa0
+> >>>>>>     process_backlog+0x87/0x130
+> >>>>>>     __napi_poll+0x28/0x180
+> >>>>>>     net_rx_action+0x339/0x420
+> >>>>>>     handle_softirqs+0xdc/0x320
+> >>>>>>     ? handle_edge_irq+0x90/0x1e0
+> >>>>>>     do_softirq.part.0+0x3b/0x60
+> >>>>>>     </IRQ>
+> >>>>>>     <TASK>
+> >>>>>>     __local_bh_enable_ip+0x60/0x70
+> >>>>>>     __dev_direct_xmit+0x14e/0x1f0
+> >>>>>>     __xsk_generic_xmit+0x482/0xb70
+> >>>>>>     ? __remove_hrtimer+0x41/0xa0
+> >>>>>>     ? __xsk_generic_xmit+0x51/0xb70
+> >>>>>>     ? _raw_spin_unlock_irqrestore+0xe/0x40
+> >>>>>>     xsk_sendmsg+0xda/0x1c0
+> >>>>>>     __sys_sendto+0x1ee/0x200
+> >>>>>>     __x64_sys_sendto+0x24/0x30
+> >>>>>>     do_syscall_64+0x84/0x2f0
+> >>>>>>     ? __pfx_pollwake+0x10/0x10
+> >>>>>>     ? __rseq_handle_notify_resume+0xad/0x4c0
+> >>>>>>     ? restore_fpregs_from_fpstate+0x3c/0x90
+> >>>>>>     ? switch_fpu_return+0x5b/0xe0
+> >>>>>>     ? do_syscall_64+0x204/0x2f0
+> >>>>>>     ? do_syscall_64+0x204/0x2f0
+> >>>>>>     ? do_syscall_64+0x204/0x2f0
+> >>>>>>     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> >>>>>>     </TASK>
+> >>>>>>    [...]
+> >>>>>>    Kernel panic - not syncing: Fatal exception in interrupt
+> >>>>>>    Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation r=
+ange: 0xffffffff80000000-0xffffffffbfffffff)
+> >>>>>>
+> >>>>>> Instead use the skb destructor_arg pointer along with pointer tagg=
+ing.
+> >>>>>> As pointers are always aligned to 8B, use the bottom bit to indica=
+te
+> >>>>>> whether this a single address or an allocated struct containing se=
+veral
+> >>>>>> addresses.
+> >>>>>>
+> >>>>>> Fixes: 30f241fcf52a ("xsk: Fix immature cq descriptor production")
+> >>>>>> Closes: https://lore.kernel.org/netdev/0435b904-f44f-48f8-afb0-688=
+68474bf1c@nop.hu/
+> >>>>>> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> >>>>>> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+> >>>>>
+> >>>>> Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+> >>>>>
+> >>>>> Could you also post a patch on top of net-next as it has diverged f=
+rom
+> >>>>> the net tree?
+> >>>>>
+> >>>>
+> >>>> I think that is handled by maintainers when merging the branches. A
+> >>>> repost would be wrong because linux-next.git and linux.git will have=
+ a
+> >>>> different variant of the same commit..
+> >>>
+> >>> But this patch cannot be applied cleanly in the net-next tree...
+> >>
+> >> What we care here is that it applies to net as that's a tree that this
+> >> patch has been posted to.
+> >
+> > It sounds like I can post my approach without this patch on net-next,
+> > right? I have no idea how long I should keep waiting :S
+> >
+> > To be clear, what I meant was to ask Fernando to post a new rebased
+> > patch targetting net-next. If the patch doesn't need to land on
+> > net-next, I will post it as soon as possible.
+> >
+>
+> My patch landed on net tree and probably soon, net tree changes are
+> going to be merged on net-next tree. If there are conflicts when merging
+> the patch the maintainer will ask us or they will solve them.
 
-The new callback provides the same functionality in a more direct way,
-following the ongoing ethtool API modernization.
+Right, it's a normal routine. I will wait then.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/ethernet/cavium/thunder/nicvf_ethtool.c | 16 +++-------------
- 1 file changed, 3 insertions(+), 13 deletions(-)
+Thanks,
+Jason
 
-diff --git a/drivers/net/ethernet/cavium/thunder/nicvf_ethtool.c b/drivers/net/ethernet/cavium/thunder/nicvf_ethtool.c
-index fc6053414b7d..413028bdcacb 100644
---- a/drivers/net/ethernet/cavium/thunder/nicvf_ethtool.c
-+++ b/drivers/net/ethernet/cavium/thunder/nicvf_ethtool.c
-@@ -541,21 +541,11 @@ static int nicvf_get_rxfh_fields(struct net_device *dev,
- 	return 0;
- }
- 
--static int nicvf_get_rxnfc(struct net_device *dev,
--			   struct ethtool_rxnfc *info, u32 *rules)
-+static u32 nicvf_get_rx_ring_count(struct net_device *dev)
- {
- 	struct nicvf *nic = netdev_priv(dev);
--	int ret = -EOPNOTSUPP;
- 
--	switch (info->cmd) {
--	case ETHTOOL_GRXRINGS:
--		info->data = nic->rx_queues;
--		ret = 0;
--		break;
--	default:
--		break;
--	}
--	return ret;
-+	return nic->rx_queues;
- }
- 
- static int nicvf_set_rxfh_fields(struct net_device *dev,
-@@ -861,7 +851,7 @@ static const struct ethtool_ops nicvf_ethtool_ops = {
- 	.get_coalesce		= nicvf_get_coalesce,
- 	.get_ringparam		= nicvf_get_ringparam,
- 	.set_ringparam		= nicvf_set_ringparam,
--	.get_rxnfc		= nicvf_get_rxnfc,
-+	.get_rx_ring_count	= nicvf_get_rx_ring_count,
- 	.get_rxfh_key_size	= nicvf_get_rxfh_key_size,
- 	.get_rxfh_indir_size	= nicvf_get_rxfh_indir_size,
- 	.get_rxfh		= nicvf_get_rxfh,
-
----
-base-commit: ab084f0b8d6d2ee4b1c6a28f39a2a7430bdfa7f0
-change-id: 20251126-gxring_cavium-de39ec6136ee
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
-
+>
+> That was my understanding of how the workflow is.
+>
+> Thanks,
+> Fernando.
+>
+> > Thanks,
+> > Jason
+> >
+> >>>
+> >>>>
+> >>>> Please, let me know if I am wrong here.
+> >>>
+> >>> I'm not quite sure either.
+> >>>
+> >>> Thanks,
+> >>> Jason
+> >>>
+> >>>>
+> >>>> Thanks,
+> >>>> Fernando.
+>
 
