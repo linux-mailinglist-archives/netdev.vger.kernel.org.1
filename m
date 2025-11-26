@@ -1,97 +1,88 @@
-Return-Path: <netdev+bounces-242007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6841CC8BA5B
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 20:42:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA3D1C8BAE5
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 20:47:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 61DB34EDB4E
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 19:39:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A38684E644D
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 19:45:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61E934A795;
-	Wed, 26 Nov 2025 19:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256A2340286;
+	Wed, 26 Nov 2025 19:45:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OP31PLDg"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="r2hc/dAj"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012015.outbound.protection.outlook.com [40.93.195.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED76B34844F
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 19:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764185795; cv=fail; b=YLW0+vfCLBIyV3eqYNGKqjlOyVQNWb6IAgmkafMTmETlX0O3c/b5hLaJ4QGQFipkJTuP0qMOV8Y3G75ngt3CzmFYSEnG5ycaM4RcROUFnMWD5DXsHjmF+DNYtsdKPq62AN18a2i5SurSM6N3loJVrov23wcRBSrGTTa/0BJhaaI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764185795; c=relaxed/simple;
-	bh=zOUmClWf3bdg1WYO7etb2+lFmgOrGq6GuuVrCrIseX8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pNThEfec1gzbOP7vHuy63rK+tM6OeXzOY5dRP1zAnblukjXEBGtCu/mtmHe4YMQ0Jy9X/DfAfmRf7fgl9+TRHbV/WYG2AXDvKWYfmW6uUT7sF+w6ll1Y6V01wC9zwO7EZBKfQjg7s2jREIE/VdS3TWFyyqX9JHm5MLPU3rfXbPk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OP31PLDg; arc=fail smtp.client-ip=40.93.195.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CiKCKxjIL1YXpjVXMNTfvHi2P7AsnAvlhYiuLcLNHYnVzAnKV9Y4laZkYjjpckjUvlQFDgRmWFxvhVnJlbu6sGBWw+VQDlHOLJH6jjxs5S+yU+viTBAPvJwyhEouTZDtt18KGK4eBZIiniX9eXZH8nBbNO5P0pxswThcFB8fEUSimsfo4JHee7wM0MyQVSLUv2I1HgvoAxeJFTFEh38SRD58i6PbQQq0Jz4j5+zWUUZtQK/6rzOBggQN7kdcNIq7Q6zEi1bUgFhp/BWlgxfZx3N6/kZXgTCzaAZ97jDVPkMooi7NtuOWpgttdCRg1JSvlqys5JqedwcB0OODHjE8Mw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GCavV9b+4vKFv8AH+0aESUb9H+XP67mEhXTzDHKG2pc=;
- b=GIlsjGgl6QChLSFaUxkc7K2x79qBTYwEG+1izi9PMDM3HzMFMR8TSZdiJx13WfKHMFd7kHP6Fnzvh5R5VmgqC38XqfymbtN/ybAFQ8rsA2lQIjcXnXAVH3E1Ro8JeW5R7DYXKEItUyQz5m1hLqeVUhdtVLlis71IMaTIth+PFpgPsdaohK6XKQCopHZXG8pNK5uE+9JAt2R4rZ4jlSIsvJzxZ4WVAmg1X/K0vZTgNtU4tIU2PUWmJqOmMsgsDhV0DYeYf5Ux/J7gDvI/H7IkR952EHVn2x8FE6h2RzJxWFC+9+M+PAQ8XeDvRl12ywQ9VKX/mXT0D2Ney9Ds8/CwRA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GCavV9b+4vKFv8AH+0aESUb9H+XP67mEhXTzDHKG2pc=;
- b=OP31PLDgHB+fOxizgQYmTeN7SpNeVrXvu9xauY/BZeiIizIjKWoo1a9SDAARVAJ4gVi7piJE/V64cvd7rzDIPjjwDQ8PerAE2eWycajsxlnqzEUEhksFydv5W7IAdR2ZyqU8OqQeepupiubZfBxMNFuwyXne9ZRIMI61kRLhCDCkmT5GBtuCmnP44JQg2YXR339bl2oPgZSaSSLvqBw1QYBwk2MmEtqS6m5oLHE2/5YbZCnZ9qmy/jRJPtfTAvQuDJm0kgl9JnLmUWvghshLCWCQ7+p7eYfADNfkgK7eA4QaxQcTcqlYuT8aGqsWHpymplfdnshXvVaquvXXa7v5lA==
-Received: from CH2PR02CA0017.namprd02.prod.outlook.com (2603:10b6:610:4e::27)
- by DS0PR12MB8218.namprd12.prod.outlook.com (2603:10b6:8:f2::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.13; Wed, 26 Nov
- 2025 19:36:27 +0000
-Received: from CH2PEPF00000142.namprd02.prod.outlook.com
- (2603:10b6:610:4e:cafe::d1) by CH2PR02CA0017.outlook.office365.com
- (2603:10b6:610:4e::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.13 via Frontend Transport; Wed,
- 26 Nov 2025 19:36:26 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- CH2PEPF00000142.mail.protection.outlook.com (10.167.244.75) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9366.7 via Frontend Transport; Wed, 26 Nov 2025 19:36:26 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 26 Nov
- 2025 11:36:16 -0800
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Wed, 26 Nov 2025 11:36:15 -0800
-Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Wed, 26 Nov 2025 11:36:14 -0800
-From: Daniel Jurgens <danielj@nvidia.com>
-To: <netdev@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>,
-	<pabeni@redhat.com>
-CC: <virtualization@lists.linux.dev>, <parav@nvidia.com>,
-	<shshitrit@nvidia.com>, <yohadt@nvidia.com>, <xuanzhuo@linux.alibaba.com>,
-	<eperezma@redhat.com>, <jgg@ziepe.ca>, <kevin.tian@intel.com>,
-	<kuba@kernel.org>, <andrew+netdev@lunn.ch>, <edumazet@google.com>, "Daniel
- Jurgens" <danielj@nvidia.com>
-Subject: [PATCH net-next v13 12/12] virtio_net: Add get ethtool flow rules ops
-Date: Wed, 26 Nov 2025 13:35:39 -0600
-Message-ID: <20251126193539.7791-13-danielj@nvidia.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20251126193539.7791-1-danielj@nvidia.com>
-References: <20251126193539.7791-1-danielj@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62DB84A02
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 19:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764186321; cv=none; b=Rby58LBxQeDOC9R/TmqWnLpSZQNBXkQ7FuR5YwnNiOu2kZXV2H3bC+1r7jioy94HK9gtaNsoaF7r2Z2bkXUPprrpfSKBtvDqh9kDqDNXpQFG6V84gu++OMVmaNi+WCmTy3m09V8Ck0+KkoFA2OK4HsbDvROqU617+SjwdabP1GY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764186321; c=relaxed/simple;
+	bh=2jP+qM2+v5iGC4HrKkBQh+JjJn4g1/u+TzFbgP4AQCw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=An42seF15yXV09Tro3z/zNOnZ1dHAX+obvhfMG9ESknFORFPWCLB3/03VjzyjZqSmn5lEKrDcWnr0+o14354Ma0Px+06HrrIzKGeqIa0J60oRUE1If/WH6w4e6PjYLYLs62Hd/cgYYH4MStVjMHl258psS9vCroUNx1EMwznIFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=r2hc/dAj; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-bb2447d11ceso105471a12.0
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 11:45:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1764186318; x=1764791118; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WtEsv1qnprkRz63f114HO+3gpWzGkQYPLZ6RpFK2vlo=;
+        b=r2hc/dAjhCKgOJwhTEfKSi5auueHtIn9h2wk/HpbonSvgrLtuRX2aJJiUUnuFUJAiR
+         gYnWEU2hCHnveKE4lXknObGeJfGlyMORuYctklC6xU1KBmwh+emBTs71UOfIl9vzvwzY
+         kdeEPI2gCFD68Oy0nt7VhaQpdR50rvxazYYCDCebbZfihj56aBHezKpnA4yyCtAHzhNq
+         1WXBbMazm8ccqL1xjtw9WPF/Lbfa8/XjHs7NDkqjSi538DOH7BKs2MY9znDOo+ybBCtw
+         mdE/xKakeTbgUJ14+Xath/fZXvdIYmCVv3HFY5mZpIaZb2jrnl4C3k35J1q/lxpmXdeY
+         OoSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764186318; x=1764791118;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WtEsv1qnprkRz63f114HO+3gpWzGkQYPLZ6RpFK2vlo=;
+        b=XuRBzh6jxMqFjL8ZF38QJ55LRRITmvHGHCabJ5emSjgnXyic5knKbnN1psiWXXl2JV
+         fuop/uwW7Nq6S59asnIA42kcmBqH0BbKtI6wVCK5Xa4lg8gl6BhWyEAI1mtbSF88uuOu
+         aE5odjf/5sfi6rNA87RrFywV55cmlBclo2DMeaB5RaEfKV6M4qA/O/aPBpfjeTgfKXop
+         rWiVUt8ySYLCb6TFVbkB/QY9dltygZwutSE3MeGzf3D9js3i60PsdnrUlR/4LlyeXGKq
+         +m4r+mjU9+HilWthfaTXuno34YKtnsr6TGLDoIATWvoY5/5+h/XUnvRt05xFzmPtUJtE
+         FmBQ==
+X-Gm-Message-State: AOJu0YzPzl9hwySKLy+s5+7cWMUIcliSkpKHFfIl6zbCDB97b025laax
+	rCuZKvObCpChypOW8Zmu1vOHyTghxNLgw7dGtQDDBS9vRuXJv1Fa2QRVANXnwra4YA==
+X-Gm-Gg: ASbGncs227/QyalcWgWs3AaBo+yS3wQcErtp5uIxsEqEitZouTHskMnCJLuuaUCB1KE
+	0oUwQaemB8h0P/kouIYVobwHJpOeK8TH/2MdfLM8y+F/XJUpUiiq0C2APlMsFjKY7mFYtWC1jAt
+	vFbtvMeTv7ML43WNZzIkHFz1tnluO+8Usaf7032sOMYzvHJdZY+WUVmAQ93/PmCfIzG3lFOjySM
+	cNQIjA0GtAWkfsX2PNOQYTZ18I4ck45w57JrfELwlT1jzzbBmxQlB7iJiXI8hoFhE657QA2QZ7U
+	INbMdovbE2/DKqjGTYcQ39hwRpM7IxnzoppUnlcf3SX2Hes/2qx25DMhMbGWnZR2iE+KH25zAqh
+	4Gc4bvrfCj5s1g7vo2UXHsS+KpbYPXDBrMtyySdUn20eSOKfKPfX3Ri6cZQ9U5uvVXghhs3OtnA
+	WIa1Mp+wjbWevNB3zWNmXPNfZ4gnI33zbw5MkjyAEe
+X-Google-Smtp-Source: AGHT+IFLLj/qsp3TdZVuBhvSHTdhyYnHycOPM+V5xxsYu8sfMBuLLU7iSV/CB0c2g/DZ7EeufYy0Pg==
+X-Received: by 2002:a05:7300:3c9d:b0:2a4:3592:c604 with SMTP id 5a478bee46e88-2a94174e0a3mr4277965eec.21.1764186318491;
+        Wed, 26 Nov 2025 11:45:18 -0800 (PST)
+Received: from p1.tailc0aff1.ts.net (209-147-139-51.nat.asu.edu. [209.147.139.51])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a93c5562b2sm24252446eec.3.2025.11.26.11.45.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Nov 2025 11:45:18 -0800 (PST)
+From: Xiang Mei <xmei5@asu.edu>
+To: security@kernel.org
+Cc: netdev@vger.kernel.org,
+	toke@toke.dk,
+	xiyou.wangcong@gmail.com,
+	cake@lists.bufferbloat.net,
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net v7 1/2] net/sched: sch_cake: Fix incorrect qlen reduction in cake_drop
+Date: Wed, 26 Nov 2025 12:45:12 -0700
+Message-ID: <20251126194513.3984722-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,219 +90,154 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000142:EE_|DS0PR12MB8218:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1954214b-de06-4246-36db-08de2d23173b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|7416014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?oVvrkqdjEw1B80GT2UkHbsI7z+HaGJ2/ggv/XLf8eBY3zoM7jC1aMhKRcESL?=
- =?us-ascii?Q?PhyTNI8LYup8Mp3mhlBeEPhIXZu+BzdGdgchN75a2Z6ZxK6HwRX8qnq+CYQA?=
- =?us-ascii?Q?3ev4VeUN8UUx/S86djiYe+2CHCtQ7RUsLI9hNi1N4RrFN4VulqECSOHRlV8h?=
- =?us-ascii?Q?zgagD4goGU/SuG1dGgZRqi7Bn54HOhr+lWT1viys/UZzWWYC2p495Wm3bPZZ?=
- =?us-ascii?Q?LdhQ7cI3+QbsfFKfhy6owsSDKotxzGCK1pqS0b0w9z+Yx+sYik4juJ7TQqK5?=
- =?us-ascii?Q?dLPgkrbwEKVNkRnoadMC7b4ZkpP6Lay93cCspHnwWpfPwZFfyS5un+2bTv4m?=
- =?us-ascii?Q?TrBbT5ALTyAl/RyoC6W9FrcLr9N3BXG1egY3eS9h/K/wyhfaP0jFvIqzeSCf?=
- =?us-ascii?Q?IRc9c1TSsRRxr0Pc/80s4yKqIDkWWxmkC1wFKr9TMcrAycDMAOax72BqOKDo?=
- =?us-ascii?Q?2tc/bAs6x6McgBh2HL6boUSah5xHsWsNu/YX7Nq3uhTlpV32rBFhqNUzCSxf?=
- =?us-ascii?Q?KRz3TAgVz7mNKed3sIlwImeLYpmjsw3uFVQaeGciJ3PgdI3bAI6apqqSJ6gh?=
- =?us-ascii?Q?345GCwTFy1+Rnwd36aNI/aLMdVHYtrFn95vwZ5hmpa5vxQtOX/ERwBI1mYTd?=
- =?us-ascii?Q?/4FaQmo+e5kIjM3W/DRex1ev0xLNFcPbJBVo55llYsrr9bk/295a0Moy9cYl?=
- =?us-ascii?Q?gp3ZMfDcUMcgmsu9GDwVSu1w+fiV3oF8KYIjMnXjiTP6EwNqah1UZIITWd7Q?=
- =?us-ascii?Q?/QgLHz68meZoIlTvODae8xogiHQApi7LMFOJ0MwzeSVwvGNunSXvuUlhIpTD?=
- =?us-ascii?Q?MWztJ2MfbtxFGHxiN/h73BLcY5aZ3btIlVXSxg32ijuLpjzOxTuJ+3vcl6fx?=
- =?us-ascii?Q?bEGpcoF/xu7/djoJQyzWVV7ZZa2M7v0x0AQF+t+ZuOoQvDya6Nd6o/rxFbkV?=
- =?us-ascii?Q?WTEtWijZKmodroE33YKK5dJJGZafy7yuvg/YPnou7Rmx25xr/l3I7ivKAPLe?=
- =?us-ascii?Q?NKRyd9iGZUQiHl2N9EmRXT4/QI+Jomp4zKCcUUIFg6gz3946I6PajG85157w?=
- =?us-ascii?Q?6VilSiGUQ3cOzMH0AIX97AM/gRbo9K4nCoBIR8EqT8ejBNfsGklAJX7TsifL?=
- =?us-ascii?Q?kZpdIsDqjz2V9XYbvy+XXHs+1q9D2GPi/wBjPQKH1PKbSSW5g7XymlNendkn?=
- =?us-ascii?Q?QC9PjiW4I4mCYfcdiTIA8S4lPBYJ0grE3byRSKIxrUmWTW9JzemBUdLO3tP5?=
- =?us-ascii?Q?DpGyywDZVprLGGUGXJoSjmAEYOqzy6GHtg4dkyi+9S+G3TNAGXgecIgoqn6t?=
- =?us-ascii?Q?31cOoegyE7pttlFBt4WSH+wUcurmc5tUChAenAXjZLkvvU8eQxMkjNUGIfcq?=
- =?us-ascii?Q?38Pd6Ftl50KfNG+KFtcZCGSEPjiKBDdovsJ4yFnhvu17wEeRzzYsvvy/RGXV?=
- =?us-ascii?Q?hPXI0nGu9FYzCapCcrEHhgwPydNplRdws555jCXncVi0VDWiqX85bnbwT3ki?=
- =?us-ascii?Q?nJV4V786q9miUFOds+QbCfT0vfBsTDqKA9OhgeDLdjuh9i/Hs77JMvnu06iM?=
- =?us-ascii?Q?X5UOLcvfzlWzanWFqYU=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(7416014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2025 19:36:26.8627
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1954214b-de06-4246-36db-08de2d23173b
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000142.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8218
 
-- Get total number of rules. There's no user interface for this. It is
-  used to allocate an appropriately sized buffer for getting all the
-  rules.
+In cake_drop(), qdisc_tree_reduce_backlog() is used to update the qlen
+and backlog of the qdisc hierarchy. Its caller, cake_enqueue(), assumes
+that the parent qdisc will enqueue the current packet. However, this
+assumption breaks when cake_enqueue() returns NET_XMIT_CN: the parent
+qdisc stops enqueuing current packet, leaving the tree qlen/backlog
+accounting inconsistent. This mismatch can lead to a NULL dereference
+(e.g., when the parent Qdisc is qfq_qdisc).
 
-- Get specific rule
-$ ethtool -u ens9 rule 0
-	Filter: 0
-		Rule Type: UDP over IPv4
-		Src IP addr: 0.0.0.0 mask: 255.255.255.255
-		Dest IP addr: 192.168.5.2 mask: 0.0.0.0
-		TOS: 0x0 mask: 0xff
-		Src port: 0 mask: 0xffff
-		Dest port: 4321 mask: 0x0
-		Action: Direct to queue 16
+This patch computes the qlen/backlog delta in a more robust way by
+observing the difference before and after the series of cake_drop()
+calls, and then compensates the qdisc tree accounting if cake_enqueue()
+returns NET_XMIT_CN.
 
-- Get all rules:
-$ ethtool -u ens9
-31 RX rings available
-Total 2 rules
+To ensure correct compensation when ACK thinning is enabled, a new
+variable is introduced to keep qlen unchanged.
 
-Filter: 0
-        Rule Type: UDP over IPv4
-        Src IP addr: 0.0.0.0 mask: 255.255.255.255
-        Dest IP addr: 192.168.5.2 mask: 0.0.0.0
-...
-
-Filter: 1
-        Flow Type: Raw Ethernet
-        Src MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
-        Dest MAC addr: 08:11:22:33:44:54 mask: 00:00:00:00:00:00
-
-Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
-Reviewed-by: Parav Pandit <parav@nvidia.com>
-Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Fixes: 15de71d06a40 ("net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit")
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
 ---
-v4: Answered questions about rules_limit overflow with no changes.
-
-v12:
-  - Use and set rule_cnt in virtnet_ethtool_get_all_flows. MST
-  - Leave rc uninitiazed at the top of virtnet_get_rxnfc. MST
+v2: add missing cc
+v3: move qdisc_tree_reduce_backlog out of cake_drop
+v4: remove redundant variable and handle ack branch correctly
+v5: add the PoC as a test case
+v6: split test and patch; fix the wrong drop count
+v7: remove redundant comments
 ---
----
- drivers/net/virtio_net.c | 82 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 82 insertions(+)
+ net/sched/sch_cake.c | 58 ++++++++++++++++++++++++--------------------
+ 1 file changed, 32 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 908e903272db..f71b7af848af 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -310,6 +310,13 @@ static int virtnet_ethtool_flow_insert(struct virtnet_ff *ff,
- 				       struct ethtool_rx_flow_spec *fs,
- 				       u16 curr_queue_pairs);
- static int virtnet_ethtool_flow_remove(struct virtnet_ff *ff, int location);
-+static int virtnet_ethtool_get_flow_count(struct virtnet_ff *ff,
-+					  struct ethtool_rxnfc *info);
-+static int virtnet_ethtool_get_flow(struct virtnet_ff *ff,
-+				    struct ethtool_rxnfc *info);
-+static int
-+virtnet_ethtool_get_all_flows(struct virtnet_ff *ff,
-+			      struct ethtool_rxnfc *info, u32 *rule_locs);
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index 32bacfc314c2..d325a90cde9e 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -1597,7 +1597,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
  
- #define VIRTNET_Q_TYPE_RX 0
- #define VIRTNET_Q_TYPE_TX 1
-@@ -5677,6 +5684,28 @@ static u32 virtnet_get_rx_ring_count(struct net_device *dev)
- 	return vi->curr_queue_pairs;
- }
+ 	qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
+ 	sch->q.qlen--;
+-	qdisc_tree_reduce_backlog(sch, 1, len);
  
-+static int virtnet_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info, u32 *rule_locs)
-+{
-+	struct virtnet_info *vi = netdev_priv(dev);
-+	int rc;
+ 	cake_heapify(q, 0);
+ 
+@@ -1743,14 +1742,14 @@ static void cake_reconfigure(struct Qdisc *sch);
+ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 			struct sk_buff **to_free)
+ {
++	u32 idx, tin, prev_qlen, prev_backlog, drop_id;
+ 	struct cake_sched_data *q = qdisc_priv(sch);
+-	int len = qdisc_pkt_len(skb);
+-	int ret;
++	int len = qdisc_pkt_len(skb), ret;
+ 	struct sk_buff *ack = NULL;
+ 	ktime_t now = ktime_get();
+ 	struct cake_tin_data *b;
+ 	struct cake_flow *flow;
+-	u32 idx, tin;
++	bool same_flow = false;
+ 
+ 	/* choose flow to insert into */
+ 	idx = cake_classify(sch, &b, skb, q->flow_mode, &ret);
+@@ -1823,6 +1822,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		consume_skb(skb);
+ 	} else {
+ 		/* not splitting */
++		int ack_pkt_len = 0;
 +
-+	switch (info->cmd) {
-+	case ETHTOOL_GRXCLSRLCNT:
-+		rc = virtnet_ethtool_get_flow_count(&vi->ff, info);
-+		break;
-+	case ETHTOOL_GRXCLSRULE:
-+		rc = virtnet_ethtool_get_flow(&vi->ff, info);
-+		break;
-+	case ETHTOOL_GRXCLSRLALL:
-+		rc = virtnet_ethtool_get_all_flows(&vi->ff, info, rule_locs);
-+		break;
-+	default:
-+		rc = -EOPNOTSUPP;
+ 		cobalt_set_enqueue_time(skb, now);
+ 		get_cobalt_cb(skb)->adjusted_len = cake_overhead(q, skb);
+ 		flow_queue_add(flow, skb);
+@@ -1833,13 +1834,13 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		if (ack) {
+ 			b->ack_drops++;
+ 			sch->qstats.drops++;
+-			b->bytes += qdisc_pkt_len(ack);
+-			len -= qdisc_pkt_len(ack);
++			ack_pkt_len = qdisc_pkt_len(ack);
++			b->bytes += ack_pkt_len;
+ 			q->buffer_used += skb->truesize - ack->truesize;
+ 			if (q->rate_flags & CAKE_FLAG_INGRESS)
+ 				cake_advance_shaper(q, b, ack, now, true);
+ 
+-			qdisc_tree_reduce_backlog(sch, 1, qdisc_pkt_len(ack));
++			qdisc_tree_reduce_backlog(sch, 1, ack_pkt_len);
+ 			consume_skb(ack);
+ 		} else {
+ 			sch->q.qlen++;
+@@ -1848,11 +1849,11 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 
+ 		/* stats */
+ 		b->packets++;
+-		b->bytes	    += len;
+-		b->backlogs[idx]    += len;
+-		b->tin_backlog      += len;
+-		sch->qstats.backlog += len;
+-		q->avg_window_bytes += len;
++		b->bytes	    += len - ack_pkt_len;
++		b->backlogs[idx]    += len - ack_pkt_len;
++		b->tin_backlog      += len - ack_pkt_len;
++		sch->qstats.backlog += len - ack_pkt_len;
++		q->avg_window_bytes += len - ack_pkt_len;
+ 	}
+ 
+ 	if (q->overflow_timeout)
+@@ -1927,24 +1928,29 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	if (q->buffer_used > q->buffer_max_used)
+ 		q->buffer_max_used = q->buffer_used;
+ 
+-	if (q->buffer_used > q->buffer_limit) {
+-		bool same_flow = false;
+-		u32 dropped = 0;
+-		u32 drop_id;
++	if (q->buffer_used <= q->buffer_limit)
++		return NET_XMIT_SUCCESS;
+ 
+-		while (q->buffer_used > q->buffer_limit) {
+-			dropped++;
+-			drop_id = cake_drop(sch, to_free);
++	prev_qlen = sch->q.qlen;
++	prev_backlog = sch->qstats.backlog;
+ 
+-			if ((drop_id >> 16) == tin &&
+-			    (drop_id & 0xFFFF) == idx)
+-				same_flow = true;
+-		}
+-		b->drop_overlimit += dropped;
++	while (q->buffer_used > q->buffer_limit) {
++		drop_id = cake_drop(sch, to_free);
++		if ((drop_id >> 16) == tin &&
++		    (drop_id & 0xFFFF) == idx)
++			same_flow = true;
 +	}
 +
-+	return rc;
-+}
-+
- static int virtnet_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info)
- {
- 	struct virtnet_info *vi = netdev_priv(dev);
-@@ -5718,6 +5747,7 @@ static const struct ethtool_ops virtnet_ethtool_ops = {
- 	.get_rxfh_fields = virtnet_get_hashflow,
- 	.set_rxfh_fields = virtnet_set_hashflow,
- 	.get_rx_ring_count = virtnet_get_rx_ring_count,
-+	.get_rxnfc = virtnet_get_rxnfc,
- 	.set_rxnfc = virtnet_set_rxnfc,
- };
++	prev_qlen -= sch->q.qlen;
++	prev_backlog -= sch->qstats.backlog;
++	b->drop_overlimit += prev_qlen;
  
-@@ -6651,6 +6681,58 @@ static int virtnet_ethtool_flow_remove(struct virtnet_ff *ff, int location)
- 	return err;
+-		if (same_flow)
+-			return NET_XMIT_CN;
++	if (same_flow) {
++		qdisc_tree_reduce_backlog(sch, prev_qlen - 1,
++					  prev_backlog - len);
++		return NET_XMIT_CN;
+ 	}
++	qdisc_tree_reduce_backlog(sch, prev_qlen, prev_backlog);
+ 	return NET_XMIT_SUCCESS;
  }
  
-+static int virtnet_ethtool_get_flow_count(struct virtnet_ff *ff,
-+					  struct ethtool_rxnfc *info)
-+{
-+	if (!ff->ff_supported)
-+		return -EOPNOTSUPP;
-+
-+	info->rule_cnt = ff->ethtool.num_rules;
-+	info->data = le32_to_cpu(ff->ff_caps->rules_limit) | RX_CLS_LOC_SPECIAL;
-+
-+	return 0;
-+}
-+
-+static int virtnet_ethtool_get_flow(struct virtnet_ff *ff,
-+				    struct ethtool_rxnfc *info)
-+{
-+	struct virtnet_ethtool_rule *eth_rule;
-+
-+	if (!ff->ff_supported)
-+		return -EOPNOTSUPP;
-+
-+	eth_rule = xa_load(&ff->ethtool.rules, info->fs.location);
-+	if (!eth_rule)
-+		return -ENOENT;
-+
-+	info->fs = eth_rule->flow_spec;
-+
-+	return 0;
-+}
-+
-+static int
-+virtnet_ethtool_get_all_flows(struct virtnet_ff *ff,
-+			      struct ethtool_rxnfc *info, u32 *rule_locs)
-+{
-+	struct virtnet_ethtool_rule *eth_rule;
-+	unsigned long i = 0;
-+	int idx = 0;
-+
-+	if (!ff->ff_supported)
-+		return -EOPNOTSUPP;
-+
-+	xa_for_each(&ff->ethtool.rules, i, eth_rule) {
-+		if (idx == info->rule_cnt)
-+			return -EMSGSIZE;
-+		rule_locs[idx++] = i;
-+	}
-+
-+	info->data = le32_to_cpu(ff->ff_caps->rules_limit);
-+	info->rule_cnt = idx;
-+
-+	return 0;
-+}
-+
- static size_t get_mask_size(u16 type)
- {
- 	switch (type) {
 -- 
-2.50.1
+2.43.0
 
 
