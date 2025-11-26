@@ -1,248 +1,302 @@
-Return-Path: <netdev+bounces-241912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58892C8A404
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 15:15:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F7ECC8A49B
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 15:21:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8F7EC347835
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 14:14:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87DC33A07FA
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 14:16:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9132D781E;
-	Wed, 26 Nov 2025 14:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8AA2F7AC5;
+	Wed, 26 Nov 2025 14:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LvZ7SMWq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ax3yLXFB"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CFFE2D6E61;
-	Wed, 26 Nov 2025 14:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC442D6E4A
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 14:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764166479; cv=none; b=mVI10YQ4naN9h8fS8xBui6HowF19/DJMT8T4U1jokInGgJ1Wg5E071/XV9SlLfhBdH0qxDvWoZnWTMiDuG8cMwepBC8u0vHfH4tAjJ6Hv670UDZJce2aH6MikHYa3g6YislyHCS2eNoaLt6pxugExI+xICZfoebpRHEyiwaYQgI=
+	t=1764166617; cv=none; b=V0NaIGcwDbJ/ZlpTjNec2XnLxT37IyQ9wfKQlj4nmhUgYS1x3fqn8Od+tJOYo92QSjHdCRoMkkrkxc2q7ff4ubuVnBfDEou0X1dV33Xebgp77JUo6RJYZMRycQNFPtdF9hfxnnpF7bmqENP26uNB4kIsqCkS0YQmghzkrhh/PgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764166479; c=relaxed/simple;
-	bh=xVjTk2jzLbAxXYSZNBJBcZfk3x8gCryYxGjkjkccXXE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TgffUXhbktVTwwxiokK2cx+yk7ZbdI6SyiIvVULlQIS++XC/bNly+TIceEy4xGJSDcNH8O+5XubVV3AnhV0QXX2gDMCMO/p5fz/aX6W93KrTRA2BFVfwWzjEwthD5LOB+aLKhUcs+FEPn986Ao05M/glrGRYilS6TZxv9OAnabs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LvZ7SMWq; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=shJ8INqCd2/yfnuiDjwObFsi6cv+nBH3HMTZig1ESzE=; b=LvZ7SMWqxM+HNf5d6MXxszdtWr
-	d4qcpEcBkzGc48eN7Goq9z6iTRJeUpifTfsFiIldo29+KTsYcVbqjkNSFfU40yRVifLHRQEj1tsO2
-	v7jF1sHyWGr4eqXrXaukQKp6yJlPzdrhe2sxsA8R20bfV1cTR5Wo/RvB1jGRQwjMOT27QYHb7LUD6
-	OZES2jkmXNlljA5Q1Gx7KT4YgzI3EFMA8zFVvVhIHudx+oDocE0vJw++BKU3TMsuhSbsrMQeXs3+H
-	hpm1YUlYjOXY7FPtLVDZZmU4/vgqDQVkfNpVuHpos99GvoRTy+DfFYN63knXGvxqRieN/5MXDx8x1
-	PNfUSA/g==;
-Received: from [172.31.31.148] (helo=u09cd745991455d.ant.amazon.com)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vOFQH-000000086cM-0SMZ;
-	Wed, 26 Nov 2025 13:19:05 +0000
-Message-ID: <ebc45c917c4c50e40411135e5fdfb19b907bfc3d.camel@infradead.org>
-Subject: Re: [RFC PATCH 1/2] ptp: vmclock: add vm generation counter
-From: David Woodhouse <dwmw2@infradead.org>
-To: "Chalios, Babis" <bchalios@amazon.es>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>,  "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,  "kuba@kernel.org"
- <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: "Graf (AWS), Alexander" <graf@amazon.de>, "mzxreary@0pointer.de"
-	 <mzxreary@0pointer.de>
-Date: Wed, 26 Nov 2025 14:14:27 +0000
-In-Reply-To: <20251125153830.11487-2-bchalios@amazon.es>
-References: <20251125153830.11487-1-bchalios@amazon.es>
-	 <20251125153830.11487-2-bchalios@amazon.es>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-PgzzRXrfw4Pk0aNK2tYW"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1764166617; c=relaxed/simple;
+	bh=AEDGAQM1/PF1m0UH1fIaRJ1Q+AToRWT6itSQj3b2oVw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n5eWQURcEZaYIb1vv1jFl8WKnZP/irEmD7cFrnLK3EVcLREyJxeKIX93nfoZAnr0ISBDEBKE1MmCCrKs40UvPvrGqKHRS8nRtuZ5Pll0LG+AF6WJgSgRUPLqe5j6X0yaiJV/YXTNsFFi7y4V6k53oNWbPgPQGPlnDY1nEJvTyxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ax3yLXFB; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <25ae6db1-856f-4592-a4fa-8a927426ed72@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764166603;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Wn1Lc3gEV2pfftZ9XKs0zcUYmlQ97wa6T4ZGjCCqTy0=;
+	b=Ax3yLXFBjFyT2vbBi6ihHz0fk81f6PZRPeXhzTSsMqsb9ErfWjc+5UZ7Juc1uiQWwE6Re5
+	z7f4PixpQPE9GEhEmVx+H46HOQA1lw7BWDzE/qFBaNc+g3cv3VGIqsTGf1xyFSBR5x7I+g
+	RWm+bxLUwx5NpUVFGGHnHsYnlX5S0vY=
+Date: Wed, 26 Nov 2025 15:16:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Subject: Re: [PATCH] RDMA/siw: reclassify sockets in order to avoid false
+ positives from lockdep
+To: Stefan Metzmacher <metze@samba.org>, linux-rdma@vger.kernel.org
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ netdev@vger.kernel.org, linux-cifs@vger.kernel.org
+References: <20251126104254.1779732-1-metze@samba.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Bernard Metzler <bernard.metzler@linux.dev>
+In-Reply-To: <20251126104254.1779732-1-metze@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-
---=-PgzzRXrfw4Pk0aNK2tYW
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, 2025-11-25 at 15:38 +0000, Chalios, Babis wrote:
-> Similar to live migration, loading a VM from some saved state (aka
-> snapshot) is also an event that calls for clock adjustments in the
-> guest. However, guests might want to take more actions as a response to
-> such events, e.g. as discarding UUIDs, resetting network connections,
-> reseeding entropy pools, etc. These are actions that guests don't
-> typically take during live migration, so add a new field in the
-> vmclock_abi called vm_generation_counter which informs the guest about
-> such events.
->=20
-> Signed-off-by: Babis Chalios <bchalios@amazon.es>
+On 26.11.2025 11:42, Stefan Metzmacher wrote:
+> While developing IPPROTO_SMBDIRECT support for the code
+> under fs/smb/common/smbdirect [1], I noticed false positives like this:
+> 
+> [T79] ======================================================
+> [T79] WARNING: possible circular locking dependency detected
+> [T79] 6.18.0-rc4-metze-kasan-lockdep.01+ #1 Tainted: G           OE
+> [T79] ------------------------------------------------------
+> [T79] kworker/2:0/79 is trying to acquire lock:
+> [T79] ffff88801f968278 (sk_lock-AF_INET){+.+.}-{0:0},
+>                          at: sock_set_reuseaddr+0x14/0x70
+> [T79]
+>          but task is already holding lock:
+> [T79] ffffffffc10f7230 (lock#9){+.+.}-{4:4},
+>                          at: rdma_listen+0x3d2/0x740 [rdma_cm]
+> [T79]
+>          which lock already depends on the new lock.
+> 
+> [T79]
+>          the existing dependency chain (in reverse order) is:
+> [T79]
+>          -> #1 (lock#9){+.+.}-{4:4}:
+> [T79]        __lock_acquire+0x535/0xc30
+> [T79]        lock_acquire.part.0+0xb3/0x240
+> [T79]        lock_acquire+0x60/0x140
+> [T79]        __mutex_lock+0x1af/0x1c10
+> [T79]        mutex_lock_nested+0x1b/0x30
+> [T79]        cma_get_port+0xba/0x7d0 [rdma_cm]
+> [T79]        rdma_bind_addr_dst+0x598/0x9a0 [rdma_cm]
+> [T79]        cma_bind_addr+0x107/0x320 [rdma_cm]
+> [T79]        rdma_resolve_addr+0xa3/0x830 [rdma_cm]
+> [T79]        destroy_lease_table+0x12b/0x420 [ksmbd]
+> [T79]        ksmbd_NTtimeToUnix+0x3e/0x80 [ksmbd]
+> [T79]        ndr_encode_posix_acl+0x6e9/0xab0 [ksmbd]
+> [T79]        ndr_encode_v4_ntacl+0x53/0x870 [ksmbd]
+> [T79]        __sys_connect_file+0x131/0x1c0
+> [T79]        __sys_connect+0x111/0x140
+> [T79]        __x64_sys_connect+0x72/0xc0
+> [T79]        x64_sys_call+0xe7d/0x26a0
+> [T79]        do_syscall_64+0x93/0xff0
+> [T79]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [T79]
+>          -> #0 (sk_lock-AF_INET){+.+.}-{0:0}:
+> [T79]        check_prev_add+0xf3/0xcd0
+> [T79]        validate_chain+0x466/0x590
+> [T79]        __lock_acquire+0x535/0xc30
+> [T79]        lock_acquire.part.0+0xb3/0x240
+> [T79]        lock_acquire+0x60/0x140
+> [T79]        lock_sock_nested+0x3b/0xf0
+> [T79]        sock_set_reuseaddr+0x14/0x70
+> [T79]        siw_create_listen+0x145/0x1540 [siw]
+> [T79]        iw_cm_listen+0x313/0x5b0 [iw_cm]
+> [T79]        cma_iw_listen+0x271/0x3c0 [rdma_cm]
+> [T79]        rdma_listen+0x3b1/0x740 [rdma_cm]
+> [T79]        cma_listen_on_dev+0x46a/0x750 [rdma_cm]
+> [T79]        rdma_listen+0x4b0/0x740 [rdma_cm]
+> [T79]        ksmbd_rdma_init+0x12b/0x270 [ksmbd]
+> [T79]        ksmbd_conn_transport_init+0x26/0x70 [ksmbd]
+> [T79]        server_ctrl_handle_work+0x1e5/0x280 [ksmbd]
+> [T79]        process_one_work+0x86c/0x1930
+> [T79]        worker_thread+0x6f0/0x11f0
+> [T79]        kthread+0x3ec/0x8b0
+> [T79]        ret_from_fork+0x314/0x400
+> [T79]        ret_from_fork_asm+0x1a/0x30
+> [T79]
+>          other info that might help us debug this:
+> 
+> [T79]  Possible unsafe locking scenario:
+> 
+> [T79]        CPU0                    CPU1
+> [T79]        ----                    ----
+> [T79]   lock(lock#9);
+> [T79]                                lock(sk_lock-AF_INET);
+> [T79]                                lock(lock#9);
+> [T79]   lock(sk_lock-AF_INET);
+> [T79]
+>           *** DEADLOCK ***
+> 
+> [T79] 5 locks held by kworker/2:0/79:
+> [T79] #0: ffff88800120b158 ((wq_completion)events_long){+.+.}-{0:0},
+>                             at: process_one_work+0xfca/0x1930
+> [T79] #1: ffffc9000474fd00 ((work_completion)(&ctrl->ctrl_work))
+>                             {+.+.}-{0:0},
+>                             at: process_one_work+0x804/0x1930
+> [T79] #2: ffffffffc11307d0 (ctrl_lock){+.+.}-{4:4},
+>                             at: server_ctrl_handle_work+0x21/0x280 [ksmbd]
+> [T79] #3: ffffffffc11347b0 (init_lock){+.+.}-{4:4},
+>                             at: ksmbd_conn_transport_init+0x18/0x70 [ksmbd]
+> [T79] #4: ffffffffc10f7230 (lock#9){+.+.}-{4:4},
+>                              at: rdma_listen+0x3d2/0x740 [rdma_cm]
+> [T79]
+>          stack backtrace:
+> [T79] CPU: 2 UID: 0 PID: 79 Comm: kworker/2:0 Kdump: loaded
+>        Tainted: G           OE
+>        6.18.0-rc4-metze-kasan-lockdep.01+ #1 PREEMPT(voluntary)
+> [T79] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+> [T79] Hardware name: innotek GmbH VirtualBox/VirtualBox,
+>        BIOS VirtualBox 12/01/2006
+> [T79] Workqueue: events_long server_ctrl_handle_work [ksmbd]
+> ...
+> [T79]  print_circular_bug+0xfd/0x130
+> [T79]  check_noncircular+0x150/0x170
+> [T79]  check_prev_add+0xf3/0xcd0
+> [T79]  validate_chain+0x466/0x590
+> [T79]  __lock_acquire+0x535/0xc30
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  lock_acquire.part.0+0xb3/0x240
+> [T79]  ? sock_set_reuseaddr+0x14/0x70
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? __kasan_check_write+0x14/0x30
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? apparmor_socket_post_create+0x180/0x700
+> [T79]  lock_acquire+0x60/0x140
+> [T79]  ? sock_set_reuseaddr+0x14/0x70
+> [T79]  lock_sock_nested+0x3b/0xf0
+> [T79]  ? sock_set_reuseaddr+0x14/0x70
+> [T79]  sock_set_reuseaddr+0x14/0x70
+> [T79]  siw_create_listen+0x145/0x1540 [siw]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? local_clock_noinstr+0xe/0xd0
+> [T79]  ? __pfx_siw_create_listen+0x10/0x10 [siw]
+> [T79]  ? trace_preempt_on+0x4c/0x130
+> [T79]  ? __raw_spin_unlock_irqrestore+0x4a/0x90
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? preempt_count_sub+0x52/0x80
+> [T79]  iw_cm_listen+0x313/0x5b0 [iw_cm]
+> [T79]  cma_iw_listen+0x271/0x3c0 [rdma_cm]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  rdma_listen+0x3b1/0x740 [rdma_cm]
+> [T79]  ? _raw_spin_unlock+0x2c/0x60
+> [T79]  ? __pfx_rdma_listen+0x10/0x10 [rdma_cm]
+> [T79]  ? rdma_restrack_add+0x12c/0x630 [ib_core]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  cma_listen_on_dev+0x46a/0x750 [rdma_cm]
+> [T79]  rdma_listen+0x4b0/0x740 [rdma_cm]
+> [T79]  ? __pfx_rdma_listen+0x10/0x10 [rdma_cm]
+> [T79]  ? cma_get_port+0x30d/0x7d0 [rdma_cm]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? rdma_bind_addr_dst+0x598/0x9a0 [rdma_cm]
+> [T79]  ksmbd_rdma_init+0x12b/0x270 [ksmbd]
+> [T79]  ? __pfx_ksmbd_rdma_init+0x10/0x10 [ksmbd]
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? register_netdevice_notifier+0x1dc/0x240
+> [T79]  ksmbd_conn_transport_init+0x26/0x70 [ksmbd]
+> [T79]  server_ctrl_handle_work+0x1e5/0x280 [ksmbd]
+> [T79]  process_one_work+0x86c/0x1930
+> [T79]  ? __pfx_process_one_work+0x10/0x10
+> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [T79]  ? assign_work+0x16f/0x280
+> [T79]  worker_thread+0x6f0/0x11f0
+> 
+> I was not able to reproduce this as I was testing with various
+> runs switching siw and rxe as well as IPPROTO_SMBDIRECT sockets,
+> while the above stack used siw with the non IPPROTO_SMBDIRECT
+> patches [1].
+> 
+> Even if this patch doesn't solve the above I think it's
+> a good idea to reclassify the sockets used by siw,
+> I also send patches for rxe to reclassify, as well
+> as my IPPROTO_SMBDIRECT socket patches [1] will do it,
+> this should minimize potential false positives.
+> 
+> [1]
+> https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/master-ipproto-smbdirect
+> 
+> Cc: Bernard Metzler <bernard.metzler@linux.dev>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: linux-rdma@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-cifs@vger.kernel.org
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
 > ---
-> =C2=A0include/uapi/linux/vmclock-abi.h | 19 +++++++++++++++++++
-> =C2=A01 file changed, 19 insertions(+)
->=20
-> diff --git a/include/uapi/linux/vmclock-abi.h b/include/uapi/linux/vmcloc=
-k-abi.h
-> index 2d99b29ac44a..fbf1c5928273 100644
-> --- a/include/uapi/linux/vmclock-abi.h
-> +++ b/include/uapi/linux/vmclock-abi.h
-> @@ -115,6 +115,12 @@ struct vmclock_abi {
-> =C2=A0	 * bit again after the update, using the about-to-be-valid fields.
-> =C2=A0	 */
-> =C2=A0#define VMCLOCK_FLAG_TIME_MONOTONIC		(1 << 7)
-> +	/*
-> +	 * If the VM_GEN_COUNTER_PRESENT flag is set, the hypervisor will
-> +	 * bump the vm_generation_counter field every time the guest is
-> +	 * loaded from some save state (restored from a snapshot).
-> +	 */
-> +#define VMCLOCK_FLAG_VM_GEN_COUNTER_PRESENT=C2=A0=C2=A0=C2=A0=C2=A0 (1 <=
-< 8)
-> =C2=A0
-> =C2=A0	__u8 pad[2];
-> =C2=A0	__u8 clock_status;
-> @@ -177,6 +183,19 @@ struct vmclock_abi {
-> =C2=A0	__le64 time_frac_sec;		/* Units of 1/2^64 of a second */
-> =C2=A0	__le64 time_esterror_nanosec;
-> =C2=A0	__le64 time_maxerror_nanosec;
+>   drivers/infiniband/sw/siw/siw_cm.c | 18 ++++++++++++++++++
+>   1 file changed, 18 insertions(+)
+> 
+> diff --git a/drivers/infiniband/sw/siw/siw_cm.c b/drivers/infiniband/sw/siw/siw_cm.c
+> index 708b13993fdf..b83abf0ea15e 100644
+> --- a/drivers/infiniband/sw/siw/siw_cm.c
+> +++ b/drivers/infiniband/sw/siw/siw_cm.c
+> @@ -39,6 +39,22 @@ static void siw_cm_llp_error_report(struct sock *s);
+>   static int siw_cm_upcall(struct siw_cep *cep, enum iw_cm_event_type reason,
+>   			 int status);
+>   
 > +
-> +	/*
-> +	 * This field changes to another non-repeating value when the VM
-> +	 * is loaded from a snapshot. This event, typically, represents a
-> +	 * "jump" forward in time. As a result, in this case as well, the
-> +	 * guest needs to discard any calibrarion against external sources.
-> +	 * Loading a snapshot in a VM has different semantics than other VM
-> +	 * events such as live migration, i.e. apart from re-adjusting guest
-> +	 * clocks a guest user space might want to discard UUIDs, reset
-> +	 * network connections or reseed entropy, etc. As a result, we
-> +	 * use a dedicated marker for such events.
-> +	 */
-> +	__le64 vm_generation_counter;
-> =C2=A0};
+> +static struct lock_class_key siw_sk_key;
+> +static struct lock_class_key siw_slock_key;
+> +
+> +static inline void siw_reclassify_socket(struct socket *sock)
+> +{
+> +	struct sock *sk = sock->sk;
+> +
+> +	if (WARN_ON_ONCE(!sock_allow_reclassification(sk)))
+> +		return;
+> +
+> +	sock_lock_init_class_and_name(sk,
+> +				      "slock-RDMA-SIW", &siw_slock_key,
+> +				      "sk_lock-RDMA-SIW", &siw_sk_key);
+> +}
+> +
+>   static void siw_sk_assign_cm_upcalls(struct sock *sk)
+>   {
+>   	struct siw_cep *cep = sk_to_cep(sk);
+> @@ -1394,6 +1410,7 @@ int siw_connect(struct iw_cm_id *id, struct iw_cm_conn_param *params)
+>   	rv = sock_create(v4 ? AF_INET : AF_INET6, SOCK_STREAM, IPPROTO_TCP, &s);
+>   	if (rv < 0)
+>   		goto error;
+> +	siw_reclassify_socket(s);
+>   
+>   	/*
+>   	 * NOTE: For simplification, connect() is called in blocking
+> @@ -1770,6 +1787,7 @@ int siw_create_listen(struct iw_cm_id *id, int backlog)
+>   	rv = sock_create(addr_family, SOCK_STREAM, IPPROTO_TCP, &s);
+>   	if (rv < 0)
+>   		return rv;
+> +	siw_reclassify_socket(s);
+>   
+>   	/*
+>   	 * Allow binding local port when still in TIME_WAIT from last close.
 
-Looks good, thank you. Just a bit of nitpicking about the comment.
+Thanks very much, makes all sense to me. I stumbled across it a while
+ago as well and quietly ignored it. Your solution is better.
+If I look through the other use cases of sock_lock_init_class_and_name(),
+I found it gated by
+#ifdef CONFIG_DEBUG_LOCK_ALLOC
+(see for example drivers/nvme/host/tcp.c). I think wee need that
+since only then the related sock_lock_xxx objects and functions are
+defined.
+drivers/nvme/host/tcp.c also has a nice comment on why this is
+needed. I think we shall have such comment as well - just to remind us
+later what we did.
 
-I really don't like talking about a "jump forward in time". That's what
-clocks *do*. VMClock tells the guest a relationship between its CPU
-counter (TSC, arch timer, etc.) and real time. As long as that
-relationship remains within the error bounds which were previously
-promised, there is no disruption. It certainly isn't about time jumping
-*forward*.
-
-Let's also make it 100% clear that an implementation must *also* bump
-the disruption_marker field in this case, not only the
-vm_generation_counter. How about...
-
-"A change in this field indicates that the guest has been loaded from a
-snapshot. In addition to handling a disruption in time (which will also
-be signalled through the disruption_marker field), a guest may wish to
-discard UUIDs, reset network connections or reseed entropy, etc."
-
---=-PgzzRXrfw4Pk0aNK2tYW
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MTEyNjE0MTQy
-N1owLwYJKoZIhvcNAQkEMSIEILb5194eTFudgyGNr97ArNbe8H+2wWhgWQkLJH+cVUbkMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAXGhcO76i4xgO
-KDd9QsmV07QbV/oLZF1FqwQpbNCVDjXcJjr/2tTIC/2PsqM6mgMWPVrcSs4LwOqS1XXSeiUFCqPu
-pyaCv1MhmgKIKiR7P3gYqxbwh+cWoS/wQl/ln2O/6Z2Xn+yDraizcwvdZqHEfein6+17vo2N84HR
-kyq55dhvUcA/z9AYJz3L6PjIHVE4lAYMAOk0PEEUwJdhDgdV1lBac8/7aHvh/oeOE4Hjnh5vau0W
-E5mlI5/iJlMCls80mqP4g/KzMo/8/7jUw2Mtg4Pr9vQP4QBlhzdpVbgw3Z6EXvdstNRUvSWhzgCd
-lP/IxGmrJl6CIM/Ua4FBmUH0AN3P1wr8T7SN6J8XPgPEv7oeTHBcuFQFzkZADvOjnBBUdbl+b7qi
-6tq7eMVeeCobsromTNgwhHxSbompPlpRb7cQmv6pgqE0aON43dXkx7Qyo6DlHL1ULiyEzEmgvlmG
-P90p6zf45b3f7c7i0X89w4RT4Hryj8joengWtW6uj8ZXG+VCk/u7TRn/r2Be5bV6oMqaxj//kQWg
-M9j12OoycGL9TDKpGlUXz3tlXgbcRmBWylBvba5jZh9XYRRQ/GJrFB4uHX7+HoHZGalJLtR9WXHr
-xzSm7jV6xZbz0Kxt6Ayfb1u4NiX6AK9eSU+bn4qIov0LYVjAvRIR8f5Ka+FkTbAAAAAAAAA=
+Thank you!
+Bernard.
 
 
---=-PgzzRXrfw4Pk0aNK2tYW--
 
