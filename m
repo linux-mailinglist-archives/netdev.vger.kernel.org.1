@@ -1,165 +1,225 @@
-Return-Path: <netdev+bounces-241717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53222C8796E
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 01:30:11 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FC7EC879BC
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 01:40:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E5D724E1505
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 00:30:09 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6B5CA352457
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 00:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7435B1F3D56;
-	Wed, 26 Nov 2025 00:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C1A1514DC;
+	Wed, 26 Nov 2025 00:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VwamRu5s"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="LvwSktpG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11021136.outbound.protection.outlook.com [40.93.194.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E230075809
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 00:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764117007; cv=none; b=R2Lblyrj3VodooExjmBUuQ38V2wBc63MfPUt2641fgfsHF9fImIR1NrIJ3I2ZZfBEUOdDX0JdOP7LIAzN9VehYtyXaX/kRidm/7dEAFph5NmvA1GxfqJFf2VC/tTENX1v4FKSGOoGtEYmmTAk9kDPWNzy9sikBnuepFU9f7veBY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764117007; c=relaxed/simple;
-	bh=+7pgfRjo/daR/nWjZbzX/uZO08iJE3h0AwCxM47eCS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dJxs3mYwkYH15gQp/ATOd+L88yysd8MtL3G4NdxlcGzqT1h2sAYxzGH22ymqUdkug2M+q5bfNMJDEx35/sLOX5q1ezp3GtEZOgU7K/dUZZcn96NY9t3karyM3U1bFZavFP1Oq3sw3A6Nbgj+3c2HdRbx40sHwYqLO6AYJEbcFWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VwamRu5s; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7aab7623f42so6411374b3a.2
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:30:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764117005; x=1764721805; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TQMjuKPHzUNhfDB/BTLq+fTDXNip/wwiVzkgCrUswNY=;
-        b=VwamRu5scCwBUWz9WyCwemooMsOX3LyoCXEk4k4S4cQz6czo6mlzblsCC5ke5LkVQz
-         9nhWPgF9YTBR93kBUD8/wKHuVC4YYrXrMRfmuGJQE+UAmwffula7JAChCIWYlMJKaAMK
-         8IpXLpqBZATHqs7NvhN6hzM9OId92KG66j+Veofvn0GWjLB+Ir034DvR7WDtZ2Fdua7E
-         P/VKd6VCJucQM76vaFNghQkgcmEzFjqUjYS++WtcX+I4XRGU4RDbJCAbmMQyTsci1QO8
-         qYAVb7l43B7vaFhr0WlI/GIcLiQSDkh7FH6AeAagpRf91xYM1dV04CLKximUj3EgbsGU
-         IHUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764117005; x=1764721805;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TQMjuKPHzUNhfDB/BTLq+fTDXNip/wwiVzkgCrUswNY=;
-        b=Lm4xPkebwK0iqaxpQXpczFeTwDQ7bSSAfnptMXdPJrv6qQV6MzylTEBPgYBhHIMmXt
-         JxyWyPAdsS9wl/YQXbDk0kENj5Y8Mvo5Nxk7++8FgMrwpkiQffxteFm2qmx6Nit4l3Z7
-         0Ds/5/G49EIMI6YjkI25Cz9DMl5ZpXvpapjq0OfOWWKa+xHdhDmzt6LdPoizBf48CrPe
-         V2ULBH4rcq42rmA7Ze7B8fRyikdUSuMX4skaed/j4PN6Sw4f1Tktc/gw566CRr9Z+nhr
-         rC/Yw++V4CwewZxqHW2KGD0Es6NZ/tq4UZr1bnfOGVCwg3gObaIs+YNYncUWBr2PvpZz
-         UeMA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEDaBwz2mUoFeP2oXQ68gPjXjUQyFlaA41DIpNTSgIp/zVR5P04ZIYrnOFpC6ycGZyyo3ZiN0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwF5Bvme8s9ZMu7jnFm+i8wlvxj14jGXxThOduvxJGPU7YODTEW
-	chGagkJ8CLa2RGGBkX95y5TSI4BrqEemm3+Jx6JDlrP+cogUnF+TOZq4
-X-Gm-Gg: ASbGnctgUP5h1UGtiBRETl6P3FWHtvGVVIX7pK9T395EkIRy7ZgERVVWUyUrZZBes1b
-	uMZSmzAkwAnEGyHIyqnPTbHo86reqbP83aIV6uQFeuH915eeJb+XRcnN5xC3/dypBtTG3uGaAqo
-	zwplivgIOOY2VditPKpiDrnkpKVODqdUtNo33yMOzLCdERU/nHZ0S6xJB1h6KCvEtv5m620qLIX
-	indsIyiuVa+pZaBX/ly+vqpH1fk7XsRCnJdxlGFlHAt7vO/xyFJYEFc++R16BdPkRqgmMkUN4p3
-	NlAHlzWg5XCqqTLdCfh95UfZWjIcKw3JySaiTrLNI77YAsvm8Jg0lQsZBSwDqVr3iDM2uBbo/PX
-	GpHK/IoYR6afntIpqV2rQsFbIiu72qvCCsOqJs2GTIT1mKXFmxwllwjs9HmEEP1I9gnj7Z1CVeU
-	33UFx1JgIEqKnya/4OhZ4DRQ==
-X-Google-Smtp-Source: AGHT+IFlzBzMU6uRJEoPA/DtA6ralWIDq9xCWcLTBXEwpgMrSQIUxDFPucCWFcH95f/neuSSWsnHWg==
-X-Received: by 2002:a05:6a00:1490:b0:7a2:7f1e:f2dd with SMTP id d2e1a72fcca58-7c58c7a69a5mr14956775b3a.11.1764117004888;
-        Tue, 25 Nov 2025 16:30:04 -0800 (PST)
-Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f0d55b71sm19503922b3a.55.2025.11.25.16.30.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 16:30:03 -0800 (PST)
-Received: by archie.me (Postfix, from userid 1000)
-	id DAF2F420A78D; Wed, 26 Nov 2025 07:30:01 +0700 (WIB)
-Date: Wed, 26 Nov 2025 07:30:01 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Mark Bloch <mbloch@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Shahar Shitrit <shshitrit@nvidia.com>
-Subject: Re: [PATCH net-next] docs: tls: Enhance TLS resync async process
- documentation
-Message-ID: <aSZKCZkUnllzyydN@archie.me>
-References: <1764054037-1307522-1-git-send-email-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C73E2AE8E;
+	Wed, 26 Nov 2025 00:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.136
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764117613; cv=fail; b=YK63CT7GTQ9JBKbjz14yfSXMooDm/hYJTv0jrh+8eb/PDpX8RxmJ2lzePDuoLgJ6zpSeY8JMAUTHi13JI/xMKlRkSQ8FjockgfL3istFaAOgFKFsVu4Vh2tmBVCzH3sGe00UWoj84iQEtAm4I0rhG0rPF/sLtnZ9gOiq7/+hf0w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764117613; c=relaxed/simple;
+	bh=Zs9M+/CUYuAYmSojjMBfK4E3W8R3touV/mKV/msh02k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=tQCphcEB75KZ7+9WJEV72q9IpKD8D2ti61vcqM24uqCJKUnPROjqaSOCvT0OluVVZygknZ03d2y+uD9t+Dlcj/lVQmwT8U5Vqdv1cvb3iV1B0wwg67bU7XoP7Swfae8J849ruVpZ+Z5wKvkNuac41srywxzgvfIhHpe0X/vYsi8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=LvwSktpG; arc=fail smtp.client-ip=40.93.194.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bkL6psqZsfueQVPQmc8cNgb6l5bsyt7ZRK1I81ixgTKcrFo1RNMsNkQYZIIFH7+9WXBwsoRB3YfBT0UFw3JlIcN7xLl/alFiljF4iHsNQOvUeINN5Axkxr1cKR9k5jP2B91SYZrEpouhKx26nilL//AygV17QwzN/KidWN3cMpRnD77VJVgm9JIBlolVEFb657JTKnbHQJ9HcB3sWRp/izgVmPEMZrvY5KtPJ6LGhHqDUm3RpAY06kBeorLJrXlYjx33uHVPLToxcctkdMFDIzu+9nZucdiuKYi7Y+Zgq8nad8x38MpQIU9I6RihuYoqfiUrTPOjOKw9Sr1irOst9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iB3eku3oW/44cQ0rNT44pMB5MchbnpR5vO/uv9wGly4=;
+ b=oU7+WNF5/QafH3QuL6lzjNwOVgsWnVC69vwC+npEBerNSp3q07EaRuFMejGl0nbW+yC+VueNX2LrcOeBJ7cO+yrXxMbrlIfeYA4WEcqEhLckd9a1P4n3unZ/qwO6kRdbwrYsaHImaTLsg+Tiwom+aBgmDKzOFcbpqfpYXlWZu/7cyvZ0cwsjUatxum8Ssjag1u7sGg0GHqTdF/Z8mOXrpXaE7pEhNjB6+DKgi1JphmQTRzy8Djv73GX8EDjrHkfqJDj0NqF88rv1XR4g5a24oaBFWfKGEPZXDmI0PnwSoow4IKCEb2rlJtnbn5Y+Tlt+VAcK0jx27u6MM10yIBcBTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iB3eku3oW/44cQ0rNT44pMB5MchbnpR5vO/uv9wGly4=;
+ b=LvwSktpGUE7ZD8aJWkELH22XFfjkS6j9kBgaIE95MONUfkKQ+Xwk0sp3PAMvX5OGIGMF7wjOCswlcaCnG/GV7gufLftkq1HLdvuSw/iJzICijdIFTvvETxOPvQRGPQraQ0lbc2F+ICjN/Va9O+I1iz+4z7ubDw7CyJXbQukHEao=
+Received: from DS3PR21MB5735.namprd21.prod.outlook.com (2603:10b6:8:2e0::20)
+ by DS0PR21MB6050.namprd21.prod.outlook.com (2603:10b6:8:2f5::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.3; Wed, 26 Nov
+ 2025 00:40:08 +0000
+Received: from DS3PR21MB5735.namprd21.prod.outlook.com
+ ([fe80::a3f4:6107:de7c:5925]) by DS3PR21MB5735.namprd21.prod.outlook.com
+ ([fe80::a3f4:6107:de7c:5925%6]) with mapi id 15.20.9388.002; Wed, 26 Nov 2025
+ 00:40:08 +0000
+From: Long Li <longli@microsoft.com>
+To: Simon Horman <horms@kernel.org>, "longli@linux.microsoft.com"
+	<longli@linux.microsoft.com>
+CC: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <DECUI@microsoft.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shradha Gupta
+	<shradhagupta@linux.microsoft.com>, Konstantin Taranov
+	<kotaranov@microsoft.com>, Souradeep Chakrabarti
+	<schakrabarti@linux.microsoft.com>, Erick Archer <erick.archer@outlook.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Subject: RE: [EXTERNAL] Re: [Patch net-next v3] net: mana: Handle hardware
+ recovery events when probing the device
+Thread-Topic: [EXTERNAL] Re: [Patch net-next v3] net: mana: Handle hardware
+ recovery events when probing the device
+Thread-Index: AQHcWnJxBK4mddwuFE6X/SkYC8/etrUDPf6AgADm1gA=
+Date: Wed, 26 Nov 2025 00:40:08 +0000
+Message-ID:
+ <DS3PR21MB5735CC21A800623D2DB5D144CEDEA@DS3PR21MB5735.namprd21.prod.outlook.com>
+References: <1763680033-5835-1-git-send-email-longli@linux.microsoft.com>
+ <aSWKLefd_mhycGDv@horms.kernel.org>
+In-Reply-To: <aSWKLefd_mhycGDv@horms.kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=06e6a858-a405-48d7-bf0a-c679db3963e3;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-11-26T00:37:36Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS3PR21MB5735:EE_|DS0PR21MB6050:EE_
+x-ms-office365-filtering-correlation-id: 70f68844-de34-4907-7d3e-08de2c8459ce
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|7416014|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?WLTN/xV+8yjj45cD74dIjd4o8WVIYzvLxEuKmu8wVYfYwUPLiyzvorulw+xF?=
+ =?us-ascii?Q?+w0YmCqMK3QaSd5gJ0AYEFVxvmdIi2BCcHCe4TjdpIpKIehSjaVcmeM0Sm1y?=
+ =?us-ascii?Q?6PJXePNYMvnGrck23Hf+ht6jsW1sUjZDSRtF9xownFv+y6N47ZiPJeL30RUM?=
+ =?us-ascii?Q?Ji/lJJY34VNBU4PKJTjv9u+yJ+MLDzKNE77fmoUbOwkGHQjgF/BLGqxCdzbh?=
+ =?us-ascii?Q?MLcejPIHpkoyOiE6SNCoHuLxRgkiP/Zi2WRbJN52IbSeN6LK8jnjiuWEx5jY?=
+ =?us-ascii?Q?bPKqYyzDogpQZyp2aHEdCXksemhGPUurQD9+ErJ+a44wyIteXj8ljdXXV9WO?=
+ =?us-ascii?Q?EGdld9LChjwhLlZfww+BoHqqSmiKoTbzQ4zUPAM5TQlXyQTi28e+k+kA0rVq?=
+ =?us-ascii?Q?Km9cM/oF9T00dL1QGUsjPlFO7yOMChL43f+iiyUGHnP2LlPR2723ejKCVdnU?=
+ =?us-ascii?Q?g8KL9BGOY5cQtgK4CivqIHeNYzmBhqL21FQ5mjVK2rTLStJlxyYHXW2dVw/n?=
+ =?us-ascii?Q?i6lHsCWD9Sl5V17N8Yv4Buq1Oa6ffbc4JzPAORb4yAvWn+GsfjZFow4dsAUV?=
+ =?us-ascii?Q?czGSJLDuVVprkXDRIPkw/z6K6eI0CLfUIDq8MxlJpskQr8JohNQTMtWgeWnc?=
+ =?us-ascii?Q?VsJA5SFb+48PzgxMCSm7bLLGWkIgh7CrKw6RToTYiXbmE9+mpJcyt7w2CgLs?=
+ =?us-ascii?Q?LHjCQOpJpKnxA/hmfTPmRlMcv5VF6BV2C07K0IdXBKq3h601vWHa9W4tOZVt?=
+ =?us-ascii?Q?BcnT824lhoYVmehMNjwDaTXxcvmRTzUVCAURfv6jUFjeLB3utFcDdEDvbYNm?=
+ =?us-ascii?Q?f4WTpkYNj8ibn0DCj3T5gZlGQdX+T3qSkSZHMoXufXgxZXhpgSPvfeWJnix5?=
+ =?us-ascii?Q?tZrWv4K6WlnOGYE5WiKbjgaEGRaX1v25bPk2YFTrNFYCC0Ih3DDY155Mt7DZ?=
+ =?us-ascii?Q?X6WqGb+2tQO/CfWmCUTcN3J0l4HD86Mf6hfsSkgPKgXAmor7zZyaz2KNu4Yv?=
+ =?us-ascii?Q?o8DKkR/fvvp6vPp3aV/N8KLLQsY7OIZFNh6PXdp0mVdPSKERDeL6BRAjvhk3?=
+ =?us-ascii?Q?nUpemb8B6XFwezaa9s1LQNnsTcO4PCmdo3dyVFWlV4zHN4LADDd8/3eeE5pS?=
+ =?us-ascii?Q?iEEo5MU/adulWWYSKl/TmBQ2rgtmG3EqiQascZK+1dmnc+2brKNsTMFj8qdQ?=
+ =?us-ascii?Q?fMuj0ihvgMPa94U+hVHvaJmZg4GFGtqMf6fK5rgl1hdL8Cg/332oYzmx9ds9?=
+ =?us-ascii?Q?TWDwzGI1yrMIi+h8x5wTOn1ZT+NJVJhxgLRXnLcJes6gvkWNw/e9/rg9xCUu?=
+ =?us-ascii?Q?ZbjC7hLoxAXAHI405T5xgn734JXb82GboxESMLtIKml2UWeqXTQVU3vzLfer?=
+ =?us-ascii?Q?9RXDaJg7MV9ikMdHnXGY8VYBmw5ByDc25vJdFbK9aLG6JuhiBxVMPfwfykzQ?=
+ =?us-ascii?Q?tF6n2V3fRHbKfgTFagISwiGcgmJUcT4yskBzdNLpw24c1ud0cnFvoA8j7V+l?=
+ =?us-ascii?Q?m0Fyj1Rn6V4EfxceAO/7Mvu02qPBaiLk9tix?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS3PR21MB5735.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?j1P7s2CZwZWiT5/xBfb3tZM9/xcEGj1vuHMZ2t3Cci5NqXZY+AmvaBAzt8c3?=
+ =?us-ascii?Q?tFJjW9RvaSIVcV+s7vumAEy6QozrzlAwsXqIp/CtIRx5j1B6oHHhOQDtnoOo?=
+ =?us-ascii?Q?GZ0fBscxQaTFzGPfyITagJQVLpGYK7L71+06AEx6eM4d/YG5R0Ch3neo8WFr?=
+ =?us-ascii?Q?SoM1kpxvcB94g2L7M43QD24wX+btvqd8iEOgJE9LcnOSyialqwWGiXi5aaWP?=
+ =?us-ascii?Q?QY3r0CwrZU6V5nz2BX4yNnleeWtJZnitszE8UABlh1F7m/CC9LGaKBo+rrZM?=
+ =?us-ascii?Q?2NBdTsqXUW7QXIdQdlEm5Eh9rHmrOQXgWbm6jATX9hkhJu3UVpCAGkFSK788?=
+ =?us-ascii?Q?GCEluEHz/UDJ22B3zIp6LZowCMeaS2rCs4fIPMY41R0vZeFXfXDVD5O8jxpj?=
+ =?us-ascii?Q?4KsFAPCCb44tVlNZvKJnH+wAo+WvdAPoDuiix5THsfDlhM7mh75hrxleih3f?=
+ =?us-ascii?Q?lwHOpkB8AwAtatHb0fK7Wb5XuDY74Flh+PhJlWuED6j4p3s0QH0rISWJWDXd?=
+ =?us-ascii?Q?tOeCLN/22LyM7ifTJf4nuNpJuXGsrP46Zcmlwz+7ycu0SDj3aUTrX+tv/mCE?=
+ =?us-ascii?Q?0JLiXRFXGcNeleuZ5lzh79pIsW2rjECNuzvm1qd6rRotzvXEXlHSlDZucFQR?=
+ =?us-ascii?Q?oKJlGHyB9fm2ce2rJO5zsq+dl9Sa8gaGCzbPZlO/2VCpWugUBj5VAozil5sc?=
+ =?us-ascii?Q?nhaZoGHk2h6dWQUSaaO8dMSZPuTlzEWn5bgYiSYk0oJ2GGtK5hKNr7jYJfAO?=
+ =?us-ascii?Q?MuaN9k9+3Ms5l9MIl7CKZoMjwCT30r12CX2zyhJvNrggDFWfEEiYL4GsMQj4?=
+ =?us-ascii?Q?QcoPVlkB+Pz0/YCRzbtxL4IY+vH/O4SvtfnRn0Tj8QNnv7Ni2Vk4kx1JNl7a?=
+ =?us-ascii?Q?zm4Cz40+6YRVuh3OKkrqef07vQGHoMNV6nVbTu8i9acF3WHcXlXOTOfqIRbo?=
+ =?us-ascii?Q?FD5gYf+5xq+62M/D0o81SbMeLDgUSG+mR48b6qGnmu2jflDcltJpwcOtSpJJ?=
+ =?us-ascii?Q?YgLyxigdwiWn4r9kCTxZUIhXhUumBS9qdxNxh14aZiH5EAJK8sPhOewzpfRi?=
+ =?us-ascii?Q?FzlO7uqm42wKvjhF1wrbFVYvR5+xp0ufFH/VXacIzSd3Uu1PIEXzV6WcVMlL?=
+ =?us-ascii?Q?K0IwN/fQkG2m0HdcGtQwKo9hioHFLOnbILBuklaW6fSa4nSglQ26uMs5Wh7L?=
+ =?us-ascii?Q?kkC+ARjPl54iY4p5Zgtuk8o40su7XXRzFts53mzWcd/V23dlRyFGMdauTb3z?=
+ =?us-ascii?Q?hRu3oV094sxuviU3yBsVoQT+5l6V6pAlvGh7R8PgSgRgLhF5vJCWy9S6YF7y?=
+ =?us-ascii?Q?ARxYaWfyZzx5MAkbHbMNLeelBVs1nlkAmZaf/nmlr+T3BGjxyRBVHYLuqorm?=
+ =?us-ascii?Q?mYHtqsJVA1MIKBZWySlQE07+7JP2G6aJZIsJiWrpPTeYlNn+Ft9LiSmnhMwb?=
+ =?us-ascii?Q?/aAHCQdDhGA2O1KIH8N3tVObRmFCwPJ0HadJ1nFfkk/7KGWyaS9hlDlvg6/a?=
+ =?us-ascii?Q?zusammxD51lN/LprHBJzhIW3ec6C+hySklFkBeCrrFM2jtAQyolrfFmsbrbC?=
+ =?us-ascii?Q?tWofoXewlJfaMRt13fQ=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Uhx3q5Xis8IAS4gY"
-Content-Disposition: inline
-In-Reply-To: <1764054037-1307522-1-git-send-email-tariqt@nvidia.com>
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS3PR21MB5735.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 70f68844-de34-4907-7d3e-08de2c8459ce
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Nov 2025 00:40:08.6313
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: MeShuBG6YI60glGp4sxIB+0ZSQ2cONu5BG45CjJmE3qjkH2+oLjmvTUx/7sPFOKctSInbSg/MuZ80VZ6Zm5I8g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR21MB6050
 
+> Subject: [EXTERNAL] Re: [Patch net-next v3] net: mana: Handle hardware
+> recovery events when probing the device
+>=20
+> On Thu, Nov 20, 2025 at 03:07:13PM -0800, longli@linux.microsoft.com
+> wrote:
+> > From: Long Li <longli@microsoft.com>
+> >
+> > When MANA is being probed, it's possible that hardware is in recovery
+> > mode and the device may get GDMA_EQE_HWC_RESET_REQUEST over HWC
+> in the
+> > middle of the probe. Detect such condition and go through the recovery
+> > service procedure.
+> >
+> > Fixes: fbe346ce9d62 ("net: mana: Handle Reset Request from MANA NIC")
+>=20
+> If this is a fix, should it be targeted at net rather than net-next?
+>=20
+> Alternatively, if it is not a fix for net, then I suggest dropping the Fi=
+xes tag and
+> adding something about commit fbe346ce9d62 ("net: mana:
+> Handle Reset Request from MANA NIC") to the patch description, above the
+> tags (with a blank line in between).
 
---Uhx3q5Xis8IAS4gY
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Can we keep the "Fixes" tag and queue the patch to net-next?
 
-On Tue, Nov 25, 2025 at 09:00:37AM +0200, Tariq Toukan wrote:
-> +When the kernel processes an RX segment that begins a new TLS record, it
-> +examines the current status of the asynchronous resynchronization reques=
-t.
-> +- If the device is still waiting to provide its guessed TCP sequence num=
-ber
-> +  (the async state), the kernel records the sequence number of this segm=
-ent
-> +  so that it can later be compared once the device's guess becomes avail=
-able.
-> +- If the device has already submitted its guessed sequence number (the n=
-on-async
-> +  state), the kernel now tries to match that guess against the sequence =
-numbers
-> +  of all TLS record headers that have been logged since the resync reque=
-st
-> +  started.
-> +
+There are other MANA patches pending in net-next and they will conflict wit=
+h each other when merging.
 
-You need to separate the status list:
+Thank you,
+Long
 
----- >8 ----
-diff --git a/Documentation/networking/tls-offload.rst b/Documentation/netwo=
-rking/tls-offload.rst
-index 6d276931669979..a41d02d72e1ee6 100644
---- a/Documentation/networking/tls-offload.rst
-+++ b/Documentation/networking/tls-offload.rst
-@@ -338,6 +338,7 @@ Cancels any in-progress resync attempt, clearing the re=
-quest state.
-=20
- When the kernel processes an RX segment that begins a new TLS record, it
- examines the current status of the asynchronous resynchronization request.
-+
- - If the device is still waiting to provide its guessed TCP sequence number
-   (the async state), the kernel records the sequence number of this segment
-   so that it can later be compared once the device's guess becomes availab=
-le.
+>=20
+> > Signed-off-by: Long Li <longli@microsoft.com>
+> > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> > ---
+> > Changes
+> > v2: Use a list for handling multiple devices.
+> >     Use disable_delayed_work_sync() on driver exit.
+> >     Replace atomic_t with flags to detect if interrupt happens before
+> > probe finishes
+> >
+> > v3: Rebase to latest net-next. Change list_for_each_entry_safe() to
+> while(!list_empty()).
+>=20
+> Code changes look good to me.
+>=20
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---Uhx3q5Xis8IAS4gY
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaSZKBQAKCRD2uYlJVVFO
-oyacAP0fN/NP544JfEy704TIpMviAVm7qketzfORZ/nMxtq97wEAjUGwXZm8f2Hk
-f0XnH1RkaVFGzFchC4P1xk7c1Dv7qQ4=
-=xNTM
------END PGP SIGNATURE-----
-
---Uhx3q5Xis8IAS4gY--
 
