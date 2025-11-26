@@ -1,161 +1,170 @@
-Return-Path: <netdev+bounces-241861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 373DAC89787
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 12:17:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F991C897A2
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 12:19:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 148404E39F2
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 11:17:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D3013B01F6
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 11:19:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 087DB29BD85;
-	Wed, 26 Nov 2025 11:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01372F39D1;
+	Wed, 26 Nov 2025 11:19:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NnEXt2xL";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ma7Uy44M"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="WQIGuiAF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1201B26A0DB
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 11:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1995C1A23B9;
+	Wed, 26 Nov 2025 11:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764155824; cv=none; b=VAf/m0+RNLLlnjXF8//kcutD9tEnQGKabUSeMqnLAIwkk9OPtc0jwjTNXz901suYk+8xfxQnl3ccf09gD0CIHTU45XsGhwCBbGCgdXELzoyb6uXd9Vx4dJqI/BY7r1HnMSZqDu+sr/bbgbOqTyL7mC1otNOsSWnMJIVSoUhzqF0=
+	t=1764155991; cv=none; b=Bzi6NdLppUsU4ToIjWEmqWTeFCuJ1JSZfLUt+pmTxbx9fw5rMhBv8QDe8Pf6NT6kz4OzJhxkYiSr+EOsVTibvXmLQnp2y/euj+dLf8JSeKaEAwWNAZAbPfp9Zfx4MgFkqFa59CSwdNNyJOa+D8Ucm7d00tDoAZf/7AlfyS3FAwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764155824; c=relaxed/simple;
-	bh=FXLxuWpTeNt/gfc34ZFouSRfw/ZzH7LBsVSlB2UyowU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PwOXPf3a6oT2/azWnUTn2qHVtw5DneXo1sscJUU+PFhl4/kH1oH+SR6Qb0emfaAq2QYi7uXxkOTkEe9zGfEdAOYogwu/m8jYYaJMXRQemMsTyDAuTuEakfUUR3rRCbYnjLN1AifC9vV9mm9RBGlGQQvXImz+atZgTF6QAgbHULw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NnEXt2xL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ma7Uy44M; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764155821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sXUwg2yPl9Js7/5lQiVXWW6sjL6SYU5SIFbfaH9Um10=;
-	b=NnEXt2xLSkZ0/EGroPkqa3WNdOs4SqskVhgNH0/JyZ1p4J08/FlR4GP6JsZubuA8wLiPs0
-	ewePlQC1TmwgxcHJcUEy/1A0yr4F+Y4Z8tmPwHP6rBrsO3ymQOKo3nUE2U5bSFK7f1+RgR
-	Az5VgceK3ySLk4wi20/rqA9MDOCCVGs=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-94-xc-8zjFTP5SNEjePy_EE0w-1; Wed, 26 Nov 2025 06:16:59 -0500
-X-MC-Unique: xc-8zjFTP5SNEjePy_EE0w-1
-X-Mimecast-MFC-AGG-ID: xc-8zjFTP5SNEjePy_EE0w_1764155818
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-477cf25ceccso25313935e9.0
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 03:16:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764155818; x=1764760618; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sXUwg2yPl9Js7/5lQiVXWW6sjL6SYU5SIFbfaH9Um10=;
-        b=ma7Uy44M4ewzjn3tXn+ARtSKTRpdeZ954SL3r2xwFBr5wNajaTzxxzqnsUSbA1oFtw
-         ARjSS66L3P13jA7Kl6FQ3MPyLcCR8LOSmu2N9rAqXBhY2+UHn47wMUj3jxLeFZj326Lh
-         DLnp2K4to4xyRFs1e7lzU9JFMdmsXW3uasL4bm2zlwTxxLrJ8Uj1bM0YPzmMyX+iT+vQ
-         DyNas3yDy7a849i3bPu7j8CZ4Rk8Dqpl25esRME/UZkSzfwEzMFKWynnlW0V8oTeabrB
-         cLsjKQDm2SQnMLIZwSzsy1+ErVj+9RxlTlcxVU60fhUIdiPkAvhIbE3tpIUYbSIobzSe
-         cH3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764155818; x=1764760618;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sXUwg2yPl9Js7/5lQiVXWW6sjL6SYU5SIFbfaH9Um10=;
-        b=vUJh1+q8QdIfDjfFlroFfLIrZMnJ8Biq4J7C+1YW63zURZfem2zGc0XnTpz4l9hHFF
-         7fxew0zwMOCGY132hu43SobY57pFc4rp3DiyB1HoA5wERjrfwFIhl5e+fxU7ptR0i0Po
-         JBLgJU0LIZVMG9K20/zRARPbP9P0mZU0FDFljdf/jY6IkBAqkaEZlNONpmpPoe6jOtbt
-         JTvTe+6qacRGcOKWlelUSBNTd7QS8KrQzc7A6UhNyFf80dlEzxJxd4DgfroYUuTCv0jr
-         9DH7aVTiVNVdBYNUT3C/dzbFKqlQKCcWXYlRPcQjMQDsdO/NxkPGwBqqtCK9yZdPKhjX
-         6oCw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3BGcoyYZIOFB+7AuOEA9mcwowAmDbdCBQOQNnBi/GI8BGacEJKEqQ8uPCa/3XAVidqCTmMrA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3M5dFO1woITXt5Y6F97u/Dh/QBkNobJeG8Y7D6mwqEC9DTkSW
-	SU98AkBiC3fe4aPzBJS1cRTGJOg45z0sLkPys/UBkADFqcCOEX2rkfsiSedkRFJgWa8tU10D9z7
-	aBDY54Thv9wSeWwFW1NkSXeA0+sxFaZNCGDHOc9mbfyJpKcKcbAqdrfnSJQ==
-X-Gm-Gg: ASbGncvmuVL53wcY5fWJKtEPp0q/gtj64pCLC+XVg10FVZalO5yxUSMkjT2zOO8aUcO
-	d65BiNyJ39CfMvIkdqetd06kePARVPUFjjetiHvSSemYZHCFZlsmVCtPmOSzmCanjRCRRdvImAu
-	Llvp/LgW83QcSsg4ps7LDgAFFmw0s065Uw9Rj5j99jT64Rk2i/MXoFPDIskvagb97XSjmailLHZ
-	u0/1mC1+ggebzj7GrAY/4x8W5H8asYVhob8tkCS18sO/vJUzJgfv+ZWKGh7AKrV/bdQ5nHlwid/
-	9nbnWFGusJ2ocz8pUCQriVJCER0js6kDdYv/Bmw/XdbPYLgLnd3j0qTLb/xeM2RDGluaQWw+/2D
-	jleuVbfkMM7MOlw==
-X-Received: by 2002:a05:600c:1c8a:b0:477:6d96:b3e5 with SMTP id 5b1f17b1804b1-47904acadd7mr67184745e9.7.1764155818323;
-        Wed, 26 Nov 2025 03:16:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHLz7TMJoiEY5ntWwLrjinKIkPuhGf7MTOYlP3j+7T2Z5i2/y+3piCR9uvk60DK9W3uKWuN6Q==
-X-Received: by 2002:a05:600c:1c8a:b0:477:6d96:b3e5 with SMTP id 5b1f17b1804b1-47904acadd7mr67184455e9.7.1764155817906;
-        Wed, 26 Nov 2025 03:16:57 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.231])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4790ab8b21fsm39688885e9.0.2025.11.26.03.16.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Nov 2025 03:16:57 -0800 (PST)
-Message-ID: <abb04d29-1cd8-4bff-879d-116798487263@redhat.com>
-Date: Wed, 26 Nov 2025 12:16:56 +0100
+	s=arc-20240116; t=1764155991; c=relaxed/simple;
+	bh=g3hn8AjbhMVAx+wCU06zKPVtYRw9XskdtyCrp63n4I4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xqapl84fCl/5H55UEELgdiE5G+rHospGMj9MG4RiG9PCXVix5Lf2LD2hUNSbuLkk/2MkhO91rjvyYedwmGxqjQKttKtt0w7N8z05GXvDbGwLyvf1F9UcXLbHwOKczTREcV4efxrJO0EYfk3FZ5tnfBSgOIdxhhHlcDwxmIFr3/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=WQIGuiAF; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=8Gw8eUmrcCieUahIupp42RD4TKbZ1gHNJBT+5hmtk8k=; b=WQIGuiAFdol8RQXtAa4GO+t2cb
+	1ivw7FA3SmrTyxzaq6BkYUc78UK184SnZ4Zcld7Aar9vGoZ6I1aHYRPeWaoa2Rn3DvNLRN/tNEU6t
+	wZMnfGt62MenU5XW8qgExaqNbthCGObMVFu9WcP9rmV3o3KwPcgl413PHSxihdt/fLkcZ9PRfn0+z
+	wdZjq1u1Cbe8MuBYSB6eZlrQ5G0d1aSYrjsrcR2TkgHIX7/wwBG93p2EuBEpdz8yY7YOaHpl5bUpA
+	aq99/BrfaI1XI0+QYNlw0NaGYsTi5zCCBzrQjj5dWq07hUBNNCi9eNGCSuRgO4Iyd5OL92wyCYLyJ
+	vzu0jPSy0KvtlHsgffe7cfHmmcJUGN+ACMWtDHP/hz/lH2t+17c4RFF6LKCFBD0sBqLBrWvPDX0EK
+	1nIZ9TbkORTxjaS28PHTmaPVdMRdg1mjtgHx6j6Kv68FYC3fjJwHzb+TY38+2IVu9cRMW+aFXVNBE
+	gxbamThM8YgIyQHVf9jSxY40;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vODYn-00FpGv-10;
+	Wed, 26 Nov 2025 11:19:45 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: io-uring@vger.kernel.org
+Cc: metze@samba.org,
+	Jens Axboe <axboe@kernel.dk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	netdev@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] io_uring/net: wire up support for sk->sk_prot->uring_cmd() with SOCKET_URING_OP_PASSTHROUGH_FLAG
+Date: Wed, 26 Nov 2025 12:19:31 +0100
+Message-ID: <20251126111931.1788970-1-metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] virtio-net: avoid unnecessary checksum
- calculation on guest RX
-To: Jon Kohler <jon@nutanix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <20251125175117.995179-1-jon@nutanix.com>
- <276828c5-72cb-4f5c-bc6f-7937aa6b6303@redhat.com>
- <3ED1B031-7C20-45F9-AB47-8FCDB68B448E@nutanix.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <3ED1B031-7C20-45F9-AB47-8FCDB68B448E@nutanix.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 11/25/25 9:00 PM, Jon Kohler wrote:
->> On Nov 25, 2025, at 12:57 PM, Paolo Abeni <pabeni@redhat.com> wrote:
->>
->> CC netdev
-> 
-> Thats odd, I used git send-email --to-cmd='./scripts/get_maintainer.pl,
-> but it looks like in MAINTAINERS, that only would have hit
-> VIRTIO CORE AND NET DRIVERS, 
+This will allow network protocols to implement async operations
+instead of using ioctl() syscalls.
 
-?!? not here:
+By using the high bit there's more than enough room for generic
+calls to be added, but also more than enough for protocols to
+implement their own specific opcodes.
 
-./scripts/get_maintainer.pl drivers/net/virtio_net.c
-"Michael S. Tsirkin" <mst@redhat.com> (maintainer:VIRTIO CORE AND NET
-DRIVERS)
-Jason Wang <jasowang@redhat.com> (maintainer:VIRTIO CORE AND NET DRIVERS)
-Xuan Zhuo <xuanzhuo@linux.alibaba.com> (reviewer:VIRTIO CORE AND NET
-DRIVERS)
-"Eugenio Pérez" <eperezma@redhat.com> (reviewer:VIRTIO CORE AND NET DRIVERS)
-Andrew Lunn <andrew+netdev@lunn.ch> (maintainer:NETWORKING DRIVERS)
-"David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING DRIVERS)
-Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING DRIVERS)
-Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING DRIVERS)
-Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING DRIVERS)
-virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS)
-netdev@vger.kernel.org (open list:NETWORKING DRIVERS)
-linux-kernel@vger.kernel.org (open list)
+The IPPROTO_SMBDIRECT socket layer [1] I'm currently working on,
+will use this in future in order to let Samba use efficient RDMA offload.
 
-The "NETWORKING DRIVER" entry should catch even virtio_net. Something
-odd in your setup?!?
+[1]
+https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/master-ipproto-smbdirect
 
-BTW, this is a bit too late, but you should wait at least 24h before
-reposting on netdev:
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Willem de Bruijn <willemb@google.com>
+Cc: io-uring@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-cifs@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
 
-https://elixir.bootlin.com/linux/v6.17.9/source/Documentation/process/maintainer-netdev.rst#L422
+---
 
-/P
+This is based on for-6.19/io_uring + the 3
+"Introduce getsockname io_uring_cmd" patches from
+https://lore.kernel.org/io-uring/20251125211806.2673912-1-krisman@suse.de/
+as the addition of SOCKET_URING_OP_GETSOCKNAME would
+conflict with the addition of SOCKET_URING_OP_PASSTHROUGH_FLAG
+---
+ include/net/sock.h            | 4 ++++
+ include/uapi/linux/io_uring.h | 7 +++++++
+ io_uring/cmd_net.c            | 2 ++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 60bcb13f045c..ffcee4792589 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -98,6 +98,7 @@ typedef struct {
+ struct sock;
+ struct proto;
+ struct net;
++struct io_uring_cmd;
+ 
+ typedef __u32 __bitwise __portpair;
+ typedef __u64 __bitwise __addrpair;
+@@ -1272,6 +1273,9 @@ struct proto {
+ 
+ 	int			(*ioctl)(struct sock *sk, int cmd,
+ 					 int *karg);
++	int			(*uring_cmd)(struct sock *sk,
++					struct io_uring_cmd *ioucmd,
++					unsigned int issue_flags);
+ 	int			(*init)(struct sock *sk);
+ 	void			(*destroy)(struct sock *sk);
+ 	void			(*shutdown)(struct sock *sk, int how);
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index b5b23c0d5283..62ce6cb7d145 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -1010,6 +1010,13 @@ enum io_uring_socket_op {
+ 	SOCKET_URING_OP_SETSOCKOPT,
+ 	SOCKET_URING_OP_TX_TIMESTAMP,
+ 	SOCKET_URING_OP_GETSOCKNAME,
++
++	/*
++	 * This lets the sk->sk_prot->uring_cmd()
++	 * handle it, giving it enough space for
++	 * custom opcodes.
++	 */
++	SOCKET_URING_OP_PASSTHROUGH_FLAG = 0x80000000
+ };
+ 
+ /*
+diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
+index 5d11caf5509c..964f1764fa67 100644
+--- a/io_uring/cmd_net.c
++++ b/io_uring/cmd_net.c
+@@ -182,6 +182,8 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ 	case SOCKET_URING_OP_GETSOCKNAME:
+ 		return io_uring_cmd_getsockname(sock, cmd, issue_flags);
+ 	default:
++		if (cmd->cmd_op & SOCKET_URING_OP_PASSTHROUGH_FLAG && prot->uring_cmd)
++			return prot->uring_cmd(sk, cmd, issue_flags);
+ 		return -EOPNOTSUPP;
+ 	}
+ }
+-- 
+2.43.0
 
 
