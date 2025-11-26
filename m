@@ -1,114 +1,167 @@
-Return-Path: <netdev+bounces-241867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35077C899B6
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 12:55:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4646EC89A1F
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 13:01:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DC023B4EC3
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 11:55:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42E743AAAA5
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 12:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9595A3254A5;
-	Wed, 26 Nov 2025 11:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41C0267AF6;
+	Wed, 26 Nov 2025 12:01:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from gnu.wildebeest.org (gnu.wildebeest.org [45.83.234.184])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CF23246EA;
-	Wed, 26 Nov 2025 11:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.83.234.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F8C2D73A6
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 12:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764158130; cv=none; b=RSz3LWXIpsp3Sqd9/hFSSai9Pat8HmJAgiOuSYORvG9BN1BeCv4njRw/2eKeVUq0EfUaz6O6wb6XVQH2oQ2hbXEn5jqzN1oPyaxFkfKjysiUuTkXuAVANT/Rf4AgwcKRNIMn+pzCwlnZQrQ7KjTmUUrt5DmNPk40h5vN/ozTblI=
+	t=1764158477; cv=none; b=G5wqrQp74p5LkzAqnZYblBvCA70BpCaUyLkv33AySfXVlAqBnXP/Zi94dcLRnMx7Gidu1Pj2N11MJquZgdgKXgVoR2gSJ2sK67MW40xkarO7wcI4r/ViW4HAMwo5rCIWqvnSLahGyJOMi3nS2nGwXH8nC6R9icJCNyeED9wrrDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764158130; c=relaxed/simple;
-	bh=mAzzMf4sOW+uxqfTrdpo0kgUwsdMto751Gn6hAWJ4A4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vAf2k3u00NA55UntB1jaUS69H8rzSAifa/YfZ6JpKjDlLHxHX2ENgtJP7sxxNQurBMcNgyPr2/zP2OVojoEKjB5OBciVQqCWTeazDhPpjs/1sl3wKSjq7oSjBNmj8COHIa9cSXH0G5Q1NJQ7VMDWHyGIIsfBHRNBVWmfing3+kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=klomp.org; spf=pass smtp.mailfrom=klomp.org; arc=none smtp.client-ip=45.83.234.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=klomp.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=klomp.org
-Received: by gnu.wildebeest.org (Postfix, from userid 1000)
-	id 7A09F3141369; Wed, 26 Nov 2025 12:47:23 +0100 (CET)
-Date: Wed, 26 Nov 2025 12:47:23 +0100
-From: Mark Wielaard <mark@klomp.org>
-To: strace development discussions <strace-devel@lists.strace.io>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org,
-	Josef Bacik <josef@toxicpanda.com>,
-	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
-	Lennart Poettering <mzxreary@0pointer.de>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Aleksa Sarai <cyphar@cyphar.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-	netdev@vger.kernel.org, libc-alpha@sourceware.org,
-	"Dmitry V. Levin" <ldv@strace.io>,
-	address-sanitizer <address-sanitizer@googlegroups.com>
-Subject: Re: Stability of ioctl constants in the UAPI (Re: [PATCH 01/32]
- pidfs: validate extensible ioctls)
-Message-ID: <20251126114723.GL11602@gnu.wildebeest.org>
-References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
- <20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org>
- <lhu7bvd6u03.fsf_-_@oldenburg.str.redhat.com>
+	s=arc-20240116; t=1764158477; c=relaxed/simple;
+	bh=LKIJSEs2I9JNnBn845A75HVIJEY1JXRS3Y1bQn29h9w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iqoY9sTFDO3L3rmS0YjbteYtnWP1fRHncP4iMPsZ43Z6nR2VWXKmld5uBT++yJR8KiNYP9k1QtJfW5vovOwWJUEoYAPejbfCIjUCsJn9GAeJRLoBgO57Qp8Uso8EjTnkr3mXvFImnBZzdFwaM56xXq/Z8QS64nQBtGiugdCwmj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vOECs-0004Ss-F3; Wed, 26 Nov 2025 13:01:10 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vOECr-002bE7-18;
+	Wed, 26 Nov 2025 13:01:09 +0100
+Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id EC0DF4A8A8B;
+	Wed, 26 Nov 2025 12:01:08 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/27] pull-request: can-next 2025-11-26
+Date: Wed, 26 Nov 2025 12:56:49 +0100
+Message-ID: <20251126120106.154635-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <lhu7bvd6u03.fsf_-_@oldenburg.str.redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi,
+Hello netdev-team,
 
-On Wed, Nov 26, 2025 at 10:08:44AM +0100, Florian Weimer wrote:
-> Is this really the right direction?  This implies that the ioctl
-> constants change as the structs get extended.  At present, this impacts
-> struct pidfd_info and PIDFD_GET_INFO.
-> 
-> I think this is a deparature from the previous design, where (low-level)
-> userspace did not have not worry about the internal structure of ioctl
-> commands and could treat them as opaque bit patterns.  With the new
-> approach, we have to dissect some of the commands in the same way
-> extensible_ioctl_valid does it above.
-> 
-> So far, this impacts glibc ABI tests.  Looking at the strace sources, it
-> doesn't look to me as if the ioctl handler is prepared to deal with this
-> situation, either, because it uses the full ioctl command for lookups.
-> 
-> The sanitizers could implement generic ioctl checking with the embedded
-> size information in the ioctl command, but the current code structure is
-> not set up to handle this because it's indexed by the full ioctl
-> command, not the type.  I think in some cases, the size is required to
-> disambiguate ioctl commands because the type field is not unique across
-> devices.  In some cases, the sanitizers would have to know the exact
-> command (not just the size), to validate points embedded in the struct
-> passed to the ioctl.  So I don't think changing ioctl constants when
-> extensible structs change is obviously beneficial to the sanitizers,
-> either.
+this is a pull request of 27 patches for net-next/main.
 
-Same for valgrind memcheck handling of ioctls.
+The first 17 patches are by Vincent Mailhol and Oliver Hartkopp and
+add CAN XL support to the CAN netlink interface.
 
-> I would prefer if the ioctl commands could be frozen and decoupled from
-> the structs.  As far as I understand it, there is no requirement that
-> the embedded size matches what the kernel deals with.
+Geert Uytterhoeven and Biju Das provide 7 patches for the rcar_canfd
+driver to add suspend/resume support.
 
-Yes please.
+The next 2 patches are by Markus Schneider-Pargmann and add them as
+the m_can maintainer.
 
-Thanks,
+Conor Dooley's patch updates the mpfs-can DT bindungs.
 
-Mark
+regards,
+Marc
+
+---
+
+The following changes since commit ab084f0b8d6d2ee4b1c6a28f39a2a7430bdfa7f0:
+
+  drivers: net: fbnic: Return the true error in fbnic_alloc_napi_vectors. (2025-11-25 19:52:58 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.19-20251126
+
+for you to fetch changes up to 9aea35eb98a6560daf85a2ae9cbd482a66e4d076:
+
+  dt-bindings: can: mpfs: document resets (2025-11-26 11:30:37 +0100)
+
+----------------------------------------------------------------
+linux-can-next-for-6.19-20251126
+
+----------------------------------------------------------------
+Biju Das (1):
+      can: rcar_canfd: Use devm_clk_get_optional() for RAM clk
+
+Conor Dooley (1):
+      dt-bindings: can: mpfs: document resets
+
+Geert Uytterhoeven (6):
+      can: rcar_canfd: Invert reset assert order
+      can: rcar_canfd: Invert global vs. channel teardown
+      can: rcar_canfd: Extract rcar_canfd_global_{,de}init()
+      can: rcar_canfd: Invert CAN clock and close_candev() order
+      can: rcar_canfd: Convert to DEFINE_SIMPLE_DEV_PM_OPS()
+      can: rcar_canfd: Add suspend/resume support
+
+Marc Kleine-Budde (3):
+      Merge patch series "can: netlink: add CAN XL support"
+      Merge patch series "Add R-Car CAN-FD suspend/resume support"
+      Merge patch series "MAINTAINERS: Add myself as m_can maintainer"
+
+Markus Schneider-Pargmann (2):
+      MAINTAINERS: Add myself as m_can maintainer
+      MAINTAINERS: Simplify m_can section
+
+Oliver Hartkopp (4):
+      can: dev: can_get_ctrlmode_str: use capitalized ctrlmode strings
+      can: dev: can_dev_dropped_skb: drop CC/FD frames in CANXL-only mode
+      can: raw: instantly reject unsupported CAN frames
+      can: dev: print bitrate error with two decimal digits
+
+Vincent Mailhol (13):
+      can: bittiming: apply NL_SET_ERR_MSG() to can_calc_bittiming()
+      can: dev: can_dev_dropped_skb: drop CAN FD skbs if FD is off
+      can: netlink: add CAN_CTRLMODE_RESTRICTED
+      can: netlink: add initial CAN XL support
+      can: netlink: add CAN_CTRLMODE_XL_TMS flag
+      can: bittiming: add PWM parameters
+      can: bittiming: add PWM validation
+      can: calc_bittiming: add PWM calculation
+      can: netlink: add PWM netlink interface
+      can: calc_bittiming: replace misleading "nominal" by "reference"
+      can: calc_bittiming: add can_calc_sample_point_nrz()
+      can: calc_bittiming: add can_calc_sample_point_pwm()
+      can: add dummy_can driver
+
+ .../bindings/net/can/microchip,mpfs-can.yaml       |   5 +
+ MAINTAINERS                                        |   8 +-
+ drivers/net/can/Kconfig                            |  17 ++
+ drivers/net/can/Makefile                           |   1 +
+ drivers/net/can/dev/bittiming.c                    |  63 ++++
+ drivers/net/can/dev/calc_bittiming.c               | 114 ++++++--
+ drivers/net/can/dev/dev.c                          |  42 ++-
+ drivers/net/can/dev/netlink.c                      | 319 +++++++++++++++++++--
+ drivers/net/can/dummy_can.c                        | 285 ++++++++++++++++++
+ drivers/net/can/rcar/rcar_canfd.c                  | 246 +++++++++++-----
+ include/linux/can/bittiming.h                      |  81 +++++-
+ include/linux/can/dev.h                            |  68 +++--
+ include/uapi/linux/can/netlink.h                   |  34 +++
+ net/can/raw.c                                      |  54 +++-
+ 14 files changed, 1166 insertions(+), 171 deletions(-)
+ create mode 100644 drivers/net/can/dummy_can.c
 
