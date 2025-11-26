@@ -1,145 +1,129 @@
-Return-Path: <netdev+bounces-241802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0509C885A0
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:07:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 503EFC8861C
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:17:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6EC6B347097
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 07:07:17 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3F993356D25
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 07:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3064D270ED7;
-	Wed, 26 Nov 2025 07:07:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1005A31B119;
+	Wed, 26 Nov 2025 07:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b="JQ7SWZ8v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V7DH7HOr";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aBNTWf+F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE1C22FDFF
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 07:07:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1E031A554
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 07:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764140832; cv=none; b=Op3V8BZyNM1IxtZ+zii9mwMXp/q0Q4pXv4M876ssZ/+dG22D32xWCb8DoHRzMruvpFvj8DG4bRTYgJ9Tfh0KkvtQmrC1Vv4VBZLJcRpTxbzk++3WYZHTvovKXvD+Kg4s0pkKsQmZa+o7fiueP9XNfBBqqfE+8XDKqHtFKHQexhw=
+	t=1764141326; cv=none; b=ULF0Shrz+PPooxWMg96DM8syhSy2G6vUrtoqy2+z9c6u/cb4+OHsDDaYmrV4HTcxsrc3/AVvaNsDMSKRuDt52/6nhRN2/4chdDZFvQfqL2hBFSkReJkbZ5qNMrdHQfm4aDQnMA8hMNJ17yWtiRC9nMf+Mp0D1fBbhVx0t+iDf0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764140832; c=relaxed/simple;
-	bh=VB4nQunFf+O3DmYPGWwxjYu5Lg4IWPHg/FOy86FFr0I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BwsqZIvT4TWJW+ExNRtC38PZJk4PQdzpkkgeYbnKBCYextBxRWtKtiJB6EPMNGYmVrZjhy+HGCBu1bC1wAjGgRjgEEQOhg1DSonvx+SRnGX6LMkpLPtJnuZFTnhoYPG9LdyPdc87to6atdCtb8EKFr+gdFeI6kPsLKF3ynrVRAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in; spf=none smtp.mailfrom=ee.vjti.ac.in; dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b=JQ7SWZ8v; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ee.vjti.ac.in
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-298145fe27eso99565085ad.1
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 23:07:10 -0800 (PST)
+	s=arc-20240116; t=1764141326; c=relaxed/simple;
+	bh=mkf/uHCKMjQSjVKT+d3VdATYkS+teAGvnv+BKYIEsOI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cXSHcPg0y00PUTxXHcLTbuxYiIEYSy7Pd/A1JkryiXKhdQO368gu+B7DDwXm970NhI5gzw61sudIBTTKRN3ehNCcNSJeTlVkimRvEDnu9h425XBfSg4Au/oRPyVfQ80oo6MAC6BYs77a7W6lH54RC5T0w1lggjstwIbecLsihYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V7DH7HOr; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aBNTWf+F; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764141323;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TCcjoQrJmDMV6tt4i7nrzjlVcToLbxZK4bwTpqKMBw4=;
+	b=V7DH7HOr/VDeygDbFjG3MNWLmhYOECemDM+d8Q2yFu2axuL0wN8NYMHirk98LEtP/jFOk6
+	1F8E+6H3YpC1HbKdNw0UNGbBIKcGVcHWt/v2oYuxt7lZmiu4Z3/ir4yqTjFUlwd8bhwHAM
+	Jmf7olQKEgWsJVDZ/IiKKzPvFXWaBBc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-336-igz4T5nxMJqSeW9oFr6dzQ-1; Wed, 26 Nov 2025 02:15:22 -0500
+X-MC-Unique: igz4T5nxMJqSeW9oFr6dzQ-1
+X-Mimecast-MFC-AGG-ID: igz4T5nxMJqSeW9oFr6dzQ_1764141321
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42b3155274eso2860254f8f.0
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 23:15:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vjti.ac.in; s=google; t=1764140830; x=1764745630; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kXm+TGMia1g3kmuDV/aF57ZmqWwNOjaNm4FLB34Qkxc=;
-        b=JQ7SWZ8va3yOG83pZgWPCtQoST0TmPwJka/mUlaX09ebW/KU5viLIYQoDWdDNMtPXC
-         zO6/7qjqDanY3+m6VJ2jPLaZI5WgqgKurhpKX4EUXxyqwbTurZNVO1zSW8jqNki7Qfut
-         4N+ynQI5lEvv3GhonqK+kXdK9H9KLIXcEC4ME=
+        d=redhat.com; s=google; t=1764141321; x=1764746121; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TCcjoQrJmDMV6tt4i7nrzjlVcToLbxZK4bwTpqKMBw4=;
+        b=aBNTWf+FRh9H73ynMEQPJvV4QlzwEYW+cZkwLPE8t+Jjhz6WVAiemC8nNTesfDbKnQ
+         b3vWRUNDsmsRIP5ztUGUx4Qb6FS5JOisofV4BYvVNLONmdqkntT7crOVU4VGauf6ZMNc
+         NNCozMQg3Xys1W9jiXR3e9fGDJag9KA0TdtDmkWw9xnV1uxpxCp2+NKsiX8+Jq72eXAD
+         KT29gGwoSGuatF4lv0fCqbY8cJqS9CECFe3jvg71sb4V3KcYDPK07/NK+FSmPCURRRko
+         XG6muxEWW5kSYExyDXF2JrawtbngLdZPU15qlWAWNuEq5eoBzqqakCmUGX9zpKII/Ece
+         pzeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764140830; x=1764745630;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kXm+TGMia1g3kmuDV/aF57ZmqWwNOjaNm4FLB34Qkxc=;
-        b=J4fx7Ja1gU/lr49ttdrGFBSypgpM1qL+RNNgPFgCfBqPqdkyNhli5LRKW0ZefxlJgt
-         eLd2MftB6wTrn7O5tWDDrJHckTQMFCxnVTn0fjH+XrENHXhoyKtneBXe5WMrTuPd8ccl
-         1Y/oJgivC98RPoKrndIpsPn4OE/grwRcgkzO6oArm9u8GC7Qpr80LDtu6QZBpJCjWtQi
-         UMdiM3LlQ41/LAmVi5u3Mn+7EuimCl+Y1mXBsSmv9opZPP11Figh/EZ+x4+NFC9wbxhq
-         PBU5Ht9PNyg9LTC0L3pt3xdn8SjMowG573yoemK2492AQND2ZRYSWJaTE0ncTFZmUG4V
-         4+dA==
-X-Forwarded-Encrypted: i=1; AJvYcCUrx9WfPxA2hOx8JsZUJhy7CZ/yc6ecp6NG8jcjb4SDGpKhNW1z+LRC9bEnQTCj3IAwJisbvSU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybYhAL0u2A7p9VGJdmUkYrRxqVms6aZ07C2pEboa75PAaptgSA
-	Qu39S+e2YLgyzGT/9q6bbTIz54FeNGeXYsE2W8nrcNhurrYIwzgK4rFRN5ki6rc+8AQ=
-X-Gm-Gg: ASbGncuw4rarGuMjIcB7ehAt77RsJ6ZK4MCkgkSCY7P0HQbtIK/Uz7kkTpeJO5gA0/B
-	BrjlS3p55pwiQcHHXWXjzC8rGe6RS3DGZ6FYsbPFksauZWWDta1nFG8G7ECxbVopjbT8msnoYpx
-	KMCnXojV08zyx9SmcNjtD4bDNq/KXAKb7ac5RFVTgehDdoIyEnTm3ERUyR7kYD49GsfCMR2XAKe
-	9+XCbQ3exBUHiqhgwqWGEJGqtmH9nXnNY2YZz2isB6Yr+RCGrGS5apVZe304X0r9HvkJrJnVq3M
-	VFaLqbA7EJJM6qlvuq5kfARFntCFhmK9Ql4ZepXcbB6L1oFHR787UZVcc7vmHPnG3YtzF5maNuV
-	n3UsD47MRv3baL4rR2jzxuyfPchfqC7F6UaEt31ToCBMs9QC+K9X+BPzO8QDuZzLXo8dh1P3hBJ
-	jSdp14tfObQSJyUt7/XeG2pJKRrLUptIH1SZbOUUvDXxTnjyMGua2vIgD0dN4lvj8PLbk=
-X-Google-Smtp-Source: AGHT+IGkJkFFiIZ7CfI+PiIjFnbPp5NR5QiZ9xPjeb3SVz81eUnXoOljRms9fCxUpzbe+iXyOsOtgw==
-X-Received: by 2002:a17:902:f70c:b0:298:6a9b:238b with SMTP id d9443c01a7336-29bab1d74ddmr58569865ad.51.1764140829664;
-        Tue, 25 Nov 2025 23:07:09 -0800 (PST)
-Received: from ranegod-HP-ENVY-x360-Convertible-13-bd0xxx.. ([2405:201:31:d869:7ab4:fdd5:842b:6bfe])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b105e4csm183853715ad.2.2025.11.25.23.06.51
+        d=1e100.net; s=20230601; t=1764141321; x=1764746121;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TCcjoQrJmDMV6tt4i7nrzjlVcToLbxZK4bwTpqKMBw4=;
+        b=UJCJHjkurctR9m/SoMcvSss/7YJY9s66Is267zdg36jfLk60VFuWk5bt02aHfUpPJb
+         OpSWSR+d1ZfxEZOjjyiq8JmAY1xDuiEm4NeJ3e5keVE83rJmByHCojJTmYblCHGvC+gd
+         /6BflK0iHPNx2R49gLUP8mFVqa1XSZfZWCxc2/tAr/0gYFq2zECtsY+ZqdlrGrRVqFHI
+         l+e7uZXp5HD+3YIEKaw1Kg+ro6qKzM/JyvO6fsI6ZyucBw/tEkJx3JvF496Tay3fJTJe
+         FgyKJ+kGF6aHzJc27dv6+/NWBTDXcyohfD4xbRtw4HjdFEtxDdf4OgbInzv6pFYQQSqk
+         55Fw==
+X-Forwarded-Encrypted: i=1; AJvYcCUrSA3+b5s2GV/7V6wUyG1TO5UsuZls0AlBo79sMZ8gthQMYCNKZxjwX8Kgd4Zzb8BxpoRwyQo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTUXuwgPV3OQUyojmVMEbq5RZ7nh74aqsptvYQXwxEz/Uj8H9F
+	5PE8F3Tnyhu+zADrfd3P9XNkkb4ULkj7XgvuC9Xeoq2spaupk3Y2zfq6iyMDgTzbvVGhMARj78m
+	zDWx8XtB53dSFaV/s0xuCg3EHN9p3vx9qQ6aCc7GL7fqUa2TkY2GMjtSI4Q==
+X-Gm-Gg: ASbGncvCi8xsr+tT2VQigGhVM7JzQoCjteJacAtbwiQM9EnC0rO6Wgm/Ca5oapSxiv0
+	fuuU/u26j0Z7dNSbaGbocgpXwyU1Vy4FwILUkolboqTgTexpblUlnln/GeUz0vj/nXPEQmJQjoX
+	YTON8cisoDknqJ4FuDDOHBDDz12nV/k+jStGfzx9hOFZLRFqLoFJYA+v2NvQaNn6JQJbUFmOigT
+	QIbYFLJDguB9jsquAkkEhUdcKCb1k7jaXde/33lpGMi6coVK9XftsAgjWrrI1m/qmulgggVr6EX
+	IW4/rZAd5AIkti5yypdY9KyID0WwssltLlrkaLzqUotL6UPwdmktW6XrKRyJlDja0WOB7/uark4
+	j6Z/UgyPtMj9/JiliIOMDvoW0MY3LxA==
+X-Received: by 2002:a05:6000:40e0:b0:42b:4081:ccec with SMTP id ffacd0b85a97d-42cc1cbd1b9mr17399194f8f.18.1764141320718;
+        Tue, 25 Nov 2025 23:15:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFxNo/Afpg3Lg6XEk3Ct+TLvZVCI8wWmYfzMD7t72pHQNYX6jVKGgWygBu70JI/2p3ZTBPPRg==
+X-Received: by 2002:a05:6000:40e0:b0:42b:4081:ccec with SMTP id ffacd0b85a97d-42cc1cbd1b9mr17399153f8f.18.1764141320200;
+        Tue, 25 Nov 2025 23:15:20 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f363c0sm39412154f8f.18.2025.11.25.23.15.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 23:07:09 -0800 (PST)
-From: ssrane_b23@ee.vjti.ac.in
-X-Google-Original-From: ssranevjti@gmail.com
-To: Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Rostislav Lisovy <lisovy@gmail.com>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev,
-	david.hunter.linux@gmail.com,
-	khalid@kernel.org,
-	Shaurya Rane <ssrane_b23@ee.vjti.ac.in>,
-	syzbot+5d8269a1e099279152bc@syzkaller.appspotmail.com
-Subject: [PATCH v2] net/sched: em_canid: fix uninit-value in em_canid_match
-Date: Wed, 26 Nov 2025 12:36:41 +0530
-Message-Id: <20251126070641.39532-1-ssranevjti@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Tue, 25 Nov 2025 23:15:19 -0800 (PST)
+Date: Wed, 26 Nov 2025 02:15:16 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: Jason Wang <jasowang@redhat.com>, willemdebruijn.kernel@gmail.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v6 0/8] tun/tap & vhost-net: netdev queue flow
+ control to avoid ptr_ring tail drop
+Message-ID: <20251126021327-mutt-send-email-mst@kernel.org>
+References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
+ <CACGkMEuboys8sCJFUTGxHUeouPFnVqVLGQBefvmxYDe4ooLfLg@mail.gmail.com>
+ <b9fff8e1-fb96-4b1f-9767-9d89adf31060@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b9fff8e1-fb96-4b1f-9767-9d89adf31060@tu-dortmund.de>
 
-From: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+On Fri, Nov 21, 2025 at 10:22:54AM +0100, Simon Schippers wrote:
+> I agree, but I really would like to reduce the buffer bloat caused by the
+> default 500 TUN / 1000 TAP packet queue without losing performance.
 
-Use pskb_may_pull() to ensure the CAN ID is accessible in the linear
-data buffer before reading it. A simple skb->len check is insufficient
-because it only verifies the total data length but does not guarantee
-the data is present in skb->data (it could be in fragments).
+that default is part of the userspace API and can't be changed.
+just change whatever userspace is creating your device.
 
-pskb_may_pull() both validates the length and pulls fragmented data
-into the linear buffer if necessary, making it safe to directly
-access skb->data.
-
-Reported-by: syzbot+5d8269a1e099279152bc@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=5d8269a1e099279152bc
-Fixes: f057bbb6f9ed ("net: em_canid: Ematch rule to match CAN frames according to their identifiers")
-Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
----
-v2: Use pskb_may_pull() instead of skb->len check to properly
-    handle fragmented skbs (Eric Dumazet)
----
- net/sched/em_canid.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/sched/em_canid.c b/net/sched/em_canid.c
-index 5337bc462755..2214b548fab8 100644
---- a/net/sched/em_canid.c
-+++ b/net/sched/em_canid.c
-@@ -99,6 +99,9 @@ static int em_canid_match(struct sk_buff *skb, struct tcf_ematch *m,
- 	int i;
- 	const struct can_filter *lp;
- 
-+	if (!pskb_may_pull(skb, sizeof(canid_t)))
-+		return 0;
-+
- 	can_id = em_canid_get_id(skb);
- 
- 	if (can_id & CAN_EFF_FLAG) {
 -- 
-2.34.1
+MST
 
 
