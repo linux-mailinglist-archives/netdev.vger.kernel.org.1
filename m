@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-241980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2C26C8B512
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:48:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55E0DC8B587
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:52:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5305235B32D
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 17:46:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44A503BB4CB
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 17:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A9C13446AD;
-	Wed, 26 Nov 2025 17:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C5E33EAE7;
+	Wed, 26 Nov 2025 17:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NcAroEv7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kznkas2i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB54315776
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 17:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76703112B0
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 17:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764178955; cv=none; b=Z/EFYOjZCK/H9aNSiMuWkwd/ExEVPUjkxkhrRCbLsMg5NhuA/dn5pi+CAVQAfotFONZH3Aky51p1XEvLIEP/eYs5kej0+W0Ra7md5YXxqvnxIVt/VooeSniLmyIl/nQzZ1yZX1SwcsipUbCczvpswh3AoQ1W5KEXr3QqRvMkRg4=
+	t=1764179060; cv=none; b=SuOztkBJKRnDNlu35c0YsWynU3Xe5M7mkwlsAqF9NFv7Tq04hJ6Y4HiCVzykgj8fPP/8IOnS30VHYQngXgzlA5WXvEID60kDpMlFVT9k4PBLoE2M2z8RRQBdtDgrbgiVt/MI2yQ1kZ86J88sOwoXowkdQ96RRNmEChbmbEBDmxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764178955; c=relaxed/simple;
-	bh=H45sT8ifW0O8vWCYPKJuUgHks2mEXGWB8Jd0Vqn88PE=;
+	s=arc-20240116; t=1764179060; c=relaxed/simple;
+	bh=DZmAfxsJe8NvUJeI6S9zqA0WF6pPJRkMTm7r9xT3UrQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Raee0PPC9UYX/9bjDdUub/7cV3sZEkUQcZlKlfqgvBdVjCh4fsXSdyu9MA7s5d2txvhn882GDIvsgZXUEQDXJeawumY1EWIBGhwKSpUk+K+cOIXbttfxjhSFPYpphHP7XoRmA75BQBBEOOgM20OJJSrKpv5CWdr1WSX1D5wxbZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NcAroEv7; arc=none smtp.client-ip=209.85.128.52
+	 To:Cc:Content-Type; b=cK7YuvY7ntO3WDxXY/R9DGVxOEyJb5dVbF1sGLrYkzuUhGkcxncjeSNnVyc/R1FkcF1c60i40SwQdeTw9yRbSR218Uqrw1HsuXlvm2cqz3opWSAb1QSlYXDGsULZcUV7NlPKe82K5faELT/jcoi4NqDnFlB0nF4uDYHCfgkpN5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kznkas2i; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-477b1cc8fb4so40555465e9.1
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 09:42:32 -0800 (PST)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-42b32ff5d10so743206f8f.1
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 09:44:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764178951; x=1764783751; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764179057; x=1764783857; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H45sT8ifW0O8vWCYPKJuUgHks2mEXGWB8Jd0Vqn88PE=;
-        b=NcAroEv7WHRM6fVZKueA6AsJXXFNUx4vKjsgGnow64+ziC3ZuhBOfkzR3H88UjZS/k
-         SGAS9JaptHKCBPLYfGfCxZaiJLxDBpSvUlxfySydVen66Akew6OZMZfqQjgTVplDQ//c
-         u7iFhb4nRh/xGhsSVXRoyGtMipZ3AUSLq/P6knWtkxaRphJhdP3Rj9REzJ/u2FwWQtP5
-         VXvq3WqFasmz0xnFkzNv26FDjfsQ/cp3QklWxmELPjCSTxybrQ8ENgfs66zZ3SUMhZe5
-         r7x+k7te4VRA6znZaKmSRTi+idImQfwB1SZnwmA4wasfQdkEKQ8nkzuNNtGW2M/7YkbZ
-         yD0Q==
+        bh=PJtndxdQkYWzvy6kDqOv7kQqo1yR4d6wvaKa4OAP+Cc=;
+        b=kznkas2iAfgrVPA3BtK/rYtQI3tQp/qqnbkmrolnZncAiTLFIy6RJUwKKFL/66vwQo
+         bm2qNK/aO4SMGXzMxzUKyPrSJd2xj/R0XfhtM/AaX8yZJ4AmaYCE6sQjBSySj68Dt2lb
+         z/xdc3cFXOap2d6X6dVuQvgxbRT59QMUaOlVMz+hxt8DGVWWHhvVnsMcsps69GwglS2E
+         wSS1A/+gvNIk2rUt60QEgFEduhhcQqeHx+KXQHcdAsPHFEgNCFHGizRDNw4M60MDlL7G
+         eDwcZ3f0OQAA5Z7jAeQyKcRU52AJ+hfCIIzWnPW4EZTMI18vpJrS4q0kkbwx/dHC6+MF
+         1pIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764178951; x=1764783751;
+        d=1e100.net; s=20230601; t=1764179057; x=1764783857;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=H45sT8ifW0O8vWCYPKJuUgHks2mEXGWB8Jd0Vqn88PE=;
-        b=D8rs+ZZDt8UNNXsD7sGOTmjxGmA7heSkWmYJfI84kwuj+WDx0QApp3JJq+qphNNKCn
-         7Pd3RX+e0ZHPFZto0DzkT3ey4eECBb6D+0pzNHyedT51IhzoZ/0HdIzt8f7SpB6BGUxq
-         4gP6OSOHjs5cWgqFclBuhBVyL9zuyVBH5gdwVTguLvAHz1P5uIgXTaQ7E7J+X3p+kT4H
-         MqDvgak1uhn7NHKowVkKMjzbfEP+5OmDEG8khb+tfg4kp4f9dNwy6lZkE3DhEd/ZtvfW
-         Cn5tsHTNGrvK2lNKYMu3ALcmPlLAXt8eAzS4T3pUW2pcvCnnnRLuNiiBqNdEJx8E44lx
-         C3yQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWzQODxf8fTozSoNTY8e+NNPegtwOYh7CjipoOJABJOJXN+q8pfWGwwSBZCusHGbaieGLmhVQg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIht3MVpYSUyi5zbq1EEIWu7eyzzTsfyFSk6YFNqZJNS+Qo9eQ
-	5EbMbv4RafkEZXkdFgD9dAeGOO7d0yYwbB4hhKljrAXVJ3vJ+ZydWShvroT1oezOJ10abmkU9S6
-	2pFoQAFvlRrNMhDySI/KhV4VMF14EcKo=
-X-Gm-Gg: ASbGncvX+Rd7Dp91XyfgvwIAt2D0V/ah2T6oIJAkUunWFXIZH0XoK6xYlKelXiumXr9
-	qLEkvM1D0NhbrHoO9oZzcFFj38ZR7W4DsBR1lGI0wSS4irjP2rqFL5W1yaii+JtjdGOAmoIdvve
-	PxJXdyYue1YxhPpiq6i6VFU4Cuz4gTgHpiahQsJlLmPMx2hak1BO9OA6DKbDK6nMrzD5bbud6XS
-	9z/DgiYIQYH3m11LbU9P4vwiQH0BRDusf4JJEGNPw1HoB06yTyrElZmo4wVD1XgOVqhMR46cxiU
-	vke+3+kEOnE0MKgUyiWHnootucxg
-X-Google-Smtp-Source: AGHT+IEZ28WwikpNMp28f9cZ8FrUOzBbOzH12B9xnya/BVPaxQoXRRptgOSDjsEI4HuhukMbEvl6ukgR6fFwxUmEXSo=
-X-Received: by 2002:a05:600c:3152:b0:458:a7fa:211d with SMTP id
- 5b1f17b1804b1-47904b24282mr78083805e9.29.1764178951003; Wed, 26 Nov 2025
- 09:42:31 -0800 (PST)
+        bh=PJtndxdQkYWzvy6kDqOv7kQqo1yR4d6wvaKa4OAP+Cc=;
+        b=FKo+tVPxCzX2pnV9gr+xGaIWu0CLWlMqfUgDY03FLyq1sVTWtDcWH6apstueDXpbgR
+         sbR011Nwiuix2OlrjdSv6ueTEaZF7c9fnuiOgH7c71xL2onBhecWIsyV+RLkQ3Xqxs7e
+         8drgq7XwlqMpNK/XdFlhO/47W1p2kgdonvR/okh7xookHVCG5bmRJysQ61g8c+TbdVv+
+         VhOUvWO+El6rKrAT/Li2GWBzKSCutboENX2N4o1mG2n/apo84nXLqmx2uuu+xvAwnKjK
+         vK4mLnvGRei2/5GxZvFBZspVxOUqjPOmYcNVuQ0VA1f7hdiY8ygrjznS/3U71SVJ/Q/v
+         uHbg==
+X-Forwarded-Encrypted: i=1; AJvYcCVcfrmVQoszzviVpLFPDldczKpAVtETY8Nqvomn6sT1LABxUeopVum4Q19hRQUcjx1lYPsWYr4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIFAPdbDLGC6X01ORfSW/RG5XKEyyPSDwFEkTCLalyumxKn55m
+	gT1JkHV9C4vBK0exlEUXkbqvVnjjD1mXg9HFUH8CKPekfi0NjpprLIKTaa5BtqgxVJDJRuGJUbv
+	obaZxRB0szlPqABULRaVhSXCkbddQBeo=
+X-Gm-Gg: ASbGncvMK01/l5Tz12dfaHjA14tPheIAoLWrKyArX35qAA2eGRLnt70xEtPfVDcbwLU
+	R5kP/K6zvwJF1YKRI8Aj5nKggT6ulmvXn+N/CCYBfU2KXWRiiponhCgyWfaMxesx3j3pxxH+VxY
+	C3NY+1k4GInlfACbiMV0AXBBrtNtZuag1Ac3EVxCX3D2rBsE81RuRzZpNba8Z8rbcNzMST6zGiM
+	PtUGfBgzXSN60YHMuplR9v9fIxgkj9y1b6AAP//ccnv1bP5CKsPTyVM/BfkvR4VU3XWAQKnGOfr
+	p31bLKGKqWte2f1JYeRMvlqD7Et5ZFyKr6UAClI=
+X-Google-Smtp-Source: AGHT+IEMtnBKL8QKEYTLtiH3Qt1JZUzmDtUchvu2N3MeDZa927dTGr16SXLA5t6Vbu7dxUN21qfwG9K9BwkeddOjilM=
+X-Received: by 2002:a05:6000:1a8a:b0:42b:47ef:1d59 with SMTP id
+ ffacd0b85a97d-42cba63b5b2mr28905036f8f.4.1764179056932; Wed, 26 Nov 2025
+ 09:44:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,37 +77,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251121113553.2955854-7-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251121193942.gsogugfoa6nafwzf@skbuf>
-In-Reply-To: <20251121193942.gsogugfoa6nafwzf@skbuf>
+ <20251121113553.2955854-7-prabhakar.mahadev-lad.rj@bp.renesas.com> <CAMuHMdXrkt0MXOBSvpdJwNVmGrnmt03mSGqj7EhqF16tf4i5Pg@mail.gmail.com>
+In-Reply-To: <CAMuHMdXrkt0MXOBSvpdJwNVmGrnmt03mSGqj7EhqF16tf4i5Pg@mail.gmail.com>
 From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Wed, 26 Nov 2025 17:42:05 +0000
-X-Gm-Features: AWmQ_bkZJBm6Wozp4bZ86ADSwgEM8iq01qAWIsEYygFDAD9xEd_cYCJ2C4ftoDY
-Message-ID: <CA+V-a8vAXg9GXn1ee0-02N7-ucHuivioTMLKFEiw1fO0nPQAzA@mail.gmail.com>
+Date: Wed, 26 Nov 2025 17:43:50 +0000
+X-Gm-Features: AWmQ_bkhH_0PDV6DBVghT_5kUE0J4e1gar5BbggGmW0QWH2FTGmxRKv3h7arj-0
+Message-ID: <CA+V-a8vhTH7qAbrJrqRimiBfwD4K08zK0_yOHHjhCjfufGWQaw@mail.gmail.com>
 Subject: Re: [PATCH net-next 06/11] net: dsa: rzn1-a5psw: Add support for
  optional timestamp clock
-To: Vladimir Oltean <olteanv@gmail.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
 Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
 	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
 	Simon Horman <horms@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Russell King <linux@armlinux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Russell King <linux@armlinux.org.uk>, Magnus Damm <magnus.damm@gmail.com>, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
 	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
 	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Vladimir,
+Hi Geert,
 
 Thank you for the review.
 
-On Fri, Nov 21, 2025 at 7:39=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
+On Mon, Nov 24, 2025 at 12:45=E2=80=AFPM Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
 >
-> On Fri, Nov 21, 2025 at 11:35:32AM +0000, Prabhakar wrote:
+> Hi Prabhakar,
+>
+> On Fri, 21 Nov 2025 at 12:36, Prabhakar <prabhakar.csengg@gmail.com> wrot=
+e:
 > > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 > >
 > > Add support for an optional "ts" (timestamp) clock to the RZN1 A5PSW
@@ -124,15 +128,73 @@ re
 > > the Ethernet switch includes a timestamp clock input.
 > >
 > > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > ---
 >
-> What is the impact to the current driver if you get the clock and
-> disable it? I'm trying to understand if it's possible to only enable it
-> when using a feature that requires it.
-I actually cannot test this by disabling the clock. As the clock for
-TS is coming from the core clock which is always ON and we dont have
-control for the ON/OFF for it.
+> Thanks for your patch!
+>
+>
+> > --- a/drivers/net/dsa/rzn1_a5psw.c
+> > +++ b/drivers/net/dsa/rzn1_a5psw.c
+> > @@ -1243,6 +1243,13 @@ static int a5psw_probe(struct platform_device *p=
+dev)
+> >                 goto free_pcs;
+> >         }
+> >
+> > +       a5psw->ts =3D devm_clk_get_optional_enabled(dev, "ts");
+> > +       if (IS_ERR(a5psw->ts)) {
+> > +               dev_err(dev, "failed get ts clock\n");
+>
+> I think the error can be -EPROBE_DEFER, so this should use
+> dev_err_probe() instead. Same for the existing calls.
+>
+Agreed. For the existing calls I'll create a separate patch.
+
+> > +               ret =3D PTR_ERR(a5psw->ts);
+> > +               goto free_pcs;
+> > +       }
+> > +
+> >         reset =3D devm_reset_control_get_optional_exclusive_deasserted(=
+dev, NULL);
+> >         if (IS_ERR(reset)) {
+> >                 ret =3D PTR_ERR(reset);
+>
+> > --- a/drivers/net/dsa/rzn1_a5psw.h
+> > +++ b/drivers/net/dsa/rzn1_a5psw.h
+> > @@ -236,6 +236,7 @@ union lk_data {
+> >   * @base: Base address of the switch
+> >   * @hclk: hclk_switch clock
+> >   * @clk: clk_switch clock
+> > + * @ts: Timestamp clock
+> >   * @dev: Device associated to the switch
+> >   * @mii_bus: MDIO bus struct
+> >   * @mdio_freq: MDIO bus frequency requested
+> > @@ -251,6 +252,7 @@ struct a5psw {
+> >         void __iomem *base;
+> >         struct clk *hclk;
+> >         struct clk *clk;
+> > +       struct clk *ts;
+>
+> "ts" is only used inside a5psw_probe(), so it can be a local variable.
+>
+Agreed, I will create a local variable.
 
 Cheers,
 Prabhakar
+
+> >         struct device *dev;
+> >         struct mii_bus  *mii_bus;
+> >         struct phylink_pcs *pcs[A5PSW_PORTS_NUM - 1];
+>
+> Gr{oetje,eeting}s,
+>
+>                         Geert
+>
+> --
+> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m6=
+8k.org
+>
+> In personal conversations with technical people, I call myself a hacker. =
+But
+> when I'm talking to journalists I just say "programmer" or something like=
+ that.
+>                                 -- Linus Torvalds
 
