@@ -1,287 +1,272 @@
-Return-Path: <netdev+bounces-241828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C786C88DDC
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 10:09:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 900EAC88E56
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 10:16:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A5D994E3D01
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:09:39 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AFC8A3546D3
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:16:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2ED3112DC;
-	Wed, 26 Nov 2025 09:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D6192D23B8;
+	Wed, 26 Nov 2025 09:15:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YQA3ioFt"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hMz1zkmI";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="d3D7gtMc";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="d/XoT1Mp";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="9NK0V7+T"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011000.outbound.protection.outlook.com [52.101.52.0])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53AB24166C;
-	Wed, 26 Nov 2025 09:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.0
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764148157; cv=fail; b=Lm3KerYEFKq5d7eI2NTRfvrbrq+yunb7BkQzRN1ma47M0lv2f4ZEKsK4nwWU/UGEcPiT6kXvebc7e8wmCUoUydOctHDsYx/LreiU8GKwnNAnqjKoPct8XG4XhkKWK66nvOdYzP+41+TpZXrmigy2Wh85DrlhVJWlBZPHQcEtV1M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764148157; c=relaxed/simple;
-	bh=zLLkOdXha8CIkQJ2XmPe4rwAm3TocQvm0Rw057aTivc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=HL2PVBQVft0azgf7ri1gf/S0G6gvpHhJKEau7+3D0Kk+GH21flCiYYqf4+/cBviR81dpQyAUAhskM7mZw4q2oNBecDLMrxD1MZMMDAhu5E9IxCu5OjErmDH7LuTvZkCel9fjtbYYhooDzP/HQUb3jZf/xzXGoDeCC74++mq6ORo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YQA3ioFt; arc=fail smtp.client-ip=52.101.52.0
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fpJm2yITQiOuku8Y80K3EN28Ts3P+iN7ytfK3iH45TT97aakEhf2vT71bYLgfa51sP+jqn+Ave3sSUxHikcZ/d9R7afLlSZ2owdQ3a4rF8ytLKTMBUZ6x41B0fNg1Z+GB3PnfJm25lnNQPlOPn5Tb0YIUpOIT+HuUSiAdvFZLi8H1fhqJ1ADE+/r+rK0nrbBN6xP62UqEy8bHOgU0u1ROTiee1gyLiiwBr9Jzl8gi5AOZf1n/9lm2eEnTCUj7reH9MGghuxHLOMsyCOrvGpnM5tWeXHTNvj4eaREiZ+BQXbUJTGE7IstGbeTPi5KfcLj1pPzylcplrXTEgt+InJkfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dsltPpmQZr9KAAlOafb1g+xggfVHqZv/tz22snXHza8=;
- b=jF4Ul1omziho2r7xOyFZgcEk7jqlnAjXBnuC1kGjgEUYsx5/ksJs6653kbPnWNeMVvH/4ZRPMrFzRanXsQqnZhuqooNJF9/hOyRaAwM5QdTKZ3DGRpRNetBa47kYDiWnvaLNj00u3vuCt2EDfVwpw2ViuNqCGTAsO2hvXvbBlJkWXlqoRQfLrj0IBZV55nDIjZpwNM9EZ8JojRI9ULGc9NM6mxMlK6p2VwN0q2Bx6joItyq3AdL1nkDY86B9lvHC0bFUdQR8SaOFwaLQhby4fiNnGK7nkils9bMJ3fofmKwQI9vjkY/WrHYBMDT8fEW+uSZYf/lq2DFjGOHj/aaRsw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dsltPpmQZr9KAAlOafb1g+xggfVHqZv/tz22snXHza8=;
- b=YQA3ioFtrzLhftriQ4Qt9zRGhE4k5b+6ZG24qh0mbR9FK9v0wfiwylR2PG+0PfSFGSRNgW1KKLcj7PmWCXDczK1hX3tTMtxpvtm1nVBhMm1czd9g4W7E6id+EsFUxIZ0nhLYpaLfaQh94W+6nOZqw1B3N4htbXThWAFbujDe4CA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by MN0PR12MB5812.namprd12.prod.outlook.com (2603:10b6:208:378::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.12; Wed, 26 Nov
- 2025 09:09:12 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.9366.009; Wed, 26 Nov 2025
- 09:09:11 +0000
-Message-ID: <34f7771f-7d6d-4bfd-9212-889433d80b4c@amd.com>
-Date: Wed, 26 Nov 2025 09:09:04 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 15/23] sfc: get endpoint decoder
-Content-Language: en-US
-To: PJ Waskiewicz <ppwaskie@kernel.org>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-Cc: Martin Habets <habetsm.xilinx@gmail.com>,
- Edward Cree <ecree.xilinx@gmail.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Ben Cheatham <benjamin.cheatham@amd.com>
-References: <20251119192236.2527305-1-alejandro.lucero-palau@amd.com>
- <20251119192236.2527305-16-alejandro.lucero-palau@amd.com>
- <4aab1857efeaf2888b1c85cbac1fc5c8fc5c8cbc.camel@kernel.org>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <4aab1857efeaf2888b1c85cbac1fc5c8fc5c8cbc.camel@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO2P265CA0341.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:d::17) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2C42E54B2
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 09:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764148552; cv=none; b=T7DDJeWFGBLVUSeSY+uFHMPNde072ahKHhfVoBvSEwFVFlcFDwH1Jt4cLQuuoycYAar2LMA7IkOQOttJ+ycCoCLviLRfZtnX3sCcaOa7HfVU0xi2n0Wzvv1W95xG4IrHVenSvPdvVzSWmkKl0uvB+VIZXyGRm72Gtp5CiI9GkBk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764148552; c=relaxed/simple;
+	bh=0he+5RMKWiSMlJ+OXnYI+mfRyOCkMTxJTC7ym2Qf/t8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S3nZm/46tYvNXzM6npndW3gwkCU99WSwi01gxkg3qGpAs5Chm22v91gpPk+KFITW/5nkHuhULhGJrhTRiofN0cuvaOH6Io+ijwH0nMDV5KQAhYp969139bW4GW4IOh7P/2ByEuF0Rh8WccP6ozQuaqGnarE8CaLChm/54uzQF4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hMz1zkmI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=d3D7gtMc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=d/XoT1Mp; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=9NK0V7+T; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 9EE185BE0B;
+	Wed, 26 Nov 2025 09:15:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764148548; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hIO8GUPkQWcXPzAo91ONaYd3FTvi8Wtx5Q2cMhxB590=;
+	b=hMz1zkmIIKt/4VXR0t2dRmFjkktPWBkmAI34dYKhRgqQfQINHNp+PYWyDNzRMtrpnUlq9t
+	YWAphT/cZQbKQxke+XyalU4smhpeaWHPidNrQMmwGtoBnvLCHc82Hmbro02QNFOjGInqa7
+	EDCCC25m+g0oymMJUuc7k9P+DqSRB3w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764148548;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hIO8GUPkQWcXPzAo91ONaYd3FTvi8Wtx5Q2cMhxB590=;
+	b=d3D7gtMcan5RpEwWNloIiAsIaBKRq8gcc5fOskEGiXJ8z/YwFSRxrXTa4XECfnO6veMZDl
+	AhnfynuIPc5bJgDg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764148547; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hIO8GUPkQWcXPzAo91ONaYd3FTvi8Wtx5Q2cMhxB590=;
+	b=d/XoT1MpOwv+SOH8jbR+fM2+hpnzLLvzoGIg8YaeLEIqp5zozYBMlaTx2TT94msy4NpsAC
+	H6EWg9HTmmt63PTyIlLVHW7PJ/tSMD9gWIJJzrDy0qWOT74jEamOV3rm83dtHXfE+g+9oS
+	4k/9Pxq3yOL4y4Tv9aCp3/bqxvxFRL4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764148547;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hIO8GUPkQWcXPzAo91ONaYd3FTvi8Wtx5Q2cMhxB590=;
+	b=9NK0V7+T9h/wRMVeRRpwzgCmx9VzkHy58K1dmR/CktGpZ1kOEffeWs+gMwAR/PqyRdj45d
+	uJV0Vh6pTKxPk1AQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C7ED03EA63;
+	Wed, 26 Nov 2025 09:15:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id wjHgLULFJmkzBwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Wed, 26 Nov 2025 09:15:46 +0000
+Message-ID: <23b56ddb-f5a3-4b2b-bf75-e93aa39ab63f@suse.de>
+Date: Wed, 26 Nov 2025 10:15:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|MN0PR12MB5812:EE_
-X-MS-Office365-Filtering-Correlation-Id: 495408b9-431a-4f40-8cb7-08de2ccb769a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?YXJoQjkrZVFWcC9rWE1GSDBibnBoa1RMQzlyTW5OZEJoWjFpcXlTOEFPaVha?=
- =?utf-8?B?SjY4SVlPRHN4MjVoQkhZLzlYWk9xZEMrVkU1SGhZNTkxWXpQNlZRZi9FWkJB?=
- =?utf-8?B?WTd5TEVKV1Mrdkd4QjdsZSthMEtkVTM0VjNUQmFsVlkybGx2elFGUDRGMHp6?=
- =?utf-8?B?N2ZTM0EzWFRrLzhvOXJDNkxvV0FJSzdBYmt5cjFDemhMQXVtNDZYTGI5VXdo?=
- =?utf-8?B?RGJIR3hTT1pCWkRlalROSStjWjIwMDhJb1lxR2tZOWNPV2lrdzJVUzdON2dP?=
- =?utf-8?B?YVUxcTVKYmE5b3V0N2cya2Qra0sydXlIYldUb2tlcE5CWkI1T2hwYlQwVTlW?=
- =?utf-8?B?WHE4NVd5c2RuSzVIRG9POS90bHpqWnNxdFdtSExhYmU3WWhvVFNLSitvYjBJ?=
- =?utf-8?B?dnJRMk1qTnFJdFZPQmtKMlBWZ1lIR3U1bVlvMkJvZ1NvMGtYYzBkUWYwM0hX?=
- =?utf-8?B?RVRQbUhVQnlEc0xqK0haS0JhTjNJMHI1UUpyS0RoM1pEVzlNckFodkVlMWk0?=
- =?utf-8?B?WThVT29mNndlSFpOcWRGeTI2bzVRSFhEK1A5SGg4amxrL2h0UnkrUTRzbUxq?=
- =?utf-8?B?eEZtdlFVUm5sUHNXUC9wQlNIK2NqUDNjRWg1djQ1S1pqT1ZzY0R3a00yU2FU?=
- =?utf-8?B?T3VTODJETG11TDJRYkUzM1M4UmplMlE0cXFEUEp6OVRXeG11ZG93VlFNaSto?=
- =?utf-8?B?dGlEUkRKY1l2OThaaGtFd3pPU0xnSFZDT25JVk5OUlNDSHFzck9HRVVxMUtk?=
- =?utf-8?B?RVZnUXBKV1NvRTVyV3RFWnp2RFBSRHlYV3k5dHIweGZiM1RmZFYwclUraWJi?=
- =?utf-8?B?cFpjWUZVK2tqamx5L25MZ1lDN2gwOVc4d0FOdndGMmNwZytkWDZoU2V0RzVr?=
- =?utf-8?B?VnFmWENpN0x6bHlmc0tLQ0dPU3VLUG9VS1dkUnpDVVYrb2x1Y0ZYQ09NNzRl?=
- =?utf-8?B?SVNOdnZzaHN1ZDdjSTlnWXJRdFBvcENjQmE2dlVFSzd5SktIR3F6OUFzaXRI?=
- =?utf-8?B?WlRueXpkWVZRSndoMWtqSVlQMVM1SmNmNE85dXRhZW1IcVlOTXk4YldxZkps?=
- =?utf-8?B?amYvb2UxQnBvRng3L1VDUmkwR3kvZDB4OXlYNFFLMjdvckhNbE16QTF5Wjhl?=
- =?utf-8?B?YXIxUUtYUUhWWkZub2dDRGo0S3dNSFN0WURnczQwSVdnZW9Ca0ZWRVd2Nmth?=
- =?utf-8?B?SmxGWnV0UElGNFRqTGFtb2hZc3RsRHJuN0N4alg4cS9ub1AxdXNhanFkaWdn?=
- =?utf-8?B?TWtLbG16TkpOOVdCNTlGTzZVVFNocE9jYzc0OTNRQ0F0YTJxd3NTNE5zTGFi?=
- =?utf-8?B?YWN0bnY1OXdBRk9CMG1IQ2xNdDZRK0VPMTMvdmxEZGFsWXY0cEl2RzdWRXVx?=
- =?utf-8?B?UWdCUWhFR2xTUk9zRUJySGdYR0xTbTdxYVM3Vm5rNTUwbUlLVEROQlpRNkdj?=
- =?utf-8?B?VlRPRC9rTm96UTZ2d1BaeHZxNTlsenBBc2JwbFFTM2s1UTdnd0NMUkM0ZXJl?=
- =?utf-8?B?UnFSUXNKS3NBQXVsNkM0ZEN1d094SFgzRTVlNFZQeWV6TE1UZzVVVXNYLzRT?=
- =?utf-8?B?RlM0YkVWTUdKSFVjMjRrSDVBbjBuVFpSK2sxL1FNakE5RjdPY2tSZ3JKcEp6?=
- =?utf-8?B?Qms4SldLclFGNGw4MWNxS0ZYWlNIbXBNTldoU012Q3NzTHEzZ01CV1NtYW9P?=
- =?utf-8?B?OVBxRWszQ3RnNlFCVkpmMUJNNTZZMFhmOHBoclExZlcyYU9PVHVRUkZRZHRn?=
- =?utf-8?B?ZlB3U1BMWEErMWNXRXhFaktnL3ZQNTZFVjJISUlJL004YmhxR3h0OUhFNkdN?=
- =?utf-8?B?MGg0SE9SczBNR2xYcG9qb3gyL0hGV3NsbHRqYlVlTS8vT2ZTdWptaXcvUFFP?=
- =?utf-8?B?QndjOGZGbXcyMXFxMVFkdG1FN2s5N2ZLYU1PT29YZnkrdEFpYUliMll1K0cv?=
- =?utf-8?B?dWxVbjNpOURDdHpNTFF3RVNkdFlwOE5aQm5TQkNZT0VITmFYVnFJbmN4Mk4v?=
- =?utf-8?B?dWpYaEpVNnhDKzZCZkU0SVIxcXdBd010eDhmTWV1TGJuUklLdVFnelZLb2RH?=
- =?utf-8?Q?8RTi82?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bDNQQzg5UzYralRhdmhSV3VmTk5LVEVsNER1OHVPa0Z3czRyYThrL1Q5YVZz?=
- =?utf-8?B?azQ0L2p3REdPamhyOG9wK2xmN1NZRjZVb2VvR3NXNXJOUDM5Snd2UG1vUTkv?=
- =?utf-8?B?VkVGdWpQTDdsVG4relZVM1hUR0d5bW80WEY4MEJXK1lyYy9jdTE0SmRVaGg4?=
- =?utf-8?B?UjgxelU1Zk9KeU16RGhFS0tlZVBMTWNjVCtmenJFWGhrZGtUM29JNU1IS0hY?=
- =?utf-8?B?TkV1YlBaYVVaV1FvTTNOeVdTNWFPdkhhNFlkazc3bU5KcEhaV0FMM0ttU0FF?=
- =?utf-8?B?WXFMMjk3MG1vZWhFL3BneGtva2NwcGdQT0tCSHJDYkxlVTJ4VWVYWHEvNTBT?=
- =?utf-8?B?VFdsdXpWRWloTVhmNElsMkdqdWVaWnFkM2U1QzNQazBZY3FDWEExcUtmbFRC?=
- =?utf-8?B?UHJHVGlxc0twR3pQTkRTODhLTVoyU2xKZEl2b0NpdlltL2xzUTRuUDZwZ1Rj?=
- =?utf-8?B?N3gvUjEvSW9SRGFDTjJRSWZFclZpZGZrTkJ0K0F1ZmNCR1ZPYW1kYjRLZzdD?=
- =?utf-8?B?Z2ZqNzgzNWhscisrQjNiNlhnRzJIelp2VEVGM3BVUC9vWi9pTld1d2lGUkRm?=
- =?utf-8?B?MXhGSUxFYjFBUFJQRDh5SUdsZkgxclRObTZEMHh3T1Brc3NSVFpvQkt1d1BP?=
- =?utf-8?B?MlJndVYzbTloZFgwVG5pUlIyZUVhZk1YTTRMMFNjYjcrbmxTeXduTVBQRHVj?=
- =?utf-8?B?ZHFBZFdUM1N4RHhaOU9ObHZ4VnQ3cXJIMkdJRGdOdzZEdmhsTDUrMjQxdlZo?=
- =?utf-8?B?NE9aOXVQQ1RJNkJSUUQxdmMrSUpHaFVWUThCU2hwV1h3UjJYbFQ0YmtmNjUz?=
- =?utf-8?B?a0Y5OWtJWXVEMkFiUE54TjdyM01zQmpGWHFXcmVwS3FiWXN5Vm1majVmVXpj?=
- =?utf-8?B?bm53aGx5d2lTb1VzRVY5dndTS1NhVXlQcnZJWlpzeXYwTGhxUnlZZmg2bjFo?=
- =?utf-8?B?SkMzelNOU09VeXAvU1htR0Mxb0JFQWlDemljRW43a2lHY3lwb2ZrRWExRkNq?=
- =?utf-8?B?VkFkd1E2RzZRcmUySFN0VjF4WEV3MHc1aHVkS3VjQ1AvaFZ6dGh3WGkrb0k1?=
- =?utf-8?B?VXhWS05IUkRhWDJhbnNBZS8yUjFXc1lORXVCL0tiVjNiNVlYSVlFUFJLbHA0?=
- =?utf-8?B?M1dHM1kwR3c2YzRaeHpkUHFVMittdW82cEMybWFpOVdKTktYNzh5b3JqclhU?=
- =?utf-8?B?OVJhc09lT0VROGRXbk9zWUpEZEZXVGpac3NYTW1wNlY3Qy9GUlhOOEZSZThC?=
- =?utf-8?B?L2JLNExGVEtJdzhPNHRSUjY3SDBzTTZORFlvVng1d0E4WTU0Y0JxWml1b2RI?=
- =?utf-8?B?dmszOHVzai8waFpkbXBvQzQ2UGFURms4SHRCYlJ6ZnYwelZnSzZBRVV0SHdu?=
- =?utf-8?B?ZmVzNWVJRjdDYVFCWHpvaHdoSlg2bWxad0UxOVhMRGtMSWNwN2VsdFN3MTBn?=
- =?utf-8?B?NDBmZnpTZitHYWtNMXBqaXFuNkI5VlFDVXhDZVBiTHJkZ0RJOW53VFZsV3Fn?=
- =?utf-8?B?cmlGVWRPRnZRcTFCLytBRTlPbkNvelYwbUZVcEp0WGE3bmdDOWZ2UFI1enIx?=
- =?utf-8?B?d0RPVkZpdkNnSUFFMjI0cHNpRmF3bjBOZ2daL1RRUXBTMXRpWDdCMWJYdEJl?=
- =?utf-8?B?ZzQ4SENTSGFQU09wT0VSZkxOaHVXa0ZNYnMvaVRWaytLaE44NDV2UThjOTdh?=
- =?utf-8?B?VlZCTUxJSTVIMEh6aERnYVZueDA4QlZPd0ZiRG14cjZrSlpmWjJScG9QREdF?=
- =?utf-8?B?ckdXMTJTUUZ4M0VZdW5ndy9LL1hyZ1c4YmZRR1hJVDV5eVh1andBUTl3alNw?=
- =?utf-8?B?ZjliT1k5RmVrTnEzb1pBaklMMFpsRGVzeWVaVVM1K1llN0x0VGFwb2FSbklZ?=
- =?utf-8?B?ZkprdGIzU0JuUjdhM0hKamtvQ3loekE5S3ozRVhYeFNJdFA5N1VYVkFFMity?=
- =?utf-8?B?UEhJNU1HUmQyeXBYck5yWmNRU2lGZlBvc1J6blRWWldJeHV2TVlGUGFUQjJj?=
- =?utf-8?B?SXV0MXMrTi9FUjFwVUxzSXVBeFRoRlRZeU1yL0dFeklYbkdYY1I0ZkFHVmdn?=
- =?utf-8?B?bHM1WHFkS2Z5cjdJZ2tCclgxVm1RbFBmYzVtVXJ3cDdmZTJuSmFJcXV2N0xM?=
- =?utf-8?Q?rRd5sXIu9ttJwByFQbURxqgCr?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 495408b9-431a-4f40-8cb7-08de2ccb769a
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2025 09:09:11.4902
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Gl4vo0hzgPd9mqIdOeT8NbA7LXCkL1WScogg83FWSQQRbC7rAmR+bRQqY6AdC5jJv8/bFbk+OleGvVPRkG9IiA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5812
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v6] xsk: avoid data corruption on cq descriptor number
+To: Jason Xing <kerneljasonxing@gmail.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: netdev@vger.kernel.org, csmate@nop.hu, bpf@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me, hawk@kernel.org,
+ daniel@iogearbox.net, ast@kernel.org, john.fastabend@gmail.com,
+ magnus.karlsson@intel.com
+References: <20251124171409.3845-1-fmancera@suse.de>
+ <CAL+tcoBKMfVnTtkwBRk9JBGbJtahyJVt4g8swsYRUk1b97LgHQ@mail.gmail.com>
+ <955e2de1-32f6-42e3-8358-b8574188ce62@suse.de>
+ <CAL+tcoD83=UXpDaLZZFU2_EDKJS9ew2njLmoH9xeXcg5+E3UDQ@mail.gmail.com>
+ <aSXZ37i5CgGKn2RF@boxer>
+ <CAL+tcoBw9OuMcpjy7eQq2=SDWRr+OGszbC+HNgbc_CVw6S=bWQ@mail.gmail.com>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <CAL+tcoBw9OuMcpjy7eQq2=SDWRr+OGszbC+HNgbc_CVw6S=bWQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_TWO(0.00)[2];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nop.hu,davemloft.net,google.com,kernel.org,redhat.com,fomichev.me,iogearbox.net,gmail.com,intel.com];
+	FREEMAIL_TO(0.00)[gmail.com,intel.com];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,intel.com:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
+X-Spam-Level: 
 
-
-On 11/26/25 01:27, PJ Waskiewicz wrote:
-> Hi Alejandro,
->
-> On Wed, 2025-11-19 at 19:22 +0000, alejandro.lucero-palau@amd.com
-> wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
+On 11/26/25 2:14 AM, Jason Xing wrote:
+> On Wed, Nov 26, 2025 at 12:31 AM Maciej Fijalkowski
+> <maciej.fijalkowski@intel.com> wrote:
 >>
->> Use cxl api for getting DPA (Device Physical Address) to use through
->> an
->> endpoint decoder.
+>> On Tue, Nov 25, 2025 at 08:11:37PM +0800, Jason Xing wrote:
+>>> On Tue, Nov 25, 2025 at 7:40 PM Fernando Fernandez Mancera
+>>> <fmancera@suse.de> wrote:
+>>>>
+>>>> On 11/25/25 12:41 AM, Jason Xing wrote:
+>>>>> On Tue, Nov 25, 2025 at 1:14 AM Fernando Fernandez Mancera
+>>>>> <fmancera@suse.de> wrote:
+>>>>>>
+>>>>>> Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+>>>>>> production"), the descriptor number is stored in skb control block and
+>>>>>> xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
+>>>>>> pool's completion queue.
+>>>>>>
+>>>>>> skb control block shouldn't be used for this purpose as after transmit
+>>>>>> xsk doesn't have control over it and other subsystems could use it. This
+>>>>>> leads to the following kernel panic due to a NULL pointer dereference.
+>>>>>>
+>>>>>>    BUG: kernel NULL pointer dereference, address: 0000000000000000
+>>>>>>    #PF: supervisor read access in kernel mode
+>>>>>>    #PF: error_code(0x0000) - not-present page
+>>>>>>    PGD 0 P4D 0
+>>>>>>    Oops: Oops: 0000 [#1] SMP NOPTI
+>>>>>>    CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
+>>>>>>    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
+>>>>>>    RIP: 0010:xsk_destruct_skb+0xd0/0x180
+>>>>>>    [...]
+>>>>>>    Call Trace:
+>>>>>>     <IRQ>
+>>>>>>     ? napi_complete_done+0x7a/0x1a0
+>>>>>>     ip_rcv_core+0x1bb/0x340
+>>>>>>     ip_rcv+0x30/0x1f0
+>>>>>>     __netif_receive_skb_one_core+0x85/0xa0
+>>>>>>     process_backlog+0x87/0x130
+>>>>>>     __napi_poll+0x28/0x180
+>>>>>>     net_rx_action+0x339/0x420
+>>>>>>     handle_softirqs+0xdc/0x320
+>>>>>>     ? handle_edge_irq+0x90/0x1e0
+>>>>>>     do_softirq.part.0+0x3b/0x60
+>>>>>>     </IRQ>
+>>>>>>     <TASK>
+>>>>>>     __local_bh_enable_ip+0x60/0x70
+>>>>>>     __dev_direct_xmit+0x14e/0x1f0
+>>>>>>     __xsk_generic_xmit+0x482/0xb70
+>>>>>>     ? __remove_hrtimer+0x41/0xa0
+>>>>>>     ? __xsk_generic_xmit+0x51/0xb70
+>>>>>>     ? _raw_spin_unlock_irqrestore+0xe/0x40
+>>>>>>     xsk_sendmsg+0xda/0x1c0
+>>>>>>     __sys_sendto+0x1ee/0x200
+>>>>>>     __x64_sys_sendto+0x24/0x30
+>>>>>>     do_syscall_64+0x84/0x2f0
+>>>>>>     ? __pfx_pollwake+0x10/0x10
+>>>>>>     ? __rseq_handle_notify_resume+0xad/0x4c0
+>>>>>>     ? restore_fpregs_from_fpstate+0x3c/0x90
+>>>>>>     ? switch_fpu_return+0x5b/0xe0
+>>>>>>     ? do_syscall_64+0x204/0x2f0
+>>>>>>     ? do_syscall_64+0x204/0x2f0
+>>>>>>     ? do_syscall_64+0x204/0x2f0
+>>>>>>     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>>>>>>     </TASK>
+>>>>>>    [...]
+>>>>>>    Kernel panic - not syncing: Fatal exception in interrupt
+>>>>>>    Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+>>>>>>
+>>>>>> Instead use the skb destructor_arg pointer along with pointer tagging.
+>>>>>> As pointers are always aligned to 8B, use the bottom bit to indicate
+>>>>>> whether this a single address or an allocated struct containing several
+>>>>>> addresses.
+>>>>>>
+>>>>>> Fixes: 30f241fcf52a ("xsk: Fix immature cq descriptor production")
+>>>>>> Closes: https://lore.kernel.org/netdev/0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu/
+>>>>>> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+>>>>>> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+>>>>>
+>>>>> Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+>>>>>
+>>>>> Could you also post a patch on top of net-next as it has diverged from
+>>>>> the net tree?
+>>>>>
+>>>>
+>>>> I think that is handled by maintainers when merging the branches. A
+>>>> repost would be wrong because linux-next.git and linux.git will have a
+>>>> different variant of the same commit..
+>>>
+>>> But this patch cannot be applied cleanly in the net-next tree...
 >>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
->> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
->> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
->> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
->> ---
->>   drivers/net/ethernet/sfc/efx_cxl.c | 12 +++++++++++-
->>   1 file changed, 11 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c
->> b/drivers/net/ethernet/sfc/efx_cxl.c
->> index d7c34c978434..1a50bb2c0913 100644
->> --- a/drivers/net/ethernet/sfc/efx_cxl.c
->> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
->> @@ -108,6 +108,14 @@ int efx_cxl_init(struct efx_probe_data
->> *probe_data)
->>   		return -ENOSPC;
->>   	}
->>   
->> +	cxl->cxled = cxl_request_dpa(cxl->cxlmd, CXL_PARTMODE_RAM,
->> +				     EFX_CTPIO_BUFFER_SIZE);
-> I've been really struggling to get this flow working in my environment.
-> The above function call has a call-chain like this:
->
-> - cxl_request_dpa()
->    => cxl_dpa_alloc()
->       => __cxl_dpa_alloc()
->          => __cxl_dpa_reserve()
->             => __request_region()
->
-> That last call to __request_region() is not handling a Type2 device
-> that has its mem region defined as EFI Special Purpose memory.
-> Basically if the underlying hardware has the memory region marked that
-> way, it's still getting mapped into the host's physical address map,
-> but it's explicitly telling the OS to bugger off and not try to map it
-> as system RAM, which is what we want. Since this is being used as an
-> acceleration path, we don't want the OS to muck about with it.
->
-> The issue here is now that I have to build CXL into the kernel itself
-> to get around the circular dependency issue with depmod, I see this
-> when my kernel boots and the device trains, but *before* my driver
-> loads:
->
-> # cat /proc/iomem
-> [...snip...]
-> c050000000-c08fffffff : CXL Window 0
->    c050000000-c08fffffff : Soft Reserved
->
-> That right there is my device.  And it's being presented correctly that
-> it's reserved so the OS doesn't mess with it.  However, that call to
-> __request_region() fails with -EBUSY since it can't take ownership of
-> that region since it's already owned by the core.
->
-> I can't just skip over this flow for DPA init, so I'm at a bit of a
-> loss how to proceed.  How is your device presenting the .mem region to
-> the host?
+>> What we care here is that it applies to net as that's a tree that this
+>> patch has been posted to.
+> 
+> It sounds like I can post my approach without this patch on net-next,
+> right? I have no idea how long I should keep waiting :S
+> 
+> To be clear, what I meant was to ask Fernando to post a new rebased
+> patch targetting net-next. If the patch doesn't need to land on
+> net-next, I will post it as soon as possible.
+> 
 
+My patch landed on net tree and probably soon, net tree changes are 
+going to be merged on net-next tree. If there are conflicts when merging 
+the patch the maintainer will ask us or they will solve them.
 
-Hi PJ,
+That was my understanding of how the workflow is.
 
+Thanks,
+Fernando.
 
-My work is based on the device not using EFI_CONVENTIONAL_MEMORY + 
-EFI_MEMORY_SP but EFI_RESERVED_TYPE. In the first case the kernel can 
-try to use that memory and the BIOS goes through default initialization, 
-the latter will avoid BIOS or kernel to mess with such a memory. Because 
-there is no BIOS yet supporting this I had to remove DAX support from 
-the kernel and deal (for testing) with some BIOS initialization we will 
-not have in production.
+> Thanks,
+> Jason
+> 
+>>>
+>>>>
+>>>> Please, let me know if I am wrong here.
+>>>
+>>> I'm not quite sure either.
+>>>
+>>> Thanks,
+>>> Jason
+>>>
+>>>>
+>>>> Thanks,
+>>>> Fernando.
 
-
-For your case I thought this work 
-https://lore.kernel.org/linux-cxl/20251120031925.87762-1-Smita.KoralahalliChannabasappa@amd.com/T/#me2bc0d25a2129993e68df444aae073addf886751 
-was solving your problem but after looking at it now, I think that will 
-only be useful for Type3 and the hotplug case. Maybe it is time to add 
-Type2 handling there. I'll study that patchset with more detail and 
-comment for solving your case.
-
-
-FWIW, last year in Vienna I raised the concern of the kernel doing 
-exactly what you are witnessing, and I proposed having a way for taking 
-the device/memory from DAX but I was told unanimously that was not 
-necessary and if the BIOS did the wrong thing, not fixing that in the 
-kernel. In hindsight I would say this conflict was not well understood 
-then (me included) with all the details, so maybe it is time to have 
-this capacity, maybe from user space or maybe specific kernel param 
-triggering the device passing from DAX.
-
-
->
-> Cheers,
-> -PJ
 
