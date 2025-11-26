@@ -1,265 +1,136 @@
-Return-Path: <netdev+bounces-241989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12A18C8B680
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 19:16:23 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69899C8B6A5
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 19:20:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8CA2D35681B
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:16:22 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 052B13585C5
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1EA727F4CE;
-	Wed, 26 Nov 2025 18:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3953C284670;
+	Wed, 26 Nov 2025 18:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ut7db16c";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IdM05r3y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wpwAD0bc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEB921CC51
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 18:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9052727F4CE
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 18:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764180977; cv=none; b=PMhfn90sZeHtKd91Sqk3Yjkrjvmpgzip3UBwOjYbbGOv/YCb/kE8W6miOz4OjoCvdbyDvy6a0alO469jGg1ypBD0jFWdMcEw45OkIY0+8YAG3XxKeaX2q4ehOulyeYab6Cs3zK7NACXHRC+mh/AXy3p+oxb4LnnFILfpFS06ux4=
+	t=1764181213; cv=none; b=Qfpt3iLoihJKBusMEdJ8Dy91Yk7B0GfibF+IEFt6dtVeLsLKXq7P7cAnovyVupW2iJo5AxZMHFOTpfJJbRWl7m8hjqJvh4I+HzNf51a+BcMUxJItNXmlMsjZVrDehy82YoXZBh47Q5cOO9Ps2kOGDmyzxdfjAC+fGBPi7KqoU4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764180977; c=relaxed/simple;
-	bh=kyULVipYGXF8pQ4S/uAyjcoQp2UuofAj8by9h0Na7sQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ii8egU7PxjQNG0rSBFxVv+m/PMjevZ8doWqj+3Xn86G1hEimYxCEMvZbbXtCSFuVI75Fjr6m14oN770gXux7RdFuYVztofQMgBP+V57qZoqtE9EkwhzXJTm+LXhH81/bXYNR/aI5UYRQi0F2NHoq0Bocsqi+B+BMqSyxabDzUnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ut7db16c; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IdM05r3y; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764180974;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qZzdcbGa6XCDNLwt3NmSWbQLiICgwvwTMHTS5/gnpeU=;
-	b=Ut7db16cA7rloEIP5c/6eFeTRVaEjy4hS0C7ke4K8lF7pPqPkefHrR0oyAo0ir9GMu55OS
-	2TMfRd2jcCVNm8Kwha0jmaU1SDXJqI2GaJxGb5t1+XHgARvB6RdhG9iH4KO7b8hJvqe0SV
-	2GJwGMD2JVB9w675GTFCR/YhNKhiBMY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-567-74p38tVJPVOVJyWZ4MFIrw-1; Wed, 26 Nov 2025 13:16:12 -0500
-X-MC-Unique: 74p38tVJPVOVJyWZ4MFIrw-1
-X-Mimecast-MFC-AGG-ID: 74p38tVJPVOVJyWZ4MFIrw_1764180971
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-477939321e6so49315e9.0
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 10:16:12 -0800 (PST)
+	s=arc-20240116; t=1764181213; c=relaxed/simple;
+	bh=OJC7xA5e6QqUaQuf0lrvbafOJp1/7PZapvqvASkO5OA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=asUVWWoHZly0Ty+I/ovs2WyVEEjjC+iFDpL2eBpsSYrlc68Ej/birRhYrD/tKIuWtscgXjIGUW1frhEHiVcWWGFTcFrObHQ7VkSn0baYb+W6gniABI3GEpTFUrWiCTEvr/C5q5g641pamSOWJyAfhja2+mdVRVUBMCOVxMBJn58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wpwAD0bc; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ed7024c8c5so924491cf.3
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 10:20:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764180970; x=1764785770; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qZzdcbGa6XCDNLwt3NmSWbQLiICgwvwTMHTS5/gnpeU=;
-        b=IdM05r3yRfxBby5yj1dFGE8cUsBUC8iPzGR3l1pAMd5j/bDTGwNbyz6QXA9ujIzQl4
-         KkcVIyJAVliscfVuaj6fzfskwkBr0SzIrjpY872N3jjPLMQjko5VaBYCtRPf51lmtmVz
-         e37kZpzPHMwanXxYbTgQvbLr+qVManvnDgmtRkIG50rCouxH+EUv/RiGjF/X8AA7eYpG
-         XYtMf6un7KrRZeFYQv7h5nzPDsF1q/IOXVY6mWLYrcGtP4Njyw3/fxHNZJ8DnnjSb7os
-         3/C9qsVRPjm8SbBF1jDSfwKVY6h53RQ+YokmPJL/GIVdoSgFlue2ta4hQQjNXQDhb+WH
-         JMKg==
+        d=google.com; s=20230601; t=1764181210; x=1764786010; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UyPqe3S1bmTAM13Rt+XtSs9dK5+j0gxlnLbuXRPirDg=;
+        b=wpwAD0bcqzeOk4i7XndwT/niHrJOIUaVNALN84iQ31VoZA14kg+PCPEkPTESX5WrER
+         biw8xu91OUhgopQSU2tGZH+eyU/20LFmZ/isebYyiFHlubaaZwEoE6DaZ/FNfjOBrtyF
+         om0UWZeUQDR94eYbA09hoVSExNaPettbEt+5aTnbaoGLYyhpvIKAdAiluS4upftxihsR
+         ol9TcUrFi4lOsRhuvqYPIDg/BcOGSVEoUGkUSwbGJZp6hX1FaC1HMM7ku6uuopix+5zV
+         ewfygijNLZlEI/ELz9GeJc8VLEuitKpybTcs1+TYK3xb9zBRDhDW1Mvl98pf5Kh+x2Mb
+         mYRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764180971; x=1764785771;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qZzdcbGa6XCDNLwt3NmSWbQLiICgwvwTMHTS5/gnpeU=;
-        b=BhesgICzDGrEfD3bOiZcDy4b5mcLf3wk+PwA4PUbcaHfCP+BZ12g94t4goLKM3I8Qs
-         C2ivBJhi6hp/h9F9NVPCVeZksDug1pVDMxMqqVy8jKXKADbq9HpT3AOOPOhxDr8tOctQ
-         X2i9CafouptfRqpOxpAARfsNq0U5pTxmlFNnK9zdHqI+QhjVn3fzlSKKXl6lzUwWiYf0
-         U2Q7+PLKmKcJKBd8MWvAuuzCpfhDSpkZb8jUmVt/t3FVyyJnMD87TFF8L6FTgStBqGdM
-         z3V8hlONp3JoFLMIsr2/bdb3c5NR00h+HECkRHfd/1ox0I1J1DOaqAWyaVLo3TPIK4ZU
-         7a3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUgFCxbdX8r4rSRoV5pwkomGT6RqRH4Qb+1i0sCiEZH/NqmvGVE8+yDfsp6uQzgn31UJaERsxc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFyGau6Pp6dghX/9NKuRp5A0a8WP4WrzPsMRZyuLxaxhJdd0Ww
-	LJZXGFo0o8yt30gEseEdCfVOubawpiXpgWDHLNRSEYIvGSzT9dBIJUSKQURK13MFr1vMxJYIjbM
-	shuTaP5X0T3FG/ds/V9TV/tu/EaE76Vhf9jkYNyfkc9T203aUGERbm6w3Jg==
-X-Gm-Gg: ASbGnctQEY2/IzfcUgm2k08yobvTLQ7+t4LDhv1nDp0yCZJfXySmex3DUxQVI3S527N
-	8/PEjK2WrSwVd8VrNGt9s8IGv42BzUZslRhtYKUcqfqksBSOrJcAiD1v8ksM18A7KjfSZ4O8AoR
-	VCSl6b83EDVV9b4x966aRoj+FbaXbkhqfyIk3nx7WTMWNfRGiKf5r5AZQXy3N77HFFO8bzUy7mj
-	7E6HE7b93r6lJfVkgO7UnpueHGRui5Dcl/3ILnKTuOeB9Udb0C3zKdLRoFyfPUW8pZ56i7d85vu
-	HQ5OMYrSRnDETiZKF8LI3OHe1VLlQkodJXacaE5BlHBiGiBAYCSB2ME3Q6QAPBqITOEM6VoWTnv
-	TWBKBaVE9XnnJxto1hUzOKyBNGQG0jQ==
-X-Received: by 2002:a05:600c:5252:b0:45d:e28c:875a with SMTP id 5b1f17b1804b1-47904b248demr87345775e9.31.1764180970580;
-        Wed, 26 Nov 2025 10:16:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHgRL93Ppj04AXVDEje5Q42qgkdWU1MdkDElxcXzRopk1GruOFcZ+Ewr6pGrw/CAbF8TMGXHA==
-X-Received: by 2002:a05:600c:5252:b0:45d:e28c:875a with SMTP id 5b1f17b1804b1-47904b248demr87345385e9.31.1764180970053;
-        Wed, 26 Nov 2025 10:16:10 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f2e598sm41453547f8f.4.2025.11.26.10.16.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 10:16:09 -0800 (PST)
-Date: Wed, 26 Nov 2025 13:16:06 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-	jon@nutanix.com, tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v6 3/8] tun/tap: add synchronized ring
- produce/consume with queue management
-Message-ID: <20251126130226-mutt-send-email-mst@kernel.org>
-References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
- <20251120152914.1127975-4-simon.schippers@tu-dortmund.de>
- <20251125100655-mutt-send-email-mst@kernel.org>
- <4db234bd-ebd7-4325-9157-e74eccb58616@tu-dortmund.de>
- <20251126100007-mutt-send-email-mst@kernel.org>
- <c0fc512a-5bee-48da-9dfb-2b8101f3dec6@tu-dortmund.de>
+        d=1e100.net; s=20230601; t=1764181210; x=1764786010;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=UyPqe3S1bmTAM13Rt+XtSs9dK5+j0gxlnLbuXRPirDg=;
+        b=F2IHG6yLV73iadjXx039TzbcLlS+qVbfuVZnJ7BzFshA0kIfAdlTCB2QWWwtrgvkzo
+         osMggGcyd0gxJmfZfG5B2qIi5ng8TD1Soc/A+mlcGEIRivSpL/7kQO6cx2UqqcQ4NJBL
+         dKuquqU5j1PTk132S4oH0CAyao/jX3BOhMPXVvzOvJPqK1ixesqoWUdTik9GRyKyyIrp
+         JsyMJkXf/LFo4HYOjRsMPNcYn/CuGPvtnAXhYXOqc7ihhsoYsagIcPsCe/3h1tP7T3+G
+         ILNgIlFtkjBd2LyWaymy4tHgzMTxjVbAoekHMQIRIfpFs70HniQb6R85Kk+fapSIKNY0
+         3Mpg==
+X-Forwarded-Encrypted: i=1; AJvYcCWkovdCQdqp9Eeh0TKjMaMivNR+qbHb3cYWy97rRjxO0OaMhRLyK/Y+v78DwEHrGwRAYB7w+Bw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygmpfIYfp+39b4WnsjEGW10gmtvawV8mcSfpesbCd3K77YYoX5
+	ZK2CSUyxSCk+jukvUCHLVoi/fCk8YSB+bKBYlBnos8Hpv+ikITkmNpFyIoDIRnQ9H18HX3fqXuZ
+	mmq1DQ4LVt0CZ8MC6lHGUpVlwturfOCmRca+jRnET
+X-Gm-Gg: ASbGncvzMvJqiMbYmeKRr7p8AG9n7t0sUVY0IPivMdR95nOuSGpTS05+rHj9OzW36GP
+	tHANJ2CI63KwJiN1oIkMwZXTKhgoE4/CunFh04fe4hk5IfidiMdQMgzauJYANUH7ssdQetXUldd
+	TU3ytKBddCcMABYOF7z6ywdkqXbWs1ma7uIB22uMmvrlmoSf7zajvfrLHqCTGFrQ5ZmsIgnl7lI
+	aroKEAnqThsoWgGJWPNf8fxhrARbPh0dWX3827fOmwlFHfbYBELV9RQL8U/sfIqUKRvUiY=
+X-Google-Smtp-Source: AGHT+IEKspoMq8viyrVX7XaVKBZ0tjStqKDHb3x/+rHSmzBoaCxDmvkK8EdWVdJRs4R/3hUDl929ZRw4zVnINipD8Hc=
+X-Received: by 2002:ac8:5e0e:0:b0:4ee:1800:615 with SMTP id
+ d75a77b69052e-4ee58841a7cmr285206791cf.14.1764181208755; Wed, 26 Nov 2025
+ 10:20:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c0fc512a-5bee-48da-9dfb-2b8101f3dec6@tu-dortmund.de>
+References: <20251124200825.241037-1-jhs@mojatatu.com> <20251124145115.30c01882@kernel.org>
+ <CAM0EoM=jDt_CeCop82aH=Fch+4M9QawX4aQdKdiUCsdFzuC2rQ@mail.gmail.com>
+ <CAM0EoM=Rci1sfLFzenP9KyGhWNuLsprRZu0jS5pg2Wh35--4wg@mail.gmail.com>
+ <CANn89iJiapfb3OULLv8FxQET4e-c7Kei_wyx2EYb7Wt_0qaAtw@mail.gmail.com> <CAM0EoMm4UZ9cM6zOTH+uT1kwyMdgEsP2BPR3C+d_-nmbXfrYyQ@mail.gmail.com>
+In-Reply-To: <CAM0EoMm4UZ9cM6zOTH+uT1kwyMdgEsP2BPR3C+d_-nmbXfrYyQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 26 Nov 2025 10:19:57 -0800
+X-Gm-Features: AWmQ_bnUlSYrbux7oZCg41QdRs-toAJdwMNcEwN5SrDgQSv44mTKEUUDY8Mrpzk
+Message-ID: <CANn89i+_4Hj2WApgy_UBFhsDy+FEM8M1HhutrUcUHKmqbMR1-A@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net/sched: act_mirred: Fix infinite loop
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, pabeni@redhat.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
+	dcaratti@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 26, 2025 at 05:04:25PM +0100, Simon Schippers wrote:
-> On 11/26/25 16:25, Michael S. Tsirkin wrote:
-> > On Wed, Nov 26, 2025 at 10:23:50AM +0100, Simon Schippers wrote:
-> >> On 11/25/25 17:54, Michael S. Tsirkin wrote:
-> >>> On Thu, Nov 20, 2025 at 04:29:08PM +0100, Simon Schippers wrote:
-> >>>> Implement new ring buffer produce and consume functions for tun and tap
-> >>>> drivers that provide lockless producer-consumer synchronization and
-> >>>> netdev queue management to prevent ptr_ring tail drop and permanent
-> >>>> starvation.
-> >>>>
-> >>>> - tun_ring_produce(): Produces packets to the ptr_ring with proper memory
-> >>>>   barriers and proactively stops the netdev queue when the ring is about
-> >>>>   to become full.
-> >>>>
-> >>>> - __tun_ring_consume() / __tap_ring_consume(): Internal consume functions
-> >>>>   that check if the netdev queue was stopped due to a full ring, and wake
-> >>>>   it when space becomes available. Uses memory barriers to ensure proper
-> >>>>   ordering between producer and consumer.
-> >>>>
-> >>>> - tun_ring_consume() / tap_ring_consume(): Wrapper functions that acquire
-> >>>>   the consumer lock before calling the internal consume functions.
-> >>>>
-> >>>> Key features:
-> >>>> - Proactive queue stopping using __ptr_ring_full_next() to stop the queue
-> >>>>   before it becomes completely full.
-> >>>> - Not stopping the queue when the ptr_ring is full already, because if
-> >>>>   the consumer empties all entries in the meantime, stopping the queue
-> >>>>   would cause permanent starvation.
-> >>>
-> >>> what is permanent starvation? this comment seems to answer this
-> >>> question:
-> >>>
-> >>>
-> >>> 	/* Do not stop the netdev queue if the ptr_ring is full already.
-> >>> 	 * The consumer could empty out the ptr_ring in the meantime
-> >>> 	 * without noticing the stopped netdev queue, resulting in a
-> >>> 	 * stopped netdev queue and an empty ptr_ring. In this case the
-> >>> 	 * netdev queue would stay stopped forever.
-> >>> 	 */
-> >>>
-> >>>
-> >>> why having a single entry in
-> >>> the ring we never use helpful to address this?
-> >>>
-> >>>
-> >>>
-> >>>
-> >>> In fact, all your patch does to solve it, is check
-> >>> netif_tx_queue_stopped on every consumed packet.
-> >>>
-> >>>
-> >>> I already proposed:
-> >>>
-> >>> static inline int __ptr_ring_peek_producer(struct ptr_ring *r)
-> >>> {
-> >>>         if (unlikely(!r->size) || r->queue[r->producer])
-> >>>                 return -ENOSPC;
-> >>>         return 0;
-> >>> }
-> >>>
-> >>> And with that, why isn't avoiding the race as simple as
-> >>> just rechecking after stopping the queue?
-> >>  
-> >> I think you are right and that is quite similar to what veth [1] does.
-> >> However, there are two differences:
-> >>
-> >> - Your approach avoids returning NETDEV_TX_BUSY by already stopping
-> >>   when the ring becomes full (and not when the ring is full already)
-> >> - ...and the recheck of the producer wakes on !full instead of empty.
-> >>
-> >> I like both aspects better than the veth implementation.
-> > 
-> > Right.
-> > 
-> > Though frankly, someone should just fix NETDEV_TX_BUSY already
-> > at least with the most popular qdiscs.
-> > 
-> > It is a common situation and it is just annoying that every driver has
-> > to come up with its own scheme.
-> 
-> I can not judge it, but yes, it would have made this patchset way
-> simpler.
-> 
-> > 
-> > 
-> > 
-> > 
-> > 
-> >> Just one thing: like the veth implementation, we probably need a
-> >> smp_mb__after_atomic() after netif_tx_stop_queue() as they also discussed
-> >> in their v6 [2].
-> > 
-> > yea makes sense.
-> > 
-> >>
-> >> On the consumer side, I would then just do:
-> >>
-> >> __ptr_ring_consume();
-> >> if (unlikely(__ptr_ring_consume_created_space()))
-> >>     netif_tx_wake_queue(txq);
-> >>
-> >> Right?
-> >>
-> >> And for the batched consume method, I would just call this in a loop.
-> > 
-> > Well tun does not use batched consume does it?
-> 
-> tun does not but vhost-net does.
-> 
-> Since vhost-net also uses tun_net_xmit() as its ndo_start_xmit in a
-> tap+vhost-net setup, its consumer must also be changed. Else
-> tun_net_xmit() would stop the queue, but it would never be woken again.
+On Wed, Nov 26, 2025 at 10:14=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
 
+> It's the multiport redirection, particularly to ingress. When it get
+> redirected to ingress it will get queued and then transitioned back.
+> xmit struct wont catch this as a recursion, so MIRRED_NEST_LIMIT will
+> not help you.
+> Example (see the first accompanying tdc test):
+> packet showing up on port0:ingress mirred redirect --> port1:egress
+> packet showing up on port1:egress mirred redirect --> port0:ingress
 
-Ah, ok.
+Have you tried recording both devices ?
 
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index f27b583def78e4afecc7112854b93d59c2520201..711fc2e31cb0451c07a39f9c942=
+26357d5faec09
+100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -445,15 +445,17 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *=
+skb,
+                return retval;
+        }
+        for (i =3D 0; i < xmit->sched_mirred_nest; i++) {
+-               if (xmit->sched_mirred_dev[i] !=3D dev)
++               if (xmit->sched_mirred_dev[i] !=3D dev &&
++                   xmit->sched_mirred_dev[i] !=3D skb->dev)
+                        continue;
+-               pr_notice_once("tc mirred: loop on device %s\n",
+-                              netdev_name(dev));
++               pr_notice_once("tc mirred: loop on device %s/%s\n",
++                              netdev_name(dev), netdev_name(skb->dev));
+                tcf_action_inc_overlimit_qstats(&m->common);
+                return retval;
+        }
 
+        xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D dev;
++       xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D skb->dev;
 
-> > 
-> > 
-> >> Thank you!
-> >>
-> >> [1] Link: https://lore.kernel.org/netdev/174559288731.827981.8748257839971869213.stgit@firesoul/T/#m2582fcc48901e2e845b20b89e0e7196951484e5f
-> >> [2] Link: https://lore.kernel.org/all/174549933665.608169.392044991754158047.stgit@firesoul/T/#m63f2deb86ffbd9ff3a27e1232077a3775606c14d
-> >>
-> >>>
-> >>> __ptr_ring_produce();
-> >>> if (__ptr_ring_peek_producer())
-> >>> 	netif_tx_stop_queue
-> >>
-> >> smp_mb__after_atomic(); // Right here
-> >>
-> >>> 	if (!__ptr_ring_peek_producer())
-> >>> 		netif_tx_wake_queue(txq);
-> >>>
-> >>>
-> >>>
-> >>>
-> >>>
-> >>>
-> >>>
-> > 
-
+        m_mac_header_xmit =3D READ_ONCE(m->tcfm_mac_header_xmit);
+        m_eaction =3D READ_ONCE(m->tcfm_eaction);
 
