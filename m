@@ -1,123 +1,141 @@
-Return-Path: <netdev+bounces-241777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35A40C88177
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 05:48:58 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3FF2C881C5
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 05:59:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F11C43B458A
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 04:48:56 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 26BC1353FAA
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 04:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC65D19006B;
-	Wed, 26 Nov 2025 04:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A81C431195F;
+	Wed, 26 Nov 2025 04:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z2kSimxO"
+	dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b="OD/NR8EE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAE4F9C0
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 04:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86968311C1D
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 04:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764132533; cv=none; b=qo5ZmfQJeWo3vHmYWNsu1TNgKbxdGN6WiHJK/aU4YVA+3qVLrM8hx5w4zgXxr5o6hPqcSewLkj07A3qtZNwGSdKmCcQpCwcBK4Qs4vZp2iYVW+/XRWkNBoPlbGWc21skSR+jtJniXZuA7MeShz4Z1MdiqmlHUnW2b2418oahyA0=
+	t=1764133170; cv=none; b=kRx311MTMgvJYNSZo0ZCL3OHq0TZ/yVxxyVPUNrp0GpCTO9uhk9EvTKcIrlmcGwVSYOat8c+epAOxf+wdpPjMUvjCbw3PACSWKJskCXwPYBWZrgg89TjQy+mw67ekbJnNSFm6XChawfGfEEn/jzTPZRVUhWgru7stXUK7JuFcSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764132533; c=relaxed/simple;
-	bh=XIyEMlTAHRUL65UANJtEyeP/JD8whikZN4FsZfDziSU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sWnWQ6upTGlb4whVfy98kuMhh0CxSH9wXZgObSH0sDtofl0xf4hsIISW/IDz3F0d/Z0WMj/ztgCJgAIgHrGi0ug25fW/vgSr6VoWYCSVKg5kmCHWTiWqjyNLxfIwCd06RVSo8zopaa3tcNakQ6vO3IQZFX1u2b4Pmd955wqTTZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z2kSimxO; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7ade456b6abso5087164b3a.3
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 20:48:52 -0800 (PST)
+	s=arc-20240116; t=1764133170; c=relaxed/simple;
+	bh=3S4lfFMj7q+YBgrmDA2SP6irVZkPQyrV0keK3iUjdKc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ek0CLC0yA0HNQwq5rqMx8JBBjHWgg5Mb3zN+OtISrF8xs+pJxSLbch/QD11kPRGeDW2JHxr7GJIIdJhqk7Mqv0b5h/FbVvd8RaEM2z0ib1dChIKNyKi2nNfkFGgOEpgtTmXAh39BDiWYFLER7/kr6iKyDbt3oHG2lGIWUtROVaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in; spf=none smtp.mailfrom=ee.vjti.ac.in; dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b=OD/NR8EE; arc=none smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ee.vjti.ac.in
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64306a32ed2so3730448d50.2
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 20:59:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764132532; x=1764737332; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QiXAl5T41fV8u91RxgFyPCavmc/kJPFAWAr+Y+SPIEA=;
-        b=Z2kSimxOseOeL76ne9e7YoBZGRmuQ/Y9YQ4AMkZV915ovhQpvQq5/jXJGuE7ccDGYe
-         9u1/mA1xICvYHYM8qWkStKKRSUxYpLz2BOU1ERN7Uo3fa8BFTtuD1zVGscUD1v3bkwZx
-         YCaLMn7PMtjlikqbuasyQPQb2gcqSkS02qqHK1ilDWdsgD0cj+neSc65xtg3YqG+1WbF
-         4xeaBlik/gjXp9T+6Yn5eiJ4zHQ4bRixr33hdC10sGvPoIKQRa5zivaLxRaNgbsSjZ9Z
-         XPcoEFllqR5waEH0wh8TlakH7zkY6Ux9vfXJOkNWYHx9CRWhmZs8qCXDpnNcFZXu6f6e
-         ZgKQ==
+        d=vjti.ac.in; s=google; t=1764133162; x=1764737962; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SstjdCULfreZEVFZNj/IhPpujFlsaGB4XKF9NC1FxsM=;
+        b=OD/NR8EEoef6l2Yj0RX3+v+RnCHHfu8OZ8zrKSvX9ZRlc9R/wAcxeEFXybdWWPtpN3
+         IxhkczpmuWncdwJQPu41cr1/AASOBiWiaiWkpFEPYjzd+vkev+KnVL2DuYvtWgG4krGi
+         KZRE7jsmnVTg+J7tteipYbqqXrleBXG5YsUwM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764132532; x=1764737332;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QiXAl5T41fV8u91RxgFyPCavmc/kJPFAWAr+Y+SPIEA=;
-        b=MEYHERwJfwlnHhu+vNYVg9Z0o/xO3qzD4t2qgp1NXapdQ22Kvkxn+NJHqWc1b3SX01
-         G6NRuPdEr+TmMKbLPPo+rjyIkb3gvC0OrdcP+gY2gDn9UcH0JVt9sqcZK6TNextJ0TeO
-         tvLRZB36A1P48AKkF4rYP9r8UBLa5wEYvF20kexCvmGbdrgEM6suQCNPLVcxRXLtiuXu
-         FN62woRDbEdFl1t8vkOgFghsbn+JvrqAHK5/YuvXr0hnmwwrK2H89zbpcec1B8zCB/yP
-         JpRi2DONrvsrnzU33vFRqlpsqRPDw4H1W3h6md6H4Gkj+IlmYjHffn+pRXPRF4uyfVtO
-         QqjA==
-X-Forwarded-Encrypted: i=1; AJvYcCW2Rv92ONOXFSiRs8RpQbrLVHH4FBhFLWwrQdWNwp2IOGYnqibUrLyiLH/o6lNw5AgV8Dr/QTU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsniPkL9IrLHuIC3im7nqmfPDIwLKtEFxLR1pJeitGv2mu0R2F
-	dyjaru3dLtDw7csbNn+CfKavEc9gQq7xSwSWJ5sF9ertFx0a/JUSCWrXFhIh/LtN
-X-Gm-Gg: ASbGncuHbXZznHbBJxn78PNEKps/KiL2gvxWcEGaSWNLDW+TK+sk6xxPJjObCOTHvHK
-	AH7v2PWrGmMaU8O0LNx530L6PiGwsjYK8ddoPO0kVbkBEeYY5F7iJ/fZfN9Umq2v5diAicGPI4y
-	bJya3PokxnCEi0cCndK+HdfjWD0DEryotJqTwRp3pq8mm3BoBjyGziElzTY5SXNsE6iyeGeks0/
-	7hz39wXMDCjROdPvLKGPuuerNK8D3cPd2s+QuRmgJnlxiP15ZGElN03QUrTmFyUR9IHiNmJQpn3
-	sUbVO2V8/9eTBf9XyU/RCmDujDpeXNltAJTxTAtFBkgNLH2IwohqmPDvSRumfOYIqkvkXXe362c
-	hrwesw8ZT+CvGSu8PkIDF7awZgq668/KZktggqiePF3dGIC2mMLhUuUfZE0UArgK32NR7TXGQMr
-	KD2RDv5NfDXmHaeBsN
-X-Google-Smtp-Source: AGHT+IE9Hsd8VUdCCHY6YB7JpxSFzmFaA4oItK9SOcNRrtKKTgmYBqkWJ+3CjM0GhWa21Ic8LR30Xg==
-X-Received: by 2002:a05:7022:ebc2:b0:11a:e610:ee32 with SMTP id a92af1059eb24-11c9d85f282mr10217764c88.25.1764132531521;
-        Tue, 25 Nov 2025 20:48:51 -0800 (PST)
-Received: from localhost ([2601:647:6802:dbc0:a2cf:2e69:756:191b])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11cc631c236sm19636334c88.7.2025.11.25.20.48.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 20:48:51 -0800 (PST)
-Date: Tue, 25 Nov 2025 20:48:49 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, will@willsroot.io, jschung2@proton.me,
-	savy@syst3mfailure.io
-Subject: Re: [Bug 220774] New: netem is broken in 6.18
-Message-ID: <aSaGsdNk/h0TuB+b@pop-os.localdomain>
-References: <20251110123807.07ff5d89@phoenix>
- <aR/qwlyEWm/pFAfM@pop-os.localdomain>
- <CAM0EoMkPdyqEMa0f4msEveGJxxd9oYaV4f3NatVXR9Fb=iCTcw@mail.gmail.com>
- <aSDdYoK7Vhw9ONzN@pop-os.localdomain>
- <20251121161322.1eb61823@phoenix.local>
- <20251121175556.26843d75@kernel.org>
- <aSH9mvol/++40XT0@pop-os.localdomain>
- <20251124191625.74569868@kernel.org>
+        d=1e100.net; s=20230601; t=1764133162; x=1764737962;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=SstjdCULfreZEVFZNj/IhPpujFlsaGB4XKF9NC1FxsM=;
+        b=MghoGO20/5dAiEuWUwgA971fYcf3EqS5DEVqtn3jXoy4J0GoZlEzb+nuNpu6O3bPuI
+         hLDFG16c2SE1VPI4CVu3+H2kNCBnkRnZSGF0+K8jgmfn4V3VxlxnhyOBe7t5qmqiRjiN
+         0UhdkS0aaroIlgOpXEjdFd4yQ3FzgiQ+cIBwYzysuyrsPowJqI9e4jXUVV5/J/LYFnv7
+         nGry8pBYW5QSwHLktv4hhMZV0GkoxXHQ8UAbjFQyYui+JFGkz/bj7TMqu/H7BFuPuWRZ
+         GssyuPsiN65d9Vfg8u9XVXbEE+xlrb9kNeb2469+ZsTFuOGs/f9EwTcet8NjJ7Ahxy2m
+         rz9A==
+X-Forwarded-Encrypted: i=1; AJvYcCX/PC+Lp8wPv7o3NxZ8d+2LMsv5fE2Wvi7fzgxY/ZCgBkPpqsLPNcny0IH2djVszazkNjPwBz0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx48vxrEJ1HRaKooOaMm1SFq7iZev+ZtypdjlL0dCXQqmgzE3A
+	b+kkURtc7TljWMmAxpZxQjwuf3X7ZfEocyWqavCYqSVXkJjD3e2j6ZCk9/3bqOq+DEHVTxmYKqR
+	0EKwHGe5ecaaRfZIEAo8xiypqGlG8pB44N0E0PoopVg==
+X-Gm-Gg: ASbGnctCwu5AMjRE1tHF71Xox1Ks5+gjQziw1s1eQvwyO2kMiIE4AK8SjSVGEY7XC41
+	JC+inStl8luLNVagu5qNhH0gfkkjNRwxggEzWl2Dh6sWwKXFGVuwCXj3joHNuWYE/EpHfNOXks7
+	CNoUcbVHaNu/UTkYFf1cd+K/wvwaA9YvrWTqXWSxcG4CtI0AtyvoRkHtEWLuI5Q4gYq7WVQAW7r
+	pPqQFyUfDw4YdGLMNlARfMWchVcKLoawTL8vYUJWz49T/wA279ppLZMNGChdxIGnJJQzu4Xq2h3
+	/5yNzbxQXvpK8bugXPgFZLQAcw==
+X-Google-Smtp-Source: AGHT+IHYV24PR1HmviDhOvHoIdpU4OrMzkDvxo9kIkiDVSrc03caPIiSxNEOTLnfxjOyc6l8KWVp3xgTJHsj5IfiBRI=
+X-Received: by 2002:a05:690c:a8e:b0:78a:7ea3:2051 with SMTP id
+ 00721157ae682-78a8b493c91mr166553187b3.26.1764133162219; Tue, 25 Nov 2025
+ 20:59:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251124191625.74569868@kernel.org>
+References: <20251126034601.236922-1-ssranevjti@gmail.com> <CANn89iLiCh85_1Ah6O_rTOCGwLet97f7DyfyZMDgfTV==iUVUw@mail.gmail.com>
+In-Reply-To: <CANn89iLiCh85_1Ah6O_rTOCGwLet97f7DyfyZMDgfTV==iUVUw@mail.gmail.com>
+From: SHAURYA RANE <ssrane_b23@ee.vjti.ac.in>
+Date: Wed, 26 Nov 2025 10:29:10 +0530
+X-Gm-Features: AWmQ_blSv9rz5XKF93QAC7OCn16_tZDGSLCqlVOse-qgbGV4NCIMipFmQ3Y0fNg
+Message-ID: <CANNWa05qyDYoCe=PQT4nx99CxFtwLoNtJoNKicLUG0A_XT-Emg@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: em_canid: add length check before reading
+ CAN ID
+To: Eric Dumazet <edumazet@google.com>
+Cc: socketcan@hartkopp.net, mkl@pengutronix.de, jhs@mojatatu.com, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, 
+	linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com, 
+	khalid@kernel.org, syzbot+5d8269a1e099279152bc@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 24, 2025 at 07:16:25PM -0800, Jakub Kicinski wrote:
-> On Sat, 22 Nov 2025 10:14:50 -0800 Cong Wang wrote:
-> > > I guess we forgot about mq.. IIRC mq doesn't come into play in
-> > > duplication, we should be able to just adjust the check to allow   
-> > 
-> > This is not true, I warned you and Jamal with precisely the mq+netem
-> > combination before applying the patch, both of you chose to ignore.
-> 
-> I'm curious why we did.. Link?
+You're right, checking skb->len alone doesn=E2=80=99t guarantee that the
+required bytes are present in the linear data area, especially for
+fragmented skbs. I=E2=80=99ll switch this to a proper pskb_may_pull(skb,
+sizeof(canid_t)) check to ensure the CAN ID is safely accessible.
+I=E2=80=99ll send a v2 patch with the corrected validation.
+Thanks,
+Shaurya
 
-https://lore.kernel.org/all/aG10rqwjX6elG1Gx@pop-os.localdomain/#t
-
-Jamal just denied the use case and let users complain.
-
-This strategy does not work, since majority users would need to wait
-until LTS gets hit by this regression. (IMHO, it is also unethical to
-knowingly break valid use cases, regardless of purpose.)
-
-Regards,
-Cong Wang
+On Wed, Nov 26, 2025 at 9:46=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Nov 25, 2025 at 7:46=E2=80=AFPM <ssrane_b23@ee.vjti.ac.in> wrote:
+> >
+> > From: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+> >
+> > Add a check to verify that the skb has at least sizeof(canid_t) bytes
+> > before reading the CAN ID from skb->data. This prevents reading
+> > uninitialized memory when processing malformed packets that don't
+> > contain a valid CAN frame.
+> >
+> > Reported-by: syzbot+5d8269a1e099279152bc@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=3D5d8269a1e099279152bc
+> > Fixes: f057bbb6f9ed ("net: em_canid: Ematch rule to match CAN frames ac=
+cording to their identifiers")
+> > Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+> > ---
+> >  net/sched/em_canid.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/net/sched/em_canid.c b/net/sched/em_canid.c
+> > index 5337bc462755..a9b6cab70ff1 100644
+> > --- a/net/sched/em_canid.c
+> > +++ b/net/sched/em_canid.c
+> > @@ -99,6 +99,9 @@ static int em_canid_match(struct sk_buff *skb, struct=
+ tcf_ematch *m,
+> >         int i;
+> >         const struct can_filter *lp;
+> >
+> > +       if (skb->len < sizeof(canid_t))
+> > +               return 0;
+> > +
+>
+> Please keep in mind that this test is not enough, even if it may
+> prevent a particular syzbot repro from triggering a bug.
+>
+> Take a look at pskb_may_pull() for details.
 
