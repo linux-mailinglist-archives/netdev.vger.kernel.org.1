@@ -1,55 +1,53 @@
-Return-Path: <netdev+bounces-241915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86176C8A4F7
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 15:25:21 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4186C8A550
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 15:28:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 54A2E4E18D6
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 14:25:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 925614E1D45
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 14:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5441B2FCC04;
-	Wed, 26 Nov 2025 14:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5D830274B;
+	Wed, 26 Nov 2025 14:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="k0ooTJYI"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="i2uuTRo+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE69258CDC;
-	Wed, 26 Nov 2025 14:25:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B2C3019A5;
+	Wed, 26 Nov 2025 14:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764167117; cv=none; b=qdPbgONKLIaWrNheJZCDBmNsrhbTbL0q9S/tibwoQ33GAtuZMvl7EMPNEm4fPE+O6mCGGwT/iPNLXgPLugVOVPAksORfjZGWqD8CSR/pQAhxl4z3nb1ByBQYZ8bnKrDpKmHcR96sKUnyGlzx1L4/YFEM0TpEQg4YN+gEOwxyj8M=
+	t=1764167312; cv=none; b=oZ2lSiRashE9h92wYLngPVUyBCgBjetSXv8lYmM34bdzECaYVOZU0hj6Twn5UKAtDh1SNVI+VxYZKlV2nEvu1NH/m4DL6wpFm+MT6j4IPSXtleJWWhPPBifApdbmX3l0MbYDtLn6VkLAFUrbp9JBr2L4alHotWnnyWJ+4RaW7LU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764167117; c=relaxed/simple;
-	bh=Ocfwjie9+FicOOaIBzOuGpVUjaUpRkYlK9kIutmZR7o=;
+	s=arc-20240116; t=1764167312; c=relaxed/simple;
+	bh=ucUJ2TypUBfDZ6l1H6e1RDgU1WpAPBYy3Ts//RPRipo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OU8Hzxd8T9cEWpEQwnFKjE9ny1Ng6Nx1D53nXPkoSp9YZAOBrQLePSwIhcXQ9nNa9ABFShH69AlYJVqYkMaxc9iE4Ye8k1i+ivAMgc0kjjAZerHGGNY9hC7FlJE7VDQH6iZPlsh3AjCXHREKU/YTHUMvX+OJPcT56ya0YdD75DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=k0ooTJYI; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 8725A4E418F3;
-	Wed, 26 Nov 2025 14:25:12 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 578AB60721;
-	Wed, 26 Nov 2025 14:25:12 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 64B5A102F08EF;
-	Wed, 26 Nov 2025 15:25:01 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1764167111; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=Sbs0A8qAYuq+r/+1fjxriavvnUhEfhMgY7SBF5X8V08=;
-	b=k0ooTJYIYW0FYBMVhrgVBpA7A6kXMyqERAgQSrzwOurSlWfmkbqR/cAmccU11VWLC5YJEI
-	n6WrPplsAi0/qCeWTP5rC5r6OVtJarSahnvu8/ytGNtL2IhjV2o4qcZLK1BKZ9REOhbIne
-	GpHwbaHF7/xV6QP11Em8OqvJQxr/vpKrq/B/xhMU6iRCotsKbsvezuDAlSdbcWdLA7WkHY
-	PgHtTABkVp75O1gL9djdWOv4/kvWgJGTXQQtoWevSW4VHF0gnednfaSxWzHACT5hKJnynF
-	DcFAau2f9LPmwhjE9ZTrqGuSx7982EfRtb9Sv1Y9Gy4TO0KRoTFUYh71zTNEkA==
-Message-ID: <9c2518d8-a0ea-46ba-9069-999c2574cd24@bootlin.com>
-Date: Wed, 26 Nov 2025 15:25:00 +0100
+	 In-Reply-To:Content-Type; b=kq6DHfMhwaq1Nf2On1orIEyT4kSNO7EafQDWsctagPwQbNhIr9UJcYBN/Eb8SN+jCrTA5ciDaWqqoFb01Q1u63x2139uIq7rv446mJz2BfJxqUQt/JSWbMicVZ5hEhvp4m4j2dqekgBZcxmeYPTjem7EisHVDB+N2sG2EMI0Osw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=i2uuTRo+; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=+QWC57AAnbT0jiqDarD21EhnkA6IP25ppE7qj/kj+3o=; b=i2uuTRo+lGns+rAIkZ37lxuILe
+	HkEWUoPICK5Ekyi6hFr08jv6ZU+AhMPQbVwrjqZM2JT2l8OVo6XgoHc/wFghYroYcyt+HAiInyrfm
+	oipnPwVZf3h1Bia4tydxfogV8ENbdfsDkPJVgWTrKLA5WYN777XWB2bYhshbmP8LSpgzIiEEoZzU/
+	54UE/Xb+RCZeC3i4JXQu1YXqQk0vwpWuVW0/EhuCL0iF1GeqDr54pSj3pEsPLe7MRKF4b4XE7o/Fj
+	rO/2A1Bklhr0ZdRUUhomg3cZ4+H/jvQ8my00CxGAdL5KFUMZWV5jKXUEQljBXm+z3S/+tftynAXnC
+	QXN5nu1/IEwPkJPeWPdTcgnN5dopm0LTHZLGj84LeWUFodbXwANe950woE4FmRoRi94LC8havLQXh
+	W1VgaGr+hvX1qDGixCozwG65m00dvGcMYDsNAZk2fXrYeijpx5FwnVabKAUrN6fnLSV5szvLcjdYL
+	NFxB91XPOKaoVqK9c46bzun8;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vOGVI-00Fqyn-1G;
+	Wed, 26 Nov 2025 14:28:20 +0000
+Message-ID: <73b14f8b-03dc-4ed0-ad07-b33460dc70e7@samba.org>
+Date: Wed, 26 Nov 2025 15:28:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,90 +55,257 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/9] dt-bindings: phy: rename
- transmit-amplitude.yaml to phy-common-props.yaml
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Daniel Golle <daniel@makrotopia.org>,
- Horatiu Vultur <horatiu.vultur@microchip.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Eric Woudstra <ericwouds@gmail.com>, =?UTF-8?B?TWFyZWsgQmVo4oia4oirbg==?=
- <kabel@kernel.org>, Lee Jones <lee@kernel.org>,
- Patrice Chotard <patrice.chotard@foss.st.com>,
- Holger Brunck <holger.brunck@hitachienergy.com>
-References: <20251122193341.332324-1-vladimir.oltean@nxp.com>
- <20251122193341.332324-2-vladimir.oltean@nxp.com>
- <0faccdb7-0934-4543-9b7f-a655a632fa86@lunn.ch>
- <20251125214450.qeljlyt3d27zclfr@skbuf>
- <b4597333-e485-426d-975e-3082895e09f6@lunn.ch>
- <20251126072638.wqwbhhab3afxvm7x@skbuf>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH] RDMA/siw: reclassify sockets in order to avoid false
+ positives from lockdep
+To: Bernard Metzler <bernard.metzler@linux.dev>, linux-rdma@vger.kernel.org
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ netdev@vger.kernel.org, linux-cifs@vger.kernel.org
+References: <20251126104254.1779732-1-metze@samba.org>
+ <25ae6db1-856f-4592-a4fa-8a927426ed72@linux.dev>
 Content-Language: en-US
-In-Reply-To: <20251126072638.wqwbhhab3afxvm7x@skbuf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <25ae6db1-856f-4592-a4fa-8a927426ed72@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Hi Bernard,
 
-On 26/11/2025 08:26, Vladimir Oltean wrote:
-> +Maxime, Holger
-> thread at https://lore.kernel.org/netdev/20251122193341.332324-2-vladimir.oltean@nxp.com/
-> 
-> On Tue, Nov 25, 2025 at 11:33:09PM +0100, Andrew Lunn wrote:
->>> Yeah, although as things currently stand, I'd say that is the lesser of
->>> problems. The only user (mv88e6xxx) does something strange: it says it
->>> wants to configure the TX amplitude of SerDes ports, but instead follows
->>> the phy-handle and applies the amplitude specified in that node.
->>>
->>> I tried to mentally follow how things would work in 2 cases:
->>> 1. PHY referenced by phy-handle is internal, then by definition it's not
->>>    a SerDes port.
->>> 2. PHY referenced by phy-handle is external, then the mv88e6xxx driver
->>>    looks at what is essentially a device tree description of the PHY's
->>>    TX, and applies that as a mirror image to the local SerDes' TX.
->>>
->>> I think the logic is used in mv88e6xxx through case #2, i.e. we
->>> externalize the mv88e6xxx SerDes electrical properties to an unrelated
->>> OF node, the connected Ethernet PHY.
+> On 26.11.2025 11:42, Stefan Metzmacher wrote:
+>> While developing IPPROTO_SMBDIRECT support for the code
+>> under fs/smb/common/smbdirect [1], I noticed false positives like this:
 >>
->> My understanding of the code is the same, #2. Although i would
->> probably not say it is an unrelated node. I expect the PHY is on the
->> other end of the SERDES link which is having the TX amplitudes
->> set. This clearly will not work if there is an SFP cage on the other
->> end, but it does for an SGMII PHY.
+>> [T79] ======================================================
+>> [T79] WARNING: possible circular locking dependency detected
+>> [T79] 6.18.0-rc4-metze-kasan-lockdep.01+ #1 Tainted: G           OE
+>> [T79] ------------------------------------------------------
+>> [T79] kworker/2:0/79 is trying to acquire lock:
+>> [T79] ffff88801f968278 (sk_lock-AF_INET){+.+.}-{0:0},
+>>                          at: sock_set_reuseaddr+0x14/0x70
+>> [T79]
+>>          but task is already holding lock:
+>> [T79] ffffffffc10f7230 (lock#9){+.+.}-{4:4},
+>>                          at: rdma_listen+0x3d2/0x740 [rdma_cm]
+>> [T79]
+>>          which lock already depends on the new lock.
+>>
+>> [T79]
+>>          the existing dependency chain (in reverse order) is:
+>> [T79]
+>>          -> #1 (lock#9){+.+.}-{4:4}:
+>> [T79]        __lock_acquire+0x535/0xc30
+>> [T79]        lock_acquire.part.0+0xb3/0x240
+>> [T79]        lock_acquire+0x60/0x140
+>> [T79]        __mutex_lock+0x1af/0x1c10
+>> [T79]        mutex_lock_nested+0x1b/0x30
+>> [T79]        cma_get_port+0xba/0x7d0 [rdma_cm]
+>> [T79]        rdma_bind_addr_dst+0x598/0x9a0 [rdma_cm]
+>> [T79]        cma_bind_addr+0x107/0x320 [rdma_cm]
+>> [T79]        rdma_resolve_addr+0xa3/0x830 [rdma_cm]
+>> [T79]        destroy_lease_table+0x12b/0x420 [ksmbd]
+>> [T79]        ksmbd_NTtimeToUnix+0x3e/0x80 [ksmbd]
+>> [T79]        ndr_encode_posix_acl+0x6e9/0xab0 [ksmbd]
+>> [T79]        ndr_encode_v4_ntacl+0x53/0x870 [ksmbd]
+>> [T79]        __sys_connect_file+0x131/0x1c0
+>> [T79]        __sys_connect+0x111/0x140
+>> [T79]        __x64_sys_connect+0x72/0xc0
+>> [T79]        x64_sys_call+0xe7d/0x26a0
+>> [T79]        do_syscall_64+0x93/0xff0
+>> [T79]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>> [T79]
+>>          -> #0 (sk_lock-AF_INET){+.+.}-{0:0}:
+>> [T79]        check_prev_add+0xf3/0xcd0
+>> [T79]        validate_chain+0x466/0x590
+>> [T79]        __lock_acquire+0x535/0xc30
+>> [T79]        lock_acquire.part.0+0xb3/0x240
+>> [T79]        lock_acquire+0x60/0x140
+>> [T79]        lock_sock_nested+0x3b/0xf0
+>> [T79]        sock_set_reuseaddr+0x14/0x70
+>> [T79]        siw_create_listen+0x145/0x1540 [siw]
+>> [T79]        iw_cm_listen+0x313/0x5b0 [iw_cm]
+>> [T79]        cma_iw_listen+0x271/0x3c0 [rdma_cm]
+>> [T79]        rdma_listen+0x3b1/0x740 [rdma_cm]
+>> [T79]        cma_listen_on_dev+0x46a/0x750 [rdma_cm]
+>> [T79]        rdma_listen+0x4b0/0x740 [rdma_cm]
+>> [T79]        ksmbd_rdma_init+0x12b/0x270 [ksmbd]
+>> [T79]        ksmbd_conn_transport_init+0x26/0x70 [ksmbd]
+>> [T79]        server_ctrl_handle_work+0x1e5/0x280 [ksmbd]
+>> [T79]        process_one_work+0x86c/0x1930
+>> [T79]        worker_thread+0x6f0/0x11f0
+>> [T79]        kthread+0x3ec/0x8b0
+>> [T79]        ret_from_fork+0x314/0x400
+>> [T79]        ret_from_fork_asm+0x1a/0x30
+>> [T79]
+>>          other info that might help us debug this:
+>>
+>> [T79]  Possible unsafe locking scenario:
+>>
+>> [T79]        CPU0                    CPU1
+>> [T79]        ----                    ----
+>> [T79]   lock(lock#9);
+>> [T79]                                lock(sk_lock-AF_INET);
+>> [T79]                                lock(lock#9);
+>> [T79]   lock(sk_lock-AF_INET);
+>> [T79]
+>>           *** DEADLOCK ***
+>>
+>> [T79] 5 locks held by kworker/2:0/79:
+>> [T79] #0: ffff88800120b158 ((wq_completion)events_long){+.+.}-{0:0},
+>>                             at: process_one_work+0xfca/0x1930
+>> [T79] #1: ffffc9000474fd00 ((work_completion)(&ctrl->ctrl_work))
+>>                             {+.+.}-{0:0},
+>>                             at: process_one_work+0x804/0x1930
+>> [T79] #2: ffffffffc11307d0 (ctrl_lock){+.+.}-{4:4},
+>>                             at: server_ctrl_handle_work+0x21/0x280 [ksmbd]
+>> [T79] #3: ffffffffc11347b0 (init_lock){+.+.}-{4:4},
+>>                             at: ksmbd_conn_transport_init+0x18/0x70 [ksmbd]
+>> [T79] #4: ffffffffc10f7230 (lock#9){+.+.}-{4:4},
+>>                              at: rdma_listen+0x3d2/0x740 [rdma_cm]
+>> [T79]
+>>          stack backtrace:
+>> [T79] CPU: 2 UID: 0 PID: 79 Comm: kworker/2:0 Kdump: loaded
+>>        Tainted: G           OE
+>>        6.18.0-rc4-metze-kasan-lockdep.01+ #1 PREEMPT(voluntary)
+>> [T79] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+>> [T79] Hardware name: innotek GmbH VirtualBox/VirtualBox,
+>>        BIOS VirtualBox 12/01/2006
+>> [T79] Workqueue: events_long server_ctrl_handle_work [ksmbd]
+>> ...
+>> [T79]  print_circular_bug+0xfd/0x130
+>> [T79]  check_noncircular+0x150/0x170
+>> [T79]  check_prev_add+0xf3/0xcd0
+>> [T79]  validate_chain+0x466/0x590
+>> [T79]  __lock_acquire+0x535/0xc30
+>> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+>> [T79]  lock_acquire.part.0+0xb3/0x240
+>> [T79]  ? sock_set_reuseaddr+0x14/0x70
+>> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+>> [T79]  ? __kasan_check_write+0x14/0x30
+>> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+>> [T79]  ? apparmor_socket_post_create+0x180/0x700
+>> [T79]  lock_acquire+0x60/0x140
+>> [T79]  ? sock_set_reuseaddr+0x14/0x70
+>> [T79]  lock_sock_nested+0x3b/0xf0
+>> [T79]  ? sock_set_reuseaddr+0x14/0x70
+>> [T79]  sock_set_reuseaddr+0x14/0x70
+>> [T79]  siw_create_listen+0x145/0x1540 [siw]
+>> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+>> [T79]  ? local_clock_noinstr+0xe/0xd0
+>> [T79]  ? __pfx_siw_create_listen+0x10/0x10 [siw]
+>> [T79]  ? trace_preempt_on+0x4c/0x130
+>> [T79]  ? __raw_spin_unlock_irqrestore+0x4a/0x90
+>> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+>> [T79]  ? preempt_count_sub+0x52/0x80
+>> [T79]  iw_cm_listen+0x313/0x5b0 [iw_cm]
+>> [T79]  cma_iw_listen+0x271/0x3c0 [rdma_cm]
+>> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+>> [T79]  rdma_listen+0x3b1/0x740 [rdma_cm]
+>> [T79]  ? _raw_spin_unlock+0x2c/0x60
+>> [T79]  ? __pfx_rdma_listen+0x10/0x10 [rdma_cm]
+>> [T79]  ? rdma_restrack_add+0x12c/0x630 [ib_core]
+>> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+>> [T79]  cma_listen_on_dev+0x46a/0x750 [rdma_cm]
+>> [T79]  rdma_listen+0x4b0/0x740 [rdma_cm]
+>> [T79]  ? __pfx_rdma_listen+0x10/0x10 [rdma_cm]
+>> [T79]  ? cma_get_port+0x30d/0x7d0 [rdma_cm]
+>> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+>> [T79]  ? rdma_bind_addr_dst+0x598/0x9a0 [rdma_cm]
+>> [T79]  ksmbd_rdma_init+0x12b/0x270 [ksmbd]
+>> [T79]  ? __pfx_ksmbd_rdma_init+0x10/0x10 [ksmbd]
+>> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+>> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+>> [T79]  ? register_netdevice_notifier+0x1dc/0x240
+>> [T79]  ksmbd_conn_transport_init+0x26/0x70 [ksmbd]
+>> [T79]  server_ctrl_handle_work+0x1e5/0x280 [ksmbd]
+>> [T79]  process_one_work+0x86c/0x1930
+>> [T79]  ? __pfx_process_one_work+0x10/0x10
+>> [T79]  ? srso_alias_return_thunk+0x5/0xfbef5
+>> [T79]  ? assign_work+0x16f/0x280
+>> [T79]  worker_thread+0x6f0/0x11f0
+>>
+>> I was not able to reproduce this as I was testing with various
+>> runs switching siw and rxe as well as IPPROTO_SMBDIRECT sockets,
+>> while the above stack used siw with the non IPPROTO_SMBDIRECT
+>> patches [1].
+>>
+>> Even if this patch doesn't solve the above I think it's
+>> a good idea to reclassify the sockets used by siw,
+>> I also send patches for rxe to reclassify, as well
+>> as my IPPROTO_SMBDIRECT socket patches [1] will do it,
+>> this should minimize potential false positives.
+>>
+>> [1]
+>> https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/master-ipproto-smbdirect
+>>
+>> Cc: Bernard Metzler <bernard.metzler@linux.dev>
+>> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+>> Cc: Leon Romanovsky <leon@kernel.org>
+>> Cc: linux-rdma@vger.kernel.org
+>> Cc: netdev@vger.kernel.org
+>> Cc: linux-cifs@vger.kernel.org
+>> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+>> ---
+>>   drivers/infiniband/sw/siw/siw_cm.c | 18 ++++++++++++++++++
+>>   1 file changed, 18 insertions(+)
+>>
+>> diff --git a/drivers/infiniband/sw/siw/siw_cm.c b/drivers/infiniband/sw/siw/siw_cm.c
+>> index 708b13993fdf..b83abf0ea15e 100644
+>> --- a/drivers/infiniband/sw/siw/siw_cm.c
+>> +++ b/drivers/infiniband/sw/siw/siw_cm.c
+>> @@ -39,6 +39,22 @@ static void siw_cm_llp_error_report(struct sock *s);
+>>   static int siw_cm_upcall(struct siw_cep *cep, enum iw_cm_event_type reason,
+>>                int status);
+>> +
+>> +static struct lock_class_key siw_sk_key;
+>> +static struct lock_class_key siw_slock_key;
+>> +
+>> +static inline void siw_reclassify_socket(struct socket *sock)
+>> +{
+>> +    struct sock *sk = sock->sk;
+>> +
+>> +    if (WARN_ON_ONCE(!sock_allow_reclassification(sk)))
+>> +        return;
+>> +
+>> +    sock_lock_init_class_and_name(sk,
+>> +                      "slock-RDMA-SIW", &siw_slock_key,
+>> +                      "sk_lock-RDMA-SIW", &siw_sk_key);
+>> +}
+>> +
+>>   static void siw_sk_assign_cm_upcalls(struct sock *sk)
+>>   {
+>>       struct siw_cep *cep = sk_to_cep(sk);
+>> @@ -1394,6 +1410,7 @@ int siw_connect(struct iw_cm_id *id, struct iw_cm_conn_param *params)
+>>       rv = sock_create(v4 ? AF_INET : AF_INET6, SOCK_STREAM, IPPROTO_TCP, &s);
+>>       if (rv < 0)
+>>           goto error;
+>> +    siw_reclassify_socket(s);
+>>       /*
+>>        * NOTE: For simplification, connect() is called in blocking
+>> @@ -1770,6 +1787,7 @@ int siw_create_listen(struct iw_cm_id *id, int backlog)
+>>       rv = sock_create(addr_family, SOCK_STREAM, IPPROTO_TCP, &s);
+>>       if (rv < 0)
+>>           return rv;
+>> +    siw_reclassify_socket(s);
+>>       /*
+>>        * Allow binding local port when still in TIME_WAIT from last close.
 > 
-> It is unrelated in the sense that the SGMII PHY is a different kernel
-> object, and the mv88e6xxx is polluting its OF node with properties which
-> it then interprets as its own, when the PHY driver may have wanted to
-> configure its SGMII TX amplitude too, via those same generic properties.
-> 
->> I guess this code is from before the time Russell converted the
->> mv88e6xxx SERDES code into PCS drivers. The register being set is
->> within the PCS register set.  The mv88e6xxx also does not make use of
->> generic phys to represent the SERDES part of the PCS. So there is no
->> phys phandle to follow since there is no phy.
-> 
-> In my view, the phy-common-props.yaml are supposed to be applicable to either:
-> (1) a network PHY with SerDes host-side connection (I suppose the media
->     side electrical properties would be covered by Maxime's phy_port
->     work - Maxime, please confirm).
+> Thanks very much, makes all sense to me. I stumbled across it a while
+> ago as well and quietly ignored it. Your solution is better.
+> If I look through the other use cases of sock_lock_init_class_and_name(),
+> I found it gated by
+> #ifdef CONFIG_DEBUG_LOCK_ALLOC
+> (see for example drivers/nvme/host/tcp.c). I think wee need that
+> since only then the related sock_lock_xxx objects and functions are
+> defined.
+> drivers/nvme/host/tcp.c also has a nice comment on why this is
+> needed. I think we shall have such comment as well - just to remind us
+> later what we did.
 
-True, but we could definitely conceive applying phy-common-props.yaml on
-the media-side as well :) I don't have a use-case for it right now
-though, and we don't yet have detailed descriptions of the electrical
-properties.
+I think it will also compile and work fine without
+CONFIG_DEBUG_LOCK_ALLOC, but I'll add it. And a comment.
 
-Maxime
+I hope you agree that we don't need the AF_INET vs. AF_INET6
+thing.
 
+Thanks!
+metze
 
