@@ -1,89 +1,91 @@
-Return-Path: <netdev+bounces-242080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EACF2C8C20F
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 22:57:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E985CC8C218
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 22:57:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8BC71351AC5
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:57:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 184ED4E267F
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23312DC35C;
-	Wed, 26 Nov 2025 21:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B726433FE2F;
+	Wed, 26 Nov 2025 21:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gAzic4y4"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="G4akfM5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f100.google.com (mail-io1-f100.google.com [209.85.166.100])
+Received: from mail-pf1-f228.google.com (mail-pf1-f228.google.com [209.85.210.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC57322DA3
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 21:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FFB33F8BB
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 21:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764194258; cv=none; b=tFp044v/tRMg5PHeZCObq61Lgp/mmuXvHZhjwiis927bzmpQC2Tbv1DFOCvVCRPydo6MCwQRYt4CD5lhLz9RJebQx3RjnhPtHJnU7duPoKZh+Smsg/9Hc4fUG4yRZMB1+0w4Sz9RQ6llN7fks0Z986nW7TBaKkqciGRDqNZ/jyY=
+	t=1764194261; cv=none; b=Jmkt6dLjTAxdNRF2Z86kE/TGYVEym0sow111xOGIAYszGRyvQx+WkU0WForJZwKQnS/sQ2KVFimOFXLbARzNfBQGodxzAFKIWBwArKVuliBdXTxxUiLL6dwmfTILEVjpvXcnVbIWbuCJT6wkCIqHdM1P8+x7Duxc88c36e2KvSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764194258; c=relaxed/simple;
-	bh=q0735M21RlHxByrV46ifCXrf3fvDlSRAO2f24OyWsf0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o+BaO6fseqFoF9cVL9G9fGnxV1ADcB+UlCVRLcrEpL/gIn78nfYliFaesoyFAGzm0MFKZKo1nEzPBYWogut4ncZrSK/2YzVSEqLyxDLTNdjeLATaLh5M4f+m3xi2OuMrl5ot0Tjry3TQI/+YaJzAyHhba5YXVaD6hYkSx7ArTPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gAzic4y4; arc=none smtp.client-ip=209.85.166.100
+	s=arc-20240116; t=1764194261; c=relaxed/simple;
+	bh=fsQU/lAIRClKQMbanwY+X7LRDVb51TeSEe7XXekwimQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hmm2sJywQNJ6yQ7kQFXjDDOKZc+BXkJu4JEC3vCMBYhAx3GhKuQXqDZKIOd84Yv/KUPqexYKOj2LUyyS4O5UnHALa8HZgkEvLhPM4abBMNZRMRCQsK/F7QIJzqz6C2PN7nEkiNtgSD6L5/wLElrUdhrQVOfDlHRwcpItgh431qM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=G4akfM5K; arc=none smtp.client-ip=209.85.210.228
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-io1-f100.google.com with SMTP id ca18e2360f4ac-948da744f87so12078239f.1
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 13:57:37 -0800 (PST)
+Received: by mail-pf1-f228.google.com with SMTP id d2e1a72fcca58-7bb3092e4d7so208037b3a.0
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 13:57:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764194256; x=1764799056;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mZoe8FIOKIhZdcQ9UOoYRdFEbVExihOehzqF5pivtek=;
-        b=Zy7tMcc0q6fozHM2jcuGeq5EZlWVAsaB1VlERZujUbEI8aUKXZiXLWBPMX9O4tz2bT
-         /2vbwaXXs8/DtnaXy9npPMtw96DLKeB8Ahff14X3EloAGngR4Xa6zB/SdrCu6PpGu76u
-         DmzLqBsyeqzW/9rTW8xdBxufs3Gas0olSx7fL+76VQZwksDcDiw9cKPQJYi7CMSEsx5m
-         FVTf8WFTgwSEFBgwhs+ZFXIppwRFJeXpRgtaGoSWyLbp70KVj/zhqUUUBv3IG2B3Kxzp
-         0jTg8eYmUCu1JtcQA50oF0EUOtPrwi0vt0D/iNp8o/MlghjEyAhdbuDHpEzwovVNJctT
-         zMLA==
-X-Gm-Message-State: AOJu0YxqbN6qsuWN1Dz0+sgjFjWY0shbBH2iccZM4yXSYtRdxs/yh6EQ
-	S+B0PK9gKHTBlerDoWHiR8vGVFcgdHenGfODpObp8Ae64RGDGg9RIpVu18BBeymeF+D5SN3LeJW
-	OjsGUvZthEeJDMyBHea9KgsSJV8TzS6QBb4N41FNCNhQYqYJQhPnTxh3qAIThw+Y3SM0kr5NIw7
-	/NHY6IXGMb6wGMi42l1YSPPXBBiYsyED1xv15leKKHcwG2gXoDN0tjzP1PN+PckHyGa07eYmgSI
-	wIC7A3sJIY=
-X-Gm-Gg: ASbGncuYoDn2Rw0ABOkSiAneDrul7+q6GX7Eav66LBe3AfHVhx9mV2rEPkhltAGBQHW
-	vvH4pQnhg4oA1S3wi/6xDt8bTOtWQ9vSpMHporODbO/ZGiwvRYm95xy+V3+BSfl2DUh0HhZE+dL
-	KwkzzxX+ntdG8R10DG+/N4tPTTQvuZ1qR+Ud+ga8I3x9La7mLYg0wzNJskNHpg31NxO2TsuD6pC
-	kY6nD50imfKKtivPjZhclCPiPQYS7Y3CPV422vsEyfkm0Ufsci7OmxHLWJ1UGl3utMZJ3zQpdux
-	U2iUaHHkACYTM3rSOPQHxWe8ljXm8jlgXPOkhWO26Gggg0/FZPsS/Tl9WpFg/rJPAsb5N/oPr2v
-	aeEgDPBvJGCYG1NkqvCQfUANjPJfc3cnP5qLxqsmBLvd4/NPfQo/qsNEb/RJ2DC/Q2OHA69kj8y
-	vdwt4h053QzCHhRF4aULQkCdnvbmCTRhIFzqqKAijGXle5
-X-Google-Smtp-Source: AGHT+IFTv9km5/JpnCL7WbkbnBgOH4jfS5BNkCKRkZzNB/ggk/Sh9RCzOxRkhgx/ci80QSJSqjcQE4rtTc70
-X-Received: by 2002:a05:6602:2c05:b0:949:305:fbb8 with SMTP id ca18e2360f4ac-949776beb36mr700769839f.0.1764194256227;
-        Wed, 26 Nov 2025 13:57:36 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-77.dlp.protect.broadcom.com. [144.49.247.77])
-        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-5b954b1844fsm1817061173.28.2025.11.26.13.57.35
+        d=1e100.net; s=20230601; t=1764194259; x=1764799059;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4GrdLEBQhE3QyPa71AOPS062WdhnOsaFdHPufbh/yNM=;
+        b=Fzrba1Y6fq4H5B9RW43Sh+/b7X3u+IkJn4fuXi41k+aUTXcGR6oJOtZrdr1MRluO4K
+         IsCZFe3pgZZ4ChNJ61tccp7jv8mPRhRT0JA6U90LcFYszoDhBIsBM9RKWjaGGpGY+zr6
+         YT/UP2o7/GyCzI0GYVFZ3NdZJfMK1UjPlXkg5U/UPZYgLHWDGv2JLdTDZZMEFSiio+9o
+         qDzbeMT4u5Q++RNCEG3LFCnSvMe1C+HnC8n/vOpJuUfKciFs5jYbFuz0S1adGoznpQ57
+         YTuZZSq+j3s5jrBa0v6Gf8JK2RcNNLiGlep8M8YpDJ5vtgopIOmdxTk1EKgK+pdDbHWy
+         wBRQ==
+X-Gm-Message-State: AOJu0Yw2nsRDy5F83Ll8Z+kfH5Grg4eeCTTeX15bBTgaDMNe2qFQj5A8
+	gKT4M01ECCsy1JJzyN/TtWQ4AgMdau7+AzsIRoeZri5oJYvonCDvBu7lrEyVDQPysTiD8vXeW5x
+	soGuK2QZUubeCBoZAQ/sdKJsGJcIyaYKtrLO/Nv21SYrZlMRF09ZYmMmivr8jJ7bQYBxonuAuHI
+	kWzYrJPwemHeGr7mtm7A4mwEwtgrAgizud2CrgsCWMqtjtRu+9lVFGGNmYve9UImjjMQlG+8u20
+	SH+VqVkoaQ=
+X-Gm-Gg: ASbGncsh6MrUwcn0hjQK67Dg/q3oub0o/P0Xtat7v3w4SftGU+cXb2CrcNFsJBKpiig
+	Ixrrz4dvNDprCo7i9EPfGTtw/FyFjZzEKx9Lwh+NvI3WH3qnNW8Ab1i3PK4yb0frDg4ZPXkbHC+
+	uRLsPFZecfQbGIJ/qDEGVQNZ3Ji3XFPRW5hHNJCFIL8BJOVoGwzAQiNXXCU5sft0SmOBSbJcmSk
+	HvKdQi0uRksC/WVyuKFUe1fauhwQfWek3XtNyh8kKeKVs0T1DSje6nakxCZbXcCtp/RQzdN47dx
+	a7owmVp/zin/f9+tSPUizKhYKIJdpFZGWl6nN6JtjguF+BScUINmGAwvUb8E+XoS487kdZkonOU
+	kQ/UxdLCz0lGEYrUjo0950vVyXFqbujf0LtF9tUozBHz07e0rBXNOgjuYlTOaNLMBcOET5Y5XIo
+	Tg8b1fs6YkvnnspIZgCGnFLOPi1c5KPwemx/czbmC2q7Zw
+X-Google-Smtp-Source: AGHT+IHRa6fmb7zvAAHP1WadRrQOkhYQC3+xLNVBJIWS/df4u0l+WUlPhZwemQExhiLzYhmxYAQknOGEGwj2
+X-Received: by 2002:a05:6a00:1820:b0:770:fd32:f365 with SMTP id d2e1a72fcca58-7c58e6088f8mr20041389b3a.25.1764194259507;
+        Wed, 26 Nov 2025 13:57:39 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-11.dlp.protect.broadcom.com. [144.49.247.11])
+        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-7c3ea4329d0sm2092077b3a.0.2025.11.26.13.57.39
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 26 Nov 2025 13:57:36 -0800 (PST)
+        Wed, 26 Nov 2025 13:57:39 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8a1c15daa69so57884685a.1
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 13:57:35 -0800 (PST)
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-882529130acso5644066d6.2
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 13:57:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1764194255; x=1764799055; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mZoe8FIOKIhZdcQ9UOoYRdFEbVExihOehzqF5pivtek=;
-        b=gAzic4y4fqsG22ZvALdSY2GNONxpR7v8SINrrimIZVLjuvLG59aLR1lXef1rpHCP/n
-         aNLvgSNdRLjnmh/0hLQ5cBpO+i5grkXcf3dnkkKMC2e5EFazo23HWpfF3hZvBAQuNSHy
-         M+ecIIOJ3/yYSp8yDjyRBA9wfDr9ERK1T0gYk=
-X-Received: by 2002:a05:620a:444f:b0:8b2:33a8:5030 with SMTP id af79cd13be357-8b4ebdcc644mr1086921885a.90.1764194255257;
-        Wed, 26 Nov 2025 13:57:35 -0800 (PST)
-X-Received: by 2002:a05:620a:444f:b0:8b2:33a8:5030 with SMTP id af79cd13be357-8b4ebdcc644mr1086919685a.90.1764194254853;
-        Wed, 26 Nov 2025 13:57:34 -0800 (PST)
+        d=broadcom.com; s=google; t=1764194258; x=1764799058; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4GrdLEBQhE3QyPa71AOPS062WdhnOsaFdHPufbh/yNM=;
+        b=G4akfM5K4hhLPt1kyQ9k3Uxh1hmIXDSPvX+fK5K2xaIERb7bgK3HxHmzBkns09YaOv
+         jkXT205oZe45H8JF4C0EyZdE5CTA1KJ6tXN2VFXZi4yOylJFG3bXysKiU6dtjYdeTOvn
+         dj0qj7I0M+fsgwj0oPegsYhkaeX+Kif53JlSc=
+X-Received: by 2002:a05:620a:46a9:b0:8b2:a485:6645 with SMTP id af79cd13be357-8b33d1d10ffmr2904605985a.34.1764194258127;
+        Wed, 26 Nov 2025 13:57:38 -0800 (PST)
+X-Received: by 2002:a05:620a:46a9:b0:8b2:a485:6645 with SMTP id af79cd13be357-8b33d1d10ffmr2904602885a.34.1764194257646;
+        Wed, 26 Nov 2025 13:57:37 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b3295db58fsm1473933185a.37.2025.11.26.13.57.32
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b3295db58fsm1473933185a.37.2025.11.26.13.57.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 13:57:34 -0800 (PST)
+        Wed, 26 Nov 2025 13:57:36 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -93,10 +95,12 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next 0/7] bnxt_en: Updates for net-next
-Date: Wed, 26 Nov 2025 13:56:41 -0800
-Message-ID: <20251126215648.1885936-1-michael.chan@broadcom.com>
+Subject: [PATCH net-next 1/7] bnxt_en: Enhance TX pri counters
+Date: Wed, 26 Nov 2025 13:56:42 -0800
+Message-ID: <20251126215648.1885936-2-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.4
+In-Reply-To: <20251126215648.1885936-1-michael.chan@broadcom.com>
+References: <20251126215648.1885936-1-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,39 +110,81 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-This series includes an enhnacement to the priority TX counters,
-an enhancement to a PHY module error extack message, cleanup of
-unneeded MSIX logic in bnxt_ulp.c, adding CQ dump during TX timeout,
-LRO/HW_GRO performance improvement by enabling Relaxed Ordering,
-improved SRIOV admin link state support, and PTP .getcrosststamp()
-support.
+The priority packet and byte counters in ethtool -S are returned by
+the driver based on the pri2cos mapping.  The assumption is that each
+priority is mapped to one and only one hardware CoS queue.  In a
+special RoCE configuration, the FW uses combined CoS queue 0 and CoS
+queue 1 for the priority mapped to CoS queue 0.  In this special
+case, we need to add the CoS queue 0 and CoS queue 1 counters for
+the priority packet and byte counters.
 
-Gautam R A (1):
-  bnxt_en: Enhance log message in bnxt_get_module_status()
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c         |  5 +++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h         |  1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 14 ++++++++++----
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
-Kalesh AP (1):
-  bnxt_en: Remove the redundant BNXT_EN_FLAG_MSIX_REQUESTED flag
-
-Michael Chan (3):
-  bnxt_en: Enhance TX pri counters
-  bnxt_en: Add CQ ring dump to bnxt_dump_cp_sw_state()
-  bnxt_en: Do not set EOP on RX AGG BDs on 5760X chips
-
-Pavan Chebbi (1):
-  bnxt_en: Add PTP .getcrosststamp() interface to get device/host times
-
-Rob Miller (1):
-  bnxt_en: Add Virtual Admin Link State Support for VFs
-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 34 +++++++++++-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  4 ++
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 19 +++++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 46 ++++++++++++++++
- .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   | 55 +++++++++++++++++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c |  7 +--
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h |  1 -
- 7 files changed, 148 insertions(+), 18 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index a625e7c311dd..148db3fe8fc2 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -8506,6 +8506,11 @@ static int bnxt_hwrm_func_qcfg(struct bnxt *bp)
+ 
+ 	if (flags & FUNC_QCFG_RESP_FLAGS_ENABLE_RDMA_SRIOV)
+ 		bp->fw_cap |= BNXT_FW_CAP_ENABLE_RDMA_SRIOV;
++	if (resp->roce_bidi_opt_mode &
++	    FUNC_QCFG_RESP_ROCE_BIDI_OPT_MODE_DEDICATED)
++		bp->cos0_cos1_shared = 1;
++	else
++		bp->cos0_cos1_shared = 0;
+ 
+ 	switch (resp->port_partition_type) {
+ 	case FUNC_QCFG_RESP_PORT_PARTITION_TYPE_NPAR1_0:
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 3613a172483a..aedb059f4ce5 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2424,6 +2424,7 @@ struct bnxt {
+ 	u8			tc_to_qidx[BNXT_MAX_QUEUE];
+ 	u8			q_ids[BNXT_MAX_QUEUE];
+ 	u8			max_q;
++	u8			cos0_cos1_shared;
+ 	u8			num_tc;
+ 
+ 	u16			max_pfcwd_tmo_ms;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 41686a6f84b5..baac639f9c94 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -688,16 +688,22 @@ static void bnxt_get_ethtool_stats(struct net_device *dev,
+ 				buf[j] = *(rx_port_stats_ext + n);
+ 			}
+ 			for (i = 0; i < 8; i++, j++) {
+-				long n = bnxt_tx_bytes_pri_arr[i].base_off +
+-					 bp->pri2cos_idx[i];
++				u8 cos_idx = bp->pri2cos_idx[i];
++				long n;
+ 
++				n = bnxt_tx_bytes_pri_arr[i].base_off + cos_idx;
+ 				buf[j] = *(tx_port_stats_ext + n);
++				if (bp->cos0_cos1_shared && !cos_idx)
++					buf[j] += *(tx_port_stats_ext + n + 1);
+ 			}
+ 			for (i = 0; i < 8; i++, j++) {
+-				long n = bnxt_tx_pkts_pri_arr[i].base_off +
+-					 bp->pri2cos_idx[i];
++				u8 cos_idx = bp->pri2cos_idx[i];
++				long n;
+ 
++				n = bnxt_tx_pkts_pri_arr[i].base_off + cos_idx;
+ 				buf[j] = *(tx_port_stats_ext + n);
++				if (bp->cos0_cos1_shared && !cos_idx)
++					buf[j] += *(tx_port_stats_ext + n + 1);
+ 			}
+ 		}
+ 	}
 -- 
 2.51.0
 
