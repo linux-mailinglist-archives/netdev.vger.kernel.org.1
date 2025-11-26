@@ -1,192 +1,293 @@
-Return-Path: <netdev+bounces-241811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55F6EC88982
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:16:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43ED5C88986
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:16:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10F0B3A479C
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:16:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F06213A4127
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7637528152A;
-	Wed, 26 Nov 2025 08:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49DFD30E855;
+	Wed, 26 Nov 2025 08:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="afRam1oi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD2C2248AE
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 08:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5890D2E5429;
+	Wed, 26 Nov 2025 08:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764144975; cv=none; b=LjLdwQP7xP3/BEXip718YaEBP+7ACCUD6R1IgJcr0tyqRF13DGkMDNaNvogVqtvWVIq8IkyKxA6Ql/N7J7iUUPc67I0wfZjeYpY/D4OiFgeBbWSKt1OqTaOgZM9x8yx4M6cQa/BeTdMBhkRXejUvNhxJyjmchTk+XGb84z41Ye8=
+	t=1764145008; cv=none; b=O1U7LckXAiWYMW8nDv6tOsa+rrMN2uZLRV8Hx5prGSm56ALPPfh5VkgiglKjwU/OjLpZhgqxfpTxsGRV/gdKHgVOfQocEFhiwbk98ZSaroizCNZN2mUCwjdvHbVYhxbzX2yESD6TQeNO2nIGsTIajHyJolhyhF95OvfN90gLE9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764144975; c=relaxed/simple;
-	bh=paGpx1Oa8J+Ki16wybCrw0vFUSnFc3+ZWphHQ1j872g=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=aG9vEsf2i8uCDMmAbJNKFZy1bs8UnwCq48RCmPVyy8nqvPBRwbYGjtXWoSyJxnnMVBcLbqRAld3Z1mjudQfeihJblU69OvazcIjsmmI3+tfB3aH8HEwiBhke3rLBk1cjwtdguIZWpWWBQGYSrdN67AHvRECiVX497Vi8q39XNU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-4347bc50df4so6462335ab.0
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 00:16:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764144973; x=1764749773;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GV7L64Lukxwhs4+pNd9OeGnnt4P82bXGOhYOkGbjhyc=;
-        b=NNv1tCts+LUTkO4ja2IzAu7ck4vrhbCXYsJLQL2tF15rRJPlUkQZFkKqvIiuQLBE0W
-         Ef1dpajxD3AT/+GJoF8MuHC5LWKmC+uabwy9H9z/DkZgI/TYzq40FI85g0KAL4v4HkoT
-         UupC3uyb7KvbfTDlJPF0D+bKO7Fmdt0H7rNFEHCqRFXgMp4ObFWekqqFcVEP4Xy2BKNi
-         J5FergGc0IGh4yauKKyHXH3lld0DZfMxw0s7xj6lcUst5C0Q5Nft2VTaTZuFe5ex5Cnz
-         pXmvqmpq+zTRi2SCE/AF1I6YsbRW9SEMSCZCuGjbQmW3sxdU0EB+mWS2kZD5MkLQw2Ua
-         K7yw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVZpnXKWm8/ch/9Fz9H3r4nqjgLJ32okQm+Q1wp24Xt9+8kXS4dBt4pDKqh86T+0qyf7DLD3o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4Tgoqby1s0YIXLt0MrAtN7AP2xDbrHTG4ivdDcBKS/tfs72B6
-	jIAHWNysQy9yQzsGZSsGgz2kh0BxouSq/40ANY/bAhSrg79oTbMm90OBPIK0VIPdRqUiK6fExOq
-	osLBLzENWZeH7UAbnlfi07Odpz4uFe6avgSWfVCpacbiB0bOWzHfHpaM8GZI=
-X-Google-Smtp-Source: AGHT+IHhzXzUmxFpN2a7S+4xTfO5tz6udl/gx+iHQbfZ9mbRbJv32etnuETAGyXGLw8MpES/tuu9m7rvRiTzifzrpnqrP4+vG2VF
+	s=arc-20240116; t=1764145008; c=relaxed/simple;
+	bh=nBYuu8mj0ALC1H9jDWA7gsnXXP84Q2XTGV0a/pFUTOM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pu+H7VMJQD4BV92UkwtuolZIH6xyTtJs7QC49HbeDRPN29djLVEg5fFs1UkwKds2zjztaMeoPEevI3C9tSC3Kp+qOJcMwqN+LGrgmGHZ42auk4s6Ncrpp1JXBMnOaqTH02bnOUyavNhLDIdm2DvZ21AxiiharZ6mWj/V5eUacEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=afRam1oi; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Reply-To:Content-ID:Content-Description;
+	bh=63dI+hYK9VK/o9qmWzGBdaZdG+IpnEG2hCQ5dItOrDg=; b=afRam1oig1D7dG8VqOnO7hSrIP
+	Q3dTjCfvYnKlptp2ZjMG0O7Ppv+Pq618otBv6ZlL47cGnIF8e+qJcZz9AePdfZfUVN4BPkkz4NQK3
+	h6V4vMfdTP1icWLSxk634ct7RVN8RWbM8bQoV4Hx4Mi7wydxD4G70xrLy8dBFw6A+SDyvmmCUmmSX
+	4/Tmc49EYHBROly+5fTFtXe2u/zI0CEmJdXAB3qSzlHjaqvEaLPgC+UWkV/OUVEa8jqrG9bzVT0cH
+	NwxPofVzFXb0c4B+LRFr4Bqe8MJs/91qWQYS9p0syZvvOiXjpvDzt4/KieY/9LncWczEklOZQqHXv
+	c4wByXAw==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <carnil@debian.org>)
+	id 1vOAhY-00440s-Vf; Wed, 26 Nov 2025 08:16:37 +0000
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 57E19BE2EE7; Wed, 26 Nov 2025 09:16:36 +0100 (CET)
+Date: Wed, 26 Nov 2025 09:16:36 +0100
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Ian MacDonald <ian@netstatz.com>, 1121032@bugs.debian.org
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Mika Westerberg <westeri@kernel.org>,
+	Yehezkel Bernat <YehezkelShB@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: Bug#1121032: net: thunderbolt: missing ndo_set_mac_address
+ breaks 802.3ad bonding
+Message-ID: <aSa3ZLvb_swDO5mQ@eldamar.lan>
+References: <CAFJzfF9N4Hak23sc-zh0jMobbkjK7rg4odhic1DQ1cC+=MoQoA@mail.gmail.com>
+ <20251121060825.GR2912318@black.igk.intel.com>
+ <176358520689.2331.14787784716487189571.reportbug@ai4.netstatz.com>
+ <CAFJzfF8aQ8KsOXTg6oaOa_Zayx=bPZtsat2h_osn8r4wyT2wOw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:198b:b0:435:a410:d8b5 with SMTP id
- e9e14a558f8ab-435b9030219mr196964365ab.1.1764144972903; Wed, 26 Nov 2025
- 00:16:12 -0800 (PST)
-Date: Wed, 26 Nov 2025 00:16:12 -0800
-In-Reply-To: <20251125224604.872351-1-victor@mojatatu.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6926b74c.a70a0220.d98e3.00cf.GAE@google.com>
-Subject: [syzbot ci] Re: net/sched: Introduce qdisc quirk_chk op
-From: syzbot ci <syzbot+ci7e35fdcdff8da55c@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stephen@networkplumber.org, victor@mojatatu.com, 
-	xiyou.wangcong@gmail.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFJzfF8aQ8KsOXTg6oaOa_Zayx=bPZtsat2h_osn8r4wyT2wOw@mail.gmail.com>
+X-Debian-User: carnil
 
-syzbot ci has tested the following series
+Hi Ian,
 
-[v2] net/sched: Introduce qdisc quirk_chk op
-https://lore.kernel.org/all/20251125224604.872351-1-victor@mojatatu.com
-* [RFC PATCH net-next v2] net/sched: Introduce qdisc quirk_chk op
+On Fri, Nov 21, 2025 at 11:50:14AM -0500, Ian MacDonald wrote:
+> On Fri, Nov 21, 2025 at 1:08 AM Mika Westerberg
+> <mika.westerberg@linux.intel.com> wrote:
+> > Okay "breaks" is probably too strong word here. It was never even supported
+> > :)
+> Agreed, let's say the "magic fades".  I am guessing the same magic
+> that allows this 0x8086 component to appear out of thin air.
+> thunderbolt 0-2: new host found, vendor=0x8086 device=0x1
+> >
+> > Can you describe what are the actual commands you run so I can try to
+> > setup on my side and see how this could be implemented?
+> 
+> Sure, first the working variant for active-backup.
+> 
+> One side shown in netplan using a single yaml file (Ubuntu 24.04 server)
+> 
+> root@ai2:~# networkctl status bond0
+> ● 3: bond0
+>                    Link File: /usr/lib/systemd/network/99-default.link
+>                 Network File: /run/systemd/network/10-netplan-bond0.network
+>                        State: routable (configured)
+>                 Online state: online
+>                         Type: bond
+>                         Kind: bond
+>                       Driver: bonding
+>             Hardware Address: 02:92:d5:a7:f4:79
+>                          MTU: 1500 (min: 68, max: 65535)
+>                        QDisc: noqueue
+> IPv6 Address Generation Mode: eui64
+>                         Mode: active-backup
+>                       Miimon: 500ms
+>                      Updelay: 0
+>                    Downdelay: 0
+>     Number of Queues (Tx/Rx): 16/16
+>             Auto negotiation: no
+>                      Address: 10.10.13.2
+>                               fe80::92:d5ff:fea7:f479
+>            Activation Policy: up
+>          Required For Online: yes
+>            DHCP6 Client DUID: DUID-EN/Vendor:0000ab11ccb509966215f387
+> 
+> Nov 21 16:10:03 ai2 systemd-networkd[720]: bond0: netdev ready
+> Nov 21 16:10:03 ai2 systemd-networkd[720]: bond0: Configuring with
+> /run/systemd/network/10-netplan-bond0.network.
+> Nov 21 16:10:03 ai2 systemd-networkd[720]: bond0: Link UP
+> Nov 21 16:10:08 ai2 systemd-networkd[720]: bond0: Gained carrier
+> Nov 21 16:10:09 ai2 systemd-networkd[720]: bond0: Gained IPv6LL
+> 
+> root@ai2:~# cat /etc/netplan/60-bonded-init.yaml
+> network:
+>   version: 2
+>   renderer: networkd
+> 
+>   ethernets:
+>     thunderbolt0:
+>       dhcp4: false
+> 
+>     thunderbolt1:
+>       dhcp4: false
+> 
+>   bonds:
+>     bond0:
+>       interfaces: [thunderbolt0, thunderbolt1]
+>       dhcp4: false
+>       addresses: [10.10.13.2/30]
+>       parameters:
+>         mode: active-backup
+>         mii-monitor-interval: 500
+> 
+> The other side using a 3 file systemd-networkd variant (using on Debian 13)
+> 
+> ai4:/etc/systemd/network# networkctl status bond0
+> ● 3: bond0
+>                  NetDev File: /etc/systemd/network/50-bond0.netdev
+>                    Link File: /usr/lib/systemd/network/99-default.link
+>                 Network File: /etc/systemd/network/53-bond0.network
+>                        State: routable (configured)
+>                 Online state: online
+>                         Type: bond
+>                         Kind: bond
+>                       Driver: bonding
+>             Hardware Address: 02:0f:03:70:86:fb
+>                          MTU: 1500 (min: 68, max: 65535)
+>                        QDisc: noqueue
+> IPv6 Address Generation Mode: eui64
+>                         Mode: active-backup
+>                       Miimon: 500ms
+>                      Updelay: 0
+>                    Downdelay: 0
+>     Number of Queues (Tx/Rx): 16/16
+>             Auto negotiation: no
+>                      Address: 10.10.13.1
+>                               fe80::f:3ff:fe70:86fb
+>            Activation Policy: up
+>          Required For Online: yes
+>           DHCPv6 Client DUID: DUID-EN/Vendor:0000ab112f49d10231f668bf
+> 
+> Nov 21 11:21:55 ai4 systemd-networkd[700]: bond0: netdev ready
+> Nov 21 11:21:55 ai4 systemd-networkd[700]: bond0: Configuring with
+> /etc/systemd/network/53-bond0.network.
+> Nov 21 11:21:55 ai4 systemd-networkd[700]: bond0: Link UP
+> Nov 21 11:22:01 ai4 systemd-networkd[700]: bond0: Gained carrier
+> Nov 21 11:22:02 ai4 systemd-networkd[700]: bond0: Gained IPv6LL
+> 
+> ai4:/etc/systemd/network# cat 50-bond0.netdev
+> # /etc/systemd/network/50-bond0.netdev
+> [NetDev]
+> Name=bond0
+> Kind=bond
+> 
+> [Bond]
+> MIIMonitorSec=0.5s
+> Mode=active-backup
+> FailOverMACPolicy=none
+> 
+> ai4:/etc/systemd/network# cat 52-thunderbolt-bond0-slaves.network
+> # /etc/systemd/network/52-thunderbolt-bond0-slaves.network
+> [Match]
+> Name=thunderbolt0 thunderbolt1
+> 
+> [Network]
+> Bond=bond0
+> 
+> ai4:/etc/systemd/network# cat 53-bond0.network
+> # /etc/systemd/network/53-bond0.network
+> [Match]
+> Name=bond0
+> 
+> [Network]
+> Address=10.10.13.1/30
+> 
+> Changing the mode to LACP/802.3ad then results in the observed mac
+> setting issues.
+> 
+> systemd-networkd/Debian Side:
+> 
+> ai4:/etc/systemd/network# cat 50-bond0.netdev
+> # /etc/systemd/network/50-bond0.netdev
+> [NetDev]
+> Name=bond0
+> Kind=bond
+> 
+> [Bond]
+> MIIMonitorSec=0.5s
+> Mode=802.3ad
+> TransmitHashPolicy=layer3+4
+> 
+> and the netplan/Ubuntu Side:
+> 
+> root@ai2:/etc/netplan# cat 60-bonded-init.yaml
+> network:
+>   version: 2
+>   renderer: networkd
+> 
+>   ethernets:
+>     thunderbolt0:
+>       dhcp4: false
+> 
+>     thunderbolt1:
+>       dhcp4: false
+> 
+>   bonds:
+>     bond0:
+>       interfaces: [thunderbolt0, thunderbolt1]
+>       dhcp4: false
+>       addresses: [10.10.13.2/30]
+>       parameters:
+>         mode: 802.3ad
+>         transmit-hash-policy: layer3+4
+>         mii-monitor-interval: 500
+> 
+> I typically reboot to apply the changes, to avoid some gaps in just
+> doing a netplan generate/apply or systemd-networkd restart, which do
+> not change the mode dynamically, as might be expected.
+> 
+> On Fri, Nov 21, 2025 at 3:11 AM Mika Westerberg
+> <mika.westerberg@linux.intel.com> wrote:
+> >
+> > Okay since the MAC address is not really being used in the USB4NET protocol
+> > it should be fine to allow it to be changed.
+> >
+> > The below allows me to change it using "ip link set" command. I wonder if
+> > you could try it with the bonding case and see it that makes any
+> > difference?
+> >
+> > diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
+> > index dcaa62377808..57b226afeb84 100644
+> > --- a/drivers/net/thunderbolt/main.c
+> > +++ b/drivers/net/thunderbolt/main.c
+> > @@ -1261,6 +1261,7 @@ static const struct net_device_ops tbnet_netdev_ops = {
+> >         .ndo_open = tbnet_open,
+> >         .ndo_stop = tbnet_stop,
+> >         .ndo_start_xmit = tbnet_start_xmit,
+> > +       .ndo_set_mac_address = eth_mac_addr,
+> >         .ndo_get_stats64 = tbnet_get_stats64,
+> >  };
+> >
+> > @@ -1281,6 +1282,9 @@ static void tbnet_generate_mac(struct net_device *dev)
+> >         hash = jhash2((u32 *)xd->local_uuid, 4, hash);
+> >         addr[5] = hash & 0xff;
+> >         eth_hw_addr_set(dev, addr);
+> > +
+> > +       /* Allow changing it if needed */
+> > +       dev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+> >  }
+> >
+> >  static int tbnet_probe(struct tb_service *svc, const struct tb_service_id *id)
+> 
+> Sure, I can give this a shot this weekend
 
-and found the following issue:
-general protection fault in netem_quirk_chk
+Where you able to test the proposed change?
 
-Full report is available here:
-https://ci.syzbot.org/series/aa7207e5-00c6-4c9d-b330-9b2041104daf
-
-***
-
-general protection fault in netem_quirk_chk
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      e2c20036a8879476c88002730d8a27f4e3c32d4b
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/bbda2e20-2099-41bd-a7d4-c298c61ed2f5/config
-C repro:   https://ci.syzbot.org/findings/21f8d5f6-c5af-4e81-a8d5-56f5febd6f03/c_repro
-syz repro: https://ci.syzbot.org/findings/21f8d5f6-c5af-4e81-a8d5-56f5febd6f03/syz_repro
-
-netlink: 28 bytes leftover after parsing attributes in process `syz.0.17'.
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 UID: 0 PID: 5961 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:nla_len include/net/netlink.h:1296 [inline]
-RIP: 0010:parse_attr net/sched/sch_netem.c:960 [inline]
-RIP: 0010:netem_quirk_chk+0x8a/0x740 net/sched/sch_netem.c:990
-Code: 7c 24 60 49 c1 ef 03 43 c7 04 27 f1 f1 f1 f1 43 c7 44 27 13 f3 f3 f3 f3 43 c6 44 27 17 f3 e8 8d 68 67 f8 48 89 d8 48 c1 e8 03 <42> 0f b6 04 20 84 c0 0f 85 32 06 00 00 0f b7 03 83 c0 fc 44 0f b7
-RSP: 0018:ffffc900032c7140 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88810ff73a00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8881b82ce000
-RBP: ffffc900032c72b8 R08: ffff88810ff73a00 R09: 0000000000000002
-R10: 00000000fffffff1 R11: ffffffff89589ab0 R12: dffffc0000000000
-R13: ffffffff89589ab0 R14: ffffffff8f7d9580 R15: 1ffff92000658e34
-FS:  000055558efa7500(0000) GS:ffff8882a9f35000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000000100 CR3: 0000000114760000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- qdisc_create+0x73f/0xf10 net/sched/sch_api.c:1319
- __tc_modify_qdisc net/sched/sch_api.c:1765 [inline]
- tc_modify_qdisc+0x1582/0x2140 net/sched/sch_api.c:1829
- rtnetlink_rcv_msg+0x77c/0xb70 net/core/rtnetlink.c:6967
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:742
- ____sys_sendmsg+0x505/0x830 net/socket.c:2630
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
- __sys_sendmsg net/socket.c:2716 [inline]
- __do_sys_sendmsg net/socket.c:2721 [inline]
- __se_sys_sendmsg net/socket.c:2719 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1beb98f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd1afcc778 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f1bebbe5fa0 RCX: 00007f1beb98f749
-RDX: 0000000000000000 RSI: 0000200000000000 RDI: 0000000000000003
-RBP: 00007f1beba13f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f1bebbe5fa0 R14: 00007f1bebbe5fa0 R15: 0000000000000003
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:nla_len include/net/netlink.h:1296 [inline]
-RIP: 0010:parse_attr net/sched/sch_netem.c:960 [inline]
-RIP: 0010:netem_quirk_chk+0x8a/0x740 net/sched/sch_netem.c:990
-Code: 7c 24 60 49 c1 ef 03 43 c7 04 27 f1 f1 f1 f1 43 c7 44 27 13 f3 f3 f3 f3 43 c6 44 27 17 f3 e8 8d 68 67 f8 48 89 d8 48 c1 e8 03 <42> 0f b6 04 20 84 c0 0f 85 32 06 00 00 0f b7 03 83 c0 fc 44 0f b7
-RSP: 0018:ffffc900032c7140 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88810ff73a00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8881b82ce000
-RBP: ffffc900032c72b8 R08: ffff88810ff73a00 R09: 0000000000000002
-R10: 00000000fffffff1 R11: ffffffff89589ab0 R12: dffffc0000000000
-R13: ffffffff89589ab0 R14: ffffffff8f7d9580 R15: 1ffff92000658e34
-FS:  000055558efa7500(0000) GS:ffff8882a9f35000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000000100 CR3: 0000000114760000 CR4: 00000000000006f0
-----------------
-Code disassembly (best guess), 1 bytes skipped:
-   0:	24 60                	and    $0x60,%al
-   2:	49 c1 ef 03          	shr    $0x3,%r15
-   6:	43 c7 04 27 f1 f1 f1 	movl   $0xf1f1f1f1,(%r15,%r12,1)
-   d:	f1
-   e:	43 c7 44 27 13 f3 f3 	movl   $0xf3f3f3f3,0x13(%r15,%r12,1)
-  15:	f3 f3
-  17:	43 c6 44 27 17 f3    	movb   $0xf3,0x17(%r15,%r12,1)
-  1d:	e8 8d 68 67 f8       	call   0xf86768af
-  22:	48 89 d8             	mov    %rbx,%rax
-  25:	48 c1 e8 03          	shr    $0x3,%rax
-* 29:	42 0f b6 04 20       	movzbl (%rax,%r12,1),%eax <-- trapping instruction
-  2e:	84 c0                	test   %al,%al
-  30:	0f 85 32 06 00 00    	jne    0x668
-  36:	0f b7 03             	movzwl (%rbx),%eax
-  39:	83 c0 fc             	add    $0xfffffffc,%eax
-  3c:	44                   	rex.R
-  3d:	0f                   	.byte 0xf
-  3e:	b7                   	.byte 0xb7
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+Regards,
+Salvatore
 
