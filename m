@@ -1,83 +1,66 @@
-Return-Path: <netdev+bounces-241866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E80A3C8995F
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 12:46:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35077C899B6
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 12:55:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D997E4E20AA
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 11:46:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DC023B4EC3
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 11:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F25324B34;
-	Wed, 26 Nov 2025 11:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="k+oI7hx2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9595A3254A5;
+	Wed, 26 Nov 2025 11:55:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from gnu.wildebeest.org (gnu.wildebeest.org [45.83.234.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7886320A0D
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 11:46:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CF23246EA;
+	Wed, 26 Nov 2025 11:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.83.234.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764157605; cv=none; b=u8DjPPZPuA+tMFHIYxlh4kX3biQqisNPdPHtpfDVmmvEHFeixOAOo88n3chrYCSmrHJSkE1G4CtwMGfGLqPPHNxkBTm4Hag1YqveT4FTb0LRGsPPWrZRWye+TCYgg/F87Yus/LGlA9xIRtZpDq/eW2pWbuvYH+MKSEWOuLyxQEo=
+	t=1764158130; cv=none; b=RSz3LWXIpsp3Sqd9/hFSSai9Pat8HmJAgiOuSYORvG9BN1BeCv4njRw/2eKeVUq0EfUaz6O6wb6XVQH2oQ2hbXEn5jqzN1oPyaxFkfKjysiUuTkXuAVANT/Rf4AgwcKRNIMn+pzCwlnZQrQ7KjTmUUrt5DmNPk40h5vN/ozTblI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764157605; c=relaxed/simple;
-	bh=4Eyv+Yv5XInFX+7bj1wjMfGMu8GrQe45JPpVsoZ8RHg=;
+	s=arc-20240116; t=1764158130; c=relaxed/simple;
+	bh=mAzzMf4sOW+uxqfTrdpo0kgUwsdMto751Gn6hAWJ4A4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cqFuN+HABJ8Xc3SiKn0NOe22AVxanX9xUCf0A2L08NYW7CQnp32R6hunNEyoCE+nFXLl3bITcjQ+XHEdWYbfKMPzl7jvoxrenfs8+IBTo6pvroTCHZkU5FUm8VP1mIYzyMkm9GZvpyqhxb20pGsbnCZ5a6BEF3uynUkBhAewQW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=k+oI7hx2; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=idZH2h/5MOn2BpvO2NsaMW9MH0PQn/xXe34joZcJV90=; b=k+oI7hx2JT1gTwNlxw/iufN1GT
-	7bt0/SdgGFl5jlQEdkfaSucsJojlmITuzJwAn229N3JVCTWmhCnMfSZPeeh/ccu5uC9qEEcc8MXLp
-	7FjQvYmR5gJQeJ6crmXSOMbMcKuRcuOqXqnhiQffmCeEYUsdeRF8AKlMEbUZyWpx1NWudpsImv9yg
-	USevgdzZANgGK9MVBYLJwilcW/iTX37QoMpWvidMCi2rIsFEcIp1cM+9I1zcRGjMVf4VbaCr+J9MN
-	eBrKYxh2q/KGiFxSfEE6/fKErhEuNP/VqFGrhyMpjesHyJH9K8omSJQozflB7ZRiHIbtn8SR7lHUP
-	31XfM12w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41852)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vODyj-000000003vq-3gDf;
-	Wed, 26 Nov 2025 11:46:33 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vODye-000000001gr-06HK;
-	Wed, 26 Nov 2025 11:46:28 +0000
-Date: Wed, 26 Nov 2025 11:46:27 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=vAf2k3u00NA55UntB1jaUS69H8rzSAifa/YfZ6JpKjDlLHxHX2ENgtJP7sxxNQurBMcNgyPr2/zP2OVojoEKjB5OBciVQqCWTeazDhPpjs/1sl3wKSjq7oSjBNmj8COHIa9cSXH0G5Q1NJQ7VMDWHyGIIsfBHRNBVWmfing3+kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=klomp.org; spf=pass smtp.mailfrom=klomp.org; arc=none smtp.client-ip=45.83.234.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=klomp.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=klomp.org
+Received: by gnu.wildebeest.org (Postfix, from userid 1000)
+	id 7A09F3141369; Wed, 26 Nov 2025 12:47:23 +0100 (CET)
+Date: Wed, 26 Nov 2025 12:47:23 +0100
+From: Mark Wielaard <mark@klomp.org>
+To: strace development discussions <strace-devel@lists.strace.io>
+Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Aleksa Sarai <cyphar@cyphar.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Furong Xu <0x1207@gmail.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Ong Boon Leong <boon.leong.ong@intel.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Jochen Henneberg <jh@henneberg-systemdesign.com>,
-	Piotr Raczynski <piotr.raczynski@intel.com>
-Subject: Re: [PATCH net-next] net: stmmac: fix rx limit check in
- stmmac_rx_zc()
-Message-ID: <aSbok34XaG1DrlKp@shell.armlinux.org.uk>
-References: <20251126104327.175590-1-aleksei.kodanev@bell-sw.com>
+	Simon Horman <horms@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+	netdev@vger.kernel.org, libc-alpha@sourceware.org,
+	"Dmitry V. Levin" <ldv@strace.io>,
+	address-sanitizer <address-sanitizer@googlegroups.com>
+Subject: Re: Stability of ioctl constants in the UAPI (Re: [PATCH 01/32]
+ pidfs: validate extensible ioctls)
+Message-ID: <20251126114723.GL11602@gnu.wildebeest.org>
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org>
+ <lhu7bvd6u03.fsf_-_@oldenburg.str.redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,71 +69,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251126104327.175590-1-aleksei.kodanev@bell-sw.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <lhu7bvd6u03.fsf_-_@oldenburg.str.redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, Nov 26, 2025 at 10:43:27AM +0000, Alexey Kodanev wrote:
-> The extra "count >= limit" check in stmmac_rx_zc() is redundant and
-> has no effect because the value of "count" doesn't change after the
-> while condition at this point.
+Hi,
+
+On Wed, Nov 26, 2025 at 10:08:44AM +0100, Florian Weimer wrote:
+> Is this really the right direction?  This implies that the ioctl
+> constants change as the structs get extended.  At present, this impacts
+> struct pidfd_info and PIDFD_GET_INFO.
 > 
-> However, it can change after "read_again:" label:
+> I think this is a deparature from the previous design, where (low-level)
+> userspace did not have not worry about the internal structure of ioctl
+> commands and could treat them as opaque bit patterns.  With the new
+> approach, we have to dissect some of the commands in the same way
+> extensible_ioctl_valid does it above.
 > 
->         while (count < limit) {
->             ...
+> So far, this impacts glibc ABI tests.  Looking at the strace sources, it
+> doesn't look to me as if the ioctl handler is prepared to deal with this
+> situation, either, because it uses the full ioctl command for lookups.
 > 
->             if (count >= limit)
->                 break;
->     read_again:
->             ...
->             /* XSK pool expects RX frame 1:1 mapped to XSK buffer */
->             if (likely(status & rx_not_ls)) {
->                 xsk_buff_free(buf->xdp);
->                 buf->xdp = NULL;
->                 dirty++;
->                 count++;
->                 goto read_again;
->             }
->             ...
-> 
-> This patch addresses the same issue previously resolved in stmmac_rx()
-> by commit fa02de9e7588 ("net: stmmac: fix rx budget limit check").
-> The fix is the same: move the check after the label to ensure that it
-> bounds the goto loop.
-> 
-> Detected using the static analysis tool - Svace.
-> Fixes: bba2556efad6 ("net: stmmac: Enable RX via AF_XDP zero-copy")
-> Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
-> ---
-> 
-> After creating the patch, I also found the previous attempt to fix this issue
-> from 2023, but I'm not sure what went wrong or why it wasn't applied:
-> https://lore.kernel.org/netdev/ZBRd2HyZdz52eXyz@nimitz/
+> The sanitizers could implement generic ioctl checking with the embedded
+> size information in the ioctl command, but the current code structure is
+> not set up to handle this because it's indexed by the full ioctl
+> command, not the type.  I think in some cases, the size is required to
+> disambiguate ioctl commands because the type field is not unique across
+> devices.  In some cases, the sanitizers would have to know the exact
+> command (not just the size), to validate points embedded in the struct
+> passed to the ioctl.  So I don't think changing ioctl constants when
+> extensible structs change is obviously beneficial to the sanitizers,
+> either.
 
-It was because:
+Same for valgrind memcheck handling of ioctls.
 
-https://lore.kernel.org/netdev/871qli0wap.fsf@henneberg-systemdesign.com/
+> I would prefer if the ioctl commands could be frozen and decoupled from
+> the structs.  As far as I understand it, there is no requirement that
+> the embedded size matches what the kernel deals with.
 
-indicated that the author was going to do further work on the patchset,
-so the patch submission was marked as "Changes Requested":
+Yes please.
 
-https://patchwork.kernel.org/project/netdevbpf/list/?series=730639&state=*
+Thanks,
 
-My guess is the author never came back with any patches.
-
-netdev is based on patchwork, which means once a patch series has been
-marked in such a way that it isn't going to be applied, it won't get
-looked at again, and it's up to the author to resubmit. If the author
-doesn't resubmit, no action will happens, especially for a driver such
-as stmmac which doesn't have a maintainer.
-
-I think this is a safe change.
-
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Thanks!
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Mark
 
