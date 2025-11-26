@@ -1,178 +1,95 @@
-Return-Path: <netdev+bounces-242099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A0EC8C3CF
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 23:43:29 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13CA1C8C461
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 00:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F7B83A95F7
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 22:43:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AF1D634E49A
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 23:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBFD533F8B3;
-	Wed, 26 Nov 2025 22:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE892DC350;
+	Wed, 26 Nov 2025 23:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="j30qKAuC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ritNPALR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10627.protonmail.ch (mail-10627.protonmail.ch [79.135.106.27])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D46E2FBDFF
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 22:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B750218845;
+	Wed, 26 Nov 2025 23:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764197005; cv=none; b=j+XXsfojnepT4IyrYQgbiXQi+W+jw7CMUECHIlhdoBjsRvfbCunH7QcxD9xaUvkf159+rvQRSS3sTMnbkib8xuqrOUcH+xrAlY5gpLUqefX21KePkwkSfUucR53c71sDSCfQIxzctm3ilT0vjiO7pAu4Y9x285m69nFBz91xBNE=
+	t=1764198045; cv=none; b=gWiDRTaAMVJy0OYwKgOITkqI/KQQJtzkWOKTnL1YcE2tQd1t1ceQErkpg/H11g2Mnn+5S0m4b4xpVF9HHjlg3SXN/2b6snPY2JUmmYRjgpf0EcAGB3tv7Y7E0Conl3j4K2b3YvrTW/yUpMDJ5NEd1j2kZCO9Vs0EkVRcO5jFPd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764197005; c=relaxed/simple;
-	bh=Gl3448YDQhHub9agEbGREFi6nCVi0ZcOAklK+F9xn/Y=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ww3UXldLdf4dbUUFFTCfKUh2WEJUF/9qW/Or32K4CkVktKxvWsOR7Pgb4JssU/ME7i0LTcl2FORR4Vt7hle5AcaCygoIJQWrVIba8Hr4hLdggcdVt7ODivXWG4py9sLhjnFC3bWWYC8M7AMbMyn1Z88C7mxjC/u9WZd9PQDDvYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=j30qKAuC; arc=none smtp.client-ip=79.135.106.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail2; t=1764196994; x=1764456194;
-	bh=Gl3448YDQhHub9agEbGREFi6nCVi0ZcOAklK+F9xn/Y=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=j30qKAuC5xgVt0DNW5/ddltu0w+VETRNd8PsxrvmyBE76YH3LOLQp8XN/oTWCj0pt
-	 0nR1O/NatNWRgTFFGjQ1WrjNsJkQtiNQUtg+fnPFrpUQpz7J9QymPXE+mBspRzuMww
-	 xbv7dPyGfSAbhTlc3sHLIPbi+C3laXAUqZBDOXUACRgyvLksT+AdRkUhsoP0/kQ5fg
-	 DNINE/wlPKYYjdreoqY1fe8D5VS76XOvk2T2zkoKt7R2T/5GZPe0G1otadD9JlBhOG
-	 KV3BIMCoKDibMh1GMFCX+kSlCg3pWm1gkMs6kZLAD+RLmvXRe8g7WR5RXGpqmjicqS
-	 zNiC+Z3nMWAdg==
-Date: Wed, 26 Nov 2025 22:43:07 +0000
-To: Cong Wang <xiyou.wangcong@gmail.com>
-From: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org, kuba@kernel.org, Savino Dicanosa <savy@syst3mfailure.io>, Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [Patch net v5 3/9] net_sched: Implement the right netem duplication behavior
-Message-ID: <JgkxCYimi4ZuZPHfXoMUgiecvZ0AKYxbIhqPQZwXcE4yC9nYnfproH5yrmQETZUo55NOjj5Q9_bOFJbWI351PFvc9wv3xiY_0Ic9AAsO1Ak=@willsroot.io>
-In-Reply-To: <aSd6dM38CXchhmJd@pop-os.localdomain>
-References: <20251126195244.88124-1-xiyou.wangcong@gmail.com> <20251126195244.88124-4-xiyou.wangcong@gmail.com> <dEmtK-Tj-bnNJVo0mNwP1vJ1cj9g0hqnoi-0HJdZeTittbRmmzE4wBRIjapBAFQNZDWgE4hcR27UrTSuiGj_-yRFntfX4Tuv4QP6asVecZQ=@willsroot.io> <aSd6dM38CXchhmJd@pop-os.localdomain>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 9ee82c9b81333d0e6ed13d86c732ca7b65c22734
+	s=arc-20240116; t=1764198045; c=relaxed/simple;
+	bh=7FXfQI/AZWdV4SZylJTzGl+kOWFrh8wKOPRgk71eBWg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Z412tezgh80f9NNTzNn/aoFx+60gOEhG/ZHSSaZPSqPZqn+UI3r52E2G4AWTyGZ+0kRYpQKZv4T79WW4h89qIiOkjKjKvIkyNy/C2uRWJ/J8el7ONOPZB2v5JZr5nDupfvttuGyAjJwaQ7hb1rYm2efz/k3ff0DRudu1OdAH39c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ritNPALR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3921C4CEF7;
+	Wed, 26 Nov 2025 23:00:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764198045;
+	bh=7FXfQI/AZWdV4SZylJTzGl+kOWFrh8wKOPRgk71eBWg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ritNPALRQD2PVOcu5YJ3n6Rt5W8boPORHPYaviwRC2my89qhXPhIH2u+7KdmNaps7
+	 A9tPWLX5qX+oSRrjgD5RWi6hzFKxcPebWha3vicd8aAZIciewu73y6zJRUB6sKIkqZ
+	 NyKU/Me5NovzeoBoQsx1SK+UOQIuTv5x3/FxgaHW6l+YtWL8iz5zgIk3mieH1RZ+IG
+	 UGouZB7HCWF1DUjnAdhzGshTAFJ95sarCUDlFdqMnSYnEkk1oCt9J/WLKe8qAwEkVC
+	 Ra1bbG0PnJgnuXccpHvuzHiNMB0Zr16fibk/WStAvcvaD8jUlARk6gG/0SnK41Top2
+	 p+9Trxnqs3kKA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB07A380CEF6;
+	Wed, 26 Nov 2025 23:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net V2] vhost: rewind next_avail_head while discarding
+ descriptors
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176419800676.1877685.4431775256421273877.git-patchwork-notify@kernel.org>
+Date: Wed, 26 Nov 2025 23:00:06 +0000
+References: <20251120022950.10117-1-jasowang@redhat.com>
+In-Reply-To: <20251120022950.10117-1-jasowang@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ stable@vger.kernel.org
 
-On Wednesday, November 26th, 2025 at 10:08 PM, Cong Wang <xiyou.wangcong@gm=
-ail.com> wrote:
+Hello:
 
->=20
->=20
-> Hi William,
->=20
-> On Wed, Nov 26, 2025 at 08:30:21PM +0000, William Liu wrote:
->=20
-> > On Wednesday, November 26th, 2025 at 7:53 PM, Cong Wang xiyou.wangcong@=
-gmail.com wrote:
-> >=20
-> > > In the old behavior, duplicated packets were sent back to the root qd=
-isc,
-> > > which could create dangerous infinite loops in hierarchical setups -
-> > > imagine a scenario where each level of a multi-stage netem hierarchy =
-kept
-> > > feeding duplicates back to the top, potentially causing system instab=
-ility
-> > > or resource exhaustion.
-> > >=20
-> > > The new behavior elegantly solves this by enqueueing duplicates to th=
-e same
-> > > qdisc that created them, ensuring that packet duplication occurs exac=
-tly
-> > > once per netem stage in a controlled, predictable manner. This change
-> > > enables users to safely construct complex network emulation scenarios=
- using
-> > > netem hierarchies (like the 4x multiplication demonstrated in testing=
-)
-> > > without worrying about runaway packet generation, while still preserv=
-ing
-> > > the intended duplication effects.
-> > >=20
-> > > Another advantage of this approach is that it eliminates the enqueue =
-reentrant
-> > > behaviour which triggered many vulnerabilities. See the last patch in=
- this
-> > > patchset which updates the test cases for such vulnerabilities.
-> > >=20
-> > > Now users can confidently chain multiple netem qdiscs together to ach=
-ieve
-> > > sophisticated network impairment combinations, knowing that each stag=
-e will
-> > > apply its effects exactly once to the packet flow, making network tes=
-ting
-> > > scenarios more reliable and results more deterministic.
->=20
->=20
->=20
-> Thanks for your quick response.
->=20
-> > Cong, this approach has an issue we previously raised - please refer to=
- [2]. I re-posted the summary of the issues with the various other approach=
-es in [3] just 2 days ago in a thread with you on it. As both Jamal and Ste=
-phen have pointed out, this breaks expected user behavior as well, and the =
-enqueuing at root was done for the sake of proper accounting and rate limit=
- semantics. You pointed out that this doesn't violate manpage semantics, bu=
-t this is still changing long-term user behavior. It doesn't make sense imo=
- to change one longtime user behavior for another.
->=20
->=20
-> If you have a better standard than man page, please kindly point it out.
-> I am happy to follow.
->=20
-> I think we both agree it should not be either my standard or anyone's
-> personal stardard, this is why I use man page as a neutral and reasonable
-> stardard.
->=20
-> If you disagree man page is reasonable, please offer a better one for me
-> to follow. I am very open, I just simply don't know anything better than
-> man page.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I agree that your change does not violate manpage semantics. This was the o=
-riginal fix I suggested from the beginning, though other maintainers pointe=
-d out the issue that I am relaying.
+On Thu, 20 Nov 2025 10:29:50 +0800 you wrote:
+> When discarding descriptors with IN_ORDER, we should rewind
+> next_avail_head otherwise it would run out of sync with
+> last_avail_idx. This would cause driver to report
+> "id X is not a head".
+> 
+> Fixing this by returning the number of descriptors that is used for
+> each buffer via vhost_get_vq_desc_n() so caller can use the value
+> while discarding descriptors.
+> 
+> [...]
 
-As I wrote in my previous email, "as both Jamal and Stephen have pointed ou=
-t, this breaks expected user behavior as well, and the enqueuing at root wa=
-s done for the sake of proper accounting and rate limit semantics."
+Here is the summary with links:
+  - [net,V2] vhost: rewind next_avail_head while discarding descriptors
+    https://git.kernel.org/netdev/net/c/779bcdd4b9ae
 
-The previous netem fix changed user behavior that did not violate the manpa=
-ge (to my knowledge). This one is the same - you are fixing one user behavi=
-or break with another. Both are cases of Hyrum's law.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
->=20
-> Sorry for my ignorance. Please help me out. :)
->=20
-> > Jamal suggested a really reasonable fix with tc_skb_ext - can we please=
- take a look at its soundness and attempt that approach? No user behavior w=
-ould be affected in that case.
->=20
->=20
-> As I already explained, tc_skb_ext is for cross-layer, in this specific
-> case, we don't cross layers, the skb is immediately queued to the same
-> layer before others.
->=20
-> Could you please kindly explain why you still believe tc_skb_ext is
-> better? I am very open to your thoughts, please enlighten me here.
->=20
 
-Yes, if we re-enqueue the packet to the same netem qdisc, we don't need thi=
-s, but that changes expected user behavior and may introduce additional cor=
-rectness issues pointed out above.
-
-If understood Jamal correctly, tc_skb_ext allows us to maintain both the re=
--entrant at root behavior AND prevent DOS.
-
-I hope you can understand I am trying to relay problems other maintainers h=
-ave pointed out repeatedly; I personally don't have a strong stake in this.
-
-> Thanks,
-> Cong
 
