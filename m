@@ -1,194 +1,109 @@
-Return-Path: <netdev+bounces-241813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD2D4C88AD5
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:37:47 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C99C88AF3
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:39:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A4E6D4E440F
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:37:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 47220356CCC
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:38:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CC931961A;
-	Wed, 26 Nov 2025 08:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5982A31A7F8;
+	Wed, 26 Nov 2025 08:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XOhfm09c"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30AA4316904
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 08:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B520D308F3E
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 08:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764146237; cv=none; b=p7BRm/XPrEJ5e6UmFKuwVOIScrBsfP0SuQ3vX3RFx4aHZaBKMEFPm9fp3e5DfwzkTbNcpnT4rRn2LQeue4G/v5RmsLjy3+kwyla+XTWfREN8MNqqGXhvHB+zvSU5bEwHLMSdV13CRJNF6ncQ/aoYdP+NJ0gmIDBx137xR1iqKNw=
+	t=1764146252; cv=none; b=E63ReVZrItzeLGUpE5AmseK5SWsRBrQInZaajd2f7dwWdpQjdt+/XU1AO48FqF2jHKIBnrP9TRzTTN+AWa0GtoR2FWzqH0xoZDv2DXNEOHQoief6MUCCZVomhipYJIaznbCOvEmFCExdvd3DbwgzPI8u8WLCR4ojB0mMjOcfJfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764146237; c=relaxed/simple;
-	bh=S+o6SzKATr7a5JhJcLGiXI0kBOidCK6+vU+eMgTdkMc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y4TcuDpFZfdT/R7ph5TxtFuUBqKWSJqX8NrYzclo2QLRkM/emOu8GGKVpZPGvf/otEw6AWwYHEsTAXsWvIH729ySA0cmErrreWVyuIe92fYbh6GLe40Ny1gNnqKfVeZYs3J8zdPLy7oj7Lizf8JLeTL9YaHOhVxX3PXxeYFq0vU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vOB14-0005OI-0w; Wed, 26 Nov 2025 09:36:46 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vOB10-002ZTc-11;
-	Wed, 26 Nov 2025 09:36:42 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vOB10-007jqy-0U;
-	Wed, 26 Nov 2025 09:36:42 +0100
-Date: Wed, 26 Nov 2025 09:36:42 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Eric Dumazet <edumazet@google.com>, Rob Herring <robh@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Lukasz Majewski <lukma@denx.de>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Divya.Koppera@microchip.com,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
-	Sabrina Dubroca <sd@queasysnail.net>, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v8 1/1] Documentation: net: add flow control
- guide and document ethtool API
-Message-ID: <aSa8Gkl1AP1U2C9j@pengutronix.de>
-References: <20251119140318.2035340-1-o.rempel@pengutronix.de>
- <20251125181957.5b61bdb3@kernel.org>
+	s=arc-20240116; t=1764146252; c=relaxed/simple;
+	bh=L6d7JX2NxpV70mdYJdWuFktVN1TIheRJ7MTJjYmywf8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AotTmmi/h098lmpXsqNwJmYZhpiTdVtjwcBkAevQ4YCn7vXOGWRPJoP21Gq6RTBlre0adaLryHRz71TmJ7MNUTWZFS3Rho081sE7h+xU5WrZlKRPxRKySUJaLvEpQNZa6o0Y2zh5VcoakyfGj75jcSXqS6CbaEKouvTJKfRFNTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XOhfm09c; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764146249;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=WfsOQjgF7/xWI1YakLoR+iRc3/E3a/SKTOgGp8KeRUE=;
+	b=XOhfm09c43t+u7lZgxUwtvT9AdiUJIx7zPhyxqAJp3iDqgUBbX9pGZ34QAnhI0qS9QBb1v
+	qBXmsVDq3B734pry2CcK6295MSFaJh+tZf2KJMDCLodTA1/IsT0x196Ia8yVrntftJbHv+
+	7JZD3DhfZux8jSZq9WIoCdzSFzmMODE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-681-Lkow2B6ZOseDFBbYdfvDYw-1; Wed,
+ 26 Nov 2025 03:37:26 -0500
+X-MC-Unique: Lkow2B6ZOseDFBbYdfvDYw-1
+X-Mimecast-MFC-AGG-ID: Lkow2B6ZOseDFBbYdfvDYw_1764146244
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A053B19560A7;
+	Wed, 26 Nov 2025 08:37:24 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.72.116.147])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7F59918004A3;
+	Wed, 26 Nov 2025 08:37:18 +0000 (UTC)
+From: Yumei Huang <yuhuang@redhat.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: sbrivio@redhat.com,
+	david@gibson.dropbear.id.au,
+	yuhuang@redhat.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Subject: [PATCH] ipv6: preserve insertion order for same-scope addresses
+Date: Wed, 26 Nov 2025 16:37:14 +0800
+Message-ID: <20251126083714.115172-1-yuhuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251125181957.5b61bdb3@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Tue, Nov 25, 2025 at 06:19:57PM -0800, Jakub Kicinski wrote:
-> On Wed, 19 Nov 2025 15:03:17 +0100 Oleksij Rempel wrote:
-> > +Kernel Policy: "Set and Trust"
-> > +==============================
-> > +
-> > +The ethtool pause API is defined as a **wish policy** for
-> > +IEEE 802.3 link-wide PAUSE only. User requests express the preferred
-> > +configuration, but drivers may reject unsupported combinations and it
-> > +may not be possible to apply a request in all link states.
-> > +
-> > +Key constraints:
-> > +
-> > +- Link-wide PAUSE is not valid on half-duplex links.
-> > +- Link-wide PAUSE cannot be used together with Priority-based Flow Control
-> > +  (PFC, IEEE 802.1Q Clause 36).
-> > +- Drivers may require generic link autonegotiation to be enabled before
-> > +  allowing Pause Autonegotiation to be enabled.
-> > +
-> > +Because of these constraints, the configuration applied to the MAC
-> > +may differ from the user request depending on the active link mode.
-> > +
-> > +Implications for userspace:
-> > +
-> > +1. Set once (the "wish"): the requested Rx/Tx PAUSE policy is
-> > +   remembered even if it cannot be applied immediately.
-> > +2. Applied conditionally: when the link comes up, the kernel enables
-> > +   PAUSE only if the active mode allows it.
-> 
-> This section is quite confusing. Documenting the constrains make sense
-> but it seems like this mostly applies to autoneg on. Without really
-> saying so. Plus the get behavior.. see below..
-> 
-> > + * @get_pauseparam: Report the configured policy for link-wide PAUSE
-> > + *      (IEEE 802.3 Annex 31B). Drivers must fill struct ethtool_pauseparam
-> > + *      such that:
-> > + *      @autoneg:
-> > + *              This refers to **Pause Autoneg** (IEEE 802.3 Annex 31B) only
-> > + *              and is part of the link autonegotiation process.
-> > + *              true  -> the device follows the negotiated result of pause
-> > + *                       autonegotiation (Pause/Asym);
-> > + *              false -> the device uses a forced MAC state independent of
-> > + *                       negotiation.
-> > + *      @rx_pause/@tx_pause:
-> > + *              represent the desired policy (preferred configuration).
-> > + *              In autoneg mode they describe what is to be advertised;
-> > + *              in forced mode they describe the MAC state to apply.
-> 
-> How is the user supposed to know what ended up getting configured?
+IPv6 addresses with the same scope were returned in reverse insertion
+order, unlike IPv4. For example, when adding a -> b -> c, the list was
+reported as c -> b -> a, while IPv4 preserved the original order.
 
-My current understanding is that get_pauseparam() is mainly a
-configuration API. It seems to be designed symmetric to
-set_pauseparam(): it reports the requested policy (autoneg flag and
-rx/tx pause), not the resolved MAC state.
+This patch aligns IPv6 address ordering with IPv4 for consistency.
 
-In autoneg mode this means the user sees what we intend to advertise
-or force, but not necessarily what the MAC actually ended up with
-after resolution.
+Signed-off-by: Yumei Huang <yuhuang@redhat.com>
+---
+ net/ipv6/addrconf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The ethtool userspace tool tries to fill this gap by showing
-"RX negotiated" and "TX negotiated" fields, for example:
-
-  Pause parameters for lan1:
-    Autonegotiate:  on
-    RX:             off
-    TX:             off
-    RX negotiated:  on
-    TX negotiated:  on
-
-As far as I can see, these "negotiated" values are not read from hardware or
-kernel. They are guessed in userspace from the local and link partner
-advertisements, assuming that the kernel follows the same pause resolution
-rules as ethtool does. If the kernel or hardware behaves differently, these
-values can be wrong.
-
-So, with the current API, the user gets:
-- the configured policy via get_pauseparam(), and
-- an ethtool-side guess of the resolved state via
-  "RX negotiated"/"TX negotiated",
-
-> Why do we need to configure autoneg via this API and not link modes directly?
-
-I am not aware of a clear reason. This documentation aims to describe
-the current behavior and capture the rationale of the existing API.
-
-Configuring it via link modes directly would likely resolve some of this
-confusion, but for now we focus on documenting how the current API is
-expected to behave.
-
-> > + *      Drivers should reject a non-zero setting of @autoneg when
-> > + *      autonegotiation is disabled (or not supported) for the link.
-> 
-> I think this belong in the @set doc below..
-
-ack
-
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 40e9c336f6c5..ca998bf46863 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -1013,7 +1013,7 @@ ipv6_link_dev_addr(struct inet6_dev *idev, struct inet6_ifaddr *ifp)
+ 	list_for_each(p, &idev->addr_list) {
+ 		struct inet6_ifaddr *ifa
+ 			= list_entry(p, struct inet6_ifaddr, if_list);
+-		if (ifp_scope >= ipv6_addr_src_scope(&ifa->addr))
++		if (ifp_scope > ipv6_addr_src_scope(&ifa->addr))
+ 			break;
+ 	}
+ 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.51.1
+
 
