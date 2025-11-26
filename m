@@ -1,200 +1,96 @@
-Return-Path: <netdev+bounces-241981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55E0DC8B587
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:52:52 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 029EAC8B599
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:53:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44A503BB4CB
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 17:47:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 40E1A4E69AE
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 17:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C5E33EAE7;
-	Wed, 26 Nov 2025 17:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46CE278165;
+	Wed, 26 Nov 2025 17:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kznkas2i"
+	dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b="sMJMDH3/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender-of-o58.zoho.eu (sender-of-o58.zoho.eu [136.143.169.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76703112B0
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 17:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764179060; cv=none; b=SuOztkBJKRnDNlu35c0YsWynU3Xe5M7mkwlsAqF9NFv7Tq04hJ6Y4HiCVzykgj8fPP/8IOnS30VHYQngXgzlA5WXvEID60kDpMlFVT9k4PBLoE2M2z8RRQBdtDgrbgiVt/MI2yQ1kZ86J88sOwoXowkdQ96RRNmEChbmbEBDmxk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764179060; c=relaxed/simple;
-	bh=DZmAfxsJe8NvUJeI6S9zqA0WF6pPJRkMTm7r9xT3UrQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cK7YuvY7ntO3WDxXY/R9DGVxOEyJb5dVbF1sGLrYkzuUhGkcxncjeSNnVyc/R1FkcF1c60i40SwQdeTw9yRbSR218Uqrw1HsuXlvm2cqz3opWSAb1QSlYXDGsULZcUV7NlPKe82K5faELT/jcoi4NqDnFlB0nF4uDYHCfgkpN5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kznkas2i; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-42b32ff5d10so743206f8f.1
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 09:44:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764179057; x=1764783857; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PJtndxdQkYWzvy6kDqOv7kQqo1yR4d6wvaKa4OAP+Cc=;
-        b=kznkas2iAfgrVPA3BtK/rYtQI3tQp/qqnbkmrolnZncAiTLFIy6RJUwKKFL/66vwQo
-         bm2qNK/aO4SMGXzMxzUKyPrSJd2xj/R0XfhtM/AaX8yZJ4AmaYCE6sQjBSySj68Dt2lb
-         z/xdc3cFXOap2d6X6dVuQvgxbRT59QMUaOlVMz+hxt8DGVWWHhvVnsMcsps69GwglS2E
-         wSS1A/+gvNIk2rUt60QEgFEduhhcQqeHx+KXQHcdAsPHFEgNCFHGizRDNw4M60MDlL7G
-         eDwcZ3f0OQAA5Z7jAeQyKcRU52AJ+hfCIIzWnPW4EZTMI18vpJrS4q0kkbwx/dHC6+MF
-         1pIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764179057; x=1764783857;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PJtndxdQkYWzvy6kDqOv7kQqo1yR4d6wvaKa4OAP+Cc=;
-        b=FKo+tVPxCzX2pnV9gr+xGaIWu0CLWlMqfUgDY03FLyq1sVTWtDcWH6apstueDXpbgR
-         sbR011Nwiuix2OlrjdSv6ueTEaZF7c9fnuiOgH7c71xL2onBhecWIsyV+RLkQ3Xqxs7e
-         8drgq7XwlqMpNK/XdFlhO/47W1p2kgdonvR/okh7xookHVCG5bmRJysQ61g8c+TbdVv+
-         VhOUvWO+El6rKrAT/Li2GWBzKSCutboENX2N4o1mG2n/apo84nXLqmx2uuu+xvAwnKjK
-         vK4mLnvGRei2/5GxZvFBZspVxOUqjPOmYcNVuQ0VA1f7hdiY8ygrjznS/3U71SVJ/Q/v
-         uHbg==
-X-Forwarded-Encrypted: i=1; AJvYcCVcfrmVQoszzviVpLFPDldczKpAVtETY8Nqvomn6sT1LABxUeopVum4Q19hRQUcjx1lYPsWYr4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIFAPdbDLGC6X01ORfSW/RG5XKEyyPSDwFEkTCLalyumxKn55m
-	gT1JkHV9C4vBK0exlEUXkbqvVnjjD1mXg9HFUH8CKPekfi0NjpprLIKTaa5BtqgxVJDJRuGJUbv
-	obaZxRB0szlPqABULRaVhSXCkbddQBeo=
-X-Gm-Gg: ASbGncvMK01/l5Tz12dfaHjA14tPheIAoLWrKyArX35qAA2eGRLnt70xEtPfVDcbwLU
-	R5kP/K6zvwJF1YKRI8Aj5nKggT6ulmvXn+N/CCYBfU2KXWRiiponhCgyWfaMxesx3j3pxxH+VxY
-	C3NY+1k4GInlfACbiMV0AXBBrtNtZuag1Ac3EVxCX3D2rBsE81RuRzZpNba8Z8rbcNzMST6zGiM
-	PtUGfBgzXSN60YHMuplR9v9fIxgkj9y1b6AAP//ccnv1bP5CKsPTyVM/BfkvR4VU3XWAQKnGOfr
-	p31bLKGKqWte2f1JYeRMvlqD7Et5ZFyKr6UAClI=
-X-Google-Smtp-Source: AGHT+IEMtnBKL8QKEYTLtiH3Qt1JZUzmDtUchvu2N3MeDZa927dTGr16SXLA5t6Vbu7dxUN21qfwG9K9BwkeddOjilM=
-X-Received: by 2002:a05:6000:1a8a:b0:42b:47ef:1d59 with SMTP id
- ffacd0b85a97d-42cba63b5b2mr28905036f8f.4.1764179056932; Wed, 26 Nov 2025
- 09:44:16 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97A9224891
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 17:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764179556; cv=pass; b=J7Rhq8KN5MvhtbcOY6CIm8WBrQ+I9niKGIS1v2uTOD/VjNMrqNpCverw+n/vWOf4BrkLTdBa4g8roa5x6r0bnxy3Pc1Or+42kcHMiSdmdMler4l7Pfy1B/GryPOis+DrauOUsLYBHk6CsVW4qQxEUOJ3Tre/dF9oNV4V87a5lo0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764179556; c=relaxed/simple;
+	bh=DQfXxJQFcUC26jDmEqaHWrG8u+uw8iZVXVc/7oyWbDw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=Jwr4sty5l+3a031MFcCigEsBuS6uORPDlNgkEGseSe4XrozOcK5vY7iRE6vT6J5ADXel4WQ4YEi+8HiqVLFEmBFqIC8SEWqsWJFICt13pw8ppwIuI/z3IA8S9K6e3jd6GMr6mHSxQ7EqI/bQdl5/586jcu6iZH1u+G/aTDkT3eE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net; spf=pass smtp.mailfrom=azey.net; dkim=pass (1024-bit key) header.d=azey.net header.i=me@azey.net header.b=sMJMDH3/; arc=pass smtp.client-ip=136.143.169.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=azey.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=azey.net
+ARC-Seal: i=1; a=rsa-sha256; t=1764179513; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=W67ScUxM9k7QwECvzxRjqLPy+JdYBvrfEW3fJyvbyYuL3+vjAs4hBtq29VI0mH457WupfkHm31kWXhpICzrCNUNvsaV7/gDauJhrKOp++tMQkdL+e0k/GX8q6KZlLibPlhdVlWCyO6AxLuMkrvdOgNRTNK0QBoDEwxt6FBlTu0Y=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1764179513; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=UvdVAR7bfnxhIVO3/JIl96qgNT5pcQ0u1Jxr0eWZVLA=; 
+	b=dx6gQosB0tCwdWEKrtD+57OoYAQpD2ow+spIpTA4Nh7Fr69AJSfEUMCvrbyKu4cTwaaXJce8g00N/exliL+2xZwUgmXsUJK5G+lKlQHkWDmEqQDbG6wxLJ8gsVu+eKZ3BpjHBIUfcDaIXTdDOX3D9EVoUSYDPbLDewkvseRlEug=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=azey.net;
+	spf=pass  smtp.mailfrom=me@azey.net;
+	dmarc=pass header.from=<me@azey.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1764179513;
+	s=zmail; d=azey.net; i=me@azey.net;
+	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=UvdVAR7bfnxhIVO3/JIl96qgNT5pcQ0u1Jxr0eWZVLA=;
+	b=sMJMDH3/n6KIxghcWYumSlIJBF5+6/RsxHMaJ0MOVmeZMpjl2nje1cjQTEQ3YxfH
+	n8KpMxwnC+TSOSBPm+6i9yv1e0BAfc0EQ8LYtyUhQilsEJRh4Lhj6wZUQw4FVjO4J0w
+	c7nTVSl5ivVs/d0o0ukUALvuCWe5R/XMeZahJhAI=
+Received: from mail.zoho.eu by mx.zoho.eu
+	with SMTP id 176417951113610.246620122537138; Wed, 26 Nov 2025 18:51:51 +0100 (CET)
+Date: Wed, 26 Nov 2025 18:51:51 +0100
+From: azey <me@azey.net>
+To: "Jakub Kicinski" <kuba@kernel.org>
+Cc: "David Ahern" <dsahern@kernel.org>,
+	"nicolasdichtel" <nicolas.dichtel@6wind.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Eric Dumazet" <edumazet@google.com>,
+	"Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
+	"netdev" <netdev@vger.kernel.org>,
+	"linux-kernel" <linux-kernel@vger.kernel.org>
+Message-ID: <19ac14b0748.af1e2f2513010.3648864297965639099@azey.net>
+In-Reply-To: <20251124190044.22959874@kernel.org>
+References: <3k3facg5fiajqlpntjqf76cfc6vlijytmhblau2f2rdstiez2o@um2qmvus4a6b> <20251124190044.22959874@kernel.org>
+Subject: Re: [PATCH v2] net/ipv6: allow device-only routes via the multipath
+ API
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251121113553.2955854-7-prabhakar.mahadev-lad.rj@bp.renesas.com> <CAMuHMdXrkt0MXOBSvpdJwNVmGrnmt03mSGqj7EhqF16tf4i5Pg@mail.gmail.com>
-In-Reply-To: <CAMuHMdXrkt0MXOBSvpdJwNVmGrnmt03mSGqj7EhqF16tf4i5Pg@mail.gmail.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Wed, 26 Nov 2025 17:43:50 +0000
-X-Gm-Features: AWmQ_bkhH_0PDV6DBVghT_5kUE0J4e1gar5BbggGmW0QWH2FTGmxRKv3h7arj-0
-Message-ID: <CA+V-a8vhTH7qAbrJrqRimiBfwD4K08zK0_yOHHjhCjfufGWQaw@mail.gmail.com>
-Subject: Re: [PATCH net-next 06/11] net: dsa: rzn1-a5psw: Add support for
- optional timestamp clock
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Russell King <linux@armlinux.org.uk>, Magnus Damm <magnus.damm@gmail.com>, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
 
-Hi Geert,
+On 2025-11-25 04:00:44 +0100  Jakub Kicinski <kuba@kernel.org> wrote:
+> On Mon, 24 Nov 2025 14:52:45 +0100 azey wrote:
+> > Signed-off-by: azey <me@azey.net>
+> 
+> We need real/legal names because licenses are a legal matter.
 
-Thank you for the review.
+Apart from this, are there any other issues with the patch?
 
-On Mon, Nov 24, 2025 at 12:45=E2=80=AFPM Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
->
-> Hi Prabhakar,
->
-> On Fri, 21 Nov 2025 at 12:36, Prabhakar <prabhakar.csengg@gmail.com> wrot=
-e:
-> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> >
-> > Add support for an optional "ts" (timestamp) clock to the RZN1 A5PSW
-> > driver. Some SoC variants provide a dedicated clock source for
-> > timestamping or time synchronization features within the Ethernet
-> > switch IP.
-> >
-> > Request and enable this clock during probe if defined in the device tre=
-e.
-> > If the clock is not present, the driver continues to operate normally.
-> >
-> > This change prepares the driver for Renesas RZ/T2H and RZ/N2H SoCs, whe=
-re
-> > the Ethernet switch includes a timestamp clock input.
-> >
-> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
->
-> Thanks for your patch!
->
->
-> > --- a/drivers/net/dsa/rzn1_a5psw.c
-> > +++ b/drivers/net/dsa/rzn1_a5psw.c
-> > @@ -1243,6 +1243,13 @@ static int a5psw_probe(struct platform_device *p=
-dev)
-> >                 goto free_pcs;
-> >         }
-> >
-> > +       a5psw->ts =3D devm_clk_get_optional_enabled(dev, "ts");
-> > +       if (IS_ERR(a5psw->ts)) {
-> > +               dev_err(dev, "failed get ts clock\n");
->
-> I think the error can be -EPROBE_DEFER, so this should use
-> dev_err_probe() instead. Same for the existing calls.
->
-Agreed. For the existing calls I'll create a separate patch.
+I'd have no problems changing the sign-off if only just to get this
+applied faster (as I said, I mostly prefer the alias since my real
+name is not at all useful for contacting me, not that I "want to be
+anonymous online" as you put it).
 
-> > +               ret =3D PTR_ERR(a5psw->ts);
-> > +               goto free_pcs;
-> > +       }
-> > +
-> >         reset =3D devm_reset_control_get_optional_exclusive_deasserted(=
-dev, NULL);
-> >         if (IS_ERR(reset)) {
-> >                 ret =3D PTR_ERR(reset);
->
-> > --- a/drivers/net/dsa/rzn1_a5psw.h
-> > +++ b/drivers/net/dsa/rzn1_a5psw.h
-> > @@ -236,6 +236,7 @@ union lk_data {
-> >   * @base: Base address of the switch
-> >   * @hclk: hclk_switch clock
-> >   * @clk: clk_switch clock
-> > + * @ts: Timestamp clock
-> >   * @dev: Device associated to the switch
-> >   * @mii_bus: MDIO bus struct
-> >   * @mdio_freq: MDIO bus frequency requested
-> > @@ -251,6 +252,7 @@ struct a5psw {
-> >         void __iomem *base;
-> >         struct clk *hclk;
-> >         struct clk *clk;
-> > +       struct clk *ts;
->
-> "ts" is only used inside a5psw_probe(), so it can be a local variable.
->
-Agreed, I will create a local variable.
-
-Cheers,
-Prabhakar
-
-> >         struct device *dev;
-> >         struct mii_bus  *mii_bus;
-> >         struct phylink_pcs *pcs[A5PSW_PORTS_NUM - 1];
->
-> Gr{oetje,eeting}s,
->
->                         Geert
->
-> --
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m6=
-8k.org
->
-> In personal conversations with technical people, I call myself a hacker. =
-But
-> when I'm talking to journalists I just say "programmer" or something like=
- that.
->                                 -- Linus Torvalds
+I still think the DCO docs agree with me, but my voice obviously isn't
+worth much and I agree there's really no need to involve Linus/Greg.
 
