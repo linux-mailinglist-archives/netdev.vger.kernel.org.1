@@ -1,165 +1,228 @@
-Return-Path: <netdev+bounces-241898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FE4AC89C76
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 13:32:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18F1EC89D93
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 13:46:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 036964EC0A6
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 12:31:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA1313B2F2C
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 12:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4ACD328611;
-	Wed, 26 Nov 2025 12:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B143717A2E6;
+	Wed, 26 Nov 2025 12:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T/6/I5MP";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pgJy0UKa"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="J7CGlAGI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F064327201
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 12:30:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D35027462;
+	Wed, 26 Nov 2025 12:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764160250; cv=none; b=hOgNi8o2FmFMI46yeH0KUjD2OVw7QJEqeCPi2R/x/ER+THHyDa3keKag86wzpnbZ+i2ucRcDHCfj8OXOjUnuJm8u0j4RQK9w8HMFv8QjZKsfB9f8dlQ+gr0iHxpbi6V+mNbrM2GNShKE6FJicm3jZzXusM3cAydFvHGq4uuJdQA=
+	t=1764161202; cv=none; b=RqTgcmvrO/ycI+k9EHF7P7glXwRcdEgMus42qdknzQn0mlScfV+K0rES0HY9IF7QuKIhlmUWq5iq5IsJakPU/cZwy3lD7V+gTnsq8xQ5dWvwpLYBiDduWTuphFhNmZdl6yjx3XZAzhuicqUiVjpIKRlWMTWR3NN1+LNSPDbDVcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764160250; c=relaxed/simple;
-	bh=TgihVCzdHkhlFl7XJgdzny7+kp/vV44ySjol3tn7/k4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sbWsJHZTYzj9a33fA0jl0ke+nhmkULepxIj+/LpnMwKyWSIOPbkJhts2ciNzfbcYs0ksdlw0KF9QW6E3DscjagK/Ngl9T+YsWrQJK+MtphSEyM6vyuOPHZe+zFvRtkRK32NPwARnsL+dViBCpyZj6p5SbKWRtqyAS8EKNp99vpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T/6/I5MP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pgJy0UKa; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764160247;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N2M8hirVbY5OIpSvxcWUFbxShnVmyIWY2UihN4VUkME=;
-	b=T/6/I5MPr5yLpAJdPGXt8IJfxs3G+uVDXAjdMJJDck4PSxxhnP0g6h+4c+ORmTFfQuzILk
-	Ux8wcQJF93U6YlC3kvC7IvkjMBECYAtLLznDYsdvFMlTJ/kplxUftkaoAU7w1twXAy8nFe
-	gHcz5V8+h1o+Lsp1WGIK6VMUcTUdRa0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-317-XOPquHZiOt-V3No3ALyYHg-1; Wed, 26 Nov 2025 07:30:45 -0500
-X-MC-Unique: XOPquHZiOt-V3No3ALyYHg-1
-X-Mimecast-MFC-AGG-ID: XOPquHZiOt-V3No3ALyYHg_1764160245
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-429cce847c4so4407417f8f.2
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 04:30:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764160244; x=1764765044; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=N2M8hirVbY5OIpSvxcWUFbxShnVmyIWY2UihN4VUkME=;
-        b=pgJy0UKa4eD5QF7aD4rG1yHFLARTTG3hANwBvlfhgrLY2AU7fR9FR36jDVpUFS97Xv
-         w9yG/q+ntxIePoPOPvVP5l2lq1buk2/Q6m3YNN08zeNL/ESU4l4BKGT0eWhUtPLyk/0f
-         4WpzMUWcQDY9t+7oiBDstpl6MBPHE8sfqtyLmc4f5WLOTf58H/VRysvsMaAWDO6FqwJY
-         GrwCgGK0FlGPPXtdZTr7bAU2s4i8FMwnsuZUf/oXkI+kQBGuiVBlJuRlGl0/cjeYxYxD
-         YNvWm6nwgNVeGzQF4lnuk0dT40vMq52R04SF1HQ7BRrSLVpwkOdne5YvZQ+lU4E+KW8a
-         uk3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764160244; x=1764765044;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N2M8hirVbY5OIpSvxcWUFbxShnVmyIWY2UihN4VUkME=;
-        b=qvy4T37zL4R64Kc02wd7kEzuiMPDHqvHQHkB4lLiN0VdXd8w1PE6o8CoJRVmw9f71a
-         f5DLBY92q7Z+r3654B3FxvE2I+JptzfxMIqW6DxCF4ln196q2jzAEE8zXe//Y8hltF0U
-         zQpH33mfe8jQcHbqIHRdAzVzbJ1kpcLZwY0nF36P1W17Zf4tEwtTOm7Nnz+dzUiZNeV0
-         98IeGvht08E7A17yuDX9P+uyUQ9DHxiUz8KHY3g5f3yPKWdhPLi6h5pfRDCatOupswjb
-         fial/uGLBZVHvzQEGCzfOZviz842gfHD0iMLScXzwL4csAoCfq6nP0qh+IQklL/4zcW3
-         vIOw==
-X-Forwarded-Encrypted: i=1; AJvYcCWpqeS31NmI73ks4qeGDSUQtMoeWVL8x+Ow1wjhGmak6CAExz2bMU9bQaa4s63NNSyL8WbiV2s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDv4AD8mb56Pr5JwWSGPckb1SPBjE9lGnf0zJirDPKLT8hKJcH
-	e3hhA2dVcsTmbwurjPwMoFlCaZro2SlvMIfcWCRT+kHPmVun8K1sKm5tuhyPAv5AjsWuhFpiUr1
-	S82VfcxzDdGBEIZ51ALqcqQjgKV5dIlDQQqszZuEZHh3tmV33wu6iLnACB1dCJz1/wA==
-X-Gm-Gg: ASbGncs3A5gTIvcH1HxFk1Xv3devvbOB6vUR4dYl8Xd+b5EhgK64qfEA/LyDBRDvF9e
-	oYRfVg2Ad6Tqxy0A/AFrSpp7J9X+7djb2G48snvnLLkr3f88r1Y+90rWJ1DLZ9oWs2hkzM1VqaK
-	rIRQOs+sf2bQTVBjZowwXvpjGsZYPu5d7Dd7oTNoQ2zaf6KjjXyei6kc+Uo/YhscP7wdARbJd8s
-	vjZbm+HpICPauXSTuQaIdunVkCeM7Sfen+igjhfHN1ufh3EIqTFegxgjSdgQpx0vVSbpgxHJXFL
-	ndeAU6sAyadU+Z9kbtGdSFYchoMOZpj0+oX6k7rqc0ZYp68gJp7m+zO5v9kauJEDNehlvPDIf9E
-	MDMboqn2JeJPuOltwmJYtTqIZN06YRw==
-X-Received: by 2002:a05:600c:450f:b0:46d:ba6d:65bb with SMTP id 5b1f17b1804b1-477c01eb9bdmr217492525e9.31.1764160244375;
-        Wed, 26 Nov 2025 04:30:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEzDOShduGdp9zc8mysLjLBhEjKzKDO88zCdk+Rqo9ljArnPM2e+3HscrIdh+6qslIZbPmv4Q==
-X-Received: by 2002:a05:600c:450f:b0:46d:ba6d:65bb with SMTP id 5b1f17b1804b1-477c01eb9bdmr217492125e9.31.1764160243786;
-        Wed, 26 Nov 2025 04:30:43 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f2e556sm39990416f8f.5.2025.11.26.04.30.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 04:30:43 -0800 (PST)
-Date: Wed, 26 Nov 2025 07:30:40 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jon Kohler <jon@nutanix.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] virtio-net: avoid unnecessary checksum
- calculation on guest RX
-Message-ID: <20251126073008-mutt-send-email-mst@kernel.org>
-References: <20251125175117.995179-1-jon@nutanix.com>
- <276828c5-72cb-4f5c-bc6f-7937aa6b6303@redhat.com>
- <3ED1B031-7C20-45F9-AB47-8FCDB68B448E@nutanix.com>
- <abb04d29-1cd8-4bff-879d-116798487263@redhat.com>
+	s=arc-20240116; t=1764161202; c=relaxed/simple;
+	bh=9YHrNOoT2Mqw9BQJ9/yu9eVaaO7ZwgULe9YF9xcYOvA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QohOf9/r9t3JtMNgcxEdqKcTbE3a0RH5OVHL/kbpkfVM090X/cyESEjN1JZ1CEau4qM/HHDXq0CbUnR7qzOzLasc/S6EDCZakAB8YKk+XBXoai/HPTB0W9UjQYgzvvNLLDI4QN87shZ94R43pvZ0t7DjBxYOJf3fEzEgAKAHZDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=J7CGlAGI; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=fouBHXkYq1jKxUVMFoPGNaZP6tNfUs3+u20LuZ/Yr+0=; b=J7CGlAGIvlh4JZEv8uxv2WhrWf
+	fI5JgzY5jCQhrqz0QSLiUNXhFAVqSsA87UZ1mVqIP6uv9I9QYSSNVXlBX0bxaZF0kglKE2sWbRwRa
+	9SLWdQzpRoAibGkG0VX33UjLaSwJpfHErdbcPMdIqxYDTqaNL2WyOH7/HkcCwF4JYK6MoBfj2KXRB
+	K/bD0kJXqKYqOJuJKeMemxsI1BqZQDcAsHpYD4jmp1nm8he5JoXL439gzTsSr/vRZV+iDLJ8Gjgri
+	HykZOnzr1DQrUNbFowAL56Tw/GsNhCvPuqNz7EtbdZ4ubVYa6/E4r/g+KRtyv+BhU7FjCAoPvcOyW
+	wQ3uvQHg==;
+Received: from [122.175.9.182] (port=35239 helo=cypher.couthit.local)
+	by server.couthit.com with esmtpa (Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1vOEur-0000000ClrJ-0IEX;
+	Wed, 26 Nov 2025 07:46:37 -0500
+From: Parvathi Pudi <parvathi@couthit.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	danishanwar@ti.com,
+	parvathi@couthit.com,
+	rogerq@kernel.org,
+	pmohan@couthit.com,
+	basharath@couthit.com,
+	afd@ti.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	alok.a.tiwari@oracle.com,
+	horms@kernel.org,
+	pratheesh@ti.com,
+	j-rameshbabu@ti.com,
+	vigneshr@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	krishna@couthit.com,
+	mohan@couthit.com
+Subject: [PATCH net-next v7 0/3] STP/RSTP SWITCH support for PRU-ICSSM Ethernet driver
+Date: Wed, 26 Nov 2025 18:14:19 +0530
+Message-ID: <20251126124602.2624264-1-parvathi@couthit.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <abb04d29-1cd8-4bff-879d-116798487263@redhat.com>
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
+X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Wed, Nov 26, 2025 at 12:16:56PM +0100, Paolo Abeni wrote:
-> On 11/25/25 9:00 PM, Jon Kohler wrote:
-> >> On Nov 25, 2025, at 12:57 PM, Paolo Abeni <pabeni@redhat.com> wrote:
-> >>
-> >> CC netdev
-> > 
-> > Thats odd, I used git send-email --to-cmd='./scripts/get_maintainer.pl,
-> > but it looks like in MAINTAINERS, that only would have hit
-> > VIRTIO CORE AND NET DRIVERS, 
-> 
-> ?!? not here:
-> 
-> ./scripts/get_maintainer.pl drivers/net/virtio_net.c
+Hi,
 
-yes but not include/linux/virtio_net.h
+The DUAL-EMAC patch series for Megabit Industrial Communication Sub-system
+(ICSSM), which provides the foundational support for Ethernet functionality
+over PRU-ICSS on the TI SOCs (AM335x, AM437x, and AM57x), was merged into
+net-next recently [1].
 
+This patch series enhances the PRU-ICSSM Ethernet driver to support bridge
+(STP/RSTP) SWITCH mode, which has been implemented using the "switchdev"
+framework and interacts with the "mstp daemon" for STP and RSTP management
+in userspace.
 
-> "Michael S. Tsirkin" <mst@redhat.com> (maintainer:VIRTIO CORE AND NET
-> DRIVERS)
-> Jason Wang <jasowang@redhat.com> (maintainer:VIRTIO CORE AND NET DRIVERS)
-> Xuan Zhuo <xuanzhuo@linux.alibaba.com> (reviewer:VIRTIO CORE AND NET
-> DRIVERS)
-> "Eugenio Pérez" <eperezma@redhat.com> (reviewer:VIRTIO CORE AND NET DRIVERS)
-> Andrew Lunn <andrew+netdev@lunn.ch> (maintainer:NETWORKING DRIVERS)
-> "David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING DRIVERS)
-> Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING DRIVERS)
-> Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING DRIVERS)
-> Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING DRIVERS)
-> virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS)
-> netdev@vger.kernel.org (open list:NETWORKING DRIVERS)
-> linux-kernel@vger.kernel.org (open list)
-> 
-> The "NETWORKING DRIVER" entry should catch even virtio_net. Something
-> odd in your setup?!?
-> 
-> BTW, this is a bit too late, but you should wait at least 24h before
-> reposting on netdev:
-> 
-> https://elixir.bootlin.com/linux/v6.17.9/source/Documentation/process/maintainer-netdev.rst#L422
-> 
-> /P
+When the  SWITCH mode is enabled, forwarding of Ethernet packets using
+either the traditional store-and-forward mechanism or via cut-through is
+offloaded to the two PRU based Ethernet interfaces available within the
+ICSSM. The firmware running on the PRU inspects the bridge port states and
+performs necessary checks before forwarding a packet. This improves the
+overall system performance and significantly reduces the packet forwarding
+latency.
+
+Protocol switching from Dual-EMAC to bridge (STP/RSTP) SWITCH mode can be
+done as follows.
+
+Assuming eth2 and eth3 are the two physical ports of the ICSS2 instance:
+
+>> brctl addbr br0
+>> ip maddr add 01:80:c2:00:00:00 dev br0
+>> ip link set dev br0 address $(cat /sys/class/net/eth2/address)
+>> brctl addif br0 eth2
+>> brctl addif br0 eth3
+>> mstpd
+>> brctl stp br0 on
+# STP to RSTP mode
+>> mstpctl setforcevers br0 rstp
+>> ip link set dev br0 up
+
+To revert back to the default dual EMAC mode, the steps are as follows:
+
+>> ip link set dev br0 down
+>> brctl delif br0 eth2
+>> brctl delif br0 eth3
+>> brctl delbr br0
+
+The patches presented in this series have gone through the patch verification
+tools and no warnings or errors are reported.
+
+Sample test logs obtained from AM33x, AM43x and AM57x verifying the
+functionality on Linux next kernel are available here:
+
+[Interface up Testing](https://gist.github.com/ParvathiPudi/f8936dbecd14aaec841b9920d1d1877a)
+
+[Ping Testing](https://gist.github.com/ParvathiPudi/3f9c3f0eb925ab5c8ddc10f0503be8d1)
+
+[Iperf Testing](https://gist.github.com/ParvathiPudi/1715a4772c3b90e9ac168a5ce266b63e)
+
+[1] https://lore.kernel.org/all/20250912104741.528721-1-parvathi@couthit.com/
+
+This is the v7 of the patch series [v1]. This version of the patchset
+addresses the comments made on [v6] of the series.
+
+Changes from v6 to v7:
+
+*) Addressed Jakub Kicinski comments on patch 2 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v5 to v6:
+
+*) Addressed Simon Horman comments on patch 1, 2 and 3 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v4 to v5:
+
+*) Addressed ALOK TIWARI comments on patch 1 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v3 to v4:
+
+*) Addressed Andrew Lunn comments on patch 1 and 2 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v2 to v3:
+
+*) Dropped the RFC tag.
+*) Addressed  MD Danish Anwar comments on patch 3 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v1 to v2 :
+
+*) Added RFC tag as net-next is closed now.
+*) Updated the cover letter of the series to generalize and indicate support for
+both STP and RSTP along with subject change as per Andrew Lunn's suggestion.
+*) Addressed the Andrew Lunn's comments on patch 1 of the series.
+*) Rebased the series on latest net-next.
+
+[v1] https://lore.kernel.org/all/20250925141246.3433603-1-parvathi@couthit.com/
+[v2] https://lore.kernel.org/all/20251006104908.775891-1-parvathi@couthit.com/
+[v3] https://lore.kernel.org/all/20251014124018.1596900-1-parvathi@couthit.com/
+[v4] https://lore.kernel.org/all/20251110125539.31052-1-parvathi@couthit.com/
+[v5] https://lore.kernel.org/all/20251113101229.675141-1-parvathi@couthit.com/
+[v6] https://lore.kernel.org/all/20251124135800.2219431-1-parvathi@couthit.com/
+
+Thanks and Regards,
+Parvathi.
+
+Roger Quadros (3):
+  net: ti: icssm-prueth: Add helper functions to configure and maintain
+    FDB
+  net: ti: icssm-prueth: Add switchdev support for icssm_prueth driver
+  net: ti: icssm-prueth: Add support for ICSSM RSTP switch
+
+ drivers/net/ethernet/ti/Makefile              |    2 +-
+ drivers/net/ethernet/ti/icssm/icssm_prueth.c  |  517 +++++++-
+ drivers/net/ethernet/ti/icssm/icssm_prueth.h  |   20 +-
+ .../ethernet/ti/icssm/icssm_prueth_fdb_tbl.h  |   76 ++
+ .../ethernet/ti/icssm/icssm_prueth_switch.c   | 1062 +++++++++++++++++
+ .../ethernet/ti/icssm/icssm_prueth_switch.h   |   37 +
+ drivers/net/ethernet/ti/icssm/icssm_switch.h  |  103 ++
+ .../net/ethernet/ti/icssm/icssm_switchdev.c   |  338 ++++++
+ .../net/ethernet/ti/icssm/icssm_switchdev.h   |   13 +
+ .../ti/icssm/icssm_vlan_mcast_filter_mmap.h   |  120 ++
+ 10 files changed, 2265 insertions(+), 23 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_fdb_tbl.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_switch.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_switchdev.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_switchdev.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_vlan_mcast_filter_mmap.h
+
+-- 
+2.43.0
 
 
