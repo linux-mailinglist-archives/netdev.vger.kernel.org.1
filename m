@@ -1,88 +1,89 @@
-Return-Path: <netdev+bounces-241709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 897FEC878A1
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 00:59:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF80FC878AA
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 01:02:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E9ED3AE53D
-	for <lists+netdev@lfdr.de>; Tue, 25 Nov 2025 23:59:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CD3E3A46C5
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 00:02:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8496E2F0C66;
-	Tue, 25 Nov 2025 23:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B9A1367;
+	Wed, 26 Nov 2025 00:02:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wHn0gM9O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xilbF0HV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C89256C84
-	for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 23:59:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD2B625
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 00:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764115192; cv=none; b=n2r5gAZ1EAN7F+I/dTxIxsxezmbVLmuvE2svy1S9MU3mALq3TAymJ2a+HR/A7VMGIqnCbzLukayXUa+l5fXPzcBgdb/Lxifg948PP8Soc3dyABSG/9OMk75/WnUielm5EbRiUAuNchuCPvzmfsXyLzv0/J9wq7iqenEelr0c9b0=
+	t=1764115372; cv=none; b=eTfxnI0MCRqoUQhDYWG4T0va1pXFczQneGQEKTZZFaTN2XcT2OWP2/p+5dJ/aNTOtoXevrQT6F1fmtTNh8/XTWuOdi2tDsHZ0djfbsTeMKUqvYyherUH3+Qsakz6PeoaYpSY57Uq8KzkiCqv+WK3fcjukhBSXpZ7PuIi8sF6uMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764115192; c=relaxed/simple;
-	bh=X+UV3u+Q49e8jqKO8GCdnEJLoPsSDkePyMd6qLGXqYk=;
+	s=arc-20240116; t=1764115372; c=relaxed/simple;
+	bh=cvffFyY+0GYcfqB7QqkXhnNppE9qXOIP5p6PgNEm1R0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A0V9EUnw6hcgHXFpb0A/16qEeZovGYVuz+nJok6/WCqL1PZBcFFR5lE6nhIrMui6yU0fVmKgGKlHVz78u3rhWvU1mCtWjTyk8mIFPtZV3knLnfVrK93ZP2j7yY5BjYOSFY6fh9A+6JikygotY+eTds8TAIINvJHK72226WOKlac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wHn0gM9O; arc=none smtp.client-ip=209.85.214.174
+	 To:Cc:Content-Type; b=hGbocweVlDt/8WAB630fw5tjM+moWU3Vi1BXoxHl6ZdIq7Lxl5EZ89YhLf0KrwfJHQdhPMueu4ODIXaFL3Cr1GtAFO72AcgT8TcWthjJaZNOwU3Sc20D+YXzVbRyDtGto61vzGKKiOlN+yyJFxnHT1X6+Bj336l1pXLg16LXnlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xilbF0HV; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2984dfae0acso95667505ad.0
-        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 15:59:50 -0800 (PST)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7bc248dc16aso4573224b3a.0
+        for <netdev@vger.kernel.org>; Tue, 25 Nov 2025 16:02:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764115190; x=1764719990; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1764115370; x=1764720170; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X+UV3u+Q49e8jqKO8GCdnEJLoPsSDkePyMd6qLGXqYk=;
-        b=wHn0gM9OmGqeK82I2tNRns7O1PyVpiU3XdKFD0O/277EeS/siPGTKdFeJ7n/XcwLCG
-         KQaV7Bq6tNHshIXllkPasTFbrJCMuBRUGJYXN9LMoL8zkSHeNjyuLs3qoCNtESYNcTtg
-         A0L+Sdg73QxGnbqcZX9tKOiFB1W9mun854PgAqSuGxAe0WtdYug5zvYfyBjAZQOQp6eI
-         k28Q8F4b5j/Fsa8oL2hksZ8NdkyX3SkBHone6aWi2Xp0AYt+pxlEJGaf0O7RaKJkfsKI
-         XXCbZpfmpWx4ZhTmylFA/itL2s5LaaD/o5m3VFfmplCWCgSNyH6h4CAtOEb6TXxIJGfL
-         YQWA==
+        bh=cvffFyY+0GYcfqB7QqkXhnNppE9qXOIP5p6PgNEm1R0=;
+        b=xilbF0HVdW7Us0BMASBd+jrciyoNgq2G4RYiNjPsy1hmHf2Z3XQT/MRd6Hm0tr5WY7
+         +X2slFW6nhH169WxDPxRNTUodurh2b7fMkqpAprfrYg/sgsJ9LNDrctX4YCqcUw2UpX6
+         dOj23SdfeZ6fPhedzLA09FW8s4f5jkjtLGYn2u+E30t0VxelRI6jcI00wzBLa47/4sPj
+         x8a8qIod3UpI5OmeBr6JeQSFk3miUZjiucHNDfA/woYgoZsyZUxiGl9JbqDRuiV604v5
+         IdjpNT5MzTnWd9U3ZHYcYWTtAZtG5D6uXz/3FHM6dNDJRC4Pko3bW+QCMlQjXFnai+uq
+         9fzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764115190; x=1764719990;
+        d=1e100.net; s=20230601; t=1764115370; x=1764720170;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=X+UV3u+Q49e8jqKO8GCdnEJLoPsSDkePyMd6qLGXqYk=;
-        b=GcoFMaGpoyp16Sf9Wd8zoBPhbM1Bppc2uvT79JR9BwJ3FUZ8zUBUkvV2UQm6MQnYlo
-         CUkgYGaKJD7F/vy/NPLiv8+OmRgKnI0bCb9Ocyh7Z+XdfTOo2fFUSY4PxINaXFhBa6BZ
-         oyXC8nyHCWRdsEAxOYv6UXfwHf2OwK8GkATKChiiUN8GrBJP9F8hzaunPejS9ET7KRr7
-         Z00EtxBQhgNItX8lPeh+cT1TGOnzeh6p6s+toBaE9slYSffWejA9p3mWqsPtChKcyNFN
-         wxrft+svyXUAfDTqWjJULoJUffgeZAGJ5Yd/dpYP7rlamBcN8vgQWJv1pprkVYEPj5pd
-         dhBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUNOqpL29A0tZ6k0HtojPB9w7xQHA62GHAhW0FhcnFs9k7nrvKmmMDNf3HuHfF77Q++KmgvyJA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyD+kuyegIHt1rYi8Uo4O3/H/EN6i7p3VBUi0829tpPSRFp2Pf7
-	vNiae/1oc0fFJ5+vqcXFK5i+o5dFjg3S3gd0XysXpWlZRX5L9lVeXfCJZmJMiNjayYvsSi6gRsX
-	2+YPvTd+2lBL4DTI5qQh790EA7syAapDbvl9KFJjh
-X-Gm-Gg: ASbGncvh5N71K0MhLjwHQCFQ3WcoHhfxYFAKrKTVsx0aioQvE6b9zL25Q9Rpkyv8iCO
-	xHr6XZAmfouD4BVWoJYJgtMZgVf9TFoMYhn+9tkKGbXrPz5GwtfHReGwqOhkgS0tZ8yraCshLWo
-	mj3p33imsaIsjGlYJn4YGEk072gDic+r3Ki7DwD5e5ZMY5eAfs16EWfqj0h8S+J9SXjhMY6UT01
-	qGt94VRHBYp7dUsVFgaB5i9pspxhg1qnlgD7K4+c7AKUsOLKK6IK4oHDuBXHPNcfc2Ci1h/Boky
-	FFfaUwmUCxPfu54APlUqpUAbAQ==
-X-Google-Smtp-Source: AGHT+IH+iD7QiGL52IruI6Y4H7C8A8j1AMErb0TxoPMCxGDtYpJ0IkSgDj9R5xsFS7FQSOqg6b7V1u3A17ck3mV7/28=
-X-Received: by 2002:a05:7022:218:b0:11b:b61a:a497 with SMTP id
- a92af1059eb24-11cbba4ab48mr3618305c88.37.1764115190064; Tue, 25 Nov 2025
- 15:59:50 -0800 (PST)
+        bh=cvffFyY+0GYcfqB7QqkXhnNppE9qXOIP5p6PgNEm1R0=;
+        b=fC2sj4H/+nldOD2YgBQ4IcrunPcH3BGziGSmgcb6DFhLPuJ3pKuMh19LucSR8JjdGB
+         aA0fYdauWwz7Sqz11ynuKftXDKY/k5BCZnnVZ4gx/B/93oYODTRoQ58kF0PJbJ7UkrPy
+         aIB3/PGQYZIil8c9F59qrEXK37zfkVNHxvQGP6/09eMEo8a9bCmbieIb3pVbFADr6BXx
+         yj2u+3Wp6GDFt6kj7LVr5uH3HoEeQiamJPEKiPk7MsrZbdzqWEEjlQvNCb8cOKHoBWuW
+         2MRXDbG6yH2G+lXEFdjpzuPxeSobN+ijOG1NdHKNLhMh17zOHj8Ht8Ml5GssWqpehDmB
+         SqJw==
+X-Forwarded-Encrypted: i=1; AJvYcCWDTJw07YmtCZavOpCsPr9nWB3t9iQ26SJts35qg8rVr3uz6kRCjEzAisHKw3GMMxz7pBUZl3A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsGZEXeXKNBf36mD+TyVq/m9FOSPectOMXwfFU6oqjDy3ofSC5
+	1Z+VxCeLevEcs/t0KD+xweSN34QrkA408NyIm1SiNW24qhJw/dZs5Utms4+u0m632a/3GC56TQT
+	jsxdZBXH+t/grwIKicPfzVuwZesTl12uNleOBe4Wf
+X-Gm-Gg: ASbGnctqirLAsUp7RSzYRp+FXFYhS1iSN3Z075w6O9ECOy3gRLH+n8U08297dwrRANu
+	xTrk6P4IzYvU42OqsC2Tyz06x6XnZEMnxuzvO2CIXIps6g2/b8OenBiM5Kj6wuWS6cSSNweX4M1
+	oKJTslP6k94csrzo19UQVDhOJjyZyCZSc3cpsa3P65JM2BpEMAkbIuUjEeijWSrmjaz5GqMwmAd
+	/1L+992UeOsneGmXOLGRn32+N8NJIJgiSRf+vAMQ7rY42wLbTvCoj7IdLjXTowB4lCh7+cVRZDq
+	bYRQ6Fe8hGIQN7qGoj6XCuhko0fhjp3nB9iKDYO5A7irfIhWZYP9kCe4dg==
+X-Google-Smtp-Source: AGHT+IFyDVTYg9ma4tiuVaNdzbFnjS3NU+C96WPZY5AleB5evRf0VAfM3J1CmMenwhOwoPkK8A5DFyHJSMsjZtOakr0=
+X-Received: by 2002:a05:7022:4283:b0:11a:6136:1f8d with SMTP id
+ a92af1059eb24-11cbba47c89mr3314361c88.22.1764115369534; Tue, 25 Nov 2025
+ 16:02:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251124175013.1473655-1-edumazet@google.com> <20251124175013.1473655-2-edumazet@google.com>
-In-Reply-To: <20251124175013.1473655-2-edumazet@google.com>
+References: <20251124175013.1473655-1-edumazet@google.com> <20251124175013.1473655-3-edumazet@google.com>
+In-Reply-To: <20251124175013.1473655-3-edumazet@google.com>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 25 Nov 2025 15:59:38 -0800
-X-Gm-Features: AWmQ_blnv3dUfDVisTEl-Juk2KeL5MCrS-FrXkQv7uLbXv7zZUD6GXQOt2AS0BY
-Message-ID: <CAAVpQUBK3rGabHzxwqRD2ht5BQkTiNXwGYsGj_+EVeKH=d9TUA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/4] tcp: rename icsk_timeout() to tcp_timeout_expires()
+Date: Tue, 25 Nov 2025 16:02:38 -0800
+X-Gm-Features: AWmQ_bnjmHNuOKA7uP0taTHAtei-vdfq8VYgO62XhV9ViNluLY5SfxXteELH3Ys
+Message-ID: <CAAVpQUChMjc+v8jJrytRnpEu1+PaJ0HTFZiWLdyQtxvY=h4pgA@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/4] net: move sk_dst_pending_confirm and
+ sk_pacing_status to sock_read_tx group
 To: Eric Dumazet <edumazet@google.com>
 Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
@@ -95,9 +96,8 @@ Content-Transfer-Encoding: quoted-printable
 On Mon, Nov 24, 2025 at 9:50=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
 wrote:
 >
-> In preparation of sk->tcp_timeout_timer introduction,
-> rename icsk_timeout() helper and change its argument to plain
-> 'const struct sock *sk'.
+> These two fields are mostly read in TCP tx path, move them
+> in an more appropriate group for better cache locality.
 >
 > Signed-off-by: Eric Dumazet <edumazet@google.com>
 
