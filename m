@@ -1,178 +1,287 @@
-Return-Path: <netdev+bounces-241827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59CAC88DCA
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 10:09:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C786C88DDC
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 10:09:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3572C3B6165
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:09:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A5D994E3D01
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE55302CD0;
-	Wed, 26 Nov 2025 09:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2ED3112DC;
+	Wed, 26 Nov 2025 09:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bIjfzYTH"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YQA3ioFt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011000.outbound.protection.outlook.com [52.101.52.0])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDE924166C
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 09:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764148146; cv=none; b=IM/016T5rEi0xpaHLjQsVbuUtfEkLVNShtc7qpdw/8G8e+5bde009CsQzNIuKsF4gWIznmYELbvk/FmNwIXTgCEnqD3cPw4HYgXs2R+dKUo74bChYqDPbYALfnqy2Cj/JI0D3ZH0SbQQKhwqcHsRZtyUQk1OZrvZxyy9RftjZj8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764148146; c=relaxed/simple;
-	bh=6w7rkWZMm2OzZs1d4tCa6J3Sjb91QF8PMCdGPkKWBoM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=rCszbxPvrwpFnGe0nC2oelOcvEJj/2pXwZvu1ha6HsNwjJGh6A7nO0OhGUsyujBN4D3r38luZA/PdEkWw3cgKnCjJLwBYUacvCcGvT50IY8SMaY0VigOeT0x0bO3d8hV+ivE4ZQmw8ywPU0Er6x6s+VZ/RoEp/CGL18LhTSpp9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bIjfzYTH; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764148143;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QioLbPIbEdhHQpe6rbAMDZ2orQalmMmfV24sYZuRkpM=;
-	b=bIjfzYTHNy4/xpz/RILQpPAvj/3+QNQve8jy59OO27cxEWIF9nIoAonc+5jYx1Yb+xtChN
-	CTLHEzck8aoy5UbFzEs8YTd7MA36d2FoR4eprQWmvNG+IGzLZOUL3m41Xv6Zw8iH18OzIK
-	pOKp3+OpBAtxzu59tRULnzHmsFmCgXo=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-610-9NRKrjBsMOyjmcTaAx-1rg-1; Wed,
- 26 Nov 2025 04:09:02 -0500
-X-MC-Unique: 9NRKrjBsMOyjmcTaAx-1rg-1
-X-Mimecast-MFC-AGG-ID: 9NRKrjBsMOyjmcTaAx-1rg_1764148138
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 432561956096;
-	Wed, 26 Nov 2025 09:08:57 +0000 (UTC)
-Received: from fweimer-oldenburg.csb.redhat.com (unknown [10.44.32.146])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F32D63001E83;
-	Wed, 26 Nov 2025 09:08:46 +0000 (UTC)
-From: Florian Weimer <fweimer@redhat.com>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>,  Amir Goldstein <amir73il@gmail.com>,
- linux-fsdevel@vger.kernel.org,  Josef Bacik <josef@toxicpanda.com>,
- Jeff Layton <jlayton@kernel.org>,  Mike Yuan <me@yhndnzj.com>,
- Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
- Lennart Poettering <mzxreary@0pointer.de>,
- Daan De Meyer <daan.j.demeyer@gmail.com>,
- Aleksa Sarai <cyphar@cyphar.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Jens Axboe <axboe@kernel.dk>,  Tejun Heo <tj@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>,
- Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,  Eric Dumazet
- <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Chuck Lever <chuck.lever@oracle.com>,  linux-nfs@vger.kernel.org,
- linux-kselftest@vger.kernel.org,  linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org,  cgroups@vger.kernel.org,
- netdev@vger.kernel.org, libc-alpha@sourceware.org, Dmitry V. Levin
- <ldv@strace.io>, address-sanitizer <address-sanitizer@googlegroups.com>,
- strace-devel@lists.strace.io
-Subject: Stability of ioctl constants in the UAPI (Re: [PATCH 01/32] pidfs:
- validate extensible ioctls)
-In-Reply-To: <20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org> (Christian
-	Brauner's message of "Wed, 10 Sep 2025 16:36:46 +0200")
-References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
-	<20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org>
-Date: Wed, 26 Nov 2025 10:08:44 +0100
-Message-ID: <lhu7bvd6u03.fsf_-_@oldenburg.str.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53AB24166C;
+	Wed, 26 Nov 2025 09:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.0
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764148157; cv=fail; b=Lm3KerYEFKq5d7eI2NTRfvrbrq+yunb7BkQzRN1ma47M0lv2f4ZEKsK4nwWU/UGEcPiT6kXvebc7e8wmCUoUydOctHDsYx/LreiU8GKwnNAnqjKoPct8XG4XhkKWK66nvOdYzP+41+TpZXrmigy2Wh85DrlhVJWlBZPHQcEtV1M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764148157; c=relaxed/simple;
+	bh=zLLkOdXha8CIkQJ2XmPe4rwAm3TocQvm0Rw057aTivc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=HL2PVBQVft0azgf7ri1gf/S0G6gvpHhJKEau7+3D0Kk+GH21flCiYYqf4+/cBviR81dpQyAUAhskM7mZw4q2oNBecDLMrxD1MZMMDAhu5E9IxCu5OjErmDH7LuTvZkCel9fjtbYYhooDzP/HQUb3jZf/xzXGoDeCC74++mq6ORo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YQA3ioFt; arc=fail smtp.client-ip=52.101.52.0
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fpJm2yITQiOuku8Y80K3EN28Ts3P+iN7ytfK3iH45TT97aakEhf2vT71bYLgfa51sP+jqn+Ave3sSUxHikcZ/d9R7afLlSZ2owdQ3a4rF8ytLKTMBUZ6x41B0fNg1Z+GB3PnfJm25lnNQPlOPn5Tb0YIUpOIT+HuUSiAdvFZLi8H1fhqJ1ADE+/r+rK0nrbBN6xP62UqEy8bHOgU0u1ROTiee1gyLiiwBr9Jzl8gi5AOZf1n/9lm2eEnTCUj7reH9MGghuxHLOMsyCOrvGpnM5tWeXHTNvj4eaREiZ+BQXbUJTGE7IstGbeTPi5KfcLj1pPzylcplrXTEgt+InJkfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dsltPpmQZr9KAAlOafb1g+xggfVHqZv/tz22snXHza8=;
+ b=jF4Ul1omziho2r7xOyFZgcEk7jqlnAjXBnuC1kGjgEUYsx5/ksJs6653kbPnWNeMVvH/4ZRPMrFzRanXsQqnZhuqooNJF9/hOyRaAwM5QdTKZ3DGRpRNetBa47kYDiWnvaLNj00u3vuCt2EDfVwpw2ViuNqCGTAsO2hvXvbBlJkWXlqoRQfLrj0IBZV55nDIjZpwNM9EZ8JojRI9ULGc9NM6mxMlK6p2VwN0q2Bx6joItyq3AdL1nkDY86B9lvHC0bFUdQR8SaOFwaLQhby4fiNnGK7nkils9bMJ3fofmKwQI9vjkY/WrHYBMDT8fEW+uSZYf/lq2DFjGOHj/aaRsw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dsltPpmQZr9KAAlOafb1g+xggfVHqZv/tz22snXHza8=;
+ b=YQA3ioFtrzLhftriQ4Qt9zRGhE4k5b+6ZG24qh0mbR9FK9v0wfiwylR2PG+0PfSFGSRNgW1KKLcj7PmWCXDczK1hX3tTMtxpvtm1nVBhMm1czd9g4W7E6id+EsFUxIZ0nhLYpaLfaQh94W+6nOZqw1B3N4htbXThWAFbujDe4CA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by MN0PR12MB5812.namprd12.prod.outlook.com (2603:10b6:208:378::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.12; Wed, 26 Nov
+ 2025 09:09:12 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.9366.009; Wed, 26 Nov 2025
+ 09:09:11 +0000
+Message-ID: <34f7771f-7d6d-4bfd-9212-889433d80b4c@amd.com>
+Date: Wed, 26 Nov 2025 09:09:04 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v21 15/23] sfc: get endpoint decoder
+Content-Language: en-US
+To: PJ Waskiewicz <ppwaskie@kernel.org>, alejandro.lucero-palau@amd.com,
+ linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
+Cc: Martin Habets <habetsm.xilinx@gmail.com>,
+ Edward Cree <ecree.xilinx@gmail.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Ben Cheatham <benjamin.cheatham@amd.com>
+References: <20251119192236.2527305-1-alejandro.lucero-palau@amd.com>
+ <20251119192236.2527305-16-alejandro.lucero-palau@amd.com>
+ <4aab1857efeaf2888b1c85cbac1fc5c8fc5c8cbc.camel@kernel.org>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <4aab1857efeaf2888b1c85cbac1fc5c8fc5c8cbc.camel@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO2P265CA0341.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:d::17) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|MN0PR12MB5812:EE_
+X-MS-Office365-Filtering-Correlation-Id: 495408b9-431a-4f40-8cb7-08de2ccb769a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?YXJoQjkrZVFWcC9rWE1GSDBibnBoa1RMQzlyTW5OZEJoWjFpcXlTOEFPaVha?=
+ =?utf-8?B?SjY4SVlPRHN4MjVoQkhZLzlYWk9xZEMrVkU1SGhZNTkxWXpQNlZRZi9FWkJB?=
+ =?utf-8?B?WTd5TEVKV1Mrdkd4QjdsZSthMEtkVTM0VjNUQmFsVlkybGx2elFGUDRGMHp6?=
+ =?utf-8?B?N2ZTM0EzWFRrLzhvOXJDNkxvV0FJSzdBYmt5cjFDemhMQXVtNDZYTGI5VXdo?=
+ =?utf-8?B?RGJIR3hTT1pCWkRlalROSStjWjIwMDhJb1lxR2tZOWNPV2lrdzJVUzdON2dP?=
+ =?utf-8?B?YVUxcTVKYmE5b3V0N2cya2Qra0sydXlIYldUb2tlcE5CWkI1T2hwYlQwVTlW?=
+ =?utf-8?B?WHE4NVd5c2RuSzVIRG9POS90bHpqWnNxdFdtSExhYmU3WWhvVFNLSitvYjBJ?=
+ =?utf-8?B?dnJRMk1qTnFJdFZPQmtKMlBWZ1lIR3U1bVlvMkJvZ1NvMGtYYzBkUWYwM0hX?=
+ =?utf-8?B?RVRQbUhVQnlEc0xqK0haS0JhTjNJMHI1UUpyS0RoM1pEVzlNckFodkVlMWk0?=
+ =?utf-8?B?WThVT29mNndlSFpOcWRGeTI2bzVRSFhEK1A5SGg4amxrL2h0UnkrUTRzbUxq?=
+ =?utf-8?B?eEZtdlFVUm5sUHNXUC9wQlNIK2NqUDNjRWg1djQ1S1pqT1ZzY0R3a00yU2FU?=
+ =?utf-8?B?T3VTODJETG11TDJRYkUzM1M4UmplMlE0cXFEUEp6OVRXeG11ZG93VlFNaSto?=
+ =?utf-8?B?dGlEUkRKY1l2OThaaGtFd3pPU0xnSFZDT25JVk5OUlNDSHFzck9HRVVxMUtk?=
+ =?utf-8?B?RVZnUXBKV1NvRTVyV3RFWnp2RFBSRHlYV3k5dHIweGZiM1RmZFYwclUraWJi?=
+ =?utf-8?B?cFpjWUZVK2tqamx5L25MZ1lDN2gwOVc4d0FOdndGMmNwZytkWDZoU2V0RzVr?=
+ =?utf-8?B?VnFmWENpN0x6bHlmc0tLQ0dPU3VLUG9VS1dkUnpDVVYrb2x1Y0ZYQ09NNzRl?=
+ =?utf-8?B?SVNOdnZzaHN1ZDdjSTlnWXJRdFBvcENjQmE2dlVFSzd5SktIR3F6OUFzaXRI?=
+ =?utf-8?B?WlRueXpkWVZRSndoMWtqSVlQMVM1SmNmNE85dXRhZW1IcVlOTXk4YldxZkps?=
+ =?utf-8?B?amYvb2UxQnBvRng3L1VDUmkwR3kvZDB4OXlYNFFLMjdvckhNbE16QTF5Wjhl?=
+ =?utf-8?B?YXIxUUtYUUhWWkZub2dDRGo0S3dNSFN0WURnczQwSVdnZW9Ca0ZWRVd2Nmth?=
+ =?utf-8?B?SmxGWnV0UElGNFRqTGFtb2hZc3RsRHJuN0N4alg4cS9ub1AxdXNhanFkaWdn?=
+ =?utf-8?B?TWtLbG16TkpOOVdCNTlGTzZVVFNocE9jYzc0OTNRQ0F0YTJxd3NTNE5zTGFi?=
+ =?utf-8?B?YWN0bnY1OXdBRk9CMG1IQ2xNdDZRK0VPMTMvdmxEZGFsWXY0cEl2RzdWRXVx?=
+ =?utf-8?B?UWdCUWhFR2xTUk9zRUJySGdYR0xTbTdxYVM3Vm5rNTUwbUlLVEROQlpRNkdj?=
+ =?utf-8?B?VlRPRC9rTm96UTZ2d1BaeHZxNTlsenBBc2JwbFFTM2s1UTdnd0NMUkM0ZXJl?=
+ =?utf-8?B?UnFSUXNKS3NBQXVsNkM0ZEN1d094SFgzRTVlNFZQeWV6TE1UZzVVVXNYLzRT?=
+ =?utf-8?B?RlM0YkVWTUdKSFVjMjRrSDVBbjBuVFpSK2sxL1FNakE5RjdPY2tSZ3JKcEp6?=
+ =?utf-8?B?Qms4SldLclFGNGw4MWNxS0ZYWlNIbXBNTldoU012Q3NzTHEzZ01CV1NtYW9P?=
+ =?utf-8?B?OVBxRWszQ3RnNlFCVkpmMUJNNTZZMFhmOHBoclExZlcyYU9PVHVRUkZRZHRn?=
+ =?utf-8?B?ZlB3U1BMWEErMWNXRXhFaktnL3ZQNTZFVjJISUlJL004YmhxR3h0OUhFNkdN?=
+ =?utf-8?B?MGg0SE9SczBNR2xYcG9qb3gyL0hGV3NsbHRqYlVlTS8vT2ZTdWptaXcvUFFP?=
+ =?utf-8?B?QndjOGZGbXcyMXFxMVFkdG1FN2s5N2ZLYU1PT29YZnkrdEFpYUliMll1K0cv?=
+ =?utf-8?B?dWxVbjNpOURDdHpNTFF3RVNkdFlwOE5aQm5TQkNZT0VITmFYVnFJbmN4Mk4v?=
+ =?utf-8?B?dWpYaEpVNnhDKzZCZkU0SVIxcXdBd010eDhmTWV1TGJuUklLdVFnelZLb2RH?=
+ =?utf-8?Q?8RTi82?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bDNQQzg5UzYralRhdmhSV3VmTk5LVEVsNER1OHVPa0Z3czRyYThrL1Q5YVZz?=
+ =?utf-8?B?azQ0L2p3REdPamhyOG9wK2xmN1NZRjZVb2VvR3NXNXJOUDM5Snd2UG1vUTkv?=
+ =?utf-8?B?VkVGdWpQTDdsVG4relZVM1hUR0d5bW80WEY4MEJXK1lyYy9jdTE0SmRVaGg4?=
+ =?utf-8?B?UjgxelU1Zk9KeU16RGhFS0tlZVBMTWNjVCtmenJFWGhrZGtUM29JNU1IS0hY?=
+ =?utf-8?B?TkV1YlBaYVVaV1FvTTNOeVdTNWFPdkhhNFlkazc3bU5KcEhaV0FMM0ttU0FF?=
+ =?utf-8?B?WXFMMjk3MG1vZWhFL3BneGtva2NwcGdQT0tCSHJDYkxlVTJ4VWVYWHEvNTBT?=
+ =?utf-8?B?VFdsdXpWRWloTVhmNElsMkdqdWVaWnFkM2U1QzNQazBZY3FDWEExcUtmbFRC?=
+ =?utf-8?B?UHJHVGlxc0twR3pQTkRTODhLTVoyU2xKZEl2b0NpdlltL2xzUTRuUDZwZ1Rj?=
+ =?utf-8?B?N3gvUjEvSW9SRGFDTjJRSWZFclZpZGZrTkJ0K0F1ZmNCR1ZPYW1kYjRLZzdD?=
+ =?utf-8?B?Z2ZqNzgzNWhscisrQjNiNlhnRzJIelp2VEVGM3BVUC9vWi9pTld1d2lGUkRm?=
+ =?utf-8?B?MXhGSUxFYjFBUFJQRDh5SUdsZkgxclRObTZEMHh3T1Brc3NSVFpvQkt1d1BP?=
+ =?utf-8?B?MlJndVYzbTloZFgwVG5pUlIyZUVhZk1YTTRMMFNjYjcrbmxTeXduTVBQRHVj?=
+ =?utf-8?B?ZHFBZFdUM1N4RHhaOU9ObHZ4VnQ3cXJIMkdJRGdOdzZEdmhsTDUrMjQxdlZo?=
+ =?utf-8?B?NE9aOXVQQ1RJNkJSUUQxdmMrSUpHaFVWUThCU2hwV1h3UjJYbFQ0YmtmNjUz?=
+ =?utf-8?B?a0Y5OWtJWXVEMkFiUE54TjdyM01zQmpGWHFXcmVwS3FiWXN5Vm1majVmVXpj?=
+ =?utf-8?B?bm53aGx5d2lTb1VzRVY5dndTS1NhVXlQcnZJWlpzeXYwTGhxUnlZZmg2bjFo?=
+ =?utf-8?B?SkMzelNOU09VeXAvU1htR0Mxb0JFQWlDemljRW43a2lHY3lwb2ZrRWExRkNq?=
+ =?utf-8?B?VkFkd1E2RzZRcmUySFN0VjF4WEV3MHc1aHVkS3VjQ1AvaFZ6dGh3WGkrb0k1?=
+ =?utf-8?B?VXhWS05IUkRhWDJhbnNBZS8yUjFXc1lORXVCL0tiVjNiNVlYSVlFUFJLbHA0?=
+ =?utf-8?B?M1dHM1kwR3c2YzRaeHpkUHFVMittdW82cEMybWFpOVdKTktYNzh5b3JqclhU?=
+ =?utf-8?B?OVJhc09lT0VROGRXbk9zWUpEZEZXVGpac3NYTW1wNlY3Qy9GUlhOOEZSZThC?=
+ =?utf-8?B?L2JLNExGVEtJdzhPNHRSUjY3SDBzTTZORFlvVng1d0E4WTU0Y0JxWml1b2RI?=
+ =?utf-8?B?dmszOHVzai8waFpkbXBvQzQ2UGFURms4SHRCYlJ6ZnYwelZnSzZBRVV0SHdu?=
+ =?utf-8?B?ZmVzNWVJRjdDYVFCWHpvaHdoSlg2bWxad0UxOVhMRGtMSWNwN2VsdFN3MTBn?=
+ =?utf-8?B?NDBmZnpTZitHYWtNMXBqaXFuNkI5VlFDVXhDZVBiTHJkZ0RJOW53VFZsV3Fn?=
+ =?utf-8?B?cmlGVWRPRnZRcTFCLytBRTlPbkNvelYwbUZVcEp0WGE3bmdDOWZ2UFI1enIx?=
+ =?utf-8?B?d0RPVkZpdkNnSUFFMjI0cHNpRmF3bjBOZ2daL1RRUXBTMXRpWDdCMWJYdEJl?=
+ =?utf-8?B?ZzQ4SENTSGFQU09wT0VSZkxOaHVXa0ZNYnMvaVRWaytLaE44NDV2UThjOTdh?=
+ =?utf-8?B?VlZCTUxJSTVIMEh6aERnYVZueDA4QlZPd0ZiRG14cjZrSlpmWjJScG9QREdF?=
+ =?utf-8?B?ckdXMTJTUUZ4M0VZdW5ndy9LL1hyZ1c4YmZRR1hJVDV5eVh1andBUTl3alNw?=
+ =?utf-8?B?ZjliT1k5RmVrTnEzb1pBaklMMFpsRGVzeWVaVVM1K1llN0x0VGFwb2FSbklZ?=
+ =?utf-8?B?ZkprdGIzU0JuUjdhM0hKamtvQ3loekE5S3ozRVhYeFNJdFA5N1VYVkFFMity?=
+ =?utf-8?B?UEhJNU1HUmQyeXBYck5yWmNRU2lGZlBvc1J6blRWWldJeHV2TVlGUGFUQjJj?=
+ =?utf-8?B?SXV0MXMrTi9FUjFwVUxzSXVBeFRoRlRZeU1yL0dFeklYbkdYY1I0ZkFHVmdn?=
+ =?utf-8?B?bHM1WHFkS2Z5cjdJZ2tCclgxVm1RbFBmYzVtVXJ3cDdmZTJuSmFJcXV2N0xM?=
+ =?utf-8?Q?rRd5sXIu9ttJwByFQbURxqgCr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 495408b9-431a-4f40-8cb7-08de2ccb769a
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2025 09:09:11.4902
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Gl4vo0hzgPd9mqIdOeT8NbA7LXCkL1WScogg83FWSQQRbC7rAmR+bRQqY6AdC5jJv8/bFbk+OleGvVPRkG9IiA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5812
 
-* Christian Brauner:
 
-> Validate extensible ioctls stricter than we do now.
+On 11/26/25 01:27, PJ Waskiewicz wrote:
+> Hi Alejandro,
 >
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
-> ---
->  fs/pidfs.c         |  2 +-
->  include/linux/fs.h | 14 ++++++++++++++
->  2 files changed, 15 insertions(+), 1 deletion(-)
+> On Wed, 2025-11-19 at 19:22 +0000, alejandro.lucero-palau@amd.com
+> wrote:
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> Use cxl api for getting DPA (Device Physical Address) to use through
+>> an
+>> endpoint decoder.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
+>> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+>> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+>> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
+>> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+>> ---
+>>   drivers/net/ethernet/sfc/efx_cxl.c | 12 +++++++++++-
+>>   1 file changed, 11 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c
+>> b/drivers/net/ethernet/sfc/efx_cxl.c
+>> index d7c34c978434..1a50bb2c0913 100644
+>> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+>> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+>> @@ -108,6 +108,14 @@ int efx_cxl_init(struct efx_probe_data
+>> *probe_data)
+>>   		return -ENOSPC;
+>>   	}
+>>   
+>> +	cxl->cxled = cxl_request_dpa(cxl->cxlmd, CXL_PARTMODE_RAM,
+>> +				     EFX_CTPIO_BUFFER_SIZE);
+> I've been really struggling to get this flow working in my environment.
+> The above function call has a call-chain like this:
 >
-> diff --git a/fs/pidfs.c b/fs/pidfs.c
-> index edc35522d75c..0a5083b9cce5 100644
-> --- a/fs/pidfs.c
-> +++ b/fs/pidfs.c
-> @@ -440,7 +440,7 @@ static bool pidfs_ioctl_valid(unsigned int cmd)
->  		 * erronously mistook the file descriptor for a pidfd.
->  		 * This is not perfect but will catch most cases.
->  		 */
-> -		return (_IOC_TYPE(cmd) == _IOC_TYPE(PIDFD_GET_INFO));
-> +		return extensible_ioctl_valid(cmd, PIDFD_GET_INFO, PIDFD_INFO_SIZE_VER0);
->  	}
->  
->  	return false;
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index d7ab4f96d705..2f2edc53bf3c 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -4023,4 +4023,18 @@ static inline bool vfs_empty_path(int dfd, const char __user *path)
->  
->  int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter);
->  
-> +static inline bool extensible_ioctl_valid(unsigned int cmd_a,
-> +					  unsigned int cmd_b, size_t min_size)
-> +{
-> +	if (_IOC_DIR(cmd_a) != _IOC_DIR(cmd_b))
-> +		return false;
-> +	if (_IOC_TYPE(cmd_a) != _IOC_TYPE(cmd_b))
-> +		return false;
-> +	if (_IOC_NR(cmd_a) != _IOC_NR(cmd_b))
-> +		return false;
-> +	if (_IOC_SIZE(cmd_a) < min_size)
-> +		return false;
-> +	return true;
-> +}
-> +
->  #endif /* _LINUX_FS_H */
+> - cxl_request_dpa()
+>    => cxl_dpa_alloc()
+>       => __cxl_dpa_alloc()
+>          => __cxl_dpa_reserve()
+>             => __request_region()
+>
+> That last call to __request_region() is not handling a Type2 device
+> that has its mem region defined as EFI Special Purpose memory.
+> Basically if the underlying hardware has the memory region marked that
+> way, it's still getting mapped into the host's physical address map,
+> but it's explicitly telling the OS to bugger off and not try to map it
+> as system RAM, which is what we want. Since this is being used as an
+> acceleration path, we don't want the OS to muck about with it.
+>
+> The issue here is now that I have to build CXL into the kernel itself
+> to get around the circular dependency issue with depmod, I see this
+> when my kernel boots and the device trains, but *before* my driver
+> loads:
+>
+> # cat /proc/iomem
+> [...snip...]
+> c050000000-c08fffffff : CXL Window 0
+>    c050000000-c08fffffff : Soft Reserved
+>
+> That right there is my device.  And it's being presented correctly that
+> it's reserved so the OS doesn't mess with it.  However, that call to
+> __request_region() fails with -EBUSY since it can't take ownership of
+> that region since it's already owned by the core.
+>
+> I can't just skip over this flow for DPA init, so I'm at a bit of a
+> loss how to proceed.  How is your device presenting the .mem region to
+> the host?
 
-Is this really the right direction?  This implies that the ioctl
-constants change as the structs get extended.  At present, this impacts
-struct pidfd_info and PIDFD_GET_INFO.
 
-I think this is a deparature from the previous design, where (low-level)
-userspace did not have not worry about the internal structure of ioctl
-commands and could treat them as opaque bit patterns.  With the new
-approach, we have to dissect some of the commands in the same way
-extensible_ioctl_valid does it above.
+Hi PJ,
 
-So far, this impacts glibc ABI tests.  Looking at the strace sources, it
-doesn't look to me as if the ioctl handler is prepared to deal with this
-situation, either, because it uses the full ioctl command for lookups.
 
-The sanitizers could implement generic ioctl checking with the embedded
-size information in the ioctl command, but the current code structure is
-not set up to handle this because it's indexed by the full ioctl
-command, not the type.  I think in some cases, the size is required to
-disambiguate ioctl commands because the type field is not unique across
-devices.  In some cases, the sanitizers would have to know the exact
-command (not just the size), to validate points embedded in the struct
-passed to the ioctl.  So I don't think changing ioctl constants when
-extensible structs change is obviously beneficial to the sanitizers,
-either.
+My work is based on the device not using EFI_CONVENTIONAL_MEMORY + 
+EFI_MEMORY_SP but EFI_RESERVED_TYPE. In the first case the kernel can 
+try to use that memory and the BIOS goes through default initialization, 
+the latter will avoid BIOS or kernel to mess with such a memory. Because 
+there is no BIOS yet supporting this I had to remove DAX support from 
+the kernel and deal (for testing) with some BIOS initialization we will 
+not have in production.
 
-I would prefer if the ioctl commands could be frozen and decoupled from
-the structs.  As far as I understand it, there is no requirement that
-the embedded size matches what the kernel deals with.
 
-Thanks,
-Florian
+For your case I thought this work 
+https://lore.kernel.org/linux-cxl/20251120031925.87762-1-Smita.KoralahalliChannabasappa@amd.com/T/#me2bc0d25a2129993e68df444aae073addf886751 
+was solving your problem but after looking at it now, I think that will 
+only be useful for Type3 and the hotplug case. Maybe it is time to add 
+Type2 handling there. I'll study that patchset with more detail and 
+comment for solving your case.
 
+
+FWIW, last year in Vienna I raised the concern of the kernel doing 
+exactly what you are witnessing, and I proposed having a way for taking 
+the device/memory from DAX but I was told unanimously that was not 
+necessary and if the BIOS did the wrong thing, not fixing that in the 
+kernel. In hindsight I would say this conflict was not well understood 
+then (me included) with all the details, so maybe it is time to have 
+this capacity, maybe from user space or maybe specific kernel param 
+triggering the device passing from DAX.
+
+
+>
+> Cheers,
+> -PJ
 
