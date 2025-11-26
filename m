@@ -1,209 +1,154 @@
-Return-Path: <netdev+bounces-241823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6E3FC88C9D
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:57:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4B9EC88D3A
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 10:04:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5947E4E94A4
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:57:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD5763B084B
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC96331B814;
-	Wed, 26 Nov 2025 08:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6373F315D27;
+	Wed, 26 Nov 2025 09:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i3dXoDxe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sOpxJnGv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5AB30DEA4
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 08:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B31C311596
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 09:04:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764147448; cv=none; b=GVRRGIuSZruu5qlKYD18M88usO5b7v9UBnMshJ1YA197CnYFA1iXYf970EBsIiaGVlu24Pus3ptAWUJ7wiFX5kVZCteJYRUK/tc0+sg94eu5zV17zeFNQEOyiELVRH4+MjhFF77ZBf8stuMWPpCAs88QSJoLnOHcW0q9RJJUflI=
+	t=1764147850; cv=none; b=Y/J0QOHwxlyGvfcEiYz3aM0jRebnZwqLas9Q9NgVC30nnHv6VTOkLEDRZ5vatPyFghQ+7UZ/BtB/w0sP6CR/+ldsU6USAPeEkQSUQxy9GcGxsc544kk9kB91IfzQ9EcA3YVd+Iba+JAJ+l1o+NzyowxlYHfH7tcmLy8EObveHDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764147448; c=relaxed/simple;
-	bh=PEMRM4SfiLbGU93b8d8dO8w8yPLvJ4lzq9WQeKexhbY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZenVbyuakyBJAQE4K1L8m1aMUir0SKasbVkZmv3x5XciEpRpXKHG6GlNjr8ovgEfUwH8yOupx1vZsxYhE/TRdtdfbrT5LmZHRaWpzpaI0/pD9deeMYQJkadFBOi6UjGJ2rWDDVJ13QsAYeKYrr+m4pm0CDht0kAxVOxI7RCmpuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i3dXoDxe; arc=none smtp.client-ip=74.125.82.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-11beb0a7bd6so687675c88.1
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 00:57:26 -0800 (PST)
+	s=arc-20240116; t=1764147850; c=relaxed/simple;
+	bh=msA1Bmidu73lv6UgIPfMu/uKxgKN3WMlHd0YJZqFXso=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C1Dx9X6yTFMF9Dl+UAoGHnrJOZ+Cl9fkJpfu7kElrajOJG1xpKvTGw3UjzFDJVd4ioeiwf9FlLhQu4IiuKLxVHLiAH2hXrrnFMeAhVbaHLOk/i9Id+YW+S95wkTj+w/AabchlZv2J0G1Onxk8q/1wYHVN1NDkLbHcZ1WimTUzeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sOpxJnGv; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4ed75832448so87838751cf.2
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 01:04:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764147446; x=1764752246; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OyD4sn9jsMLtWXgnyFdyRLUkPxYCW2TqpmGHV9ixsxU=;
-        b=i3dXoDxe4pMLfCXXlUcbmq4yp+KNj909HNYQAp/NWWmKNbpLHddLiCZXDW4vrt0Xu7
-         dJtyfZtt9tCephdMenM9/Ens1yGgnzcrMfsGK+jEIuNzaNGWw0ulS8QRtzKArqdFGQ42
-         CZOkBJsAu7rx88C4s+kYqDhHlzgWMiYuJkiAchyij2hxqrVC9heSKT2qpEiABAxN2+To
-         67t6Axs71KnLLqrBwM2Qyer1ZwyoSuOo5L/Th8Rfc9BNx1LC2kWfcO07UY45KjifcIpR
-         ijNIcgcOChVBSnTmW/Egu5VWOhXvZ2+PnVlnDi3/WXmMEjM0UCLMQ5XadjANJIf6z3zn
-         nbKA==
+        d=google.com; s=20230601; t=1764147842; x=1764752642; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hyRh8xXL0L8kVbM1qWyCLwjKZ6UbKVPw2m1+P8OYNlQ=;
+        b=sOpxJnGv3ACf/h6aEZtQTVsMLfcSr1mRWlVQTJ09a2bfIw55plRjSMIcfHnZiHVW6s
+         b2PtvVfB3gtWUvCQMXd2b6E6Ed94wtJ4sIywer91pv+L+W0adMBP1MgYqu4gCSeNLEek
+         KUO1XhdZnbh5/SA/tix+WvQ1HyofMlw2mFpGJBJIo02SPWyHT1AfQdbyJ8AT97LYVVW0
+         yYYGH4DI+y6fq7LRGn4gLXubfIt3+BXmNGOXVoMC8vi03Rol9fzaMIaBViclYeOpT843
+         qiuJXRQKuzqlZFcSbTheevlOH0bB7Ku5CyNWvKiJQcGe6MPLs2UR13/Uwt7DuaaH6906
+         p5Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764147446; x=1764752246;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OyD4sn9jsMLtWXgnyFdyRLUkPxYCW2TqpmGHV9ixsxU=;
-        b=FY346cLyEWXQEFT0zISKRnXTSyVASRRtSYlyoSsS+i6jx2Zjur5CZqWSFplPCrNGC2
-         BV5gRL/7kDMcvcymM3WU3JfvnexUJEnEJmapLc7b/NyXBaNUXuBb7OrpxE9q5Tbr1Fx6
-         S/Rh4fsmYNGTsJ9YEVz+DfLMBM1iUj9mXO7n8p+0ijqq8uL/Y3IfvKw3wlNkejolHn6U
-         4OshlxJhJmv0cpVw6upuvBPFk0M+4Ebp85u8HrHCZm9BHw4mpCGw98gJIA68/1/bIMvI
-         tzKd+fzJw7DOE7Bpx65VXtOf9nI1vdRUAO56F4qIDBtk3cvvnw13V/5x6NXPYKOMDi5k
-         ADcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVmldFREFQrKyVs92+L8PJ14hs+pjyW5OmmSGveKk9WWRhzjk5DalIKANb73VVseA+01GVYGA8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyz9p0uPx3QRf2hoIQN6CFmJhLbX3nUlpyqsQOHcyjH7ZMZcLbO
-	FH6DpcDAW5QnIOLWoa+od3QvgWnLFVcOUQqi5q7RFh0B466cXLkTRzL8
-X-Gm-Gg: ASbGncvYOpZ6ADzEKid6VH5aCPwY05u2csEzV+XAsyYa06vN1BSU9ypQDlyJ5OUeh5M
-	0Ikn8tsJ2VxQU+9Kh/1zj0eOO4sdD4lRB2p2OgojxTnaQB6mkVRnEelwyixFYT5yFCluwb+Xtns
-	ATNS7aDg6D4x+/GmyMbw2ICOL2ObkvTABaFqxg7WeL2khWre37Fd6CPOzN816aVCgQy07zs/0Pl
-	xvYKFRdk1CUydO6nQaOHTToMl3bEkE+RWpMIDG7kGzvi8Qr9YwWOgCJSaW+bRkETcmHR3sVAoMM
-	JUhvgS/yJmmSBFdWQbmBSUStRHxVsNqsirC7e73X7RSbsLehajPI6rGbwQ2Lj3FEXjGYNn4vsBL
-	WofJ/cKlVPXWGnOBIuW4MNwthtInSFHR2Ib08LFKBiGyDWqw0IkiQpLwBiFNbPr0At+m5DLV7l2
-	7ylZQtiskIG58d6ufAdMQA0RCdIlqI+B4mhaXMavCSDLQ=
-X-Google-Smtp-Source: AGHT+IFrIMIkTPrxwRfvEMQ5cEoCTFWA9fomBn7RLpjcNkpm60ZPM71v6rIQ9mqGMQwZqmC/nqOzYQ==
-X-Received: by 2002:a05:7022:ec17:b0:11b:9386:a382 with SMTP id a92af1059eb24-11c9cabc4f0mr12703137c88.21.1764147445929;
-        Wed, 26 Nov 2025 00:57:25 -0800 (PST)
-Received: from fedora (c-76-133-73-115.hsd1.ca.comcast.net. [76.133.73.115])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11c93db556csm92664267c88.1.2025.11.26.00.57.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 00:57:25 -0800 (PST)
-Date: Wed, 26 Nov 2025 00:57:22 -0800
-From: Tao Ren <rentao.bupt@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jacky Chou <jacky_chou@aspeedtech.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Po-Yu Chuang <ratbert@faraday-tech.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-	"taoren@meta.com" <taoren@meta.com>
-Subject: Re: [PATCH net-next v4 4/4] net: ftgmac100: Add RGMII delay support
- for AST2600
-Message-ID: <aSbA8i5S36GeryXc@fedora>
-References: <20251110-rgmii_delay_2600-v4-0-5cad32c766f7@aspeedtech.com>
- <20251110-rgmii_delay_2600-v4-4-5cad32c766f7@aspeedtech.com>
- <68f10ee1-d4c8-4498-88b0-90c26d606466@lunn.ch>
- <SEYPR06MB5134EBA2235B3D4BE39B19359DCCA@SEYPR06MB5134.apcprd06.prod.outlook.com>
- <3af52caa-88a7-4b88-bd92-fd47421cc81a@lunn.ch>
- <SEYPR06MB51342977EC2246163D14BDC19DCDA@SEYPR06MB5134.apcprd06.prod.outlook.com>
- <041e23a2-67e6-4ebb-aee5-14400491f99c@lunn.ch>
- <SEYPR06MB5134BC17E80DB66DD385024D9DD1A@SEYPR06MB5134.apcprd06.prod.outlook.com>
- <1c2ace4e-f3bb-4efa-a621-53c3711f46cb@lunn.ch>
+        d=1e100.net; s=20230601; t=1764147842; x=1764752642;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hyRh8xXL0L8kVbM1qWyCLwjKZ6UbKVPw2m1+P8OYNlQ=;
+        b=FLR3F6fs0RwAK+qrJSyRS9xubttmNik1uHT+ZnbN7zYDyxkmM1R0d2Qu01Hn8XHUxJ
+         T1ErISIdIz7nuKUcDbf9LOPV30F3oG2AO2oxzLKEmwDeIIpjK/PbnSxiLCb1ax8FfFgG
+         L+LFhhcW1+vVAAXfN1BdtQZogqhMCidx8W5MpWcIjL/wrQvhdQ8hL0nRCDuXdrxrZcY8
+         fyi5sJZYsFSgScAVkf+UQVMAzITRKaolzKLc1OYlgO46Fc7EDkp+r9qFVwIDFbdCv0KM
+         n/V6X4106iS0sQotlkYwzSSRlu8fEDmhGNItp+XQJn8hEWSMu92aO7te9yWC6FQy1AcW
+         41wQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUTCEkJFTSI6UrgWtVc3TNaiYGgrIEnrBL9c3LoTi4aqSvLqso4lGIx3KWavFXM5d1WqMHJDtU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPrCPyVQZVXBPYIQTO4eaxdxdqGLMy7p/KAOH1LhAY0bPixhcd
+	Q3+lPLIAAojPuA8lHysz0P/N+uEe2dGQ91wM/aaMVBPaL4NztZa3vpMDCbgfJbVxv7aZNzcfokF
+	4q0GMrG59F5ZNY2/OYArhF2J5rd1Mz9d6nqNsSig6
+X-Gm-Gg: ASbGnctZT96GT8jZsbJ1AM48x1ilN4i/2Zl41RQovhKX4xaUuHyXm2zjXO9lmgrg6MD
+	Jv075caf1PQeHKNV9aDj6u8vf5Q8l3f0EJnjgfugQvufTMrNupGYwTe5CY20oDqoUNiog0uIDwq
+	4xLYIjO8mVSU11JKqz+oJqlOwxazItQaUtX26ESfhaIHrr3ZLKBB3z+vsq0fNoFWuYVkFDlMgrc
+	AGRD5yosr3WWmh8DNL19zaVwfpCHYN3SYaKSa5qz/tU2dLrSQ+KFQ2bBZ+rSdPZg2/Uqw==
+X-Google-Smtp-Source: AGHT+IEPVELKVM1cwUwrfGMntJ3piYPimKdkJDSl5UF5isYNXZBNp4wQ/L7Ai4Aqn4fzrw9sl0QMSXAAIJOZ5vJ9tYw=
+X-Received: by 2002:ac8:58d4:0:b0:4ee:1db1:a61b with SMTP id
+ d75a77b69052e-4ee58b04acbmr253389301cf.75.1764147841940; Wed, 26 Nov 2025
+ 01:04:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1c2ace4e-f3bb-4efa-a621-53c3711f46cb@lunn.ch>
+References: <20251126085718.50808-1-ssranevjti@gmail.com>
+In-Reply-To: <20251126085718.50808-1-ssranevjti@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 26 Nov 2025 01:03:50 -0800
+X-Gm-Features: AWmQ_bmE9KDgoqH9fUKEjaUj9BjCwLFusadkTUuVGXRtTtcEL0ewy5b2wK6n-kg
+Message-ID: <CANn89iKRYHaYS_wC0CzxsFD6pCHv126xKDbVgozBKvZyK-j7Yw@mail.gmail.com>
+Subject: Re: [PATCH v3] net/sched: em_canid: fix uninit-value in em_canid_match
+To: ssrane_b23@ee.vjti.ac.in
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Rostislav Lisovy <lisovy@gmail.com>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, 
+	linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com, 
+	khalid@kernel.org, syzbot+5d8269a1e099279152bc@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Wed, Nov 26, 2025 at 12:57=E2=80=AFAM <ssrane_b23@ee.vjti.ac.in> wrote:
+>
+> From: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+>
+> Use pskb_may_pull() to ensure a complete CAN frame is present in the
+> linear data buffer before reading the CAN ID. A simple skb->len check
+> is insufficient because it only verifies the total data length but does
+> not guarantee the data is present in skb->data (it could be in
+> fragments).
+>
+> pskb_may_pull() both validates the length and pulls fragmented data
+> into the linear buffer if necessary, making it safe to directly
+> access skb->data.
+>
+> Reported-by: syzbot+5d8269a1e099279152bc@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D5d8269a1e099279152bc
+> Fixes: f057bbb6f9ed ("net: em_canid: Ematch rule to match CAN frames acco=
+rding to their identifiers")
+> Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+> ---
+> v3: Use CAN_MTU to validate a complete CAN frame is present
+> v2: Use pskb_may_pull() instead of skb->len check to properly
+>     handle fragmented skbs
+> ---
+>  net/sched/em_canid.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/net/sched/em_canid.c b/net/sched/em_canid.c
+> index 5337bc462755..2d27f91d8441 100644
+> --- a/net/sched/em_canid.c
+> +++ b/net/sched/em_canid.c
+> @@ -99,6 +99,9 @@ static int em_canid_match(struct sk_buff *skb, struct t=
+cf_ematch *m,
+>         int i;
+>         const struct can_filter *lp;
+>
+> +       if (!pskb_may_pull(skb, CAN_MTU))
+> +               return 0;
+> +
+>         can_id =3D em_canid_get_id(skb);
+>
+>         if (can_id & CAN_EFF_FLAG) {
 
-On Wed, Nov 26, 2025 at 12:49:57AM +0100, Andrew Lunn wrote:
-> > I try to summary in the following informations that I understand.
-> > 
-> > 1. with rx-internal-delay-ps OR tx-internal-delay-ps OR both
-> > 
-> >   Use "rx/tx-internal-delay-ps" property to configure RGMII delay at MAC side
-> >   Pass "phy-mode" to PHY driver by calling of_phy_get_and_connect()
-> 
-> Yes, since they are new properties, you can assume the phy-mode is
-> correct for these delays. We just need to watch out for DT developers
-> setting these delays to 2000ps and 'rgmii', which would be against the
-> guidelines.
-> 
-> 
-> > 2. withour rx-internal-delay-ps AND tx-internal-delay-ps
-> > 
-> >   If "phy-mode" is 'rgmii-rxid' or 'rgmii-txid':
-> > 	Keep original delay
-> > 	Print Warning message
-> > 	  "Update 'phy-mode' to rgmii-id and add 'rx/tx-internal-delay-ps'"
-> > 
-> > There are FOUR conditions in delay configuration:
-> > 'X' means RGMII delay setting from bootloader
-> > A: 7500 <= X <= 8000, 0 <= X <= 500
-> > B: 500 < X < 1500
-> > C: 1500 <= X <= 2500
-> > 	Mean "Enable RGMII delay" at MAC side
-> > D: 2500 < X < 7500
-> > 
-> >   If "phy-mode" is 'rgmii':
-> > 	Condition A:
-> > 		Keep original delay
-> > 		Update "phy-mode" to 'rgmii-id'
-> > 		Print Information message
-> > 			"Forced 'phy-mode' to rgmii-id"
-> 
-> So 0 <= X <= 500 is a small tuning value, so yes, is correct.
-> 
-> > 	Condition B and D
-> > 		Keep original delay
-> > 		Print Warning message
-> > 	  		"Update 'phy-mode' to rgmii-id and add 'rx/tx-internal-delay-ps'"
-> 
-> Yes.
-> 
-> > 	Condition C:
-> > 		Disable RGMII delay at MAC side
-> > 		Update "phy-mode" to 'rgmii-id'
-> > 		Print Warning message
-> > 	  		"Update 'phy-mode' to rgmii-id and add 'rx/tx-internal-delay-ps'"
-> 
-> 'rx/tx-internal-delay-ps are probably not required in this case, the
-> 2ns from the PHY is probably sufficient.
-> 
-> > 
-> >   If "phy-mode" is 'rgmii-id':
-> > 	Condition A:
-> > 		Keep original delay
-> > 		Keep "phy-mode" to 'rgmii-id'
-> > 	Condition B and D
-> > 		Keep original delay
-> > 		Print Warning message
-> > 	  		"Update 'phy-mode' to rgmii-id and add 'rx/tx-internal-delay-ps'"
-> > 	Condition C:
-> > 		Disable RGMII delay at MAC side
-> > 		Update "phy-mode" to 'rgmii-id'
-> > 		Print Warning message
-> > 	  		"Update 'phy-mode' to rgmii-id and add 'rx/tx-internal-delay-ps'"
-> > 
-> 
-> These look correct.
-> 
-> How many different boards do you have you can test with? Do you only
-> have access to RDKs? Or do you have a test farm of customer boards for
-> regression testing. I would throw the patchset at as many boards as
-> you can to make sure there are no regressions.
+For your next netdev patches, please read
+Documentation/process/maintainer-netdev.rst
 
-I synced with Jacky offline a few times, and I'm happy to test the
-patches on my Facebook Network OpenBMC platforms.
+Resending after review
+~~~~~~~~~~~~~~~~~~~~~~
 
-Hi Jacky,
+Allow at least 24 hours to pass between postings. This will ensure reviewer=
+s
+from all geographical locations have a chance to chime in. Do not wait
+too long (weeks) between postings either as it will make it harder for revi=
+ewers
+to recall all the context.
 
-Looking forward to your v5, and please don't hesitate to ping me offline
-if you need more info about my test hardware.
-
-
-Cheers,
-
-Tao
+Thank you.
 
