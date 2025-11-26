@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-241817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1022EC88B17
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:41:52 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D627FC88B1D
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:42:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4E6393447B0
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:41:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AC0054E73D5
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 08:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E4331A7F0;
-	Wed, 26 Nov 2025 08:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F74A31B123;
+	Wed, 26 Nov 2025 08:41:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f0QJgryF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i8k11jTB"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E27D31A55A
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 08:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D56C31AF39
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 08:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764146488; cv=none; b=lKjraj+H3Frb3e4SnX7IATozDaJFqWTO7ty/H5N/NjliCzi3fm6qZnkKhWKCV0ia23IQrFVLSus2yD+IVusxMO06l62Ek5kM2/NDrtW+sNI1q6Ecn/o+d5UNdT8mftg9k8REoLK3BRtWKzbbGifZ+IuX/7XlPxYqt4GzPVdqp/I=
+	t=1764146491; cv=none; b=oqmIq3uRxCnX2JozDrn2LjtlpbZntzEUafhE7aVMloz2DffriAa0pDfXmb6QfFuD76n5lmN9EFMyF+/vfMRtcA9h/I12hX4DJIxfbEr5ZGNREOx0DUO2IdWSmEJF/mTUaAnozAbQg9j7nBbo4kvep97uWvKaahGZ1RqNg94oez4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764146488; c=relaxed/simple;
-	bh=GMqvMppgg9+kh8EZJaPvH4xH3QOVzWZS8jhDW4n9Qjk=;
+	s=arc-20240116; t=1764146491; c=relaxed/simple;
+	bh=8q0JnY5DrrZ+PN2DSLXQVtqJLuqFnZlkdZoIWfZykH4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=azGP5mssl83YSLW0ZDnCF/fnzXyVHTBu5vZdVJGLVatl6vR8obx7McwDerpNxMTPGo5PmS0nEH2wJYY1FB/TGV1I03aCQ/U7b1AXqf00sGvwxt+CQazPT+57ktKi0kYGyJz0aeETBAQVy1OeHWycVrk+pZUiMlxFxVxpxy+PcFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f0QJgryF; arc=none smtp.client-ip=209.85.210.178
+	 MIME-Version; b=Sq01eUwnsHD0+uDjDWC+dhhCWry7QLzu44uD5D7FLOlVWLKCqpcTdV+8N/xvB58ry0qW6MVbWT4pLwJMt31wG8caaPiDwPZ52JhLbQOE+p/c59+IdMvIPwuo+OFHnns/OAVxQUQ4gdk/pO3xHtlTMXQiYwq4YbJftms9GBhblr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i8k11jTB; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7b75e366866so3008080b3a.2
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 00:41:26 -0800 (PST)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-794e300e20dso356446b3a.1
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 00:41:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764146486; x=1764751286; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764146489; x=1764751289; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5jVEFoefhamhUSCRXilkvRs0+/dJxtk9IdYrSyATDdg=;
-        b=f0QJgryF+Rv9OPfmWd64T+cwYvfWEHtDdrh92OQWhAQznc8884BKoE72xQyBTDdxrn
-         b+jPh7drMYqSWUH2G759Y+cHEfBnw6R4MJ2QAnNuBLVwRyTxO9ycSle3UaVVNcGCcjZo
-         lkD1iatAshnCcl740//M3scf4Aw8l7tfQARnuuELLirw89g//co1YoumUKRUQbLDql5l
-         +CyhlnCuPY/BIFkKlSSDlmR70Of18hrROmX17mzcvRKQkOqOOxNodXzXQYYrgaZaEnCP
-         GrVdq3+p7uD4XYs0svjpLiJmLMwqNuuDXLBIK9s0W5d6cI5EV4CZVof7HkrBmnTpz1A7
-         6j0A==
+        bh=YZ/O2Ko3hOv90LKroi8XCwo6K73vNvCcrb4vBmq+pd8=;
+        b=i8k11jTB2YRvq13lAr08kiugg1VHRpAIuK4mQhMWBR8fiY8kcrWezYvzXS0MITGq9Y
+         SnOad0nGmoSYPc4u6uizzly7mA8MW59npjK3C4wO0bCqBY58rErWNxqhrJtpFBaloBG4
+         zN0jsTKkPsLBmkmLMu4sRQk/Srf57/bSoA+lo7uzymyF0KJHyHDwdt2DNcwQCVjdK9U9
+         cr03Y/k+1q6C7X8u39FxCaHgwijahpWAOU5+jPtChlKOeAt0NAgkTTmxjpb4uFSh0c95
+         VFgbcGDtoPtpkmd1oKL+lW+Mh0oerhSZgH0nynAcP38pjUkViWja6QTHC25ziRXYRq1L
+         +0Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764146486; x=1764751286;
+        d=1e100.net; s=20230601; t=1764146489; x=1764751289;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=5jVEFoefhamhUSCRXilkvRs0+/dJxtk9IdYrSyATDdg=;
-        b=H1mMbnDiNYvQcSMusgVBGPRHn48tG+cyjUQ558u6o/7Cwu2W42J1T9UEDXSDorGpqr
-         T1CWiNXJX4AGz/diUbNnky+4cVK6SmagKRil07/kAxfMqC7WT5Xz9RjylGxmJxIfekC0
-         4WEpf+uJGL8xfGm+ngu7jIsS9YVZ4isPFzuvCycZ3LTdFXVcA5kLddvcsO0bW5hIUXQF
-         roUUf0ybeLdWR3RtwKeBKWRdZAOlwGR4tpm3IqXJhNH1ppQ9bDi2lRPd1FqbZs2AuOdB
-         cmQfD6Gzu5eBR/U836Z6piKOQih7a+ZE0Hz/xMMqqPUhJ5zAA/XTOdjfmS0ji01qPyFp
-         KlyQ==
-X-Gm-Message-State: AOJu0YzoRsQPuVuWYp/WVlaovRg8nLRi1700i4aWteNPfjeAKBP9yb2R
-	HHnWPFiYG6C8rqREu9jGnLHAMr2PhjYhrIAF/9PIyxjYKlPU04HQCbU9676KBQ==
-X-Gm-Gg: ASbGnctL426dlL3NIj/EKu3eIFqOJO2fGU0gKSiGUnlPkU4t2LeJFZZwSA+GT33jll0
-	OGrwxTmJNXyXANtV38ncx1fL67R2MNK2tYym5ArdIgb7u6uW0Z44B5Gaj4mMvX5BlbExDW5qL46
-	HfuASlsyzuX/CqHmpluH4PAsQ2jo995ombvdG9eIQ+BNTL/pf+rCF1xTLYtwUHLWmeMoVeW0Ptk
-	dEyoGLSeiCUA1p5AQ+DKd//Qz8qApsB7w/rhVd8d2Mj3Atf7uCixpU2FYmK8wPrINZfpqOwWYSP
-	vSXo4oTOSZptuvfcOuN9fac1xyn7f/339NoNROrzT/3dNabkRSMV/AcDapIodAPW2p+XxgCMWU9
-	Om6S2vbmjSzEeJ9fd9atVcfVu4vqCwADqHM2zOsavYYGqBVJvgnp0ZDILzI5G12WTthYItC2yFt
-	qGyWF7C8rj5v/8Q33avOgJig==
-X-Google-Smtp-Source: AGHT+IH6MlF20aBw/ekPgNeSRKYo2VxiBjnu0MoQG1M0PA3MeCaWoqn4gRIyesjAQhNiYNPyQu2Z5g==
-X-Received: by 2002:a05:6a20:12cc:b0:34f:28f7:ed78 with SMTP id adf61e73a8af0-3637db6471dmr6746156637.25.1764146485644;
-        Wed, 26 Nov 2025 00:41:25 -0800 (PST)
+        bh=YZ/O2Ko3hOv90LKroi8XCwo6K73vNvCcrb4vBmq+pd8=;
+        b=wY5+RLhrV8MKhG7W0tmGUVTOP8QKxDWfuemWt2Z72i591POuWFoLna1h25sykHbmHo
+         09BqlX6VTAADXwJu/+8DUEcz+EVXqbkKNKpwSo2xbOLV07jn06h1DkK29sIu7Bajom4S
+         4bVbPdxRfustQePtcFA2DVpQfxVHVF97gucVaMrMWzMVoXKcWhsySr8MbF5iUjsI9VwH
+         zyCpu+G1qMP+9CS3qqvGlB5jA5iKgtd7uM6tiCO0N4o8LD1RsGp1dRRCo0BIUbHLSzHy
+         xNO2izjIbN2k6FQ5PFgYQC80ZNq7UluexBSj7c0wnKhFtUK1A8fptSt3x3DedwlCQsh8
+         VwcA==
+X-Gm-Message-State: AOJu0Yys8BfxrFMF1losY/im17J8WfJY7/qoq+CqLzLfmPfqrBVI0vyS
+	X2TMs4CDN0sjsx6JxfCy6p4MwG8W/oh+6RONq9kBt7sWA4HCENkkHsyIfYOR7Q==
+X-Gm-Gg: ASbGncuNcuMrLXWtUOOuI5l8Ouvz4YWx9LGj09vKkDoHbEnmhI874NEWo3i+JRpm/vX
+	1C5ZHQUcbBKwucZiTuaTvqFS7uSrwDlGTK6mo7QTJTPcmH8Yrb3jwI5I95MYEb4t+Y50/CgdGVT
+	ZtgMyYzlr9K+Ii6D9KR5xMlpIJZHgZQXH+v/ry3/X8chm9ArZAPFoAtLltOT7Ee6O6GxWtpzhyp
+	Jqi9mYGwlcQRwgvK2SePw9kWJDMgLQztH37NXf+CJVoU/dZu2FAB+HOiDMtFXOOAtD3IIPGN+nj
+	qnzpEbz7Gbr78YMywAG5W/Mt3GevjG0nGzWKSh8bkFjIsyaMKy06pOr908yYtkkZyjRG1cdXYgk
+	XbDGt3yHq3zj77J6D1OJ6Qp8p3upbGTTUfgVRC8XPJCVYugLdxb8KcZStcWyHdt5qXzfKlpknna
+	oUEH2C2LVPmIqeRsL8pjq48A==
+X-Google-Smtp-Source: AGHT+IEjsyvBfRts3y6K7+GKt69nymFayBLHmMH7D8x0mMtsZfiZYyaGDV/wMWKATGIe4TPDDuAAjw==
+X-Received: by 2002:a05:6a20:6a07:b0:35d:e4b2:b383 with SMTP id adf61e73a8af0-3614f5a21ecmr22112751637.31.1764146488787;
+        Wed, 26 Nov 2025 00:41:28 -0800 (PST)
 Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f024adcfsm20918248b3a.31.2025.11.26.00.41.23
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f024adcfsm20918248b3a.31.2025.11.26.00.41.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 00:41:25 -0800 (PST)
+        Wed, 26 Nov 2025 00:41:28 -0800 (PST)
 From: David Yang <mmyangfl@gmail.com>
 To: netdev@vger.kernel.org
 Cc: David Yang <mmyangfl@gmail.com>,
@@ -83,9 +83,9 @@ Cc: David Yang <mmyangfl@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 1/2] net: dsa: yt921x: Fix parsing MIB attributes
-Date: Wed, 26 Nov 2025 16:40:19 +0800
-Message-ID: <20251126084024.2843851-2-mmyangfl@gmail.com>
+Subject: [PATCH net-next v2 2/2] net: dsa: yt921x: Use macros for MIB locations
+Date: Wed, 26 Nov 2025 16:40:20 +0800
+Message-ID: <20251126084024.2843851-3-mmyangfl@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251126084024.2843851-1-mmyangfl@gmail.com>
 References: <20251126084024.2843851-1-mmyangfl@gmail.com>
@@ -97,67 +97,194 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There are hard-to-find unused fields in the MIB table I didn't notice in
-the example driver code, causing wrong interpretation of the MIB data.
+Extract MIB constants into the header file to improve code style. This
+patch will not change the behavior of the function.
 
-For some 64-bit attributes, the current (wrong) implementation took the
-correct lower 32 bits, but messed up the upper 32 bits, so it would work
-accidentally until 32-bit overflows happen. Fix that too.
-
-Fixes: 186623f4aa72 ("net: dsa: yt921x: Add support for Motorcomm YT921x")
 Signed-off-by: David Yang <mmyangfl@gmail.com>
 ---
- drivers/net/dsa/yt921x.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ drivers/net/dsa/yt921x.c | 103 +++++++++++++++++++--------------------
+ drivers/net/dsa/yt921x.h |  54 ++++++++++++++++++++
+ 2 files changed, 103 insertions(+), 54 deletions(-)
 
 diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index 944988e29127..97fc6085f4d0 100644
+index 97fc6085f4d0..ebfd34f72314 100644
 --- a/drivers/net/dsa/yt921x.c
 +++ b/drivers/net/dsa/yt921x.c
-@@ -56,13 +56,13 @@ static const struct yt921x_mib_desc yt921x_mib_descs[] = {
+@@ -39,60 +39,55 @@ struct yt921x_mib_desc {
+  * to perform 32bit MIB overflow wraparound.
+  */
+ static const struct yt921x_mib_desc yt921x_mib_descs[] = {
+-	MIB_DESC(1, 0x00, NULL),	/* RxBroadcast */
+-	MIB_DESC(1, 0x04, NULL),	/* RxPause */
+-	MIB_DESC(1, 0x08, NULL),	/* RxMulticast */
+-	MIB_DESC(1, 0x0c, NULL),	/* RxCrcErr */
+-
+-	MIB_DESC(1, 0x10, NULL),	/* RxAlignErr */
+-	MIB_DESC(1, 0x14, NULL),	/* RxUnderSizeErr */
+-	MIB_DESC(1, 0x18, NULL),	/* RxFragErr */
+-	MIB_DESC(1, 0x1c, NULL),	/* RxPktSz64 */
+-
+-	MIB_DESC(1, 0x20, NULL),	/* RxPktSz65To127 */
+-	MIB_DESC(1, 0x24, NULL),	/* RxPktSz128To255 */
+-	MIB_DESC(1, 0x28, NULL),	/* RxPktSz256To511 */
+-	MIB_DESC(1, 0x2c, NULL),	/* RxPktSz512To1023 */
+-
+-	MIB_DESC(1, 0x30, NULL),	/* RxPktSz1024To1518 */
+-	MIB_DESC(1, 0x34, NULL),	/* RxPktSz1519ToMax */
+-	/* 0x38 unused */
+-	MIB_DESC(2, 0x3c, NULL),	/* RxGoodBytes */
+-
+-	/* 0x40 */
+-	MIB_DESC(2, 0x44, "RxBadBytes"),
+-	/* 0x48 */
+-	MIB_DESC(1, 0x4c, NULL),	/* RxOverSzErr */
+-
+-	MIB_DESC(1, 0x50, NULL),	/* RxDropped */
+-	MIB_DESC(1, 0x54, NULL),	/* TxBroadcast */
+-	MIB_DESC(1, 0x58, NULL),	/* TxPause */
+-	MIB_DESC(1, 0x5c, NULL),	/* TxMulticast */
+-
+-	MIB_DESC(1, 0x60, NULL),	/* TxUnderSizeErr */
+-	MIB_DESC(1, 0x64, NULL),	/* TxPktSz64 */
+-	MIB_DESC(1, 0x68, NULL),	/* TxPktSz65To127 */
+-	MIB_DESC(1, 0x6c, NULL),	/* TxPktSz128To255 */
+-
+-	MIB_DESC(1, 0x70, NULL),	/* TxPktSz256To511 */
+-	MIB_DESC(1, 0x74, NULL),	/* TxPktSz512To1023 */
+-	MIB_DESC(1, 0x78, NULL),	/* TxPktSz1024To1518 */
+-	MIB_DESC(1, 0x7c, NULL),	/* TxPktSz1519ToMax */
+-
+-	/* 0x80 unused */
+-	MIB_DESC(2, 0x84, NULL),	/* TxGoodBytes */
+-	/* 0x88 */
+-	MIB_DESC(1, 0x8c, NULL),	/* TxCollision */
+-
+-	MIB_DESC(1, 0x90, NULL),	/* TxExcessiveCollistion */
+-	MIB_DESC(1, 0x94, NULL),	/* TxMultipleCollision */
+-	MIB_DESC(1, 0x98, NULL),	/* TxSingleCollision */
+-	MIB_DESC(1, 0x9c, NULL),	/* TxPkt */
+-
+-	MIB_DESC(1, 0xa0, NULL),	/* TxDeferred */
+-	MIB_DESC(1, 0xa4, NULL),	/* TxLateCollision */
+-	MIB_DESC(1, 0xa8, "RxOAM"),
+-	MIB_DESC(1, 0xac, "TxOAM"),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_BROADCAST, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_PAUSE, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_MULTICAST, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_CRC_ERR, NULL),
++
++	MIB_DESC(1, YT921X_MIB_DATA_RX_ALIGN_ERR, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_UNDERSIZE_ERR, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_FRAG_ERR, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_PKT_SZ_64, NULL),
++
++	MIB_DESC(1, YT921X_MIB_DATA_RX_PKT_SZ_65_TO_127, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_PKT_SZ_128_TO_255, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_PKT_SZ_256_TO_511, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_PKT_SZ_512_TO_1023, NULL),
++
++	MIB_DESC(1, YT921X_MIB_DATA_RX_PKT_SZ_1024_TO_1518, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_PKT_SZ_1519_TO_MAX, NULL),
++	MIB_DESC(2, YT921X_MIB_DATA_RX_GOOD_BYTES, NULL),
++
++	MIB_DESC(2, YT921X_MIB_DATA_RX_BAD_BYTES, "RxBadBytes"),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_OVERSIZE_ERR, NULL),
++
++	MIB_DESC(1, YT921X_MIB_DATA_RX_DROPPED, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_BROADCAST, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_PAUSE, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_MULTICAST, NULL),
++
++	MIB_DESC(1, YT921X_MIB_DATA_TX_UNDERSIZE_ERR, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_PKT_SZ_64, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_PKT_SZ_65_TO_127, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_PKT_SZ_128_TO_255, NULL),
++
++	MIB_DESC(1, YT921X_MIB_DATA_TX_PKT_SZ_256_TO_511, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_PKT_SZ_512_TO_1023, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_PKT_SZ_1024_TO_1518, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_PKT_SZ_1519_TO_MAX, NULL),
++
++	MIB_DESC(2, YT921X_MIB_DATA_TX_GOOD_BYTES, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_COLLISION, NULL),
++
++	MIB_DESC(1, YT921X_MIB_DATA_TX_EXCESSIVE_COLLISION, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_MULTIPLE_COLLISION, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_SINGLE_COLLISION, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_PKT, NULL),
++
++	MIB_DESC(1, YT921X_MIB_DATA_TX_DEFERRED, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_LATE_COLLISION, NULL),
++	MIB_DESC(1, YT921X_MIB_DATA_RX_OAM, "RxOAM"),
++	MIB_DESC(1, YT921X_MIB_DATA_TX_OAM, "TxOAM"),
+ };
  
- 	MIB_DESC(1, 0x30, NULL),	/* RxPktSz1024To1518 */
- 	MIB_DESC(1, 0x34, NULL),	/* RxPktSz1519ToMax */
--	MIB_DESC(2, 0x38, NULL),	/* RxGoodBytes */
--	/* 0x3c */
-+	/* 0x38 unused */
-+	MIB_DESC(2, 0x3c, NULL),	/* RxGoodBytes */
+ struct yt921x_info {
+diff --git a/drivers/net/dsa/yt921x.h b/drivers/net/dsa/yt921x.h
+index 3e85d90826fb..44719d841d40 100644
+--- a/drivers/net/dsa/yt921x.h
++++ b/drivers/net/dsa/yt921x.h
+@@ -173,6 +173,60 @@
+ #define  YT921X_MIB_CTRL_ALL_PORT		BIT(0)
+ #define YT921X_MIBn_DATA0(port)		(0xc0100 + 0x100 * (port))
+ #define YT921X_MIBn_DATAm(port, x)	(YT921X_MIBn_DATA0(port) + 4 * (x))
++#define  YT921X_MIB_DATA_RX_BROADCAST		0x00
++#define  YT921X_MIB_DATA_RX_PAUSE		0x04
++#define  YT921X_MIB_DATA_RX_MULTICAST		0x08
++#define  YT921X_MIB_DATA_RX_CRC_ERR		0x0c
++
++#define  YT921X_MIB_DATA_RX_ALIGN_ERR		0x10
++#define  YT921X_MIB_DATA_RX_UNDERSIZE_ERR	0x14
++#define  YT921X_MIB_DATA_RX_FRAG_ERR		0x18
++#define  YT921X_MIB_DATA_RX_PKT_SZ_64		0x1c
++
++#define  YT921X_MIB_DATA_RX_PKT_SZ_65_TO_127	0x20
++#define  YT921X_MIB_DATA_RX_PKT_SZ_128_TO_255	0x24
++#define  YT921X_MIB_DATA_RX_PKT_SZ_256_TO_511	0x28
++#define  YT921X_MIB_DATA_RX_PKT_SZ_512_TO_1023	0x2c
++
++#define  YT921X_MIB_DATA_RX_PKT_SZ_1024_TO_1518	0x30
++#define  YT921X_MIB_DATA_RX_PKT_SZ_1519_TO_MAX	0x34
++/* 0x38: unused */
++#define  YT921X_MIB_DATA_RX_GOOD_BYTES		0x3c
++
++/* 0x40: 64 bytes */
++#define  YT921X_MIB_DATA_RX_BAD_BYTES		0x44
++/* 0x48: 64 bytes */
++#define  YT921X_MIB_DATA_RX_OVERSIZE_ERR	0x4c
++
++#define  YT921X_MIB_DATA_RX_DROPPED		0x50
++#define  YT921X_MIB_DATA_TX_BROADCAST		0x54
++#define  YT921X_MIB_DATA_TX_PAUSE		0x58
++#define  YT921X_MIB_DATA_TX_MULTICAST		0x5c
++
++#define  YT921X_MIB_DATA_TX_UNDERSIZE_ERR	0x60
++#define  YT921X_MIB_DATA_TX_PKT_SZ_64		0x64
++#define  YT921X_MIB_DATA_TX_PKT_SZ_65_TO_127	0x68
++#define  YT921X_MIB_DATA_TX_PKT_SZ_128_TO_255	0x6c
++
++#define  YT921X_MIB_DATA_TX_PKT_SZ_256_TO_511	0x70
++#define  YT921X_MIB_DATA_TX_PKT_SZ_512_TO_1023	0x74
++#define  YT921X_MIB_DATA_TX_PKT_SZ_1024_TO_1518	0x78
++#define  YT921X_MIB_DATA_TX_PKT_SZ_1519_TO_MAX	0x7c
++
++/* 0x80: unused */
++#define  YT921X_MIB_DATA_TX_GOOD_BYTES		0x84
++/* 0x88: 64 bytes */
++#define  YT921X_MIB_DATA_TX_COLLISION		0x8c
++
++#define  YT921X_MIB_DATA_TX_EXCESSIVE_COLLISION	0x90
++#define  YT921X_MIB_DATA_TX_MULTIPLE_COLLISION	0x94
++#define  YT921X_MIB_DATA_TX_SINGLE_COLLISION	0x98
++#define  YT921X_MIB_DATA_TX_PKT			0x9c
++
++#define  YT921X_MIB_DATA_TX_DEFERRED		0xa0
++#define  YT921X_MIB_DATA_TX_LATE_COLLISION	0xa4
++#define  YT921X_MIB_DATA_RX_OAM			0xa8
++#define  YT921X_MIB_DATA_TX_OAM			0xac
  
--	MIB_DESC(2, 0x40, "RxBadBytes"),
--	/* 0x44 */
--	MIB_DESC(2, 0x48, NULL),	/* RxOverSzErr */
--	/* 0x4c */
-+	/* 0x40 */
-+	MIB_DESC(2, 0x44, "RxBadBytes"),
-+	/* 0x48 */
-+	MIB_DESC(1, 0x4c, NULL),	/* RxOverSzErr */
- 
- 	MIB_DESC(1, 0x50, NULL),	/* RxDropped */
- 	MIB_DESC(1, 0x54, NULL),	/* TxBroadcast */
-@@ -79,10 +79,10 @@ static const struct yt921x_mib_desc yt921x_mib_descs[] = {
- 	MIB_DESC(1, 0x78, NULL),	/* TxPktSz1024To1518 */
- 	MIB_DESC(1, 0x7c, NULL),	/* TxPktSz1519ToMax */
- 
--	MIB_DESC(2, 0x80, NULL),	/* TxGoodBytes */
--	/* 0x84 */
--	MIB_DESC(2, 0x88, NULL),	/* TxCollision */
--	/* 0x8c */
-+	/* 0x80 unused */
-+	MIB_DESC(2, 0x84, NULL),	/* TxGoodBytes */
-+	/* 0x88 */
-+	MIB_DESC(1, 0x8c, NULL),	/* TxCollision */
- 
- 	MIB_DESC(1, 0x90, NULL),	/* TxExcessiveCollistion */
- 	MIB_DESC(1, 0x94, NULL),	/* TxMultipleCollision */
-@@ -705,7 +705,7 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- 			res = yt921x_reg_read(priv, reg + 4, &val1);
- 			if (res)
- 				break;
--			val = ((u64)val0 << 32) | val1;
-+			val = ((u64)val1 << 32) | val0;
- 		}
- 
- 		WRITE_ONCE(*valp, val);
+ #define YT921X_EDATA_CTRL		0xe0000
+ #define  YT921X_EDATA_CTRL_ADDR_M		GENMASK(15, 8)
 -- 
 2.51.0
 
