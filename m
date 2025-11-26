@@ -1,391 +1,147 @@
-Return-Path: <netdev+bounces-242043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B92C6C8BCEA
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:20:16 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29BB8C8BCF0
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:20:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40DEB3A7008
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 20:20:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E2BB64E07BF
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 20:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF4E341642;
-	Wed, 26 Nov 2025 20:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6275E340A79;
+	Wed, 26 Nov 2025 20:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="l0+uYE+k";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="pA7qptr4";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="n2iYVi6u";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ITcgysbd"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="jqOd0rgh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81A23148BD
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 20:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37B83148BD
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 20:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764188411; cv=none; b=tksjaU28N/hHejHkEuvpaJ9dDhdE32JSmdvRF5tdgxCCyjTgYdYkHyyzWVA/zgDQuOM8ZNSP9XW545jOP4SB3w3MNTKBB64EKYCFJoi2TLLMJV8bNw/bZEIjH9UW3n7EJImzr1kA9QxZ2nh9wMuOrZ0rf537aLjW6rhvnkrgppc=
+	t=1764188428; cv=none; b=Q4OGp9Tw4xO9vt5IBE90Z005WQYyrFIwsHS3NSTqQNBJAAJvDgtWm5jJppr82ynvVyp+wnligUrgBx1foU0oq51892PVa7dbZQqdduVPxgR19SvK29OCuWFdNZVaPxhnncIelKohYrAPD7BMUdjnUtlbZe/toySILGFNvG0pxkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764188411; c=relaxed/simple;
-	bh=3xf/d4zi+3N7+h/wteuZciKcrT6tEwTTuvcqiCP7G1A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HnI7OVPoEhS1Dg1usF5LxTDVMUf6+DEHByWAYzANORykDC/01sbjXUxi+LBwTfEnwya7GBVwhv6FWNPN99FEDgBJX+Zjg7e2oN7RJBljOEuofrtxkHV3sASj9GNPfte3zOQAjmARXKTflgcIuIMKoKcLzZ5IzLT2GadSkJDsS2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=l0+uYE+k; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=pA7qptr4; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=n2iYVi6u; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ITcgysbd; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E863F336C0;
-	Wed, 26 Nov 2025 20:20:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764188404; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fW6x2f8ex+aAbpzCN3iK/uH0KKwVGB+ilGfHO9wn0l0=;
-	b=l0+uYE+kzwYOqInHDqx1cUl7p9XBrq7Yf2UgQv7cS719mm/FUqIFPRRbpmJs67H/+ybEjq
-	91ZEPOQUopYlU1r3Hes3kOdiGIVBdEOntbiA/FriRt899RE+ZJKBf5CHRroo86AjMTr3VF
-	IjKC5q+X6POH6wA1ImmsQmhlRstFBjs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764188404;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fW6x2f8ex+aAbpzCN3iK/uH0KKwVGB+ilGfHO9wn0l0=;
-	b=pA7qptr4mXpDz3Bne2sS08XSDJMtYzaDypIiWREHfDAH8P3aprlEBRmdVfqMmuH2DN6oke
-	38SXAfNwZCkDwrDA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=n2iYVi6u;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=ITcgysbd
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764188403; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fW6x2f8ex+aAbpzCN3iK/uH0KKwVGB+ilGfHO9wn0l0=;
-	b=n2iYVi6uCDE4prnL9u2nprriR112FhQY9ZOaPJ8pxiV69SZahh8MqMTaBQ9Yxtd8j+Qy5L
-	+tLuNQQL0LrwbpPFyHwD3sK9t7hWu347hwwHJfvU/XkCRHCNxKHmgl3KPaN006w6O59LNu
-	u9QFbVqOHIL94czpPk7bxdfWThUo6qI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764188403;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fW6x2f8ex+aAbpzCN3iK/uH0KKwVGB+ilGfHO9wn0l0=;
-	b=ITcgysbd9xZG8i53uOY5HMYqCCLMrfmsFNi9qtO+cdOV+5LIKmPehpF5yfgyjs4W18drrZ
-	7zqvNcu3UQc4CNAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 47EDB3EA63;
-	Wed, 26 Nov 2025 20:20:03 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id yE1jDvNgJ2mDEQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Wed, 26 Nov 2025 20:20:03 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	shuah@kernel.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	dsahern@kernel.org,
-	davem@davemloft.net,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH 2/2 net-next] selftests: ipv6_icmp: add tests for ICMPv6 handling
-Date: Wed, 26 Nov 2025 21:19:43 +0100
-Message-ID: <20251126201943.4480-2-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251126201943.4480-1-fmancera@suse.de>
-References: <20251126201943.4480-1-fmancera@suse.de>
+	s=arc-20240116; t=1764188428; c=relaxed/simple;
+	bh=s6+VOjSxW0rFQ/Aau/c2Ab0oWGxyuzEY2yGCrA8dtyc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RIWrso/LODVAye2utG5p6R3PFxCFZ/5vFJQqzLO7SufCDN51PkR/U0l3VBDu8BFeAYtJGn2u5sHdmi80cw98gK5/bWSWjoWgR2BP8AxkMOK11wjFpUUVU0Mjk9IqBYOpj/x02CYYwAfJm9VRy/It6lDLSBTtDQSXAdBvxZs6fKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=jqOd0rgh; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-29812589890so1901185ad.3
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 12:20:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1764188426; x=1764793226; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vhapffvBMHSAzz0gP7Hz86mVNhs9Q4A7pwye0xenJCU=;
+        b=jqOd0rghlE7WUjEA8G2suwNZksT0LBhyDXeZd7T0SOyI1HT4ILP2qHqQ2AuO9ONoQO
+         ikK/j59OVDGz2UPlCJd0PJBFhyzqaS1aVg/1cCOErOTkda4MhutfwwAVRNJdwuu209tl
+         lRFavvDb60vL0frSb6i5xyiKOSV+LK7Bjtm3fplDiY+XCyCoWdcxIV+zwhQ4EzhRWPHf
+         GIvRuvGLzFoocavms3SVQBvdJwFMP52y7la11ySreSUjtDaqs5024mL+4Da0Y2xzfptI
+         NB1Mx+N9KS4PlYvoFyBaNWkggfQeLfzi49v6bJhOLL0xlgrTAOh/ODGwh4D0tMQiJeVP
+         Nw+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764188426; x=1764793226;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vhapffvBMHSAzz0gP7Hz86mVNhs9Q4A7pwye0xenJCU=;
+        b=T2d9ZTqYNvfmA6hOwwAm8/POu3YmYy3+q+J0RY4eZGA6xS16GdV/Agqr4QJUfXSG0j
+         nQio6uYyGQtNiaV8N3fRkB+44eghGdkp6Wp4cCbFHnnzgJmKA3AmzXf1yoMY9hifxxv+
+         Km4SnhhEh8Iwf8qZoiGjDC719Ypsi2FgWCY1zLt/o5qnKrWCYVRnQnQGByxylqlVNPck
+         zjDFizp0bg0YsSJ70li/tIwvub61Pw0u0reAXOLPlPX9JntZnaDWAlHp9hUrenSDTsb7
+         X0DlHcEk4yfxyeKdaqZTjo+n2oL+KjcoFBSY+394h1g/tjNbVFayKHyCEv5GzdJJ5n6O
+         OVIg==
+X-Forwarded-Encrypted: i=1; AJvYcCV6G2kWHmvY8pjgEAsstMIUcEVhPQuHJ3Ky8GsDZanciLKrH5sz1ThZWBBEAxL42/OgZWONrvc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHw1tIzsh2cKvGiCbQLt8xL33bF8+MxjOvaJlJBZXadXLpDKdr
+	Ko2SL4F8R1FXDcYMPiqL9nKPEMfZDR00hdwojh7KrGHTM9KqLMrbM+WBHWlbLxry2oUVfSf01we
+	Q6xEzsK71qinYs4EW6zrlsgClSAkQt4QNhc9Yd0qe
+X-Gm-Gg: ASbGncshmTu3c8zOvKUYsGYit8Ha7koBfw7O8voAMSEIJrWfgHmhHYW8u5Ui67UyAz5
+	4tvU167iXCV/MYnayqsbA0kJxhTJTnulUKIrGUJiKrmzrGivWvXoWPCWzVAfuZ2CyHjJz+g5MFq
+	nawj4hee6uh74CVxRmPOGAitfNPYXBAuKVZPRKmypJWOHD3Pw7DTvOTRn5X8/vj1cvwDhp8HlI+
+	fK1hX4HYKtENmGhDDwUrbpVNW2vBABmtw+FFvtFIHjI0eMOvESNubkW1+ZG8ladnfi5Lper3qMR
+	lC0=
+X-Google-Smtp-Source: AGHT+IENlKo2mknI86CHP5wEat5rQO6OaaMCsr+2henrqCniZ3MhdPmImBkuCTd6+tMwAfMN3hXEeV+U+tbZxON7K/0=
+X-Received: by 2002:a17:903:3c46:b0:27e:dc53:d239 with SMTP id
+ d9443c01a7336-29b6bf3b302mr249431245ad.35.1764188426047; Wed, 26 Nov 2025
+ 12:20:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Level: 
-X-Spam-Score: -3.01
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: E863F336C0
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
+References: <20251124200825.241037-1-jhs@mojatatu.com> <20251124145115.30c01882@kernel.org>
+ <CAM0EoM=jDt_CeCop82aH=Fch+4M9QawX4aQdKdiUCsdFzuC2rQ@mail.gmail.com>
+ <CAM0EoM=Rci1sfLFzenP9KyGhWNuLsprRZu0jS5pg2Wh35--4wg@mail.gmail.com>
+ <CANn89iJiapfb3OULLv8FxQET4e-c7Kei_wyx2EYb7Wt_0qaAtw@mail.gmail.com>
+ <CAM0EoMm4UZ9cM6zOTH+uT1kwyMdgEsP2BPR3C+d_-nmbXfrYyQ@mail.gmail.com> <CANn89i+_4Hj2WApgy_UBFhsDy+FEM8M1HhutrUcUHKmqbMR1-A@mail.gmail.com>
+In-Reply-To: <CANn89i+_4Hj2WApgy_UBFhsDy+FEM8M1HhutrUcUHKmqbMR1-A@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 26 Nov 2025 15:20:15 -0500
+X-Gm-Features: AWmQ_bmMsmC7VvzyK1UGypcrr81e9W-Pc8KGYP0rO-P6sfI3tpDgTGX7WloMMH4
+Message-ID: <CAM0EoMmoMUtrBHyYUWNeBnFFj8kDFYPyQB+O1fdGB4xk_bMWZA@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net/sched: act_mirred: Fix infinite loop
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, pabeni@redhat.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
+	dcaratti@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Test ICMPv6 to link local address and local address. In addition, this
-test set could be extended to cover more situations in the future.
+On Wed, Nov 26, 2025 at 1:20=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, Nov 26, 2025 at 10:14=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+>
+> > It's the multiport redirection, particularly to ingress. When it get
+> > redirected to ingress it will get queued and then transitioned back.
+> > xmit struct wont catch this as a recursion, so MIRRED_NEST_LIMIT will
+> > not help you.
+> > Example (see the first accompanying tdc test):
+> > packet showing up on port0:ingress mirred redirect --> port1:egress
+> > packet showing up on port1:egress mirred redirect --> port0:ingress
+>
+> Have you tried recording both devices ?
+>
+> diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> index f27b583def78e4afecc7112854b93d59c2520201..711fc2e31cb0451c07a39f9c9=
+4226357d5faec09
+> 100644
+> --- a/net/sched/act_mirred.c
+> +++ b/net/sched/act_mirred.c
+> @@ -445,15 +445,17 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff=
+ *skb,
+>                 return retval;
+>         }
+>         for (i =3D 0; i < xmit->sched_mirred_nest; i++) {
+> -               if (xmit->sched_mirred_dev[i] !=3D dev)
+> +               if (xmit->sched_mirred_dev[i] !=3D dev &&
+> +                   xmit->sched_mirred_dev[i] !=3D skb->dev)
+>                         continue;
+> -               pr_notice_once("tc mirred: loop on device %s\n",
+> -                              netdev_name(dev));
+> +               pr_notice_once("tc mirred: loop on device %s/%s\n",
+> +                              netdev_name(dev), netdev_name(skb->dev));
+>                 tcf_action_inc_overlimit_qstats(&m->common);
+>                 return retval;
+>         }
+>
+>         xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D dev;
+> +       xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D skb->dev;
+>
+>         m_mac_header_xmit =3D READ_ONCE(m->tcfm_mac_header_xmit);
+>         m_eaction =3D READ_ONCE(m->tcfm_eaction);
 
-ICMPv6 to local addresses
-    TEST: Ping to link local address                                   [OK]
-    TEST: Ping to link local address from ::1                          [OK]
-    TEST: Ping to local address                                        [OK]
-    TEST: Ping to local address from ::1                               [OK]
+Did you mean not to decrement sched_mirred_nest twice?
+I dont have time today but will continue early AM.
 
-Tests passed:   4
-Tests failed:   0
-
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
- tools/testing/selftests/net/Makefile     |   1 +
- tools/testing/selftests/net/ipv6_icmp.sh | 204 +++++++++++++++++++++++
- 2 files changed, 205 insertions(+)
- create mode 100755 tools/testing/selftests/net/ipv6_icmp.sh
-
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index b66ba04f19d9..4d29b47bb084 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -47,6 +47,7 @@ TEST_PROGS := \
- 	ip_local_port_range.sh \
- 	ipv6_flowlabel.sh \
- 	ipv6_force_forwarding.sh \
-+	ipv6_icmp.sh \
- 	ipv6_route_update_soft_lockup.sh \
- 	l2_tos_ttl_inherit.sh \
- 	l2tp.sh \
-diff --git a/tools/testing/selftests/net/ipv6_icmp.sh b/tools/testing/selftests/net/ipv6_icmp.sh
-new file mode 100755
-index 000000000000..d4764219007c
---- /dev/null
-+++ b/tools/testing/selftests/net/ipv6_icmp.sh
-@@ -0,0 +1,204 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This test is for checking IPv6 ICMP behavior in different situations.
-+source lib.sh
-+ret=0
-+
-+# all tests in this script, can be overridden with -t option
-+TESTS="icmpv6_to_local_address"
-+
-+VERBOSE=0
-+PAUSE_ON_FAIL=no
-+PAUSE=no
-+
-+which ping6 > /dev/null 2>&1 && ping6=$(which ping6) || ping6=$(which ping)
-+
-+log_test()
-+{
-+	local rc=$1
-+	local expected=$2
-+	local msg="$3"
-+
-+	if [ ${rc} -eq ${expected} ]; then
-+		printf "    TEST: %-60s  [OK]\n" "${msg}"
-+		nsuccess=$((nsuccess+1))
-+	else
-+		ret=1
-+		nfail=$((nfail+1))
-+		printf "    TEST: %-60s  [FAIL]\n" "${msg}"
-+		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
-+		echo
-+			echo "hit enter to continue, 'q' to quit"
-+			read a
-+			[ "$a" = "q" ] && exit 1
-+		fi
-+	fi
-+
-+	if [ "${PAUSE}" = "yes" ]; then
-+		echo
-+		echo "hit enter to continue, 'q' to quit"
-+		read a
-+		[ "$a" = "q" ] && exit 1
-+	fi
-+}
-+
-+setup()
-+{
-+	set -e
-+	setup_ns ns1
-+	IP="$(which ip) -netns $ns1"
-+	NS_EXEC="$(which ip) netns exec $ns1"
-+
-+	$IP link add dummy0 type dummy
-+	$IP link set dev dummy0 up
-+	$IP -6 address add 2001:db8:1::1/64 dev dummy0 nodad
-+	set +e
-+}
-+
-+cleanup()
-+{
-+	$IP link del dev dummy0 &> /dev/null
-+	cleanup_ns $ns1
-+}
-+
-+get_linklocal()
-+{
-+	local dev=$1
-+	local addr
-+
-+	addr=$($IP -6 -br addr show dev ${dev} | \
-+	awk '{
-+		for (i = 3; i <= NF; ++i) {
-+			if ($i ~ /^fe80/)
-+				print $i
-+		}
-+	}'
-+	)
-+	addr=${addr/\/*}
-+
-+	[ -z "$addr" ] && return 1
-+
-+	echo $addr
-+
-+	return 0
-+}
-+
-+run_cmd()
-+{
-+	local cmd="$1"
-+	local out
-+	local stderr="2>/dev/null"
-+
-+	if [ "$VERBOSE" = "1" ]; then
-+		printf "    COMMAND: $cmd\n"
-+		stderr=
-+	fi
-+
-+	out=$(eval $cmd $stderr)
-+	rc=$?
-+	if [ "$VERBOSE" = "1" -a -n "$out" ]; then
-+		echo "    $out"
-+	fi
-+
-+	[ "$VERBOSE" = "1" ] && echo
-+
-+	return $rc
-+}
-+
-+icmpv6_to_local_address()
-+{
-+	local rc
-+
-+	echo
-+	echo "ICMPv6 to local addresses"
-+
-+	setup
-+
-+	local lldummy=$(get_linklocal dummy0)
-+
-+	if [ -z "$lldummy" ]; then
-+		echo "Failed to get link local address for dummy0"
-+		return 1
-+	fi
-+
-+	# ping6 to link local address
-+	run_cmd "$NS_EXEC ${ping6} -c 3 $lldummy%dummy0"
-+	log_test $? 0 "Ping to link local address"
-+
-+	# ping6 to link local address from localhost (::1)
-+	run_cmd "$NS_EXEC ${ping6} -c 3 -I ::1 $lldummy%dummy0"
-+	log_test $? 0 "Ping to link local address from ::1"
-+
-+	# ping6 to local address
-+	run_cmd "$NS_EXEC ${ping6} -c 3 2001:db8:1::1"
-+	log_test $? 0 "Ping to local address"
-+
-+	# ping6 to local address from localhost (::1)
-+	run_cmd "$NS_EXEC ${ping6} -c 3 -I ::1 2001:db8:1::1"
-+	log_test $? 0 "Ping to local address from ::1"
-+}
-+
-+################################################################################
-+# usage
-+
-+usage()
-+{
-+	cat <<EOF
-+usage: ${0##*/} OPTS
-+
-+    -t <test>   Test(s) to run (default: all)
-+                (options: $TESTS)
-+    -p          Pause on fail
-+    -P          Pause after each test before cleanup
-+    -v          Verbose mode (show commands and output)
-+EOF
-+}
-+
-+################################################################################
-+# main
-+
-+trap cleanup EXIT
-+
-+while getopts :t:pPhv o
-+do
-+	case $o in
-+		t) TESTS=$OPTARG;;
-+		p) PAUSE_ON_FAIL=yes;;
-+		P) PAUSE=yes;;
-+		v) VERBOSE=$(($VERBOSE + 1));;
-+		h) usage; exit 0;;
-+		*) usage; exit 1;;
-+	esac
-+done
-+
-+[ "${PAUSE}" = "yes" ] && PAUSE_ON_FAIL=no
-+
-+if [ "$(id -u)" -ne 0 ];then
-+	echo "SKIP: Need root privileges"
-+	exit $ksft_skip;
-+fi
-+
-+if [ ! -x "$(command -v ip)" ]; then
-+	echo "SKIP: Could not run test without ip tool"
-+	exit $ksft_skip
-+fi
-+
-+# start clean
-+cleanup &> /dev/null
-+
-+for t in $TESTS
-+do
-+	case $t in
-+	icmpv6_to_local_address)	icmpv6_to_local_address;;
-+
-+	help) echo "Test names: $TESTS"; exit 0;;
-+	esac
-+done
-+
-+if [ "$TESTS" != "none" ]; then
-+	printf "\nTests passed: %3d\n" ${nsuccess}
-+	printf "Tests failed: %3d\n" ${nfail}
-+fi
-+
-+exit $ret
--- 
-2.51.1
-
+cheers,
+jamal
 
