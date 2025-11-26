@@ -1,123 +1,145 @@
-Return-Path: <netdev+bounces-242040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEA81C8BBF0
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:01:24 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C99FC8BC0E
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:03:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AB3ED4E4A82
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 20:01:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A806F4E5C8C
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 20:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2484E3161AA;
-	Wed, 26 Nov 2025 20:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D90633D6C7;
+	Wed, 26 Nov 2025 20:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PYN2xCna"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AhEfGA74"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A0422AE7A
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 20:01:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDE9302748
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 20:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764187281; cv=none; b=Bcv6RsEEZp/+0TT/CXMBFU2ikAzgwFFT2+kD5XMHqt21638EYyPXVjeFw9qm3etvHlIKAHET36A1UlSRzN9QZ26c5uj+VM+Qz4N/8Wn6DASuKXW7OQo+ddXnrsM8PRRUSIPyQP3b103wGdOip0ET6lk0EpNf6UF9PisaQ8lz8iw=
+	t=1764187368; cv=none; b=lyXrvQsfF9Rt35erlKcwFqeDwLMkzPLqxDTkx0fkU/LM+NoIX3U4zJdSPAEzV4tLU7/3eqYuE4MgU/iUdCQ9nz4BLPLS1mvBds8N5PrFosy0txH4AI7ZAgIilCE4O3XC1vxPUFQAJjYZ5VNkwGjbPk9ounDW0bnsP9o2xReKJVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764187281; c=relaxed/simple;
-	bh=CVk5Ik3dMIJ4Xe2jy9D7p0ieUE7u9nbrX6GfzALmaqA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SjWPIlM46LCQ7zcNldrzxuv7tGK1ia4dhlbFUwoaOblSONk1/4A+g88nSGjYFpvM70qN1cmTpj/Z2wZi7xCdVMsG1uixywxDuc9hJ7u1YWQ4FLYJho/ckm5ukUZthVNsYUcqCDGvtphNG+052wDrLLPJcO0tM101+YVFknOWJ4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PYN2xCna; arc=none smtp.client-ip=209.85.215.177
+	s=arc-20240116; t=1764187368; c=relaxed/simple;
+	bh=io2b3WP5mJSrzoPU9P3LKCt9DN2B8GXCdJ4X44P7TU4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XyW+WPYjrxoUQ/zSivgZiDNqOhgHKZohEtk/yb/+OWIIhalTI9NVyPVncqbhPU32anX8NxXCp8TSik+mUWRVENQS+UPG1rUIR0n7GSihF6fx48bMZDOk8h4dFHuSh3gf6nM84nACbotl/NdILeLNLfXA/8pknKPrvnUVXe6eHWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AhEfGA74; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-bde0f62464cso149414a12.2
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 12:01:19 -0800 (PST)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-42b379cd896so111536f8f.3
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 12:02:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764187279; x=1764792079; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9qMn6bFYv6kGyj9tjqAoP1eZ0Ua/HYVXcdKwly7wduc=;
-        b=PYN2xCnaRgPjqeetusEZbuufrQ+wK6EsLQ8THeyYpNIjt95WHCimmVz6VErlmiyCOF
-         pXXUpaqXV6IVyj1eUVek5l+FEYzBj9YaBFZyGcZJIozcktI//abygjvIwKrGNW3UNMIr
-         xNb5CvwW6im3BWjD/j5Y/Z+hp96/qXqy56PbATJPoWRVOzVLCarRtnqAVvNYhTdy5IP1
-         rxVxwlS9qcGRoUD/8fn63V2hFt5ZHD5WJNX6u2VZm6pc1FzOremoExxvRns2cZ4ly8Bq
-         Muvmb4V90QZYxcXMl3O2R2ObFZ32vxlv16HzKqhpKYpTteNH/ZiewmFeesapIMzNxemx
-         yPOg==
+        d=gmail.com; s=20230601; t=1764187365; x=1764792165; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=io2b3WP5mJSrzoPU9P3LKCt9DN2B8GXCdJ4X44P7TU4=;
+        b=AhEfGA74+WtLFdY7FUEVVqG/COqUjj68ANLx3nAvKOy3eGB6YdK2IR8pdSKXMx0UB/
+         zto+FrF2N4GVjCURo5ZE3v++mNOCXPdqt08VuHNhEWisIHjlvMo79+eiX2R7H3pLFKKY
+         ZtZ0v3Has5Hb1Ek31pYuB3E/0YH6evR2f9n1f6H/9WRyEh1lgulbfWwoTpe8zRRrncBr
+         zsXFppqoke0qHuTdFdPQ/sMXa+OgqdiE9ad+1+tVp8BcmPgGqh1e5l/xp0bTScyDCWCJ
+         0uZ3VFuqs4D3YtqnL4ldYgMnfxcp34k3sA0d8wMwfTIaI3Er9MI+jy8+Y7L+BaEbCJ6X
+         exVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764187279; x=1764792079;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9qMn6bFYv6kGyj9tjqAoP1eZ0Ua/HYVXcdKwly7wduc=;
-        b=J+vNW28JUacBOfKHBKgA0myxhMCu2moJbpt+dZR/ae31o6eLSzMFNNJ5xnGWhoXQA7
-         JxBU6M2hNgFL7TsFCtbQ/2PvbKAbQwzNV66LHXb7MjuYYDeRbh3tUHm8c0/HFstsfTcZ
-         nIRp//jaoKJw31/WbzuuEiEeTU6qIn/BscZouZfoZ5uhaeQeHVxhVWomeKJY0Xh5+9ku
-         5p1Q8DnxKbWg4PQywZ2PEEyZZJ4Og0CBNbn5N5rYDJdReb8hWOy9BozisHihm5PvL3oF
-         8u/I2R+6w6moe7zKZad52+WQeptEyKrkf4Fr/iucgV4T2KaL7JQ0mzChmuwgWJ7hkPGt
-         sV3Q==
-X-Gm-Message-State: AOJu0YxnWbmjt01kpcT9Rzc5JuQaAPZw9kCKTL5ThgED/LoJjRCWJ2Oq
-	tbQRMhcP9iBPKL+NzYSjE7eXGEWxMsp11b/phoqHrYLAAxohvyaWD8hI
-X-Gm-Gg: ASbGncuGI5a5WsqxvRGwSwgDjUrBNRJz4lx6XEFpdLGHHS5RxRcQ7mzjI2prNIjeEPA
-	juKB8WWQjkhsB8AHb8PFVvAYzifwjNvKficc5vWodep9vWEeAkVcnNgSCK1XbNEe3Rw6KpggfuM
-	wYO8ewmlaGb1Rn0kUCvQeYqeds1ZqQCMKPc54D2cSLfAzNi/CxB8MnlrK56ZZ7YanyKOngXFDZh
-	3DPgfTD7XoS8bFK9ax0Ys/rc6VEirvJbu9jthMBFlb4jXH7n93SM6K9nMj2H04B8jT9QZD3qvOE
-	o6reqsCWAFqisLGXMeCVsxgDc+F0hDfg6UQudLoliyjC0YelDHLsWsLM+ASwjYijqKfCQ/7Dv60
-	I9okxwjQkv1pOdsEoeJ2Bdlilw8UqyWW7tZYyBzB9OgnFx7h7lTQsZARCpLGZe56ptBT1xA/NYD
-	yCTA0H2UYsa1JnhPPA+qYu
-X-Google-Smtp-Source: AGHT+IHXHo6GNNm0POh1mAORb4BYcYXcF5Rd5TJ50ua+awlutI6+xROA5iFvORHBUkDOoIW/B5qFaw==
-X-Received: by 2002:a05:7300:6115:b0:2a4:3594:d54e with SMTP id 5a478bee46e88-2a719d86ae3mr13955158eec.27.1764187278729;
-        Wed, 26 Nov 2025 12:01:18 -0800 (PST)
-Received: from archlinux ([2804:7f1:ebc3:752f:12e1:8eff:fe46:88b8])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a93c5562b2sm24363259eec.3.2025.11.26.12.01.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 12:01:17 -0800 (PST)
-Date: Wed, 26 Nov 2025 20:01:11 +0000
-From: Andre Carvalho <asantostc@gmail.com>
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v6 5/5] selftests: netconsole: validate target
- resume
-Message-ID: <hjty4katdz2lmkbjqt4tourk6nf5eq3x2nh6if4ay5xdslpr6n@3htraj5r67py>
-References: <20251121-netcons-retrigger-v6-0-9c03f5a2bd6f@gmail.com>
- <20251121-netcons-retrigger-v6-5-9c03f5a2bd6f@gmail.com>
+        d=1e100.net; s=20230601; t=1764187365; x=1764792165;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=io2b3WP5mJSrzoPU9P3LKCt9DN2B8GXCdJ4X44P7TU4=;
+        b=kyvrNe32Tx9cds5XGJMJGdxiP43EYG/5eRZE3OxffbwquzW96mIOF4f3Y/4U9gq7cb
+         EEJpc3n9/wzTmLG2k+HcqQ5Jor5yVSL5MkvPNiKbP+wdxnoJf7QLtjq0AVBIlZFLjGIU
+         HWvtC/+RhnoxKsoJE9en9VlgdRbHkSRiE3QmHwgsKHVdwfO5wqVBAqQQ9RnOyrB0a/ga
+         QM7nTRVJqPwIV+7SuPuySr6c2UlwHoL9ofpUJXvKd9WHam+simHDyrzYO3MoJ+/0np9d
+         8ZngKYWdrY2Nkspv6tu8yV/07u2j24wggQVlMmbKptt5J9dAnqKl7D5AC7QVk88VZND2
+         0brQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWf7j0YnGLoIhOZwz3EnIhmTNMxJAiMfeGTnr7UxqzpSTPKTxd3UzqvNqt+JaiId1sAVypg7TE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxy7wwfaXKDi1/J8XzuaTWdT0wi3ca77ikQxymyREay6vY1ng9Z
+	VbAarvetzNgU4osSpSUlemNFflxer1DAbgxyUz/w6PVCtkqyFcxYl1lnLpnGnCZZNWlisVDLZZD
+	lix9law1k+C46/JhjoNWSNWeqhV9a4L0=
+X-Gm-Gg: ASbGnctKHbXqBdwF/P4CKQmLdUT4JmE9W9Z6fjUsG+NRcvbUDaC3E2lZ88kx1MUq4vD
+	AygyRFHFiG4bXXOW+HWZ5IIey9IXMIASoqW6PLbMwvwZHwIWKL8eBB07SiwzcpUFZINwyShUh34
+	8xZdZiUlNoyzYgybdLPk6Hu7fJZYTaVlbRiNgoNxSgevB8kQRMxgG54uBuTClYMdwoJDns3blG4
+	W0na/jOV47PPwbaeyM/iqtq7ScsmlGz7G4U4jj8ya2uFA/+RaQ+uQUN171/opd+kXApAlwJgYg6
+	v4pwoebTOm1K39ZGGHOjp/ZjcTji
+X-Google-Smtp-Source: AGHT+IHhPTLf5CTLCoQ18EsMIZtWnWzd5QhbLVXWFL+PMuHp5nvUjMTQ/DYhFP88GSmklCKy+nnqz6NENwZFNXmLY3I=
+X-Received: by 2002:a05:6000:26cc:b0:427:9d7:86f9 with SMTP id
+ ffacd0b85a97d-42cc1d19d6dmr21241880f8f.47.1764187364909; Wed, 26 Nov 2025
+ 12:02:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251121-netcons-retrigger-v6-5-9c03f5a2bd6f@gmail.com>
+References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251121113553.2955854-9-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251121205546.6bqpo2bn5sp3uxxu@skbuf>
+In-Reply-To: <20251121205546.6bqpo2bn5sp3uxxu@skbuf>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Wed, 26 Nov 2025 20:02:17 +0000
+X-Gm-Features: AWmQ_bmTU2niYWdcaSdZep0i6gskfGJjESBHVN_mhWxbtBqTU4OVzxNhhj_FZfk
+Message-ID: <CA+V-a8vH+qCgNti+dHVXqfa02-zMnbUKw2gScWyeuh=EhL8HaA@mail.gmail.com>
+Subject: Re: [PATCH net-next 08/11] net: dsa: rzn1-a5psw: Make DSA tag
+ protocol configurable via OF data
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Russell King <linux@armlinux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 21, 2025 at 12:49:04PM +0000, Andre Carvalho wrote:
-> +	echo "${BINDMODE} : Test passed" >&2
-> +done
-> +
-> +trap - EXIT
-> +exit "${ksft_pass}"
+Hi Vladimir,
 
-Shellcheck complains about this line given that it expects that exported
-variables from other files are always uppercase. I'm going to submit a new
-version of this test using ${EXIT_STATUS} instead, which is the same approach
-taken by a netcons_torture.sh which was recently added.
+Thank you for the review.
 
-We may want to refactor these tests to make use of other selftest's functions
-that actually mutate EXIT_STATUS based on the intermediary results of the tests
-(by using log_test and other functions from lib.sh) which I think may also
-help with making result logging a bit more in line with other tests. I'd like to
-do this in a separate series and migrate all tests, if we agree on this direction.
+On Fri, Nov 21, 2025 at 8:55=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
+ wrote:
+>
+> On Fri, Nov 21, 2025 at 11:35:34AM +0000, Prabhakar wrote:
+> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> >
+> > Update the RZN1 A5PSW driver to obtain the DSA tag protocol from
+> > device-specific data instead of using a hard-coded value. Add a new
+> > `tag_proto` field to `struct a5psw_of_data` and use it in
+> > `a5psw_get_tag_protocol()` to return the appropriate protocol for
+> > each SoC.
+> >
+> > This allows future SoCs such as RZ/T2H and RZ/N2H, which use the
+> > DSA_TAG_PROTO_RZT2H_ETHSW tag format, to share the same driver
+> > infrastructure without code duplication.
+>
+> Again the twitching when reading the commit title. I thought this has
+> something to do with the "dsa-tag-protocol" property from
+> Documentation/devicetree/bindings/net/dsa/dsa-port.yaml. The tagger *is*
+> runtime-configurable if you implement the ds->ops->change_tag_protocol()
+> API, and it's also possible to trigger that API function from OF
+> properties. But this is not what the patch does, so it is confusing.
+>
+> I think it would be more natural to say "choose tagging protocol based
+> on compatible string".
+>
+Ok, I will update the commit message in v2.
 
-> 
-> -- 
-> 2.52.0
-> 
+> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> > ---
+>
+> Anyway I'm not reviewing this commit until the reason why you added a
+> new name for this tagger becomes completely clear.
+As discussed in patch 2/11 the format fields vary, so this change is
+needed to support the new SoC.
 
--- 
-Andre Carvalho
+Cheers,
+Prabhakar
 
