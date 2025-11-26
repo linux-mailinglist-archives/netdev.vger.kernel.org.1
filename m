@@ -1,117 +1,178 @@
-Return-Path: <netdev+bounces-241826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2187AC88DBE
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 10:08:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C59CAC88DCA
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 10:09:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 055BF3B0D67
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:08:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3572C3B6165
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 09:09:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8FA24166C;
-	Wed, 26 Nov 2025 09:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE55302CD0;
+	Wed, 26 Nov 2025 09:09:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KQSYhYWM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bIjfzYTH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17926311C33
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 09:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDE924166C
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 09:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764148083; cv=none; b=mi4GSO4VtlOEcoA2j4wlwZYSue48XNAqZD9qefJdFFdr2+J5mXnN4mv28+n1DimzEZA7sa83ciEIkVeR1gXJrWsQxAM0Hl9uZ89Shqg2QqJjSPkHViBwZ2JHB3xJo/j6OrtbTkiep3FWTi0ozWyuQKumZ3qUGz/vtdB+ZTZW9eE=
+	t=1764148146; cv=none; b=IM/016T5rEi0xpaHLjQsVbuUtfEkLVNShtc7qpdw/8G8e+5bde009CsQzNIuKsF4gWIznmYELbvk/FmNwIXTgCEnqD3cPw4HYgXs2R+dKUo74bChYqDPbYALfnqy2Cj/JI0D3ZH0SbQQKhwqcHsRZtyUQk1OZrvZxyy9RftjZj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764148083; c=relaxed/simple;
-	bh=HwiqTfc0ORQUbJNLeAsHqDBa+rkjLR6ljPCGa4YxK14=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WhwcG6yB7d03bU5ZuHHw6785QcZnWPK/gROCWzxai5D4MuPLiv0tWjfXiYLKpBnlb2ZE33+0CfbJxiAsrzwSEi77XFjqwBlYYDRyhrUZaW7JFE6/wId/BSGm1ER6igRl9wjXR5O8aA/jovC2bB69m6BtYNlc04kdMwSqW916Occ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KQSYhYWM; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-78a76afeff5so62647857b3.0
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 01:08:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764148081; x=1764752881; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CjAGTBpMxxBSQmxs5UnRo87q9r9evSqhYfSB+cRvCWs=;
-        b=KQSYhYWMw8UNq2z2Rfg5WHuUWSn1ldpm71l8owOgzdz5Bt9W7BSokUJBoci1YKNVls
-         LaSrGfCXjHlpPcfsnPTVuIrCrM2uw3nlalGy3UADwXBj8sf63DLIzLERRuoTP40twVj1
-         gvJFtQ5/IdlHkkrQ3SKykDvw8H3nvSiTt5O3OH+krbFL7r3mBra/BGl675pAu7B4d7Mr
-         PTUQMirHOa6e7I9ggzcvNAFh3tI1GCNXz/PfAULyqPbmHnBdAVJrevMm/TsD+xO5t0Sr
-         xfkX80AYz6sCGVep+tSa3762n5g1rz0XsLYpZkY/eqImmgDLm1lsLad/Fq3vP+wcyI8P
-         l72w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764148081; x=1764752881;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CjAGTBpMxxBSQmxs5UnRo87q9r9evSqhYfSB+cRvCWs=;
-        b=MOs00IUGjQbzKG3pVK2b7pgvovNAFKdNROmLlpnSO4FXZilNm/Eut0cpw8BJcmxLSF
-         2AJFRQwOFz/hRvTMTzPxYFNip9nO50L2SEzeZmYeF1HLbyMFMy7d35E8nN3P/qhDv+6f
-         pnOXbY7tEjJzWV1ca8Sw23illtfmDlfcdj6I5bAZLBg09v7eYRB4HaVf3yVQ+qzD1uSu
-         qT0jJV6KowVoMAjW1NlvnFaxUy4Py0J7xzvxJ+yv9k6rtu0gYYTP/Sj0dqnIvaNT5Wvb
-         yylOK0zYYNHhXs9hFAxa2FvO7lf9FSPOQVc9pvEtTmdhgI2wUWdBGU98leBeMgwIOCCa
-         miPA==
-X-Forwarded-Encrypted: i=1; AJvYcCWg5mXC4hOJ2jcI1cUUs+7tdeShbiuH4u29QpiTNpyP2Kf8q4vTjzI7jXAboH5ayzHTpQSna0A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCOUFJ+EtWHx13UVpfmmpxxk+XM4tejifx0hfsL1EtphMGashR
-	PNW/vzf92TIjkzK8lpmXkDS4lBItcbg1ngYiGU7KkHL91iLTeM7eP1x1SM+ob5faaP5UnEOUpsV
-	hv/6xl4cvvAqCKhtb3iG/vwx/tTQiljQ=
-X-Gm-Gg: ASbGncsY7TF/tg4paqY0yfjU4kzVWz5KY9/2PuzFzgFRu5ieqhGQHszv0X6K1i0BT/1
-	6+bUQchg94x6r2bwwJ+s4HSKCzwvUKBIjRsUZpDy0vnFMtPpfvE54FcZReVXIR8zeslB3biijk2
-	VkWBy+YXI2u1NXGtLnFNr/E7creIQd3vGGjeb3qSy4TGRcnSzeyxpQtsTNzK1lce/QTtu0KBwk5
-	jeVvFjh4IZAGlvpzNgGjJCDPi+LW9wEqcY9eET3CT63Ucb/4XGB195JVogVsfau3QYjrw==
-X-Google-Smtp-Source: AGHT+IEDokaxQva4zlrRNnp1WFQDpvzDgUHXvz7vbLSmVkLCLdfIksfumSZ2iHOW9eVV0aL1wCWxxRBx6KIE1wevpl4=
-X-Received: by 2002:a05:690c:7302:b0:786:5c90:922b with SMTP id
- 00721157ae682-78ab6f1bc5amr54574677b3.35.1764148081059; Wed, 26 Nov 2025
- 01:08:01 -0800 (PST)
+	s=arc-20240116; t=1764148146; c=relaxed/simple;
+	bh=6w7rkWZMm2OzZs1d4tCa6J3Sjb91QF8PMCdGPkKWBoM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=rCszbxPvrwpFnGe0nC2oelOcvEJj/2pXwZvu1ha6HsNwjJGh6A7nO0OhGUsyujBN4D3r38luZA/PdEkWw3cgKnCjJLwBYUacvCcGvT50IY8SMaY0VigOeT0x0bO3d8hV+ivE4ZQmw8ywPU0Er6x6s+VZ/RoEp/CGL18LhTSpp9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bIjfzYTH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764148143;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QioLbPIbEdhHQpe6rbAMDZ2orQalmMmfV24sYZuRkpM=;
+	b=bIjfzYTHNy4/xpz/RILQpPAvj/3+QNQve8jy59OO27cxEWIF9nIoAonc+5jYx1Yb+xtChN
+	CTLHEzck8aoy5UbFzEs8YTd7MA36d2FoR4eprQWmvNG+IGzLZOUL3m41Xv6Zw8iH18OzIK
+	pOKp3+OpBAtxzu59tRULnzHmsFmCgXo=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-610-9NRKrjBsMOyjmcTaAx-1rg-1; Wed,
+ 26 Nov 2025 04:09:02 -0500
+X-MC-Unique: 9NRKrjBsMOyjmcTaAx-1rg-1
+X-Mimecast-MFC-AGG-ID: 9NRKrjBsMOyjmcTaAx-1rg_1764148138
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 432561956096;
+	Wed, 26 Nov 2025 09:08:57 +0000 (UTC)
+Received: from fweimer-oldenburg.csb.redhat.com (unknown [10.44.32.146])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F32D63001E83;
+	Wed, 26 Nov 2025 09:08:46 +0000 (UTC)
+From: Florian Weimer <fweimer@redhat.com>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>,  Amir Goldstein <amir73il@gmail.com>,
+ linux-fsdevel@vger.kernel.org,  Josef Bacik <josef@toxicpanda.com>,
+ Jeff Layton <jlayton@kernel.org>,  Mike Yuan <me@yhndnzj.com>,
+ Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+ Lennart Poettering <mzxreary@0pointer.de>,
+ Daan De Meyer <daan.j.demeyer@gmail.com>,
+ Aleksa Sarai <cyphar@cyphar.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Jens Axboe <axboe@kernel.dk>,  Tejun Heo <tj@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>,
+ Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,  Eric Dumazet
+ <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Chuck Lever <chuck.lever@oracle.com>,  linux-nfs@vger.kernel.org,
+ linux-kselftest@vger.kernel.org,  linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  cgroups@vger.kernel.org,
+ netdev@vger.kernel.org, libc-alpha@sourceware.org, Dmitry V. Levin
+ <ldv@strace.io>, address-sanitizer <address-sanitizer@googlegroups.com>,
+ strace-devel@lists.strace.io
+Subject: Stability of ioctl constants in the UAPI (Re: [PATCH 01/32] pidfs:
+ validate extensible ioctls)
+In-Reply-To: <20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org> (Christian
+	Brauner's message of "Wed, 10 Sep 2025 16:36:46 +0200")
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+	<20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org>
+Date: Wed, 26 Nov 2025 10:08:44 +0100
+Message-ID: <lhu7bvd6u03.fsf_-_@oldenburg.str.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251125075150.13879-1-jonas.gorski@gmail.com>
- <20251125075150.13879-5-jonas.gorski@gmail.com> <20251125204215.2lz44qdegapgncn5@skbuf>
-In-Reply-To: <20251125204215.2lz44qdegapgncn5@skbuf>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Wed, 26 Nov 2025 10:07:50 +0100
-X-Gm-Features: AWmQ_bll3UdEjOyoEFRk7CBCUQGw3JLq2bBLVPDuhdDwAVW8tw4Y62qQCx7hcDA
-Message-ID: <CAOiHx=nZvCGf9f5_07pUS+nS3FOrn9e2-eoyAkOw_oTHO7Aujw@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/7] net: dsa: b53: fix CPU port unicast ARL
- entries for BCM5325/65
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tue, Nov 25, 2025 at 9:42=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
+* Christian Brauner:
+
+> Validate extensible ioctls stricter than we do now.
 >
-> On Tue, Nov 25, 2025 at 08:51:47AM +0100, Jonas Gorski wrote:
-> > On BCM5325 and BCM5365, unicast ARL entries use 8 as the value for the
-> > CPU port, so we need to translate it to/from 5 as used for the CPU port
-> > at most other places.
-> > +     ent->port =3D (mac_vid >> ARLTBL_DATA_PORT_ID_S_25) &
-> > +                  ARLTBL_DATA_PORT_ID_MASK_25;
-> > +     if (!is_multicast_ether_addr(ent->mac) && ent->port =3D=3D B53_CP=
-U_PORT)
-> > +             ent->port =3D B53_CPU_PORT_25;
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> ---
+>  fs/pidfs.c         |  2 +-
+>  include/linux/fs.h | 14 ++++++++++++++
+>  2 files changed, 15 insertions(+), 1 deletion(-)
 >
-> Why not use is_unicast_ether_addr() to have a more clear correlation
-> between the commit message and the code?
+> diff --git a/fs/pidfs.c b/fs/pidfs.c
+> index edc35522d75c..0a5083b9cce5 100644
+> --- a/fs/pidfs.c
+> +++ b/fs/pidfs.c
+> @@ -440,7 +440,7 @@ static bool pidfs_ioctl_valid(unsigned int cmd)
+>  		 * erronously mistook the file descriptor for a pidfd.
+>  		 * This is not perfect but will catch most cases.
+>  		 */
+> -		return (_IOC_TYPE(cmd) == _IOC_TYPE(PIDFD_GET_INFO));
+> +		return extensible_ioctl_valid(cmd, PIDFD_GET_INFO, PIDFD_INFO_SIZE_VER0);
+>  	}
+>  
+>  	return false;
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index d7ab4f96d705..2f2edc53bf3c 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -4023,4 +4023,18 @@ static inline bool vfs_empty_path(int dfd, const char __user *path)
+>  
+>  int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter);
+>  
+> +static inline bool extensible_ioctl_valid(unsigned int cmd_a,
+> +					  unsigned int cmd_b, size_t min_size)
+> +{
+> +	if (_IOC_DIR(cmd_a) != _IOC_DIR(cmd_b))
+> +		return false;
+> +	if (_IOC_TYPE(cmd_a) != _IOC_TYPE(cmd_b))
+> +		return false;
+> +	if (_IOC_NR(cmd_a) != _IOC_NR(cmd_b))
+> +		return false;
+> +	if (_IOC_SIZE(cmd_a) < min_size)
+> +		return false;
+> +	return true;
+> +}
+> +
+>  #endif /* _LINUX_FS_H */
 
-There is a very simple explanation for that: I didn't know it existed.
-Will change it for v2.
+Is this really the right direction?  This implies that the ioctl
+constants change as the structs get extended.  At present, this impacts
+struct pidfd_info and PIDFD_GET_INFO.
 
-Thanks for the review,
-Jonas
+I think this is a deparature from the previous design, where (low-level)
+userspace did not have not worry about the internal structure of ioctl
+commands and could treat them as opaque bit patterns.  With the new
+approach, we have to dissect some of the commands in the same way
+extensible_ioctl_valid does it above.
+
+So far, this impacts glibc ABI tests.  Looking at the strace sources, it
+doesn't look to me as if the ioctl handler is prepared to deal with this
+situation, either, because it uses the full ioctl command for lookups.
+
+The sanitizers could implement generic ioctl checking with the embedded
+size information in the ioctl command, but the current code structure is
+not set up to handle this because it's indexed by the full ioctl
+command, not the type.  I think in some cases, the size is required to
+disambiguate ioctl commands because the type field is not unique across
+devices.  In some cases, the sanitizers would have to know the exact
+command (not just the size), to validate points embedded in the struct
+passed to the ioctl.  So I don't think changing ioctl constants when
+extensible structs change is obviously beneficial to the sanitizers,
+either.
+
+I would prefer if the ioctl commands could be frozen and decoupled from
+the structs.  As far as I understand it, there is no requirement that
+the embedded size matches what the kernel deals with.
+
+Thanks,
+Florian
+
 
