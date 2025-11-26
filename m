@@ -1,194 +1,149 @@
-Return-Path: <netdev+bounces-242072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC435C8BFEB
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 22:17:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42D54C8C066
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 22:29:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BD013A2C8C
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:17:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E9E9B4E27B4
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:29:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5F225A2A2;
-	Wed, 26 Nov 2025 21:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872D92D6E7C;
+	Wed, 26 Nov 2025 21:28:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A40A/b9M"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kA6HxFiB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11E126CE11
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 21:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A710529D265;
+	Wed, 26 Nov 2025 21:28:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764191831; cv=none; b=lW6OCa6Y+Ool2/p+2pSz3F9hHjdBA0fvaVXfnZpQ03CIoNYNHmqsek7OBtHoul01sey9sEFl3C5ctL4d9rYbmsQ+Tb2PtYrW48v5R1RU3Bblwj+CpcmMRn9CIepUOXs0yFqp/aKBBjjuOD+1z8jk0PbtFlw/FXKs801kTaDKPHg=
+	t=1764192537; cv=none; b=i45y26cYlczb3t/Vw7Zkrq5tLquc5pZUgvUhpmNPmxB3mFT/NVvMY1CgS24zZM+tC+DWNjXc/AaL92e+fiQhBo/+FxDs3h50J3EQNsrZFjC3eO+m3ZfugzIPZCcnz3DlaiXNXvhHhjLPWCB2yyzK8PqRfmcuPkKWR4hy5Wk0GzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764191831; c=relaxed/simple;
-	bh=Tu9UoJab2N9aOFK02uU2NH64dAR7qMBaHBTPor6ABm8=;
+	s=arc-20240116; t=1764192537; c=relaxed/simple;
+	bh=CssGIMckCwYlvoFRUzLEnjscQLkpYHsbeBgfng32u6Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MP1TQASm6r4t+y3cidS3cQGAdSifc8caSX5IDtATV3acVMeNnXnfdJ3Jb4ourGe2PByfL6na8K64v8UIqWH+ZjFNWINlk4JXAFLCTgiRI5j7ecmFXMo1luREv2pp8+vWgIb5ZS55NjnCSzLOUec/niU6c1pESnLoCm5T+ZyjMeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A40A/b9M; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764191828;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5bX/0i7tj4y+cgcP++a7Y4BBxU58ei/TXceewZURiUM=;
-	b=A40A/b9M4w9iqQANsV4R8Q9GUy1icgkrT3E/nFvwERp5ps6LrprZI4YFtB6SpR1OGOZRDn
-	EqjUZkiz79U3as4ukUtjkvvYTJpySBandw6UWkcCl1ypbM0fQiSXBy2froTMjlhVNhj0+L
-	n5bVon0QQ/XXOh8L4LOxrSBWx9MlG0Y=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-673-OSoQCYNGNvK3Jpe5w-JuHA-1; Wed,
- 26 Nov 2025 16:17:03 -0500
-X-MC-Unique: OSoQCYNGNvK3Jpe5w-JuHA-1
-X-Mimecast-MFC-AGG-ID: OSoQCYNGNvK3Jpe5w-JuHA_1764191822
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C749419560B0;
-	Wed, 26 Nov 2025 21:17:01 +0000 (UTC)
-Received: from localhost (unknown [10.2.16.34])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AF10F1800451;
-	Wed, 26 Nov 2025 21:17:00 +0000 (UTC)
-Date: Wed, 26 Nov 2025 16:03:13 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: virtualization@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	netdev@vger.kernel.org, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost/vsock: improve RCU read sections around
- vhost_vsock_get()
-Message-ID: <20251126210313.GA499503@fedora>
-References: <20251126133826.142496-1-sgarzare@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yz+QjPIBMkLK2cn2Lid0OgvbL+cfKb9/m60ghfUhyd5iHtOxmgK9Z3QxX+mDtXixKg30EnhIgpFQ/FSZmeaLdWGXS9hzSFezNwT9JHM230g/BiVKzAHE4baX5SMNIrc8fxrN1u2CrhKhWPZrUhjqXoauhN9NCTzAG9BTtfrvTMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kA6HxFiB; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=9X9n7aU/TJ/voAwW/L3k+ydogg1yk6XrLlkSzg40I3k=; b=kA
+	6HxFiB1sY6IB1o70t2byczTUOOsu9RU8YJcSpyw2PA6tyKVqJnVFlKUZXriahBf3CPtZBG0JDzYr3
+	Fqg8Pb5vInoZK1teKCIPN1b4skCruU4JaP6NS2rKIPM3yHSDs2FIWageDVCho5sRbD2mSvyc/6Txx
+	/HrJrdomOHycelk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vON41-00FCJf-Oz; Wed, 26 Nov 2025 22:28:37 +0100
+Date: Wed, 26 Nov 2025 22:28:37 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: pcs: renesas,rzn1-miic:
+ Add renesas,miic-phylink-active-low property
+Message-ID: <116b3a93-2b65-4464-821a-cbc7aa1b3dc1@lunn.ch>
+References: <20251112201937.1336854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251112201937.1336854-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <de098757-2088-4b34-8a9a-407f9487991c@lunn.ch>
+ <CA+V-a8vgJcJ+EsxSwQzQbprjqhxy-QS84=wE6co+D50wOOOweA@mail.gmail.com>
+ <0d13ed33-cb0b-4cb0-8af3-b54c2ad7537b@lunn.ch>
+ <CA+V-a8vx5KTUD_j7+1TC9r5JrGo2fJ0D7XXJCc-oHidtbUN=ZA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="g1JPwMl4XCtaMV09"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251126133826.142496-1-sgarzare@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+V-a8vx5KTUD_j7+1TC9r5JrGo2fJ0D7XXJCc-oHidtbUN=ZA@mail.gmail.com>
 
+On Wed, Nov 26, 2025 at 08:55:53PM +0000, Lad, Prabhakar wrote:
+> Hi Andrew,
+> 
+> On Thu, Nov 13, 2025 at 9:58 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > > Each of these IPs has its own link status pin as an input to the SoC:
+> >
+> > > The above architecture is for the RZ/N1 SoC. For RZ/T2H SoC we dont
+> > > have a SERCOS Controller. So in the case of RZ/T2H EVK the
+> > > SWITCH_MII_LINK status pin is connected to the LED1 of VSC8541 PHY.
+> > >
+> > > The PHYLNK register [0] (section 10.2.5 page 763) allows control of
+> > > the active level of the link.
+> > > 0: High active (Default)
+> > > 1: Active Low
+> > >
+> > > For example the SWITCH requires link-up to be reported to the switch
+> > > via the SWITCH_MII_LINK input pin.
+> >
+> > Why does the switch require this? The switch also needs to know the
+> > duplex, speed etc. Link on its own is of not enough. So when phylink
+> > mac_link_up is called, you tell it the speed, duplex and also that the
+> > link is up. When the link goes down, mac_link_down callback will be
+> > called and you tell it the link is down.
+> >
+> Sorry for the delayed response. I was awaiting more info from the HW
+> team on this. Below is the info I got from the HW info.
+> 
+> EtherPHY link-up and link-down status is required as a hardware IP
+> feature, regardless of whether GMAC or ETHSW is used.
+> In the case of GMAC, the software retrieves this information from
+> EtherPHY via MDC/MDIO and then configures GMAC accordingly. In
+> contrast, ETHSW provides dedicated pins for this purpose.
+> For ETHSW, this information is also necessary for communication
+> between two external nodes (e.g., Node A to Node B) that does not
+> involve the host CPU, as the switching occurs entirely within ETHSW.
+> This is particularly important for DLR (Device Level Ring: a
+> redundancy protocol used in EtherNet/IP). DLR relies on detecting
+> link-down events caused by cable issues as quickly as possible to
+> enable fast switchover to a redundant path. Handling such path
+> switching in software introduces performance impacts, which is why
+> ETHSW includes dedicated pins.
+> As for Active Level configuration, it is designed to provide
+> flexibility to accommodate the specifications of external EtherPHY
+> devices.
+> 
+> Please share your thoughts.
 
---g1JPwMl4XCtaMV09
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Please add this to the commit, to make it clear what these pins are
+for.
 
-On Wed, Nov 26, 2025 at 02:38:26PM +0100, Stefano Garzarella wrote:
-> From: Stefano Garzarella <sgarzare@redhat.com>
->=20
-> vhost_vsock_get() uses hash_for_each_possible_rcu() to find the
-> `vhost_vsock` associated with the `guest_cid`. hash_for_each_possible_rcu=
-()
-> should only be called within an RCU read section, as mentioned in the
-> following comment in include/linux/rculist.h:
->=20
-> /**
->  * hlist_for_each_entry_rcu - iterate over rcu list of given type
->  * @pos:	the type * to use as a loop cursor.
->  * @head:	the head for your list.
->  * @member:	the name of the hlist_node within the struct.
->  * @cond:	optional lockdep expression if called from non-RCU protection.
->  *
->  * This list-traversal primitive may safely run concurrently with
->  * the _rcu list-mutation primitives such as hlist_add_head_rcu()
->  * as long as the traversal is guarded by rcu_read_lock().
->  */
->=20
-> Currently, all calls to vhost_vsock_get() are between rcu_read_lock()
-> and rcu_read_unlock() except for calls in vhost_vsock_set_cid() and
-> vhost_vsock_reset_orphans(). In both cases, the current code is safe,
-> but we can make improvements to make it more robust.
->=20
-> About vhost_vsock_set_cid(), when building the kernel with
-> CONFIG_PROVE_RCU_LIST enabled, we get the following RCU warning when the
-> user space issues `ioctl(dev, VHOST_VSOCK_SET_GUEST_CID, ...)` :
->=20
->   WARNING: suspicious RCU usage
->   6.18.0-rc7 #62 Not tainted
->   -----------------------------
->   drivers/vhost/vsock.c:74 RCU-list traversed in non-reader section!!
->=20
->   other info that might help us debug this:
->=20
->   rcu_scheduler_active =3D 2, debug_locks =3D 1
->   1 lock held by rpc-libvirtd/3443:
->    #0: ffffffffc05032a8 (vhost_vsock_mutex){+.+.}-{4:4}, at: vhost_vsock_=
-dev_ioctl+0x2ff/0x530 [vhost_vsock]
->=20
->   stack backtrace:
->   CPU: 2 UID: 0 PID: 3443 Comm: rpc-libvirtd Not tainted 6.18.0-rc7 #62 P=
-REEMPT(none)
->   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-7.fc=
-42 06/10/2025
->   Call Trace:
->    <TASK>
->    dump_stack_lvl+0x75/0xb0
->    dump_stack+0x14/0x1a
->    lockdep_rcu_suspicious.cold+0x4e/0x97
->    vhost_vsock_get+0x8f/0xa0 [vhost_vsock]
->    vhost_vsock_dev_ioctl+0x307/0x530 [vhost_vsock]
->    __x64_sys_ioctl+0x4f2/0xa00
->    x64_sys_call+0xed0/0x1da0
->    do_syscall_64+0x73/0xfa0
->    entry_SYSCALL_64_after_hwframe+0x76/0x7e
->    ...
->    </TASK>
->=20
-> This is not a real problem, because the vhost_vsock_get() caller, i.e.
-> vhost_vsock_set_cid(), holds the `vhost_vsock_mutex` used by the hash
-> table writers. Anyway, to prevent that warning, add lockdep_is_held()
-> condition to hash_for_each_possible_rcu() to verify that either the
-> caller is in an RCU read section or `vhost_vsock_mutex` is held when
-> CONFIG_PROVE_RCU_LIST is enabled; and also clarify the comment for
-> vhost_vsock_get() to better describe the locking requirements and the
-> scope of the returned pointer validity.
->=20
-> About vhost_vsock_reset_orphans(), currently this function is only
-> called via vsock_for_each_connected_socket(), which holds the
-> `vsock_table_lock` spinlock (which is also an RCU read-side critical
-> section). However, add an explicit RCU read lock there to make the code
-> more robust and explicit about the RCU requirements, and to prevent
-> issues if the calling context changes in the future or if
-> vhost_vsock_reset_orphans() is called from other contexts.
->=20
-> Fixes: 834e772c8db0 ("vhost/vsock: fix use-after-free in network stack ca=
-llers")
-> Cc: stefanha@redhat.com
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  drivers/vhost/vsock.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
+It actually seems like it is mostly relevant for link down, not up.
+If the link goes down, it does not matter if it is 10Half, or 1G Full.
+All you want to do is swap to a redundant path as soon as possible.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+It would however be interesting it know more about link up. Does the
+hardware start using the port as soon as link up is reported by this
+pin? So it could be blasting frames out at 1G, until software catches
+up and tells the MAC to slow down and do 10Half? So all those frames
+are corrupted, causing your nice redundant network to break for a
+while?
 
---g1JPwMl4XCtaMV09
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmknaxEACgkQnKSrs4Gr
-c8gttwf/ZJ0Ara63zkxpEWCtgFN92fZknjdxSfwNZ2z6NsKZDwPYCnI5BYYU+7aN
-RYICx39augMRLy430bN6PQJjaMJsGeAWuXegBNEKPe7U4lCjCKiNoU3sgpMbr/Rj
-iyFJLkTK4umOp04jeODZBVDjd5vRp9dUvu1/zkuDriRn7HWry51Rbk/Ib1F3h9IP
-qK5iVrjTRXliuSAtnokc0Kk1Ff41kyZnb6bLK1obA5h93W2RZIppBj2jLcrX8PLF
-I0z2g79tY2zw03KhtvE29Faf5K6FD92KTkdZEa5K2oQkosI4b+56MmoQMyhxRkgp
-M839LQbIdZnpzGHw6Liu9a3FC9i9HA==
-=vy3f
------END PGP SIGNATURE-----
-
---g1JPwMl4XCtaMV09--
-
+	Andrew
 
