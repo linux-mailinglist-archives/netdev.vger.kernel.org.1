@@ -1,178 +1,251 @@
-Return-Path: <netdev+bounces-241992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46145C8B6F0
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 19:26:22 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFBE7C8B73E
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 19:35:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2E6E3AD6CD
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:26:20 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 292D7345E4D
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:35:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD323128B2;
-	Wed, 26 Nov 2025 18:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158CF286400;
+	Wed, 26 Nov 2025 18:35:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ec8aQLAK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TBGkIfMn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f100.google.com (mail-yx1-f100.google.com [74.125.224.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59CF31282F
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 18:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE542248AE;
+	Wed, 26 Nov 2025 18:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764181579; cv=none; b=PNq8TLHqTfu9YrE+5LWRtkrLSIelBk4LCOuz25aGeGwem/udV4Fd1CsgmUQuHiOREsRtvX3mYN0xy8x0Y7TqNCIzohE92aFF4HMIOMwsb5ewwhRTSVDp6xQm2r5gwI5IGSqkgQBblTQ2EPNHruLsejK8jnj+JZhm2V5O05DSTRY=
+	t=1764182140; cv=none; b=tHj2ZhNZm+2OLadvkPlDh29ErtnV9kvVv5XfeYLrqn8A1WZtWmfZMPqS8Q9D8DF9tuy/63trKMzyp3+g+rhS2nQS94UOdB0F/YsZcM5trsEIsuonIH+8PWlWSlViYh2G6YPZfd2Hc3Pit0sjrBs/smEJ/33xylUHFBSfiI1cLA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764181579; c=relaxed/simple;
-	bh=j/Ly1tXrw33VIEzyL5/TVBCJhQ4MccXYSpDKd3mM/QM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HSk8R2f3bNPmlj56bh3mOIdfqUETkEWRbPoO66YIVdwSkf1wq8b3fofD6uhuzXUCDwMkiwZnd0V5TVOYfQBZgnQlADlszSXjbirB0/I/qvOdc8qBd5ADPXeEEtbK6pWMkQMdaotVVcGSGRonDoAQQlSTruqGGEIL3+ASt8cD4UI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ec8aQLAK; arc=none smtp.client-ip=74.125.224.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yx1-f100.google.com with SMTP id 956f58d0204a3-640daf41b19so148193d50.0
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 10:26:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764181577; x=1764786377;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:dkim-signature:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Cy8AKiI7FbfC4e7RG9mzZPcfmwKd6ALYyfBgdGUTSMQ=;
-        b=t3nzJ6X6z79XSvvVdxxsEwf/rvQlAs3PNN4JB6JKLLsFU9EcD7RYQqAGFppEnV5onY
-         TOql9GncVbPa9/aDwK91spWYURS8YkFouQt4Fwp//SVuXCRuD9WC5FL961t6qPYY0Wc1
-         7ASA98EXxigXA9Xwy54s2yiE+9k2fGitq+iyKgwOfs/fErB1Oe05BoPiyWA+ANipaF6R
-         1qTc/p/Zb2pCsZDfthcMXKKDS2P629Oy7NMZuCTbmVE9XxDPAxO2lRZeOeZ98+ROsuA9
-         8ZmjvmQQwfPXV2PITUPOyUVKkD0eG86638e9faMIWK3zgguObOpZZRr3GqjtemV647va
-         X6fw==
-X-Forwarded-Encrypted: i=1; AJvYcCUmQwT/np+dd21fIIDopkCYI+3NpV1uhqREqA33XzzxvPLN2PxBFnOC6uD/PdYRgga94FLCh38=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTwJi/Ojy6haQIPZGGJw/hty/GS1iByHFigNfsHIJlmiElAjE0
-	cbMFkI5H10Ocqn5zcPfSFUylYBTsjDxedBX3c59n+ALSwF0VLQWRbikxIayJOyDv4iOSUTAid6i
-	BRo5fI6fWfcMQMZlMjZOllBxAVZFEjgb9H0bRJn2xe56wFFgXIj9FnAr4bAEkhV8H7pO/njaS65
-	r8BNg9irEhJBId0lANH0QNRMOIwknhg/bwNlOOAeZU6fy56h+PAlXsRGstx4DIrQYalBiR1krgl
-	iqoFlZ/o/zBi1Ls
-X-Gm-Gg: ASbGnct6S8yQ96RNM2fUvlz7p4o7cTky//7F0mvB6ZkCxyE6vYzdRkLqMypLHxJMifu
-	YLqT0exBuYXzzF17mTSav40M48kTf/F0cUZxIOwsC2hRXkaE00R0UIA/jPI2zwO4oU7T+C+wjZS
-	Av2hyHbUk3SiJon8ihFdkhRCQ3UFzrNtyg/e3K8dIJ/5XhO++ADgDbUf9JKpBztDVMvBtostHf2
-	6HJp87EqHb11NO0RkEcDc1WqH7xsscIjkGisznhGhcCt1uolQLngBqq1kQVPq4iTRZUW0N2aXzq
-	CqqUlLOO+HMqMAzwgIN6Kbp0dU4T8jgrribKHpLn5v4Jkk2hhsMXn7okzSa5wu/r6/ozfaZxRuT
-	uwcfq6prIyHyESqHAlZOuoWKoIeVd4niqotM5LNlngbnTt31AapxpX/lozPHZ/0IXFSTVL5UAKN
-	vbkL2bYEzq68u2il/BCsQmmuS09gM7SXXoY7sZK8ShbcO0LrDdwQ==
-X-Google-Smtp-Source: AGHT+IE+zWJGYdRqT964R+A3g76viDz3/9XlyB7kXVU1WThi9tWa+K5h2Ss+IQGfVD0+7zsiyb1ez1839EO4
-X-Received: by 2002:a05:690e:1443:b0:63f:a4ca:dc21 with SMTP id 956f58d0204a3-642f8e2e343mr15995331d50.19.1764181576614;
-        Wed, 26 Nov 2025 10:26:16 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-77.dlp.protect.broadcom.com. [144.49.247.77])
-        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-642f7188142sm1548112d50.9.2025.11.26.10.26.16
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 26 Nov 2025 10:26:16 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f69.google.com with SMTP id a92af1059eb24-11bd7a827fdso1536241c88.1
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 10:26:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1764181575; x=1764786375; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cy8AKiI7FbfC4e7RG9mzZPcfmwKd6ALYyfBgdGUTSMQ=;
-        b=Ec8aQLAKDLWAl9yBEkE1sv3uWphfNhiYJ13teo8WPDQOWZ6+kI0Uq1P+rfFRf9kBx8
-         g3MG0M1HtmE9nFYUyPHqLogBhrUgksoFbA+/rQVNd5FDQjKkknzNjEGWHkUSMv99LLTK
-         gtMZAbipvR7IsmEJ1MvWH/kRsRlACJOqUFJI4=
-X-Forwarded-Encrypted: i=1; AJvYcCVRLNI5aGoQdGhwE0RKQEqOls+UKkzEqMxkSOvG/a+Fbm9OkHbcxKPF+2PiA9t8Bt2kKgPXeWU=@vger.kernel.org
-X-Received: by 2002:a05:7022:fb0b:b0:119:e569:f85d with SMTP id a92af1059eb24-11c94b90cb3mr13324834c88.20.1764181575161;
-        Wed, 26 Nov 2025 10:26:15 -0800 (PST)
-X-Received: by 2002:a05:7022:fb0b:b0:119:e569:f85d with SMTP id a92af1059eb24-11c94b90cb3mr13324814c88.20.1764181574647;
-        Wed, 26 Nov 2025 10:26:14 -0800 (PST)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11c93e6dbc8sm100132165c88.10.2025.11.26.10.26.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Nov 2025 10:26:13 -0800 (PST)
-Message-ID: <9efdfd06-60d5-48db-b1d9-6d134cc39732@broadcom.com>
-Date: Wed, 26 Nov 2025 10:26:12 -0800
+	s=arc-20240116; t=1764182140; c=relaxed/simple;
+	bh=oTaJfHnKsmK6inQoltB8x3WChksALN+IW6Kq2p4t8P8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=e3c8kb0KSHPMKWMiBNF/G3BOZ5JrXI9ghUYyMWNlb9d2X9vTDwoxER6P5ZY0u9OCXyKp33QuMmApDo+a+JZ32+Z6tAuTLqkeSO1ZHe77ZyOg3mrI/IURlAncf+TmjzVbQ7viBRJxngEeRy0MS5P0fors0qbbIRvvZVq+tZpV8eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TBGkIfMn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15B8AC4CEF7;
+	Wed, 26 Nov 2025 18:35:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764182139;
+	bh=oTaJfHnKsmK6inQoltB8x3WChksALN+IW6Kq2p4t8P8=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=TBGkIfMn6szVeVn2AuROOCU8qv8ps8NCC0q66qob7yBtbmFnTvG9VK7H61gpzst7N
+	 YdgOlu4/HbUNxd0CAVxhIZ/S59Xh4qkZ1M03PN+9olXhbG5FICB7U0PUBAz6gcmuMh
+	 uUiCQyO0/NCay3OLu5DJd4+4npO0RufzU0GtLScJYDU7YE0AH40KsaEGJ2UyvlVCXg
+	 +eZO+4rwx2RhZsOTKbhfsug8qtv2GDEvy5GRgkRYE7czt0rZXk3TNFHAQkWrSGyepv
+	 Xz47jhzjpWWJp4m6tvrNS3x8cNSUNxDnQP38Aodk0a26smRyc4+T05k3137jGHGN7K
+	 5rsxcg2ba6B0g==
+Message-ID: <7f1e56067bdc46195a9e36f914aa103dc76d4f7f.camel@kernel.org>
+Subject: Re: [PATCH v21 15/23] sfc: get endpoint decoder
+From: PJ Waskiewicz <ppwaskie@kernel.org>
+To: Alejandro Lucero Palau <alucerop@amd.com>,
+ alejandro.lucero-palau@amd.com, 	linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, 	edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, dave.jiang@intel.com
+Cc: Martin Habets <habetsm.xilinx@gmail.com>, Edward Cree
+	 <ecree.xilinx@gmail.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+ Ben Cheatham <benjamin.cheatham@amd.com>
+Date: Wed, 26 Nov 2025 10:35:38 -0800
+In-Reply-To: <34f7771f-7d6d-4bfd-9212-889433d80b4c@amd.com>
+References: <20251119192236.2527305-1-alejandro.lucero-palau@amd.com>
+	 <20251119192236.2527305-16-alejandro.lucero-palau@amd.com>
+	 <4aab1857efeaf2888b1c85cbac1fc5c8fc5c8cbc.camel@kernel.org>
+	 <34f7771f-7d6d-4bfd-9212-889433d80b4c@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/7] net: dsa: b53: fix BCM5325/65 ARL entry
- multicast port masks
-To: Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?=C3=81lvaro_Fern=C3=A1ndez_Rojas?= <noltari@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251125075150.13879-1-jonas.gorski@gmail.com>
- <20251125075150.13879-6-jonas.gorski@gmail.com>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20251125075150.13879-6-jonas.gorski@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
+Hi Alejandro,
 
+On Wed, 2025-11-26 at 09:09 +0000, Alejandro Lucero Palau wrote:
+>=20
+> On 11/26/25 01:27, PJ Waskiewicz wrote:
+> > Hi Alejandro,
+> >=20
+> > On Wed, 2025-11-19 at 19:22 +0000, alejandro.lucero-palau@amd.com
+> > wrote:
+> > > From: Alejandro Lucero <alucerop@amd.com>
+> > >=20
+> > > Use cxl api for getting DPA (Device Physical Address) to use
+> > > through
+> > > an
+> > > endpoint decoder.
+> > >=20
+> > > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> > > Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
+> > > Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+> > > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> > > Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
+> > > Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+> > > ---
+> > > =C2=A0=C2=A0drivers/net/ethernet/sfc/efx_cxl.c | 12 +++++++++++-
+> > > =C2=A0=C2=A01 file changed, 11 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/drivers/net/ethernet/sfc/efx_cxl.c
+> > > b/drivers/net/ethernet/sfc/efx_cxl.c
+> > > index d7c34c978434..1a50bb2c0913 100644
+> > > --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> > > +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> > > @@ -108,6 +108,14 @@ int efx_cxl_init(struct efx_probe_data
+> > > *probe_data)
+> > > =C2=A0=C2=A0		return -ENOSPC;
+> > > =C2=A0=C2=A0	}
+> > > =C2=A0=20
+> > > +	cxl->cxled =3D cxl_request_dpa(cxl->cxlmd,
+> > > CXL_PARTMODE_RAM,
+> > > +				=C2=A0=C2=A0=C2=A0=C2=A0 EFX_CTPIO_BUFFER_SIZE);
+> > I've been really struggling to get this flow working in my
+> > environment.
+> > The above function call has a call-chain like this:
+> >=20
+> > - cxl_request_dpa()
+> > =C2=A0=C2=A0 =3D> cxl_dpa_alloc()
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D> __cxl_dpa_alloc()
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D> __cxl_dpa_reserve=
+()
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D>=
+ __request_region()
+> >=20
+> > That last call to __request_region() is not handling a Type2 device
+> > that has its mem region defined as EFI Special Purpose memory.
+> > Basically if the underlying hardware has the memory region marked
+> > that
+> > way, it's still getting mapped into the host's physical address
+> > map,
+> > but it's explicitly telling the OS to bugger off and not try to map
+> > it
+> > as system RAM, which is what we want. Since this is being used as
+> > an
+> > acceleration path, we don't want the OS to muck about with it.
+> >=20
+> > The issue here is now that I have to build CXL into the kernel
+> > itself
+> > to get around the circular dependency issue with depmod, I see this
+> > when my kernel boots and the device trains, but *before* my driver
+> > loads:
+> >=20
+> > # cat /proc/iomem
+> > [...snip...]
+> > c050000000-c08fffffff : CXL Window 0
+> > =C2=A0=C2=A0 c050000000-c08fffffff : Soft Reserved
+> >=20
+> > That right there is my device.=C2=A0 And it's being presented correctly
+> > that
+> > it's reserved so the OS doesn't mess with it.=C2=A0 However, that call
+> > to
+> > __request_region() fails with -EBUSY since it can't take ownership
+> > of
+> > that region since it's already owned by the core.
+> >=20
+> > I can't just skip over this flow for DPA init, so I'm at a bit of a
+> > loss how to proceed.=C2=A0 How is your device presenting the .mem regio=
+n
+> > to
+> > the host?
+>=20
+>=20
+> Hi PJ,
+>=20
+>=20
+> My work is based on the device not using EFI_CONVENTIONAL_MEMORY +=20
+> EFI_MEMORY_SP but EFI_RESERVED_TYPE. In the first case the kernel can
+> try to use that memory and the BIOS goes through default
+> initialization,=20
 
-On 11/24/2025 11:51 PM, Jonas Gorski wrote:
-> We currently use the mask 0xf for writing and reading b53_entry::port,
-> but this is only correct for unicast ARL entries. Multicast ARL entries
-> use a bitmask, and 0xf is not enough space for ports > 3, which includes
-> the CPU port.
-> 
-> So extend the mask accordingly to also fit port 4 (bit 4) and MII (bit
-> 5). According to the datasheet the multicast port mask is [60:48],
-> making it 12 bit wide, but bits 60-55 are reserved anyway, and collide
-> with the priority field at [60:59], so I am not sure if this is valid.
-> Therefore leave it at the actual used range, [53:48].
-> 
-> The ARL search result register differs a bit, and there the mask is only
-> [52:48], so only spanning the user ports. The MII port bit is
-> contained in the Search Result Extension register. So create a separate
-> search result parse function that properly handles this.
-> 
-> Fixes: c45655386e53 ("net: dsa: b53: add support for FDB operations on 5325/5365")
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
-> ---
+I'm not sure I follow.  Your device is based on using
+EFI_RESERVED_TYPE?  Or is it based on the former?  My device is based
+on EFI_RESERVED_TYPE, which translates into the Soft Reserved status as
+a result of BIOS enumeration and the CXL core enumerating that memory
+resource.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+> the latter will avoid BIOS or kernel to mess with such a memory.
+> Because=20
+> there is no BIOS yet supporting this I had to remove DAX support from
+> the kernel and deal (for testing) with some BIOS initialization we
+> will=20
+> not have in production.
 
+Can you elaborate what you mean here?  Do you mean the proposed patches
+here are trying to work around this BIOS limitation?
+
+I'm not sure I understand what BIOS limitations you mean though.  I see
+on both an AMD and Intel host (CXL 2.0-capable) the same behavior that
+I'd expect of EFI_RESERVED_TYPE getting set aside so the OS doesn't
+mess with it.  This is on CRB-level stuff plus production-level
+platforms.
+
+>=20
+>=20
+> For your case I thought this work=20
+> https://lore.kernel.org/linux-cxl/20251120031925.87762-1-Smita.Koralahall=
+iChannabasappa@amd.com/T/#me2bc0d25a2129993e68df444aae073addf886751
+> =C2=A0
+> was solving your problem but after looking at it now, I think that
+> will=20
+> only be useful for Type3 and the hotplug case. Maybe it is time to
+> add=20
+> Type2 handling there. I'll study that patchset with more detail and=20
+> comment for solving your case.
+
+I just looked through that, and I might be able to cherry-pick some
+stuff.  I'll do the same offline and see if I can come up with a
+workable solution to get past this wall for now.
+
+That said though, I don't really want or care about DAX.  I can already
+find and map the underlying CXL.mem accelerated region through other
+means (RCRB, DVSEC, etc.).
+
+What I'm trying to do is get the regionX object to instantiate on my
+CXL.mem memory block, so that I can remove the region, ultimately
+tearing down the decoders, and allowing me to hotplug the device.  The
+patches here seem to still assume a Type3-ish device where there's DPA
+needing to get mapped into HPA, which our devices are already allocated
+in the decoders due to the EFI_RESERVED_TYPE enumeration.  But the
+patches aren't seeing that firmware already set them up, since the
+decoders haven't been committed yet.
+
+My root decoder has 1GB of space, which is the size of my endpoint
+device's memory size (1GB).  There is no DPA to map, and the HPA
+already appears "full" since the device is already configured in the
+decoder.
+
+TL;DR: if your device you're testing with presents the CXL.mem region
+as EFI_RESERVED_TYPE, I don't see how these patches are working.=20
+Unless you're doing something extra outside of the patches, which isn't
+obvious to me.
+
+>=20
+>=20
+> FWIW, last year in Vienna I raised the concern of the kernel doing=20
+> exactly what you are witnessing, and I proposed having a way for
+> taking=20
+> the device/memory from DAX but I was told unanimously that was not=20
+> necessary and if the BIOS did the wrong thing, not fixing that in the
+> kernel. In hindsight I would say this conflict was not well
+> understood=20
+> then (me included) with all the details, so maybe it is time to have=20
+> this capacity, maybe from user space or maybe specific kernel param=20
+> triggering the device passing from DAX.
+
+I do recall this.  Unfortunately I brought up similar concerns way back
+in Dublin in 2021 regarding all of this flow well before 2.0-capable
+hosts arrived.  I think I started asking the questions way too early,
+since this was of little to no concern at the time (nor was Type2
+device support).
+
+Cheers,
+-PJ
 
