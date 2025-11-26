@@ -1,148 +1,178 @@
-Return-Path: <netdev+bounces-242098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57465C8C3C6
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 23:42:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5A0EC8C3CF
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 23:43:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09BE93A9640
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 22:42:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F7B83A95F7
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 22:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949922FD67C;
-	Wed, 26 Nov 2025 22:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBFD533F8B3;
+	Wed, 26 Nov 2025 22:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gRRdj9Ry"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="j30qKAuC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-10627.protonmail.ch (mail-10627.protonmail.ch [79.135.106.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E781096F;
-	Wed, 26 Nov 2025 22:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D46E2FBDFF
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 22:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764196948; cv=none; b=Jtf21OGhaihUL0sfaQx+7q1f+lSrFYiyCmEYq+44Yw2uJfrETExdx5l30u+71gVMhFXkslWI5VxDGq/plSvM83ZFFYU3Dfh7gfJMM+uTqhhTUe/WFxd1v1s5cjlHqQ6+a6Gj9OAUPfhwokrB2+FPirduzhrEpy1SWzFvQKoeEwg=
+	t=1764197005; cv=none; b=j+XXsfojnepT4IyrYQgbiXQi+W+jw7CMUECHIlhdoBjsRvfbCunH7QcxD9xaUvkf159+rvQRSS3sTMnbkib8xuqrOUcH+xrAlY5gpLUqefX21KePkwkSfUucR53c71sDSCfQIxzctm3ilT0vjiO7pAu4Y9x285m69nFBz91xBNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764196948; c=relaxed/simple;
-	bh=PRq4OqG77py5Csrg+wbpeqbxUuRVXQjM6NihQgIDLQ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UmCC6cre01RXID9CfX60Q9Or4ncjmNJpXUK1zGh9LAYshB3OW/n5MPdTouDBAA+bzxHgnmkjYzfKMlHsmGQO8GueODcJli3csQVXIVzzpboFcE1uEddfrzTfZfa2v26lH2BA1oZjSwtPZfLjFtkwrXOecHeisQKAGRWmQUKpX5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gRRdj9Ry; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9427C4CEF7;
-	Wed, 26 Nov 2025 22:42:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764196947;
-	bh=PRq4OqG77py5Csrg+wbpeqbxUuRVXQjM6NihQgIDLQ0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gRRdj9Ry7euiVzJR42qeCJTPMBFEq0/suFDUEiu/YLybCoOKwplyit5KlDztPlF4s
-	 SBkj2mBoTX20vnSlmKDHl9TyEs7ipw7SmWiDe5e2pHryCD7wbVcb7jT/uGDp8YMRkK
-	 9rU05eO8HRc7PMMqp9mpDI976rYWcdBJgvJlUzOMkVCdq4TYz2XJ8wDd2cSgRlcC4Y
-	 SgnwNktWnpLfJDlTa1HC75sQm9JzD/XCxVmv4CkqcAAllTPpqiXspsxcT0ymIVAtVR
-	 vYipaTvcIYzZYtCSB4L6QnnEUjAEeltXVP1SxW1B0LYmZahfyb8tIOVUrnbPL++T2w
-	 BfJKI5eIW0WRw==
-Date: Wed, 26 Nov 2025 14:42:25 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- Alexei Starovoitov <ast@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Eric Dumazet <edumazet@google.com>, Rob Herring <robh@kernel.org>, Florian
- Fainelli <f.fainelli@gmail.com>, Donald Hunter <donald.hunter@gmail.com>,
- Daniel Borkmann <daniel@iogearbox.net>, Jonathan Corbet <corbet@lwn.net>,
- John Fastabend <john.fastabend@gmail.com>, Lukasz Majewski <lukma@denx.de>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, Stanislav Fomichev
- <sdf@fomichev.me>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Divya.Koppera@microchip.com, Kory Maincent <kory.maincent@bootlin.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
- Sabrina Dubroca <sd@queasysnail.net>, linux-kernel@vger.kernel.org,
- kernel@pengutronix.de, Krzysztof Kozlowski <krzk+dt@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v8 1/1] Documentation: net: add flow control
- guide and document ethtool API
-Message-ID: <20251126144225.3a91b8cc@kernel.org>
-In-Reply-To: <aSa8Gkl1AP1U2C9j@pengutronix.de>
-References: <20251119140318.2035340-1-o.rempel@pengutronix.de>
-	<20251125181957.5b61bdb3@kernel.org>
-	<aSa8Gkl1AP1U2C9j@pengutronix.de>
+	s=arc-20240116; t=1764197005; c=relaxed/simple;
+	bh=Gl3448YDQhHub9agEbGREFi6nCVi0ZcOAklK+F9xn/Y=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ww3UXldLdf4dbUUFFTCfKUh2WEJUF/9qW/Or32K4CkVktKxvWsOR7Pgb4JssU/ME7i0LTcl2FORR4Vt7hle5AcaCygoIJQWrVIba8Hr4hLdggcdVt7ODivXWG4py9sLhjnFC3bWWYC8M7AMbMyn1Z88C7mxjC/u9WZd9PQDDvYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=j30qKAuC; arc=none smtp.client-ip=79.135.106.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail2; t=1764196994; x=1764456194;
+	bh=Gl3448YDQhHub9agEbGREFi6nCVi0ZcOAklK+F9xn/Y=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=j30qKAuC5xgVt0DNW5/ddltu0w+VETRNd8PsxrvmyBE76YH3LOLQp8XN/oTWCj0pt
+	 0nR1O/NatNWRgTFFGjQ1WrjNsJkQtiNQUtg+fnPFrpUQpz7J9QymPXE+mBspRzuMww
+	 xbv7dPyGfSAbhTlc3sHLIPbi+C3laXAUqZBDOXUACRgyvLksT+AdRkUhsoP0/kQ5fg
+	 DNINE/wlPKYYjdreoqY1fe8D5VS76XOvk2T2zkoKt7R2T/5GZPe0G1otadD9JlBhOG
+	 KV3BIMCoKDibMh1GMFCX+kSlCg3pWm1gkMs6kZLAD+RLmvXRe8g7WR5RXGpqmjicqS
+	 zNiC+Z3nMWAdg==
+Date: Wed, 26 Nov 2025 22:43:07 +0000
+To: Cong Wang <xiyou.wangcong@gmail.com>
+From: William Liu <will@willsroot.io>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, kuba@kernel.org, Savino Dicanosa <savy@syst3mfailure.io>, Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [Patch net v5 3/9] net_sched: Implement the right netem duplication behavior
+Message-ID: <JgkxCYimi4ZuZPHfXoMUgiecvZ0AKYxbIhqPQZwXcE4yC9nYnfproH5yrmQETZUo55NOjj5Q9_bOFJbWI351PFvc9wv3xiY_0Ic9AAsO1Ak=@willsroot.io>
+In-Reply-To: <aSd6dM38CXchhmJd@pop-os.localdomain>
+References: <20251126195244.88124-1-xiyou.wangcong@gmail.com> <20251126195244.88124-4-xiyou.wangcong@gmail.com> <dEmtK-Tj-bnNJVo0mNwP1vJ1cj9g0hqnoi-0HJdZeTittbRmmzE4wBRIjapBAFQNZDWgE4hcR27UrTSuiGj_-yRFntfX4Tuv4QP6asVecZQ=@willsroot.io> <aSd6dM38CXchhmJd@pop-os.localdomain>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 9ee82c9b81333d0e6ed13d86c732ca7b65c22734
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 26 Nov 2025 09:36:42 +0100 Oleksij Rempel wrote:
-> On Tue, Nov 25, 2025 at 06:19:57PM -0800, Jakub Kicinski wrote:
-> > On Wed, 19 Nov 2025 15:03:17 +0100 Oleksij Rempel wrote:  
-> > > + * @get_pauseparam: Report the configured policy for link-wide PAUSE
-> > > + *      (IEEE 802.3 Annex 31B). Drivers must fill struct ethtool_pauseparam
-> > > + *      such that:
-> > > + *      @autoneg:
-> > > + *              This refers to **Pause Autoneg** (IEEE 802.3 Annex 31B) only
-> > > + *              and is part of the link autonegotiation process.
-> > > + *              true  -> the device follows the negotiated result of pause
-> > > + *                       autonegotiation (Pause/Asym);
-> > > + *              false -> the device uses a forced MAC state independent of
-> > > + *                       negotiation.
-> > > + *      @rx_pause/@tx_pause:
-> > > + *              represent the desired policy (preferred configuration).
-> > > + *              In autoneg mode they describe what is to be advertised;
-> > > + *              in forced mode they describe the MAC state to apply.  
-> > 
-> > How is the user supposed to know what ended up getting configured?  
-> 
-> My current understanding is that get_pauseparam() is mainly a
-> configuration API. It seems to be designed symmetric to
-> set_pauseparam(): it reports the requested policy (autoneg flag and
-> rx/tx pause), not the resolved MAC state.
-> 
-> In autoneg mode this means the user sees what we intend to advertise
-> or force, but not necessarily what the MAC actually ended up with
-> after resolution.
-> 
-> The ethtool userspace tool tries to fill this gap by showing
-> "RX negotiated" and "TX negotiated" fields, for example:
-> 
->   Pause parameters for lan1:
->     Autonegotiate:  on
->     RX:             off
->     TX:             off
->     RX negotiated:  on
->     TX negotiated:  on
-> 
-> As far as I can see, these "negotiated" values are not read from hardware or
-> kernel. They are guessed in userspace from the local and link partner
-> advertisements, assuming that the kernel follows the same pause resolution
-> rules as ethtool does. If the kernel or hardware behaves differently, these
-> values can be wrong.
-> 
-> So, with the current API, the user gets:
-> - the configured policy via get_pauseparam(), and
-> - an ethtool-side guess of the resolved state via
->   "RX negotiated"/"TX negotiated",
+On Wednesday, November 26th, 2025 at 10:08 PM, Cong Wang <xiyou.wangcong@gm=
+ail.com> wrote:
 
-Again, that's all well and good for autoneg, but in DC use cases with
-integrated NICs autoneg is usually off. And in that case having get
-report "desired" config of some sort makes much less sense, when we also
-recommend that drivers reject unsupported configurations.
+>=20
+>=20
+> Hi William,
+>=20
+> On Wed, Nov 26, 2025 at 08:30:21PM +0000, William Liu wrote:
+>=20
+> > On Wednesday, November 26th, 2025 at 7:53 PM, Cong Wang xiyou.wangcong@=
+gmail.com wrote:
+> >=20
+> > > In the old behavior, duplicated packets were sent back to the root qd=
+isc,
+> > > which could create dangerous infinite loops in hierarchical setups -
+> > > imagine a scenario where each level of a multi-stage netem hierarchy =
+kept
+> > > feeding duplicates back to the top, potentially causing system instab=
+ility
+> > > or resource exhaustion.
+> > >=20
+> > > The new behavior elegantly solves this by enqueueing duplicates to th=
+e same
+> > > qdisc that created them, ensuring that packet duplication occurs exac=
+tly
+> > > once per netem stage in a controlled, predictable manner. This change
+> > > enables users to safely construct complex network emulation scenarios=
+ using
+> > > netem hierarchies (like the 4x multiplication demonstrated in testing=
+)
+> > > without worrying about runaway packet generation, while still preserv=
+ing
+> > > the intended duplication effects.
+> > >=20
+> > > Another advantage of this approach is that it eliminates the enqueue =
+reentrant
+> > > behaviour which triggered many vulnerabilities. See the last patch in=
+ this
+> > > patchset which updates the test cases for such vulnerabilities.
+> > >=20
+> > > Now users can confidently chain multiple netem qdiscs together to ach=
+ieve
+> > > sophisticated network impairment combinations, knowing that each stag=
+e will
+> > > apply its effects exactly once to the packet flow, making network tes=
+ting
+> > > scenarios more reliable and results more deterministic.
+>=20
+>=20
+>=20
+> Thanks for your quick response.
+>=20
+> > Cong, this approach has an issue we previously raised - please refer to=
+ [2]. I re-posted the summary of the issues with the various other approach=
+es in [3] just 2 days ago in a thread with you on it. As both Jamal and Ste=
+phen have pointed out, this breaks expected user behavior as well, and the =
+enqueuing at root was done for the sake of proper accounting and rate limit=
+ semantics. You pointed out that this doesn't violate manpage semantics, bu=
+t this is still changing long-term user behavior. It doesn't make sense imo=
+ to change one longtime user behavior for another.
+>=20
+>=20
+> If you have a better standard than man page, please kindly point it out.
+> I am happy to follow.
+>=20
+> I think we both agree it should not be either my standard or anyone's
+> personal stardard, this is why I use man page as a neutral and reasonable
+> stardard.
+>=20
+> If you disagree man page is reasonable, please offer a better one for me
+> to follow. I am very open, I just simply don't know anything better than
+> man page.
 
-> > Why do we need to configure autoneg via this API and not link modes directly?  
-> 
-> I am not aware of a clear reason. This documentation aims to describe
-> the current behavior and capture the rationale of the existing API.
+I agree that your change does not violate manpage semantics. This was the o=
+riginal fix I suggested from the beginning, though other maintainers pointe=
+d out the issue that I am relaying.
 
-To spell it out more forcefully I think it describes the current
-behavior for certain devices. I could be wrong but the expectations
-for when autoneg is off should be different.
+As I wrote in my previous email, "as both Jamal and Stephen have pointed ou=
+t, this breaks expected user behavior as well, and the enqueuing at root wa=
+s done for the sake of proper accounting and rate limit semantics."
 
-> Configuring it via link modes directly would likely resolve some of this
-> confusion, but for now we focus on documenting how the current API is
-> expected to behave.
+The previous netem fix changed user behavior that did not violate the manpa=
+ge (to my knowledge). This one is the same - you are fixing one user behavi=
+or break with another. Both are cases of Hyrum's law.
 
-You say current API - is setting Pause and Asym_Pause via link modes
-today rejected? I don't see an explicit check by grepping but I haven't
-really tried..
+>=20
+> Sorry for my ignorance. Please help me out. :)
+>=20
+> > Jamal suggested a really reasonable fix with tc_skb_ext - can we please=
+ take a look at its soundness and attempt that approach? No user behavior w=
+ould be affected in that case.
+>=20
+>=20
+> As I already explained, tc_skb_ext is for cross-layer, in this specific
+> case, we don't cross layers, the skb is immediately queued to the same
+> layer before others.
+>=20
+> Could you please kindly explain why you still believe tc_skb_ext is
+> better? I am very open to your thoughts, please enlighten me here.
+>=20
+
+Yes, if we re-enqueue the packet to the same netem qdisc, we don't need thi=
+s, but that changes expected user behavior and may introduce additional cor=
+rectness issues pointed out above.
+
+If understood Jamal correctly, tc_skb_ext allows us to maintain both the re=
+-entrant at root behavior AND prevent DOS.
+
+I hope you can understand I am trying to relay problems other maintainers h=
+ave pointed out repeatedly; I personally don't have a strong stake in this.
+
+> Thanks,
+> Cong
 
