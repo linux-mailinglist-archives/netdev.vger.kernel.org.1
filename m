@@ -1,162 +1,194 @@
-Return-Path: <netdev+bounces-242071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3149C8BF4E
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:59:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC435C8BFEB
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 22:17:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA0AE3B9FF1
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 20:58:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BD013A2C8C
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 21:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538B0346FAD;
-	Wed, 26 Nov 2025 20:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5F225A2A2;
+	Wed, 26 Nov 2025 21:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="JWXB4x17"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A40A/b9M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA50346795;
-	Wed, 26 Nov 2025 20:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11E126CE11
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 21:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764190603; cv=none; b=PCHPVgqDKhalmonTcYNjEVYDZk3FB0zAjBtzTD2fGv09OD2yuXtH2Os8NjkoKf7cOyWiy3YxeHukH+L3aBqOgO7Vj/iIlD0R/nZzs7uGuvj1/029fedgck9eQTITYfR0eCdkS6JMva2OyNwLCsbm5Pyzu82aaJGWCTJgcGSdbII=
+	t=1764191831; cv=none; b=lW6OCa6Y+Ool2/p+2pSz3F9hHjdBA0fvaVXfnZpQ03CIoNYNHmqsek7OBtHoul01sey9sEFl3C5ctL4d9rYbmsQ+Tb2PtYrW48v5R1RU3Bblwj+CpcmMRn9CIepUOXs0yFqp/aKBBjjuOD+1z8jk0PbtFlw/FXKs801kTaDKPHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764190603; c=relaxed/simple;
-	bh=dN/TnNPylo9A9QSP94vr9a6n9mwd7vHCVPpFiUiKl68=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KMBaEsiku1PDPI6GEFOx1t0+z0ko9XOOjcOSXIPxuTj9khhQdx+rh0zt3bW5LTA0/R8N507yn5SyZKY1dKiw+vPgcDCG9CY9v1towuYZT6+YFOyBIlE+h4mXNq/Xqc3rWBUyndYLb6Om3c9MB1oMxnuVWHXLIR5oAlERYrqGRHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=JWXB4x17; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id BB9D160272;
-	Wed, 26 Nov 2025 21:56:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1764190600;
-	bh=KEIyZlBt5ANXgCIg1tIMzlRcOXaKZNTQ+/VibBB3J48=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JWXB4x17IZvYl/5t2ju5rl1qbfG3tFjk/zvRdtkSea5bvkbtB3hr7yg8TnXV/SkyQ
-	 5rS/ZS4WpGRMLyPjHQJwoAZuE5KmVjBWUG9OrU8zSe8Cl2Ea87Vrl9SiAggVuBKJHY
-	 32bzaTnhxDuOaZEEGM2PBNtL19JmCR4OIuJeDwlGQdRP610MkAzdFbGcm7+BJbgICg
-	 T8r1b64OEPD/o9/QpKeQsjoWiGPr40/r3KMlpslfOZsvwxxB5tv6wK/926otQq9+mW
-	 4kkwQ4jjgdVQ8dgookjHu4a6ZQaIa2jp82W3iKzxlbPpXAWLqLO87RNR372IBg1lpF
-	 xzZlp+oip8OfA==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net-next 16/16] netfilter: nf_tables: improve UAPI kernel-doc comments
-Date: Wed, 26 Nov 2025 20:56:11 +0000
-Message-ID: <20251126205611.1284486-17-pablo@netfilter.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251126205611.1284486-1-pablo@netfilter.org>
-References: <20251126205611.1284486-1-pablo@netfilter.org>
+	s=arc-20240116; t=1764191831; c=relaxed/simple;
+	bh=Tu9UoJab2N9aOFK02uU2NH64dAR7qMBaHBTPor6ABm8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MP1TQASm6r4t+y3cidS3cQGAdSifc8caSX5IDtATV3acVMeNnXnfdJ3Jb4ourGe2PByfL6na8K64v8UIqWH+ZjFNWINlk4JXAFLCTgiRI5j7ecmFXMo1luREv2pp8+vWgIb5ZS55NjnCSzLOUec/niU6c1pESnLoCm5T+ZyjMeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A40A/b9M; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764191828;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5bX/0i7tj4y+cgcP++a7Y4BBxU58ei/TXceewZURiUM=;
+	b=A40A/b9M4w9iqQANsV4R8Q9GUy1icgkrT3E/nFvwERp5ps6LrprZI4YFtB6SpR1OGOZRDn
+	EqjUZkiz79U3as4ukUtjkvvYTJpySBandw6UWkcCl1ypbM0fQiSXBy2froTMjlhVNhj0+L
+	n5bVon0QQ/XXOh8L4LOxrSBWx9MlG0Y=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-673-OSoQCYNGNvK3Jpe5w-JuHA-1; Wed,
+ 26 Nov 2025 16:17:03 -0500
+X-MC-Unique: OSoQCYNGNvK3Jpe5w-JuHA-1
+X-Mimecast-MFC-AGG-ID: OSoQCYNGNvK3Jpe5w-JuHA_1764191822
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C749419560B0;
+	Wed, 26 Nov 2025 21:17:01 +0000 (UTC)
+Received: from localhost (unknown [10.2.16.34])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AF10F1800451;
+	Wed, 26 Nov 2025 21:17:00 +0000 (UTC)
+Date: Wed, 26 Nov 2025 16:03:13 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: virtualization@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	netdev@vger.kernel.org, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost/vsock: improve RCU read sections around
+ vhost_vsock_get()
+Message-ID: <20251126210313.GA499503@fedora>
+References: <20251126133826.142496-1-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="g1JPwMl4XCtaMV09"
+Content-Disposition: inline
+In-Reply-To: <20251126133826.142496-1-sgarzare@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-From: Randy Dunlap <rdunlap@infradead.org>
 
-In include/uapi/linux/netfilter/nf_tables.h,
-correct the kernel-doc comments for mistyped enum names and enum values to
-avoid these kernel-doc warnings and improve the documentation:
+--g1JPwMl4XCtaMV09
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-nf_tables.h:896: warning: Enum value 'NFT_EXTHDR_OP_TCPOPT' not described
- in enum 'nft_exthdr_op'
-nf_tables.h:896: warning: Excess enum value 'NFT_EXTHDR_OP_TCP' description
- in 'nft_exthdr_op'
+On Wed, Nov 26, 2025 at 02:38:26PM +0100, Stefano Garzarella wrote:
+> From: Stefano Garzarella <sgarzare@redhat.com>
+>=20
+> vhost_vsock_get() uses hash_for_each_possible_rcu() to find the
+> `vhost_vsock` associated with the `guest_cid`. hash_for_each_possible_rcu=
+()
+> should only be called within an RCU read section, as mentioned in the
+> following comment in include/linux/rculist.h:
+>=20
+> /**
+>  * hlist_for_each_entry_rcu - iterate over rcu list of given type
+>  * @pos:	the type * to use as a loop cursor.
+>  * @head:	the head for your list.
+>  * @member:	the name of the hlist_node within the struct.
+>  * @cond:	optional lockdep expression if called from non-RCU protection.
+>  *
+>  * This list-traversal primitive may safely run concurrently with
+>  * the _rcu list-mutation primitives such as hlist_add_head_rcu()
+>  * as long as the traversal is guarded by rcu_read_lock().
+>  */
+>=20
+> Currently, all calls to vhost_vsock_get() are between rcu_read_lock()
+> and rcu_read_unlock() except for calls in vhost_vsock_set_cid() and
+> vhost_vsock_reset_orphans(). In both cases, the current code is safe,
+> but we can make improvements to make it more robust.
+>=20
+> About vhost_vsock_set_cid(), when building the kernel with
+> CONFIG_PROVE_RCU_LIST enabled, we get the following RCU warning when the
+> user space issues `ioctl(dev, VHOST_VSOCK_SET_GUEST_CID, ...)` :
+>=20
+>   WARNING: suspicious RCU usage
+>   6.18.0-rc7 #62 Not tainted
+>   -----------------------------
+>   drivers/vhost/vsock.c:74 RCU-list traversed in non-reader section!!
+>=20
+>   other info that might help us debug this:
+>=20
+>   rcu_scheduler_active =3D 2, debug_locks =3D 1
+>   1 lock held by rpc-libvirtd/3443:
+>    #0: ffffffffc05032a8 (vhost_vsock_mutex){+.+.}-{4:4}, at: vhost_vsock_=
+dev_ioctl+0x2ff/0x530 [vhost_vsock]
+>=20
+>   stack backtrace:
+>   CPU: 2 UID: 0 PID: 3443 Comm: rpc-libvirtd Not tainted 6.18.0-rc7 #62 P=
+REEMPT(none)
+>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-7.fc=
+42 06/10/2025
+>   Call Trace:
+>    <TASK>
+>    dump_stack_lvl+0x75/0xb0
+>    dump_stack+0x14/0x1a
+>    lockdep_rcu_suspicious.cold+0x4e/0x97
+>    vhost_vsock_get+0x8f/0xa0 [vhost_vsock]
+>    vhost_vsock_dev_ioctl+0x307/0x530 [vhost_vsock]
+>    __x64_sys_ioctl+0x4f2/0xa00
+>    x64_sys_call+0xed0/0x1da0
+>    do_syscall_64+0x73/0xfa0
+>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>    ...
+>    </TASK>
+>=20
+> This is not a real problem, because the vhost_vsock_get() caller, i.e.
+> vhost_vsock_set_cid(), holds the `vhost_vsock_mutex` used by the hash
+> table writers. Anyway, to prevent that warning, add lockdep_is_held()
+> condition to hash_for_each_possible_rcu() to verify that either the
+> caller is in an RCU read section or `vhost_vsock_mutex` is held when
+> CONFIG_PROVE_RCU_LIST is enabled; and also clarify the comment for
+> vhost_vsock_get() to better describe the locking requirements and the
+> scope of the returned pointer validity.
+>=20
+> About vhost_vsock_reset_orphans(), currently this function is only
+> called via vsock_for_each_connected_socket(), which holds the
+> `vsock_table_lock` spinlock (which is also an RCU read-side critical
+> section). However, add an explicit RCU read lock there to make the code
+> more robust and explicit about the RCU requirements, and to prevent
+> issues if the calling context changes in the future or if
+> vhost_vsock_reset_orphans() is called from other contexts.
+>=20
+> Fixes: 834e772c8db0 ("vhost/vsock: fix use-after-free in network stack ca=
+llers")
+> Cc: stefanha@redhat.com
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  drivers/vhost/vsock.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
 
-nf_tables.h:1210: warning: expecting prototype for enum
- nft_flow_attributes. Prototype was for enum nft_offload_attributes instead
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-nf_tables.h:1428: warning: expecting prototype for enum nft_reject_code.
- Prototype was for enum nft_reject_inet_code instead
+--g1JPwMl4XCtaMV09
+Content-Type: application/pgp-signature; name=signature.asc
 
-(add beginning '@' to each enum value description:)
-nf_tables.h:1493: warning: Enum value 'NFTA_TPROXY_FAMILY' not described
- in enum 'nft_tproxy_attributes'
-nf_tables.h:1493: warning: Enum value 'NFTA_TPROXY_REG_ADDR' not described
- in enum 'nft_tproxy_attributes'
-nf_tables.h:1493: warning: Enum value 'NFTA_TPROXY_REG_PORT' not described
- in enum 'nft_tproxy_attributes'
+-----BEGIN PGP SIGNATURE-----
 
-nf_tables.h:1796: warning: expecting prototype for enum
- nft_device_attributes. Prototype was for enum
- nft_devices_attributes instead
+iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmknaxEACgkQnKSrs4Gr
+c8gttwf/ZJ0Ara63zkxpEWCtgFN92fZknjdxSfwNZ2z6NsKZDwPYCnI5BYYU+7aN
+RYICx39augMRLy430bN6PQJjaMJsGeAWuXegBNEKPe7U4lCjCKiNoU3sgpMbr/Rj
+iyFJLkTK4umOp04jeODZBVDjd5vRp9dUvu1/zkuDriRn7HWry51Rbk/Ib1F3h9IP
+qK5iVrjTRXliuSAtnokc0Kk1Ff41kyZnb6bLK1obA5h93W2RZIppBj2jLcrX8PLF
+I0z2g79tY2zw03KhtvE29Faf5K6FD92KTkdZEa5K2oQkosI4b+56MmoQMyhxRkgp
+M839LQbIdZnpzGHw6Liu9a3FC9i9HA==
+=vy3f
+-----END PGP SIGNATURE-----
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- include/uapi/linux/netfilter/nf_tables.h | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/include/uapi/linux/netfilter/nf_tables.h b/include/uapi/linux/netfilter/nf_tables.h
-index 7c0c915f0306..45c71f7d21c2 100644
---- a/include/uapi/linux/netfilter/nf_tables.h
-+++ b/include/uapi/linux/netfilter/nf_tables.h
-@@ -881,7 +881,7 @@ enum nft_exthdr_flags {
-  * enum nft_exthdr_op - nf_tables match options
-  *
-  * @NFT_EXTHDR_OP_IPV6: match against ipv6 extension headers
-- * @NFT_EXTHDR_OP_TCP: match against tcp options
-+ * @NFT_EXTHDR_OP_TCPOPT: match against tcp options
-  * @NFT_EXTHDR_OP_IPV4: match against ipv4 options
-  * @NFT_EXTHDR_OP_SCTP: match against sctp chunks
-  * @NFT_EXTHDR_OP_DCCP: match against dccp otions
-@@ -1200,7 +1200,7 @@ enum nft_ct_attributes {
- #define NFTA_CT_MAX		(__NFTA_CT_MAX - 1)
- 
- /**
-- * enum nft_flow_attributes - ct offload expression attributes
-+ * enum nft_offload_attributes - ct offload expression attributes
-  * @NFTA_FLOW_TABLE_NAME: flow table name (NLA_STRING)
-  */
- enum nft_offload_attributes {
-@@ -1410,7 +1410,7 @@ enum nft_reject_types {
- };
- 
- /**
-- * enum nft_reject_code - Generic reject codes for IPv4/IPv6
-+ * enum nft_reject_inet_code - Generic reject codes for IPv4/IPv6
-  *
-  * @NFT_REJECT_ICMPX_NO_ROUTE: no route to host / network unreachable
-  * @NFT_REJECT_ICMPX_PORT_UNREACH: port unreachable
-@@ -1480,9 +1480,9 @@ enum nft_nat_attributes {
- /**
-  * enum nft_tproxy_attributes - nf_tables tproxy expression netlink attributes
-  *
-- * NFTA_TPROXY_FAMILY: Target address family (NLA_U32: nft_registers)
-- * NFTA_TPROXY_REG_ADDR: Target address register (NLA_U32: nft_registers)
-- * NFTA_TPROXY_REG_PORT: Target port register (NLA_U32: nft_registers)
-+ * @NFTA_TPROXY_FAMILY: Target address family (NLA_U32: nft_registers)
-+ * @NFTA_TPROXY_REG_ADDR: Target address register (NLA_U32: nft_registers)
-+ * @NFTA_TPROXY_REG_PORT: Target port register (NLA_U32: nft_registers)
-  */
- enum nft_tproxy_attributes {
- 	NFTA_TPROXY_UNSPEC,
-@@ -1783,7 +1783,7 @@ enum nft_synproxy_attributes {
- #define NFTA_SYNPROXY_MAX (__NFTA_SYNPROXY_MAX - 1)
- 
- /**
-- * enum nft_device_attributes - nf_tables device netlink attributes
-+ * enum nft_devices_attributes - nf_tables device netlink attributes
-  *
-  * @NFTA_DEVICE_NAME: name of this device (NLA_STRING)
-  * @NFTA_DEVICE_PREFIX: device name prefix, a simple wildcard (NLA_STRING)
--- 
-2.47.3
+--g1JPwMl4XCtaMV09--
 
 
