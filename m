@@ -1,141 +1,256 @@
-Return-Path: <netdev+bounces-241984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-241985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22267C8B5DB
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 19:00:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69402C8B624
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 19:08:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D68673A7F46
-	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:00:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 143B43A1F15
+	for <lists+netdev@lfdr.de>; Wed, 26 Nov 2025 18:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771E0207A0B;
-	Wed, 26 Nov 2025 18:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FCA130ACF0;
+	Wed, 26 Nov 2025 18:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ait/aLkn";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="isIhE8Uj"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Ck9GrCIa"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89E1201278
-	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 18:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D0C27145F
+	for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 18:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764180037; cv=none; b=LjmKqDgcIMzby1ar0yN6OTRP1z/puaibXDe5SCeTliMMns+RszDHGpFU6po463p/s0aUhyco1nmBBb0oaYyKXSB1VQdiRxs15DUhjlFDqC/DR1hn1Ggy5um0hK6xHmwtxExUxnqiNkg2UqNsvCQv7oDKeI8hdvqwcRNAWPmHPMc=
+	t=1764180506; cv=none; b=YhfGgSKzfUPyGDQ/R2Uga4UzwdJuJtwEz1RbX1X05ucyfpMtmJRf5YaPr392So0EvmWJ7W7yqwEZ8blq4dorwrCLrcUJ4656Vul7RKBRnHiU8YT3uH2jXn3xWKVXUFpPBbQ0RnARfPZIUlEZrTKVC019/qqRDiRhaxQJD46AIy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764180037; c=relaxed/simple;
-	bh=IYZdkZZKGPGx9sx2990egUZQsDNd44OswOXxoE5ncJ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pFHz8T3xwLWIqThmsCpKt2L1X6pr6REiKQMuyrEtSx227xXFQ+/x6GlLVxmM6+G3kPW6ASN/IWVfDRHppsBTBiX1UTSoPkN8cj79oFi7TKjqN09CPh4sMtkjao7PUuBAGm3KLASdmWy2Xt1Vl6q92yefJmP2zsfAx5sgO6/In/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ait/aLkn; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=isIhE8Uj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764180034;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9YgBhXcGSddKFMYnZCe5lp8J3od8fCjODxmcHFceGH4=;
-	b=ait/aLknifM9ACMilxCWqnaHu6n/k4JAWM9kVOdWbeZasQAPDOqUJg4AcZGtkKWpgqFniL
-	vHHKU7yuC6RpEAa/21qKtDDls4laoOF+dPMcg+0y+TMgNPL7HcHYXn3vKXdGGNP5dlP3u7
-	AVYcjbZp9kMzMAfaFk8Up15E0bWSb6c=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-447-Pb-KD6pnO9iVvO0H-QYhSQ-1; Wed, 26 Nov 2025 13:00:30 -0500
-X-MC-Unique: Pb-KD6pnO9iVvO0H-QYhSQ-1
-X-Mimecast-MFC-AGG-ID: Pb-KD6pnO9iVvO0H-QYhSQ_1764180029
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42b2f79759bso61239f8f.2
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 10:00:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764180029; x=1764784829; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9YgBhXcGSddKFMYnZCe5lp8J3od8fCjODxmcHFceGH4=;
-        b=isIhE8UjL4JiIdJA50kgMgkYZgTNffhnecWANMhWEa81hqzlH29lWDZGDbBQX5fZIi
-         a9ImFjEXjnlRdlrp8m7/u3iG4FXyBsOoRO+Ro4feuthirJdVu5GhA12pwpRK0O8vBEHO
-         KpeF3B9eb6wfr5QBLOSP7Quv1Bh+E2RFT98zXSqOMz81QPEjk1KWZVYwheg7q2/Uc2Ts
-         fQj6mrdXnmRYDLKtfIsXCSp2RwUIeeg/IuiERSJu4pHfIbvpk5Avr2FbaLbKMrMcrAWG
-         EtfyRVstjk/Q0s1n7OX8akRpRQQPmKPX7Dwi99kgqkqitKByWE698O8broHG+go2x9vX
-         VIGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764180029; x=1764784829;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9YgBhXcGSddKFMYnZCe5lp8J3od8fCjODxmcHFceGH4=;
-        b=Inxfy62IbMT6A83ObGJiDxjHpS34cBr3qmgaDZCw2FTI5DU/2Gl5b+Qp/Qfr4nRQZB
-         hA13BEvyCeBE9vQkWYL/zyHTqGHONBuwSrdVkAbOK7nvAe2a5Gv8xQ3JdTy1+8BLfaxk
-         jD5dAKeIxgb2/N+nhf6145F5uUXvTRlXQEf25RZ5/3fFoC+tUrvF3/rB6ttcsVMSlxuH
-         tu6doQ6a72PE7zSNKqgQfWtvyyyuxOjeV2tafK5U8e+cNhnf5HNw/NL3vkRRsVwaPoKs
-         HkqequVOXubO0OxD1BQXNPOwLzXpOO517hCZBCdUb0/ft0fBGVl/yf4ktGY90s/qTHH7
-         xbTA==
-X-Gm-Message-State: AOJu0Yw4S8Tsj2Ozgl5DwfAICRGCmTC7EdRn0SaCBmK4mAxbff0DXqIu
-	eykwlNUpB8oAOs4zq5bmwj05xMaL1ktX0Pr4B9J/8/77O0DkISNQf6a5T6opugzazlvlySgNHSt
-	8WsnRfb4MQcVLnsEbJNmz5iu0W5LolmABVuLWeTgPdHtw0R+RNvrbZVQHwg==
-X-Gm-Gg: ASbGncthqrjgbB7HIePPOhL/N5P5jn1vrXrD16oc3i6gQV05KP+niXYeMbLO3D02131
-	L9obRf2n6Bwa9wpZzXBsVi7mPH+95DIUZxzTL1K9dywPArPa7dCYyfQalf5PMXA7ceD+MFgsKQ8
-	+byWgTv7qdtHkd7UBsrvm7vdV4LbvV3mjhQnMgib5LbCNQdSINDp88AtTSCpyjnXniqUIJQD6uZ
-	8lHYDfNdup32Iyn299a+zMQs04kOIAJw/pDnpjIwubNqSFJ25OVLks3M//SQ6eGIBPNYk7pV/Ti
-	BtdbBqsAmPVTMf7Sd4JJfp4iG6arGE+3oAdqgyqcKapiW4x+v5zYJvVZEMoqxHoIity9jzAiI7s
-	piCHzHB6+HRTDLW/NUBM3nla40a2AXg==
-X-Received: by 2002:a05:6000:290f:b0:429:8bfe:d842 with SMTP id ffacd0b85a97d-42cc1cd8f9fmr23640976f8f.4.1764180029300;
-        Wed, 26 Nov 2025 10:00:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE0n3yZ2xVz1rTRRSLX3s4tZ7PRJCUewur62JS2UwJ6l+0kyCvE19owlYWk1fAt9tOk3rS6ZQ==
-X-Received: by 2002:a05:6000:290f:b0:429:8bfe:d842 with SMTP id ffacd0b85a97d-42cc1cd8f9fmr23640923f8f.4.1764180028743;
-        Wed, 26 Nov 2025 10:00:28 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fb9190sm42148196f8f.33.2025.11.26.10.00.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 10:00:28 -0800 (PST)
-Date: Wed, 26 Nov 2025 13:00:25 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Dan Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
-	virtualization@lists.linux.dev, parav@nvidia.com,
-	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
-	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
-Subject: Re: [PATCH net-next v12 07/12] virtio_net: Implement layer 2 ethtool
- flow rules
-Message-ID: <20251126125951-mutt-send-email-mst@kernel.org>
-References: <20251119191524.4572-1-danielj@nvidia.com>
- <20251119191524.4572-8-danielj@nvidia.com>
- <20251124160517-mutt-send-email-mst@kernel.org>
- <1a770ddf-af27-4a44-95e0-b7971deac819@nvidia.com>
+	s=arc-20240116; t=1764180506; c=relaxed/simple;
+	bh=2vHZnixxWT4TaMXqFluMRkXbh+v++mMm586S+pXahWU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
+	 References:In-Reply-To; b=dvPMY53FQiIGWBrsNTLmnou83Sj/HFliRLaUfQ41cGoDnXVW/SxjiPC9pTRXo7B/x4sbMfWIe1FdRHbwNEYwPzC/RspeBScmrxSR3+bUMm3RkmeNvH1tF4xWR70FjlgACWVVZOBPhT2JkKfOcLSKNZlQVVMk0DexNd5OJdF0cno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Ck9GrCIa; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id E173F1A1D85;
+	Wed, 26 Nov 2025 18:08:20 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 9B34360721;
+	Wed, 26 Nov 2025 18:08:20 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8C6F4102F22D9;
+	Wed, 26 Nov 2025 19:08:15 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1764180500; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=XkO9p8rK6RjRrBCy7/XhXYqGZ8sdXY37vJd20XZIRvQ=;
+	b=Ck9GrCIaLwm8fuVkUewVo6REg81W6K48VRso8mT5H/fby7ZEA2CQPexR0uNlFoxHRK2rIz
+	A+YcpPWmQl9CWkG4GJcFO5bcvkR8Y3VGLqQtZbAqxeQqTn5opNCFTF3DFd+aTQXA/m7Bjy
+	JmsYaASlwsEcIAiV07oF9TcMoE+9EecwPU5M5CY2QWYa/fce7rU8EiQ6ckE6/eG2Wbv+QG
+	gWdxBqwbDfRqifn7rL4F5Uijjv1t6I22XT7HXBGby4B30W7v7EJ9/IanI3FuuX8r8lBM7+
+	as0Ze9vBQ9rk+lLJ/X13vukv9gh4Y796L2BfgnR/lvdOyGch0FVXpMaj/RxY8w==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1a770ddf-af27-4a44-95e0-b7971deac819@nvidia.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 26 Nov 2025 19:08:14 +0100
+Message-Id: <DEITSIO441QL.X81MVLL3EIV4@bootlin.com>
+Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Lorenzo Bianconi" <lorenzo@kernel.org>
+To: "Paolo Valerio" <pvalerio@redhat.com>, <netdev@vger.kernel.org>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH RFC net-next 0/6] net: macb: Add XDP support and page
+ pool integration
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20251119135330.551835-1-pvalerio@redhat.com>
+In-Reply-To: <20251119135330.551835-1-pvalerio@redhat.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed, Nov 26, 2025 at 10:25:44AM -0600, Dan Jurgens wrote:
-> On 11/24/25 3:05 PM, Michael S. Tsirkin wrote:
-> > On Wed, Nov 19, 2025 at 01:15:18PM -0600, Daniel Jurgens wrote:
-> >> @@ -5681,6 +5710,7 @@ static const struct ethtool_ops virtnet_ethtool_ops = {
-> >>  	.get_rxfh_fields = virtnet_get_hashflow,
-> >>  	.set_rxfh_fields = virtnet_set_hashflow,
-> >>  	.get_rx_ring_count = virtnet_get_rx_ring_count,
-> >> +	.set_rxnfc = virtnet_set_rxnfc,
-> >>  };
-> >>  
-> >>  static void virtnet_get_queue_stats_rx(struct net_device *dev, int i,
-> > 
-> > should we not wire up get_rxnfc too? weird to be able to set but
-> > not get.
-> > 
-> 
-> I prefer to do that as the last patch. That's what really turn the
-> feature on. ethtool need to do gets before it can set. Also, this patch
-> is already quite large.
+Hello Paolo,
+
+So this is an initial review, I'll start here with five series-wide
+topics and send small per-line comments (ie nitpicks) in a second stage.
 
 
-ok
+
+### Rx buffer size computation
+
+The buffer size computation should be reworked. At the end of the series
+it looks like:
+
+static int macb_open(struct net_device *dev)
+{
+    size_t bufsz =3D dev->mtu + ETH_HLEN + ETH_FCS_LEN + NET_IP_ALIGN;
+
+    // ...
+
+    macb_init_rx_buffer_size(bp, bufsz);
+
+    // ...
+}
+
+static void macb_init_rx_buffer_size(struct macb *bp, size_t size)
+{
+    if (!macb_is_gem(bp)) {
+        bp->rx_buffer_size =3D MACB_RX_BUFFER_SIZE;
+    } else {
+        bp->rx_buffer_size =3D size
+            + SKB_DATA_ALIGN(sizeof(struct skb_shared_info))
+            + MACB_PP_HEADROOM;
+
+        if (bp->rx_buffer_size > PAGE_SIZE)
+            bp->rx_buffer_size =3D PAGE_SIZE;
+
+        if (bp->rx_buffer_size % RX_BUFFER_MULTIPLE)
+            bp->rx_buffer_size =3D roundup(bp->rx_buffer_size, RX_BUFFER_MU=
+LTIPLE);
+    }
+}
+
+Most of the issues with this code is not stemming from your series, but
+this big rework is the right moment to fix it all.
+
+ - NET_IP_ALIGN is accounted for in the headroom even though it isn't
+   present if !RSC.
+
+ - When skbuff.c/h allocates an SKB buffer, it SKB_DATA_ALIGN()s
+   headroom+data. We should probably do the same. In our case it would
+   be:
+
+   bp->rx_buffer_size =3D SKB_DATA_ALIGN(MACB_PP_HEADROOM + size) +
+                        SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+   // or
+   bp->rx_buffer_size =3D SKB_HEAD_ALIGN(MACB_PP_HEADROOM + size);
+
+   I've not computed if it can ever give a different value to your
+   series in terms of total size or shinfo alignment. I'd guess it is
+   unlikely.
+
+ - If the size clamping to PAGE_SIZE comes into play, we are probably
+   doomed. It means we cannot deal with the MTU and we'll probably get
+   corruption. If we do put a check in place, it should loudly fail
+   rather than silently clamp.
+
+TLDR: I think macb_init_rx_buffer_size() should encapsulate the whole
+rx buffer size computation. It can use bp->rx_offset and add on top
+MTU & co. It might start failing if >PAGE_SIZE (?).
+
+
+
+### Buffer variable names
+
+Related: so many variables, fields or constants have ambiguous names,
+can we do something about it?
+
+ - bp->rx_offset is named oddly to my ears. Offset to what?
+   Maybe bp->rx_head or bp->rx_headroom?
+
+ - bp->rx_buffer_size: it used to be approximately the payload size
+   (plus NET_IP_ALIGN). Now it contains the XDP headroom and shinfo.
+   That's on GEM, because on MACB it means something different.
+
+   This line is a bit ironic and illustrates the trouble:
+      buffer_size =3D SKB_WITH_OVERHEAD(bp->rx_buffer_size) - bp->rx_offset
+
+ - data in gem_rx|gem_rx_refill|gem_free_rx_buffers() points to what we
+   could call skb->head, ie start of buffer & start of XDP headroom.
+   Its name implied skb->data to me, ie after the headroom.
+
+   It also made `data - page_address(page) + bp->rx_offset` hard to
+   understand. It is easier for me to understand that the following is
+   the page fragment offset till skb->data:
+
+      buff_head + bp->rx_headroom - page_address(page)
+
+ - MACB_MAX_PAD is ambiguous. It rhymes with NET_SKB_PAD which is the
+   default SKB headroom but here it contains part of the headroom
+   (XDP_PACKET_HEADROOM but not NET_IP_ALIGN) and the tailroom (shinfo).
+
+ - Field `data` in `struct macb_tx_buff` points to skb/xdp_frame but my
+   initial thought was skb->data pointer (ie after headroom).
+   What about va or ptr or buff or frame or ...?
+
+TLDR: I had a hard time understanding size/offset expressions (both from
+existing code and the series) because of variable names.
+
+
+
+### Duplicated buffer size computations
+
+Last point related to buffer size computation:
+
+ - it is duplicated in macb_set_mtu() but forgets NET_IP_ALIGN & proper
+   SKB_DATA_ALIGN() and,
+
+ - it is duplicated in gem_xdp_setup() but I don't see why because the
+   buffer size is computed to work fine with/without XDP enabled. Also
+   this check means we cannot load an XDP program before macb_open()
+   because bp->rx_buffer_size =3D=3D 0.
+
+TLDR: Let's deduplicate size computations to minimise chances of getting
+it wrong.
+
+
+
+### Allocation changes
+
+I am not convinced by patches 1/6 and 2/6 that change the alloc strategy
+in two steps, from netdev_alloc_skb() to page_pool_alloc_pages() to
+page_pool_alloc_frag().
+
+ - The transient solution isn't acceptable when PAGE_SIZE is large.
+   We have 16K and would never want one buffer per page.
+
+ - It forces you to introduce temporary code & constants which is added
+   noise IMO. MACB_PP_MAX_BUF_SIZE() is odd as is the alignment of
+   buffer sizes to page sizes. It forces you to deal with
+   `bp->rx_buffer_size > PAGE_SIZE` which we could ignore. Right?
+
+TLDR: do alloc changes in one step.
+
+
+
+### XDP_SETUP_PROG if netif_running()
+
+I'd like to start a discussion on the expected behavior on XDP program
+change if netif_running(). Summarised:
+
+static int gem_xdp_setup(struct net_device *dev, struct bpf_prog *prog,
+             struct netlink_ext_ack *extack)
+{
+    bool running =3D netif_running(dev);
+    bool need_update =3D !!bp->prog !=3D !!prog;
+
+    if (running && need_update)
+        macb_close(dev);
+    old_prog =3D rcu_replace_pointer(bp->prog, prog, lockdep_rtnl_is_held()=
+);
+    if (running && need_update)
+        return macb_open(dev);
+}
+
+Have you experimented with that? I don't see anything graceful in our
+close operation, it looks like we'll get corruption or dropped packets
+or both. We shouldn't impose that on the user who just wanted to swap
+the program.
+
+I cannot find any good reason that implies we wouldn't be able to swap
+our XDP program on the fly. If we think it is unsafe, I'd vote for
+starting with a -EBUSY return code and iterating on that.
+
+TLDR: macb_close() on XDP program change is probably a bad idea.
+
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
