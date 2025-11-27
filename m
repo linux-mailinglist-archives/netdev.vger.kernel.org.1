@@ -1,299 +1,348 @@
-Return-Path: <netdev+bounces-242160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6E5FC8CCD3
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 05:30:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FC7EC8CCF4
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 05:44:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B33A3B259F
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 04:30:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CE8E44E1E79
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 04:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC6C25333F;
-	Thu, 27 Nov 2025 04:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2092DA774;
+	Thu, 27 Nov 2025 04:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m1u2KEfa"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PABDm7aw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1619718A921
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 04:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5336829D294
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 04:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764217855; cv=none; b=H6nSeV7vplW/UHdpAGknDebcvHw4oORluZPbGFHGTboPI6clVUyIfN1snZvrUb5TKD5dhlv9JM7dOA54oOaPxUPOEBy6aQZmRGF0hlejbVX4NIEyeuRmwSRGZBIHehubPVvJhiGiaLgviiwa2QV1JZtpl6myPr77/mZ9bxufUGU=
+	t=1764218653; cv=none; b=aCM1cciY+fu4MJC/K1g69glKNF3PFc3I+SsJ3dR+QpQTfr1MViFiytGJng6jurpvcrD4JGXe5tPdsMHCKFS+CnPwg8PT5j3JQN7GcqjpgXr3BGAHxQXBM0KQWaLPKSIjyMNoOBQIU+X/NowA1mwqVpfeNpIjDHKE2Td7fzFnLv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764217855; c=relaxed/simple;
-	bh=thAE5Beno2ivMQNVSCVf47IBVxGLTgHfsFGBA8RJM7c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KMzaTpFhbd+XGWGzq2cTDsaeNcGJBCs+hAPxknQVw4XNrbD2DYmyK3X9pDuh2PEkxkFCBZVhDPSxlyvKY5CPIIUdNgxfjSX85eTvNQTrPtImTasFuufkbbOM4BR2tIBNcIA5eQ8CJBDFNqmFdaaGh1QJCGgRDjOv2OSzqv5rZFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m1u2KEfa; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764217854; x=1795753854;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=thAE5Beno2ivMQNVSCVf47IBVxGLTgHfsFGBA8RJM7c=;
-  b=m1u2KEfaQ+vVBPIDOBCyVUllKlWDkxABpIpi8RwOHAbIWh6l5bW8wFfb
-   KusPzo/ghaf64nTQ9pvZ8FJjXOK6rNBpTJ5w5FezC6Ho8v0Gn1bwPv9Xy
-   /0EBnl61TwKZ6J9EiKlkFROcQ+rtWxPxVHi7YX5wHwo5sBetThtpeuzLC
-   tHoWbjvKGCGYLt20FTrOahRdNX0DF+R3xUcTVIxUQ49cb+Zt7gtE3sboB
-   YzjrMOMEjzfvrYFJD1ziEMATrRoQjAkJAy1CP0FSdAUUqey22XVTvp4n9
-   oPCpV3moNb2aUI1Jb6c4b66nAokBp1xBnyXPnlNZ9mNwyqRo+GcWvJALv
-   A==;
-X-CSE-ConnectionGUID: B6+PEKe8QhGuiOu0ogtUKw==
-X-CSE-MsgGUID: eyMFiCh8SASaAlG7/S5GJw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="77625021"
-X-IronPort-AV: E=Sophos;i="6.20,230,1758610800"; 
-   d="scan'208";a="77625021"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 20:30:53 -0800
-X-CSE-ConnectionGUID: kfPQP0dAQYyncKYK+1Rl3g==
-X-CSE-MsgGUID: L5MmAWq4QgenPI/dZaLjCQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,230,1758610800"; 
-   d="scan'208";a="198079068"
-Received: from ccdlinuxdev11.iil.intel.com ([143.185.162.70])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 20:30:51 -0800
-From: Vitaly Lifshits <vitaly.lifshits@intel.com>
-To: intel-wired-lan@osuosl.org,
-	netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	pabeni@redhat.com
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Subject: [PATCH iwl-next v1 1/1] e1000e: introduce private flag to override XTAL clock frequency
-Date: Thu, 27 Nov 2025 06:30:47 +0200
-Message-Id: <20251127043047.728116-1-vitaly.lifshits@intel.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1764218653; c=relaxed/simple;
+	bh=aNoLBee7wmlMLQZEba5dljIwZwEs5pG9banx4D2ehPI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e8BxIP0kxRNdky0r6df/1oesM+cCRPPU0+ZzXF5bW9XrDvZAfBePAz1v7HwinaMnbwcWnLI4aKDudjj2R8DXI1Zg7Wz5kTjLTyf7QKvc1nOUWkkOEoTuBZsXcrKXrxt/vT5ev1NqLIGuIGklCUM+mlQh01+t56l5Vfxpblprpi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PABDm7aw; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4f7829be-a60f-4053-ab66-7981cba23175@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764218636;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NCC0nbZfQ6o92BClTunQY/D6ZUKEsE2vp4CNBcIh0Ws=;
+	b=PABDm7awJNkJbHnFWGwRy3Fbdajs3nmqbLSyB2eiuVixCSjmgIxzLiGgPN6sVVOZ9/2PjB
+	Z/4Sh6FHs75phonyg+ZY/r7BAUoWo4JKm5F3JPOYEQ3oAQ47KWqsceuF+4t8LHVPS09WCa
+	GCQGyR+KTcEN2sEABtBdPLkeYOOpvdE=
+Date: Wed, 26 Nov 2025 20:43:51 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH v2] RDMA/rxe: reclassify sockets in order to avoid false
+ positives from lockdep
+To: Stefan Metzmacher <metze@samba.org>, linux-rdma@vger.kernel.org
+Cc: Zhu Yanjun <zyjzyj2000@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+ linux-cifs@vger.kernel.org
+References: <20251126150744.1836188-1-metze@samba.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20251126150744.1836188-1-metze@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On some TGP and ADP systems, the hardware XTAL clock is incorrectly
-set to 24MHz instead of the expected 38.4MHz, causing PTP timer
-inaccuracies. Since affected systems cannot be reliably detected,
-introduce an ethtool private flag that allows user-space to override
-the XTAL clock frequency.
 
-Tested on an affected system using the phc_ctl tool:
+在 2025/11/26 7:07, Stefan Metzmacher 写道:
+> While developing IPPROTO_SMBDIRECT support for the code
+> under fs/smb/common/smbdirect [1], I noticed false positives like this:
+>
+> [+0,003927] ============================================
+> [+0,000532] WARNING: possible recursive locking detected
+> [+0,000611] 6.18.0-rc5-metze-kasan-lockdep.02+ #1 Tainted: G           OE
+> [+0,000835] --------------------------------------------
+> [+0,000729] ksmbd:r5445/3609 is trying to acquire lock:
+> [+0,000709] ffff88800b9570f8 (k-sk_lock-AF_INET){+.+.}-{0:0},
+>                                at: inet_shutdown+0x52/0x360
+> [+0,000831]
+>              but task is already holding lock:
+> [+0,000684] ffff88800654af78 (k-sk_lock-AF_INET){+.+.}-{0:0},
+>                             at: smbdirect_sk_close+0x122/0x790 [smbdirect]
+> [+0,000928]
+>              other info that might help us debug this:
+> [+0,005552]  Possible unsafe locking scenario:
+>
+> [+0,000723]        CPU0
+> [+0,000359]        ----
+> [+0,000377]   lock(k-sk_lock-AF_INET);
+> [+0,000478]   lock(k-sk_lock-AF_INET);
+> [+0,000498]
+>               *** DEADLOCK ***
+>
+> [+0,001012]  May be due to missing lock nesting notation
+>
+> [+0,000831] 3 locks held by ksmbd:r5445/3609:
+> [+0,000484]  #0: ffff88800654af78 (k-sk_lock-AF_INET){+.+.}-{0:0},
+>                             at: smbdirect_sk_close+0x122/0x790 [smbdirect]
+> [+0,001000]  #1: ffff888020a40458 (&id_priv->handler_mutex){+.+.}-{4:4},
+>                             at: rdma_lock_handler+0x17/0x30 [rdma_cm]
+> [+0,000982]  #2: ffff888020a40350 (&id_priv->qp_mutex){+.+.}-{4:4},
+>                             at: rdma_destroy_qp+0x5d/0x1f0 [rdma_cm]
+> [+0,000934]
+>              stack backtrace:
+> [+0,000589] CPU: 0 UID: 0 PID: 3609 Comm: ksmbd:r5445 Kdump: loaded
+>               Tainted: G           OE
+>               6.18.0-rc5-metze-kasan-lockdep.02+ #1 PREEMPT(voluntary)
+> [+0,000023] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+> [+0,000004] Hardware name: innotek GmbH VirtualBox/VirtualBox,
+>              BIOS VirtualBox 12/01/2006
+> ...
+> [+0,000010] print_deadlock_bug+0x245/0x330
+> [+0,000014] validate_chain+0x32a/0x590
+> [+0,000012] __lock_acquire+0x535/0xc30
+> [+0,000013] lock_acquire.part.0+0xb3/0x240
+> [+0,000017] ? inet_shutdown+0x52/0x360
+> [+0,000013] ? srso_alias_return_thunk+0x5/0xfbef5
+> [+0,000007] ? mark_held_locks+0x46/0x90
+> [+0,000012] lock_acquire+0x60/0x140
+> [+0,000006] ? inet_shutdown+0x52/0x360
+> [+0,000028] lock_sock_nested+0x3b/0xf0
+> [+0,000009] ? inet_shutdown+0x52/0x360
+> [+0,000008] inet_shutdown+0x52/0x360
+> [+0,000010] kernel_sock_shutdown+0x5b/0x90
+> [+0,000011] rxe_qp_do_cleanup+0x4ef/0x810 [rdma_rxe]
+> [+0,000043] ? __pfx_rxe_qp_do_cleanup+0x10/0x10 [rdma_rxe]
+> [+0,000030] execute_in_process_context+0x2b/0x170
+> [+0,000013] rxe_qp_cleanup+0x1c/0x30 [rdma_rxe]
+> [+0,000021] __rxe_cleanup+0x1cf/0x2e0 [rdma_rxe]
+> [+0,000036] ? __pfx___rxe_cleanup+0x10/0x10 [rdma_rxe]
+> [+0,000020] ? srso_alias_return_thunk+0x5/0xfbef5
+> [+0,000006] ? __kasan_check_read+0x11/0x20
+> [+0,000012] rxe_destroy_qp+0xe1/0x230 [rdma_rxe]
+> [+0,000035] ib_destroy_qp_user+0x217/0x450 [ib_core]
+> [+0,000074] rdma_destroy_qp+0x83/0x1f0 [rdma_cm]
+> [+0,000034] smbdirect_connection_destroy_qp+0x98/0x2e0 [smbdirect]
+> [+0,000017] ? __pfx_smb_direct_logging_needed+0x10/0x10 [ksmbd]
+> [+0,000044] smbdirect_connection_destroy+0x698/0xed0 [smbdirect]
+> [+0,000023] ? __pfx_smbdirect_connection_destroy+0x10/0x10 [smbdirect]
+> [+0,000033] ? __pfx_smb_direct_logging_needed+0x10/0x10 [ksmbd]
+> [+0,000031] smbdirect_connection_destroy_sync+0x42b/0x9f0 [smbdirect]
+> [+0,000029] ? mark_held_locks+0x46/0x90
+> [+0,000012] ? __pfx_smbdirect_connection_destroy_sync+0x10/0x10 [smbdirect]
+> [+0,000019] ? srso_alias_return_thunk+0x5/0xfbef5
+> [+0,000007] ? trace_hardirqs_on+0x64/0x70
+> [+0,000029] ? srso_alias_return_thunk+0x5/0xfbef5
+> [+0,000010] ? srso_alias_return_thunk+0x5/0xfbef5
+> [+0,000006] ? __smbdirect_connection_schedule_disconnect+0x339/0x4b0
+> [+0,000021] smbdirect_sk_destroy+0xb0/0x680 [smbdirect]
+> [+0,000024] ? srso_alias_return_thunk+0x5/0xfbef5
+> [+0,000006] ? trace_hardirqs_on+0x64/0x70
+> [+0,000006] ? srso_alias_return_thunk+0x5/0xfbef5
+> [+0,000005] ? __local_bh_enable_ip+0xba/0x150
+> [+0,000011] sk_common_release+0x66/0x340
+> [+0,000010] smbdirect_sk_close+0x12a/0x790 [smbdirect]
+> [+0,000023] ? ip_mc_drop_socket+0x1e/0x240
+> [+0,000013] inet_release+0x10a/0x240
+> [+0,000011] smbdirect_sock_release+0x502/0xe80 [smbdirect]
+> [+0,000015] ? srso_alias_return_thunk+0x5/0xfbef5
+> [+0,000024] sock_release+0x91/0x1c0
+> [+0,000010] smb_direct_free_transport+0x31/0x50 [ksmbd]
+> [+0,000025] ksmbd_conn_free+0x1d0/0x240 [ksmbd]
+> [+0,000040] smb_direct_disconnect+0xb2/0x120 [ksmbd]
+> [+0,000023] ? srso_alias_return_thunk+0x5/0xfbef5
+> [+0,000018] ksmbd_conn_handler_loop+0x94e/0xf10 [ksmbd]
+> ...
+>
+> I'll also add reclassify to the smbdirect socket code [1],
+> but I think it's better to have it in both direction
+> (below and above the RDMA layer).
+>
+> [1]
+> https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/master-ipproto-smbdirect
+>
+> Cc: Zhu Yanjun <zyjzyj2000@gmail.com>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: linux-rdma@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-cifs@vger.kernel.org
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+>
+> ---
+>
+> v2: - use CONFIG_DEBUG_LOCK_ALLOC (Bernard on siw patch)
+>      - add a comment (Bernard on siw patch)
+>      - AF_INET vs. AF_INET6 (Bernard on siw patch)
+> ---
+>   drivers/infiniband/sw/rxe/rxe_net.c | 49 +++++++++++++++++++++++++++++
+>   drivers/infiniband/sw/rxe/rxe_qp.c  | 49 +++++++++++++++++++++++++++++
+>   2 files changed, 98 insertions(+)
+>
+> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/rxe/rxe_net.c
+> index ac0183a2ff7a..9fee969f5c6f 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_net.c
+> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
+> @@ -18,6 +18,54 @@
+>   #include "rxe_net.h"
+>   #include "rxe_loc.h"
+>   
+> +#ifdef CONFIG_DEBUG_LOCK_ALLOC
+> +/*
+> + * lockdep can detect false positive circular dependencies
+> + * when there are user-space socket API users or in kernel
+> + * users switching between a tcp and rdma transport.
+> + * Maybe also switching between siw and rxe may cause
+> + * problems as per default sockets are only classified
+> + * by family and not by ip protocol. And there might
+> + * be different locks used between the application
+> + * and the low level sockets.
+> + *
+> + * Problems were seen with ksmbd.ko and cifs.ko,
+> + * switching transports, use git blame to find
+> + * more details.
+> + */
+> +static struct lock_class_key rxe_recv_sk_key[2];
+> +static struct lock_class_key rxe_recv_slock_key[2];
+> +#endif /* CONFIG_DEBUG_LOCK_ALLOC */
+> +
+> +static inline void rxe_reclassify_recv_socket(struct socket *sock)
+> +{
+> +#ifdef CONFIG_DEBUG_LOCK_ALLOC
+> +	struct sock *sk = sock->sk;
+> +
+> +	if (WARN_ON_ONCE(!sock_allow_reclassification(sk)))
+> +		return;
+> +
+> +	switch (sk->sk_family) {
+> +	case AF_INET:
+> +		sock_lock_init_class_and_name(sk,
+> +					      "slock-AF_INET-RDMA-RXE-RECV",
+> +					      &rxe_recv_slock_key[0],
+> +					      "sk_lock-AF_INET-RDMA-RXE-RECV",
+> +					      &rxe_recv_sk_key[0]);
+> +		break;
+> +	case AF_INET6:
+> +		sock_lock_init_class_and_name(sk,
+> +					      "slock-AF_INET6-RDMA-RXE-RECV",
+> +					      &rxe_recv_slock_key[1],
+> +					      "sk_lock-AF_INET6-RDMA-RXE-RECV",
+> +					      &rxe_recv_sk_key[1]);
+> +		break;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +	}
+> +#endif /* CONFIG_DEBUG_LOCK_ALLOC */
+> +}
+> +
+>   static struct rxe_recv_sockets recv_sockets;
 
-Without the flag:
-  sudo phc_ctl enp0s31f6 set 0.0 wait 10 get
-  phc_ctl[...] clock time is 16.000541250 (expected ~10s)
 
-With the flag:
-  sudo phc_ctl enp0s31f6 set 0.0 wait 10 get
-  phc_ctl[...] clock time is 9.984407212 (expected ~10s)
+Thanks. The global variable recv_sockets should be placed at the top of 
+the newly added source file.
+If I recall correctly, the global variable declaration needs to be at 
+the beginning of the file and after the header files.
 
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
----
- drivers/net/ethernet/intel/e1000e/e1000.h   |  7 ++--
- drivers/net/ethernet/intel/e1000e/ethtool.c | 39 ++++++++++-----------
- drivers/net/ethernet/intel/e1000e/ich8lan.c |  4 +--
- drivers/net/ethernet/intel/e1000e/netdev.c  | 18 +++++++---
- 4 files changed, 39 insertions(+), 29 deletions(-)
+I also read the commit of siw. This commit is similar with the one of siw.
 
-diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/ethernet/intel/e1000e/e1000.h
-index aa08f397988e..63145bf5adcf 100644
---- a/drivers/net/ethernet/intel/e1000e/e1000.h
-+++ b/drivers/net/ethernet/intel/e1000e/e1000.h
-@@ -310,6 +310,7 @@ struct e1000_adapter {
- 
- 	unsigned int flags;
- 	unsigned int flags2;
-+	unsigned int priv_flags;
- 	struct work_struct downshift_task;
- 	struct work_struct update_phy_task;
- 	struct work_struct print_hang_task;
-@@ -460,8 +461,10 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca);
- #define FLAG2_DFLT_CRC_STRIPPING          BIT(12)
- #define FLAG2_CHECK_RX_HWTSTAMP           BIT(13)
- #define FLAG2_CHECK_SYSTIM_OVERFLOW       BIT(14)
--#define FLAG2_ENABLE_S0IX_FLOWS           BIT(15)
--#define FLAG2_DISABLE_K1		   BIT(16)
-+
-+#define PRIV_FLAG_ENABLE_S0IX_FLOWS	   BIT(0)
-+#define PRIV_FLAG_DISABLE_K1		   BIT(1)
-+#define PRIV_FLAG_38_4MHZ_XTAL_CLK	   BIT(2)
- 
- #define E1000_RX_DESC_PS(R, i)	    \
- 	(&(((union e1000_rx_desc_packet_split *)((R).desc))[i]))
-diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-index cee57a2149ab..3415c38e1d9a 100644
---- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-@@ -24,10 +24,9 @@ struct e1000_stats {
- };
- 
- static const char e1000e_priv_flags_strings[][ETH_GSTRING_LEN] = {
--#define E1000E_PRIV_FLAGS_S0IX_ENABLED	BIT(0)
- 	"s0ix-enabled",
--#define E1000E_PRIV_FLAGS_DISABLE_K1	BIT(1)
- 	"disable-k1",
-+	"force_38_4mhz_xtal_clock",
- };
- 
- #define E1000E_PRIV_FLAGS_STR_LEN ARRAY_SIZE(e1000e_priv_flags_strings)
-@@ -2298,49 +2297,49 @@ static int e1000e_get_ts_info(struct net_device *netdev,
- static u32 e1000e_get_priv_flags(struct net_device *netdev)
- {
- 	struct e1000_adapter *adapter = netdev_priv(netdev);
--	u32 priv_flags = 0;
- 
--	if (adapter->flags2 & FLAG2_ENABLE_S0IX_FLOWS)
--		priv_flags |= E1000E_PRIV_FLAGS_S0IX_ENABLED;
--
--	if (adapter->flags2 & FLAG2_DISABLE_K1)
--		priv_flags |= E1000E_PRIV_FLAGS_DISABLE_K1;
--
--	return priv_flags;
-+	return adapter->priv_flags;
- }
- 
- static int e1000e_set_priv_flags(struct net_device *netdev, u32 priv_flags)
- {
- 	struct e1000_adapter *adapter = netdev_priv(netdev);
- 	struct e1000_hw *hw = &adapter->hw;
--	unsigned int flags2 = adapter->flags2;
-+	unsigned int temp_flags = 0;
- 	unsigned int changed;
- 
--	flags2 &= ~(FLAG2_ENABLE_S0IX_FLOWS | FLAG2_DISABLE_K1);
--
--	if (priv_flags & E1000E_PRIV_FLAGS_S0IX_ENABLED) {
-+	if (priv_flags & PRIV_FLAG_ENABLE_S0IX_FLOWS) {
- 		if (hw->mac.type < e1000_pch_cnp) {
- 			e_err("S0ix is not supported on this device\n");
- 			return -EINVAL;
- 		}
- 
--		flags2 |= FLAG2_ENABLE_S0IX_FLOWS;
-+		temp_flags |= PRIV_FLAG_ENABLE_S0IX_FLOWS;
- 	}
- 
--	if (priv_flags & E1000E_PRIV_FLAGS_DISABLE_K1) {
-+	if (priv_flags & PRIV_FLAG_DISABLE_K1) {
- 		if (hw->mac.type < e1000_ich8lan) {
- 			e_err("Disabling K1 is not supported on this device\n");
- 			return -EINVAL;
- 		}
- 
--		flags2 |= FLAG2_DISABLE_K1;
-+		temp_flags |= PRIV_FLAG_DISABLE_K1;
-+	}
-+
-+	if (priv_flags & PRIV_FLAG_38_4MHZ_XTAL_CLK) {
-+		if (hw->mac.type != e1000_pch_tgp && hw->mac.type != e1000_pch_adp) {
-+			e_err("Forcing 38.4MHz frequency on the XTAL is not supported on this device\n");
-+			return -EINVAL;
-+		}
-+
-+		temp_flags |= PRIV_FLAG_38_4MHZ_XTAL_CLK;
- 	}
- 
--	changed = adapter->flags2 ^ flags2;
-+	changed = adapter->priv_flags ^ temp_flags;
- 	if (changed)
--		adapter->flags2 = flags2;
-+		adapter->priv_flags = temp_flags;
- 
--	if (changed & FLAG2_DISABLE_K1) {
-+	if (changed & (PRIV_FLAG_DISABLE_K1 | PRIV_FLAG_38_4MHZ_XTAL_CLK)) {
- 		/* reset the hardware to apply the changes */
- 		while (test_and_set_bit(__E1000_RESETTING,
- 					&adapter->state))
-diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-index 0ff8688ac3b8..8669dfaf38ea 100644
---- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
-+++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-@@ -302,7 +302,7 @@ static s32 e1000_reconfigure_k1_params(struct e1000_hw *hw)
- 	s32 ret_val;
- 
- 	if (hw->mac.type < e1000_pch_mtp) {
--		if (hw->adapter->flags2 & FLAG2_DISABLE_K1)
-+		if (hw->adapter->priv_flags & PRIV_FLAG_DISABLE_K1)
- 			return e1000_configure_k1_ich8lan(hw, false);
- 		return 0;
- 	}
-@@ -315,7 +315,7 @@ static s32 e1000_reconfigure_k1_params(struct e1000_hw *hw)
- 
- 	/* Wait for the interface the settle */
- 	usleep_range(1000, 1100);
--	if (hw->adapter->flags2 & FLAG2_DISABLE_K1)
-+	if (hw->adapter->flags2 & PRIV_FLAG_DISABLE_K1)
- 		return e1000_configure_k1_ich8lan(hw, false);
- 
- 	/* Change K1 exit timeout */
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 116f3c92b5bc..93ab22f3cd3e 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -3531,9 +3531,17 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca)
- 		shift = INCVALUE_SHIFT_24MHZ;
- 		adapter->cc.shift = shift;
- 		break;
--	case e1000_pch_cnp:
- 	case e1000_pch_tgp:
- 	case e1000_pch_adp:
-+		if (adapter->priv_flags & PRIV_FLAG_38_4MHZ_XTAL_CLK) {
-+			incperiod = INCPERIOD_38400KHZ;
-+			incvalue = INCVALUE_38400KHZ;
-+			shift = INCVALUE_SHIFT_38400KHZ;
-+			adapter->cc.shift = shift;
-+			break;
-+		}
-+		fallthrough;
-+	case e1000_pch_cnp:
- 	case e1000_pch_nvp:
- 		if (er32(TSYNCRXCTL) & E1000_TSYNCRXCTL_SYSCFI) {
- 			/* Stable 24MHz frequency */
-@@ -6987,7 +6995,7 @@ static int e1000e_pm_suspend(struct device *dev)
- 	rc = __e1000_shutdown(pdev, false);
- 	if (!rc) {
- 		/* Introduce S0ix implementation */
--		if (adapter->flags2 & FLAG2_ENABLE_S0IX_FLOWS)
-+		if (adapter->priv_flags & PRIV_FLAG_ENABLE_S0IX_FLOWS)
- 			e1000e_s0ix_entry_flow(adapter);
- 	}
- 
-@@ -7002,7 +7010,7 @@ static int e1000e_pm_resume(struct device *dev)
- 	int rc;
- 
- 	/* Introduce S0ix implementation */
--	if (adapter->flags2 & FLAG2_ENABLE_S0IX_FLOWS)
-+	if (adapter->priv_flags & PRIV_FLAG_ENABLE_S0IX_FLOWS)
- 		e1000e_s0ix_exit_flow(adapter);
- 
- 	rc = __e1000_resume(pdev);
-@@ -7676,7 +7684,7 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	e1000e_ptp_init(adapter);
- 
- 	if (hw->mac.type >= e1000_pch_mtp)
--		adapter->flags2 |= FLAG2_DISABLE_K1;
-+		adapter->priv_flags |= PRIV_FLAG_DISABLE_K1;
- 
- 	/* reset the hardware with the new settings */
- 	e1000e_reset(adapter);
-@@ -7689,7 +7697,7 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		e1000e_get_hw_control(adapter);
- 
- 	if (hw->mac.type >= e1000_pch_cnp)
--		adapter->flags2 |= FLAG2_ENABLE_S0IX_FLOWS;
-+		adapter->priv_flags |= PRIV_FLAG_ENABLE_S0IX_FLOWS;
- 
- 	strscpy(netdev->name, "eth%d", sizeof(netdev->name));
- 	err = register_netdev(netdev);
+And after applying this commit, RXE still can work well. I am fine with 
+this.
+
+Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+
+Zhu Yanjun
+
+
+>   
+>   static struct dst_entry *rxe_find_route4(struct rxe_qp *qp,
+> @@ -192,6 +240,7 @@ static struct socket *rxe_setup_udp_tunnel(struct net *net, __be16 port,
+>   	err = udp_sock_create(net, &udp_cfg, &sock);
+>   	if (err < 0)
+>   		return ERR_PTR(err);
+> +	rxe_reclassify_recv_socket(sock);
+>   
+>   	tnl_cfg.encap_type = 1;
+>   	tnl_cfg.encap_rcv = rxe_udp_encap_recv;
+> diff --git a/drivers/infiniband/sw/rxe/rxe_qp.c b/drivers/infiniband/sw/rxe/rxe_qp.c
+> index 95f1c1c2949d..845bdd03ca28 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_qp.c
+> +++ b/drivers/infiniband/sw/rxe/rxe_qp.c
+> @@ -15,6 +15,54 @@
+>   #include "rxe_queue.h"
+>   #include "rxe_task.h"
+>   
+> +#ifdef CONFIG_DEBUG_LOCK_ALLOC
+> +/*
+> + * lockdep can detect false positive circular dependencies
+> + * when there are user-space socket API users or in kernel
+> + * users switching between a tcp and rdma transport.
+> + * Maybe also switching between siw and rxe may cause
+> + * problems as per default sockets are only classified
+> + * by family and not by ip protocol. And there might
+> + * be different locks used between the application
+> + * and the low level sockets.
+> + *
+> + * Problems were seen with ksmbd.ko and cifs.ko,
+> + * switching transports, use git blame to find
+> + * more details.
+> + */
+> +static struct lock_class_key rxe_send_sk_key[2];
+> +static struct lock_class_key rxe_send_slock_key[2];
+> +#endif /* CONFIG_DEBUG_LOCK_ALLOC */
+> +
+> +static inline void rxe_reclassify_send_socket(struct socket *sock)
+> +{
+> +#ifdef CONFIG_DEBUG_LOCK_ALLOC
+> +	struct sock *sk = sock->sk;
+> +
+> +	if (WARN_ON_ONCE(!sock_allow_reclassification(sk)))
+> +		return;
+> +
+> +	switch (sk->sk_family) {
+> +	case AF_INET:
+> +		sock_lock_init_class_and_name(sk,
+> +					      "slock-AF_INET-RDMA-RXE-SEND",
+> +					      &rxe_send_slock_key[0],
+> +					      "sk_lock-AF_INET-RDMA-RXE-SEND",
+> +					      &rxe_send_sk_key[0]);
+> +		break;
+> +	case AF_INET6:
+> +		sock_lock_init_class_and_name(sk,
+> +					      "slock-AF_INET6-RDMA-RXE-SEND",
+> +					      &rxe_send_slock_key[1],
+> +					      "sk_lock-AF_INET6-RDMA-RXE-SEND",
+> +					      &rxe_send_sk_key[1]);
+> +		break;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +	}
+> +#endif /* CONFIG_DEBUG_LOCK_ALLOC */
+> +}
+> +
+>   static int rxe_qp_chk_cap(struct rxe_dev *rxe, struct ib_qp_cap *cap,
+>   			  int has_srq)
+>   {
+> @@ -244,6 +292,7 @@ static int rxe_qp_init_req(struct rxe_dev *rxe, struct rxe_qp *qp,
+>   	err = sock_create_kern(&init_net, AF_INET, SOCK_DGRAM, 0, &qp->sk);
+>   	if (err < 0)
+>   		return err;
+> +	rxe_reclassify_send_socket(qp->sk);
+>   	qp->sk->sk->sk_user_data = qp;
+>   
+>   	/* pick a source UDP port number for this QP based on
+
 -- 
-2.34.1
+Best Regards,
+Yanjun.Zhu
 
 
