@@ -1,234 +1,161 @@
-Return-Path: <netdev+bounces-242377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E73BC8FE89
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 19:23:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343A9C8FEB0
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 19:25:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E46113A9F20
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 18:22:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA36B3AAAAD
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 18:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD1B301473;
-	Thu, 27 Nov 2025 18:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F7F3009D9;
+	Thu, 27 Nov 2025 18:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5If9gO+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eTI7NGgd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B191301012
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 18:22:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A35E2FFDE2;
+	Thu, 27 Nov 2025 18:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764267770; cv=none; b=U/37cBbA8HXozjN6ctQWsAwoNwbNU2jS7R65gwgUSq8H6eOjvreadvJbzsi4HKib5HJT6orsAH10visVWPYYm4FerF9kA/VMQMMHvGx9TqQxfFqQenEGW33hFXLYxj72pkAIy5HPU5lmh0hqU62Ar1eiPUR8iuRjZj1ziFdcPWg=
+	t=1764267936; cv=none; b=BlWHh5K95c/2NWt8/HdX9vG3O5/PKagzaqMdXJ29zzQth0mczEuiwbtyeOJaG2cs0bSMqpUiYh0eAHoUTG/aAreK8ZKhLwhp+YCr1LMmGOvovWuwQjm3RKwxw+1gMZzuJ9rXyReIUH20rzRJyKgud+p+TlWlf2kq+fvOnchhlws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764267770; c=relaxed/simple;
-	bh=2zh5IckA93jcXpcP2jg/bB2AVaYgRYS+ot7BWC5MT2A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ioTpD51NwzdRzttgHMFkmJHwPavgSHcyeCRR8Dsq/66mYevWb8WrIEgJru6+iX8cBVLp6YYuYrSfLRpYIWAJB7ScGcwZDRDGA+IkUsh1OHjld0Qou5XWga5u3TOWrzi5/yQAEfU4jdu5mF8Q36Mc+nAiTWHN5+vnMyhagzb2saE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t5If9gO+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98FA8C2BCB3
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 18:22:49 +0000 (UTC)
+	s=arc-20240116; t=1764267936; c=relaxed/simple;
+	bh=4U7GjycIJ0nTS6ErulWOvbKg9W2AgVrJduwNRhinSiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t7hj7rb52W1XlRnJ/skwo8SNfo4EVO8zw/bNEQ26MpdZ3e9SpJLz8ZGc0vUIMa4CtUy+s5xPGZ4UVrbx3FyImM7lsA+5hOd0u/N77WV1TnBDobV4nmMHKoWN6mtxx7aFCV5M3qTuJo8pDw4RwYK6QuX7T0KLL5BKFecOLke6Hig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eTI7NGgd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37560C4CEF8;
+	Thu, 27 Nov 2025 18:25:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764267769;
-	bh=2zh5IckA93jcXpcP2jg/bB2AVaYgRYS+ot7BWC5MT2A=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=t5If9gO++OOilnxFrwBrkBC309GX2ZWoD+KuNyiD5dUztBFiu96epD55nIlqdm2bE
-	 I629s/i5ebpTIV1f8i9y5LxYTw1ElYOyDOS7zh8yoLRb12SJMkNSTl/k5UVdiV9Wcx
-	 4pI9IStlpgObJIRTRBZMtk1aAK13fAJZM4p9nuCNWNYZMgi9MXm7gEip+9kip1t60N
-	 fsKjao8brX5y0iEjBEnKN0hZgNGxRVvpYBmlN4f60tM41YnF3OOyz3ScwQfNNPuO1O
-	 tD5BH4EMod/AgIyuDOrhBKsWuQJMKPloN85ij5AbiVt3+3bxe8+vH/r2iPJ0jTChzF
-	 Psdd0ZmiQoKyA==
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-45066bee74aso237846b6e.2
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 10:22:49 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV9RWb0N8muhF3pbdESJfL3hoNpwONHc5OIbvmp3jgO5tWFVmhiPYEsnmqQqeS/kRvswTQCFBM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyI1CH7rRGVVUwKy/qrRYyqlZzqA7lAOsgvd0t7WsG6LtufRKCe
-	7Ay04Fy4bHdJU32Hu2AiYFtV5nOrwy9iNuu0PBBCipocSKAt7C71mq7Wcg1uToCSBPY8ZFMTjxw
-	ebbUeAMkQ9QS5L+BjvK3BK6henU7EHEc=
-X-Google-Smtp-Source: AGHT+IH1bZuq2107Z9vV3tIssGfEt3HKcvXwJtichyRCHN4NG+9zrGINSBUFfZp8A6sCqAX7wGBoKCjmIoVGx2W+fiQ=
-X-Received: by 2002:a05:6808:1803:b0:44d:a972:f48d with SMTP id
- 5614622812f47-45115ade7bcmr8045952b6e.51.1764267768535; Thu, 27 Nov 2025
- 10:22:48 -0800 (PST)
+	s=k20201202; t=1764267935;
+	bh=4U7GjycIJ0nTS6ErulWOvbKg9W2AgVrJduwNRhinSiQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eTI7NGgd5iJCMDj9VTbLzLvskyITR6yKEz4rHf5ZCzjPL5IrOG68MuE9xeG7upxYl
+	 ACvs27AikXfSH8ms08Ppm3ESKmg0G4eN4geYd+WzQgM5Gvk0sC2b6b7i+OKfczzebr
+	 SRcHEEFFgNbzdRvUTFyM800BHiNztT2Cj11K/VoA/s1r728bbB18Nbsjy6uJbrWuLm
+	 jCgH5lwAbm3gPFcN+/47cRRo7uFPpALeLnycB4x42pU2SQKG2XjQxdjRCX65wKG7Tb
+	 kFaSVNjrI4DIiVwh/HfmnpaoyXGmW7kNBTuWsDnEryxa5b6eDkRkjPXJ+F9fW4gMh0
+	 5rGH3Nmha1ZKg==
+Date: Thu, 27 Nov 2025 18:25:30 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next] selftests/net/ipsec: Fix variable size type not
+ at the end of struct
+Message-ID: <aSiXmp4mh7M3RaRv@horms.kernel.org>
+References: <20251126054711.26465-1-ankitkhushwaha.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251120-thermal-device-v1-0-bbdad594d57a@gmx.de>
- <CAJZ5v0jOPrBcozzJMsB1eE12MuZRWDAV-+=jfrhJbi=S0p5J9Q@mail.gmail.com> <5f3ef610-4024-4ca0-a934-2649f5d25f40@gmx.de>
-In-Reply-To: <5f3ef610-4024-4ca0-a934-2649f5d25f40@gmx.de>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Thu, 27 Nov 2025 19:22:37 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0hdqY-=O5Ai6c5qjMr_pRFc+SDyV1QruM=ZeHH9Z=guSg@mail.gmail.com>
-X-Gm-Features: AWmQ_bmQtAcoPswZk2AImBNuJ-60z5nmzzYc3vdfnDFN0Jddf0LEskGxktPDRCM
-Message-ID: <CAJZ5v0hdqY-=O5Ai6c5qjMr_pRFc+SDyV1QruM=ZeHH9Z=guSg@mail.gmail.com>
-Subject: Re: [PATCH RFC RESEND 0/8] thermal: core: Allow setting the parent
- device of thermal zone/cooling devices
-To: Armin Wolf <W_Armin@gmx.de>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>, 
-	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>, Len Brown <lenb@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
-	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	etnaviv@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
-	linux-tegra@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
-	ath11k@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, platform-driver-x86@vger.kernel.org, 
-	linux-pci@vger.kernel.org, imx@lists.linux.dev, 
-	linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251126054711.26465-1-ankitkhushwaha.linux@gmail.com>
 
-On Sat, Nov 22, 2025 at 3:18=E2=80=AFPM Armin Wolf <W_Armin@gmx.de> wrote:
->
-> Am 21.11.25 um 21:35 schrieb Rafael J. Wysocki:
->
-> > On Thu, Nov 20, 2025 at 4:41=E2=80=AFAM Armin Wolf <W_Armin@gmx.de> wro=
-te:
+On Wed, Nov 26, 2025 at 11:17:11AM +0530, Ankit Khushwaha wrote:
+> The "struct alg" object contains a union of 3 xfrm structures:
+> 
+> 	union {
+> 		struct xfrm_algo;
+> 		struct xfrm_algo_aead;
+> 		struct xfrm_algo_auth;
+> 	}
+> 
+> All of them end with a flexible array member used to store key material,
+> but the flexible array appears at *different offsets* in each struct.
+> bcz of this, union itself is of variable-sized & Placing it above
+> char buf[...] triggers:
+> 
+> ipsec.c:835:5: warning: field 'u' with variable sized type 'union
+> (unnamed union at ipsec.c:831:3)' not at the end of a struct or class
+> is a GNU extension [-Wgnu-variable-sized-type-not-at-end]
+>   835 |                 } u;
+>       |                   ^
 
-[...]
+FWIIW, I was able to reproduce this using the
+-Wflex-array-member-not-at-end (n.b. different option name to above)
+option with the GCC 15.2.0 toolchain here [1].
 
-> >> ---
-> >> Armin Wolf (8):
-> >>        thermal: core: Allow setting the parent device of cooling devic=
-es
-> >>        thermal: core: Set parent device in thermal_of_cooling_device_r=
-egister()
-> >>        ACPI: processor: Stop creating "device" sysfs link
-> >
-> > That link is not to the cooling devices' parent, but to the ACPI
-> > device object (a struct acpi_device) that corresponds to the parent.
-> > The parent of the cooling device should be the processor device, not
-> > its ACPI companion, so I'm not sure why there would be a conflict.
->
->  From the perspective of the Linux device core, a parent device does not =
-have to be
-> a "physical" device. In the case of the ACPI processor driver, the ACPI d=
-evice is used,
-> so the cooling device registered by said driver belongs to the ACPI devic=
-e.
+[1] https://mirrors.edge.kernel.org/pub/tools/crosstool/
 
-Well, that's a problem.  A struct acpi_device should not be a parent
-of anything other than a struct acpi_device.
+> 
+> one fix is to use "TRAILING_OVERLAP()" which works with one flexible
+> array member only.
+> 
+> But In "struct alg" flexible array member exists in all union members,
+> but not at the same offset, so TRAILING_OVERLAP cannot be applied.
+> 
+> so the fix is to explicitly overlay the key buffer at the correct offset
+> for the largest union member (xfrm_algo_auth). This ensures that the
+> flexible-array region and the fixed buffer line up.
+> 
+> No functional change.
 
-> I agree that using the Linux processor device would make more sense, but =
-this will require
-> changes inside the ACPI processor driver.
+I verified this does not change the layout of the union (now structure),
+by copying it outside the function and giving it a name.
+And then analysing the binary using pahole.
 
-So be it.
+So I agree this should not have any run-time effect.
 
-> As for the "device" symlink: The conflict would be a naming conflict, as =
-both "device" symlinks
-> (the one created by the ACPI processor driver and the one created by the =
-device core) will
-> be created in the same directory (which is the directory of the cooling d=
-evice).
+But I've CCed Gustavo and linux-hardening, as their experience
+seems relevant here.
 
-I see.
+> 
+> Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
 
-But why is the new symlink needed in the first place?  If the device
-has a parent, it will appear under that parent in /sys/devices/, won't
-it?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Currently, all of the thermal class devices appear under
-/sys/devices/virtual/thermal/ because they have no parents and they
-all get a class parent kobject under /sys/devices/virtual/, as that's
-what get_device_parent() does.
-
-If they have real parents, they will appear under those parents, so
-why will the parents need to be pointed to additionally?
-
-BTW, this means that the layout of /sys/devices/ will change when
-thermal devices get real parents.  I'm not sure if this is a problem,
-but certainly something to note.
-
-> >>        ACPI: fan: Stop creating "device" sysfs link
-> >>        ACPI: video: Stop creating "device" sysfs link
-> > Analogously in the above two cases AFAICS.
-> >
-> > The parent of a cooling device should be a "physical" device object,
-> > like a platform device or a PCI device or similar, not a struct
-> > acpi_device (which in fact is not a device even).
->
->  From the perspective of the Linux device core, a ACPI device is a perfec=
-tly valid device.
-
-The driver core is irrelevant here.
-
-As I said before, a struct acpi_device object should not be a parent
-of anything other than a struct acpi_device object.  Those things are
-not devices and they cannot be used for representing PM dependencies,
-for example.
-
-> I agree that using a platform device or PCI device is better, but this al=
-ready happens
-> inside the ACPI fan driver (platform device).
-
-So it should not happen there.
-
-> Only the ACPI video driver created a "device" sysfs link that points to t=
-he ACPI device
-> instead of the PCI device. I just noticed that i accidentally changed thi=
-s by using the
-> PCI device as the parent device for the cooling device.
->
-> If you want then we can keep this change.
-
-The PCI device should be its parent.
-
-> >>        thermal: core: Set parent device in thermal_cooling_device_regi=
-ster()
-> >>        ACPI: thermal: Stop creating "device" sysfs link
-> > And this link is to the struct acpi_device representing the thermal zon=
-e itself.
->
-> Correct, the ACPI thermal zone driver is a ACPI driver, meaning that he b=
-inds to
-> ACPI devices. Because of this all (thermal zone) devices created by an in=
-stance of
-> said driver are descendants of the ACPI device said instance is bound to.
->
-> We can of course convert the ACPI thermal zone driver into a platform dri=
-ver, but
-> this would be a separate patch series.
-
-If you want parents, this needs to be done first, but I'm still not
-sure what the parent of a thermal zone would represent.
-
-In the ACPI case it is kind of easy - it would be the (platform)
-device corresponding to a given ThermalZone object in the ACPI
-namespace - but it only has a practical meaning if that device has a
-specific parent.  For example, if the corresponding ThermalZone object
-is present in the \_SB scope, the presence of the thermal zone parent
-won't provide any additional information.
-
-Unfortunately, the language in the specification isn't particularly
-helpful here: "Thermal zone objects should appear in the namespace
-under the portion of the system that comprises the thermal zone. For
-example, a thermal zone that is isolated to a docking station should
-be defined within the scope of the docking station device."  To me
-"the portion of the system" is not too meaningful unless it is just
-one device without children.  That's why _TZD has been added AFAICS.
-
-> >>        thermal: core: Allow setting the parent device of thermal zone =
-devices
-> >
-> > I'm not sure if this is a good idea, at least until it is clear what
-> > the role of a thermal zone parent device should be.
->
-> Take a look at my explanation with the Intel Wifi driver.
-
-I did and I think that you want the parent to be a device somehow
-associated with the thermal zone, but how exactly?  What should that
-be in the Wifi driver case, the PCI device or something else?
-
-And what if the thermal zone affects multiple devices?  Which of them
-(if any) would be its parent?  And would it be consistent with the
-ACPI case described above?
-
-All of that needs consideration IMV.
+> ---
+>  tools/testing/selftests/net/ipsec.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/ipsec.c b/tools/testing/selftests/net/ipsec.c
+> index 0ccf484b1d9d..f4afef51b930 100644
+> --- a/tools/testing/selftests/net/ipsec.c
+> +++ b/tools/testing/selftests/net/ipsec.c
+> @@ -43,6 +43,10 @@
+> 
+>  #define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
+> 
+> +#ifndef offsetof
+> +#define offsetof(TYPE, MEMBER)	__builtin_offsetof(TYPE, MEMBER)
+> +#endif
+> +
+>  #define IPV4_STR_SZ	16	/* xxx.xxx.xxx.xxx is longest + \0 */
+>  #define MAX_PAYLOAD	2048
+>  #define XFRM_ALGO_KEY_BUF_SIZE	512
+> @@ -827,13 +831,16 @@ static int xfrm_fill_key(char *name, char *buf,
+>  static int xfrm_state_pack_algo(struct nlmsghdr *nh, size_t req_sz,
+>  		struct xfrm_desc *desc)
+>  {
+> -	struct {
+> +	union {
+>  		union {
+>  			struct xfrm_algo	alg;
+>  			struct xfrm_algo_aead	aead;
+>  			struct xfrm_algo_auth	auth;
+>  		} u;
+> -		char buf[XFRM_ALGO_KEY_BUF_SIZE];
+> +		struct {
+> +			unsigned char __offset_to_FAM[offsetof(struct xfrm_algo_auth, alg_key)];
+> +			char buf[XFRM_ALGO_KEY_BUF_SIZE];
+> +		};
+>  	} alg = {};
+>  	size_t alen, elen, clen, aelen;
+>  	unsigned short type;
 
