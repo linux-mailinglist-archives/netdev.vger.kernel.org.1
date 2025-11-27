@@ -1,79 +1,100 @@
-Return-Path: <netdev+bounces-242392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49F49C90139
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 21:05:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2790BC90154
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 21:06:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E8511352402
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 20:05:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD62E3AAEA9
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 20:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5586430CD93;
-	Thu, 27 Nov 2025 20:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C93830DEA7;
+	Thu, 27 Nov 2025 20:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RlDD9Z37"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c89VzHD8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D29D30C60A;
-	Thu, 27 Nov 2025 20:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D945530DD06;
+	Thu, 27 Nov 2025 20:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764273936; cv=none; b=b4JMQ+Ow05NoLdbyopGl+JCXQk8bhtAyN0SntrdNgEt895Otr/SgLeV3TglVR4z2WRttAstA80oDUIDLatKf7YWeJphJXDGDJBjvsfUAM8kEmE5lqkeVMPajEpfD2PZrKgv/MY9+4tf96QWoBOzy9T1hjP33dJSAqux8D9wCtlM=
+	t=1764273997; cv=none; b=JcnnIvXi5i6m+6tOlxucqh1YqyZG8pKQx6fAJ0Tc5Y7Ns+aUUhRN3Yd9MP+18eckxYItogiJeKa0M7op42nzHtFCIJbFyjKN68dM0WgMeWNprPU2hWOA1EbWM7GHSWYJkVtJnGmnuqRFFsXZS3xwYsmHO4DDYNvlnTjPGyKTEP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764273936; c=relaxed/simple;
-	bh=3lGiFfcqdHFfg+BJlwthCUrnN10mGWjPK04DgQ8ZVmw=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=BB15TVKBG/LQT7AXpl/Ktv5aHwxkCnkOZQX7p7h0uxzYmfKgc7rL/xMY/XlVjG3aNO+RahcyrmOdWZsRre2oTROtxzxY5zXgOP2Gk2SIaARcRkKruAzn1ks+8IMViycg5uIGu8vxosHQVF4VgZByNR+HNvqKE0PwadnHW8POjDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RlDD9Z37; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BE36C4CEFB;
-	Thu, 27 Nov 2025 20:05:36 +0000 (UTC)
+	s=arc-20240116; t=1764273997; c=relaxed/simple;
+	bh=jnL5tP7VUoG8mpJi+s2F6SszKuVjvvL+PAqOALc0RuI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VyQY8kkJ+XWYft/gpBet+oJyKEJqI82bNFNSUhgEAhecn+BLMooZJW6UsyPd52ML32IPHllMzIYPyXtfi7s9GEryoWyH3jfkTeYKwP0M2zqlOmb/4Gopt5/eAHkBi6OmyAaPWf37lYIEgiWvUj8jXLd7DTb6WaHSxR8BFF9hdHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c89VzHD8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B790FC4CEF8;
+	Thu, 27 Nov 2025 20:06:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764273936;
-	bh=3lGiFfcqdHFfg+BJlwthCUrnN10mGWjPK04DgQ8ZVmw=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=RlDD9Z376KAuX/FJaP0U61QzzzhUKOD7xt/fMY4Gipz7fXsAfUuIqkKyKYxLi3POH
-	 d84ZSy87ymh6H0SR5fJE24i2Im/09k4osChghp4S7Ai78SZhjCCxnT1nCgtH6XfDp3
-	 Cw7PtuxZAprFpxrjSFnP/3Daee2d+gaWMPryeESZfrUtHh1Qtss+/f8pHnncaTv3c5
-	 cVP8DGRNLg2CcjT12BnkHkHvDVSAi97x56d7LiCFaBlfcM1ck1XsZJJtvRauTmSps5
-	 s54eKohIjBS5A3IyFXksSIGjKw8xyLJ24gBqMaB61TrjvMPraGj57PnvXqU1ofej8z
-	 l/DcBOqpFgarw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B5AA03808204;
-	Thu, 27 Nov 2025 20:02:39 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.18-rc8
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20251127143830.279720-1-pabeni@redhat.com>
-References: <20251127143830.279720-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20251127143830.279720-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.18-rc8
-X-PR-Tracked-Commit-Id: f07f4ea53e22429c84b20832fa098b5ecc0d4e35
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 1f5e808aa63af61ec0d6a14909056d6668813e86
-Message-Id: <176427375842.20489.15172072246081700238.pr-tracker-bot@kernel.org>
-Date: Thu, 27 Nov 2025 20:02:38 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	s=k20201202; t=1764273996;
+	bh=jnL5tP7VUoG8mpJi+s2F6SszKuVjvvL+PAqOALc0RuI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c89VzHD8qAagoVgodoLZz8iGYgI+22YwtwdE3mxI85w28yDbvvbyZrGbwmGTOSJNJ
+	 VbNNwfB3ZaJLIpoMELX8ZjfV4OnSp/Q6ixtVlf4owtgAf6vqE/JsGL5WUB4CdEK4Xy
+	 lDwofnXnChGJu/w5y/Wa5WtC9NzrLmt6UA4T5gtmzHqv2j/60Eqhx5as84J1x6YRvP
+	 euVulmTpuhaT8v4uM1WNqqOlXhzdT7O5QwNC/kwqd5XN/4ao/3iAGzStQE1JAeDbwc
+	 q24TJygQ6VxwRu6of6b7Y4sFD/VrDggTyoSNC1Ar7ZENT7TWOHRIkN+K363Rug3v/h
+	 aDq+aLo3XcFjg==
+Date: Thu, 27 Nov 2025 20:06:31 +0000
+From: Simon Horman <horms@kernel.org>
+To: Carolina Jubran <cjubran@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Gal Pressman <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>, Nimrod Oren <noren@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next V2 0/6] selftests: drv-net: Fix issues in
+ devlink_rate_tc_bw.py
+Message-ID: <20251127200631.GA737230@horms.kernel.org>
+References: <20251123171015.3188514-1-cjubran@nvidia.com>
+ <20251124191026.1438551c@kernel.org>
+ <d81820e1-21e0-4c59-8532-ba55ac47c6fd@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d81820e1-21e0-4c59-8532-ba55ac47c6fd@nvidia.com>
 
-The pull request you sent on Thu, 27 Nov 2025 15:38:30 +0100:
+On Wed, Nov 26, 2025 at 10:06:18AM +0200, Carolina Jubran wrote:
+> 
+> On 25/11/2025 5:10, Jakub Kicinski wrote:
+> > On Sun, 23 Nov 2025 19:10:09 +0200 Carolina Jubran wrote:
+> > > This series fixes issues in the devlink_rate_tc_bw.py selftest and
+> > > introduces a new Iperf3Runner that helps with measurement handling.
+> > Sorry to report but patch 2 doesn't apply cleanly.
+> 
+> 
+> I am based on top of net-next, and I do not see any issues applying the
+> series. I rebased on top of commit ab084f0b8d6d2ee4b1c6a28f39a2a7430bdfa7f0
+> and patch 2 still applies cleanly for me.
+> 
+> I’ll prepare a v3 to fix the new pylint warnings in load.py while I’m at
+> it.
+> 
+> If you are applying it on a different base, please let me know which
+> one.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.18-rc8
+Hi Carolina,
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/1f5e808aa63af61ec0d6a14909056d6668813e86
+FWIIW, I do see that b4 shazam (which I assume runs git am) is unable to
+apply this series cleanly to ab084f0b8d6d2ee4b1c6a28f39a2a7430bdfa7f0 due
+to some fuzz when applying the first patch: Hunk #1 of
+tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+And I expect that a rebase figures this out, which is why you
+aren't seeing it.
 
