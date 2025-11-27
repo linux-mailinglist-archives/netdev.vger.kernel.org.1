@@ -1,209 +1,157 @@
-Return-Path: <netdev+bounces-242243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAE3AC8E0DD
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:30:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02781C8E0FE
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:35:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4E7B435094E
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:30:20 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 793B9344AE9
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B5F32E126;
-	Thu, 27 Nov 2025 11:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF84329367;
+	Thu, 27 Nov 2025 11:35:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="TTL4FNxn";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="th81SrRI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fmFRSgd5";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IbK6lBvz"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5020732D450;
-	Thu, 27 Nov 2025 11:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD9A3242B7
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 11:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764242997; cv=none; b=d9UFrzBpziK3QsbKQQOgRJ/3hTSBdlazKnmt76zoSXl5c54hlESdlrsYeAaY2jurpBPl7ytzI1v/J4NOXMkLti75dDT9PSgHf6S/BXeMkRATsIzC1j06w3+pAaNBSTdhhaT8xj8pTwqViHPT5ZzcTzzQkwv4ny+EmoZa43hSXSg=
+	t=1764243354; cv=none; b=izzZ53IGrF8TaIBv/qnSawWIEIatJS8C6t5jw7nwl183uehdvlXWHe17I7of1I5ZjISZK7Rd0c1D1tuzZFIXdu3ExxnXVspX8P0y6FYYYGmzzPVSyCT4LU2+fhlEGOvW0g8g2iRie842OnRp847Uon9OMh2J2SiyZAE6st34LJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764242997; c=relaxed/simple;
-	bh=ni6eUbSRNbWSO2UkDBUKrlrMwCDYaUIFArrCsuDA4x4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XJXNZ2NRYtB3DoOOkVHnHfr/LG/VmyFrs5Q/LHhTzJpFivoVyBCq9phhhFznhK4UpQhTAryriOAUxaGDpDJfw/o5Qn7CH++yWZenGSB+IMhrAZgw1rwQru8/94qXKjkI1gJpQ1npv5G+rUWOSbmLkarvdQEIOsUd19hIxtLLK48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=TTL4FNxn; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=th81SrRI; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id 35B49EC03C0;
-	Thu, 27 Nov 2025 06:29:53 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Thu, 27 Nov 2025 06:29:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1764242993; x=
-	1764329393; bh=QMKuAR9oXiWSIw/hOTBIm/XyJDjajozFBENz+bR6HlE=; b=T
-	TL4FNxnWsntUC/lYgUmzTEm69qVJKS+/DjfqjN8cE2kPJeG1nruzhD7d9fpITy/i
-	aAybGNrNwe5Ji4ZceiFViNxM5pMG7gMnNbHnDOLu0Q3IOKgsTpiHEIlNniQleRfU
-	QtSbXB8AHtr68wNE32ZSHSP0myfBVXOIoWOG4asEmGBY8M9XG+06GHrcHkcyMCsh
-	CUDhIWjRhcFNNfFnwuG4YWE6mhuWsu0qWUJRi3EtTlPAfUCViz74e0Q+1U27Gpoy
-	7wIgXd2d9WQ+lyaQMCEVVMYIfgp9L+669S5Q2BvtOaimZxp43tkxVaqt7ARLxV6w
-	UAIbeYl1wmULnQJ96hjRg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1764242993; x=1764329393; bh=QMKuAR9oXiWSIw/hOTBIm/XyJDjajozFBEN
-	z+bR6HlE=; b=th81SrRIciB63IQwlOMkOOWbL6XD44jsIJOsWSmhsq1T2GIKqm6
-	9+pDcVawoYImrVnSCh1sasZtz0aTEjj0/aLMk0xItfjHX1gexJzpivVeQge5/Qy6
-	cHJClr6C1UZnx1IWfUhiwwBldEJyYCGhwuRRbLVlNeA32Rcr+rc19e0QRrwVEvgX
-	z9O0ILhWJ1qfXE3EoZuRV4AdrO4IMBpvnEtznIPozXCcKzIC+rb1Z5YNDSxsjBuT
-	YvqmRl9kN6FxsKhCALGPl+8rbfShgxtL6gLX+svnWGHuccmSb/bDqrACJGTT16E6
-	ctM8wzbckXjtBKUA2U1vJ5H3uZA6mLjiXdg==
-X-ME-Sender: <xms:MDYoaXlAOKWxluzZutg6gAcOS27BypvAe07sc3oW1TeOIHMwBTKWqw>
-    <xme:MDYoaUKZWSSPbK9a4nDn7ETSUYvxxENaEIlj88L99_yQC0UQg4Ctu_Il2oTmu8xy3
-    hTv1XAQ2mg3U_CMnULDEG8wxiV0xOlKLgVQCJL2jmydnJ2HuYmqxrml>
-X-ME-Received: <xmr:MDYoaU5cJeWFV9obmM4_hK5hwnLOMNvxYi-O0BN8jv7zGfjBAc3ridBhihXd>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgeejudduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvg
-    htpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtoheprhgrlhhfsehmrghnuggvlhgsihhtrdgtohhmpdhrtghpthhtohepkhhusggrse
-    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgvlhhfthgvshhtsehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrd
-    horhhg
-X-ME-Proxy: <xmx:MDYoaQ2A7mx7JbanJ0s2aVlywOBZjHepTcRI44VcdjJPxOTiS5FzOQ>
-    <xmx:MDYoaSeqnAiyVHYqF6iRoVWANj4GoKJdhX5Jth942dVhQMx831NZTg>
-    <xmx:MDYoaeeAVRipXQA4PZfC214sC66HoBn3wrrD9lqoj811PJNMIh1vhQ>
-    <xmx:MDYoaVxIb0AnA87pOrctquLUd_A4-QnNRHdiei6DapKEJZmTNJkPNg>
-    <xmx:MTYoaedOrNzoeVrNpgyXLKyZkGgGRMA0HlVTNt1FSUzBP338cmiRRAcH>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 27 Nov 2025 06:29:52 -0500 (EST)
-Date: Thu, 27 Nov 2025 12:29:51 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Ralf Lici <ralf@mandelbit.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-kselftest@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>
-Subject: Re: [RFC net-next 11/13] selftests: ovpn: add test for bound device
-Message-ID: <aSg2L5eAAEhyHMxM@krikkit>
-References: <20251121002044.16071-1-antonio@openvpn.net>
- <20251121002044.16071-12-antonio@openvpn.net>
+	s=arc-20240116; t=1764243354; c=relaxed/simple;
+	bh=4WI7yCChHQXZkx37ypnImXEbQ0maLcssq2bhKZ7ODlg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Wuq5NZgJ+9v2ASJUXKJit5qtPMOUcYMDsGnnlDo8Qgr9IqwTDaHNzaBf9uekOUuOW20CNOY6ZWVnw5wLI7YnlMpW0EP4FRdbneeWV1ZhAYbooOO3xBQaTkJEIcnBj52Xr1XPQPvPVdmhHWS3YgmbygeU1P/RrK/JCcg2ASLJSJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fmFRSgd5; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IbK6lBvz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764243352;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TPLeXmZroMIKbU6mJWFaUG0Igc2fFk4vqnIUHWReN0w=;
+	b=fmFRSgd5bCvoA5N7oip/xX4k+woCvJkX88igq8DbWiAON4Yhd4d3VeTIft3tPdIHHU30Q8
+	mwcU6qJOyBpNJ2NPzD+cAPLQJTd9Maev/P+9A5EuvD3ykOJYyZQp8qz58lpzsATMCkCobN
+	yssVgq0aBpZzIwOuJBZaMbSvZqK1w8Q=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-370-xLvD9U3rOziHIiQe2vGR8w-1; Thu, 27 Nov 2025 06:35:50 -0500
+X-MC-Unique: xLvD9U3rOziHIiQe2vGR8w-1
+X-Mimecast-MFC-AGG-ID: xLvD9U3rOziHIiQe2vGR8w_1764243349
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-429c521cf2aso620251f8f.3
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 03:35:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764243349; x=1764848149; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TPLeXmZroMIKbU6mJWFaUG0Igc2fFk4vqnIUHWReN0w=;
+        b=IbK6lBvzPLHYjX4sOV1T5CeN6qQIuhO4QcWkq2eO56yqJUzzgY5OvIRBKNniDKdUXA
+         QAsrEu3DIWmg6Qteu2Gw79A0R3Z/jXWFtxYKv+7x4s09aPCCXS/GEeCkS9tedUxAN7E9
+         8ZCxzhhhljGnZl5OtROhOT0zDNu6i2xwzVRTCw5wPv33n3UJcFE4Q6qgFVeBt4e1Uxtl
+         1tPl8zlxCachsWYYgFcetUp79FkQ04BG8OJrV7DsvShjc4R5KwYc3CPOl2P+sBSkddXu
+         TtjV3DL2t6LU9as93+LgPvMUn1XwkMMVk/F6CbvYPWZrdfTpAMavPc8UDO/0ylMrpbqq
+         pnPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764243349; x=1764848149;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TPLeXmZroMIKbU6mJWFaUG0Igc2fFk4vqnIUHWReN0w=;
+        b=AeYoFU1RIvn5YRI9WWJ3h6mStH00tbQ4xStMCZ65ZXpnCkCXI+eACEZyQQrba8DvST
+         8Wk3WzWMcb6UF6gPO7oh1sstKziK0ju+59EHS7bpDx74/WC/G0jB1CHUa6Jvf+PcIWoJ
+         cdFpBaTRt9eos2+SqoWfOfF07fCWEVPh+k/7Y5pTfY8MzsFZ7d1s6CWX8tp0lhrGu5Zf
+         RuXiG9suHOtdgDXwkEld+4kTr3RjJl7CVBB46lGRu+mNNOpm0xl1PmCiSctxbiPFy2Vz
+         evo1Dvq0G/VVSxLgvVlhdqy9D7pvYJi1bLYNPNtLqok/1jtgUnyPl/pnwvZtxMnUDNWv
+         i9zg==
+X-Forwarded-Encrypted: i=1; AJvYcCUj0p9oDBFfAcffXf9WXrQDqzAQelChyQvH4seo5s7iP14bvYB76mW/aMvDh1NRFpePxIcQRZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxM7vgTFzrLjQE94pxqNZe6VmRARDubuiKBJOadwYKFBxy4P+dx
+	qKAAbDs3eSgU5/H8ov8BTTASDzKGtvlQ5f/bdWcGj9AAaGffscDatqgJBtL8Xyx3lkJKejmehAZ
+	/30LVIvPmwvaq7wM5KqhvIi9imFyl1s7THjRuxnWc/Gzu2qrzf4dcdNffaA==
+X-Gm-Gg: ASbGncuk8zVtXfhsYgu6VYguTd1+exqLIPHECml1i13XtDIpv1glgI+2a0bzB60R5JR
+	WGx883y8aGZWwtLTwqq1CgE7q+qyk4z66nQh+rVb39+S3Qjou+idt3EE5lgri4wYS8Vb/zRTS6s
+	/3Ixx6PA+g4sNVlPhVDqnuLC+J913tV1A3LExP8Khm/tCJ8FFeg1gAVqEW9+1D0ap4bAWFaCeny
+	+9DWntMHmRcwbQ9oDtZ9bWlErYJHo1+4RKts4Hr7yVtLRxV5QbbwqaRbDft/UNHgz3n3I1mziwV
+	ebtc9o7a3GwMFo9jr1ZDoIDP0JWgL6/MyaceOzLAfu9fkfX98pBdvViomEtlpIwBj5MHdLxAVMJ
+	M/dMv9JOWf9jldg==
+X-Received: by 2002:a5d:5e01:0:b0:42b:3131:5435 with SMTP id ffacd0b85a97d-42cc1ac9de0mr24340547f8f.2.1764243349478;
+        Thu, 27 Nov 2025 03:35:49 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHw+losns/EbFf8Iuyd+Ic4CbDitf9tLRbOX3h2FYMV1qJKEuWEEDc8zOqFzENhs0ha+EaT5Q==
+X-Received: by 2002:a5d:5e01:0:b0:42b:3131:5435 with SMTP id ffacd0b85a97d-42cc1ac9de0mr24340515f8f.2.1764243349101;
+        Thu, 27 Nov 2025 03:35:49 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.212])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1ca1a2easm3317816f8f.23.2025.11.27.03.35.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Nov 2025 03:35:48 -0800 (PST)
+Message-ID: <0bcdd667-1811-4bde-8313-1a7e3abe55ad@redhat.com>
+Date: Thu, 27 Nov 2025 12:35:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251121002044.16071-12-antonio@openvpn.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/3] xsk: use atomic operations around
+ cached_prod for copy mode
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+References: <20251125085431.4039-1-kerneljasonxing@gmail.com>
+ <20251125085431.4039-3-kerneljasonxing@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251125085431.4039-3-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-2025-11-21, 01:20:42 +0100, Antonio Quartulli wrote:
-> From: Ralf Lici <ralf@mandelbit.com>
-> 
-> Add a selftest to verify that when a socket is bound to a device, UDP
-> traffic from ovpn is correctly routed through the specified interface.
-> 
-> The test sets up a P2P session between two peers in separate network
-> namespaces, connected via two veth pairs. It binds to both veth
-> interfaces and uses tcpdump to confirm that traffic flows through the
-> expected paths.
-
-The current setup doesn't really test that, since it would also work
-without SO_BINDTODEVICE (traffic still flows through the expected veth
-if I pass "any" instead of veth1/veth2 to the new_peer commands).
-
-
-[...]
-> diff --git a/tools/testing/selftests/net/ovpn/common.sh b/tools/testing/selftests/net/ovpn/common.sh
-> index d926413c9f16..c802e4e50054 100644
-> --- a/tools/testing/selftests/net/ovpn/common.sh
-> +++ b/tools/testing/selftests/net/ovpn/common.sh
-> @@ -66,9 +66,11 @@ setup_listener() {
+On 11/25/25 9:54 AM, Jason Xing wrote:
+> diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+> index 44cc01555c0b..3a023791b273 100644
+> --- a/net/xdp/xsk_queue.h
+> +++ b/net/xdp/xsk_queue.h
+> @@ -402,13 +402,28 @@ static inline void xskq_prod_cancel_n(struct xsk_queue *q, u32 cnt)
+>  	q->cached_prod -= cnt;
 >  }
 >  
->  add_peer() {
-> +	dev=${2:-"any"}
-
-nit: no user of add_peer is patched to pass this extra argument
-
-
-> diff --git a/tools/testing/selftests/net/ovpn/test-bind.sh b/tools/testing/selftests/net/ovpn/test-bind.sh
-> new file mode 100755
-> index 000000000000..fd7c3c8fdf63
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/ovpn/test-bind.sh
-> @@ -0,0 +1,103 @@
-[...]
-> +run_bind_test() {
-> +	dev1=${1}
-> +	dev2=${2}
-> +	raddr4_peer1=${3}
-> +	raddr4_peer2=${4}
+> -static inline int xskq_prod_reserve(struct xsk_queue *q)
+> +static inline bool xsk_cq_cached_prod_nb_free(struct xsk_queue *q)
+>  {
+> -	if (xskq_prod_is_full(q))
+> +	u32 cached_prod = atomic_read(&q->cached_prod_atomic);
+> +	u32 free_entries = q->nentries - (cached_prod - q->cached_cons);
 > +
-> +	touch /tmp/ovpn-bind1.log
-> +	touch /tmp/ovpn-bind2.log
+> +	if (free_entries)
+> +		return true;
 > +
-> +	ip netns exec peer1 ${OVPN_CLI} del_peer tun1 1 2>/dev/null || true
-> +	ip netns exec peer2 ${OVPN_CLI} del_peer tun2 10 2>/dev/null || true
+> +	/* Refresh the local tail pointer */
+> +	q->cached_cons = READ_ONCE(q->ring->consumer);
+> +	free_entries = q->nentries - (cached_prod - q->cached_cons);
 > +
-> +	# close any active socket
-> +	killall $(basename ${OVPN_CLI}) 2>/dev/null || true
-> +
-> +	ip netns exec peer1 ${OVPN_CLI} new_peer tun1 ${dev1} 1 10 1 ${raddr4_peer1} 1
-> +	ip netns exec peer1 ${OVPN_CLI} new_key tun1 1 1 0 ${ALG} 0 data64.key
-> +	ip netns exec peer2 ${OVPN_CLI} new_peer tun2 ${dev2} 10 1 1 ${raddr4_peer2} 1
-> +	ip netns exec peer2 ${OVPN_CLI} new_key tun2 10 1 0 ${ALG} 1 data64.key
-> +
-> +	ip netns exec peer1 ${OVPN_CLI} set_peer tun1 1 60 120
-> +	ip netns exec peer2 ${OVPN_CLI} set_peer tun2 10 60 120
-> +
-> +	timeout 2 ip netns exec peer1 tcpdump -i veth1 "${PROTO,,}" port 1 -n -q > /tmp/ovpn-bind1.log &
-
-Maybe add
-2> /dev/null
-to clean up a bit the script output?
-
-> +	tcpdump1_pid=$!
-> +	timeout 2 ip netns exec peer1 tcpdump -i veth2 "${PROTO,,}" port 1 -n -q > /tmp/ovpn-bind2.log &
-> +	tcpdump2_pid=$!
-> +	sleep 0.5
-> +
-> +	ip netns exec peer1 ping -qfc 50 -w 1 5.5.5.2
-> +
-> +	wait ${tcpdump1_pid} || true
-> +	wait ${tcpdump2_pid} || true
+> +	return free_entries ? true : false;
 > +}
-> +
-> +run_bind_test veth1 any 10.10.10.2 10.10.10.1
-> +[ "$(grep -c -i udp /tmp/ovpn-bind1.log)" -ge 100 ]
-> +[ "$(grep -c -i udp /tmp/ovpn-bind2.log)" -eq 0 ]
-> +
-> +run_bind_test veth2 any 20.20.20.2 20.20.20.1
-> +[ "$(grep -c -i udp /tmp/ovpn-bind2.log)" -ge 100 ]
-> +[ "$(grep -c -i udp /tmp/ovpn-bind1.log)" -eq 0 ]
-> +
-> +run_bind_test any veth1 10.10.10.2 10.10.10.1
-> +[ "$(grep -c -i udp /tmp/ovpn-bind1.log)" -ge 100 ]
-> +[ "$(grep -c -i udp /tmp/ovpn-bind2.log)" -eq 0 ]
-> +
-> +run_bind_test any veth2 20.20.20.2 20.20.20.1
-> +[ "$(grep -c -i udp /tmp/ovpn-bind2.log)" -ge 100 ]
-> +[ "$(grep -c -i udp /tmp/ovpn-bind1.log)" -eq 0 ]
-> +
-> +cleanup
+_If_ different CPUs can call xsk_cq_cached_prod_reserve() simultaneously
+(as the spinlock existence suggests) the above change introduce a race:
 
-And also clean up the log files? (maybe via "trap <function> EXIT" so
-that they get removed as well if the test fails)
+xsk_cq_cached_prod_nb_free() can return true when num_free == 1  on
+CPU1, and xsk_cq_cached_prod_reserve increment cached_prod_atomic on
+CPU2 before CPU1 completed xsk_cq_cached_prod_reserve().
 
--- 
-Sabrina
+/P
+
 
