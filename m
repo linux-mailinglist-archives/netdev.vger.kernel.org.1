@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-242400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B70A9C9024F
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 21:44:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BD42C90252
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 21:45:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 93FA34E31F7
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 20:44:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 290D83AA06F
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 20:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53398319847;
-	Thu, 27 Nov 2025 20:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F43631A7E6;
+	Thu, 27 Nov 2025 20:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h4Vq6lT8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wsilw5Za"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474F8314B65
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 20:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D074315D23
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 20:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764276276; cv=none; b=F3DiG4XFK1lieP420HUZ/8dJFrCTKirZgJOKh5DZ5DIH/U4X7HKcz7ggCGKKGgV5vYXpwAJnW3ZA40HsDT/crHxjkRQa1MxMMtywiPEl2vrGN9UvOgnsP1ueQJBNhDs0i43HBNgM6+UpPIeHdyz57qKup2PKKV3EBAKoTJGPekM=
+	t=1764276277; cv=none; b=HdP/ZA+gRUfinxS6NSF5WuQXKHwzpLuJgfJaExuXKWIhVhK7HIrFQkybN30G04gZfBYEG2WIFs2iP33galbmmDai7hbCQbuWllI2Yb/ZPDw1/7WZH5E6BaY+0R6IH2eZJp+PnB02jgMh+PNMad44dr7/hNcsz2mwFJCLAf4l9eU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764276276; c=relaxed/simple;
-	bh=LSh5hLuiJCxDRwJ+BQ+Xc7tCZE16QA/b770rYhc+vp8=;
+	s=arc-20240116; t=1764276277; c=relaxed/simple;
+	bh=YCXiESmxDru16OuSBpgWKD7MLSgAxyhCtNWm4oA5/Po=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B5icvYql3utZiUH1g5wt9IQm+ErBrVPzzvY9Csxyd6VxeJMctNv48/HYA0KpIhEPxy6dp0W7j8Ze77ufMvM/25xh4nJp8WBF/gp3XGERD4qoRcvSbyE2OlPGJM2XCpdYUUcxBlVEaJteJ6jioQY/cRTegk1u/OMR4Edtd1w8P/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h4Vq6lT8; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version; b=C7z6CjNhHSCX29iEmT0NoBAX7DLaQhhd8dc+KvKiFHMWfn+YCKU+00Gany4970MjLq5aOOBSTncSzX712nLxJlZHaArgD6x7OM47/zvC5Tmwo8+7/1Q664XAjopGFgQ4MIUlMt8yEwmtk2IIfT9UtHY1MRSFShbmYGDQYKPZtz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wsilw5Za; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4775ae77516so11988345e9.1
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 12:44:33 -0800 (PST)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4775e891b5eso5046775e9.2
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 12:44:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764276272; x=1764881072; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764276273; x=1764881073; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BopLoWIhKj7xpDJExutQghL/d96/x+rVfP3p1ohtywE=;
-        b=h4Vq6lT8dw57ZZH9qYwYgKj40DBAQA5xlFNwfRYEnrpMIrT0ISZ16ioVBQSBDlNS5s
-         OKr7CBmJc7rpRztUcdIkdL20sYQCEqxfKNw9S2pTWdajS5IV8p+8OjSZ8vj4uLU0N8fc
-         BUB0mMsV84s6iwxryLWxQUiMKv1OHPAmWpc5cbJCvnslwq/szwv6Gw/5Cv9PyXQe0ZS9
-         opRJkfbKBH0wdTl1SrYT5U33BidBSxKRl+rXISl9ELU6C/NDEj3X7MYJdMAQgB8NLQOm
-         mgAt2pktouiiow4hpjQgQZ+orqEmk9O0VTQbD04Yz5QaSYRPoBsLTLImjlrBB6FLho3i
-         AMCg==
+        bh=wxF93ks89kapv2UHbHs6Gp6gp3EbwDOqDtHBuiudG8w=;
+        b=Wsilw5Zal1PwTwqGdBy/ll/skI7gC66j41e12RvZYN1jEEMB1b8w+emjzdf1qSEiAb
+         NLU6TFQCMCoqAJYP529iwMT/InyNiFJlsKMzZ1dY6CbCQ+f3wAco//3/HoJgL63ewSqC
+         bXzohjdK6eGJxx1571k0RQ+4QEyqAAfRVHcyDaq/1AF5lk7xn01A/cleYxiMDcDfes+s
+         RKE624d5ixtc/gb7FJ7xKBEezyrdCwszyFCDab7mh6GDNSIJCQyUuB6WnZf+wq1OxFdL
+         e28L1CCYA59ryqWeTQA2sacgIOrTGtoujsJlvcqwDIJxUAmTDyLJxGrdxUz/Xd4amzPf
+         jhpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764276272; x=1764881072;
+        d=1e100.net; s=20230601; t=1764276273; x=1764881073;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=BopLoWIhKj7xpDJExutQghL/d96/x+rVfP3p1ohtywE=;
-        b=eNMIsY40ax6/KBOaWlzuj4niU8fiOZYdvamAL28qHQfnu7rU+CUOOW5DvioxXvK9tX
-         97Nb+3pKlNM50LWPUYgbhFfyMV9qKL63+o9MD2s5A1hY9MQAYqw0rYHho4l4qq69cYjr
-         e7DuXiGH37drMwzrC4A9iQS3+XDDCarC6JuMZP1MnrVY8Y0zEdd80gsZP+Sea/10V6+P
-         Mbgte8BI/NzB1E7tBD12RbOCCBAq9QcLB5UtEz9rTKsHX2JO1dIZdUjeODH6kJQM5goQ
-         jZOnFpkSyoTBfl1JYHsTQlrL/JJDMaj3B4eAWd/WHmPfF/+Yg6j1nU0msw5ud82NZFZa
-         03vw==
-X-Gm-Message-State: AOJu0YxzOg4CF8D8nYcpohNO1NV13/x4GDFpOzwlpza5QQRZX7Q4fIMe
-	0R/22o4+NblWO1FyiGy7MJJbCVkwIyNb2r0tfFioCPam2jeVdIews2jo2AcFIg==
-X-Gm-Gg: ASbGncsWvh8JWdBeZdlqErJOeIwEaeQAe3cR8HgIM+YUEGYV4EoiP6HGDMF/oes+MWr
-	1rIYcHzGxZ3lkJ0MZ1aqzHmyIaGNH8VLajnQ8/kjcHQv5wirs7+6k8AiIVpi+X7ilC1JbBWXSWz
-	FmARNqNR9azNAWFLGfJqI8d+otvf5DjzEhSW3qXvQU9kADutygy3oiEGgLaZlA4WzBa6zYbic1z
-	NdB8e2YCVsR0LnXNyot0RdahbcgFe1cg70LGBa71UdqJtwYQQ/ksb30FHSjzw2oAhXg92WcnVWx
-	NNDlI9LzmJG1iTg3Eiai+f8IBDPVtShkjkrKhEI+t5I21BoWdaZNyfBaXwf2WoMT8jUM3zry6iN
-	5pzIoRz2/Phe+BzKHGP/wMHOyrfrgpq1OJuJzgF23+RsRCI8FNBEUCj0Ncs11Wmb8SFwiq39F0P
-	xaBDffiLybIRBVfw==
-X-Google-Smtp-Source: AGHT+IFwRmakImgODlTFBacPBXxUnLB6FVPSTpr1ZGMe5y5759YvSUHXOymgL600ltx5XYutVYMrKw==
-X-Received: by 2002:a05:6000:40c9:b0:429:b5a8:5c65 with SMTP id ffacd0b85a97d-42cc1d2d5d1mr27183858f8f.30.1764276271798;
-        Thu, 27 Nov 2025 12:44:31 -0800 (PST)
+        bh=wxF93ks89kapv2UHbHs6Gp6gp3EbwDOqDtHBuiudG8w=;
+        b=K7lFpBm6crOgEyDZTa1TEG4w+wYz6NL+TXD/lMDuVPFgs5fmt43HetfwWuirOwZ3nk
+         XowfVsDWnahK0vhZ8rdLwHWBW6vxLymFtoTz0BuSLySZxc6us8IHKMjdfF44yH5eG+6/
+         NUpN+hbT/NNolJmwJphcpxb8GR7fLkc0KbOivD2Sndg9kxf5/rBcOZw4wAj3QLPQxqT2
+         BwP3o49YpLnIEZTD1qOvFG0s+2kjnmcwO3MFzm0FAXJqwb4xyjrAGvAYtztoq/csZWmH
+         tZME2eitdFvRviXLAdlI/brGvgmTFJPOT18MKjtEB0bgjaY4qdEfapkT9phIGohxkZbV
+         qx4A==
+X-Gm-Message-State: AOJu0Yx2B6fZ+cyCFE9048rtJTaMowoMKxk7IK2rWb2jZ2RpTpSNi7mS
+	FGUvf/AjXku8Gpclyj+70kW7EZul1tvKna6rE1W0s+MshMzTxP7E/H1tvyB0mQ==
+X-Gm-Gg: ASbGnctwtOi1Ggftsg4WOKSv1eNVrekmSp5i/w8vVTVEsdzfjvynYQqVL8Mk19wGyne
+	9hEvSJ5maQBLYepp0Fb9JCDb6mkQJ48BqgEnAZiQYt4SWTfGITCsLXckpxsqLqpKwVyjmbRt3gi
+	CLiPngarCGcfbTB1j2fpcfLPVWLJC6TrlDRovt+Ahnncl8/yAX8VOPq9E+KBACwOQ5SAxPe5KaZ
+	vcrZGjZlMVPHoPQI2aiSOPS3eC4/q869oDydQ53HIDKSYWhhfgQxp3NiN1gZJRylnp/TgC4yM+g
+	hOX2SbUOcJMuSClXCLay8wlxEQyPPYgcocwT0K3NoJc0vJ1OTbS918S4i9lS2aefPnBAJjJ/Kl9
+	USs4fLQjRGKxZwl+09H7Bj9ismJbtLDjM4SCajXjc7lrr/OHbtmMECR2lEPnBMiAHD5OrL4jUQc
+	1g/uZTVgWGWP+UYg==
+X-Google-Smtp-Source: AGHT+IH1GkgX0eRSxmMDdZ7g/7AgTv8fnG0KEnbsq0aEMjYefG8hJDp/+kuxJRcP57+KR5Klf3SUYw==
+X-Received: by 2002:a05:600c:1993:b0:477:9392:8557 with SMTP id 5b1f17b1804b1-477c01b495amr240147615e9.18.1764276273164;
+        Thu, 27 Nov 2025 12:44:33 -0800 (PST)
 Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1c5d614asm5346105f8f.12.2025.11.27.12.44.30
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1c5d614asm5346105f8f.12.2025.11.27.12.44.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Nov 2025 12:44:31 -0800 (PST)
+        Thu, 27 Nov 2025 12:44:32 -0800 (PST)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -92,9 +92,9 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	linux-kselftest@vger.kernel.org,
 	io-uring@vger.kernel.org,
 	dtatulea@nvidia.com
-Subject: [PATCH net-next v6 2/8] net: memzero mp params when closing a queue
-Date: Thu, 27 Nov 2025 20:44:15 +0000
-Message-ID: <cea893ad1560a47f6a1c6c8fbfe1a308613d11cd.1764264798.git.asml.silence@gmail.com>
+Subject: [PATCH net-next v6 3/8] net: let pp memory provider to specify rx buf len
+Date: Thu, 27 Nov 2025 20:44:16 +0000
+Message-ID: <9cd0f777a19d4b71bec1ee36d3cbcab89083ec47.1764264798.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1764264798.git.asml.silence@gmail.com>
 References: <cover.1764264798.git.asml.silence@gmail.com>
@@ -106,43 +106,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Instead of resetting memory provider parameters one by one in
-__net_mp_{open,close}_rxq, memzero the entire structure. It'll be used
-to extend the structure.
+Allow memory providers to configure rx queues with a specific receive
+buffer length. Pass it in struct pp_memory_provider_params, which is
+copied into the queue, so it's preserved across queue restarts. It's an
+opt-in feature for drivers, which they can enable by setting
+NDO_QUEUE_RX_BUF_SIZE to their struct netdev_queue_mgmt_ops.
 
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- net/core/netdev_rx_queue.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ include/net/netdev_queues.h   | 9 +++++++++
+ include/net/page_pool/types.h | 1 +
+ net/core/netdev_rx_queue.c    | 4 ++++
+ 3 files changed, 14 insertions(+)
 
+diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+index cd00e0406cf4..2e6bcec1e1e3 100644
+--- a/include/net/netdev_queues.h
++++ b/include/net/netdev_queues.h
+@@ -111,6 +111,11 @@ void netdev_stat_queue_sum(struct net_device *netdev,
+ 			   int tx_start, int tx_end,
+ 			   struct netdev_queue_stats_tx *tx_sum);
+ 
++enum {
++	/* queue restart support custom rx buffer sizes */
++	NDO_QUEUE_RX_BUF_SIZE		= 0x1,
++};
++
+ /**
+  * struct netdev_queue_mgmt_ops - netdev ops for queue management
+  *
+@@ -130,6 +135,8 @@ void netdev_stat_queue_sum(struct net_device *netdev,
+  * @ndo_queue_get_dma_dev: Get dma device for zero-copy operations to be used
+  *			   for this queue. Return NULL on error.
+  *
++ * @supported_params: bitmask of supported features, see NDO_QUEUE_*
++ *
+  * Note that @ndo_queue_mem_alloc and @ndo_queue_mem_free may be called while
+  * the interface is closed. @ndo_queue_start and @ndo_queue_stop will only
+  * be called for an interface which is open.
+@@ -149,6 +156,8 @@ struct netdev_queue_mgmt_ops {
+ 						  int idx);
+ 	struct device *		(*ndo_queue_get_dma_dev)(struct net_device *dev,
+ 							 int idx);
++
++	unsigned supported_params;
+ };
+ 
+ bool netif_rxq_has_unreadable_mp(struct net_device *dev, int idx);
+diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+index 1509a536cb85..be74e4aec7b5 100644
+--- a/include/net/page_pool/types.h
++++ b/include/net/page_pool/types.h
+@@ -161,6 +161,7 @@ struct memory_provider_ops;
+ struct pp_memory_provider_params {
+ 	void *mp_priv;
+ 	const struct memory_provider_ops *mp_ops;
++	u32 rx_buf_len;
+ };
+ 
+ struct page_pool {
 diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
-index c7d9341b7630..a0083f176a9c 100644
+index a0083f176a9c..09d6f97e910e 100644
 --- a/net/core/netdev_rx_queue.c
 +++ b/net/core/netdev_rx_queue.c
-@@ -139,10 +139,9 @@ int __net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+@@ -29,6 +29,10 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
+ 	    !qops->ndo_queue_mem_alloc || !qops->ndo_queue_start)
+ 		return -EOPNOTSUPP;
  
- 	rxq->mp_params = *p;
- 	ret = netdev_rx_queue_restart(dev, rxq_idx);
--	if (ret) {
--		rxq->mp_params.mp_ops = NULL;
--		rxq->mp_params.mp_priv = NULL;
--	}
-+	if (ret)
-+		memset(&rxq->mp_params, 0, sizeof(rxq->mp_params));
++	if (!(qops->supported_params & NDO_QUEUE_RX_BUF_SIZE) &&
++	    rxq->mp_params.rx_buf_len)
++		return -EOPNOTSUPP;
 +
- 	return ret;
- }
+ 	netdev_assert_locked(dev);
  
-@@ -179,8 +178,7 @@ void __net_mp_close_rxq(struct net_device *dev, unsigned int ifq_idx,
- 			 rxq->mp_params.mp_priv != old_p->mp_priv))
- 		return;
- 
--	rxq->mp_params.mp_ops = NULL;
--	rxq->mp_params.mp_priv = NULL;
-+	memset(&rxq->mp_params, 0, sizeof(rxq->mp_params));
- 	err = netdev_rx_queue_restart(dev, ifq_idx);
- 	WARN_ON(err && err != -ENETDOWN);
- }
+ 	new_mem = kvzalloc(qops->ndo_queue_mem_size, GFP_KERNEL);
 -- 
 2.52.0
 
