@@ -1,139 +1,99 @@
-Return-Path: <netdev+bounces-242274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DF14C8E418
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:29:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3149DC8E433
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:33:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 481163ACE48
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:29:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3B453AE1BC
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A81330322;
-	Thu, 27 Nov 2025 12:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48ECC32D0FE;
+	Thu, 27 Nov 2025 12:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="cyR5QCPr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dA0QO9u4"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B8832AADA;
-	Thu, 27 Nov 2025 12:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2071519B5A3;
+	Thu, 27 Nov 2025 12:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764246583; cv=none; b=ChYJOehuqrVP/B/Iz1PcDccvcPAecsHfwW4ajH8WbyehDxVo8lGcXA0yrjAdkqiKzRCJWma4ssE0dFkKsYs30JT+JPv4xgwp04uYQFgcF3eXNYGIzJNut0WkxoFOxh3z1JJheLdJTQEee73BzSB5CM+ZaQ4yi1akT6J2p5PXSKo=
+	t=1764246835; cv=none; b=Hb+4yrAfdv/AoMKEFE312vHOb207nrf/C5XC+JH2zqf6AWxbCBrBlRWylhgUQR9RuWhfd2xgysJNeWtRc3d4EInBZb6wzlD76yiaV+SF+4BYF+fEksuuJPgVrNYGpsctkd2agaTrZu0SQAKWoMPpJK+axaLGYSK3xZjh4v1BmcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764246583; c=relaxed/simple;
-	bh=hIpYSKfO4HFhoXiKbSUCF4+uYzXtrNa5Zd9QByI/HlY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K2e9ETUB9IMcikNg0fQNx/VnA6czb2wp6nickeaykTU+Qy5ejWflWxSxVCs/mlMCluGzNFWBj96eixISDKlNi8ZLh/rKyMYi+SGl6P2yTbRUBUBSkY88/myyUvyyLG7WICCK654+/UW0X/d57Rj6jfIB5jZLC9otZIMCY97tYI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=cyR5QCPr; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id 61B832126F76; Thu, 27 Nov 2025 04:29:36 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 61B832126F76
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1764246576;
-	bh=vux0D5GHamUSpvMt2OhA+/x0C3GHs6iaT+YVZ4z6yO0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cyR5QCPrYnWU/vEE4vKVZIXcqOxV6Pc5P3nQ56VXpaSbuu3FyKr8/6/NBDou5zMAt
-	 TyEW74s5Mjs8Xfrj5KC+OvK1AhlPJ2aEnOOc9zrJEaJWO+qEwMFxlgvDyiTVdv4NeQ
-	 Kz4/aeuROIC7qasPZ3l+2cn8pXSpOAtiNUYe0des=
-Date: Thu, 27 Nov 2025 04:29:36 -0800
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
-	kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dipayanroy@microsoft.com
-Subject: Re: [PATCH net-next, v4] net: mana: Implement ndo_tx_timeout and
- serialize queue resets per port.
-Message-ID: <20251127122936.GA10090@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20251123180818.GA18398@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <20251126200541.00e5270f@kernel.org>
+	s=arc-20240116; t=1764246835; c=relaxed/simple;
+	bh=9XpFaoSIL1kTn6eFjQgnB+mcw8pcb+2pZRRAZG57Zqk=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=adBf+98haXFLLKyFGh7qxhcVRaDZ/pIH+kH740MDKRSMldgA7RTLVTc7ZEXzG3vmpeNaT6G7MvSAmhze/eu9Yx97QvCOjYk5sVwAnNpVP4duct3HuKUV7kGwU+AaCxtIerrnbx3ZqGDyngIrmwYiMwJJQPkHpPpA4uu30NAGyIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dA0QO9u4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A902C4CEF8;
+	Thu, 27 Nov 2025 12:33:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764246834;
+	bh=9XpFaoSIL1kTn6eFjQgnB+mcw8pcb+2pZRRAZG57Zqk=;
+	h=Subject:From:To:Cc:Date:From;
+	b=dA0QO9u4WYmpZZcK+9psjV3OaBgajeD5sunxdM4w5czH8k7RsKONihD6RaB7Rrakb
+	 BwfbbJN0SSYWPmKPHFIG4VWpKR8VAI0Q3I+qPdU5FmF1HYUn7KBQA3hfWy0A6FOCbs
+	 8jjL/2VvhLoQRkj+BshLim/SHPWdfbOGpSATd0DSlDVhjvoRAtpaw3LPHpaIGoG+uM
+	 ZX8fnKWEChEjwxNr3UjxtKRwz+C+pEKDF4Pqc5w/pJFLnvF8jegnpCxAV4hi//EIwW
+	 lSpauYRDgTfMIDrQZKnFkX5CArDyR0kN6TZUW6OJvUd646M+cOrbZQkU9mTD46YUFx
+	 pAIkIjGy8QmCA==
+Subject: [PATCH nf-next RFC 0/3] netfilter: x_tables: statistic nth match
+ account GRO/GSO packets
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: netfilter-devel@vger.kernel.org, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Florian Westphal <fw@strlen.de>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
+ phil@nwl.cc, Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, kernel-team@cloudflare.com,
+ mfleming@cloudflare.com, matt@readmodwrite.com
+Date: Thu, 27 Nov 2025 13:33:49 +0100
+Message-ID: <176424680115.194326.6611149743733067162.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251126200541.00e5270f@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
+In production we have a service that does sampling of 1 in every 10000 nth
+packets. This is leveraging the iptables statistic module for reducing the
+samples send to userspace via NFLOG target.
 
-On Wed, Nov 26, 2025 at 08:05:41PM -0800, Jakub Kicinski wrote:
-> On Sun, 23 Nov 2025 10:08:18 -0800 Dipayaan Roy wrote:
-> > Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detected
-> > and a device-controlled port reset for all queues can be scheduled to a
-> > ordered workqueue. The reset for all queues on stall detection is
-> > recomended by hardware team.
-> > 
-> > The change introduces a single ordered workqueue
-> > "mana_per_port_queue_reset_wq" queuing one work_struct per port,
-> > using WQ_UNBOUND | WQ_MEM_RECLAIM so stalled queue reset work can
-> > run on any CPU and still make forward progress under memory
-> > pressure.
-> 
-> And we need to be able to reset the NIC queue under memory pressure
-> because.. ?  I could be wrong but I still find this unusual / defensive
-> programming, if you could point me at some existing drivers that'd help.
->
-I found these existing drivers using 'create_singlethread_workqueue',
+This part worked nicely until a mathematician noticed that we were under
+sampling GRO/GSO packets. This is an example of a Bernoulli trial. When wanted
+to sample one packet every nth packet. When a GRO packet contains e.g. just 2
+packets then we should have sampled that at 5000. At 10 packets this is
+1000. This caused enough under sampling of GRO/GSO to make statistics wrong in
+our backend systems consuming this.
 
-drivers/net/ethernet/mellanox/mlx4/en_main.c
-drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+The production workaround is simply send all packets larger than the MTU to
+userspace (via NFLOG). Then let the userspace sampler daemon pick 1 in 10000 nth
+packets to be logged to the backend. Needless to say, this solution doesn't
+scale. In production if enough CPUs participate this results in lock contention,
+and in general this is limiting through to 20Gbit/s out of 25Gbit/s.
 
-'create_singlethread_workqueue' in turn uses  WQ_MEM_RECLAIM
+This patchset avoids having to send all GRO/GSO packet to userspace, by letting
+the statistics nth mode account for the number of GRO/GSO fragments.
 
-as in below macros 
-#define alloc_ordered_workqueue(fmt, flags, args...) \
-	alloc_workqueue(fmt, WQ_UNBOUND | __WQ_ORDERED | (flags), 1,
-##args)
+---
 
-...
-#define create_singlethread_workqueue(name) \
-	alloc_ordered_workqueue("%s", __WQ_LEGACY | WQ_MEM_RECLAIM,
-name)
+Jesper Dangaard Brouer (3):
+      xt_statistic: taking GRO/GSO into account for nth-match
+      xt_statistic: do nth-mode accounting per CPU
+      xt_statistic: DEBUG patch
 
-I will switch to directly using create_singlethread_workqueue instead
-of explicitly mentioning the flags in the next version. 
 
- 
-> > @@ -3287,6 +3341,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
-> >  	ndev->min_mtu = ETH_MIN_MTU;
-> >  	ndev->needed_headroom = MANA_HEADROOM;
-> >  	ndev->dev_port = port_idx;
-> > +	ndev->watchdog_timeo = 15 * HZ;
-> 
-> 5 sec is typical, off the top of my head
-> 
-As per our internal discussion, 15 second timeout recommended by HW team based on the FPGA reconfig
-scenario.
-> > @@ -3647,6 +3717,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
-> >  		free_netdev(ndev);
-> >  	}
-> >  
-> > +	if (ac->per_port_queue_reset_wq) {
-> > +		destroy_workqueue(ac->per_port_queue_reset_wq);
-> > +		ac->per_port_queue_reset_wq = NULL;
-> > +	}
-> 
-> I think you're missing this cleanup in the failure path of mana_probe
-Right, if all the ports fail to probe the clean up will get skipped from
-mana_remove. I will fix this in the v5.
-> -- 
-> pw-bot: cr
+ include/uapi/linux/netfilter/xt_statistic.h |  1 +
+ net/netfilter/xt_statistic.c                | 94 +++++++++++++++++++--
+ 2 files changed, 89 insertions(+), 6 deletions(-)
 
-Thank you for the comments, I will work on it in v5.
+--
 
-Regards
 
